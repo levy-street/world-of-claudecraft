@@ -342,6 +342,33 @@ export const tr_TR: EnTranslations = {
       "healerConfirmAccept": "Beni Canlandır",
       "healerConfirmCancel": "İptal etmek"
     },
+    "unstuck": {
+      "menuButton": "Kurtulma",
+      "help": "Kurtarma: /unstuck, seni yakındaki ulaşılabilir güvenli bir noktaya taşıyacak hareketsiz bir geri sayım başlatır.",
+      "helpAtGraveyard": "Kurtarma: /unstuck hareketsiz bir geri sayım başlatır, ardından ruhunu en yakın mezarlığa gönderir. Solgun Gözcü aracılığıyla dönmek Gözcünün Bedelini gerektirir.",
+      "started": "Kurtulma {seconds} saniye içinde. Hareket etmek, savaşmak, hasar almak veya başka bir eylem başlatmak bunu iptal eder.",
+      "countdown": "Kurtulma: {seconds}",
+      "completed": "En yakın ulaşılabilir güvenli noktaya taşındın.",
+      "completedAtGraveyard": "Ruhun en yakın mezarlığa döndü. Gözcünün Bedelini kabul etmek için Solgun Gözcü ile konuş.",
+      "revivedAtGraveyard": "En yakın mezarlığa döndürüldün ve diriltildin. Gözcünün Bedeli üzerinde ağırlık yapıyor.",
+      "cancelledMoved": "Hareket ettiğin için Kurtulma iptal edildi.",
+      "cancelledDamaged": "Hasar aldığın için Kurtulma iptal edildi.",
+      "cancelledCombat": "Savaşa girdiğin için Kurtulma iptal edildi.",
+      "cancelledBusy": "Başka bir eylem başlattığın için Kurtulma iptal edildi.",
+      "cancelledState": "Durumun değiştiği için Kurtulma iptal edildi.",
+      "cancelledDisconnected": "Bağlantın kesildiği için Kurtulma iptal edildi.",
+      "noSafePosition": "Yakınlarda ulaşılabilir güvenli bir nokta bulunamadı. Taşınmadın.",
+      "alreadyActive": "Kurtulma zaten geri sayıyor.",
+      "alreadySafe": "Zaten güvenli ve ulaşılabilir bir konumdasın.",
+      "cooldown": "Kurtulma {seconds} saniye içinde hazır olacak.",
+      "dead": "Ölüyken veya ruh formundayken Kurtulmayı kullanamazsın.",
+      "combat": "Savaş sırasında Kurtulmayı kullanamazsın.",
+      "controlled": "Hareketin kısıtlıyken Kurtulmayı kullanamazsın.",
+      "standStill": "Kurtulmayı kullanmadan önce sağlam zeminde hareketsiz dur.",
+      "standStillAnywhere": "Kurtulmayı kullanmadan önce hareketsiz dur.",
+      "busy": "Kurtulmayı kullanmadan önce mevcut eylemini bitir.",
+      "unavailable": "Kurtulma mevcut durumunda kullanılamaz."
+    },
     "fct": {
       "absorbed": "{amount} soğuruldu",
       "cheap": "Daha ucuz!"
@@ -781,6 +808,7 @@ export const tr_TR: EnTranslations = {
       "leaderboard": "Sıralama",
       "dailyRewards": "Mağaza",
       "deeds": "Yiğitlikler",
+      "mounts": "Binekler",
       "professions": "Meslekler",
       "nameplates": "İsimler",
       "haptics": "Dokunsal Geri Bildirim",
@@ -881,10 +909,15 @@ export const tr_TR: EnTranslations = {
       "autoShowHint": "Satırlar, partindeki oyuncular hasar vermeye veya iyileştirmeye başladığında otomatik görünür; bu bölüm ise savaş bittikten birkaç saniye sonra kapanır.",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
-      "breakdownOther": "Other ({count})",
+      "breakdownOther": "Diğer ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Melee"
+      "melee": "Yakın dövüş",
+      "move": "Bu ölçeri taşımak için sürükleyin",
+      "resize": "Bu ölçeri yeniden boyutlandırmak için sürükleyin",
+      "dock": "Bu ölçeri ölçerler penceresine geri yerleştirin",
+      "separate": "Ayır: {meter}",
+      "regroup": "Yeniden grupla: {meter}"
     },
     "petFeed": {
       "disabledFullHp": "Evcil hayvanın canı dolu",
@@ -902,7 +935,59 @@ export const tr_TR: EnTranslations = {
       "petStop": "Yoldaş: Dur",
       "petTaunt": "Yoldaş: Kışkırt",
       "petDefensive": "Yoldaş: Savunmacı",
-      "petAggressive": "Yoldaş: Saldırgan"
+      "petAggressive": "Yoldaş: Saldırgan",
+      "mount": "Bin / İn"
+    },
+    "mounts": {
+      "title": "Binekler",
+      "close": "Kapat",
+      "select": "Seç",
+      "selected": "Seçildi",
+      "riding": "Binicilik",
+      "mount": "Bin",
+      "dismount": "İn",
+      "useToRide": "Bu bineği çağırmak için kullan.",
+      "emptyTitle": "Toplanmış binek yok",
+      "emptyStableHint": "20. seviyeye ulaş ve Highwatch'ın batısındaki Highwatch Ahırları'nda Ahır Ustası Marla'dan binicilik dersleri al.",
+      "emptyDropHint": "Daha nadir binekler, kahramanca zindan patronlarından ve Yarık tamamlamalarından düşer.",
+      "clickManage": "Bineğini seçmek için tıkla",
+      "rarity_common": "Sıradan",
+      "rarity_rare": "Nadir",
+      "rarity_epic": "Epik",
+      "spec_speed": "+%{pct} ekstra hareket kabiliyeti",
+      "name_valorsteed": "Yiğit Küheylan",
+      "name_grag_bear": "Golyat Grag-Ayı",
+      "name_stalkglider_snail": "Yosun Kabuklu Süzülgen",
+      "name_aether_hover_cycle": "Aether Turnuva Motosikleti",
+      "name_shadowjump_toad": "Gölge Sıçrayan Kurbağa Kama-Kage",
+      "name_stormfeather_griffin": "Gökyüzü Erişimli Fırtınatüy",
+      "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
+      "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
+      "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
+      "desc_stalkglider_snail": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.",
+      "desc_aether_hover_cycle": "Savaşta hızlı, alçaktan süzülerek hareket etmek için tasarlanmış güçlü bir büyü-teknoloji motosikleti.",
+      "desc_shadowjump_toad": "Her arazi türünü aşan, şimşek hızındaki gölgeli sıçramalarla eğitilmiş, dev ve sağlam adımlı bir kurbağa.",
+      "desc_stormfeather_griffin": "Rün nallı pençeleriyle yerde süzülen, kanatları katlı, asil bir fırtına grifonu.",
+      "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi."
+    },
+    "mountTraining": {
+      "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
+      "ownedMountPrompt": "Dizginlerin çantalarında. Binmek için onları kullan.",
+      "ridePrompt": "Parlayan işareti başlangıç çizgisine kadar takip et, sonra Yarışı Başlat'a bas.",
+      "begin": "Derse Başla",
+      "success": "Yiğit Küheylanı evcilleştirdin.",
+      "returnToMarla": "Yiğit Küheylan dizginlerini 10 altına satın almak için ahırdaki Marla'ya dön."
+    },
+    "mountRace": {
+      "startButton": "Yarışı Başlat",
+      "cancelButton": "Yarışı İptal Et",
+      "go": "BAŞLA!",
+      "start": "Başla! Her atlayışı geç, sonra kemerden geri dön.",
+      "toFinish": "Kemerden geri dön!",
+      "finished": "{seconds} saniyede tamamlandı!",
+      "timeout": "Yarış Başarısız",
+      "progress": "Kapılar {n}/{total}",
+      "timeLeft": "{seconds}sn"
     },
     "vcup": {
       "title": "Vadi Kupası",
@@ -1434,6 +1519,10 @@ export const tr_TR: EnTranslations = {
       "twoFactorRecoveryTitle": "Kurtarma kodlarınızı kaydedin",
       "twoFactorRecoveryHint": "Her kod bir kez çalışır. Onları güvenli bir yerde saklayın: kimlik doğrulama uygulamanızı kaybederseniz geri dönmenin tek yolu onlardır.",
       "twoFactorDownloadCodes": "Kodları İndir",
+      "recoveryCodesFileHeader": "{brand} kurtarma kodları",
+      "recoveryCodesFileAccount": "Hesap: {username}",
+      "recoveryCodesFileHint": "Kimlik doğrulama uygulamanıza erişimi kaybederseniz her kod bir kez kullanılabilir.",
+      "recoveryCodesFileWarn": "Bu dosyayı güvenli ve özel bir yerde saklayın.",
       "twoFactorDone": "Bitti",
       "twoFactorDisableHint": "İki adımlı doğrulamayı kapatmak için parolanızı girin. Kurtarma kodlarınız geçersiz kılınacak.",
       "twoFactorDisableBtn": "İki Adımlı Doğrulamayı Kapat",
@@ -1568,6 +1657,7 @@ export const tr_TR: EnTranslations = {
       "filterConsumable": "Sarf Malzemeleri",
       "filterMaterial": "Malzemeler",
       "filterQuest": "Görev",
+      "filterMount": "Binekler",
       "sortAria": "Çanta ögelerini sırala",
       "sortRecent": "En son",
       "sortQuality": "Kalite",
@@ -1785,6 +1875,9 @@ export const tr_TR: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Gereken Seviye {level}",
+      "riftTier": "{tier} dereceli Yarık eşyası",
+      "riftUpgrade": "Yarık yükseltmesi {level}/{max}",
+      "riftSockets": "Yarık mücevherleri {used}/{total}",
       "statEnchanted": "+{value} {stat} (Büyülü)",
       "enchantedFallback": "Büyülü"
     },
@@ -2722,6 +2815,14 @@ export const tr_TR: EnTranslations = {
       "lbEmpty": "Henüz sıralamaya girmiş vakanüvis yok.",
       "broadcastsLabel": "Kazanılan yiğitlikleri lonca ve arkadaşlarınla paylaş",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "Dünya Haritası",
+      "summary": "Dünya haritası. Haritasını açmak için bir bölge seç.",
+      "toWorld": "Dünya haritası",
+      "toZone": "Bölge haritası",
+      "toggleAria": "Dünya haritası ile bölge haritası arasında geçiş yap",
+      "levels": "Seviye {min} ile {max} arası"
     }
   },
   "gatherEvent": {
@@ -2950,7 +3051,17 @@ export const tr_TR: EnTranslations = {
         "marshName": "Mirefen Bataklığı",
         "marshBlurb": "Batık bataklıklar ve dalgaların aşındırdığı harabeler; Mudfinlerin ve daha beterlerinin yurdu.",
         "peaksName": "Dikenzirve Tepeleri",
-        "peaksBlurb": "Rüzgârın kavurduğu, diyarın en soğuk tehlikelerine doğru yükselen sırtlar."
+        "peaksBlurb": "Rüzgârın kavurduğu, diyarın en soğuk tehlikelerine doğru yükselen sırtlar.",
+        "duskName": "Örtülü Vadi",
+        "duskBlurb": "İçeri giden bir yol olduğuna dair fısıltılar doğruysa, dağların altında mühürlenmiş bir diyar.",
+        "emberName": "Ejder Toprakları",
+        "emberBlurb": "Solgun Geçit'in ötesinde yeşillik küle bırakır yerini ve çorak topraklara kadim bir şey hükmeder.",
+        "frostName": "Kırağı Diyarı",
+        "frostBlurb": "Her haritanın ötesinde, yalnızca dans eden ışıklarda görülebilen karla kaplı bir yükseklik.",
+        "amberName": "Kehribar Vadisi",
+        "amberBlurb": "Batı uçurumlarının ardında hiç bitmeyen bir sonbahar ve altın rengi bir gölün üzerinde fenerler var.",
+        "fenName": "Söğüt Bataklığı",
+        "fenBlurb": "Sonbahar tacının ötesinde, söğütlerle ve durgun suyla dolu aydınlık bir bataklık ve bir hendeğin ardında bir kasaba var."
       },
       "group": {
         "heading": "Zorlu kısımlar için grup kur",
@@ -3419,6 +3530,18 @@ export const tr_TR: EnTranslations = {
       "reptile": {
         "name": "Sürüngenler",
         "desc": "Kendi özgün tıslaması ve ısırışıyla soğukkanlı avcılar; sıcakkanlı yaratıklardan tamamen farklı bir türdür."
+      },
+      "murloc": {
+        "name": "Vırakyüzgeçler",
+        "desc": "Göl kıyısının ve gelgit havuzlarının vraklayan balık halkı, fazla yaklaşan her şeyin üzerine çabucak üşüşür."
+      },
+      "kobold": {
+        "name": "Yaramazlar",
+        "desc": "Çayırların ve çitlerin telaşlı leş yiyicileri ve cinleri, sayıca çoğalana kadar tehlikeden çok baş belasıdırlar."
+      },
+      "demon": {
+        "name": "İblisler",
+        "desc": "Yarıkların ötesinden gelen istilacılar, tepeden tırnağa ateş ve kin doludurlar. Biri nerede durursa, bir gedik asla uzak değildir."
       }
     },
     "worldPage": {
@@ -3432,15 +3555,55 @@ export const tr_TR: EnTranslations = {
       "valeBlurb": "Yeni kahramanların Eastbrook kasabası çevresinde kurtlar ve haydutlarla dişlerini biledikleri yemyeşil başlangıç vadisi.",
       "marshBlurb": "Sis ve harabelerle dolu, suya gömülmüş bir ülke. Mudfinler sığlıkları sarar ve suyun altında daha eski bir şey kıpırdanır, köprü-kasabası Fenbridge'den izlenir.",
       "peaksBlurb": "Rüzgarın aşındırdığı sırtlar ve eski maden ocakları, diyarın en soğuk, en yüksek tehlikelerine doğru tırmanır; ileri karakol Highwatch tarafından tutulur.",
+      "duskBlurb": "Eldergleam'ın büyük ağacının altında kalıcı bir alacakaranlığın hüküm sürdüğü, kristal kalıntıların parıldadığı ve havanın eski bir büyüyle uğuldadığı bir vadi.",
+      "emberBlurb": "Ejderlerin kaldera üzerinde daireler çizdiği ve trol ateşlerinin kumullar arasında yandığı, kapı kasabası Wyrmwatch'tan gözlenen, fırtınayla aydınlanan kül ve kan camı çorak toprakları.",
+      "frostBlurb": "Kutup ışığının altında kar ve karanlık çamların sessizliği, soğuğun kendisinin uyanık hissettiği ve Icemantle'ın ateşlerini yanık tuttuğu bir yer.",
+      "amberBlurb": "Hiç dökülmeyen altın ve kızıl yapraklardan oluşan sonsuz bir sonbahar, fenerlerle aydınlatılan Lanternmere kasabasının çevresinde toplanmış.",
+      "fenBlurb": "Zambaklarla ve yavaş akan suyla dolu, aydınlık ve uğuldayan bir sulak alan, köprü kasabası Bridgemere'den uzanan eski tahta yollarla geçilir.",
+      "nightBlurb": "Çiçeklerin patikaları aydınlattığı ve Moonrest'in düş gören bir gökyüzü altında sessiz bir nöbet tuttuğu, yıldızlı gece yarısı diyarı.",
+      "hauntBlurb": "Devasa ağaç tepelerinin altındaki lanetli bir orman, yolda tek dürüst ışığın Gallowmere'in fenerleri olduğu.",
+      "galeBlurb": "Rüzgarın hiç dinmediği, Eski Fener'in hiç sönmediği ve Wickharbor'un kapılarını sıkıca kapattığı deniz kayalıkları ve uluyan bozkırlar.",
+      "jungleBlurb": "Palmiyelerden, beyaz kumdan ve gürültücü kuşlardan oluşan tropikal bir sarmaşık, sahil kasabası Drifthaven'ın kıyıda bir ateş yaktığı.",
+      "gardenBlurb": "Kimsenin görmediği bir bahçıvan tarafından hala budanmaya devam eden, Hedgewick ve onun çeşme avlularının ötesinden girilen bir çit labirenti bahçe diyarı.",
       "valeGreeting": "Kılıcını yakın tut. Vadi eski Vadi değil.",
       "valeGreeter": "Mareşal Redbrook, Eastbrook",
       "marshGreeting": "Kapıda durun. Şu sazların ötesinde, öldürme işini bizim yerimize bataklık görür.",
       "marshGreeter": "Muhafız Fenwick, Fenbridge",
       "peaksGreeting": "İki yüz yıldır bu sur dayandı. Benim nöbetimde yıkılmayacak, ama inliyor.",
       "peaksGreeter": "Yüzbaşı Thessaly, Highwatch",
+      "duskGreeting": "Senin türünden pek azı bu dalların altında durmuştur. Nazikçe yürü ve hoş geldin.",
+      "duskGreeter": "Bekçi Saelwyn, Eldergleam",
+      "emberGreeting": "Çorak topraklardan sıcak bir rüzgar, Ejder Ağzı Kalderası üzerinde ejderler ve kumullarda trol ateşleri. Oraya gitmeden önce bir şeyler iç.",
+      "emberGreeter": "Kapı muhafızı, Wyrmwatch",
+      "frostGreeting": "Duvarın ötesinde kar her sesi yutar. Işıklar dans etmeye başlarsa, sesini alçalt ve ateşini yanık tut.",
+      "frostGreeter": "Ocak bekçisi, Icemantle",
+      "amberGreeting": "Buradaki her yaprak altın ve kızıl renkte yanar, ama hiçbiri asla dökülmez. Fenerler senin için yakıldı; yukarı çıkarken Altın Eriyiş'e dikkat et.",
+      "amberGreeter": "Fener ustası, Lanternmere",
+      "fenGreeting": "Bataklık yusufçuklar ve arılarla uğuldar. Köprüden geç, biraz ayaklarını dinlendir ve göletlerin ötesinde tahta yollardan ayrılma.",
+      "fenGreeter": "Köprü bekçisi, Bridgemere",
+      "nightGreeting": "Gece Kapısı'nın ardında havanın kendisi rüya görür. Çiçek ışığını takip et ve gökyüzünde asılı duran uykudaki dünyaya dikkat et.",
+      "nightGreeter": "Nöbet bekçisi, Moonrest",
+      "hauntGreeting": "Fenerlerin yanından ayrılma, gezgin. Ve eğer orman yolun dışından adını seslenirse, cevap verme.",
+      "hauntGreeter": "Fener yakıcısı, Gallowmere",
+      "galeGreeting": "Rüzgar burada bir kez bile durmadı ve Eski Fener bir kez bile sönmedi. Han kapısını arkandan kapat.",
+      "galeGreeter": "Fener bekçisi, Wickharbor",
+      "jungleGreeting": "Sıcak kum, gürültücü kuşlar ve ufku yutan bir orman. Sahilde bir ateş yakılı tutuyoruz; ona geri dönmeye çalış.",
+      "jungleGreeter": "Liman amiri, Drifthaven",
+      "gardenGreeting": "Yüz yıldır kimse bir bahçıvan görmemiş olsa da biri çitleri budamaya devam ediyor. Labirente dikkat et: o da seni izliyor.",
+      "gardenGreeter": "Kapı bekçisi, Hedgewick",
       "valePlaceNotes": "Doğudere ilk ana üssünüzdür. Kurt Koşusu ve Yaban Domuzu Çayırı yumuşak av sahalarıdır; Ayna Gölü balık tutulacak güzel sulardır, gerçi sığlıklarında çamuryüzgeçler kaynar; Sableweb ve Bakır Kazısı örümcekleri ve cevhere aç kazıcıları saklar; bir Haydut Kampı ve Yıkık Şapel daha çetin işler barındırır; Emanetlik Tepesi, diyarın ilk mağara seferi olan Çökmüş Emanetlik'e iner; Parlakorman Açıklığı kuzeydeki sakin, güneşli bir korudur; ve Domuz Tarlası, Doğudere'nin surla çevrili domuztopu sahasıdır, orada Vadi Kupası bir hasat ateşkesi altında oynanır.",
       "marshPlaceNotes": "Fenbridge tek kuru yolu korur. Avcı Sazlıkları ve Derinbataklık Sığlıkları bataklık hayvanları ve Mudfinlerle kaynar; Dul Örümcek Çalılığı sımsıkı ağlarla örülüdür; Boğulmuş Şapel ve Trol Höyükleri daha eski tehlikeleri barındırır; bataklığın kendi mağara seferi olan Boğulmuş Litanya ise höyüklerin hemen kuzeyinde açılır; Mezar Çağıran Kampı tarikatın siper kazdığı yerdir ve Batık Kale bataklığın örneklenmiş kalbidir.",
       "peaksPlaceNotes": "Highwatch suru tutar. Sinsi Sırt ve Deeprock Oyukları sırt kedilerinin ve oyucularındır; Dev Etekleri ve Drogmar Savaş Kampı kiralık zorbalarındır; Fırtınakaya elementallerle çıtırdar ve altında Işıltıgöl ışıldar, kıyısı Boğulmuş Tapınak'a inen solgun ışıktan geçidi barındıran dağ gölü; Solucankült Çadırları ve Hortlak Tarlaları tarikatın yüksek mevzisini kuşatır, zirvesinde Mezarejderi Mabedi yer alır.",
+      "duskPlaceNotes": "Eldergleam, büyük ağacın altında toplanır. Alacakaranlık Mağarası ve seyir tepesi içeri giden yol ve vadinin ilk görünüşüdür; Kadim Koru ve Yıldız Düşümü Çukuru sessiz güneyi korur; Batık Avlu doğuda yabani otlarla kaplı kalıntıları barındırır; Parıldayan Derinlik ve Kristal Sığlıklar ise kuzeyde parıldar.",
+      "emberPlaceNotes": "Wyrmwatch kapıyı tutar. Kapı Ormanı, çorak topraklardan önceki son yeşilliktir; Kül Kumulları kül ve daha kötüsüyle sürüklenir; Trol Meclisi, kum trollerinin ateşlerini topladığı yerdir; Kan Camı Tarlaları jilet gibi keskin parçalarla parıldar; ve Ejder Ağzı Kalderası ejderlerin etrafında döndüğü tüten taçtır.",
+      "frostPlaceNotes": "Icemantle son sıcak ocağı korur. Kar Sınırı, kar yığınlarının hakimiyeti ele geçirdiği yeri gösterir; Buzul Gölü, buzun altında kara ve durgun bir sudur; Kutup Işığı Basamakları dans eden ışıkların altında yükselir; Titrek Bataklık asla tam olarak uyumayan donmuş bir bataklıktır; ve Uluyan Taraçalar her gece adını hak eder.",
+      "amberPlaceNotes": "Lanternmere, hasadın tam kalbinde parıldar. Altın Eriyiş, kehribar gibi kaygan bir geçittir; Yaldızlı Bahçe ve Hasat Vadisi en tatlı ürünleri ve en cüretkar hırsızları barındırır; Büyük Göl yanan yaprakları yansıtır; Kül Akçaağaç Tepesi en yüksekte durur ve en kızıl renktedir; ve Eğik Dikilitaş sonbahardan daha eski bir şeyi hatırlar.",
+      "fenPlaceNotes": "Bridgemere, yavaş akan suyun üzerine kurulmuştur. Kehribar Basamakları hasat ülkesinden aşağı iner; Zambak Bozkırları ve Parıldayan Bataklık Gölcükleri ışık cinleri ve yusufçuklarla parıldar; Willowweep dallarını göle uzatır; ve Uykulu Düzlükler bu topraklarda bulunabilecek en sakin yerdir.",
+      "nightPlaceNotes": "Moonrest nöbeti tutar. Gece Kapısı gece yarısı ülkesine giden yoldur; Ay Kuyusu yanında durabileceğin yıldız ışığını barındırır; Gloamfield karanlıkta çiçek açar; Ebedi Nöbet hiç kımıldamadan gözetler; ve Uykusuz Höyük burada asla rüya görmeyen tek yerdir.",
+      "hauntPlaceNotes": "Gallowmere kendi fenerlerinin içine sinmiştir. Karga Kapısı, ormanın kasvetli ön kapısıdır; Dul Çalılığı ağlarla sıkıca örülüdür; Asılı Çayırlık ve Yas Taşı Şapeli ormanın en eski kederlerini barındırır; ve Avcının Açıklığı hala orada avlanan her neyse ona aittir.",
+      "galePlaceNotes": "Wickharbor rüzgara doğru eğilir. Rüzgar Yolu içeri giden kayalık yoldur; Uluyan Bozkırlar fırtına altında ağaçsızca uzanır; Eski Fener herkesin hatırlayabildiği kadar uzun süredir yanmaktadır; Uçurum suya dik iner; Enkaz Tarlaları kıyıyı dürüst tutar; ve Ayna Gölü tüm diyardaki tek durgun şeydir.",
+      "junglePlaceNotes": "Drifthaven ateşini sahilde tutar. Sarmaşık Ağzı, nehrin yeşil duvarla buluştuğu yerdir; Palmiye Plajı dalgalar boyunca beyaz ve sıcak uzanır; Zümrüt Sarmaşık ve Sarmaşık Şelalesi iç kısmı yutar; Safir Lagünü berrak ve derin parıldar; ve Batık İdol suyun altından gözetler.",
+      "gardenPlaceNotes": "Hedgewick, Bahçe Kapısı'nda bekler. Çiçek Terası Yolu kırpılmış renklerle çiçek açar; Şafak Kalesi yeni duvarların ardında şövalyelerini eğitir; Yaprak Gölcüğü yıl boyunca pembe tonlarda süzülür; Eski Değirmen kendi halka tarhlarını çevirir; Büyük Labirent her konuk için düzenini değiştirir, kemerlerini yapraklı tilkiler gözetler; Kuzey Karakolu çıkış yolunu korur; Zambak Çukuru bunların hepsinin ötesinde dinlenir; ve Çeşme Avlusu hala bahçenin kalbinde berrak akar.",
       "gladeTitle": "Sakin bir köşe: Parlakorman Açıklığı",
       "gladeBody": "Vale'deki her hikaye ölülerle ilgili değildir. Kuzeyde, Brightwood Glade adlı güneşli bir koru, dalların altındaki sessiz patikaları ve benek benek ışığıyla kendi daha yumuşak ritmini korur. Takip ettiğiniz izin yumuşak bir karşı sesidir ve yol başıboş dolaşmanıza imkan verdiğinde görmeye değer.",
       "worldBossTitle": "Zirve uyandığında: dünya şefi",
@@ -3514,6 +3677,7 @@ export const tr_TR: EnTranslations = {
       "bastionBody": "Bataklığa kapılmış sular altındaki bir kale; boğulmuş savunucuların ve yükselen suyun kendisinin elinde tutuluyor.",
       "templeBody": "Zirvelerin yükseklerinde, ışıldayan bir göletin altına gömülmüş, soğuk ışıktan bir geçitle ulaşılan ay ışığıyla aydınlanmış bir tapınak. Boğulmuş bir tarikat çürümüş cüppeleriyle hâlâ orada aşağıda şarkı söylüyor ve kıyıya kazınmış uyarılar, aşağıdaki bir şeyin yalnızca uyuduğunu söylüyor. Meraklılar ve iyi hazırlananlar için, ana hikâyeden ayrı duran, kendi içinde bir gizem.",
       "sanctumBody": "Tarikatın uzun emeğinin korkunç doruğuna ulaştığı, Dikenzirve'nin karanlık kalbi.",
+      "wildheartBody": "İki yükseltilmiş av patikasının yeşim rengi bir cenoteyi çevrelediği, yağmurla ıslanmış bir orman kalderası. Canavar inlerini ve ata kalıntılarını geç, ardından Zulgar ile yüzleşmek için ritüel piramidine tırman.",
       "raidName": "Son oyun akını",
       "raidBody": "Mühürlü bir kraliyet kapısının ardında on oyunculu bir sınav bekler: çok aşamalı bir savaş ve tüm akının birlikte durdurması gereken, ölümsüz bir güç. İçeri girme hakkını kazanın, sonra dokuz arkadaşınızı getirin.",
       "heroicTitle": "Kahramanca mod",
@@ -5062,6 +5226,57 @@ export const tr_TR: EnTranslations = {
     "chat": "Sohbeti Aç"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "Şu anda tüm Yarıklar kararsız. Yakında tekrar dene.",
+      "enterFloor": "Yarıktan geçip {name} içine giriyorsun.",
+      "descendFloor": "{name} içinde daha derine iniyorsun.",
+      "stepBack": "Yarıktan geriye adım atıyorsun.",
+      "pylonLit": "Bir rün sütunu hayat buluyor ({lit}/{total}).",
+      "wayDownOpens": "Aşağıya giden yol açılıyor.",
+      "exitOpens": "Yarık titriyor. Düşenlerin ardında eve giden bir yol açılıyor.",
+      "portalOpens": "{zone} bölgesinde {tier} dereceli bir Yarık açılıyor!",
+      "portalSealed": "{zone} bölgesindeki {tier} dereceli Yarık mühürlendi.",
+      "portalCollapses": "{zone} bölgesindeki {tier} dereceli Yarık çöküyor.",
+      "levelGate": "Bu Yarığa yalnızca {level} seviyesinde veya üzerindeki maceracılar girebilir.",
+      "deadEntry": "Ölüyken bir Yarığa giremezsin.",
+      "deadEntryCombat": "Grubun hala savaşta. Ölüler, dövüş bittiğinde tekrar girebilir.",
+      "iceGoalLit": "Kırağı sembolü parlıyor. Yol harekete geçiyor.",
+      "socketsShut": "Yuvalar gıcırdayarak kapanıyor. Yol harekete geçiyor.",
+      "seqProgress": "Rünler sırayla yanıt veriyor ({step}/{total}).",
+      "seqReset": "Rünler karanlığa gömülüyor. Yeniden başla.",
+      "gateOpen": "Kapı gıcırdayarak açılıyor.",
+      "orbSealed": "Küre, aşağıdaki ritüel tarafından mühürlenmiş.",
+      "orbWakes": "Pentagramın alevi sönüyor. Sunağın üzerinde bir şey uyanıyor.",
+      "orbOpensGate": "Kan Küresi parlıyor. Tapınağın kapıları gıcırdayarak açılıyor.",
+      "alreadyCleared": "Bu Yarık zaten {names} tarafından temizlendi.",
+      "raceLost": "Yarık zaten {names} tarafından temizlendi. Koşun sona eriyor.",
+      "raceWorldWin": "{names}, {tier} dereceli Yarık yarışını {seconds} saniyede kazandı!",
+      "raceWinBanner": "Yarık Yarışı Kazanıldı - {seconds}sn",
+      "raceLostBanner": "Yarık Zaten Temizlendi",
+      "forgeUpgraded": "{name} için Yarık yükseltmesi tamamlandı.",
+      "forgeEnchanted": "{name} için Yarık büyüsü tamamlandı.",
+      "forgeSocketed": "{name} için Yarık mücevheri yuvalandı.",
+      "detonateGlacialGrave": "Buzul Mezarı patlıyor!",
+      "detonateAbsoluteZero": "Mutlak Sıfır patlıyor!",
+      "detonateMagmaWell": "Magma Kuyusu patlıyor!",
+      "detonateCoreMeltdown": "Çekirdek Erimesi patlıyor!",
+      "detonateVenomPool": "Zehir Gölü patlıyor!",
+      "detonateBroodmothersMark": "Yuva Anasının Damgası patlıyor!",
+      "detonateSoulGrave": "Ruh Mezarı patlıyor!",
+      "detonateDeathSentence": "Ölüm Fermanı düşüyor!",
+      "detonateEarthshatter": "Yer Yarılması patlıyor!",
+      "detonateFinalJudgment": "Son Yargı iniyor!",
+      "detonateVoidRift": "Hiçlik Yarığı patlıyor!",
+      "detonateArcaneAnnihilation": "Aether Yıkımı patlıyor!",
+      "detonateLightningRod": "Yıldırım Çubuğu çarpıyor!",
+      "detonateStormcallersWrath": "Fırtına Çağırıcısının Gazabı patlıyor!",
+      "detonateAbyssalMaw": "Uçurum Ağzı kapanıyor!",
+      "detonateCrushingDepth": "Ezici Derinlik eziyor!",
+      "detonatePactSeal": "Antlaşma Mührü patlıyor!",
+      "detonateBloodRite": "Kan Ayini düşüyor!",
+      "detonatePitSentence": "Çukur Fermanı patlıyor!",
+      "detonateHellfireBrand": "Cehennem Ateşi Damgası patlıyor!"
+    },
     "delve": {
       "cannotEnterNow": "Şu anda bir delveye giremezsin.",
       "leaveDungeonFirst": "Önce zindandan ayrıl.",
@@ -5916,6 +6131,8 @@ export const tr_TR: EnTranslations = {
       "secondsRemaining": "{seconds} saniye kaldı",
       "enteringZone": "{zone} bölgesine giriliyor.",
       "welcomeZone": "{zone} bölgesine hoş geldin!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Seviye {level}!",
       "levelLog": "{level}. seviyeye ulaştın!",
       "xpGain": "{amount} deneyim kazandın.",
@@ -6168,6 +6385,8 @@ export const tr_TR: EnTranslations = {
       "floatingDodge": "Savuşturma",
       "floatingParry": "Karşılama",
       "floatingResist": "Direnildi",
+      "floatingHealFull": "Dolu",
+      "floatingHealAbsorbed": "Emildi",
       "cannotMove": "Hareket edemezsin!",
       "attack": "saldırı",
       "damageDone": "{ability} yeteneğin {target} hedefine {amount} hasar vurdu.",
@@ -6182,6 +6401,10 @@ export const tr_TR: EnTranslations = {
       "healSelfCrit": "{ability} yeteneğin seni kritik {amount} iyileştirdi.",
       "healOther": "{ability} yeteneğin {target} hedefini {amount} iyileştirdi.",
       "healOtherCrit": "{ability} yeteneğin {target} hedefini kritik {amount} iyileştirdi.",
+      "healSelfFull": "{ability} yeteneğin isabet etti, ama sağlığın zaten tam.",
+      "healOtherFull": "{ability} yeteneğin {target} hedefine isabet etti, ama hedefin sağlığı zaten tam.",
+      "healSelfAbsorbed": "{ability} yeteneğin, üzerindeki vebalı lekeler tarafından yutuldu.",
+      "healOtherAbsorbed": "{ability} yeteneğin, {target} üzerindeki vebalı lekeler tarafından yutuldu.",
       "death": "{name} öldü.",
       "auraGain": "{name} kazandın.",
       "auraFade": "{name} üzerinden kayboluyor.",
@@ -6540,7 +6763,23 @@ export const tr_TR: EnTranslations = {
       "fishing": "Balık Tutma",
       "gathering": "Toplama",
       "demonHeal": "Şeytan İyileştirmesi",
-      "thunzharrStormcall": "Fırtına Çağrısı"
+      "thunzharrStormcall": "Fırtına Çağrısı",
+      "rift_frost_execution": "Buzul Mezarı",
+      "rift_frost_strike": "Mutlak Sıfır",
+      "rift_ember_execution": "Magma Kuyusu",
+      "rift_ember_strike": "Çekirdek Erimesi",
+      "rift_venom_execution": "Zehir Gölü",
+      "rift_venom_strike": "Yuva Anasının Damgası",
+      "rift_necro_execution": "Ruh Mezarı",
+      "rift_necro_strike": "Ölüm Fermanı",
+      "rift_brute_execution": "Yer Yarılması",
+      "rift_brute_strike": "Son Yargı",
+      "rift_arcane_execution": "Hiçlik Yarığı",
+      "rift_arcane_strike": "Aether Yıkımı",
+      "rift_storm_execution": "Yıldırım Çubuğu",
+      "rift_storm_strike": "Fırtına Çağırıcısının Gazabı",
+      "rift_tide_execution": "Uçurum Ağzı",
+      "rift_tide_strike": "Ezici Derinlik"
     }
   },
   "questUi": {
@@ -6657,7 +6896,8 @@ export const tr_TR: EnTranslations = {
       "tool": "Alet",
       "potion": "Şifa İksiri",
       "elixir": "İksir",
-      "bag": "Çanta"
+      "bag": "Çanta",
+      "mount": "Binek"
     },
     "stats": {
       "armor": "Zırh",
@@ -9201,6 +9441,312 @@ export const tr_TR: EnTranslations = {
       "resonant_timber": {
         "name": "Tınıtlı Kereste"
       },
+      "duskwisp_essence": {
+        "name": "Alacakaranlık ruh ışığı özü"
+      },
+      "spore_heart": {
+        "name": "Spor kalbi"
+      },
+      "gleaming_antler": {
+        "name": "Işıldayan boynuz"
+      },
+      "wisp_mote": {
+        "name": "Ruh ışığı zerresi"
+      },
+      "starfall_shard": {
+        "name": "Yıldız düşüşü kıymığı"
+      },
+      "elder_bark": {
+        "name": "Ulu ağaç kabuğu"
+      },
+      "hollow_sealstone": {
+        "name": "Kuytu Vadi Mühür Taşı"
+      },
+      "monument_overlook": {
+        "name": "Yıpranmış anıt"
+      },
+      "monument_court": {
+        "name": "Batık anıt"
+      },
+      "monument_north": {
+        "name": "Unutulmuş anıt"
+      },
+      "guardian_core": {
+        "name": "Muhafız çekirdeği"
+      },
+      "wardens_seal": {
+        "name": "Gözcünün Mührü"
+      },
+      "gleamstag_charm": {
+        "name": "Işıltı Geyiği tılsımı"
+      },
+      "veilsteel_blade": {
+        "name": "Perde çeliği kılıç"
+      },
+      "duskfang_dirk": {
+        "name": "Alacakaranlık dişi hançer"
+      },
+      "gleamwood_stave": {
+        "name": "Işıltı ağacı asa"
+      },
+      "wardens_oathband": {
+        "name": "Gözcünün yemin bilekliği"
+      },
+      "wardplate_cuirass": {
+        "name": "Muhafız plaka zırhı"
+      },
+      "nightweave_tunic": {
+        "name": "Gece örgüsü yelek"
+      },
+      "veilcloth_robe": {
+        "name": "Perde bezi cübbe"
+      },
+      "rift_essence": {
+        "name": "Yarık Özü"
+      },
+      "rift_gem_crimson": {
+        "name": "Kızıl Yarık Mücevheri"
+      },
+      "rift_gem_azure": {
+        "name": "Gök Mavisi Yarık Mücevheri"
+      },
+      "rift_gem_verdant": {
+        "name": "Yeşil Yarık Mücevheri"
+      },
+      "riftbound_band_of_might": {
+        "name": "Yarık Bağlı Güç Halkası"
+      },
+      "riftbound_band_of_insight": {
+        "name": "Yarık Bağlı Sezgi Halkası"
+      },
+      "riftbound_band_of_guile": {
+        "name": "Yarık Bağlı Hile Halkası"
+      },
+      "hoarfrost_edge": {
+        "name": "Kırağı Ağzı"
+      },
+      "emberforge_gauntlets": {
+        "name": "Kor Ocağı Eldivenleri"
+      },
+      "broodmother_carapace": {
+        "name": "Yuva Anası Kabuğu"
+      },
+      "bonelord_mantle": {
+        "name": "Kemik Lordu Pelerini"
+      },
+      "graskbreaker_girdle": {
+        "name": "Grask Kırıcı Kemeri"
+      },
+      "voidscar_handwraps": {
+        "name": "Hiçlik Yarası El Sargıları"
+      },
+      "stormscale_treads": {
+        "name": "Fırtına Pulu Botları"
+      },
+      "abyssal_loop": {
+        "name": "Uçurum Halkası"
+      },
+      "pactbound_vestments": {
+        "name": "Antlaşmaya Bağlı Cübbe"
+      },
+      "pitlords_cleaver": {
+        "name": "Çukur Efendisinin Satırı"
+      },
+      "emberforged_bulwark": {
+        "name": "Korda Dövülmüş Kalkan"
+      },
+      "stormsunder_hood": {
+        "name": "Fırtına Yırtıcısı Başlığı"
+      },
+      "voidweave_mantle": {
+        "name": "Hiçlik Dokuması Pelerini"
+      },
+      "abysswrought_band": {
+        "name": "Uçurumda Dövülmüş Halka"
+      },
+      "heart_of_the_rift": {
+        "name": "Yarığın Kalbi"
+      },
+      "voidsong_dirk": {
+        "name": "Hiçlik Şarkısı, Yırtık Perdenin Hançeri"
+      },
+      "wildheart_tuskblade": {
+        "name": "Yaban Yürek Diş Bıçağı"
+      },
+      "wildheart_hexwood_staff": {
+        "name": "Çukurun Büyülü Odun Asası"
+      },
+      "wildheart_fangknife": {
+        "name": "Zulgar'ın Diş Bıçağı"
+      },
+      "thick_winter_pelt": {
+        "name": "Kalın Kış Postu"
+      },
+      "aurora_mote": {
+        "name": "Kutup Işığı Zerresi"
+      },
+      "hearth_ember_cache": {
+        "name": "Kor Saklama Kutusu"
+      },
+      "sprung_trap": {
+        "name": "Fırlamış Bataklık Tuzağı"
+      },
+      "hearthlined_treads": {
+        "name": "Ocak Astarlı Botlar"
+      },
+      "frostmane_mantle": {
+        "name": "Kırağı Yeleli Pelerini"
+      },
+      "ashbone_war_brand": {
+        "name": "Kültükemik Savaş Markası"
+      },
+      "emberwing_scale": {
+        "name": "Kor Kanadı Pulu"
+      },
+      "scorched_supply_crate": {
+        "name": "Kararmış Erzak Sandığı"
+      },
+      "wyrmwatch_warning_banner": {
+        "name": "Wyrmwatch Uyarı Sancağı"
+      },
+      "cinderwalk_treads": {
+        "name": "Kül Yürüyüşü Botları"
+      },
+      "mawscale_pauldrons": {
+        "name": "Ağız Pulu Omuzlukları"
+      },
+      "gilded_sap_clot": {
+        "name": "Yaldızlı Reçine Pıhtısı"
+      },
+      "amberfall_sap_bucket": {
+        "name": "Reçine Toplama Kovası"
+      },
+      "mere_ferry_lantern": {
+        "name": "Feribot Feneri"
+      },
+      "orchard_sapbinder_grips": {
+        "name": "Reçine Tutucu Eldivenleri"
+      },
+      "mantle_of_the_meredark": {
+        "name": "Meredark Pelerini"
+      },
+      "plump_fen_eel": {
+        "name": "Tombul Bataklık Yılan Balığı"
+      },
+      "wisplight_globe": {
+        "name": "Işık Cini Küresi"
+      },
+      "fenway_mooring_line": {
+        "name": "Kesilmiş Bağlama Halatı"
+      },
+      "bridgemere_toll_chest": {
+        "name": "Batık Geçiş Ücreti Sandığı"
+      },
+      "eelskin_mudwaders": {
+        "name": "Yılan Balığı Derisi Bataklık Çizmeleri"
+      },
+      "lilybed_mantle": {
+        "name": "Zambak Yatağı Pelerini"
+      },
+      "moonfleece_tuft": {
+        "name": "Ay Yünü Tutamı"
+      },
+      "gloamfield_nightbloom": {
+        "name": "Gece Çiçeği Tomurcuğu"
+      },
+      "vigil_star_chart": {
+        "name": "Nöbet Yıldız Haritası"
+      },
+      "barrow_grave_offering": {
+        "name": "Dağılmış Mezar Sunusu"
+      },
+      "moonfleece_mitts": {
+        "name": "Ay Yünü Eldivenleri"
+      },
+      "barrowshade_mantle": {
+        "name": "Höyük Gölgesi Pelerini"
+      },
+      "widowsilk_skein": {
+        "name": "Dul İpeği Yumağı"
+      },
+      "gallowmere_grave_candle": {
+        "name": "Mezar Mumu"
+      },
+      "silkbound_remains": {
+        "name": "İpekle Sarılmış Kalıntılar"
+      },
+      "gravebound_silk_wraps": {
+        "name": "Mezara Bağlı İpek Sargılar"
+      },
+      "mantle_of_the_unhorsed": {
+        "name": "Attan Düşürülmüşün Pelerini"
+      },
+      "pearlwake_cargo_crate": {
+        "name": "Pearlwake Yük Sandığı"
+      },
+      "canopy_silk_hank": {
+        "name": "Ağaç Tepesi İpeği Yumağı"
+      },
+      "sunken_offering_bowl": {
+        "name": "Yeniden Doldurulmuş Sunu Kasesi"
+      },
+      "saltwalker_sandals": {
+        "name": "Tuz Yürüyücüsü Sandaletleri"
+      },
+      "sunken_idol_mantle": {
+        "name": "Batık İdol Pelerini"
+      },
+      "hedgewick_shears": {
+        "name": "Çalınmış Hedgewick Makası"
+      },
+      "evergarden_bloom_clipping": {
+        "name": "Budanmış Çiçek Kesiği"
+      },
+      "hedgewick_tool_cart": {
+        "name": "Devrilmiş Alet Arabası"
+      },
+      "evergarden_statue_rubbing": {
+        "name": "Heykel İzi"
+      },
+      "shearkeeper_gloves": {
+        "name": "Uçurum Bekçisi Eldivenleri"
+      },
+      "fountain_court_mantle": {
+        "name": "Çeşme Avlusu Pelerini"
+      },
+      "galecrest_ram_wool": {
+        "name": "Yağlı Koç Yünü"
+      },
+      "shear_storm_lantern": {
+        "name": "Söndürülmüş Fırtına Feneri"
+      },
+      "wreckfield_flotsam_crate": {
+        "name": "Enkaz Kalıntısı Sandığı"
+      },
+      "wickspun_treads": {
+        "name": "Fitil Örgüsü Botları"
+      },
+      "wreck_wardens_mantle": {
+        "name": "Enkaz Bekçisi Pelerini"
+      },
+      "breakscarred_steel": {
+        "name": "Gedik İzli Çelik"
+      },
+      "farshore_salt_moss": {
+        "name": "Uzak Kıyı Tuz Yosunu"
+      },
+      "gullhaven_watchbell": {
+        "name": "Kıyı Nöbet Çanı"
+      },
+      "saltforged_grips": {
+        "name": "Tuzda Dövülmüş Eldivenler"
+      },
+      "mantle_of_the_unbroken_shore": {
+        "name": "Kırılmamış Kıyı Pelerini"
+      },
+      "last_keep_signet": {
+        "name": "Son Kale Mührü"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -9932,6 +10478,30 @@ export const tr_TR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Fırtınaçağıranın Bel Koruyucusu"
+      },
+      "riding_training": {
+        "name": "Binicilik Eğitimi"
+      },
+      "reins_valorsteed": {
+        "name": "Valorsteed Dizginleri"
+      },
+      "reins_grag_bear": {
+        "name": "Golyat Grag-Ayısının Dizginleri"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Yosun Kabuklu Sap Süzülgeninin Dizginleri"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Kontak Anahtarı: Eter Şövalyesinin Uçan Motosikleti"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Gölge Sıçrayışlı Kurbağa Kama-Kage’nin Dizginleri"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Göğe Uzanan Fırtına Tüyünün Dizginleri"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Yıldırım Adımlı Büyük Hindinin Dizginleri"
       }
     },
     "mobs": {
@@ -10181,6 +10751,312 @@ export const tr_TR: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Uyanmış Fırtına Dölü"
       },
+      "stable_horse": {
+        "name": "Ahır Atı"
+      },
+      "rift_spawnling": {
+        "name": "Yarık Yavrusu"
+      },
+      "rift_bonewalker": {
+        "name": "Dirilmiş Kemik Yürüyücü"
+      },
+      "rift_frost_revenant": {
+        "name": "Kırağıya Bağlı Hayalet"
+      },
+      "rift_rime_elemental": {
+        "name": "Kırağı Elementali"
+      },
+      "rift_ember_fiend": {
+        "name": "Kor İblisi"
+      },
+      "rift_magma_brute": {
+        "name": "Magma Canavarı"
+      },
+      "rift_venom_weaver": {
+        "name": "Zehir Dokumacısı"
+      },
+      "rift_thornback": {
+        "name": "Diken Sırtlı Avcı"
+      },
+      "rift_boneclad": {
+        "name": "Kemik Zırhlı Savaşçı"
+      },
+      "rift_marrow_troll": {
+        "name": "İlik Trolü"
+      },
+      "rift_void_acolyte": {
+        "name": "Hiçlik Yarası Çırağı"
+      },
+      "rift_dread_stalker": {
+        "name": "Dehşet Avcısı"
+      },
+      "rift_storm_caller": {
+        "name": "Fırtına Çağırıcısı"
+      },
+      "rift_stormscale": {
+        "name": "Fırtına Pullu Ejder"
+      },
+      "rift_tide_thrall": {
+        "name": "Gelgit Kölesi"
+      },
+      "rift_deep_lurker": {
+        "name": "Derinlik Pusucusu"
+      },
+      "rift_stone_ogre": {
+        "name": "Taş Ogre"
+      },
+      "rift_boss_frost": {
+        "name": "Kırağı Bekçisi"
+      },
+      "rift_boss_ember": {
+        "name": "Kor Ocağı Zorbası"
+      },
+      "rift_boss_venom": {
+        "name": "Yuva Anası Vysska"
+      },
+      "rift_boss_necro": {
+        "name": "Kemik Lordu Xarreth"
+      },
+      "rift_boss_brute": {
+        "name": "Savaş Lordu Grask"
+      },
+      "rift_boss_arcane": {
+        "name": "Arhon Nyxaris"
+      },
+      "rift_boss_storm": {
+        "name": "Fırtına Vharok"
+      },
+      "rift_boss_tide": {
+        "name": "Uçurum Ağzı"
+      },
+      "glimmerwisp": {
+        "name": "Parıldayan Işık Cini"
+      },
+      "duskwisp": {
+        "name": "Alacakaranlık Işık Cini"
+      },
+      "veiled_stag": {
+        "name": "Örtülü Geyik"
+      },
+      "veiled_doe": {
+        "name": "Örtülü Dişi Geyik"
+      },
+      "gleamstag": {
+        "name": "Parıltılı Geyik"
+      },
+      "sporeling_gatherer": {
+        "name": "Sporcuk Toplayıcı"
+      },
+      "corrupted_sporeling": {
+        "name": "Yozlaşmış Sporcuk"
+      },
+      "mushroom_pixie": {
+        "name": "Parıltı Halkı Perisi"
+      },
+      "treant_elder": {
+        "name": "Yaşlı Ağaç Devi"
+      },
+      "ancient_guardian": {
+        "name": "Kadim Muhafız"
+      },
+      "waking_warden": {
+        "name": "Uyanan Bekçi"
+      },
+      "old_marrowshell": {
+        "name": "Yaşlı İlikkabuk"
+      },
+      "aurelhorn": {
+        "name": "Aurelhorn, Sürünün İlki"
+      },
+      "snowdrift_wolf": {
+        "name": "Kar Yığını Kurdu"
+      },
+      "ice_wisp": {
+        "name": "Buz Işık Cini"
+      },
+      "rime_elemental": {
+        "name": "Kırağı Elementali"
+      },
+      "fen_sprite": {
+        "name": "Bataklık Perisi"
+      },
+      "frostmane_yeti": {
+        "name": "Kırağı Yeleli Yeti"
+      },
+      "terrace_howler": {
+        "name": "Taraça Uluyanı"
+      },
+      "apprentice_wren": {
+        "name": "Çırak Wren"
+      },
+      "emberwing_drake": {
+        "name": "Kor Kanat Ejderi"
+      },
+      "ashbone_raider": {
+        "name": "Kültükemik Akıncısı"
+      },
+      "ashbone_warcaller": {
+        "name": "Kültükemik Savaş Çağırıcısı"
+      },
+      "dune_troll": {
+        "name": "Kumul Trolü"
+      },
+      "cindraleth_maw_matriarch": {
+        "name": "Ağız Anaerkili Cindraleth"
+      },
+      "gilded_stag": {
+        "name": "Yaldızlı Geyik"
+      },
+      "gloam_fox": {
+        "name": "Alacakaranlık Tilkisi"
+      },
+      "orchard_treant": {
+        "name": "Bahçe Ağaç Devi"
+      },
+      "the_meredark": {
+        "name": "Meredark"
+      },
+      "harvest_sprite": {
+        "name": "Hasat Perisi"
+      },
+      "mere_lurker": {
+        "name": "Göl Pusucusu"
+      },
+      "bogtoad": {
+        "name": "Bataklık Kurbağası"
+      },
+      "drowsy_croaker": {
+        "name": "Uykulu Vraklayan"
+      },
+      "lily_wisp": {
+        "name": "Zambak Işık Cini"
+      },
+      "willow_sprite": {
+        "name": "Söğüt Perisi"
+      },
+      "moonfleece_grazer": {
+        "name": "Ay Yünü Otlayıcısı"
+      },
+      "gloam_strider": {
+        "name": "Alacakaranlık Gezgini"
+      },
+      "nightkin_stargazer": {
+        "name": "Gece Halkı Yıldız Gözlemcisi"
+      },
+      "barrow_king": {
+        "name": "Höyük Kralı"
+      },
+      "barrow_wight": {
+        "name": "Höyük Hayaleti"
+      },
+      "widowsilk_spinner": {
+        "name": "Dul İpeği Örücüsü"
+      },
+      "wood_wraith": {
+        "name": "Orman Hayaleti"
+      },
+      "gravenbark_shambler": {
+        "name": "Mezar Kütüğü Sürüngeni"
+      },
+      "pale_huntsman": {
+        "name": "Solgun Avcı"
+      },
+      "gravedigger_mosley": {
+        "name": "Mezarcı Mosley"
+      },
+      "tide_scuttler": {
+        "name": "Gelgit Yürüyücüsü"
+      },
+      "thicket_boar": {
+        "name": "Çalılık Yaban Domuzu"
+      },
+      "canopy_weaver": {
+        "name": "Ağaç Tepesi Dokumacısı"
+      },
+      "idol_guardian": {
+        "name": "İdol Muhafızı"
+      },
+      "castaway_navigator": {
+        "name": "Rehber Suli"
+      },
+      "topiary_stag": {
+        "name": "Çit Geyiği"
+      },
+      "topiary_wolf": {
+        "name": "Çit Kurdu"
+      },
+      "hedge_gnome": {
+        "name": "Çit Cücesi"
+      },
+      "hedge_knight": {
+        "name": "Şafak Kalesi Şövalyesi"
+      },
+      "the_topiary_bull": {
+        "name": "Çit Boğası"
+      },
+      "moor_ram": {
+        "name": "Bozkır Koçu"
+      },
+      "gale_wisp": {
+        "name": "Fırtına Işık Cini"
+      },
+      "shoal_scuttler": {
+        "name": "Sığlık Yürüyücüsü"
+      },
+      "downs_bandit": {
+        "name": "Bozkır Haydudu"
+      },
+      "wreck_thief": {
+        "name": "Enkaz Tarlası Hırsızı"
+      },
+      "the_wreck_warden": {
+        "name": "Enkaz Bekçisi"
+      },
+      "drowned_deckhand": {
+        "name": "Boğulmuş Gemici"
+      },
+      "riftspawn": {
+        "name": "Yarık Doğumu"
+      },
+      "breach_wretch": {
+        "name": "Gedik Zavallısı"
+      },
+      "void_stalker": {
+        "name": "Hiçlik Avcısı"
+      },
+      "sundered_horror": {
+        "name": "Parçalanmış Dehşet"
+      },
+      "fisher_bram": {
+        "name": "Balıkçı Bram"
+      },
+      "rift_hellguard": {
+        "name": "Cehennem Muhafızı"
+      },
+      "rift_pact_acolyte": {
+        "name": "Antlaşma Çırağı"
+      },
+      "rift_boss_ritualist": {
+        "name": "Antlaşmaya Bağlı Büyücü Vel'Kor"
+      },
+      "rift_boss_pitlord": {
+        "name": "Azgorath, Çukurun Efendisi"
+      },
+      "wildheart_stalker": {
+        "name": "Sarmaşık Pençeli Avcı"
+      },
+      "wildheart_ravager": {
+        "name": "Kanyeleli Yağmacı"
+      },
+      "wildheart_hexcaller": {
+        "name": "Güneşkemik Lanet Çağırıcısı"
+      },
+      "wildheart_beastmaster": {
+        "name": "Diş Lordu Canavar Efendisi"
+      },
+      "wildheart_high_priest": {
+        "name": "Zulgar, Çukurun Sesi"
+      },
       "ironvein_foreman": {
         "name": "Demirdamar Ustabaşı"
       },
@@ -10334,6 +11210,11 @@ export const tr_TR: EnTranslations = {
         "title": "Maden Ustabaşısı",
         "greeting": "Bütün kazı şu toprağa bulanmış haşaratla kaynıyor!"
       },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Ahır Ustası",
+        "greeting": "Her binici buraya iki ayağıyla gelir, {className}. Çamura yüz üstü düşmeden Valorsteed'e oturana dek dizginleri sana vermem, çünkü Highwatch'ta kırık kemiklere bakacak fazladan şifacı yok."
+      },
       "warden_fenwick": {
         "name": "Muhafız Fenwick",
         "title": "Fenbridge Muhafızı",
@@ -10463,6 +11344,246 @@ export const tr_TR: EnTranslations = {
         "name": "Vakanüvis Zenzie",
         "title": "Zirveler Vakayinamesi",
         "greeting": "Dağ hiçbir şeyi unutmaz, {playerName}; ben de unutmam. Bakalım sen neler yapmışsın."
+      },
+      "keeper_saelwyn": {
+        "name": "Bekçi Saelwyn",
+        "title": "Vadinin Bekçisi",
+        "greeting": "Senin türünden pek azı bu dalların altında durmuştur, {className}. Nazikçe yürü ve hoş geldin."
+      },
+      "loremother_bryn": {
+        "name": "Bilgi Anası Bryn",
+        "title": "Mabedin Sesi",
+        "greeting": "Bu vadideki her ışık bir şey hatırlıyor, {playerName}. Dinlememe yardım et."
+      },
+      "provisioner_fenna": {
+        "name": "Erzakçı Fenna",
+        "title": "Eldergleam Erzakçısı",
+        "greeting": "Ekmek hala sıcak, su hala tatlı. Vadi sağlıyor, ben de öyle."
+      },
+      "wardsmith_orun": {
+        "name": "Tılsım Ustası Orun",
+        "title": "Eski Ocakların Bekçisi",
+        "greeting": "Bu ocaklar yüzyıllar önce soğudu, {className}, ama işçilikleri hala keskinliğini koruyor."
+      },
+      "archivist_tullo": {
+        "name": "Arşivci Tullo",
+        "title": "Taşları Okuyan",
+        "greeting": "Dışarıdaki anıtlar bir çağdır kimseyle konuşmadı. Belki taze kulaklar bekliyorlardı."
+      },
+      "huntsman_deral": {
+        "name": "Avcı Deral",
+        "title": "Sürülerin Bekçisi",
+        "greeting": "Şimdi sessiz ol. Sürü bu vadinin çıkardığı her sesi bilir, ben de öyle."
+      },
+      "warden_kaldra": {
+        "name": "Bekçi Kaldra",
+        "title": "Icemantle Bekçisi",
+        "greeting": "Setlere dikkat et, yabancı. Kar aldığını geri vermez."
+      },
+      "hearthkeeper_maeve": {
+        "name": "Ocak Bekçisi Maeve",
+        "title": "Ocak Evinin Bekçisi",
+        "greeting": "İçeri gel, soğuktan kurtul. Ben nefes aldığım sürece ocak evinin ateşi hiç sönmez."
+      },
+      "scout_einna": {
+        "name": "Öncü Einna",
+        "title": "Kar Sınırı Öncüsü",
+        "greeting": "Geçidi canlı geçtin. Güzel. Icemantle bunu duymalı."
+      },
+      "aurorist_veyla": {
+        "name": "Işıkbilimci Veyla",
+        "title": "Işıkları Okuyan",
+        "greeting": "Sessiz ol. Işıklar bu gece konuşuyor ve kendilerini tekrar etmiyorlar."
+      },
+      "trapper_brosk": {
+        "name": "Tuzakçı Brosk",
+        "title": "Titrek Bataklık Tuzakçısı",
+        "greeting": "Bataklık bu hafta üç tuzak ipimi aldı. Bataklık yirmi yıldır tek bir ip bile almamıştı."
+      },
+      "gatecaptain_brannoc": {
+        "name": "Kapı Kaptanı Brannoc",
+        "title": "Wyrmwatch Komutanı",
+        "greeting": "Wyrmwatch kapıyı tutuyor. Kırk yıldır tutuyor. Bu gece de tutacak."
+      },
+      "quartermaster_sela": {
+        "name": "Levazımcı Sela",
+        "title": "Garnizon Depolarının Bekçisi",
+        "greeting": "Bu avludaki her sandık buraya gelmek için kırk mil kül geçti. Onlara nazik davran."
+      },
+      "scout_yerrin": {
+        "name": "Öncü Yerrin",
+        "title": "Uzak Kumul Gözcüsü",
+        "greeting": "Alçak dur. Ses camdan garip bir şekilde yayılıyor ve aşağıdaki kapının kulakları var."
+      },
+      "reeve_ottoline": {
+        "name": "Vali Ottoline",
+        "title": "Lanternmere Valisi",
+        "greeting": "Lanternmere'e hoş geldin, burada hasat hiç bitmez, iş de öyle."
+      },
+      "waywatcher_sorrel": {
+        "name": "Yol Gözcüsü Sorrel",
+        "title": "Altın Eriyişin Gözcüsü",
+        "greeting": "Arkanda kar, önünde altın. Altın Eriyişi iki kez geçen azdır, bu yüzden bu geçişi değerli kıl."
+      },
+      "ferrymaster_caddow": {
+        "name": "Feribot Ustası Caddow",
+        "title": "Fener Feribotlarının Bekçisi",
+        "greeting": "Sis yine Göl'ün üzerinde. Fenerler suda sönünce, akıllı insanlar kıyıda kalır."
+      },
+      "orchardist_pomeline": {
+        "name": "Bahçıvan Pomeline",
+        "title": "Yaldızlı Sıraların Bekçisi",
+        "greeting": "Nereye bastığına dikkat et. Bu sıralardaki her kök kasabadan daha yaşlı ve hepsi hatırlıyor."
+      },
+      "waykeeper_pell": {
+        "name": "Yol Bekçisi Pell",
+        "title": "Kehribar Basamaklarının Bekçisi",
+        "greeting": "Basamaklardan aşağı ve yumuşak topraklara. Çizmelerini nereye bastığına dikkat et."
+      },
+      "bridgewright_alden": {
+        "name": "Köprü Ustası Alden",
+        "title": "Fenway Ustası",
+        "greeting": "Bu kasabadaki her tahta benim korumam altında, ve bataklık hepsini kemiriyor."
+      },
+      "netter_maris": {
+        "name": "Ağcı Maris",
+        "title": "Bridgemere'in Yılan Balığı Ağcısı",
+        "greeting": "Bu kokuyu alıyor musun? Füme yılan balığı. Bu kasabanın yarısı onunla satın aldığım kazıkların üzerinde duruyor."
+      },
+      "mother_sedge": {
+        "name": "Ana Sedge",
+        "title": "Willowweep'in Bataklık Cadısı",
+        "greeting": "Söğütler, çizmelerin köprüden ayrılmadan önce geleceğini bana söylemişti."
+      },
+      "lamplighter_sorrel": {
+        "name": "Fener Yakıcısı Sorrel",
+        "title": "Gece Kapısının Bekçisi",
+        "greeting": "Fenerlere dikkat et, dostum. Bu kapının ardında güneş pes eder ve çiçekler hüküm sürer."
+      },
+      "lira_dewsong": {
+        "name": "Lira Dewsong",
+        "title": "Moonrest'in Gece Bahçıvanı",
+        "greeting": "Moonrest'e hoş geldin, burada çiçekler bizim yerimize şafağı getirir."
+      },
+      "weaver_amelle": {
+        "name": "Dokumacı Amelle",
+        "title": "Ay Yünü Dokumacısı",
+        "greeting": "Bunu hissediyor musun? Dokuma tezgahında ay yünü. Yanında oturduğun her ateşten daha sıcak."
+      },
+      "astronomer_cassian": {
+        "name": "Gökbilimci Cassian",
+        "title": "Nöbetteki Gözcü",
+        "greeting": "Şşt, şimdi sessiz ol. Gökyüzü burada asla ağarmaz, bu yüzden konuşmayı da hiç bırakmaz."
+      },
+      "lampman_cobb": {
+        "name": "Fenerci Cobb",
+        "title": "Karga Kapısı Fenerlerinin Bekçisi",
+        "greeting": "Fener ışığında kal, dostum. Orman kapıdan geçen herkesi sayar."
+      },
+      "sexton_marrow": {
+        "name": "Mezarcı Marrow",
+        "title": "Gallowmere Mezarcısı",
+        "greeting": "Onları burada derin gömüyoruz ve çanları çalıyoruz ki aşağıda kalmaları gerektiğini hatırlasınlar."
+      },
+      "widow_tansy": {
+        "name": "Dul Tansy",
+        "title": "Gallowmere'in Mum Yapımcısı",
+        "greeting": "Her mezar için bir mum ve hiçbiri sönmemeli. Hiçbiri, duyuyor musun beni?"
+      },
+      "vicar_creel": {
+        "name": "Papaz Creel",
+        "title": "Yas Taşının Son Papazı",
+        "greeting": "Şapel yıllar önce çöktü. Altındaki ölüler bunu fark etmedi, bu yüzden kaldım."
+      },
+      "strandwatcher_pell": {
+        "name": "Kıyı Bekçisi Pell",
+        "title": "Sarmaşık Ağzının Gözcüsü",
+        "greeting": "Sonunda kara ağaçlardan çıktın. Nefes al, yabancı, güneş geçidin bu tarafında duruyor."
+      },
+      "salvage_boss_ryna": {
+        "name": "Kurtarma Şefi Ryna",
+        "title": "Enkaz Hattının Hanımı",
+        "greeting": "Çalışan kollara sahip bir {className}, güzel. Yengeçler saymana yetecek kadar parmak bırakırsa, enkaz hattı iyi öder."
+      },
+      "pearlmother_isha": {
+        "name": "İnci Ana Isha",
+        "title": "Dalgıçların Yaşlısı",
+        "greeting": "Deniz verir, kum saklar, orman ise alır. Kıyıdan ayrılma, yabancı."
+      },
+      "hermit_okku": {
+        "name": "Okku",
+        "title": "İçeri Giren Adam",
+        "greeting": "Şimdi sessiz ol. Davullar ağaçların altında yürüyen her şeyi sayar ve seni de zaten saydılar."
+      },
+      "gatewarden_pell": {
+        "name": "Kapı Bekçisi Pell",
+        "title": "Bahçe Kapısının Bekçisi",
+        "greeting": "Çimenlerde nasıl yürüdüğüne dikkat et. Bahçe onları düzenli tutar ve düzenli olmalarını sever."
+      },
+      "head_gardener_amaranth": {
+        "name": "Baş Bahçıvan Amaranth",
+        "title": "Sonsuz Bahçenin Baş Bahçıvanı",
+        "greeting": "Gözlerimin altındaki gölgelere aldırma. Bahçe rüya görürken birinin uyanık kalması gerekiyor."
+      },
+      "wickmother_sorrel": {
+        "name": "Han Anası Sorrel",
+        "title": "Hedgewick Hanının Bekçisi",
+        "greeting": "İçeri gel, otur, ateşte likör var. Sadece demir olan her şeye elini koy: cüceler son zamanlarda hafif elli oldu."
+      },
+      "gardener_yew": {
+        "name": "Bahçıvan Yew",
+        "title": "Son Bahçıvan",
+        "greeting": "Şu el arabasını uzatır mısın? Bu çimenler kendi kendine yürümüyor, köy ne düşünürse düşünsün."
+      },
+      "watcher_maren": {
+        "name": "Gözcü Maren",
+        "title": "Rüzgar Yolu Nöbeti",
+        "greeting": "Kapının ötesinde adımına dikkat et. Buradaki rüzgar önce şapkaları alır, soru asla sormaz."
+      },
+      "harbormaster_odile": {
+        "name": "Liman Amiri Odile",
+        "title": "Wickharbor Liman Amiri",
+        "greeting": "Bu koydaki her tekne omurgasını Eski Fener'e borçludur. Çabuk konuş, gelgit beklemez."
+      },
+      "keeper_bram": {
+        "name": "Bekçi Bram",
+        "title": "Eski Fenerin Bekçisi",
+        "greeting": "Otuz dokuz yıldır bu lamba benim nöbetimde yandı. Senin nöbetinde de sönmeyecek."
+      },
+      "salvager_edda": {
+        "name": "Kurtarmacı Edda",
+        "title": "Enkaz Tarlası Kurtarmacısı",
+        "greeting": "Enkaz odunu, halat ve ölü adamların yükü. Bekçi izin verdiğinde, deniz maaşımı öder."
+      },
+      "warden_coalfast": {
+        "name": "Bekçi Coalfast",
+        "title": "Tabya Komutanı",
+        "greeting": "Gediklerin Gullhaven'ın küçük olmasına aldırdığı yok, {className}. Bu kıyıyı tutarız, yoksa tutulacak kıyı kalmaz. Bizimle dur, bunu unutmam."
+      },
+      "riftwatch_ollun": {
+        "name": "Yarık Nöbetçisi Ollun",
+        "title": "Gedik Bilgini",
+        "greeting": "Kulağın varsa, her gedik açılmadan önce şarkı söyler. Şu anda adada kıpırdanan üç tanesini duyabiliyorum ve biri yakın."
+      },
+      "quartermaster_edda": {
+        "name": "Levazımcı Edda",
+        "title": "Tabya Zırh Ustası",
+        "greeting": "Çelik ve tuz, {className}, dağıtacak elimde kalan tek şey bu. Al bunu ve gediklerin, ulaşabileceğim yerde açıldıklarına pişman olmalarını sağla."
+      },
+      "mender_saul": {
+        "name": "İyileştirici Saul",
+        "title": "Saha Cerrahı",
+        "greeting": "Bu tek ayda, balıkçı düşmelerini iyileştirdiğim on yıldan daha fazla kemik kaynattırdım. Gedikler aldıklarından pek bir şey bırakmıyor. Elinden geliyorsa bana sağ salim dön."
+      },
+      "bellkeeper_tam": {
+        "name": "Çan Bekçisi Tam",
+        "title": "Nöbet Çanı Muhafızı",
+        "greeting": "Çan, gediklerin bize verdiği tek uyarıdır, {className}. Tarlalar için bir vuruş, kayalıklar için iki, kaçmanın işe yaramayacağı kadar yaklaştığında ise üç. Kulağını ona ver, seni bir parça halinde tutabilir."
+      },
+      "fisher_nell": {
+        "name": "Korkmuş Nell",
+        "title": "Gullhaven Balıkçısı",
+        "greeting": "Tam ağların kurutulduğu yerde açıldı. Tam orada, hayatım boyunca her sabah durduğum yerde. Artık kıyıya inmiyorum. Artık pek bir yere gitmiyorum."
       },
       "forgemistress_darva": {
         "name": "Dövme Ustası Darva",
@@ -11433,6 +12554,192 @@ export const tr_TR: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Binicilik Dersleri",
+        "text": "Her binici buraya iki ayağıyla gelir, {playerName}, tıpkı tanıştığımız gün sana söylediğim gibi. Ücreti öde, işaret verdiğimde eğitim Valorsteed'ini yanına çağır ve eyere çık. Sonra parkuru koş: işareti izleyip başlangıç kemerine git, her engeli temiz al ve kum bitmeden çizgiyi yeniden geç. Bunu başarırsan eyer senindir. Padoktan uzaklaşırsan baştan başlarız.",
+        "completion": "İşte böyle. Tek hamlede eyere çıktın ve yukarıda dimdik oturdun. Valorsteed artık senin, {playerName}: eyer, dizginler ve satın almak yerine hak edilmiş bir binicilik onuru.",
+        "objectives": {
+          "0": {
+            "label": "Valorsteed'i evcilleştir"
+          }
+        }
+      },
+      "q_veil_thinned": {
+        "title": "İncelen Perde",
+        "text": "Demek mağara senin için açıldı. O halde mühür korktuğumdan daha zayıf, {playerName}. Perdenin yırtıldığı yerde, ışık cinleri karanlık ve soğuk hale gelir. Bana alacakaranlık ışık cinlerinden sekiz öz getir, yaranın ne kadar derin olduğunu okuyayım.",
+        "completion": "Soğuk, hepsi. Vadinin, yırtığın bir Yarığa dönüşmesine belki bir mevsim var. Yapacak işimiz var, sen ve ben.",
+        "objectives": {
+          "0": {
+            "label": "Alacakaranlık Işık Cini Özü"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "Parıldayan Boynuzlar",
+        "text": "Örtülü geyikler otladıkları yerde ışık saçar, ve döktükleri boynuzlar bu ışığı yıllarca tutar. Beşini, vadinin kalbindeki açık çayırdaki sürülerden, ve fenerlerim kış boyunca yağ olmadan yanar. Geyiklere zarar vermek gerekmez, ama onlardan kolayca ayrılmazlar.",
+        "completion": "Işığı nasıl tuttuklarına bak! Alev yok, duman yok, sadece parıltı. Vadi sağlıyor.",
+        "objectives": {
+          "0": {
+            "label": "Parıldayan Boynuz"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "Sığlıkların Işıkları",
+        "text": "Parıldayan ışık cinleri, Vadi mühürlendiğinde buraya düşen eski yıldız ışığından zerreler taşır. Altı zerre, ve mabet lambaları bir yıl boyunca yanacak. Yalnızca sönenlerden al; Vadi açgözlülük olmadan yeterince veriyor.",
+        "completion": "İlk yıldızlar kadar yumuşak. Onları buraya, sunağın yanına koy; mabet gerisini halledecek.",
+        "objectives": {
+          "0": {
+            "label": "Işık Cini Zerresi"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "Derinliği Sakinleştirmek",
+        "text": "Parıldayan Derinlik'in sporcukları, yırtık halkalarına dokunmadan önce nazik bir halktı. Yozlaşmanın aldığını geri vermez. Yozlaşmışlara huzur ver, {playerName}: Derinliğin kuzeyinde on tanesine.",
+        "completion": "Benim yapmaya dayanamadığımı yaptın. Toplayıcılar hala güney halkalarında şarkı söylüyor; senin sayende şarkı söylemeye devam edecekler.",
+        "objectives": {
+          "0": {
+            "label": "Huzura Kavuşturulan Yozlaşmış Sporcuk"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "Halkanın Kalpleri",
+        "text": "Bir sporcuk karanlığa yenildiğinde, kalbi ödünç alınmış bir gölgeyle atmaya devam eder. Mabette arındırılmış dört kalp, bize yozlaşmanın nasıl yayıldığını öğretebilir. Bu kasvetli bir iş, {playerName}, ama bir onarım işi.",
+        "completion": "İşte. Arındırılmış ve sessiz. Her biri aynı işareti gösteriyor: gölge Batık Avlu'DAN akıyor. Saelwyn'e söyle.",
+        "objectives": {
+          "0": {
+            "label": "Sporcuk Kalbi"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "Taşların Hatırladığı",
+        "text": "Mühürlenmeden önceki üç anıt hala ayakta: biri Alacakaranlık Seyir Tepesi'nde, biri Batık Avlu'da, ve biri de kimsenin yürümediği uzak kuzeydoğuda kayıp. Onları benim için oku, {playerName}. Dizlerim iki asır önceki merdivenlerde tükendi.",
+        "completion": "Bir seyir tepesi, bir avlu, ve unutulmuş bir köşe... ve mühürleme şarkısının üç kıtası da, söylendiğinden beri ilk kez bir arada. Yaşlı bir okuyucuyu çok mutlu ettin.",
+        "objectives": {
+          "0": {
+            "label": "Okunan Seyir Tepesi Anıtı"
+          },
+          "1": {
+            "label": "Okunan Avlu Anıtı"
+          },
+          "2": {
+            "label": "Okunan Unutulmuş Anıt"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "Çayırdaki Tehdit",
+        "text": "Alacakaranlık ışık cinleri karanlıktan sonra tezgahlarımın arasında süzülmeye başladı, {playerName}, ve soğuklukları dokundukları her şeyi bozuyor. Benim için sayılarını azalt: on tanesini, perde neresi yırtıldıysa orada.",
+        "completion": "Gece pazarı yeniden açılabilir. Ömür boyu bir müşterin var, ya da en azından bir indirimin.",
+        "objectives": {
+          "0": {
+            "label": "Dağıtılan Alacakaranlık Işık Cini"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "Yıldız Düşümü Kırıntıları",
+        "text": "Alacakaranlık ışık cinleri kristal tarlaların üzerinden geçtiğinde, eski yıldız ışığından kıymıklar onlara dikenler gibi yapışır. Altı kırıntı, {playerName}, ve mühürlemeyi söylendiği tam mevsime tarihlendirebilirim.",
+        "completion": "Şu çizgilere bak! Sonbahar. Vadi sonbaharda mühürlenmiş. İki yüz yıllık tartışma, altı küçük taş tarafından çözüldü.",
+        "objectives": {
+          "0": {
+            "label": "Yıldız Düşümü Kırıntısı"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "Ağaç Devi Anlaşması",
+        "text": "Koru'nun yaşlıları, yozlaşma köklerini kemirirken dış kabuklarını dökerler. Dört parça, ve bütün Koru için bir merhem kaynatabilirim. Onu söktüğün sürece sana teşekkür etmeyecekler, {playerName}, ama bunun sayesinde bir asır daha ayakta kalacaklar.",
+        "completion": "Kalın ve sağlam, dördü de. Merhemin kaynaması bir hafta sürecek ve işini bitirmesi yüz yıl. Ağaçlar iyiliği farklı ölçer.",
+        "objectives": {
+          "0": {
+            "label": "Yaşlı Kabuğu"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "Sporcuk Gelgitine Karşı",
+        "text": "Merhem Koru'yu koruyor, ama yozlaşma her alacakaranlıkta Derinlik'e daha da baskı yapıyor. Toplayıcılar kuzey halkalarını geri alabilmeden önce, yozlaşmışlardan on iki tanesi daha huzura kavuşturulmalı, {playerName}.",
+        "completion": "Kuzeydeki halkalar bu gece yeniden şarkı söylüyor. Sessizce, ama söylüyor.",
+        "objectives": {
+          "0": {
+            "label": "Huzura Kavuşturulan Yozlaşmış Sporcuk"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "Batık Avlu",
+        "text": "Bryn kalpleri doğru okudu: yırtık, doğudaki eski avludan geçiyor, ve muhafızları yanlış uyanmış. Mührü korumak için inşa edilmişlerdi; şimdi ona yaklaşan herkesi ezecekler. Sekizini harabelerden temizle.",
+        "completion": "Sekiz muhafız, susturuldu. Onların yükseltildiği zamanı hatırlıyorum, {playerName}. Bu kadar şaşırma; Vadi bekçilerini uzun süre tutar.",
+        "objectives": {
+          "0": {
+            "label": "Susturulan Kadim Muhafız"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "Bekçinin Yankıları",
+        "text": "Efendileri susturulmuş olsa bile, avlu muhafızları onun son emrini sönmeyen bir yankı gibi tekrar ediyor. Mühür geri konana kadar, uyanmaya devam edecekler, {playerName}. Duvarcıların mühür taşına ulaşabilmesi için on tanesini daha sustur.",
+        "completion": "Yankı her seferinde daha da zayıflıyor. Yakında avlu, bir harabeye yakışır şekilde yalnızca rüzgar ve sarmaşık barındıracak.",
+        "objectives": {
+          "0": {
+            "label": "Susturulan Kadim Muhafız"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "Uyanan Bekçi",
+        "text": "Avlu sessiz, ama efendisi değil. Mührü tutan Bekçi çarpılmış olarak uyandı, ve o ayakta durduğu sürece mühür onarılamaz. Kolay düşmeyecek; bulabilirsen bir arkadaş getir, {playerName}. Bulabilirsen iki tane getir.",
+        "completion": "Sesinin çanı sessiz. Bunu buradan hissettim, tüm vadiden kalkan bir ağırlık gibi.",
+        "objectives": {
+          "0": {
+            "label": "Yenilen Uyanan Bekçi"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "Geri Getirilen Mühür",
+        "text": "Bekçinin mührünü avlunun kalbindeki mühür taşına götür ve koptuğu yere geri koy. O zaman Vadi iyileşmeye başlayabilir, ve sen, {playerName}, türünden kimsenin daha önce yapmadığı bir şeyi yapmış olacaksın.",
+        "completion": "Buradan kapandığını hissettim, alacakaranlık kadar nazikçe. Vadi dostlarını hatırlar, {playerName}. Ne kadar uzağa seyahat edersen et, büyük ağacın altında senin için her zaman bir ışık olacak.",
+        "objectives": {
+          "0": {
+            "label": "Mühür Taşına Geri Konan Mühür"
+          }
+        }
+      },
+      "q_hollow_the_huntsman": {
+        "title": "Sürülerin Bekçisi",
+        "text": "Işık cinlerinden fazlasıyla başa çıkabilecek biri gibi görünüyorsun, {playerName}. Avcı Deral, buranın doğusundaki geyik çayırları arasında gözetleme noktasını tutuyor, ve haftalardır yetenekli eller arıyor. Orada her ne izliyorsa, köyde yüksek sesle söylemeyecek.",
+        "completion": "Fenna mı gönderdi seni? Güzel. Demek sana güveniyor, ve benim çizilmesi gereken iki ismim var.",
+        "objectives": {
+          "0": {
+            "label": "Avcı Deral'ı Bul"
+          }
+        }
+      },
+      "q_hollow_old_marrowshell": {
+        "title": "Sığlıkların Yaşlı Kabuğu",
+        "text": "İlk isim Yaşlı İlikkabuk, Eldergleam'ın bir kapısı olmadan önce doğu sığlıklarında avlanan, bir araba büyüklüğünde bir yengeç. Dolaşır, {playerName}, o yüzden izine rastlayana kadar kıyı boyunca yürümen gerekecek. Yalnız gitme ve durgunluğuna güvenme.",
+        "completion": "Sığlıklar yeniden sadece su. O kabuğun benden daha iyi avcıları kırdığını gördüm, {playerName}. Seni değil.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Yaşlı İlikkabuk"
+          }
+        }
+      },
+      "q_hollow_first_of_the_herd": {
+        "title": "Sürünün İlki",
+        "text": "İkinci ismi söylemek daha zor. Aurelhorn, büyükannem bu gözetleme noktasını tuttuğunda bu sürüleri yönetiyordu, ve Vadi'de her ne uyandıysa onu da yanlış uyandırdı. Bir zamanlar koruduğu şeyi çiğniyor, ve sürü onun delirmesine dayanamayacak. Eski avlu yollarının yakınındaki çayırlarda dolaşıyor. Onu merhametle bitir, {playerName}, ve bu yükü paylaşmak için bir arkadaş getir.",
+        "completion": "Demek İlk, sonuncunun elinde düşüyor. Sürü şimdiden daha sakin, hissediyor musun? Bugün Vadi'ye bir iyilik yaptın, öyle görünmese bile.",
+        "objectives": {
+          "0": {
+            "label": "Huzura Kavuşturulan Aurelhorn"
+          }
+        }
+      },
       "q_prof_hobby_switch": {
         "title": "Farklı Bir Uğraş",
         "text": "Ana dallar yemin ister. Bir hobi ise yalnızca merakının nereye gezindiğini sorar, {playerName}. Birkaç ot topla ve ana dallarının karşısındaki hangi zanaatı sürdürmek istediğine karar ver.",
@@ -11440,6 +12747,916 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ot tarlası toplandı"
+          }
+        }
+      },
+      "q_fv_snowline_report": {
+        "title": "Kar Sınırından Haber",
+        "text": "Ejder Toprakları'ndan çıkıp tırmanan her ruh ateşimin yanından geçer, {playerName}, ve her hafta daha azı tırmanıyor. Bekçi Kaldra, kuzey yolunun yukarısında Icemantle'ı tutuyor. Ona geçidin hala açık olduğunu söyle, ve bir yabancının onu tek başına yürüdüğünü söyle.",
+        "completion": "Geçit tutuyor, demek. Einna, yol işaretlerini gömüp geçen fırtınalar boyunca o yol kampını tutuyor, ve bana bir kez bile boş haber göndermedi. Icemantle'a hoş geldin, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Bekçi Kaldra'ya Rapor Ver"
+          }
+        }
+      },
+      "q_fv_wolves_at_the_door": {
+        "title": "Kapıdaki Kurtlar",
+        "text": "Kar yığını sürüleri eskiden yüksek setlerde kalırdı. Şimdi gündüz vakti göl yolunu geçiyorlar ve oduncularım duvarları terk etmiyor. Sürüleri seyrelt, {playerName}, on tanesini, ve yol yeniden bir yol olsun.",
+        "completion": "Burayla göl arasında on gölge daha az. Oduncular şimdiden kimin önce çıkacağı konusunda tartışıyor.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Kar Yığını Kurdu"
+          }
+        }
+      },
+      "q_fv_winter_pelts": {
+        "title": "Loca İçin Postlar",
+        "text": "Odun bir bedeni hayatta tutar, {playerName}, ama yün bu soğuğu çeviremez, sadece kurt kürkü çevirebilir. Kar yığını sürülerinden altı kalın kış postu, ve locanın barındırdığı herkes için yatak astarlayabilirim.",
+        "completion": "Böyle bir kürk, kışın dinlediği tek argümandır. Şu botları al, son partiden astarlandı.",
+        "objectives": {
+          "0": {
+            "label": "Kalın Kış Postu"
+          }
+        }
+      },
+      "q_fv_ember_caches": {
+        "title": "Göl Yolundaki Korlar",
+        "text": "Dün gece göl yolunda bir kor kutusu kızağı devrildi: bir ay boyunca canlı bir ateşi saklayan demir kazanlar. Üçü hala karda yatıyor, {playerName}, ve loca içerdiklerinden vazgeçemez. Ateşi eve getir.",
+        "completion": "Hepsi hala sıcak. Locaya bütün bir kış merhamet satın aldın, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Kurtarılan Kor Saklama Kutusu"
+          }
+        }
+      },
+      "q_fv_lights_over_steps": {
+        "title": "Basamakların Üzerindeki Işıklar",
+        "text": "Bu ay her gece kutup ışığı yeşil yandı, ve yaşlılar altında yürümek istemiyor. Bir kadın nedenini bilebilir: Işıkbilimci Veyla. Göletin güneydoğusundaki Kutup Işığı Basamakları'nda tek başına kamp kuruyor. Kampını bul, {playerName}, ve ışıkların ona ne söylediğini dinle.",
+        "completion": "Kaldra mı gönderdi seni? Demek sonunda endişelendi, ve haklı olarak. Otur, {playerName}. Bir süre benimle gökyüzünü izle.",
+        "objectives": {
+          "0": {
+            "label": "Işıkbilimci Veyla'yı Bul"
+          }
+        }
+      },
+      "q_fv_silent_trapline": {
+        "title": "Sessiz Tuzak Hattı",
+        "text": "Yaşlı Brosk, buranın batısındaki Titrek Bataklık tuzak hattında çalışır, ve on bir yıldır her hafta odun kızağıyla bir deste kürk gönderdi. Şimdi iki haftadır hiçbir şey yok. O donmayacak kadar inatçı ve boğulmayacak kadar dikkatli, {playerName}, o yüzden başka bir şey yanlış. Bataklıktaki kampını bul ve nefes aldığını gör.",
+        "completion": "Maeve mi gönderdi seni? Ha. On bir yıl oldu ve kadın hala bataklığın beni yiyeceğini düşünüyor. Şey... bu yıl haklı olabilir. Hatlarıma ne yaptığına bak.",
+        "objectives": {
+          "0": {
+            "label": "Tuzakçı Brosk'u Bul"
+          }
+        }
+      },
+      "q_fv_aurora_motes": {
+        "title": "Kutup Işığının Zerreleri",
+        "text": "Bu basamaklarda süzülen ışık cinleri, ışıkların kendisi tarafından dökülür, ve her biri kalbinde kutup ışığından bir zerre taşır. Gökyüzünün ne yazdığını okumak için altı taneye ihtiyacım var, {playerName}. Işık cinleri karşılık vermez. Bunun işi kolaylaştırıp kolaylaştırmadığı ya da zorlaştırdığı, seninle vicdanın arasındaki bir mesele.",
+        "completion": "Altı zerre, hala parıldıyor. Onlara bak, {playerName}: birbirleriyle uyum içinde nabız gibi atıyorlar. Işıklar hava durumu değil. Onlar bir sinyal.",
+        "objectives": {
+          "0": {
+            "label": "Kutup Işığı Zerresi"
+          }
+        }
+      },
+      "q_fv_rime_unbound": {
+        "title": "Serbest Kalan Kırağı",
+        "text": "Kutup ışığı bu kadar parlak yandığında, soğuk ayağa kalkıp yürür: kırağı elementalleri, irade verilmiş kırağı. Işıkların setlere dokunduğu yerde toplanırlar, ve her gece kampıma biraz daha yaklaşıyorlar. Sekizini parçala, {playerName}, biri beni parçalamadan önce.",
+        "completion": "Gece şimdiden daha ince hissettiriyor. Onları uyandıran her ne ise henüz bitmedi, ama Basamaklara biraz sessizlik kazandırdın.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Kırağı Elementali"
+          }
+        }
+      },
+      "q_fv_sprung_traps": {
+        "title": "Tuzaklardaki Periler",
+        "text": "Bataklık perileri, {playerName}. Bu küçük şeytanlar eğlence olsun diye tuzaklarımı fırlatıyor ve demiri sazlıklara saçıyor. Onları kov, sekiz tanesi geri kalanına ders vermeli, ve oradayken tuzak hatlarımdan geriye kalanı topla.",
+        "completion": "Dört iyi tuzak geri döndü ve sazlıklar sessizleşti. Benden daha ağır bir elle tuzak kuruyorsun, {playerName}, ama sonuçlarla tartışamam.",
+        "objectives": {
+          "0": {
+            "label": "Kovulan Bataklık Perisi"
+          },
+          "1": {
+            "label": "Kurtarılan Tuzak"
+          }
+        }
+      },
+      "q_fv_howl_above": {
+        "title": "Taraçalardaki Uluma",
+        "text": "Bunu alacakaranlıkta duyarsın, {playerName}: Uluyan Taraçalar'dan gelen, kar yığını sürülerine ait olmayan bir uluma. Daha büyük gırtlaklar. Taraça uluyanları, büyükannemin bu görevi tuttuğu zamandan beri ilk kez zirvelerden indi, ve kurtları yoluma iten onlar. Sekizini temizle ve geri it.",
+        "completion": "Sekiz, ve alacakaranlık korosu bu yüzden daha seyrek. Ama uluyanlar zirveleri boşuna terk etmez. Yukarıdaki bir şey onları hareket ettirdi, ve korkarım ki bunun bir adı var.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Taraça Uluyanı"
+          }
+        }
+      },
+      "q_fv_seeing_wren_home": {
+        "title": "Wren'i Eve Ulaştırmak",
+        "text": "Çırağım Wren iki gün önce Altın Eriyiş hattını yürümeye çıktı ve bir daha geri dönmedi. İzlerini buldum, Kutup Işığı Basamakları'nın güneybatısındaki yol işaretlerinin altında saklanıyor, kurtlardan çok korktuğu için kımıldayamıyor. Bataklığı terk edemem, {playerName}. Onu Basamaklardaki Veyla'nın kampına götür. Işıkların altında güvende olacak.",
+        "completion": "Kız içeride, battaniyelerimin yarısına sarılı ve yıldızları gökten indirecek kadar konuşuyor. Bugün nazik bir şey yaptın, {playerName}. Diyar bunlardan pek fazla görmüyor.",
+        "objectives": {
+          "0": {
+            "label": "Çırak Wren Kutup Işığı Basamaklarına Güvenle Ulaştırıldı"
+          }
+        }
+      },
+      "q_fv_frostmane_tyrant": {
+        "title": "Kırağı Yeleli Zorba",
+        "text": "Uluyanlar taraçalardan indiğinde avlanmıyorlardı. Kaçıyorlardı. Bir yeti yüksek toprakları ele geçirdi, dağ halkı ona Kırağı Yeleli diyor, ve sürüler bile onunla bir yamacı paylaşmıyor. Bu bitmeli, {playerName}, kış onu duvarlarıma sürmeden önce. Bir arkadaş getir. İki getir.",
+        "completion": "Dün gece rüzgar dindiğinde, bütün köy Kırağı Yeleli'nin eskiden olduğu yerdeki sessizliği duydu. Diyar sana yıllarca ödeyeceği bir borç içinde, {playerName}. Bunu tak, ve Icemantle'daki her kapı sana açık.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Kırağı Yeleli"
+          }
+        }
+      },
+      "q_dk_ash_on_the_wind": {
+        "title": "Rüzgardaki Kül",
+        "text": "Palisatın güneyine bak, {playerName}. Kumullardaki o ateşler trol ocak ateşleri değil, Kültükemik toplanmaları, ve her gece daha fazlası oluyor. Ölüler kemik tarlalarından dişlerinde hala kumla çıkıyor. Kapıma bir yol açmadan önce on akıncıyı devir.",
+        "completion": "Kumullarda on kılıç eksildi, ve toplanma ateşleri dün gece daha alçak yandı. Nöbetçilerim uyudu, bir haftadır yapmadıkları bir şey. İyi devrildi, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Kültükemik Akıncısı"
+          }
+        }
+      },
+      "q_dk_trolls_on_the_road": {
+        "title": "Yoldaki Troller",
+        "text": "Kumul trolleri bir erzak vagonunun sesini öğrendi, {playerName}. Bu ay Kül Kumulları yolunu üç kez vurdular, ve son sürücü elinde yalnızca dizginlerle yürüyerek geldi. O yoldan sekiz trol temizlenirse vagonlarım yeniden yola çıkar.",
+        "completion": "Sekiz, ve sürücülerim her sefer öncesi veda mektupları yazmayı bıraktı. Garnizon senin sayende yemek yiyor, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Kumul Trolü"
+          }
+        }
+      },
+      "q_dk_scorched_stores": {
+        "title": "Kararmış Erzaklar",
+        "text": "Son vagon yandı, {playerName}, ama demir kayışlı sandıklar tamamen yanmaz. Dördü hala kumul yolunda içinde bir mevsimlik tuz, çivi ve yay kirişi kararmış halde duruyor. Troller onları nasıl açacaklarını çözmeden önce erzaklarımı eve getir.",
+        "completion": "Simsiyah kararmış ama her mandal hala tutuyor. Demirci çivilerini alır, okçu kirişlerini, ve sen sandıklarımı geri getirene sakladığım botları alırsın, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Kurtarılan Kararmış Erzak Sandığı"
+          }
+        }
+      },
+      "q_dk_banners_over_the_dunes": {
+        "title": "Kumulların Üzerindeki Sancaklar",
+        "text": "Kültükemikler eski kemik tarlası mezarlarında toplanıyor, {playerName}, ve devriyelerim kumulları bir duvarı okudukları gibi okuyamıyor. Ölüleri ayağa kaldıran savaş çağırıcılarından beşini öldür ve nöbetçilerimin sırttan işaretleyebilmesi için her toplanma alanına bir uyarı sancağı dik.",
+        "completion": "Sıcak rüzgarda çırpınan üç sancak, tam da dürbünümün bulabileceği yerde. Beş savaş çağırıcısı susturulduğuna göre, çağrılarına ne cevap verirse versin, daha yavaş gelecek. Bize zaman kazandırdın, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Kültükemik Savaş Çağırıcısı"
+          },
+          "1": {
+            "label": "Dikilen Uyarı Sancağı"
+          }
+        }
+      },
+      "q_dk_watcher_at_the_wargate": {
+        "title": "Savaş Kapısındaki Gözcü",
+        "text": "Bir şey Kültükemikleri doğuya çekiyor, {playerName}, ve ne olduğunu öğrenmesi için en iyimi gönderdim. Öncü Yerrin, Trol Meclisi'nin ötesindeki uzak kumullarda, ömrümde kimsenin inşa etmediği bir kapının görüş alanında bir aydır kamp kuruyor. Raporları on gün önce durdu. Kampını bul ve bana onun gözlerini getir.",
+        "completion": "Brannoc mu gönderdi seni? Demek son habercim asla ulaşamadı. Sesini alçalt ve otur, {playerName}. Şu aşağıdaki kapıyı görüyor musun? Önündeki savaş sancaklarını say, o zaman neden bir şeyleri yazmayı bıraktığımı anlarsın.",
+        "objectives": {
+          "0": {
+            "label": "Öncü Yerrin'i Bul"
+          }
+        }
+      },
+      "q_dk_marrow_and_ash": {
+        "title": "İlik ve Kül",
+        "text": "Her Kültükemik akıncısı bir savaş markası taşır, {playerName}: yürüdüğü ordunun kararmış işareti. Bu sırttan dört ordu saydım, ama tahminler istihbarat değildir. Bana akıncılardan ve savaş çağırıcılarından altı marka getir, Brannoc'a gelmekte olan savaşın şeklini vereyim.",
+        "completion": "Altı marka, ve her birine aynı işaret yakılmış. Bu bir akın toplanması değil, {playerName}. Kumullardaki her ordu altımızdaki savaş kapısına bağlı, troller ona Orkadia diyor, ve birlikte hizmet ettiğim hiçbir beş asker o kapının ardında davul çalanı kıramazdı. Belki senin gibi beş kişi kırabilir.",
+        "objectives": {
+          "0": {
+            "label": "Kültükemik Savaş Markası"
+          }
+        }
+      },
+      "q_dk_scales_of_the_maw": {
+        "title": "Ağzın Pulları",
+        "text": "Rüzgar Ejder Ağzı Kalderası'ndan estiğinde, kor kanat ejderleri dişlerini sayabilecek kadar alçaktan kampımın üzerinden geçiyor, {playerName}. Her gün daha uzağa gidiyorlar, ve o kraterdeki bir şey onları sürüyor. Bana pullarından üç tane getir. Pullar sıcaklığı hatırlar, ve yanıktan bir ejderin nerede tünediğini okuyabilirim.",
+        "completion": "Şunun alt tarafına bak, {playerName}: sarmal şeklinde kararmış, ve yalnızca bir şey dairelerde yuva yapar. Bu ejderler yuva bekçileridir. Ejder Ağzı Kalderası'ndaki bir şey bir anne.",
+        "objectives": {
+          "0": {
+            "label": "Kor Kanadı Pulu"
+          }
+        }
+      },
+      "q_dk_matriarch_of_the_maw": {
+        "title": "Ağzın Anaerkili",
+        "text": "Pullar doğruyu söyledi, {playerName}. Şafakta kenara tırmandım ve onu krater tabanında gördüm: Cindraleth, bu gökyüzündeki her kor kanadın altında yumurtadan çıktığı anaerkil, tutuşmak üzere olan bir kömür kadar altın renkli. O kuluçkadayken ejderler daha da cesurlaşıyor, ve Wyrmwatch hem ejderlerle hem Kültükemiklerle savaşamaz. Onu kendi kraterinde bitir, sonra haberi Kapı Kaptanı Brannoc'a götür. Yalnız gitme.",
+        "completion": "Ejder Ağzı Kalderası'nın üzerindeki gökyüzü iki gündür boş, ve şimdi çizmelerinde bir anaerkilin kanıyla kapımdan geçiyorsun. Wyrmwatch kırk yıldır tam da bunun için nöbet tutuyor, {playerName}. Şu omuzlukları al, kendi demircimiz tarafından işlenmiş ağız pulundan. Ejderlerin görebileceği yerde tak.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Ağız Anaerkili Cindraleth"
+          }
+        }
+      },
+      "q_af_goldmelt_road": {
+        "title": "Aşağıya İnen Altın Yol",
+        "text": "Altın Eriyişi geçtin, {playerName}, çizmelerinde hala kar var. Bu tapınağı, Lanternmere soğuktan kimin geldiğini bilsin diye tutuyorum, ve son zamanlarda bildirecek pek bir şeyim olmadı. Altın yoldan kasabaya in, kuyunun yanında Vali Ottoline'i bul ve ona geçidin sessiz olduğunu söyle.",
+        "completion": "Altın Eriyişte sessizlik var, ve saçlarında kar olan bir gezgin bunun kanıtı. Sorrel nöbetini boş haber göndermeyecek kadar iyi tutuyor. Lanternmere'de hoş karşılan, {playerName}. Fenerler senin için yanıyor.",
+        "objectives": {
+          "0": {
+            "label": "Vali Ottoline'e Rapor Ver"
+          }
+        }
+      },
+      "q_af_foxes_in_the_lamplight": {
+        "title": "Fener Işığındaki Tilkiler",
+        "text": "Alacakaranlık tilkileri fener stoklarının ne kadar değerli olduğunu öğrendi, {playerName}. Her alacakaranlıkta çitlerden sızıp feribot fenerleri için sıkıp çıkardığımız donyağını götürüyorlar. Yumuşak pençeler, daha da yumuşak bir vicdan. On tanesini temizle, geri kalanlar kasabadan korkmayı hatırlar.",
+        "completion": "On tane, ve dün gece stoklar bu sezonda ilk kez el değmeden kaldı. Fenerciler teşekkürlerini iletiyor, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Alacakaranlık Tilkisi"
+          }
+        }
+      },
+      "q_af_lanterns_on_the_water": {
+        "title": "Su Üzerindeki Fenerler",
+        "text": "Göl'deki her feribot bir kıç feneri taşır, {playerName}, ve teknelerimden üçü şafakta kendilerinkiler olmadan döndü. Sis onları aldı, ya da sisteki bir şey aldı. Rüzgar döndüğünde doğu kıyısına vuruyorlar. Kıyı yolunu yürü ve fenerlerimi eve getir.",
+        "completion": "Üçü de, hala yanıyor. Feribot fenerleri suda sönmez, {playerName}. Bütün mesele bu. Beni endişelendiren şey, onları neyin koparttığı.",
+        "objectives": {
+          "0": {
+            "label": "Kurtarılan Feribot Feneri"
+          }
+        }
+      },
+      "q_af_orchard_call": {
+        "title": "Bahçe İçin Bir Araba",
+        "text": "Bahçıvan Pomeline, batı yolundaki Yaldızlı Bahçe'yi tutuyor ve reçine arabaları üç gündür gecikmiş durumda. Bütün kasaba o kehribar reçinesiyle dönüyor, {playerName}: fener reçinesi, tatlandırıcı, hasat birası. Batı yolunu yürü ve onu neyin alıkoyduğunu öğren.",
+        "completion": "Vali arabalarını sayıyor, öyle mi? Peki, bir süre daha eksik saymaya devam edebilir. Sıralarıma bak, {playerName}. Geç kalmış bir teslimattan daha büyük dertlerim var.",
+        "objectives": {
+          "0": {
+            "label": "Bahçıvan Pomeline'i Bul"
+          }
+        }
+      },
+      "q_af_amber_from_the_herd": {
+        "title": "Sürüden Kehribar",
+        "text": "Yaldızlı geyikler en yaşlı ağaçlarımın altına yatar ve reçine gece boyunca kürklerine altın gibi damlar. Taranan pıhtılar ormandaki en saf kehribardır. Bana altı tane getir, {playerName}. Geyikler sana teşekkür etmeyecek ama özlemeyecekler de.",
+        "completion": "Altı pıhtı, dökülmüş bal kadar temiz. Bu eldivenler son partiden dikildi, {playerName}: reçineyle sertleşmiş ve göründüğünden daha sıcak.",
+        "objectives": {
+          "0": {
+            "label": "Yaldızlı Reçine Pıhtısı"
+          }
+        }
+      },
+      "q_af_what_took_the_moorings": {
+        "title": "Bağlama Halatlarını Ne Aldı",
+        "text": "Şimdi kasabanın önünde söylemediğimi sana söyleyeceğim. Bağlama halatları kaymadı, ısırılarak kesildi. Göl pusucuları her gece daha da cesurlaşıyor, halatları ve dümenleri çekiştiriyorlar. Sekiz tanesini sonsuza dek suyun altına geri gönder, {playerName}, bir feribotçu onlarla gitmeden önce.",
+        "completion": "Sığlıklarda sekiz şekil daha az, ve geçiş bugün iki haftadır ilk kez zamanında yapıldı. Ama cesur pusucular, sürülmüş pusuculardır, {playerName}. Göl'ün altındaki bir şey onları hareket ettiriyor.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Göl Pusucusu"
+          }
+        }
+      },
+      "q_af_sprites_and_spigots": {
+        "title": "Periler ve Musluklar",
+        "text": "Hasat perileri, {playerName}. İçindeki tatlılık için musluklarımı gövdelerden söküp kovaları çimenlere fırlatıyorlar. Bu küçük hırsızlardan sekiz tanesini kov ve dört kovamı geri getir, arabalar yeniden yola çıksın.",
+        "completion": "Dört kova kancalarına geri döndü ve sıralar sessizleşti. Perilerle benden daha ağır bir elin var, {playerName}, ve bugün buna sevindim.",
+        "objectives": {
+          "0": {
+            "label": "Kovulan Hasat Perisi"
+          },
+          "1": {
+            "label": "Kurtarılan Reçine Toplama Kovası"
+          }
+        }
+      },
+      "q_af_the_meredark": {
+        "title": "Meredark",
+        "text": "Yaşlı feribotçuların yalnızca karada söylediği bir isim var: Meredark, ilk pusucu, göl kadar yaşlı ve iki katı sabırlı. Batık iskelenin sular altında kaldığı yıl bir kez daha yükselmişti, ve şimdi yeniden yükseliyor. Alacakaranlıkta güney kıyısındaki iskele kalıntılarında güneşleniyor, {playerName}. Bir arkadaş al, iki al, ve hala bitirilebiliyorken bitir.",
+        "completion": "Bu sabah Göl'ün üzerindeki sis kalktı, {playerName}, ve bütün kasaba bunu gördü. Feribotlar gece geçişlerini yeniden yapacak, ve sudaki her fener senin adına yanacak. Bunu al: batık iskeleden çıkarıldı ve bunu takmaya senden daha layık kimse yok.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Meredark"
+          }
+        }
+      },
+      "q_wf_across_the_fenway": {
+        "title": "Fenway'in Ötesinde",
+        "text": "Söğüt Bataklığı, yumuşak huylu bir diyar, ama yumuşak huylu olmak güvenli olmakla aynı şey değil, {playerName}. Yolu kuzeye, Fenway setine kadar takip et ve Bridgemere'e geç. Köprü Ustası Alden'e Basamakların açık olduğunu ve yol kampı ateşinin yanık olduğunu söyle.",
+        "completion": "Pell, bataklığın ona üfleyebileceği her sisin arasından o ateşi yanık tutuyor. Basamakların açık olduğunu söylüyorsa, açıktır. Bridgemere'e hoş geldin, {playerName}. Tahtalarımda adımına dikkat et, iyi anlaşırız.",
+        "objectives": {
+          "0": {
+            "label": "Köprü Ustası Alden'e Rapor Ver"
+          }
+        }
+      },
+      "q_wf_rope_chewers": {
+        "title": "Halat Kemirenler",
+        "text": "Bataklık kurbağaları, {playerName}. Geceleri hendekten çıkıp bağlama halatlarımı sanki sazlık sapıymış gibi kemiriyorlar. Geçen hafta üç kayık sürüklendi, ve birinin içinde iyi vinçim vardı. Sayılarını azalt, on tane şişko şeyi, ve tekneler bağladığımız yerde kalsın.",
+        "completion": "Hendeğimde on çift diş daha az. Kayıklar bir aydır ilk kez bağlama halatlarında bütün gece kaldı, {playerName}. Kasabadaki her ağcının teşekkürünü kazandın.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Bataklık Kurbağası"
+          }
+        }
+      },
+      "q_wf_eels_for_the_smokehouse": {
+        "title": "Tütsü Evi İçin Yılan Balıkları",
+        "text": "Bataklık kurbağaları sadece halatlarımı değil, {playerName}, avımı da yiyor: yılan balıklarını tuzaklardan direkt olarak bütün yutuyorlar. Et bozulmadan önce açgözlü şeylerden altı tombul olanını kurtar, tütsü evi ateşleri yanık kalsın.",
+        "completion": "Altı iyi yılan balığı, neredeyse hiç ezilmemiş. Tütsü evi sabaha kadar para gibi kokacak. Al, bu bataklık çizmeleri daha hızlıyken benimdi: yılan balığı derisi ıslaklığı başka hiçbir şey gibi çevirmez.",
+        "objectives": {
+          "0": {
+            "label": "Tombul Bataklık Yılan Balığı"
+          }
+        }
+      },
+      "q_wf_mind_the_moorings": {
+        "title": "Bağlama Halatlarına Dikkat Et",
+        "text": "Buralarda iyi halat çok değerlidir, {playerName}: kurbağaların ısırıp geçtiği her halat, bir haftalık yılan balığı parasının gitmesi demek. Kesilen uçlar hala teknelerin kaçırdığı hendek kıyısı boyunca yatıyor. Tahta yolları yürü ve bana dört halat getir, onları yeni gibi ekleyebilirim.",
+        "completion": "Şuna bak: temiz ısırıklar, hepsi, ama eklemeye yetecek kadar halat kaldı. Bana bir aylık para, ağcılara da bir aylık homurdanma kazandırdın, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Kurtarılan Kesilmiş Bağlama Halatı"
+          }
+        }
+      },
+      "q_wf_witch_of_willowweep": {
+        "title": "Willowweep'in Cadısı",
+        "text": "Şimdiye kadar duymuşsundur, {playerName}: horlama. Yavaş ve ağır, Uykulu Düzlükler'in ötesinde, sanki bataklığın kendisi uykusunda dönüyormuş gibi. Kurbağalar, periler, öğlen yanan ışık cinleri: hepsi o ses başladığında başladı. Bir ruh bunun ne olduğunu bilebilir. Ana Sedge, hendeğin batısında ve uzak kıyının aşağısında, Willowweep'te bir kamp tutuyor. Onu bul ve bataklığımın ortasında ne uyuduğunu sor.",
+        "completion": "Alden seni bunca yol boyunca horlama hakkında sormaya mı gönderdi? Demek köprü halkı sonunda dinliyor. Nemden uzak otur, {playerName}. O sesin bir adı ve bir gırtlağı var, ve onu susturmama yardım edecek kadar aptal birini bekliyordum.",
+        "objectives": {
+          "0": {
+            "label": "Ana Sedge'yi Bul"
+          }
+        }
+      },
+      "q_wf_toll_and_tangle": {
+        "title": "Ücret ve Kargaşa",
+        "text": "Söğüt perileri bir feribotu koparmayı güzel bir oyun sanıyor, {playerName}, ve geçen hafta ücret kayığı, üzerinde bir mevsimlik köprü ücretiyle doğu hattında devrildi. Sandıklar sığlıklara battı, ve periler tahta yollarda sanki kendilerininmiş gibi dans ediyor. Sekizini kov ve üç ücret sandığını çıkar, Bridgemere bu kış yemek yesin.",
+        "completion": "Üç sandık, ve içindeki para hala kuru. Periler bir hafta boyunca söğüt dallarında somurtacak, {playerName}, ve kasaba kış ekmeğini sana borçlu.",
+        "objectives": {
+          "0": {
+            "label": "Kovulan Söğüt Perisi"
+          },
+          "1": {
+            "label": "Kurtarılan Ücret Sandığı"
+          }
+        }
+      },
+      "q_wf_wisplight_charms": {
+        "title": "Işık Cini Tılsımları",
+        "text": "Havuzların üzerindeki ışık cinleri, bataklığın sesli rüya görmesidir, {playerName}, ve ışıkları Vraklayanın uyutmasına karşı direnen tek şeydir. Onu söğüt tılsımlarına örüyorum: biri boynunda, ve horlama göz kapaklarını aşağı çekemez. Bana altı ışık cini küresi getir. Işık cinleri onlar için seninle savaşmayacak, bu da onu ya bir iyilik ya da bir hırsızlık yapar, nasıl taşıdığına bağlı.",
+        "completion": "Altı küre, hala rüya görmekten sıcak. Ay doğana kadar bana zaman ver, senin için ve yanında durmaya cesaret eden herkes için tılsımlar öreyim.",
+        "objectives": {
+          "0": {
+            "label": "Işık Cini Küresi"
+          }
+        }
+      },
+      "q_wf_croakers_hush": {
+        "title": "Vraklayanın Sessizliği",
+        "text": "Şimdi horlayanın adını biliyorsun, {playerName}: Uykulu Vraklayan, Uykulu Düzlükler'deki yaşlı kurbağa kral. Her yıl vraklaması daha da ağırlaşıyor, ve her yıl bataklığın daha fazlası uyanmayı unutuyor. Tılsımlar gözlerini açık tutacak, ama iriliği başka bir mesele: bir arkadaş getir ve onunla suda savaşma. Yaşlı kralı daha sessiz bir uykuya yatır.",
+        "completion": "Dinle, {playerName}. Hiçbir şey. Bu bataklığın üzerindeki otuz yıldır ilk gerçek sessizlik, ve kasabanın yarısı bu tuhaflıktan bu gece uyuyamayacak. Söğütler kendi tarzlarında teşekkür ediyor. Bunu tak, onun kendi zambak yatağından dokunmuş, ve su nereye ulaşırsa bataklık seni bir dost olarak tanıyacak.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Uykulu Vraklayan"
+          }
+        }
+      },
+      "q_nb_road_of_lanterns": {
+        "title": "Fenerler Yolu",
+        "text": "Buralarda güneş asla takip etmez, {playerName}, sadece tırmanış boyunca yanık tuttuğum lambalar. Moonrest kuzeyde, çiçek ışığının toplandığı yerde bulunur. Lira Dewsong'u bahçeleri arasında bul ve ona Gece Kapısı lambalarının hala yandığını söyle.",
+        "completion": "Lambalar hala yanıyor, ve yol bize hala yabancılar getiriyor. Sorrel o kapıyı Moonrest'te herkesin hatırladığından daha uzun süredir tutuyor. Hoş geldin, {playerName}, hiç şafak sökmeyen diyara.",
+        "objectives": {
+          "0": {
+            "label": "Moonrest'te Lira Dewsong'u Bul"
+          }
+        }
+      },
+      "q_nb_striders_in_the_dark": {
+        "title": "Karanlıktaki Gezginler",
+        "text": "Alacakaranlık gezginleri her zaman sabırlı avcılar olmuştur, {playerName}, ama son zamanlarda tam çiçek tarhlarına sızıp fenerlerimizin altında ay yünü kuzularını alıyorlar. On tanesini temizle ve bozkırlara sessizliğini geri ver.",
+        "completion": "On gezgin daha az, ve sürüler şimdiden daha rahat otluyor. Bahçeler kendi saatlerini tutar, ama bu gece onları huzur içinde tutuyorlar.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Alacakaranlık Gezgini"
+          }
+        }
+      },
+      "q_nb_wool_by_moonlight": {
+        "title": "Ay Işığında Yün",
+        "text": "Hiçbir şey ay yünü gibi ısıtmaz, {playerName}, ve hiçbir şey bu kadar ince eğrilmez. Otlayıcılar gümüş yünlerini bozkırlarda süzülürken gevşek tutamlar halinde taşır. Bana sürülerden altı iyi tutam getir, sana yürümeye değer bir şey dokuyayım.",
+        "completion": "Yıldız ışığı kadar gümüş ve iki katı yumuşak. Al, {playerName}: son partiden eldivenler, yalnızca ay yününün astarlayabileceği gibi astarlanmış.",
+        "objectives": {
+          "0": {
+            "label": "Ay Yünü Tutamı"
+          }
+        }
+      },
+      "q_nb_night_gardens": {
+        "title": "Gece Bahçeleri",
+        "text": "Gece çiçeği yalnızca bu gökyüzünün altında açar, ve Gloamfield diyardaki en eski tarhları barındırır. Mabet çelenkleri için dört taze çiçeğe ihtiyacım var, {playerName}. Onları nazikçe kes: bir tarh, sert bir eli bir mevsim boyunca hatırlar.",
+        "completion": "Hala parıldıyor, her yaprağı. Mabet bir hafta boyunca gece kokacak, ve Moonrest bu sayede daha rahat uyuyor.",
+        "objectives": {
+          "0": {
+            "label": "Toplanan Gece Çiçeği Tomurcuğu"
+          }
+        }
+      },
+      "q_nb_eyes_on_the_vigil": {
+        "title": "Nöbetteki Gözler",
+        "text": "Bir şey, gezginleri cesur ve sürüleri huzursuz yapıyor, {playerName}, ve bunu çiçeklerde okuyamıyorum. Cassian bunu gökyüzünde okuyabilir. Gözlem kampını, gece halkının taşlar arasında süzüldüğü, buranın doğusundaki Ebedi Nöbet'in yanında tutuyor. Onu bul, ve yıldızların ne söylediğini sor.",
+        "completion": "Lira mı gönderdi seni? Demek bahçeler de hissediyor. Bir an dürbünün yanında otur, {playerName}. Yıldızlar bir aydır huzursuz, ve çizdiğim her harita kuzeye, höyüğe doğru eğiliyor.",
+        "objectives": {
+          "0": {
+            "label": "Ebedi Nöbet'te Gökbilimci Cassian'ı Bul"
+          }
+        }
+      },
+      "q_nb_charts_of_the_stones": {
+        "title": "Taşlardaki Haritalar",
+        "text": "Nöbet taşları Moonrest'ten daha yaşlı, onlara bakan gece halkından daha yaşlı, ve yüzeyleri, hayatımı okumayı öğrenmeye adadığım yıldız haritalarıyla kazınmış. Gökyüzü kaydı, {playerName}, ve ne kadar olduğunu bilmem gerekiyor. Üç taştaki haritaları oku ve bana yönlerini getir.",
+        "completion": "Şüphe kalmadı. Her yön Uykusuz Höyük'e doğru sürünmüş, sanki gökyüzünün kendisi izlemek için o höyüğe eğiliyormuş gibi. Eski krallar bir sebepten hizalanmış yıldızların altına gömülmüştü, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Okunan Yıldız Haritası"
+          }
+        }
+      },
+      "q_nb_restless_mounds": {
+        "title": "Huzursuz Höyükler",
+        "text": "Haritalar bir uyarıydı, ve höyük tarlası bunu kanıtlıyor: höyükler alttan açılıyor. Hayaletler eski onurları taşıyarak mezar sıralarında dolaşıyor, ve onları uykuda tutan sunular çimenlere saçılmış yatıyor. Sekizini indir, {playerName}, ve dört sunuyu bana geri getir.",
+        "completion": "Mezar altını, hala topraktan soğuk. Hayaletler kendi kendilerine kalkmıyor, {playerName}: büyük höyüğün altındaki bir şey onları çağırıyor, ve korkarım haritalar bize onun adını çoktan söyledi.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Höyük Hayaleti"
+          },
+          "1": {
+            "label": "Kurtarılan Mezar Sunusu"
+          }
+        }
+      },
+      "q_nb_the_barrow_king": {
+        "title": "Höyük Kralı Uyanıyor",
+        "text": "Her yön, her huzursuz yıldız, her açılmış höyük tek bir şeye işaret ediyor: Höyük Kralı büyük höyüğün altında uyanıyor, ve bu diyarın onu geri tutacak bir şafağı yok. Tacını hatırlamadan önce huzura kavuşturulmalı, {playerName}. Yalnız gitme: bir arkadaş getir ve çiçek ışığını arkanda tut.",
+        "completion": "Yıldızlar bir mevsim içinde ilk kez sakinleşti, {playerName}. Höyükler kapandı, gece halkı taşlarının yanında durgunlaştı, ve kral bir kez daha aşağıda uyuyor. Bu pelerini tak: Moonrest onu, gecenin sonunda güvendiği kişi için kesti.",
+        "objectives": {
+          "0": {
+            "label": "Huzura Kavuşturulan Höyük Kralı"
+          }
+        }
+      },
+      "q_ww_bells_of_gallowmere": {
+        "title": "Gallowmere'in Çanları",
+        "text": "O çan seslerini duyuyor musun, {playerName}? Bu, kuzey yolunun yukarısındaki Gallowmere, ölülerini uykuya çalıyor. Mezarcı Marrow, örtünün altındaki her ruhun sayımını tutuyor, yaşayan ve gömülü. Git ve sayıl, orman seni kendi başına saymadan önce.",
+        "completion": "Cobb seni yolun yukarısına sağ salim mi gönderdi? İyi adam. O kapı fenerlerini otuz yıldır yanık tuttu, ve orman onu bir kez bile geçemedi. Gallowmere'e hoş geldin, {playerName}. Çanlara dikkat et.",
+        "objectives": {
+          "0": {
+            "label": "Mezarcı Marrow'a Rapor Ver"
+          }
+        }
+      },
+      "q_ww_silk_in_the_eaves": {
+        "title": "Saçaklardaki İpek",
+        "text": "Batı yolunu yürürken yukarı bak, {playerName}, ve onları göreceksin: hiçbir rüzgarın ulaşmadığı yerde sallanan, ağaç tepesinde sarılı şekiller. Dul ipeği örücüleri Çalılık'tan sürünerek çıkmış ve kilerlerini fenerlerimin üzerine germiş. On tanesini öldür, yol yeniden bir yol olsun.",
+        "completion": "Saçaklarda on dokumacı daha az. Fenerciler bu gece yukarı bakmadan tur atacak, ve bu burada düşündüğünden daha değerli.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Dul İpeği Örücüsü"
+          }
+        }
+      },
+      "q_ww_widows_skeins": {
+        "title": "Dulun Yumakları",
+        "text": "Örücüler ölülerimizi kilerleri için alıyor, {playerName}, o yüzden ben de kefenlerimiz için ipeklerini alıyorum. Temiz yanıyor ve keteninkinden çok daha iyi bir kutsama tutuyor. Bana altı yumak dul ipeği getir, gömeceğimiz bir sonraki ruh sarılı ve korunmuş inecek.",
+        "completion": "Altı yumak, tutulmuş bir nefes kadar yumuşak. Ölüler bunun içinde daha rahat yatacak. Şu sargıları al, son partiden diktim, ve orman onları bir kez bile ısırıp geçmedi.",
+        "objectives": {
+          "0": {
+            "label": "Dul İpeği Yumağı"
+          }
+        }
+      },
+      "q_ww_candles_at_the_bounds": {
+        "title": "Sınırlardaki Mumlar",
+        "text": "Dört sınır taşı Gallowmere'i çevreler, {playerName}, çıkan her yolda bir tane, ve her taşta bir mezar mumu yanar. Onlar yandığı sürece, gömülüler gömülü kalır. Çisenti hepsini söndürdü, dördünü de, ve ben sınırları tek başıma yürüyecek kadar yaşlıyım. Mumumu al ve onları çabucak yeniden yak.",
+        "completion": "Dördü de mi yanıyor? O zaman nefes al, {playerName}. Sen duymadın ama bütün köy duydu: son fitil tutuştuğu an çanlar daha rahat çaldı.",
+        "objectives": {
+          "0": {
+            "label": "Yeniden Yakılan Mezar Mumu"
+          }
+        }
+      },
+      "q_ww_the_last_vicar": {
+        "title": "Son Papaz",
+        "text": "Buranın güneyinde Yas Taşı Şapeli, kara göletinin yanında çürüyor, ve bir adam hala ona bakıyor: çatı çöktüğünde ayrılmayı reddeden Papaz Creel. Eski ayinleri benim çanlarımdan daha iyi biliyor, {playerName}, ve bir aydır haber göndermedi. Şapel yolunu yürü ve nefes aldığını gör.",
+        "completion": "Marrow benim için mi endişeleniyor? Bu yeni bir şey. Ona Yas Taşı'nın bir şekilde ayakta olduğunu söyle, ben de öyle. Bir süre kal, {playerName}. Gölet fısıldıyor, ve yalnız dinlememeyi tercih ederim.",
+        "objectives": {
+          "0": {
+            "label": "Papaz Creel'i Bul"
+          }
+        }
+      },
+      "q_ww_wraiths_of_the_tarn": {
+        "title": "Göletin Hayaletleri",
+        "text": "Orman hayaletleri bir zamanlar şapel bekçileriydi, {playerName}, onurlu ölülerin üzerine dikilen ağaçlardan büyümüşlerdi. Gölet karardığından beri görevlerini unuttular, ve şimdi mezarlığımda toprağı çekiştirerek süzülüyorlar. Başladıklarını bitirmeden önce sekizini parçala.",
+        "completion": "Sekiz bekçi sonunda yattı. Buna gün ışığında bir merhamet demeyeceğim, ama aramızda kalsın, {playerName}, öyleydi.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Orman Hayaleti"
+          }
+        }
+      },
+      "q_ww_what_the_bark_holds": {
+        "title": "Kabuğun Sakladığı",
+        "text": "Gallowmere'in doğusundaki Asılı Çayırlık'ta örücüler ipekle sarılmış ölülerini dallara asıyor, ve mezar kütüğü sürüngenleri altında sabırlı tabut taşıyıcılar gibi nöbet tutuyor. Yukarıdakiler bizim halkımız, {playerName}. Beş sürüngeni devir, sarılı ölülerden üçünü indir, ve onları toprağa, eve getir.",
+        "completion": "Gece çökmeden üç ruh dürüst toprağın altına geri döndü. Sürüngenler yeniden büyür, kabuk her zaman büyür, ama bu gece çayır boş asılı duruyor, ve bu yeterli.",
+        "objectives": {
+          "0": {
+            "label": "Devrilen Mezar Kütüğü Sürüngeni"
+          },
+          "1": {
+            "label": "İndirilen İpekle Sarılmış Kalıntılar"
+          }
+        }
+      },
+      "q_ww_walking_mosley_home": {
+        "title": "Mosley'i Eve Ulaştırmak",
+        "text": "Mezarcım Mosley üç gün önce eski avluda bir mezar açmak için şapel yolunu tuttu, ve kazı üzerine çöktü. Tırnaklarıyla kazıp çıktı, aptal yaşıyor, ama şapel mezarlarının yanında büzülmüş ve yoldaki örücüler yüzünden kımıldamıyor. Onu eve götür, {playerName}. Yaşayan bir adam için çanları çalamam.",
+        "completion": "Kapıdan kendi ayaklarının üzerinde geçti, bundan sonra bir şalgam tarhından daha derin bir şey kazmayacağına yemin ederek. Pazara kadar avluya geri dönecek, hep dönerler. Teşekkür ederim, {playerName}. Gallowmere halkını tutar, bütün yasamız bu.",
+        "objectives": {
+          "0": {
+            "label": "Mezarcı Mosley Gallowmere'e Güvenle Ulaştırıldı"
+          }
+        }
+      },
+      "q_ww_horn_of_the_huntsman": {
+        "title": "Avcının Borusu",
+        "text": "Şimdiye kadar borazanı duymuşsundur, {playerName}, ince ve uzak, bütün ormanın nefesini tuttuğu ses. Solgun Avcı, buranın kuzeyindeki çayırında at sürüyor, ve geçtiği her mezar daha da sığlaşıyor. Bir zamanlar bir insandı, ve yanlış gömüldü, ve duanın bunu çözeceğini düşünmekten vazgeçtim. Bir arkadaş al, iki al, ve onu attan indir.",
+        "completion": "Borazan notanın ortasında durdu. Gallowmere'deki her çan kendiliğinden bir kez çaldı, ve sonra orman otuz yıldır duyduğumdan daha sessizleşti. Benim yapamadığım ayini sen yaptın, {playerName}. Bunu tak ve örtünün altında korkmadan yürü.",
+        "objectives": {
+          "0": {
+            "label": "Attan İndirilen Solgun Avcı"
+          }
+        }
+      },
+      "q_pr_down_to_drifthaven": {
+        "title": "Drifthaven'a İniş",
+        "text": "Kara ağaçlardan çıkıp güneşe, {playerName}. Kıyı yolunu kuzeye takip et, gelgit dönmeden Drifthaven'a varırsın. Kurtarma Şefi Ryna'yı sor, fırtınadan beri her el çifti için işi var, ve ona Sarmaşık Ağzı yolunun hala açık olduğunu söyle.",
+        "completion": "Pell mi gönderdi seni? Demek bütün Sarmaşık Ağzı yolunu tek başına yürüdün, ve bu benim için yeterli bir referans. Drifthaven'a hoş geldin, {playerName}. Bir halat kap, elimiz dar.",
+        "objectives": {
+          "0": {
+            "label": "Kurtarma Şefi Ryna'ya Rapor Ver"
+          }
+        }
+      },
+      "q_pr_wreck_line_cargo": {
+        "title": "Enkaz Hattı",
+        "text": "Üç gece önceki fırtına Pearlwake'i resife sürükledi, ve kargosu burayla Palmiye Plajı arasındaki enkaz hattının tüm uzunluğuna saçılmış durumda. Üç sandık ticaret malı hala dalgalarda yatıyor, {playerName}. Gelgit ya da yengeçler geriye kalanı almadan önce onları içeri getir.",
+        "completion": "Tuzla lekelenmiş ama sağlam, üçü de. Bu ay dalgıçlar senin sayende yemek yiyor, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Kurtarılan Pearlwake Yük Sandığı"
+          }
+        }
+      },
+      "q_pr_scuttler_cull": {
+        "title": "Kabuk Sırtlı Hırsızlar",
+        "text": "Bu kıyıdaki her enkaz gelgit yürüyücülerini çeker, ve Pearlwake resifin yarısını çekti. Kurtarma ekiplerim, sığlıklarda o pençeler varken bir hatta çalışmaz. On tanesini kır, {playerName}, ve enkaz hattı yeniden bizim olsun.",
+        "completion": "Dalgalarda on pençe daha az. Ekiplerim şimdiden geri dalgalara giriyor, ve hiçbiri teşekkür etmedi, o yüzden ben edeceğim: teşekkür ederim, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Kırılan Gelgit Yürüyücüsü"
+          }
+        }
+      },
+      "q_pr_boars_in_the_gardens": {
+        "title": "Bahçelerdeki Yaban Domuzları",
+        "text": "Derin yeşilliğin içinde her ne kıpırdıyorsa, çalılık yaban domuzlarını sahilimize itiyor. Bu hafta bahçe teraslarını iki kez altüst ettiler, ve sıradaki kurutma rafları olacak. On yaban domuzu, {playerName}, ve geri kalanını ağaçların altına geri it.",
+        "completion": "Raflar ayakta ve bahçeler yeniden ekilebilir. Yaban domuzları kuma çıkmayı kendileri seçmedi, {playerName}. Bunu hatırla: bir şey onları hareket ettirdi.",
+        "objectives": {
+          "0": {
+            "label": "Kovulan Çalılık Yaban Domuzu"
+          }
+        }
+      },
+      "q_pr_the_man_who_went_in": {
+        "title": "İçeri Giren Adam",
+        "text": "Dalgıçlar ağaç sınırının ötesine adım atmayacak, {playerName}, ve onlardan bunu istemeyeceğim. Şimdiye kadar davulları duymuşsundur zaten: herkes ikinci geceye kadar duyar. Bu adada o sese doğru yürüyüp geri dönen tek bir adam oldu. Okku. Sarmaşık yolunun derinliklerindeki Sarmaşık Şelalesi'nde büyük banyan ağaçlarının altında kamp kuruyor. Onu bul ve yeşilliğin ne sakladığını sor.",
+        "completion": "Isha mı gönderdi seni? İnci Ana yıllardır adımı ağzına almadı. Sarmaşıkların erişemeyeceği bir yere otur, {playerName}, ve bildiklerimi anlatayım: davullar tehlike değil. Onlar bir uyarı.",
+        "objectives": {
+          "0": {
+            "label": "Sarmaşık Şelalesi'nde Okku'yu Bul"
+          }
+        }
+      },
+      "q_pr_canopy_silk": {
+        "title": "Ağaç Tepesinden İpek",
+        "text": "Yukarı bak, {playerName}. Buradan idole kadar her ağaç tepesi bir balık ağı gibi örülmüş, ve dokumacılar her mevsim daha da cesurlaşıyor. Ormanın bana sinsice yaklaşamaması için kendi ipeklerini yollara geriyorum, tuzak çanları. Ağaç tepesi dokumacılarından altı iyi yumak hatlarımı yeniden gerecek.",
+        "completion": "İyi, sağlam ipek. Çanlarım biraz daha uzun şarkı söyleyecek, ve ben bilmeden gece bu yollarda hiçbir şey yürümez, {playerName}. Son zamanlarda bir şey sık sık yürüyor.",
+        "objectives": {
+          "0": {
+            "label": "Ağaç Tepesi İpeği Yumağı"
+          }
+        }
+      },
+      "q_pr_the_lost_navigator": {
+        "title": "Kayıp Rehber",
+        "text": "Pearlwake'ten biri hariç herkesi çıkardık: uzak sahile yüzen ve bir daha içeri girmeyen Rehber Suli. Bir dalgıç onu Palmiye Plajı'nın ötesindeki pruva enkazında saklanmış, hayatta, ama yalnız başına o mesafeyi geçecek kadar dermanı olmadığını gördü. Onu kıyı yolu boyunca eve götür, {playerName}. Yengeçler bunu sevmeyecek, ve orman daha da az sevecek.",
+        "completion": "Suli ateşin yanında, hala yüzerek geçebileceğine yemin ediyor. Bu kıyıdaki tek harita okuyucusunu geri getirdin, {playerName}. Bunlar onun deniz sandığından, onun izniyle.",
+        "objectives": {
+          "0": {
+            "label": "Rehber Suli Drifthaven'a Güvenle Ulaştırıldı"
+          }
+        }
+      },
+      "q_pr_what_the_drums_guard": {
+        "title": "Davulların Koruduğu Şey",
+        "text": "Batık İdol'e yaşayan bir adamın cesaret edebileceği kadar yakın yürüdüm, ve iki şey gördüm: dokumacılar idol yolunu ağla perdelemiş, ve boyunca eski sunu kaseleri yeniden doldurulmuş. Taze taze, {playerName}. Yoldan sekiz dokumacı kes ve bana o sunulardan üç tane getir. Hala ölü bir tanrıyı hangi elin beslediğini bilmek isterim.",
+        "completion": "Yosun, inci kabuğu ve yaban domuzu kanı, parmaklarla sıkıştırılmış. O harabedeki bir şey hala ayinlerini sürdürüyor, {playerName}, ve Muhafız geri kalan her şeyi dışarıda tutuyor. Bunun hakkında açıkça konuşma zamanı geldi.",
+        "objectives": {
+          "0": {
+            "label": "Devrilen Ağaç Tepesi Dokumacısı"
+          },
+          "1": {
+            "label": "Toplanan Yeniden Doldurulmuş Sunu Kasesi"
+          }
+        }
+      },
+      "q_pr_idol_guardian": {
+        "title": "İdol Muhafızı",
+        "text": "İdol bu adadan daha yaşlı, {playerName}. Davullardan daha yaşlı, Palmiye Kıyısı adından daha yaşlı. Muhafızı, palmiyeler büyümeden önce o batık halkada durmuş, ve şimdi uyanıp geceleri sütunlar arasında yürüyor. Sunular her neyi besliyorsa, Muhafız onun kapı bekçisi. Bir arkadaş getir ve onu kır.",
+        "completion": "Ormanın kendisinin bile dokunmadığı bir şeyi devirdin. Şuraya bak, idolün arkasına: Muhafız hiçbir zaman sütunları korumuyordu, {playerName}, altlarındaki basamakları koruyordu. Davullar bu gece sustu. Yaban Yürek Çukuru'nun altında her ne uyuyorsa artık adını biliyor.",
+        "objectives": {
+          "0": {
+            "label": "Kırılan İdol Muhafızı"
+          }
+        }
+      },
+      "q_eg_gate_report": {
+        "title": "Kapıdan Gelen Haber",
+        "text": "Bu kapının ötesindeki çimenler yüz yıldır kendi kendilerini budadı, {playerName}, ve son zamanlarda ziyaretçileri de budamaya başladılar. Baş Bahçıvan Amaranth, kapı çimenlerinin ötesindeki yolda, Hedgewick'te defterleri tutuyor. Ona başka bir gezginin geçtiğini söyle ve çitlerin dün gece kapının yanında hareket ettiğini söyle.",
+        "completion": "Hareket etmişler, öyle mi. Pell bunu her hafta bildiriyor, ve her hafta haklı çıkıyor. Gözlerimi bağışla, {playerName}, yıllardır bir gece bile tam uyumadım: birinin bahçenin bizi izlemesini izlemesi gerekiyor. Hedgewick'e hoş geldin.",
+        "objectives": {
+          "0": {
+            "label": "Baş Bahçıvan Amaranth'a Rapor Ver"
+          }
+        }
+      },
+      "q_eg_hungry_shapes": {
+        "title": "Açlığa Budanmış",
+        "text": "Bu bahçeyi şekillendiren her kimse, ya dikkatsizleşti ya da acımasızlaştı. Vahşi Güller'deki kurt şekilleri gösteri için kırpılmıştı, ama son zamanlarda avlanıyorlar: yeşil çeneler, karınsız, ve durmak için hiçbir sebep yok. On çit kurdunu devir, {playerName}, ve çimenlerin bir süreliğine yeniden çimen olmasına izin ver.",
+        "completion": "On kurdun durduğu yerde on yığın kesinti. Bu bahçıvanlık gibi hissettirmeli, {playerName}. Neden savaş gibi hissettiriyor?",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Çit Kurdu"
+          }
+        }
+      },
+      "q_eg_stolen_shears": {
+        "title": "Çalınan Makaslar",
+        "text": "Hedgewick'teki her makas çifti iki hafta içinde ortadan kayboldu, {playerName}: kancalardan, kilitli kulübelerden, bir çift de ben kestirirken kendi önlüğümden. Bu, çimenlerinde yürümemizden nefret eden çit cüceleri, o küçük bahçıvanlar. Bütün köy mutfak bıçaklarına düşmeden altı çift geri getir.",
+        "completion": "Altı çift, ve aralarında kendiminki de var, bıçaktaki çentiği her yerde tanırım. Al, bu eldivenler budama işi için örüldü. Sıcak eller sabit makaslar sağlar.",
+        "objectives": {
+          "0": {
+            "label": "Çalınmış Hedgewick Makası"
+          }
+        }
+      },
+      "q_eg_who_trims_the_hedges": {
+        "title": "Çitleri Kim Buduyor",
+        "text": "Otuz yıldır bu defterleri tutuyorum, {playerName}, ve on yıldır düzgün uyuyamadım, çünkü hesaplar tutmuyor. Çimen kesilmek ister ve çitler şekillendirilmek ister, ve burada kimse ikisini de yapmıyor, yine de her şafakta bahçe budanmış duruyor. Son zamanlarda orman halkı, Zambak Çukuru yanındaki labirentin ötesinde, uzak güney çimenlerinde el arabalı yaşlı bir adam gördüklerine yemin ediyor. Onu bul. Eğer gerçekse, sonunda uyuyabilirim. Değilse, sanırım hiç uyuyamayacağım.",
+        "completion": "Demek ev sonunda birini gönderdi. Yüz yıldır bu çimenlerde yürüyorum, {playerName}, ve bahçe ile aramda bir anlaşma var: budanmayı isteyeni budarım. Otur. Çitler sensiz bir saat idare edebilir.",
+        "objectives": {
+          "0": {
+            "label": "Zambak Çukuru Yanındaki Bahçıvanı Bul"
+          }
+        }
+      },
+      "q_eg_gnomes_in_the_green": {
+        "title": "Bahçıvanların Kini",
+        "text": "Makaslar sadece başlangıçtı, {playerName}. Dün gece cüceler alet arabalarımızı yeşilliğe devirdi, biri labirentin batısındaki inlerinin yanında, biri bahçenin tam karşısında gölet yolunda, ve yüz yıllık iyi demiri çimenlere saçtı. Bu küçük şeytanlardan sekizini kov ve devrilen arabaları eve getir.",
+        "completion": "Üç araba geri döndü ve kazıklar yeniden dolu. Küçük şeytanlar çitlerinde somurtsun bakalım: Hedgewick bu çimenlerde de çalışıyor.",
+        "objectives": {
+          "0": {
+            "label": "Kovulan Çit Cücesi"
+          },
+          "1": {
+            "label": "Kurtarılan Alet Arabası"
+          }
+        }
+      },
+      "q_eg_bloom_clippings": {
+        "title": "Canlı Yeşillikten Kesikler",
+        "text": "Bu bahçeyi anlamak mı istiyorsun? O zaman onu benim okuduğum gibi oku. Çimenlerde otlayan geyikler en gerçek yeşili büyütür: üzerlerindeki her yaprak bir sayfadır. Bana çit geyiklerinden altı taze kesim getir, {playerName}. Budama için sana teşekkür etmeyecekler, ama yeniden büyüyecekler. Burada her şey yeniden büyür.",
+        "completion": "Şuraya bak: yapraklar kendi içine kıvrılıyor, her kesim aynı. Bahçe korkuyor, {playerName}. Yüz yıldır onu bir kez bile korkmuş görmedim.",
+        "objectives": {
+          "0": {
+            "label": "Budanmış Çiçek Kesiği"
+          }
+        }
+      },
+      "q_eg_four_statues": {
+        "title": "Dört Sessiz Kız Kardeş",
+        "text": "Bahçe genç olduğunda, ilk bahçıvanlar bölgelerini gözetmek için dört mermer kız kardeş dikti: biri Vahşi Güller'in üzerinde, biri labirentin doğusundaki gölet yolunda, biri cücelerin inlerini tuttuğu batı çimeninde, ve biri çitlerin ötesindeki güney çimeninde. Labirent aralarında büyüdü, ve çoğu insan dördünü birden hiç görmez. Bölgeleri dolaş, {playerName}, ve avucunu her kız kardeşe bas. Bahçe seni dört yandan da incelediğinde, yabancılardan sakladığı yerleri açacaktır.",
+        "completion": "Dört kalıp, dört kız kardeş, ve hiçbiri mermer gözyaşı dökmedi. Bahçe seni ölçtü, {playerName}, ve seni eksik bulmadı. Şimdi seni derdin gerçekten yaşadığı yere gönderebilirim.",
+        "objectives": {
+          "0": {
+            "label": "Ziyaret Edilen Bahçe Heykeli"
+          }
+        }
+      },
+      "q_eg_bull_of_the_court": {
+        "title": "Çeşme Avlusunun Boğası",
+        "text": "Şimdi gerçeği söyleyeyim, {playerName}. Labirentin kalbindeki boğa benim başyapıtımdı: onu Çeşme Avlusu'nu korusun diye şekillendirdim, ve yüz yıl boyunca öyle yaptı. Ama yeşilliğin içindeki korku ona da ulaştı, ve artık hiçbir şeyi korumuyor, avlanıyor. Labirent içine dalan herkesi ona besliyor. Onu bozmak için çok yaşlıyım, ve kökünden dalına kadar bozulması gerekiyor. Bir arkadaş getir, labirentten avluya yürü ve boğamı devir.",
+        "completion": "Burada, o parçalanırken hissettim. Yüz yıllık emek, ve onu bitirmekte haklıydın. Bu pelerini al: onu, en iyi eserimden daha güçlü olduğunu kanıtlayan kim olursa olsun için kestim. Avlu bu gece sadece bir çeşme, {playerName}, ve bahçe sadece bir bahçe. Belki artık Baş Bahçıvan da ben de uyuyabiliriz.",
+        "objectives": {
+          "0": {
+            "label": "Bozulan Çit Boğası"
+          }
+        }
+      },
+      "q_fs_bell_at_the_landing": {
+        "title": "İskeledeki Çan",
+        "text": "Feribot Yolu'ndan mı geçtin, {playerName}? O zaman bir haftadır ilk gelensin, ve Bekçi seni incelemek isteyecektir. Gullhaven, artık kimsenin bakmadığı kurutma raflarının ötesinde, kıyı yolunun yukarısında bulunur. Bekçi Coalfast'e setin hala ayakta olduğunu ve Tam'ın bugün henüz üç vuruşluk çanı çalmadığını söyle. Henüz.",
+        "completion": "Set tutuyor, ve Tam'ın hala üç vuruş hakkında şaka yapacak nefesi var. Güzel. Biz kuşatma altındaki bir adayız, {playerName}, ve bu kum setini geçen her el çifti, gediklerin halkıma ulaşmadan önce geçmesi gereken bir çifttir. Gullhaven'a hoş geldin.",
+        "objectives": {
+          "0": {
+            "label": "Bekçi Coalfast'e Rapor Ver"
+          }
+        }
+      },
+      "q_fs_hold_the_riftfields": {
+        "title": "Yarık Tarlalarını Tut",
+        "text": "Kasabanın doğusunda tahıl sıraları harabeye döndü, ve Yarık Tarlaları gediğinden geçen zavallılar şimdi onları tertemiz yiyip bitiriyor. Halkım içinde duramadığı bir tarlaya bakamaz, {playerName}. Zavallılardan on tanesini temizle ve çiftçilere topraklarını geri ver.",
+        "completion": "On tane eksik, ve tarla işçileri şimdiden kimin önce çıkacağı konusunda tartışıyor. Bu uzun sürmeyecek, gedikler asla uzun süre dinlenmez, ama yemek yiyen bir kasaba, direnen bir kasabadır.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Gedik Zavallısı"
+          }
+        }
+      },
+      "q_fs_steel_for_the_redoubt": {
+        "title": "Tabya İçin Çelik",
+        "text": "Dağıttığım her bıçak, ya denizin geri verdiği ya da ölülerden söktüğüm bir bıçak, {playerName}. Zavallılar gediklerden hurda taşıyor: menteşeler, kancalar, kırık kılıç çeliği, saksağan eşyaları, ama düzgünce dövülüyor. Bana toplanmış çeliklerinden altı parça getir, barikat hattı dişlerine yeniden kavuşsun.",
+        "completion": "Tuzla oyulmuş ve gedik izli, ama yine de keskinliğini koruyacak. Al, bu kavramaları kendim astarladım. Çelik karşılığı çelik, {playerName}: Uzak Kıyı'nın bugünlerde yaptığı tek ticaret bu.",
+        "objectives": {
+          "0": {
+            "label": "Gedik İzli Çelik"
+          }
+        }
+      },
+      "q_fs_the_three_bells": {
+        "title": "Üç Çan",
+        "text": "Kendiminkinin ötesindeki kıyıda üç nöbet çanı duruyor: biri İskele noktasında, biri güney kumsalında, biri de Yarık Tarlaları kıyısında. Bir halat çürümüşse ya da bir çan tokmağı sökülmüşse, kasaba bir gediği ancak sokaklara ulaştığında öğrenir. Kıyıyı yürü, {playerName}, ve her çanı bir kez çal, hala bir sesi olduğunu bileyim.",
+        "completion": "Üç ses, üç yanıt, suyun üzerinden temizce taşındı. Bu gece Gullhaven'da uyu, {playerName}, ve bil ki bir çan seni uyandırırsa, bu benim elimle ve doğru zamanda olacak.",
+        "objectives": {
+          "0": {
+            "label": "Çalınan Nöbet Çanı"
+          }
+        }
+      },
+      "q_fs_song_before_the_break": {
+        "title": "Gedik Öncesi Şarkı",
+        "text": "Gediklerin açılmadan önce onları duyan bir adam var. Yarık Nöbetçisi Ollun: bir bilgin, ya da bir deli, ve son zamanlarda bu farkı göze alamıyorum. Nöbetini, kasabanın güneydoğusundaki yolun yukarısındaki Nöbet Çayırı'nda tutuyor. Onu bul, {playerName}, ve ada bize sırada ne yapacak diye sor.",
+        "completion": "Bekçi mi gönderdi seni? Güzel. Bu, kasabanın sonunda dinlemeye başladığı anlamına geliyor. Şimdi bir an sessiz ol, {playerName}. Şurada, rüzgarın altında, duyuyor musun? Kayalıklar şarkı söylüyor, ve bu ezgiyi sevmiyorum.",
+        "objectives": {
+          "0": {
+            "label": "Yarık Nöbetçisi Ollun'u Bul"
+          }
+        }
+      },
+      "q_fs_moss_and_mending": {
+        "title": "Yosun ve İyileşme",
+        "text": "Gelgit çizgisi boyunca büyüyen tuz yosunu, bildiğim en iyi yara sargısıdır, ve yarık yavruları büyüdüğü kıyının her parçasını ele geçirdi. Derilerine takılmış tutamlarını taşıyorlar, akla gelebilecek her şeyin arasında. Doğu topraklarında altı tanesini temizle, {playerName}, ve çiğnedikleri yerden bana dört iyi avuç yosun kopar.",
+        "completion": "Bir elde yosun, diğer elde daha sessiz bir kıyı. Bütün muayenehanemi yeniden stokladın, {playerName}. Bana bir iyilik yap ve bir sonraki hastam olma.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Yarık Doğumu"
+          },
+          "1": {
+            "label": "Uzak Kıyı Tuz Yosunu"
+          }
+        }
+      },
+      "q_fs_bram_come_home": {
+        "title": "Bram Eve Dönüyor",
+        "text": "Bram'ım, ağ gediği açıldığı sabah tekneyi çıkardı, ve deniz onu İskele noktasının ötesinde bir yere geri fırlattı. Onu üç gece önce duydum, {playerName}, suyun üzerinden sesleniyordu, ve gitmeye çok korktum. Hala çok korkuyorum. Lütfen. Teknesi kuzey kıyısında parçalanmış yatıyor. Onu bana eve getir.",
+        "completion": "Bram! Onu bana sağ salim getirdin, {playerName}. İkimiz de ağladık ve hiçbirimiz utanmıyoruz. Gedikler bu adadan bundan sonra ne alırsa alsın, ailemi alamazlar. Artık olmaz.",
+        "objectives": {
+          "0": {
+            "label": "Balıkçı Bram Gullhaven'a Güvenle Ulaştırıldı"
+          }
+        }
+      },
+      "q_fs_stalkers_off_the_light": {
+        "title": "Işıktan Uzaklaştırılan Avcılar",
+        "text": "Avcılar nöbet ateşleri arasındaki karanlıkta avlanır, ve her gece çayırımın etrafında biraz daha yakından dönerler. Onlar akılsız değil, {playerName}, sabırlılar, ve sabır dayanamayacağım tek şey. Sekizini öldür ve karanlığı geldiği kayalıklara geri it.",
+        "completion": "Sekiz gece dönüp durmak, bir gecede sona erdi. Ateşler şimdiden daha durgun yanıyor, ya da belki de bu sadece ellerim. Her iki durumda da çayır yeniden benim, ve adanın düşündüğünü duyabiliyorum.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Hiçlik Avcısı"
+          }
+        }
+      },
+      "q_fs_the_great_break": {
+        "title": "Büyük Gedik",
+        "text": "Bu adanın söylediği her şarkı aynı alçak notada bitiyor, ve bu, Yarılmış Kayalıklar'dan geliyor. Oraya büyük gedikten bir şey geçti, {playerName}, kayalıkların kendisinin içeri almak için çatladığı bir şey, ve hala büyüyor. Kuzeye yürürse, hiçbir çan önemli olmayacak. Bir arkadaş al, iki al, ve onu bitir. Sonra Coalfast'e ezginin değiştiğini söyle.",
+        "completion": "Ollun önden haber gönderdi: şarkı durdu. Bütün kasabam sessizliği duydu, {playerName}, ve yarısı hiçbir şeyin sesine ağladı. Bu pelerini tak. Uzak Kıyı, kıyısını kimin tuttuğunu unutmaz.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Parçalanmış Dehşet"
+          }
+        }
+      },
+      "q_gc_down_the_windway": {
+        "title": "Rüzgar Yolu'ndan Aşağı",
+        "text": "Tırmanışı yaptın, {playerName}, o yüzden rüzgar seni tutmaya karar verdi. Wickharbor, koyunun rüzgar altında saklı, bozkır yolu boyunca doğuda bulunur. Liman Amiri Odile geçitten gelen her ruhu sayar, ve seni de saymak isteyecektir. Ona Rüzgar Yolu'nun hala açık olduğunu söyle.",
+        "completion": "Bu havada, yaya olarak geçitten mi geçtin? Maren bana yeterince az isim gönderiyor, ve daha da azı kendileri için hesap vermeye geliyor. Wickharbor'a hoş geldin, {playerName}. Han kapısını arkandan kapat.",
+        "objectives": {
+          "0": {
+            "label": "Liman Amiri Odile'ye Rapor Ver"
+          }
+        }
+      },
+      "q_gc_wool_off_the_downs": {
+        "title": "Bozkırdan Yün",
+        "text": "Tekne mürettebatım, yağlı beziyi kağıt gibi kesen bir kasırgaya karşı kürek çekiyor, {playerName}. Bu rüzgarı yalnızca bir şey çevirir: bozkır koçlarından çıkan yağlı yün, Wickharbor usulü kalın eğrilmiş. Sürüler kasabanın batısındaki Uluyan Bozkırlar'da otlar. Altı iyi post, ve her mürettebat bu sezon sıcak kürek çeker.",
+        "completion": "Böyle bir post, koçların insanları öldüren havada orada şişman ve kendinden memnun durmasının nedenidir. Eğiriciler fener ışığında bununla uğraşacak. Şu botları al, {playerName}, son kırkımdan astarlandı.",
+        "objectives": {
+          "0": {
+            "label": "Yağlı Koç Yünü"
+          }
+        }
+      },
+      "q_gc_scuttlers_in_the_pots": {
+        "title": "Kapanlardaki Yürüyücüler",
+        "text": "Sığlık yürüyücüleri kayalık yolu tırmanmayı ve yengeç kapanlarımızı taşlara vurup kırmayı öğrendi, {playerName}. Bu hafta avın yarısı gitti, ve bir kapan işçisi bir ay boyunca kullanamayacağı bir elle kaldı. Onlardan on tanesini kır, geri kalanı neden sığlıklarda kaldıklarını hatırlar.",
+        "completion": "Yolumda on kabuk daha az, ve kapanlar bu sabah dolu çıktı. Kapan işçileri seni iyi bir alamet olarak adlandırıyor, {playerName}. Wickharbor'da övgü bu kadar sıcak olabilir.",
+        "objectives": {
+          "0": {
+            "label": "Öldürülen Sığlık Yürüyücüsü"
+          }
+        }
+      },
+      "q_gc_keeper_of_the_flame": {
+        "title": "Alevin Bekçisi",
+        "text": "Yaşlı Bram, kasabanın kuzeydoğusundaki yüksek burunda Fener'i tutuyor, ve iki haftadır erzakları için aşağı inmedi. Lamba hala yanıyor, demek yaşıyor, ama onun yaşındaki bir adam bu rüzgarda o burunda tek başına, {playerName}. Fener yolunu tırman ve onu ayakta gör.",
+        "completion": "Odile seni bunca yol boyunca rüzgarın beni alıp almadığına bakman için mi gönderdi? Ha. Ona lambanın yandığını, benim de öyle olduğumu söyle. Ama madem tırmanışı yaptın, {playerName}, bir an kal. Fener'in, yalnızca bir yabancının yapmaya uygun göründüğü bir işi var.",
+        "objectives": {
+          "0": {
+            "label": "Bekçi Bram'ı Bul"
+          }
+        }
+      },
+      "q_gc_lanterns_on_the_shear": {
+        "title": "Uçurumdaki Fenerler",
+        "text": "Fener büyük ışıktır, {playerName}, ama gece gezginini Uçurum'un üzerindeki kayalık yolda yürüten fırtına fenerleridir. Dün gece kasırga hepsini söndürdü, ve karanlıktaki o yol, kısa bir sonu olan uzun bir düşüştür. Çakmağımı al ve kayalık boyunca dört tanesini yeniden yak.",
+        "completion": "Kayalık yolda dört ışık noktası, tam da ait oldukları yerde. Buradan yukarıdan bakınca, kıyı sanki gözlerini yeniden açmış gibi görünüyor. Sende bir bekçi olma potansiyeli var, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Yeniden Yakılan Fırtına Feneri"
+          }
+        }
+      },
+      "q_gc_wind_against_the_wick": {
+        "title": "Fitile Karşı Rüzgar",
+        "text": "Fırtına ışık cinleri, kinci hale gelmiş rüzgardır, {playerName}. Ayna Gölü yakınındaki yüksek bozkırlarda toplanırlar, ve buldukları her alevi söndürürler: bir fener, bir ocak, bir gün de bu lamba. Otuz dokuz yıldır Fener'i yanık tuttum, ve onu kinli bir havaya kaybetmeyeceğim. Sekiz tanesini dağıt.",
+        "completion": "Dün gece lamba titremedi bile, bir aydır ilk kez. Rüzgar hala bizden nefret ediyor, {playerName}, ama adilce nefret etmeye geri döndü.",
+        "objectives": {
+          "0": {
+            "label": "Dağıtılan Fırtına Işık Cini"
+          }
+        }
+      },
+      "q_gc_the_far_shore": {
+        "title": "Uzak Kıyı",
+        "text": "Bu fener odasından bütün kıyıyı görebiliyorum, {playerName}, ve kuzeyde gördüğüm hoşuma gitmiyor. Yeşil ışıklar, düşük gelgitte Enkaz Tarlaları'nda gövdeden gövdeye yürüyor. O kıyıda tek başına çalışan bir kadın var: Edda, kurtarmacı. Uçurum'un ötesinden kuzeye giden kayalık yolu takip et, ta ki enkazlar başlayana kadar, ve hala nefes aldığından emin ol.",
+        "completion": "Bram şimdi kulesinden kıyımı izliyor, öyle mi? İhtiyar endişelenmekte haklı, {playerName}. Ölüler geceleri kendi enkazlarında dolaşıyor, ve son zamanlarda güneşin doğup doğmadığını umursamamaya başladılar.",
+        "objectives": {
+          "0": {
+            "label": "Kurtarmacı Edda'yı Bul"
+          }
+        }
+      },
+      "q_gc_dead_mens_cargo": {
+        "title": "Ölü Adamların Yükü",
+        "text": "Kurtarma yasası basit, {playerName}: denizin sahile verdiği benimdir. Boğulmuş gemiciler bu konuda hemfikir değil. Gövdelerinden kalkıp yığdığım her sandığı gelgit çizgisinin altına geri sürüklüyorlar. Altısını sonsuza dek indir, ve sahil sessizken, gelgit itirazını dile getirmeden önce üç enkaz kalıntısı sandığı içeri getir.",
+        "completion": "Altı mürettebat daha sessiz, ve üç sandık kuru ve güvende. Benden daha ağır bir elle kurtarma yapıyorsun, {playerName}, ama defter umursamıyor. Bunun yarısı yasaya göre senindir, ve yasa derken benim öyle dediğimi kastediyorum.",
+        "objectives": {
+          "0": {
+            "label": "Huzura Kavuşturulan Boğulmuş Gemici"
+          },
+          "1": {
+            "label": "Kurtarılan Enkaz Kalıntısı Sandığı"
+          }
+        }
+      },
+      "q_gc_the_wreck_warden": {
+        "title": "Enkaz Bekçisi",
+        "text": "Şimdi gemicilerin neden ayağa kalktığını biliyorsun, {playerName}. Bir şey, bu kıyıda kırılan ilk enkazın midye kabuklu zırhını giyiyor, ve tutması için tutulmuş bir mezarlık gibi sahildeki her gövdeyi bekçiliğini yapıyor. On yıldır göz diktiğim bir hazine ve dinlenmesini tercih edeceğim bir tayfa tutuyor. Enkaz Bekçisi'ni bitir. Bir arkadaş getir, ölüler iyi nöbet tutar.",
+        "completion": "Düştüğü an sahil sessizleşti, {playerName}. On yıldır burada çalışırken duyduğum ilk sessizlik. Tayfalar artık sadece kemik, dinlenen kemikler. Hazinenin en üstündeki pelerini al, zaten her zaman yaşayan bir sırta daha çok yakışacaktı.",
+        "objectives": {
+          "0": {
+            "label": "Devrilen Enkaz Bekçisi"
           }
         }
       },
@@ -11544,6 +13761,9 @@ export const tr_TR: EnTranslations = {
           },
           "10": {
             "label": "Domuz Tarlası"
+          },
+          "11": {
+            "label": "Uzak Kıyı Geçidi"
           }
         }
       },
@@ -11612,6 +13832,300 @@ export const tr_TR: EnTranslations = {
             "label": "Mezarejderi Mabedi"
           }
         }
+      },
+      "veiled_hollow": {
+        "name": "Örtülü Vadi",
+        "welcome": "Hava eski bir büyüyle uğulduyor. Eldergleam'ın büyük ağacının altında Bekçi Saelwyn'i ara.",
+        "pois": {
+          "0": {
+            "label": "Eldergleam"
+          },
+          "1": {
+            "label": "Alacakaranlık Mağarası"
+          },
+          "2": {
+            "label": "Alacakaranlık Seyir Tepesi"
+          },
+          "3": {
+            "label": "Kadim Koru"
+          },
+          "4": {
+            "label": "Yıldız Düşümü Çukuru"
+          },
+          "5": {
+            "label": "Batık Avlu"
+          },
+          "6": {
+            "label": "Kristal Sığlıklar"
+          },
+          "7": {
+            "label": "Parıldayan Derinlik"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "Ejder Toprakları",
+        "welcome": "Çorak topraklardan sıcak bir rüzgar esiyor. Ejderler Ejder Ağzı Kalderası üzerinde daireler çiziyor, kumullarda ise trol ateşleri yanıyor.",
+        "pois": {
+          "0": {
+            "label": "Wyrmwatch"
+          },
+          "1": {
+            "label": "Kapı Ormanı"
+          },
+          "2": {
+            "label": "Kül Kumulları"
+          },
+          "3": {
+            "label": "Trol Meclisi"
+          },
+          "4": {
+            "label": "Son Kale"
+          },
+          "5": {
+            "label": "Kan Camı Tarlaları"
+          },
+          "6": {
+            "label": "Ejder Ağzı Kalderası"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "Kırağı Diyarı",
+        "welcome": "Kar her sesi yutuyor. Dans eden ışıkların altında soğuğun kendisi bile uyanık hissettiriyor.",
+        "pois": {
+          "0": {
+            "label": "Icemantle"
+          },
+          "1": {
+            "label": "Kar Sınırı"
+          },
+          "2": {
+            "label": "Buzul Gölü"
+          },
+          "3": {
+            "label": "Kutup Işığı Basamakları"
+          },
+          "4": {
+            "label": "Titrek Bataklık"
+          },
+          "5": {
+            "label": "Uluyan Taraçalar"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "Kehribar Vadisi",
+        "welcome": "Buradaki her yaprak altın ve kızıl renkte yanar, ama hiçbiri asla dökülmez. Lanternmere'in fenerleri senin için yakıldı.",
+        "pois": {
+          "0": {
+            "label": "Lanternmere"
+          },
+          "1": {
+            "label": "Altın Eriyiş"
+          },
+          "2": {
+            "label": "Yaldızlı Bahçe"
+          },
+          "3": {
+            "label": "Hasat Vadisi"
+          },
+          "4": {
+            "label": "Büyük Göl"
+          },
+          "5": {
+            "label": "Kül Akçaağaç Tepesi"
+          },
+          "6": {
+            "label": "Eğik Dikilitaş"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "Söğüt Bataklığı",
+        "welcome": "Bataklık yusufçuklar ve arılarla uğulduyor. Köprüden geçip Bridgemere'e ulaş ve orada biraz dinlen.",
+        "pois": {
+          "0": {
+            "label": "Bridgemere"
+          },
+          "1": {
+            "label": "Kehribar Basamakları"
+          },
+          "2": {
+            "label": "Zambak Bozkırları"
+          },
+          "3": {
+            "label": "Parıldayan Bataklık Gölcükleri"
+          },
+          "4": {
+            "label": "Willowweep"
+          },
+          "5": {
+            "label": "Uykulu Düzlükler"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "Gece Çiçeği",
+        "welcome": "Gece Kapısı'nın ardında havanın kendisi rüya görür. Çiçek ışığını takip ederek Moonrest'e ulaş ve gökyüzünde asılı duran uykudaki dünyaya dikkat et.",
+        "pois": {
+          "0": {
+            "label": "Moonrest"
+          },
+          "1": {
+            "label": "Gece Kapısı"
+          },
+          "2": {
+            "label": "Ay Kuyusu"
+          },
+          "3": {
+            "label": "Gloamfield"
+          },
+          "4": {
+            "label": "Ebedi Nöbet"
+          },
+          "5": {
+            "label": "Uykusuz Höyük"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "Hayalet Ormanı",
+        "welcome": "Ağaç tepeleri yolun üzerinde bir kapak gibi kapanıyor. Gallowmere'in fenerlerinden ayrılma ve orman adını seslenirse cevap verme.",
+        "pois": {
+          "0": {
+            "label": "Gallowmere"
+          },
+          "1": {
+            "label": "Karga Kapısı"
+          },
+          "2": {
+            "label": "Dul Çalılığı"
+          },
+          "3": {
+            "label": "Asılı Çayırlık"
+          },
+          "4": {
+            "label": "Yas Taşı Şapeli"
+          },
+          "5": {
+            "label": "Avcının Açıklığı"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "Palmiye Kıyısı",
+        "welcome": "Sıcak kum, gürültücü kuşlar ve ufku yutan bir orman. Drifthaven senin için sahilde bir ateş yakıyor.",
+        "pois": {
+          "0": {
+            "label": "Drifthaven"
+          },
+          "1": {
+            "label": "Sarmaşık Ağzı"
+          },
+          "2": {
+            "label": "Palmiye Plajı"
+          },
+          "3": {
+            "label": "Zümrüt Sarmaşık"
+          },
+          "4": {
+            "label": "Sarmaşık Şelalesi"
+          },
+          "5": {
+            "label": "Safir Lagünü"
+          },
+          "6": {
+            "label": "Batık İdol"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "Sonsuz Bahçe",
+        "welcome": "Yüz yıldır kimse bir bahçıvan görmemiş olsa da biri çitleri budamaya devam ediyor. Labirente dikkat et: o da seni izliyor.",
+        "pois": {
+          "0": {
+            "label": "Hedgewick"
+          },
+          "1": {
+            "label": "Bahçe Kapısı"
+          },
+          "2": {
+            "label": "Çiçek Terası Yolu"
+          },
+          "3": {
+            "label": "Şafak Kalesi"
+          },
+          "4": {
+            "label": "Yaprak Gölcüğü"
+          },
+          "5": {
+            "label": "Büyük Labirent"
+          },
+          "6": {
+            "label": "Çeşme Avlusu"
+          },
+          "7": {
+            "label": "Eski Değirmen"
+          },
+          "8": {
+            "label": "Kuzey Karakolu"
+          },
+          "9": {
+            "label": "Zambak Çukuru"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "Fırtına Sırtı",
+        "welcome": "Rüzgar burada hiç durmadı ve Eski Fener hiç sönmedi. Wickharbor senden yalnızca han kapısını arkandan kapatmanı ister.",
+        "pois": {
+          "0": {
+            "label": "Wickharbor"
+          },
+          "1": {
+            "label": "Rüzgar Yolu"
+          },
+          "2": {
+            "label": "Uluyan Bozkırlar"
+          },
+          "3": {
+            "label": "Eski Fener"
+          },
+          "4": {
+            "label": "Uçurum"
+          },
+          "5": {
+            "label": "Enkaz Tarlaları"
+          },
+          "6": {
+            "label": "Ayna Gölü"
+          },
+          "7": {
+            "label": "Fırtına Sırtı Ahırları"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "Uzak Kıyı",
+        "welcome": "Kum setini geç, Gullhaven'ın çanı kasabadan önce seni bulacaktır. Gedikler uyarı vermeden açılıyor ve tabya, oradan akan her şeye karşı bu kıyıyı koruyor. Senin gibi birini uzun zamandır bekliyorlardı.",
+        "pois": {
+          "0": {
+            "label": "Gullhaven"
+          },
+          "1": {
+            "label": "İskele"
+          },
+          "2": {
+            "label": "Nöbet Çayırı"
+          },
+          "3": {
+            "label": "Yarılmış Kayalıklar"
+          },
+          "4": {
+            "label": "Yarık Tarlaları"
+          }
+        }
       }
     },
     "dungeons": {
@@ -11639,6 +14153,16 @@ export const tr_TR: EnTranslations = {
         "name": "Nythraxis Akın Arenası",
         "enterText": "Mühürlü kraliyet kapısından geçersin.",
         "leaveText": "Dikenzirve'nin soğuk havasına geri dönersin."
+      },
+      "wildheart_basin": {
+        "name": "Yaban Yürek Çukuru",
+        "enterText": "Ilık yağmur eski taşların üzerinde tıslıyor. Yaban Yürek Çukuru önünde açılıyor.",
+        "leaveText": "Taş dişlerin altından geçip Palmiye Kıyısının güneşine geri dönüyorsun."
+      },
+      "the_last_keep": {
+        "name": "Son Kale",
+        "enterText": "Son Kale'nin soğuk, sessiz koridorlarına adım atıyorsun.",
+        "leaveText": "Kale kapısını arkandan kapatıp Ejder Topraklarının rüzgarına geri dönüyorsun."
       },
       "drowned_temple": {
         "name": "Boğulmuş Tapınak",

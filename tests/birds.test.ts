@@ -1,10 +1,11 @@
-import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
+import { describe, expect, it } from 'vitest';
 import { buildBirds } from '../src/render/birds';
+import { DUNGEON_X_THRESHOLD } from '../src/sim/data';
 
 // DUNGEON_X_THRESHOLD = 600 (src/sim/data.ts): x beyond this is inside an
 // instance, where the sky — and the flock — must not render.
-const INDOORS_X = 700;
+const INDOORS_X = DUNGEON_X_THRESHOLD + 100;
 
 describe('ambient bird flock', () => {
   it('builds a non-empty flock under a single group', () => {

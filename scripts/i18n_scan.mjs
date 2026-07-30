@@ -120,7 +120,7 @@ const SCOPE_RANK = { main: 0, sim: 1, server: 2, admin: 3 };
 // A human-meaningful reason per cognate (blocked rows require one). Keyed by the
 // stable part of the id so the seed stays short; falls back to a generic cognate
 // note for the long tail of accepted borrowings.
-function cognateReason(scope, locale, key) {
+function cognateReason(_scope, _locale, key) {
   if (key === 'who.statusCombat')
     return "'combat' is a real word in this locale and is identical to English.";
   if (key === 'who.statusOnline')
@@ -256,11 +256,11 @@ async function main() {
       const blockedForKey = blockedRows.get(`${scope}:${key}`);
       const locales = {};
       for (const lang of NON_EN) {
-        const reason = blockedForKey && blockedForKey.get(lang);
+        const reason = blockedForKey?.get(lang);
         if (reason !== undefined) {
           locales[lang] = { state: 'blocked', reason };
         } else {
-          const v = dict[lang] && dict[lang][key];
+          const v = dict[lang]?.[key];
           locales[lang] = isPresent(v)
             ? { state: 'translated', srcHash: enHash, by: 'human' }
             : { state: 'pending' };
@@ -307,7 +307,7 @@ async function main() {
       const blockedForKey = blockedRows.get(`${scope}:${key}`);
       const locales = {};
       for (const lang of NON_EN) {
-        const reason = blockedForKey && blockedForKey.get(lang);
+        const reason = blockedForKey?.get(lang);
         if (reason !== undefined) {
           locales[lang] = { state: 'blocked', reason };
         } else {
@@ -389,7 +389,7 @@ async function main() {
     };
   }
 
-  const text = JSON.stringify(registry, null, 2) + '\n';
+  const text = `${JSON.stringify(registry, null, 2)}\n`;
   mkdirSync(OUT_DIR, { recursive: true });
   atomicWriteFileSync(OUT_PATH, text);
 
@@ -423,7 +423,7 @@ async function main() {
     counts: registry.counts,
     perLocale,
   };
-  const summaryText = JSON.stringify(summary, null, 2) + '\n';
+  const summaryText = `${JSON.stringify(summary, null, 2)}\n`;
   atomicWriteFileSync(SUMMARY_PATH, summaryText);
 
   console.log(

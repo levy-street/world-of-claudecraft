@@ -488,4 +488,9 @@ export const table: DeedLocaleTable = {
     name: '拆解行家',
     desc: '将50件装备拆解还原为原始材料。',
   },
+  dgn_wildheart_basin: { name: '盆地反击', desc: '在荒野之心盆地中击败盆地之声祖尔加。' },
+  dgn_wildheart_basin_heroic: {
+    name: '英雄：荒野之心盆地',
+    desc: '在英雄难度的荒野之心盆地中击败盆地之声祖尔加。',
+  },
 };

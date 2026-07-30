@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { createMob } from '../src/sim/entity';
 import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 import { MELEE_RANGE } from '../src/sim/types';
 
 // Regression for "excessive melee range on monsters": a STATIONARY mob used to gain a
@@ -51,6 +51,13 @@ describe('mob melee reach: walking past a stationary mob', () => {
     const mob = placeMob(sim, 4.5, false);
     const swung = sim.tryMobMeleeSwingInRange(mob, p);
     expect(swung).toBe(true);
+    // The subject is the range gate; the hit-table roll can whiff (miss, dodge,
+    // parry) depending on where the shared RNG stream sits, so re-swing until
+    // one connects before asserting the damage landed.
+    for (let i = 0; i < 20 && p.hp === 100000; i++) {
+      mob.swingTimer = 0;
+      sim.tryMobMeleeSwingInRange(mob, p);
+    }
     expect(p.hp).toBeLessThan(100000);
   });
 
@@ -67,8 +74,14 @@ describe('mob melee reach: walking past a stationary mob', () => {
     // At 6.5 yd a pursuing mob (reach 6) still cannot connect; the old +3 reach (8 yd) would have.
     expect(sim.tryMobMeleeSwingInRange(placeMob(sim, 6.5, true), p)).toBe(false);
     expect(p.hp).toBe(100000);
-    // At 5.5 yd the 1 yd grace does let a pursuing mob connect.
-    expect(sim.tryMobMeleeSwingInRange(placeMob(sim, 5.5, true), p)).toBe(true);
+    // At 5.5 yd the 1 yd grace does let a pursuing mob connect. As above,
+    // re-swing past hit-table whiffs before asserting the damage landed.
+    const mob = placeMob(sim, 5.5, true);
+    expect(sim.tryMobMeleeSwingInRange(mob, p)).toBe(true);
+    for (let i = 0; i < 20 && p.hp === 100000; i++) {
+      mob.swingTimer = 0;
+      sim.tryMobMeleeSwingInRange(mob, p);
+    }
     expect(p.hp).toBeLessThan(100000);
   });
 

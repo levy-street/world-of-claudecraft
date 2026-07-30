@@ -52,7 +52,7 @@ describe('mob component-type tags', () => {
     expect(allUnmapped).toEqual(['fen_troll']);
     // The complement, so an always-false predicate could not pass the row above
     // by emptying the sweep.
-    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(17);
+    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(21);
   });
 
   it('never lets a template out-pay the tag list it advertises (#2514)', () => {
@@ -103,9 +103,11 @@ describe('mob component-type tags', () => {
       const fullyMapped = tags.length * expectedQty(0);
       expect(defaultPick, `${mob.id} (${tags.join(', ')})`).toBeLessThanOrEqual(fullyMapped);
     }
-    // ...over the mixed templates, all nine of them, so an emptied sweep reads
-    // as wrong rather than as a pass.
-    expect(mixedSeen).toBe(9);
+    // ...over every PARTLY-mapped template, so an emptied sweep reads as wrong
+    // rather than as a pass. A CORPUS CENSUS, not a behaviour claim: v0.32.0
+    // authored 9 against the release bestiary and this branch's rift/dungeon
+    // mobs bring a tenth. The per-template bound above is what holds the line.
+    expect(mixedSeen).toBe(10);
     // And the threshold really is where the comment says it is, stated as a
     // hypothetical shape rather than waiting for content to author one.
     expect(3 * expectedQty(1)).toBeGreaterThan(4 * expectedQty(0));

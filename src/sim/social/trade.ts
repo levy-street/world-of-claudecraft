@@ -2,8 +2,9 @@
 // SimContext. The trade SESSION + INVITE state stay Sim-owned fields (live ctx
 // views: `trades`, `tradeInvites`), like E1's delayedEvents; the leave-path
 // cleanup + the joint invite-expiry sweep reach them through the same seam. The
-// inventory hub (addItem/removeItem/countItem) stays on Sim and is consumed via
-// ctx. This is a MOVE: the statements, branches, and iteration order are
+// inventory hub stays on Sim and is consumed via ctx. Instanced payloads cross
+// intact through removeOffer/grantOffer; Rift gear remains owner-bound and is
+// excluded explicitly. This is a MOVE: the statements, branches, and iteration order are
 // byte-identical to the pre-move methods (the immutability waiver applies, so the
 // in-place mutation of the shared TradeSession / PlayerMeta.copper is preserved).
 //
@@ -12,6 +13,7 @@
 
 import type { TradeInfo } from '../../world_api';
 import { addStacked, bagCapacity, countFit, removeStacked } from '../bags';
+import { RIFT_GEAR_ITEM_IDS } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { removePreferFungible } from '../items';
 import type { PlayerMeta, TradeSession } from '../sim';
@@ -21,6 +23,7 @@ import { dist2d, type InvSlot, type ItemInstancePayload } from '../types';
 // A trade is only offered/kept while both parties are within this many yards;
 // the drift sweep cancels an open session once they wander past TRADE_RANGE + 4.
 const TRADE_RANGE = 10;
+const RIFT_GEAR_ITEMS = new Set<string>(RIFT_GEAR_ITEM_IDS);
 
 // The one trade-locked predicate (Professions 2.0). A copy is
 // trade-locked once its payload carries boundTo: a bound instance stays with
@@ -139,7 +142,9 @@ export function tradeSetOffer(
     if (!slot || typeof slot.itemId !== 'string' || !Number.isFinite(slot.count)) continue;
     const count = Math.max(1, Math.floor(slot.count));
     const def = ITEMS[slot.itemId];
-    if (!def || def.kind === 'quest' || def.soulbound) continue; // quest + soulbound items never trade
+    if (!def || def.kind === 'quest' || def.soulbound || RIFT_GEAR_ITEMS.has(slot.itemId)) {
+      continue;
+    }
     merged.set(slot.itemId, (merged.get(slot.itemId) ?? 0) + count);
   }
   const cleaned: InvSlot[] = [];

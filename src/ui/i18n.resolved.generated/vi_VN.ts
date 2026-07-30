@@ -342,6 +342,33 @@ export const vi_VN: EnTranslations = {
       "healerConfirmAccept": "Hồi sinh tôi",
       "healerConfirmCancel": "Hủy bỏ"
     },
+    "unstuck": {
+      "menuButton": "Thoát Kẹt",
+      "help": "Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên để đưa bạn đến một vị trí an toàn gần đó có thể tiếp cận được.",
+      "helpAtGraveyard": "Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên, sau đó đưa linh hồn của bạn đến nghĩa trang gần nhất. Quay lại qua Người Giữ Nhợt Nhạt yêu cầu Phí Tổn Của Người Giữ.",
+      "started": "Thoát Kẹt sau {seconds} giây. Di chuyển, chiến đấu, bị gây sát thương, hoặc bắt đầu hành động khác sẽ hủy nó.",
+      "countdown": "Thoát Kẹt: {seconds}",
+      "completed": "Đã di chuyển đến vị trí an toàn gần nhất có thể tiếp cận được.",
+      "completedAtGraveyard": "Linh hồn của bạn đã trở về nghĩa trang gần nhất. Hãy nói chuyện với Người Giữ Nhợt Nhạt để chấp nhận Phí Tổn Của Người Giữ.",
+      "revivedAtGraveyard": "Bạn đã được đưa về nghĩa trang gần nhất và hồi sinh. Phí Tổn Của Người Giữ đang đè nặng lên bạn.",
+      "cancelledMoved": "Thoát Kẹt bị hủy vì bạn đã di chuyển.",
+      "cancelledDamaged": "Thoát Kẹt bị hủy vì bạn đã bị gây sát thương.",
+      "cancelledCombat": "Thoát Kẹt bị hủy vì bạn đã vào trạng thái chiến đấu.",
+      "cancelledBusy": "Thoát Kẹt bị hủy vì bạn đã bắt đầu một hành động khác.",
+      "cancelledState": "Thoát Kẹt bị hủy vì trạng thái của bạn đã thay đổi.",
+      "cancelledDisconnected": "Thoát Kẹt bị hủy vì bạn đã mất kết nối.",
+      "noSafePosition": "Không tìm thấy vị trí an toàn nào có thể tiếp cận gần đó. Bạn đã không được di chuyển.",
+      "alreadyActive": "Thoát Kẹt đang đếm ngược rồi.",
+      "alreadySafe": "Bạn đã ở một vị trí an toàn và có thể tiếp cận được.",
+      "cooldown": "Thoát Kẹt sẽ sẵn sàng sau {seconds} giây.",
+      "dead": "Bạn không thể sử dụng Thoát Kẹt khi đã chết hoặc đang ở dạng linh hồn.",
+      "combat": "Bạn không thể sử dụng Thoát Kẹt trong khi chiến đấu.",
+      "controlled": "Bạn không thể sử dụng Thoát Kẹt khi khả năng di chuyển bị suy giảm.",
+      "standStill": "Đứng yên trên mặt đất vững chắc trước khi sử dụng Thoát Kẹt.",
+      "standStillAnywhere": "Đứng yên trước khi sử dụng Thoát Kẹt.",
+      "busy": "Hãy hoàn tất hành động hiện tại trước khi sử dụng Thoát Kẹt.",
+      "unavailable": "Thoát Kẹt không khả dụng trong trạng thái hiện tại của bạn."
+    },
     "fct": {
       "absorbed": "Đã hấp thụ {amount}",
       "cheap": "Giảm chi phí!"
@@ -781,6 +808,7 @@ export const vi_VN: EnTranslations = {
       "leaderboard": "Xếp Hạng",
       "dailyRewards": "Cửa hàng",
       "deeds": "Kỳ Công",
+      "mounts": "Thú Cưỡi",
       "professions": "Nghề nghiệp",
       "nameplates": "Tên",
       "haptics": "Phản Hồi Rung",
@@ -881,10 +909,15 @@ export const vi_VN: EnTranslations = {
       "autoShowHint": "Các hàng xuất hiện tự động sau khi nhóm của bạn gây sát thương hoặc hồi máu, và phần này đóng lại vài giây sau khi chiến đấu kết thúc.",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
-      "breakdownOther": "Other ({count})",
+      "breakdownOther": "Khác ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Melee"
+      "melee": "Cận Chiến",
+      "move": "Kéo để di chuyển thước đo này",
+      "resize": "Kéo để thay đổi kích thước thước đo này",
+      "dock": "Đưa thước đo này trở lại cửa sổ thước đo",
+      "separate": "Tách {meter}",
+      "regroup": "Ghép lại {meter}"
     },
     "petFeed": {
       "disabledFullHp": "Thú cưng đang đầy máu",
@@ -902,7 +935,59 @@ export const vi_VN: EnTranslations = {
       "petStop": "Thú Cưng: Dừng",
       "petTaunt": "Thú Cưng: Khiêu Khích",
       "petDefensive": "Thú Cưng: Phòng Thủ",
-      "petAggressive": "Thú Cưng: Hung Hăng"
+      "petAggressive": "Thú Cưng: Hung Hăng",
+      "mount": "Cưỡi Thú / Xuống Thú"
+    },
+    "mounts": {
+      "title": "Thú Cưỡi",
+      "close": "Đóng",
+      "select": "Chọn",
+      "selected": "Đã Chọn",
+      "riding": "Đang Cưỡi",
+      "mount": "Lên Thú Cưỡi",
+      "dismount": "Xuống Thú Cưỡi",
+      "useToRide": "Sử dụng để triệu hồi thú cưỡi này.",
+      "emptyTitle": "Chưa Có Thú Cưỡi Nào",
+      "emptyStableHint": "Đạt cấp độ 20 và học cưỡi ngựa cùng Trưởng Chuồng Ngựa Marla tại Chuồng Ngựa Highwatch, phía tây Highwatch.",
+      "emptyDropHint": "Thú cưỡi hiếm hơn rơi ra từ trùm hầm ngục anh hùng và khi hoàn thành Rạn Nứt.",
+      "clickManage": "Nhấp để chọn thú cưỡi của bạn",
+      "rarity_common": "Phổ Thông",
+      "rarity_rare": "Hiếm",
+      "rarity_epic": "Sử Thi",
+      "spec_speed": "+{pct}% tốc độ di chuyển",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Gấu Grag Khổng Lồ",
+      "name_stalkglider_snail": "Ốc Sên Lượn Vỏ Rêu",
+      "name_aether_hover_cycle": "Xe Lượn Đấu Sĩ Ê-te",
+      "name_shadowjump_toad": "Kama-Kage, Cóc Nhảy Bóng Tối",
+      "name_stormfeather_griffin": "Stormfeather Vươn Trời",
+      "name_thunderstrut_gobbler": "Thunderstrut, Gà Tây Vĩ Đại",
+      "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
+      "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
+      "desc_stalkglider_snail": "Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.",
+      "desc_aether_hover_cycle": "Một cỗ xe phép thuật cơ khí mạnh mẽ, được thiết kế để di chuyển nhanh và lướt sát mặt đất trong chiến đấu.",
+      "desc_shadowjump_toad": "Một con cóc khổng lồ, bước chân vững chãi, được huấn luyện những cú nhảy bóng tối nhanh như chớp có thể vượt qua mọi địa hình.",
+      "desc_stormfeather_griffin": "Một con sư tử đầu chim bão uy nghi, rảo bước trên mặt đất bằng những móng vuốt được bọc rune, đôi cánh xếp gọn.",
+      "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông."
+    },
+    "mountTraining": {
+      "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
+      "ownedMountPrompt": "Dây cương của bạn đang ở trong túi đồ. Hãy dùng để cưỡi.",
+      "ridePrompt": "Đi theo điểm đánh dấu phát sáng đến vạch xuất phát, sau đó nhấn Bắt Đầu Đua.",
+      "begin": "Bắt Đầu Bài Học",
+      "success": "Bạn đã thuần hóa được Valorsteed.",
+      "returnToMarla": "Quay lại gặp Marla tại chuồng ngựa để mua dây cương Valorsteed với giá 10 vàng."
+    },
+    "mountRace": {
+      "startButton": "Bắt Đầu Đua",
+      "cancelButton": "Hủy Đua",
+      "go": "XUẤT PHÁT!",
+      "start": "Xuất phát! Vượt qua mọi cú nhảy, sau đó cưỡi trở lại qua cổng vòm.",
+      "toFinish": "Cưỡi trở lại qua cổng vòm!",
+      "finished": "Hoàn thành trong {seconds} giây!",
+      "timeout": "Đua Thất Bại",
+      "progress": "Cổng {n}/{total}",
+      "timeLeft": "{seconds} giây"
     },
     "vcup": {
       "title": "Cúp Thung Lũng",
@@ -1434,6 +1519,10 @@ export const vi_VN: EnTranslations = {
       "twoFactorRecoveryTitle": "Lưu các mã khôi phục của bạn",
       "twoFactorRecoveryHint": "Mỗi mã chỉ dùng được một lần. Cất giữ chúng ở nơi an toàn: chúng là cách duy nhất để vào lại nếu bạn mất ứng dụng xác thực.",
       "twoFactorDownloadCodes": "Tải Mã Xuống",
+      "recoveryCodesFileHeader": "Mã khôi phục {brand}",
+      "recoveryCodesFileAccount": "Tài khoản: {username}",
+      "recoveryCodesFileHint": "Mỗi mã có thể dùng một lần nếu bạn mất quyền truy cập vào ứng dụng xác thực của mình.",
+      "recoveryCodesFileWarn": "Cất giữ tệp này ở nơi an toàn và riêng tư.",
       "twoFactorDone": "Xong",
       "twoFactorDisableHint": "Nhập mật khẩu của bạn để tắt xác thực hai lớp. Các mã khôi phục của bạn sẽ bị loại bỏ.",
       "twoFactorDisableBtn": "Tắt Xác Thực Hai Lớp",
@@ -1568,6 +1657,7 @@ export const vi_VN: EnTranslations = {
       "filterConsumable": "Vật phẩm tiêu hao",
       "filterMaterial": "Nguyên liệu",
       "filterQuest": "Nhiệm vụ",
+      "filterMount": "Vật cưỡi",
       "sortAria": "Sắp xếp vật phẩm trong túi",
       "sortRecent": "Gần đây",
       "sortQuality": "Phẩm chất",
@@ -1785,6 +1875,9 @@ export const vi_VN: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Yêu cầu Cấp {level}",
+      "riftTier": "Vật phẩm Rạn Nứt hạng {tier}",
+      "riftUpgrade": "Nâng cấp Rạn Nứt {level}/{max}",
+      "riftSockets": "Ngọc Rạn Nứt {used}/{total}",
       "statEnchanted": "+{value} {stat} (Đã Pháp Khắc)",
       "enchantedFallback": "Đã Pháp Khắc"
     },
@@ -2722,6 +2815,14 @@ export const vi_VN: EnTranslations = {
       "lbEmpty": "Chưa có sử quan nào được xếp hạng.",
       "broadcastsLabel": "Chia sẻ kỳ công vừa lập với bang hội và bạn bè",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "Bản Đồ Thế Giới",
+      "summary": "Bản đồ thế giới. Chọn một vùng để mở bản đồ của vùng đó.",
+      "toWorld": "Bản Đồ Thế Giới",
+      "toZone": "Bản Đồ Vùng",
+      "toggleAria": "Chuyển đổi giữa bản đồ thế giới và bản đồ vùng",
+      "levels": "Cấp {min} đến {max}"
     }
   },
   "gatherEvent": {
@@ -2950,7 +3051,17 @@ export const vi_VN: EnTranslations = {
         "marshName": "Đầm Lầy Bùn Sâu",
         "marshBlurb": "Những đầm lầy chìm sâu và phế tích bị thủy triều mài mòn, nơi trú ngụ của mudfin và những thứ tệ hơn.",
         "peaksName": "Cao Nguyên Đỉnh Gai",
-        "peaksBlurb": "Những rặng núi bị gió bào mòn vươn lên về phía những hiểm nguy lạnh giá nhất của vương quốc."
+        "peaksBlurb": "Những rặng núi bị gió bào mòn vươn lên về phía những hiểm nguy lạnh giá nhất của vương quốc.",
+        "duskName": "Thung Lũng Sương Phủ",
+        "duskBlurb": "Một cõi giới bị niêm phong sâu trong lòng núi, nếu những lời đồn về một lối vào là có thật.",
+        "emberName": "Vùng Đất Rồng",
+        "emberBlurb": "Băng qua Đường Đắp Nhợt Nhạt, sắc xanh nhường chỗ cho tro tàn, và một thứ gì đó cổ xưa đang cai trị vùng đất hoang này.",
+        "frostName": "Đỉnh Sương Giá",
+        "frostBlurb": "Một đỉnh cao phủ tuyết nằm ngoài mọi tấm bản đồ, chỉ thoáng hiện trong ánh sáng nhảy múa trên bầu trời.",
+        "amberName": "Xứ Thu Hổ Phách",
+        "amberBlurb": "Phía sau những vách đá phía tây là một mùa thu bất tận, cùng những ngọn đèn lồng soi bóng trên mặt hồ vàng óng.",
+        "fenName": "Đầm Liễu",
+        "fenBlurb": "Qua khỏi vương miện mùa thu, là một đầm lầy tươi sáng với liễu rủ và mặt nước lặng yên, cùng một thị trấn nép sau con hào."
       },
       "group": {
         "heading": "Hợp sức cho những phần khó nhằn",
@@ -3419,6 +3530,18 @@ export const vi_VN: EnTranslations = {
       "reptile": {
         "name": "Bò Sát",
         "desc": "Những thợ săn máu lạnh với tiếng rít và cú đớp rất riêng của chúng, khác biệt hoàn toàn so với các dã thú máu nóng."
+      },
+      "murloc": {
+        "name": "Vây Ộp Oạp",
+        "desc": "Giống người cá biết kêu ộp oạp sống ở bờ hồ và vũng nước triều, nhanh chóng vây lấy bất cứ thứ gì lội đến quá gần."
+      },
+      "kobold": {
+        "name": "Tiểu Yêu",
+        "desc": "Những kẻ nhặt nhạnh lăng xăng và tinh linh của bãi cỏ, bờ giậu, phiền toái nhiều hơn là nguy hiểm, cho đến khi chúng tụ tập đông đảo."
+      },
+      "demon": {
+        "name": "Ác Ma",
+        "desc": "Những kẻ xâm lược đến từ bên kia các vết rạn, toàn thân là lửa và ác ý. Nơi nào có một kẻ trong chúng đứng, nơi đó không bao giờ cách xa một vết rạn."
       }
     },
     "worldPage": {
@@ -3432,15 +3555,55 @@ export const vi_VN: EnTranslations = {
       "valeBlurb": "Thung lũng khởi đầu xanh tươi, nơi những anh hùng mới rèn luyện bản lĩnh với lũ sói và đám cướp quanh thị trấn Eastbrook.",
       "marshBlurb": "Một xứ sở chìm trong sương mù và phế tích. Bầy mudfin tràn ngập vùng nước nông và một thứ gì đó cổ xưa hơn đang cựa quậy dưới mặt nước, được canh chừng từ thị trấn cầu Fenbridge.",
       "peaksBlurb": "Những rặng núi bị gió bào mòn và các hầm mỏ cũ vươn tới những hiểm họa lạnh giá, cao nhất của vương quốc, được trấn giữ bởi tiền đồn Highwatch.",
+      "duskBlurb": "Một thung lũng chìm trong hoàng hôn vĩnh cửu dưới tán đại thụ Eldergleam, nơi những phế tích pha lê tỏa sáng và không khí ngân vang phép thuật cổ xưa.",
+      "emberBlurb": "Vùng đất hoang tàn ngập tro tàn và bloodglass, rực sáng dưới ánh bão chớp giật, nơi bầy rồng lượn vòng trên miệng núi lửa và lửa trại của troll cháy rực giữa những cồn cát, tất cả được canh giữ từ thị trấn cổng Wyrmwatch.",
+      "frostBlurb": "Một khoảng lặng phủ tuyết và thông đen dưới ánh cực quang, nơi cái lạnh dường như cũng đang thức tỉnh, còn Icemantle vẫn giữ cho lửa trại không bao giờ tắt.",
+      "amberBlurb": "Một mùa thu vĩnh cửu với những chiếc lá vàng đỏ không bao giờ rụng, quần tụ quanh thị trấn Lanternmere rực sáng ánh đèn lồng.",
+      "fenBlurb": "Một vùng đất ngập nước tươi sáng, rộn ràng tiếng vo ve, phủ đầy hoa súng và dòng nước chảy chậm, được băng qua bằng những lối ván gỗ cũ kỹ từ thị trấn cầu Bridgemere.",
+      "nightBlurb": "Một cõi giới của đêm khuya lấp lánh sao trời, nơi hoa lá thắp sáng những lối đi và Moonrest lặng lẽ canh giữ dưới bầu trời đang say giấc mộng.",
+      "hauntBlurb": "Một khu rừng ma ám dưới những tán cây khổng lồ, nơi những ngọn đèn lồng của Gallowmere là thứ ánh sáng chân thật duy nhất trên con đường.",
+      "galeBlurb": "Những vách đá ven biển và cao nguyên lộng gió nơi cơn gió chẳng bao giờ ngơi nghỉ, Hải Đăng Cổ chẳng bao giờ tắt, và Wickharbor thì luôn đóng chặt cửa nẻo.",
+      "jungleBlurb": "Một mớ bòng bong nhiệt đới của những rặng cọ, cát trắng và tiếng chim ríu rít vang xa, cùng thị trấn ven biển Drifthaven vẫn giữ ngọn lửa cháy sáng trên bãi cát.",
+      "gardenBlurb": "Một cõi giới vườn mê cung hàng rào vẫn được xén tỉa gọn gàng dù chưa ai từng thấy bóng dáng một người làm vườn nào, bước vào qua khỏi Hedgewick và những sân đài phun nước của nó.",
       "valeGreeting": "Hãy giữ lưỡi kiếm bên mình. Thung Lũng không còn như xưa nữa.",
       "valeGreeter": "Cảnh Sát Trưởng Redbrook, Eastbrook",
       "marshGreeting": "Dừng lại ở cổng. Vượt qua đám sậy kia, đầm lầy sẽ giết thay cho chúng ta.",
       "marshGreeter": "Hộ Vệ Fenwick, Fenbridge",
       "peaksGreeting": "Hai trăm năm bức tường này đã đứng vững. Nó sẽ không sụp đổ dưới phiên gác của ta, nhưng nó đang rền rĩ.",
       "peaksGreeter": "Đại Úy Thessaly, Highwatch",
+      "duskGreeting": "Rất ít người như bạn từng đứng dưới những tán cành này. Hãy bước đi nhẹ nhàng, và xin chào đón bạn đến đây.",
+      "duskGreeter": "Người Giữ Saelwyn, Eldergleam",
+      "emberGreeting": "Gió nóng thổi từ vùng đất hoang, rồng bay lượn trên Drakemaw, và lửa trại của troll cháy giữa những cồn cát. Uống nước trước khi bước ra ngoài đó.",
+      "emberGreeter": "Vệ Quan Cổng, Wyrmwatch",
+      "frostGreeting": "Tuyết nuốt trọn mọi âm thanh ngoài kia, sau bức tường. Nếu ánh sáng bắt đầu nhảy múa trên trời, hãy giữ giọng thật khẽ và lửa thì đừng để tắt.",
+      "frostGreeter": "Người Giữ Lửa, Icemantle",
+      "amberGreeting": "Nơi đây mỗi chiếc lá đều rực cháy sắc vàng đỏ, vậy mà chẳng bao giờ rụng xuống. Đèn lồng đã thắp sẵn để đón bạn rồi đấy; hãy cẩn thận với Goldmelt trên đường lên nhé.",
+      "amberGreeter": "Thợ Đèn Lồng, Lanternmere",
+      "fenGreeting": "Đầm lầy này rì rào tiếng chuồn chuồn và ong mật. Hãy qua cầu, nghỉ chân một lát, và cứ đi trên ván gỗ khi qua những vũng nước nhé.",
+      "fenGreeter": "Người Giữ Cầu, Bridgemere",
+      "nightGreeting": "Qua khỏi Nightgate, chính bầu không khí cũng đang chìm trong giấc mộng. Hãy men theo ánh sáng của hoa, và để ý đến thế giới đang say ngủ treo lơ lửng trên bầu trời.",
+      "nightGreeter": "Vệ Quan Canh Thức, Moonrest",
+      "hauntGreeting": "Hãy bám theo ánh đèn lồng, lữ khách à. Và nếu khu rừng gọi tên bạn từ ngoài con đường, đừng bao giờ đáp lại.",
+      "hauntGreeter": "Người Thắp Đèn, Gallowmere",
+      "galeGreeting": "Ở đây gió chưa từng một lần ngừng thổi, và Hải Đăng Cổ chưa từng một lần tắt lửa. Nhớ đóng cửa quán trọ lại sau lưng nhé.",
+      "galeGreeter": "Người Giữ Hải Đăng, Wickharbor",
+      "jungleGreeting": "Cát ấm, tiếng chim ríu rít, và một khu rừng rậm nuốt trọn cả chân trời. Chúng tôi luôn giữ một ngọn lửa cháy trên bãi biển; cố mà quay về với nó nhé.",
+      "jungleGreeter": "Nữ Quản Cảng, Drifthaven",
+      "gardenGreeting": "Vẫn có ai đó đang xén tỉa hàng rào, dù đã cả trăm năm nay chẳng ai thấy bóng dáng người làm vườn. Hãy cẩn thận với mê cung: nó cũng đang để mắt tới bạn đấy.",
+      "gardenGreeter": "Người Giữ Cổng, Hedgewick",
       "valePlaceNotes": "Eastbrook là căn cứ nhà đầu tiên của bạn. Wolf Run và Boar Meadow là vùng săn bắn hiền hòa; Mirror Lake là vùng nước câu cá lý tưởng, dù lũ cá bùn lúc nhúc nơi vùng nước nông của nó; Sableweb và Copper Dig giấu lũ nhện và đám đào mỏ tham quặng; một Bandit Camp và Fallen Chapel chứa những công việc gai góc hơn; Reliquary Hill dẫn xuống Collapsed Reliquary, delve đầu tiên của vương quốc; Brightwood Glade là một khu rừng thưa ngập nắng, tĩnh lặng ở phía bắc; và Sân Heo Nái là sân bóng heo rừng có tường bao của Eastbrook, nơi Cúp Thung Lũng thi đấu dưới một lệnh hưu chiến mùa gặt.",
       "marshPlaceNotes": "Fenbridge canh giữ con đường khô ráo duy nhất. Prowler Reeds và Deepfen Shallows đầy ắp thú đầm lầy và mudfin; Widow Thicket giăng kín mạng nhện dày đặc; Drowned Chapel và Troll Mounds giữ những hiểm họa cổ xưa hơn, với Kinh Cầu Chết Chìm, delve của riêng đầm lầy, mở ra ngay phía bắc các gò mộ; Gravecaller Encampment là nơi giáo phái đào hầm ẩn náu, và Pháo Đài Chìm là trái tim hầm ngục của đầm lầy.",
       "peaksPlaceNotes": "Highwatch giữ vững bức tường. Stalker Ridge và Deeprock Burrows thuộc về mèo núi và lũ đào hang; Ogre Foothills và Drogmar's War-Camp thuộc về lũ côn đồ đánh thuê; Stormcrag lách tách tiếng các nguyên tố, và bên dưới nó Hồ Lung Linh phát sáng, hồ nước trên núi mà bờ của nó giữ cánh cổng ánh sáng nhợt nhạt dẫn xuống Ngôi Đền Chết Chìm; Wyrmcult Tents và Revenant Fields bao quanh vùng đất cao của giáo phái, với Thánh Đường Mộ Long ở đỉnh của nó.",
+      "duskPlaceNotes": "Eldergleam quần tụ dưới tán đại thụ. Hang Duskfall cùng đài quan sát của nó là lối vào và cũng là cảnh tượng đầu tiên của thung lũng; Rừng Cổ Thụ và Bồn Địa Starfall giữ lấy miền nam tĩnh lặng; Sân Chìm ôm những phế tích rậm rạp ở phía đông; còn Vực Sâu Lấp Lánh và Bãi Cạn Pha Lê tỏa sáng khắp miền bắc.",
+      "emberPlaceNotes": "Wyrmwatch trấn giữ cổng vào. Gatewood là mảng xanh cuối cùng trước vùng đất hoang; Cồn Cát Tro Tàn cuộn tro bụi và những thứ còn tệ hơn thế; Trollmoot là nơi lũ troll cồn cát tụ tập quanh lửa trại; Cánh Đồng Bloodglass lấp lánh những mảnh vỡ sắc như dao cạo; còn Miệng Núi Lửa Drakemaw là vương miện bốc khói mà bầy rồng vẫn lượn vòng quanh.",
+      "frostPlaceNotes": "Icemantle giữ ngọn lửa ấm cuối cùng. Snowline đánh dấu nơi tuyết trôi bắt đầu chiếm lĩnh; Hồ Băng Hà là vùng nước đen tĩnh lặng dưới lớp băng; Bậc Thang Cực Quang vươn lên dưới ánh sáng nhảy múa; Shiverfen là đầm lầy đóng băng chẳng bao giờ thực sự ngủ yên; còn Bậc Thềm Gào Thét thì đêm nào cũng xứng với cái tên của mình.",
+      "amberPlaceNotes": "Lanternmere tỏa sáng giữa lòng mùa gặt. Goldmelt là con đèo phủ hổ phách dẫn vào thị trấn; Vườn Cây Dát Vàng và Thung Lũng Mùa Gặt giữ những vụ mùa ngọt nhất cùng những tên trộm liều lĩnh nhất; Đại Hồ phản chiếu những tán lá rực cháy; Đồi Cindermaple sừng sững cao nhất và đỏ nhất; còn Trụ Đá Nghiêng thì lưu giữ ký ức về một điều gì đó cổ xưa hơn cả mùa thu.",
+      "fenPlaceNotes": "Bridgemere nằm vắt ngang dòng nước chảy chậm. Bậc Thang Amberfen đổ xuống từ miền đất mùa gặt; Lilymoors và Vũng Nước Bogshine lấp lánh ma trơi và chuồn chuồn; Willowweep buông cành rủ xuống mặt hồ; còn Vùng Đất Lim Dim là nơi hiền hòa nhất mà vùng đất này có thể có.",
+      "nightPlaceNotes": "Moonrest giữ vững buổi canh thức. Nightgate là lối vào miền đất nửa đêm; Moonwell lưu giữ ánh sao mà bạn có thể đứng cạnh bên; Gloamfield nở hoa trong bóng tối; Đài Canh Thức Bất Động dõi trông mà chẳng bao giờ lay động; còn Gò Mộ Không Ngủ là nơi duy nhất ở đây chẳng bao giờ chìm vào giấc mộng.",
+      "hauntPlaceNotes": "Gallowmere co cụm bên trong vòng đèn lồng của mình. Crowgate là cánh cửa u ám của khu rừng; Bụi Rậm Của Góa Phụ giăng kín tơ nhện dày đặc; Khoảng Rừng Treo và Nhà Nguyện Mournstone giữ lại những nỗi đau cổ xưa nhất của khu rừng; còn Bãi Trống Của Thợ Săn thuộc về bất cứ thứ gì vẫn còn săn đuổi nơi đó.",
+      "galePlaceNotes": "Wickharbor nghiêng mình đón gió. Windway là con đường vách đá dẫn vào; Cao Nguyên Gào Thét trải dài trọc lóc dưới cơn cuồng phong; Hải Đăng Cổ đã cháy sáng lâu đến mức không ai còn nhớ nổi từ bao giờ; Shear đổ dốc thẳng đứng xuống mặt nước; Wreckfields giữ cho bờ biển này luôn thành thật; còn Hồ Gương là thứ duy nhất còn tĩnh lặng trong cả cõi này.",
+      "junglePlaceNotes": "Drifthaven giữ ngọn lửa của mình trên bãi biển. Tanglemouth là nơi dòng sông gặp bức tường xanh thẳm; Palmstrand chạy dài trắng xóa và ấm áp dọc theo sóng biển; Rừng Rậm Ngọc Lục Bảo và Vinefall nuốt trọn vùng nội địa; Đầm Phá Lam Ngọc tỏa sáng trong vắt và sâu thẳm; còn Tượng Thần Chìm dõi theo từ dưới làn nước.",
+      "gardenPlaceNotes": "Hedgewick chờ đợi ngay tại Cổng Vườn. Lối Đi Bồn Hoa nở rộ sắc màu được xén tỉa gọn gàng; Lâu Đài Dawnhold vẫn huấn luyện hiệp sĩ sau những bức tường mới; Ao Cánh Hoa trôi dạt sắc hồng quanh năm; Cối Xay Cũ vẫn tự xoay vòng luống hoa của riêng nó; Đại Mê Cung thay đổi cách cư xử cho từng vị khách, những vòm cổng của nó được canh giữ bởi lũ cáo lá; Trạm Gác Phương Bắc trấn giữ con đường ra; Bồn Hoa Huệ nghỉ ngơi phía sau tất cả; và Sân Đài Phun Nước vẫn chảy trong vắt tại trái tim khu vườn.",
       "gladeTitle": "Một góc tĩnh lặng: Brightwood Glade",
       "gladeBody": "Không phải mọi câu chuyện ở Vale đều về người chết. Ở phía bắc, một khu rừng thưa ngập nắng tên là Brightwood Glade giữ nhịp điệu dịu dàng của riêng nó, toàn những lối đi tĩnh lặng và ánh sáng lốm đốm dưới tán cành. Nó là một nốt nhạc đối lập êm dịu với con đường bạn đang theo, và đáng để ghé thăm khi cung đường cho bạn chỗ để lang thang.",
       "worldBossTitle": "Khi đỉnh núi thức giấc: con trùm thế giới",
@@ -3514,6 +3677,7 @@ export const vi_VN: EnTranslations = {
       "bastionBody": "Một pháo đài ngập nước đã mất vào tay đầm lầy, do những kẻ phòng thủ chết chìm và chính con nước dâng nắm giữ.",
       "templeBody": "Một ngôi đền dưới ánh trăng chìm bên dưới một hồ băng phát sáng cao trên các đỉnh núi, đến được qua một cánh cổng ánh sáng lạnh. Một giáo phái chết chìm vẫn ca hát dưới đó trong những tấm lễ phục mục nát, và những lời cảnh báo khắc trên bờ nói rằng thứ gì đó bên dưới chỉ đang ngủ. Một bí ẩn khép kín, tách biệt khỏi cốt truyện chính, dành cho những kẻ tò mò và chuẩn bị kỹ càng.",
       "sanctumBody": "Trái tim đen tối của Đỉnh Gai, nơi công cuộc lâu dài của giáo phái đạt đến đỉnh điểm khủng khiếp.",
+      "wildheartBody": "Một miệng núi lửa rừng rậm đẫm mưa, nơi hai lối đi săn bắn trên cao vòng quanh một hố sụt ngọc bích. Băng qua những hang thú và tàn tích tổ tiên, rồi leo lên kim tự tháp nghi lễ để đối mặt với Zulgar.",
       "raidName": "Raid cuối game",
       "raidBody": "Phía sau một cánh cửa hoàng gia niêm phong chờ đợi một thử thách mười người chơi: một trận chiến nhiều giai đoạn và một thế lực bất tử mà cả raid phải cùng nhau ngăn chặn. Hãy giành quyền vào trong, rồi rủ chín người bạn cùng đến.",
       "heroicTitle": "Chế độ Anh Hùng",
@@ -5062,6 +5226,57 @@ export const vi_VN: EnTranslations = {
     "chat": "Mở Trò Chuyện"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "Tất cả Rạn Nứt hiện đang không ổn định. Hãy thử lại sau.",
+      "enterFloor": "Bạn bước qua Rạn Nứt vào {name}.",
+      "descendFloor": "Bạn đi sâu hơn vào {name}.",
+      "stepBack": "Bạn bước lùi qua Rạn Nứt.",
+      "pylonLit": "Một trụ rune bùng sáng ({lit}/{total}).",
+      "wayDownOpens": "Lối đi xuống xé toạc mở ra.",
+      "exitOpens": "Rạn Nứt rung chuyển. Một lối về nhà xé toạc mở ra phía sau những kẻ đã ngã xuống.",
+      "portalOpens": "Một Rạn Nứt hạng {tier} xé toạc mở ra tại {zone}!",
+      "portalSealed": "Rạn Nứt hạng {tier} tại {zone} đã bị niêm phong.",
+      "portalCollapses": "Rạn Nứt hạng {tier} tại {zone} sụp đổ.",
+      "levelGate": "Chỉ những nhà thám hiểm cấp độ {level} trở lên mới có thể vào Rạn Nứt này.",
+      "deadEntry": "Bạn không thể vào Rạn Nứt khi đang chết.",
+      "deadEntryCombat": "Nhóm của bạn vẫn đang trong giao tranh. Người đã chết có thể vào lại khi trận chiến kết thúc.",
+      "iceGoalLit": "Ấn băng bùng cháy. Con đường lay động.",
+      "socketsShut": "Các hốc khóa kèn kẹt đóng lại. Con đường lay động.",
+      "seqProgress": "Các rune lần lượt hồi đáp ({step}/{total}).",
+      "seqReset": "Các rune tối sầm lại. Bắt đầu lại.",
+      "gateOpen": "Cánh cổng kèn kẹt mở ra.",
+      "orbSealed": "Quả cầu bị niêm phong bởi nghi lễ bên dưới.",
+      "orbWakes": "Ngọn lửa của ngôi sao ngũ giác tàn lụi. Có thứ gì đó thức giấc trên bàn thờ.",
+      "orbOpensGate": "Quả Cầu Máu bùng sáng. Cánh cổng ngôi đền kèn kẹt mở ra.",
+      "alreadyCleared": "Rạn Nứt này đã bị {names} dọn sạch.",
+      "raceLost": "Rạn Nứt đã bị {names} dọn sạch. Lượt chạy của bạn kết thúc.",
+      "raceWorldWin": "{names} đã chiến thắng đường đua Rạn Nứt hạng {tier} trong {seconds} giây!",
+      "raceWinBanner": "Chiến Thắng Đường Đua Rạn Nứt - {seconds} giây",
+      "raceLostBanner": "Rạn Nứt Đã Được Dọn Sạch",
+      "forgeUpgraded": "Đã hoàn tất nâng cấp Rạn Nứt cho {name}.",
+      "forgeEnchanted": "Đã hoàn tất phù phép Rạn Nứt cho {name}.",
+      "forgeSocketed": "Đã gắn ngọc Rạn Nứt cho {name}.",
+      "detonateGlacialGrave": "Nấm Mồ Băng Hà phát nổ!",
+      "detonateAbsoluteZero": "Độ Không Tuyệt Đối bùng nổ!",
+      "detonateMagmaWell": "Giếng Dung Nham bùng nổ!",
+      "detonateCoreMeltdown": "Lõi Nóng Chảy phát nổ!",
+      "detonateVenomPool": "Vũng Nọc Độc bùng nổ!",
+      "detonateBroodmothersMark": "Dấu Ấn Của Mẹ Bầy phát nổ!",
+      "detonateSoulGrave": "Nấm Mồ Linh Hồn phát nổ!",
+      "detonateDeathSentence": "Án Tử sập xuống!",
+      "detonateEarthshatter": "Đại Địa Chấn phát nổ!",
+      "detonateFinalJudgment": "Phán Quyết Cuối Cùng giáng xuống!",
+      "detonateVoidRift": "Vết Rạn Hư Không phát nổ!",
+      "detonateArcaneAnnihilation": "Hủy Diệt Huyền Thuật bùng nổ!",
+      "detonateLightningRod": "Cột Thu Lôi giáng xuống!",
+      "detonateStormcallersWrath": "Thịnh Nộ Của Kẻ Gọi Bão bùng nổ!",
+      "detonateAbyssalMaw": "Hàm Vực Thẳm khép lại!",
+      "detonateCrushingDepth": "Nghiền Nát Vực Sâu nghiền nát!",
+      "detonatePactSeal": "Ấn Khế Ước phát nổ!",
+      "detonateBloodRite": "Nghi Lễ Máu sập xuống!",
+      "detonatePitSentence": "Án Phạt Vực Ngục phát nổ!",
+      "detonateHellfireBrand": "Ấn Hỏa Ngục phát nổ!"
+    },
     "delve": {
       "cannotEnterNow": "Bạn không thể vào hầm thám hiểm lúc này.",
       "leaveDungeonFirst": "Hãy rời hầm ngục trước đã.",
@@ -5916,6 +6131,8 @@ export const vi_VN: EnTranslations = {
       "secondsRemaining": "còn {seconds} giây",
       "enteringZone": "Đang vào {zone}.",
       "welcomeZone": "Chào mừng đến {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Cấp {level}!",
       "levelLog": "Bạn đã đạt cấp {level}!",
       "xpGain": "Bạn nhận được {amount} kinh nghiệm.",
@@ -6168,6 +6385,8 @@ export const vi_VN: EnTranslations = {
       "floatingDodge": "Né",
       "floatingParry": "Gạt Đòn",
       "floatingResist": "Kháng",
+      "floatingHealFull": "Đầy",
+      "floatingHealAbsorbed": "Hấp Thụ",
       "cannotMove": "Không thể di chuyển!",
       "attack": "tấn công",
       "damageDone": "{ability} của bạn đánh trúng {target} gây {amount}.",
@@ -6182,6 +6401,10 @@ export const vi_VN: EnTranslations = {
       "healSelfCrit": "{ability} của bạn chí mạng hồi {amount} máu cho bạn.",
       "healOther": "{ability} của bạn hồi {amount} máu cho {target}.",
       "healOtherCrit": "{ability} của bạn chí mạng hồi {amount} máu cho {target}.",
+      "healSelfFull": "{ability} của bạn đã trúng, nhưng bạn đã đầy máu.",
+      "healOtherFull": "{ability} của bạn đã trúng {target}, nhưng mục tiêu đã đầy máu.",
+      "healSelfAbsorbed": "Ôn dịch trên người bạn nuốt chửng {ability} của bạn.",
+      "healOtherAbsorbed": "Ôn dịch trên {target} nuốt chửng {ability} của bạn.",
       "death": "{name} gục ngã.",
       "auraGain": "Bạn nhận được {name}.",
       "auraFade": "{name} tan biến khỏi bạn.",
@@ -6540,7 +6763,23 @@ export const vi_VN: EnTranslations = {
       "fishing": "Câu Cá",
       "gathering": "Thu Thập",
       "demonHeal": "Quỷ Trị Liệu",
-      "thunzharrStormcall": "Tiếng Gọi Bão"
+      "thunzharrStormcall": "Tiếng Gọi Bão",
+      "rift_frost_execution": "Nấm Mồ Băng Hà",
+      "rift_frost_strike": "Độ Không Tuyệt Đối",
+      "rift_ember_execution": "Giếng Dung Nham",
+      "rift_ember_strike": "Lõi Nóng Chảy",
+      "rift_venom_execution": "Vũng Nọc Độc",
+      "rift_venom_strike": "Dấu Ấn Của Mẹ Bầy",
+      "rift_necro_execution": "Nấm Mồ Linh Hồn",
+      "rift_necro_strike": "Án Tử",
+      "rift_brute_execution": "Đại Địa Chấn",
+      "rift_brute_strike": "Phán Quyết Cuối Cùng",
+      "rift_arcane_execution": "Vết Rạn Hư Không",
+      "rift_arcane_strike": "Hủy Diệt Huyền Thuật",
+      "rift_storm_execution": "Cột Thu Lôi",
+      "rift_storm_strike": "Thịnh Nộ Của Kẻ Gọi Bão",
+      "rift_tide_execution": "Hàm Vực Thẳm",
+      "rift_tide_strike": "Nghiền Nát Vực Sâu"
     }
   },
   "questUi": {
@@ -6657,7 +6896,8 @@ export const vi_VN: EnTranslations = {
       "tool": "Dụng Cụ",
       "potion": "Thuốc",
       "elixir": "Tiên Dược",
-      "bag": "Túi"
+      "bag": "Túi",
+      "mount": "Thú Cưỡi"
     },
     "stats": {
       "armor": "Giáp",
@@ -9201,6 +9441,312 @@ export const vi_VN: EnTranslations = {
       "resonant_timber": {
         "name": "Gỗ Cộng Hưởng"
       },
+      "duskwisp_essence": {
+        "name": "Tinh chất ma trơi hoàng hôn"
+      },
+      "spore_heart": {
+        "name": "Trái tim bào tử"
+      },
+      "gleaming_antler": {
+        "name": "Gạc hươu lấp lánh"
+      },
+      "wisp_mote": {
+        "name": "Hạt sáng ma trơi"
+      },
+      "starfall_shard": {
+        "name": "Mảnh sao rơi"
+      },
+      "elder_bark": {
+        "name": "Vỏ cây trưởng lão"
+      },
+      "hollow_sealstone": {
+        "name": "Phiến Đá Ấn của Thung Lũng"
+      },
+      "monument_overlook": {
+        "name": "Bia đá phong hóa"
+      },
+      "monument_court": {
+        "name": "Bia đá chìm"
+      },
+      "monument_north": {
+        "name": "Bia đá bị lãng quên"
+      },
+      "guardian_core": {
+        "name": "Lõi hộ vệ"
+      },
+      "wardens_seal": {
+        "name": "Ấn của Người Canh Giữ"
+      },
+      "gleamstag_charm": {
+        "name": "Bùa Hươu Sáng"
+      },
+      "veilsteel_blade": {
+        "name": "Lưỡi kiếm thép màn che"
+      },
+      "duskfang_dirk": {
+        "name": "Dao găm nanh hoàng hôn"
+      },
+      "gleamwood_stave": {
+        "name": "Trượng gỗ lấp lánh"
+      },
+      "wardens_oathband": {
+        "name": "Vòng thề ước của Người Canh Giữ"
+      },
+      "wardplate_cuirass": {
+        "name": "Giáp tấm hộ vệ"
+      },
+      "nightweave_tunic": {
+        "name": "Áo vải dệt đêm"
+      },
+      "veilcloth_robe": {
+        "name": "Áo choàng vải màn che"
+      },
+      "rift_essence": {
+        "name": "Tinh Chất Rạn Nứt"
+      },
+      "rift_gem_crimson": {
+        "name": "Đá Quý Rạn Nứt Đỏ Thẫm"
+      },
+      "rift_gem_azure": {
+        "name": "Đá Quý Rạn Nứt Xanh Lam"
+      },
+      "rift_gem_verdant": {
+        "name": "Đá Quý Rạn Nứt Xanh Lục"
+      },
+      "riftbound_band_of_might": {
+        "name": "Nhẫn Sức Mạnh Rạn Nứt"
+      },
+      "riftbound_band_of_insight": {
+        "name": "Nhẫn Tuệ Giác Rạn Nứt"
+      },
+      "riftbound_band_of_guile": {
+        "name": "Nhẫn Mưu Mẹo Rạn Nứt"
+      },
+      "hoarfrost_edge": {
+        "name": "Lưỡi Sương Giá"
+      },
+      "emberforge_gauntlets": {
+        "name": "Găng Tay Lò Than Hồng"
+      },
+      "broodmother_carapace": {
+        "name": "Mai Giáp Mẹ Bầy"
+      },
+      "bonelord_mantle": {
+        "name": "Áo Choàng Lãnh Chúa Xương"
+      },
+      "graskbreaker_girdle": {
+        "name": "Đai Lưng Kẻ Diệt Grask"
+      },
+      "voidscar_handwraps": {
+        "name": "Quấn Tay Voidscar"
+      },
+      "stormscale_treads": {
+        "name": "Giày Stormscale"
+      },
+      "abyssal_loop": {
+        "name": "Vòng Vực Thẳm"
+      },
+      "pactbound_vestments": {
+        "name": "Áo Lễ Phục Bị Khế Ước Trói Buộc"
+      },
+      "pitlords_cleaver": {
+        "name": "Đại Đao Chặt Của Chúa Tể Vực Ngục"
+      },
+      "emberforged_bulwark": {
+        "name": "Khiên Lò Than Hồng"
+      },
+      "stormsunder_hood": {
+        "name": "Mũ Trùm Xé Bão"
+      },
+      "voidweave_mantle": {
+        "name": "Áo Choàng Dệt Hư Không"
+      },
+      "abysswrought_band": {
+        "name": "Nhẫn Rèn Vực Thẳm"
+      },
+      "heart_of_the_rift": {
+        "name": "Trái Tim Của Rạn Nứt"
+      },
+      "voidsong_dirk": {
+        "name": "Khúc Ca Hư Không, Dao Găm Của Bức Màn Bị Xé Rách"
+      },
+      "wildheart_tuskblade": {
+        "name": "Đao Ngà Wildheart"
+      },
+      "wildheart_hexwood_staff": {
+        "name": "Trượng Gỗ Yểm Bùa Của Vùng Trũng"
+      },
+      "wildheart_fangknife": {
+        "name": "Dao Nanh Của Zulgar"
+      },
+      "thick_winter_pelt": {
+        "name": "Da Lông Mùa Đông Dày"
+      },
+      "aurora_mote": {
+        "name": "Hạt Cực Quang"
+      },
+      "hearth_ember_cache": {
+        "name": "Kho Than Hồng"
+      },
+      "sprung_trap": {
+        "name": "Bẫy Đầm Lầy Đã Sập"
+      },
+      "hearthlined_treads": {
+        "name": "Giày Lót Lò Sưởi"
+      },
+      "frostmane_mantle": {
+        "name": "Áo Choàng Của Bờm Băng Giá"
+      },
+      "ashbone_war_brand": {
+        "name": "Chiến Đao Xương Tro"
+      },
+      "emberwing_scale": {
+        "name": "Vảy Cánh Lửa"
+      },
+      "scorched_supply_crate": {
+        "name": "Thùng Tiếp Tế Cháy Sém"
+      },
+      "wyrmwatch_warning_banner": {
+        "name": "Biểu Ngữ Cảnh Báo Trạm Gác Giao Long"
+      },
+      "cinderwalk_treads": {
+        "name": "Giày Tro Than"
+      },
+      "mawscale_pauldrons": {
+        "name": "Giáp Vai Vảy Hàm"
+      },
+      "gilded_sap_clot": {
+        "name": "Khối Nhựa Dát Vàng"
+      },
+      "amberfall_sap_bucket": {
+        "name": "Xô Hứng Nhựa"
+      },
+      "mere_ferry_lantern": {
+        "name": "Đèn Lồng Đò"
+      },
+      "orchard_sapbinder_grips": {
+        "name": "Găng Tay Ràng Nhựa"
+      },
+      "mantle_of_the_meredark": {
+        "name": "Áo Choàng Của Meredark"
+      },
+      "plump_fen_eel": {
+        "name": "Lươn Đầm Lầy Béo Mập"
+      },
+      "wisplight_globe": {
+        "name": "Quả Cầu Đốm Sáng"
+      },
+      "fenway_mooring_line": {
+        "name": "Dây Neo Bị Cắt"
+      },
+      "bridgemere_toll_chest": {
+        "name": "Rương Thu Phí Chìm"
+      },
+      "eelskin_mudwaders": {
+        "name": "Giày Lội Bùn Da Lươn"
+      },
+      "lilybed_mantle": {
+        "name": "Áo Choàng Của Luống Hoa Huệ"
+      },
+      "moonfleece_tuft": {
+        "name": "Búi Lông Trăng"
+      },
+      "gloamfield_nightbloom": {
+        "name": "Đóa Hoa Nightbloom"
+      },
+      "vigil_star_chart": {
+        "name": "Bản Đồ Sao Canh Thức"
+      },
+      "barrow_grave_offering": {
+        "name": "Lễ Vật Mộ Vương Vãi"
+      },
+      "moonfleece_mitts": {
+        "name": "Găng Tay Lông Trăng"
+      },
+      "barrowshade_mantle": {
+        "name": "Áo Choàng Barrowshade"
+      },
+      "widowsilk_skein": {
+        "name": "Cuộn Tơ Góa Phụ"
+      },
+      "gallowmere_grave_candle": {
+        "name": "Nến Mộ"
+      },
+      "silkbound_remains": {
+        "name": "Di Hài Bọc Lụa"
+      },
+      "gravebound_silk_wraps": {
+        "name": "Quấn Tay Lụa Trói Mộ"
+      },
+      "mantle_of_the_unhorsed": {
+        "name": "Áo Choàng Của Kẻ Ngã Ngựa"
+      },
+      "pearlwake_cargo_crate": {
+        "name": "Thùng Hàng Vệt Sóng Ngọc Trai"
+      },
+      "canopy_silk_hank": {
+        "name": "Cuộn Tơ Tán Cây"
+      },
+      "sunken_offering_bowl": {
+        "name": "Bát Cúng Được Đổ Đầy Lại"
+      },
+      "saltwalker_sandals": {
+        "name": "Dép Muối"
+      },
+      "sunken_idol_mantle": {
+        "name": "Áo Choàng Của Tượng Thần Chìm"
+      },
+      "hedgewick_shears": {
+        "name": "Kéo Tỉa Hedgewick Bị Đánh Cắp"
+      },
+      "evergarden_bloom_clipping": {
+        "name": "Cành Hoa Bị Cắt Tỉa"
+      },
+      "hedgewick_tool_cart": {
+        "name": "Xe Đẩy Dụng Cụ Bị Đổ"
+      },
+      "evergarden_statue_rubbing": {
+        "name": "Bản Chà Tượng"
+      },
+      "shearkeeper_gloves": {
+        "name": "Găng Tay Người Xén Lông"
+      },
+      "fountain_court_mantle": {
+        "name": "Áo Choàng Của Sân Đài Phun Nước"
+      },
+      "galecrest_ram_wool": {
+        "name": "Lông Cừu Nhờn"
+      },
+      "shear_storm_lantern": {
+        "name": "Đèn Bão Bị Dập Tắt"
+      },
+      "wreckfield_flotsam_crate": {
+        "name": "Thùng Mảnh Vỡ Trôi Dạt"
+      },
+      "wickspun_treads": {
+        "name": "Giày Sợi Bấc"
+      },
+      "wreck_wardens_mantle": {
+        "name": "Áo Choàng Của Vệ Quan Xác Tàu"
+      },
+      "breakscarred_steel": {
+        "name": "Thép Sẹo Gãy"
+      },
+      "farshore_salt_moss": {
+        "name": "Rêu Muối Farshore"
+      },
+      "gullhaven_watchbell": {
+        "name": "Chuông Canh Ven Biển"
+      },
+      "saltforged_grips": {
+        "name": "Găng Tay Muối Rèn"
+      },
+      "mantle_of_the_unbroken_shore": {
+        "name": "Áo Choàng Của Bờ Biển Nguyên Vẹn"
+      },
+      "last_keep_signet": {
+        "name": "Nhẫn Ấn Của The Last Keep"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -9932,6 +10478,30 @@ export const vi_VN: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Hộ Yêu của Triệu Bão Sư"
+      },
+      "riding_training": {
+        "name": "Huấn Luyện Cưỡi Ngựa"
+      },
+      "reins_valorsteed": {
+        "name": "Dây cương Valorsteed"
+      },
+      "reins_grag_bear": {
+        "name": "Dây cương Gấu Grag Goliath"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Dây cương Ốc Lướt Vỏ Rêu"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Chìa khóa khởi động: Xe Bay Kỵ Sĩ Aether"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Dây cương Kama-Kage, Cóc Nhảy Bóng"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Dây cương Vũ Bão Vươn Trời"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Dây cương Gà Tây Chúa Sải Bước Sấm"
       }
     },
     "mobs": {
@@ -10181,6 +10751,312 @@ export const vi_VN: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Tinh Linh Bão Trỗi Dậy"
       },
+      "stable_horse": {
+        "name": "Ngựa chuồng"
+      },
+      "rift_spawnling": {
+        "name": "Ấu Trùng Rạn Nứt"
+      },
+      "rift_bonewalker": {
+        "name": "Kẻ Đi Xương Hồi Sinh"
+      },
+      "rift_frost_revenant": {
+        "name": "Oán Linh Bị Băng Trói"
+      },
+      "rift_rime_elemental": {
+        "name": "Nguyên Tố Sương Băng"
+      },
+      "rift_ember_fiend": {
+        "name": "Ác Quỷ Than Hồng"
+      },
+      "rift_magma_brute": {
+        "name": "Dã Thú Dung Nham"
+      },
+      "rift_venom_weaver": {
+        "name": "Kẻ Dệt Nọc Độc"
+      },
+      "rift_thornback": {
+        "name": "Kẻ Rình Rập Lưng Gai"
+      },
+      "rift_boneclad": {
+        "name": "Chiến Binh Bọc Xương"
+      },
+      "rift_marrow_troll": {
+        "name": "Troll Tủy"
+      },
+      "rift_void_acolyte": {
+        "name": "Tu Đồ Sẹo Hư Không"
+      },
+      "rift_dread_stalker": {
+        "name": "Kẻ Rình Rập Kinh Hoàng"
+      },
+      "rift_storm_caller": {
+        "name": "Kẻ Gọi Bão"
+      },
+      "rift_stormscale": {
+        "name": "Rồng Vảy Bão"
+      },
+      "rift_tide_thrall": {
+        "name": "Nô Lệ Thủy Triều"
+      },
+      "rift_deep_lurker": {
+        "name": "Kẻ Rình Vực Sâu"
+      },
+      "rift_stone_ogre": {
+        "name": "Ogre Đá"
+      },
+      "rift_boss_frost": {
+        "name": "Vệ Quan Sương Giá"
+      },
+      "rift_boss_ember": {
+        "name": "Bạo Chúa Lò Than Hồng"
+      },
+      "rift_boss_venom": {
+        "name": "Mẹ Bầy Vysska"
+      },
+      "rift_boss_necro": {
+        "name": "Lãnh Chúa Xương Xarreth"
+      },
+      "rift_boss_brute": {
+        "name": "Lãnh Chúa Chiến Tranh Grask"
+      },
+      "rift_boss_arcane": {
+        "name": "Đại Pháp Quan Nyxaris"
+      },
+      "rift_boss_storm": {
+        "name": "Cuồng Phong Vharok"
+      },
+      "rift_boss_tide": {
+        "name": "Hàm Vực Thẳm"
+      },
+      "glimmerwisp": {
+        "name": "Tinh Linh Lấp Lánh"
+      },
+      "duskwisp": {
+        "name": "Tinh Linh Hoàng Hôn"
+      },
+      "veiled_stag": {
+        "name": "Hươu Đực Che Màn"
+      },
+      "veiled_doe": {
+        "name": "Hươu Cái Che Màn"
+      },
+      "gleamstag": {
+        "name": "Hươu Lấp Lánh"
+      },
+      "sporeling_gatherer": {
+        "name": "Kẻ Hái Bào Tử"
+      },
+      "corrupted_sporeling": {
+        "name": "Bào Tử Tha Hóa"
+      },
+      "mushroom_pixie": {
+        "name": "Yêu Tinh Tộc Lấp Lánh"
+      },
+      "treant_elder": {
+        "name": "Mộc Nhân Trưởng Lão"
+      },
+      "ancient_guardian": {
+        "name": "Vệ Binh Cổ Đại"
+      },
+      "waking_warden": {
+        "name": "Vệ Quan Thức Tỉnh"
+      },
+      "old_marrowshell": {
+        "name": "Lão Vỏ Tủy"
+      },
+      "aurelhorn": {
+        "name": "Aurelhorn, Con Đầu Đàn"
+      },
+      "snowdrift_wolf": {
+        "name": "Sói Tuyết Trôi Dạt"
+      },
+      "ice_wisp": {
+        "name": "Tinh Linh Băng"
+      },
+      "rime_elemental": {
+        "name": "Nguyên Tố Sương Băng"
+      },
+      "fen_sprite": {
+        "name": "Tinh Linh Đầm Lầy"
+      },
+      "frostmane_yeti": {
+        "name": "Người Tuyết Bờm Băng Giá"
+      },
+      "terrace_howler": {
+        "name": "Kẻ Gào Thét Bậc Thang"
+      },
+      "apprentice_wren": {
+        "name": "Học Việc Wren"
+      },
+      "emberwing_drake": {
+        "name": "Rồng Cánh Lửa"
+      },
+      "ashbone_raider": {
+        "name": "Kẻ Đột Kích Xương Tro"
+      },
+      "ashbone_warcaller": {
+        "name": "Kẻ Hô Chiến Xương Tro"
+      },
+      "dune_troll": {
+        "name": "Troll Cồn Cát"
+      },
+      "cindraleth_maw_matriarch": {
+        "name": "Cindraleth Mẫu Chúa Hàm"
+      },
+      "gilded_stag": {
+        "name": "Hươu Đực Dát Vàng"
+      },
+      "gloam_fox": {
+        "name": "Cáo Chạng Vạng"
+      },
+      "orchard_treant": {
+        "name": "Mộc Nhân Vườn Cây"
+      },
+      "the_meredark": {
+        "name": "Meredark"
+      },
+      "harvest_sprite": {
+        "name": "Tinh Linh Mùa Gặt"
+      },
+      "mere_lurker": {
+        "name": "Kẻ Rình Đầm Hồ"
+      },
+      "bogtoad": {
+        "name": "Cóc Đầm Lầy"
+      },
+      "drowsy_croaker": {
+        "name": "Kẻ Ộp Ộp Ngái Ngủ"
+      },
+      "lily_wisp": {
+        "name": "Tinh Linh Hoa Huệ"
+      },
+      "willow_sprite": {
+        "name": "Tinh Linh Cây Liễu"
+      },
+      "moonfleece_grazer": {
+        "name": "Kẻ Gặm Cỏ Lông Trăng"
+      },
+      "gloam_strider": {
+        "name": "Kẻ Rảo Bước Chạng Vạng"
+      },
+      "nightkin_stargazer": {
+        "name": "Kẻ Ngắm Sao Tộc Đêm"
+      },
+      "barrow_king": {
+        "name": "Vua Gò Mộ"
+      },
+      "barrow_wight": {
+        "name": "U Linh Gò Mộ"
+      },
+      "widowsilk_spinner": {
+        "name": "Kẻ Nhả Tơ Góa Phụ"
+      },
+      "wood_wraith": {
+        "name": "Oán Linh Gỗ"
+      },
+      "gravenbark_shambler": {
+        "name": "Kẻ Lê Bước Vỏ Cây Khắc"
+      },
+      "pale_huntsman": {
+        "name": "Thợ Săn Nhợt Nhạt"
+      },
+      "gravedigger_mosley": {
+        "name": "Người Đào Mộ Mosley"
+      },
+      "tide_scuttler": {
+        "name": "Kẻ Bò Thủy Triều"
+      },
+      "thicket_boar": {
+        "name": "Lợn Rừng Bụi Rậm"
+      },
+      "canopy_weaver": {
+        "name": "Kẻ Dệt Tán Cây"
+      },
+      "idol_guardian": {
+        "name": "Vệ Binh Tượng Thần"
+      },
+      "castaway_navigator": {
+        "name": "Hoa Tiêu Suli"
+      },
+      "topiary_stag": {
+        "name": "Hươu Đực Cây Kiểng"
+      },
+      "topiary_wolf": {
+        "name": "Sói Cây Kiểng"
+      },
+      "hedge_gnome": {
+        "name": "Yêu Tinh Đất Hàng Rào"
+      },
+      "hedge_knight": {
+        "name": "Hiệp Sĩ Dawnhold"
+      },
+      "the_topiary_bull": {
+        "name": "Bò Đực Cây Kiểng"
+      },
+      "moor_ram": {
+        "name": "Cừu Đực Đầm Hoang"
+      },
+      "gale_wisp": {
+        "name": "Tinh Linh Cuồng Phong"
+      },
+      "shoal_scuttler": {
+        "name": "Kẻ Bò Bãi Cạn"
+      },
+      "downs_bandit": {
+        "name": "Tên Cướp Vùng Đồi"
+      },
+      "wreck_thief": {
+        "name": "Tên Trộm Bãi Xác Tàu"
+      },
+      "the_wreck_warden": {
+        "name": "Vệ Quan Xác Tàu"
+      },
+      "drowned_deckhand": {
+        "name": "Thủy Thủ Chết Đuối"
+      },
+      "riftspawn": {
+        "name": "Quái Sinh Rạn Nứt"
+      },
+      "breach_wretch": {
+        "name": "Kẻ Khốn Khổ Vết Nứt"
+      },
+      "void_stalker": {
+        "name": "Kẻ Rình Rập Hư Không"
+      },
+      "sundered_horror": {
+        "name": "Kẻ Kinh Hoàng Bị Xé Toạc"
+      },
+      "fisher_bram": {
+        "name": "Ngư Dân Bram"
+      },
+      "rift_hellguard": {
+        "name": "Vệ Binh Địa Ngục"
+      },
+      "rift_pact_acolyte": {
+        "name": "Tu Đồ Khế Ước"
+      },
+      "rift_boss_ritualist": {
+        "name": "Pháp Sư Vel'Kor, Kẻ Bị Khế Ước Trói Buộc"
+      },
+      "rift_boss_pitlord": {
+        "name": "Azgorath, Chúa Tể Vực Ngục"
+      },
+      "wildheart_stalker": {
+        "name": "Kẻ Rình Rập Vuốt Dây Leo"
+      },
+      "wildheart_ravager": {
+        "name": "Kẻ Tàn Phá Bờm Máu"
+      },
+      "wildheart_hexcaller": {
+        "name": "Kẻ Niệm Chú Xương Mặt Trời"
+      },
+      "wildheart_beastmaster": {
+        "name": "Thuần Thú Sư Lãnh Chúa Nanh"
+      },
+      "wildheart_high_priest": {
+        "name": "Zulgar, Tiếng Nói Của Vùng Trũng"
+      },
       "ironvein_foreman": {
         "name": "Quản Đốc Mạch Sắt"
       },
@@ -10334,6 +11210,11 @@ export const vi_VN: EnTranslations = {
         "title": "Quản Đốc Hầm Mỏ",
         "greeting": "Cả khu khai quật bò lúc nhúc lũ sâu bọ bám đầy bùn đất đó!"
       },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Quản Mã",
+        "greeting": "Kỵ sĩ nào cũng bước vào bằng hai chân, {className}. Ta chỉ trao dây cương khi nào ngươi ngồi vững trên lưng Valorsteed mà không lăn xuống bùn, vì Highwatch chẳng dư thầy thuốc để chữa xương gãy."
+      },
       "warden_fenwick": {
         "name": "Vệ Quan Fenwick",
         "title": "Vệ Quan của Fenbridge",
@@ -10463,6 +11344,246 @@ export const vi_VN: EnTranslations = {
         "name": "Sử Quan Zenzie",
         "title": "Biên Niên Sử Đỉnh Núi",
         "greeting": "Ngọn núi không quên bất cứ điều gì, {playerName}, và ta cũng vậy. Để xem ngươi đã làm nên những gì nào."
+      },
+      "keeper_saelwyn": {
+        "name": "Người Giữ Saelwyn",
+        "title": "Người Giữ Hollow",
+        "greeting": "Rất ít người như ngươi từng đứng dưới những tán cây này, {className}. Hãy bước thật nhẹ nhàng, và được chào đón."
+      },
+      "loremother_bryn": {
+        "name": "Sử Mẫu Bryn",
+        "title": "Tiếng Nói Của Miếu Thờ",
+        "greeting": "Mỗi ánh sáng trong thung lũng này đều ghi nhớ điều gì đó, {playerName}. Hãy giúp ta lắng nghe."
+      },
+      "provisioner_fenna": {
+        "name": "Người Tiếp Tế Fenna",
+        "title": "Người Tiếp Tế Của Eldergleam",
+        "greeting": "Bánh mì vẫn còn ấm, nước vẫn còn ngọt lành. Hollow ban tặng, và ta cũng vậy."
+      },
+      "wardsmith_orun": {
+        "name": "Thợ Rèn Hộ Ấn Orun",
+        "title": "Người Giữ Những Lò Rèn Cổ",
+        "greeting": "Những lò rèn này đã nguội lạnh từ hàng thế kỷ trước, {className}, nhưng thành quả của chúng vẫn còn sắc bén."
+      },
+      "archivist_tullo": {
+        "name": "Người Lưu Trữ Tullo",
+        "title": "Người Đọc Đá",
+        "greeting": "Những đài tưởng niệm ngoài kia đã không nói chuyện với ai từ bao đời nay. Có lẽ chúng đang chờ những đôi tai mới."
+      },
+      "huntsman_deral": {
+        "name": "Thợ Săn Deral",
+        "title": "Vệ Quan Bầy Đàn",
+        "greeting": "Im lặng nào. Bầy thú biết rõ từng âm thanh mà thung lũng này tạo ra, và tôi cũng vậy."
+      },
+      "warden_kaldra": {
+        "name": "Vệ Quan Kaldra",
+        "title": "Vệ Quan Của Icemantle",
+        "greeting": "Cẩn thận với những băng ghế, kẻ lạ mặt. Tuyết giữ lại những gì nó đã lấy đi."
+      },
+      "hearthkeeper_maeve": {
+        "name": "Người Giữ Lò Sưởi Maeve",
+        "title": "Người Giữ Lữ Quán Lò Sưởi",
+        "greeting": "Vào trong đi, tránh cái lạnh. Ngọn lửa trong lữ quán này sẽ không bao giờ tắt, chừng nào tôi còn hơi thở."
+      },
+      "scout_einna": {
+        "name": "Trinh Sát Einna",
+        "title": "Trinh Sát Ranh Tuyết",
+        "greeting": "Ngươi đã băng qua đèo mà vẫn còn sống. Tốt. Icemantle nên biết về chuyện này."
+      },
+      "aurorist_veyla": {
+        "name": "Nhà Cực Quang Veyla",
+        "title": "Người Đọc Ánh Cực Quang",
+        "greeting": "Suỵt. Đêm nay ánh cực quang đang cất lời, và chúng không bao giờ lặp lại."
+      },
+      "trapper_brosk": {
+        "name": "Người Đặt Bẫy Brosk",
+        "title": "Người Đặt Bẫy Của Shiverfen",
+        "greeting": "Đầm lầy đã lấy mất ba đường bẫy của tôi trong tuần này. Suốt hai mươi năm qua, đầm lầy chưa từng lấy mất đường bẫy nào."
+      },
+      "gatecaptain_brannoc": {
+        "name": "Đội Trưởng Cổng Brannoc",
+        "title": "Chỉ Huy Của Wyrmwatch",
+        "greeting": "Wyrmwatch giữ vững cánh cổng này. Đã giữ suốt bốn mươi năm qua. Đêm nay nó vẫn sẽ giữ vững."
+      },
+      "quartermaster_sela": {
+        "name": "Quân Nhu Trưởng Sela",
+        "title": "Người Giữ Kho Quân Nhu",
+        "greeting": "Mỗi thùng hàng trong sân này đã vượt qua bốn mươi dặm tro tàn để đến được đây. Hãy đối xử tử tế với chúng."
+      },
+      "scout_yerrin": {
+        "name": "Trinh Sát Yerrin",
+        "title": "Người Canh Gác Cồn Cát Xa",
+        "greeting": "Cúi thấp xuống. Âm thanh vọng lại kỳ lạ trên mặt kính, và cánh cổng bên dưới có tai đấy."
+      },
+      "reeve_ottoline": {
+        "name": "Xã Trưởng Ottoline",
+        "title": "Xã Trưởng Của Lanternmere",
+        "greeting": "Chào mừng đến với Lanternmere, nơi mùa gặt chẳng bao giờ kết thúc, và công việc cũng vậy."
+      },
+      "waywatcher_sorrel": {
+        "name": "Người Canh Đường Sorrel",
+        "title": "Người Canh Gác Của Goldmelt",
+        "greeting": "Tuyết ở phía sau, vàng son ở phía trước. Ít ai băng qua Goldmelt đến lần thứ hai, nên hãy khiến chuyến đi này thật đáng giá."
+      },
+      "ferrymaster_caddow": {
+        "name": "Phà Trưởng Caddow",
+        "title": "Người Giữ Những Chuyến Phà Đèn Lồng",
+        "greeting": "Sương mù lại giăng trên mặt đầm nước lần nữa. Khi những ngọn đèn lồng trên mặt nước tắt đi, kẻ khôn ngoan sẽ ở lại trên bờ."
+      },
+      "orchardist_pomeline": {
+        "name": "Người Coi Vườn Quả Pomeline",
+        "title": "Người Giữ Những Hàng Cây Dát Vàng",
+        "greeting": "Cẩn thận từng bước chân. Mỗi gốc rễ trong những hàng cây này đều già hơn cả thị trấn, và chúng vẫn còn nhớ."
+      },
+      "waykeeper_pell": {
+        "name": "Người Giữ Đường Pell",
+        "title": "Người Giữ Bậc Thang Amberfen",
+        "greeting": "Xuống hết bậc thang là đến vùng đất mềm mại. Cẩn thận nơi ngươi đặt chân."
+      },
+      "bridgewright_alden": {
+        "name": "Thợ Cầu Alden",
+        "title": "Bậc Thầy Của Fenway",
+        "greeting": "Mỗi tấm ván trong thị trấn này đều do tôi trông coi, và đầm lầy thì gặm nhấm tất cả chúng."
+      },
+      "netter_maris": {
+        "name": "Thợ Lưới Maris",
+        "title": "Thợ Lưới Lươn Của Bridgemere",
+        "greeting": "Ngửi thấy không? Lươn hun khói đấy. Nửa cái thị trấn này đứng trên những cây cột mà tôi mua được nhờ nó."
+      },
+      "mother_sedge": {
+        "name": "Mẫu Sedge",
+        "title": "Phù Thủy Đầm Lầy Của Willowweep",
+        "greeting": "Những cây liễu đã báo cho ta biết ngươi sẽ đến, từ trước khi đôi ủng của ngươi rời khỏi cây cầu."
+      },
+      "lamplighter_sorrel": {
+        "name": "Người Thắp Đèn Sorrel",
+        "title": "Người Giữ Nightgate",
+        "greeting": "Coi chừng những ngọn đèn, bạn hiền. Qua khỏi cánh cổng này, mặt trời buông xuôi và hoa lá lên ngôi."
+      },
+      "lira_dewsong": {
+        "name": "Lira Dewsong",
+        "title": "Người Làm Vườn Đêm Của Moonrest",
+        "greeting": "Chào mừng đến với Moonrest, nơi những đóa hoa thay chúng ta đón bình minh."
+      },
+      "weaver_amelle": {
+        "name": "Thợ Dệt Amelle",
+        "title": "Thợ Dệt Moonfleece",
+        "greeting": "Cảm nhận được không? Đó là Moonfleece trên khung cửi. Ấm hơn bất kỳ ngọn lửa nào ngươi từng ngồi cạnh."
+      },
+      "astronomer_cassian": {
+        "name": "Nhà Thiên Văn Cassian",
+        "title": "Người Canh Gác Đêm Trực",
+        "greeting": "Suỵt, im nào. Bầu trời nơi đây chẳng bao giờ hửng sáng, nên nó cũng chẳng bao giờ ngừng thì thầm."
+      },
+      "lampman_cobb": {
+        "name": "Người Coi Đèn Cobb",
+        "title": "Người Giữ Những Chiếc Đèn Lồng Crowgate",
+        "greeting": "Cứ đứng trong ánh đèn, bạn hiền. Khu rừng đếm từng người đi qua cánh cổng này."
+      },
+      "sexton_marrow": {
+        "name": "Người Giữ Mộ Marrow",
+        "title": "Người Giữ Mộ Của Gallowmere",
+        "greeting": "Chúng tôi chôn họ thật sâu ở đây, và rung chuông để họ nhớ mà nằm yên."
+      },
+      "widow_tansy": {
+        "name": "Quả Phụ Tansy",
+        "title": "Thợ Làm Nến Của Gallowmere",
+        "greeting": "Một ngọn nến cho mỗi nấm mộ, và không được để ngọn nào tắt. Không một ngọn nào, ngươi nghe rõ chưa?"
+      },
+      "vicar_creel": {
+        "name": "Cha Xứ Creel",
+        "title": "Cha Xứ Cuối Cùng Của Mournstone",
+        "greeting": "Nhà nguyện đã sụp đổ từ nhiều năm trước. Những người chết bên dưới nó chẳng hề hay biết, nên tôi đã ở lại."
+      },
+      "strandwatcher_pell": {
+        "name": "Người Canh Bờ Pell",
+        "title": "Người Canh Gác Của Tanglemouth",
+        "greeting": "Cuối cùng cũng ra khỏi rừng cây đen. Thở đi, kẻ lạ mặt, mặt trời vẫn còn ngự trị ở phía bên này của con đèo."
+      },
+      "salvage_boss_ryna": {
+        "name": "Đầu Lĩnh Trục Vớt Ryna",
+        "title": "Nữ Chủ Của Tuyến Xác Tàu",
+        "greeting": "Một {className} với đôi tay còn lành lặn, tốt. Tuyến xác tàu trả công hậu hĩnh, nếu lũ cua còn chừa lại đủ ngón tay cho ngươi đếm."
+      },
+      "pearlmother_isha": {
+        "name": "Ngọc Mẫu Isha",
+        "title": "Trưởng Lão Của Những Người Lặn",
+        "greeting": "Biển cả cho đi, cát giữ lại, và rừng rậm lấy đi. Hãy ở lại trên bờ cát, kẻ lạ mặt."
+      },
+      "hermit_okku": {
+        "name": "Okku",
+        "title": "Người Đã Bước Vào Trong",
+        "greeting": "Im lặng nào. Tiếng trống đếm mọi thứ bước đi dưới tán cây, và chúng đã đếm được ngươi rồi."
+      },
+      "gatewarden_pell": {
+        "name": "Vệ Quan Cổng Pell",
+        "title": "Người Giữ Cổng Vườn",
+        "greeting": "Cẩn thận khi bước trên bãi cỏ. Khu vườn tự cắt tỉa chúng, và nó thích mọi thứ gọn gàng."
+      },
+      "head_gardener_amaranth": {
+        "name": "Người Làm Vườn Trưởng Amaranth",
+        "title": "Người Làm Vườn Trưởng Của The Evergarden",
+        "greeting": "Đừng để ý đến quầng thâm dưới mắt tôi. Ai đó phải thức trong khi khu vườn còn đang say ngủ."
+      },
+      "wickmother_sorrel": {
+        "name": "Nến Mẫu Sorrel",
+        "title": "Người Giữ Quán Trọ Hedgewick",
+        "greeting": "Vào đi, ngồi xuống, có rượu ấm đang hâm trên lửa đấy. Chỉ cần để mắt tới bất cứ thứ gì bằng sắt: dạo này lũ gnome tay chân nhanh nhẹn lắm."
+      },
+      "gardener_yew": {
+        "name": "Người Làm Vườn Yew",
+        "title": "Người Làm Vườn Cuối Cùng",
+        "greeting": "Đưa tôi cái xe cút kít đó được không? Mấy bãi cỏ này chẳng tự đi cắt được đâu, dù cái xóm nhỏ này có nghĩ gì đi nữa."
+      },
+      "watcher_maren": {
+        "name": "Người Canh Gác Maren",
+        "title": "Đội Gác Đường Gió",
+        "greeting": "Cẩn thận bước chân qua khỏi cổng. Gió trên này cuốn mất mũ trước tiên, và chẳng bao giờ thèm hỏi han gì cả."
+      },
+      "harbormaster_odile": {
+        "name": "Cảng Trưởng Odile",
+        "title": "Cảng Trưởng Của Wickharbor",
+        "greeting": "Mọi con thuyền trong vịnh này đều nợ Ngọn Hải Đăng Cổ mạng sống của mình. Nói nhanh lên, thủy triều sẽ không chờ đâu."
+      },
+      "keeper_bram": {
+        "name": "Người Giữ Bram",
+        "title": "Người Giữ Ngọn Hải Đăng Cổ",
+        "greeting": "Ba mươi chín năm qua, ngọn đèn này đã cháy sáng dưới sự canh giữ của tôi. Nó sẽ không tắt trong phiên gác của ngươi đâu."
+      },
+      "salvager_edda": {
+        "name": "Người Trục Vớt Edda",
+        "title": "Người Trục Vớt Của Wreckfield",
+        "greeting": "Gỗ tàu đắm, dây thừng, và hàng hóa của người chết. Biển cả trả lương cho ta, khi nào Vệ Quan còn cho phép."
+      },
+      "warden_coalfast": {
+        "name": "Vệ Quan Coalfast",
+        "title": "Chỉ Huy Đồn Lũy",
+        "greeting": "Những vết rạn chẳng quan tâm Gullhaven bé nhỏ đến đâu, {className}. Chúng ta giữ vững bờ biển này, hoặc sẽ chẳng còn bờ biển nào để mà giữ. Hãy sát cánh cùng chúng ta, và ta sẽ không quên điều đó."
+      },
+      "riftwatch_ollun": {
+        "name": "Người Canh Rạn Nứt Ollun",
+        "title": "Học Giả Vết Rạn",
+        "greeting": "Mỗi vết rạn đều ngân lên trước khi mở ra, nếu ngươi có đôi tai để nghe. Ngay lúc này ta có thể nghe thấy ba vết đang cựa mình trên hòn đảo, và một trong số đó đang đến gần."
+      },
+      "quartermaster_edda": {
+        "name": "Quân Nhu Trưởng Edda",
+        "title": "Thợ Giáp Đồn Lũy",
+        "greeting": "Thép và muối, {className}, đó là tất cả những gì ta còn để trao cho ngươi. Hãy nhận lấy và khiến những vết rạn phải hối hận vì đã mở ra trong tầm tay ta."
+      },
+      "mender_saul": {
+        "name": "Lang Y Saul",
+        "title": "Quân Y Dã Chiến",
+        "greeting": "Tháng này tôi đã nắn xương nhiều hơn cả mười năm chữa trị cho những cú ngã khi đánh cá. Các vết rạn chẳng để lại được bao nhiêu từ những gì chúng lấy đi. Hãy trở về với ta nguyên vẹn, nếu ngươi có thể."
+      },
+      "bellkeeper_tam": {
+        "name": "Người Giữ Chuông Tam",
+        "title": "Người Giữ Chuông Canh",
+        "greeting": "Chiếc chuông là lời cảnh báo duy nhất mà các vết rạn ban cho chúng ta, {className}. Một tiếng cho cánh đồng, hai tiếng cho vách đá, ba tiếng khi nó đã gần đến mức chạy trốn cũng vô ích. Hãy để tai lắng nghe nó, nó có thể giữ cho ngươi được nguyên vẹn."
+      },
+      "fisher_nell": {
+        "name": "Nell Hoảng Sợ",
+        "title": "Ngư Dân Gullhaven",
+        "greeting": "Nó mở ra ngay chỗ phơi lưới. Ngay tại đó, nơi tôi từng đứng mỗi sáng suốt cả cuộc đời mình. Tôi không còn xuống bờ biển nữa. Tôi cũng chẳng còn đi đâu nhiều nữa."
       },
       "forgemistress_darva": {
         "name": "Nữ thợ rèn Darva",
@@ -11433,6 +12554,192 @@ export const vi_VN: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Bài Học Cưỡi Ngựa",
+        "text": "Kỵ sĩ nào cũng bước vào bằng hai chân, {playerName}, đúng như ta đã nói ngày ta gặp ngươi. Trả lệ phí, rồi khi ta ra hiệu, hãy gọi con Valorsteed huấn luyện đến và leo lên yên. Rồi chạy hết đường đua: theo dấu hiệu tới cổng vòm xuất phát, vượt sạch từng chướng ngại, và băng qua vạch lần nữa trước khi cát chảy hết. Làm được vậy thì yên ngựa là của ngươi. Đi khỏi bãi quây là ta bắt đầu lại từ đầu.",
+        "completion": "Đấy, được rồi. Lên yên bằng một động tác gọn gàng và ngồi thật vững. Valorsteed giờ là của ngươi, {playerName}: yên ngựa, dây cương, và danh dự của một kỵ sĩ giành được chỗ ngồi bằng chính công sức, chứ không phải mua nó.",
+        "objectives": {
+          "0": {
+            "label": "Thuần Hóa Valorsteed"
+          }
+        }
+      },
+      "q_veil_thinned": {
+        "title": "Bức Màn Đã Mỏng Đi",
+        "text": "Vậy là hang động đã mở ra cho bạn. Vậy thì phong ấn yếu hơn ta lo sợ, {playerName}. Nơi bức màn bị xé rách, những Duskwisp trở nên tối tăm và lạnh lẽo. Mang cho ta tám tinh chất từ những Duskwisp và ta sẽ đọc được vết thương ăn sâu đến đâu.",
+        "completion": "Lạnh lẽo, tất cả chúng. Hollow có lẽ chỉ còn một mùa trước khi vết rách trở thành một rạn nứt. Chúng ta có việc phải làm, bạn và ta.",
+        "objectives": {
+          "0": {
+            "label": "Tinh chất ma trơi hoàng hôn"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "Gạc Lấp Lánh",
+        "text": "Những chú hươu đực che màn tỏa sáng nơi chúng gặm cỏ, và những chiếc gạc chúng rụng xuống giữ ánh sáng đó suốt nhiều năm. Năm chiếc, từ các đàn hươu trong khoảng trống mở giữa lòng thung lũng, và đèn lồng của ta sẽ cháy suốt mùa đông mà không cần dầu. Đàn hươu không cần phải bị làm hại, nhưng chúng không dễ dàng rời xa chúng đâu.",
+        "completion": "Nhìn xem chúng giữ ánh sáng như thế nào! Không lửa, không khói, chỉ có ánh sáng dịu. Hollow luôn cung cấp đủ.",
+        "objectives": {
+          "0": {
+            "label": "Gạc Lấp Lánh"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "Ánh Sáng Của Bãi Cạn",
+        "text": "Những Glimmerwisp mang theo những hạt ánh sao cổ xưa đã rơi xuống đây khi Hollow bị phong ấn. Sáu hạt, và đèn miếu thờ sẽ cháy sáng suốt một năm. Chỉ lấy từ những con đang tàn lụi thôi; Hollow cho đi đủ nhiều mà không cần tham lam.",
+        "completion": "Dịu nhẹ như những vì sao đầu tiên. Đặt chúng ở đây cạnh bàn thờ; miếu thờ sẽ lo phần còn lại.",
+        "objectives": {
+          "0": {
+            "label": "Hạt sáng ma trơi"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "Xoa Dịu Vực Sâu",
+        "text": "Những bào tử của Vực Sâu Lấp Lánh từng là những sinh vật hiền lành trước khi vết rách chạm đến vòng tròn của chúng. Những gì sự tha hóa lấy đi, nó không bao giờ trả lại. Ban cho những kẻ tha hóa sự an nghỉ, {playerName}: mười con, ở phía bắc Vực Sâu.",
+        "completion": "Bạn đã làm điều ta không thể chịu đựng để làm. Những người hái lượm vẫn hát ở vòng tròn phía nam; nhờ có bạn, họ sẽ tiếp tục hát.",
+        "objectives": {
+          "0": {
+            "label": "Bào Tử Tha Hóa được an nghỉ"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "Những Trái Tim Của Vòng Tròn",
+        "text": "Khi một con bào tử ngã vào bóng tối, trái tim nó vẫn tiếp tục đập bằng bóng tối vay mượn. Bốn trái tim đó, được thanh tẩy tại miếu thờ, có thể dạy chúng ta biết sự tha hóa lan truyền ra sao. Đây là công việc ảm đạm, {playerName}, nhưng đó là công việc hàn gắn.",
+        "completion": "Đó. Đã thanh tẩy, và yên tĩnh. Mỗi cái đều mang cùng một dấu ấn: bóng tối chảy ra TỪ Sân Chìm. Hãy báo cho Saelwyn.",
+        "objectives": {
+          "0": {
+            "label": "Tim Bào Tử"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "Những Gì Đá Còn Nhớ",
+        "text": "Ba đài tưởng niệm vẫn còn đứng từ trước khi phong ấn được lập: một tại Đài Quan Sát Duskfall, một trong Sân Chìm, và một bị lãng quên ở tận đông bắc xa xôi nơi không ai bước đến. Đọc chúng giúp ta, {playerName}. Đầu gối của ta đã kiệt sức từ hai thế kỷ bậc thang trước rồi.",
+        "completion": "Một đài quan sát, một sân chìm, và một góc bị lãng quên... và cả ba khổ thơ của bài ca phong ấn, cùng nhau lần đầu tiên kể từ khi nó được ngân lên. Bạn đã khiến một người đọc già nua rất hạnh phúc.",
+        "objectives": {
+          "0": {
+            "label": "Đài tưởng niệm ở Đài Quan Sát đã được đọc"
+          },
+          "1": {
+            "label": "Đài tưởng niệm ở Sân Chìm đã được đọc"
+          },
+          "2": {
+            "label": "Đài tưởng niệm bị lãng quên đã được đọc"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "Hiểm Họa Trong Khoảng Trống",
+        "text": "Lũ Duskwisp đã bắt đầu lang thang giữa các quầy hàng của ta sau khi trời tối, {playerName}, và cái lạnh của chúng làm hỏng mọi thứ nó chạm vào. Hãy giảm bớt số lượng chúng giúp ta: mười con, ở bất cứ nơi nào bức màn đã bị xé rách.",
+        "completion": "Chợ đêm có thể mở lại rồi. Bạn có một khách hàng trọn đời, hoặc ít nhất là một khoản giảm giá.",
+        "objectives": {
+          "0": {
+            "label": "Duskwisp bị xua tan"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "Mảnh Vỡ Starfall",
+        "text": "Khi những Duskwisp lướt qua các cánh đồng pha lê, những mảnh ánh sao cổ xưa bám vào chúng như gai dính. Sáu mảnh, {playerName}, và ta có thể xác định thời điểm phong ấn chính xác đến mùa nó được ngân lên.",
+        "completion": "Nhìn những vệt vân này đi! Mùa thu. Hollow đã bị phong ấn vào mùa thu. Hai trăm năm tranh cãi, được giải quyết bởi sáu hòn đá nhỏ.",
+        "objectives": {
+          "0": {
+            "label": "Mảnh Vỡ Starfall"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "Thỏa Ước Mộc Nhân",
+        "text": "Những trưởng lão của Rừng Cổ Thụ đang bong lớp vỏ ngoài khi sự tha hóa gặm nhấm rễ của chúng. Bốn đoạn vỏ, và ta có thể pha chế một thứ thuốc mỡ cho cả khu rừng. Chúng sẽ không cảm ơn bạn khi bạn cạy nó ra đâu, {playerName}, nhưng chúng sẽ đứng vững thêm cả thế kỷ nhờ vào đó.",
+        "completion": "Dày và chắc chắn, cả bốn đoạn. Thuốc mỡ sẽ mất một tuần để pha chế và cả trăm năm để hoàn thành công việc của nó. Cây cối đo lường lòng tốt theo một cách khác.",
+        "objectives": {
+          "0": {
+            "label": "Vỏ Cây Trưởng Lão"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "Chống Lại Thủy Triều Bào Tử",
+        "text": "Thuốc mỡ đang giữ vững Rừng Cổ Thụ, nhưng sự tha hóa lại càng gây sức ép mạnh hơn tại Vực Sâu Lấp Lánh mỗi khi chạng vạng buông xuống. Mười hai kẻ tha hóa nữa phải được cho an nghỉ trước khi những người hái lượm có thể giành lại vòng tròn phía bắc của họ, {playerName}.",
+        "completion": "Những vòng tròn phía bắc lại đang hát đêm nay. Khe khẽ thôi, nhưng vẫn đang hát.",
+        "objectives": {
+          "0": {
+            "label": "Bào Tử Tha Hóa được an nghỉ"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "Sân Chìm",
+        "text": "Bryn đọc những trái tim ấy chính xác: vết rách chạy xuyên qua sân đình cổ ở phía đông, và những vệ binh của nó đã thức tỉnh sai cách. Chúng được tạo ra để bảo vệ phong ấn; giờ chúng sẽ nghiền nát bất cứ ai đến gần nó. Dọn sạch tám con khỏi tàn tích này.",
+        "completion": "Tám vệ binh, đã tĩnh lặng. Ta còn nhớ khi chúng được dựng lên, {playerName}. Đừng ngạc nhiên quá vậy; Hollow giữ những người canh giữ của nó rất lâu.",
+        "objectives": {
+          "0": {
+            "label": "Vệ Binh Cổ Đại bị làm cho tĩnh lặng"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "Tiếng Vọng Của Vệ Quan",
+        "text": "Dù chủ nhân của chúng đã bị bịt miệng, những vệ binh sân đình vẫn lặp lại mệnh lệnh cuối cùng của nó như một tiếng vọng không chịu tan biến. Cho đến khi phong ấn được đặt trở lại, chúng sẽ tiếp tục thức tỉnh, {playerName}. Hãy làm tĩnh lặng mười con nữa để những người thợ đá có thể tiếp cận phiến đá ấn.",
+        "completion": "Tiếng vọng mờ dần đi mỗi lần. Chẳng bao lâu nữa sân đình sẽ chỉ còn gió và dây thường xuân, đúng như một tàn tích nên có.",
+        "objectives": {
+          "0": {
+            "label": "Vệ Binh Cổ Đại bị làm cho tĩnh lặng"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "Vệ Quan Thức Tỉnh",
+        "text": "Sân đình yên tĩnh, nhưng chủ nhân của nó thì không. Vệ Quan giữ phong ấn đã thức tỉnh một cách méo mó, và khi nó còn đứng vững, phong ấn không thể được hàn gắn. Nó sẽ không ngã xuống dễ dàng đâu; rủ theo một người bạn nếu bạn có thể tìm được, {playerName}. Rủ theo hai người nếu bạn có thể tìm được hai.",
+        "completion": "Tiếng chuông từ giọng nói của nó đã im bặt. Ta cảm nhận được điều đó từ đây, như một gánh nặng được trút khỏi cả thung lũng.",
+        "objectives": {
+          "0": {
+            "label": "Vệ Quan Thức Tỉnh bị đánh bại"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "Phong Ấn Được Phục Hồi",
+        "text": "Mang phong ấn của Vệ Quan đến phiến đá ấn tại trung tâm sân đình và đặt nó trở lại nơi nó từng bị đánh bật ra. Khi đó Hollow có thể bắt đầu chữa lành, và bạn, {playerName}, sẽ đã làm được điều mà chưa ai thuộc giống loài bạn từng làm được.",
+        "completion": "Ta cảm nhận được nó khép lại từ đây, nhẹ nhàng như hoàng hôn. Hollow nhớ đến những người bạn của mình, {playerName}. Dù bạn có đi xa đến đâu, sẽ luôn có một ánh sáng dành cho bạn dưới gốc đại thụ.",
+        "objectives": {
+          "0": {
+            "label": "Phong ấn được đặt trở lại phiến đá ấn"
+          }
+        }
+      },
+      "q_hollow_the_huntsman": {
+        "title": "Vệ Quan Bầy Đàn",
+        "text": "Bạn trông như người có thể xử lý được nhiều hơn là mấy con ma trơi, {playerName}. Thợ Săn Deral giữ trạm gác của mình giữa những đồng cỏ hươu về phía đông nơi này, và ông ấy đã tìm kiếm những bàn tay có năng lực suốt nhiều tuần. Bất cứ thứ gì ông ấy đang truy tìm ngoài đó, ông ấy sẽ không nói to điều đó trong làng.",
+        "completion": "Fenna cử bạn đến? Tốt. Vậy là bà ấy tin tưởng bạn, và ta có hai cái tên cần được gạch bỏ.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Thợ Săn Deral"
+          }
+        }
+      },
+      "q_hollow_old_marrowshell": {
+        "title": "Chiếc Mai Cũ Của Bãi Cạn",
+        "text": "Cái tên đầu tiên là Lão Vỏ Tủy, một con cua to bằng cả chiếc xe đã săn mồi ở bãi cạn phía đông từ trước khi Eldergleam có cổng. Nó lang thang khắp nơi, {playerName}, nên bạn sẽ phải đi dọc bờ biển cho đến khi bắt gặp dấu vết của nó. Đừng đi một mình, và đừng tin vào sự bất động của nó.",
+        "completion": "Bãi cạn giờ lại chỉ còn là nước. Ta đã chứng kiến cái mai đó đánh bại những thợ săn giỏi hơn ta, {playerName}. Nhưng không phải bạn.",
+        "objectives": {
+          "0": {
+            "label": "Lão Vỏ Tủy bị tiêu diệt"
+          }
+        }
+      },
+      "q_hollow_first_of_the_herd": {
+        "title": "Con Đầu Đàn",
+        "text": "Cái tên thứ hai khó nói hơn. Aurelhorn từng dẫn dắt những đàn hươu này khi bà của ta còn giữ trạm gác này, và bất cứ thứ gì đã thức tỉnh trong Hollow đã đánh thức nó sai cách. Nó giẫm nát những gì nó từng bảo vệ, và cả đàn sẽ không sống sót qua cơn điên loạn của nó. Nó lang thang trên những đồng cỏ gần các con đường sân đình cũ. Kết liễu nó bằng lòng thương xót, {playerName}, và rủ theo một người bạn để cùng chia sẻ gánh nặng này.",
+        "completion": "Vậy là Con Đầu Đàn ngã xuống dưới tay người đến sau cùng. Đàn hươu đã bình tĩnh hơn rồi, bạn có cảm nhận được không? Bạn đã làm một việc tốt cho Hollow hôm nay, dù nó không có vẻ như vậy.",
+        "objectives": {
+          "0": {
+            "label": "Aurelhorn được ban cho sự thanh thản"
+          }
+        }
+      },
       "q_prof_hobby_switch": {
         "title": "Một Đam Mê Khác",
         "text": "Chuyên ngành đòi hỏi lời thề. Sở thích chỉ hỏi sự tò mò của bạn đi đâu, {playerName}. Hãy hái một ít thảo dược và quyết định kỹ nghệ nào đối diện với chuyên ngành của bạn mà bạn muốn theo đuổi.",
@@ -11440,6 +12747,916 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Mảnh thảo dược đã thu hoạch"
+          }
+        }
+      },
+      "q_fv_snowline_report": {
+        "title": "Tin Tức Từ Snowline",
+        "text": "Mọi linh hồn leo ra khỏi Drakelands đều đi qua ngọn lửa của ta, {playerName}, và mỗi tuần lại có ít người leo hơn. Vệ Quan Kaldra trấn giữ Icemantle trên con đường phía bắc. Nói với bà ấy rằng đèo núi vẫn còn mở, và nói với bà ấy rằng một người lạ đã đi qua nó một mình.",
+        "completion": "Vậy là đèo núi vẫn trụ vững. Einna giữ trạm gác đó xuyên qua những cơn bão chôn vùi cả cột mốc đường, và cô ấy chưa từng một lần gửi cho ta tin tức vô ích. Chào mừng đến Icemantle, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Báo cáo với Vệ Quan Kaldra"
+          }
+        }
+      },
+      "q_fv_wolves_at_the_door": {
+        "title": "Sói Trước Cửa",
+        "text": "Các bầy sói tuyết trôi dạt trước đây chỉ ở trên những thềm đá cao. Giờ chúng băng qua đường hồ băng giữa ban ngày và những người đốn củi của ta không dám rời khỏi tường thành. Giảm bớt số lượng bầy sói, {playerName}, mười con, và con đường sẽ lại là con đường.",
+        "completion": "Bớt đi mười bóng đen giữa nơi này và hồ băng. Những người đốn củi đã bắt đầu tranh cãi xem ai sẽ ra ngoài trước.",
+        "objectives": {
+          "0": {
+            "label": "Sói Tuyết Trôi Dạt bị tiêu diệt"
+          }
+        }
+      },
+      "q_fv_winter_pelts": {
+        "title": "Da Lông Cho Lữ Quán",
+        "text": "Củi lửa giữ cho cơ thể sống sót, {playerName}, nhưng len sẽ không chống lại được cái lạnh này, chỉ có lông sói mới làm được. Sáu tấm da lông mùa đông dày từ các bầy sói tuyết trôi dạt và ta có thể lót túi ngủ cho tất cả những ai được lữ quán che chở.",
+        "completion": "Lông thú như thế này là lý lẽ duy nhất mà mùa đông chịu lắng nghe. Nhận lấy đôi giày này, chúng được lót từ mẻ lông cuối cùng.",
+        "objectives": {
+          "0": {
+            "label": "Da Lông Mùa Đông Dày"
+          }
+        }
+      },
+      "q_fv_ember_caches": {
+        "title": "Than Hồng Trên Đường Hồ Băng",
+        "text": "Một chiếc xe trượt chở kho than hồng đã lật nhào trên đường hồ băng đêm qua: những chiếc ấm sắt giữ cho ngọn lửa ủ sống suốt một tháng. Ba chiếc vẫn còn nằm trong tuyết, {playerName}, và lữ quán không thể để mất những gì chúng chứa. Hãy mang ngọn lửa về nhà.",
+        "completion": "Vẫn còn ấm, từng chiếc một. Bạn đã mua cho lữ quán cả một mùa đông khoan dung, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Kho Than Hồng được tìm lại"
+          }
+        }
+      },
+      "q_fv_lights_over_steps": {
+        "title": "Ánh Sáng Trên Bậc Thang",
+        "text": "Cực quang đã cháy màu xanh lục mỗi đêm trong tháng này, và các bậc trưởng lão không chịu đi dưới nó. Có một người phụ nữ có thể biết lý do: Veyla, Nhà Cực Quang. Cô ấy cắm trại một mình trên Bậc Thang Cực Quang, đông nam qua khỏi hồ băng. Tìm trại của cô ấy, {playerName}, và nghe những gì ánh sáng đã nói với cô ấy.",
+        "completion": "Kaldra cử bạn đến? Vậy là cuối cùng bà ấy cũng lo lắng, và bà ấy đúng khi lo lắng. Ngồi xuống đi, {playerName}. Ngắm bầu trời cùng ta một lát.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Nhà Cực Quang Veyla"
+          }
+        }
+      },
+      "q_fv_silent_trapline": {
+        "title": "Tuyến Bẫy Im Lặng",
+        "text": "Brosk Già trông coi tuyến bẫy Shiverfen về phía tây nơi này, và mỗi tuần suốt mười một năm ông ấy đều gửi một bó lông thú lên bằng xe trượt gỗ. Đã hai tuần nay, không có gì cả. Ông ấy quá bướng bỉnh để bị đóng băng và quá thận trọng để bị chết đuối, {playerName}, nên chắc hẳn có chuyện gì khác không ổn. Tìm trại của ông ấy tại đầm lầy và xem ông ấy còn thở không.",
+        "completion": "Maeve cử bạn đến sao? Ha. Mười một năm rồi mà bà ấy vẫn nghĩ đầm lầy sẽ nuốt chửng ta. Chà... năm nay có lẽ bà ấy đúng. Nhìn xem nó đã làm gì với các tuyến bẫy của ta.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Người Đặt Bẫy Brosk"
+          }
+        }
+      },
+      "q_fv_aurora_motes": {
+        "title": "Hạt Của Cực Quang",
+        "text": "Những tinh linh lang thang trên bậc thang này được chính ánh sáng ấy trút ra, và mỗi con mang một hạt cực quang trong tim mình. Ta cần sáu hạt để đọc được những gì bầu trời đang viết, {playerName}. Những tinh linh này không chống trả. Việc đó khiến công việc dễ hơn hay khó hơn là chuyện giữa bạn và lương tâm của bạn.",
+        "completion": "Sáu hạt, vẫn còn phát sáng. Nhìn chúng đi, {playerName}: chúng nhấp nháy cùng nhịp với nhau. Những ánh sáng này không phải là thời tiết. Chúng là một tín hiệu.",
+        "objectives": {
+          "0": {
+            "label": "Hạt Cực Quang"
+          }
+        }
+      },
+      "q_fv_rime_unbound": {
+        "title": "Sương Băng Được Giải Phóng",
+        "text": "Khi cực quang cháy sáng đến thế này, cái lạnh đứng dậy và bước đi: những nguyên tố sương băng, sương giá được ban cho ý chí. Chúng tụ tập nơi ánh sáng chạm vào các thềm đá, và chúng đang lang thang gần trại của ta hơn mỗi đêm. Đập tan tám con, {playerName}, trước khi một con đập tan ta.",
+        "completion": "Đêm nay đã cảm thấy mỏng manh hơn rồi. Bất cứ thứ gì đánh thức chúng vẫn chưa xong việc, nhưng bạn đã mua cho Bậc Thang này chút yên tĩnh.",
+        "objectives": {
+          "0": {
+            "label": "Nguyên Tố Sương Băng bị tiêu diệt"
+          }
+        }
+      },
+      "q_fv_sprung_traps": {
+        "title": "Tinh Linh Trong Những Chiếc Bẫy",
+        "text": "Tinh linh đầm lầy, {playerName}. Lũ quỷ nhỏ này kích hoạt bẫy của ta để mua vui và làm vương vãi những mảnh sắt vào bụi lau sậy. Hãy đuổi chúng đi, tám con chắc đủ để dạy cho phần còn lại, và thu thập những gì còn sót lại từ tuyến bẫy của ta khi bạn ở ngoài đó.",
+        "completion": "Bốn chiếc bẫy tốt đã về và bụi lau sậy đã yên tĩnh trở lại. Bạn đặt bẫy mạnh tay hơn ta nhiều, {playerName}, nhưng ta không thể tranh cãi với kết quả.",
+        "objectives": {
+          "0": {
+            "label": "Tinh Linh Đầm Lầy bị đuổi đi"
+          },
+          "1": {
+            "label": "Bẫy được tìm lại"
+          }
+        }
+      },
+      "q_fv_howl_above": {
+        "title": "Tiếng Gào Trên Bậc Thềm",
+        "text": "Bạn nghe thấy nó lúc chạng vạng, {playerName}: một tiếng gào từ Bậc Thềm Gào Thét không phải của các bầy sói tuyết trôi dạt. Những cổ họng lớn hơn. Những kẻ gào thét bậc thang đã xuống từ đỉnh núi lần đầu tiên kể từ khi bà của ta giữ vị trí này, và chính chúng đã đẩy đàn sói lên con đường của ta. Diệt tám con và đẩy chúng lùi lại.",
+        "completion": "Tám con, và bản hợp xướng chạng vạng đã thưa hơn vì điều đó. Nhưng những kẻ gào thét không rời đỉnh núi vô cớ. Có thứ gì đó trên đó đã xui khiến chúng, và ta sợ rằng thứ đó có một cái tên.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Gào Thét Bậc Thang bị tiêu diệt"
+          }
+        }
+      },
+      "q_fv_seeing_wren_home": {
+        "title": "Đưa Wren Về Nhà",
+        "text": "Học việc Wren của ta đã ra đi dọc theo tuyến Goldmelt hai ngày trước và không bao giờ trở lại. Ta đã tìm thấy dấu chân cô bé, cô bé đang trốn dưới những cột mốc đường tây nam Bậc Thang Cực Quang, quá sợ đàn sói để di chuyển. Ta không thể rời khỏi đầm lầy này, {playerName}. Hãy dẫn cô bé đến trại của Veyla trên Bậc Thang. Cô bé sẽ an toàn dưới ánh sáng.",
+        "completion": "Cô bé đang ở trong nhà, cuộn mình trong nửa số chăn của ta và huyên thuyên về những vì sao trên trời. Bạn đã làm một việc tốt hôm nay, {playerName}. Vùng Đất này không thường thấy những việc như vậy.",
+        "objectives": {
+          "0": {
+            "label": "Học Việc Wren được đưa an toàn đến Bậc Thang Cực Quang"
+          }
+        }
+      },
+      "q_fv_frostmane_tyrant": {
+        "title": "Bạo Chúa Bờm Băng Giá",
+        "text": "Những kẻ gào thét không phải đang săn mồi khi chúng xuống khỏi bậc thềm. Chúng đang chạy trốn. Một con người tuyết đã chiếm lấy vùng đất cao, dân miền núi gọi nó là Bờm Băng Giá, và ngay cả các bầy sói cũng không chịu chia sẻ một sườn núi với nó. Việc này phải chấm dứt, {playerName}, trước khi mùa đông đẩy nó xuống tận tường thành của ta. Rủ theo một người bạn. Rủ theo hai người.",
+        "completion": "Khi gió lặng đêm qua, cả ngôi làng đã nghe thấy sự im lặng nơi Bờm Băng Giá từng ở. Vùng Đất này nợ bạn một món nợ sẽ mất nhiều năm để trả, {playerName}. Hãy khoác lên thứ này, và mọi cánh cửa ở Icemantle sẽ rộng mở với bạn.",
+        "objectives": {
+          "0": {
+            "label": "Bờm Băng Giá bị tiêu diệt"
+          }
+        }
+      },
+      "q_dk_ash_on_the_wind": {
+        "title": "Tro Bay Trong Gió",
+        "text": "Nhìn về phía nam khỏi hàng rào cọc này, {playerName}. Những ngọn lửa trên cồn cát kia không phải lửa nấu ăn của troll, đó là những cuộc tập hợp của Xương Tro, và mỗi đêm lại có thêm nhiều hơn. Xác chết trồi lên từ những cánh đồng xương với cát vẫn còn dính trên răng. Hãy chặt hạ mười kẻ đột kích trước khi chúng mở được đường đến cổng của ta.",
+        "completion": "Bớt đi mười lưỡi đao trên cồn cát, và ngọn lửa tập hợp cháy thấp hơn đêm qua. Lính canh của ta đã ngủ được, điều mà họ chưa làm suốt một tuần qua. Ra tay tốt lắm, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Đột Kích Xương Tro bị tiêu diệt"
+          }
+        }
+      },
+      "q_dk_trolls_on_the_road": {
+        "title": "Troll Trên Đường",
+        "text": "Đám troll cồn cát đã học được âm thanh của một chiếc xe tiếp tế, {playerName}. Chúng đã tấn công con đường Cồn Cát Tro Tàn ba lần trong tháng này, và người đánh xe cuối cùng bước vào chỉ còn mang theo dây cương. Dẹp tám con troll khỏi con đường đó thì xe của ta sẽ lại lăn bánh.",
+        "completion": "Tám con, và những người đánh xe của ta đã ngừng viết thư từ biệt trước mỗi chuyến đi. Đồn trú này có cái ăn là nhờ bạn, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Troll Cồn Cát bị tiêu diệt"
+          }
+        }
+      },
+      "q_dk_scorched_stores": {
+        "title": "Kho Hàng Cháy Sém",
+        "text": "Chiếc xe hàng cuối cùng đã cháy, {playerName}, nhưng những thùng bọc sắt không cháy xuyên qua được. Bốn thùng vẫn đang nằm cháy sém dọc theo con đường cồn cát, bên trong chứa muối, đinh, và dây cung đủ dùng cả mùa. Mang kho hàng của ta về nhà trước khi đám troll tìm ra cách mở chúng.",
+        "completion": "Cháy đen nhưng mọi cái chốt vẫn còn giữ chặt. Người thợ rèn có đinh của mình, người làm cung có dây của cô ấy, và bạn có đôi ủng ta để dành cho ai mang thùng hàng của ta về, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Thùng Tiếp Tế Cháy Sém được tìm lại"
+          }
+        }
+      },
+      "q_dk_banners_over_the_dunes": {
+        "title": "Cờ Hiệu Trên Cồn Cát",
+        "text": "Xương Tro tập hợp tại những nấm mộ cánh đồng xương cũ, {playerName}, và đội tuần tra của ta không thể đọc được cồn cát như cách họ đọc một bức tường. Hãy giết năm kẻ hô chiến của chúng, những kẻ hét gào khiến xác chết đứng dậy, và cắm một lá cờ cảnh báo tại mỗi bãi tập hợp để lính canh của ta có thể đánh dấu từ trên sườn núi.",
+        "completion": "Ba lá cờ phần phật trong gió nóng, đúng nơi ống nhòm của ta có thể thấy chúng. Với năm kẻ hô chiến đã bị bịt miệng, bất cứ thứ gì đáp lại tiếng gọi của chúng sẽ đến chậm hơn. Bạn đã mua cho chúng ta thời gian, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Hô Chiến Xương Tro bị tiêu diệt"
+          },
+          "1": {
+            "label": "Cờ cảnh báo đã cắm"
+          }
+        }
+      },
+      "q_dk_watcher_at_the_wargate": {
+        "title": "Người Canh Gác Tại Cổng Chiến Tranh",
+        "text": "Có thứ gì đó đang kéo Xương Tro về phía đông, {playerName}, và ta đã cử người giỏi nhất của mình đi tìm hiểu. Trinh Sát Yerrin đã cắm trại một tháng ở cồn cát xa xôi qua khỏi Trollmoot, trong tầm nhìn của một cánh cổng mà không ai xây trong đời ta. Báo cáo của cô ấy đã ngừng lại mười ngày trước. Tìm trại của cô ấy và mang về cho ta những gì cô ấy đã thấy.",
+        "completion": "Brannoc cử bạn đến? Vậy thì người đưa tin cuối cùng của ta đã không đến nơi. Hạ giọng xuống và ngồi đi, {playerName}. Bạn thấy cánh cổng bên dưới kia không? Hãy đếm những lá cờ chiến tranh trước nó, và bạn sẽ hiểu tại sao ta đã ngừng ghi chép mọi thứ.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Trinh Sát Yerrin"
+          }
+        }
+      },
+      "q_dk_marrow_and_ash": {
+        "title": "Tủy Và Tro",
+        "text": "Mỗi kẻ đột kích Xương Tro đều mang một chiến đao, {playerName}: một dấu khắc cháy sém của đội quân mà nó phục vụ. Ta đã đếm được bốn đội quân từ sườn núi này, nhưng phỏng đoán không phải là tình báo. Mang cho ta sáu chiến đao từ những kẻ đột kích và kẻ hô chiến của chúng, và ta sẽ cho Brannoc biết hình dạng cuộc chiến sắp tới.",
+        "completion": "Sáu chiến đao, và một dấu ấn cháy khắc trên mỗi cái. Đây không phải cuộc tập hợp đột kích thường, {playerName}. Mọi đội quân trên cồn cát này đều phục tùng cổng chiến tranh bên dưới chúng ta, đám troll gọi nó là Orkadia, và không có năm người lính nào ta từng phục vụ cùng có thể phá vỡ thứ đang rền vang sau cánh cửa đó. Có lẽ năm người như bạn thì được.",
+        "objectives": {
+          "0": {
+            "label": "Chiến Đao Xương Tro"
+          }
+        }
+      },
+      "q_dk_scales_of_the_maw": {
+        "title": "Vảy Của Hàm Rồng",
+        "text": "Khi gió đổi hướng từ Drakemaw, đàn rồng cánh lửa lượn qua trại của ta thấp đến mức có thể đếm được răng chúng, {playerName}. Chúng bay xa hơn mỗi ngày, và có thứ gì đó trong miệng núi lửa đó đang thúc đẩy chúng. Mang cho ta ba chiếc vảy của chúng. Vảy ghi nhớ nhiệt độ, và ta có thể đọc được nơi một con rồng từng đậu qua vết cháy.",
+        "completion": "Nhìn mặt dưới của cái này đi, {playerName}: cháy sém thành hình xoắn ốc, và chỉ có một thứ làm tổ theo vòng tròn. Những con rồng này là những kẻ canh giữ trứng. Có thứ gì đó trong Drakemaw là một con mẹ.",
+        "objectives": {
+          "0": {
+            "label": "Vảy Cánh Lửa"
+          }
+        }
+      },
+      "q_dk_matriarch_of_the_maw": {
+        "title": "Mẫu Chúa Hàm",
+        "text": "Những chiếc vảy đã nói đúng, {playerName}. Ta trèo lên miệng núi lửa lúc bình minh và thấy nó dưới đáy hố: Cindraleth, mẫu chúa mà mọi rồng cánh lửa trên bầu trời này đã nở ra dưới quyền, vàng óng như than sắp bén lửa. Khi nó ấp trứng, đám rồng con trở nên táo tợn hơn, và Wyrmwatch không thể vừa chiến đấu với rồng vừa chiến đấu với Xương Tro. Kết liễu nó trong hố núi lửa của nó, rồi mang tin đến Đội Trưởng Cổng Brannoc. Đừng đi một mình.",
+        "completion": "Bầu trời trên Drakemaw đã trống rỗng suốt hai ngày, và giờ bạn bước qua cổng của ta với máu của mẫu chúa dính trên ủng. Wyrmwatch đã đứng canh bốn mươi năm chính vì khoảnh khắc này, {playerName}. Nhận lấy đôi giáp vai này, làm từ vảy hàm, được thợ rèn của chúng ta chế tác. Hãy mang chúng ở nơi đám rồng có thể nhìn thấy.",
+        "objectives": {
+          "0": {
+            "label": "Cindraleth Mẫu Chúa Hàm bị tiêu diệt"
+          }
+        }
+      },
+      "q_af_goldmelt_road": {
+        "title": "Con Đường Vàng Đi Xuống",
+        "text": "Bạn đã băng qua Goldmelt, {playerName}, tuyết vẫn còn bám trên đôi ủng của bạn. Ta canh giữ miếu thờ này để Lanternmere biết ai bước vào từ giá lạnh, và gần đây ta chẳng có gì để báo cáo. Hãy đi theo con đường vàng xuống thị trấn, tìm Xã Trưởng Ottoline bên giếng nước, và nói với bà ấy rằng đèo núi vẫn yên tĩnh.",
+        "completion": "Yên tĩnh trên Goldmelt, và một lữ khách với tuyết trên tóc để chứng minh điều đó. Sorrel canh gác quá tốt để gửi tin tức vô ích. Chào mừng đến Lanternmere, {playerName}. Những chiếc đèn lồng cháy sáng vì bạn.",
+        "objectives": {
+          "0": {
+            "label": "Báo cáo với Xã Trưởng Ottoline"
+          }
+        }
+      },
+      "q_af_foxes_in_the_lamplight": {
+        "title": "Cáo Trong Ánh Đèn Lồng",
+        "text": "Đàn cáo chạng vạng đã học được giá trị của kho đèn lồng, {playerName}. Mỗi khi chạng vạng buông xuống, chúng lẻn qua hàng rào và tha đi mỡ động vật mà chúng ta ép để làm đèn phà. Bàn chân mềm mại, lương tâm còn mềm mại hơn. Hãy diệt mười con và số còn lại sẽ nhớ mà sợ thị trấn này.",
+        "completion": "Mười con, và kho đồ đêm qua không bị đụng đến lần đầu tiên trong mùa này. Những người thắp đèn gửi lời cảm ơn đến bạn, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Cáo Chạng Vạng bị tiêu diệt"
+          }
+        }
+      },
+      "q_af_lanterns_on_the_water": {
+        "title": "Đèn Lồng Trên Mặt Nước",
+        "text": "Mỗi chiếc phà trên hồ đều mang một chiếc đèn lồng đuôi thuyền, {playerName}, và ba chiếc thuyền của ta trở về lúc bình minh mà không còn đèn. Sương mù đã lấy chúng đi, hoặc thứ gì đó trong sương mù đã làm vậy. Chúng dạt vào bờ đông khi gió đổi chiều. Hãy đi dọc con đường ven bờ và mang những chiếc đèn lồng của ta về.",
+        "completion": "Cả ba chiếc, vẫn còn cháy sáng. Đèn lồng đò không tắt trong nước, {playerName}. Đó chính là mục đích của chúng. Điều khiến ta lo lắng là thứ gì đã kéo chúng rời ra.",
+        "objectives": {
+          "0": {
+            "label": "Đèn Lồng Đò được tìm lại"
+          }
+        }
+      },
+      "q_af_orchard_call": {
+        "title": "Một Chuyến Xe Cho Khu Vườn",
+        "text": "Người Coi Vườn Quả Pomeline giữ Vườn Dát Vàng trên con đường phía tây, và những xe nhựa cây của bà ấy đã trễ ba ngày. Cả thị trấn sống nhờ vào nhựa hổ phách đó, {playerName}: nhựa thông cho đèn, chất làm ngọt, và rượu bia mùa gặt. Hãy đi theo con đường phía tây và tìm hiểu xem điều gì đang giữ chân bà ấy.",
+        "completion": "Xã Trưởng đếm những chuyến xe của bà ta à? Được thôi, bà ta cứ đếm chúng thiếu thêm một thời gian nữa cũng được. Nhìn những hàng cây của ta đi, {playerName}. Ta có những rắc rối lớn hơn một chuyến giao hàng trễ nải nhiều.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Người Coi Vườn Quả Pomeline"
+          }
+        }
+      },
+      "q_af_amber_from_the_herd": {
+        "title": "Hổ Phách Từ Đàn Hươu",
+        "text": "Những chú hươu đực dát vàng nằm nghỉ dưới những gốc cây cổ thụ nhất của ta, và nhựa cây nhỏ giọt vàng óng lên bộ lông chúng suốt đêm. Những khối nhựa được chải ra là hổ phách tinh khiết nhất trong khu rừng này. Mang cho ta sáu khối, {playerName}. Đàn hươu sẽ không cảm ơn bạn đâu, nhưng chúng cũng sẽ không tiếc gì cả.",
+        "completion": "Sáu khối, sạch như mật ong vừa rót. Đôi găng tay này được khâu từ mẻ nhựa cuối cùng, {playerName}: cứng lại vì nhựa cây, và ấm hơn vẻ ngoài của chúng.",
+        "objectives": {
+          "0": {
+            "label": "Khối Nhựa Dát Vàng"
+          }
+        }
+      },
+      "q_af_what_took_the_moorings": {
+        "title": "Điều Gì Đã Lấy Đi Những Sợi Dây Neo",
+        "text": "Giờ ta sẽ nói cho bạn nghe điều ta không dám nói trước mặt cả thị trấn. Những sợi dây neo không tự tuột ra, chúng đã bị cắn đứt. Những kẻ rình đầm hồ, mỗi đêm một táo tợn hơn, kéo giật dây thừng và bánh lái. Hãy đưa tám con trong số chúng xuống dưới nước mãi mãi, {playerName}, trước khi một người lái phà bị kéo theo chúng.",
+        "completion": "Bớt đi tám bóng hình dưới vùng nước cạn, và chuyến qua sông hôm nay chạy đúng giờ lần đầu tiên trong hai tuần qua. Nhưng những kẻ rình rập táo tợn là những kẻ rình rập bị xui khiến, {playerName}. Có thứ gì đó dưới đáy hồ đang điều khiển chúng.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Rình Đầm Hồ bị tiêu diệt"
+          }
+        }
+      },
+      "q_af_sprites_and_spigots": {
+        "title": "Tinh Linh Và Vòi Hứng Nhựa",
+        "text": "Tinh linh mùa gặt, {playerName}. Chúng cạy vòi hứng nhựa của ta ra khỏi thân cây vì vị ngọt bên trong và ném những chiếc xô vào bãi cỏ. Hãy đuổi tám tên trộm nhỏ này đi và mang về bốn chiếc xô của ta, thì những chuyến xe sẽ lại lăn bánh.",
+        "completion": "Bốn chiếc xô đã về lại trên móc treo và những hàng cây đã yên tĩnh trở lại. Bạn ra tay mạnh mẽ với đám tinh linh hơn ta nhiều, {playerName}, và hôm nay ta mừng vì điều đó.",
+        "objectives": {
+          "0": {
+            "label": "Tinh Linh Mùa Gặt bị đuổi đi"
+          },
+          "1": {
+            "label": "Xô Hứng Nhựa được tìm lại"
+          }
+        }
+      },
+      "q_af_the_meredark": {
+        "title": "Meredark",
+        "text": "Những người lái phà già có một cái tên mà họ chỉ nói khi đã lên bờ: Meredark, kẻ rình rập đầu tiên, già như chính hồ nước này và kiên nhẫn gấp đôi. Nó từng trỗi dậy một lần trước đây, năm mà cầu tàu chìm xuống nước, và giờ nó lại đang trỗi dậy. Lúc chạng vạng, nó phơi mình trên tàn tích cầu tàu ngoài bờ nam, {playerName}. Hãy rủ theo một người bạn, hay hai người, và kết liễu nó trong khi vẫn còn có thể.",
+        "completion": "Sương mù đã tan khỏi mặt hồ sáng nay, {playerName}, và cả thị trấn đều thấy điều đó. Những chiếc phà sẽ lại chạy chuyến đêm, và mọi ngọn đèn lồng trên mặt nước sẽ cháy sáng vì tên bạn. Hãy nhận lấy thứ này: nó được vớt lên từ cầu tàu chìm, và không ai xứng đáng mang nó hơn bạn.",
+        "objectives": {
+          "0": {
+            "label": "Meredark bị tiêu diệt"
+          }
+        }
+      },
+      "q_wf_across_the_fenway": {
+        "title": "Băng Qua Fenway",
+        "text": "Một vùng đất hiền hòa, Willowfen này, nhưng hiền hòa không có nghĩa là an toàn, {playerName}. Theo con đường phía bắc đến đường đê Fenway và băng qua Bridgemere. Nói với Thợ Cầu Alden rằng Bậc Thang đã mở và ngọn lửa trạm gác đã được thắp lên.",
+        "completion": "Pell giữ ngọn lửa đó cháy sáng xuyên qua mọi lớp sương mù mà đầm lầy có thể phả vào cô ấy. Nếu cô ấy nói Bậc Thang đã mở, thì chúng đã mở. Chào mừng đến Bridgemere, {playerName}. Cẩn thận bước chân trên những tấm ván của tôi và chúng ta sẽ hòa hợp thôi.",
+        "objectives": {
+          "0": {
+            "label": "Báo cáo với Thợ Cầu Alden"
+          }
+        }
+      },
+      "q_wf_rope_chewers": {
+        "title": "Những Kẻ Gặm Dây Thừng",
+        "text": "Cóc đầm lầy, {playerName}. Chúng leo lên khỏi hào ban đêm và gặm đứt dây neo của tôi như thể đó chỉ là những cọng lau sậy. Ba chiếc thuyền nhỏ đã trôi dạt tuần trước, và một trong số đó mang theo cả chiếc tời tốt của tôi. Giảm bớt số lượng chúng, mười con béo ị đó, và những chiếc thuyền sẽ ở yên nơi chúng tôi buộc chúng.",
+        "completion": "Bớt đi mười bộ răng trong hào của tôi. Những chiếc thuyền nhỏ đã đậu yên tại chỗ neo suốt đêm lần đầu tiên trong một tháng, {playerName}. Bạn có lời cảm ơn của mọi người đánh lưới trong thị trấn.",
+        "objectives": {
+          "0": {
+            "label": "Cóc Đầm Lầy bị tiêu diệt"
+          }
+        }
+      },
+      "q_wf_eels_for_the_smokehouse": {
+        "title": "Lươn Cho Nhà Xông Khói",
+        "text": "Lũ cóc đầm lầy không chỉ ăn dây thừng của tôi, {playerName}, chúng còn ăn cả hải sản tôi bắt được: chúng nuốt trọn cả con lươn, ngay từ trong bẫy. Giải thoát sáu con lươn béo mập khỏi lũ tham lam đó trước khi thịt bị hỏng, và lửa nhà xông khói sẽ tiếp tục cháy.",
+        "completion": "Sáu con lươn tốt, hầu như không bị bầm dập. Nhà xông khói sẽ tỏa mùi như tiền bạc vào buổi sáng. Đây, đôi giày lội nước này từng là của tôi khi tôi còn nhanh nhẹn: da lươn chống nước tốt hơn bất cứ thứ gì khác.",
+        "objectives": {
+          "0": {
+            "label": "Lươn Đầm Lầy Béo Mập"
+          }
+        }
+      },
+      "q_wf_mind_the_moorings": {
+        "title": "Chú Ý Đến Dây Neo",
+        "text": "Dây thừng tốt rất quý giá ở đây, {playerName}: mỗi sợi dây bị lũ cóc cắn đứt là một tuần tiền bán lươn mất trắng. Những đầu dây bị cắt vẫn còn nằm dọc bờ hào nơi những chiếc thuyền tuột khỏi chúng. Đi trên những lối ván gỗ và mang về cho tôi bốn sợi dây, và tôi có thể nối chúng lại tốt như mới.",
+        "completion": "Nhìn xem: những vết cắn gọn gàng, từng sợi một, nhưng vẫn còn đủ dây thừng để nối lại. Bạn đã tiết kiệm cho tôi một tháng tiền bạc và cho những người đánh lưới một tháng cằn nhằn, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Dây Neo Bị Cắt được tìm lại"
+          }
+        }
+      },
+      "q_wf_witch_of_willowweep": {
+        "title": "Phù Thủy Của Willowweep",
+        "text": "Chắc giờ bạn đã nghe thấy nó, {playerName}: tiếng ngáy. Chậm rãi và nặng nề, ngoài Bãi Bằng Buồn Ngủ, như thể chính đầm lầy đang trở mình trong giấc ngủ. Lũ cóc, lũ tinh linh, những đốm sáng bừng cháy giữa trưa: tất cả bắt đầu khi âm thanh đó bắt đầu. Có một linh hồn có thể biết đó là gì. Mẫu Sedge cắm trại tại Willowweep, phía tây quanh hào nước và xuống bờ xa. Tìm bà ấy, và hỏi bà ấy xem điều gì đang ngủ giữa đầm lầy của tôi.",
+        "completion": "Alden đã cử bạn đi xa đến đây chỉ để hỏi về tiếng ngáy đó sao? Vậy là dân cầu cuối cùng cũng chịu lắng nghe. Ngồi xuống tránh xa chỗ ẩm ướt đi, {playerName}. Âm thanh đó có một cái tên, và một cổ họng, và tôi đã chờ đợi một kẻ đủ ngốc nghếch để giúp tôi làm nó im lặng.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Mẫu Sedge"
+          }
+        }
+      },
+      "q_wf_toll_and_tangle": {
+        "title": "Phí Cầu Và Mớ Rối",
+        "text": "Tinh linh cây liễu nghĩ rằng cắt đứt một chiếc phà là một trò chơi hay, {playerName}, và tuần trước chiếc thuyền thu phí đã lật trên tuyến phía đông với cả một mùa phí cầu ở trên tàu. Những chiếc rương đã chìm xuống vùng nước cạn và lũ tinh linh nhảy múa trên những lối ván gỗ như thể chúng sở hữu chúng vậy. Đuổi tám con đi và kéo lên ba rương thu phí, và Bridgemere sẽ có cái ăn mùa đông này.",
+        "completion": "Ba chiếc rương, và đồng tiền bên trong vẫn còn khô ráo. Lũ tinh linh sẽ hờn dỗi trong bụi liễu gai suốt một tuần, {playerName}, và thị trấn nợ bạn tấm bánh mùa đông của nó.",
+        "objectives": {
+          "0": {
+            "label": "Tinh Linh Cây Liễu bị đuổi đi"
+          },
+          "1": {
+            "label": "Rương Thu Phí Chìm được tìm lại"
+          }
+        }
+      },
+      "q_wf_wisplight_charms": {
+        "title": "Bùa Đốm Sáng",
+        "text": "Những đốm sáng trên các hồ nước là đầm lầy đang mơ thành tiếng, {playerName}, và ánh sáng của chúng là thứ duy nhất chống lại được lời ru ngủ của Kẻ Ộp Ộp. Tôi dệt nó vào những chiếc bùa liễu: một chiếc quanh cổ bạn và tiếng ngáy sẽ không thể kéo sụp mí mắt bạn xuống. Mang cho tôi sáu quả cầu đốm sáng. Những đốm sáng sẽ không chống lại bạn để giữ chúng, điều đó khiến nó trở thành một lòng tốt hoặc một hành vi trộm cắp, tùy vào cách bạn nhìn nhận nó.",
+        "completion": "Sáu quả cầu, vẫn còn ấm với giấc mơ. Cho tôi đến khi trăng lên và tôi sẽ dệt xong bùa cho bạn và bất cứ ai đủ can đảm đứng bên cạnh bạn.",
+        "objectives": {
+          "0": {
+            "label": "Quả Cầu Đốm Sáng"
+          }
+        }
+      },
+      "q_wf_croakers_hush": {
+        "title": "Sự Im Lặng Của Kẻ Ộp Ộp",
+        "text": "Giờ bạn đã biết tên kẻ ngáy đó, {playerName}: Kẻ Ộp Ộp Ngái Ngủ, vị vua cóc già ngoài Bãi Bằng Buồn Ngủ. Mỗi năm tiếng ộp ộp của nó lại nặng nề hơn, và mỗi năm càng có nhiều phần của đầm lầy quên cách thức tỉnh. Những lá bùa sẽ giữ cho mắt bạn mở, nhưng thân hình đồ sộ của nó lại là chuyện khác: rủ theo một người bạn, và đừng chiến đấu với nó dưới nước. Đưa vị vua già vào một giấc ngủ yên tĩnh hơn.",
+        "completion": "Lắng nghe đi, {playerName}. Không gì cả. Sự im lặng thực sự đầu tiên trên đầm lầy này trong ba mươi năm, và nửa thị trấn sẽ không ngủ được đêm nay vì sự kỳ lạ của nó. Những cây liễu gửi lời cảm ơn, theo cách của chúng. Khoác lên thứ này, được dệt từ chính luống hoa huệ của nó, và đầm lầy sẽ biết bạn là bạn bè ở bất cứ nơi nào nước chạm tới.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Ộp Ộp Ngái Ngủ bị tiêu diệt"
+          }
+        }
+      },
+      "q_nb_road_of_lanterns": {
+        "title": "Con Đường Đèn Lồng",
+        "text": "Trên này mặt trời không bao giờ theo tới, {playerName}, chỉ có những ngọn đèn ta giữ cháy sáng dọc theo đường leo. Moonrest nằm về phía bắc nơi ánh sáng hoa tụ lại. Tìm Lira Dewsong giữa những khu vườn của cô ấy và nói với cô ấy rằng đèn Nightgate vẫn còn cháy.",
+        "completion": "Đèn vẫn còn cháy, và con đường vẫn còn mang những người lạ đến với chúng ta. Sorrel đã giữ cánh cổng đó lâu hơn bất cứ ai ở Moonrest còn nhớ được. Chào mừng, {playerName}, đến với vương quốc không bao giờ có bình minh.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Lira Dewsong tại Moonrest"
+          }
+        }
+      },
+      "q_nb_striders_in_the_dark": {
+        "title": "Những Kẻ Rảo Bước Trong Bóng Tối",
+        "text": "Những kẻ rảo bước chạng vạng luôn là những thợ săn kiên nhẫn, {playerName}, nhưng gần đây chúng lẻn thẳng vào các luống hoa và bắt đi những chú cừu con lông trăng ngay dưới đèn lồng của chúng ta. Diệt mười con và trả lại sự yên tĩnh cho những ngọn đồi.",
+        "completion": "Bớt đi mười kẻ rảo bước, và đàn hươu đã gặm cỏ thoải mái hơn. Những khu vườn giữ giờ giấc riêng của chúng, nhưng đêm nay chúng giữ trong bình yên.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Rảo Bước Chạng Vạng bị tiêu diệt"
+          }
+        }
+      },
+      "q_nb_wool_by_moonlight": {
+        "title": "Len Dưới Ánh Trăng",
+        "text": "Không gì ấm áp như lông trăng, {playerName}, và không gì có thể kéo sợi tinh xảo đến vậy. Những kẻ gặm cỏ mang theo lớp lông bạc rời rạc thành từng búi khi chúng lang thang trên những ngọn đồi. Mang cho ta sáu búi lông tốt từ đàn hươu và ta sẽ dệt cho bạn thứ gì đó xứng đáng với chuyến đi này.",
+        "completion": "Bạc như ánh sao và mềm gấp đôi. Đây, {playerName}: đôi găng tay từ mẻ cuối cùng, được lót theo cách chỉ có lông trăng mới làm được.",
+        "objectives": {
+          "0": {
+            "label": "Búi Lông Trăng"
+          }
+        }
+      },
+      "q_nb_night_gardens": {
+        "title": "Những Khu Vườn Đêm",
+        "text": "Hoa nightbloom chỉ nở dưới bầu trời này, và Gloamfield giữ những luống hoa cổ xưa nhất trong cả vương quốc. Ta cần bốn đóa hoa tươi cho vòng hoa miếu thờ, {playerName}. Cắt chúng thật nhẹ nhàng: một luống hoa nhớ một bàn tay thô bạo suốt cả mùa.",
+        "completion": "Vẫn còn phát sáng, từng cánh hoa một. Miếu thờ sẽ thoảng hương đêm suốt một tuần, và Moonrest sẽ ngủ ngon hơn nhờ vậy.",
+        "objectives": {
+          "0": {
+            "label": "Đóa Hoa Nightbloom được thu thập"
+          }
+        }
+      },
+      "q_nb_eyes_on_the_vigil": {
+        "title": "Mắt Nhìn Về Canh Thức Vĩnh Cửu",
+        "text": "Có thứ gì đó khiến những kẻ rảo bước trở nên táo bạo và đàn hươu bất an, {playerName}, và ta không thể đọc được điều đó từ những bông hoa. Cassian có thể đọc được từ bầu trời. Ông ấy giữ trại quan sát của mình gần Canh Thức Vĩnh Cửu phía đông nơi này, nơi tộc đêm lang thang giữa những phiến đá. Tìm ông ấy, và hỏi xem các vì sao đang nói gì.",
+        "completion": "Lira cử bạn đến? Vậy là cả những khu vườn cũng cảm nhận được điều đó. Ngồi cạnh ống kính một lát đi, {playerName}. Các vì sao đã bất an suốt một tháng, và mỗi bản đồ ta vẽ đều nghiêng về phía bắc, hướng đến gò mộ.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Nhà Thiên Văn Cassian tại Canh Thức Vĩnh Cửu"
+          }
+        }
+      },
+      "q_nb_charts_of_the_stones": {
+        "title": "Bản Đồ Trong Những Phiến Đá",
+        "text": "Những phiến đá Canh Thức còn cổ xưa hơn cả Moonrest, cổ xưa hơn cả tộc đêm chăm sóc chúng, và bề mặt của chúng được khắc những bản đồ sao mà ta đã dành cả đời để học cách đọc. Bầu trời đã dịch chuyển, {playerName}, và ta phải biết đã dịch chuyển bao xa. Đọc bản đồ trên ba phiến đá và mang về cho ta phương vị của chúng.",
+        "completion": "Không còn nghi ngờ gì nữa. Mọi phương vị đều đã dịch chuyển dần về phía Gò Mộ Không Ngủ, như thể chính bầu trời đang cúi xuống gò đất đó để quan sát. Các vị vua xưa được chôn cất dưới những vì sao thẳng hàng không phải vô cớ, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Bản đồ sao đã được đọc"
+          }
+        }
+      },
+      "q_nb_restless_mounds": {
+        "title": "Những Gò Mộ Bất An",
+        "text": "Những bản đồ là một lời cảnh báo, và cánh đồng gò mộ chứng minh điều đó: các gò mộ đang mở ra từ bên dưới. Những u linh bước đi trên các hàng mộ khoác lên vinh dự xưa cũ, và những lễ vật từng giữ cho chúng ngủ yên giờ nằm vương vãi trong cỏ. Hạ gục tám con, {playerName}, và thu thập bốn lễ vật mang về cho ta.",
+        "completion": "Vàng mộ, vẫn còn lạnh vì đất. Những u linh không tự mình trỗi dậy đâu, {playerName}: có thứ gì đó dưới gò mộ lớn đang gọi chúng ra, và ta sợ rằng các bản đồ đã tiết lộ cho chúng ta cái tên của nó rồi.",
+        "objectives": {
+          "0": {
+            "label": "U Linh Gò Mộ bị tiêu diệt"
+          },
+          "1": {
+            "label": "Lễ vật mộ được tìm lại"
+          }
+        }
+      },
+      "q_nb_the_barrow_king": {
+        "title": "Vua Gò Mộ Thức Tỉnh",
+        "text": "Mọi phương vị, mọi vì sao bất an, mọi gò mộ đang mở ra đều chỉ về một điều: Vua Gò Mộ đang thức tỉnh dưới gò đất lớn, và vương quốc này không có bình minh để ngăn nó lại. Nó phải được cho an nghỉ trước khi nó nhớ lại vương miện của mình, {playerName}. Đừng đi một mình: rủ theo một người bạn, và giữ ánh sáng hoa sau lưng bạn.",
+        "completion": "Các vì sao đã lắng xuống lần đầu tiên trong cả mùa, {playerName}. Các gò mộ đã đóng lại, tộc đêm đã trở nên tĩnh lặng bên những phiến đá của họ, và vị vua lại ngủ yên bên dưới. Hãy khoác lên tấm áo choàng này: Moonrest đã cắt nó cho bất cứ ai màn đêm cuối cùng cũng tin tưởng.",
+        "objectives": {
+          "0": {
+            "label": "Vua Gò Mộ được cho an nghỉ"
+          }
+        }
+      },
+      "q_ww_bells_of_gallowmere": {
+        "title": "Những Chiếc Chuông Của Gallowmere",
+        "text": "Nghe tiếng chuông đó không, {playerName}? Đó là Gallowmere, trên con đường phía bắc, đang rung chuông ru người chết của nó vào giấc ngủ. Người Giữ Mộ Marrow giữ số đếm của mọi linh hồn dưới tán rừng, cả người sống lẫn người đã chôn cất. Đi đến và được đếm, trước khi khu rừng tự đếm bạn.",
+        "completion": "Cobb đã đưa bạn lên con đường này nguyên vẹn à? Người tốt đấy. Ông ấy đã giữ những chiếc đèn lồng cổng đó cháy sáng suốt ba mươi năm, và khu rừng chưa từng một lần vượt qua được ông ấy. Chào mừng đến Gallowmere, {playerName}. Chú ý đến những chiếc chuông.",
+        "objectives": {
+          "0": {
+            "label": "Báo cáo với Người Giữ Mộ Marrow"
+          }
+        }
+      },
+      "q_ww_silk_in_the_eaves": {
+        "title": "Tơ Trên Mái Hiên",
+        "text": "Nhìn lên khi bạn đi trên con đường phía tây, {playerName}, và bạn sẽ thấy chúng: những hình dạng được bọc kín trên tán cây, đung đưa nơi không làn gió nào chạm tới. Những kẻ nhả tơ góa phụ đã bò ra khỏi Lùm Cây và giăng kho dự trữ của chúng ngay trên đèn lồng của ta. Giết mười con, và con đường sẽ lại là con đường.",
+        "completion": "Bớt đi mười kẻ dệt tơ trên mái hiên. Những người thắp đèn sẽ đi tuần đêm nay mà không cần ngước nhìn lên, và điều đó đáng giá hơn bạn tưởng ở nơi này.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Nhả Tơ Góa Phụ bị tiêu diệt"
+          }
+        }
+      },
+      "q_ww_widows_skeins": {
+        "title": "Những Cuộn Tơ Của Góa Phụ",
+        "text": "Lũ nhả tơ lấy người chết của chúng ta cho kho dự trữ của chúng, {playerName}, nên ta lấy tơ của chúng cho khăn liệm của chúng ta. Nó cháy sạch và giữ được phước lành tốt hơn cả vải lanh từng làm được. Mang cho ta sáu cuộn tơ góa phụ, và linh hồn tiếp theo chúng ta chôn cất sẽ được bọc kín và bảo hộ.",
+        "completion": "Sáu cuộn tơ, mềm như một hơi thở nín lặng. Người chết sẽ nằm yên hơn trong đó. Nhận lấy những tấm bọc này, ta đã khâu chúng từ mẻ cuối cùng, và khu rừng chưa từng một lần cắn thủng chúng.",
+        "objectives": {
+          "0": {
+            "label": "Cuộn Tơ Góa Phụ"
+          }
+        }
+      },
+      "q_ww_candles_at_the_bounds": {
+        "title": "Nến Ở Ranh Giới",
+        "text": "Bốn phiến đá ranh giới bao quanh Gallowmere, {playerName}, một trên mỗi con đường ra vào, và một ngọn nến mộ cháy trên mỗi phiến đá. Khi chúng còn cháy, người đã chôn vẫn ở yên dưới mộ. Mưa phùn đã làm tắt chúng, cả bốn ngọn, và ta đã quá già để tự mình đi vòng quanh ranh giới. Cầm lấy cây nến của ta và thắp lại chúng, thật nhanh.",
+        "completion": "Cả bốn ngọn đều cháy sao? Vậy thì hãy thở phào đi, {playerName}. Bạn không nghe thấy, nhưng cả ngôi làng đã nghe: những chiếc chuông rung nhẹ nhõm hơn ngay khoảnh khắc sợi bấc cuối cùng bắt lửa.",
+        "objectives": {
+          "0": {
+            "label": "Nến mộ được thắp lại"
+          }
+        }
+      },
+      "q_ww_the_last_vicar": {
+        "title": "Cha Xứ Cuối Cùng",
+        "text": "Phía nam nơi này, Nhà Nguyện Mournstone đang mục nát bên cạnh hồ nước đen của nó, và một người đàn ông vẫn chăm sóc nó: Cha Xứ Creel, người không chịu rời đi khi mái nhà sụp đổ. Ông ấy biết những nghi lễ xưa rõ hơn cả những chiếc chuông của ta, {playerName}, và ông ấy đã không gửi tin tức suốt một tháng nay. Đi trên con đường nhà nguyện và xem ông ấy còn thở không.",
+        "completion": "Marrow lo lắng cho ta à? Đó là điều mới đấy. Nói với ông ấy rằng Mournstone vẫn đứng vững, theo một cách nào đó, và ta cũng vậy. Ở lại một lát đi, {playerName}. Hồ nước đã thì thầm suốt, và ta thà không nghe nó một mình.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Cha Xứ Creel"
+          }
+        }
+      },
+      "q_ww_wraiths_of_the_tarn": {
+        "title": "Oán Linh Của Hồ Nước",
+        "text": "Những oán linh gỗ từng là các vệ quan nhà nguyện, {playerName}, mọc lên từ những cây được trồng trên người đã khuất được tôn kính. Kể từ khi hồ nước chuyển sang màu đen, chúng đã quên đi nhiệm vụ của mình, và giờ chúng lang thang qua nghĩa trang của ta, kéo giật lớp đất. Đập tan tám con trước khi chúng hoàn thành những gì đã bắt đầu.",
+        "completion": "Cuối cùng tám vệ quan cũng được đặt xuống yên nghỉ. Ta sẽ không gọi đó là lòng thương xót giữa ban ngày, nhưng giữa chúng ta với nhau, {playerName}, đó đúng là một hành động thương xót.",
+        "objectives": {
+          "0": {
+            "label": "Oán Linh Gỗ bị tiêu diệt"
+          }
+        }
+      },
+      "q_ww_what_the_bark_holds": {
+        "title": "Điều Mà Vỏ Cây Nắm Giữ",
+        "text": "Trong Trảng Rừng Treo Cổ phía đông Gallowmere, lũ nhả tơ treo người chết được bọc tơ của chúng từ những cành cây, và những kẻ lê bước vỏ cây khắc đứng canh gác bên dưới như những người khiêng quan tài kiên nhẫn. Đó là người dân của chúng ta ở trên đó, {playerName}. Đập tan năm kẻ lê bước, hạ xuống ba xác chết bị bọc, và đưa họ về với đất.",
+        "completion": "Ba linh hồn trở lại dưới lòng đất chân chính trước khi màn đêm buông xuống. Những kẻ lê bước sẽ mọc lại, vỏ cây luôn như vậy, nhưng đêm nay trảng rừng treo trống không, và như thế là đủ.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Lê Bước Vỏ Cây Khắc bị hạ gục"
+          },
+          "1": {
+            "label": "Di Hài Bọc Lụa được hạ xuống"
+          }
+        }
+      },
+      "q_ww_walking_mosley_home": {
+        "title": "Đưa Mosley Về Nhà",
+        "text": "Người đào mộ của ta, Mosley, đã đi trên con đường nhà nguyện ba ngày trước để mở một huyệt mộ trong khu đất cũ, và hố đào đã sập xuống trên người ông ấy. Ông ấy đã cào bới thoát ra, kẻ ngốc đó vẫn còn sống, nhưng ông ấy đang co ro cạnh những ngôi mộ nhà nguyện và không dám di chuyển vì lũ nhả tơ trên đường. Đưa ông ấy về nhà, {playerName}. Ta không thể rung chuông cho một người còn sống.",
+        "completion": "Ông ấy đã bước qua cổng bằng chính đôi chân mình, thề rằng từ giờ sẽ không đào gì sâu hơn một luống củ cải. Ông ấy sẽ trở lại khu đất đó trước ngày Chủ Nhật, họ luôn như vậy. Cảm ơn bạn, {playerName}. Gallowmere giữ gìn người dân của mình, đó là toàn bộ luật lệ của chúng ta.",
+        "objectives": {
+          "0": {
+            "label": "Người Đào Mộ Mosley được đưa an toàn trở lại Gallowmere"
+          }
+        }
+      },
+      "q_ww_horn_of_the_huntsman": {
+        "title": "Chiếc Tù Và Của Thợ Săn",
+        "text": "Chắc giờ bạn đã nghe thấy tiếng tù và, {playerName}, mỏng manh và xa xăm, âm thanh khiến cả khu rừng nín thở. Thợ Săn Nhợt Nhạt cưỡi ngựa qua khoảng trống của hắn phía bắc nơi này, và mỗi ngôi mộ hắn đi qua đều trở nên nông hơn. Hắn từng là một con người, và hắn đã bị chôn cất sai cách, và ta đã thôi giả vờ rằng lời cầu nguyện có thể giải quyết được điều đó. Rủ theo một người bạn, rủ theo hai người, và hất hắn khỏi lưng ngựa.",
+        "completion": "Tiếng tù và ngừng bặt giữa chừng. Mỗi chiếc chuông ở Gallowmere đã rung một lần, tự nó rung lên, rồi khu rừng trở nên yên tĩnh hơn bất cứ lúc nào ta từng nghe trong ba mươi năm qua. Bạn đã thực hiện nghi lễ mà ta không thể, {playerName}. Khoác lên thứ này, và bước đi dưới tán rừng mà không sợ hãi.",
+        "objectives": {
+          "0": {
+            "label": "Thợ Săn Nhợt Nhạt bị hất khỏi lưng ngựa"
+          }
+        }
+      },
+      "q_pr_down_to_drifthaven": {
+        "title": "Xuôi Xuống Drifthaven",
+        "text": "Ra khỏi hàng cây đen và bước vào ánh nắng, {playerName}. Theo con đường ven bờ về phía bắc và bạn sẽ đến Drifthaven trước khi thủy triều đổi chiều. Hỏi tìm Đầu Lĩnh Trục Vớt Ryna, cô ấy có việc cho bất cứ đôi tay nào kể từ sau cơn bão, và nói với cô ấy rằng con đường Tanglemouth vẫn còn mở.",
+        "completion": "Pell cử bạn đến? Vậy là bạn đã đi bộ suốt cả con đường Tanglemouth một mình, và đó là bằng chứng đủ tốt cho ta rồi. Chào mừng đến Drifthaven, {playerName}. Cầm lấy một sợi dây thừng đi, chúng ta đang thiếu người.",
+        "objectives": {
+          "0": {
+            "label": "Báo cáo với Đầu Lĩnh Trục Vớt Ryna"
+          }
+        }
+      },
+      "q_pr_wreck_line_cargo": {
+        "title": "Tuyến Xác Tàu",
+        "text": "Cơn bão ba đêm trước đã đẩy chiếc Pearlwake lên rạn san hô, và hàng hóa của nó rải rác suốt cả tuyến xác tàu giữa đây và Palmstrand. Ba thùng hàng hóa giao thương vẫn còn nằm trong sóng biển, {playerName}. Mang chúng vào trước khi thủy triều, hoặc lũ cua, giành lấy những gì còn sót lại.",
+        "completion": "Nhuốm màu muối nhưng vẫn nguyên vẹn, cả ba thùng. Những người thợ lặn có cái ăn tháng này là nhờ bạn, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Hàng Hóa Pearlwake được tìm lại"
+          }
+        }
+      },
+      "q_pr_scuttler_cull": {
+        "title": "Những Tên Trộm Mai Cứng",
+        "text": "Mọi xác tàu trên bờ biển này đều thu hút lũ kẻ bò thủy triều, và chiếc Pearlwake đã thu hút cả nửa rạn san hô. Đội trục vớt của tôi sẽ không làm việc trên tuyến với những chiếc càng đó ở vùng nước cạn. Đập vỡ mười con, {playerName}, và tuyến xác tàu sẽ lại là của chúng tôi.",
+        "completion": "Bớt đi mười chiếc càng trong sóng biển. Đội của tôi đã lội trở ra ngoài rồi, và không ai trong số họ nói lời cảm ơn, vậy nên để tôi nói: cảm ơn bạn, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Bò Thủy Triều bị đập vỡ"
+          }
+        }
+      },
+      "q_pr_boars_in_the_gardens": {
+        "title": "Lợn Rừng Trong Những Khu Vườn",
+        "text": "Bất cứ thứ gì đang khuấy động trong màu xanh sâu thẳm đó, nó đẩy đàn lợn rừng bụi rậm ra ngoài bãi biển của chúng ta. Chúng đã đào xới các bậc thềm vườn hai lần tuần này, và tiếp theo chúng sẽ nhắm đến những giá phơi. Mười con lợn rừng, {playerName}, và đẩy số còn lại trở về dưới tán cây.",
+        "completion": "Những giá phơi vẫn đứng vững và các khu vườn có thể trồng lại được. Đàn lợn rừng không tự chọn đến bãi cát này đâu, {playerName}. Hãy nhớ điều đó: có thứ gì đó đã xui khiến chúng.",
+        "objectives": {
+          "0": {
+            "label": "Lợn Rừng Bụi Rậm bị đuổi đi"
+          }
+        }
+      },
+      "q_pr_the_man_who_went_in": {
+        "title": "Người Đã Bước Vào Trong",
+        "text": "Những người thợ lặn sẽ không bước qua ranh giới cây cối, {playerName}, và tôi sẽ không yêu cầu họ làm vậy. Chắc bạn đã nghe tiếng trống rồi: ai cũng nghe thấy, vào đêm thứ hai. Chỉ có một người trên hòn đảo này từng bước về phía âm thanh đó và trở lại. Okku. Ông ấy cắm trại dưới những cây đa lớn tại Vinefall, sâu trên con đường Tangle. Tìm ông ấy, và hỏi ông ấy xem màu xanh đó đang giấu điều gì.",
+        "completion": "Isha cử bạn đến? Ngọc Mẫu đã không nhắc đến tên tôi suốt nhiều năm rồi. Ngồi ngoài tầm với của dây leo đi, {playerName}, và tôi sẽ kể cho bạn nghe những gì tôi biết: tiếng trống không phải là mối nguy hiểm. Chúng là lời cảnh báo.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Okku tại Vinefall"
+          }
+        }
+      },
+      "q_pr_canopy_silk": {
+        "title": "Tơ Từ Tán Cây",
+        "text": "Nhìn lên trên đi, {playerName}. Mọi tán cây từ đây đến tượng thần đều giăng tơ như lưới đánh cá, và những kẻ dệt tơ ngày càng táo tợn hơn mỗi mùa. Ta căng chính tơ của chúng qua các lối đi, chuông dây vấp, để khu rừng không thể lẻn đến gần ta. Sáu cuộn tơ tốt từ những kẻ dệt tán cây sẽ căng lại dây của ta.",
+        "completion": "Tơ tốt, chắc chắn. Chuông của ta sẽ còn ngân vang thêm một thời gian, và không có gì đi trên những lối này ban đêm mà ta không biết, {playerName}. Gần đây, có thứ gì đó đã đi lại thường xuyên.",
+        "objectives": {
+          "0": {
+            "label": "Cuộn Tơ Tán Cây"
+          }
+        }
+      },
+      "q_pr_the_lost_navigator": {
+        "title": "Vị Hoa Tiêu Lạc Lối",
+        "text": "Chúng tôi đã cứu mọi người khỏi chiếc Pearlwake trừ một người: Hoa Tiêu Suli, người đã bơi về phía bờ xa và không bao giờ bước vào bờ. Một người thợ lặn phát hiện cô ấy đang trốn trong đống đổ nát mũi tàu qua khỏi Palmstrand, còn sống, nhưng quá kiệt sức để tự mình vượt qua hiểm nguy. Đưa cô ấy về nhà dọc theo con đường ven bờ, {playerName}. Lũ cua sẽ không thích điều đó, và khu rừng còn thích ít hơn.",
+        "completion": "Suli đang ngồi cạnh đống lửa, vẫn khăng khăng rằng cô ấy có thể tự bơi được. Bạn đã mang về người đọc hải đồ duy nhất trên bờ biển này, {playerName}. Đây là đồ từ rương biển của cô ấy, với sự chúc phúc của cô ấy.",
+        "objectives": {
+          "0": {
+            "label": "Hoa Tiêu Suli được đưa an toàn đến Drifthaven"
+          }
+        }
+      },
+      "q_pr_what_the_drums_guard": {
+        "title": "Điều Mà Tiếng Trống Canh Giữ",
+        "text": "Tôi đã đi đến gần Tượng Thần Chìm nhất mà một người sống dám làm, và tôi thấy hai điều: những kẻ dệt tơ đã giăng màn tơ trên con đường tượng thần, và những bát cúng cũ dọc theo nó đã được đổ đầy trở lại. Còn tươi mới, {playerName}. Chặt hạ tám kẻ dệt tơ khỏi con đường và mang cho tôi ba lễ vật đó. Tôi muốn biết bàn tay nào vẫn đang nuôi dưỡng một vị thần đã chết.",
+        "completion": "Rêu, vỏ trai ngọc, và máu lợn rừng, được nén bằng những ngón tay. Có thứ gì đó trong tàn tích đó vẫn đang giữ nghi lễ của nó, {playerName}, và Vệ Binh ngăn chặn mọi thứ khác. Đã đến lúc chúng ta nói thẳng về điều này.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Dệt Tán Cây bị chặt hạ"
+          },
+          "1": {
+            "label": "Bát Cúng Được Đổ Đầy Lại được thu thập"
+          }
+        }
+      },
+      "q_pr_idol_guardian": {
+        "title": "Vệ Binh Tượng Thần",
+        "text": "Bức tượng thần này còn cổ xưa hơn cả hòn đảo, {playerName}. Cổ xưa hơn cả tiếng trống, cổ xưa hơn cả cái tên Palmreach. Vệ Binh của nó đã đứng trong vòng tròn chìm đó từ trước khi những cây cọ mọc lên, và giờ nó thức tỉnh và đi lại giữa các cột đá vào ban đêm. Bất cứ thứ gì được những lễ vật nuôi dưỡng, Vệ Binh chính là kẻ canh cửa của nó. Rủ theo một người bạn, và đập tan nó.",
+        "completion": "Bạn đã hạ gục một thứ mà chính khu rừng cũng không dám chạm vào. Nhìn kia, phía sau tượng thần: Vệ Binh chưa bao giờ canh giữ các cột đá cả, {playerName}, nó canh giữ những bậc thang bên dưới chúng. Tiếng trống đã im bặt đêm nay. Bất cứ thứ gì đang ngủ dưới Wildheart Basin giờ đã biết tên bạn.",
+        "objectives": {
+          "0": {
+            "label": "Vệ Binh Tượng Thần bị đập tan"
+          }
+        }
+      },
+      "q_eg_gate_report": {
+        "title": "Tin Tức Qua Cổng",
+        "text": "Những bãi cỏ qua khỏi cổng này đã tự cắt tỉa suốt cả trăm năm, {playerName}, và gần đây chúng đã bắt đầu cắt tỉa cả khách viếng thăm. Người Làm Vườn Trưởng Amaranth giữ sổ sách tại Hedgewick, trên con đường qua khỏi bãi cỏ cổng. Nói với bà ấy rằng có thêm một lữ khách đã đi qua, và nói với bà ấy rằng hàng rào cạnh cổng đã di chuyển đêm qua.",
+        "completion": "Di chuyển à. Pell báo cáo điều đó mỗi tuần, và tuần nào cậu ấy cũng đúng. Thứ lỗi cho đôi mắt của ta, {playerName}, ta đã không ngủ trọn một đêm nào suốt nhiều năm: ai đó phải canh chừng khu vườn đang canh chừng chúng ta. Chào mừng đến Hedgewick.",
+        "objectives": {
+          "0": {
+            "label": "Báo cáo với Người Làm Vườn Trưởng Amaranth"
+          }
+        }
+      },
+      "q_eg_hungry_shapes": {
+        "title": "Bị Tỉa Thành Cơn Đói",
+        "text": "Bất cứ ai đang tạo hình khu vườn này đã trở nên bất cẩn, hoặc tàn nhẫn. Những hình sói ngoài Rose Wilds được cắt tỉa để trưng bày, nhưng gần đây chúng lại săn mồi: hàm xanh, không bụng, và không lý do gì để dừng lại. Hãy chặt hạ mười con sói cây kiểng, {playerName}, và để những bãi cỏ trở lại là bãi cỏ trong một thời gian.",
+        "completion": "Mười đống cành lá cắt tỉa nơi mười con sói từng đứng. Việc này đáng lẽ phải giống làm vườn, {playerName}. Sao nó lại giống chiến tranh đến vậy?",
+        "objectives": {
+          "0": {
+            "label": "Sói Cây Kiểng bị tiêu diệt"
+          }
+        }
+      },
+      "q_eg_stolen_shears": {
+        "title": "Chiếc Kéo Bị Đánh Cắp",
+        "text": "Mọi cây kéo ở Hedgewick đều đã biến mất trong hai tuần qua, {playerName}: khỏi móc treo, khỏi những nhà kho khóa kín, một cây thậm chí khỏi tạp dề của chính ta trong lúc ta chợp mắt. Đó là lũ yêu tinh đất hàng rào, những kẻ quản sân nhỏ bé căm ghét chúng ta bước lên bãi cỏ của chúng. Lấy lại sáu cây kéo trước khi cả thôn này chỉ còn dùng dao bếp.",
+        "completion": "Sáu cây, và cây của ta cũng ở trong đó, ta có thể nhận ra vết mẻ trên lưỡi kéo ở bất cứ đâu. Đây, đôi găng tay này được đan riêng cho việc tỉa cành. Đôi tay ấm áp làm nên nhát kéo vững vàng.",
+        "objectives": {
+          "0": {
+            "label": "Kéo Tỉa Hedgewick Bị Đánh Cắp"
+          }
+        }
+      },
+      "q_eg_who_trims_the_hedges": {
+        "title": "Ai Là Người Tỉa Hàng Rào",
+        "text": "Ta đã giữ sổ sách suốt ba mươi năm, {playerName}, và không ngủ ngon suốt mười năm trong số đó, vì những con số không bao giờ khớp. Cỏ cần cắt và hàng rào cần tạo hình, và không ai ở đây làm cả hai việc đó, thế mà mỗi bình minh khu vườn vẫn đứng đó gọn gàng tỉa tót. Gần đây dân rừng thề rằng họ thấy một ông lão với chiếc xe cút kít trên những bãi cỏ xa phía nam, qua khỏi mê cung gần Bồn Địa Hoa Loa Kèn. Tìm ông ta. Nếu ông ta có thật, cuối cùng ta cũng có thể ngủ được. Nếu không, ta cho rằng ta sẽ chẳng bao giờ ngủ được.",
+        "completion": "Vậy là ngôi nhà cuối cùng cũng cử ai đó đến. Cả trăm năm ta đã đi trên những bãi cỏ này, {playerName}, và khu vườn với ta có một sự thấu hiểu ngầm: ta tỉa những gì cần được tỉa. Ngồi xuống đi. Hàng rào có thể nhường bạn một giờ.",
+        "objectives": {
+          "0": {
+            "label": "Tìm người làm vườn gần Bồn Địa Hoa Loa Kèn"
+          }
+        }
+      },
+      "q_eg_gnomes_in_the_green": {
+        "title": "Mối Hận Của Người Quản Sân",
+        "text": "Kéo tỉa chỉ mới là bắt đầu, {playerName}. Đêm qua đám yêu tinh đã lật đổ xe đẩy dụng cụ của chúng ta vào mảng xanh, một chiếc gần hang ổ của chúng phía tây mê cung, một chiếc khác băng hẳn qua khu vườn trên lối đi ven ao, và làm vương vãi cả trăm năm sắt tốt ra bãi cỏ. Hãy đuổi tám tên quỷ nhỏ này đi và kéo những chiếc xe đã đổ về nhà.",
+        "completion": "Ba chiếc xe đã về và những chiếc móc đã đầy trở lại. Cứ để đám quỷ nhỏ hờn dỗi trong hàng rào của chúng: Hedgewick cũng chăm sóc những bãi cỏ này.",
+        "objectives": {
+          "0": {
+            "label": "Yêu Tinh Đất Hàng Rào bị đuổi đi"
+          },
+          "1": {
+            "label": "Xe đẩy dụng cụ được tìm lại"
+          }
+        }
+      },
+      "q_eg_bloom_clippings": {
+        "title": "Cành Cắt Từ Mảng Xanh Sống",
+        "text": "Bạn muốn hiểu khu vườn này? Vậy hãy đọc nó theo cách của ta. Những chú hươu gặm cỏ trên bãi cỏ mọc lên màu xanh chân thật nhất: mỗi chiếc lá trên chúng là một trang sách. Mang cho ta sáu cành lá tươi từ những chú hươu cây kiểng, {playerName}. Chúng sẽ không cảm ơn bạn vì việc tỉa cành đâu, nhưng chúng sẽ mọc lại. Mọi thứ ở đây đều mọc lại.",
+        "completion": "Nhìn đây này: những chiếc lá đang quăn lại vào chính mình, mọi cành cắt đều giống nhau. Khu vườn này đang sợ hãi, {playerName}. Trong cả trăm năm, ta chưa từng một lần biết nó sợ hãi.",
+        "objectives": {
+          "0": {
+            "label": "Cành Hoa Bị Cắt Tỉa"
+          }
+        }
+      },
+      "q_eg_four_statues": {
+        "title": "Bốn Người Chị Em Lặng Lẽ",
+        "text": "Khi khu vườn còn non trẻ, những người làm vườn đầu tiên đã dựng bốn bức tượng chị em bằng đá cẩm thạch để canh giữ bốn góc của nó: một ở trên Rose Wilds, một trên lối đi ven ao phía đông mê cung, một trên bãi cỏ phía tây nơi đám yêu tinh giữ hang ổ của chúng, và một trên bãi cỏ phía nam qua khỏi hàng rào. Mê cung mọc lên giữa chúng, và hầu hết mọi người chưa bao giờ thấy đủ cả bốn. Hãy đi qua bốn góc, {playerName}, và áp lòng bàn tay bạn lên mỗi bức tượng chị em. Khi khu vườn đã nhìn kỹ bạn từ cả bốn phía, nó sẽ mở ra những nơi nó vẫn giấu kín khỏi người lạ.",
+        "completion": "Bốn bản chà, bốn chị em, và không tượng nào rơi lệ cẩm thạch. Khu vườn đã đo lường bạn, {playerName}, và nó không thấy bạn thiếu sót. Giờ ta có thể gửi bạn đến nơi rắc rối thực sự đang ẩn náu.",
+        "objectives": {
+          "0": {
+            "label": "Tượng vườn đã ghé thăm"
+          }
+        }
+      },
+      "q_eg_bull_of_the_court": {
+        "title": "Con Bò Đực Của Sân Đài Phun Nước",
+        "text": "Giờ là sự thật, {playerName}. Con bò đực ở trung tâm mê cung là kiệt tác của ta: ta đã tạo hình nó để canh giữ Sân Đài Phun Nước, và suốt cả trăm năm nó đã làm vậy. Nhưng nỗi sợ trong mảng xanh này đã lan đến nó, và giờ nó không canh giữ gì nữa, nó săn mồi. Mê cung nuôi nó bằng bất cứ ai lạc vào trong. Ta đã quá già để hóa giải nó, và việc đó phải triệt để, tận gốc rễ lẫn cành lá. Rủ theo một người bạn, đi qua mê cung đến sân đài, và hạ gục con bò đực của ta.",
+        "completion": "Ta đã cảm nhận được điều đó, ngay đây, khi nó tan rã. Cả trăm năm công sức, và bạn đã đúng khi kết liễu nó. Nhận lấy tấm áo choàng này: ta đã cắt nó cho bất cứ ai chứng tỏ mạnh hơn kiệt tác tốt nhất của ta. Sân đài đêm nay chỉ còn là một đài phun nước, {playerName}, và khu vườn chỉ còn là một khu vườn. Có lẽ giờ Người Làm Vườn Trưởng và ta đều có thể ngủ yên.",
+        "objectives": {
+          "0": {
+            "label": "Bò Đực Cây Kiểng bị hóa giải"
+          }
+        }
+      },
+      "q_fs_bell_at_the_landing": {
+        "title": "Chiếc Chuông Tại Bến Tàu",
+        "text": "Bạn đã đi qua Ferrywalk sao, {playerName}? Vậy bạn là người đầu tiên trong tuần này, và Vệ Quan sẽ muốn xem xét bạn. Gullhaven nằm trên con đường ven bờ, qua khỏi những giá phơi không còn ai chăm sóc nữa. Nói với Vệ Quan Coalfast rằng con đê vẫn còn đứng vững, và rằng Tam vẫn chưa rung ba tiếng chuông hôm nay. Chưa đâu.",
+        "completion": "Con đê vẫn đứng vững, và Tam vẫn còn đủ hơi để đùa về ba tiếng chuông đó. Tốt. Chúng ta là một hòn đảo đang bị vây hãm, {playerName}, và mỗi đôi tay vượt qua doi cát đó là một đôi tay mà những vết rạn phải vượt qua trước khi chạm đến người của ta. Chào mừng đến Gullhaven.",
+        "objectives": {
+          "0": {
+            "label": "Báo cáo với Vệ Quan Coalfast"
+          }
+        }
+      },
+      "q_fs_hold_the_riftfields": {
+        "title": "Giữ Vững Riftfields",
+        "text": "Phía đông thị trấn, những hàng lúa đã bị tàn phá, và những kẻ khốn khổ đến qua vết rạn Riftfields giờ đang gặt sạch chúng. Người của ta không thể chăm sóc một cánh đồng mà họ không thể đứng vào, {playerName}. Diệt mười kẻ khốn khổ đó và trả lại đất cho những người nông dân.",
+        "completion": "Bớt đi mười kẻ, và những người làm ruộng đã bắt đầu tranh cãi xem ai sẽ ra ngoài trước. Việc này sẽ không kéo dài, những vết rạn chẳng bao giờ nghỉ ngơi lâu, nhưng một thị trấn có cái ăn là một thị trấn trụ vững.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Khốn Khổ Vết Nứt bị tiêu diệt"
+          }
+        }
+      },
+      "q_fs_steel_for_the_redoubt": {
+        "title": "Thép Cho Đồn Lũy",
+        "text": "Mỗi lưỡi đao tôi trao đi đều là thứ biển trả lại hoặc thứ tôi cạy từ xác chết, {playerName}. Những kẻ khốn khổ mang phế liệu qua các vết rạn, bản lề, móc câu, thép kiếm gãy, đồ vặt vãnh, nhưng khi rèn ra chúng đều tốt cả. Mang cho tôi sáu mảnh thép chúng nhặt được và tuyến chướng ngại vật sẽ có lại hàm răng của nó.",
+        "completion": "Rỗ muối và sẹo gãy, nhưng nó vẫn sẽ giữ được độ bén như thường. Đây, chính tôi đã lót những chỗ cầm này. Thép đổi thép, {playerName}: đó là thương vụ duy nhất mà Farshore vận hành những ngày này.",
+        "objectives": {
+          "0": {
+            "label": "Thép Sẹo Gãy"
+          }
+        }
+      },
+      "q_fs_the_three_bells": {
+        "title": "Ba Chiếc Chuông",
+        "text": "Ba chiếc chuông canh đứng canh bờ biển ngoài chuông của tôi: một ở mũi Bến Tàu, một ở bờ biển phía nam, một nữa ở gần bờ Riftfields. Nếu một sợi dây đã mục hay một quả lắc đã bị cuốn đi, thị trấn sẽ chỉ biết về một vết rạn khi nó đã ở ngay trên đường phố. Hãy đi dọc bờ biển, {playerName}, và rung mỗi chiếc chuông một lần, để tôi biết nó vẫn còn tiếng.",
+        "completion": "Ba tiếng nói, ba câu trả lời, vang vọng rõ ràng qua mặt nước. Hãy ngủ ở Gullhaven đêm nay, {playerName}, và biết rằng nếu một tiếng chuông đánh thức bạn, đó sẽ là do tay tôi và đúng lúc.",
+        "objectives": {
+          "0": {
+            "label": "Chuông canh đã được rung"
+          }
+        }
+      },
+      "q_fs_song_before_the_break": {
+        "title": "Bài Ca Trước Khi Vết Rạn Mở Ra",
+        "text": "Có một người đàn ông nghe được những vết rạn trước khi chúng mở ra. Người Canh Rạn Nứt Ollun: một học giả, hoặc một kẻ điên, và gần đây tôi không thể phân biệt được sự khác nhau. Anh ta giữ phiên gác của mình tại Đồng Cỏ Canh Gác, trên con đường đông nam thị trấn. Tìm anh ta, {playerName}, và hỏi anh ta xem hòn đảo này sắp làm gì với chúng ta tiếp theo.",
+        "completion": "Vệ Quan cử bạn đến? Tốt. Điều đó có nghĩa là thị trấn cuối cùng đã bắt đầu lắng nghe. Giờ hãy đứng yên một lát, {playerName}. Kia, dưới làn gió, bạn có nghe thấy không? Những vách đá đang hát, và tôi không thích giai điệu đó.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Người Canh Rạn Nứt Ollun"
+          }
+        }
+      },
+      "q_fs_moss_and_mending": {
+        "title": "Rêu Và Việc Chữa Lành",
+        "text": "Rêu muối mọc dọc theo đường thủy triều là loại băng bó vết thương tốt nhất mà tôi biết, và lũ riftspawn đã chiếm mọi đoạn bờ biển nơi nó mọc. Kỳ lạ thay, chúng mang những búi rêu vướng trên da mình. Dọn sạch sáu con khỏi vùng bờ phía đông, {playerName}, và hái cho tôi bốn nắm rêu tốt từ nơi chúng đã giẫm đạp qua.",
+        "completion": "Rêu trong một tay và một bờ biển yên tĩnh hơn ở tay kia. Bạn đã bổ sung đầy đủ cho cả phòng phẫu thuật của tôi, {playerName}. Hãy làm ơn đừng trở thành bệnh nhân tiếp theo của tôi.",
+        "objectives": {
+          "0": {
+            "label": "Riftspawn bị tiêu diệt"
+          },
+          "1": {
+            "label": "Rêu Muối Farshore"
+          }
+        }
+      },
+      "q_fs_bram_come_home": {
+        "title": "Bram Trở Về Nhà",
+        "text": "Bram của tôi đã đưa thuyền ra khơi vào sáng hôm vết rạn ở khu lưới mở ra, và biển đã ném anh ấy trở lại đâu đó qua khỏi mũi Bến Tàu. Tôi nghe thấy anh ấy ba đêm trước, {playerName}, gọi vọng qua mặt nước, và tôi đã quá sợ hãi để đi. Tôi vẫn còn quá sợ hãi. Làm ơn. Thuyền của anh ấy đang đắm trên bờ bắc. Hãy dẫn anh ấy về nhà cho tôi.",
+        "completion": "Bram! Bạn đã mang anh ấy về nguyên vẹn cho tôi, {playerName}. Cả hai chúng tôi đều đã khóc và không ai trong chúng tôi thấy xấu hổ. Dù những vết rạn có lấy đi thứ gì từ hòn đảo này tiếp theo, chúng sẽ không lấy được gia đình tôi. Không còn nữa đâu.",
+        "objectives": {
+          "0": {
+            "label": "Ngư Dân Bram được đưa về Gullhaven an toàn"
+          }
+        }
+      },
+      "q_fs_stalkers_off_the_light": {
+        "title": "Đẩy Lùi Những Kẻ Rình Rập Khỏi Ánh Sáng",
+        "text": "Những kẻ rình rập săn mồi trong bóng tối giữa các đống lửa canh gác, và mỗi đêm chúng lại vòng quanh đồng cỏ của tôi gần hơn một chút. Chúng không mù quáng đâu, {playerName}, chúng kiên nhẫn, và kiên nhẫn là thứ duy nhất tôi không thể chịu đựng lâu hơn. Giết tám con và đẩy bóng tối trở lại vách đá nơi nó đã đến.",
+        "completion": "Tám đêm vòng quanh, kết thúc chỉ trong một đêm. Những đống lửa đã cháy ổn định hơn rồi, hoặc có lẽ đó chỉ là đôi tay tôi. Dù thế nào thì đồng cỏ cũng lại là của tôi, và tôi có thể nghe thấy hòn đảo này suy nghĩ.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Rình Rập Hư Không bị tiêu diệt"
+          }
+        }
+      },
+      "q_fs_the_great_break": {
+        "title": "Vết Rạn Vĩ Đại",
+        "text": "Mỗi bài ca hòn đảo này hát đều kết thúc trên cùng một nốt trầm, và nó phát ra từ Vách Đá Vỡ Nát. Có thứ gì đó đã đến qua vết rạn vĩ đại ở đó, {playerName}, thứ mà chính những vách đá đã nứt ra để cho vào, và nó vẫn đang lớn lên. Nếu nó đi về phía bắc, không tiếng chuông nào còn quan trọng nữa. Rủ theo một người bạn, rủ theo hai người, và kết liễu nó. Rồi nói với Coalfast rằng giai điệu đã thay đổi.",
+        "completion": "Ollun đã báo trước: tiếng hát đã ngừng. Cả thị trấn tôi đều nghe thấy sự im lặng đó, {playerName}, và một nửa trong số họ đã khóc trước âm thanh của sự im ắng hoàn toàn. Hãy khoác lên tấm áo choàng này. Farshore không quên ai đã giữ vững bờ biển của nó.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Kinh Hoàng Bị Xé Toạc bị tiêu diệt"
+          }
+        }
+      },
+      "q_gc_down_the_windway": {
+        "title": "Xuôi Theo Windway",
+        "text": "Bạn đã vượt qua được cuộc leo trèo, {playerName}, nên gió đã quyết định giữ bạn lại. Wickharbor nằm về phía đông dọc theo con đường đồi, nép mình trong chỗ khuất gió của vịnh nhỏ của nó. Cảng Trưởng Odile đếm từng linh hồn vượt qua đèo núi, và bà ấy sẽ muốn đếm bạn. Nói với bà ấy rằng Windway vẫn còn mở.",
+        "completion": "Vượt đèo bằng đôi chân, trong thời tiết này sao? Maren gửi cho tôi rất ít cái tên, và càng ít người tự mình bước vào để trả lời. Chào mừng đến Wickharbor, {playerName}. Đóng cửa quán trọ lại sau lưng bạn nhé.",
+        "objectives": {
+          "0": {
+            "label": "Báo cáo với Cảng Trưởng Odile"
+          }
+        }
+      },
+      "q_gc_wool_off_the_downs": {
+        "title": "Len Từ Những Ngọn Đồi",
+        "text": "Những thủy thủ đoàn của tôi chèo thuyền vào trận cuồng phong xuyên thủng cả áo dầu như giấy, {playerName}. Chỉ có một thứ chống lại được làn gió này: len nhờn từ những con cừu đực đầm hoang, được kéo sợi dày theo cách của Wickharbor. Những đàn cừu gặm cỏ trên Đồi Gào Thét phía tây thị trấn. Sáu bộ lông tốt và mọi thủy thủ đoàn sẽ chèo thuyền ấm áp mùa này.",
+        "completion": "Bộ lông như thế này là lý do tại sao những con cừu đực đứng ngoài kia béo tốt và tự mãn trong thời tiết giết chết cả con người. Những người kéo sợi sẽ bắt tay vào việc dưới ánh đèn. Nhận lấy đôi giày này, {playerName}, chúng được lót từ lần xén lông cuối cùng.",
+        "objectives": {
+          "0": {
+            "label": "Lông Cừu Nhờn"
+          }
+        }
+      },
+      "q_gc_scuttlers_in_the_pots": {
+        "title": "Kẻ Bò Trong Những Chiếc Lồng",
+        "text": "Lũ kẻ bò bãi cạn đã học được cách leo lên con đường vách đá và đập vỡ những chiếc lồng bắt cua của chúng ta trên đá, {playerName}. Nửa số hải sản bắt được tuần này đã mất, và một người coi lồng cua sẽ không dùng được một tay trong cả tháng. Đập tan mười con và số còn lại sẽ nhớ tại sao chúng nên ở yên trong bãi cạn.",
+        "completion": "Bớt đi mười chiếc mai trên đường của tôi, và những chiếc lồng đầy ắp sáng nay. Những người coi lồng cua gọi bạn là điềm lành đấy, {playerName}. Ở Wickharbor, đó là lời khen ấm áp nhất có thể có.",
+        "objectives": {
+          "0": {
+            "label": "Kẻ Bò Bãi Cạn bị tiêu diệt"
+          }
+        }
+      },
+      "q_gc_keeper_of_the_flame": {
+        "title": "Người Giữ Ngọn Lửa",
+        "text": "Bram Già canh giữ Ngọn Hải Đăng trên mũi đất cao đông bắc thị trấn, và ông ấy đã không xuống lấy đồ tiếp tế suốt hai tuần nay. Ngọn đèn vẫn còn cháy, nên ông ấy vẫn sống, nhưng một người ở tuổi ông ấy một mình trên mũi đất đó trong cơn gió này, {playerName}. Hãy leo lên con đường hải đăng và xem ông ấy có còn đứng vững không.",
+        "completion": "Odile cử bạn đi xa đến đây để xem gió đã cuốn ta đi chưa à? Ha. Nói với bà ấy rằng ngọn đèn vẫn cháy và ta cũng vậy. Nhưng vì bạn đã leo lên tới đây, {playerName}, hãy ở lại một lát. Ngọn Hải Đăng có việc mà dường như chỉ người lạ mới thích hợp làm.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Người Giữ Bram"
+          }
+        }
+      },
+      "q_gc_lanterns_on_the_shear": {
+        "title": "Đèn Lồng Trên Vách Đứng",
+        "text": "Ngọn Hải Đăng là ánh sáng lớn, {playerName}, nhưng chính những chiếc đèn bão mới dẫn đường cho lữ khách ban đêm xuống con đường vách đá phía trên Vách Đứng. Đêm qua trận cuồng phong đã dập tắt tất cả chúng, và con đường đó trong bóng tối là một cú ngã dài với một kết thúc ngắn ngủi. Cầm lấy đồ đánh lửa của ta và thắp lại bốn chiếc đèn dọc theo vách đá.",
+        "completion": "Bốn điểm sáng trên con đường vách đá, đúng nơi chúng thuộc về. Từ trên này nhìn xuống, có vẻ như bờ biển đã mở mắt trở lại. Bạn có tố chất của một người giữ đèn đấy, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Đèn bão được thắp lại"
+          }
+        }
+      },
+      "q_gc_wind_against_the_wick": {
+        "title": "Gió Chống Lại Sợi Bấc",
+        "text": "Tinh linh cuồng phong là làn gió đã trở nên hằn học, {playerName}. Chúng tụ tập trên những ngọn đồi cao gần Hồ Gương, và mỗi ngọn lửa chúng tìm thấy, chúng đều dập tắt, một chiếc đèn lồng, một lò sưởi, một ngày nào đó là ngọn đèn này. Ba mươi chín năm ta đã giữ cho Ngọn Hải Đăng cháy sáng, và ta sẽ không để mất nó vì thời tiết mang lòng thù hận. Xua tan tám con.",
+        "completion": "Ngọn đèn thậm chí không hề lay động đêm qua, lần đầu tiên trong một tháng. Gió vẫn còn ghét chúng ta, {playerName}, nhưng nó đã trở lại ghét chúng ta một cách công bằng.",
+        "objectives": {
+          "0": {
+            "label": "Tinh Linh Cuồng Phong bị xua tan"
+          }
+        }
+      },
+      "q_gc_the_far_shore": {
+        "title": "Bờ Biển Xa",
+        "text": "Từ căn phòng đèn này, tôi có thể thấy toàn bộ bờ biển, {playerName}, và những gì tôi thấy ở phía bắc thì tôi không thích. Những ánh đèn xanh di chuyển trên Wreckfields lúc thủy triều xuống, từng thân tàu một. Có một người phụ nữ làm việc một mình ở bờ biển đó: Edda, người trục vớt. Hãy theo con đường vách đá về phía bắc qua khỏi Vách Đứng cho đến khi những xác tàu bắt đầu xuất hiện, và xem cô ấy còn thở không.",
+        "completion": "Bram đang canh bờ biển của tôi từ tháp của ông ấy à? Ông lão đúng khi lo lắng, {playerName}. Người chết đã đi lại trên chính xác tàu của họ vào ban đêm, và gần đây họ đã thôi quan tâm liệu mặt trời có mọc hay không.",
+        "objectives": {
+          "0": {
+            "label": "Tìm Người Trục Vớt Edda"
+          }
+        }
+      },
+      "q_gc_dead_mens_cargo": {
+        "title": "Hàng Hóa Của Người Chết",
+        "text": "Luật trục vớt rất đơn giản, {playerName}: những gì biển ban cho bãi biển đều là của tôi. Những thủy thủ chết đuối không đồng ý như vậy. Họ trồi lên từ thân tàu của mình và kéo mọi thùng hàng tôi xếp trở lại dưới đường thủy triều. Hạ gục sáu người trong số họ vĩnh viễn, và trong lúc bãi biển yên tĩnh, hãy kéo vào ba thùng mảnh vỡ trôi dạt trước khi thủy triều đưa ra khiếu nại phản đối.",
+        "completion": "Sáu thủy thủ đoàn yên tĩnh hơn và ba thùng hàng khô ráo an toàn. Bạn trục vớt mạnh tay hơn tôi nhiều, {playerName}, nhưng sổ sách không quan tâm điều đó. Một nửa số này là của bạn theo luật, và theo luật ở đây nghĩa là tôi nói vậy.",
+        "objectives": {
+          "0": {
+            "label": "Thủy Thủ Chết Đuối được an nghỉ"
+          },
+          "1": {
+            "label": "Thùng Mảnh Vỡ Trôi Dạt được trục vớt"
+          }
+        }
+      },
+      "q_gc_the_wreck_warden": {
+        "title": "Vệ Quan Xác Tàu",
+        "text": "Giờ bạn đã biết tại sao những thủy thủ trỗi dậy, {playerName}. Có thứ gì đó khoác lên bộ giáp bám đầy hà của xác tàu đầu tiên từng vỡ tan trên bờ biển này, và nó canh giữ mọi thân tàu trên bãi biển như một nghĩa trang mà nó được thuê để trông coi. Nó nắm giữ một kho báu tôi đã thèm muốn suốt mười năm và một thủy thủ đoàn tôi thà thấy họ yên nghỉ. Kết liễu Vệ Quan Xác Tàu. Rủ theo một người bạn, người chết canh gác rất tốt.",
+        "completion": "Bãi biển im bặt ngay khoảnh khắc nó ngã xuống, {playerName}. Đây là lần đầu tiên tôi nghe thấy sự im lặng trên bờ biển này trong mười năm làm việc ở đây. Những thủy thủ đoàn giờ chỉ còn là xương, những bộ xương yên nghỉ. Lấy tấm áo choàng trên đỉnh kho báu đi, nó vốn dĩ luôn hợp với một tấm lưng còn sống hơn.",
+        "objectives": {
+          "0": {
+            "label": "Vệ Quan Xác Tàu bị hạ gục"
           }
         }
       },
@@ -11544,6 +13761,9 @@ export const vi_VN: EnTranslations = {
           },
           "10": {
             "label": "Sân Heo Nái"
+          },
+          "11": {
+            "label": "Đường Đê Farshore"
           }
         }
       },
@@ -11612,6 +13832,300 @@ export const vi_VN: EnTranslations = {
             "label": "Thánh Đường Mộ Long"
           }
         }
+      },
+      "veiled_hollow": {
+        "name": "Thung Lũng Sương Phủ",
+        "welcome": "Không khí nơi đây vang vọng phép thuật cổ xưa. Hãy tìm đến Người Canh Giữ Saelwyn dưới gốc đại thụ của Eldergleam.",
+        "pois": {
+          "0": {
+            "label": "Eldergleam"
+          },
+          "1": {
+            "label": "Hang Động Duskfall"
+          },
+          "2": {
+            "label": "Đài Quan Sát Duskfall"
+          },
+          "3": {
+            "label": "Rừng Cổ Thụ"
+          },
+          "4": {
+            "label": "Bồn Địa Starfall"
+          },
+          "5": {
+            "label": "Sân Chìm"
+          },
+          "6": {
+            "label": "Bãi Cạn Pha Lê"
+          },
+          "7": {
+            "label": "Vực Sâu Lấp Lánh"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "Vùng Đất Rồng",
+        "welcome": "Luồng gió nóng cuộn lên từ vùng đất hoang phía trước. Rồng lượn vòng trên Drakemaw, và lửa troll cháy rực giữa những cồn cát.",
+        "pois": {
+          "0": {
+            "label": "Wyrmwatch"
+          },
+          "1": {
+            "label": "Gatewood"
+          },
+          "2": {
+            "label": "Cồn Cát Tro Tàn"
+          },
+          "3": {
+            "label": "Trollmoot"
+          },
+          "4": {
+            "label": "Pháo Đài Cuối Cùng"
+          },
+          "5": {
+            "label": "Cánh Đồng Bloodglass"
+          },
+          "6": {
+            "label": "Miệng Núi Lửa Drakemaw"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "Đỉnh Sương Giá",
+        "welcome": "Tuyết nuốt trọn mọi âm thanh. Dưới ánh sáng nhảy múa trên bầu trời, cái lạnh dường như cũng đang thức giấc.",
+        "pois": {
+          "0": {
+            "label": "Icemantle"
+          },
+          "1": {
+            "label": "Snowline"
+          },
+          "2": {
+            "label": "Hồ Băng Hà"
+          },
+          "3": {
+            "label": "Bậc Thang Cực Quang"
+          },
+          "4": {
+            "label": "Shiverfen"
+          },
+          "5": {
+            "label": "Bậc Thềm Gào Thét"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "Xứ Thu Hổ Phách",
+        "welcome": "Mỗi chiếc lá nơi đây cháy rực sắc vàng và đỏ, nhưng chẳng bao giờ rụng xuống. Những chiếc đèn lồng của Lanternmere đã thắp sáng chờ đón bạn.",
+        "pois": {
+          "0": {
+            "label": "Lanternmere"
+          },
+          "1": {
+            "label": "Goldmelt"
+          },
+          "2": {
+            "label": "Vườn Dát Vàng"
+          },
+          "3": {
+            "label": "Trũng Thu Hoạch"
+          },
+          "4": {
+            "label": "Hồ Lớn"
+          },
+          "5": {
+            "label": "Đồi Cindermaple"
+          },
+          "6": {
+            "label": "Cự Thạch Nghiêng"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "Đầm Liễu",
+        "welcome": "Đầm lầy rộn ràng tiếng chuồn chuồn và ong bay vo ve. Hãy băng qua cây cầu vào Bridgemere và nghỉ chân đôi chút.",
+        "pois": {
+          "0": {
+            "label": "Bridgemere"
+          },
+          "1": {
+            "label": "Bậc Thang Amberfen"
+          },
+          "2": {
+            "label": "Lilymoors"
+          },
+          "3": {
+            "label": "Vũng Bogshine"
+          },
+          "4": {
+            "label": "Willowweep"
+          },
+          "5": {
+            "label": "Bãi Bằng Buồn Ngủ"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "Cánh Đồng Dạ Hoa",
+        "welcome": "Qua khỏi Nightgate, chính không khí cũng đang mơ màng. Hãy theo ánh sáng của loài hoa dẫn tới Moonrest, và để ý thế giới đang say ngủ treo lơ lửng trên bầu trời.",
+        "pois": {
+          "0": {
+            "label": "Moonrest"
+          },
+          "1": {
+            "label": "Nightgate"
+          },
+          "2": {
+            "label": "Moonwell"
+          },
+          "3": {
+            "label": "Gloamfield"
+          },
+          "4": {
+            "label": "Canh Thức Vĩnh Cửu"
+          },
+          "5": {
+            "label": "Gò Mộ Không Ngủ"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "Rừng Oan Hồn",
+        "welcome": "Tán lá khép lại trên con đường như một chiếc nắp đậy. Hãy bám theo ánh đèn lồng của Gallowmere, và đừng đáp lời nếu khu rừng gọi tên bạn.",
+        "pois": {
+          "0": {
+            "label": "Gallowmere"
+          },
+          "1": {
+            "label": "Crowgate"
+          },
+          "2": {
+            "label": "Lùm Cây Của Góa Phụ"
+          },
+          "3": {
+            "label": "Trảng Rừng Treo Cổ"
+          },
+          "4": {
+            "label": "Nhà Nguyện Mournstone"
+          },
+          "5": {
+            "label": "Khoảng Trống Của Thợ Săn"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "Vịnh Cọ",
+        "welcome": "Cát ấm, tiếng chim ríu rít, và một khu rừng nuốt trọn cả chân trời. Drifthaven vẫn giữ một đống lửa cháy sáng trên bãi biển chờ bạn.",
+        "pois": {
+          "0": {
+            "label": "Drifthaven"
+          },
+          "1": {
+            "label": "Tanglemouth"
+          },
+          "2": {
+            "label": "Palmstrand"
+          },
+          "3": {
+            "label": "Bụi Rậm Ngọc Lục Bảo"
+          },
+          "4": {
+            "label": "Vinefall"
+          },
+          "5": {
+            "label": "Đầm Phá Lam Ngọc"
+          },
+          "6": {
+            "label": "Tượng Thần Chìm"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "Khu Vườn Vĩnh Cửu",
+        "welcome": "Vẫn có ai đó đang tỉa những hàng rào cây, dù đã cả trăm năm không ai thấy bóng dáng người làm vườn. Hãy cẩn thận với mê cung: nó cũng đang để mắt đến bạn.",
+        "pois": {
+          "0": {
+            "label": "Hedgewick"
+          },
+          "1": {
+            "label": "Cổng Vườn"
+          },
+          "2": {
+            "label": "Lối Đi Vườn Hoa"
+          },
+          "3": {
+            "label": "Lâu Đài Dawnhold"
+          },
+          "4": {
+            "label": "Ao Cánh Hoa"
+          },
+          "5": {
+            "label": "Đại Mê Cung"
+          },
+          "6": {
+            "label": "Sân Đài Phun Nước"
+          },
+          "7": {
+            "label": "Cối Xay Cũ"
+          },
+          "8": {
+            "label": "Trạm Canh Bắc"
+          },
+          "9": {
+            "label": "Bồn Địa Hoa Loa Kèn"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "Đỉnh Gió Lộng",
+        "welcome": "Gió nơi đây chưa từng một lần ngừng thổi, và Ngọn Hải Đăng Cũ chưa từng một lần tắt. Wickharbor chỉ mong bạn khép cửa quán trọ lại sau lưng.",
+        "pois": {
+          "0": {
+            "label": "Wickharbor"
+          },
+          "1": {
+            "label": "Windway"
+          },
+          "2": {
+            "label": "Đồi Gào Thét"
+          },
+          "3": {
+            "label": "Ngọn Hải Đăng Cũ"
+          },
+          "4": {
+            "label": "Vách Đứng"
+          },
+          "5": {
+            "label": "Wreckfields"
+          },
+          "6": {
+            "label": "Hồ Gương"
+          },
+          "7": {
+            "label": "Chuồng Ngựa Galecrest"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "Bờ Biển Xa Xôi",
+        "welcome": "Băng qua doi cát, tiếng chuông của Gullhaven sẽ tìm ra bạn trước cả khi thị trấn kịp hay. Những rạn nứt xé toạc không chút báo trước, và đồn lũy vẫn trấn giữ bờ biển này trước bất cứ thứ gì tràn qua. Họ đã chờ đợi một người như bạn từ rất lâu rồi.",
+        "pois": {
+          "0": {
+            "label": "Gullhaven"
+          },
+          "1": {
+            "label": "Bến Tàu"
+          },
+          "2": {
+            "label": "Đồng Cỏ Canh Gác"
+          },
+          "3": {
+            "label": "Vách Đá Vỡ Nát"
+          },
+          "4": {
+            "label": "Riftfields"
+          }
+        }
       }
     },
     "dungeons": {
@@ -11639,6 +14153,16 @@ export const vi_VN: EnTranslations = {
         "name": "Đấu Trường Raid Nythraxis",
         "enterText": "Bạn đi qua cánh cửa hoàng gia niêm phong.",
         "leaveText": "Bạn trở lại không khí lạnh giá của Đỉnh Gai."
+      },
+      "wildheart_basin": {
+        "name": "Lòng Chảo Trái Tim Hoang Dã",
+        "enterText": "Mưa ấm rít trên nền đá cổ. The Wildheart Basin mở ra trước mắt bạn.",
+        "leaveText": "Bạn đi ngang qua những nanh đá một lần nữa, trở về dưới ánh nắng Palmreach."
+      },
+      "the_last_keep": {
+        "name": "Pháo Đài Cuối Cùng",
+        "enterText": "Bạn bước vào những đại sảnh lạnh lẽo, tĩnh lặng của Last Keep.",
+        "leaveText": "Bạn kéo cánh cửa pháo đài đóng sập lại và bước trở về với cơn gió của Drakelands."
       },
       "drowned_temple": {
         "name": "Ngôi Đền Chết Chìm",

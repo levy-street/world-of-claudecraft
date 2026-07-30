@@ -172,8 +172,10 @@ jobs:
       # suites need the generated artifacts no matter which shard they hash
       # into), so this job needs no explicit i18n:gen step; the freshness diff
       # lives in pr-checks.
+      # Full Sim suites are CPU-heavy. Keep each shard at half the runner's
+      # available cores, matching the bounded local gate.
       - name: Run tests (PR tier, shard ${{ matrix.shard }} of 4)
-        run: npm test -- --shard=${{ matrix.shard }}/4
+        run: npm test -- --shard=${{ matrix.shard }}/4 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
 
   # Runs in parallel with pr-gate: same if-condition, no needs edge in either
   # direction. The default pull_request merge-ref checkout MUST be preserved
@@ -298,8 +300,10 @@ jobs:
       # Sharded like pr-gate; `npm test` (pretest) regenerates the i18n
       # artifacts in EVERY shard so the artifact-dependent suites pass no
       # matter which shard they hash into.
+      # Full Sim suites are CPU-heavy. Keep each shard at half the runner's
+      # available cores, matching the bounded local gate.
       - name: Run tests (release tier - 21-locale + empty-pending, shard ${{ matrix.shard }} of 4)
-        run: npm test -- --shard=${{ matrix.shard }}/4
+        run: npm test -- --shard=${{ matrix.shard }}/4 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
 
       - name: Typecheck
         if: matrix.shard == 1

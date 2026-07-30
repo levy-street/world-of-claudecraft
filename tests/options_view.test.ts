@@ -495,7 +495,7 @@ describe('options_view: interface tab taxonomy', () => {
 // Main menu routing (cluster 5)
 // ---------------------------------------------------------------------------
 describe('options_view: main menu routing', () => {
-  it('routes each row to its sub-view, with logout + close, omitting bug report offline', () => {
+  it('routes each row to its sub-view, with unstuck before logout + close, omitting bug report offline', () => {
     const offline = buildOptionsMenu({ bugReportAvailable: false });
     expect(offline.map((e) => e.labelKey)).toEqual([
       'hud.options.keyBindings',
@@ -504,9 +504,11 @@ describe('options_view: main menu routing', () => {
       'hud.options.interface',
       'hud.options.audio',
       'hudChrome.perf.title',
+      'hudChrome.unstuck.menuButton',
       'hud.options.logout',
       'hud.options.returnToGame',
     ]);
+    expect(offline.at(-3)?.action).toEqual({ kind: 'unstuck' });
     expect(offline.at(-2)?.action).toEqual({ kind: 'logout' });
     expect(offline.at(-1)?.action).toEqual({ kind: 'close' });
     // exactly one interface entry (no duplicates), routing to the interface view
@@ -519,6 +521,12 @@ describe('options_view: main menu routing', () => {
     const online = buildOptionsMenu({ bugReportAvailable: true });
     const bug = online.find((e) => e.labelKey === 'hudChrome.bugReport.menuButton');
     expect(bug?.action).toEqual({ kind: 'goto', view: 'bugreport' });
+    expect(online.slice(-4)).toEqual([
+      { labelKey: 'hudChrome.bugReport.menuButton', action: { kind: 'goto', view: 'bugreport' } },
+      { labelKey: 'hudChrome.unstuck.menuButton', action: { kind: 'unstuck' } },
+      { labelKey: 'hud.options.logout', action: { kind: 'logout' } },
+      { labelKey: 'hud.options.returnToGame', action: { kind: 'close' } },
+    ]);
   });
 });
 

@@ -451,6 +451,7 @@ export const es_ES: Record<string, string> = {
   'error.invalidStreamerLink':
     'Un enlace de streamer debe ser un enlace https en el dominio de la plataforma.',
   'nav.history': 'Historial',
+  'nav.unstuckReports': 'Informes de Desatascar',
   'moderationHistory.actionKick': 'Expulsado',
   'moderationHistory.actionKill': 'Eliminado',
   'moderationHistory.actionIpBlock': 'IP bloqueada',

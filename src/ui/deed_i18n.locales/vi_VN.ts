@@ -814,4 +814,12 @@ export const table: DeedLocaleTable = {
     name: 'Bãi Phế Liệu',
     desc: 'Tháo dỡ 50 món trang bị thành nguyên liệu thô.',
   },
+  dgn_wildheart_basin: {
+    name: 'Lòng Chảo Phản Đòn',
+    desc: 'Đánh bại Zulgar, Tiếng Nói Của Vùng Trũng, trong Lòng Chảo Trái Tim Hoang Dã.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Anh Hùng: Lòng Chảo Trái Tim Hoang Dã',
+    desc: 'Đánh bại Zulgar, Tiếng Nói Của Vùng Trũng, trong Lòng Chảo Trái Tim Hoang Dã ở độ khó Anh Hùng.',
+  },
 };

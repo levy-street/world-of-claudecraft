@@ -87,6 +87,7 @@ import {
   handleClaudiumApi,
   handleClaudiumStripeWebhook,
 } from './claudium';
+import { configureCommunityTestAccounts } from './community_test_accounts';
 import {
   bustDailyRewardBoardCache,
   dailyRewardEventsCutoffDay,
@@ -302,6 +303,8 @@ import {
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
 import { passesTurnstile } from './turnstile';
+import { pruneUnstuckReports, UNSTUCK_REPORT_RETENTION_DAYS } from './unstuck_db';
+import { stopUnstuckRecords, UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS } from './unstuck_records';
 import { MAX_ASSET_BYTES } from './user_assets';
 import {
   assetBytesCore,
@@ -423,7 +426,9 @@ const DAILY_PRUNE_INTERVAL_MS = 24 * 3600 * 1000;
 // lazily instead of at module load.
 let gameInstance: GameServer | null = null;
 function liveGame(): GameServer {
-  gameInstance ??= new GameServer();
+  gameInstance ??= new GameServer({
+    communityTestRifts: activeConfig().communityTestRifts,
+  });
   return gameInstance;
 }
 
@@ -2832,6 +2837,7 @@ export async function startServer(): Promise<http.Server> {
   // primes activeConfig() for the request path (a request-time read returns this
   // same memoized Config).
   const config = activeConfig();
+  configureCommunityTestAccounts(config.provisionTestAccounts);
   // Point the contributor-stats reader at the one boot Config, replacing its former
   // duplicate GITHUB_REPO/GITHUB_TOKEN module reads (configure<Domain>Runtime).
   configureGithubContributorsRuntime({
@@ -2880,9 +2886,15 @@ export async function startServer(): Promise<http.Server> {
   }
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
+  const prunedUnstuckReports = await pruneUnstuckReports(pool);
+  if (prunedUnstuckReports > 0)
+    console.log(
+      `pruned ${prunedUnstuckReports} unstuck report row(s) older than ${UNSTUCK_REPORT_RETENTION_DAYS} days`,
+    );
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
+  await game.loadRifts();
   await game.loadChatFilter();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();
@@ -2890,6 +2902,9 @@ export async function startServer(): Promise<http.Server> {
     .then((count) => recordSitePresenceSample(count))
     .catch((err) => console.error('site presence sample failed:', err));
   setInterval(() => {
+    void pruneUnstuckReports(pool).catch((err) =>
+      console.error('unstuck report prune failed:', err),
+    );
     void pruneExpiredOAuthGrants(pool).catch((err) =>
       console.error('oauth grant prune failed:', err),
     );
@@ -3116,6 +3131,7 @@ export async function startServer(): Promise<http.Server> {
     // close below (their intervals are unref()'d, but an in-flight tick could still
     // fire before pool.end()).
     await businessMetrics.stop();
+    game.beginShutdown();
     // Same rationale for the retention sweep: an in-flight prune batch must not
     // race the pool close below.
     await retentionSweep.stop();
@@ -3123,6 +3139,7 @@ export async function startServer(): Promise<http.Server> {
     await game.saveAll('shutdown');
     await game.saveMarket();
     await game.saveMail();
+    await game.saveRifts();
     await game.endAllPlaySessions();
     // Drain any bank_ledger writes still queued on the FIFO tail BEFORE the lease
     // sweep: once the leases drop, a replacement process can load the same character
@@ -3138,6 +3155,11 @@ export async function startServer(): Promise<http.Server> {
     // go missing until that character's next login (the join reconcile is the
     // only heal). Rejections log inside the writer, so the drain never throws.
     await deedRecordsIdle();
+    // Stop accepted /unstuck report intake and drain only to a finite deadline.
+    // Per-query timeouts bound an active write; deadline expiry aborts retry
+    // delays and drops queued telemetry before the shared pool closes.
+    const unstuckReportsDrained = await stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS);
+    if (!unstuckReportsDrained) console.warn('unstuck report drain deadline reached');
     // Stop and drain the Steam mirror's in-memory push FIFO too (right after the
     // deeds records it observes): an unlock still queued here would be lost on
     // pool.end(), and the next reconcile (on link or on login) is its only

@@ -39,13 +39,14 @@ const SYNTHETIC: MobTemplate = {
 };
 
 describe('heroic tuning data contract', () => {
-  it('covers the four five-player dungeons plus the raid arena, with their final bosses', () => {
+  it('covers the five five-player dungeons plus the raid arena, with their final bosses', () => {
     expect([...HEROIC_DUNGEON_IDS].sort()).toEqual([
       'drowned_temple',
       'gravewyrm_sanctum',
       'hollow_crypt',
       'nythraxis_boss_arena',
       'sunken_bastion',
+      'wildheart_basin',
     ]);
     expect(
       Object.fromEntries(Object.values(HEROIC_DUNGEON_TUNING).map((t) => [t.id, t.finalBossId])),
@@ -54,6 +55,7 @@ describe('heroic tuning data contract', () => {
       sunken_bastion: 'vael_the_mistcaller',
       drowned_temple: 'ysolei',
       gravewyrm_sanctum: 'korzul_the_gravewyrm',
+      wildheart_basin: 'wildheart_high_priest',
       nythraxis_boss_arena: 'nythraxis_scourge_of_thornpeak',
     });
     for (const tuning of Object.values(HEROIC_DUNGEON_TUNING)) {
@@ -71,6 +73,7 @@ describe('heroic tuning data contract', () => {
       sunken_bastion: 1,
       drowned_temple: 1,
       gravewyrm_sanctum: 1,
+      wildheart_basin: 1,
       nythraxis_boss_arena: 3,
     });
   });
@@ -100,6 +103,7 @@ describe('heroic tuning data contract', () => {
       sunken_bastion: [4.0, 18, 9.75, 1.3],
       drowned_temple: [5.2, 16.5, 9.15, 1.25],
       gravewyrm_sanctum: [4.0, 15.5, 8.55, 1.2],
+      wildheart_basin: [4.0, 17.25, 8.625, 1.2],
       // The raid multiplier is smaller in RELATIVE terms because normal
       // Nythraxis already lands the game's hardest hits; the heroic boss
       // floors at 1200 through the dungeon-wide value while the encounter

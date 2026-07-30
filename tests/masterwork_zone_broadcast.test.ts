@@ -54,12 +54,14 @@ const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';
 const ITEM_ID = 'eastbrook_ritual_vestments';
 
 // Hunted proc seed, pinned (the professions_masterwork suite idiom: only the
-// pinned literal is committed). With tailoring as the active archetype and
-// skill 200 the single output-side draw procs at 0.14; at this seed, with this
-// exact setup order (three extra players added, then the archetype accept, the
-// skill poke, 3x linen_scrap, 1x spider_leg, then the craft), the first craft
-// procs. Position pokes after setup draw nothing, so both placements below
-// share the identical stream. Spare hunted seeds on record: 4, 18, 26, 29.
+// pinned literal is committed), re-recorded after the Eastbrook camp respacing
+// thinned the zone-1 camp counts and shifted the camp-driven world-gen draw
+// sequence. With tailoring as the active archetype and skill 200 the single
+// output-side draw procs at 0.14; at this seed, with this exact setup order
+// (three extra players added, then the archetype accept, the skill poke, 3x
+// linen_scrap, 1x spider_leg, then the craft), the first craft procs. Position
+// pokes after setup draw nothing, so both placements below share the identical
+// stream. Spare hunted seeds on record: 21, 23, 27, 28.
 const PROC_SEED = 2;
 
 // One procced craft with an audience: a bystander in the crafter's zone, a
@@ -80,7 +82,7 @@ function runScenario(opts?: { crafterInInstanceSpace?: boolean }) {
   sim.addItem('spool_of_thread', 5, crafter);
 
   const crafterE = sim.entities.get(crafter)!;
-  const zoneId = zoneAt(crafterE.pos.z).id;
+  const zoneId = zoneAt(crafterE.pos.x, crafterE.pos.z).id;
   // Instance space: far-off x band, z untouched (the exclusion is x-driven).
   sim.entities.get(delver)!.pos.x = DUNGEON_X_THRESHOLD + 100;
   // A different overworld zone: scan the z strips outward from the spawn until
@@ -88,12 +90,12 @@ function runScenario(opts?: { crafterInInstanceSpace?: boolean }) {
   // turn this player into an in-zone recipient).
   const farE = sim.entities.get(farhand)!;
   let z = farE.pos.z;
-  for (let i = 0; i < 400 && zoneAt(z).id === zoneId; i++) z += 50;
-  if (zoneAt(z).id === zoneId) {
+  for (let i = 0; i < 400 && zoneAt(farE.pos.x, z).id === zoneId; i++) z += 50;
+  if (zoneAt(farE.pos.x, z).id === zoneId) {
     z = farE.pos.z;
-    for (let i = 0; i < 400 && zoneAt(z).id === zoneId; i++) z -= 50;
+    for (let i = 0; i < 400 && zoneAt(farE.pos.x, z).id === zoneId; i++) z -= 50;
   }
-  expect(zoneAt(z).id).not.toBe(zoneId);
+  expect(zoneAt(farE.pos.x, z).id).not.toBe(zoneId);
   farE.pos.z = z;
   if (opts?.crafterInInstanceSpace) crafterE.pos.x = DUNGEON_X_THRESHOLD + 100;
 
@@ -261,18 +263,18 @@ describe('masterworkZone over the live GameServer wire (session routing)', () =>
     const sd = joinServer(server, fcDelver, 94, 'Delver');
     const entities = (server.sim as unknown as { entities: Map<number, Entity> }).entities;
     const crafterE = entities.get(sc.pid)!;
-    const zoneId = zoneAt(crafterE.pos.z).id;
+    const zoneId = zoneAt(crafterE.pos.x, crafterE.pos.z).id;
     // Park the far player in a different overworld zone (the z-scan idiom from
     // the emit suite above: layout-agnostic, so a zone reshuffle cannot
     // silently turn them into an in-zone recipient).
     const farE = entities.get(sf.pid)!;
     let z = farE.pos.z;
-    for (let i = 0; i < 400 && zoneAt(z).id === zoneId; i++) z += 50;
-    if (zoneAt(z).id === zoneId) {
+    for (let i = 0; i < 400 && zoneAt(farE.pos.x, z).id === zoneId; i++) z += 50;
+    if (zoneAt(farE.pos.x, z).id === zoneId) {
       z = farE.pos.z;
-      for (let i = 0; i < 400 && zoneAt(z).id === zoneId; i++) z -= 50;
+      for (let i = 0; i < 400 && zoneAt(farE.pos.x, z).id === zoneId; i++) z -= 50;
     }
-    expect(zoneAt(z).id).not.toBe(zoneId);
+    expect(zoneAt(farE.pos.x, z).id).not.toBe(zoneId);
     farE.pos.z = z;
     farE.prevPos = { ...farE.prevPos, z };
     // Park the delver in instance space (same overworld z as the crafter, so
@@ -282,7 +284,7 @@ describe('masterworkZone over the live GameServer wire (session routing)', () =>
     const delverE = entities.get(sd.pid)!;
     delverE.pos.x = DUNGEON_X_THRESHOLD + 100;
     delverE.prevPos = { ...delverE.prevPos, x: delverE.pos.x };
-    expect(zoneAt(delverE.pos.z).id).toBe(zoneId);
+    expect(zoneAt(delverE.pos.x, delverE.pos.z).id).toBe(zoneId);
 
     // Fan out on the LIVE server sim (the craft trigger itself is pinned by the
     // emit suite; this suite owns the wire routing), then run the real pump.

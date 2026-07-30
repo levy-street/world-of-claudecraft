@@ -56,6 +56,7 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/blocked-ips', permission: 'moderation.read' },
 
   { method: 'GET', pattern: '/admin/api/bug-reports', permission: 'support.read' },
+  { method: 'GET', pattern: '/admin/api/unstuck-reports', permission: 'support.read' },
   {
     method: 'GET',
     pattern: /^\/admin\/api\/bug-reports\/(\d+)\/screenshot$/,

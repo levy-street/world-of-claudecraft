@@ -342,6 +342,33 @@ export const cs_CZ: EnTranslations = {
       "healerConfirmAccept": "Oživ mě",
       "healerConfirmCancel": "Zrušit"
     },
+    "unstuck": {
+      "menuButton": "Vyproštění",
+      "help": "Záchrana: /unstuck spustí nehybné odpočítávání, které tě přemístí na nedaleké dostupné bezpečné místo.",
+      "helpAtGraveyard": "Záchrana: /unstuck spustí nehybné odpočítávání a poté pošle tvého ducha na nejbližší hřbitov. Návrat přes Bledého strážce vyžaduje Strážcovo mýtné.",
+      "started": "Vyproštění za {seconds} sekund. Pohyb, boj, utrpění zranění nebo zahájení jiné akce ho zruší.",
+      "countdown": "Vyproštění: {seconds}",
+      "completed": "Přemístěno na nejbližší dostupné bezpečné místo.",
+      "completedAtGraveyard": "Tvůj duch se vrátil na nejbližší hřbitov. Promluv s Bledým strážcem a přijmi Strážcovo mýtné.",
+      "revivedAtGraveyard": "Byl jsi vrácen na nejbližší hřbitov a oživen. Strážcovo mýtné na tobě leží.",
+      "cancelledMoved": "Vyproštění zrušeno, protože ses pohnul.",
+      "cancelledDamaged": "Vyproštění zrušeno, protože jsi utrpěl zranění.",
+      "cancelledCombat": "Vyproštění zrušeno, protože jsi vstoupil do boje.",
+      "cancelledBusy": "Vyproštění zrušeno, protože jsi zahájil jinou akci.",
+      "cancelledState": "Vyproštění zrušeno, protože se změnil tvůj stav.",
+      "cancelledDisconnected": "Vyproštění zrušeno, protože jsi byl odpojen.",
+      "noSafePosition": "V okolí nebylo nalezeno žádné dostupné bezpečné místo. Nebyl jsi přemístěn.",
+      "alreadyActive": "Vyproštění už odpočítává.",
+      "alreadySafe": "Už se nacházíš na bezpečném, dostupném místě.",
+      "cooldown": "Vyproštění bude připraveno za {seconds} sekund.",
+      "dead": "Nemůžeš použít Vyproštění, pokud jsi mrtvý nebo v podobě ducha.",
+      "combat": "Během boje nemůžeš použít Vyproštění.",
+      "controlled": "Nemůžeš použít Vyproštění, když je tvůj pohyb omezen.",
+      "standStill": "Zůstaň stát na pevné zemi, než použiješ Vyproštění.",
+      "standStillAnywhere": "Zůstaň stát, než použiješ Vyproštění.",
+      "busy": "Dokonči svou současnou akci, než použiješ Vyproštění.",
+      "unavailable": "Vyproštění není ve tvém současném stavu dostupné."
+    },
     "fct": {
       "absorbed": "Pohlceno {amount}",
       "cheap": "Levnější!"
@@ -781,6 +808,7 @@ export const cs_CZ: EnTranslations = {
       "leaderboard": "Žebříčky",
       "dailyRewards": "Obchod",
       "deeds": "Skutky",
+      "mounts": "Jízdní zvířata",
       "professions": "Profese",
       "nameplates": "Jména",
       "haptics": "Haptika",
@@ -881,10 +909,15 @@ export const cs_CZ: EnTranslations = {
       "autoShowHint": "Řádky se zobrazí automaticky, jakmile tvoje skupina způsobí poškození nebo léčení, a tento segment se zavře několik sekund po skončení boje.",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
-      "breakdownOther": "Other ({count})",
+      "breakdownOther": "Ostatní ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Melee"
+      "melee": "Boj zblízka",
+      "move": "Tažením přesuneš tento měřič",
+      "resize": "Tažením změníš velikost tohoto měřiče",
+      "dock": "Vrátit tento měřič zpět do okna měřičů",
+      "separate": "Oddělit {meter}",
+      "regroup": "Znovu seskupit {meter}"
     },
     "petFeed": {
       "disabledFullHp": "Mazlíček má plné zdraví",
@@ -902,7 +935,59 @@ export const cs_CZ: EnTranslations = {
       "petStop": "Mazlíček: Zastavit",
       "petTaunt": "Mazlíček: Provokace",
       "petDefensive": "Mazlíček: Obranný",
-      "petAggressive": "Mazlíček: Agresivní"
+      "petAggressive": "Mazlíček: Agresivní",
+      "mount": "Nasednout / Sesednout"
+    },
+    "mounts": {
+      "title": "Jízdní zvířata",
+      "close": "Zavřít",
+      "select": "Vybrat",
+      "selected": "Vybráno",
+      "riding": "Jízda",
+      "mount": "Nasednout",
+      "dismount": "Sesednout",
+      "useToRide": "Použij k přivolání tohoto jízdního zvířete.",
+      "emptyTitle": "Žádná jízdní zvířata nezískána",
+      "emptyStableHint": "Dosáhni úrovně 20 a vezmi si jezdecké lekce u Stájmistryně Marly ve Highwatchských stájích, západně od Highwatche.",
+      "emptyDropHint": "Vzácnější jízdní zvířata padají z hrdinských bossů žalářů a z dokončených trhlin.",
+      "clickManage": "Klikni pro výběr jízdního zvířete",
+      "rarity_common": "Běžné",
+      "rarity_rare": "Vzácné",
+      "rarity_epic": "Epické",
+      "spec_speed": "+{pct}% pohyblivosti navíc",
+      "name_valorsteed": "Udatný oř",
+      "name_grag_bear": "Goliáš, medvěd Grag",
+      "name_stalkglider_snail": "Mechoulitý klouzavec",
+      "name_aether_hover_cycle": "Vznášecí kolo éterického kolbáře",
+      "name_shadowjump_toad": "Kama-Kage, stínoskákací ropucha",
+      "name_stormfeather_griffin": "Nebeský Bouřepero",
+      "name_thunderstrut_gobbler": "Hromokrok, Velký krocan",
+      "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
+      "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
+      "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
+      "desc_aether_hover_cycle": "Výkonné magitechnické kolo navržené pro rychlý, nízko se vznášející pohyb v boji.",
+      "desc_shadowjump_toad": "Mohutná, jistonohá obří ropucha, vycvičená v bleskurychlých stínových skocích, které zvládnou jakýkoli terén.",
+      "desc_stormfeather_griffin": "Vznešený bouřný gryf, který se plíží po zemi na rounami okovaných spárech, se složenými křídly.",
+      "desc_thunderstrut_gobbler": "Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak."
+    },
+    "mountTraining": {
+      "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
+      "ownedMountPrompt": "Tvé otěže jsou v tvých brašnách. Použij je k jízdě.",
+      "ridePrompt": "Následuj zářící značku ke startovní čáře a stiskni Začít závod.",
+      "begin": "Začít lekci",
+      "success": "Zkrotil jsi Udatného oře.",
+      "returnToMarla": "Vrať se k Marle do stájí a kup si otěže Udatného oře za 10 zlatých."
+    },
+    "mountRace": {
+      "startButton": "Začít závod",
+      "cancelButton": "Zrušit závod",
+      "go": "START!",
+      "start": "Vyraz! Zdolej každý skok a pak se vrať zpět obloukem.",
+      "toFinish": "Jeď zpět obloukem!",
+      "finished": "Dokončeno za {seconds} s!",
+      "timeout": "Závod selhal",
+      "progress": "Brány {n} z {total}",
+      "timeLeft": "{seconds} s"
     },
     "vcup": {
       "title": "Pohár údolí",
@@ -1434,6 +1519,10 @@ export const cs_CZ: EnTranslations = {
       "twoFactorRecoveryTitle": "Ulož si obnovovací kódy",
       "twoFactorRecoveryHint": "Každý kód funguje jednou. Ulož je na bezpečné místo: jsou jedinou cestou zpět, pokud ztratíš autentizační aplikaci.",
       "twoFactorDownloadCodes": "Stáhnout kódy",
+      "recoveryCodesFileHeader": "Obnovovací kódy {brand}",
+      "recoveryCodesFileAccount": "Účet: {username}",
+      "recoveryCodesFileHint": "Každý kód lze použít jednou, pokud ztratíte přístup ke své autentizační aplikaci.",
+      "recoveryCodesFileWarn": "Uchovávejte tento soubor na bezpečném a soukromém místě.",
       "twoFactorDone": "Hotovo",
       "twoFactorDisableHint": "Pro vypnutí dvoufaktoru zadej heslo. Tvoje obnovovací kódy budou zahozeny.",
       "twoFactorDisableBtn": "Vypnout dvoufaktor",
@@ -1568,6 +1657,7 @@ export const cs_CZ: EnTranslations = {
       "filterConsumable": "Spotřební",
       "filterMaterial": "Materiály",
       "filterQuest": "Úkolové",
+      "filterMount": "Jezdecká zvířata",
       "sortAria": "Řadit předměty v batozích",
       "sortRecent": "Nedávné",
       "sortQuality": "Kvalita",
@@ -1785,6 +1875,9 @@ export const cs_CZ: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Vyžaduje úroveň {level}",
+      "riftTier": "Trhlinový předmět stupně {tier}",
+      "riftUpgrade": "Vylepšení trhliny {level}/{max}",
+      "riftSockets": "Trhlinové drahokamy {used}/{total}",
       "statEnchanted": "+{value} {stat} (okouzleno)",
       "enchantedFallback": "Okouzlený"
     },
@@ -2722,6 +2815,14 @@ export const cs_CZ: EnTranslations = {
       "lbEmpty": "V žebříčku zatím nejsou žádní kronikáři.",
       "broadcastsLabel": "Sdílet vykonané skutky s cechem a přáteli",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "Mapa světa",
+      "summary": "Mapa světa. Vyber oblast a otevři její mapu.",
+      "toWorld": "Mapa světa",
+      "toZone": "Mapa oblasti",
+      "toggleAria": "Přepnout mezi mapou světa a mapou oblasti",
+      "levels": "Úrovně {min} až {max}"
     }
   },
   "gatherEvent": {
@@ -2950,7 +3051,17 @@ export const cs_CZ: EnTranslations = {
         "marshName": "Mirefenský močál",
         "marshBlurb": "Potopené slatě a přílivem ošlehané ruiny, domov bahenních ploutví a horších věcí.",
         "peaksName": "Thornpeakské výšiny",
-        "peaksBlurb": "Větrem bičované hřebeny stoupající k nejchladnějším hrozbám světa."
+        "peaksBlurb": "Větrem bičované hřebeny stoupající k nejchladnějším hrozbám světa.",
+        "duskName": "Zahalená kotlina",
+        "duskBlurb": "Říše zapečetěná pod horami, pokud jsou šepoty o cestě dovnitř pravdivé.",
+        "emberName": "Dračí země",
+        "emberBlurb": "Za Bledou hrází ustupuje zeleň popelu a něco prastarého vládne pustinám.",
+        "frostName": "Kraj Mrazivého závoje",
+        "frostBlurb": "Zasněžená výšina za hranicemi všech map, zahlédnutelná jen v tančících světlech.",
+        "amberName": "Jantarový pád",
+        "amberBlurb": "Za západními útesy podzim, který nikdy nekončí, a lucerny na zlatém jezeře.",
+        "fenName": "Vrbová bažina",
+        "fenBlurb": "Za podzimní korunou jasná bažina vrb a klidné vody, a město za vodním příkopem."
       },
       "group": {
         "heading": "Na těžké věci se spojte",
@@ -3419,6 +3530,18 @@ export const cs_CZ: EnTranslations = {
       "reptile": {
         "name": "Plazi",
         "desc": "Studenokrevní lovci s vlastním syčením a lupem čelistí, odlišní od teplokrevných bestií."
+      },
+      "murloc": {
+        "name": "Kvákoploutví",
+        "desc": "Kvákající rybí lid jezerních břehů a přílivových tůní, rychle se hrnoucí na cokoliv, co se přiblíží příliš blízko."
+      },
+      "kobold": {
+        "name": "Skrčci",
+        "desc": "Pobíhající mrchožrouti a víly mýtin a živých plotů, spíš otrava než hrozba, dokud se nesejdou ve velkém počtu."
+      },
+      "demon": {
+        "name": "Démoni",
+        "desc": "Vetřelci zpoza trhlin, samý oheň a zloba. Kde jeden stojí, průlom není nikdy daleko."
       }
     },
     "worldPage": {
@@ -3432,15 +3555,55 @@ export const cs_CZ: EnTranslations = {
       "valeBlurb": "Zelené počáteční údolí, kde si noví hrdinové brousí zuby na vlcích a banditech kolem města Eastbrook.",
       "marshBlurb": "Utopená země mlhy a ruin. Bahenní ploutve se rojí v mělčinách a pod vodou se hýbe něco staršího, hlídané z mostního města Fenbridge.",
       "peaksBlurb": "Větrem bičované hřebeny a stará důlní díla stoupající k nejchladnějším a nejvyšším hrozbám světa, držené výspou Highwatch.",
+      "duskBlurb": "Údolí trvalého soumraku pod velkým stromem Prastarého svitu, kde svítí křišťálové trosky a vzduch hučí prastarou magií.",
+      "emberBlurb": "Bouří ozářené pustiny popela a krvavého skla, kde draci krouží nad kalderou a trollí ohně hoří v dunách, střežené z branného města Dračí hlídka.",
+      "frostBlurb": "Ticho sněhu a temných borovic pod polární září, kde se sám chlad zdá být vzhůru a Ledový plášť udržuje své ohně hořící.",
+      "amberBlurb": "Věčný podzim zlata a rudých listů, které nikdy nespadnou, shromážděný kolem lucernami osvětleného města Lucernojezero.",
+      "fenBlurb": "Jasná, hučící mokřina lilií a klidné vody, protínaná starými lávkami z mostního města Mostojezero.",
+      "nightBlurb": "Říše hvězdné půlnoci, kde květy osvětlují stezky a Měsíční klid udržuje tichou hlídku pod snící oblohou.",
+      "hauntBlurb": "Strašidelný les pod obřími korunami, kde jsou lucerny Šibeničního jezera jediným poctivým světlem na cestě.",
+      "galeBlurb": "Mořské útesy a kvílivé stráně, kde vítr nikdy neustává, Starý maják nikdy nezhasíná a Osadní přístav pevně zavírá své dveře.",
+      "jungleBlurb": "Tropický spletenec palem, bílého písku a hlučného ptactva, přičemž pobřežní město Naplavený přístav udržuje na pláži zapálený oheň.",
+      "gardenBlurb": "Zahradní říše živoplotového bludiště, stále stříhaná nikým, koho kdo viděl, do níž se vchází kolem Živoplotova a jeho fontánových nádvoří.",
       "valeGreeting": "Měj čepel po ruce. Údolí už není, co bývalo.",
       "valeGreeter": "Maršál Redbrook, Eastbrook",
       "marshGreeting": "Zastav se u brány. Za tím rákosím zabíjí močál za nás.",
       "marshGreeter": "Strážce Fenwick, Fenbridge",
       "peaksGreeting": "Dvě stě let tahle zeď drží. Na mé hlídce se nezlomí, ale sténá.",
       "peaksGreeter": "Kapitánka Thessaly, Highwatch",
+      "duskGreeting": "Málo z tvého druhu stálo pod těmito větvemi. Choď opatrně a buď vítán.",
+      "duskGreeter": "Strážce Saelwyn, Prastarý svit",
+      "emberGreeting": "Horký vítr z pustin, draci nad Dračí tlamou a trollí ohně v dunách. Napij se, než tam vyrazíš.",
+      "emberGreeter": "Strážce brány, Dračí hlídka",
+      "frostGreeting": "Sníh pohlcuje každý zvuk za hradbou. Pokud se světla rozzáří tancem, ztiš hlas a udržuj oheň.",
+      "frostGreeter": "Strážce ohniště, Ledový plášť",
+      "amberGreeting": "Každý list zde plane zlatě a rudě, přesto žádný nikdy nespadne. Lucerny jsou pro tebe rozsvíceny; dej pozor na Zlatotání na cestě nahoru.",
+      "amberGreeter": "Lucernář, Lucernojezero",
+      "fenGreeting": "Bažina hučí vážkami a včelami. Přejdi most, chvíli si odpočiň a drž se lávek za tůněmi.",
+      "fenGreeter": "Strážce mostu, Mostojezero",
+      "nightGreeting": "Za Noční branou sní i samotný vzduch. Následuj květinové světlo a dej pozor na spící svět, který visí na obloze.",
+      "nightGreeter": "Strážce hlídky, Měsíční klid",
+      "hauntGreeting": "Drž se lucern, poutníku. A pokud tě les zavolá jménem od cesty, neodpovídej mu.",
+      "hauntGreeter": "Lampář, Šibeniční jezero",
+      "galeGreeting": "Vítr tu nikdy ani na chvíli neustal a Starý maják nikdy ani na okamžik nezhasl. Zavři za sebou dveře hospody.",
+      "galeGreeter": "Strážce majáku, Osadní přístav",
+      "jungleGreeting": "Teplý písek, hlučné ptactvo a džungle, která pohlcuje obzor. Udržujeme na pláži zapálený oheň; snaž se k němu vrátit.",
+      "jungleGreeter": "Přístavní velitelka, Naplavený přístav",
+      "gardenGreeting": "Někdo pořád stříhá živé ploty, ačkoliv zahradníka nikdo neviděl už sto let. Dej pozor na bludiště: ono dává pozor i na tebe.",
+      "gardenGreeter": "Strážce brány, Živoplotov",
       "valePlaceNotes": "Eastbrook je tvoje první domovská základna. Vlčí stezka a Kančí louka jsou mírná loviště; Zrcadlové jezero je pěkná voda pro rybaření, ač se v jeho mělčinách hemží bahnoploutví; Černopavučina a Měděná štola skrývají pavouky a rudychtivé kopáče; Tábor banditů a Padlá kaple drží drsnější práci; Vrch relikviáře klesá do Zhrouceného relikviáře, první výpravy světa; Mýtina Brightwoodu je tichý, sluncem zalitý háj na severu; a Prasečí pole je hrazené kančbalové hřiště Eastbrooku, kde se pod žňovým příměřím hraje o Pohár údolí.",
       "marshPlaceNotes": "Fenbridge hlídá jedinou suchou cestu. Rákosiny slídilů a Mělčiny Deepfenu se hemží močálovými šelmami a bahenními ploutvemi; Vdoví houština je hustě opředená pavučinami; Utopená kaple a Trollí mohyly drží starší nebezpečí a hned severně od mohyl se otevírá Utopená litanie, vlastní výprava močálu; Tábor Hrobovolajících je zakopaný kult a Potopená bašta je instancované srdce močálu.",
       "peaksPlaceNotes": "Highwatch drží zeď. Hřeben slídilů a Hlubokamenné nory patří hřebenovým kočkám a norníkům; Zlobří podhůří a Drogmarův válečný tábor surovcům za žold; Bouřný skalní štít praská elementály a pod ním září Třpytivé pleso, tůň, jejíž břeh střeží bránu bledého světla dolů do Utopeného chrámu; Stany kultu draka a Pole revenantů obkružují vyvýšeninu kultu, se Svatyní Hrobodraka na vrcholu.",
+      "duskPlaceNotes": "Prastarý svit se shromažďuje pod velkým stromem. Jeskyně Soumračného pádu a její vyhlídka jsou cestou dovnitř a prvním pohledem na údolí; Prastarý háj a Kotlina hvězdného pádu udržují tichý jih; Potopené nádvoří skrývá zarostlé trosky na východě; a Zářící hlubina s Křišťálovými mělčinami svítí přes celý sever.",
+      "emberPlaceNotes": "Dračí hlídka drží bránu. Branní les je poslední zelení před pustinou; Popelové duny se ženou popelem a horšími věcmi; Trollí sněm je místem, kde dyntrollové shromažďují své ohně; Pole krvavého skla se třpytí ostrými střepy; a Kaldera Dračí tlamy je kouřící korunou, kolem které draci krouží.",
+      "frostPlaceNotes": "Ledový plášť udržuje poslední teplé ohniště. Sněžná hranice značí, kde přebírají vládu závěje; Ledovcové jezírko je černá, tichá voda pod ledem; Schody polární záře stoupají pod tančícími světly; Chvějivá bažina je zmrzlá slatina, která nikdy docela neusíná; a Kvílivé terasy si své jméno zaslouží každou noc.",
+      "amberPlaceNotes": "Lucernojezero zář v srdci sklizně. Zlatotání je jantarem kluzký průsmyk dovnitř; Pozlacený sad a Sklizňová kotlina skrývají nejsladší úlovky a nejodvážnější zloděje; Velké jezero zrcadlí hořící listí; Popelojavorové návrší stojí nejvyšší a nejrudější; a Nakloněný monolit pamatuje něco staršího než podzim.",
+      "fenPlaceNotes": "Mostojezero leží obkročmo nad klidnou vodou. Schody Jantarové bažiny sestupují ze sklizňové krajiny; Liliové vřesoviště a Bažinolesklé tůně se třpytí bludičkami a vážkami; Vrbí pláč noří své větve do jezera; a Ospalé pláně jsou tak mírné, jak jen tato zem dovede být.",
+      "nightPlaceNotes": "Měsíční klid drží hlídku. Noční brána je cestou do půlnoční krajiny; Měsíční studna uchovává hvězdné světlo, u kterého můžeš stát; Soumrakové pole kvete ve tmě; Stálá hlídka bdí, aniž by se kdy pohnula; a Bezesná mohyla je jediným místem zde, které nikdy nesní.",
+      "hauntPlaceNotes": "Šibeniční jezero se choulí uvnitř svých lucern. Vraní brána je pochmurnými předními dveřmi lesa; Vdovin houština je hustě spředena pavučinami; Visící mýtina a Kaple Truchlokamene uchovávají nejstarší žal lesa; a Lovcova mýtina patří tomu, co tam ještě pořád loví.",
+      "galePlaceNotes": "Osadní přístav se opírá o vítr. Větrná cesta je cesta útesem dovnitř; Kvílivé stráně se táhnou bez stromů pod vichrem; Starý maják hoří tak dlouho, jak si kdo pamatuje; Sráz padá strmě k vodě; Vraková pole udržují pobřeží poctivé; a Zrcadlové jezírko je tou jedinou tichou věcí v celé říši.",
+      "junglePlaceNotes": "Naplavený přístav udržuje svůj oheň na pláži. Spletené ústí je místem, kde řeka narazí na zelenou hráz; Palmová pláž se táhne bílá a teplá podél příboje; Smaragdová spleť a Liánový pád pohlcují vnitrozemí; Safírová laguna svítí čirá a hluboká; a Potopená modla vyhlíží zpod hladiny.",
+      "gardenPlaceNotes": "Živoplotov čeká u Zahradní brány. Parterová promenáda kvete v zastřižených barvách; Hrad Úsvitu cvičí své rytíře za novými hradbami; Okvětní rybník se rok co rok vznáší v růžové; Starý mlýn obrací své vlastní záhony; Velké bludiště přeskupuje své cesty pro každého hosta, jeho oblouky střeženy listnatými liškami; Severní hlídka střeží výjezdovou cestu; Liliová kotlina odpočívá za tím vším; a Fontánové nádvoří stále čistě protéká v srdci zahrady.",
       "gladeTitle": "Tichý kout: Mýtina Brightwoodu",
       "gladeBody": "Ne každý příběh v údolí je o mrtvých. Na severu si sluncem zalitý háj zvaný Mýtina Brightwoodu drží vlastní jemnější rytmus, samé tiché stezky a skvrnité světlo pod větvemi. Je to měkký protipól cesty, po které jdeš, a stojí za vidění, když ti cesta dá prostor se toulat.",
       "worldBossTitle": "Když se štít probudí: světový boss",
@@ -3514,6 +3677,7 @@ export const cs_CZ: EnTranslations = {
       "bastionBody": "Zaplavená pevnost ztracená v močálu, držená utopenými obránci a samotným stoupajícím přílivem.",
       "templeBody": "Měsíční svatyně potopená pod zářícím plesem vysoko ve štítech, dosažitelná branou studeného světla. Utopený kult tam dole stále zpívá ve shnilých rouchách a varování vyrytá na břehu říkají, že něco níže jen spí. Samostatná záhada mimo hlavní příběh, pro zvědavé a dobře připravené.",
       "sanctumBody": "Temné srdce Thornpeaku, kde dlouhá práce kultu dosáhne strašného vrcholu.",
+      "wildheartBody": "Deštěm promáčená džunglová kaldera, kde dvě vyvýšené lovecké stezky obtáčejí nefritovou cenotu. Projdi doupaty šelem a troskami předků, poté vystoupej na rituální pyramidu, abys čelil Zulgarovi.",
       "raidName": "Endgame raid",
       "raidBody": "Za zapečetěnými královskými dveřmi čeká desetičlenná zkouška: vícefázový boj a nesmrtelná síla, kterou musí celý raid společně vyřadit. Získej si vstup a přiveď devět přátel.",
       "heroicTitle": "Hrdinský režim",
@@ -5062,6 +5226,57 @@ export const cs_CZ: EnTranslations = {
     "chat": "Otevřít chat"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "Všechny trhliny jsou právě nestabilní. Zkus to znovu brzy.",
+      "enterFloor": "Vstupuješ skrz trhlinu do {name}.",
+      "descendFloor": "Sestupuješ hlouběji do {name}.",
+      "stepBack": "Vracíš se zpět skrz trhlinu.",
+      "pylonLit": "Runový pilíř vzplane k životu ({lit}/{total}).",
+      "wayDownOpens": "Cesta dolů se protrhává.",
+      "exitOpens": "Trhlina se zachvěje. Cesta domů se protrhne za padlými.",
+      "portalOpens": "Trhlina stupně {tier} se protrhává v {zone}!",
+      "portalSealed": "Trhlina stupně {tier} v {zone} byla zapečetěna.",
+      "portalCollapses": "Trhlina stupně {tier} v {zone} se hroutí.",
+      "levelGate": "Do této trhliny mohou vstoupit jen dobrodruzi na úrovni {level} nebo vyšší.",
+      "deadEntry": "Nemůžeš vstoupit do trhliny, když jsi mrtvý.",
+      "deadEntryCombat": "Tvá skupina je stále v boji. Mrtví mohou vstoupit znovu, jakmile boj skončí.",
+      "iceGoalLit": "Mrazivé znamení vzplane. Cesta se pohne.",
+      "socketsShut": "Objímky se s vrzáním zavírají. Cesta se pohne.",
+      "seqProgress": "Runy odpovídají popořadě ({step}/{total}).",
+      "seqReset": "Runy pohasnou. Začni znovu.",
+      "gateOpen": "Brána se s vrzáním otevírá.",
+      "orbSealed": "Koule je zapečetěna rituálem dole.",
+      "orbWakes": "Plamen pentagramu dohasíná. Něco se probouzí na oltáři.",
+      "orbOpensGate": "Krvavá koule vzplane. Brány chrámu se s vrzáním otevírají.",
+      "alreadyCleared": "Tuto trhlinu už vyčistil {names}.",
+      "raceLost": "Trhlinu už vyčistil {names}. Tvůj běh končí.",
+      "raceWorldWin": "{names} vyhrál závod trhlinou stupně {tier} za {seconds} s!",
+      "raceWinBanner": "Závod trhlinou vyhrán: {seconds} s",
+      "raceLostBanner": "Trhlina už vyčištěna",
+      "forgeUpgraded": "Vylepšení trhliny dokončeno pro {name}.",
+      "forgeEnchanted": "Okouzlení trhliny dokončeno pro {name}.",
+      "forgeSocketed": "Trhlinový drahokam osazen pro {name}.",
+      "detonateGlacialGrave": "Ledovcový hrob detonuje!",
+      "detonateAbsoluteZero": "Absolutní nula vybuchuje!",
+      "detonateMagmaWell": "Magmová studna vybuchuje!",
+      "detonateCoreMeltdown": "Tavení jádra detonuje!",
+      "detonateVenomPool": "Jedová tůň vybuchuje!",
+      "detonateBroodmothersMark": "Znamení Matky plodu detonuje!",
+      "detonateSoulGrave": "Hrob duší detonuje!",
+      "detonateDeathSentence": "Trest smrti dopadá!",
+      "detonateEarthshatter": "Zemětřas detonuje!",
+      "detonateFinalJudgment": "Poslední soud dopadá!",
+      "detonateVoidRift": "Trhlina prázdnoty detonuje!",
+      "detonateArcaneAnnihilation": "Arkánová anihilace vybuchuje!",
+      "detonateLightningRod": "Hromosvod udeří!",
+      "detonateStormcallersWrath": "Hněv Vyvolávače bouří vybuchuje!",
+      "detonateAbyssalMaw": "Propastná tlama se zavírá!",
+      "detonateCrushingDepth": "Drtivá hlubina drtí!",
+      "detonatePactSeal": "Pečeť paktu detonuje!",
+      "detonateBloodRite": "Krvavý rituál dopadá!",
+      "detonatePitSentence": "Rozsudek jámy detonuje!",
+      "detonateHellfireBrand": "Pekelný cejch detonuje!"
+    },
     "delve": {
       "cannotEnterNow": "Teď nemůžeš vstoupit do výpravy.",
       "leaveDungeonFirst": "Nejdřív opusť dungeon.",
@@ -5545,7 +5760,7 @@ export const cs_CZ: EnTranslations = {
     },
     "augment": {
       "choose": "Vyber vylepšení",
-      "cardAria": "{name} ({category}) - {description}",
+      "cardAria": "{name} ({category}): {description}",
       "aug_brutality": {
         "name": "Brutalita",
         "desc": "Tvoje fyzické údery zasahují o 15 % tvrději."
@@ -5916,6 +6131,8 @@ export const cs_CZ: EnTranslations = {
       "secondsRemaining": "Zbývá {seconds} sekund",
       "enteringZone": "Vstupuješ do {zone}.",
       "welcomeZone": "Vítej v {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Úroveň {level}!",
       "levelLog": "Dosáhl(a) jsi úrovně {level}!",
       "xpGain": "Získáváš {amount} zkušeností.",
@@ -6168,6 +6385,8 @@ export const cs_CZ: EnTranslations = {
       "floatingDodge": "Vyhnutí",
       "floatingParry": "Odraženo",
       "floatingResist": "Odoláno",
+      "floatingHealFull": "Plné",
+      "floatingHealAbsorbed": "Pohlceno",
       "cannotMove": "Nemůžeš se hýbat!",
       "attack": "útok",
       "damageDone": "Tvoje {ability} zasahuje {target} za {amount}.",
@@ -6182,6 +6401,10 @@ export const cs_CZ: EnTranslations = {
       "healSelfCrit": "Tvoje {ability} tě kriticky léčí za {amount}.",
       "healOther": "Tvoje {ability} léčí {target} za {amount}.",
       "healOtherCrit": "Tvoje {ability} kriticky léčí {target} za {amount}.",
+      "healSelfFull": "Tvoje {ability} dopadlo, ale už máš plné zdraví.",
+      "healOtherFull": "Tvoje {ability} dopadlo na {target}, ale cíl už má plné zdraví.",
+      "healSelfAbsorbed": "Tvé {ability} pohlcuje nákaza na tobě.",
+      "healOtherAbsorbed": "Tvé {ability} pohlcuje nákaza na {target}.",
       "death": "{name} umírá.",
       "auraGain": "Získáváš {name}.",
       "auraFade": "{name} z tebe mizí.",
@@ -6540,7 +6763,23 @@ export const cs_CZ: EnTranslations = {
       "fishing": "Rybaření",
       "gathering": "Sběr",
       "demonHeal": "Léčení démona",
-      "thunzharrStormcall": "Volání bouře"
+      "thunzharrStormcall": "Volání bouře",
+      "rift_frost_execution": "Ledovcový hrob",
+      "rift_frost_strike": "Absolutní nula",
+      "rift_ember_execution": "Magmová studna",
+      "rift_ember_strike": "Tavení jádra",
+      "rift_venom_execution": "Jedová tůň",
+      "rift_venom_strike": "Znamení Matky plodu",
+      "rift_necro_execution": "Hrob duší",
+      "rift_necro_strike": "Trest smrti",
+      "rift_brute_execution": "Zemětřas",
+      "rift_brute_strike": "Poslední soud",
+      "rift_arcane_execution": "Trhlina prázdnoty",
+      "rift_arcane_strike": "Arkánová anihilace",
+      "rift_storm_execution": "Hromosvod",
+      "rift_storm_strike": "Hněv Vyvolávače bouří",
+      "rift_tide_execution": "Propastná tlama",
+      "rift_tide_strike": "Drtivá hlubina"
     }
   },
   "questUi": {
@@ -6657,7 +6896,8 @@ export const cs_CZ: EnTranslations = {
       "tool": "Nástroj",
       "potion": "Lektvar",
       "elixir": "Elixír",
-      "bag": "Batoh"
+      "bag": "Batoh",
+      "mount": "Jízdní zvíře"
     },
     "stats": {
       "armor": "Brnění",
@@ -9201,6 +9441,312 @@ export const cs_CZ: EnTranslations = {
       "resonant_timber": {
         "name": "Rezonující dřevo"
       },
+      "duskwisp_essence": {
+        "name": "Esence soumračné bludičky"
+      },
+      "spore_heart": {
+        "name": "Výtrusníkové srdce"
+      },
+      "gleaming_antler": {
+        "name": "Zářivý paroh"
+      },
+      "wisp_mote": {
+        "name": "Zrnko bludičky"
+      },
+      "starfall_shard": {
+        "name": "Střep hvězdného pádu"
+      },
+      "elder_bark": {
+        "name": "Prastará kůra"
+      },
+      "hollow_sealstone": {
+        "name": "Pečetní kámen Kotliny"
+      },
+      "monument_overlook": {
+        "name": "Zvětralý monument"
+      },
+      "monument_court": {
+        "name": "Potopený monument"
+      },
+      "monument_north": {
+        "name": "Zapomenutý monument"
+      },
+      "guardian_core": {
+        "name": "Jádro strážce"
+      },
+      "wardens_seal": {
+        "name": "Pečeť Strážce"
+      },
+      "gleamstag_charm": {
+        "name": "Amulet Zářivého jelena"
+      },
+      "veilsteel_blade": {
+        "name": "Čepel ze závojové oceli"
+      },
+      "duskfang_dirk": {
+        "name": "Dýka Soumračného tesáku"
+      },
+      "gleamwood_stave": {
+        "name": "Hůl ze zářivého dřeva"
+      },
+      "wardens_oathband": {
+        "name": "Přísežní prsten Strážce"
+      },
+      "wardplate_cuirass": {
+        "name": "Kyrys ochranné desky"
+      },
+      "nightweave_tunic": {
+        "name": "Tunika Nočního tkaní"
+      },
+      "veilcloth_robe": {
+        "name": "Roucho ze závojoviny"
+      },
+      "rift_essence": {
+        "name": "Esence trhliny"
+      },
+      "rift_gem_crimson": {
+        "name": "Karmínový drahokam trhliny"
+      },
+      "rift_gem_azure": {
+        "name": "Blankytný drahokam trhliny"
+      },
+      "rift_gem_verdant": {
+        "name": "Zelenavý drahokam trhliny"
+      },
+      "riftbound_band_of_might": {
+        "name": "Trhlinou spoutaný prsten Síly"
+      },
+      "riftbound_band_of_insight": {
+        "name": "Trhlinou spoutaný prsten Vhledu"
+      },
+      "riftbound_band_of_guile": {
+        "name": "Trhlinou spoutaný prsten Lsti"
+      },
+      "hoarfrost_edge": {
+        "name": "Čepel jinovatky"
+      },
+      "emberforge_gauntlets": {
+        "name": "Rukavice Žhavé kovárny"
+      },
+      "broodmother_carapace": {
+        "name": "Krunýř Matky plodu"
+      },
+      "bonelord_mantle": {
+        "name": "Plášť Kostipána"
+      },
+      "graskbreaker_girdle": {
+        "name": "Opasek Graskova zhoubce"
+      },
+      "voidscar_handwraps": {
+        "name": "Omotávky Jizvy prázdnoty"
+      },
+      "stormscale_treads": {
+        "name": "Boty bouřošupin"
+      },
+      "abyssal_loop": {
+        "name": "Propastná smyčka"
+      },
+      "pactbound_vestments": {
+        "name": "Paktem svázané roucho"
+      },
+      "pitlords_cleaver": {
+        "name": "Sekáč Pána Jámy"
+      },
+      "emberforged_bulwark": {
+        "name": "Žhavě kovaný val"
+      },
+      "stormsunder_hood": {
+        "name": "Kápě Bouřerozrážeče"
+      },
+      "voidweave_mantle": {
+        "name": "Plášť tkaný prázdnotou"
+      },
+      "abysswrought_band": {
+        "name": "Propastí kovaný prsten"
+      },
+      "heart_of_the_rift": {
+        "name": "Srdce trhliny"
+      },
+      "voidsong_dirk": {
+        "name": "Píseň prázdnoty, dýka Roztrženého závoje"
+      },
+      "wildheart_tuskblade": {
+        "name": "Klová čepel Divokého srdce"
+      },
+      "wildheart_hexwood_staff": {
+        "name": "Hůl z prokletého dřeva Kotliny"
+      },
+      "wildheart_fangknife": {
+        "name": "Tesákový nůž Zulgara"
+      },
+      "thick_winter_pelt": {
+        "name": "Silná zimní kožešina"
+      },
+      "aurora_mote": {
+        "name": "Zrnko polární záře"
+      },
+      "hearth_ember_cache": {
+        "name": "Skrýš žhavých uhlíků"
+      },
+      "sprung_trap": {
+        "name": "Spuštěná bažinná past"
+      },
+      "hearthlined_treads": {
+        "name": "Boty podšité ohništěm"
+      },
+      "frostmane_mantle": {
+        "name": "Plášť Mrazivé hřívy"
+      },
+      "ashbone_war_brand": {
+        "name": "Popelokostní válečný cejch"
+      },
+      "emberwing_scale": {
+        "name": "Šupina Žhavokřídlého draka"
+      },
+      "scorched_supply_crate": {
+        "name": "Ožehnutá zásobovací bedna"
+      },
+      "wyrmwatch_warning_banner": {
+        "name": "Varovný praporec Dračí hlídky"
+      },
+      "cinderwalk_treads": {
+        "name": "Boty popelochodce"
+      },
+      "mawscale_pauldrons": {
+        "name": "Nárameníky tlamošupin"
+      },
+      "gilded_sap_clot": {
+        "name": "Pozlacená hrudka mízy"
+      },
+      "amberfall_sap_bucket": {
+        "name": "Vědro na sběr mízy"
+      },
+      "mere_ferry_lantern": {
+        "name": "Přívozní lucerna"
+      },
+      "orchard_sapbinder_grips": {
+        "name": "Rukavice pojiče mízy"
+      },
+      "mantle_of_the_meredark": {
+        "name": "Plášť Jezerotmy"
+      },
+      "plump_fen_eel": {
+        "name": "Baculatý bažinný úhoř"
+      },
+      "wisplight_globe": {
+        "name": "Koule bludičkového světla"
+      },
+      "fenway_mooring_line": {
+        "name": "Přeříznuté kotevní lano"
+      },
+      "bridgemere_toll_chest": {
+        "name": "Potopená pokladnice mýtného"
+      },
+      "eelskin_mudwaders": {
+        "name": "Bahenní holínky z úhoří kůže"
+      },
+      "lilybed_mantle": {
+        "name": "Plášť liliového záhonu"
+      },
+      "moonfleece_tuft": {
+        "name": "Chomáč měsíčního rouna"
+      },
+      "gloamfield_nightbloom": {
+        "name": "Květ Nočního květu"
+      },
+      "vigil_star_chart": {
+        "name": "Hvězdná mapa Hlídky"
+      },
+      "barrow_grave_offering": {
+        "name": "Rozptýlený hrobový dar"
+      },
+      "moonfleece_mitts": {
+        "name": "Palčáky z měsíčního rouna"
+      },
+      "barrowshade_mantle": {
+        "name": "Plášť mohylového stínu"
+      },
+      "widowsilk_skein": {
+        "name": "Přadeno vdovího hedvábí"
+      },
+      "gallowmere_grave_candle": {
+        "name": "Hrobová svíce"
+      },
+      "silkbound_remains": {
+        "name": "Hedvábím ovinuté ostatky"
+      },
+      "gravebound_silk_wraps": {
+        "name": "Hrobem svázané hedvábné omotávky"
+      },
+      "mantle_of_the_unhorsed": {
+        "name": "Plášť sesazeného z koně"
+      },
+      "pearlwake_cargo_crate": {
+        "name": "Nákladní bedna Perlové brázdy"
+      },
+      "canopy_silk_hank": {
+        "name": "Přadeno korunového hedvábí"
+      },
+      "sunken_offering_bowl": {
+        "name": "Znovunaplněná obětní mísa"
+      },
+      "saltwalker_sandals": {
+        "name": "Sandály Solného chodce"
+      },
+      "sunken_idol_mantle": {
+        "name": "Plášť potopené modly"
+      },
+      "hedgewick_shears": {
+        "name": "Ukradené nůžky Živoplotova"
+      },
+      "evergarden_bloom_clipping": {
+        "name": "Ostřihaná květinová sazenice"
+      },
+      "hedgewick_tool_cart": {
+        "name": "Převrácený vozík s nářadím"
+      },
+      "evergarden_statue_rubbing": {
+        "name": "Otisk sochy"
+      },
+      "shearkeeper_gloves": {
+        "name": "Rukavice Strážce srázu"
+      },
+      "fountain_court_mantle": {
+        "name": "Plášť Fontánového nádvoří"
+      },
+      "galecrest_ram_wool": {
+        "name": "Mastná beraní vlna"
+      },
+      "shear_storm_lantern": {
+        "name": "Zhasnutá bouřková lucerna"
+      },
+      "wreckfield_flotsam_crate": {
+        "name": "Bedna naplaveného dřeva"
+      },
+      "wickspun_treads": {
+        "name": "Boty knotového předení"
+      },
+      "wreck_wardens_mantle": {
+        "name": "Plášť Strážce vraku"
+      },
+      "breakscarred_steel": {
+        "name": "Průlomem zjizvená ocel"
+      },
+      "farshore_salt_moss": {
+        "name": "Slaný mech Vzdáleného pobřeží"
+      },
+      "gullhaven_watchbell": {
+        "name": "Pobřežní strážní zvon"
+      },
+      "saltforged_grips": {
+        "name": "Solí kované rukavice"
+      },
+      "mantle_of_the_unbroken_shore": {
+        "name": "Plášť nezlomeného pobřeží"
+      },
+      "last_keep_signet": {
+        "name": "Signet Poslední tvrze"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -9932,6 +10478,30 @@ export const cs_CZ: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Pás volajícího bouři"
+      },
+      "riding_training": {
+        "name": "Jezdecký výcvik"
+      },
+      "reins_valorsteed": {
+        "name": "Otěže Valorsteeda"
+      },
+      "reins_grag_bear": {
+        "name": "Otěže Goliáše Grag-medvěda"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Otěže mechokrunýřového plachtíka"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Startovací klíč: Éterové vznášecí kolo"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Otěže Kama-Kageho, ropuchy stínového skoku"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Otěže Bouřopera Nebedosahujícího"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Otěže Hromokroka, velkého krocana"
       }
     },
     "mobs": {
@@ -10181,6 +10751,312 @@ export const cs_CZ: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Probuzený bouřník"
       },
+      "stable_horse": {
+        "name": "Stájový kůň"
+      },
+      "rift_spawnling": {
+        "name": "Trhlinové plůdě"
+      },
+      "rift_bonewalker": {
+        "name": "Vstalý kostichodec"
+      },
+      "rift_frost_revenant": {
+        "name": "Mrazem spoutaný revenant"
+      },
+      "rift_rime_elemental": {
+        "name": "Jinovatkový elementál"
+      },
+      "rift_ember_fiend": {
+        "name": "Žhavý běs"
+      },
+      "rift_magma_brute": {
+        "name": "Magmová bestie"
+      },
+      "rift_venom_weaver": {
+        "name": "Jedotkadlec"
+      },
+      "rift_thornback": {
+        "name": "Trnohřbetý plíživec"
+      },
+      "rift_boneclad": {
+        "name": "Kostiodění válečník"
+      },
+      "rift_marrow_troll": {
+        "name": "Morkový troll"
+      },
+      "rift_void_acolyte": {
+        "name": "Akolyta Jizvy prázdnoty"
+      },
+      "rift_dread_stalker": {
+        "name": "Děsivý plíživec"
+      },
+      "rift_storm_caller": {
+        "name": "Vyvolávač bouří"
+      },
+      "rift_stormscale": {
+        "name": "Bouřošupinatý drak"
+      },
+      "rift_tide_thrall": {
+        "name": "Otrok přílivu"
+      },
+      "rift_deep_lurker": {
+        "name": "Hlubinný číhal"
+      },
+      "rift_stone_ogre": {
+        "name": "Kamenný zlobr"
+      },
+      "rift_boss_frost": {
+        "name": "Strážce jinovatky"
+      },
+      "rift_boss_ember": {
+        "name": "Tyran Žhavé kovárny"
+      },
+      "rift_boss_venom": {
+        "name": "Matka plodu Vysska"
+      },
+      "rift_boss_necro": {
+        "name": "Kostipán Xarreth"
+      },
+      "rift_boss_brute": {
+        "name": "Válečný vládce Grask"
+      },
+      "rift_boss_arcane": {
+        "name": "Archont Nyxaris"
+      },
+      "rift_boss_storm": {
+        "name": "Bouře Vharok"
+      },
+      "rift_boss_tide": {
+        "name": "Propastná tlama"
+      },
+      "glimmerwisp": {
+        "name": "Třpytivá bludička"
+      },
+      "duskwisp": {
+        "name": "Soumračná bludička"
+      },
+      "veiled_stag": {
+        "name": "Zahalený jelen"
+      },
+      "veiled_doe": {
+        "name": "Zahalená laň"
+      },
+      "gleamstag": {
+        "name": "Zářivý jelen"
+      },
+      "sporeling_gatherer": {
+        "name": "Výtrusníkový sběrač"
+      },
+      "corrupted_sporeling": {
+        "name": "Zkažený výtrusník"
+      },
+      "mushroom_pixie": {
+        "name": "Skřítek Zářilidu"
+      },
+      "treant_elder": {
+        "name": "Starší stromový obr"
+      },
+      "ancient_guardian": {
+        "name": "Prastarý strážce"
+      },
+      "waking_warden": {
+        "name": "Probouzející se strážce"
+      },
+      "old_marrowshell": {
+        "name": "Starý Morkoškeble"
+      },
+      "aurelhorn": {
+        "name": "Aurelhorn, první ze stáda"
+      },
+      "snowdrift_wolf": {
+        "name": "Vlk ze závěje"
+      },
+      "ice_wisp": {
+        "name": "Ledová bludička"
+      },
+      "rime_elemental": {
+        "name": "Jinovatkový elementál"
+      },
+      "fen_sprite": {
+        "name": "Bažinná víla"
+      },
+      "frostmane_yeti": {
+        "name": "Yeti s mrazivou hřívou"
+      },
+      "terrace_howler": {
+        "name": "Terasový vytec"
+      },
+      "apprentice_wren": {
+        "name": "Učednice Wren"
+      },
+      "emberwing_drake": {
+        "name": "Žhavokřídlý drak"
+      },
+      "ashbone_raider": {
+        "name": "Popelokostní nájezdník"
+      },
+      "ashbone_warcaller": {
+        "name": "Popelokostní svolávač války"
+      },
+      "dune_troll": {
+        "name": "Dunový troll"
+      },
+      "cindraleth_maw_matriarch": {
+        "name": "Cindraleth, matriarcha Tlamy"
+      },
+      "gilded_stag": {
+        "name": "Pozlacený jelen"
+      },
+      "gloam_fox": {
+        "name": "Soumraková liška"
+      },
+      "orchard_treant": {
+        "name": "Sadový stromový obr"
+      },
+      "the_meredark": {
+        "name": "Jezerotma"
+      },
+      "harvest_sprite": {
+        "name": "Sklizňová víla"
+      },
+      "mere_lurker": {
+        "name": "Jezerní číhal"
+      },
+      "bogtoad": {
+        "name": "Bažinná ropucha"
+      },
+      "drowsy_croaker": {
+        "name": "Ospalý kvákal"
+      },
+      "lily_wisp": {
+        "name": "Liliová bludička"
+      },
+      "willow_sprite": {
+        "name": "Vrbová víla"
+      },
+      "moonfleece_grazer": {
+        "name": "Spasovač měsíčního rouna"
+      },
+      "gloam_strider": {
+        "name": "Soumrakový chodec"
+      },
+      "nightkin_stargazer": {
+        "name": "Hvězdopozorovatel Nočního rodu"
+      },
+      "barrow_king": {
+        "name": "Mohylový král"
+      },
+      "barrow_wight": {
+        "name": "Mohylové strašidlo"
+      },
+      "widowsilk_spinner": {
+        "name": "Předoucí vdovohedvábník"
+      },
+      "wood_wraith": {
+        "name": "Lesní přízrak"
+      },
+      "gravenbark_shambler": {
+        "name": "Rytokorý vlekoun"
+      },
+      "pale_huntsman": {
+        "name": "Bledý lovec"
+      },
+      "gravedigger_mosley": {
+        "name": "Hrobník Mosley"
+      },
+      "tide_scuttler": {
+        "name": "Přílivový pobíhal"
+      },
+      "thicket_boar": {
+        "name": "Houštinový kanec"
+      },
+      "canopy_weaver": {
+        "name": "Korunotkadlec"
+      },
+      "idol_guardian": {
+        "name": "Strážce modly"
+      },
+      "castaway_navigator": {
+        "name": "Navigátorka Suli"
+      },
+      "topiary_stag": {
+        "name": "Zastřihovaný jelen"
+      },
+      "topiary_wolf": {
+        "name": "Zastřihovaný vlk"
+      },
+      "hedge_gnome": {
+        "name": "Živoplotový gnóm"
+      },
+      "hedge_knight": {
+        "name": "Rytíř Hradu Úsvitu"
+      },
+      "the_topiary_bull": {
+        "name": "Zastřihovaný býk"
+      },
+      "moor_ram": {
+        "name": "Vřesovištní beran"
+      },
+      "gale_wisp": {
+        "name": "Vichrná bludička"
+      },
+      "shoal_scuttler": {
+        "name": "Mělčinový pobíhal"
+      },
+      "downs_bandit": {
+        "name": "Bandita ze strání"
+      },
+      "wreck_thief": {
+        "name": "Zloděj z Vrakových polí"
+      },
+      "the_wreck_warden": {
+        "name": "Strážce vraku"
+      },
+      "drowned_deckhand": {
+        "name": "Utopený lodník"
+      },
+      "riftspawn": {
+        "name": "Trhlinozplozenec"
+      },
+      "breach_wretch": {
+        "name": "Průlomový ubožák"
+      },
+      "void_stalker": {
+        "name": "Plíživec prázdnoty"
+      },
+      "sundered_horror": {
+        "name": "Rozpolcená hrůza"
+      },
+      "fisher_bram": {
+        "name": "Rybář Bram"
+      },
+      "rift_hellguard": {
+        "name": "Pekelná stráž"
+      },
+      "rift_pact_acolyte": {
+        "name": "Paktový akolyta"
+      },
+      "rift_boss_ritualist": {
+        "name": "Mág Vel'Kor Paktovaný"
+      },
+      "rift_boss_pitlord": {
+        "name": "Azgorath, pán Jámy"
+      },
+      "wildheart_stalker": {
+        "name": "Liánodrápý plíživec"
+      },
+      "wildheart_ravager": {
+        "name": "Krvavohřívý pustošitel"
+      },
+      "wildheart_hexcaller": {
+        "name": "Slunečněkostní přivolávač kleteb"
+      },
+      "wildheart_beastmaster": {
+        "name": "Tesákopán, krotitel zvěře"
+      },
+      "wildheart_high_priest": {
+        "name": "Zulgar, hlas Kotliny"
+      },
       "ironvein_foreman": {
         "name": "Předák Železné žíly"
       },
@@ -10334,6 +11210,11 @@ export const cs_CZ: EnTranslations = {
         "title": "Důlní předák",
         "greeting": "Celý výkop se hemží tou špínou obalenou havětí!"
       },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Správkyně stájí",
+        "greeting": "Každý jezdec sem přijde po svých, {className}. Otěže nedostaneš, dokud neusedneš na Valorsteeda, aniž bys skončil v blátě, a Highwatch nemá ranhojiče nazbyt pro zlomené kosti."
+      },
       "warden_fenwick": {
         "name": "Strážce Fenwick",
         "title": "Strážce Fenbridge",
@@ -10463,6 +11344,246 @@ export const cs_CZ: EnTranslations = {
         "name": "Kronikářka Zenzie",
         "title": "Kronika výšin",
         "greeting": "Hora nezapomíná na nic, {playerName}, a já také ne. Podívejme se, co máš za sebou."
+      },
+      "keeper_saelwyn": {
+        "name": "Strážce Saelwyn",
+        "title": "Strážce Kotliny",
+        "greeting": "Málo z tvého druhu stálo pod těmito větvemi, {className}. Choď opatrně a buď vítán."
+      },
+      "loremother_bryn": {
+        "name": "Pověstmatka Bryn",
+        "title": "Hlas svatyně",
+        "greeting": "Každé světlo v tomto údolí si něco pamatuje, {playerName}. Pomoz mi naslouchat."
+      },
+      "provisioner_fenna": {
+        "name": "Zásobovatelka Fenna",
+        "title": "Zásobovatelka Prastarého svitu",
+        "greeting": "Chléb ještě teplý, voda ještě sladká. Kotlina poskytuje, a já také."
+      },
+      "wardsmith_orun": {
+        "name": "Runokovář Orun",
+        "title": "Strážce starých kováren",
+        "greeting": "Tyto kovárny vychladly před staletími, {className}, ale jejich dílo si stále drží ostří."
+      },
+      "archivist_tullo": {
+        "name": "Archivář Tullo",
+        "title": "Čtenář kamenů",
+        "greeting": "Ty monumenty tam venku k nikomu nepromluvily už věky. Možná čekaly na nové uši."
+      },
+      "huntsman_deral": {
+        "name": "Lovec Deral",
+        "title": "Strážce stád",
+        "greeting": "Teď tiše. Stádo zná každý zvuk, který toto údolí vydává, a já také."
+      },
+      "warden_kaldra": {
+        "name": "Strážkyně Kaldra",
+        "title": "Strážkyně Ledového pláště",
+        "greeting": "Dávej pozor na římsy, cizinče. Sníh si podrží, co si vezme."
+      },
+      "hearthkeeper_maeve": {
+        "name": "Strážkyně ohniště Maeve",
+        "title": "Strážkyně Ohnišťové chaty",
+        "greeting": "Pojď dovnitř z chladu. Oheň v chatě nezhasne, dokud dýchám."
+      },
+      "scout_einna": {
+        "name": "Zvěd Einna",
+        "title": "Zvěd Sněžné hranice",
+        "greeting": "Prošla jsi průsmykem živá. Dobře. Ledový plášť by se to měl dozvědět."
+      },
+      "aurorist_veyla": {
+        "name": "Zářověštkyně Veyla",
+        "title": "Čtenářka světel",
+        "greeting": "Tiše. Světla dnes v noci mluví, a neopakují se."
+      },
+      "trapper_brosk": {
+        "name": "Lapač Brosk",
+        "title": "Lapač z Chvějivé bažiny",
+        "greeting": "Bažina si tento týden vzala tři mé linky. Bažina si nevzala žádnou linku po dvacet let."
+      },
+      "gatecaptain_brannoc": {
+        "name": "Kapitán brány Brannoc",
+        "title": "Velitel Dračí hlídky",
+        "greeting": "Dračí hlídka drží bránu. Držela ji čtyřicet let. Bude ji držet i dnes v noci."
+      },
+      "quartermaster_sela": {
+        "name": "Intendantka Sela",
+        "title": "Strážkyně posádkových zásob",
+        "greeting": "Každá bedna na tomto dvoře urazila čtyřicet mil popela, aby se sem dostala. Zacházej s nimi šetrně."
+      },
+      "scout_yerrin": {
+        "name": "Zvěd Yerrin",
+        "title": "Hlídač Vzdálených dun",
+        "greeting": "Drž se při zemi. Zvuk se od skla nese podivně, a brána dole má uši."
+      },
+      "reeve_ottoline": {
+        "name": "Rychtářka Ottoline",
+        "title": "Rychtářka Lucernojezera",
+        "greeting": "Vítej v Lucernojezeru, kde sklizeň nikdy nekončí, a stejně tak ani práce."
+      },
+      "waywatcher_sorrel": {
+        "name": "Hlídač cesty Sorrel",
+        "title": "Hlídač Zlatotání",
+        "greeting": "Sníh za tebou, zlato před tebou. Málokdo projde Zlatotáním dvakrát, tak ať ten přechod stojí za to."
+      },
+      "ferrymaster_caddow": {
+        "name": "Mistr převozu Caddow",
+        "title": "Strážce lucernových přívozů",
+        "greeting": "Nad jezerem je zase mlha. Když lucerny na vodě zhasnou, moudří lidé zůstávají na břehu."
+      },
+      "orchardist_pomeline": {
+        "name": "Sadařka Pomeline",
+        "title": "Strážkyně pozlacených řad",
+        "greeting": "Dávej pozor, kam šlapeš. Každý kořen v těchto řadách je starší než město, a pamatují si."
+      },
+      "waykeeper_pell": {
+        "name": "Strážce cesty Pell",
+        "title": "Strážce Schodů Jantarové bažiny",
+        "greeting": "Dolů po schodech a do měkké krajiny. Dávej pozor, kam stavíš boty."
+      },
+      "bridgewright_alden": {
+        "name": "Mostař Alden",
+        "title": "Mistr Bažinné cesty",
+        "greeting": "Každé prkno v tomto městě je moje starost, a bažina je všechna okusuje."
+      },
+      "netter_maris": {
+        "name": "Sítařka Maris",
+        "title": "Úhoří sítařka z Mostojezera",
+        "greeting": "Cítíš to? Uzený úhoř. Polovina tohoto města stojí na kůlech, které jsem si díky němu koupila."
+      },
+      "mother_sedge": {
+        "name": "Matka Sedge",
+        "title": "Bažinná čarodějka z Vrbího pláče",
+        "greeting": "Vrby mi řekly, že přicházíš, ještě než tvé boty opustily most."
+      },
+      "lamplighter_sorrel": {
+        "name": "Lampář Sorrel",
+        "title": "Strážce Noční brány",
+        "greeting": "Dávej pozor na lampy, příteli. Za touto branou se slunce vzdává a květiny přebírají vládu."
+      },
+      "lira_dewsong": {
+        "name": "Lira Dewsong",
+        "title": "Noční zahradnice Měsíčního klidu",
+        "greeting": "Vítej v Měsíčním klidu, kde za nás svítání obstarávají květiny."
+      },
+      "weaver_amelle": {
+        "name": "Tkadlena Amelle",
+        "title": "Tkadlena měsíčního rouna",
+        "greeting": "Cítíš to? Měsíční rouno na stavu. Teplejší než jakýkoliv oheň, u kterého jsi kdy seděl."
+      },
+      "astronomer_cassian": {
+        "name": "Astronom Cassian",
+        "title": "Hlídač u Hlídky",
+        "greeting": "Teď tiše. Obloha tu nikdy nesvítá, takže také nikdy nepřestává mluvit."
+      },
+      "lampman_cobb": {
+        "name": "Lucerník Cobb",
+        "title": "Strážce lucern Vraní brány",
+        "greeting": "Zůstaň ve světle lampy, příteli. Les počítá každého, kdo projde branou."
+      },
+      "sexton_marrow": {
+        "name": "Kostelník Marrow",
+        "title": "Kostelník Šibeničního jezera",
+        "greeting": "Pohřbíváme je tu hluboko a zvoníme na zvony, aby si pamatovali zůstat dole."
+      },
+      "widow_tansy": {
+        "name": "Vdova Tansy",
+        "title": "Svícařka Šibeničního jezera",
+        "greeting": "Svíce pro každý hrob, a ani jedna nesmí zhasnout. Ani jedna, slyšíš mě?"
+      },
+      "vicar_creel": {
+        "name": "Vikář Creel",
+        "title": "Poslední vikář Truchlokamene",
+        "greeting": "Kaple se zřítila před lety. Mrtví pod ní si toho nevšimli, a tak jsem zůstal."
+      },
+      "strandwatcher_pell": {
+        "name": "Strážce pobřeží Pell",
+        "title": "Hlídač Spleteného ústí",
+        "greeting": "Konečně venku z černých stromů. Dýchej, cizinče, slunce drží tuto stranu průsmyku."
+      },
+      "salvage_boss_ryna": {
+        "name": "Vrakařská předačka Ryna",
+        "title": "Paní Vrakové linie",
+        "greeting": "{className} s funkčníma rukama, dobře. Vraková linie dobře platí, pokud ti krabi nechají dost prstů, abys to spočítal."
+      },
+      "pearlmother_isha": {
+        "name": "Perlová matka Isha",
+        "title": "Starší potápěčů",
+        "greeting": "Moře dává, písek uchovává a džungle bere. Zůstaň na pláži, cizinče."
+      },
+      "hermit_okku": {
+        "name": "Okku",
+        "title": "Muž, který vešel dovnitř",
+        "greeting": "Teď tiše. Bubny počítají všechno, co chodí pod stromy, a už spočítaly i tebe."
+      },
+      "gatewarden_pell": {
+        "name": "Strážce brány Pell",
+        "title": "Strážce Zahradní brány",
+        "greeting": "Dávej pozor, jak chodíš po trávnících. Zahrada je udržuje zastřižené a má je ráda upravené."
+      },
+      "head_gardener_amaranth": {
+        "name": "Vrchní zahradnice Amaranth",
+        "title": "Vrchní zahradnice Věčné zahrady",
+        "greeting": "Nevšímej si stínů pod mýma očima. Někdo musí zůstat vzhůru, zatímco zahrada sní."
+      },
+      "wickmother_sorrel": {
+        "name": "Hostinská Sorrel",
+        "title": "Strážkyně hostince Živoplotov",
+        "greeting": "Pojď dál, posaď se, na ohni je nápoj. Jen měj ruku na všem železném: gnómové mají v poslední době lehké prsty."
+      },
+      "gardener_yew": {
+        "name": "Zahradník Yew",
+        "title": "Poslední zahradník",
+        "greeting": "Podal bys mi ten kolečko? Tyhle trávníky se sami nesekají, ať si vesnice myslí cokoliv."
+      },
+      "watcher_maren": {
+        "name": "Hlídačka Maren",
+        "title": "Hlídka Větrné cesty",
+        "greeting": "Dávej pozor na krok za branou. Vítr tu nahoře bere nejdřív klobouky a otázky nikdy."
+      },
+      "harbormaster_odile": {
+        "name": "Přístavní mistr Odile",
+        "title": "Přístavní mistr Osadního přístavu",
+        "greeting": "Každá loď v této zátoce vděčí za svůj kýl Starému majáku. Mluv rychle, příliv nebude čekat."
+      },
+      "keeper_bram": {
+        "name": "Strážce Bram",
+        "title": "Strážce Starého majáku",
+        "greeting": "Devětatřicet let hořela tato lampa pod mou hlídkou. Nezhasne pod tvou."
+      },
+      "salvager_edda": {
+        "name": "Vrakařka Edda",
+        "title": "Vrakařka z Vrakových polí",
+        "greeting": "Vrakové dřevo, lana a náklad mrtvých mužů. Moře platí mou mzdu, když to Strážce dovolí."
+      },
+      "warden_coalfast": {
+        "name": "Strážce Coalfast",
+        "title": "Velitel pevnůstky",
+        "greeting": "Průlomům je jedno, že Racčí přístav je malý, {className}. Buď držíme toto pobřeží, nebo žádné pobřeží k držení nezůstane. Stůj při nás, a já to nezapomenu."
+      },
+      "riftwatch_ollun": {
+        "name": "Trhlinohlídač Ollun",
+        "title": "Učenec průlomů",
+        "greeting": "Každý průlom zpívá, než se otevře, pokud na to máš ucho. Právě teď slyším, jak se na ostrově hýbou tři, a jeden z nich je blízko."
+      },
+      "quartermaster_edda": {
+        "name": "Intendantka Edda",
+        "title": "Zbrojířka pevnůstky",
+        "greeting": "Ocel a sůl, {className}, to je vše, co mi zbývá rozdávat. Vezmi si to a přiměj průlomy litovat, že se otevřely tam, kam jsem dosáhla."
+      },
+      "mender_saul": {
+        "name": "Ranhojič Saul",
+        "title": "Polní chirurg",
+        "greeting": "Za tento jediný měsíc jsem narovnal víc kostí než za deset let léčení rybářských úrazů. Průlomy nenechávají moc z toho, co si vezmou. Vrať se ke mně celý, pokud to dokážeš zařídit."
+      },
+      "bellkeeper_tam": {
+        "name": "Strážce zvonu Tam",
+        "title": "Strážce hlídkového zvonu",
+        "greeting": "Zvon je jediné varování, které nám průlomy dávají, {className}. Jedno zazvonění pro pole, dvě pro útesy, tři, když je to tak blízko, že útěk nepomůže. Měj na něj uši nastražené, a možná tě udrží celého."
+      },
+      "fisher_nell": {
+        "name": "Vyděšená Nell",
+        "title": "Rybářka z Racčího přístavu",
+        "greeting": "Otevřelo se to přesně tam, kde schnou sítě. Přesně tam, kde jsem stávala každé ráno svého života. Už nechodím dolů k pobřeží. Už skoro nikam nechodím."
       },
       "forgemistress_darva": {
         "name": "Mistryně kovárny Darva",
@@ -11433,6 +12554,192 @@ export const cs_CZ: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Jezdecké lekce",
+        "text": "Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Zaplať poplatek, a až dám pokyn, přivolej cvičného Valorsteeda a vylez do sedla. Pak projeď parkur: sleduj značku ke startovnímu oblouku, vezmi každý skok čistě a znovu projeď cílem, než se přesýpací hodiny vyprázdní. Dokážeš to, a sedlo je tvoje. Zatouláš se z ohrady a začínáme znovu.",
+        "completion": "Tak. Nahoru jedním plynulým pohybem a v sedle pevně jako skála. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.",
+        "objectives": {
+          "0": {
+            "label": "Zkroť Valorsteeda"
+          }
+        }
+      },
+      "q_veil_thinned": {
+        "title": "Ztenčený závoj",
+        "text": "Takže se ti jeskyně otevřela. Pak je pečeť slabší, než jsem se obávala, {playerName}. Tam, kde se závoj trhá, bludičky ztmavnou a zchladnou. Přines mi osm esencí ze soumračných bludiček a já přečtu, jak hluboko rána sahá.",
+        "completion": "Studené, každá z nich. Kotlina má možná ještě sezónu, než se roztržení stane trhlinou. Máme práci, ty a já.",
+        "objectives": {
+          "0": {
+            "label": "Esence soumračné bludičky"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "Zářivé parohy",
+        "text": "Zahalení jeleni vyzařují světlo tam, kde se pasou, a jejich shozené parohy si ho udrží celé roky. Pět z nich, ze stád na otevřené mýtině v srdci údolí, a mé lucerny prohoří celou zimu bez oleje. Jelenům se nemusí ublížit, ale nerozloučí se s nimi snadno.",
+        "completion": "Podívej se, jak drží světlo! Žádný plamen, žádný kouř, jen záře. Kotlina poskytuje.",
+        "objectives": {
+          "0": {
+            "label": "Zářivý paroh"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "Světla mělčin",
+        "text": "Třpytivé bludičky nesou zrnka starého hvězdného světla, které sem spadlo, když byla Kotlina zapečetěna. Šest zrnek, a svatyňové lampy budou hořet celý rok. Ber jen od těch, co blednou; Kotlina dává dost i bez hrabivosti.",
+        "completion": "Jemná jako první hvězdy. Polož je sem k oltáři; svatyně udělá zbytek.",
+        "objectives": {
+          "0": {
+            "label": "Zrnko bludičky"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "Uklidnění hlubiny",
+        "text": "Výtrusníci ze Zářící hlubiny byli mírumilovný lid, než se roztržení dotklo jejich kruhů. Co si zkaženost vezme, to nevrací. Dopřej zkaženým odpočinek, {playerName}: deset z nich, na severu hlubiny.",
+        "completion": "Udělal jsi to, co jsem nedokázal snést. Sběrači stále zpívají v jižních kruzích; díky tobě budou zpívat dál.",
+        "objectives": {
+          "0": {
+            "label": "Zkažený výtrusník uložen k odpočinku"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "Srdce kruhu",
+        "text": "Když výtrusník padne temnotě, jeho srdce dál bije s vypůjčeným stínem. Čtyři z těchto srdcí, očištěná u svatyně, nás mohou naučit, jak se zkaženost šíří. Je to ponurá práce, {playerName}, ale je to práce, která léčí.",
+        "completion": "Tak. Očištěná, a tichá. Každé z nich ukazuje stejnou známku: stín proudí Z Potopeného nádvoří. Řekni to Saelwynovi.",
+        "objectives": {
+          "0": {
+            "label": "Výtrusníkové srdce"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "Co si kameny pamatují",
+        "text": "Tři monumenty stále stojí z doby před zapečetěním: jeden na Vyhlídce Soumračného pádu, jeden na Potopeném nádvoří, a jeden ztracený daleko na severovýchodě, kam nikdo nechodí. Přečti mi je, {playerName}. Má kolena to vzdala před dvěma staletími schodů.",
+        "completion": "Vyhlídka, nádvoří a zapomenutý kout... a všechny tři verše zapečeťovací písně, pohromadě poprvé od doby, kdy byla zpívána. Udělal jsi staré čtenářce velkou radost.",
+        "objectives": {
+          "0": {
+            "label": "Monument Vyhlídky přečten"
+          },
+          "1": {
+            "label": "Monument Nádvoří přečten"
+          },
+          "2": {
+            "label": "Zapomenutý monument přečten"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "Hrozba v mýtině",
+        "text": "Soumračné bludičky se po setmění začaly vznášet mezi mými stánky, {playerName}, a jejich chlad kazí vše, čeho se dotkne. Prořeď je pro mě: deset z nich, kdekoliv se závoj roztrhl.",
+        "completion": "Noční trh může znovu otevřít. Máš zákaznici na celý život, nebo aspoň slevu.",
+        "objectives": {
+          "0": {
+            "label": "Soumračná bludička rozehnána"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "Střepy hvězdného pádu",
+        "text": "Když soumračné bludičky přelétnou přes křišťálová pole, ulpí na nich úlomky starého hvězdného světla jako bodláčí. Šest střepů, {playerName}, a já dokážu datovat zapečetění na přesnou sezónu, kdy bylo zazpíváno.",
+        "completion": "Podívej se na ty pruhy! Podzim. Kotlina byla zapečetěna na podzim. Dvě stě let sporů, vyřešeno šesti malými kaménky.",
+        "objectives": {
+          "0": {
+            "label": "Střep hvězdného pádu"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "Dohoda stromových obrů",
+        "text": "Starší Háje shazují svou vnější kůru, jak zkaženost hlodá na jejich kořenech. Čtyři kusy z ní, a já dokážu uvařit mast pro celý Háj. Nepoděkují ti, když ji odloupneš, {playerName}, ale kvůli tomu budou stát o století déle.",
+        "completion": "Silné a zdravé, všechny čtyři. Mast bude trvat týden uvařit a sto let dokončit své dílo. Stromy měří laskavost jinak.",
+        "objectives": {
+          "0": {
+            "label": "Prastará kůra"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "Proti výtrusnému přílivu",
+        "text": "Mast drží Háj, ale zkaženost tlačí na Hlubinu s každým soumrakem silněji. Dvanáct dalších zkažených musí být uloženo k odpočinku, než sběrači znovu získají své severní kruhy, {playerName}.",
+        "completion": "Kruhy na severu dnes v noci znovu zpívají. Potichu, ale zpívají.",
+        "objectives": {
+          "0": {
+            "label": "Zkažený výtrusník uložen k odpočinku"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "Potopené nádvoří",
+        "text": "Bryn přečetla srdce správně: roztržení prochází starým nádvořím na východě, a jeho strážci se probudili špatně. Byli postaveni, aby chránili pečeť; teď rozdrtí každého, kdo se k ní přiblíží. Vyčisti osm z nich z trosek.",
+        "completion": "Osm strážců, utišeno. Pamatuji si, když byli vztyčeni, {playerName}. Netvař se tak překvapeně; Kotlina si udržuje své strážce dlouho.",
+        "objectives": {
+          "0": {
+            "label": "Prastarý strážce utišen"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "Ozvěny Strážce",
+        "text": "I s umlčeným pánem opakují strážci nádvoří jeho poslední rozkaz jako ozvěnu, která nechce vyblednout. Dokud pečeť nebude vrácena zpět, budou se dál probouzet, {playerName}. Utiš deset dalších z nich, aby se kameníci dostali k pečetnímu kameni.",
+        "completion": "Ozvěna je pokaždé slabší. Brzy nádvoří nebude držet nic než vítr a břečťan, jak se na ruinu sluší.",
+        "objectives": {
+          "0": {
+            "label": "Prastarý strážce utišen"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "Probouzející se strážce",
+        "text": "Nádvoří je tiché, ale jeho pán ne. Strážce, který drží pečeť, se probudil zvrácený, a dokud stojí, pečeť nelze spravit. Nepadne snadno; vezmi si přítele, pokud nějakého najdeš, {playerName}. Vezmi si dva, pokud najdeš dva.",
+        "completion": "Zvon jeho hlasu utichl. Cítila jsem to odsud, jako by z celého údolí spadla tíha.",
+        "objectives": {
+          "0": {
+            "label": "Probouzející se strážce poražen"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "Pečeť obnovena",
+        "text": "Vezmi Strážcovu pečeť k pečetnímu kameni v srdci nádvoří a vrať ji tam, odkud byla vyražena. Pak se Kotlina může začít hojit, a ty, {playerName}, budeš mít za sebou to, co nikdo z tvého druhu ještě neudělal.",
+        "completion": "Cítila jsem, jak se to odsud zavírá, jemně jako soumrak. Kotlina si pamatuje své přátele, {playerName}. Ať cestuješ jakkoliv daleko, vždy pro tebe bude světlo pod velkým stromem.",
+        "objectives": {
+          "0": {
+            "label": "Pečeť vrácena do pečetního kamene"
+          }
+        }
+      },
+      "q_hollow_the_huntsman": {
+        "title": "Strážce stád",
+        "text": "Vypadáš jako někdo, kdo zvládne víc než bludičky, {playerName}. Lovec Deral drží svou hlídku mezi jelenními loukami východně odtud, a už týdny se ptá po schopných rukou. Ať už venku sleduje cokoliv, ve vesnici to nahlas neřekne.",
+        "completion": "Fenna tě poslala? Dobře. Pak ti věří, a já mám dvě jména, která potřebuji škrtnout.",
+        "objectives": {
+          "0": {
+            "label": "Najít Lovce Derala"
+          }
+        }
+      },
+      "q_hollow_old_marrowshell": {
+        "title": "Starý krunýř mělčin",
+        "text": "To první jméno je Starý Morkoškeble, krab velikosti vozu, který loví ve východních mělčinách od doby, kdy Prastarý svit ještě neměl bránu. Toulá se, {playerName}, takže budeš muset projít pobřežní linii, dokud nenarazíš na jeho stopu. Nechoď sám a nedůvěřuj jeho nehybnosti.",
+        "completion": "Mělčiny jsou zase jen voda. Viděla jsem ten krunýř zlomit lepší lovce, než jsem já, {playerName}. Ne tebe.",
+        "objectives": {
+          "0": {
+            "label": "Starý Morkoškeble zabit"
+          }
+        }
+      },
+      "q_hollow_first_of_the_herd": {
+        "title": "První ze stáda",
+        "text": "To druhé jméno je těžší vyslovit. Aurelhorn vedl tato stáda, když má babička držela tuto hlídku, a ať už se v Kotlině probudilo cokoliv, probudilo ho špatně. Dupe po tom, co kdysi chránil, a stádo nepřežije jeho šílenství. Toulá se po loukách poblíž starých cest k nádvoří. Skonči ho s milosrdenstvím, {playerName}, a vezmi si přítele, aby sis tu tíhu rozdělil.",
+        "completion": "Takže první padne poslednímu. Stádo je už klidnější, cítíš to? Prokázal jsi dnes Kotlině laskavost, i když tak nevypadá.",
+        "objectives": {
+          "0": {
+            "label": "Aurelhorn dán klid"
+          }
+        }
+      },
       "q_prof_hobby_switch": {
         "title": "Jiná kratochvíle",
         "text": "Hlavní obory vyžadují slib. Koníček se jen ptá, kam tě zavede tvá zvídavost, {playerName}. Nasbírej pár bylin a rozhodni se, které řemeslo naproti svým hlavním oborům chceš provozovat.",
@@ -11440,6 +12747,916 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Sklizena bylinkářská záplata"
+          }
+        }
+      },
+      "q_fv_snowline_report": {
+        "title": "Zpráva ze Sněžné hranice",
+        "text": "Každá duše, která vystoupá z Dračích zemí, míjí můj oheň, {playerName}, a každý týden jich vystoupá méně. Strážkyně Kaldra drží Ledový plášť nahoru po severní cestě. Řekni jí, že průsmyk je stále otevřený, a řekni jí, že jím prošel cizinec sám.",
+        "completion": "Průsmyk tedy drží. Einna sedí v tom táboře i bouřemi, které pohřbí cestní značky, a nikdy mi neposlala liché zprávy. Vítej v Ledovém plášti, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Ohlásit se Strážkyni Kaldře"
+          }
+        }
+      },
+      "q_fv_wolves_at_the_door": {
+        "title": "Vlci u dveří",
+        "text": "Smečky ze závějí se kdysi držely vysokých říms. Teď přecházejí cestu k jezírku za denního světla, a mí dřevorubci nechtějí opustit hradby. Prořeď smečky, {playerName}, deset z nich, a cesta bude zase jen cestou.",
+        "completion": "O deset méně stínů mezi tady a jezírkem. Dřevorubci se už hádají, kdo vyjde jako první.",
+        "objectives": {
+          "0": {
+            "label": "Vlk ze závěje zabit"
+          }
+        }
+      },
+      "q_fv_winter_pelts": {
+        "title": "Kožešiny pro chatu",
+        "text": "Palivové dříví udrží tělo naživu, {playerName}, ale vlna tento chlad neodrazí, jen vlčí kožešina to dokáže. Šest silných zimních kožešin ze smeček ze závějí, a já dokážu podšít spací pytle pro každého, koho chata ukrývá.",
+        "completion": "Kožešina jako tato je jediný argument, na který zima slyší. Vezmi si tyto boty, jsou podšité poslední dávkou.",
+        "objectives": {
+          "0": {
+            "label": "Silná zimní kožešina"
+          }
+        }
+      },
+      "q_fv_ember_caches": {
+        "title": "Uhlíky na cestě k jezírku",
+        "text": "Sáně se skrýšemi žhavých uhlíků se minulou noc převrhly na cestě k jezírku: železné kotle, které udrží zahrabaný oheň živý po měsíc. Tři z nich stále leží ve sněhu, {playerName}, a chata nemůže postrádat, co obsahují. Přines oheň domů.",
+        "completion": "Stále teplé, každé z nich. Koupil jsi chatě celou zimu milosrdenství, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Skrýš žhavých uhlíků nalezena"
+          }
+        }
+      },
+      "q_fv_lights_over_steps": {
+        "title": "Světla nad schody",
+        "text": "Polární záře hoří zeleně každou noc tento měsíc, a staří lidé pod ní nechtějí chodit. Jedna žena by mohla vědět proč: Veyla, Zářověštkyně. Táboří sama na Schodech polární záře, jihovýchodně za jezírkem. Najdi její tábor, {playerName}, a vyslechni, co jí světla řekla.",
+        "completion": "Kaldra tě poslala? Tak si konečně dělá starosti, a má proč. Sedni si, {playerName}. Sleduj se mnou chvíli oblohu.",
+        "objectives": {
+          "0": {
+            "label": "Najít Zářověštkyni Veylu"
+          }
+        }
+      },
+      "q_fv_silent_trapline": {
+        "title": "Tichá past linie",
+        "text": "Starý Brosk obsluhuje past linii ve Chvějivé bažině západně odtud, a každý týden po jedenáct let posílal se sáněmi na dřevo balík kožešin. Teď dva týdny nic. Je příliš tvrdohlavý na to, aby zmrzl, a příliš opatrný na to, aby se utopil, {playerName}, takže je špatně něco jiného. Najdi jeho tábor v bažině a přesvědč se, že dýchá.",
+        "completion": "Maeve tě poslala? Ha. Jedenáct let a ta žena si pořád myslí, že mě bažina sežere. No... letos by mohla mít pravdu. Podívej se, co to udělalo s mými linkami.",
+        "objectives": {
+          "0": {
+            "label": "Najít Lapače Broska"
+          }
+        }
+      },
+      "q_fv_aurora_motes": {
+        "title": "Zrnka polární záře",
+        "text": "Bludičky, které se vznášejí po těchto schodech, jsou setřeseny samotnými světly, a každá nese ve svém srdci zrnko polární záře. Potřebuji šest, abych přečetla, co obloha píše, {playerName}. Bludičky se nebrání. Zda to práci usnadňuje nebo ztěžuje, je věcí mezi tebou a tvým svědomím.",
+        "completion": "Šest zrnek, stále zářících. Podívej se na ně, {playerName}: pulzují ve vzájemném rytmu. Ta světla nejsou počasí. Jsou to signál.",
+        "objectives": {
+          "0": {
+            "label": "Zrnko polární záře"
+          }
+        }
+      },
+      "q_fv_rime_unbound": {
+        "title": "Jinovatka rozpoutaná",
+        "text": "Když polární záře hoří takhle jasně, chlad vstává a chodí: jinovatkoví elementálové, mráz obdařený vůlí. Shromažďují se tam, kde se světla dotýkají říms, a každou noc se toulají blíž k mému táboru. Rozbij osm z nich, {playerName}, než jeden z nich rozbije mě.",
+        "completion": "Noc už se zdá tišší. Ať už je probouzí cokoliv, ještě to neskončilo, ale koupil jsi schodům trochu klidu.",
+        "objectives": {
+          "0": {
+            "label": "Jinovatkový elementál zabit"
+          }
+        }
+      },
+      "q_fv_sprung_traps": {
+        "title": "Víly v pastech",
+        "text": "Bažinné víly, {playerName}. Ti malí ďáblíci spouštějí mé pasti pro zábavu a rozhazují železo do rákosí. Zažeň je, osm by mělo naučit zbytek, a posbírej, co zbylo z mých pastí, když už tam jsi.",
+        "completion": "Čtyři dobré pasti zpátky a rákosí ztichlo. Máš na chytání tvrdší ruku než já, {playerName}, ale s výsledky nemohu polemizovat.",
+        "objectives": {
+          "0": {
+            "label": "Bažinná víla zahnána"
+          },
+          "1": {
+            "label": "Past nalezena"
+          }
+        }
+      },
+      "q_fv_howl_above": {
+        "title": "Vytí na terasách",
+        "text": "Slyšíš to za soumraku, {playerName}: vytí z Kvílivých teras, které nepatří smečkám ze závějí. Větší hrdla. Terasoví vytci sešli z vrcholků poprvé od doby, kdy tuto hlídku držela má babička, a jsou to oni, kdo zahnal vlky na mou cestu. Sniž jejich počet o osm a zažeň je zpátky.",
+        "completion": "Osm, a soumrakový chór je díky tomu tišší. Ale vytci neopouštějí vrcholky bezdůvodně. Něco tam nahoře je pohnulo, a obávám se, že to má jméno.",
+        "objectives": {
+          "0": {
+            "label": "Terasový vytec zabit"
+          }
+        }
+      },
+      "q_fv_seeing_wren_home": {
+        "title": "Doprovodit Wren domů",
+        "text": "Má učednice Wren šla před dvěma dny projít linii Zlatotání a nikdy se nevrátila. Našel jsem její stopy, schovává se pod cestními značkami jihozápadně od Schodů polární záře, příliš vyděšená z vlků na to, aby se hnula. Nemohu opustit bažinu, {playerName}. Doveď ji do tábora Veyly na schodech. Bude v bezpečí pod světly.",
+        "completion": "Ta dívka je uvnitř, zabalená do poloviny mých přikrývek a povídá si s hvězdami na obloze. Udělal jsi dnes dobrou věc, {playerName}. Kraj takových moc nevídá.",
+        "objectives": {
+          "0": {
+            "label": "Učednice Wren bezpečně dovedena ke Schodům polární záře"
+          }
+        }
+      },
+      "q_fv_frostmane_tyrant": {
+        "title": "Tyran Mrazivé hřívy",
+        "text": "Vytci nelovili, když sešli dolů po terasách. Prchali. Yeti si nárokoval vysočinu, horský lid ho nazývá Mrazivá hříva, a ani smečky s ním nechtějí sdílet svah. Musí to skončit, {playerName}, než ho zima zažene dolů k mým hradbám. Vezmi si přítele. Vezmi si dva.",
+        "completion": "Když se včera v noci utišil vítr, celá vesnice slyšela ticho tam, kde bývala Mrazivá hříva. Kraj ti dluží dluh, který mu bude trvat roky splatit, {playerName}. Nos tohle, a každé dveře v Ledovém plášti jsou ti otevřené.",
+        "objectives": {
+          "0": {
+            "label": "Mrazivá hříva poražena"
+          }
+        }
+      },
+      "q_dk_ash_on_the_wind": {
+        "title": "Popel ve větru",
+        "text": "Podívej se na jih od palisády, {playerName}. Ty ohně v dunách nejsou trollí vařící ohně, jsou to popelokostní sněmy, a každou noc jich přibývá. Mrtví vylézají z kostěných polí s pískem ještě v zubech. Skolej deset nájezdníků, než si prosekají cestu k mé bráně.",
+        "completion": "O deset méně čepelí v dunách, a ohně sněmu hořely včera v noci níž. Moje hlídky spaly, což se jim nepodařilo už týden. Dobře sekáno, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Popelokostní nájezdník zabit"
+          }
+        }
+      },
+      "q_dk_trolls_on_the_road": {
+        "title": "Trollové na cestě",
+        "text": "Dunoví trollové se naučili poznat zvuk zásobovacího vozu, {playerName}. Tento měsíc zaútočili na cestu Popelovými dunami třikrát, a poslední vozka přišel s ničím jiným než opratěmi. Osm trollů pryč z té cesty, a mé vozy se zase rozjedou.",
+        "completion": "Osm, a moji vozkové přestali před každou jízdou psát dopisy na rozloučenou. Posádka jí díky tobě, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Dunový troll zabit"
+          }
+        }
+      },
+      "q_dk_scorched_stores": {
+        "title": "Ožehnuté zásoby",
+        "text": "Poslední vůz shořel, {playerName}, ale bedny opásané železem neshoří skrz naskrz. Čtyři z nich stále leží ožehnuté podél dunové cesty se zásobou soli, hřebíků a tětiv na celou sezónu. Přines mé zásoby domů, než trollové přijdou na to, jak je otevřít.",
+        "completion": "Ožehnuté do černa, ale každá zástrčka stále drží. Kovář dostane své hřebíky, lučištnice své tětivy, a ty dostaneš boty, které jsem schovával pro toho, kdo mi přinese bedny zpátky, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Ožehnutá zásobovací bedna nalezena"
+          }
+        }
+      },
+      "q_dk_banners_over_the_dunes": {
+        "title": "Praporce nad dunami",
+        "text": "Popelokostní se sjíždějí u starých hrobů kostěných polí, {playerName}, a mé hlídky nedokážou číst duny tak, jak čtou zeď. Zabij pět jejich svolávačů války, těch, co křičí, aby mrtví vstali, a zapíchni varovný praporec na každé shromaždiště, aby ho mé hlídky mohly označit z hřebene.",
+        "completion": "Tři praporce vlající v horkém větru, přesně tam, kde je můj dalekohled najde. S pěti umlčenými svolávači bude vše, co odpoví na jejich volání, přicházet pomaleji. Koupil jsi nám čas, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Popelokostní svolávač války zabit"
+          },
+          "1": {
+            "label": "Varovný praporec zapíchnut"
+          }
+        }
+      },
+      "q_dk_watcher_at_the_wargate": {
+        "title": "Hlídka u válečné brány",
+        "text": "Něco táhne popelokostní na východ, {playerName}, a poslal jsem svou nejlepší, aby zjistila co. Zvěd Yerrin táboří měsíc ve vzdálených dunách za Trollím sněmem, na dohled brány, kterou nikdo za mého života nepostavil. Její hlášení se před deseti dny zastavila. Najdi její tábor a přines mi její oči.",
+        "completion": "Brannoc tě poslal? Tak se můj poslední posel nikdy nedostal. Ztiš hlas a sedni si, {playerName}. Vidíš tu bránu dole? Spočítej válečné praporce před ní, a pochopíš, proč jsem přestal psát věci na papír.",
+        "objectives": {
+          "0": {
+            "label": "Najít Zvěda Yerrin"
+          }
+        }
+      },
+      "q_dk_marrow_and_ash": {
+        "title": "Morek a popel",
+        "text": "Každý popelokostní nájezdník nese válečný cejch, {playerName}: sežehnutý záznam hordy, pod kterou pochoduje. Z tohoto hřebene jsem napočítal čtyři hordy, ale dohady nejsou zpravodajství. Přines mi šest cejchů od nájezdníků a jejich svolávačů, a já dám Brannocovi tvar války, která přichází.",
+        "completion": "Šest cejchů, a do každého z nich vypálena jedna značka. Tohle není obyčejné shromáždění nájezdníků, {playerName}. Každá horda v dunách odpovídá válečné bráně pod námi, trollové ji nazývají Orkadia, a žádných pět vojáků, se kterými jsem kdy sloužil, by nedokázalo rozbít to, co buší za těmi dveřmi. Snad pět takových, jako jsi ty.",
+        "objectives": {
+          "0": {
+            "label": "Popelokostní válečný cejch"
+          }
+        }
+      },
+      "q_dk_scales_of_the_maw": {
+        "title": "Šupiny Tlamy",
+        "text": "Když se vítr obrátí od Dračí tlamy, žhavokřídlí draci na něm létají nad mým táborem tak nízko, že bys jim spočítal zuby, {playerName}. Zalétávají čím dál dál a něco v tom kráteru je žene. Přines mi tři jejich šupiny. Šupiny si pamatují teplo a já podle spáleniny dokážu vyčíst, kde se drak zdržoval.",
+        "completion": "Podívej se na spodní stranu téhle, {playerName}: sežehnutá do spirály, a v kruzích hnízdí jen jedna věc. Tito draci jsou strážci líhně. Něco v Dračí tlamě je matka.",
+        "objectives": {
+          "0": {
+            "label": "Šupina Žhavokřídlého draka"
+          }
+        }
+      },
+      "q_dk_matriarch_of_the_maw": {
+        "title": "Matriarcha Tlamy",
+        "text": "Šupiny říkaly pravdu, {playerName}. Vylezl jsem na okraj za úsvitu a viděl ji na dně kráteru: Cindraleth, matriarcha, pod kterou se vylíhl každý žhavokřídlý drak na této obloze, zlatá jako uhlík, který se chystá vzplanout. Zatímco ona sedí na vejcích, draci jsou stále odvážnější, a Dračí hlídka nemůže bojovat s draky i popelokostními zároveň. Skonči ji v jejím kráteru, pak přines zprávu Kapitánovi brány Brannocovi. Nechoď sám.",
+        "completion": "Obloha nad Dračí tlamou byla prázdná dva dny, a teď procházíš mou branou s krví matriarchy na botách. Dračí hlídka stála čtyřicet let na stráži přesně kvůli tomuto, {playerName}. Vezmi si tyto nárameníky z tlamošupin, zpracované naším vlastním kovářem. Nos je tam, kde je draci uvidí.",
+        "objectives": {
+          "0": {
+            "label": "Cindraleth, matriarcha Tlamy, poražena"
+          }
+        }
+      },
+      "q_af_goldmelt_road": {
+        "title": "Zlatá cesta dolů",
+        "text": "Přišel jsi přes Zlatotání, {playerName}, se sněhem ještě na botách. Střežím tuto svatyni, aby Lucernojezero vědělo, kdo přichází z chladu, a v poslední době jsem měl málo co hlásit. Vezmi zlatou cestu dolů do města, najdi Rychtářku Ottoline u studny a řekni jí, že průsmyk je klidný.",
+        "completion": "Klid na Zlatotání, a poutník se sněhem ve vlasech jako důkaz. Sorrel drží svou hlídku příliš dobře na to, aby posílala liché zprávy. Buď vítán v Lucernojezeru, {playerName}. Lucerny hoří pro tebe.",
+        "objectives": {
+          "0": {
+            "label": "Ohlásit se Rychtářce Ottoline"
+          }
+        }
+      },
+      "q_af_foxes_in_the_lamplight": {
+        "title": "Lišky ve světle lucern",
+        "text": "Soumrakové lišky se naučily, jakou hodnotu mají zásoby pro lucerny, {playerName}. Každý soumrak proklouznou přes ploty a odnesou lůj, který lisujeme na přívozní lampy. Měkké tlapky, ještě měkčí svědomí. Sniž jejich počet o deset a zbytek si zapamatuje strach z města.",
+        "completion": "Deset, a zásoby zůstaly minulou noc nedotčeny poprvé v této sezóně. Lampáři posílají své díky, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Soumraková liška zabita"
+          }
+        }
+      },
+      "q_af_lanterns_on_the_water": {
+        "title": "Lucerny na vodě",
+        "text": "Každý přívoz na jezeře nese záďovou lucernu, {playerName}, a tři z mých lodí se vrátily za úsvitu bez nich. Mlha si je vzala, nebo něco v té mlze. Vyplavují se podél východního břehu, když se vítr obrátí. Projdi pobřežní cestu a přines mé lucerny domů.",
+        "completion": "Všechny tři, a stále hoří. Přívozní lucerny ve vodě nezhasínají, {playerName}. To je celý jejich smysl. Co mě znepokojuje, je to, co je utrhlo.",
+        "objectives": {
+          "0": {
+            "label": "Přívozní lucerna nalezena"
+          }
+        }
+      },
+      "q_af_orchard_call": {
+        "title": "Vozík pro sad",
+        "text": "Sadařka Pomeline se stará o Pozlacený sad na západní cestě, a její vozíky s mízou mají tři dny zpoždění. Celé město žije z té jantarové mízy, {playerName}: lampová pryskyřice, sladidlo, sklizňové pivo. Projdi západní cestu a zjisti, co ji zdrželo.",
+        "completion": "Rychtářka počítá své vozíky, jo? No, může je počítat jako chybějící ještě chvíli déle. Podívej se na mé řady, {playerName}. Mám větší starosti než pozdní dodávku.",
+        "objectives": {
+          "0": {
+            "label": "Najít Sadařku Pomeline"
+          }
+        }
+      },
+      "q_af_amber_from_the_herd": {
+        "title": "Jantar ze stáda",
+        "text": "Pozlacení jeleni uléhají pod mými nejstaršími stromy a míza jim celou noc kape zlatě do srsti. Vyčesané hrudky jsou nejčistším jantarem v celém hvozdu. Přines mi šest, {playerName}. Jeleni ti nepoděkují, ale ani jim to nebude chybět.",
+        "completion": "Šest hrudek, čistých jako rozlitý med. Tyto rukavice jsou ušity z poslední dávky, {playerName}: mízou ztuhlé a teplejší, než vypadají.",
+        "objectives": {
+          "0": {
+            "label": "Pozlacená hrudka mízy"
+          }
+        }
+      },
+      "q_af_what_took_the_moorings": {
+        "title": "Co vzalo úvazy",
+        "text": "Teď ti řeknu, co jsem neřekl před městem. Úvazy nebyly uvolněny, byly prokousnuty. Jezerní číhalové, každou noc odvážnější, škubající za lana a kormidla. Ulož osm z nich zpátky pod vodu natrvalo, {playerName}, než s nimi zmizí i nějaký převozník.",
+        "completion": "O osm méně tvarů v mělčinách, a přeprava dnes proběhla včas poprvé za čtrnáct dní. Ale odvážní číhalové jsou hnaní číhalové, {playerName}. Něco pod jezerem je pohání.",
+        "objectives": {
+          "0": {
+            "label": "Jezerní číhal poražen"
+          }
+        }
+      },
+      "q_af_sprites_and_spigots": {
+        "title": "Víly a mízové kohouty",
+        "text": "Sklizňové víly, {playerName}. Vytrhávají mé mízové kohouty z kmenů kvůli sladkosti uvnitř a odhazují vědra do trávy. Zažeň osm těch malých zlodějek a přines zpátky čtyři má vědra, a vozíky se zase rozjedou.",
+        "completion": "Čtyři vědra zpátky na hácích a řady zase ztichly. Máš na víly tvrdší ruku než já, {playerName}, a dnes jsem tomu rád.",
+        "objectives": {
+          "0": {
+            "label": "Sklizňová víla zahnána"
+          },
+          "1": {
+            "label": "Vědro na sběr mízy nalezeno"
+          }
+        }
+      },
+      "q_af_the_meredark": {
+        "title": "Jezerotma",
+        "text": "Staří převozníci mají jméno, které vyslovují jen na břehu: Jezerotma, první číhal, starý jako jezero a dvakrát tak trpělivý. Jednou už povstal, v roce, kdy se potopilo molo, a povstává znovu. Za soumraku se vyhřívá na troskách mola u jižního břehu, {playerName}. Vezmi si přítele, vezmi si dva, a skonči to, dokud to ještě jde skoncovat.",
+        "completion": "Mlha se dnes ráno zvedla z jezera, {playerName}, a celé město to vidělo. Přívozy poplují noční trasu znovu, a každá lucerna na vodě bude hořet ve tvém jménu. Vezmi si tohle: bylo to vyloveno z potopeného mola, a nikdo nemá větší právo to nosit.",
+        "objectives": {
+          "0": {
+            "label": "Jezerotma poražena"
+          }
+        }
+      },
+      "q_wf_across_the_fenway": {
+        "title": "Přes Bažinnou cestu",
+        "text": "Mírumilovná krajina, Vrbová bažina, ale mírumilovné neznamená bezpečné, {playerName}. Následuj cestu na sever k hrázi Bažinné cesty a přejdi do Mostojezera. Řekni Mostaři Aldenovi, že schody jsou otevřené a oheň v cestovním táboře hoří.",
+        "completion": "Pell udržuje ten oheň hořící přes každou mlhu, kterou na ni bažina dýchne. Pokud říká, že schody jsou otevřené, jsou otevřené. Vítej v Mostojezeru, {playerName}. Dávej pozor na krok na mých prknech a budeme spolu vycházet dobře.",
+        "objectives": {
+          "0": {
+            "label": "Ohlásit se Mostaři Aldenovi"
+          }
+        }
+      },
+      "q_wf_rope_chewers": {
+        "title": "Okusovači lan",
+        "text": "Bažinné ropuchy, {playerName}. Vylézají z příkopu v noci a prokusují mé úvazová lana, jako by to byly rákosové stonky. Tři čluny se minulý týden utrhly a plavaly pryč, a jeden z nich měl na palubě mou dobrou navijáku. Prořeď je, deset těch tlustých věcí, a lodě zůstanou tam, kde je uvážeme.",
+        "completion": "O deset méně sad zubů v mém příkopu. Čluny zůstaly u svých úvazů celou noc poprvé za měsíc, {playerName}. Máš díky od každého sítaře ve městě.",
+        "objectives": {
+          "0": {
+            "label": "Bažinná ropucha zabita"
+          }
+        }
+      },
+      "q_wf_eels_for_the_smokehouse": {
+        "title": "Úhoři pro udírnu",
+        "text": "Bažinné ropuchy nejen žerou mé provazy, {playerName}, žerou můj úlovek: hltají úhoře celé, přímo z pastí. Osvoboď šest tučných z spárů těch hltounů, než se maso zkazí, a ohně v udírně zůstanou zapálené.",
+        "completion": "Šest dobrých úhořů, sotva pomačkaných. Udírna bude do rána vonět penězi. Tady, tyto holínky byly moje, když jsem byl rychlejší: úhoří kůže odrazí vlhko jako nic jiného.",
+        "objectives": {
+          "0": {
+            "label": "Baculatý bažinný úhoř"
+          }
+        }
+      },
+      "q_wf_mind_the_moorings": {
+        "title": "Dej pozor na úvazy",
+        "text": "Dobré lano je tu drahé, {playerName}: každá linka, kterou ropuchy prokoušou, je týden úhořích peněz pryč. Přeříznuté konce stále leží podél břehu příkopu, kde je lodě upustily. Projdi lávky a přines mi zpátky čtyři lana, a já je spojím jako nová.",
+        "completion": "Podívej se na to: čisté kousance, každý z nich, ale zbylo dost lana na spojení. Ušetřil jsi mi měsíc mincí a sítařům měsíc reptání, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Přeříznuté kotevní lano nalezeno"
+          }
+        }
+      },
+      "q_wf_witch_of_willowweep": {
+        "title": "Čarodějka z Vrbího pláče",
+        "text": "Už jsi to slyšel, {playerName}: to chrápání. Pomalé a těžké, tam za Ospalými plánemi, jako by se sama bažina obracela ve spánku. Ropuchy, víly, bludičky hořící o poledni: všechno to začalo, když začal ten zvuk. Jedna duše by mohla vědět, co to je. Matka Sedge má tábor u Vrbího pláče, na západ kolem příkopu a dolů po vzdáleném břehu. Najdi ji, a zeptej se jí, co spí uprostřed mé bažiny.",
+        "completion": "Alden tě poslal celou tu cestu, aby ses zeptal na chrápání? Pak mostní lid konečně naslouchá. Posaď se mimo vlhko, {playerName}. Ten zvuk má jméno a hrdlo, a já čekala na někoho dost pošetilého, aby mi pomohl ho utišit.",
+        "objectives": {
+          "0": {
+            "label": "Najít Matku Sedge"
+          }
+        }
+      },
+      "q_wf_toll_and_tangle": {
+        "title": "Mýtné a spleť",
+        "text": "Vrbové víly si myslí, že je to fajn hra, odříznout přívoz, {playerName}, a minulý týden se převrhl mýtní člun na východní trase se sezónním mostním mýtným na palubě. Truhly se potopily v mělčinách a víly tancují po lávkách, jako by jim patřily. Zažeň osm a vylov tři mýtní truhly, a Mostojezero bude tuto zimu jíst.",
+        "completion": "Tři truhly, a mince stále suché uvnitř. Víly budou trucovat ve vrbových proutcích celý týden, {playerName}, a město ti dluží svůj zimní chléb.",
+        "objectives": {
+          "0": {
+            "label": "Vrbová víla zahnána"
+          },
+          "1": {
+            "label": "Mýtní truhla nalezena"
+          }
+        }
+      },
+      "q_wf_wisplight_charms": {
+        "title": "Amulety bludičkového světla",
+        "text": "Bludičky nad tůněmi jsou bažina, která sní nahlas, {playerName}, a jejich světlo je jediné, co odolá Kvákalovu ukolébání. Tkám ho do vrbových amuletů: jeden kolem tvého krku a chrápání nedokáže stáhnout tvá víčka dolů. Přines mi šest koulí bludičkového světla. Bludičky se o ně nebudou prát, což z toho dělá buď laskavost, nebo krádež, podle toho, jak to neseš.",
+        "completion": "Šest koulí, stále teplé sněním. Dej mi čas do východu měsíce a budu mít amulety utkané pro tebe a pro každého, kdo je dost odvážný, aby stál po tvém boku.",
+        "objectives": {
+          "0": {
+            "label": "Koule bludičkového světla"
+          }
+        }
+      },
+      "q_wf_croakers_hush": {
+        "title": "Ticho kvákala",
+        "text": "Teď znáš jméno toho chrápajícího, {playerName}: Ospalý kvákal, starý žabí král z Ospalých plání. Každý rok se jeho kvákání prohlubuje, a každý rok větší část bažiny zapomíná se probudit. Amulety ti udrží oči otevřené, ale jeho velikost je jiná záležitost: vezmi si přítele, a nebojuj s ním ve vodě. Ulož starého krále do tiššího spánku.",
+        "completion": "Poslouchej, {playerName}. Nic. První skutečné ticho nad touto bažinou za třicet let, a polovina města dnes v noci nebude spát kvůli té podivnosti. Vrby děkují, po svém. Nos tohle, utkané z jeho vlastního liliového záhonu, a bažina tě pozná jako přítele, kamkoliv voda dosáhne.",
+        "objectives": {
+          "0": {
+            "label": "Ospalý kvákal poražen"
+          }
+        }
+      },
+      "q_nb_road_of_lanterns": {
+        "title": "Cesta luceren",
+        "text": "Tady nahoře slunce nikdy nenásleduje, {playerName}, jen lampy, které udržuji zapálené podél výstupu. Měsíční klid leží na severu, kde se shromažďuje květinové světlo. Najdi Liru Dewsong mezi jejími zahradami a řekni jí, že lampy Noční brány stále hoří.",
+        "completion": "Lampy stále hoří, a cesta stále přivádí cizince k nám. Sorrel drží tu bránu déle, než si kdokoliv v Měsíčním klidu pamatuje. Vítej, {playerName}, v říši, která nikdy nesvítá.",
+        "objectives": {
+          "0": {
+            "label": "Najít Liru Dewsong v Měsíčním klidu"
+          }
+        }
+      },
+      "q_nb_striders_in_the_dark": {
+        "title": "Chodci ve tmě",
+        "text": "Soumrakoví chodci byli vždy trpěliví lovci, {playerName}, ale v poslední době se plíží přímo do záhonů a berou jehňata měsíčního rouna přímo pod našimi lucernami. Sniž jejich počet o deset a vrať stráním jejich klid.",
+        "completion": "O deset chodců méně, a stáda se už pasou klidněji. Zahrady si drží svůj vlastní čas, ale dnes v noci ho drží v klidu.",
+        "objectives": {
+          "0": {
+            "label": "Soumrakový chodec zabit"
+          }
+        }
+      },
+      "q_nb_wool_by_moonlight": {
+        "title": "Vlna za měsíčního svitu",
+        "text": "Nic nehřeje jako měsíční rouno, {playerName}, a nic se nepřede tak jemně. Spasovači nosí svou stříbrnou vlnu volně v chomáčích, když se toulají po stráních. Přines mi šest dobrých chomáčů ze stád a já ti utkám něco, co za tu chůzi stálo.",
+        "completion": "Stříbrné jako hvězdné světlo a dvakrát tak měkké. Tady, {playerName}: palčáky z poslední dávky, podšité tak, jak dokáže podšít jen měsíční rouno.",
+        "objectives": {
+          "0": {
+            "label": "Chomáč měsíčního rouna"
+          }
+        }
+      },
+      "q_nb_night_gardens": {
+        "title": "Noční zahrady",
+        "text": "Noční květ se otevírá jen pod touto oblohou, a Soumrakové pole drží nejstarší záhony v celé říši. Potřebuji čtyři čerstvé květy na girlandy pro svatyni, {playerName}. Řež je jemně: záhon si pamatuje hrubou ruku celou sezónu.",
+        "completion": "Stále zářící, každý okvětní lístek. Svatyně bude vonět nocí celý týden, a Měsíční klid díky tomu spí lépe.",
+        "objectives": {
+          "0": {
+            "label": "Květ Nočního květu sesbírán"
+          }
+        }
+      },
+      "q_nb_eyes_on_the_vigil": {
+        "title": "Oči na Hlídce",
+        "text": "Něco dělá chodce odvážnými a stáda neklidnými, {playerName}, a já to nedokážu přečíst v květinách. Cassian to dokáže přečíst na obloze. Drží svůj pozorovací tábor u Stálé hlídky východně odtud, kde se Noční rod vznáší mezi kameny. Najdi ho a zeptej se, co říkají hvězdy.",
+        "completion": "Lira tě poslala? Pak to cítí i zahrady. Posaď se na chvíli u dalekohledu, {playerName}. Hvězdy jsou neklidné už měsíc, a každá mapa, kterou nakreslím, se naklání na sever směrem k mohyle.",
+        "objectives": {
+          "0": {
+            "label": "Najít Astronoma Cassiana u Stálé hlídky"
+          }
+        }
+      },
+      "q_nb_charts_of_the_stones": {
+        "title": "Mapy v kamenech",
+        "text": "Kameny Hlídky jsou starší než Měsíční klid, starší než Noční rod, který se o ně stará, a jejich plochy jsou vytesány hvězdnými mapami, které jsem se celý život učil číst. Obloha se posunula, {playerName}, a já musím vědět, o kolik. Přečti mapy na třech z kamenů a přines mi jejich zaměření.",
+        "completion": "Nezbývá žádná pochybnost. Každé zaměření se plíživě posunulo k Bezesné mohyle, jako by se samotná obloha nakláněla nad tu mohylu, aby ji sledovala. Staří králové byli pohřbeni pod srovnanými hvězdami z nějakého důvodu, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Hvězdná mapa přečtena"
+          }
+        }
+      },
+      "q_nb_restless_mounds": {
+        "title": "Neklidné mohyly",
+        "text": "Mapy byly varováním, a pole mohyl to dokazuje: mohyly se otevírají zezdola. Strašidla chodí po hrobových řadách, nosí staré vyznamenání, a dary, které je udržovaly spící, leží rozházené v trávě. Sraž osm z nich, {playerName}, a přines mi zpátky čtyři dary.",
+        "completion": "Hrobové zlato, stále chladné od hlíny. Strašidla nevstávají sama od sebe, {playerName}: něco pod velkou mohylou je volá ven, a obávám se, že nám mapy už řekly jeho jméno.",
+        "objectives": {
+          "0": {
+            "label": "Mohylové strašidlo zabito"
+          },
+          "1": {
+            "label": "Hrobový dar nalezen"
+          }
+        }
+      },
+      "q_nb_the_barrow_king": {
+        "title": "Mohylový král se probouzí",
+        "text": "Každé zaměření, každá neklidná hvězda, každá otevřená mohyla ukazuje na jednu věc: Mohylový král se probouzí pod velkou mohylou, a tato říše nemá žádné svítání, které by ho zadrželo. Musí být uložen k odpočinku, než si vzpomene na svou korunu, {playerName}. Nechoď sám: vezmi si přítele a měj květinové světlo v zádech.",
+        "completion": "Hvězdy se poprvé po celou sezónu uklidnily, {playerName}. Mohyly jsou uzavřeny, Noční rod znehybněl u svých kamenů, a král znovu spí dole. Nos tento plášť: Měsíční klid ho ušil pro toho, komu noc konečně důvěřovala.",
+        "objectives": {
+          "0": {
+            "label": "Mohylový král uložen k odpočinku"
+          }
+        }
+      },
+      "q_ww_bells_of_gallowmere": {
+        "title": "Zvony Šibeničního jezera",
+        "text": "Slyšíš to zvonění, {playerName}? To je Šibeniční jezero, nahoru po severní cestě, jak ukolébává své mrtvé zvoněním ke spánku. Kostelník Marrow vede počet každé duše pod korunami stromů, živé i pohřbené. Jdi a nech se spočítat, než tě spočítá les sám.",
+        "completion": "Cobb tě poslal po cestě celého, jo? Dobrý muž. Udržuje ty branové lucerny zapálené třicet let, a les se kolem něj nikdy nedostal. Vítej v Šibeničním jezeru, {playerName}. Dávej pozor na zvony.",
+        "objectives": {
+          "0": {
+            "label": "Ohlásit se Kostelníkovi Marrowovi"
+          }
+        }
+      },
+      "q_ww_silk_in_the_eaves": {
+        "title": "Hedvábí ve stříškách",
+        "text": "Podívej se nahoru, když jdeš po západní cestě, {playerName}, a uvidíš je: zabalené tvary v korunách stromů, kolíbající se tam, kam vítr nedosahuje. Vdovohedvábníci se vyplížili z Houštiny a natáhli své spíže nad mými lucernami. Zabij deset, a cesta bude zase jen cestou.",
+        "completion": "O deset méně tkalců ve stříškách. Lampáři dnes v noci obejdou svá kola, aniž by se dívali nahoru, a to má tady větší cenu, než víš.",
+        "objectives": {
+          "0": {
+            "label": "Předoucí vdovohedvábník zabit"
+          }
+        }
+      },
+      "q_ww_widows_skeins": {
+        "title": "Vdoviny přadena",
+        "text": "Tkalci si berou naše mrtvé do svých spíží, {playerName}, tak si já beru jejich hedvábí na naše rubáše. Hoří čistě a drží požehnání lépe, než kdy dokázalo plátno. Přines mi šest přaden vdovího hedvábí, a příští duše, kterou pohřbíme, půjde dolů zahalená a chráněná.",
+        "completion": "Šest přaden, měkkých jako zadržený dech. Mrtví v tomto budou ležet lehčeji. Vezmi si tyto omotávky, ušila jsem je z poslední dávky, a les se skrze ně nikdy neprokousal.",
+        "objectives": {
+          "0": {
+            "label": "Přadeno vdovího hedvábí"
+          }
+        }
+      },
+      "q_ww_candles_at_the_bounds": {
+        "title": "Svíce na hranicích",
+        "text": "Čtyři hraniční kameny obklopují Šibeniční jezero, {playerName}, jeden na každé cestě ven, a hrobová svíce hoří na každém kameni. Dokud hoří, pohřbení zůstávají pohřbeni. Mrholení je utopilo, všechny čtyři, a já jsem příliš stará na to, abych sama obcházela hranice. Vezmi si mou svíčku a znovu je zapal, rychle.",
+        "completion": "Všechny čtyři hoří? Tak si oddechni, {playerName}. Neslyšel jsi to, ale celá vesnice ano: zvony zazněly lehčeji ve chvíli, kdy chytil poslední knot.",
+        "objectives": {
+          "0": {
+            "label": "Hrobová svíce znovu zapálena"
+          }
+        }
+      },
+      "q_ww_the_last_vicar": {
+        "title": "Poslední vikář",
+        "text": "Jižně odtud chátrá Kaple Truchlokamene u svého černého jezírka, a jeden muž se o ni stále stará: Vikář Creel, který neodešel, když se zřítila střecha. Zná staré obřady lépe než mé zvony, {playerName}, a měsíc neposlal žádnou zprávu. Projdi kapelní cestu a přesvědč se, že dýchá.",
+        "completion": "Marrow si o mě dělá starosti? To je novinka. Řekni mu, že Truchlokámen stále stojí, svým způsobem, a já taky. Zůstaň chvíli, {playerName}. Jezírko šeptá, a raději bych neposlouchal sám.",
+        "objectives": {
+          "0": {
+            "label": "Najít Vikáře Creela"
+          }
+        }
+      },
+      "q_ww_wraiths_of_the_tarn": {
+        "title": "Přízraky jezírka",
+        "text": "Lesní přízraky byly kdysi strážci kaple, {playerName}, vyrostlé ze stromů zasazených nad ctěnými mrtvými. Od té doby, co jezírko zčernalo, zapomněly na svůj úřad, a teď se vznášejí mým hřbitovem a trhají hlínu. Rozbij osm z nich, než dokončí, co začaly.",
+        "completion": "Osm strážců konečně uloženo. Za denního světla to nenazvu milosrdenstvím, ale mezi námi, {playerName}, jím bylo.",
+        "objectives": {
+          "0": {
+            "label": "Lesní přízrak zabit"
+          }
+        }
+      },
+      "q_ww_what_the_bark_holds": {
+        "title": "Co kůra drží",
+        "text": "Ve Visící mýtině východně od Šibeničního jezera věší tkalci své hedvábím zabalené mrtvé z větví, a rytokorí vlekouni stojí na stráži pod nimi jako trpěliví nosiči rakví. To jsou naši lidé tam nahoře, {playerName}. Znič pět vlekounů, sřež tři ze zabalených mrtvých, a přines je domů do hlíny.",
+        "completion": "Tři duše zpátky pod poctivou zemí před setměním. Vlekouni znovu vyrostou, kůra to vždycky dělá, ale dnes v noci mýtina visí prázdná, a to stačí.",
+        "objectives": {
+          "0": {
+            "label": "Rytokorý vlekoun poražen"
+          },
+          "1": {
+            "label": "Hedvábím ovinuté ostatky sřezány"
+          }
+        }
+      },
+      "q_ww_walking_mosley_home": {
+        "title": "Doprovodit Mosleyho domů",
+        "text": "Můj hrobník Mosley se před třemi dny vydal po kapelní cestě otevřít hrob na starém hřbitově, a výkop se na něj zřítil. Vyškrábal se ven, ten blázen žije, ale krčí se u kapelních hrobů a nechce se hnout kvůli tkalcům na cestě. Doveď ho domů, {playerName}. Nemohu zvonit na zvony pro živého muže.",
+        "completion": "Prošel bránou na vlastních nohou, přísahá, že od teď nebude kopat nic hlubšího než záhon tuřínu. Bude zpátky na hřbitově do neděle, vždycky jsou. Děkuji ti, {playerName}. Šibeniční jezero si udržuje své lidi, to je celý náš zákon.",
+        "objectives": {
+          "0": {
+            "label": "Hrobník Mosley bezpečně doveden zpátky do Šibeničního jezera"
+          }
+        }
+      },
+      "q_ww_horn_of_the_huntsman": {
+        "title": "Roh lovce",
+        "text": "Už jsi ten roh slyšel, {playerName}, tenký a vzdálený, zvuk, kvůli kterému celý les zadržuje dech. Bledý lovec projíždí svou mýtinou severně odtud, a každý hrob, kolem kterého projede, se prohlubuje mělčeji. Kdysi byl člověkem, a byl pohřben špatně, a já se přestala přetvařovat, že to spraví modlitba. Vezmi si přítele, vezmi si dva, a shoď ho z koně.",
+        "completion": "Roh se zastavil uprostřed tónu. Každý zvon v Šibeničním jezeru zazněl jednou, sám od sebe, a pak les ztichl víc, než jsem ho slyšela za třicet let. Vykonal jsi obřad, který já nedokázala, {playerName}. Nos tohle, a choď pod korunami stromů beze strachu.",
+        "objectives": {
+          "0": {
+            "label": "Bledý lovec shozen z koně"
+          }
+        }
+      },
+      "q_pr_down_to_drifthaven": {
+        "title": "Dolů do Naplaveného přístavu",
+        "text": "Ven z černých stromů a do slunce, {playerName}. Následuj pobřežní cestu na sever a narazíš na Naplavený přístav dřív, než se obrátí příliv. Zeptej se po Vrakařské předačce Ryně, má práci pro jakýkoliv pár rukou od té bouře, a řekni jí, že cesta Spleteným ústím je stále otevřená.",
+        "completion": "Pell tě poslal? Pak jsi prošel celou cestu Spleteným ústím sám, a to je pro mě dostatečné doporučení. Vítej v Naplaveném přístavu, {playerName}. Chop se lana, máme nedostatek rukou.",
+        "objectives": {
+          "0": {
+            "label": "Ohlásit se Vrakařské předačce Ryně"
+          }
+        }
+      },
+      "q_pr_wreck_line_cargo": {
+        "title": "Vraková linie",
+        "text": "Bouře před třemi nocemi zahnala Perlovou brázdu na útes, a její náklad je rozházen po celé délce vrakové linie mezi tímto místem a Palmovou pláží. Tři bedny s obchodním zbožím stále leží v příboji, {playerName}. Přines je dřív, než si to, co zbylo, nárokuje příliv nebo krabi.",
+        "completion": "Solí potřísněné, ale v pořádku, všechny tři. Potápěči tento měsíc jedí díky tobě, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Náklad Perlové brázdy nalezen"
+          }
+        }
+      },
+      "q_pr_scuttler_cull": {
+        "title": "Krunýřatí zloději",
+        "text": "Každý vrak na tomto pobřeží přitahuje přílivové pobíhaly, a Perlová brázda přitáhla polovinu útesu. Mé vrakařské posádky nebudou pracovat na lince s těmi klepety v mělčinách. Rozbij deset z nich, {playerName}, a vraková linie je zase naše.",
+        "completion": "O deset méně klepet v příboji. Mé posádky se už brodí zpátky, a ani jedna z nich nepoděkovala, tak to udělám já: děkuji, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Přílivový pobíhal rozbit"
+          }
+        }
+      },
+      "q_pr_boars_in_the_gardens": {
+        "title": "Kanci v zahradách",
+        "text": "Ať se v hluboké zeleni hýbe cokoliv, tlačí houštinové kance ven na naši pláž. Tento týden dvakrát vyryli zahradní terasy, a sušicí stojany budou další. Deset kanců, {playerName}, a zažeň zbytek zpátky pod stromy.",
+        "completion": "Stojany stojí a zahrady mohou být znovu vysazeny. Kanci si nevybrali přijít na písek, {playerName}. Pamatuj si to: něco je pohnulo.",
+        "objectives": {
+          "0": {
+            "label": "Houštinový kanec zahnán"
+          }
+        }
+      },
+      "q_pr_the_man_who_went_in": {
+        "title": "Muž, který vešel dovnitř",
+        "text": "Potápěči nechtějí vkročit za linii stromů, {playerName}, a nebudu je o to žádat. Bubny jsi už slyšel: každý je slyší, do druhé noci. Jeden muž na tomto ostrově kdy šel k tomu zvuku a vrátil se. Okku. Táboří pod velkými banyány u Liánového pádu, hluboko nahoru po Spletené cestě. Najdi ho a zeptej se ho, co zeleň skrývá.",
+        "completion": "Isha tě poslala? Perlová matka nevyslovila mé jméno už roky. Sedni si mimo dosah lián, {playerName}, a řeknu ti, co vím: bubny nejsou nebezpečí. Jsou varováním.",
+        "objectives": {
+          "0": {
+            "label": "Najít Okku u Liánového pádu"
+          }
+        }
+      },
+      "q_pr_canopy_silk": {
+        "title": "Hedvábí z korun stromů",
+        "text": "Podívej se nahoru, {playerName}. Každá koruna stromu odsud až k modle je opředena jako rybářská síť, a tkalci jsou každou sezónu odvážnější. Napínám jejich vlastní hedvábí přes stezky, drátky se zvonky, aby se na mě džungle nemohla připlížit. Šest dobrých přaden od korunotkalců mi znovu natáhne linky.",
+        "completion": "Dobré, pevné hedvábí. Mé zvonky budou zpívat ještě chvíli, a nic nechodí po těchto stezkách v noci, aniž bych to věděl, {playerName}. V poslední době tu něco chodí často.",
+        "objectives": {
+          "0": {
+            "label": "Přadeno korunového hedvábí"
+          }
+        }
+      },
+      "q_pr_the_lost_navigator": {
+        "title": "Ztracená navigátorka",
+        "text": "Vytáhli jsme z Perlové brázdy každou ruku kromě jedné: Navigátorku Suli, která plavala k vzdálené pláži a nikdy nedošla. Potápěč ji zahlédl schovanou v troskách přídě za Palmovou pláží, živou, ale příliš vyčerpanou na to, aby sama zvládla ten úsek. Doveď ji domů podél pobřežní cesty, {playerName}. Krabům se to nebude líbit, a džungli ještě míň.",
+        "completion": "Suli je u ohně, stále přísahá, že by to doplavala. Přivedl jsi zpátky jedinou čtenářku map na tomto pobřeží, {playerName}. Tyto jsou z její námořnické truhly, s jejím požehnáním.",
+        "objectives": {
+          "0": {
+            "label": "Navigátorka Suli bezpečně dovedena do Naplaveného přístavu"
+          }
+        }
+      },
+      "q_pr_what_the_drums_guard": {
+        "title": "Co bubny střeží",
+        "text": "Přiblížil jsem se k Potopené modle tak blízko, jak se jen živý muž odváží, a viděl jsem dvě věci: tkalci zahalili cestu k modle do pavučin, a staré obětní mísy podél ní byly znovu naplněny. Čerstvě, {playerName}. Odsekni osm tkalců z cesty a přines mi tři z těch darů. Rád bych věděl, čí ruka stále krmí mrtvého boha.",
+        "completion": "Mech, perlová skořápka a kančí krev, nabalené prsty. Něco v té ruině stále dodržuje své obřady, {playerName}, a Strážce drží všechno ostatní venku. Je čas, abychom o tom mluvili otevřeně.",
+        "objectives": {
+          "0": {
+            "label": "Korunotkadlec sťat"
+          },
+          "1": {
+            "label": "Znovunaplněná obětní mísa sesbírána"
+          }
+        }
+      },
+      "q_pr_idol_guardian": {
+        "title": "Strážce modly",
+        "text": "Modla je starší než ostrov, {playerName}. Starší než bubny, starší než jméno Palmový kraj. Její strážce stál v tom potopeném kruhu od doby, než tam vyrostly palmy, a teď se probouzí a chodí po sloupech v noci. Ať už dary krmí cokoliv, strážce je jeho dveřní hlídkou. Vezmi si přítele a znič ho.",
+        "completion": "Skolil jsi věc, které se sama džungle nechtěla dotknout. Podívej se tam, za modlou: strážce nikdy nestřežil sloupy, {playerName}, střežil schody pod nimi. Bubny dnes v noci ztichly. Ať už pod Kotlinou Divokého srdce spí cokoliv, teď zná tvé jméno.",
+        "objectives": {
+          "0": {
+            "label": "Strážce modly zničen"
+          }
+        }
+      },
+      "q_eg_gate_report": {
+        "title": "Zpráva bránou",
+        "text": "Trávníky za touto branou se stříhaly samy po sto let, {playerName}, a v poslední době začaly stříhat i návštěvníky. Vrchní zahradnice Amaranth vede záznamy v Živoplotově, nahoru po cestě za branovými trávníky. Řekni jí, že prošel další poutník, a řekni jí, že se živé ploty u brány minulou noc pohnuly.",
+        "completion": "Pohnuly se, jo. Pell to hlásí každý týden, a každý týden má pravdu. Odpusť mým očím, {playerName}, celou noc jsem nespala už roky: někdo musí hlídat zahradu, která hlídá nás. Vítej v Živoplotově.",
+        "objectives": {
+          "0": {
+            "label": "Ohlásit se Vrchní zahradnici Amaranth"
+          }
+        }
+      },
+      "q_eg_hungry_shapes": {
+        "title": "Ostříháni do hladu",
+        "text": "Kdokoliv tvaruje tuto zahradu, zlenivěl nebo zezlověl. Vlčí tvary v Růžové divočině byly zastřiženy na parádu, ale v poslední době loví: zelené čelisti, žádné břicho a žádný důvod kdy přestat. Skolej deset zastřihovaných vlků, {playerName}, a nech trávníky být zase na chvíli jen trávníky.",
+        "completion": "Deset hromad ostřižků tam, kde stálo deset vlků. Mělo by to připomínat zahradničení, {playerName}. Proč to připomíná válku?",
+        "objectives": {
+          "0": {
+            "label": "Zastřihovaný vlk zabit"
+          }
+        }
+      },
+      "q_eg_stolen_shears": {
+        "title": "Ukradené nůžky",
+        "text": "Každý pár nůžek v Živoplotově zmizel za čtrnáct dní, {playerName}: z kolíků, ze zamčených kůlen, jeden pár dokonce z mé vlastní zástěry, když jsem podřimovala. Jsou to živoplotoví gnómové, malí zahradníci, kteří nás nesnáší, jak chodíme po jejich trávnících. Získej šest párů zpátky, než celá osada bude odkázaná na kuchyňské nože.",
+        "completion": "Šest párů, a můj vlastní mezi nimi, poznala bych ten zub na čepeli kdekoli. Tady, tyto rukavice byly upleteny pro prořezávací práci. Teplé ruce dělají stálé nůžky.",
+        "objectives": {
+          "0": {
+            "label": "Ukradené nůžky Živoplotova"
+          }
+        }
+      },
+      "q_eg_who_trims_the_hedges": {
+        "title": "Kdo stříhá živé ploty",
+        "text": "Vedu účetní knihy třicet let, {playerName}, a pořádně jsem nespala deset z nich, protože se čísla nesčítají. Tráva chce sekat a živé ploty chtějí tvarovat, a nikdo tu nedělá ani jedno, přesto každý úsvit zahrada stojí zastřižená. V poslední době lesní lid přísahá, že vidí starého muže s kolečkem na vzdálených jižních trávnících, za bludištěm u Liliové kotliny. Najdi ho. Pokud je skutečný, konečně budu moct spát. Pokud není, myslím, že nikdy nebudu.",
+        "completion": "Tak dům konečně někoho poslal. Sto let jsem chodil po těchto trávnících, {playerName}, a zahrada a já máme dohodu: stříhám to, co si o stříhání říká. Sedni si. Živé ploty ti mohou postrádat hodinu.",
+        "objectives": {
+          "0": {
+            "label": "Najít zahradníka u Liliové kotliny"
+          }
+        }
+      },
+      "q_eg_gnomes_in_the_green": {
+        "title": "Zášť zahradníků",
+        "text": "Nůžky byly jen začátek, {playerName}. Minulou noc gnómové převrhli naše vozíky s nářadím do zeleně, jeden u jejich nory západně od bludiště, jeden úplně přes zahradu u rybniční promenády, a rozházeli sto let dobrého železa do trávy. Zažeň osm malých ďáblů a odvez rozházené vozíky domů.",
+        "completion": "Tři vozíky zpátky a kolíky zase plné. Ať si malí ďáblové trucují ve svých živých plotech: Živoplotov se stará i o tyto trávníky.",
+        "objectives": {
+          "0": {
+            "label": "Živoplotový gnóm zahnán"
+          },
+          "1": {
+            "label": "Vozík s nářadím nalezen"
+          }
+        }
+      },
+      "q_eg_bloom_clippings": {
+        "title": "Sazenice z živé zeleně",
+        "text": "Chceš pochopit tuto zahradu? Pak ji čti tak, jako já. Jeleni, kteří se pasou na trávnících, pěstují tu nejpravdivější zeleň: každý list na nich je stránkou. Přines mi šest čerstvých sazenic ze zastřihovaných jelenů, {playerName}. Nepoděkují ti za prořezávání, ale znovu vyrostou. Tady vše znovu vyroste.",
+        "completion": "Podívej se sem: listy se stáčejí samy do sebe, každá sazenice stejně. Zahrada se bojí, {playerName}. Za sto let jsem ji nikdy neviděl bát se.",
+        "objectives": {
+          "0": {
+            "label": "Ostřihaná květinová sazenice"
+          }
+        }
+      },
+      "q_eg_four_statues": {
+        "title": "Čtyři tiché sestry",
+        "text": "Když byla zahrada mladá, první zahradníci vztyčili čtyři mramorové sestry, aby střežily její čtvrti: jednu nad Růžovou divočinou, jednu u rybniční promenády východně od bludiště, jednu na západním trávníku, kde si gnómové drží svou noru, a jednu na jižním trávníku za živými ploty. Bludiště vyrostlo mezi nimi, a většina lidí nikdy nevidí všechny čtyři. Projdi čtvrtěmi, {playerName}, a přilož dlaň ke každé sestře. Až tě zahrada prohlédne ze všech čtyř stran, otevře místa, která skrývá před cizinci.",
+        "completion": "Čtyři otisky, čtyři sestry, a ani jedna z nich neplakala mramorem. Zahrada tě zvážila, {playerName}, a neshledala tě nedostatečným. Teď tě mohu poslat tam, kde skutečně žije potíž.",
+        "objectives": {
+          "0": {
+            "label": "Zahradní socha navštívena"
+          }
+        }
+      },
+      "q_eg_bull_of_the_court": {
+        "title": "Býk Fontánového nádvoří",
+        "text": "Teď pravdu, {playerName}. Býk v srdci bludiště byl mým mistrovským dílem: vytvaroval jsem ho, aby střežil Fontánové nádvoří, a po sto let to dělal. Ale strach v zeleni ho dostihl, a teď nic nestřeží, loví. Bludiště mu předhazuje každého, kdo se do něj zatoulá. Jsem příliš starý na to, abych ho rozformoval, a musí to být úplné rozformování, kořen i větev. Vezmi si přítele, projdi bludištěm k nádvoří, a skolej mého býka.",
+        "completion": "Cítil jsem to, tady, když se rozpadl. Sto let práce, a měl jsi pravdu, že jsi to ukončil. Vezmi si tento plášť: ušil jsem ho pro toho, kdo se ukáže silnější než mé nejlepší dílo. Nádvoří je dnes v noci jen fontánou, {playerName}, a zahrada je jen zahradou. Snad teď můžeme s Vrchní zahradnicí oba spát.",
+        "objectives": {
+          "0": {
+            "label": "Zastřihovaný býk rozformován"
+          }
+        }
+      },
+      "q_fs_bell_at_the_landing": {
+        "title": "Zvon u přístaviště",
+        "text": "Přišel jsi přes Přívozní stezku, {playerName}? Pak jsi první za týden, a Strážce si tě bude chtít prohlédnout. Racčí přístav leží nahoru po pobřežní cestě, za sušicími stojany, o které se už nikdo nestará. Řekni Strážci Coalfastovi, že hráz stále stojí, a že Tam dnes ještě nezazvonil na trojí zvonění. Zatím.",
+        "completion": "Hráz drží, a Tam má ještě dost dechu, aby žertoval o trojím zvonění. Dobře. Jsme ostrov v obležení, {playerName}, a každý pár rukou, který přejde tu písečnou lávku, je pár, který musí průlomy nejdřív překonat, než se dostanou k mým lidem. Vítej v Racčím přístavu.",
+        "objectives": {
+          "0": {
+            "label": "Ohlásit se Strážci Coalfastovi"
+          }
+        }
+      },
+      "q_fs_hold_the_riftfields": {
+        "title": "Udrž Trhlinová pole",
+        "text": "Východně od města obilné řady zpustly, a ubožáci, kteří prošli průlomem Trhlinových polí, je teď dočista sklízejí. Mí lidé nemohou obdělávat pole, ve kterém nemohou stát, {playerName}. Sniž počet deseti ubožáků a vrať farmářům jejich půdu.",
+        "completion": "O deset méně, a polní dělníci se už hádají, kdo vyjde jako první. Nevydrží to dlouho, průlomy nikdy dlouho neodpočívají, ale město, které jí, je město, které vydrží.",
+        "objectives": {
+          "0": {
+            "label": "Průlomový ubožák zabit"
+          }
+        }
+      },
+      "q_fs_steel_for_the_redoubt": {
+        "title": "Ocel pro pevnůstku",
+        "text": "Každá čepel, kterou rozdávám, je buď ta, co vrátilo moře, nebo ta, co jsem vypáčila z mrtvých, {playerName}. Ubožáci nosí skrz průlomy šrot, panty, háky, rozbitou mečovou ocel, strakatiny, ale dá se z toho ukovat pořádná věc. Přines mi šest kusů jejich sesbírané oceli a barikádová linie dostane zpátky své zuby.",
+        "completion": "Prožraná solí a zjizvená průlomy, ale ostří stejně udrží. Tady, tyto rukojeti jsem podšila sama. Ocel za ocel, {playerName}: to je jediný obchod, který Vzdálené pobřeží v dnešních dnech vede.",
+        "objectives": {
+          "0": {
+            "label": "Průlomem zjizvená ocel"
+          }
+        }
+      },
+      "q_fs_the_three_bells": {
+        "title": "Tři zvony",
+        "text": "Tři hlídkové zvony stráží pobřeží kromě toho mého: jeden na Přístavištním mysu, jeden na jižní pláži, jeden u pobřeží Trhlinových polí. Pokud lano zpuchřelo nebo srdce zvonu odneslo, město se o průlomu dozví, až už bude v ulicích. Projdi pobřeží, {playerName}, a zazvoň na každý zvon jednou, abych věděla, že má stále hlas.",
+        "completion": "Tři hlasy, tři odpovědi, čistě donesené přes vodu. Spi dnes v noci v Racčím přístavu, {playerName}, a věz, že pokud tě zvon probudí, bude to mou rukou a včas.",
+        "objectives": {
+          "0": {
+            "label": "Hlídkový zvon rozezněn"
+          }
+        }
+      },
+      "q_fs_song_before_the_break": {
+        "title": "Píseň před průlomem",
+        "text": "Je tu muž, který slyší průlomy, ještě než se otevřou. Trhlinohlídač Ollun: učenec, nebo šílenec, a v poslední době si ten rozdíl nemůžu dovolit. Drží svou hlídku na Hlídkové louce, nahoru po cestě jihovýchodně od města. Najdi ho, {playerName}, a zeptej se ho, co nám ostrov chystá příště.",
+        "completion": "Strážce tě poslal? Dobře. To znamená, že město konečně začalo naslouchat. Teď buď na okamžik potichu, {playerName}. Tam, pod větrem, slyšíš to? Útesy zpívají, a ta melodie se mi nelíbí.",
+        "objectives": {
+          "0": {
+            "label": "Najít Trhlinohlídače Olluna"
+          }
+        }
+      },
+      "q_fs_moss_and_mending": {
+        "title": "Mech a léčení",
+        "text": "Slaný mech, co roste podél přílivové linie, je nejlepší obvazový materiál, jaký znám, a trhlinozplozenci si nárokovali každý kus pobřeží, kde roste. Nosí ho v chomáčích zaseknutý ve svých kůžích, ze všech věcí zrovna to. Vyčisti šest z nich z východních výběžků, {playerName}, a vytrhni mi čtyři dobré hrsti mechu z toho, co pošlapali.",
+        "completion": "Mech v jedné ruce a klidnější pobřeží v druhé. Doplnil jsi celou mou ordinaci, {playerName}. Prokaž mi tu laskavost, že se nestaneš mým dalším pacientem.",
+        "objectives": {
+          "0": {
+            "label": "Trhlinozplozenec zabit"
+          },
+          "1": {
+            "label": "Slaný mech Vzdáleného pobřeží"
+          }
+        }
+      },
+      "q_fs_bram_come_home": {
+        "title": "Bram se vrací domů",
+        "text": "Můj Bram vzal loď ráno, kdy se otevřel síťový průlom, a moře ho vyvrhlo někam za Přístavištní mys. Slyšela jsem ho před třemi nocemi, {playerName}, jak volá přes vodu, a byla jsem příliš vyděšená na to, abych šla. Stále jsem příliš vyděšená. Prosím. Jeho loď leží ztroskotaná na severním pobřeží. Doveď ho ke mně domů.",
+        "completion": "Brame! Přivedl jsi mi ho zpátky celého, {playerName}. Oba jsme plakali a ani jeden z nás se nestydí. Ať už si průlomy z tohoto ostrova vezmou příště cokoliv, mou rodinu nedostanou. Už ne.",
+        "objectives": {
+          "0": {
+            "label": "Rybář Bram bezpečně doveden domů do Racčího přístavu"
+          }
+        }
+      },
+      "q_fs_stalkers_off_the_light": {
+        "title": "Plíživci pryč od světla",
+        "text": "Plíživci loví ve tmě mezi hlídkovými ohni, a každou noc krouží kolem mé louky o něco blíž. Nejsou tupí, {playerName}, jsou trpěliví, a trpělivost je jediné, co nemohu přečkat. Zabij osm a zatlač tmu zpátky k útesům, kterými prošla.",
+        "completion": "Osm nocí kroužení, ukončeno za jednu. Ohně už hoří stáleji, nebo to jsou možná jen mé ruce. Tak či onak, louka je zase moje, a slyším, jak ostrov přemýšlí.",
+        "objectives": {
+          "0": {
+            "label": "Plíživec prázdnoty zabit"
+          }
+        }
+      },
+      "q_fs_the_great_break": {
+        "title": "Velký průlom",
+        "text": "Každá píseň, kterou tento ostrov zpívá, končí na stejném hlubokém tónu, a přichází z Rozeklaných útesů. Něco prošlo tím velkým průlomem, {playerName}, něco, co samotné útesy popraskaly, aby to vpustily, a stále to roste. Pokud to půjde na sever, na žádném zvonu nebude záležet. Vezmi si přítele, vezmi si dva, a skonči to. Pak řekni Coalfastovi, že se melodie změnila.",
+        "completion": "Ollun poslal zprávu předem: zpěv ustal. Celé mé město slyšelo ticho, {playerName}, a polovina z nich plakala nad zvukem naprosto ničeho. Nos tento plášť. Vzdálené pobřeží nezapomíná, kdo drželo jeho kus pobřeží.",
+        "objectives": {
+          "0": {
+            "label": "Rozpolcená hrůza poražena"
+          }
+        }
+      },
+      "q_gc_down_the_windway": {
+        "title": "Dolů po Větrné cestě",
+        "text": "Zvládl jsi výstup, {playerName}, takže si tě vítr rozhodl nechat. Osadní přístav leží na východ podél cesty přes stráně, schovaný v závětří své zátoky. Přístavní mistr Odile počítá každou duši, která přejde přes průsmyk, a bude si chtít spočítat i tebe. Řekni jí, že Větrná cesta je stále otevřená.",
+        "completion": "Přes průsmyk pěšky, v tomhle počasí? Maren mi posílá dost málo jmen, a ještě méně jich přijde odpovědět za sebe osobně. Vítej v Osadním přístavu, {playerName}. Zavři za sebou dveře hospody.",
+        "objectives": {
+          "0": {
+            "label": "Ohlásit se Přístavnímu mistrovi Odile"
+          }
+        }
+      },
+      "q_gc_wool_off_the_downs": {
+        "title": "Vlna ze strání",
+        "text": "Mé lodní posádky veslují do vichru, který proráží nepromokavou plachtovinu jako papír, {playerName}. Jen jedna věc tento vítr odrazí: mastná vlna z vřesovištních beranů, spředená natlusto po způsobu Osadního přístavu. Stáda se pasou na Kvílivých stráních západně od města. Šest dobrých rounů, a každá posádka bude tuto sezónu veslovat v teple.",
+        "completion": "Rouno jako toto je důvod, proč tam berani stojí tlustí a spokojení v počasí, které zabíjí lidi. Přadleny se do toho pustí při svitu lampy. Vezmi si tyto boty, {playerName}, jsou podšité z poslední stříže.",
+        "objectives": {
+          "0": {
+            "label": "Mastná beraní vlna"
+          }
+        }
+      },
+      "q_gc_scuttlers_in_the_pots": {
+        "title": "Pobíhalové v pastech",
+        "text": "Mělčinoví pobíhalové se naučili šplhat po útesové cestě a rozbíjet naše krabí pasti o kameny, {playerName}. Polovina úlovku tento týden pryč, a jeden dělník s rukou, kterou nebude moct měsíc používat. Rozbij deset z nich a zbytek si vzpomene, proč se drželi u mělčin.",
+        "completion": "O deset méně krunýřů na mé cestě, a pasti dnes ráno vytáhli plné. Dělníci tě nazývají dobrým znamením, {playerName}. V Osadním přístavu je to tak vřelá chvála, jak jen to jde.",
+        "objectives": {
+          "0": {
+            "label": "Mělčinový pobíhal zabit"
+          }
+        }
+      },
+      "q_gc_keeper_of_the_flame": {
+        "title": "Strážce plamene",
+        "text": "Starý Bram se stará o Maják na vysokém mysu severovýchodně od města, a už dva týdny nesešel dolů pro své zásoby. Lampa stále hoří, takže žije, ale muž jeho věku sám na tom mysu v tomhle větru, {playerName}. Vystoupej po cestě k majáku a přesvědč se, že stojí.",
+        "completion": "Odile tě poslala celou tu cestu, aby zjistila, jestli mě nevzal vítr? Ha. Řekni jí, že lampa hoří a já taky. Ale protože jsi tu cestu zvládl, {playerName}, zůstaň chvíli. Maják má práci, na kterou se zdá být vhodný jen cizinec.",
+        "objectives": {
+          "0": {
+            "label": "Najít Strážce Brama"
+          }
+        }
+      },
+      "q_gc_lanterns_on_the_shear": {
+        "title": "Lucerny na Srázu",
+        "text": "Maják je velké světlo, {playerName}, ale jsou to bouřkové lucerny, které vedou nočního poutníka dolů po útesové cestě nad Srázem. Minulou noc je vichr uhasil všechny, a ta cesta ve tmě je dlouhý pád s krátkým koncem. Vezmi si mé křesadlo a znovu zapal ty čtyři podél útesu.",
+        "completion": "Čtyři světelné body na útesové cestě, přesně tam, kam patří. Odsud shora to vypadá, jako by pobřeží znovu otevřelo oči. Máš v sobě zárodek strážce, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Bouřková lucerna znovu zapálena"
+          }
+        }
+      },
+      "q_gc_wind_against_the_wick": {
+        "title": "Vítr proti knotu",
+        "text": "Vichrné bludičky jsou vítr, co zezlověl, {playerName}. Shromažďují se na vysokých stráních u Zrcadlového jezírka, a každý plamen, který najdou, uhasí, lucernu, ohniště, jednoho dne i tuhle lampu. Devětatřicet let jsem udržovala Maják zapálený, a neztratím ho kvůli počasí s hlubokou zaťatostí. Rozežeň osm z nich.",
+        "completion": "Lampa se minulou noc ani nezachvěla, poprvé za měsíc. Vítr nás pořád nesnáší, {playerName}, ale vrátil se k tomu, že nás nesnáší poctivě.",
+        "objectives": {
+          "0": {
+            "label": "Vichrná bludička rozehnána"
+          }
+        }
+      },
+      "q_gc_the_far_shore": {
+        "title": "Vzdálený břeh",
+        "text": "Z této lampové komory vidím celé pobřeží, {playerName}, a to, co vidím na severu, se mi nelíbí. Zelená světla procházející Vrakovými poli za odlivu, trup po trupu. Jedna žena pracuje na tom pobřeží sama: Edda, vrakařka. Následuj útesovou cestu na sever za Sráz, dokud nezačnou vraky, a přesvědč se, že stále dýchá.",
+        "completion": "Bram teď hlídá mé pobřeží ze své věže, jo? Ten stařec má právo si dělat starosti, {playerName}. Mrtví chodí po vlastních vracích v noci, a v poslední době je přestalo zajímat, jestli je nahoře slunce.",
+        "objectives": {
+          "0": {
+            "label": "Najít Vrakařku Eddu"
+          }
+        }
+      },
+      "q_gc_dead_mens_cargo": {
+        "title": "Náklad mrtvých mužů",
+        "text": "Zákon vraku je jednoduchý, {playerName}: co moře dá pláži, to je moje. Utopení lodníci s tím nesouhlasí. Vstávají ze svých trupů a stahují každou bednu, kterou naskládám, zpátky pod přílivovou linii. Ulož šest z nich k odpočinku navždy, a zatímco je pláž tichá, dovleč tři bedny naplaveného dřeva, než příliv podá svůj protinárok.",
+        "completion": "Šest posádek tišších a tři bedny bezpečně na suchu. Vrakuješ s tvrdší rukou než já, {playerName}, ale účetní knize je to jedno. Polovina tohoto je tvá podle zákona, a zákonem myslím to, že to tak říkám.",
+        "objectives": {
+          "0": {
+            "label": "Utopený lodník uložen k odpočinku"
+          },
+          "1": {
+            "label": "Bedna naplaveného dřeva vylovena"
+          }
+        }
+      },
+      "q_gc_the_wreck_warden": {
+        "title": "Strážce vraku",
+        "text": "Teď víš, proč lodníci vstávají, {playerName}. Něco nosí kraby obrostlou plátovou zbroj prvního vraku, který kdy na tomto pobřeží ztroskotal, a hlídá každý trup na pláži jako hřbitov, o který bylo najato pečovat. Drží poklad, po kterém jsem toužila deset let, a posádku, kterou bych raději viděla odpočívat. Skonči Strážce vraku. Vezmi si přítele, mrtví drží dobrou hlídku.",
+        "completion": "Pláž ztichla ve chvíli, kdy padl, {playerName}. První ticho, které jsem na tomto pobřeží slyšela za deset let jeho obdělávání. Posádky jsou teď jen kosti, odpočívající kosti. Vezmi si plášť z vrchu pokladu, vždycky se lépe hodil na živá záda.",
+        "objectives": {
+          "0": {
+            "label": "Strážce vraku poražen"
           }
         }
       },
@@ -11544,6 +13761,9 @@ export const cs_CZ: EnTranslations = {
           },
           "10": {
             "label": "Prasečí pole"
+          },
+          "11": {
+            "label": "Hráz Vzdáleného pobřeží"
           }
         }
       },
@@ -11612,6 +13832,300 @@ export const cs_CZ: EnTranslations = {
             "label": "Svatyně Hrobodraka"
           }
         }
+      },
+      "veiled_hollow": {
+        "name": "Zahalená kotlina",
+        "welcome": "Vzduch hučí prastarou magií. Vyhledej Strážce Saelwyna pod velkým stromem Prastarého svitu.",
+        "pois": {
+          "0": {
+            "label": "Prastarý svit"
+          },
+          "1": {
+            "label": "Jeskyně Soumračného pádu"
+          },
+          "2": {
+            "label": "Vyhlídka Soumračného pádu"
+          },
+          "3": {
+            "label": "Prastarý háj"
+          },
+          "4": {
+            "label": "Kotlina hvězdného pádu"
+          },
+          "5": {
+            "label": "Potopené nádvoří"
+          },
+          "6": {
+            "label": "Křišťálové mělčiny"
+          },
+          "7": {
+            "label": "Zářící hlubina"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "Dračí země",
+        "welcome": "Horký vítr se valí od pustin před tebou. Draci krouží nad Dračí tlamou a trollí ohně hoří v dunách.",
+        "pois": {
+          "0": {
+            "label": "Dračí hlídka"
+          },
+          "1": {
+            "label": "Branní les"
+          },
+          "2": {
+            "label": "Popelové duny"
+          },
+          "3": {
+            "label": "Trollí sněm"
+          },
+          "4": {
+            "label": "Poslední tvrz"
+          },
+          "5": {
+            "label": "Pole krvavého skla"
+          },
+          "6": {
+            "label": "Kaldera Dračí tlamy"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "Kraj Mrazivého závoje",
+        "welcome": "Sníh pohlcuje každý zvuk. Pod tančícími světly se sám chlad zdá být vzhůru.",
+        "pois": {
+          "0": {
+            "label": "Ledový plášť"
+          },
+          "1": {
+            "label": "Sněžná hranice"
+          },
+          "2": {
+            "label": "Ledovcové jezírko"
+          },
+          "3": {
+            "label": "Schody polární záře"
+          },
+          "4": {
+            "label": "Chvějivá bažina"
+          },
+          "5": {
+            "label": "Kvílivé terasy"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "Jantarový pád",
+        "welcome": "Každý list zde plane zlatě a rudě, přesto žádný nikdy nespadne. Lucerny v Lucernojezeru jsou pro tebe rozsvíceny.",
+        "pois": {
+          "0": {
+            "label": "Lucernojezero"
+          },
+          "1": {
+            "label": "Zlatotání"
+          },
+          "2": {
+            "label": "Pozlacený sad"
+          },
+          "3": {
+            "label": "Sklizňová kotlina"
+          },
+          "4": {
+            "label": "Velké jezero"
+          },
+          "5": {
+            "label": "Popelojavorové návrší"
+          },
+          "6": {
+            "label": "Nakloněný monolit"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "Vrbová bažina",
+        "welcome": "Bažina hučí vážkami a včelami. Přejdi most do Mostojezera a chvíli si odpočiň.",
+        "pois": {
+          "0": {
+            "label": "Mostojezero"
+          },
+          "1": {
+            "label": "Schody Jantarové bažiny"
+          },
+          "2": {
+            "label": "Liliové vřesoviště"
+          },
+          "3": {
+            "label": "Bažinolesklé tůně"
+          },
+          "4": {
+            "label": "Vrbí pláč"
+          },
+          "5": {
+            "label": "Ospalé pláně"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "Noční květ",
+        "welcome": "Za Noční branou sní i samotný vzduch. Následuj květinové světlo do Měsíčního klidu a dej pozor na spící svět, který visí na obloze.",
+        "pois": {
+          "0": {
+            "label": "Měsíční klid"
+          },
+          "1": {
+            "label": "Noční brána"
+          },
+          "2": {
+            "label": "Měsíční studna"
+          },
+          "3": {
+            "label": "Soumrakové pole"
+          },
+          "4": {
+            "label": "Stálá hlídka"
+          },
+          "5": {
+            "label": "Bezesná mohyla"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "Přízračný les",
+        "welcome": "Koruny stromů se zavírají nad cestou jako víko. Drž se lucern Šibeničního jezera a neodpovídej, pokud les zavolá tvé jméno.",
+        "pois": {
+          "0": {
+            "label": "Šibeniční jezero"
+          },
+          "1": {
+            "label": "Vraní brána"
+          },
+          "2": {
+            "label": "Vdovin houština"
+          },
+          "3": {
+            "label": "Visící mýtina"
+          },
+          "4": {
+            "label": "Kaple Truchlokamene"
+          },
+          "5": {
+            "label": "Lovcova mýtina"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "Palmový kraj",
+        "welcome": "Teplý písek, hlučné ptactvo a džungle, která pohlcuje obzor. Naplavený přístav ti na pláži drží zapálený oheň.",
+        "pois": {
+          "0": {
+            "label": "Naplavený přístav"
+          },
+          "1": {
+            "label": "Spletené ústí"
+          },
+          "2": {
+            "label": "Palmová pláž"
+          },
+          "3": {
+            "label": "Smaragdová spleť"
+          },
+          "4": {
+            "label": "Liánový pád"
+          },
+          "5": {
+            "label": "Safírová laguna"
+          },
+          "6": {
+            "label": "Potopená modla"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "Věčná zahrada",
+        "welcome": "Někdo pořád stříhá živé ploty, ačkoliv zahradníka nikdo neviděl už sto let. Dej pozor na bludiště: ono dává pozor i na tebe.",
+        "pois": {
+          "0": {
+            "label": "Živoplotov"
+          },
+          "1": {
+            "label": "Zahradní brána"
+          },
+          "2": {
+            "label": "Parterová promenáda"
+          },
+          "3": {
+            "label": "Hrad Úsvitu"
+          },
+          "4": {
+            "label": "Okvětní rybník"
+          },
+          "5": {
+            "label": "Velké bludiště"
+          },
+          "6": {
+            "label": "Fontánové nádvoří"
+          },
+          "7": {
+            "label": "Starý mlýn"
+          },
+          "8": {
+            "label": "Severní hlídka"
+          },
+          "9": {
+            "label": "Liliová kotlina"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "Vichrný hřeben",
+        "welcome": "Vítr tu nikdy ani na chvíli neustal a Starý maják nikdy ani na okamžik nezhasl. Osadní přístav žádá jen, abys za sebou zavřel dveře hospody.",
+        "pois": {
+          "0": {
+            "label": "Osadní přístav"
+          },
+          "1": {
+            "label": "Větrná cesta"
+          },
+          "2": {
+            "label": "Kvílivé stráně"
+          },
+          "3": {
+            "label": "Starý maják"
+          },
+          "4": {
+            "label": "Sráz"
+          },
+          "5": {
+            "label": "Vraková pole"
+          },
+          "6": {
+            "label": "Zrcadlové jezírko"
+          },
+          "7": {
+            "label": "Stáje Vichrného hřebene"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "Vzdálené pobřeží",
+        "welcome": "Přejdi písečnou lávku a zvon Racčího přístavu tě najde dřív, než to stihne město. Průlomy se protrhávají bez varování a pevnůstka drží své pobřeží proti všemu, co se jimi valí. Čekali dlouho na někoho, jako jsi ty.",
+        "pois": {
+          "0": {
+            "label": "Racčí přístav"
+          },
+          "1": {
+            "label": "Přístaviště"
+          },
+          "2": {
+            "label": "Hlídková louka"
+          },
+          "3": {
+            "label": "Rozeklané útesy"
+          },
+          "4": {
+            "label": "Trhlinová pole"
+          }
+        }
       }
     },
     "dungeons": {
@@ -11639,6 +14153,16 @@ export const cs_CZ: EnTranslations = {
         "name": "Raidová aréna Nythraxis",
         "enterText": "Procházíš zapečetěnými královskými dveřmi.",
         "leaveText": "Vracíš se do chladného vzduchu Thornpeaku."
+      },
+      "wildheart_basin": {
+        "name": "Kotlina Divokého srdce",
+        "enterText": "Teplý déšť syčí na starém kameni. Kotlina Divokého srdce se otevírá před tebou.",
+        "leaveText": "Vracíš se pod kamennými tesáky zpět do slunce Palmového kraje."
+      },
+      "the_last_keep": {
+        "name": "Poslední tvrz",
+        "enterText": "Vstupuješ do chladných, tichých síní Poslední tvrze.",
+        "leaveText": "Zavíráš bránu tvrze za sebou a vracíš se do větru Dračích zemí."
       },
       "drowned_temple": {
         "name": "Utopený chrám",

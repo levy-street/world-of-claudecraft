@@ -44,6 +44,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     onGround: true,
     jumping: false,
     fallStartY: pos.y,
+    fatigueTicks: 0,
     hp: 1,
     maxHp: 1,
     resource: 0,
@@ -137,6 +138,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     pulseTimer: 0,
     stompTimer: 0,
     bigCastTimer: 0,
+    deathZoneCastTimer: 0,
+    deathZoneStrikeTimer: 0,
     infernoTimer: 0,
     infernoRemaining: 0,
     infernoPulsesFired: 0,
@@ -196,6 +199,9 @@ function baseEntity(id: number, pos: Vec3): Entity {
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
+    mountKey: '',
+    mountCastRemaining: 0,
+    mountCastKey: '',
     mainhandItemId: null,
     offhandItemId: null,
     weaponSkinLoadout: {},
@@ -226,6 +232,7 @@ export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: stri
 }
 
 export type PlayerEquipment = Partial<Record<EquipSlot, string>>;
+export type PlayerEquipmentInstances = Partial<Record<EquipSlot, ItemInstancePayload>>;
 
 // Classic-era rules: first 20 stamina gives 1 hp each, the rest 10 hp each.
 // First 20 intellect gives 1 mana each, the rest 15 mana each.
@@ -254,7 +261,7 @@ export function recalcPlayerStats(
   cls: PlayerClass,
   equipment: PlayerEquipment,
   mods: TalentModifiers | undefined,
-  equipmentInstance: Partial<Record<EquipSlot, ItemInstancePayload>>,
+  equipmentInstance: PlayerEquipmentInstances,
 ): void {
   const def = CLASSES[cls];
   const lvl = e.level;
@@ -301,21 +308,23 @@ export function recalcPlayerStats(
       s.spi += item.stats.spi ?? 0;
       s.armor += item.stats.armor ?? 0;
     }
-    // Instance stat bonus: additive on top of the item's own base stats, from
-    // this specific instance's rolled.stats: an enchant's bonus
-    // (src/sim/professions/enchanting.ts applyEnchant), a masterwork
-    // copy's baked tier-delta bonus (src/sim/professions/masterwork.ts), or
-    // both merged. The equip path carries the consumed inventory instance into
-    // equipmentInstance (items.ts equipItem), so either applies on equip. A
-    // plain piece has no entry here, so this is a no-op for the common case.
-    const enchantStats = equipmentInstance?.[slot]?.rolled?.stats;
-    if (enchantStats) {
-      s.str += enchantStats.str ?? 0;
-      s.agi += enchantStats.agi ?? 0;
-      s.sta += enchantStats.sta ?? 0;
-      s.int += enchantStats.int ?? 0;
-      s.spi += enchantStats.spi ?? 0;
-      s.armor += enchantStats.armor ?? 0;
+    // Instance bonus, additive on top of the item's own base stats, from this
+    // specific instance's rolled.stats: an enchant, a Phase 2 masterwork copy's
+    // baked tier-delta bonus, or a Rift-forged upgrade (the Rift payload keeps
+    // rolled.stats as its authoritative aggregate). The equip path carries the
+    // consumed inventory instance into equipmentInstance, so every source applies.
+    // A plain piece has no entry here, so this is a no-op for the common case.
+    const rolled = equipmentInstance?.[slot]?.rolled?.stats;
+    if (rolled) {
+      s.str += Number.isFinite(rolled.str) ? rolled.str : 0;
+      s.agi += Number.isFinite(rolled.agi) ? rolled.agi : 0;
+      s.sta += Number.isFinite(rolled.sta) ? rolled.sta : 0;
+      s.int += Number.isFinite(rolled.int) ? rolled.int : 0;
+      s.spi += Number.isFinite(rolled.spi) ? rolled.spi : 0;
+      s.armor += Number.isFinite(rolled.armor) ? rolled.armor : 0;
+      bonusSp += Number.isFinite(rolled.spellPower) ? rolled.spellPower : 0;
+      bonusCritRating += Number.isFinite(rolled.critRating) ? rolled.critRating : 0;
+      bonusHasteRating += Number.isFinite(rolled.hasteRating) ? rolled.hasteRating : 0;
     }
   }
   // Item-set bonuses from equipped pieces. Flat primary stats join the gear
@@ -586,7 +595,8 @@ export function recalcPlayerStats(
   // The class-agnostic crit core (rating + talent/set crit + flat crit auras).
   // Both hit tables read it: melee adds Agility on top, spells add Intellect
   // (the community-found gap: spell crit read ONLY Intellect, so crit gear and
-  // crit talents were dead weight to casters).
+  // crit talents were dead weight to casters). The active mount's bonus rides
+  // here too so it covers melee, ranged, and ability crit uniformly.
   e.sharedCritBonus =
     bonusCrit + (mods?.stats.crit ?? 0) + setEff.crit + critFractionFromRating(e.critRating);
   // Crit: ~1% per 20 agi at low level
@@ -721,6 +731,9 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   if (template.stoneskin) e.stoneskinTimer = template.stoneskin.every;
   // Telegraph the first hardcast (bigCast) the same way: one full interval after engage.
   if (template.bigCast) e.bigCastTimer = template.bigCast.every;
+  // Telegraph the lethal zone casts the same way: one full interval before first fire.
+  if (template.deathZoneCast) e.deathZoneCastTimer = template.deathZoneCast.every;
+  if (template.deathZoneStrike) e.deathZoneStrikeTimer = template.deathZoneStrike.every;
   if (template.infernoChannel) e.infernoTimer = template.infernoChannel.every;
   // Telegraph the first Rally the same way: one full interval after engage.
   if (template.rally) e.rallyTimer = template.rally.every;

@@ -156,23 +156,23 @@ const RUN_ID =
 //   'once'     tap each mob once then hold in place (mass-pull, boss-pulse): total damage
 //              stays near N taps per mob, so a low-hp camp survives and a world boss is
 //              never dented. Respawned bots re-tap to climb back onto the tables.
-// The spot coordinates are content-coupled: (-15, 55) is the zone1 forest_wolf camp and
+// The spot coordinates are content-coupled: (-27, 71) is the zone1 forest_wolf camp and
 // (110, 760) is the zone3 world boss. If the content moves, the staging assertion fails
 // loudly (STAGING FAILED) instead of silently measuring an empty field; update the spots
 // from src/sim/content/zone1.ts and src/sim/world_boss.ts if that happens.
 const SCENARIOS = {
   'idle-crowd': {
     level: 18,
-    spot: { x: -15, z: 55 },
-    campRadius: 22,
+    spot: { x: -27, z: 71 },
+    campRadius: 28.5,
     tap: false,
     sig: 'aggro',
     hold: 'passive',
   },
   'mass-pull': {
     level: 3,
-    spot: { x: -15, z: 55 },
-    campRadius: 22,
+    spot: { x: -27, z: 71 },
+    campRadius: 28.5,
     tap: true,
     sig: 'threat',
     hold: 'once',

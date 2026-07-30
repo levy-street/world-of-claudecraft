@@ -42,6 +42,7 @@
 //   bank.ts             IWorldBank           per-character deposit box (proximity-gated info +
 //                                            deposit/withdraw/buy-slots)
 //   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
+//   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
@@ -75,6 +76,7 @@ import type { IWorldInventory } from './world_api/inventory';
 import type { IWorldLoot } from './world_api/loot';
 import type { IWorldMail } from './world_api/mail';
 import type { IWorldMarket } from './world_api/market';
+import type { IWorldMounts } from './world_api/mounts';
 import type { IWorldParty } from './world_api/party';
 import type { IWorldPet } from './world_api/pet';
 import type { IWorldProfessions } from './world_api/professions';
@@ -184,10 +186,11 @@ export type {
   DungeonFinderProposalView,
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
-export type { RaidLockout } from './world_api/dungeons';
+export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
 export type { WorldInteractionOutcome } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
+export type { MountRaceView } from './world_api/mounts';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
 export type {
   CraftingIdentityView,
@@ -259,7 +262,8 @@ export interface IWorld
     IWorldValeCup,
     IWorldDungeonFinder,
     IWorldActionBar,
-    IWorldDeeds {}
+    IWorldDeeds,
+    IWorldMounts {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -430,6 +434,13 @@ export const COMMAND_NAMES = [
   'vcup_ready',
   'vcup_bet',
   'vcup_practice',
+  'mount_toggle',
+  'mount_train_begin',
+  'mount_train_answer',
+  'mount_train_abort',
+  'mount_race_start',
+  'mount_race_cancel',
+  'learn_riding',
   'releaseEmpowered',
   'df_roles',
   'df_queue',
@@ -440,12 +451,17 @@ export const COMMAND_NAMES = [
   'df_apply',
   'df_apply_cancel',
   'df_app_respond',
+  'rift_upgrade_item',
+  'rift_enchant_item',
+  'rift_socket_gem',
   'deed_set_title',
   // personal chat ignores: the chat-only sibling of block_add/block_remove.
   // (An admin "mute" is a moderation action, not a wire command.)
   'ignore_add',
   'ignore_remove',
   'stow_weapon',
+  // Local geometry recovery. Appended because wire tokens are never reordered.
+  'unstuck',
   // Append-only protocol addition for the canonical Talents V2 row mutation.
   'selectTalentRow',
   'resurrect_respond',
@@ -492,6 +508,13 @@ export const DISPATCH_ONLY_COMMANDS = [
   'leave_crypt',
   'social_refresh',
   'targetNearest',
+  // Riding-lesson leftovers: 'mount_train_answer' (the removed lean-cue arm) and
+  // 'mount_train_abort' (the removed course minigame's cancel) no longer have a
+  // ClientWorld sender, but the wire strings ARE the protocol (append-only), so
+  // the server keeps dispatching them: answer as a no-op, abort as a session
+  // abandon.
+  'mount_train_answer',
+  'mount_train_abort',
 ] as const satisfies readonly CommandName[];
 
 export type DispatchOnlyCommand = (typeof DISPATCH_ONLY_COMMANDS)[number];
@@ -539,7 +562,8 @@ export type WorldFacet =
   | 'IWorldValeCup'
   | 'IWorldDungeonFinder'
   | 'IWorldActionBar'
-  | 'IWorldDeeds';
+  | 'IWorldDeeds'
+  | 'IWorldMounts';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -551,6 +575,7 @@ export const COMMAND_FACETS = {
   attack: 'IWorldCombat',
   stopattack: 'IWorldCombat',
   release: 'IWorldCombat',
+  unstuck: 'IWorldCombat',
   // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',
@@ -563,6 +588,14 @@ export const COMMAND_FACETS = {
   tabFriendly: 'IWorldTargeting',
   // IWorldLoot: need-greed roll submit.
   lootRoll: 'IWorldLoot',
+  // IWorldInventory: non-fungible Rift gear progression. These mutate the
+  // authoritative inventory copy; every cost and payload is validated again
+  // in the sim before the item instance is changed. (salvage_item rides the
+  // professions surface and, like the other enchanting-family commands, has
+  // no facet row here.)
+  rift_upgrade_item: 'IWorldInventory',
+  rift_enchant_item: 'IWorldInventory',
+  rift_socket_gem: 'IWorldInventory',
   // IWorldTelemetry: fire-and-forget metrics sink.
   telemetry: 'IWorldTelemetry',
   // IWorldProgressionXp: opt-in cosmetic prestige (leaderboard is a REST GET, no
@@ -710,6 +743,21 @@ export const COMMAND_FACETS = {
   vcup_ready: 'IWorldValeCup',
   vcup_bet: 'IWorldValeCup',
   vcup_practice: 'IWorldValeCup',
+  // IWorldMounts: pick + mount/dismount (snake_case wire strings, by design).
+  // The active mount is a self-snapshot read (terse `mnt`, no send, untagged);
+  // summoning one is an item use (use_item), not a mount command.
+  // mount_train_begin is the legacy riding-lesson entry point; its feedback
+  // rides the mountTrain* events (no snapshot field).
+  mount_toggle: 'IWorldMounts',
+  mount_train_begin: 'IWorldMounts',
+  // mount_race_start begins a show-jumping race from the glowing platform;
+  // mount_race_cancel exits it. Both are validated server-side and feed the
+  // mountRace* events.
+  mount_race_start: 'IWorldMounts',
+  mount_race_cancel: 'IWorldMounts',
+  // learn_riding: purchase the riding skill from Marla (80g, once). No snapshot
+  // field; the result rides the ridingTrained snapshot delta (mntRtd).
+  learn_riding: 'IWorldMounts',
   // IWorldDungeonFinder: the group finder (snake_case wire strings, by design).
   // dungeonFinderInfo / dungeonFinderBoard are snapshot reads (no send, untagged).
   df_roles: 'IWorldDungeonFinder',

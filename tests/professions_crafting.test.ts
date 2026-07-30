@@ -875,9 +875,12 @@ describe('masterwork proc (Professions 2.0)', () => {
   }
 
   it('a proc mints a signed masterwork instance and surfaces it on every seam (hunted seed)', () => {
-    // Seed 2 was hunted (bounded scan from seed 1 upward) so the single proc
-    // draw lands under the capped 15 percent chance; only the pinned literal
-    // is committed, per the suite's seed-pinning idiom.
+    // Seed 2 was hunted (bounded scan from seed 1 upward, re-recorded after
+    // the Eastbrook camp respacing thinned the zone-1 camp counts and shifted
+    // the camp-driven world-gen draw sequence) so the single proc draw lands
+    // under the capped 15 percent chance; only the pinned literal is
+    // committed, per the suite's seed-pinning idiom. Spares on record: 21, 23,
+    // 27, and 28.
     const { sim, pid, meta } = vestmentsScenario(2);
     sim.drainEvents();
     let draws = 0;

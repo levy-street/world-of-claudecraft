@@ -342,6 +342,33 @@ export const id_ID: EnTranslations = {
       "healerConfirmAccept": "Bangkitkan Aku",
       "healerConfirmCancel": "Membatalkan"
     },
+    "unstuck": {
+      "menuButton": "Lepaskan Diri",
+      "help": "Pemulihan: /unstuck memulai hitung mundur diam di tempat untuk memindahkanmu ke titik aman terjangkau terdekat.",
+      "helpAtGraveyard": "Pemulihan: /unstuck memulai hitung mundur diam di tempat, lalu mengirim rohmu ke kuburan terdekat. Kembali lewat Sang Penjaga Pucat membutuhkan Upeti Sang Penjaga.",
+      "started": "Lepaskan Diri dalam {seconds} detik. Bergerak, bertarung, menerima kerusakan, atau memulai tindakan lain akan membatalkannya.",
+      "countdown": "Lepaskan Diri: {seconds}",
+      "completed": "Dipindahkan ke titik aman terjangkau terdekat.",
+      "completedAtGraveyard": "Rohmu telah kembali ke kuburan terdekat. Bicaralah dengan Sang Penjaga Pucat untuk menerima Upeti Sang Penjaga.",
+      "revivedAtGraveyard": "Kamu telah dikembalikan ke kuburan terdekat dan dihidupkan kembali. Upeti Sang Penjaga membebanimu.",
+      "cancelledMoved": "Lepaskan Diri dibatalkan karena kamu bergerak.",
+      "cancelledDamaged": "Lepaskan Diri dibatalkan karena kamu menerima kerusakan.",
+      "cancelledCombat": "Lepaskan Diri dibatalkan karena kamu memasuki pertempuran.",
+      "cancelledBusy": "Lepaskan Diri dibatalkan karena kamu memulai tindakan lain.",
+      "cancelledState": "Lepaskan Diri dibatalkan karena keadaanmu berubah.",
+      "cancelledDisconnected": "Lepaskan Diri dibatalkan karena koneksimu terputus.",
+      "noSafePosition": "Tidak ditemukan titik aman terjangkau di dekatmu. Kamu tidak dipindahkan.",
+      "alreadyActive": "Lepaskan Diri sedang menghitung mundur.",
+      "alreadySafe": "Kamu sudah berada di posisi yang aman dan terjangkau.",
+      "cooldown": "Lepaskan Diri akan siap dalam {seconds} detik.",
+      "dead": "Kamu tidak dapat menggunakan Lepaskan Diri saat tewas atau dalam wujud roh.",
+      "combat": "Kamu tidak dapat menggunakan Lepaskan Diri saat bertempur.",
+      "controlled": "Kamu tidak dapat menggunakan Lepaskan Diri saat pergerakanmu terhalang.",
+      "standStill": "Berdirilah diam di tanah padat sebelum menggunakan Lepaskan Diri.",
+      "standStillAnywhere": "Berdirilah diam sebelum menggunakan Lepaskan Diri.",
+      "busy": "Selesaikan tindakanmu saat ini sebelum menggunakan Lepaskan Diri.",
+      "unavailable": "Lepaskan Diri tidak tersedia dalam keadaanmu saat ini."
+    },
     "fct": {
       "absorbed": "{amount} diserap",
       "cheap": "Lebih murah!"
@@ -781,6 +808,7 @@ export const id_ID: EnTranslations = {
       "leaderboard": "Peringkat",
       "dailyRewards": "Toko",
       "deeds": "Jasa",
+      "mounts": "Tunggangan",
       "professions": "Profesi",
       "nameplates": "Nama",
       "haptics": "Haptik",
@@ -881,10 +909,15 @@ export const id_ID: EnTranslations = {
       "autoShowHint": "Baris muncul secara otomatis setelah partaimu memberikan kerusakan atau penyembuhan, dan segmen ini tertutup beberapa detik setelah pertarungan berakhir.",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
-      "breakdownOther": "Other ({count})",
+      "breakdownOther": "Lainnya ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Melee"
+      "melee": "Jarak Dekat",
+      "move": "Seret untuk memindahkan pengukur ini",
+      "resize": "Seret untuk mengubah ukuran pengukur ini",
+      "dock": "Kembalikan pengukur ini ke jendela pengukur",
+      "separate": "Pisahkan {meter}",
+      "regroup": "Gabungkan kembali {meter}"
     },
     "petFeed": {
       "disabledFullHp": "Peliharaan sudah dalam kondisi darah penuh",
@@ -902,7 +935,59 @@ export const id_ID: EnTranslations = {
       "petStop": "Peliharaan: Berhenti",
       "petTaunt": "Peliharaan: Ejek",
       "petDefensive": "Peliharaan: Defensif",
-      "petAggressive": "Peliharaan: Agresif"
+      "petAggressive": "Peliharaan: Agresif",
+      "mount": "Naiki / Turun"
+    },
+    "mounts": {
+      "title": "Tunggangan",
+      "close": "Tutup",
+      "select": "Pilih",
+      "selected": "Terpilih",
+      "riding": "Menunggang",
+      "mount": "Naiki",
+      "dismount": "Turun",
+      "useToRide": "Gunakan untuk memanggil tunggangan ini.",
+      "emptyTitle": "Belum ada tunggangan terkumpul",
+      "emptyStableHint": "Capai level 20 dan ikuti pelajaran menunggang bersama Kepala Kandang Marla di Kandang Highwatch, sebelah barat Highwatch.",
+      "emptyDropHint": "Tunggangan yang lebih langka dijatuhkan oleh bos dungeon heroik dan penyelesaian Rift.",
+      "clickManage": "Klik untuk memilih tungganganmu",
+      "rarity_common": "Umum",
+      "rarity_rare": "Langka",
+      "rarity_epic": "Epik",
+      "spec_speed": "+{pct}% mobilitas ekstra",
+      "name_valorsteed": "Valorsteed",
+      "name_grag_bear": "Grag-Bear Raksasa",
+      "name_stalkglider_snail": "Stalk-Glider Cangkang Lumut",
+      "name_aether_hover_cycle": "Sepeda Melayang Aether-Jouster",
+      "name_shadowjump_toad": "Kama-Kage Sang Kodok Lompat-Bayangan",
+      "name_stormfeather_griffin": "Stormfeather Penjelajah Langit",
+      "name_thunderstrut_gobbler": "Thunderstrut Sang Kalkun Agung",
+      "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
+      "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
+      "desc_stalkglider_snail": "Siput ulet berenergi tahan lama yang memberikan kecepatan perjalanan tambahan.",
+      "desc_aether_hover_cycle": "Sepeda magiteknologi bertenaga besar yang dirancang untuk pergerakan tempur cepat dan melayang rendah.",
+      "desc_shadowjump_toad": "Kodok raksasa masif berpijakan mantap, terlatih dalam lompatan bayangan secepat kilat yang mampu menjangkau medan apa pun.",
+      "desc_stormfeather_griffin": "Griffin badai yang anggun, melangkah di tanah dengan cakar bersepatu rune, sayap terlipat rapat.",
+      "desc_thunderstrut_gobbler": "Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur."
+    },
+    "mountTraining": {
+      "mountPrompt": "Tekan {key} untuk menaiki Valorsteed latihan.",
+      "ownedMountPrompt": "Tali kekangmu ada di dalam tasmu. Gunakan untuk menunggang.",
+      "ridePrompt": "Ikuti penanda bercahaya ke garis start, lalu tekan Mulai Balapan.",
+      "begin": "Mulai Pelajaran",
+      "success": "Kamu telah menjinakkan Valorsteed.",
+      "returnToMarla": "Kembali ke Marla di kandang untuk membeli tali kekang Valorsteed-mu seharga 10 emas."
+    },
+    "mountRace": {
+      "startButton": "Mulai Balapan",
+      "cancelButton": "Batalkan Balapan",
+      "go": "AYO!",
+      "start": "Ayo! Lewati setiap lompatan, lalu kembali menunggang melewati gerbang lengkung.",
+      "toFinish": "Kembali menunggang melewati gerbang lengkung!",
+      "finished": "Selesai dalam {seconds}s!",
+      "timeout": "Balapan Gagal",
+      "progress": "Gerbang {n} dari {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Piala Lembah",
@@ -1434,6 +1519,10 @@ export const id_ID: EnTranslations = {
       "twoFactorRecoveryTitle": "Simpan kode pemulihanmu",
       "twoFactorRecoveryHint": "Setiap kode berlaku sekali. Simpan di tempat yang aman: kode-kode itu satu-satunya cara masuk kembali jika kamu kehilangan aplikasi autentikatormu.",
       "twoFactorDownloadCodes": "Unduh Kode",
+      "recoveryCodesFileHeader": "Kode pemulihan {brand}",
+      "recoveryCodesFileAccount": "Akun: {username}",
+      "recoveryCodesFileHint": "Setiap kode dapat digunakan sekali jika kamu kehilangan akses ke aplikasi autentikatormu.",
+      "recoveryCodesFileWarn": "Simpan file ini di tempat yang aman dan pribadi.",
       "twoFactorDone": "Selesai",
       "twoFactorDisableHint": "Masukkan kata sandimu untuk mematikan dua-faktor. Kode pemulihanmu akan dibuang.",
       "twoFactorDisableBtn": "Matikan Dua-Faktor",
@@ -1568,6 +1657,7 @@ export const id_ID: EnTranslations = {
       "filterConsumable": "Konsumsi",
       "filterMaterial": "Bahan",
       "filterQuest": "Misi",
+      "filterMount": "Tunggangan",
       "sortAria": "Urutkan barang tas",
       "sortRecent": "Terbaru",
       "sortQuality": "Kualitas",
@@ -1785,6 +1875,9 @@ export const id_ID: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Membutuhkan Level {level}",
+      "riftTier": "Barang Rift peringkat {tier}",
+      "riftUpgrade": "Peningkatan Rift {level}/{max}",
+      "riftSockets": "Permata Rift {used}/{total}",
       "statEnchanted": "+{value} {stat} (Dimantrai)",
       "enchantedFallback": "Dimantrai"
     },
@@ -2722,6 +2815,14 @@ export const id_ID: EnTranslations = {
       "lbEmpty": "Belum ada nama yang tercatat di peringkat.",
       "broadcastsLabel": "Bagikan jasa yang diraih kepada guild dan teman",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "Peta Dunia",
+      "summary": "Peta dunia. Pilih zona untuk membuka petanya.",
+      "toWorld": "Peta dunia",
+      "toZone": "Peta zona",
+      "toggleAria": "Beralih antara peta dunia dan peta zona",
+      "levels": "Level {min} hingga {max}"
     }
   },
   "gatherEvent": {
@@ -2950,7 +3051,17 @@ export const id_ID: EnTranslations = {
         "marshName": "Rawa Mirefen",
         "marshBlurb": "Rawa tenggelam dan reruntuhan tergerus pasang, sarang Mudfin dan yang lebih buruk.",
         "peaksName": "Dataran Tinggi Thornpeak",
-        "peaksBlurb": "Punggung bukit tersapu angin yang menanjak menuju bahaya terdingin di realm."
+        "peaksBlurb": "Punggung bukit tersapu angin yang menanjak menuju bahaya terdingin di realm.",
+        "duskName": "Ceruk Terselubung",
+        "duskBlurb": "Sebuah alam yang tersegel di bawah pegunungan, jika bisikan tentang jalan masuk itu benar.",
+        "emberName": "Tanah Naga",
+        "emberBlurb": "Melintasi Jalan Lintas Pucat, hijau berganti menjadi abu, dan sesuatu yang kuno menguasai padang tandus itu.",
+        "frostName": "Tabir Beku",
+        "frostBlurb": "Sebuah ketinggian bersalju di luar setiap peta, hanya terlihat sekilas dalam cahaya yang menari.",
+        "amberName": "Air Terjun Amber",
+        "amberBlurb": "Di balik tebing barat, musim gugur yang tak pernah berakhir, dan lentera-lentera di atas danau keemasan.",
+        "fenName": "Paya Willow",
+        "fenBlurb": "Melewati mahkota musim gugur, sebuah rawa cerah berisi pohon willow dan air yang tenang, serta sebuah kota di balik parit."
       },
       "group": {
         "heading": "Bersatu untuk bagian yang sulit",
@@ -3419,6 +3530,18 @@ export const id_ID: EnTranslations = {
       "reptile": {
         "name": "Reptil",
         "desc": "Pemburu berdarah dingin dengan desis dan cakitan khas mereka sendiri, berbeda dari hewan berdarah panas."
+      },
+      "murloc": {
+        "name": "Sirip Kodok",
+        "desc": "Bangsa ikan yang bersuara serak dari tepi danau dan kolam pasang surut, cepat menyerbu apa pun yang mengarungi terlalu dekat."
+      },
+      "kobold": {
+        "name": "Berandal",
+        "desc": "Pemulung kecil yang berlarian dan roh-roh nakal dari tanah lapang dan pagar semak, lebih mengganggu daripada mengancam sampai mereka berkumpul dalam jumlah besar."
+      },
+      "demon": {
+        "name": "Iblis",
+        "desc": "Penyerbu dari luar rift, sepenuhnya api dan kebencian. Di mana pun satu berdiri, sebuah celah tak pernah jauh."
       }
     },
     "worldPage": {
@@ -3432,15 +3555,55 @@ export const id_ID: EnTranslations = {
       "valeBlurb": "Lembah awal yang hijau, tempat para pahlawan baru mengasah diri melawan serigala dan bandit di sekitar kota Eastbrook.",
       "marshBlurb": "Negeri yang tenggelam penuh kabut dan reruntuhan. Mudfin berkerumun di perairan dangkal dan sesuatu yang lebih tua bergerak di bawah air, diawasi dari kota-jembatan Fenbridge.",
       "peaksBlurb": "Punggung bukit yang terkikis angin dan bekas tambang tua yang menanjak ke bahaya tertinggi dan terdingin di alam ini, dijaga oleh pos Highwatch.",
+      "duskBlurb": "Sebuah lembah senja abadi di bawah pohon agung Eldergleam, tempat reruntuhan kristal bersinar dan udara berdengung dengan sihir kuno.",
+      "emberBlurb": "Padang tandus yang diterangi badai, berisi abu dan bloodglass, tempat drake-drake berputar di atas kaldera dan api troll membara di antara gumuk pasir, diawasi dari kota gerbang Wyrmwatch.",
+      "frostBlurb": "Keheningan salju dan pohon pinus gelap di bawah aurora, tempat hawa dingin itu sendiri terasa terjaga dan Icemantle menjaga apinya tetap menyala.",
+      "amberBlurb": "Musim gugur abadi berisi daun-daun keemasan dan merah yang tak pernah gugur, berkumpul di sekitar kota Lanternmere yang diterangi lentera.",
+      "fenBlurb": "Sebuah lahan basah yang cerah dan berdengung, berisi bunga lili dan air yang tenang, diseberangi lewat jalan papan tua dari kota jembatan Bridgemere.",
+      "nightBlurb": "Sebuah alam tengah malam berbintang tempat bunga-bunga menerangi jalan setapak dan Moonrest menjaga kesunyian di bawah langit yang bermimpi.",
+      "hauntBlurb": "Sebuah hutan berhantu di bawah kanopi raksasa, tempat lentera-lentera Gallowmere adalah satu-satunya cahaya jujur di jalan.",
+      "galeBlurb": "Tebing laut dan perbukitan melolong tempat angin tak pernah beristirahat, Suar Tua tak pernah padam, dan Wickharbor menutup rapat pintu-pintunya.",
+      "jungleBlurb": "Sebuah belukar tropis berisi pohon palem, pasir putih, dan burung-burung berkicau riuh, dengan kota pantai Drifthaven menjaga api tetap menyala di pesisir.",
+      "gardenBlurb": "Sebuah alam taman labirin pagar yang masih rapi terpangkas tanpa tukang kebun yang pernah terlihat siapa pun, dimasuki lewat Hedgewick dan pelataran air mancurnya.",
       "valeGreeting": "Jaga bilahmu tetap dekat. Lembah ini tak lagi seperti dulu.",
       "valeGreeter": "Marshal Redbrook, Eastbrook",
       "marshGreeting": "Berhenti di gerbang. Lewat alang-alang itu, rawa yang akan membunuh untuk kami.",
       "marshGreeter": "Warden Fenwick, Fenbridge",
       "peaksGreeting": "Dua ratus tahun tembok ini bertahan. Ia tidak akan jebol dalam tugas jagaku, tetapi ia merintih.",
       "peaksGreeter": "Captain Thessaly, Highwatch",
+      "duskGreeting": "Sedikit dari bangsamu pernah berdiri di bawah dahan-dahan ini. Melangkahlah dengan lembut, dan selamat datang.",
+      "duskGreeter": "Penjaga Saelwyn, Eldergleam",
+      "emberGreeting": "Angin panas dari padang tandus, naga-naga di atas Drakemaw, dan api troll di gumuk pasir. Minumlah dulu sebelum kau melangkah keluar ke sana.",
+      "emberGreeter": "Sang penjaga gerbang, Wyrmwatch",
+      "frostGreeting": "Salju menelan setiap suara di luar tembok. Jika cahaya mulai menari, tenangkan suaramu dan jaga apimu tetap menyala.",
+      "frostGreeter": "Sang penjaga perapian, Icemantle",
+      "amberGreeting": "Setiap daun di sini membara keemasan dan merah, namun tak satu pun pernah gugur. Lentera-lentera telah dinyalakan untukmu; waspadai Goldmelt dalam perjalananmu ke atas.",
+      "amberGreeter": "Sang pembuat lentera, Lanternmere",
+      "fenGreeting": "Rawa ini berdengung dengan capung dan lebah. Seberangi jembatan, istirahatkan kakimu sejenak, dan tetaplah di atas papan saat melewati kolam-kolam.",
+      "fenGreeter": "Sang penjaga jembatan, Bridgemere",
+      "nightGreeting": "Melewati Gerbang Malam, udara itu sendiri bermimpi. Ikuti cahaya bunga, dan waspadai dunia tidur yang tergantung di langit.",
+      "nightGreeter": "Sang penjaga malam, Moonrest",
+      "hauntGreeting": "Tetaplah dekat lentera, wahai pengembara. Dan jika hutan ini memanggil namamu dari luar jalan, jangan menyahutnya.",
+      "hauntGreeter": "Sang penyala lentera, Gallowmere",
+      "galeGreeting": "Angin di sini tak pernah berhenti barang sekali, dan Suar Tua tak pernah padam barang sekali. Tutup pintu penginapan di belakangmu.",
+      "galeGreeter": "Sang penjaga suar, Wickharbor",
+      "jungleGreeting": "Pasir hangat, burung-burung berkicau riuh, dan rimba yang melahap cakrawala. Kami menjaga api tetap menyala di pantai; usahakanlah untuk kembali padanya.",
+      "jungleGreeter": "Sang penguasa pelabuhan, Drifthaven",
+      "gardenGreeting": "Seseorang masih memangkas pagar tanaman itu, meski tak ada tukang kebun yang terlihat selama seratus tahun. Waspadai labirin itu: ia pun mengawasimu balik.",
+      "gardenGreeter": "Sang penjaga gerbang, Hedgewick",
       "valePlaceNotes": "Eastbrook adalah markas pertamamu. Wolf Run dan Boar Meadow adalah lahan berburu yang lembut; Mirror Lake adalah air yang bagus untuk memancing, meski mudfin memenuhi perairan dangkalnya; Sableweb dan Copper Dig menyembunyikan laba-laba dan penggali yang rakus bijih; sebuah Bandit Camp dan Fallen Chapel menyimpan pekerjaan yang lebih kasar; Reliquary Hill menurun ke Collapsed Reliquary, delve pertama realm; Brightwood Glade adalah hutan kecil tenang yang dibasuh sinar matahari di utara; dan Sowfield adalah lapangan bola babi hutan bertembok milik Eastbrook, tempat Piala Lembah dimainkan di bawah gencatan panen.",
       "marshPlaceNotes": "Fenbridge menjaga satu-satunya jalan kering. Prowler Reeds dan Deepfen Shallows dipenuhi binatang rawa dan Mudfin; Widow Thicket dipintal tebal oleh jaring; Drowned Chapel dan Troll Mounds menyimpan bahaya yang lebih tua, dengan Litani Tenggelam, delve milik rawa ini, terbuka tepat di utara gundukan itu; Gravecaller Encampment adalah sarang kultus yang menggali masuk, dan Benteng Karam adalah jantung berinstans rawa ini.",
       "peaksPlaceNotes": "Highwatch menjaga tembok. Stalker Ridge dan Deeprock Burrows milik kucing punggung bukit dan penggali liang; Ogre Foothills dan Drogmar's War-Camp milik para bedebah bayaran; Stormcrag berderak oleh elemental, dan di bawahnya bersinar Glimmermere, tasik yang tepiannya menyimpan gerbang cahaya pucat menuju Kuil Tenggelam; Wyrmcult Tents dan Revenant Fields mengelilingi dataran tinggi kultus, dengan Sanktum Gravewyrm di puncaknya.",
+      "duskPlaceNotes": "Eldergleam berkumpul di bawah pohon agung itu. Gua Duskfall dan titik pandangnya adalah jalan masuk sekaligus pemandangan pertama lembah ini; Rimba Elder dan Cekungan Bintang Jatuh menjaga selatan yang sunyi; Pelataran Tenggelam menyimpan reruntuhan yang ditumbuhi semak di timur; dan Kedalaman Berkilau serta Perairan Dangkal Kristal bersinar di sepanjang utara.",
+      "emberPlaceNotes": "Wyrmwatch menjaga gerbang itu. Hutan Gerbang adalah kehijauan terakhir sebelum padang tandus; Gumuk Pasir Abu melayang dengan abu dan hal yang lebih buruk; Trollmoot adalah tempat troll gumuk pasir mengumpulkan api mereka; Padang Bloodglass berkilauan dengan pecahan tajam bagai silet; dan Kaldera Drakemaw adalah mahkota berasap yang dikitari para drake.",
+      "frostPlaceNotes": "Icemantle menjaga perapian hangat terakhir. Garis Salju menandai tempat tumpukan salju mulai menguasai; Danau Gletser adalah air hitam yang tenang di bawah es; Tangga Aurora menanjak di bawah cahaya yang menari; Shiverfen adalah rawa beku yang tak pernah benar-benar tidur; dan Teras Lolongan membuktikan namanya setiap malam.",
+      "amberPlaceNotes": "Lanternmere bersinar di jantung musim panen. Goldmelt adalah jalan masuk yang licin oleh damar; Kebun Bersepuh Emas dan Ceruk Panen menyimpan hasil petik yang termanis dan pencuri yang paling berani; Danau Besar memantulkan dedaunan yang membara; Ketinggian Cindermaple berdiri paling tinggi dan paling merah; dan Monolit Condong mengingat sesuatu yang lebih tua dari musim gugur.",
+      "fenPlaceNotes": "Bridgemere berdiri mengangkangi air yang tenang. Tangga Amberfen turun dari negeri panen; Paya Lili dan Kolam Bogshine berkilauan dengan kunang rawa dan capung; Willowweep menjuntaikan dahan-dahannya ke danau; dan Dataran Mengantuk adalah bagian paling lembut dari tanah ini.",
+      "nightPlaceNotes": "Moonrest menjaga kesunyian malam. Gerbang Malam adalah jalan menuju negeri tengah malam; Sumur Bulan menampung cahaya bintang yang bisa kau berdiri di sampingnya; Gloamfield mekar dalam kegelapan; Sang Penjaga Tegak mengawasi tanpa pernah bergerak; dan Gundukan Tanpa Tidur adalah satu-satunya tempat di sini yang tak pernah bermimpi.",
+      "hauntPlaceNotes": "Gallowmere meringkuk di dalam lentera-lenteranya. Gerbang Gagak adalah pintu depan hutan yang suram; Semak Janda terjalin tebal dengan jaring laba-laba; Padang Tergantung dan Kapel Mournstone menyimpan duka tertua hutan ini; dan Tanah Lapang Sang Pemburu menjadi milik apa pun yang masih berburu di sana.",
+      "galePlaceNotes": "Wickharbor bersandar melawan angin. Jalan Angin adalah jalan tebing masuk; Perbukitan Lolongan bergulung tanpa pohon di bawah badai; Suar Tua telah menyala selama yang bisa diingat siapa pun; Tebing Curam jatuh curam ke air; Ladang Bangkai Kapal menjaga kejujuran pesisir; dan Danau Cermin adalah satu-satunya hal yang diam di seluruh alam ini.",
+      "junglePlaceNotes": "Drifthaven menjaga apinya di pantai. Muara Belukar adalah tempat sungai bertemu tembok hijau; Pesisir Palem membentang putih dan hangat di sepanjang ombak; Belukar Zamrud dan Air Terjun Sulur menelan pedalaman; Laguna Safir bersinar jernih dan dalam; dan Arca Tenggelam mengawasi dari bawah air.",
+      "gardenPlaceNotes": "Hedgewick menanti di Gerbang Taman. Jalan Parterre mekar dalam warna yang tertata rapi; Kastel Dawnhold melatih para ksatrianya di balik tembok baru; Kolam Kelopak melayang merah muda sepanjang tahun; Kilang Tua memutar bedengannya sendiri; Labirin Besar mengatur ulang caranya untuk setiap tamu, lengkungannya diawasi oleh rubah-rubah berdaun; Pos Jaga Utara menjaga jalan keluar; Cekungan Lili beristirahat di luar semua itu; dan Pelataran Air Mancur masih mengalir jernih di jantung taman.",
       "gladeTitle": "Sebuah sudut yang tenang: Brightwood Glade",
       "gladeBody": "Tidak setiap kisah di Lembah ini tentang yang mati. Di utara, sebuah hutan kecil yang dibasuh sinar matahari bernama Brightwood Glade menjaga iramanya sendiri yang lebih lembut, serba jalan setapak yang tenang dan cahaya berbintik di bawah dahan. Ia adalah penyeimbang lembut bagi jejak yang sedang kamu ikuti, dan layak dikunjungi saat jalan memberimu ruang untuk mengembara.",
       "worldBossTitle": "Saat puncak terjaga: sang bos dunia",
@@ -3514,6 +3677,7 @@ export const id_ID: EnTranslations = {
       "bastionBody": "Benteng terendam yang lenyap ditelan rawa, dikuasai para penjaga yang tenggelam dan oleh pasang air itu sendiri.",
       "templeBody": "Tempat pemujaan bermandi cahaya bulan yang tenggelam di bawah danau bercahaya tinggi di puncak gunung, dijangkau melalui sebuah gerbang cahaya dingin. Sebuah pemujaan yang tenggelam masih bernyanyi di bawah sana dalam jubah lapuk mereka, dan peringatan yang terukir di tepian mengatakan sesuatu di bawah hanya tertidur. Sebuah misteri yang berdiri sendiri, terpisah dari kisah utama, untuk mereka yang penasaran dan siap sedia.",
       "sanctumBody": "Jantung kelam Thornpeak, tempat pekerjaan panjang sang pemuja mencapai puncaknya yang mengerikan.",
+      "wildheartBody": "Sebuah kaldera rimba yang basah oleh hujan tempat dua jalur perburuan yang ditinggikan mengelilingi cenote giok. Lintasi sarang-sarang binatang buas dan reruntuhan leluhur, lalu daki piramida ritual untuk menghadapi Zulgar.",
       "raidName": "Raid akhir permainan",
       "raidBody": "Di balik pintu kerajaan yang tersegel menanti cobaan untuk sepuluh pemain: pertarungan berfase banyak dan sebuah kekuatan abadi yang harus dipadamkan bersama oleh seluruh raid. Raih jalanmu untuk masuk, lalu bawa sembilan kawan.",
       "heroicTitle": "Mode heroik",
@@ -5062,6 +5226,57 @@ export const id_ID: EnTranslations = {
     "chat": "Buka Obrolan"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "Semua rift sedang tidak stabil saat ini. Coba lagi nanti.",
+      "enterFloor": "Kamu melangkah melalui rift menuju {name}.",
+      "descendFloor": "Kamu turun lebih dalam ke {name}.",
+      "stepBack": "Kamu melangkah mundur melalui rift.",
+      "pylonLit": "Sebuah pilar rune menyala hidup ({lit}/{total}).",
+      "wayDownOpens": "Jalan turun terkoyak terbuka.",
+      "exitOpens": "Rift itu berguncang. Sebuah jalan pulang terkoyak terbuka di belakang yang tumbang.",
+      "portalOpens": "Sebuah rift peringkat {tier} terkoyak terbuka di {zone}!",
+      "portalSealed": "Rift peringkat {tier} di {zone} telah tersegel.",
+      "portalCollapses": "Rift peringkat {tier} di {zone} runtuh.",
+      "levelGate": "Hanya petualang level {level} ke atas yang boleh memasuki rift ini.",
+      "deadEntry": "Kamu tidak dapat memasuki rift saat tewas.",
+      "deadEntryCombat": "Party-mu masih dalam pertempuran. Yang tewas dapat masuk kembali begitu pertarungan berhenti.",
+      "iceGoalLit": "Sigil es menyala. Jalan pun bergerak.",
+      "socketsShut": "Soket-soket berderit menutup. Jalan pun bergerak.",
+      "seqProgress": "Rune-rune menjawab satu per satu ({step}/{total}).",
+      "seqReset": "Rune-rune itu meredup gelap. Mulai lagi.",
+      "gateOpen": "Gerbang berderit terbuka.",
+      "orbSealed": "Orb itu tersegel oleh ritual di bawah.",
+      "orbWakes": "Api pentagram itu padam berkedip. Sesuatu terbangun di altar.",
+      "orbOpensGate": "Orb Darah menyala terang. Gerbang kuil berderit terbuka.",
+      "alreadyCleared": "Rift ini sudah dibersihkan oleh {names}.",
+      "raceLost": "Rift ini sudah dibersihkan oleh {names}. Percobaanmu berakhir.",
+      "raceWorldWin": "{names} memenangkan balapan Rift peringkat {tier} dalam {seconds}s!",
+      "raceWinBanner": "Balapan Rift Dimenangkan - {seconds}s",
+      "raceLostBanner": "Rift Sudah Dibersihkan",
+      "forgeUpgraded": "Peningkatan Rift untuk {name} selesai.",
+      "forgeEnchanted": "Pemantraan Rift untuk {name} selesai.",
+      "forgeSocketed": "Permata Rift terpasang untuk {name}.",
+      "detonateGlacialGrave": "Makam Glasial meledak!",
+      "detonateAbsoluteZero": "Nol Mutlak meletus!",
+      "detonateMagmaWell": "Sumur Magma meletus!",
+      "detonateCoreMeltdown": "Peleburan Inti meledak!",
+      "detonateVenomPool": "Kubangan Racun meletus!",
+      "detonateBroodmothersMark": "Tanda Sang Induk Sarang meledak!",
+      "detonateSoulGrave": "Makam Jiwa meledak!",
+      "detonateDeathSentence": "Vonis Mati turun!",
+      "detonateEarthshatter": "Guncangan Bumi meledak!",
+      "detonateFinalJudgment": "Penghakiman Akhir menghantam!",
+      "detonateVoidRift": "Retakan Hampa meledak!",
+      "detonateArcaneAnnihilation": "Pemusnahan Arkana meletus!",
+      "detonateLightningRod": "Penangkal Petir menyambar!",
+      "detonateStormcallersWrath": "Amarah Sang Pemanggil Badai meletus!",
+      "detonateAbyssalMaw": "Rahang Jurang menutup!",
+      "detonateCrushingDepth": "Kedalaman Penghancur menghancurkan!",
+      "detonatePactSeal": "Segel Pakta meledak!",
+      "detonateBloodRite": "Ritus Darah turun!",
+      "detonatePitSentence": "Vonis Jurang meledak!",
+      "detonateHellfireBrand": "Cap Api Neraka meledak!"
+    },
     "delve": {
       "cannotEnterNow": "Kamu tidak dapat memasuki delve saat ini.",
       "leaveDungeonFirst": "Tinggalkan dungeon dulu.",
@@ -5916,6 +6131,8 @@ export const id_ID: EnTranslations = {
       "secondsRemaining": "{seconds} detik tersisa",
       "enteringZone": "Memasuki {zone}.",
       "welcomeZone": "Selamat datang di {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Level {level}!",
       "levelLog": "Kamu telah mencapai level {level}!",
       "xpGain": "Kamu memperoleh {amount} pengalaman.",
@@ -6168,6 +6385,8 @@ export const id_ID: EnTranslations = {
       "floatingDodge": "Elak",
       "floatingParry": "Tangkis",
       "floatingResist": "Ditahan",
+      "floatingHealFull": "Penuh",
+      "floatingHealAbsorbed": "Diserap",
       "cannotMove": "Tidak bisa bergerak!",
       "attack": "serang",
       "damageDone": "{ability}-mu mengenai {target} sebesar {amount}.",
@@ -6182,6 +6401,10 @@ export const id_ID: EnTranslations = {
       "healSelfCrit": "{ability}-mu menyembuhkanmu secara kritis sebesar {amount}.",
       "healOther": "{ability}-mu menyembuhkan {target} sebesar {amount}.",
       "healOtherCrit": "{ability}-mu menyembuhkan {target} secara kritis sebesar {amount}.",
+      "healSelfFull": "{ability}-mu mendarat, tetapi kesehatanmu sudah penuh.",
+      "healOtherFull": "{ability}-mu mendarat pada {target}, tetapi kesehatannya sudah penuh.",
+      "healSelfAbsorbed": "{ability} milikmu dilahap oleh wabah pada dirimu.",
+      "healOtherAbsorbed": "{ability} milikmu dilahap oleh wabah pada {target}.",
       "death": "{name} tewas.",
       "auraGain": "Kamu memperoleh {name}.",
       "auraFade": "{name} memudar darimu.",
@@ -6540,7 +6763,23 @@ export const id_ID: EnTranslations = {
       "fishing": "Memancing",
       "gathering": "Mengumpulkan",
       "demonHeal": "Penyembuhan Iblis",
-      "thunzharrStormcall": "Panggilan Badai"
+      "thunzharrStormcall": "Panggilan Badai",
+      "rift_frost_execution": "Makam Glasial",
+      "rift_frost_strike": "Nol Mutlak",
+      "rift_ember_execution": "Sumur Magma",
+      "rift_ember_strike": "Peleburan Inti",
+      "rift_venom_execution": "Kubangan Racun",
+      "rift_venom_strike": "Tanda Sang Induk Sarang",
+      "rift_necro_execution": "Makam Jiwa",
+      "rift_necro_strike": "Vonis Mati",
+      "rift_brute_execution": "Guncangan Bumi",
+      "rift_brute_strike": "Penghakiman Akhir",
+      "rift_arcane_execution": "Retakan Hampa",
+      "rift_arcane_strike": "Pemusnahan Arkana",
+      "rift_storm_execution": "Penangkal Petir",
+      "rift_storm_strike": "Amarah Sang Pemanggil Badai",
+      "rift_tide_execution": "Rahang Jurang",
+      "rift_tide_strike": "Kedalaman Penghancur"
     }
   },
   "questUi": {
@@ -6657,7 +6896,8 @@ export const id_ID: EnTranslations = {
       "tool": "Perkakas",
       "potion": "Ramuan",
       "elixir": "Eliksir",
-      "bag": "Tas"
+      "bag": "Tas",
+      "mount": "Tunggangan"
     },
     "stats": {
       "armor": "Zirah",
@@ -9201,6 +9441,312 @@ export const id_ID: EnTranslations = {
       "resonant_timber": {
         "name": "Kayu Beresonansi"
       },
+      "duskwisp_essence": {
+        "name": "Sari api senja"
+      },
+      "spore_heart": {
+        "name": "Jantung spora"
+      },
+      "gleaming_antler": {
+        "name": "Tanduk berkilau"
+      },
+      "wisp_mote": {
+        "name": "Butir cahaya"
+      },
+      "starfall_shard": {
+        "name": "Serpihan bintang jatuh"
+      },
+      "elder_bark": {
+        "name": "Kulit kayu tetua"
+      },
+      "hollow_sealstone": {
+        "name": "Batu Segel Lembah"
+      },
+      "monument_overlook": {
+        "name": "Monumen lapuk"
+      },
+      "monument_court": {
+        "name": "Monumen tenggelam"
+      },
+      "monument_north": {
+        "name": "Monumen terlupakan"
+      },
+      "guardian_core": {
+        "name": "Inti penjaga"
+      },
+      "wardens_seal": {
+        "name": "Segel Sang Pengawas"
+      },
+      "gleamstag_charm": {
+        "name": "Jimat Rusa Berkilau"
+      },
+      "veilsteel_blade": {
+        "name": "Bilah baja tabir"
+      },
+      "duskfang_dirk": {
+        "name": "Belati taring senja"
+      },
+      "gleamwood_stave": {
+        "name": "Tongkat kayu berkilau"
+      },
+      "wardens_oathband": {
+        "name": "Gelang sumpah Pengawas"
+      },
+      "wardplate_cuirass": {
+        "name": "Zirah lempeng penjaga"
+      },
+      "nightweave_tunic": {
+        "name": "Tunik anyaman malam"
+      },
+      "veilcloth_robe": {
+        "name": "Jubah kain tabir"
+      },
+      "rift_essence": {
+        "name": "Sari Rift"
+      },
+      "rift_gem_crimson": {
+        "name": "Permata Rift Merah Tua"
+      },
+      "rift_gem_azure": {
+        "name": "Permata Rift Biru Langit"
+      },
+      "rift_gem_verdant": {
+        "name": "Permata Rift Hijau Subur"
+      },
+      "riftbound_band_of_might": {
+        "name": "Cincin Terikat Rift dari Kekuatan"
+      },
+      "riftbound_band_of_insight": {
+        "name": "Cincin Terikat Rift dari Wawasan"
+      },
+      "riftbound_band_of_guile": {
+        "name": "Cincin Terikat Rift dari Tipu Daya"
+      },
+      "hoarfrost_edge": {
+        "name": "Bilah Embun Beku"
+      },
+      "emberforge_gauntlets": {
+        "name": "Sarung Tangan Emberforge"
+      },
+      "broodmother_carapace": {
+        "name": "Karapas Induk Sarang"
+      },
+      "bonelord_mantle": {
+        "name": "Mantel Tuan Tulang"
+      },
+      "graskbreaker_girdle": {
+        "name": "Sabuk Graskbreaker"
+      },
+      "voidscar_handwraps": {
+        "name": "Pembalut Tangan Voidscar"
+      },
+      "stormscale_treads": {
+        "name": "Alas Kaki Stormscale"
+      },
+      "abyssal_loop": {
+        "name": "Cincin Jurang"
+      },
+      "pactbound_vestments": {
+        "name": "Jubah Terikat Pakta"
+      },
+      "pitlords_cleaver": {
+        "name": "Golok Tuan Jurang"
+      },
+      "emberforged_bulwark": {
+        "name": "Perisai Emberforged"
+      },
+      "stormsunder_hood": {
+        "name": "Tudung Stormsunder"
+      },
+      "voidweave_mantle": {
+        "name": "Mantel Voidweave"
+      },
+      "abysswrought_band": {
+        "name": "Cincin Abysswrought"
+      },
+      "heart_of_the_rift": {
+        "name": "Jantung Rift"
+      },
+      "voidsong_dirk": {
+        "name": "Voidsong, Belati Selubung Terbelah"
+      },
+      "wildheart_tuskblade": {
+        "name": "Bilah Taring Wildheart"
+      },
+      "wildheart_hexwood_staff": {
+        "name": "Tongkat Hexwood dari Cekungan"
+      },
+      "wildheart_fangknife": {
+        "name": "Pisau Taring Zulgar"
+      },
+      "thick_winter_pelt": {
+        "name": "Bulu Musim Dingin yang Tebal"
+      },
+      "aurora_mote": {
+        "name": "Butir Aurora"
+      },
+      "hearth_ember_cache": {
+        "name": "Simpanan Bara"
+      },
+      "sprung_trap": {
+        "name": "Jerat Rawa yang Terpicu"
+      },
+      "hearthlined_treads": {
+        "name": "Alas Kaki Berlapis Perapian"
+      },
+      "frostmane_mantle": {
+        "name": "Mantel Frostmane"
+      },
+      "ashbone_war_brand": {
+        "name": "Bilah Perang Ashbone"
+      },
+      "emberwing_scale": {
+        "name": "Sisik Emberwing"
+      },
+      "scorched_supply_crate": {
+        "name": "Peti Perbekalan yang Hangus"
+      },
+      "wyrmwatch_warning_banner": {
+        "name": "Panji Peringatan Wyrmwatch"
+      },
+      "cinderwalk_treads": {
+        "name": "Alas Kaki Cinderwalk"
+      },
+      "mawscale_pauldrons": {
+        "name": "Bahu Mawscale"
+      },
+      "gilded_sap_clot": {
+        "name": "Gumpalan Getah Bersepuh Emas"
+      },
+      "amberfall_sap_bucket": {
+        "name": "Ember Sadap Getah"
+      },
+      "mere_ferry_lantern": {
+        "name": "Lentera Feri"
+      },
+      "orchard_sapbinder_grips": {
+        "name": "Pegangan Sapbinder"
+      },
+      "mantle_of_the_meredark": {
+        "name": "Mantel Sang Meredark"
+      },
+      "plump_fen_eel": {
+        "name": "Belut Rawa yang Gemuk"
+      },
+      "wisplight_globe": {
+        "name": "Bola Wisplight"
+      },
+      "fenway_mooring_line": {
+        "name": "Tali Tambat yang Terputus"
+      },
+      "bridgemere_toll_chest": {
+        "name": "Peti Upeti Tenggelam"
+      },
+      "eelskin_mudwaders": {
+        "name": "Sepatu Lumpur Kulit Belut"
+      },
+      "lilybed_mantle": {
+        "name": "Mantel Hamparan Lili"
+      },
+      "moonfleece_tuft": {
+        "name": "Seberkas Moonfleece"
+      },
+      "gloamfield_nightbloom": {
+        "name": "Kuntum Nightbloom"
+      },
+      "vigil_star_chart": {
+        "name": "Peta Bintang Sang Penjaga Tegak"
+      },
+      "barrow_grave_offering": {
+        "name": "Persembahan Makam yang Berserakan"
+      },
+      "moonfleece_mitts": {
+        "name": "Sarung Tangan Moonfleece"
+      },
+      "barrowshade_mantle": {
+        "name": "Mantel Barrowshade"
+      },
+      "widowsilk_skein": {
+        "name": "Gulungan Benang Widowsilk"
+      },
+      "gallowmere_grave_candle": {
+        "name": "Lilin Makam"
+      },
+      "silkbound_remains": {
+        "name": "Sisa Jasad Terikat Sutra"
+      },
+      "gravebound_silk_wraps": {
+        "name": "Pembalut Sutra Terikat Kubur"
+      },
+      "mantle_of_the_unhorsed": {
+        "name": "Mantel Sang Tersungkur dari Pelana"
+      },
+      "pearlwake_cargo_crate": {
+        "name": "Peti Kargo Pearlwake"
+      },
+      "canopy_silk_hank": {
+        "name": "Gulungan Sutra Kanopi"
+      },
+      "sunken_offering_bowl": {
+        "name": "Mangkuk Persembahan yang Terisi Ulang"
+      },
+      "saltwalker_sandals": {
+        "name": "Sandal Saltwalker"
+      },
+      "sunken_idol_mantle": {
+        "name": "Mantel Arca Tenggelam"
+      },
+      "hedgewick_shears": {
+        "name": "Gunting Hedgewick yang Dicuri"
+      },
+      "evergarden_bloom_clipping": {
+        "name": "Potongan Bunga Terpangkas"
+      },
+      "hedgewick_tool_cart": {
+        "name": "Gerobak Alat yang Tumpah"
+      },
+      "evergarden_statue_rubbing": {
+        "name": "Cetakan Gosok Arca"
+      },
+      "shearkeeper_gloves": {
+        "name": "Sarung Tangan Shearkeeper"
+      },
+      "fountain_court_mantle": {
+        "name": "Mantel Pelataran Air Mancur"
+      },
+      "galecrest_ram_wool": {
+        "name": "Wol Domba Berminyak"
+      },
+      "shear_storm_lantern": {
+        "name": "Lentera Badai yang Dipadamkan"
+      },
+      "wreckfield_flotsam_crate": {
+        "name": "Peti Puing Kapal"
+      },
+      "wickspun_treads": {
+        "name": "Alas Kaki Wickspun"
+      },
+      "wreck_wardens_mantle": {
+        "name": "Mantel Sang Penjaga Bangkai Kapal"
+      },
+      "breakscarred_steel": {
+        "name": "Baja Bekas Luka Celah"
+      },
+      "farshore_salt_moss": {
+        "name": "Lumut Garam Farshore"
+      },
+      "gullhaven_watchbell": {
+        "name": "Lonceng Waspada Pesisir"
+      },
+      "saltforged_grips": {
+        "name": "Pegangan Saltforged"
+      },
+      "mantle_of_the_unbroken_shore": {
+        "name": "Mantel Pesisir yang Tak Terputus"
+      },
+      "last_keep_signet": {
+        "name": "Cincin Stempel Last Keep"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -9932,6 +10478,30 @@ export const id_ID: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Pelindung Pinggang Pemanggil Badai"
+      },
+      "riding_training": {
+        "name": "Pelatihan Menunggang"
+      },
+      "reins_valorsteed": {
+        "name": "Tali Kekang Valorsteed"
+      },
+      "reins_grag_bear": {
+        "name": "Tali Kekang Beruang Grag Goliat"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Tali Kekang Siput Peluncur Cangkang Lumut"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Kunci Kontak: Sepeda Layang Penunggang Eter"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Tali Kekang Kama-Kage si Kodok Lompat Bayangan"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Tali Kekang Bulu Badai Penggapai Langit"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Tali Kekang Kalkun Agung Penderap Guntur"
       }
     },
     "mobs": {
@@ -10181,6 +10751,312 @@ export const id_ID: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Anak Badai Terjaga"
       },
+      "stable_horse": {
+        "name": "Kuda Kandang"
+      },
+      "rift_spawnling": {
+        "name": "Anak Rift"
+      },
+      "rift_bonewalker": {
+        "name": "Penjelajah Tulang yang Bangkit"
+      },
+      "rift_frost_revenant": {
+        "name": "Revenant Terikat Es"
+      },
+      "rift_rime_elemental": {
+        "name": "Elemental Rime"
+      },
+      "rift_ember_fiend": {
+        "name": "Iblis Bara"
+      },
+      "rift_magma_brute": {
+        "name": "Raksasa Magma"
+      },
+      "rift_venom_weaver": {
+        "name": "Pemintal Racun"
+      },
+      "rift_thornback": {
+        "name": "Pengintai Thornback"
+      },
+      "rift_boneclad": {
+        "name": "Prajurit Berbalut Tulang"
+      },
+      "rift_marrow_troll": {
+        "name": "Troll Sumsum"
+      },
+      "rift_void_acolyte": {
+        "name": "Akolit Voidscar"
+      },
+      "rift_dread_stalker": {
+        "name": "Pengintai Mengerikan"
+      },
+      "rift_storm_caller": {
+        "name": "Pemanggil Badai"
+      },
+      "rift_stormscale": {
+        "name": "Drake Stormscale"
+      },
+      "rift_tide_thrall": {
+        "name": "Budak Pasang"
+      },
+      "rift_deep_lurker": {
+        "name": "Pengintai Kedalaman"
+      },
+      "rift_stone_ogre": {
+        "name": "Ogre Batu"
+      },
+      "rift_boss_frost": {
+        "name": "Penjaga Embun Beku"
+      },
+      "rift_boss_ember": {
+        "name": "Tiran Emberforge"
+      },
+      "rift_boss_venom": {
+        "name": "Induk Sarang Vysska"
+      },
+      "rift_boss_necro": {
+        "name": "Tuan Tulang Xarreth"
+      },
+      "rift_boss_brute": {
+        "name": "Panglima Perang Grask"
+      },
+      "rift_boss_arcane": {
+        "name": "Arkon Nyxaris"
+      },
+      "rift_boss_storm": {
+        "name": "Topan Vharok"
+      },
+      "rift_boss_tide": {
+        "name": "Rahang Jurang"
+      },
+      "glimmerwisp": {
+        "name": "Api Kilau"
+      },
+      "duskwisp": {
+        "name": "Api Senja"
+      },
+      "veiled_stag": {
+        "name": "Rusa Terselubung"
+      },
+      "veiled_doe": {
+        "name": "Rusa Betina Terselubung"
+      },
+      "gleamstag": {
+        "name": "Sang Gleamstag"
+      },
+      "sporeling_gatherer": {
+        "name": "Sporeling Pengumpul"
+      },
+      "corrupted_sporeling": {
+        "name": "Sporeling Tercemar"
+      },
+      "mushroom_pixie": {
+        "name": "Peri Gleamfolk"
+      },
+      "treant_elder": {
+        "name": "Treant Tetua"
+      },
+      "ancient_guardian": {
+        "name": "Penjaga Kuno"
+      },
+      "waking_warden": {
+        "name": "Sang Penjaga yang Terjaga"
+      },
+      "old_marrowshell": {
+        "name": "Marrowshell Tua"
+      },
+      "aurelhorn": {
+        "name": "Aurelhorn, Sang Pertama dari Kawanan"
+      },
+      "snowdrift_wolf": {
+        "name": "Serigala Tumpukan Salju"
+      },
+      "ice_wisp": {
+        "name": "Roh Cahaya Es"
+      },
+      "rime_elemental": {
+        "name": "Elemental Rime"
+      },
+      "fen_sprite": {
+        "name": "Peri Rawa"
+      },
+      "frostmane_yeti": {
+        "name": "Yeti Frostmane"
+      },
+      "terrace_howler": {
+        "name": "Pelolong Teras"
+      },
+      "apprentice_wren": {
+        "name": "Murid Wren"
+      },
+      "emberwing_drake": {
+        "name": "Drake Emberwing"
+      },
+      "ashbone_raider": {
+        "name": "Perampok Ashbone"
+      },
+      "ashbone_warcaller": {
+        "name": "Pemanggil Perang Ashbone"
+      },
+      "dune_troll": {
+        "name": "Troll Gumuk Pasir"
+      },
+      "cindraleth_maw_matriarch": {
+        "name": "Cindraleth Sang Matriark Rahang"
+      },
+      "gilded_stag": {
+        "name": "Rusa Bersepuh Emas"
+      },
+      "gloam_fox": {
+        "name": "Rubah Kelam"
+      },
+      "orchard_treant": {
+        "name": "Treant Kebun Buah"
+      },
+      "the_meredark": {
+        "name": "Sang Meredark"
+      },
+      "harvest_sprite": {
+        "name": "Peri Panen"
+      },
+      "mere_lurker": {
+        "name": "Pengintai Danau"
+      },
+      "bogtoad": {
+        "name": "Kodok Rawa"
+      },
+      "drowsy_croaker": {
+        "name": "Sang Kodok Mengantuk"
+      },
+      "lily_wisp": {
+        "name": "Roh Cahaya Lili"
+      },
+      "willow_sprite": {
+        "name": "Peri Willow"
+      },
+      "moonfleece_grazer": {
+        "name": "Pemamah Moonfleece"
+      },
+      "gloam_strider": {
+        "name": "Penjelajah Kelam"
+      },
+      "nightkin_stargazer": {
+        "name": "Pengamat Bintang Nightkin"
+      },
+      "barrow_king": {
+        "name": "Sang Raja Gundukan"
+      },
+      "barrow_wight": {
+        "name": "Wight Gundukan"
+      },
+      "widowsilk_spinner": {
+        "name": "Pemintal Widowsilk"
+      },
+      "wood_wraith": {
+        "name": "Arwah Hutan"
+      },
+      "gravenbark_shambler": {
+        "name": "Penyaruk Gravenbark"
+      },
+      "pale_huntsman": {
+        "name": "Sang Pemburu Pucat"
+      },
+      "gravedigger_mosley": {
+        "name": "Penggali Kubur Mosley"
+      },
+      "tide_scuttler": {
+        "name": "Perayap Pasang"
+      },
+      "thicket_boar": {
+        "name": "Babi Hutan Semak"
+      },
+      "canopy_weaver": {
+        "name": "Pemintal Kanopi"
+      },
+      "idol_guardian": {
+        "name": "Sang Penjaga Arca"
+      },
+      "castaway_navigator": {
+        "name": "Juru Mudi Suli"
+      },
+      "topiary_stag": {
+        "name": "Rusa Topiary"
+      },
+      "topiary_wolf": {
+        "name": "Serigala Topiary"
+      },
+      "hedge_gnome": {
+        "name": "Gnome Semak"
+      },
+      "hedge_knight": {
+        "name": "Ksatria Dawnhold"
+      },
+      "the_topiary_bull": {
+        "name": "Sang Banteng Topiary"
+      },
+      "moor_ram": {
+        "name": "Domba Paya"
+      },
+      "gale_wisp": {
+        "name": "Roh Cahaya Badai"
+      },
+      "shoal_scuttler": {
+        "name": "Perayap Gosong Pasir"
+      },
+      "downs_bandit": {
+        "name": "Bandit Perbukitan"
+      },
+      "wreck_thief": {
+        "name": "Pencuri Ladang Bangkai Kapal"
+      },
+      "the_wreck_warden": {
+        "name": "Sang Penjaga Bangkai Kapal"
+      },
+      "drowned_deckhand": {
+        "name": "Kelasi Tenggelam"
+      },
+      "riftspawn": {
+        "name": "Anakan Celah"
+      },
+      "breach_wretch": {
+        "name": "Makhluk Malang Celah"
+      },
+      "void_stalker": {
+        "name": "Pengintai Hampa"
+      },
+      "sundered_horror": {
+        "name": "Sang Momok Terbelah"
+      },
+      "fisher_bram": {
+        "name": "Nelayan Bram"
+      },
+      "rift_hellguard": {
+        "name": "Penjaga Neraka"
+      },
+      "rift_pact_acolyte": {
+        "name": "Akolit Pakta"
+      },
+      "rift_boss_ritualist": {
+        "name": "Magus Vel'Kor Sang Terikat Pakta"
+      },
+      "rift_boss_pitlord": {
+        "name": "Azgorath, Tuan Jurang"
+      },
+      "wildheart_stalker": {
+        "name": "Pengintai Vineclaw"
+      },
+      "wildheart_ravager": {
+        "name": "Bloodmane, Sang Perusak"
+      },
+      "wildheart_hexcaller": {
+        "name": "Sunbone, Pemanggil Kutuk"
+      },
+      "wildheart_beastmaster": {
+        "name": "Fanglord, Penakluk Binatang"
+      },
+      "wildheart_high_priest": {
+        "name": "Zulgar, Suara Cekungan"
+      },
       "ironvein_foreman": {
         "name": "Mandor Ironvein"
       },
@@ -10334,6 +11210,11 @@ export const id_ID: EnTranslations = {
         "title": "Mandor Tambang",
         "greeting": "Seluruh galian dipenuhi hama berlumur tanah itu!"
       },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Kepala Kandang",
+        "greeting": "Setiap penunggang datang dengan dua kaki, {className}. Kendali baru kuberikan setelah kau sanggup menunggangi Valorsteed tanpa jatuh tersungkur, dan Highwatch tak punya tabib lebih untuk tulang yang patah."
+      },
       "warden_fenwick": {
         "name": "Penjaga Fenwick",
         "title": "Penjaga Fenbridge",
@@ -10463,6 +11344,246 @@ export const id_ID: EnTranslations = {
         "name": "Juru Kronik Zenzie",
         "title": "Kronik Puncak",
         "greeting": "Gunung tidak melupakan apa pun, {playerName}, dan aku pun tidak. Mari kita lihat apa saja yang telah kau lakukan."
+      },
+      "keeper_saelwyn": {
+        "name": "Penjaga Saelwyn",
+        "title": "Penjaga Ceruk",
+        "greeting": "Sedikit dari bangsamu pernah berdiri di bawah dahan-dahan ini, {className}. Melangkahlah dengan lembut, dan selamat datang."
+      },
+      "loremother_bryn": {
+        "name": "Ibu Kisah Bryn",
+        "title": "Suara Kuil",
+        "greeting": "Setiap cahaya di lembah ini mengingat sesuatu, {playerName}. Bantu aku mendengarkan."
+      },
+      "provisioner_fenna": {
+        "name": "Juru Bekal Fenna",
+        "title": "Juru Bekal Eldergleam",
+        "greeting": "Roti masih hangat, air masih segar. Ceruk ini menyediakan, begitu pula aku."
+      },
+      "wardsmith_orun": {
+        "name": "Pandai Penangkal Orun",
+        "title": "Penjaga Tempa-Tempa Tua",
+        "greeting": "Tempa-tempa ini telah dingin berabad-abad lalu, {className}, tapi hasil karyanya masih tetap tajam."
+      },
+      "archivist_tullo": {
+        "name": "Arsiparis Tullo",
+        "title": "Pembaca Batu",
+        "greeting": "Monumen-monumen di luar sana belum pernah bicara pada siapa pun selama satu zaman. Mungkin mereka sedang menunggu telinga yang baru."
+      },
+      "huntsman_deral": {
+        "name": "Pemburu Deral",
+        "title": "Penjaga Kawanan",
+        "greeting": "Diamlah sekarang. Kawanan itu mengenal setiap suara yang dibuat lembah ini, begitu pula aku."
+      },
+      "warden_kaldra": {
+        "name": "Penjaga Kaldra",
+        "title": "Penjaga Icemantle",
+        "greeting": "Perhatikan bangku-bangku itu, orang asing. Salju menyimpan apa yang diambilnya."
+      },
+      "hearthkeeper_maeve": {
+        "name": "Penjaga Perapian Maeve",
+        "title": "Penjaga Pondok Perapian",
+        "greeting": "Masuklah dari dingin ini. Api pondok tak pernah padam, selama aku masih bernapas."
+      },
+      "scout_einna": {
+        "name": "Perintis Einna",
+        "title": "Perintis Garis Salju",
+        "greeting": "Kau melewati jalan sempit itu hidup-hidup. Bagus. Icemantle harus mendengar soal ini."
+      },
+      "aurorist_veyla": {
+        "name": "Pengamat Aurora Veyla",
+        "title": "Pembaca Cahaya",
+        "greeting": "Diamlah. Cahaya-cahaya itu sedang berbicara malam ini, dan mereka tak pernah mengulang diri."
+      },
+      "trapper_brosk": {
+        "name": "Pemasang Jerat Brosk",
+        "title": "Pemasang Jerat Shiverfen",
+        "greeting": "Rawa mengambil tiga jeratku minggu ini. Rawa tak pernah mengambil satu jerat pun dalam dua puluh tahun."
+      },
+      "gatecaptain_brannoc": {
+        "name": "Kapten Gerbang Brannoc",
+        "title": "Komandan Wyrmwatch",
+        "greeting": "Wyrmwatch menjaga gerbang ini. Telah menjaganya empat puluh tahun. Dan akan tetap menjaganya malam ini."
+      },
+      "quartermaster_sela": {
+        "name": "Kepala Perbekalan Sela",
+        "title": "Penjaga Gudang Garnisun",
+        "greeting": "Setiap peti di halaman ini menyeberangi empat puluh mil abu untuk sampai ke sini. Perlakukan mereka dengan baik."
+      },
+      "scout_yerrin": {
+        "name": "Perintis Yerrin",
+        "title": "Pengawas Gumuk Pasir Jauh",
+        "greeting": "Tetap merunduk. Suara merambat aneh dari kaca itu, dan gerbang di bawah sana punya telinga."
+      },
+      "reeve_ottoline": {
+        "name": "Demang Ottoline",
+        "title": "Reeve Lanternmere",
+        "greeting": "Selamat datang di Lanternmere, tempat musim panen tak pernah berakhir, begitu pula pekerjaannya."
+      },
+      "waywatcher_sorrel": {
+        "name": "Pengawas Jalan Sorrel",
+        "title": "Pengawas Goldmelt",
+        "greeting": "Salju di belakangmu, emas di depan. Sedikit yang melewati Goldmelt dua kali, jadi buatlah penyeberangan ini berarti."
+      },
+      "ferrymaster_caddow": {
+        "name": "Nakhoda Feri Caddow",
+        "title": "Penjaga Feri Lentera",
+        "greeting": "Kabut turun lagi di atas danau. Saat lentera-lentera padam di atas air, orang bijak tetap tinggal di darat."
+      },
+      "orchardist_pomeline": {
+        "name": "Ahli Kebun Pomeline",
+        "title": "Penjaga Barisan Bersepuh Emas",
+        "greeting": "Perhatikan langkahmu. Setiap akar di barisan ini lebih tua dari kota ini, dan mereka ingat."
+      },
+      "waykeeper_pell": {
+        "name": "Penjaga Jalan Pell",
+        "title": "Penjaga Tangga Amberfen",
+        "greeting": "Turun lewat Tangga dan masuk ke negeri yang lembut. Perhatikan tempat kau menjejakkan sepatu botmu."
+      },
+      "bridgewright_alden": {
+        "name": "Tukang Jembatan Alden",
+        "title": "Tuan Jalan Rawa",
+        "greeting": "Setiap papan di kota ini adalah tanggung jawabku untuk dijaga, dan rawa ini mengunyah semuanya."
+      },
+      "netter_maris": {
+        "name": "Penjaring Maris",
+        "title": "Penjaring Belut Bridgemere",
+        "greeting": "Cium itu? Belut asap. Setengah kota ini berdiri di atas tonggak yang kubeli dengan hasil jualnya."
+      },
+      "mother_sedge": {
+        "name": "Ibu Sedge",
+        "title": "Penyihir Rawa dari Willowweep",
+        "greeting": "Pohon-pohon willow memberitahuku kau akan datang sebelum sepatu botmu meninggalkan jembatan."
+      },
+      "lamplighter_sorrel": {
+        "name": "Penyala Lentera Sorrel",
+        "title": "Penjaga Gerbang Malam",
+        "greeting": "Perhatikan lentera-lentera itu, kawan. Melewati gerbang ini matahari menyerah dan bunga-bunga mengambil alih."
+      },
+      "lira_dewsong": {
+        "name": "Lira Dewsong",
+        "title": "Tukang Kebun Malam Moonrest",
+        "greeting": "Selamat datang di Moonrest, tempat bunga-bunga melakukan fajar untuk kita."
+      },
+      "weaver_amelle": {
+        "name": "Penenun Amelle",
+        "title": "Penenun Moonfleece",
+        "greeting": "Rasakan itu? Moonfleece di atas alat tenun. Lebih hangat dari api mana pun yang pernah kau duduki di sampingnya."
+      },
+      "astronomer_cassian": {
+        "name": "Astronom Cassian",
+        "title": "Pengawas di Sang Penjaga Tegak",
+        "greeting": "Diamlah. Langit di sini tak pernah fajar, jadi ia juga tak pernah berhenti bicara."
+      },
+      "lampman_cobb": {
+        "name": "Penjaga Lentera Cobb",
+        "title": "Penjaga Lentera Gerbang Gagak",
+        "greeting": "Tetaplah dalam cahaya lentera, kawan. Hutan ini menghitung setiap orang yang melewati gerbang."
+      },
+      "sexton_marrow": {
+        "name": "Koster Marrow",
+        "title": "Sexton Gallowmere",
+        "greeting": "Kami mengubur mereka dalam-dalam di sini, dan kami membunyikan lonceng agar mereka ingat untuk tetap di bawah."
+      },
+      "widow_tansy": {
+        "name": "Janda Tansy",
+        "title": "Pembuat Lilin Gallowmere",
+        "greeting": "Sebatang lilin untuk setiap makam, dan tak satu pun boleh padam. Tak satu pun, kau dengar aku?"
+      },
+      "vicar_creel": {
+        "name": "Vikaris Creel",
+        "title": "Vikaris Terakhir Mournstone",
+        "greeting": "Kapel itu runtuh bertahun-tahun lalu. Yang mati di bawahnya tak menyadarinya, jadi aku tetap tinggal."
+      },
+      "strandwatcher_pell": {
+        "name": "Pengawas Pesisir Pell",
+        "title": "Pengawas Muara Belukar",
+        "greeting": "Akhirnya keluar dari pepohonan hitam itu. Bernapaslah, orang asing, matahari masih bertahan di sisi jalan sempit ini."
+      },
+      "salvage_boss_ryna": {
+        "name": "Bos Salvase Ryna",
+        "title": "Nyonya Jalur Bangkai Kapal",
+        "greeting": "Seorang {className} dengan lengan yang masih berfungsi, bagus. Jalur bangkai kapal membayar dengan baik, jika kepiting-kepiting itu menyisakan cukup jari untuk menghitungnya."
+      },
+      "pearlmother_isha": {
+        "name": "Ibu Mutiara Isha",
+        "title": "Tetua Para Penyelam",
+        "greeting": "Laut memberi, pasir menyimpan, dan rimba mengambil. Tetaplah di pesisir, wahai orang asing."
+      },
+      "hermit_okku": {
+        "name": "Okku",
+        "title": "Sang Pria yang Masuk ke Dalam",
+        "greeting": "Diamlah sekarang. Genderang itu menghitung segala yang berjalan di bawah pepohonan, dan mereka sudah menghitungmu."
+      },
+      "gatewarden_pell": {
+        "name": "Penjaga Gerbang Pell",
+        "title": "Penjaga Gerbang Taman",
+        "greeting": "Hati-hati melangkah di halaman ini. Taman ini menjaganya tetap terpangkas, dan ia suka semuanya rapi."
+      },
+      "head_gardener_amaranth": {
+        "name": "Kepala Tukang Kebun Amaranth",
+        "title": "Kepala Tukang Kebun Evergarden",
+        "greeting": "Jangan pedulikan bayangan di bawah mataku. Seseorang harus tetap terjaga selagi taman ini bermimpi."
+      },
+      "wickmother_sorrel": {
+        "name": "Ibu Wick Sorrel",
+        "title": "Penjaga Penginapan Hedgewick",
+        "greeting": "Masuklah, duduk, ada minuman cordial di atas api. Cuma jaga tanganmu tetap dekat apa pun yang terbuat dari besi: para gnome akhir-akhir ini jahil tangan."
+      },
+      "gardener_yew": {
+        "name": "Tukang Kebun Yew",
+        "title": "Sang Tukang Kebun Terakhir",
+        "greeting": "Tolong ambilkan gerobak dorong itu, ya? Halaman-halaman ini tak bisa berjalan sendiri, apa pun yang dipikirkan dusun ini."
+      },
+      "watcher_maren": {
+        "name": "Pengawas Maren",
+        "title": "Sang Penjaga Jalan Angin",
+        "greeting": "Jaga langkahmu melewati gerbang ini. Angin di sini merenggut topi lebih dulu dan tak pernah bertanya."
+      },
+      "harbormaster_odile": {
+        "name": "Syahbandar Odile",
+        "title": "Syahbandar Wickharbor",
+        "greeting": "Setiap perahu di teluk ini berutang lunas kapalnya pada Suar Tua. Bicaralah cepat, air pasang tak akan menunggu."
+      },
+      "keeper_bram": {
+        "name": "Penjaga Bram",
+        "title": "Penjaga Suar Tua",
+        "greeting": "Tiga puluh sembilan tahun lampu ini telah menyala dalam pengawasanku. Ia tak akan padam dalam pengawasanmu."
+      },
+      "salvager_edda": {
+        "name": "Penyalvasi Edda",
+        "title": "Penyalvasi Ladang Bangkai Kapal",
+        "greeting": "Kayu bangkai kapal, tali, dan muatan orang-orang mati. Laut membayar upahku, kalau Sang Penjaga mengizinkannya."
+      },
+      "warden_coalfast": {
+        "name": "Penjaga Coalfast",
+        "title": "Komandan Benteng Pertahanan",
+        "greeting": "Celah-celah itu tak peduli bahwa Gullhaven ini kecil, {className}. Kita menjaga pesisir ini, atau tak ada lagi pesisir yang tersisa untuk dijaga. Berdirilah bersama kami dan aku tak akan melupakannya."
+      },
+      "riftwatch_ollun": {
+        "name": "Pengawas Rift Ollun",
+        "title": "Cendekiawan Celah",
+        "greeting": "Setiap celah bernyanyi sebelum ia terbuka, jika kau punya telinga untuk itu. Aku bisa mendengar tiga di antaranya bergerak di pulau ini sekarang, dan satu di antaranya dekat."
+      },
+      "quartermaster_edda": {
+        "name": "Kepala Perbekalan Edda",
+        "title": "Pandai Zirah Benteng Pertahanan",
+        "greeting": "Baja dan garam, {className}, itulah semua yang tersisa untuk kubagikan. Ambillah, dan buat celah-celah itu menyesal telah terbuka di tempat yang bisa kujangkau."
+      },
+      "mender_saul": {
+        "name": "Penambal Saul",
+        "title": "Tabib Lapangan",
+        "greeting": "Aku telah menyambung lebih banyak tulang dalam sebulan ini dibanding sepuluh tahun menambal jatuh dari memancing. Celah-celah itu tak menyisakan banyak dari apa yang mereka ambil. Kembalilah padaku utuh, jika kau bisa mengusahakannya."
+      },
+      "bellkeeper_tam": {
+        "name": "Penjaga Lonceng Tam",
+        "title": "Penjaga Lonceng Peringatan",
+        "greeting": "Lonceng ini satu-satunya peringatan yang diberikan celah-celah itu pada kita, {className}. Satu dentang untuk ladang, dua untuk tebing, tiga saat sudah cukup dekat sehingga lari pun tak akan menolong. Pasang telingamu padanya, dan ia mungkin akan menjagamu tetap utuh."
+      },
+      "fisher_nell": {
+        "name": "Nell yang Ketakutan",
+        "title": "Nelayan Gullhaven",
+        "greeting": "Ia terbuka tepat di tempat jaring-jaring dikeringkan. Tepat di sana, tempat aku berdiri setiap pagi seumur hidupku. Aku tak lagi turun ke pantai. Aku tak lagi pergi ke mana pun sebenarnya."
       },
       "forgemistress_darva": {
         "name": "Empu Tempa Darva",
@@ -11433,6 +12554,192 @@ export const id_ID: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Pelajaran Menunggang Kuda",
+        "text": "Setiap penunggang datang dengan dua kaki, {playerName}, persis seperti kukatakan pada hari kita bertemu. Bayar biayanya, dan saat kuberi aba-aba, panggil Valorsteed latihan itu dan naiklah ke pelana. Lalu tempuh lintasannya: ikuti penanda ke gerbang start, lewati tiap rintangan dengan bersih, dan lintasi garis lagi sebelum pasir habis. Berhasil, dan pelana itu milikmu. Kalau kau keluar dari padok, kita mulai lagi dari awal.",
+        "completion": "Nah, begitu. Naik dengan satu gerakan mulus dan duduk mantap di atas. Valorsteed kini milikmu, {playerName}: pelana, kendali, dan kehormatan seorang penunggang yang meraih tempat duduknya, bukan membelinya.",
+        "objectives": {
+          "0": {
+            "label": "Jinakkan Valorsteed"
+          }
+        }
+      },
+      "q_veil_thinned": {
+        "title": "Selubung yang Menipis",
+        "text": "Jadi gua itu terbuka untukmu. Berarti segel itu lebih lemah dari yang kukhawatirkan, {playerName}. Di tempat selubung itu terkoyak, roh-roh cahaya berubah gelap dan dingin. Bawakan aku delapan sari dari para duskwisp dan aku akan membaca seberapa dalam luka ini.",
+        "completion": "Dingin, setiap satunya. Ceruk ini mungkin punya waktu satu musim sebelum koyakan ini menjadi sebuah rift. Kita punya pekerjaan yang harus dilakukan, kau dan aku.",
+        "objectives": {
+          "0": {
+            "label": "Sari api senja"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "Tanduk-Tanduk Berkilau",
+        "text": "Rusa-rusa terselubung memancarkan cahaya di tempat mereka merumput, dan tanduk yang mereka luruhkan menyimpan cahaya itu selama bertahun-tahun. Lima di antaranya, dari kawanan di tanah lapang terbuka di jantung lembah ini, dan lentera-lenteraku akan menyala sepanjang musim dingin tanpa minyak. Rusa-rusa itu tak perlu dilukai, tapi mereka tak mudah melepaskannya.",
+        "completion": "Lihatlah bagaimana mereka menyimpan cahaya itu! Tanpa nyala api, tanpa asap, hanya kilau. Ceruk ini menyediakan.",
+        "objectives": {
+          "0": {
+            "label": "Tanduk Berkilau"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "Cahaya-Cahaya di Perairan Dangkal",
+        "text": "Para glimmerwisp membawa butir-butir cahaya bintang kuno yang jatuh di sini saat Ceruk ini disegel. Enam butir, dan lampu-lampu kuil akan menyala selama setahun. Ambil hanya dari yang memudar; Ceruk ini memberi cukup tanpa perlu keserakahan.",
+        "completion": "Lembut bagai bintang-bintang pertama. Letakkan mereka di sini dekat altar; kuil ini akan melakukan sisanya.",
+        "objectives": {
+          "0": {
+            "label": "Butir cahaya"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "Menenangkan Kedalaman",
+        "text": "Para sporeling di Kedalaman Berkilau adalah makhluk yang lembut sebelum koyakan itu menyentuh lingkaran mereka. Apa yang diambil korupsi ini, tak pernah dikembalikan. Berikan yang tercemar ketenangan, {playerName}: sepuluh di antara mereka, di utara Kedalaman itu.",
+        "completion": "Kau melakukan apa yang tak sanggup kulakukan. Para pengumpul masih bernyanyi di lingkaran selatan; berkatmu, mereka akan terus bernyanyi.",
+        "objectives": {
+          "0": {
+            "label": "Sporeling Tercemar diistirahatkan"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "Jantung-Jantung Lingkaran",
+        "text": "Saat seekor sporeling jatuh ke dalam kegelapan, jantungnya terus berdetak dengan bayangan pinjaman. Empat jantung itu, disucikan di kuil, mungkin bisa mengajarkan kita bagaimana korupsi ini menyebar. Ini pekerjaan yang suram, {playerName}, tapi ini pekerjaan yang menyembuhkan.",
+        "completion": "Nah. Disucikan, dan tenang. Masing-masing menunjukkan tanda yang sama: bayangan itu mengalir DARI Pelataran Tenggelam. Katakan pada Saelwyn.",
+        "objectives": {
+          "0": {
+            "label": "Jantung Spora"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "Apa yang Diingat Batu-Batu Itu",
+        "text": "Tiga monumen masih berdiri sejak sebelum penyegelan: satu di Titik Pandang Duskfall, satu di Pelataran Tenggelam, dan satu hilang jauh di timur laut tempat tak seorang pun berjalan. Bacakan untukku, {playerName}. Lututku sudah menyerah dua abad tangga lalu.",
+        "completion": "Sebuah titik pandang, sebuah pelataran, dan sebuah sudut yang terlupakan... dan ketiga bait nyanyian penyegelan itu, bersatu untuk pertama kalinya sejak dinyanyikan. Kau telah membuat seorang pembaca tua sangat bahagia.",
+        "objectives": {
+          "0": {
+            "label": "Monumen Titik Pandang dibaca"
+          },
+          "1": {
+            "label": "Monumen Pelataran dibaca"
+          },
+          "2": {
+            "label": "Monumen yang terlupakan dibaca"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "Ancaman di Tanah Lapang",
+        "text": "Duskwisp telah mulai melayang di antara lapak-lapakku setelah gelap, {playerName}, dan hawa dinginnya merusak apa pun yang disentuhnya. Kurangi jumlah mereka untukku: sepuluh di antaranya, di mana pun selubung itu telah terkoyak.",
+        "completion": "Pasar malam bisa dibuka lagi. Kau punya pelanggan seumur hidup, atau setidaknya diskon.",
+        "objectives": {
+          "0": {
+            "label": "Duskwisp dibubarkan"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "Serpihan Starfall",
+        "text": "Saat duskwisp melintasi ladang-ladang kristal, serpihan cahaya bintang kuno menempel padanya bagai duri. Enam serpihan, {playerName}, dan aku bisa menentukan waktu penyegelan itu hingga ke musim tepat saat ia dinyanyikan.",
+        "completion": "Lihatlah guratan-guratan ini! Musim gugur. Ceruk ini disegel pada musim gugur. Dua ratus tahun perdebatan, diselesaikan oleh enam batu kecil.",
+        "objectives": {
+          "0": {
+            "label": "Serpihan Starfall"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "Perjanjian Treant",
+        "text": "Para tetua Rimba ini melepaskan kulit kayu luar mereka saat korupsi ini menggerogoti akar mereka. Empat potong darinya, dan aku bisa meracik salep untuk seluruh Rimba ini. Mereka tak akan berterima kasih selagi kau mencongkelnya lepas, {playerName}, tapi mereka akan berdiri seabad lebih lama karenanya.",
+        "completion": "Tebal dan kokoh, keempatnya. Salep ini akan butuh seminggu untuk diracik dan seratus tahun untuk menyelesaikan kerjanya. Pohon-pohon mengukur kebaikan secara berbeda.",
+        "objectives": {
+          "0": {
+            "label": "Kulit Kayu Tetua"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "Melawan Pasang Spora",
+        "text": "Salep itu menahan Rimba ini, tapi korupsi itu semakin menekan di Kedalaman ini setiap senja. Dua belas lagi yang tercemar harus diistirahatkan sebelum para pengumpul bisa merebut kembali lingkaran utara mereka, {playerName}.",
+        "completion": "Lingkaran-lingkaran di utara bernyanyi lagi malam ini. Pelan, tapi bernyanyi.",
+        "objectives": {
+          "0": {
+            "label": "Sporeling Tercemar diistirahatkan"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "Pelataran Tenggelam",
+        "text": "Bryn membaca jantung-jantung itu dengan benar: koyakan itu membentang melalui pelataran tua di timur, dan para penjaganya telah terbangun dengan salah. Mereka dibangun untuk melindungi segel itu; kini mereka akan menghancurkan siapa pun yang mendekatinya. Bersihkan delapan di antara mereka dari reruntuhan itu.",
+        "completion": "Delapan penjaga, ditenangkan. Aku ingat saat mereka didirikan, {playerName}. Jangan terlalu terkejut; Ceruk ini menjaga para penjaganya untuk waktu yang lama.",
+        "objectives": {
+          "0": {
+            "label": "Penjaga Kuno ditenangkan"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "Gema Sang Penjaga",
+        "text": "Bahkan dengan tuan mereka telah dibungkam, para penjaga pelataran mengulangi perintah terakhirnya bagai sebuah gema yang tak mau memudar. Hingga segel itu dipasang kembali, mereka akan terus terbangun, {playerName}. Tenangkan sepuluh lagi di antara mereka agar para tukang batu bisa mencapai batu segel.",
+        "completion": "Gema itu semakin memudar setiap kalinya. Segera pelataran ini hanya akan menyisakan angin dan tanaman rambat, sebagaimana seharusnya sebuah reruntuhan.",
+        "objectives": {
+          "0": {
+            "label": "Penjaga Kuno ditenangkan"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "Sang Penjaga yang Terjaga",
+        "text": "Pelataran ini sunyi, tapi tuannya tidak. Sang Penjaga yang menjaga segel itu telah terbangun dengan terpelintir, dan selama ia masih berdiri, segel itu tak bisa dipulihkan. Ia tak akan tumbang dengan mudah; ajak seorang kawan jika kau bisa menemukannya, {playerName}. Ajak dua jika kau bisa menemukan dua.",
+        "completion": "Lonceng suaranya kini sunyi. Aku merasakannya dari sini, bagai sebuah beban terangkat dari seluruh lembah.",
+        "objectives": {
+          "0": {
+            "label": "Sang Penjaga yang Terjaga dikalahkan"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "Segel yang Dipulihkan",
+        "text": "Bawa segel Sang Penjaga ke batu segel di jantung pelataran itu dan pasang kembali di tempat ia dulu terlepas. Maka Ceruk ini bisa mulai pulih, dan kau, {playerName}, akan telah melakukan apa yang belum pernah dilakukan siapa pun dari bangsamu.",
+        "completion": "Aku merasakannya menutup dari sini, selembut senja. Ceruk ini mengingat sahabat-sahabatnya, {playerName}. Sejauh apa pun kau mengembara, akan selalu ada cahaya untukmu di bawah pohon agung itu.",
+        "objectives": {
+          "0": {
+            "label": "Segel dipasang kembali di batu segel"
+          }
+        }
+      },
+      "q_hollow_the_huntsman": {
+        "title": "Penjaga Kawanan",
+        "text": "Kau tampak seperti orang yang bisa menangani lebih dari sekadar roh cahaya, {playerName}. Pemburu Deral menjaga pos pengintaiannya di antara padang rumput rusa sebelah timur sini, dan ia telah mencari tangan-tangan yang cakap selama berminggu-minggu. Apa pun yang sedang dilacaknya di luar sana, ia tak akan mengatakannya keras-keras di desa.",
+        "completion": "Fenna mengirimmu? Bagus. Berarti ia mempercayaimu, dan aku punya dua nama yang perlu dicoret.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Pemburu Deral"
+          }
+        }
+      },
+      "q_hollow_old_marrowshell": {
+        "title": "Cangkang Tua di Perairan Dangkal",
+        "text": "Nama pertama adalah Marrowshell Tua, seekor kepiting sebesar gerobak yang telah berburu di perairan dangkal timur sejak sebelum Eldergleam memiliki gerbang. Ia mengembara, {playerName}, jadi kau harus menyusuri garis pantai hingga kau menemukan jejaknya. Jangan pergi sendirian, dan jangan percaya pada kediamannya.",
+        "completion": "Perairan dangkal itu kembali hanya menjadi air. Aku telah menyaksikan cangkang itu menghancurkan pemburu yang lebih baik dariku, {playerName}. Tapi tidak kau.",
+        "objectives": {
+          "0": {
+            "label": "Marrowshell Tua terbunuh"
+          }
+        }
+      },
+      "q_hollow_first_of_the_herd": {
+        "title": "Sang Pertama dari Kawanan",
+        "text": "Nama kedua lebih sulit diucapkan. Aurelhorn memimpin kawanan ini saat nenekku menjaga pos pengintaian ini, dan apa pun yang terbangun di Ceruk ini membangunkannya dengan cara yang salah. Ia menginjak-injak apa yang dulu dijaganya, dan kawanan ini tak akan bertahan dari kegilaannya. Ia mengembara di padang rumput dekat jalan-jalan pelataran tua. Akhiri hidupnya dengan belas kasih, {playerName}, dan ajak seorang kawan untuk berbagi beban ini.",
+        "completion": "Jadi Sang Pertama tumbang di tangan yang terakhir. Kawanan ini sudah lebih tenang, kau merasakannya? Kau telah berbuat baik pada Ceruk ini hari ini, meski tak tampak seperti itu.",
+        "objectives": {
+          "0": {
+            "label": "Aurelhorn diberi ketenangan"
+          }
+        }
+      },
       "q_prof_hobby_switch": {
         "title": "Hobi yang Berbeda",
         "text": "Bidang utama menuntut sumpah. Hobi hanya bertanya ke mana rasa ingin tahumu mengembara, {playerName}. Kumpulkan beberapa herba dan putuskan kerajinan mana yang berlawanan dengan bidang utamamu yang ingin kamu tekuni.",
@@ -11440,6 +12747,916 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Petak herba dipanen"
+          }
+        }
+      },
+      "q_fv_snowline_report": {
+        "title": "Kabar dari Garis Salju",
+        "text": "Setiap jiwa yang mendaki keluar dari Drakelands melewati apiku, {playerName}, dan semakin sedikit yang mendaki tiap minggunya. Penjaga Kaldra menjaga Icemantle di jalan utara. Katakan padanya jalan sempit itu masih terbuka, dan katakan padanya seorang orang asing melewatinya sendirian.",
+        "completion": "Berarti jalan sempit itu bertahan. Einna menjaga pos itu melewati badai yang mengubur penanda jalan, dan ia belum pernah sekali pun mengirimkan kabar yang tak berarti. Selamat datang di Icemantle, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Lapor kepada Penjaga Kaldra"
+          }
+        }
+      },
+      "q_fv_wolves_at_the_door": {
+        "title": "Serigala di Depan Pintu",
+        "text": "Kawanan tumpukan salju dulu bertahan di dataran tinggi. Sekarang mereka menyeberangi jalan danau di siang hari dan para penebang kayuku tak mau meninggalkan tembok. Kurangi jumlah kawanan itu, {playerName}, sepuluh ekor, dan jalan itu akan kembali menjadi jalan.",
+        "completion": "Sepuluh bayangan lebih sedikit antara sini dan danau. Para penebang kayu sudah berdebat siapa yang keluar duluan.",
+        "objectives": {
+          "0": {
+            "label": "Serigala Tumpukan Salju terbunuh"
+          }
+        }
+      },
+      "q_fv_winter_pelts": {
+        "title": "Bulu untuk Pondok",
+        "text": "Kayu bakar menjaga tubuh tetap hidup, {playerName}, tapi wol tak akan menahan dinginnya ini, hanya bulu serigala yang bisa. Enam bulu musim dingin tebal dari kawanan tumpukan salju dan aku bisa melapisi kantong tidur untuk semua orang yang dinaungi pondok ini.",
+        "completion": "Bulu seperti ini adalah satu-satunya argumen yang didengarkan musim dingin. Ambillah alas kaki ini, dilapisi dari kumpulan terakhir.",
+        "objectives": {
+          "0": {
+            "label": "Bulu Musim Dingin yang Tebal"
+          }
+        }
+      },
+      "q_fv_ember_caches": {
+        "title": "Bara di Jalan Danau",
+        "text": "Sebuah kereta luncur berisi simpanan bara terbalik di jalan danau semalam: ketel-ketel besi yang menjaga api tetap hidup terpendam selama sebulan. Tiga di antaranya masih tergeletak di salju, {playerName}, dan pondok ini tak bisa kehilangan apa yang mereka simpan. Bawa pulang apinya.",
+        "completion": "Masih hangat, setiap satunya. Kau telah membelikan pondok ini keringanan sepanjang musim dingin, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Simpanan Bara ditemukan kembali"
+          }
+        }
+      },
+      "q_fv_lights_over_steps": {
+        "title": "Cahaya di Atas Tangga",
+        "text": "Aurora telah membara hijau setiap malam bulan ini, dan para tetua tak mau berjalan di bawahnya. Satu wanita mungkin tahu alasannya: Veyla, sang Pengamat Aurora. Ia berkemah sendirian di Tangga Aurora, tenggara melewati danau gletser. Temukan perkemahannya, {playerName}, dan dengarkan apa yang telah diberitahukan cahaya-cahaya itu padanya.",
+        "completion": "Kaldra mengirimmu? Berarti ia akhirnya khawatir, dan ia benar untuk khawatir. Duduklah, {playerName}. Amati langit bersamaku sejenak.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Pengamat Aurora Veyla"
+          }
+        }
+      },
+      "q_fv_silent_trapline": {
+        "title": "Jalur Jerat yang Sunyi",
+        "text": "Brosk Tua menjaga jalur jerat Shiverfen di sebelah barat sini, dan setiap minggu selama sebelas tahun ia telah mengirim seikat bulu bersama kereta luncur kayu. Sudah dua minggu ini, tak ada apa-apa. Ia terlalu keras kepala untuk membeku dan terlalu berhati-hati untuk tenggelam, {playerName}, jadi ada hal lain yang salah. Temukan perkemahannya di rawa dan pastikan ia masih bernapas.",
+        "completion": "Maeve mengirimmu? Ha. Sebelas tahun dan wanita itu masih mengira rawa ini akan memakanku. Yah... tahun ini mungkin dia benar. Lihatlah apa yang telah dilakukannya pada jalur-jalurku.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Pemasang Jerat Brosk"
+          }
+        }
+      },
+      "q_fv_aurora_motes": {
+        "title": "Butir-Butir Aurora",
+        "text": "Roh-roh cahaya yang melayang di tangga ini dilepaskan oleh cahaya-cahaya itu sendiri, dan masing-masing membawa sebutir aurora di dalam intinya. Aku butuh enam untuk membaca apa yang sedang dituliskan langit, {playerName}. Roh-roh cahaya itu tak melawan balik. Apakah itu membuat pekerjaan ini lebih mudah atau lebih sulit adalah urusan antara kau dan nuranimu.",
+        "completion": "Enam butir, masih bercahaya. Lihatlah mereka, {playerName}: mereka berdenyut serentak satu sama lain. Cahaya-cahaya itu bukanlah cuaca. Mereka adalah sebuah sinyal.",
+        "objectives": {
+          "0": {
+            "label": "Butir Aurora"
+          }
+        }
+      },
+      "q_fv_rime_unbound": {
+        "title": "Rime yang Terlepas",
+        "text": "Saat aurora membara seterang ini, hawa dingin bangkit dan berjalan: elemental rime, embun beku yang diberi kehendak. Mereka berkumpul di tempat cahaya-cahaya itu menyentuh dataran, dan mereka mengembara semakin dekat ke perkemahanku tiap malam. Hancurkan delapan di antara mereka, {playerName}, sebelum salah satu dari mereka menghancurkanku.",
+        "completion": "Malam sudah terasa lebih sunyi. Apa pun yang membangunkan mereka belum selesai, tapi kau telah membelikan Tangga ini sedikit ketenangan.",
+        "objectives": {
+          "0": {
+            "label": "Elemental Rime terbunuh"
+          }
+        }
+      },
+      "q_fv_sprung_traps": {
+        "title": "Peri-Peri di Dalam Jerat",
+        "text": "Peri rawa, {playerName}. Iblis-iblis kecil itu memicu jeratku untuk bersenang-senang dan menyebarkan besinya ke rerumputan buluh. Usir mereka, delapan seharusnya cukup mengajari sisanya, dan kumpulkan apa yang tersisa dari jalur jeratku selagi kau di sana.",
+        "completion": "Empat jerat baik kembali dan rerumputan buluh kembali sunyi. Kau memasang jerat dengan tangan lebih tegas dariku, {playerName}, tapi aku tak bisa membantah hasilnya.",
+        "objectives": {
+          "0": {
+            "label": "Peri Rawa diusir"
+          },
+          "1": {
+            "label": "Jerat ditemukan kembali"
+          }
+        }
+      },
+      "q_fv_howl_above": {
+        "title": "Lolongan di Teras-Teras",
+        "text": "Kau mendengarnya saat senja, {playerName}: sebuah lolongan dari Teras Lolongan yang bukan berasal dari kawanan serigala tumpukan salju. Kerongkongan yang lebih besar. Para pelolong teras telah turun dari puncak untuk pertama kalinya sejak nenekku memegang pos ini, dan merekalah yang mendorong serigala-serigala itu ke jalanku. Basmi delapan dan dorong mereka kembali.",
+        "completion": "Delapan, dan paduan suara senja jadi lebih sunyi karenanya. Tapi para pelolong tak meninggalkan puncak tanpa alasan. Sesuatu di sana telah menggerakkan mereka, dan aku khawatir hal itu punya nama.",
+        "objectives": {
+          "0": {
+            "label": "Pelolong Teras terbunuh"
+          }
+        }
+      },
+      "q_fv_seeing_wren_home": {
+        "title": "Mengantar Wren Pulang",
+        "text": "Muridku Wren pergi menyusuri jalur Goldmelt dua hari lalu dan tak pernah kembali. Aku menemukan jejaknya, ia bersembunyi di bawah penanda jalan barat daya Tangga Aurora, terlalu takut pada serigala untuk bergerak. Aku tak bisa meninggalkan rawa ini, {playerName}. Antarkan dia ke perkemahan Veyla di Tangga itu. Ia akan aman di bawah cahaya-cahaya itu.",
+        "completion": "Gadis itu ada di dalam, terbungkus setengah selimutku dan mengoceh tentang bintang-bintang di langit. Kau melakukan hal yang baik hari ini, {playerName}. Reach ini tak sering melihat hal seperti itu.",
+        "objectives": {
+          "0": {
+            "label": "Murid Wren diantar dengan selamat ke Tangga Aurora"
+          }
+        }
+      },
+      "q_fv_frostmane_tyrant": {
+        "title": "Tiran Frostmane",
+        "text": "Para pelolong itu tidak sedang berburu saat mereka turun dari teras-teras itu. Mereka sedang melarikan diri. Seekor yeti telah menguasai dataran tinggi itu, penduduk gunung menyebutnya Frostmane, dan bahkan kawanan serigala tak mau berbagi lereng dengannya. Ini harus diakhiri, {playerName}, sebelum musim dingin mendorongnya turun ke tembokku. Ajak seorang kawan. Ajak dua.",
+        "completion": "Saat angin mereda semalam, seluruh desa mendengar keheningan di tempat Frostmane biasa berada. Reach ini berutang budi yang akan butuh bertahun-tahun untuk dibayar, {playerName}. Kenakan ini, dan setiap pintu di Icemantle akan terbuka untukmu.",
+        "objectives": {
+          "0": {
+            "label": "Sang Frostmane terbunuh"
+          }
+        }
+      },
+      "q_dk_ash_on_the_wind": {
+        "title": "Abu di Angin",
+        "text": "Lihatlah ke selatan dari pagar kayu ini, {playerName}. Api-api di gumuk pasir itu bukan api masak troll, itu adalah kumpulan pasukan Ashbone, dan setiap malam jumlahnya bertambah. Yang mati bangkit dari ladang tulang dengan pasir masih menempel di gigi mereka. Tebas sepuluh perampok sebelum mereka membuka jalan menuju gerbangku.",
+        "completion": "Sepuluh bilah lebih sedikit di gumuk pasir, dan api-api kumpulan pasukan membara lebih redup semalam. Para penjagaku bisa tidur, sesuatu yang belum pernah mereka lakukan selama seminggu. Tebasan yang bagus, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Perampok Ashbone terbunuh"
+          }
+        }
+      },
+      "q_dk_trolls_on_the_road": {
+        "title": "Troll-Troll di Jalan",
+        "text": "Troll-troll gumuk pasir telah mengenal suara gerobak perbekalan, {playerName}. Mereka menyerang jalan Gumuk Pasir Abu tiga kali bulan ini, dan pengemudi terakhir berjalan masuk hanya membawa tali kekang. Singkirkan delapan troll dari jalan itu dan gerobak-gerobakku akan berjalan lagi.",
+        "completion": "Delapan, dan para pengemudiku sudah berhenti menulis surat perpisahan sebelum setiap perjalanan. Garnisun ini bisa makan berkat kau, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Troll Gumuk Pasir terbunuh"
+          }
+        }
+      },
+      "q_dk_scorched_stores": {
+        "title": "Simpanan yang Hangus",
+        "text": "Gerobak terakhir terbakar, {playerName}, tapi peti berikat besi tak terbakar habis. Empat di antaranya masih tergeletak hangus di sepanjang jalan gumuk pasir dengan persediaan semusim garam, paku, dan tali busur di dalamnya. Bawa pulang simpananku sebelum para troll mencari tahu cara membukanya.",
+        "completion": "Hangus menghitam dan setiap kaitnya masih menahan. Sang pandai besi mendapatkan pakunya, sang pembuat panah mendapatkan talinya, dan kau mendapatkan sepatu bot yang kusimpan untuk siapa pun yang membawa kembali petiku, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Peti perbekalan yang hangus ditemukan kembali"
+          }
+        }
+      },
+      "q_dk_banners_over_the_dunes": {
+        "title": "Panji-Panji di Atas Gumuk Pasir",
+        "text": "Pasukan Ashbone berkumpul di makam ladang tulang tua itu, {playerName}, dan patroliku tak bisa membaca gumuk pasir semudah mereka membaca tembok. Bunuh lima pemanggil perang mereka, yang berteriak membangunkan yang mati, dan tancapkan panji peringatan di setiap tempat berkumpul agar penjagaku bisa menandainya dari punggung bukit.",
+        "completion": "Tiga panji berkibar dalam angin panas, tepat di tempat yang bisa ditemukan teropongku. Dengan lima pemanggil perang dibungkam, apa pun yang menjawab panggilan mereka akan datang lebih lambat. Kau membelikan kami waktu, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Pemanggil Perang Ashbone terbunuh"
+          },
+          "1": {
+            "label": "Panji peringatan ditancapkan"
+          }
+        }
+      },
+      "q_dk_watcher_at_the_wargate": {
+        "title": "Sang Pengawas di Gerbang Perang",
+        "text": "Sesuatu menarik pasukan Ashbone ke timur, {playerName}, dan aku mengirim orang terbaikku untuk mencari tahu apa itu. Perintis Yerrin telah berkemah sebulan di gumuk pasir jauh melewati Trollmoot, dalam pandangan sebuah gerbang yang tak seorang pun bangun semasa hidupku. Laporannya berhenti sepuluh hari lalu. Temukan perkemahannya dan bawakan aku pengamatannya.",
+        "completion": "Brannoc mengirimmu? Berarti utusan terakhirku tak pernah sampai. Rendahkan suaramu dan duduklah, {playerName}. Kau lihat gerbang di bawah sana? Hitunglah panji perang di depannya, dan kau akan mengerti mengapa aku berhenti menuliskan segalanya.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Perintis Yerrin"
+          }
+        }
+      },
+      "q_dk_marrow_and_ash": {
+        "title": "Sumsum dan Abu",
+        "text": "Setiap perampok Ashbone membawa sebuah bilah perang, {playerName}: sebuah tanda hangus dari pasukan yang menaunginya. Aku telah menghitung empat pasukan dari punggung bukit ini, tapi tebakan bukanlah informasi intelijen. Bawakan aku enam bilah dari para perampok dan pemanggil perang mereka, dan aku akan memberi Brannoc gambaran perang yang akan datang.",
+        "completion": "Enam bilah, dan satu tanda terbakar di setiap satunya. Ini bukan sekadar kumpulan perampok biasa, {playerName}. Setiap pasukan di gumuk pasir ini tunduk pada gerbang perang di bawah kita, para troll menyebutnya Orkadia, dan tak ada lima prajurit pun yang pernah bertugas denganku yang bisa menjebol apa yang bergemuruh di balik pintu itu. Mungkin lima orang sepertimu bisa.",
+        "objectives": {
+          "0": {
+            "label": "Bilah Perang Ashbone"
+          }
+        }
+      },
+      "q_dk_scales_of_the_maw": {
+        "title": "Sisik-Sisik Sang Rahang",
+        "text": "Saat angin berbalik dari Drakemaw, drake-drake emberwing menungganginya melintasi perkemahanku cukup rendah untuk menghitung gigi mereka, {playerName}. Jangkauan mereka semakin jauh tiap harinya, dan sesuatu di kawah itu menggerakkan mereka. Bawakan aku tiga sisik mereka. Sisik mengingat panas, dan aku bisa membaca dari bekas bakarnya di mana seekor drake pernah bertengger.",
+        "completion": "Lihat sisi bawah yang satu ini, {playerName}: hangus membentuk spiral, dan hanya satu hal yang bersarang melingkar. Drake-drake ini adalah penjaga telur. Sesuatu di Drakemaw ini adalah seorang induk.",
+        "objectives": {
+          "0": {
+            "label": "Sisik Emberwing"
+          }
+        }
+      },
+      "q_dk_matriarch_of_the_maw": {
+        "title": "Matriark Sang Rahang",
+        "text": "Sisik-sisik itu berkata benar, {playerName}. Aku mendaki tepi kawah saat fajar dan melihatnya di dasar kawah: Cindraleth, sang matriark tempat setiap emberwing di langit ini menetas, keemasan bagai bara yang hendak menyala. Selagi ia mengeram, para drake tumbuh semakin berani, dan Wyrmwatch tak bisa melawan naga dan Ashbone sekaligus. Akhiri hidupnya di kawahnya, lalu bawa kabar ini kepada Kapten Gerbang Brannoc. Jangan pergi sendirian.",
+        "completion": "Langit di atas Drakemaw telah kosong selama dua hari, dan kini kau melangkah lewat gerbangku dengan darah sang matriark di sepatu botmu. Wyrmwatch telah berjaga empat puluh tahun demi hal ini, {playerName}. Ambillah pelindung bahu ini, sisik rahang, ditempa oleh pandai besi kami sendiri. Kenakan di tempat yang bisa dilihat para drake.",
+        "objectives": {
+          "0": {
+            "label": "Cindraleth Sang Matriark Rahang terbunuh"
+          }
+        }
+      },
+      "q_af_goldmelt_road": {
+        "title": "Jalan Emas Menurun",
+        "text": "Kau datang melewati Goldmelt, {playerName}, salju masih menempel di sepatu botmu. Aku menjaga kuil ini agar Lanternmere tahu siapa yang datang dari hawa dingin, dan akhir-akhir ini aku tak punya banyak yang bisa dilaporkan. Turunlah lewat jalan emas menuju kota, temui Reeve Ottoline di sumur, dan katakan padanya bahwa jalan sempit itu tenang.",
+        "completion": "Tenang di Goldmelt, dan seorang pengembara dengan salju di rambutnya sebagai buktinya. Sorrel menjaga pos jaganya terlalu baik untuk mengirim kabar yang tak berarti. Selamat datang di Lanternmere, {playerName}. Lentera-lentera menyala untukmu.",
+        "objectives": {
+          "0": {
+            "label": "Lapor kepada Reeve Ottoline"
+          }
+        }
+      },
+      "q_af_foxes_in_the_lamplight": {
+        "title": "Rubah-Rubah di Cahaya Lentera",
+        "text": "Rubah-rubah kelam telah belajar berapa nilai simpanan lentera itu, {playerName}. Setiap senja mereka menyelinap lewat pagar dan membawa kabur lemak yang kami peras untuk lampu-lampu feri. Cakar yang lembut, nurani yang lebih lembut lagi. Basmi sepuluh ekor di antaranya dan sisanya akan ingat untuk takut pada kota ini.",
+        "completion": "Sepuluh ekor, dan simpanan itu tak tersentuh semalam untuk pertama kalinya musim ini. Para penyala lentera mengirimkan terima kasih mereka, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Rubah Kelam terbunuh"
+          }
+        }
+      },
+      "q_af_lanterns_on_the_water": {
+        "title": "Lentera-Lentera di Atas Air",
+        "text": "Setiap feri di danau ini membawa lentera buritan, {playerName}, dan tiga perahuku kembali saat fajar tanpa lenteranya. Kabut mengambilnya, atau sesuatu di dalam kabut itu yang melakukannya. Mereka terdampar di sepanjang pesisir timur saat angin berbalik arah. Susuri jalan pesisir dan bawa pulang lentera-lenteraku.",
+        "completion": "Ketiganya, dan masih menyala. Lentera feri tak pernah padam di dalam air, {playerName}. Itulah gunanya. Yang mengkhawatirkanku adalah apa yang menariknya lepas.",
+        "objectives": {
+          "0": {
+            "label": "Lentera Feri ditemukan kembali"
+          }
+        }
+      },
+      "q_af_orchard_call": {
+        "title": "Sebuah Gerobak untuk Kebun",
+        "text": "Ahli Kebun Pomeline menjaga Kebun Bersepuh Emas di jalan barat, dan gerobak getahnya telat tiga hari. Seluruh kota bergantung pada getah amber itu, {playerName}: damar lampu, pemanis, dan bir panen. Susuri jalan barat dan cari tahu apa yang menahannya.",
+        "completion": "Sang Reeve menghitung gerobaknya, begitu? Kalau begitu, biarkan ia menghitungnya hilang sedikit lebih lama lagi. Lihatlah barisan pohonku, {playerName}. Aku punya masalah yang lebih besar daripada pengiriman yang terlambat.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Ahli Kebun Pomeline"
+          }
+        }
+      },
+      "q_af_amber_from_the_herd": {
+        "title": "Amber dari Kawanan",
+        "text": "Rusa-rusa bersepuh emas itu tidur di bawah pohon-pohon tertuaku, dan getah menetes keemasan ke bulu mereka sepanjang malam. Gumpalan yang tersisir darinya adalah amber termurni di rimba ini. Bawakan aku enam, {playerName}. Rusa-rusa itu tak akan berterima kasih, tapi mereka juga tak akan kehilangan apa-apa.",
+        "completion": "Enam gumpalan, bersih bagai madu yang dituang. Sarung tangan ini dijahit dari kumpulan terakhir, {playerName}: dikeraskan getah, dan lebih hangat dari yang terlihat.",
+        "objectives": {
+          "0": {
+            "label": "Gumpalan Getah Bersepuh Emas"
+          }
+        }
+      },
+      "q_af_what_took_the_moorings": {
+        "title": "Apa yang Merenggut Tambatan",
+        "text": "Sekarang akan kukatakan apa yang tidak kukatakan di depan kota. Tambatan itu tidak terlepas, ia digigit putus. Para Pengintai Danau, semakin berani tiap malam, menyeret tali dan kemudi. Kembalikan delapan di antaranya ke bawah air untuk selamanya, {playerName}, sebelum seorang nahkoda feri ikut terseret bersama mereka.",
+        "completion": "Delapan sosok lebih sedikit di perairan dangkal, dan penyeberangan berjalan tepat waktu hari ini untuk pertama kalinya dalam dua minggu. Tapi pengintai yang berani adalah pengintai yang digerakkan, {playerName}. Sesuatu di bawah danau ini sedang menggerakkan mereka.",
+        "objectives": {
+          "0": {
+            "label": "Pengintai Danau terbunuh"
+          }
+        }
+      },
+      "q_af_sprites_and_spigots": {
+        "title": "Peri dan Kran Sadap",
+        "text": "Peri panen, {playerName}. Mereka mencungkil kran sadap getahku dari batang pohon demi manisnya isi di dalam dan melempar embernya ke rerumputan. Usir delapan pencuri kecil itu dan bawa kembali empat emberku, maka gerobak-gerobak itu akan berjalan lagi.",
+        "completion": "Empat ember kembali tergantung di kaitnya dan barisan pohon kembali sunyi. Tanganmu lebih tegas menghadapi para peri dibanding aku, {playerName}, dan hari ini aku bersyukur karenanya.",
+        "objectives": {
+          "0": {
+            "label": "Peri Panen diusir"
+          },
+          "1": {
+            "label": "Ember Sadap Getah ditemukan kembali"
+          }
+        }
+      },
+      "q_af_the_meredark": {
+        "title": "Sang Meredark",
+        "text": "Para nahkoda feri tua punya nama yang hanya mereka ucapkan di daratan: Sang Meredark, pengintai pertama, setua danau ini dan dua kali lebih sabar. Ia pernah bangkit sekali sebelumnya, tahun ketika dermaga tenggelam terendam, dan kini ia bangkit lagi. Saat senja ia berjemur di reruntuhan dermaga di lepas pesisir selatan, {playerName}. Ajak seorang kawan, ajak dua, dan akhiri ia selagi masih bisa diakhiri.",
+        "completion": "Kabut terangkat dari danau ini pagi tadi, {playerName}, dan seluruh kota menyaksikannya. Feri-feri akan berlayar menyeberang malam lagi, dan setiap lentera di atas air akan menyala atas namamu. Ambillah ini: benda ini dikeruk dari dermaga yang tenggelam, dan tak ada orang yang lebih berhak memakainya darimu.",
+        "objectives": {
+          "0": {
+            "label": "Sang Meredark terbunuh"
+          }
+        }
+      },
+      "q_wf_across_the_fenway": {
+        "title": "Menyeberangi Jalan Rawa",
+        "text": "Negeri yang lembut, Willowfen ini, tapi lembut tidak sama dengan aman, {playerName}. Ikuti jalan ke utara menuju jalan lintas Fenway dan seberangi menuju Bridgemere. Katakan pada Tukang Jembatan Alden bahwa Tangga itu terbuka dan api perkemahan telah menyala.",
+        "completion": "Pell menjaga api itu tetap menyala melewati setiap kabut yang bisa dihembuskan rawa ini padanya. Jika ia bilang Tangga itu terbuka, berarti memang terbuka. Selamat datang di Bridgemere, {playerName}. Jaga langkahmu di atas papan-papanku dan kita akan akur.",
+        "objectives": {
+          "0": {
+            "label": "Lapor kepada Tukang Jembatan Alden"
+          }
+        }
+      },
+      "q_wf_rope_chewers": {
+        "title": "Para Penggigit Tali",
+        "text": "Kodok rawa, {playerName}. Mereka merangkak keluar dari parit pada malam hari dan menggigit putus tali tambatku seolah itu batang buluh. Tiga perahu kecil hanyut minggu lalu, dan salah satunya membawa kerekan baikku. Kurangi jumlah mereka, sepuluh makhluk gemuk itu, dan perahu-perahu tetap berada di tempat kami mengikatnya.",
+        "completion": "Sepuluh set gigi lebih sedikit di paritku. Perahu-perahu kecil itu tetap di tambatannya semalam penuh untuk pertama kalinya dalam sebulan, {playerName}. Kau mendapat terima kasih dari setiap penjaring di kota ini.",
+        "objectives": {
+          "0": {
+            "label": "Kodok Rawa terbunuh"
+          }
+        }
+      },
+      "q_wf_eels_for_the_smokehouse": {
+        "title": "Belut untuk Rumah Pengasapan",
+        "text": "Kodok rawa tidak hanya memakan taliku, {playerName}, mereka memakan hasil tangkapanku: mereka menelan belut-belut itu utuh-utuh, langsung dari perangkap. Bebaskan enam yang gemuk dari makhluk-makhluk rakus itu sebelum dagingnya membusuk, dan api rumah pengasapan tetap menyala.",
+        "completion": "Enam belut baik, nyaris tak lecet. Rumah pengasapan akan berbau seperti uang menjelang pagi. Ini, sepatu bot ini dulu milikku saat aku masih gesit: kulit belut menahan basah seperti tak ada bandingannya.",
+        "objectives": {
+          "0": {
+            "label": "Belut Rawa yang Gemuk"
+          }
+        }
+      },
+      "q_wf_mind_the_moorings": {
+        "title": "Perhatikan Tambatan",
+        "text": "Tali yang baik mahal di sini, {playerName}: setiap tali yang digigit putus oleh kodok-kodok itu adalah seminggu uang hasil belut yang hilang. Ujung-ujung yang terputus masih tergeletak di sepanjang pesisir parit tempat perahu-perahu itu terlepas. Susuri jalan papan dan bawakan aku kembali empat tali, dan aku bisa menyambungnya sebaik baru.",
+        "completion": "Lihatlah itu: gigitan bersih, setiap satunya, tapi masih ada cukup tali yang tersisa untuk disambung. Kau telah menghematkan aku sebulan uang dan para penjaring sebulan gerutuan, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Tali Tambat yang Terputus ditemukan kembali"
+          }
+        }
+      },
+      "q_wf_witch_of_willowweep": {
+        "title": "Penyihir Willowweep",
+        "text": "Kau pasti sudah mendengarnya sekarang, {playerName}: dengkuran itu. Pelan dan berat, jauh melewati Dataran Mengantuk, seperti rawa ini sendiri berbalik dalam tidurnya. Kodok-kodok, para peri, roh cahaya yang membara di siang hari: semuanya dimulai saat suara itu dimulai. Satu jiwa mungkin tahu apa itu. Ibu Sedge berkemah di Willowweep, barat mengelilingi parit dan menyusuri pesisir jauh. Temukan dia, dan tanyakan padanya apa yang tidur di tengah rawaku.",
+        "completion": "Alden mengirimmu jauh-jauh ke sini untuk bertanya soal dengkuran itu? Berarti penduduk jembatan akhirnya mendengarkan. Duduklah di luar kelembapan, {playerName}. Suara itu punya nama, dan sebuah kerongkongan, dan aku telah menunggu seseorang yang cukup bodoh untuk membantuku menenangkannya.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Ibu Sedge"
+          }
+        }
+      },
+      "q_wf_toll_and_tangle": {
+        "title": "Upeti dan Jalinan",
+        "text": "Peri willow menganggap melepaskan feri adalah permainan yang menyenangkan, {playerName}, dan minggu lalu perahu upeti terbalik di jalur timur dengan upeti jembatan semusim di dalamnya. Peti-peti itu tenggelam ke perairan dangkal dan para peri menari di jalan papan seolah itu milik mereka. Usir delapan dan angkat tiga peti upeti, dan Bridgemere bisa makan musim dingin ini.",
+        "completion": "Tiga peti, dan koinnya masih kering di dalam. Para peri akan merajuk di semak ranting selama seminggu, {playerName}, dan kota ini berutang roti musim dinginnya padamu.",
+        "objectives": {
+          "0": {
+            "label": "Peri Willow diusir"
+          },
+          "1": {
+            "label": "Peti Upeti ditemukan kembali"
+          }
+        }
+      },
+      "q_wf_wisplight_charms": {
+        "title": "Jimat Wisplight",
+        "text": "Roh cahaya di atas kolam-kolam adalah rawa ini bermimpi dengan suara keras, {playerName}, dan cahayanya adalah satu-satunya hal yang bertahan melawan buaian Sang Pengorak. Aku menenunnya ke dalam jimat willow: satu di lehermu dan dengkuran itu tak akan bisa menyeret kelopak matamu turun. Bawakan aku enam bola wisplight. Roh-roh cahaya itu tak akan melawanmu untuk mendapatkannya, yang membuatnya menjadi sebuah kebaikan atau sebuah pencurian, tergantung bagaimana kau membawanya.",
+        "completion": "Enam bola, masih hangat dengan mimpi. Beri aku waktu hingga bulan terbit dan aku akan menenun jimat untukmu dan siapa pun yang cukup berani berdiri di sampingmu.",
+        "objectives": {
+          "0": {
+            "label": "Bola Wisplight"
+          }
+        }
+      },
+      "q_wf_croakers_hush": {
+        "title": "Kesunyian Sang Pengorak",
+        "text": "Sekarang kau tahu nama sang pendengkur, {playerName}: Sang Kodok Mengantuk, raja kodok tua di Dataran Mengantuk. Setiap tahun dengkurannya semakin berat, dan setiap tahun semakin banyak rawa ini lupa untuk terbangun. Jimat-jimat itu akan menjaga matamu tetap terbuka, tapi tubuhnya yang besar adalah masalah lain: ajak seorang kawan, dan jangan melawannya di dalam air. Buat sang raja tua tidur lebih tenang.",
+        "completion": "Dengarkan, {playerName}. Tak ada apa-apa. Keheningan sejati pertama di atas rawa ini dalam tiga puluh tahun, dan setengah kota ini tak akan bisa tidur malam ini karena keanehannya. Pohon-pohon willow mengucapkan terima kasih, dengan cara mereka sendiri. Kenakan ini, ditenun dari hamparan lilinya sendiri, dan rawa ini akan mengenalimu sebagai sahabat di mana pun air ini mencapai.",
+        "objectives": {
+          "0": {
+            "label": "Sang Kodok Mengantuk terbunuh"
+          }
+        }
+      },
+      "q_nb_road_of_lanterns": {
+        "title": "Jalan Lentera-Lentera",
+        "text": "Di sini matahari tak pernah mengikuti, {playerName}, hanya lampu-lampu yang kujaga tetap menyala di sepanjang pendakian. Moonrest terletak di utara tempat cahaya bunga berkumpul. Temukan Lira Dewsong di antara taman-tamannya dan katakan padanya lampu-lampu Gerbang Malam masih menyala.",
+        "completion": "Lampu-lampu itu masih menyala, dan jalan ini masih membawa orang asing kepada kami. Sorrel telah menjaga gerbang itu lebih lama dari yang diingat siapa pun di Moonrest. Selamat datang, {playerName}, di alam yang tak pernah fajar.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Lira Dewsong di Moonrest"
+          }
+        }
+      },
+      "q_nb_striders_in_the_dark": {
+        "title": "Penjelajah dalam Kegelapan",
+        "text": "Para penjelajah kelam selalu menjadi pemburu yang sabar, {playerName}, tapi akhir-akhir ini mereka menyelinap tepat ke bedengan bunga dan mengambil anak domba moonfleece di bawah lentera-lentera kami. Basmi sepuluh di antara mereka dan kembalikan ketenangan perbukitan ini.",
+        "completion": "Sepuluh penjelajah lebih sedikit, dan kawanan sudah merumput lebih tenang. Taman-taman ini menjaga jamnya sendiri, tapi malam ini mereka menjaganya dalam damai.",
+        "objectives": {
+          "0": {
+            "label": "Penjelajah Kelam terbunuh"
+          }
+        }
+      },
+      "q_nb_wool_by_moonlight": {
+        "title": "Wol di Bawah Cahaya Bulan",
+        "text": "Tak ada yang menghangatkan seperti moonfleece, {playerName}, dan tak ada yang bisa dipintal sehalus itu. Para pemamah membawa wol peraknya lepas dalam seberkas-seberkas saat mereka melayang di perbukitan. Bawakan aku enam seberkas baik dari kawanan itu dan aku akan menenunkanmu sesuatu yang sepadan dengan perjalanan ini.",
+        "completion": "Perak bagai cahaya bintang dan dua kali lebih lembut. Ini, {playerName}: sarung tangan dari kumpulan terakhir, dilapisi dengan cara yang hanya bisa dilakukan moonfleece.",
+        "objectives": {
+          "0": {
+            "label": "Seberkas Moonfleece"
+          }
+        }
+      },
+      "q_nb_night_gardens": {
+        "title": "Taman-Taman Malam",
+        "text": "Bunga nightbloom hanya mekar di bawah langit ini, dan Gloamfield menyimpan bedengan tertua di alam ini. Aku butuh empat kuntum segar untuk untaian bunga kuil, {playerName}. Potonglah dengan lembut: sebuah bedengan mengingat tangan yang kasar selama satu musim.",
+        "completion": "Masih bercahaya, setiap kelopaknya. Kuil ini akan beraroma malam selama seminggu, dan Moonrest akan tidur lebih nyenyak karenanya.",
+        "objectives": {
+          "0": {
+            "label": "Kuntum Nightbloom dikumpulkan"
+          }
+        }
+      },
+      "q_nb_eyes_on_the_vigil": {
+        "title": "Mata pada Sang Penjaga Tegak",
+        "text": "Sesuatu telah membuat para penjelajah berani dan kawanan gelisah, {playerName}, dan aku tak bisa membacanya dari bunga-bunga. Cassian bisa membacanya dari langit. Ia menjaga perkemahan observatoriumnya di dekat Sang Penjaga Tegak sebelah timur sini, tempat kaum nightkin melayang di antara batu-batu. Temukan dia, dan tanyakan apa yang dikatakan bintang-bintang.",
+        "completion": "Lira mengirimmu? Berarti taman-taman itu juga merasakannya. Duduklah di dekat teropong sejenak, {playerName}. Bintang-bintang telah gelisah selama sebulan, dan setiap peta yang kugambar condong ke utara menuju gundukan itu.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Astronom Cassian di Sang Penjaga Tegak"
+          }
+        }
+      },
+      "q_nb_charts_of_the_stones": {
+        "title": "Peta di Batu-Batu",
+        "text": "Batu-batu Vigili lebih tua dari Moonrest, lebih tua dari kaum nightkin yang merawatnya, dan permukaannya terukir peta bintang yang telah kuhabiskan seumur hidupku mempelajari cara membacanya. Langit telah bergeser, {playerName}, dan aku harus tahu seberapa jauh. Baca peta pada tiga batu dan bawakan aku arahnya.",
+        "completion": "Tak ada keraguan lagi. Setiap arah telah merangkak menuju Gundukan Tanpa Tidur, seolah langit itu sendiri condong di atas gundukan itu untuk mengawasi. Raja-raja tua dulu dikubur di bawah bintang yang sejajar dengan alasan tertentu, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Peta bintang dibaca"
+          }
+        }
+      },
+      "q_nb_restless_mounds": {
+        "title": "Gundukan-Gundukan yang Gelisah",
+        "text": "Peta-peta itu adalah sebuah peringatan, dan ladang gundukan ini membuktikannya: gundukan-gundukan itu terbuka dari bawah. Para wight berjalan di barisan makam mengenakan kehormatan lama mereka, dan persembahan yang menjaga mereka tetap tidur tergeletak berserakan di rerumputan. Tumbangkan delapan di antara mereka, {playerName}, dan kumpulkan empat persembahan itu kembali padaku.",
+        "completion": "Emas makam, masih dingin dari tanah. Para wight itu tidak bangkit dengan sendirinya, {playerName}: sesuatu di bawah gundukan besar itu memanggil mereka keluar, dan aku khawatir peta-peta itu sudah memberitahu kita namanya.",
+        "objectives": {
+          "0": {
+            "label": "Wight Gundukan terbunuh"
+          },
+          "1": {
+            "label": "Persembahan makam ditemukan kembali"
+          }
+        }
+      },
+      "q_nb_the_barrow_king": {
+        "title": "Sang Raja Gundukan Terbangun",
+        "text": "Setiap arah, setiap bintang yang gelisah, setiap gundukan yang terbuka menunjuk pada satu hal: Sang Raja Gundukan sedang terbangun di bawah gundukan besar itu, dan alam ini tak punya fajar untuk menahannya. Ia harus diistirahatkan sebelum ia mengingat mahkotanya, {playerName}. Jangan pergi sendirian: ajak seorang kawan, dan jaga cahaya bunga tetap di belakangmu.",
+        "completion": "Bintang-bintang telah tenang untuk pertama kalinya dalam satu musim, {playerName}. Gundukan-gundukan itu tertutup, kaum nightkin telah kembali diam di batu-batu mereka, dan sang raja tidur lagi di bawah sana. Kenakan mantel ini: Moonrest memangkasnya untuk siapa pun yang akhirnya dipercaya malam.",
+        "objectives": {
+          "0": {
+            "label": "Sang Raja Gundukan diistirahatkan"
+          }
+        }
+      },
+      "q_ww_bells_of_gallowmere": {
+        "title": "Lonceng-Lonceng Gallowmere",
+        "text": "Dengar dentang itu, {playerName}? Itu Gallowmere, di jalan utara, membunyikan lonceng untuk menidurkan yang mati. Sexton Marrow menghitung setiap jiwa di bawah kanopi, yang hidup dan yang terkubur. Pergilah dan dihitung, sebelum hutan ini menghitungmu sendiri.",
+        "completion": "Cobb mengirimmu ke jalan ini utuh, begitu? Pria yang baik. Ia telah menjaga lentera gerbang itu tetap menyala selama tiga puluh tahun, dan hutan ini belum pernah sekali pun melewatinya. Selamat datang di Gallowmere, {playerName}. Perhatikan lonceng-loncengnya.",
+        "objectives": {
+          "0": {
+            "label": "Lapor kepada Sexton Marrow"
+          }
+        }
+      },
+      "q_ww_silk_in_the_eaves": {
+        "title": "Sutra di Cabang-Cabang Atas",
+        "text": "Lihatlah ke atas saat kau berjalan di jalan barat, {playerName}, dan kau akan melihat mereka: sosok-sosok terbungkus di kanopi, bergoyang di tempat yang tak terjangkau angin. Para pemintal widowsilk telah merayap keluar dari Semak dan merentangkan lumbung mereka di atas lentera-lenteraku. Bunuh sepuluh, dan jalan ini akan kembali menjadi jalan.",
+        "completion": "Sepuluh pemintal lebih sedikit di cabang-cabang atas. Para penyala lentera akan berjalan ronde mereka malam ini tanpa perlu mendongak, dan itu lebih berharga di sini daripada yang kau tahu.",
+        "objectives": {
+          "0": {
+            "label": "Pemintal Widowsilk terbunuh"
+          }
+        }
+      },
+      "q_ww_widows_skeins": {
+        "title": "Gulungan Benang Sang Janda",
+        "text": "Para pemintal mengambil yang mati kami untuk lumbung mereka, {playerName}, jadi aku mengambil sutra mereka untuk kain kafan kami. Ia terbakar bersih dan menyimpan berkah lebih baik daripada linen mana pun. Bawakan aku enam gulungan benang widowsilk, dan jiwa berikutnya yang kami kubur akan turun terbungkus dan terlindungi.",
+        "completion": "Enam gulungan benang, lembut bagai napas yang ditahan. Yang mati akan berbaring lebih tenang dalam ini. Ambillah pembalut ini, kujahit dari kumpulan terakhir, dan hutan ini belum pernah sekali pun menggigitnya tembus.",
+        "objectives": {
+          "0": {
+            "label": "Gulungan Benang Widowsilk"
+          }
+        }
+      },
+      "q_ww_candles_at_the_bounds": {
+        "title": "Lilin-Lilin di Perbatasan",
+        "text": "Empat batu perbatasan mengelilingi Gallowmere, {playerName}, satu di setiap jalan keluar, dan sebuah lilin makam menyala di setiap batu. Selama mereka menyala, yang terkubur tetap terkubur. Gerimis telah memadamkan semuanya, keempatnya, dan aku terlalu tua untuk menyusuri perbatasan sendirian. Ambil lilin panjangku dan nyalakan kembali semuanya, dengan cepat.",
+        "completion": "Keempatnya menyala? Kalau begitu bernapaslah, {playerName}. Kau tak mendengarnya, tapi seluruh desa mendengarnya: lonceng-lonceng berbunyi lebih lega tepat saat sumbu terakhir menyala.",
+        "objectives": {
+          "0": {
+            "label": "Lilin makam dinyalakan kembali"
+          }
+        }
+      },
+      "q_ww_the_last_vicar": {
+        "title": "Vikaris Terakhir",
+        "text": "Di selatan sini, Kapel Mournstone lapuk di dekat danau hitamnya, dan satu pria masih merawatnya: Vikaris Creel, yang tak mau pergi saat atapnya runtuh. Ia mengenal ritus-ritus lama lebih baik dari lonceng-loncengku, {playerName}, dan ia belum mengirim kabar selama sebulan. Susuri jalan kapel dan pastikan ia masih bernapas.",
+        "completion": "Marrow mengkhawatirkan aku? Itu hal baru. Katakan padanya Mournstone masih berdiri, dengan caranya sendiri, begitu juga aku. Tinggallah sejenak, {playerName}. Danau itu telah berbisik, dan aku lebih baik tidak mendengarkannya sendirian.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Vikaris Creel"
+          }
+        }
+      },
+      "q_ww_wraiths_of_the_tarn": {
+        "title": "Arwah-Arwah Danau",
+        "text": "Arwah hutan dulu adalah para penjaga kapel, {playerName}, tumbuh dari pohon-pohon yang ditanam di atas yang mati terhormat. Sejak danau itu berubah hitam, mereka telah melupakan tugas mereka, dan kini mereka melayang melalui kuburanku menarik-narik tanah. Hancurkan delapan di antara mereka sebelum mereka menyelesaikan apa yang telah mereka mulai.",
+        "completion": "Delapan penjaga akhirnya diistirahatkan. Aku tak akan menyebutnya belas kasihan di siang hari, tapi di antara kita, {playerName}, itu memang belas kasihan.",
+        "objectives": {
+          "0": {
+            "label": "Arwah Hutan terbunuh"
+          }
+        }
+      },
+      "q_ww_what_the_bark_holds": {
+        "title": "Apa yang Disimpan Kulit Kayu",
+        "text": "Di Padang Tergantung sebelah timur Gallowmere, para pemintal menggantungkan yang mati terbungkus sutra dari dahan-dahan, dan para penyaruk gravenbark berjaga di bawahnya bagai pengusung jenazah yang sabar. Mereka adalah penduduk kami di atas sana, {playerName}. Hancurkan lima penyaruk, turunkan tiga yang mati terbungkus itu, dan bawa mereka pulang ke tanah.",
+        "completion": "Tiga jiwa kembali di bawah tanah yang layak sebelum malam tiba. Para penyaruk akan tumbuh kembali, kulit kayu selalu begitu, tapi malam ini padang itu tergantung kosong, dan itu sudah cukup.",
+        "objectives": {
+          "0": {
+            "label": "Penyaruk Gravenbark ditumbangkan"
+          },
+          "1": {
+            "label": "Sisa jasad terikat sutra diturunkan"
+          }
+        }
+      },
+      "q_ww_walking_mosley_home": {
+        "title": "Mengantar Mosley Pulang",
+        "text": "Penggali kuburku Mosley mengambil jalan kapel tiga hari lalu untuk membuka petak di pekarangan tua, dan galiannya runtuh menimpanya. Ia mencakar jalan keluarnya, orang bodoh itu masih hidup, tapi ia meringkuk di dekat makam-makam kapel dan tak mau bergerak karena para pemintal di jalan. Antarkan dia pulang, {playerName}. Aku tak bisa membunyikan lonceng untuk orang yang masih hidup.",
+        "completion": "Ia melewati gerbang dengan kedua kakinya sendiri, bersumpah tak akan menggali apa pun yang lebih dalam dari bedengan lobak mulai sekarang. Ia akan kembali ke pekarangan itu sebelum hari Minggu, mereka selalu begitu. Terima kasih, {playerName}. Gallowmere menjaga penduduknya, itulah seluruh hukum kami.",
+        "objectives": {
+          "0": {
+            "label": "Penggali Kubur Mosley diantar dengan selamat kembali ke Gallowmere"
+          }
+        }
+      },
+      "q_ww_horn_of_the_huntsman": {
+        "title": "Terompet Sang Pemburu",
+        "text": "Kau pasti sudah mendengar terompet itu sekarang, {playerName}, tipis dan jauh, suara yang membuat seluruh hutan ini menahan napas. Sang Pemburu Pucat menunggangi tanah lapangnya di sebelah utara sini, dan setiap makam yang dilewatinya semakin dangkal. Ia pernah menjadi seorang pria, dan ia dikubur dengan salah, dan aku sudah berhenti berpura-pura bahwa doa saja akan cukup. Ajak seorang kawan, ajak dua, dan jatuhkan dia dari kudanya.",
+        "completion": "Terompet itu berhenti di tengah nada. Setiap lonceng di Gallowmere berbunyi sekali, dengan sendirinya, dan kemudian hutan ini menjadi lebih sunyi dari yang pernah kudengar selama tiga puluh tahun. Kau telah melakukan ritus yang tak bisa kulakukan, {playerName}. Kenakan ini, dan berjalanlah di bawah kanopi tanpa rasa takut.",
+        "objectives": {
+          "0": {
+            "label": "Sang Pemburu Pucat dijatuhkan dari kudanya"
+          }
+        }
+      },
+      "q_pr_down_to_drifthaven": {
+        "title": "Turun ke Drifthaven",
+        "text": "Keluar dari pepohonan hitam dan menuju matahari, {playerName}. Ikuti jalan pesisir ke utara dan kau akan mencapai Drifthaven sebelum air pasang berbalik. Carilah Bos Salvase Ryna, ia punya pekerjaan untuk pasangan tangan mana pun sejak badai itu, dan katakan padanya jalan Muara Belukar masih terbuka.",
+        "completion": "Pell mengirimmu? Berarti kau berjalan sepanjang jalan Muara Belukar sendirian, dan itu sudah cukup jadi rujukan bagiku. Selamat datang di Drifthaven, {playerName}. Ambil tali, kami kekurangan tangan.",
+        "objectives": {
+          "0": {
+            "label": "Lapor kepada Bos Salvase Ryna"
+          }
+        }
+      },
+      "q_pr_wreck_line_cargo": {
+        "title": "Jalur Bangkai Kapal",
+        "text": "Badai tiga malam lalu mendorong Pearlwake ke atas karang, dan kargonya berserakan sepanjang jalur bangkai kapal antara sini dan Pesisir Palem. Tiga peti barang dagangan masih tergeletak di ombak, {playerName}. Bawa masuk sebelum air pasang, atau para kepiting, mengklaim apa yang tersisa.",
+        "completion": "Bernoda garam tapi masih kokoh, ketiganya. Para penyelam bisa makan bulan ini berkatmu, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Kargo Pearlwake ditemukan kembali"
+          }
+        }
+      },
+      "q_pr_scuttler_cull": {
+        "title": "Pencuri Bercangkang",
+        "text": "Setiap bangkai kapal di pesisir ini menarik para perayap pasang, dan Pearlwake telah menarik setengah karang. Awak salvaseku tak mau bekerja di jalur dengan cakar-cakar itu di perairan dangkal. Belah sepuluh di antara mereka, {playerName}, dan jalur bangkai kapal kembali menjadi milik kami.",
+        "completion": "Sepuluh cakar lebih sedikit di ombak. Awakku sudah kembali mengarungi air, dan tak satu pun dari mereka mengucapkan terima kasih, jadi biar aku yang melakukannya: terima kasih, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Perayap Pasang dibelah"
+          }
+        }
+      },
+      "q_pr_boars_in_the_gardens": {
+        "title": "Babi Hutan di Taman-Taman",
+        "text": "Apa pun yang bergerak di kehijauan dalam itu, ia mendorong babi-babi hutan semak keluar ke pesisir kami. Mereka telah mencabik-cabik teras taman dua kali minggu ini, dan rak pengering akan menjadi sasaran berikutnya. Sepuluh babi hutan, {playerName}, dan dorong sisanya kembali ke bawah pepohonan.",
+        "completion": "Rak-rak itu tetap berdiri dan taman-taman bisa ditanami kembali. Babi-babi hutan itu tidak memilih untuk datang ke pasir ini, {playerName}. Ingatlah itu: sesuatu telah menggerakkan mereka.",
+        "objectives": {
+          "0": {
+            "label": "Babi Hutan Semak diusir"
+          }
+        }
+      },
+      "q_pr_the_man_who_went_in": {
+        "title": "Pria yang Pernah Masuk",
+        "text": "Para penyelam tak mau melangkah melewati batas pepohonan, {playerName}, dan aku tak akan memintanya. Kau pasti sudah mendengar genderang itu sekarang: semua orang mendengarnya, pada malam kedua. Hanya satu pria di pulau ini yang pernah berjalan menuju suara itu dan kembali. Okku. Ia berkemah di bawah pohon-pohon beringin besar di Air Terjun Sulur, jauh di jalan Belukar. Temukan dia, dan tanyakan apa yang disembunyikan kehijauan itu.",
+        "completion": "Isha mengirimmu? Sang Ibu Mutiara belum menyebut namaku selama bertahun-tahun. Duduklah di luar jangkauan sulur-sulur ini, {playerName}, dan aku akan mengatakan apa yang kutahu: genderang itu bukanlah bahaya. Ia adalah sebuah peringatan.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Okku di Air Terjun Sulur"
+          }
+        }
+      },
+      "q_pr_canopy_silk": {
+        "title": "Sutra dari Kanopi",
+        "text": "Lihat ke atas, {playerName}. Setiap kanopi dari sini hingga arca itu terjalin bagai jaring ikan, dan para pemintal tumbuh semakin berani tiap musim. Aku merentangkan sutra mereka sendiri melintasi jalan setapak, lonceng kawat pemicu, agar rimba ini tak bisa menyelinap ke arahku. Enam gulungan baik dari para pemintal kanopi akan merentangkan kembali jalur-jalurku.",
+        "completion": "Sutra yang baik dan kuat. Loncengku akan berbunyi lebih lama lagi, dan tak ada yang berjalan di jalan setapak ini malam hari tanpa sepengetahuanku, {playerName}. Akhir-akhir ini, sesuatu sering berjalan lewat sini.",
+        "objectives": {
+          "0": {
+            "label": "Gulungan Sutra Kanopi"
+          }
+        }
+      },
+      "q_pr_the_lost_navigator": {
+        "title": "Sang Navigator yang Hilang",
+        "text": "Kami menyelamatkan semua awak dari Pearlwake kecuali satu: Navigator Suli, yang berenang menuju pesisir jauh dan tak pernah berjalan masuk. Seorang penyelam melihatnya bersembunyi di reruntuhan haluan kapal melewati Pesisir Palem, masih hidup, tapi terlalu lelah untuk menempuh bahaya itu sendirian. Antarkan dia pulang di sepanjang jalan pesisir, {playerName}. Para kepiting tak akan menyukainya, dan rimba ini lebih tak menyukainya lagi.",
+        "completion": "Suli ada di dekat api, masih bersumpah ia bisa saja berenang sendiri. Kau membawa kembali satu-satunya pembaca peta di pesisir ini, {playerName}. Ini dari peti lautnya, dengan restunya.",
+        "objectives": {
+          "0": {
+            "label": "Navigator Suli diantar dengan selamat ke Drifthaven"
+          }
+        }
+      },
+      "q_pr_what_the_drums_guard": {
+        "title": "Apa yang Dijaga Genderang",
+        "text": "Aku telah berjalan sedekat yang berani dilakukan orang hidup ke Arca Tenggelam, dan aku melihat dua hal: para pemintal telah menirai jalan arca itu dengan jaring, dan mangkuk-mangkuk persembahan tua di sepanjang jalan itu telah terisi lagi. Baru saja, {playerName}. Tebas delapan pemintal dari jalan itu dan bawakan aku tiga persembahan itu. Aku ingin tahu tangan siapa yang masih memberi makan dewa yang telah mati.",
+        "completion": "Lumut, cangkang mutiara, dan darah babi hutan, dipadatkan oleh jari-jari. Sesuatu di reruntuhan itu masih menjalankan ritenya, {playerName}, dan Sang Penjaga menghalau segala yang lain. Sudah waktunya kita membicarakannya secara terbuka.",
+        "objectives": {
+          "0": {
+            "label": "Pemintal Kanopi ditebas"
+          },
+          "1": {
+            "label": "Mangkuk Persembahan yang Terisi Ulang dikumpulkan"
+          }
+        }
+      },
+      "q_pr_idol_guardian": {
+        "title": "Sang Penjaga Arca",
+        "text": "Arca itu lebih tua dari pulau ini, {playerName}. Lebih tua dari genderang, lebih tua dari nama Palmreach. Sang Penjaganya telah berdiri di lingkaran tenggelam itu sejak sebelum pohon palem tumbuh, dan kini ia terbangun dan berjalan di antara tiang-tiang pada malam hari. Apa pun yang diberi makan oleh persembahan itu, Sang Penjaga adalah penjaga pintunya. Ajak seorang kawan, dan hancurkan ia.",
+        "completion": "Kau telah menumbangkan sesuatu yang bahkan rimba ini tak berani sentuh. Lihat di sana, di balik arca itu: Sang Penjaga tak pernah menjaga tiang-tiang itu, {playerName}, ia menjaga tangga di bawahnya. Genderang telah sunyi malam ini. Apa pun yang tidur di bawah Wildheart Basin kini mengetahui namamu.",
+        "objectives": {
+          "0": {
+            "label": "Sang Penjaga Arca dihancurkan"
+          }
+        }
+      },
+      "q_eg_gate_report": {
+        "title": "Kabar Lewat Gerbang",
+        "text": "Halaman-halaman melewati gerbang ini telah memangkas dirinya sendiri selama seratus tahun, {playerName}, dan akhir-akhir ini mereka mulai memangkas para pengunjung. Kepala Tukang Kebun Amaranth menyimpan catatan di Hedgewick, di jalan melewati halaman gerbang ini. Beritahu dia seorang pengembara lain telah datang, dan beritahu dia bahwa pagar semak di dekat gerbang bergerak semalam.",
+        "completion": "Bergerak, begitu ya. Pell melaporkan itu setiap minggu, dan setiap minggu ia benar. Maafkan mataku, {playerName}, aku belum tidur semalam penuh selama bertahun-tahun: seseorang harus mengawasi taman ini mengawasi kita. Selamat datang di Hedgewick.",
+        "objectives": {
+          "0": {
+            "label": "Lapor kepada Kepala Tukang Kebun Amaranth"
+          }
+        }
+      },
+      "q_eg_hungry_shapes": {
+        "title": "Terpangkas Menjadi Lapar",
+        "text": "Siapa pun yang membentuk taman ini telah menjadi ceroboh, atau kejam. Bentuk-bentuk serigala di Rose Wilds dipangkas hanya untuk pajangan, namun akhir-akhir ini mereka berburu: rahang hijau, tanpa perut, dan tak ada alasan untuk pernah berhenti. Tumbangkan sepuluh serigala topiary, {playerName}, dan biarkan halaman-halaman ini menjadi halaman lagi untuk sementara.",
+        "completion": "Sepuluh tumpukan guntingan di tempat sepuluh serigala pernah berdiri. Ini seharusnya terasa seperti berkebun, {playerName}. Mengapa ini terasa seperti perang?",
+        "objectives": {
+          "0": {
+            "label": "Serigala Topiary terbunuh"
+          }
+        }
+      },
+      "q_eg_stolen_shears": {
+        "title": "Gunting yang Dicuri",
+        "text": "Setiap pasang gunting di Hedgewick telah hilang dalam dua minggu, {playerName}: dari kaitannya, dari gudang terkunci, sepasang bahkan dari celemekku sendiri saat aku tertidur sejenak. Ini ulah para gnome semak, para penjaga lapangan kecil yang benci kita menginjak halaman mereka. Ambil kembali enam pasang sebelum seluruh dusun ini hanya tersisa pisau dapur.",
+        "completion": "Enam pasang, dan punyaku sendiri ada di antaranya, aku akan mengenali goresan pada bilahnya di mana pun. Ini, sarung tangan ini dirajut untuk pekerjaan memangkas. Tangan yang hangat membuat gunting yang stabil.",
+        "objectives": {
+          "0": {
+            "label": "Gunting Hedgewick yang Dicuri"
+          }
+        }
+      },
+      "q_eg_who_trims_the_hedges": {
+        "title": "Siapa yang Memangkas Pagar Semak",
+        "text": "Aku telah menyimpan buku catatan selama tiga puluh tahun, {playerName}, dan tidak tidur nyenyak selama sepuluh tahun darinya, karena hitungannya tak pernah pas. Rumput ingin dipotong dan pagar semak ingin dibentuk, dan tak seorang pun di sini melakukan keduanya, namun setiap fajar taman ini berdiri terpangkas rapi. Akhir-akhir ini penduduk hutan bersumpah mereka melihat seorang pria tua dengan gerobak dorong di halaman selatan yang jauh, melewati labirin di dekat Cekungan Lili. Temukan dia. Jika ia nyata, akhirnya aku bisa tidur. Jika tidak, kurasa aku tak akan pernah bisa.",
+        "completion": "Jadi akhirnya rumah itu mengirim seseorang. Seratus tahun aku telah berjalan di halaman-halaman ini, {playerName}, dan taman ini dan aku punya sebuah kesepahaman: aku memangkas apa yang meminta untuk dipangkas. Duduklah. Pagar semak ini bisa meluangkan sejam untukmu.",
+        "objectives": {
+          "0": {
+            "label": "Temukan tukang kebun di dekat Cekungan Lili"
+          }
+        }
+      },
+      "q_eg_gnomes_in_the_green": {
+        "title": "Dendam Sang Penjaga Lapangan",
+        "text": "Gunting itu hanyalah permulaan, {playerName}. Semalam para gnome menjungkirkan gerobak alat kami ke dalam hijau, satu di dekat sarang mereka sebelah barat labirin, satu lagi bersih menyeberang taman di jalan kolam, dan menyebarkan besi baik berumur seratus tahun ke rerumputan. Usir delapan iblis kecil itu dan seret pulang gerobak-gerobak yang tumpah.",
+        "completion": "Tiga gerobak kembali dan kaitan-kaitan penuh lagi. Biarkan iblis-iblis kecil itu merajuk di pagar semak mereka: Hedgewick juga menggarap halaman-halaman ini.",
+        "objectives": {
+          "0": {
+            "label": "Gnome Semak diusir"
+          },
+          "1": {
+            "label": "Gerobak alat ditemukan kembali"
+          }
+        }
+      },
+      "q_eg_bloom_clippings": {
+        "title": "Guntingan dari Hijau yang Hidup",
+        "text": "Kau ingin memahami taman ini? Kalau begitu bacalah seperti caraku membacanya. Rusa-rusa yang merumput di halaman ini menumbuhkan hijau yang paling murni: setiap daun pada mereka adalah sebuah halaman. Bawakan aku enam guntingan segar dari rusa-rusa topiary, {playerName}. Mereka tak akan berterima kasih atas pemangkasan itu, tapi mereka akan tumbuh kembali. Segalanya di sini tumbuh kembali.",
+        "completion": "Lihat ini: daun-daunnya menggulung ke dalam dirinya sendiri, setiap guntingan sama saja. Taman ini ketakutan, {playerName}. Dalam seratus tahun aku belum pernah sekali pun mengenalnya ketakutan.",
+        "objectives": {
+          "0": {
+            "label": "Potongan Bunga Terpangkas"
+          }
+        }
+      },
+      "q_eg_four_statues": {
+        "title": "Empat Saudari yang Diam",
+        "text": "Saat taman ini masih muda, para tukang kebun pertama mendirikan empat saudari marmer untuk mengawasi wilayahnya: satu di atas Rose Wilds, satu di jalan kolam sebelah timur labirin, satu di halaman barat tempat para gnome menjaga sarangnya, dan satu di halaman selatan melewati pagar semak. Labirin ini tumbuh di antara mereka, dan kebanyakan orang tak pernah melihat keempatnya. Susuri keempat wilayah itu, {playerName}, dan tekankan telapak tanganmu pada setiap saudari. Saat taman ini telah mengamatimu dari keempat sisi, ia akan membuka tempat-tempat yang disembunyikannya dari orang asing.",
+        "completion": "Empat cetakan gosok, empat saudari, dan tak satu pun dari mereka menangiskan marmer. Taman ini telah mengukur dirimu, {playerName}, dan ia tidak mendapatimu kurang. Sekarang aku bisa mengirimmu ke tempat masalah sesungguhnya berada.",
+        "objectives": {
+          "0": {
+            "label": "Arca taman dikunjungi"
+          }
+        }
+      },
+      "q_eg_bull_of_the_court": {
+        "title": "Banteng Pelataran Air Mancur",
+        "text": "Sekarang kebenarannya, {playerName}. Banteng di jantung labirin itu adalah mahakaryaku: aku membentuknya untuk menjaga Pelataran Air Mancur, dan selama seratus tahun ia melakukannya. Tapi ketakutan dalam hijau ini telah menjangkitinya, dan kini ia tak menjaga apa-apa, ia berburu. Labirin ini memberinya makan siapa pun yang tersesat masuk. Aku terlalu tua untuk membongkarnya, dan itu harus dibongkar habis, akar dan cabangnya. Ajak seorang kawan, susuri labirin menuju pelataran itu, dan tumbangkan bantengku.",
+        "completion": "Aku merasakannya, di sini, saat ia terurai. Seratus tahun kerja, dan kau benar untuk mengakhirinya. Ambillah mantel ini: aku memangkasnya untuk siapa pun yang terbukti lebih kuat dari karya terbaikku. Pelataran itu hanyalah sebuah air mancur malam ini, {playerName}, dan taman ini hanyalah sebuah taman. Mungkin sekarang aku dan Kepala Tukang Kebun bisa sama-sama tidur.",
+        "objectives": {
+          "0": {
+            "label": "Sang Banteng Topiary dibongkar"
+          }
+        }
+      },
+      "q_fs_bell_at_the_landing": {
+        "title": "Lonceng di Dermaga",
+        "text": "Kau datang lewat Ferrywalk, {playerName}? Berarti kau yang pertama dalam seminggu, dan Sang Penjaga akan ingin memeriksamu. Gullhaven terletak di jalan pesisir, melewati rak-rak pengering yang tak lagi dirawat siapa pun. Katakan pada Penjaga Coalfast bahwa jalan lintas itu masih berdiri, dan bahwa Tam belum membunyikan tiga dentang hari ini. Belum.",
+        "completion": "Jalan lintas itu bertahan, dan Tam masih punya cukup napas untuk bercanda soal tiga dentang itu. Bagus. Kita adalah sebuah pulau yang terkepung, {playerName}, dan setiap pasang tangan yang menyeberangi gosong pasir itu adalah satu pasang yang harus dilewati celah-celah itu sebelum mencapai orang-orangku. Selamat datang di Gullhaven.",
+        "objectives": {
+          "0": {
+            "label": "Lapor kepada Penjaga Coalfast"
+          }
+        }
+      },
+      "q_fs_hold_the_riftfields": {
+        "title": "Pertahankan Ladang Rift",
+        "text": "Di timur kota, barisan gandum telah hancur berantakan, dan makhluk-makhluk malang yang datang lewat celah Ladang Rift kini memunguti sisanya bersih. Orang-orangku tak bisa merawat ladang yang tak bisa mereka injak, {playerName}. Basmi sepuluh makhluk malang itu dan kembalikan tanah para petani.",
+        "completion": "Sepuluh lebih sedikit, dan para buruh ladang sudah berdebat siapa yang keluar duluan. Ini tak akan bertahan lama, celah-celah itu tak pernah beristirahat lama, tapi kota yang bisa makan adalah kota yang bertahan.",
+        "objectives": {
+          "0": {
+            "label": "Makhluk Malang Celah terbunuh"
+          }
+        }
+      },
+      "q_fs_steel_for_the_redoubt": {
+        "title": "Baja untuk Benteng Pertahanan",
+        "text": "Setiap bilah yang kuberikan adalah bilah yang dikembalikan laut atau yang kucongkel dari yang mati, {playerName}. Para makhluk malang itu membawa rongsokan lewat celah-celah, engsel, kait, baja pedang patah, barang-barang sisa, tapi semuanya bisa ditempa jadi baik. Bawakan aku enam potong baja jarahan mereka dan barisan barikade akan mendapatkan taringnya kembali.",
+        "completion": "Berlubang karat garam dan berbekas luka celah, tapi tetap akan menahan ketajamannya. Ini, aku sendiri yang melapisi pegangan ini. Baja demi baja, {playerName}: itulah satu-satunya perdagangan yang berjalan di Farshore akhir-akhir ini.",
+        "objectives": {
+          "0": {
+            "label": "Baja Bekas Luka Celah"
+          }
+        }
+      },
+      "q_fs_the_three_bells": {
+        "title": "Tiga Lonceng",
+        "text": "Tiga lonceng waspada berdiri di pesisir melampaui milikku sendiri: satu di titik Dermaga, satu di pantai selatan, satu lagi di dekat pesisir Ladang Rift. Jika sebuah tali telah lapuk atau sebuah pemukul lonceng telah terbawa pergi, kota ini baru mengetahui adanya celah saat itu sudah berada di jalanan. Susuri pesisir, {playerName}, dan bunyikan setiap lonceng sekali, agar aku tahu ia masih memiliki suara.",
+        "completion": "Tiga suara, tiga jawaban, terbawa jernih di atas air. Tidurlah di Gullhaven malam ini, {playerName}, dan tahulah bahwa jika sebuah lonceng membangunkanmu, itu akan karena tanganku dan pada waktu yang tepat.",
+        "objectives": {
+          "0": {
+            "label": "Lonceng Waspada dibunyikan"
+          }
+        }
+      },
+      "q_fs_song_before_the_break": {
+        "title": "Nyanyian Sebelum Celah Terbuka",
+        "text": "Ada seorang pria yang bisa mendengar celah-celah sebelum mereka terbuka. Pengawas Rift Ollun: seorang cendekiawan, atau orang gila, dan akhir-akhir ini aku tak mampu membedakannya. Ia menjaga pos jaganya di Padang Rumput Jaga, di jalan tenggara kota. Temukan dia, {playerName}, dan tanyakan padanya apa yang akan dilakukan pulau ini pada kita selanjutnya.",
+        "completion": "Sang Penjaga mengirimmu? Bagus. Berarti kota ini akhirnya mulai mendengarkan. Sekarang diamlah sejenak, {playerName}. Di sana, di bawah angin, kau mendengarnya? Tebing-tebing itu bernyanyi, dan aku tak menyukai nadanya.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Pengawas Rift Ollun"
+          }
+        }
+      },
+      "q_fs_moss_and_mending": {
+        "title": "Lumut dan Penyembuhan",
+        "text": "Lumut garam yang tumbuh di sepanjang garis pasang adalah pembalut luka terbaik yang kutahu, dan para riftspawn telah menguasai setiap jengkal pesisir tempatnya tumbuh. Anehnya, mereka membawa seberkas lumut itu tersangkut di kulit mereka. Bersihkan enam di antaranya dari jangkauan timur, {playerName}, dan petikkan aku empat genggam lumut baik dari yang telah mereka injak-injak.",
+        "completion": "Lumut di satu tangan dan pesisir yang lebih tenang di tangan lainnya. Kau telah mengisi ulang seluruh ruang bedahku, {playerName}. Lakukan kebaikan ini untukku dengan tidak menjadi pasien berikutnya.",
+        "objectives": {
+          "0": {
+            "label": "Riftspawn terbunuh"
+          },
+          "1": {
+            "label": "Lumut Garam Farshore"
+          }
+        }
+      },
+      "q_fs_bram_come_home": {
+        "title": "Bram Pulang ke Rumah",
+        "text": "Bram-ku membawa perahu keluar pagi ketika celah jaring itu terbuka, dan laut melemparkannya kembali entah di mana melewati titik Dermaga. Aku mendengarnya tiga malam lalu, {playerName}, memanggil dari atas air, dan aku terlalu takut untuk pergi. Aku masih terlalu takut. Kumohon. Perahunya terdampar hancur di pesisir utara. Antarkan dia pulang padaku.",
+        "completion": "Bram! Kau membawanya kembali padaku utuh, {playerName}. Kami berdua menangis dan tak satu pun dari kami malu. Apa pun yang diambil celah-celah itu dari pulau ini selanjutnya, mereka tak akan mendapatkan keluargaku. Tidak lagi.",
+        "objectives": {
+          "0": {
+            "label": "Nelayan Bram diantar pulang dengan selamat ke Gullhaven"
+          }
+        }
+      },
+      "q_fs_stalkers_off_the_light": {
+        "title": "Pengintai Menjauh dari Cahaya",
+        "text": "Para pengintai berburu dalam gelap di antara api-api jaga, dan setiap malam mereka mengelilingi padang rumputku semakin dekat. Mereka tak bodoh, {playerName}, mereka sabar, dan kesabaran adalah satu hal yang tak bisa kutandingi. Bunuh delapan dan dorong kegelapan itu kembali ke tebing tempatnya datang.",
+        "completion": "Delapan malam mengelilingi, berakhir dalam satu malam. Api-api itu sudah membara lebih stabil, atau mungkin itu cuma tanganku. Bagaimanapun juga padang rumput ini kembali menjadi milikku, dan aku bisa mendengar pulau ini berpikir.",
+        "objectives": {
+          "0": {
+            "label": "Pengintai Hampa terbunuh"
+          }
+        }
+      },
+      "q_fs_the_great_break": {
+        "title": "Celah Raksasa",
+        "text": "Setiap nyanyian yang dilantunkan pulau ini berakhir pada nada rendah yang sama, dan itu datang dari Tebing Terbelah. Sesuatu datang lewat celah raksasa di sana, {playerName}, sesuatu yang membuat tebing-tebing itu sendiri retak terbuka untuk memasukkannya, dan ia masih terus tumbuh. Jika ia berjalan ke utara, tak ada lonceng yang akan berarti. Ajak seorang kawan, ajak dua, dan akhiri ia. Lalu katakan pada Coalfast bahwa nadanya telah berubah.",
+        "completion": "Ollun mengirim kabar lebih dulu: nyanyian itu berhenti. Seluruh kotaku mendengar keheningan itu, {playerName}, dan setengah dari mereka menangis mendengar suara dari ketiadaan. Kenakan mantel ini. Farshore tak akan lupa siapa yang menjaga pesisirnya.",
+        "objectives": {
+          "0": {
+            "label": "Sang Momok Terbelah terbunuh"
+          }
+        }
+      },
+      "q_gc_down_the_windway": {
+        "title": "Menuruni Jalan Angin",
+        "text": "Kau berhasil mendaki, {playerName}, jadi angin telah memutuskan untuk membiarkanmu. Wickharbor terletak di timur sepanjang jalan perbukitan, terselip di balik lindungan teluknya. Syahbandar Odile menghitung setiap jiwa yang datang melewati jalan sempit itu, dan ia akan ingin menghitungmu juga. Katakan padanya Jalan Angin masih terbuka.",
+        "completion": "Melewati jalan sempit itu dengan berjalan kaki, dalam cuaca seperti ini? Maren jarang mengirimkan nama padaku, dan lebih jarang lagi yang datang sendiri untuk menjawab langsung. Selamat datang di Wickharbor, {playerName}. Tutup pintu penginapan di belakangmu.",
+        "objectives": {
+          "0": {
+            "label": "Lapor kepada Syahbandar Odile"
+          }
+        }
+      },
+      "q_gc_wool_off_the_downs": {
+        "title": "Wol dari Perbukitan",
+        "text": "Awak perahuku mendayung menerjang badai yang menembus jas hujan bagai kertas, {playerName}. Hanya satu hal yang menahan angin ini: wol berminyak dari domba jantan paya, dipintal tebal ala Wickharbor. Kawanan itu merumput di Perbukitan Lolongan sebelah barat kota. Enam bulu domba yang baik dan setiap awak akan mendayung dengan hangat musim ini.",
+        "completion": "Bulu domba seperti ini adalah alasan mengapa domba-domba jantan itu berdiri gemuk dan puas diri dalam cuaca yang mematikan manusia. Para pemintal akan mengerjakannya di bawah cahaya lampu. Ambillah alas kaki ini, {playerName}, dilapisi dari hasil cukuran terakhir.",
+        "objectives": {
+          "0": {
+            "label": "Wol Domba Berminyak"
+          }
+        }
+      },
+      "q_gc_scuttlers_in_the_pots": {
+        "title": "Perayap di Dalam Perangkap",
+        "text": "Para perayap gosong pasir telah belajar mendaki jalan tebing dan membelah perangkap kepiting kami di atas bebatuan, {playerName}. Setengah hasil tangkapan hilang minggu ini, dan satu penjaga perangkap kehilangan penggunaan salah satu tangannya selama sebulan. Hancurkan sepuluh di antaranya dan sisanya akan ingat mengapa mereka dulu tetap di gosong pasir.",
+        "completion": "Sepuluh cangkang lebih sedikit di jalanku, dan perangkap-perangkap penuh pagi ini. Para penjaga perangkap menyebutmu pertanda baik, {playerName}. Di Wickharbor itu adalah pujian sehangat yang bisa didapat.",
+        "objectives": {
+          "0": {
+            "label": "Perayap Gosong Pasir terbunuh"
+          }
+        }
+      },
+      "q_gc_keeper_of_the_flame": {
+        "title": "Sang Penjaga Nyala Api",
+        "text": "Bram Tua menjaga Suar itu di tanjung tinggi timur laut kota, dan ia belum turun untuk mengambil perbekalannya selama dua minggu. Lampu itu masih menyala, jadi ia masih hidup, tapi seorang pria seusianya sendirian di tanjung itu dalam angin seperti ini, {playerName}. Daki jalan suar dan pastikan ia masih berdiri.",
+        "completion": "Odile mengirimmu jauh-jauh ke sini untuk melihat apakah angin telah merenggutku? Ha. Katakan padanya lampu ini menyala dan begitu juga aku. Tapi karena kau sudah mendaki sejauh ini, {playerName}, tinggallah sejenak. Suar ini punya pekerjaan yang tampaknya hanya cocok dikerjakan orang asing.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Penjaga Bram"
+          }
+        }
+      },
+      "q_gc_lanterns_on_the_shear": {
+        "title": "Lentera-Lentera di Tebing Curam",
+        "text": "Suar itu adalah cahaya besar, {playerName}, tapi lentera-lentera badailah yang menuntun pengembara malam menuruni jalan tebing di atas Tebing Curam. Semalam badai memadamkan semuanya, dan jalan itu dalam gelap adalah jatuh panjang dengan akhir yang singkat. Ambil pemantikku dan nyalakan kembali keempatnya di sepanjang tebing.",
+        "completion": "Empat titik cahaya di jalan tebing, tepat pada tempatnya. Dari sini tampak seolah pesisir ini telah membuka matanya lagi. Kau punya bakat seorang penjaga, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Lentera badai dinyalakan kembali"
+          }
+        }
+      },
+      "q_gc_wind_against_the_wick": {
+        "title": "Angin Melawan Sumbu",
+        "text": "Roh cahaya badai adalah angin yang telah menjadi dengki, {playerName}. Mereka berkumpul di perbukitan tinggi dekat Danau Cermin, dan setiap nyala api yang mereka temukan, mereka padamkan, sebuah lentera, sebuah perapian, suatu hari lampu ini. Tiga puluh sembilan tahun aku telah menjaga Suar ini tetap menyala, dan aku tak akan kehilangannya karena cuaca yang menyimpan dendam. Sebarkan delapan di antaranya.",
+        "completion": "Lampu itu bahkan tak berkedip semalam, pertama kalinya dalam sebulan. Angin masih membenci kita, {playerName}, tapi ia telah kembali membenci kita secara adil.",
+        "objectives": {
+          "0": {
+            "label": "Roh Cahaya Badai disebarkan"
+          }
+        }
+      },
+      "q_gc_the_far_shore": {
+        "title": "Pesisir Jauh",
+        "text": "Dari ruang lampu ini aku bisa melihat seluruh pesisir, {playerName}, dan apa yang kulihat di utara tak kusukai. Cahaya-cahaya hijau berjalan di Ladang Bangkai Kapal saat air surut, lambung demi lambung. Satu wanita bekerja di pesisir itu sendirian: Edda, sang penyalvasi. Ikuti jalan tebing ke utara melewati Tebing Curam hingga bangkai-bangkai kapal itu mulai terlihat, dan pastikan ia masih bernapas.",
+        "completion": "Bram mengawasi pesisirku dari menaranya sekarang, begitu? Pria tua itu benar untuk khawatir, {playerName}. Yang mati telah berjalan di bangkai kapal mereka sendiri pada malam hari, dan akhir-akhir ini mereka berhenti peduli apakah matahari sedang terbit.",
+        "objectives": {
+          "0": {
+            "label": "Temukan Penyalvasi Edda"
+          }
+        }
+      },
+      "q_gc_dead_mens_cargo": {
+        "title": "Kargo Orang-Orang Mati",
+        "text": "Hukum salvasi itu sederhana, {playerName}: apa pun yang diberikan laut pada pantai adalah milikku. Para kelasi tenggelam tidak setuju. Mereka bangkit dari lambung kapal mereka dan menyeret kembali setiap peti yang kususun ke bawah garis pasang. Tumbangkan enam di antara mereka untuk selamanya, dan selagi pantai ini sunyi, angkut tiga peti puing kapal sebelum air pasang mengajukan gugatan baliknya.",
+        "completion": "Enam awak lebih sunyi dan tiga peti aman di daratan. Kau menyalvasi dengan tangan lebih tegas dariku, {playerName}, tapi buku catatan tak peduli soal itu. Setengah dari ini adalah milikmu menurut hukum, dan yang kumaksud hukum adalah aku yang berkata begitu.",
+        "objectives": {
+          "0": {
+            "label": "Kelasi Tenggelam diistirahatkan"
+          },
+          "1": {
+            "label": "Peti Puing Kapal disalvasi"
+          }
+        }
+      },
+      "q_gc_the_wreck_warden": {
+        "title": "Sang Penjaga Bangkai Kapal",
+        "text": "Sekarang kau tahu mengapa para kelasi bangkit, {playerName}. Sesuatu mengenakan zirah berteritip dari bangkai kapal pertama yang pernah hancur di pesisir ini, dan ia menjaga setiap lambung di pantai bagai sebuah kuburan yang disewanya untuk dijaga. Ia menyimpan harta karun yang telah kuidamkan selama sepuluh tahun dan sebuah awak yang lebih baik kulihat beristirahat. Akhiri Sang Penjaga Bangkai Kapal. Ajak seorang kawan, yang mati menjaga dengan baik.",
+        "completion": "Pantai ini menjadi sunyi begitu ia tumbang, {playerName}. Keheningan pertama yang kudengar di pesisir ini selama sepuluh tahun bekerja di sana. Para awak kini hanyalah tulang, tulang yang beristirahat. Ambil mantel dari atas tumpukan harta itu, mantel itu memang selalu lebih cocok untuk punggung yang masih hidup.",
+        "objectives": {
+          "0": {
+            "label": "Sang Penjaga Bangkai Kapal ditumbangkan"
           }
         }
       },
@@ -11544,6 +13761,9 @@ export const id_ID: EnTranslations = {
           },
           "10": {
             "label": "Sowfield"
+          },
+          "11": {
+            "label": "Jalan Lintas Farshore"
           }
         }
       },
@@ -11612,6 +13832,300 @@ export const id_ID: EnTranslations = {
             "label": "Sanktum Gravewyrm"
           }
         }
+      },
+      "veiled_hollow": {
+        "name": "Ceruk Terselubung",
+        "welcome": "Udara ini berdengung dengan sihir kuno. Temui Penjaga Saelwyn di bawah pohon agung Eldergleam.",
+        "pois": {
+          "0": {
+            "label": "Eldergleam"
+          },
+          "1": {
+            "label": "Gua Duskfall"
+          },
+          "2": {
+            "label": "Titik Pandang Duskfall"
+          },
+          "3": {
+            "label": "Rimba Elder"
+          },
+          "4": {
+            "label": "Cekungan Bintang Jatuh"
+          },
+          "5": {
+            "label": "Pelataran Tenggelam"
+          },
+          "6": {
+            "label": "Perairan Dangkal Kristal"
+          },
+          "7": {
+            "label": "Kedalaman Berkilau"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "Tanah Naga",
+        "welcome": "Angin panas berhembus dari padang tandus di depan. Naga-naga berputar di atas Drakemaw, dan api troll membara di gumuk pasir.",
+        "pois": {
+          "0": {
+            "label": "Wyrmwatch"
+          },
+          "1": {
+            "label": "Hutan Gerbang"
+          },
+          "2": {
+            "label": "Gumuk Pasir Abu"
+          },
+          "3": {
+            "label": "Trollmoot"
+          },
+          "4": {
+            "label": "Benteng Terakhir"
+          },
+          "5": {
+            "label": "Padang Bloodglass"
+          },
+          "6": {
+            "label": "Kaldera Drakemaw"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "Tabir Beku",
+        "welcome": "Salju menelan setiap suara. Di bawah cahaya yang menari, hawa dingin itu sendiri terasa terjaga.",
+        "pois": {
+          "0": {
+            "label": "Icemantle"
+          },
+          "1": {
+            "label": "Garis Salju"
+          },
+          "2": {
+            "label": "Danau Gletser"
+          },
+          "3": {
+            "label": "Tangga Aurora"
+          },
+          "4": {
+            "label": "Shiverfen"
+          },
+          "5": {
+            "label": "Teras Lolongan"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "Air Terjun Amber",
+        "welcome": "Setiap daun di sini membara keemasan dan merah, namun tak satu pun pernah gugur. Lentera-lentera Lanternmere menyala untukmu.",
+        "pois": {
+          "0": {
+            "label": "Lanternmere"
+          },
+          "1": {
+            "label": "Goldmelt"
+          },
+          "2": {
+            "label": "Kebun Bersepuh Emas"
+          },
+          "3": {
+            "label": "Ceruk Panen"
+          },
+          "4": {
+            "label": "Danau Besar"
+          },
+          "5": {
+            "label": "Ketinggian Cindermaple"
+          },
+          "6": {
+            "label": "Monolit Condong"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "Paya Willow",
+        "welcome": "Rawa ini berdengung dengan capung dan lebah. Seberangi jembatan menuju Bridgemere dan istirahatkan kakimu sejenak.",
+        "pois": {
+          "0": {
+            "label": "Bridgemere"
+          },
+          "1": {
+            "label": "Tangga Amberfen"
+          },
+          "2": {
+            "label": "Paya Lili"
+          },
+          "3": {
+            "label": "Kolam Bogshine"
+          },
+          "4": {
+            "label": "Willowweep"
+          },
+          "5": {
+            "label": "Dataran Mengantuk"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "Kuntum Malam",
+        "welcome": "Melewati Gerbang Malam, udara itu sendiri bermimpi. Ikuti cahaya bunga menuju Moonrest, dan waspadai dunia tidur yang tergantung di langit.",
+        "pois": {
+          "0": {
+            "label": "Moonrest"
+          },
+          "1": {
+            "label": "Gerbang Malam"
+          },
+          "2": {
+            "label": "Sumur Bulan"
+          },
+          "3": {
+            "label": "Gloamfield"
+          },
+          "4": {
+            "label": "Sang Penjaga Tegak"
+          },
+          "5": {
+            "label": "Gundukan Tanpa Tidur"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "Hutan Arwah",
+        "welcome": "Kanopi menutup di atas jalan bagai sebuah tutup. Tetaplah dekat lentera-lentera Gallowmere, dan jangan menyahut bila hutan ini memanggil namamu.",
+        "pois": {
+          "0": {
+            "label": "Gallowmere"
+          },
+          "1": {
+            "label": "Gerbang Gagak"
+          },
+          "2": {
+            "label": "Semak Janda"
+          },
+          "3": {
+            "label": "Padang Tergantung"
+          },
+          "4": {
+            "label": "Kapel Mournstone"
+          },
+          "5": {
+            "label": "Tanah Lapang Sang Pemburu"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "Teluk Palem",
+        "welcome": "Pasir hangat, burung-burung berkicau riuh, dan rimba yang melahap cakrawala. Drifthaven menjaga api tetap menyala di pantai untukmu.",
+        "pois": {
+          "0": {
+            "label": "Drifthaven"
+          },
+          "1": {
+            "label": "Muara Belukar"
+          },
+          "2": {
+            "label": "Pesisir Palem"
+          },
+          "3": {
+            "label": "Belukar Zamrud"
+          },
+          "4": {
+            "label": "Air Terjun Sulur"
+          },
+          "5": {
+            "label": "Laguna Safir"
+          },
+          "6": {
+            "label": "Arca Tenggelam"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "Taman Abadi",
+        "welcome": "Seseorang masih memangkas pagar tanaman itu, meski tak ada tukang kebun yang terlihat selama seratus tahun. Waspadai labirin itu: ia pun mengawasimu balik.",
+        "pois": {
+          "0": {
+            "label": "Hedgewick"
+          },
+          "1": {
+            "label": "Gerbang Taman"
+          },
+          "2": {
+            "label": "Jalan Parterre"
+          },
+          "3": {
+            "label": "Kastel Dawnhold"
+          },
+          "4": {
+            "label": "Kolam Kelopak"
+          },
+          "5": {
+            "label": "Labirin Besar"
+          },
+          "6": {
+            "label": "Pelataran Air Mancur"
+          },
+          "7": {
+            "label": "Kilang Tua"
+          },
+          "8": {
+            "label": "Pos Jaga Utara"
+          },
+          "9": {
+            "label": "Cekungan Lili"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "Puncak Angin",
+        "welcome": "Angin di sini tak pernah berhenti barang sekali, dan Suar Tua tak pernah padam barang sekali. Wickharbor hanya meminta agar kau menutup pintu penginapan di belakangmu.",
+        "pois": {
+          "0": {
+            "label": "Wickharbor"
+          },
+          "1": {
+            "label": "Jalan Angin"
+          },
+          "2": {
+            "label": "Perbukitan Lolongan"
+          },
+          "3": {
+            "label": "Suar Tua"
+          },
+          "4": {
+            "label": "Tebing Curam"
+          },
+          "5": {
+            "label": "Ladang Bangkai Kapal"
+          },
+          "6": {
+            "label": "Danau Cermin"
+          },
+          "7": {
+            "label": "Kandang Galecrest"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "Pesisir Jauh",
+        "welcome": "Seberangi gosong pasir itu, dan lonceng Gullhaven akan menemukanmu sebelum kotanya sendiri. Celah-celah itu terkoyak terbuka tanpa peringatan, dan benteng pertahanan menjaga pantainya dari apa pun yang tercurah masuk. Mereka telah menunggu lama untuk seseorang sepertimu.",
+        "pois": {
+          "0": {
+            "label": "Gullhaven"
+          },
+          "1": {
+            "label": "Dermaga"
+          },
+          "2": {
+            "label": "Padang Rumput Jaga"
+          },
+          "3": {
+            "label": "Tebing Terbelah"
+          },
+          "4": {
+            "label": "Ladang Rift"
+          }
+        }
       }
     },
     "dungeons": {
@@ -11639,6 +14153,16 @@ export const id_ID: EnTranslations = {
         "name": "Arena Raid Nythraxis",
         "enterText": "Kau melewati pintu kerajaan yang tersegel.",
         "leaveText": "Kau kembali ke udara dingin Thornpeak."
+      },
+      "wildheart_basin": {
+        "name": "Cekungan Hati Liar",
+        "enterText": "Hujan hangat mendesis di atas batu tua. Wildheart Basin terbuka di hadapanmu.",
+        "leaveText": "Kau melewati kembali di bawah taring-taring batu menuju matahari Palmreach."
+      },
+      "the_last_keep": {
+        "name": "Benteng Terakhir",
+        "enterText": "Kau melangkah masuk ke aula-aula dingin dan sunyi Last Keep.",
+        "leaveText": "Kau menutup pintu benteng itu dan melangkah kembali ke angin Drakelands."
       },
       "drowned_temple": {
         "name": "Kuil Tenggelam",

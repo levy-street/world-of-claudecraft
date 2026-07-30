@@ -42,6 +42,7 @@ import {
 import { graftSkinnedNodes } from './mesh_graft';
 import { mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
+import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
@@ -358,6 +359,7 @@ function attachProp(
   stowed = false,
 ): THREE.Object3D {
   const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(att.url).scene));
+  primeSkinnedSortSpheres(payload);
   payload.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) o.userData.weaponMesh = true;
   });
@@ -676,6 +678,28 @@ export function mechAssetsReady(): boolean {
   return true;
 }
 
+// Lazy fetch for rideable mount GLBs (the mech pattern, per visual key): a
+// mount loads on the first sight of a rider, so seven mount models never
+// weigh on every client's boot. Memoized per key; mounts have no skin or
+// emissive atlases, so the GLB is the whole job.
+const mountAssetPromises = new Map<string, Promise<void>>();
+export function preloadMountAssets(visualKey: string): Promise<void> {
+  const existing = mountAssetPromises.get(visualKey);
+  if (existing) return existing;
+  const def = VISUALS[visualKey];
+  if (!def) return Promise.resolve();
+  const job = loadGltf(def.url).then((g) => {
+    gltfByUrl.set(def.url, g);
+  });
+  mountAssetPromises.set(visualKey, job);
+  return job;
+}
+
+export function mountAssetsReady(visualKey: string): boolean {
+  const def = VISUALS[visualKey];
+  return !!def && gltfByUrl.has(assetUrl(def.url));
+}
+
 function resolvedGltf(url: string): GLTF {
   const resolvedUrl = assetUrl(url);
   const g = gltfByUrl.get(resolvedUrl);
@@ -717,6 +741,7 @@ function optimizedScene(url: string, exclude: Set<string> = new Set()): THREE.Ob
   if (hit) return hit;
   const root = cloneSkinned(resolvedGltf(url).scene);
   mergeSkinnedParts(root, exclude);
+  primeSkinnedSortSpheres(root);
   optimizedSceneCache.set(url, root);
   return root;
 }

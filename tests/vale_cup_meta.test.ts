@@ -12,7 +12,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { VALE_CUP_BALL_TEMPLATE_ID } from '../src/sim/content/vale_cup';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../src/sim/data';
-import { Sim } from '../src/sim/sim';
+import type { Sim } from '../src/sim/sim';
 import { endCupMatch, VALE_CUP_BRAM_ID, VC_MATCH_DURATION } from '../src/sim/social/vale_cup';
 import { GOAL_LINE_EAST_X, PITCH_CENTER } from '../src/sim/vale_cup_layout';
 import {
@@ -35,7 +35,7 @@ describe('Vale Cup: parimutuel betting', () => {
   // Stage a bot showcase in the briefing window, then seat two spectators at the
   // Sowfield with copper to wager.
   function stageBettableMatch() {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Host' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Host' });
     (sim as unknown as { cfg: { valeCupShowcase: boolean } }).cfg.valeCupShowcase = true;
     for (let i = 0; i < 20 * 60 + 2 && !sim.vcup.match; i++) sim.tick();
     const match = sim.vcup.match!;
@@ -183,7 +183,7 @@ describe('Vale Cup: determinism', () => {
 
   it('the same seed and script replays an identical match (run-twice trace)', () => {
     const run = () => {
-      const sim = new Sim({ seed: 5, playerClass: 'warrior', playerName: 'Solo' });
+      const sim = makeWorld({ seed: 5, noPlayer: false, playerName: 'Solo' });
       sim.vcupPracticeStart(2);
       const trace: unknown[] = [];
       for (let i = 0; i < 20 * 45; i++) {
@@ -206,7 +206,7 @@ describe('Vale Cup: determinism', () => {
 
   it('draws ZERO shared rng anywhere on the queue + match path (draw-value accounting)', () => {
     const script = (withCup: boolean): number[] => {
-      const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+      const sim = makeWorld({ seed: 7 });
       const a = addAt(sim, 'warrior', 'Aleph');
       const b = addAt(sim, 'mage', 'Bet', 6, -40);
       const values: number[] = [];
@@ -232,7 +232,7 @@ describe('Vale Cup: determinism', () => {
 
   it('the BOT path (practice: spawn, chase, kicks, shoulders, dives) also draws zero shared rng', () => {
     const script = (withCup: boolean): number[] => {
-      const sim = new Sim({ seed: 11, playerClass: 'warrior', playerName: 'Solo' });
+      const sim = makeWorld({ seed: 11, noPlayer: false, playerName: 'Solo' });
       const values: number[] = [];
       sim.rng.setObserver((v) => values.push(v));
       if (withCup) sim.vcupPracticeStart(3);
@@ -284,7 +284,7 @@ describe('Vale Cup: parallel private practice', () => {
   });
 
   it('a practice bout plays a real match of football (kickoff, ball moves)', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior', playerName: 'Solo' });
+    const sim = makeWorld({ seed: 7, noPlayer: false, playerName: 'Solo' });
     sim.vcupPracticeStart(3, sim.primaryId);
     const match = sim.vcup.practices[0];
     tickUntil(sim, () => match.phase === 'active', 20 * 40);
@@ -303,7 +303,7 @@ describe('Vale Cup: parallel private practice', () => {
   it('a human Shoot fires toward the practice goal, not back toward the Sowfield', () => {
     // Regression: sport landmarks are Sowfield-frame; on an offset practice pitch
     // the shot aim must add match.origin or it fires the wrong way (toward x=0).
-    const sim = new Sim({ seed: 3, playerClass: 'warrior', playerName: 'Solo' });
+    const sim = makeWorld({ seed: 3, noPlayer: false, playerName: 'Solo' });
     sim.vcupPracticeStart(1, sim.primaryId);
     const match = sim.vcup.practices[0];
     readyAll(sim);
@@ -318,7 +318,7 @@ describe('Vale Cup: parallel private practice', () => {
   });
 
   it('refuses to double-seat a player already practicing', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Solo' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Solo' });
     sim.vcupPracticeStart(1, sim.primaryId);
     expect(sim.vcup.practices.length).toBe(1);
     sim.vcupPracticeStart(2, sim.primaryId);

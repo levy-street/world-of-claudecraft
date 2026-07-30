@@ -1,17 +1,21 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { chunkIntersectsRegion, normalTexelBounds } from '../src/render/terrain_region_core';
+import {
+  chunkIntersectsRegion,
+  normalTexelBounds,
+  owningRectIndex,
+  rectDistance,
+  type WorldRect,
+} from '../src/render/terrain_region_core';
 import {
   advanceWaterSchedule,
   shoreDepthAt,
+  snapWaterFieldOrigin,
+  WATER_FIELD_CELL_SIZE,
   WATER_MAX_STEPS_PER_FRAME,
   WATER_SCHEDULE_SLEEP,
   WATER_SCHEDULE_WAKE,
-  waterBodyVisible,
-  waterCellIntersectsDisc,
-  waterGridPlan,
-  waterResidentBodyBudget,
-  waterSimulationPlan,
-  waterSimulationTargetResolution,
+  waterFieldNeedsReanchor,
+  waterFieldPlan,
 } from '../src/render/water_core';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../src/sim/world';
@@ -133,47 +137,114 @@ describe('normalTexelBounds (macro normal partial rebake)', () => {
   });
 });
 
-describe('optimized water geometry and culling', () => {
-  it('bounds tessellation for very large editor-authored lakes', () => {
-    expect(waterGridPlan(48, 2.6, 8, 64)).toEqual({ size: 96, segments: 37 });
-    expect(waterGridPlan(10_000, 2, 8, 64).segments).toBe(64);
+describe('owningRectIndex (terrain chunk cell -> building zone)', () => {
+  // Three rects laid out like the real world's south end: a centre strip, an
+  // east wing beside it, and a west wing one band NORTH of them, leaving the
+  // south-west corner covered by nobody.
+  const STRIP: WorldRect = { minX: -180, maxX: 180, minZ: -180, maxZ: 180 };
+  const EAST: WorldRect = { minX: 180, maxX: 540, minZ: -180, maxZ: 180 };
+  const WEST_NORTH: WorldRect = { minX: -540, maxX: -180, minZ: 180, maxZ: 700 };
+  const RECTS = [STRIP, EAST, WEST_NORTH];
+
+  it('returns the containing rect', () => {
+    expect(owningRectIndex(0, 0, RECTS)).toBe(0);
+    expect(owningRectIndex(300, -100, RECTS)).toBe(1);
+    expect(owningRectIndex(-300, 400, RECTS)).toBe(2);
   });
 
-  it('drops corner cells but retains every cell touching the circular boundary', () => {
-    expect(waterCellIntersectsDisc(-1, -1, 1, 1, 5)).toBe(true);
-    expect(waterCellIntersectsDisc(4.9, -0.2, 5.2, 0.2, 5)).toBe(true);
-    expect(waterCellIntersectsDisc(7, 7, 8, 8, 5)).toBe(false);
+  it('resolves a shared border to exactly one rect (half-open on max)', () => {
+    // x = 180 is STRIP's max edge and EAST's min edge: EAST takes it, and no
+    // point is ever claimed twice.
+    expect(owningRectIndex(180, 0, RECTS)).toBe(1);
+    expect(owningRectIndex(179.999, 0, RECTS)).toBe(0);
   });
 
-  it('culls only after the whole lake has left fog range', () => {
-    expect(waterBodyVisible(70, 0, 0, 0, 20, 50)).toBe(true);
-    expect(waterBodyVisible(70.01, 0, 0, 0, 20, 50)).toBe(false);
-    expect(waterBodyVisible(0, 0, 500, 500, 20, 100)).toBe(false);
+  it('gives an uncovered cell to the nearest rect, not to a z-band neighbour', () => {
+    // The real bug: (-210, 150) is the chunk cell holding the dry ground south
+    // of the Willowfen border, inside no rect at all. It must still be built.
+    // Nearest here is a tie (30 west of STRIP, 30 south of WEST_NORTH), broken
+    // to the lower index.
+    expect(owningRectIndex(-210, 150, RECTS)).toBe(0);
+    // Deep in the gap the west wing is unambiguously nearer than the strip,
+    // so a z-band clamp (which would say "strip, same latitude") is wrong.
+    expect(owningRectIndex(-510, 150, RECTS)).toBe(2);
+    // ...and low in the gap the strip is nearer than the west wing.
+    expect(owningRectIndex(-210, -150, RECTS)).toBe(0);
   });
 
-  it('bounds fixed-step wave simulation by graphics tier', () => {
-    expect(waterSimulationPlan(29, 'medium')).toEqual({ resolution: 64, stepHz: 20 });
-    expect(waterSimulationPlan(48, 'high')).toEqual({ resolution: 96, stepHz: 24 });
-    expect(waterSimulationPlan(56, 'ultra')).toEqual({ resolution: 128, stepHz: 30 });
-    expect(waterSimulationPlan(10_000, 'ultra')).toEqual({ resolution: 128, stepHz: 30 });
-    expect(waterSimulationPlan(0, 'low')).toEqual({ resolution: 48, stepHz: 15 });
+  it('gives a cell past a rect edge back to that rect', () => {
+    // The chunk grid overhangs the world box by up to one row; the overhanging
+    // cell centres sit just outside the northmost rect and must build with it.
+    expect(owningRectIndex(-300, 720, RECTS)).toBe(2);
   });
 
-  it('keeps target allocation fixed for every lake radius and contact order', () => {
-    const radii = [0, 1, 29, 48, 96, 10_000];
+  it('reports -1 for an empty rect list', () => {
+    expect(owningRectIndex(0, 0, [])).toBe(-1);
+  });
+});
+
+describe('rectDistance', () => {
+  const R: WorldRect = { minX: -10, maxX: 10, minZ: -10, maxZ: 10 };
+
+  it('is zero inside and on the border', () => {
+    expect(rectDistance(0, 0, R)).toBe(0);
+    expect(rectDistance(10, 10, R)).toBe(0);
+    expect(rectDistance(-10, 4, R)).toBe(0);
+  });
+
+  it('measures the axis gap outside, and the corner diagonal past a corner', () => {
+    expect(rectDistance(13, 0, R)).toBeCloseTo(3, 10);
+    expect(rectDistance(0, -14, R)).toBeCloseTo(4, 10);
+    expect(rectDistance(13, 14, R)).toBeCloseTo(5, 10); // 3-4-5
+  });
+});
+
+describe('camera-anchored wave field plan', () => {
+  it('bounds the field allocation and step rate by graphics tier', () => {
+    expect(waterFieldPlan('medium')).toEqual({
+      resolution: 64,
+      cellSize: WATER_FIELD_CELL_SIZE,
+      size: 64 * WATER_FIELD_CELL_SIZE,
+      stepHz: 20,
+    });
+    expect(waterFieldPlan('high')).toEqual({
+      resolution: 96,
+      cellSize: WATER_FIELD_CELL_SIZE,
+      size: 96 * WATER_FIELD_CELL_SIZE,
+      stepHz: 24,
+    });
+    expect(waterFieldPlan('ultra').resolution).toBe(128);
+    expect(waterFieldPlan('ultra').stepHz).toBe(30);
+    expect(waterFieldPlan('low').resolution).toBe(48);
+    expect(waterFieldPlan('low').stepHz).toBe(15);
+  });
+
+  it('keeps the world-space cell size fixed across tiers, so only coverage scales', () => {
     for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
-      const allocation = waterSimulationTargetResolution(tier);
-      expect(radii.map((radius) => waterSimulationPlan(radius, tier).resolution)).toEqual(
-        radii.map(() => allocation),
-      );
+      const plan = waterFieldPlan(tier);
+      expect(plan.cellSize).toBe(WATER_FIELD_CELL_SIZE);
+      expect(plan.size).toBeCloseTo(plan.resolution * plan.cellSize, 10);
     }
   });
 
-  it('bounds resident height fields independently of custom-map lake count', () => {
-    expect(waterResidentBodyBudget('low')).toBe(1);
-    expect(waterResidentBodyBudget('medium')).toBe(2);
-    expect(waterResidentBodyBudget('high')).toBe(3);
-    expect(waterResidentBodyBudget('ultra')).toBe(4);
+  it('snaps the field origin to the texel lattice so a re-anchor never resamples', () => {
+    // Any snapped origin is an exact multiple of the cell size: that is what
+    // makes the scroll pass an integer texel shift instead of a blur.
+    for (const value of [0, 0.34, -0.34, 12.7, -103.2]) {
+      const snapped = snapWaterFieldOrigin(value, 0.7);
+      expect(Math.abs(snapped / 0.7 - Math.round(snapped / 0.7))).toBeLessThan(1e-9);
+      expect(Math.abs(snapped - value)).toBeLessThanOrEqual(0.35 + 1e-9);
+    }
+  });
+
+  it('re-anchors only once the camera leaves the hysteresis band', () => {
+    const size = 64;
+    // Dead centre and small drifts hold the anchor (no scroll pass per frame).
+    expect(waterFieldNeedsReanchor(0, 0, 0, 0, size)).toBe(false);
+    expect(waterFieldNeedsReanchor(9, 0, 0, 0, size)).toBe(false);
+    // Past 30% of the half-size (9.6 yd here) on either axis, it re-centres.
+    expect(waterFieldNeedsReanchor(10, 0, 0, 0, size)).toBe(true);
+    expect(waterFieldNeedsReanchor(0, -10, 0, 0, size)).toBe(true);
   });
 
   it('drops hidden impulses without extending the wake and sleeps on schedule', () => {

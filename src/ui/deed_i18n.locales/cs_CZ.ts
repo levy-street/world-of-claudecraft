@@ -780,4 +780,12 @@ export const table: DeedLocaleTable = {
     name: 'Burza vrakovišť',
     desc: 'Rozeber 50 kusů výstroje zpět na základní materiály.',
   },
+  dgn_wildheart_basin: {
+    name: 'Kotlina udeří zpět',
+    desc: 'Poraz Zulgara, hlas Kotliny, v Kotlině Divokého srdce.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Hrdinská: Kotlina Divokého srdce',
+    desc: 'Poraz Zulgara, hlas Kotliny, v Kotlině Divokého srdce na hrdinské obtížnosti.',
+  },
 };

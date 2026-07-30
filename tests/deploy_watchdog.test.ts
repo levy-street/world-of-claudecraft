@@ -227,11 +227,11 @@ interface Harness {
   restartLog: string;
 }
 
-// A temp PATH dir holding two shims. `docker` prints a scripted `<running> <health>`
-// pair for `inspect` and records every `restart` invocation to a file; `flock` (which
-// may be entirely ABSENT on macOS) is overridden so the lock decision is deterministic
-// and cross-platform, controllable via SHIM_FLOCK_EXIT. Prepending this dir to PATH
-// makes both shims win over any real binary, and keeps the script off real docker.
+// A temp PATH dir holding three shims. `docker` prints a scripted `<running> <health>`
+// pair for `inspect` and records every `restart` invocation to a file; `flock` and GNU
+// `timeout` (both may be absent on macOS) are overridden so lock and timeout behavior
+// stay deterministic and cross-platform. Prepending this dir to PATH makes the shims
+// win over any real binaries and keeps the script off real docker.
 function makeHarness(): Harness {
   const dir = mkdtempSync(join(tmpdir(), 'woc-watchdog-'));
   harnessDirs.push(dir);
@@ -259,6 +259,28 @@ exit "\${SHIM_FLOCK_EXIT:-0}"
 `;
   writeFileSync(join(dir, 'flock'), flockShim);
   chmodSync(join(dir, 'flock'), 0o755);
+  const timeoutShim = `#!/usr/bin/env node
+const { spawn } = require('node:child_process');
+const args = process.argv.slice(2);
+if (args[0] === '-k') args.splice(0, 2);
+const seconds = Number(args.shift());
+const child = spawn(args.shift(), args, { stdio: 'inherit' });
+let timedOut = false;
+const timer = setTimeout(() => {
+  timedOut = true;
+  child.kill('SIGTERM');
+}, seconds * 1000);
+child.on('error', () => {
+  clearTimeout(timer);
+  process.exit(125);
+});
+child.on('exit', (code) => {
+  clearTimeout(timer);
+  process.exit(timedOut ? 124 : (code ?? 125));
+});
+`;
+  writeFileSync(join(dir, 'timeout'), timeoutShim);
+  chmodSync(join(dir, 'timeout'), 0o755);
   return {
     dir,
     stateFile: join(dir, 'state'),

@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.31.0",
+  "version": "0.32.0",
   "private": true,
   "license": "MIT",
   "author": {
@@ -59,6 +59,7 @@
     "ops:cpu-monitor": "node scripts/prod_cpu_monitor.mjs",
     "feel:smoke": "node scripts/feel_smoke.mjs",
     "asset:budget": "node scripts/asset_budget.mjs",
+    "assets:mapbg": "node scripts/build_map_backgrounds.mjs",
     "assets:items": "node scripts/convert_item_icons_webp.mjs",
     "assets:skills": "node scripts/convert_skill_icons_webp.mjs",
     "assets:chrome": "node scripts/convert_chrome_icons_webp.mjs",
@@ -91,7 +92,8 @@
     "sfx:studio:smoke": "node scripts/sfx_studio/e2e.mjs",
     "wiki:seed": "node scripts/mediawiki/build_seed.mjs",
     "sim:nythraxis-matrix": "tsx scripts/nythraxis_matrix.ts",
-    "sim:healing": "tsx scripts/healing_montecarlo.ts"
+    "sim:healing": "tsx scripts/healing_montecarlo.ts",
+    "sim:rift": "tsx scripts/rift_montecarlo.ts"
   },
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.1084.0",

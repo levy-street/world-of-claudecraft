@@ -14,7 +14,7 @@ import {
   updateCasting,
 } from '../src/sim/combat/casting_lifecycle';
 import { handleDeath } from '../src/sim/combat/damage';
-import { MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { clearNythraxisWardChannelCast } from '../src/sim/encounters/nythraxis';
 import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
@@ -22,7 +22,7 @@ import { Sim } from '../src/sim/sim';
 import { readyArenaFighter } from '../src/sim/social/arena';
 import { fiestaDownEntity } from '../src/sim/social/fiesta';
 import { releasePlayerSpirit, resurrectAtSpiritHealer } from '../src/sim/spirit';
-import type { Entity, PlayerClass } from '../src/sim/types';
+import type { Entity, PlayerClass, WorldContent } from '../src/sim/types';
 import {
   CAST_PUSHBACK_SEC,
   CAST_QUEUE_WINDOW_SEC,
@@ -34,8 +34,24 @@ import { placePlayerInOpenField } from './helpers/open_field';
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 
+// Every test spawns its own target via createMob (and spirit healers come from
+// the OVERWORLD_GRAVEYARDS constant, not WorldContent), so no assertion reads
+// ambient camps/npcs/ground objects: strip them to keep each Sim and tick cheap
+// (the dot_final_tick subsystem-world pattern).
+const CAST_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeSim(cls: PlayerClass, level: number): { sim: AnySim; p: AnyEntity; meta: any } {
-  const sim = new Sim({ seed: 99, playerClass: cls, autoEquip: true }) as AnySim;
+  const sim = new Sim({
+    seed: 99,
+    playerClass: cls,
+    autoEquip: true,
+    world: CAST_TEST_WORLD,
+  }) as AnySim;
   sim.setPlayerLevel(level);
   placePlayerInOpenField(sim);
   const p = sim.player as AnyEntity;

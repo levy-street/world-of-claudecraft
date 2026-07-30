@@ -11,7 +11,7 @@
 // The S3 guard in tests/localization_fixes.test.ts parses src/sim/sim.ts, enumerates
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
-import { ABILITIES, DELVES, ITEMS, MOBS } from '../sim/data';
+import { ABILITIES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
 import { tEntity } from './entity_i18n';
 import {
@@ -47,6 +47,35 @@ const baseEnTable = {
   'log.bankSlotsPurchased': 'You purchase additional bank slots.',
   'error.specLevel': 'You may choose a specialization at level {level}.',
   'error.equipLevel': 'You must be level {level} to equip that.',
+  'error.mountLevel': 'You must be level {level} to ride that mount.',
+  // Mount collection pivot (src/sim/mounts.ts toggleMount, src/sim/items.ts
+  // buyItem): the toggle with nothing owned, and the two stablemaster buy gates.
+  // Placeholder-free, so they register in the EXACT matcher automatically.
+  'error.noMountYet': "You don't have a mount yet.",
+  'error.mountBuyLevel': 'You must be level 20 to buy a mount.',
+  'error.mountAlreadyOwned': 'You already own that mount.',
+  // Riding skill gate (src/sim/mounts.ts): emitted when the player tries to
+  // mount or select a mount without having purchased the riding skill from Marla.
+  // Placeholder-free, so it registers in the EXACT matcher automatically.
+  'error.ridingUntrained': 'You must learn to ride first. Find a riding trainer.',
+  // Riding skill purchase (learnRiding in src/sim/mounts_training.ts).
+  'error.ridingAlreadyLearned': 'You have already learned Riding.',
+  'error.ridingTrainLevel': 'You must be level 20 to learn Riding.',
+  'error.ridingWrongNpc': 'You must speak to Marla Hitchen to learn Riding.',
+  'log.ridingLearned': 'You have learned Riding. You can now summon and ride a mount.',
+  // Riding lesson (src/sim/mounts_training.ts). The shared "Too far away." /
+  // "Not enough money." / "You can't do that while dead." refusals are reused
+  // verbatim and already registered above.
+  'error.ridingQuestUntrained': 'You must learn Riding before taking this lesson.',
+  'error.mountTrainLevel': 'You must be level 20 to take riding lessons.',
+  'error.mountTrainNeedsQuest': 'You need to accept the riding lesson quest first.',
+  'error.mountTrainInProgress': 'A riding lesson is already in progress.',
+  'error.mountTrainDismountFirst': 'Dismount first.',
+  // Riding-lesson notices (log-type), emitted from the per-tick driver.
+  // Placeholder-free, so they register in the EXACT matcher automatically.
+  'log.mountTrainSuccess': "Marla takes the Valorsteed's reins. Well ridden.",
+  'log.mountTrainLeftYard':
+    'You leave the paddock and the lesson ends. Come back to Marla to try again.',
   'error.invalidBuild': 'Invalid talent build.',
   'error.unknownSpec': 'Unknown specialization.',
   'error.maxLoadouts': 'You can save at most {count} loadouts.',
@@ -154,6 +183,84 @@ const baseEnTable = {
   'groundPickup.graveVossEnough':
     "You have already taken what Royal Assassin Voss's grave will give.",
   'groundPickup.cryptRitualCircleEnough': 'The circle has nothing more to give you.',
+  // The Veiled Hollow pickup surfaces (sealstone puzzle + the three memory
+  // monuments): dems added these to GROUND_PICKUP_LINES; their EXACT matcher
+  // entries land here so the client re-localizes the sim-emitted lines.
+  'groundPickup.hollowSealstoneDeny':
+    'The sealstone waits, its socket empty. You have nothing that fits it.',
+  'groundPickup.hollowSealstoneEnough': 'The seal is set. The sealstone asks nothing more of you.',
+  'groundPickup.monumentOverlookDeny':
+    'The verse is worn shallow. Without a reason to read, it stays silent.',
+  'groundPickup.monumentOverlookEnough':
+    'You have already read what the Overlook monument remembers.',
+  'groundPickup.monumentCourtDeny':
+    'Ivy blankets the verse. Without a reason to read, it stays silent.',
+  'groundPickup.monumentCourtEnough': 'You have already read what the Court monument remembers.',
+  'groundPickup.monumentNorthDeny': 'The forgotten verse waits for a reader with a reason.',
+  'groundPickup.monumentNorthEnough':
+    'You have already read what the forgotten monument remembers.',
+  // The new-realm quest pass pickup surfaces: English source (contributor adds
+  // English; the maintainer fills every locale at release), EXACT-matched here
+  // so the client re-localizes once the fills land. Values must stay
+  // byte-identical to GROUND_PICKUP_LINES.
+  'groundPickup.hearthEmberCacheDeny':
+    'The ember kettle is banked and sealed. It is not yours to carry.',
+  'groundPickup.hearthEmberCacheEnough': 'You have recovered every ember cache the lodge lost.',
+  'groundPickup.sprungTrapDeny':
+    'The sprung iron is tangled in the reeds, and it is not your trapline.',
+  'groundPickup.sprungTrapEnough': 'You have gathered all of the traps Brosk asked for.',
+  'groundPickup.scorchedSupplyCrateDeny':
+    'The crate is too hot to shoulder without a reason to brave it.',
+  'groundPickup.scorchedSupplyCrateEnough':
+    'You have recovered every crate the quartermaster listed.',
+  'groundPickup.wyrmwatchWarningBannerDeny':
+    'The banner pole is bundled tight. Wyrmwatch has not issued it to you.',
+  'groundPickup.wyrmwatchWarningBannerEnough': 'Every warning banner is already planted.',
+  'groundPickup.amberfallSapBucketDeny':
+    'The sap bucket hangs on its tap, and the orchard is not yours to strip.',
+  'groundPickup.amberfallSapBucketEnough': 'You are carrying all the sap buckets that overturned.',
+  'groundPickup.mereFerryLanternDeny':
+    'The lantern bobs at the waterline, waiting for the ferry crew.',
+  'groundPickup.mereFerryLanternEnough': 'You have fished out every ferry lantern the mere took.',
+  'groundPickup.fenwayMooringLineDeny':
+    'The cut line is snagged fast, and no one asked you to haul it.',
+  'groundPickup.fenwayMooringLineEnough': 'You have recovered all the mooring line Alden needs.',
+  'groundPickup.bridgemereTollChestDeny':
+    'The toll-chest is bedded deep in fen mud and is not yours to raise.',
+  'groundPickup.bridgemereTollChestEnough': 'You have raised every sunken toll-chest.',
+  'groundPickup.gloamfieldNightbloomDeny':
+    'The blossom only opens for a gardener of the night beds.',
+  'groundPickup.gloamfieldNightbloomEnough': 'Your basket holds all the nightbloom it can.',
+  'groundPickup.vigilStarChartDeny':
+    'The chart stone shows nothing to eyes the Astronomer has not guided.',
+  'groundPickup.vigilStarChartEnough': 'You have read every chart the Vigil holds.',
+  'groundPickup.barrowGraveOfferingDeny':
+    'The scattered offering is grave-bound. Disturb it with cause, or not at all.',
+  'groundPickup.barrowGraveOfferingEnough': 'You have gathered all the scattered offerings.',
+  'groundPickup.gallowmereGraveCandleDeny':
+    "The grave-candle is not yours to light without the candlewright's blessing.",
+  'groundPickup.gallowmereGraveCandleEnough': 'Every boundary candle already burns.',
+  'groundPickup.silkboundRemainsDeny': 'The silk-wrapped shape is not yours to cut down.',
+  'groundPickup.silkboundRemainsEnough': 'You have cut down all the remains the vicar asked after.',
+  'groundPickup.pearlwakeCargoCrateDeny':
+    'The cargo crate is salvage-marked. The wreck line has rules.',
+  'groundPickup.pearlwakeCargoCrateEnough': 'You have hauled every crate off the wreck line.',
+  'groundPickup.sunkenOfferingBowlDeny':
+    'The offering bowl is dry, and the idol road keeps its own accounts.',
+  'groundPickup.sunkenOfferingBowlEnough': 'Every offering bowl on the idol road is filled.',
+  'groundPickup.evergardenStatueRubbingDeny':
+    'The statue offers nothing to a passerby without a purpose.',
+  'groundPickup.evergardenStatueRubbingEnough': 'You have taken a rubbing from all four sisters.',
+  'groundPickup.hedgewickToolCartDeny':
+    'The spilled cart is garden property, and the gardeners are counting.',
+  'groundPickup.hedgewickToolCartEnough': 'You have righted every spilled tool cart.',
+  'groundPickup.shearStormLanternDeny':
+    'The storm-lantern is chained to its post against the gale.',
+  'groundPickup.shearStormLanternEnough': 'Every lantern on the Shear is already lit.',
+  'groundPickup.wreckfieldFlotsamCrateDeny': 'Salvage law is clear: no claim, no crate.',
+  'groundPickup.wreckfieldFlotsamCrateEnough': 'You have salvaged all the flotsam Edda marked.',
+  'groundPickup.gullhavenWatchbellDeny': "The watchbell answers only the bellkeeper's errand.",
+  'groundPickup.gullhavenWatchbellEnough': 'Every coastal watchbell has been rung.',
   'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
   'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
   'error.vcupNoNation': 'Pick a banner nation first.',
@@ -372,6 +479,11 @@ const baseEnTable = {
   'aura.bonesplinter': 'Bonesplinter',
   'aura.raggedGash': 'Ragged Gash',
   'aura.soulblaze': 'Soulblaze',
+  'log.seaFatigue': 'The open sea saps your strength. Swim back to shore!',
+  'log.veilEnter': 'A veil of dusk parts before you, and the Hollow opens ahead.',
+  'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
+  'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
+  'log.ferryLeave': 'The bell answers from the vale, and the mainland takes you back.',
   'aura.bladedEcho': 'Bladed Echo',
   'aura.emboldened': 'Emboldened',
   'aura.enraged': 'Enraged',
@@ -502,6 +614,11 @@ export type SimMessageKey = keyof typeof enTable;
 // back to English here until the release localization pass fills them.
 const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, string>>> = {
   en: {
+    'log.seaFatigue': 'The open sea saps your strength. Swim back to shore!',
+    'log.veilEnter': 'A veil of dusk parts before you, and the Hollow opens ahead.',
+    'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
+    'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
+    'log.ferryLeave': 'The bell answers from the vale, and the mainland takes you back.',
     'log.deathwardSaves': 'A deathward saves you!',
     'error.lineOfSight': 'Line of sight.',
     'error.bagsFull': 'Your bags are full.',
@@ -512,6 +629,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': 'Your belongings have been packed into new bags.',
     'error.specLevel': 'You may choose a specialization at level {level}.',
     'error.equipLevel': 'You must be level {level} to equip that.',
+    'error.mountLevel': 'You must be level {level} to ride that mount.',
+    'error.noMountYet': "You don't have a mount yet.",
+    'error.mountBuyLevel': 'You must be level 20 to buy a mount.',
+    'error.mountAlreadyOwned': 'You already own that mount.',
     'error.invalidBuild': 'Invalid talent build.',
     'error.unknownSpec': 'Unknown specialization.',
     'error.maxLoadouts': 'You can save at most {count} loadouts.',
@@ -680,6 +801,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.resurrectionSickness': "The Keeper's Toll",
   },
   es: {
+    'error.mountTrainInProgress': 'Ya hay una lección de equitación en curso.',
+    'error.mountTrainDismountFirst': 'Desmonta primero.',
+    'error.ridingAlreadyLearned': 'Ya has aprendido equitación.',
+    'error.ridingTrainLevel': 'Debes ser nivel 20 para aprender equitación.',
+    'error.mountTrainLevel': 'Debes ser nivel 20 para tomar lecciones de equitación.',
+    'error.ridingQuestUntrained': 'Debes aprender equitación antes de tomar esta lección.',
+    'error.ridingUntrained': 'Debes aprender a montar primero. Busca un instructor de equitación.',
+    'error.ridingWrongNpc': 'Debes hablar con Marla Hitchen para aprender equitación.',
+    'error.mountTrainNeedsQuest': 'Primero debes aceptar la misión de equitación.',
     'error.notInGroup': 'Ese aliado no está en tu grupo.',
     'error.noDeadAlly': 'Debes seleccionar a un aliado muerto de tu grupo.',
     'error.professionChoiceUnavailable': 'Esa elección de profesión no está disponible.',
@@ -802,6 +932,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.tollingBell': 'Campana doblante',
     'mechanic.howlingGale': 'Vendaval aullante',
     'aura.drownedCanticle': 'Cántico ahogado',
+    'log.seaFatigue': 'El mar abierto agota tus fuerzas. ¡Nada de vuelta a la orilla!',
+    'log.veilEnter': 'Un velo de crepúsculo se abre ante ti, y la Hondonada se despliega adelante.',
+    'log.veilLeave': 'El velo se cierra a tu espalda, y el aire de la montaña vuelve a morder.',
+    'log.ferryEnter': 'La campana del ferry suena una vez, y la Costa Lejana surge de la espuma.',
+    'log.ferryLeave': 'La campana responde desde el valle, y tierra firme te recibe de vuelta.',
     'log.learnedAbility': 'Has aprendido una nueva habilidad: {name}.',
     'log.abilityRankUp': 'Tu {name} ha mejorado a Rango {rank}.',
     'log.stopFollowing': 'Dejas de seguir.',
@@ -893,6 +1028,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': 'Tus pertenencias se han guardado en bolsas nuevas.',
     'error.specLevel': 'Puedes elegir una especialización al nivel {level}.',
     'error.equipLevel': 'Debes ser nivel {level} para equipar eso.',
+    'error.mountLevel': 'Debes ser nivel {level} para montar esa montura.',
+    'error.noMountYet': 'Aún no tienes una montura.',
+    'error.mountBuyLevel': 'Debes ser nivel 20 para comprar una montura.',
+    'error.mountAlreadyOwned': 'Ya tienes esa montura.',
     'error.invalidBuild': 'Configuración de talentos no válida.',
     'error.unknownSpec': 'Especialización desconocida.',
     'error.maxLoadouts': 'Puedes guardar como máximo {count} configuraciones.',
@@ -1074,6 +1213,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento perfecto',
   },
   es_ES: {
+    'error.mountTrainInProgress': 'Ya hay una lección de equitación en curso.',
+    'error.mountTrainDismountFirst': 'Desmonta primero.',
+    'error.ridingAlreadyLearned': 'Ya has aprendido equitación.',
+    'error.ridingTrainLevel': 'Debes ser nivel 20 para aprender equitación.',
+    'error.mountTrainLevel': 'Debes ser nivel 20 para tomar lecciones de equitación.',
+    'error.ridingQuestUntrained': 'Debes aprender equitación antes de tomar esta lección.',
+    'error.ridingUntrained': 'Debes aprender a montar primero. Busca un instructor de equitación.',
+    'error.ridingWrongNpc': 'Debes hablar con Marla Hitchen para aprender equitación.',
+    'error.mountTrainNeedsQuest': 'Primero debes aceptar la misión de equitación.',
     'error.notInGroup': 'Ese aliado no está en tu grupo.',
     'error.noDeadAlly': 'Debes seleccionar a un aliado muerto de tu grupo.',
     'error.professionChoiceUnavailable': 'Esa elección de profesión no está disponible.',
@@ -1193,6 +1341,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.tollingBell': 'Campana doblante',
     'mechanic.howlingGale': 'Vendaval aullante',
     'aura.drownedCanticle': 'Cántico ahogado',
+    'log.seaFatigue': 'El mar abierto agota tus fuerzas. ¡Nada de vuelta a la orilla!',
+    'log.veilEnter': 'Un velo de crepúsculo se abre ante ti, y la Hondonada se despliega adelante.',
+    'log.veilLeave': 'El velo se cierra a tu espalda, y el aire de la montaña vuelve a morder.',
+    'log.ferryEnter': 'La campana del ferry suena una vez, y la Costa Lejana surge de la espuma.',
+    'log.ferryLeave': 'La campana responde desde el valle, y tierra firme te recibe de vuelta.',
     'log.learnedAbility': 'Has aprendido una nueva habilidad: {name}.',
     'log.abilityRankUp': 'Tu {name} ha mejorado a Rango {rank}.',
     'log.stopFollowing': 'Dejas de seguir.',
@@ -1284,6 +1437,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': 'Tus pertenencias se han guardado en bolsas nuevas.',
     'error.specLevel': 'Podrás elegir una especialización en el nivel {level}.',
     'error.equipLevel': 'Debes ser nivel {level} para equipar eso.',
+    'error.mountLevel': 'Debes ser nivel {level} para montar esa montura.',
+    'error.noMountYet': 'Aún no tienes una montura.',
+    'error.mountBuyLevel': 'Debes ser nivel 20 para comprar una montura.',
+    'error.mountAlreadyOwned': 'Ya tienes esa montura.',
     'error.invalidBuild': 'Configuración de talentos no válida.',
     'error.unknownSpec': 'Especialización desconocida.',
     'error.maxLoadouts': 'Puedes guardar como máximo {count} configuraciones.',
@@ -1468,6 +1625,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento perfecto',
   },
   fr_FR: {
+    'error.mountTrainInProgress': "Une leçon d'équitation est déjà en cours.",
+    'error.mountTrainDismountFirst': "Descendez d'abord.",
+    'error.ridingAlreadyLearned': "Vous avez déjà appris l'équitation.",
+    'error.ridingTrainLevel': "Vous devez être niveau 20 pour apprendre l'équitation.",
+    'error.mountTrainLevel': "Vous devez être niveau 20 pour prendre des leçons d'équitation.",
+    'error.ridingQuestUntrained': "Vous devez apprendre l'équitation avant de prendre cette leçon.",
+    'error.ridingUntrained':
+      "Vous devez apprendre à monter d'abord. Trouvez un instructeur d'équitation.",
+    'error.ridingWrongNpc': "Vous devez parler à Marla Hitchen pour apprendre l'équitation.",
+    'error.mountTrainNeedsQuest': "Vous devez d'abord accepter la quête d'équitation.",
     'error.notInGroup': "Cet allié n'est pas dans votre groupe.",
     'error.noDeadAlly': 'Vous devez cibler un allié mort dans votre groupe.',
     'error.professionChoiceUnavailable': "Ce choix de profession n'est pas disponible.",
@@ -1590,6 +1757,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.tollingBell': 'Cloche du glas',
     'mechanic.howlingGale': 'Bourrasque hurlante',
     'aura.drownedCanticle': 'Cantique noyé',
+    'log.seaFatigue': 'La haute mer épuise vos forces. Regagnez le rivage à la nage !',
+    'log.veilEnter': "Un voile de crépuscule s'écarte, et la Combe s'ouvre devant vous.",
+    'log.veilLeave': "Le voile se referme derrière vous, et l'air des montagnes mord de nouveau.",
+    'log.ferryEnter': 'La cloche du bac sonne une fois, et le Rivage Lointain surgit des embruns.',
+    'log.ferryLeave': 'La cloche repond depuis le val, et la terre ferme vous reprend.',
     'log.learnedAbility': 'Vous avez appris une nouvelle technique : {name}.',
     'log.abilityRankUp': 'Votre {name} est passé au rang {rank}.',
     'log.stopFollowing': 'Vous ne suivez plus.',
@@ -1682,6 +1854,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': 'Vos affaires ont été rangées dans de nouveaux sacs.',
     'error.specLevel': 'Vous pourrez choisir une spécialisation au niveau {level}.',
     'error.equipLevel': 'Vous devez être niveau {level} pour équiper cet objet.',
+    'error.mountLevel': 'Vous devez être niveau {level} pour monter cette monture.',
+    'error.noMountYet': "Vous n'avez pas encore de monture.",
+    'error.mountBuyLevel': 'Vous devez être niveau 20 pour acheter une monture.',
+    'error.mountAlreadyOwned': 'Vous possédez déjà cette monture.',
     'error.invalidBuild': 'Distribution de talents invalide.',
     'error.unknownSpec': 'Spécialisation inconnue.',
     'error.maxLoadouts': 'Vous pouvez enregistrer au maximum {count} configurations.',
@@ -1867,6 +2043,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Moment parfait',
   },
   fr_CA: {
+    'error.mountTrainInProgress': "Une leçon d'équitation est déjà en cours.",
+    'error.mountTrainDismountFirst': "Descendez d'abord.",
+    'error.ridingAlreadyLearned': "Vous avez déjà appris l'équitation.",
+    'error.ridingTrainLevel': "Vous devez être niveau 20 pour apprendre l'équitation.",
+    'error.mountTrainLevel': "Vous devez être niveau 20 pour prendre des leçons d'équitation.",
+    'error.ridingQuestUntrained': "Vous devez apprendre l'équitation avant de prendre cette leçon.",
+    'error.ridingUntrained':
+      "Vous devez apprendre à monter d'abord. Trouvez un instructeur d'équitation.",
+    'error.ridingWrongNpc': "Vous devez parler à Marla Hitchen pour apprendre l'équitation.",
+    'error.mountTrainNeedsQuest': "Vous devez d'abord accepter la quête d'équitation.",
     'error.notInGroup': "Cet allié n'est pas dans votre groupe.",
     'error.noDeadAlly': 'Vous devez cibler un allié mort dans votre groupe.',
     'error.professionChoiceUnavailable': "Ce choix de profession n'est pas disponible.",
@@ -1988,6 +2174,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.tollingBell': 'Cloche du glas',
     'mechanic.howlingGale': 'Bourrasque hurlante',
     'aura.drownedCanticle': 'Cantique noyé',
+    'log.seaFatigue': 'La haute mer épuise vos forces. Regagnez le rivage à la nage !',
+    'log.veilEnter': "Un voile de crépuscule s'écarte, et la Combe s'ouvre devant vous.",
+    'log.veilLeave': "Le voile se referme derrière vous, et l'air des montagnes mord de nouveau.",
+    'log.ferryEnter': 'La cloche du bac sonne une fois, et le Rivage Lointain surgit des embruns.',
+    'log.ferryLeave': 'La cloche repond depuis le val, et la terre ferme vous reprend.',
     'log.learnedAbility': 'Vous avez appris une nouvelle technique : {name}.',
     'log.abilityRankUp': 'Votre {name} est passé au rang {rank}.',
     'log.stopFollowing': 'Vous ne suivez plus.',
@@ -2080,6 +2271,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': 'Vos affaires ont été rangées dans de nouveaux sacs.',
     'error.specLevel': 'Vous pourrez choisir une spécialisation au niveau {level}.',
     'error.equipLevel': 'Vous devez être niveau {level} pour équiper cet objet.',
+    'error.mountLevel': 'Vous devez être niveau {level} pour monter cette monture.',
+    'error.noMountYet': "Vous n'avez pas encore de monture.",
+    'error.mountBuyLevel': 'Vous devez être niveau 20 pour acheter une monture.',
+    'error.mountAlreadyOwned': 'Vous possédez déjà cette monture.',
     'error.invalidBuild': 'Spécialisation invalide.',
     'error.unknownSpec': 'Spécialisation inconnue.',
     'error.maxLoadouts': 'Vous pouvez enregistrer au maximum {count} configurations.',
@@ -2266,6 +2461,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Moment parfait',
   },
   en_CA: {
+    'log.seaFatigue': 'The open sea saps your strength. Swim back to shore!',
+    'log.veilEnter': 'A veil of dusk parts before you, and the Hollow opens ahead.',
+    'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
+    'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
+    'log.ferryLeave': 'The bell answers from the vale, and the mainland takes you back.',
     'log.deathwardSaves': 'A deathward saves you!',
     'log.learnedAbility': 'You have learned a new ability: {name}.',
     'log.abilityRankUp': 'Your {name} has improved to Rank {rank}.',
@@ -2356,6 +2556,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': 'Your belongings have been packed into new bags.',
     'error.specLevel': 'You may choose a specialization at level {level}.',
     'error.equipLevel': 'You must be level {level} to equip that.',
+    'error.mountLevel': 'You must be level {level} to ride that mount.',
+    'error.noMountYet': "You don't have a mount yet.",
+    'error.mountBuyLevel': 'You must be level 20 to buy a mount.',
+    'error.mountAlreadyOwned': 'You already own that mount.',
     'error.invalidBuild': 'Invalid talent build.',
     'error.unknownSpec': 'Unknown specialization.',
     'error.maxLoadouts': 'You can save at most {count} loadouts.',
@@ -2444,6 +2648,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Might of the Serpent',
   },
   it_IT: {
+    'error.mountTrainInProgress': 'È già in corso una lezione di equitazione.',
+    'error.mountTrainDismountFirst': 'Smonta prima.',
+    'error.ridingAlreadyLearned': "Hai già imparato l'equitazione.",
+    'error.ridingTrainLevel': "Devi essere di livello 20 per imparare l'equitazione.",
+    'error.mountTrainLevel': 'Devi essere di livello 20 per prendere lezioni di equitazione.',
+    'error.ridingQuestUntrained': "Devi imparare l'equitazione prima di prendere questa lezione.",
+    'error.ridingUntrained': 'Devi imparare a cavalcare prima. Trova un istruttore di equitazione.',
+    'error.ridingWrongNpc': "Devi parlare con Marla Hitchen per imparare l'equitazione.",
+    'error.mountTrainNeedsQuest': 'Devi prima accettare la missione di equitazione.',
     'error.notInGroup': "Quell'alleato non è nel gruppo.",
     'error.noDeadAlly': 'Devi bersagliare un alleato del gruppo che sia morto.',
     'error.professionChoiceUnavailable': 'Quella scelta di professione non è disponibile.',
@@ -2564,6 +2777,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.tollingBell': 'Campana Rintoccante',
     'mechanic.howlingGale': 'Raffica Ululante',
     'aura.drownedCanticle': 'Cantico Annegato',
+    'log.seaFatigue': 'Il mare aperto ti prosciuga le forze. Torna a riva a nuoto!',
+    'log.veilEnter': 'Un velo di crepuscolo si apre davanti a te, e la Conca si rivela più avanti.',
+    'log.veilLeave': "Il velo si richiude alle tue spalle, e l'aria di montagna torna a pungere.",
+    'log.ferryEnter':
+      'La campana del traghetto suona una volta, e la Riva Lontana emerge dagli spruzzi.',
+    'log.ferryLeave': 'La campana risponde dalla valle, e la terraferma ti riaccoglie.',
     'log.learnedAbility': 'Hai imparato una nuova abilità: {name}.',
     'log.abilityRankUp': 'La tua {name} è migliorata al Grado {rank}.',
     'log.stopFollowing': 'Smetti di seguire.',
@@ -2655,6 +2874,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': 'I tuoi averi sono stati riposti in nuove borse.',
     'error.specLevel': 'Puoi scegliere una specializzazione al livello {level}.',
     'error.equipLevel': 'Devi essere di livello {level} per equipaggiarlo.',
+    'error.mountLevel': 'Devi essere di livello {level} per cavalcare quella cavalcatura.',
+    'error.noMountYet': 'Non hai ancora una cavalcatura.',
+    'error.mountBuyLevel': 'Devi essere di livello 20 per comprare una cavalcatura.',
+    'error.mountAlreadyOwned': 'Possiedi già quella cavalcatura.',
     'error.invalidBuild': 'Build dei talenti non valida.',
     'error.unknownSpec': 'Specializzazione sconosciuta.',
     'error.maxLoadouts': 'Puoi salvare al massimo {count} configurazioni.',
@@ -2838,6 +3061,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento Perfetto',
   },
   de_DE: {
+    'error.mountTrainInProgress': 'Es läuft bereits eine Reitstunde.',
+    'error.mountTrainDismountFirst': 'Ihr müsst zuerst absitzen.',
+    'error.ridingAlreadyLearned': 'Ihr habt Reiten bereits erlernt.',
+    'error.ridingTrainLevel': 'Ihr müsst Stufe 20 sein, um Reiten zu erlernen.',
+    'error.mountTrainLevel': 'Ihr müsst Stufe 20 sein, um Reitstunden zu nehmen.',
+    'error.ridingQuestUntrained': 'Ihr müsst Reiten erlernen, bevor Ihr diese Stunde nehmt.',
+    'error.ridingUntrained': 'Ihr müsst zuerst reiten lernen. Sucht einen Reitlehrer.',
+    'error.ridingWrongNpc': 'Ihr müsst mit Marla Hitchen sprechen, um Reiten zu erlernen.',
+    'error.mountTrainNeedsQuest': 'Ihr müsst zuerst die Reitstunden-Quest annehmen.',
     'error.notInGroup': 'Dieser Verbündete ist nicht in deiner Gruppe.',
     'error.noDeadAlly': 'Du musst einen toten Verbündeten in deiner Gruppe als Ziel wählen.',
     'error.professionChoiceUnavailable': 'Diese Berufsauswahl ist nicht verfügbar.',
@@ -2959,6 +3191,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.tollingBell': 'Läutende Glocke',
     'mechanic.howlingGale': 'Heulender Sturm',
     'aura.drownedCanticle': 'Ertrunkener Choral',
+    'log.seaFatigue': 'Die offene See zehrt an deinen Kräften. Schwimm zurück ans Ufer!',
+    'log.veilEnter':
+      'Ein Schleier aus Dämmerung teilt sich vor dir, und die Senke öffnet sich dahinter.',
+    'log.veilLeave': 'Der Schleier schließt sich hinter dir, und die Bergluft beißt wieder.',
+    'log.ferryEnter': 'Die Faehrglocke schlaegt einmal, und das Fernufer steigt aus der Gischt.',
+    'log.ferryLeave': 'Die Glocke antwortet aus dem Tal, und das Festland nimmt dich zurueck.',
     'log.learnedAbility': 'Ihr habt eine neue Fähigkeit erlernt: {name}.',
     'log.abilityRankUp': 'Euer {name} wurde auf Rang {rank} verbessert.',
     'log.stopFollowing': 'Ihr folgt nicht mehr.',
@@ -3050,6 +3288,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': 'Eure Habseligkeiten wurden in neue Taschen gepackt.',
     'error.specLevel': 'Ihr könnt auf Stufe {level} eine Spezialisierung wählen.',
     'error.equipLevel': 'Ihr müsst Stufe {level} sein, um das anzulegen.',
+    'error.mountLevel': 'Ihr müsst Stufe {level} sein, um dieses Reittier zu reiten.',
+    'error.noMountYet': 'Ihr habt noch kein Reittier.',
+    'error.mountBuyLevel': 'Ihr müsst Stufe 20 sein, um ein Reittier zu kaufen.',
+    'error.mountAlreadyOwned': 'Ihr besitzt dieses Reittier bereits.',
     'error.invalidBuild': 'Ungültige Talentverteilung.',
     'error.unknownSpec': 'Unbekannte Spezialisierung.',
     'error.maxLoadouts': 'Ihr könnt höchstens {count} Vorlagen speichern.',
@@ -3236,6 +3478,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Perfekter Moment',
   },
   zh_CN: {
+    'error.mountTrainInProgress': '骑乘课程已在进行中。',
+    'error.mountTrainDismountFirst': '请先下骑。',
+    'error.mountTrainLevel': '你必须达到等级20才能参加骑乘课程。',
+    'error.mountTrainNeedsQuest': '你必须先接受骑乘课程任务。',
     'error.notInGroup': '该盟友不在你的队伍中。',
     'error.noDeadAlly': '你必须以队伍中一名死亡的盟友为目标。',
     'error.professionChoiceUnavailable': '该专业选项不可用。',
@@ -3408,6 +3654,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.tollingBell': '鸣响之钟',
     'mechanic.howlingGale': '呼啸狂风',
     'aura.drownedCanticle': '溺亡圣咏',
+    'log.seaFatigue': '汪洋正在耗尽你的体力。快游回岸边！',
+    'log.veilEnter': '暮色的帷幕在你面前分开，幽谷在前方展开。',
+    'log.veilLeave': '帷幕在你身后合拢，山间的寒风再次刺骨。',
+    'log.ferryEnter': '渡船的钟声响起一声，远岸从浪花中浮现。',
+    'log.ferryLeave': '钟声自谷中回应，大陆将你迎回。',
     'log.learnedAbility': '你学会了新技能：{name}。',
     'log.abilityRankUp': '你的{name}已提升至等级 {rank}。',
     'log.stopFollowing': '你停止了跟随。',
@@ -3504,6 +3755,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': '你的物品已装入新背包。',
     'error.specLevel': '你将在{level}级时选择专精。',
     'error.equipLevel': '你必须达到等级{level}才能装备该物品。',
+    'error.mountLevel': '你必须达到等级{level}才能骑乘该坐骑。',
+    'error.noMountYet': '你还没有坐骑。',
+    'error.mountBuyLevel': '你必须达到等级20才能购买坐骑。',
+    'error.mountAlreadyOwned': '你已经拥有该坐骑了。',
+    'error.ridingUntrained': '你必须先学会骑乘。请找骑乘训练师。',
+    'error.ridingAlreadyLearned': '你已经学会了骑乘术。',
+    'error.ridingTrainLevel': '你必须达到等级20才能学习骑乘术。',
+    'error.ridingWrongNpc': '你必须和玛拉·希肯交谈才能学习骑乘术。',
+    'log.ridingLearned': '你已学会骑乘术，现在可以召唤并骑乘坐骑。',
+    'error.ridingQuestUntrained': '你必须先学习骑乘术才能参加这个课程。',
     'error.invalidBuild': '无效的天赋配置。',
     'error.unknownSpec': '未知的专精。',
     'error.maxLoadouts': '你最多只能保存{count}套配置。',
@@ -3613,6 +3874,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '完美时刻',
   },
   zh_TW: {
+    'error.mountTrainInProgress': '騎乘課程已在進行中。',
+    'error.mountTrainDismountFirst': '請先下騎。',
+    'error.mountTrainLevel': '你必須達到等級 20 才能參加騎乘課程。',
+    'error.mountTrainNeedsQuest': '你必須先接受騎乘課程任務。',
     'error.notInGroup': '該盟友不在你的隊伍中。',
     'error.noDeadAlly': '你必須鎖定隊伍中一名陣亡的盟友。',
     'error.professionChoiceUnavailable': '該專業選擇目前無法使用。',
@@ -3785,6 +4050,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.tollingBell': '鳴響喪鐘',
     'mechanic.howlingGale': '呼嘯狂風',
     'aura.drownedCanticle': '溺亡聖詠',
+    'log.seaFatigue': '汪洋正在耗盡你的體力。快游回岸邊！',
+    'log.veilEnter': '暮色的帷幕在你面前分開，幽谷在前方展開。',
+    'log.veilLeave': '帷幕在你身後合攏，山間的寒風再次刺骨。',
+    'log.ferryEnter': '渡船的鐘聲響起一聲，遠岸從浪花中浮現。',
+    'log.ferryLeave': '鐘聲自谷中回應，大陸將你迎回。',
     'log.learnedAbility': '你學會了新技能：{name}。',
     'log.abilityRankUp': '你的「{name}」已提升至第 {rank} 級。',
     'log.stopFollowing': '你停止了跟隨。',
@@ -3881,6 +4151,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': '你的物品已裝入新背包。',
     'error.specLevel': '你必須達到等級 {level} 才能選擇專精。',
     'error.equipLevel': '你必須達到等級 {level} 才能裝備該物品。',
+    'error.mountLevel': '你必須達到等級 {level} 才能騎乘該坐騎。',
+    'error.noMountYet': '你還沒有坐騎。',
+    'error.mountBuyLevel': '你必須達到等級 20 才能購買坐騎。',
+    'error.mountAlreadyOwned': '你已經擁有該坐騎了。',
+    'error.ridingUntrained': '你必須先學會騎乘。請找騎乘訓練師。',
+    'error.ridingAlreadyLearned': '你已經學會了騎乘術。',
+    'error.ridingTrainLevel': '你必須達到等級 20 才能學習騎乘術。',
+    'error.ridingWrongNpc': '你必須和瑪拉·希肯交談才能學習騎乘術。',
+    'log.ridingLearned': '你已學會騎乘術，現在可以召喚並騎乘坐騎。',
+    'error.ridingQuestUntrained': '你必須先學習騎乘術才能參加這個課程。',
     'error.invalidBuild': '無效的天賦配置。',
     'error.unknownSpec': '未知的專精。',
     'error.maxLoadouts': '你最多只能儲存 {count} 組配置。',
@@ -3990,6 +4270,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '完美時刻',
   },
   ko_KR: {
+    'error.mountTrainInProgress': '기승 수업이 이미 진행 중입니다.',
+    'error.mountTrainDismountFirst': '먼저 내리세요.',
+    'error.mountTrainLevel': '기승 수업을 받으려면 20레벨이 되어야 합니다.',
+    'error.mountTrainNeedsQuest': '먼저 기승 수업 퀘스트를 수락해야 합니다.',
     'error.notInGroup': '그 아군은 당신의 그룹에 속해 있지 않습니다.',
     'error.noDeadAlly': '그룹 내 죽은 아군을 대상으로 지정해야 합니다.',
     'error.professionChoiceUnavailable': '해당 전문 기술 선택지는 사용할 수 없습니다.',
@@ -4167,6 +4451,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.tollingBell': '울리는 종',
     'mechanic.howlingGale': '울부짖는 강풍',
     'aura.drownedCanticle': '익사한 성가',
+    'log.seaFatigue': '먼바다가 그대의 기력을 앗아 간다. 어서 해안으로 헤엄쳐 돌아가라!',
+    'log.veilEnter': '황혼의 장막이 눈앞에서 갈라지고, 골짜기가 앞에 펼쳐진다.',
+    'log.veilLeave': '장막이 등 뒤에서 닫히고, 산바람이 다시 살을 엔다.',
+    'log.ferryEnter': '나룻배의 종이 한 번 울리고, 먼기슭이 물보라 속에서 떠오른다.',
+    'log.ferryLeave': '골짜기에서 종소리가 화답하고, 뭍이 너를 다시 맞이한다.',
     'log.learnedAbility': '새로운 기술을 배웠습니다: {name}.',
     'log.abilityRankUp': '{name}이(가) {rank}단계로 향상되었습니다.',
     'log.stopFollowing': '따라가기를 멈췄습니다.',
@@ -4264,6 +4553,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': '소지품이 새 가방에 담겼습니다.',
     'error.specLevel': '{level}레벨에 전문화를 선택할 수 있습니다.',
     'error.equipLevel': '{level}레벨이 되어야 착용할 수 있습니다.',
+    'error.mountLevel': '{level}레벨이 되어야 그 탈것을 탈 수 있습니다.',
+    'error.noMountYet': '아직 탈것이 없습니다.',
+    'error.mountBuyLevel': '20레벨이 되어야 탈것을 구매할 수 있습니다.',
+    'error.mountAlreadyOwned': '이미 그 탈것을 가지고 있습니다.',
+    'error.ridingUntrained': '먼저 기승술을 배워야 합니다. 기승 훈련사를 찾으세요.',
+    'error.ridingAlreadyLearned': '이미 기승술을 배웠습니다.',
+    'error.ridingTrainLevel': '기승술을 배우려면 20레벨이 되어야 합니다.',
+    'error.ridingWrongNpc': '기승술을 배우려면 마를라 히첸과 이야기해야 합니다.',
+    'log.ridingLearned': '기승술을 습득했습니다. 이제 탈것을 소환하고 탈 수 있습니다.',
+    'error.ridingQuestUntrained': '이 수업을 받으려면 먼저 기승술을 배워야 합니다.',
     'error.invalidBuild': '잘못된 특성 구성입니다.',
     'error.unknownSpec': '알 수 없는 전문화입니다.',
     'error.maxLoadouts': '특성 묶음은 최대 {count}개까지 저장할 수 있습니다.',
@@ -4376,6 +4675,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '완벽한 순간',
   },
   ja_JP: {
+    'error.mountTrainInProgress': '騎乗レッスンはすでに進行中です。',
+    'error.mountTrainDismountFirst': '先に降りてください。',
+    'error.mountTrainLevel': '騎乗レッスンを受けるにはレベル20が必要です。',
+    'error.mountTrainNeedsQuest': '先に騎乗レッスンのクエストを受諾してください。',
     'error.notInGroup': 'その仲間はあなたのグループに入っていません。',
     'error.noDeadAlly': 'グループ内の死亡した仲間をターゲットしてください。',
     'error.professionChoiceUnavailable': 'その職業選択は利用できません。',
@@ -4559,6 +4862,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.tollingBell': '鳴り響く鐘',
     'mechanic.howlingGale': '咆哮の烈風',
     'aura.drownedCanticle': '溺れし聖歌',
+    'log.seaFatigue': '外海が体力を奪っていく。岸へ泳ぎ戻れ！',
+    'log.veilEnter': '黄昏の帳が目の前で開き、幽谷が行く手に広がる。',
+    'log.veilLeave': '帳が背後で閉じ、山の空気が再び肌を刺す。',
+    'log.ferryEnter': '渡し船の鐘が一度鳴り、遠つ岸がしぶきの中から現れる。',
+    'log.ferryLeave': '谷から鐘が応え、本土がお前を迎え戻す。',
     'log.learnedAbility': '新しいアビリティ「{name}」を習得しました。',
     'log.abilityRankUp': '「{name}」がランク{rank}に上昇しました。',
     'log.stopFollowing': '追従を解除しました。',
@@ -4658,6 +4966,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': '持ち物は新しいバッグに収納されました。',
     'error.specLevel': '専門化はレベル{level}で選択できます。',
     'error.equipLevel': 'それを装備するにはレベル{level}が必要です。',
+    'error.mountLevel': 'そのマウントに乗るにはレベル{level}が必要です。',
+    'error.noMountYet': 'まだマウントを持っていません。',
+    'error.mountBuyLevel': 'マウントを購入するにはレベル20が必要です。',
+    'error.mountAlreadyOwned': 'そのマウントはすでに所有しています。',
+    'error.ridingUntrained': 'まず騎乗術を習得してください。騎乗訓練士を探しましょう。',
+    'error.ridingAlreadyLearned': 'すでに騎乗術を習得しています。',
+    'error.ridingTrainLevel': '騎乗術を習得するにはレベル20が必要です。',
+    'error.ridingWrongNpc': '騎乗術を習得するにはマーラ・ヒッチェンに話しかけてください。',
+    'log.ridingLearned': '騎乗術を習得しました。マウントを召喚して乗れるようになりました。',
+    'error.ridingQuestUntrained': 'このレッスンを受けるには、まず騎乗術を習得してください。',
     'error.invalidBuild': '無効なタレントビルドです。',
     'error.unknownSpec': '不明な専門化です。',
     'error.maxLoadouts': 'ロードアウトは最大{count}個まで保存できます。',
@@ -4771,6 +5089,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': '完璧な瞬間',
   },
   pt_BR: {
+    'error.mountTrainInProgress': 'Uma aula de equitação já está em andamento.',
+    'error.mountTrainDismountFirst': 'Desmonte primeiro.',
+    'error.ridingAlreadyLearned': 'Você já aprendeu equitação.',
+    'error.ridingTrainLevel': 'Você precisa ser nível 20 para aprender equitação.',
+    'error.mountTrainLevel': 'Você precisa ser nível 20 para fazer aulas de equitação.',
+    'error.ridingQuestUntrained': 'Você precisa aprender equitação antes de fazer esta aula.',
+    'error.ridingUntrained':
+      'Você precisa aprender a montar primeiro. Procure um instrutor de equitação.',
+    'error.ridingWrongNpc': 'Você precisa falar com Marla Hitchen para aprender equitação.',
+    'error.mountTrainNeedsQuest': 'Você precisa aceitar a missão de equitação primeiro.',
     'error.notInGroup': 'Esse aliado não está no seu grupo.',
     'error.noDeadAlly': 'Você deve ter como alvo um aliado morto do seu grupo.',
     'error.professionChoiceUnavailable': 'Essa escolha de profissão não está disponível.',
@@ -4890,6 +5218,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.tollingBell': 'Dobre do Sino',
     'mechanic.howlingGale': 'Vendaval Uivante',
     'aura.drownedCanticle': 'Cântico Afogado',
+    'log.seaFatigue': 'O mar aberto suga suas forças. Nade de volta à praia!',
+    'log.veilEnter': 'Um véu de crepúsculo se abre à sua frente, e o Vale Oculto surge adiante.',
+    'log.veilLeave': 'O véu se fecha às suas costas, e o ar da montanha volta a morder.',
+    'log.ferryEnter': 'O sino da balsa toca uma vez, e a Costa Distante ergue-se da espuma.',
+    'log.ferryLeave': 'O sino responde do vale, e o continente o recebe de volta.',
     'log.learnedAbility': 'Você aprendeu uma nova habilidade: {name}.',
     'log.abilityRankUp': 'Sua habilidade {name} melhorou para o Grau {rank}.',
     'log.stopFollowing': 'Você parou de seguir.',
@@ -4980,6 +5313,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': 'Seus pertences foram guardados em bolsas novas.',
     'error.specLevel': 'Você pode escolher uma especialização no nível {level}.',
     'error.equipLevel': 'Você precisa ser nível {level} para equipar isso.',
+    'error.mountLevel': 'Você precisa ser nível {level} para montar essa montaria.',
+    'error.noMountYet': 'Você ainda não tem uma montaria.',
+    'error.mountBuyLevel': 'Você precisa ser nível 20 para comprar uma montaria.',
+    'error.mountAlreadyOwned': 'Você já tem essa montaria.',
     'error.invalidBuild': 'Estrutura de talentos inválida.',
     'error.unknownSpec': 'Especialização desconhecida.',
     'error.maxLoadouts': 'Você pode salvar no máximo {count} conjuntos.',
@@ -5164,6 +5501,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momento Perfeito',
   },
   ru_RU: {
+    'error.mountTrainInProgress': 'Урок верховой езды уже идёт.',
+    'error.mountTrainDismountFirst': 'Сначала спешьтесь.',
+    'error.mountTrainLevel': 'Чтобы брать уроки верховой езды, нужен 20 уровень.',
+    'error.mountTrainNeedsQuest': 'Сначала нужно принять задание на урок верховой езды.',
     'error.notInGroup': 'Этот союзник не состоит в вашей группе.',
     'error.noDeadAlly': 'Выберите погибшего союзника из своей группы.',
     'error.professionChoiceUnavailable': 'Этот выбор профессии недоступен.',
@@ -5346,6 +5687,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.tollingBell': 'Погребальный колокол',
     'mechanic.howlingGale': 'Воющий шквал',
     'aura.drownedCanticle': 'Песнь утопленников',
+    'log.seaFatigue': 'Открытое море вытягивает из вас силы. Плывите обратно к берегу!',
+    'log.veilEnter': 'Сумеречная завеса расступается перед вами, и впереди открывается Лощина.',
+    'log.veilLeave': 'Завеса смыкается за спиной, и горный воздух снова обжигает холодом.',
+    'log.ferryEnter': 'Колокол парома звонит один раз, и Дальний берег встаёт из брызг.',
+    'log.ferryLeave': 'Колокол отвечает из долины, и большая земля принимает вас обратно.',
     'log.learnedAbility': 'Вы изучили новое умение: {name}.',
     'log.abilityRankUp': 'Умение «{name}» повышено до ранга {rank}.',
     'log.stopFollowing': 'Вы перестаёте следовать.',
@@ -5445,6 +5791,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.bagsMigrated': 'Ваши вещи разложены по новым сумкам.',
     'error.specLevel': 'Выбрать специализацию можно на {level} уровне.',
     'error.equipLevel': 'Чтобы экипировать это, нужен {level} уровень.',
+    'error.mountLevel': 'Чтобы ездить на этом транспорте, нужен {level} уровень.',
+    'error.noMountYet': 'У вас пока нет транспорта.',
+    'error.mountBuyLevel': 'Чтобы купить транспорт, нужен 20 уровень.',
+    'error.mountAlreadyOwned': 'У вас уже есть этот транспорт.',
+    'error.ridingUntrained': 'Сначала нужно научиться верховой езде. Найдите инструктора.',
+    'error.ridingAlreadyLearned': 'Вы уже обучились верховой езде.',
+    'error.ridingTrainLevel': 'Чтобы обучиться верховой езде, нужен 20 уровень.',
+    'error.ridingWrongNpc': 'Чтобы обучиться верховой езде, поговорите с Марлой Хитчен.',
+    'log.ridingLearned':
+      'Вы обучились верховой езде. Теперь вы можете призывать и оседлать ездовое животное.',
+    'error.ridingQuestUntrained': 'Чтобы пройти этот урок, сначала обучитесь верховой езде.',
     'error.invalidBuild': 'Недопустимая сборка талантов.',
     'error.unknownSpec': 'Неизвестная специализация.',
     'error.maxLoadouts': 'Можно сохранить не более {count} наборов.',
@@ -5560,6 +5917,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   cs_CZ: {
     'error.sellBound': 'Tento předmět je vázaný a nelze ho prodat.',
     ...BASE_NEW.cs_CZ,
+    'error.mountTrainInProgress': 'Jezdecká lekce už probíhá.',
+    'error.mountTrainDismountFirst': 'Nejdřív sesedni.',
+    'error.mountAlreadyOwned': 'Toto jízdní zvíře už vlastníš.',
+    'error.ridingAlreadyLearned': 'Jízdu ses již naučil(a).',
+    'error.mountBuyLevel': 'Musíš být na úrovni 20, abys mohl(a) koupit jízdní zvíře.',
+    'error.ridingTrainLevel': 'Musíš být na úrovni 20, abys se mohl(a) naučit Jízdu.',
+    'error.mountTrainLevel': 'Musíš být na úrovni 20, abys si mohl(a) vzít jezdecké lekce.',
+    'error.ridingQuestUntrained': 'Musíš se nejprve naučit Jízdu, než si vezmeš tuto lekci.',
+    'error.ridingUntrained': 'Musíš se nejprve naučit jezdit. Najdi jezdeckého instruktora.',
+    'error.ridingWrongNpc': 'Musíš promluvit s Marla Hitchen, abys se naučil(a) Jízdu.',
+    'error.mountTrainNeedsQuest': 'Nejdřív musíš přijmout úkol Jezdecké lekce.',
     'log.readyCheckNotReady': '{name} není připraven(a).',
     'log.readyCheckNoResponse': '{name} neodpověděl(a) na kontrolu připravenosti.',
     'error.notInGroup': 'Tento spojenec není ve vaší skupině.',
@@ -5665,6 +6033,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   nl_NL: {
     'error.sellBound': 'Dat voorwerp is gebonden en kan niet worden verkocht.',
     ...BASE_NEW.nl_NL,
+    'error.mountTrainInProgress': 'Er is al een rijles bezig.',
+    'error.mountTrainDismountFirst': 'Stijg eerst af.',
+    'error.mountAlreadyOwned': 'Je hebt dat rijdier al.',
+    'error.ridingAlreadyLearned': 'Je hebt Rijden al geleerd.',
+    'error.mountBuyLevel': 'Je moet niveau 20 zijn om een rijdier te kopen.',
+    'error.ridingTrainLevel': 'Je moet niveau 20 zijn om Rijden te leren.',
+    'error.mountTrainLevel': 'Je moet niveau 20 zijn om rijlessen te volgen.',
+    'error.ridingQuestUntrained': 'Je moet Rijden leren voordat je deze les kunt volgen.',
+    'error.ridingUntrained': 'Je moet eerst leren rijden. Zoek een rijinstructeur.',
+    'error.ridingWrongNpc': 'Je moet met Marla Hitchen praten om Rijden te leren.',
+    'error.mountTrainNeedsQuest': 'Je moet eerst de quest Rijlessen aanvaarden.',
     'log.readyCheckNotReady': '{name} is niet gereed.',
     'log.readyCheckNoResponse': '{name} heeft niet gereageerd op de gereedheidscontrole.',
     'error.notInGroup': 'Die bondgenoot zit niet in jouw groep.',
@@ -5769,6 +6148,18 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   pl_PL: {
     'error.sellBound': 'Ten przedmiot jest przywiązany i nie można go sprzedać.',
     ...BASE_NEW.pl_PL,
+    'error.mountTrainInProgress': 'Lekcja jazdy konnej już trwa.',
+    'error.mountTrainDismountFirst': 'Najpierw zsiądź.',
+    'error.mountAlreadyOwned': 'Masz już tego wierzchowca.',
+    'error.ridingAlreadyLearned': 'Nauczyłeś się już Jeździectwa.',
+    'error.mountBuyLevel': 'Musisz osiągnąć poziom 20, aby kupić wierzchowca.',
+    'error.ridingTrainLevel': 'Musisz osiągnąć poziom 20, aby nauczyć się Jeździectwa.',
+    'error.mountTrainLevel': 'Musisz osiągnąć poziom 20, aby wziąć lekcje jazdy konnej.',
+    'error.ridingQuestUntrained': 'Musisz nauczyć się Jeździectwa, zanim weźmiesz tę lekcję.',
+    'error.ridingUntrained':
+      'Musisz najpierw nauczyć się jeździć. Znajdź instruktora jazdy konnej.',
+    'error.ridingWrongNpc': 'Musisz porozmawiać z Marla Hitchen, aby nauczyć się Jeździectwa.',
+    'error.mountTrainNeedsQuest': 'Najpierw musisz przyjąć zadanie Lekcje jazdy konnej.',
     'log.readyCheckNotReady': '{name} nie jest gotowy(-a).',
     'log.readyCheckNoResponse': '{name} nie odpowiedział(a) na sprawdzanie gotowości.',
     'error.notInGroup': 'Ten sojusznik nie należy do twojej grupy.',
@@ -5875,6 +6266,18 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   id_ID: {
     'error.sellBound': 'Barang itu terikat dan tidak dapat dijual.',
     ...BASE_NEW.id_ID,
+    'error.mountTrainInProgress': 'Sudah ada pelajaran menunggang yang sedang berlangsung.',
+    'error.mountTrainDismountFirst': 'Turun dulu.',
+    'error.mountAlreadyOwned': 'Kamu sudah punya tunggangan itu.',
+    'error.ridingAlreadyLearned': 'Kamu sudah mempelajari Menunggang.',
+    'error.mountBuyLevel': 'Kamu harus level 20 untuk membeli tunggangan.',
+    'error.ridingTrainLevel': 'Kamu harus level 20 untuk mempelajari Menunggang.',
+    'error.mountTrainLevel': 'Kamu harus level 20 untuk mengikuti pelajaran menunggang.',
+    'error.ridingQuestUntrained':
+      'Kamu harus mempelajari Menunggang sebelum mengikuti pelajaran ini.',
+    'error.ridingUntrained': 'Kamu harus belajar menunggang dulu. Cari pelatih menunggang kuda.',
+    'error.ridingWrongNpc': 'Kamu harus bicara dengan Marla Hitchen untuk mempelajari Menunggang.',
+    'error.mountTrainNeedsQuest': 'Kamu harus menerima misi Pelajaran Menunggang Kuda dulu.',
     'log.readyCheckNotReady': '{name} belum siap.',
     'log.readyCheckNoResponse': '{name} tidak menanggapi pemeriksaan kesiapan.',
     'error.notInGroup': 'Sekutu itu tidak ada dalam grupmu.',
@@ -5979,6 +6382,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   tr_TR: {
     'error.sellBound': 'O eşya bağlı ve satılamaz.',
     ...BASE_NEW.tr_TR,
+    'error.mountTrainInProgress': 'Zaten devam eden bir binicilik dersi var.',
+    'error.mountTrainDismountFirst': 'Önce in.',
+    'error.mountAlreadyOwned': 'O bineğe zaten sahipsin.',
+    'error.ridingAlreadyLearned': 'Biniciliği zaten öğrendin.',
+    'error.mountBuyLevel': 'Binek almak için 20. seviyeye ulaşmalısın.',
+    'error.ridingTrainLevel': 'Biniciliği öğrenmek için 20. seviyeye ulaşmalısın.',
+    'error.mountTrainLevel': 'Binicilik dersi almak için 20. seviyeye ulaşmalısın.',
+    'error.ridingQuestUntrained': 'Bu dersi almadan önce Biniciliği öğrenmelisin.',
+    'error.ridingUntrained': 'Önce binmeyi öğrenmelisin. Bir binicilik eğitmeni bul.',
+    'error.ridingWrongNpc': 'Biniciliği öğrenmek için Marla Hitchen ile konuşmalısın.',
+    'error.mountTrainNeedsQuest': 'Önce Binicilik Dersleri görevini kabul etmelisin.',
     'log.readyCheckNotReady': '{name} hazır değil.',
     'log.readyCheckNoResponse': '{name} hazırlık kontrolüne yanıt vermedi.',
     'error.notInGroup': 'O müttefik grubunda değil.',
@@ -6084,6 +6498,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   sv_SE: {
     'error.sellBound': 'Det föremålet är bundet och kan inte säljas.',
     ...BASE_NEW.sv_SE,
+    'error.mountTrainInProgress': 'En ridlektion pågår redan.',
+    'error.mountTrainDismountFirst': 'Stig av först.',
+    'error.mountAlreadyOwned': 'Du har redan det riddjuret.',
+    'error.ridingAlreadyLearned': 'Du har redan lärt dig Ridning.',
+    'error.mountBuyLevel': 'Du måste vara nivå 20 för att köpa ett riddjur.',
+    'error.ridingTrainLevel': 'Du måste vara nivå 20 för att lära dig Ridning.',
+    'error.mountTrainLevel': 'Du måste vara nivå 20 för att ta ridlektioner.',
+    'error.ridingQuestUntrained': 'Du måste lära dig Ridning innan du tar den här lektionen.',
+    'error.ridingUntrained': 'Du måste lära dig rida först. Hitta en ridinstruktör.',
+    'error.ridingWrongNpc': 'Du måste prata med Marla Hitchen för att lära dig Ridning.',
+    'error.mountTrainNeedsQuest': 'Du måste först acceptera uppdraget Ridlektioner.',
     'log.readyCheckNotReady': '{name} är inte redo.',
     'log.readyCheckNoResponse': '{name} svarade inte på beredskapskontrollen.',
     'error.notInGroup': 'Den allierade är inte i din grupp.',
@@ -6188,6 +6613,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   vi_VN: {
     'error.sellBound': 'Vật phẩm đó đã bị ràng buộc và không thể bán.',
     ...BASE_NEW.vi_VN,
+    'error.mountTrainInProgress': 'Đã có một bài học cưỡi ngựa đang diễn ra.',
+    'error.mountTrainDismountFirst': 'Xuống thú cưỡi trước đã.',
+    'error.mountAlreadyOwned': 'Bạn đã sở hữu thú cưỡi đó rồi.',
+    'error.ridingAlreadyLearned': 'Bạn đã học Cưỡi Ngựa rồi.',
+    'error.mountBuyLevel': 'Bạn phải đạt cấp 20 để mua thú cưỡi.',
+    'error.ridingTrainLevel': 'Bạn phải đạt cấp 20 để học Cưỡi Ngựa.',
+    'error.mountTrainLevel': 'Bạn phải đạt cấp 20 để tham gia bài học cưỡi ngựa.',
+    'error.ridingQuestUntrained': 'Bạn phải học Cưỡi Ngựa trước khi tham gia bài học này.',
+    'error.ridingUntrained': 'Bạn phải học cưỡi trước. Hãy tìm một người huấn luyện cưỡi ngựa.',
+    'error.ridingWrongNpc': 'Bạn phải nói chuyện với Marla Hitchen để học Cưỡi Ngựa.',
+    'error.mountTrainNeedsQuest': 'Bạn phải nhận nhiệm vụ Bài Học Cưỡi Ngựa trước.',
     'log.readyCheckNotReady': '{name} chưa sẵn sàng.',
     'log.readyCheckNoResponse': '{name} không phản hồi kiểm tra sẵn sàng.',
     'error.notInGroup': 'Đồng minh đó không ở trong nhóm của bạn.',
@@ -6291,6 +6727,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   da_DK: {
     'error.sellBound': 'Den genstand er bundet og kan ikke sælges.',
     ...BASE_NEW.da_DK,
+    'error.mountTrainInProgress': 'Der er allerede en ridelektion i gang.',
+    'error.mountTrainDismountFirst': 'Stig af først.',
+    'error.mountAlreadyOwned': 'Du har allerede det ridedyr.',
+    'error.ridingAlreadyLearned': 'Du har allerede lært Ridning.',
+    'error.mountBuyLevel': 'Du skal have niveau 20 for at købe et ridedyr.',
+    'error.ridingTrainLevel': 'Du skal have niveau 20 for at lære Ridning.',
+    'error.mountTrainLevel': 'Du skal have niveau 20 for at tage ridelektioner.',
+    'error.ridingQuestUntrained': 'Du skal lære Ridning, inden du tager denne lektion.',
+    'error.ridingUntrained': 'Du skal lære at ride først. Find en rideinstruktør.',
+    'error.ridingWrongNpc': 'Du skal tale med Marla Hitchen for at lære Ridning.',
+    'error.mountTrainNeedsQuest': 'Du skal først acceptere questen Ridelektioner.',
     'log.readyCheckNotReady': '{name} er ikke klar.',
     'log.readyCheckNoResponse': '{name} svarede ikke på klar-tjekket.',
     'error.notInGroup': 'Den allierede er ikke i din gruppe.',
@@ -6968,6 +7415,12 @@ function locMob(name: string): string {
 function locAbility(name: string): string {
   const id = abilityNameToId.get(name);
   return id ? tEntity({ kind: 'ability', id, field: 'name' }) : name;
+}
+const zoneNameToId = new Map<string, string>();
+for (const z of ZONES) zoneNameToId.set(z.name, z.id);
+function locZone(name: string): string {
+  const id = zoneNameToId.get(name);
+  return id ? tEntity({ kind: 'zone', id, field: 'name' }) : name;
 }
 function locDelve(name: string): string {
   const id = delveNameToId.get(name);
@@ -8342,6 +8795,10 @@ const RULES: Rule[] = [
     build: (m) => tSim('error.equipLevel', { level: m[1] }),
   },
   {
+    re: /^You must be level (\d+) to ride that mount\.$/,
+    build: (m) => tSim('error.mountLevel', { level: m[1] }),
+  },
+  {
     re: /^You must have a shield equipped\.$/,
     build: () => t('hudChrome.abilityError.shieldRequired'),
   },
@@ -8630,6 +9087,182 @@ const RULES: Rule[] = [
   // sim.lockpick.* keys (src/ui/i18n.catalog/index.ts). The module-enter banner is two
   // rules anchored on the fixed objective lines ("X: Clear the room." / "X: Defeat the
   // boss."), each localizing the captured module name, so there is no bare catch-all.
+  // Procedural Rift sim text (src/sim/rift/runs.ts), re-localized through the
+  // sim.rift.* keys. The captured floor name is a generated English name and is
+  // spliced verbatim, like player/build names.
+  {
+    re: /^All rifts are unstable right now\. Try again soon\.$/,
+    build: () => t('sim.rift.allUnstable'),
+  },
+  {
+    re: /^You step through the rift into (.+)\.$/,
+    build: (m) => t('sim.rift.enterFloor', { name: m[1] }),
+  },
+  {
+    re: /^You descend deeper into (.+)\.$/,
+    build: (m) => t('sim.rift.descendFloor', { name: m[1] }),
+  },
+  { re: /^You step back through the rift\.$/, build: () => t('sim.rift.stepBack') },
+  {
+    re: /^A rune pylon flares to life \(([^/)]+)\/([^)]+)\)\.$/,
+    build: (m) => t('sim.rift.pylonLit', { lit: m[1], total: m[2] }),
+  },
+  { re: /^The way down tears open\.$/, build: () => t('sim.rift.wayDownOpens') },
+  { re: /^The frost sigil blazes\. The way stirs\.$/, build: () => t('sim.rift.iceGoalLit') },
+  { re: /^The sockets grind shut\. The way stirs\.$/, build: () => t('sim.rift.socketsShut') },
+  {
+    re: /^The runes answer in turn \(([^/)]+)\/([^)]+)\)\.$/,
+    build: (m) => t('sim.rift.seqProgress', { step: m[1], total: m[2] }),
+  },
+  { re: /^The runes go dark\. Begin again\.$/, build: () => t('sim.rift.seqReset') },
+  { re: /^The gate grinds open\.$/, build: () => t('sim.rift.gateOpen') },
+  { re: /^The orb is sealed by the ritual below\.$/, build: () => t('sim.rift.orbSealed') },
+  {
+    re: /^The pentagram's flame gutters out\. Something wakes on the altar\.$/,
+    build: () => t('sim.rift.orbWakes'),
+  },
+  {
+    re: /^The Blood Orb flares\. The gates of the temple grind open\.$/,
+    build: () => t('sim.rift.orbOpensGate'),
+  },
+  {
+    re: /^A ([CBAS])-rank rift tears open in (.+)!$/,
+    build: (m) => t('sim.rift.portalOpens', { tier: m[1], zone: locZone(m[2]) }),
+  },
+  {
+    re: /^The ([CBAS])-rank rift in (.+) has been sealed\.$/,
+    build: (m) => t('sim.rift.portalSealed', { tier: m[1], zone: locZone(m[2]) }),
+  },
+  {
+    re: /^The ([CBAS])-rank rift in (.+) collapses\.$/,
+    build: (m) => t('sim.rift.portalCollapses', { tier: m[1], zone: locZone(m[2]) }),
+  },
+  {
+    re: /^Only adventurers of level (\d+) or higher may enter this rift\.$/,
+    build: (m) => t('sim.rift.levelGate', { level: m[1] }),
+  },
+  {
+    re: /^You cannot enter a rift while dead\.$/,
+    build: () => t('sim.rift.deadEntry'),
+  },
+  {
+    re: /^Your party is still in combat\. The dead may re-enter once the fighting stops\.$/,
+    build: () => t('sim.rift.deadEntryCombat'),
+  },
+  {
+    re: /^The rift shudders\. A way home tears open behind the fallen\.$/,
+    build: () => t('sim.rift.exitOpens'),
+  },
+  {
+    re: /^This rift has already been cleared by (.+)\.$/,
+    build: (m) => t('sim.rift.alreadyCleared', { names: m[1] }),
+  },
+  {
+    re: /^The rift has already been cleared by (.+)\. Your run ends\.$/,
+    build: (m) => t('sim.rift.raceLost', { names: m[1] }),
+  },
+  {
+    // The localization drift guard substitutes every template interpolation with
+    // "Aki", so tier/time cannot be narrowed here to C/B/A/S and digits.
+    re: /^(.+) won the (.+)-rank Rift race in (.+)s!$/,
+    build: (m) => t('sim.rift.raceWorldWin', { names: m[1], tier: m[2], seconds: m[3] }),
+  },
+  {
+    re: /^Rift upgrade completed for (.+)\.$/,
+    build: (m) => t('sim.rift.forgeUpgraded', { name: m[1] }),
+  },
+  {
+    re: /^Rift enchant completed for (.+)\.$/,
+    build: (m) => t('sim.rift.forgeEnchanted', { name: m[1] }),
+  },
+  {
+    re: /^Rift gem socketed for (.+)\.$/,
+    build: (m) => t('sim.rift.forgeSocketed', { name: m[1] }),
+  },
+  // Boss lethal death-zone detonation lines (src/sim/mob/locomotion.ts). The sim
+  // emits def.detonateText verbatim at zone expiry; match each exact string here and
+  // re-render via its sim.rift.detonate* catalog key. One rule per mechanic so each
+  // can be translated distinctly (a frost grave != an arcane rift).
+  {
+    re: /^Glacial Grave detonates!$/,
+    build: () => t('sim.rift.detonateGlacialGrave'),
+  },
+  {
+    re: /^Absolute Zero erupts!$/,
+    build: () => t('sim.rift.detonateAbsoluteZero'),
+  },
+  {
+    re: /^Magma Well erupts!$/,
+    build: () => t('sim.rift.detonateMagmaWell'),
+  },
+  {
+    re: /^Core Meltdown detonates!$/,
+    build: () => t('sim.rift.detonateCoreMeltdown'),
+  },
+  {
+    re: /^Venom Pool erupts!$/,
+    build: () => t('sim.rift.detonateVenomPool'),
+  },
+  {
+    re: /^Broodmother's Mark detonates!$/,
+    build: () => t('sim.rift.detonateBroodmothersMark'),
+  },
+  {
+    re: /^Soul Grave detonates!$/,
+    build: () => t('sim.rift.detonateSoulGrave'),
+  },
+  {
+    re: /^Death Sentence falls!$/,
+    build: () => t('sim.rift.detonateDeathSentence'),
+  },
+  {
+    re: /^Earthshatter detonates!$/,
+    build: () => t('sim.rift.detonateEarthshatter'),
+  },
+  {
+    re: /^Final Judgment lands!$/,
+    build: () => t('sim.rift.detonateFinalJudgment'),
+  },
+  {
+    re: /^Void Rift detonates!$/,
+    build: () => t('sim.rift.detonateVoidRift'),
+  },
+  {
+    re: /^Arcane Annihilation erupts!$/,
+    build: () => t('sim.rift.detonateArcaneAnnihilation'),
+  },
+  {
+    re: /^Lightning Rod strikes!$/,
+    build: () => t('sim.rift.detonateLightningRod'),
+  },
+  {
+    re: /^Stormcaller's Wrath erupts!$/,
+    build: () => t('sim.rift.detonateStormcallersWrath'),
+  },
+  {
+    re: /^Abyssal Maw closes!$/,
+    build: () => t('sim.rift.detonateAbyssalMaw'),
+  },
+  {
+    re: /^Crushing Depth crushes!$/,
+    build: () => t('sim.rift.detonateCrushingDepth'),
+  },
+  {
+    re: /^Pact Seal detonates!$/,
+    build: () => t('sim.rift.detonatePactSeal'),
+  },
+  {
+    re: /^Blood Rite falls!$/,
+    build: () => t('sim.rift.detonateBloodRite'),
+  },
+  {
+    re: /^Pit Sentence detonates!$/,
+    build: () => t('sim.rift.detonatePitSentence'),
+  },
+  {
+    re: /^Hellfire Brand detonates!$/,
+    build: () => t('sim.rift.detonateHellfireBrand'),
+  },
   { re: /^You cannot enter a delve right now\.$/, build: () => t('sim.delve.cannotEnterNow') },
   { re: /^Leave the dungeon first\.$/, build: () => t('sim.delve.leaveDungeonFirst') },
   { re: /^Leave the arena first\.$/, build: () => t('sim.delve.leaveArenaFirst') },

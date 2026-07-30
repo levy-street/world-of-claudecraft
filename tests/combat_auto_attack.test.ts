@@ -44,6 +44,18 @@ function makeSim(
   return { sim, p, meta };
 }
 
+// The proc-before-thorns ordering tests can only observe their ordering on a swing
+// that CONNECTS, so they need a seed whose hit-table roll lands above the floor miss
+// chance. This is a hunted fixture, not a tuning value: scan upward and keep the
+// first seed whose first post-construction draw clears the miss floor for all three
+// arms (paladin, shaman, rogue). Re-hunt it whenever an upstream draw site moves.
+// Re-hunted after the Eastbrook camp respacing thinned the zone-1 camp counts, which
+// removes construction-time draws and shifts every later draw: at the previous 26014
+// the roll fell to 0.0034, under the 1.2 percent floor, so the swing missed and the
+// premise vanished (the miss-chance math itself was unchanged). Spares on record:
+// 26016 through 26020 all connect for this drive.
+const CONNECTING_SWING_SEED = 26015;
+
 // An idle hostile mob, beefed, in front of the player at distance dz, targeted + faced.
 function spawnDummy(sim: Sim, p: Entity, level = 5, dz = 2): Entity {
   const mob = createMob(sim.nextId++, MOBS.forest_wolf, level, {
@@ -294,7 +306,7 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
     },
   ])('applies $name before thorns without changing the shared RNG trace', (testCase) => {
     const run = (active: boolean) => {
-      const { sim, p } = makeSim(testCase.cls, 20, 26014);
+      const { sim, p } = makeSim(testCase.cls, 20, CONNECTING_SWING_SEED);
       if (active) {
         expect(sim.applyTalents({ spec: null, rows: testCase.row })).toBe(true);
       }
@@ -333,7 +345,7 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
     // chance for 10 energy), so the proc now draws exactly one rng roll per
     // poisoned swing; the roll resolves before the thorns retaliation.
     const run = (active: boolean) => {
-      const { sim, p } = makeSim('rogue', 20, 26014);
+      const { sim, p } = makeSim('rogue', 20, CONNECTING_SWING_SEED);
       if (active) {
         expect(sim.applyTalents({ spec: null, rows: { 14: 'rog_r14_deadly_brew' } })).toBe(true);
       }

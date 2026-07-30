@@ -10,7 +10,7 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
-import { QUESTS, STATIONS } from '../src/sim/data';
+import { DELVE_X_MIN, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { createMinimapMarkers, type MinimapMarker, minimapMode } from '../src/ui/minimap_markers';
 import type { IWorld } from '../src/world_api';
@@ -128,17 +128,21 @@ describe('minimapMode (delve vs overworld discriminator)', () => {
       player: { pos: { x: number } };
       delveRun: unknown;
     };
-    // A real delve-band x: the band is CAPPED east by the Protect Yumi maze
-    // band (YUMI_BAND_X_MIN = 8000), so the old open-ended 100000 probe now
-    // classifies as the maze.
-    w.player.pos.x = 5000;
-    w.delveRun = { delveId: 'd', modules: ['m'], moduleIndex: 0, origin: { x: 5000, z: 0 } };
+    w.player.pos.x = DELVE_X_MIN + 200; // a delve-band x
+    w.delveRun = {
+      delveId: 'd',
+      modules: ['m'],
+      moduleIndex: 0,
+      origin: { x: DELVE_X_MIN + 200, z: 0 },
+    };
     expect(minimapMode(w as unknown as IWorld)).toBe('delve');
   });
 
   it('returns yumiMaze anywhere in the Protect Yumi band, run or not', () => {
     const w = makeWorld('client') as unknown as { player: { pos: { x: number } } };
-    w.player.pos.x = 8400;
+    // Read the band from data.ts: the grid world relocated every instance band onto
+    // the far-east instance plane, so a literal x here would rot on the next move.
+    w.player.pos.x = YUMI_MAZE_X;
     expect(minimapMode(w as unknown as IWorld)).toBe('yumiMaze');
   });
 });

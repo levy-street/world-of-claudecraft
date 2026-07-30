@@ -79,3 +79,16 @@ export function applyPointLightBudget(
     }
   }
 }
+
+/**
+ * How many renderer-owned pad lights must be visible so the TOTAL visible
+ * point-light count stays pinned at `visibleCount` even when fewer real lights
+ * than the budget exist (boot before props stream in, sparse custom maps,
+ * dungeon interiors). Three counts a light into numPointLights iff `visible`,
+ * and that count is part of every lit material's program cache key, so any
+ * drift recompiles every lit material in view: the open-world travel freeze.
+ * Pad lights carry intensity 0 / distance 0, so they shade nothing.
+ */
+export function pointLightPadCount(rankedCount: number, visibleCount: number): number {
+  return Math.max(0, visibleCount - Math.min(visibleCount, rankedCount));
+}

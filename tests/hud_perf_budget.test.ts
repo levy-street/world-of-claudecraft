@@ -625,6 +625,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // the start of a decode and two of them reads that abandon a decode whose unit changed;
 // perf_graph is handed both its context and its color and reaches for neither.
 const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
+  { file: 'continent_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/delve/delve_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'minimap_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
@@ -693,6 +694,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     driverAllow: {},
   },
   { file: 'bank_window.ts', reflowAllow: { '.scrollTop': 4 }, driverAllow: {} },
+  // The scroll pair and the rAF both belonged to the mount picker's
+  // scroll-the-selected-card-into-view path, which went away when reins became
+  // usable items and the picker was deleted. The sheet now reads nothing and
+  // arms nothing.
+  { file: 'char_window.ts', reflowAllow: {}, driverAllow: {} },
   {
     file: 'crafting_window.ts',
     reflowAllow: { '.scrollTop': 2, '.scrollLeft': 2 },
@@ -805,6 +811,10 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     reflowAllow: { '.getBoundingClientRect': 2, getComputedStyle: 2, '.scrollTop': 2 },
     driverAllow: {},
   },
+  // The bug-report submit path schedules its screenshot capture off the critical
+  // path. ONE call, guarded by a feature check with a setTimeout fallback; the
+  // count is 3 because the optional-API type declaration names it twice more.
+  { file: 'options_window.ts', reflowAllow: {}, driverAllow: { requestIdleCallback: 3 } },
   { file: 'professions_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'spellbook_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The tree height-cap fit: the root's max-height (read through the shared getUiScale
@@ -1040,6 +1050,48 @@ const coldReflowAllowance = new Map(COLD_PAINTER_ALLOWANCES.map((c) => [c.file, 
 const coldDriverAllowance = new Map(COLD_PAINTER_ALLOWANCES.map((c) => [c.file, c.driverAllow]));
 // Every bucket, since a driver allowance is grantable in any of them and the hot/canvas ones
 // hold a hard zero today. Ordered so the pinned scan list below reads in bucket order.
+// The documented exception this file's own #2518 join says to write when a module
+// MENTIONS a driver name more often than it CALLS it. driverAllow counts name
+// occurrences (FRAME_DRIVERS); sweepDriverBodies resolves call sites; a module
+// that feature-detects a driver behind a typed cast names it three times and
+// calls it once, so no single grant can satisfy both halves.
+//
+// This is deliberately NOT a loosening of either counter. Both numbers are
+// recorded here and both are asserted exactly, so the day the source changes in
+// either direction (a second call site appears, or the feature-detect goes) this
+// entry stops matching and the module comes back for a fresh decision instead of
+// silently absorbing it.
+interface DriverNameOnlyException {
+  readonly file: string;
+  readonly driver: string;
+  /** How many times the NAME appears (what driverAllow must grant). */
+  readonly names: number;
+  /** How many of those the BODY SWEEP can resolve to a call it can walk. Zero
+   *  when the driver is invoked through a local of a widened type rather than
+   *  off the global, which is what a feature-detect looks like. */
+  readonly sweepResolvable: number;
+  /** How many of them arm something REPEATING, i.e. owe a per-tick callback
+   *  contract. A one-shot deferral arms nothing and owes none. */
+  readonly repeating: number;
+  readonly why: string;
+}
+const DRIVER_NAME_ONLY: readonly DriverNameOnlyException[] = [
+  {
+    file: 'options_window.ts',
+    driver: 'requestIdleCallback',
+    names: 3,
+    sweepResolvable: 0,
+    repeating: 0,
+    why: 'the bug-report screenshot capture defers itself off the interaction frame once, with a setTimeout(0) fallback. requestIdleCallback is not universally available, so the module names it three times to use it once: the optional member on the widened window type, the feature-detect guard, and the call. The call goes through that widened local rather than off the global, so the body sweep resolves none of the three. It arms nothing repeating, so there is no per-tick contract to declare either.',
+  },
+];
+const driverNameOnlyByFile = new Map(DRIVER_NAME_ONLY.map((e) => [e.file, e]));
+/** Name occurrences an exception accounts for but the body sweep cannot resolve. */
+const DRIVER_NAME_ONLY_UNRESOLVABLE = DRIVER_NAME_ONLY.reduce(
+  (total, e) => total + (e.names - e.sweepResolvable),
+  0,
+);
+
 const DRIVER_HOSTS: ReadonlyArray<DriverHost> = [
   ...HOT_PAINTERS,
   ...CANVAS_PAINTERS,
@@ -1221,6 +1273,55 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
 
   // #2518: a granted driver allowance now costs something. The sweep above says a module
   // repaints on a cadence; this one says what it is allowed to DO on that cadence.
+  // The exception table above is hand-authored, so its three numbers could drift
+  // from the source they describe. `names` is already cross-checked by the cold
+  // driver sweep (it must equal driverAllow, which that sweep counts off real
+  // text). These two assertions computationally check the OTHER two claims, which
+  // are the ones a re-balancing edit could otherwise quietly falsify:
+  //   sweepResolvable - the call must NOT be reachable off the global, which is
+  //                     what makes the body sweep unable to walk it
+  //   repeating       - the call must not sit inside anything that re-arms
+  // Without this, someone could make the callback genuinely recurring, adjust the
+  // table to keep the arithmetic green, and lose the contract silently: exactly
+  // the quiet loosening this exception exists to avoid.
+  it('every DRIVER_NAME_ONLY claim is checked against the real source, not just the table', () => {
+    expect(DRIVER_NAME_ONLY.length, 'the exception table is non-empty').toBeGreaterThan(0);
+    for (const entry of DRIVER_NAME_ONLY) {
+      const src = stripComments(painterRawSource(entry.file));
+      const occurrences = src.split(entry.driver).length - 1;
+      expect(
+        occurrences,
+        `${entry.file}: DRIVER_NAME_ONLY.names says ${entry.names} but the source names ${entry.driver} ${occurrences}x`,
+      ).toBe(entry.names);
+
+      // sweepResolvable: a call the body sweep can walk is one made straight off
+      // the global. Reaching it through a widened local (the feature-detect shape)
+      // is what makes it unresolvable, and it is why the count is 0.
+      const globalCalls = (src.match(new RegExp(`(?<![.\\w])${entry.driver}\\s*\\(`, 'g')) ?? [])
+        .length;
+      expect(
+        globalCalls,
+        `${entry.file}: ${entry.driver} is called off the global ${globalCalls}x, so the body sweep CAN resolve it and sweepResolvable: ${entry.sweepResolvable} is wrong`,
+      ).toBe(entry.sweepResolvable);
+
+      // repeating: count real CALL expressions, not name mentions. A cadence needs
+      // the driver invoked more than once (or re-armed from inside its own
+      // callback, which would itself be a second call expression), so exactly one
+      // call is the shape of a one-shot deferral and cannot be a repeating driver.
+      // Counting calls rather than names is what keeps the feature-detect guard
+      // (`if (x.requestIdleCallback)`) and the type declaration out of the total.
+      const callExpressions = (src.match(new RegExp(`${entry.driver}\\s*\\(`, 'g')) ?? []).length;
+      if (entry.repeating === 0) {
+        expect(
+          callExpressions,
+          `${entry.file}: ${entry.driver} has ${callExpressions} call expressions, so repeating: 0 (a one-shot deferral) is wrong`,
+        ).toBe(1);
+      } else {
+        expect(callExpressions).toBeGreaterThanOrEqual(entry.repeating);
+      }
+    }
+  });
+
   it('a granted repeating driver does only its documented work on each tick', () => {
     const sweep = sweepDriverBodies(DRIVER_HOSTS, painterRawSource);
     expect(sweep.checked, 'the driver-body sweep skipped part of the vocabulary').toEqual([
@@ -1259,9 +1360,10 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
         ),
       0,
     );
-    expect(sweep.resolved, 'a granted driver did not resolve to a real call site').toBe(
-      grantedDrivers,
-    );
+    expect(
+      sweep.resolved + DRIVER_NAME_ONLY_UNRESOLVABLE,
+      'a granted driver did not resolve to a real call site (and no DRIVER_NAME_ONLY entry accounts for it)',
+    ).toBe(grantedDrivers);
     expect(sweep.resolved, 'the driver-body sweep resolved nothing at all').toBeGreaterThan(0);
     // SECOND, exactly which callbacks were walked, both ways. A host list narrowed to an
     // empty slice, or a `drivers` list quietly deleted from an entry, reports zero violations
@@ -1627,8 +1729,8 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       'gone_painter.ts (HOT_PAINTERS: not an on-disk src/ui painter)',
       'b_painter.ts (CANVAS_PAINTERS: classified twice)',
       'c_painter.ts (COLD_PAINTER_ALLOWANCES: not a cold painter, so nothing reads it)',
-      'b_painter.ts (drivers: 1 driver(s) granted by driverAllow, 0 callback allowance(s) declared)',
-      'live_window.ts (drivers: 0 driver(s) granted by driverAllow, 2 callback allowance(s) declared)',
+      'b_painter.ts (drivers: 1 contractable driver(s) of 1 granted by driverAllow, 0 callback allowance(s) declared)',
+      'live_window.ts (drivers: 0 contractable driver(s) of 0 granted by driverAllow, 2 callback allowance(s) declared)',
       'live_window.ts#0 (drivers: "setTimeout" is not a driver label)',
       'live_window.ts#0 (drivers: the granted cadence says what it is for)',
       'live_window.ts#0 (stopsAt: "render" cuts the walk with no reason)',
@@ -1726,9 +1828,13 @@ function registrationProblems(
         0,
       );
       const declaredCallbacks = host.drivers?.length ?? 0;
-      if (granted !== declaredCallbacks) {
+      // A name-only exception grants names it never calls, so those need no
+      // per-tick callback contract: only the resolvable call sites do.
+      const nameOnly = driverNameOnlyByFile.get(host.file);
+      const contractable = granted - (nameOnly ? nameOnly.names - nameOnly.repeating : 0);
+      if (contractable !== declaredCallbacks) {
         problems.push(
-          `${host.file} (drivers: ${granted} driver(s) granted by driverAllow, ${declaredCallbacks} callback allowance(s) declared)`,
+          `${host.file} (drivers: ${contractable} contractable driver(s) of ${granted} granted by driverAllow, ${declaredCallbacks} callback allowance(s) declared)`,
         );
       }
       for (const [index, grant] of (host.drivers ?? []).entries()) {

@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
+import type { SimEvent, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+
+// /follow is pure player-vs-player movement: no ambient camps, npcs or quest
+// objects are involved, so strip them to keep sim.tick() cheap (same
+// subsystem-world pattern as tests/dot_final_tick.test.ts).
+const FOLLOW_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
 
 function entity(sim: Sim, id: number) {
   const found = sim.entities.get(id);
@@ -10,7 +21,7 @@ function entity(sim: Sim, id: number) {
 }
 
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: FOLLOW_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {

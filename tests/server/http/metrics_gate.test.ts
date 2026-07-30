@@ -194,7 +194,6 @@ describe('pg rate-limit store emits on the attack-signal slot (no ratelimit.pg.h
 
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase24_metrics_gate';
 
-const MAX_POLL_TICKS = 5000;
 type MainModule = typeof import('../../../server/main');
 let main: MainModule;
 let savedNodeEnv: string | undefined;
@@ -210,16 +209,12 @@ afterAll(() => {
   else process.env.NODE_ENV = savedNodeEnv;
 });
 
-/** Drive routeHttpRequest for a GET url and poll until the fire-and-forget response ends. */
+/** Drive routeHttpRequest for a GET url and await the fire-and-forget response end. */
 async function drive(url: string, headers?: Record<string, string>): Promise<FakeRes> {
   const req = makeReq({ url, headers });
   const res = new FakeRes();
   main.routeHttpRequest(req, res as unknown as http.ServerResponse);
-  let ticks = 0;
-  while (!res.writableEnded) {
-    if (ticks++ > MAX_POLL_TICKS) throw new Error('response never ended');
-    await new Promise((r) => setImmediate(r));
-  }
+  await res.waitForEnd();
   return res;
 }
 

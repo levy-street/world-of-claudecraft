@@ -60,15 +60,21 @@ describe('WorldContent static gameplay services', () => {
     ).not.toThrow();
   });
 
-  it('rejects a custom noticeboard id before the next player spawn can overwrite it', () => {
+  it('rejects a custom noticeboard id before the next dynamic spawn can overwrite it', () => {
     const empty = worldWithoutServices();
     setActiveWorldContent(empty);
     const probe = new Sim({ seed: 71, playerClass: 'warrior', noPlayer: true, world: empty });
     const collidingEntityId = probe.nextId;
     expect(collidingEntityId).toBeLessThan(STATIC_WORLD_SERVICE_ENTITY_ID_MIN);
     expect(probe.entities.has(collidingEntityId)).toBe(false);
+    // The rejection below is a pure range check, so it only guards something real if
+    // this id is one the sequential allocator genuinely hands out. Assert live
+    // OCCUPANCY in a player-bearing sim rather than equality with playerId: the
+    // constructor spawns entities on both sides of the player's own allocation, so
+    // the slot the serviceless probe left free is taken by an ordinary world spawn.
     const playerProbe = new Sim({ seed: 71, playerClass: 'warrior', world: empty });
-    expect(playerProbe.playerId).toBe(collidingEntityId);
+    expect(playerProbe.entities.has(collidingEntityId)).toBe(true);
+    expect(playerProbe.playerId).toBeLessThan(STATIC_WORLD_SERVICE_ENTITY_ID_MIN);
 
     const world: WorldContent = {
       ...empty,

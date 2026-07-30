@@ -845,7 +845,7 @@ describe('Vale Cup: sport moves', () => {
     // Live-balance pin: keepers line up ON their goal line at every kickoff and
     // the whistle grace clamps a charged shot to the short-touch profile, so an
     // instant unchallenged shot from the center spot is savable, not a goal.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Solo' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Solo' });
     sim.vcupPracticeStart(3); // the bot side's seat 0 keeps goal
     const match = sim.vcup.practices[0];
     readyAll(sim);
@@ -964,7 +964,7 @@ describe('Vale Cup: sport moves', () => {
     // the human idle, the all-bot attack must not run away. Shot range gate +
     // deterministic aim error + a slower decision cadence keep the scoreline
     // human-playable. Deterministic (zero rng), so these are hard bounds.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Idle' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Idle' });
     sim.vcupPracticeStart(3);
     const match = sim.vcup.practices[0];
     readyAll(sim);

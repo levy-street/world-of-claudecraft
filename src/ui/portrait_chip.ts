@@ -59,6 +59,11 @@ export interface PortraitChipOpts {
    *  the pre-game choose/create screens pass classIconUrl(cls); every in-game
    *  HUD chip omits it and keeps the live 3D render. Never hydrates. */
   iconUrl?: string;
+  /** Omit the potentially large data URL from generated HTML and let
+   *  hydratePortraits assign it after the subtree is mounted. Useful for dense
+   *  repeated grids where embedding one cached portrait dozens of times would
+   *  create multi-megabyte innerHTML strings. Assets must already be ready. */
+  deferSource?: boolean;
 }
 
 /** Class crest data URL — the placeholder before the 3D portrait is ready and
@@ -70,12 +75,24 @@ function crestUrl(cls: PlayerClass): string {
 /** Build a portrait-chip HTML string. Call {@link hydratePortraits} on the
  *  container afterwards (or rely on the global ready hook to upgrade it). */
 export function portraitChipHtml(opts: PortraitChipOpts): string {
-  const { cls, skin = 0, name, variant = 'sm', badge = true, framing = 'headshot', iconUrl } = opts;
-  // A painted class icon (iconUrl) wins over the 3D portrait and never hydrates.
-  const portrait = iconUrl ?? playerPortraitDataUrl(cls, skin, framing);
-  const src = portrait ?? crestUrl(cls);
-  const pending = portrait ? '' : ' data-portrait-pending="1"';
-  const fallbackCls = portrait ? '' : ' is-fallback';
+  const {
+    cls,
+    skin = 0,
+    name,
+    variant = 'sm',
+    badge = true,
+    framing = 'headshot',
+    iconUrl,
+    deferSource = false,
+  } = opts;
+  // A painted class icon (iconUrl) wins over the 3D portrait, never hydrates, and
+  // ignores deferSource (a static icon URL is small enough to embed inline).
+  const defer = deferSource && !iconUrl;
+  const portrait = iconUrl ?? (defer ? null : playerPortraitDataUrl(cls, skin, framing));
+  const src = defer ? null : (portrait ?? crestUrl(cls));
+  const source = src ? ` src="${src}"` : '';
+  const pending = portrait && !defer ? '' : ' data-portrait-pending="1"';
+  const fallbackCls = portrait && !defer ? '' : ' is-fallback';
   const alt = esc(t('character.portraitAlt', { name }));
   // The painted icon is already class-art, so its crest badge would be redundant.
   const badgeHtml =
@@ -84,7 +101,7 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
       : '';
   return (
     `<span class="portrait-chip portrait-${variant}${fallbackCls}" data-class="${cls}" data-cls="${cls}" data-skin="${skin}" data-framing="${framing}"${pending}>` +
-    `<span class="portrait-ring"><img class="portrait-img" src="${src}" alt="${alt}" draggable="false"></span>` +
+    `<span class="portrait-ring"><img class="portrait-img"${source} alt="${alt}" loading="lazy" decoding="async" draggable="false"></span>` +
     badgeHtml +
     `</span>`
   );
@@ -102,7 +119,11 @@ export function hydratePortraits(root: ParentNode = document): void {
     const url = playerPortraitDataUrl(cls, skin, framing);
     if (!url) return;
     const img = chip.querySelector<HTMLImageElement>('.portrait-img');
-    if (img) img.src = url;
+    if (img) {
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.src = url;
+    }
     chip.classList.remove('is-fallback');
     chip.removeAttribute('data-portrait-pending');
   });

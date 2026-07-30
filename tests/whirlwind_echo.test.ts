@@ -152,7 +152,9 @@ describe('single-target casts echo onto enemies near the target', () => {
   });
 
   it('(d) Red Harvest consumes ONE charge and echoes all three strikes', () => {
-    const { sim, p } = makeSim();
+    // This seed lands all three independently rolled weapon strikes. The
+    // default integration seed deterministically dodges the middle strike.
+    const { sim, p } = makeSim(31338);
     const { primary, near, far } = arena(sim, p);
     p.resource = 100;
     sim.castAbility('whirlwind');

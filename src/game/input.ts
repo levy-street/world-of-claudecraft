@@ -90,7 +90,8 @@ export interface InputCallbacks {
       | 'deeds'
       | 'professions'
       | 'crafting'
-      | 'sheathe',
+      | 'sheathe'
+      | 'mount',
   ): void;
   onEmoteWheel(open: boolean): void;
   onClickPick(x: number, y: number, button: number): void;
@@ -1015,6 +1016,9 @@ export class Input {
         return;
       case 'dungeonFinder':
         this.cb.onUiKey('dungeonFinder');
+        return;
+      case 'mount':
+        this.cb.onUiKey('mount');
         return;
       case 'valecup':
         this.cb.onUiKey('valecup');

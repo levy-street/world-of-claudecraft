@@ -74,19 +74,26 @@ function resolveAimedCast(sim: Sim, pid: number): ReturnType<typeof aimedFx> {
 describe('ground-targeted casting (Flamestrike)', () => {
   it('detonates at the aimed point (ring event + damage there), not on the caster', () => {
     const { sim, pid } = makeMage();
-    place(sim, pid, 0, 0);
-    const atAim = spawnWolfAt(sim, 18, 0);
-    const atCaster = spawnWolfAt(sim, 0, 2);
+    // Re-anchored to the collider-free OPEN_FIELD lane (was the town hub at 0,0)
+    // after the Eastbrook camp respacing thinned the zone-1 camp counts: camp
+    // discs feed groundHeight and prop placement (src/sim/world.ts reads CAMPS
+    // for every height sample), so respacing them moved the hub props enough to
+    // BLOCK line of sight from (0,0) to (18,0). aoeDamage skips any target the
+    // caster cannot see, so the aimed wolf took nothing. Same geometry, same
+    // numbers, on the lane the sibling clamp test already uses.
+    place(sim, pid, OPEN_FIELD.x, OPEN_FIELD.z);
+    const atAim = spawnWolfAt(sim, OPEN_FIELD.x + 18, OPEN_FIELD.z);
+    const atCaster = spawnWolfAt(sim, OPEN_FIELD.x, OPEN_FIELD.z + 2);
     sim.drainEvents();
 
-    sim.castAbility('flamestrike', pid, { x: 18, z: 0 }); // within range 30
+    sim.castAbility('flamestrike', pid, { x: OPEN_FIELD.x + 18, z: OPEN_FIELD.z }); // within range 30
 
     const fx = resolveAimedCast(sim, pid);
     expect(fx).toBeDefined();
-    expect(fx?.x).toBeCloseTo(18, 1);
+    expect(fx?.x).toBeCloseTo(OPEN_FIELD.x + 18, 1);
     expect(fx?.radius).toBe(7); // the AoE ring size rides the event
     expect(atAim.hp).toBeLessThan(5000);
-    expect(atCaster.hp).toBe(5000); // 16yd from the blast: untouched
+    expect(atCaster.hp).toBe(5000); // 18yd from the blast: untouched
   });
 
   it('clamps the aimed point to the ability range from the caster', () => {

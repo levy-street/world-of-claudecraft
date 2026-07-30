@@ -593,7 +593,11 @@ describe('axe: social window', () => {
 // ---------------------------------------------------------------------------
 
 describe('axe: character window', () => {
-  it('paperdoll sheet is clean (dialog role + role=img preview host)', async () => {
+  it('paperdoll and preview are clean and keep their own accessible names', async () => {
+    // The mount picker used to live in this sheet and this test drove it. Reins are
+    // usable items now (bags / action bar -> useItem), so the sheet has no picker
+    // and no mount rows to focus; what is left to hold is the dialog naming and the
+    // preview's own name, which is what the axe pass below actually protects.
     const root = host('char-window');
     root.style.display = 'none';
     const win = new CharWindow(
@@ -602,9 +606,10 @@ describe('axe: character window', () => {
         world: () =>
           ({
             cfg: { playerClass: 'warrior' },
-            player: { name: 'Aurelia', level: 60, skin: 0 },
+            player: { name: 'Aurelia', level: 12, skin: 0, mountKey: '' },
             equipment: {},
             professionsState: { skills: [] },
+            ownedMounts: () => ['valorsteed', 'grag_bear', 'stalkglider_snail'],
           }) as never,
         statCellHtml: () => '',
         statTooltipHtml: () => '',
@@ -617,6 +622,11 @@ describe('axe: character window', () => {
         renderSkinPicker: () => {
           const row = root.querySelector('#char-skin-row');
           if (row) row.innerHTML = '<button type="button" role="listitem">1</button>';
+        },
+        attachTooltip: (el: HTMLElement) => {
+          el.addEventListener('focusin', () => {
+            el.dataset.tooltipOpened = 'true';
+          });
         },
         captureFocus: () => null,
       }),
@@ -632,6 +642,10 @@ describe('axe: character window', () => {
     const titleSubtitle = root.querySelector('#char-title .panel-subtitle')?.textContent ?? '';
     expect(previewName).toBe(t('hudChrome.character.modelPreview'));
     expect(previewName).not.toBe(titleSubtitle);
+    // The picker is GONE, not merely unpopulated: a stray mount row here would mean
+    // the sheet grew a second way to summon a mount beside the reins item.
+    expect(root.querySelector('[data-mount-key]')).toBeNull();
+    expect(root.querySelector('.mount-picker')).toBeNull();
     await expectClean(root);
   });
 });

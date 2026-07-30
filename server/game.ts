@@ -50,6 +50,8 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
+import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
+import { populateCommunityRiftPortals } from '../src/sim/rift/portals';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { RAID_MAX } from '../src/sim/social/party';
@@ -75,6 +77,7 @@ import {
   RUN_SPEED,
   type SimEvent,
   type SportRole,
+  type UnstuckBlockedReason,
   type VcBracket,
   type VcNationId,
 } from '../src/sim/types';
@@ -125,6 +128,7 @@ import {
   loadAccountFlair,
   loadMailState,
   loadMarketState,
+  loadRiftState,
   markAccountQuestComplete,
   openPlaySession,
   pool,
@@ -134,6 +138,7 @@ import {
   saveCharacterState,
   saveMailState,
   saveMarketState,
+  saveRiftState,
   setAccountWeaponSkinLoadout,
   setCharacterHotbarLayout,
   touchCharacterLogin,
@@ -201,9 +206,12 @@ import {
   tallyDrop,
 } from './msg_rate_limit';
 import { PartyFrameProjectionCache } from './party_frame_projection';
+import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
 import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
+import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
+import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
 import { createSerialWriter } from './serial_writer';
 import {
   jsonWithField,
@@ -220,6 +228,7 @@ import { PgSocialDb } from './social_db';
 import { reconcileOnLogin } from './steam/mirror';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
+import { recordUnstuckEvent } from './unstuck_records';
 import { holderInfoForPubkey } from './woc_balance';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -323,6 +332,8 @@ export const MOB_UPDATE_BUCKETS = [
   'elemental',
   'dragonkin',
   'demon',
+  'kobold',
+  'murloc',
   'reptile',
   'other',
 ] as const satisfies readonly (MobFamily | 'other')[];
@@ -393,7 +404,7 @@ export const SIM_MOB_ZONE_PHASES = [
 // (a cheap zoneAt band scan plus a Map lookup of an interned string).
 export function mobZonePhase(mob: Entity): string {
   if (mob.pos.x > DUNGEON_X_THRESHOLD) return MOB_ZONE_PHASE_INSTANCE;
-  return MOB_ZONE_PHASE_BY_ID.get(zoneAt(mob.pos.z).id) ?? MOB_ZONE_PHASE_OTHER;
+  return MOB_ZONE_PHASE_BY_ID.get(zoneAt(mob.pos.x, mob.pos.z).id) ?? MOB_ZONE_PHASE_OTHER;
 }
 
 const ARENA_WIRE_HZ = 0.1;
@@ -449,6 +460,7 @@ type ClientMessage = Record<string, unknown> & {
   mode?: string;
   n?: string;
   name?: string;
+  mount?: string;
   nation?: string;
   node?: string;
   npc?: number;
@@ -468,6 +480,8 @@ type ClientMessage = Record<string, unknown> & {
   skin?: number;
   slot?: number | string;
   spec?: unknown;
+  stat?: string;
+  gem?: string;
   t?: string;
   tags?: unknown;
   text?: string;
@@ -535,12 +549,17 @@ const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'enter_delve',
   'duel_req',
   'duel_accept',
+  'unstuck',
   'card_queue_join',
 ]);
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'inv_move', // rewrites the inventory array order: the self snapshot must resend it
   'unequip_item',
+  'salvage_item',
+  'rift_upgrade_item',
+  'rift_enchant_item',
+  'rift_socket_gem',
   'equip_bag',
   'unequip_bag',
   'use',
@@ -566,6 +585,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',
+  'mount_toggle',
   'change_weapon_skin',
   'prestige',
   'market_list',
@@ -934,6 +954,10 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.wings) out.wg = 1; // wings back-cosmetic (render-only, like bd)
   if (e.hairColor !== undefined) out.hcl = e.hairColor;
   if (e.faceColor !== undefined) out.fcl = e.faceColor;
+  // Active rideable mount ('' omitted). This identity field is intentionally
+  // distinct from the self-only persisted pick (`mntSel`): using `mnt` for both
+  // made the appended self delta overwrite the live riding state in JSON.
+  if (e.mountKey) out.mnt = e.mountKey;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
@@ -990,6 +1014,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.guild) out.gd = e.guild;
   if (e.title) out.title = e.title; // Book of Deeds active title (a deed id; the client localizes)
   if (e.dungeonId) out.dgn = e.dungeonId;
+  if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
   if (e.objectItemId) out.obj = e.objectItemId;
   if (e.scale !== 1) out.sc = e.scale;
   if (e.color !== 0xffffff) out.c = e.color;
@@ -1087,7 +1112,15 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.castTot = round2(e.castTotal);
     if (e.channeling) out.chan = 1;
   }
+  // Mount summon/dismount transition, so every client can time the summon FX / call
+  // pose and the self-extrapolator can root the local player in lockstep. Volatile
+  // (rides the per-tick dynamic fields, not identity): mcr omitted when idle (0), mck
+  // omitted while dismounting or idle (''). The sim reads mountCastRemaining (movement
+  // root), so it is actionable and always rides when non-zero.
+  if (e.mountCastRemaining) out.mcr = round2(e.mountCastRemaining);
+  if (e.mountCastKey) out.mck = e.mountCastKey;
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
+  if (e.riftSliding) out.sld = 1; // ice-slide: render a frozen gliding pose
   // Ledge climb: quantized progress (1..99), not the arc. The client never
   // re-simulates the pull (the server owns it and streams the resulting
   // positions); it needs to know a climb is running, to stop predicting a
@@ -1314,6 +1347,10 @@ export interface PerfCaptureStatus {
   last: PerfCaptureResult | null;
 }
 
+export interface GameServerOptions {
+  readonly communityTestRifts?: boolean;
+}
+
 export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
@@ -1359,6 +1396,7 @@ export class GameServer {
   private readonly partyFrameProjectionCache = new PartyFrameProjectionCache();
   private lastWireSweepTick = 0;
   private interval: NodeJS.Timeout | null = null;
+  private draining = false;
   private holderTierInterval: NodeJS.Timeout | null = null;
   private keepaliveInterval: NodeJS.Timeout | null = null;
   // Wall-clock ms at which the keepalive sweep last ran, so a sweep can tell whether
@@ -1394,6 +1432,7 @@ export class GameServer {
   // older snapshot over a newer one. Snapshots are captured inside the queued
   // thunk, so commit order equals capture order equals freshness order.
   private readonly enqueueMarketWrite = createSerialWriter();
+  private readonly enqueueRiftWrite = createSerialWriter();
   private restartCountdownStartedAt: number | null = null;
   private readonly restartCountdownTimers: NodeJS.Timeout[] = [];
   private readonly startedAt = Date.now();
@@ -1483,8 +1522,12 @@ export class GameServer {
   // Throttle for the optional over-budget stutter log (PERF_TICK_LOG=1).
   private lastPerfLogTick = 0;
   private readonly ipSessionCounts = new Map<string, number>();
+  private readonly riftUpgrader: RiftUpgradeCoordinator;
+  private readonly riftAssets: RiftAssetCoordinator;
+  private readonly communityTestRifts: boolean;
 
-  constructor() {
+  constructor(options: GameServerOptions = {}) {
+    this.communityTestRifts = options.communityTestRifts ?? false;
     this.sim = new Sim({
       seed: WORLD_SEED,
       playerClass: 'warrior',
@@ -1493,6 +1536,9 @@ export class GameServer {
       // Thunzharr is up as soon as the realm boots; subsequent rises keep the
       // normal interval cadence (see src/sim/world_boss.ts).
       worldBossAtBoot: true,
+      // Ranked rift portals spawn on the live realm (dev/test worlds opt in).
+      riftPortals: true,
+      communityRifts: this.communityTestRifts,
       lockoutNowMs: () => Date.now(),
       // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
       // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
@@ -1519,6 +1565,8 @@ export class GameServer {
       },
       valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
     });
+    this.riftUpgrader = new RiftUpgradeCoordinator(riftUpgraderConfigFromEnv());
+    this.riftAssets = new RiftAssetCoordinator(riftAssetConfigFromEnv());
     this.social = new SocialService(this.socialDb, this.socialTransport());
     this.moderation = new ModerationService(this.moderationHost(), {
       recordAction: (input) => recordInGameAction(input),
@@ -1850,7 +1898,8 @@ export class GameServer {
     // and walk-up spectators inside the footprint report the venue, not the
     // vale. English at the source like the dungeon/delve names above; the
     // client re-localizes the label (src/ui/server_i18n.ts localizeZone).
-    const zone = instanceZone ?? (isAtSowfield(pos.x, pos.z) ? 'The Sowfield' : zoneAt(pos.z).name);
+    const zone =
+      instanceZone ?? (isAtSowfield(pos.x, pos.z) ? 'The Sowfield' : zoneAt(pos.x, pos.z).name);
     return { zone, status, x: pos.x, z: pos.z };
   }
 
@@ -2014,8 +2063,12 @@ export class GameServer {
           while (acc >= DT) {
             this.clearStaleInputs();
             lap('stale');
+            this.riftUpgrader.drain(this.sim.ctx);
+            this.riftAssets.drain(this.sim.ctx);
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
+            this.riftUpgrader.observe(this.sim.ctx);
+            this.riftAssets.observe(this.sim.ctx);
             lap('tick');
             // Fold this tick's mob-scan counts before the next tick resets them: the
             // latest-tick values feed the heartbeat, and an in-flight capture sums and
@@ -2103,6 +2156,7 @@ export class GameServer {
       void this.saveAll('autosave');
       void this.saveMarket();
       void this.saveMail();
+      void this.saveRifts();
       void heartbeatCharacterLeases().catch((err) => console.error('lease heartbeat failed:', err));
     }
   }
@@ -2198,6 +2252,21 @@ export class GameServer {
     if (this.playtimeInterval) clearInterval(this.playtimeInterval);
     if (this.dailyRewardActivityInterval) clearInterval(this.dailyRewardActivityInterval);
     if (this.keepaliveInterval) clearInterval(this.keepaliveInterval);
+  }
+
+  /**
+   * Freeze inbound gameplay before the shutdown snapshot and terminally record
+   * every accepted recovery attempt while its session identity is still live.
+   * Synchronous flagging and cancellation make repeated calls idempotent and
+   * leave no window for a buffered /unstuck command to start after the sweep.
+   */
+  beginShutdown(): number {
+    this.draining = true;
+    let cancelled = 0;
+    for (const session of this.clients.values()) {
+      if (this.cancelAndRecordUnstuck(session)) cancelled++;
+    }
+    return cancelled;
   }
 
   // Grant playtime reward points to each online account that has been ACTIVE (gave
@@ -2317,7 +2386,7 @@ export class GameServer {
     const zone = e
       ? e.dungeonId
         ? (DUNGEONS[e.dungeonId]?.name ?? e.dungeonId)
-        : zoneAt(e.pos.z).name
+        : zoneAt(e.pos.x, e.pos.z).name
       : REALM;
     // In-game: a system broadcast everyone sees (variable-routed; S3 guard skips it).
     this.broadcastSystem(`[${command.tag}] ${session.name}: ${message || command.label}`);
@@ -2793,6 +2862,21 @@ export class GameServer {
       const e = this.sim.entities.get(pid);
       if (e && e.level < 20) this.sim.setPlayerLevel(20, pid);
     }
+    // PBE only (PBE_BOOST_ACCOUNTS=1): top the character up to the current
+    // boost kit once per BOOST_KIT_VERSION (true-BiS gear for every spec, BiS
+    // bags, riding, attunement), so a roster created before the boost existed,
+    // or before a kit revision, re-kits at its next login. The stamp rides the
+    // character state and persists through the normal save path. Never
+    // allowed to fail the join.
+    if (pbeBoostEnabled()) {
+      try {
+        if (applyBoostKitToPlayer(this.sim, pid)) {
+          console.log(`pbe boost kit topped up: ${name} (character ${characterId})`);
+        }
+      } catch (err) {
+        console.error('pbe boost kit top-up failed:', err);
+      }
+    }
     const accountCosmetics = this.rememberAccountCosmetics(
       accountId,
       meta.accountCosmetics ?? {
@@ -3054,6 +3138,7 @@ export class GameServer {
     if (session.left || session.linkdead || !this.clients.has(session.pid)) return false;
     if (session.spectating) this.exitSpectate(session, false);
     if (session.jailVisit) this.exitJailVisit(session, false);
+    this.cancelAndRecordUnstuck(session);
     session.linkdead = true;
     session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
     this.botDetector.setTrackingConnection(session.botTrackingContext, false);
@@ -3134,6 +3219,7 @@ export class GameServer {
     if (session.left || !this.clients.has(session.pid)) return;
     if (session.spectating) this.exitSpectate(session, false);
     if (session.jailVisit) this.exitJailVisit(session, false);
+    this.cancelAndRecordUnstuck(session);
     session.left = true;
     this.clients.delete(session.pid);
     this.botDetector.releaseTrackingContext(session.botTrackingContext);
@@ -3399,6 +3485,41 @@ export class GameServer {
     }
   }
 
+  async loadRifts(): Promise<void> {
+    try {
+      loadRiftWorldState(this.sim.ctx, await loadRiftState(), Date.now(), {
+        strict: this.communityTestRifts,
+      });
+    } catch (err) {
+      console.error('failed to load shared Rift state:', err);
+      if (this.communityTestRifts) throw err;
+      return;
+    }
+    if (!this.communityTestRifts) return;
+
+    populateCommunityRiftPortals(this.sim.ctx);
+    try {
+      await this.persistRifts();
+    } catch (err) {
+      console.error('failed to save shared Rift state:', err);
+      throw err;
+    }
+  }
+
+  private async persistRifts(): Promise<void> {
+    await this.enqueueRiftWrite(() =>
+      saveRiftState(serializeRiftWorldState(this.sim.ctx, Date.now())),
+    );
+  }
+
+  async saveRifts(): Promise<void> {
+    try {
+      await this.persistRifts();
+    } catch (err) {
+      console.error('failed to save shared Rift state:', err);
+    }
+  }
+
   rekeyMarketSeller(characterId: number, oldName: string, newName: string): boolean {
     return this.sim.rekeyMarketSeller(characterId, oldName, newName);
   }
@@ -3629,7 +3750,9 @@ export class GameServer {
     const dungeonId = e.dungeonId ?? instance?.dungeonId ?? null;
     if (dungeonId) {
       const dungeon = DUNGEONS[dungeonId];
-      const zone = dungeon ? zoneAt(dungeon.doorPos.z) : zoneAt(e.pos.z);
+      const zone = dungeon
+        ? zoneAt(dungeon.doorPos.x, dungeon.doorPos.z)
+        : zoneAt(e.pos.x, e.pos.z);
       return {
         kind: 'dungeon',
         zoneId: zone.id,
@@ -3646,7 +3769,7 @@ export class GameServer {
     const delveRun = this.sim.delveRunForPlayer(e.id);
     if (delveRun) {
       const delve = DELVES[delveRun.delveId];
-      const zone = delve ? zoneAt(delve.doorPos.z) : zoneAt(e.pos.z);
+      const zone = delve ? zoneAt(delve.doorPos.x, delve.doorPos.z) : zoneAt(e.pos.x, e.pos.z);
       return {
         kind: 'delve',
         zoneId: zone.id,
@@ -3660,7 +3783,7 @@ export class GameServer {
       };
     }
 
-    const zone = zoneAt(e.pos.z);
+    const zone = zoneAt(e.pos.x, e.pos.z);
     let bestIndex: number | null = null;
     let bestDistance = ADMIN_LOCATION_POI_RADIUS;
     for (let i = 0; i < zone.pois.length; i++) {
@@ -3927,6 +4050,10 @@ export class GameServer {
     // session and starts the awaited persistence flush. Never let that stale
     // authority mutate live state after the character snapshot was captured.
     if (session.left || this.clients.get(session.pid) !== session) return;
+    // beginShutdown flips this before its cancellation sweep. Buffered frames
+    // must not mutate gameplay after that point or create an unstuck attempt
+    // that can neither tick nor be included in the shutdown snapshot.
+    if (this.draining) return;
     gameMetricsCounters().wsMessage('in');
     const receivedAtMs = Date.now();
     const gate = consumeInboundFrame(session.msgRate, receivedAtMs / 1000, raw.length);
@@ -4077,10 +4204,18 @@ export class GameServer {
       return;
     }
     if (session.spectating) {
+      if (msg.cmd === 'unstuck') {
+        this.sendUnstuckBlocked(session, 'spectating');
+        return;
+      }
       if (msg.cmd !== 'chat' || typeof msg.text !== 'string') return;
       const text = msg.text.trim();
       if (canAttemptModerationCommands(session) && this.moderation.handleChatCommand(session, text))
         return;
+      if (/^\/unstuck\s*$/i.test(text)) {
+        this.sendUnstuckBlocked(session, 'spectating');
+        return;
+      }
       if (this.isSpectateLocalChat(session, text)) {
         this.sendChatNotice(session, 'Local chat is unavailable while spectating.');
         return;
@@ -4119,7 +4254,8 @@ export class GameServer {
     // instance entry would teleport it out of the cage and the jail enforcement
     // straight back, ruining the match for everyone else in it.
     if (session.jailed && typeof msg.cmd === 'string' && JAILED_BLOCKED_COMMANDS.has(msg.cmd)) {
-      this.sendChatNotice(session, 'You cannot do that while jailed.');
+      if (msg.cmd === 'unstuck') this.sendUnstuckBlocked(session, 'jailed');
+      else this.sendChatNotice(session, 'You cannot do that while jailed.');
       this.sendCommandOutcome(session, msg, false);
       return;
     }
@@ -4402,6 +4538,19 @@ export class GameServer {
         // inv/purse mirrors on the next snapshot.
         if (typeof msg.item === 'string') sim.unbindItem(msg.item, pid);
         break;
+      case 'rift_upgrade_item':
+        if (typeof msg.item === 'string') sim.upgradeRiftItem(msg.item, pid);
+        break;
+      case 'rift_enchant_item':
+        if (typeof msg.item === 'string' && typeof msg.stat === 'string') {
+          sim.enchantRiftItem(msg.item, msg.stat, pid);
+        }
+        break;
+      case 'rift_socket_gem':
+        if (typeof msg.item === 'string' && typeof msg.gem === 'string') {
+          sim.socketRiftGem(msg.item, msg.gem, pid);
+        }
+        break;
       case 'place_mobile_station':
         if (typeof msg.craft === 'string') sim.placeMobileStation(msg.craft, pid);
         break;
@@ -4448,6 +4597,39 @@ export class GameServer {
       case 'unequip_mech_chroma':
         if (typeof msg.chroma === 'string') this.unequipAccountMechChroma(session, msg.chroma);
         break;
+      // Rideable mounts: the Sim re-validates everything (catalog key, level
+      // gate, combat gate); the entity mirror + self `mnt` field carry the result.
+      case 'mount_toggle':
+        sim.toggleMountFor(pid);
+        break;
+      // Riding lesson: the Sim re-validates everything (level, range, quest
+      // state, fee, session state).
+      case 'mount_train_begin':
+        sim.mountTrainBeginFor(pid);
+        break;
+      case 'mount_train_answer':
+        // Deprecated no-op (the removed lean-cue lesson's answer command). The
+        // token stays in COMMAND_NAMES (append-only, dispatch-only); the server
+        // ignores it and a modern client never sends it.
+        break;
+      case 'mount_train_abort':
+        // Dispatch-only (no HUD sends it anymore): abandons an active lesson,
+        // the fee stays paid.
+        sim.mountTrainAbortFor(pid);
+        break;
+      // Riding skill purchase: player buys Riding from Marla for 80g. The Sim
+      // re-validates NPC identity, range, level, and funds.
+      case 'learn_riding':
+        if (typeof msg.npc === 'number') sim.learnRidingFor(msg.npc, pid);
+        break;
+      // Show-jumping race: the Sim re-validates the glowing platform, lesson or
+      // mount eligibility, and liveness before arming the countdown.
+      case 'mount_race_start':
+        sim.mountRaceStartFor(pid);
+        break;
+      case 'mount_race_cancel':
+        sim.mountRaceCancelFor(pid);
+        break;
       // Season 1 Armory: apply (skin: string) or detach (skin: null + wtype) a
       // purchased weapon skin. Ownership is checked against account cosmetics
       // here; the Sim re-validates the equipped-weapon-type match.
@@ -4484,6 +4666,9 @@ export class GameServer {
       case 'release':
         sim.releaseSpirit(pid);
         break;
+      case 'unstuck':
+        sim.unstuck(pid);
+        break;
       case 'resurrect_corpse':
         sim.resurrectAtCorpse(pid);
         break;
@@ -4506,6 +4691,13 @@ export class GameServer {
           this.moderation.handleChatCommand(session, text)
         )
           break;
+        // Recovery is a gameplay command, not broadcast chat. Keep it usable
+        // while muted and outside the chat token bucket, then route through the
+        // same authoritative system as the dedicated Settings action.
+        if (/^\/unstuck\s*$/i.test(text)) {
+          sim.unstuck(pid);
+          break;
+        }
         // The player's own ignore/block commands. Deliberately BEFORE isChatMuted
         // and the rate limiter: a GM-silenced player must still be able to manage
         // their own lists, and a list readout must not burn a chat token toward
@@ -5581,7 +5773,7 @@ export class GameServer {
           ents.push(auraChanged ? cache.liteAuraJson : cache.liteJson);
         }
         // forget entities that left interest, so a re-entry sends identity again
-        for (const id of session.sentEnts.keys()) {
+        for (const [id] of session.sentEnts) {
           if (!present.has(id)) session.sentEnts.delete(id);
         }
         const selfStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
@@ -5937,10 +6129,10 @@ export class GameServer {
     // sizes, the live strip, the winners and guild boards, who is practicing) rides
     // `vcupb`, serialized ONCE per broadcast pass by the realm-readout memo and
     // reused across every viewer. A fresh join or a spectate enter/exit clears
-    // lastSent, so the `sent['vcup'] === undefined` arm re-ships both keys
+    // lastSent, so the `sent.vcup === undefined` arm re-ships both keys
     // immediately even between due passes (the old per-session negative-init did
     // this; the dueness gate alone would not, so keep this arm).
-    if (vcupDue || sent['vcup'] === undefined) {
+    if (vcupDue || sent.vcup === undefined) {
       const shared = realmReadoutObject(this.realmReadout, this.sim.tickCount, () =>
         this.sim.cupSharedInfoFor(),
       );
@@ -6067,6 +6259,20 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
+    // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
+    // every mount whose reins item sits in bags or bank. A handful of short
+    // strings whose serialized form only changes on a loot/bank move, so the
+    // per-tick diff is negligible. Wire key `mntOwn`.
+    maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
+    // Riding skill: persisted, so the client knows whether to show the riding
+    // trainer UI without waiting on a mount/select command to fail. Wire key
+    // `mntRtd`; delta-guarded, only changes once (false to true, never back).
+    maybe('mntRtd', meta.ridingTrained === true ? true : null);
+    // Session-only lesson and race state must still reconcile after linkdead:
+    // events sent while the socket is absent are not replayed on resume. These
+    // self deltas are authoritative and clear stale client mirrors with false/null.
+    maybe('mntLesson', this.sim.mountLessonActiveFor(anchorSession.pid));
+    maybe('mntRace', this.sim.mountRaceViewFor(anchorSession.pid));
     // Book of Deeds: the Renown total and the selected title id, cheap
     // scalars diffed per tick (grants land from sim sites that never mark
     // this session dirty, and the title echo must not wait on the heavy gate).
@@ -6089,6 +6295,7 @@ export class GameServer {
       maybe('bags', meta.bags);
       maybe('buyback', meta.vendorBuyback);
       maybe('equip', meta.equipment);
+      maybe('einst', meta.equipmentInstance);
       maybe('cosmetics', anchorSession.accountCosmetics);
       maybe('qlog', [...meta.questLog.values()]);
       maybe('qdone', [...meta.questsDone]);
@@ -6265,6 +6472,19 @@ export class GameServer {
     // inline.
     const deedUnlocks = new Map<ClientSession, string[]>();
     for (const ev of events) {
+      if (ev.type === 'unstuck' && ev.pid !== undefined) {
+        const session = this.clients.get(ev.pid);
+        if (session) {
+          recordUnstuckEvent(
+            {
+              realm: REALM,
+              accountId: session.accountId,
+              characterId: session.characterId,
+            },
+            ev,
+          );
+        }
+      }
       if (ev.type === 'deedUnlocked' && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (s) {
@@ -6851,6 +7071,26 @@ export class GameServer {
   // client already renders for rate-limit / cooldown messages).
   private sendChatNotice(session: ClientSession, text: string): void {
     this.send(session, { t: 'events', list: [{ type: 'error', text }] });
+  }
+
+  private sendUnstuckBlocked(session: ClientSession, reason: UnstuckBlockedReason): void {
+    this.send(session, { t: 'events', list: [{ type: 'unstuck', phase: 'blocked', reason }] });
+  }
+
+  private cancelAndRecordUnstuck(session: ClientSession): boolean {
+    // Do not enqueue this event on the sim bus: linkdead sessions remain in the
+    // client map, where detectActivity would otherwise record it a second time.
+    const event = this.sim.cancelUnstuckForDisconnect(session.pid, false);
+    if (!event) return false;
+    recordUnstuckEvent(
+      {
+        realm: REALM,
+        accountId: session.accountId,
+        characterId: session.characterId,
+      },
+      event,
+    );
+    return true;
   }
 
   private sendSystemNotice(session: ClientSession, text: string): void {

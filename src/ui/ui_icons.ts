@@ -72,6 +72,7 @@ export type UiIconName =
   | 'book'
   | 'cards'
   | 'trash'
+  | 'mount'
   | 'crafting'
   | 'professions'
   | 'makers-mark'
@@ -185,6 +186,10 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored open book (the Book of Deeds): two page leaves meeting at a
   // spine dip, each page hollowed so the glyph reads at micro-button size
   book: '<path fill-rule="evenodd" d="M256 118c-44-26-104-38-172-38v312c68 0 128 12 172 38 44-26 104-38 172-38V80c-68 0-128 12-172 38zM124 122c40 4 76 13 104 28v246c-30-13-66-21-104-24V122zm264 0v250c-38 3-74 11-104 24V150c28-15 64-24 104-28z"/>',
+  // hand-authored horseshoe (the Mounts window / mount keybind), opening up,
+  // matching the bar glyph weight
+  mount:
+    '<path d="M120 140 A176 176 0 1 0 392 140 L340 188 A104 104 0 1 1 172 188 Z"/><path d="M96 108h84v36H96zM332 108h84v36h-84z"/>',
   // hand-authored playing card (the Card Duel minigame): a solid card body
   // with a hollowed diamond pip so the glyph reads as "a card" at
   // micro-button size (evenodd punches the pip through the body)

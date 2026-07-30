@@ -113,7 +113,12 @@ export function applyHeal(
       hexOutputMult(ctx, source) *
       healingTakenMult(ctx, target),
   );
+  const beforeAbsorb = healed;
   healed = consumeHealAbsorb(ctx, target, healed);
+  // How much a necrotic blight devoured. Carried on the event because a fully
+  // absorbed heal also lands as amount 0, and the client must not read that as
+  // "already at full health": the target can be at 30 percent and blighted.
+  const absorbed = beforeAbsorb - healed;
   healed = Math.min(healed, target.maxHp - target.hp);
   target.hp += healed;
   ctx.emit({
@@ -123,6 +128,7 @@ export function applyHeal(
     amount: healed,
     crit,
     ability,
+    ...(absorbed > 0 ? { absorbed } : {}),
   });
   healingThreat(ctx, source, target, healed);
   // Talent procs listening for critical heals (deterministic, no rng draw).

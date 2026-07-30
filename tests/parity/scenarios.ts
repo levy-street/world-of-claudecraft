@@ -21,7 +21,15 @@
 // mobSwing, spawnDelveModule), never reaching into not-yet-extracted internals
 // in a way the sim itself does not already expose.
 
-import { arenaOrigin, DELVES, instanceOrigin, MOBS, PROPS, QUESTS } from '../../src/sim/data';
+import {
+  arenaOrigin,
+  DELVES,
+  DUNGEON_X_THRESHOLD,
+  instanceOrigin,
+  MOBS,
+  PROPS,
+  QUESTS,
+} from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';
 import { solveLockActions } from '../../src/sim/lockpick';
 import { gatherCastDurationSec } from '../../src/sim/professions/gathering';
@@ -1555,7 +1563,14 @@ function masterLoot(): Scenario {
       'convertMasterRollToNeedGreed over a candidate subset',
       'resolveLootRoll tie-break rng.int over tied need rolls',
     ],
-    build: () => new Sim({ seed: 1091, playerClass: 'warrior', noPlayer: true }),
+    // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge. This branch
+    // never touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
+    // here); its extra content just moves the shared rng before the rolls, and at
+    // 1091 the need rolls stopped TYING. The tie is the whole point of the
+    // scenario's last coverage line (resolveLootRoll's tie-break rng.int), so the
+    // seed is re-hunted to keep two rollers level rather than re-recorded to
+    // whatever the new draw happens to be.
+    build: () => new Sim({ seed: 1326, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       const a = sim.addPlayer('warrior', 'Aaa');
@@ -3540,17 +3555,20 @@ function mobLifecycle(): Scenario {
       rec.notes.addDespawned = !sim.entities.has(add.id);
       rec.snapshot('respawn');
 
-      // 5) Dungeon mob stays dead: spawnPos past DUNGEON_X_THRESHOLD (600) -> the
-      // corpse-tick respawn gate is skipped, the mob never respawns into the wild.
+      // 5) Dungeon mob stays dead: spawnPos past DUNGEON_X_THRESHOLD -> the
+      // corpse-tick respawn gate is skipped, the mob never respawns into the
+      // wild. (The threshold moved east with the instance plane in the world
+      // grid stage 2; place relative to it, not at a literal x.)
+      const dungeonX = DUNGEON_X_THRESHOLD + 100;
       const dungeonMob = spawnMob(
         sim,
         'forest_wolf',
         5,
-        700,
-        terrainHeight(700, 300, sim.cfg.seed),
+        dungeonX,
+        terrainHeight(dungeonX, 300, sim.cfg.seed),
         300,
       );
-      dungeonMob.spawnPos = { x: 700, y: dungeonMob.pos.y, z: 300 };
+      dungeonMob.spawnPos = { x: dungeonX, y: dungeonMob.pos.y, z: 300 };
       rec.track(dungeonMob.id);
       lethal(sim, player, dungeonMob);
       dungeonMob.corpseTimer = 0;
@@ -4462,9 +4480,13 @@ function cardDuel(): Scenario {
 // Seed HUNTED (bounded scan from seed 1 upward over this exact drive sequence, not
 // committed) so the vestments proc draw lands under the capped 15 percent
 // masterwork chance and the proc fires inside the recorded run; only the found
-// literal is pinned here. Spare seeds 23 and 34 were also verified to fire the proc
-// for this drive.
-function professionsCraft(seed = 21): Scenario {
+// literal is pinned here. Re-hunted after the new-realm quest pass shifted the
+// construction-time draw stream (quest camps + escort NPC spawns across the new
+// realms), and again after the Eastbrook camp respacing thinned the zone-1 camp
+// counts (fewer camp mobs means fewer construction-time draws, which moves every
+// later draw). Spare seeds 36 and 39 were also verified to fire the proc for this
+// drive.
+function professionsCraft(seed = 10): Scenario {
   return {
     name: 'professions_craft',
     coverage: [

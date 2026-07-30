@@ -4,7 +4,16 @@
 // and the lead-up quest chain + boss loot table hang together.
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
-import { DUNGEON_LIST, DUNGEONS, ITEMS, instanceOrigin, MOBS, NPCS, QUESTS } from '../src/sim/data';
+import {
+  DUNGEON_LIST,
+  DUNGEONS,
+  INSTANCE_X_BASE,
+  ITEMS,
+  instanceOrigin,
+  MOBS,
+  NPCS,
+  QUESTS,
+} from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { dist2d } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -44,8 +53,8 @@ describe('The Drowned Temple', () => {
     expect(t.suggestedPlayers).toBe(5);
     // it joins the map-derived dungeon list (the moongate draws itself there)
     expect(DUNGEON_LIST.some((d) => d.id === 'drowned_temple')).toBe(true);
-    // index-3 origin sits clear of the arena band (x >= 2800)
-    expect(instanceOrigin(3, 0).x).toBe(2700);
+    // index-3 origin keeps its slot in the relocated instance plane
+    expect(instanceOrigin(3, 0).x).toBe(INSTANCE_X_BASE + 2700);
   });
 
   it('is enterable through the moongate with its full spawn set, and exits home', () => {

@@ -148,13 +148,27 @@ export async function runParity(opts: RunParityOpts): Promise<ParityReport> {
 
   for (const fixture of opts.fixtures) {
     await isolatePass(opts.reset);
-    const oldCap = normalize(await captureResponse(opts.oldDispatch, fixture.req()));
+    const oldCap = await captureParityPass(fixture, 'old', opts.oldDispatch, normalize);
 
     await isolatePass(opts.reset);
-    const newCap = normalize(await captureResponse(opts.newDispatch, fixture.req()));
+    const newCap = await captureParityPass(fixture, 'new', opts.newDispatch, normalize);
 
     divergences.push(...diffResponses(fixture.name, oldCap, newCap));
   }
 
   return { ok: divergences.length === 0, divergences };
+}
+
+async function captureParityPass(
+  fixture: ParityFixture,
+  pass: 'old' | 'new',
+  dispatch: Dispatch,
+  normalize: typeof normalizeResponse,
+): Promise<CapturedResponse> {
+  try {
+    return normalize(await captureResponse(dispatch, fixture.req()));
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`parity fixture "${fixture.name}" ${pass} pass failed: ${message}`);
+  }
 }

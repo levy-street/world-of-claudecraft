@@ -193,6 +193,20 @@ describe('buildDelveInteractable', () => {
     expect(rangeCulled.visible).toBe(false);
   });
 
+  it('keeps non-lootable Rift puzzle, hazard, and consumed-state props visible', () => {
+    const statefulRiftTemplates = [
+      'rift_pylon',
+      'rift_roller',
+      'rift_gate_open',
+      'rift_treasure_open',
+      'rift_chest_jammed',
+    ];
+
+    for (const templateId of statefulRiftTemplates) {
+      expect(delveInteractableVisible(templateId, false), templateId).toBe(true);
+    }
+  });
+
   it('keeps an object view hidden until async shader compilation completes', () => {
     const compiling = buildDelveInteractable('delve_bell_rope_pulled', 44).group;
     expect(syncDelveInteractableVisibility(compiling, 'delve_bell_rope_pulled', false, true)).toBe(

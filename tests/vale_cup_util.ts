@@ -1,15 +1,35 @@
-// Shared world-staging helpers for the three Vale Cup suites (vale_cup_match,
-// vale_cup_bots, vale_cup_meta), moved verbatim from the original single-file
-// tests/vale_cup.test.ts when it was split along describe boundaries for CI
-// shard balance. Not a test file: nothing here runs on its own.
+// Shared world-staging helpers for the three split Vale Cup suites
+// (vale_cup_match, vale_cup_bots, vale_cup_meta). Not a test file: nothing here
+// runs on its own.
 
 import { expect } from 'vitest';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
+import type { SimConfig, SimEvent, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
-export function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+// Vale Cup tests need the real terrain, pitch and instance-plane geometry, but
+// none of the hundreds of unrelated overworld mobs, NPCs, or objects. Full
+// matches advance thousands of ticks, so stripping ambient constructor spawns
+// keeps every terrain-relevant field while avoiding unrelated simulation work.
+export const VALE_CUP_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  // Bram spawns from the ACTIVE world's npc registry (a custom world without
+  // him must not inherit one), so the scoped world keeps his record while
+  // still dropping every other npc for a cheap construction.
+  npcs: { groundskeeper_bram: BUILTIN_WORLD.npcs.groundskeeper_bram },
+  groundObjects: [],
+};
+
+export function makeWorld(overrides: Partial<SimConfig> = {}) {
+  return new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    noPlayer: true,
+    ...overrides,
+    world: VALE_CUP_TEST_WORLD,
+  });
 }
 
 export function teleport(sim: Sim, pid: number, x: number, z: number) {

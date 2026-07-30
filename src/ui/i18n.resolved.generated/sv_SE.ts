@@ -342,6 +342,33 @@ export const sv_SE: EnTranslations = {
       "healerConfirmAccept": "Återuppliva mig",
       "healerConfirmCancel": "Avbryt"
     },
+    "unstuck": {
+      "menuButton": "Fastna-hjälp",
+      "help": "Räddning: /unstuck startar en stillastående nedräkning som flyttar dig till en närliggande nåbar säker plats.",
+      "helpAtGraveyard": "Räddning: /unstuck startar en stillastående nedräkning och skickar sedan din ande till närmaste kyrkogård. Att återvända via Den bleka väktaren kräver Väktarens tribut.",
+      "started": "Fastna-hjälp om {seconds} sekunder. Att röra sig, strida, ta skada eller påbörja en annan handling avbryter den.",
+      "countdown": "Fastna-hjälp: {seconds}",
+      "completed": "Flyttad till närmaste nåbara säkra plats.",
+      "completedAtGraveyard": "Din ande har återvänt till närmaste kyrkogård. Tala med Den bleka väktaren för att godta Väktarens tribut.",
+      "revivedAtGraveyard": "Du har återförts till närmaste kyrkogård och återupplivats. Väktarens tribut vilar tungt på dig.",
+      "cancelledMoved": "Fastna-hjälp avbröts eftersom du rörde dig.",
+      "cancelledDamaged": "Fastna-hjälp avbröts eftersom du tog skada.",
+      "cancelledCombat": "Fastna-hjälp avbröts eftersom du gick in i strid.",
+      "cancelledBusy": "Fastna-hjälp avbröts eftersom du påbörjade en annan handling.",
+      "cancelledState": "Fastna-hjälp avbröts eftersom ditt tillstånd ändrades.",
+      "cancelledDisconnected": "Fastna-hjälp avbröts eftersom du kopplades från.",
+      "noSafePosition": "Ingen nåbar säker plats hittades i närheten. Du flyttades inte.",
+      "alreadyActive": "Fastna-hjälp räknar redan ner.",
+      "alreadySafe": "Du befinner dig redan på en säker, nåbar plats.",
+      "cooldown": "Fastna-hjälp är redo om {seconds} sekunder.",
+      "dead": "Du kan inte använda Fastna-hjälp medan du är död eller i andeform.",
+      "combat": "Du kan inte använda Fastna-hjälp under strid.",
+      "controlled": "Du kan inte använda Fastna-hjälp medan din rörelseförmåga är nedsatt.",
+      "standStill": "Stå still på fast mark innan du använder Fastna-hjälp.",
+      "standStillAnywhere": "Stå still innan du använder Fastna-hjälp.",
+      "busy": "Avsluta din nuvarande handling innan du använder Fastna-hjälp.",
+      "unavailable": "Fastna-hjälp är inte tillgänglig i ditt nuvarande tillstånd."
+    },
     "fct": {
       "absorbed": "{amount} absorberat",
       "cheap": "Billigare!"
@@ -781,6 +808,7 @@ export const sv_SE: EnTranslations = {
       "leaderboard": "Ranking",
       "dailyRewards": "Butik",
       "deeds": "Bedrifter",
+      "mounts": "Riddjur",
       "professions": "Yrken",
       "nameplates": "Namn",
       "haptics": "Haptik",
@@ -881,10 +909,15 @@ export const sv_SE: EnTranslations = {
       "autoShowHint": "Rader visas automatiskt när din grupp gör skada eller helar, och detta segment stängs några sekunder efter att striden avslutas.",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
-      "breakdownOther": "Other ({count})",
+      "breakdownOther": "Övrigt ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Melee"
+      "melee": "Närstrid",
+      "move": "Dra för att flytta den här mätaren",
+      "resize": "Dra för att ändra storlek på den här mätaren",
+      "dock": "Docka tillbaka den här mätaren i mätarfönstret",
+      "separate": "Separera {meter}",
+      "regroup": "Gruppera {meter} igen"
     },
     "petFeed": {
       "disabledFullHp": "Husdjuret har fulla livspunkter",
@@ -902,7 +935,59 @@ export const sv_SE: EnTranslations = {
       "petStop": "Djur: Stanna",
       "petTaunt": "Djur: Provocera",
       "petDefensive": "Djur: Defensivt",
-      "petAggressive": "Djur: Aggressivt"
+      "petAggressive": "Djur: Aggressivt",
+      "mount": "Sitt upp / Stig av"
+    },
+    "mounts": {
+      "title": "Riddjur",
+      "close": "Stäng",
+      "select": "Välj",
+      "selected": "Vald",
+      "riding": "Ridning",
+      "mount": "Sitt upp",
+      "dismount": "Stig av",
+      "useToRide": "Använd för att frammana detta riddjur.",
+      "emptyTitle": "Inga riddjur insamlade",
+      "emptyStableHint": "Nå nivå 20 och ta ridlektioner hos Stallmästare Marla vid Highwatch stall, väster om Highwatch.",
+      "emptyDropHint": "Sällsyntare riddjur droppar från hjältemodiga fängelsehålebossar och avklarade revor.",
+      "clickManage": "Klicka för att välja ditt riddjur",
+      "rarity_common": "Vanlig",
+      "rarity_rare": "Sällsynt",
+      "rarity_epic": "Episk",
+      "spec_speed": "+{pct}% extra rörlighet",
+      "name_valorsteed": "Tapperhetshästen",
+      "name_grag_bear": "Goliat Grag-björnen",
+      "name_stalkglider_snail": "Mosskal-stjälkglidaren",
+      "name_aether_hover_cycle": "Etertornerarens svävcykel",
+      "name_shadowjump_toad": "Kama-Kage, Skuggsprångspaddan",
+      "name_stormfeather_griffin": "Himmelsvidd Stormfjäder",
+      "name_thunderstrut_gobbler": "Åskstoltsern, Den stora kalkonen",
+      "desc_valorsteed": "En uthållig, säkerfotad stridshäst som ger ökad reshastighet.",
+      "desc_grag_bear": "En uthållig, säkerfotad björn som ger ökad reshastighet.",
+      "desc_stalkglider_snail": "En robust, långsamt brinnande snigel som ger ökad reshastighet.",
+      "desc_aether_hover_cycle": "En kraftfull magitech-cykel designad för snabb, lågsvävande förflyttning i strid.",
+      "desc_shadowjump_toad": "En massiv, säkerfotad jättepadda, tränad i blixtsnabba skuggsprång som täcker all terräng.",
+      "desc_stormfeather_griffin": "En kunglig stormgrip som smyger fram på runskodda klor, med vingarna hopfällda.",
+      "desc_thunderstrut_gobbler": "En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln."
+    },
+    "mountTraining": {
+      "mountPrompt": "Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.",
+      "ownedMountPrompt": "Dina tyglar finns i dina väskor. Använd dem för att rida.",
+      "ridePrompt": "Följ den glödande markören till startlinjen, tryck sedan på Starta loppet.",
+      "begin": "Börja lektionen",
+      "success": "Du har tämjt Tapperhetshästen.",
+      "returnToMarla": "Återvänd till Marla vid stallet för att köpa dina Tapperhetshäst-tyglar för 10g."
+    },
+    "mountRace": {
+      "startButton": "Starta loppet",
+      "cancelButton": "Avbryt loppet",
+      "go": "KÖR!",
+      "start": "Kör! Klara varje hopp, rid sedan tillbaka genom bågen.",
+      "toFinish": "Rid tillbaka genom bågen!",
+      "finished": "Klart på {seconds} s!",
+      "timeout": "Loppet misslyckades",
+      "progress": "Portar {n} av {total}",
+      "timeLeft": "{seconds} s"
     },
     "vcup": {
       "title": "Dalcupen",
@@ -1434,6 +1519,10 @@ export const sv_SE: EnTranslations = {
       "twoFactorRecoveryTitle": "Spara dina återställningskoder",
       "twoFactorRecoveryHint": "Varje kod fungerar en gång. Förvara dem på ett säkert ställe: de är enda vägen tillbaka in om du förlorar din autentiseringsapp.",
       "twoFactorDownloadCodes": "Ladda ner koder",
+      "recoveryCodesFileHeader": "{brand}-återställningskoder",
+      "recoveryCodesFileAccount": "Konto: {username}",
+      "recoveryCodesFileHint": "Varje kod kan användas en gång om du förlorar åtkomsten till din autentiseringsapp.",
+      "recoveryCodesFileWarn": "Förvara den här filen på ett säkert och privat ställe.",
       "twoFactorDone": "Klart",
       "twoFactorDisableHint": "Ange ditt lösenord för att stänga av tvåfaktor. Dina återställningskoder kommer att kastas.",
       "twoFactorDisableBtn": "Stäng av tvåfaktor",
@@ -1568,6 +1657,7 @@ export const sv_SE: EnTranslations = {
       "filterConsumable": "Förbrukningsvaror",
       "filterMaterial": "Material",
       "filterQuest": "Uppdrag",
+      "filterMount": "Riddjur",
       "sortAria": "Sortera väskföremål",
       "sortRecent": "Senaste",
       "sortQuality": "Kvalitet",
@@ -1785,6 +1875,9 @@ export const sv_SE: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Kräver nivå {level}",
+      "riftTier": "Revföremål av grad {tier}",
+      "riftUpgrade": "Revuppgradering {level}/{max}",
+      "riftSockets": "Revstenar {used}/{total}",
       "statEnchanted": "+{value} {stat} (Förtrollad)",
       "enchantedFallback": "Förtrollad"
     },
@@ -2722,6 +2815,14 @@ export const sv_SE: EnTranslations = {
       "lbEmpty": "Inga rankade krönikörer ännu.",
       "broadcastsLabel": "Dela fullbordade bedrifter med gille och vänner",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "Världskarta",
+      "summary": "Världskarta. Välj en zon för att öppna dess karta.",
+      "toWorld": "Världskarta",
+      "toZone": "Zonkarta",
+      "toggleAria": "Växla mellan världskartan och zonkartan",
+      "levels": "Nivåer {min} till {max}"
     }
   },
   "gatherEvent": {
@@ -2950,7 +3051,17 @@ export const sv_SE: EnTranslations = {
         "marshName": "Dykärrsträsket",
         "marshBlurb": "Sjunkna kärr och tidsslitna ruiner, hem åt Mudfiner och värre.",
         "peaksName": "Törntoppshöjderna",
-        "peaksBlurb": "Vindpiskade åsar som klättrar mot världens kallaste faror."
+        "peaksBlurb": "Vindpiskade åsar som klättrar mot världens kallaste faror.",
+        "duskName": "Slöjhålan",
+        "duskBlurb": "Ett rike förseglat under bergen, om viskningarna om en väg in stämmer.",
+        "emberName": "Drakländerna",
+        "emberBlurb": "Bortom Den bleka vägbanken viker det gröna för aska, och något urgammalt styr ödemarken.",
+        "frostName": "Frostslöjans vidder",
+        "frostBlurb": "En snöbunden höjd bortom varje karta, skymtad enbart i de dansande skenen.",
+        "amberName": "Bärnstensfallet",
+        "amberBlurb": "Bortom de västra klipporna en höst som aldrig tar slut, och lyktor på en gyllene sjö.",
+        "fenName": "Pilkärret",
+        "fenBlurb": "Bortom höstens krona, ett ljust kärr av pilar och stilla vatten, och en stad bakom en vallgrav."
       },
       "group": {
         "heading": "Slå er samman för de svåra delarna",
@@ -3419,6 +3530,18 @@ export const sv_SE: EnTranslations = {
       "reptile": {
         "name": "Reptiler",
         "desc": "Kallblodiga jägare med ett eget väsande och ett snäppande bett, skilda från de varmblodiga djuren."
+      },
+      "murloc": {
+        "name": "Kväkfenor",
+        "desc": "Kväkande fiskfolk från sjöstrand och tidvattenspöl, snabba att svärma allt som vadar för nära."
+      },
+      "kobold": {
+        "name": "Skälmar",
+        "desc": "Krypande asätare och älvor från glänta och häck, mer besvärliga än farliga tills de samlas i antal."
+      },
+      "demon": {
+        "name": "Demoner",
+        "desc": "Inkräktare bortom revorna, idel eld och ondska. Där en står är en bräsch aldrig långt borta."
       }
     },
     "worldPage": {
@@ -3432,15 +3555,55 @@ export const sv_SE: EnTranslations = {
       "valeBlurb": "Den gröna startdalen, där nya hjältar prövar sina krafter på vargar och banditer kring staden Eastbrook.",
       "marshBlurb": "Ett dränkt land av dimma och ruiner. Mudfiner svärmar i grundvattnet och något äldre rör sig under ytan, bevakat från bro-staden Fenbridge.",
       "peaksBlurb": "Vindpiskade åsar och gamla gruvverk som klättrar mot rikets kallaste, högsta faror, hållna av utposten Highwatch.",
+      "duskBlurb": "En dal i evig skymning under Fornglimmers stora träd, där kristallruiner glöder och luften surrar av gammal magi.",
+      "emberBlurb": "Stormbelysta ödemarker av aska och blodglas där drakar kretsar över kaldera, och trollens eldar brinner bland dynerna, vaktade från porten Drakvakten.",
+      "frostBlurb": "En tystnad av snö och mörka granar under norrskenet, där kylan själv känns vaken och Ismanteln håller sina eldar brinnande.",
+      "amberBlurb": "En evig höst av guld och röda löv som aldrig faller, samlad kring den lyktupplysta staden Lyktsjön.",
+      "fenBlurb": "En ljus, surrande våtmark av liljor och lugnt vatten, korsad på gamla spångar från brostaden Brosjön.",
+      "nightBlurb": "Ett rike av stjärnklar midnatt där blommor lyser upp stigarna och Månvila håller en tyst vaka under en drömmande himmel.",
+      "hauntBlurb": "En hemsökt skog under jättelika lövtak, där lyktorna i Galgsjön är det enda ärliga ljuset på vägen.",
+      "galeBlurb": "Havsklippor och tjutande kullar där vinden aldrig vilar, Den gamla vårdkasen aldrig slocknar, och Vikhamn stänger sina dörrar hårt.",
+      "jungleBlurb": "Ett tropiskt snår av palmer, vit sand och högljudda fåglar, med strandstaden Drivhamn som håller en eld tänd på stranden.",
+      "gardenBlurb": "Ett labyrintträdgårdsrike som fortfarande klipps av ingen trädgårdsmästare någon har sett, du kommer in förbi Häckby och dess fontängårdar.",
       "valeGreeting": "Håll ditt svärd nära. Dalen är inte vad den var.",
       "valeGreeter": "Marskalk Redbrook, Eastbrook",
       "marshGreeting": "Stanna vid porten. Bortom de vassen sköter myren dödandet åt oss.",
       "marshGreeter": "Väktare Fenwick, Fenbridge",
       "peaksGreeting": "Tvåhundra år har denna mur hållit. Den ska inte brista på min vakt, men den stönar.",
       "peaksGreeter": "Kapten Thessaly, Highwatch",
+      "duskGreeting": "Få av ditt slag har stått under dessa grenar. Gå varsamt, och var välkommen.",
+      "duskGreeter": "Väktare Saelwyn, Fornglimmer",
+      "emberGreeting": "Het vind från ödemarken, drakar över Drakgapet, och trollens eldar i dynerna. Drick något innan du vandrar ut dit.",
+      "emberGreeter": "Portväktaren, Drakvakten",
+      "frostGreeting": "Snön sväljer varje ljud bortom muren. Om skenen börjar dansa, håll rösten låg och elden tänd.",
+      "frostGreeter": "Härdväktaren, Ismanteln",
+      "amberGreeting": "Varje löv här brinner guld och rött, men inget faller någonsin. Lyktorna är tända för dig; se upp med Guldsmältan på vägen upp.",
+      "amberGreeter": "Lykttillverkaren, Lyktsjön",
+      "fenGreeting": "Kärret surrar av trollsländor och bin. Korsa bron, vila fötterna en stund, och håll dig på spängerna förbi dammarna.",
+      "fenGreeter": "Broväktaren, Brosjön",
+      "nightGreeting": "Bortom Nattporten drömmer själva luften. Följ blomljuset, och se upp för den sovande världen som hänger i skyn.",
+      "nightGreeter": "Vakväktaren, Månvila",
+      "hauntGreeting": "Håll dig till lyktorna, resenär. Och om skogen ropar ditt namn från sidan av vägen, svara inte.",
+      "hauntGreeter": "Lykttändaren, Galgsjön",
+      "galeGreeting": "Vinden har aldrig en enda gång slutat blåsa här, och Den gamla vårdkasen har aldrig en enda gång slocknat. Stäng värdshusdörren efter dig.",
+      "galeGreeter": "Vårdkasväktaren, Vikhamn",
+      "jungleGreeting": "Varm sand, högljudda fåglar och en djungel som äter upp horisonten. Vi håller en eld tänd på stranden; försök komma tillbaka till den.",
+      "jungleGreeter": "Hamnfogden, Drivhamn",
+      "gardenGreeting": "Någon klipper fortfarande häckarna, fast ingen trädgårdsmästare har synts till på hundra år. Se upp med labyrinten: den ser upp med dig också.",
+      "gardenGreeter": "Grindvakten, Häckby",
       "valePlaceNotes": "Östbäck är din första hembas. Vargstråket och Vildsvinsängen är milda jaktmarker; Spegelsjön är gott fiskevatten, fast gyttjefenor svärmar i grunden; Sableweb och Kopparbrottet döljer spindlar och malmgiriga grävare; ett Banditläger och Det fallna kapellet rymmer hårdare arbete; Relikkullen leder ner i Det rasade relikvariet, rikets första delve; Ljusskogsgläntan är en lugn, solbelyst lund i norr; och Suggfältet är Östbäcks muromgärdade vildsvinsbollsplan, där Dalcupen spelas under ett skördestillestånd.",
       "marshPlaceNotes": "Kärrbron vaktar den enda torra vägen. Smygjägarvassen och Djupkärrsgrunden kryllar av träskbestar och Mudfiner; Änkesnåret är tjockt spunnet med väv; Det dränkta kapellet och Trollhögarna rymmer äldre faror, medan Den dränkta litanian, kärrets egen delve, öppnar strax norr om högarna; Gravkallarlägret är kulten nedgrävd, och Den sjunkna bastionen är kärrets instansierade hjärta.",
       "peaksPlaceNotes": "Highwatch håller muren. Stalker Ridge och Deeprock Burrows tillhör åskatter och grävare; Ogre Foothills och Drogmar's War-Camp åt brutaler till salu; Stormcrag sprakar av elementarer, och nedanför den lyser Skimmertjärnen, tjärnen vars strand vaktar porten av blekt ljus ner till Det dränkta templet; Wyrmcult Tents och Revenant Fields omger kultens höglänta mark, med Gravlindormens helgedom på dess topp.",
+      "duskPlaceNotes": "Fornglimmer samlas under det stora trädet. Skymningsfallets grotta och dess utsikt är vägen in och den första blicken av dalen; Den forntida lunden och Stjärnfallsbassängen håller den tysta södern; Den sjunkna gården rymmer övervuxna ruiner i öster; och Det glittrande djupet och De kristallklara grunden glöder över norr.",
+      "emberPlaceNotes": "Drakvakten håller porten. Portskogen är det sista gröna innan ödemarken; Sotdynerna drivs av aska och värre saker; Trollmötet är där dyntrollen samlar sina eldar; Blodglasfälten glittrar av rakvassa skärvor; och Drakgapets kaldera är den rykande krona som drakarna kretsar kring.",
+      "frostPlaceNotes": "Ismanteln håller den sista varma härden. Snölinjen markerar var drivorna tar över; Glaciärtjärnen är svart, stilla vatten under isen; Norrskenstrapporna klättrar under de dansande skenen; Skälvkärret är en frusen myr som aldrig riktigt sover; och De tjutande terrasserna förtjänar sitt namn varje natt.",
+      "amberPlaceNotes": "Lyktsjön glöder i skördens hjärta. Guldsmältan är det bärnstenshala passet in; Den förgyllda fruktlunden och Skördehålan gömmer de sötaste fynden och de djärvaste tjuvarna; Den stora sjön speglar de brinnande löven; Sotlönnshöjden står högst och rödast; och Den lutande monoliten minns något äldre än hösten.",
+      "fenPlaceNotes": "Brosjön ligger tvärs över det lugna vattnet. Bärnstenskärrets trappor kommer ner från skördelandet; Liljemyrarna och Myrglansdammarna glittrar av irrbloss och trollsländor; Pilgråten släpar sina grenar ner i sjön; och De sömniga slätterna är så milda som detta land någonsin blir.",
+      "nightPlaceNotes": "Månvila håller vakan. Nattporten är vägen in i midnattslandet; Månbrunnen rymmer stjärnljus du kan stå bredvid; Skymningsfältet blommar i mörkret; Den stående vakan vakar utan att någonsin röra sig; och Den sömnlösa gravhögen är den enda platsen här som aldrig drömmer.",
+      "hauntPlaceNotes": "Galgsjön håller sig tätt inom sina lyktor. Kråkporten är skogens dystra framdörr; Änkans snår är tätt spunnet med spindelväv; Den hängande gläntan och Sorgestenskapellet bär skogens äldsta sorger; och Jägarens glänta tillhör vad det än är som fortfarande jagar där.",
+      "galePlaceNotes": "Vikhamn lutar sig mot vinden. Vindleden är klippvägen in; De tjutande kullarna rullar trädlösa under stormen; Den gamla vårdkasen har brunnit så länge någon kan minnas; Branten faller brant ner mot vattnet; Vrakfälten håller kusten ärlig; och Spegeltjärnen är det enda stillsamma i hela riket.",
+      "junglePlaceNotes": "Drivhamn håller sin eld på stranden. Snårmynningen är där floden möter den gröna muren; Palmstranden löper vit och varm längs bränningen; Smaragdsnåret och Rankfallet sväljer inlandet; Safirlagunen glöder klar och djup; och Den sjunkna avguden vakar från vattnets djup.",
+      "gardenPlaceNotes": "Häckby väntar vid Trädgårdsporten. Parterrpromenaden blommar i klippt färgprakt; Gryningsborgen drillar sina riddare bakom nya murar; Kronbladsdammen driver rosa året runt; Den gamla kvarnen vänder sina egna rabatter; Den stora labyrinten omarrangerar sina vägar för varje gäst, dess valv vaktade av lövklädda rävar; Nordvakten håller utfartsvägen; Liljebassängen vilar bortom allt detta; och Fontängården rinner fortfarande klar vid trädgårdens hjärta.",
       "gladeTitle": "En stilla vrå: Brightwood Glade",
       "gladeBody": "Inte varje berättelse i the Vale handlar om de döda. I norr håller en solbelyst lund kallad Brightwood Glade sin egen mildare rytm, med tysta stigar och fläckvist ljus under grenverket. Det är en mjuk motpol till spåret du följer, och värt att se när vägen ger dig utrymme att vandra.",
       "worldBossTitle": "När berget vaknar: världsbossen",
@@ -3514,6 +3677,7 @@ export const sv_SE: EnTranslations = {
       "bastionBody": "En översvämmad fästning förlorad till träsket, hållen av dränkta försvarare och den stigande tidvattnet självt.",
       "templeBody": "En månbelyst helgedom sjunken under en glödande tjärn högt uppe bland topparna, nådd genom en port av kallt ljus. En dränkt kult sjunger fortfarande där nere i sina ruttna skrudar, och varningarna ristade på stranden säger att något därunder bara sover. Ett fristående mysterium, åtskilt från huvudberättelsen, för de nyfikna och de välförberedda.",
       "sanctumBody": "Törntoppens mörka hjärta, där kultens långa arbete når sin fasansfulla höjdpunkt.",
+      "wildheartBody": "En regnvåt djungelkaldera där två upphöjda jaktstigar cirklar en jadegrön cenot. Korsa bestars lyor och förfädersruiner, klättra sedan upp för ritualpyramiden för att möta Zulgar.",
       "raidName": "Slutspelsraiden",
       "raidBody": "Bortom en förseglad kunglig dörr väntar en prövning för tio spelare: en strid i flera faser och en odödlig kraft som hela raiden måste stänga ner tillsammans. Förtjäna din väg in, ta sedan med dig nio vänner.",
       "heroicTitle": "Heroiskt läge",
@@ -5062,6 +5226,57 @@ export const sv_SE: EnTranslations = {
     "chat": "Öppna chatt"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "Alla revor är instabila just nu. Försök igen snart.",
+      "enterFloor": "Du kliver genom revan in i {name}.",
+      "descendFloor": "Du stiger djupare ner i {name}.",
+      "stepBack": "Du kliver tillbaka genom revan.",
+      "pylonLit": "En runpelare flammar till liv ({lit}/{total}).",
+      "wayDownOpens": "Vägen ner rivs upp.",
+      "exitOpens": "Revan skälver. En väg hem rivs upp bakom de fallna.",
+      "portalOpens": "En reva av grad {tier} rivs upp i {zone}!",
+      "portalSealed": "Revan av grad {tier} i {zone} har förseglats.",
+      "portalCollapses": "Revan av grad {tier} i {zone} kollapsar.",
+      "levelGate": "Endast äventyrare på nivå {level} eller högre får gå in i denna reva.",
+      "deadEntry": "Du kan inte gå in i en reva medan du är död.",
+      "deadEntryCombat": "Din grupp är fortfarande i strid. De döda kan gå in igen när striden upphör.",
+      "iceGoalLit": "Frostsigillet flammar upp. Vägen rör sig.",
+      "socketsShut": "Hållarna gnisslar igen. Vägen rör sig.",
+      "seqProgress": "Runorna svarar i tur ({step}/{total}).",
+      "seqReset": "Runorna slocknar. Börja om.",
+      "gateOpen": "Porten gnisslar upp.",
+      "orbSealed": "Orben är förseglad av riten därnere.",
+      "orbWakes": "Pentagrammets låga slocknar. Något vaknar på altaret.",
+      "orbOpensGate": "Blodorben flammar upp. Templets portar gnisslar upp.",
+      "alreadyCleared": "Denna reva har redan rensats av {names}.",
+      "raceLost": "Revan har redan rensats av {names}. Ditt försök tar slut.",
+      "raceWorldWin": "{names} vann revloppet av grad {tier} på {seconds} s!",
+      "raceWinBanner": "Revlopp vunnet: {seconds} s",
+      "raceLostBanner": "Revan redan rensad",
+      "forgeUpgraded": "Revuppgradering slutförd för {name}.",
+      "forgeEnchanted": "Revförtrollning slutförd för {name}.",
+      "forgeSocketed": "Revsten monterad för {name}.",
+      "detonateGlacialGrave": "Glaciärgraven detonerar!",
+      "detonateAbsoluteZero": "Absoluta nollpunkten bryter ut!",
+      "detonateMagmaWell": "Magmakällan bryter ut!",
+      "detonateCoreMeltdown": "Kärnsmältan detonerar!",
+      "detonateVenomPool": "Giftpölen bryter ut!",
+      "detonateBroodmothersMark": "Kullmoderns märke detonerar!",
+      "detonateSoulGrave": "Själagraven detonerar!",
+      "detonateDeathSentence": "Dödsdomen faller!",
+      "detonateEarthshatter": "Jordkrossen detonerar!",
+      "detonateFinalJudgment": "Den slutgiltiga domen slår ner!",
+      "detonateVoidRift": "Tomrumsrevan detonerar!",
+      "detonateArcaneAnnihilation": "Arkanförintelse bryter ut!",
+      "detonateLightningRod": "Åskledaren slår till!",
+      "detonateStormcallersWrath": "Stormroparens vrede bryter ut!",
+      "detonateAbyssalMaw": "Avgrundsgapet sluts!",
+      "detonateCrushingDepth": "Krossande djup krossar!",
+      "detonatePactSeal": "Paktförseglingen detonerar!",
+      "detonateBloodRite": "Blodriten faller!",
+      "detonatePitSentence": "Gropdomen detonerar!",
+      "detonateHellfireBrand": "Helvetesbranden detonerar!"
+    },
     "delve": {
       "cannotEnterNow": "Du kan inte gå in i en fördjupning just nu.",
       "leaveDungeonFirst": "Lämna fängelsehålan först.",
@@ -5545,7 +5760,7 @@ export const sv_SE: EnTranslations = {
     },
     "augment": {
       "choose": "Välj en förstärkning",
-      "cardAria": "{name} ({category}) - {description}",
+      "cardAria": "{name} ({category}): {description}",
       "aug_brutality": {
         "name": "Brutalitet",
         "desc": "Dina fysiska slag träffar 15% hårdare."
@@ -5916,6 +6131,8 @@ export const sv_SE: EnTranslations = {
       "secondsRemaining": "{seconds} sekunder kvar",
       "enteringZone": "Träder in i {zone}.",
       "welcomeZone": "Välkommen till {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Nivå {level}!",
       "levelLog": "Du har nått nivå {level}!",
       "xpGain": "Du får {amount} erfarenhet.",
@@ -6168,6 +6385,8 @@ export const sv_SE: EnTranslations = {
       "floatingDodge": "Undvek",
       "floatingParry": "Parerade",
       "floatingResist": "Motstod",
+      "floatingHealFull": "Fullt",
+      "floatingHealAbsorbed": "Absorberad",
       "cannotMove": "Kan inte röra dig!",
       "attack": "anfall",
       "damageDone": "Din {ability} träffar {target} för {amount}.",
@@ -6182,6 +6401,10 @@ export const sv_SE: EnTranslations = {
       "healSelfCrit": "Din {ability} läker dig kritiskt för {amount}.",
       "healOther": "Din {ability} läker {target} för {amount}.",
       "healOtherCrit": "Din {ability} läker {target} kritiskt för {amount}.",
+      "healSelfFull": "Din {ability} landar, men du har redan full hälsa.",
+      "healOtherFull": "Din {ability} landar på {target}, men målet har redan full hälsa.",
+      "healSelfAbsorbed": "Din {ability} slukas av rötan på dig.",
+      "healOtherAbsorbed": "Din {ability} slukas av rötan på {target}.",
       "death": "{name} dör.",
       "auraGain": "Du får {name}.",
       "auraFade": "{name} bleknar bort från dig.",
@@ -6540,7 +6763,23 @@ export const sv_SE: EnTranslations = {
       "fishing": "Fiske",
       "gathering": "Insamling",
       "demonHeal": "Demonläkning",
-      "thunzharrStormcall": "Stormrop"
+      "thunzharrStormcall": "Stormrop",
+      "rift_frost_execution": "Glaciärgraven",
+      "rift_frost_strike": "Absoluta nollpunkten",
+      "rift_ember_execution": "Magmakällan",
+      "rift_ember_strike": "Kärnsmältan",
+      "rift_venom_execution": "Giftpölen",
+      "rift_venom_strike": "Kullmoderns märke",
+      "rift_necro_execution": "Själagraven",
+      "rift_necro_strike": "Dödsdomen",
+      "rift_brute_execution": "Jordkrossen",
+      "rift_brute_strike": "Den slutgiltiga domen",
+      "rift_arcane_execution": "Tomrumsrevan",
+      "rift_arcane_strike": "Arkanförintelse",
+      "rift_storm_execution": "Åskledaren",
+      "rift_storm_strike": "Stormroparens vrede",
+      "rift_tide_execution": "Avgrundsgapet",
+      "rift_tide_strike": "Krossande djup"
     }
   },
   "questUi": {
@@ -6657,7 +6896,8 @@ export const sv_SE: EnTranslations = {
       "tool": "Verktyg",
       "potion": "Trolldryck",
       "elixir": "Elixir",
-      "bag": "Väska"
+      "bag": "Väska",
+      "mount": "Riddjur"
     },
     "stats": {
       "armor": "Rustning",
@@ -9201,6 +9441,312 @@ export const sv_SE: EnTranslations = {
       "resonant_timber": {
         "name": "Resonant timmer"
       },
+      "duskwisp_essence": {
+        "name": "Skymningsirrbloss-essens"
+      },
+      "spore_heart": {
+        "name": "Sporhjärta"
+      },
+      "gleaming_antler": {
+        "name": "Glimmande horn"
+      },
+      "wisp_mote": {
+        "name": "Irrblosskorn"
+      },
+      "starfall_shard": {
+        "name": "Stjärnfallsskärva"
+      },
+      "elder_bark": {
+        "name": "Äldstebark"
+      },
+      "hollow_sealstone": {
+        "name": "Däldens sigillsten"
+      },
+      "monument_overlook": {
+        "name": "Vittrat monument"
+      },
+      "monument_court": {
+        "name": "Sjunket monument"
+      },
+      "monument_north": {
+        "name": "Bortglömt monument"
+      },
+      "guardian_core": {
+        "name": "Väktarkärna"
+      },
+      "wardens_seal": {
+        "name": "Väktarens sigill"
+      },
+      "gleamstag_charm": {
+        "name": "Glimhjortstalisman"
+      },
+      "veilsteel_blade": {
+        "name": "Slöjstålsklinga"
+      },
+      "duskfang_dirk": {
+        "name": "Skymningstandsdolk"
+      },
+      "gleamwood_stave": {
+        "name": "Glimträstav"
+      },
+      "wardens_oathband": {
+        "name": "Väktarens edband"
+      },
+      "wardplate_cuirass": {
+        "name": "Vaktplåtskyrass"
+      },
+      "nightweave_tunic": {
+        "name": "Nattvävnadstunika"
+      },
+      "veilcloth_robe": {
+        "name": "Slöjtygsrock"
+      },
+      "rift_essence": {
+        "name": "Revessens"
+      },
+      "rift_gem_crimson": {
+        "name": "Karmosinröd revsten"
+      },
+      "rift_gem_azure": {
+        "name": "Azurblå revsten"
+      },
+      "rift_gem_verdant": {
+        "name": "Grönskande revsten"
+      },
+      "riftbound_band_of_might": {
+        "name": "Revbunden ring av styrka"
+      },
+      "riftbound_band_of_insight": {
+        "name": "Revbunden ring av insikt"
+      },
+      "riftbound_band_of_guile": {
+        "name": "Revbunden ring av list"
+      },
+      "hoarfrost_edge": {
+        "name": "Rimfrostegg"
+      },
+      "emberforge_gauntlets": {
+        "name": "Glödsmidjans pansarhandskar"
+      },
+      "broodmother_carapace": {
+        "name": "Kullmoderns pansar"
+      },
+      "bonelord_mantle": {
+        "name": "Benherrens mantel"
+      },
+      "graskbreaker_girdle": {
+        "name": "Graskkrossargördel"
+      },
+      "voidscar_handwraps": {
+        "name": "Tomrumsärrshandlindor"
+      },
+      "stormscale_treads": {
+        "name": "Stormfjällsstövlar"
+      },
+      "abyssal_loop": {
+        "name": "Avgrundsslinga"
+      },
+      "pactbound_vestments": {
+        "name": "Paktbundna dräkter"
+      },
+      "pitlords_cleaver": {
+        "name": "Gropherrens klyva"
+      },
+      "emberforged_bulwark": {
+        "name": "Glödsmitt bålverk"
+      },
+      "stormsunder_hood": {
+        "name": "Stormsöndrarhuva"
+      },
+      "voidweave_mantle": {
+        "name": "Tomrumsvävd mantel"
+      },
+      "abysswrought_band": {
+        "name": "Avgrundssmidd ring"
+      },
+      "heart_of_the_rift": {
+        "name": "Revans hjärta"
+      },
+      "voidsong_dirk": {
+        "name": "Tomrumssång, Den splittrade slöjans dolk"
+      },
+      "wildheart_tuskblade": {
+        "name": "Vildhjärtats betklinga"
+      },
+      "wildheart_hexwood_staff": {
+        "name": "Bassängens förhäxade trästav"
+      },
+      "wildheart_fangknife": {
+        "name": "Zulgars huggtandskniv"
+      },
+      "thick_winter_pelt": {
+        "name": "Tjock vinterpäls"
+      },
+      "aurora_mote": {
+        "name": "Norrskenskorn"
+      },
+      "hearth_ember_cache": {
+        "name": "Glödgömma"
+      },
+      "sprung_trap": {
+        "name": "Utlöst kärrfälla"
+      },
+      "hearthlined_treads": {
+        "name": "Härdfodrade stövlar"
+      },
+      "frostmane_mantle": {
+        "name": "Frostmanens mantel"
+      },
+      "ashbone_war_brand": {
+        "name": "Askbens krigsbrand"
+      },
+      "emberwing_scale": {
+        "name": "Glödvingefjäll"
+      },
+      "scorched_supply_crate": {
+        "name": "Svedd förrådskista"
+      },
+      "wyrmwatch_warning_banner": {
+        "name": "Drakvaktens varningsbanér"
+      },
+      "cinderwalk_treads": {
+        "name": "Sotvandrarstövlar"
+      },
+      "mawscale_pauldrons": {
+        "name": "Gapfjällsaxelplåtar"
+      },
+      "gilded_sap_clot": {
+        "name": "Förgylld savklump"
+      },
+      "amberfall_sap_bucket": {
+        "name": "Savtappningshink"
+      },
+      "mere_ferry_lantern": {
+        "name": "Färjelykta"
+      },
+      "orchard_sapbinder_grips": {
+        "name": "Savbindarhandskar"
+      },
+      "mantle_of_the_meredark": {
+        "name": "Sjömörkrets mantel"
+      },
+      "plump_fen_eel": {
+        "name": "Fyllig kärrål"
+      },
+      "wisplight_globe": {
+        "name": "Irrbloss-ljusglob"
+      },
+      "fenway_mooring_line": {
+        "name": "Avskuren förtöjningslina"
+      },
+      "bridgemere_toll_chest": {
+        "name": "Sjunken tullkista"
+      },
+      "eelskin_mudwaders": {
+        "name": "Ålskinnsvadarstövlar"
+      },
+      "lilybed_mantle": {
+        "name": "Liljebäddens mantel"
+      },
+      "moonfleece_tuft": {
+        "name": "Månullstofs"
+      },
+      "gloamfield_nightbloom": {
+        "name": "Nattblomstrets blomma"
+      },
+      "vigil_star_chart": {
+        "name": "Vakans stjärnkarta"
+      },
+      "barrow_grave_offering": {
+        "name": "Spritt gravoffer"
+      },
+      "moonfleece_mitts": {
+        "name": "Månullsvantar"
+      },
+      "barrowshade_mantle": {
+        "name": "Gravhögsskuggans mantel"
+      },
+      "widowsilk_skein": {
+        "name": "Änkesidenhärva"
+      },
+      "gallowmere_grave_candle": {
+        "name": "Gravljus"
+      },
+      "silkbound_remains": {
+        "name": "Sidenbundna kvarlevor"
+      },
+      "gravebound_silk_wraps": {
+        "name": "Gravbundna sidenlindor"
+      },
+      "mantle_of_the_unhorsed": {
+        "name": "Den avsuttnes mantel"
+      },
+      "pearlwake_cargo_crate": {
+        "name": "Pärlkölvattnets lastkista"
+      },
+      "canopy_silk_hank": {
+        "name": "Lövtakssidenhärva"
+      },
+      "sunken_offering_bowl": {
+        "name": "Återfylld offerskål"
+      },
+      "saltwalker_sandals": {
+        "name": "Saltvandrarsandaler"
+      },
+      "sunken_idol_mantle": {
+        "name": "Den sjunkna avgudens mantel"
+      },
+      "hedgewick_shears": {
+        "name": "Stulen Häckby-sax"
+      },
+      "evergarden_bloom_clipping": {
+        "name": "Beskuren blomstersticklig"
+      },
+      "hedgewick_tool_cart": {
+        "name": "Vält verktygsvagn"
+      },
+      "evergarden_statue_rubbing": {
+        "name": "Statyavgnidning"
+      },
+      "shearkeeper_gloves": {
+        "name": "Brantväktarens handskar"
+      },
+      "fountain_court_mantle": {
+        "name": "Fontängårdens mantel"
+      },
+      "galecrest_ram_wool": {
+        "name": "Fettig baggeull"
+      },
+      "shear_storm_lantern": {
+        "name": "Släckt stormlykta"
+      },
+      "wreckfield_flotsam_crate": {
+        "name": "Vrakgodskista"
+      },
+      "wickspun_treads": {
+        "name": "Vekspunna stövlar"
+      },
+      "wreck_wardens_mantle": {
+        "name": "Vrakväktarens mantel"
+      },
+      "breakscarred_steel": {
+        "name": "Brytärrat stål"
+      },
+      "farshore_salt_moss": {
+        "name": "Fjärrkustens saltmossa"
+      },
+      "gullhaven_watchbell": {
+        "name": "Kustvaktklocka"
+      },
+      "saltforged_grips": {
+        "name": "Saltsmidda handskar"
+      },
+      "mantle_of_the_unbroken_shore": {
+        "name": "Den obrutna kustens mantel"
+      },
+      "last_keep_signet": {
+        "name": "Sista fästets signetring"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },
@@ -9932,6 +10478,30 @@ export const sv_SE: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Stormkallarens midjeskydd"
+      },
+      "riding_training": {
+        "name": "Ridträning"
+      },
+      "reins_valorsteed": {
+        "name": "Tyglar till Valorsteed"
+      },
+      "reins_grag_bear": {
+        "name": "Tyglar till Goliat Grag-björnen"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Tyglar till mosskal-stjälkglidaren"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Tändningsnyckel: eterriddarens svävarcykel"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Tyglar till Kama-Kage, skuggsprångspaddan"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Tyglar till den himlanående Stormfjädern"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Tyglar till Åskstoltseraren, den stora kalkonen"
       }
     },
     "mobs": {
@@ -10181,6 +10751,312 @@ export const sv_SE: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Väckt stormyngel"
       },
+      "stable_horse": {
+        "name": "Stallhäst"
+      },
+      "rift_spawnling": {
+        "name": "Revyngel"
+      },
+      "rift_bonewalker": {
+        "name": "Uppstånden benvandrare"
+      },
+      "rift_frost_revenant": {
+        "name": "Frostbunden gengångare"
+      },
+      "rift_rime_elemental": {
+        "name": "Rimfrostelementar"
+      },
+      "rift_ember_fiend": {
+        "name": "Glödvidunder"
+      },
+      "rift_magma_brute": {
+        "name": "Magmabest"
+      },
+      "rift_venom_weaver": {
+        "name": "Giftvävare"
+      },
+      "rift_thornback": {
+        "name": "Törnryggens smygare"
+      },
+      "rift_boneclad": {
+        "name": "Benklädd krigare"
+      },
+      "rift_marrow_troll": {
+        "name": "Märgtroll"
+      },
+      "rift_void_acolyte": {
+        "name": "Tomrumsärrets akolyt"
+      },
+      "rift_dread_stalker": {
+        "name": "Skräcksmygare"
+      },
+      "rift_storm_caller": {
+        "name": "Stormropare"
+      },
+      "rift_stormscale": {
+        "name": "Stormfjälldrake"
+      },
+      "rift_tide_thrall": {
+        "name": "Tidvattnets träl"
+      },
+      "rift_deep_lurker": {
+        "name": "Djuplurkare"
+      },
+      "rift_stone_ogre": {
+        "name": "Stenoger"
+      },
+      "rift_boss_frost": {
+        "name": "Rimfrostens väktare"
+      },
+      "rift_boss_ember": {
+        "name": "Glödsmidjans tyrann"
+      },
+      "rift_boss_venom": {
+        "name": "Kullmodern Vysska"
+      },
+      "rift_boss_necro": {
+        "name": "Benherren Xarreth"
+      },
+      "rift_boss_brute": {
+        "name": "Krigsherre Grask"
+      },
+      "rift_boss_arcane": {
+        "name": "Arkon Nyxaris"
+      },
+      "rift_boss_storm": {
+        "name": "Orkanen Vharok"
+      },
+      "rift_boss_tide": {
+        "name": "Avgrundsgapet"
+      },
+      "glimmerwisp": {
+        "name": "Glimmerirrbloss"
+      },
+      "duskwisp": {
+        "name": "Skymningsirrbloss"
+      },
+      "veiled_stag": {
+        "name": "Slöjhjort"
+      },
+      "veiled_doe": {
+        "name": "Slöjhind"
+      },
+      "gleamstag": {
+        "name": "Glimmerhjorten"
+      },
+      "sporeling_gatherer": {
+        "name": "Sporlingssamlare"
+      },
+      "corrupted_sporeling": {
+        "name": "Korrumperad sporling"
+      },
+      "mushroom_pixie": {
+        "name": "Glimmerfolkets pyssling"
+      },
+      "treant_elder": {
+        "name": "Äldste trädjätten"
+      },
+      "ancient_guardian": {
+        "name": "Uråldrig väktare"
+      },
+      "waking_warden": {
+        "name": "Den vaknande väktaren"
+      },
+      "old_marrowshell": {
+        "name": "Gamla Märgskalet"
+      },
+      "aurelhorn": {
+        "name": "Aurelhorn, hjordens förste"
+      },
+      "snowdrift_wolf": {
+        "name": "Snödrivans varg"
+      },
+      "ice_wisp": {
+        "name": "Isirrbloss"
+      },
+      "rime_elemental": {
+        "name": "Rimfrostelementar"
+      },
+      "fen_sprite": {
+        "name": "Kärrälva"
+      },
+      "frostmane_yeti": {
+        "name": "Frostmanad yeti"
+      },
+      "terrace_howler": {
+        "name": "Terrassernas tjutare"
+      },
+      "apprentice_wren": {
+        "name": "Lärling Wren"
+      },
+      "emberwing_drake": {
+        "name": "Glödvingedrake"
+      },
+      "ashbone_raider": {
+        "name": "Askbensplundrare"
+      },
+      "ashbone_warcaller": {
+        "name": "Askbens krigsropare"
+      },
+      "dune_troll": {
+        "name": "Dyntroll"
+      },
+      "cindraleth_maw_matriarch": {
+        "name": "Cindraleth, Gapets matriark"
+      },
+      "gilded_stag": {
+        "name": "Förgylld hjort"
+      },
+      "gloam_fox": {
+        "name": "Skymningsräv"
+      },
+      "orchard_treant": {
+        "name": "Fruktlundens trädjätte"
+      },
+      "the_meredark": {
+        "name": "Sjömörkret"
+      },
+      "harvest_sprite": {
+        "name": "Skördeälva"
+      },
+      "mere_lurker": {
+        "name": "Sjölurkare"
+      },
+      "bogtoad": {
+        "name": "Kärrpadda"
+      },
+      "drowsy_croaker": {
+        "name": "Den sömniga kväkaren"
+      },
+      "lily_wisp": {
+        "name": "Liljeirrbloss"
+      },
+      "willow_sprite": {
+        "name": "Pilälva"
+      },
+      "moonfleece_grazer": {
+        "name": "Månullsbetare"
+      },
+      "gloam_strider": {
+        "name": "Skymningsvandrare"
+      },
+      "nightkin_stargazer": {
+        "name": "Nattsläktets stjärnskådare"
+      },
+      "barrow_king": {
+        "name": "Gravhögskungen"
+      },
+      "barrow_wight": {
+        "name": "Gravhögsvätte"
+      },
+      "widowsilk_spinner": {
+        "name": "Änkesidenspinnare"
+      },
+      "wood_wraith": {
+        "name": "Skogsvålnad"
+      },
+      "gravenbark_shambler": {
+        "name": "Ristbarksraglaren"
+      },
+      "pale_huntsman": {
+        "name": "Den bleka jägaren"
+      },
+      "gravedigger_mosley": {
+        "name": "Gravgrävaren Mosley"
+      },
+      "tide_scuttler": {
+        "name": "Tidvattenskuttlaren"
+      },
+      "thicket_boar": {
+        "name": "Snårvildsvin"
+      },
+      "canopy_weaver": {
+        "name": "Lövtaksvävare"
+      },
+      "idol_guardian": {
+        "name": "Avgudens väktare"
+      },
+      "castaway_navigator": {
+        "name": "Navigatör Suli"
+      },
+      "topiary_stag": {
+        "name": "Formklippt hjort"
+      },
+      "topiary_wolf": {
+        "name": "Formklippt varg"
+      },
+      "hedge_gnome": {
+        "name": "Häckgnom"
+      },
+      "hedge_knight": {
+        "name": "Gryningsborgens riddare"
+      },
+      "the_topiary_bull": {
+        "name": "Den formklippta tjuren"
+      },
+      "moor_ram": {
+        "name": "Hedbagge"
+      },
+      "gale_wisp": {
+        "name": "Stormirrbloss"
+      },
+      "shoal_scuttler": {
+        "name": "Grundskuttlaren"
+      },
+      "downs_bandit": {
+        "name": "Kullbandit"
+      },
+      "wreck_thief": {
+        "name": "Vrakfältets tjuv"
+      },
+      "the_wreck_warden": {
+        "name": "Vrakväktaren"
+      },
+      "drowned_deckhand": {
+        "name": "Drunknad däcksman"
+      },
+      "riftspawn": {
+        "name": "Revavkomma"
+      },
+      "breach_wretch": {
+        "name": "Bräschens stackare"
+      },
+      "void_stalker": {
+        "name": "Tomrumssmygare"
+      },
+      "sundered_horror": {
+        "name": "Den splittrade fasan"
+      },
+      "fisher_bram": {
+        "name": "Fiskaren Bram"
+      },
+      "rift_hellguard": {
+        "name": "Helvetesvakt"
+      },
+      "rift_pact_acolyte": {
+        "name": "Paktens akolyt"
+      },
+      "rift_boss_ritualist": {
+        "name": "Magus Vel'Kor den Paktbundne"
+      },
+      "rift_boss_pitlord": {
+        "name": "Azgorath, Gropens herre"
+      },
+      "wildheart_stalker": {
+        "name": "Rankklons smygare"
+      },
+      "wildheart_ravager": {
+        "name": "Blodmanens förhärjare"
+      },
+      "wildheart_hexcaller": {
+        "name": "Solbensbesvärjaren"
+      },
+      "wildheart_beastmaster": {
+        "name": "Huggtandsherren, djurens mästare"
+      },
+      "wildheart_high_priest": {
+        "name": "Zulgar, Bassängens röst"
+      },
       "ironvein_foreman": {
         "name": "Järnådersförman"
       },
@@ -10334,6 +11210,11 @@ export const sv_SE: EnTranslations = {
         "title": "Gruvförman",
         "greeting": "Hela utgrävningen kryllar av de där lerinkrustade skadedjuren!"
       },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stallmästare",
+        "greeting": "Varje ryttare kommer in på två ben, {className}. Tyglarna får du inte förrän du kan sitta kvar på Valorsteed utan att kyssa leran, och Highwatch har inga läkare att avvara för brutna ben."
+      },
       "warden_fenwick": {
         "name": "Väktaren Fenwick",
         "title": "Väktare av Fenbridge",
@@ -10463,6 +11344,246 @@ export const sv_SE: EnTranslations = {
         "name": "Krönikör Zenzie",
         "title": "Topparnas krönika",
         "greeting": "Berget glömmer ingenting, {playerName}, och det gör inte jag heller. Låt oss se vad du har uträttat."
+      },
+      "keeper_saelwyn": {
+        "name": "Väktaren Saelwyn",
+        "title": "Väktare av Hålan",
+        "greeting": "Få av ditt slag har stått under dessa grenar, {className}. Gå varsamt, och var välkommen."
+      },
+      "loremother_bryn": {
+        "name": "Sagomodern Bryn",
+        "title": "Helgedomens röst",
+        "greeting": "Varje ljus i denna dal minns något, {playerName}. Hjälp mig lyssna."
+      },
+      "provisioner_fenna": {
+        "name": "Proviantmästaren Fenna",
+        "title": "Proviantmästare i Fornglimmer",
+        "greeting": "Bröd fortfarande varmt, vatten fortfarande sött. Hålan förser, och det gör jag också."
+      },
+      "wardsmith_orun": {
+        "name": "Runsmeden Orun",
+        "title": "Väktare av de gamla smedjorna",
+        "greeting": "Dessa smedjor svalnade för århundraden sedan, {className}, men deras verk håller fortfarande en egg."
+      },
+      "archivist_tullo": {
+        "name": "Arkivarien Tullo",
+        "title": "Uttolkare av stenar",
+        "greeting": "Monumenten där ute har inte talat med någon på en evighet. Kanske väntade de på nya öron."
+      },
+      "huntsman_deral": {
+        "name": "Jägaren Deral",
+        "title": "Hjordarnas väktare",
+        "greeting": "Tyst nu. Hjorden känner till varje ljud denna dal gör, och det gör jag också."
+      },
+      "warden_kaldra": {
+        "name": "Väktaren Kaldra",
+        "title": "Väktare av Ismanteln",
+        "greeting": "Se upp med bänkarna, främling. Snön behåller det den tar."
+      },
+      "hearthkeeper_maeve": {
+        "name": "Härdväktaren Maeve",
+        "title": "Väktare av Härdstugan",
+        "greeting": "Kom in från kylan. Stugans eld slocknar aldrig, så länge jag drar andan."
+      },
+      "scout_einna": {
+        "name": "Spanaren Einna",
+        "title": "Spanare vid Snölinjen",
+        "greeting": "Du gick genom passet levande. Bra. Ismanteln borde få höra om det."
+      },
+      "aurorist_veyla": {
+        "name": "Norrskenstydaren Veyla",
+        "title": "Uttolkare av skenen",
+        "greeting": "Tyst. Skenen talar i natt, och de upprepar sig aldrig."
+      },
+      "trapper_brosk": {
+        "name": "Fångstmannen Brosk",
+        "title": "Fångstman i Skälvkärret",
+        "greeting": "Kärret tog tre av mina linor denna vecka. Kärret tog aldrig en lina på tjugo år."
+      },
+      "gatecaptain_brannoc": {
+        "name": "Portkaptenen Brannoc",
+        "title": "Befälhavare över Drakvakten",
+        "greeting": "Drakvakten håller porten. Har hållit den i fyrtio år. Den kommer hålla den i natt."
+      },
+      "quartermaster_sela": {
+        "name": "Kvartermästaren Sela",
+        "title": "Väktare av garnisonsförråden",
+        "greeting": "Varje kista på denna gård korsade fyrtio mil aska för att komma hit. Behandla dem varsamt."
+      },
+      "scout_yerrin": {
+        "name": "Spanaren Yerrin",
+        "title": "Vakt bortom dynerna",
+        "greeting": "Håll dig lågt. Ljud bär sig märkligt över glaset, och porten därnere har öron."
+      },
+      "reeve_ottoline": {
+        "name": "Fogden Ottoline",
+        "title": "Fogde i Lyktsjön",
+        "greeting": "Välkommen till Lyktsjön, där skörden aldrig tar slut, och inte heller arbetet."
+      },
+      "waywatcher_sorrel": {
+        "name": "Vägvakten Sorrel",
+        "title": "Vakt vid Guldsmältan",
+        "greeting": "Snö bakom dig, guld framför. Få vandrar Guldsmältan två gånger, så se till att korsningen räknas."
+      },
+      "ferrymaster_caddow": {
+        "name": "Färjmästaren Caddow",
+        "title": "Väktare av lyktfärjorna",
+        "greeting": "Dimman ligger över sjön igen. När lyktorna slocknar på vattnet håller sig kloka människor på land."
+      },
+      "orchardist_pomeline": {
+        "name": "Fruktodlaren Pomeline",
+        "title": "Väktare av de förgyllda raderna",
+        "greeting": "Se upp var du går. Varje rot i dessa rader är äldre än staden, och de minns."
+      },
+      "waykeeper_pell": {
+        "name": "Vägväktaren Pell",
+        "title": "Väktare av Bärnstenskärrets trappor",
+        "greeting": "Ner för trapporna och in i det mjuka landet. Se upp var du sätter dina stövlar."
+      },
+      "bridgewright_alden": {
+        "name": "Brobyggaren Alden",
+        "title": "Mästare av Kärrvägen",
+        "greeting": "Varje planka i denna stad är min att vårda, och kärret tuggar på dem alla."
+      },
+      "netter_maris": {
+        "name": "Nätfiskaren Maris",
+        "title": "Ålfiskare i Brosjön",
+        "greeting": "Känner du det? Rökt ål. Halva denna stad står på pålar jag köpte med den."
+      },
+      "mother_sedge": {
+        "name": "Moder Sedge",
+        "title": "Kärrhäxa från Pilgråten",
+        "greeting": "Pilarna berättade att du kom innan dina stövlar lämnade bron."
+      },
+      "lamplighter_sorrel": {
+        "name": "Lykttändaren Sorrel",
+        "title": "Väktare av Nattporten",
+        "greeting": "Se upp med lyktorna, vän. Bortom denna port ger solen upp och blommorna tar över."
+      },
+      "lira_dewsong": {
+        "name": "Lira Dewsong",
+        "title": "Natt-trädgårdsmästare i Månvila",
+        "greeting": "Välkommen till Månvila, där blommorna gryr åt oss."
+      },
+      "weaver_amelle": {
+        "name": "Väver Amelle",
+        "title": "Månullsväverska",
+        "greeting": "Känner du det? Månull på vävstolen. Varmare än någon eld du någonsin suttit vid."
+      },
+      "astronomer_cassian": {
+        "name": "Astronomen Cassian",
+        "title": "Vakt vid vakan",
+        "greeting": "Tyst nu. Himlen gryr aldrig här, så den slutar heller aldrig tala."
+      },
+      "lampman_cobb": {
+        "name": "Lyktkarlen Cobb",
+        "title": "Väktare av Kråkportens lyktor",
+        "greeting": "Håll dig i lyktskenet, vän. Skogen räknar alla som passerar porten."
+      },
+      "sexton_marrow": {
+        "name": "Klockaren Marrow",
+        "title": "Klockare i Galgsjön",
+        "greeting": "Vi begraver dem djupt här, och vi ringer klockorna så att de minns att stanna nere."
+      },
+      "widow_tansy": {
+        "name": "Änkan Tansy",
+        "title": "Ljustillverkare i Galgsjön",
+        "greeting": "Ett ljus för varje grav, och inte ett enda får slockna. Inte ett enda, hör du mig?"
+      },
+      "vicar_creel": {
+        "name": "Kaplanen Creel",
+        "title": "Siste kaplanen vid Sorgestenen",
+        "greeting": "Kapellet föll för år sedan. De döda under det märkte det inte, så jag stannade."
+      },
+      "strandwatcher_pell": {
+        "name": "Strandvakten Pell",
+        "title": "Vakt vid Snårmynningen",
+        "greeting": "Ute ur de svarta träden äntligen. Andas, främling, solen håller denna sida av passet."
+      },
+      "salvage_boss_ryna": {
+        "name": "Bärgningsbasen Ryna",
+        "title": "Härskarinna över vrakraden",
+        "greeting": "En {className} med fungerande armar, bra. Vrakraden betalar bra, om krabborna lämnar dig tillräckligt med fingrar för att räkna den."
+      },
+      "pearlmother_isha": {
+        "name": "Pärlmodern Isha",
+        "title": "De dykandes äldste",
+        "greeting": "Havet ger, sanden behåller, och djungeln tar. Håll dig på stranden, främling."
+      },
+      "hermit_okku": {
+        "name": "Okku",
+        "title": "Mannen som gick in",
+        "greeting": "Tyst nu. Trummorna räknar allt som går under träden, och de har redan räknat dig."
+      },
+      "gatewarden_pell": {
+        "name": "Portväktaren Pell",
+        "title": "Väktare av Trädgårdsporten",
+        "greeting": "Se upp med hur du går på gräsmattorna. Trädgården håller dem klippta, och den vill ha dem prydliga."
+      },
+      "head_gardener_amaranth": {
+        "name": "Överträdgårdsmästaren Amaranth",
+        "title": "Överträdgårdsmästare i Evighetsträdgården",
+        "greeting": "Bry dig inte om skuggorna under mina ögon. Någon måste hålla sig vaken medan trädgården drömmer."
+      },
+      "wickmother_sorrel": {
+        "name": "Värdinnan Sorrel",
+        "title": "Värdinna på Häckby värdshus",
+        "greeting": "Kom in, sätt dig, det finns saft på elden. Håll bara en hand på allt av järn: gnomerna har lätta fingrar på sistone."
+      },
+      "gardener_yew": {
+        "name": "Trädgårdsmästaren Yew",
+        "title": "Den siste trädgårdsmästaren",
+        "greeting": "Räck mig den skottkärran, är du snäll? Dessa gräsmattor går inte omkring av sig själva, vad byn än tror."
+      },
+      "watcher_maren": {
+        "name": "Vakten Maren",
+        "title": "Vakten vid Vindleden",
+        "greeting": "Se upp med fotfästet bortom porten. Vinden här uppe tar hattar först och frågor aldrig."
+      },
+      "harbormaster_odile": {
+        "name": "Hamnmästaren Odile",
+        "title": "Hamnmästare i Vikhamn",
+        "greeting": "Varje båt i denna vik är skyldig Den gamla vårdkasen sin köl. Tala fort, tidvattnet väntar inte."
+      },
+      "keeper_bram": {
+        "name": "Väktaren Bram",
+        "title": "Väktare av Den gamla vårdkasen",
+        "greeting": "Nio och trettio år har denna lykta brunnit under min vakt. Den kommer inte slockna under din."
+      },
+      "salvager_edda": {
+        "name": "Bärgaren Edda",
+        "title": "Bärgare från Vrakfälten",
+        "greeting": "Vrakvirke, rep och döda mäns last. Havet betalar min lön, när Väktaren tillåter det."
+      },
+      "warden_coalfast": {
+        "name": "Väktaren Coalfast",
+        "title": "Skansens befälhavare",
+        "greeting": "Bräscherna bryr sig inte om att Måshamn är litet, {className}. Vi håller denna kust, annars finns ingen kust kvar att hålla. Stå med oss så glömmer jag det inte."
+      },
+      "riftwatch_ollun": {
+        "name": "Revvakten Ollun",
+        "title": "Bräschforskare",
+        "greeting": "Varje bräsch sjunger innan den öppnas, om du har örat för det. Jag kan höra tre av dem röra sig på ön just nu, och en av dem är nära."
+      },
+      "quartermaster_edda": {
+        "name": "Kvartermästaren Edda",
+        "title": "Skansens vapensmed",
+        "greeting": "Stål och salt, {className}, det är allt jag har kvar att dela ut. Ta det och se till att bräscherna ångrar att de öppnade där jag kunde nå dem."
+      },
+      "mender_saul": {
+        "name": "Botaren Saul",
+        "title": "Fältkirurg",
+        "greeting": "Jag har lagt fler ben denna enda månad än under tio år av att laga fiskefall. Bräscherna lämnar inte mycket kvar av det de tar. Kom tillbaka till mig hel, om du kan klara det."
+      },
+      "bellkeeper_tam": {
+        "name": "Klockväktaren Tam",
+        "title": "Väktare av vaktklockan",
+        "greeting": "Klockan är den enda varning bräscherna ger oss, {className}. En klämtning för fälten, två för klipporna, tre när det är så nära att springa inte hjälper. Håll ett öra mot den, så kan den hålla dig hel."
+      },
+      "fisher_nell": {
+        "name": "Skräckslagna Nell",
+        "title": "Fiskare i Måshamn",
+        "greeting": "Den öppnades precis där näten torkar. Precis där, där jag stod varje morgon i mitt liv. Jag går inte ner till stranden längre. Jag går inte till så mycket alls längre."
       },
       "forgemistress_darva": {
         "name": "Smedmästarinnan Darva",
@@ -11433,6 +12554,192 @@ export const sv_SE: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Ridlektioner",
+        "text": "Varje ryttare kommer in på två ben, {playerName}, precis som jag sa den dag vi möttes. Betala avgiften, och när jag ger tecken kallar du till dig övnings-Valorsteeden och kliver upp i sadeln. Rid sedan banan: följ markören till startbågen, ta varje hinder rent och korsa linjen igen innan sanden runnit ut. Klarar du det är sadeln din. Vandrar du ut ur hagen börjar vi om.",
+        "completion": "Så där ja. Upp i en enda mjuk rörelse och stadigt sittande där uppe. Valorsteed är din, {playerName}: sadel, tyglar och ryktet som en ryttare som förtjänade sadeln istället för att köpa den.",
+        "objectives": {
+          "0": {
+            "label": "Tämj Valorsteed"
+          }
+        }
+      },
+      "q_veil_thinned": {
+        "title": "Den uttunnade slöjan",
+        "text": "Så grottan öppnade sig för dig. Då är förseglingen svagare än jag fruktade, {playerName}. Där slöjan rivs sönder blir irrblossen mörka och kalla. Ge mig åtta essenser från skymningsirrblossen så läser jag hur djupt såret går.",
+        "completion": "Kalla, alla som en. Hålan har kanske en säsong kvar innan revan blir en fullständig reva. Vi har arbete att göra, du och jag.",
+        "objectives": {
+          "0": {
+            "label": "Skymningsirrbloss-essens"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "Glimmrande horn",
+        "text": "Slöjhjortarna fäller ljus där de betar, och deras fällda horn håller det i åratal. Fem av dem, från hjordarna i den öppna gläntan i dalens hjärta, och mina lyktor brinner genom vintern utan olja. Hjortarna behöver inte skadas, men de skiljs inte gärna från dem.",
+        "completion": "Titta hur de håller ljuset! Ingen låga, ingen rök, bara glöden. Hålan förser.",
+        "objectives": {
+          "0": {
+            "label": "Glimmrande horn"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "Ljus i grunden",
+        "text": "Glimmerirrblossen bär korn av det gamla stjärnljuset som föll här när Hålan förseglades. Sex korn, så brinner helgedomens lampor i ett år. Ta bara från de som bleknar; Hålan ger nog utan girighet.",
+        "completion": "Mjuka som de första stjärnorna. Sätt dem här vid altaret; helgedomen sköter resten.",
+        "objectives": {
+          "0": {
+            "label": "Irrblosskorn"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "Lugna djupet",
+        "text": "Sporlingarna i Det glittrande djupet var ett fridfullt folk innan revan rörde vid deras ringar. Vad korruptionen tar ger den inte tillbaka. Ge de korrumperade ro, {playerName}: tio av dem, i norra delen av djupet.",
+        "completion": "Du gjorde det jag inte kunde bära att göra. Samlarna sjunger fortfarande i de södra ringarna; tack vare dig kommer de fortsätta sjunga.",
+        "objectives": {
+          "0": {
+            "label": "Korrumperad sporling lagd till ro"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "Ringens hjärtan",
+        "text": "När en sporling faller för mörkret fortsätter dess hjärta att slå med lånad skugga. Fyra av dessa hjärtan, renade vid helgedomen, kan lära oss hur korruptionen sprids. Det är dystert arbete, {playerName}, men det är läkande arbete.",
+        "completion": "Där. Renat, och stilla. Vart och ett visar samma tecken: skuggan flödar FRÅN Den sjunkna gården. Berätta för Saelwyn.",
+        "objectives": {
+          "0": {
+            "label": "Sporhjärta"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "Vad stenarna minns",
+        "text": "Tre monument står fortfarande kvar från före förseglingen: ett vid Skymningsfallets utsikt, ett i Den sjunkna gården, och ett förlorat i den fjärran nordost dit ingen går. Läs dem åt mig, {playerName}. Mina knän gav vika för två århundraden av trappor sedan.",
+        "completion": "En utsikt, en gård och ett bortglömt hörn, och alla tre verserna av förseglingssången, tillsammans för första gången sedan den sjöngs. Du har gjort en gammal läsare mycket glad.",
+        "objectives": {
+          "0": {
+            "label": "Utsiktens monument läst"
+          },
+          "1": {
+            "label": "Gårdens monument läst"
+          },
+          "2": {
+            "label": "Det bortglömda monumentet läst"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "Hot i gläntan",
+        "text": "Skymningsirrbloss har börjat driva in bland mina stånd efter mörkrets inbrott, {playerName}, och deras köld förstör allt den rör vid. Gallra ut dem åt mig: tio av dem, var slöjan än har rivits upp.",
+        "completion": "Nattmarknaden kan öppna igen. Du har en kund för livet, eller åtminstone rabatt.",
+        "objectives": {
+          "0": {
+            "label": "Skymningsirrbloss skingrat"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "Skärvor av stjärnfall",
+        "text": "När skymningsirrbloss passerar över kristallfälten fastnar flisor av gammalt stjärnljus vid dem som kardborrar. Sex skärvor, {playerName}, så kan jag datera förseglingen till exakt den säsong den sjöngs.",
+        "completion": "Titta på strimmorna! Höst. Hålan förseglades på hösten. Tvåhundra års tvist, avgjort av sex små stenar.",
+        "objectives": {
+          "0": {
+            "label": "Stjärnfallsskärva"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "Trädjättarnas överenskommelse",
+        "text": "De äldsta i Lunden fäller sin yttre bark medan korruptionen gnager på deras rötter. Fyra längder av den, så kan jag brygga en salva för hela Lunden. De kommer inte tacka dig medan du bänder loss den, {playerName}, men de kommer stå ett århundrade längre för det.",
+        "completion": "Tjock och frisk, alla fyra. Salvan kommer ta en vecka att brygga och hundra år att fullborda sitt verk. Träd mäter godhet annorlunda.",
+        "objectives": {
+          "0": {
+            "label": "Ålderdomlig bark"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "Mot sportidvattnet",
+        "text": "Salvan håller Lunden, men korruptionen pressar hårdare på Djupet för varje skymning. Tolv till av de korrumperade måste läggas till ro innan samlarna kan återta sina norra ringar, {playerName}.",
+        "completion": "Ringarna i norr sjunger igen i natt. Tyst, men de sjunger.",
+        "objectives": {
+          "0": {
+            "label": "Korrumperad sporling lagd till ro"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "Den sjunkna gården",
+        "text": "Bryn läste hjärtana rätt: revan löper genom den gamla gården i öster, och dess väktare har vaknat fel. De byggdes för att skydda förseglingen; nu krossar de vem som helst som närmar sig den. Rensa åtta av dem från ruinerna.",
+        "completion": "Åtta väktare, stillade. Jag minns när de restes, {playerName}. Se inte så förvånad ut; Hålan behåller sina väktare länge.",
+        "objectives": {
+          "0": {
+            "label": "Uråldrig väktare stillad"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "Väktarens ekon",
+        "text": "Även med sin herre tystad upprepar gårdens väktare dess sista befallning som ett eko som inte vill blekna. Tills förseglingen är återsatt kommer de fortsätta vakna, {playerName}. Stilla tio till av dem så att stenhuggarna kan nå sigillstenen.",
+        "completion": "Ekot blir svagare för varje gång. Snart kommer gården bara hålla vind och murgröna, som en ruin bör.",
+        "objectives": {
+          "0": {
+            "label": "Uråldrig väktare stillad"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "Den vaknande väktaren",
+        "text": "Gården är tyst, men dess herre är det inte. Väktaren som håller förseglingen har vaknat förvriden, och medan den står kan förseglingen inte lagas. Den faller inte lätt; ta med en vän om du kan hitta en, {playerName}. Ta med två om du kan hitta två.",
+        "completion": "Klockan i dess röst är tyst. Jag kände det härifrån, som en tyngd lyft från hela dalen.",
+        "objectives": {
+          "0": {
+            "label": "Den vaknande väktaren besegrad"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "Förseglingen återställd",
+        "text": "Ta Väktarens sigill till sigillstenen i gårdens hjärta och sätt tillbaka det där det slogs loss. Då kan Hålan börja läka, och du, {playerName}, kommer ha gjort vad ingen av ditt slag har gjort förut.",
+        "completion": "Jag kände det slutas härifrån, milt som skymning. Hålan minns sina vänner, {playerName}. Hur långt du än reser kommer det alltid finnas ett ljus för dig under det stora trädet.",
+        "objectives": {
+          "0": {
+            "label": "Sigillet återsatt i sigillstenen"
+          }
+        }
+      },
+      "q_hollow_the_huntsman": {
+        "title": "Hjordarnas väktare",
+        "text": "Du ser ut som någon som klarar av mer än irrbloss, {playerName}. Jägaren Deral håller sin utkik bland hjortängarna öster om här, och han har frågat efter kapabla händer i veckor. Vad han än spårar där ute vill han inte säga högt i byn.",
+        "completion": "Fenna skickade dig? Bra. Då litar hon på dig, och jag har två namn som behöver strykas ut.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Jägaren Deral"
+          }
+        }
+      },
+      "q_hollow_old_marrowshell": {
+        "title": "Det gamla skalet i grunden",
+        "text": "Det första namnet är Gamla Märgskalet, en krabba stor som en vagn som har jagat de östra grunden sedan innan Fornglimmer hade en port. Den vandrar, {playerName}, så du får gå längs strandlinjen tills du korsar dess spår. Gå inte ensam, och lita inte på dess stillhet.",
+        "completion": "Grunden är bara vatten igen. Jag har sett det skalet krossa bättre jägare än mig, {playerName}. Inte dig.",
+        "objectives": {
+          "0": {
+            "label": "Gamla Märgskalet dräpt"
+          }
+        }
+      },
+      "q_hollow_first_of_the_herd": {
+        "title": "Hjordens förste",
+        "text": "Det andra namnet är svårare att säga. Aurelhorn ledde dessa hjordar när min mormor höll denna utkiksplats, och vad som än vaknade i Hålan väckte honom fel. Han trampar ner det han en gång vaktade, och hjorden överlever inte hans vansinne. Han strövar omkring på ängarna nära de gamla gårdsvägarna. Gör slut på honom med nåd, {playerName}, och ta med en vän att dela bördan med.",
+        "completion": "Så den förste faller för den siste. Hjorden är redan lugnare, känner du det? Du gjorde Hålan en tjänst idag, även om det inte ser ut som en.",
+        "objectives": {
+          "0": {
+            "label": "Aurelhorn given frid"
+          }
+        }
+      },
       "q_prof_hobby_switch": {
         "title": "Ett annorlunda tidsfördriv",
         "text": "Ämnen kräver ett löfte. Ett hobby frågar bara vart din nyfikenhet vandrar, {playerName}. Plocka några örter och bestäm vilket hantverk, det som är motsatt dina ämnen, du vill ägna dig åt.",
@@ -11440,6 +12747,916 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Örtfläck skördad"
+          }
+        }
+      },
+      "q_fv_snowline_report": {
+        "title": "Bud från Snölinjen",
+        "text": "Varje själ som klättrar ut ur Drakländerna passerar min eld, {playerName}, och färre klättrar för varje vecka. Väktaren Kaldra håller Ismanteln uppe vid norra vägen. Berätta för henne att passet fortfarande är öppet, och berätta för henne att en främling vandrade det ensam.",
+        "completion": "Passet håller, alltså. Einna sitter kvar i det väglägret genom stormar som begraver vägmärkena, och hon har aldrig en enda gång sänt mig lösa nyheter. Välkommen till Ismanteln, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Rapportera till Väktaren Kaldra"
+          }
+        }
+      },
+      "q_fv_wolves_at_the_door": {
+        "title": "Vargar vid dörren",
+        "text": "Snödrivsflockarna brukade hålla sig till de höga avsatserna. Nu korsar de tjärnvägen i dagsljus och mina vedhuggare vill inte lämna murarna. Gallra flockarna, {playerName}, tio av dem, så blir vägen en väg igen.",
+        "completion": "Tio färre skuggor mellan här och tjärnen. Vedhuggarna bråkar redan om vem som ska gå ut först.",
+        "objectives": {
+          "0": {
+            "label": "Snödrivans varg dräpt"
+          }
+        }
+      },
+      "q_fv_winter_pelts": {
+        "title": "Pälsar till stugan",
+        "text": "Ved håller en kropp vid liv, {playerName}, men ull avvärjer inte denna kyla, bara vargpäls gör det. Sex tjocka vinterpälsar från snödrivsflockarna så kan jag fodra liggunderlag åt alla stugan härbärgerar.",
+        "completion": "Päls som denna är det enda argument vintern lyssnar på. Ta dessa stövlar, de är fodrade med den senaste omgången.",
+        "objectives": {
+          "0": {
+            "label": "Tjock vinterpäls"
+          }
+        }
+      },
+      "q_fv_ember_caches": {
+        "title": "Glöd på tjärnvägen",
+        "text": "En släde med glödgömmor välte på tjärnvägen inatt: järngrytor som håller en täckt eld levande i en månad. Tre av dem ligger fortfarande i snön, {playerName}, och stugan kan inte avvara vad de rymmer. För elden hem.",
+        "completion": "Fortfarande varma, allihop. Du har köpt stugan en hel vinter av nåd, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Glödgömma återfunnen"
+          }
+        }
+      },
+      "q_fv_lights_over_steps": {
+        "title": "Sken över trapporna",
+        "text": "Norrskenet har brunnit grönt varje natt denna månad, och de gamla vill inte vandra under det. En kvinna kanske vet varför: Veyla, Norrskenstydaren. Hon lägrar sig ensam på Norrskenstrapporna, sydost förbi tjärnen. Hitta hennes läger, {playerName}, och hör vad skenen har berättat för henne.",
+        "completion": "Kaldra skickade dig? Då är hon äntligen orolig, och hon har rätt att vara det. Sätt dig, {playerName}. Titta på himlen med mig en stund.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Norrskenstydaren Veyla"
+          }
+        }
+      },
+      "q_fv_silent_trapline": {
+        "title": "Den tysta fällinjen",
+        "text": "Gamle Brosk sköter fällinjen i Skälvkärret väster om här, och varje vecka i elva år har han sänt upp ett knippe pälsar med vedsläden. Två veckor nu, inget. Han är för envis för att frysa ihjäl och för försiktig för att drunkna, {playerName}, så något annat är fel. Hitta hans läger vid kärret och se honom andas.",
+        "completion": "Maeve skickade dig? Ha. Elva år och kvinnan tror fortfarande att kärret ska äta upp mig. Nåväl... i år kanske hon har rätt. Titta vad det har gjort med mina linor.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Fångstmannen Brosk"
+          }
+        }
+      },
+      "q_fv_aurora_motes": {
+        "title": "Norrskenets korn",
+        "text": "Irrbloss som driver längs dessa trappor fälls av skenen själva, och var och en bär ett korn av norrskenet i sitt hjärta. Jag behöver sex för att läsa vad himlen skriver, {playerName}. Irrbloss slår inte tillbaka. Om det gör arbetet lättare eller svårare är en sak mellan dig och ditt samvete.",
+        "completion": "Sex korn, fortfarande glödande. Titta på dem, {playerName}: de pulserar i takt med varandra. Skenen är inget väder. De är en signal.",
+        "objectives": {
+          "0": {
+            "label": "Norrskenskorn"
+          }
+        }
+      },
+      "q_fv_rime_unbound": {
+        "title": "Rimfrost frigjord",
+        "text": "När norrskenet brinner så här klart reser sig kylan och går: rimfrostelementarer, frost given en vilja. De samlas där skenen rör vid avsatserna, och de vandrar allt närmare mitt läger varje natt. Slå sönder åtta av dem, {playerName}, innan en av dem slår sönder mig.",
+        "completion": "Natten känns redan tunnare. Vad som än väcker dem är inte klart, men du har köpt trapporna lite tystnad.",
+        "objectives": {
+          "0": {
+            "label": "Rimfrostelementar dräpt"
+          }
+        }
+      },
+      "q_fv_sprung_traps": {
+        "title": "Älvor i fällorna",
+        "text": "Kärrälvor, {playerName}. De små djävlarna utlöser mina fällor för nöjes skull och strör järnet i vassen. Jaga bort dem, åtta borde lära resten en läxa, och samla ihop det som är kvar av mina fällinjer medan du ändå är ute där.",
+        "completion": "Fyra bra fällor tillbaka och vassen har blivit tyst. Du fångar med en tyngre hand än jag gör, {playerName}, men jag kan inte klaga på resultaten.",
+        "objectives": {
+          "0": {
+            "label": "Kärrälva bortjagad"
+          },
+          "1": {
+            "label": "Fälla återfunnen"
+          }
+        }
+      },
+      "q_fv_howl_above": {
+        "title": "Tjutet på terrasserna",
+        "text": "Du hör det i skymningen, {playerName}: ett tjut från De tjutande terrasserna som inte är snödrivsflockarna. Större strupar. Terrasstjutarna har kommit ner från topparna för första gången sedan min mormor höll denna post, och det är de som drev vargarna ut på min väg. Gallra åtta och driv tillbaka dem.",
+        "completion": "Åtta, och skymningskören är tunnare för det. Men tjutare lämnar inte topparna utan anledning. Något däruppe rörde dem, och jag fruktar att det har ett namn.",
+        "objectives": {
+          "0": {
+            "label": "Terrassernas tjutare dräpt"
+          }
+        }
+      },
+      "q_fv_seeing_wren_home": {
+        "title": "Föra Wren hem",
+        "text": "Min lärling Wren gick ut för att vandra Guldsmältans linje för två dagar sedan och kom aldrig tillbaka. Jag fann hennes spår, hon gömmer sig under vägmärkena sydväst om Norrskenstrapporna, för rädd för vargarna för att röra sig. Jag kan inte lämna kärret, {playerName}. För henne till Veylas läger på trapporna. Hon kommer vara säker under skenen.",
+        "completion": "Flickan är inne, insvept i hälften av mina filtar och pratar stjärnorna ur skyn. Du gjorde något gott idag, {playerName}. Vidderna ser inte många sådana.",
+        "objectives": {
+          "0": {
+            "label": "Lärling Wren säkert förd till Norrskenstrapporna"
+          }
+        }
+      },
+      "q_fv_frostmane_tyrant": {
+        "title": "Frostmanens tyrann",
+        "text": "Tjutarna jagade inte när de kom ner för terrasserna. De flydde. En yeti har tagit högmarken, bergsfolket kallar den Frostmanen, och inte ens flockarna vill dela en sluttning med den. Det måste ta slut, {playerName}, innan vintern driver den ner till mina murar. Ta med en vän. Ta med två.",
+        "completion": "När vinden lade sig i natt hörde hela byn tystnaden där Frostmanen brukade vara. Vidderna är dig skyldiga en skuld som kommer ta år att betala, {playerName}. Bär detta, och varje dörr i Ismanteln står öppen för dig.",
+        "objectives": {
+          "0": {
+            "label": "Frostmanen dräpt"
+          }
+        }
+      },
+      "q_dk_ash_on_the_wind": {
+        "title": "Aska i vinden",
+        "text": "Titta söderut från palissaden, {playerName}. Elderna i dynerna är inga trollkokeldar, de är askbenssamlingar, och varje natt blir det fler. De döda kommer upp ur benfälten med sand fortfarande i tänderna. Fäll tio plundrare innan de hugger sig en väg till min port.",
+        "completion": "Tio färre klingor i dynerna, och samlingens eldar brann lägre i natt. Mina vakter sov, vilket de inte gjort på en vecka. Väl huggit, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Askbensplundrare dräpt"
+          }
+        }
+      },
+      "q_dk_trolls_on_the_road": {
+        "title": "Troll på vägen",
+        "text": "Dyntrollen har lärt sig ljudet av en förrådsvagn, {playerName}. De har slagit till mot Sotdynernas väg tre gånger denna månad, och den senaste körsvennen kom in bärandes på inget annat än tyglarna. Åtta troll bort från den vägen så rullar mina vagnar igen.",
+        "completion": "Åtta, och mina körsvenner har slutat skriva avskedsbrev innan varje färd. Garnisonen äter tack vare dig, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Dyntroll dräpt"
+          }
+        }
+      },
+      "q_dk_scorched_stores": {
+        "title": "Svedda förråd",
+        "text": "Den sista vagnen brann upp, {playerName}, men järnbeslagna kistor brinner inte igenom. Fyra av dem ligger fortfarande svedda längs dynvägen med en säsongs salt, spik och bågsträngar inuti. Ta mina förråd hem innan trollen listar ut hur man öppnar dem.",
+        "completion": "Svedda svarta och varenda lås håller fortfarande. Smeden får sin spik, fjäderfästerskan sina strängar, och du får stövlarna jag sparade åt den som förde mina kistor tillbaka, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Svedd förrådskista återfunnen"
+          }
+        }
+      },
+      "q_dk_banners_over_the_dunes": {
+        "title": "Banér över dynerna",
+        "text": "Askbenen samlas vid de gamla benfältsgravarna, {playerName}, och mina patruller kan inte läsa dynerna som de läser en mur. Döda fem av deras krigsropare, de som skriker de döda upprätt, och res ett varningsbanér på varje samlingsplats så att mina vakter kan märka ut den från åsen.",
+        "completion": "Tre banér som smäller i den heta vinden, precis där min kikare kan finna dem. Med fem krigsropare tystade kommer vad som än svarar deras kall komma långsammare. Du köpte oss tid, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Askbens krigsropare dräpt"
+          },
+          "1": {
+            "label": "Varningsbanér rest"
+          }
+        }
+      },
+      "q_dk_watcher_at_the_wargate": {
+        "title": "Vakten vid krigsporten",
+        "text": "Något drar askbenen österut, {playerName}, och jag sände min bästa för att ta reda på vad. Spanaren Yerrin har lägrat sig en månad i de bortre dynerna bortom Trollmötet, i sikte av en port ingen byggde under min livstid. Hennes rapporter upphörde för tio dagar sedan. Hitta hennes läger och ge mig hennes ögon.",
+        "completion": "Brannoc skickade dig? Då nådde min sista budbärare aldrig fram. Håll rösten låg och sätt dig, {playerName}. Ser du porten där nere? Räkna krigsbanéren framför den, så förstår du varför jag slutade skriva ner saker.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Spanaren Yerrin"
+          }
+        }
+      },
+      "q_dk_marrow_and_ash": {
+        "title": "Märg och aska",
+        "text": "Varje askbensplundrare bär en krigsbrand, {playerName}: en sveden räkning av hären den marscherar under. Jag har räknat fyra härar från denna ås, men gissningar är inte underrättelser. Ge mig sex brännmärken från plundrarna och deras krigsropare, så ska jag ge Brannoc formen av kriget som kommer.",
+        "completion": "Sex brännmärken, och ett tecken bränt in i varenda ett. Detta är ingen vanlig plundringssamling, {playerName}. Varje här i dynerna svarar till krigsporten under oss, trollen kallar den Orkadia, och inga fem soldater jag någonsin tjänstgjort med kunde krossa det som trummar bakom den dörren. Kanske fem som du.",
+        "objectives": {
+          "0": {
+            "label": "Askbens krigsbrand"
+          }
+        }
+      },
+      "q_dk_scales_of_the_maw": {
+        "title": "Gapets fjäll",
+        "text": "När vinden vänder från Drakgapet rider glödvingedrakarna på den över mitt läger, lågt nog att räkna deras tänder, {playerName}. De sträcker sig längre för varje dag, och något i den kratern driver dem. Ge mig tre av deras fjäll. Fjäll minns hetta, och jag kan läsa var en drake har hållit till genom brännskadan.",
+        "completion": "Titta på undersidan av det här, {playerName}: bränt i en spiral, och bara en sak bygger bo i cirklar. Dessa drakar är kullvakter. Något i Drakgapet är en moder.",
+        "objectives": {
+          "0": {
+            "label": "Glödvingefjäll"
+          }
+        }
+      },
+      "q_dk_matriarch_of_the_maw": {
+        "title": "Gapets matriark",
+        "text": "Fjällen talade sant, {playerName}. Jag klättrade upp på kanten i gryningen och såg henne på kraterbottnen: Cindraleth, matriarken varje glödvinge på denna himmel kläcktes under, guldfärgad som ett kol på väg att fatta eld. Medan hon ruvar blir drakarna djärvare, och Drakvakten kan inte strida mot både drakar och askben. Gör slut på henne i hennes krater, för sedan budet till Portkaptenen Brannoc. Gå inte ensam.",
+        "completion": "Himlen över Drakgapet har varit tom i två dagar, och nu går du genom min port med en matriarks blod på stövlarna. Drakvakten har stått vakt i fyrtio år just för detta, {playerName}. Ta dessa axelplåtar, gapfjäll, smidda av vår egen smed. Bär dem där drakarna kan se dem.",
+        "objectives": {
+          "0": {
+            "label": "Cindraleth, Gapets matriark, dräpt"
+          }
+        }
+      },
+      "q_af_goldmelt_road": {
+        "title": "Guldvägen ner",
+        "text": "Du kom över Guldsmältan, {playerName}, med snö kvar på stövlarna. Jag vårdar detta helgedom så att Lyktsjön vet vem som kommer in från kylan, och på sistone har jag haft lite att rapportera. Ta guldvägen ner till staden, hitta Fogden Ottoline vid brunnen, och berätta för henne att passet är stilla.",
+        "completion": "Stilla på Guldsmältan, och en resenär med snö i håret som bevis. Sorrel håller sin vakt för väl för att sända lösa ord. Var välkommen i Lyktsjön, {playerName}. Lyktorna brinner för dig.",
+        "objectives": {
+          "0": {
+            "label": "Rapportera till Fogden Ottoline"
+          }
+        }
+      },
+      "q_af_foxes_in_the_lamplight": {
+        "title": "Rävar i lyktskenet",
+        "text": "Skymningsrävarna har lärt sig vad lyktförråden är värda, {playerName}. Varje skymning smiter de genom stängslen och släpar iväg med talgen vi pressar till färjelyktorna. Mjuka tassar, mjukare samvete. Gallra tio av dem så minns resten att frukta staden.",
+        "completion": "Tio, och förråden lämnades orörda i natt för första gången denna säsong. Lykttändarna sänder sitt tack, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Skymningsräv dräpt"
+          }
+        }
+      },
+      "q_af_lanterns_on_the_water": {
+        "title": "Lyktor på vattnet",
+        "text": "Varje färja på sjön bär en akterlykta, {playerName}, och tre av mina båtar kom tillbaka i gryningen utan sina. Dimman tog dem, eller något i dimman gjorde det. De spolas upp längs östra stranden när vinden vänder. Gå strandvägen och för mina lyktor hem.",
+        "completion": "Alla tre, och fortfarande brinnande. Färjelyktor slocknar inte i vatten, {playerName}. Det är själva poängen med dem. Det som oroar mig är vad som slet loss dem.",
+        "objectives": {
+          "0": {
+            "label": "Färjelykta återfunnen"
+          }
+        }
+      },
+      "q_af_orchard_call": {
+        "title": "En vagn till fruktlunden",
+        "text": "Fruktodlaren Pomeline sköter Den förgyllda fruktlunden vid västra vägen, och hennes savvagnar är tre dagar försenade. Hela staden går på den bärnstensfärgade saven, {playerName}: lampkåda, sötning, skördeölet. Gå västra vägen och ta reda på vad som håller henne kvar.",
+        "completion": "Fogden räknar sina vagnar, jaså? Nåväl, hon får räkna dem saknade ett tag till. Titta på mina rader, {playerName}. Jag har större bekymmer än en försenad leverans.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Fruktodlaren Pomeline"
+          }
+        }
+      },
+      "q_af_amber_from_the_herd": {
+        "title": "Bärnsten från hjorden",
+        "text": "De förgyllda hjortarna lägger sig under mina äldsta träd, och saven droppar guld i deras pälsar hela natten. Kammade klumpar av den är den renaste bärnstenen i skogslandet. Ge mig sex, {playerName}. Hjortarna kommer inte tacka dig, men de kommer inte sakna den heller.",
+        "completion": "Sex klumpar, rena som hälld honung. Dessa handskar är sydda av den senaste omgången, {playerName}: savstyvade, och varmare än de ser ut.",
+        "objectives": {
+          "0": {
+            "label": "Förgylld savklump"
+          }
+        }
+      },
+      "q_af_what_took_the_moorings": {
+        "title": "Vad som tog förtöjningarna",
+        "text": "Nu ska jag berätta det jag inte sa inför staden. Förtöjningarna slets inte loss, de tuggades av. Sjölurkare, djärvare för varje natt, som drar i rep och roder. Sänk åtta av dem under vattnet för gott, {playerName}, innan en färjkarl följer med dem.",
+        "completion": "Åtta färre skepnader i grundvattnet, och överfarten gick i tid idag för första gången på två veckor. Men djärva lurkare är drivna lurkare, {playerName}. Något under sjön rör dem.",
+        "objectives": {
+          "0": {
+            "label": "Sjölurkare dräpt"
+          }
+        }
+      },
+      "q_af_sprites_and_spigots": {
+        "title": "Älvor och savtappar",
+        "text": "Skördeälvor, {playerName}. De bänder loss mina savtappar från stammarna för sötman inuti och slänger hinkarna i gräset. Jaga bort åtta av de små tjuvarna och för tillbaka fyra av mina hinkar, så rullar vagnarna igen.",
+        "completion": "Fyra hinkar tillbaka på sina krokar och raderna har blivit tysta. Du har en tyngre hand med älvor än jag har, {playerName}, och idag är jag glad över det.",
+        "objectives": {
+          "0": {
+            "label": "Skördeälva bortjagad"
+          },
+          "1": {
+            "label": "Savtappshink återfunnen"
+          }
+        }
+      },
+      "q_af_the_meredark": {
+        "title": "Sjömörkret",
+        "text": "De gamla färjkarlarna har ett namn de bara säger på land: Sjömörkret, den första lurkaren, gammal som sjön och dubbelt så tålmodig. Den steg upp en gång förut, året den dränkta bryggan sjönk, och den stiger upp nu igen. I skymningen solar den sig på bryggruinen utanför södra stranden, {playerName}. Ta med en vän, ta med två, och gör slut på den medan det fortfarande går.",
+        "completion": "Dimman lyfte från sjön i morse, {playerName}, och hela staden såg det. Färjorna kommer köra nattöverfarten igen, och varje lykta på vattnet kommer brinna i ditt namn. Ta detta: det bärgades från den dränkta bryggan, och ingen har bättre rätt att bära det.",
+        "objectives": {
+          "0": {
+            "label": "Sjömörkret dräpt"
+          }
+        }
+      },
+      "q_wf_across_the_fenway": {
+        "title": "Över Kärrvägen",
+        "text": "Ett milt land, Pilkärret, men milt är inte samma sak som säkert, {playerName}. Följ vägen norrut till Kärrvägens vägbank och korsa in i Brosjön. Berätta för Brobyggaren Alden att Trapporna är öppna och att vägläger-elden är tänd.",
+        "completion": "Pell håller den elden brinnande genom varenda dimma kärret kan andas mot henne. Om hon säger att Trapporna är öppna så är de öppna. Välkommen till Brosjön, {playerName}. Se var du sätter foten på mina plankor så kommer vi trivas bra ihop.",
+        "objectives": {
+          "0": {
+            "label": "Rapportera till Brobyggaren Alden"
+          }
+        }
+      },
+      "q_wf_rope_chewers": {
+        "title": "Repgnagarna",
+        "text": "Kärrpaddor, {playerName}. De drar sig upp ur vallgraven om natten och tuggar sönder mina förtöjningsrep som vore de vassstrån. Tre eka drev iväg förra veckan, och en av dem hade min goda vinsch ombord. Gallra dem, tio av de feta sakerna, så stannar båtarna där vi binder dem.",
+        "completion": "Tio färre uppsättningar tänder i min vallgrav. Ekorna låg still vid sina förtöjningar hela natten för första gången på en månad, {playerName}. Du har tacket från varenda nätfiskare i staden.",
+        "objectives": {
+          "0": {
+            "label": "Kärrpadda dräpt"
+          }
+        }
+      },
+      "q_wf_eels_for_the_smokehouse": {
+        "title": "Ål till rökhuset",
+        "text": "Kärrpaddorna äter inte bara upp mina rep, {playerName}, de äter upp min fångst: de sväljer ålarna hela, rakt ur fällorna. Skär loss sex feta åt undan de girriga sakerna innan köttet skämts, så förblir rökhusets eldar tända.",
+        "completion": "Sex bra ålar, knappt blåtira. Rökhuset kommer dofta pengar till morgonen. Här, dessa vadarstövlar var mina när jag var snabbare: ålskinn avvärjer vätan som inget annat.",
+        "objectives": {
+          "0": {
+            "label": "Fyllig kärrål"
+          }
+        }
+      },
+      "q_wf_mind_the_moorings": {
+        "title": "Se upp med förtöjningarna",
+        "text": "Gott rep är dyrt här ute, {playerName}: varje lina paddorna tuggar av är en vecka av ålpengar borta. De avbitna ändarna ligger fortfarande längs vallgravens strand där båtarna slet sig loss. Gå spängerna och för mig tillbaka fyra linor, så kan jag splitsa dem som nya.",
+        "completion": "Titta på det: rena bett, varenda ett, men det finns rep nog kvar att splitsa. Du har sparat mig en månads mynt och nätfiskarna en månads grumsande, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Avskuren förtöjningslina återfunnen"
+          }
+        }
+      },
+      "q_wf_witch_of_willowweep": {
+        "title": "Häxan i Pilgråten",
+        "text": "Du har hört det vid det här laget, {playerName}: snarkningen. Långsam och tung, ute bortom De sömniga slätterna, som om kärret själv vänder sig i sömnen. Paddorna, älvorna, irrblossen som brinner vid middagstid: allt började när det ljudet gjorde det. En själ kanske vet vad det är. Moder Sedge håller ett läger vid Pilgråten, väster runt vallgraven och ner för den bortre stranden. Hitta henne, och fråga henne vad som sover mitt i mitt kärr.",
+        "completion": "Alden skickade dig hela vägen hit för att fråga om snarkandet? Då lyssnar brofolket äntligen. Sätt dig ner utom fukten, {playerName}. Det ljudet har ett namn, och en strupe, och jag har väntat på någon dåraktig nog att hjälpa mig tysta det.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Moder Sedge"
+          }
+        }
+      },
+      "q_wf_toll_and_tangle": {
+        "title": "Tull och trassel",
+        "text": "Pilälvorna tycker det är en fin lek att skära loss en färja, {playerName}, och förra veckan gick tulleka omkull på den östra leden med en säsongs brotull ombord. Kistorna sjönk i grunt vatten och älvorna dansar på spängerna som om de äger dem. Jaga bort åtta och dra upp tre tullkistor, så äter Brosjön denna vinter.",
+        "completion": "Tre kistor, och myntet fortfarande torrt inuti. Älvorna kommer sura i videbuskarna en vecka, {playerName}, och staden är dig skyldig sitt vinterbröd.",
+        "objectives": {
+          "0": {
+            "label": "Pilälva bortjagad"
+          },
+          "1": {
+            "label": "Tullkista återfunnen"
+          }
+        }
+      },
+      "q_wf_wisplight_charms": {
+        "title": "Irrbloss-amuletter",
+        "text": "Irrblossen över dammarna är kärret som drömmer högt, {playerName}, och deras ljus är det enda som håller emot Kväkarens dvala. Jag väver in det i pilamuletter: en runt din hals och snarkningen kan inte dra ner dina ögonlock. Ge mig sex irrbloss-ljusglober. Irrblossen kommer inte slåss om dem, vilket gör det till en godhet eller en stöld, beroende på hur du bär det.",
+        "completion": "Sex glober, fortfarande varma av drömmande. Ge mig till månuppgång så har jag amuletter vävda åt dig och den som är modig nog att stå bredvid dig.",
+        "objectives": {
+          "0": {
+            "label": "Irrbloss-ljusglob"
+          }
+        }
+      },
+      "q_wf_croakers_hush": {
+        "title": "Kväkarens tystnad",
+        "text": "Nu vet du snarkarens namn, {playerName}: Den sömniga kväkaren, den gamla paddkungen ute på De sömniga slätterna. Varje år blir hans kväkande tyngre, och varje år glömmer mer av kärret att vakna. Amuletterna håller dina ögon öppna, men hans massa är en annan sak: ta med en vän, och strid inte mot honom i vattnet. Sänk den gamle kungen i en tystare sömn.",
+        "completion": "Lyssna, {playerName}. Ingenting. Den första sanna tystnaden över detta kärr på trettio år, och halva staden kommer inte sova i natt av det märkliga i det. Pilarna säger tack, på sitt sätt. Bär detta, vävt från hans egen liljebädd, så känner kärret igen dig som en vän vart vattnet än når.",
+        "objectives": {
+          "0": {
+            "label": "Den sömniga kväkaren dräpt"
+          }
+        }
+      },
+      "q_nb_road_of_lanterns": {
+        "title": "Lyktornas väg",
+        "text": "Här uppe följer solen aldrig med, {playerName}, bara lamporna jag håller tända längs klättringen. Månvila ligger norrut där blomljuset samlas. Hitta Lira Dewsong bland sina trädgårdar och berätta för henne att Nattportens lampor fortfarande brinner.",
+        "completion": "Lamporna brinner fortfarande, och vägen för fortfarande främlingar till oss. Sorrel har hållit den porten längre än någon i Månvila minns. Välkommen, {playerName}, till riket som aldrig gryr.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Lira Dewsong i Månvila"
+          }
+        }
+      },
+      "q_nb_striders_in_the_dark": {
+        "title": "Vandrare i mörkret",
+        "text": "Skymningsvandrarna var alltid tålmodiga jägare, {playerName}, men på sistone smiter de rakt in i blomsterbäddarna och tar månullslamm under våra lyktor. Gallra tio av dem och ge hedarna tillbaka sin frid.",
+        "completion": "Tio vandrare färre, och hjordarna betar redan lättare. Trädgårdarna håller sina egna tider, men i natt håller de dem i frid.",
+        "objectives": {
+          "0": {
+            "label": "Skymningsvandrare dräpt"
+          }
+        }
+      },
+      "q_nb_wool_by_moonlight": {
+        "title": "Ull i månsken",
+        "text": "Inget värmer som månull, {playerName}, och inget spinns så fint. Betarna bär sin silverull löst i tofsar medan de driver över hedarna. Ge mig sex bra tofsar från hjordarna så väver jag åt dig något värt vandringen.",
+        "completion": "Silverfärgad som stjärnljus och dubbelt så mjuk. Här, {playerName}: vantar från den senaste omgången, fodrade som bara månull kan fodra.",
+        "objectives": {
+          "0": {
+            "label": "Månullstofs"
+          }
+        }
+      },
+      "q_nb_night_gardens": {
+        "title": "Natt-trädgårdarna",
+        "text": "Nattblomstret öppnar sig bara under denna himmel, och Skymningsfältet håller de äldsta bäddarna i riket. Jag behöver fyra färska blommor till helgedomens girlanger, {playerName}. Skär dem varsamt: en bädd minns en hårdhänt beröring en hel säsong.",
+        "completion": "Fortfarande glödande, varenda kronblad. Helgedomen kommer dofta natt i en vecka, och Månvila sover lättare för det.",
+        "objectives": {
+          "0": {
+            "label": "Nattblomstrets blomma insamlad"
+          }
+        }
+      },
+      "q_nb_eyes_on_the_vigil": {
+        "title": "Ögon på vakan",
+        "text": "Något gör vandrarna djärva och hjordarna oroliga, {playerName}, och jag kan inte läsa det i blommorna. Cassian kan läsa det i himlen. Han håller sitt observatorieläger vid Den stående vakan öster om här, där nattsläktet driver bland stenarna. Hitta honom, och fråga vad stjärnorna säger.",
+        "completion": "Lira skickade dig? Då känner trädgårdarna det också. Sätt dig vid kikaren ett ögonblick, {playerName}. Stjärnorna har varit rastlösa i en månad, och varje karta jag ritar lutar norrut mot gravhögen.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Astronomen Cassian vid Den stående vakan"
+          }
+        }
+      },
+      "q_nb_charts_of_the_stones": {
+        "title": "Kartorna i stenarna",
+        "text": "Vakans stenar är äldre än Månvila, äldre än nattsläktet som vårdar dem, och deras ytor är ristade med stjärnkartor jag har ägnat mitt liv åt att lära mig läsa. Himlen har förskjutits, {playerName}, och jag måste veta hur mycket. Läs kartorna på tre av stenarna och ge mig deras bäringar.",
+        "completion": "Inget tvivel finns kvar. Varenda bäring har krupit mot Den sömnlösa gravhögen, som om himlen själv lutar sig över den högen för att vaka. De gamla kungarna begravdes under uppradade stjärnor av en anledning, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Stjärnkarta läst"
+          }
+        }
+      },
+      "q_nb_restless_mounds": {
+        "title": "De rastlösa högarna",
+        "text": "Kartorna var en varning, och gravhögsfältet bevisar det: högarna öppnas underifrån. Vättar vandrar gravraderna bärandes de gamla hedersmärkena, och offren som höll dem sovande ligger utströdda i gräset. Sänk åtta av dem, {playerName}, och samla fyra av offren tillbaka till mig.",
+        "completion": "Gravguld, fortfarande kallt från jorden. Vättarna reser sig inte av sig själva, {playerName}: något under den stora högen kallar på dem, och jag fruktar att kartorna redan har berättat dess namn för oss.",
+        "objectives": {
+          "0": {
+            "label": "Gravhögsvätte dräpt"
+          },
+          "1": {
+            "label": "Gravoffer återfunnet"
+          }
+        }
+      },
+      "q_nb_the_barrow_king": {
+        "title": "Gravhögskungen vaknar",
+        "text": "Varje bäring, varje rastlös stjärna, varje öppnad hög pekar mot en sak: Gravhögskungen vaknar under den stora högen, och detta rike har ingen gryning som håller honom tillbaka. Han måste läggas till ro innan han minns sin krona, {playerName}. Gå inte ensam: ta med en vän, och håll blomljuset i ryggen.",
+        "completion": "Stjärnorna har lugnat sig för första gången på en säsong, {playerName}. Högarna är stängda, nattsläktet har blivit stilla vid sina stenar, och kungen sover därunder än en gång. Bär denna mantel: Månvila skar till den åt den som natten äntligen litade på.",
+        "objectives": {
+          "0": {
+            "label": "Gravhögskungen lagd till ro"
+          }
+        }
+      },
+      "q_ww_bells_of_gallowmere": {
+        "title": "Klockorna i Galgsjön",
+        "text": "Hör du klämtandet, {playerName}? Det är Galgsjön, uppe vid norra vägen, som ringer sina döda till sömns. Klockaren Marrow för räkning över varje själ under lövtaket, levande och begraven. Gå och bli räknad, innan skogen räknar dig själv.",
+        "completion": "Cobb skickade dig upp vägen hel, gjorde han? Bra karl. Han har hållit de portlyktorna tända i trettio år, och skogen har aldrig en enda gång kommit förbi honom. Välkommen till Galgsjön, {playerName}. Se upp med klockorna.",
+        "objectives": {
+          "0": {
+            "label": "Rapportera till Klockaren Marrow"
+          }
+        }
+      },
+      "q_ww_silk_in_the_eaves": {
+        "title": "Siden i takfoten",
+        "text": "Titta upp när du går västra vägen, {playerName}, och du kommer se dem: insvepta skepnader i lövtaket, som svajar där ingen vind når. Änkesidenspinnarna har smugit sig ut ur Snåret och spänt sina skafferier över mina lyktor. Döda tio, så blir vägen en väg igen.",
+        "completion": "Tio färre spinnare i takfoten. Lykttändarna kommer gå sina rundor i natt utan att titta upp, och det är värt mer här än du vet.",
+        "objectives": {
+          "0": {
+            "label": "Änkesidenspinnare dräpt"
+          }
+        }
+      },
+      "q_ww_widows_skeins": {
+        "title": "Änkans härvor",
+        "text": "Spinnarna tar våra döda till sina skafferier, {playerName}, så jag tar deras siden till våra svepningar. Det brinner rent och håller en välsignelse bättre än linne någonsin gjorde. Ge mig sex härvor änkesiden, så går nästa själ vi begraver ner insvept och skyddad.",
+        "completion": "Sex härvor, mjuka som en hållen andedräkt. De döda kommer vila lättare i detta. Ta dessa lindor, jag sydde dem av den senaste omgången, och skogen har aldrig en enda gång bitit igenom dem.",
+        "objectives": {
+          "0": {
+            "label": "Änkesidenhärva"
+          }
+        }
+      },
+      "q_ww_candles_at_the_bounds": {
+        "title": "Ljus vid gränserna",
+        "text": "Fyra gränsstenar ringar in Galgsjön, {playerName}, en på varje väg ut, och ett gravljus brinner på varje sten. Medan de brinner förblir de begravda begravda. Duggregnet har släckt dem, alla fyra, och jag är för gammal för att gå gränserna ensam. Ta mitt stearinljus och tänd dem igen, fort.",
+        "completion": "Alla fyra brinnande? Andas då ut, {playerName}. Du hörde det inte, men hela byn gjorde det: klockorna ringde lättare i samma stund den sista veken fattade.",
+        "objectives": {
+          "0": {
+            "label": "Gravljus återtänt"
+          }
+        }
+      },
+      "q_ww_the_last_vicar": {
+        "title": "Den siste kaplanen",
+        "text": "Söder om här multnar Sorgestenskapellet vid sin svarta tjärn, och en man sköter det fortfarande: Kaplanen Creel, som inte ville lämna när taket rasade. Han känner de gamla riterna bättre än mina klockor gör, {playerName}, och han har inte skickat bud på en månad. Gå kapellvägen och se honom andas.",
+        "completion": "Marrow oroar sig för mig? Det är nytt. Berätta för honom att Sorgestenen står kvar, på sitt sätt, och det gör jag också. Stanna ett tag, {playerName}. Tjärnen har viskat, och jag vill helst inte lyssna ensam.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Kaplanen Creel"
+          }
+        }
+      },
+      "q_ww_wraiths_of_the_tarn": {
+        "title": "Vålnader vid tjärnen",
+        "text": "Skogsvålnaderna var kapellets väktare en gång, {playerName}, vuxna från träd planterade över de hedrade döda. Sedan tjärnen blev svart har de glömt sitt ämbete, och nu driver de genom min kyrkogård och drar i jorden. Slå sönder åtta av dem innan de fullbordar vad de har påbörjat.",
+        "completion": "Åtta väktare lagda till vila äntligen. Jag kallar det inte en nåd i dagsljus, men mellan oss, {playerName}, var det en.",
+        "objectives": {
+          "0": {
+            "label": "Skogsvålnad dräpt"
+          }
+        }
+      },
+      "q_ww_what_the_bark_holds": {
+        "title": "Vad barken håller",
+        "text": "I Den hängande gläntan öster om Galgsjön hänger spinnarna sina sidensvepta döda från grenarna, och ristbarksraglarna står vakt därunder som tålmodiga likbärare. Det är vårt folk däruppe, {playerName}. Slå ner fem raglare, skär ner tre av de svepta döda, och för dem hem till jorden.",
+        "completion": "Tre själar tillbaka under ärlig jord innan mörkrets inbrott. Raglarna kommer växa tillbaka, bark gör alltid det, men i natt hänger gläntan tom, och det räcker.",
+        "objectives": {
+          "0": {
+            "label": "Ristbarksraglare fälld"
+          },
+          "1": {
+            "label": "Sidenbundna kvarlevor nerskurna"
+          }
+        }
+      },
+      "q_ww_walking_mosley_home": {
+        "title": "Föra Mosley hem",
+        "text": "Min gravgrävare Mosley tog kapellvägen för tre dagar sedan för att öppna en grav på den gamla gården, och grävningen rasade över honom. Han klöste sig ut, dåren lever, men han sitter hopkrupen vid kapellets gravar och vägrar röra sig för spindlar på vägen. För honom hem, {playerName}. Jag kan inte ringa klockorna för en levande man.",
+        "completion": "Han kom genom porten på egna två fötter, svärandes på att han inte tänker gräva något djupare än en rovsäng från och med nu. Han är tillbaka på gården till söndag, det är de alltid. Tack, {playerName}. Galgsjön behåller sitt folk, det är hela vår lag.",
+        "objectives": {
+          "0": {
+            "label": "Gravgrävaren Mosley säkert förd tillbaka till Galgsjön"
+          }
+        }
+      },
+      "q_ww_horn_of_the_huntsman": {
+        "title": "Jägarens horn",
+        "text": "Du har hört hornet vid det här laget, {playerName}, tunt och avlägset, ljudet hela skogen håller andan för. Den bleka jägaren rider sin glänta norr om här, och varje grav han passerar blir grundare. Han var en människa en gång, och han begravdes fel, och jag är klar med att låtsas att bön räcker. Ta med en vän, ta med två, och rid av honom.",
+        "completion": "Hornet stannade mitt i tonen. Varenda klocka i Galgsjön ringde en gång, av sig själv, och sedan blev skogen tystare än jag hört den på trettio år. Du har utfört riten jag inte kunde, {playerName}. Bär detta, och vandra under lövtaket utan fruktan.",
+        "objectives": {
+          "0": {
+            "label": "Den bleka jägaren avriden"
+          }
+        }
+      },
+      "q_pr_down_to_drifthaven": {
+        "title": "Ner till Drivhamn",
+        "text": "Ut ur de svarta träden och in i solen, {playerName}. Följ strandvägen norrut så når du Drivhamn innan tidvattnet vänder. Fråga efter Bärgningsbasen Ryna, hon har arbete åt vilket par händer som helst sedan stormen, och berätta för henne att Snårmynningens väg fortfarande är öppen.",
+        "completion": "Pell skickade dig? Då vandrade du hela Snårmynningens väg ensam, och det är referens nog för mig. Välkommen till Drivhamn, {playerName}. Ta tag i ett rep, vi är underbemannade.",
+        "objectives": {
+          "0": {
+            "label": "Rapportera till Bärgningsbasen Ryna"
+          }
+        }
+      },
+      "q_pr_wreck_line_cargo": {
+        "title": "Vrakraden",
+        "text": "Stormen för tre nätter sedan drev Pärlkölvattnet upp på revet, och hennes last ligger utströdd hela vägen längs vrakraden mellan här och Palmstranden. Tre kistor med handelsvaror ligger fortfarande i bränningen, {playerName}. För dem i land innan tidvattnet, eller krabborna, tar det som är kvar.",
+        "completion": "Saltfläckade men hela, alla tre. Dykarna äter denna månad tack vare dig, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Pärlkölvattnets last återfunnen"
+          }
+        }
+      },
+      "q_pr_scuttler_cull": {
+        "title": "Skalryggade tjuvar",
+        "text": "Varje vrak på denna kust drar till sig tidvattenskuttlarna, och Pärlkölvattnet har dragit till sig halva revet. Mina bärgningsbesättningar vill inte arbeta en linje med de klorna i grundvattnet. Knäck tio av dem, {playerName}, så är vrakraden vår igen.",
+        "completion": "Tio färre klor i bränningen. Mina besättningar vadar redan tillbaka ut, och ingen av dem sa tack, så jag gör det: tack, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Tidvattenskuttlare knäckt"
+          }
+        }
+      },
+      "q_pr_boars_in_the_gardens": {
+        "title": "Vildsvin i trädgårdarna",
+        "text": "Vad som än rör sig i den djupa grönskan, det driver snårvildsvinen ut på vår strand. De har bökat upp trädgårdsterrasserna två gånger denna vecka, och torkställningarna blir nästa. Tio vildsvin, {playerName}, och driv resten tillbaka under träden.",
+        "completion": "Ställningarna står kvar och trädgårdarna kan planteras om. Vildsvinen valde inte att komma ut på sanden, {playerName}. Kom ihåg det: något drev dem.",
+        "objectives": {
+          "0": {
+            "label": "Snårvildsvin bortjagat"
+          }
+        }
+      },
+      "q_pr_the_man_who_went_in": {
+        "title": "Mannen som gick in",
+        "text": "Dykarna vill inte kliva förbi trädlinjen, {playerName}, och jag ber dem inte om det. Du har hört trummorna vid det här laget: alla gör det, senast andra natten. En man på denna ö gick någonsin mot det ljudet och kom tillbaka. Okku. Han lägrar sig under de stora banyanträden vid Rankfallet, djupt uppe på Snårvägen. Hitta honom, och fråga honom vad grönskan döljer.",
+        "completion": "Isha skickade dig? Pärlmodern har inte sagt mitt namn på år. Sätt dig utom räckhåll för rankorna, {playerName}, så ska jag berätta vad jag vet: trummorna är inte faran. De är varningen.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Okku vid Rankfallet"
+          }
+        }
+      },
+      "q_pr_canopy_silk": {
+        "title": "Siden från lövtaket",
+        "text": "Titta upp, {playerName}. Varje lövtak härifrån till avguden är spunnet som ett fisknät, och vävarna blir djärvare för varje säsong. Jag spänner deras eget siden tvärs över stigarna, snubbeltrådsklockor, så att djungeln inte kan smyga sig på mig. Sex bra härvor från lövtaksvävarna sträcker om mina linor.",
+        "completion": "Bra, starkt siden. Mina klockor kommer sjunga ett tag till, och inget vandrar dessa stigar om natten utan att jag vet om det, {playerName}. På sistone har något vandrat ofta.",
+        "objectives": {
+          "0": {
+            "label": "Lövtakssidenhärva"
+          }
+        }
+      },
+      "q_pr_the_lost_navigator": {
+        "title": "Den förlorade navigatören",
+        "text": "Vi drog upp varenda hand från Pärlkölvattnet utom en: Navigatör Suli, som simmade mot den bortre stranden och aldrig kom in. En dykare siktade henne gömd i bogvraket bortom Palmstranden, vid liv, men för utmattad för att klara sträckan ensam. För henne hem längs strandvägen, {playerName}. Krabborna kommer inte gilla det, och djungeln gillar det mindre.",
+        "completion": "Suli sitter vid elden, fortfarande övertygad om att hon kunde ha simmat det. Du förde tillbaka den enda kartläsaren på denna kust, {playerName}. Dessa är från hennes sjökista, med hennes välsignelse.",
+        "objectives": {
+          "0": {
+            "label": "Navigatör Suli säkert förd till Drivhamn"
+          }
+        }
+      },
+      "q_pr_what_the_drums_guard": {
+        "title": "Vad trummorna vaktar",
+        "text": "Jag har vandrat så nära Den sjunkna avguden som en levande man vågar, och jag såg två saker: vävarna har draperat avgudsvägen i väv, och de gamla offerskålarna längs den har fyllts igen. Nyligen, {playerName}. Hugg ner åtta vävare från vägen och ge mig tre av de offren. Jag skulle vilja veta vilken hand som fortfarande föder en död gud.",
+        "completion": "Mossa, pärlskal och vildsvinsblod, packat för hand. Något i den ruinen håller fortfarande sina riter, {playerName}, och väktaren håller allt annat ute. Det är dags vi talade klarspråk om det.",
+        "objectives": {
+          "0": {
+            "label": "Lövtaksvävare nerhuggen"
+          },
+          "1": {
+            "label": "Återfylld offerskål insamlad"
+          }
+        }
+      },
+      "q_pr_idol_guardian": {
+        "title": "Avgudens väktare",
+        "text": "Avguden är äldre än ön, {playerName}. Äldre än trummorna, äldre än namnet Palmvidden. Dess väktare har stått i den dränkta ringen sedan innan palmerna växte, och nu vaknar den och vandrar pelarna om natten. Vad offren än föder, väktaren är dess dörrvakt. Ta med en vän, och krossa den.",
+        "completion": "Du fällde något djungeln själv inte skulle röra. Titta där, bakom avguden: väktaren vaktade aldrig pelarna, {playerName}, den vaktade trapporna under dem. Trummorna har tystnat i natt. Vad som än sover under Vildhjärtats bassäng känner nu ditt namn.",
+        "objectives": {
+          "0": {
+            "label": "Avgudens väktare krossad"
+          }
+        }
+      },
+      "q_eg_gate_report": {
+        "title": "Bud genom porten",
+        "text": "Gräsmattorna bortom denna port har klippt sig själva i hundra år, {playerName}, och på sistone har de börjat klippa besökare också. Överträdgårdsmästaren Amaranth för räkenskaperna i Häckby, uppe vägen bortom portens gräsmattor. Berätta för henne att ännu en resenär kommit igenom, och berätta för henne att häckarna vid porten rörde sig i natt.",
+        "completion": "Rörde sig, jaså. Pell rapporterar det varje vecka, och varje vecka har han rätt. Förlåt mina ögon, {playerName}, jag har inte sovit en hel natt på år: någon måste vakta trädgården som vaktar oss. Välkommen till Häckby.",
+        "objectives": {
+          "0": {
+            "label": "Rapportera till Överträdgårdsmästaren Amaranth"
+          }
+        }
+      },
+      "q_eg_hungry_shapes": {
+        "title": "Beskurna till hunger",
+        "text": "Vem som än formar denna trädgård har blivit vårdslös, eller grym. Vargformerna ute i Rosenvildmarken klipptes för att synas, men på sistone jagar de: gröna käkar, inga magar, och ingen anledning att någonsin sluta. Fäll tio formklippta vargar, {playerName}, och låt gräsmattorna få vara gräsmattor igen ett tag.",
+        "completion": "Tio högar av avklipp där tio vargar stod. Det borde kännas som trädgårdsarbete, {playerName}. Varför känns det som krig?",
+        "objectives": {
+          "0": {
+            "label": "Formklippt varg dräpt"
+          }
+        }
+      },
+      "q_eg_stolen_shears": {
+        "title": "De stulna saxarna",
+        "text": "Varenda sax i Häckby har försvunnit på två veckor, {playerName}: från krokarna, ur låsta skjul, ett par ur mitt eget förkläde medan jag slumrade till. Det är häckgnomerna, de små trädgårdsvaktarna som hatar att vi går på deras gräsmattor. Skaffa tillbaka sex par innan hela byn står med bara köksknivar.",
+        "completion": "Sex par, och mitt eget bland dem, jag skulle känna igen hacket i bladet var som helst. Här, dessa handskar stickades för beskärningsarbete. Varma händer ger stadiga saxar.",
+        "objectives": {
+          "0": {
+            "label": "Stulen Häckby-sax"
+          }
+        }
+      },
+      "q_eg_who_trims_the_hedges": {
+        "title": "Vem klipper häckarna",
+        "text": "Jag har fört räkenskaperna i trettio år, {playerName}, och inte sovit ordentligt på tio av dem, för siffrorna vill inte gå ihop. Gräset vill klippas och häckarna vill formas, och ingen här gör något av det, ändå står trädgården klippt varje gryning. På sistone svär skogsfolket att de ser en gammal man med en skottkärra på de bortre södra gräsmattorna, bortom labyrinten vid Liljebassängen. Hitta honom. Om han är verklig kan jag äntligen sova. Om han inte är det antar jag att jag aldrig kommer göra det.",
+        "completion": "Så huset skickade äntligen någon. I hundra år har jag vandrat dessa gräsmattor, {playerName}, och trädgården och jag har en överenskommelse: jag klipper det som ber om att klippas. Sätt dig. Häckarna kan avvara dig en timme.",
+        "objectives": {
+          "0": {
+            "label": "Hitta trädgårdsmästaren vid Liljebassängen"
+          }
+        }
+      },
+      "q_eg_gnomes_in_the_green": {
+        "title": "Trädgårdsvaktarnas groll",
+        "text": "Saxarna var bara början, {playerName}. Igår natt vräkte gnomerna våra verktygsvagnar ner i grönskan, en ute vid deras bo väster om labyrinten, en tvärs över trädgården vid dammpromenaden, och strödde hundra års gott järn i gräset. Jaga bort åtta av de små djävlarna och släpa hem de vräkta vagnarna.",
+        "completion": "Tre vagnar tillbaka och pinnarna fulla igen. Låt de små djävlarna sura i sina häckar: Häckby brukar dessa gräsmattor också.",
+        "objectives": {
+          "0": {
+            "label": "Häckgnom bortjagad"
+          },
+          "1": {
+            "label": "Verktygsvagn återfunnen"
+          }
+        }
+      },
+      "q_eg_bloom_clippings": {
+        "title": "Sticklingar från den levande grönskan",
+        "text": "Vill du förstå denna trädgård? Läs den då som jag gör. Hjortarna som betar gräsmattorna växer den sannaste grönskan: varje löv på dem är en sida. Ge mig sex färska sticklingar från de formklippta hjortarna, {playerName}. De kommer inte tacka dig för beskärningen, men de växer tillbaka. Allt här växer tillbaka.",
+        "completion": "Titta här: löven krullar sig inåt, varje stickling likadan. Trädgården är rädd, {playerName}. På hundra år har jag aldrig en enda gång känt den rädd.",
+        "objectives": {
+          "0": {
+            "label": "Beskuren blomstersticklig"
+          }
+        }
+      },
+      "q_eg_four_statues": {
+        "title": "De fyra tysta systrarna",
+        "text": "När trädgården var ung reste de första trädgårdsmästarna fyra marmorsystrar för att vakta dess kvarter: en ovanför Rosenvildmarken, en vid dammpromenaden öster om labyrinten, en på västra gräsmattan där gnomerna håller sitt bo, och en på södra gräsmattan bortom häckarna. Labyrinten växte upp mellan dem, och de flesta ser aldrig alla fyra. Gå kvarteren runt, {playerName}, och tryck din handflata mot varje syster. När trädgården har synat dig från alla fyra håll, öppnar den platser den håller dolda för främlingar.",
+        "completion": "Fyra avgnidningar, fyra systrar, och ingen av dem grät marmor. Trädgården har tagit ditt mått, {playerName}, och den fann dig inte bristfällig. Nu kan jag sända dig dit oron verkligen bor.",
+        "objectives": {
+          "0": {
+            "label": "Trädgårdsstaty besökt"
+          }
+        }
+      },
+      "q_eg_bull_of_the_court": {
+        "title": "Tjuren i Fontängården",
+        "text": "Nu sanningen, {playerName}. Tjuren i labyrintens hjärta var mitt mästerverk: jag formade honom att vakta Fontängården, och i hundra år gjorde han det. Men rädslan i grönskan har nått honom, och han vaktar ingenting nu, han jagar. Labyrinten föder honom med den som vandrar in. Jag är för gammal för att avforma honom, och det måste vara en fullständig avformning, rot och gren. Ta med en vän, gå genom labyrinten till gården, och fäll min tjur.",
+        "completion": "Jag kände det, här, när han föll isär. Hundra års arbete, och du hade rätt att avsluta det. Ta denna mantel: jag skar till den åt den som visade sig starkare än mitt bästa verk. Gården är bara en fontän i natt, {playerName}, och trädgården är bara en trädgård. Kanske kan Överträdgårdsmästaren och jag båda sova nu.",
+        "objectives": {
+          "0": {
+            "label": "Den formklippta tjuren avformad"
+          }
+        }
+      },
+      "q_fs_bell_at_the_landing": {
+        "title": "Klockan vid landningsplatsen",
+        "text": "Du kom över Färjeleden, {playerName}? Då är du den första på en vecka, och Väktaren kommer vilja se på dig. Måshamn ligger uppe vid strandvägen, förbi torkställningarna ingen sköter längre. Berätta för Väktaren Coalfast att vägbanken fortfarande står, och att Tam inte har ringt en trippelklämtning idag. Ännu.",
+        "completion": "Vägbanken håller, och Tam har fortfarande andan kvar att skämta om trippelklämtningen. Bra. Vi är en ö under belägring, {playerName}, och varje par händer som korsar den sandrevlen är ett par bräscherna måste ta sig förbi innan de når mitt folk. Välkommen till Måshamn.",
+        "objectives": {
+          "0": {
+            "label": "Rapportera till Väktaren Coalfast"
+          }
+        }
+      },
+      "q_fs_hold_the_riftfields": {
+        "title": "Håll Revfälten",
+        "text": "Öster om staden har sädesraderna gått under, och stackarna som kom genom Revfältens bräsch plockar dem nu rena. Mitt folk kan inte sköta ett fält de inte kan stå i, {playerName}. Gallra tio av stackarna och ge bönderna tillbaka sin mark.",
+        "completion": "Tio färre, och fältarbetarna bråkar redan om vem som går ut först. Det kommer inte vara för alltid, bräscherna vilar aldrig länge, men en stad som äter är en stad som håller.",
+        "objectives": {
+          "0": {
+            "label": "Bräschens stackare dräpt"
+          }
+        }
+      },
+      "q_fs_steel_for_the_redoubt": {
+        "title": "Stål till skansen",
+        "text": "Varje klinga jag delar ut är en havet gav tillbaka eller en jag bänt loss från de döda, {playerName}. Stackarna bär skrot genom bräscherna, gångjärn, krokar, brutet svärdsstål, skatgods, men det smids ut sant. Ge mig sex bitar av deras plockade stål så får barrikadlinjen tillbaka sina tänder.",
+        "completion": "Saltgropigt och bräschärrat, men det håller en egg ändå. Här, jag fodrade dessa grepp själv. Stål för stål, {playerName}: det är den enda handel Fjärrkusten driver nuförtiden.",
+        "objectives": {
+          "0": {
+            "label": "Brytärrat stål"
+          }
+        }
+      },
+      "q_fs_the_three_bells": {
+        "title": "De tre klockorna",
+        "text": "Tre vaktklockor står vid kusten bortom min egen: en vid Landningsudden, en vid södra stranden, en ute vid Revfältens kust. Om ett rep har ruttnat eller en kläpp har försvunnit lär sig staden om en bräsch först när den redan är i gatorna. Gå längs kusten, {playerName}, och ring varje klocka en gång, så jag vet att den fortfarande har en röst.",
+        "completion": "Tre röster, tre svar, buret rent över vattnet. Sov i Måshamn i natt, {playerName}, och vet att om en klocka väcker dig så är det av min hand och i god tid.",
+        "objectives": {
+          "0": {
+            "label": "Vaktklocka ringd"
+          }
+        }
+      },
+      "q_fs_song_before_the_break": {
+        "title": "Sången före bräschen",
+        "text": "Det finns en man som hör bräscherna innan de öppnas. Revvakten Ollun: en lärd man, eller en dåre, och på sistone har jag inte råd med skillnaden. Han håller sin vaka vid Vaktängen, uppe vägen sydost om staden. Hitta honom, {playerName}, och fråga honom vad ön tänker göra med oss härnäst.",
+        "completion": "Väktaren skickade dig? Bra. Det betyder att staden äntligen har börjat lyssna. Var stilla ett ögonblick nu, {playerName}. Där, under vinden, hör du det? Klipporna sjunger, och jag gillar inte melodin.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Revvakten Ollun"
+          }
+        }
+      },
+      "q_fs_moss_and_mending": {
+        "title": "Mossa och läkning",
+        "text": "Saltmossan som växer längs tidvattenslinjen är den bästa sårpackning jag känner till, och revavkommorna har tagit varje sträcka kust den växer på. De bär tofsar av den fasthakade i sina hudar, av alla saker. Rensa sex av dem från de östra utsträckningarna, {playerName}, och plocka mig fyra bra nävar mossa från det de trampat sönder.",
+        "completion": "Mossa i ena handen och en tystare kustlinje i den andra. Du har fyllt på hela min mottagning, {playerName}. Gör mig tjänsten att inte bli min nästa patient.",
+        "objectives": {
+          "0": {
+            "label": "Revavkomma dräpt"
+          },
+          "1": {
+            "label": "Fjärrkustens saltmossa"
+          }
+        }
+      },
+      "q_fs_bram_come_home": {
+        "title": "Bram kommer hem",
+        "text": "Min Bram tog ut båten morgonen nätbräschen öppnades, och havet kastade tillbaka honom någonstans bortom Landningsudden. Jag hörde honom för tre nätter sedan, {playerName}, ropande över vattnet, och jag var för rädd för att gå. Jag är fortfarande för rädd. Snälla. Hans båt ligger vrakad på norra stranden. För honom hem till mig.",
+        "completion": "Bram! Du förde honom tillbaka till mig hel, {playerName}. Vi grät båda och ingen av oss skäms. Vad bräscherna än tar från denna ö härnäst, de får inte min familj. Inte längre.",
+        "objectives": {
+          "0": {
+            "label": "Fiskaren Bram säkert hemförd till Måshamn"
+          }
+        }
+      },
+      "q_fs_stalkers_off_the_light": {
+        "title": "Smygare bort från ljuset",
+        "text": "Smygarna jagar i mörkret mellan vaktbålen, och varje natt kretsar de lite närmare min äng. De är inte tanklösa, {playerName}, de är tålmodiga, och tålamod är det enda jag inte kan hålla ut längre än. Döda åtta och tryck tillbaka mörkret till klipporna det kom igenom.",
+        "completion": "Åtta nätters kretsande, avslutat på en. Eldarna brinner redan stadigare, eller så är det bara mina händer. Hur som helst är ängen min igen, och jag kan höra ön tänka.",
+        "objectives": {
+          "0": {
+            "label": "Tomrumssmygare dräpt"
+          }
+        }
+      },
+      "q_fs_the_great_break": {
+        "title": "Den stora bräschen",
+        "text": "Varje sång denna ö sjunger slutar på samma djupa ton, och den kommer från De klyvda klipporna. Något kom igenom den stora bräschen där, {playerName}, något klipporna själva sprack upp för att släppa in, och det växer fortfarande. Om det vandrar norrut spelar ingen klocka roll. Ta med en vän, ta med två, och gör slut på det. Berätta sedan för Coalfast att melodin har ändrats.",
+        "completion": "Ollun sände bud i förväg: sången upphörde. Hela min stad hörde tystnaden, {playerName}, och hälften av dem grät åt ljudet av ingenting alls. Bär denna mantel. Fjärrkusten glömmer inte vem som höll dess kust.",
+        "objectives": {
+          "0": {
+            "label": "Den splittrade fasan dräpt"
+          }
+        }
+      },
+      "q_gc_down_the_windway": {
+        "title": "Ner för Vindleden",
+        "text": "Du klarade klättringen, {playerName}, så vinden har bestämt sig för att behålla dig. Vikhamn ligger österut längs hedvägen, insvept i lä av sin vik. Hamnmästaren Odile räknar varje själ som kommer över passet, och hon kommer vilja räkna dig. Berätta för henne att Vindleden fortfarande är öppen.",
+        "completion": "Över passet till fots, i detta väder? Maren skickar mig få nog namn, och ännu färre kommer in för att svara för sig själva. Välkommen till Vikhamn, {playerName}. Stäng värdshusdörren efter dig.",
+        "objectives": {
+          "0": {
+            "label": "Rapportera till Hamnmästaren Odile"
+          }
+        }
+      },
+      "q_gc_wool_off_the_downs": {
+        "title": "Ull från hedarna",
+        "text": "Mina båtbesättningar ror in i en storm som skär genom oljekläder som papper, {playerName}. Bara en sak avvärjer denna vind: den feta ullen från hedbaggarna, spunnen tjock på Vikhamns vis. Hjordarna betar De tjutande kullarna väster om staden. Sex bra fällar och varje besättning ror varm denna säsong.",
+        "completion": "Fäll som denna är varför baggarna står där ute feta och belåtna i väder som dödar män. Spinnerskorna kommer sätta igång vid lampsken. Ta dessa stövlar, {playerName}, de är fodrade från den senaste klippningen.",
+        "objectives": {
+          "0": {
+            "label": "Fettig baggeull"
+          }
+        }
+      },
+      "q_gc_scuttlers_in_the_pots": {
+        "title": "Skuttlare i tinorna",
+        "text": "Grundskuttlarna har lärt sig klättra upp klippvägen och knäcka våra krabbtinor mot stenarna, {playerName}. Halva fångsten borta denna vecka, och en tinvaktare med en hand han inte kommer använda på en månad. Krossa tio av dem så minns resten varför de höll sig till grunden.",
+        "completion": "Tio färre skal på min väg, och tinorna kom upp fulla i morse. Tinvaktarna kallar dig ett gott omen, {playerName}. I Vikhamn är det så varmt beröm blir.",
+        "objectives": {
+          "0": {
+            "label": "Grundskuttlare dräpt"
+          }
+        }
+      },
+      "q_gc_keeper_of_the_flame": {
+        "title": "Lågans väktare",
+        "text": "Gamle Bram sköter Vårdkasen på det höga näset nordost om staden, och han har inte kommit ner för sina förråd på två veckor. Lampan brinner fortfarande, så han lever, men en man i hans ålder ensam på det näset i denna vind, {playerName}. Klättra vårdkasvägen och se honom stå kvar.",
+        "completion": "Odile skickade dig hela vägen hit för att se om vinden hade tagit mig? Ha. Berätta för henne att lampan brinner och det gör jag också. Men eftersom du har klarat klättringen, {playerName}, stanna ett ögonblick. Vårdkasen har arbete som bara en främling verkar lämpad för.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Väktaren Bram"
+          }
+        }
+      },
+      "q_gc_lanterns_on_the_shear": {
+        "title": "Lyktor på Branten",
+        "text": "Vårdkasen är det stora ljuset, {playerName}, men det är stormlyktorna som leder en nattresenär ner för klippvägen ovanför Branten. Igår natt släckte stormen varenda en av dem, och den vägen i mörkret är ett långt fall med ett kort slut. Ta min tändare och tänd de fyra utmed klippan igen.",
+        "completion": "Fyra ljuspunkter på klippvägen, precis där de hör hemma. Härifrån ser det ut som om kusten har öppnat sina ögon igen. Du har gryningen till en väktare i dig, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Stormlykta återtänd"
+          }
+        }
+      },
+      "q_gc_wind_against_the_wick": {
+        "title": "Vind mot veken",
+        "text": "Stormirrblossen är vinden som blivit ondsint, {playerName}. De samlas på de höga hedarna vid Spegeltjärnen, och varje låga de finner släcker de, en lykta, en härd, en dag denna lampa. Trettionio år har jag hållit Vårdkasen tänd, och jag tänker inte förlora den till väder med ett agg. Skingra åtta av dem.",
+        "completion": "Lampan fladdrade inte ens i natt, första gången på en månad. Vinden hatar oss fortfarande, {playerName}, men den har gått tillbaka till att hata oss rättvist.",
+        "objectives": {
+          "0": {
+            "label": "Stormirrbloss skingrat"
+          }
+        }
+      },
+      "q_gc_the_far_shore": {
+        "title": "Den bortre kusten",
+        "text": "Från detta lamprum kan jag se hela kusten, {playerName}, och vad jag ser i norr gillar jag inte. Gröna ljus som vandrar över Vrakfälten vid lågvatten, skrov för skrov. En kvinna arbetar den kusten ensam: Edda, bärgaren. Följ klippvägen norrut förbi Branten tills vraken börjar, och se till att hon fortfarande andas.",
+        "completion": "Bram vaktar min kust från sitt torn nu, jaså? Den gamle mannen har rätt att oroa sig, {playerName}. De döda har gått omkring i sina egna vrak om natten, och på sistone har de slutat bry sig om solen är uppe.",
+        "objectives": {
+          "0": {
+            "label": "Hitta Bärgaren Edda"
+          }
+        }
+      },
+      "q_gc_dead_mens_cargo": {
+        "title": "Döda mäns last",
+        "text": "Bärgningslagen är enkel, {playerName}: vad havet ger stranden är mitt. De drunknade däcksmännen håller inte med. De reser sig ur sina skrov och drar varje kista jag staplar tillbaka under tidvattenslinjen. Sänk sex av dem för gott, och medan stranden är tyst, dra in tre vrakgodskistor innan tidvattnet lämnar sin motfordran.",
+        "completion": "Sex besättningar tystare och tre kistor torrlagda. Du bärgar med en tyngre hand än jag gör, {playerName}, men räkenskapen bryr sig inte. Hälften av detta är ditt enligt lag, och med lag menar jag att jag säger det.",
+        "objectives": {
+          "0": {
+            "label": "Drunknad däcksman lagd till ro"
+          },
+          "1": {
+            "label": "Vrakgodskista bärgad"
+          }
+        }
+      },
+      "q_gc_the_wreck_warden": {
+        "title": "Vrakväktaren",
+        "text": "Nu vet du varför däcksmännen reser sig, {playerName}. Något bär havstulsbeklädda plåten från det första vraket som någonsin slog sönder på denna kust, och det vaktar varje skrov på stranden som en kyrkogård det hyrts att vårda. Det håller en skatt jag har åtrått i tio år och en besättning jag hellre ser vila. Gör slut på Vrakväktaren. Ta med en vän, de döda håller god vakt.",
+        "completion": "Stranden blev tyst i samma stund den föll, {playerName}. Första tystnaden jag hört på denna kust på tio år av att arbeta den. Besättningarna är bara ben nu, vilande ben. Ta manteln från toppen av skatten, den skulle alltid passa en levande rygg bättre.",
+        "objectives": {
+          "0": {
+            "label": "Vrakväktaren fälld"
           }
         }
       },
@@ -11544,6 +13761,9 @@ export const sv_SE: EnTranslations = {
           },
           "10": {
             "label": "Suggfältet"
+          },
+          "11": {
+            "label": "Fjärrkustens vägbank"
           }
         }
       },
@@ -11612,6 +13832,300 @@ export const sv_SE: EnTranslations = {
             "label": "Gravlindormens helgedom"
           }
         }
+      },
+      "veiled_hollow": {
+        "name": "Slöjhålan",
+        "welcome": "Luften surrar av gammal magi. Sök upp Väktare Saelwyn under det stora trädet i Fornglimmer.",
+        "pois": {
+          "0": {
+            "label": "Fornglimmer"
+          },
+          "1": {
+            "label": "Skymningsfallets grotta"
+          },
+          "2": {
+            "label": "Skymningsfallets utsikt"
+          },
+          "3": {
+            "label": "Den forntida lunden"
+          },
+          "4": {
+            "label": "Stjärnfallsbassängen"
+          },
+          "5": {
+            "label": "Den sjunkna gården"
+          },
+          "6": {
+            "label": "De kristallklara grunden"
+          },
+          "7": {
+            "label": "Det glittrande djupet"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "Drakländerna",
+        "welcome": "Het vind drar in från ödemarken framför dig. Drakar kretsar över Drakgapet, och trollens eldar brinner i dynerna.",
+        "pois": {
+          "0": {
+            "label": "Drakvakten"
+          },
+          "1": {
+            "label": "Portskogen"
+          },
+          "2": {
+            "label": "Sotdynerna"
+          },
+          "3": {
+            "label": "Trollmötet"
+          },
+          "4": {
+            "label": "Sista fästet"
+          },
+          "5": {
+            "label": "Blodglasfälten"
+          },
+          "6": {
+            "label": "Drakgapets kaldera"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "Frostslöjans vidder",
+        "welcome": "Snön sväljer varje ljud. Under de dansande skenen känns kylan själv vaken.",
+        "pois": {
+          "0": {
+            "label": "Ismanteln"
+          },
+          "1": {
+            "label": "Snölinjen"
+          },
+          "2": {
+            "label": "Glaciärtjärnen"
+          },
+          "3": {
+            "label": "Norrskenstrapporna"
+          },
+          "4": {
+            "label": "Skälvkärret"
+          },
+          "5": {
+            "label": "De tjutande terrasserna"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "Bärnstensfallet",
+        "welcome": "Varje löv här brinner guld och rött, men inget faller någonsin. Lyktorna i Lyktsjön är tända för dig.",
+        "pois": {
+          "0": {
+            "label": "Lyktsjön"
+          },
+          "1": {
+            "label": "Guldsmältan"
+          },
+          "2": {
+            "label": "Den förgyllda fruktlunden"
+          },
+          "3": {
+            "label": "Skördehålan"
+          },
+          "4": {
+            "label": "Den stora sjön"
+          },
+          "5": {
+            "label": "Sotlönnshöjden"
+          },
+          "6": {
+            "label": "Den lutande monoliten"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "Pilkärret",
+        "welcome": "Kärret surrar av trollsländor och bin. Korsa bron in i Brosjön och vila fötterna en stund.",
+        "pois": {
+          "0": {
+            "label": "Brosjön"
+          },
+          "1": {
+            "label": "Bärnstenskärrets trappor"
+          },
+          "2": {
+            "label": "Liljemyrarna"
+          },
+          "3": {
+            "label": "Myrglansdammarna"
+          },
+          "4": {
+            "label": "Pilgråten"
+          },
+          "5": {
+            "label": "De sömniga slätterna"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "Nattblomstret",
+        "welcome": "Bortom Nattporten drömmer själva luften. Följ blomljuset till Månvila, och se upp för den sovande världen som hänger i skyn.",
+        "pois": {
+          "0": {
+            "label": "Månvila"
+          },
+          "1": {
+            "label": "Nattporten"
+          },
+          "2": {
+            "label": "Månbrunnen"
+          },
+          "3": {
+            "label": "Skymningsfältet"
+          },
+          "4": {
+            "label": "Den stående vakan"
+          },
+          "5": {
+            "label": "Den sömnlösa gravhögen"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "Vålnadsskogen",
+        "welcome": "Lövtaket sluter sig över vägen som ett lock. Håll dig till lyktorna i Galgsjön, och svara inte om skogen ropar ditt namn.",
+        "pois": {
+          "0": {
+            "label": "Galgsjön"
+          },
+          "1": {
+            "label": "Kråkporten"
+          },
+          "2": {
+            "label": "Änkans snår"
+          },
+          "3": {
+            "label": "Den hängande gläntan"
+          },
+          "4": {
+            "label": "Sorgestenskapellet"
+          },
+          "5": {
+            "label": "Jägarens glänta"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "Palmvidden",
+        "welcome": "Varm sand, högljudda fåglar och en djungel som äter upp horisonten. Drivhamn håller en eld tänd på stranden för dig.",
+        "pois": {
+          "0": {
+            "label": "Drivhamn"
+          },
+          "1": {
+            "label": "Snårmynningen"
+          },
+          "2": {
+            "label": "Palmstranden"
+          },
+          "3": {
+            "label": "Smaragdsnåret"
+          },
+          "4": {
+            "label": "Rankfallet"
+          },
+          "5": {
+            "label": "Safirlagunen"
+          },
+          "6": {
+            "label": "Den sjunkna avguden"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "Evighetsträdgården",
+        "welcome": "Någon klipper fortfarande häckarna, fast ingen trädgårdsmästare har synts till på hundra år. Se upp med labyrinten: den ser upp med dig också.",
+        "pois": {
+          "0": {
+            "label": "Häckby"
+          },
+          "1": {
+            "label": "Trädgårdsporten"
+          },
+          "2": {
+            "label": "Parterrpromenaden"
+          },
+          "3": {
+            "label": "Gryningsborgen"
+          },
+          "4": {
+            "label": "Kronbladsdammen"
+          },
+          "5": {
+            "label": "Den stora labyrinten"
+          },
+          "6": {
+            "label": "Fontängården"
+          },
+          "7": {
+            "label": "Den gamla kvarnen"
+          },
+          "8": {
+            "label": "Nordvakten"
+          },
+          "9": {
+            "label": "Liljebassängen"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "Stormkammen",
+        "welcome": "Vinden har aldrig en enda gång slutat blåsa här, och Den gamla vårdkasen har aldrig en enda gång slocknat. Vikhamn ber bara att du stänger värdshusdörren efter dig.",
+        "pois": {
+          "0": {
+            "label": "Vikhamn"
+          },
+          "1": {
+            "label": "Vindleden"
+          },
+          "2": {
+            "label": "De tjutande kullarna"
+          },
+          "3": {
+            "label": "Den gamla vårdkasen"
+          },
+          "4": {
+            "label": "Branten"
+          },
+          "5": {
+            "label": "Vrakfälten"
+          },
+          "6": {
+            "label": "Spegeltjärnen"
+          },
+          "7": {
+            "label": "Stormkammens stall"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "Fjärrkusten",
+        "welcome": "Korsa sandrevlen så hittar Måshamns klocka dig innan staden gör det. Revorna river upp sig utan förvarning, och skansen håller sin kust mot vad som än strömmar igenom. De har väntat länge på någon som du.",
+        "pois": {
+          "0": {
+            "label": "Måshamn"
+          },
+          "1": {
+            "label": "Landningsplatsen"
+          },
+          "2": {
+            "label": "Vaktängen"
+          },
+          "3": {
+            "label": "De klyvda klipporna"
+          },
+          "4": {
+            "label": "Revfälten"
+          }
+        }
       }
     },
     "dungeons": {
@@ -11639,6 +14153,16 @@ export const sv_SE: EnTranslations = {
         "name": "Nythraxis raidarena",
         "enterText": "Du passerar genom den förseglade kungliga dörren.",
         "leaveText": "Du återvänder till Törntopps kalla luft."
+      },
+      "wildheart_basin": {
+        "name": "Vildhjärtats bassäng",
+        "enterText": "Varmt regn fräser mot gammal sten. Vildhjärtats bassäng öppnar sig framför dig.",
+        "leaveText": "Du passerar tillbaka under stentänderna in i Palmviddens sol."
+      },
+      "the_last_keep": {
+        "name": "Sista fästet",
+        "enterText": "Du kliver in i de kalla, tysta hallarna i Sista fästet.",
+        "leaveText": "Du drar igen fästningsporten och kliver ut i Drakländernas vind."
       },
       "drowned_temple": {
         "name": "Det dränkta templet",

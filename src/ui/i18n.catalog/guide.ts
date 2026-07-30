@@ -160,6 +160,19 @@ export const guideStrings = {
       marshBlurb: 'Sunken fens and tide-worn ruins, home to mudfins and worse.',
       peaksName: 'Thornpeak Heights',
       peaksBlurb: "Wind-scoured ridges climbing toward the realm's coldest dangers.",
+      duskName: 'The Veiled Hollow',
+      duskBlurb: 'A realm sealed beneath the mountains, if the whispers of a way in are true.',
+      emberName: 'The Drakelands',
+      emberBlurb:
+        'Across the Pale Causeway the green gives way to cinder, and something old rules the wastes.',
+      frostName: 'The Frostveil Reach',
+      frostBlurb: 'A snowbound height beyond every map, glimpsed only in the dancing lights.',
+      amberName: 'The Amberfall',
+      amberBlurb:
+        'Behind the western cliffs an autumn that never ends, and lanterns on a golden mere.',
+      fenName: 'The Willowfen',
+      fenBlurb:
+        'Past the autumn crown, a bright fen of willows and still water, and a town behind a moat.',
     },
 
     // Group content teaser.
@@ -778,6 +791,18 @@ export const guideStrings = {
       name: 'Reptiles',
       desc: 'Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts.',
     },
+    murloc: {
+      name: 'Croakfins',
+      desc: 'Croaking fish-folk of lake shore and tide pool, quick to swarm anything that wades too close.',
+    },
+    kobold: {
+      name: 'Scamps',
+      desc: 'Skittering scavengers and sprites of glade and hedgerow, more nuisance than menace until they gather in numbers.',
+    },
+    demon: {
+      name: 'Demons',
+      desc: 'Invaders from beyond the rifts, all fire and spite. Where one stands, a breach is never far.',
+    },
   },
 
   // World / zones.
@@ -797,6 +822,26 @@ export const guideStrings = {
       'A drowned country of fog and ruins. Mudfins swarm the shallows and something older stirs beneath the water, watched from the bridge-town of Fenbridge.',
     peaksBlurb:
       "Wind-scoured ridges and old mine-works climbing to the realm's coldest, highest dangers, held by the outpost of Highwatch.",
+    duskBlurb:
+      'A valley of permanent dusk beneath the great tree of Eldergleam, where crystal ruins glow and the air hums with old magic.',
+    emberBlurb:
+      'Storm-lit wastes of ash and bloodglass where drakes wheel over the caldera and troll fires burn among the dunes, watched from the gate-town of Wyrmwatch.',
+    frostBlurb:
+      'A hush of snow and dark pines under the aurora, where the cold itself feels awake and Icemantle keeps its fires burning.',
+    amberBlurb:
+      'An eternal autumn of gold and red leaves that never fall, gathered around the lantern-lit town of Lanternmere.',
+    fenBlurb:
+      'A bright, humming wetland of lilies and slow water, crossed on old boardwalks from the bridge-town of Bridgemere.',
+    nightBlurb:
+      'A realm of starry midnight where flowers light the paths and Moonrest keeps a quiet vigil under a dreaming sky.',
+    hauntBlurb:
+      'A haunted forest under giant canopies, where the lanterns of Gallowmere are the only honest light on the road.',
+    galeBlurb:
+      'Sea-cliffs and howling downs where the wind never rests, the Old Beacon never goes out, and Wickharbor shuts its doors tight.',
+    jungleBlurb:
+      'A tropical tangle of palms, white sand, and loud birds, with the beach-town of Drifthaven keeping a fire lit on the strand.',
+    gardenBlurb:
+      'A hedge-maze garden realm still trimmed by no gardener anyone has seen, entered past Hedgewick and its fountain courts.',
 
     // One quotable hub greeting per zone, keyed by biome. Speaker names are proper nouns
     // (passed as raw text in world.ts), so only the spoken line is a key here.
@@ -807,6 +852,35 @@ export const guideStrings = {
     peaksGreeting:
       'Two hundred years this wall has held. It will not break on my watch, but it groans.',
     peaksGreeter: 'Captain Thessaly, Highwatch',
+    duskGreeting: 'Few of your kind have stood beneath these boughs. Walk gently, and be welcome.',
+    duskGreeter: 'Keeper Saelwyn, Eldergleam',
+    emberGreeting:
+      'Hot wind off the wastes, dragons over the Drakemaw, and troll fires in the dunes. Drink before you walk out there.',
+    emberGreeter: 'The gatewarden, Wyrmwatch',
+    frostGreeting:
+      'Snow swallows every sound out past the wall. If the lights start dancing, keep your voice down and your fire lit.',
+    frostGreeter: 'The hearthkeeper, Icemantle',
+    amberGreeting:
+      'Every leaf here burns gold and red, yet none ever fall. The lanterns are lit for you; mind the Goldmelt on your way up.',
+    amberGreeter: 'The lanternwright, Lanternmere',
+    fenGreeting:
+      'The fen hums with dragonflies and bees. Cross the bridge, rest your feet awhile, and stay on the boards past the pools.',
+    fenGreeter: 'The bridgekeeper, Bridgemere',
+    nightGreeting:
+      'Past the Nightgate the air itself dreams. Follow the flower-light, and mind the sleeping world that hangs in the sky.',
+    nightGreeter: 'The vigil-warden, Moonrest',
+    hauntGreeting:
+      'Keep to the lanterns, traveler. And if the wood calls your name from off the road, do not answer it.',
+    hauntGreeter: 'The lamplighter, Gallowmere',
+    galeGreeting:
+      'The wind has never once stopped here, and the Old Beacon has never once gone out. Close the inn door behind you.',
+    galeGreeter: 'The beacon-keeper, Wickharbor',
+    jungleGreeting:
+      'Warm sand, loud birds, and a jungle that eats the horizon. We keep a fire lit on the beach; try to come back to it.',
+    jungleGreeter: 'The harbormistress, Drifthaven',
+    gardenGreeting:
+      'Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.',
+    gardenGreeter: 'The gatekeeper, Hedgewick',
 
     // Short, spoiler-safe one-liners for each zone's notable places (keyed by biome). One
     // sentence per place, in the same order as the POI list.
@@ -816,6 +890,26 @@ export const guideStrings = {
       "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and mudfins; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers, with The Drowned Litany, the marsh's own delve, opening just north of the mounds; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
     peaksPlaceNotes:
       "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and burrowers; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals, and below it glows the Glimmermere, the tarn whose shore keeps the gate of pale light down to the Drowned Temple; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
+    duskPlaceNotes:
+      'Eldergleam gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.',
+    emberPlaceNotes:
+      'Wyrmwatch holds the gate. The Gatewood is the last green before the waste; the Cinder Dunes drift with ash and worse; the Trollmoot is where the dune trolls gather their fires; the Bloodglass Fields glitter with razor shards; and the Drakemaw Caldera is the smoking crown the drakes circle.',
+    frostPlaceNotes:
+      'Icemantle keeps the last warm hearth. The Snowline marks where the drifts take over; Glacier Tarn is black, still water under the ice; the Aurora Steps climb beneath the dancing lights; the Shiverfen is a frozen mire that never quite sleeps; and the Howling Terraces earn their name every night.',
+    amberPlaceNotes:
+      'Lanternmere glows at the heart of the harvest. The Goldmelt is the amber-slick pass in; the Gilded Orchard and Harvest Hollow keep the sweetest pickings and the boldest thieves; the Great Mere mirrors the burning leaves; Cindermaple Rise stands tallest and reddest; and the Leaning Monolith remembers something older than autumn.',
+    fenPlaceNotes:
+      'Bridgemere sits astride the slow water. The Amberfen Steps come down from the harvest country; the Lilymoors and Bogshine Pools glitter with wisps and dragonflies; Willowweep trails its branches into the mere; and the Drowsy Flats are as gentle as this land gets.',
+    nightPlaceNotes:
+      'Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonwell holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.',
+    hauntPlaceNotes:
+      "Gallowmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
+    galePlaceNotes:
+      'Wickharbor leans into the wind. The Windway is the cliff road in; the Howling Downs roll treeless under the gale; the Old Beacon has burned for as long as anyone can say; the Shear drops sheer to the water; the Wreckfields keep the coast honest; and the Mirror Tarn is the one still thing in the whole realm.',
+    junglePlaceNotes:
+      'Drifthaven keeps its fire on the beach. The Tanglemouth is where the river meets the green wall; the Palmstrand runs white and warm along the surf; the Emerald Tangle and the Vinefall swallow the interior; the Sapphire Lagoon glows clear and deep; and the Sunken Idol watches from beneath the water.',
+    gardenPlaceNotes:
+      'Hedgewick waits at the Garden Gate. The Parterre Walk blooms in clipped color; Dawnhold Castle drills its knights behind new walls; the Petal Pond drifts pink the year round; the Old Mill turns over its own ring beds; the Great Maze rearranges its manners for every guest, its arches watched by leafy foxes; the North Watch keeps the exit road; the Lily Basin rests beyond it all; and the Fountain Court still runs clear at the garden heart.',
 
     // Brightwood Glade vignette, distilled spoiler-safe.
     gladeTitle: 'A quiet corner: Brightwood Glade',
@@ -940,6 +1034,8 @@ export const guideStrings = {
       'A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.',
     sanctumBody:
       "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
+    wildheartBody:
+      'A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to face Zulgar.',
     raidName: 'The endgame raid',
     raidBody:
       'Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.',
