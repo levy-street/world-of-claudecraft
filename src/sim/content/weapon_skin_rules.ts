@@ -43,6 +43,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   direfang_greatblade: 'sword',
   hoarfrost_edge: 'sword',
   wildheart_tuskblade: 'sword',
+  corebreaker_heart_of_the_undermount: 'sword',
   // Daggers
   rusty_dagger: 'dagger',
   whetted_iron_dirk: 'dagger',
@@ -132,6 +133,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   gleamwood_stave: 'staff',
   wildheart_hexwood_staff: 'staff',
   saans_stoking_iron: 'staff',
+  the_last_restraint: 'staff',
   // Wands
   drowned_tide_scepter: 'wand',
   palecoil_rod: 'wand',

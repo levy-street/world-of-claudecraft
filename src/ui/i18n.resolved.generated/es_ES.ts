@@ -9797,40 +9797,40 @@ export const es_ES: EnTranslations = {
         "name": "Runeseeker's Lantern"
       },
       "crownforged_heartplate": {
-        "name": "Coraza Forjacorona"
+        "name": "Peto Forjacorona"
       },
       "nighttalon_emberweave": {
-        "name": "Tejido de Ascuas Garranocturna"
+        "name": "Ascua tejida Garra Nocturna"
       },
       "soulflame_vestments": {
-        "name": "Vestiduras Llama de Alma"
+        "name": "Ornamentos de Llama de Alma"
       },
       "stormcallers_hauberk": {
-        "name": "Camisote del Invocatormentas"
+        "name": "Cota del Clamatormentas"
       },
       "volzharrs_knucklestone": {
-        "name": "Piedra de Nudillos de Volzharr"
+        "name": "Nudillera pétrea de Volzharr"
       },
       "magmastrider_greaves": {
-        "name": "Grebas Zancamagma"
+        "name": "Escarpes Zancamagma"
       },
       "footwraps_of_the_waking_floor": {
-        "name": "Vendas del Suelo Despierto"
+        "name": "Escarpines del Suelo Despierto"
       },
       "forgeheat_cinch": {
-        "name": "Faja de Calor de Forja"
+        "name": "Ceñidor de la Forja Ardiente"
       },
       "corebreaker_heart_of_the_undermount": {
-        "name": "Rompenúcleos, Corazón de la Submontaña"
+        "name": "Quebrantador del Núcleo, Corazón de la Submontaña"
       },
       "the_last_restraint": {
-        "name": "La Última Atadura"
+        "name": "El Último Freno"
       },
       "band_of_the_ninth_quench": {
-        "name": "Sortija de la Novena Templanza"
+        "name": "Banda de la Novena Extinción"
       },
       "moltenheart_chroma": {
-        "name": "Corazón Fundido"
+        "name": "Corazón de Magma"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"
@@ -14533,7 +14533,7 @@ export const es_ES: EnTranslations = {
         "bonus2": "Aumenta el poder de ataque en 40.",
         "bonus3": "Aumenta la fuerza en 15, el aguante en 15 y la velocidad de ataque y de lanzamiento en 15%.",
         "bonus4": "Tus golpes críticos con el arma astillan al objetivo con Astilla de Hueso, haciéndolo sangrar 8 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.",
-        "bonus5": "Aumenta un 3 % la probabilidad de golpe crítico."
+        "bonus5": "Otorga un 3 % más de probabilidad de golpe crítico."
       },
       "deathlord": {
         "name": "Equipo de batalla de Barrowlord",
@@ -14556,21 +14556,21 @@ export const es_ES: EnTranslations = {
         "bonus2": "Aumenta el poder de ataque en 40.",
         "bonus3": "Aumenta la agilidad en 15, la probabilidad de crítico en 2% y la velocidad de ataque y de lanzamiento en 15%.",
         "bonus4": "Tus golpes críticos con el arma abren un Tajo Desgarrado, haciendo sangrar al objetivo 6 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.",
-        "bonus5": "Aumenta un 3 % la probabilidad de golpe crítico."
+        "bonus5": "Otorga un 3 % más de probabilidad de golpe crítico."
       },
       "soulflame": {
         "name": "Vestiduras de Wraithfire",
         "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus3": "Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.",
         "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s.",
-        "bonus5": "Aumenta un 3 % la probabilidad de golpe crítico con hechizos."
+        "bonus5": "Otorga un 3 % más de probabilidad de golpe crítico con hechizos."
       },
       "stormcallers": {
         "name": "Vestiduras de Galecall",
         "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus3": "Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.",
         "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s.",
-        "bonus5": "Aumenta un 3 % la probabilidad de golpe crítico con hechizos."
+        "bonus5": "Otorga un 3 % más de probabilidad de golpe crítico con hechizos."
       },
       "vale_arcanist": {
         "name": "Vestiduras del Arcanista del Valle",

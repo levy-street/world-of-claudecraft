@@ -44,9 +44,9 @@ describe('deed_i18n English resolution', () => {
 
   it('manifests one row per name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 225 deeds x (name + desc) + the 30 shipped title rewards.
-    expect(manifest.length).toBe(225 * 2 + 30);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(30);
+    // 228 deeds x (name + desc) + the 31 shipped title rewards.
+    expect(manifest.length).toBe(228 * 2 + 31);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(31);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
       field: 'title',
