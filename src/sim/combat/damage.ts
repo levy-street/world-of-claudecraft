@@ -31,6 +31,7 @@ import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../ent
 import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill } from '../instances/dungeons';
 import { pvpDamageMultiplier } from '../pvp';
+import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -1150,9 +1151,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     }
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
-    e.respawnTimer =
-      template?.respawnSeconds ??
-      ctx.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+    // Respawn cadence is the zone's, not one flat world timer: the policy leaf
+    // reads the mob's SPAWN point so a corpse dragged across a border still
+    // returns on its home band's schedule. Draws no rng.
+    e.respawnTimer = resolveRespawnSeconds(template, e.spawnPos, ctx.cfg.respawnSeconds);
     // A fixed respawn also caps corpse decay so the mob returns on schedule whether
     // or not its loot was looted (training dummy: 10s).
     if (template?.respawnSeconds !== undefined) {
