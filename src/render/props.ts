@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import {
+  deinterleaveGeometry,
+  mergeGeometries,
+} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { buildingCameraHeight } from '../sim/building_layout';
 import { mineMoundFootprint, STALL_HALF_D, STALL_HALF_W } from '../sim/colliders';
 import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
@@ -33,6 +36,7 @@ import {
   isEastbrookRebuildStall,
   isEastbrookRebuildWell,
 } from './eastbrook_town';
+import { indexExactVertexTuples } from './exact_index_geometry';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
 
@@ -2576,8 +2580,8 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
 // (material, castShadow, z-band). Flames (animated) and InstancedMeshes
 // survive untouched, as do the PointLights (not meshes). The merged meshes
 // replace the originals on the same group; emptied sub-groups are left in
-// place (they carry lights). Geometries are de-indexed before merging so
-// indexed glTF extracts and procedural shapes can share a bucket.
+// place (they carry lights). Non-indexed procedural shapes receive exact tuple
+// indices so they can share indexed glTF buckets without expanding either.
 function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE.Mesh[] {
   group.updateMatrixWorld(true);
   interface Bucket {
@@ -2602,9 +2606,10 @@ function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE
       bucket = { material, castShadow: mesh.castShadow, geoms: [] };
       buckets.set(key, bucket);
     }
-    // clone/de-index: extracted geometries are shared across placements, so
-    // the bake must never mutate them in place
-    const geo = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
+    // Extracted geometries are shared across placements, so the bake must
+    // never mutate them in place. Preserve source index reuse and normalize
+    // procedural streams with byte-exact full-tuple indices.
+    const geo = normalizedStaticGeometry(mesh.geometry);
     bucket.geoms.push(geo.applyMatrix4(mesh.matrixWorld));
     merged.push(mesh);
   });
@@ -2623,3 +2628,11 @@ function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE
   }
   return out;
 }
+
+function normalizedStaticGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
+  const normalized = source.clone();
+  deinterleaveGeometry(normalized);
+  return normalized.index ? normalized : indexExactVertexTuples(normalized);
+}
+
+export const propStaticMergeInternalsForTest = { mergeStaticMeshes };
