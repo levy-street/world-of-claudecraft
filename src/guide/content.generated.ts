@@ -2041,32 +2041,35 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "name": "The Wildheart Basin"
   },
   {
-    "id": "raid",
+    "id": "nythraxis_boss_arena",
     "isRaid": true,
     "suggestedPlayers": 10,
     "min": 20,
     "max": 20
   },
   {
-    "id": "raid",
+    "id": "undermount_wing1",
     "isRaid": true,
     "suggestedPlayers": 10,
     "min": 24,
-    "max": 24
+    "max": 24,
+    "name": "Undermount: The Descent"
   },
   {
-    "id": "raid",
+    "id": "undermount_wing2",
     "isRaid": true,
     "suggestedPlayers": 10,
     "min": 24,
-    "max": 24
+    "max": 24,
+    "name": "Undermount: The Tempering"
   },
   {
-    "id": "raid",
+    "id": "undermount_wing3",
     "isRaid": true,
     "suggestedPlayers": 10,
     "min": 26,
-    "max": 26
+    "max": 26,
+    "name": "Undermount: The Waking"
   }
 ];
 

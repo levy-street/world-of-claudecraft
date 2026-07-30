@@ -60,8 +60,8 @@ const RAID_SECONDARY_LEGENDARY = 30; // 3.0%
 // spell-facing Hit seed marks caster DPS and keeps Hit, paired with haste. A
 // spell-facing throughput seed (or no seed, like the Heartwood healer staff) stays
 // throughput-only and pairs crit + haste, so healer-facing gear never gains Hit.
-function applyRaidVariantRatings(variant: ItemDef, base: ItemDef): void {
-  const isLegendary = (base.quality ?? 'common') === 'legendary';
+function applyRaidVariantRatings(variant: ItemDef, base: ItemDef, targetLevel: number): void {
+  const isIlvl37 = targetLevel >= 37;
   const s = base.stats;
   // Spell-facing: carries caster stats (int/spirit/Spell Power) and no attack-power
   // stats (strength/agility). It only carries Hit when the authored base explicitly
@@ -82,13 +82,13 @@ function applyRaidVariantRatings(variant: ItemDef, base: ItemDef): void {
     : primaryKey === 'hitRating'
       ? 'critRating'
       : 'hitRating';
-  const primaryVal = isLegendary
+  const primaryVal = isIlvl37
     ? RAID_PRIMARY_LEGENDARY
     : base.weapon
       ? RAID_PRIMARY_WEAPON
       : RAID_PRIMARY_ARMOR;
   variant[primaryKey] = primaryVal;
-  variant[secondaryKey] = isLegendary ? RAID_SECONDARY_LEGENDARY : RAID_SECONDARY;
+  variant[secondaryKey] = isIlvl37 ? RAID_SECONDARY_LEGENDARY : RAID_SECONDARY;
 }
 
 function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LEVEL): ItemDef {
@@ -137,7 +137,7 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
     sourceLevel === NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL ||
     sourceLevel === UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL
   )
-    applyRaidVariantRatings(variant, base);
+    applyRaidVariantRatings(variant, base, targetLevel);
   // The spread widens ItemDef's discriminated union; the transform preserves the
   // base item's kind/slot shape, so this is a valid ItemDef of the same variant.
   return variant as ItemDef;

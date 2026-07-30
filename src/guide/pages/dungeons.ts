@@ -10,14 +10,17 @@ import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
 import { callout, p, pageHeader, related, section } from './ui';
 
-// Curated flavor body, keyed by the generated dungeon id (raid is the withheld-name one).
+// Curated flavor body, keyed by the generated dungeon id.
 const BODY: Record<string, TranslationKey> = {
   hollow_crypt: 'guide.dungeonsPage.hollowBody',
   sunken_bastion: 'guide.dungeonsPage.bastionBody',
   drowned_temple: 'guide.dungeonsPage.templeBody',
   gravewyrm_sanctum: 'guide.dungeonsPage.sanctumBody',
   wildheart_basin: 'guide.dungeonsPage.wildheartBody',
-  raid: 'guide.dungeonsPage.raidBody',
+  nythraxis_boss_arena: 'guide.dungeonsPage.raidBody',
+  undermount_wing1: 'guide.dungeonsPage.raidBody',
+  undermount_wing2: 'guide.dungeonsPage.raidBody',
+  undermount_wing3: 'guide.dungeonsPage.raidBody',
 };
 
 function levelLabel(d: GuideDungeon): string {
@@ -30,7 +33,7 @@ function levelLabel(d: GuideDungeon): string {
 function dungeonCard(d: GuideDungeon): string {
   const bodyKey = BODY[d.id];
   if (!bodyKey) return '';
-  const name = d.isRaid ? t('guide.dungeonsPage.raidName') : (d.name ?? '');
+  const name = d.id === 'nythraxis_boss_arena' ? t('guide.dungeonsPage.raidName') : (d.name ?? '');
   const level = levelLabel(d);
   return `
     <section class="guide-dungeon-card${d.isRaid ? ' guide-dungeon-raid' : ''}" id="dungeon-${esc(d.id)}">

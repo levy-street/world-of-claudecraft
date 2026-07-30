@@ -264,9 +264,9 @@ const zones = ZONES.map((z) => ({
   welcome: z.welcome ?? '',
 }));
 
-// Dungeons + the raid. Only group content (suggestedPlayers >= 5) so the solo raid
+// Dungeons + raids. Only group content (suggestedPlayers >= 5) so the solo raid
 // lead-in crypt is excluded. The level band is derived from each instance's own
-// spawns, so it can never drift from the game. The raid's sim name contains the
+// spawns, so it can never drift from the game. Nythraxis's sim name contains the
 // final boss name, so it is withheld here and the page renders its own unnamed copy.
 const dungeonBand = (def) => {
   let min = Infinity;
@@ -285,12 +285,12 @@ const dungeons = Object.values(DUNGEONS)
     const isRaid = (d.suggestedPlayers ?? 0) >= 10;
     const band = dungeonBand(d);
     return {
-      id: isRaid ? 'raid' : d.id,
+      id: d.id,
       isRaid,
       suggestedPlayers: d.suggestedPlayers,
       min: band.min,
       max: band.max,
-      ...(isRaid ? {} : { name: d.name }),
+      ...(d.id === 'nythraxis_boss_arena' ? {} : { name: d.name }),
     };
   })
   .sort((a, b) => (a.min ?? 99) - (b.min ?? 99) || a.suggestedPlayers - b.suggestedPlayers);

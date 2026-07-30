@@ -85,7 +85,7 @@ export function buildIndex(): SearchEntry[] {
   }
   for (const d of GUIDE_DUNGEONS) {
     add(
-      d.isRaid ? t('guide.dungeonsPage.raidName') : (d.name ?? ''),
+      d.id === 'nythraxis_boss_arena' ? t('guide.dungeonsPage.raidName') : (d.name ?? ''),
       t('guide.search.typeDungeon'),
       `${hrefFor('dungeons')}#dungeon-${d.id}`,
     );
