@@ -106,6 +106,23 @@ export function terrainStamps() {
     pair(out, { ...r, falloff: 'smooth', mode: undefined, hardness: 0.1 });
   }
 
+  // 4b. Chamber features: one size up from the rolls, so the field chambers
+  //     read as ground with a shape rather than a plain with a ripple. A grassy
+  //     knoll over each keep approach's west pocket, a soft hollow on the east
+  //     approach, and a rise against the rampart before the curtain. All of it
+  //     sits clear of the rune pads, the rubble formations, the barricades and
+  //     the pinned landmark heights (the flag terraces, the chamber centre at
+  //     z -80, the gate thresholds), and the slopes stay a stroll: cover walls
+  //     and crates seat themselves on whatever ground this gives them.
+  const features = [
+    { x: -38, z: -104, radius: 20, delta: 1.1 },
+    { x: 24, z: -88, radius: 18, delta: -0.8 },
+    { x: 36, z: -70, radius: 16, delta: 0.9 },
+  ];
+  for (const f of features) {
+    pair(out, { ...f, falloff: 'smooth', mode: undefined, hardness: 0.12 });
+  }
+
   // 5. Ground grain: a fine mirrored ripple over the whole rect. Placed on a
   //    hashed lattice so it never lines up into visible rows, and capped at a
   //    couple of handspans so it can never gate a stride or tilt a wall.

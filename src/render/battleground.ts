@@ -36,9 +36,10 @@ import { freezeStaticMatrices } from './static_matrix';
 
 export * from './battleground_core';
 
-/** The field's point-light budget. The map authors 14 lights (keep braziers,
- *  flag shrines, the pit fires); every one is cosmetic warmth, so the low tier
- *  keeps the brightest few rather than all of them. */
+/** The field's point-light budget. The map authors 12 lights (the flag stands'
+ *  team glow, the gate and gatehouse flames, the ruin pit fires, the
+ *  graveyards); every one is cosmetic warmth, so the low tier keeps the
+ *  brightest few rather than all of them. */
 const BG_LIGHT_BUDGET_BY_TIER: Record<string, number> = {
   low: 0,
   medium: 6,

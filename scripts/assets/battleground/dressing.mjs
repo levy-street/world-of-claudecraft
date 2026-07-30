@@ -747,10 +747,11 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
   }
 
   // The keep court: banners on the back wall, arms racks and stores against the
-  // side walls, braziers flanking the flag stand. Everything hugs a wall, so
-  // the court itself stays the clean fight space the plan intends.
+  // side walls, the team's standards flanking the flag stand. Everything hugs a
+  // wall or the stand itself, so the court stays the clean fight space the plan
+  // intends.
+  const courtSeat = floorUnder(0, -FLAG_Z, 14, 8);
   for (const sx of [-1, 1]) {
-    const courtSeat = floorUnder(0, -FLAG_Z, 14, 8);
     both({
       assetId: 'dungeon/banner_patterna_white',
       x: r4(sx * 7),
@@ -784,25 +785,102 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
       collisionMode: 'baked',
       name: 'Court stores',
     });
-    both({
-      assetId: 'props/bonfire',
-      x: r4(sx * 6),
-      z: -122,
-      rotY: 0,
-      scale: 1.5,
-      collide: true,
-      collisionMode: 'baked',
-      name: 'Court brazier',
-    });
   }
-  // ONE light for the pair of court braziers, not one each: the field's authored
-  // light set has to fit the renderer's per-tier budget (14 on the top tiers), and
-  // a light past the budget is authored cost that never reaches a frame.
+
+  // The flag stand itself: a two-step stone dais under the flag, with the
+  // team's shield standards flanking it. No firepits here anymore: an open
+  // flame on the one spot every fight converges on read as a hazard, and the
+  // stand carries the ceremony instead. Both dais steps finish far under the
+  // physics step height, so the dais is ground a body strides over rather than
+  // a ledge, and it rides camGhost like all low stone, so the chase camera in
+  // the court never jams (the compiler's CAMERA_SOLID_MIN_HEIGHT guarantees
+  // both). The standards are CEREMONY ONLY, by design: the braziers they
+  // replace were steppable and sight-transparent, and a colliding post here
+  // would let a defender break line of sight four yards from the flag, in the
+  // one court the plan keeps as a clean fight space. tests/battleground_band
+  // pins the whole contract (dais step height, pickup clearance, no blocker
+  // by the stand).
+  both({
+    assetId: 'dungeon/path_a',
+    x: 0,
+    z: -FLAG_Z,
+    rotY: 0,
+    scale: 3.2,
+    collide: true,
+    collisionMode: 'baked',
+    y: 0.05,
+    name: 'Flag dais',
+  });
+  both({
+    assetId: 'dungeon/path_a',
+    x: 0,
+    z: -FLAG_Z,
+    rotY: yaw(0.5),
+    scale: 2.1,
+    collide: true,
+    collisionMode: 'baked',
+    y: 0.42,
+    name: 'Flag dais',
+  });
+  for (const sx of [-1, 1]) {
+    bothTeamArt(
+      {
+        assetId: 'dungeon/banner_shield_red',
+        x: r4(sx * 4.2),
+        z: -120.4,
+        rotY: 0,
+        scale: 1.7,
+        collide: false,
+        name: 'Flag standard',
+      },
+      'dungeon/banner_shield_blue',
+    );
+  }
+  // ONE team-coloured glow over each stand: the field's authored light set has
+  // to fit the renderer's per-tier budget (14 on the top tiers), and a light
+  // past the budget is authored cost that never reaches a frame.
   bothTeamLights(
-    { x: 0, y: 3, z: -122, color: CRIMSON_GLOW, intensity: 26, range: 28 },
+    { x: 0, y: 4.5, z: -FLAG_Z, color: CRIMSON_GLOW, intensity: 30, range: 32 },
     AZURE_GLOW,
   );
-  bothLights({ x: 0, y: 7, z: -FLAG_Z, color: FLAME, intensity: 32, range: 36 });
+
+  // The keep's colours on the OUTSIDE of the castle, as the code-defined field
+  // flew them: two standards high on the back rampart over the keep, and one on
+  // each side wall's outer face by the mouth, so a runner reads whose keep they
+  // are charging from anywhere in the chamber. Cloth against stone: thin, no
+  // collision, and the wall behind each one is what blocks.
+  for (const sx of [-1, 1]) {
+    bothTeamArt(
+      {
+        assetId: 'dungeon/banner_triple_red',
+        x: r4(sx * 7),
+        z: -138.5,
+        rotY: 0,
+        scale: 3.2,
+        collide: false,
+        y: 5.6,
+        detached: true,
+        groundY: r4(floorUnder(sx * 7, -138.5, 2, 1) - BURY),
+        name: 'Keep standard',
+      },
+      'dungeon/banner_triple_blue',
+    );
+    bothTeamArt(
+      {
+        assetId: 'dungeon/banner_triple_red',
+        x: r4(sx * 17.4),
+        z: -111.5,
+        rotY: yaw(sx < 0 ? HALF_PI : -HALF_PI),
+        scale: 2.4,
+        collide: false,
+        y: 2.2,
+        detached: true,
+        groundY: r4(floorUnder(sx * 17.4, -111.5, 1, 2) - BURY),
+        name: 'Keep colours',
+      },
+      'dungeon/banner_triple_blue',
+    );
+  }
 
   // The camp in the pocket beside each keep: tents, a fire, a cart, hay.
   {

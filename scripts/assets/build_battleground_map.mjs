@@ -205,6 +205,12 @@ const NON_COLLIDING_BY_DESIGN = new Map([
     'the wooded lip OUTSIDE the ramparts: out of play, unreachable, and pure silhouette',
   ],
   ['Undergrowth', 'ferns and bushes, which the open world does not collide either'],
+  [
+    'Flag standard',
+    'ceremony flanking the flag stand: a colliding post here would break line of sight ' +
+      'four yards from the flag, in the court the plan keeps as a clean fight space ' +
+      '(the steppable, sight-transparent braziers it replaced never blocked either)',
+  ],
 ]);
 
 const solidProblems = [];

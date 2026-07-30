@@ -63,6 +63,7 @@ import {
   isYumiMazePos,
   YUMI_BAND_X_MAX,
 } from '../src/sim/data';
+import { MAX_STEP_HEIGHT } from '../src/sim/physics/character';
 import { Sim } from '../src/sim/sim';
 import { BG_PICKUP_RADIUS } from '../src/sim/social/battleground';
 import { bgGraveyardSpot } from '../src/sim/spirit';
@@ -850,6 +851,58 @@ describe('Thornhollow collision honesty: what blocks, blocks; what opens, opens'
     }
   });
 
+  it('the flag stand is ground, not a fortress: dais steps stride, nothing blocks the flag', () => {
+    // The stand's whole contract, pinned so a later scale or position tweak
+    // cannot silently break it: the dais under the flag is a stepped SURFACE a
+    // body walks straight onto (every standable top in the court rises under
+    // the physics step height), and no blocking collider stands inside the
+    // pickup radius, so contesting the flag is never a fight with furniture.
+    // The flanking standards are ceremony only by design (see the dressing
+    // pass): a colliding post four yards out would break line of sight in the
+    // court the plan keeps clean.
+    const distToObb = (
+      c: { x: number; z: number; hw: number; hd: number; rot: number },
+      px: number,
+      pz: number,
+    ) => {
+      const dx = px - c.x;
+      const dz = pz - c.z;
+      const lx = dx * Math.cos(c.rot) - dz * Math.sin(c.rot);
+      const lz = dx * Math.sin(c.rot) + dz * Math.cos(c.rot);
+      return Math.hypot(Math.max(Math.abs(lx) - c.hw, 0), Math.max(Math.abs(lz) - c.hd, 0));
+    };
+    for (const base of BG_BASES) {
+      // The sibling test pins every band collider as an obb; the narrow here
+      // is for the type system, not a real filter.
+      const court = battlegroundColliders().filter(
+        (c): c is Extract<ReturnType<typeof battlegroundColliders>[number], { type: 'obb' }> =>
+          c.type === 'obb' && Math.hypot(c.x - base.flag.x, c.z - base.flag.z) < 9,
+      );
+      // A dais is authored under the flag: standable steps exist...
+      expect(
+        court.filter((c) => c.standable && distToObb(c, base.flag.x, base.flag.z) === 0).length,
+        `team ${base.team} flag has no dais under it`,
+      ).toBeGreaterThanOrEqual(2);
+      // ...and every one of them is a stride, not a ledge.
+      for (const c of court) {
+        if (!c.standable || c.moveTopY === undefined) continue;
+        expect(
+          c.moveTopY - bgFieldHeightLocal(c.x, c.z),
+          `standable top at (${c.x}, ${c.z}) gates a stride`,
+        ).toBeLessThanOrEqual(MAX_STEP_HEIGHT);
+      }
+      // Nothing that BLOCKS reaches the pickup radius (with a body radius of
+      // clearance past it), so the scrum on the stand never snags on a prop.
+      for (const c of court) {
+        if (c.standable) continue;
+        expect(
+          distToObb(c, base.flag.x, base.flag.z),
+          `blocking collider at (${c.x}, ${c.z}) crowds team ${base.team}'s flag`,
+        ).toBeGreaterThan(BG_PICKUP_RADIUS + 0.5);
+      }
+    }
+  });
+
   it('every collider is a box, seated inside the field rect', () => {
     const cs = battlegroundColliders();
     expect(cs.length).toBeGreaterThan(1000);
@@ -928,7 +981,15 @@ describe('Thornhollow collision honesty: what blocks, blocks; what opens, opens'
       string,
       { boxes?: { x: number; y: number; z: number; hx: number; hy: number; hz: number }[] }
     >;
-    const NON_COLLIDING_BY_DESIGN = new Set(['dungeon/torch_mounted', 'dungeon/fence_broken']);
+    // banner_shield: the flag standards, ceremony only by design (a colliding
+    // post four yards from the flag would break line of sight in the court the
+    // plan keeps clean; the braziers they replaced never blocked either).
+    const NON_COLLIDING_BY_DESIGN = new Set([
+      'dungeon/torch_mounted',
+      'dungeon/fence_broken',
+      'dungeon/banner_shield_red',
+      'dungeon/banner_shield_blue',
+    ]);
     let checked = 0;
     for (const p of TH_PLACEMENTS) {
       // Out-of-play slope dressing is unreachable by construction.
