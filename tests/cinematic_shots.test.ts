@@ -40,13 +40,87 @@ import { PROPS } from '../src/sim/data';
 import {
   GULLHAVEN_HARBOR,
   HARBORS,
-  type HarborDeck,
   type HarborDef,
   harborRampHeight,
   harborShipLocalBounds,
   harborShipLocalPointInside,
   MAINLAND_HARBOR,
 } from '../src/sim/harbor_layout';
+import {
+  add,
+  CAMERA_TERRAIN_CLEARANCE_YARDS,
+  CAMERA_WATER_CLEARANCE_YARDS,
+  type CameraGeometry,
+  cameraGeometry,
+  DEG_PER_RAD,
+  deckStandInPoint,
+  directionAngleDeg,
+  ENTITY_SUPPORT_EPSILON_YARDS,
+  evaluateEntitySupport,
+  evaluateFraming,
+  FULL_BLACK_OPACITY,
+  HARBOR_HULL_FOOTPRINTS,
+  HORIZONTAL_HALF_FOV_RAD,
+  HULL_INTERSECTION_EPSILON_YARDS,
+  hullWorldCollision,
+  length,
+  MAX_ARRIVAL_BERTH_DISTANCE_YARDS,
+  MAX_DOLLY_SPEED_YARDS_PER_SEC,
+  MAX_HELD_SHOT_SECONDS,
+  MAX_ON_CAMERA_PROP_ACCELERATION_YARDS_PER_SEC_SQUARED,
+  MAX_PAN_RATE_DEG_PER_SEC,
+  MAX_POSE_ORIENTATION_STEP_DEG,
+  MAX_POSE_POSITION_STEP_YARDS,
+  MAX_RELEASE_ORIENTATION_DELTA_DEG,
+  MAX_RELEASE_POSITION_DELTA_YARDS,
+  MAX_SCENE_CAPTURE_SECONDS,
+  MAX_SUBJECT_FRAME_HEIGHT_PERCENT,
+  MECHANICAL_CHECKS,
+  type MechanicalCheck,
+  MIN_ARRIVAL_DIRECTION_DOT,
+  MIN_ARRIVAL_SEAWARD_START_YARDS,
+  MIN_FULL_BLACK_CUT_SLACK_SECONDS,
+  MIN_HELD_SHOT_SECONDS,
+  MIN_ON_CAMERA_PROP_WAY_YARDS_PER_SEC,
+  MIN_PROP_PATH_TRAVEL_YARDS,
+  MIN_SHIP_SCREEN_DIRECTION_DOT,
+  MIN_SHIP_SCREEN_VELOCITY_PER_SEC,
+  MIN_SHOT_CAMERA_ORIENTATION_DELTA_DEG,
+  MIN_SHOT_CAMERA_POSITION_DELTA_YARDS,
+  MIN_SHOT_PARALLAX,
+  MIN_SHOT_SUBJECT_SCREEN_MOTION,
+  MIN_SUBJECT_FRAME_HEIGHT_PERCENT,
+  NOMINAL_SUBJECT_HEIGHT_YARDS,
+  normalize,
+  PIER_KEEP_OUT_HEIGHT_YARDS,
+  PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS,
+  playerCapsuleIntersectsFrame,
+  pointInFrame,
+  pointInsideDeck,
+  RIDER_DECK_EDGE_EPSILON_YARDS,
+  RIDER_HARBOR_BY_TEMPLATE,
+  RIDER_WALK_STEP_EPSILON_YARDS,
+  riderDeckViolation,
+  SAMPLE_INTERVAL_SEC,
+  SCENE_TIME_EPSILON_SECONDS,
+  type ScreenPoint,
+  SHOT_PARALLAX_REFERENCE_DEPTH_YARDS,
+  SHOT_SAMPLE_RATE_HZ,
+  SIGHT_LINE_NEAR_CAMERA_CLEARANCE_YARDS,
+  SIGHT_LINE_STEP_YARDS,
+  SIGHT_LINE_TERRAIN_MARGIN_YARDS,
+  SUBJECT_REFERENCE_RADIUS_YARDS,
+  SUBTITLE_READ_TIME_FLOOR_CHARACTERS_PER_SECOND,
+  scale,
+  screenPoint,
+  settledPlayerStartForScene,
+  shipDeckLocalBounds,
+  shipTarget,
+  subtract,
+  supportSurfacesAt,
+  VERTICAL_HALF_FOV_RAD,
+  type Violation,
+} from '../src/sim/scenes/lint_core';
 import {
   SCENE_FUTURE_MUSIC_DIRECTIVES,
   SCENE_SAMPLED_MUSIC_DIRECTIVES,
@@ -70,179 +144,6 @@ import { SUPPORTED_LANGUAGES } from '../src/ui/i18n.resolved.generated/loaders';
 import { WORLD_SEED } from '../src/world_seed.mjs';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { tsFilesUnder } from './helpers/ts_files_under';
-
-// Twenty samples per second match the authoring report without tying the gate to render frame rate.
-const SHOT_SAMPLE_RATE_HZ = 20;
-// Cameras must keep this vertical distance above the terrain surface.
-const CAMERA_TERRAIN_CLEARANCE_YARDS = 0.75;
-// Cameras over submerged terrain must also keep this distance above the water surface.
-const CAMERA_WATER_CLEARANCE_YARDS = 0.75;
-// Fixed pier and ramp geometry occupies this much space above its walkable surface.
-const PIER_KEEP_OUT_HEIGHT_YARDS = 3.5;
-// Camera collision has a small horizontal radius around fixed pier and ramp footprints.
-const PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS = 0.75;
-// Sight lines sample terrain at this fixed world-space interval.
-const SIGHT_LINE_STEP_YARDS = 1;
-// Ignore this short segment so a camera resting against geometry does not occlude itself.
-const SIGHT_LINE_NEAR_CAMERA_CLEARANCE_YARDS = 0.25;
-// A sight line needs this much room above sampled terrain to avoid grazing the surface.
-const SIGHT_LINE_TERRAIN_MARGIN_YARDS = 0.1;
-// A two-yard subject is the shared actor-scale proxy for framing checks.
-const NOMINAL_SUBJECT_HEIGHT_YARDS = 2;
-// The lower framing bound prevents subjects from reading as indistinct scenery.
-const MIN_SUBJECT_FRAME_HEIGHT_PERCENT = 5;
-// The upper framing bound prevents a nominal actor from filling an unusable amount of the frame.
-const MAX_SUBJECT_FRAME_HEIGHT_PERCENT = 45;
-// Look direction may turn no faster than this between consecutive shot samples.
-const MAX_PAN_RATE_DEG_PER_SEC = 60;
-// Camera translation may move no faster than this between consecutive shot samples.
-const MAX_DOLLY_SPEED_YARDS_PER_SEC = 30;
-// A single 10 Hz position step above this is a pose discontinuity.
-const MAX_POSE_POSITION_STEP_YARDS = 3.5;
-// A single 10 Hz orientation step above this is a pose discontinuity.
-const MAX_POSE_ORIENTATION_STEP_DEG = 10;
-// A held shot shorter than this reads as an accidental camera twitch.
-const MIN_HELD_SHOT_SECONDS = 1.5;
-// A held shot longer than this stalls the cinematic grammar.
-const MAX_HELD_SHOT_SECONDS = 8;
-// A visible release may land at most this far from the gameplay camera.
-const MAX_RELEASE_POSITION_DELTA_YARDS = 20;
-// A visible release may turn at most this far toward the gameplay camera.
-const MAX_RELEASE_ORIENTATION_DELTA_DEG = 75;
-// Screen motion below this normalized-frame rate is treated as stationary.
-const MIN_SHIP_SCREEN_VELOCITY_PER_SEC = 0.01;
-// Opposing screen vectors make a vessel appear to travel against its projected world velocity.
-const MIN_SHIP_SCREEN_DIRECTION_DOT = 0;
-// A vessel under way below this speed reads as stopped while it remains on camera.
-const MIN_ON_CAMERA_PROP_WAY_YARDS_PER_SEC = 0.5;
-// One hundredth of a yard distinguishes an authored voyage from a stationary prop cue.
-const MIN_PROP_PATH_TRAVEL_YARDS = 0.01;
-// Vessel acceleration above this cap reads as a visible lurch.
-const MAX_ON_CAMERA_PROP_ACCELERATION_YARDS_PER_SEC_SQUARED = 4;
-// One percent of a normalized half-frame is the minimum meaningful subject travel.
-const MIN_SHOT_SUBJECT_SCREEN_MOTION = 0.01;
-// A quarter-yard camera move is the minimum meaningful positional pose change.
-const MIN_SHOT_CAMERA_POSITION_DELTA_YARDS = 0.25;
-// Half a degree is the minimum meaningful camera orientation change.
-const MIN_SHOT_CAMERA_ORIENTATION_DELTA_DEG = 0.5;
-// Half a percent of a normalized half-frame is the minimum meaningful parallax.
-const MIN_SHOT_PARALLAX = 0.005;
-// The parallax probe sits beyond the first visible subject along its view ray.
-const SHOT_PARALLAX_REFERENCE_DEPTH_YARDS = 40;
-// The cinematic renderer's default vertical field of view is 60 degrees.
-const CINEMATIC_VERTICAL_FOV_DEG = 60;
-// The gate protects the standard widescreen composition used for cinematic review.
-const CINEMATIC_FRAME_ASPECT = 16 / 9;
-// Overlay opacity must reach this value before a camera jump is hidden.
-const FULL_BLACK_OPACITY = 1;
-// Every camera cut needs one full sim tick of black leading into the cut.
-const MIN_FULL_BLACK_CUT_SLACK_SECONDS = 1 / 20;
-// Authored times within this tolerance are treated as lying on a scene boundary.
-const SCENE_TIME_EPSILON_SECONDS = 1e-7;
-// The authoritative player collider is a 0.5-yard radius, and the visual is about 2.6 yards tall.
-const PLAYER_BODY_RADIUS_YARDS = 0.5;
-const PLAYER_BODY_HEIGHT_YARDS = 2.6;
-// Capture aborts at this duration so a malformed registry entry cannot hang the suite.
-const MAX_SCENE_CAPTURE_SECONDS = 180;
-// Arrival paths must begin materially beyond the berth on its layout-derived seaward side.
-const MIN_ARRIVAL_SEAWARD_START_YARDS = 12;
-// Arrival travel and the ship's bow must align closely with the direct course to the berth.
-const MIN_ARRIVAL_DIRECTION_DOT = 0.95;
-// The final arrival pose must land on the destination berth before the hidden park cue.
-const MAX_ARRIVAL_BERTH_DISTANCE_YARDS = 0.5;
-// Hull terrain probes are close enough to catch a narrow shoreline ridge without slowing watch mode.
-const HULL_TERRAIN_SAMPLE_STEP_YARDS = 2;
-// Contact within this tolerance is accepted as a berth seam, not solid penetration.
-const HULL_INTERSECTION_EPSILON_YARDS = 0.01;
-// Feet must remain this close to an authored presentation support surface.
-const ENTITY_SUPPORT_EPSILON_YARDS = 0.1;
-// Rider centers may cross a deck edge only by this numerical transform tolerance.
-const RIDER_DECK_EDGE_EPSILON_YARDS = 0.01;
-// A captured player delta below this tolerance is treated as stationary.
-const RIDER_WALK_STEP_EPSILON_YARDS = 1e-4;
-// A subjectRef must resolve this close to the authored look-at in the horizontal world plane.
-const SUBJECT_REFERENCE_RADIUS_YARDS = 3;
-// Subtitle duration floors use this readability ceiling: minimum seconds equals chars divided by CPS.
-const SUBTITLE_READ_TIME_FLOOR_CHARACTERS_PER_SECOND = 20;
-
-type MechanicalCheck =
-  | 'clearance.terrain'
-  | 'clearance.water'
-  | 'clearance.volume'
-  | 'visibility.occlusion'
-  | 'framing.size'
-  | 'framing.direction'
-  | 'motion.panRate'
-  | 'motion.dollySpeed'
-  | 'motion.poseContinuity'
-  | 'motion.cutJump'
-  | 'motion.propWay'
-  | 'motion.propAcceleration'
-  | 'motion.visualFloor'
-  | 'cut.heldDuration'
-  | 'cut.bracketing'
-  | 'cut.firstTransition'
-  | 'cut.finalRelease'
-  | 'cut.releaseDelta'
-  | 'cut.fadeSlack'
-  | 'fade.symmetry'
-  | 'timing.opWithinDuration'
-  | 'cut.teardown'
-  | 'continuity.shipScreenDirection'
-  | 'continuity.standInHandoff'
-  | 'prop.segment'
-  | 'prop.speed'
-  | 'prop.arrivalDirection'
-  | 'collision.hull'
-  | 'support.entity'
-  | 'containment.rider'
-  | 'reference.music'
-  | 'reference.orphan'
-  | 'reference.subject'
-  | 'reference.lineKey'
-  | 'reference.subtitleReadTime';
-
-const MECHANICAL_CHECKS = [
-  'clearance.terrain',
-  'clearance.water',
-  'clearance.volume',
-  'visibility.occlusion',
-  'framing.size',
-  'framing.direction',
-  'motion.panRate',
-  'motion.dollySpeed',
-  'motion.poseContinuity',
-  'motion.cutJump',
-  'motion.propWay',
-  'motion.propAcceleration',
-  'motion.visualFloor',
-  'cut.heldDuration',
-  'cut.bracketing',
-  'cut.firstTransition',
-  'cut.finalRelease',
-  'cut.releaseDelta',
-  'cut.fadeSlack',
-  'fade.symmetry',
-  'timing.opWithinDuration',
-  'cut.teardown',
-  'continuity.shipScreenDirection',
-  'continuity.standInHandoff',
-  'prop.segment',
-  'prop.speed',
-  'prop.arrivalDirection',
-  'collision.hull',
-  'support.entity',
-  'containment.rider',
-  'reference.music',
-  'reference.orphan',
-  'reference.subject',
-  'reference.lineKey',
-  'reference.subtitleReadTime',
-] as const satisfies readonly MechanicalCheck[];
-type AssertNever<T extends never> = T;
-type _EveryMechanicalCheckIsMirrored = AssertNever<
-  Exclude<MechanicalCheck, (typeof MECHANICAL_CHECKS)[number]>
->;
 
 interface LegacyExemption {
   readonly sceneId: string;
@@ -405,19 +306,6 @@ interface ActiveProp {
   readonly timedOp: TimedSceneOp;
 }
 
-interface CameraGeometry {
-  readonly camera: SceneRigPoint;
-  readonly lookAt: SceneRigPoint;
-  readonly forward: SceneRigPoint;
-  readonly right: SceneRigPoint;
-  readonly up: SceneRigPoint;
-}
-
-interface ScreenPoint {
-  readonly x: number;
-  readonly y: number;
-}
-
 interface ShipScreenSample {
   readonly screen: ScreenPoint;
   readonly world: SceneRigPoint;
@@ -453,16 +341,6 @@ interface ReleaseDelta {
   readonly fullBlack: boolean;
   readonly position: number;
   readonly orientationDeg: number;
-}
-
-interface Violation {
-  readonly sceneId: string;
-  readonly check: MechanicalCheck;
-  readonly opIndex: number;
-  readonly opKind: string;
-  readonly time: number;
-  readonly threshold: string;
-  readonly measured: string;
 }
 
 interface SyntheticPresentationFixture {
@@ -1755,14 +1633,6 @@ let sampleTerrainHeight: typeof import('../src/sim/world').terrainHeight;
 let spawnSquadForLinter: typeof import('../src/sim/squad/squad').spawnSquad;
 let localeTranslationFills: ReadonlyMap<string, ReadonlyMap<string, string>> = new Map();
 let runtimeWaterLevel = 0;
-const SAMPLE_INTERVAL_SEC = 1 / SHOT_SAMPLE_RATE_HZ;
-const DEG_PER_RAD = 180 / Math.PI;
-const VERTICAL_HALF_FOV_RAD = (CINEMATIC_VERTICAL_FOV_DEG * Math.PI) / 360;
-const HORIZONTAL_HALF_FOV_RAD = Math.atan(Math.tan(VERTICAL_HALF_FOV_RAD) * CINEMATIC_FRAME_ASPECT);
-const RIDER_HARBOR_BY_TEMPLATE = new Map<string, HarborDef['id']>([
-  ['ferryman_ewald', 'mainland'],
-  ['ferrykeeper_odda', 'gullhaven'],
-]);
 
 function sceneEvents(events: readonly SimEvent[]): Extract<SimEvent, { type: 'scene' }>[] {
   return events.filter(
@@ -1859,17 +1729,6 @@ function sceneFrame(sim: Sim, trackedIds: ReadonlySet<number>): SceneFrame {
     },
     entities,
   };
-}
-
-function settledPlayerStartForScene(id: string): { x: number; z: number } | null {
-  const harborId =
-    id === 'scn_lb_ferry_depart_back'
-      ? 'mainland'
-      : id === 'scn_lb_ferry_depart_out' || id === 'scn_lb_q0_ashore' || id === 'scn_lb_q0_voyage'
-        ? 'gullhaven'
-        : null;
-  if (harborId === null) return null;
-  return HARBORS.find((harbor) => harbor.id === harborId)?.deckArrival ?? null;
 }
 
 function captureScene(
@@ -2244,99 +2103,8 @@ function copyPose(pose: ScenePose): ScenePose {
   };
 }
 
-function subtract(a: SceneRigPoint, b: SceneRigPoint): SceneRigPoint {
-  return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z };
-}
-
-function add(a: SceneRigPoint, b: SceneRigPoint): SceneRigPoint {
-  return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z };
-}
-
-function scale(point: SceneRigPoint, factor: number): SceneRigPoint {
-  return { x: point.x * factor, y: point.y * factor, z: point.z * factor };
-}
-
-function length(point: SceneRigPoint): number {
-  return Math.hypot(point.x, point.y, point.z);
-}
-
-function normalize(point: SceneRigPoint): SceneRigPoint {
-  const magnitude = length(point);
-  if (magnitude <= 1e-9) return { x: 0, y: 0, z: 0 };
-  return scale(point, 1 / magnitude);
-}
-
-function dot(a: SceneRigPoint, b: SceneRigPoint): number {
-  return a.x * b.x + a.y * b.y + a.z * b.z;
-}
-
-function cross(a: SceneRigPoint, b: SceneRigPoint): SceneRigPoint {
-  return {
-    x: a.y * b.z - a.z * b.y,
-    y: a.z * b.x - a.x * b.z,
-    z: a.x * b.y - a.y * b.x,
-  };
-}
-
-function clampUnit(value: number): number {
-  return Math.min(1, Math.max(-1, value));
-}
-
-function directionAngleDeg(a: SceneRigPoint, b: SceneRigPoint): number {
-  return Math.acos(clampUnit(dot(normalize(a), normalize(b)))) * DEG_PER_RAD;
-}
-
 function geometryForPose(pose: ScenePose): CameraGeometry {
-  const camera = sceneRigCameraPosition(pose);
-  const lookAt = sceneRigLookAtPosition(pose);
-  const forward = normalize(subtract(lookAt, camera));
-  let right = normalize(cross({ x: 0, y: 1, z: 0 }, forward));
-  if (length(right) <= 1e-9) right = { x: 1, y: 0, z: 0 };
-  const up = normalize(cross(forward, right));
-  return { camera, lookAt, forward, right, up };
-}
-
-function pointInFrame(
-  geometry: CameraGeometry,
-  point: SceneRigPoint,
-): { horizontal: number; vertical: number; depth: number } {
-  const direction = normalize(subtract(point, geometry.camera));
-  const depth = dot(direction, geometry.forward);
-  return {
-    horizontal: Math.atan2(dot(direction, geometry.right), depth),
-    vertical: Math.atan2(dot(direction, geometry.up), depth),
-    depth,
-  };
-}
-
-function screenPoint(geometry: CameraGeometry, point: SceneRigPoint): ScreenPoint {
-  const projected = pointInFrame(geometry, point);
-  return {
-    x: Math.tan(projected.horizontal) / Math.tan(HORIZONTAL_HALF_FOV_RAD),
-    y: Math.tan(projected.vertical) / Math.tan(VERTICAL_HALF_FOV_RAD),
-  };
-}
-
-function playerCapsuleIntersectsFrame(
-  geometry: CameraGeometry,
-  player: { x: number; y: number; z: number },
-): boolean {
-  const lowerCenterY = player.y + PLAYER_BODY_RADIUS_YARDS;
-  const upperCenterY = player.y + PLAYER_BODY_HEIGHT_YARDS - PLAYER_BODY_RADIUS_YARDS;
-  const lower = subtract({ x: player.x, y: lowerCenterY, z: player.z }, geometry.camera);
-  const upper = subtract({ x: player.x, y: upperCenterY, z: player.z }, geometry.camera);
-  const horizontalTan = Math.tan(HORIZONTAL_HALF_FOV_RAD);
-  const verticalTan = Math.tan(VERTICAL_HALF_FOV_RAD);
-  const inwardPlanes = [
-    normalize(add(scale(geometry.forward, horizontalTan), geometry.right)),
-    normalize(subtract(scale(geometry.forward, horizontalTan), geometry.right)),
-    normalize(add(scale(geometry.forward, verticalTan), geometry.up)),
-    normalize(subtract(scale(geometry.forward, verticalTan), geometry.up)),
-    geometry.forward,
-  ];
-  return inwardPlanes.every(
-    (normal) => Math.max(dot(lower, normal), dot(upper, normal)) >= -PLAYER_BODY_RADIUS_YARDS,
-  );
+  return cameraGeometry(sceneRigCameraPosition(pose), sceneRigLookAtPosition(pose));
 }
 
 function subjectForShot(
@@ -2361,10 +2129,6 @@ function propPose(
   const active = activeProps.get(target);
   if (!active) return { x: 0, y: 0, z: 0, yaw: 0 };
   return propPathPoseAt(active.segment, time - active.startedAt);
-}
-
-function shipTarget(harbor: HarborDef): string {
-  return `harbor_ship_${harbor.id}`;
 }
 
 function shipFrameAt(
@@ -2421,51 +2185,13 @@ function arrivalDirectionMetrics(
   });
 }
 
-function parkedShipFrame(harbor: HarborDef): SceneAttachFrame {
-  return {
-    position: {
-      x: harbor.berth.x,
-      y: runtimeWaterLevel - harbor.berth.draft,
-      z: harbor.berth.z,
-    },
-    yaw: harbor.berth.rot,
-  };
-}
-
-function shipDeckLocalBounds(
-  harbor: HarborDef,
-  deck: HarborDeck,
-): { x0: number; x1: number; z0: number; z1: number; centerY: number } {
-  const parked = parkedShipFrame(harbor);
-  let x0 = Number.POSITIVE_INFINITY;
-  let x1 = Number.NEGATIVE_INFINITY;
-  let z0 = Number.POSITIVE_INFINITY;
-  let z1 = Number.NEGATIVE_INFINITY;
-  for (const x of [deck.x - deck.hw, deck.x + deck.hw]) {
-    for (const z of [deck.z - deck.hd, deck.z + deck.hd]) {
-      const local = worldToLocal(parked, { x, y: deck.y, z });
-      x0 = Math.min(x0, local.x);
-      x1 = Math.max(x1, local.x);
-      z0 = Math.min(z0, local.z);
-      z1 = Math.max(z1, local.z);
-    }
-  }
-  return {
-    x0,
-    x1,
-    z0,
-    z1,
-    centerY: deck.y - parked.position.y,
-  };
-}
-
 function shipDeckCenterAt(
   harbor: HarborDef,
   time: number,
   activeProps: ReadonlyMap<string, ActiveProp>,
 ): SceneRigPoint {
   const deck = harbor.shipDecks[0];
-  const bounds = shipDeckLocalBounds(harbor, deck);
+  const bounds = shipDeckLocalBounds(harbor, deck, runtimeWaterLevel);
   return sceneRigLocalToWorld(
     shipFrameAt(harbor, time, activeProps),
     {
@@ -2512,195 +2238,6 @@ function subjectReferencePointsAt(
     candidates.push({ ...deckCenter, y: deckCenter.y + NOMINAL_SUBJECT_HEIGHT_YARDS / 2 });
   }
   return candidates;
-}
-
-type HullFootprint = ReturnType<typeof harborShipLocalBounds>;
-
-const HARBOR_HULL_FOOTPRINTS: Readonly<Record<HarborDef['id'], HullFootprint>> = {
-  mainland: harborShipLocalBounds(MAINLAND_HARBOR.berth),
-  gullhaven: harborShipLocalBounds(GULLHAVEN_HARBOR.berth),
-};
-
-function sampledAxis(minimum: number, maximum: number): number[] {
-  const span = maximum - minimum;
-  const steps = Math.max(1, Math.ceil(span / HULL_TERRAIN_SAMPLE_STEP_YARDS));
-  return Array.from({ length: steps + 1 }, (_, index) => minimum + (span * index) / steps);
-}
-
-function hullTerrainSamples(footprint: HullFootprint): readonly { x: number; z: number }[] {
-  const samples: { x: number; z: number }[] = [];
-  for (const x of sampledAxis(footprint.x - footprint.hw, footprint.x + footprint.hw)) {
-    for (const z of sampledAxis(footprint.z - footprint.hd, footprint.z + footprint.hd)) {
-      samples.push({ x, z });
-    }
-  }
-  return samples;
-}
-
-const HULL_TERRAIN_SAMPLES: Readonly<Record<HarborDef['id'], readonly { x: number; z: number }[]>> =
-  {
-    mainland: hullTerrainSamples(HARBOR_HULL_FOOTPRINTS.mainland),
-    gullhaven: hullTerrainSamples(HARBOR_HULL_FOOTPRINTS.gullhaven),
-  };
-
-interface HullCollision {
-  readonly label: string;
-  readonly penetration: number;
-}
-
-function hullRectPenetration(
-  frame: SceneAttachFrame,
-  footprint: HullFootprint,
-  rect: { x: number; z: number; hw: number; hd: number },
-): number | null {
-  const center = sceneRigLocalToWorld(
-    frame,
-    { x: footprint.x, y: 0, z: footprint.z },
-    { x: 0, y: 0, z: 0 },
-  );
-  const cosYaw = Math.cos(frame.yaw);
-  const sinYaw = Math.sin(frame.yaw);
-  const localX = { x: cosYaw, z: -sinYaw };
-  const localZ = { x: sinYaw, z: cosYaw };
-  const delta = { x: rect.x - center.x, z: rect.z - center.z };
-  const axes = [{ x: 1, z: 0 }, { x: 0, z: 1 }, localX, localZ];
-  let minimumPenetration = Number.POSITIVE_INFINITY;
-  for (const axis of axes) {
-    const distance = Math.abs(delta.x * axis.x + delta.z * axis.z);
-    const hullRadius =
-      footprint.hw * Math.abs(localX.x * axis.x + localX.z * axis.z) +
-      footprint.hd * Math.abs(localZ.x * axis.x + localZ.z * axis.z);
-    const rectRadius = rect.hw * Math.abs(axis.x) + rect.hd * Math.abs(axis.z);
-    const penetration = hullRadius + rectRadius - distance;
-    if (penetration <= HULL_INTERSECTION_EPSILON_YARDS) return null;
-    minimumPenetration = Math.min(minimumPenetration, penetration);
-  }
-  return minimumPenetration;
-}
-
-function hullWorldCollision(
-  harbor: HarborDef,
-  frame: SceneAttachFrame,
-  seed: number,
-): HullCollision | null {
-  const footprint = HARBOR_HULL_FOOTPRINTS[harbor.id];
-  for (const fixedHarbor of HARBORS) {
-    for (const [index, deck] of fixedHarbor.decks.entries()) {
-      const penetration = hullRectPenetration(frame, footprint, deck);
-      if (penetration !== null) {
-        return { label: `${fixedHarbor.id} deck ${index}`, penetration };
-      }
-    }
-    for (const [index, ramp] of fixedHarbor.ramps.entries()) {
-      const penetration = hullRectPenetration(frame, footprint, ramp);
-      if (penetration !== null) {
-        return { label: `${fixedHarbor.id} ramp ${index}`, penetration };
-      }
-    }
-  }
-
-  const bottomY = frame.position.y + footprint.bottomY;
-  for (const sample of HULL_TERRAIN_SAMPLES[harbor.id]) {
-    const world = sceneRigLocalToWorld(
-      frame,
-      { x: sample.x, y: 0, z: sample.z },
-      { x: 0, y: 0, z: 0 },
-    );
-    const terrainY = sampleTerrainHeight(world.x, world.z, seed);
-    const penetration = terrainY - bottomY;
-    if (penetration <= HULL_INTERSECTION_EPSILON_YARDS) continue;
-    return {
-      label: terrainY < runtimeWaterLevel ? 'water floor' : 'terrain',
-      penetration,
-    };
-  }
-  return null;
-}
-
-interface SupportSurface {
-  readonly label: string;
-  readonly y: number;
-}
-
-function pointInsideDeck(deck: HarborDeck, x: number, z: number): boolean {
-  return Math.abs(x - deck.x) <= deck.hw && Math.abs(z - deck.z) <= deck.hd;
-}
-
-function supportSurfacesAt(
-  point: EntityPoint,
-  seed: number,
-  time: number,
-  activeProps: ReadonlyMap<string, ActiveProp>,
-): SupportSurface[] {
-  const terrainY = sampleTerrainHeight(point.x, point.z, seed);
-  const surfaces: SupportSurface[] = [
-    { label: terrainY < runtimeWaterLevel ? 'water floor' : 'terrain', y: terrainY },
-  ];
-  for (const harbor of HARBORS) {
-    for (const deck of harbor.decks) {
-      if (pointInsideDeck(deck, point.x, point.z)) {
-        surfaces.push({ label: `${harbor.id} pier deck`, y: deck.y });
-      }
-    }
-    const rampY = harborRampHeight(harbor, point.x, point.z);
-    if (rampY !== Number.NEGATIVE_INFINITY) {
-      surfaces.push({ label: `${harbor.id} ramp`, y: rampY });
-    }
-    const frame = shipFrameAt(harbor, time, activeProps);
-    const local = worldToLocal(frame, point);
-    for (const deck of harbor.shipDecks) {
-      const bounds = shipDeckLocalBounds(harbor, deck);
-      if (
-        local.x >= bounds.x0 &&
-        local.x <= bounds.x1 &&
-        local.z >= bounds.z0 &&
-        local.z <= bounds.z1
-      ) {
-        surfaces.push({
-          label: `${harbor.id} displaced ship deck`,
-          y: frame.position.y + bounds.centerY,
-        });
-      }
-    }
-  }
-  return surfaces;
-}
-
-function deckStandInPoint(harbor: HarborDef, frame: SceneAttachFrame): EntityPoint {
-  const bounds = shipDeckLocalBounds(harbor, harbor.shipDecks[0]);
-  return sceneRigLocalToWorld(
-    frame,
-    {
-      x: (bounds.x0 + bounds.x1) / 2,
-      y: bounds.centerY,
-      z: (bounds.z0 + bounds.z1) / 2,
-    },
-    { x: 0, y: 0, z: 0 },
-  );
-}
-
-function riderDeckViolation(
-  label: string,
-  harbor: HarborDef,
-  frame: SceneAttachFrame,
-  point: EntityPoint,
-): string | null {
-  const local = worldToLocal(frame, point);
-  for (const deck of harbor.shipDecks) {
-    const bounds = shipDeckLocalBounds(harbor, deck);
-    const inside =
-      local.x >= bounds.x0 - RIDER_DECK_EDGE_EPSILON_YARDS &&
-      local.x <= bounds.x1 + RIDER_DECK_EDGE_EPSILON_YARDS &&
-      local.z >= bounds.z0 - RIDER_DECK_EDGE_EPSILON_YARDS &&
-      local.z <= bounds.z1 + RIDER_DECK_EDGE_EPSILON_YARDS;
-    if (!inside) continue;
-    const airGap = local.y - bounds.centerY;
-    if (Math.abs(airGap) <= ENTITY_SUPPORT_EPSILON_YARDS) return null;
-    return `${label} has ${airGap.toFixed(2)} yd deck air gap in ${harbor.id}`;
-  }
-  return `${label} left ${harbor.id} deck bounds at local x ${local.x.toFixed(
-    2,
-  )}, z ${local.z.toFixed(2)}`;
 }
 
 function cameraVolumeIntrusion(
@@ -2784,7 +2321,9 @@ function sightLineOcclusion(
       const local = worldToLocal(shipFrameAt(harbor, time, activeProps), point);
       const footprint = HARBOR_HULL_FOOTPRINTS[harbor.id];
       const hullTopY = Math.max(
-        ...harbor.shipDecks.map((deck) => shipDeckLocalBounds(harbor, deck).centerY),
+        ...harbor.shipDecks.map(
+          (deck) => shipDeckLocalBounds(harbor, deck, runtimeWaterLevel).centerY,
+        ),
       );
       const clearance = Math.max(
         Math.abs(local.x - footprint.x) - footprint.hw,
@@ -2965,7 +2504,10 @@ function lintCollisionAndSupportSample(
     const liveFrame = shipFrameAt(harbor, time, activeProps);
     activeShips.push({ harbor, active, frame: liveFrame });
     if (!state.hullOps.has(active.timedOp.index)) {
-      const collision = hullWorldCollision(harbor, liveFrame, scene.seed);
+      const collision = hullWorldCollision(harbor, liveFrame, scene.seed, {
+        terrainHeight: sampleTerrainHeight,
+        waterLevel: runtimeWaterLevel,
+      });
       if (collision) {
         state.hullOps.add(active.timedOp.index);
         report({
@@ -3023,19 +2565,22 @@ function lintCollisionAndSupportSample(
     supportEntities.push({
       key: `stand-in:${activeShip.harbor.id}`,
       label: `${activeShip.harbor.id} deck stand-in`,
-      point: deckStandInPoint(activeShip.harbor, activeShip.frame),
+      point: deckStandInPoint(activeShip.harbor, activeShip.frame, runtimeWaterLevel),
       context: activeShip.active.timedOp,
     });
   }
 
   for (const entity of supportEntities) {
     if (state.unsupportedEntities.has(entity.key)) continue;
-    const surfaces = supportSurfacesAt(entity.point, scene.seed, time, activeProps);
-    const nearest = surfaces.reduce((best, candidate) =>
-      Math.abs(entity.point.y - candidate.y) < Math.abs(entity.point.y - best.y) ? candidate : best,
+    const support = evaluateEntitySupport(
+      entity.point,
+      supportSurfacesAt(entity.point, scene.seed, {
+        terrainHeight: sampleTerrainHeight,
+        waterLevel: runtimeWaterLevel,
+        shipFrameAt: (harbor) => shipFrameAt(harbor, time, activeProps),
+      }),
     );
-    const gap = entity.point.y - nearest.y;
-    if (Math.abs(gap) <= ENTITY_SUPPORT_EPSILON_YARDS) continue;
+    if (support.passing) continue;
     state.unsupportedEntities.add(entity.key);
     report({
       sceneId: scene.id,
@@ -3046,9 +2591,9 @@ function lintCollisionAndSupportSample(
       threshold: `every presentation entity within ${ENTITY_SUPPORT_EPSILON_YARDS.toFixed(
         2,
       )} yd of terrain, a pier or ramp, or a displaced ship deck`,
-      measured: `${entity.label} is ${Math.abs(gap).toFixed(2)} yd ${
-        gap >= 0 ? 'above' : 'below'
-      } ${nearest.label}`,
+      measured: `${entity.label} is ${Math.abs(support.gap).toFixed(2)} yd ${
+        support.gap >= 0 ? 'above' : 'below'
+      } ${support.nearest.label}`,
     });
   }
 
@@ -3059,7 +2604,13 @@ function lintCollisionAndSupportSample(
     activeShip: (typeof activeShips)[number],
   ): void => {
     if (state.uncontainedRiders.has(key)) return;
-    const measured = riderDeckViolation(label, activeShip.harbor, activeShip.frame, point);
+    const measured = riderDeckViolation(
+      label,
+      activeShip.harbor,
+      activeShip.frame,
+      point,
+      runtimeWaterLevel,
+    );
     if (measured === null) return;
     state.uncontainedRiders.add(key);
     report({
@@ -3079,7 +2630,7 @@ function lintCollisionAndSupportSample(
     checkRider(
       `stand-in:${activeShip.harbor.id}`,
       'deck stand-in',
-      deckStandInPoint(activeShip.harbor, activeShip.frame),
+      deckStandInPoint(activeShip.harbor, activeShip.frame, runtimeWaterLevel),
       activeShip,
     );
     for (const [entityId, harborId] of scene.riderHarbors) {
@@ -4105,14 +3656,8 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
           )}), ${occlusion.distanceFromCamera.toFixed(2)} yd from camera`,
         });
       }
-      const subjectDistance = length(subtract(subject, geometry.camera));
-      const angularHeight =
-        2 * Math.atan(NOMINAL_SUBJECT_HEIGHT_YARDS / 2 / Math.max(subjectDistance, 1e-9));
-      const frameHeightPercent = (angularHeight / (VERTICAL_HALF_FOV_RAD * 2)) * 100;
-      if (
-        frameHeightPercent < MIN_SUBJECT_FRAME_HEIGHT_PERCENT ||
-        frameHeightPercent > MAX_SUBJECT_FRAME_HEIGHT_PERCENT
-      ) {
+      const framing = evaluateFraming(geometry, subject);
+      if (!framing.sizePassing) {
         report({
           sceneId: scene.id,
           check: 'framing.size',
@@ -4120,15 +3665,10 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
           opKind: opKind(currentCameraOp.op),
           time,
           threshold: `${MIN_SUBJECT_FRAME_HEIGHT_PERCENT.toFixed(1)}% to ${MAX_SUBJECT_FRAME_HEIGHT_PERCENT.toFixed(1)}% of frame height`,
-          measured: `${frameHeightPercent.toFixed(2)}%`,
+          measured: `${framing.frameHeightPercent.toFixed(2)}%`,
         });
       }
-      const projected = pointInFrame(geometry, subject);
-      if (
-        projected.depth <= 0 ||
-        Math.abs(projected.horizontal) > HORIZONTAL_HALF_FOV_RAD ||
-        Math.abs(projected.vertical) > VERTICAL_HALF_FOV_RAD
-      ) {
+      if (!framing.directionPassing) {
         report({
           sceneId: scene.id,
           check: 'framing.direction',
@@ -4140,9 +3680,11 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
           ).toFixed(1)} deg and vertical ${(VERTICAL_HALF_FOV_RAD * DEG_PER_RAD).toFixed(
             1,
           )} deg half extents`,
-          measured: `horizontal ${(projected.horizontal * DEG_PER_RAD).toFixed(1)} deg, vertical ${(
-            projected.vertical * DEG_PER_RAD
-          ).toFixed(1)} deg, depth ${projected.depth.toFixed(3)}`,
+          measured: `horizontal ${(framing.projected.horizontal * DEG_PER_RAD).toFixed(
+            1,
+          )} deg, vertical ${(framing.projected.vertical * DEG_PER_RAD).toFixed(
+            1,
+          )} deg, depth ${framing.projected.depth.toFixed(3)}`,
         });
       }
     }

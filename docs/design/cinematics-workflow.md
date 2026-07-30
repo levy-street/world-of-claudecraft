@@ -20,6 +20,7 @@ files as anchors, never line numbers or inventory counts.
 | Runtime camera evaluation | `src/game/scene_director.ts`: `SceneDirector`; `src/game/scene_director_core.ts`: `applySceneOp`, `scenePose`; `src/game/scene_rig_core.ts`: `sceneRigCameraPosition`, `sceneRigLookAtPosition` |
 | Runtime overlay and props | `src/ui/hud/scene/scene_controller.ts`: `SceneHudController`; `src/ui/hud/scene/scene_overlay_view.ts`: `overlayApplyOp`, `sceneOverlayView`; `src/render/harbor.ts`: `buildHarbors`; `src/render/prop_path_core.ts`: `propPathPoseAt` |
 | Editor framing | `src/editor/cinematic_panel.ts`: `CinematicPanel`; `src/editor/cinematic_scrub_core.ts`: `evaluateCinematicScrubFrame`; `src/editor/cinematic_capture_core.ts`: `createCinematicCameraCapture` |
+| Shared mechanical predicates | `src/sim/scenes/lint_core.ts`: `MechanicalCheck`, `hullWorldCollision`, `evaluateEntitySupport`, `riderDeckViolation`, `evaluateFraming` |
 | Contact-sheet review | `scripts/lib/cinematic_contact_sheet_plan_core.mjs`: `planContactSheet`; `scripts/lib/cinematic_contact_sheet_html_core.mjs`: `renderContactSheetHtml` |
 | Shared clock and seed | `src/world_api/scenes.ts`: `IWorldScenes.presentationTime`; `src/world_seed.mjs`: `WORLD_SEED` |
 
@@ -64,9 +65,10 @@ and look-at points plus the shared seed, tool id, and capture date. The dev
 save path updates `src/editor/cinematic_captures.generated.ts`, and the
 panel also provides paste-ready source.
 
-The current panel does not draw linter violations as viewport gizmos. Keep
-the watch-mode shot linter beside the editor and use its named violation,
-op, time, threshold, and measurement to drive the framing change.
+The panel evaluates `src/sim/scenes/lint_core.ts` at the selected fixed-tick
+time. Hull boxes, support rays, and framing bounds are neutral while passing
+and red on violation. The violation list reports the check id, op index, and
+exact measured value used by the shot gate.
 
 ### 3. Review
 
@@ -108,10 +110,11 @@ teardown change. It is not the first feedback loop for a scene author.
 
 ## Mechanical check taxonomy
 
-`tests/cinematic_shots.test.ts` owns the machine-readable check ids,
-thresholds, synthetic scenes, shared-seed capture, and the empty legacy
-exemption pin. It samples every registered scene against the following
-taxonomy.
+`src/sim/scenes/lint_core.ts` owns the machine-readable check ids, thresholds,
+and spatial predicates shared by the shot gate and editor. The synthetic
+scenes, shared-seed capture, and empty legacy exemption pin remain in
+`tests/cinematic_shots.test.ts`, which samples every registered scene against
+the following taxonomy.
 
 ### Collision and support
 

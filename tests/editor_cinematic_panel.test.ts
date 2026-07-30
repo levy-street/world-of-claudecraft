@@ -23,12 +23,24 @@ describe('editor Cinematic panel', () => {
     const evaluate = vi.fn((_scene, timeSec: number) => ({
       timeSec,
       camera: null,
+      subject: null,
       propCues: [],
       overlay: {
         fadeOpacity: 0.5,
         letterbox: true,
         cinematic: true,
       },
+      violations: [
+        {
+          sceneId: 'scene',
+          check: 'support.entity' as const,
+          opIndex: 7,
+          opKind: 'actorMove',
+          time: timeSec,
+          threshold: 'supported',
+          measured: 'actor is 1.25 yd above terrain',
+        },
+      ],
     }));
     const parent = requiredElement('viewport');
     const panel = new CinematicPanel(parent, {
@@ -46,6 +58,7 @@ describe('editor Cinematic panel', () => {
     expect(parent.querySelector('[role="status"]')?.textContent).toBe('');
     expect(requiredQuery<HTMLElement>(parent, '.ed-cinematic-fade').style.opacity).toBe('0.5');
     expect(parent.textContent).toContain('Letterbox: on');
+    expect(parent.textContent).toContain('support.entity | op 7 | actor is 1.25 yd above terrain');
 
     const range = requiredQuery<HTMLInputElement>(parent, 'input[type="range"]');
     range.value = '1.07';
@@ -82,8 +95,10 @@ describe('editor Cinematic panel', () => {
       evaluate: (_scene, timeSec) => ({
         timeSec,
         camera: null,
+        subject: null,
         propCues: [],
         overlay: { fadeOpacity: 0, letterbox: false, cinematic: true },
+        violations: [],
       }),
       setAuthoredCamera: vi.fn(),
       capture: captureCurrent,
