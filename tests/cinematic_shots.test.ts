@@ -1,4 +1,7 @@
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 import {
   measureArrivalApproach,
@@ -17,6 +20,7 @@ import {
   sceneRigLocalToWorld,
   sceneRigLookAtPosition,
 } from '../src/game/scene_rig_core';
+import { SFX_FIXED_CATALOG_KEYS } from '../src/game/sfx_manifest.generated';
 import { composeHarborShipAttachFrame } from '../src/render/harbor_ship_attach_core';
 import { type PropPathSegment, propPathPoseAt } from '../src/render/prop_path_core';
 import {
@@ -25,6 +29,7 @@ import {
   LAST_BELL_VOYAGE_SEGMENT_IDS,
   LB_PROP_CUE_PARK,
 } from '../src/sim/content/last_bell_cinematics';
+import { PROPS } from '../src/sim/data';
 import {
   GULLHAVEN_HARBOR,
   HARBORS,
@@ -35,6 +40,10 @@ import {
   harborShipLocalPointInside,
   MAINLAND_HARBOR,
 } from '../src/sim/harbor_layout';
+import {
+  SCENE_FUTURE_MUSIC_DIRECTIVES,
+  SCENE_SAMPLED_MUSIC_DIRECTIVES,
+} from '../src/sim/scenes/registry';
 import type { SceneDef, SceneOpDef } from '../src/sim/scenes/scenes';
 import type { Sim } from '../src/sim/sim';
 import type {
@@ -49,7 +58,11 @@ import {
   overlayApplyOp,
   sceneOverlayView,
 } from '../src/ui/hud/scene/scene_overlay_view';
+import { en } from '../src/ui/i18n.catalog';
+import { SUPPORTED_LANGUAGES } from '../src/ui/i18n.resolved.generated/loaders';
 import { WORLD_SEED } from '../src/world_seed.mjs';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 // Twenty samples per second match the authoring report without tying the gate to render frame rate.
 const SHOT_SAMPLE_RATE_HZ = 20;
@@ -136,6 +149,10 @@ const ENTITY_SUPPORT_EPSILON_YARDS = 0.1;
 const RIDER_DECK_EDGE_EPSILON_YARDS = 0.01;
 // A captured player delta below this tolerance is treated as stationary.
 const RIDER_WALK_STEP_EPSILON_YARDS = 1e-4;
+// A subjectRef must resolve this close to the authored look-at in the horizontal world plane.
+const SUBJECT_REFERENCE_RADIUS_YARDS = 3;
+// Subtitle duration floors use this readability ceiling: minimum seconds equals chars divided by CPS.
+const SUBTITLE_READ_TIME_FLOOR_CHARACTERS_PER_SECOND = 20;
 
 type MechanicalCheck =
   | 'clearance.terrain'
@@ -167,7 +184,12 @@ type MechanicalCheck =
   | 'prop.arrivalDirection'
   | 'collision.hull'
   | 'support.entity'
-  | 'containment.rider';
+  | 'containment.rider'
+  | 'reference.music'
+  | 'reference.orphan'
+  | 'reference.subject'
+  | 'reference.lineKey'
+  | 'reference.subtitleReadTime';
 
 interface LegacyExemption {
   readonly sceneId: string;
@@ -307,6 +329,31 @@ const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
     check: 'containment.rider',
     reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
   },
+  {
+    sceneId: 'cast_off',
+    check: 'reference.orphan',
+    reason: 'P1.3 must cue or remove the legacy authored cast-off prop segment.',
+  },
+  {
+    sceneId: 'scn_lb_q0_ashore',
+    check: 'reference.orphan',
+    reason: 'P1.3 must trigger or remove the superseded standalone arrival scene.',
+  },
+  {
+    sceneId: 'scn_lb_q0_ashore',
+    check: 'reference.subtitleReadTime',
+    reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
+  },
+  {
+    sceneId: 'scn_lb_q0_doorway',
+    check: 'reference.subtitleReadTime',
+    reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
+    check: 'reference.subtitleReadTime',
+    reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
+  },
 ];
 
 interface TimedSceneOp {
@@ -338,6 +385,7 @@ interface CapturedScene {
   readonly authoredOps: readonly SceneOpDef[];
   readonly frames: ReadonlyMap<number, SceneFrame>;
   readonly entityLabels: ReadonlyMap<number, string>;
+  readonly entityReferenceIds: ReadonlyMap<string, readonly number[]>;
   readonly riderHarbors: ReadonlyMap<number, HarborDef['id']>;
 }
 
@@ -414,6 +462,8 @@ interface SyntheticControl {
   readonly expectedMeasured?: string;
   readonly actorIds?: readonly string[];
   readonly playerStart?: { x: number; z: number };
+  readonly orphanSegmentId?: string;
+  readonly orphanScene?: boolean;
 }
 
 const SYNTHETIC_FAST_PROP_CUE = 'scn_test_lint_prop_speed_bad';
@@ -427,6 +477,11 @@ const SYNTHETIC_ATTACH_PASS_CUE = 'scn_test_lint_attach_pass';
 const SYNTHETIC_PROP_DEAD_STOP_CUE = 'scn_test_lint_prop_dead_stop_bad';
 const SYNTHETIC_PROP_LURCH_CUE = 'scn_test_lint_prop_lurch_bad';
 
+type SyntheticSceneOpDef =
+  | SceneOpDef
+  | { at: number; kind: 'prop'; target: string; cue: string }
+  | { at: number; kind: 'music'; directive: string };
+
 interface SyntheticCameraSceneOptions {
   readonly hideRelease?: boolean;
   readonly coverFirstCut?: boolean;
@@ -434,7 +489,7 @@ interface SyntheticCameraSceneOptions {
   readonly includeRelease?: boolean;
   readonly includeUnlock?: boolean;
   readonly includeLetterboxOff?: boolean;
-  readonly extraOps?: readonly SceneOpDef[];
+  readonly extraOps?: readonly SyntheticSceneOpDef[];
   readonly presentationFixture?: SyntheticPresentationFixture;
 }
 
@@ -499,7 +554,7 @@ function syntheticCameraScene(
             },
           ] satisfies SceneOpDef[])
         : []),
-      ...extraOps,
+      ...(extraOps as readonly SceneOpDef[]),
     ],
   };
 }
@@ -578,6 +633,7 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
             fallback: { x: 0, z: 0, height: 2 },
           },
           dur: 1.6,
+          subjectRef: 'tam',
         },
       },
     ]),
@@ -1225,6 +1281,144 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
   },
   {
     def: syntheticCameraScene(
+      'scn_test_lint_music_unknown_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      {
+        extraOps: [{ at: 0.2, kind: 'music', directive: 'lb_no_such_directive' }],
+      },
+    ),
+    expectedCheck: 'reference.music',
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_music_future_pass',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      {
+        extraOps: [
+          { at: 0.2, kind: 'music', directive: 'theme:last_bell' },
+          { at: 0.3, kind: 'music', directive: 'resume' },
+        ],
+      },
+    ),
+    expectedCheck: null,
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_orphan_segment_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+    ),
+    expectedCheck: 'reference.orphan',
+    orphanSegmentId: 'scn_test_lint_orphan_segment_bad',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_orphan_scene_bad', 1.7, SYNTHETIC_GRAMMAR_CAMERA_OPS),
+    expectedCheck: 'reference.orphan',
+    orphanScene: true,
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_subject_reference_missing_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 0, z: 0, height: 100 },
+            { x: 1, z: 0, height: 100 },
+          ],
+          lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
+          dur: 1.6,
+          subjectRef: 'missing_cinematic_subject',
+        },
+      },
+    ]),
+    expectedCheck: 'reference.subject',
+    expectedMeasured: 'no presentation entity or fixture named missing_cinematic_subject',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_subject_reference_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 0, z: 0, height: 100 },
+            { x: 1, z: 0, height: 100 },
+          ],
+          lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
+          dur: 1.6,
+          subjectRef: 'statueBlock',
+        },
+      },
+    ]),
+    expectedCheck: 'reference.subject',
+    expectedMeasured: 'nearest statueBlock',
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_line_key_missing_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      {
+        extraOps: [
+          {
+            at: 0.2,
+            kind: 'line',
+            speaker: '',
+            key: 'lb.no_such_scene_line',
+            dur: 1,
+          },
+        ],
+      },
+    ),
+    expectedCheck: 'reference.lineKey',
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_subtitle_read_time_bad',
+      4.8,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      {
+        extraOps: [
+          {
+            at: 0.2,
+            kind: 'line',
+            speaker: '',
+            key: 'lb.q0.scene.harbor',
+            dur: 4.4,
+          },
+        ],
+      },
+    ),
+    expectedCheck: 'reference.subtitleReadTime',
+    expectedMeasured: 'ru_RU has',
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_subtitle_pending_fallback_bad',
+      4,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      {
+        extraOps: [
+          {
+            at: 0.2,
+            kind: 'line',
+            speaker: '',
+            key: 'lb.q0.tam.stretchers',
+            dur: 3.5,
+          },
+        ],
+      },
+    ),
+    expectedCheck: 'reference.subtitleReadTime',
+    expectedMeasured: 'es has 72 chars',
+  },
+  {
+    def: syntheticCameraScene(
       'scn_test_lint_release_missing_bad',
       1.7,
       SYNTHETIC_GRAMMAR_CAMERA_OPS,
@@ -1326,7 +1520,21 @@ const ARRIVAL_HARBOR_BY_CUE = new Map<string, HarborDef['id']>([
   [SYNTHETIC_MISSED_BERTH_ARRIVAL_CUE, 'gullhaven'],
   [SYNTHETIC_CROSSWIND_ARRIVAL_CUE, 'gullhaven'],
 ]);
+const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
+const SCENE_TRIGGER_FILES = [
+  ...tsFilesUnder(path.join(REPO_ROOT, 'src/sim/content')),
+  ...tsFilesUnder(path.join(REPO_ROOT, 'src/sim/last_bell')),
+];
+const LOCALE_OVERLAY_FILES = tsFilesUnder(path.join(REPO_ROOT, 'src/ui/i18n.locales'));
+const SCENE_TRIGGER_SOURCES = SCENE_TRIGGER_FILES.map(({ file, full }) => ({
+  file,
+  source: readFileSync(full, 'utf8'),
+}));
 const RENDERER_SOURCE = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+const SCENE_SFX_SOURCE = readFileSync(new URL('../src/game/scene_sfx.ts', import.meta.url), 'utf8');
+const SHIPPED_SFX_KEYS: ReadonlySet<string> = new Set(SFX_FIXED_CATALOG_KEYS);
+const RESOLVED_DIRECTOR_MUSIC_DIRECTIVES: ReadonlySet<string> = new Set(['silence', 'resume']);
+const FUTURE_MUSIC_DIRECTIVES: ReadonlySet<string> = new Set(SCENE_FUTURE_MUSIC_DIRECTIVES);
 let SimConstructor: typeof import('../src/sim/sim').Sim;
 let playRegisteredScene: typeof import('../src/sim/scenes/scenes').playSceneForPlayer;
 let readRegisteredSceneIds: typeof import('../src/sim/scenes/scenes').registeredSceneIds;
@@ -1334,6 +1542,7 @@ let readRegisteredScene: typeof import('../src/sim/scenes/scenes').sceneById;
 let registerSceneForLinter: typeof import('../src/sim/scenes/scenes').registerScene;
 let sampleTerrainHeight: typeof import('../src/sim/world').terrainHeight;
 let spawnSquadForLinter: typeof import('../src/sim/squad/squad').spawnSquad;
+let localeTranslationFills: ReadonlyMap<string, ReadonlyMap<string, string>> = new Map();
 let runtimeWaterLevel = 0;
 const SAMPLE_INTERVAL_SEC = 1 / SHOT_SAMPLE_RATE_HZ;
 const DEG_PER_RAD = 180 / Math.PI;
@@ -1363,6 +1572,18 @@ async function loadLinterRuntime(): Promise<void> {
   spawnSquadForLinter = squadModule.spawnSquad;
   sampleTerrainHeight = worldModule.terrainHeight;
   runtimeWaterLevel = worldModule.WATER_LEVEL;
+  const lineKeys = new Set<string>();
+  for (const id of readRegisteredSceneIds()) {
+    for (const op of readRegisteredScene(id)?.ops ?? []) {
+      if (op.kind === 'line') lineKeys.add(op.key);
+    }
+  }
+  for (const control of SYNTHETIC_CONTROLS) {
+    for (const op of control.def.ops) {
+      if (op.kind === 'line') lineKeys.add(op.key);
+    }
+  }
+  localeTranslationFills = readLocaleTranslationFills(lineKeys);
 }
 
 function trackedEntityIds(op: SceneWireOp): number[] {
@@ -1399,6 +1620,15 @@ function authoredSceneActorIds(ops: readonly SceneOpDef[]): string[] {
     }
   }
   return [...actorIds];
+}
+
+function authoredSubjectRefs(ops: readonly SceneOpDef[]): string[] {
+  const refs = new Set<string>();
+  for (const op of ops) {
+    if (op.kind !== 'camera' || op.shot.kind === 'release') continue;
+    if (op.shot.subjectRef) refs.add(op.shot.subjectRef);
+  }
+  return [...refs];
 }
 
 function sceneFrame(sim: Sim, trackedIds: ReadonlySet<number>): SceneFrame {
@@ -1444,6 +1674,7 @@ function captureScene(
     playerName: 'Shot Linter',
   });
   const entityLabels = new Map<number, string>();
+  const entityReferenceIds = new Map<string, number[]>();
   const riderHarbors = new Map<number, HarborDef['id']>();
   for (const entity of sim.entities.values()) {
     const harborId = RIDER_HARBOR_BY_TEMPLATE.get(entity.templateId);
@@ -1477,6 +1708,21 @@ function captureScene(
     for (const [actorId, entityId] of squad?.actorIds ?? []) {
       entityLabels.set(entityId, `scene actor ${actorId}`);
     }
+  }
+  for (const subjectRef of authoredSubjectRefs(authored?.ops ?? [])) {
+    const matchingIds: number[] = [];
+    for (const entity of sim.entities.values()) {
+      if (
+        entity.templateId !== subjectRef &&
+        entity.name !== subjectRef &&
+        entity.squadActorId !== subjectRef
+      ) {
+        continue;
+      }
+      matchingIds.push(entity.id);
+      if (!entityLabels.has(entity.id)) entityLabels.set(entity.id, subjectRef);
+    }
+    entityReferenceIds.set(subjectRef, matchingIds);
   }
   expect(
     playRegisteredScene(sim.ctx, sim.playerId, id),
@@ -1532,6 +1778,7 @@ function captureScene(
     authoredOps: authored?.ops ?? [],
     frames,
     entityLabels,
+    entityReferenceIds,
     riderHarbors,
   };
 }
@@ -1661,6 +1908,7 @@ function captureSyntheticControl(def: SceneDef): CapturedScene {
     authoredOps: sortedOps,
     frames,
     entityLabels: new Map(),
+    entityReferenceIds: new Map(),
     riderHarbors: new Map(),
   };
 }
@@ -2725,6 +2973,368 @@ function lintMinimumVisualMotion(
   }
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function sampledDirectiveSfxKey(directive: string): string | null {
+  const escaped = escapeRegExp(directive);
+  const property = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(directive) ? escaped : `['"]${escaped}['"]`;
+  const match = SCENE_SFX_SOURCE.match(new RegExp(`(?:^|\\n)\\s*${property}:\\s*['"]([^'"]+)['"]`));
+  return match?.[1] ?? null;
+}
+
+function translationText(table: unknown, key: string): string | null {
+  let current = table;
+  for (const part of key.split('.')) {
+    if (current === null || typeof current !== 'object' || !(part in current)) return null;
+    current = (current as Record<string, unknown>)[part];
+  }
+  return typeof current === 'string' ? current : null;
+}
+
+function readLocaleTranslationFills(
+  lineKeys: ReadonlySet<string>,
+): ReadonlyMap<string, ReadonlyMap<string, string>> {
+  const fills = new Map<string, Map<string, string>>();
+  for (const lang of SUPPORTED_LANGUAGES) fills.set(lang, new Map());
+  for (const { file, full } of LOCALE_OVERLAY_FILES) {
+    const lang = path.basename(file, '.ts');
+    const source = readFileSync(full, 'utf8');
+    if (![...lineKeys].some((key) => source.includes(`'${key}'`) || source.includes(`"${key}"`))) {
+      continue;
+    }
+    const sourceFile = ts.createSourceFile(full, source, ts.ScriptTarget.Latest, false);
+    const visit = (node: ts.Node): void => {
+      if (ts.isPropertyAssignment(node) && ts.isStringLiteralLike(node.name)) {
+        const key = node.name.text;
+        if (lineKeys.has(key)) {
+          if (!ts.isStringLiteralLike(node.initializer)) {
+            throw new Error(`${file}: scene line fill ${key} must be a string literal`);
+          }
+          fills.get(lang)?.set(key, node.initializer.text);
+        }
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(sourceFile);
+  }
+  return fills;
+}
+
+function subtitleCharacterCount(text: string): number {
+  return Array.from(text.trim()).length;
+}
+
+function lintSceneReferences(scene: CapturedScene, report: (violation: Violation) => void): void {
+  const sampledDirectives: ReadonlySet<string> = new Set(SCENE_SAMPLED_MUSIC_DIRECTIVES);
+  for (const timed of scene.ops) {
+    if (timed.op.kind === 'music') {
+      const directive = timed.op.directive;
+      const sampledKey = sampledDirectives.has(directive)
+        ? sampledDirectiveSfxKey(directive)
+        : null;
+      const resolved =
+        RESOLVED_DIRECTOR_MUSIC_DIRECTIVES.has(directive) ||
+        FUTURE_MUSIC_DIRECTIVES.has(directive) ||
+        (sampledKey !== null && SHIPPED_SFX_KEYS.has(sampledKey));
+      if (!resolved) {
+        report({
+          sceneId: scene.id,
+          check: 'reference.music',
+          opIndex: timed.index,
+          opKind: opKind(timed.op),
+          time: timed.at,
+          threshold:
+            'a director directive, shipped sampled mapping, or explicit future-phase directive',
+          measured: `unresolved directive ${directive}`,
+        });
+      }
+      continue;
+    }
+    if (timed.op.kind !== 'line') continue;
+    const english = translationText(en, timed.op.key);
+    if (english === null) {
+      report({
+        sceneId: scene.id,
+        check: 'reference.lineKey',
+        opIndex: timed.index,
+        opKind: opKind(timed.op),
+        time: timed.at,
+        threshold: 'a leaf in the generated i18n catalog registry',
+        measured: `missing key ${timed.op.key}`,
+      });
+      continue;
+    }
+    for (const lang of SUPPORTED_LANGUAGES) {
+      // Sparse overlays contain real fills only. An omitted pending row deliberately uses English.
+      const localized = localeTranslationFills.get(lang)?.get(timed.op.key) ?? english;
+      const chars = subtitleCharacterCount(localized);
+      const minimumSeconds = chars / SUBTITLE_READ_TIME_FLOOR_CHARACTERS_PER_SECOND;
+      if (timed.op.dur + SCENE_TIME_EPSILON_SECONDS >= minimumSeconds) continue;
+      const measuredCps = timed.op.dur > 0 ? (chars / timed.op.dur).toFixed(2) : 'infinite';
+      report({
+        sceneId: scene.id,
+        check: 'reference.subtitleReadTime',
+        opIndex: timed.index,
+        opKind: opKind(timed.op),
+        time: timed.at,
+        threshold: `at least ${minimumSeconds.toFixed(2)}s for ${lang} at ${SUBTITLE_READ_TIME_FLOOR_CHARACTERS_PER_SECOND} chars/s`,
+        measured: `${lang} has ${chars} chars in ${timed.op.dur.toFixed(2)}s (${measuredCps} chars/s)`,
+      });
+    }
+  }
+}
+
+function activePropsAt(scene: CapturedScene, time: number): Map<string, ActiveProp> {
+  const activeProps = new Map<string, ActiveProp>();
+  for (const timed of scene.ops) {
+    if (timed.at > time + SCENE_TIME_EPSILON_SECONDS || timed.op.kind !== 'prop') continue;
+    if (timed.op.cue === LB_PROP_CUE_PARK) {
+      activeProps.delete(timed.op.target);
+      continue;
+    }
+    const segment = PROP_SEGMENTS[timed.op.cue];
+    if (segment) {
+      activeProps.set(timed.op.target, {
+        segment,
+        startedAt: timed.at,
+        timedOp: timed,
+      });
+    }
+  }
+  return activeProps;
+}
+
+function lintSubjectReferences(
+  scene: CapturedScene,
+  samples: readonly CameraSample[],
+  report: (violation: Violation) => void,
+): void {
+  const authoredCameras = scene.authoredOps.filter(
+    (op): op is Extract<SceneOpDef, { kind: 'camera' }> => op.kind === 'camera',
+  );
+  const timedCameras = scene.ops.filter(
+    (timed): timed is TimedCameraOp => timed.op.kind === 'camera',
+  );
+  for (let index = 0; index < authoredCameras.length; index++) {
+    const authored = authoredCameras[index];
+    if (authored.shot.kind === 'release' || !authored.shot.subjectRef) continue;
+    const subjectRef = authored.shot.subjectRef;
+    const timed = timedCameras[index];
+    const sample = timed
+      ? samples.find((candidate) => candidate.timedOp.index === timed.index)
+      : undefined;
+    const lookAt = sample?.geometry.lookAt;
+    const candidates: Array<{ x: number; z: number }> = [];
+    for (const fixture of PROPS.decorProps ?? []) {
+      if (
+        fixture.key === subjectRef ||
+        (fixture.parts ?? []).some((part) => part.key === subjectRef)
+      ) {
+        candidates.push(fixture);
+      }
+    }
+    if (sample) {
+      const frame = frameAt(scene, sample.time);
+      for (const entityId of scene.entityReferenceIds.get(subjectRef) ?? []) {
+        const point = frame.entities.get(entityId);
+        if (point) candidates.push(point);
+      }
+      const harbor = HARBORS.find((candidate) => shipTarget(candidate) === subjectRef);
+      if (harbor) {
+        candidates.push(shipDeckCenterAt(harbor, sample.time, activePropsAt(scene, sample.time)));
+      }
+    }
+    const nearest =
+      lookAt === undefined
+        ? Number.POSITIVE_INFINITY
+        : Math.min(
+            ...candidates.map((candidate) =>
+              Math.hypot(candidate.x - lookAt.x, candidate.z - lookAt.z),
+            ),
+          );
+    if (nearest <= SUBJECT_REFERENCE_RADIUS_YARDS) continue;
+    report({
+      sceneId: scene.id,
+      check: 'reference.subject',
+      opIndex: timed?.index ?? -1,
+      opKind: timed ? opKind(timed.op) : 'camera',
+      time: timed?.at ?? authored.at,
+      threshold: `${subjectRef} within ${SUBJECT_REFERENCE_RADIUS_YARDS.toFixed(1)} yd of the shot look-at`,
+      measured:
+        candidates.length === 0
+          ? `no presentation entity or fixture named ${subjectRef}`
+          : `nearest ${subjectRef} is ${nearest.toFixed(2)} yd away`,
+    });
+  }
+}
+
+interface SceneTriggerSource {
+  readonly file: string;
+  readonly source: string;
+}
+
+function expressionSceneIds(
+  expression: ts.Expression,
+  registeredIds: ReadonlySet<string>,
+  bindings: ReadonlyMap<string, ReadonlySet<string>>,
+): Set<string> {
+  if (ts.isStringLiteralLike(expression)) {
+    return registeredIds.has(expression.text) ? new Set([expression.text]) : new Set();
+  }
+  if (ts.isIdentifier(expression)) return new Set(bindings.get(expression.text) ?? []);
+  if (
+    ts.isParenthesizedExpression(expression) ||
+    ts.isAsExpression(expression) ||
+    ts.isTypeAssertionExpression(expression) ||
+    ts.isSatisfiesExpression(expression) ||
+    ts.isNonNullExpression(expression)
+  ) {
+    return expressionSceneIds(expression.expression, registeredIds, bindings);
+  }
+  if (ts.isConditionalExpression(expression)) {
+    return new Set([
+      ...expressionSceneIds(expression.whenTrue, registeredIds, bindings),
+      ...expressionSceneIds(expression.whenFalse, registeredIds, bindings),
+    ]);
+  }
+  if (ts.isBinaryExpression(expression)) {
+    return new Set([
+      ...expressionSceneIds(expression.left, registeredIds, bindings),
+      ...expressionSceneIds(expression.right, registeredIds, bindings),
+    ]);
+  }
+  if (ts.isArrayLiteralExpression(expression)) {
+    return new Set(
+      expression.elements.flatMap((element) =>
+        ts.isSpreadElement(element)
+          ? []
+          : [...expressionSceneIds(element, registeredIds, bindings)],
+      ),
+    );
+  }
+  return new Set();
+}
+
+function sourceSceneTriggers(
+  triggerSource: SceneTriggerSource,
+  registeredIds: ReadonlySet<string>,
+): Set<string> {
+  const sourceFile = ts.createSourceFile(
+    triggerSource.file,
+    triggerSource.source,
+    ts.ScriptTarget.Latest,
+    true,
+  );
+  const initializers: Array<{ name: string; expression: ts.Expression }> = [];
+  const collectInitializers = (node: ts.Node): void => {
+    if (
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.initializer !== undefined
+    ) {
+      initializers.push({ name: node.name.text, expression: node.initializer });
+    }
+    ts.forEachChild(node, collectInitializers);
+  };
+  collectInitializers(sourceFile);
+
+  const bindings = new Map<string, Set<string>>();
+  for (let pass = 0; pass <= initializers.length; pass++) {
+    let changed = false;
+    for (const initializer of initializers) {
+      const resolved = expressionSceneIds(initializer.expression, registeredIds, bindings);
+      const current = bindings.get(initializer.name) ?? new Set<string>();
+      const next = new Set([...current, ...resolved]);
+      if (next.size === current.size) continue;
+      bindings.set(initializer.name, next);
+      changed = true;
+    }
+    if (!changed) break;
+  }
+
+  const triggered = new Set<string>();
+  const addExpression = (expression: ts.Expression | undefined): void => {
+    if (!expression) return;
+    for (const sceneId of expressionSceneIds(expression, registeredIds, bindings)) {
+      triggered.add(sceneId);
+    }
+  };
+  const visitTriggers = (node: ts.Node): void => {
+    if (ts.isPropertyAssignment(node)) {
+      const name =
+        ts.isIdentifier(node.name) || ts.isStringLiteralLike(node.name) ? node.name.text : null;
+      if (name === 'sceneId') addExpression(node.initializer);
+    } else if (ts.isShorthandPropertyAssignment(node) && node.name.text === 'sceneId') {
+      addExpression(node.name);
+    } else if (ts.isCallExpression(node)) {
+      const calleeName = ts.isIdentifier(node.expression)
+        ? node.expression.text
+        : ts.isPropertyAccessExpression(node.expression)
+          ? node.expression.name.text
+          : null;
+      if (calleeName === 'playScene' || calleeName === 'playSceneForPlayer') {
+        addExpression(node.arguments[2]);
+      }
+    }
+    ts.forEachChild(node, visitTriggers);
+  };
+  visitTriggers(sourceFile);
+  return triggered;
+}
+
+function registeredSceneTriggerIds(
+  triggerSources: readonly SceneTriggerSource[],
+  registeredIds: ReadonlySet<string>,
+): Set<string> {
+  const triggered = new Set<string>();
+  for (const triggerSource of triggerSources) {
+    for (const sceneId of sourceSceneTriggers(triggerSource, registeredIds)) {
+      triggered.add(sceneId);
+    }
+  }
+  return triggered;
+}
+
+function lintReferenceOrphans(
+  scenes: readonly SceneDef[],
+  segmentIds: readonly string[],
+  triggerSources: readonly SceneTriggerSource[],
+  report: (violation: Violation) => void,
+): void {
+  const cuedSegments = new Set(
+    scenes.flatMap((scene) => scene.ops.flatMap((op) => (op.kind === 'prop' ? [op.cue] : []))),
+  );
+  for (const segmentId of segmentIds) {
+    if (segmentId === LB_PROP_CUE_PARK || cuedSegments.has(segmentId)) continue;
+    report({
+      sceneId: segmentId,
+      check: 'reference.orphan',
+      opIndex: -1,
+      opKind: 'prop/registry',
+      time: 0,
+      threshold: 'at least one registered scene cue',
+      measured: `registered prop segment ${segmentId} is never cued`,
+    });
+  }
+
+  const registeredIds = new Set(scenes.map((scene) => scene.id));
+  const triggeredIds = registeredSceneTriggerIds(triggerSources, registeredIds);
+  for (const scene of scenes) {
+    if (triggeredIds.has(scene.id)) continue;
+    report({
+      sceneId: scene.id,
+      check: 'reference.orphan',
+      opIndex: -1,
+      opKind: 'scene/registry',
+      time: 0,
+      threshold: 'at least one campaign trigger reference outside registerScene',
+      measured: `registered scene ${scene.id} has no classified trigger`,
+    });
+  }
+}
+
 function lintScene(scene: CapturedScene, report: (violation: Violation) => void): CameraSample[] {
   const director = createSceneDirectorState();
   const overlay = createSceneOverlayState();
@@ -2748,6 +3358,7 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
   };
 
   lintFilmGrammar(scene, cameraOps, report);
+  lintSceneReferences(scene, report);
 
   for (const shot of shotOps) {
     const nextCamera = cameraOps.find(
@@ -3253,6 +3864,7 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
   lintShipScreenContinuity(scene, cameraOps, samples, report);
   lintPropMotionQuality(scene, propMotionSamples, report);
   lintMinimumVisualMotion(scene, shotOps, samples, report);
+  lintSubjectReferences(scene, samples, report);
   return samples;
 }
 
@@ -3484,7 +4096,41 @@ describe('cinematic shot mechanical gate', () => {
         check: 'containment.rider',
         reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
       },
+      {
+        sceneId: 'cast_off',
+        check: 'reference.orphan',
+        reason: 'P1.3 must cue or remove the legacy authored cast-off prop segment.',
+      },
+      {
+        sceneId: 'scn_lb_q0_ashore',
+        check: 'reference.orphan',
+        reason: 'P1.3 must trigger or remove the superseded standalone arrival scene.',
+      },
+      {
+        sceneId: 'scn_lb_q0_ashore',
+        check: 'reference.subtitleReadTime',
+        reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
+      },
+      {
+        sceneId: 'scn_lb_q0_doorway',
+        check: 'reference.subtitleReadTime',
+        reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
+        check: 'reference.subtitleReadTime',
+        reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
+      },
     ]);
+    expect(
+      SCENE_TRIGGER_FILES.length,
+      'the scene trigger scan must cover the recursive content and campaign source corpus',
+    ).toBeGreaterThanOrEqual(80);
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
+    expect([...localeTranslationFills.keys()]).toEqual([...SUPPORTED_LANGUAGES]);
+    expect(LOCALE_OVERLAY_FILES.map(({ file }) => path.basename(file, '.ts')).sort()).toEqual(
+      SUPPORTED_LANGUAGES.filter((lang) => lang !== 'en').sort(),
+    );
     // A renderer lens change must update the linter's framing calculations.
     expect(RENDERER_SOURCE).toContain('CAMERA_BASE_FOV = 60');
     const modelBounds = harborShipLocalBounds(GULLHAVEN_HARBOR.berth);
@@ -3567,6 +4213,11 @@ describe('cinematic shot mechanical gate', () => {
 
     const ids = readRegisteredSceneIds();
     expect(ids.length, 'the Last Bell scene registry must not be empty').toBeGreaterThan(0);
+    const registeredScenes = ids.flatMap((id) => {
+      const scene = readRegisteredScene(id);
+      return scene ? [scene] : [];
+    });
+    expect(registeredScenes).toHaveLength(ids.length);
     const exemptionKeys = new Set(
       LEGACY_EXEMPTIONS.map((row) => `${row.sceneId}\u0000${row.check}`),
     );
@@ -3586,6 +4237,12 @@ describe('cinematic shot mechanical gate', () => {
       failures.push(violation);
     };
 
+    lintReferenceOrphans(
+      registeredScenes,
+      Object.keys(LAST_BELL_PROP_PATH_SEGMENTS),
+      SCENE_TRIGGER_SOURCES,
+      report,
+    );
     for (const id of ids) lintScene(captureScene(id), report);
 
     const staleExemptions = LEGACY_EXEMPTIONS.filter(
@@ -3633,6 +4290,36 @@ describe('cinematic shot mechanical gate', () => {
           `${control.def.id} did not capture its tracked dolly subject`,
         ).toBe(true);
       }
+      if (control.orphanSegmentId !== undefined) {
+        lintReferenceOrphans(
+          [control.def],
+          [control.orphanSegmentId],
+          [
+            {
+              file: 'synthetic_orphan_segment_trigger.ts',
+              source: `playSceneForPlayer(ctx, pid, '${control.def.id}');`,
+            },
+          ],
+          (violation) => violations.push(violation),
+        );
+      }
+      if (control.orphanScene) {
+        lintReferenceOrphans(
+          [control.def],
+          [],
+          [
+            {
+              file: 'synthetic_orphan_scene_registration.ts',
+              source: [
+                `const SYNTHETIC_SCENE_ID = '${control.def.id}';`,
+                'registerScene({ id: SYNTHETIC_SCENE_ID });',
+                `const unrelatedMetadata = '${control.def.id}';`,
+              ].join('\n'),
+            },
+          ],
+          (violation) => violations.push(violation),
+        );
+      }
       lintScene(scene, (violation) => violations.push(violation));
       if (control.expectedCheck === null) {
         expect(violations, violations.map(violationMessage).join('\n')).toEqual([]);
@@ -3640,7 +4327,10 @@ describe('cinematic shot mechanical gate', () => {
       }
       const expected = violations.find(
         (violation) =>
-          violation.sceneId === control.def.id && violation.check === control.expectedCheck,
+          violation.sceneId === control.def.id &&
+          violation.check === control.expectedCheck &&
+          (control.expectedMeasured === undefined ||
+            violation.measured.includes(control.expectedMeasured)),
       );
       expect(expected, violations.map(violationMessage).join('\n')).toBeDefined();
       // LOAD-BEARING: several arrival controls trip multiple arms. The expectedMeasured

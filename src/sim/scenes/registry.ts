@@ -46,6 +46,8 @@ export interface SceneDollyShotDef {
   points: readonly SceneRigPointDef[];
   lookAt: SceneDollyLookAtDef;
   dur: number;
+  /** Presentation fixture or entity id expected near the authored look-at. */
+  subjectRef?: string;
 }
 
 export interface SceneAttachShotDef {
@@ -57,6 +59,8 @@ export interface SceneAttachShotDef {
   offset: SceneRigPoint;
   /** Exact look-at point in the target's local frame. */
   lookAt: SceneRigPoint;
+  /** Presentation fixture or entity id expected near the authored look-at. */
+  subjectRef?: string;
 }
 
 export type SceneOpDef = { at: number } & (
@@ -73,6 +77,8 @@ export type SceneOpDef = { at: number } & (
             pitch?: number;
             yaw?: number;
             dur: number;
+            /** Presentation fixture or entity id expected near the authored look-at. */
+            subjectRef?: string;
           }
         | SceneDollyShotDef
         | SceneAttachShotDef
