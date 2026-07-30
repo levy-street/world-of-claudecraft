@@ -4,11 +4,17 @@ import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { mobPortraitBackgroundSvg } from '../scripts/lib/mob_portrait_background.mjs';
 import { MOBS } from '../src/sim/data';
-import { targetPortraitUrl } from '../src/ui/target_portrait_view';
+import { MOB_PORTRAIT_ALIASES, targetPortraitUrl } from '../src/ui/target_portrait_view';
 
 describe('targetPortraitUrl', () => {
   it('selects committed portrait art for mob templates only', () => {
     expect(targetPortraitUrl('morthen', true)).toBe('/ui/mobs/morthen.webp');
+    expect(targetPortraitUrl('undermount_cinderling', true)).toBe(
+      '/ui/mobs/volzharr_buried_furnace.webp',
+    );
+    expect(targetPortraitUrl('wyrmcult_dig_foreman', true)).toBe(
+      '/ui/mobs/wyrmcult_necromancer.webp',
+    );
     expect(targetPortraitUrl('the_merchant', false)).toBeNull();
   });
 
@@ -59,6 +65,9 @@ describe('targetPortraitUrl', () => {
       .filter((file) => file.endsWith('.webp'))
       .map((file) => file.slice(0, -'.webp'.length))
       .sort();
-    expect(assets).toEqual(Object.keys(MOBS).sort());
+    const expectedAssets = Object.keys(MOBS)
+      .filter((mobId) => !MOB_PORTRAIT_ALIASES[mobId])
+      .sort();
+    expect(assets).toEqual(expectedAssets);
   });
 });

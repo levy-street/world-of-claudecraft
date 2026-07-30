@@ -5,10 +5,15 @@
 // the PlayerMeta.undermountCleared state, and the clear-on-boss-death hook land.
 
 import { describe, expect, it } from 'vitest';
-import { ZONE3_OBJECTS, ZONE3_QUEST_ORDER } from '../src/sim/content/zone3';
+import { ZONE3_QUEST_ORDER } from '../src/sim/content/zone3';
 import { CLASSES, ITEMS, MOBS, QUESTS } from '../src/sim/data';
 import { onUndermountBossDeath } from '../src/sim/encounters/undermount';
 import { enterDungeon, instanceKeyFor } from '../src/sim/instances/dungeons';
+import {
+  UNDERMOUNT_FOREMAN_ID,
+  UNDERMOUNT_RUNE_ITEM_ID,
+  UNDERMOUNT_RUNE_POSITIONS,
+} from '../src/sim/quests/undermount_prequest';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
@@ -200,7 +205,7 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     expect(QUESTS.q_undermount_heat.objectives).toEqual([
       {
         type: 'interact',
-        targetObjectItemId: 'gravewyrm_sigil',
+        targetObjectItemId: UNDERMOUNT_RUNE_ITEM_ID,
         count: 3,
         label: 'Rune rubbings taken',
       },
@@ -208,7 +213,7 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     expect(QUESTS.q_undermount_ledger.objectives).toEqual([
       {
         type: 'kill',
-        targetMobId: 'wyrmcult_necromancer',
+        targetMobId: UNDERMOUNT_FOREMAN_ID,
         count: 1,
         label: 'Wyrmcult foreman slain',
       },
@@ -227,11 +232,8 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     ]);
     expect(QUESTS.q_undermount_descent.requiresQuest).toBe('q_undermount_ledger');
     expect(QUESTS.q_undermount_ledger.requiresQuest).toBe('q_undermount_heat');
-    expect(
-      ZONE3_OBJECTS.find((object) => object.itemId === 'gravewyrm_sigil')?.positions.length,
-      'three existing rune markers keep the first quest reachable without changing world init',
-    ).toBeGreaterThanOrEqual(3);
-    expect(MOBS.wyrmcult_necromancer.loot).toContainEqual({
+    expect(MOBS[UNDERMOUNT_FOREMAN_ID].name).toBe('Wyrmcult Dig Foreman');
+    expect(MOBS[UNDERMOUNT_FOREMAN_ID].loot).toContainEqual({
       itemId: 'undermount_foreman_ledger',
       chance: 1,
       questId: 'q_undermount_ledger',
@@ -252,6 +254,74 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     expect(lantern.hitRating ?? 0).toBe(0);
     expect(lantern.pvpOffenseRating ?? 0).toBe(0);
     expect(lantern.pvpDefenseRating ?? 0).toBe(0);
+    expect(lantern.cosmeticOnly).toBe(true);
     expect(new Set(lantern.requiredClass)).toEqual(new Set(Object.keys(CLASSES)));
+  });
+
+  it('creates and completes the optional chain at Maerin without colliding with sigils', () => {
+    const sim = makeSim(73);
+    const pid = sim.addPlayer('warrior', 'Runeseeker');
+    const player = sim.entities.get(pid) as AnyEntity;
+    const meta = metaOf(sim, pid);
+    player.level = 20;
+    player.pos = { x: -170, y: 0, z: 606 };
+
+    meta.questLog.set('q_wyrm_sigils', {
+      questId: 'q_wyrm_sigils',
+      counts: [0],
+      state: 'active',
+      resolvedCounts: [3],
+    });
+    sim.acceptQuest('q_undermount_heat', pid);
+
+    const runeFaces = [...sim.entities.values()].filter(
+      (entity: AnyEntity) =>
+        entity.kind === 'object' && entity.objectItemId === UNDERMOUNT_RUNE_ITEM_ID,
+    );
+    expect(runeFaces).toHaveLength(3);
+    expect(runeFaces.map((entity: AnyEntity) => ({ x: entity.pos.x, z: entity.pos.z }))).toEqual(
+      UNDERMOUNT_RUNE_POSITIONS,
+    );
+    for (const rune of runeFaces) {
+      player.pos = { ...rune.pos };
+      expect(sim.pickUpObject(rune.id, pid)).toBe(true);
+    }
+    expect(meta.questLog.get('q_undermount_heat')?.state).toBe('ready');
+    expect(meta.questLog.get('q_wyrm_sigils')?.counts).toEqual([0]);
+
+    const gravewyrmSigil = [...sim.entities.values()].find(
+      (entity: AnyEntity) => entity.objectItemId === 'gravewyrm_sigil',
+    );
+    if (!gravewyrmSigil) throw new Error('missing original Gravewyrm Sigil object');
+    player.pos = { ...gravewyrmSigil.pos };
+    expect(sim.pickUpObject(gravewyrmSigil.id, pid)).toBe(true);
+    expect(meta.questLog.get('q_wyrm_sigils')?.counts).toEqual([1]);
+
+    player.pos = { x: -170, y: 0, z: 606 };
+    sim.turnInQuest('q_undermount_heat', pid);
+    sim.acceptQuest('q_undermount_ledger', pid);
+    const digMobs = [...sim.entities.values()].filter(
+      (entity: AnyEntity) =>
+        entity.kind === 'mob' &&
+        (entity.templateId === UNDERMOUNT_FOREMAN_ID || entity.templateId === 'wyrmcult_zealot') &&
+        Math.abs(entity.pos.x + 186) < 15 &&
+        Math.abs(entity.pos.z - 613) < 8,
+    );
+    expect(
+      digMobs.filter((entity: AnyEntity) => entity.templateId === UNDERMOUNT_FOREMAN_ID),
+    ).toHaveLength(1);
+    expect(
+      digMobs.filter((entity: AnyEntity) => entity.templateId === 'wyrmcult_zealot'),
+    ).toHaveLength(3);
+
+    for (const mob of digMobs) {
+      sim.dealDamage(player, mob, mob.hp, false, 'physical', null, 'hit', true);
+      if (mob.templateId === UNDERMOUNT_FOREMAN_ID) {
+        player.pos = { ...mob.pos };
+        sim.lootCorpse(mob.id, pid);
+      }
+    }
+    expect(meta.questLog.get('q_undermount_ledger')?.counts).toEqual([1, 3, 1]);
+    expect(meta.questLog.get('q_undermount_ledger')?.state).toBe('ready');
   });
 });

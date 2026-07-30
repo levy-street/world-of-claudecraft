@@ -9787,6 +9787,9 @@ export const ru_RU: EnTranslations = {
       "slakeleather_belt": {
         "name": "Пояс из закалённой кожи"
       },
+      "undermount_rune_rubbing": {
+        "name": "Копия руны Подгорья"
+      },
       "undermount_foreman_ledger": {
         "name": "Журнал прораба Подгорья"
       },
@@ -10748,6 +10751,9 @@ export const ru_RU: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "Угленыш"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Прораб раскопок культа Змея"
       },
       "reliquary_ledger_wraith": {
         "name": "Книжный призрак"

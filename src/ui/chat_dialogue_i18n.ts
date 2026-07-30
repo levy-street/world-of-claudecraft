@@ -6,6 +6,7 @@ export interface ChatDialogueEvent {
   channel?: string;
   entityId?: number;
   classId?: PlayerClass;
+  authoredSpeaker?: { kind: 'npc' | 'mob'; templateId: string };
   from: string;
   text: string;
 }
@@ -20,18 +21,22 @@ export function chatDialoguePresentation(
   event: ChatDialogueEvent,
   speaker: Entity | undefined,
 ): ChatDialoguePresentation {
-  const authoredSpeaker =
-    speaker !== undefined &&
-    event.channel === 'yell' &&
+  const authoredIdentity =
+    event.authoredSpeaker ??
+    (speaker &&
     event.entityId === speaker.id &&
     event.classId === undefined &&
-    (speaker.kind === 'npc' || (speaker.kind === 'mob' && speaker.ownerId === null));
+    (speaker.kind === 'npc' || (speaker.kind === 'mob' && speaker.ownerId === null))
+      ? { kind: speaker.kind, templateId: speaker.templateId }
+      : undefined);
+  const authoredSpeaker =
+    event.channel === 'yell' && event.classId === undefined && authoredIdentity !== undefined;
   if (!authoredSpeaker) return { from: event.from, text: event.text };
 
   const from =
-    speaker.kind === 'npc'
-      ? tEntity({ kind: 'npc', id: speaker.templateId, field: 'name' })
-      : tEntity({ kind: 'mob', id: speaker.templateId, field: 'name' });
+    authoredIdentity.kind === 'npc'
+      ? tEntity({ kind: 'npc', id: authoredIdentity.templateId, field: 'name' })
+      : tEntity({ kind: 'mob', id: authoredIdentity.templateId, field: 'name' });
   return {
     from,
     text: localizeSimText(event.text) ?? event.text,

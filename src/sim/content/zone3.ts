@@ -523,6 +523,29 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     color: 0x533566,
     componentTags: ['cloth'],
   },
+  wyrmcult_dig_foreman: {
+    id: 'wyrmcult_dig_foreman',
+    name: 'Wyrmcult Dig Foreman',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'humanoid',
+    elite: true,
+    // Surface pre-quest miniboss profile. Every number is tuning for PBE.
+    hpBase: 170,
+    hpPerLevel: 38,
+    dmgBase: 18,
+    dmgPerLevel: 3.2,
+    attackSpeed: 2.4,
+    armorPerLevel: 32,
+    moveSpeed: 6.5,
+    aggroRadius: 12,
+    loot: [
+      { copper: 250, chance: 1 },
+      { itemId: 'undermount_foreman_ledger', chance: 1, questId: 'q_undermount_ledger' },
+    ],
+    scale: 1.15,
+    color: 0x7d4f2a,
+  },
   boneclad_revenant: {
     id: 'boneclad_revenant',
     name: 'Boneclad Revenant',
@@ -1330,7 +1353,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     objectives: [
       {
         type: 'interact',
-        targetObjectItemId: 'gravewyrm_sigil',
+        targetObjectItemId: 'undermount_rune_rubbing',
         count: 3,
         label: 'Rune rubbings taken',
       },
@@ -1353,7 +1376,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     objectives: [
       {
         type: 'kill',
-        targetMobId: 'wyrmcult_necromancer',
+        targetMobId: 'wyrmcult_dig_foreman',
         count: 1,
         label: 'Wyrmcult foreman slain',
       },
@@ -2275,6 +2298,13 @@ export const ZONE3_OBJECTS: GroundObjectDef[] = [
 
 export const ZONE3_ITEMS: Record<string, ItemDef> = {
   // --- quest items ---
+  undermount_rune_rubbing: {
+    id: 'undermount_rune_rubbing',
+    name: 'Undermount Rune Rubbing',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_undermount_heat',
+  },
   undermount_foreman_ledger: {
     id: 'undermount_foreman_ledger',
     name: "Foreman's Undermount Ledger",
@@ -2291,6 +2321,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: {},
     sellValue: 0,
     soulbound: true,
+    cosmeticOnly: true,
     requiredClass: [
       'warrior',
       'paladin',

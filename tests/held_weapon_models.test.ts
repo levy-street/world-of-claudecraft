@@ -87,7 +87,12 @@ describe('held weapon models', () => {
       .filter((item) => itemOffhandModelUrl(item.id) === null)
       .map((item) => item.id)
       .sort();
-    expect(unmapped).toEqual(['heroic_wraithfire_orb', 'valefire_lantern', 'wraithfire_orb']);
+    expect(unmapped).toEqual([
+      'heroic_wraithfire_orb',
+      'runeseekers_lantern',
+      'valefire_lantern',
+      'wraithfire_orb',
+    ]);
   });
 
   it('resolves actual offhands independently from the mainhand model', () => {

@@ -9787,6 +9787,9 @@ export const ko_KR: EnTranslations = {
       "slakeleather_belt": {
         "name": "식힘가죽 허리띠"
       },
+      "undermount_rune_rubbing": {
+        "name": "언더마운트 룬 탁본"
+      },
       "undermount_foreman_ledger": {
         "name": "언더마운트 작업반장의 장부"
       },
@@ -10748,6 +10751,9 @@ export const ko_KR: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "잿불정령"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "고룡교단 발굴 감독관"
       },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"

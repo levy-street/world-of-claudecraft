@@ -1630,6 +1630,7 @@ const MOB_KEYS: Record<string, string> = {
   sister_nhalia_drowned_canticle: 'mob_dark_caster',
   deacon_voss: 'mob_dark_caster',
   wyrmcult_necromancer: 'mob_dark_caster',
+  wyrmcult_dig_foreman: 'mob_dark_caster',
   vael_the_mistcaller: 'mob_dark_caster',
   grand_necromancer_velkhar: 'mob_dark_caster',
   gorrak: 'mob_bruiser',

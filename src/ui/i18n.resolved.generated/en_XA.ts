@@ -9787,6 +9787,9 @@ export const en_XA: EnTranslations = {
       "slakeleather_belt": {
         "name": "[Šļáķéļéáţĥéŕ Ɓéļţ]"
       },
+      "undermount_rune_rubbing": {
+        "name": "[Úñðéŕɱóúñţ Ŕúñé Ŕúƀƀíñĝ]"
+      },
       "undermount_foreman_ledger": {
         "name": "[Ƒóŕéɱáñ'š Úñðéŕɱóúñţ Ļéðĝéŕ]"
       },
@@ -10748,6 +10751,9 @@ export const en_XA: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "[Çíñðéŕļíñĝ]"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "[Ŵýŕɱçúļţ Ðíĝ Ƒóŕéɱáñ]"
       },
       "reliquary_ledger_wraith": {
         "name": "[Ļéðĝéŕ Ŵŕáíţĥ]"

@@ -698,6 +698,9 @@ interface BaseItemDef {
   // reward tokens can opt into permanent storage. Enforced in social/trade.ts,
   // mail/post_office.ts, market.ts, and items.ts.
   soulbound?: boolean;
+  // Equipped presentation-only reward. It may occupy a visible equipment slot,
+  // but it is not combat gear and therefore has no item level or stat budget.
+  cosmeticOnly?: true;
   // Vendor service entry: buying this "item" teaches the riding skill instead of
   // adding anything to the bags (items.ts buyItem delegates to learnRiding, which
   // owns every gate: already trained, level, the 80g fee). Only the stablemaster
@@ -3974,6 +3977,10 @@ export type SimEvent = { pid?: number } & (
         | 'emote'
         | 'roll';
       entityId?: number;
+      // Authenticated authored-speaker identity for NPC and mob yells. This
+      // travels with the event because online interest snapshots can arrive
+      // after a spawn-tick yell, or omit a distant loud speaker entirely.
+      authoredSpeaker?: { kind: 'npc' | 'mob'; templateId: string };
       to?: string;
       // Account flair of the SENDER, attached by the server at fan-out (the sim
       // never sets it). Sparse: absent for a normal player, so an ordinary chat

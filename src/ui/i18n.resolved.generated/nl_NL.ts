@@ -9787,6 +9787,9 @@ export const nl_NL: EnTranslations = {
       "slakeleather_belt": {
         "name": "Koellederen riem"
       },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
       "undermount_foreman_ledger": {
         "name": "Foreman's Undermount Ledger"
       },
@@ -10748,6 +10751,9 @@ export const nl_NL: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
       },
       "reliquary_ledger_wraith": {
         "name": "Grootboek-Schim"

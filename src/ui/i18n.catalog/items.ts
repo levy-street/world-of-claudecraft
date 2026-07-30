@@ -2299,6 +2299,7 @@ const ITEM_ENTITY_IDS = [
   'ashwalk_sandals',
   'quenchsilk_cord',
   'slakeleather_belt',
+  'undermount_rune_rubbing',
   'undermount_foreman_ledger',
   'runeseekers_lantern',
 ] as const;
@@ -2412,6 +2413,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   ashwalk_sandals: 'Ashwalk Sandals',
   quenchsilk_cord: 'Quenchsilk Cord',
   slakeleather_belt: 'Slakeleather Belt',
+  undermount_rune_rubbing: 'Undermount Rune Rubbing',
   undermount_foreman_ledger: "Foreman's Undermount Ledger",
   runeseekers_lantern: "Runeseeker's Lantern",
 };

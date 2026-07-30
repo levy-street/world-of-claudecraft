@@ -8,6 +8,7 @@ import {
 import { ITEMS, MOBS } from '../src/sim/data';
 import {
   expectedStatBudget,
+  isItemLevelEligible,
   itemFromRaid,
   itemLevel,
   itemScore,
@@ -375,7 +376,7 @@ describe('item level: every level-20 item is balanced to budget', () => {
     let checked = 0;
     for (const id of Object.keys(ITEMS)) {
       const item = ITEMS[id];
-      if (!item.slot || itemSourceLevel(id) !== 20) continue;
+      if (!isItemLevelEligible(item) || itemSourceLevel(id) !== 20) continue;
       checked++;
       if (primaryStatSum(item) !== expectedStatBudget(item)) {
         offBudget.push(`${id}: have ${primaryStatSum(item)}, want ${expectedStatBudget(item)}`);

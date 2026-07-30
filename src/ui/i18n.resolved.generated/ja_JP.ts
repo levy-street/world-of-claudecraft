@@ -9787,6 +9787,9 @@ export const ja_JP: EnTranslations = {
       "slakeleather_belt": {
         "name": "冷まし革のベルト"
       },
+      "undermount_rune_rubbing": {
+        "name": "アンダーマウントのルーン拓本"
+      },
       "undermount_foreman_ledger": {
         "name": "アンダーマウント監督官の帳簿"
       },
@@ -10748,6 +10751,9 @@ export const ja_JP: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "燼の子"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "ワームカルト発掘監督"
       },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"

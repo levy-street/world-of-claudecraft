@@ -264,6 +264,7 @@ function maerinYellEvent(maerin: Entity, text: string, pid: number): SimEvent {
     text,
     channel: 'yell',
     entityId: maerin.id,
+    authoredSpeaker: { kind: 'npc', templateId: maerin.templateId },
     pid,
   };
 }

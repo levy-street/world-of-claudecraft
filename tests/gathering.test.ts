@@ -262,12 +262,13 @@ describe('isHarvestableCorpse', () => {
     // pass the row above by making the sweep vacuous.
     const included = Object.entries(MOBS).filter(([, m]) => isHarvestableCorpse(m.componentTags));
     expect(included).toHaveLength(21);
-    // ...and the untagged templates are counted rather than assumed: 203 of them
+    // ...and the untagged templates are counted rather than assumed: 205 of them
     // ship (the four Undermount raid bosses joined untagged, like every other
     // boss), all excluded before this change and all excluded after it, which
-    // is the path fen_troll now joins instead of getting one of its own.
+    // is the path fen_troll now joins instead of getting one of its own. The
+    // quest-local Wyrmcult Dig Foreman is likewise an unharvestable miniboss.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(203);
+    expect(untagged).toHaveLength(205);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

@@ -48,10 +48,32 @@ describe('authored chat dialogue localization', () => {
     ).toEqual({ from: player.name, text: MAERIN_LEDGER_LINE });
   });
 
-  it('keeps raw yell text on the voice lookup path', async () => {
+  it('localizes an authenticated authored yell before its speaker snapshot arrives', async () => {
+    await ensureLocaleLoaded('zh_CN');
+    setLanguage('zh_CN');
+
+    const presented = chatDialoguePresentation(
+      {
+        channel: 'yell',
+        entityId: 91,
+        from: 'Runeseeker Maerin',
+        text: MAERIN_LEDGER_LINE,
+        authoredSpeaker: { kind: 'npc', templateId: 'runeseeker_maerin' },
+      },
+      undefined,
+    );
+
+    expect(presented.from).not.toBe('Runeseeker Maerin');
+    expect(presented.text).not.toBe(MAERIN_LEDGER_LINE);
+  });
+
+  it('wires localized yell text to chat and bubbles while keeping the raw voice key', async () => {
     const source = await import('node:fs/promises').then((fs) =>
       fs.readFile(new URL('../src/ui/hud.ts', import.meta.url), 'utf8'),
     );
+    expect(source).toMatch(/const dialogue = chatDialoguePresentation\(/);
+    expect(source).toMatch(/this\.chatLogFrom\(\s*dialogue\.from,\s*dialogue\.text,/);
+    expect(source).toMatch(/ev\.channel === 'yell' \? dialogue\.text : ev\.text/);
     expect(source).toMatch(/yellVoiceKey\(ev\.text\)/);
   });
 });

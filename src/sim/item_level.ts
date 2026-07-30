@@ -282,7 +282,9 @@ export function itemFromRaid(itemId: string): boolean {
 // item-level readout or stat budget.
 export function isItemLevelEligible(item: ItemDef): boolean {
   return (
-    !!item.slot && (item.kind === 'armor' || item.kind === 'weapon' || item.kind === 'held_offhand')
+    !item.cosmeticOnly &&
+    !!item.slot &&
+    (item.kind === 'armor' || item.kind === 'weapon' || item.kind === 'held_offhand')
   );
 }
 

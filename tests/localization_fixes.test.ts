@@ -607,6 +607,16 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
   });
 
   it('every required Volzharr mechanic resolves in every locale', () => {
+    setLanguage('en');
+    for (const name of [
+      'Emberfeed',
+      'Forgeheat',
+      'Vent Fissure',
+      'Undermount Eruption',
+      'The Embers Come Home',
+    ]) {
+      expect(localizeSimAuraName(name), `en: ${name}`).toBe(name);
+    }
     for (const lang of supportedLanguages) {
       setLanguage(lang);
       for (const name of [
@@ -632,6 +642,8 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
       'Half-formed. We killed him before the forge could finish its work.',
       'The fire is receding north along the vein. This is not over.',
     ];
+    setLanguage('en');
+    for (const line of lines) expect(localizeSimText(line), `en: ${line}`).toBe(line);
     for (const lang of supportedLanguages) {
       setLanguage(lang);
       for (const line of lines) {

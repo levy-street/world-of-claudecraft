@@ -9787,6 +9787,9 @@ export const zh_CN: EnTranslations = {
       "slakeleather_belt": {
         "name": "淬革腰带"
       },
+      "undermount_rune_rubbing": {
+        "name": "地底熔炉符文拓片"
+      },
       "undermount_foreman_ledger": {
         "name": "地底熔炉工头账簿"
       },
@@ -10748,6 +10751,9 @@ export const zh_CN: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "余烬灵"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "巨龙教团挖掘监工"
       },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"

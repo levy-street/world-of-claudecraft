@@ -9787,6 +9787,9 @@ export const pt_BR: EnTranslations = {
       "slakeleather_belt": {
         "name": "Cinto de Couro Temperado"
       },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
       "undermount_foreman_ledger": {
         "name": "Foreman's Undermount Ledger"
       },
@@ -10748,6 +10751,9 @@ export const pt_BR: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
       },
       "reliquary_ledger_wraith": {
         "name": "Espectro do Registro"

@@ -47,6 +47,7 @@ import {
   resolvedQuestObjectiveCounts,
   validateProfessionQuestSelection,
 } from './profession_quest_effects';
+import { ensureUndermountPrequestEntities } from './undermount_prequest';
 
 // Pure quest-state computation, shared by the sim and the network client. Relocated
 // from sim.ts (W4) and re-exported from sim.ts so the ClientWorld import
@@ -158,6 +159,7 @@ export function finalizeQuestAccept(
     ...(selection === undefined ? {} : { selection }),
     resolvedCounts: resolvedQuestObjectiveCounts(quest, meta),
   });
+  ensureUndermountPrequestEntities(ctx, questId);
   for (const itemId of questFallbackGrants(quest, (id) => ctx.countItem(id, meta.entityId) > 0)) {
     ctx.addItem(itemId, 1, meta.entityId);
   }
