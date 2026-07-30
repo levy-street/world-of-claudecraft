@@ -29,6 +29,7 @@ import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
+import { undermountBossCompletesWing, undermountWingByBoss } from './encounters/undermount';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -124,6 +125,9 @@ const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   ysolei: 'drowned_temple',
   korzul_the_gravewyrm: 'gravewyrm_sanctum',
   nythraxis_scourge_of_thornpeak: 'nythraxis_boss_arena',
+  vosh_the_glazier: 'undermount_wing1',
+  saan_the_stoker: 'undermount_wing1',
+  odrenn_the_temperer: 'undermount_wing2',
 };
 
 // Perfection tasks: zero player deaths inside the boss's heroic instance
@@ -1419,7 +1423,12 @@ export function onMobKillCreditForDeeds(
   // Dungeon completion credit (the Nythraxis raid routes through the room
   // roster at the lockout site instead, so it is excluded here).
   const inst = instanceForMob(ctx, mob);
-  if (FINAL_BOSS_DUNGEONS[mob.templateId] && mob.templateId !== 'nythraxis_scourge_of_thornpeak') {
+  const undermountBoss = undermountWingByBoss(mob.templateId) !== undefined;
+  if (
+    FINAL_BOSS_DUNGEONS[mob.templateId] &&
+    mob.templateId !== 'nythraxis_scourge_of_thornpeak' &&
+    (!undermountBoss || undermountBossCompletesWing(ctx, mob))
+  ) {
     onDungeonFinalBossKilledForDeeds(ctx, mob, inst, eligible);
   }
 

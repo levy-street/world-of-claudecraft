@@ -33,6 +33,7 @@ import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { clearDelveRaiseDeadChannel } from '../delves/runs';
+import { UNDERMOUNT_ROOM_RADIUS, undermountWingByBoss } from '../encounters/undermount';
 import { isEscortNpcTemplate } from '../escort';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import {
@@ -945,7 +946,7 @@ function pulseLoudYell(ctx: SimContext, mob: Entity): void {
 
 // An evading mob has reached its spawn (walking or phasing): drop the pull
 // entirely and return to idle at full health, ready to be pulled again.
-export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
+export function resetEvadingMob(ctx: SimContext, mob: Entity, resetWingPartners = true): void {
   mob.aiState = 'idle';
   mob.hp = mob.maxHp;
   mob.auras = [];
@@ -1024,6 +1025,24 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // call unconditionally (unlike the two hooks above, which key on a specific
   // template id).
   clearDelveRaiseDeadChannel(ctx, mob);
+  if (resetWingPartners) {
+    const wing = undermountWingByBoss(mob.templateId);
+    if (wing && wing.bossMobIds.length > 1) {
+      for (const partner of ctx.entities.values()) {
+        if (partner.kind !== 'mob' || partner.id === mob.id) continue;
+        if (!wing.bossMobIds.includes(partner.templateId)) continue;
+        if (dist2d(partner.spawnPos, mob.spawnPos) > UNDERMOUNT_ROOM_RADIUS) continue;
+        if (partner.dead) {
+          ctx.respawnMob(partner);
+          continue;
+        }
+        partner.pos = { ...partner.spawnPos };
+        partner.prevPos = { ...partner.spawnPos };
+        ctx.rebucket(partner);
+        resetEvadingMob(ctx, partner, false);
+      }
+    }
+  }
 }
 
 // Cowardly mobs panic once per pull at low HP, then recover their nerve and turn to

@@ -127,6 +127,13 @@ function wingBossesAllDown(ctx: SimContext, wing: UndermountWing, dying: Entity)
   return true;
 }
 
+/** True when this boss death completes its Undermount wing. Single-boss wings
+ *  complete immediately; the Kiln-Keepers complete only on the second death. */
+export function undermountBossCompletesWing(ctx: SimContext, boss: Entity): boolean {
+  const wing = WING_BY_BOSS.get(boss.templateId);
+  return wing !== undefined && wingBossesAllDown(ctx, wing, boss);
+}
+
 // Frenzy the surviving keeper(s) of a duo when one of them dies: a stacking-free
 // haste buff so killing the keepers far apart is a wipe. No-op for a single-boss
 // wing or when no partner is still up in the room.
@@ -165,11 +172,17 @@ export function onUndermountBossDeath(ctx: SimContext, boss: Entity): void {
   const wing = WING_BY_BOSS.get(boss.templateId);
   if (!wing) return;
   frenzyUndermountPartners(ctx, wing, boss);
-  if (!wingBossesAllDown(ctx, wing, boss)) return;
+  if (!undermountBossCompletesWing(ctx, boss)) return;
+  const instance = ctx.instances.find((claim) => claim.mobIds.includes(boss.id));
+  const normalLockoutUntil =
+    instance?.difficulty === 'normal' ? ctx.raidResetMs(ctx.lockoutNowMs()) : null;
   for (const meta of ctx.players.values()) {
     const p = ctx.entities.get(meta.entityId);
     if (p && dist2d(p.pos, boss.spawnPos) <= UNDERMOUNT_ROOM_RADIUS) {
       meta.undermountCleared.add(wing.dungeonId);
+      if (normalLockoutUntil !== null) {
+        meta.raidLockouts.set(wing.dungeonId, normalLockoutUntil);
+      }
     }
   }
 }

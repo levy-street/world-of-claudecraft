@@ -17,7 +17,11 @@
 
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
-import { undermountWing, undermountWingSealed } from '../encounters/undermount';
+import {
+  undermountBossCompletesWing,
+  undermountWing,
+  undermountWingSealed,
+} from '../encounters/undermount';
 import { createGroundObject, createMob } from '../entity';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -425,9 +429,15 @@ function isRaidLocked(ctx: SimContext, meta: PlayerMeta, dungeonId: string): boo
 function heroicFinalBossAlive(ctx: SimContext, inst: InstanceSlot): boolean {
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
   if (!tuning) return false;
+  const wing = undermountWing(inst.dungeonId);
   for (const id of inst.mobIds) {
     const e = ctx.entities.get(id);
-    if (e && e.templateId === tuning.finalBossId && !e.dead) return true;
+    if (
+      e &&
+      !e.dead &&
+      (wing ? wing.bossMobIds.includes(e.templateId) : e.templateId === tuning.finalBossId)
+    )
+      return true;
   }
   return false;
 }
@@ -804,7 +814,12 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
   if (inst?.difficulty !== 'heroic') return;
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
-  if (!tuning || mob.templateId !== tuning.finalBossId) return;
+  if (!tuning) return;
+  const wing = undermountWing(inst.dungeonId);
+  const completesClaim = wing
+    ? wing.bossMobIds.includes(mob.templateId) && undermountBossCompletesWing(ctx, mob)
+    : mob.templateId === tuning.finalBossId;
+  if (!completesClaim) return;
   const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
   const rewardWindow = heroicRewardWindowToken(lockedUntil);
   // recipients is the death-time participation snapshot (damage.ts): it is empty

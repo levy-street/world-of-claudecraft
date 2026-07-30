@@ -32,6 +32,17 @@ export const HEROIC_LOOT_SOURCE_LEVEL = 25;
 export const NYTHRAXIS_RAID_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 export const NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL = 27;
 
+// Undermount wing 1 and 2 normal raid epics are already item level 33. Their
+// heroic copies use source level 31 (tuning), which lands at item level 37 after
+// the epic quality bonus. The boss ids anchor both variant generation and the
+// item-level source index to the actual raid loot tables.
+export const UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL = 31;
+export const UNDERMOUNT_RAID_BOSS_IDS = [
+  'vosh_the_glazier',
+  'saan_the_stoker',
+  'odrenn_the_temperer',
+] as const;
+
 // Combat-rating allowance for the ilvl-31 five-player heroic set: ONE rating
 // (hit/crit/haste) per piece, the tier's differentiator over ilvl 26/28 gear.
 // The three Heroic Nythraxis weapons below are item level 33 instead and carry the

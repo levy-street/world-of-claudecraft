@@ -3669,7 +3669,7 @@ const ITEM_ICON_IMAGES = ITEM_WEAPON_VARIANTS;
 
 /** Static URL of a weapon's rendered thumbnail, or null if it uses a recipe. */
 function weaponIconUrl(id: string): string | null {
-  const model = ITEM_ICON_IMAGES[id];
+  const model = ITEM_ICON_IMAGES[id] ?? ITEM_ICON_IMAGES[ITEMS[id]?.heroicOf ?? ''];
   return model ? `${WEAPON_ICON_DIR}/${model}.jpg` : null;
 }
 
@@ -4320,6 +4320,37 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_shadowjump_toad',
   'reins_stormfeather_griffin',
   'reins_thunderstrut_gobbler',
+  // Undermount wing 1 and 2 raid armor and jewelry. Weapons use rendered models.
+  'slag_tempered_sabatons',
+  'glasswalker_treads',
+  'twice_fired_slippers',
+  'stokebrand_striders',
+  'cindertoad_signet',
+  'ring_of_the_first_quench',
+  'coalglow_band',
+  'crownforged_warleggings',
+  'nighttalon_prowlers',
+  'soulflame_kilt',
+  'stormcallers_legwraps',
+  'twicetempered_girdle',
+  'ashwalk_sandals',
+  'quenchsilk_cord',
+  'slakeleather_belt',
+  'heroic_slag_tempered_sabatons',
+  'heroic_glasswalker_treads',
+  'heroic_twice_fired_slippers',
+  'heroic_stokebrand_striders',
+  'heroic_cindertoad_signet',
+  'heroic_ring_of_the_first_quench',
+  'heroic_coalglow_band',
+  'heroic_crownforged_warleggings',
+  'heroic_nighttalon_prowlers',
+  'heroic_soulflame_kilt',
+  'heroic_stormcallers_legwraps',
+  'heroic_twicetempered_girdle',
+  'heroic_ashwalk_sandals',
+  'heroic_quenchsilk_cord',
+  'heroic_slakeleather_belt',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the

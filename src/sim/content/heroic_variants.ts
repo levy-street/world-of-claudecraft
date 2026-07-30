@@ -3,7 +3,8 @@
 // item identity one tier up. Epics read item level 28, rares 25 (see
 // HEROIC_VARIANT_SOURCE_LEVEL in ../item_level), with primary stats rescaled to the
 // matching budget. The swap happens in loot/loot_roll.ts, and only when it is an
-// UPGRADE (raid epics, already item level 29, are left alone).
+// UPGRADE. Raid tiers use their own source levels: Nythraxis reaches item level
+// 33/37 and Undermount wing 1 and 2 epics reach item level 37.
 //
 // These are real ItemDefs merged into ITEMS (data.ts), so every downstream reader
 // (tooltip, equip, itemScore, the server->client wire) treats a Heroic variant like
@@ -24,8 +25,14 @@ import {
   weaponDpsBudget,
 } from '../item_budget';
 import type { ItemDef, MobTemplate } from '../types';
+import { HEROIC_DUNGEON_TUNING } from './dungeon_difficulty';
 import { DUNGEON_DEFS } from './dungeons';
-import { NYTHRAXIS_RAID_BOSS_ID, NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL } from './heroic_loot';
+import {
+  NYTHRAXIS_RAID_BOSS_ID,
+  NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL,
+  UNDERMOUNT_RAID_BOSS_IDS,
+  UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL,
+} from './heroic_loot';
 import { TEMPLE_DUNGEON_DEFS } from './temple';
 
 // The id of the Heroic variant of a base item (a stable, pure prefix).
@@ -124,23 +131,21 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
       ...scaleWeaponDamage(base.weapon, Math.max(curveDps, baseDps)),
     };
   }
-  // Heroic RAID variants (source level 27 -> item level 33/37) get the dual rating;
-  // five-man heroic variants inherit their base's ratings unchanged via the spread.
-  if (sourceLevel === NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL) applyRaidVariantRatings(variant, base);
+  // Heroic RAID variants get the dual rating; five-man heroic variants inherit
+  // their base's ratings unchanged via the spread.
+  if (
+    sourceLevel === NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL ||
+    sourceLevel === UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL
+  )
+    applyRaidVariantRatings(variant, base);
   // The spread widens ItemDef's discriminated union; the transform preserves the
   // base item's kind/slot shape, so this is a valid ItemDef of the same variant.
   return variant as ItemDef;
 }
 
-// The five dungeon/raid instances that have a heroic difficulty. Only mobs that
+// The dungeon and raid instances that have a heroic difficulty. Only mobs that
 // spawn inside one of these instances can drop a heroic-upgraded variant.
-const HEROIC_INSTANCE_IDS = new Set([
-  'hollow_crypt',
-  'sunken_bastion',
-  'drowned_temple',
-  'gravewyrm_sanctum',
-  'nythraxis_boss_arena',
-]);
+const HEROIC_INSTANCE_IDS = new Set(Object.keys(HEROIC_DUNGEON_TUNING));
 
 const HEROIC_ELIGIBLE_MOBS = new Set<string>();
 for (const def of [...Object.values(DUNGEON_DEFS), ...Object.values(TEMPLE_DUNGEON_DEFS)]) {
@@ -184,11 +189,18 @@ export function buildHeroicVariants(
   const raidBases = new Set(
     (mobs[NYTHRAXIS_RAID_BOSS_ID]?.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
   );
+  const undermountRaidBases = new Set(
+    UNDERMOUNT_RAID_BOSS_IDS.flatMap((bossId) =>
+      (mobs[bossId]?.loot ?? []).flatMap((entry) => (entry.itemId ? [entry.itemId] : [])),
+    ),
+  );
   const out: Record<string, ItemDef> = {};
   for (const id of eligible) {
     const sourceLevel = raidBases.has(id)
       ? NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL
-      : HEROIC_VARIANT_SOURCE_LEVEL;
+      : undermountRaidBases.has(id)
+        ? UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL
+        : HEROIC_VARIANT_SOURCE_LEVEL;
     out[heroicVariantId(id)] = makeHeroicVariant(items[id], sourceLevel);
   }
   return out;

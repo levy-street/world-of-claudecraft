@@ -2239,6 +2239,49 @@ export const DEEDS: Record<string, DeedDef> = {
       count: 1,
     },
   },
+  // Undermount wings 1 and 2. New records stay at the append-only tail.
+  dgn_undermount_kiln_keepers: {
+    id: 'dgn_undermount_kiln_keepers',
+    name: 'What Walks Out of the Kiln',
+    desc: 'Defeat Vosh the Glazier and Saan the Stoker in Undermount: The Descent.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'dungeonClears', dungeonId: 'undermount_wing1', count: 1 },
+  },
+  dgn_undermount_kiln_keepers_heroic: {
+    id: 'dgn_undermount_kiln_keepers_heroic',
+    name: 'Heroic: The Descent',
+    desc: 'Defeat the Kiln-Keepers in Undermount: The Descent on Heroic difficulty.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: {
+      kind: 'dungeonClears',
+      dungeonId: 'undermount_wing1',
+      difficulty: 'heroic',
+      count: 1,
+    },
+  },
+  dgn_undermount_odrenn: {
+    id: 'dgn_undermount_odrenn',
+    name: 'An Even Temper',
+    desc: 'Defeat Odrenn the Temperer in Undermount: The Tempering.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'dungeonClears', dungeonId: 'undermount_wing2', count: 1 },
+  },
+  dgn_undermount_odrenn_heroic: {
+    id: 'dgn_undermount_odrenn_heroic',
+    name: 'Heroic: The Tempering',
+    desc: 'Defeat Odrenn the Temperer in Undermount: The Tempering on Heroic difficulty.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: {
+      kind: 'dungeonClears',
+      dungeonId: 'undermount_wing2',
+      difficulty: 'heroic',
+      count: 1,
+    },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

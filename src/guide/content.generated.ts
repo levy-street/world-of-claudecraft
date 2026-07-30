@@ -4703,6 +4703,34 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "dgn_undermount_kiln_keepers",
+    "name": "What Walks Out of the Kiln",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_undermount_kiln_keepers_heroic",
+    "name": "Heroic: The Descent",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_undermount_odrenn",
+    "name": "An Even Temper",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_undermount_odrenn_heroic",
+    "name": "Heroic: The Tempering",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
   }
 ];
 

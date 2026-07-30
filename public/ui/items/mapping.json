@@ -2163,6 +2163,246 @@
       "sourcePack": "greaves",
       "sourceFile": "22.png",
       "confidence": "medium"
+    },
+    {
+      "itemId": "slag_tempered_sabatons",
+      "name": "Slag-Tempered Sabatons",
+      "sourcePack": "woc_generated",
+      "sourceFile": "slag_tempered_sabatons.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "glasswalker_treads",
+      "name": "Glasswalker Treads",
+      "sourcePack": "woc_generated",
+      "sourceFile": "glasswalker_treads.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "twice_fired_slippers",
+      "name": "Twice-Fired Slippers",
+      "sourcePack": "woc_generated",
+      "sourceFile": "twice_fired_slippers.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "stokebrand_striders",
+      "name": "Stokebrand Striders",
+      "sourcePack": "woc_generated",
+      "sourceFile": "stokebrand_striders.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "cindertoad_signet",
+      "name": "Cindertoad Signet",
+      "sourcePack": "woc_generated",
+      "sourceFile": "cindertoad_signet.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "ring_of_the_first_quench",
+      "name": "Ring of the First Quench",
+      "sourcePack": "woc_generated",
+      "sourceFile": "ring_of_the_first_quench.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "coalglow_band",
+      "name": "Coalglow Band",
+      "sourcePack": "woc_generated",
+      "sourceFile": "coalglow_band.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "crownforged_warleggings",
+      "name": "Crownforged Warleggings",
+      "sourcePack": "woc_generated",
+      "sourceFile": "crownforged_warleggings.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "nighttalon_prowlers",
+      "name": "Nighttalon Prowlers",
+      "sourcePack": "woc_generated",
+      "sourceFile": "nighttalon_prowlers.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "soulflame_kilt",
+      "name": "Soulflame Kilt",
+      "sourcePack": "woc_generated",
+      "sourceFile": "soulflame_kilt.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "stormcallers_legwraps",
+      "name": "Stormcaller's Legwraps",
+      "sourcePack": "woc_generated",
+      "sourceFile": "stormcallers_legwraps.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "twicetempered_girdle",
+      "name": "Twicetempered Girdle",
+      "sourcePack": "woc_generated",
+      "sourceFile": "twicetempered_girdle.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "ashwalk_sandals",
+      "name": "Ashwalk Sandals",
+      "sourcePack": "woc_generated",
+      "sourceFile": "ashwalk_sandals.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "quenchsilk_cord",
+      "name": "Quenchsilk Cord",
+      "sourcePack": "woc_generated",
+      "sourceFile": "quenchsilk_cord.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "slakeleather_belt",
+      "name": "Slakeleather Belt",
+      "sourcePack": "woc_generated",
+      "sourceFile": "slakeleather_belt.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_slag_tempered_sabatons",
+      "name": "Heroic Slag-Tempered Sabatons",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_slag_tempered_sabatons.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_glasswalker_treads",
+      "name": "Heroic Glasswalker Treads",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_glasswalker_treads.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_twice_fired_slippers",
+      "name": "Heroic Twice-Fired Slippers",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_twice_fired_slippers.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_stokebrand_striders",
+      "name": "Heroic Stokebrand Striders",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_stokebrand_striders.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_cindertoad_signet",
+      "name": "Heroic Cindertoad Signet",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_cindertoad_signet.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_ring_of_the_first_quench",
+      "name": "Heroic Ring of the First Quench",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_ring_of_the_first_quench.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_coalglow_band",
+      "name": "Heroic Coalglow Band",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_coalglow_band.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_crownforged_warleggings",
+      "name": "Heroic Crownforged Warleggings",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_crownforged_warleggings.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_nighttalon_prowlers",
+      "name": "Heroic Nighttalon Prowlers",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_nighttalon_prowlers.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_soulflame_kilt",
+      "name": "Heroic Soulflame Kilt",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_soulflame_kilt.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_stormcallers_legwraps",
+      "name": "Heroic Stormcaller's Legwraps",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_stormcallers_legwraps.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_twicetempered_girdle",
+      "name": "Heroic Twicetempered Girdle",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_twicetempered_girdle.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_ashwalk_sandals",
+      "name": "Heroic Ashwalk Sandals",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_ashwalk_sandals.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_quenchsilk_cord",
+      "name": "Heroic Quenchsilk Cord",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_quenchsilk_cord.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_slakeleather_belt",
+      "name": "Heroic Slakeleather Belt",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_slakeleather_belt.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
     }
   ],
   "generatedBatches": [
