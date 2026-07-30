@@ -30,22 +30,29 @@ ships to build this one, and you drown it back.)
   arena); the dungeon adds no ship-physics or water-simulation system.
 - Schedule cut applied at pass 2: three bosses (Charwick, the Hulljack, Redwake), no
   optional wing, no cannon beat; Overseer Brack and Quartermaster Sallow cut outright.
-- Next-stage gate: Levy chooses the 13 to 15 or level-20 band, PR #2321 lands, and the PBE
+- Next-stage gate: Levy chooses the 13 to 15 or level-20 band, the
+  `feature/procedural-dungeons` branch (umbrella PR #1584) lands in a release, and the PBE
   commitment is recorded. The proposed portfolio position is not approval.
 
 ## Where it sits
 
 - Location: the Galecrest coast, just south of Wickharbor. The sea cave
   sits under the cliffs in the lee of the harbor cove, its work-lift head
-  tucked beside the road down from the Windway pass, so lower-level
+  tucked beside the Wickharbor cove, so lower-level
   parties reach it from Mirefen through the pass with only a short
   escorted run, the classic "dungeon mouth in a scary zone" move. The
   Company's hulls are stolen off the Wreckfields to the north, and
   Harbormaster Odile's noticeboard carries the lead-in quest: Wickharbor
-  thinks it has a salvage-theft problem, the party finds a navy.
-- Hard dependency: the Galecrest zone (#2321) must land first. This PRD
-  stacks on it.
-- Level band: minLevel 13, tuned for 14 to 16 (tuning). Bridges the gap
+  thinks it has a salvage-theft problem, the party finds a navy. The
+  proposed door area is x 400 to 430, z 370 to 400, near the cove. S1 must
+  verify final placement against the real terrain before committing the
+  `doorPos`.
+- Hard dependency: the `feature/procedural-dungeons` branch (umbrella PR #1584)
+  must land in a release first. This PRD stacks on it.
+- Finder band: `HULLWORKS_MIN_LEVEL` is 13, and the normal Dungeon Finder
+  activity has `minLevel: 13` and `maxLevel: 15`. Those finder rows are the
+  only level enforcement surface. Physical door entry remains ungated by
+  level, like every other dungeon. The band bridges the gap
   between the Sunken Bastion (~11 to 13) and the Glimmermere Temple (15 to
   16); nothing currently owns 13 to 15. OPEN QUESTION (Levy): the
   Galecrest is authored as a level 20 zone, so a 13 to 15 dungeon inside
@@ -172,9 +179,15 @@ ribs open, water you let in lapping at the berth. Three phases.
   ran for years on one good hat.
 - Heroic mode ships at launch on the existing machinery (maintainer
   direction): heroic difficulty flag, standing multipliers, and the
-  automatic five-man heroic swap doing the loot (these 13-to-15 drops are
-  below the swap's upgrade floor, so variants generate for free). No
-  heroic-only mechanics, nothing bespoke to author.
+  automatic five-man heroic swap doing the loot. The qualifying loot
+  variants generate without per-variant authoring, but heroic does not ship
+  for free as a complete activity. The same change must author one normal
+  and one heroic row in `FINDER_ACTIVITIES`, their ordered
+  `FinderEncounter` entries and `hudChrome.finder.mech.*` copy keys, the
+  normal `minLevel: 13` and `maxLevel: 15` band, the heroic `minLevel: 20`
+  and `maxLevel: 20` band with its daily lockout summary, and
+  `HEROIC_BOSS_LOOT` rows. It must also update the pinned activity id list and level ranges in
+  `tests/dungeon_finder.test.ts`. No heroic-only mechanics are added.
 
 ## Deeds (per the design/deeds.md authoring contract, same change as the
 DUNGEON_DEFS entries)
@@ -248,9 +261,16 @@ Files ADDED:
 Files MODIFIED:
 - `src/sim/data.ts` (merge), `src/sim/content/deeds.ts` (append),
   `src/sim/sim.ts` (module ticks) + `server/game.ts` SIM_LAP_PHASES pins.
-- `src/sim/content/galecrest.ts` (branch #2321 file): the entrance
+- `src/sim/content/galecrest.ts`, from the `feature/procedural-dungeons`
+  branch (umbrella PR #1584): the entrance
   work-lift POI, the entrance pocket kept clear of level-20 camps, and
   Odile's noticeboard quest hook; the ONLY zone-file edit, kept minimal.
+- `src/sim/content/dungeon_finder.ts` (`FINDER_ACTIVITIES` normal and heroic
+  rows plus ordered `FinderEncounter` entries),
+  `src/sim/content/heroic_loot.ts` (`HEROIC_BOSS_LOOT` rows), and
+  `tests/dungeon_finder.test.ts` (pinned activity ids and level ranges) in
+  the same change. Add the corresponding `hudChrome.finder.mech.*` copy
+  keys to `src/ui/i18n.catalog/hud_chrome.ts` with the finder rows.
 - `src/ui/sim_i18n.ts`, `src/ui/i18n.catalog/items.ts` for English item
   names and five non-Latin overlays for M16 quest prose, regenerated
   resolved files; `src/game/instance_music.ts` + `music_tracks.ts`;
