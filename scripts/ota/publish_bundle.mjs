@@ -17,8 +17,14 @@
 //
 // Requirements: the AWS CLI on PATH with credentials for the bucket, and the
 // system zip binary. Env (documented in .env.example): OTA_S3_BUCKET,
-// OTA_PUBLIC_BASE_URL, optional OTA_S3_PREFIX (default 'ota') and
-// OTA_MIN_NATIVE_VERSION.
+// OTA_PUBLIC_BASE_URL, optional OTA_S3_PREFIX (default 'ota'),
+// OTA_MIN_NATIVE_VERSION, and OTA_S3_ENDPOINT_URL.
+//
+// The store is S3-COMPATIBLE, not necessarily S3: this project publishes to the
+// Cloudflare R2 bucket that already serves desktop updates, so every aws call
+// takes --endpoint-url from OTA_S3_ENDPOINT_URL when set (the same way the
+// woc-deploy desktop upload targets R2). Unset means real AWS S3, where the CLI
+// derives the endpoint from the region.
 //
 // Pure planning/validation lives in the exported functions and is unit-tested
 // (tests/ota_publish.test.ts); the file I/O and aws/zip calls at the bottom
@@ -35,6 +41,22 @@ const SEMVER_RE = /^\d+\.\d+\.\d+$/;
 /** The versioned, immutable artifact name for one published web bundle. */
 export function bundleFileName(version) {
   return `wocc-web-${version}.zip`;
+}
+
+/**
+ * The endpoint override every aws invocation needs to reach an S3-compatible
+ * store that is not AWS S3 (Cloudflare R2 here). Empty for real S3, where the
+ * CLI resolves the endpoint itself. https only: this pushes the document that
+ * decides which JS every phone runs, so it never travels over a MITM-able
+ * transport, the same rule the server applies to the manifest URL.
+ */
+export function awsEndpointArgs(endpointUrl) {
+  const url = String(endpointUrl ?? '').trim();
+  if (!url) return [];
+  if (!url.startsWith('https://')) {
+    throw new Error('ota publish: OTA_S3_ENDPOINT_URL must be an https:// origin');
+  }
+  return ['--endpoint-url', url];
 }
 
 /** Parse the CLI flags; throws with a usage-style message on anything malformed. */
@@ -129,10 +151,12 @@ function run(cmd, cmdArgs, opts = {}) {
   }
 }
 
-function s3ObjectExists(bucket, key) {
-  const res = spawnSync('aws', ['s3api', 'head-object', '--bucket', bucket, '--key', key], {
-    stdio: 'ignore',
-  });
+function s3ObjectExists(bucket, key, endpointArgs) {
+  const res = spawnSync(
+    'aws',
+    ['s3api', 'head-object', '--bucket', bucket, '--key', key, ...endpointArgs],
+    { stdio: 'ignore' },
+  );
   if (res.error) throw res.error;
   return res.status === 0;
 }
@@ -141,13 +165,9 @@ function sha256Of(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex');
 }
 
-function uploadFile(localPath, bucket, key, contentType, cacheControl, dryRun) {
+function uploadFile(localPath, bucket, key, contentType, cacheControl, endpointArgs, dryRun) {
   const dest = `s3://${bucket}/${key}`;
-  if (dryRun) {
-    console.log(`[dry-run] aws s3 cp ${localPath} ${dest}`);
-    return;
-  }
-  run('aws', [
+  const cmdArgs = [
     's3',
     'cp',
     localPath,
@@ -156,7 +176,16 @@ function uploadFile(localPath, bucket, key, contentType, cacheControl, dryRun) {
     contentType,
     '--cache-control',
     cacheControl,
-  ]);
+    ...endpointArgs,
+  ];
+  if (dryRun) {
+    // Quote the values that contain spaces (the cache-control list) so the
+    // printed line is the command an operator can actually paste to reproduce.
+    const shown = cmdArgs.map((a) => (a.includes(' ') ? `'${a}'` : a)).join(' ');
+    console.log(`[dry-run] aws ${shown}`);
+    return;
+  }
+  run('aws', cmdArgs);
 }
 
 function main() {
@@ -165,6 +194,7 @@ function main() {
   const publicBaseUrl = process.env.OTA_PUBLIC_BASE_URL;
   const prefix = process.env.OTA_S3_PREFIX ?? 'ota';
   const minNative = args.minNative ?? process.env.OTA_MIN_NATIVE_VERSION ?? null;
+  const endpointArgs = awsEndpointArgs(process.env.OTA_S3_ENDPOINT_URL);
   const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
   const version = args.rollback ?? args.version ?? pkg.version;
 
@@ -176,11 +206,11 @@ function main() {
     // Rollback: the zip must already be published; download it to re-derive
     // the checksum the re-pointed manifest advertises.
     const probe = planOtaPublish({ version, bucket, prefix, publicBaseUrl, minNative });
-    if (!s3ObjectExists(bucket, probe.bundleKey)) {
+    if (!s3ObjectExists(bucket, probe.bundleKey, endpointArgs)) {
       throw new Error(`ota publish: rollback target ${probe.bundleKey} does not exist`);
     }
     rmSync(zipPath, { force: true });
-    run('aws', ['s3', 'cp', `s3://${bucket}/${probe.bundleKey}`, zipPath]);
+    run('aws', ['s3', 'cp', `s3://${bucket}/${probe.bundleKey}`, zipPath, ...endpointArgs]);
     checksum = sha256Of(zipPath);
   } else {
     if (!args.skipBuild) {
@@ -207,7 +237,7 @@ function main() {
   });
 
   if (!args.rollback) {
-    if (s3ObjectExists(bucket, plan.bundleKey) && !args.force) {
+    if (s3ObjectExists(bucket, plan.bundleKey, endpointArgs) && !args.force) {
       throw new Error(
         `ota publish: ${plan.bundleKey} already exists; bump the version or pass --force`,
       );
@@ -218,13 +248,22 @@ function main() {
       plan.bundleKey,
       'application/zip',
       'public, max-age=31536000, immutable',
+      endpointArgs,
       args.dryRun,
     );
   }
 
   const manifestPath = resolve(outDir, 'latest.json');
   writeFileSync(manifestPath, `${JSON.stringify(plan.manifest, null, 2)}\n`);
-  uploadFile(manifestPath, bucket, plan.manifestKey, 'application/json', 'no-cache', args.dryRun);
+  uploadFile(
+    manifestPath,
+    bucket,
+    plan.manifestKey,
+    'application/json',
+    'no-cache',
+    endpointArgs,
+    args.dryRun,
+  );
 
   console.log(`\nota publish: ${args.rollback ? 'rolled back to' : 'published'} ${version}`);
   console.log(`  bundle:   ${plan.bundleUrl}`);

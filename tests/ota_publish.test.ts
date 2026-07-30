@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { bundleFileName, parseOtaArgs, planOtaPublish } from '../scripts/ota/publish_bundle.mjs';
+import {
+  awsEndpointArgs,
+  bundleFileName,
+  parseOtaArgs,
+  planOtaPublish,
+} from '../scripts/ota/publish_bundle.mjs';
 
 const BASE = {
   version: '0.33.0',
@@ -84,5 +89,31 @@ describe('parseOtaArgs', () => {
 describe('bundleFileName', () => {
   it('names artifacts by version', () => {
     expect(bundleFileName('0.33.0')).toBe('wocc-web-0.33.0.zip');
+  });
+});
+
+describe('awsEndpointArgs', () => {
+  // Publishing targets the Cloudflare R2 bucket that already serves desktop
+  // updates, so every aws call needs --endpoint-url. Without the override the
+  // CLI would silently talk to AWS S3 and the publish would land nowhere useful.
+  it('emits the override that points the AWS CLI at an S3-compatible store', () => {
+    expect(awsEndpointArgs('https://acct.r2.cloudflarestorage.com')).toEqual([
+      '--endpoint-url',
+      'https://acct.r2.cloudflarestorage.com',
+    ]);
+  });
+
+  it('emits nothing for real AWS S3, where the CLI resolves its own endpoint', () => {
+    expect(awsEndpointArgs(undefined)).toEqual([]);
+    expect(awsEndpointArgs(null)).toEqual([]);
+    expect(awsEndpointArgs('')).toEqual([]);
+    expect(awsEndpointArgs('   ')).toEqual([]);
+  });
+
+  it('refuses a non-https endpoint, matching the manifest transport rule', () => {
+    expect(() => awsEndpointArgs('http://acct.r2.cloudflarestorage.com')).toThrow(
+      /OTA_S3_ENDPOINT_URL must be an https/,
+    );
+    expect(() => awsEndpointArgs('acct.r2.cloudflarestorage.com')).toThrow(/https/);
   });
 });

@@ -29,6 +29,7 @@ export interface OtaPublishPlan {
 }
 
 export function bundleFileName(version: string): string;
+export function awsEndpointArgs(endpointUrl: string | undefined | null): string[];
 export function parseOtaArgs(argv: string[]): OtaPublishArgs;
 export function planOtaPublish(input: {
   version: string;
