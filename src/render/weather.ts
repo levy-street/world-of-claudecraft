@@ -117,6 +117,7 @@ export class Weather {
   private points: THREE.Points;
   private material: THREE.PointsMaterial;
   private positions: Float32Array;
+  private readonly positionAttribute: THREE.BufferAttribute;
   private fallSpeed: Float32Array; // per-particle fall speed
   private phase: Float32Array; // per-particle sway phase
   private readonly count: number;
@@ -144,7 +145,10 @@ export class Weather {
     }
 
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+    this.positionAttribute = new THREE.BufferAttribute(this.positions, 3).setUsage(
+      THREE.DynamicDrawUsage,
+    );
+    geo.setAttribute('position', this.positionAttribute);
     // generous bounding sphere — the cloud is re-centred on the camera every
     // frame, so a fixed large radius avoids per-frame recompute and culling.
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), Math.hypot(HX, HY, HZ));
@@ -195,7 +199,6 @@ export class Weather {
     this.material.map = this.textures[s.texture];
     this.material.color.setHex(s.color);
     this.material.size = s.size;
-    this.material.needsUpdate = true;
   }
 
   /**
@@ -260,6 +263,6 @@ export class Weather {
         pos[j + 1] += HY * 2; // fell out the bottom -> back to the top
       else if (ry > HY) pos[j + 1] -= HY * 2;
     }
-    (this.points.geometry.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
+    this.positionAttribute.needsUpdate = true;
   }
 }

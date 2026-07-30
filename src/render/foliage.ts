@@ -58,6 +58,7 @@ import {
 } from './garden_parterre_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { attachShadowPassOnlyGate } from './shadow_pass_gate_core';
+import { freezeStaticMatrices } from './static_matrix';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
@@ -2217,6 +2218,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       im.visible = chunk.lastSeen === generation;
       chunk.mesh = im;
       parent.add(im);
+      freezeStaticMatrices(im);
     }
     if (fn > 0) {
       fm.count = fn;
@@ -2226,6 +2228,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       fm.visible = chunk.lastSeen === generation;
       chunk.flowerMesh = fm;
       parent.add(fm);
+      freezeStaticMatrices(fm);
     }
     chunk.ready = true;
     builtChunks++;
@@ -2473,6 +2476,7 @@ export function buildFoliage(seed: number): FoliageView {
         },
       }
     : buildGrassRing(group, seed);
+  freezeStaticMatrices(group);
   return {
     group,
     setGrassQuality(level: number): void {

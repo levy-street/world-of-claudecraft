@@ -108,6 +108,7 @@ export function buildMotes(seed: number): MotesView {
   const homeZ = new Float32Array(count);
 
   const tmpColor = new THREE.Color();
+  let colorsDirty = false;
 
   // (re)home a single mote to a random spot inside the ring around the player,
   // re-sampling terrain + biome tint. Returns false when the spot is unusable
@@ -135,12 +136,17 @@ export function buildMotes(seed: number): MotesView {
     colors[i * 3] = tmpColor.r;
     colors[i * 3 + 1] = tmpColor.g;
     colors[i * 3 + 2] = tmpColor.b;
+    colorsDirty = true;
     return true;
   }
 
   const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const positionAttribute = new THREE.BufferAttribute(positions, 3).setUsage(
+    THREE.DynamicDrawUsage,
+  );
+  const colorAttribute = new THREE.BufferAttribute(colors, 3);
+  geo.setAttribute('position', positionAttribute);
+  geo.setAttribute('color', colorAttribute);
 
   const mat = new THREE.PointsMaterial({
     size: GFX.standardMaterials ? 0.5 : 0.7,
@@ -192,8 +198,11 @@ export function buildMotes(seed: number): MotesView {
         positions[i * 3 + 1] = baseY[i] + bobAmp[i] + Math.sin(ph * 1.3) * 0.35;
         positions[i * 3 + 2] = homeZ[i] + Math.cos(ph * 0.8) * 0.5;
       }
-      geo.attributes.position.needsUpdate = true;
-      geo.attributes.color.needsUpdate = true;
+      positionAttribute.needsUpdate = true;
+      if (colorsDirty) {
+        colorAttribute.needsUpdate = true;
+        colorsDirty = false;
+      }
     },
   };
 }
