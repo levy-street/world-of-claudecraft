@@ -2,15 +2,15 @@
   "scenario": "undermount_volzharr",
   "seed": 1032,
   "sampleEvery": 20,
-  "ticks": 71,
+  "ticks": 73,
   "coverage": [
     "encounters/volzharr.ts permanent Vent Fissure placement and pulse state",
     "The Embers Come Home wake, deterministic shamble, consume, and Emberfeed stack",
     "Undermount Eruption windup event, telegraph window, damage roll, and scheduler state",
     "wing 3 entry after character-scoped wing 1 and wing 2 pre-clears"
   ],
-  "draws": 253,
-  "drawDigest": "51d671b7",
+  "draws": 268,
+  "drawDigest": "0a38d3ed",
   "frames": [
     {
       "tick": 0,
@@ -1309,13 +1309,13 @@
       "tick": 6,
       "time": 0.3,
       "nextId": 834,
-      "state": "dff268bb",
-      "events": "66ffcfad",
+      "state": "7c13d39f",
+      "events": "aae41f70",
       "rng": {
         "draws": 27,
         "digest": "d7d05947"
       },
-      "label": "volzharr-shambler-woken",
+      "label": "volzharr-vent-pulsed",
       "players": [
         {
           "activeLoadout": -1,
@@ -1595,14 +1595,11 @@
             ]
           ],
           "volzharr": {
-            "emberWakeTimer": 29.95,
+            "emberWakeTimer": 998.8,
             "eruptTimer": 998.8,
-            "shamblers": [
-              826
-            ],
             "tremorTimer": 39.7,
             "ventCount": 1,
-            "ventTimer": 998.9
+            "ventTimer": 24.85
           },
           "weapon": {
             "max": 681,
@@ -1659,7 +1656,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.301679,
+          "facing": -2.22712,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 900,
@@ -1673,8 +1670,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117423.50953,
-            "z": -1228.02306
+            "x": 117423.750444,
+            "z": -1228.192216
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1952,13 +1949,13 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 834,
-      "state": "141c6fd2",
-      "events": "9864c5c2",
+      "state": "c6ed38ce",
+      "events": "66ffcfad",
       "rng": {
         "draws": 27,
         "digest": "d7d05947"
       },
-      "label": "volzharr-shambler-consumed",
+      "label": "volzharr-shambler-woken",
       "players": [
         {
           "activeLoadout": -1,
@@ -2194,19 +2191,6 @@
         {
           "aggroTargetId": 822,
           "aiState": "chase",
-          "auras": [
-            {
-              "duration": 36000,
-              "id": "volzharr_emberfeed",
-              "kind": "buff_haste",
-              "name": "Emberfeed",
-              "remaining": 35999.9,
-              "school": "fire",
-              "sourceId": 824,
-              "stacks": 1,
-              "value": 0.03
-            }
-          ],
           "combatTimer": 0.4,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2251,12 +2235,14 @@
             ]
           ],
           "volzharr": {
-            "emberWakeTimer": 29.85,
-            "emberfeedStacks": 1,
+            "emberWakeTimer": 29.95,
             "eruptTimer": 998.7,
+            "shamblers": [
+              826
+            ],
             "tremorTimer": 39.6,
             "ventCount": 1,
-            "ventTimer": 998.8
+            "ventTimer": 998.9
           },
           "weapon": {
             "max": 681,
@@ -2298,6 +2284,48 @@
           "wanderTarget": {
             "x": 117375.587142,
             "z": -1224.231829
+          },
+          "wanderTimer": 29.65,
+          "weapon": {
+            "max": 1,
+            "min": 1,
+            "speed": 10
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99.4,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.30355,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 900,
+          "id": 826,
+          "kind": "mob",
+          "level": 24,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900,
+          "moveSpeed": 3,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 117423.424364,
+            "z": -1228.090204
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 117424,
+            "z": -1228
+          },
+          "stats": {},
+          "templateId": "undermount_cinderling",
+          "wanderTarget": {
+            "x": 117420.700519,
+            "z": -1230.541362
           },
           "wanderTimer": 29.65,
           "weapon": {
@@ -2561,10 +2589,622 @@
       ]
     },
     {
-      "tick": 9,
-      "time": 0.45,
+      "tick": 10,
+      "time": 0.5,
       "nextId": 834,
-      "state": "7eb3134e",
+      "state": "18399160",
+      "events": "9864c5c2",
+      "rng": {
+        "draws": 27,
+        "digest": "d7d05947"
+      },
+      "label": "volzharr-shambler-consumed",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 25
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 25
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 822,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "undermountCleared": [
+            "undermount_wing1",
+            "undermount_wing2"
+          ]
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "priest",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 823,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "undermountCleared": [
+            "undermount_wing1",
+            "undermount_wing2"
+          ]
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.5,
+              "school": "physical",
+              "sourceId": 822
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 0.5,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fiveSecondRule": 99.5,
+          "hp": 900000,
+          "id": 822,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 117400,
+            "z": -1222
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99.5,
+          "comboUntil": -1,
+          "critChance": 0.0555,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0555,
+          "fiveSecondRule": 99.5,
+          "hp": 900000,
+          "id": 823,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900000,
+          "maxResource": 175,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 117404,
+            "z": -1222
+          },
+          "potionCooldownUntil": -1,
+          "resource": 175,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 12,
+          "stats": {
+            "agi": 11,
+            "armor": 50,
+            "int": 23,
+            "spi": 24,
+            "sta": 13,
+            "str": 10
+          },
+          "templateId": "priest",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aggroTargetId": 822,
+          "aiState": "chase",
+          "auras": [
+            {
+              "duration": 36000,
+              "id": "volzharr_emberfeed",
+              "kind": "buff_haste",
+              "name": "Emberfeed",
+              "remaining": 35999.9,
+              "school": "fire",
+              "sourceId": 824,
+              "stacks": 1,
+              "value": 0.03
+            }
+          ],
+          "combatTimer": 0.5,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.141593,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 68975,
+          "id": 824,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 117400,
+            "z": -1210
+          },
+          "level": 26,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 69000,
+          "moveSpeed": 5.5,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 117400,
+            "z": -1212.75
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 117400,
+            "z": -1210
+          },
+          "stats": {
+            "armor": 850
+          },
+          "tappedById": 822,
+          "templateId": "volzharr_buried_furnace",
+          "threat": [
+            [
+              822,
+              26
+            ]
+          ],
+          "volzharr": {
+            "emberWakeTimer": 29.85,
+            "emberfeedStacks": 1,
+            "eruptTimer": 998.6,
+            "tremorTimer": 39.5,
+            "ventCount": 1,
+            "ventTimer": 998.8
+          },
+          "weapon": {
+            "max": 681,
+            "min": 436,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99.5,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -0.30116,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 900,
+          "id": 825,
+          "kind": "mob",
+          "level": 24,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900,
+          "moveSpeed": 3,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 117377.84427,
+            "z": -1231.498629
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 117378,
+            "z": -1232
+          },
+          "stats": {},
+          "templateId": "undermount_cinderling",
+          "wanderTarget": {
+            "x": 117375.587142,
+            "z": -1224.231829
+          },
+          "wanderTimer": 29.55,
+          "weapon": {
+            "max": 1,
+            "min": 1,
+            "speed": 10
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99.5,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 2.494498,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 900,
+          "id": 827,
+          "kind": "mob",
+          "level": 24,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900,
+          "moveSpeed": 3,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 117370.316507,
+            "z": -1206.418865
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 117370,
+            "z": -1206
+          },
+          "stats": {},
+          "templateId": "undermount_cinderling",
+          "wanderTarget": {
+            "x": 117371.883329,
+            "z": -1208.492398
+          },
+          "wanderTimer": 29.55,
+          "weapon": {
+            "max": 1,
+            "min": 1,
+            "speed": 10
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99.5,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 2.738967,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 900,
+          "id": 828,
+          "kind": "mob",
+          "level": 24,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900,
+          "moveSpeed": 3,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 117431.205714,
+            "z": -1202.483019
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 117431,
+            "z": -1202
+          },
+          "stats": {},
+          "templateId": "undermount_cinderling",
+          "wanderTarget": {
+            "x": 117433.579286,
+            "z": -1208.056202
+          },
+          "wanderTimer": 29.55,
+          "weapon": {
+            "max": 1,
+            "min": 1,
+            "speed": 10
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99.5,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 2.67801,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 900,
+          "id": 829,
+          "kind": "mob",
+          "level": 24,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900,
+          "moveSpeed": 3,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 117382.234756,
+            "z": -1184.46959
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 117382,
+            "z": -1184
+          },
+          "stats": {},
+          "templateId": "undermount_cinderling",
+          "wanderTarget": {
+            "x": 117383.560481,
+            "z": -1187.121472
+          },
+          "wanderTimer": 29.55,
+          "weapon": {
+            "max": 1,
+            "min": 1,
+            "speed": 10
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99.5,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.430669,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 900,
+          "id": 830,
+          "kind": "mob",
+          "level": 24,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900,
+          "moveSpeed": 3,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 117419.65742,
+            "z": -1180.397824
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 117420,
+            "z": -1180
+          },
+          "stats": {},
+          "templateId": "undermount_cinderling",
+          "wanderTarget": {
+            "x": 117416.214264,
+            "z": -1184.396215
+          },
+          "wanderTimer": 29.55,
+          "weapon": {
+            "max": 1,
+            "min": 1,
+            "speed": 10
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99.5,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -0.277824,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 900,
+          "id": 831,
+          "kind": "mob",
+          "level": 24,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900,
+          "moveSpeed": 3,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 117391.856012,
+            "z": -1165.495131
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 117392,
+            "z": -1166
+          },
+          "stats": {},
+          "templateId": "undermount_cinderling",
+          "wanderTarget": {
+            "x": 117390.9168,
+            "z": -1162.201954
+          },
+          "wanderTimer": 29.55,
+          "weapon": {
+            "max": 1,
+            "min": 1,
+            "speed": 10
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99.5,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.927113,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 900,
+          "id": 832,
+          "kind": "mob",
+          "level": 24,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900,
+          "moveSpeed": 3,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 117409.507976,
+            "z": -1162.183133
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 117410,
+            "z": -1162
+          },
+          "stats": {},
+          "templateId": "undermount_cinderling",
+          "wanderTarget": {
+            "x": 117401.836182,
+            "z": -1165.038599
+          },
+          "wanderTimer": 29.55,
+          "weapon": {
+            "max": 1,
+            "min": 1,
+            "speed": 10
+          }
+        }
+      ]
+    },
+    {
+      "tick": 11,
+      "time": 0.55,
+      "nextId": 834,
+      "state": "1b2f8697",
       "events": "f49f8912",
       "rng": {
         "draws": 27,
@@ -2702,19 +3342,19 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3599.55,
+              "remaining": 3599.45,
               "school": "physical",
               "sourceId": 822
             }
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "combatTimer": 0.45,
+          "combatTimer": 0.55,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fiveSecondRule": 99.45,
+          "fiveSecondRule": 99.55,
           "hp": 900000,
           "id": 822,
           "inCombat": true,
@@ -2758,12 +3398,12 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "combatTimer": 99.45,
+          "combatTimer": 99.55,
           "comboUntil": -1,
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0555,
-          "fiveSecondRule": 99.45,
+          "fiveSecondRule": 99.55,
           "hp": 900000,
           "id": 823,
           "kind": "player",
@@ -2819,7 +3459,7 @@
               "value": 0.03
             }
           ],
-          "combatTimer": 0.45,
+          "combatTimer": 0.55,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2844,7 +3484,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 117400,
-            "z": -1212.475
+            "z": -1213.025
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2867,7 +3507,8 @@
             "emberfeedStacks": 1,
             "eruptTelegraphUntil": 3,
             "eruptTimer": 45,
-            "tremorTimer": 39.55,
+            "tremorSuppressed": true,
+            "tremorTimer": "Infinity",
             "ventCount": 1,
             "ventTimer": 998.75
           },
@@ -2879,7 +3520,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 99.45,
+          "combatTimer": 99.55,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2898,8 +3539,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117377.859843,
-            "z": -1231.548766
+            "x": 117377.828697,
+            "z": -1231.448492
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2912,7 +3553,7 @@
             "x": 117375.587142,
             "z": -1224.231829
           },
-          "wanderTimer": 29.6,
+          "wanderTimer": 29.5,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -2921,7 +3562,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 99.45,
+          "combatTimer": 99.55,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2940,8 +3581,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117370.284856,
-            "z": -1206.376979
+            "x": 117370.348158,
+            "z": -1206.460752
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2954,7 +3595,7 @@
             "x": 117371.883329,
             "z": -1208.492398
           },
-          "wanderTimer": 29.6,
+          "wanderTimer": 29.5,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -2963,7 +3604,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 99.45,
+          "combatTimer": 99.55,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2982,8 +3623,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117431.185142,
-            "z": -1202.434717
+            "x": 117431.226285,
+            "z": -1202.53132
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2996,7 +3637,7 @@
             "x": 117433.579286,
             "z": -1208.056202
           },
-          "wanderTimer": 29.6,
+          "wanderTimer": 29.5,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -3005,7 +3646,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 99.45,
+          "combatTimer": 99.55,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3024,8 +3665,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117382.211281,
-            "z": -1184.422631
+            "x": 117382.258232,
+            "z": -1184.516549
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3038,7 +3679,7 @@
             "x": 117383.560481,
             "z": -1187.121472
           },
-          "wanderTimer": 29.6,
+          "wanderTimer": 29.5,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -3047,7 +3688,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 99.45,
+          "combatTimer": 99.55,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3066,8 +3707,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117419.691678,
-            "z": -1180.358041
+            "x": 117419.623162,
+            "z": -1180.437606
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3080,7 +3721,7 @@
             "x": 117416.214264,
             "z": -1184.396215
           },
-          "wanderTimer": 29.6,
+          "wanderTimer": 29.5,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -3089,7 +3730,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 99.45,
+          "combatTimer": 99.55,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3108,8 +3749,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117391.870411,
-            "z": -1165.545618
+            "x": 117391.841613,
+            "z": -1165.444644
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3122,7 +3763,7 @@
             "x": 117390.9168,
             "z": -1162.201954
           },
-          "wanderTimer": 29.6,
+          "wanderTimer": 29.5,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -3131,7 +3772,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 99.45,
+          "combatTimer": 99.55,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3150,8 +3791,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117409.557179,
-            "z": -1162.16482
+            "x": 117409.458774,
+            "z": -1162.201446
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3164,7 +3805,7 @@
             "x": 117401.836182,
             "z": -1165.038599
           },
-          "wanderTimer": 29.6,
+          "wanderTimer": 29.5,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -3177,7 +3818,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 834,
-      "state": "53c0810c",
+      "state": "94f1c61a",
       "events": "0a4e1786",
       "rng": {
         "draws": 30,
@@ -3188,7 +3829,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 834,
-      "state": "3d48bfdf",
+      "state": "980f3d22",
       "events": "aae41f70",
       "rng": {
         "draws": 30,
@@ -3199,7 +3840,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 834,
-      "state": "60d56a0d",
+      "state": "34557cc9",
       "events": "aae41f70",
       "rng": {
         "draws": 163,
@@ -3207,14 +3848,14 @@
       }
     },
     {
-      "tick": 71,
-      "time": 3.55,
+      "tick": 73,
+      "time": 3.65,
       "nextId": 834,
-      "state": "7da607f0",
+      "state": "2875480e",
       "events": "2eaf3543",
       "rng": {
-        "draws": 253,
-        "digest": "51d671b7"
+        "draws": 268,
+        "digest": "0a38d3ed"
       },
       "label": "volzharr-eruption-fired",
       "players": [
@@ -3351,7 +3992,7 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3596.45,
+              "remaining": 3596.35,
               "school": "physical",
               "sourceId": 822
             }
@@ -3363,7 +4004,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fiveSecondRule": 102.55,
+          "fiveSecondRule": 102.65,
           "hp": 898634,
           "id": 822,
           "inCombat": true,
@@ -3413,7 +4054,7 @@
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0555,
-          "fiveSecondRule": 102.55,
+          "fiveSecondRule": 102.65,
           "hp": 899623,
           "id": 823,
           "inCombat": true,
@@ -3505,7 +4146,7 @@
           "stats": {
             "armor": 850
           },
-          "swingTimer": 2.4,
+          "swingTimer": 2.3,
           "tappedById": 822,
           "templateId": "volzharr_buried_furnace",
           "threat": [
@@ -3518,7 +4159,7 @@
             "emberWakeTimer": 995.85,
             "emberfeedStacks": 1,
             "eruptTimer": 41.9,
-            "tremorTimer": 36.45,
+            "tremorTimer": 0.4,
             "ventCount": 1,
             "ventTimer": 995.65
           },
@@ -3530,7 +4171,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3549,8 +4190,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117376.894317,
-            "z": -1228.440264
+            "x": 117376.863171,
+            "z": -1228.33999
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3563,7 +4204,7 @@
             "x": 117375.587142,
             "z": -1224.231829
           },
-          "wanderTimer": 26.5,
+          "wanderTimer": 26.4,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -3572,7 +4213,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3601,7 +4242,7 @@
           },
           "stats": {},
           "templateId": "undermount_cinderling",
-          "wanderTimer": 5.590575,
+          "wanderTimer": 5.490575,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -3610,7 +4251,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3629,8 +4270,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117432.460566,
-            "z": -1205.429432
+            "x": 117432.501709,
+            "z": -1205.526035
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3643,7 +4284,7 @@
             "x": 117433.579286,
             "z": -1208.056202
           },
-          "wanderTimer": 26.5,
+          "wanderTimer": 26.4,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -3652,7 +4293,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3681,7 +4322,7 @@
           },
           "stats": {},
           "templateId": "undermount_cinderling",
-          "wanderTimer": 4.61772,
+          "wanderTimer": 4.51772,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -3690,7 +4331,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3709,8 +4350,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117417.567681,
-            "z": -1182.824549
+            "x": 117417.499165,
+            "z": -1182.904114
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3723,7 +4364,7 @@
             "x": 117416.214264,
             "z": -1184.396215
           },
-          "wanderTimer": 26.5,
+          "wanderTimer": 26.4,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -3732,7 +4373,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3761,7 +4402,7 @@
           },
           "stats": {},
           "templateId": "undermount_cinderling",
-          "wanderTimer": 8.599634,
+          "wanderTimer": 4.769429,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -3770,7 +4411,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3789,8 +4430,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117406.506631,
-            "z": -1163.300243
+            "x": 117406.408227,
+            "z": -1163.336869
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3803,7 +4444,7 @@
             "x": 117401.836182,
             "z": -1165.038599
           },
-          "wanderTimer": 26.5,
+          "wanderTimer": 26.4,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -3813,14 +4454,14 @@
       ]
     },
     {
-      "tick": 71,
-      "time": 3.55,
+      "tick": 73,
+      "time": 3.65,
       "nextId": 834,
-      "state": "7da607f0",
+      "state": "2875480e",
       "events": "741638a5",
       "rng": {
-        "draws": 253,
-        "digest": "51d671b7"
+        "draws": 268,
+        "digest": "0a38d3ed"
       },
       "label": "final",
       "players": [
@@ -3957,7 +4598,7 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3596.45,
+              "remaining": 3596.35,
               "school": "physical",
               "sourceId": 822
             }
@@ -3969,7 +4610,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fiveSecondRule": 102.55,
+          "fiveSecondRule": 102.65,
           "hp": 898634,
           "id": 822,
           "inCombat": true,
@@ -4019,7 +4660,7 @@
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0555,
-          "fiveSecondRule": 102.55,
+          "fiveSecondRule": 102.65,
           "hp": 899623,
           "id": 823,
           "inCombat": true,
@@ -4111,7 +4752,7 @@
           "stats": {
             "armor": 850
           },
-          "swingTimer": 2.4,
+          "swingTimer": 2.3,
           "tappedById": 822,
           "templateId": "volzharr_buried_furnace",
           "threat": [
@@ -4124,7 +4765,7 @@
             "emberWakeTimer": 995.85,
             "emberfeedStacks": 1,
             "eruptTimer": 41.9,
-            "tremorTimer": 36.45,
+            "tremorTimer": 0.4,
             "ventCount": 1,
             "ventTimer": 995.65
           },
@@ -4136,7 +4777,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -4155,8 +4796,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117376.894317,
-            "z": -1228.440264
+            "x": 117376.863171,
+            "z": -1228.33999
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -4169,7 +4810,7 @@
             "x": 117375.587142,
             "z": -1224.231829
           },
-          "wanderTimer": 26.5,
+          "wanderTimer": 26.4,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -4178,7 +4819,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -4207,7 +4848,7 @@
           },
           "stats": {},
           "templateId": "undermount_cinderling",
-          "wanderTimer": 5.590575,
+          "wanderTimer": 5.490575,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -4216,7 +4857,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -4235,8 +4876,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117432.460566,
-            "z": -1205.429432
+            "x": 117432.501709,
+            "z": -1205.526035
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -4249,7 +4890,7 @@
             "x": 117433.579286,
             "z": -1208.056202
           },
-          "wanderTimer": 26.5,
+          "wanderTimer": 26.4,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -4258,7 +4899,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -4287,7 +4928,7 @@
           },
           "stats": {},
           "templateId": "undermount_cinderling",
-          "wanderTimer": 4.61772,
+          "wanderTimer": 4.51772,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -4296,7 +4937,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -4315,8 +4956,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117417.567681,
-            "z": -1182.824549
+            "x": 117417.499165,
+            "z": -1182.904114
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -4329,7 +4970,7 @@
             "x": 117416.214264,
             "z": -1184.396215
           },
-          "wanderTimer": 26.5,
+          "wanderTimer": 26.4,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -4338,7 +4979,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -4367,7 +5008,7 @@
           },
           "stats": {},
           "templateId": "undermount_cinderling",
-          "wanderTimer": 8.599634,
+          "wanderTimer": 4.769429,
           "weapon": {
             "max": 1,
             "min": 1,
@@ -4376,7 +5017,7 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 102.55,
+          "combatTimer": 102.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -4395,8 +5036,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 117406.506631,
-            "z": -1163.300243
+            "x": 117406.408227,
+            "z": -1163.336869
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -4409,7 +5050,7 @@
             "x": 117401.836182,
             "z": -1165.038599
           },
-          "wanderTimer": 26.5,
+          "wanderTimer": 26.4,
           "weapon": {
             "max": 1,
             "min": 1,

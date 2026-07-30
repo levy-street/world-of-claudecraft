@@ -4819,6 +4819,8 @@ function undermountVolzharr(): Scenario {
           (entity: AnyEntity | undefined) => entity?.templateId === 'undermount_cinderling',
         ) as AnyEntity[];
       rec.track(boss.id, ...cinderlings.map((entity) => entity.id));
+      rec.notes.bossId = boss.id;
+      rec.notes.cinderlingIds = cinderlings.map((entity) => entity.id);
 
       const tank = sim.entities.get(tankId) as AnyEntity;
       const healer = sim.entities.get(healerId) as AnyEntity;
@@ -4848,12 +4850,32 @@ function undermountVolzharr(): Scenario {
       ).length;
       rec.snapshot('volzharr-vent-placed');
 
+      const vent = sim.ctx.groundAoEs.find(
+        (effect: { sourceId: number }) => effect.sourceId === boss.id,
+      );
+      if (!vent) throw new Error('Volzharr did not place a Vent Fissure');
+      vent.tickTimer = DT;
+      rec.tick(2);
+      rec.notes.ventPulseTimerAfter = vent.tickTimer;
+      rec.notes.ventPulseInterval = vent.interval;
+      rec.notes.ventPulseDamage = [vent.min, vent.max];
+      rec.snapshot('volzharr-vent-pulsed');
+
       st.ventTimer = 999;
       st.emberWakeTimer = DT;
+      const cinderlingStart = new Map(
+        cinderlings.map((entity) => [entity.id, { x: entity.pos.x, z: entity.pos.z }]),
+      );
       rec.tick(2);
       const shamblerId = [...st.shamblers][0];
       if (shamblerId === undefined) throw new Error('Volzharr did not wake a Cinderling');
       rec.notes.shamblerId = shamblerId;
+      const shamblerAfterWake = sim.entities.get(shamblerId) as AnyEntity | undefined;
+      const start = cinderlingStart.get(shamblerId);
+      if (!shamblerAfterWake || !start) throw new Error('woken Cinderling start state is missing');
+      rec.notes.shamblerMoved =
+        Math.hypot(shamblerAfterWake.pos.x - boss.pos.x, shamblerAfterWake.pos.z - boss.pos.z) <
+        Math.hypot(start.x - boss.pos.x, start.z - boss.pos.z);
       rec.snapshot('volzharr-shambler-woken');
 
       const shambler = sim.entities.get(shamblerId) as AnyEntity | undefined;
@@ -4863,13 +4885,29 @@ function undermountVolzharr(): Scenario {
       sim.rebucket(shambler);
       rec.tick(2);
       rec.notes.emberfeedStacks = st.emberfeedStacks;
+      rec.notes.shamblerConsumed = !sim.entities.has(shamblerId);
       rec.snapshot('volzharr-shambler-consumed');
 
       st.emberWakeTimer = 999;
       st.eruptTimer = DT;
+      st.tremorTimer = DT;
       rec.tick(1);
+      rec.notes.eruptionWindups = rec.allEvents.filter(
+        (event) => event.type === 'spellfx' && event.sourceId === boss.id && event.fx === 'windup',
+      ).length;
+      rec.notes.tremorSuppressedDuringEruption = st.tremorSuppressed;
       rec.snapshot('volzharr-eruption-windup');
       rec.tick(Math.ceil(3.1 / DT));
+      rec.notes.eruptionDamageEvents = rec.allEvents.filter(
+        (event) =>
+          event.type === 'damage' &&
+          event.sourceId === boss.id &&
+          event.ability === 'Undermount Eruption',
+      ).length;
+      rec.notes.eruptTelegraphUntil = st.eruptTelegraphUntil;
+      rec.notes.tremorSuppressedAfterEruption = st.tremorSuppressed;
+      rec.notes.tremorTimerAfterEruption = st.tremorTimer;
+      rec.notes.eruptTimerAfterEruption = st.eruptTimer;
       rec.snapshot('volzharr-eruption-fired');
     },
   };
