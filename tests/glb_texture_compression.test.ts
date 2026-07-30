@@ -70,10 +70,12 @@ describe('GLB texture KTX2 compression', () => {
       converted++;
     }
     expect(offenders).toEqual([]);
-    // The world's model set is KTX2 at scale; a mass revert (or an empty walk
-    // from a bad path) must not pass silently.
-    expect(converted).toBeGreaterThan(1000);
-    expect(skins).toBeGreaterThan(0);
+    // Tight vacuity floors (tests/CLAUDE.md): a deleted or renamed file drops
+    // out of the walk silently, so the counts must sit at the real set size.
+    // Every WEAPON_VFX model must exist on disk and carry drawable textures.
+    expect(skins).toBe(vfxSkinFiles.size);
+    // 1037 converted at introduction; new textured models only add to this.
+    expect(converted).toBeGreaterThanOrEqual(1037);
   });
 
   it('extracts the same WEAPON_VFX exclusion set the converter uses', () => {
@@ -83,7 +85,24 @@ describe('GLB texture KTX2 compression', () => {
 
   it('ships the basis transcoder and wires KTX2Loader into the runtime loader', () => {
     for (const f of ['basis_transcoder.js', 'basis_transcoder.wasm']) {
-      expect(fs.existsSync(path.join(ROOT, 'public', 'basis', f)), `public/basis/${f}`).toBe(true);
+      const shipped = path.join(ROOT, 'public', 'basis', f);
+      expect(fs.existsSync(shipped), `public/basis/${f}`).toBe(true);
+      // The copies must match the installed three's transcoder byte for byte:
+      // KTX2Loader and its worker expect this exact ABI, and a three bump that
+      // changes it would otherwise fail every GLB parse with no red test.
+      const vendored = path.join(
+        ROOT,
+        'node_modules',
+        'three',
+        'examples',
+        'jsm',
+        'libs',
+        'basis',
+        f,
+      );
+      expect(fs.readFileSync(shipped).equals(fs.readFileSync(vendored)), `${f} matches three`).toBe(
+        true,
+      );
     }
     const loaderSrc = fs.readFileSync(
       path.join(ROOT, 'src', 'render', 'assets', 'loader.ts'),

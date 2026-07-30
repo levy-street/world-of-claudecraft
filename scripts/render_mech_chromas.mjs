@@ -87,7 +87,7 @@ async function shoot(texPath, outName) {
   const full = await page.evaluate((g, t) => window.renderMech(g, t), glbB64, texB64);
   const small = await downscale(full, OUT_PX);
   writeFileSync(path.join(OUT, outName), Buffer.from(small.split(',')[1], 'base64'));
-  console.log(`✓ ${outName}`);
+  console.log(`done ${outName}`);
 }
 
 // base first (sanity / framing), then all chromas

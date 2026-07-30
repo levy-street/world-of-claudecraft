@@ -2026,34 +2026,39 @@ export class Renderer {
     // One residency table at the end of the build (dev console): where the
     // decoded bytes sit at exactly the point the iPhone 17 Pro is killed.
     // Scene first so shared buffers/images attribute to the live world, then
-    // the caches so only their EXCLUSIVE retention shows as theirs.
-    console.info(
-      formatResidencyBudget(
-        residencyBudget([
-          { label: 'scene', objects: [this.scene] },
-          {
-            label: 'char parse cache',
-            objects: characterResidencySources().parsedScenes,
-          },
-          {
-            label: 'prop extract cache',
-            geometries: propResidencySources().extractedGeometries,
-          },
-          {
-            label: 'prop parse cache',
-            objects: propResidencySources().parsedScenes,
-          },
-          {
-            label: 'foliage extract cache',
-            geometries: foliageResidencySources().extractedGeometries,
-          },
-          {
-            label: 'foliage parse cache',
-            objects: foliageResidencySources().parsedScenes,
-          },
-        ]),
-      ),
-    );
+    // the caches so only their EXCLUSIVE retention shows as theirs. Gated to
+    // dev browsers and the native iOS profile under diagnosis: the walk
+    // allocates identity sets over every buffer at the peak-memory instant,
+    // which the production web population must not pay.
+    if (import.meta.env.DEV || GFX.nativeIosMemoryProfile) {
+      console.info(
+        formatResidencyBudget(
+          residencyBudget([
+            { label: 'scene', objects: [this.scene] },
+            {
+              label: 'char parse cache',
+              objects: characterResidencySources().parsedScenes,
+            },
+            {
+              label: 'prop extract cache',
+              geometries: propResidencySources().extractedGeometries,
+            },
+            {
+              label: 'prop parse cache',
+              objects: propResidencySources().parsedScenes,
+            },
+            {
+              label: 'foliage extract cache',
+              geometries: foliageResidencySources().extractedGeometries,
+            },
+            {
+              label: 'foliage parse cache',
+              objects: foliageResidencySources().parsedScenes,
+            },
+          ]),
+        ),
+      );
+    }
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each

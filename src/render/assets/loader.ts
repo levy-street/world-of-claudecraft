@@ -77,11 +77,15 @@ function withRetry<T>(attemptOnce: () => Promise<T>): Promise<T> {
 
 function loader(): GLTFLoader {
   if (!gltfLoader) {
-    gltfLoader = new GLTFLoader();
-    gltfLoader.setMeshoptDecoder(MeshoptDecoder);
+    // Assemble into a local and publish only on full success: caching a
+    // half-wired loader after a throw here would fail every later KTX2 GLB
+    // parse for the whole session with no recovery path.
+    const assembled = new GLTFLoader();
+    assembled.setMeshoptDecoder(MeshoptDecoder);
     // Model textures ship as KTX2 (KHR_texture_basisu): without the transcoder
     // attached, parsing any public/models GLB rejects outright.
-    gltfLoader.setKTX2Loader(ktx2Loader());
+    assembled.setKTX2Loader(ktx2Loader());
+    gltfLoader = assembled;
   }
   return gltfLoader;
 }

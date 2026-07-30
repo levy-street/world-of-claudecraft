@@ -34,6 +34,9 @@ function detectViaThrowawayContext(loader: KTX2Loader): void {
     // No context available (exhausted pool, headless edge case): fall back to
     // transcoding into plain RGBA, which every WebGL implementation accepts.
     // Bigger in memory, but it keeps models loading instead of failing parse.
+    // Dev-channel English: this restores the decoded-bitmap footprint the
+    // KTX2 conversion exists to remove, so it must be visible in a console.
+    console.warn('[ktx2] no probe context; transcoding to uncompressed RGBA');
     loader.workerConfig = {
       astcSupported: false,
       etc1Supported: false,

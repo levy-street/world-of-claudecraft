@@ -119,6 +119,9 @@ beforeEach(() => {
   process.env.DISCORD_GUILD_ID = '111111111111111111';
   // Auto-join is off by default; the auto-join describe sets a bot token per case.
   delete process.env.DISCORD_BOT_TOKEN;
+  // server/env.ts loads the machine .env at import; a developer's real guild
+  // invite must not leak into the DEFAULT_INVITE assertions.
+  delete process.env.DISCORD_GUILD_INVITE;
   linkRow = [];
   ownerRows = [];
   rewardRows = [];

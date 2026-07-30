@@ -2,10 +2,13 @@
 //
 // Walks the live scene graph plus the module-level asset caches and reports
 // where the decoded bytes sit at a moment in time: geometry attribute arrays
-// (deduped by buffer identity, split scene vs cache), decoded texture images
-// (width x height x 4, deduped by source), and the parsed-GLTF retention maps.
-// English console output by design (a `?budget`/dev diagnostic like perf.ts);
-// nothing here runs unless dumpResidencyBudget() is called.
+// (deduped by buffer identity, split scene vs cache), decoded or transcoded
+// texture bytes (compressed mip chains counted as stored, bitmaps as w*h*4,
+// deduped by source), and the parsed-GLTF retention maps. English console
+// output by design. The one caller is the Renderer constructor's build
+// summary, gated to dev browsers and the native iOS profile. Known
+// under-count: only the six common material map slots are walked; alphaMap,
+// envMap, scene.background and the standalone texture cache are not.
 import type * as THREE from 'three';
 
 export interface ResidencyBucket {
