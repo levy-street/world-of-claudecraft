@@ -17,10 +17,12 @@
 //   GET    /api/assets/mine              -> { assets: UserAssetWire[] }
 //   GET    /api/assets/<sha256>.glb      -> bytes (public)
 //   DELETE /api/assets/<id>              -> { ok: true }
+//   POST   /__editor/cinematic-capture   -> { ok: true } (Vite dev server only)
 // Errors are stable snake_case codes ({ error: '...' }), mapped to t() keys by
 // server_errors_core.ts.
 
 import type { MapDoc } from '../sim/map_doc';
+import type { CinematicCameraCapture } from './cinematic_capture_core';
 
 const SESSION_KEY = 'woc_session'; // mirrors src/net/online.ts Api.SESSION_KEY
 
@@ -85,12 +87,16 @@ export function signedIn(): boolean {
  */
 export const CALL_TIMEOUT_MS = 20_000;
 
-async function call(path: string, init: RequestInit = {}): Promise<any> {
+async function call(
+  path: string,
+  init: RequestInit = {},
+  withSession = true,
+): Promise<Record<string, unknown>> {
   const session = storedSession();
   const headers: Record<string, string> = {
     ...((init.headers as Record<string, string>) ?? {}),
   };
-  if (session) headers.Authorization = `Bearer ${session.token}`;
+  if (session && withSession) headers.Authorization = `Bearer ${session.token}`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), CALL_TIMEOUT_MS);
   let res: Response;
@@ -101,7 +107,9 @@ async function call(path: string, init: RequestInit = {}): Promise<any> {
   } finally {
     clearTimeout(timer);
   }
-  const data = await res.json().catch(() => ({}));
+  const decoded: unknown = await res.json().catch(() => ({}));
+  const data =
+    typeof decoded === 'object' && decoded !== null ? (decoded as Record<string, unknown>) : {};
   if (!res.ok) {
     const code = typeof data.error === 'string' ? data.error : null;
     const version = typeof data.version === 'number' ? data.version : undefined;
@@ -191,4 +199,14 @@ export async function listMyAssets(): Promise<UserAssetWire[]> {
 
 export async function deleteUserAsset(id: number): Promise<void> {
   await call(`/api/assets/${id}`, { method: 'DELETE' });
+}
+
+// ---- local cinematic capture ---------------------------------------------------
+
+/** Write the latest marked camera capture through the dev-only Vite endpoint.
+ * Production/editor preview hosts do not expose it, and the panel keeps the
+ * formatted block visible for manual copy when this request is unavailable. */
+export async function saveCinematicCameraCapture(capture: CinematicCameraCapture): Promise<void> {
+  const data = await call('/__editor/cinematic-capture', jsonInit('POST', capture), false);
+  if (data.ok !== true) throw new EditorApiError('invalid_response', 0);
 }

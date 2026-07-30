@@ -35,6 +35,12 @@ const SURFACE_PINS: readonly SeedSurfacePin[] = [
     importSource: "import { WORLD_SEED } from '../src/world_seed.mjs';",
     referenceCount: 2,
   },
+  {
+    name: 'editor cinematic capture',
+    path: '../src/editor/cinematic_capture_core.ts',
+    importSource: "import { WORLD_SEED } from '../world_seed.mjs';",
+    referenceCount: 4,
+  },
 ];
 
 const NUMERIC_SEED_PATTERNS = [
