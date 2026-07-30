@@ -30,8 +30,10 @@ import {
   HARBORS,
   type HarborDeck,
   type HarborDef,
+  harborRampHeight,
   harborShipLocalBounds,
   harborShipLocalPointInside,
+  MAINLAND_HARBOR,
 } from '../src/sim/harbor_layout';
 import type { SceneDef, SceneOpDef } from '../src/sim/scenes/scenes';
 import type { Sim } from '../src/sim/sim';
@@ -108,6 +110,16 @@ const MIN_ARRIVAL_SEAWARD_START_YARDS = 12;
 const MIN_ARRIVAL_DIRECTION_DOT = 0.95;
 // The final arrival pose must land on the destination berth before the hidden park cue.
 const MAX_ARRIVAL_BERTH_DISTANCE_YARDS = 0.5;
+// Hull terrain probes are close enough to catch a narrow shoreline ridge without slowing watch mode.
+const HULL_TERRAIN_SAMPLE_STEP_YARDS = 2;
+// Contact within this tolerance is accepted as a berth seam, not solid penetration.
+const HULL_INTERSECTION_EPSILON_YARDS = 0.01;
+// Feet must remain this close to an authored presentation support surface.
+const ENTITY_SUPPORT_EPSILON_YARDS = 0.1;
+// Rider centers may cross a deck edge only by this numerical transform tolerance.
+const RIDER_DECK_EDGE_EPSILON_YARDS = 0.01;
+// A captured player delta below this tolerance is treated as stationary.
+const RIDER_WALK_STEP_EPSILON_YARDS = 1e-4;
 
 type MechanicalCheck =
   | 'clearance.terrain'
@@ -132,7 +144,10 @@ type MechanicalCheck =
   | 'continuity.standInHandoff'
   | 'prop.segment'
   | 'prop.speed'
-  | 'prop.arrivalDirection';
+  | 'prop.arrivalDirection'
+  | 'collision.hull'
+  | 'support.entity'
+  | 'containment.rider';
 
 interface LegacyExemption {
   readonly sceneId: string;
@@ -140,10 +155,15 @@ interface LegacyExemption {
   readonly reason: string;
 }
 
-// P1.3 must clear every row while re-authoring the voyage fades.
+// P1.3 and P3 must clear every row while fixing voyage content and deck riding.
 const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
   {
     sceneId: 'scn_lb_ferry_depart_back',
+    check: 'collision.hull',
+    reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_back',
     check: 'cut.fadeSlack',
     reason: 'P1.3 must add full-black tick slack to every voyage cut.',
   },
@@ -153,6 +173,21 @@ const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
     reason: 'P1.3 must author a clear fade before the voyage scene ends.',
   },
   {
+    sceneId: 'scn_lb_ferry_depart_back',
+    check: 'support.entity',
+    reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_back',
+    check: 'containment.rider',
+    reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_out',
+    check: 'collision.hull',
+    reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
+  },
+  {
     sceneId: 'scn_lb_ferry_depart_out',
     check: 'cut.fadeSlack',
     reason: 'P1.3 must add full-black tick slack to every voyage cut.',
@@ -161,6 +196,16 @@ const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
     sceneId: 'scn_lb_ferry_depart_out',
     check: 'fade.symmetry',
     reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_out',
+    check: 'support.entity',
+    reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_out',
+    check: 'containment.rider',
+    reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
   },
   {
     sceneId: 'scn_lb_q0_ashore',
@@ -174,6 +219,11 @@ const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
   },
   {
     sceneId: 'scn_lb_q0_voyage',
+    check: 'collision.hull',
+    reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
     check: 'cut.fadeSlack',
     reason: 'P1.3 must add full-black tick slack to every voyage cut.',
   },
@@ -181,6 +231,16 @@ const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
     sceneId: 'scn_lb_q0_voyage',
     check: 'fade.symmetry',
     reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
+    check: 'support.entity',
+    reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
+    check: 'containment.rider',
+    reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
   },
 ];
 
@@ -212,6 +272,8 @@ interface CapturedScene {
   readonly ops: readonly TimedSceneOp[];
   readonly authoredOps: readonly SceneOpDef[];
   readonly frames: ReadonlyMap<number, SceneFrame>;
+  readonly entityLabels: ReadonlyMap<number, string>;
+  readonly riderHarbors: ReadonlyMap<number, HarborDef['id']>;
 }
 
 interface ActiveProp {
@@ -255,8 +317,16 @@ interface Violation {
   readonly measured: string;
 }
 
+interface SyntheticPresentationFixture {
+  readonly playerHeightOffset?: number;
+}
+
+interface SyntheticSceneDef extends SceneDef {
+  readonly presentationFixture?: SyntheticPresentationFixture;
+}
+
 interface SyntheticControl {
-  readonly def: SceneDef;
+  readonly def: SyntheticSceneDef;
   readonly expectedCheck: MechanicalCheck | null;
   readonly expectedMeasured?: string;
   readonly actorIds?: readonly string[];
@@ -268,6 +338,8 @@ const SYNTHETIC_LANDWARD_ARRIVAL_CUE = 'scn_test_lint_arrival_direction_bad';
 const SYNTHETIC_REVERSED_BOW_ARRIVAL_CUE = 'scn_test_lint_arrival_bow_bad';
 const SYNTHETIC_MISSED_BERTH_ARRIVAL_CUE = 'scn_test_lint_arrival_berth_bad';
 const SYNTHETIC_CROSSWIND_ARRIVAL_CUE = 'scn_test_lint_arrival_travel_bad';
+const SYNTHETIC_HULL_CLIP_CUE = 'scn_test_lint_hull_clip_bad';
+const SYNTHETIC_RIDER_DRIFT_CUE = 'scn_test_lint_rider_drift_bad';
 
 interface SyntheticCameraSceneOptions {
   readonly hideRelease?: boolean;
@@ -277,6 +349,7 @@ interface SyntheticCameraSceneOptions {
   readonly includeUnlock?: boolean;
   readonly includeLetterboxOff?: boolean;
   readonly extraOps?: readonly SceneOpDef[];
+  readonly presentationFixture?: SyntheticPresentationFixture;
 }
 
 function syntheticCameraScene(
@@ -284,7 +357,7 @@ function syntheticCameraScene(
   duration: number,
   cameraOps: readonly SceneOpDef[],
   options: SyntheticCameraSceneOptions = {},
-): SceneDef {
+): SyntheticSceneDef {
   const {
     hideRelease = true,
     coverFirstCut = true,
@@ -293,11 +366,13 @@ function syntheticCameraScene(
     includeUnlock = true,
     includeLetterboxOff = true,
     extraOps = [],
+    presentationFixture,
   } = options;
   const releaseAt = duration - 0.1;
   return {
     id,
     duration,
+    presentationFixture,
     ops: [
       { at: 0, kind: 'inputLock', on: true },
       { at: 0, kind: 'letterbox', on: true },
@@ -432,6 +507,60 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
       },
     ]),
     expectedCheck: null,
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_hull_clip_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_mainland',
+        cue: SYNTHETIC_HULL_CLIP_CUE,
+      },
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_mainland',
+          fallbackFrame: { point: { x: 228.5, z: -44, height: 8 }, yaw: Math.PI / 2 },
+          offset: { x: 0, y: 18, z: -24 },
+          lookAt: { x: 0, y: 8, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: 'collision.hull',
+    expectedMeasured: 'mainland deck',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_entity_float_bad', 1.7, SYNTHETIC_GRAMMAR_CAMERA_OPS, {
+      presentationFixture: { playerHeightOffset: 2 },
+    }),
+    expectedCheck: 'support.entity',
+    expectedMeasured: 'player is 2.00 yd above terrain',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_rider_drift_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_mainland',
+        cue: SYNTHETIC_RIDER_DRIFT_CUE,
+      },
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_mainland',
+          fallbackFrame: { point: { x: 240.5, z: -84, height: 8 }, yaw: Math.PI / 2 },
+          offset: { x: 0, y: 18, z: -24 },
+          lookAt: { x: 0, y: 8, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: 'containment.rider',
+    expectedMeasured: 'ferryman_ewald left mainland deck bounds',
+    playerStart: MAINLAND_HARBOR.boarding,
   },
   {
     def: syntheticCameraScene('scn_test_lint_framing_direction_bad', 8, [
@@ -967,6 +1096,18 @@ const PROP_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> = {
     duration: 4.3,
     ease: 'easeInOutSine',
   },
+  [SYNTHETIC_HULL_CLIP_CUE]: {
+    start: { x: 0, y: 0, z: -12, yaw: 0 },
+    end: { x: 0, y: 0, z: -12, yaw: 0 },
+    duration: 1.6,
+    ease: 'linear',
+  },
+  [SYNTHETIC_RIDER_DRIFT_CUE]: {
+    start: { x: 40, y: 0, z: 0, yaw: 0 },
+    end: { x: 40, y: 0, z: 0, yaw: 0 },
+    duration: 1.6,
+    ease: 'linear',
+  },
 };
 const ARRIVAL_HARBOR_BY_CUE = new Map<string, HarborDef['id']>([
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.arrival, 'gullhaven'],
@@ -989,6 +1130,10 @@ const SAMPLE_INTERVAL_SEC = 1 / SHOT_SAMPLE_RATE_HZ;
 const DEG_PER_RAD = 180 / Math.PI;
 const VERTICAL_HALF_FOV_RAD = (CINEMATIC_VERTICAL_FOV_DEG * Math.PI) / 360;
 const HORIZONTAL_HALF_FOV_RAD = Math.atan(Math.tan(VERTICAL_HALF_FOV_RAD) * CINEMATIC_FRAME_ASPECT);
+const RIDER_HARBOR_BY_TEMPLATE = new Map<string, HarborDef['id']>([
+  ['ferryman_ewald', 'mainland'],
+  ['ferrykeeper_odda', 'gullhaven'],
+]);
 
 function sceneEvents(events: readonly SimEvent[]): Extract<SimEvent, { type: 'scene' }>[] {
   return events.filter(
@@ -1011,13 +1156,40 @@ async function loadLinterRuntime(): Promise<void> {
   runtimeWaterLevel = worldModule.WATER_LEVEL;
 }
 
-function trackedEntityId(op: SceneWireOp): number | null {
-  if (op.kind !== 'camera') return null;
-  if (op.shot.kind === 'focus') return op.shot.entityId;
+function trackedEntityIds(op: SceneWireOp): number[] {
+  if (op.kind === 'line') return op.speakerEntityId === null ? [] : [op.speakerEntityId];
+  if (op.kind === 'anim') return [op.entityId];
+  if (op.kind !== 'camera') return [];
+  if (op.shot.kind === 'focus') return op.shot.entityId === null ? [] : [op.shot.entityId];
   if (op.shot.kind === 'dolly' && op.shot.lookAt.kind === 'subject') {
-    return op.shot.lookAt.entityId;
+    return op.shot.lookAt.entityId === null ? [] : [op.shot.lookAt.entityId];
   }
-  return null;
+  return [];
+}
+
+function authoredSceneActorIds(ops: readonly SceneOpDef[]): string[] {
+  const actorIds = new Set<string>();
+  for (const op of ops) {
+    if (op.kind === 'line' && op.speakerActorId !== undefined) {
+      actorIds.add(op.speakerActorId);
+    }
+    if (
+      (op.kind === 'actorMove' || op.kind === 'actorFace' || op.kind === 'anim') &&
+      op.actorId !== undefined
+    ) {
+      actorIds.add(op.actorId);
+    }
+    if (op.kind !== 'camera' || op.shot.kind === 'release' || op.shot.kind === 'attach') {
+      continue;
+    }
+    if (op.shot.kind === 'focus' && op.shot.actorId !== undefined) {
+      actorIds.add(op.shot.actorId);
+    }
+    if (op.shot.kind === 'dolly' && op.shot.lookAt.kind === 'subject') {
+      actorIds.add(op.shot.lookAt.actorId);
+    }
+  }
+  return [...actorIds];
 }
 
 function sceneFrame(sim: Sim, trackedIds: ReadonlySet<number>): SceneFrame {
@@ -1062,6 +1234,14 @@ function captureScene(
     playerClass: 'warrior',
     playerName: 'Shot Linter',
   });
+  const entityLabels = new Map<number, string>();
+  const riderHarbors = new Map<number, HarborDef['id']>();
+  for (const entity of sim.entities.values()) {
+    const harborId = RIDER_HARBOR_BY_TEMPLATE.get(entity.templateId);
+    if (harborId === undefined) continue;
+    entityLabels.set(entity.id, entity.templateId);
+    riderHarbors.set(entity.id, harborId);
+  }
   const settledStart = playerStart ?? settledPlayerStartForScene(id);
   if (settledStart) {
     sim.player.pos = sim.groundPos(settledStart.x, settledStart.z);
@@ -1069,17 +1249,25 @@ function captureScene(
     sim.rebucket(sim.player);
   }
   const playbackKey = -sim.playerId;
-  if (actorIds.length > 0) {
+  const requestedActorIds = [
+    ...new Set([...actorIds, ...authoredSceneActorIds(authored?.ops ?? [])]),
+  ];
+  if (requestedActorIds.length > 0) {
+    const squad = spawnSquadForLinter(sim.ctx, {
+      claimId: playbackKey,
+      dungeonId: '',
+      anchor: { x: 0, z: 3 },
+      actorIds: requestedActorIds,
+      humanCount: 1,
+    });
+    expect(squad, `failed to spawn synthetic scene subjects for ${id}`).not.toBeNull();
     expect(
-      spawnSquadForLinter(sim.ctx, {
-        claimId: playbackKey,
-        dungeonId: '',
-        anchor: { x: 0, z: 3 },
-        actorIds,
-        humanCount: 1,
-      }),
-      `failed to spawn synthetic scene subjects for ${id}`,
-    ).not.toBeNull();
+      [...(squad?.actorIds.keys() ?? [])].sort(),
+      `scene ${id} must resolve every authored actor`,
+    ).toEqual([...requestedActorIds].sort());
+    for (const [actorId, entityId] of squad?.actorIds ?? []) {
+      entityLabels.set(entityId, `scene actor ${actorId}`);
+    }
   }
   expect(
     playRegisteredScene(sim.ctx, sim.playerId, id),
@@ -1089,7 +1277,7 @@ function captureScene(
   expect(startedAt, `registered scene ${id} did not create a playback`).toBeDefined();
   const startTime = startedAt ?? sim.time;
   const ops: TimedSceneOp[] = [];
-  const trackedIds = new Set<number>();
+  const trackedIds = new Set(entityLabels.keys());
   const frames = new Map<number, SceneFrame>();
   frames.set(0, sceneFrame(sim, trackedIds));
   let duration: number | null = null;
@@ -1109,8 +1297,16 @@ function captureScene(
             : roundTime(elapsed);
       const timedOp = { index: ops.length, at, op: event.op };
       ops.push(timedOp);
-      const entityId = trackedEntityId(event.op);
-      if (entityId !== null) trackedIds.add(entityId);
+      for (const entityId of trackedEntityIds(event.op)) {
+        trackedIds.add(entityId);
+        const entity = sim.entities.get(entityId);
+        entityLabels.set(
+          entityId,
+          entity?.squadActorId !== undefined
+            ? `scene actor ${entity.squadActorId}`
+            : (entity?.templateId ?? `scene entity ${entityId}`),
+        );
+      }
       if (event.op.kind === 'start') duration = event.op.duration;
       if (event.op.kind === 'end') ended = true;
     }
@@ -1126,6 +1322,8 @@ function captureScene(
     ops,
     authoredOps: authored?.ops ?? [],
     frames,
+    entityLabels,
+    riderHarbors,
   };
 }
 
@@ -1253,7 +1451,27 @@ function captureSyntheticControl(def: SceneDef): CapturedScene {
     ops,
     authoredOps: sortedOps,
     frames,
+    entityLabels: new Map(),
+    riderHarbors: new Map(),
   };
+}
+
+function applySyntheticPresentationFixture(
+  scene: CapturedScene,
+  fixture: SyntheticPresentationFixture | undefined,
+): CapturedScene {
+  if (fixture?.playerHeightOffset === undefined) return scene;
+  const frames = new Map<number, SceneFrame>();
+  for (const [sample, frame] of scene.frames) {
+    frames.set(sample, {
+      ...frame,
+      live: {
+        ...frame.live,
+        playerY: frame.live.playerY + fixture.playerHeightOffset,
+      },
+    });
+  }
+  return { ...scene, frames };
 }
 
 function roundTime(value: number): number {
@@ -1512,6 +1730,195 @@ function shipDeckCenterAt(
   );
 }
 
+type HullFootprint = ReturnType<typeof harborShipLocalBounds>;
+
+const HARBOR_HULL_FOOTPRINTS: Readonly<Record<HarborDef['id'], HullFootprint>> = {
+  mainland: harborShipLocalBounds(MAINLAND_HARBOR.berth),
+  gullhaven: harborShipLocalBounds(GULLHAVEN_HARBOR.berth),
+};
+
+function sampledAxis(minimum: number, maximum: number): number[] {
+  const span = maximum - minimum;
+  const steps = Math.max(1, Math.ceil(span / HULL_TERRAIN_SAMPLE_STEP_YARDS));
+  return Array.from({ length: steps + 1 }, (_, index) => minimum + (span * index) / steps);
+}
+
+function hullTerrainSamples(footprint: HullFootprint): readonly { x: number; z: number }[] {
+  const samples: { x: number; z: number }[] = [];
+  for (const x of sampledAxis(footprint.x - footprint.hw, footprint.x + footprint.hw)) {
+    for (const z of sampledAxis(footprint.z - footprint.hd, footprint.z + footprint.hd)) {
+      samples.push({ x, z });
+    }
+  }
+  return samples;
+}
+
+const HULL_TERRAIN_SAMPLES: Readonly<Record<HarborDef['id'], readonly { x: number; z: number }[]>> =
+  {
+    mainland: hullTerrainSamples(HARBOR_HULL_FOOTPRINTS.mainland),
+    gullhaven: hullTerrainSamples(HARBOR_HULL_FOOTPRINTS.gullhaven),
+  };
+
+interface HullCollision {
+  readonly label: string;
+  readonly penetration: number;
+}
+
+function hullRectPenetration(
+  frame: SceneAttachFrame,
+  footprint: HullFootprint,
+  rect: { x: number; z: number; hw: number; hd: number },
+): number | null {
+  const center = sceneRigLocalToWorld(
+    frame,
+    { x: footprint.x, y: 0, z: footprint.z },
+    { x: 0, y: 0, z: 0 },
+  );
+  const cosYaw = Math.cos(frame.yaw);
+  const sinYaw = Math.sin(frame.yaw);
+  const localX = { x: cosYaw, z: -sinYaw };
+  const localZ = { x: sinYaw, z: cosYaw };
+  const delta = { x: rect.x - center.x, z: rect.z - center.z };
+  const axes = [{ x: 1, z: 0 }, { x: 0, z: 1 }, localX, localZ];
+  let minimumPenetration = Number.POSITIVE_INFINITY;
+  for (const axis of axes) {
+    const distance = Math.abs(delta.x * axis.x + delta.z * axis.z);
+    const hullRadius =
+      footprint.hw * Math.abs(localX.x * axis.x + localX.z * axis.z) +
+      footprint.hd * Math.abs(localZ.x * axis.x + localZ.z * axis.z);
+    const rectRadius = rect.hw * Math.abs(axis.x) + rect.hd * Math.abs(axis.z);
+    const penetration = hullRadius + rectRadius - distance;
+    if (penetration <= HULL_INTERSECTION_EPSILON_YARDS) return null;
+    minimumPenetration = Math.min(minimumPenetration, penetration);
+  }
+  return minimumPenetration;
+}
+
+function hullWorldCollision(
+  harbor: HarborDef,
+  frame: SceneAttachFrame,
+  seed: number,
+): HullCollision | null {
+  const footprint = HARBOR_HULL_FOOTPRINTS[harbor.id];
+  for (const fixedHarbor of HARBORS) {
+    for (const [index, deck] of fixedHarbor.decks.entries()) {
+      const penetration = hullRectPenetration(frame, footprint, deck);
+      if (penetration !== null) {
+        return { label: `${fixedHarbor.id} deck ${index}`, penetration };
+      }
+    }
+    for (const [index, ramp] of fixedHarbor.ramps.entries()) {
+      const penetration = hullRectPenetration(frame, footprint, ramp);
+      if (penetration !== null) {
+        return { label: `${fixedHarbor.id} ramp ${index}`, penetration };
+      }
+    }
+  }
+
+  const bottomY = frame.position.y + footprint.bottomY;
+  for (const sample of HULL_TERRAIN_SAMPLES[harbor.id]) {
+    const world = sceneRigLocalToWorld(
+      frame,
+      { x: sample.x, y: 0, z: sample.z },
+      { x: 0, y: 0, z: 0 },
+    );
+    const terrainY = sampleTerrainHeight(world.x, world.z, seed);
+    const penetration = terrainY - bottomY;
+    if (penetration <= HULL_INTERSECTION_EPSILON_YARDS) continue;
+    return {
+      label: terrainY < runtimeWaterLevel ? 'water floor' : 'terrain',
+      penetration,
+    };
+  }
+  return null;
+}
+
+interface SupportSurface {
+  readonly label: string;
+  readonly y: number;
+}
+
+function pointInsideDeck(deck: HarborDeck, x: number, z: number): boolean {
+  return Math.abs(x - deck.x) <= deck.hw && Math.abs(z - deck.z) <= deck.hd;
+}
+
+function supportSurfacesAt(
+  point: EntityPoint,
+  seed: number,
+  time: number,
+  activeProps: ReadonlyMap<string, ActiveProp>,
+): SupportSurface[] {
+  const terrainY = sampleTerrainHeight(point.x, point.z, seed);
+  const surfaces: SupportSurface[] = [
+    { label: terrainY < runtimeWaterLevel ? 'water floor' : 'terrain', y: terrainY },
+  ];
+  for (const harbor of HARBORS) {
+    for (const deck of harbor.decks) {
+      if (pointInsideDeck(deck, point.x, point.z)) {
+        surfaces.push({ label: `${harbor.id} pier deck`, y: deck.y });
+      }
+    }
+    const rampY = harborRampHeight(harbor, point.x, point.z);
+    if (rampY !== Number.NEGATIVE_INFINITY) {
+      surfaces.push({ label: `${harbor.id} ramp`, y: rampY });
+    }
+    const frame = shipFrameAt(harbor, time, activeProps);
+    const local = worldToLocal(frame, point);
+    for (const deck of harbor.shipDecks) {
+      const bounds = shipDeckLocalBounds(harbor, deck);
+      if (
+        local.x >= bounds.x0 &&
+        local.x <= bounds.x1 &&
+        local.z >= bounds.z0 &&
+        local.z <= bounds.z1
+      ) {
+        surfaces.push({
+          label: `${harbor.id} displaced ship deck`,
+          y: frame.position.y + bounds.centerY,
+        });
+      }
+    }
+  }
+  return surfaces;
+}
+
+function deckStandInPoint(harbor: HarborDef, frame: SceneAttachFrame): EntityPoint {
+  const bounds = shipDeckLocalBounds(harbor, harbor.shipDecks[0]);
+  return sceneRigLocalToWorld(
+    frame,
+    {
+      x: (bounds.x0 + bounds.x1) / 2,
+      y: bounds.centerY,
+      z: (bounds.z0 + bounds.z1) / 2,
+    },
+    { x: 0, y: 0, z: 0 },
+  );
+}
+
+function riderDeckViolation(
+  label: string,
+  harbor: HarborDef,
+  frame: SceneAttachFrame,
+  point: EntityPoint,
+): string | null {
+  const local = worldToLocal(frame, point);
+  for (const deck of harbor.shipDecks) {
+    const bounds = shipDeckLocalBounds(harbor, deck);
+    const inside =
+      local.x >= bounds.x0 - RIDER_DECK_EDGE_EPSILON_YARDS &&
+      local.x <= bounds.x1 + RIDER_DECK_EDGE_EPSILON_YARDS &&
+      local.z >= bounds.z0 - RIDER_DECK_EDGE_EPSILON_YARDS &&
+      local.z <= bounds.z1 + RIDER_DECK_EDGE_EPSILON_YARDS;
+    if (!inside) continue;
+    const airGap = local.y - bounds.centerY;
+    if (Math.abs(airGap) <= ENTITY_SUPPORT_EPSILON_YARDS) return null;
+    return `${label} has ${airGap.toFixed(2)} yd deck air gap in ${harbor.id}`;
+  }
+  return `${label} left ${harbor.id} deck bounds at local x ${local.x.toFixed(
+    2,
+  )}, z ${local.z.toFixed(2)}`;
+}
+
 function cameraVolumeIntrusion(
   camera: SceneRigPoint,
   time: number,
@@ -1691,6 +2098,164 @@ function lintFilmGrammar(
   });
 }
 
+interface CollisionSupportState {
+  readonly hullOps: Set<number>;
+  readonly unsupportedEntities: Set<string>;
+  readonly uncontainedRiders: Set<string>;
+}
+
+function lintCollisionAndSupportSample(
+  scene: CapturedScene,
+  time: number,
+  frame: SceneFrame,
+  context: TimedSceneOp,
+  activeProps: ReadonlyMap<string, ActiveProp>,
+  state: CollisionSupportState,
+  report: (violation: Violation) => void,
+): void {
+  const activeShips: {
+    harbor: HarborDef;
+    active: ActiveProp;
+    frame: SceneAttachFrame;
+  }[] = [];
+  for (const [target, active] of activeProps) {
+    const harbor = HARBORS.find((candidate) => shipTarget(candidate) === target);
+    if (!harbor) continue;
+    const liveFrame = shipFrameAt(harbor, time, activeProps);
+    activeShips.push({ harbor, active, frame: liveFrame });
+    if (!state.hullOps.has(active.timedOp.index)) {
+      const collision = hullWorldCollision(harbor, liveFrame, scene.seed);
+      if (collision) {
+        state.hullOps.add(active.timedOp.index);
+        report({
+          sceneId: scene.id,
+          check: 'collision.hull',
+          opIndex: active.timedOp.index,
+          opKind: opKind(active.timedOp.op),
+          time,
+          threshold: `no penetration beyond ${HULL_INTERSECTION_EPSILON_YARDS.toFixed(
+            2,
+          )} yd into pier decks, ramps, terrain, or the water floor`,
+          measured: `${harbor.id} hull penetrates ${collision.label} by ${collision.penetration.toFixed(
+            2,
+          )} yd`,
+        });
+      }
+    }
+  }
+
+  const previousFrame =
+    time <= SAMPLE_INTERVAL_SEC / 2
+      ? frame
+      : frameAt(scene, Math.max(0, time - SAMPLE_INTERVAL_SEC));
+  const playerPoint = {
+    x: frame.live.playerX,
+    y: frame.live.playerY,
+    z: frame.live.playerZ,
+  };
+  const playerMoved =
+    Math.hypot(
+      playerPoint.x - previousFrame.live.playerX,
+      playerPoint.y - previousFrame.live.playerY,
+      playerPoint.z - previousFrame.live.playerZ,
+    ) > RIDER_WALK_STEP_EPSILON_YARDS;
+  const supportEntities: {
+    key: string;
+    label: string;
+    point: EntityPoint;
+    context: TimedSceneOp;
+  }[] = [];
+  if (activeShips.length === 0 || playerMoved) {
+    supportEntities.push({ key: 'player', label: 'player', point: playerPoint, context });
+  }
+  for (const [entityId, point] of frame.entities) {
+    const riderHarborId = scene.riderHarbors.get(entityId);
+    const riderShip = activeShips.find(({ harbor }) => harbor.id === riderHarborId);
+    supportEntities.push({
+      key: `entity:${entityId}`,
+      label: scene.entityLabels.get(entityId) ?? `scene entity ${entityId}`,
+      point,
+      context: riderShip?.active.timedOp ?? context,
+    });
+  }
+  for (const activeShip of activeShips) {
+    supportEntities.push({
+      key: `stand-in:${activeShip.harbor.id}`,
+      label: `${activeShip.harbor.id} deck stand-in`,
+      point: deckStandInPoint(activeShip.harbor, activeShip.frame),
+      context: activeShip.active.timedOp,
+    });
+  }
+
+  for (const entity of supportEntities) {
+    if (state.unsupportedEntities.has(entity.key)) continue;
+    const surfaces = supportSurfacesAt(entity.point, scene.seed, time, activeProps);
+    const nearest = surfaces.reduce((best, candidate) =>
+      Math.abs(entity.point.y - candidate.y) < Math.abs(entity.point.y - best.y) ? candidate : best,
+    );
+    const gap = entity.point.y - nearest.y;
+    if (Math.abs(gap) <= ENTITY_SUPPORT_EPSILON_YARDS) continue;
+    state.unsupportedEntities.add(entity.key);
+    report({
+      sceneId: scene.id,
+      check: 'support.entity',
+      opIndex: entity.context.index,
+      opKind: opKind(entity.context.op),
+      time,
+      threshold: `every presentation entity within ${ENTITY_SUPPORT_EPSILON_YARDS.toFixed(
+        2,
+      )} yd of terrain, a pier or ramp, or a displaced ship deck`,
+      measured: `${entity.label} is ${Math.abs(gap).toFixed(2)} yd ${
+        gap >= 0 ? 'above' : 'below'
+      } ${nearest.label}`,
+    });
+  }
+
+  const checkRider = (
+    key: string,
+    label: string,
+    point: EntityPoint,
+    activeShip: (typeof activeShips)[number],
+  ): void => {
+    if (state.uncontainedRiders.has(key)) return;
+    const measured = riderDeckViolation(label, activeShip.harbor, activeShip.frame, point);
+    if (measured === null) return;
+    state.uncontainedRiders.add(key);
+    report({
+      sceneId: scene.id,
+      check: 'containment.rider',
+      opIndex: activeShip.active.timedOp.index,
+      opKind: opKind(activeShip.active.timedOp.op),
+      time,
+      threshold: `rider centers inside displaced deck bounds within ${RIDER_DECK_EDGE_EPSILON_YARDS.toFixed(
+        2,
+      )} yd and feet within ${ENTITY_SUPPORT_EPSILON_YARDS.toFixed(2)} yd of deck`,
+      measured,
+    });
+  };
+
+  for (const activeShip of activeShips) {
+    checkRider(
+      `stand-in:${activeShip.harbor.id}`,
+      'deck stand-in',
+      deckStandInPoint(activeShip.harbor, activeShip.frame),
+      activeShip,
+    );
+    for (const [entityId, harborId] of scene.riderHarbors) {
+      if (harborId !== activeShip.harbor.id) continue;
+      const point = frame.entities.get(entityId);
+      if (!point) continue;
+      checkRider(
+        `entity:${entityId}`,
+        scene.entityLabels.get(entityId) ?? `scene entity ${entityId}`,
+        point,
+        activeShip,
+      );
+    }
+    if (playerMoved) checkRider('walking-player', 'walking player', playerPoint, activeShip);
+  }
+}
+
 function lintScene(scene: CapturedScene, report: (violation: Violation) => void): CameraSample[] {
   const director = createSceneDirectorState();
   const overlay = createSceneOverlayState();
@@ -1706,6 +2271,11 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
     [...scene.ops].reverse().find((timed) => timed.op.kind === 'end') ?? scene.ops.at(-1);
   const releases: ReleaseDelta[] = [];
   const samples: CameraSample[] = [];
+  const collisionSupportState: CollisionSupportState = {
+    hullOps: new Set(),
+    unsupportedEntities: new Set(),
+    uncontainedRiders: new Set(),
+  };
 
   lintFilmGrammar(scene, cameraOps, report);
 
@@ -1834,12 +2404,17 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
             measured: `missing cue ${timed.op.cue}`,
           });
         } else {
+          const harbor = HARBORS.find((candidate) => shipTarget(candidate) === target);
+          if (harbor) {
+            for (const candidate of HARBORS) {
+              if (candidate.id !== harbor.id) activeProps.delete(shipTarget(candidate));
+            }
+          }
           activeProps.set(target, {
             segment,
             startedAt: timed.at,
             timedOp: timed,
           });
-          const harbor = HARBORS.find((candidate) => shipTarget(candidate) === target);
           if (harbor) {
             const maximumSpeed = maximumPropSegmentSpeed(harbor, segment);
             if (maximumSpeed > LAST_BELL_CINEMATIC_SHIP_SPEED_CAP_YARDS_PER_SEC) {
@@ -1926,6 +2501,18 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
     }
 
     const frame = frameAt(scene, time);
+    const supportContext = scene.ops[Math.max(0, opCursor - 1)] ?? scene.ops[0];
+    if (supportContext) {
+      lintCollisionAndSupportSample(
+        scene,
+        time,
+        frame,
+        supportContext,
+        activeProps,
+        collisionSupportState,
+        report,
+      );
+    }
     const resolveEntity = (id: number): EntityPoint | null => frame.entities.get(id) ?? null;
     const resolveAttachment = (target: string): SceneAttachFrame | null => {
       const harbor = HARBORS.find((candidate) => shipTarget(candidate) === target);
@@ -2278,7 +2865,12 @@ describe('cinematic shot mechanical gate', () => {
       MIN_FULL_BLACK_CUT_SLACK_SECONDS,
       'fade slack must stay exactly one 20 Hz sim tick',
     ).toBe(SYNTHETIC_ONE_TICK_BLACK_SLACK_SECONDS);
-    expect(LEGACY_EXEMPTIONS, 'P1.3 voyage exemption inventory must stay exact').toEqual([
+    expect(LEGACY_EXEMPTIONS, 'cinematic exemption inventory must stay exact').toEqual([
+      {
+        sceneId: 'scn_lb_ferry_depart_back',
+        check: 'collision.hull',
+        reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
+      },
       {
         sceneId: 'scn_lb_ferry_depart_back',
         check: 'cut.fadeSlack',
@@ -2290,6 +2882,21 @@ describe('cinematic shot mechanical gate', () => {
         reason: 'P1.3 must author a clear fade before the voyage scene ends.',
       },
       {
+        sceneId: 'scn_lb_ferry_depart_back',
+        check: 'support.entity',
+        reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_back',
+        check: 'containment.rider',
+        reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_out',
+        check: 'collision.hull',
+        reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
+      },
+      {
         sceneId: 'scn_lb_ferry_depart_out',
         check: 'cut.fadeSlack',
         reason: 'P1.3 must add full-black tick slack to every voyage cut.',
@@ -2298,6 +2905,16 @@ describe('cinematic shot mechanical gate', () => {
         sceneId: 'scn_lb_ferry_depart_out',
         check: 'fade.symmetry',
         reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_out',
+        check: 'support.entity',
+        reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_out',
+        check: 'containment.rider',
+        reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
       },
       {
         sceneId: 'scn_lb_q0_ashore',
@@ -2311,6 +2928,11 @@ describe('cinematic shot mechanical gate', () => {
       },
       {
         sceneId: 'scn_lb_q0_voyage',
+        check: 'collision.hull',
+        reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
         check: 'cut.fadeSlack',
         reason: 'P1.3 must add full-black tick slack to every voyage cut.',
       },
@@ -2318,6 +2940,16 @@ describe('cinematic shot mechanical gate', () => {
         sceneId: 'scn_lb_q0_voyage',
         check: 'fade.symmetry',
         reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
+        check: 'support.entity',
+        reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
+        check: 'containment.rider',
+        reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
       },
     ]);
     // A renderer lens change must update the linter's framing calculations.
@@ -2330,6 +2962,10 @@ describe('cinematic shot mechanical gate', () => {
       hd: 8.863490707113863,
       bottomY: -0.0004148165653705534,
       topY: 39.56988457001259,
+    });
+    expect(HARBOR_HULL_FOOTPRINTS, 'each shipping ferry needs an authored hull box').toEqual({
+      mainland: harborShipLocalBounds(MAINLAND_HARBOR.berth),
+      gullhaven: modelBounds,
     });
     const modelCenter = { x: 0, y: 20, z: 0 };
     expect(harborShipLocalPointInside(modelBounds, modelCenter)).toBe(true);
@@ -2433,10 +3069,11 @@ describe('cinematic shot mechanical gate', () => {
     for (const control of SYNTHETIC_CONTROLS) registerSceneForLinter(control.def);
     for (const control of SYNTHETIC_CONTROLS) {
       const violations: Violation[] = [];
-      const scene =
+      const captured =
         control.actorIds || control.playerStart
           ? captureScene(control.def.id, control.actorIds, control.playerStart)
           : captureSyntheticControl(control.def);
+      const scene = applySyntheticPresentationFixture(captured, control.def.presentationFixture);
       if (control.actorIds) {
         const subjectShot = scene.ops.find(
           (
