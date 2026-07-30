@@ -423,19 +423,21 @@ describe('retro fallback proof sets stay anchored to the real tables', () => {
     expect(retroArm).toContain("'prog_guildsworn'");
   });
 
-  it('the creditable mob-level ceiling is the S-rank rift pin', () => {
+  it('the creditable mob-level ceiling is the Undermount capstone pin', () => {
     // Giantslayer's stranded heal keys on the highest level a creditable mob
-    // can ever spawn at. S-rank rift floors run mobs up to RIFT_MAX_MOB_LEVEL
-    // (the game-wide ceiling; at 23 the +5-level kill is out of reach at the
-    // level-20 cap, so capped players take the stranded retro-grant instead);
-    // heroic instances pin every mob to one shared level below it; outside
-    // those no spawnable template exceeds the player cap. The only templates
-    // authored above the ceiling can never be credited: warlock and mage pets
-    // sync to their owner's level and die outside kill credit (combat/damage.ts
-    // owned-pet early return), and the Yumi cat's damage is intercepted before
-    // the death path (social/yumi.ts).
+    // can ever spawn at. The Undermount raid capstone (Volzharr, level 26) is
+    // the game-wide ceiling, which keeps the +5-level kill reachable at the
+    // level-20 cap (no stranded retro-grant). Below it: S-rank rift floors run
+    // mobs up to RIFT_MAX_MOB_LEVEL (23), heroic instances pin every mob to
+    // one shared level below that, and outside those no spawnable template
+    // exceeds the raid tier. The only templates authored above the player cap
+    // that can never be credited: warlock and mage pets sync to their owner's
+    // level and die outside kill credit (combat/damage.ts owned-pet early
+    // return), and the Yumi cat's damage is intercepted before the death path
+    // (social/yumi.ts).
     const heroicLevels = Object.values(HEROIC_DUNGEON_TUNING).map((t) => t.level);
-    expect(RIFT_MAX_MOB_LEVEL).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    expect(MOBS.volzharr_buried_furnace.maxLevel).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    expect(RIFT_MAX_MOB_LEVEL).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
     expect(Math.max(...heroicLevels)).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
     expect(RIFT_LEVEL_CAP).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
     const neverCreditable = new Set([

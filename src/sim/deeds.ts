@@ -96,20 +96,23 @@ export const GROUND_PICKUP_PROVING_QUESTS: readonly string[] = [
   'q_glimmermere_light',
 ];
 
-// The highest level any giantslayer-creditable mob can ever spawn at: S-rank
-// rift floors now hold a flat level 23 (rift/ranks.ts RIFT_MAX_MOB_LEVEL),
-// heroic instances pin every mob to 22 (content/dungeon_difficulty.ts), and
-// nothing else exceeds the player cap itself (dummies, the world boss, and
-// owned pets are excluded from the killing-blow credit). cmb_giantslayer needs
-// a blow five levels up, so past this ceiling minus five (23 - 5 = 18) the
-// deed is permanently out of reach; a capped player (20) is at level 20 which
-// is above 18, so the deed IS permanently stranded in rifts for capped
-// characters and the retro auto-heal DOES fire. Giantslayer is no longer
-// earnable inside S-rank rifts (maintainer-accepted in v0.23.0 rank retune).
+// The highest level any giantslayer-creditable mob can ever spawn at. The
+// Undermount raid capstone (Volzharr, the Buried Furnace) is the current
+// ceiling at level 26 (content/dungeons.ts; the wing 1 and 2 bosses sit at
+// 24). Below the raid tier: S-rank rift floors hold a flat level 23
+// (rift/ranks.ts RIFT_MAX_MOB_LEVEL), heroic instances pin every mob to 22
+// (content/dungeon_difficulty.ts), and nothing else exceeds the player cap
+// itself (dummies, the world boss, and owned pets are excluded from the
+// killing-blow credit). cmb_giantslayer needs a blow five levels up, so with
+// the ceiling at 26 a capped player (20, needing a level-25 mob) can still
+// earn it against Volzharr: the deed is NOT stranded at cap and the retro
+// auto-heal does not fire (this consciously re-decides the v0.23.0 rank-retune
+// stranding, per the PINNED note below; the Undermount tier reopened the
+// window the S-rank flattening had closed).
 // PINNED: shipping a higher-level creditable mob is a conscious re-decision of
 // the stranded threshold (the content-integrity test cross-checks the ceiling
 // against the real tables).
-export const MAX_CREDITABLE_MOB_LEVEL = 23;
+export const MAX_CREDITABLE_MOB_LEVEL = 26;
 
 // Dungeon final bosses whose kill credit bumps deedStats.dungeonClears (keys
 // '<dungeonId>' and '<dungeonId>:heroic') and the dungeonFinalBossKills
@@ -1102,11 +1105,12 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   if (GROUND_PICKUP_PROVING_QUESTS.some((q) => meta.questsDone.has(q))) {
     grantDeed(ctx, meta, 'exp_something_shiny', { retro: true });
   }
-  // Stranded: once no creditable mob can sit five levels up (the heroic pin
-  // is the ceiling), the killing blow is permanently out of reach; a level
-  // never goes back down (prestige is cosmetic), so past the window the deed
-  // strands for the character's whole future. Below the threshold the live
-  // kill site stays the only grant path.
+  // Stranded: once no creditable mob can sit five levels up, the killing blow
+  // is permanently out of reach; a level never goes back down (prestige is
+  // cosmetic), so past the window the deed strands for the character's whole
+  // future. With the Undermount ceiling at 26 this never fires (cap 20 + 5 =
+  // 25 <= 26: Volzharr keeps the deed earnable); the arm stays for the next
+  // time a content retune lowers the ceiling below cap + 5.
   if (player.level + 5 > MAX_CREDITABLE_MOB_LEVEL) {
     grantDeed(ctx, meta, 'cmb_giantslayer', { retro: true });
   }
