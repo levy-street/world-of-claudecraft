@@ -429,6 +429,20 @@ if (typeof window !== 'undefined') {
     registerDeferredPreload(() =>
       loadGltf(def.url).then((gltf) => {
         loadedProps.set(key, gltf);
+        // Packaged iOS: extract IMMEDIATELY and release the parse, instead of
+        // holding all 194 parsed scenes until buildProps runs in the Renderer
+        // ctor. Measured on an iPhone 17 Pro, WebContent died at 1.54 GB mid
+        // preload with the renderer never reached, so build-time extraction
+        // never got the chance to release anything; extracting per-prop as it
+        // lands keeps only the float geometry + converted materials resident
+        // (exactly what build-time extraction retains) and frees the parse's
+        // duplicate buffers progressively. Tier-safe HERE ONLY because
+        // nativeIosMemoryProfile derives from hints alone and pins
+        // standardMaterials=false at import AND live resolve, so the converted
+        // material class cannot drift the way an import-time TIER read would
+        // (the farmCrate P0). Also moves the extraction CPU out of the
+        // synchronous scene build, which shortens the entry stall.
+        if (GFX.nativeIosMemoryProfile) propAsset(key as PropKey);
       }),
     );
   }

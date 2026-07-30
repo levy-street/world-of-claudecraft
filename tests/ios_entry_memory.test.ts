@@ -189,3 +189,38 @@ describe('preload registry retains no resolution values', () => {
     await expect(assetsReady()).rejects.toThrow('asset preload failed (1)');
   });
 });
+
+describe('post-entry mob-body streaming (packaged iOS)', () => {
+  // The heaviest character content (creatures + the skeleton family, embedded
+  // 1024-class atlases) is carved out of the boot gate on the packaged shell and
+  // streamed after prewarm, through the fail-soft view-create seam (#2079).
+  // Measured before this: WebContent at 1.54 GB pre-renderer on an iPhone 17 Pro.
+  it('streams only mob bodies, never anything the char-select preview builds directly', () => {
+    expect(assetsSource).toContain(
+      "const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];",
+    );
+    // Scoped to the packaged shell: everywhere else the gate keeps the full set.
+    expect(assetsSource).toContain('GFX.nativeIosMemoryProfile\n  ? allPreloadUrls.filter');
+    // The preview gate sweeps the GATE set, so the launcher never awaits or
+    // re-fetches a streamed mob body.
+    expect(assetsSource).toContain(
+      'const preloadUrls = allPreloadUrls.filter((u) => !streamedUrls.includes(u));',
+    );
+  });
+
+  it('starts the stream after prewarm, not inside the entry gate', () => {
+    const prewarmAt = mainSource.indexOf("checkpoint('prewarm-complete'");
+    const streamAt = mainSource.indexOf('startStreamedCharacterPreloads()');
+    const assetsAwaitAt = mainSource.indexOf('await assetsReady(');
+    expect(prewarmAt).toBeGreaterThan(-1);
+    expect(streamAt).toBeGreaterThan(prewarmAt);
+    expect(streamAt).toBeGreaterThan(assetsAwaitAt);
+  });
+
+  it('extracts props and foliage as they land on the packaged shell', () => {
+    const propsSource = read('../src/render/props.ts');
+    const foliageSource = read('../src/render/foliage.ts');
+    expect(propsSource).toContain('if (GFX.nativeIosMemoryProfile) propAsset(key as PropKey);');
+    expect(foliageSource).toContain('if (GFX.nativeIosMemoryProfile) extractParts(url);');
+  });
+});

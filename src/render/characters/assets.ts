@@ -452,7 +452,27 @@ function assetUrl(url: string): string {
 // tier via assetUrl(), and resolvedGltf() throws "character asset not preloaded"
 // synchronously, so the preload set must be a superset of any tier's placement set or
 // world entry crashes (the character-side twin of the v0.16.0 props P0).
-const preloadUrls = characterPreloadUrls(GFX.standardMaterials);
+const allPreloadUrls = characterPreloadUrls(GFX.standardMaterials);
+
+// Packaged iOS carves the mob bodies out of the boot gate and STREAMS them after
+// first frame instead. They are the heaviest character content (creature +
+// skeleton-family GLBs with embedded 1024-class atlases; 47 files, and by far
+// the largest share of the decoded character residency) and nothing on the
+// launcher, the character-select preview, or the player's own spawn needs them:
+// mob views are created fail-soft (createCharacterVisual returns null and
+// view_create_retry retries, the #2079 seam; mounts already stream exactly this
+// way), so a mob whose GLB is still arriving pops in a beat later instead of
+// crashing anything. Measured on an iPhone 17 Pro, decoding the full set inside
+// the entry gate put WebContent at 1.54 GB before the renderer ever existed;
+// streaming defers that mass to after the entry spike has cleared. Weapons and
+// NPC bodies stay in the gate: the char-select preview builds CharacterVisual
+// DIRECTLY (not through the fail-soft factory), so a missing held-weapon GLB
+// there would throw.
+const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
+const streamedUrls = GFX.nativeIosMemoryProfile
+  ? allPreloadUrls.filter((u) => STREAMED_URL_PREFIXES.some((p) => u.includes(p)))
+  : [];
+const preloadUrls = allPreloadUrls.filter((u) => !streamedUrls.includes(u));
 
 for (const url of preloadUrls) {
   registerPreload(
@@ -460,6 +480,27 @@ for (const url of preloadUrls) {
       gltfByUrl.set(url, g);
     }),
   );
+}
+
+let streamedStarted = false;
+/**
+ * Start the post-entry mob-body stream (idempotent; returns how many fetches
+ * this call started). main.ts calls it once the entry is past its allocation
+ * spike (prewarm complete). Empty everywhere but the packaged iOS shell, where
+ * the boot gate above deliberately excluded these urls. Failures retry through
+ * loadGltf's own eviction on next sight, exactly like the mount lazy loads.
+ */
+export function startStreamedCharacterPreloads(): number {
+  if (streamedStarted) return 0;
+  streamedStarted = true;
+  for (const url of streamedUrls) {
+    void loadGltf(url)
+      .then((g) => {
+        gltfByUrl.set(url, g);
+      })
+      .catch(() => undefined);
+  }
+  return streamedUrls.length;
 }
 
 // Skin textures: player alternate body atlases, loaded sRGB + flipY=false so

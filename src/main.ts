@@ -171,7 +171,11 @@ import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
 import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
-import { charactersReady, preloadMechAssets } from './render/characters/assets';
+import {
+  charactersReady,
+  preloadMechAssets,
+  startStreamedCharacterPreloads,
+} from './render/characters/assets';
 import { skinCount } from './render/characters/manifest';
 import {
   onPortraitsReady,
@@ -3966,6 +3970,15 @@ async function startGame(
     // fall back to Three's normal first-use compilation once the zone itself
     // has been materialized successfully.
     console.warn('Renderer prewarm failed', err);
+  }
+  // The entry allocation spike is over: start streaming the mob bodies the
+  // packaged iOS boot gate deliberately excluded (empty everywhere else). A mob
+  // whose GLB is still arriving renders a beat late through the fail-soft
+  // view-create path, instead of its decode competing with the scene build for
+  // the WebContent memory ceiling.
+  const streamedCount = startStreamedCharacterPreloads();
+  if (streamedCount > 0) {
+    console.info(`[entry-guard] streaming ${streamedCount} deferred character assets`);
   }
   // Each preview prewarm mints a SECONDARY WebGL context beside the world
   // renderer: real WebKit GPU-process residency held for a window the player

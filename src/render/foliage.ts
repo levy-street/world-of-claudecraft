@@ -171,6 +171,10 @@ for (const urls of Object.values(MODEL_URLS)) {
     registerDeferredPreload(() =>
       loadGltf(url).then((g) => {
         loadedModels.set(url, g);
+        // Packaged iOS: extract now and release the parse rather than holding it
+        // until buildFoliage (same rationale and same tier-safety argument as the
+        // props preload; see the comment there and the 17 Pro 1.54 GB kill).
+        if (GFX.nativeIosMemoryProfile) extractParts(url);
       }),
     );
   }
