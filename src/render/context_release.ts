@@ -10,9 +10,43 @@
 export interface WebGLContextHolder {
   forceContextLoss(): void;
   dispose(): void;
+  getContext?(): WebGLRenderingContext | WebGL2RenderingContext;
 }
 
 const holders = new Set<WebGLContextHolder>();
+const normalizedInfoLogContexts = new WeakSet<object>();
+
+/**
+ * Three r165 calls `.trim()` directly on WebGL info logs, although the WebGL
+ * contract allows browsers to return null. Chrome 150 does that on some Linux
+ * shader/link paths, which used to throw during the first render and leave the
+ * loading screen up forever. Three r179+ coalesces these values to an empty
+ * string; mirror that narrow upstream fix while this project remains pinned to
+ * r165 for shader-chunk compatibility.
+ */
+function normalizeNullableInfoLogs(context: WebGLRenderingContext | WebGL2RenderingContext): void {
+  if (normalizedInfoLogContexts.has(context)) return;
+  const getProgramInfoLog = context.getProgramInfoLog.bind(context);
+  const getShaderInfoLog = context.getShaderInfoLog.bind(context);
+  try {
+    Object.defineProperties(context, {
+      getProgramInfoLog: {
+        configurable: true,
+        value: (program: WebGLProgram) => getProgramInfoLog(program) ?? '',
+        writable: true,
+      },
+      getShaderInfoLog: {
+        configurable: true,
+        value: (shader: WebGLShader) => getShaderInfoLog(shader) ?? '',
+        writable: true,
+      },
+    });
+    normalizedInfoLogContexts.add(context);
+  } catch {
+    // Some embedded WebViews may expose non-configurable host methods. Leaving
+    // them untouched is safer than making renderer construction itself fail.
+  }
+}
 
 /**
  * Track a renderer so its GL context is released on page teardown. Returns an
@@ -20,8 +54,17 @@ const holders = new Set<WebGLContextHolder>();
  * touched twice.
  */
 export function trackWebGLContext(holder: WebGLContextHolder): () => void {
+  try {
+    const context = holder.getContext?.();
+    if (context) normalizeNullableInfoLogs(context);
+  } catch {
+    // Context release tracking must remain available even if an unusual host
+    // rejects context introspection.
+  }
   holders.add(holder);
-  return () => { holders.delete(holder); };
+  return () => {
+    holders.delete(holder);
+  };
 }
 
 /**
@@ -31,8 +74,16 @@ export function trackWebGLContext(holder: WebGLContextHolder): () => void {
  */
 export function releaseTrackedWebGLContexts(): void {
   for (const holder of holders) {
-    try { holder.forceContextLoss(); } catch { /* context may already be lost */ }
-    try { holder.dispose(); } catch { /* best-effort teardown */ }
+    try {
+      holder.forceContextLoss();
+    } catch {
+      /* context may already be lost */
+    }
+    try {
+      holder.dispose();
+    } catch {
+      /* best-effort teardown */
+    }
   }
   holders.clear();
 }

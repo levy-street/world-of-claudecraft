@@ -13,7 +13,14 @@
 import { statSync } from 'node:fs';
 import { getBounds, NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
-import { dedup, prune, resample, textureCompress, transformMesh } from '@gltf-transform/functions';
+import {
+  dedup,
+  meshopt,
+  prune,
+  resample,
+  textureCompress,
+  transformMesh,
+} from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 
 let ioPromise = null;
@@ -407,8 +414,15 @@ export async function normalizeProp(inPath, outPath, { height, rotateY = 0, maxT
   const cx = (min[0] + max[0]) / 2;
   const cz = (min[2] + max[2]) / 2;
   applyToAllMeshes(doc, mat4Translate(-cx, -min[1], -cz));
-  // Plain WebP encoding, no meshopt (matches the weapon + animated lanes).
-  await doc.transform(prune(), dedup(), ...(await textureTransforms(maxTex ?? 512)));
+  // Static props always ship with Meshopt geometry and quantized attributes.
+  // Keep rigged creatures on the animation-safe plain encoding lane below.
+  await MeshoptEncoder.ready;
+  await doc.transform(
+    prune(),
+    dedup(),
+    ...(await textureTransforms(maxTex ?? 512)),
+    meshopt({ encoder: MeshoptEncoder, level: 'high' }),
+  );
   await saveGlb(doc, outPath);
   return { scale: +s.toFixed(4), height };
 }

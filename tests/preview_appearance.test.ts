@@ -14,6 +14,8 @@ const mechAssets = vi.hoisted(() => ({
   resolve: null as (() => void) | null,
 }));
 
+const visualInstances = vi.hoisted(() => [] as Array<{ dispose: ReturnType<typeof vi.fn> }>);
+
 vi.mock('../src/render/characters/assets', () => ({
   mechAssetsReady: () => mechAssets.ready,
   preloadMechAssets: vi.fn(() => {
@@ -40,6 +42,7 @@ vi.mock('../src/render/characters/visual', () => ({
     setSkin = vi.fn();
     dispose = vi.fn();
     constructor() {
+      visualInstances.push(this);
       visualDoubles.built.push(this as unknown as { setWeaponSkin: unknown });
     }
   },
@@ -79,6 +82,7 @@ beforeEach(() => {
   mechAssets.promise = null;
   mechAssets.resolve = null;
   vi.mocked(preloadMechAssets).mockClear();
+  visualInstances.length = 0;
 });
 
 describe('previewAppearanceVisual', () => {
@@ -231,6 +235,47 @@ describe('CharacterPreview.setClass', () => {
   });
 });
 
+describe('CharacterPreview visual reuse', () => {
+  function livePreview(): CharacterPreview {
+    const preview = Object.create(CharacterPreview.prototype) as CharacterPreview;
+    Object.assign(preview, {
+      destroyed: false,
+      currentVisual: null,
+      currentVisualSig: null,
+      currentSkin: 0,
+      closeupCache: new Map(),
+      characterGroup: { add: vi.fn(), remove: vi.fn(), rotation: { y: 1 } },
+    });
+    return preview;
+  }
+
+  it('keeps the warm rig and closeup cache when an identical sheet repaint remounts it', () => {
+    const preview = livePreview();
+    preview.setVisualKey('player_warrior', 'sword_a');
+    const state = preview as unknown as { closeupCache: Map<string, HTMLCanvasElement> };
+    state.closeupCache.set('hero', {} as HTMLCanvasElement);
+
+    preview.setVisualKey('player_warrior', 'sword_a');
+
+    expect(visualInstances).toHaveLength(1);
+    expect(state.closeupCache.has('hero')).toBe(true);
+  });
+
+  it('disposes the owned skeleton resources and invalidates captures on a real change', () => {
+    const preview = livePreview();
+    preview.setVisualKey('player_warrior', 'sword_a');
+    const first = visualInstances[0];
+    const state = preview as unknown as { closeupCache: Map<string, HTMLCanvasElement> };
+    state.closeupCache.set('hero', {} as HTMLCanvasElement);
+
+    preview.setVisualKey('player_warrior', 'sword_b');
+
+    expect(visualInstances).toHaveLength(2);
+    expect(first.dispose).toHaveBeenCalledOnce();
+    expect(state.closeupCache.size).toBe(0);
+  });
+});
+
 describe('CharacterPreview visual lifecycle', () => {
   it('disposes the previous cloned rig before replacing it', () => {
     const preview = Object.create(CharacterPreview.prototype) as CharacterPreview;
@@ -240,6 +285,7 @@ describe('CharacterPreview visual lifecycle', () => {
     const add = vi.fn();
     state.destroyed = false;
     state.currentSkin = 0;
+    state.closeupCache = new Map();
     state.currentVisual = { root: {}, dispose };
     state.characterGroup = { remove, add, rotation: { y: 1 } };
 
@@ -259,6 +305,7 @@ describe('CharacterPreview.setVisualKey: the weapon-skin rebuild contract', () =
     state.currentSkin = 0;
     state.currentWeaponSkinId = persistedSkin;
     state.currentVisual = null;
+    state.closeupCache = new Map();
     state.characterGroup = { add: vi.fn(), remove: vi.fn(), rotation: { y: 1 } };
     return preview;
   }

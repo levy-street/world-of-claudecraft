@@ -121,6 +121,29 @@ describe('buildMailboxView', () => {
     });
     expect(a).toEqual(b);
   });
+
+  it('keeps rows beyond the old first-page boundary reachable in the inbox model', () => {
+    const messages = Array.from({ length: 60 }, (_, i) => ({
+      id: i + 1,
+      senderName: 'Alice',
+      kind: 'player' as const,
+      subject: `Letter ${i + 1}`,
+      body: `Body ${i + 1}`,
+      copper: 0,
+      items: [],
+      read: true,
+    }));
+    const view = buildMailboxView({
+      info: { ...INFO, messages, totalCount: messages.length, unread: 0 },
+      tab: 'inbox',
+      openedId: 60,
+      attachments: [],
+    });
+    if (view.kind !== 'inbox') throw new Error('expected inbox');
+    expect(view.body.rows).toHaveLength(60);
+    expect(view.body.rows[59]?.subject).toBe('Letter 60');
+    expect(view.body.opened?.id).toBe(60);
+  });
 });
 
 describe('clampParcelQty (#1444 attach-a-quantity stepper)', () => {

@@ -814,6 +814,38 @@ describe('quality-tiered enchanting gains', () => {
     expect(meta.craftSkills.enchanting).toBe(1);
   });
 
+  it('a crafted signed disenchant keeps material rewards and throttle but grants no enchanting skill', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid)!;
+    sim.ctx.addItemInstance('moggers_copper_cudgel', { signer: meta.name }, pid);
+
+    const result = resolveDisenchant(sim.ctx, pid, 'moggers_copper_cudgel');
+
+    expect(result.ok).toBe(true);
+    expect(result.materialItemId).toBe('arcane_essence');
+    expect(result.count).toBe(1);
+    expect(sim.countItem('moggers_copper_cudgel', pid)).toBe(0);
+    expect(sim.countItem('arcane_essence', pid)).toBe(1);
+    expect(meta.craftThrottle.count).toBe(1);
+    expect(meta.craftSkills.enchanting ?? 0).toBe(0);
+  });
+
+  it('a plain non-crafted eligible disenchant still grants enchanting skill', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid)!;
+    sim.addItem('moggers_copper_cudgel', 1, pid);
+
+    const result = resolveDisenchant(sim.ctx, pid, 'moggers_copper_cudgel');
+
+    expect(result.ok).toBe(true);
+    expect(sim.countItem('moggers_copper_cudgel', pid)).toBe(0);
+    expect(sim.countItem('arcane_essence', pid)).toBe(1);
+    expect(meta.craftThrottle.count).toBe(1);
+    expect(meta.craftSkills.enchanting).toBe(ENCHANTING_SKILL_GAIN);
+  });
+
   it('commons gray out at capability 3 (skill 75): the disenchant still succeeds with zero gain', () => {
     const sim = makeSim();
     const pid = sim.playerId;

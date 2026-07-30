@@ -33,6 +33,8 @@ const abilityIds = new Set([
   'frost_armor',
   'arcane_intellect',
   'polymorph',
+  'pyroblast',
+  'fireball_form',
   'shared_id',
 ]);
 const itemIds = new Set(['baked_bread', 'spring_water', 'shared_id']);
@@ -573,6 +575,23 @@ describe('applying a saved talent loadout bar', () => {
     });
   });
 
+  it('restores an attack-indexed Mage Fire loadout to the visible action slots', () => {
+    const current = Array<ReturnType<typeof applyLoadoutBar>[number]>(33).fill(null);
+    const saved = Array<string | null>(33).fill(null);
+    saved[1] = 'fireball';
+    saved[4] = 'pyroblast';
+    saved[11] = 'fireball_form';
+
+    const restored = applyLoadoutBar(current, saved, 33, abilityExists);
+
+    expect(restored[0]).toEqual({ type: 'ability', id: 'fireball' });
+    expect(restored[1]).toBeNull();
+    expect(restored[3]).toEqual({ type: 'ability', id: 'pyroblast' });
+    expect(restored[4]).toBeNull();
+    expect(restored[10]).toEqual({ type: 'ability', id: 'fireball_form' });
+    expect(restored[11]).toBeNull();
+  });
+
   it('preserves third-row actions missing from a legacy two-row loadout', () => {
     const current = Array<ReturnType<typeof applyLoadoutBar>[number]>(33).fill(null);
     current[32] = { type: 'ability', id: 'polymorph' };
@@ -631,6 +650,15 @@ describe('loadoutKnownAbilityIds', () => {
 
     expect(applyLoadoutBar(current, ['stormstrike'], 1, (id) => restorationKnown.has(id))).toEqual([
       null,
+    ]);
+  });
+
+  it('restores a target-build granted ability before the live known list updates', () => {
+    const enhancement = { ...emptyAllocation(), spec: 'enhancement' };
+    const enhancementKnown = loadoutKnownAbilityIds('shaman', enhancement, 20);
+
+    expect(applyLoadoutBar([null], ['stormstrike'], 1, (id) => enhancementKnown.has(id))).toEqual([
+      { type: 'ability', id: 'stormstrike' },
     ]);
   });
 });

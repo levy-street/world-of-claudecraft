@@ -259,8 +259,12 @@ describe('fire mage short-fight burst (27s live report harness)', () => {
   // Post-#2358 (crit/haste rating halved) the naked frost 27s cell is
   // proc-luck heavy: ~8 Rimelances fit the window, so a single seed has a
   // 27% chance of ZERO Fingers procs and its DPS swings ~40%. The band
-  // therefore compares 5-seed MEANS (same seeds as the talented gates); the
-  // single seed-41 run above stays for the breakdown report and sanity.
+  // therefore compares 5-seed MEANS; the single seed-41 run above stays for the
+  // breakdown report and sanity. These seeds were the talented gates' ladder too
+  // until the Eastbrook camp respacing: that gate now runs 101 + 7k WITHOUT 41,
+  // because its over-nerf guard compares against a seed-41 naked run and would
+  // otherwise weigh 41 on both sides. This band compares naked fire against
+  // naked frost, never against a seed-41 baseline, so it keeps 41.
   const BAND_SEEDS = [41, 101, 108, 115, 122];
   const fireMean =
     BAND_SEEDS.map((s) => runShortFight('fire', FIGHT_SECONDS, s).dps).reduce((a, b) => a + b, 0) /
@@ -337,7 +341,15 @@ describe('the tuned knobs (balance 2026-07-25, designer round)', () => {
 // (3.6x). Fight-long balance lives in the sustained block below.
 describe('talented burst window (Monte Carlo 2026-07-24, designer round 2026-07-25)', () => {
   const BURST_SANITY_CEILING = 1.8; // x the talented frost 27s comparator
-  const CEILING_SEEDS = [41, 101, 108, 115, 122];
+  // Monte Carlo sample: the 101 + 7k ladder. Re-hunted after the Eastbrook camp
+  // respacing thinned the zone-1 camp counts (world-gen draws 5 rng values per
+  // camp mob, so every seed's stream shifted). Seed 41 LEFT the sample and the
+  // ladder gained 129: 41 is the seed the over-nerf guard's naked comparator
+  // itself runs, and the respacing pushed that naked run to the 96th percentile
+  // of its own distribution (272.1 DPS against a 237.1 naked mean over 45
+  // seeds), so keeping 41 on both sides made the guard compare the talented
+  // mean partly against itself at its single luckiest naked roll.
+  const CEILING_SEEDS = [101, 108, 115, 122, 129];
   const fire = CEILING_SEEDS.map((seed) =>
     runShortFight('fire', FIGHT_SECONDS, seed, TOP_TALENTED_ROWS),
   );
@@ -360,10 +372,15 @@ describe('talented burst window (Monte Carlo 2026-07-24, designer round 2026-07-
   });
 
   it('the talented build still out-bursts the naked spec (over-nerf guard)', () => {
-    // Mean versus mean over the SAME seed panel: a single-seed naked run can
-    // high-roll past the talented mean on pure crit luck whenever the shared
-    // rng stream shifts (any world-content change forks it), which is seed
-    // noise, not an over-nerf.
+    // PAIRED comparison: the naked comparator runs the SAME seed ladder as the
+    // talented sample, mean against mean. It used to be a 5-seed talented mean
+    // against ONE naked run on the default seed, which is a population claim
+    // measured against a single roll: whether it passed depended on where that
+    // one seed happened to land in the naked distribution (after the Eastbrook
+    // camp respacing it landed at the 96th percentile, 272.1 DPS against a 237.1
+    // naked mean over 45 seeds, so no representative sample could pass it). Same
+    // assertion, same intent, compared like for like, so the margin now reflects
+    // the real talent contribution (about 12 percent) instead of one lucky roll.
     const naked = CEILING_SEEDS.map((seed) => runShortFight('fire', FIGHT_SECONDS, seed));
     const nakedMean = naked.reduce((a, r) => a + r.dps, 0) / naked.length;
     expect(mean).toBeGreaterThanOrEqual(nakedMean);

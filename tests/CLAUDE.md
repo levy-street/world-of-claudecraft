@@ -37,7 +37,8 @@ Subdirectories (plus one shared fixture):
   `ts.createSourceFile` walk that reports the calls a class method evaluates, each with the
   `if` chain guarding each, `test_block_calls.ts`, the `ts.createSourceFile` walk that reports
   every `describe`/`it`/`test`/`suite` call in a source tagged with the block enclosing it,
-  `alloc_probe.ts`).
+  `driver_callback_bodies.ts`, the `ts.createSourceFile` walk that resolves a repeating
+  driver's callback and every same-module body one of its ticks can reach, `alloc_probe.ts`).
 - `global_setup.ts`: runs on every vitest invocation (`vite.config.ts` `test.globalSetup`);
   mints the SFX Studio temp root (`WOC_SFX_STUDIO_TEST_ROOT`).
 
@@ -130,7 +131,14 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   or cold, the registration-free default for a window (no forced-reflow read and no repeating
   driver of its own, at any cadence). The raw-write scan is waived for cold NOT because a
   window is cold, which this tree contradicts, but because a COUNT cannot tell a build-time
-  write from a repeated one; see the bucket 3 comment for the cadences involved.
+  write from a repeated one; see the bucket 3 comment for the cadences involved. Inside a
+  granted driver's callback it CAN, so a `driverAllow` entry now costs a `drivers` entry per
+  call site: the cadence, pinned against the source literal, plus exact counts of raw writes,
+  element re-queries and IDL-property writes over everything ONE TICK reaches
+  (`helpers/driver_callback_bodies.ts`). The unit is the callback body PLUS every same-module
+  function it calls, because a body-only scan is vacuous over this tree: all three live
+  callbacks are a guard and a method call, and the writes that motivated the rule are one hop
+  further in.
 - `hud_update_drive.test.ts` answers the cadence question that gate refuses to: one
   hand-written row per call `Hud.update()` evaluates, carrying its band
   (`frame`/`fast`/`medium`/`slow`), the exact condition text gating it, what it repaints, and

@@ -23,6 +23,7 @@ function input(overrides: Partial<InstanceMusicInput> = {}): InstanceMusicInput 
     inDungeon: false,
     entities: [],
     cupInfo: null,
+    riftFloor: null,
     ...overrides,
   };
 }
@@ -60,7 +61,10 @@ describe('instance music policy', () => {
     expect(first.instanceId).toBe('collapsed_reliquary');
     expect(first.zone).toBe('dungeon_hollow_crypt');
     expect(port.resetForDungeonEntry).toHaveBeenCalledTimes(1);
-    expect(port.resetForDungeonEntry).toHaveBeenCalledWith('collapsed_reliquary');
+    expect(port.resetForDungeonEntry).toHaveBeenCalledWith(
+      'collapsed_reliquary',
+      'dungeon_hollow_crypt',
+    );
     expect(port.update).toHaveBeenLastCalledWith('dungeon_hollow_crypt', false);
   });
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-[English](../../CONTRIBUTING.md) · [Español](CONTRIBUTING.es.md) · [Español (España)](CONTRIBUTING.es_ES.md) · [Français](CONTRIBUTING.fr_FR.md) · [Français (Canada)](CONTRIBUTING.fr_CA.md) · [Italiano](CONTRIBUTING.it_IT.md) · [Deutsch](CONTRIBUTING.de_DE.md) · [简体中文](CONTRIBUTING.zh_CN.md) · [繁體中文](CONTRIBUTING.zh_TW.md) · [한국어](CONTRIBUTING.ko_KR.md) · [日本語](CONTRIBUTING.ja_JP.md) · [Português (Brasil)](CONTRIBUTING.pt_BR.md) · [Русский](CONTRIBUTING.ru_RU.md) · [Nederlands](CONTRIBUTING.nl_NL.md) · [Polski](CONTRIBUTING.pl_PL.md) · [Bahasa Indonesia](CONTRIBUTING.id_ID.md) · [Türkçe](CONTRIBUTING.tr_TR.md) · [Svenska](CONTRIBUTING.sv_SE.md) · [Tiếng Việt](CONTRIBUTING.vi_VN.md) · **Dansk**
+[English](../../CONTRIBUTING.md) · [Español](CONTRIBUTING.es.md) · [Español (España)](CONTRIBUTING.es_ES.md) · [Français](CONTRIBUTING.fr_FR.md) · [Français (Canada)](CONTRIBUTING.fr_CA.md) · [Italiano](CONTRIBUTING.it_IT.md) · [Deutsch](CONTRIBUTING.de_DE.md) · [简体中文](CONTRIBUTING.zh_CN.md) · [繁體中文](CONTRIBUTING.zh_TW.md) · [한국어](CONTRIBUTING.ko_KR.md) · [日本語](CONTRIBUTING.ja_JP.md) · [Português (Brasil)](CONTRIBUTING.pt_BR.md) · [Русский](CONTRIBUTING.ru_RU.md) · [Čeština](CONTRIBUTING.cs_CZ.md) · [Nederlands](CONTRIBUTING.nl_NL.md) · [Polski](CONTRIBUTING.pl_PL.md) · [Bahasa Indonesia](CONTRIBUTING.id_ID.md) · [Türkçe](CONTRIBUTING.tr_TR.md) · [Svenska](CONTRIBUTING.sv_SE.md) · [Tiếng Việt](CONTRIBUTING.vi_VN.md) · **Dansk**
 
 </div>
 
@@ -39,8 +39,10 @@ Der er plads til alle her:
 
 ## Kom i gang
 
-Du skal bruge [Node.js 22+](https://nodejs.org/) og npm. Til multiplayer-serveren
-skal du også bruge [Docker](https://www.docker.com/) til at køre Postgres.
+Du skal bruge [Node.js 26](https://nodejs.org/) og npm, de versioner som CI og
+produktions-imaget bruger. Ældre majorversioner er ikke testet. Til
+multiplayer-serveren skal du også bruge [Docker](https://www.docker.com/) til at
+køre Postgres.
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
@@ -50,26 +52,89 @@ cd world-of-claudecraft
 # 2. Install dependencies
 npm ci
 
-# 3. Run the offline client (no server or database needed)
+# 3. Point git at the repository hooks (once per clone)
+git config core.hooksPath .githooks
+
+# 4. Run the offline client (no server or database needed)
 npm run dev          # open the URL it prints (usually http://localhost:5173)
 ```
 
 Det er nok til at spille offline-verdenen og arbejde på de fleste ting. For at
-køre hele online-stacken:
+køre hele online-stacken skal du først have et databasekodeord i dit miljø:
 
 ```bash
+cp .env.example .env
+# set POSTGRES_PASSWORD and point DATABASE_URL at the same password
 npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
 npm run server       # build and run the authoritative game server on :8787
 npm run dev          # in another terminal; the client proxies to the server
 ```
 
+Hvis du planlægger at køre hele gaten nedenfor, så installér den browser, den
+styrer, én gang: `npx playwright install chromium`.
+
 [README](../../README.md) indeholder den fulde guide til at hoste, udvikle og
 spille, og `CLAUDE.md`-filerne rundt omkring i repoet dokumenterer
 konventionerne for hvert område.
 
+### TypeScript-værktøjskæde
+
+Typetjek kører på TypeScript 7, den native compiler: `npx tsc --noEmit` virker
+præcis som før, og et fuldt tjek af repoet tager nu få sekunder i stedet for
+titalls sekunder. Installationen er det officielle dobbelte alias:
+`typescript`-pakken slår op i JS-API'et fra TypeScript 6 (via
+`@typescript/typescript6`-wrapperen), fordi `svelte-check` stadig bruger det
+API, mens `@typescript/native` leverer `tsc`-binæren. Ting, du bør vide:
+
+- **Editorer.** VS Code kræver marketplace-udvidelsen "TypeScript 7"
+  (`TypeScriptTeam.native-preview`) for understøttelse af den native
+  language service, indtil den indbyggede understøttelse udkommer; den slås til
+  og fra via indstillingen `js/ts.experimental.useTsgo`, og kommandoen "Disable
+  TypeScript 7 Language Server" er den sanktionerede tilbagefaldsvej til
+  tsserver fra TypeScript 6. JetBrains-IDE'er registrerer kun den native server
+  automatisk under pakkenavnet `@typescript/native-preview`, så de opdager den
+  ikke via dette repos `@typescript/native`-alias; deres medfølgende
+  TypeScript 6-understøttelse fungerer fint.
+- **Nyttige tsc-flag.** `--checkers N` angiver antallet af parallelle
+  typetjek-workers (standard 4; resultaterne er identiske uanset antal): sænk
+  det for at begrænse hukommelsen på en presset runner, hæv det på en maskine
+  med mange kerner, og mål begge veje, for mere er ikke altid hurtigere.
+  `--singleThreaded` slår al parallelitet fra. Et ad hoc-tjek af en enkelt fil
+  (`npx tsc somefile.ts`) fejler, når mappen indeholder en `tsconfig.json`;
+  angiv `--ignoreConfig` for den gamle adfærd.
+- **Lockfil.** Generér kun `package-lock.json` igen med
+  `npx npm@10 install --package-lock-only`: filen bruger npm-10-semantik, og
+  nyere npm-majorversioner (inklusive den npm 11, som CI's Node 26 leverer)
+  dropper i stilhed `svelte-check`s indlejrede optional-peer-poster, hvilket
+  bringer `npm ci` ud af sync i CI. Et almindeligt `npm ci` er sikkert på enhver
+  npm-majorversion. Bekræft efter regenereringen, at `npm ci --dry-run` er i
+  sync både under npm 10 og under din arbejdsstations npm.
+- **Hvornår det skal tages op igen.** Slå det dobbelte alias sammen til én
+  enkelt `typescript`-afhængighed, når BEGGE gælder: det stabile JS-API i
+  TypeScript 7.1 er udkommet (TypeScript 7.0 leverer slet intet JS-API;
+  erstatningen spores i microsoft/typescript-go issue 2824), og
+  sveltejs/language-tools issue 3063 er lukket med en udgivet `svelte-check`,
+  der tager det i brug. svelte-checks eksperimentelle `--tsgo`-tilstande
+  ophæver ikke kravet om TypeScript 6-API'et, og dens igangværende indlæsning af
+  TypeScript 7 (language-tools PR 3073) læser det `@typescript/native`-alias,
+  dette repo allerede bruger, så en omdøbning er ikke nødvendig.
+
 ## Sådan laver du din ændring
 
-1. **Opret en branch** ud fra `main`: `feature/<short-slug>` eller `fix/<short-slug>`.
+1. **Start fra den nyeste release-branch, og aldrig fra `main`.** Aktivt arbejde
+   integreres på en `release/vX.Y.Z`-branch; `main` halter bagefter og er ikke
+   basis for bidrag. Find den nyeste, og lav din branch ud fra den:
+
+   ```bash
+   git fetch origin
+   git branch -r --list 'origin/release/*' | sort -V | tail -1   # the newest release branch
+   git switch -c feature/<short-slug> origin/release/vX.Y.Z
+   ```
+
+   Kør altid det opslag i stedet for at kopiere et versionsnummer fra denne
+   vejledning: release-branches udskiftes ofte, og den nyeste flytter sig med
+   hver udgivelse. Branches hedder `feature/<short-slug>` eller
+   `fix/<short-slug>`.
 2. **Lav fokuserede commits.** Mindre, selvstændige ændringer er nemmere at
    gennemgå og merge end store.
 3. **Tilføj eller opdater tests** for enhver adfærd, du ændrer i `src/sim/` eller
@@ -92,24 +157,48 @@ Dette er de bærende regler i kodebasen. Den fulde detalje findes i
 - **Gameplay-matematikken følger MMO-formler fra den klassiske æra** (rage,
   hit-tabeller, rustning, XP-kurver). Lad være med at opfinde balancetal. Henvis
   i stedet til formlen.
+- **Ny logik lander som sit eget lille, testede modul bag en eksisterende
+  grænseflade** i stedet for at blive hægtet på en af de store
+  koordinatorfiler. Data, som rendereren eller HUD'en læser, går over
+  `IWorld`-grænsefladen (`src/world_api/`) og implementeres i både offline- og
+  online-verdenen; et nyt simuleringssystem lander bag `SimContext`; et nyt
+  REST-endpoint er et rutemodul, du kan stilladsere med `npm run new:endpoint`.
 - **Rediger ikke genererede filer i hånden** såsom `*.generated.ts`. Generér dem
   igen gennem build'et.
+- **Husstil for tekst: ingen lange tankestreger, korte tankestreger eller
+  emojis** nogen steder, hverken i kode, kommentarer, dokumentation,
+  commit-beskeder, PR-tekst eller tekst, spillerne ser. Brug kommaer, koloner,
+  parenteser eller "til" for intervaller. Et pre-push-tjek scanner din diff og
+  blokerer pushet ved et hit.
 - **Commit aldrig hemmeligheder** eller en `.env`-fil, og aktivér aldrig
   `ALLOW_DEV_COMMANDS` i en produktionssti, da det låser snyd op.
 
+### Kodestil
+
+Formateringen står [Biome](https://biomejs.dev/) for, konfigureret i
+`biome.json`: 2 mellemrums indrykning, linjer på 100 kolonner, enkelte
+anførselstegn, afsluttende kommaer. Formatér kun de filer, du har rørt
+(`npx @biomejs/biome check --write <your-file.ts>`), og tjek dem med
+`npm run ci:changed`. CI kontrollerer kun ændrede filer, så lad være med at
+omformatere resten af træet: en kørsel på tværs af hele repoet trækker
+mangeårig gæld frem, som ikke er din at rette.
+
 ## Før du åbner en pull request
 
-Kør venligst disse lokalt. Det er de samme tjek, som CI kører:
+Kør repositoriets gate lokalt. Det er den samme kontrakt, som CI håndhæver:
 
 ```bash
-npm test                    # Vitest suite
-npx tsc --noEmit            # TypeScript typecheck (the project is strict)
-npm run security:gate       # malicious-code release gate (high-severity signatures; also asserted by npm test)
-npm run build               # production client build
+npm run gate
 ```
 
-Hvis du har ændret server- eller headless-kode, så kør også `npm run build:server`
-og `npm run build:env`.
+Mens du itererer, kan du køre en enkelt suite (`npx vitest run tests/sim.test.ts`)
+og `npm run ci:changed` for formateringen; `npm test` kører det hele, og kortet
+over suiterne findes i `tests/CLAUDE.md`. Hele `npm run gate` dækker friskheden
+af genererede artefakter, malware-scanningen, formateringen af ændrede filer,
+konformitetstjekket af lydeffekter, hele testsuiten, en regressionsrunde i en
+rigtig browser, det strenge typetjek samt client-, server- og headless-build'ene.
+De lagdelte tjek, fra pre-push-gulvet og opefter, er beskrevet i
+[`docs/qa-gate.md`](../qa-gate.md).
 
 Test derefter din ændring på både desktop og mobil, herunder en
 telefonstørrelse-viewport i både stående og liggende format, hvis den berører
@@ -119,15 +208,24 @@ formularinput på mindst 16px skrifttype. UI-standarderne er dokumenteret i
 
 ## Åbn pull requesten
 
-Push din branch og åbn en PR mod `main`.
+Push din branch og åbn en PR **mod den samme nyeste `release/vX.Y.Z`-branch, som
+du startede fra. Sigt aldrig mod `main`**, som er en integrationsbranch til
+release-tid snarere end basis for bidrag. GitHub forudvælger ofte `main` for dig,
+så skift basisbranch, før du indsender.
 [Pull request-skabelonen](../../.github/PULL_REQUEST_TEMPLATE.md) guider dig
 gennem en kort tjekliste. Udfyld den venligst:
 
 - Beskriv **hvad** der blev ændret, og **hvorfor**.
 - Link et eventuelt relateret issue (for eksempel "Closes #123").
 - Tilføj **skærmbilleder eller et klip for UI-ændringer**, på desktop og mobil.
-- Bekræft, at tests, typecheck og build'et består, og at nye strenge er
-  oversat.
+- Bekræft, at `npm run gate` består, og at nye spillervendte strenge følger
+  politikken om engelsk først for bidragydere nedenfor.
+
+På din PR kører CI formatering og linting over dine ændrede filer, hele
+testsuiten fordelt på fire parallelle shards, en regressionsrunde i browseren
+samt typetjekket plus client-, server- og headless-build'ene. Det svarer til det,
+`npm run gate` kører lokalt, så en grøn gate er en god forudsigelse af en grøn
+PR.
 
 En grøn CI-kørsel og en komplet tjekliste er, hvad vi kigger efter, før vi
 merger. En maintainer kan foreslå ændringer. Det er en normal, samarbejdende del
@@ -135,32 +233,41 @@ af processen, ikke en afvisning. Vi sigter efter at være venlige og
 konstruktive i gennemgangen, og vi beder om det samme af dig.
 
 > Commit-beskeder og PR-titler følger [Conventional Commits](https://www.conventionalcommits.org/)
-> med et scope, hvor det passer (`feat(talents): ...`, `fix(net): ...`). Det er
-> en konvention, vi godt kan lide, snarere end et strengt krav. Tydelige,
-> beskrivende beskeder betyder mere end perfekt formatering.
+> med et scope (`feat(talents): ...`, `fix(net): ...`). Hver commit bærer også en
+> body: efter en tom linje en til fire enkle sætninger, der fortæller, hvad der
+> blev ændret og hvorfor, ombrudt omkring 72 kolonner. En titel alene er ikke nok.
 
 <a id="localization"></a>
 
 ## Lokalisering
 
-World of ClaudeCraft udgives på mange sprog, og vi holder det sådan, efterhånden
-som spillet vokser. Hver spillersynlig streng oversættes til hver understøttet
-lokalitet.
+World of ClaudeCraft udgives på mange sprog. Hver spillersynlig streng skal være
+en oversættelsesnøgle, mens bidragydere til funktioner normalt kun tilføjer den
+engelske kilde.
 
-- Al brugervendt tekst er en `t()`-nøgle defineret i [`src/ui/i18n.ts`](../../src/ui/i18n.ts).
-  Tilføj en ny streng til `en`-lokaliteten først, og angiv derefter en reel
-  oversættelse i alle andre lokaliteter i `supportedLanguages`. Ingen engelske
-  pladsholdere og ingen `// TODO`.
+- Al brugervendt tekst er en `t()`-nøgle. Tilføj ny engelsk tekst til det
+  tilsvarende domænemodul under
+  [`src/ui/i18n.catalog/`](../../src/ui/i18n.catalog/) (ny HUD-ramme hører til i
+  `hud_chrome.ts`), og render den derefter med `t('dotted.key', values)`. Kun
+  engelsk er præcis det rigtige for en feature-PR: maintaineren udfylder de
+  øvrige lokaliteter ved release, så du redigerer ikke overlayene i
+  `src/ui/i18n.locales/`, og du efterlader aldrig en engelsk pladsholder eller en
+  `// TODO` i et af dem. M16-undtagelsen er en ny ordrig engelsk værdi, som også
+  kræver de fem ikke-latinske udfyldninger, der er beskrevet i
+  [`src/ui/CLAUDE.md`](../../src/ui/CLAUDE.md).
 - Tal, penge, datoer, enheder og procenter går gennem formaterne
   (`formatNumber`, `formatMoney`, `formatDateTime`, `Intl`) i stedet for manuel
   strengbygning.
 - Spillervendt tekst, der udsendes fra `src/sim/` eller `server/`, som forbliver
   sprogagnostiske, skal lokaliseres igen ved klientgrænsen i samme ændring.
   Guard-testen `npx vitest run tests/localization_fixes.test.ts` håndhæver dette.
+- Efter du har tilføjet eller ændret en streng, så kør `npm run i18n:gen`, og
+  commit de regenererede bundles i samme ændring. Både gaten og CI sammenligner
+  de committede artefakter med en frisk regenerering, så en forældet bundle får
+  build'et til at fejle.
 
-Hvis din ændring tilføjer en streng, og du kun kan skrive den på nogle sprog, er
-det fint. Åbn PR'en og bed om hjælp med resten i beskrivelsen. Vi vil meget
-hellere hjælpe dig med at blive færdig end have, at du holder igen.
+Så tilføj dine strenge på engelsk, og åbn PR'en; du behøver ikke selv at oversætte
+dem. Hvis du gerne vil hjælpe med oversættelser, så se næste afsnit.
 
 <a id="translating-the-game"></a>
 
@@ -169,11 +276,19 @@ hellere hjælpe dig med at blive færdig end have, at du holder igen.
 Vil du forbedre et sprog eller hjælpe med at bringe spillet til et nyt? Du behøver
 ikke at skrive nogen spilkode for at gøre det:
 
-1. Åbn [`src/ui/i18n.ts`](../../src/ui/i18n.ts) og find den lokalitet, du vil
-   arbejde på. Hvert lokalitetsobjekt lister de samme nøgler som `en`.
+1. De fleste spillervendte oversættelser bor i overlay-filerne pr. sprog under
+   [`src/ui/i18n.locales/`](../../src/ui/i18n.locales/) (en pr. lokalitet), som
+   spejler de engelske nøgler i
+   [`src/ui/i18n.catalog/`](../../src/ui/i18n.catalog/). Tekst, der udsendes af
+   simuleringen og serveren, oversættes i `src/ui/sim_i18n.ts` og
+   `src/ui/server_i18n.ts`, talenttekst i `talent_i18n`-modulerne, og
+   admin-dashboardet har sit eget sæt under `src/admin/i18n.locales/`.
 2. Forbedr eksisterende oversættelser, eller udfyld dem, der læses akavet.
-3. Kør `npx tsc --noEmit` for at bekræfte, at intet mangler, og åbn derefter en
-   PR.
+3. Kør `npm run i18n:gen`, commit de regenererede bundles sammen med din
+   overlay-ændring, kør derefter lokaliseringssuiterne
+   (`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`)
+   og åbn en PR. Et typetjek alene fortæller dig ikke, om en nøgle mangler, da
+   overlayene bevidst er sparsomme.
 
 For at foreslå en helt ny lokalitet eller for at drøfte tone og terminologi kan
 du starte en tråd på [Discord](https://discord.com/invite/worldofclaudecraft), så hjælper vi dig
@@ -190,6 +305,9 @@ Brug venligst [issue-skabelonerne](https://github.com/levy-street/world-of-claud
   desktop eller mobil).
 - **Funktionsanmodning.** Beskriv det problem, du forsøger at løse, ikke kun
   løsningen. Kontekst hjælper os med at designe det rigtige.
+- **Sikkerhedssårbarheder.** Åbn venligst ikke et offentligt issue. Rapportér dem
+  privat ved at følge [SECURITY.md](../../SECURITY.md), så arbejder vi sammen med
+  dig om en rettelse og om offentliggørelsen.
 
 ## Få hjælp
 
@@ -199,8 +317,44 @@ lille, og nye bidragydere er altid velkomne.
 
 ## Licens
 
-Ved at bidrage accepterer du, at dine bidrag licenseres under projektets
-[MIT-licens](../../LICENSE), den samme licens, der dækker projektet.
+Ved at bidrage med kode accepterer du, at dine kodebidrag licenseres under
+projektets [MIT-licens](../../LICENSE), den samme licens, der dækker projektet.
+
+MIT-licensen betyder præcis, hvad den siger: enhver må bruge, ændre og
+videredistribuere koden, kommercielt eller ej. Vores
+[servicevilkår](https://worldofclaudecraft.com/terms) gælder for det hostede
+spil, vi driver på worldofclaudecraft.com (konti, adfærd, virtuelle genstande),
+og de begrænser ikke de rettigheder, MIT-licensen giver dig eller andre i denne
+kode. Navnene og brandingen "World of ClaudeCraft" og "Levy Street" er ikke
+dækket af MIT-licensen.
+
+Originale kreative assets (lydoptagelser, musik, kunst og lignende ophavsretligt
+beskyttede værker) er undtagelsen. Hvis du bidrager med et originalt asset, du
+selv har skabt, må du i stedet beholde ophavsretten og bidrage med det under en
+licens efter eget valg (for eksempel CC BY-NC 4.0), forudsat at:
+
+- licensen, de asset-stier den dækker, og din kreditering er noteret i
+  licenstabellen i [CREDITS.md](../../CREDITS.md) som en del af den samme pull
+  request, og
+- den som minimum indeholder en evigtgyldig, royaltyfri tilladelse til Levy
+  Street til at bruge assetsene kommercielt i World of ClaudeCraft, herunder i
+  officielle udgivelser og i in-game-butikken.
+
+For assets, der står i tabellen i CREDITS.md, går den noterede licens forud for
+projektets MIT-standardlicens.
+
+**Medie-assets uden en post i CREDITS.md er ikke licenseret under MIT.**
+Registret er stadig ved at blive gjort færdigt, så en manglende post betyder, at
+vilkårene ikke er noteret, ikke at assetet er frit at tage. Det er med vilje: det
+forhindrer, at et uregistreret bidrag gives væk som standard. For kode er det
+omvendt, og alt, der ikke er undtaget i CREDITS.md, er MIT.
+
+Netop derfor er posten i registret ikke valgfrit papirarbejde. Hvis du bidrager
+med et asset uden en række i CREDITS.md, kan ingen længere nede i kæden bruge
+det, og vi har ingen registrering af, hvad du har givet os lov til. Udfyld også
+kolonnen **Redistribution** ærligt. Det er den, der fortæller nogen, som forker
+dette projekt, om de må give dit asset videre, og nogle rækker er markeret med
+"No, permission required" netop, fordi det ikke er tilladt.
 
 ---
 

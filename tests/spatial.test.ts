@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { CAMPS } from '../src/sim/data';
+import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { SpatialGrid } from '../src/sim/spatial';
 import { dist2d, type Entity } from '../src/sim/types';
-import { terrainHeight } from '../src/sim/world';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 function bruteForceInRadius(sim: Sim, x: number, z: number, radius: number): Set<number> {
   const out = new Set<number>();
@@ -78,24 +79,21 @@ describe('spatial grid', () => {
   it('player combat flag matches per-player scan semantics', () => {
     const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
     const p = sim.entities.get(sim.primaryId)!;
-    // Stand on open ground just outside a camp and walk AT it. Marching
-    // blindly out of spawn used to work only because the town was empty; it
-    // is furnished now (see src/sim/town_props.ts), so a blind walk parks the
-    // body against a workbench and no mob ever notices it.
-    const camp = CAMPS.find((c) => Math.hypot(c.center.x, c.center.z) < 140);
-    if (!camp) throw new Error('test fixture needs a nearby camp');
-    const len = Math.hypot(camp.center.x, camp.center.z) || 1;
-    const startX = camp.center.x - (camp.center.x / len) * 30;
-    const startZ = camp.center.z - (camp.center.z / len) * 30;
-    p.pos = { x: startX, y: terrainHeight(startX, startZ, sim.cfg.seed), z: startZ };
-    p.prevPos = { ...p.pos };
-    p.onGround = true;
-    p.facing = Math.atan2(camp.center.x - p.pos.x, camp.center.z - p.pos.z);
-    // walk the player into a camp until something aggroes
+    // Stage the pull in the collider-free open-field lane rather than walking a fixed
+    // heading out of the spawn hoping to reach a camp: that route depends on whatever
+    // the authored world puts on the heading (it now wedges the player against a fence
+    // 27 yards north, so nothing ever aggroes). The mob's own aggro scan still makes
+    // the pull, which is what the per-player combat flag is being checked against.
+    placePlayerInOpenField(sim);
+    const wolf = createMob(sim.nextId++, MOBS.forest_wolf, 1, {
+      x: p.pos.x,
+      y: p.pos.y,
+      z: p.pos.z + 5,
+    });
+    wolf.hostile = true;
+    sim.addEntity(wolf);
     let aggroed = false;
-    for (let i = 0; i < 4000 && !aggroed; i++) {
-      const meta = sim.players.get(sim.primaryId)!;
-      meta.moveInput.forward = true;
+    for (let i = 0; i < 400 && !aggroed; i++) {
       sim.tick();
       for (const e of sim.entities.values()) {
         if (

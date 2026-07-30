@@ -166,6 +166,8 @@ const SHARE_GLYPH =
 
 export class CharWindow {
   private openerFocus: HTMLElement | null = null;
+  // One-shot: the mount card to ring + scroll to on the next render (a bag
+  // click on a reins item lands here). Cleared after that render paints it.
 
   constructor(private readonly deps: CharWindowDeps) {}
 

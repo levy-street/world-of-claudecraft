@@ -31,6 +31,8 @@ export interface BagItemInfo {
   noDiscard?: boolean;
   /** Bound to its owner: cannot be traded, mailed, listed, or sold. */
   soulbound?: boolean;
+  /** The catalog mount a kind:'mount' reins item owns (see MountItemDef). */
+  mount?: string;
 }
 
 /** The open-window modes that change what a bag click does. At most one is the
@@ -79,6 +81,7 @@ export type BagTooltipHintKey =
   | 'hudChrome.bank.depositHint'
   | 'hudChrome.bank.cannotDeposit'
   | 'itemUi.tooltip.clickDestroy'
+  | 'hudChrome.mounts.clickManage'
   | 'itemUi.tooltip.clickEquip'
   | 'itemUi.tooltip.clickConsume'
   | 'itemUi.tooltip.clickUseInstant'
@@ -111,6 +114,9 @@ export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
   if (mode.petFeed) return item.kind === 'food' ? 'petFeed' : 'petFeedBlocked';
   if (item.kind === 'quest') return 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
+  // A collected reins item falls through to 'use' like any other usable item:
+  // clicking it summons that mount (sim useItem -> summonMountItem). There is no
+  // picker to open any more.
   return 'use';
 }
 
@@ -231,6 +237,7 @@ export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipH
   if (mode.bankDeposit)
     return item.kind === 'quest' ? 'hudChrome.bank.cannotDeposit' : 'hudChrome.bank.depositHint';
   if (item.kind === 'quest') return 'itemUi.tooltip.clickDestroy';
+  if (item.kind === 'mount') return 'hudChrome.mounts.clickManage';
   if (
     item.kind === 'weapon' ||
     item.kind === 'armor' ||

@@ -24,7 +24,7 @@ export interface MailMessageView {
 }
 
 export interface MailInfo {
-  messages: MailMessageView[]; // newest first, capped to one wire window
+  messages: MailMessageView[]; // newest first, all delivered letters in the box
   totalCount: number; // all delivered letters in the box
   unread: number;
   postage: number; // copper cost per sent letter

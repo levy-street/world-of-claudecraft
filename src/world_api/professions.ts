@@ -223,12 +223,16 @@ export interface IWorldProfessions {
   activeMobileStationCraft: string | null;
   // Enchanting profession commands (Professions 2.0): disenchant a held
   // eligible weapon/armor piece into arcane materials, apply an enchant to a held
-  // copy, or salvage a held piece into generic materials. Server-authoritative:
-  // Sim re-validates ownership/eligibility/throttle inside the resolvers
+  // copy, or salvage a held piece into generic materials. `slotIndex`, when
+  // present, requests the exact carried inventory slot the player clicked; the
+  // sim re-validates that it still holds `itemId` before consuming it, so stale
+  // UI can never destroy a different stack. Omitted, the legacy item-id
+  // resolver remains in force. Server-authoritative: Sim re-validates
+  // ownership/eligibility/throttle inside the resolvers
   // (src/sim/professions/enchanting.ts and salvage.ts) and nothing is trusted from
   // the client; ClientWorld sends the disenchant_item/apply_enchant/salvage_item
   // wire command and never decides the outcome.
-  disenchantItem(itemId: string): void;
+  disenchantItem(itemId: string, target?: { slotIndex: number }): void;
   // `slot` targets the copy WORN in that equipment slot, enchanting it in place
   // (no unequip / enchant / re-equip round trip). Omitted, the enchant applies to
   // a bagged copy exactly as before. It is a SLOT and not an item id because

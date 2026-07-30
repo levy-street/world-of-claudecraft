@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { castBarState, consumeBarState } from '../src/render/cast_bar';
+import { castBarState, consumeBarState, mountSummonBarState } from '../src/render/cast_bar';
+import { MOUNT_SUMMON_SECONDS } from '../src/sim/mounts';
 import { CONSUME_DURATION, type Consuming, type Entity } from '../src/sim/types';
 
 // castBarState reads only a handful of cast fields, so a minimal partial entity
@@ -189,6 +190,59 @@ describe('overhead eat/drink overlay', () => {
     const a = consumeBarState(food(8), drink(3));
     const b = consumeBarState(food(8), drink(3));
     expect(a).toEqual(b);
+  });
+});
+
+// mountSummonBarState: the player-only mount summon channel bar. Hidden during a
+// dismount channel (mountCastKey === '') and when mountCastRemaining is 0 or
+// negative. Drains like a channel over MOUNT_SUMMON_SECONDS. The mountKey is the
+// stable discriminator; the painter resolves the localized mount name.
+describe('mount summon bar', () => {
+  it('is hidden when mountCastKey is empty (no summon or dismount channel)', () => {
+    const s = mountSummonBarState(0, '');
+    expect(s.visible).toBe(false);
+  });
+
+  it('is hidden when mountCastKey is empty even if time remains (dismount channel)', () => {
+    // A dismount channel has mountCastKey === '': the summon bar must NOT show.
+    const s = mountSummonBarState(0.5, '');
+    expect(s.visible).toBe(false);
+  });
+
+  it('is hidden when remaining is zero even if a key is set', () => {
+    expect(mountSummonBarState(0, 'valorsteed').visible).toBe(false);
+  });
+
+  it('shows a full bar at the start of a summon (full MOUNT_SUMMON_SECONDS remaining)', () => {
+    const s = mountSummonBarState(MOUNT_SUMMON_SECONDS, 'valorsteed');
+    expect(s.visible).toBe(true);
+    expect(s.fill).toBeCloseTo(1);
+    expect(s.mountKey).toBe('valorsteed');
+    expect(s.remaining).toBeCloseTo(MOUNT_SUMMON_SECONDS);
+  });
+
+  it('drains the fill toward zero as time ticks down', () => {
+    // Half the summon time elapsed -> half-full (draining channel).
+    const s = mountSummonBarState(MOUNT_SUMMON_SECONDS / 2, 'grag_bear');
+    expect(s.visible).toBe(true);
+    expect(s.fill).toBeCloseTo(0.5);
+    expect(s.mountKey).toBe('grag_bear');
+  });
+
+  it('clamps fill to 0..1 against transient overshoot', () => {
+    expect(mountSummonBarState(MOUNT_SUMMON_SECONDS + 5, 'valorsteed').fill).toBe(1);
+    expect(mountSummonBarState(-1, 'valorsteed').visible).toBe(false);
+  });
+
+  it('is deterministic: same inputs give the same output', () => {
+    const a = mountSummonBarState(0.75, 'stormfeather_griffin');
+    const b = mountSummonBarState(0.75, 'stormfeather_griffin');
+    expect(a).toEqual(b);
+  });
+
+  it('carries the correct mountKey for the painter to localize', () => {
+    const epic = mountSummonBarState(1.0, 'thunderstrut_gobbler');
+    expect(epic.mountKey).toBe('thunderstrut_gobbler');
   });
 });
 

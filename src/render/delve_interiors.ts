@@ -41,10 +41,13 @@ export function buildDelveModule(
   const variant = DELVE_MODULE_VARIANT[moduleId] ?? 'delve_ossuary';
   // Static Blackwater hazard pools (The Drowned Litany) are authored on the module
   // def; the renderer draws a visible pool at each so the sim's damage zone reads.
-  return dungeons.buildInterior(interior, ox, oz, {
-    layout,
-    variant,
-    hazards: mod?.hazards,
-    moduleId,
-  });
+  // The built group is only tracked for rift interiors; delves discard it.
+  return dungeons
+    .buildInterior(interior, ox, oz, {
+      layout,
+      variant,
+      hazards: mod?.hazards,
+      moduleId,
+    })
+    .then(() => undefined);
 }

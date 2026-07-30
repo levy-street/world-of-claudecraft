@@ -1,16 +1,27 @@
 import { describe, expect, it } from 'vitest';
+import { BUILTIN_WORLD, zoneAt } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import { SimEvent } from '../src/sim/types';
-import { zoneAt } from '../src/sim/data';
+import type { SimEvent, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
+// /graveyard reads the zone table (kept on the fixture); ambient camps, npcs
+// and quest objects play no part, so strip them to keep the ctor and
+// sim.tick() cheap (same subsystem-world pattern as tests/dot_final_tick.test.ts).
+const GRAVEYARD_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: GRAVEYARD_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
   const e = sim.entities.get(pid)!;
-  e.pos.x = x; e.pos.z = z;
+  e.pos.x = x;
+  e.pos.z = z;
   e.pos.y = groundHeight(x, z, sim.cfg.seed);
   e.prevPos = { ...e.pos };
 }
@@ -29,7 +40,7 @@ describe('/graveyard command', () => {
     const a = sim.addPlayer('warrior', 'Aleph');
     sim.tick();
     teleport(sim, a, 0, 0); // overworld, first zone
-    const zone = zoneAt(0);
+    const zone = zoneAt(0, 0);
     const gy = zone.graveyard;
     const expected = `If you fall here, your spirit returns to the ${zone.name} graveyard at (${Math.floor(gy.x)}, ${Math.floor(gy.z)}).`;
 
@@ -42,7 +53,7 @@ describe('/graveyard command', () => {
     const a = sim.addPlayer('warrior', 'Aleph');
     sim.tick();
     teleport(sim, a, 0, 600); // deeper zone (Thornpeak range, zMin 540)
-    const zone = zoneAt(600);
+    const zone = zoneAt(0, 600);
     const gy = zone.graveyard;
     const expected = `If you fall here, your spirit returns to the ${zone.name} graveyard at (${Math.floor(gy.x)}, ${Math.floor(gy.z)}).`;
 

@@ -45,6 +45,33 @@ describe('Wildfang Rally never stacks with itself', () => {
   });
 });
 
+describe('Emboldening Roar never stacks its crit buff with itself', () => {
+  it('two Fury warriors casting on an overlapping ally leave exactly one 3-charge copy', () => {
+    const sim = new Sim({ seed: 2026, playerClass: 'warrior', noPlayer: true }) as AnySim;
+    const a = sim.addPlayer('warrior', 'WarriorA');
+    const b = sim.addPlayer('warrior', 'WarriorB');
+    for (const pid of [a, b]) {
+      sim.setPlayerLevel(20, pid);
+      expect(sim.setSpec('fury', pid)).toBe(true);
+    }
+    const entA = sim.entities.get(a) as Entity;
+    const entB = sim.entities.get(b) as Entity;
+    entB.pos = { ...entA.pos };
+
+    sim.castAbility('emboldening_roar', a);
+    entB.gcdRemaining = 0;
+    sim.castAbility('emboldening_roar', b);
+
+    for (const ent of [entA, entB]) {
+      const crit = ent.auras.filter((x) => x.id === 'emboldening_roar_crit');
+      expect(crit, 'one Emboldened copy').toHaveLength(1);
+      expect(crit[0].charges).toBe(3);
+      // The later cast owns the surviving copy.
+      expect(crit[0].sourceId).toBe(b);
+    }
+  });
+});
+
 describe('every group buff is exhaustion-gated or source-independent', () => {
   it('no aoeAlly buff can silently self-stack across casters', () => {
     const offenders: string[] = [];
@@ -58,6 +85,16 @@ describe('every group buff is exhaustion-gated or source-independent', () => {
           // The dispatch stamps this half as `${abilityId}_ap`.
           if (!SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS.has(`${ability.id}_ap`)) {
             offenders.push(`${ability.id} (aoeAllyAttackPower)`);
+          }
+        } else if (eff.type === 'aoeAllySureCrit') {
+          // The dispatch stamps this as `${abilityId}_crit` (Emboldening Roar).
+          if (!SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS.has(`${ability.id}_crit`)) {
+            offenders.push(`${ability.id} (aoeAllySureCrit)`);
+          }
+        } else if (eff.type === 'aoeAllyMaxHp') {
+          // The dispatch stamps this as `${abilityId}_hp` (Rallying Cry).
+          if (!SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS.has(`${ability.id}_hp`)) {
+            offenders.push(`${ability.id} (aoeAllyMaxHp)`);
           }
         }
       }

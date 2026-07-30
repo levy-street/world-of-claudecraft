@@ -8,7 +8,7 @@
 // mirror produce identical output, and (unlike world.entities) none of it is
 // interest-radius limited: a camp far across the zone still resolves.
 
-import { CAMPS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
+import { CAMPS, ESCORTS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
 import { type QuestObjective, type QuestProgress, questObjectiveRequired } from './types';
 
 /** Identity of one quest objective (the map tooltip resolves its localized
@@ -175,6 +175,10 @@ export function questObjectiveAreas(
         if (node.type === obj.nodeType)
           push(ref, { x: node.pos.x, z: node.pos.z }, POINT_AREA_RADIUS);
       }
+    } else if (obj.type === 'escort') {
+      // The escort begins where the idle escortee stands (its def start point).
+      const escort = ESCORTS[obj.escortId];
+      if (escort) push(ref, { x: escort.start.x, z: escort.start.z }, POINT_AREA_RADIUS);
     }
   }
   return out;

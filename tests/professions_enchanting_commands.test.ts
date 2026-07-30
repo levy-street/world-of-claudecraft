@@ -901,6 +901,7 @@ describe('ClientWorld enchanting members are live (send + event mirror)', () => 
       c.ws = { readyState: 1, send: (p: string) => sent.push(JSON.parse(p)) };
       const client = c as ClientWorld;
       client.disenchantItem('sword_x');
+      client.disenchantItem('sword_x', { slotIndex: 3 });
       client.applyEnchant('sword_x', 'ench_y');
       client.applyEnchant('sword_x', 'ench_y', 'offhand');
       client.applyEnchant('sword_x', 'ench_y', undefined, true);
@@ -909,6 +910,7 @@ describe('ClientWorld enchanting members are live (send + event mirror)', () => 
       client.salvageItem('sword_z');
       expect(sent).toEqual([
         { t: 'cmd', cmd: 'disenchant_item', item: 'sword_x' },
+        { t: 'cmd', cmd: 'disenchant_item', item: 'sword_x', slot: 3 },
         // No slot given: an undefined field drops out of the JSON entirely, so a
         // bagged apply stays byte-identical to the pre-feature wire form.
         { t: 'cmd', cmd: 'apply_enchant', item: 'sword_x', enchant: 'ench_y' },

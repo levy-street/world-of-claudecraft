@@ -802,4 +802,12 @@ export const table: DeedLocaleTable = {
     name: 'Dziedziniec Rozbieraczy',
     desc: 'Odzyskaj 50 sztuk ekwipunku, rozkładając je na surowce.',
   },
+  dgn_wildheart_basin: {
+    name: 'Kotlina Odgryza Się',
+    desc: 'Pokonaj Zulgara, Głos Kotliny, w Kotlinie Dzikiego Serca.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroiczna: Kotlina Dzikiego Serca',
+    desc: 'Pokonaj Zulgara, Głos Kotliny, w Kotlinie Dzikiego Serca na heroicznym poziomie trudności.',
+  },
 };

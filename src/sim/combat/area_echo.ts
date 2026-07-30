@@ -42,7 +42,20 @@ function replayDamage(
   let targets = 0;
   for (const hostile of ctx.hostilesInRadius(source, primary.pos, AOE_ECHO_RADIUS)) {
     if (hostile.id === primary.id || !ctx.hasLineOfSight(source, hostile)) continue;
-    ctx.dealDamage(source, hostile, replayed, false, school, abilityName, 'hit', false, threat);
+    ctx.dealDamage(
+      source,
+      hostile,
+      replayed,
+      false,
+      school,
+      abilityName,
+      'hit',
+      false,
+      threat,
+      true,
+      false,
+      true,
+    );
     targets += 1;
     if (targets >= maxTargets) return;
   }

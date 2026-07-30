@@ -17,6 +17,9 @@ export const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS: ReadonlySet<string> = new S
   'battle_shout',
   'blessing_of_might',
   'devotion_aura',
+  // Emboldening Roar (Fury aoeAllySureCrit): two Fury warriors must not stack
+  // two separate 3-charge guaranteed-crit auras on a shared ally.
+  'emboldening_roar_crit',
   'mark_of_the_wild',
   'power_word_fortitude',
   'rallying_cry_dr',

@@ -36,6 +36,8 @@ import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import type { PlayerClass } from '../src/sim/types';
 
+const hudSrc = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+
 interface FakeClient {
   sent: any[];
   ws: any;
@@ -199,6 +201,19 @@ describe('market collect indicator markup parity', () => {
       expect(html, `${entry} badge lost its localized tooltip`).toContain(
         'data-i18n-title="hudChrome.marketIndicator.tip"',
       );
+      expect(html, `${entry} badge gained visible text that can disturb the minimap`).toMatch(
+        /<button id="market-indicator"[^>]*><\/button>/,
+      );
     }
+  });
+
+  it('wires the shared HUD tooltip on hover and keyboard focus', () => {
+    const initStart = hudSrc.indexOf('private initMarketIndicator(): void');
+    expect(initStart).toBeGreaterThanOrEqual(0);
+    const initEnd = hudSrc.indexOf('\n  // The World Market coin by the minimap', initStart);
+    expect(initEnd).toBeGreaterThan(initStart);
+    const initBody = hudSrc.slice(initStart, initEnd);
+    expect(initBody).toMatch(/this\.attachTooltip\(\s*el,/);
+    expect(initBody).toContain("t('hudChrome.marketIndicator.tip')");
   });
 });

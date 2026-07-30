@@ -149,7 +149,10 @@ describe('prepare_ai_review: event and prompt validation', () => {
     } finally {
       fs.rmSync(fixture, { recursive: true, force: true });
     }
-  }, 30_000);
+    // Real-git integration test: the shared clone of the whole repo plus a
+    // commit can exceed 30s under full-suite disk/CPU contention (a measured
+    // recurring gate flake); passes in isolation in a few seconds.
+  }, 120_000);
 });
 
 describe('post_ai_review: structured output', () => {

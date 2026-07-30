@@ -306,17 +306,12 @@ function isolate(): void {
 type MainModule = typeof import('../../../server/main');
 
 // A Dispatch that BAKES IN the /api dispatch mode: it flips the flag (legacy vs
-// new) via the test-only setter, drives the real routeHttpRequest, then polls
-// res.writableEnded (routeHttpRequest is synchronous fire-and-forget).
+// new) via the test-only setter and drives the real routeHttpRequest. The shared
+// captureResponse helper waits on FakeRes's end signal.
 function makeModedDispatch(main: MainModule, mode: 'legacy' | 'new'): Dispatch {
-  return async (req, res) => {
+  return (req, res) => {
     main.setApiDispatchModeForTests(mode);
     main.routeHttpRequest(req, res);
-    let ticks = 0;
-    while (!(res as unknown as { writableEnded: boolean }).writableEnded) {
-      if (ticks++ > MAX_POLL_TICKS) throw new Error('response never ended');
-      await new Promise((r) => setImmediate(r));
-    }
   };
 }
 

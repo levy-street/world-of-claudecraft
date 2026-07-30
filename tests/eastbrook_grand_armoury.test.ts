@@ -630,9 +630,12 @@ describe('Eastbrook Grand Armoury render seam', () => {
   it('dispatches the landmark before the old inn asset branch', () => {
     const source = readFileSync(new URL('../src/render/props.ts', import.meta.url), 'utf8');
     const armouryDispatch = source.indexOf('buildEastbrookGrandArmouryView(b, ground)');
-    const legacyInnDispatch = source.indexOf("b.kind === 'inn' ? 'inn'");
+    // The legacy per-kind asset resolution (the `inn` entry now rides a
+    // kindAsset lookup rather than an inline ternary, so the Veiled Hollow set
+    // can share it) must stay BELOW the landmark dispatch, which `continue`s.
+    const legacyAssetDispatch = source.indexOf('kindAsset[b.kind] ??');
     expect(armouryDispatch).toBeGreaterThan(0);
-    expect(legacyInnDispatch).toBeGreaterThan(armouryDispatch);
+    expect(legacyAssetDispatch).toBeGreaterThan(armouryDispatch);
     expect(source).toMatch(
       /const armoury = buildEastbrookGrandArmouryView\(b, ground\);\s*if \(armoury\) \{\s*group\.add\(armoury\.group\);\s*registerHideable\(\s*armoury\.group,\s*obbFootprint\(b\.x, b\.z, b\.w \/ 2, b\.d \/ 2, b\.rot, armoury\.cameraTopY\),\s*\);\s*continue;\s*\}/,
     );

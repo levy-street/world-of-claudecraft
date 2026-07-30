@@ -33,7 +33,7 @@ import {
   hotTickBonus,
 } from '../spell_scaling';
 import { stunDrCategory } from '../stun_dr';
-import { addThreat } from '../threat';
+import { addThreat, dropThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import {
   angleTo,
@@ -122,6 +122,49 @@ function preservesStealth(ability: AbilityDef): boolean {
     ability.id === 'sap' ||
     ability.id === 'shadowstep'
   );
+}
+
+function dropsCombatOnStealth(ability: AbilityDef): boolean {
+  return ability.id === 'vanish';
+}
+
+function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
+  p.combatTimer = 5;
+  p.inCombat = false;
+  p.autoAttack = false;
+  p.targetId = null;
+  p.queuedOnSwing = null;
+  delete p.queuedOnSwingFree;
+  delete p.queuedOnSwingCostMultiplier;
+
+  const pet = ctx.petOf(p.id);
+  const escapeIds = pet ? [p.id, pet.id] : [p.id];
+  if (pet) {
+    pet.combatTimer = 5;
+    pet.inCombat = false;
+    pet.aggroTargetId = null;
+    pet.targetId = null;
+  }
+
+  for (const entity of ctx.entities.values()) {
+    if (entity.kind !== 'mob' || entity.dead || !ctx.isHostileTo(p, entity)) continue;
+    let dropped = false;
+    for (const id of escapeIds) {
+      if (entity.threat.has(id) || entity.forcedTargetId === id) dropped = true;
+      dropThreat(entity, id);
+      if (entity.aggroTargetId === id) {
+        entity.aggroTargetId = null;
+        dropped = true;
+      }
+    }
+    if (!dropped) continue;
+    if (entity.ownerId !== null) {
+      if (entity.aggroTargetId === null) entity.inCombat = false;
+    } else if (entity.threat.size === 0 && entity.aggroTargetId === null) {
+      entity.aiState = 'evade';
+      entity.inCombat = false;
+    }
+  }
 }
 
 // Resolve the exclusiveGroup for an AURA id: either a plain ability id (a
@@ -403,7 +446,7 @@ export function runEffects(
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
-        ctx.dealDamage(
+        const resolvedDamage = ctx.dealDamage(
           p,
           target,
           finalDamage,
@@ -420,10 +463,18 @@ export function runEffects(
         );
         if (areaEcho) {
           areaEchoDealt = true;
-          echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
+          echoAreaDamage(ctx, p, target, resolvedDamage, ability.school, ability.name, threatOpts);
         }
         if (sweeping)
-          sweepStrikeDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
+          sweepStrikeDamage(
+            ctx,
+            p,
+            target,
+            resolvedDamage,
+            ability.school,
+            ability.name,
+            threatOpts,
+          );
         // Power Echo (mage choice row): the armed echo repeats the SAME
         // resolved amount at its fraction on the same target (already rolled,
         // post crit; no new rng draw), consumed BEFORE the repeat so a copy
@@ -1130,8 +1181,14 @@ export function runEffects(
             e.type === 'aoeRoot',
         );
         if (eff.directPct !== undefined && lastDirectDamage <= 0) break;
+        // Combo-point finishers (rupture/rip, spendsCombo: true) add a perCombo
+        // term to the base total, mirroring finisherDamage/finisherHaste/
+        // finisherStun below: spentCombo is already 0 for any ability that
+        // doesn't spend combo, so this is a no-op for every other dot.
         const dotTotal =
-          eff.directPct === undefined ? eff.total : Math.round(lastDirectDamage * eff.directPct);
+          eff.directPct === undefined
+            ? eff.total + (eff.perCombo ?? 0) * spentCombo
+            : Math.round(lastDirectDamage * eff.directPct);
         const dotBase = Math.max(1, Math.round(dotTotal / (eff.duration / eff.interval)));
         // Physical bleeds (Rend, Rupture, Garrote, Rip) scale off melee Attack
         // Power here just like a spell DoT scales off Spell Power; `hybrid` still
@@ -1438,7 +1495,10 @@ export function runEffects(
           res.castTime,
           true,
         );
-        const baseAmount = ctx.rng.range(eff.min, eff.max) + chainSpBonus;
+        // Resolve the shared primary amount once before applying hop falloff.
+        // Fractional spell-power coefficients must not make later hops round
+        // from a hidden value that differs from the primary damage players saw.
+        const baseAmount = Math.round(ctx.rng.range(eff.min, eff.max) + chainSpBonus);
         const hitsPrimary = eff.hitsPrimary === true && target !== null;
         const hitList: Entity[] = hitsPrimary && target ? [target] : [];
         const excluded = new Set<number>([p.id]);
@@ -2145,7 +2205,10 @@ export function runEffects(
         break;
       }
       case 'breakRoots': {
-        removeRootAuras(ctx, p);
+        // Self-cast only: a personal barrier laid on a friendly TARGET (the
+        // Chronomancy Temporal Barrier can shield an ally) must not cleanse
+        // the caster's own root just because they cast the spell.
+        if (!target || target === p) removeRootAuras(ctx, p);
         break;
       }
       case 'breakControl': {
@@ -2294,6 +2357,9 @@ export function runEffects(
           charges: eff.charges,
           icdMax: eff.internalCooldown,
         });
+        if (eff.kind === 'stealth' && dropsCombatOnStealth(ability)) {
+          dropSelfFromHostileFocus(ctx, p);
+        }
         recalcPlayerStats(
           p,
           meta.cls,

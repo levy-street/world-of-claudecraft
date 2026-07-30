@@ -2,6 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FiestaController } from '../src/ui/hud/fiesta/fiesta_controller';
+import { t } from '../src/ui/i18n';
 import type { FiestaMatchInfo, IWorld } from '../src/world_api';
 
 function match(overrides: Partial<FiestaMatchInfo> = {}): FiestaMatchInfo {
@@ -174,5 +175,32 @@ describe('FiestaController', () => {
     expect(test.audio.click).toHaveBeenCalledTimes(1);
     expect(test.augments.style.display).toBe('none');
     expect(test.augments.innerHTML).toBe('');
+  });
+
+  it('localizes each augment card aria-label through one composed t() key', () => {
+    const test = harness();
+    test.fiesta.offer = {
+      tier: 'silver',
+      wave: 1,
+      choices: ['aug_brutality', 'aug_toughness', 'aug_keen_eye'],
+    };
+
+    test.controller.update();
+
+    const cards = test.augments.querySelectorAll<HTMLButtonElement>('.fa-card');
+    const expected = [
+      { id: 'aug_brutality', category: t('fiesta.category.offense') },
+      { id: 'aug_toughness', category: t('fiesta.category.defense') },
+      { id: 'aug_keen_eye', category: t('fiesta.category.offense') },
+    ];
+    expected.forEach((augment, index) => {
+      expect(cards[index].getAttribute('aria-label')).toBe(
+        t('fiesta.augment.cardAria', {
+          name: t(`fiesta.augment.${augment.id}.name` as Parameters<typeof t>[0]),
+          category: augment.category,
+          description: t(`fiesta.augment.${augment.id}.desc` as Parameters<typeof t>[0]),
+        }),
+      );
+    });
   });
 });

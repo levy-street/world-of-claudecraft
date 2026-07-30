@@ -70,6 +70,10 @@ const parse = (res: any) => ({
 // the right rows by inspecting the SQL, and records the writes it sees.
 let accountRow: any;
 let characters: any[];
+// Rows returned for the account-wide (every realm) character read the GDPR
+// export uses: distinct from `characters` (this process's realm only) so a
+// test can prove the export is not silently dropping the other-realm rows.
+let charactersAllRealms: any[];
 let charCount: number;
 let writes: { sql: string; params: any[] }[];
 // Pending email-change row the consume UPDATE returns (null = invalid/expired).
@@ -88,6 +92,9 @@ function routeQuery(sql: string, params: any[]) {
     return { rows: [{ unsubscribe_token: params[1] ?? 'unsub-token' }] };
   if (sql.includes('FROM accounts WHERE id')) return { rows: accountRow ? [accountRow] : [] };
   if (sql.includes('COUNT(*)')) return { rows: [{ count: charCount }] };
+  // Must be checked before the generic realm-scoped branch below: this is the
+  // account-wide (every realm) read, keyed by its distinguishing ORDER BY.
+  if (sql.includes('ORDER BY realm, id')) return { rows: charactersAllRealms };
   if (sql.includes('FROM characters WHERE account_id') || sql.includes('FROM characters c')) {
     return { rows: characters };
   }
@@ -113,6 +120,7 @@ beforeEach(async () => {
     marketing_opt_in: false,
   };
   characters = [{ id: 10 }, { id: 11 }];
+  charactersAllRealms = characters;
   charCount = 2;
   pendingChange = { account_id: 1, new_email: 'new@example.com' };
   emailBackfillRows = 1;
@@ -472,6 +480,23 @@ describe('handleAccountExport', () => {
     const bundle = JSON.parse(res.body);
     expect(bundle.account).toMatchObject({ id: 1, username: 'Aelwyn' });
     expect(Array.isArray(bundle.characters)).toBe(true);
+  });
+  it('includes characters from every realm the account holds, not just this process realm', async () => {
+    // This deployment runs multiple realm processes against one shared
+    // database (server/realm.ts); an account may hold characters on several of
+    // them. The export is an account-wide self-service surface (matching
+    // characterCountForAccount / handleAccountWhoami), so it must return every
+    // realm's characters, not only the realm serving this request.
+    charactersAllRealms = [
+      { id: 10, name: 'Aelwyn', class: 'warrior', level: 12, state: {}, realm: 'ashvale' },
+      { id: 55, name: 'Faelar', class: 'druid', level: 30, state: {}, realm: 'thornreach' },
+    ];
+    const res = makeRes();
+    await handleAccountExport(makeReq({}, '198.51.100.42'), res, 1);
+    const bundle = JSON.parse(res.body);
+    const realms = bundle.characters.map((c: any) => c.realm).sort();
+    expect(realms).toEqual(['ashvale', 'thornreach']);
+    expect(bundle.characters.map((c: any) => c.id).sort()).toEqual([10, 55]);
   });
   it('404s when the account is gone', async () => {
     accountRow = null;

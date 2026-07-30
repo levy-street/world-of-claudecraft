@@ -173,6 +173,23 @@ export class Weather {
     this.enabled = on;
   }
 
+  /**
+   * Expose the otherwise hidden precipitation draw during the renderer's boot
+   * warm pass. Both rain and snow use the same PointsMaterial program shape;
+   * returning both maps lets the loading screen upload them before a biome
+   * transition can make either one visible.
+   */
+  beginPrewarm(): readonly THREE.Texture[] {
+    this.points.visible = true;
+    return [this.textures.flake, this.textures.streak];
+  }
+
+  endPrewarm(): void {
+    this.points.visible = false;
+    this.intensity = 0;
+    this.material.opacity = 0;
+  }
+
   private applyStyle(mode: Precip): void {
     const s = STYLES[mode];
     this.material.map = this.textures[s.texture];
@@ -192,7 +209,7 @@ export class Weather {
     const want: Precip | null =
       !this.enabled || biome === null
         ? null
-        : biome === 'peaks'
+        : biome === 'peaks' || biome === 'frost'
           ? 'snow'
           : biome === 'marsh'
             ? 'rain'

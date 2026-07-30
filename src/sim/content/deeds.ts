@@ -2217,6 +2217,28 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'stat', stat: 'salvagesPerformed', count: 50 },
   },
+  // Wildheart Basin (Palmreach). New records stay at the append-only tail.
+  dgn_wildheart_basin: {
+    id: 'dgn_wildheart_basin',
+    name: 'The Basin Bites Back',
+    desc: 'Defeat Zulgar, Voice of the Basin in the Wildheart Basin.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'dungeonClears', dungeonId: 'wildheart_basin', count: 1 },
+  },
+  dgn_wildheart_basin_heroic: {
+    id: 'dgn_wildheart_basin_heroic',
+    name: 'Heroic: The Wildheart Basin',
+    desc: 'Defeat Zulgar, Voice of the Basin in the Wildheart Basin on Heroic difficulty.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: {
+      kind: 'dungeonClears',
+      dungeonId: 'wildheart_basin',
+      difficulty: 'heroic',
+      count: 1,
+    },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

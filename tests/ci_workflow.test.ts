@@ -114,11 +114,14 @@ describe('CI workflow parity', () => {
     // need them regardless of which shard they hash into), never a bare vitest
     // invocation. fail-fast stays off so shards pass or fail independently and
     // a red run always reports the whole suite.
+    const halfCoreCap =
+      '--maxWorkers="$(node -p \'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))\')"';
     for (const job of [prGate, releaseGate]) {
       expect(job).toContain('strategy:');
       expect(job).toContain('fail-fast: false');
       expect(job).toContain('shard: [1, 2, 3, 4]');
       expect(job).toContain('run: npm test -- --shard=${{ matrix.shard }}/4');
+      expect(job).toContain(halfCoreCap);
     }
     expect(workflow.match(/run: npm test -- --shard=\$\{\{ matrix\.shard \}\}\/4/g)).toHaveLength(
       2,

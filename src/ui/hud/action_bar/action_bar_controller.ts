@@ -60,6 +60,7 @@ export class ActionBarController {
   );
   private loadedFromStorage = false;
   private knownAbilityIdsAtLastSync: Set<string> | null = null;
+  private pendingLoadoutKnownAbilityIds: Set<string> | null = null;
   private attackActionState: HotbarAction = null;
   // Suppresses the persistence seam while the controller is loading/seeding from
   // storage: only user-driven changes after init should upload. Flipped true at
@@ -103,6 +104,18 @@ export class ActionBarController {
     this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
   }
 
+  replaceActionsForLoadout(
+    actions: HotbarAction[],
+    targetKnownAbilityIds: ReadonlySet<string>,
+  ): void {
+    this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
+    this.pendingLoadoutKnownAbilityIds = new Set(targetKnownAbilityIds);
+    this.knownAbilityIdsAtLastSync = new Set([
+      ...this.deps.knownAbilityIds(),
+      ...targetKnownAbilityIds,
+    ]);
+  }
+
   get attackAction(): HotbarAction {
     return this.attackActionState;
   }
@@ -138,7 +151,16 @@ export class ActionBarController {
   }
 
   syncKnownAbilities(): void {
-    const knownAbilityIds = [...this.deps.knownAbilityIds()];
+    const liveKnownAbilityIds = [...this.deps.knownAbilityIds()];
+    if (
+      this.pendingLoadoutKnownAbilityIds &&
+      [...this.pendingLoadoutKnownAbilityIds].every((id) => liveKnownAbilityIds.includes(id))
+    ) {
+      this.pendingLoadoutKnownAbilityIds = null;
+    }
+    const knownAbilityIds = this.pendingLoadoutKnownAbilityIds
+      ? [...new Set([...liveKnownAbilityIds, ...this.pendingLoadoutKnownAbilityIds])]
+      : liveKnownAbilityIds;
     const autoPlaceAbilityIds = new Set<string>();
     const consider = (id: string): void => {
       // A passive (Measured Fury) is known but never castable, so it never
@@ -221,11 +243,16 @@ export class ActionBarController {
     // Gathering implements (#2343): the simple pole (use.type 'fishing') and
     // every gatherTool (picks, axes, sickles, tiered rods) are placeable, so
     // a keybound press works the tool exactly like the bags click.
+    // Reins: the mounts-as-items pivot routes kind 'mount' through the same
+    // useItem dispatch a potion rides (src/sim/items.ts -> summonMountItem), so
+    // reins are placeable for the same reason a potion is. Without this arm the
+    // bag drag never writes a hotbar payload and the bar cannot accept them.
     const item = ITEMS[itemId];
     return (
       item?.kind === 'food' ||
       item?.kind === 'drink' ||
       item?.kind === 'potion' ||
+      item?.kind === 'mount' ||
       item?.use?.type === 'fishing' ||
       item?.use?.type === 'gatherTool'
     );

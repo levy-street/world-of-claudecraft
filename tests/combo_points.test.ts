@@ -4,11 +4,25 @@
 // window on every award). Pairs with src/sim/sim.ts awardCombo +
 // src/sim/combat/auras.ts updateComboExpiry.
 import { describe, expect, it } from 'vitest';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import { dist2d, type SimEvent } from '../src/sim/types';
+import { dist2d, type SimEvent, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
-const makeSim = () => new Sim({ seed: 42, playerClass: 'rogue', autoEquip: true });
+// Every test drives combo points against a real forest wolf as the target
+// dummy, so keep the real forest_wolf camps (the wolves under test, at their
+// authored spawn points) and strip the rest of the ambient world, which only
+// makes every tick a continent-wide AI pass (subsystem-world pattern, see
+// tests/dot_final_tick.test.ts).
+const COMBO_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((c) => c.mobId === 'forest_wolf'),
+  npcs: {},
+  groundObjects: [],
+};
+
+const makeSim = () =>
+  new Sim({ seed: 42, playerClass: 'rogue', autoEquip: true, world: COMBO_TEST_WORLD });
 
 function nearestMobs(sim: Sim, templateId: string, count: number) {
   const p = sim.player;

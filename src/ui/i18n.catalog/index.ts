@@ -625,6 +625,64 @@ export const en = {
   // Locale overlays are English-filled + marked pending by the i18n build until a
   // translation pass. ENGLISH ONLY here; never add per-locale blocks to this section.
   sim: {
+    // Procedural Rift sim-emitted player text (src/sim/rift/runs.ts). Same model
+    // as sim.delve below: the sim emits English, sim_i18n.ts re-localizes. The
+    // {name} value is the generated floor name (spliced verbatim, like build names).
+    rift: {
+      allUnstable: 'All rifts are unstable right now. Try again soon.',
+      enterFloor: 'You step through the rift into {name}.',
+      descendFloor: 'You descend deeper into {name}.',
+      stepBack: 'You step back through the rift.',
+      pylonLit: 'A rune pylon flares to life ({lit}/{total}).',
+      wayDownOpens: 'The way down tears open.',
+      exitOpens: 'The rift shudders. A way home tears open behind the fallen.',
+      portalOpens: 'A {tier}-rank rift tears open in {zone}!',
+      portalSealed: 'The {tier}-rank rift in {zone} has been sealed.',
+      portalCollapses: 'The {tier}-rank rift in {zone} collapses.',
+      levelGate: 'Only adventurers of level {level} or higher may enter this rift.',
+      deadEntry: 'You cannot enter a rift while dead.',
+      deadEntryCombat:
+        'Your party is still in combat. The dead may re-enter once the fighting stops.',
+      iceGoalLit: 'The frost sigil blazes. The way stirs.',
+      socketsShut: 'The sockets grind shut. The way stirs.',
+      seqProgress: 'The runes answer in turn ({step}/{total}).',
+      seqReset: 'The runes go dark. Begin again.',
+      gateOpen: 'The gate grinds open.',
+      orbSealed: 'The orb is sealed by the ritual below.',
+      orbWakes: "The pentagram's flame gutters out. Something wakes on the altar.",
+      orbOpensGate: 'The Blood Orb flares. The gates of the temple grind open.',
+      alreadyCleared: 'This rift has already been cleared by {names}.',
+      raceLost: 'The rift has already been cleared by {names}. Your run ends.',
+      raceWorldWin: '{names} won the {tier}-rank Rift race in {seconds}s!',
+      raceWinBanner: 'Rift Race Won - {seconds}s',
+      raceLostBanner: 'Rift Already Cleared',
+      forgeUpgraded: 'Rift upgrade completed for {name}.',
+      forgeEnchanted: 'Rift enchant completed for {name}.',
+      forgeSocketed: 'Rift gem socketed for {name}.',
+      // Boss lethal death-zone detonation log lines (src/sim/mob/locomotion.ts).
+      // Each fires at the moment a telegraphed zone expires. Emitted in English
+      // by the sim; re-localized via the sim.rift.detonate* rules in sim_i18n.ts.
+      detonateGlacialGrave: 'Glacial Grave detonates!',
+      detonateAbsoluteZero: 'Absolute Zero erupts!',
+      detonateMagmaWell: 'Magma Well erupts!',
+      detonateCoreMeltdown: 'Core Meltdown detonates!',
+      detonateVenomPool: 'Venom Pool erupts!',
+      detonateBroodmothersMark: "Broodmother's Mark detonates!",
+      detonateSoulGrave: 'Soul Grave detonates!',
+      detonateDeathSentence: 'Death Sentence falls!',
+      detonateEarthshatter: 'Earthshatter detonates!',
+      detonateFinalJudgment: 'Final Judgment lands!',
+      detonateVoidRift: 'Void Rift detonates!',
+      detonateArcaneAnnihilation: 'Arcane Annihilation erupts!',
+      detonateLightningRod: 'Lightning Rod strikes!',
+      detonateStormcallersWrath: "Stormcaller's Wrath erupts!",
+      detonateAbyssalMaw: 'Abyssal Maw closes!',
+      detonateCrushingDepth: 'Crushing Depth crushes!',
+      detonatePactSeal: 'Pact Seal detonates!',
+      detonateBloodRite: 'Blood Rite falls!',
+      detonatePitSentence: 'Pit Sentence detonates!',
+      detonateHellfireBrand: 'Hellfire Brand detonates!',
+    },
     delve: {
       cannotEnterNow: 'You cannot enter a delve right now.',
       leaveDungeonFirst: 'Leave the dungeon first.',
@@ -1141,6 +1199,7 @@ export const en = {
     },
     augment: {
       choose: 'Choose an Augment',
+      cardAria: '{name} ({category}) - {description}',
       aug_brutality: { name: 'Brutality', desc: 'Your physical strikes hit 15% harder.' },
       aug_spellfire: { name: 'Grimfire', desc: 'Your spells deal 15% more damage.' },
       aug_toughness: { name: 'Toughness', desc: 'Gain 12% maximum health.' },
@@ -1366,6 +1425,18 @@ export const en = {
       nighttalon_waistband: { name: 'Direfang Waistband' },
       soulflame_cord: { name: 'Wraithfire Cord' },
       stormcallers_waistguard: { name: 'Galecall Waistguard' },
+      // The stablemaster's riding-skill service entry (buyItem delegates to
+      // learnRiding; never lands in the bags).
+      riding_training: { name: 'Riding Training' },
+      // Collectible mount reins (boss drops; src/sim/mounts.ts mountOwned).
+      // reins_valorsteed is the one bought from the stablemaster, not looted.
+      reins_valorsteed: { name: 'Reins of the Valorsteed' },
+      reins_grag_bear: { name: 'Reins of the Goliath Grag-Bear' },
+      reins_stalkglider_snail: { name: 'Reins of the Moss-Shell Stalk-Glider' },
+      reins_aether_hover_cycle: { name: 'Ignition Key: Aether-Jouster Hover-Cycle' },
+      reins_shadowjump_toad: { name: 'Reins of Kama-Kage the Shadow-Jump Toad' },
+      reins_stormfeather_griffin: { name: 'Reins of the Sky-Reach Stormfeather' },
+      reins_thunderstrut_gobbler: { name: 'Reins of Thunderstrut the Grand Gobbler' },
     },
     itemSets: itemSetEntityText,
     mobs: {

@@ -27,13 +27,14 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // mage line's pickRowTalent) plus the mage line's empowered-cast release and pet
 // Water Jet commands, on top of Season 1 Armory skin, ignore_add/ignore_remove,
 // stow_weapon, Dungeon Finder, inv_move, the release's Card Duel minigame
-// (card_queue_join/leave, play_card, card_forfeit), and Professions 2.0's
+// (card_queue_join/leave, play_card, card_forfeit), Professions 2.0's
 // place_mobile_station, train_recipe, the three enchanting actions
-// (disenchant_item, apply_enchant, salvage_item), and unbind_item (the
-// Maker's Bond unbind service).
-const EXPECTED_SEND_COUNT = 164;
-const EXPECTED_DISPATCH_COUNT = 173;
-const EXPECTED_DISPATCH_ONLY_COUNT = 9;
+// (disenchant_item, apply_enchant, salvage_item), unbind_item (the
+// Maker's Bond unbind service), and the Rift + mounts surface (rift and
+// forge commands, learn_riding, mount selection).
+const EXPECTED_SEND_COUNT = 173; // mount_select left the wire (reins are items)
+const EXPECTED_DISPATCH_COUNT = 184; // mount_select left the wire (reins are items)
+const EXPECTED_DISPATCH_ONLY_COUNT = 11;
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must
@@ -116,6 +117,11 @@ describe('command schema parity (W0b)', () => {
     // handshake) but is dispatched server-side, so it must count.
     expect(sendSet.has('challengeResponse')).toBe(true);
     expect(dispatchSet.has('challengeResponse')).toBe(true);
+  });
+
+  it('pins unstuck in both the client send-set and authoritative dispatch-set', () => {
+    expect(sendSet.has('unstuck')).toBe(true);
+    expect(dispatchSet.has('unstuck')).toBe(true);
   });
 
   it('every ClientWorld send has a matching server dispatch case (send-set is a subset)', () => {

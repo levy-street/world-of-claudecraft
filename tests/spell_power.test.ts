@@ -153,8 +153,18 @@ describe('Spell Power end-to-end through the sim', () => {
     };
     sim.castAbility('shadow_word_pain', p.id);
     sim.tick();
-    const aura = dummy.auras.find((a) => a.kind === 'dot' && a.id === 'shadow_word_pain')!;
+    let aura = dummy.auras.find((a) => a.kind === 'dot' && a.id === 'shadow_word_pain');
+    // the cast can MISS on the spell hit table (rng-stream dependent, so a
+    // content change upstream can turn a landing seed into a missing one):
+    // recast past the GCD until it sticks, like the other combat fixtures
+    for (let attempt = 0; !aura && attempt < 8; attempt++) {
+      for (let i = 0; i < 31; i++) sim.tick();
+      sim.castAbility('shadow_word_pain', p.id);
+      sim.tick();
+      aura = dummy.auras.find((a) => a.kind === 'dot' && a.id === 'shadow_word_pain');
+    }
     expect(aura).toBeDefined();
+    if (!aura) return;
     const basePerTick = Math.max(1, Math.round(dot.total / (dot.duration / dot.interval)));
     const bonusPerTick = dotTickBonus(p.spellPower, swp.def, dot.duration, dot.interval);
     expect(aura.value).toBe(basePerTick + bonusPerTick);

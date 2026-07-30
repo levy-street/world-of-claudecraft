@@ -677,4 +677,12 @@ export const table: DeedLocaleTable = {
     name: '解体師の庭',
     desc: '装備品を50点解体して素材に戻す。',
   },
+  dgn_wildheart_basin: {
+    name: '盆地の逆襲',
+    desc: 'ワイルドハート盆地で盆地の声ズルガーを倒す。',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: '英雄: ワイルドハート盆地',
+    desc: '英雄難易度のワイルドハート盆地で盆地の声ズルガーを倒す。',
+  },
 };

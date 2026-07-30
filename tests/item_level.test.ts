@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import {
+  RIFT_EPIC_ITEM_IDS,
+  RIFT_LEGENDARY_ITEM_IDS,
+  RIFT_RARE_ITEM_IDS,
+} from '../src/sim/content/rift/items';
 import { ITEMS, MOBS } from '../src/sim/data';
 import {
   expectedStatBudget,
@@ -12,6 +17,8 @@ import {
   primaryStatBudget,
   primaryStatSum,
   RAID_ILVL_BONUS,
+  RIFT_CLEAR_LOOT_SOURCE_LEVEL,
+  RIFT_LEGENDARY_LOOT_SOURCE_LEVEL,
   resetItemLevelCache,
 } from '../src/sim/item_level';
 
@@ -225,17 +232,23 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
   it('every explicit heroic-table drop is at its tier item level with its exact stat budget', () => {
     // The five-man final bosses register at source level 25 (item level 31). The
     // 10-player raid boss (Heroic Nythraxis) is one tier above at source level 27:
-    // its explicit table lists only the three heroic-only weapons (item level 33).
-    // See buildSourceIndex + NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL.
+    // its explicit table lists the three heroic-only weapons (item level 33) plus
+    // the two blue mount reins secondary paths (excluded from budget sweep below).
+    // Mount reins (kind 'mount') have no item level; only armor/weapon entries are
+    // budget-enforced.
+    const isGearEntry = (itemId: string): boolean => {
+      const item = ITEMS[itemId];
+      return !!item && item.kind !== 'mount';
+    };
     const raidIds = new Set(
       (HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak ?? []).flatMap((e) =>
-        e.itemId ? [e.itemId] : [],
+        e.itemId && isGearEntry(e.itemId) ? [e.itemId] : [],
       ),
     );
     expect(raidIds.size).toBe(3); // the three heroic-only raid weapons
     const ids = Object.values(HEROIC_BOSS_LOOT)
       .flat()
-      .flatMap((e) => (e.itemId ? [e.itemId] : []));
+      .flatMap((e) => (e.itemId && isGearEntry(e.itemId) ? [e.itemId] : []));
     expect(ids.length).toBeGreaterThanOrEqual(12); // the full five-man heroic set + raid weapons
     for (const id of ids) {
       const item = ITEMS[id];
@@ -251,9 +264,11 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
   it('the raid boss set pieces and legendaries upgrade to raid-tier heroic variants (33/37)', () => {
     // These are not listed in the explicit table: they come from the normal-loot
     // heroic swap (heroic_<base>), rescaled to the raid tier (source 27).
-    const raidBases = (MOBS.nythraxis_scourge_of_thornpeak?.loot ?? []).flatMap((e: any) =>
-      e.itemId ? [e.itemId] : [],
-    );
+    const raidBases = (MOBS.nythraxis_scourge_of_thornpeak?.loot ?? []).flatMap((e: any) => {
+      if (!e.itemId) return [];
+      const item = ITEMS[e.itemId];
+      return item?.slot && (item.kind === 'armor' || item.kind === 'weapon') ? [e.itemId] : [];
+    });
     expect(raidBases.length).toBeGreaterThanOrEqual(8);
     let epics = 0;
     let legendaries = 0;
@@ -326,6 +341,64 @@ describe('item level: purity and determinism', () => {
     resetItemLevelCache();
     const after = CHEST_TRIO.map((id) => [itemSourceLevel(id), itemLevel(ITEMS[id])]);
     expect(after).toEqual(before);
+  });
+});
+
+describe('item level: rift gear is budget-exact (rares ilvl 26, epics ilvl 31, legendaries ilvl 37)', () => {
+  it('rift world-drop rares resolve at ilvl 26 with exact budget', () => {
+    // Rift mobs have maxLevel 23 (rank retune: max spawn level is 23).
+    // Rare quality adds 3, so ilvl = 26.
+    // The mob-loot block in buildSourceIndex registers them at source 23.
+    for (const id of RIFT_RARE_ITEM_IDS) {
+      const item = ITEMS[id];
+      expect(item, `${id} is a real item`).toBeTruthy();
+      expect(itemSourceLevel(id), `${id} source`).toBe(23);
+      expect(item.quality, `${id} quality`).toBe('rare');
+      expect(itemLevel(item), `${id} ilvl`).toBe(26);
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
+    }
+  });
+
+  it('rift clear-time epics resolve at ilvl 31 with exact budget and a combat rating', () => {
+    // Clear-time epics are registered at RIFT_CLEAR_LOOT_SOURCE_LEVEL (25).
+    // Epic quality adds 6, so ilvl = 31. Each piece carries one combat rating
+    // (hitRating / critRating / hasteRating) matching the heroic ilvl-31 floor.
+    for (const id of RIFT_EPIC_ITEM_IDS) {
+      const item = ITEMS[id];
+      expect(item, `${id} is a real item`).toBeTruthy();
+      expect(itemSourceLevel(id), `${id} source`).toBe(RIFT_CLEAR_LOOT_SOURCE_LEVEL);
+      expect(item.quality, `${id} quality`).toBe('epic');
+      expect(itemLevel(item), `${id} ilvl`).toBe(31);
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
+      // Every rift epic must carry exactly one combat rating.
+      const ratingCount = [item.hitRating, item.critRating, item.hasteRating].filter(
+        (r) => r !== undefined && r > 0,
+      ).length;
+      expect(ratingCount, `${id} carries one combat rating`).toBe(1);
+    }
+  });
+
+  it('every rift legendary resolves at ilvl 37 with exact budget, and is NOT a raid drop', () => {
+    // The S legendaries sit a tier above the clear-time epics, at the raid SOURCE
+    // level (27), so legendary quality's +10 puts them at ilvl 37. Iterated over
+    // the whole pool, not just the first: the S chase is TWO independent rolls,
+    // and a second legendary added off the wrong source level would be the silent
+    // way to slip an over-budget chase item in.
+    expect(RIFT_LEGENDARY_ITEM_IDS.length, 'the S chase is a pair').toBe(2);
+    expect(RIFT_LEGENDARY_LOOT_SOURCE_LEVEL, 'one tier above the clear epics').toBe(
+      RIFT_CLEAR_LOOT_SOURCE_LEVEL + 2,
+    );
+    for (const id of RIFT_LEGENDARY_ITEM_IDS) {
+      const item = ITEMS[id];
+      expect(item, `${id} is a real item`).toBeTruthy();
+      expect(itemSourceLevel(id), `${id} source`).toBe(RIFT_LEGENDARY_LOOT_SOURCE_LEVEL);
+      expect(item.quality, `${id} quality`).toBe('legendary');
+      expect(itemLevel(item), `${id} ilvl`).toBe(37);
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
+      // Sharing the raid SOURCE level must not make it read as raid loot: the two
+      // are separate axes and only the level is borrowed.
+      expect(itemFromRaid(id), `${id} is not a raid drop`).toBe(false);
+    }
   });
 });
 

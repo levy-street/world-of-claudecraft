@@ -439,7 +439,7 @@ describe('text_sprite_cache: the bound and its eviction', () => {
   it('ships the budget it documents', () => {
     // Pinned to the literal: every other assertion here is parameterized on the
     // constant, so without this the budget could change with the suite green.
-    expect(TEXT_SPRITE_LIMIT).toBe(320);
+    expect(TEXT_SPRITE_LIMIT).toBe(384);
   });
 
   it('stays above the largest label set one redraw can ask for', () => {
@@ -482,8 +482,8 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     // quotes, which is the other direction the check below cannot see.
     expect(
       worstCase,
-      'the header quotes 263; a SMALLER total means a term broke',
-    ).toBeGreaterThanOrEqual(263);
+      'the header quotes 370; a SMALLER total means a term broke',
+    ).toBeGreaterThanOrEqual(370);
     expect(
       TEXT_SPRITE_LIMIT,
       `worst case grew to ${worstCase}: raise TEXT_SPRITE_LIMIT above it, or the map thrashes`,

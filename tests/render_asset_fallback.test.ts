@@ -60,12 +60,29 @@ describe('render asset preload fallbacks', () => {
     mockEmptyAssetLoads();
 
     const { buildTerrain, hasTerrainSplatAssets } = await import('../src/render/terrain');
+    const { zoneAt } = await import('../src/sim/data');
     expect(hasTerrainSplatAssets()).toBe(false);
 
     const terrain = buildTerrain(20061);
+    expect(terrain.group.children).toHaveLength(0);
+    const zone = zoneAt(0, 0);
+    const progress: number[] = [];
+    const first = terrain.ensureZone(zone, (done, total) => progress.push(done / total));
+    expect(terrain.ensureZone(zone)).toBe(first);
+    await first;
     expect(terrain.group.children.length).toBeGreaterThan(0);
-    // Real timers, never cancelled: without this the far-chunk stream keeps
-    // building on a setTimeout chain in the background for the rest of the suite.
+    expect(terrain.isZoneLoaded(zone.id)).toBe(true);
+    expect(progress[0]).toBeGreaterThan(0);
+    expect(progress.at(-1)).toBe(1);
+    expect(progress.every((value, index) => index === 0 || value >= progress[index - 1])).toBe(
+      true,
+    );
+    const childCount = terrain.group.children.length;
+    await terrain.ensureZone(zone);
+    expect(terrain.group.children).toHaveLength(childCount);
+    // Real timers, never cancelled: without this an abandoned zone build keeps
+    // running on a setTimeout chain in the background for the rest of the suite.
     terrain.cancelStreaming();
-  });
+    // One streamed zone still exercises the complete Lambert fallback mesh.
+  }, 90_000);
 });

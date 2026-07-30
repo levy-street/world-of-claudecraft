@@ -186,6 +186,7 @@ describe('mage choice rows (owner tree)', () => {
     expect(option?.effect.ability).toEqual([
       { ability: 'ice_barrier', addEffects: [{ type: 'breakRoots' }] },
       { ability: 'blazing_barrier', addEffects: [{ type: 'breakRoots' }] },
+      { ability: 'temporal_barrier', addEffects: [{ type: 'breakRoots' }] },
     ]);
 
     applyControl(sim, p, mob.id, 'slow');
@@ -209,6 +210,19 @@ describe('mage choice rows (owner tree)', () => {
 
     expect(p.auras.some((aura) => aura.kind === 'root')).toBe(false);
     expect(p.auras.some((aura) => aura.id === 'blazing_barrier')).toBe(true);
+  });
+
+  it('Shifting Ward breaks roots when an Arcane mage casts Temporal Barrier on themselves', () => {
+    const { sim, p } = rig({ 8: 'mag_r8_temporal_rift' }, 20, 'arcane');
+    const mob = addTargetMob(sim);
+    applyControl(sim, p, mob.id, 'root');
+
+    // No friendly override and the current target is the hostile mob, so
+    // resolveFriendlyTarget falls back to self: this is a self-cast.
+    sim.castAbility('temporal_barrier');
+
+    expect(p.auras.some((aura) => aura.kind === 'root')).toBe(false);
+    expect(p.auras.some((aura) => aura.id === 'temporal_barrier')).toBe(true);
   });
 
   it('Shifting Ward does not self-cleanse an Arcane mage shielding an ally', () => {
@@ -342,6 +356,27 @@ describe('mage choice rows (owner tree)', () => {
     const cap = p.auras.find((a) => a.id === 'overflowing_power_cap');
     expect(cap?.value).toBeCloseTo(shave, 5);
   });
+
+  it.each([
+    ['frost', 'ice_barrier', 'ice_lance'],
+    ['fire', 'blazing_barrier', 'fire_blast'],
+    ['arcane', 'temporal_barrier', 'arcane_explosion'],
+  ] as const)(
+    'Overflowing Power shaves the %s personal barrier cooldown',
+    (spec, barrierId, spenderId) => {
+      const { sim, p } = rig({ 20: 'mag_r20_overflowing_power' }, 20, spec);
+      addTargetMob(sim, 100000, 3);
+      p.cooldowns.set(barrierId, 12);
+      const before = p.resource;
+
+      sim.castAbility(spenderId);
+
+      const spent = before - p.resource;
+      expect(spent, `${spec}:${spenderId} spent mana`).toBeGreaterThan(0);
+      const shave = (spent / p.maxResource) * 10 * 2;
+      expect(p.cooldowns.get(barrierId), `${spec}:${barrierId}`).toBeCloseTo(12 - shave, 5);
+    },
+  );
 
   it('Aetherwell channels mana and STACKS spell power the longer you channel', () => {
     const { sim, p } = rig({ 20: 'mag_r20_evocation' });

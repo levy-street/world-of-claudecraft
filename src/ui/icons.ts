@@ -2955,6 +2955,8 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ],
     ['sparkle'],
   ),
+  // Collectible mount reins ship rendered 3D face icons (WebP) via ITEM_IMAGE_IDS +
+  // scripts/render_mount_icons.mjs, so they need no procedural recipe here.
   worn_sword: r('steel', 'steel', ['sword']),
   gnarled_staff: r('wood', 'earthBrown', [{ p: 'staff', pal: 'earthBrown' }]),
   rusty_dagger: r('steel', 'earthBrown', [{ p: 'dagger', pal: 'earthBrown' }]),
@@ -3130,6 +3132,8 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   // Heroic Quartermaster jewelry (marks-vendor rings and pendants); a coin
   // base reads as the band, the overlay carries the stat identity.
   seal_of_the_nine_oaths: r('fury', 'blood', ['coin', 'gem'], ['glow']),
+  // the Last Keep's flavor signet: a gold seal disc set with an ember-red stone
+  last_keep_signet: r('treasure', 'gold', ['coin', { p: 'gem', pal: 'blood' }], ['glow']),
   nielas_coldlight_band: r('arcane', 'arcanePink', ['coin', 'gem'], ['glow']),
   sutils_gambit: r('nature', 'leafGreen', ['coin', 'gem'], ['sparkle']),
   oath_of_the_round_table: r('earth', 'earthBrown', ['coin', 'gem'], ['glow']),
@@ -3243,6 +3247,8 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
   family_elemental: r('storm', 'sky', ['lightning'], ['glow']),
   family_dragonkin: r('fire', 'ember', ['claw_slash'], ['glow']),
   family_reptile: r('earth', 'leafGreen', ['fang']),
+  family_kobold: r('junk', 'gold', ['candle']),
+  family_murloc: r('drink', 'sky', ['droplet'], ['motion']),
   family_sheep: r('nature', 'silverWhite', ['sheep_head']),
   // status / interaction markers
   status_npc: r('parchment', 'gold', ['sigil_rune']),
@@ -3534,14 +3540,23 @@ function itemFallback(id: string): IconRecipe | null {
 
 const SPECK_COUNT = 40;
 
-function getCanvas2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
-  const ctx = canvas.getContext('2d');
+type PaintCanvas = HTMLCanvasElement | OffscreenCanvas;
+
+function getCanvas2d(canvas: PaintCanvas): CanvasRenderingContext2D {
+  // OffscreenCanvasRenderingContext2D implements every operation used by the
+  // procedural recipes. The DOM type has a few extra methods, so keep the
+  // renderer's existing narrow context type after this boundary.
+  const ctx = (canvas as HTMLCanvasElement).getContext('2d');
   if (!ctx) throw new Error('2D canvas context is unavailable');
   return ctx;
 }
 
-function compose(recipe: IconRecipe, seedKey: string, size: number): HTMLCanvasElement {
-  const canvas = document.createElement('canvas');
+function paintIconCanvas(
+  canvas: PaintCanvas,
+  recipe: IconRecipe,
+  seedKey: string,
+  size: number,
+): void {
   canvas.width = size;
   canvas.height = size;
   const ctx = getCanvas2d(canvas);
@@ -3612,7 +3627,11 @@ function compose(recipe: IconRecipe, seedKey: string, size: number): HTMLCanvasE
   ctx.strokeStyle = withAlpha(bgc[0], 0.22);
   rrPath(ctx, 3.6, 3.6, 92.8, 92.8, 9);
   ctx.stroke();
+}
 
+function compose(recipe: IconRecipe, seedKey: string, size: number): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  paintIconCanvas(canvas, recipe, seedKey, size);
   return canvas;
 }
 
@@ -4291,6 +4310,16 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'ogre_war_totem',
   'sanctum_key_shard',
   'unknown_alien_weaponry',
+  // mount (rideable) reins: 3D face/front icons rendered from the mount GLBs via
+  // scripts/render_mount_icons.mjs (a headless-Chrome front three-quarter head close-up),
+  // committed as transparent WebP. These win over the procedural recipe in iconDataUrl.
+  'reins_valorsteed',
+  'reins_grag_bear',
+  'reins_stalkglider_snail',
+  'reins_aether_hover_cycle',
+  'reins_shadowjump_toad',
+  'reins_stormfeather_griffin',
+  'reins_thunderstrut_gobbler',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the
@@ -4307,8 +4336,130 @@ for (const item of Object.values(ITEMS)) {
 // real, non-weapon item; both sets are served by itemImageUrl and gated on committed art.
 export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 
+// Items whose painted art has not been commissioned yet. The derivation above deliberately
+// enters EVERY non-weapon item into ITEM_IMAGE_IDS, which is what keeps the filesystem and
+// provenance gates honest, but an id listed here has no committed .webp behind it yet, so
+// itemImageUrl declines it and iconDataUrl composes the procedural recipe instead of pointing
+// an <img> at a file that 404s. Same shape as the i18n `pending` model: the debt is
+// enumerated rather than silent, and it shrinks as art lands.
+//
+// These are the zone and Rift items added by the procedural-dungeons work, which predates the
+// every-item-ships-painted-art rule (v0.30.0, #2301). tests/item_icons.test.ts holds the line
+// from BOTH sides: a stale entry (art committed but still listed) fails, and a NEW item with no
+// art that is NOT listed here still fails. Do not add to this list to silence that failure;
+// commission the art.
+export const ITEM_ART_PENDING = new Set<string>([
+  // amberfall.ts
+  'amberfall_sap_bucket',
+  'gilded_sap_clot',
+  'mantle_of_the_meredark',
+  'mere_ferry_lantern',
+  'orchard_sapbinder_grips',
+  // drakelands.ts
+  'ashbone_war_brand',
+  'cinderwalk_treads',
+  'emberwing_scale',
+  'mawscale_pauldrons',
+  'scorched_supply_crate',
+  'wyrmwatch_warning_banner',
+  // evergarden.ts
+  'evergarden_bloom_clipping',
+  'evergarden_statue_rubbing',
+  'fountain_court_mantle',
+  'hedgewick_shears',
+  'hedgewick_tool_cart',
+  'shearkeeper_gloves',
+  // farshore.ts
+  'breakscarred_steel',
+  'farshore_salt_moss',
+  'gullhaven_watchbell',
+  'mantle_of_the_unbroken_shore',
+  'saltforged_grips',
+  // frostveil.ts
+  'aurora_mote',
+  'frostmane_mantle',
+  'hearth_ember_cache',
+  'hearthlined_treads',
+  'sprung_trap',
+  'thick_winter_pelt',
+  // galecrest.ts
+  'galecrest_ram_wool',
+  'shear_storm_lantern',
+  'wickspun_treads',
+  'wreck_wardens_mantle',
+  'wreckfield_flotsam_crate',
+  // items.ts
+  'riding_training',
+  // nightbloom.ts
+  'barrow_grave_offering',
+  'barrowshade_mantle',
+  'gloamfield_nightbloom',
+  'moonfleece_mitts',
+  'moonfleece_tuft',
+  'vigil_star_chart',
+  // palmreach.ts
+  'canopy_silk_hank',
+  'pearlwake_cargo_crate',
+  'saltwalker_sandals',
+  'sunken_idol_mantle',
+  'sunken_offering_bowl',
+  // realm.ts
+  'duskwisp_essence',
+  'elder_bark',
+  'gleaming_antler',
+  'gleamstag_charm',
+  'guardian_core',
+  'hollow_sealstone',
+  'monument_court',
+  'monument_north',
+  'monument_overlook',
+  'nightweave_tunic',
+  'spore_heart',
+  'starfall_shard',
+  'veilcloth_robe',
+  'wardens_oathband',
+  'wardens_seal',
+  'wardplate_cuirass',
+  'wisp_mote',
+  // rift/items.ts
+  'abyssal_loop',
+  'abysswrought_band',
+  'bonelord_mantle',
+  'broodmother_carapace',
+  'emberforge_gauntlets',
+  'emberforged_bulwark',
+  'graskbreaker_girdle',
+  'heart_of_the_rift',
+  'pactbound_vestments',
+  'rift_essence',
+  'rift_gem_azure',
+  'rift_gem_crimson',
+  'rift_gem_verdant',
+  'riftbound_band_of_guile',
+  'riftbound_band_of_insight',
+  'riftbound_band_of_might',
+  'stormscale_treads',
+  'stormsunder_hood',
+  'voidscar_handwraps',
+  'voidweave_mantle',
+  // willowfen.ts
+  'bridgemere_toll_chest',
+  'eelskin_mudwaders',
+  'fenway_mooring_line',
+  'lilybed_mantle',
+  'plump_fen_eel',
+  'wisplight_globe',
+  // wraithwood.ts
+  'gallowmere_grave_candle',
+  'gravebound_silk_wraps',
+  'mantle_of_the_unhorsed',
+  'silkbound_remains',
+  'widowsilk_skein',
+]);
+
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
+  if (ITEM_ART_PENDING.has(id)) return null;
   return ITEM_IMAGE_IDS.has(id) || UI_ITEM_IMAGE_IDS.has(id) ? `${ITEM_ICON_DIR}/${id}.webp` : null;
 }
 
@@ -4387,10 +4538,7 @@ export function iconCanvas(
   return canvas;
 }
 
-// Returns the icon URL for an ability/item/aura/crest id — a static image URL
-// for weapons that have a rendered thumbnail, otherwise a cached procedural PNG
-// data URL. Both forms work as an <img src> or CSS background-image.
-export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_ICON_SIZE): string {
+function staticIconUrl(kind: IconKind, id: string): string | null {
   if (kind === 'item') {
     const weapon = weaponIconUrl(id);
     if (weapon) return weapon;
@@ -4410,10 +4558,53 @@ export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_I
   // (that is class-crest portraits only, unit_portrait_painter.ts), so no canvas is needed. Every
   // other crest id (class/talent crests, the deed_cat_* bases, bespoke procedural recipes) returns
   // null here and falls through to the composited canvas below.
-  if (kind === 'crest') {
-    const img = deedImageUrl(id);
-    if (img) return img;
+  if (kind === 'crest') return deedImageUrl(id);
+  return null;
+}
+
+/** Internal bridge for the worker-backed idle warmer. */
+export function needsIconDataUrlWarm(
+  kind: IconKind,
+  id: string,
+  size: number = DEFAULT_ICON_SIZE,
+): boolean {
+  return staticIconUrl(kind, id) === null && !urlCache.has(`${kind}|${id}|${size}`);
+}
+
+/** Internal bridge for the worker-backed idle warmer. */
+export function storePrewarmedIconDataUrl(
+  kind: IconKind,
+  id: string,
+  size: number,
+  url: string,
+): void {
+  const key = `${kind}|${id}|${size}`;
+  // A foreground request may have populated the cache while the worker was
+  // encoding. Its synchronous result remains authoritative.
+  if (!urlCache.has(key)) urlCache.set(key, url);
+}
+
+/** Worker-only renderer: no DOM access and no work on the gameplay thread. */
+export function renderProceduralIconPng(
+  kind: IconKind,
+  id: string,
+  size: number = DEFAULT_ICON_SIZE,
+): Promise<Blob> {
+  if (typeof OffscreenCanvas === 'undefined') {
+    return Promise.reject(new Error('OffscreenCanvas is unavailable'));
   }
+  const key = `${kind}|${id}|${size}`;
+  const canvas = new OffscreenCanvas(size, size);
+  paintIconCanvas(canvas, resolveRecipe(kind, id), key, size);
+  return canvas.convertToBlob({ type: 'image/png' });
+}
+
+// Returns the icon URL for an ability/item/aura/crest id - a static image URL
+// for weapons that have a rendered thumbnail, otherwise a cached procedural PNG
+// data URL. Both forms work as an <img src> or CSS background-image.
+export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_ICON_SIZE): string {
+  const staticUrl = staticIconUrl(kind, id);
+  if (staticUrl) return staticUrl;
   const key = `${kind}|${id}|${size}`;
   const cached = urlCache.get(key);
   if (cached) return cached;

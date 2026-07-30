@@ -72,6 +72,9 @@ describe('no quest duplicates another (same giver + identical objectives)', () =
             case 'gather':
               target = `gather ${o.nodeType ?? o.itemId}`;
               break;
+            case 'escort':
+              target = `escort ${o.escortId}`;
+              break;
           }
           return `${target} x${o.count}`;
         })

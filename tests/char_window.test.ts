@@ -100,6 +100,9 @@ describe('char_window: profession art placements', () => {
       honor: 0,
       archetypeTitle: 'weaponcrafting+armorcrafting' as string | null,
       hobbyCraft: 'jewelcrafting',
+      selectedMount: () => null,
+      ownedMounts: () => [],
+      selectMount: () => {},
       professionsState: {
         skills: [
           { professionId: 'mining', skill: 11, maxSkill: 125 },
@@ -199,6 +202,9 @@ describe('char_window: profession art placements', () => {
       honor: 0,
       archetypeTitle: null,
       hobbyCraft: 'jewelcrafting',
+      selectedMount: () => null,
+      ownedMounts: () => [],
+      selectMount: () => {},
       professionsState: {
         skills: [
           { professionId: 'mining', skill: 99.75, maxSkill: 100 },

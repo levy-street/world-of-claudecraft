@@ -6,14 +6,15 @@ import { describe, expect, it } from 'vitest';
 //
 // The base `.window` rule centers every window with `left: 50%` +
 // `transform: translateX(-50%)`. A `body.mobile-touch` rule that re-pins a
-// window to one side (sets `left` to a fixed value, leaving `right` open) MUST
-// also re-declare `transform`. Otherwise the inherited `translateX(-50%)`
-// shifts the left-pinned window half its own width off the left edge of the
-// screen. That was the #char-window bug: `left: 10px` on a 360px window landed
-// the box at roughly -170px, clipping the equipment column and title.
-//
-// Both-sides-pinned windows (left AND right set, e.g. #social-window,
-// #report-window) are a different, stretched layout and are out of scope here.
+// window's `left` away from `50%` (whether it leaves `right` open, as a
+// left-pinned window does, or pins `right` too, stretching the window edge
+// to edge) MUST also re-declare `transform`. Otherwise the inherited
+// `translateX(-50%)` shifts the box left by half its own width. For a
+// left-pinned window that clips the equipment column and title (the
+// #char-window bug: `left: 10px` on a 360px window landed the box at
+// roughly -170px). For a both-sides-pinned, near-full-viewport-width window
+// (e.g. #trade-window, #report-window) the same unwanted shift pushes most
+// of the box off the left edge of the screen.
 //
 // The HUD chrome ships in two build entries (`index.html` at `/` and `play.html`
 // at `/play`, vite.config.ts). Both load the shared style modules through the
@@ -137,6 +138,22 @@ describe.each(HTML_ENTRIES)('mobile window positioning (%s)', (entry) => {
       offenders,
       'these left-pinned mobile-touch windows do not reset the centering transform, ' +
         `so translateX(-50%) shifts them off the left edge:\n${offenders.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('both-sides-pinned mobile windows also reset the inherited centering transform', () => {
+    const offenders: string[] = [];
+    for (const [id, m] of merged) {
+      const leftPinned = m.left !== null && m.left !== '50%' && m.left !== 'auto';
+      const rightPinned = m.right !== null && m.right !== 'auto';
+      if (leftPinned && rightPinned && m.transform === null)
+        offenders.push(`#${id} (left: ${m.left}, right: ${m.right})`);
+    }
+    expect(
+      offenders,
+      'these both-sides-pinned mobile-touch windows do not reset the centering transform, ' +
+        'so the inherited translateX(-50%) still shifts the now near-full-viewport-width box ' +
+        `left by half its own width, pushing most of it off-screen:\n${offenders.join('\n')}`,
     ).toEqual([]);
   });
 });

@@ -47,6 +47,7 @@ export const ZONE1_ZONE: ZoneDef = {
     { x: -5, z: -52, label: 'Reliquary Hill', id: 'reliquary_hill' },
     { x: 40, z: 140, label: 'Brightwood Glade', id: 'brightwood_glade' },
     { x: -11, z: -112, label: 'The Sowfield', id: 'the_sowfield' },
+    { x: 150, z: -46, label: 'The Farshore Causeway', id: 'the_farshore_causeway' },
   ],
   welcome: 'Find Marshal Redbrook in town - he has work for you.',
   welcomeQuestId: 'q_wolves',
@@ -1442,27 +1443,61 @@ export const ZONE1_QUEST_ORDER = [
 // rendered world and the corrected map both put -x on your right).
 // ---------------------------------------------------------------------------
 
+// STARTER PACING: every packed camp whose disc reaches within 100 yd of the town
+// hub is spaced so adjacent mobs stand at least 11.5 yd apart (radius / sqrt(count),
+// camp_scatter.ts), no disc comes closer than 38 yd to the hub, and NO TWO
+// POPULATIONS OVERLAP: two camps of DIFFERENT mobIds keep their discs fully apart
+// (distance >= radiusA + radiusB + 2). Two camps of the SAME mobId are one
+// population split in two, so they may still abut ((rA + rB) * 0.75 + 8).
+// Below that the packs chain-pull: aggro radii here run 9-13 yd, so a camp
+// scattered tighter than its own aggro radius drags neighbours onto a level-1
+// player, and two interleaved camps pull two different families at once. The
+// lever is spacing and (where a camp could not otherwise fit) a small count cut;
+// aggroRadius and the social-aggro flee-rally (src/sim/mob/social_aggro.ts) are
+// deliberately unchanged, and no named rare or elite was ever thinned. Counts were
+// trimmed by one per crowded camp (murlocs by three, see below) on maintainer
+// authorization, 2026-07-28, and every camp stays at or above half of the largest
+// single kill-quest requirement against its mobId. Camps were pushed OUTWARD along
+// their existing bearing so each stays in its own corner.
+// Guarded by tests/eastbrook_camp_spacing.test.ts. Row ORDER is a determinism
+// contract (see the CAMPS merge in data.ts): edit values, never reorder.
 export const ZONE1_CAMPS: CampDef[] = [
   // Wolves: north woods
-  { mobId: 'forest_wolf', center: { x: -15, z: 55 }, radius: 22, count: 7 },
-  { mobId: 'forest_wolf', center: { x: 20, z: 70 }, radius: 20, count: 6 },
-  { mobId: 'old_greyjaw', center: { x: 0, z: 95 }, radius: 8, count: 1 },
+  { mobId: 'forest_wolf', center: { x: -27, z: 71 }, radius: 28.5, count: 6 },
+  { mobId: 'forest_wolf', center: { x: 24, z: 70 }, radius: 26, count: 5 },
+  // Nudged north to stay ahead of the widened wolf runs (q_greyjaw sends the
+  // player to "the deep woods north of the wolf runs").
+  { mobId: 'old_greyjaw', center: { x: 0, z: 100 }, radius: 8, count: 1 },
   // Boars: east meadow
-  { mobId: 'wild_boar', center: { x: 55, z: 12 }, radius: 22, count: 6 },
-  { mobId: 'wild_boar', center: { x: 80, z: -15 }, radius: 18, count: 5 },
+  { mobId: 'wild_boar', center: { x: 63, z: 16 }, radius: 26, count: 5 },
+  { mobId: 'wild_boar', center: { x: 84, z: -27 }, radius: 23.5, count: 4 },
   { mobId: 'mogger', center: { x: 118, z: -26 }, radius: 5, count: 1 },
   // Spiders: western woods
-  { mobId: 'webwood_spider', center: { x: -60, z: 5 }, radius: 22, count: 7 },
-  // Murlocs: lake shore northwest — camp straddles the waterline
-  { mobId: 'mudfin_murloc', center: { x: -75, z: 57 }, radius: 14, count: 8 },
-  // Kobolds: mine southwest
-  { mobId: 'tunnel_rat', center: { x: -82, z: -62 }, radius: 20, count: 9 },
-  // Bandits: southeast camp
-  { mobId: 'vale_bandit', center: { x: 65, z: -65 }, radius: 24, count: 7 },
+  { mobId: 'webwood_spider', center: { x: -68, z: 2 }, radius: 28.5, count: 6 },
+  // Murlocs: lake shore northwest, camp still straddles the waterline. This camp is
+  // radius-capped by Mirror Lake, not by its neighbours: the terrain flatten disc is
+  // radius * 1.8, so a radius wide enough for 11.5 yd spacing drags a 59 yd flatten
+  // across the lake and lifts its bed above swim depth (the lake stops needing a
+  // swim, fish stop leaping, the map stops painting it as water). Even radius 15.5
+  // reshapes the south shore enough to break the mount-versus-swimmer waterline
+  // (tests/mount_transition.test.ts), so 15 is the measured shore-safe ceiling and
+  // the COUNT comes down instead: 8 to 5. That keeps Fisher Dunwall's "where there
+  // is one mudfin, there are five" literal, still covers half of his slay-8, and
+  // lifts spacing from 4.95 to 6.71 yd. It is the one camp that cannot reach 11.5;
+  // the documented exception and the lake guard live in
+  // tests/eastbrook_camp_spacing.test.ts.
+  { mobId: 'mudfin_murloc', center: { x: -75, z: 57 }, radius: 15, count: 5 },
+  // Kobolds: mine southwest. Held in place (the mine and its colliders are here).
+  { mobId: 'tunnel_rat', center: { x: -82, z: -62 }, radius: 33, count: 8 },
+  // Bandits: southeast camp. Shifted off its own campfire collider and clear of the
+  // boar meadow; the tents, crates and supply drops all stay inside the disc, and it
+  // no longer merges with the outpost below.
+  { mobId: 'vale_bandit', center: { x: 50, z: -72 }, radius: 28.5, count: 6 },
   { mobId: 'vale_bandit', center: { x: 90, z: -90 }, radius: 16, count: 5 },
   { mobId: 'gorrak', center: { x: 92, z: -92 }, radius: 2, count: 1 },
-  // Undead: ruins northeast
-  { mobId: 'restless_bones', center: { x: 80, z: 78 }, radius: 18, count: 8 },
+  // Undead: ruins northeast. The chapel guardians below are the same population, so
+  // they may still flank the altar inside this disc.
+  { mobId: 'restless_bones', center: { x: 82, z: 78 }, radius: 28.5, count: 6 },
   { mobId: 'captain_verlan', center: { x: 92, z: 90 }, radius: 4, count: 1 },
 ];
 

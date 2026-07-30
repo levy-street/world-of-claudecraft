@@ -18,6 +18,7 @@ import {
 } from '../src/ui/hud/action_bar/action_bar_view';
 import {
   clampMobilePage,
+  mobileActionSourceSlotCount,
   mobilePageCount,
   nextMobilePage,
   sourceSlotForMobileButton,
@@ -380,6 +381,42 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     expect(calls).toContainEqual({ m: 'setDisplay', args: [els[4].btn, 'none'] });
     expect(calls).toContainEqual({ m: 'setDisplay', args: [els[5].btn, 'none'] });
   });
+
+  it('hides buttons outside the enabled primary-only mobile span', () => {
+    const { calls, writers } = recordingFacet();
+    const els = [0, 1, 2, 3, 4, 5].map((i) => slotElements(`ring${i}`));
+    const painter = new MobileActionRingPainter(
+      writers,
+      {
+        bar: { container: { tag: 'c' } as unknown as HTMLElement, slots: els },
+        pageToggle: { tag: 'toggle' } as unknown as HTMLElement,
+        pageIndicator: { tag: 'indicator' } as unknown as HTMLElement,
+      },
+      (key) => `URL(${key})`,
+      (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
+    );
+    const visibleSlots = mobileActionSourceSlotCount({ secondary: false, third: false });
+    const pageBox = { page: 2 };
+    const view = createActionBarView(
+      {
+        slots: ringDescriptor(
+          pageBox,
+          new Map([
+            [11, ability('slot11')],
+            [12, ability('slot12')],
+          ]),
+        ),
+      },
+      fakeDeps(),
+    );
+    const state = view.tick(idleWorld());
+
+    painter.paint(state, 2, mobilePageCount(visibleSlots), visibleSlots);
+
+    expect(calls).toContainEqual({ m: 'setDisplay', args: [els[1].btn, ''] });
+    expect(calls).toContainEqual({ m: 'setDisplay', args: [els[2].btn, 'none'] });
+    expect(calls).toContainEqual({ m: 'setDisplay', args: [els[5].btn, 'none'] });
+  });
 });
 
 describe('MobileActionRingPainter: removable attack control', () => {
@@ -476,17 +513,13 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     // The slot click handler must call sourceSlotForMobileButton at click time
     // (reading this.mobileActionPage fresh) so a page cycle after bind still
     // routes taps to the correct source slot.
-    expect(hud).toContain('this.castSlot(sourceSlotForMobileButton(this.mobileActionPage, i));');
+    expect(hud).toContain('this.castSlot(this.mobileSourceSlotForButton(i));');
   });
 
   it('resolves every action-view getter from the current mobile page at tick time', () => {
-    expect(hud).toContain(
-      'this.actionForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)) !== null',
-    );
-    expect(hud).toContain(
-      'this.abilityForSlot(sourceSlotForMobileButton(this.mobileActionPage, i))',
-    );
-    expect(hud).toContain('this.itemForSlot(sourceSlotForMobileButton(this.mobileActionPage, i))');
+    expect(hud).toContain('this.actionForSlot(this.mobileSourceSlotForButton(i)) !== null');
+    expect(hud).toContain('this.abilityForSlot(this.mobileSourceSlotForButton(i))');
+    expect(hud).toContain('this.itemForSlot(this.mobileSourceSlotForButton(i))');
   });
 
   it('wires the page toggle button to cycleMobileActionPage', () => {
@@ -507,7 +540,13 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
 
   it('passes the shared mobile page count into the mobile ring painter', () => {
     expect(hud).toMatch(
-      /this\.mobileActionRingPainter\.paint\([\s\S]*?mobilePageCount\(\),[\s\S]*?\);/,
+      /this\.mobileActionRingPainter\.paint\([\s\S]*?mobilePageCount\(mobileActionSourceSlotCount\),[\s\S]*?\);/,
+    );
+  });
+
+  it('passes the live mobile-visible source-slot count into the mobile ring painter', () => {
+    expect(hud).toContain(
+      'const mobileActionSourceSlotCount = this.mobileActionSourceSlotCount();',
     );
   });
 
@@ -515,5 +554,59 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     expect(hud).toContain(
       "(iconKey) => (iconKey === ATTACK_ICON_KEY ? '' : this.actionBarIconBg(iconKey)),",
     );
+  });
+
+  // #2529: the page/count latch is two integers, so a language switch alone
+  // cannot move it and the elision above would hold the previous locale's
+  // "Page X of Y" and toggle name for as long as the player stayed on the page.
+  it('re-issues the elided indicator writes in the new locale after relocalize()', () => {
+    const { calls, writers } = recordingFacet();
+    const els = [0, 1, 2, 3, 4, 5].map((i) => slotElements(`ring${i}`));
+    const indicator = { tag: 'indicator' } as unknown as HTMLElement;
+    const toggle = { tag: 'toggle' } as unknown as HTMLElement;
+    let locale = 'en';
+    const painter = new MobileActionRingPainter(
+      writers,
+      {
+        bar: { container: { tag: 'c' } as unknown as HTMLElement, slots: els },
+        pageToggle: toggle,
+        pageIndicator: indicator,
+      },
+      (key) => `URL(${key})`,
+      (key, values) => `${locale}:${key}${values ? `|${JSON.stringify(values)}` : ''}`,
+    );
+    const pageBox = { page: 0 };
+    const view = createActionBarView({ slots: ringDescriptor(pageBox, new Map()) }, fakeDeps());
+    const indicatorWrites = (): unknown[] =>
+      calls.filter((c) => c.m === 'setText' && c.args[0] === indicator).map((c) => c.args[1]);
+    const toggleWrites = (): unknown[] =>
+      calls.filter((c) => c.m === 'setAttr' && c.args[0] === toggle).map((c) => c.args[2]);
+
+    painter.paint(view.tick(idleWorld()), 0, 2);
+    expect(indicatorWrites()).toEqual([
+      'en:hudChrome.mobile.actionPageIndicator|{"page":1,"count":2}',
+    ]);
+    expect(toggleWrites()).toEqual(['en:hudChrome.mobile.actionPageToggle']);
+
+    // The switch itself moves nothing the latch can see: this paint must elide.
+    locale = 'es';
+    painter.paint(view.tick(idleWorld()), 0, 2);
+    expect(indicatorWrites(), 'the unchanged-page paint stopped eliding').toHaveLength(1);
+
+    painter.relocalize();
+    painter.paint(view.tick(idleWorld()), 0, 2);
+    expect(indicatorWrites()).toEqual([
+      'en:hudChrome.mobile.actionPageIndicator|{"page":1,"count":2}',
+      'es:hudChrome.mobile.actionPageIndicator|{"page":1,"count":2}',
+    ]);
+    expect(toggleWrites()).toEqual([
+      'en:hudChrome.mobile.actionPageToggle',
+      'es:hudChrome.mobile.actionPageToggle',
+    ]);
+
+    // The latch is retaken by that paint, so the ring goes straight back to
+    // eliding rather than rewriting both nodes on every subsequent frame.
+    painter.paint(view.tick(idleWorld()), 0, 2);
+    expect(indicatorWrites(), 'relocalize() left the page latch cleared').toHaveLength(2);
   });
 });

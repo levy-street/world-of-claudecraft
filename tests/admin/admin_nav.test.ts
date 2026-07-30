@@ -86,6 +86,24 @@ describe('AdminNav', () => {
     );
   });
 
+  it('keeps bug reports as the support default and exposes unstuck reports', () => {
+    render(AdminNav, {
+      route: { page: 'unstuck-reports' },
+      onSelect: () => {},
+      onClose: () => {},
+    });
+
+    expect(screen.getByRole('link', { name: t('nav.support') })).toHaveAttribute(
+      'href',
+      expect.stringContaining('page=bug-reports'),
+    );
+    expect(screen.getByRole('link', { name: t('nav.bugReports') })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: t('nav.unstuckReports') })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
   it('filters sections and items down to the granted permissions', () => {
     grantPermissions(['moderation.read', 'accounts.read']);
     render(AdminNav, {
@@ -107,6 +125,7 @@ describe('AdminNav', () => {
     expect(screen.queryByRole('link', { name: t('nav.overview') })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: t('nav.botDetector') })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: t('nav.bugReports') })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: t('nav.unstuckReports') })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: t('nav.staff') })).not.toBeInTheDocument();
   });
 });
