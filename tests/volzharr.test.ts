@@ -198,10 +198,12 @@ describe('Volzharr, the Buried Furnace (wing 3)', () => {
     greeder.pos = { x: vent.pos.x + VENT_RADIUS + 2, y: greeder.pos.y, z: vent.pos.z };
     ticks(sim, 2);
     expect(stander.vy).toBeGreaterThan(0); // launched
-    ticks(sim, 200); // ten seconds of greed
-    const stacks = auraStacks(greeder, FORGEHEAT_AURA_ID);
-    expect(stacks).toBeGreaterThan(0);
-    expect(stacks).toBeLessThanOrEqual(FORGEHEAT_STACK_CAP);
+    // Decisive stack curve, not a vacuous range (#2671 review finding 1): a
+    // stack per full second of continuous rim exposure, then the hard cap.
+    ticks(sim, 50); // ~2.6 seconds on the rim
+    expect(auraStacks(greeder, FORGEHEAT_AURA_ID)).toBe(3);
+    ticks(sim, 150); // ten seconds of greed total
+    expect(auraStacks(greeder, FORGEHEAT_AURA_ID)).toBe(FORGEHEAT_STACK_CAP);
   });
 
   it('wakes Cinderlings that shamble home and feed permanent Emberfeed stacks', () => {

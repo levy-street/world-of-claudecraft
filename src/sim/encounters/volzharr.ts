@@ -21,7 +21,8 @@
 // players take every ground pulse under them; no mechanic assumes
 // height-dodging. All rng through ctx.rng in tick order: one draw pair per
 // unbaited vent (angle+distance), one draw per baited vent (the target pick),
-// and NOTHING else draws. src/sim-pure (tests/architecture.test.ts).
+// one damage-roll draw per Eruption resolve, and NOTHING else draws.
+// src/sim-pure (tests/architecture.test.ts).
 
 import type { SimContext } from '../sim_context';
 import { type Aura, DT, dist2d, type Entity } from '../types';
@@ -67,6 +68,7 @@ export interface VolzharrEncounterState {
   emberWakeTimer: number;
   emberfeedStacks: number;
   geyserCd: Map<number, number>; // entityId -> remaining cooldown
+  rimHeat: Map<number, number>; // entityId -> continuous seconds on a Forgeheat rim
   shamblers: Set<number>; // woken Cinderling entity ids walking home
 }
 
@@ -124,6 +126,7 @@ export function initVolzharrEncounter(boss: Entity): void {
     emberWakeTimer: EMBER_WAKE_CADENCE_S,
     emberfeedStacks: 0,
     geyserCd: new Map(),
+    rimHeat: new Map(),
     shamblers: new Set(),
   };
 }
@@ -210,22 +213,20 @@ export function updateVolzharrEncounter(ctx: SimContext, boss: Entity): void {
       p.vy = GEYSER_APEX_VY; // the standing fall model prices the landing
     }
     if (nearVent && !inVent) {
-      const current = p.auras.find((a) => a.id === FORGEHEAT_AURA_ID)?.stacks ?? 0;
-      const stacks = Math.min(FORGEHEAT_STACK_CAP, current + (current === 0 ? 1 : 0));
-      // One stack gained on entering the rim; held stacks refresh while near.
-      // Additional stacks accrue on a 1 s cadence via the aura's own refresh:
-      // model it simply: while near, bump at most once per second of exposure.
+      // Exposure is tracked EXPLICITLY (a per-entity seconds-on-rim
+      // accumulator, like geyserCd), never inferred from the aura's own
+      // remaining: the refresh rewrote remaining every tick, so the decay
+      // condition could never reach a full second and the cap was
+      // unreachable (#2671 review finding 1). One stack on entry, one more
+      // per full second of continuous greed, capped; an unexpired holder is
+      // never downgraded by re-entering the rim.
+      const heat = (st.rimHeat.get(p.id) ?? 0) + DT;
+      st.rimHeat.set(p.id, heat);
       const holder = p.auras.find((a) => a.id === FORGEHEAT_AURA_ID);
-      let next = stacks;
-      if (holder) {
-        // remaining ticks down; when it has decayed a full second below its
-        // duration, treat that as one second of exposure and add a stack.
-        if (holder.duration - holder.remaining >= 1 && (holder.stacks ?? 1) < FORGEHEAT_STACK_CAP) {
-          next = (holder.stacks ?? 1) + 1;
-        } else {
-          next = holder.stacks ?? 1;
-        }
-      }
+      const next = Math.min(
+        FORGEHEAT_STACK_CAP,
+        Math.max(holder?.stacks ?? 1, 1 + Math.floor(heat)),
+      );
       pushStackAura(
         ctx,
         p,
@@ -250,6 +251,10 @@ export function updateVolzharrEncounter(ctx: SimContext, boss: Entity): void {
         'fire',
         boss.id,
       );
+    } else {
+      // Stepping off the rim ends the continuous-exposure clock; the held
+      // aura keeps decaying on its own duration.
+      st.rimHeat.delete(p.id);
     }
   }
 
