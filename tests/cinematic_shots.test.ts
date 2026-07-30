@@ -89,6 +89,22 @@ const MAX_RELEASE_POSITION_DELTA_YARDS = 20;
 const MAX_RELEASE_ORIENTATION_DELTA_DEG = 75;
 // Screen motion below this normalized-frame rate is treated as stationary.
 const MIN_SHIP_SCREEN_VELOCITY_PER_SEC = 0.01;
+// A vessel under way below this speed reads as stopped while it remains on camera.
+const MIN_ON_CAMERA_PROP_WAY_YARDS_PER_SEC = 0.5;
+// One hundredth of a yard distinguishes an authored voyage from a stationary prop cue.
+const MIN_PROP_PATH_TRAVEL_YARDS = 0.01;
+// Vessel acceleration above this cap reads as a visible lurch.
+const MAX_ON_CAMERA_PROP_ACCELERATION_YARDS_PER_SEC_SQUARED = 4;
+// One percent of a normalized half-frame is the minimum meaningful subject travel.
+const MIN_SHOT_SUBJECT_SCREEN_MOTION = 0.01;
+// A quarter-yard camera move is the minimum meaningful positional pose change.
+const MIN_SHOT_CAMERA_POSITION_DELTA_YARDS = 0.25;
+// Half a degree is the minimum meaningful camera orientation change.
+const MIN_SHOT_CAMERA_ORIENTATION_DELTA_DEG = 0.5;
+// Half a percent of a normalized half-frame is the minimum meaningful parallax.
+const MIN_SHOT_PARALLAX = 0.005;
+// The parallax probe sits beyond the first visible subject along its view ray.
+const SHOT_PARALLAX_REFERENCE_DEPTH_YARDS = 40;
 // The cinematic renderer's default vertical field of view is 60 degrees.
 const CINEMATIC_VERTICAL_FOV_DEG = 60;
 // The gate protects the standard widescreen composition used for cinematic review.
@@ -132,8 +148,12 @@ type MechanicalCheck =
   | 'motion.dollySpeed'
   | 'motion.poseContinuity'
   | 'motion.cutJump'
+  | 'motion.propWay'
+  | 'motion.propAcceleration'
+  | 'motion.visualFloor'
   | 'cut.heldDuration'
   | 'cut.bracketing'
+  | 'cut.firstTransition'
   | 'cut.finalRelease'
   | 'cut.releaseDelta'
   | 'cut.fadeSlack'
@@ -169,8 +189,23 @@ const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
   },
   {
     sceneId: 'scn_lb_ferry_depart_back',
+    check: 'cut.firstTransition',
+    reason: 'P3 must ease the first attach shot from the live camera pose.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_back',
     check: 'fade.symmetry',
     reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_back',
+    check: 'motion.propAcceleration',
+    reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_back',
+    check: 'motion.propWay',
+    reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
   },
   {
     sceneId: 'scn_lb_ferry_depart_back',
@@ -194,8 +229,23 @@ const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
   },
   {
     sceneId: 'scn_lb_ferry_depart_out',
+    check: 'cut.firstTransition',
+    reason: 'P3 must ease the first attach shot from the live camera pose.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_out',
     check: 'fade.symmetry',
     reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_out',
+    check: 'motion.propAcceleration',
+    reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_out',
+    check: 'motion.propWay',
+    reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
   },
   {
     sceneId: 'scn_lb_ferry_depart_out',
@@ -229,8 +279,23 @@ const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
   },
   {
     sceneId: 'scn_lb_q0_voyage',
+    check: 'cut.firstTransition',
+    reason: 'P3 must ease the first attach shot from the live camera pose.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
     check: 'fade.symmetry',
     reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
+    check: 'motion.propAcceleration',
+    reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
+    check: 'motion.propWay',
+    reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
   },
   {
     sceneId: 'scn_lb_q0_voyage',
@@ -290,6 +355,11 @@ interface CameraGeometry {
   readonly up: SceneRigPoint;
 }
 
+interface ScreenPoint {
+  readonly x: number;
+  readonly y: number;
+}
+
 interface CameraSample {
   readonly time: number;
   readonly timedOp: TimedSceneOp;
@@ -297,6 +367,18 @@ interface CameraSample {
   readonly geometry: CameraGeometry;
   readonly fullBlack: boolean;
   readonly shipScreenX: ReadonlyMap<string, number>;
+  readonly subject: SceneRigPoint | null;
+  readonly subjectScreen: ScreenPoint | null;
+}
+
+interface PropMotionSample {
+  readonly time: number;
+  readonly target: string;
+  readonly active: ActiveProp;
+  readonly cameraOp: TimedSceneOp;
+  readonly position: SceneRigPoint;
+  readonly inFrame: boolean;
+  readonly fullBlack: boolean;
 }
 
 interface ReleaseDelta {
@@ -319,6 +401,7 @@ interface Violation {
 
 interface SyntheticPresentationFixture {
   readonly playerHeightOffset?: number;
+  readonly playerStart?: { x: number; z: number };
 }
 
 interface SyntheticSceneDef extends SceneDef {
@@ -340,6 +423,9 @@ const SYNTHETIC_MISSED_BERTH_ARRIVAL_CUE = 'scn_test_lint_arrival_berth_bad';
 const SYNTHETIC_CROSSWIND_ARRIVAL_CUE = 'scn_test_lint_arrival_travel_bad';
 const SYNTHETIC_HULL_CLIP_CUE = 'scn_test_lint_hull_clip_bad';
 const SYNTHETIC_RIDER_DRIFT_CUE = 'scn_test_lint_rider_drift_bad';
+const SYNTHETIC_ATTACH_PASS_CUE = 'scn_test_lint_attach_pass';
+const SYNTHETIC_PROP_DEAD_STOP_CUE = 'scn_test_lint_prop_dead_stop_bad';
+const SYNTHETIC_PROP_LURCH_CUE = 'scn_test_lint_prop_lurch_bad';
 
 interface SyntheticCameraSceneOptions {
   readonly hideRelease?: boolean;
@@ -424,7 +510,10 @@ const SYNTHETIC_GRAMMAR_CAMERA_OPS = [
     kind: 'camera',
     shot: {
       kind: 'dolly',
-      points: [{ x: 0, z: 0, height: 100 }],
+      points: [
+        { x: 0, z: 0, height: 100 },
+        { x: 1, z: 0, height: 100 },
+      ],
       lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
       dur: 1.6,
     },
@@ -446,7 +535,10 @@ function syntheticFadeSlackScene(id: string, blackSlackSeconds: number): SceneDe
         kind: 'camera',
         shot: {
           kind: 'dolly',
-          points: [{ x: 0, z: 0, height: 100 }],
+          points: [
+            { x: 0, z: 0, height: 100 },
+            { x: 1, z: 0, height: 100 },
+          ],
           lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
           dur: 1.6,
         },
@@ -493,19 +585,32 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     actorIds: ['tam'],
   },
   {
-    def: syntheticCameraScene('scn_test_lint_attach_pass', 1.7, [
-      {
-        at: 0,
-        kind: 'camera',
-        shot: {
-          kind: 'attach',
-          target: 'test_ship',
-          fallbackFrame: { point: { x: 2, z: -2, height: 0 }, yaw: 0 },
-          offset: { x: 0, y: 5.774799, z: -11.390825 },
-          lookAt: { x: 0, y: 2, z: 0 },
+    def: syntheticCameraScene(
+      'scn_test_lint_attach_pass',
+      1.7,
+      [
+        {
+          at: 0,
+          kind: 'prop',
+          target: 'harbor_ship_mainland',
+          cue: SYNTHETIC_ATTACH_PASS_CUE,
         },
+        {
+          at: 0,
+          kind: 'camera',
+          shot: {
+            kind: 'attach',
+            target: 'harbor_ship_mainland',
+            fallbackFrame: { point: { x: 240.5, z: -44, height: 8 }, yaw: Math.PI / 2 },
+            offset: { x: -50, y: 18, z: 0 },
+            lookAt: { x: -30, y: 8.6, z: 0 },
+          },
+        },
+      ],
+      {
+        presentationFixture: { playerStart: MAINLAND_HARBOR.berth },
       },
-    ]),
+    ),
     expectedCheck: null,
   },
   {
@@ -804,6 +909,92 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
       },
     ]),
     expectedCheck: 'prop.speed',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_prop_dead_stop_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_mainland',
+        cue: SYNTHETIC_PROP_DEAD_STOP_CUE,
+      },
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_mainland',
+          fallbackFrame: { point: { x: 240.5, z: -44, height: 8 }, yaw: Math.PI / 2 },
+          offset: { x: 6.6, y: 18, z: -28 },
+          lookAt: { x: 6.6, y: 8.6, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: 'motion.propWay',
+    expectedMeasured: 'way fell from',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_prop_lurch_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_mainland',
+        cue: SYNTHETIC_PROP_LURCH_CUE,
+      },
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_mainland',
+          fallbackFrame: { point: { x: 240.5, z: -44, height: 8 }, yaw: Math.PI / 2 },
+          offset: { x: 6.6, y: 18, z: -28 },
+          lookAt: { x: 6.6, y: 8.6, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: 'motion.propAcceleration',
+    expectedMeasured: 'acceleration',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_visual_motion_floor_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 0, z: 0, height: 100 }],
+          lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
+          dur: 1.6,
+        },
+      },
+    ]),
+    expectedCheck: 'motion.visualFloor',
+    expectedMeasured: 'subject 0.0000',
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_first_transition_bad',
+      1.7,
+      [
+        {
+          at: 0,
+          kind: 'camera',
+          shot: {
+            kind: 'dolly',
+            points: [
+              { x: 0, z: 0, height: 100 },
+              { x: 1, z: 0, height: 100 },
+            ],
+            lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
+            dur: 1.6,
+          },
+        },
+      ],
+      { coverFirstCut: false },
+    ),
+    expectedCheck: 'cut.firstTransition',
+    expectedMeasured: 'camera/dolly without full black',
   },
   {
     def: syntheticCameraScene('scn_test_lint_arrival_direction_bad', 1.7, [
@@ -1107,6 +1298,24 @@ const PROP_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> = {
     end: { x: 40, y: 0, z: 0, yaw: 0 },
     duration: 1.6,
     ease: 'linear',
+  },
+  [SYNTHETIC_ATTACH_PASS_CUE]: {
+    start: { x: 50, y: 10, z: 0, yaw: 0 },
+    end: { x: 58, y: 10, z: 0, yaw: 0 },
+    duration: 4,
+    ease: 'linear',
+  },
+  [SYNTHETIC_PROP_DEAD_STOP_CUE]: {
+    start: { x: 159.519453, y: 0, z: -4.456482, yaw: -1.910796 },
+    end: { x: 165.519453, y: 0, z: -4.456482, yaw: -1.910796 },
+    duration: 0.7,
+    ease: 'linear',
+  },
+  [SYNTHETIC_PROP_LURCH_CUE]: {
+    start: { x: 159.519453, y: 0, z: -4.456482, yaw: -1.910796 },
+    end: { x: 167.519453, y: 0, z: -4.456482, yaw: -1.910796 },
+    duration: 1.6,
+    ease: 'easeInQuad',
   },
 };
 const ARRIVAL_HARBOR_BY_CUE = new Map<string, HarborDef['id']>([
@@ -1460,14 +1669,22 @@ function applySyntheticPresentationFixture(
   scene: CapturedScene,
   fixture: SyntheticPresentationFixture | undefined,
 ): CapturedScene {
-  if (fixture?.playerHeightOffset === undefined) return scene;
+  if (fixture?.playerHeightOffset === undefined && fixture?.playerStart === undefined) return scene;
   const frames = new Map<number, SceneFrame>();
   for (const [sample, frame] of scene.frames) {
+    const playerX = fixture.playerStart?.x ?? frame.live.playerX;
+    const playerZ = fixture.playerStart?.z ?? frame.live.playerZ;
+    const basePlayerY =
+      fixture.playerStart === undefined
+        ? frame.live.playerY
+        : sampleTerrainHeight(playerX, playerZ, scene.seed);
     frames.set(sample, {
       ...frame,
       live: {
         ...frame.live,
-        playerY: frame.live.playerY + fixture.playerHeightOffset,
+        playerX,
+        playerY: basePlayerY + (fixture.playerHeightOffset ?? 0),
+        playerZ,
       },
     });
   }
@@ -1565,6 +1782,14 @@ function pointInFrame(
   };
 }
 
+function screenPoint(geometry: CameraGeometry, point: SceneRigPoint): ScreenPoint {
+  const projected = pointInFrame(geometry, point);
+  return {
+    x: Math.tan(projected.horizontal) / Math.tan(HORIZONTAL_HALF_FOV_RAD),
+    y: Math.tan(projected.vertical) / Math.tan(VERTICAL_HALF_FOV_RAD),
+  };
+}
+
 function playerCapsuleIntersectsFrame(
   geometry: CameraGeometry,
   player: { x: number; y: number; z: number },
@@ -1588,8 +1813,7 @@ function playerCapsuleIntersectsFrame(
 }
 
 function screenX(geometry: CameraGeometry, point: SceneRigPoint): number {
-  const projected = pointInFrame(geometry, point);
-  return Math.tan(projected.horizontal) / Math.tan(HORIZONTAL_HALF_FOV_RAD);
+  return screenPoint(geometry, point).x;
 }
 
 function subjectForShot(
@@ -2048,6 +2272,7 @@ function lintFilmGrammar(
   }
 
   const firstAuthoredCamera = scene.authoredOps.find((op) => op.kind === 'camera');
+  const firstShot = cameraOps.find((timed) => timed.op.shot.kind !== 'release');
   for (const [cutIndex, cut] of cameraOps.entries()) {
     const isSceneStartCut =
       cutIndex === 0 &&
@@ -2058,6 +2283,21 @@ function lintFilmGrammar(
       : Math.max(0, cut.at - MIN_FULL_BLACK_CUT_SLACK_SECONDS);
     const startOpacity = fadeOpacityAfterSceneOps(scene, slackStart, cut.index);
     const cutOpacity = fadeOpacityAfterSceneOps(scene, cut.at);
+    if (
+      cut.index === firstShot?.index &&
+      cutOpacity < FULL_BLACK_OPACITY &&
+      cut.op.shot.kind !== 'focus'
+    ) {
+      report({
+        sceneId: scene.id,
+        check: 'cut.firstTransition',
+        opIndex: cut.index,
+        opKind: opKind(cut.op),
+        time: cut.at,
+        threshold: 'full black at the first cut or a focus shot eased from the live camera pose',
+        measured: `${opKind(cut.op)} without full black, fade ${cutOpacity.toFixed(3)}`,
+      });
+    }
     if (startOpacity < FULL_BLACK_OPACITY || cutOpacity < FULL_BLACK_OPACITY) {
       report({
         sceneId: scene.id,
@@ -2256,6 +2496,235 @@ function lintCollisionAndSupportSample(
   }
 }
 
+function propMotionVelocity(
+  previous: PropMotionSample,
+  current: PropMotionSample,
+): SceneRigPoint | null {
+  const dt = current.time - previous.time;
+  if (dt <= SCENE_TIME_EPSILON_SECONDS || dt > SAMPLE_INTERVAL_SEC * 1.5) return null;
+  return scale(subtract(current.position, previous.position), 1 / dt);
+}
+
+function samePropCameraWindow(previous: PropMotionSample, current: PropMotionSample): boolean {
+  return (
+    previous.active.timedOp.index === current.active.timedOp.index &&
+    previous.cameraOp.index === current.cameraOp.index
+  );
+}
+
+function propVisible(sample: PropMotionSample): boolean {
+  return sample.inFrame && !sample.fullBlack;
+}
+
+function lintPropMotionQuality(
+  scene: CapturedScene,
+  samples: readonly PropMotionSample[],
+  report: (violation: Violation) => void,
+): void {
+  const byCue = new Map<number, PropMotionSample[]>();
+  for (const sample of samples) {
+    const cueSamples = byCue.get(sample.active.timedOp.index);
+    if (cueSamples) cueSamples.push(sample);
+    else byCue.set(sample.active.timedOp.index, [sample]);
+  }
+  const reportedWay = new Set<number>();
+  const reportedAcceleration = new Set<number>();
+
+  for (const cueSamples of byCue.values()) {
+    const context = cueSamples[0];
+    if (!context) continue;
+    const harbor = HARBORS.find((candidate) => shipTarget(candidate) === context.target);
+    if (!harbor) continue;
+    const start = shipFrameForPose(harbor, propPathPoseAt(context.active.segment, 0)).position;
+    const end = shipFrameForPose(
+      harbor,
+      propPathPoseAt(context.active.segment, context.active.segment.duration),
+    ).position;
+    const vesselUnderWay = length(subtract(end, start)) > MIN_PROP_PATH_TRAVEL_YARDS;
+    if (!vesselUnderWay) continue;
+
+    for (let index = 1; index < cueSamples.length; index++) {
+      const previous = cueSamples[index - 1];
+      const current = cueSamples[index];
+      if (
+        !previous ||
+        !current ||
+        !samePropCameraWindow(previous, current) ||
+        !previous.fullBlack ||
+        current.fullBlack ||
+        !current.inFrame ||
+        current.time - current.active.startedAt >= current.active.segment.duration ||
+        reportedWay.has(current.active.timedOp.index)
+      ) {
+        continue;
+      }
+      const velocity = propMotionVelocity(previous, current);
+      if (!velocity) continue;
+      const way = length(velocity);
+      if (way >= MIN_ON_CAMERA_PROP_WAY_YARDS_PER_SEC) continue;
+      reportedWay.add(current.active.timedOp.index);
+      report({
+        sceneId: scene.id,
+        check: 'motion.propWay',
+        opIndex: current.active.timedOp.index,
+        opKind: opKind(current.active.timedOp.op),
+        time: current.time,
+        threshold: `at least ${MIN_ON_CAMERA_PROP_WAY_YARDS_PER_SEC.toFixed(
+          2,
+        )} yd/s way when a fade reveals a vessel under way`,
+        measured: `${way.toFixed(2)} yd/s way at fade-in for ${current.target}`,
+      });
+    }
+
+    for (let index = 2; index < cueSamples.length; index++) {
+      const first = cueSamples[index - 2];
+      const middle = cueSamples[index - 1];
+      const current = cueSamples[index];
+      if (
+        !first ||
+        !middle ||
+        !current ||
+        !samePropCameraWindow(first, middle) ||
+        !samePropCameraWindow(middle, current) ||
+        !propVisible(first) ||
+        !propVisible(middle) ||
+        !propVisible(current)
+      ) {
+        continue;
+      }
+      const previousVelocity = propMotionVelocity(first, middle);
+      const currentVelocity = propMotionVelocity(middle, current);
+      if (!previousVelocity || !currentVelocity) continue;
+      const previousWay = length(previousVelocity);
+      const currentWay = length(currentVelocity);
+
+      if (
+        !reportedWay.has(current.active.timedOp.index) &&
+        previousWay >= MIN_ON_CAMERA_PROP_WAY_YARDS_PER_SEC &&
+        currentWay < MIN_ON_CAMERA_PROP_WAY_YARDS_PER_SEC
+      ) {
+        reportedWay.add(current.active.timedOp.index);
+        report({
+          sceneId: scene.id,
+          check: 'motion.propWay',
+          opIndex: current.active.timedOp.index,
+          opKind: opKind(current.active.timedOp.op),
+          time: current.time,
+          threshold: `at least ${MIN_ON_CAMERA_PROP_WAY_YARDS_PER_SEC.toFixed(
+            2,
+          )} yd/s while a vessel under way remains on camera`,
+          measured: `way fell from ${previousWay.toFixed(2)} to ${currentWay.toFixed(
+            2,
+          )} yd/s for ${current.target}`,
+        });
+      }
+
+      if (reportedAcceleration.has(current.active.timedOp.index)) continue;
+      const dt = (current.time - first.time) / 2;
+      if (dt <= SCENE_TIME_EPSILON_SECONDS) continue;
+      const acceleration = length(subtract(currentVelocity, previousVelocity)) / dt;
+      if (acceleration <= MAX_ON_CAMERA_PROP_ACCELERATION_YARDS_PER_SEC_SQUARED) continue;
+      reportedAcceleration.add(current.active.timedOp.index);
+      report({
+        sceneId: scene.id,
+        check: 'motion.propAcceleration',
+        opIndex: current.active.timedOp.index,
+        opKind: opKind(current.active.timedOp.op),
+        time: current.time,
+        threshold: `at most ${MAX_ON_CAMERA_PROP_ACCELERATION_YARDS_PER_SEC_SQUARED.toFixed(
+          2,
+        )} yd/s^2 on-camera vessel acceleration`,
+        measured: `${acceleration.toFixed(2)} yd/s^2 acceleration for ${current.target}`,
+      });
+    }
+  }
+}
+
+function lintMinimumVisualMotion(
+  scene: CapturedScene,
+  shotOps: readonly TimedCameraOp[],
+  samples: readonly CameraSample[],
+  report: (violation: Violation) => void,
+): void {
+  for (const shot of shotOps) {
+    const visible = samples.filter(
+      (sample) =>
+        sample.timedOp.index === shot.index &&
+        !sample.fullBlack &&
+        sample.subject !== null &&
+        sample.subjectScreen !== null,
+    );
+    const first = visible[0];
+    if (!first?.subject || !first.subjectScreen) continue;
+    const subjectRay = normalize(subtract(first.subject, first.geometry.camera));
+    const background = add(first.subject, scale(subjectRay, SHOT_PARALLAX_REFERENCE_DEPTH_YARDS));
+    const firstBackgroundScreen = screenPoint(first.geometry, background);
+    let maximumSubjectMotion = 0;
+    let maximumCameraPositionDelta = 0;
+    let maximumCameraOrientationDelta = 0;
+    let maximumParallax = 0;
+
+    for (const sample of visible.slice(1)) {
+      if (!sample.subjectScreen) continue;
+      const subjectDelta = {
+        x: sample.subjectScreen.x - first.subjectScreen.x,
+        y: sample.subjectScreen.y - first.subjectScreen.y,
+      };
+      maximumSubjectMotion = Math.max(
+        maximumSubjectMotion,
+        Math.hypot(subjectDelta.x, subjectDelta.y),
+      );
+      maximumCameraPositionDelta = Math.max(
+        maximumCameraPositionDelta,
+        length(subtract(sample.geometry.camera, first.geometry.camera)),
+      );
+      maximumCameraOrientationDelta = Math.max(
+        maximumCameraOrientationDelta,
+        directionAngleDeg(sample.geometry.forward, first.geometry.forward),
+      );
+      const backgroundScreen = screenPoint(sample.geometry, background);
+      const backgroundDelta = {
+        x: backgroundScreen.x - firstBackgroundScreen.x,
+        y: backgroundScreen.y - firstBackgroundScreen.y,
+      };
+      maximumParallax = Math.max(
+        maximumParallax,
+        Math.hypot(subjectDelta.x - backgroundDelta.x, subjectDelta.y - backgroundDelta.y),
+      );
+    }
+
+    if (
+      maximumSubjectMotion > MIN_SHOT_SUBJECT_SCREEN_MOTION ||
+      maximumCameraPositionDelta > MIN_SHOT_CAMERA_POSITION_DELTA_YARDS ||
+      maximumCameraOrientationDelta > MIN_SHOT_CAMERA_ORIENTATION_DELTA_DEG ||
+      maximumParallax > MIN_SHOT_PARALLAX
+    ) {
+      continue;
+    }
+    report({
+      sceneId: scene.id,
+      check: 'motion.visualFloor',
+      opIndex: shot.index,
+      opKind: opKind(shot.op),
+      time: first.time,
+      threshold: `subject screen motion above ${MIN_SHOT_SUBJECT_SCREEN_MOTION.toFixed(
+        3,
+      )}, camera pose delta above ${MIN_SHOT_CAMERA_POSITION_DELTA_YARDS.toFixed(
+        2,
+      )} yd or ${MIN_SHOT_CAMERA_ORIENTATION_DELTA_DEG.toFixed(
+        2,
+      )} deg, or parallax above ${MIN_SHOT_PARALLAX.toFixed(3)}`,
+      measured: `subject ${maximumSubjectMotion.toFixed(
+        4,
+      )}, camera ${maximumCameraPositionDelta.toFixed(
+        2,
+      )} yd and ${maximumCameraOrientationDelta.toFixed(
+        2,
+      )} deg, parallax ${maximumParallax.toFixed(4)}`,
+    });
+  }
+}
+
 function lintScene(scene: CapturedScene, report: (violation: Violation) => void): CameraSample[] {
   const director = createSceneDirectorState();
   const overlay = createSceneOverlayState();
@@ -2271,6 +2740,7 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
     [...scene.ops].reverse().find((timed) => timed.op.kind === 'end') ?? scene.ops.at(-1);
   const releases: ReleaseDelta[] = [];
   const samples: CameraSample[] = [];
+  const propMotionSamples: PropMotionSample[] = [];
   const collisionSupportState: CollisionSupportState = {
     hullOps: new Set(),
     unsupportedEntities: new Set(),
@@ -2527,14 +2997,29 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
     const poseCopy = copyPose(pose);
     const geometry = geometryForPose(poseCopy);
     const fullBlack = overlayModel.fadeOpacity >= FULL_BLACK_OPACITY;
+    const activeShot = director.shot;
+    const subject = activeShot ? subjectForShot(activeShot, poseCopy, resolveEntity) : null;
     const shipScreenPositions = new Map<string, number>();
     for (const target of propTargets) {
       const harbor = HARBORS.find((candidate) => shipTarget(candidate) === target);
       if (!harbor) continue;
-      shipScreenPositions.set(
+      const shipCenter = shipDeckCenterAt(harbor, time, activeProps);
+      shipScreenPositions.set(target, screenX(geometry, shipCenter));
+      const active = activeProps.get(target);
+      if (!active) continue;
+      const projected = pointInFrame(geometry, shipCenter);
+      propMotionSamples.push({
+        time,
         target,
-        screenX(geometry, shipDeckCenterAt(harbor, time, activeProps)),
-      );
+        active,
+        cameraOp: currentCameraOp,
+        position: shipFrameAt(harbor, time, activeProps).position,
+        inFrame:
+          projected.depth > 0 &&
+          Math.abs(projected.horizontal) <= HORIZONTAL_HALF_FOV_RAD &&
+          Math.abs(projected.vertical) <= VERTICAL_HALF_FOV_RAD,
+        fullBlack,
+      });
     }
     const sample: CameraSample = {
       time,
@@ -2543,6 +3028,8 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
       geometry,
       fullBlack,
       shipScreenX: shipScreenPositions,
+      subject,
+      subjectScreen: subject ? screenPoint(geometry, subject) : null,
     };
     samples.push(sample);
 
@@ -2590,9 +3077,8 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
       });
     }
 
-    const activeShot = director.shot;
     if (activeShot) {
-      const subject = subjectForShot(activeShot, poseCopy, resolveEntity);
+      if (!subject) throw new Error(`scene ${scene.id} has an active shot without a subject`);
       const sightClearance = sightLineClearance(geometry.camera, subject, scene.seed);
       if (sightClearance < 0) {
         report({
@@ -2765,6 +3251,8 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
   }
 
   lintShipScreenContinuity(scene, cameraOps, samples, report);
+  lintPropMotionQuality(scene, propMotionSamples, report);
+  lintMinimumVisualMotion(scene, shotOps, samples, report);
   return samples;
 }
 
@@ -2878,8 +3366,23 @@ describe('cinematic shot mechanical gate', () => {
       },
       {
         sceneId: 'scn_lb_ferry_depart_back',
+        check: 'cut.firstTransition',
+        reason: 'P3 must ease the first attach shot from the live camera pose.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_back',
         check: 'fade.symmetry',
         reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_back',
+        check: 'motion.propAcceleration',
+        reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_back',
+        check: 'motion.propWay',
+        reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
       },
       {
         sceneId: 'scn_lb_ferry_depart_back',
@@ -2903,8 +3406,23 @@ describe('cinematic shot mechanical gate', () => {
       },
       {
         sceneId: 'scn_lb_ferry_depart_out',
+        check: 'cut.firstTransition',
+        reason: 'P3 must ease the first attach shot from the live camera pose.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_out',
         check: 'fade.symmetry',
         reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_out',
+        check: 'motion.propAcceleration',
+        reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_out',
+        check: 'motion.propWay',
+        reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
       },
       {
         sceneId: 'scn_lb_ferry_depart_out',
@@ -2938,8 +3456,23 @@ describe('cinematic shot mechanical gate', () => {
       },
       {
         sceneId: 'scn_lb_q0_voyage',
+        check: 'cut.firstTransition',
+        reason: 'P3 must ease the first attach shot from the live camera pose.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
         check: 'fade.symmetry',
         reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
+        check: 'motion.propAcceleration',
+        reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
+        check: 'motion.propWay',
+        reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
       },
       {
         sceneId: 'scn_lb_q0_voyage',
