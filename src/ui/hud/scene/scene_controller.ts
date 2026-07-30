@@ -4,6 +4,12 @@
 // Hud.update(). Camera, input lock, and music live game-side in
 // src/game/scene_director.ts; this controller owns everything drawn.
 
+import {
+  armSceneTeardownWatchdog,
+  clearSceneTeardownWatchdog,
+  consumeSceneTeardownWatchdog,
+  createSceneTeardownWatchdogState,
+} from '../../../game/scene_teardown_watchdog_core';
 import type { SimEvent } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
@@ -41,6 +47,7 @@ export interface SceneHudControllerDeps {
 
 export class SceneHudController {
   private readonly overlay = createSceneOverlayState();
+  private readonly teardownWatchdog = createSceneTeardownWatchdogState();
   private readonly choice = createSceneChoiceState();
   private readonly overlayWindow: SceneOverlayWindow;
   private readonly choiceWindow: SceneChoiceWindow;
@@ -67,6 +74,10 @@ export class SceneHudController {
     const nowSec = ev.presentationTime ?? this.deps.now();
     if (ev.type === 'sceneSync') {
       overlayApplySync(this.overlay, ev.state);
+      if (ev.state === null) clearSceneTeardownWatchdog(this.teardownWatchdog);
+      else {
+        armSceneTeardownWatchdog(this.teardownWatchdog, nowSec, ev.state.remainingSeconds);
+      }
       return;
     }
     if (ev.type === 'sceneChoiceSync') {
@@ -97,6 +108,11 @@ export class SceneHudController {
     }
     if (ev.type === 'scene') {
       overlayApplyOp(this.overlay, ev.op, nowSec);
+      if (ev.op.kind === 'start') {
+        armSceneTeardownWatchdog(this.teardownWatchdog, nowSec, ev.op.duration);
+      } else if (ev.op.kind === 'end') {
+        clearSceneTeardownWatchdog(this.teardownWatchdog);
+      }
       return;
     }
     if (ev.type === 'sceneChoice') {
@@ -133,6 +149,9 @@ export class SceneHudController {
   /** Per-frame paint, called from Hud.update(). */
   update(): void {
     const nowSec = this.deps.now();
+    if (consumeSceneTeardownWatchdog(this.teardownWatchdog, nowSec)) {
+      overlayApplyOp(this.overlay, { kind: 'end' }, nowSec);
+    }
     this.overlayWindow.paint(sceneOverlayView(this.overlay, nowSec));
     this.choiceWindow.update(
       sceneChoiceView(this.choice, nowSec, this.deps.world().playerId),

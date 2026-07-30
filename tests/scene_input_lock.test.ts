@@ -7,6 +7,7 @@ import {
   runOfflineSceneInputTick,
   SceneInputLockCoordinator,
 } from '../src/game/scene_input_lock';
+import { SCENE_TEARDOWN_WATCHDOG_MARGIN_SEC } from '../src/game/scene_teardown_watchdog_core';
 import type { SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
@@ -232,6 +233,124 @@ describe('scene input lock frame coordination', () => {
     expect(director.cameraActive()).toBe(false);
   });
 
+  it('tears down a started scene when its end event never arrives', () => {
+    let now = 14;
+    const world = { playerId: 7, entities: new Map() } as unknown as IWorld;
+    const musicSilence = vi.fn();
+    const propCue = vi.fn();
+    const propReset = vi.fn();
+    const director = new SceneDirector({
+      world: () => world,
+      nowSec: () => now,
+      musicSilence,
+      propCue,
+      propReset,
+      reducedMotion: () => false,
+    });
+
+    director.handleEvents([
+      {
+        type: 'scene',
+        sceneId: 'scn_missing_end',
+        pid: 7,
+        presentationTime: 10,
+        op: { kind: 'start', duration: 4 },
+      },
+      {
+        type: 'scene',
+        sceneId: 'scn_missing_end',
+        pid: 7,
+        presentationTime: 10,
+        op: { kind: 'inputLock', on: true },
+      },
+      {
+        type: 'scene',
+        sceneId: 'scn_missing_end',
+        pid: 7,
+        presentationTime: 10,
+        op: {
+          kind: 'camera',
+          shot: {
+            kind: 'focus',
+            entityId: null,
+            x: 0,
+            y: 0,
+            z: 0,
+            dist: 8,
+            pitch: 0.3,
+            yaw: 0,
+            dur: 4,
+          },
+        },
+      },
+      {
+        type: 'scene',
+        sceneId: 'scn_missing_end',
+        pid: 7,
+        presentationTime: 10,
+        op: { kind: 'music', directive: 'silence' },
+      },
+      {
+        type: 'scene',
+        sceneId: 'scn_missing_end',
+        pid: 7,
+        presentationTime: 10,
+        op: { kind: 'prop', target: 'harbor_ship_mainland', cue: 'missing_end' },
+      },
+    ]);
+
+    now = 10 + 4 + SCENE_TEARDOWN_WATCHDOG_MARGIN_SEC - 0.001;
+    expect(director.sceneActive()).toBe(true);
+    expect(director.inputLocked()).toBe(true);
+    expect(propReset).not.toHaveBeenCalled();
+
+    now = 10 + 4 + SCENE_TEARDOWN_WATCHDOG_MARGIN_SEC;
+    expect(director.inputLocked()).toBe(false);
+    expect(director.sceneActive()).toBe(false);
+    expect(director.cameraActive()).toBe(false);
+    expect(musicSilence).toHaveBeenLastCalledWith(false);
+    expect(propCue).toHaveBeenCalledTimes(1);
+    expect(propReset).toHaveBeenCalledTimes(1);
+  });
+
+  it('arms missing-end teardown from reconnect remaining seconds', () => {
+    let now = 32;
+    const world = { playerId: 7, entities: new Map() } as unknown as IWorld;
+    const musicSilence = vi.fn();
+    const propReset = vi.fn();
+    const director = new SceneDirector({
+      world: () => world,
+      nowSec: () => now,
+      musicSilence,
+      propReset,
+      reducedMotion: () => false,
+    });
+
+    director.handleEvents([
+      {
+        type: 'sceneSync',
+        presentationTime: 30,
+        state: {
+          sceneId: 'scn_reconnect_missing_end',
+          remainingSeconds: 2,
+          inputLocked: true,
+          letterbox: true,
+          musicSilenced: true,
+        },
+      },
+    ]);
+    expect(propReset).toHaveBeenCalledTimes(1);
+
+    now = 30 + 2 + SCENE_TEARDOWN_WATCHDOG_MARGIN_SEC - 0.001;
+    expect(director.inputLocked()).toBe(true);
+
+    now = 30 + 2 + SCENE_TEARDOWN_WATCHDOG_MARGIN_SEC;
+    expect(director.inputLocked()).toBe(false);
+    expect(director.sceneActive()).toBe(false);
+    expect(musicSilence).toHaveBeenLastCalledWith(false);
+    expect(propReset).toHaveBeenCalledTimes(2);
+  });
+
   it('wires both event paths before their next authoritative input boundary', () => {
     const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
     const offline = main.slice(main.indexOf('while (acc >= DT)'), main.indexOf('const pp ='));
@@ -250,5 +369,6 @@ describe('scene input lock frame coordination', () => {
     expect(main).toMatch(/const netFacing = sceneInputLocked\s+\? null/);
     expect(main).toContain('resetSceneFacingInputState(sceneFacingInput)');
     expect(main).toContain('bindMirroredSceneInputLock(online, sceneInputLock)');
+    expect(main).toContain('releaseInputLockMirror: () => online?.releaseSceneInputLockMirror(),');
   });
 });
