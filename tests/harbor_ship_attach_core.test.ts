@@ -177,15 +177,18 @@ describe('HarborShipPendingCueState', () => {
 describe('harbor ship attachment wiring', () => {
   it('binds the live harbor frame beside the SceneDirector prop dependencies', () => {
     expect(MAIN_SOURCE).toMatch(
-      / {4}nowSec: \(\) => world\.presentationTime,\n {4}musicSilence: [^\n]+,\n {4}playDirective: [^\n]+,\n {4}propCue: \(target, cue, startSec\) => cueHarborShip\(target, cue, startSec\),\n {4}propReset: \(\) => resetHarborShipCues\(\),\n {4}attachmentFrame: \(target, out\) => harborShipAttachFrame\(target, out\),/,
+      / {4}nowSec: \(\) => world\.presentationTime,\n {4}musicSilence: [^\n]+,\n {4}playDirective: [^\n]+,\n {4}propCue: \(target, cue, startSec\) => cueHarborShip\(target, cue, startSec\),\n {4}propReset: \(\) => resetHarborShipCues\(\),\n {4}releaseInputLockMirror: [^\n]+,\n {4}attachmentFrame: \(target, out, presentationTimeSec\) =>\n {6}harborShipAttachFrame\(target, out, presentationTimeSec\),/,
     );
     expect(HARBOR_SOURCE).toContain('out: SceneAttachFrame = SHIP_ATTACH_FRAME,');
+    expect(HARBOR_SOURCE).toContain('presentationTimeSec?: number,');
   });
 
   it('shares one composition function between the camera query and mesh update', () => {
     const attachFrameSource = functionSource('harborShipAttachFrame');
     expect(attachFrameSource).toContain('if (!handle) return null;');
-    expect(attachFrameSource).toContain('const elapsedSec = SHIP_CUES.elapsedSec(handle);');
+    expect(attachFrameSource).toContain(
+      '(presentationTimeSec ?? harborSceneNowSec()) - handle.cueStartSec',
+    );
     expect(attachFrameSource).toContain('propPathPoseAt(handle.segment, elapsedSec, CUE_POSE)');
     expect(attachFrameSource).toContain('return composeHarborShipAttachFrame(handle, pose, out);');
     expect(attachFrameSource).not.toContain('handle.group.position');
@@ -198,7 +201,7 @@ describe('harbor ship attachment wiring', () => {
       'if (elapsedSec !== null && handle.segment !== null) {\n    handle.group.matrixAutoUpdate = true;',
     );
     expect(updateSource).toContain(
-      'const frame = composeHarborShipAttachFrame(handle, pose, SHIP_UPDATE_FRAME);',
+      'const frame = composeHarborShipAttachFrame(handle, pose, handle.frame);',
     );
     expect(updateSource).toContain(
       'handle.group.position.set(frame.position.x, frame.position.y, frame.position.z);',

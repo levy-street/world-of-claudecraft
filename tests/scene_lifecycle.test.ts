@@ -133,23 +133,6 @@ interface RunResetState {
   readonly campaignFlags: readonly (readonly [string, string])[];
 }
 
-type LifecycleCheck = 'entityPositions';
-
-interface LegacyExemption {
-  readonly sceneId: string;
-  readonly check: LifecycleCheck;
-  readonly reason: string;
-}
-
-// P3 must clear this row by settling actorMove positions on the skip tick.
-const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
-  {
-    sceneId: 'scn_lb_q0_doorway',
-    check: 'entityPositions',
-    reason: 'P3 must settle actorMove endpoints immediately when a scene is skipped.',
-  },
-];
-
 class HeadlessSceneClient {
   private nowSec = 0;
   private readonly overlay = createSceneOverlayState();
@@ -598,25 +581,6 @@ describe('registered scene lifecycle smoke', () => {
 });
 
 describe('registered scene skip parity sweep', () => {
-  for (const exemption of LEGACY_EXEMPTIONS) {
-    it.skip(`${exemption.sceneId} ${exemption.check}: ${exemption.reason}`, () => {});
-  }
-
-  it('pins the exact P3 lifecycle exemption inventory', () => {
-    expect(LEGACY_EXEMPTIONS).toEqual([
-      {
-        sceneId: 'scn_lb_q0_doorway',
-        check: 'entityPositions',
-        reason: 'P3 must settle actorMove endpoints immediately when a scene is skipped.',
-      },
-    ]);
-    for (const exemption of LEGACY_EXEMPTIONS) {
-      expect(SCENE_IDS, `${exemption.sceneId}: exemption scene must remain registered`).toContain(
-        exemption.sceneId,
-      );
-    }
-  });
-
   for (const sceneId of SCENE_IDS) {
     it(`${sceneId} restores lifecycle state and matches the watched world across the skip sweep`, {
       timeout: TEST_TIMEOUT_MS,
@@ -624,10 +588,6 @@ describe('registered scene skip parity sweep', () => {
       const watched = watchedOutcome(sceneId);
       const scene = sceneById(sceneId);
       if (!scene) throw new Error(`registered scene did not resolve: ${sceneId}`);
-      const positionExemption = LEGACY_EXEMPTIONS.find(
-        (row) => row.sceneId === sceneId && row.check === 'entityPositions',
-      );
-      const mismatchedPositionTicks: number[] = [];
       let run = createSceneRun(sceneId);
       const reset = captureRunResetState(run);
       const resetWorld = worldStateSnapshot(run);
@@ -651,24 +611,11 @@ describe('registered scene skip parity sweep', () => {
           worldProgressionSnapshot(skippedWorld),
           `${sceneId} tick ${skipTick}: watched-identical quest and flag state`,
         ).toEqual(worldProgressionSnapshot(watched.world));
-        const skippedPositions = skippedWorld.entities;
-        if (positionExemption) {
-          if (JSON.stringify(skippedPositions) !== JSON.stringify(watched.world.entities)) {
-            mismatchedPositionTicks.push(skipTick);
-          }
-        } else {
-          expect(
-            skippedPositions,
-            `${sceneId} tick ${skipTick}: watched-identical entity positions`,
-          ).toEqual(watched.world.entities);
-        }
-        if (index + 1 < offsets.length) run = restartSceneRun(run, reset, resetWorld);
-      }
-      if (positionExemption) {
         expect(
-          mismatchedPositionTicks.length,
-          `${sceneId}: P3 actorMove exemption must not become stale`,
-        ).toBeGreaterThan(0);
+          skippedWorld.entities,
+          `${sceneId} tick ${skipTick}: watched-identical entity positions`,
+        ).toEqual(watched.world.entities);
+        if (index + 1 < offsets.length) run = restartSceneRun(run, reset, resetWorld);
       }
     });
   }

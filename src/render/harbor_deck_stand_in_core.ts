@@ -17,6 +17,13 @@ export interface DeckStandInRuntimeHandle<TVisual> {
   deckStandIn: TVisual | null;
 }
 
+export function authoritativeDeckRigVisible(
+  standInActive: boolean,
+  sceneCameraActive: boolean,
+): boolean {
+  return !standInActive || !sceneCameraActive;
+}
+
 /** Resolve the transient visual lifecycle from the cue and local-player identity. */
 export function deckStandInAction(
   cueLive: boolean,

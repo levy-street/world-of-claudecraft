@@ -32,12 +32,19 @@ import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
 import { GFX, surfaceMat } from './gfx';
 import {
+  type HarborDeckRiderResolution,
+  harborDeckRiderMidInteraction,
+  missingDeckRiderWarning,
+  resolveHarborDeckRider,
+} from './harbor_deck_rider_core';
+import {
   type DeckStandInAttachPoint,
   deckStandInParentTransform,
   disposeDeckStandIn,
 } from './harbor_deck_stand_in_core';
 import { composeHarborShipAttachFrame } from './harbor_ship_attach_core';
 import { HarborShipCueRegistry } from './harbor_ship_cue_registry';
+import { firstHarborHullColliderOverlap } from './harbor_ship_tripwire_core';
 import { createHarborShipUpdater } from './harbor_ship_update_core';
 import { type PropPathSample, type PropPathSegment, propPathPoseAt } from './prop_path_core';
 import { type PropAsset, propAsset } from './props';
@@ -374,11 +381,16 @@ function buildBollard(
 // cue (nobody but the cued rider ever receives the ops, so the motion is
 // per-client presentation, never shared state).
 interface HarborShipHandle {
+  target: string;
+  harbor: HarborDef;
   group: THREE.Group;
   baseX: number;
   baseY: number;
   baseZ: number;
   baseRot: number;
+  frame: SceneAttachFrame;
+  shipDecks: readonly HarborDeck[];
+  displaced: boolean;
   shipScale: number;
   /** Mirrored simulation seconds when the active segment started, or null. */
   cueStartSec: number | null;
@@ -422,6 +434,7 @@ const SHIP_CUES = new HarborShipCueRegistry<PropPathSegment, HarborShipHandle>({
   activate: (handle, segment, startSec) => {
     handle.segment = segment;
     handle.cueStartSec = startSec;
+    handle.displaced = true;
     handle.group.matrixAutoUpdate = true;
   },
   reset: (handle) => resetShip(handle),
@@ -431,20 +444,41 @@ const SHIP_ATTACH_FRAME: SceneAttachFrame = {
   position: { x: 0, y: 0, z: 0 },
   yaw: 0,
 };
-const SHIP_UPDATE_FRAME: SceneAttachFrame = {
-  position: { x: 0, y: 0, z: 0 },
+const DECK_RIDER_RESOLUTION: HarborDeckRiderResolution = {
+  entityId: 0,
+  target: '',
+  mode: 'none',
+  x: 0,
+  y: 0,
+  z: 0,
   yaw: 0,
 };
+const DECK_RIDER_REQUIRED_RESOLUTION: HarborDeckRiderResolution = {
+  entityId: 0,
+  target: '',
+  mode: 'none',
+  x: 0,
+  y: 0,
+  z: 0,
+  yaw: 0,
+};
+let activeHarbors: readonly HarborDef[] = [];
+let warnedDeckRiders: Set<string> | null = null;
+let warnedHullCues: Set<string> | null = null;
 
 /** Compute the ship's current world transform without touching its freeze state.
  * The yaw convention is shared with scene_rig_core.localToWorld. */
 export function harborShipAttachFrame(
   target: string,
   out: SceneAttachFrame = SHIP_ATTACH_FRAME,
+  presentationTimeSec?: number,
 ): SceneAttachFrame | null {
   const handle = SHIP_CUES.get(target);
   if (!handle) return null;
-  const elapsedSec = SHIP_CUES.elapsedSec(handle);
+  const elapsedSec =
+    handle.cueStartSec === null
+      ? null
+      : (presentationTimeSec ?? harborSceneNowSec()) - handle.cueStartSec;
   const pose =
     elapsedSec !== null && handle.segment !== null
       ? propPathPoseAt(handle.segment, elapsedSec, CUE_POSE)
@@ -468,9 +502,14 @@ export function resetHarborShipCues(): void {
 function resetShip(handle: HarborShipHandle): void {
   handle.cueStartSec = null;
   handle.segment = null;
+  handle.displaced = false;
   disposeDeckStandIn(handle, (visual) => visual.dispose());
   handle.group.position.set(handle.baseX, handle.baseY, handle.baseZ);
   handle.group.rotation.y = handle.baseRot;
+  handle.frame.position.x = handle.baseX;
+  handle.frame.position.y = handle.baseY;
+  handle.frame.position.z = handle.baseZ;
+  handle.frame.yaw = handle.baseRot;
   // Back under the freeze: recompose the rest pose once (updateMatrix flags
   // the world-matrix cascade for this frame), then stop the per-frame churn.
   handle.group.updateMatrix();
@@ -501,9 +540,105 @@ function updateHarborShipMotion(handle: HarborShipHandle): void {
   if (elapsedSec !== null && handle.segment !== null) {
     handle.group.matrixAutoUpdate = true;
     const pose = propPathPoseAt(handle.segment, elapsedSec, CUE_POSE);
-    const frame = composeHarborShipAttachFrame(handle, pose, SHIP_UPDATE_FRAME);
+    const frame = composeHarborShipAttachFrame(handle, pose, handle.frame);
     handle.group.position.set(frame.position.x, frame.position.y, frame.position.z);
     handle.group.rotation.y = frame.yaw;
+    if (import.meta.env.DEV) {
+      const overlap = firstHarborHullColliderOverlap(handle.harbor, frame, activeHarbors);
+      if (overlap) {
+        warnedHullCues ??= new Set();
+        const key = `${handle.target}:${handle.cueStartSec}:${overlap.harborId}:${overlap.colliderKind}:${overlap.colliderIndex}`;
+        if (!warnedHullCues.has(key)) {
+          warnedHullCues.add(key);
+          console.warn(
+            `Cinematic ship hull ${handle.target} overlaps ${overlap.harborId} ${overlap.colliderKind} collider ${overlap.colliderIndex}.`,
+          );
+        }
+      }
+    }
+  }
+}
+
+function resolveDeckRider(
+  entity: Entity,
+  pose: { x: number; y: number; z: number; yaw: number },
+  out: HarborDeckRiderResolution,
+): HarborDeckRiderResolution {
+  return resolveHarborDeckRider(
+    {
+      entityId: entity.id,
+      x: pose.x,
+      y: pose.y,
+      z: pose.z,
+      yaw: pose.yaw,
+      midInteraction: harborDeckRiderMidInteraction(entity),
+    },
+    SHIP_CUES.values(),
+    out,
+  );
+}
+
+/** True when renderer retention must keep this parked entity for a live ship cue. */
+export function harborDeckRiderActive(entity: Entity): boolean {
+  return (
+    resolveDeckRider(
+      entity,
+      { x: entity.pos.x, y: entity.pos.y, z: entity.pos.z, yaw: entity.facing },
+      DECK_RIDER_REQUIRED_RESOLUTION,
+    ).mode !== 'none'
+  );
+}
+
+/** Resolve one visual's live ship pose without mutating it. */
+export function harborDeckRiderVisualPlan(
+  entity: Entity,
+  visual: THREE.Object3D,
+): HarborDeckRiderResolution {
+  return resolveDeckRider(
+    entity,
+    {
+      x: visual.position.x,
+      y: visual.position.y,
+      z: visual.position.z,
+      yaw: visual.rotation.y,
+    },
+    DECK_RIDER_RESOLUTION,
+  );
+}
+
+/** Apply a resolved deck-rider plan to the rig group and its anchored nameplate. */
+export function applyHarborDeckRiderVisual(
+  resolution: HarborDeckRiderResolution,
+  visual: THREE.Object3D,
+): void {
+  if (resolution.mode === 'none') return;
+  if (resolution.mode === 'hide') {
+    visual.visible = false;
+    return;
+  }
+  visual.position.set(resolution.x, resolution.y, resolution.z);
+  visual.rotation.y = resolution.yaw;
+}
+
+/** Development assertion kept separate from mutation so a missed apply still warns. */
+export function warnMissingHarborDeckRider(
+  resolution: HarborDeckRiderResolution,
+  visual: THREE.Object3D,
+): void {
+  if (!import.meta.env.DEV) return;
+  const warning = missingDeckRiderWarning(resolution, {
+    x: visual.position.x,
+    y: visual.position.y,
+    z: visual.position.z,
+    yaw: visual.rotation.y,
+  });
+  if (warning) {
+    warnedDeckRiders ??= new Set();
+    const key = `${resolution.target}:${resolution.entityId}`;
+    if (!warnedDeckRiders.has(key)) {
+      warnedDeckRiders.add(key);
+      console.warn(warning);
+    }
   }
 }
 
@@ -537,11 +672,23 @@ function buildShip(parent: THREE.Group, harbor: HarborDef): void {
   g.rotation.y = harbor.berth.rot;
   const target = `harbor_ship_${harbor.id}`;
   const handle: HarborShipHandle = {
+    target,
+    harbor,
     group: g,
     baseX: harbor.berth.x,
     baseY: WATER_LEVEL - harbor.berth.draft,
     baseZ: harbor.berth.z,
     baseRot: harbor.berth.rot,
+    frame: {
+      position: {
+        x: harbor.berth.x,
+        y: WATER_LEVEL - harbor.berth.draft,
+        z: harbor.berth.z,
+      },
+      yaw: harbor.berth.rot,
+    },
+    shipDecks: harbor.shipDecks,
+    displaced: false,
     shipScale: scale,
     cueStartSec: null,
     segment: null,
@@ -557,6 +704,11 @@ export function buildHarbors(seed: number, deps: HarborSceneDeps): { group: THRE
   group.name = 'harbors';
   SHIP_CUES.clearHandles();
   const harbors = getActiveWorldContent().props.harbors ?? [];
+  activeHarbors = harbors;
+  if (import.meta.env.DEV) {
+    warnedDeckRiders?.clear();
+    warnedHullCues?.clear();
+  }
   for (const harbor of harbors) {
     const g = new THREE.Group();
     const wood = new WoodBuckets();

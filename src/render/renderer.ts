@@ -265,7 +265,15 @@ import {
   takeOrBuildGroundObject,
 } from './ground_object_pool';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
-import { buildHarbors, updateHarborShips } from './harbor';
+import {
+  applyHarborDeckRiderVisual,
+  buildHarbors,
+  harborDeckRiderActive,
+  harborDeckRiderVisualPlan,
+  updateHarborShips,
+  warnMissingHarborDeckRider,
+} from './harbor';
+import { authoritativeDeckRigVisible } from './harbor_deck_stand_in_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
@@ -4499,6 +4507,18 @@ export class Renderer {
       this.createRequiredView(player.id, createdViewTypes) +
       this.createRequiredView(player.targetId, createdViewTypes)
     );
+  }
+
+  private createHarborDeckRiderViews(createdViewTypes: string[]): number {
+    let created = 0;
+    for (const entity of this.sim.entities.values()) {
+      if (this.views.has(entity.id) || !harborDeckRiderActive(entity)) continue;
+      if (!this.viewCreateRetry.canAttempt(entity.id, 'view', performance.now())) continue;
+      this.createView(entity);
+      this.sampleCreatedViewType(createdViewTypes, entity);
+      created++;
+    }
+    return created;
   }
 
   private async createMandatoryLandmarkViews(
@@ -9100,6 +9120,7 @@ export class Renderer {
     // Dynamic worlds create nearby views lazily and drop views for leavers or
     // entities that moved well outside the draw band.
     createdViews += this.createRequiredViews(p, createdViewTypes);
+    createdViews += this.createHarborDeckRiderViews(createdViewTypes);
     this.collectMissingViewCandidates(p, this.entityViewCreateRangeSq, false);
     createdViews += this.createCandidateViews(
       this.runtimeViewCreateBudget(dt),
@@ -9114,6 +9135,7 @@ export class Renderer {
         (!isPersistentPortalObject(e) &&
           id !== p.id &&
           id !== p.targetId &&
+          !harborDeckRiderActive(e) &&
           distSqXZ(e, p) > this.entityViewDestroyRangeSq)
       ) {
         this.doomedIds.push(id);
@@ -9225,17 +9247,12 @@ export class Renderer {
       const travel = !polyed && !bear && !cat && hasTravelForm;
       const fireballForm = !polyed && !bear && !cat && !travel && hasFireballForm;
       const _stealthed = hasStealth;
-      const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
-      const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
-      const visuallyDead = isVisuallyDead(e) && !e.ghost;
-      const waterJetVisualChannel = this.waterJetVisualChannels.has(e.id);
-      // This is the final render-side casting state, including Water Jet's
-      // spellfx-driven channel. It feeds both the rig and the fairness carve-out.
-      const characterCasting = characterPresentationCasting(
-        e.castingAbility,
-        waterJetVisualChannel,
-        visuallyDead,
-      );
+      // distance cull: far rigs are invisible specks but cost real draw calls
+      const cdx = e.pos.x - p.pos.x,
+        cdz = e.pos.z - p.pos.z;
+      const d2 = cdx * cdx + cdz * cdz;
+      const isSelf = id === p.id;
+      const deckRiderActive = !isSelf && harborDeckRiderActive(e);
       // Pose carries information the player acts on (own feedback, the read on
       // the current target, pet combat, a cast windup telegraph) rather than
       // mere cosmetic smoothness: such an entity is exempt from BOTH the cadence
@@ -9257,7 +9274,10 @@ export class Renderer {
         // The authoritative rider is already parked at the destination ship
         // while the moving clone carries the voyage shots. The park cue drops
         // the clone under black, and this real rig returns on the next frame.
-        v.group.visible = !harborDeckStandInActive;
+        v.group.visible = authoritativeDeckRigVisible(
+          harborDeckStandInActive,
+          this.sceneCameraFocus !== null,
+        );
         v.isFar = false;
         if (shadowsEnabled) {
           v.visual?.setShadow(true);
@@ -9271,6 +9291,13 @@ export class Renderer {
         // actual on-screen boundary flicker. group.visible carries last frame's
         // state: once shown, keep it until past the 96yd destroy radius (where
         // the view is torn down anyway); while hidden, show only within 80yd.
+        const showCutoff = v.group.visible
+          ? this.entityViewDestroyRangeSq
+          : this.entityViewCreateRangeSq;
+        if (!deckRiderActive && d2 > showCutoff) {
+          v.group.visible = false;
+          continue;
+        }
         // hidden until its shaders finish linking off-thread (async-compile gate);
         // the object branch below may still re-hide loot
         v.group.visible = !v.compilePending;
@@ -9361,6 +9388,11 @@ export class Renderer {
         this.selfFacingLastTarget = r.lastTarget;
       }
       v.group.rotation.y = facing;
+      if (deckRiderActive) {
+        const riderPlan = harborDeckRiderVisualPlan(e, v.group);
+        applyHarborDeckRiderVisual(riderPlan, v.group);
+        if (import.meta.env.DEV) warnMissingHarborDeckRider(riderPlan, v.group);
+      }
 
       if (e.kind === 'object') {
         // The sim swaps delve interactable templates in place (pressure plate ->

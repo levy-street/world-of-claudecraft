@@ -32,6 +32,7 @@ import type {
   SceneRigPoint,
   SceneWireOp,
 } from '../types';
+import { fastForwardActorMoves } from './actor_move';
 import {
   clearScriptedPlayerWalks,
   fastForwardScriptedPlayerWalks,
@@ -150,6 +151,16 @@ function resolveRigPoint(
   return { x, y: ctx.groundPos(x, z).y + point.height, z };
 }
 
+function cameraShotDuration(def: SceneDef, opIndex: number): number {
+  const current = def.ops[opIndex];
+  if (current?.kind !== 'camera' || current.shot.kind === 'release') return 0;
+  for (let index = opIndex + 1; index < def.ops.length; index++) {
+    const next = def.ops[index];
+    if (next.kind === 'camera' && next.at > current.at) return next.at - current.at;
+  }
+  return Math.max(0, def.duration - current.at);
+}
+
 // A personal shared-world scene (the ferry arrival): audience of one, no
 // claim, camera points are world coords, keyed by -pid so claim playbacks
 // (positive entity-id keys) never collide.
@@ -246,6 +257,7 @@ function resolveAndApply(
   playback: ScenePlayback,
   op: SceneOpDef,
   applyOnly: boolean,
+  shotDuration = 0,
 ): SceneWireOp | null {
   const origin = claimOrigin(ctx, playback);
   const actorEntity = (actorId: string | undefined): Entity | null =>
@@ -305,6 +317,7 @@ function resolveAndApply(
           shot: {
             kind: 'attach',
             target: op.shot.target,
+            dur: shotDuration,
             fallbackFrame: {
               position: resolveRigPoint(ctx, origin, op.shot.fallbackFrame.point),
               yaw: op.shot.fallbackFrame.yaw,
@@ -399,6 +412,9 @@ function finishScene(ctx: SimContext, playback: ScenePlayback, skipped: boolean)
       if (!playback.emitted[i]) resolveAndApply(ctx, playback, def.ops[i], true);
     }
   }
+  if (def) {
+    fastForwardActorMoves(ctx, playback.claimId, claimOrigin(ctx, playback), def.ops);
+  }
   // End is unconditional teardown, including stale walk state whose player
   // entity disappeared before the endpoint could be placed.
   clearScriptedPlayerWalks(ctx, playback.claimId);
@@ -456,7 +472,7 @@ export function updateScenes(ctx: SimContext): void {
     for (let i = 0; i < def.ops.length; i++) {
       if (playback.emitted[i] || def.ops[i].at > elapsed) continue;
       playback.emitted[i] = true;
-      const wire = resolveAndApply(ctx, playback, def.ops[i], false);
+      const wire = resolveAndApply(ctx, playback, def.ops[i], false, cameraShotDuration(def, i));
       if (wire) emitResolvedOp(ctx, playback, wire);
     }
     if (elapsed >= def.duration) finishScene(ctx, playback, false);
