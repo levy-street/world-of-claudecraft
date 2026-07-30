@@ -159,7 +159,8 @@ the following taxonomy.
   live camera pose.
 - `cut.finalRelease` and `cut.releaseDelta`: the final camera op releases
   gameplay control without an uncovered position or orientation jump.
-- `cut.fadeSlack`: every cut has at least one sim tick of full black.
+- `cut.fadeSlack`: every fade-out and fade-in meets the shared perceptual
+  duration floor, and every camera cut occurs at full black.
 - `fade.symmetry`: every authored fade to black has a later authored clear
   before scene end.
 - `timing.opWithinDuration`: every authored op time lies inside the scene

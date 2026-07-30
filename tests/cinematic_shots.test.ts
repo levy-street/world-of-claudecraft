@@ -79,9 +79,9 @@ import {
   type MechanicalCheck,
   MIN_ARRIVAL_DIRECTION_DOT,
   MIN_ARRIVAL_SEAWARD_START_YARDS,
-  MIN_FULL_BLACK_CUT_SLACK_SECONDS,
   MIN_HELD_SHOT_SECONDS,
   MIN_ON_CAMERA_PROP_WAY_YARDS_PER_SEC,
+  MIN_PERCEPTUAL_FADE_SECONDS,
   MIN_PROP_PATH_TRAVEL_YARDS,
   MIN_SHIP_SCREEN_DIRECTION_DOT,
   MIN_SHIP_SCREEN_VELOCITY_PER_SEC,
@@ -358,6 +358,7 @@ interface SyntheticControl {
   readonly def: SyntheticSceneDef;
   readonly expectedCheck: MechanicalCheck | null;
   readonly expectedMeasured?: string;
+  readonly onlyExpectedCheck?: boolean;
   readonly actorIds?: readonly string[];
   readonly playerStart?: { x: number; z: number };
   readonly orphanSegmentId?: string;
@@ -410,10 +411,16 @@ function syntheticCameraScene(
     extraOps = [],
     presentationFixture,
   } = options;
-  const releaseAt = duration - 0.1;
+  const preRollSeconds = MIN_PERCEPTUAL_FADE_SECONDS + SAMPLE_INTERVAL_SEC;
+  const shiftedDuration = duration + preRollSeconds;
+  const shiftOp = <Op extends SyntheticSceneOpDef>(op: Op): Op => ({
+    ...op,
+    at: Number.isFinite(op.at) && op.at >= 0 ? op.at + preRollSeconds : op.at,
+  });
+  const releaseAt = shiftedDuration - 0.1;
   return {
     id,
-    duration,
+    duration: shiftedDuration,
     presentationFixture,
     ops: [
       ...(includeInitialLock
@@ -421,22 +428,37 @@ function syntheticCameraScene(
         : []),
       { at: 0, kind: 'letterbox', on: true },
       ...(coverFirstCut
-        ? ([{ at: 0, kind: 'fade', to: 'black', dur: 0 }] satisfies SceneOpDef[])
+        ? ([
+            {
+              at: 0,
+              kind: 'fade',
+              to: 'black',
+              dur: MIN_PERCEPTUAL_FADE_SECONDS,
+            },
+          ] satisfies SceneOpDef[])
         : []),
-      ...cameraOps,
+      // Mechanical failure controls deliberately inject test-only prop
+      // segments after bypassing the production authoring boundary.
+      ...(cameraOps.map(shiftOp) as readonly SceneOpDef[]),
       ...(coverFirstCut
         ? ([
             {
-              // Authored t=0 ops emit on the first tick, so clear on the following tick.
-              at: MIN_FULL_BLACK_CUT_SLACK_SECONDS * 2,
+              at: preRollSeconds + SAMPLE_INTERVAL_SEC,
               kind: 'fade',
               to: 'clear',
-              dur: 0,
+              dur: MIN_PERCEPTUAL_FADE_SECONDS,
             },
           ] satisfies SceneOpDef[])
         : []),
       ...(hideRelease && includeRelease
-        ? ([{ at: duration - 0.2, kind: 'fade', to: 'black', dur: 0 }] satisfies SceneOpDef[])
+        ? ([
+            {
+              at: releaseAt - preRollSeconds,
+              kind: 'fade',
+              to: 'black',
+              dur: MIN_PERCEPTUAL_FADE_SECONDS,
+            },
+          ] satisfies SceneOpDef[])
         : []),
       ...(includeRelease
         ? ([{ at: releaseAt, kind: 'camera', shot: { kind: 'release' } }] satisfies SceneOpDef[])
@@ -450,14 +472,14 @@ function syntheticCameraScene(
       ...(hideRelease && clearReleaseFade && includeRelease
         ? ([
             {
-              at: releaseAt + MIN_FULL_BLACK_CUT_SLACK_SECONDS,
+              at: releaseAt + SAMPLE_INTERVAL_SEC,
               kind: 'fade',
               to: 'clear',
-              dur: 0,
+              dur: MIN_PERCEPTUAL_FADE_SECONDS,
             },
           ] satisfies SceneOpDef[])
         : []),
-      ...(extraOps as readonly SceneOpDef[]),
+      ...(extraOps.map(shiftOp) as readonly SceneOpDef[]),
     ],
   };
 }
@@ -478,15 +500,16 @@ const SYNTHETIC_GRAMMAR_CAMERA_OPS = [
   },
 ] satisfies readonly SceneOpDef[];
 
-// These independent fixture values pin the exact 20 Hz tick boundary.
-const SYNTHETIC_ONE_TICK_BLACK_SLACK_SECONDS = 0.05;
-const SYNTHETIC_SUB_TICK_BLACK_SLACK_SECONDS = 0.04;
-
-function syntheticFadeSlackScene(id: string, blackSlackSeconds: number): SceneDef {
-  const cutAt = SYNTHETIC_ONE_TICK_BLACK_SLACK_SECONDS * 2;
+function syntheticFadeDurationScene(
+  id: string,
+  fadeOutDuration: number,
+  fadeInDuration: number,
+  precedeFadeWithActor = false,
+): SceneDef {
+  const cutAt = MIN_PERCEPTUAL_FADE_SECONDS + SAMPLE_INTERVAL_SEC;
   return syntheticCameraScene(
     id,
-    1.8,
+    2.4,
     [
       {
         at: cutAt,
@@ -505,12 +528,55 @@ function syntheticFadeSlackScene(id: string, blackSlackSeconds: number): SceneDe
     {
       coverFirstCut: false,
       extraOps: [
-        { at: cutAt - blackSlackSeconds, kind: 'fade', to: 'black', dur: 0 },
+        ...(precedeFadeWithActor
+          ? ([{ at: 0, kind: 'actorFace', actorId: 'tam', facing: 0 }] satisfies SceneOpDef[])
+          : []),
+        { at: 0, kind: 'fade', to: 'black', dur: fadeOutDuration },
         {
-          at: cutAt + SYNTHETIC_ONE_TICK_BLACK_SLACK_SECONDS,
+          at: cutAt + SAMPLE_INTERVAL_SEC,
           kind: 'fade',
           to: 'clear',
-          dur: 0,
+          dur: fadeInDuration,
+        },
+      ],
+    },
+  );
+}
+
+function syntheticEarlyCutScene(id: string): SceneDef {
+  const cutAt = MIN_PERCEPTUAL_FADE_SECONDS - SAMPLE_INTERVAL_SEC;
+  return syntheticCameraScene(
+    id,
+    2.4,
+    [
+      {
+        at: cutAt,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 0, z: 0, height: 100 },
+            { x: 1, z: 0, height: 100 },
+          ],
+          lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
+          dur: 1.6,
+        },
+      },
+    ],
+    {
+      coverFirstCut: false,
+      extraOps: [
+        {
+          at: 0,
+          kind: 'fade',
+          to: 'black',
+          dur: MIN_PERCEPTUAL_FADE_SECONDS,
+        },
+        {
+          at: cutAt + SAMPLE_INTERVAL_SEC,
+          kind: 'fade',
+          to: 'clear',
+          dur: MIN_PERCEPTUAL_FADE_SECONDS,
         },
       ],
     },
@@ -1028,6 +1094,36 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
   },
   {
     def: syntheticCameraScene(
+      'scn_test_lint_prop_fade_reveal_bad',
+      1.7,
+      [
+        {
+          at: 0,
+          kind: 'prop',
+          target: 'harbor_ship_mainland',
+          cue: SYNTHETIC_PROP_LURCH_CUE,
+        },
+        {
+          at: 0,
+          kind: 'camera',
+          shot: {
+            kind: 'attach',
+            target: 'harbor_ship_mainland',
+            fallbackFrame: { point: { x: 240.5, z: -44, height: 8 }, yaw: Math.PI / 2 },
+            offset: { x: 6.6, y: 18, z: -28 },
+            lookAt: { x: 6.6, y: 8.6, z: 0 },
+          },
+        },
+      ],
+      {
+        presentationFixture: { disableLivePoseEase: true },
+      },
+    ),
+    expectedCheck: 'motion.propWay',
+    expectedMeasured: 'way at fade-in',
+  },
+  {
+    def: syntheticCameraScene(
       'scn_test_lint_prop_lurch_bad',
       1.7,
       [
@@ -1244,18 +1340,40 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     expectedMeasured: 'deck stand-in handed off outside full black',
   },
   {
-    def: syntheticFadeSlackScene(
-      'scn_test_lint_fade_slack_tick_pass',
-      SYNTHETIC_ONE_TICK_BLACK_SLACK_SECONDS,
+    def: syntheticFadeDurationScene(
+      'scn_test_lint_fade_duration_floor_pass',
+      MIN_PERCEPTUAL_FADE_SECONDS,
+      MIN_PERCEPTUAL_FADE_SECONDS,
     ),
     expectedCheck: null,
   },
   {
-    def: syntheticFadeSlackScene(
-      'scn_test_lint_fade_slack_bad',
-      SYNTHETIC_SUB_TICK_BLACK_SLACK_SECONDS,
+    def: syntheticFadeDurationScene(
+      'scn_test_lint_fade_out_duration_bad',
+      MIN_PERCEPTUAL_FADE_SECONDS - SAMPLE_INTERVAL_SEC,
+      MIN_PERCEPTUAL_FADE_SECONDS,
+      true,
     ),
     expectedCheck: 'cut.fadeSlack',
+    expectedMeasured: 'fade/black',
+    onlyExpectedCheck: true,
+    playerStart: { x: 0, z: 0 },
+  },
+  {
+    def: syntheticFadeDurationScene(
+      'scn_test_lint_fade_in_duration_bad',
+      MIN_PERCEPTUAL_FADE_SECONDS,
+      MIN_PERCEPTUAL_FADE_SECONDS - SAMPLE_INTERVAL_SEC,
+    ),
+    expectedCheck: 'cut.fadeSlack',
+    expectedMeasured: 'fade/clear',
+    onlyExpectedCheck: true,
+  },
+  {
+    def: syntheticEarlyCutScene('scn_test_lint_fade_cut_early_bad'),
+    expectedCheck: 'cut.fadeSlack',
+    expectedMeasured: 'after co-timed cut ops',
+    onlyExpectedCheck: true,
   },
   {
     def: syntheticCameraScene('scn_test_lint_held_duration_bad', 1.2, [
@@ -1292,7 +1410,14 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
       SYNTHETIC_GRAMMAR_CAMERA_OPS,
       {
         clearReleaseFade: false,
-        extraOps: [{ at: 1.7, kind: 'fade', to: 'clear', dur: 0 }],
+        extraOps: [
+          {
+            at: 1.7,
+            kind: 'fade',
+            to: 'clear',
+            dur: MIN_PERCEPTUAL_FADE_SECONDS,
+          },
+        ],
       },
     ),
     expectedCheck: 'fade.symmetry',
@@ -2367,6 +2492,29 @@ function fadeOpacityAfterSceneOps(
   return sceneOverlayView(overlay, time).fadeOpacity;
 }
 
+function fadeOpacityAfterAuthoredFades(
+  scene: CapturedScene,
+  time: number,
+  beforeIndex: number,
+): number {
+  const overlay = createSceneOverlayState();
+  const precedingFades: {
+    index: number;
+    op: Extract<SceneOpDef, { kind: 'fade' }>;
+  }[] = [];
+  for (const [index, op] of scene.authoredOps.entries()) {
+    if (index < beforeIndex && op.kind === 'fade' && op.at <= time + SCENE_TIME_EPSILON_SECONDS) {
+      precedingFades.push({ index, op });
+    }
+  }
+  precedingFades.sort((a, b) => a.op.at - b.op.at || a.index - b.index);
+  for (const timed of precedingFades) {
+    sceneOverlayView(overlay, timed.op.at);
+    overlayApplyOp(overlay, timed.op, timed.op.at);
+  }
+  return sceneOverlayView(overlay, time).fadeOpacity;
+}
+
 function lintFilmGrammar(
   scene: CapturedScene,
   cameraOps: readonly TimedCameraOp[],
@@ -2391,7 +2539,28 @@ function lintFilmGrammar(
   }
 
   for (const [index, op] of scene.authoredOps.entries()) {
-    if (op.kind !== 'fade' || op.to !== 'black') continue;
+    if (op.kind !== 'fade') continue;
+    const opacityBefore = fadeOpacityAfterAuthoredFades(scene, op.at, index);
+    const targetOpacity = op.to === 'black' ? FULL_BLACK_OPACITY : 0;
+    const changesOpacity = Math.abs(opacityBefore - targetOpacity) > SCENE_TIME_EPSILON_SECONDS;
+    if (
+      changesOpacity &&
+      (!Number.isFinite(op.dur) ||
+        op.dur < MIN_PERCEPTUAL_FADE_SECONDS - SCENE_TIME_EPSILON_SECONDS)
+    ) {
+      report({
+        sceneId: scene.id,
+        check: 'cut.fadeSlack',
+        opIndex: index + 1,
+        opKind: authoredOpKind(op),
+        time: op.at,
+        threshold: `fade-out and fade-in transitions lasting at least ${MIN_PERCEPTUAL_FADE_SECONDS.toFixed(
+          2,
+        )}s`,
+        measured: `fade/${op.to} from ${opacityBefore.toFixed(3)} over ${op.dur.toFixed(2)}s`,
+      });
+    }
+    if (op.to !== 'black') continue;
     const hasLaterClear = scene.authoredOps
       .slice(index + 1)
       .some(
@@ -2411,17 +2580,8 @@ function lintFilmGrammar(
     }
   }
 
-  const firstAuthoredCamera = scene.authoredOps.find((op) => op.kind === 'camera');
   const firstShot = cameraOps.find((timed) => timed.op.shot.kind !== 'release');
-  for (const [cutIndex, cut] of cameraOps.entries()) {
-    const isSceneStartCut =
-      cutIndex === 0 &&
-      firstAuthoredCamera?.kind === 'camera' &&
-      firstAuthoredCamera.at <= SCENE_TIME_EPSILON_SECONDS;
-    const slackStart = isSceneStartCut
-      ? cut.at
-      : Math.max(0, cut.at - MIN_FULL_BLACK_CUT_SLACK_SECONDS);
-    const startOpacity = fadeOpacityAfterSceneOps(scene, slackStart, cut.index);
+  for (const cut of cameraOps) {
     const cutOpacity = fadeOpacityAfterSceneOps(scene, cut.at);
     const easesFromLivePose =
       cut.op.shot.kind !== 'release' &&
@@ -2438,19 +2598,15 @@ function lintFilmGrammar(
         measured: `${opKind(cut.op)} without full black, fade ${cutOpacity.toFixed(3)}`,
       });
     }
-    if (startOpacity < FULL_BLACK_OPACITY || cutOpacity < FULL_BLACK_OPACITY) {
+    if (cutOpacity < FULL_BLACK_OPACITY) {
       report({
         sceneId: scene.id,
         check: 'cut.fadeSlack',
         opIndex: cut.index,
         opKind: opKind(cut.op),
         time: cut.at,
-        threshold: `${MIN_FULL_BLACK_CUT_SLACK_SECONDS.toFixed(
-          2,
-        )}s of full black spanning the cut, bounded by scene start`,
-        measured: `fade ${startOpacity.toFixed(3)} at ${slackStart.toFixed(
-          2,
-        )}s and ${cutOpacity.toFixed(3)} after co-timed cut ops`,
+        threshold: 'full black at the camera cut after a perceptual fade-out',
+        measured: `fade ${cutOpacity.toFixed(3)} after co-timed cut ops`,
       });
     }
   }
@@ -3906,122 +4062,9 @@ describe('cinematic shot mechanical gate', () => {
 
   it('samples every registered scene at 20 Hz against the mechanical rubric', async () => {
     await loadLinterRuntime();
-    expect(
-      MIN_FULL_BLACK_CUT_SLACK_SECONDS,
-      'fade slack must stay exactly one 20 Hz sim tick',
-    ).toBe(SYNTHETIC_ONE_TICK_BLACK_SLACK_SECONDS);
-    expect(LEGACY_EXEMPTIONS, 'cinematic exemption inventory must stay exact').toEqual([
-      {
-        sceneId: 'scn_lb_ferry_depart_back',
-        check: 'collision.hull',
-        reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_back',
-        check: 'cut.fadeSlack',
-        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_back',
-        check: 'fade.symmetry',
-        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_back',
-        check: 'motion.propAcceleration',
-        reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_back',
-        check: 'motion.propWay',
-        reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_out',
-        check: 'collision.hull',
-        reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_out',
-        check: 'cut.fadeSlack',
-        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_out',
-        check: 'fade.symmetry',
-        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_out',
-        check: 'motion.propAcceleration',
-        reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_out',
-        check: 'motion.propWay',
-        reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
-      },
-      {
-        sceneId: 'scn_lb_q0_ashore',
-        check: 'cut.fadeSlack',
-        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-      },
-      {
-        sceneId: 'scn_lb_q0_ashore',
-        check: 'fade.symmetry',
-        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'collision.hull',
-        reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'cut.fadeSlack',
-        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'fade.symmetry',
-        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'motion.propAcceleration',
-        reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'motion.propWay',
-        reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
-      },
-      {
-        sceneId: 'cast_off',
-        check: 'reference.orphan',
-        reason: 'P1.3 must cue or remove the legacy authored cast-off prop segment.',
-      },
-      {
-        sceneId: 'scn_lb_q0_ashore',
-        check: 'reference.orphan',
-        reason: 'P1.3 must trigger or remove the superseded standalone arrival scene.',
-      },
-      {
-        sceneId: 'scn_lb_q0_ashore',
-        check: 'reference.subtitleReadTime',
-        reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
-      },
-      {
-        sceneId: 'scn_lb_q0_doorway',
-        check: 'reference.subtitleReadTime',
-        reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'reference.subtitleReadTime',
-        reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
-      },
-    ]);
+    expect(MIN_PERCEPTUAL_FADE_SECONDS).toBeGreaterThanOrEqual(0.3);
+    expect(MIN_PERCEPTUAL_FADE_SECONDS).toBeLessThanOrEqual(0.5);
+    expect(LEGACY_EXEMPTIONS, 'cinematic exemption inventory must stay exact').toEqual([]);
     expect(
       SCENE_TRIGGER_FILES.length,
       'the scene trigger scan must cover the recursive content and campaign source corpus',
@@ -4237,6 +4280,12 @@ describe('cinematic shot mechanical gate', () => {
       // substring keeps per-arm coverage from silently collapsing to whichever arm reports first.
       if (control.expectedMeasured !== undefined) {
         expect(expected?.measured).toContain(control.expectedMeasured);
+      }
+      if (control.onlyExpectedCheck) {
+        expect(
+          [...new Set(violations.map((violation) => violation.check))],
+          violations.map(violationMessage).join('\n'),
+        ).toEqual([control.expectedCheck]);
       }
     }
   }, 120_000);

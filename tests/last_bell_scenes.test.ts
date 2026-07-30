@@ -579,14 +579,14 @@ describe('the voyage cinematic', () => {
     }).toEqual({ out: 18.8, back: 18.8, q0: 34 });
     const cameraTimes = (scene: typeof out): number[] =>
       scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.at] : []));
-    expect(cameraTimes(out)).toEqual([0.2, 4.2, 8.5, 12.8, 17.8]);
-    expect(cameraTimes(back)).toEqual([0.2, 4.2, 8.5, 12.8, 17.8]);
-    expect(cameraTimes(q0)).toEqual([0.2, 4.2, 8.5, 12.8, 18.3, 26.1, 33]);
+    expect(cameraTimes(out)).toEqual([0.45, 4.2, 8.5, 12.8, 17.8]);
+    expect(cameraTimes(back)).toEqual([0.45, 4.2, 8.5, 12.8, 17.8]);
+    expect(cameraTimes(q0)).toEqual([0.45, 4.2, 8.5, 12.8, 18.3, 26.1, 33]);
 
     for (const scene of [out, back, q0]) {
       expect(
         scene.ops.some(
-          (op) => op.at === 0 && op.kind === 'fade' && op.to === 'black' && op.dur === 0,
+          (op) => op.at === 0 && op.kind === 'fade' && op.to === 'black' && op.dur === 0.4,
         ),
       ).toBe(true);
       const finalFade = scene.ops.filter((op) => op.kind === 'fade').at(-1);
@@ -680,10 +680,9 @@ describe('the voyage cinematic', () => {
           ? [{ at: op.at, dur: op.dur }]
           : [],
       );
-      expect(pierFade).toHaveLength(2);
-      expect(pierFade.map((op) => op.dur)).toEqual([0.4, 0]);
+      expect(pierFade).toHaveLength(1);
+      expect(pierFade.map((op) => op.dur)).toEqual([0.4]);
       expect(pierFade[0]?.at).toBeCloseTo(12.35, 8);
-      expect(pierFade[1]?.at).toBeCloseTo(12.75, 8);
     }
 
     const arrivalCutKinds = (scene: typeof out) =>
