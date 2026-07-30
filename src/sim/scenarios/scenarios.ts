@@ -79,7 +79,10 @@ export interface ScenarioStageDef {
   timedSpawns?: readonly { at: number; spawns: readonly ScenarioSpawnDef[] }[];
   objects?: readonly ScenarioObjectDef[];
   directives?: readonly { actorId: string; directive: SquadDirective }[];
-  /** Scene script to play at stage start (scene system, src/sim/scenes/). */
+  /** Scene script to play at stage start (scene system, src/sim/scenes/).
+   * Authoring constraint: do not arm until every intended participant is
+   * inside the scene claim box. Anyone outside on the arm tick is deliberately
+   * excluded from the whole scene. */
   sceneId?: string;
   /** Dialogue choice to cue at stage start (scenes/choices.ts). */
   choiceId?: string;
