@@ -3,6 +3,7 @@
 // enters only through advance(), where it moves the authored scrub position.
 
 import '../sim/content/last_bell_campaign';
+import type { Violation } from '../sim/scenes/lint_core';
 import type { SceneDef } from '../sim/scenes/registry';
 import { registeredSceneIds, sceneById } from '../sim/scenes/registry';
 import { formatNumber, t } from '../ui/i18n';
@@ -18,8 +19,12 @@ import {
 } from './cinematic_scrub_core';
 import { button, el } from './dom';
 
+export interface CinematicPanelFrame extends CinematicScrubFrame {
+  readonly violations: readonly Violation[];
+}
+
 export interface CinematicPanelDeps {
-  evaluate(scene: SceneDef, timeSec: number): CinematicScrubFrame | null;
+  evaluate(scene: SceneDef, timeSec: number): CinematicPanelFrame | null;
   setAuthoredCamera(on: boolean): void;
   capture(scene: SceneDef, timeSec: number, capturedAt: string): CinematicCameraCapture | null;
   saveCapture(capture: CinematicCameraCapture): Promise<void>;
@@ -36,6 +41,7 @@ export class CinematicPanel {
   private readonly authoredCameraInput: HTMLInputElement;
   private readonly fadeReadout: HTMLElement;
   private readonly letterboxReadout: HTMLElement;
+  private readonly violationList: HTMLUListElement;
   private readonly captureButton: HTMLButtonElement;
   private readonly copyButton: HTMLButtonElement;
   private readonly output: HTMLTextAreaElement;
@@ -129,6 +135,14 @@ export class CinematicPanel {
     readouts.append(this.fadeReadout, this.letterboxReadout);
     this.body.appendChild(readouts);
 
+    const violationSection = el('section', 'ed-cinematic-violations');
+    violationSection.appendChild(
+      el('h3', 'ed-cinematic-violations-title', t('editor.cinematic.violations')),
+    );
+    this.violationList = document.createElement('ul');
+    violationSection.appendChild(this.violationList);
+    this.body.appendChild(violationSection);
+
     const captureRow = el('div', 'ed-row');
     this.captureButton = button(
       t('editor.cinematic.capture'),
@@ -167,6 +181,7 @@ export class CinematicPanel {
     if (!ready) {
       this.pause();
       this.clearFade();
+      this.renderViolations([]);
       this.status.textContent = t('editor.cinematic.unavailable');
       return;
     }
@@ -253,6 +268,7 @@ export class CinematicPanel {
     this.letterboxReadout.textContent = t(
       frame.overlay.letterbox ? 'editor.cinematic.letterboxOn' : 'editor.cinematic.letterboxOff',
     );
+    this.renderViolations(frame.violations);
     if (frame.overlay.fadeOpacity <= 0) {
       this.clearFade();
     } else {
@@ -278,6 +294,30 @@ export class CinematicPanel {
   private clearFade(): void {
     this.fadeOverlay.style.display = 'none';
     this.fadeOverlay.style.opacity = '0';
+  }
+
+  private renderViolations(violations: readonly Violation[]): void {
+    const rows: HTMLLIElement[] = [];
+    if (violations.length === 0) {
+      const row = document.createElement('li');
+      row.className = 'ed-cinematic-violation-empty';
+      row.textContent = t('editor.cinematic.noViolations');
+      rows.push(row);
+    } else {
+      for (const violation of violations) {
+        const row = document.createElement('li');
+        row.textContent = t('editor.cinematic.violationRow', {
+          check: violation.check,
+          opIndex: formatNumber(violation.opIndex, {
+            useGrouping: false,
+            maximumFractionDigits: 0,
+          }),
+          measured: violation.measured,
+        });
+        rows.push(row);
+      }
+    }
+    this.violationList.replaceChildren(...rows);
   }
 
   private async capture(): Promise<void> {

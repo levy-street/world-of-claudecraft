@@ -130,8 +130,8 @@ describe('editor cinematic scrub core', () => {
 
     const start = frame(scene, 0).camera;
     expect(start?.position.x).toBeCloseTo(0);
-    expect(start?.position.y).toBeCloseTo(8);
-    expect(start?.position.z).toBeCloseTo(-10);
+    expect(start?.position.y).toBeCloseTo(2 + Math.sin(LIVE.pitch) * LIVE.dist);
+    expect(start?.position.z).toBeCloseTo(-Math.cos(LIVE.pitch) * LIVE.dist);
     expect(start?.target).toEqual({ x: 0, y: 2, z: 0 });
 
     const end = frame(scene, 2).camera;
@@ -156,6 +156,9 @@ describe('editor cinematic scrub core', () => {
     };
 
     expect(frame(scene, 0.45).camera).toBeNull();
+    const entering = frame(scene, 0.5);
+    expect(entering.subject).toEqual({ x: 10, y: 2, z: 4 });
+    expect(entering.camera?.target).not.toEqual(entering.subject);
     const held = frame(scene, 1.5).camera;
     expect(held?.target).toEqual({ x: 10, y: 2, z: 4 });
     expect(
@@ -237,8 +240,9 @@ describe('editor cinematic scrub core', () => {
       cue: 'lb_voyage_out_cast_off',
       startedAt: 0,
     });
-    expect(cue.pose.x).toBeCloseTo(segment.end.x * 0.75);
-    expect(cue.pose.z).toBeCloseTo(segment.end.z * 0.75);
+    const expected = propPathPoseAt(segment, 2);
+    expect(cue.pose.x).toBeCloseTo(expected.x);
+    expect(cue.pose.z).toBeCloseTo(expected.z);
     expect(cue.pose.done).toBe(false);
   });
 
