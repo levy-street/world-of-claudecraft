@@ -527,58 +527,77 @@ describe('the voyage cinematic', () => {
       backArrival: LAST_BELL_PROP_PATH_SEGMENTS.lb_voyage_back_arrival,
     }).toEqual({
       outCastOff: {
-        start: { x: 0, y: 0, z: 0, yaw: 0 },
-        end: { x: 22, y: 0, z: 3, yaw: -0.12 },
+        start: { x: 0, y: 0.5, z: 4, yaw: 0 },
+        end: { x: 22, y: 0.5, z: 7, yaw: 0 },
         duration: 4,
-        ease: 'easeOutQuad',
+        ease: 'linear',
       },
       outOpenWater: {
-        start: { x: 159.519453, y: 0, z: -4.456482, yaw: -1.910796 },
-        end: { x: 207.519453, y: 0, z: -4.456482, yaw: -1.910796 },
+        start: { x: -0.480547, y: 0, z: -164.456482, yaw: -1.910796 },
+        end: { x: 47.519453, y: 0, z: -164.456482, yaw: -1.910796 },
         duration: 4.3,
         ease: 'linear',
       },
       outArrival: {
-        start: { x: -32, y: 0, z: 0, yaw: -2.822845 },
-        end: { x: 0, y: 0, z: 0, yaw: -2.822845 },
-        duration: 4.3,
-        ease: 'easeInOutSine',
+        start: { x: -48, y: 0.75, z: 0, yaw: -2.822845 },
+        end: { x: 0, y: 0.75, z: 0, yaw: -2.822845 },
+        duration: 15,
+        ease: 'linear',
       },
       backCastOff: {
-        start: { x: 0, y: 0, z: 0, yaw: 0 },
-        end: { x: 22, y: 0, z: 0, yaw: -0.08 },
+        start: { x: 0, y: 0.5, z: -4, yaw: 0 },
+        end: { x: 22, y: 0.5, z: -7, yaw: 0 },
         duration: 4,
-        ease: 'easeOutQuad',
+        ease: 'linear',
       },
       backOpenWater: {
-        start: { x: 150.151155, y: 0, z: -6.154286, yaw: -0.371593 },
-        end: { x: 198.151155, y: 0, z: -6.154286, yaw: -0.371593 },
+        start: { x: 170.151155, y: 0, z: -126.154286, yaw: -0.371593 },
+        end: { x: 218.151155, y: 0, z: -126.154286, yaw: -0.371593 },
         duration: 4.3,
         ease: 'linear',
       },
       backArrival: {
-        start: { x: -32, y: 0, z: 0, yaw: 1.511606 },
-        end: { x: 0, y: 0, z: 0, yaw: 1.511606 },
-        duration: 4.3,
-        ease: 'easeInOutSine',
+        start: { x: -140, y: 0.5, z: 0, yaw: 1.511606 },
+        end: { x: 0, y: 0.5, z: 0, yaw: 1.511606 },
+        duration: 16,
+        ease: 'linear',
       },
     });
 
     const out = sceneById('scn_lb_ferry_depart_out');
     const back = sceneById('scn_lb_ferry_depart_back');
-    const ashore = sceneById('scn_lb_q0_ashore');
     const q0 = sceneById('scn_lb_q0_voyage');
     expect(out).toBeDefined();
     expect(back).toBeDefined();
-    expect(ashore).toBeDefined();
     expect(q0).toBeDefined();
-    if (!out || !back || !ashore || !q0) return;
+    if (!out || !back || !q0) return;
+    expect({
+      out: out.duration,
+      back: back.duration,
+      q0: q0.duration,
+    }).toEqual({ out: 18.8, back: 18.8, q0: 34 });
+    const cameraTimes = (scene: typeof out): number[] =>
+      scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.at] : []));
+    expect(cameraTimes(out)).toEqual([0.2, 4.2, 8.5, 12.8, 17.8]);
+    expect(cameraTimes(back)).toEqual([0.2, 4.2, 8.5, 12.8, 17.8]);
+    expect(cameraTimes(q0)).toEqual([0.2, 4.2, 8.5, 12.8, 18.3, 26.1, 33]);
+
+    for (const scene of [out, back, q0]) {
+      expect(
+        scene.ops.some(
+          (op) =>
+            op.at === 0 && op.kind === 'fade' && op.to === 'black' && op.dur === 0,
+        ),
+      ).toBe(true);
+      const finalFade = scene.ops.filter((op) => op.kind === 'fade').at(-1);
+      expect(finalFade).toMatchObject({ kind: 'fade', to: 'clear', dur: 0.4 });
+      expect(finalFade?.at).toBeCloseTo(scene === q0 ? 33.05 : 17.85, 8);
+    }
 
     const shotKinds = (scene: typeof out): string[] =>
       scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.shot.kind] : []));
     expect(shotKinds(out)).toEqual(['attach', 'attach', 'attach', 'dolly', 'release']);
     expect(shotKinds(back)).toEqual(['attach', 'attach', 'attach', 'dolly', 'release']);
-    expect(shotKinds(ashore)).toEqual(['dolly', 'dolly', 'dolly', 'release']);
     expect(shotKinds(q0)).toEqual([
       'attach',
       'attach',
@@ -656,45 +675,36 @@ describe('the voyage cinematic', () => {
     expect(back.ops.some((op) => op.kind === 'line')).toBe(false);
 
     for (const scene of [out, back]) {
-      expect(
-        scene.ops.filter(
-          (op) => op.kind === 'fade' && op.to === 'black' && op.at > 8.5 && op.at < 12.8,
-        ),
-      ).toEqual([{ at: 12.4, kind: 'fade', to: 'black', dur: 0.4 }]);
+      const pierFade = scene.ops.flatMap((op) =>
+        op.kind === 'fade' && op.to === 'black' && op.at > 8.5 && op.at < 12.8
+          ? [{ at: op.at, dur: op.dur }]
+          : [],
+      );
+      expect(pierFade).toHaveLength(2);
+      expect(pierFade.map((op) => op.dur)).toEqual([0.4, 0]);
+      expect(pierFade[0]?.at).toBeCloseTo(12.35, 8);
+      expect(pierFade[1]?.at).toBeCloseTo(12.75, 8);
     }
 
     const arrivalCutKinds = (scene: typeof out) =>
       scene.ops
         .filter((op) => Math.abs(op.at - 12.8) < 1e-8)
         .map((op) => (op.kind === 'prop' ? `${op.kind}/${op.cue}` : op.kind));
-    expect(arrivalCutKinds(out)).toEqual(['fade', `prop/${LB_PROP_CUE_PARK}`, 'camera']);
-    expect(arrivalCutKinds(back)).toEqual(['fade', `prop/${LB_PROP_CUE_PARK}`, 'camera']);
+    expect(arrivalCutKinds(out)).toEqual([`prop/${LB_PROP_CUE_PARK}`, 'fade', 'camera']);
+    expect(arrivalCutKinds(back)).toEqual([`prop/${LB_PROP_CUE_PARK}`, 'fade', 'camera']);
 
     const q0Lines = q0.ops.flatMap((op) =>
       op.kind === 'line' ? [{ at: op.at, key: op.key, dur: op.dur }] : [],
     );
     expect(q0Lines.map(({ key, dur }) => ({ key, dur }))).toEqual([
-      { key: 'lb.q0.scene.harbor', dur: 4.5 },
-      { key: 'lb.q0.scene.plinth', dur: 4.5 },
-      { key: 'lb.q0.scene.toll', dur: 5 },
+      { key: 'lb.q0.scene.harbor', dur: 4.75 },
+      { key: 'lb.q0.scene.plinth', dur: 7.5 },
+      { key: 'lb.q0.scene.toll', dur: 6.5 },
     ]);
     expect(q0Lines.map((line) => line.at)).toEqual([
       expect.closeTo(13.3, 8),
-      expect.closeTo(18, 8),
-      expect.closeTo(22.8, 8),
-    ]);
-    const ashoreLines = ashore.ops.flatMap((op) =>
-      op.kind === 'line' ? [{ at: op.at, key: op.key, dur: op.dur }] : [],
-    );
-    expect(ashoreLines.map(({ key, dur }) => ({ key, dur }))).toEqual([
-      { key: 'lb.q0.scene.harbor', dur: 4.5 },
-      { key: 'lb.q0.scene.plinth', dur: 4.5 },
-      { key: 'lb.q0.scene.toll', dur: 5 },
-    ]);
-    expect(ashoreLines.map((line) => line.at)).toEqual([
-      expect.closeTo(0.5, 8),
-      expect.closeTo(5.2, 8),
-      expect.closeTo(10, 8),
+      expect.closeTo(18.5, 8),
+      expect.closeTo(26.3, 8),
     ]);
     expect(
       q0.ops.filter((op) => op.kind === 'music' && op.directive === 'lb_bell_toll_one'),
@@ -759,7 +769,7 @@ describe('the voyage cinematic', () => {
     const line = ops.find((e) => e.op.kind === 'line');
     expect(line?.op.kind === 'line' ? line.op.key : '').toBe('lb.q0.scene.harbor');
     // The whole voyage ends as one scene.
-    const tail = sceneOps(collect(sim, 16.25 * 20));
+    const tail = sceneOps(collect(sim, 21 * 20));
     const lineKeys = [...ops, ...tail]
       .filter((e): e is typeof e & { op: { kind: 'line'; key: string } } => e.op.kind === 'line')
       .map((e) => e.op.key);

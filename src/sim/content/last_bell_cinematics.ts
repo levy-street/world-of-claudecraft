@@ -1,11 +1,8 @@
 // Last Bell prop paths are authored beside the scene definitions but remain
 // inert presentation data. The sim carries only each segment id on the prop
-// wire op; the render client resolves the matching record.
-
-export const LAST_BELL_CAST_OFF_SEGMENT_ID = 'cast_off';
-
-// Cinematic compression may reposition the ferry between cuts, but motion
-// visible inside one shot stays below this world-space speed.
+// wire op; the render client resolves the matching record. Cinematic
+// compression may reposition the ferry between cuts, but motion visible
+// inside one shot stays below this world-space speed.
 export const LAST_BELL_CINEMATIC_SHIP_SPEED_CAP_YARDS_PER_SEC = 12;
 
 // cueHarborShip deliberately treats an unknown cue as its documented park
@@ -27,47 +24,41 @@ export const LAST_BELL_VOYAGE_SEGMENT_IDS = {
 } as const;
 
 export const LAST_BELL_PROP_PATH_SEGMENTS = {
-  [LAST_BELL_CAST_OFF_SEGMENT_ID]: {
-    start: { x: 0, y: 0, z: 0, yaw: 0 },
-    end: { x: 26, y: 0, z: 0, yaw: 0.09 },
-    duration: 16,
-    ease: 'easeInQuad',
-  },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff]: {
-    start: { x: 0, y: 0, z: 0, yaw: 0 },
-    end: { x: 22, y: 0, z: 3, yaw: -0.12 },
+    start: { x: 0, y: 0.5, z: 4, yaw: 0 },
+    end: { x: 22, y: 0.5, z: 7, yaw: 0 },
     duration: 4,
-    ease: 'easeOutQuad',
+    ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.openWater]: {
-    start: { x: 159.519453, y: 0, z: -4.456482, yaw: -1.910796 },
-    end: { x: 207.519453, y: 0, z: -4.456482, yaw: -1.910796 },
+    start: { x: -0.480547, y: 0, z: -164.456482, yaw: -1.910796 },
+    end: { x: 47.519453, y: 0, z: -164.456482, yaw: -1.910796 },
     duration: 4.3,
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.arrival]: {
-    start: { x: -32, y: 0, z: 0, yaw: -2.822845 },
-    end: { x: 0, y: 0, z: 0, yaw: -2.822845 },
-    duration: 4.3,
-    ease: 'easeInOutSine',
+    start: { x: -48, y: 0.75, z: 0, yaw: -2.822845 },
+    end: { x: 0, y: 0.75, z: 0, yaw: -2.822845 },
+    duration: 15,
+    ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.castOff]: {
-    start: { x: 0, y: 0, z: 0, yaw: 0 },
-    end: { x: 22, y: 0, z: 0, yaw: -0.08 },
+    start: { x: 0, y: 0.5, z: -4, yaw: 0 },
+    end: { x: 22, y: 0.5, z: -7, yaw: 0 },
     duration: 4,
-    ease: 'easeOutQuad',
+    ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.openWater]: {
-    start: { x: 150.151155, y: 0, z: -6.154286, yaw: -0.371593 },
-    end: { x: 198.151155, y: 0, z: -6.154286, yaw: -0.371593 },
+    start: { x: 170.151155, y: 0, z: -126.154286, yaw: -0.371593 },
+    end: { x: 218.151155, y: 0, z: -126.154286, yaw: -0.371593 },
     duration: 4.3,
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.arrival]: {
-    start: { x: -32, y: 0, z: 0, yaw: 1.511606 },
-    end: { x: 0, y: 0, z: 0, yaw: 1.511606 },
-    duration: 4.3,
-    ease: 'easeInOutSine',
+    start: { x: -140, y: 0.5, z: 0, yaw: 1.511606 },
+    end: { x: 0, y: 0.5, z: 0, yaw: 1.511606 },
+    duration: 16,
+    ease: 'linear',
   },
 } as const;
 
