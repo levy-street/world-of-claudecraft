@@ -730,17 +730,19 @@ export const VISUALS: Record<string, VisualDef> = {
         slam: '2H_Melee_Attack_Chop',
         red_harvest: '2H_Melee_Attack_Chop',
         breachmaker: '2H_Melee_Attack_Chop',
-        // Shieldcrack slams the SHIELD (offhand arm), not the sword: the
-        // synthesized bash (scripts/_add_shield_bash_anim.mjs) drives the
-        // left arm carrying the handslot.l shield; the weapon hand stays back.
-        shield_slam: 'Shield_Bash',
+        // Shieldcrack slams the SHIELD (offhand arm), not the sword. The
+        // synthesized bash (scripts/_add_shield_bash_anim.mjs) was authored
+        // into the v01 rig; the v02 pack's only shield-arm clip is Block, the
+        // nearest read until the bash is re-synthesized onto the v02 rig.
+        shield_slam: 'Block',
         raging_gale: 'Dualwield_Melee_Attack_Chop',
         bloodthirst: 'Dualwield_Melee_Attack_Chop',
-        // Reaping Arc and Revenge hit everything in the frontal arc: the
-        // synthesized flat reap (scripts/_add_sweep_slice_anim.mjs), not the
-        // top-to-bottom chop (owner: "sideways sword sweep").
-        cleave: '1H_Melee_Attack_Slice_Horizontal',
-        revenge: '1H_Melee_Attack_Slice_Horizontal',
+        // Reaping Arc and Revenge hit everything in the frontal arc. The
+        // synthesized flat reap (scripts/_add_sweep_slice_anim.mjs) was
+        // authored into the v01 rig; the v02 pack's diagonal slice is the
+        // nearest sweep until the reap is re-synthesized onto the v02 rig.
+        cleave: '1H_Melee_Attack_Slice_Diagonal',
+        revenge: '1H_Melee_Attack_Slice_Diagonal',
         thunder_clap: '1H_Melee_Attack_Chop',
         faultline: '1H_Melee_Attack_Chop',
         heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
