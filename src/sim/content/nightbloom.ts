@@ -121,7 +121,10 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 7.5,
     aggroRadius: 0, // placid silver-wooled herds drifting the downs
-    loot: [{ itemId: 'moonfleece_tuft', chance: 0.6, questId: 'q_nb_wool_by_moonlight' }],
+    loot: [
+      { copper: 105, chance: 1 },
+      { itemId: 'moonfleece_tuft', chance: 0.6, questId: 'q_nb_wool_by_moonlight' },
+    ],
     scale: 1.1,
     color: 0xe6e9f4,
   },
@@ -139,7 +142,7 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 9.5, // sleek night hunters: fast, keen-eyed
     aggroRadius: 14,
-    loot: [],
+    loot: [{ copper: 105, chance: 1 }],
     scale: 1.1,
     color: 0x4c4a72,
   },
@@ -157,7 +160,7 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 11,
     moveSpeed: 7.5,
     aggroRadius: 0, // masked watchers adrift around their stones
-    loot: [],
+    loot: [{ copper: 110, chance: 1 }],
     scale: 1.0,
     color: 0x8fa8e0,
   },
@@ -176,7 +179,10 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7.5,
     aggroRadius: 14,
     elite: true,
-    loot: [],
+    loot: [
+      { copper: 450, chance: 1 },
+      { itemId: 'bone_fragments', chance: 1 },
+    ],
     scale: 1.5,
     color: 0xb8cce8,
   },
@@ -197,7 +203,10 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 14,
     moveSpeed: 7,
     aggroRadius: 12,
-    loot: [],
+    loot: [
+      { copper: 110, chance: 1 },
+      { itemId: 'bone_fragments', chance: 0.5 },
+    ],
     scale: 1.15,
     color: 0x9fb0c4,
   },

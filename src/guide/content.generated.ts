@@ -1973,7 +1973,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "families": [
       "beast",
       "kobold",
-      "undead"
+      "undead",
+      "elemental"
     ]
   },
   {
@@ -2281,6 +2282,16 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_alpaca",
         "tint": "#d8d0c0",
         "still": "/guide-stills/mob_alpaca__d8d0c0.webp"
+      },
+      {
+        "name": "Shoal Scuttler",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "shoal_scuttler",
+        "model": "mob_crab",
+        "tint": "#8898a8",
+        "still": "/guide-stills/mob_crab__8898a8.webp"
       },
       {
         "name": "Thicket Boar",
@@ -2848,6 +2859,16 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_ghost",
         "tint": "#d0f2c8",
         "still": "/guide-stills/mob_ghost__d0f2c8.webp"
+      },
+      {
+        "name": "Gale Wisp",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "gale_wisp",
+        "model": "mob_elemental",
+        "tint": "#bfe0e8",
+        "still": "/guide-stills/mob_elemental__bfe0e8.webp"
       },
       {
         "name": "Nightkin Stargazer",

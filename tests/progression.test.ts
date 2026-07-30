@@ -10,6 +10,7 @@ import {
   CAMPS,
   CLASSES,
   DUNGEON_LIST,
+  ESCORTS,
   GATHER_NODES,
   GROUND_OBJECTS,
   ITEMS,
@@ -138,6 +139,48 @@ describe('content referential integrity', () => {
   it('QUEST_ORDER covers every quest exactly once', () => {
     expect([...QUEST_ORDER].sort()).toEqual(Object.keys(QUESTS).sort());
     expect(new Set(QUEST_ORDER).size).toBe(QUEST_ORDER.length);
+  });
+
+  it('every kill-quest target actually spawns (camp, dungeon, escort, or script)', () => {
+    // v0.32.0 shipped two Galecrest kill quests whose targets had lost their
+    // camps to a camp-rehoming pass, leaving both quests uncompletable. Kill
+    // targets must come from a world camp, a dungeon spawn table, an escort
+    // ambush wave, or a known encounter script.
+    const spawnable = new Set<string>();
+    for (const c of CAMPS) spawnable.add(c.mobId);
+    for (const d of DUNGEON_LIST) for (const s of d.spawns) spawnable.add(s.mobId);
+    for (const e of Object.values(ESCORTS)) {
+      for (const a of e.ambushes) spawnable.add(a.mobId);
+    }
+    // Summoned by the Nythraxis encounter script (summonQuestMob in
+    // src/sim/encounters/nythraxis.ts), not by any camp.
+    spawnable.add('bound_guardian');
+    const problems: string[] = [];
+    for (const q of Object.values(QUESTS)) {
+      for (const o of q.objectives) {
+        if (o.type === 'kill' && o.targetMobId && !spawnable.has(o.targetMobId))
+          problems.push(`${q.id}: kill target ${o.targetMobId} never spawns`);
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+
+  it('every camp-spawned mob has a loot table (copper at minimum)', () => {
+    // The v0.32.0 realms shipped 34 camp-spawned mobs with empty loot arrays:
+    // rollLoot (src/sim/loot/loot_roll.ts) drives entirely off template.loot,
+    // so those corpses dropped nothing, not even copper. The only sanctioned
+    // lootless camp spawns are the practice target and the ambient stable
+    // horse, both non-combat fixtures by design.
+    const LOOTLESS_FIXTURES = new Set(['training_dummy', 'stable_horse']);
+    const problems: string[] = [];
+    const seen = new Set<string>();
+    for (const c of CAMPS) {
+      if (seen.has(c.mobId) || LOOTLESS_FIXTURES.has(c.mobId)) continue;
+      seen.add(c.mobId);
+      const t = MOBS[c.mobId];
+      if (t && t.loot.length === 0) problems.push(`${c.mobId} spawns from a camp with no loot`);
+    }
+    expect(problems).toEqual([]);
   });
 
   it('all loot tables, vendor stock, camps and dungeon spawns resolve', () => {

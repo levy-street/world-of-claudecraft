@@ -119,6 +119,7 @@ import {
   GALECREST_QUEST_CAMPS,
   GALECREST_QUEST_ORDER,
   GALECREST_QUESTS,
+  GALECREST_RESTORED_QUEST_CAMPS,
   GALECREST_ROADS,
   GALECREST_ZONE,
 } from './content/galecrest';
@@ -497,6 +498,10 @@ export const CAMPS: CampDef[] = [
   // LAST so no earlier camp's world-gen rng draw moves (see the draw-order
   // comment at the top of this array).
   ...EVERGARDEN_KNIGHT_CAMPS,
+  // The Galecrest's restored kill-quest targets (gale wisps + shoal
+  // scuttlers, see galecrest.ts): appended after every camp that shipped in
+  // v0.32.0, same tail-append draw-order rule as above.
+  ...GALECREST_RESTORED_QUEST_CAMPS,
 ];
 
 // Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here

@@ -132,7 +132,10 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13, // a fleece the wind gave up on
     moveSpeed: 8.5,
     aggroRadius: 0, // grazing the downs, braced side-on to the gale
-    loot: [{ itemId: 'galecrest_ram_wool', chance: 0.65, questId: 'q_gc_wool_off_the_downs' }],
+    loot: [
+      { copper: 105, chance: 1 },
+      { itemId: 'galecrest_ram_wool', chance: 0.65, questId: 'q_gc_wool_off_the_downs' },
+    ],
     scale: 1.1,
     color: 0xd8d0c0,
   },
@@ -150,7 +153,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 9,
     moveSpeed: 9,
     aggroRadius: 11, // a knot of living wind, and it resents shelter
-    loot: [],
+    loot: [{ copper: 105, chance: 1 }],
     scale: 1.25,
     color: 0xbfe0e8,
   },
@@ -168,7 +171,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 14, // storm-shell
     moveSpeed: 7,
     aggroRadius: 8,
-    loot: [],
+    loot: [{ copper: 105, chance: 1 }],
     scale: 1.2,
     color: 0x8898a8,
   },
@@ -186,7 +189,11 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 8.5,
     aggroRadius: 10, // squatting the old raider tents, and keeping them
-    loot: [],
+    loot: [
+      { copper: 110, chance: 1 },
+      { itemId: 'bandit_bandana', chance: 0.5 },
+      { itemId: 'linen_scrap', chance: 0.3 },
+    ],
     scale: 0.95,
     color: 0x5a8a46,
   },
@@ -204,7 +211,11 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 8.5,
     aggroRadius: 10, // every beached cargo on this coast is theirs by claim
-    loot: [],
+    loot: [
+      { copper: 110, chance: 1 },
+      { itemId: 'bandit_bandana', chance: 0.5 },
+      { itemId: 'linen_scrap', chance: 0.3 },
+    ],
     scale: 0.95,
     color: 0x5a8a46,
   },
@@ -223,7 +234,10 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 14, // every hull on that beach is a grave he keeps
     elite: true,
-    loot: [],
+    loot: [
+      { copper: 450, chance: 1 },
+      { itemId: 'bone_fragments', chance: 1 },
+    ],
     scale: 1.45,
     color: 0x7a8a86,
   },
@@ -245,7 +259,10 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13,
     moveSpeed: 7.5,
     aggroRadius: 12,
-    loot: [],
+    loot: [
+      { copper: 110, chance: 1 },
+      { itemId: 'bone_fragments', chance: 0.5 },
+    ],
     scale: 1.05,
     color: 0x86988e,
   },
@@ -608,6 +625,23 @@ export const GALECREST_OBJECTS: GroundObjectDef[] = [
 export const GALECREST_QUEST_CAMPS: CampDef[] = [
   { mobId: 'drowned_deckhand', center: { x: 352, z: 662 }, radius: 10, count: 3 },
   { mobId: 'drowned_deckhand', center: { x: 306, z: 618 }, radius: 9, count: 3 },
+];
+
+// Restored kill-quest targets. The camps polish pass (80b6e39f1) rehomed every
+// gale_wisp and shoal_scuttler camp to other mobs, but the quest pass still
+// targets both (q_gc_wind_against_the_wick kills 8 wisps,
+// q_gc_scuttlers_in_the_pots kills 10 scuttlers), leaving the two quests
+// uncompletable. Kept separate and appended at the very END of the merged
+// CAMPS array in data.ts (the same tail-append draw-order rule as above). The
+// wisps take back their original Mirror Tarn downs camp at (284, 578) plus the
+// freed ram spot on the Howling Downs; the scuttlers hold the cliff road by
+// the Shear, east of the stable paddock (STABLE_PADDOCK x2 = 426) and clear of
+// the coastline (galeLandness >= 0.57 at both centers).
+export const GALECREST_RESTORED_QUEST_CAMPS: CampDef[] = [
+  { mobId: 'gale_wisp', center: { x: 284, z: 578 }, radius: 10, count: 4 },
+  { mobId: 'gale_wisp', center: { x: 250, z: 320 }, radius: 5, count: 2 },
+  { mobId: 'shoal_scuttler', center: { x: 460, z: 560 }, radius: 8, count: 3 },
+  { mobId: 'shoal_scuttler', center: { x: 438, z: 580 }, radius: 7, count: 3 },
 ];
 
 export const GALECREST_PROPS: ZonePropsDef = {

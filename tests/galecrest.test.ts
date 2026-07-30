@@ -5,7 +5,12 @@
 // realm owns stands on dry ground.
 
 import { describe, expect, it } from 'vitest';
-import { GALECREST_CAMPS, GALECREST_ROADS, GALECREST_ZONE } from '../src/sim/content/galecrest';
+import {
+  GALECREST_CAMPS,
+  GALECREST_RESTORED_QUEST_CAMPS,
+  GALECREST_ROADS,
+  GALECREST_ZONE,
+} from '../src/sim/content/galecrest';
 import { STRIP_MAX_X, ZONES, zoneAt } from '../src/sim/data';
 import { galeLandness, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../src/sim/world';
 
@@ -31,7 +36,11 @@ describe('Galecrest zone registration', () => {
     expect(zoneAt(hub.x, hub.z).id).toBe('galecrest');
     expect(terrainHeight(hub.x, hub.z, SEED)).toBeGreaterThan(WATER_LEVEL);
     expect(terrainHeight(graveyard.x, graveyard.z, SEED)).toBeGreaterThan(WATER_LEVEL);
-    for (const camp of GALECREST_CAMPS) {
+    // GALECREST_QUEST_CAMPS is deliberately absent: the drowned deckhands
+    // stand in the Wreckfields surf below the waterline by design (they rise
+    // from their wrecks at low tide), so the dry-ground sweep excludes them.
+    const allCamps = [...GALECREST_CAMPS, ...GALECREST_RESTORED_QUEST_CAMPS];
+    for (const camp of allCamps) {
       expect(zoneAt(camp.center.x, camp.center.z).id).toBe('galecrest');
       expect(
         terrainHeight(camp.center.x, camp.center.z, SEED),
