@@ -4742,9 +4742,10 @@ function lastBellTidemill(): Scenario {
       for (const actorId of squadIds) rec.track(actorId);
       rec.snapshot('doorway-scene-armed');
 
-      // The shipped scene ends before 12 seconds; leave one second of runway
+      // The builder-authored scene ends at 15 seconds (subtitle read-time
+      // floors and the fade-in tail lengthened it); leave one second of runway
       // for the scenario driver to observe completion and despawn the squad.
-      rec.tick(20 * 13);
+      rec.tick(20 * 16);
       rec.snapshot('tidemill-complete');
     },
   };
