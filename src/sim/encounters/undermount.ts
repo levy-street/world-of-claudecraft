@@ -246,9 +246,9 @@ function spawnUndermountMaerin(
     maerin.castTargetId = null;
     maerin.channeling = true;
     ctx.emit({
-      type: 'spellfx',
-      sourceId: maerin.id,
-      targetId: maerin.id,
+      type: 'spellfxAt',
+      x: maerin.pos.x,
+      z: maerin.pos.z,
       school: 'arcane',
       fx: 'nova',
     });

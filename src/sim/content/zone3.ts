@@ -511,6 +511,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 100, chance: 1 },
       { itemId: 'ritual_phylactery', chance: 0.55, questId: 'q_necromancers' },
+      { itemId: 'undermount_foreman_ledger', chance: 1, questId: 'q_undermount_ledger' },
       { itemId: 'linen_scrap', chance: 0.3 },
       { itemId: 'wyrmcult_spellgrips', chance: 0.04 },
     ],
@@ -520,30 +521,6 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     spellReflect: { value: 9, name: 'Spectral Ward', school: 'shadow' },
     scale: 1.0,
     color: 0x533566,
-    componentTags: ['cloth'],
-  },
-  wyrmcult_dig_foreman: {
-    id: 'wyrmcult_dig_foreman',
-    name: 'Wyrmcult Dig Foreman',
-    minLevel: 20,
-    maxLevel: 20,
-    family: 'humanoid',
-    elite: true,
-    // Surface pre-quest miniboss profile. Every number is tuning for PBE.
-    hpBase: 170,
-    hpPerLevel: 38,
-    dmgBase: 18,
-    dmgPerLevel: 3.2,
-    attackSpeed: 2.4,
-    armorPerLevel: 32,
-    moveSpeed: 6.5,
-    aggroRadius: 12,
-    loot: [
-      { copper: 250, chance: 1 },
-      { itemId: 'undermount_foreman_ledger', chance: 1, questId: 'q_undermount_ledger' },
-    ],
-    scale: 1.15,
-    color: 0x7d4f2a,
     componentTags: ['cloth'],
   },
   boneclad_revenant: {
@@ -1353,7 +1330,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     objectives: [
       {
         type: 'interact',
-        targetObjectItemId: 'undermount_rune_rubbing',
+        targetObjectItemId: 'gravewyrm_sigil',
         count: 3,
         label: 'Rune rubbings taken',
       },
@@ -1376,7 +1353,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     objectives: [
       {
         type: 'kill',
-        targetMobId: 'wyrmcult_dig_foreman',
+        targetMobId: 'wyrmcult_necromancer',
         count: 1,
         label: 'Wyrmcult foreman slain',
       },
@@ -2205,14 +2182,8 @@ export const ZONE3_CAMPS: CampDef[] = [
   // x=0 approach road, so it is nudged east to keep the central path clear; the
   // tents still flank the gate.
   { mobId: 'wyrmcult_zealot', center: { x: 55, z: 820 }, radius: 20, count: 8 },
-  { mobId: 'wyrmcult_zealot', center: { x: 34, z: 845 }, radius: 16, count: 3 },
-  // The dig-site camp rehomes three existing zealot spawns rather than adding
-  // shared-stream wanderers. Population and world-gen draw cadence stay fixed.
-  { mobId: 'wyrmcult_zealot', center: { x: -186, z: 615 }, radius: 16, count: 3 },
-  { mobId: 'wyrmcult_necromancer', center: { x: 40, z: 855 }, radius: 14, count: 4 },
-  // The foreman replaces one existing necromancer spawn in the same creation
-  // slot, preserving roster size and the shared idle-wander draw cadence.
-  { mobId: 'wyrmcult_dig_foreman', center: { x: -186, z: 615 }, radius: 14, count: 1 },
+  { mobId: 'wyrmcult_zealot', center: { x: 34, z: 845 }, radius: 16, count: 6 },
+  { mobId: 'wyrmcult_necromancer', center: { x: 40, z: 855 }, radius: 14, count: 5 },
   // Revenants: the old battlefield (Revenant Fields). The second pack used to sit
   // at (-15, 860), right where the x=0 Sanctum Approach road ends and only ~20yd
   // from the gate, so (aggroRadius 11) it jumped players entering/exiting the
@@ -2235,16 +2206,6 @@ export const ZONE3_CAMPS: CampDef[] = [
 ];
 
 export const ZONE3_OBJECTS: GroundObjectDef[] = [
-  {
-    itemId: 'undermount_rune_rubbing',
-    name: 'Undermount Rune Face',
-    // Fixed dig-site points, all positions are tuning.
-    positions: [
-      { x: -164, z: 601 },
-      { x: -160, z: 609 },
-      { x: -166, z: 616 },
-    ],
-  },
   {
     itemId: 'highwatch_summons',
     name: 'Highwatch Summons',
@@ -2314,13 +2275,6 @@ export const ZONE3_OBJECTS: GroundObjectDef[] = [
 
 export const ZONE3_ITEMS: Record<string, ItemDef> = {
   // --- quest items ---
-  undermount_rune_rubbing: {
-    id: 'undermount_rune_rubbing',
-    name: 'Undermount Rune Rubbing',
-    kind: 'quest',
-    sellValue: 0,
-    questId: 'q_undermount_heat',
-  },
   undermount_foreman_ledger: {
     id: 'undermount_foreman_ledger',
     name: "Foreman's Undermount Ledger",

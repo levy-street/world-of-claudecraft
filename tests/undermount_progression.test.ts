@@ -5,8 +5,8 @@
 // the PlayerMeta.undermountCleared state, and the clear-on-boss-death hook land.
 
 import { describe, expect, it } from 'vitest';
-import { ZONE3_QUEST_ORDER } from '../src/sim/content/zone3';
-import { CLASSES, ITEMS, QUESTS } from '../src/sim/data';
+import { ZONE3_OBJECTS, ZONE3_QUEST_ORDER } from '../src/sim/content/zone3';
+import { CLASSES, ITEMS, MOBS, QUESTS } from '../src/sim/data';
 import { onUndermountBossDeath } from '../src/sim/encounters/undermount';
 import { enterDungeon, instanceKeyFor } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
@@ -107,6 +107,22 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     expect(meta.undermountCleared.size).toBe(0);
   });
 
+  it('keeps wing clears scoped to the character that earned them', () => {
+    const sim = makeSim(19);
+    const clearedPid = sim.addPlayer('warrior', 'Cleared');
+    const sealedPid = sim.addPlayer('mage', 'Sealed');
+    metaOf(sim, clearedPid).undermountCleared.add('undermount_wing1');
+
+    enterDungeon(sim.ctx, 'undermount_wing2', clearedPid);
+    enterDungeon(sim.ctx, 'undermount_wing2', sealedPid);
+
+    expect(claimFor(sim, 'undermount_wing2', clearedPid), 'cleared character enters').toBeDefined();
+    expect(
+      claimFor(sim, 'undermount_wing2', sealedPid),
+      'other character stays sealed',
+    ).toBeUndefined();
+  });
+
   it('spawns Maerin once on a completed wing and delivers every beat in order', () => {
     const expectedByWing = {
       undermount_wing1: [
@@ -184,7 +200,7 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     expect(QUESTS.q_undermount_heat.objectives).toEqual([
       {
         type: 'interact',
-        targetObjectItemId: 'undermount_rune_rubbing',
+        targetObjectItemId: 'gravewyrm_sigil',
         count: 3,
         label: 'Rune rubbings taken',
       },
@@ -192,7 +208,7 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     expect(QUESTS.q_undermount_ledger.objectives).toEqual([
       {
         type: 'kill',
-        targetMobId: 'wyrmcult_dig_foreman',
+        targetMobId: 'wyrmcult_necromancer',
         count: 1,
         label: 'Wyrmcult foreman slain',
       },
@@ -210,6 +226,16 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
       },
     ]);
     expect(QUESTS.q_undermount_descent.requiresQuest).toBe('q_undermount_ledger');
+    expect(QUESTS.q_undermount_ledger.requiresQuest).toBe('q_undermount_heat');
+    expect(
+      ZONE3_OBJECTS.find((object) => object.itemId === 'gravewyrm_sigil')?.positions.length,
+      'three existing rune markers keep the first quest reachable without changing world init',
+    ).toBeGreaterThanOrEqual(3);
+    expect(MOBS.wyrmcult_necromancer.loot).toContainEqual({
+      itemId: 'undermount_foreman_ledger',
+      chance: 1,
+      questId: 'q_undermount_ledger',
+    });
     expect(new Set(Object.values(QUESTS.q_undermount_descent.itemRewards))).toEqual(
       new Set(['runeseekers_lantern']),
     );
@@ -224,5 +250,8 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     expect(lantern.critRating ?? 0).toBe(0);
     expect(lantern.hasteRating ?? 0).toBe(0);
     expect(lantern.hitRating ?? 0).toBe(0);
+    expect(lantern.pvpOffenseRating ?? 0).toBe(0);
+    expect(lantern.pvpDefenseRating ?? 0).toBe(0);
+    expect(new Set(lantern.requiredClass)).toEqual(new Set(Object.keys(CLASSES)));
   });
 });

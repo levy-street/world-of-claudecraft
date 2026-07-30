@@ -1857,7 +1857,6 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "families": [
       "murloc",
       "kobold",
-      "humanoid",
       "elemental"
     ]
   },
