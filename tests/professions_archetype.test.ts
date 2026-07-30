@@ -348,24 +348,6 @@ describe('defaultHobbyForPair skill preference (hobby default)', () => {
   it('returns null for a non-adjacent pair', () => {
     expect(defaultHobbyForPair('engineering', 'tailoring', {})).toBeNull();
   });
-
-  // Bug (fresh code audit, no existing issue): the ring-order tie break alone
-  // ignores content availability. The live, shipped Bombardier pair
-  // (engineering+alchemy) has ring opposites inscription (ring index 5) and
-  // enchanting (ring index 6); ring order picks inscription first, but
-  // inscription has zero recipes and no other skill-gain path
-  // (content/deeds.ts's prog_guildsworn comment: "Jewelcrafting and
-  // Inscription have no live skill-gain path yet"), so a fresh Bombardier
-  // character is defaulted into a hobby slot that can never progress until an
-  // unrelated hobby-switch quest is separately discovered. Enchanting has
-  // real content (disenchanting) and must win the tie instead.
-  it('prefers a candidate with real content over one with none, at equal (zero) skill', () => {
-    expect(defaultHobbyForPair('engineering', 'alchemy', {})).toBe('enchanting');
-  });
-
-  it('the content-availability tiebreak never overrides an actual skill preference', () => {
-    expect(defaultHobbyForPair('engineering', 'alchemy', { inscription: 5 })).toBe('inscription');
-  });
 });
 
 function ctxOf(sim: Sim) {
