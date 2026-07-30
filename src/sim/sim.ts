@@ -197,6 +197,7 @@ import { arenaMapForSlot } from './dungeon_layout';
 import * as nythraxis from './encounters/nythraxis';
 import * as odrenn from './encounters/odrenn';
 import * as undermount from './encounters/undermount';
+import * as volzharr from './encounters/volzharr';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
 // delves/runs.ts + render/dungeon.ts; W11 dropped the stranded sim.ts import. I2a's delve
@@ -4558,9 +4559,11 @@ export class Sim {
       // arrow (mob/locomotion.ts updateMob drives it via ctx). resetNythraxisEncounter
       // keeps its .bind delegate (foreign callers + a test reach sim.resetNythraxisEncounter).
       updateNythraxisEncounter: (boss) => nythraxis.updateNythraxisEncounter(sim.ctx, boss),
-      // Undermount wing 2 (same late-bound pattern; driven from mob/locomotion.ts).
+      // Undermount wings 2 and 3 (same late-bound pattern; driven from mob/locomotion.ts).
       updateOdrennEncounter: (boss) => odrenn.updateOdrennEncounter(sim.ctx, boss),
       resetOdrennEncounter: (boss) => odrenn.resetOdrennEncounter(sim.ctx, boss),
+      updateVolzharrEncounter: (boss) => volzharr.updateVolzharrEncounter(sim.ctx, boss),
+      resetVolzharrEncounter: (boss) => volzharr.resetVolzharrEncounter(sim.ctx, boss),
       resetNythraxisEncounter: sim.resetNythraxisEncounter.bind(sim),
       updateFearMovement: sim.updateFearMovement.bind(sim),
       // M4 mob death lifecycle: the five execution bodies live in mob/lifecycle.ts;

@@ -292,6 +292,8 @@ function makeCtx() {
     updateBossMechanics: vi.fn(),
     updateNythraxisEncounter: vi.fn(),
     updateOdrennEncounter: vi.fn(),
+    updateVolzharrEncounter: vi.fn(),
+    resetVolzharrEncounter: vi.fn(),
     resetOdrennEncounter: vi.fn(),
     resetNythraxisEncounter: vi.fn(),
     despawnSummonedAdds: vi.fn(),

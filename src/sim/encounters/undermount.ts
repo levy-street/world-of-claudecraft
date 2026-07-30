@@ -37,6 +37,26 @@ export const ODRENN_HYSTERESIS_YD = 2; // keep-your-mark band astride the center
 export const ODRENN_ENRAGE_STACK_CADENCE_S = 45; // permanent stacking haste self-buff
 export const ODRENN_ENRAGE_HASTE_PER_STACK = 0.06; // +6% attack speed per Tempering stack
 
+// Wing 3, Volzharr: the section-1 constants from the handoff plus the ember
+// march (all (tuning), locked for PBE). Consumed by encounters/volzharr.ts.
+export const VENT_CADENCE_S = 25; // permanent Vent Fissure spawn cadence
+export const VENT_BAIT_EVERY = 3; // every third vent opens under a random player
+export const VENT_PULSE_DPS = 15; // fire per second inside a vent; vents never close
+export const VENT_RADIUS = 4;
+export const FORGEHEAT_RADIUS = 5; // within this of a vent edge (not in it) stacks Forgeheat
+export const FORGEHEAT_STACK_CAP = 5;
+export const FORGEHEAT_HASTE_PER_STACK = 0.04; // the offense arm
+export const FORGEHEAT_FIRE_TAKEN_PER_STACK = 0.2; // the risk arm
+export const FORGEHEAT_DURATION_S = 4; // decays seconds after leaving the vent edge
+export const ERUPTION_CADENCE_S = 45;
+export const ERUPTION_TELEGRAPH_S = 3.0;
+export const ERUPTION_DMG_MIN = 350;
+export const ERUPTION_DMG_MAX = 450;
+export const EMBER_WAKE_CADENCE_S = 30; // one dormant Cinderling wakes
+export const EMBER_SHAMBLE_SPEED = 3; // woken embers walk AT VOLZHARR, vent-immune
+export const EMBER_CONSUME_RADIUS = 3; // reaching him feeds him
+export const EMBERFEED_HASTE_PER_STACK = 0.03; // permanent, uncapped (the aging clock)
+
 // Kiln Fury: the surviving keeper of a duo frenzies when its partner falls (the
 // kill-together tension). The engine's packFrenzy only buffs SAME-templateId
 // packmates, so this cross-keeper frenzy is bespoke to the encounter.

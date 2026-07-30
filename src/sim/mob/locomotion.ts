@@ -265,6 +265,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     if (mob.inCombat) ctx.updateOdrennEncounter(mob);
     else if (mob.odrenn) ctx.resetOdrennEncounter(mob);
   }
+  if (mob.templateId === 'volzharr_buried_furnace') {
+    if (mob.inCombat) ctx.updateVolzharrEncounter(mob);
+    else if (mob.volzharr) ctx.resetVolzharrEncounter(mob);
+  }
   if (mob.inCombat || (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')) {
     const nythraxisScriptLocked =
       isNythraxis &&

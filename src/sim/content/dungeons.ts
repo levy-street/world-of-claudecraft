@@ -1098,6 +1098,27 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     scale: 1.8,
     color: 0xbfa36a,
   },
+  undermount_cinderling: {
+    id: 'undermount_cinderling',
+    name: 'Cinderling',
+    minLevel: 24,
+    maxLevel: 24,
+    family: 'elemental',
+    // Dormant embers of the half-formed god. They never fight: aggroRadius 3
+    // is the proximity wake (guilt) and the Volzharr module owns their walk.
+    // Low HP on purpose: killing a woken shambler denies Volzharr his stack.
+    hpBase: 900,
+    hpPerLevel: 0,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 10,
+    armorPerLevel: 0,
+    moveSpeed: 3,
+    aggroRadius: 3,
+    loot: [],
+    scale: 0.7,
+    color: 0xff7a29,
+  },
   volzharr_buried_furnace: {
     id: 'volzharr_buried_furnace',
     name: 'Volzharr, the Buried Furnace',
@@ -1204,6 +1225,18 @@ const UNDERMOUNT_WING2_SPAWN_LIST: DungeonSpawn[] = [{ mobId: 'odrenn_the_temper
 
 const UNDERMOUNT_WING3_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'volzharr_buried_furnace', x: 0, z: 40 },
+  // Dormant Cinderlings: half-sunk magma elementals scattered at AUTHORED fixed
+  // positions (no spawn rng), weighted toward the arena's future vent corridors.
+  // They never attack; the Volzharr module wakes them one at a time and marches
+  // them home to feed him (The Embers Come Home). Proximity wakes one early.
+  { mobId: 'undermount_cinderling', x: -22, z: 18 },
+  { mobId: 'undermount_cinderling', x: 24, z: 22 },
+  { mobId: 'undermount_cinderling', x: -30, z: 44 },
+  { mobId: 'undermount_cinderling', x: 31, z: 48 },
+  { mobId: 'undermount_cinderling', x: -18, z: 66 },
+  { mobId: 'undermount_cinderling', x: 20, z: 70 },
+  { mobId: 'undermount_cinderling', x: -8, z: 84 },
+  { mobId: 'undermount_cinderling', x: 10, z: 88 },
 ];
 
 export const DUNGEON_DEFS: Record<string, DungeonDef> = {
