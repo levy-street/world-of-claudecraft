@@ -3,8 +3,9 @@
 Status: INCUBATION, draft pass 2 (2026-07-26) for discussion with Levy. Not scheduled
 and not eligible for Stage 5. The reduced raid core still needs an explicit Stage 3
 scope decision before its existing handoff can be dispatched.
-Depends on the Farshore zone (PR #2321, feature/procedural-dungeons) landing
-first. Supersedes the earlier Wickharbor-anchored draft. Pass-2 scope cut
+Depends on the Farshore zone on the `feature/procedural-dungeons` branch
+(umbrella PR #1584) landing first. Supersedes the earlier Wickharbor-anchored
+draft. Pass-2 scope cut
 (maintainer direction): entry is the standard click-the-moored-ship raid
 gate, and every cross-instance or single-crew system is removed (bell
 relay, Gullhaven Answers, previous-crew ghost ship, town-side live state);
@@ -39,8 +40,8 @@ without creating persistent per-crew world state.
 - First schedule cut: the weekly low-tide assault becomes a separately approved post-raid
   extension. It cannot delay or share the initial raid dispatch.
 - Next-stage gate: Hullworks and one raid prove the pipeline, Levy approves the reduced
-  raid core, and PR #2321 lands. The low-tide extension receives its own later scope
-  decision.
+  raid core, and the `feature/procedural-dungeons` branch (umbrella PR #1584) lands. The
+  low-tide extension receives its own later scope decision.
 
 ## Why this patch
 
@@ -77,8 +78,8 @@ Stage is the existing Farshore content (nothing invented here):
 - The Three Bells (existing quest motif): flavor only; the raid adds no
   live town-side state (pass-2 rule: no single-crew systems).
 
-Dependency: the Farshore ships in #2321. This PRD stacks on it or follows
-it; it does not fork it.
+Dependency: the Farshore ships on the `feature/procedural-dungeons` branch
+(umbrella PR #1584). This PRD stacks on it or follows it; it does not fork it.
 
 ## The enemy: the Glasswake Covenant
 
@@ -181,8 +182,7 @@ run: the before and after shots tell the run's whole story. Render-side
 compositing only, no new sim system.
 
 ### Boss 1: Vessarine, First Voice of the Glasswake (the Sundered Cliffs)
-The encounter formerly labeled "the Split Horizon" now has a villain: 
-Vessarine, the siren matriarch who taught the Covenant to sing, coiled on
+Vessarine, the siren matriarch who taught the Covenant to sing, is coiled on
 the tallest sea stack, conducting. She pulls when the ship enters her
 strait, opening on a yell ("Every wreck on this coast learned my name
 before the water took them. Learn it dry."). Her Wakeglass Sirens sing
@@ -279,10 +279,10 @@ begins dragging it toward the largest break.
   captives when that optional beat was completed, and the town's named boats.
   None of it leaks outside the instance.
 
-Persistence: first server clear engraves the roster on the Landing bell
-(a one-time plaque, the existing precedent). That is the raid's entire
-open-world footprint besides the moored ship. The low-tide extension is a
-separate later feature.
+**Future flourish:** A first-server-clear plaque would be realm-global persisted
+state, which conflicts with the raid's no-cross-instance-state rail. It needs its
+own persistence design, including a `server/` surface and serialize/load coverage,
+before it can be scheduled.
 
 ## Loot direction (sketch)
 
@@ -358,8 +358,10 @@ Files ADDED:
 - Sim modules behind the SimContext seam, each with its own test file:
   `src/sim/voyage_ship.ts` (ship state, trophies; sail panels derive
   client-side from party composition, zero sim cost),
-  `src/sim/voyage_watches.ts` (Split Horizon watch split, aura-keyed,
-  client-side filtering only), `src/sim/beckoning.ts` (the lured walk
+  `src/sim/voyage_watches.ts` (Vessarine watch split, aura-keyed; server-side
+  interest scoping honors the watch flags without putting viewer-specific fields
+  in shared cached payloads, so the fogged route never ships in the snapshot),
+  `src/sim/beckoning.ts` (the lured walk
   state, the one NEW primitive), `src/sim/voyage_vote.ts` (Name-Taker
   election). The later low-tide extension owns `src/sim/lowtide_assault.ts`
   only if separately approved. (Pass 2/3 cuts: bell_relay.ts, wake_doubles.ts
@@ -369,8 +371,10 @@ Files ADDED:
   `src/render/voyage_fx.ts` (aurora finale), called by the renderer, never
   method banks on `renderer.ts`.
 - `public/audio/music/` tracks (sail theme plus one per boss);
-  `public/models/` ship/naga GLBs via the gen-3d-asset lanes; icons via
-  gen-icon-art.
+  `public/models/` ship/naga GLBs via the `image-to-glb` skill
+  (`.claude/skills/image-to-glb/SKILL.md`) plus
+  `docs/image-to-glb-asset-workflow.md`. Icons and non-GLB kit elements are
+  plain authoring work with no named skill.
 - Tests: `tests/farshore_voyage.test.ts` per module, one `tests/parity`
   scenario + golden per boss.
 
