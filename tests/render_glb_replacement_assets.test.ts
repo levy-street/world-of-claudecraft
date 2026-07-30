@@ -25,6 +25,7 @@ import {
 import { artisanRowPreloadInternalsForTest } from '../src/render/artisan_row_props';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { bankerChestPreloadInternalsForTest } from '../src/render/banker_chest';
+import { battlegroundRuneModelPreloadInternalsForTest } from '../src/render/battleground_rune_model';
 import { marshDressingPreloadInternalsForTest } from '../src/render/delve_marsh_dressing';
 import { delvePropsPreloadInternalsForTest } from '../src/render/delve_props';
 import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
@@ -496,6 +497,16 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('mailbox pillar asset', () => {
     expectAssetExistsAndManifested(mailboxPreloadInternalsForTest.mailboxAssetUrl);
+  });
+
+  // Ravenrift rune pads: the def table is all-null until custom models land
+  // (each unregistered rune spins its procedural fallback), so this sweeps an
+  // empty list today and starts enforcing the moment a url is filled in — no
+  // extra wiring needed when the GLB is dropped under public/models.
+  it('battleground rune pad assets', () => {
+    for (const url of battlegroundRuneModelPreloadInternalsForTest.urls()) {
+      expectAssetExistsAndManifested(url);
+    }
   });
 
   it('banker chest asset', () => {

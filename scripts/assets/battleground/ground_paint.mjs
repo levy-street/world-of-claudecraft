@@ -19,7 +19,6 @@
 
 import {
   COVER_PILLARS,
-  CURTAIN_Z,
   FLAG_Z,
   GATEHOUSE_ROOMS,
   GRAVEYARDS,
@@ -41,9 +40,16 @@ export const PAINT_CELL = 0.25;
 export const BARE = 255;
 
 /**
- * The swatch table, carried over from Thornhollow unchanged: same ids, same
- * texture files, same tiling periods and albedo lifts, so the field is dressed
- * in exactly the ground the art direction was built around.
+ * The swatch table: NINE materials, three of each family — grass, cobble,
+ * dirt. It was eighteen, and the field paid for it twice. Once in coherence (a
+ * ground made of eighteen photographs reads as noise however carefully each
+ * region is drawn) and once at load, since every entry is a layer of the
+ * terrain texture array whether or not a single cell is painted with it.
+ *
+ * Ids are the original ones and are NOT renumbered: the shader indexes layers
+ * by array POSITION (bgPaintLookup remaps id -> index), so the ids are free to
+ * be sparse and keeping them stable keeps this table diffable against the
+ * Thornhollow original.
  */
 export const SWATCHES = [
   { id: 200, color: 5204764, label: 'Hollow Meadow', textureSha: 'builtin:Grass002', tileSize: 26 },
@@ -56,64 +62,14 @@ export const SWATCHES = [
     light: -0.08,
   },
   {
-    id: 202,
-    color: 3813156,
-    label: 'Trodden Path',
-    textureSha: 'builtin:Ground100',
-    tileSize: 7,
-    light: 0.12,
-  },
-  {
-    id: 203,
-    color: 5917244,
-    label: 'Keep Stone',
-    textureSha: 'builtin:Rock054',
-    tileSize: 6,
-    light: -0.05,
-  },
-  { id: 204, color: 3948343, label: 'Fightpit Rock', textureSha: 'builtin:Cliff002', tileSize: 8 },
-  {
-    id: 205,
-    color: 2564120,
-    label: 'Forest Loam',
-    textureSha: 'builtin:Ground101',
-    tileSize: 8,
-    light: 0.1,
-  },
-  {
     id: 206,
     color: 3618364,
     label: 'Old Cobblestone',
     textureSha: 'builtin:Cobblestone002',
     tileSize: 14,
   },
-  { id: 207, color: 4740397, label: 'Living Roots', textureSha: 'builtin:Roots002', tileSize: 15 },
-  { id: 208, color: 4143656, label: 'Mossy Bark', textureSha: 'builtin:Wood004', tileSize: 29 },
-  {
-    id: 209,
-    color: 2829351,
-    label: 'Shadowed Earth',
-    textureSha: 'builtin:Ground118',
-    tileSize: 14,
-  },
-  {
-    id: 210,
-    color: 4865588,
-    label: 'Sunbaked Cliff',
-    textureSha: 'builtin:Cliff006',
-    tileSize: 14,
-  },
   { id: 211, color: 3880492, label: 'Stony Dirt', textureSha: 'builtin:Ground116', tileSize: 14 },
   { id: 212, color: 4140834, label: 'Dusty Earth', textureSha: 'builtin:Ground107', tileSize: 14 },
-  { id: 213, color: 6380598, label: 'Tangled Roots', textureSha: 'builtin:Roots001', tileSize: 14 },
-  {
-    id: 214,
-    color: 5063216,
-    label: 'Pebbled Ground',
-    textureSha: 'builtin:Ground115',
-    tileSize: 14,
-  },
-  { id: 215, color: 6122821, label: 'Meadow Stones', textureSha: 'builtin:Rock056', tileSize: 14 },
   { id: 216, color: 6520097, label: 'Spring Sward', textureSha: 'builtin:Grass003', tileSize: 14 },
   {
     id: 217,
@@ -124,25 +80,28 @@ export const SWATCHES = [
   },
 ];
 
-/** Named handles so the region list below reads as ground, not as numbers. */
-const MEADOW = 200;
-const RIDGE_GRASS = 201;
-const TRODDEN = 202;
-const KEEP_STONE = 203;
-const RUIN_ROCK = 204;
-const LOAM = 205;
-const FLAGSTONE = 206;
-const LIVING_ROOTS = 207;
-const MOSSY_TIMBER = 208;
-const SHADOWED = 209;
-const SUNBAKED = 210;
-const STONY_DIRT = 211;
-const DUSTY = 212;
-const TANGLED_ROOTS = 213;
-const PEBBLED = 214;
-const MEADOW_STONES = 215;
-const SWARD = 216;
-const COBBLED = 217;
+/**
+ * Named handles so the region program below reads as ground, not as numbers.
+ * Grouped by family, because the family is the art direction: grass is the
+ * default, cobble means someone BUILT here, dirt means the ground is broken or
+ * worn. A region that is none of those three has no business being painted.
+ */
+const MEADOW = 200; // grass: the hollow floor
+const SWARD = 216; // grass: lusher, open chambers
+const RIDGE_GRASS = 201; // grass: thinner, along the ramparts
+const FLAGSTONE = 206; // cobble: laid grey stone — floors and footings
+const COBBLED = 217; // cobble: rounded grey stone — rune pads, thresholds
+const WORN_EARTH = 212; // dirt: worn routes and scuff
+const SCREE = 211; // dirt: pebbled broken ground around rubble
+
+// Two textures were CUT here rather than merely left unpainted, because both
+// were actively wrong against a green field:
+//   Ground100 'Trodden Path' — very nearly black. As a route through grass it
+//     read as a burn scar, not a path.
+//   Rock054 'Keep Stone' — warm pink cobble flecked with purple crystal. It
+//     belongs in a cave, and as a wall footing it ringed the whole field in
+//     pink. Footings are Cobblestone002 now, which is the grey the walls
+//     themselves are built from.
 
 /** The Crimson flag stand: the one objective mark authored in canonical space
  *  (its Azure twin arrives with the mirror pass). */
@@ -150,16 +109,12 @@ const FLAG_STANDS_CANONICAL = [{ x: 0, z: -FLAG_Z }];
 
 /** Ground that grows: where a grass tuft belongs. */
 export const GRASS_GROUND = new Set([MEADOW, SWARD, RIDGE_GRASS]);
-/** Ground that holds undergrowth: grass plus the soft, shaded floors. */
-export const SOFT_GROUND = new Set([
-  MEADOW,
-  SWARD,
-  RIDGE_GRASS,
-  LOAM,
-  LIVING_ROOTS,
-  TANGLED_ROOTS,
-  PEBBLED,
-]);
+/**
+ * Ground that holds undergrowth. Now the same set as GRASS_GROUND: the soft
+ * shaded floors it used to also cover (loam, root mats) are no longer painted,
+ * and a fern has no business on cobble, dirt or a worn route.
+ */
+export const SOFT_GROUND = new Set([MEADOW, SWARD, RIDGE_GRASS]);
 
 /**
  * Nearest-cell swatch lookup over a built paint grid. The dressing pass uses it
@@ -334,87 +289,58 @@ export function buildPaint() {
   const g = new PaintGrid();
   const keepFront = -(FLAG_Z - KEEP_MOUTH_DZ); // -108, the keep mouth line
 
-  // --- the hollow floor -----------------------------------------------------
+  // --- 1. the hollow floor is GRASS -----------------------------------------
+  // The whole field, wall to wall. Everything below is an exception carved out
+  // of it, which is the point: this is a green hollow with things built in it,
+  // not a quarry with grass at the edges.
   g.rect(MEADOW, 0, 0, HALF_X + 6, HALF_Z + 6, 0);
+  // Lusher sward through the open chambers, where nothing is built and nothing
+  // is walked hard enough to wear it.
+  g.blotches(SWARD, [-HALF_X, -HALF_Z + 8, HALF_X, 0], 34, 6, 13, 11);
+  // Thinner ridge grass down the ramparts, where the hollow's own walls shade
+  // the ground: the field reads as a bowl instead of as a flat green sheet.
+  g.blotches(RIDGE_GRASS, [-HALF_X, -HALF_Z, -30, 0], 14, 4, 10, 23);
+  g.blotches(RIDGE_GRASS, [30, -HALF_Z, HALF_X, 0], 14, 4, 10, 31);
+  g.rect(RIDGE_GRASS, -HALF_X, 0, 3.2, HALF_Z, 1.8);
+  g.rect(RIDGE_GRASS, HALF_X, 0, 3.2, HALF_Z, 1.8);
+  g.rect(RIDGE_GRASS, 0, -HALF_Z, HALF_X, 3.2, 1.8);
 
-  // Field chambers: meadow broken by lusher sward, thin ridge grass toward the
-  // ramparts, and loam creeping out of the wall feet.
-  g.blotches(SWARD, [-HALF_X, -104, HALF_X, -CURTAIN_Z], 26, 5, 11, 11);
-  g.blotches(RIDGE_GRASS, [-HALF_X, -HALF_Z, -30, -CURTAIN_Z], 16, 5, 12, 23);
-  g.blotches(RIDGE_GRASS, [30, -HALF_Z, HALF_X, -CURTAIN_Z], 16, 5, 12, 31);
-  g.blotches(PEBBLED, [-HALF_X, -100, HALF_X, -CURTAIN_Z], 14, 3, 7, 47);
-  g.blotches(LOAM, [-HALF_X, -HALF_Z, -34, -20], 14, 4, 10, 53);
-  g.blotches(LOAM, [34, -HALF_Z, HALF_X, -20], 14, 4, 10, 59);
-
-  // Rampart feet: root mats creeping in from the walls, all the way round.
-  g.rect(LIVING_ROOTS, -HALF_X, 0, 4.5, HALF_Z, 1.6);
-  g.rect(LIVING_ROOTS, HALF_X, 0, 4.5, HALF_Z, 1.6);
-  g.rect(LIVING_ROOTS, 0, -HALF_Z, HALF_X, 4.5, 1.6);
-  g.blotches(TANGLED_ROOTS, [-HALF_X, -HALF_Z, -40, 0], 18, 3, 8, 67);
-  g.blotches(TANGLED_ROOTS, [40, -HALF_Z, HALF_X, 0], 18, 3, 8, 71);
-
-  // --- the Ruin Courtyard ---------------------------------------------------
-  // A sunk bowl of broken ground: stony dirt to the curtains, shadowed earth in
-  // the dish, bare rock over the heart, with dust and meadow stones between.
-  g.rect(STONY_DIRT, 0, 0, HALF_X + 4, CURTAIN_Z + 3, 1.9);
-  g.disc(SHADOWED, 0, 0, 44, 2.1);
-  g.disc(RUIN_ROCK, 0, 0, 25, 2.1);
-  g.blotches(DUSTY, [-44, -CURTAIN_Z, 44, 0], 20, 4, 9, 83);
-  g.blotches(MEADOW_STONES, [-HALF_X, -CURTAIN_Z, HALF_X, 0], 18, 3, 8, 89);
-  g.blotches(SUNBAKED, [-30, -34, 30, 0], 12, 3, 7, 97);
-  // The heart ruin's own apron: broken paving spilling out of the shell.
-  g.rect(COBBLED, 0, 0, 14, 14, 2.2);
-  g.rect(RUIN_ROCK, 0, 0, 8.6, 8.6, 0.5);
-  // Ruined timber decking at each gatehouse's courtyard mouth.
-  for (const room of GATEHOUSE_ROOMS) {
-    if (room.z > 0) continue;
-    g.blotches(
-      MOSSY_TIMBER,
-      [room.x - 10, room.z - 16, room.x + 10, room.z + 16],
-      7,
-      2.5,
-      5.5,
-      101 + room.x,
-    );
-  }
-
-  // Rubble formations sit in their own apron of stone, so a low mound reads as
-  // ground rather than as props dropped on grass.
+  // --- 2. DIRT, only where the ground is genuinely broken -------------------
+  // Rubble formations sit in their own apron of pebbled scree, so a low mound
+  // reads as ground that has collapsed rather than as props dropped on a lawn.
+  // Kept TIGHT to the pile: a generous apron on every mound turns the field
+  // into brown blobs on green, which is the single easiest way to make an
+  // otherwise good ground plan look amateur.
   for (const pile of RUBBLE_PILES) {
     if (pile.z > 0.5) continue;
-    g.disc(MEADOW_STONES, pile.x, pile.z, (pile.kind === 'large' ? 4.6 : 2) + 2.6, 0.8);
+    g.disc(SCREE, pile.x, pile.z, (pile.kind === 'large' ? 4.6 : 2) + 1.3, 0.7);
+  }
+  // A little scuff where the courtyard has been fought over, and nothing else:
+  // the rest of the dirt on this field is the routes below, which is dirt that
+  // MEANS something.
+  g.blotches(WORN_EARTH, [-26, -26, 26, 0], 7, 2.5, 5.5, 83);
+  // Graveyard plots: turned earth inside the rails.
+  for (const plot of GRAVEYARDS) {
+    if (plot.z > 0) continue;
+    g.rect(WORN_EARTH, plot.x, plot.z, plot.hw + 1, plot.hd + 1, 0.9);
+  }
+
+  // --- 3. BUILT ground is COBBLE --------------------------------------------
+  // Footings first: every wall run stands on its own stone, so no masonry
+  // floats on grass.
+  for (const w of planWalls()) {
+    if (w.z - w.hd > 0.5) continue;
+    g.rect(FLAGSTONE, w.x, w.z, w.hw + 0.7, w.hd + 0.7, 0.35);
   }
   for (const p of COVER_PILLARS) {
     if (p.z > 0.5) continue;
-    g.disc(KEEP_STONE, p.x, p.z, 3.4, 0.5);
+    g.disc(FLAGSTONE, p.x, p.z, 2.7, 0.5);
   }
-
-  // --- the keep terraces ----------------------------------------------------
-  // Packed earth over the whole terrace, garrison flagstone in the keep court
-  // and out through the mouth.
-  g.rect(STONY_DIRT, 0, -HALF_Z, HALF_X + 4, HALF_Z - 106, 1.7);
-  g.blotches(DUSTY, [-HALF_X, -HALF_Z, HALF_X, -108], 12, 4, 9, 107);
-  g.rect(FLAGSTONE, 0, -(FLAG_Z + 1), KEEP_HALF_X + 1.5, 13, 1.1);
-  g.rect(FLAGSTONE, 0, keepFront + 2, KEEP_HALF_X - 3, 6, 1.2);
-  // The pocket behind the keep, where the great hall stands.
-  g.rect(FLAGSTONE, 0, -HALF_Z + 6, 15, 7, 1.1);
-
-  // Graveyard plots: turned dirt inside the rails, roots at the edges.
-  for (const plot of GRAVEYARDS) {
-    if (plot.z > 0) continue;
-    g.rect(SHADOWED, plot.x, plot.z, plot.hw + 1, plot.hd + 1, 0.9);
-    g.blotches(
-      TANGLED_ROOTS,
-      [plot.x - plot.hw, plot.z - plot.hd, plot.x + plot.hw, plot.z + plot.hd],
-      6,
-      1.6,
-      3.2,
-      113,
-    );
-  }
-
-  // --- built surfaces -------------------------------------------------------
-  // Gatehouse floors: laid road cobble, so a crossing reads as a built room.
+  // The heart ruin: a laid flagstone floor inside its shell, spilling out as
+  // broken road cobble.
+  g.rect(COBBLED, 0, 0, 15, 15, 2.2);
+  g.rect(FLAGSTONE, 0, 0, 8.8, 8.8, 0.6);
+  // Gatehouse floors: laid cobble, so a crossing reads as a built room.
   for (const room of GATEHOUSE_ROOMS) {
     if (room.z > 0) continue;
     g.rect(COBBLED, room.x, room.z, room.hw + 0.5, room.hd + 0.5, 0.7);
@@ -424,18 +350,20 @@ export function buildPaint() {
     if (gate.z > 0) continue;
     g.rect(COBBLED, gate.x, gate.z, gate.half + 4, 7, 0.8);
   }
+  // The keep: garrison flagstone through the court, out through the mouth, and
+  // in the pocket behind where the great hall stands. The terrace AROUND it
+  // stays grass — the keep is a building, not a compound.
+  g.rect(FLAGSTONE, 0, -(FLAG_Z + 1), KEEP_HALF_X + 2.5, 14, 1.1);
+  g.rect(FLAGSTONE, 0, keepFront + 2, KEEP_HALF_X - 3, 6, 1.2);
+  g.rect(FLAGSTONE, 0, -HALF_Z + 6, 15, 7, 1.1);
 
-  // Every wall stands on its own stone footing, so no run floats on grass.
-  for (const w of planWalls()) {
-    if (w.z - w.hd > 0.5) continue;
-    g.rect(KEEP_STONE, w.x, w.z, w.hw + 1.1, w.hd + 1.1, 0.35);
-  }
-
-  // --- the routes people actually run --------------------------------------
-  for (const pts of ROUTE_LINES) g.line(TRODDEN, pts, 2.6);
-  // The keep mouth and the gate thresholds are the busiest ground on the field.
+  // --- 4. the routes people actually run ------------------------------------
+  // Worn over the top of everything: a path crosses a gatehouse floor because
+  // that is where the feet go.
+  for (const pts of ROUTE_LINES) g.line(WORN_EARTH, pts, 2.6);
+  // The keep mouth is the busiest ground on the field.
   g.line(
-    TRODDEN,
+    WORN_EARTH,
     [
       { x: 0, z: -128 },
       { x: 0, z: -104 },
@@ -443,19 +371,16 @@ export function buildPaint() {
     3.4,
   );
 
-  // --- objective marks: nothing is allowed to cover these -------------------
+  // --- 5. objective marks: nothing is allowed to cover these ----------------
   for (const stand of FLAG_STANDS_CANONICAL) {
-    g.disc(KEEP_STONE, stand.x, stand.z, 6.2, 0.5);
-    g.disc(COBBLED, stand.x, stand.z, 3.4, 0.3);
+    g.disc(FLAGSTONE, stand.x, stand.z, 6.2, 0.5);
   }
-  for (const pad of SPEED_RUNES) {
+  // Every rune pad sits on its own round of natural cobble. Painted LAST and
+  // for all six alike, so the ground under a pad is the same wherever it is on
+  // the field and no route or apron can eat into it.
+  for (const pad of [...SPEED_RUNES, ...POWER_RUNES]) {
     if (pad.z > 0.5) continue;
-    g.disc(KEEP_STONE, pad.x, pad.z, 3.6, 0.35);
-  }
-  for (const pad of POWER_RUNES) {
-    if (pad.z > 0.5) continue;
-    g.disc(KEEP_STONE, pad.x, pad.z, 3.6, 0.35);
-    g.disc(SUNBAKED, pad.x, pad.z, 1.9, 0.2);
+    g.disc(COBBLED, pad.x, pad.z, 3.6, 0.4);
   }
 
   g.mirror();

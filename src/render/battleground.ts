@@ -17,6 +17,7 @@
 // the field's art and its point lights render on every tier; only shadow
 // casting and paint texture resolution follow the tier.
 import * as THREE from 'three';
+import { TH_PLACEMENTS } from '../sim/thornhollow_field.generated';
 import { loadGltf, loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import {
@@ -28,6 +29,7 @@ import {
   bgGrassPatches,
   bgPaintTextureFiles,
 } from './battleground_core';
+import { buildLanternFlames } from './battleground_lantern_fx';
 import { type BgPlacementsView, buildBattlegroundPlacements } from './battleground_placements';
 import { type BgTerrainView, buildBattlegroundTerrain } from './battleground_terrain';
 import { ensureDungeonAssets } from './dungeon';
@@ -252,6 +254,14 @@ export function buildBattleground(
       for (const mesh of await buildDecals(bgFieldHeightLocal)) {
         owned.push(mesh.geometry, mesh.material as THREE.Material);
         group.add(mesh);
+      }
+
+      // Lantern flames: one Points draw for every lamp on the field, animated
+      // entirely in its vertex shader off the shared clock (no tick here).
+      const flames = buildLanternFlames(TH_PLACEMENTS, { lowGfx: opts.lowGfx });
+      if (flames) {
+        owned.push(flames.geometry, flames.material as THREE.Material);
+        group.add(flames);
       }
 
       const budget = BG_LIGHT_BUDGET_BY_TIER[GFX.tier] ?? 6;

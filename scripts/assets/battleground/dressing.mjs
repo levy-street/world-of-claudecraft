@@ -516,23 +516,30 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
   // --- rune pads ------------------------------------------------------------
   for (const pad of [...SPEED_RUNES, ...POWER_RUNES]) {
     if (pad.z > 0.5) continue;
-    both({
-      assetId: 'dungeon/path_a',
-      x: r4(pad.x),
-      z: r4(pad.z),
-      rotY: 0,
-      scale: 2.1,
-      collide: false,
-      y: 0.12,
-      name: 'Rune glyph',
-    });
+    // A pad ON the centre line is its own twin's mirror, so the pair (-38, 0)
+    // and (38, 0) both survive the z filter and `both()` then authors each of
+    // them AND the other — every midfield pad came out with two coincident
+    // rings of four lanterns stacked in the same holes. Take one side only and
+    // let the mirror supply the other.
+    if (Math.abs(pad.z) <= 0.5 && pad.x > 0) continue;
+    // No glyph slab under the pad. A 'dungeon/path_a' plate used to sit here,
+    // and it read as a loose rock dropped on the ground: the mode draws its own
+    // glow disc and spinning body at this exact spot, so the plate only hid the
+    // painted cobble the pad was sited on. The four lanterns still ring it.
     for (let i = 0; i < 4; i++) {
       const a = (i / 4) * TAU + Math.PI / 4;
       both({
         assetId: 'dungeon/post_lantern',
         x: r4(pad.x + Math.cos(a) * 3.7),
         z: r4(pad.z + Math.sin(a) * 3.7),
-        rotY: yaw(a),
+        // Face the arm INWARD, so all four hang their lamp over the pad. The
+        // post's arm runs down its own +Z, and rotY maps local +Z to world
+        // (sin, cos), so aiming it at the centre — world (-cos a, -sin a) —
+        // solves to -a - PI/2. Passing `a` (what this used to do) pointed each
+        // post a different way round and only one of the four happened to look
+        // right. See LANTERN_ARM_LOCAL in battleground_lantern_fx_core.ts,
+        // which reads the same model the same way for the flame emitter.
+        rotY: yaw(-a - Math.PI / 2),
         scale: 1.5,
         collide: true,
         collisionMode: 'baked',
