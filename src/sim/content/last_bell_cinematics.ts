@@ -70,3 +70,6 @@ export const LAST_BELL_PROP_PATH_SEGMENTS = {
     ease: 'easeInOutSine',
   },
 } as const;
+
+export type LastBellPropPathSegmentId = keyof typeof LAST_BELL_PROP_PATH_SEGMENTS;
+export type LastBellPropCueId = keyof typeof LAST_BELL_PROP_PATH_SEGMENTS | typeof LB_PROP_CUE_PARK;
