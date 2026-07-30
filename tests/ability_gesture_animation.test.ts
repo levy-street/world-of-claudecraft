@@ -70,6 +70,12 @@ describe('dedicated ability gesture animations', () => {
       fadeIn: vi.fn(),
       fadeOut: vi.fn(),
       play: vi.fn(),
+      // The zero-weight watchdog (readActionWeight/beginAction) reads the live
+      // mixer facts; report a scheduled, fully-weighted action so the fake
+      // reads as driving the rig and the repair path never trips under test.
+      isScheduled: vi.fn(),
+      getEffectiveWeight: vi.fn(),
+      setEffectiveWeight: vi.fn(),
       clampWhenFinished: false,
       timeScale: 1,
     } as unknown as THREE.AnimationAction;
@@ -78,6 +84,9 @@ describe('dedicated ability gesture animations', () => {
     vi.mocked(action.fadeIn).mockReturnValue(action);
     vi.mocked(action.fadeOut).mockReturnValue(action);
     vi.mocked(action.play).mockReturnValue(action);
+    vi.mocked(action.isScheduled).mockReturnValue(true);
+    vi.mocked(action.getEffectiveWeight).mockReturnValue(1);
+    vi.mocked(action.setEffectiveWeight).mockReturnValue(action);
 
     const visual = Object.create(CharacterVisual.prototype) as CharacterVisual;
     const state = visual as unknown as Record<string, unknown>;

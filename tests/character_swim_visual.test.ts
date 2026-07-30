@@ -56,6 +56,11 @@ describe('CharacterVisual swimming presentation', () => {
     state.climbBlend = 0;
     state.climbPhase = 0;
     state.climbTarget = null;
+    // The v0.32 zero-weight watchdog scans the mixer each update; Object.create
+    // skips its field initializers, so seed the scan scratch and debounce (the
+    // empty actions map means the repair path stays off, by design).
+    state.weightScan = [];
+    state.starvedFrames = 0;
     state.model = model;
     state.weaponAuraMeshes = [aura];
     state.pendingDt = 0;

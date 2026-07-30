@@ -10,6 +10,12 @@ function fakeAction(): THREE.AnimationAction {
     fadeIn: vi.fn(),
     fadeOut: vi.fn(),
     play: vi.fn(),
+    // The zero-weight watchdog (readActionWeight/beginAction) reads the live
+    // mixer facts; report a scheduled, fully-weighted action so the fakes read
+    // as driving the rig and the repair path never trips under test.
+    isScheduled: vi.fn(),
+    getEffectiveWeight: vi.fn(),
+    setEffectiveWeight: vi.fn(),
     clampWhenFinished: false,
     timeScale: 1,
   } as unknown as THREE.AnimationAction;
@@ -18,6 +24,9 @@ function fakeAction(): THREE.AnimationAction {
   vi.mocked(action.fadeIn).mockReturnValue(action);
   vi.mocked(action.fadeOut).mockReturnValue(action);
   vi.mocked(action.play).mockReturnValue(action);
+  vi.mocked(action.isScheduled).mockReturnValue(true);
+  vi.mocked(action.getEffectiveWeight).mockReturnValue(1);
+  vi.mocked(action.setEffectiveWeight).mockReturnValue(action);
   return action;
 }
 
@@ -99,6 +108,10 @@ describe('CharacterVisual channel animation', () => {
     state.bobPhase = 0;
     state.swimHidingWeapons = false;
     state.mixer = { update: vi.fn() };
+    // The v0.32 zero-weight watchdog scans the mixer each update; Object.create
+    // skips its field initializers, so seed the scan scratch and debounce.
+    state.weightScan = [];
+    state.starvedFrames = 0;
 
     const anim: AnimState = {
       speed: 0,
@@ -141,6 +154,10 @@ describe('CharacterVisual channel animation', () => {
     state.bobPhase = 0;
     state.swimHidingWeapons = false;
     state.mixer = { update: vi.fn() };
+    // The v0.32 zero-weight watchdog scans the mixer each update; Object.create
+    // skips its field initializers, so seed the scan scratch and debounce.
+    state.weightScan = [];
+    state.starvedFrames = 0;
 
     const hardcast: AnimState = {
       speed: 0,
@@ -186,6 +203,10 @@ describe('CharacterVisual channel animation', () => {
     state.bobPhase = 0;
     state.swimHidingWeapons = false;
     state.mixer = { update: vi.fn() };
+    // The v0.32 zero-weight watchdog scans the mixer each update; Object.create
+    // skips its field initializers, so seed the scan scratch and debounce.
+    state.weightScan = [];
+    state.starvedFrames = 0;
 
     const anim: AnimState = {
       speed: 0,
@@ -233,6 +254,10 @@ describe('CharacterVisual channel animation', () => {
     state.bobPhase = 0;
     state.swimHidingWeapons = false;
     state.mixer = { update: vi.fn() };
+    // The v0.32 zero-weight watchdog scans the mixer each update; Object.create
+    // skips its field initializers, so seed the scan scratch and debounce.
+    state.weightScan = [];
+    state.starvedFrames = 0;
 
     const anim: AnimState = {
       speed: 0,
