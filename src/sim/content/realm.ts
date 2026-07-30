@@ -165,7 +165,10 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 7.5,
     aggroRadius: 0, // drifting ambient light, harmless unless harmed
-    loot: [{ itemId: 'wisp_mote', chance: 0.6, questId: 'q_wisp_lights' }],
+    loot: [
+      { copper: 75, chance: 1 },
+      { itemId: 'wisp_mote', chance: 0.6, questId: 'q_wisp_lights' },
+    ],
     scale: 0.7,
     color: 0xffc4ec,
   },
@@ -210,6 +213,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     loot: [{ itemId: 'gleaming_antler', chance: 0.55, questId: 'q_gleaming_antlers' }],
     scale: 1.0,
     color: 0xb9a3cf,
+    componentTags: ['hide', 'meat'],
   },
   veiled_doe: {
     id: 'veiled_doe',
@@ -228,6 +232,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 40, chance: 1 }],
     scale: 0.9,
     color: 0xcdbfdc,
+    componentTags: ['hide', 'meat'],
   },
   gleamstag: {
     id: 'gleamstag',
@@ -267,7 +272,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 7.5,
     aggroRadius: 0, // the little folk of the village never strike first
-    loot: [],
+    loot: [{ copper: 80, chance: 1 }],
     scale: 1.0,
     color: 0xd8c4f0,
   },
@@ -285,7 +290,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 7,
     aggroRadius: 0, // the mushroom folk tend their rings in peace
-    loot: [],
+    loot: [{ copper: 75, chance: 1 }],
     scale: 0.8,
     color: 0xd8b98a,
   },
@@ -328,7 +333,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 6, // rooted patience; do not test it
     wardAllies: { radius: 14, every: 10, amount: 70, duration: 8, name: 'Bark Ward' },
     loot: [
-      { copper: 150, chance: 1 },
+      { copper: 90, chance: 1 },
       { itemId: 'elder_bark', chance: 0.7, questId: 'q_treant_accord' },
     ],
     scale: 1.45,
@@ -351,7 +356,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 10,
     stoneskin: { amount: 90, every: 12, duration: 8, name: 'Stone Bulwark' },
     loot: [
-      { copper: 170, chance: 1 },
+      { copper: 95, chance: 1 },
       { itemId: 'guardian_core', chance: 0.4 },
     ],
     scale: 1.2,

@@ -116,6 +116,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     loot: [{ itemId: 'gilded_sap_clot', chance: 0.6, questId: 'q_af_amber_from_the_herd' }],
     scale: 1.15,
     color: 0xd8a848,
+    componentTags: ['hide', 'meat'],
   },
   gloam_fox: {
     id: 'gloam_fox',
@@ -134,6 +135,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     loot: [],
     scale: 1,
     color: 0xd87838,
+    componentTags: ['hide', 'fang'],
   },
   orchard_treant: {
     id: 'orchard_treant',
@@ -150,7 +152,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 6.5,
     aggroRadius: 0, // ancient and calm, until an axe is raised
     elite: true,
-    loot: [],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.4,
     color: 0xc89838,
   },
@@ -168,7 +170,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 11,
     moveSpeed: 8.5,
     aggroRadius: 11, // orchard thieves, and territorial about it
-    loot: [],
+    loot: [{ copper: 95, chance: 1 }],
     scale: 0.85,
     color: 0xe8c878,
   },
@@ -186,7 +188,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13,
     moveSpeed: 8,
     aggroRadius: 13,
-    loot: [],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.1,
     color: 0xa8b048,
   },
@@ -209,7 +211,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 16,
     elite: true,
-    loot: [],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.6,
     color: 0x5a7038,
   },

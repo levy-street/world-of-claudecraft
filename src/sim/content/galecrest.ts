@@ -135,6 +135,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     loot: [{ itemId: 'galecrest_ram_wool', chance: 0.65, questId: 'q_gc_wool_off_the_downs' }],
     scale: 1.1,
     color: 0xd8d0c0,
+    componentTags: ['hide', 'meat'],
   },
   gale_wisp: {
     id: 'gale_wisp',
@@ -186,7 +187,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 8.5,
     aggroRadius: 10, // squatting the old raider tents, and keeping them
-    loot: [],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 0.95,
     color: 0x5a8a46,
   },
@@ -204,7 +205,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 8.5,
     aggroRadius: 10, // every beached cargo on this coast is theirs by claim
-    loot: [],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 0.95,
     color: 0x5a8a46,
   },
@@ -223,7 +224,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 14, // every hull on that beach is a grave he keeps
     elite: true,
-    loot: [],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.45,
     color: 0x7a8a86,
   },
@@ -245,7 +246,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13,
     moveSpeed: 7.5,
     aggroRadius: 12,
-    loot: [],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.05,
     color: 0x86988e,
   },
