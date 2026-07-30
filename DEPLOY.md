@@ -308,14 +308,14 @@ For off-box safety, sync the directory to S3 occasionally:
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the full
   `/dev` cheat set (the level/teleport cheats the test bots use, plus item
   grants, mob spawns, instance teleports, and the dev command GUI).
-- **Community test profile**: on a disposable public test realm, set both
-  `PROVISION_TEST_ACCOUNTS=1` and `COMMUNITY_TEST_RIFTS=1` in the host `.env`,
-  then restart the game container. The first flag gives newly created accounts
-  nine level-20 characters, one per class, with complete Warfare gear
-  and four maximum-size bags. It does not backfill existing accounts. The Rift
-  flag restores persisted events before filling eight distinct eligible regions,
-  uses six-hour portal lifetimes and one-minute replacements, and raises capacity
-  to 24 concurrent groups. Both flags are off by default and neither enables dev
+- **Community test profile**: on a disposable public test realm, set
+  `PROVISION_TEST_ACCOUNTS=1` in the host `.env`, then restart the game
+  container. The flag gives newly created accounts nine level-20 characters,
+  one per class, with complete Warfare gear and four maximum-size bags. It does
+  not backfill existing accounts. (Rift portal density no longer needs a flag:
+  every realm keeps one portal per eligible zone on an hourly rotation, so the
+  former `COMMUNITY_TEST_RIFTS` toggle is gone.) The flag is off by default and
+  does not enable dev
   commands, so keep `ALLOW_DEV_COMMANDS=0` on a public realm.
 
   For the initial community test, leave `RIFT_UPGRADER_URL` and

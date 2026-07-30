@@ -5043,9 +5043,6 @@ export interface SimConfig {
   // scheduler (rift/portals.ts). Default OFF so deterministic tests, parity
   // traces, and the RL env keep a portal-free world unless they opt in.
   riftPortals?: boolean;
-  // Public test realms may opt into a denser natural-portal policy and a larger
-  // instance pool. Default OFF so all existing hosts retain their current policy.
-  communityRifts?: boolean;
   // Host-computed next raid-reset instant for a given lockout "now" (epoch ms). The
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.

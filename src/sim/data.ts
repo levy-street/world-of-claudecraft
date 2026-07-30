@@ -1043,9 +1043,12 @@ export const RIFT_BAND_X_MIN = RIFT_X_MIN - 40;
 // only RIFT_REGION_HALF_X wide either side; 1000u of headroom keeps it clear of the
 // relocated Protect Yumi maze band (YUMI_BAND_X_MIN) that now sits past it.
 export const RIFT_BAND_X_MAX = RIFT_X_MIN + 1000;
-export const RIFT_SLOT_COUNT = 8; // normal concurrent-rift capacity
-export const COMMUNITY_RIFT_SLOT_COUNT = 24; // opt-in public-test capacity
-const RIFT_LAYOUT_SLOT_COUNT = COMMUNITY_RIFT_SLOT_COUNT;
+// Concurrent-rift capacity for every host. With one portal per eligible zone
+// and per-event instance caps enforced at entry, the bound is population, not
+// events; slots are only backing records until a group enters, so a large pool
+// costs nothing at rest.
+export const RIFT_SLOT_COUNT = 64;
+const RIFT_LAYOUT_SLOT_COUNT = RIFT_SLOT_COUNT;
 export const RIFT_MAX_FLOORS = 6; // matches rift_gen MAX_FLOORS
 const RIFT_Z0 = -1250;
 // Each FLOOR gets its own z-stacked origin within a slot, so descending builds a

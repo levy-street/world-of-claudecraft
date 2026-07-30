@@ -154,7 +154,6 @@ import {
   abilitiesKnownAt,
   arenaOrigin,
   CLASSES,
-  COMMUNITY_RIFT_SLOT_COUNT,
   DELVE_COMPANIONS,
   DELVE_LIST,
   DELVE_SLOT_COUNT,
@@ -468,11 +467,7 @@ import {
   onNodeGatheredForQuests,
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
-import {
-  type NaturalRiftPortal,
-  RIFT_PORTAL_FIRST_AT,
-  updateRiftPortals as updateRiftPortalsImpl,
-} from './rift/portals';
+import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
 import {
   enchantRiftItem as enchantRiftItemImpl,
   type RiftForgeResult,
@@ -1747,7 +1742,9 @@ export class Sim {
   // scheduler; both live SimContext views).
   naturalRiftPortals: NaturalRiftPortal[] = [];
   riftPortalSpawnCount = 0;
-  riftPortalNextAt = RIFT_PORTAL_FIRST_AT;
+  // Placement-failure backoff gate only; per-zone cadence lives in the event
+  // history (rift/portals.ts riftZoneNextOpenAt).
+  riftPortalNextAt = 0;
   // Escort quest runs (src/sim/escort.ts), keyed by EscortDef id. Live
   // SimContext view; the module owns every mutation.
   escortRuns = new Map<string, EscortRunState>();
@@ -1856,7 +1853,6 @@ export class Sim {
       devCommands: this.devCommands,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
-      communityRifts: cfg.communityRifts ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       valeCupShowcase: cfg.valeCupShowcase ?? false,
@@ -2142,10 +2138,8 @@ export class Sim {
       }
     }
 
-    // Procedural rift instance pool (empty until a portal is entered). Public
-    // test realms opt into a larger pool without changing the normal host cap.
-    const riftSlotCount = this.cfg.communityRifts ? COMMUNITY_RIFT_SLOT_COUNT : RIFT_SLOT_COUNT;
-    for (let i = 0; i < riftSlotCount; i++) {
+    // Procedural rift instance pool (empty until a portal is entered).
+    for (let i = 0; i < RIFT_SLOT_COUNT; i++) {
       this.riftInstances.push({
         slot: i,
         instanceId: 0,
@@ -2191,6 +2185,7 @@ export class Sim {
         tier: null,
         portalId: null,
         rewarded: false,
+        progressed: false,
         seqResetAt: -Infinity,
         bossDeathZones: [],
       });

@@ -269,6 +269,12 @@ export interface RiftInstance {
   startedAt: number;
   finishedAt: number | null;
   outcome: RiftInstanceOutcome;
+  /** True once the run is SPOILED: any mob killed, or the off-path cache
+   * plundered. A progressed run never recycles and binds its members WoW-raid
+   * style (enterRift routes them back and never into a sibling instance).
+   * Survives descent (floor teardown must not erase progress); reset only when
+   * the slot itself is freed. */
+  progressed: boolean;
   /** Snapshot of the event artifact at entry. Never changes mid-race. */
   upgrade: RiftUpgradeManifest | null;
   seed: number;

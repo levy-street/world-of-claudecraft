@@ -203,17 +203,11 @@ describe('loadConfig', () => {
     );
   });
 
-  it('parses COMMUNITY_TEST_RIFTS strictly and defaults it off', () => {
-    expect(loadConfig({ ...MIN_ENV }).communityTestRifts).toBe(false);
-    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: '1' }).communityTestRifts).toBe(true);
-    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'true' }).communityTestRifts).toBe(true);
-    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: '0' }).communityTestRifts).toBe(false);
-    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'FALSE' }).communityTestRifts).toBe(
-      false,
-    );
-    expect(() => loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'yes' })).toThrow(
-      /COMMUNITY_TEST_RIFTS/,
-    );
+  it('ignores the retired COMMUNITY_TEST_RIFTS flag entirely', () => {
+    // The dense rift population is the one policy on every host now; a stale
+    // host .env value must neither throw nor surface on the config object.
+    const config = loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'yes' });
+    expect('communityTestRifts' in config).toBe(false);
   });
 
   it('reads the numeric and string overrides', () => {

@@ -231,11 +231,13 @@ exempt from the procedural rank-mechanic budget so the citadel identity is never
 A scheduler opens ranked portals automatically. Tuning is `RIFT_TIER_INFO` plus the
 `RIFT_PORTAL_*` constants at the top of the module.
 
-- **Cadence.** First portal ~2 min after boot (so a fresh realm is not empty),
-  then one roughly every `RIFT_PORTAL_INTERVAL` (~3 hours of sim time, which is
-  real time on the 20 Hz live server); at most `RIFT_PORTAL_MAX_OPEN` (3) open
-  world-wide. Enabled by `SimConfig.riftPortals` (on for the live server and the
-  offline client; OFF by default so tests / parity / the RL env stay portal-free).
+- **Cadence.** Every eligible zone keeps one open portal: the first population
+  fills ~2 min after boot (`RIFT_PORTAL_FIRST_AT`), and each zone's next portal
+  opens `RIFT_PORTAL_ZONE_CYCLE` (1 h) after the previous one OPENED, so an
+  expired portal is replaced immediately while a first-cleared zone stays empty
+  until its boundary. Enabled by `SimConfig.riftPortals` (on for the live server
+  and the offline client; OFF by default so tests / parity / the RL env stay
+  portal-free).
 - **Determinism.** Each spawn rolls zone, rank, position and rift seed from a
   DEDICATED `Rng` derived from `(worldSeed, spawnOrdinal)`, never the shared
   stream, so adding the scheduler shifts no existing draw order.
@@ -254,15 +256,14 @@ A scheduler opens ranked portals automatically. Tuning is `RIFT_TIER_INFO` plus 
   ladder up to the S legendary), the natural-first-clear personal rings, essence
   and gems, the mount rolls, and the rank coin bonus. Dev-portal runs (tier
   null) still pay the gear ladder but no first-clear extras.
-- **Public test profile.** `COMMUNITY_TEST_RIFTS=1` is a validated, default-off
-  server flag. After persisted state loads, the server preserves open events, fills
-  to eight distinct active eligible regions, and saves the result before accepting
-  players. A transitional population can exceed eight portals when restored events
-  overlap in one region; those valid events drain normally.
-  A missing portal is replaced after 60 seconds, community portals last six hours,
-  and the instance pool grows from eight to 24 concurrent groups. Persistence load
-  or initial save failure aborts boot in this mode so an unknown saved state is
-  never overwritten. Normal scheduling and capacity remain unchanged when off.
+- **Population policy (all realms).** Every eligible zone keeps one open portal,
+  cycling hourly: a zone's next portal opens `RIFT_PORTAL_ZONE_CYCLE` (1 h) after
+  the previous one OPENED, so an uncleared portal is replaced the moment it
+  collapses while a first-cleared (sealed) zone stays empty until its boundary
+  and can never be immediately refarmed. The cadence derives from the persisted
+  event history (latest opening per zone), so restarts preserve it without extra
+  saved state. The former `COMMUNITY_TEST_RIFTS` public-test flag is gone: the
+  dense population is now the one policy on every host.
 
 ## Client sync + render
 

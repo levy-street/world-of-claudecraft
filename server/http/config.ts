@@ -89,9 +89,6 @@ export interface Config {
   // Off-by-default community-realm account provisioning. When enabled, the
   // central account insert atomically creates the full level-20 test roster.
   readonly provisionTestAccounts: boolean;
-  // Public-test Rift profile. Strictly validated, read once at boot, and off by
-  // default so a typo cannot silently enable or disable the denser realm policy.
-  readonly communityTestRifts: boolean;
   readonly turnstileSecret: string;
   readonly maxWsPerIpHard: number;
   // The realm player admission cap: the WS handshake (server/ws_auth.ts) refuses a
@@ -193,7 +190,6 @@ const REQUIRE_WEB_LOGIN_ENV = 'REQUIRE_WEB_LOGIN';
 const CONTENT_TYPE_ENFORCE_ENV = 'API_CONTENT_TYPE_ENFORCE';
 const ORIGIN_CHECK_ENFORCE_ENV = 'API_ORIGIN_CHECK_ENFORCE';
 const PROVISION_TEST_ACCOUNTS_ENV = 'PROVISION_TEST_ACCOUNTS';
-const COMMUNITY_TEST_RIFTS_ENV = 'COMMUNITY_TEST_RIFTS';
 
 // The recognized boolean-flag vocabulary shared by REQUIRE_WEB_LOGIN and the two
 // API enforce flags (matches web_login_guard.ts / content_type.ts / origin_check.ts:
@@ -314,7 +310,6 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
   validateBooleanFlag(env, CONTENT_TYPE_ENFORCE_ENV);
   validateBooleanFlag(env, ORIGIN_CHECK_ENFORCE_ENV);
   validateBooleanFlag(env, PROVISION_TEST_ACCOUNTS_ENV);
-  validateBooleanFlag(env, COMMUNITY_TEST_RIFTS_ENV);
   validatePublicOrigin(env);
   validateRealms(env);
 
@@ -331,7 +326,6 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     port: numberOr(env.PORT, DEFAULT_PORT),
     allowDevCommands: env.ALLOW_DEV_COMMANDS === ALLOW_DEV_COMMANDS_ON,
     provisionTestAccounts: resolveBooleanFlag(env, PROVISION_TEST_ACCOUNTS_ENV),
-    communityTestRifts: resolveBooleanFlag(env, COMMUNITY_TEST_RIFTS_ENV),
     turnstileSecret: env.TURNSTILE_SECRET ?? DEFAULT_TURNSTILE_SECRET,
     maxWsPerIpHard: numberOr(env.MAX_WS_PER_IP_HARD, DEFAULT_MAX_WS_PER_IP_HARD),
     // Trimmed so a whitespace-only value reads as unset -> the default, never as

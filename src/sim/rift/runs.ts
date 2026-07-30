@@ -53,6 +53,9 @@ const ORB_TRIGGER_RADIUS = 3.2;
 const ORB_NOTICE_COOLDOWN = 6; // seconds between "the orb is sealed" nudges
 const SEQ_RESET_NOTICE_COOLDOWN = 4; // seconds between "the runes go dark" reset notices
 const POOL_FULL_NOTICE_COOLDOWN = 4; // seconds between "all rifts are unstable" / "already cleared" denials on walk-in
+// Concurrent instances one shared event may hold. The global pool (RIFT_SLOT_COUNT)
+// backs every event together; this cap keeps a single hyped portal from draining it.
+export const RIFT_EVENT_INSTANCE_CAP = 32;
 const BOULDER_PUSH_RADIUS = 2.0; // shove a boulder when this close and moving into it
 const PAD_RADIUS = 2.2; // a boulder counts as socketed within this of its pad
 const ICE_SLIDE_SPEED = 13; // yd/s glide across the ice (~1.85x run: frictionless momentum)
@@ -453,6 +456,7 @@ function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
   inst.tier = null;
   inst.portalId = null;
   inst.rewarded = false;
+  inst.progressed = false;
   inst.bossDeathZones = [];
   if (eventId !== null) {
     const event = ctx.riftEvents.find((candidate) => candidate.eventId === eventId);
@@ -527,7 +531,19 @@ export function enterRift(
       return;
     }
   }
+  const matchesEvent = (candidate: RiftInstance): boolean =>
+    eventId !== null
+      ? candidate.eventId === eventId
+      : candidate.eventId === null && candidate.seed === seed >>> 0;
+  const liveMatch = (candidate: RiftInstance): boolean =>
+    candidate.partyKey !== null && candidate.outcome === 'active' && matchesEvent(candidate);
+
   if (eventId !== null && !deadEntry) {
+    // A resolved event denies every LIVING entrant outright. No re-entry
+    // exemption is needed: sealing or collapsing always deletes the portal
+    // entity in the same call chain, so this eventId path cannot even be
+    // reached once the event is cleared or collapsed, and mid-run groups
+    // simply keep playing inside their instance.
     const event = ctx.riftEvents.find((candidate) => candidate.eventId === eventId);
     if (!event || event.status === 'cleared' || event.status === 'collapsed') {
       if (ctx.time >= (r.e.riftPoolFullAt ?? -Infinity) + POOL_FULL_NOTICE_COOLDOWN) {
@@ -541,28 +557,77 @@ export function enterRift(
     event.contentLocked = true;
   }
 
-  // Members of one group share an instance. Every other group entering the same
-  // event receives another slot with identical generated content. A dead
-  // member may match their own DECIDED run (corpse retrieval, above).
-  // A dead entrant matches by MEMBERSHIP ONLY (never the partyKey arm), so the
-  // instance entered is guaranteed to be the same one the combat gate above
+  // ---- Instance resolution (WoW-raid-style binding) --------------------------
+  // The first mob kill (or plundered cache) marks a run PROGRESSED. A progressed
+  // run binds its members: they always re-enter that run and can never land in a
+  // different instance of the same event, whatever their party does. An
+  // UNPROGRESSED run is disposable: once its members regroup and enter another
+  // run, the stale empty copy recycles so a freshly formed party shares one
+  // clean instance instead of being split across leftovers.
+  // A dead entrant still matches by MEMBERSHIP ONLY (never the partyKey arm), so
+  // the instance entered is guaranteed to be the same one the combat gate above
   // checked, and may be a decided (won) run for corpse retrieval.
-  let inst =
-    ctx.riftInstances.find(
-      (candidate) =>
-        candidate.partyKey !== null &&
-        (deadEntry
-          ? candidate.memberIds.has(r.meta.entityId)
-          : candidate.outcome === 'active' &&
-            (candidate.memberIds.has(r.meta.entityId) || candidate.partyKey === key)) &&
-        (eventId !== null
-          ? candidate.eventId === eventId
-          : candidate.eventId === null && candidate.seed === seed >>> 0),
-    ) ?? null;
+  let inst: RiftInstance | null = null;
+  if (deadEntry) {
+    inst =
+      ctx.riftInstances.find(
+        (candidate) =>
+          candidate.partyKey !== null &&
+          candidate.memberIds.has(r.meta.entityId) &&
+          matchesEvent(candidate),
+      ) ?? null;
+    if (!inst) return; // a ghost never allocates a fresh run
+  } else {
+    // 1. Binding wins over everything, including the entrant's current party.
+    inst =
+      ctx.riftInstances.find(
+        (candidate) =>
+          liveMatch(candidate) && candidate.progressed && candidate.memberIds.has(r.meta.entityId),
+      ) ?? null;
+    // 2. The current group's run: exact key match first, then any live run a
+    //    CURRENT party member is inside of or bound to (covers party-id churn
+    //    and mid-run replacement invites). Entering a progressed run binds the
+    //    entrant to it via the membership added below.
+    if (inst === null) {
+      const partyPids = ctx.partyOf(r.meta.entityId)?.members ?? [];
+      const mateRun = (candidate: RiftInstance): boolean =>
+        liveMatch(candidate) &&
+        partyPids.some((pid) => pid !== r.meta.entityId && candidate.memberIds.has(pid));
+      inst =
+        ctx.riftInstances.find((candidate) => liveMatch(candidate) && candidate.partyKey === key) ??
+        ctx.riftInstances.find((candidate) => mateRun(candidate) && candidate.progressed) ??
+        ctx.riftInstances.find(mateRun) ??
+        null;
+      if (inst !== null) inst.partyKey = key; // the current group owns the run now
+    }
+    // 3. Recycle the entrant's stale, unprogressed, player-empty leftovers of
+    //    this event (they regrouped; the clean copies must not pin or leak).
+    for (const candidate of ctx.riftInstances) {
+      if (candidate === inst || !liveMatch(candidate) || candidate.progressed) continue;
+      if (!candidate.memberIds.has(r.meta.entityId)) continue;
+      if (instancePlayerIds(ctx, candidate).length > 0) continue;
+      // A zero-kill wipe leaves ghosts entitled to a corpse run (the death
+      // rules above): never recycle a run out from under a dead member.
+      let deadMember = false;
+      for (const memberId of candidate.memberIds) {
+        if (ctx.entities.get(memberId)?.dead) {
+          deadMember = true;
+          break;
+        }
+      }
+      if (deadMember) continue;
+      freeRiftInstance(ctx, candidate);
+    }
+  }
   if (!inst) {
-    if (deadEntry) return; // a ghost never allocates a fresh run
+    // The cap counts SLOT OCCUPANCY for the event, not just active races:
+    // decided (won/lost) runs still hold their slot until reclaim, and one
+    // hyped portal must never drain the whole global pool through them.
+    const eventRuns = ctx.riftInstances.filter(
+      (candidate) => candidate.partyKey !== null && matchesEvent(candidate),
+    ).length;
     const free = ctx.riftInstances.find((i) => i.partyKey === null);
-    if (!free) {
+    if (!free || eventRuns >= RIFT_EVENT_INSTANCE_CAP) {
       if (ctx.time >= (r.e.riftPoolFullAt ?? -Infinity) + POOL_FULL_NOTICE_COOLDOWN) {
         r.e.riftPoolFullAt = ctx.time;
         ctx.error(r.meta.entityId, 'All rifts are unstable right now. Try again soon.');
@@ -607,6 +672,7 @@ export function enterRift(
     inst.tier = eventId === null ? null : (portal?.riftTier ?? null);
     inst.portalId = portal?.id ?? null;
     inst.rewarded = false;
+    inst.progressed = false;
     markRiftEventActive(ctx, eventId);
     spawnRiftFloor(ctx, inst);
   }
@@ -1079,6 +1145,10 @@ export function riftOpenTreasure(ctx: SimContext, objectId: number, pid?: number
     return;
   }
   const inst = riftInstanceAtPos(ctx, r.e.pos);
+  // Plundering the cache spoils the run exactly like a kill: a recycled copy
+  // would respawn the chest, so an unbound leave-regroup-reenter loop could
+  // farm it. Progress pins the run instead.
+  if (inst) inst.progressed = true;
   const tier: LootTier =
     inst?.tier === 'S' ? 'premium' : inst?.tier === 'A' || inst?.tier === 'B' ? 'medium' : 'low';
   const cls = ctx.players.get(r.meta.entityId)?.cls ?? 'warrior';
@@ -1148,7 +1218,12 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
 // heroic dungeon/raid currency, and the rift prize is the clear-time gear
 // ladder, the first-clear rings/essence/gems, the mount rolls, and coin.
 
-function terminateLosingInstance(ctx: SimContext, inst: RiftInstance): void {
+/** Complete a run whose event was first-cleared by another group. No eject, no
+ * teardown (maintainer decision, 2026-07-30): the group keeps its instance to
+ * the end, the boss corpse still pays the rank-gated gear ladder, and only the
+ * event's first-clear extras (rings, essence, gems, the world banner) stay
+ * exclusive to the race winner. */
+function completeLosingRun(ctx: SimContext, inst: RiftInstance, boss: Entity | null): void {
   const event =
     inst.eventId === null
       ? null
@@ -1156,11 +1231,12 @@ function terminateLosingInstance(ctx: SimContext, inst: RiftInstance): void {
   const winnerNames = event?.firstClear?.memberNames ?? [];
   const clearTime = event?.firstClear?.duration ?? 0;
   const tier = event?.tier ?? inst.tier;
+  inst.rewarded = true;
   inst.outcome = 'lost';
   inst.finishedAt = ctx.time;
-  if (inst.lockpick) riftLockpickAbort(ctx, inst);
-  for (const pid of instancePlayerIds(ctx, inst)) {
-    if (event && tier) {
+  if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
+  if (event && tier) {
+    for (const pid of instancePlayerIds(ctx, inst)) {
       ctx.emit({
         type: 'riftRaceResult',
         pid,
@@ -1171,27 +1247,21 @@ function terminateLosingInstance(ctx: SimContext, inst: RiftInstance): void {
         clearTime,
       });
     }
-    ctx.emit({
-      type: 'log',
-      text: `The rift has already been cleared by ${winnerNames.join(', ') || 'another party'}. Your run ends.`,
-      color: '#f99',
-      pid,
-    });
-    forceExitRiftPlayer(ctx, inst, pid, true);
   }
-  freeRiftInstance(ctx, inst);
 }
 
-/** Resolve the authoritative first-clear claim. The winning instance remains open
- * for loot and egress; every competing group is notified, ejected, and torn down. */
+/** Resolve the authoritative first-clear claim. Every finishing instance stays
+ * open for loot and egress; losing the race only forfeits the first-clear
+ * extras, never the run. Returns true when this run is decided and should get
+ * its exit spawned. */
 function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | null): boolean {
-  if (inst.rewarded) return inst.outcome === 'won';
+  if (inst.rewarded) return inst.outcome !== 'active';
   const present = instancePlayerIds(ctx, inst);
   const participants = present.length > 0 ? present : [...inst.memberIds];
   const claim = claimRiftFirstClear(ctx, inst, participants);
   if (!claim.won) {
-    terminateLosingInstance(ctx, inst);
-    return false;
+    completeLosingRun(ctx, inst, boss);
+    return true;
   }
 
   inst.rewarded = true;
@@ -1251,14 +1321,8 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
       text: `${winnerNames.join(', ') || 'A party'} won the ${claim.event.tier}-rank Rift race in ${clearTime.toFixed(1)}s!`,
       color: '#ffd76a',
     });
-
-    const competitors = ctx.riftInstances.filter(
-      (candidate) =>
-        candidate !== inst &&
-        candidate.partyKey !== null &&
-        candidate.eventId === claim.event?.eventId,
-    );
-    for (const competitor of competitors) terminateLosingInstance(ctx, competitor);
+    // Competing instances are deliberately left running: they finish their own
+    // race and complete as losers when their boss falls (completeLosingRun).
   }
   return true;
 }
@@ -1471,7 +1535,20 @@ export function updateRiftInstances(ctx: SimContext): void {
   // whose bosses fall inside the same window would be ranked by slot order and
   // the earlier kill could lose the shared race.
   for (const inst of ctx.riftInstances) {
-    if (inst.partyKey === null || inst.bossDiedAtTick !== null || inst.bossId === null) continue;
+    if (inst.partyKey === null) continue;
+    // First-kill watch: the moment ANY mob of an unspoiled run dies, the run is
+    // PROGRESSED (binds members, stops recycling). Self-disabling: once set, the
+    // scan never runs again for this instance.
+    if (!inst.progressed) {
+      for (const id of inst.mobIds) {
+        const mob = ctx.entities.get(id);
+        if (mob?.dead) {
+          inst.progressed = true;
+          break;
+        }
+      }
+    }
+    if (inst.bossDiedAtTick !== null || inst.bossId === null) continue;
     if (ctx.entities.get(inst.bossId)?.dead) {
       inst.bossDiedAtTick = ctx.tickCount;
       // Clear any pending lethal death zones so a zone placed just before the
@@ -1581,7 +1658,8 @@ export function updateRiftInstances(ctx: SimContext): void {
     )
     .sort((a, b) => (a.bossDiedAtTick as number) - (b.bossDiedAtTick as number) || a.slot - b.slot);
   for (const inst of cleared) {
-    // An earlier claim this sweep may have torn this competitor down already.
+    // Safety only: nothing tears down competitors mid-sweep anymore, but a
+    // freed slot must never be completed.
     if (inst.partyKey === null) continue;
     const boss = inst.bossId !== null ? ctx.entities.get(inst.bossId) : null;
     if (!completeRiftClear(ctx, inst, boss ?? null)) continue;

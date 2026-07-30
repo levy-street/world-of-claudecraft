@@ -7,8 +7,13 @@ import {
 } from '../src/sim/content/rift/items';
 import { isRiftPos, ZONES } from '../src/sim/data';
 import {
+  closeNaturalRiftPortal,
+  eligibleRiftZones,
+  RIFT_EVENT_HISTORY_LIMIT,
   RIFT_MIN_LEVEL,
+  RIFT_PORTAL_FIRST_AT,
   RIFT_PORTAL_LIFETIME,
+  RIFT_PORTAL_ZONE_CYCLE,
   RIFT_TIER_INFO,
   riftTierForZone,
   updateRiftPortals,
@@ -40,13 +45,22 @@ function tickSeconds(sim: Sim, seconds: number): SimEvent[] {
 }
 
 // Portal cadence is a scheduler concern, not an integration test for 2,400 full
-// world ticks. Move the deterministic clock to its deadline and invoke that one
-// subsystem tick directly; run gameplay ticks only where the test needs them.
+// world ticks. Move the deterministic clock to the first-spawn boundary and
+// pump the 1 Hz scheduler pass directly. The scheduler spawns AT MOST ONE
+// portal per pass (tick-budget cap), so filling the one-portal-per-zone
+// population takes one pass per eligible zone; callers that only need "a
+// portal" take naturalRiftPortals[0].
 function spawnDuePortal(sim: Sim): SimEvent[] {
-  sim.time = sim.riftPortalNextAt + 0.1;
+  sim.time = Math.max(sim.time, RIFT_PORTAL_FIRST_AT) + 0.1;
   sim.tickCount += (10 - (sim.tickCount % 20) + 20) % 20;
-  updateRiftPortals(sim.ctx);
-  return sim.drainEvents();
+  const out: SimEvent[] = [];
+  for (let pass = 0; pass <= eligibleRiftZones().length; pass++) {
+    updateRiftPortals(sim.ctx);
+    out.push(...sim.drainEvents());
+    sim.time += 1;
+    sim.tickCount += 20;
+  }
+  return out;
 }
 
 function clearRiftToBossKill(sim: Sim, inst: RiftInstance): Entity {
@@ -121,48 +135,119 @@ describe('rift ranks: zone mapping and tuning', () => {
   });
 });
 
-describe('rift portals: natural spawn scheduler', () => {
-  it('spawns a ranked portal on the cadence and announces it world-visibly', () => {
+describe('rift portals: one-per-zone rotation scheduler', () => {
+  it('fills every eligible zone at the first boundary and announces each world-visibly', () => {
     const sim = makeSim();
     expect(sim.naturalRiftPortals.length).toBe(0);
     const events = spawnDuePortal(sim);
-    expect(sim.naturalRiftPortals.length).toBe(1);
-    const p = sim.naturalRiftPortals[0];
-    const portal = sim.entities.get(p.id)!;
-    expect(portal.templateId).toBe('rift_portal');
-    expect(portal.riftTier).toBe(p.tier);
-    expect(portal.riftBaseLevel).toBe(RIFT_TIER_INFO[p.tier].baseLevel);
-    // World-visible announce (no pid) naming the rank and the zone.
-    const announce = events.find(
-      (e) => e.type === 'log' && e.text === `A ${p.tier}-rank rift tears open in ${p.zoneName}!`,
-    );
-    expect(announce).toBeDefined();
-    expect((announce as { pid?: number }).pid).toBeUndefined();
-    // The zone name is a real zone and the tier legal for it.
-    const zi = ZONES.findIndex((z) => z.name === p.zoneName);
-    expect(zi).toBeGreaterThanOrEqual(0);
+    // One portal per eligible zone, all distinct zones, in a single pass.
+    const zones = eligibleRiftZones();
+    expect(zones.length).toBe(11);
+    expect(sim.naturalRiftPortals.length).toBe(zones.length);
+    expect(new Set(sim.naturalRiftPortals.map((q) => q.zoneId)).size).toBe(zones.length);
+    for (const p of sim.naturalRiftPortals) {
+      const portal = sim.entities.get(p.id)!;
+      expect(portal.templateId).toBe('rift_portal');
+      expect(portal.riftTier).toBe(p.tier);
+      expect(portal.riftBaseLevel).toBe(RIFT_TIER_INFO[p.tier].baseLevel);
+      // World-visible announce (no pid) naming the rank and the zone.
+      const announce = events.find(
+        (e) => e.type === 'log' && e.text === `A ${p.tier}-rank rift tears open in ${p.zoneName}!`,
+      );
+      expect(announce).toBeDefined();
+      expect((announce as { pid?: number }).pid).toBeUndefined();
+      const zi = ZONES.findIndex((z) => z.name === p.zoneName);
+      expect(zi).toBeGreaterThanOrEqual(0);
+    }
   });
 
-  it('is deterministic: two same-seed sims spawn the identical portal', () => {
+  it('spawns nothing before the first-spawn warmup on a fresh world', () => {
+    const sim = makeSim();
+    sim.time = RIFT_PORTAL_FIRST_AT - 5;
+    sim.tickCount += (10 - (sim.tickCount % 20) + 20) % 20;
+    updateRiftPortals(sim.ctx);
+    expect(sim.naturalRiftPortals).toHaveLength(0);
+  });
+
+  it('the riftPortalNextAt backoff gate blocks the whole zone scan until it lapses', () => {
+    const sim = makeSim();
+    sim.time = RIFT_PORTAL_FIRST_AT + 1;
+    sim.riftPortalNextAt = sim.time + 60; // as set by a placement failure
+    sim.tickCount += (10 - (sim.tickCount % 20) + 20) % 20;
+    updateRiftPortals(sim.ctx);
+    expect(sim.naturalRiftPortals).toHaveLength(0);
+    sim.time += 61;
+    for (let pass = 0; pass <= eligibleRiftZones().length; pass++) {
+      sim.tickCount += 20;
+      updateRiftPortals(sim.ctx);
+      sim.time += 1;
+    }
+    expect(sim.naturalRiftPortals).toHaveLength(eligibleRiftZones().length);
+  });
+
+  it('spawns at most one portal per scheduler pass (tick-budget cap)', () => {
+    const sim = makeSim();
+    sim.time = RIFT_PORTAL_FIRST_AT + 0.1;
+    sim.tickCount += (10 - (sim.tickCount % 20) + 20) % 20;
+    updateRiftPortals(sim.ctx);
+    expect(sim.naturalRiftPortals).toHaveLength(1);
+    sim.tickCount += 20;
+    updateRiftPortals(sim.ctx);
+    expect(sim.naturalRiftPortals).toHaveLength(2);
+  });
+
+  it('keeps the history limit comfortably above the zone count (cadence derivation)', () => {
+    // riftZoneNextOpenAt derives each zone's boundary from the newest event of
+    // that zone; the completed-event trim must never be able to drop it.
+    expect(eligibleRiftZones().length * 2).toBeLessThan(RIFT_EVENT_HISTORY_LIMIT);
+  });
+
+  it('a sealed zone stays empty until its hourly boundary, then reopens fresh', () => {
+    const sim = makeSim();
+    spawnDuePortal(sim);
+    const first = sim.naturalRiftPortals[0];
+    const firstOpenedAt = first.openedAt;
+    // Seal it early (a first clear closes the way in).
+    sim.time = firstOpenedAt + 600;
+    closeNaturalRiftPortal(sim.ctx, first.id, 'sealed');
+    expect(sim.naturalRiftPortals.some((q) => q.zoneId === first.zoneId)).toBe(false);
+    // Before the boundary: the zone must NOT refill.
+    sim.time = firstOpenedAt + RIFT_PORTAL_ZONE_CYCLE - 5;
+    sim.tickCount += (10 - (sim.tickCount % 20) + 20) % 20;
+    updateRiftPortals(sim.ctx);
+    expect(sim.naturalRiftPortals.some((q) => q.zoneId === first.zoneId)).toBe(false);
+    // At the boundary: a FRESH event opens in the same zone.
+    sim.time = firstOpenedAt + RIFT_PORTAL_ZONE_CYCLE + 1;
+    sim.tickCount += 20;
+    updateRiftPortals(sim.ctx);
+    const reopened = sim.naturalRiftPortals.find((q) => q.zoneId === first.zoneId);
+    expect(reopened).toBeDefined();
+    expect(reopened!.eventId).not.toBe(first.eventId);
+  });
+
+  it('is deterministic: two same-seed sims spawn the identical portal population', () => {
     const a = makeSim();
     const b = makeSim();
     spawnDuePortal(a);
     spawnDuePortal(b);
-    const pa = a.naturalRiftPortals[0];
-    const pb = b.naturalRiftPortals[0];
-    expect(pa.tier).toBe(pb.tier);
-    expect(pa.zoneName).toBe(pb.zoneName);
-    expect(pa.riftName).toBe(pb.riftName);
-    const ea = a.entities.get(pa.id)!;
-    const eb = b.entities.get(pb.id)!;
-    expect(ea.pos).toEqual(eb.pos);
+    expect(a.naturalRiftPortals.length).toBe(b.naturalRiftPortals.length);
+    for (let i = 0; i < a.naturalRiftPortals.length; i++) {
+      const pa = a.naturalRiftPortals[i];
+      const pb = b.naturalRiftPortals[i];
+      expect(pa.tier).toBe(pb.tier);
+      expect(pa.zoneName).toBe(pb.zoneName);
+      expect(pa.riftName).toBe(pb.riftName);
+      const ea = a.entities.get(pa.id)!;
+      const eb = b.entities.get(pb.id)!;
+      expect(ea.pos).toEqual(eb.pos);
+    }
   });
 
   it('collapses an unclosed portal after its lifetime, with a world announce', () => {
     const sim = makeSim();
     spawnDuePortal(sim);
     const p = sim.naturalRiftPortals[0];
-    expect(Math.abs(p.expiresAt - (sim.time + RIFT_PORTAL_LIFETIME))).toBeLessThan(3);
+    expect(p.expiresAt - p.openedAt).toBe(RIFT_PORTAL_LIFETIME);
     // Fast-forward the deadline instead of ticking 15 real minutes.
     p.expiresAt = sim.time + 1;
     sim.time = p.expiresAt + 0.1;
@@ -176,6 +261,24 @@ describe('rift portals: natural spawn scheduler', () => {
         (e) => e.type === 'log' && e.text === `The ${p.tier}-rank rift in ${p.zoneName} collapses.`,
       ),
     ).toBe(true);
+  });
+
+  it('replaces a naturally expired portal in the same pass (rolling hourly cycle)', () => {
+    const sim = makeSim();
+    spawnDuePortal(sim);
+    const p = sim.naturalRiftPortals[0];
+    // At the REAL expiry (openedAt + lifetime = the zone boundary), one pass
+    // both collapses the old portal and opens the zone's next event.
+    sim.time = p.openedAt + RIFT_PORTAL_LIFETIME + 0.2;
+    sim.tickCount += (10 - (sim.tickCount % 20) + 20) % 20;
+    updateRiftPortals(sim.ctx);
+    expect(sim.entities.has(p.id)).toBe(false);
+    const replacement = sim.naturalRiftPortals.find((q) => q.zoneId === p.zoneId);
+    expect(replacement).toBeDefined();
+    expect(replacement!.eventId).not.toBe(p.eventId);
+    // Still exactly one portal per zone across the whole population.
+    const zoneIds = sim.naturalRiftPortals.map((q) => q.zoneId);
+    expect(new Set(zoneIds).size).toBe(zoneIds.length);
   });
 });
 
@@ -310,23 +413,15 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     const sim = makeSim();
     sim.setPlayerLevel(RIFT_MIN_LEVEL);
     sim.utcDay = '2026-07-08';
-    // Force an A-rank portal (baseLevel 25) so the gem arm triggers.
+    // Need an A- or S-rank NATURAL portal so the gem arm triggers (a dev portal
+    // would pay no progression loot at all). The one-per-zone population always
+    // contains one: most eligible zones weight A/S heavily.
     spawnDuePortal(sim);
-    // If the spawned portal is not A or S, override to A via dev command.
-    const portal0 = sim.naturalRiftPortals[0];
-    if (!portal0 || (portal0.tier !== 'A' && portal0.tier !== 'S')) {
-      // Seed a new portal at the right rank via the dev command.
-      sim.chat('/dev portal 99 25 A', sim.player.id);
-      const portalEntity = [...sim.entities.values()].find(
-        (e) => e.templateId === 'rift_portal' && e.riftSeed === 99,
-      )!;
-      sim.player.pos = { ...portalEntity.pos };
-      sim.player.prevPos = { ...portalEntity.pos };
-    } else {
-      const portalEntity = sim.entities.get(portal0.id)!;
-      sim.player.pos = { ...portalEntity.pos };
-      sim.player.prevPos = { ...portalEntity.pos };
-    }
+    const ranked = sim.naturalRiftPortals.find((q) => q.tier === 'A' || q.tier === 'S');
+    expect(ranked, 'an A/S natural portal exists in the population').toBeDefined();
+    const portalEntity = sim.entities.get(ranked!.id)!;
+    sim.player.pos = { ...portalEntity.pos };
+    sim.player.prevPos = { ...portalEntity.pos };
     sim.tick();
     const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
     expect(inst, 'entered a rift').toBeDefined();
