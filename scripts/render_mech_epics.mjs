@@ -17,7 +17,7 @@ mkdirSync(OUT, { recursive: true });
 
 const BUNDLE = 'tmp/mech_render_epic_bundle.js';
 if (!existsSync(BUNDLE)) {
-  console.error(`missing ${BUNDLE} — bundle the entry first (see header)`);
+  console.error(`missing ${BUNDLE}: bundle the entry first (see header)`);
   process.exit(1);
 }
 const ktx2Tag = ktx2TranscoderScriptTag(
