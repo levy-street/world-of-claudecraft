@@ -359,16 +359,17 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned for the Undermount raid merge (same precedent
-      // as the chunk-streaming base merge before it): the seal fingerprints
+      // Deliberately re-pinned for the S9 decal work (same precedent as the
+      // Undermount raid merge before it): the seal fingerprints
       // src/render/renderer.ts, so it re-mints whenever the renderer
       // coordinator moves. Exactly one component leaf moves here,
-      // runtimeRender.renderer.sha256, folding in the Undermount molten-forge
-      // lighting rig (fog preset, sun/hemi/env/rim arms). Every Eastbrook line
-      // in renderer.ts is byte-identical across that delta and the undermount
-      // rig is gated on the undermount interior only, so the accepted evidence
+      // runtimeRender.renderer.sha256, folding in the Undermount actionable
+      // decal wiring (the UndermountDecals module, its vent/entity syncs, and
+      // the Volzharr eruption windup hook). Every Eastbrook line in
+      // renderer.ts is byte-identical across that delta and the decals are
+      // gated on the undermount interior only, so the accepted evidence
       // still depicts this tree. No recapture.
-      fingerprint: 'dae44ddc6935ed23bcb8f2b01bd53839e5baf3ec58355c5eedf8541499e2c622',
+      fingerprint: '6fe68c3e2e0b93583c2356316def47b858cad20ec528d64ff8bef10decddb187',
       components: {
         captureContract: {
           id: 'polish-v2',
