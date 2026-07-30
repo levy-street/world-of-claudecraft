@@ -185,8 +185,8 @@ describe('Kiln-Keepers duo (wing 1)', () => {
       const inst = claimFor(sim, 'undermount_wing1', pid);
       const first = bossIn(sim, inst, order[0]);
       const last = bossIn(sim, inst, order[1]);
-      expect(bossIn(sim, inst, 'vosh_the_glazier').maxHp).toBeGreaterThan(34000);
-      expect(bossIn(sim, inst, 'saan_the_stoker').maxHp).toBeGreaterThan(28000);
+      expect(bossIn(sim, inst, 'vosh_the_glazier').maxHp).toBeGreaterThan(26000);
+      expect(bossIn(sim, inst, 'saan_the_stoker').maxHp).toBeGreaterThan(20000);
       sim.dealDamage(player, first, first.hp + 1, false, 'physical', null, 'hit', true);
       expect(first.loot).toBeNull();
       expect(first.lootable).toBe(false);

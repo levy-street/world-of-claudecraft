@@ -1170,11 +1170,13 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // template carries (tests/dungeon_difficulty.test.ts): no CC, no snares.
     ccImmune: true,
     slowImmune: true,
-    // 34k effective on normal (createMob applies the 2.3x elite factor). The
+    // 26k effective on normal (createMob applies the 2.3x elite factor). The
     // Kiln-Keepers are a 10-player wing-1 duo: two health pools fought together,
-    // combined below the 60k Nythraxis finale but each a real tank-and-spank.
-    // Vosh is the melee anchor and carries the larger pool.
-    hpBase: 34000 / 2.3,
+    // combined 46k, well below the 60k Nythraxis finale. Sized to the level-20
+    // mana economy: the ten-bot E2E proved a 62k duo outlasts both healers' full
+    // mana pools (wipe at ~150s with Saan at 17%), so the onboarding wing must
+    // die inside ~150s of sustained raid damage. Vosh carries the larger pool.
+    hpBase: 26000 / 2.3,
     hpPerLevel: 0,
     dmgBase: 46,
     dmgPerLevel: 9.6,
@@ -1210,11 +1212,12 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // template carries (tests/dungeon_difficulty.test.ts): no CC, no snares.
     ccImmune: true,
     slowImmune: true,
-    // 28k effective on normal (the 2.3x elite factor). Saan is the caster half of
-    // the duo: a smaller pool than Vosh, but her cross-heal (Anneal) tops
-    // off her partner, so the raid must burn the two keepers down together rather
-    // than tunnelling one. Her melee is soft; her damage is the Kilnflare Pulse.
-    hpBase: 28000 / 2.3,
+    // 20k effective on normal (the 2.3x elite factor; see the Vosh comment for
+    // the duo's 46k combined budget). Saan is the caster half: a smaller pool
+    // than Vosh, but her cross-heal (Anneal) tops off her partner, so the raid
+    // must burn the two keepers down together rather than tunnelling one. Her
+    // melee is soft; her damage is the Kilnflare Pulse.
+    hpBase: 20000 / 2.3,
     hpPerLevel: 0,
     dmgBase: 30,
     dmgPerLevel: 6.2,
