@@ -946,7 +946,11 @@ function buildDelveEmbers(
 export function buildProps(seed: number, delveLabel?: (delveId: string) => string): PropsResult {
   const group = new THREE.Group();
   const flames: THREE.Mesh[] = [];
-  const flameSet = new Set<THREE.Mesh>(); // membership mirror for the bake-eligibility scan
+  // Meshes the far-cell bake must never absorb because the renderer animates
+  // them live (campfire flames, windmill sails): baking one freezes its pose
+  // while the live copy is hidden in far mode. They stay individual in BOTH
+  // modes and keep their own shadow flags.
+  const keepLiveMeshes = new Set<THREE.Mesh>();
   const windmillFans: THREE.Object3D[] = [];
   const fireLights: THREE.PointLight[] = [];
   const activeContent = getActiveWorldContent();
@@ -974,10 +978,11 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh) return;
       keepFromMerge.add(mesh);
-      // Animated flames and transparent meshes stay live in both modes (the
-      // bake would freeze the flicker or break blend ordering).
+      // Animated meshes (flames, windmill sails) and transparent meshes stay
+      // live in both modes (the bake would freeze the animation or break
+      // blend ordering).
       const srcMat = mesh.material as THREE.Material;
-      if (!flameSet.has(mesh) && srcMat.transparent !== true) {
+      if (!keepLiveMeshes.has(mesh) && srcMat.transparent !== true) {
         bakeMeshes.push({ mesh, srcMat });
       }
       if (lowProps) return;
@@ -1225,6 +1230,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         pivot.add(fanMesh);
         holder.add(pivot);
         keepFromMerge.add(fanMesh);
+        keepLiveMeshes.add(fanMesh);
         windmillFans.push(pivot);
       }
     }
@@ -1407,7 +1413,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     flame.scale.setScalar(1.15);
     g.add(flame);
     flames.push(flame);
-    flameSet.add(flame);
+    keepLiveMeshes.add(flame);
     noShadow.add(flame);
     const light = new THREE.PointLight(0xff8830, 12, 16, 2);
     // Root-level, world-positioned: the light must NOT live inside the hideable
@@ -1921,7 +1927,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       flame.scale.setScalar(0.72);
       bg.add(flame);
       flames.push(flame);
-      flameSet.add(flame);
+      keepLiveMeshes.add(flame);
       noShadow.add(flame);
       const light = new THREE.PointLight(0xff8a3a, 9, 13, 2);
       light.position.y = postH + 0.55;

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   applyPropCellMode,
@@ -149,5 +150,32 @@ describe('applyPropCellMode', () => {
     cell.hideables[0].hidden = true;
     applyPropCellMode(cell, { farMode: true, showMerged: true });
     expect(cell.hideables[0].hidden).toBe(true);
+  });
+});
+
+// The bake-eligibility wiring in props.ts is not reachable as a pure unit (it
+// lives inside buildProps, which needs the full GLB cache), so the contract is
+// pinned as a source scan, the tests/foliage_lod.test.ts precedent: every
+// renderer-animated mesh must be excluded from the far-cell bake, or its pose
+// bakes frozen while the live copy hides in far mode (the windmill-sail
+// regression from the v0.33.0 base merge, which added spinning windmills to a
+// world whose bake predates them).
+describe('props.ts bake-eligibility wiring (source pins)', () => {
+  const propsSrc = readFileSync(new URL('../src/render/props.ts', import.meta.url), 'utf8');
+
+  it('filters the hideable bake scan on the keep-live set', () => {
+    expect(propsSrc).toMatch(/!keepLiveMeshes\.has\(mesh\) && srcMat\.transparent !== true/);
+  });
+
+  it('keeps the windmill sail out of the bake at its reparent site', () => {
+    const windmillBlock = propsSrc.slice(
+      propsSrc.indexOf("d.key === 'hexWindmill'"),
+      propsSrc.indexOf('windmillFans.push(pivot)'),
+    );
+    expect(windmillBlock).toContain('keepLiveMeshes.add(fanMesh)');
+  });
+
+  it('keeps campfire flames out of the bake', () => {
+    expect(propsSrc).toMatch(/keepLiveMeshes\.add\(flame\)/);
   });
 });
