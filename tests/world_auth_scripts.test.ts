@@ -40,6 +40,10 @@ const AUTHENTICATED_NODE_CLIENTS = [
     authSend: 'ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)));',
   },
   {
+    path: 'scripts/undermount_bot_raid.mjs',
+    authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)));',
+  },
+  {
     path: 'scripts/mob_stall_repro.mjs',
     authSend: 'ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)));',
   },
