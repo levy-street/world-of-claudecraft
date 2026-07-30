@@ -83,6 +83,11 @@ describe('player body scale', () => {
     const expected = [
       ...ALL_CLASSES.map((cls) => `player_${cls}`),
       ...ALL_CLASSES.map((cls) => `player_${cls}_armored`),
+      // The per-class Combat Mech suits are cosmetic swaps of the class body,
+      // so they inherit its height exactly (normalizeFrom, pinned in
+      // armored_visual_size.test.ts) and belong in this set for the same
+      // reason the armored bodies do.
+      ...ALL_CLASSES.map((cls) => `player_${cls}_mech`),
       'player_mech',
       // Not a player body: HUMANOID_H * 1.2 is the SAME float as PLAYER_H, so the
       // objective cat lands in this set without having changed by a single unit.
