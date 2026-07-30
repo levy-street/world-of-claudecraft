@@ -64,6 +64,7 @@
     "i18n:gen": "npm run i18n:build && npm run i18n:admin && npm run i18n:scan",
     "i18n:hash": "node scripts/i18n_resolved_hash.mjs",
     "i18n:worklist": "node scripts/i18n_fill_worklist.mjs",
+    "cinematic:contact-sheet": "node scripts/cinematic_contact_sheet.mjs",
     "perf:tour": "node scripts/perf_tour.mjs",
     "perf:crowd": "node scripts/crowd_fps_bench.mjs",
     "perf:prewarm": "node scripts/prewarm_travel_bench.mjs",
