@@ -248,6 +248,59 @@ describe('scene playback', () => {
     expect(sceneActiveFor(sim.ctx, claimIdOf(sim))).toBe(false);
   });
 
+  it('deliberately excludes a party member outside the claim box when the scene arms', () => {
+    const worldOutcome = (sim: Sim) => {
+      const claimId = claimIdOf(sim);
+      const coalfast = squadActorEntity(sim.ctx, claimId, 'coalfast');
+      const tam = squadActorEntity(sim.ctx, claimId, 'tam');
+      return {
+        stageIndex: scenarioRunFor(sim.ctx, claimId)?.stageIndex,
+        player: { pos: { ...sim.player.pos }, facing: sim.player.facing },
+        coalfast: coalfast ? { pos: { ...coalfast.pos }, facing: coalfast.facing } : null,
+        tam: tam ? { pos: { ...tam.pos }, facing: tam.facing } : null,
+      };
+    };
+
+    const watched = makeSim();
+    expect(startScenario(watched.ctx, 'sc_test_scene_stage')).toBe(true);
+    collect(watched, 5 * 20);
+    const watchedOutcome = worldOutcome(watched);
+
+    const sim = makeSim();
+    const includedPid = sim.playerId;
+    const outsidePid = sim.addPlayer('mage', 'Outside Member');
+    sim.partyInvite(outsidePid, includedPid);
+    sim.partyAccept(outsidePid);
+    const outsideMeta = sim.ctx.players.get(outsidePid);
+    outsideMeta?.questLog.set(QUEST_ID, { questId: QUEST_ID, counts: [0], state: 'active' });
+    expect(startScenario(sim.ctx, 'sc_test_scene_stage', includedPid)).toBe(true);
+    expect(startScenario(sim.ctx, 'sc_test_scene_stage', outsidePid)).toBe(true);
+
+    const claimId = claimIdOf(sim);
+    const instance = sim.ctx.instances.find((slot) => slot.exitId === claimId);
+    const outsidePlayer = sim.entities.get(outsidePid);
+    expect(instance).toBeDefined();
+    expect(outsidePlayer).toBeDefined();
+    if (!instance || !outsidePlayer) return;
+    const origin = sim.ctx.instanceOriginOf(instance);
+    outsidePlayer.pos = sim.groundPos(origin.x + 121, origin.z);
+    outsidePlayer.prevPos = { ...outsidePlayer.pos };
+    sim.rebucket(outsidePlayer);
+
+    const armedEvents = collect(sim, 2);
+    expect(sim.sceneReconnectStateFor(includedPid)).toMatchObject({
+      sceneId: 'scn_test_doorway',
+    });
+    expect(sim.sceneReconnectStateFor(outsidePid)).toBeNull();
+    const events = [...armedEvents, ...collect(sim, 5 * 20 - 2)];
+    const ops = sceneOps(events);
+    expect(ops.filter((event) => event.pid === outsidePid)).toEqual([]);
+    expect(ops.filter((event) => event.pid === includedPid).map((event) => event.op.kind)).toEqual(
+      expect.arrayContaining(['start', 'end']),
+    );
+    expect(worldOutcome(sim)).toEqual(watchedOutcome);
+  });
+
   it('sends end to every participant that received start after they leave the audience box', () => {
     const sim = makeSim();
     const a = sim.playerId;
