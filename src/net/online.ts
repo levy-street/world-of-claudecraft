@@ -1965,6 +1965,12 @@ export class ClientWorld implements IWorld {
     return this.sceneInputLockedBeforeDrain;
   }
 
+  releaseSceneInputLockMirror(): void {
+    if (!this.sceneInputLockedBeforeDrain) return;
+    this.sceneInputLockedBeforeDrain = false;
+    this.onSceneInputLockChanged?.(false);
+  }
+
   setMoveInput(input: unknown, facing?: unknown): void {
     Object.assign(this.moveInput, sanitizeMoveInput(input));
     if (facing !== undefined) this.setMouselookFacing(facing);

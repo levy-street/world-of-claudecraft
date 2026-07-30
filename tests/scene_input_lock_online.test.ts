@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { SceneDirector } from '../src/game/scene_director';
 import {
   bindMirroredSceneInputLock,
   drainMirroredSceneInput,
@@ -148,6 +149,54 @@ describe('online scene input lock receipt', () => {
 
     expect(changes.mock.calls).toEqual([[true], [false]]);
     expect(client.sceneInputLockPending()).toBe(false);
+  });
+
+  it('clears the receipt mirror when the director watchdog supplies a missing end', () => {
+    const { client } = bareOnline();
+    let now = 0;
+    let targetLocked = false;
+    const director = new SceneDirector({
+      world: () => client,
+      nowSec: () => now,
+      musicSilence: vi.fn(),
+      releaseInputLockMirror: () => client.releaseSceneInputLockMirror(),
+      reducedMotion: () => false,
+    });
+    const coordinator = new SceneInputLockCoordinator(
+      director,
+      {
+        setSceneInputLocked(locked) {
+          targetLocked = locked;
+        },
+      },
+      vi.fn(),
+    );
+    bindMirroredSceneInputLock(client, coordinator);
+
+    feed(client, [
+      {
+        type: 'scene',
+        sceneId: 'scn_online_missing_end',
+        pid: 7,
+        op: { kind: 'start', duration: 2 },
+      },
+      {
+        type: 'scene',
+        sceneId: 'scn_online_missing_end',
+        pid: 7,
+        op: { kind: 'inputLock', on: true },
+      },
+    ]);
+    const activeFrame = drainMirroredSceneInput(client, coordinator);
+    expect(activeFrame.locked).toBe(true);
+    expect(client.sceneInputLockPending()).toBe(true);
+    expect(targetLocked).toBe(true);
+
+    now = 3;
+    expect(director.inputLocked()).toBe(false);
+    expect(client.sceneInputLockPending()).toBe(false);
+    expect(targetLocked).toBe(false);
+    expect(drainMirroredSceneInput(client, coordinator).locked).toBe(false);
   });
 
   it('ignores scene locks scoped to another player', () => {
