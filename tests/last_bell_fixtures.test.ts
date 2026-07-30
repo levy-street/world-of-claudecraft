@@ -219,8 +219,8 @@ describe('Last Bell campaign fixtures', () => {
       groundY + 4.4,
     );
 
-    const scene = sceneById('scn_lb_q0_ashore');
-    if (!scene) throw new Error('Q0 arrival scene is not registered');
+    const scene = sceneById('scn_lb_q0_voyage');
+    if (!scene) throw new Error('Q0 voyage scene is not registered');
     const plinthIndex = scene.ops.findIndex(
       (op) => op.kind === 'line' && op.key === 'lb.q0.scene.plinth',
     );

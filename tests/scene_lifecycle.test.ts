@@ -34,7 +34,6 @@ const TEST_TIMEOUT_MS = 120_000;
 const EXPECTED_SCENE_IDS = [
   'scn_lb_ferry_depart_back',
   'scn_lb_ferry_depart_out',
-  'scn_lb_q0_ashore',
   'scn_lb_q0_doorway',
   'scn_lb_q0_voyage',
 ] as const;
