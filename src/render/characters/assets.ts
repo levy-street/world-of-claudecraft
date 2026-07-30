@@ -583,7 +583,7 @@ export function skinEmissiveTexture(key: string, skinIndex: number): THREE.Textu
   return url ? (skinEmisTexByUrl.get(url) ?? null) : null;
 }
 
-// Lazy fetch for cosmetic-only bodies (the Combat Mech) — the legacy shared GLB,
+// Lazy fetch for cosmetic-only bodies (the Combat Mech): the legacy shared GLB,
 // every per-class suit GLB (mechVisualKeys), and every chroma + emissive map.
 // Memoized: opening the preview repeatedly is free. Kept out of the boot sweep
 // so the ~4 MB asset set never delays every client's load.

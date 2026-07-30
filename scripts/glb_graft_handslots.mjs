@@ -22,22 +22,36 @@ const parentOf = (doc, name) => {
 
 let grafted = 0;
 for (const slot of ['handslot.r', 'handslot.l']) {
-  const src = body.getRoot().listNodes().find((n) => n.getName() === slot);
+  const src = body
+    .getRoot()
+    .listNodes()
+    .find((n) => n.getName() === slot);
   if (!src) throw new Error(`body has no ${slot}`);
   const srcParent = parentOf(body, slot);
   if (!srcParent) throw new Error(`${slot} has no parent in the body`);
-  if (set.getRoot().listNodes().some((n) => n.getName() === slot)) {
+  if (
+    set
+      .getRoot()
+      .listNodes()
+      .some((n) => n.getName() === slot)
+  ) {
     console.log(`  ${slot} already present, skipping`);
     continue;
   }
-  const dstParent = set.getRoot().listNodes().find((n) => n.getName() === srcParent.getName());
+  const dstParent = set
+    .getRoot()
+    .listNodes()
+    .find((n) => n.getName() === srcParent.getName());
   if (!dstParent) throw new Error(`set has no bone ${srcParent.getName()} to parent ${slot}`);
-  const node = set.createNode(slot)
+  const node = set
+    .createNode(slot)
     .setTranslation(src.getTranslation())
     .setRotation(src.getRotation())
     .setScale(src.getScale());
   dstParent.addChild(node);
-  console.log(`  grafted ${slot} under ${dstParent.getName()} t=[${src.getTranslation().map((v) => v.toFixed(4))}] s=[${src.getScale().map((v) => v.toFixed(3))}]`);
+  console.log(
+    `  grafted ${slot} under ${dstParent.getName()} t=[${src.getTranslation().map((v) => v.toFixed(4))}] s=[${src.getScale().map((v) => v.toFixed(3))}]`,
+  );
   grafted++;
 }
 await io.write(setPath, set);

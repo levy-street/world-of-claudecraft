@@ -32,7 +32,6 @@ import {
   wingsProp,
 } from './assets';
 import { buildHalo } from './halo';
-import { attachWings, removeWings } from './wings';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
@@ -41,6 +40,7 @@ import {
   disposeOwnedWeaponSkinMaterials,
   markOwnedWeaponSkinMaterials,
 } from './weapon_skin_materials';
+import { attachWings, removeWings } from './wings';
 
 export type { AnimState, BaseState } from './anim_state';
 

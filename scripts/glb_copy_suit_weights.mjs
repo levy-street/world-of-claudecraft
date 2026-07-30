@@ -2,7 +2,7 @@
 //
 // Every per-class mech suit is the SAME source mesh (identical vertex count and
 // order; the forge only transforms positions), but each class's weight transfer
-// pulls from ITS body's segments — and robe bodies (warlock/priest/druid) carry
+// pulls from ITS body's segments, and robe bodies (warlock/priest/druid) carry
 // cloth-drape leg weights, so their suit boots inherit shin/knee bones and
 // stretch mid-walk. The warrior transfer is the proven-good assignment for this
 // mesh, so copy its JOINTS_0/WEIGHTS_0 per Armor_* prim, remapping joint
@@ -21,15 +21,24 @@ const donor = await io.read(donorPath);
 const target = await io.read(targetPath);
 
 const armorNodes = (doc) =>
-  doc.getRoot().listNodes().filter((n) => n.getName().startsWith('Armor_') && n.getMesh());
+  doc
+    .getRoot()
+    .listNodes()
+    .filter((n) => n.getName().startsWith('Armor_') && n.getMesh());
 
 const donorNodes = new Map(armorNodes(donor).map((n) => [n.getName(), n]));
 let copied = 0;
 for (const tNode of armorNodes(target)) {
   const dNode = donorNodes.get(tNode.getName());
   if (!dNode) throw new Error(`donor lacks ${tNode.getName()}`);
-  const dJoints = dNode.getSkin().listJoints().map((j) => j.getName());
-  const tJoints = tNode.getSkin().listJoints().map((j) => j.getName());
+  const dJoints = dNode
+    .getSkin()
+    .listJoints()
+    .map((j) => j.getName());
+  const tJoints = tNode
+    .getSkin()
+    .listJoints()
+    .map((j) => j.getName());
   const remap = dJoints.map((name) => {
     const idx = tJoints.indexOf(name);
     if (idx < 0) throw new Error(`target skin lacks joint ${name}`);
@@ -42,7 +51,9 @@ for (const tNode of armorNodes(target)) {
   const tJ = tPrim.getAttribute('JOINTS_0');
   const tW = tPrim.getAttribute('WEIGHTS_0');
   if (dJ.getCount() !== tJ.getCount()) {
-    throw new Error(`${tNode.getName()} vertex count mismatch: ${dJ.getCount()} vs ${tJ.getCount()}`);
+    throw new Error(
+      `${tNode.getName()} vertex count mismatch: ${dJ.getCount()} vs ${tJ.getCount()}`,
+    );
   }
   const je = [0, 0, 0, 0];
   const we = [0, 0, 0, 0];
