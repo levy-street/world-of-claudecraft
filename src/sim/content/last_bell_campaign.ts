@@ -12,9 +12,18 @@
 
 import { GULLHAVEN_HARBOR, type HarborDef, MAINLAND_HARBOR } from '../harbor_layout';
 import { registerScenario } from '../scenarios/registry';
+import {
+  beat,
+  buildScene,
+  coveredCut,
+  fadeInTail,
+  SCENE_CUT_FADE_SECONDS,
+  type SceneCameraShotDef,
+  type SceneTimelineEntry,
+} from '../scenes/authoring';
 import { registerChoice } from '../scenes/choices';
 import { registerScene, type SceneAttachShotDef, type SceneDollyShotDef } from '../scenes/registry';
-import type { MobTemplate, NpcDef, QuestDef } from '../types';
+import { DT, type MobTemplate, type NpcDef, type QuestDef } from '../types';
 import {
   LAST_BELL_VOYAGE_SEGMENT_IDS,
   type LastBellPropPathSegmentId,
@@ -190,16 +199,42 @@ registerChoice({
 // Scenes
 // ---------------------------------------------------------------------------
 
-type SceneOps = Parameters<typeof registerScene>[0]['ops'];
-type SceneOp = SceneOps[number];
-
-const CAST_OFF_AT = 0.2;
-const OPEN_WATER_AT = 4.2;
-const SEA_ARRIVAL_AT = 8.5;
-const PIER_AT = 12.8;
 const PIER_SHOT_SECONDS = 5;
-const Q0_STORY_SECONDS = 11.25;
-const RELEASE_SECONDS = 1;
+const LAST_BELL_HARBOR_LINE_SECONDS = 4.75;
+const LAST_BELL_PLINTH_LINE_SECONDS = 7.5;
+const LAST_BELL_TOLL_LINE_SECONDS = 6.5;
+
+const VOYAGE_CORE_BEATS = {
+  castOff: 0.2,
+  openWater: 4.2,
+  seaArrival: 8.5,
+  pier: 12.8,
+} as const;
+
+const RERIDE_BEATS = {
+  ...VOYAGE_CORE_BEATS,
+  release: 17.8,
+  end: 18.8,
+} as const;
+
+const Q0_VOYAGE_BEATS = {
+  ...VOYAGE_CORE_BEATS,
+  statue: 18.3,
+  toll: 26.1,
+  release: 33,
+  end: 34,
+} as const;
+
+const Q0_DOORWAY_BEATS = {
+  entrance: 0.5,
+  facing: 3.5,
+  tamLine: 4,
+  coalfastLine: 9.5,
+} as const;
+
+type VoyageCoreBeat = keyof typeof VOYAGE_CORE_BEATS;
+type ReleaseBeat = 'release' | 'end';
+type Q0StoryBeat = 'statue' | 'toll';
 
 interface VoyageDirection {
   readonly departureHarbor: HarborDef;
@@ -306,86 +341,89 @@ function attachShot(
   };
 }
 
-function arrivalPierOps(
+function blackTickCoveredCut<Beat extends string>(
+  at: Beat,
+  shot: SceneCameraShotDef,
+): SceneTimelineEntry<Beat>[] {
+  return [
+    { at: beat(at, -DT), kind: 'fade', to: 'black', dur: 0 },
+    coveredCut(at, shot),
+  ];
+}
+
+function arrivalPierTimeline(
   direction: VoyageDirection,
-  at: number,
   includeHarborLine: boolean,
-): SceneOp[] {
-  const ops: SceneOp[] = [
-    { at, kind: 'fade', to: 'black', dur: 0 },
-    { at, kind: 'prop', target: direction.arrivalTarget, cue: LB_PROP_CUE_PARK },
-    { at, kind: 'camera', shot: direction.pierShot },
-    { at: at + 0.1, kind: 'fade', to: 'clear', dur: 0.6 },
+): SceneTimelineEntry<VoyageCoreBeat>[] {
+  const timeline: SceneTimelineEntry<VoyageCoreBeat>[] = [
+    { at: 'pier', kind: 'prop', target: direction.arrivalTarget, cue: LB_PROP_CUE_PARK },
+    ...blackTickCoveredCut('pier', direction.pierShot),
     {
-      at: at + 0.4,
+      at: beat('pier', 0.4),
       kind: 'playerWalk',
       to: direction.walkTo,
       speed: direction.walkSpeed,
     },
   ];
   if (includeHarborLine) {
-    ops.push({
-      at: at + 0.5,
+    timeline.push({
+      at: beat('pier', 0.5),
       kind: 'line',
       speaker: '',
       key: 'lb.q0.scene.harbor',
-      dur: 4.5,
+      dur: LAST_BELL_HARBOR_LINE_SECONDS,
     });
   }
-  return ops;
+  return timeline;
 }
 
-function departureCore(direction: VoyageDirection, includeHarborLine = false): SceneOp[] {
+function voyageTimeline(
+  direction: VoyageDirection,
+  includeHarborLine = false,
+): SceneTimelineEntry<VoyageCoreBeat>[] {
   return [
     { at: 0, kind: 'letterbox', on: true },
     { at: 0, kind: 'inputLock', on: true },
     { at: 0, kind: 'music', directive: 'lb_harbor_ambience' },
+    { at: 0, kind: 'fade', to: 'black', dur: 0 },
     {
-      at: CAST_OFF_AT,
+      at: 'castOff',
       kind: 'prop',
       target: direction.departureTarget,
       cue: direction.segmentIds.castOff,
     },
-    {
-      at: CAST_OFF_AT,
-      kind: 'camera',
-      shot: attachShot(direction.departureTarget, direction.departureHarbor, direction.sternOffset),
-    },
+    ...blackTickCoveredCut(
+      'castOff',
+      attachShot(direction.departureTarget, direction.departureHarbor, direction.sternOffset),
+    ),
     { at: 1.2, kind: 'music', directive: 'lb_bell_toll_one' },
     { at: 1.8, kind: 'music', directive: 'lb_ship_castoff' },
-    { at: 3.75, kind: 'fade', to: 'black', dur: 0.4 },
     {
-      at: OPEN_WATER_AT,
+      at: 'openWater',
       kind: 'prop',
       target: direction.departureTarget,
       cue: direction.segmentIds.openWater,
     },
+    ...blackTickCoveredCut(
+      'openWater',
+      attachShot(direction.departureTarget, direction.departureHarbor, direction.sideOffset),
+    ),
     {
-      at: OPEN_WATER_AT,
-      kind: 'camera',
-      shot: attachShot(direction.departureTarget, direction.departureHarbor, direction.sideOffset),
-    },
-    { at: OPEN_WATER_AT + 0.15, kind: 'fade', to: 'clear', dur: 0.35 },
-    { at: 8.05, kind: 'fade', to: 'black', dur: 0.4 },
-    {
-      at: SEA_ARRIVAL_AT,
+      at: 'seaArrival',
       kind: 'prop',
       target: direction.arrivalTarget,
       cue: direction.segmentIds.arrival,
     },
-    {
-      at: SEA_ARRIVAL_AT,
-      kind: 'camera',
-      shot: attachShot(
+    ...blackTickCoveredCut(
+      'seaArrival',
+      attachShot(
         direction.arrivalTarget,
         direction.arrivalHarbor,
         direction.bowOffset,
         direction.arrivalLookAt,
       ),
-    },
-    { at: SEA_ARRIVAL_AT + 0.15, kind: 'fade', to: 'clear', dur: 0.35 },
-    { at: PIER_AT - 0.4, kind: 'fade', to: 'black', dur: 0.4 },
-    ...arrivalPierOps(direction, PIER_AT, includeHarborLine),
+    ),
+    ...arrivalPierTimeline(direction, includeHarborLine),
   ];
 }
 
@@ -424,95 +462,107 @@ const Q0_TOLL_SHOT: SceneDollyShotDef = {
   dur: 6.45,
 };
 
-function q0ArrivalBeats(at: number): SceneOp[] {
+function q0StoryTimeline(): SceneTimelineEntry<Q0StoryBeat>[] {
   return [
-    { at: at - 0.4, kind: 'fade', to: 'black', dur: 0.4 },
-    { at, kind: 'camera', shot: Q0_STATUE_SHOT },
-    { at: at + 0.15, kind: 'fade', to: 'clear', dur: 0.35 },
+    ...blackTickCoveredCut('statue', Q0_STATUE_SHOT),
     {
-      at: at + 0.2,
+      at: beat('statue', 0.2),
       kind: 'line',
       speaker: '',
       key: 'lb.q0.scene.plinth',
-      dur: 4.5,
+      dur: LAST_BELL_PLINTH_LINE_SECONDS,
     },
-    { at: at + 4.4, kind: 'fade', to: 'black', dur: 0.4 },
-    { at: at + 4.7, kind: 'music', directive: 'lb_bell_toll_one' },
-    { at: at + 4.8, kind: 'camera', shot: Q0_TOLL_SHOT },
-    { at: at + 4.95, kind: 'fade', to: 'clear', dur: 0.35 },
-    { at: at + 5, kind: 'line', speaker: '', key: 'lb.q0.scene.toll', dur: 5 },
+    { at: beat('toll', -0.1), kind: 'music', directive: 'lb_bell_toll_one' },
+    ...blackTickCoveredCut('toll', Q0_TOLL_SHOT),
+    {
+      at: beat('toll', 0.2),
+      kind: 'line',
+      speaker: '',
+      key: 'lb.q0.scene.toll',
+      dur: LAST_BELL_TOLL_LINE_SECONDS,
+    },
   ];
 }
 
-function releaseTail(at: number): SceneOp[] {
+function releaseTimeline(): SceneTimelineEntry<ReleaseBeat>[] {
   return [
-    { at: at - 0.4, kind: 'fade', to: 'black', dur: 0.4 },
-    { at, kind: 'camera', shot: { kind: 'release' } },
-    { at: at + RELEASE_SECONDS, kind: 'letterbox', on: false },
-    { at: at + RELEASE_SECONDS, kind: 'inputLock', on: false },
+    {
+      at: beat('release', -(SCENE_CUT_FADE_SECONDS + DT)),
+      kind: 'fade',
+      to: 'black',
+      dur: SCENE_CUT_FADE_SECONDS,
+    },
+    { at: beat('release', -DT), kind: 'fade', to: 'black', dur: 0 },
+    { at: 'release', kind: 'fade', to: 'black', dur: 0 },
+    { at: 'release', kind: 'camera', shot: { kind: 'release' } },
+    fadeInTail(beat('release', DT)),
+    { at: 'end', kind: 'letterbox', on: false },
+    { at: 'end', kind: 'inputLock', on: false },
   ];
 }
 
-const Q0_STORY_AT = PIER_AT + PIER_SHOT_SECONDS;
-const Q0_RELEASE_AT = Q0_STORY_AT + Q0_STORY_SECONDS;
-const RERIDE_RELEASE_AT = PIER_AT + PIER_SHOT_SECONDS;
+registerScene(
+  buildScene({
+    id: 'scn_lb_ferry_depart_out',
+    beats: RERIDE_BEATS,
+    releaseMargin: 0,
+    timeline: [...voyageTimeline(OUTBOUND), ...releaseTimeline()],
+  }),
+);
 
-registerScene({
-  id: 'scn_lb_q0_ashore',
-  duration: PIER_SHOT_SECONDS + Q0_STORY_SECONDS + RELEASE_SECONDS,
-  ops: [
-    { at: 0, kind: 'letterbox', on: true },
-    { at: 0, kind: 'inputLock', on: true },
-    ...arrivalPierOps(OUTBOUND, 0, true),
-    ...q0ArrivalBeats(PIER_SHOT_SECONDS),
-    ...releaseTail(PIER_SHOT_SECONDS + Q0_STORY_SECONDS),
-  ],
-});
+registerScene(
+  buildScene({
+    id: 'scn_lb_ferry_depart_back',
+    beats: RERIDE_BEATS,
+    releaseMargin: 0,
+    timeline: [...voyageTimeline(RETURN), ...releaseTimeline()],
+  }),
+);
 
-registerScene({
-  id: 'scn_lb_ferry_depart_out',
-  duration: RERIDE_RELEASE_AT + RELEASE_SECONDS,
-  ops: [...departureCore(OUTBOUND), ...releaseTail(RERIDE_RELEASE_AT)],
-});
-
-registerScene({
-  id: 'scn_lb_ferry_depart_back',
-  duration: RERIDE_RELEASE_AT + RELEASE_SECONDS,
-  ops: [...departureCore(RETURN), ...releaseTail(RERIDE_RELEASE_AT)],
-});
-
-registerScene({
-  id: 'scn_lb_q0_voyage',
-  duration: Q0_RELEASE_AT + RELEASE_SECONDS,
-  ops: [
-    ...departureCore(OUTBOUND, true),
-    ...q0ArrivalBeats(Q0_STORY_AT),
-    ...releaseTail(Q0_RELEASE_AT),
-  ],
-});
+registerScene(
+  buildScene({
+    id: 'scn_lb_q0_voyage',
+    beats: Q0_VOYAGE_BEATS,
+    releaseMargin: 0,
+    timeline: [
+      ...voyageTimeline(OUTBOUND, true),
+      ...q0StoryTimeline(),
+      ...releaseTimeline(),
+    ],
+  }),
+);
 
 // Staged, unlocked: two in the doorway. You keep control; Tam's line lands
 // while you catch your breath, and the grey man looks at you slightly
 // longer, then leaves the recruiting unsaid.
-registerScene({
-  id: 'scn_lb_q0_doorway',
-  duration: 12,
-  ops: [
-    { at: 0.5, kind: 'actorMove', actorId: 'tam', x: -2, z: -14 },
-    { at: 0.5, kind: 'actorMove', actorId: 'coalfast', x: 2, z: -14 },
-    { at: 3.5, kind: 'actorFace', actorId: 'tam', facing: 0 },
-    { at: 3.5, kind: 'actorFace', actorId: 'coalfast', facing: 0 },
-    {
-      at: 4.0,
-      kind: 'line',
-      speaker: 'lb.speaker.tam',
-      speakerActorId: 'tam',
-      key: 'lb.q0.tam.stretchers',
-      dur: 5,
-    },
-    { at: 9.5, kind: 'line', speaker: '', key: 'lb.q0.coalfast.look', dur: 2.4 },
-  ],
-});
+registerScene(
+  buildScene({
+    id: 'scn_lb_q0_doorway',
+    beats: Q0_DOORWAY_BEATS,
+    releaseMargin: 0,
+    timeline: [
+      { at: 'entrance', kind: 'actorMove', actorId: 'tam', x: -2, z: -14 },
+      { at: 'entrance', kind: 'actorMove', actorId: 'coalfast', x: 2, z: -14 },
+      { at: 'facing', kind: 'actorFace', actorId: 'tam', facing: 0 },
+      { at: 'facing', kind: 'actorFace', actorId: 'coalfast', facing: 0 },
+      {
+        at: 'tamLine',
+        kind: 'line',
+        speaker: 'lb.speaker.tam',
+        speakerActorId: 'tam',
+        key: 'lb.q0.tam.stretchers',
+        dur: 5,
+      },
+      {
+        at: 'coalfastLine',
+        kind: 'line',
+        speaker: '',
+        key: 'lb.q0.coalfast.look',
+        dur: 5.5,
+      },
+    ],
+  }),
+);
 
 // ---------------------------------------------------------------------------
 // Scenario: the Tidemill (solo instance climax)

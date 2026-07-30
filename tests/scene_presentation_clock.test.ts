@@ -18,8 +18,8 @@ import {
   propPathPoseAt,
 } from '../src/render/prop_path_core';
 import {
-  LAST_BELL_CAST_OFF_SEGMENT_ID,
   LAST_BELL_PROP_PATH_SEGMENTS,
+  LAST_BELL_VOYAGE_SEGMENT_IDS,
 } from '../src/sim/content/last_bell_cinematics';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { MAINLAND_HARBOR } from '../src/sim/harbor_layout';
@@ -311,12 +311,15 @@ describe('mirrored scene presentation clock', () => {
     let clock = 10;
     try {
       buildHarbors(17, { nowSec: () => clock });
-      cueHarborShip('harbor_ship_mainland', LAST_BELL_CAST_OFF_SEGMENT_ID, clock);
+      cueHarborShip('harbor_ship_mainland', LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff, clock);
 
       clock = 13.25;
       const actual = harborShipAttachFrame('harbor_ship_mainland');
       expect(actual).not.toBeNull();
-      const prop = propPathPoseAt(LAST_BELL_PROP_PATH_SEGMENTS.cast_off, 3.25);
+      const prop = propPathPoseAt(
+        LAST_BELL_PROP_PATH_SEGMENTS[LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff],
+        3.25,
+      );
       const expected = composeHarborShipAttachFrame(
         {
           baseX: MAINLAND_HARBOR.berth.x,
