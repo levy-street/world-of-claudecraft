@@ -9728,64 +9728,64 @@ export const da_DK: EnTranslations = {
         "name": "Segl fra Den Sidste Borg"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Slaggehærdede sabatons"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Glasvandrerens støvler"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Dobbeltbrændte tøfler"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Ildmærkets vandrestøvler"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Saans ildrager"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Glaspusterens daggert"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Slusebæreren"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Glødetudsens signet"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Den første hærdnings ring"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Kulglødsring"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Kronesmedede krigsbenklæder"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Nattekloens snigestøvler"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Sjæleflammekilt"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Stormkalderens benvikler"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "Det jævne temperament"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Glødebue, Odrenns stav"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Dobbelthærdet bælte"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Askevandrerens sandaler"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Hærdningssilkesnor"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Hærdet læderbælte"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

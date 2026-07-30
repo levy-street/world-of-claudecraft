@@ -9728,64 +9728,64 @@ export const pl_PL: EnTranslations = {
         "name": "Sygnet Ostatniej Twierdzy"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Trzewiki Hartowane Żużlem"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Buty Szkłochodu"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Dwukrotnie Wypalane Pantofle"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Buty Żagwiowego Piętna"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Pogrzebacz Saana"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Nóż Dmuchacza Szkła"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Śluzonośca"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Sygnet Żarnej Ropuchy"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Pierścień Pierwszego Hartowania"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Pierścień Węglowego Blasku"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Koronokute nogawice bojowe"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Buty Nocnego Szpona"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Kilt duszopłomienia"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Owijki Przywoływacza Burz"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "Równy Hart"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Łuk Żaru, różdżka Odrenna"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Podwójnie Hartowany Pas"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Sandały Popiołochodu"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Sznur Hartowanego Jedwabiu"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Pas z Hartowanej Skóry"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

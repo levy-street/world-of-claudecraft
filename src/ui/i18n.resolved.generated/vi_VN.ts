@@ -9728,64 +9728,64 @@ export const vi_VN: EnTranslations = {
         "name": "Nhẫn Ấn Của The Last Keep"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Ủng Thép Tôi Bằng Xỉ"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Giày Bộ Hành Kính"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Dép Nung Hai Lần"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Giày Dấu Khều Lửa"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Que Khều Lò của Saan"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Dao Găm của Thợ Thổi Thủy Tinh"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Kẻ Mang Cửa Cống"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Ấn Nhẫn Cóc Than Hồng"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Nhẫn Lần Tôi Đầu Tiên"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Nhẫn Ánh Than"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Giáp Chân Chiến Trận Rèn Vương Miện"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Giày Rình Dạ Trảo"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Váy Hồn Hỏa"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Vải Quấn Chân của Triệu Bão Sư"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "Độ Tôi Cân Bằng"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Cung Than Hồng, Trượng của Odrenn"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Đai Tôi Hai Lần"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Dép Bộ Hành Tro"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Dây Lụa Tôi"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Thắt Lưng Da Tôi"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

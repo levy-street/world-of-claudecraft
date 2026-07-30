@@ -9728,64 +9728,64 @@ export const de_DE: EnTranslations = {
         "name": "Siegelring von Last Keep"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Schlackengehärtete Sabatons"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Glaswanderer-Tritte"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Zweifach gebrannte Pantoffeln"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Schürbrand-Tritte"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Saans Schüreisen"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Glasbläser-Shiv"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Schleusenträger"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Glutkröten-Siegelring"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Ring der ersten Abschreckung"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Kohlenglut-Reif"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Kronengeschmiedete Kriegsbeinkleider"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Nachtkrallen-Pirschstiefel"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Seelenflammen-Kilt"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Beinwickel des Sturmberufers"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "Das ausgeglichene Gemüt"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Glutbogen, Odrenns Rute"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Doppelt gehärteter Gürtel"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Aschenwanderer-Sandalen"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Härterseiden-Schnur"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Löschledergürtel"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

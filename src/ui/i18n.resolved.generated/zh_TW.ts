@@ -9728,64 +9728,64 @@ export const zh_TW: EnTranslations = {
         "name": "最後的堡壘印戒"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "渣淬護脛"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "踏玻之靴"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "二次燒製便鞋"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "爐印行靴"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "薩安撥火棍"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "玻璃匠短刀"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "持閘者"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "燼蟾徽戒"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "初淬之戒"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "煤光指環"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "冠鑄戰腿甲"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "夜爪潛行靴"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "魂焰戰裙"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "喚雷者裹腿"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "平衡之淬"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "燼弧，奧德倫之杖"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "雙淬腰帶"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "踏灰涼鞋"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "淬火絲繩"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "淬革腰帶"
       },
       "conjured_water4": {
         "name": "魔法泉水"

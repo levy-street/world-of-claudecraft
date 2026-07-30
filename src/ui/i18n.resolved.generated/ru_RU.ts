@@ -9728,64 +9728,64 @@ export const ru_RU: EnTranslations = {
         "name": "Печатка Последнего оплота"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Сабатоны шлаковой закалки"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Ботинки стеклохода"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Дважды обожжённые туфли"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Ботинки клейма кочегара"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Кочерга Саана"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Шив стеклодува"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Шлюзоносец"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Печатка угольной жабы"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Кольцо первой закалки"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Кольцо угольного свечения"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Боевые поножи коронной ковки"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Крадущиеся сапоги Ночного Когтя"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Килт пламени души"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Обмотки призывателя бурь"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "Ровный закал"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Жаровая дуга, жезл Одренна"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Пояс двойной закалки"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Сандалии пеплохода"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Шнур закалённого шёлка"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Пояс из закалённой кожи"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

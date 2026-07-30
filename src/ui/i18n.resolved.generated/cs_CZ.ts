@@ -9728,64 +9728,64 @@ export const cs_CZ: EnTranslations = {
         "name": "Signet Poslední tvrze"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Struskou kalené sabatony"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Boty sklochodce"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Dvakrát pálené střevíce"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Boty žhavého cejchu"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Saanův pohrabáč"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Sklářovo šídlo"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Stavidlonoš"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Pečetní prsten žhavé ropuchy"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Prsten prvního zakalení"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Prsten uhelné záře"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Korunou kované válečné nohavice"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Boty nočního spáru"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Kilt plamene duše"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Ovinovačky vyvolávače bouří"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "Rovnoměrný popust"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Žhavý oblouk, Odrennův prut"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Dvakrát kalený pás"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Sandály popelochodce"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Šňůra z kalicího hedvábí"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Opasek z kalicí kůže"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

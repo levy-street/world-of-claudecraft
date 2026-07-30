@@ -9728,64 +9728,64 @@ export const sv_SE: EnTranslations = {
         "name": "Sista fästets signetring"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Slagghärdade sabatonger"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Glasvandrarens stövlar"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Dubbelbrända tofflor"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Eldmärkesstövlar"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Saans eldgaffel"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Glasblåsarens kniv"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Slussbäraren"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Glödpaddans sigill"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Den första härdningens ring"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Kolglödsring"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Kronsmidda krigsbyxor"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Nattklons smygstövlar"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Själslågskilt"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Stormkallarens benlindor"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "Det jämna lynnet"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Glödbåge, Odrenns stav"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Dubbelhärdat bälte"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Askvandrarens sandaler"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Härdningssidenband"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Släckläderbälte"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

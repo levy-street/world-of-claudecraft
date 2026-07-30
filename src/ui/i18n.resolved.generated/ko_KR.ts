@@ -9728,64 +9728,64 @@ export const ko_KR: EnTranslations = {
         "name": "마지막 요새의 인장"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "광재뜨임 철갑장화"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "유리길 장화"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "두 번 구운 덧신"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "화부낙인 장화"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "사안의 화로 부지깽이"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "유리장이의 칼"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "수문지기"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "불씨두꺼비 인장"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "첫 뜨임의 반지"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "숯불빛 반지"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "왕관벼림 전투 다리갑옷"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "밤발톱 잠행화"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "영혼불꽃 킬트"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "폭풍소환사의 다리싸개"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "고른 뜨임"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "불씨활, 오드렌의 지팡이"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "두 번 뜨인 요대"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "잿길 샌들"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "뜨임비단 끈"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "식힘가죽 허리띠"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

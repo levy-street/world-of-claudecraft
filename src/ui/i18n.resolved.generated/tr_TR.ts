@@ -9728,64 +9728,64 @@ export const tr_TR: EnTranslations = {
         "name": "Son Kale Mührü"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Cürufla Suverilmiş Savaş Çizmeleri"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Camyürüyen Çizmeleri"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "İki Kez Pişirilmiş Terlikler"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Körük Damgası Çizmeleri"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Saan’ın Ateş Demiri"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Cam Üfleyicinin Hançeri"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Savak Taşıyıcı"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Köz Kurbağası Mührü"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "İlk Suvermenin Yüzüğü"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Kömür Parıltısı Halkası"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Taçdövme Savaş Tozlukları"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Gecepençesi Sinsi Çizmeleri"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Ruhalevi İskoç Eteği"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Fırtınaçağıranın Bacak Sargıları"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "Dengeli Suverme"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Kor Yay, Odrenn’in Asası"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "İki Kez Suverilmiş Kuşak"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Külyürüyen Sandaletleri"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Suverilmiş İpek Kordon"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Suverilmiş Deri Kemeri"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

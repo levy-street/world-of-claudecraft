@@ -9728,64 +9728,64 @@ export const es: EnTranslations = {
         "name": "Sello del Last Keep"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Escarpes Templados en Escoria"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Botas Caminacristal"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Zapatillas de Doble Cocción"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Botas Marca de Ascua"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Atizador de Saan"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Navaja del Soplador de Vidrio"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Portador de la Esclusa"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Sello del Sapo de Ascua"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Anillo del Primer Temple"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Sortija de Rescoldo"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Perneras de guerra Forjacorona"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Botas de Acecho Garra Nocturna"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Falda Llama de Alma"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Vendas de piernas del Invocatormentas"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "El Temple Sereno"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Arco de Ascua, vara de Odrenn"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Cinturón de Doble Temple"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Sandalias Caminaceniza"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Cordón de Seda Templada"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Cinturón de Cuero Templado"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"

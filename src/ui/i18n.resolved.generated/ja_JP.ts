@@ -9728,64 +9728,64 @@ export const ja_JP: EnTranslations = {
         "name": "最後の砦の印章"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "鉱滓焼入れのサバトン"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "玻璃歩きの足具"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "二度焼きの室内履き"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "火熾し印の足具"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "サーンの火掻き棒"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "玻璃職人のシヴ"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "水門担ぎ"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "熾火蛙の印章"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "最初の焼入れの指輪"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "炭火の指輪"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "王冠鍛造の戦脚甲"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "夜爪の忍び靴"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "魂炎のキルト"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "嵐呼びの脚巻き"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "平静なる焼き戻し"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "炎弧、オドレンの杖"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "二度焼き戻しの腰帯"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "灰歩きのサンダル"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "焼入れ絹の紐"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "冷まし革のベルト"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

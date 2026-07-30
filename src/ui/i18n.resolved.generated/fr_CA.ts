@@ -9728,64 +9728,64 @@ export const fr_CA: EnTranslations = {
         "name": "Chevalière de The Last Keep"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Bottes de plaque trempées dans le laitier"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Souliers marcheverre"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Pantoufles cuites deux fois"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Souliers marque-braise"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Fer à attiser de Saan"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Couteau du souffleur de verre"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Gardien de l’écluse"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Bague crapaud-de-braise"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Bague de la première trempe"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Jonc lueur-de-charbon"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Pantalon de guerre Forgécouronne"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Souliers de rôdeur Serre-de-nuit"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Jupe écossaise Flamme-d’âme"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Jambières d’Appel-tempête"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "Le Calme égal"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Sillage-de-braise, bâton d’Odrenn"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Ceinture à double trempe"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Souliers marchecendre"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Corde de soie trempée"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Courroie en cuir trempé"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"

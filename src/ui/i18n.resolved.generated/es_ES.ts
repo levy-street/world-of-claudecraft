@@ -9728,64 +9728,64 @@ export const es_ES: EnTranslations = {
         "name": "Sello del Last Keep"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Escarpes Templados con Escoria"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Calzado Caminacristal"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Escarpines de Doble Cocción"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Zancadores Marcaascua"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Hierro Atizador de Saan"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Puñal del Soplador de Vidrio"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Guardián de la Esclusa"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Sortija-sello del Sapo de Brasa"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Sortija de la Primera Templanza"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Anillo del Fulgor del Carbón"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Grebas de guerra Forjacorona"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Acechadores Garra Nocturna"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Faldellín Llama de Alma"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Polainas del Invocatormentas"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "La Templanza Ecuánime"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Estela de Ascua, cetro de Odrenn"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Faja de Doble Temple"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Sandalias del Camino de Ceniza"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Fajín de Seda de Temple"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Faja de Cuero Apagado"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"

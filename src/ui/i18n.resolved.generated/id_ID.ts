@@ -9728,64 +9728,64 @@ export const id_ID: EnTranslations = {
         "name": "Cincin Stempel Last Keep"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Sepatu Baja Tempa Terak"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Sepatu Penapak Kaca"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Selop Bakar Dua Kali"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Sepatu Cap Pengobar"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Besi Pengobar Saan"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Belati Peniup Kaca"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Pembawa Pintu Air"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Cincin Meterai Katak Bara"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Cincin Pendinginan Pertama"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Cincin Cahaya Arang"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Celana Perang Tempaan Mahkota"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Sepatu Pengendap Cakar Malam"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Rok Api Jiwa"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Balutan Kaki Pemanggil Badai"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "Temperamen Seimbang"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Busur Bara, Tongkat Odrenn"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Sabuk Tempa Ganda"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Sandal Penapak Abu"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Tali Sutra Pendingin"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Sabuk Kulit Pendingin"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

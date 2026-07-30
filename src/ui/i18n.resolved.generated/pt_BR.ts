@@ -9728,64 +9728,64 @@ export const pt_BR: EnTranslations = {
         "name": "Sinete do Último Reduto"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Escarpes Temperados em Escória"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Botas Anda-Vidro"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Pantufas de Dupla Queima"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Botas Marca de Braseiro"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Atiçador de Saan"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Faca do Soprador de Vidro"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Portador da Comporta"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Sinete do Sapo de Brasa"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Anel da Primeira Têmpera"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Anel do Brilho de Carvão"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Perneiras de Guerra Forjacoroa"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Botas de Espreita Garra Noturna"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Kilt Chama d'Alma"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Faixas de Perna do Chamatormenta"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "A Têmpera Equilibrada"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Arco de Brasa, Bastão de Odrenn"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Cinturão de Dupla Têmpera"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Sandálias Anda-Cinzas"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Cordão de Seda Temperada"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Cinto de Couro Temperado"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

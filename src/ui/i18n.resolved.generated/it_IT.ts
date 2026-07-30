@@ -9728,64 +9728,64 @@ export const it_IT: EnTranslations = {
         "name": "Sigillo dell’Ultima Rocca"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Calzari Temprati nella Scoria"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Calzari Passavetro"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Pantofole Cotte Due Volte"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Calzari del Marchio Ardente"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Attizzatoio di Saan"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Stiletto del Soffiatore di Vetro"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Portachiusa"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Sigillo del Rospo di Brace"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Anello della Prima Tempra"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Anello del Bagliore di Carbone"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Gambali da Guerra Forgiacorona"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Calzari Artiglio Notturno"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Gonnellino Fiammanima"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Fasce da gamba del Chiamatempeste"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "La Tempra Equanime"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Arco di Brace, verga di Odrenn"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Cinturone a Doppia Tempra"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Sandali Passacenere"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Cordone di Seta Temprata"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Cintura di Cuoio Temprato"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"

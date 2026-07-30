@@ -9728,64 +9728,64 @@ export const nl_NL: EnTranslations = {
         "name": "Zegel van de Laatste Burcht"
       },
       "slag_tempered_sabatons": {
-        "name": "Slag-Tempered Sabatons"
+        "name": "Slakgetemperde laarzen"
       },
       "glasswalker_treads": {
-        "name": "Glasswalker Treads"
+        "name": "Glasloper-schoenen"
       },
       "twice_fired_slippers": {
-        "name": "Twice-Fired Slippers"
+        "name": "Dubbelgebakken pantoffels"
       },
       "stokebrand_striders": {
-        "name": "Stokebrand Striders"
+        "name": "Pookbrand-stappers"
       },
       "saans_stoking_iron": {
-        "name": "Saan's Stoking Iron"
+        "name": "Saans pookijzer"
       },
       "glassblowers_shiv": {
-        "name": "Glassblower's Shiv"
+        "name": "Glasblazersmes"
       },
       "sluicebearer": {
-        "name": "Sluicebearer"
+        "name": "Sluisdrager"
       },
       "cindertoad_signet": {
-        "name": "Cindertoad Signet"
+        "name": "Sintelpadsignet"
       },
       "ring_of_the_first_quench": {
-        "name": "Ring of the First Quench"
+        "name": "Ring van de eerste afkoeling"
       },
       "coalglow_band": {
-        "name": "Coalglow Band"
+        "name": "Koolgloedband"
       },
       "crownforged_warleggings": {
-        "name": "Crownforged Warleggings"
+        "name": "Kroongesmede oorlogsbeenkappen"
       },
       "nighttalon_prowlers": {
-        "name": "Nighttalon Prowlers"
+        "name": "Nachtklauwsluipers"
       },
       "soulflame_kilt": {
-        "name": "Soulflame Kilt"
+        "name": "Zielsvlamkilt"
       },
       "stormcallers_legwraps": {
-        "name": "Stormcaller's Legwraps"
+        "name": "Beenwikkels van de Stormroeper"
       },
       "the_even_temper": {
-        "name": "The Even Temper"
+        "name": "Het Gelijkmatige Temperament"
       },
       "cinderarc_odrenns_rod": {
-        "name": "Cinderarc, Odrenn's Rod"
+        "name": "Sintelboog, Odrenns roede"
       },
       "twicetempered_girdle": {
-        "name": "Twicetempered Girdle"
+        "name": "Dubbelgetemperde gordel"
       },
       "ashwalk_sandals": {
-        "name": "Ashwalk Sandals"
+        "name": "Asloper-sandalen"
       },
       "quenchsilk_cord": {
-        "name": "Quenchsilk Cord"
+        "name": "Koelzijdesnoer"
       },
       "slakeleather_belt": {
-        "name": "Slakeleather Belt"
+        "name": "Koellederen riem"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"
