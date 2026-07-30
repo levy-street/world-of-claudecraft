@@ -524,7 +524,12 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/druid/violet.webp`,
   ],
   // Combat Mech chromas — every index is a real full-model texture (no null
-  // default; the embedded base texture is not one of the rewards).
+  // default; the embedded base texture is not one of the rewards). The
+  // per-class mech SUITS wear the same 15 colorways, recreated on the suit's
+  // own MoF atlas (tmp/chroma_work/generate_suit_chromas.py) and registered
+  // per suit key by the MECH_SUIT_CLASSES loop below; indexes stay in
+  // MECH_CHROMAS order so the same skin index renders the same colorway on
+  // the legacy body and every suit.
   player_mech: MECH_CHROMAS.map(mechChromaUrl),
   // Bursar Fernando (the Eastbrook banker easter egg): the rogue palette with
   // the skin swatch repainted light brown and the hair/brow swatch black, in
@@ -559,6 +564,8 @@ export function skinSwatchColor(key: string, index: number): string | null {
 export const SKIN_EMISSIVE: Record<string, (string | null)[]> = {
   // (the mage's night-look eye glow retired with the night atlas: both were
   // authored for the old mage.glb UVs, which the v02 body no longer uses)
+  // Suit epics glow like the legacy mech epics: visor-slit emissive maps baked
+  // on the suit atlas, registered per suit key by the MECH_SUIT_CLASSES loop.
   player_mech: MECH_CHROMAS.map(mechEmissiveUrl),
 };
 
@@ -882,8 +889,9 @@ export const VISUALS: Record<string, VisualDef> = {
     cosmetics: V02_HEAD_COSMETICS,
   },
 
-  // -- cosmetic body skin (class-agnostic; both the skin preview and a live
-  //    player whose skinCatalog === 'mech', see visualKeyFor) ----------------
+  // -- legacy cosmetic body skin (RETIRED: every class now wears its own
+  //    re-forged per-class suit, see MECH_SUIT_CLASSES; this def remains only
+  //    as visualKeyFor's unreachable fallback and is never preloaded) --------
   player_mech: {
     url: `${PLAYERS}/Mech/characters/CombatMech.glb`,
     height: PLAYER_H,
@@ -1537,6 +1545,80 @@ export function hasArmoredBody(cls: PlayerClass): boolean {
   return VISUALS[`player_${cls}_armored`] !== undefined;
 }
 
+// --- Per-class Combat Mech suits -------------------------------------------
+// The Combat Mech re-forged per class onto each class's own rig, the exact
+// recipe of the level-20 armored bodies: every class renders the 'mech' skin
+// catalog as `player_<class>_mech`, a separate GLB of Armor_* meshes on the
+// SAME donor rig as its base body (no clips of its own; binds the base clips
+// via animUrls, holds the same weapons through the grafted handslot bones).
+// The legacy class-agnostic `player_mech` stays as the dispatch fallback only.
+// The suit fully encloses the skull, so like the enclosing lvl20 helms it
+// drops the head cosmetics and skips the graft.
+const MECH_SUIT_CLASSES: readonly PlayerClass[] = [
+  'warrior',
+  'paladin',
+  'hunter',
+  'rogue',
+  'priest',
+  'shaman',
+  'mage',
+  'warlock',
+  'druid',
+];
+
+for (const cls of MECH_SUIT_CLASSES) {
+  const base = VISUALS[`player_${cls}`];
+  if (base) {
+    VISUALS[`player_${cls}_mech`] = {
+      ...armoredVariant(base, `player_${cls}`, `${PLAYERS}/${cls}_mech.glb`, false),
+      // Mech-family loading: kept out of the boot sweep like player_mech, warmed
+      // by preloadMechAssets() alongside it (see mechVisualKeys).
+      lazyPreload: true,
+    };
+    // Every suit shares ONE chroma atlas set: the forge only transforms
+    // geometry, never UVs, so the 15 recolored suit atlases (and the epic
+    // emissive maps) fit every class's suit identically.
+    SKINS[`player_${cls}_mech`] = MECH_CHROMAS.map((c) => `${SKINS_DIR}/mech/mech_${c.id}.webp`);
+    SKIN_EMISSIVE[`player_${cls}_mech`] = MECH_CHROMAS.map((c) =>
+      c.rank === 'epic' ? `${SKINS_DIR}/mech/mech_${c.id}_emis.webp` : null,
+    );
+  }
+}
+
+// The lazy mech bundle warms the per-class suits only. The legacy shared
+// `player_mech` body is fully superseded (every PlayerClass resolves a suit,
+// so no dispatch path reaches it); its def stays purely as the unreachable
+// fallback below, and its 5.4MB of GLB + chroma textures are never fetched.
+const MECH_VISUAL_KEYS: ReadonlySet<string> = new Set(
+  MECH_SUIT_CLASSES.map((cls) => `player_${cls}_mech`),
+);
+
+/** Every visual key the Combat Mech skin catalog resolves to for a real class
+ *  (one suit per class): the set preloadMechAssets warms. */
+export function mechVisualKeys(): string[] {
+  return [...MECH_VISUAL_KEYS];
+}
+
+/** The wings back-cosmetic prop (Entity.wings). Rides the lazy mech asset
+ *  bundle (preloadMechAssets), not the boot sweep: today's only wings model is
+ *  the Combat Mech thruster wings. */
+export const MECH_WINGS_URL = `${PLAYERS}/mech_wings.glb`;
+
+/** Whether a visual key is one of the Combat Mech bodies (legacy or per-class
+ *  suit), i.e. lazily fetched via preloadMechAssets rather than the boot sweep. */
+export function isMechVisualKey(key: string): boolean {
+  return MECH_VISUAL_KEYS.has(key);
+}
+
+/** The body model key the 'mech' skin catalog resolves to for a class: the
+ *  class's own re-forged suit when it ships one, else the legacy shared body.
+ *  Single source of truth for the entity dispatch (visualKeyFor) and the
+ *  preview resolver (classVisualKey) so they can never disagree. */
+export function mechVisualKeyFor(cls: PlayerClass): string {
+  const suit = `player_${cls}_mech`;
+  return VISUALS[suit] ? suit : 'player_mech';
+}
+
 // ---------------------------------------------------------------------------
 // Dispatch: entity -> visual key (mirrors the old buildRigFor selection:
 // e.kind + e.templateId + MOBS[id].family)
@@ -1679,7 +1761,8 @@ const NPC_KEYS: Record<string, string> = {
 
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
-    if (e.skinCatalog === 'mech') return 'player_mech';
+    // e.templateId is the player's class on every host (see createCharacterVisual).
+    if (e.skinCatalog === 'mech') return mechVisualKeyFor(e.templateId as PlayerClass);
     if (e.skinCatalog === 'armored') {
       const armored = `player_${e.templateId}_armored`;
       if (VISUALS[armored]) return armored;

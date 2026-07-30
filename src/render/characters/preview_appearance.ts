@@ -1,6 +1,6 @@
 import type { PlayerClass } from '../../sim/types';
 import type { WeaponLayoutOverride } from './manifest';
-import { mechHeldWeaponOverride } from './manifest';
+import { isMechVisualKey, mechHeldWeaponOverride, mechVisualKeyFor } from './manifest';
 
 /** A character's real, in-world appearance for the char-select / char-sheet
  *  turntable: body class, appearance skin, whether it is the class rig or the
@@ -67,7 +67,7 @@ export function defaultHeadFor(cls: PlayerClass): {
  *  to its own key; every other catalog uses the plain class body. Shared by the
  *  preview and the appearance resolver so they can never disagree. */
 export function classVisualKey(cls: PlayerClass, catalog: 'class' | 'mech' | 'armored'): string {
-  if (catalog === 'mech') return 'player_mech';
+  if (catalog === 'mech') return mechVisualKeyFor(cls);
   return catalog === 'armored' ? `player_${cls}_armored` : `player_${cls}`;
 }
 
@@ -77,7 +77,7 @@ export function classVisualKey(cls: PlayerClass, catalog: 'class' | 'mech' | 'ar
  *  every non-mech key to 'class', which silently rendered the base body in place
  *  of the level-20 armored one. */
 export function catalogForVisualKey(key: string): 'class' | 'mech' | 'armored' {
-  if (key === 'player_mech') return 'mech';
+  if (isMechVisualKey(key)) return 'mech';
   return key.endsWith('_armored') ? 'armored' : 'class';
 }
 
@@ -94,12 +94,14 @@ export interface PreviewVisual {
  *  class's hand layout (a rogue mech dual-wields), while the class rig uses
  *  `player_<class>` with no override. Kept DOM/Three-free so it is unit-tested. */
 export function previewAppearanceVisual(a: PreviewAppearance): PreviewVisual {
-  const mech = a.skinCatalog === 'mech';
+  const visualKey = classVisualKey(a.cls, a.skinCatalog);
   return {
-    visualKey: classVisualKey(a.cls, a.skinCatalog),
+    visualKey,
     weaponItemId: a.mainhandItemId ?? null,
     offhandItemId: a.offhandItemId ?? null,
-    weaponOverride: mech ? mechHeldWeaponOverride(a.cls) : null,
+    // Only the legacy shared mech body needs the wearer-class hand layout; a
+    // per-class suit spreads its base class def and already holds weapons right.
+    weaponOverride: visualKey === 'player_mech' ? mechHeldWeaponOverride(a.cls) : null,
   };
 }
 

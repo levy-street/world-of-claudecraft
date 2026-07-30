@@ -137,8 +137,12 @@ describe('capping', () => {
 
 describe('shipped level-20 armor', () => {
   it('has no open rim cycle left in any piece', () => {
-    const files = readdirSync(PLAYERS).filter((f) => f.endsWith('_lvl20.glb'));
-    expect(files).toHaveLength(9);
+    // The per-class mech suits ride the same forge and the same capping pass,
+    // so they are held to the same no-open-shell contract as the lvl20 sets.
+    const files = readdirSync(PLAYERS).filter(
+      (f) => f.endsWith('_lvl20.glb') || f.endsWith('_mech.glb'),
+    );
+    expect(files).toHaveLength(18); // 9 lvl20 sets + 9 mech suits
 
     const offenders: string[] = [];
     for (const file of files) {
@@ -167,4 +171,25 @@ describe('shipped level-20 armor', () => {
 
     expect(offenders).toEqual([]);
   }, 30_000);
+
+  it('every set GLB carries the handslot bones that hold the wearer weapons', () => {
+    // The armored/suit visuals spread the class body's attach defs (weapons on
+    // handslot.r, offhand on handslot.l), but those bones are NOT part of the
+    // forge output: they are grafted in as a post-step (scripts/glb_graft_handslots.mjs,
+    // copying the body's parent bone + local TRS). A set that skips the graft
+    // renders fine until a weapon equips into nothing, so pin the bones here.
+    const files = readdirSync(PLAYERS).filter(
+      (f) => f.endsWith('_lvl20.glb') || f.endsWith('_mech.glb'),
+    );
+    expect(files).toHaveLength(18);
+    const offenders: string[] = [];
+    for (const file of files) {
+      const { json } = readGlb(path.join(PLAYERS, file));
+      const names = new Set(((json.nodes ?? []) as { name?: string }[]).map((node) => node.name));
+      for (const bone of ['handslot.r', 'handslot.l']) {
+        if (!names.has(bone)) offenders.push(`${file} :: missing ${bone}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
 });

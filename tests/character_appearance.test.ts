@@ -65,7 +65,7 @@ describe('character appearance picker', () => {
   it('reopens the character preview on the active cosmetic body catalog', () => {
     expect(activeCharacterAppearancePreview('shaman', 0, 'mech')).toEqual({
       skin: 0,
-      visualKey: 'player_mech',
+      visualKey: 'player_shaman_mech',
     });
     expect(activeCharacterAppearancePreview('paladin', 1, 'class')).toEqual({
       skin: 1,

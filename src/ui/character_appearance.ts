@@ -1,4 +1,5 @@
 import { hasArmoredBody } from '../render/characters/manifest';
+import { classVisualKey } from '../render/characters/preview_appearance';
 import { canWearArmorSet, MECH_CHROMAS, SKIN_COUNTS } from '../sim/content/skins';
 import type { PlayerClass, SkinCatalog } from '../sim/types';
 
@@ -65,11 +66,8 @@ export function activeCharacterAppearancePreview(
 ): ActiveCharacterAppearancePreview {
   return {
     skin: Math.max(0, Math.floor(skin)),
-    visualKey:
-      catalog === 'mech'
-        ? 'player_mech'
-        : catalog === 'armored'
-          ? `player_${cls}_armored`
-          : `player_${cls}`,
+    // classVisualKey is the shared catalog -> body-key resolver (it knows which
+    // classes wear a re-forged per-class mech suit vs the legacy shared mech).
+    visualKey: classVisualKey(cls, catalog),
   };
 }

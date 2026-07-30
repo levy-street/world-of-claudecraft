@@ -28,6 +28,8 @@ import {
   type AttachDef,
   characterPreloadUrls,
   itemWeaponModelUrl,
+  MECH_WINGS_URL,
+  mechVisualKeys,
   offhandModelUrl,
   SKIN_EMISSIVE,
   SKINS,
@@ -581,26 +583,52 @@ export function skinEmissiveTexture(key: string, skinIndex: number): THREE.Textu
   return url ? (skinEmisTexByUrl.get(url) ?? null) : null;
 }
 
-// Lazy fetch for cosmetic-only bodies (the Combat Mech) — the GLB plus every
-// chroma + emissive map. Memoized: opening the preview repeatedly is free. Kept
-// out of the boot sweep so the ~4 MB asset set never delays every client's load.
+// Lazy fetch for cosmetic-only bodies (the Combat Mech) — the legacy shared GLB,
+// every per-class suit GLB (mechVisualKeys), and every chroma + emissive map.
+// Memoized: opening the preview repeatedly is free. Kept out of the boot sweep
+// so the ~4 MB asset set never delays every client's load.
 let mechAssetsPromise: Promise<void> | null = null;
 export function preloadMechAssets(): Promise<void> {
   if (mechAssetsPromise) return mechAssetsPromise;
-  const def = VISUALS.player_mech;
-  if (!def) return Promise.resolve();
-  const jobs: Promise<unknown>[] = [
-    loadGltf(def.url).then((g) => {
-      gltfByUrl.set(def.url, g);
+  const jobs: Promise<unknown>[] = [];
+  for (const key of mechVisualKeys()) {
+    const def = VISUALS[key];
+    if (!def) continue;
+    jobs.push(
+      loadGltf(def.url).then((g) => {
+        gltfByUrl.set(def.url, g);
+      }),
+    );
+  }
+  if (jobs.length === 0) return Promise.resolve();
+  // The wings back-cosmetic prop rides the same lazy bundle (see MECH_WINGS_URL).
+  jobs.push(
+    loadGltf(MECH_WINGS_URL).then((g) => {
+      gltfByUrl.set(MECH_WINGS_URL, g);
     }),
-  ];
-  for (const url of SKINS.player_mech ?? []) if (url) jobs.push(loadSkinTexInto(url, skinTexByUrl));
-  if (GFX.standardMaterials) {
-    for (const url of SKIN_EMISSIVE.player_mech ?? [])
-      if (url) jobs.push(loadSkinTexInto(url, skinEmisTexByUrl));
+  );
+  for (const key of mechVisualKeys()) {
+    for (const url of SKINS[key] ?? []) if (url) jobs.push(loadSkinTexInto(url, skinTexByUrl));
+    if (GFX.standardMaterials) {
+      for (const url of SKIN_EMISSIVE[key] ?? [])
+        if (url) jobs.push(loadSkinTexInto(url, skinEmisTexByUrl));
+    }
   }
   mechAssetsPromise = Promise.all(jobs).then(() => undefined);
   return mechAssetsPromise;
+}
+
+/** Fresh clone of the wings back-cosmetic prop, or null while its GLB is still
+ *  fetching (the caller retries on a later frame, the createView convention:
+ *  never throw on the per-frame render path). A miss kicks the lazy mech
+ *  bundle, which is where the wings ride. */
+export function wingsProp(): THREE.Object3D | null {
+  const g = gltfByUrl.get(assetUrl(MECH_WINGS_URL));
+  if (!g) {
+    void preloadMechAssets().catch(() => undefined);
+    return null;
+  }
+  return cloneSkinned(g.scene);
 }
 
 // Lazy fetch for the Training Dummy (models/creatures/training_dummy.glb):
@@ -631,14 +659,21 @@ export function trainingDummyAssetsReady(): boolean {
 }
 
 export function mechAssetsReady(): boolean {
-  const def = VISUALS.player_mech;
-  if (!def || !gltfByUrl.has(assetUrl(def.url))) return false;
-  const skinsReady = (SKINS.player_mech ?? []).every((url) => !url || skinTexByUrl.has(url));
-  if (!GFX.standardMaterials) return skinsReady;
-  return (
-    skinsReady &&
-    (SKIN_EMISSIVE.player_mech ?? []).every((url) => !url || skinEmisTexByUrl.has(url))
-  );
+  for (const key of mechVisualKeys()) {
+    const def = VISUALS[key];
+    if (!def || !gltfByUrl.has(assetUrl(def.url))) return false;
+  }
+  if (!gltfByUrl.has(assetUrl(MECH_WINGS_URL))) return false;
+  for (const key of mechVisualKeys()) {
+    if (!(SKINS[key] ?? []).every((url) => !url || skinTexByUrl.has(url))) return false;
+    if (
+      GFX.standardMaterials &&
+      !(SKIN_EMISSIVE[key] ?? []).every((url) => !url || skinEmisTexByUrl.has(url))
+    ) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function resolvedGltf(url: string): GLTF {

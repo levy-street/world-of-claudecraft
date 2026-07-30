@@ -203,10 +203,15 @@ describe('held weapon models', () => {
     expect(players).toContain('player_hunter_armored');
     for (const key of players) {
       const def = VISUALS[key];
-      // The level-20 armored bodies are cosmetic swaps of the class body, so the
-      // exemption is a property of the CLASS, not of one visual key: the armored
-      // hunter keeps its crossbow for exactly the same reason the base one does.
-      if (key === 'player_hunter' || key === 'player_hunter_armored') {
+      // The level-20 armored bodies and the per-class mech suits are cosmetic
+      // swaps of the class body, so the exemption is a property of the CLASS,
+      // not of one visual key: the armored and mech hunters keep the crossbow
+      // for exactly the same reason the base one does.
+      if (
+        key === 'player_hunter' ||
+        key === 'player_hunter_armored' ||
+        key === 'player_hunter_mech'
+      ) {
         expect(def.weaponSlots, `${key} must keep its crossbow`).toBeUndefined();
       } else {
         expect(def.weaponSlots?.includes(0), `${key} should swap its mainhand`).toBe(true);

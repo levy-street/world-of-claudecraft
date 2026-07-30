@@ -500,8 +500,11 @@ describe('Combat Mech held weapon over the wire', () => {
     expect(mirrored.mainhandItemId).toBe('rusty_dagger');
     expect(mirrored.offhandItemId).toBe('keen_dirk');
 
-    // what the renderer derives from the mirrored entity
-    expect(visualKeyFor(mirrored)).toBe('player_mech');
+    // what the renderer derives from the mirrored entity: the rogue's own
+    // re-forged suit, which spreads the rogue def (dual-wield layout included)
+    expect(visualKeyFor(mirrored)).toBe('player_rogue_mech');
+    // the legacy override helper still reports the rogue layout for the shared
+    // mech body (the dispatch fallback for unregistered classes)
     const override = mechHeldWeaponOverride(mirrored.templateId as PlayerClass);
     expect(override?.weaponSlots).toEqual([0]);
     expect(override?.offhandSlot).toBe(1);
@@ -572,11 +575,39 @@ describe('Combat Mech held weapon over the wire', () => {
     expect(mirrored.skinCatalog).toBe('mech');
     expect(mirrored.mainhandItemId).toBe('worn_sword');
     expect(mirrored.offhandItemId).toBe('eastbrook_buckler');
-    expect(visualKeyFor(mirrored)).toBe('player_mech');
+    // The warrior wears its re-forged per-class suit, which spreads the warrior
+    // def (weaponSlots + offhandSlot), so the shield mirrors through the def
+    // itself and no legacy hand-layout override is consulted.
+    expect(visualKeyFor(mirrored)).toBe('player_warrior_mech');
+    // The legacy override helper still reports the warrior layout for the shared
+    // mech body (any class without a suit relies on it).
     expect(mechHeldWeaponOverride(mirrored.templateId as PlayerClass)).toMatchObject({
       weaponSlots: [0],
       offhandSlot: 1,
     });
+  });
+
+  it('mirrors the wings back-cosmetic to other players, absolutely', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+    const pid = sim.playerId;
+    sim.setPlayerWings(pid, true);
+    const e = sim.entities.get(pid)!;
+
+    // server emit: identity field, sparse like bd (absent when off)
+    const on = wireEntity(e);
+    expect(on.wg).toBe(1);
+
+    const client = bareClient(pid + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [on] });
+    expect(client.entities.get(e.id)!.wings).toBe(true);
+
+    // toggling off drops the field, and the ABSOLUTE decode clears the mirror
+    // (the armored-nudge lesson: never `w.wg ?? current`)
+    sim.setPlayerWings(pid, false);
+    const off = wireEntity(e);
+    expect(off.wg).toBeUndefined();
+    (client as any).applySnapshot({ t: 'snap', ents: [off] });
+    expect(client.entities.get(e.id)!.wings).toBe(false);
   });
 });
 

@@ -1,5 +1,6 @@
 import { skinCount } from '../../../render/characters/manifest';
 import { playerPortraitDataUrl, visualPortraitDataUrl } from '../../../render/characters/portrait';
+import { classVisualKey } from '../../../render/characters/preview_appearance';
 import { SKIN_RANKS, skinRankOrder } from '../../../sim/content/skins';
 import type { PlayerClass, SkinRank } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
@@ -138,8 +139,10 @@ export class SkinEventController {
   }
 
   private choiceThumb(index: number): string | null {
+    // Mech chroma thumbs render on the wearer class's own re-forged suit (the
+    // body the claim will actually show), not the legacy shared mech.
     return this.mode === 'mech'
-      ? visualPortraitDataUrl('player_mech', index)
+      ? visualPortraitDataUrl(classVisualKey(this.deps.world().cfg.playerClass, 'mech'), index)
       : playerPortraitDataUrl(this.deps.world().cfg.playerClass, index);
   }
 
@@ -186,7 +189,8 @@ export class SkinEventController {
     const playerClass = world.cfg.playerClass;
     const granted = skinRankOrder(rank);
     const mech = this.mode === 'mech';
-    const previewKey = mech ? 'player_mech' : `player_${playerClass}`;
+    // The live preview body: the wearer class's own suit for mech claims.
+    const previewKey = mech ? classVisualKey(playerClass, 'mech') : `player_${playerClass}`;
     const element = this.root();
     const title = esc(t('skinEvent.title'));
     const rankName = skinRankName(rank);

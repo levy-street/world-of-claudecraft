@@ -105,12 +105,34 @@ describe('previewAppearanceVisual', () => {
     expect(v.weaponItemId).toBeNull();
   });
 
-  it('uses the Combat Mech body for an event skin (skinCatalog mech)', () => {
-    const v = previewAppearanceVisual(appearance({ cls: 'warrior', skinCatalog: 'mech' }));
-    expect(v.visualKey).toBe('player_mech');
+  it('every class wears its own re-forged mech suit', () => {
+    for (const cls of [
+      'warrior',
+      'paladin',
+      'hunter',
+      'rogue',
+      'priest',
+      'shaman',
+      'mage',
+      'warlock',
+      'druid',
+    ] as const) {
+      const v = previewAppearanceVisual(appearance({ cls, skinCatalog: 'mech' }));
+      expect(v.visualKey, cls).toBe(`player_${cls}_mech`);
+      // A suit spreads its base class def (attach/weaponSlots/offhandSlot), so
+      // it holds weapons in the class layout and needs NO legacy override.
+      expect(v.weaponOverride, cls).toBeNull();
+    }
+    // The legacy shared body stays as the dispatch fallback for a class whose
+    // suit is not registered (none today; pinned with a synthetic class).
+    const stray = previewAppearanceVisual(
+      appearance({ cls: 'not_a_class' as never, skinCatalog: 'mech' }),
+    );
+    expect(stray.visualKey).toBe('player_mech');
+    expect(stray.weaponOverride).toEqual(mechHeldWeaponOverride('not_a_class' as never));
   });
 
-  it('mirrors the wearer class hand layout and actual offhand on the mech', () => {
+  it('passes both held items through on a suit (the rogue dual-wield case)', () => {
     const rogue = previewAppearanceVisual(
       appearance({
         cls: 'rogue',
@@ -119,16 +141,9 @@ describe('previewAppearanceVisual', () => {
         offhandItemId: 'dagger_y',
       }),
     );
-    expect(rogue.visualKey).toBe('player_mech');
+    expect(rogue.visualKey).toBe('player_rogue_mech');
     expect(rogue.weaponItemId).toBe('dagger_x');
     expect(rogue.offhandItemId).toBe('dagger_y');
-    // Same override the in-world mech render applies for the dual-wield class.
-    expect(rogue.weaponOverride).toEqual(mechHeldWeaponOverride('rogue'));
-    expect(rogue.weaponOverride).not.toBeNull();
-
-    // Winning Warrior also needs its independent shield / Fury offhand layout.
-    const warrior = previewAppearanceVisual(appearance({ cls: 'warrior', skinCatalog: 'mech' }));
-    expect(warrior.weaponOverride).toEqual(mechHeldWeaponOverride('warrior'));
   });
 });
 
@@ -232,10 +247,12 @@ describe('CharacterPreview.setAppearance', () => {
 
     expect(preloadMechAssets).toHaveBeenCalledOnce();
     expect(setVisualKey).toHaveBeenCalledTimes(2);
+    // The rogue's own suit (no legacy hand-layout override: the suit def
+    // carries the dual-wield layout itself).
     expect(setVisualKey).toHaveBeenLastCalledWith(
-      'player_mech',
+      'player_rogue_mech',
       'dagger_x',
-      mechHeldWeaponOverride('rogue'),
+      null,
       'dagger_y',
     );
   });

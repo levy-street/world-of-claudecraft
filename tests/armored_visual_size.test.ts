@@ -20,11 +20,13 @@ import { ALL_CLASSES } from '../src/sim/types';
 // numbers that decide rendered size.
 let VISUALS: typeof import('../src/render/characters/manifest')['VISUALS'];
 let hasArmoredBody: typeof import('../src/render/characters/manifest')['hasArmoredBody'];
+let mechVisualKeys: typeof import('../src/render/characters/manifest')['mechVisualKeys'];
 
 beforeAll(async () => {
   const manifest = await import('../src/render/characters/manifest');
   VISUALS = manifest.VISUALS;
   hasArmoredBody = manifest.hasArmoredBody;
+  mechVisualKeys = manifest.mechVisualKeys;
 });
 
 describe('armored body size', () => {
@@ -62,6 +64,38 @@ describe('armored body size', () => {
       .map(([key]) => key)
       .sort();
 
-    expect(users).toEqual(ALL_CLASSES.map((cls) => `player_${cls}_armored`).sort());
+    // The armored bodies plus every re-forged per-class mech suit (both are
+    // live same-size swaps on the class rig); the legacy shared mech is not one.
+    const mechSuits = mechVisualKeys().filter((key) => key !== 'player_mech');
+    expect(users).toEqual(
+      [...ALL_CLASSES.map((cls) => `player_${cls}_armored`), ...mechSuits].sort(),
+    );
+  });
+});
+
+describe('per-class mech suit bodies', () => {
+  it('every class ships a suit; suits follow the armored-body contract', () => {
+    const suits = mechVisualKeys().filter((key) => key !== 'player_mech');
+    expect(suits.sort()).toEqual(ALL_CLASSES.map((cls) => `player_${cls}_mech`).sort());
+
+    for (const key of suits) {
+      const def = VISUALS[key];
+      const baseKey = key.replace(/_mech$/, '');
+      expect(VISUALS[baseKey], key).toBeDefined();
+      // Same live-swap size contract as the armored bodies: /dev mech must not
+      // grow, shrink or float the character.
+      expect(def.normalizeFrom, key).toBe(baseKey);
+      expect(def.height, key).toBe(VISUALS[baseKey].height);
+      // No clips of its own: the suit binds the base body's clips by name.
+      expect(def.animUrls, key).toContain(VISUALS[baseKey].url);
+      // Fully enclosing suit: no head cosmetics and no head graft.
+      expect(def.cosmetics, key).toBeUndefined();
+      expect(def.graftUrl, key).toBeUndefined();
+      // Mech-family loading: out of the boot sweep, warmed by preloadMechAssets.
+      expect(def.lazyPreload, key).toBe(true);
+      // Holds the wearer's weapons exactly like the base body.
+      expect(def.weaponSlots, key).toEqual(VISUALS[baseKey].weaponSlots);
+      expect(def.offhandSlot, key).toBe(VISUALS[baseKey].offhandSlot);
+    }
   });
 });

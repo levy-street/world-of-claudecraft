@@ -76,10 +76,14 @@ describe('appearance skin selection', () => {
     expect(characterAssetsSource).toContain(
       'for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));',
     );
+    // The lazy mech bundle warms every mech body's skins (legacy + per-class
+    // suits) UNGATED, while only the emissive maps sit behind the tier gate.
     expect(characterAssetsSource).toContain(
-      'for (const url of SKINS.player_mech ?? []) if (url) jobs.push(loadSkinTexInto(url, skinTexByUrl));',
+      'for (const url of SKINS[key] ?? []) if (url) jobs.push(loadSkinTexInto(url, skinTexByUrl));',
     );
-    expect(characterAssetsSource).toContain('if (!GFX.standardMaterials) return skinsReady;');
+    expect(characterAssetsSource).toContain(
+      'if (GFX.standardMaterials) {\n      for (const url of SKIN_EMISSIVE[key] ?? [])',
+    );
     expect(characterAssetsSource).not.toContain('Standard tier only — low tier aliases');
     expect(characterAssetsSource).not.toContain(
       'if (GFX.standardMaterials) {\n  // Boot sweep skips lazyPreload keys',
