@@ -15,7 +15,11 @@ import { registerScenario } from '../scenarios/registry';
 import { registerChoice } from '../scenes/choices';
 import { registerScene, type SceneAttachShotDef, type SceneDollyShotDef } from '../scenes/registry';
 import type { MobTemplate, NpcDef, QuestDef } from '../types';
-import { LAST_BELL_VOYAGE_SEGMENT_IDS, LB_PROP_CUE_PARK } from './last_bell_cinematics';
+import {
+  LAST_BELL_VOYAGE_SEGMENT_IDS,
+  type LastBellPropPathSegmentId,
+  LB_PROP_CUE_PARK,
+} from './last_bell_cinematics';
 
 // ---------------------------------------------------------------------------
 // Mobs
@@ -203,9 +207,9 @@ interface VoyageDirection {
   readonly departureTarget: string;
   readonly arrivalTarget: string;
   readonly segmentIds: {
-    readonly castOff: string;
-    readonly openWater: string;
-    readonly arrival: string;
+    readonly castOff: LastBellPropPathSegmentId;
+    readonly openWater: LastBellPropPathSegmentId;
+    readonly arrival: LastBellPropPathSegmentId;
   };
   readonly sternOffset: { x: number; y: number; z: number };
   readonly sideOffset: { x: number; y: number; z: number };

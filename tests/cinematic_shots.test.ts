@@ -214,10 +214,12 @@ const SYNTHETIC_REVERSED_BOW_ARRIVAL_CUE = 'scn_test_lint_arrival_bow_bad';
 const SYNTHETIC_MISSED_BERTH_ARRIVAL_CUE = 'scn_test_lint_arrival_berth_bad';
 const SYNTHETIC_CROSSWIND_ARRIVAL_CUE = 'scn_test_lint_arrival_travel_bad';
 
+type SyntheticSceneOpDef = SceneOpDef | { at: number; kind: 'prop'; target: string; cue: string };
+
 function syntheticCameraScene(
   id: string,
   duration: number,
-  cameraOps: readonly SceneOpDef[],
+  cameraOps: readonly SyntheticSceneOpDef[],
   hideRelease = true,
 ): SceneDef {
   const releaseAt = duration - 0.1;
@@ -227,7 +229,9 @@ function syntheticCameraScene(
     ops: [
       { at: 0, kind: 'inputLock', on: true },
       { at: 0, kind: 'letterbox', on: true },
-      ...cameraOps,
+      // Mechanical failure controls deliberately inject test-only prop
+      // segments after bypassing the production authoring boundary.
+      ...(cameraOps as readonly SceneOpDef[]),
       ...(hideRelease
         ? ([{ at: duration - 0.2, kind: 'fade', to: 'black', dur: 0 }] satisfies SceneOpDef[])
         : []),
