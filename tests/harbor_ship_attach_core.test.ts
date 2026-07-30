@@ -177,7 +177,7 @@ describe('HarborShipPendingCueState', () => {
 describe('harbor ship attachment wiring', () => {
   it('binds the live harbor frame beside the SceneDirector prop dependencies', () => {
     expect(MAIN_SOURCE).toMatch(
-      / {4}propCue: \(target, cue\) => cueHarborShip\(target, cue\),\n {4}propReset: \(\) => resetHarborShipCues\(\),\n {4}attachmentFrame: \(target, out\) => harborShipAttachFrame\(target, out\),/,
+      / {4}nowSec: \(\) => world\.presentationTime,\n {4}musicSilence: [^\n]+,\n {4}playDirective: [^\n]+,\n {4}propCue: \(target, cue, startSec\) => cueHarborShip\(target, cue, startSec\),\n {4}propReset: \(\) => resetHarborShipCues\(\),\n {4}attachmentFrame: \(target, out\) => harborShipAttachFrame\(target, out\),/,
     );
     expect(HARBOR_SOURCE).toContain('out: SceneAttachFrame = SHIP_ATTACH_FRAME,');
   });
@@ -185,17 +185,17 @@ describe('harbor ship attachment wiring', () => {
   it('shares one composition function between the camera query and mesh update', () => {
     const attachFrameSource = functionSource('harborShipAttachFrame');
     expect(attachFrameSource).toContain('if (!handle) return null;');
-    expect(attachFrameSource).toContain(
-      'propPathPoseAt(handle.segment, performance.now() / 1000 - handle.cueStartSec, CUE_POSE)',
-    );
+    expect(attachFrameSource).toContain('const elapsedSec = SHIP_CUES.elapsedSec(handle);');
+    expect(attachFrameSource).toContain('propPathPoseAt(handle.segment, elapsedSec, CUE_POSE)');
     expect(attachFrameSource).toContain('return composeHarborShipAttachFrame(handle, pose, out);');
     expect(attachFrameSource).not.toContain('handle.group.position');
     expect(attachFrameSource).not.toContain('handle.group.rotation');
     expect(attachFrameSource).not.toContain('handle.group.matrixAutoUpdate');
 
     const updateSource = functionSource('updateHarborShipMotion');
+    expect(updateSource).toContain('const elapsedSec = SHIP_CUES.elapsedSec(handle);');
     expect(updateSource).toContain(
-      'if (handle.cueStartSec !== null && handle.segment !== null) {\n    handle.group.matrixAutoUpdate = true;',
+      'if (elapsedSec !== null && handle.segment !== null) {\n    handle.group.matrixAutoUpdate = true;',
     );
     expect(updateSource).toContain(
       'const frame = composeHarborShipAttachFrame(handle, pose, SHIP_UPDATE_FRAME);',
@@ -208,7 +208,7 @@ describe('harbor ship attachment wiring', () => {
 
   it('routes cues through the executable pending-cue registry', () => {
     const cueSource = functionSource('cueHarborShip');
-    expect(cueSource).toContain('SHIP_CUES.cue(target, cue);');
+    expect(cueSource).toContain('SHIP_CUES.cue(target, cue, startSec);');
   });
 
   it('registers built ship handles with the executable pending-cue registry', () => {

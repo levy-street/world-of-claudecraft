@@ -203,7 +203,7 @@ describe('scene input lock frame coordination', () => {
       },
     ]);
 
-    expect(propCue).toHaveBeenCalledWith('harbor_ship_mainland', 'old_voyage');
+    expect(propCue).toHaveBeenCalledWith('harbor_ship_mainland', 'old_voyage', 10);
     expect(director.cameraActive()).toBe(true);
 
     director.handleEvents([

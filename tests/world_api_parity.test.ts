@@ -417,7 +417,8 @@ export const IWORLD_MEMBERS = [
   { name: 'deedsRarity', kind: 'method' },
   { name: 'deedsRecent', kind: 'method' },
   { name: 'deedsLeaderboard', kind: 'method' },
-  // --- Last Bell scenes (IWorldScenes): skip + leader dialogue-choice answer ---
+  // --- Last Bell scenes (IWorldScenes): one presentation clock + commands ---
+  { name: 'presentationTime', kind: 'data' },
   { name: 'sceneSkip', kind: 'method' },
   { name: 'answerSceneChoice', kind: 'method' },
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
@@ -529,38 +530,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, the mobile-station pair (placeMobileStation +
     // activeMobileStationCraft), the commissions unbindItem command, and the
-    // Rift + mounts surface. The v0.31.0 base merge added the release's three new
-    // members on top of the branch's 272; making reins usable items then removed
-    // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
-    // activeMasterLootRolls, leaving 274; the packet's slotted tool effects add
-    // toolEffectSlots (data) and slotToolEffect (method) for 276, the
-    // acquisition craft's recharge command (rechargeToolEffect) makes 277,
-    // and the UX pass's node respawn countdown read (nodeRespawnSeconds)
-    // makes 278; the v0.33.0 sync merges bring the rift floor timer HUD's
-    // riftEventMsRemaining, the instance-payload pipes' marketListInstance,
-    // and reactive aura timing's reactiveAbilityWindowRemaining (all
-    // methods) for 281; the v0.34.0 sync removes the renderer-only
-    // riftCollisionToken (data) with third-person camera collision,
-    // leaving 280; a later v0.34.0 sync re-adds riftCollisionToken (data)
-    // so client-side swept-landing and click-to-move pathing can treat
-    // rift walls as solid, leaving 281. The Guild Bank foundation adds the six
-    // IWorldGuildBank members (guildBankInfo, one data read, plus five
-    // commands), leaving 287. The guild bank ACTIVITY LOG adds one read member
-    // (guildBankLog, a method because reading it is what requests the cold
-    // payload on demand: it has no snapshot key), leaving 288. Thornhollow
-    // Fields adds the four battleground facet members on top of that base:
-    // the bgInfo data member plus the bgQueueJoin / bgQueueLeave / bgFlagAction
-    // commands, leaving 293 (this base tip already carries the Book of Deeds
-    // recent strip's deedsRecent read). The stop-auto-attack-on-target-switch
-    // setting adds setStopAutoAttackOnTargetSwitch (method), leaving 294. This
-    // branch's commission order board (issue #1298) adds commissionOrders
-    // (data) plus openCommissionOrder/cancelCommissionOrder/
-    // acceptCommissionOrder/deliverCommissionOrder (methods), leaving 299.
-    // This branch's paperdoll helmet-visibility eye adds setHelmHidden
-    // (IWorldCosmetics, a method), leaving 300.
-    expect(IWORLD_MEMBERS.length).toBe(300);
-    expect(DATA_MEMBERS.length).toBe(76);
-    expect(METHOD_MEMBERS.length).toBe(224);
+    // Rift + mounts surface. The action-bar pair and Last Bell's clock plus two
+    // scene methods are included in the merged facet union; making reins usable
+    // items removed selectedMount + selectMount from the prior surface. The
+    // v0.32.0 integration adds activeMasterLootRolls.
+    expect(IWORLD_MEMBERS.length).toBe(277);
+    expect(DATA_MEMBERS.length).toBe(73);
+    expect(METHOD_MEMBERS.length).toBe(204);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -781,6 +757,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'playEmote',
       'player',
       'playerId',
+      'presentationTime',
       'prestige',
       'prestigeRank',
       'professionsState',
@@ -933,6 +910,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyInfo',
       'player',
       'playerId',
+      'presentationTime',
       'prestigeRank',
       'professionsState',
       'questLog',
@@ -1677,6 +1655,7 @@ type _ExhaustProfessions = AssertNever<
 >;
 
 const FACET_SCENES = [
+  'presentationTime',
   'sceneSkip',
   'answerSceneChoice',
 ] as const satisfies readonly (keyof IWorldScenes)[];
@@ -1769,8 +1748,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(300);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(300);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(277);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(277);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

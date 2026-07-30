@@ -272,11 +272,14 @@ describe('scene camera wire transport', () => {
         },
       },
     ];
-    const frame = assembleEventsFrame(serializeEventFragments(events));
+    const frame = assembleEventsFrame(serializeEventFragments(events), 4.25);
     const client = Object.create(ClientWorld.prototype) as ClientWorld;
     (client as unknown as { eventQueue: SimEvent[] }).eventQueue = [];
     (client as unknown as { onMessage(raw: string): void }).onMessage(frame);
-    expect(client.drainEvents()).toEqual(events);
+    expect(client.presentationTime).toBe(4.25);
+    expect(client.drainEvents()).toEqual(
+      events.map((event) => ({ ...event, presentationTime: 4.25 })),
+    );
   });
 });
 

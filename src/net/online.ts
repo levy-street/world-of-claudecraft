@@ -254,6 +254,7 @@ import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
+import { presentationTimeAfterWire, stampScenePresentationTime } from './presentation_clock';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 import { sceneInputLockAfterEvent } from './scene_input_lock_mirror';
@@ -1882,6 +1883,9 @@ export class ClientWorld implements IWorld {
     null;
   onReconnected: (() => void) | null = null;
   onSceneInputLockChanged: ((locked: boolean) => void) | null = null;
+  // IWorldScenes: authoritative seconds from scene event, convergence, and
+  // mandatory snapshot frames. Independent of stable timer-wire negotiation.
+  presentationTime = 0;
   private sceneInputLockedBeforeDrain = false;
   private reconnectAttempts = 0;
   // consecutive 'character already in world' rejections during a reconnect;
@@ -2401,6 +2405,7 @@ export class ClientWorld implements IWorld {
       this.playerId = msg.pid;
       this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;
+      this.presentationTime = presentationTimeAfterWire(this.presentationTime, msg.time);
       if (typeof msg.realm === 'string') this.realm = msg.realm;
       if (Array.isArray(msg.softWords)) {
         this.profanityWords = msg.softWords.filter(
@@ -2484,6 +2489,7 @@ export class ClientWorld implements IWorld {
       }
       Object.assign(this.moveInput, emptyMoveInput());
       this.mouselookFacing = null;
+      this.presentationTime = presentationTimeAfterWire(this.presentationTime, msg.time);
       // A spectate transition swaps the represented player without a hello.
       // Converge both personal presentation streams at the same boundary so
       // the prior identity cannot strand a scene lock or choice focus trap.
@@ -2545,8 +2551,9 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'events') {
+      this.presentationTime = presentationTimeAfterWire(this.presentationTime, msg.time);
       for (const ev of msg.list) {
-        const event = ev as SimEvent;
+        const event = stampScenePresentationTime(ev as SimEvent, this.presentationTime);
         this.mirrorSceneInputLock(event);
         this.applyLockpickEvent(event);
         this.applyMountRaceEvent(event);
@@ -2645,16 +2652,24 @@ export class ClientWorld implements IWorld {
   }
 
   private queueSceneConvergence(sceneState: unknown, sceneChoiceState: unknown): void {
-    const sceneSync = {
-      type: 'sceneSync',
-      state: helloSceneState(sceneState),
-    } as SimEvent;
+    const sceneSync = stampScenePresentationTime(
+      {
+        type: 'sceneSync',
+        state: helloSceneState(sceneState),
+      },
+      this.presentationTime,
+    );
     this.mirrorSceneInputLock(sceneSync);
     this.eventQueue.push(sceneSync);
-    this.eventQueue.push({
-      type: 'sceneChoiceSync',
-      state: helloChoiceState(sceneChoiceState),
-    });
+    this.eventQueue.push(
+      stampScenePresentationTime(
+        {
+          type: 'sceneChoiceSync',
+          state: helloChoiceState(sceneChoiceState),
+        },
+        this.presentationTime,
+      ),
+    );
   }
 
   consumeSocialChanged(): boolean {
@@ -2793,6 +2808,7 @@ export class ClientWorld implements IWorld {
     if (typeof this.spectating === 'string' && typeof snap.self?.id === 'number') {
       this.playerId = snap.self.id;
     }
+    this.presentationTime = presentationTimeAfterWire(this.presentationTime, snap.time);
     const timerWire = this.prepareSnapshotTimers(snap.tw, snap.time);
     // the interpolation alpha the render loop reached on its last frame
     // (same formula and caps as main.ts); used below to re-anchor the new

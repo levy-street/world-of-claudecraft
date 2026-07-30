@@ -50,7 +50,7 @@
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
-//   scenes.ts           IWorldScenes         Last Bell scene skip + dialogue-choice answer
+//   scenes.ts           IWorldScenes         scene presentation clock + skip/choice commands
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
