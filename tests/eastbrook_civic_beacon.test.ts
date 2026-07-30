@@ -213,17 +213,24 @@ describe('Eastbrook civic beacon shader animation', () => {
     expect(material.customProgramCacheKey).toBe(cacheKeyIdentity);
   });
 
-  it('selects only the synthetic 36-vertex civic fixture after merge and keeps the material independent', () => {
+  it('selects only the synthetic 36-index civic fixture after exact merge and keeps the material independent', () => {
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
     const micro = view.group.getObjectByName('eastbrookTownMicroEmissiveBatch') as THREE.Mesh;
     const mask = micro.geometry.getAttribute(EASTBROOK_CIVIC_MASK_ATTRIBUTE);
     const bytes = mask.array as Uint8Array;
     const selectedCount = bytes.reduce((sum, value) => sum + (value === 255 ? 1 : 0), 0);
-    const civicTemplateVertexCount = 36;
+    const index = micro.geometry.getIndex();
+    let selectedIndexCount = 0;
+    if (index) {
+      for (let element = 0; element < index.count; element += 1) {
+        selectedIndexCount += bytes[index.getX(element)] === 255 ? 1 : 0;
+      }
+    }
 
     expect(mask.normalized).toBe(true);
     expect(mask.count).toBe(micro.geometry.getAttribute('position').count);
-    expect(selectedCount).toBe(civicTemplateVertexCount);
+    expect(selectedCount).toBe(24);
+    expect(selectedIndexCount).toBe(36);
     expect(bytes.length - selectedCount).toBeGreaterThan(0);
     const buildingMaterial = (
       view.group.getObjectByName(

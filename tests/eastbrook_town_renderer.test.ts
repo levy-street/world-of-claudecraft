@@ -122,6 +122,17 @@ describe('Eastbrook town visibility core', () => {
 });
 
 describe('Eastbrook town renderer', () => {
+  it('re-indexes exact generated surface tuples without changing triangle count', () => {
+    const template = eastbrookTownInternalsForTest.extractTemplate(
+      sourceAsset(false),
+      EASTBROOK_TOWN_ASSET_URLS[0],
+    );
+    const opaque = template.opaque;
+    expect(opaque).not.toBeNull();
+    expect(opaque?.getIndex()?.count).toBe(36);
+    expect(opaque?.getAttribute('position').count).toBe(24);
+  });
+
   it('places the exact canonical buildings and initialization-batches every low prop and wall chord', () => {
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 1.5, true);
     expect(view.group.name).toBe(EASTBROOK_TOWN_ROOT_NAME);
@@ -338,11 +349,14 @@ describe('Eastbrook town renderer', () => {
 
     const position = mirrored.geometry.getAttribute('position');
     const normal = mirrored.geometry.getAttribute('normal');
-    const a = new THREE.Vector3().fromBufferAttribute(position, 0);
-    const b = new THREE.Vector3().fromBufferAttribute(position, 1);
-    const c = new THREE.Vector3().fromBufferAttribute(position, 2);
+    const index = mirrored.geometry.getIndex();
+    const a = new THREE.Vector3().fromBufferAttribute(position, index?.getX(0) ?? 0);
+    const b = new THREE.Vector3().fromBufferAttribute(position, index?.getX(1) ?? 1);
+    const c = new THREE.Vector3().fromBufferAttribute(position, index?.getX(2) ?? 2);
     const faceNormal = b.clone().sub(a).cross(c.clone().sub(a)).normalize();
-    const storedNormal = new THREE.Vector3().fromBufferAttribute(normal, 0).normalize();
+    const storedNormal = new THREE.Vector3()
+      .fromBufferAttribute(normal, index?.getX(0) ?? 0)
+      .normalize();
     expect(faceNormal.dot(storedNormal)).toBeGreaterThan(0);
   });
 
