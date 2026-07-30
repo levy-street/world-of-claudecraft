@@ -425,7 +425,9 @@ import {
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
-import type { IWorld } from './world_api';
+import { formatXp } from './ui/xp_bar';
+import type { IWorld, LeaderboardEntry } from './world_api';
+import { WORLD_SEED } from './world_seed.mjs';
 
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop

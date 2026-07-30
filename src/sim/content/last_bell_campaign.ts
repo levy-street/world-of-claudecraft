@@ -194,7 +194,7 @@ const OPEN_WATER_AT = 4.2;
 const SEA_ARRIVAL_AT = 8.5;
 const PIER_AT = 12.8;
 const PIER_SHOT_SECONDS = 5;
-const Q0_STORY_SECONDS = 11;
+const Q0_STORY_SECONDS = 11.25;
 const RELEASE_SECONDS = 1;
 
 interface VoyageDirection {
@@ -416,7 +416,7 @@ const Q0_TOLL_SHOT: SceneDollyShotDef = {
       },
     ],
   },
-  dur: 6.2,
+  dur: 6.45,
 };
 
 function q0ArrivalBeats(at: number): SceneOp[] {

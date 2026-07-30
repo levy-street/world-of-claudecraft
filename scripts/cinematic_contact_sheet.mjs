@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import puppeteer from 'puppeteer-core';
 
+import { WORLD_SEED } from '../src/world_seed.mjs';
 import { dismissEntryOverlays } from './enter_offline_game.mjs';
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
@@ -18,7 +19,6 @@ const VIEWPORT = { width: 1280, height: 720, deviceScaleFactor: 1 };
 const WORLD_BOOT_TIMEOUT_MS = 300_000;
 const SCENE_START_TIMEOUT_MS = 10_000;
 const POLL_MS = 250;
-const WORLD_SEED_FALLBACK = 20061;
 
 function usage() {
   return [
@@ -279,7 +279,7 @@ async function startScene(page, scene) {
     };
   }, scene.id);
   if (!started.ok) throw new Error(`Scene ${scene.id} refused to start.`);
-  return started.seed ?? WORLD_SEED_FALLBACK;
+  return started.seed ?? WORLD_SEED;
 }
 
 async function takeFrame(page, filePath) {
