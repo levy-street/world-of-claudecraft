@@ -4909,6 +4909,49 @@ describe('Temporal Hourglass snapshot parity', () => {
 });
 
 describe('Undermount vent snapshot parity', () => {
+  it('reuses the Sim vent projection until its active vent topology changes', () => {
+    const sim = new Sim({ seed: 1032, playerClass: 'warrior', noPlayer: true });
+    const activeVent = {
+      sourceId: 9876,
+      pos: { x: 3, y: 0, z: 5 },
+      radius: 4,
+      min: 15,
+      max: 15,
+      remaining: 36000,
+      interval: 1,
+      tickTimer: 1,
+      school: 'fire',
+      ability: 'Vent Fissure',
+    };
+    const groundAoEs = (sim as unknown as { groundAoEs: Array<typeof activeVent> }).groundAoEs;
+    groundAoEs.push(activeVent);
+
+    const first = sim.activeUndermountVents;
+    expect(first).toEqual([{ id: '9876:0', x: 3, z: 5, radius: 4 }]);
+    expect(sim.activeUndermountVents).toBe(first);
+
+    groundAoEs.push(
+      { ...activeVent, sourceId: 9877, ability: 'Consecration' },
+      { ...activeVent, sourceId: 9878, remaining: 0 },
+    );
+    expect(sim.activeUndermountVents).toBe(first);
+
+    const secondVent = { ...activeVent, sourceId: 9879, pos: { x: 7, y: 0, z: 9 } };
+    groundAoEs.push(secondVent);
+    const second = sim.activeUndermountVents;
+    expect(second).not.toBe(first);
+    expect(second).toEqual([
+      { id: '9876:0', x: 3, z: 5, radius: 4 },
+      { id: '9879:0', x: 7, z: 9, radius: 4 },
+    ]);
+    expect(sim.activeUndermountVents).toBe(second);
+
+    secondVent.remaining = 0;
+    const third = sim.activeUndermountVents;
+    expect(third).not.toBe(second);
+    expect(third).toEqual([{ id: '9876:0', x: 3, z: 5, radius: 4 }]);
+  });
+
   it('mirrors authoritative vents and clears vents missing from the next snapshot', () => {
     const client = bareClient(1);
     (client as any).applySnapshot({

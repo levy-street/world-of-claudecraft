@@ -69,6 +69,14 @@ describe('Undermount actionable decal contract', () => {
     expect((ring.material as THREE.MeshBasicMaterial).color.getHex()).toBe(0xff4b16);
     expect((core.material as THREE.MeshBasicMaterial).color.getHex()).toBe(0x050100);
 
+    decals.syncVents([{ id: '7:0', x: -2, z: 1, radius: 2 }]);
+    expect(scene.getObjectByName('undermount-vent-decal')).toBe(group);
+    expect(scene.children.filter((child) => child.name === 'undermount-vent-decal')).toHaveLength(
+      1,
+    );
+    expect(group.position).toMatchObject({ x: -2, y: -0.91, z: 1 });
+    expect(group.scale).toMatchObject({ x: 2, y: 2, z: 2 });
+
     decals.syncVents([]);
     expect(scene.getObjectByName('undermount-vent-decal')).toBeUndefined();
     decals.dispose();
@@ -119,6 +127,14 @@ describe('Undermount actionable decal contract', () => {
     expect(ring.visible).toBe(true);
     expect(ring.position).toMatchObject({ x: 3, y: 2.135, z: 5 });
     expect(ring.scale.x).toBe(34);
+    decals.update(0.6, false);
+    const animatedOpacity = (ring.material as THREE.MeshBasicMaterial).opacity;
+    expect(animatedOpacity).toBeGreaterThanOrEqual(0.42);
+    expect(animatedOpacity).toBeLessThanOrEqual(0.9);
+    expect(animatedOpacity).not.toBe(0.9);
+    expect(ring.visible).toBe(true);
+
+    decals.beginEruption(3, 5);
     decals.update(1, true);
     expect((ring.material as THREE.MeshBasicMaterial).opacity).toBe(0.9);
     decals.update(1.99, true);

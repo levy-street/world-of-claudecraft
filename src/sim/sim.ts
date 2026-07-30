@@ -1835,21 +1835,23 @@ export class Sim {
     if (count !== this.undermountVentEffects.length) topologyChanged = true;
     if (!topologyChanged) return this.undermountVentView;
 
-    this.undermountVentEffects.length = 0;
-    this.undermountVentView.length = 0;
+    const effects: GroundAoE[] = [];
+    const view: import('../world_api/combat').ActiveUndermountVent[] = [];
     const ordinalBySource = new Map<number, number>();
     for (const effect of this.groundAoEs) {
       if (effect.remaining <= 0 || effect.ability !== 'Vent Fissure') continue;
       const ordinal = ordinalBySource.get(effect.sourceId) ?? 0;
       ordinalBySource.set(effect.sourceId, ordinal + 1);
-      this.undermountVentEffects.push(effect);
-      this.undermountVentView.push({
+      effects.push(effect);
+      view.push({
         id: `${effect.sourceId}:${ordinal}`,
         x: effect.pos.x,
         z: effect.pos.z,
         radius: effect.radius,
       });
     }
+    this.undermountVentEffects = effects;
+    this.undermountVentView = view;
     return this.undermountVentView;
   }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
