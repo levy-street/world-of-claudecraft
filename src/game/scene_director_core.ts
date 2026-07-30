@@ -16,6 +16,7 @@ import type { SceneCameraShot, SceneReconnectState, SceneWireOp } from '../sim/t
 import {
   evaluateSceneRigPose,
   type SceneAttachmentResolver,
+  type SceneRigEaseFrom,
   type SceneRigPose,
   sceneCameraEase,
 } from './scene_rig_core';
@@ -36,6 +37,8 @@ type SceneActiveShot = Exclude<SceneCameraShot, { kind: 'release' }>;
 
 /** Ease-back duration when the camera is handed back to the player. */
 export const SCENE_RELEASE_SEC = 0.8;
+/** Entry ease for dolly and attach shots taking ownership from a live camera. */
+export const SCENE_RIG_ENTRY_SEC = 0.8;
 
 export interface SceneDirectorState {
   sceneActive: boolean;
@@ -54,10 +57,20 @@ export interface SceneDirectorState {
   /** Reused output containers (per-frame path: no allocation). */
   readonly pose: ScenePose;
   readonly last: ScenePose;
+  readonly rigEaseFrom: SceneRigEaseFrom;
   hasLast: boolean;
+  staticPoseLatched: boolean;
 }
 
 export function createSceneDirectorState(): SceneDirectorState {
+  const last: ScenePose = {
+    yaw: 0,
+    pitch: 0,
+    dist: 0,
+    focusX: 0,
+    focusY: 0,
+    focusZ: 0,
+  };
   return {
     sceneActive: false,
     inputLocked: false,
@@ -68,14 +81,25 @@ export function createSceneDirectorState(): SceneDirectorState {
     from: null,
     prePose: null,
     pose: { yaw: 0, pitch: 0, dist: 0, focusX: 0, focusY: 0, focusZ: 0 },
-    last: { yaw: 0, pitch: 0, dist: 0, focusX: 0, focusY: 0, focusZ: 0 },
+    last,
+    rigEaseFrom: { pose: last, duration: SCENE_RIG_ENTRY_SEC },
     hasLast: false,
+    staticPoseLatched: false,
   };
 }
 
 /** True while the scene camera owns the pose (a shot is live or releasing). */
 export function sceneCameraActive(s: SceneDirectorState): boolean {
   return s.shot !== null || s.releasing;
+}
+
+export function sceneShotEasesFromLivePose(shot: SceneActiveShot): boolean {
+  switch (shot.kind) {
+    case 'focus':
+    case 'dolly':
+    case 'attach':
+      return true;
+  }
 }
 
 /**
@@ -115,6 +139,7 @@ export function applySceneOp(
         s.shot = op.shot;
         s.shotStartAt = nowSec;
         s.releasing = false;
+        s.staticPoseLatched = false;
       }
       return null;
     case 'music':
@@ -153,6 +178,7 @@ function clearCamera(s: SceneDirectorState): void {
   s.from = null;
   s.prePose = null;
   s.hasLast = false;
+  s.staticPoseLatched = false;
 }
 
 /**
@@ -170,16 +196,14 @@ export function scenePose(
   resolveAttachment?: SceneAttachmentResolver,
   reducedMotion = false,
 ): ScenePose | null {
-  // Authored camera travel is optional presentation. Reduced-motion players
-  // retain the ordinary gameplay camera while scene input locks, subtitles,
-  // choices, and timing continue unchanged.
-  if (reducedMotion) {
-    clearCamera(s);
-    return null;
-  }
   if (!sceneCameraActive(s)) return null;
   const out = s.pose;
   if (s.releasing) {
+    if (reducedMotion) {
+      restoreGameplayPose(s, live, out);
+      clearCamera(s);
+      return out;
+    }
     const from = s.from;
     if (!from) {
       clearCamera(s);
@@ -218,28 +242,106 @@ export function scenePose(
     };
     if (s.prePose === null) s.prePose = { yaw: live.yaw, pitch: live.pitch, dist: live.dist };
   }
-  if (shot.kind !== 'focus') {
-    evaluateSceneRigPose(
-      shot,
-      nowSec - s.shotStartAt,
-      resolveEntity,
-      resolveAttachment ?? noAttachments,
-      out,
-    );
-    saveLast(s, out);
+  if (reducedMotion) {
+    if (!s.staticPoseLatched) {
+      evaluateActiveShot(
+        s,
+        shot,
+        representativeElapsed(shot),
+        resolveEntity,
+        resolveAttachment ?? noAttachments,
+        false,
+        s.shotStartAt + representativeElapsed(shot),
+        out,
+      );
+      s.staticPoseLatched = true;
+      saveLast(s, out);
+    } else {
+      copyPoseInto(s.last, out);
+    }
     return out;
   }
-  const focus = (shot.entityId !== null ? resolveEntity(shot.entityId) : null) ?? shot;
-  const t = shot.dur > 0 ? clamp01((nowSec - s.shotStartAt) / shot.dur) : 1;
-  const g = sceneCameraEase(t);
-  out.yaw = lerpAngle(s.from.yaw, shot.yaw, g);
-  out.pitch = lerp(s.from.pitch, shot.pitch, g);
-  out.dist = lerp(s.from.dist, shot.dist, g);
-  out.focusX = lerp(s.from.focusX, focus.x, g);
-  out.focusY = lerp(s.from.focusY, focus.y, g);
-  out.focusZ = lerp(s.from.focusZ, focus.z, g);
+  if (s.staticPoseLatched) {
+    s.staticPoseLatched = false;
+    s.from = copyPose(s.last);
+    s.shotStartAt = nowSec;
+  }
+  evaluateActiveShot(
+    s,
+    shot,
+    nowSec - s.shotStartAt,
+    resolveEntity,
+    resolveAttachment ?? noAttachments,
+    true,
+    undefined,
+    out,
+  );
   saveLast(s, out);
   return out;
+}
+
+function evaluateActiveShot(
+  s: SceneDirectorState,
+  shot: SceneActiveShot,
+  elapsedSec: number,
+  resolveEntity: (id: number) => { x: number; y: number; z: number } | null,
+  resolveAttachment: SceneAttachmentResolver,
+  easeRigEntry: boolean,
+  attachmentTimeSec: number | undefined,
+  out: ScenePose,
+): void {
+  const from = s.from;
+  if (!from) return;
+  if (shot.kind !== 'focus') {
+    s.rigEaseFrom.pose = from;
+    evaluateSceneRigPose(
+      shot,
+      elapsedSec,
+      resolveEntity,
+      resolveAttachment,
+      out,
+      easeRigEntry ? s.rigEaseFrom : undefined,
+      attachmentTimeSec,
+    );
+    return;
+  }
+  const focus = (shot.entityId !== null ? resolveEntity(shot.entityId) : null) ?? shot;
+  const t = shot.dur > 0 ? clamp01(elapsedSec / shot.dur) : 1;
+  const g = sceneCameraEase(t);
+  out.yaw = lerpAngle(from.yaw, shot.yaw, g);
+  out.pitch = lerp(from.pitch, shot.pitch, g);
+  out.dist = lerp(from.dist, shot.dist, g);
+  out.focusX = lerp(from.focusX, focus.x, g);
+  out.focusY = lerp(from.focusY, focus.y, g);
+  out.focusZ = lerp(from.focusZ, focus.z, g);
+}
+
+function representativeElapsed(shot: SceneActiveShot): number {
+  switch (shot.kind) {
+    case 'focus':
+    case 'dolly':
+      return shot.dur / 2;
+    case 'attach':
+      return (shot.dur ?? 0) / 2;
+  }
+}
+
+function restoreGameplayPose(s: SceneDirectorState, live: SceneLivePose, out: ScenePose): void {
+  out.yaw = s.prePose?.yaw ?? live.yaw;
+  out.pitch = s.prePose?.pitch ?? live.pitch;
+  out.dist = s.prePose?.dist ?? live.dist;
+  out.focusX = live.playerX;
+  out.focusY = live.playerY;
+  out.focusZ = live.playerZ;
+}
+
+function copyPoseInto(from: ScenePose, out: ScenePose): void {
+  out.yaw = from.yaw;
+  out.pitch = from.pitch;
+  out.dist = from.dist;
+  out.focusX = from.focusX;
+  out.focusY = from.focusY;
+  out.focusZ = from.focusZ;
 }
 
 /**

@@ -328,6 +328,21 @@ describe('mirrored scene presentation clock', () => {
         { position: { x: 0, y: 0, z: 0 }, yaw: 0 },
       );
       expect(actual).toEqual(expected);
+
+      const midpoint = harborShipAttachFrame('harbor_ship_mainland', undefined, 14);
+      const midpointProp = propPathPoseAt(LAST_BELL_PROP_PATH_SEGMENTS.cast_off, 4);
+      expect(midpoint).toEqual(
+        composeHarborShipAttachFrame(
+          {
+            baseX: MAINLAND_HARBOR.berth.x,
+            baseY: WATER_LEVEL - MAINLAND_HARBOR.berth.draft,
+            baseZ: MAINLAND_HARBOR.berth.z,
+            baseRot: MAINLAND_HARBOR.berth.rot,
+          },
+          midpointProp,
+          { position: { x: 0, y: 0, z: 0 }, yaw: 0 },
+        ),
+      );
     } finally {
       resetHarborShipCues();
       setActiveWorldContent(null);

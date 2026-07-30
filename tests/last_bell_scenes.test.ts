@@ -188,6 +188,7 @@ describe('scene playback', () => {
     const attach = ops.find((e) => e.op.kind === 'camera' && e.op.shot.kind === 'attach');
     if (attach?.op.kind === 'camera' && attach.op.shot.kind === 'attach') {
       expect(attach.op.shot.target).toBe('test_ship');
+      expect(attach.op.shot.dur).toBeCloseTo(3.7, 10);
       expect(attach.op.shot.fallbackFrame.position.x).toBeCloseTo(origin.x + 3, 6);
       expect(attach.op.shot.fallbackFrame.position.z).toBeCloseTo(origin.z - 5, 6);
       expect(attach.op.shot.fallbackFrame.yaw).toBe(0.4);

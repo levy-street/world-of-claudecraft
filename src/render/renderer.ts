@@ -178,7 +178,15 @@ import {
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
-import { buildHarbors, updateHarborShips } from './harbor';
+import {
+  applyHarborDeckRiderVisual,
+  buildHarbors,
+  harborDeckRiderActive,
+  harborDeckRiderVisualPlan,
+  updateHarborShips,
+  warnMissingHarborDeckRider,
+} from './harbor';
+import { authoritativeDeckRigVisible } from './harbor_deck_stand_in_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
@@ -3425,6 +3433,18 @@ export class Renderer {
       if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) continue;
       this.createView(e);
       this.sampleCreatedViewType(createdViewTypes, e);
+      created++;
+    }
+    return created;
+  }
+
+  private createHarborDeckRiderViews(createdViewTypes: string[]): number {
+    let created = 0;
+    for (const entity of this.sim.entities.values()) {
+      if (this.views.has(entity.id) || !harborDeckRiderActive(entity)) continue;
+      if (!this.viewCreateRetry.canAttempt(entity.id, 'view', performance.now())) continue;
+      this.createView(entity);
+      this.sampleCreatedViewType(createdViewTypes, entity);
       created++;
     }
     return created;
@@ -6964,6 +6984,7 @@ export class Renderer {
     // entities that moved well outside the draw band. This avoids building
     // rig/nameplate DOM for the whole sim on the first rendered frame.
     createdViews += this.createRequiredViews(p, createdViewTypes);
+    createdViews += this.createHarborDeckRiderViews(createdViewTypes);
     this.collectMissingViewCandidates(p, this.entityViewCreateRangeSq, false);
     createdViews += this.createCandidateViews(this.runtimeViewCreateBudget(dt), createdViewTypes);
     this.doomedIds.length = 0;
@@ -6974,6 +6995,7 @@ export class Renderer {
         (!isPersistentPortalObject(e) &&
           id !== p.id &&
           id !== p.targetId &&
+          !harborDeckRiderActive(e) &&
           distSqXZ(e, p) > this.entityViewDestroyRangeSq)
       ) {
         this.doomedIds.push(id);
@@ -7067,6 +7089,7 @@ export class Renderer {
         cdz = e.pos.z - p.pos.z;
       const d2 = cdx * cdx + cdz * cdz;
       const isSelf = id === p.id;
+      const deckRiderActive = !isSelf && harborDeckRiderActive(e);
       // Pose carries information the player acts on (own feedback, the read on
       // the current target, pet combat, a cast windup telegraph) rather than
       // mere cosmetic smoothness: such an entity is exempt from BOTH the cadence
@@ -7088,7 +7111,10 @@ export class Renderer {
         // The authoritative rider is already parked at the destination ship
         // while the moving clone carries the voyage shots. The park cue drops
         // the clone under black, and this real rig returns on the next frame.
-        v.group.visible = !harborDeckStandInActive;
+        v.group.visible = authoritativeDeckRigVisible(
+          harborDeckStandInActive,
+          this.sceneCameraFocus !== null,
+        );
         v.isFar = false;
         v.visual?.setShadow(true);
         v.visual?.setProxyShadow(false);
@@ -7103,7 +7129,7 @@ export class Renderer {
         const showCutoff = v.group.visible
           ? this.entityViewDestroyRangeSq
           : this.entityViewCreateRangeSq;
-        if (d2 > showCutoff) {
+        if (!deckRiderActive && d2 > showCutoff) {
           v.group.visible = false;
           continue;
         }
@@ -7195,6 +7221,11 @@ export class Renderer {
         this.selfFacingLastTarget = r.lastTarget;
       }
       v.group.rotation.y = facing;
+      if (deckRiderActive) {
+        const riderPlan = harborDeckRiderVisualPlan(e, v.group);
+        applyHarborDeckRiderVisual(riderPlan, v.group);
+        if (import.meta.env.DEV) warnMissingHarborDeckRider(riderPlan, v.group);
+      }
 
       if (e.kind === 'object') {
         // The sim swaps delve interactable templates in place (pressure plate ->
