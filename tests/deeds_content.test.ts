@@ -58,9 +58,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 223 deeds worth 2740 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(223);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2740);
+  it('ships exactly 225 deeds worth 2760 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(225);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2760);
   });
 
   it('ships the audited per-category counts', () => {
@@ -128,6 +128,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // RARE_SLAIN_TEMPLATES coverage test below).
       'chr_marsh_rares_ii',
       'chr_peaks_rares_ii',
+      'chr_gleamstag',
+      'chr_hollow_rares',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -187,6 +189,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.chr_peaks_rares_ii.trigger).toEqual({
       kind: 'visits',
       markIds: ['slain:old_cragmaw', 'slain:shardlord_kazzix'],
+    });
+    expect(DEEDS.chr_gleamstag.renown).toBe(5);
+    expect(DEEDS.chr_gleamstag.trigger).toEqual({ kind: 'visit', markId: 'slain:gleamstag' });
+    expect(DEEDS.chr_hollow_rares.renown).toBe(10);
+    expect(DEEDS.chr_hollow_rares.trigger).toEqual({
+      kind: 'visits',
+      markIds: ['slain:old_marrowshell', 'slain:aurelhorn'],
     });
   });
 
@@ -342,12 +351,13 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined at the release/v0.30.0 base merge: the catalog appends the
   // Wildheart Basin dungeon deed pair (2 new deeds); no shipped
   // trigger or renown changed.
-  // Re-baselined again for the RARE_SLAIN_TEMPLATES coverage fix: two more
-  // appended deeds, chr_marsh_rares_ii (Grubjaw) and chr_peaks_rares_ii (Old
-  // Cragmaw, Shardlord Kazzix), covering three camp rares that shipped with
-  // their zones but were missing from both their zone's chr_*_rares deed and
-  // RARE_SLAIN_TEMPLATES. No shipped trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = 'PLACEHOLDER_RECOMPUTE';
+  // Re-baselined again for the RARE_SLAIN_TEMPLATES coverage fix: four more
+  // appended deeds, chr_marsh_rares_ii (Grubjaw), chr_peaks_rares_ii (Old
+  // Cragmaw, Shardlord Kazzix), chr_gleamstag, and chr_hollow_rares (Old
+  // Marrowshell, Aurelhorn), all uncredited camp rares found by the same
+  // coverage test after rebasing onto release/v0.33.0. No shipped trigger or
+  // renown changed.
+  const FROZEN_CATALOG_SHA256 = '15329b9c0bed71a46d009cb9dbe38db889dd55b235682f88001b775ae2c41fd1';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -541,7 +551,7 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_peaks_rares_ii');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_hollow_rares');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

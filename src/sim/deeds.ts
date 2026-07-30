@@ -216,6 +216,9 @@ export const RARE_SLAIN_TEMPLATES = new Set([
   'marrowlord_varkas',
   'old_cragmaw',
   'shardlord_kazzix',
+  'gleamstag',
+  'old_marrowshell',
+  'aurelhorn',
 ]);
 
 // Zone fishing catches that count as "a fish" for the chr_ first-cast deeds
