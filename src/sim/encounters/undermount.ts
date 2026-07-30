@@ -14,8 +14,10 @@
 // is the one ctx-dependent function (duo frenzy + wing-clear credit), mirroring
 // encounters/nythraxis.ts grantNythraxisLockout.
 
+import { NPCS } from '../data';
+import { createNpc } from '../entity';
 import type { SimContext } from '../sim_context';
-import { type Aura, dist2d, type Entity } from '../types';
+import { type Aura, dist2d, type Entity, type SimEvent, YELL_RANGE } from '../types';
 
 // Players within this many yards of the dead boss's spawn get the wing cleared.
 // Matches NYTHRAXIS_ROOM_RADIUS: large enough to cover the interior, small enough
@@ -63,6 +65,28 @@ export const EMBERFEED_HASTE_PER_STACK = 0.03; // permanent, uncapped (the aging
 const KEEPER_FRENZY_AURA_ID = 'undermount_keeper_frenzy';
 const KEEPER_FRENZY_HASTE = 0.5; // +50% attack speed while enraged (tuning)
 const KEEPER_FRENZY_DURATION = 90; // effectively the rest of the fight (tuning)
+
+const UNDERMOUNT_MAERIN_ID = 'runeseeker_maerin';
+const UNDERMOUNT_MAERIN_ENTRY_OFFSET = 12; // fixed draw-free entry distance (tuning)
+const UNDERMOUNT_MAERIN_LINE_DELAY = 2.6; // seconds between corpse yells (tuning)
+const UNDERMOUNT_MAERIN_CHANNEL_SECONDS = 600; // persists as door-opening flavor (tuning)
+const UNDERMOUNT_MAERIN_CHANNEL_ID = 'undermount_door_channel';
+
+const UNDERMOUNT_MAERIN_LINES: Readonly<Record<string, readonly string[]>> = {
+  undermount_wing1: [
+    "This craftsmanship... a whole guild's work, for a cult of arsonists? Something down here is worth hiding behind all this.",
+    'Beast provisions, wages, kennel feed... and the signature page torn out. Someone left in a hurry. North.',
+    'They are not making anything. They are keeping something ASLEEP until they are ready.',
+  ],
+  undermount_wing2: [
+    'These are not summoning wards. They are RESTRAINTS, and we have been CUTTING them. Every keeper we killed was a lock.',
+    'There was never a factory. There was only ever him, and a very good disguise. Go.',
+  ],
+  undermount_wing3: [
+    'Half-formed. We killed him before the forge could finish its work.',
+    'The fire is receding north along the vein. This is not over.',
+  ],
+};
 
 export interface UndermountWing {
   /** The DUNGEON_DEFS id for this wing's instance. */
@@ -179,6 +203,106 @@ function frenzyUndermountPartners(ctx: SimContext, wing: UndermountWing, dying: 
   }
 }
 
+function findUndermountMaerin(ctx: SimContext, boss: Entity): Entity | null {
+  for (const entity of ctx.entities.values()) {
+    if (
+      entity.templateId === UNDERMOUNT_MAERIN_ID &&
+      !entity.dead &&
+      dist2d(entity.spawnPos, boss.spawnPos) <= UNDERMOUNT_ROOM_RADIUS
+    ) {
+      return entity;
+    }
+  }
+  return null;
+}
+
+function spawnUndermountMaerin(
+  ctx: SimContext,
+  boss: Entity,
+  channelNextDoor: boolean,
+): { maerin: Entity; spawned: boolean } | null {
+  const existing = findUndermountMaerin(ctx, boss);
+  if (existing) return { maerin: existing, spawned: false };
+  const def = NPCS[UNDERMOUNT_MAERIN_ID];
+  if (!def) return null;
+  const entry = ctx.groundPos(boss.pos.x, boss.pos.z - UNDERMOUNT_MAERIN_ENTRY_OFFSET);
+  const maerin = createNpc(ctx.nextId++, def, entry);
+  maerin.level = boss.level;
+  maerin.hostile = false;
+  maerin.facing = 0;
+  maerin.prevFacing = 0;
+  maerin.spawnPos = { ...entry };
+  ctx.addEntity(maerin);
+  const instance = ctx.instances.find((claim) => claim.mobIds.includes(boss.id));
+  instance?.mobIds.push(maerin.id);
+
+  // One fixed, draw-free movement step gives the entry its walk-in direction
+  // without adding a new tick system or changing shared rng order.
+  ctx.moveToward(maerin, ctx.groundPos(boss.pos.x, boss.pos.z), maerin.moveSpeed);
+  if (channelNextDoor) {
+    maerin.castingAbility = UNDERMOUNT_MAERIN_CHANNEL_ID;
+    maerin.castTotal = UNDERMOUNT_MAERIN_CHANNEL_SECONDS;
+    maerin.castRemaining = UNDERMOUNT_MAERIN_CHANNEL_SECONDS;
+    maerin.castTargetId = null;
+    maerin.channeling = true;
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: maerin.id,
+      targetId: maerin.id,
+      school: 'arcane',
+      fx: 'nova',
+    });
+  }
+  return { maerin, spawned: true };
+}
+
+function maerinYellEvent(maerin: Entity, text: string, pid: number): SimEvent {
+  return {
+    type: 'chat',
+    fromPid: maerin.id,
+    from: maerin.name,
+    text,
+    channel: 'yell',
+    entityId: maerin.id,
+    pid,
+  };
+}
+
+function scheduleUndermountMaerinDialogue(
+  ctx: SimContext,
+  boss: Entity,
+  maerin: Entity,
+  lines: readonly string[],
+): void {
+  lines.forEach((text, index) => {
+    for (const meta of ctx.players.values()) {
+      const player = ctx.entities.get(meta.entityId);
+      if (!player || dist2d(player.pos, boss.pos) > YELL_RANGE) continue;
+      const event = maerinYellEvent(maerin, text, meta.entityId);
+      if (index === 0) {
+        ctx.emit(event);
+      } else {
+        ctx.delayedEvents.push({
+          at: ctx.time + index * UNDERMOUNT_MAERIN_LINE_DELAY,
+          event,
+          guard: () => ctx.entities.get(maerin.id) === maerin && !maerin.dead,
+        });
+      }
+    }
+  });
+}
+
+function startUndermountMaerinBeat(ctx: SimContext, boss: Entity, wing: UndermountWing): void {
+  const spawned = spawnUndermountMaerin(ctx, boss, wing.order < UNDERMOUNT_WINGS.length);
+  if (!spawned?.spawned) return;
+  scheduleUndermountMaerinDialogue(
+    ctx,
+    boss,
+    spawned.maerin,
+    UNDERMOUNT_MAERIN_LINES[wing.dungeonId] ?? [],
+  );
+}
+
 /**
  * Undermount wing boss-death hook, fired for every wing-boss death:
  * 1. Frenzy any surviving duo partner (Kiln Fury), the kill-together tension.
@@ -205,4 +329,5 @@ export function onUndermountBossDeath(ctx: SimContext, boss: Entity): void {
       }
     }
   }
+  startUndermountMaerinBeat(ctx, boss, wing);
 }

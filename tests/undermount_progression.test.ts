@@ -5,11 +5,12 @@
 // the PlayerMeta.undermountCleared state, and the clear-on-boss-death hook land.
 
 import { describe, expect, it } from 'vitest';
-import { ITEMS, QUEST_ORDER, QUESTS } from '../src/sim/data';
+import { ZONE3_QUEST_ORDER } from '../src/sim/content/zone3';
+import { CLASSES, ITEMS, QUESTS } from '../src/sim/data';
 import { onUndermountBossDeath } from '../src/sim/encounters/undermount';
 import { enterDungeon, instanceKeyFor } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
-import { CLASSES, type Entity } from '../src/sim/types';
+import type { Entity } from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -156,9 +157,12 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
       expect(yells.length, `${dungeonId} has 2 to 3 corpse lines`).toBeGreaterThanOrEqual(2);
       expect(yells.length, `${dungeonId} has 2 to 3 corpse lines`).toBeLessThanOrEqual(3);
 
-      const maerins = [...sim.entities.values()].filter(
-        (entity: AnyEntity) => entity.templateId === 'runeseeker_maerin' && !entity.dead,
-      );
+      const maerins = claim.mobIds
+        .map((entityId: number) => sim.entities.get(entityId))
+        .filter(
+          (entity: AnyEntity | undefined) =>
+            entity?.templateId === 'runeseeker_maerin' && !entity.dead,
+        );
       expect(maerins, `${dungeonId} owns one Maerin spawn`).toHaveLength(1);
       if (dungeonId !== 'undermount_wing3') {
         expect(maerins[0].channeling, 'Maerin channels the next wing door as flavor').toBe(true);
@@ -172,7 +176,7 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
   });
 
   it('authors the optional surface chain and no-stat Runeseeker Lantern reward', () => {
-    expect(QUEST_ORDER.slice(-3)).toEqual([
+    expect(ZONE3_QUEST_ORDER.slice(-3)).toEqual([
       'q_undermount_heat',
       'q_undermount_ledger',
       'q_undermount_descent',
@@ -209,7 +213,9 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     expect(new Set(Object.values(QUESTS.q_undermount_descent.itemRewards))).toEqual(
       new Set(['runeseekers_lantern']),
     );
-    expect(Object.keys(QUESTS.q_undermount_descent.itemRewards)).toEqual([...CLASSES]);
+    expect(new Set(Object.keys(QUESTS.q_undermount_descent.itemRewards))).toEqual(
+      new Set(Object.keys(CLASSES)),
+    );
 
     const lantern = ITEMS.runeseekers_lantern;
     expect(lantern.kind).toBe('held_offhand');

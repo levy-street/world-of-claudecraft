@@ -1857,6 +1857,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "families": [
       "murloc",
       "kobold",
+      "humanoid",
       "elemental"
     ]
   },
@@ -2067,7 +2068,7 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "id": "undermount_wing3",
     "isRaid": true,
     "suggestedPlayers": 10,
-    "min": 26,
+    "min": 24,
     "max": 26,
     "name": "Undermount: The Waking"
   }

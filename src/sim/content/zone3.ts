@@ -522,6 +522,30 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     color: 0x533566,
     componentTags: ['cloth'],
   },
+  wyrmcult_dig_foreman: {
+    id: 'wyrmcult_dig_foreman',
+    name: 'Wyrmcult Dig Foreman',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'humanoid',
+    elite: true,
+    // Surface pre-quest miniboss profile. Every number is tuning for PBE.
+    hpBase: 170,
+    hpPerLevel: 38,
+    dmgBase: 18,
+    dmgPerLevel: 3.2,
+    attackSpeed: 2.4,
+    armorPerLevel: 32,
+    moveSpeed: 6.5,
+    aggroRadius: 12,
+    loot: [
+      { copper: 250, chance: 1 },
+      { itemId: 'undermount_foreman_ledger', chance: 1, questId: 'q_undermount_ledger' },
+    ],
+    scale: 1.15,
+    color: 0x7d4f2a,
+    componentTags: ['cloth'],
+  },
   boneclad_revenant: {
     id: 'boneclad_revenant',
     name: 'Boneclad Revenant',
@@ -1319,16 +1343,22 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
 export const ZONE3_QUESTS: Record<string, QuestDef> = {
   q_undermount_heat: {
     id: 'q_undermount_heat',
-    name: 'The Heat That Should Not Be',
+    name: "The Heat That Shouldn't Be",
     giverNpcId: 'runeseeker_maerin',
     turnInNpcId: 'runeseeker_maerin',
     minLevel: 20,
-    text: 'I cannot read the dig-stones with zealots swarming them, $N. The Wyrmcult works this fissure day and night, and the rock is warm a hundred paces from any fire. Thin them out and buy me a quiet hour.',
+    text: 'The stones around this fissure are hot enough to blur the charcoal, $N. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.',
     completionText:
-      "Good. Now I can work. These are not a smith's workmarks, $N. They are wards, and something has been cutting them.",
+      "The lines all turn inward. These are not a smith's workmarks, $N. They are wards, and something has been cutting them from below.",
     objectives: [
-      { type: 'kill', targetMobId: 'wyrmcult_zealot', count: 6, label: 'Wyrmcult Zealots slain' },
+      {
+        type: 'interact',
+        targetObjectItemId: 'undermount_rune_rubbing',
+        count: 3,
+        label: 'Rune rubbings taken',
+      },
     ],
+    // Rewards are tuning for the optional level-20 chain.
     xpReward: 600,
     copperReward: 800,
     itemRewards: {},
@@ -1340,17 +1370,30 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'runeseeker_maerin',
     requiresQuest: 'q_undermount_heat',
     minLevel: 20,
-    text: 'The necromancers keep the count of what the forge produces. Break enough of them and I will piece it together. I want to know where all this heat is going.',
+    text: 'The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, $N. I want to know where every ingot, ration, and wage is going.',
     completionText:
-      'Downward. Every ingot, every ember, all of it spent below us, $N. They are not making anything up here. The forge is a lid.',
+      'Downward. Every ingot, every ember, all of it spent below us, $N. The forge produces nothing for the surface. It is feeding whatever the mountain buried.',
     objectives: [
       {
         type: 'kill',
-        targetMobId: 'wyrmcult_necromancer',
+        targetMobId: 'wyrmcult_dig_foreman',
+        count: 1,
+        label: 'Wyrmcult foreman slain',
+      },
+      {
+        type: 'kill',
+        targetMobId: 'wyrmcult_zealot',
         count: 3,
-        label: 'Wyrmcult Necromancers slain',
+        label: 'Wyrmcult guards slain',
+      },
+      {
+        type: 'collect',
+        itemId: 'undermount_foreman_ledger',
+        count: 1,
+        label: 'Foreman ledger recovered',
       },
     ],
+    // Rewards are tuning for the optional level-20 chain.
     xpReward: 800,
     copperReward: 1000,
     itemRewards: {},
@@ -1362,20 +1405,31 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'runeseeker_maerin',
     requiresQuest: 'q_undermount_ledger',
     minLevel: 20,
-    text: 'One ritual-leader still holds the inner circle. Put him down, and the cult cannot finish what they started before you reach the bottom.',
+    text: 'The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, $N. I am joining the descent.',
     completionText:
-      'There was never a factory, $N. There was only ever him, and a very good disguise. I am going down with you. Whatever they kept asleep, we are about to wake it early.',
+      'Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.',
     objectives: [
       {
-        type: 'kill',
-        targetMobId: 'wyrmcult_necromancer',
+        type: 'interact',
+        targetNpcId: 'runeseeker_maerin',
         count: 1,
-        label: 'Wyrmcult ritual-leader slain',
+        label: 'Speak with Runeseeker Maerin',
       },
     ],
+    // Rewards are tuning for the optional level-20 chain. The Lantern is cosmetic.
     xpReward: 1000,
     copperReward: 1500,
-    itemRewards: {},
+    itemRewards: {
+      warrior: 'runeseekers_lantern',
+      paladin: 'runeseekers_lantern',
+      hunter: 'runeseekers_lantern',
+      rogue: 'runeseekers_lantern',
+      priest: 'runeseekers_lantern',
+      shaman: 'runeseekers_lantern',
+      mage: 'runeseekers_lantern',
+      warlock: 'runeseekers_lantern',
+      druid: 'runeseekers_lantern',
+    },
   },
   q_highwatch_summons: {
     id: 'q_highwatch_summons',
@@ -2081,9 +2135,6 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
 };
 
 export const ZONE3_QUEST_ORDER = [
-  'q_undermount_heat',
-  'q_undermount_ledger',
-  'q_undermount_descent',
   'q_highwatch_summons',
   'q_stalkers',
   'q_stalker_pelts',
@@ -2119,6 +2170,9 @@ export const ZONE3_QUEST_ORDER = [
   'q_nythraxis_scourges_end',
   'q_prof_workorder_apothecary',
   'q_riding_lessons',
+  'q_undermount_heat',
+  'q_undermount_ledger',
+  'q_undermount_descent',
 ];
 
 // ---------------------------------------------------------------------------
@@ -2172,9 +2226,25 @@ export const ZONE3_CAMPS: CampDef[] = [
   { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 390, z: 594 }, radius: 0, count: 1 },
   { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 404, z: 598 }, radius: 0, count: 1 },
   { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 418, z: 602 }, radius: 0, count: 1 },
+  // Static Undermount dig-site opposition. Exact points draw no world-gen rng.
+  // Counts and positions are tuning for the optional surface chain.
+  { mobId: 'wyrmcult_dig_foreman', center: { x: -186, z: 615 }, radius: 0, count: 1 },
+  { mobId: 'wyrmcult_zealot', center: { x: -181, z: 611 }, radius: 0, count: 1 },
+  { mobId: 'wyrmcult_zealot', center: { x: -190, z: 609 }, radius: 0, count: 1 },
+  { mobId: 'wyrmcult_zealot', center: { x: -192, z: 617 }, radius: 0, count: 1 },
 ];
 
 export const ZONE3_OBJECTS: GroundObjectDef[] = [
+  {
+    itemId: 'undermount_rune_rubbing',
+    name: 'Undermount Rune Face',
+    // Fixed dig-site points, all positions are tuning.
+    positions: [
+      { x: -164, z: 601 },
+      { x: -160, z: 609 },
+      { x: -166, z: 616 },
+    ],
+  },
   {
     itemId: 'highwatch_summons',
     name: 'Highwatch Summons',
@@ -2244,6 +2314,41 @@ export const ZONE3_OBJECTS: GroundObjectDef[] = [
 
 export const ZONE3_ITEMS: Record<string, ItemDef> = {
   // --- quest items ---
+  undermount_rune_rubbing: {
+    id: 'undermount_rune_rubbing',
+    name: 'Undermount Rune Rubbing',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_undermount_heat',
+  },
+  undermount_foreman_ledger: {
+    id: 'undermount_foreman_ledger',
+    name: "Foreman's Undermount Ledger",
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_undermount_ledger',
+  },
+  runeseekers_lantern: {
+    id: 'runeseekers_lantern',
+    name: "Runeseeker's Lantern",
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'uncommon',
+    stats: {},
+    sellValue: 0,
+    soulbound: true,
+    requiredClass: [
+      'warrior',
+      'paladin',
+      'hunter',
+      'rogue',
+      'priest',
+      'shaman',
+      'mage',
+      'warlock',
+      'druid',
+    ],
+  },
   highwatch_summons: {
     id: 'highwatch_summons',
     name: 'Highwatch Summons',
