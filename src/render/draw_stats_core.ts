@@ -35,7 +35,7 @@ export interface DrawStatsAccumulator {
    * first call only establishes the baseline: its return value is a zero
    * frame, never the raw counter reading.
    */
-  beginFrame(read: DrawStatsCounters): DrawStatsCounters;
+  beginFrame(read: DrawStatsCounters, out?: DrawStatsCounters): DrawStatsCounters;
   /**
    * Exclude an out-of-band render (screenshot capture, prewarm pass) from the
    * next frame's delta. Contract: the caller resets the WebGL counters
@@ -59,22 +59,35 @@ const copyFrame = (read: DrawStatsCounters): DrawStatsCounters => ({
 export function createDrawStatsAccumulator(): DrawStatsAccumulator {
   let baseline: DrawStatsCounters | null = null;
   return {
-    beginFrame(read: DrawStatsCounters): DrawStatsCounters {
+    beginFrame(read: DrawStatsCounters, out?: DrawStatsCounters): DrawStatsCounters {
+      const frame = out ?? zeroFrame();
       if (baseline === null) {
         baseline = copyFrame(read);
-        return zeroFrame();
+        frame.calls = 0;
+        frame.triangles = 0;
+        frame.points = 0;
+        frame.lines = 0;
+        return frame;
       }
-      const delta: DrawStatsCounters = {
-        calls: Math.max(0, read.calls - baseline.calls),
-        triangles: Math.max(0, read.triangles - baseline.triangles),
-        points: Math.max(0, read.points - baseline.points),
-        lines: Math.max(0, read.lines - baseline.lines),
-      };
-      baseline = copyFrame(read);
-      return delta;
+      frame.calls = Math.max(0, read.calls - baseline.calls);
+      frame.triangles = Math.max(0, read.triangles - baseline.triangles);
+      frame.points = Math.max(0, read.points - baseline.points);
+      frame.lines = Math.max(0, read.lines - baseline.lines);
+      baseline.calls = read.calls;
+      baseline.triangles = read.triangles;
+      baseline.points = read.points;
+      baseline.lines = read.lines;
+      return frame;
     },
     noteOutOfBand(_read: DrawStatsCounters): void {
-      baseline = zeroFrame();
+      if (baseline) {
+        baseline.calls = 0;
+        baseline.triangles = 0;
+        baseline.points = 0;
+        baseline.lines = 0;
+      } else {
+        baseline = zeroFrame();
+      }
     },
   };
 }

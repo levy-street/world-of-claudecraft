@@ -362,7 +362,7 @@ export interface FoliageView {
   ): void;
   setGrassQuality(level: number): void;
   setModelQuality(level: number): void;
-  perfStats(): FoliagePerfStats;
+  perfStats(out?: FoliagePerfStats): FoliagePerfStats;
 }
 
 export interface FoliagePerfStats {
@@ -1655,7 +1655,7 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
 interface GrassRing {
   update(px: number, pz: number): void;
   setQuality(level: number): void;
-  perfStats(): FoliagePerfStats;
+  perfStats(out?: FoliagePerfStats): FoliagePerfStats;
 }
 
 interface GrassChunk {
@@ -1744,36 +1744,82 @@ function localGrassDisabled(): boolean {
   );
 }
 
-function emptyGrassStats(enabled: boolean, cacheLimit = 0): FoliagePerfStats {
-  return {
-    modelQuality: 1,
-    modelBuckets: 0,
-    modelVisibleBuckets: 0,
-    modelBucketsByLod: {},
-    modelVisibleByLod: {},
-    modelDraws: 0,
-    modelVisibleDraws: 0,
-    modelDrawsByLod: {},
-    modelVisibleDrawsByLod: {},
-    modelTriangles: 0,
-    modelVisibleTriangles: 0,
-    modelTrianglesByLod: {},
-    modelVisibleTrianglesByLod: {},
-    grassEnabled: enabled,
-    grassQuality: enabled ? 1 : 0,
-    grassActiveRadius: 0,
-    grassChunks: 0,
-    grassReadyChunks: 0,
-    grassVisibleChunks: 0,
-    grassQueuedChunks: 0,
-    grassTufts: 0,
-    grassVisibleTufts: 0,
-    grassBuiltChunks: 0,
-    grassDisposedChunks: 0,
-    grassLastBuildMs: 0,
-    grassBuildMs: 0,
-    grassCacheLimit: cacheLimit,
-  };
+function clearNumberRecord(record: Record<string, number>): void {
+  for (const key in record) delete record[key];
+}
+
+function copyNumberRecord(
+  out: Record<string, number>,
+  source: Readonly<Record<string, number>>,
+): void {
+  clearNumberRecord(out);
+  for (const key in source) out[key] = source[key];
+}
+
+function emptyGrassStats(
+  enabled: boolean,
+  cacheLimit = 0,
+  out?: FoliagePerfStats,
+): FoliagePerfStats {
+  const stats =
+    out ??
+    ({
+      modelQuality: 1,
+      modelBuckets: 0,
+      modelVisibleBuckets: 0,
+      modelBucketsByLod: {},
+      modelVisibleByLod: {},
+      modelDraws: 0,
+      modelVisibleDraws: 0,
+      modelDrawsByLod: {},
+      modelVisibleDrawsByLod: {},
+      modelTriangles: 0,
+      modelVisibleTriangles: 0,
+      modelTrianglesByLod: {},
+      modelVisibleTrianglesByLod: {},
+      grassEnabled: enabled,
+      grassQuality: enabled ? 1 : 0,
+      grassActiveRadius: 0,
+      grassChunks: 0,
+      grassReadyChunks: 0,
+      grassVisibleChunks: 0,
+      grassQueuedChunks: 0,
+      grassTufts: 0,
+      grassVisibleTufts: 0,
+      grassBuiltChunks: 0,
+      grassDisposedChunks: 0,
+      grassLastBuildMs: 0,
+      grassBuildMs: 0,
+      grassCacheLimit: cacheLimit,
+    } satisfies FoliagePerfStats);
+  stats.modelQuality = 1;
+  stats.modelBuckets = 0;
+  stats.modelVisibleBuckets = 0;
+  clearNumberRecord(stats.modelBucketsByLod);
+  clearNumberRecord(stats.modelVisibleByLod);
+  stats.modelDraws = 0;
+  stats.modelVisibleDraws = 0;
+  clearNumberRecord(stats.modelDrawsByLod);
+  clearNumberRecord(stats.modelVisibleDrawsByLod);
+  stats.modelTriangles = 0;
+  stats.modelVisibleTriangles = 0;
+  clearNumberRecord(stats.modelTrianglesByLod);
+  clearNumberRecord(stats.modelVisibleTrianglesByLod);
+  stats.grassEnabled = enabled;
+  stats.grassQuality = enabled ? 1 : 0;
+  stats.grassActiveRadius = 0;
+  stats.grassChunks = 0;
+  stats.grassReadyChunks = 0;
+  stats.grassVisibleChunks = 0;
+  stats.grassQueuedChunks = 0;
+  stats.grassTufts = 0;
+  stats.grassVisibleTufts = 0;
+  stats.grassBuiltChunks = 0;
+  stats.grassDisposedChunks = 0;
+  stats.grassLastBuildMs = 0;
+  stats.grassBuildMs = 0;
+  stats.grassCacheLimit = cacheLimit;
+  return stats;
 }
 
 function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
@@ -2323,8 +2369,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       buildQueuedChunks();
       retireStaleChunks();
     },
-    perfStats(): FoliagePerfStats {
-      const stats = emptyGrassStats(true, cacheLimit);
+    perfStats(out?: FoliagePerfStats): FoliagePerfStats {
+      const stats = emptyGrassStats(true, cacheLimit, out);
       stats.grassQuality = Math.round(quality * 100) / 100;
       stats.grassActiveRadius = activeRadius();
       stats.grassChunks = chunks.size;
@@ -2436,9 +2482,9 @@ export function buildFoliage(seed: number): FoliageView {
   const modelBucketsByLod: Record<string, number> = {};
   const modelDrawsByLod: Record<string, number> = {};
   const modelTrianglesByLod: Record<string, number> = {};
-  let modelVisibleByLod: Record<string, number> = {};
-  let modelVisibleDrawsByLod: Record<string, number> = {};
-  let modelVisibleTrianglesByLod: Record<string, number> = {};
+  const modelVisibleByLod: Record<string, number> = {};
+  const modelVisibleDrawsByLod: Record<string, number> = {};
+  const modelVisibleTrianglesByLod: Record<string, number> = {};
   let modelDraws = 0;
   let modelTriangles = 0;
   // Reused by the per-frame bucket cull below. Allocating this input inside the
@@ -2471,8 +2517,8 @@ export function buildFoliage(seed: number): FoliageView {
     ? {
         update(): void {},
         setQuality(): void {},
-        perfStats(): FoliagePerfStats {
-          return emptyGrassStats(false);
+        perfStats(out?: FoliagePerfStats): FoliagePerfStats {
+          return emptyGrassStats(false, 0, out);
         },
       }
     : buildGrassRing(group, seed);
@@ -2523,9 +2569,9 @@ export function buildFoliage(seed: number): FoliageView {
       modelVisibleBuckets = 0;
       modelVisibleDraws = 0;
       modelVisibleTriangles = 0;
-      modelVisibleByLod = {};
-      modelVisibleDrawsByLod = {};
-      modelVisibleTrianglesByLod = {};
+      clearNumberRecord(modelVisibleByLod);
+      clearNumberRecord(modelVisibleDrawsByLod);
+      clearNumberRecord(modelVisibleTrianglesByLod);
       // This walks 1k+ buckets every frame. Keep it indexed: the iterator/result
       // churn from `for...of` remained the dominant foliage allocation after the
       // cull input itself became reusable.
@@ -2561,21 +2607,21 @@ export function buildFoliage(seed: number): FoliageView {
         }
       }
     },
-    perfStats(): FoliagePerfStats {
-      const stats = grass.perfStats();
+    perfStats(out?: FoliagePerfStats): FoliagePerfStats {
+      const stats = grass.perfStats(out);
       stats.modelQuality = Math.round(modelQuality * 100) / 100;
       stats.modelBuckets = bucketMeshes.length;
       stats.modelVisibleBuckets = modelVisibleBuckets;
-      stats.modelBucketsByLod = { ...modelBucketsByLod };
-      stats.modelVisibleByLod = { ...modelVisibleByLod };
+      copyNumberRecord(stats.modelBucketsByLod, modelBucketsByLod);
+      copyNumberRecord(stats.modelVisibleByLod, modelVisibleByLod);
       stats.modelDraws = modelDraws;
       stats.modelVisibleDraws = modelVisibleDraws;
-      stats.modelDrawsByLod = { ...modelDrawsByLod };
-      stats.modelVisibleDrawsByLod = { ...modelVisibleDrawsByLod };
+      copyNumberRecord(stats.modelDrawsByLod, modelDrawsByLod);
+      copyNumberRecord(stats.modelVisibleDrawsByLod, modelVisibleDrawsByLod);
       stats.modelTriangles = modelTriangles;
       stats.modelVisibleTriangles = modelVisibleTriangles;
-      stats.modelTrianglesByLod = { ...modelTrianglesByLod };
-      stats.modelVisibleTrianglesByLod = { ...modelVisibleTrianglesByLod };
+      copyNumberRecord(stats.modelTrianglesByLod, modelTrianglesByLod);
+      copyNumberRecord(stats.modelVisibleTrianglesByLod, modelVisibleTrianglesByLod);
       return stats;
     },
   };

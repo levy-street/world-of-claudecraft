@@ -11,6 +11,7 @@ import {
   governorDrawSignal,
 } from '../src/render/draw_stats_core';
 import { GFX_CONFIG_VERSION } from '../src/render/gfx';
+import { assertAllocationStable } from './util/alloc_probe';
 
 const counters = (
   calls: number,
@@ -20,6 +21,24 @@ const counters = (
 ): DrawStatsCounters => ({ calls, triangles, points, lines });
 
 describe('draw_stats_core', () => {
+  it('fills one caller-owned frame counter on the composer hot path', () => {
+    const acc = createDrawStatsAccumulator();
+    const read = counters(0, 0, 0, 0);
+    const out = counters(0, 0, 0, 0);
+    acc.beginFrame(read, out);
+    expect(() =>
+      assertAllocationStable(
+        () => {
+          read.calls++;
+          read.triangles += 10;
+          return acc.beginFrame(read, out);
+        },
+        64,
+        'draw stats frame',
+      ),
+    ).not.toThrow();
+  });
+
   it('accumulates across passes: consecutive monotonic reads become per-frame deltas', () => {
     const acc = createDrawStatsAccumulator();
     acc.beginFrame(counters(0, 0, 0, 0)); // baseline capture, return discarded

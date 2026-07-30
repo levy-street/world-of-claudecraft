@@ -111,7 +111,8 @@ import { trackWebGLContext } from './context_release';
 import {
   animatesEveryFrame,
   animCadenceFrames,
-  characterLodBands,
+  type CharacterLodBands,
+  characterLodBandsInto,
   crowdLodScaleSq,
   midAnimCadence,
   showsStaticFarMesh,
@@ -193,7 +194,13 @@ import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { LightPulses } from './light_pulses';
-import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
+import {
+  type LocoState,
+  type LocoTrack,
+  newLocoState,
+  newLocoTrack,
+  updateLocomotionInto,
+} from './locomotion';
 import {
   type MageBarrierState,
   type MageBarrierVisual,
@@ -247,7 +254,16 @@ import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
 import { isOwnedPetHostile } from './reaction';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
-import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
+import {
+  RenderBudgetGovernor,
+  type RenderBudgetSample,
+  type RenderBudgetState,
+} from './render_budget';
+import {
+  beginRendererFrameTelemetry,
+  type RendererFramePhaseMs,
+  type RendererWorldPhaseMs,
+} from './renderer_frame_telemetry_core';
 import { buildRiftRankBadge } from './rift_rank';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import {
@@ -270,7 +286,7 @@ import {
   type SkyView,
 } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
-import { freezeStaticMatrices } from './static_matrix';
+import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from './static_matrix';
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
@@ -284,7 +300,7 @@ import {
 import { buildTerrain, type TerrainView } from './terrain';
 import { uploadDataTextureInChunks } from './texture_upload';
 import { sparkleTexture } from './textures';
-import { targetIntensity } from './travel_speed_fx';
+import { targetIntensityFromValues } from './travel_speed_fx';
 import { TravelSpeedFxPainter } from './travel_speed_fx_painter';
 import {
   BALL_RADIUS,
@@ -299,6 +315,11 @@ import { ValeCupPracticeSky } from './vale_cup_practice_sky';
 import { buildValeCupStadium, type ValeCupStadiumView } from './vale_cup_stadium';
 import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_team_ring';
 import { SCHOOL_COLORS, Vfx } from './vfx';
+import {
+  finishViewCandidates,
+  type ViewCandidate,
+  writeViewCandidate,
+} from './view_candidate_pool_core';
 import { ViewCreateRetryGate } from './view_create_retry';
 import { type WarriorCastVisualPlan, warriorCastVisualPlan } from './warrior_cast_fx_core';
 import { RecklessSkullPainter } from './warrior_cast_fx_painter';
@@ -602,8 +623,6 @@ type RendererPhaseStats = Record<
   RendererPhase,
   { count: number; avg: number; p95: number; max: number }
 >;
-type RendererFramePhaseMs = Record<RendererPhase, number>;
-type RendererWorldPhaseMs = Record<RendererWorldPhase, number>;
 type RenderDiagnosticsCategory = string;
 type RenderableDiagnosticObject = THREE.Object3D & {
   isMesh?: boolean;
@@ -634,12 +653,6 @@ type TextureBackedMaterial = THREE.Material & {
   gradientMap?: THREE.Texture | null;
 };
 type TextureMaterialKey = keyof Omit<TextureBackedMaterial, keyof THREE.Material>;
-interface ViewCandidate {
-  e: Entity;
-  d2: number;
-  priority: number;
-}
-
 export interface RenderDiagnosticsCategoryStats {
   objects: number;
   draws: number;
@@ -831,14 +844,32 @@ export interface EntityView {
   comboPips: HTMLDivElement[]; // the COMBO_PIP_MAX pip cells, lit left-to-right
   nameplateDisplay: string;
   nameplateTransform: string;
+  nameplateScreenX: number;
+  nameplateScreenY: number;
   nameplateSig: string;
+  nameplateStaticName: string;
+  nameplateStaticColor: string | null;
+  nameplateStaticHpDisplay: string;
+  nameplateStaticMarker: string;
+  nameplateStaticMarkerClass: string;
+  nameplateStaticOpacity: string;
+  nameplateStaticFrame: string;
+  nameplateStaticGuild: string;
+  nameplateStaticDevOutline: string | null;
+  nameplateStaticAi: boolean;
+  nameplateStaticI18nRevision: number;
   /** Bitset of the last-applied combat-state classes, for per-frame write elision. */
   nameplateStateMask: number;
   /** Last-applied friendly-pet class, diffed separately from the combat-state bitset. */
   nameplateFriendlyPet: boolean;
   nameplateHpWidth: string;
-  titleSig: string; // cheap-diff for the deed-title subtitle (lang|deed id)
+  nameplateHp: number;
+  nameplateMaxHp: number;
+  titleSig: string; // cheap-diff for the deed-title subtitle (i18n revision|deed id)
+  nameplateTitleId: string;
+  nameplateTitleI18nRevision: number;
   comboSig: string; // cheap-diff for the combo pip row
+  nameplateComboCount: number;
   tierEl: HTMLImageElement; // $WOC holder-tier flair badge (other players)
   tierValue: number; // last-applied holderTier, to diff cheaply
   devTierEl: HTMLImageElement; // developer-badge flair badge (other players)
@@ -848,6 +879,8 @@ export interface EntityView {
   aiEl: HTMLSpanElement; // operator-set [AI] account tag, inline before the name
   levelEl: HTMLSpanElement; // mob level badge (e.g. "[5]"), inline before the name; hidden for non-mobs
   levelSig: string; // cheap-diff for the level badge (levelText|color)
+  nameplateLevelText: string;
+  nameplateLevelColor: string;
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
@@ -872,6 +905,7 @@ export interface EntityView {
   // locomotion-state hysteresis so a one-frame speed dip can't reset the
   // walk clip (see locomotion.ts)
   loco: LocoTrack;
+  locoState: LocoState;
   // spatial-audio state: distance travelled since the last footfall, and edge
   // latches for jump/land/water-entry detection.
   stepAccum: number;
@@ -1120,6 +1154,7 @@ export class Renderer {
   // Travel-form speed-illusion overlay (presentation only; see travel_speed_fx*).
   private travelSpeedFx: TravelSpeedFxPainter;
   private nameplatePainter: NameplatePainter;
+  private readonly nameplateBatch = document.createDocumentFragment();
   // Last local-player XZ, to derive ground speed for the speed cue (yd/s).
   private lastLocalPos: { x: number; z: number } | null = null;
   // Cached prefers-reduced-motion query. `.matches` stays live as the OS setting
@@ -1173,6 +1208,11 @@ export class Renderer {
   private recklessSkulls = new RecklessSkullPainter();
   private groundAimReticle: GroundAimReticleVisual;
   raycaster = new THREE.Raycaster();
+  private readonly raycastNdc = new THREE.Vector2();
+  private readonly raycastGroundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  private readonly raycastHit = new THREE.Vector3();
+  private readonly raycastHits: THREE.Intersection[] = [];
+  private readonly directHitIds: number[] = [];
   clickTargets: THREE.Object3D[] = [];
   // Gather-node meshes (#1866), raycast separately from `clickTargets`/`pick()`:
   // nodes are static content keyed by string id, not entities keyed by numeric
@@ -1238,6 +1278,21 @@ export class Renderer {
   private entityViewCreateRangeSq = ENTITY_VIEW_CREATE_RANGE_SQ;
   private entityViewDestroyRangeSq = ENTITY_VIEW_DESTROY_RANGE_SQ;
   private renderBudgetGovernor!: RenderBudgetGovernor;
+  private renderBudgetState!: RenderBudgetState;
+  private readonly renderBudgetSample: RenderBudgetSample = {
+    dt: 0,
+    frameMs: 0,
+    totalMs: 0,
+    submitMs: 0,
+    calls: 0,
+    triangles: 0,
+    grassVisibleTufts: 0,
+    grassVisibleChunks: 0,
+    activeViews: 0,
+    createdViews: 0,
+    minRenderScale: 1,
+    maxRenderScale: 1,
+  };
   // Last frame-budget pressure (render_budget.ts), fed to the character LOD plan
   // so the animated far band is the first extra cost surrendered on a machine
   // already at its budget. Cosmetic only: the fairness floor for an actionable
@@ -1279,6 +1334,15 @@ export class Renderer {
   private tmpV = new THREE.Vector3();
   private tmpPuff = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
+  private viewCandidatePool: ViewCandidate[] = [];
+  private readonly characterLodPlan: CharacterLodBands = {
+    shadowRangeSq: 0,
+    lodRangeSq: 0,
+    staticRangeSq: 0,
+    actionableStaticRangeSq: 0,
+    midCadence: 1,
+    farCadence: 1,
+  };
   // Persistent scratch for the sloppy-pick column build. pick() is also the
   // per-frame hover-cursor path (updateHoverCursor in main.ts), so a fresh array
   // here would be per-frame garbage on every cursor-over-empty-ground frame.
@@ -1543,6 +1607,9 @@ export class Renderer {
   // seed-bound ground sampler, built once so the per-frame Vale Cup ring update
   // allocates no closure (see the drape path in vale_cup_team_ring.ts).
   private groundSample = (x: number, z: number): number => groundHeight(x, z, this.sim.cfg.seed);
+  private selectionDrapeSupportY = 0;
+  private selectionGroundSample = (x: number, z: number): number =>
+    Math.max(this.groundSample(x, z), this.selectionDrapeSupportY);
 
   private lowGfx: boolean;
   private post: PostPipeline | null = null;
@@ -1588,7 +1655,7 @@ export class Renderer {
   private renderDiagnosticsLastPrograms = 0;
   private renderDiagnosticsLastTextures = 0;
   private appliedBudgetLevels: RenderBudgetState['levels'] | null = null;
-  private lastQualityChange: Omit<RendererQualityChangeStats, 'ageMs'> | null = null;
+  private lastQualityChange: RendererQualityChangeStats | null = null;
   private visualPool = new Map<string, CharacterVisual[]>();
   private pooledVisualCount = 0;
   private objectPool = new Map<string, PooledObjectView[]>();
@@ -1650,7 +1717,7 @@ export class Renderer {
       budget: GFX.budget,
       enabled: GFX.autoGovernor,
     });
-    this.renderBudgetGovernor.reset(
+    this.renderBudgetState = this.renderBudgetGovernor.reset(
       this.effectiveRenderScale,
       this.renderBudgetMinScale(),
       this.renderBudgetMaxScale(),
@@ -1690,6 +1757,9 @@ export class Renderer {
       0.1,
       950,
     );
+    // updateCamera owns the one explicit camera matrix refresh. Prevent each
+    // WebGLRenderer pass from repeating it for an unchanged camera.
+    this.camera.matrixWorldAutoUpdate = false;
     // Nameplate Three/DOM ownership lives in the painter; it reads the
     // viewport / mob-nameplate toggle lazily (the renderer reassigns viewport on
     // resize) and borrows the renderer's PvP reaction check.
@@ -1937,12 +2007,12 @@ export class Renderer {
     this.scene.add(this.terrainView.group);
     // Terrain chunks never move after build (the LOD update only toggles
     // visibility): stop their per-frame matrix recompose (static_matrix.ts).
-    freezeStaticMatrices(this.terrainView.group);
+    freezeStaticSubtreeMatrices(this.terrainView.group);
     bd('terrain');
     this.waterView = buildWater(this.sim.cfg.seed, this.webgl);
     setRenderCategory(this.waterView.group, 'water');
     this.scene.add(this.waterView.group);
-    freezeStaticMatrices(this.waterView.group); // water animates via uniforms, never transforms
+    freezeStaticSubtreeMatrices(this.waterView.group); // water animates via uniforms, never transforms
     bd('water');
 
     this.foliage = buildFoliage(this.sim.cfg.seed);
@@ -2046,7 +2116,7 @@ export class Renderer {
     setRenderCategory(this.eastbrookTownView.group, 'props');
     this.scene.add(this.eastbrookTownView.group);
     bd('eastbrook-town');
-    freezeStaticMatrices(this.eastbrookTownView.group);
+    freezeStaticSubtreeMatrices(this.eastbrookTownView.group);
 
     // Map-editor play-test: freely placed GLB models (cosmetic, render-only). Loads
     // async and pops in; absent for the built-in world. The view supports live
@@ -2067,7 +2137,7 @@ export class Renderer {
     setRenderCategory(gatherNodes.group, 'props');
     this.scene.add(gatherNodes.group);
     // Baked into world space at build with no per-frame update(), same as props.
-    freezeStaticMatrices(gatherNodes.group);
+    freezeStaticSubtreeMatrices(gatherNodes.group);
     this.gatherNodeMeshes = gatherNodes.group.children;
     bd('jail-gather');
 
@@ -3026,13 +3096,12 @@ export class Renderer {
     this.adaptiveGrace = 1.0;
     this.adaptiveCooldown = 0.5;
     this.stableFrameTime = 0;
-    this.applyRenderBudgetState(
-      this.renderBudgetGovernor.reset(
-        this.effectiveRenderScale,
-        this.renderBudgetMinScale(),
-        this.renderBudgetMaxScale(),
-      ),
+    this.renderBudgetState = this.renderBudgetGovernor.reset(
+      this.effectiveRenderScale,
+      this.renderBudgetMinScale(),
+      this.renderBudgetMaxScale(),
     );
+    this.applyRenderBudgetState(this.renderBudgetState);
     this.applyResolution();
   }
 
@@ -3060,20 +3129,23 @@ export class Renderer {
     const previousScale = this.effectiveRenderScale;
     const previousLevels = this.appliedBudgetLevels;
     const levelsChanged = previousLevels
-      ? Object.entries(state.levels).some(
-          ([key, value]) =>
-            Math.abs(value - previousLevels[key as keyof RenderBudgetState['levels']]) >= 0.001,
-        )
+      ? Math.abs(state.levels.grass - previousLevels.grass) >= 0.001 ||
+        Math.abs(state.levels.foliage - previousLevels.foliage) >= 0.001 ||
+        Math.abs(state.levels.vfx - previousLevels.vfx) >= 0.001 ||
+        Math.abs(state.levels.lighting - previousLevels.lighting) >= 0.001 ||
+        Math.abs(state.levels.resolution - previousLevels.resolution) >= 0.001
       : true;
     if (levelsChanged) {
+      const nextLevels = { ...state.levels };
       this.lastQualityChange = {
         atMs: performance.now(),
+        ageMs: 0,
         mode: state.mode,
         reason: state.reason,
-        previousLevels: previousLevels ?? state.levels,
-        levels: state.levels,
+        previousLevels: previousLevels ?? nextLevels,
+        levels: nextLevels,
       };
-      this.appliedBudgetLevels = { ...state.levels };
+      this.appliedBudgetLevels = nextLevels;
     }
     this.effectiveRenderScale = Math.min(
       this.renderBudgetMaxScale(),
@@ -3204,7 +3276,7 @@ export class Renderer {
       contextRestored: this.contextRestoredCount,
       phaseMs: this.rendererPhaseStats(),
       renderDiagnostics: this.lastFrameStats.renderDiagnostics,
-      lastFrame: this.lastFrameStats,
+      lastFrame: this.snapshotLastFrameStats(),
       prewarm: this.lastPrewarmStats,
     };
   }
@@ -3296,6 +3368,28 @@ export class Renderer {
     this.phaseSamples[phase].push(Math.min(250, ms));
   }
 
+  private markRendererPhase(
+    out: RendererFramePhaseMs,
+    phase: RendererPhase,
+    start: number,
+  ): number {
+    const now = performance.now();
+    const ms = now - start;
+    out[phase] = roundMs(ms);
+    this.recordRendererPhase(phase, ms);
+    return now;
+  }
+
+  private markRendererWorldPhase(
+    out: RendererWorldPhaseMs,
+    phase: RendererWorldPhase,
+    start: number,
+  ): number {
+    const now = performance.now();
+    out[phase] += roundMs(now - start);
+    return now;
+  }
+
   private rendererPhaseStats(): RendererPhaseStats {
     return {
       setup: summarizeMs(this.phaseSamples.setup.toArray()),
@@ -3304,6 +3398,42 @@ export class Renderer {
       nameplates: summarizeMs(this.phaseSamples.nameplates.toArray()),
       submit: summarizeMs(this.phaseSamples.submit.toArray()),
       total: summarizeMs(this.phaseSamples.total.toArray()),
+    };
+  }
+
+  private snapshotLastFrameStats(): RendererFrameStats {
+    const frame = this.lastFrameStats;
+    const foliage = frame.foliage;
+    const qualityChange = frame.lastQualityChange;
+    return {
+      phaseMs: { ...frame.phaseMs },
+      worldPhaseMs: { ...frame.worldPhaseMs },
+      foliage: {
+        ...foliage,
+        modelBucketsByLod: { ...foliage.modelBucketsByLod },
+        modelVisibleByLod: { ...foliage.modelVisibleByLod },
+        modelDrawsByLod: { ...foliage.modelDrawsByLod },
+        modelVisibleDrawsByLod: { ...foliage.modelVisibleDrawsByLod },
+        modelTrianglesByLod: { ...foliage.modelTrianglesByLod },
+        modelVisibleTrianglesByLod: { ...foliage.modelVisibleTrianglesByLod },
+      },
+      renderDiagnostics: frame.renderDiagnostics,
+      cameraPosition: { ...frame.cameraPosition },
+      playerPosition: { ...frame.playerPosition },
+      biome: frame.biome,
+      lastQualityChange: qualityChange
+        ? {
+            ...qualityChange,
+            previousLevels: { ...qualityChange.previousLevels },
+            levels: { ...qualityChange.levels },
+          }
+        : null,
+      createdViews: frame.createdViews,
+      createdViewTypes: [...frame.createdViewTypes],
+      removedViews: frame.removedViews,
+      candidateViews: frame.candidateViews,
+      activeViews: frame.activeViews,
+      visibleViews: frame.visibleViews,
     };
   }
 
@@ -3341,7 +3471,7 @@ export class Renderer {
   }
 
   private collectRenderDiagnostics(): RenderDiagnosticsSnapshot {
-    if (!this.renderDiagnosticsEnabled) return emptyRenderDiagnosticsSnapshot();
+    if (!this.renderDiagnosticsEnabled) return this.renderDiagnosticsSnapshot;
     const info = this.webgl.info;
     const programs = info.programs?.length ?? 0;
     const textures = info.memory.textures;
@@ -3463,7 +3593,7 @@ export class Renderer {
   }
 
   private renderDiagnosticsForFrame(now: number, force = false): RenderDiagnosticsSnapshot {
-    if (!this.renderDiagnosticsEnabled) return emptyRenderDiagnosticsSnapshot();
+    if (!this.renderDiagnosticsEnabled) return this.renderDiagnosticsSnapshot;
     if (force) {
       this.renderDiagnosticsSnapshot = this.collectRenderDiagnostics();
       this.renderDiagnosticsNextSampleAt = now + RENDER_DIAGNOSTICS_SAMPLE_MS;
@@ -3494,8 +3624,6 @@ export class Renderer {
   private updateAdaptiveResolution(dt: number): void {
     if (!Number.isFinite(dt) || dt <= 0) return;
     const frameMs = Math.min(250, dt * 1000);
-    const previousSubmitMs = this.lastFrameStats.phaseMs.submit;
-    const previousTotalMs = this.lastFrameStats.phaseMs.total;
     const info = this.webgl.info;
     // Do not let the live governor resize the drawing buffers during play.
     // Three/WebGL can turn setSize/setPixelRatio into a large synchronous
@@ -3511,25 +3639,24 @@ export class Renderer {
     const drawSignal = this.drawStats
       ? governorDrawSignal(GFX.tier, this.drawStatsFrame)
       : info.render;
-    const state = this.renderBudgetGovernor.update({
-      dt,
-      frameMs,
-      totalMs: previousTotalMs,
-      submitMs: previousSubmitMs,
-      // Non-composer profiles read info.render live, where three's per-render
-      // auto-reset drops the off-screen water-simulation passes: add them back
-      // (1 draw call / 2 triangles per pass). Composer tiers pass drawSignal
-      // through untouched, so the frozen legacy constant stays exact and the
-      // water passes already inside drawStatsFrame are never counted twice.
-      calls: drawSignal.calls + (this.drawStats ? 0 : this.lastWaterSimulationPasses),
-      triangles: drawSignal.triangles + (this.drawStats ? 0 : this.lastWaterSimulationPasses * 2),
-      grassVisibleTufts: this.lastFrameStats.foliage.grassVisibleTufts,
-      grassVisibleChunks: this.lastFrameStats.foliage.grassVisibleChunks,
-      activeViews: this.lastFrameStats.activeViews,
-      createdViews: this.lastFrameStats.createdViews,
-      minRenderScale: lockedRenderScale,
-      maxRenderScale: lockedRenderScale,
-    });
+    const sample = this.renderBudgetSample;
+    sample.dt = dt;
+    sample.frameMs = frameMs;
+    // Non-composer profiles read info.render live, where three's per-render
+    // auto-reset drops the off-screen water-simulation passes: add them back
+    // (1 draw call / 2 triangles per pass). Composer tiers pass drawSignal
+    // through untouched, so the frozen legacy constant stays exact and the
+    // water passes already inside drawStatsFrame are never counted twice.
+    sample.calls = drawSignal.calls + (this.drawStats ? 0 : this.lastWaterSimulationPasses);
+    sample.triangles =
+      drawSignal.triangles + (this.drawStats ? 0 : this.lastWaterSimulationPasses * 2);
+    sample.grassVisibleTufts = this.lastFrameStats.foliage.grassVisibleTufts;
+    sample.grassVisibleChunks = this.lastFrameStats.foliage.grassVisibleChunks;
+    sample.activeViews = this.lastFrameStats.activeViews;
+    sample.createdViews = this.lastFrameStats.createdViews;
+    sample.minRenderScale = lockedRenderScale;
+    sample.maxRenderScale = lockedRenderScale;
+    const state = this.renderBudgetGovernor.update(sample, this.renderBudgetState);
     this.frameMsEma = state.frameMsEma;
     this.adaptiveCooldown = state.cooldownSeconds;
     this.stableFrameTime = state.stableSeconds;
@@ -3579,22 +3706,24 @@ export class Renderer {
     rangeSq: number,
     includeRequired: boolean,
   ): void {
-    this.viewCandidates.length = 0;
+    let count = 0;
     for (const e of this.sim.entities.values()) {
       if (this.views.has(e.id)) continue;
       const required = e.id === center.id || e.id === center.targetId;
       if (required && !includeRequired) continue;
       const d2 = distSqXZ(e, center);
       if (!required && d2 > rangeSq) continue;
-      this.viewCandidates.push({
-        e,
+      writeViewCandidate(
+        this.viewCandidatePool,
+        this.viewCandidates,
+        count,
+        e.id,
         d2,
-        priority: this.viewCandidatePriority(e, center, d2),
-      });
+        this.viewCandidatePriority(e, center, d2),
+      );
+      count++;
     }
-    if (this.viewCandidates.length > 1) {
-      this.viewCandidates.sort((a, b) => a.priority - b.priority || a.d2 - b.d2 || a.e.id - b.e.id);
-    }
+    finishViewCandidates(this.viewCandidates, count);
   }
 
   private createdViewType(e: Entity): string {
@@ -3606,18 +3735,29 @@ export class Renderer {
     if (into.length < VIEW_CREATED_TYPE_SAMPLE_LIMIT) into.push(this.createdViewType(e));
   }
 
-  private createRequiredViews(player: Entity, createdViewTypes: string[]): number {
-    let created = 0;
-    const requiredIds = [player.id, player.targetId].filter((id): id is number => id !== null);
-    for (const id of requiredIds) {
-      const e = this.sim.entities.get(id);
-      if (!e || this.views.has(e.id)) continue;
-      if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) continue;
-      this.createView(e);
-      this.sampleCreatedViewType(createdViewTypes, e);
-      created++;
-    }
-    return created;
+  private createRequiredView(
+    id: number | null,
+    createdViewTypes: string[],
+    nameplateParent: ParentNode,
+  ): number {
+    if (id === null) return 0;
+    const e = this.sim.entities.get(id);
+    if (!e || this.views.has(e.id)) return 0;
+    if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) return 0;
+    this.createView(e, nameplateParent);
+    this.sampleCreatedViewType(createdViewTypes, e);
+    return 1;
+  }
+
+  private createRequiredViews(
+    player: Entity,
+    createdViewTypes: string[],
+    nameplateParent: ParentNode = this.nameplateLayer,
+  ): number {
+    return (
+      this.createRequiredView(player.id, createdViewTypes, nameplateParent) +
+      this.createRequiredView(player.targetId, createdViewTypes, nameplateParent)
+    );
   }
 
   private async createMandatoryLandmarkViews(
@@ -3674,17 +3814,19 @@ export class Renderer {
     limit: number,
     createdViewTypes: string[],
     deadlineMs = Infinity,
+    nameplateParent: ParentNode = this.nameplateLayer,
   ): number {
     const max = Math.max(0, Math.floor(limit));
     let created = 0;
     for (const candidate of this.viewCandidates) {
       if (created >= max || performance.now() >= deadlineMs) break;
-      if (this.views.has(candidate.e.id)) continue;
+      const e = this.sim.entities.get(candidate.id);
+      if (!e || this.views.has(e.id)) continue;
       // a recent failed build (assets unavailable) sits out its cooldown so it
       // cannot burn a budget slot every frame
-      if (!this.viewCreateRetry.canAttempt(candidate.e.id, 'view', performance.now())) continue;
-      this.createView(candidate.e);
-      this.sampleCreatedViewType(createdViewTypes, candidate.e);
+      if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) continue;
+      this.createView(e, nameplateParent);
+      this.sampleCreatedViewType(createdViewTypes, e);
       created++;
     }
     return created;
@@ -5567,7 +5709,7 @@ export class Renderer {
     return group;
   }
 
-  private createView(e: Entity): void {
+  private createView(e: Entity, nameplateParent: ParentNode = this.nameplateLayer): void {
     const group = new THREE.Group();
     setRenderCategory(group, `entity:${e.kind}`);
     let visual: CharacterVisual | null = null;
@@ -5926,7 +6068,7 @@ export class Renderer {
       hpBar,
       castBar,
     );
-    this.nameplateLayer.appendChild(np);
+    nameplateParent.appendChild(np);
 
     // Object views gate their own casters. Character shadows live in visual,
     // while separately composed accessories use this same distance gate.
@@ -5992,16 +6134,36 @@ export class Renderer {
       portal,
       nameplateDisplay: 'none',
       nameplateTransform: '',
+      nameplateScreenX: Number.NaN,
+      nameplateScreenY: Number.NaN,
       nameplateSig: '',
+      nameplateStaticName: '',
+      nameplateStaticColor: null,
+      nameplateStaticHpDisplay: '',
+      nameplateStaticMarker: '',
+      nameplateStaticMarkerClass: '',
+      nameplateStaticOpacity: '',
+      nameplateStaticFrame: '',
+      nameplateStaticGuild: '',
+      nameplateStaticDevOutline: null,
+      nameplateStaticAi: false,
+      nameplateStaticI18nRevision: 0,
       nameplateStateMask: 0,
       nameplateFriendlyPet: false,
       nameplateHpWidth: '',
+      nameplateHp: Number.NaN,
+      nameplateMaxHp: Number.NaN,
       titleSig: '',
+      nameplateTitleId: '',
+      nameplateTitleI18nRevision: 0,
       comboSig: '',
+      nameplateComboCount: -1,
       tierValue: 0,
       devTierValue: 0,
       discordAvatarSig: '',
       levelSig: '',
+      nameplateLevelText: '',
+      nameplateLevelColor: '',
       objectCasters,
       viewLights,
       shadowOn: true,
@@ -6021,6 +6183,7 @@ export class Renderer {
       weaponStowed: false,
       liveScale: e.scale,
       loco: newLocoTrack(),
+      locoState: newLocoState(),
       stepAccum: 0,
       waterContactSeen: false,
       waterContactActive: false,
@@ -7029,29 +7192,20 @@ export class Renderer {
   ): void {
     const totalStart = performance.now();
     let phaseStart = totalStart;
-    const framePhaseMs = emptyFramePhaseMs();
-    const worldPhaseMs = emptyWorldPhaseMs();
+    const frameStats = this.lastFrameStats;
+    const framePhaseMs = frameStats.phaseMs;
+    const worldPhaseMs = frameStats.worldPhaseMs;
+    beginRendererFrameTelemetry(framePhaseMs, worldPhaseMs, this.renderBudgetSample);
     let createdViews = 0;
     let removedViews = 0;
-    const createdViewTypes: string[] = [];
-    const markPhase = (phase: RendererPhase): void => {
-      const t = performance.now();
-      const ms = t - phaseStart;
-      framePhaseMs[phase] = roundMs(ms);
-      this.recordRendererPhase(phase, ms);
-      phaseStart = t;
-    };
-    const markWorldPhase = (phase: RendererWorldPhase, start: number): number => {
-      const t = performance.now();
-      worldPhaseMs[phase] += roundMs(t - start);
-      return t;
-    };
+    const createdViewTypes = frameStats.createdViewTypes;
+    createdViewTypes.length = 0;
 
     // Composer tiers: snapshot the previous frame's accumulated draw counters
     // (all composer + shadow passes) and re-arm the baseline BEFORE the governor
     // reads its draw signal below. The WebGL counters themselves stay monotonic
     // (autoReset is off); out-of-band renders reset them via discardOutOfBandDraws.
-    if (this.drawStats) this.drawStatsFrame = this.drawStats.beginFrame(this.webgl.info.render);
+    if (this.drawStats) this.drawStats.beginFrame(this.webgl.info.render, this.drawStatsFrame);
     this.updateAdaptiveResolution(dt);
     this.viewportPollTimer += dt;
     if (this.viewportPollTimer >= 0.25) {
@@ -7088,14 +7242,22 @@ export class Renderer {
       selfMotion,
       selfAuthoritativeDiscontinuity,
     );
-    markPhase('setup');
+    phaseStart = this.markRendererPhase(framePhaseMs, 'setup', phaseStart);
 
     // dynamic worlds: create nearby views lazily and drop views for leavers or
     // entities that moved well outside the draw band. This avoids building
     // rig/nameplate DOM for the whole sim on the first rendered frame.
-    createdViews += this.createRequiredViews(p, createdViewTypes);
+    createdViews += this.createRequiredViews(p, createdViewTypes, this.nameplateBatch);
     this.collectMissingViewCandidates(p, this.entityViewCreateRangeSq, false);
-    createdViews += this.createCandidateViews(this.runtimeViewCreateBudget(dt), createdViewTypes);
+    createdViews += this.createCandidateViews(
+      this.runtimeViewCreateBudget(dt),
+      createdViewTypes,
+      Infinity,
+      this.nameplateBatch,
+    );
+    if (this.nameplateBatch.childNodes.length > 0) {
+      this.nameplateLayer.appendChild(this.nameplateBatch);
+    }
     this.doomedIds.length = 0;
     for (const id of this.views.keys()) {
       const e = sim.entities.get(id);
@@ -7132,7 +7294,8 @@ export class Renderer {
     // count (the one-frame lag is imperceptible); recount as we go this frame.
     // The plan also carries the animated far band (articulated rig at a low
     // cadence between `lodRangeSq` and `staticRangeSq`) and its cadences.
-    const lodBands = characterLodBands(
+    const lodBands = characterLodBandsInto(
+      this.characterLodPlan,
       this.lastVisibleRigCount,
       ENTITY_SHADOW_RANGE_SQ,
       ENTITY_LOD_RANGE_SQ,
@@ -7363,11 +7526,18 @@ export class Renderer {
           v.sparkle.scale.set(pulse, pulse, 1);
           v.sparkle.material.rotation = this.time * 0.8;
         }
+        let wardstoneLit = false;
         if (
           vis &&
-          (e.objectItemId === 'bastion_ward_stone' || e.objectItemId === 'soulshard_pillar') &&
-          e.auras.some((a) => a.id === 'nythraxis_wardstone_lit')
+          (e.objectItemId === 'bastion_ward_stone' || e.objectItemId === 'soulshard_pillar')
         ) {
+          for (const aura of e.auras) {
+            if (aura.id !== 'nythraxis_wardstone_lit') continue;
+            wardstoneLit = true;
+            break;
+          }
+        }
+        if (wardstoneLit) {
           this.vfx.castSparkle(e.id, 'arcane', dt * 2.6);
         }
         if (v.portal && vis) {
@@ -7649,7 +7819,7 @@ export class Renderer {
         vz = az - v.lastZ;
       v.lastX = ax;
       v.lastZ = az;
-      const loco = updateLocomotion(v.loco, vx, vz, facing, dt);
+      const loco = updateLocomotionInto(v.locoState, v.loco, vx, vz, facing, dt);
       const moving = loco.moving;
       v.fireballTravelVisual = syncFireballTravelVisual(
         v.fireballTravelVisual,
@@ -8141,8 +8311,10 @@ export class Renderer {
     // CAUTION: getWorldPosition on a node inside a GATED subtree does not heal
     // the chain in r165, hence the light-owner exemption; any new world-space
     // read of a view child must use group.position or exempt the view too.)
+    let visibleViews = 0;
     for (const [, v] of this.views) {
       v.group.matrixWorldAutoUpdate = v.group.visible || this.lightOwnerGroups.has(v.group);
+      if (v.group.visible) visibleViews++;
     }
 
     // selection ring
@@ -8166,6 +8338,7 @@ export class Renderer {
           // surface, not buried at terrain height under it.
           const supportY = supportHeightAt(seed, cx, cz, 0.5, tv.group.position.y + 0.01);
           const gy = Math.max(groundHeight(cx, cz, seed), supportY);
+          this.selectionDrapeSupportY = supportY;
           this.selectionRing.position.set(cx, gy, cz);
           this.selectionRing.scale.setScalar(target.scale);
           const drape = drapeRingLocalY(
@@ -8175,7 +8348,7 @@ export class Renderer {
             gy,
             target.scale,
             0.08,
-            (sx, sz) => Math.max(groundHeight(sx, sz, seed), supportY),
+            this.selectionGroundSample,
             this.selectionRingDrapeY,
           );
           const ringPos = this.selectionRingMesh.geometry.getAttribute(
@@ -8228,17 +8401,15 @@ export class Renderer {
       if (p.dead) {
         this.targetCone.group.visible = false;
       } else {
-        const seed = this.sim.cfg.seed;
         const lv = this.views.get(p.id);
         const facing = lv ? lv.group.rotation.y : p.facing;
-        const sample = (sx: number, sz: number): number => groundHeight(sx, sz, seed);
         drapeConeWorld(
           this.targetCone.localXZ,
           selfPos.x,
           selfPos.z,
           facing,
           0.07,
-          sample,
+          this.groundSample,
           this.targetCone.worldXYZ,
         );
         this.targetCone.pos.needsUpdate = true;
@@ -8249,14 +8420,14 @@ export class Renderer {
           selfPos.z,
           0,
           0.07,
-          sample,
+          this.groundSample,
           this.targetCone.ringWorldXYZ,
         );
         this.targetCone.ringPos.needsUpdate = true;
         this.targetCone.group.visible = true;
       }
     }
-    markPhase('entities');
+    phaseStart = this.markRendererPhase(framePhaseMs, 'entities', phaseStart);
 
     // Corpse beacon: a soft light pillar over the local player's body while their
     // spirit runs back to it (the ghost run). Built once, then just repositioned.
@@ -8311,7 +8482,7 @@ export class Renderer {
       light.intensity = base + Math.sin(this.time * 11 + i * 1.7) * 2.5 * (base / 11);
     }
     this.budgetFireLights(p.pos.x, p.pos.z);
-    worldStart = markWorldPhase('lights', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'lights', worldStart);
 
     // water shimmer (low-tier texture scroll; shader water rides uTime)
     this.lastWaterSimulationPasses = this.waterView.update(
@@ -8320,7 +8491,7 @@ export class Renderer {
       this.camera.position.z,
       (this.scene.fog as THREE.Fog).far,
     );
-    worldStart = markWorldPhase('water', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'water', worldStart);
     this.vfx.update(dt);
     // Racing line (cosmetic; reads the self race view only).
     this.raceLine.update(this.sim.mountRaceView(), this.time, dt);
@@ -8348,10 +8519,10 @@ export class Renderer {
     for (const view of this.yumiMazeViews.values()) view.update(this.sim);
     this.yumiTeamMarkers.update(this.sim, this.views);
     this.tickValeCupFx(dt);
-    worldStart = markWorldPhase('vfx', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'vfx', worldStart);
 
     this.updateCamera(selfPos, dt);
-    worldStart = markWorldPhase('camera', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'camera', worldStart);
     // Fully-fogged terrain chunks / tree buckets are dropped before the
     // frustum; camera-ghost props hide against the current eye-to-camera ray.
     const fogFar = (this.scene.fog as THREE.Fog).far;
@@ -8361,7 +8532,7 @@ export class Renderer {
     this.queueVisibleZonePrepares(Math.max(fogFar, this.lastRequestedFogFar));
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
     this.updateZoneFeatureVisibility(fogFar);
-    worldStart = markWorldPhase('terrain', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'terrain', worldStart);
     this.propsView.update(
       this.camera.position.x,
       this.camera.position.y,
@@ -8389,7 +8560,7 @@ export class Renderer {
       this.cameraLookAt.y,
       this.cameraLookAt.z,
     );
-    worldStart = markWorldPhase('props', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'props', worldStart);
     this.foliage.update(
       p.pos.x,
       p.pos.z,
@@ -8404,7 +8575,7 @@ export class Renderer {
       this.lastRequestedFogNear,
       this.lastRequestedFogFar,
     );
-    worldStart = markWorldPhase('foliage', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.motes.update(p.pos.x, p.pos.z, dt);
     this.realmFlora?.update(this.time);
@@ -8433,16 +8604,16 @@ export class Renderer {
       this.groundSample,
       this.views,
     );
-    worldStart = markWorldPhase('fish', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'fish', worldStart);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
-    worldStart = markWorldPhase('ambience', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'ambience', worldStart);
     // shadow frustum follows the player
     const pv = this.views.get(p.id);
     if (pv) {
       const pp = pv.group.position;
       this.updateKeyLight(pp);
     }
-    worldStart = markWorldPhase('shadows', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'shadows', worldStart);
     // sky dome + sun disc ride along with the camera
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     // The dome rides the camera, so it also serves Wildheart's open-air field.
@@ -8460,12 +8631,12 @@ export class Renderer {
       dt,
       this.fogState === 'outdoor' ? zoneBiomeAt(p.pos.x, p.pos.z) : null,
     );
-    worldStart = markWorldPhase('sky', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'sky', worldStart);
     this.updateCelestialSprites();
-    worldStart = markWorldPhase('sunSprites', worldStart);
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'sunSprites', worldStart);
     this.updateGodRays();
-    worldStart = markWorldPhase('godRays', worldStart);
-    markPhase('world');
+    worldStart = this.markRendererWorldPhase(worldPhaseMs, 'godRays', worldStart);
+    phaseStart = this.markRendererPhase(framePhaseMs, 'world', phaseStart);
 
     this.nameplateTimer += dt;
     // Static-preset tiered cadence: the nameplate refresh interval follows
@@ -8483,7 +8654,7 @@ export class Renderer {
     if (fullNameplatePass) this.nameplateTimer = 0;
     this.nameplatePainter.update(fullNameplatePass);
     this.updateChatBubbles();
-    markPhase('nameplates');
+    phaseStart = this.markRendererPhase(framePhaseMs, 'nameplates', phaseStart);
     this.updateTravelSpeedFx(p, selfPos, dt);
     // Fiesta screen shake: trauma^2 jitter offsets the camera for the draw only.
     let shakeX = 0,
@@ -8499,7 +8670,7 @@ export class Renderer {
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
     }
     this.updateOpaqueDrawOrder(dt);
-    this.camera.updateMatrixWorld();
+    if (shakeX !== 0 || shakeY !== 0) this.camera.updateMatrixWorld();
     this.vfx.prepareDraw(this.camera);
     if (this.post) this.post.render();
     else this.webgl.render(this.scene, this.camera);
@@ -8507,49 +8678,32 @@ export class Renderer {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;
     }
-    markPhase('submit');
+    phaseStart = this.markRendererPhase(framePhaseMs, 'submit', phaseStart);
     const totalMs = performance.now() - totalStart;
     framePhaseMs.total = roundMs(totalMs);
     this.recordRendererPhase('total', totalMs);
-    let visibleViews = 0;
-    for (const v of this.views.values()) {
-      if (v.group.visible) visibleViews++;
-    }
     const afterSubmit = performance.now();
-    const renderDiagnostics = this.renderDiagnosticsForFrame(
+    frameStats.renderDiagnostics = this.renderDiagnosticsForFrame(
       afterSubmit,
       framePhaseMs.submit >= RENDER_STALL_ATTRIBUTION_MS,
     );
-    const qualityChange = this.lastQualityChange
-      ? {
-          ...this.lastQualityChange,
-          ageMs: roundMs(afterSubmit - this.lastQualityChange.atMs),
-        }
-      : null;
-    this.lastFrameStats = {
-      phaseMs: framePhaseMs,
-      worldPhaseMs,
-      foliage: this.foliage.perfStats(),
-      renderDiagnostics,
-      cameraPosition: {
-        x: roundMs(this.camera.position.x),
-        y: roundMs(this.camera.position.y),
-        z: roundMs(this.camera.position.z),
-      },
-      playerPosition: {
-        x: roundMs(p.pos.x),
-        y: roundMs(p.pos.y),
-        z: roundMs(p.pos.z),
-      },
-      biome: zoneBiomeAt(p.pos.x, p.pos.z),
-      lastQualityChange: qualityChange,
-      createdViews,
-      createdViewTypes,
-      removedViews,
-      candidateViews: this.viewCandidates.length,
-      activeViews: this.views.size,
-      visibleViews,
-    };
+    this.foliage.perfStats(frameStats.foliage);
+    frameStats.cameraPosition.x = roundMs(this.camera.position.x);
+    frameStats.cameraPosition.y = roundMs(this.camera.position.y);
+    frameStats.cameraPosition.z = roundMs(this.camera.position.z);
+    frameStats.playerPosition.x = roundMs(p.pos.x);
+    frameStats.playerPosition.y = roundMs(p.pos.y);
+    frameStats.playerPosition.z = roundMs(p.pos.z);
+    frameStats.biome = zoneBiomeAt(p.pos.x, p.pos.z);
+    if (this.lastQualityChange) {
+      this.lastQualityChange.ageMs = roundMs(afterSubmit - this.lastQualityChange.atMs);
+    }
+    frameStats.lastQualityChange = this.lastQualityChange;
+    frameStats.createdViews = createdViews;
+    frameStats.removedViews = removedViews;
+    frameStats.candidateViews = this.viewCandidates.length;
+    frameStats.activeViews = this.views.size;
+    frameStats.visibleViews = visibleViews;
     if (this.hitchLogEnabled && this.hitchSkipNextFrame) {
       this.hitchSkipNextFrame = false;
     } else if (this.hitchLogEnabled) {
@@ -8585,12 +8739,13 @@ export class Renderer {
     } else {
       this.lastLocalPos = { x: selfPos.x, z: selfPos.z };
     }
-    const inTravelForm = p.auras.some((a) => a.kind === 'form_travel');
-    const target = targetIntensity({
-      inTravelForm,
-      speed,
-      reducedMotion: this.reducedMotion(),
-    });
+    let inTravelForm = false;
+    for (const aura of p.auras) {
+      if (aura.kind !== 'form_travel') continue;
+      inTravelForm = true;
+      break;
+    }
+    const target = targetIntensityFromValues(inTravelForm, speed, this.reducedMotion());
     this.travelSpeedFx.update(target, dt);
   }
 
@@ -8852,7 +9007,7 @@ export class Renderer {
     this.terrainView = buildTerrain(this.sim.cfg.seed);
     setRenderCategory(this.terrainView.group, 'terrain');
     this.scene.add(this.terrainView.group);
-    freezeStaticMatrices(this.terrainView.group);
+    freezeStaticSubtreeMatrices(this.terrainView.group);
     // A full editor rebuild replaces the zone cache along with the geometry.
     // Re-run the same preparation path for every resident zone so the renderer
     // cannot mistake an empty replacement view for an already-ready region.
@@ -8901,7 +9056,7 @@ export class Renderer {
     this.waterView = buildWater(this.sim.cfg.seed, this.webgl);
     setRenderCategory(this.waterView.group, 'water');
     this.scene.add(this.waterView.group);
-    freezeStaticMatrices(this.waterView.group);
+    freezeStaticSubtreeMatrices(this.waterView.group);
     for (const zone of ZONES) {
       if (!this.preparedZones.has(zone.id)) continue;
       void this.waterView.ensureZone(zone).then((meshes) => {
@@ -9231,14 +9386,15 @@ export class Renderer {
   // horizontal plane at the player's foot height — robust on the gentle terrain
   // here and far cheaper than raycasting the terrain mesh.
   groundPoint(clientX: number, clientY: number, planeY: number): { x: number; z: number } | null {
-    const ndc = new THREE.Vector2(
+    this.raycastNdc.set(
       (clientX / window.innerWidth) * 2 - 1,
       -(clientY / window.innerHeight) * 2 + 1,
     );
-    this.raycaster.setFromCamera(ndc, this.camera);
-    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -planeY);
-    const hit = new THREE.Vector3();
-    return this.raycaster.ray.intersectPlane(plane, hit) ? { x: hit.x, z: hit.z } : null;
+    this.raycaster.setFromCamera(this.raycastNdc, this.camera);
+    this.raycastGroundPlane.constant = -planeY;
+    return this.raycaster.ray.intersectPlane(this.raycastGroundPlane, this.raycastHit)
+      ? { x: this.raycastHit.x, z: this.raycastHit.z }
+      : null;
   }
 
   // Click/tap-to-harvest (#1866): raycasts the static gather-node meshes
@@ -9248,12 +9404,17 @@ export class Renderer {
   // by string id, not entities keyed by numeric id, so widening `pick()`'s
   // return contract would force every existing caller to re-discriminate.
   pickGatherNode(clientX: number, clientY: number): string | null {
-    const ndc = new THREE.Vector2(
+    this.raycastNdc.set(
       (clientX / this.viewport.width) * 2 - 1,
       -(clientY / this.viewport.height) * 2 + 1,
     );
-    this.raycaster.setFromCamera(ndc, this.camera);
-    return resolveGatherNodePick(this.raycaster.intersectObjects(this.gatherNodeMeshes, true));
+    this.raycaster.setFromCamera(this.raycastNdc, this.camera);
+    const hits = this.raycastHits;
+    hits.length = 0;
+    this.raycaster.intersectObjects(this.gatherNodeMeshes, true, hits);
+    const result = resolveGatherNodePick(hits);
+    hits.length = 0;
+    return result;
   }
 
   pick(clientX: number, clientY: number): number | null {
@@ -9267,13 +9428,16 @@ export class Renderer {
   // click that lands on a node must not be stolen by the sloppy assist below)
   // can slot the node raycast in between this and pickSloppy.
   pickDirect(clientX: number, clientY: number): number | null {
-    const ndc = new THREE.Vector2(
+    this.raycastNdc.set(
       (clientX / this.viewport.width) * 2 - 1,
       -(clientY / this.viewport.height) * 2 + 1,
     );
-    this.raycaster.setFromCamera(ndc, this.camera);
-    const hits = this.raycaster.intersectObjects(this.clickTargets, true);
-    const directHitIds: number[] = [];
+    this.raycaster.setFromCamera(this.raycastNdc, this.camera);
+    const hits = this.raycastHits;
+    hits.length = 0;
+    this.raycaster.intersectObjects(this.clickTargets, true, this.raycastHits);
+    const directHitIds = this.directHitIds;
+    directHitIds.length = 0;
     for (const hit of hits) {
       let o: THREE.Object3D | null = hit.object;
       while (o) {
@@ -9295,6 +9459,7 @@ export class Renderer {
         o = o.parent;
       }
     }
+    hits.length = 0;
     if (directHitIds.length === 0) return null;
     return resolveDirectPickEntityId(directHitIds, this.sim.entities, this.sim.player.targetId);
   }

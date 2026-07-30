@@ -650,6 +650,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the touch consumables quick bar, only while the row is expanded',
   },
   {
+    call: 'this.xpBarViewCache.resolve',
+    band: 'frame',
+    gate: '',
+    surface: 'none',
+    why: 'derives the localized XP view only when its scalar inputs or i18n revision change',
+  },
+  {
     call: 'this.xpBarPainter.paint',
     band: 'frame',
     gate: '',

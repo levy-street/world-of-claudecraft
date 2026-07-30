@@ -124,7 +124,7 @@ for (let i = 0; i < SPRITE_FILES.length; i++) {
 
 // The composed atlas canvas, kept module-level and reused. A SECOND Vfx in the
 // same page is real (the editor viewport's reload() builds a fresh Renderer, and
-// each Renderer owns a Vfx), and composeAtlasCanvas() releases its source
+// each Renderer owns a Vfx), and composeParticleAtlas() releases its source
 // sprites, so recomposing would silently paint all 16 cells as fallback discs.
 // Retaining the one 1024x1024 canvas instead of 16 decoded sources is also the
 // cheaper half of that trade.
@@ -177,7 +177,7 @@ function composeParticleAtlas(): ComposedParticleAtlas {
   // uploaded to the GPU) are dead weight from here on: ~16 MB retained for
   // nothing, on a process whose memory ceiling is what kills world entry on
   // 4 GB iPhones. Safe to drop because nothing recomposes this canvas (see
-  // atlasCanvas above) and no context-restore path re-reads the sources: a lost
+  // composedAtlas above) and no context-restore path re-reads the sources: a lost
   // WebGL context is a dead session here, handled out of band by the entry crash
   // guard, never re-uploaded from CPU-side copies.
   for (let i = 0; i < SPRITE_FILES.length; i++) {

@@ -270,10 +270,15 @@ describe('main.ts resume wiring', () => {
 
   it('re-stamps on hide and pagehide via the freshness-gated refresh', () => {
     expect(mainTs).toContain(
-      "if (document.visibilityState === 'hidden') {\n      console.info('[entry-diag] page hidden; entry probe cleared as a lifecycle transition');\n      refreshPlayMarker(Date.now());",
+      "if (document.visibilityState === 'hidden') {\n      refreshPlayMarker(Date.now());",
     );
-    expect(mainTs).toContain("window.addEventListener('pagehide', (event) => {");
-    expect(mainTs).toContain('console.info(`[entry-diag] pagehide persisted=');
+    expect(mainTs).toContain("window.addEventListener('pagehide', () => {");
+    // Both lifecycle moments disarm the probe. Pinned as behavior rather than
+    // alongside a console echo: those echoes fired on every tab switch and were
+    // removed as log noise, which has no bearing on what this test guards.
+    expect(mainTs).toContain(
+      'refreshPlayMarker(Date.now());\n      // A page that leaves the foreground mid-entry',
+    );
     // The same hide/pagehide moments also disarm the world-entry crash probe: leaving
     // the foreground (or a deliberate reload) is not a foreground entry crash, so it
     // must never cost the player a graphics tier (entry_crash_guard.ts).
