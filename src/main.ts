@@ -1208,6 +1208,9 @@ async function startGame(
     renderer.showDevBadges = settings.get('showDevBadges');
     renderer.showOwnNameplate = settings.get('showOwnNameplate');
     renderer.showPlayerNameplates = settings.get('showPlayerNameplates');
+    renderer.showAuraSigils = settings.get('showAuraSigils');
+    renderer.auraSigilOpacity = settings.get('auraSigilOpacity');
+    renderer.auraSigilScale = settings.get('auraSigilScale');
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
     // front of the player, for tuning the targeting angle/radius (tab_target.ts).
     if (import.meta.env.DEV && new URLSearchParams(location.search).get('targetcone') === '1') {
@@ -2119,6 +2122,10 @@ async function startGame(
       renderer.showPlayerNameplates = settings.set('showPlayerNameplates', !!value);
       return;
     }
+    if (key === 'showAuraSigils') {
+      renderer.showAuraSigils = settings.set('showAuraSigils', !!value);
+      return;
+    }
     if (key === 'invertLookY') {
       input.setInvertLookY(settings.set('invertLookY', !!value));
       return;
@@ -2183,6 +2190,12 @@ async function startGame(
         break;
       case 'renderScale':
         renderer.setRenderScale(v);
+        break;
+      case 'auraSigilOpacity':
+        renderer.auraSigilOpacity = v;
+        break;
+      case 'auraSigilScale':
+        renderer.auraSigilScale = v;
         break;
       case 'fullscreen':
         v >= 0.5 ? requestPreferredFullscreen() : exitBrowserFullscreen();

@@ -324,6 +324,9 @@ const GENERAL_KEYS = [
   'showItemLevel',
   'showOwnNameplate',
   'showPlayerNameplates',
+  'showAuraSigils',
+  'auraSigilOpacity',
+  'auraSigilScale',
 ];
 const FRAMES_KEYS = [
   'playerFrameScale',

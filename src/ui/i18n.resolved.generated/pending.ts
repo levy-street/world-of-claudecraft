@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
+  "es_ES": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
+  "fr_FR": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
+  "fr_CA": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
+  "de_DE": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
+  "nl_NL": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
+  "pl_PL": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
+  "id_ID": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
+  "tr_TR": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
+  "sv_SE": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
+  "vi_VN": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ],
+  "da_DK": [
+    "hudChrome.options.auraSigilOpacity",
+    "hudChrome.options.auraSigilScale",
+    "hudChrome.options.showAuraSigils"
+  ]
 };

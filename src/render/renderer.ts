@@ -189,6 +189,12 @@ import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features'
 import { LightPulses } from './light_pulses';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import {
+  type AuraSigilState,
+  type AuraSigilVisual,
+  auraSigilStateForAuras,
+  syncAuraSigilVisual,
+} from './aura_sigil_visual';
+import {
   type MageBarrierState,
   type MageBarrierVisual,
   mageBarrierStateForAura,
@@ -781,6 +787,7 @@ export interface EntityView {
   temporalHourglassVisual: TemporalHourglassVisual | null;
   frostNovaRootVisual: FrostNovaRootVisual | null; // Atadura de Hielo restraint at the feet
   mageBarrierVisual: MageBarrierVisual | null; // personal mage absorb shell, built lazily
+  auraSigilVisual: AuraSigilVisual | null; // ground sigil for an exclusive self-buff, built lazily
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
@@ -1452,6 +1459,14 @@ export class Renderer {
     theme: 'frost',
     value: 0,
   };
+  private readonly auraSigilStateScratch: AuraSigilState = {
+    id: '',
+    school: 'holy',
+  };
+  /** Player-facing aura-sigil switches, pushed in from main.ts like the nameplate flags. */
+  showAuraSigils = true;
+  auraSigilOpacity = 0.65;
+  auraSigilScale = 1;
   private glacialFrontVisual!: GlacialFrontVisual;
   private fishingBobbers!: FishingBobberVisual;
   private weather: Weather;
@@ -5729,6 +5744,7 @@ export class Renderer {
       temporalHourglassVisual: null,
       frostNovaRootVisual: null,
       mageBarrierVisual: null,
+      auraSigilVisual: null,
       height,
       clickTarget,
       nameplate: np,
@@ -6707,6 +6723,7 @@ export class Renderer {
     v.temporalHourglassVisual?.dispose();
     v.frostNovaRootVisual?.dispose();
     v.mageBarrierVisual?.dispose();
+    v.auraSigilVisual?.dispose();
     this.views.delete(id);
   }
 
@@ -6951,6 +6968,12 @@ export class Renderer {
         if (isFrostNovaRootAura(a)) hasFrostNovaRoot = true;
         mageBarrierState ??= mageBarrierStateForAura(a, this.mageBarrierStateScratch);
       }
+      // Persistent exclusive self-buffs (paladin auras, warrior stances/shouts,
+      // hunter aspects) mark their CASTER with a ground sigil. Derived from the
+      // same mirrored aura list; sourceId keeps a buffed party member clean.
+      const auraSigilState = this.showAuraSigils
+        ? auraSigilStateForAuras(id, e.auras, this.auraSigilStateScratch)
+        : null;
       const polyed = hasPoly;
       const bear = !polyed && hasBear;
       const ghostWolf = !polyed && !bear && hasGhostWolf;
@@ -7212,6 +7235,15 @@ export class Renderer {
         v.height,
         mageBarrierState,
         dt,
+      );
+      v.auraSigilVisual = syncAuraSigilVisual(
+        v.auraSigilVisual,
+        v.group,
+        v.height,
+        auraSigilState,
+        dt,
+        this.auraSigilOpacity,
+        this.auraSigilScale,
       );
       const iceBlockActivated = v.iceBlockVisual?.activatedThisFrame === true;
 
