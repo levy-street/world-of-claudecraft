@@ -2205,8 +2205,14 @@ export const ZONE3_CAMPS: CampDef[] = [
   // x=0 approach road, so it is nudged east to keep the central path clear; the
   // tents still flank the gate.
   { mobId: 'wyrmcult_zealot', center: { x: 55, z: 820 }, radius: 20, count: 8 },
-  { mobId: 'wyrmcult_zealot', center: { x: 34, z: 845 }, radius: 16, count: 6 },
-  { mobId: 'wyrmcult_necromancer', center: { x: 40, z: 855 }, radius: 14, count: 5 },
+  { mobId: 'wyrmcult_zealot', center: { x: 34, z: 845 }, radius: 16, count: 3 },
+  // The dig-site camp rehomes three existing zealot spawns rather than adding
+  // shared-stream wanderers. Population and world-gen draw cadence stay fixed.
+  { mobId: 'wyrmcult_zealot', center: { x: -186, z: 615 }, radius: 16, count: 3 },
+  { mobId: 'wyrmcult_necromancer', center: { x: 40, z: 855 }, radius: 14, count: 4 },
+  // The foreman replaces one existing necromancer spawn in the same creation
+  // slot, preserving roster size and the shared idle-wander draw cadence.
+  { mobId: 'wyrmcult_dig_foreman', center: { x: -186, z: 615 }, radius: 14, count: 1 },
   // Revenants: the old battlefield (Revenant Fields). The second pack used to sit
   // at (-15, 860), right where the x=0 Sanctum Approach road ends and only ~20yd
   // from the gate, so (aggroRadius 11) it jumped players entering/exiting the
@@ -2226,12 +2232,6 @@ export const ZONE3_CAMPS: CampDef[] = [
   { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 390, z: 594 }, radius: 0, count: 1 },
   { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 404, z: 598 }, radius: 0, count: 1 },
   { mobId: STABLE_HORSE_TEMPLATE_ID, center: { x: 418, z: 602 }, radius: 0, count: 1 },
-  // Static Undermount dig-site opposition. Exact points draw no world-gen rng.
-  // Counts and positions are tuning for the optional surface chain.
-  { mobId: 'wyrmcult_dig_foreman', center: { x: -186, z: 615 }, radius: 0, count: 1 },
-  { mobId: 'wyrmcult_zealot', center: { x: -181, z: 611 }, radius: 0, count: 1 },
-  { mobId: 'wyrmcult_zealot', center: { x: -190, z: 609 }, radius: 0, count: 1 },
-  { mobId: 'wyrmcult_zealot', center: { x: -192, z: 617 }, radius: 0, count: 1 },
 ];
 
 export const ZONE3_OBJECTS: GroundObjectDef[] = [
