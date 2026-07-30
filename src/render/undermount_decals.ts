@@ -139,11 +139,12 @@ export class UndermountDecals {
       visual.chilled.visible = (mask & UNDERMOUNT_DECAL.chilled) !== 0;
       visual.forgeheat.position.y = FLOOR_LIFT;
       visual.forgeheat.scale.setScalar(1.55 * entity.scale);
-      for (const glyph of [visual.scorched, visual.chilled]) {
-        glyph.position.y = MARK_LIFT * entity.scale;
-        glyph.scale.setScalar(0.72 * entity.scale);
-        glyph.quaternion.copy(camera.quaternion);
-      }
+      visual.scorched.position.y = MARK_LIFT * entity.scale;
+      visual.scorched.scale.setScalar(0.72 * entity.scale);
+      visual.scorched.quaternion.copy(camera.quaternion);
+      visual.chilled.position.y = MARK_LIFT * entity.scale;
+      visual.chilled.scale.setScalar(0.72 * entity.scale);
+      visual.chilled.quaternion.copy(camera.quaternion);
     }
     for (const [id, visual] of this.entities) {
       if (visual.seenAt === generation) continue;
@@ -160,11 +161,13 @@ export class UndermountDecals {
     this.eruptionRing.visible = true;
   }
 
-  update(dt: number): void {
+  update(dt: number, reducedMotion = false): void {
     if (this.eruptionElapsed >= ERUPTION_TELEGRAPH_S) return;
     this.eruptionElapsed += dt;
     const t = Math.min(1, this.eruptionElapsed / ERUPTION_TELEGRAPH_S);
-    this.eruptionMaterial.opacity = 0.42 + 0.48 * (0.5 + 0.5 * Math.sin(t * Math.PI * 10));
+    this.eruptionMaterial.opacity = reducedMotion
+      ? 0.9
+      : 0.42 + 0.48 * (0.5 + 0.5 * Math.sin(t * Math.PI * 10));
     if (t >= 1) this.eruptionRing.visible = false;
   }
 
@@ -202,6 +205,7 @@ export class UndermountDecals {
         side: THREE.DoubleSide,
       }),
     );
+    core.name = 'undermount-vent-core';
     const ring = new THREE.Mesh(
       this.ventRingGeometry,
       new THREE.MeshBasicMaterial({
@@ -213,6 +217,7 @@ export class UndermountDecals {
         side: THREE.DoubleSide,
       }),
     );
+    ring.name = 'undermount-vent-ring';
     core.renderOrder = 9;
     ring.renderOrder = 10;
     group.add(core, ring);
@@ -234,6 +239,7 @@ export class UndermountDecals {
         side: THREE.DoubleSide,
       }),
     );
+    forgeheat.name = 'undermount-forgeheat-ring';
     forgeheat.renderOrder = 11;
     const scorched = new THREE.LineLoop(
       this.scorchedGeometry,
@@ -243,6 +249,8 @@ export class UndermountDecals {
       this.chilledGeometry,
       lineMaterial(undermountDecalColor('chilled')),
     );
+    scorched.name = 'undermount-scorched-glyph';
+    chilled.name = 'undermount-chilled-glyph';
     scorched.renderOrder = 12;
     chilled.renderOrder = 12;
     group.add(forgeheat, scorched, chilled);

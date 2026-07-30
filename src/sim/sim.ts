@@ -1786,6 +1786,11 @@ export class Sim {
   private devSandboxIds: number[] = [];
   private pendingMobRespawns: PendingMobRespawn[] = [];
   private groundAoEs: GroundAoE[] = [];
+  // Vent records are immutable after placement. Keep their IWorld projection
+  // stable between topology changes so a 60 Hz renderer does not rebuild arrays,
+  // records, string ids, and an ordinal map while the sim advances at 20 Hz.
+  private undermountVentEffects: GroundAoE[] = [];
+  private undermountVentView: import('../world_api/combat').ActiveUndermountVent[] = [];
   get activeFrostRings(): ActiveFrostRing[] {
     const rings: ActiveFrostRing[] = [];
     for (const effect of this.groundAoEs) {
@@ -1820,20 +1825,32 @@ export class Sim {
     return hourglasses;
   }
   get activeUndermountVents(): import('../world_api/combat').ActiveUndermountVent[] {
-    const vents: import('../world_api/combat').ActiveUndermountVent[] = [];
+    let count = 0;
+    let topologyChanged = false;
+    for (const effect of this.groundAoEs) {
+      if (effect.remaining <= 0 || effect.ability !== 'Vent Fissure') continue;
+      if (this.undermountVentEffects[count] !== effect) topologyChanged = true;
+      count++;
+    }
+    if (count !== this.undermountVentEffects.length) topologyChanged = true;
+    if (!topologyChanged) return this.undermountVentView;
+
+    this.undermountVentEffects.length = 0;
+    this.undermountVentView.length = 0;
     const ordinalBySource = new Map<number, number>();
     for (const effect of this.groundAoEs) {
       if (effect.remaining <= 0 || effect.ability !== 'Vent Fissure') continue;
       const ordinal = ordinalBySource.get(effect.sourceId) ?? 0;
       ordinalBySource.set(effect.sourceId, ordinal + 1);
-      vents.push({
+      this.undermountVentEffects.push(effect);
+      this.undermountVentView.push({
         id: `${effect.sourceId}:${ordinal}`,
         x: effect.pos.x,
         z: effect.pos.z,
         radius: effect.radius,
       });
     }
-    return vents;
+    return this.undermountVentView;
   }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.

@@ -4922,29 +4922,48 @@ describe('Undermount vent snapshot parity', () => {
     expect(client.activeUndermountVents).toEqual([]);
   });
 
-  it('interest-scopes permanent Volzharr vents', () => {
+  it.each([
+    ['a non-array payload', { id: '9:0', x: 3, z: 5, r: 4 }],
+    ['a non-string id', [{ id: 9, x: 3, z: 5, r: 4 }]],
+    ['a non-finite x', [{ id: '9:0', x: Number.NaN, z: 5, r: 4 }]],
+    ['a non-finite z', [{ id: '9:0', x: 3, z: Number.POSITIVE_INFINITY, r: 4 }]],
+    ['a non-finite radius', [{ id: '9:0', x: 3, z: 5, r: Number.NaN }]],
+    ['a zero radius', [{ id: '9:0', x: 3, z: 5, r: 0 }]],
+    ['a negative radius', [{ id: '9:0', x: 3, z: 5, r: -1 }]],
+  ])('rejects %s from the vent wire', (_label, undermountVents) => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [], undermountVents });
+    expect(client.activeUndermountVents).toEqual([]);
+  });
+
+  it('includes the vent-radius boundary and excludes farther Volzharr vents', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Ventwire', 'warrior');
-    const bossId = 9876;
     const player = server.sim.entities.get(session.pid)!;
-    (server.sim as any).groundAoEs.push({
-      sourceId: bossId,
-      pos: { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
-      radius: 4,
-      min: 15,
-      max: 15,
-      remaining: 36000,
-      interval: 1,
-      tickTimer: 1,
-      school: 'fire',
-      ability: 'Vent Fissure',
-    });
+    const pushVent = (sourceId: number, xOffset: number): void => {
+      (server.sim as any).groundAoEs.push({
+        sourceId,
+        pos: { x: player.pos.x + xOffset, y: player.pos.y, z: player.pos.z },
+        radius: 4,
+        min: 15,
+        max: 15,
+        remaining: 36000,
+        interval: 1,
+        tickTimer: 1,
+        school: 'fire',
+        ability: 'Vent Fissure',
+      });
+    };
+    pushVent(9876, 4);
+    pushVent(9877, 134);
+    pushVent(9878, 134.1);
 
     broadcast(server);
 
     expect(lastSnap(fc.sent).undermountVents).toEqual([
-      { id: `${bossId}:0`, x: expect.any(Number), z: expect.any(Number), r: 4 },
+      { id: '9876:0', x: expect.any(Number), z: expect.any(Number), r: 4 },
+      { id: '9877:0', x: expect.any(Number), z: expect.any(Number), r: 4 },
     ]);
   });
 });

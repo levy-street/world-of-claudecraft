@@ -3576,7 +3576,7 @@ export class Renderer {
     this.temporalHourglassGroundVisuals.update(dt);
     this.undermountDecals.syncVents(this.sim.activeUndermountVents);
     this.undermountDecals.syncEntities(this.sim.entities.values(), this.views, this.camera);
-    this.undermountDecals.update(dt);
+    this.undermountDecals.update(dt, this.reducedMotion());
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);
@@ -8113,7 +8113,7 @@ export class Renderer {
     this.temporalHourglassGroundVisuals.update(dt);
     this.undermountDecals.syncVents(this.sim.activeUndermountVents);
     this.undermountDecals.syncEntities(this.sim.entities.values(), this.views, this.camera);
-    this.undermountDecals.update(dt);
+    this.undermountDecals.update(dt, this.reducedMotion());
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);
