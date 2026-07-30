@@ -4734,6 +4734,7 @@ export const SCENARIOS: Scenario[] = [
   professionsCraft(),
   professionsGather(),
   undermountOdrenn(),
+  undermountVolzharr(),
 ];
 
 function undermountOdrenn(): Scenario {
@@ -4782,6 +4783,94 @@ function undermountOdrenn(): Scenario {
       }
       rec.tick(20);
       rec.snapshot('odrenn-arc-temper');
+    },
+  };
+}
+
+function undermountVolzharr(): Scenario {
+  return {
+    name: 'undermount_volzharr',
+    coverage: [
+      'encounters/volzharr.ts permanent Vent Fissure placement and pulse state',
+      'The Embers Come Home wake, deterministic shamble, consume, and Emberfeed stack',
+      'Undermount Eruption windup event, telegraph window, damage roll, and scheduler state',
+      'wing 3 entry after character-scoped wing 1 and wing 2 pre-clears',
+    ],
+    build: () => new Sim({ seed: 1032, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const tankId = sim.addPlayer('warrior', 'Ventward');
+      const healerId = sim.addPlayer('priest', 'Ashkeeper');
+      for (const pid of [tankId, healerId]) {
+        const meta = sim.ctx.resolve(pid)?.meta;
+        meta?.undermountCleared?.add('undermount_wing1');
+        meta?.undermountCleared?.add('undermount_wing2');
+      }
+      enterDungeon(sim.ctx, 'undermount_wing3', tankId);
+      const inst = (sim.instances as any[]).find((i) => i.dungeonId === 'undermount_wing3');
+      const boss = inst.mobIds
+        .map((id: number) => sim.entities.get(id))
+        .find(
+          (entity: AnyEntity | undefined) => entity?.templateId === 'volzharr_buried_furnace',
+        ) as AnyEntity;
+      const cinderlings = inst.mobIds
+        .map((id: number) => sim.entities.get(id))
+        .filter(
+          (entity: AnyEntity | undefined) => entity?.templateId === 'undermount_cinderling',
+        ) as AnyEntity[];
+      rec.track(boss.id, ...cinderlings.map((entity) => entity.id));
+
+      const tank = sim.entities.get(tankId) as AnyEntity;
+      const healer = sim.entities.get(healerId) as AnyEntity;
+      for (const [index, player] of [tank, healer].entries()) {
+        beef(player, 900000);
+        player.pos = {
+          x: boss.spawnPos.x + index * 4,
+          y: boss.pos.y,
+          z: boss.spawnPos.z - 12,
+        };
+        player.prevPos = { ...player.pos };
+        sim.rebucket(player);
+      }
+      sim.dealDamage(tank, boss, 25, false, 'physical', null, 'hit', true);
+      rec.tick(2);
+      rec.snapshot('volzharr-pull');
+
+      const st = boss.volzharr;
+      if (!st) throw new Error('Volzharr encounter state did not initialize');
+
+      st.ventTimer = DT;
+      st.emberWakeTimer = 999;
+      st.eruptTimer = 999;
+      rec.tick(2);
+      rec.notes.ventCount = sim.ctx.groundAoEs.filter(
+        (effect: { sourceId: number }) => effect.sourceId === boss.id,
+      ).length;
+      rec.snapshot('volzharr-vent-placed');
+
+      st.ventTimer = 999;
+      st.emberWakeTimer = DT;
+      rec.tick(2);
+      const shamblerId = [...st.shamblers][0];
+      if (shamblerId === undefined) throw new Error('Volzharr did not wake a Cinderling');
+      rec.notes.shamblerId = shamblerId;
+      rec.snapshot('volzharr-shambler-woken');
+
+      const shambler = sim.entities.get(shamblerId) as AnyEntity | undefined;
+      if (!shambler) throw new Error('woken Cinderling is missing');
+      shambler.pos = { x: boss.pos.x + 1, y: boss.pos.y, z: boss.pos.z };
+      shambler.prevPos = { ...shambler.pos };
+      sim.rebucket(shambler);
+      rec.tick(2);
+      rec.notes.emberfeedStacks = st.emberfeedStacks;
+      rec.snapshot('volzharr-shambler-consumed');
+
+      st.emberWakeTimer = 999;
+      st.eruptTimer = DT;
+      rec.tick(1);
+      rec.snapshot('volzharr-eruption-windup');
+      rec.tick(Math.ceil(3.1 / DT));
+      rec.snapshot('volzharr-eruption-fired');
     },
   };
 }
