@@ -5,14 +5,21 @@
 // ferries stay interactable. Also pins the H1 tear-out: the interim landing
 // docks are gone (the authored harbors replaced them, see
 // tests/last_bell_harbor.test.ts) while the fishing jetties survive.
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { PROP_ASSET_DEFS, propPlacementInternalsForTest } from '../src/render/props';
+import { colliderInternalsForTest } from '../src/sim/colliders';
 import { FARSHORE_PROPS } from '../src/sim/content/farshore';
+import { LAST_BELL_CAMPAIGN_QUESTS } from '../src/sim/content/last_bell_campaign';
 import { ZONE1_PROPS } from '../src/sim/content/zone1';
+import { PROPS } from '../src/sim/data';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 import { answerSceneChoice } from '../src/sim/scenes/choices';
+import { sceneById } from '../src/sim/scenes/registry';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
-import { FARSHORE_BREACH } from '../src/sim/world';
+import { FARSHORE_BREACH, groundHeight } from '../src/sim/world';
+import { lastBellStrings } from '../src/ui/i18n.catalog/last_bell';
 
 function makeSim(): Sim {
   const sim = new Sim({ seed: 4242, playerClass: 'warrior', playerName: 'Ash', devCommands: true });
@@ -162,5 +169,93 @@ describe('Last Bell campaign fixtures', () => {
     // The fishing flavor stays: Demi's vale jetty and the Landing's jetty.
     expect(ZONE1_PROPS.docks.some((d) => d.x === -64 && d.z === 60)).toBe(true);
     expect(FARSHORE_PROPS.docks.some((d) => d.x === 778 && d.z === -36)).toBe(true);
+  });
+
+  it('places the old warden statue at the Q0 look-at point with its plinth', () => {
+    const statue = {
+      key: 'statueBlock',
+      x: 818,
+      z: 120,
+      rot: Math.PI / 2,
+      scale: 5,
+      r: 1,
+      h: 4.4,
+      parts: [{ key: 'statueHead', y: 1.95, scale: 2.5 }],
+    };
+    expect(FARSHORE_PROPS.decorProps).toContainEqual(statue);
+    expect(PROPS.decorProps).toContainEqual(statue);
+
+    for (const key of [statue.key, ...statue.parts.map((part) => part.key)]) {
+      expect(PROP_ASSET_DEFS[key], `${key} must resolve through the prop registry`).toBeDefined();
+    }
+
+    const seed = 4242;
+    const groundY = groundHeight(statue.x, statue.z, seed);
+    const renderBaseY = groundY - 0.05;
+    const group = new THREE.Group();
+    const added: {
+      parent: THREE.Object3D;
+      key: string;
+      options: { x?: number; y?: number; z?: number; rot?: number; scale: number };
+    }[] = [];
+    propPlacementInternalsForTest.placeDecorPropGroup(
+      group,
+      statue,
+      renderBaseY,
+      (parent, key, options) => {
+        added.push({ parent, key, options });
+      },
+    );
+    expect(group.position.toArray()).toEqual([818, renderBaseY, 120]);
+    expect(group.rotation.y).toBeCloseTo(Math.PI / 2);
+    expect(added.every(({ parent }) => parent === group)).toBe(true);
+    expect(
+      added.map(({ key, options }) => ({ key, y: options.y ?? 0, scale: options.scale })),
+    ).toEqual([
+      { key: 'statueBlock', y: 0, scale: 5 },
+      { key: 'statueHead', y: 1.95, scale: 2.5 },
+    ]);
+    expect(propPlacementInternalsForTest.decorPropCameraTopY(statue, renderBaseY)).toBeCloseTo(
+      groundY + 4.4,
+    );
+
+    const scene = sceneById('scn_lb_q0_ashore');
+    if (!scene) throw new Error('Q0 arrival scene is not registered');
+    const plinthIndex = scene.ops.findIndex(
+      (op) => op.kind === 'line' && op.key === 'lb.q0.scene.plinth',
+    );
+    const shotOp = scene.ops
+      .slice(0, plinthIndex)
+      .reverse()
+      .find((op) => op.kind === 'camera');
+    if (
+      shotOp?.kind !== 'camera' ||
+      shotOp.shot.kind !== 'dolly' ||
+      shotOp.shot.lookAt.kind !== 'point'
+    ) {
+      throw new Error('Q0 plinth line has no preceding point-target dolly shot');
+    }
+    expect({
+      x: shotOp.shot.lookAt.point.x,
+      z: shotOp.shot.lookAt.point.z,
+    }).toEqual({ x: statue.x, z: statue.z });
+
+    const statueCollider = colliderInternalsForTest
+      .staticWorldColliders(seed)
+      .find((collider) => collider.type === 'circle' && collider.x === 818 && collider.z === 120);
+    expect(statueCollider).toMatchObject({
+      type: 'circle',
+      x: 818,
+      z: 120,
+      r: 1,
+      camGhost: true,
+    });
+    expect(statueCollider?.cameraTopY).toBeCloseTo(groundHeight(818, 120, seed) + 4.4);
+
+    expect(LAST_BELL_CAMPAIGN_QUESTS.q_lb_q0_ashore.text).toContain(
+      'east past the harbor steps and the old statue',
+    );
+    expect(lastBellStrings.q0.scene.plinth).toContain('bronze warden');
+    expect(lastBellStrings.q0.scene.plinth).toContain('plinth');
   });
 });

@@ -22,7 +22,7 @@ import {
   propPlacementRoll,
 } from '../sim/prop_layout';
 import { hash2 } from '../sim/rng';
-import type { BuildingDef } from '../sim/types';
+import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
@@ -724,6 +724,45 @@ function rotLocal(lx: number, lz: number, rot: number): { x: number; z: number }
 
 type Scale = number | [number, number, number];
 
+type DecorPropDef = NonNullable<ZonePropsDef['decorProps']>[number];
+type DecorPartOptions = {
+  x?: number;
+  y?: number;
+  z?: number;
+  rot?: number;
+  scale: number;
+};
+type AddDecorPart<T> = (parent: THREE.Object3D, key: PropKey, options: DecorPartOptions) => T;
+
+function placeDecorPropGroup<T>(
+  group: THREE.Group,
+  decor: DecorPropDef,
+  baseY: number,
+  addPart: AddDecorPart<T>,
+): T {
+  const primary = addPart(group, decor.key as PropKey, { scale: decor.scale ?? 1 });
+  for (const part of decor.parts ?? []) {
+    addPart(group, part.key as PropKey, {
+      x: part.x,
+      y: part.y,
+      z: part.z,
+      rot: part.rot,
+      scale: part.scale ?? 1,
+    });
+  }
+  group.position.set(decor.x, baseY, decor.z);
+  group.rotation.y = decor.rot ?? 0;
+  return primary;
+}
+
+function decorPropCameraTopY(decor: DecorPropDef, baseY: number): number {
+  const groundedSink = decor.float === undefined ? 0.05 : 0;
+  return baseY + groundedSink + (decor.h ?? 4);
+}
+
+/** Test-only seam for composite decor grouping and local part transforms. */
+export const propPlacementInternalsForTest = { decorPropCameraTopY, placeDecorPropGroup };
+
 function setScale(o: THREE.Object3D, s: Scale): void {
   if (typeof s === 'number') o.scale.setScalar(s);
   else o.scale.set(s[0], s[1], s[2]);
@@ -1192,12 +1231,21 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // r > 0 entries mirror the circle collider in colliders.ts and camera-ghost;
   // r 0 dressing stays always-visible (small silhouettes, nothing to hide).
   for (const d of getActiveWorldContent().props.decorProps ?? []) {
-    if (!(d.key in PROP_ASSET_DEFS)) {
-      console.warn(`decorProps: unknown prop key "${d.key}" skipped`);
+    const unknownKey = [d.key, ...(d.parts ?? []).map((part) => part.key)].find(
+      (key) => !(key in PROP_ASSET_DEFS),
+    );
+    if (unknownKey !== undefined) {
+      console.warn(`decorProps: unknown prop key "${unknownKey}" skipped`);
       continue;
     }
     const g = new THREE.Group();
-    const holder = addParts(g, d.key as PropKey, { scale: d.scale ?? 1 });
+    // Floating decor (moored ships) rides the waterline at its draft depth
+    // instead of standing on the seabed.
+    const baseY =
+      d.float !== undefined
+        ? Math.max(ground(d.x, d.z), WATER_LEVEL - d.float)
+        : ground(d.x, d.z) - 0.05;
+    const holder = placeDecorPropGroup(g, d, baseY, addParts);
     // the windmill's sail cross is a distinct authored mesh: reparent it onto
     // a pivot at its axle so the renderer can spin it (kept out of the static
     // merge, the campfire-flame idiom)
@@ -1217,17 +1265,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         windmillFans.push(pivot);
       }
     }
-    // floating decor (moored ships) rides the waterline at its draft depth
-    // instead of standing on the seabed
-    const baseY =
-      d.float !== undefined
-        ? Math.max(ground(d.x, d.z), WATER_LEVEL - d.float)
-        : ground(d.x, d.z) - 0.05;
-    g.position.set(d.x, baseY, d.z);
-    g.rotation.y = d.rot ?? 0;
     group.add(shadowed(g));
     if (d.r) {
-      registerHideable(g, circleFootprint(d.x, d.z, d.r, baseY + (d.h ?? 4)));
+      registerHideable(g, circleFootprint(d.x, d.z, d.r, decorPropCameraTopY(d, baseY)));
     }
   }
 
