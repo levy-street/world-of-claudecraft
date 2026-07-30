@@ -1139,8 +1139,6 @@ export type MobFamily =
   | 'elemental'
   | 'dragonkin'
   | 'demon'
-  | 'kobold'
-  | 'murloc'
   | 'reptile';
 export type PetMode = 'passive' | 'defensive' | 'aggressive';
 export type PetRole = 'melee_tank' | 'ranged_dps';

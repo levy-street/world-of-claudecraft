@@ -121,7 +121,7 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     name: 'Breach Wretch',
     minLevel: 3,
     maxLevel: 5,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 30,
     hpPerLevel: 11,
     dmgBase: 6,

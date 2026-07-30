@@ -162,7 +162,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     name: 'Fen Sprite',
     minLevel: 17,
     maxLevel: 18,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 48,
     hpPerLevel: 17,
     dmgBase: 9,

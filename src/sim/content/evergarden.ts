@@ -199,7 +199,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     name: 'Hedge Gnome',
     minLevel: 20,
     maxLevel: 20,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 52,
     hpPerLevel: 18,
     dmgBase: 11,
