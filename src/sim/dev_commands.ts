@@ -257,8 +257,13 @@ export function handleDevChat(
   if (kitMatch) {
     const meta = ctx.players.get(pid);
     if (!meta) return null;
-    const spec = kitMatch[1] ?? meta.talents.spec;
-    const tier = (kitMatch[2]?.toLowerCase() ?? 'fresh') as 'fresh' | 'raid';
+    // The tier is independently selectable: a bare `/dev kit raid` binds the
+    // tier word to the first group, so re-read it as the tier with the spec
+    // defaulted, instead of erroring on 'raid' as a spec.
+    const firstIsTier = /^(?:fresh|raid)$/i.test(kitMatch[1] ?? '');
+    const spec = (firstIsTier ? undefined : kitMatch[1]) ?? meta.talents.spec;
+    const tierWord = firstIsTier ? kitMatch[1] : kitMatch[2];
+    const tier = (tierWord?.toLowerCase() ?? 'fresh') as 'fresh' | 'raid';
     if (!spec) {
       ctx.error(pid, '[dev] No spec chosen; pass one, e.g. /dev kit fury.');
       return null;

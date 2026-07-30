@@ -370,6 +370,22 @@ describe('/dev kit against a real Sim', () => {
     }
   });
 
+  it('accepts a bare raid tier word with no spec, using the current spec', () => {
+    // The tier is independently selectable: /dev kit raid must not bind
+    // "raid" to the spec group and error (#2671 review minor).
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', devCommands: true });
+    sim.setPlayerLevel(DEV_KIT_LEVEL);
+    const meta = sim.players.get(sim.playerId);
+    if (meta) meta.talents.spec = 'prot';
+    sim.chat('/dev kit raid');
+    const equip = sim.players.get(sim.playerId)?.equipment ?? {};
+    const beyondFresh = Object.values(equip).some((id) => {
+      const item = id ? ITEMS[id] : undefined;
+      return item !== undefined && !isFreshTwentyItem('warrior', item);
+    });
+    expect(beyondFresh).toBe(true);
+  });
+
   it('accepts a trailing raid tier word and equips past the fresh quality cap', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', devCommands: true });
     sim.setPlayerLevel(DEV_KIT_LEVEL);
