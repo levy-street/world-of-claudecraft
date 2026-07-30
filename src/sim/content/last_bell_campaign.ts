@@ -397,6 +397,7 @@ const Q0_STATUE_SHOT: SceneDollyShotDef = {
   ],
   lookAt: { kind: 'point', point: { x: 818, z: 120, height: 2 } },
   dur: 4.8,
+  subjectRef: 'statueBlock',
 };
 
 const Q0_TOLL_SHOT: SceneDollyShotDef = {
