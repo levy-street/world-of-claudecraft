@@ -8,6 +8,7 @@ import {
   LAST_BELL_PROP_PATH_SEGMENTS,
   LAST_BELL_VOYAGE_SEGMENT_IDS,
 } from '../src/sim/content/last_bell_cinematics';
+import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 
 const GLIDE: PropPathSegment = {
   start: { x: 3, y: -2, z: 7, yaw: -0.8 },
@@ -106,15 +107,15 @@ describe('Last Bell outbound cast-off segment', () => {
   // shipped voyage clearance or visible motion.
   it('pins the shipped cast-off segment values', () => {
     expect(LAST_BELL_PROP_PATH_SEGMENTS[LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff]).toEqual({
-      start: { x: 0, y: 0.5, z: 4, yaw: 0 },
-      end: { x: 22, y: 0.5, z: 7, yaw: 0 },
+      start: { x: 0, y: 0, z: 0, yaw: 0 },
+      end: { x: 22, y: 0, z: 7, yaw: 0 },
       duration: 4,
       ease: 'linear',
     });
   });
 
   it('starts at the authored seaward pose and is clamped below zero', () => {
-    expect(propPathPoseAt(segment, 0)).toEqual({ x: 0, y: 0.5, z: 4, yaw: 0, done: false });
+    expect(propPathPoseAt(segment, 0)).toEqual({ x: 0, y: 0, z: 0, yaw: 0, done: false });
     expect(propPathPoseAt(segment, -3).x).toBe(0);
   });
 
@@ -150,5 +151,49 @@ describe('Last Bell outbound cast-off segment', () => {
     const returned = propPathPoseAt(segment, 3, out);
     expect(returned).toBe(out);
     expect(out.x).toBeGreaterThan(0);
+  });
+});
+
+describe('Last Bell berth continuity', () => {
+  const parkedPose = { x: 0, y: 0, z: 0, yaw: 0 };
+
+  it('pins the perpendicular bow-in island berth against the mainland convention', () => {
+    expect(MAINLAND_HARBOR.berth).toEqual({
+      x: 240.5,
+      z: -44,
+      rot: Math.PI / 2,
+      draft: 2.5,
+      length: 60,
+    });
+    expect(GULLHAVEN_HARBOR.berth).toEqual({
+      x: 713,
+      z: 120.5,
+      rot: Math.PI / 2,
+      draft: 2.5,
+      length: 60,
+    });
+  });
+
+  it('starts departures and ends arrivals at the rendered parked pose', () => {
+    const departures = [
+      LAST_BELL_PROP_PATH_SEGMENTS[LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff],
+      LAST_BELL_PROP_PATH_SEGMENTS[LAST_BELL_VOYAGE_SEGMENT_IDS.back.castOff],
+    ];
+    const arrivals = [
+      LAST_BELL_PROP_PATH_SEGMENTS[LAST_BELL_VOYAGE_SEGMENT_IDS.out.arrival],
+      LAST_BELL_PROP_PATH_SEGMENTS[LAST_BELL_VOYAGE_SEGMENT_IDS.back.arrival],
+    ];
+
+    for (const segment of departures) {
+      expect(segment.start).toEqual(parkedPose);
+      expect(propPathPoseAt(segment, 0)).toEqual({ ...parkedPose, done: false });
+    }
+    for (const segment of arrivals) {
+      expect(segment.end).toEqual(parkedPose);
+      expect(propPathPoseAt(segment, segment.duration)).toEqual({
+        ...parkedPose,
+        done: true,
+      });
+    }
   });
 });

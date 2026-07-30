@@ -188,7 +188,7 @@ describe('Q0 Ashore end to end', () => {
     expect(sceneEvents.every((e) => e.sceneId === 'scn_lb_ferry_depart_out')).toBe(true);
     expect(sceneEvents.some((e) => e.op.kind === 'line')).toBe(false);
     // And talking to Odda on the Gullhaven ship's deck ferries back.
-    teleport(sim, 727, 131);
+    teleport(sim, GULLHAVEN_HARBOR.boarding.x, GULLHAVEN_HARBOR.boarding.z);
     const odda = findByName(sim, 'Ferrykeeper Odda');
     sim.player.targetId = odda?.id ?? null;
     sim.interact();

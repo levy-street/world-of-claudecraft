@@ -29,13 +29,13 @@ describe('Last Bell harbors', () => {
     expect(HARBORS.map((h) => h.id)).toEqual(['mainland', 'gullhaven']);
     // Pin the anchors so the campaign cannot silently drift.
     expect(MAINLAND_HARBOR.gangplank).toEqual({ x: 230.4, z: -48, facing: Math.PI / 2 });
-    expect(GULLHAVEN_HARBOR.gangplank).toEqual({ x: 727.5, z: 122, facing: 0 });
+    expect(GULLHAVEN_HARBOR.gangplank).toEqual({ x: 723.5, z: 116.5, facing: 0 });
     expect(MAINLAND_HARBOR.boarding).toEqual({ x: 239, z: -48 });
-    expect(GULLHAVEN_HARBOR.boarding).toEqual({ x: 727.5, z: 130 });
+    expect(GULLHAVEN_HARBOR.boarding).toEqual({ x: 714.5, z: 116.5 });
     expect(MAINLAND_HARBOR.deckArrival).toEqual({ x: 240.5, z: -50.6 });
-    expect(GULLHAVEN_HARBOR.deckArrival).toEqual({ x: 725.4, z: 132.5 });
-    expect(MAINLAND_HARBOR.arrival).toEqual({ x: 173, z: -48 });
-    expect(GULLHAVEN_HARBOR.arrival).toEqual({ x: 782, z: 116 });
+    expect(GULLHAVEN_HARBOR.deckArrival).toEqual({ x: 713, z: 113.9 });
+    expect(MAINLAND_HARBOR.arrival).toEqual({ x: 173, z: -42 });
+    expect(GULLHAVEN_HARBOR.arrival).toEqual({ x: 782, z: 125 });
   });
 
   it('keeps every ramp inside the climb gate and flush at both ends', () => {
@@ -228,12 +228,14 @@ describe('Last Bell harbors', () => {
     // Walking off the pier's south edge stops at the rail (z -51.4).
     const railed = resolveMovement(seed, 188, -50.2, 188, -54);
     expect(railed.z).toBeGreaterThan(-51.4);
-    // Gullhaven: the walkway now runs on west past the old head onto the
-    // outer run, and the berth head's west rail stops the walk at the end.
+    // Gullhaven: the walkway runs west to the berth head. Its west rail
+    // blocks away from the gangplank and leaves the authored gap open.
     const openRun = resolveMovement(seed, 756, 116, 745, 116);
     expect(Math.abs(openRun.x - 745)).toBeLessThan(0.2);
-    const westRail = resolveMovement(seed, 727, 116.5, 719, 116.5);
+    const westRail = resolveMovement(seed, 727, 111, 719, 111);
     expect(westRail.x).toBeGreaterThan(722.5);
+    const gullhavenGap = resolveMovement(seed, 727, 116.5, 719, 116.5);
+    expect(gullhavenGap.x).toBeLessThan(721);
     // The gangplank gap is genuinely open: stepping off the head's east
     // edge (x 206) onto the gangplank ramp is not blocked by a rail.
     const throughGap = resolveMovement(seed, 205, -48, 207.5, -48);
