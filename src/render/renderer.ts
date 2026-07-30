@@ -265,6 +265,8 @@ import { uploadDataTextureInChunks } from './texture_upload';
 import { sparkleTexture } from './textures';
 import { targetIntensity } from './travel_speed_fx';
 import { TravelSpeedFxPainter } from './travel_speed_fx_painter';
+import { UndermountDecals } from './undermount_decals';
+import { isVolzharrEruptionWindup } from './undermount_decals_core';
 import {
   BALL_RADIUS,
   buildValeCupBall,
@@ -1456,6 +1458,7 @@ export class Renderer {
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
+  private undermountDecals!: UndermountDecals;
   private readonly mageBarrierStateScratch: MageBarrierState = {
     theme: 'frost',
     value: 0,
@@ -2189,6 +2192,9 @@ export class Renderer {
       });
     });
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
+    this.undermountDecals = new UndermountDecals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
     this.vfx = new Vfx(this.scene, (id, frac) => {
@@ -3568,6 +3574,9 @@ export class Renderer {
     }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
+    this.undermountDecals.syncVents(this.sim.activeUndermountVents);
+    this.undermountDecals.syncEntities(this.sim.entities.values(), this.views, this.camera);
+    this.undermountDecals.update(dt);
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);
@@ -4764,6 +4773,10 @@ export class Renderer {
   handleEvent(ev: SimEvent): void {
     switch (ev.type) {
       case 'spellfx': {
+        const undermountSource = this.sim.entities.get(ev.sourceId);
+        if (isVolzharrEruptionWindup(ev, undermountSource?.templateId) && undermountSource) {
+          this.undermountDecals.beginEruption(undermountSource.pos.x, undermountSource.pos.z);
+        }
         if (ev.fx === 'blinkStep') {
           // A teleport step (Flickerstep / Shadowstep): reset the cached self
           // position so the body snaps to the authoritative destination. A
@@ -8098,6 +8111,9 @@ export class Renderer {
     }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
+    this.undermountDecals.syncVents(this.sim.activeUndermountVents);
+    this.undermountDecals.syncEntities(this.sim.entities.values(), this.views, this.camera);
+    this.undermountDecals.update(dt);
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);

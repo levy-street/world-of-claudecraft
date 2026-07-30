@@ -4908,6 +4908,47 @@ describe('Temporal Hourglass snapshot parity', () => {
   });
 });
 
+describe('Undermount vent snapshot parity', () => {
+  it('mirrors authoritative vents and clears vents missing from the next snapshot', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      undermountVents: [{ id: '9:0', x: 3, z: 5, r: 4 }],
+    });
+    expect(client.activeUndermountVents).toEqual([{ id: '9:0', x: 3, z: 5, radius: 4 }]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeUndermountVents).toEqual([]);
+  });
+
+  it('interest-scopes permanent Volzharr vents', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Ventwire', 'warrior');
+    const bossId = 9876;
+    const player = server.sim.entities.get(session.pid)!;
+    (server.sim as any).groundAoEs.push({
+      sourceId: bossId,
+      pos: { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
+      radius: 4,
+      min: 15,
+      max: 15,
+      remaining: 36000,
+      interval: 1,
+      tickTimer: 1,
+      school: 'fire',
+      ability: 'Vent Fissure',
+    });
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).undermountVents).toEqual([
+      { id: `${bossId}:0`, x: expect.any(Number), z: expect.any(Number), r: 4 },
+    ]);
+  });
+});
+
 describe('authoritative interaction command outcomes', () => {
   it.each([
     ['loot', { id: -1 }],

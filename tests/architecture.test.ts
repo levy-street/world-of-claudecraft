@@ -294,6 +294,7 @@ const RENDER_PURE_CORES = [
   'src/render/race_line_core.ts',
   'src/render/sea_mist_core.ts',
   'src/render/terrain_region_core.ts',
+  'src/render/undermount_decals_core.ts',
   'src/render/water_core.ts',
   'src/render/water_flora_core.ts',
   'src/render/day_night_core.ts',

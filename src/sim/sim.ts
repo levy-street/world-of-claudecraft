@@ -1819,6 +1819,22 @@ export class Sim {
     }
     return hourglasses;
   }
+  get activeUndermountVents(): import('../world_api/combat').ActiveUndermountVent[] {
+    const vents: import('../world_api/combat').ActiveUndermountVent[] = [];
+    const ordinalBySource = new Map<number, number>();
+    for (const effect of this.groundAoEs) {
+      if (effect.remaining <= 0 || effect.ability !== 'Vent Fissure') continue;
+      const ordinal = ordinalBySource.get(effect.sourceId) ?? 0;
+      ordinalBySource.set(effect.sourceId, ordinal + 1);
+      vents.push({
+        id: `${effect.sourceId}:${ordinal}`,
+        x: effect.pos.x,
+        z: effect.pos.z,
+        radius: effect.radius,
+      });
+    }
+    return vents;
+  }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.
   private frozenOrbs: FrozenOrbState[] = [];
