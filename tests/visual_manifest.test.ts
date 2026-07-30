@@ -151,22 +151,20 @@ describe('character visual manifest', () => {
     ).toEqual([]);
   });
 
-  it('points the rogue bespoke abilities at their synthesized clips in the rogue GLB', async () => {
+  it('points the rogue bespoke abilities at clips the v02 rogue GLB ships', async () => {
     const visual = VISUALS.player_rogue;
-    // The strangle one-shot (scripts/_add_garrote_choke_anim.mjs): a wire
-    // pull to the chest, never the dagger swing the default rotation plays.
-    expect(visual.clips.attackByAbility?.garrote).toBe('Garrote_Choke');
-    // Boot kicks (scripts/_add_boot_kick_anim.mjs) and Dirt Toss throws
-    // (scripts/_add_dirt_throw_anim.mjs); neither is a dagger swing.
-    expect(visual.clips.attackByAbility?.kick).toBe('Kick_A');
-    expect(visual.clips.attackByAbility?.blind).toBe('Dirt_Throw');
+    // The v01 rig's synthesized gestures (Garrote_Choke, Kick_A, Dirt_Throw)
+    // are not baked into the v02 body. The v02 rig's own kick clip covers the
+    // interrupt; garrote and blind fall back to no gesture (their VFX and SFX
+    // still fire) until the gestures are re-synthesized onto the v02 rig.
+    expect(visual.clips.attackByAbility?.kick).toBe('2H_Kick');
+    expect(visual.clips.attackByAbility?.garrote).toBeUndefined();
+    expect(visual.clips.attackByAbility?.blind).toBeUndefined();
+    // Only the mapped gesture is asserted against the GLB here: the v02 pack
+    // omits some optional kaykit clips (Block, 2H_Ranged_Shoot) by design, and
+    // required-clip completeness is character_clipmaps.test.ts's contract.
     const animationNames = await glbAnimationNames(`public/${visual.url}`);
-    expect(animationNames.has('Garrote_Choke')).toBe(true);
-    expect(animationNames.has('Kick_A')).toBe(true);
-    expect(animationNames.has('Dirt_Throw')).toBe(true);
-    expect(
-      [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
-    ).toEqual([]);
+    expect(animationNames.has('2H_Kick')).toBe(true);
   });
 
   it('points the Stone Cantor manifest at clips present in the GLB (including the synthesized Hit)', async () => {

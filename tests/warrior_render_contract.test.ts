@@ -28,15 +28,17 @@ describe('winning Warrior attack animation routing', () => {
       slam: '2H_Melee_Attack_Chop',
       red_harvest: '2H_Melee_Attack_Chop',
       breachmaker: '2H_Melee_Attack_Chop',
-      // Shieldcrack drives the offhand SHIELD arm (synthesized clip,
-      // scripts/_add_shield_bash_anim.mjs), never a sword chop.
-      shield_slam: 'Shield_Bash',
+      // Shieldcrack drives the offhand SHIELD arm, never a sword chop. The
+      // synthesized bash lives in the v01 rig only; Block is the v02 pack's
+      // one shield-arm clip until the bash is re-synthesized onto it.
+      shield_slam: 'Block',
       raging_gale: 'Dualwield_Melee_Attack_Chop',
       bloodthirst: 'Dualwield_Melee_Attack_Chop',
-      // The two frontal-arc AoE strikes reap sideways (synthesized clip,
-      // scripts/_add_sweep_slice_anim.mjs), never the top-to-bottom chop.
-      cleave: '1H_Melee_Attack_Slice_Horizontal',
-      revenge: '1H_Melee_Attack_Slice_Horizontal',
+      // The two frontal-arc AoE strikes reap sideways, never the top-to-bottom
+      // chop. The synthesized flat reap lives in the v01 rig only; the diagonal
+      // slice is the nearest v02 sweep until the reap is re-synthesized.
+      cleave: '1H_Melee_Attack_Slice_Diagonal',
+      revenge: '1H_Melee_Attack_Slice_Diagonal',
       thunder_clap: '1H_Melee_Attack_Chop',
       faultline: '1H_Melee_Attack_Chop',
       heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
