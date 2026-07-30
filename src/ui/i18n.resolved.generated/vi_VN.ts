@@ -340,14 +340,11 @@ export const vi_VN: EnTranslations = {
       "menuButton": "Thoát Kẹt",
       "help": "Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên để đưa bạn đến một vị trí an toàn gần đó có thể tiếp cận được.",
       "helpAtGraveyard": "Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên, sau đó đưa linh hồn của bạn đến nghĩa trang gần nhất. Quay lại qua Người Giữ Nhợt Nhạt yêu cầu Phí Tổn Của Người Giữ.",
-      "helpUnstuckSickness": "Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên, sau đó đưa bạn đến nghĩa trang gần nhất và hồi sinh bạn nếu bạn đã ngã xuống. Hội Chứng Thoát Kẹt sẽ đè nặng lên bạn tối đa 5 phút.",
       "started": "Thoát Kẹt sau {seconds} giây. Di chuyển, chiến đấu, bị gây sát thương, hoặc bắt đầu hành động khác sẽ hủy nó.",
       "countdown": "Thoát Kẹt: {seconds}",
       "completed": "Đã di chuyển đến vị trí an toàn gần nhất có thể tiếp cận được.",
       "completedAtGraveyard": "Linh hồn của bạn đã trở về nghĩa trang gần nhất. Hãy nói chuyện với Người Giữ Nhợt Nhạt để chấp nhận Phí Tổn Của Người Giữ.",
       "revivedAtGraveyard": "Bạn đã được đưa về nghĩa trang gần nhất và hồi sinh. Phí Tổn Của Người Giữ đang đè nặng lên bạn.",
-      "movedToGraveyard": "Bạn đã được đưa đến nghĩa trang gần nhất. Hội Chứng Thoát Kẹt đang đè nặng lên bạn.",
-      "revivedAtGraveyardUnstuck": "Bạn đã được đưa đến nghĩa trang gần nhất và hồi sinh. Hội Chứng Thoát Kẹt đang đè nặng lên bạn.",
       "cancelledMoved": "Thoát Kẹt bị hủy vì bạn đã di chuyển.",
       "cancelledDamaged": "Thoát Kẹt bị hủy vì bạn đã bị gây sát thương.",
       "cancelledCombat": "Thoát Kẹt bị hủy vì bạn đã vào trạng thái chiến đấu.",
@@ -887,13 +884,6 @@ export const vi_VN: EnTranslations = {
       "lockedToast": "Bạn đang bị khóa với {raid}. Mở khóa sau {time}.",
       "heroicName": "{name} Anh Hùng",
       "heroicLocked": "Bạn đang bị khóa với {name} Anh Hùng."
-    },
-    "riftTracker": {
-      "title": "Rạn Nứt",
-      "floor": "Tầng {current}/{total}",
-      "closesIn": "Đóng sau {time}",
-      "clockMs": "{minutes}:{seconds}",
-      "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "compass": {
       "N": "B",
@@ -2127,7 +2117,6 @@ export const vi_VN: EnTranslations = {
         "noRecipient": "Không ai mang tên đó có hòm thư ở đây.",
         "tooManyParcels": "Một lá thư chở tối đa {count} bưu kiện.",
         "noMailQuestItems": "Bạn không thể gửi vật phẩm nhiệm vụ qua thư.",
-        "noMailBound": "Vật phẩm đó đã bị ràng buộc và không thể gửi qua thư.",
         "notEnoughItems": "Bạn không có đủ số lượng đó để gửi.",
         "cantAffordPostage": "Bạn không đủ tiền trả bưu phí.",
         "recipientBoxFull": "Hòm thư của người nhận đã đầy.",
@@ -2936,9 +2925,6 @@ export const vi_VN: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại."
-    },
-    "ota_updates": {
-      "invalid_input": "Dữ liệu nhập không hợp lệ."
     }
   },
   "guide": {
@@ -3538,6 +3524,14 @@ export const vi_VN: EnTranslations = {
       "reptile": {
         "name": "Bò Sát",
         "desc": "Những thợ săn máu lạnh với tiếng rít và cú đớp rất riêng của chúng, khác biệt hoàn toàn so với các dã thú máu nóng."
+      },
+      "murloc": {
+        "name": "Vây Ộp Oạp",
+        "desc": "Giống người cá biết kêu ộp oạp sống ở bờ hồ và vũng nước triều, nhanh chóng vây lấy bất cứ thứ gì lội đến quá gần."
+      },
+      "kobold": {
+        "name": "Tiểu Yêu",
+        "desc": "Những kẻ nhặt nhạnh lăng xăng và tinh linh của bãi cỏ, bờ giậu, phiền toái nhiều hơn là nguy hiểm, cho đến khi chúng tụ tập đông đảo."
       },
       "demon": {
         "name": "Ác Ma",
@@ -6479,12 +6473,11 @@ export const vi_VN: EnTranslations = {
       "arenaQueueTrading": "Hãy hoàn tất giao dịch trước khi xếp hàng.",
       "arenaQueueInstance": "Bạn không thể xếp hàng khi đang ở trong hầm ngục.",
       "tradeInProgress": "Một giao dịch đang diễn ra.",
-      "tradeAlreadyTrading": "Người chơi đó đang giao dịch.",
+      "tradeAlreadyTrading": "That player is already trading.",
       "tradeTooFar": "Mục tiêu ở quá xa để giao dịch.",
       "tradeExpired": "Yêu cầu giao dịch đã hết hạn.",
       "tradeFailed": "Giao dịch thất bại: vật phẩm hoặc tiền không còn khả dụng.",
-      "tradeBound": "Vật phẩm đó đã bị ràng buộc và không thể giao dịch.",
-      "marketListBound": "Vật phẩm đó đã bị ràng buộc và không thể rao bán."
+      "tradeBound": "Vật phẩm đó đã bị ràng buộc và không thể giao dịch."
     },
     "logs": {
       "standUp": "Bạn đứng dậy.",
@@ -6840,8 +6833,7 @@ export const vi_VN: EnTranslations = {
       "incomplete": "Nhiệm vụ đó chưa hoàn thành.",
       "giverMissing": "Người giao nhiệm vụ không ở gần đây.",
       "turnInMissing": "Nơi nộp nhiệm vụ không ở gần đây.",
-      "tooFar": "Quá xa.",
-      "escortAway": "Người bạn cần hộ tống hiện không có ở đó. Họ sẽ trở lại sớm."
+      "tooFar": "Quá xa."
     }
   },
   "itemUi": {
@@ -12844,7 +12836,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Đưa Wren Về Nhà",
-        "text": "Học việc Wren của ta đã ra đi dọc theo tuyến Goldmelt hai ngày trước và không bao giờ trở lại. Ta đã tìm thấy dấu chân cô bé, cô bé đang trốn dưới những cột mốc đường đông bắc Bậc Thang Cực Quang, quá sợ đàn sói để di chuyển. Ta không thể rời khỏi đầm lầy này, {playerName}. Hãy dẫn cô bé đến trại của Veyla trên Bậc Thang. Cô bé sẽ an toàn dưới ánh sáng.",
+        "text": "Học việc Wren của ta đã ra đi dọc theo tuyến Goldmelt hai ngày trước và không bao giờ trở lại. Ta đã tìm thấy dấu chân cô bé, cô bé đang trốn dưới những cột mốc đường tây nam Bậc Thang Cực Quang, quá sợ đàn sói để di chuyển. Ta không thể rời khỏi đầm lầy này, {playerName}. Hãy dẫn cô bé đến trại của Veyla trên Bậc Thang. Cô bé sẽ an toàn dưới ánh sáng.",
         "completion": "Cô bé đang ở trong nhà, cuộn mình trong nửa số chăn của ta và huyên thuyên về những vì sao trên trời. Bạn đã làm một việc tốt hôm nay, {playerName}. Vùng Đất này không thường thấy những việc như vậy.",
         "objectives": {
           "0": {
@@ -13528,7 +13520,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Trở Về Nhà",
-        "text": "Bram của tôi đã đưa thuyền ra khơi vào sáng hôm vết rạn ở khu lưới mở ra, và biển đã ném anh ấy trở lại đâu đó qua khỏi mũi Bến Tàu. Tôi nghe thấy anh ấy ba đêm trước, {playerName}, gọi vọng qua mặt nước, và tôi đã quá sợ hãi để đi. Tôi vẫn còn quá sợ hãi. Làm ơn. Thuyền của anh ấy đang đắm trên bờ nam. Hãy dẫn anh ấy về nhà cho tôi.",
+        "text": "Bram của tôi đã đưa thuyền ra khơi vào sáng hôm vết rạn ở khu lưới mở ra, và biển đã ném anh ấy trở lại đâu đó qua khỏi mũi Bến Tàu. Tôi nghe thấy anh ấy ba đêm trước, {playerName}, gọi vọng qua mặt nước, và tôi đã quá sợ hãi để đi. Tôi vẫn còn quá sợ hãi. Làm ơn. Thuyền của anh ấy đang đắm trên bờ bắc. Hãy dẫn anh ấy về nhà cho tôi.",
         "completion": "Bram! Bạn đã mang anh ấy về nguyên vẹn cho tôi, {playerName}. Cả hai chúng tôi đều đã khóc và không ai trong chúng tôi thấy xấu hổ. Dù những vết rạn có lấy đi thứ gì từ hòn đảo này tiếp theo, chúng sẽ không lấy được gia đình tôi. Không còn nữa đâu.",
         "objectives": {
           "0": {

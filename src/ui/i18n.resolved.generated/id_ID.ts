@@ -340,14 +340,11 @@ export const id_ID: EnTranslations = {
       "menuButton": "Lepaskan Diri",
       "help": "Pemulihan: /unstuck memulai hitung mundur diam di tempat untuk memindahkanmu ke titik aman terjangkau terdekat.",
       "helpAtGraveyard": "Pemulihan: /unstuck memulai hitung mundur diam di tempat, lalu mengirim rohmu ke kuburan terdekat. Kembali lewat Sang Penjaga Pucat membutuhkan Upeti Sang Penjaga.",
-      "helpUnstuckSickness": "Pemulihan: /unstuck memulai hitung mundur diam di tempat, lalu memindahkanmu ke kuburan terdekat dan menghidupkanmu kembali jika kamu telah tumbang. Penyakit Pelepasan tetap membebanimu hingga 5 menit.",
       "started": "Lepaskan Diri dalam {seconds} detik. Bergerak, bertarung, menerima kerusakan, atau memulai tindakan lain akan membatalkannya.",
       "countdown": "Lepaskan Diri: {seconds}",
       "completed": "Dipindahkan ke titik aman terjangkau terdekat.",
       "completedAtGraveyard": "Rohmu telah kembali ke kuburan terdekat. Bicaralah dengan Sang Penjaga Pucat untuk menerima Upeti Sang Penjaga.",
       "revivedAtGraveyard": "Kamu telah dikembalikan ke kuburan terdekat dan dihidupkan kembali. Upeti Sang Penjaga membebanimu.",
-      "movedToGraveyard": "Kamu telah dipindahkan ke kuburan terdekat. Penyakit Pelepasan membebanimu.",
-      "revivedAtGraveyardUnstuck": "Kamu telah dipindahkan ke kuburan terdekat dan dihidupkan kembali. Penyakit Pelepasan membebanimu.",
       "cancelledMoved": "Lepaskan Diri dibatalkan karena kamu bergerak.",
       "cancelledDamaged": "Lepaskan Diri dibatalkan karena kamu menerima kerusakan.",
       "cancelledCombat": "Lepaskan Diri dibatalkan karena kamu memasuki pertempuran.",
@@ -887,13 +884,6 @@ export const id_ID: EnTranslations = {
       "lockedToast": "Anda terkunci pada {raid}. Terbuka dalam {time}.",
       "heroicName": "{name} Heroik",
       "heroicLocked": "Anda terkunci pada {name} Heroik."
-    },
-    "riftTracker": {
-      "title": "Rift",
-      "floor": "Lantai {current} dari {total}",
-      "closesIn": "Tutup dalam {time}",
-      "clockMs": "{minutes}:{seconds}",
-      "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "compass": {
       "N": "U",
@@ -2127,7 +2117,6 @@ export const id_ID: EnTranslations = {
         "noRecipient": "Tidak ada orang dengan nama itu yang memiliki kotak surat di sini.",
         "tooManyParcels": "Satu surat memuat paling banyak {count} bingkisan.",
         "noMailQuestItems": "Kamu tidak bisa mengirim barang misi lewat surat.",
-        "noMailBound": "Barang itu terikat dan tidak dapat dikirim lewat surat.",
         "notEnoughItems": "Kamu tidak punya sebanyak itu untuk dikirim.",
         "cantAffordPostage": "Kamu tidak mampu membayar perangkonya.",
         "recipientBoxFull": "Kotak surat mereka penuh.",
@@ -2936,9 +2925,6 @@ export const id_ID: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi."
-    },
-    "ota_updates": {
-      "invalid_input": "Masukan tidak valid."
     }
   },
   "guide": {
@@ -3538,6 +3524,14 @@ export const id_ID: EnTranslations = {
       "reptile": {
         "name": "Reptil",
         "desc": "Pemburu berdarah dingin dengan desis dan cakitan khas mereka sendiri, berbeda dari hewan berdarah panas."
+      },
+      "murloc": {
+        "name": "Sirip Kodok",
+        "desc": "Bangsa ikan yang bersuara serak dari tepi danau dan kolam pasang surut, cepat menyerbu apa pun yang mengarungi terlalu dekat."
+      },
+      "kobold": {
+        "name": "Berandal",
+        "desc": "Pemulung kecil yang berlarian dan roh-roh nakal dari tanah lapang dan pagar semak, lebih mengganggu daripada mengancam sampai mereka berkumpul dalam jumlah besar."
       },
       "demon": {
         "name": "Iblis",
@@ -6479,12 +6473,11 @@ export const id_ID: EnTranslations = {
       "arenaQueueTrading": "Selesaikan dulu perdaganganmu sebelum antre.",
       "arenaQueueInstance": "Kamu tidak bisa antre dari dalam instance.",
       "tradeInProgress": "Perdagangan sudah berlangsung.",
-      "tradeAlreadyTrading": "Pemain itu sedang berdagang.",
+      "tradeAlreadyTrading": "That player is already trading.",
       "tradeTooFar": "Sasaran terlalu jauh untuk berdagang.",
       "tradeExpired": "Permintaan perdagangan telah kedaluwarsa.",
       "tradeFailed": "Perdagangan gagal: barang atau uang sudah tidak tersedia.",
-      "tradeBound": "Barang itu terikat dan tidak dapat diperdagangkan.",
-      "marketListBound": "Barang itu terikat dan tidak dapat dijual di pasar."
+      "tradeBound": "Barang itu terikat dan tidak dapat diperdagangkan."
     },
     "logs": {
       "standUp": "Kamu berdiri.",
@@ -6840,8 +6833,7 @@ export const id_ID: EnTranslations = {
       "incomplete": "Misi itu belum selesai.",
       "giverMissing": "Pemberi misi itu tidak ada di dekat sini.",
       "turnInMissing": "Tempat penyerahan misi itu tidak ada di dekat sini.",
-      "tooFar": "Terlalu jauh.",
-      "escortAway": "Orang yang harus kau antar sedang tidak ada di tempatnya. Ia akan segera kembali."
+      "tooFar": "Terlalu jauh."
     }
   },
   "itemUi": {
@@ -12844,7 +12836,7 @@ export const id_ID: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Mengantar Wren Pulang",
-        "text": "Muridku Wren pergi menyusuri jalur Goldmelt dua hari lalu dan tak pernah kembali. Aku menemukan jejaknya, ia bersembunyi di bawah penanda jalan timur laut Tangga Aurora, terlalu takut pada serigala untuk bergerak. Aku tak bisa meninggalkan rawa ini, {playerName}. Antarkan dia ke perkemahan Veyla di Tangga itu. Ia akan aman di bawah cahaya-cahaya itu.",
+        "text": "Muridku Wren pergi menyusuri jalur Goldmelt dua hari lalu dan tak pernah kembali. Aku menemukan jejaknya, ia bersembunyi di bawah penanda jalan barat daya Tangga Aurora, terlalu takut pada serigala untuk bergerak. Aku tak bisa meninggalkan rawa ini, {playerName}. Antarkan dia ke perkemahan Veyla di Tangga itu. Ia akan aman di bawah cahaya-cahaya itu.",
         "completion": "Gadis itu ada di dalam, terbungkus setengah selimutku dan mengoceh tentang bintang-bintang di langit. Kau melakukan hal yang baik hari ini, {playerName}. Reach ini tak sering melihat hal seperti itu.",
         "objectives": {
           "0": {
@@ -13528,7 +13520,7 @@ export const id_ID: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Pulang ke Rumah",
-        "text": "Bram-ku membawa perahu keluar pagi ketika celah jaring itu terbuka, dan laut melemparkannya kembali entah di mana melewati titik Dermaga. Aku mendengarnya tiga malam lalu, {playerName}, memanggil dari atas air, dan aku terlalu takut untuk pergi. Aku masih terlalu takut. Kumohon. Perahunya terdampar hancur di pesisir selatan. Antarkan dia pulang padaku.",
+        "text": "Bram-ku membawa perahu keluar pagi ketika celah jaring itu terbuka, dan laut melemparkannya kembali entah di mana melewati titik Dermaga. Aku mendengarnya tiga malam lalu, {playerName}, memanggil dari atas air, dan aku terlalu takut untuk pergi. Aku masih terlalu takut. Kumohon. Perahunya terdampar hancur di pesisir utara. Antarkan dia pulang padaku.",
         "completion": "Bram! Kau membawanya kembali padaku utuh, {playerName}. Kami berdua menangis dan tak satu pun dari kami malu. Apa pun yang diambil celah-celah itu dari pulau ini selanjutnya, mereka tak akan mendapatkan keluargaku. Tidak lagi.",
         "objectives": {
           "0": {
