@@ -1581,6 +1581,9 @@ export interface CharacterState {
   deedStats?: SavedDeedStats;
   activeTitle?: string | null;
   renown?: number;
+  // Undermount wing unseals (character-scoped raid progression), absent
+  // until the first wing clear.
+  undermountCleared?: string[];
 }
 
 export interface PetState {
@@ -2796,6 +2799,14 @@ export class Sim {
       if (s.heroicDaily) {
         meta.heroicDaily = { date: s.heroicDaily.date, marked: new Set(s.heroicDaily.marked) };
       }
+      // Undermount wing unseals are progression, not session state: without
+      // this a relog after clearing wing 1 re-seals wing 2 while the daily
+      // lockout blocks re-clearing wing 1.
+      if (Array.isArray(s.undermountCleared)) {
+        for (const id of s.undermountCleared) {
+          if (typeof id === 'string') meta.undermountCleared.add(id);
+        }
+      }
       // The Book of Deeds. Earned days load verbatim; the legacy milestone set
       // unions into the earned map (milestone unification); renown is
       // RECOMPUTED from the earned set below (the sim is authoritative, the
@@ -3498,6 +3509,11 @@ export class Sim {
       // so pre-deed saves stay byte-equal until the system engages. The
       // legacy unlockedMilestones above stays dual-written for one release.
       ...(meta.deedsEarned.size > 0 ? { deeds: Object.fromEntries(meta.deedsEarned) } : {}),
+      // Undermount wing unseals: conditional-when-empty like the deed fields
+      // so pre-raid saves stay byte-equal.
+      ...(meta.undermountCleared.size > 0
+        ? { undermountCleared: [...meta.undermountCleared] }
+        : {}),
       ...(() => {
         const deedStats = serializeDeedStats(meta.deedStats);
         return deedStats ? { deedStats } : {};

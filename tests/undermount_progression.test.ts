@@ -112,6 +112,23 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     expect(meta.undermountCleared.size).toBe(0);
   });
 
+  it('persists wing unseals across save and load', () => {
+    // Without this a raid that cleared wing 1 on Friday cannot enter wing 2
+    // after a relog, and the persisted daily lockout blocks re-clearing it:
+    // a hard progression block, not a cosmetic gap (#2671 review finding 2).
+    const sim = makeSim(23);
+    const pid = sim.addPlayer('warrior', 'Saver');
+    metaOf(sim, pid).undermountCleared.add('undermount_wing1');
+    const state = sim.serializeCharacter(pid);
+    expect(state).not.toBeNull();
+
+    const sim2 = makeSim(23);
+    const pid2 = sim2.addPlayer('warrior', 'Loader', { state: state as any });
+    expect([...metaOf(sim2, pid2).undermountCleared]).toContain('undermount_wing1');
+    enterDungeon(sim2.ctx, 'undermount_wing2', pid2);
+    expect(claimFor(sim2, 'undermount_wing2', pid2), 'unseal survives the reload').toBeDefined();
+  });
+
   it('keeps wing clears scoped to the character that earned them', () => {
     const sim = makeSim(19);
     const clearedPid = sim.addPlayer('warrior', 'Cleared');
@@ -128,24 +145,30 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     ).toBeUndefined();
   });
 
-  it('spawns Maerin once on a completed wing and delivers every beat in order', () => {
-    const expectedByWing = {
-      undermount_wing1: [
-        "This craftsmanship... a whole guild's work, for a cult of arsonists? Something down here is worth hiding behind all this.",
-        'Beast provisions, wages, kennel feed... and the signature page torn out. Someone left in a hurry. North.',
-        'They are not making anything. They are keeping something ASLEEP until they are ready.',
-      ],
-      undermount_wing2: [
-        'These are not summoning wards. They are RESTRAINTS, and we have been CUTTING them. Every keeper we killed was a lock.',
-        'There was never a factory. There was only ever him, and a very good disguise. Go.',
-      ],
-      undermount_wing3: [
-        'Half-formed. We killed him before the forge could finish its work.',
-        'The fire is receding north along the vein. This is not over.',
-      ],
-    } as const;
+  // One test per wing (was a single three-Sim loop): each wing builds a full
+  // raid Sim and runs the dialogue scheduler, and the combined runtime sat
+  // close enough to the 20 s testTimeout to flake a loaded CI runner
+  // (#2671 review minor).
+  const MAERIN_BEATS = {
+    undermount_wing1: [
+      "This craftsmanship... a whole guild's work, for a cult of arsonists? Something down here is worth hiding behind all this.",
+      'Beast provisions, wages, kennel feed... and the signature page torn out. Someone left in a hurry. North.',
+      'They are not making anything. They are keeping something ASLEEP until they are ready.',
+    ],
+    undermount_wing2: [
+      'These are not summoning wards. They are RESTRAINTS, and we have been CUTTING them. Every keeper we killed was a lock.',
+      'There was never a factory. There was only ever him, and a very good disguise. Go.',
+    ],
+    undermount_wing3: [
+      'Half-formed. We killed him before the forge could finish its work.',
+      'The fire is receding north along the vein. This is not over.',
+    ],
+  } as const;
 
-    for (const [index, [dungeonId, expected]] of Object.entries(expectedByWing).entries()) {
+  it.each(Object.keys(MAERIN_BEATS).map((dungeonId, index) => [dungeonId, index] as const))(
+    'spawns Maerin once on completed %s and delivers every beat in order',
+    (dungeonId, index) => {
+      const expected = MAERIN_BEATS[dungeonId as keyof typeof MAERIN_BEATS];
       const sim = makeSim(40 + index);
       const pid = sim.addPlayer('warrior', 'Solo');
       const player = sim.entities.get(pid) as AnyEntity;
@@ -189,9 +212,11 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
         expect(maerins[0].channeling, 'Maerin channels the next wing door as flavor').toBe(true);
         expect(maerins[0].castingAbility).toBe('undermount_door_channel');
       }
-    }
+    },
+  );
 
-    expect(expectedByWing.undermount_wing1).toContain(
+  it('keeps the torn-ledger Kennelmaster hook in the wing 1 script', () => {
+    expect(MAERIN_BEATS.undermount_wing1).toContain(
       'Beast provisions, wages, kennel feed... and the signature page torn out. Someone left in a hurry. North.',
     );
   });
