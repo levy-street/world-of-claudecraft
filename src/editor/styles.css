@@ -561,6 +561,40 @@ input[type="range"] {
   font-size: 11px;
 }
 
+.ed-cinematic-violations {
+  padding: 8px;
+  background: rgba(7, 9, 12, 0.45);
+  border: 1px solid var(--ed-line);
+  border-radius: 4px;
+}
+
+.ed-cinematic-violations-title {
+  margin: 0 0 6px;
+  color: var(--ed-text);
+  font-size: 11px;
+}
+
+.ed-cinematic-violations ul {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  gap: 5px;
+  list-style: none;
+}
+
+.ed-cinematic-violations li {
+  color: #ff7474;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.ed-cinematic-violations .ed-cinematic-violation-empty {
+  color: var(--ed-muted);
+}
+
 .ed-cinematic-output {
   min-height: 170px;
   resize: vertical;

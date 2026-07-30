@@ -21,6 +21,7 @@ import {
   type LastBellPropPathSegmentId,
 } from '../sim/content/last_bell_cinematics';
 import { HARBORS } from '../sim/harbor_layout';
+import { NOMINAL_SUBJECT_HEIGHT_YARDS } from '../sim/scenes/lint_core';
 import type { SceneDef, SceneOpDef, SceneRigPointDef } from '../sim/scenes/registry';
 import {
   DT,
@@ -67,6 +68,7 @@ export interface CinematicScrubWorld {
 export interface CinematicScrubFrame {
   readonly timeSec: number;
   readonly camera: CinematicCameraPose | null;
+  readonly subject: SceneRigPoint | null;
   readonly propCues: readonly CinematicPropCue[];
   readonly overlay: {
     readonly fadeOpacity: number;
@@ -130,9 +132,11 @@ export function evaluateCinematicScrubFrame(
   world: CinematicScrubWorld,
 ): CinematicScrubFrame {
   const timeSec = sampleCinematicTime(requestedTimeSec, scene.duration);
+  const camera = evaluateCamera(scene, timeSec, world);
   return {
     timeSec,
-    camera: evaluateCamera(scene, timeSec, world),
+    camera,
+    subject: camera?.subject ?? null,
     propCues: activePropCues(scene, timeSec),
     overlay: evaluateOverlay(scene, timeSec),
   };
@@ -176,7 +180,7 @@ function evaluateCamera(
   scene: SceneDef,
   timeSec: number,
   world: CinematicScrubWorld,
-): CinematicCameraPose | null {
+): (CinematicCameraPose & { readonly subject: SceneRigPoint | null }) | null {
   if (timeSec >= scene.duration) return null;
   const state = createSceneDirectorState();
   applySceneOp(state, { kind: 'start', duration: scene.duration }, 0);
@@ -223,9 +227,21 @@ function evaluateCamera(
   }
 
   if (!pose) return null;
+  const target = { ...sceneRigLookAtPosition(pose) };
+  const subject =
+    state.shot?.kind === 'focus'
+      ? {
+          x: state.shot.x,
+          y: state.shot.y + NOMINAL_SUBJECT_HEIGHT_YARDS,
+          z: state.shot.z,
+        }
+      : state.shot
+        ? target
+        : null;
   return {
     position: { ...sceneRigCameraPosition(pose) },
-    target: { ...sceneRigLookAtPosition(pose) },
+    target,
+    subject,
   };
 }
 
