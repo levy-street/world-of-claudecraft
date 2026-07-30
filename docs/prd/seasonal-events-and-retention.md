@@ -118,14 +118,16 @@ rhythm so a returning player knows what is on today (days all tuning):
 - Tuesday: reset day (existing 3 AM raid-lockout reset, unchanged).
 - Wednesday: Vale Cup match day (the fixture book Groundskeeper Bram
   already keeps in fiction becomes a published day).
-- Friday: market day: work-order cadence windows clear at open so every
-  order is freshly available, plus a cosmetics-only visiting peddler
-  stall. No payout changes (the payout fraction is an economy constant).
-- Saturday: the low-tide Ferrywalk assault (the weekly event specced in
-  docs/prd/farshore-odyssey-raid.md), once that PRD lands.
-- Sunday: a featured Hunt window for the Pale Huntsman
-  (docs/prd/pale-huntsman-worldboss.md). His Hunt rides its own short
-  cadence all week; Sunday is the calendar-featured ride, not the only one.
+- Friday: market day: one visiting peddler NPC and one stall exist only
+  while the Friday calendar gate is open. The peddler is a normal vendor
+  definition with a vendor inventory, and the same gate that drives fixture
+  days spawns and despawns both NPC and stall. Stock reuses existing item ids
+  to avoid a new i18n bill.
+- Saturday: the low-tide Ferrywalk assault, once the proposed Farshore
+  Odyssey raid PRD lands.
+- Sunday: a featured Hunt window for the Pale Huntsman, once the proposed
+  worldboss PRD lands. That PRD proposes a short Hunt cadence all week;
+  Sunday is the calendar-featured ride, not the only one.
 
 Nothing here is exclusive or expiring; a fixture day is when a thing
 reliably happens, not the only time it can. The v1 surface is the
@@ -167,9 +169,10 @@ All verified on origin/release/v0.30.0 by reading each module:
 - Realm persistence: server/db.ts owns the `world_state` JSONB store and
   realm-scoped `market:<realm>` / `mail:<realm>` wrappers. Seasonal state uses
   one `seasonal:<realm>` row and its own validated load/save wrappers.
-- Shared wire: server/game.ts `realmReadoutJson` plus `maybeRaw` builds and
-  stringifies viewer-identical state once per broadcast pass. Seasonal state
-  uses that path, not a per-session `maybe()` stringify.
+- Shared wire: `server/realm_readout_memo.ts` exports `realmReadoutJson`;
+  `server/game.ts` imports it and combines its memoized readout with `maybeRaw`
+  so viewer-identical state is built and stringified once per broadcast pass.
+  Seasonal state uses that path, not a per-session `maybe()` stringify.
 - Deeds: src/sim/content/deeds.ts + evaluator src/sim/deeds.ts (meters,
   flags, retro grants, onFishCaughtForDeeds); contract docs/design/deeds.md.
 - Fishing: full profession as cited above (rare precedent the_codfather).
@@ -184,7 +187,8 @@ All verified on origin/release/v0.30.0 by reading each module:
 
 1. The seasonal/fixture window scheduler: one small SimContext module
    (src/sim/events/season_schedule.ts) deriving open windows from host-supplied
-   civil-time inputs; offline gets a deterministic sim-tick fallback cadence.
+   civil-time inputs. Offline worlds never read wall clock and expose fair
+   content only when a host-provided world-creation flag opts in, default OFF.
 2. The seasonal realm save: one versioned `SeasonalRealmSave` in
    `world_state` under `seasonal:<realm>`, with boot load, coalesced save,
    shutdown drain, validation, and boundary reconciliation. The live object
@@ -227,10 +231,11 @@ shutdown before the pool closes. Failed writes leave state dirty for retry.
 Expose aggregate save age, dirty revision, and last-failure status through the
 existing internal performance/health surface without realm payload contents.
 
-Fair-open letters and Friday work-order refreshes are per-character effects,
-not realm scans. Store `lastFairLetterId` and `lastMarketRefreshId` on each
-character, reconcile lazily when that character loads, and update online
-characters at the boundary. Never scan the character table at a seasonal
+Fair-open letters are per-character effects, not realm scans. Store
+`lastFairLetterId` on each character, reconcile lazily when that character
+loads, and update online characters at the boundary. The Friday peddler NPC
+and stall are derived directly from the calendar gate and carry no
+per-character refresh state. Never scan the character table at a seasonal
 boundary.
 
 ## i18n scope, priced honestly
@@ -254,8 +259,8 @@ authorization.
 
 1. PR A (no Amberfall dependency, first within this program): the scheduler module,
    versioned seasonal realm save and full server lifecycle, calendar data,
-   lazy per-character market/letter reconciliation, noticeboard surface,
-   shared wire seam, and tests.
+   gate-driven visiting peddler stall, lazy per-character letter reconciliation,
+   noticeboard surface, shared wire seam, and tests.
 2. PR B (needs #2321): fair core: stalls, turn-in meter, fair quests and
    NPC placements, fair deeds, English catalog rows, and M16 fills.
 3. PR C: derby plus lantern launch, their deeds, VFX, screenshot evidence.
@@ -263,9 +268,10 @@ authorization.
 
 ## Acceptance criteria
 
-- Determinism: no wall clock or Math.random in sim; windows host-supplied
-  or tick-derived; architecture and parity tests green.
-- Three hosts: identical behavior offline, online, headless; IWorld
+- Determinism: no wall clock or Math.random in sim; online windows are
+  host-supplied, and offline fair content is controlled only by the
+  host-provided world-creation flag; architecture and parity tests green.
+- Three hosts: behavior is identical for identical host inputs; IWorld
   extended before any render/ui consumption; meter mirrored in ClientWorld.
 - Persistence: same-fair restarts preserve the meter; next-fair and downtime
   reconciliation reset exactly once; two realms never share state; malformed
@@ -296,18 +302,20 @@ Files ADDED:
 - `src/render/fair_dressing.ts` (meter-tiered town props, lantern-launch
   choreography on the festival-gold VFX palette).
 - The calendar data table (inside `season_schedule.ts` or a sibling
-  `src/sim/content/event_calendar.ts`).
+  `src/sim/content/event_calendar.ts`), including the gate-driven peddler
+  NPC, existing-id vendor stock, and stall placement.
 
 Files MODIFIED:
 - `src/sim/sim.ts` (scheduler tick, one live `SeasonalRealmState`) and
   `server/game.ts` (SIM_LAP_PHASES decision, host civil-time input, seasonal
-  dirty/coalesced writer, load/save lifecycle, `realmReadoutJson` + `maybeRaw`).
+  dirty/coalesced writer, load/save lifecycle, and `maybeRaw` integration with
+  `realmReadoutJson` from `server/realm_readout_memo.ts`).
 - `server/db.ts` (typed `seasonalStateKey`, `loadSeasonalState`, and
   `saveSeasonalState` wrappers over `world_state`) and `server/main.ts` (load
   before listen, shutdown drain before pool close).
-- Character state serialization for `lastFairLetterId` and
-  `lastMarketRefreshId`, reconciled lazily on character load and for online
-  characters at boundaries, with no database-wide character scan.
+- Character state serialization for `lastFairLetterId`, reconciled lazily on
+  character load and for online characters at boundaries, with no
+  database-wide character scan.
 - `src/world_api/` facet for the meter + open-window state, both worlds
   (`src/net/online.ts` mirror), `tests/world_api_parity.test.ts` pins.
 - `tests/snapshots.test.ts` pins for fresh-join delivery and unchanged shared
@@ -332,7 +340,10 @@ Files MODIFIED:
 2. Fair recipes at convenience parity: acceptable, or cut crafting to zero?
 3. Lantern follower cosmetic: fund a small vanity-pet system later, or is
    the skin-variant version the permanent answer?
-4. Offline worlds: fair always-on, or the tick-cadence fallback windows?
-5. The Sunday Hunt slot: confirm featuring the Pale Huntsman's ride on the
-   calendar (his PRD gives the Hunt its own 3-hour cadence (tuning); the
-   calendar entry is presentation, not a schedule change).
+4. Resolved: offline worlds never read wall clock. A host-provided flag at
+   world creation opts into always-on fair content and defaults OFF. Offline
+   parity goldens therefore never shift.
+5. The Sunday Hunt slot: once the proposed Pale Huntsman worldboss PRD
+   lands, confirm featuring its ride on the calendar. That PRD proposes a
+   3-hour Hunt cadence (tuning); the calendar entry is presentation, not a
+   schedule change.

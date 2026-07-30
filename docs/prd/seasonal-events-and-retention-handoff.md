@@ -18,7 +18,8 @@
    API. Guarded by `tests/architecture.test.ts`.
 2. All sim randomness goes through `Rng` (`ctx.rng`). Never `Math.random`, `Date.now`,
    `performance.now` in sim logic. Windows are host-supplied civil-time inputs
-   or deterministic sim-tick fallback; the sim NEVER reads a clock.
+   online; offline fair content is controlled by a host-provided flag set at
+   world creation and defaulting OFF. The sim NEVER reads a clock.
 3. Every player-visible string is i18n: sim/server emit stable keys or English
    literals with matcher entries (`src/ui/sim_i18n.ts`, S3 guard
    `tests/localization_fixes.test.ts`); UI strings are `t()` keys in
@@ -51,8 +52,6 @@ export const FAIR_FIRST_OPEN_LOCAL = '2026-09-18T20:00:00'; // realm-local propo
 export const LANTERN_LAUNCH_HOUR = 20;       // realm-local civil 20:00 (tuning)
 export const LANTERN_CHANNEL_SEC = 3;        // freely interruptible
 export const FAIR_METER_THRESHOLDS = [300, 800, 1500] as const; // turn-ins (tuning)
-export const OFFLINE_FAIR_CADENCE_TICKS = 8 * 7 * 24 * 3600 * 20; // tick fallback
-export const OFFLINE_FAIR_WINDOW_TICKS = 14 * 24 * 3600 * 20;
 export const SEASONAL_SAVE_VERSION = 1;
 export const FAIR_METER_CAP = FAIR_METER_THRESHOLDS[2];
 
@@ -79,26 +78,26 @@ All rows verified on origin/release/v0.30.0 except the Amberfall rows (branch on
 
 | Concern | Anchor |
 |---|---|
-| Cadence primitive | `src/sim/professions/cadence.ts`: `WORK_ORDER_CADENCE_TICKS = 36000` (:14), `CadenceMap` (:35), `isCadenceBlocked` (:39), `armCadence` (:46), `serializeCadence` (:100, persisted and clamped on load). Consumers via `repeatCadenceTicks`: zone1/zone2/zone3 records + `src/sim/quests/quest_commands.ts`. There is NO daily-quest system; this is the reuse target. |
-| Host civil time | `server/raid_reset.ts`: 03:00 realm-zone boundary, `nextRaidResetMs` (:115), `isSupportedTimeZone` (:30). Fair windows reuse host-computed civil inputs, but seasonal state does NOT use per-character `meta.raidLockouts`. |
-| Realm JSONB store | `server/db.ts`: `world_state` table (:596), generic `loadWorldState` / `saveWorldState` (:3404), realm-key wrappers `market:<realm>` and `mail:<realm>` (:3464 onward). Seasonal adds typed wrappers for exactly one `seasonal:<realm>` row. |
-| Save cadence | `server/game.ts`: `createSerialWriter` market writer near :1370; `flushPeriodicSaves` 30-second cadence :2059. Seasonal adds a dirty, coalesced writer with at most one in-flight and one trailing save; no turn-in query. |
-| Boot and shutdown | `server/main.ts`: boot constructs the live game after schema setup near :2814; shutdown stops the game and drains market/mail near :3095. Seasonal load completes before listen, and its writer drains before pool close. |
-| Shared realm wire | `server/game.ts`: `maybeRaw` near :5742 and `realmReadoutJson` use near :5871 build and stringify viewer-identical state once per broadcast pass. Seasonal uses this shared path, not per-session `maybe()`. |
-| Fishing | `src/sim/professions/fishing.ts`: `startFishing` (:124), `completeFishing` (:211, ONE table draw; capacity gates after the roll :255 so draw order never depends on bags; Vale-table fallback :223), `fishingCatchGain` (:92), rare precedent `the_codfather` (:39), `onFishCaughtForDeeds` call (:284). |
-| Deeds | Content `src/sim/content/deeds.ts`: `DEED_ORDER` (:2228) APPEND-ONLY (contract header :6). Evaluator `src/sim/deeds.ts`: `onFishCaughtForDeeds` (:1792), `onNpcTalkedForDeeds` (:1765), `onCupMatchEndForDeeds` (:1699) as meter/flag templates. Contract doc: `docs/design/deeds.md`. |
-| Skins | `src/sim/content/skins.ts`: `EVENT_SKIN_TOKEN_ID = 'event_skin_token'` (:17), `rollSkinRank(unitRoll)` (:28), `EVENT_SKIN_TIERS` (:45, ":38 placeholder mapping onto existing alt skins" is the comment S8 replaces). |
-| Card duel | `src/sim/social/card_duel.ts` + `card_duel_queue.ts` (`createCardDuelQueue` :8, `joinCardDuelQueue` :16, `tryPairCardDuel` :44); `src/sim/content/card_master.ts` `CARD_MASTER_NPC_ID` (:6). Only the fair desk placement is new. |
-| Mail | `src/sim/content/letters.ts`: `LetterDef` (:17), `QUEST_LETTERS` (:90) as the record template; delivery via `src/sim/mail/post_office.ts` (PostOffice, letterId client localization). |
-| Noticeboards | `src/sim/content/noticeboards.ts`: `NOTICEBOARDS` (:29, one Eastbrook board), `noticeboardDefByEntityId` (:32). Town Focus is an interaction precedent only; seasonal persistence and shared wire use the rows above. |
-| Content merge | `src/sim/data.ts` imports content modules (zone3 at :109; amberfall at branch data.ts:43). New content modules merge here. |
-| Amberfall (branch #2321 ONLY) | `src/sim/content/amberfall.ts`: hub Lanternmere (:34), Great Mere POI (:48), NPCs `reeve_ottoline` (:223), `waywatcher_sorrel` (:233), `ferrymaster_caddow` (:244), `orchardist_pomeline` (:255), existing `stalls:` prop records (:543). Fair placements are ADDITIVE to this file. |
+| Cadence primitive | `src/sim/professions/cadence.ts`: `WORK_ORDER_CADENCE_TICKS = 36000`, `CadenceMap`, `isCadenceBlocked`, `armCadence`, and `serializeCadence`. Consumers use `repeatCadenceTicks` in the zone quest records and `src/sim/quests/quest_commands.ts`. At 20 Hz the cadence is 30 minutes, so it remains a provisioning-order precedent and is never cleared for market day. |
+| Host civil time | `server/raid_reset.ts`: `nextRaidResetMs` and `isSupportedTimeZone`. Fair windows reuse host-computed civil inputs, but seasonal state does NOT use per-character `meta.raidLockouts`. |
+| Realm JSONB store | `server/db.ts`: `world_state`, `loadWorldState`, `saveWorldState`, and the realm-key wrappers for `market:<realm>` and `mail:<realm>`. Seasonal adds typed wrappers for exactly one `seasonal:<realm>` row. |
+| Save cadence | `server/game.ts`: `createSerialWriter` and `flushPeriodicSaves`. Seasonal adds a dirty, coalesced writer with at most one in-flight and one trailing save; no turn-in query. |
+| Boot and shutdown | `server/main.ts`: the schema setup, game construction, and shutdown lifecycle. Seasonal load completes before listen, and its writer drains before pool close. |
+| Shared realm wire | `server/realm_readout_memo.ts` exports `realmReadoutJson`; `server/game.ts` imports it and combines its memoized readout with `maybeRaw`. Seasonal uses this shared path, not per-session `maybe()`. |
+| Fishing | `src/sim/professions/fishing.ts`: `startFishing`, `completeFishing`, `fishingCatchGain`, rare precedent `the_codfather`, and the `onFishCaughtForDeeds` call. `completeFishing` keeps one table draw, with capacity gates after the roll so draw order never depends on bags. |
+| Deeds | Content `src/sim/content/deeds.ts`: append-only `DEED_ORDER`. Evaluator `src/sim/deeds.ts`: `onFishCaughtForDeeds`, `onNpcTalkedForDeeds`, and `onCupMatchEndForDeeds` as meter and flag templates. Contract doc: `docs/design/deeds.md`. |
+| Skins | `src/sim/content/skins.ts`: `EVENT_SKIN_TOKEN_ID`, `rollSkinRank`, and `EVENT_SKIN_TIERS`. The placeholder mapping comment identifies what S8 replaces. |
+| Card duel | `src/sim/social/card_duel.ts` + `card_duel_queue.ts`: `createCardDuelQueue`, `joinCardDuelQueue`, and `tryPairCardDuel`; `src/sim/content/card_master.ts`: `CARD_MASTER_NPC_ID`. Only the fair desk placement is new. |
+| Mail | `src/sim/content/letters.ts`: `LetterDef` and `QUEST_LETTERS` as the record template; delivery via `src/sim/mail/post_office.ts` and `PostOffice`, with letterId client localization. |
+| Noticeboards | `src/sim/content/noticeboards.ts`: `NOTICEBOARDS` and `noticeboardDefByEntityId`. Town Focus is an interaction precedent only; seasonal persistence and shared wire use the rows above. |
+| Content merge | `src/sim/data.ts` imports the zone content modules. New content modules merge here. |
+| Amberfall (branch #2321 ONLY) | `src/sim/content/amberfall.ts`: Lanternmere, the Great Mere POI, `reeve_ottoline`, `waywatcher_sorrel`, `ferrymaster_caddow`, `orchardist_pomeline`, and the existing `stalls` prop records. Fair placements are ADDITIVE to this file. |
 | SimContext seam | `src/sim/sim_context.ts`; new system modules take `ctx: SimContext`, backing state lives on `Sim` as a live ctx view (`src/sim/CLAUDE.md`). |
 | IWorld | `src/world_api.ts` + per-facet files in `src/world_api/` (e.g. `daily_rewards.ts` as a facet template); parity pin `tests/world_api_parity.test.ts`. |
-| ClientWorld | `src/net/online.ts` `applySnapshot` self/global mirrors (tfocus pattern :2973). |
-| Server tick pin | `SIM_LAP_PHASES` `server/game.ts:334` (pinned by `tests/server/tick_perf_capture.test.ts`); a new named sim phase must be added to the array or its timing drops. |
+| ClientWorld | `src/net/online.ts`: `applySnapshot` self and global mirrors. |
+| Server tick pin | `server/game.ts`: `SIM_LAP_PHASES`, pinned by `tests/server/tick_perf_capture.test.ts`. A new named sim phase must be added to the array or its timing drops. |
 | Parity goldens | `tests/parity/scenarios.ts`; `UPDATE_PARITY=1 npx vitest run tests/parity` regenerates; never regenerate to hide a diff. |
-| Wardstone channel precedent | `src/sim/interaction.ts` (:472 area, `nythraxis_ward_channel`): the readable ground-object channel pattern for stalls and lanterns. |
+| Wardstone channel precedent | `src/sim/interaction.ts`: `nythraxis_ward_channel`, the readable ground-object channel pattern for stalls and lanterns. |
 
 ## 3. Slices
 
@@ -134,7 +133,10 @@ export interface SeasonWindowState {
 ```
   Host mode computes instants and a stable `fairId` from the opening instant,
   schedule version, and realm time zone, then hands those values to the sim.
-  Offline mode uses `OFFLINE_FAIR_CADENCE_TICKS` (pending Levy open question 4).
+  Offline mode receives a host-provided `offlineFairEnabled` flag at world
+  creation. It defaults OFF. When explicitly enabled, fair content is always
+  open with a stable offline `fairId`; no calendar progression or wall-clock
+  read occurs.
 - Persist only `SeasonalRealmSave { version, fairId, meter }`. Sanitize on load:
   reject unknown shapes, normalize meter to a finite integer in
   `0..FAIR_METER_CAP`, retain it only when the loaded `fairId` matches the
@@ -143,35 +145,42 @@ export interface SeasonWindowState {
   and one trailing write for newer state; autosave may flush dirty state; fair
   boundaries and thresholds request a flush; failure leaves dirty state for retry;
   shutdown drains. A turn-in never calls `saveSeasonalState` directly.
-- Tests FIRST: same seed + host inputs produce identical windows; offline boundaries
-  land on exact ticks; same-fair restart preserves meter; next-fair and downtime
-  reconciliation reset once; corrupt/non-finite/out-of-range documents sanitize;
-  realms use distinct keys; writer queue stays bounded; failure retries; shutdown
-  drains; save-age/failure diagnostics expose no payload; architecture proves no
-  sim clock read. Pin exactly one zero-or-one-row boot read and writes only on
-  dirty autosave, boundary, threshold, or shutdown triggers. Independent malformed
-  cases cover unknown version, missing/invalid `fairId`, missing meter, negative,
-  fractional, above-cap, NaN, and Infinity. Fixed vectors cover the anchor, two
-  recurrence cycles, a DST transition, exact boundaries, and a schedule-version change.
+- Tests FIRST: same seed + host inputs produce identical windows; offline worlds
+  default to fair content OFF and enable it only through the world-creation flag;
+  same-fair restart preserves meter; next-fair and downtime reconciliation reset
+  once; corrupt/non-finite/out-of-range documents sanitize; realms use distinct
+  keys; writer queue stays bounded; failure retries; shutdown drains;
+  save-age/failure diagnostics expose no payload; architecture proves no sim clock
+  read. Pin exactly one zero-or-one-row boot read and writes only on dirty autosave,
+  boundary, threshold, or shutdown triggers. Independent malformed cases cover
+  unknown version, missing/invalid `fairId`, missing meter, negative, fractional,
+  above-cap, NaN, and Infinity. Fixed vectors cover the anchor, two recurrence
+  cycles, a DST transition, exact boundaries, and a schedule-version change.
 - Acceptance: `npx vitest run tests/season_schedule.test.ts tests/server/seasonal_persistence.test.ts tests/architecture.test.ts && npx vitest run tests/parity`
 
 ### S2. Calendar data table + market day + noticeboard/letter surface (completes PR A)
 - Goal: the published weekly rhythm and its minimal v1 surface.
 - Files: NEW `src/sim/content/event_calendar.ts` (fixture-day table: Tuesday reset,
-  Wednesday Vale Cup, Friday market day, Saturday Ferrywalk placeholder, Sunday
-  featured Hunt; days tuning; merged by `data.ts`); MODIFIED `season_schedule.ts`
-  (market-day cadence clear: on the Friday boundary, clear work-order `CadenceMap`
-  keys so every order is freshly available; NO payout change),
+  Wednesday Vale Cup, Friday market day, Saturday Ferrywalk placeholder once its
+  proposed PRD lands, Sunday featured Hunt placeholder once its proposed PRD lands;
+  days tuning; merged by `data.ts`). Friday market day defines one visiting peddler
+  as a normal vendor NPC with one stall and an inventory of existing item ids. The
+  fixture-day gate spawns both NPC and stall while open and despawns both when
+  closed; it never mutates work-order cadence or payout state. MODIFIED
   `src/sim/content/noticeboards.ts` (calendar notice content),
   `src/sim/content/letters.ts` (fair-open letter record), character state
-  serialization (`lastFairLetterId`, `lastMarketRefreshId`) with lazy reconcile
-  on character load and an online-character boundary update, `src/ui/sim_i18n.ts`
-  matcher entries for any sim-emitted lines. Never scan the character table.
-- Reused: CadenceMap, NOTICEBOARDS, LetterDef/PostOffice. NEW: the data table only.
-- Tests FIRST: cadence keys clear exactly once per market boundary; a character
-  offline at the boundary reconciles on next load; an online character updates at
-  the boundary; fixture resolution is pure; fair letter delivers once per `fairId`;
-  no boundary-wide character query occurs.
+  serialization (`lastFairLetterId`) with lazy reconcile on character load and an
+  online-character boundary update, `src/ui/sim_i18n.ts` matcher entries for any
+  sim-emitted lines. Never scan the character table.
+- Reused: normal NPC definitions, vendor inventory and interaction machinery,
+  existing item ids, NOTICEBOARDS, and LetterDef/PostOffice. NEW: the fixture table,
+  one peddler NPC definition, and one stall placement only.
+- Tests FIRST: the peddler NPC and stall exist only while the Friday gate is open;
+  vendor interaction uses the existing machinery; every stock item id already
+  exists; work-order `CadenceMap` state is unchanged at both Friday boundaries;
+  fixture resolution is pure; fair letter delivers once per `fairId`; a character
+  offline at the fair boundary reconciles on next load; no boundary-wide character
+  query occurs.
 - Acceptance: `npx vitest run tests/season_schedule.test.ts tests/server/seasonal_persistence.test.ts tests/localization_fixes.test.ts && npx vitest run tests/parity`
 
 ### S3. Realm-shared fair meter (seam slice: IWorld, wire, mirror, parity)
@@ -188,11 +197,13 @@ export interface SeasonWindowState {
   readout memo because every client renders the same town):
 ```ts
 // server snapshot: fair: { o: 0|1, m: number, t: 0|1|2|3 }
+// server/game.ts imports realmReadoutJson from server/realm_readout_memo.ts
 // server: maybeRaw('fair', realmReadoutJson(... seasonalInfo ...))
 // online.ts applySnapshot: if (s.fair) this.seasonal = decodeFair(s.fair);
 ```
-- Reused: `realmReadoutJson` + `maybeRaw`, world_api facet layout, S1 realm save.
-  NEW: meter state only (resets each fair, gates nothing).
+- Reused: `realmReadoutJson` from `server/realm_readout_memo.ts`, `maybeRaw` in
+  `server/game.ts`, world_api facet layout, and the S1 realm save. NEW: meter
+  state only (resets each fair, gates nothing).
 - Tests FIRST: offline Sim and ClientWorld expose identical `seasonalInfo`; meter
   survives same-fair save/load; values clamp to `0..FAIR_METER_CAP`; threshold
   crossings dirty and flush once; 100 turn-ins issue zero immediate queries and
@@ -226,9 +237,11 @@ export interface SeasonWindowState {
   beside `onFishCaughtForDeeds`.
 - Reused: the single-table-draw contract, `the_codfather` rare precedent, deed
   meters. NEW: one item id (English row plus maintainer release fill) + persisted lifetime tally.
-- Tests FIRST: draw order identical whether or not the fair is open EXCEPT the fair
-  row (pin the one-draw contract); tally accumulates across two simulated fair
-  windows and never resets; Gleamer is no-sell; derby deed fires at thresholds.
+- Tests FIRST: default offline worlds keep fair content OFF. On every path exercised
+  by a parity scenario, fishing has no new draw AND no changed outcome. Separate
+  opt-in fair tests pin the existing one-draw contract while exercising the fair
+  row; tally accumulates across two simulated fair windows and never resets;
+  Gleamer is no-sell; derby deed fires at thresholds.
 - Acceptance: `npx vitest run tests/professions_fishing.test.ts tests/deeds_content.test.ts && npx vitest run tests/parity` (expect NO golden churn; see gotcha G3)
 
 ### S6. Lantern launch + meter-tiered town dressing (render; with S5 = PR C)
@@ -279,15 +292,18 @@ export interface SeasonWindowState {
 
 ## 4. Gotchas (read before every slice)
 
-- **G1, determinism is the whole point.** No wall clock in sim, ever: windows arrive
-  as host-supplied epoch ms (server) or tick cadence (offline). If a slice needs "is
-  the fair open", it reads `SeasonWindowState`, never computes a date.
+- **G1, determinism is the whole point.** No wall clock in sim, ever: online windows
+  arrive as host-supplied epoch ms. Offline fair content reads only the
+  world-creation opt-in flag, default OFF. If a slice needs "is the fair open", it
+  reads `SeasonWindowState`, never computes a date.
 - **G2, SIM_LAP_PHASES is pinned.** Any new named phase in the server tick must be
-  added to the array at `server/game.ts:334` or `tests/server/tick_perf_capture.test.ts`
-  documents the dropped timing. Prefer folding the scheduler into an existing phase.
-- **G3, parity goldens.** Any new `ctx.rng` draw on a shared code path (the fishing
-  table draw especially) shifts draw order and reds every golden. Fair-only draws
-  live inside fair-only branches; the S5 test pins this. If a golden reds, fix the
+  added to `SIM_LAP_PHASES` in `server/game.ts` or
+  `tests/server/tick_perf_capture.test.ts` documents the dropped timing. Prefer
+  folding the scheduler into an existing phase.
+- **G3, parity goldens.** The fair-only fishing invariant is no new draw AND no
+  changed outcome on any path a parity scenario exercises. Offline worlds default
+  to fair content OFF, so offline goldens never shift. The S5 tests pin both the
+  default path and the separate host-opt-in fair path. If a golden reds, fix the
   code, never `UPDATE_PARITY=1` an existing scenario.
 - **G4, the item-i18n bill.** Every NEW item id costs an English catalog row plus a
   maintainer-owned release overlay fill. Mitigation is designed in: turn-ins and
@@ -306,12 +322,14 @@ export interface SeasonWindowState {
 - **G8, realm state is one row and one writer.** Key exactly `seasonal:<realm>`;
   one live object on Sim; at most one write in flight plus one trailing dirty write.
   No per-turn-in query, no PlayerMeta copy, no derived timestamp in the save.
-- **G9, boundaries do not scan characters.** Fair letters and Friday refreshes use
-  per-character last-seen ids, lazy reconciliation on load, and an online-only
-  boundary pass. Never query every character when a window changes.
+- **G9, boundaries do not scan characters.** Fair letters use per-character
+  last-seen ids, lazy reconciliation on load, and an online-only boundary pass.
+  The Friday peddler NPC and stall are derived from the fixture gate and have no
+  per-character refresh state. Never query every character when a window changes.
 - **G10, shared wire is serialized once.** Viewer-identical seasonal state uses
-  `realmReadoutJson` + `maybeRaw`; a `maybe('fair', value)` call inside each session
-  loop reintroduces avoidable stringify cost and is not acceptable.
+  `realmReadoutJson` from `server/realm_readout_memo.ts` plus `maybeRaw` in
+  `server/game.ts`; a `maybe('fair', value)` call inside each session loop
+  reintroduces avoidable stringify cost and is not acceptable.
 
 ## 5. Agent dispatch template (for later; do not dispatch yet)
 
