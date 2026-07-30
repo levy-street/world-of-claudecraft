@@ -339,6 +339,81 @@ describe('attach rig', () => {
   });
 });
 
+describe('live-pose entry easing', () => {
+  const easeFrom: SceneRigPose = {
+    yaw: 1,
+    pitch: 0.3,
+    dist: 12,
+    focusX: 0,
+    focusY: 0,
+    focusZ: 0,
+  };
+
+  it('accepts the ease-from pose as explicit dolly input', () => {
+    const shot: SceneRigCameraShot = {
+      kind: 'dolly',
+      points: [
+        { x: 2, y: 6, z: 4 },
+        { x: 10, y: 8, z: 12 },
+      ],
+      lookAt: { kind: 'point', point: { x: 6, y: 3, z: 8 } },
+      dur: 2,
+    };
+
+    expect(
+      evaluateSceneRigPose(shot, 0, noEntities, noAttachments, undefined, {
+        pose: easeFrom,
+        duration: 0.8,
+      }),
+    ).toEqual(easeFrom);
+    const landed = evaluateSceneRigPose(shot, 0.8, noEntities, noAttachments, undefined, {
+      pose: easeFrom,
+      duration: 0.8,
+    });
+    const authored = evaluateSceneRigPose(shot, 0.8, noEntities, noAttachments);
+    expect(landed).toEqual(authored);
+    const authoredHalf = evaluateSceneRigPose(shot, 0.4, noEntities, noAttachments);
+    const easedHalf = evaluateSceneRigPose(shot, 0.4, noEntities, noAttachments, undefined, {
+      pose: easeFrom,
+      duration: 0.8,
+    });
+    expect(easedHalf.yaw).toBeCloseTo((easeFrom.yaw + authoredHalf.yaw) / 2, 10);
+    expect(easedHalf.dist).toBeCloseTo((easeFrom.dist + authoredHalf.dist) / 2, 10);
+    expect(easedHalf.focusX).toBeCloseTo((easeFrom.focusX + authoredHalf.focusX) / 2, 10);
+  });
+
+  it('accepts the ease-from pose as explicit attach input', () => {
+    const shot: SceneRigCameraShot = {
+      kind: 'attach',
+      target: 'ship',
+      fallbackFrame: { position: { x: 10, y: 5, z: 20 }, yaw: 0 },
+      offset: { x: 2, y: 3, z: 0 },
+      lookAt: { x: 0, y: 1, z: 4 },
+    };
+
+    expect(
+      evaluateSceneRigPose(shot, 0, noEntities, noAttachments, undefined, {
+        pose: easeFrom,
+        duration: 0.8,
+      }),
+    ).toEqual(easeFrom);
+    expect(
+      evaluateSceneRigPose(shot, 0.8, noEntities, noAttachments, undefined, {
+        pose: easeFrom,
+        duration: 0.8,
+      }),
+    ).toEqual(evaluateSceneRigPose(shot, 0.8, noEntities, noAttachments));
+    const authoredHalf = evaluateSceneRigPose(shot, 0.4, noEntities, noAttachments);
+    const easedHalf = evaluateSceneRigPose(shot, 0.4, noEntities, noAttachments, undefined, {
+      pose: easeFrom,
+      duration: 0.8,
+    });
+    expect(easedHalf.yaw).toBeCloseTo((easeFrom.yaw + authoredHalf.yaw) / 2, 10);
+    expect(easedHalf.dist).toBeCloseTo((easeFrom.dist + authoredHalf.dist) / 2, 10);
+    expect(easedHalf.focusZ).toBeCloseTo((easeFrom.focusZ + authoredHalf.focusZ) / 2, 10);
+  });
+});
+
 describe('degenerate rig inputs', () => {
   it('holds a single-point spline at every sample', () => {
     const shot: SceneRigCameraShot = {
@@ -386,7 +461,7 @@ describe('allocation plumbing', () => {
 
   it('routes every live rig point through the module scratch containers', () => {
     expect(RIG_SOURCE).toContain(
-      'const frame = resolveAttachment(shot.target, ATTACH_FRAME) ?? shot.fallbackFrame;',
+      'resolveAttachment(shot.target, ATTACH_FRAME, attachmentTimeSec) ?? shot.fallbackFrame;',
     );
     expect(RIG_SOURCE).toContain('const camera = localToWorld(frame, shot.offset, CAMERA_POINT);');
     expect(RIG_SOURCE).toContain('const lookAt = localToWorld(frame, shot.lookAt, LOOK_AT_POINT);');

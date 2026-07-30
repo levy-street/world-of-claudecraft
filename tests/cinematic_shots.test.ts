@@ -11,16 +11,23 @@ import {
 import {
   applySceneOp,
   createSceneDirectorState,
+  SCENE_RIG_ENTRY_SEC,
   type SceneLivePose,
   type ScenePose,
   scenePose,
+  sceneShotEasesFromLivePose,
 } from '../src/game/scene_director_core';
 import {
+  evaluateSceneRigPose,
   sceneRigCameraPosition,
   sceneRigLocalToWorld,
   sceneRigLookAtPosition,
 } from '../src/game/scene_rig_core';
 import { SFX_FIXED_CATALOG_KEYS } from '../src/game/sfx_manifest.generated';
+import {
+  type HarborDeckRiderResolution,
+  resolveHarborDeckRider,
+} from '../src/render/harbor_deck_rider_core';
 import { composeHarborShipAttachFrame } from '../src/render/harbor_ship_attach_core';
 import { type PropPathSegment, propPathPoseAt } from '../src/render/prop_path_core';
 import {
@@ -197,37 +204,117 @@ interface LegacyExemption {
   readonly reason: string;
 }
 
-// P3 must clear every row while fixing deck riding.
+// P1.3 must clear every row while fixing voyage content.
 const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
   {
     sceneId: 'scn_lb_ferry_depart_back',
-    check: 'support.entity',
-    reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
+    check: 'collision.hull',
+    reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
   },
   {
     sceneId: 'scn_lb_ferry_depart_back',
-    check: 'containment.rider',
-    reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
+    check: 'cut.fadeSlack',
+    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_back',
+    check: 'fade.symmetry',
+    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_back',
+    check: 'motion.propAcceleration',
+    reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_back',
+    check: 'motion.propWay',
+    reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
   },
   {
     sceneId: 'scn_lb_ferry_depart_out',
-    check: 'support.entity',
-    reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
+    check: 'collision.hull',
+    reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
   },
   {
     sceneId: 'scn_lb_ferry_depart_out',
-    check: 'containment.rider',
-    reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
+    check: 'cut.fadeSlack',
+    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_out',
+    check: 'fade.symmetry',
+    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_out',
+    check: 'motion.propAcceleration',
+    reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_out',
+    check: 'motion.propWay',
+    reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
+  },
+  {
+    sceneId: 'scn_lb_q0_ashore',
+    check: 'cut.fadeSlack',
+    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+  },
+  {
+    sceneId: 'scn_lb_q0_ashore',
+    check: 'fade.symmetry',
+    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
   },
   {
     sceneId: 'scn_lb_q0_voyage',
-    check: 'support.entity',
-    reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
+    check: 'collision.hull',
+    reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
   },
   {
     sceneId: 'scn_lb_q0_voyage',
-    check: 'containment.rider',
-    reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
+    check: 'cut.fadeSlack',
+    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
+    check: 'fade.symmetry',
+    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
+    check: 'motion.propAcceleration',
+    reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
+    check: 'motion.propWay',
+    reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
+  },
+  {
+    sceneId: 'cast_off',
+    check: 'reference.orphan',
+    reason: 'P1.3 must cue or remove the legacy authored cast-off prop segment.',
+  },
+  {
+    sceneId: 'scn_lb_q0_ashore',
+    check: 'reference.orphan',
+    reason: 'P1.3 must trigger or remove the superseded standalone arrival scene.',
+  },
+  {
+    sceneId: 'scn_lb_q0_ashore',
+    check: 'reference.subtitleReadTime',
+    reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
+  },
+  {
+    sceneId: 'scn_lb_q0_doorway',
+    check: 'reference.subtitleReadTime',
+    reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
+    check: 'reference.subtitleReadTime',
+    reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
   },
 ];
 
@@ -262,6 +349,8 @@ interface CapturedScene {
   readonly entityLabels: ReadonlyMap<number, string>;
   readonly entityReferenceIds: ReadonlyMap<string, readonly number[]>;
   readonly riderHarbors: ReadonlyMap<number, HarborDef['id']>;
+  readonly disableDeckRiding?: boolean;
+  readonly disableLivePoseEase?: boolean;
 }
 
 interface ActiveProp {
@@ -292,6 +381,7 @@ interface CameraSample {
   readonly shipScreenX: ReadonlyMap<string, number>;
   readonly subject: SceneRigPoint | null;
   readonly subjectScreen: ScreenPoint | null;
+  readonly entryEase: boolean;
 }
 
 interface PropMotionSample {
@@ -325,6 +415,8 @@ interface Violation {
 interface SyntheticPresentationFixture {
   readonly playerHeightOffset?: number;
   readonly playerStart?: { x: number; z: number };
+  readonly disableDeckRiding?: boolean;
+  readonly disableLivePoseEase?: boolean;
 }
 
 interface SyntheticSceneDef extends SceneDef {
@@ -575,25 +667,32 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     expectedMeasured: 'player is 2.00 yd above terrain',
   },
   {
-    def: syntheticCameraScene('scn_test_lint_rider_drift_bad', 1.7, [
-      {
-        at: 0,
-        kind: 'prop',
-        target: 'harbor_ship_mainland',
-        cue: SYNTHETIC_RIDER_DRIFT_CUE,
-      },
-      {
-        at: 0,
-        kind: 'camera',
-        shot: {
-          kind: 'attach',
+    def: syntheticCameraScene(
+      'scn_test_lint_rider_drift_bad',
+      1.7,
+      [
+        {
+          at: 0,
+          kind: 'prop',
           target: 'harbor_ship_mainland',
-          fallbackFrame: { point: { x: 240.5, z: -84, height: 8 }, yaw: Math.PI / 2 },
-          offset: { x: 0, y: 18, z: -24 },
-          lookAt: { x: 0, y: 8, z: 0 },
+          cue: SYNTHETIC_RIDER_DRIFT_CUE,
         },
+        {
+          at: 0,
+          kind: 'camera',
+          shot: {
+            kind: 'attach',
+            target: 'harbor_ship_mainland',
+            fallbackFrame: { point: { x: 240.5, z: -84, height: 8 }, yaw: Math.PI / 2 },
+            offset: { x: 0, y: 18, z: -24 },
+            lookAt: { x: 0, y: 8, z: 0 },
+          },
+        },
+      ],
+      {
+        presentationFixture: { disableDeckRiding: true },
       },
-    ]),
+    ),
     expectedCheck: 'containment.rider',
     expectedMeasured: 'ferryman_ewald left mainland deck bounds',
     playerStart: MAINLAND_HARBOR.boarding,
@@ -713,28 +812,35 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     expectedCheck: 'motion.poseContinuity',
   },
   {
-    def: syntheticCameraScene('scn_test_lint_cut_jump_bad', 3.2, [
-      {
-        at: 0,
-        kind: 'camera',
-        shot: {
-          kind: 'dolly',
-          points: [{ x: 0, z: 0, height: 100 }],
-          lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
-          dur: 1.6,
+    def: syntheticCameraScene(
+      'scn_test_lint_cut_jump_bad',
+      3.2,
+      [
+        {
+          at: 0,
+          kind: 'camera',
+          shot: {
+            kind: 'dolly',
+            points: [{ x: 0, z: 0, height: 100 }],
+            lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
+            dur: 1.6,
+          },
         },
-      },
-      {
-        at: 1.6,
-        kind: 'camera',
-        shot: {
-          kind: 'dolly',
-          points: [{ x: 10, z: 0, height: 100 }],
-          lookAt: { kind: 'point', point: { x: 10, z: 10, height: 100 } },
-          dur: 1.6,
+        {
+          at: 1.6,
+          kind: 'camera',
+          shot: {
+            kind: 'dolly',
+            points: [{ x: 10, z: 0, height: 100 }],
+            lookAt: { kind: 'point', point: { x: 10, z: 10, height: 100 } },
+            dur: 1.6,
+          },
         },
+      ],
+      {
+        presentationFixture: { disableLivePoseEase: true },
       },
-    ]),
+    ),
     expectedCheck: 'motion.cutJump',
   },
   {
@@ -842,48 +948,62 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     expectedCheck: 'prop.speed',
   },
   {
-    def: syntheticCameraScene('scn_test_lint_prop_dead_stop_bad', 1.7, [
-      {
-        at: 0,
-        kind: 'prop',
-        target: 'harbor_ship_mainland',
-        cue: SYNTHETIC_PROP_DEAD_STOP_CUE,
-      },
-      {
-        at: 0,
-        kind: 'camera',
-        shot: {
-          kind: 'attach',
+    def: syntheticCameraScene(
+      'scn_test_lint_prop_dead_stop_bad',
+      1.7,
+      [
+        {
+          at: 0,
+          kind: 'prop',
           target: 'harbor_ship_mainland',
-          fallbackFrame: { point: { x: 240.5, z: -44, height: 8 }, yaw: Math.PI / 2 },
-          offset: { x: 6.6, y: 18, z: -28 },
-          lookAt: { x: 6.6, y: 8.6, z: 0 },
+          cue: SYNTHETIC_PROP_DEAD_STOP_CUE,
         },
+        {
+          at: 0,
+          kind: 'camera',
+          shot: {
+            kind: 'attach',
+            target: 'harbor_ship_mainland',
+            fallbackFrame: { point: { x: 240.5, z: -44, height: 8 }, yaw: Math.PI / 2 },
+            offset: { x: 6.6, y: 18, z: -28 },
+            lookAt: { x: 6.6, y: 8.6, z: 0 },
+          },
+        },
+      ],
+      {
+        presentationFixture: { disableLivePoseEase: true },
       },
-    ]),
+    ),
     expectedCheck: 'motion.propWay',
     expectedMeasured: 'way fell from',
   },
   {
-    def: syntheticCameraScene('scn_test_lint_prop_lurch_bad', 1.7, [
-      {
-        at: 0,
-        kind: 'prop',
-        target: 'harbor_ship_mainland',
-        cue: SYNTHETIC_PROP_LURCH_CUE,
-      },
-      {
-        at: 0,
-        kind: 'camera',
-        shot: {
-          kind: 'attach',
+    def: syntheticCameraScene(
+      'scn_test_lint_prop_lurch_bad',
+      1.7,
+      [
+        {
+          at: 0,
+          kind: 'prop',
           target: 'harbor_ship_mainland',
-          fallbackFrame: { point: { x: 240.5, z: -44, height: 8 }, yaw: Math.PI / 2 },
-          offset: { x: 6.6, y: 18, z: -28 },
-          lookAt: { x: 6.6, y: 8.6, z: 0 },
+          cue: SYNTHETIC_PROP_LURCH_CUE,
         },
+        {
+          at: 0,
+          kind: 'camera',
+          shot: {
+            kind: 'attach',
+            target: 'harbor_ship_mainland',
+            fallbackFrame: { point: { x: 240.5, z: -44, height: 8 }, yaw: Math.PI / 2 },
+            offset: { x: 6.6, y: 18, z: -28 },
+            lookAt: { x: 6.6, y: 8.6, z: 0 },
+          },
+        },
+      ],
+      {
+        presentationFixture: { disableLivePoseEase: true },
       },
-    ]),
+    ),
     expectedCheck: 'motion.propAcceleration',
     expectedMeasured: 'acceleration',
   },
@@ -922,7 +1042,10 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
           },
         },
       ],
-      { coverFirstCut: false },
+      {
+        coverFirstCut: false,
+        presentationFixture: { disableLivePoseEase: true },
+      },
     ),
     expectedCheck: 'cut.firstTransition',
     expectedMeasured: 'camera/dolly without full black',
@@ -1792,7 +1915,14 @@ function applySyntheticPresentationFixture(
   scene: CapturedScene,
   fixture: SyntheticPresentationFixture | undefined,
 ): CapturedScene {
-  if (fixture?.playerHeightOffset === undefined && fixture?.playerStart === undefined) return scene;
+  if (
+    fixture?.playerHeightOffset === undefined &&
+    fixture?.playerStart === undefined &&
+    fixture?.disableDeckRiding === undefined &&
+    fixture?.disableLivePoseEase === undefined
+  ) {
+    return scene;
+  }
   const frames = new Map<number, SceneFrame>();
   for (const [sample, frame] of scene.frames) {
     const playerX = fixture.playerStart?.x ?? frame.live.playerX;
@@ -1811,7 +1941,12 @@ function applySyntheticPresentationFixture(
       },
     });
   }
-  return { ...scene, frames };
+  return {
+    ...scene,
+    frames,
+    disableDeckRiding: fixture?.disableDeckRiding,
+    disableLivePoseEase: fixture?.disableLivePoseEase,
+  };
 }
 
 function roundTime(value: number): number {
@@ -1827,6 +1962,62 @@ function frameAt(scene: CapturedScene, time: number): SceneFrame {
     if (frame) return frame;
   }
   throw new Error(`scene ${scene.id} has no captured frame at ${time.toFixed(2)}s`);
+}
+
+const PRESENTED_RIDER: HarborDeckRiderResolution = {
+  entityId: 0,
+  target: '',
+  mode: 'none',
+  x: 0,
+  y: 0,
+  z: 0,
+  yaw: 0,
+};
+
+function presentationFrameAt(
+  scene: CapturedScene,
+  time: number,
+  activeProps: ReadonlyMap<string, ActiveProp>,
+): SceneFrame {
+  const frame = frameAt(scene, time);
+  if (scene.disableDeckRiding) return frame;
+  let entities: Map<number, EntityPoint> | null = null;
+  for (const [entityId, harborId] of scene.riderHarbors) {
+    const point = frame.entities.get(entityId);
+    const harbor = HARBORS.find((candidate) => candidate.id === harborId);
+    if (!point || !harbor || !activeProps.has(shipTarget(harbor))) continue;
+    const resolution = resolveHarborDeckRider(
+      {
+        entityId,
+        x: point.x,
+        y: point.y,
+        z: point.z,
+        yaw: 0,
+        midInteraction: false,
+      },
+      [
+        {
+          target: shipTarget(harbor),
+          baseX: harbor.berth.x,
+          baseY: runtimeWaterLevel - harbor.berth.draft,
+          baseZ: harbor.berth.z,
+          baseRot: harbor.berth.rot,
+          frame: shipFrameAt(harbor, time, activeProps),
+          shipDecks: harbor.shipDecks,
+          displaced: true,
+        },
+      ],
+      PRESENTED_RIDER,
+    );
+    if (resolution.mode !== 'ride') continue;
+    entities ??= new Map(frame.entities);
+    entities.set(entityId, {
+      x: resolution.x,
+      y: resolution.y,
+      z: resolution.z,
+    });
+  }
+  return entities ? { ...frame, entities } : frame;
 }
 
 function copyPose(pose: ScenePose): ScenePose {
@@ -2406,18 +2597,18 @@ function lintFilmGrammar(
       : Math.max(0, cut.at - MIN_FULL_BLACK_CUT_SLACK_SECONDS);
     const startOpacity = fadeOpacityAfterSceneOps(scene, slackStart, cut.index);
     const cutOpacity = fadeOpacityAfterSceneOps(scene, cut.at);
-    if (
-      cut.index === firstShot?.index &&
-      cutOpacity < FULL_BLACK_OPACITY &&
-      cut.op.shot.kind !== 'focus'
-    ) {
+    const easesFromLivePose =
+      cut.op.shot.kind !== 'release' &&
+      sceneShotEasesFromLivePose(cut.op.shot) &&
+      !scene.disableLivePoseEase;
+    if (cut.index === firstShot?.index && cutOpacity < FULL_BLACK_OPACITY && !easesFromLivePose) {
       report({
         sceneId: scene.id,
         check: 'cut.firstTransition',
         opIndex: cut.index,
         opKind: opKind(cut.op),
         time: cut.at,
-        threshold: 'full black at the first cut or a focus shot eased from the live camera pose',
+        threshold: 'full black at the first cut or a shot eased from the live camera pose',
         measured: `${opKind(cut.op)} without full black, fade ${cutOpacity.toFixed(3)}`,
       });
     }
@@ -2773,6 +2964,7 @@ function lintMinimumVisualMotion(
     const visible = samples.filter(
       (sample) =>
         sample.timedOp.index === shot.index &&
+        !sample.entryEase &&
         !sample.fullBlack &&
         sample.subject !== null &&
         sample.subjectScreen !== null,
@@ -2998,7 +3190,7 @@ function lintSubjectReferences(
     const subjectRef = authored.shot.subjectRef;
     const timed = timedCameras[index];
     const sample = timed
-      ? samples.find((candidate) => candidate.timedOp.index === timed.index)
+      ? samples.find((candidate) => candidate.timedOp.index === timed.index && !candidate.entryEase)
       : undefined;
     const lookAt = sample?.geometry.lookAt;
     const candidates: Array<{ x: number; z: number }> = [];
@@ -3456,7 +3648,7 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
       }
     }
 
-    const frame = frameAt(scene, time);
+    const frame = presentationFrameAt(scene, time, activeProps);
     const supportContext = scene.ops[Math.max(0, opCursor - 1)] ?? scene.ops[0];
     if (supportContext) {
       lintCollisionAndSupportSample(
@@ -3474,7 +3666,17 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
       const harbor = HARBORS.find((candidate) => shipTarget(candidate) === target);
       return harbor ? shipFrameAt(harbor, time, activeProps) : null;
     };
-    const pose = scenePose(director, time, frame.live, resolveEntity, resolveAttachment);
+    const directedPose = scenePose(director, time, frame.live, resolveEntity, resolveAttachment);
+    const activeShot = director.shot;
+    const pose =
+      scene.disableLivePoseEase && currentCameraOp && activeShot && activeShot.kind !== 'focus'
+        ? evaluateSceneRigPose(
+            activeShot,
+            time - currentCameraOp.at,
+            resolveEntity,
+            resolveAttachment,
+          )
+        : directedPose;
     const overlayModel = sceneOverlayView(overlay, time);
     if (!pose || !currentCameraOp) {
       previous = null;
@@ -3483,7 +3685,11 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
     const poseCopy = copyPose(pose);
     const geometry = geometryForPose(poseCopy);
     const fullBlack = overlayModel.fadeOpacity >= FULL_BLACK_OPACITY;
-    const activeShot = director.shot;
+    const rigEntryEase =
+      activeShot !== null &&
+      activeShot.kind !== 'focus' &&
+      !scene.disableLivePoseEase &&
+      time - currentCameraOp.at < SCENE_RIG_ENTRY_SEC;
     const subject = activeShot ? subjectForShot(activeShot, poseCopy, resolveEntity) : null;
     const shipScreenPositions = new Map<string, number>();
     for (const target of propTargets) {
@@ -3516,8 +3722,13 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
       shipScreenX: shipScreenPositions,
       subject,
       subjectScreen: subject ? screenPoint(geometry, subject) : null,
+      entryEase: rigEntryEase,
     };
     samples.push(sample);
+    if (rigEntryEase) {
+      previous = null;
+      continue;
+    }
 
     const terrainY = sampleTerrainHeight(geometry.camera.x, geometry.camera.z, scene.seed);
     const terrainClearance = geometry.camera.y - terrainY;
@@ -3843,33 +4054,113 @@ describe('cinematic shot mechanical gate', () => {
     expect(LEGACY_EXEMPTIONS, 'cinematic exemption inventory must stay exact').toEqual([
       {
         sceneId: 'scn_lb_ferry_depart_back',
-        check: 'support.entity',
-        reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
+        check: 'collision.hull',
+        reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
       },
       {
         sceneId: 'scn_lb_ferry_depart_back',
-        check: 'containment.rider',
-        reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
+        check: 'cut.fadeSlack',
+        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_back',
+        check: 'fade.symmetry',
+        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_back',
+        check: 'motion.propAcceleration',
+        reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_back',
+        check: 'motion.propWay',
+        reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
       },
       {
         sceneId: 'scn_lb_ferry_depart_out',
-        check: 'support.entity',
-        reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
+        check: 'collision.hull',
+        reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
       },
       {
         sceneId: 'scn_lb_ferry_depart_out',
-        check: 'containment.rider',
-        reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
+        check: 'cut.fadeSlack',
+        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_out',
+        check: 'fade.symmetry',
+        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_out',
+        check: 'motion.propAcceleration',
+        reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_out',
+        check: 'motion.propWay',
+        reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
+      },
+      {
+        sceneId: 'scn_lb_q0_ashore',
+        check: 'cut.fadeSlack',
+        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+      },
+      {
+        sceneId: 'scn_lb_q0_ashore',
+        check: 'fade.symmetry',
+        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
       },
       {
         sceneId: 'scn_lb_q0_voyage',
-        check: 'support.entity',
-        reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
+        check: 'collision.hull',
+        reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
       },
       {
         sceneId: 'scn_lb_q0_voyage',
-        check: 'containment.rider',
-        reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
+        check: 'cut.fadeSlack',
+        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
+        check: 'fade.symmetry',
+        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
+        check: 'motion.propAcceleration',
+        reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
+        check: 'motion.propWay',
+        reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
+      },
+      {
+        sceneId: 'cast_off',
+        check: 'reference.orphan',
+        reason: 'P1.3 must cue or remove the legacy authored cast-off prop segment.',
+      },
+      {
+        sceneId: 'scn_lb_q0_ashore',
+        check: 'reference.orphan',
+        reason: 'P1.3 must trigger or remove the superseded standalone arrival scene.',
+      },
+      {
+        sceneId: 'scn_lb_q0_ashore',
+        check: 'reference.subtitleReadTime',
+        reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
+      },
+      {
+        sceneId: 'scn_lb_q0_doorway',
+        check: 'reference.subtitleReadTime',
+        reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
+        check: 'reference.subtitleReadTime',
+        reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
       },
     ]);
     expect(

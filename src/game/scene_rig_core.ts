@@ -17,7 +17,13 @@ export type SceneEntityResolver = (id: number) => SceneRigPoint | null;
 export type SceneAttachmentResolver = (
   target: string,
   out?: SceneAttachFrame,
+  presentationTimeSec?: number,
 ) => SceneAttachFrame | null;
+
+export interface SceneRigEaseFrom {
+  pose: SceneRigPose;
+  duration: number;
+}
 
 const EPSILON = 1e-8;
 // The renderer aims two yards above a ScenePose focus anchor. Rig look-at
@@ -40,13 +46,17 @@ export function evaluateSceneRigPose(
   resolveEntity: SceneEntityResolver,
   resolveAttachment: SceneAttachmentResolver,
   out?: SceneRigPose,
+  easeFrom?: SceneRigEaseFrom,
+  attachmentTimeSec?: number,
 ): SceneRigPose {
   const pose = out ?? emptyPose();
   if (shot.kind === 'attach') {
-    const frame = resolveAttachment(shot.target, ATTACH_FRAME) ?? shot.fallbackFrame;
+    const frame =
+      resolveAttachment(shot.target, ATTACH_FRAME, attachmentTimeSec) ?? shot.fallbackFrame;
     const camera = localToWorld(frame, shot.offset, CAMERA_POINT);
     const lookAt = localToWorld(frame, shot.lookAt, LOOK_AT_POINT);
-    return poseFromWorldPoints(camera, lookAt, pose);
+    poseFromWorldPoints(camera, lookAt, pose);
+    return easeRigPoseFrom(pose, elapsedSec, easeFrom);
   }
 
   const t = shot.dur > 0 ? clamp01(elapsedSec / shot.dur) : 1;
@@ -73,7 +83,8 @@ export function evaluateSceneRigPose(
       break;
     }
   }
-  return poseFromWorldPoints(camera, lookAt, pose);
+  poseFromWorldPoints(camera, lookAt, pose);
+  return easeRigPoseFrom(pose, elapsedSec, easeFrom);
 }
 
 /**
@@ -137,6 +148,25 @@ export function sceneRigLookAtPosition(pose: SceneRigPose, out?: SceneRigPoint):
 /** The established scene-camera ease shared by authored motion and release. */
 export function sceneCameraEase(value: number): number {
   return 0.5 - Math.cos(Math.PI * value) / 2;
+}
+
+function easeRigPoseFrom(
+  authored: SceneRigPose,
+  elapsedSec: number,
+  easeFrom: SceneRigEaseFrom | undefined,
+): SceneRigPose {
+  if (!easeFrom) return authored;
+  const t = easeFrom.duration > 0 ? clamp01(elapsedSec / easeFrom.duration) : 1;
+  if (t >= 1) return authored;
+  const g = sceneCameraEase(t);
+  const from = easeFrom.pose;
+  authored.yaw = lerpAngle(from.yaw, authored.yaw, g);
+  authored.pitch = lerp(from.pitch, authored.pitch, g);
+  authored.dist = lerp(from.dist, authored.dist, g);
+  authored.focusX = lerp(from.focusX, authored.focusX, g);
+  authored.focusY = lerp(from.focusY, authored.focusY, g);
+  authored.focusZ = lerp(from.focusZ, authored.focusZ, g);
+  return authored;
 }
 
 function poseFromWorldPoints(
@@ -216,6 +246,17 @@ function copyPoint(from: SceneRigPoint, to: SceneRigPoint): SceneRigPoint {
 
 function emptyPose(): SceneRigPose {
   return { yaw: 0, pitch: 0, dist: 0, focusX: 0, focusY: 0, focusZ: 0 };
+}
+
+function lerp(from: number, to: number, t: number): number {
+  return from + (to - from) * t;
+}
+
+function lerpAngle(from: number, to: number, t: number): number {
+  let delta = to - from;
+  while (delta > Math.PI) delta -= Math.PI * 2;
+  while (delta < -Math.PI) delta += Math.PI * 2;
+  return from + delta * t;
 }
 
 function clamp01(value: number): number {
