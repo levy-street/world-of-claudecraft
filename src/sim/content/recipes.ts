@@ -1368,7 +1368,10 @@ export const FIELD_RECIPES: ReadonlySet<string> = new Set(COMMON_RECIPES.map((r)
 // Reverse lookup (#1149, Battlefield Experience): the recipe whose crafting
 // produced a given result item id, so a tracked-event handler holding only an
 // item instance can resolve back to the craft (professionId) that made it.
-// First match wins: no two recipes in this table share a resultItemId today.
+// Searches ALL_RECIPES (common, tool, caster hub, combo, and ladder alike),
+// not just COMMON_RECIPES: a narrower search here silently broke attribution
+// for every recipe outside the common set. First match wins: no two recipes
+// in this table share a resultItemId today.
 export function recipeForResultItem(itemId: string): ProfessionRecipeRecord | undefined {
-  return COMMON_RECIPES.find((r) => r.resultItemId === itemId);
+  return ALL_RECIPES.find((r) => r.resultItemId === itemId);
 }

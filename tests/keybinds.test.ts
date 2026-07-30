@@ -162,6 +162,7 @@ describe('Keybinds defaults', () => {
     // Bare Z sheathes; the Book of Deeds ships on the shifted layer of the same key.
     expect(kb.actionForCode('KeyZ')).toBe('sheathe');
     expect(kb.actionForCode('Shift+KeyZ')).toBe('deeds');
+    expect(kb.actionForCode('Backquote')).toBe('mount');
     for (let index = 0; index < 11; index++) {
       const suffix = index < 9 ? index + 1 : index === 9 ? 0 : 'Decimal';
       expect(kb.actionForCode(`Shift+Numpad${suffix}`)).toBe(`slot${index + 23}`);
@@ -306,6 +307,7 @@ describe('persistence', () => {
     expect(kb.actionForCode('Equal')).toBe('slot11');
     // sheathe postdates this save: it keeps its default Z, not unbound.
     expect(kb.actionForCode('KeyZ')).toBe('sheathe');
+    expect(kb.actionForCode('Backquote')).toBe('mount');
   });
 
   it('drops a retained default that a stored binding already claimed', () => {
@@ -415,23 +417,24 @@ describe('per-character scope', () => {
   it('uses the production char:<numeric id> scope shape', () => {
     // Online scope is `char:${c.id}` where c.id is the numeric DB character id.
     const kb = new Keybinds('char:1729');
-    kb.bind('jump', 0, 'KeyZ');
+    kb.bind('jump', 0, 'Backquote');
     expect(localStorage.getItem('woc_keybinds:char:1729')).not.toBeNull();
-    expect(new Keybinds('char:1729').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:1729').actionForCode('Backquote')).toBe('jump');
   });
 
   it('namespaces the offline scope (offline:<class>:<name>) per character', () => {
     // Offline scope is `offline:${playerClass}:${name}` (the only stable handle).
     const aldric = new Keybinds('offline:warrior:Aldric');
-    aldric.bind('jump', 0, 'KeyZ');
+    aldric.bind('jump', 0, 'Semicolon');
     expect(localStorage.getItem('woc_keybinds:offline:warrior:Aldric')).not.toBeNull();
     expect(localStorage.getItem('woc_keybinds')).toBeNull();
     // A different offline character starts from defaults, not Aldric's binding
     // (KeyZ is sheathe's default, so Brenna resolves it to sheathe, not jump).
     expect(new Keybinds('offline:mage:Brenna').actionForCode('KeyZ')).toBe('sheathe');
+    expect(new Keybinds('offline:mage:Brenna').actionForCode('Semicolon')).toBe(null);
     expect(new Keybinds('offline:mage:Brenna').codeAt('jump', 0)).toBe('Space');
     // The same scope reads back its own profile.
-    expect(new Keybinds('offline:warrior:Aldric').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('offline:warrior:Aldric').actionForCode('Semicolon')).toBe('jump');
   });
 
   it('shares one store across same-class same-name offline characters', () => {
@@ -444,11 +447,11 @@ describe('per-character scope', () => {
   });
 
   it('seeds from the legacy blob when the scoped value is corrupt JSON', () => {
-    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['KeyZ', null] }));
+    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['Backquote', null] }));
     localStorage.setItem('woc_keybinds:char:alice', '{not valid json');
     // A corrupt scoped value behaves like an absent one: still seed from legacy,
     // do not drop to bare defaults.
-    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:alice').actionForCode('Backquote')).toBe('jump');
   });
 
   it('repairs the Q/E strafe overhaul signature on a scoped profile', () => {
@@ -472,6 +475,28 @@ describe('per-character scope', () => {
     expect(fresh.codeAt('slot11', 0)).toBe('Equal');
     expect(fresh.actionForCode('KeyQ')).toBe('strafeLeft');
     expect(fresh.actionForCode('KeyE')).toBe('strafeRight');
+  });
+
+  it('repairs a stale v0.24.0-window meters:KeyZ binding and its collateral Sheathe eviction', () => {
+    // The v0.24.0 overhaul window also persisted Damage Meters on KeyZ alongside
+    // the Q/E strafe signature. meters is processed before sheathe in
+    // BIND_ACTIONS, so an unrepaired stored meters:['KeyZ', null] claims KeyZ
+    // first and the load-time uniqueness sweep silently evicts Sheathe/Unsheathe
+    // Weapon's untouched default down to unbound.
+    localStorage.setItem(
+      'woc_keybinds:char:alice',
+      JSON.stringify({
+        strafeLeft: [null, null],
+        strafeRight: [null, null],
+        slot10: ['KeyQ', 'Minus'],
+        slot11: ['KeyE', 'Equal'],
+        meters: ['KeyZ', null],
+      }),
+    );
+    const fresh = new Keybinds('char:alice');
+    expect(fresh.codeAt('meters', 0)).toBe('Shift+KeyH');
+    expect(fresh.codeAt('sheathe', 0)).toBe('KeyZ');
+    expect(fresh.actionForCode('KeyZ')).toBe('sheathe');
   });
 
   it('re-seeds an evicted meters binding to Shift+KeyH on a scoped profile', () => {
@@ -529,13 +554,13 @@ describe('per-character scope', () => {
   });
 
   it('seeds from the legacy blob when the scoped value is not a plain object', () => {
-    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['KeyZ', null] }));
+    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['Backquote', null] }));
     // A JSON array is typeof 'object' but is not a valid profile; it must seed.
     localStorage.setItem('woc_keybinds:char:alice', JSON.stringify(['garbage']));
-    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:alice').actionForCode('Backquote')).toBe('jump');
     // A JSON scalar likewise.
     localStorage.setItem('woc_keybinds:char:bob', JSON.stringify(42));
-    expect(new Keybinds('char:bob').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:bob').actionForCode('Backquote')).toBe('jump');
   });
 
   it('reset() persists to the scoped key and leaves the legacy blob untouched', () => {
@@ -546,6 +571,7 @@ describe('per-character scope', () => {
     // Alice's scoped profile is back to defaults...
     expect(new Keybinds('char:alice').codeAt('jump', 0)).toBe('Space');
     expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('sheathe');
+    expect(new Keybinds('char:alice').actionForCode('Backquote')).toBe('mount');
     // ...and reset never wrote the legacy key.
     expect(JSON.parse(localStorage.getItem('woc_keybinds')!).jump).toEqual(['KeyJ', null]);
   });

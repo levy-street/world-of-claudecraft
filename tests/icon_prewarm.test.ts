@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   defaultIconPrewarmEntries,
+  defaultIconPrewarmPlan,
   type IconPrewarmEntry,
   prewarmIconCache,
 } from '../src/ui/icon_prewarm';
+import { iconDataUrl, needsIconDataUrlWarm, storePrewarmedIconDataUrl } from '../src/ui/icons';
 
 type IdleCb = (d: { timeRemaining(): number }) => void;
 
@@ -138,11 +140,89 @@ describe('prewarmIconCache', () => {
     expect(warmed).toEqual(['it0', 'it2']);
   });
 
+  it('waits for an asynchronous warm before scheduling the next icon', async () => {
+    const w = stubWindow();
+    restore = w.restore;
+    const warmed: string[] = [];
+    let release = () => {};
+    prewarmIconCache(entries(2), {
+      warm: (_k, id) => {
+        warmed.push(id);
+        return new Promise<void>((resolve) => {
+          release = resolve;
+        });
+      },
+    });
+
+    w.idleQueue.shift()!({ timeRemaining: () => 50 });
+    expect(warmed).toEqual(['it0']);
+    expect(w.idleQueue).toHaveLength(0);
+
+    release();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(w.idleQueue).toHaveLength(1);
+    w.idleQueue.shift()!({ timeRemaining: () => 50 });
+    expect(warmed).toEqual(['it0', 'it1']);
+  });
+
+  it('continues after an asynchronous warm rejects', async () => {
+    const w = stubWindow();
+    restore = w.restore;
+    const warmed: string[] = [];
+    prewarmIconCache(entries(2), {
+      warm: (_k, id) => {
+        warmed.push(id);
+        return id === 'it0' ? Promise.reject(new Error('bad async recipe')) : Promise.resolve();
+      },
+    });
+
+    w.idleQueue.shift()!({ timeRemaining: () => 50 });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(w.idleQueue).toHaveLength(1);
+    w.idleQueue.shift()!({ timeRemaining: () => 50 });
+    expect(warmed).toEqual(['it0', 'it1']);
+  });
+
   it('schedules nothing for an empty list', () => {
     const w = stubWindow();
     restore = w.restore;
     prewarmIconCache([], { warm: () => {} });
     expect(w.idleQueue).toHaveLength(0);
+  });
+
+  it('dispatches the eager prefix without waiting for an idle deadline', () => {
+    const w = stubWindow();
+    restore = w.restore;
+    const warmed: string[] = [];
+    prewarmIconCache(entries(3), {
+      eagerCount: 2,
+      warm: (_kind, id) => {
+        warmed.push(id);
+      },
+    });
+
+    // The first two callbacks are zero-delay loading tasks. Once the prefix is
+    // drained, the remaining catalog work returns to the idle lane.
+    w.idleQueue.shift()!(undefined as any);
+    expect(warmed).toEqual(['it0', 'it1']);
+    expect(w.idleQueue).toHaveLength(1);
+    w.idleQueue.shift()!({ timeRemaining: () => 50 });
+    expect(warmed).toEqual(['it0', 'it1', 'it2']);
+  });
+
+  it('forwards an entry-specific size to the cache warmer', () => {
+    const w = stubWindow();
+    restore = w.restore;
+    const warmed: Array<[string, number]> = [];
+    prewarmIconCache([{ kind: 'crest', id: 'class_mage', size: 20 }], {
+      warm: (_kind, id, size) => {
+        warmed.push([id, size]);
+      },
+    });
+    w.idleQueue.shift()!({ timeRemaining: () => 50 });
+    expect(warmed).toEqual([['class_mage', 20]]);
   });
 });
 
@@ -153,5 +233,49 @@ describe('defaultIconPrewarmEntries', () => {
     expect(list.some((e) => e.kind === 'item')).toBe(true);
     expect(list.some((e) => e.kind === 'ability')).toBe(true);
     for (const e of list) expect(typeof e.id).toBe('string');
+  });
+
+  it('puts a stable, deduplicated runtime priority prefix before the catalog', () => {
+    const plan = defaultIconPrewarmPlan([
+      { kind: 'item', id: 'baked_bread' },
+      { kind: 'ability', id: 'heroic_strike' },
+      { kind: 'item', id: 'baked_bread' },
+    ]);
+    expect(plan.priorityCount).toBeGreaterThan(2);
+    expect(plan.entries.slice(0, 2)).toEqual([
+      { kind: 'item', id: 'baked_bread' },
+      { kind: 'ability', id: 'heroic_strike' },
+    ]);
+    expect(
+      plan.entries.filter((entry) => entry.kind === 'item' && entry.id === 'baked_bread'),
+    ).toHaveLength(1);
+    expect(plan.entries.slice(0, plan.priorityCount)).toContainEqual({
+      kind: 'item',
+      id: 'coin_gold',
+    });
+  });
+
+  it('deduplicates exact cache keys but preserves different requested sizes', () => {
+    const plan = defaultIconPrewarmPlan([
+      { kind: 'crest', id: 'class_mage', size: 20 },
+      { kind: 'crest', id: 'class_mage', size: 20 },
+      { kind: 'crest', id: 'class_mage' },
+    ]);
+    expect(plan.entries.slice(0, 2)).toEqual([
+      { kind: 'crest', id: 'class_mage', size: 20 },
+      { kind: 'crest', id: 'class_mage' },
+    ]);
+  });
+});
+
+describe('worker icon cache bridge', () => {
+  it('makes a worker-rendered URL immediately available to synchronous consumers', () => {
+    const id = '__worker_cache_bridge_test__';
+    const size = 73;
+    const url = 'data:image/png;base64,d29ya2VyLWljb24=';
+    expect(needsIconDataUrlWarm('aura', id, size)).toBe(true);
+    storePrewarmedIconDataUrl('aura', id, size, url);
+    expect(needsIconDataUrlWarm('aura', id, size)).toBe(false);
+    expect(iconDataUrl('aura', id, size)).toBe(url);
   });
 });

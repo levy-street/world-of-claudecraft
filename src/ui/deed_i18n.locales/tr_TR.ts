@@ -768,4 +768,12 @@ export const table: DeedLocaleTable = {
     name: 'Hurda Bahçesi',
     desc: 'Elli teçhizat parçasını hurda işlemine sokarak ham maddelere dönüştür.',
   },
+  dgn_wildheart_basin: {
+    name: 'Çukurun İntikamı',
+    desc: "Yaban Yürek Çukuru'nda Zulgar, Çukurun Sesi'ni alt et.",
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Kahramanca: Yaban Yürek Çukuru',
+    desc: "Yaban Yürek Çukuru'nda Zulgar, Çukurun Sesi'ni Kahramanca zorlukta alt et.",
+  },
 };

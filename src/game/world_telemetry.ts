@@ -22,7 +22,7 @@ export interface WorldTelemetry {
 }
 
 export function telemetryZoneId(x: number, z: number): string {
-  if (x <= DUNGEON_X_THRESHOLD) return zoneAt(z).id;
+  if (x <= DUNGEON_X_THRESHOLD) return zoneAt(x, z).id;
   if (isDelvePos(x)) return `delve:${delveAt(x)?.id ?? 'unknown'}`;
   if (isArenaPos(x)) return 'arena';
   if (isYumiMazePos(x)) return 'yumi_maze';

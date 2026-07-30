@@ -243,7 +243,9 @@ describe('camera prompt client integration', () => {
 
   it('suspends movement and enters gamepad pointer mode while the prompt is open', () => {
     expect(main).toMatch(/input\.setSuspendMovement\([^;]*cameraPromptOpen\(\)/);
-    expect(main).toMatch(/isPointerMode: \(\) => hud\.isWindowOpen\(\) \|\| cameraPromptOpen\(\)/);
+    expect(main).toMatch(
+      /shouldUseGamepadPointerMode\(\s*hud\.isWindowOpen\(\),\s*cameraPromptOpen\(\),/,
+    );
   });
 
   it('routes the gamepad Escape action to the prompt before HUD windows', () => {

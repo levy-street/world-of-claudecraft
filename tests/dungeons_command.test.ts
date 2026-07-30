@@ -18,7 +18,7 @@ describe('/dungeons command', () => {
     sim.tick();
 
     const parts = DUNGEON_LIST.map(
-      (d) => `${d.name} (${zoneAt(d.doorPos.z).name}, ${d.suggestedPlayers} players)`,
+      (d) => `${d.name} (${zoneAt(d.doorPos.x, d.doorPos.z).name}, ${d.suggestedPlayers} players)`,
     );
     const expected = `Dungeons (${parts.length}): ${parts.join(', ')}.`;
 

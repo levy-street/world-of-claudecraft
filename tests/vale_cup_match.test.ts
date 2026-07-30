@@ -114,6 +114,27 @@ describe('Vale Cup: queue guards', () => {
     expect(errorsOf(sim.drainEvents())).toContain('You cannot queue from inside an instance.');
   });
 
+  it('prunes a queued player who walked into a dungeon/instance mid-queue (issue #1600 x-band recheck)', () => {
+    // The join-time instance guard only blocks queuing FROM inside an instance
+    // (see the test above). Once queued, matchmaking itself must recheck the
+    // guard every pass, mirroring the sibling arena 1v1/2v2/fiesta queues
+    // (arena.ts matchmakeArena1v1 / pruneTeamQueue), or a player who wanders
+    // into a dungeon mid-queue stays a valid candidate and gets teleported
+    // out of the instance onto the pitch, fully restored, when the pitch pops.
+    const sim = makeWorld();
+    const inside = addAt(sim, 'warrior', 'Inside');
+    const outside = addAt(sim, 'mage', 'Outside', 4, -40);
+    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, inside);
+    sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, outside);
+    // Move the queued player past the instance x-band WITHOUT enterDungeon, so
+    // the entry-dequeue path does not mask the matchmaking prune under test.
+    teleport(sim, inside, DUNGEON_X_THRESHOLD + 50, -40);
+    sim.tick();
+    expect(sim.vcup.match).toBeNull(); // no match: the pack lost its second body
+    expect(sim.cupInfoFor(inside)!.queued).toBe(false); // pruned
+    expect(sim.cupInfoFor(outside)!.queued).toBe(true); // the honest queuer waits
+  });
+
   it('rejects a missing banner nation', () => {
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Aleph');
@@ -494,6 +515,139 @@ describe('Vale Cup: match lifecycle', () => {
   });
 });
 
+describe('Vale Cup: teardown does not grant a free full HP/resource/cooldown restore', () => {
+  it('teardownCupMatch restores pre-match HP, resource, and cooldowns instead of full-healing', () => {
+    const sim = makeWorld();
+    // A mage (mana resource): the in-match clean slate tops mana to max, so a
+    // drained pool restoring is a meaningful assertion (rage clean-slates to 0
+    // either way).
+    const a = addAt(sim, 'mage', 'Aleph');
+    const b = addAt(sim, 'warrior', 'Bet', 4, -40);
+    const ae = sim.entities.get(a)!;
+    expect(ae.maxHp).toBeGreaterThan(0);
+
+    // The fighter walks in wounded, low on mana, with an ability on cooldown.
+    ae.hp = Math.floor(ae.maxHp * 0.4);
+    ae.resource = Math.floor(ae.maxResource * 0.3);
+    ae.cooldowns.set('charge', 9);
+    const woundedHp = ae.hp;
+    const drainedResource = ae.resource;
+
+    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
+    sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, b);
+    sim.tick(); // forms the match: valeCupStandardize's clean slate takes over
+    const match = sim.vcup.match!;
+    expect(match.phase).toBe('briefing');
+
+    // The pre-match snapshot captured exactly what the fighter carried in (the
+    // cooldown ticks down by one DT on the same tick the match forms, so it
+    // reads the snapshot back rather than the un-decayed literal).
+    expect(match.preMatchPools).toBeDefined();
+    const pools = match.preMatchPools?.get(a);
+    expect(pools).toBeDefined();
+    if (!pools) return;
+    expect(pools.hp).toBe(woundedHp);
+    expect(pools.resource).toBe(drainedResource);
+    const preCooldown = pools.cooldowns.get('charge');
+    expect(preCooldown).toBeLessThanOrEqual(9);
+    expect(preCooldown).toBeGreaterThan(8.9);
+
+    // The in-match clean slate still stands: full HP/resource, cooldowns cleared.
+    expect(ae.hp).toBe(ae.maxHp);
+    expect(ae.resource).toBe(ae.maxResource);
+    expect(ae.cooldowns.size).toBe(0);
+
+    // Ready up, play the whistle through to an active bout, then force a
+    // quick, uneven result and run the aftermath out to teardown.
+    readyAll(sim);
+    tickUntil(sim, () => match.phase === 'active', 20 * 6);
+    (match as any).scoreA = 1;
+    (match as any).clock = VC_MATCH_DURATION;
+    tickUntil(sim, () => sim.vcup.match === null, 20 * 20);
+
+    // The fighter is handed back EXACTLY what they walked in with: no free
+    // heal, no free mana, no free cooldown reset.
+    expect(ae.hp).toBe(woundedHp);
+    expect(ae.hp).toBeLessThan(ae.maxHp);
+    expect(ae.resource).toBe(drainedResource);
+    expect(ae.cooldowns.get('charge')).toBe(preCooldown);
+  });
+
+  it('the exploit: repeatedly entering and tearing down a match cannot be farmed as a free heal/mana reset', () => {
+    const sim = makeWorld();
+    // A mage again: mana clean-slates to full mid-match, so restoring a
+    // deliberately drained pool is a meaningful (not vacuously-zero) check.
+    const a = addAt(sim, 'mage', 'Aleph');
+    const b = addAt(sim, 'warrior', 'Bet', 4, -40);
+    const ae = sim.entities.get(a)!;
+
+    // Run one full queue -> ready -> active -> teardown cycle, wounding the
+    // fighter to a given fraction of max HP/resource beforehand, and return
+    // what it was wounded to.
+    const runOneCycle = (frac: number): { hp: number; resource: number } => {
+      ae.hp = Math.floor(ae.maxHp * frac);
+      ae.resource = Math.floor(ae.maxResource * frac);
+      const wounded = { hp: ae.hp, resource: ae.resource };
+      sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
+      sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, b);
+      sim.tick();
+      const match = sim.vcup.match!;
+      readyAll(sim);
+      tickUntil(sim, () => match.phase === 'active', 20 * 6);
+      (match as any).scoreA = 1;
+      (match as any).clock = VC_MATCH_DURATION;
+      tickUntil(sim, () => sim.vcup.match === null, 20 * 20);
+      return wounded;
+    };
+
+    // A first bout: leaving it does not top the fighter off.
+    const wounded1 = runOneCycle(0.5);
+    expect(ae.hp).toBe(wounded1.hp);
+    expect(ae.hp).toBeLessThan(ae.maxHp);
+    expect(ae.resource).toBe(wounded1.resource);
+    expect(ae.resource).toBeLessThan(ae.maxResource);
+
+    // A second, independent bout right after: still no free restore, proving
+    // the exploit is not a one-time snapshot bug but genuinely un-farmable.
+    const wounded2 = runOneCycle(0.2);
+    expect(ae.hp).toBe(wounded2.hp);
+    expect(ae.hp).toBeLessThan(ae.maxHp);
+    expect(ae.resource).toBe(wounded2.resource);
+    expect(ae.resource).toBeLessThan(ae.maxResource);
+  });
+
+  it('vcupPracticeStart (the instant solo bot practice) is covered by the same restore', () => {
+    // A mage: mana clean-slates to full mid-match, so restoring a drained pool
+    // is a meaningful check (rage clean-slates to 0 either way).
+    const sim = new Sim({ seed: 7, playerClass: 'mage', playerName: 'Solo' });
+    const pe = sim.entities.get(sim.primaryId)!;
+    pe.hp = Math.floor(pe.maxHp * 0.35);
+    pe.resource = Math.floor(pe.maxResource * 0.1);
+    const wounded = pe.hp;
+    const drained = pe.resource;
+
+    sim.vcupPracticeStart(1);
+    const match = sim.vcup.practices[0];
+    expect(match.preMatchPools?.get(sim.primaryId)?.hp).toBe(wounded);
+    expect(match.preMatchPools?.get(sim.primaryId)?.resource).toBe(drained);
+
+    // In-match clean slate: full HP/resource while the practice bout runs.
+    expect(pe.hp).toBe(pe.maxHp);
+    expect(pe.resource).toBe(pe.maxResource);
+
+    readyAll(sim);
+    tickUntil(sim, () => match.phase === 'active', 20 * 6);
+    (match as any).scoreA = 1;
+    (match as any).clock = VC_MATCH_DURATION;
+    tickUntil(sim, () => sim.vcup.practices.length === 0, 20 * 20);
+
+    // Practice is instant, repeatable, and free to enter (vale_cup_bots.ts): if
+    // it granted a full restore this would be an infinite heal/mana loop.
+    expect(pe.hp).toBe(wounded);
+    expect(pe.resource).toBe(drained);
+  });
+});
+
 describe('Vale Cup: sport moves', () => {
   // Stage a lone shooter on the ball a fixed distance out from the empty east
   // goal, facing it, then fire sport_shoot at a given charge (encoded as the aim
@@ -691,7 +845,7 @@ describe('Vale Cup: sport moves', () => {
     // Live-balance pin: keepers line up ON their goal line at every kickoff and
     // the whistle grace clamps a charged shot to the short-touch profile, so an
     // instant unchallenged shot from the center spot is savable, not a goal.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Solo' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Solo' });
     sim.vcupPracticeStart(3); // the bot side's seat 0 keeps goal
     const match = sim.vcup.practices[0];
     readyAll(sim);
@@ -810,7 +964,7 @@ describe('Vale Cup: sport moves', () => {
     // the human idle, the all-bot attack must not run away. Shot range gate +
     // deterministic aim error + a slower decision cadence keep the scoreline
     // human-playable. Deterministic (zero rng), so these are hard bounds.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Idle' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Idle' });
     sim.vcupPracticeStart(3);
     const match = sim.vcup.practices[0];
     readyAll(sim);

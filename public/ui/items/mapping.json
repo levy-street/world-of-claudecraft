@@ -1434,6 +1434,62 @@
       "confidence": "medium"
     },
     {
+      "itemId": "reins_aether_hover_cycle",
+      "name": "Ignition Key: Aether-Jouster Hover-Cycle",
+      "sourcePack": "woc_mount_models",
+      "sourceFile": "aether_hover_cycle.glb",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned render of a project-owned mount model)"
+    },
+    {
+      "itemId": "reins_grag_bear",
+      "name": "Reins of the Goliath Grag-Bear",
+      "sourcePack": "woc_mount_models",
+      "sourceFile": "grag_bear.glb",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned render of a project-owned mount model)"
+    },
+    {
+      "itemId": "reins_shadowjump_toad",
+      "name": "Reins of Kama-Kage the Shadow-Jump Toad",
+      "sourcePack": "woc_mount_models",
+      "sourceFile": "shadowjump_toad.glb",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned render of a project-owned mount model)"
+    },
+    {
+      "itemId": "reins_stalkglider_snail",
+      "name": "Reins of the Moss-Shell Stalk-Glider",
+      "sourcePack": "woc_mount_models",
+      "sourceFile": "stalkglider_snail.glb",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned render of a project-owned mount model)"
+    },
+    {
+      "itemId": "reins_stormfeather_griffin",
+      "name": "Reins of the Sky-Reach Stormfeather",
+      "sourcePack": "woc_mount_models",
+      "sourceFile": "stormfeather_griffin.glb",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned render of a project-owned mount model)"
+    },
+    {
+      "itemId": "reins_thunderstrut_gobbler",
+      "name": "Reins of Thunderstrut the Grand Gobbler",
+      "sourcePack": "woc_mount_models",
+      "sourceFile": "thunderstrut_gobbler.glb",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned render of a project-owned mount model)"
+    },
+    {
+      "itemId": "reins_valorsteed",
+      "name": "Reins of the Valorsteed",
+      "sourcePack": "woc_mount_models",
+      "sourceFile": "valorsteed.glb",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned render of a project-owned mount model)"
+    },
+    {
       "itemId": "reliquary_cloth_chest",
       "name": "Shroud of the Reliquary",
       "sourcePack": "equipment",
@@ -2375,6 +2431,15 @@
         "yumis_keepsake_locket",
         "zense_meridian",
         "zyzzs_deathless_signet"
+      ]
+    },
+    {
+      "source": "World of ClaudeCraft procedural icon compositor (renderProceduralIconPng)",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "in-game procedural icon recipe (icons.ts last_keep_signet: gold seal disc, ember gem)",
+      "commonPrompt": "not applicable: deterministic compositor render, no image model",
+      "itemIds": [
+        "last_keep_signet"
       ]
     }
   ]

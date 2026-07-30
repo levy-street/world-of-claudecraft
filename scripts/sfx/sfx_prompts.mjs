@@ -92,6 +92,34 @@ export const SFX = [
   FOOT('foot_snow', 'crunching into fresh deep snow, soft compression'),
   FOOT('foot_water', 'splashing through shallow water, wet splash'),
   {
+    key: 'mount_run_valorsteed',
+    custom: true,
+  },
+  {
+    key: 'mount_run_grag_bear',
+    custom: true,
+  },
+  {
+    key: 'mount_run_stalkglider_snail',
+    custom: true,
+  },
+  {
+    key: 'mount_run_aether_hover_cycle',
+    custom: true,
+  },
+  {
+    key: 'mount_run_shadowjump_toad',
+    custom: true,
+  },
+  {
+    key: 'mount_run_stormfeather_griffin',
+    custom: true,
+  },
+  {
+    key: 'mount_run_thunderstrut_gobbler',
+    custom: true,
+  },
+  {
     key: 'move_jump',
     custom: true,
     duration: 0.5,

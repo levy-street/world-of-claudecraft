@@ -308,6 +308,23 @@ For off-box safety, sync the directory to S3 occasionally:
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the full
   `/dev` cheat set (the level/teleport cheats the test bots use, plus item
   grants, mob spawns, instance teleports, and the dev command GUI).
+- **Community test profile**: on a disposable public test realm, set both
+  `PROVISION_TEST_ACCOUNTS=1` and `COMMUNITY_TEST_RIFTS=1` in the host `.env`,
+  then restart the game container. The first flag gives newly created accounts
+  nine level-20 characters, one per class, with complete Warfare gear
+  and four maximum-size bags. It does not backfill existing accounts. The Rift
+  flag restores persisted events before filling eight distinct eligible regions,
+  uses six-hour portal lifetimes and one-minute replacements, and raises capacity
+  to 24 concurrent groups. Both flags are off by default and neither enables dev
+  commands, so keep `ALLOW_DEV_COMMANDS=0` on a public realm.
+
+  For the initial community test, leave `RIFT_UPGRADER_URL` and
+  `RIFT_UPGRADER_MODEL` unset and keep `RIFT_RUNTIME_ASSETS=0` unless remote AI
+  and asset-job costs are explicitly part of the test. Monitor tick performance
+  before opening the realm. To roll back, set both community flags to `0` and
+  restart the game container. Disabling stops future roster seeding and dense
+  Rift refill; characters already created remain, and persisted portals close
+  through their normal clear or expiry lifecycle.
 - **Bot detector (implementation)**: the open-source tree ships with a no-op stub
   (`server/bot_detector/stub.ts`). Detection hooks are wired in, but they observe
   nothing and never act. To bundle the real behavioral detector, clone the private

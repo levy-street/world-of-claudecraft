@@ -46,6 +46,19 @@ describe('captureResponse', () => {
     expect(captured.status).toBe(200);
     expect(captured.body).toBe(JSON.stringify({ async: true }));
   });
+
+  it('awaits a fire-and-forget response after the dispatcher returns', async () => {
+    const fireAndForget: Dispatch = (_req, res) => {
+      setImmediate(() => {
+        res.writeHead(202, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ deferred: true }));
+      });
+    };
+
+    const captured = await captureResponse(fireAndForget, makeReq());
+    expect(captured.status).toBe(202);
+    expect(captured.body).toBe(JSON.stringify({ deferred: true }));
+  });
 });
 
 describe('goldenMaster', () => {

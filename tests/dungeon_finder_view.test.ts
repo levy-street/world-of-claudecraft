@@ -11,6 +11,7 @@ import {
   buildFinderProposalPopupView,
   type DungeonFinderViewInput,
   FINDER_PORTRAIT_DIR,
+  finderLootItemIds,
 } from '../src/ui/dungeon_finder_view';
 import type { DungeonFinderInfo } from '../src/world_api';
 
@@ -59,6 +60,14 @@ function live(view: ReturnType<typeof buildDungeonFinderView>) {
 }
 
 describe('dungeon finder view core', () => {
+  it('enumerates every catalogue loot icon once for loading-screen prewarm', () => {
+    const ids = finderLootItemIds();
+    expect(ids.length).toBeGreaterThan(90);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids).toContain('gravewoven_bag');
+    expect(ids).toContain('scepter_of_the_deathless_court');
+  });
+
   it('renders the loading state only when the online mirror has not synced', () => {
     expect(buildDungeonFinderView(input({ info: null })).kind).toBe('loading');
     expect(buildDungeonFinderView(input()).kind).toBe('live');

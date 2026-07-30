@@ -2718,7 +2718,12 @@
   }
 
   /* ---------- combat meters ---------- */
-  #meters-window {
+  /* The damage window and the two detachable meters (Healing, Threat) share one
+     panel shape. Undisturbed they sit in the bottom-right HUD stack exactly as
+     the meters window always has; once the player drags or resizes one,
+     meters_frame.ts switches it to absolute left/top/width/height and stamps
+     .mt-framed, which is what turns it into a fixed-height scrolling column. */
+  .mt-panel {
     width: 240px;
     padding: 8px 10px;
     display: none;
@@ -2726,8 +2731,74 @@
     margin-bottom: 6px;
     text-align: left;
   }
-  #meters-window .panel-title {
+  .mt-panel .panel-title {
     margin-bottom: 4px;
+  }
+  /* A framed panel owns its height, so the bar list takes the leftover space and
+     scrolls rather than pushing the panel taller than the player sized it. */
+  /* The framed column's `display: flex` is written inline alongside the box (the
+     panel's open/closed state is an inline display too, so the class cannot win
+     that tie); this carries the rest of the framed layout. */
+  .mt-panel.mt-framed {
+    flex-direction: column;
+    z-index: 21;
+  }
+  .mt-panel.mt-framed .mt-rows {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  /* The title bar is the move handle. Buttons inside keep their own cursor and
+     their own pointerdown (meters_frame.ts ignores a press that lands on one). */
+  .mt-panel .mt-move-handle {
+    cursor: var(--cursor-point);
+    touch-action: none;
+  }
+  .mt-panel .mt-move-handle button {
+    touch-action: auto;
+  }
+  .mt-title-label {
+    font-family: var(--title-font);
+    color: var(--gold);
+  }
+  body.meter-frame-dragging,
+  body.meter-frame-dragging * {
+    user-select: none;
+  }
+  /* Corner resize grip, the same classic diagonal hatch the chat frame uses. */
+  .panel-resize-grip {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    z-index: 3;
+    opacity: 0.45;
+    background: linear-gradient(
+      135deg,
+      transparent 0 45%,
+      #95886a 45% 55%,
+      transparent 55% 70%,
+      #95886a 70% 80%,
+      transparent 80%
+    );
+  }
+  .panel-resize-grip:hover {
+    opacity: 0.9;
+  }
+  .mt-panel {
+    position: relative;
+  }
+  /* Desktop-only chrome, mirroring the chat grip and the unit-frame move button:
+     on mobile the stylesheet owns panel placement. */
+  body.mobile-touch .panel-resize-grip {
+    display: none;
+  }
+  body.mobile-touch .mt-panel .mt-move-handle {
+    cursor: default;
+    touch-action: auto;
   }
   .mt-tab {
     background: #1a1410;
@@ -2799,6 +2870,48 @@
     color: #ffe;
     text-shadow: 1px 1px 1px #000;
   }
+  /* Each bar is focusable so its hover breakdown is reachable by keyboard, not
+     by pointer only (attachTooltip shows on focusin and on a long-press). */
+  .mt-row:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -1px;
+  }
+  /* Hover breakdown painted into the shared #tooltip box (meters.ts): one row
+     per ability, or per contributor on the Threat tab. The mini bar sits behind
+     the text the same way .mt-fill does on the bar itself. */
+  #tooltip .mt-tip-sub {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  #tooltip .mt-tip-row {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 180px;
+    padding: 1px 4px;
+    line-height: 1.5;
+  }
+  #tooltip .mt-tip-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: #ffffff14;
+    border-radius: 2px;
+  }
+  #tooltip .mt-tip-name {
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #tooltip .mt-tip-val {
+    position: relative;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
   body.mobile-touch #meters-window .mt-rows {
     max-height: 82px;
     overflow-y: auto;
@@ -2861,6 +2974,24 @@
   #minimap-clock:hover {
     color: #fff;
     border-color: #c9a86a;
+  }
+  /* day/night dial: a small satellite disc on the top-right rim of the minimap
+     (mirrors the #raid-lockout button placement), showing the 12h world cycle.
+     Purely informational, so it ignores pointer input. */
+  #minimap-daynight {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 3;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: #14141d;
+    box-shadow:
+      0 1px 3px #000a,
+      inset 0 0 6px #0007;
+    pointer-events: none;
   }
   #minimap-coords {
     margin-top: 4px;
@@ -4449,9 +4580,14 @@
     left: 50%;
     top: 28%;
     transform: translateX(-50%);
+    width: max-content;
+    max-width: calc(100vw - 48px);
+    box-sizing: border-box;
     color: var(--gold);
     font-size: 38px;
     font-weight: bold;
+    line-height: 1.15;
+    text-align: center;
     text-shadow:
       0 0 18px #00000088,
       2px 2px 6px #000;
@@ -4460,7 +4596,21 @@
     pointer-events: none;
     font-family: var(--title-font);
     letter-spacing: 1px;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  #banner.has-subtext {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #banner .banner-subtext {
+    margin-top: 6px;
+    color: var(--color-text-light);
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0;
   }
   #banner.banner-with-art {
     display: flex;

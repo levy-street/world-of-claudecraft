@@ -98,7 +98,7 @@ export function rankAllowsSkin(granted: SkinRank, skin: number): boolean {
 }
 
 export function mechChromaForSkin(skin: number): MechChroma | null {
-  return Number.isInteger(skin) ? MECH_CHROMAS[skin] ?? null : null;
+  return Number.isInteger(skin) ? (MECH_CHROMAS[skin] ?? null) : null;
 }
 
 export function mechChromaSkinIndex(chromaId: string): number {
@@ -119,8 +119,15 @@ export function rankAllowsMechChroma(granted: SkinRank, skin: number): boolean {
 // host-agnostic sim can validate a chosen skin index without importing render/.
 // tests/skin_event.test.ts asserts this stays in lockstep with SKINS.
 export const SKIN_COUNTS: Record<PlayerClass, number> = {
-  warrior: 4, paladin: 2, hunter: 4, rogue: 4, priest: 4,
-  mage: 4, warlock: 4, shaman: 4, druid: 4,
+  warrior: 6,
+  paladin: 4,
+  hunter: 6,
+  rogue: 6,
+  priest: 6,
+  mage: 6,
+  warlock: 6,
+  shaman: 6,
+  druid: 6,
 };
 
 /** Whether `skin` is a valid appearance index for `cls` (0 = default). */

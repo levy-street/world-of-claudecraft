@@ -461,6 +461,7 @@ function installMobileControlDom(): {
   moreButton: FakeElement;
   moreModal: FakeElement;
   emoteButton: FakeElement;
+  mountButton: FakeElement;
   discordButton: FakeElement;
   donateButton: FakeElement;
   chatButton: FakeElement;
@@ -486,6 +487,7 @@ function installMobileControlDom(): {
     ['mobile-more', new FakeElement()],
     ['mobile-extra-controls', new FakeElement()],
     ['mobile-emote', new FakeElement()],
+    ['mobile-mounts', new FakeElement()],
     ['mobile-discord', new FakeElement()],
     ['mobile-donate', new FakeElement()],
     ['mobile-chat', new FakeElement()],
@@ -525,6 +527,7 @@ function installMobileControlDom(): {
     moreButton: elements.get('mobile-more')!,
     moreModal: elements.get('mobile-extra-controls')!,
     emoteButton: elements.get('mobile-emote')!,
+    mountButton: elements.get('mobile-mounts')!,
     discordButton: elements.get('mobile-discord')!,
     donateButton: elements.get('mobile-donate')!,
     chatButton: elements.get('mobile-chat')!,
@@ -572,6 +575,7 @@ function mobileCallbacks() {
     onMap: noop,
     onLeaderboard: noop,
     onDailyRewards: noop,
+    onMountToggle: noop,
     onDeeds: noop,
     onProfessions: noop,
     onNameplates: () => false,
@@ -1244,6 +1248,29 @@ describe('MobileControls pointer lifecycle', () => {
     emoteButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
 
     expect(emotes).toBe(1);
+  });
+
+  it('fires the mount callback when the More-tray Mount button is tapped', () => {
+    const { mountButton } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    let mountToggles = 0;
+    const callbacks = {
+      ...mobileCallbacks(),
+      onMountToggle: () => {
+        mountToggles += 1;
+      },
+    };
+    new MobileControls(input, callbacks).start();
+
+    mountButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+
+    expect(mountToggles).toBe(1);
   });
 
   it('fires the Discord callback when the on-screen Discord button is tapped', () => {

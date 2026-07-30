@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const moderation = vi.hoisted(() => ({
   recordInGameAction: vi.fn(async () => {}),
@@ -10,6 +10,9 @@ const moderation = vi.hoisted(() => ({
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  // leave() flushes character + market in one call; without this export the
+  // leave save throws and sits out the full real-timer retry backoff (3.75s).
+  saveCharacterAndMarketState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -39,7 +42,23 @@ vi.mock('../server/moderation_db', () => moderation);
 
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
+import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { isInJailCage, JAIL_GATE, JAIL_VISITOR_POS, jailGateTeleport } from '../src/sim/jail';
+
+// Moderation acts on player sessions and the fixed jail cage; ambient camps,
+// world npcs and quest objects never take part, and every test here boots one
+// or more full GameServers, so strip them via the active-world seam
+// (GameServer takes no world option; same subsystem-world pattern as
+// tests/dot_final_tick.test.ts, seam precedent in tests/mob_locomotion.test.ts).
+// The stowed-pet test restores a pet from the static forest_wolf MOB template,
+// which is data, not world content.
+setActiveWorldContent({
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+});
+afterAll(() => setActiveWorldContent(null));
 
 // In-game moderation now requires explicit permissions at join (no is_admin ->
 // all-permissions fallback). These operators exercise both act and spectate.

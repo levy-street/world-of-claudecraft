@@ -146,6 +146,9 @@ export interface MobileControlCallbacks {
   onDailyRewards(): void;
   /** Open the Book of Deeds window, folded into the More tray on mobile. */
   onDeeds(): void;
+  /** Mount / dismount the picked mount directly, in the More tray (the pick
+   *  itself changes in the character sheet's mount picker). */
+  onMountToggle(): void;
   /** Open the Professions window, folded into the More tray on mobile. */
   onProfessions(): void;
   /** Toggle world nameplates; returns the new on/off state to sync the button glow. */
@@ -506,6 +509,7 @@ export class MobileControls {
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());
     this.bindButton('mobile-daily-rewards', () => this.callbacks.onDailyRewards());
     this.bindButton('mobile-deeds', () => this.callbacks.onDeeds());
+    this.bindButton('mobile-mounts', () => this.callbacks.onMountToggle());
     this.bindButton('mobile-professions', () => this.callbacks.onProfessions());
     const nameplatesBtn = document.getElementById('mobile-nameplates');
     this.bindButton('mobile-nameplates', () => {

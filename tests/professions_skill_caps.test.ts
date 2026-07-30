@@ -143,7 +143,10 @@ describe('at cap, actions still work: only skill gain stops', () => {
     // The professions_masterwork.test.ts fixture recipe: skillReq 0, uncommon
     // def with a stats profile, bump tier 2 inside the pre-attunement rare
     // ceiling, so the proc effect gate stays open on a fresh character.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    // Seed 40, hunted (re-hunted after the procedural-dungeons merge shifted
+    // the camp-driven world-gen draw sequence): the proc lands before the
+    // unstackable vestments outputs fill the bags and deny a craft.
+    const sim = new Sim({ seed: 40, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     const meta = mustMeta(sim, pid);
     meta.craftSkills.tailoring = 125;

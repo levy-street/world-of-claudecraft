@@ -1,0 +1,683 @@
+// The terrain chunk generator's COMPUTE half: palette, per-vertex sampling, and
+// the row-wise fills that write plain typed arrays.
+//
+// Split out of terrain.ts because none of it touches WebGL. It writes
+// Float32Array / Uint32Array and nothing else, so it can run off the main
+// thread; terrain.ts keeps finishChunkGeometry, which is the only part that
+// needs Three's BufferGeometry, and every other WebGL-side concern.
+//
+// Why that matters: generating a zone's geometry costs 2 to 4 seconds of pure
+// arithmetic, but the background lane stretches it to 60 to 105 (Frostveil
+// measured terrainMs 3914 gating vs 85523 idle, the same geometry) purely to
+// avoid stealing frame time. Off-thread that tax disappears, and the outdoor
+// fog clamp stops waiting on it.
+//
+// STILL IMPORTS THREE, on purpose, and is therefore deliberately NOT named
+// *_core: the vertex sampler does its colour work with THREE.Color over the
+// palette below, and THREE.Color applies an sRGB to linear conversion under
+// ColorManagement. Replacing it with plain float maths would reshade the whole
+// world while changing nothing's shape, so that swap is a separate step guarded
+// by tests/terrain_chunk_geometry.test.ts. Three's maths classes run fine in a
+// worker meanwhile; they only cost bundle size.
+//
+// MOVED VERBATIM from terrain.ts. The geometry pin proves it byte for byte.
+
+import * as THREE from 'three';
+import {
+  COLUMN_ZONES,
+  columnBlendAt,
+  STRIP_ZONES,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+  ZONES,
+} from '../sim/data';
+import { fbm2 } from '../sim/rng';
+import type { BiomeId } from '../sim/types';
+import { roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import { impactCraterTerrainBlend } from './impact_terrain';
+import { meshTerrainHeight } from './terrain_mesh_height';
+
+const SKIRT_DROP = 0.3;
+const SLOPE_EPS = 1.5; // matches the legacy color pass so tints don't shift
+const BIOME_PALETTE: Record<
+  BiomeId,
+  { grass: number; grassDark: number; grassYellow: number; dirt: number; sand: number }
+> = {
+  vale: {
+    grass: 0x548545,
+    grassDark: 0x3e6635,
+    grassYellow: 0x768c44,
+    dirt: 0x8a6f47,
+    sand: 0xc2b283,
+  },
+  marsh: {
+    grass: 0x596d36,
+    grassDark: 0x41522b,
+    grassYellow: 0x71764a,
+    dirt: 0x6e5a3e,
+    sand: 0x8f7f5c,
+  },
+  peaks: {
+    grass: 0x687a55,
+    grassDark: 0x4d5c45,
+    grassYellow: 0x8d9168,
+    dirt: 0x7d6a50,
+    sand: 0xb0a486,
+  },
+  // Paint-only biomes (editor brush): flat palettes, no zone-band blend.
+  // Coastal green-blue, brighter sand than the desert's.
+  beach: {
+    grass: 0x9ab86a,
+    grassDark: 0x7d9a5a,
+    grassYellow: 0xb8c278,
+    dirt: 0xc2a575,
+    sand: 0xf0e4bc,
+  },
+  // Warmer and browner than the beach, less green. Pushed further orange
+  // than a first pass to separate it clearly from the beach at a glance.
+  desert: {
+    grass: 0xcbaa5e,
+    grassDark: 0xa88d48,
+    grassYellow: 0xe0c070,
+    dirt: 0xc08f4a,
+    sand: 0xecc890,
+  },
+  // Dark, red-tinted ash rather than the cave's neutral grey. Pushed darker
+  // still so it reads as scorched ground, not just "dirty".
+  volcano: {
+    grass: 0x3c2c28,
+    grassDark: 0x281c18,
+    grassYellow: 0x503830,
+    dirt: 0x2c2018,
+    sand: 0x4c342c,
+  },
+  // Neutral blue-grey stone, distinct from volcano's warm ash. Pushed cooler
+  // and darker so it reads as underground rock, not daylight dirt.
+  cave: {
+    grass: 0x585e66,
+    grassDark: 0x3e444c,
+    grassYellow: 0x6a7078,
+    dirt: 0x484e56,
+    sand: 0x767c86,
+  },
+  // dusk: violet-cast glade greens with dusty rose soil
+  dusk: {
+    grass: 0x6d7566,
+    grassDark: 0x4c4e58,
+    grassYellow: 0x8c8078,
+    dirt: 0x6e5a68,
+    sand: 0xa593a2,
+  },
+  ember: {
+    grass: 0xc9a86a,
+    grassDark: 0xa8854f,
+    grassYellow: 0xd8bc80,
+    dirt: 0x9a6a44,
+    sand: 0xe0c088,
+  },
+  frost: {
+    grass: 0xeef4fa,
+    grassDark: 0xd8e4f0,
+    grassYellow: 0xcfdce8,
+    dirt: 0x9fb0c0,
+    sand: 0xdfe8f2,
+  },
+  amber: {
+    grass: 0xc9a44e,
+    grassDark: 0xa88438,
+    grassYellow: 0xe0c060,
+    dirt: 0x8a6a42,
+    sand: 0xd8bc84,
+  },
+  fen: {
+    grass: 0x7cab68,
+    grassDark: 0x5c8a52,
+    grassYellow: 0xa2c47a,
+    dirt: 0x6e6448,
+    sand: 0xb8bc8e,
+  },
+  // night: the Nightbloom dreams in violet. The splat textures are
+  // green-authored, so these run hot and saturated or the meadow reads
+  // green anyway (the amber realm's fire-orange needed the same push)
+  night: {
+    grass: 0xc06cf2,
+    grassDark: 0x8f4ecc,
+    grassYellow: 0xe08cf8,
+    dirt: 0x8a5cb8,
+    sand: 0xd8a8f0,
+  },
+  // haunt: dead mossy floor, cold wet earth, everything a shade too dark
+  haunt: {
+    grass: 0x46543e,
+    grassDark: 0x2e382c,
+    grassYellow: 0x5a6644,
+    dirt: 0x453c34,
+    sand: 0x6b6754,
+  },
+  // jungle: saturated tropical green over bright coral sand
+  jungle: {
+    grass: 0x3f9448,
+    grassDark: 0x2c7038,
+    grassYellow: 0x74b04e,
+    dirt: 0x8a6e4a,
+    sand: 0xf2e2b4,
+  },
+  // garden: mown lawn over warm gravel, tidy even where it has run wild
+  garden: {
+    grass: 0x58a04e,
+    grassDark: 0x3f7e3c,
+    grassYellow: 0x86b85c,
+    dirt: 0x8a7a5a,
+    sand: 0xd8cca8,
+  },
+  // gale: wind-dried sage downs over grey shingle
+  gale: {
+    grass: 0x6a9a62,
+    grassDark: 0x4c7a4e,
+    grassYellow: 0x9ab070,
+    dirt: 0x7a6e58,
+    sand: 0xd8d0b8,
+  },
+};
+
+// rock starts creeping in at lower slopes in the peaks, later in the marsh
+const ROCK_SLOPE_START: Record<BiomeId, number> = {
+  vale: 0.55,
+  marsh: 0.62,
+  peaks: 0.45,
+  beach: 0.7,
+  desert: 0.55,
+  volcano: 0.35,
+  cave: 0.4,
+  dusk: 0.52,
+  ember: 0.5,
+  frost: 0.5,
+  amber: 0.52,
+  fen: 0.6,
+  night: 0.55,
+  haunt: 0.58,
+  jungle: 0.6,
+  garden: 0.6,
+  gale: 0.5, // the cliffs crag early
+};
+
+const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
+
+interface VertexSample {
+  height: number;
+  slope: number;
+  normal: [number, number, number];
+  color: [number, number, number];
+  splat: [number, number, number, number]; // grass, dirt, rock, sand
+  extra: [number, number, number, number]; // mud, snow, impact scorch, impact ash
+}
+
+// Shared scratch colors for the palette blend (hot loop, avoid allocation).
+const cTmp = new THREE.Color();
+const grassC = new THREE.Color(),
+  grassDarkC = new THREE.Color(),
+  grassYellowC = new THREE.Color();
+const dirtC = new THREE.Color(),
+  sandC = new THREE.Color();
+const dirtDarkC = new THREE.Color(0x73592f);
+const rockC = new THREE.Color(0x7a7a72);
+const wetRockC = new THREE.Color(0x3f4442); // dark wet-rock shoreline (peaks/volcano/cave)
+const impactAshC = new THREE.Color(0x18110d);
+const impactScorchC = new THREE.Color(0x2a160c);
+const hazyPeakC = new THREE.Color(0xa8bdd4); // world-rim mountains, atmospheric
+const emberForestC = new THREE.Color(0x729a4e); // the Drakelands' green gatewood
+const emberScorchC = new THREE.Color(0x6a4a40); // volcanic ground near the Drakemaw
+const emberBasaltC = new THREE.Color(0x4e3c34); // the cones' dark volcanic rock
+const cobbleC = new THREE.Color(0x8f8c86); // the Amberfall's laid stone
+const cobbleDarkC = new THREE.Color(0x6e6b66); // ...its mortar-shadow cells
+const duskCliffC = new THREE.Color(0x544d58); // dark weathered sea-cliff stone
+const duskStrataC = new THREE.Color(0x8d7d76); // pale strata bands in the face
+const snowCapC = new THREE.Color(0xedf3fa);
+const lowSunC = new THREE.Color(0xe7d9a5);
+const lowShadeC = new THREE.Color(0x60745b);
+const zonePalettes = ZONES.map((zn) => {
+  const p = BIOME_PALETTE[zn.biome];
+  return {
+    grass: new THREE.Color(p.grass),
+    grassDark: new THREE.Color(p.grassDark),
+    grassYellow: new THREE.Color(p.grassYellow),
+    dirt: new THREE.Color(p.dirt),
+    sand: new THREE.Color(p.sand),
+  };
+});
+
+function paletteAt(x: number, z: number): void {
+  const stripPalette = (zn: (typeof ZONES)[number]) =>
+    zonePalettes[ZONES.indexOf(zn)] ?? zonePalettes[0];
+  grassC.copy(stripPalette(STRIP_ZONES[0]).grass);
+  grassDarkC.copy(stripPalette(STRIP_ZONES[0]).grassDark);
+  grassYellowC.copy(stripPalette(STRIP_ZONES[0]).grassYellow);
+  dirtC.copy(stripPalette(STRIP_ZONES[0]).dirt);
+  sandC.copy(stripPalette(STRIP_ZONES[0]).sand);
+  for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
+    const b = STRIP_ZONES[i].zMax;
+    const t = clamp01((z - (b - 30)) / 65);
+    const tt = t * t * (3 - 2 * t);
+    if (tt <= 0) break;
+    const next = stripPalette(STRIP_ZONES[i + 1]);
+    grassC.lerp(next.grass, tt);
+    grassDarkC.lerp(next.grassDark, tt);
+    grassYellowC.lerp(next.grassYellow, tt);
+    dirtC.lerp(next.dirt, tt);
+    sandC.lerp(next.sand, tt);
+  }
+  for (const col of COLUMN_ZONES) {
+    const t = columnBlendAt(col, x, z);
+    if (t <= 0) continue;
+    const p = stripPalette(col);
+    grassC.lerp(p.grass, t);
+    grassDarkC.lerp(p.grassDark, t);
+    grassYellowC.lerp(p.grassYellow, t);
+    dirtC.lerp(p.dirt, t);
+    sandC.lerp(p.sand, t);
+  }
+}
+
+// How "marsh" a given z is — mirrors the palette/heightfield blend windows so
+// the mud texture fades in exactly where the marsh palette does.
+function marshWeightAt(x: number, z: number): number {
+  let w = STRIP_ZONES[0].biome === 'marsh' ? 1 : 0;
+  for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
+    const b = STRIP_ZONES[i].zMax;
+    const t = clamp01((z - (b - 30)) / 65);
+    const tt = t * t * (3 - 2 * t);
+    if (tt <= 0) break;
+    w += ((STRIP_ZONES[i + 1].biome === 'marsh' ? 1 : 0) - w) * tt;
+  }
+  for (const col of COLUMN_ZONES) {
+    const t = columnBlendAt(col, x, z);
+    if (t > 0) w += ((col.biome === 'marsh' ? 1 : 0) - w) * t;
+  }
+  return w;
+}
+
+// blend the splat weight vector toward a single layer
+function lerpSplat(w: [number, number, number, number], layer: 0 | 1 | 2 | 3, t: number): void {
+  if (t <= 0) return;
+  w[0] -= w[0] * t;
+  w[1] -= w[1] * t;
+  w[2] -= w[2] * t;
+  w[3] -= w[3] * t;
+  w[layer] += t;
+}
+
+// One terrain sample: height, analytic normal, legacy tint color and splat
+// weights. Both tiers use the color; only the splat tier consumes weights.
+function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): VertexSample {
+  const h = meshTerrainHeight(x, z, seed);
+  const hx = meshTerrainHeight(x + SLOPE_EPS, z, seed) - meshTerrainHeight(x - SLOPE_EPS, z, seed);
+  const hz = meshTerrainHeight(x, z + SLOPE_EPS, seed) - meshTerrainHeight(x, z - SLOPE_EPS, seed);
+  const slope = Math.sqrt(hx * hx + hz * hz) / (2 * SLOPE_EPS);
+  const invLen = 1 / Math.hypot(hx / (2 * SLOPE_EPS), 1, hz / (2 * SLOPE_EPS));
+  const normal: [number, number, number] = [
+    -(hx / (2 * SLOPE_EPS)) * invLen,
+    invLen,
+    -(hz / (2 * SLOPE_EPS)) * invLen,
+  ];
+
+  paletteAt(x, z);
+  const biome = zoneBiomeAt(x, z);
+  const w: [number, number, number, number] = [1, 0, 0, 0];
+  const impact = impactCraterTerrainBlend(x, z);
+
+  // base grass with patchy variation: a coarse fbm layer for dry/lush
+  // patches plus a fine one for grain, replacing the old pure-sine tint
+  // (sine repeats on a visible grid at a distance; noise reads as natural
+  // ground cover instead).
+  const v = fbm2(x * 0.045, z * 0.045, seed + 53, 3);
+  cTmp.copy(grassC).lerp(grassDarkC, v);
+  const v2 = fbm2(x * 0.16, z * 0.16, seed + 59, 2);
+  cTmp.lerp(grassYellowC, v2 * 0.35);
+  if (biome === 'ember') {
+    // the gatewood is green in the south near Wyrmwatch and dries into sand
+    // northward; the volcanic belt then darkens toward scorched basalt
+    const forest = 1 - clamp01((z - 1925) / 145);
+    if (forest > 0) cTmp.lerp(emberForestC, forest * 0.85);
+    const sandT = clamp01((z - 1925) / 145);
+    lerpSplat(w, 3, sandT * 0.75);
+    // the Wyrmroad: a sheltered green corridor along x 404 through the
+    // volcanic belt toward the south crossing, the realm's second gradient
+    const passT = 1 - clamp01((Math.abs(x - 404) - 26) / 26);
+    const valley = passT * clamp01((z - 2310) / 80);
+    const scorch = clamp01((z - 2260) / 100) * (1 - valley);
+    if (scorch > 0) {
+      cTmp.lerp(emberScorchC, scorch * 0.55);
+      lerpSplat(w, 2, scorch * 0.5);
+    }
+    if (valley > 0) {
+      cTmp.lerp(emberForestC, valley * 0.8);
+      lerpSplat(w, 0, valley * 0.6);
+    }
+  }
+  // the marsh reads muddier: patches of wet dirt across the lowland
+  if (biome === 'marsh') lerpSplat(w, 1, 0.3 * v2 * clamp01((4 - h) / 6));
+  // shoreline blend, biome-specific: marsh has no sandy beach (wet mud
+  // instead), rocky/ashen biomes get a darker wet-rock tint, everywhere else
+  // keeps the classic sandy bank. Color and splat weight share one feathered
+  // falloff so the shore blends out instead of cutting a razor-hard edge.
+  const wl = WATER_LEVEL;
+  const shore = clamp01((wl + 1.6 - h) / 1.6);
+  if (biome === 'marsh') {
+    cTmp.lerp(dirtDarkC, shore);
+    lerpSplat(w, 1, shore);
+  } else if (biome === 'peaks' || biome === 'volcano' || biome === 'cave') {
+    cTmp.lerp(wetRockC, shore);
+    lerpSplat(w, 2, shore);
+  } else {
+    cTmp.lerp(sandC, shore);
+    lerpSplat(w, 3, shore);
+  }
+  // packed dirt at each hub settlement (same feather as the splat weight —
+  // a constant lerp stamped a clean-edged brown disc on the grass)
+  for (const zn of ZONES) {
+    const dHub = Math.hypot(x - zn.hub.x, z - zn.hub.z);
+    if (dHub < 14) {
+      const hubT = clamp01((14 - dHub) / 3);
+      if (zn.biome === 'amber') {
+        // Lanternmere's plaza is paved like its roads
+        const cell =
+          (Math.sin(Math.floor(x * 1.6) * 12.9898 + Math.floor(z * 1.6) * 78.233) + 1) / 2;
+        cTmp.lerp(cobbleC, 0.85 * hubT);
+        cTmp.lerp(cobbleDarkC, cell * 0.45 * hubT);
+        lerpSplat(w, 2, 0.75 * hubT);
+      } else {
+        cTmp.lerp(dirtDarkC, 0.7 * hubT);
+        lerpSplat(w, 1, 0.75 * hubT);
+      }
+      break;
+    }
+  }
+  const rd = roadDistance(x, z);
+  // the Amberfall paves its ways: cobblestone, cell-jittered so the vertex
+  // grid reads as laid stones rather than one grey ribbon (rock splat)
+  const cobbles = biome === 'amber';
+  if (rd < 2.0) {
+    if (cobbles) {
+      const cell = (Math.sin(Math.floor(x * 1.6) * 12.9898 + Math.floor(z * 1.6) * 78.233) + 1) / 2;
+      cTmp.lerp(cobbleC, 0.9);
+      cTmp.lerp(cobbleDarkC, cell * 0.5);
+      lerpSplat(w, 2, 0.85);
+    } else {
+      cTmp.lerp(dirtC, 0.85);
+      lerpSplat(w, 1, 0.85);
+    }
+  } else if (rd < 3.4) {
+    const t = 0.85 * (1 - (rd - 2.0) / 1.4);
+    cTmp.lerp(cobbles ? cobbleC : dirtC, t);
+    lerpSplat(w, cobbles ? 2 : 1, t);
+  }
+  // Break up the rock/snow blend so cliffs read as striated stone and snow
+  // reads as patchy drifts instead of a single flat tone / a clean cutoff.
+  const rockStreak = fbm2(x * 0.09, z * 0.09, seed + 41, 3);
+  const snowPatch = fbm2(x * 0.06, z * 0.06, seed + 47, 3);
+  const rockStart = ROCK_SLOPE_START[biome];
+  if (slope > rockStart) {
+    const t = Math.min(1, (slope - rockStart) * 2);
+    cTmp.lerp(rockC, t);
+    cTmp.lerp(dirtDarkC, t * (rockStreak - 0.5) * 0.35);
+    lerpSplat(w, 2, t);
+    // (the Great Maze's hedge walls are modeled props over flat lawn now:
+    // no steep terrain faces remain inside the maze to restyle)
+    // dusk sea cliffs read as dark weathered stone with pale strata bands, so
+    // the coast walls look like rugged wave-cut rock instead of smooth clay
+    if (biome === 'dusk') {
+      const nearSea = clamp01((16 - h) / 12);
+      const band = (Math.sin(h * 1.7 + x * 0.06 + z * 0.045) + 1) / 2;
+      cTmp.lerp(duskCliffC, t * nearSea * (0.45 + band * 0.35));
+      cTmp.lerp(duskStrataC, t * nearSea * (1 - band) * 0.3);
+    }
+  }
+  // high ground (ridges, peaks) goes rocky then snowy (the Drakelands' high
+  // rock reads as dark basalt instead, and its peaks never take snow). The snow
+  // ramp is wide (26u, over four terrace bands) with a strong patch-noise term:
+  // the terraced heightfield steps 6u at a time, and a ramp comparable to the
+  // step paints alternate treads fully white / fully bare, which reads as a
+  // repetitive checkerboard from a distance. The grid world terraces too, so it
+  // keeps the release's wide ramp; only the snow LINE (h - 34) stays tuned to
+  // the grid's own peak heights.
+  let snow = 0;
+  if (biome === 'ember') {
+    const t2 = Math.max(
+      slope > rockStart ? Math.min(1, (slope - rockStart) * 2) : 0,
+      clamp01((h - 18) / 8) * 0.75,
+    );
+    if (t2 > 0) cTmp.lerp(emberBasaltC, t2 * 0.85);
+  }
+  if (biome === 'frost') {
+    // the Reach is snowbound from the shore up, not just on its crowns; the
+    // Snowline and the Goldmelt (the sideways crossings) both sit at z 1890
+    // on opposite borders, so the green valley floors fade under the snow
+    // toward the interior instead of flipping white at the borders
+    const passT = 1 - clamp01((Math.abs(z - 1890) - 26) / 26);
+    const green = passT * clamp01((Math.abs(x) - 95) / 85);
+    const snowline = 1 - green;
+    if (green > 0) cTmp.lerp(emberForestC, green * 0.8);
+    const blanket = clamp01((h - (WATER_LEVEL + 1.2)) / 3) * snowline;
+    cTmp.lerp(snowCapC, 0.8 * blanket);
+    snow = Math.max(snow, 0.85 * blanket);
+  }
+  if (h > 22) {
+    const rockT = clamp01((h - 22) / 10) * (0.6 + rockStreak * 0.25);
+    cTmp.lerp(biome === 'ember' ? emberBasaltC : rockC, rockT);
+    snow = biome === 'ember' ? 0 : clamp01((h - 34 + (snowPatch - 0.5) * 14) / 26) * 0.85;
+    cTmp.lerp(snowCapC, snow);
+    lerpSplat(w, 2, clamp01((h - 22) / 10) * 0.8);
+  }
+  if (impact.scorch > 0) {
+    cTmp.lerp(impactScorchC, 0.88 * impact.scorch);
+    cTmp.lerp(impactAshC, 0.58 * impact.ash);
+    lerpSplat(w, 1, impact.dirt);
+    lerpSplat(w, 2, impact.rock);
+  }
+  // the rim wall reads as distant sunlit peaks, not a black cliff. The haze
+  // kicks in well before the wall itself (edge starts negative deep inland)
+  // so from a zone's centre the rim reads as atmospheric haze rather than a
+  // crisp silhouette, reinforcing the reduced BIOME_FOG draw distance.
+  const edge = Math.max(
+    Math.abs(x) - (WORLD_MAX_X - 70),
+    WORLD_MIN_Z + 70 - z,
+    z - (WORLD_MAX_Z - 70),
+  );
+  const rim = clamp01(edge / 64);
+  if (rim > 0) {
+    cTmp.lerp(hazyPeakC, rim * 0.95);
+    // same wide, noise-broken ramp as the interior snow above: a pure
+    // height threshold snowed every terrace tread above the line uniformly,
+    // turning the rim's 2D terrace lattice into a white/grey checkerboard
+    const rimSnow = clamp01((h - 21 + (snowPatch - 0.5) * 12) / 26) * rim * 0.8;
+    cTmp.lerp(snowCapC, rimSnow);
+    snow = Math.max(snow, rimSnow);
+    lerpSplat(w, 2, rim * 0.85);
+  }
+  // mud rides the dirt layer wherever the marsh palette is active
+  const mud = marshWeightAt(x, z);
+  if (lowShade) {
+    const ridge = clamp01((slope - 0.22) * 1.6);
+    const lowland = clamp01((wl + 7 - h) / 12);
+    const upland = clamp01((h - 8) / 22);
+    cTmp.lerp(lowShadeC, 0.07 * ridge + 0.05 * lowland * mud);
+    cTmp.lerp(lowSunC, 0.035 * (1 - shore) + 0.045 * upland);
+    cTmp.multiplyScalar(0.98 + upland * 0.04 - ridge * 0.025);
+  }
+  return {
+    height: h,
+    slope,
+    normal,
+    color: [cTmp.r, cTmp.g, cTmp.b],
+    splat: w,
+    extra: [mud, snow, impact.scorch, impact.ash],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Chunk geometry: interior (nx+1)x(nz+1) grid wrapped in a skirt ring whose
+// vertices sit on the chunk border but 0.3u lower, hiding LOD cracks.
+// ---------------------------------------------------------------------------
+
+/**
+ * The generator's whole output: plain typed arrays and nothing else. This is
+ * the payload that crosses a worker boundary (every buffer is transferable),
+ * and it is all finishChunkGeometry needs to build a BufferGeometry.
+ */
+export interface ChunkGeometryArrays {
+  positions: Float32Array;
+  normals: Float32Array;
+  colors: Float32Array;
+  uvs: Float32Array;
+  splats: Float32Array | null;
+  extras: Float32Array | null;
+  indices: Uint32Array;
+}
+
+export interface ChunkGeometryBuildState extends ChunkGeometryArrays {
+  nx: number;
+  nz: number;
+  gw: number;
+  gh: number;
+  x0: number;
+  z0: number;
+  stepX: number;
+  stepZ: number;
+  seed: number;
+  skirtSpan: number;
+  worldDepth: number;
+  /** GFX.lowPlus && !GFX.terrainSplat, resolved by the CALLER: gfx.ts reads
+   *  document/navigator, so a worker would resolve a different tier. */
+  lowShade: boolean;
+  sampleCache: Map<number, VertexSample>;
+}
+
+export function beginChunkGeometry(
+  x0: number,
+  z0: number,
+  size: number,
+  spacing: number,
+  seed: number,
+  withSplat: boolean,
+  skirtSpan: number,
+  lowShade: boolean,
+): ChunkGeometryBuildState {
+  const nx = Math.max(4, Math.round(size / spacing));
+  const nz = nx;
+  const stepX = size / nx;
+  const stepZ = size / nz;
+  const gw = nx + 3; // grid width including the skirt ring
+  const gh = nz + 3;
+  const count = gw * gh;
+
+  const positions = new Float32Array(count * 3);
+  const normals = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
+  const uvs = new Float32Array(count * 2);
+  const splats = withSplat ? new Float32Array(count * 4) : null;
+  const extras = withSplat ? new Float32Array(count * 4) : null;
+  const quadsX = gw - 1,
+    quadsZ = gh - 1;
+  const indices = new Uint32Array(quadsX * quadsZ * 6);
+  return {
+    nx,
+    nz,
+    gw,
+    gh,
+    x0,
+    z0,
+    stepX,
+    stepZ,
+    seed,
+    skirtSpan,
+    worldDepth: WORLD_MAX_Z - WORLD_MIN_Z,
+    lowShade,
+    positions,
+    normals,
+    colors,
+    uvs,
+    splats,
+    extras,
+    indices,
+    sampleCache: new Map<number, VertexSample>(),
+  };
+}
+
+export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): void {
+  const { nx, nz, gw, x0, z0, stepX, stepZ, seed, skirtSpan, worldDepth, lowShade } = state;
+  for (let gi = 0; gi < gw; gi++) {
+    const i = gi - 1,
+      j = gj - 1; // interior indices; -1 / n+1 are skirt
+    const ci = Math.max(0, Math.min(nx, i));
+    const cj = Math.max(0, Math.min(nz, j));
+    const isSkirt = i !== ci || j !== cj;
+    const x = x0 + ci * stepX;
+    const z = z0 + cj * stepZ;
+    // Skirt verts share the border sample - cache by clamped grid index.
+    const cacheKey = cj * gw + ci;
+    let s = state.sampleCache.get(cacheKey);
+    if (!s) {
+      s = sampleVertex(x, z, seed, lowShade);
+      state.sampleCache.set(cacheKey, s);
+    }
+    const vi = gj * gw + gi;
+    state.positions[vi * 3] = x;
+    // Slope-aware drop: a T-junction hole under a coarse neighbor's chord is
+    // bounded by the local gradient times that neighbor's vertex spacing.
+    state.positions[vi * 3 + 1] = s.height - (isSkirt ? SKIRT_DROP + s.slope * skirtSpan : 0);
+    state.positions[vi * 3 + 2] = z;
+    state.normals[vi * 3] = s.normal[0];
+    state.normals[vi * 3 + 1] = s.normal[1];
+    state.normals[vi * 3 + 2] = s.normal[2];
+    state.colors[vi * 3] = s.color[0];
+    state.colors[vi * 3 + 1] = s.color[1];
+    state.colors[vi * 3 + 2] = s.color[2];
+    state.uvs[vi * 2] = (x + WORLD_MAX_X) / (WORLD_MAX_X * 2);
+    state.uvs[vi * 2 + 1] = (z - WORLD_MIN_Z) / worldDepth;
+    if (state.splats) {
+      state.splats[vi * 4] = s.splat[0];
+      state.splats[vi * 4 + 1] = s.splat[1];
+      state.splats[vi * 4 + 2] = s.splat[2];
+      state.splats[vi * 4 + 3] = s.splat[3];
+    }
+    if (state.extras) {
+      state.extras[vi * 4] = s.extra[0];
+      state.extras[vi * 4 + 1] = s.extra[1];
+      state.extras[vi * 4 + 2] = s.extra[2];
+      state.extras[vi * 4 + 3] = s.extra[3];
+    }
+  }
+}
+
+export function fillChunkIndexRow(state: ChunkGeometryBuildState, gj: number): void {
+  const quadsX = state.gw - 1;
+  let k = gj * quadsX * 6;
+  for (let gi = 0; gi < quadsX; gi++) {
+    const a = gj * state.gw + gi;
+    const b = a + 1;
+    const c = a + state.gw;
+    const d = c + 1;
+    // Split along the diagonal whose endpoints are closest in height, so the
+    // fold follows ridge/terrace edges. Both windings keep the +y face up.
+    const ha = state.positions[a * 3 + 1];
+    const hb = state.positions[b * 3 + 1];
+    const hc = state.positions[c * 3 + 1];
+    const hd = state.positions[d * 3 + 1];
+    if (Math.abs(hb - hc) <= Math.abs(ha - hd)) {
+      state.indices[k++] = a;
+      state.indices[k++] = c;
+      state.indices[k++] = b;
+      state.indices[k++] = b;
+      state.indices[k++] = c;
+      state.indices[k++] = d;
+    } else {
+      state.indices[k++] = a;
+      state.indices[k++] = c;
+      state.indices[k++] = d;
+      state.indices[k++] = a;
+      state.indices[k++] = d;
+      state.indices[k++] = b;
+    }
+  }
+}

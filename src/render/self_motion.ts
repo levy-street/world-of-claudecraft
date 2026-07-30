@@ -27,7 +27,7 @@
 
 import { moverHeight, resolveMovement } from '../sim/colliders';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
-import { DT, type Entity, type MoveInput, RUN_SPEED } from '../sim/types';
+import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
 
 // Latency cap on the extrapolation window: at least one snapshot-ish interval
 // so low-ping links still get the start-of-motion snap, and a hard ceiling so
@@ -85,13 +85,62 @@ export interface SelfMotionFrame {
   frameDt: number;
 }
 
-interface Vec3Like {
+export interface Vec3Like {
   x: number;
   y: number;
   z: number;
 }
 
 const clamp = (n: number, min: number, max: number): number => Math.max(min, Math.min(max, n));
+
+export function hasAuthoritativeSelfPositionDiscontinuity(
+  events: readonly SimEvent[],
+  playerId: number,
+): boolean {
+  return events.some(
+    (event) =>
+      event.type === 'unstuck' &&
+      event.phase === 'completed' &&
+      (event.pid === undefined || event.pid === playerId),
+  );
+}
+
+export const SELF_RENDER_SMOOTH_RATE = 30;
+
+/**
+ * Advance the renderer's non-predictive self pose. A completed authoritative
+ * recovery is a semantic discontinuity even when it moves less than the usual
+ * six-yard teleport threshold, so it always replaces the prior display pose.
+ */
+export function updateSelfRenderFallback(
+  current: Vec3Like,
+  targetX: number,
+  targetY: number,
+  targetZ: number,
+  ready: boolean,
+  dt: number,
+  smooth: boolean,
+  authoritativeDiscontinuity: boolean,
+): void {
+  const dx = targetX - current.x;
+  const dy = targetY - current.y;
+  const dz = targetZ - current.z;
+  if (
+    !smooth ||
+    !ready ||
+    authoritativeDiscontinuity ||
+    dx * dx + dy * dy + dz * dz > SELF_MOTION_SNAP_DIST_SQ
+  ) {
+    current.x = targetX;
+    current.y = targetY;
+    current.z = targetZ;
+    return;
+  }
+  const t = 1 - Math.exp(-SELF_RENDER_SMOOTH_RATE * Math.max(0, dt));
+  current.x += dx * t;
+  current.y += dy * t;
+  current.z += dz * t;
+}
 
 export class SelfMotionPredictor {
   /**
@@ -204,7 +253,7 @@ export class SelfMotionPredictor {
    * predictor is disabled (the caller falls back to the plain lead-smoothing
    * path, which shares the same selfRenderPosition so the handoff is seamless).
    */
-  step(self: Entity, frame: SelfMotionFrame): Vec3Like | null {
+  step(self: Entity, frame: SelfMotionFrame, authoritativeDiscontinuity = false): Vec3Like | null {
     if (!frame.enabled) {
       this.reset();
       return null;
@@ -228,7 +277,7 @@ export class SelfMotionPredictor {
     this.lastDead = self.dead;
     this.lastGhost = self.ghost;
     let actor = this.actor;
-    if (actor && !flipped) {
+    if (actor && !flipped && !authoritativeDiscontinuity) {
       const dx = actor.pos.x - ax;
       const dy = actor.pos.y - ay;
       const dz = actor.pos.z - az;
@@ -256,6 +305,17 @@ export class SelfMotionPredictor {
       this.histCount = 0;
       this.histHead = 0;
     }
+    if (authoritativeDiscontinuity) {
+      // Do not integrate even one held-input step on the recovery frame. The
+      // event's destination is the authoritative visual truth for this frame,
+      // and the next frame may resume bounded prediction from this clean root.
+      this.out.x = ax;
+      this.out.y = ay;
+      this.out.z = az;
+      this.recordHistory(ax, ay, az);
+      this.leadMs = 0;
+      return this.out;
+    }
     // Borrow the mirrored per-frame state the kernel reads; the pose fields
     // above stay owned by the scratch actor.
     actor.auras = self.auras;
@@ -263,6 +323,15 @@ export class SelfMotionPredictor {
     actor.sitting = self.sitting;
     actor.castingAbility = self.castingAbility;
     actor.maxHp = self.maxHp;
+    // Mount speed reads the entity mirror (player_motion.moveSpeedMult), so a
+    // mid-session mount/dismount must reach the scratch actor the same frame.
+    actor.mountKey = self.mountKey;
+    // The kernel roots movement while a mount summon channel is in flight
+    // (mountCastRemaining > 0 with a non-empty mountCastKey); borrow both so the
+    // online display roots in lockstep with the server. A dismount channel
+    // (mountCastKey === '') does not root movement and is move-cancelable.
+    actor.mountCastRemaining = self.mountCastRemaining;
+    actor.mountCastKey = self.mountCastKey;
 
     // Fixed-step advance with the held intent. Turn flags are stripped: the
     // heading is assigned from the one display source each step, and letting

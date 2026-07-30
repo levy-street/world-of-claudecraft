@@ -5,7 +5,13 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import { ITEM_IMAGE_IDS, iconDataUrl, itemImageUrl, UI_ITEM_IMAGE_IDS } from '../src/ui/icons';
+import {
+  ITEM_ART_PENDING,
+  ITEM_IMAGE_IDS,
+  iconDataUrl,
+  itemImageUrl,
+  UI_ITEM_IMAGE_IDS,
+} from '../src/ui/icons';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 // Gate for the committed WebP item icons (mirror of tests/skill_icons.test.ts). Art under
@@ -163,6 +169,7 @@ describe('item webp icons', () => {
   it('A) every image-backed item id resolves to a committed, decodable .webp', async () => {
     const broken: string[] = [];
     for (const id of [...ITEM_IMAGE_IDS, ...UI_ITEM_IMAGE_IDS]) {
+      if (ITEM_ART_PENDING.has(id)) continue; // covered by A2/A3 below
       const url = itemImageUrl(id);
       expect(url, `${id} must resolve to a webp url`).toMatch(/^\/ui\/items\/.+\.webp$/);
       const file = path.join(publicDir, (url as string).replace(/^\//, ''));
@@ -177,6 +184,35 @@ describe('item webp icons', () => {
       }
     }
     expect(broken).toEqual([]);
+  });
+
+  // A2/A3 keep the pending list from becoming a dumping ground. Guard A skips those ids, so
+  // without these two arms an item could be parked here forever, or a NEW artless item could
+  // be added to the list to silence a real failure.
+  it('A2) every art-pending id is a real, non-weapon item that genuinely has no art yet', () => {
+    const stale: string[] = [];
+    for (const id of ITEM_ART_PENDING) {
+      const def = (ITEMS as Record<string, { kind?: string }>)[id];
+      if (!def) stale.push(`${id} (no such item: drop it from ITEM_ART_PENDING)`);
+      else if (def.kind === 'weapon') stale.push(`${id} (weapon: never belongs in the item set)`);
+      else if (existsSync(path.join(itemsDir, `${id}.webp`))) {
+        stale.push(`${id} (art IS committed now: remove it from ITEM_ART_PENDING)`);
+      }
+    }
+    expect(stale, 'ITEM_ART_PENDING must shrink as art lands, and never outlive its items').toEqual(
+      [],
+    );
+  });
+
+  it('A3) a pending id serves the drawn icon instead of a url pointing at a missing file', () => {
+    // The whole point of the pending list: itemImageUrl declines, so iconDataUrl composes the
+    // procedural recipe rather than handing an <img> a 404. Asserted on the real surface the
+    // bag bar, tooltips, loot and the vendor call.
+    for (const id of ITEM_ART_PENDING) {
+      expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
+    }
+    // And the inverse: an id with committed art must still win the static url.
+    expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });
 
   it('B) commits only webp art (+ mapping.json) under public/ui/items', () => {
@@ -376,6 +412,9 @@ describe('item webp icons', () => {
       'non-weapon items must never fall back to the legacy procedural compositor',
     ).toEqual(expected);
     for (const id of expected) {
+      // Art-pending ids deliberately serve the drawn recipe instead (A2/A3 gate the list, and
+      // iconDataUrl would need a DOM canvas here anyway). Every other item must serve its WebP.
+      if (ITEM_ART_PENDING.has(id)) continue;
       expect(iconDataUrl('item', id), `${id} must serve its committed WebP`).toBe(
         `/ui/items/${id}.webp`,
       );

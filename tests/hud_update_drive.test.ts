@@ -576,9 +576,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     guard: {
       kind: 'module',
       module: 'spellbook_window.ts',
-      proof: 'if (SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig) {',
+      proof: 'if (this.knownChanged(this.deps.world().known)) {',
     },
-    why: 'the ONLY window on the per-frame band; the sig gates the rebuild, the fall-through hotbar-control refresh runs every frame',
+    why: 'the ONLY window on the per-frame band, and since #2519 BOTH of its halves are gated: the guard proved below (knownChanged, an in-place walk of the resolved-ability numbers, no signature string built per frame) gates the rebuild, and the fall-through hotbar-control refresh takes its own change check (takeControlChange) over the three bar inputs its toggles render, so an unchanged frame makes no lookup, no allocation and no DOM write',
   },
   {
     call: 'this.actionBarPainter.paint',
@@ -668,37 +668,62 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.showBanner',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && pastDeadBand && this.lastZoneId !== ''",
+    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
     surface: 'chrome',
-    why: 'the zone banner on a real zone crossing; the dead-band stops border straddling from re-firing it',
+    why: 'the zone banner on a real zone crossing, committed the moment zoneAt flips (the old z-only dead band never fired on an east-west realm crossing)',
   },
   {
     call: 'this.log',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && pastDeadBand && this.lastZoneId !== ''",
+    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
     surface: 'chrome',
     why: 'the zone-entry chat line',
   },
   {
     call: 'this.logZoneWelcome',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && pastDeadBand && this.lastZoneId !== ''",
+    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
     surface: 'chrome',
     why: 'the zone welcome blurb in chat',
   },
   {
     call: 'this.renderer.vistaPan',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && pastDeadBand && this.lastZoneId !== '' && !p.dead && !p.inCombat && !recentCombat",
+    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== '' && !p.dead && !p.inCombat && !recentCombat",
     surface: 'none',
     why: 'the zone-entry camera sweep; a renderer call, not a HUD write',
   },
   {
     call: 'this.prewarmMapBg',
     band: 'medium',
-    gate: '!inDungeon && currentZone.id !== this.lastZoneId && pastDeadBand',
+    gate: '!inDungeon && currentZone.id !== this.lastZoneId',
     surface: 'none',
     why: 'idle-schedules the new zone map background into an offscreen canvas',
+  },
+  {
+    call: 'this.mountRaceStrip.repaintIfChanged',
+    band: 'frame',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'mount_race_strip.ts',
+      proof:
+        'if (view.raceId !== this.lastRaceId || view.phase !== this.lastPhase || second !== this.lastSecond) {',
+    },
+    why: 'the show-jumping race timer strip; the same per-frame safety net as lockpick, behind a display check and a sig diff bucketed to whole seconds',
+  },
+  {
+    call: 'this.mountRaceControls.update',
+    band: 'frame',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'mount_race_controls.ts',
+      proof: 'if (!button || mode === this.buttonMode) return;',
+    },
+    why: 'the Start/Cancel Race button and the 3..2..1..GO countdown; each painter returns early on an unchanged mode',
   },
   {
     call: 'this.showSubzone',
@@ -966,6 +991,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     surface: 'chrome',
     why: 'the minimap clock text, value-diffed',
+  },
+  {
+    call: 'this.updateDayNightDial',
+    band: 'fast',
+    gate: '',
+    surface: 'chrome',
+    why: 'the decorative day/night ring beside the minimap, repainted from the same world clock',
   },
   {
     call: 'this.updateMinimapCoords',
@@ -1298,7 +1330,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 37, chrome: 68, none: 14 });
+    ).toEqual({ window: 39, chrome: 69, none: 14 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1310,7 +1342,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     for (const row of HUD_UPDATE_DRIVES)
       if (row.guard) byKind[row.guard.kind] = (byKind[row.guard.kind] ?? 0) + 1;
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
-      module: 19,
+      module: 21,
       hud: 5,
       callsite: 9,
       none: 4,
@@ -1361,9 +1393,14 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'mailbox_window.ts: if (sig === this.lastSig) return;',
         'market_window.ts: if (sig === this.lastSig) return;',
         'meters.ts: if (!this.isOpen || now - this.lastRender < 250) return;',
+        'mount_race_controls.ts: if (!button || mode === this.buttonMode) return;',
+        'mount_race_strip.ts: if (view.raceId !== this.lastRaceId || view.phase !== this.lastPhase || second !== this.lastSecond) {',
         'professions_window.ts: if (sig === this.lastSig) return;',
         'social_window.ts: if (struct !== this.lastStruct) {',
-        'spellbook_window.ts: if (SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig) {',
+        // #2519 replaced the joined signature string this used to build every frame with
+        // an in-place comparison against the retained numbers; same guard, same place, no
+        // per-frame allocation.
+        'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'vale_cup_betting.ts: if (view.sig !== this.lastSig) {',
         'vale_cup_briefing.ts: if (view.sig !== this.lastSig) {',
         'vale_cup_window.ts: if (view.sig === this.lastSig) return;',
@@ -1392,6 +1429,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(modules.filter((m) => !adapterName.test(m)).sort()).toEqual([
       'dungeon_finder_proposal_popup.ts',
       'meters.ts',
+      'mount_race_controls.ts',
+      'mount_race_strip.ts',
       'vale_cup_betting.ts',
       'vale_cup_briefing.ts',
     ]);

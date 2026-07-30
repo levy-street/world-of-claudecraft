@@ -128,6 +128,7 @@ const CALLBACK_KEYS = [
   'swingIntervalMult',
   'mobCanSwim',
   'resolveMovePoint',
+  'resolvePlayerMove',
   'resolveMove',
   'updatePet',
   'isDelveCompanionMob',
@@ -178,6 +179,9 @@ const CALLBACK_KEYS = [
   'abandonLockpick',
   'tickLockpickTimeout',
   'startDelveRaiseDeadChannel',
+  'tickMountTraining',
+  'abandonMountTraining',
+  'tickMountRace',
   // C4a casting-lifecycle surface.
   'resolvedAbility',
   'playerGcdFor',
@@ -188,6 +192,7 @@ const CALLBACK_KEYS = [
   'tameError',
   'standUp',
   'breakGhostWolf',
+  'forceDismount',
   'startAutoAttack',
   'revivePet',
   'completeFishing',
@@ -228,6 +233,8 @@ const CALLBACK_KEYS = [
   'mailAuthoredLetter',
   // Set proc firing.
   'applySetProcs',
+  // Vale Cup <-> Arena queue exclusion (social/vale_cup.ts).
+  'vcupSeatedOrQueued',
   // The Vale Cup sport-move arms (social/vale_cup.ts).
   'vcupBallKick',
   'vcupBallPass',
@@ -243,6 +250,12 @@ function makeFakeHost() {
   const entities = new Map<number, Entity>();
   const clock = { time: 0, tick: 0 };
   const host: SimContextHost = {
+    riftCollisionToken: 1,
+    naturalRiftPortals: [],
+    riftEvents: [],
+    nextRiftInstanceId: 1,
+    riftPortalNextAt: 120,
+    riftPortalSpawnCount: 0,
     get rng() {
       return rng;
     },
@@ -269,6 +282,8 @@ function makeFakeHost() {
     frozenOrbs: [],
     dungeonDoorIds: null,
     instances: [],
+    riftInstances: [],
+    riftPortalIds: null,
     dungeonResetLocks: new Map(),
     arenaMatches: new Map(),
     duels: new Map(),
@@ -284,6 +299,7 @@ function makeFakeHost() {
     arenaQueueYumi5: [],
     yumiBusySlots: new Set(),
     yumiCatMatches: new Map(),
+    escortRuns: new Map(),
     matchmakeYumi: vi.fn(),
     updateYumiActive: vi.fn(),
     yumiPlayerDown: vi.fn(),
@@ -390,6 +406,9 @@ function makeFakeHost() {
     instanceClaimIdAt: vi.fn(() => null),
     enterDungeon: vi.fn(),
     leaveDungeon: vi.fn(),
+    enterRift: vi.fn(),
+    leaveRift: vi.fn(),
+    riftOpenTreasure: vi.fn(),
     resetDungeonInstances: vi.fn(),
     inheritDungeonResetLocks: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
@@ -435,6 +454,7 @@ function makeFakeHost() {
     swingIntervalMult: vi.fn(() => 1),
     mobCanSwim: vi.fn(() => false),
     resolveMovePoint: vi.fn(() => ({ x: 0, z: 0 })),
+    resolvePlayerMove: vi.fn(() => ({ x: 0, z: 0 })),
     resolveMove: vi.fn(() => ({ x: 0, z: 0 })),
     updatePet: vi.fn(),
     isDelveCompanionMob: vi.fn(() => false),
@@ -474,6 +494,9 @@ function makeFakeHost() {
     abandonLockpick: vi.fn(),
     tickLockpickTimeout: vi.fn(),
     startDelveRaiseDeadChannel: vi.fn(() => false),
+    tickMountTraining: vi.fn(),
+    tickMountRace: vi.fn(),
+    abandonMountTraining: vi.fn(),
     resolvedAbility: vi.fn(() => null),
     playerGcdFor: vi.fn(() => 1.5),
     isFriendlyTo: vi.fn(() => false),
@@ -485,6 +508,7 @@ function makeFakeHost() {
     tameError: vi.fn(() => null),
     standUp: vi.fn(),
     breakGhostWolf: vi.fn(),
+    forceDismount: vi.fn(),
     startAutoAttack: vi.fn(),
     revivePet: vi.fn(),
     completeFishing: vi.fn(),
@@ -524,6 +548,8 @@ function makeFakeHost() {
     mailHeroicMarks: vi.fn(),
     mailAuthoredLetter: vi.fn(),
     applySetProcs: vi.fn(),
+    // Vale Cup <-> Arena queue exclusion.
+    vcupSeatedOrQueued: vi.fn(() => false),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),
     vcupBallPass: vi.fn(),

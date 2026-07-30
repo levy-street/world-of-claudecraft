@@ -35,6 +35,13 @@ const ITEMS: Record<string, ItemDef> = {
   rod: { id: 'rod', name: 'Fishing Rod', kind: 'tool', quality: 'common' },
   keystone: { id: 'keystone', name: 'Crypt Keystone', kind: 'quest', quality: 'common' },
   relic: { id: 'relic', name: 'Ancient Relic', kind: 'armor', slot: 'chest', quality: 'legendary' },
+  reins: {
+    id: 'reins',
+    name: 'Reins of the Valorsteed',
+    kind: 'mount',
+    mount: 'valorsteed',
+    quality: 'common',
+  },
 } as unknown as Record<string, ItemDef>;
 
 const lookup = (id: string): ItemDef | undefined => ITEMS[id];
@@ -85,6 +92,18 @@ describe('applyBagFilter — category filtering', () => {
   it('keeps only quest items', () => {
     const out = applyBagFilter(INV, lookup, { category: 'quest', sort: 'recent', search: '' });
     expect(ids(out)).toEqual(['keystone']);
+  });
+
+  it('keeps only mounts (reins items)', () => {
+    // A local inventory so the shared INV-based order/quality/name assertions
+    // above stay stable; only this case exercises the mount category.
+    const inv: InvSlot[] = [
+      { itemId: 'blade', count: 1 },
+      { itemId: 'reins', count: 1 },
+      { itemId: 'potion', count: 1 },
+    ];
+    const out = applyBagFilter(inv, lookup, { category: 'mount', sort: 'recent', search: '' });
+    expect(ids(out)).toEqual(['reins']);
   });
 
   it('drops slots whose item is missing from the table', () => {
@@ -177,6 +196,10 @@ describe('BAG_CATEGORIES', () => {
   it('lists every category exactly once, starting with all', () => {
     expect(BAG_CATEGORIES[0]).toBe('all');
     expect(new Set(BAG_CATEGORIES).size).toBe(BAG_CATEGORIES.length);
+  });
+
+  it('includes the mounts category', () => {
+    expect(BAG_CATEGORIES).toContain('mount');
   });
 });
 

@@ -16,6 +16,8 @@ import {
   CAMPS,
   DUNGEON_LIST,
   QUESTS,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
   setActiveWorldContent,
   ZONES,
 } from '../src/sim/data';
@@ -36,6 +38,7 @@ const hud = hudSource.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 
 const MAP_COLOR_TOKENS = [
+  '--color-map-ocean',
   '--color-map-label',
   '--color-map-outline',
   '--color-map-portal-dot',
@@ -157,6 +160,9 @@ function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
         trace.blits.push({ sprite: image as LabelSprite, dx: rest[0], dy: rest[1] });
       }
     },
+    // the painter floods the ocean before the zone bg blit; the fake context
+    // must answer every call it makes, not only the path-building ones
+    fillRect(): void {},
     beginPath(): void {
       commands = [];
     },
@@ -268,6 +274,13 @@ describe('map_window_painter: no magic values', () => {
     }
   });
 
+  it('caches bounded decorations per zone instead of generating the whole world', () => {
+    expect(code).toContain('decorationsByZone.get(opts.zone.id)');
+    expect(code).toContain('generateDecorationsInBounds(world.cfg.seed, opts.zoneBg.region)');
+    expect(code).toContain('decorationsByZone.set(opts.zone.id, decorations)');
+    expect(code).not.toContain('generateDecorations(world.cfg.seed)');
+  });
+
   it('draws the active-world armoury footprint with its dedicated token', () => {
     const trace = newTrace();
     installMapStyleGlobals(trace);
@@ -276,9 +289,18 @@ describe('map_window_painter: no magic values', () => {
     const world = mapWorld();
     const emptyProps = emptyZoneProps();
     const background = { width: 560, height: 560 } as HTMLCanvasElement;
+    const zone = ZONES[0];
     const options = {
-      zone: ZONES[0],
-      bg: background,
+      zone,
+      zoneBg: {
+        canvas: background,
+        region: {
+          minX: zone.xMin ?? STRIP_MIN_X,
+          maxX: zone.xMax ?? STRIP_MAX_X,
+          minZ: zone.zMin,
+          maxZ: zone.zMax,
+        },
+      },
       canvasSize: 560,
       zoom: 6,
       center: { x: 17.5, z: -5.5 },
@@ -327,10 +349,6 @@ describe('map_window_painter: no magic values', () => {
     ]);
     expect(trace.styleReads.filter((token) => token.endsWith('building-armoury'))).toHaveLength(2);
   });
-
-  it('caches the whole-world decorations once instead of regenerating per redraw', () => {
-    expect(code).toContain('if (!this.decorations) this.decorations = generateDecorations(');
-  });
 });
 
 describe('map_window_painter: cadence + cached background preserved', () => {
@@ -341,13 +359,15 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(hud).toContain('this.mapPainter.paintOverworld(ctx, this.sim, {');
   });
 
-  it('blits the Hud-owned cached terrain background rather than rebuilding it', () => {
-    // The painter receives the cached bg and only drawImages it (no terrain build).
+  it('accepts only the current Hud-owned zone background and never prewarms all zones', () => {
+    // The painter receives one cached bg and only drawImages it (no terrain build).
     expect(code).toContain('ctx.drawImage(');
     expect(code).not.toContain('paintTerrainRows');
     expect(code).not.toContain('renderTerrainCanvas');
-    // Hud keeps the bg cache + prewarm and passes the cached canvas in each redraw.
-    expect(hud).toContain('bg: this.mapZoneBg(zone)');
+    expect(code).toContain('zoneBg: MapZoneBg');
+    expect(code).not.toContain('zoneBgs');
+    expect(hud).toContain('canvas: this.mapZoneBg(zone)');
+    expect(hud).not.toContain('prewarmAllZones');
   });
 });
 
@@ -542,7 +562,18 @@ function expectedLabels(): Set<string> {
 function labelPaintOptions(ping?: { x: number; z: number }) {
   return {
     zone: LABEL_ZONE,
-    bg: { width: 560, height: 560 } as HTMLCanvasElement,
+    // The committed zone background, in the painter's own shape: a cached
+    // canvas plus the world region it covers (the painter composites only the
+    // current zone's plate, so it needs the rect to place it).
+    zoneBg: {
+      canvas: { width: 560, height: 560 } as HTMLCanvasElement,
+      region: {
+        minX: LABEL_ZONE.xMin ?? STRIP_MIN_X,
+        maxX: LABEL_ZONE.xMax ?? STRIP_MAX_X,
+        minZ: LABEL_ZONE.zMin,
+        maxZ: LABEL_ZONE.zMax,
+      },
+    },
     canvasSize: 560,
     zoom: 1,
     center: null,

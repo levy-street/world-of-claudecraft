@@ -844,4 +844,12 @@ export const table: DeedLocaleTable = {
     name: 'Il Cantiere dei Demolitore',
     desc: "Smantella 50 pezzi d'equipaggiamento ricavandone materie prime.",
   },
+  dgn_wildheart_basin: {
+    name: 'Il Bacino Morde Ancora',
+    desc: 'Sconfiggi Zulgar, Voce del Bacino, nel Bacino di Wildheart.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Eroico: Il Bacino di Wildheart',
+    desc: 'Sconfiggi Zulgar, Voce del Bacino, nel Bacino di Wildheart in difficoltà Eroica.',
+  },
 };

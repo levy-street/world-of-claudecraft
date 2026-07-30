@@ -28,16 +28,30 @@ import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
+import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
-import { DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { Sim } from '../src/sim/sim';
-import { type Aura, DT, type PlayerClass } from '../src/sim/types';
+import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
 import { buildCraftingView } from '../src/ui/crafting_view';
+
+// Wire round-trip fixtures only read the player entity they build, never ambient
+// world content, so strip camps/npcs/ground objects to keep each direct Sim cheap
+// (dot_final_tick pattern). The aura-decode suites near the end of this file grab
+// a real camp mob and the GameServer harness ships its own full world; both keep
+// the builtin content.
+const WIRE_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
 
 const DELTA_KEYS = [
   'inv',
@@ -149,6 +163,10 @@ function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWo
   c.pendingSpectateFacing = null;
   c.nodeCooldowns = new Map();
   return c;
+}
+
+function feedEventFrame(client: ClientWorld, frame: unknown): void {
+  (client as any).onMessage(JSON.stringify(frame));
 }
 
 describe('self stat wire round-trip', () => {
@@ -441,7 +459,7 @@ describe('raid lockouts over the wire', () => {
 // emit into the real client mirror and checks the visual layer's inputs.
 describe('Combat Mech held weapon over the wire', () => {
   it('mirrors a Rogue mech with independent mainhand and offhand weapons', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
+    const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true, world: WIRE_TEST_WORLD });
     const pid = sim.playerId;
     sim.setPlayerLevel(20, pid);
     sim.setPlayerSkin(pid, 0, 'mech');
@@ -475,7 +493,12 @@ describe('Combat Mech held weapon over the wire', () => {
   });
 
   it('mirrors a winning Warrior mech with its real shield offhand', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: WIRE_TEST_WORLD,
+    });
     const pid = sim.playerId;
     sim.setPlayerSkin(pid, 0, 'mech');
     sim.addItem('worn_sword', 1, pid);
@@ -730,7 +753,12 @@ describe('loot FFA lapse over the wire', () => {
 
 describe('combat ratings over the wire', () => {
   it('mirrors Ranged Attack Power so online hunter attack-spell tooltips can scale', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true });
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'hunter',
+      autoEquip: true,
+      world: WIRE_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     sim.tick();
     const e = sim.player;
@@ -2050,7 +2078,12 @@ describe('client-side delta merge', () => {
     // would silently decode every online aura to sourceId 0, degrading the
     // target strip's ownFirst dot/hot prominence online while offline keeps it
     // (the stacks/charges sibling pins above follow the same pattern).
-    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: WIRE_TEST_WORLD,
+    });
     const e = sim.entities.get(sim.playerId)!;
     e.auras.push(
       {
@@ -2320,7 +2353,12 @@ describe('despawn grace (anti-flicker)', () => {
 // offline/headless never call it, so the field stays ''.
 describe('guild nameplate wire', () => {
   it('carries the guild name through wireEntity only when set', () => {
-    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: WIRE_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Thaldrin');
 
     expect(wireEntity(sim.entities.get(pid)!).gd).toBeUndefined();
@@ -2583,7 +2621,12 @@ describe('active title wire (Book of Deeds)', () => {
 // recalcPlayerStats; the renderer maps them to GLBs (ITEM_WEAPON_VARIANTS).
 describe('held weapon wire (mainhandItemId/offhandItemId)', () => {
   it('carries both equipped hand item ids through wireEntity', () => {
-    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: WIRE_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Thaldrin');
     const e = sim.entities.get(pid)!;
     // a fresh warrior starts holding its class startWeapon
@@ -3086,6 +3129,108 @@ describe('lockpick view rebuilds from events on the online client', () => {
   });
 });
 
+describe('online mount command and race-event transport', () => {
+  it('round-trips client frames through actor-scoped server dispatch and mirrors the race lifecycle', () => {
+    const server = new GameServer();
+    const actorWire = fakeWs();
+    const actor = joinServer(server, actorWire, 1, 'Rider');
+    const otherWire = fakeWs();
+    const other = joinServer(server, otherWire, 2, 'Bystander');
+    const sim = server.sim;
+    const actorMeta = sim.players.get(actor.pid)!;
+    const otherMeta = sim.players.get(other.pid)!;
+    const actorEntity = sim.entities.get(actor.pid)!;
+    const otherEntity = sim.entities.get(other.pid)!;
+    sim.setPlayerLevel(20, actor.pid);
+    sim.setPlayerLevel(20, other.pid);
+    sim.addItem('reins_grag_bear', 1, actor.pid);
+    // Riding is a purchased skill now; the transport fixture buys past the gate.
+    actorMeta.ridingTrained = true;
+    otherMeta.ridingTrained = true;
+
+    // Drive the real ClientWorld command adapter. Every remaining mount command
+    // is payload-free now that mount_select is gone, so the fragile part is the
+    // command TOKEN arriving unchanged at the server dispatch.
+    const outbox: string[] = [];
+    const commandClient = bareClient(actor.pid);
+    (commandClient as any).connected = true;
+    (commandClient as any).ws = { readyState: 1, send: (payload: string) => outbox.push(payload) };
+    (commandClient as any).entities.set(actor.pid, { level: 20 });
+    const owned: MountKey[] = ['grag_bear'];
+    (commandClient as any).selfOwnedMounts = owned;
+    commandClient.toggleMounted();
+    commandClient.mountRaceStart();
+    commandClient.mountRaceCancel();
+    expect(outbox.map((payload) => JSON.parse(payload))).toEqual([
+      { t: 'cmd', cmd: 'mount_toggle' },
+      { t: 'cmd', cmd: 'mount_race_start' },
+      { t: 'cmd', cmd: 'mount_race_cancel' },
+    ]);
+
+    // The toggle no longer summons: reins are items, so an unmounted toggle is a
+    // no-op and neither player starts a summon channel from it.
+    server.handleMessage(actor, outbox[0]);
+    expect(actorEntity.mountCastKey).toBe('');
+    expect(otherEntity.mountCastKey).toBe('');
+
+    // Put the actor at the course already mounted, then start through the
+    // client-built frame. The bystander must never gain a session or receive
+    // the actor's personal race events.
+    actorEntity.mountCastRemaining = 0;
+    actorEntity.mountCastKey = '';
+    actorEntity.mountKey = 'grag_bear';
+    actorEntity.inCombat = false;
+    actorEntity.onGround = true;
+    actorEntity.pos.x = MOUNT_RACE_START_PLATFORM.x;
+    actorEntity.pos.z = MOUNT_RACE_START_PLATFORM.z;
+    actorEntity.pos.y = terrainHeight(actorEntity.pos.x, actorEntity.pos.z, sim.cfg.seed);
+    actorEntity.prevPos = { ...actorEntity.pos };
+    // outbox[1] is mount_race_start (mount_select no longer occupies index 0).
+    server.handleMessage(actor, outbox[1]);
+    expect(actorMeta.mountRace?.phase).toBe('countdown');
+    expect(otherMeta.mountRace ?? null).toBeNull();
+
+    const mirror = bareClient(actor.pid);
+    const routeTick = (): void => {
+      const events = sim.tick();
+      (server as any).routeEvents(events);
+    };
+    const feedNewActorFrames = (): void => {
+      for (const frame of actorWire.sent.splice(0)) {
+        if (
+          frame.t === 'events' &&
+          frame.list.some((event: { type?: string }) => event.type?.startsWith('mountRace'))
+        ) {
+          feedEventFrame(mirror, frame);
+        }
+      }
+    };
+
+    routeTick();
+    feedNewActorFrames();
+    expect(mirror.mountRaceView()).toMatchObject({ phase: 'countdown', cleared: 0 });
+
+    for (let i = 1; i < MOUNT_RACE_COUNTDOWN_TICKS; i++) routeTick();
+    feedNewActorFrames();
+    expect(actorMeta.mountRace?.phase).toBe('racing');
+    expect(mirror.mountRaceView()).toMatchObject({ phase: 'racing', cleared: 0 });
+
+    server.handleMessage(actor, outbox[2]); // mount_race_cancel
+    routeTick();
+    feedNewActorFrames();
+    expect(actorMeta.mountRace ?? null).toBeNull();
+    expect(mirror.mountRaceView()).toBeNull();
+    expect(otherMeta.mountRace ?? null).toBeNull();
+    expect(
+      otherWire.sent.some(
+        (frame) =>
+          frame.t === 'events' &&
+          frame.list.some((event: { type?: string }) => event.type?.startsWith('mountRace')),
+      ),
+    ).toBe(false);
+  });
+});
+
 // ---------------------------------------------------------------------------
 // W0a: full self-snapshot delta round-trip gate.
 //
@@ -3102,10 +3247,11 @@ describe('lockpick view rebuilds from events on the online client', () => {
 
 // The pinned set of delta keys, sorted. Cross-checked below against the
 // live `maybe(...)` (and `maybeRaw(...)`) calls scraped from server/game.ts
-// source, so a 51st unregistered delta key reddens this gate. All but two ride
+// source, so any unregistered delta key reddens this gate. All but two ride
 // via `maybe(...)`; `vcupb` and `dfb` are written with `maybeRaw(...)` (realm-wide
 // fragments, each serialized at most once per tick by a realm-readout memo and
-// shared across viewers), not plain `maybe(...)`.
+// shared across viewers), not plain `maybe(...)`. The count is the union of the
+// release's realm-readout keys and the procedural-dungeon branch's rift delta keys.
 const ALL_DELTA_KEYS = [
   'achg',
   'achr',
@@ -3131,6 +3277,7 @@ const ALL_DELTA_KEYS = [
   'drun',
   'dstats',
   'duel',
+  'einst',
   'ench',
   'equip',
   'gprof',
@@ -3147,6 +3294,11 @@ const ALL_DELTA_KEYS = [
   'marks',
   'milestones',
   'mktU',
+  'mloot',
+  'mntLesson',
+  'mntOwn',
+  'mntRace',
+  'mntRtd',
   'mst',
   'ncd',
   'party',
@@ -3198,6 +3350,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   drun: 'delveRun',
   dstats: 'deedStats',
   duel: 'duelInfo',
+  einst: 'equipmentInstances',
   ench: 'lastEnchantResult',
   equip: 'equipment',
   gprof: 'gatheringProficiency',
@@ -3213,6 +3366,11 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   marks: 'markers',
   milestones: 'unlockedMilestones',
   mktU: 'marketCollectPending',
+  mloot: 'masterLootPrompts',
+  mntLesson: 'mountLessonActive',
+  mntOwn: 'ownedMounts',
+  mntRace: 'mountRaceView',
+  mntRtd: 'ridingTrained',
   mres: 'maxResource',
   mst: 'activeMobileStationCraft',
   party: 'partyInfo',
@@ -3296,9 +3454,18 @@ function dirtyEveryDeltaField(): {
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
 
   // Direct PlayerMeta fields.
-  meta.inventory = [{ itemId: 'baked_bread', count: 3 }];
+  // The reins item both dirties `inv` further and flips `mntOwn` (the owned
+  // mount collection) to a non-default value, which is what lets the pick
+  // below land on a non-horse mount.
+  meta.inventory = [
+    { itemId: 'baked_bread', count: 3 },
+    { itemId: 'reins_grag_bear', count: 1 },
+  ];
   meta.vendorBuyback = [{ itemId: 'apprentice_staff', count: 1 }];
   meta.equipment = { ...meta.equipment, mainhand: 'zealotsbane_blade' };
+  meta.equipmentInstance = {
+    ring1: { rolled: { quality: 'epic', stats: { str: 2 } }, boundTo: lp },
+  };
   meta.questLog.set('q_widows', { questId: 'q_widows', counts: [10, 0], state: 'active' });
   meta.questsDone.add('q_wolves');
   meta.raidLockouts.set('nythraxis_boss_arena', FAR_FUTURE_MS);
@@ -3339,6 +3506,22 @@ function dirtyEveryDeltaField(): {
   meta.nodeHarvestReadyAt[GATHER_NODES[0].id] = sim.time + 30;
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', rows: {} };
+  meta.ridingTrained = true; // dirties mntRtd (the purchased riding skill)
+  meta.mountTraining = {
+    sessionId: 'mt_wire_fixture',
+    ownerId: lp,
+    anchor: { x: p.pos.x, z: p.pos.z },
+    state: 'IN_PROGRESS',
+    phase: 'ride',
+  };
+  meta.mountRace = {
+    raceId: 'race_wire_fixture',
+    ownerId: lp,
+    phase: 'racing',
+    goTick: sim.tickCount,
+    deadlineTick: sim.tickCount + 200,
+    clearedMask: 3,
+  };
   // Book of Deeds: two earned deeds with DISTINCT utcDay stamps (an empty map
   // would be a vacuous pin), a non-zero stat block covering the counter, both
   // sets, and a clear record, a renown total, and an active title
@@ -3403,6 +3586,25 @@ function dirtyEveryDeltaField(): {
     candidates: [lp],
     partyMembers: [lp, mp],
     choices: new Map(),
+  });
+  // `mloot`: a SECOND roll, still in its master-loot curate phase with the leader
+  // as the master looter. Deliberately distinct from the need/greed roll above so
+  // the two surfaces cannot be confused: activeLootRolls/lootRollGroupStatus skip
+  // this one (masterLooter set) and activeMasterLootRolls skips that one.
+  (sim as any).pendingLootRolls.set(2, {
+    id: 2,
+    itemId: 'greyjaw_hide_boots',
+    itemName: 'Greyjaw Hide Boots',
+    quality: 'uncommon',
+    expiresAt: 9999,
+    candidates: [lp, mp],
+    candidateNames: new Map([
+      [lp, 'Alld'],
+      [mp, 'Memb'],
+    ]),
+    partyMembers: [lp, mp],
+    choices: new Map(),
+    masterLooter: lp,
   });
 
   // Enchanting-action outcomes (Professions 2.0): poke the exact
@@ -3575,9 +3777,13 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.prestigeRank).toBe(3); // prk -> prestigeRank
 
     // --- fields that decode onto the client ---
-    expect(client.inventory).toEqual([{ itemId: 'baked_bread', count: 3 }]); // inv -> inventory
+    expect(client.inventory).toEqual([
+      { itemId: 'baked_bread', count: 3 },
+      { itemId: 'reins_grag_bear', count: 1 },
+    ]); // inv -> inventory
     expect(client.vendorBuyback).toEqual([{ itemId: 'apprentice_staff', count: 1 }]); // buyback -> vendorBuyback
     expect(client.equipment).toMatchObject({ mainhand: 'zealotsbane_blade' }); // equip -> equipment
+    expect(client.equipmentInstances.ring1?.rolled?.stats).toEqual({ str: 2 });
     // cosmetics -> accountCosmetics, asserted against the normalized shape (the input
     // is already the normal {completedQuestIds, mechChromaIds} form, see :192-202)
     expect(client.accountCosmetics).toEqual({
@@ -3593,6 +3799,21 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.unlockedMilestones).toEqual(['milestone_test']); // milestones -> unlockedMilestones
     // lockouts -> selfLockouts (private), via the raidLockouts() accessor
     expect(client.raidLockouts().map((l) => l.id)).toEqual(['nythraxis_boss_arena']);
+    // mnt is active identity only: a persisted pick must not make a dismounted
+    // online player render or move as mounted.
+    expect(client.player.mountKey).toBe('');
+    // mntOwn -> selfOwnedMounts (private), via the ownedMounts() accessor. The
+    // horse is no longer auto-owned, so the collection is exactly what the reins
+    // item in the seeded inventory grants (server ownedMountsFor -> wire -> mirror).
+    expect(client.ownedMounts()).toEqual(['grag_bear']);
+    expect(client.mountLessonActive()).toBe(true);
+    expect(client.mountRaceView()).toMatchObject({
+      raceId: 'race_wire_fixture',
+      phase: 'racing',
+      clearedMask: 3,
+      cleared: 2,
+    });
+    expect(client.ridingTrained()).toBe(true); // mntRtd -> ridingTrained
     expect(client.partyInfo).not.toBeNull(); // party -> partyInfo
     expect(client.partyInfo?.members.some((m) => m.pid === memberPid)).toBe(true);
     expect(client.markerFor(memberPid)).toBe(3); // marks -> markers, via markerFor()
@@ -3604,6 +3825,22 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
+    // mloot -> masterLootPrompts, via the activeMasterLootRolls() accessor. Roll 2
+    // only: the curate-phase master roll is master-looter-only, and roll 1 (a plain
+    // need/greed roll) must never leak onto it.
+    expect(client.activeMasterLootRolls()).toEqual([
+      {
+        rollId: 2,
+        itemId: 'greyjaw_hide_boots',
+        itemName: 'Greyjaw Hide Boots',
+        quality: 'uncommon',
+        expiresAt: 9999,
+        candidates: [
+          { pid: leader.pid, name: 'Alld' },
+          { pid: memberPid, name: 'Memb' },
+        ],
+      },
+    ]);
     // lrollg -> lootRollGroup, via the lootRollGroupStatus() accessor
     expect(client.lootRollGroupStatus()).toEqual([
       {
@@ -3723,6 +3960,21 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.cupInfo?.live).toBeNull(); // no live match in the fixture
   });
 
+  it('keeps the live ride distinct from the persisted mount pick on self snapshots', () => {
+    const { server, fc, leader } = dirtyEveryDeltaField();
+    server.sim.entities.get(leader.pid)!.mountKey = 'valorsteed';
+    broadcast(server);
+    const snapshot = lastSnap(fc.sent);
+    expect(snapshot.self.mnt).toBe('valorsteed');
+    // There is no persisted pick any more: mntSel left the wire when reins became
+    // usable items, so the active mount is the only mount field on the snapshot.
+    expect(snapshot.self).not.toHaveProperty('mntSel');
+
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(snapshot);
+    expect(client.player.mountKey).toBe('valorsteed');
+  });
+
   it('flips mst to null when the mobile station expires (server-side tick-domain check)', () => {
     // The expiry arm of the mst self-delta: activeMobileStationCraftFor
     // resolves active-vs-expired against the SERVER sim's own tickCount, so
@@ -3781,6 +4033,28 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.lifetimeHonor).toBe(654);
     expect(client.companionState?.companionId).toBe('companion_tessa');
   });
+
+  it('authoritatively clears stale race and lesson mirrors after a missed end event', () => {
+    const { server, fc, leader } = dirtyEveryDeltaField();
+    broadcast(server);
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.mountLessonActive()).toBe(true);
+    expect(client.mountRaceView()).not.toBeNull();
+
+    const meta = server.sim.meta(leader.pid)!;
+    meta.mountTraining = null;
+    meta.mountRace = null;
+    fc.sent.length = 0;
+    broadcast(server);
+    const ended = lastSnap(fc.sent);
+    expect(ended.self.mntLesson).toBe(false);
+    expect(ended.self.mntRace).toBeNull();
+
+    (client as any).applySnapshot(ended);
+    expect(client.mountLessonActive()).toBe(false);
+    expect(client.mountRaceView()).toBeNull();
+  });
 });
 
 describe('gather node cooldown wire round trip (ncd)', () => {
@@ -3817,9 +4091,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 56 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(56);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(56);
+  it('ALL_DELTA_KEYS contains exactly 62 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(62);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(62);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3838,7 +4112,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
-    expect(scraped.size).toBe(56);
+    // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
+    // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
+    // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62.
+    expect(scraped.size).toBe(62);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3860,6 +4137,14 @@ describe('delta-key contract pins (anti-drift)', () => {
       atitle: 'activeTitle',
       deeds: 'deedsEarned',
       dstats: 'deedStats',
+      mntLesson: 'mountLessonActive',
+      mntRace: 'mountRaceView',
+      mntRtd: 'ridingTrained',
+      // Two loot-roll surfaces whose terse keys look interchangeable: mloot is the
+      // master-looter curate prompt, lroll the need/greed one, and swapping either
+      // right-hand side would pass every other check in this test.
+      lroll: 'lootRollPrompts',
+      mloot: 'masterLootPrompts',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);
@@ -4047,7 +4332,12 @@ describe('dfb realm-readout memo (shared board bytes, per-session cadence)', () 
 // (ClientWorld.applySnapshot).
 describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
   function roundTrip(aura: Aura): { wire: Record<string, unknown>; mirror: Aura } {
-    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: WIRE_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Sapped');
     const e = sim.entities.get(pid)!;
     e.auras.push(aura);

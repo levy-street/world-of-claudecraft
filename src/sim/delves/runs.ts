@@ -1077,10 +1077,19 @@ export function tickDelvePressurePlates(ctx: SimContext, run: DelveRun): void {
 export function tickDelveRaiseDeadChannel(ctx: SimContext, run: DelveRun): void {
   const channel = run.raiseDeadChannel;
   if (!channel) return;
+  const boss = ctx.entities.get(channel.bossId);
+  // The boss can enter 'evade' (leash break, or any other reset path) well before
+  // it finishes walking home to resetEvadingMob's arrival check. Drop the channel
+  // the moment that happens instead of letting it keep counting down in the
+  // background: a wipe/leash mid-channel must not still ambush the next pull with
+  // stale adds once the boss looks freshly reset.
+  if (!boss || boss.dead || boss.aiState === 'evade') {
+    run.raiseDeadChannel = null;
+    return;
+  }
   channel.remaining -= DT;
   if (channel.remaining > 0) return;
   run.raiseDeadChannel = null;
-  const boss = ctx.entities.get(channel.bossId);
   if (boss && !boss.dead) {
     ctx.spawnBossAdds(boss, channel.mobId, channel.count);
     // Raise Dead resolved uninterrupted (PRD §7.4 telegraph): mirror of the
@@ -1140,6 +1149,34 @@ function standingOnLitanyDryGround(moduleId: string, localX: number, localZ: num
   return false;
 }
 
+/** The active static Blackwater tier at a world point, or null on dry ground. */
+export function delveBlackwaterTierAt(
+  run: DelveRun,
+  pos: Pick<Vec3, 'x' | 'z'>,
+): 'shallow' | 'deep' | null {
+  const moduleId = run.modules[run.moduleIndex];
+  const zones = DELVE_MODULES[moduleId]?.hazards;
+  if (!moduleId || !zones || zones.length === 0) return null;
+  const ox = run.origin.x;
+  const oz = run.origin.z + delveModuleZOffset(run);
+  const localX = pos.x - ox;
+  const localZ = pos.z - oz;
+  if (standingOnLitanyDryGround(moduleId, localX, localZ)) return null;
+
+  let worstTier: 'shallow' | 'deep' | null = null;
+  for (const zone of zones) {
+    const dx = localX - zone.x;
+    const dz = localZ - zone.z;
+    const rx = zone.rx ?? zone.r;
+    const rz = zone.rz ?? zone.r;
+    if ((dx * dx) / (rx * rx) + (dz * dz) / (rz * rz) > 1) continue;
+    const tier = zone.tier ?? 'deep';
+    if (tier === 'deep') return 'deep';
+    worstTier = 'shallow';
+  }
+  return worstTier;
+}
+
 export function tickDelveBlackwater(ctx: SimContext, run: DelveRun): void {
   const mod = DELVE_MODULES[run.modules[run.moduleIndex]];
   const zones = mod?.hazards;
@@ -1156,35 +1193,12 @@ export function tickDelveBlackwater(ctx: SimContext, run: DelveRun): void {
       ? DELVE_BLACKWATER_PCT_HEROIC
       : DELVE_BLACKWATER_PCT_NORMAL;
   if (highWater) basePct *= 1.35;
-  const ox = run.origin.x;
-  const oz = run.origin.z + delveModuleZOffset(run);
   for (const pid of ctx.partyMembersForKey(run.partyKey)) {
     const p = ctx.entities.get(pid);
     if (!p || p.dead) continue;
     // Airborne players dodge water damage.
     if (p.jumping) continue;
-    // Standing on an island or the dais is dry ground, regardless of which
-    // hazard zone's radius it geometrically falls inside.
-    if (standingOnLitanyDryGround(run.modules[run.moduleIndex], p.pos.x - ox, p.pos.z - oz)) {
-      continue;
-    }
-    // Find the worst-tier zone the player is standing in.
-    let worstTier: 'shallow' | 'deep' | null = null;
-    for (const z of zones) {
-      const dx = p.pos.x - (ox + z.x);
-      const dz = p.pos.z - (oz + z.z);
-      // An authored ellipse (rx/rz, e.g. the apse moat) checks per-axis; a plain
-      // zone (rx/rz unset) falls back to the circular r/r check.
-      const rx = z.rx ?? z.r;
-      const rz = z.rz ?? z.r;
-      if ((dx * dx) / (rx * rx) + (dz * dz) / (rz * rz) > 1) continue;
-      const zt = z.tier ?? 'deep';
-      if (zt === 'deep') {
-        worstTier = 'deep';
-        break; // deep is worst; no need to check further
-      }
-      if (worstTier === null) worstTier = 'shallow';
-    }
+    const worstTier = delveBlackwaterTierAt(run, p.pos);
     if (worstTier === null) continue;
     const tierMult = worstTier === 'deep' ? 2.0 : 0.35;
     const dmg = Math.max(1, Math.round(p.maxHp * basePct * tierMult));
@@ -1271,6 +1285,17 @@ export function startDelveRaiseDeadChannel(
     telegraph: true,
   });
   return true;
+}
+
+// Evade/wipe reset: an in-flight Raise Dead channel is DelveRun-level state
+// (not an Entity field), so the generic resetEvadingMob (mob/locomotion.ts)
+// cannot reach it directly. If the boss going home mid-channel is the one who
+// started it, drop it: mirrors the manual grave-interrupt cancel in
+// delveInteract below, so a stale channel never outlives the reset and spawns
+// unowned adds a few seconds after the pull was supposed to have ended.
+export function clearDelveRaiseDeadChannel(ctx: SimContext, boss: Entity): void {
+  const run = delveRunForMob(ctx, boss.id);
+  if (run?.raiseDeadChannel?.bossId === boss.id) run.raiseDeadChannel = null;
 }
 
 // ----- interact + reward delivery --------------------------------------------

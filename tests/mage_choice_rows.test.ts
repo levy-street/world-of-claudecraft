@@ -186,6 +186,7 @@ describe('mage choice rows (owner tree)', () => {
     expect(option?.effect.ability).toEqual([
       { ability: 'ice_barrier', addEffects: [{ type: 'breakRoots' }] },
       { ability: 'blazing_barrier', addEffects: [{ type: 'breakRoots' }] },
+      { ability: 'temporal_barrier', addEffects: [{ type: 'breakRoots' }] },
     ]);
 
     applyControl(sim, p, mob.id, 'slow');
@@ -209,6 +210,19 @@ describe('mage choice rows (owner tree)', () => {
 
     expect(p.auras.some((aura) => aura.kind === 'root')).toBe(false);
     expect(p.auras.some((aura) => aura.id === 'blazing_barrier')).toBe(true);
+  });
+
+  it('Shifting Ward breaks roots when an Arcane mage casts Temporal Barrier on themselves', () => {
+    const { sim, p } = rig({ 8: 'mag_r8_temporal_rift' }, 20, 'arcane');
+    const mob = addTargetMob(sim);
+    applyControl(sim, p, mob.id, 'root');
+
+    // No friendly override and the current target is the hostile mob, so
+    // resolveFriendlyTarget falls back to self: this is a self-cast.
+    sim.castAbility('temporal_barrier');
+
+    expect(p.auras.some((aura) => aura.kind === 'root')).toBe(false);
+    expect(p.auras.some((aura) => aura.id === 'temporal_barrier')).toBe(true);
   });
 
   it('Shifting Ward does not self-cleanse an Arcane mage shielding an ally', () => {

@@ -17,6 +17,7 @@ import {
   GATHERING_PROFESSION_IDS,
   GATHERING_PROFESSIONS,
 } from '../src/sim/content/professions';
+import { RIFT_MOBS } from '../src/sim/content/rift/mobs';
 import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
 import { YUMI_TEMPLATE_ID } from '../src/sim/content/yumi';
 import {
@@ -35,6 +36,7 @@ import {
   MILESTONE_DEED_TO_LEGACY,
   VISITED_MARK_NAMESPACES,
 } from '../src/sim/deeds';
+import { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from '../src/sim/rift/rift_gen';
 import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
 
 const ALL = DEED_ORDER.map((id) => DEEDS[id]);
@@ -54,9 +56,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 219 deeds worth 2710 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(219);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2710);
+  it('ships exactly 221 deeds worth 2730 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(221);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2730);
   });
 
   it('ships the audited per-category counts', () => {
@@ -65,7 +67,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(byCategory).toEqual({
       progression: 50,
       combat: 10,
-      dungeon: 27,
+      dungeon: 29,
       delve: 13,
       chronicle: 24,
       collection: 28,
@@ -116,7 +118,18 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_perfect_specimen',
       'soc_first_salvage',
       'soc_salvage_50',
+      // The Wildheart Basin dungeon deeds append after the
+      // Professions 2.0 tail (the release base merge put that tail first).
+      'dgn_wildheart_basin',
+      'dgn_wildheart_basin_heroic',
     ]);
+    expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
+    expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
+    expect(DEEDS.dgn_wildheart_basin.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'wildheart_basin',
+      count: 1,
+    });
     expect(DEEDS.prog_crown_below.renown).toBe(25);
     expect(DEEDS.prog_mere_at_rest.renown).toBe(25);
     expect(DEEDS.prog_callused_hands.renown).toBe(5);
@@ -313,7 +326,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // milestones, the rare-find quartet, and the salvage pair). No shipped
   // trigger or renown changed; prog_master_gatherer had only its English desc
   // reworded, which this digest deliberately does not cover.
-  const FROZEN_CATALOG_SHA256 = '059694159a630369a4f9536f741dff8128f04ced50b8eb11a3a9edfde65e996a';
+  // Re-baselined at the release/v0.30.0 base merge: the catalog appends the
+  // Wildheart Basin dungeon deed pair (2 new deeds); no shipped
+  // trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '7e6b910bfc0b7a9a4635d7df67ee6c22691edb583a8bb59355d8a5063568ee75';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -407,23 +423,30 @@ describe('retro fallback proof sets stay anchored to the real tables', () => {
     expect(retroArm).toContain("'prog_guildsworn'");
   });
 
-  it('the creditable mob-level ceiling is the heroic pin', () => {
+  it('the creditable mob-level ceiling is the S-rank rift pin', () => {
     // Giantslayer's stranded heal keys on the highest level a creditable mob
-    // can ever spawn at. Heroic instances pin every mob to one shared level;
-    // outside heroic no spawnable template exceeds the player cap. The only
-    // templates authored above the ceiling can never be credited: warlock
-    // and mage pets sync to their owner's level and die outside kill credit
-    // (combat/damage.ts owned-pet early return), and the Yumi cat's damage
-    // is intercepted before the death path (social/yumi.ts).
+    // can ever spawn at. S-rank rift floors run mobs up to RIFT_MAX_MOB_LEVEL
+    // (the game-wide ceiling; at 23 the +5-level kill is out of reach at the
+    // level-20 cap, so capped players take the stranded retro-grant instead);
+    // heroic instances pin every mob to one shared level below it; outside
+    // those no spawnable template exceeds the player cap. The only templates
+    // authored above the ceiling can never be credited: warlock and mage pets
+    // sync to their owner's level and die outside kill credit (combat/damage.ts
+    // owned-pet early return), and the Yumi cat's damage is intercepted before
+    // the death path (social/yumi.ts).
     const heroicLevels = Object.values(HEROIC_DUNGEON_TUNING).map((t) => t.level);
-    expect(Math.max(...heroicLevels)).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    expect(RIFT_MAX_MOB_LEVEL).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    expect(Math.max(...heroicLevels)).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
+    expect(RIFT_LEVEL_CAP).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
     const neverCreditable = new Set([
       ...Object.keys(WARLOCK_PET_MOBS),
       ...Object.keys(MAGE_PET_MOBS),
       YUMI_TEMPLATE_ID,
     ]);
+    const dynamicallyLevelCapped = new Set(Object.keys(RIFT_MOBS));
     for (const [id, m] of Object.entries(MOBS)) {
-      if (m.dummy || m.worldBoss || neverCreditable.has(id)) continue;
+      if (m.dummy || m.worldBoss || neverCreditable.has(id) || dynamicallyLevelCapped.has(id))
+        continue;
       expect(m.maxLevel, id).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
     }
     // Delve spawns bypass maxLevel: the live level is minLevel plus the
@@ -448,7 +471,7 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('soc_salvage_50');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_wildheart_basin_heroic');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

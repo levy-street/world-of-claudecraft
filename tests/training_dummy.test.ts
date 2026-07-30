@@ -12,12 +12,18 @@ type RebucketSim = Sim & {
 };
 
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, devCommands: true });
 }
 
 function dummyOf(sim: Sim): Entity {
   const d = [...sim.entities.values()].find((e) => e.templateId === 'training_dummy' && !e.dead);
   if (!d) throw new Error('training dummy not spawned');
+  return d;
+}
+
+function healingDummyOf(sim: Sim): Entity {
+  const d = [...sim.entities.values()].find((e) => e.friendlyPracticeTarget && !e.dead);
+  if (!d) throw new Error('healing dummy not spawned');
   return d;
 }
 
@@ -45,6 +51,13 @@ function meleePlayerAt(sim: Sim, x: number, z: number): number {
 function roguePlayerAt(sim: Sim, x: number, z: number): number {
   const pid = sim.addPlayer('rogue', 'Ivara', { autoEquip: true });
   sim.setPlayerLevel(18, pid);
+  moveEntityTo(sim, entityById(sim, pid), x, z);
+  return pid;
+}
+
+function priestPlayerAt(sim: Sim, x: number, z: number): number {
+  const pid = sim.addPlayer('priest', 'Healer', { autoEquip: true });
+  sim.setPlayerLevel(20, pid);
   moveEntityTo(sim, entityById(sim, pid), x, z);
   return pid;
 }
@@ -187,5 +200,45 @@ describe('Highwatch training dummy', () => {
     );
     if (!back) throw new Error('training dummy did not respawn');
     expect(back.hp).toBe(back.maxHp);
+  });
+
+  it('spawns a friendly healer practice dummy that friendly targeting can select', () => {
+    const sim = makeWorld();
+    const d = healingDummyOf(sim);
+    const pid = priestPlayerAt(sim, d.pos.x - 6, d.pos.z);
+    const priest = entityById(sim, pid);
+
+    expect(d.hostile).toBe(false);
+    expect(d.templateId).toBe('training_dummy');
+    expect(d.name).toBe('Healing Dummy');
+    expect(d.aiState).toBe('idle');
+    expect(Math.round(d.pos.x)).toBe(-34);
+    expect(Math.round(d.pos.z)).toBe(648);
+    sim.tick();
+    sim.targetNearestFriendly(pid);
+
+    expect(priest.targetId).toBe(d.id);
+    expect(priest.autoAttack).toBe(false);
+    expect(sim.isHostileTo(priest, d)).toBe(false);
+  });
+
+  it('accepts repeated friendly heals without creating hostile combat', () => {
+    const sim = makeWorld();
+    const d = healingDummyOf(sim);
+    const pid = priestPlayerAt(sim, d.pos.x - 5, d.pos.z);
+    const priest = entityById(sim, pid);
+    priest.targetId = d.id;
+
+    for (let cast = 0; cast < 3; cast++) {
+      sim.castAbility('lesser_heal', pid);
+      for (let i = 0; i < 20 * 3; i++) sim.tick();
+    }
+
+    expect(d.hp).toBe(d.maxHp);
+    expect(d.dead).toBe(false);
+    expect(d.inCombat).toBe(false);
+    expect(d.threat.size).toBe(0);
+    expect(priest.inCombat).toBe(false);
+    expect(priest.autoAttack).toBe(false);
   });
 });

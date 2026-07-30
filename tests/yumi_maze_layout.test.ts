@@ -12,7 +12,11 @@ import {
   dungeonAt,
   isArenaPos,
   isDelvePos,
+  isRiftPos,
+  isVcPracticePos,
   isYumiMazePos,
+  RIFT_X_MIN,
+  VC_PRACTICE_X,
   YUMI_BAND_X_MAX,
   YUMI_BAND_X_MIN,
   YUMI_MAZE_SLOT_COUNT,
@@ -194,17 +198,37 @@ describe('yumi maze band edges', () => {
     expect(isYumiMazePos(YUMI_BAND_X_MIN - 1)).toBe(false);
     expect(isDelvePos(YUMI_MAZE_X)).toBe(false);
     expect(isDelvePos(YUMI_BAND_X_MIN)).toBe(false);
-    expect(isDelvePos(YUMI_BAND_X_MIN - 1)).toBe(true);
     expect(isDelvePos(DELVE_X_MIN)).toBe(true);
     expect(isDelvePos(DELVE_BAND_X_MIN)).toBe(true);
     expect(isArenaPos(YUMI_MAZE_X)).toBe(false);
     expect(isArenaPos(ARENA_X)).toBe(true);
     expect(dungeonAt(YUMI_MAZE_X)).toBeNull();
-    // Two-sided east cap: the Vale Cup practice pitches (x = 30000) must
-    // never classify as the maze band.
+    // Two-sided east cap on the maze band.
     expect(isYumiMazePos(YUMI_BAND_X_MAX - 1)).toBe(true);
     expect(isYumiMazePos(YUMI_BAND_X_MAX)).toBe(false);
-    expect(isYumiMazePos(30000)).toBe(false);
+    // The maze is no longer the delve band's east neighbour: the grid world's
+    // instance plane runs delve -> Vale Cup practice -> rift -> maze, so assert the
+    // property the old adjacency stood in for. Every band predicate must claim its
+    // OWN anchor and no other's, in both directions.
+    const anchors: Array<[string, number]> = [
+      ['arena', ARENA_X],
+      ['delve', DELVE_X_MIN],
+      ['vcPractice', VC_PRACTICE_X],
+      ['rift', RIFT_X_MIN],
+      ['maze', YUMI_MAZE_X],
+    ];
+    const predicates: Array<[string, (x: number) => boolean]> = [
+      ['arena', isArenaPos],
+      ['delve', isDelvePos],
+      ['vcPractice', isVcPracticePos],
+      ['rift', isRiftPos],
+      ['maze', isYumiMazePos],
+    ];
+    for (const [band, x] of anchors) {
+      for (const [name, pred] of predicates) {
+        expect(pred(x), `${name}Pos(${band} anchor ${x})`).toBe(name === band);
+      }
+    }
   });
 
   it('slot origins resolve back to their slots', () => {

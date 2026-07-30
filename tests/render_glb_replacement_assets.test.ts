@@ -30,10 +30,14 @@ import { delvePropsPreloadInternalsForTest } from '../src/render/delve_props';
 import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
 import { eastbrookGrandArmouryInternalsForTest } from '../src/render/eastbrook_grand_armoury';
 import { fishPreloadInternalsForTest } from '../src/render/fish';
+import { galeFeaturesPreloadInternalsForTest } from '../src/render/gale_features';
+import { gardenFeaturesPreloadInternalsForTest } from '../src/render/garden_features';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
+import { propPreloadInternalsForTest } from '../src/render/props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { stationsPreloadInternalsForTest } from '../src/render/stations';
+import { wildheartPropsPreloadInternalsForTest } from '../src/render/wildheart_props';
 import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
 import { EASTBROOK_GRAND_ARMOURY } from '../src/sim/building_layout';
 import type { BuildingDef } from '../src/sim/types';
@@ -67,7 +71,7 @@ const armouryFinalPipelineEnabled =
     item.src?.endsWith('eastbrook_grand_armoury-final.glb'),
   ) ?? false;
 const ARMOURY_SHIPPING_BYTE_CEILING = 160 * 1024;
-const ARMOURY_SHIPPING_SHA256 = '182ea1aa3741a17a00947b63e1a2e8c7e0dec44f3bfd9165b6f1d9ef93e37595';
+const ARMOURY_SHIPPING_SHA256 = '96618c2cb18ada633f65e57e48d376c58fff353506c213e52c26b879d16c6cff';
 const MANIFEST_HASH_LENGTH = 12;
 
 function expectAssetExistsAndManifested(url: string): void {
@@ -661,6 +665,7 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('dungeon door arch asset', () => {
     expectAssetExistsAndManifested(doorPortalPreloadInternalsForTest.doorArchAssetUrl);
+    expectAssetExistsAndManifested(doorPortalPreloadInternalsForTest.wildheartGateAssetUrl);
   });
 
   it('quest object assets', () => {
@@ -677,6 +682,38 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('crafting station prop assets (Professions 2.0)', () => {
     for (const url of Object.values(stationsPreloadInternalsForTest.assetUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('Wildheart Basin jungle prop assets', () => {
+    for (const url of Object.values(wildheartPropsPreloadInternalsForTest.assetUrl)) {
+      expectAssetExistsAndManifested(url);
+      const file = path.join(publicDir, url.replace(/^\//, ''));
+      const size = statSync(file).size;
+      expect(size, `${url} should meet the static-prop size floor`).toBeGreaterThanOrEqual(40_000);
+      expect(size, `${url} should meet the static-prop size ceiling`).toBeLessThanOrEqual(100_000);
+      expect(
+        readGlbJson(path.join(publicDir, url.replace(/^\//, ''))).extensionsUsed,
+        `${url} should use Meshopt`,
+      ).toContain('EXT_meshopt_compression');
+    }
+  });
+
+  it('Great Maze hedge wall and arch assets', () => {
+    for (const url of Object.values(gardenFeaturesPreloadInternalsForTest.mazeAssetUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('Old Beacon tower drum assets', () => {
+    for (const url of galeFeaturesPreloadInternalsForTest.towerAssetUrl) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('every decor prop asset (the full PROP_ASSET_DEFS catalog)', () => {
+    for (const url of Object.values(propPreloadInternalsForTest.propAssetUrl)) {
       expectAssetExistsAndManifested(url);
     }
   });

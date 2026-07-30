@@ -163,6 +163,24 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('password_set');
   });
 
+  it('applies the unstuck reporting schema after the core identity tables', async () => {
+    await ensureSchema();
+    const coreIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS accounts'),
+    );
+    const unstuckIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS unstuck_reports'),
+    );
+    expect(coreIndex).toBeGreaterThanOrEqual(0);
+    expect(unstuckIndex).toBeGreaterThan(coreIndex);
+    const ddl = h.calls[unstuckIndex];
+    expect(ddl).toContain('CREATE INDEX IF NOT EXISTS unstuck_reports_realm_id');
+    expect(ddl).toContain('attempt_id UUID NOT NULL UNIQUE');
+    expect(ddl).toContain('CREATE INDEX IF NOT EXISTS unstuck_reports_created');
+    expect(ddl).toContain('ON DELETE SET NULL');
+    expect(ddl).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
+  });
+
   it('disables the statement timeout for the boot transaction before the advisory lock', async () => {
     // Boot DDL serializes on the advisory lock across concurrent realm processes and
     // may legitimately wait far past any request budget, so the boot transaction runs
@@ -287,6 +305,16 @@ describe('ensureSchema wires every schema module at boot', () => {
     const sansReconcile = ddl.replace('DROP INDEX IF EXISTS character_deeds_deed;', '');
     expect(sansReconcile).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
     expect(sansReconcile).not.toMatch(/ADD COLUMN (?!IF NOT EXISTS)/i);
+  });
+
+  it('applies the content-moderation audit schema (map unpublish, asset block/unblock)', async () => {
+    // Regression guard for the same "defined but never wired" failure mode as
+    // DISCORD_SCHEMA above: content_moderation_actions backs the admin
+    // dashboard's map/asset moderation audit trail (server/content_moderation_db.ts).
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS content_moderation_actions');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS content_moderation_actions_resource');
   });
 
   it('applies the tier-2 rate-limit schema under the advisory lock', async () => {

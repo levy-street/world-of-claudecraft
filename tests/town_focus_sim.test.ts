@@ -265,7 +265,11 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
         // Explicit [] = spread, keeping the pick identical on both arms so
         // only applyFocusBonus can produce the edge (see the test above).
         sim.harvestCorpse(mob.id, [], a);
-        total = sim.countItem('rough_hide', a);
+        // drain the bag each harvest: richer merged-world yields can hit the
+        // bag cap inside 300 trials, and a capped total reads as a dead heat
+        const gained = sim.countItem('rough_hide', a);
+        total += gained;
+        if (gained > 0) sim.removeItem('rough_hide', gained, a);
       }
       return total;
     }

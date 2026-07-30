@@ -34,6 +34,7 @@ import {
   interactObjectForQuests,
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
+import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
@@ -46,7 +47,6 @@ import {
 } from './loot/loot_roll';
 import { applyFocusBonus, applyFocusTierBonus, type FocusAllocation } from './professions/focus';
 import {
-  effectiveFocusComponents,
   forfeitsEveryMappedYield,
   type HarvestTier,
   harvestItemForFamily,
@@ -57,12 +57,22 @@ import {
   resolveCorpseFocusHarvest,
   resolveCorpseHarvest,
   rollCorpseMaterialRarity,
+  yieldingFocusComponents,
 } from './professions/gathering';
 import { type HarvestYield, recordHarvestYield } from './professions/harvest_yields';
 import { bestOwnedAnyGatherToolTier, canHarvestMonsterMaterial } from './professions/tools';
 import type { SimContext } from './sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, OBJECT_RESPAWN } from './types';
+import {
+  cloneItemInstancePayload,
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  OBJECT_RESPAWN,
+} from './types';
 import { markWorldBossLooted } from './world_boss';
+
+const LOCKPICK_OFFER_COOLDOWN = 4; // seconds between repeated rift_locked_chest offer emits per player
 
 // Shared corpse loot-rights snapshot for both the manual `lootCorpse` and the passive
 // walk-by `autoLootForParty`. The caller passes `ffaUnlocked` so the two paths can
@@ -135,7 +145,11 @@ export function lootCorpse(
     if (!lootSlotVisibleTo(s, meta.entityId)) continue;
     if (s.openToAll) {
       while (s.count > 0 && ctx.canAddItem(s.itemId, 1, meta.entityId)) {
-        ctx.addItem(s.itemId, 1, meta.entityId);
+        if (s.instance) {
+          ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
+        } else {
+          ctx.addItem(s.itemId, 1, meta.entityId);
+        }
         s.count--;
         didLoot = true;
       }
@@ -147,15 +161,27 @@ export function lootCorpse(
         bagsFull = true;
         continue;
       }
-      ctx.addItem(s.itemId, 1, meta.entityId);
+      if (s.instance) {
+        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
+      } else {
+        ctx.addItem(s.itemId, 1, meta.entityId);
+      }
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       tookPersonal = true;
       didLoot = true;
       continue;
     }
     if (!rights.shared) continue;
-    while (s.count > 0 && awardSharedLootItem(ctx, s.itemId, mob, meta)) {
-      s.count--;
+    while (s.count > 0) {
+      if (s.instance) {
+        if (!ctx.canAddItem(s.itemId, 1, meta.entityId)) break;
+        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
+        s.count--;
+      } else if (awardSharedLootItem(ctx, s.itemId, mob, meta)) {
+        s.count--;
+      } else {
+        break;
+      }
       didLoot = true;
     }
     if (s.count > 0) bagsFull = true;
@@ -221,16 +247,22 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
  * player's persistent town focus: the corpse tags holding allocation points
  * (none focused falls through to the spread). An EXPLICIT array keeps the
  * #1142 semantics: empty or covering every tagged component spreads across
- * every tag (the #1141 behavior); picking fewer concentrates the effort for
+ * every tag (the #1141 behavior); extracting fewer concentrates the effort for
  * a higher tier per component, per resolveCorpseFocusHarvest in
- * professions/gathering.ts. That array is sanitized before any of it is read
+ * professions/gathering.ts. Extracting, not picking: an unmapped family is
+ * never extracted, so on a corpse carrying one mapped family there is no
+ * choice to make (#2514, see below). That array is sanitized before any of it is read
  * (effectiveFocusComponents): repeats collapse (#2474) and tags this corpse
  * does not carry drop out (#2504), so `['hide','hide']` and `['hide','junk']`
  * are both exactly `['hide']` here and in the pre-claim capacity gate below,
  * and a pick of nothing but junk is exactly the empty pick (it spreads).
  * A pick that survives sanitization but names only families with no item
  * behind them is REFUSED pre-claim instead (#2509, see the gate below), so no
- * selection can spend a single-use corpse for nothing.
+ * selection can spend a single-use corpse for nothing. A pick that names such
+ * a family BESIDE one that pays is allowed, and the unmapped entry is simply
+ * not extracted (#2514, yieldingFocusComponents): it costs no tier roll, no
+ * rng draw, and no concentration tier, so `['hide','claw']` is byte-identical
+ * to `['hide']`.
  *
  * The corpse-level half of that rule is isHarvestableCorpse (#2513): it answers
  * on the MAPPED families the template carries, so a corpse that could never pay
@@ -299,23 +331,24 @@ export function harvestCorpse(
   // Placed with the capacity gate below, for the same three reasons that one
   // is here: pre-claim (a refusal must leave the corpse for the next
   // harvester), rng-free (a refused command must not shift the world's draw
-  // order), and reading the same `effectiveFocusComponents` set the roll will.
-  // It fires exactly when the `wanted` loop below would come out empty, and
+  // order), and derived from the same sanitized pick the roll is. It fires
+  // exactly when the `wanted` loop below would come out empty (both sides ask
+  // harvestFamilyYieldsItem over effectiveFocusComponents, one as a `.some`
+  // and one as the `.filter` inside yieldingFocusComponents), and
   // the bags-full gate needs `wanted` non-empty, so neither can mask the
   // other's message. The predicate itself lives beside effectiveFocusComponents
   // (professions/gathering.ts) because the picker's view-core mirrors it; one
   // rule, one place, or the two drift the first time the spread rule moves.
   //
   // Deliberately NOT narrowed inside effectiveFocusComponents the way an
-  // uncarried tag is (#2504): the concentration bonus is
-  // `taggedComponents.length - effectiveChosen.length`, so dropping a
-  // carried-but-unmapped entry from the pick would raise the bonus on every
-  // mixed pick and break the documented "an explicit full cover spreads
-  // exactly like an empty pick" equivalence. Measured on old_greyjaw seed 5:
-  // ['hide','claw'] yields rough_hide 3 at bonus 1 today and would become the
-  // bonus-2 ['hide'] world (rough_hide 4 plus a pristine_hide), and the
-  // check-every-box ['hide','fang','claw'] would stop spreading. This refusal
-  // re-tunes nothing: every pick that yields anything behaves exactly as before.
+  // uncarried tag is (#2504), and that ordering is still load-bearing after
+  // #2514 moved the bonus: the refusal is a statement about the pick the player
+  // MADE, so it has to be asked before the unmapped families are dropped. Fold
+  // the drop into effectiveFocusComponents instead and ['claw'] sanitizes to
+  // the empty pick, spreads, and burns the corpse in the silence this refusal
+  // exists to end. The drop happens one step later, in
+  // yieldingFocusComponents, which is what the capacity gate below and the tier
+  // rolls read.
   //
   // Scope, the other half of the #2504 comment: that one covers a tag the
   // corpse does not CARRY, which sanitizes away and spreads. This covers a tag
@@ -344,14 +377,32 @@ export function harvestCorpse(
     return;
   }
   const wanted: InvSlot[] = [];
-  for (const component of effectiveFocusComponents(componentTags ?? [], chosen)) {
+  // The EXTRACTED set (#2514), which is exactly what resolveCorpseFocusHarvest
+  // will roll. Reserves nothing new: this loop already open-coded the same
+  // filter (`harvestItemForFamily` then `continue`) over the effective pick, so
+  // `wanted` is byte-identical before and after. What changes is that the rule
+  // is now NAMED, and the gate and the roll read the one function instead of
+  // agreeing by coincidence, which is the same argument harvestItemForFamily's
+  // own docstring makes about its readers.
+  for (const component of yieldingFocusComponents(componentTags ?? [], chosen)) {
     const wantedItemId = harvestItemForFamily(component);
+    // A type narrowing, not a filter: yieldingFocusComponents already dropped
+    // every family this same accessor answers nothing for, so the arm is
+    // unreachable by construction. No fixture can reach it, so what is pinned
+    // is the property instead (tests/corpse_harvest_sim.test.ts, "every family
+    // a harvest extracts has an item behind it", swept over every shipped
+    // tagged template x every pick shape).
     if (!wantedItemId) continue;
     const maxQty = focusedHarvestQuantity('legendary', component, meta.townFocus);
     const existing = wanted.find((w) => w.itemId === wantedItemId);
     if (existing) existing.count += maxQty;
     else wanted.push({ itemId: wantedItemId, count: maxQty });
   }
+  // The third dead-by-construction guard on this path, named beside its two
+  // siblings above so the set is auditable rather than one-of-three documented:
+  // both gates upstream guarantee yieldingFocusComponents is non-empty, so
+  // `wanted` always holds at least one row and the short-circuit's false arm is
+  // unreachable. Dead since #2513, kept for the same reason the others are.
   if (wanted.length > 0 && !fitsAll(meta.inventory, bagCapacity(meta.bags), wanted)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return;
@@ -409,6 +460,14 @@ export function harvestCorpse(
   }[] = [];
   for (const y of yields) {
     const itemId = harvestItemForFamily(y.component);
+    // Unreachable by construction since #2514, for the same reason and under
+    // the same property pin as the capacity gate's twin above:
+    // resolveCorpseFocusHarvest only ever yields families
+    // yieldingFocusComponents kept, and that filter and this lookup are the
+    // SAME accessor. Kept as the type narrowing the `string | undefined`
+    // return needs, and because this `continue` is the exact line that used to
+    // swallow an unmapped family in silence, which is the harm the last three
+    // issues in this trail closed one path at a time.
     if (!itemId) continue;
     // #1143: the player's persistent town focus adds a bonus on top of the
     // #1142 roll for a focused component; an unfocused component's tier is
@@ -589,8 +648,9 @@ export function harvestCorpse(
   // deliberately kept as dead defensive code. The proof, because "unreachable"
   // is a claim worth being able to check: the corpse-level gate above
   // guarantees at least one tag maps to an item; the #2509 gate then guarantees
-  // at least one member of the EFFECTIVE pick does; the `wanted` loop and the
-  // roll loop both iterate that same effective set, so at least one iteration
+  // at least one member of the EFFECTIVE pick does, so yieldingFocusComponents
+  // (that same set, filtered by that same accessor) is non-empty; the `wanted`
+  // loop and the roll loop both iterate it, so at least one iteration
   // clears `if (!itemId) continue`; `harvestTierQuantity` is `indexOf + 1 >= 1`
   // and applyFocusBonus never lowers it, so that iteration's qty is >= 1; and
   // every arm of the loop plus both signedGrants loops call recordHarvestYield,
@@ -780,6 +840,27 @@ export function interact(
           ctx.leaveDungeon(p.id);
           return;
         }
+        if (target.templateId === 'rift_portal' && target.riftSeed !== undefined) {
+          ctx.enterRift(target.riftSeed, target.riftBaseLevel ?? p.level, p.id, undefined, target);
+          return;
+        }
+        if (target.templateId === 'rift_exit') {
+          ctx.leaveRift(p.id);
+          return;
+        }
+        if (target.templateId === 'rift_locked_chest') {
+          // Offer the ante selector; the pick itself runs via lockpick_engage.
+          // Rate-limited per player so repeated F-key spam does not re-open the UI.
+          if (ctx.time >= (p.riftLockpickOfferAt ?? -Infinity) + LOCKPICK_OFFER_COOLDOWN) {
+            p.riftLockpickOfferAt = ctx.time;
+            ctx.emit({ type: 'lockpickOffer', objectId: target.id, bountiful: false, pid: p.id });
+          }
+          return;
+        }
+        if (target.templateId === 'rift_treasure') {
+          ctx.riftOpenTreasure(target.id, p.id);
+          return;
+        }
         if (target.templateId === 'mailbox') {
           ctx.emit({ type: 'mailbox', pid: p.id });
           return;
@@ -800,6 +881,9 @@ export function interact(
       }
     }
   }
+  // Escort start: standing near an idle escortee whose quest this player has
+  // active begins the walk (escort.ts picks the nearest eligible one).
+  if (tryStartEscort(ctx, p, r.meta)) return;
   let bestCorpse: Entity | null = null;
   let bestCorpseD2 = INTERACT_RANGE * INTERACT_RANGE;
   let bestObj: Entity | null = null;
@@ -850,6 +934,25 @@ export function interact(
     }
     if (obj.templateId === 'dungeon_exit') {
       ctx.leaveDungeon(p.id);
+      return;
+    }
+    if (obj.templateId === 'rift_portal' && obj.riftSeed !== undefined) {
+      ctx.enterRift(obj.riftSeed, obj.riftBaseLevel ?? p.level, p.id, undefined, obj);
+      return;
+    }
+    if (obj.templateId === 'rift_exit') {
+      ctx.leaveRift(p.id);
+      return;
+    }
+    if (obj.templateId === 'rift_locked_chest') {
+      if (ctx.time >= (p.riftLockpickOfferAt ?? -Infinity) + LOCKPICK_OFFER_COOLDOWN) {
+        p.riftLockpickOfferAt = ctx.time;
+        ctx.emit({ type: 'lockpickOffer', objectId: obj.id, bountiful: false, pid: p.id });
+      }
+      return;
+    }
+    if (obj.templateId === 'rift_treasure') {
+      ctx.riftOpenTreasure(obj.id, p.id);
       return;
     }
     if (obj.templateId === 'mailbox') {

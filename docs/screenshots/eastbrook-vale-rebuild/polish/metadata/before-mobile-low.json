@@ -5,7 +5,7 @@
   "profile": "mobile-low",
   "townContractId": "polish-baseline",
   "sourceRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-  "sourceFingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b",
+  "sourceFingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e",
   "polishProvenance": {
     "schemaVersion": 1,
     "mode": "baseline-revision",
@@ -20,7 +20,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -1145,7 +1145,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -2270,7 +2270,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -3395,7 +3395,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -4520,7 +4520,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -5645,7 +5645,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -6770,7 +6770,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -7895,7 +7895,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -9020,7 +9020,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -10147,7 +10147,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -11274,7 +11274,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -12401,7 +12401,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -13528,7 +13528,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -14655,7 +14655,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -16723,7 +16723,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -17850,7 +17850,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -18977,7 +18977,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -20104,7 +20104,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -21231,7 +21231,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -22358,7 +22358,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -23485,7 +23485,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -24612,7 +24612,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -25739,7 +25739,7 @@
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b"
+        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
       },
       "polishProvenance": {
         "schemaVersion": 1,

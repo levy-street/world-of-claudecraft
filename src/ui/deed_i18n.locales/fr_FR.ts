@@ -847,6 +847,14 @@ export const table: DeedLocaleTable = {
     name: 'La Casse du démolisseur',
     desc: "Récupérez 50 pièces d'équipement pour en extraire les matériaux bruts.",
   },
+  dgn_wildheart_basin: {
+    name: 'Le bassin riposte',
+    desc: 'Vainquez Zulgar, Voix du Bassin, dans le Bassin du Cœur Sauvage.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Héroïque : le Bassin du Cœur Sauvage',
+    desc: 'Vainquez Zulgar, Voix du Bassin, dans le Bassin du Cœur Sauvage en difficulté héroïque.',
+  },
 };
 
 // fr_CA rides this base table plus the delve-vocabulary override layer

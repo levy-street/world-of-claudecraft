@@ -27,6 +27,8 @@ import {
   DUNGEON_WALL_X,
   type DungeonLayout,
   type GridPoint,
+  type InteriorStyle,
+  LASTKEEP_LAYOUT,
   NYTHRAXIS_LAYOUT,
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
@@ -35,9 +37,17 @@ import {
   type WallStub,
 } from '../sim/dungeon_layout';
 import { polygonContainsPoint, polygonXAtZ } from '../sim/geometry2d';
+import {
+  authoredLiftAt,
+  authoredWallSegments,
+  doorRampHalf,
+  type WallSeg,
+} from '../sim/rift/authored';
 import { ARENA_WATER_NAVE_HALF_X, arenaWaterBands } from './arena_water_band_core';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { fitAuthoredWallSegment } from './authored_walls_core';
+import { DAIS_PLATFORM_HEIGHT } from './dais_lift';
 import {
   placeLitanyMarshDressing,
   placeMarshBlackwaterPools,
@@ -46,8 +56,12 @@ import {
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
+import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { sharedUniforms } from './gfx';
+import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
+import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { radialGlowTexture } from './textures';
+import { buildWildheartFieldInterior } from './wildheart_props';
 
 const FLAME_EMISSIVE_HIGH = 2.2;
 // dungeon torch point lights: pumped + hung low so warm pools break up the
@@ -70,6 +84,10 @@ export type DungeonInteriorVariant =
   // The Drowned Court: the ODD-slot arena map, a flooded-temple pit (temple
   // moonfire palette + water bands over the shared arena wall machinery).
   | 'arena_drowned'
+  // The Last Keep: the lived-in Drakelands castle interior. Clean stone walls,
+  // warm candle torchlight, and the kcas furniture dressing on stories 1-2;
+  // only its undercroft rooms keep the crypt's cracked stone and cold flame.
+  | 'lastkeep'
   | 'nythraxis'
   // Collapsed Reliquary delve sub-themes (share the ember crypt-stone base, see
   // isDelveVariant; differ only in wall-side props, clutter, and the dais).
@@ -130,6 +148,10 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   arena: { flame: 0xffb24a, emissive: 0xcc5a14, light: 0xff9a3c },
   // the Drowned Court fights under the temple's cold moonfire (same palette)
   arena_drowned: { flame: 0xd9c9ff, emissive: 0x6a4fd0, light: 0xb79cff },
+  // The Last Keep is a LIVED-IN castle: soft candle-orange hearth light, warmer
+  // and paler than the arena's hard ember (its undercroft alone burns the
+  // crypt's cold blue, split per story in the authored build path).
+  lastkeep: { flame: 0xffc27a, emissive: 0xcc6a1e, light: 0xffa14e },
   nythraxis: { flame: 0x8f5cff, emissive: 0x4b1c9a, light: 0x7b4dff },
   // delve reliquaries burn with grave-ember red: warm coals over cold stone
   delve_ossuary: { flame: 0xff7a3c, emissive: 0xcc3a14, light: 0xff6a3c },
@@ -165,6 +187,14 @@ const MARSH_FLOOR_TINT = 0x3c3830;
 // crushing the stone albedo).
 const DROWNED_WALL_TINT = 0x8b9cb8;
 const DROWNED_FLOOR_TINT = 0x93a2b4;
+
+// The Last Keep multiplies the shared crypt-stone pack toward warm, kept
+// sandstone (walls) and honeyed flags (floors) so the castle reads lived-in
+// rather than sepulchral; deliberately pale so the warm torchlight still
+// carries the mood. Applied through the same tintedMaterial path an authored
+// rift style uses, so no other interior is touched.
+const KEEP_WALL_TINT = 0xe4d6bd;
+const KEEP_FLOOR_TINT = 0xdccdb2;
 
 // The Drowned Temple is flooded — a translucent, self-animating water sheet
 // (driven by the shared uTime so it needs no per-frame plumbing) with cheap
@@ -252,6 +282,10 @@ const KIT_MODELS = [
   'banner_green',
   'banner_patternC_green',
   'banner_triple_green',
+  // The Infernal Citadel's authored halls hang blood-red war banners (the kit
+  // already ships them; the crypt's pale ones read as bedsheets under its grade).
+  'banner_red',
+  'banner_triple_red',
   'chest',
   'chest_gold',
   'coin_stack_medium',
@@ -623,14 +657,13 @@ export class DungeonInteriors {
   private glowDecalMats = new Map<number, THREE.MeshBasicMaterial>();
   private flameGeo: THREE.BufferGeometry | null = null;
   private packMats = new Map<Pack, THREE.Material>();
-  // delve_marsh / delve_marsh_apse wall+pillar and floor tints: clones of
-  // packMats keyed by pack, built once and reused for every marsh room this
-  // instance draws (see marshMaterial). Never touched by any other variant.
-  private marshWallMats = new Map<Pack, THREE.Material>();
-  private marshFloorMats = new Map<Pack, THREE.Material>();
-  // Drowned Court wall/pillar and floor tints, same lifecycle as the marsh maps.
-  private drownedWallMats = new Map<Pack, THREE.Material>();
-  private drownedFloorMats = new Map<Pack, THREE.Material>();
+  /**
+   * Every tinted grade of a pack material, keyed `${pack}:${tint}`: the marsh
+   * and Drowned Court wall/floor tints and any authored InteriorStyle grade all
+   * share this one cache, built once per DungeonInteriors instance and reused
+   * for every room, never cloned per room or mesh.
+   */
+  private tintedMats = new Map<string, THREE.Material>();
   private waterMat: THREE.ShaderMaterial | null = null;
   private arenaHideables: ArenaHideable[] = [];
 
@@ -701,10 +734,34 @@ export class DungeonInteriors {
         rz?: number;
         tier?: 'shallow' | 'deep';
       }>;
+      // Rift hazards render as molten lava instead of the delve's blackwater; the
+      // sim damage model is shared, only the palette differs.
+      hazardStyle?: 'blackwater' | 'lava';
+      // Rift ice-slide zone (frictionless slick you skate across to the goal
+      // sigil): a pale frost sheet over this rect, purely cosmetic.
+      iceZone?: { x: number; z: number; hw: number; hd: number } | null;
+      // Rift raised "sanctum" tier: a full-width staircase (rampZ0 to rampZ1) up to
+      // a raised rear deck at `height`. The geometry matches the sim height field
+      // (riftPlatformLift), so the player stands exactly on the rendered deck.
+      platform?: { rampZ0: number; rampZ1: number; height: number } | null;
       moduleId?: DelveModuleId;
+      // Procedural Rift re-grade: a generated palette layered over one of the four
+      // base kits. `style.kit` picks the wall/floor/prop mesh mix; `style.torch`
+      // overrides the torch/light colours. Undefined for authored dungeons/delves.
+      style?: InteriorStyle;
     },
-  ): Promise<void> {
+  ): Promise<THREE.Group> {
     await ensureDungeonAssets();
+    if (interior === 'wildheart') {
+      const group = buildWildheartFieldInterior({
+        lowGfx: this.lowGfx,
+        flames: this.flames,
+        fireLights: this.fireLights,
+      });
+      group.position.set(ox, 0, oz);
+      this.scene.add(group);
+      return group;
+    }
     // Delve modules pass an explicit per-module layout so render geometry matches
     // the SAME layout sim/colliders.ts derives collision from (what you see is
     // what you collide with). Without it, every module fell back to CRYPT_LAYOUT
@@ -721,18 +778,83 @@ export class DungeonInteriors {
               arenaMapForSlot(arenaOriginAt(oz).slot).layout
             : interior === 'nythraxis'
               ? NYTHRAXIS_LAYOUT
-              : CRYPT_LAYOUT);
-    const variant = opts?.variant ?? this.variantFor(interior, ox, oz);
+              : interior === 'lastkeep'
+                ? // The Last Keep: an authored room-graph castle interior; its
+                  // rooms/doors/decor route the build through the authored path
+                  // below, exactly like the citadel's set-piece floors.
+                  LASTKEEP_LAYOUT
+                : CRYPT_LAYOUT);
+    const variant = opts?.style?.kit ?? opts?.variant ?? this.variantFor(interior, ox, oz);
+    const torch = opts?.style?.torch ?? TORCH_COLORS[variant];
+    const daisRaised = opts?.style?.daisRaised;
     const group = new THREE.Group();
     const p = new Placements();
     const arenaWalls = isArenaVariant(variant) ? this.pendingArenaWalls(layout, ox, oz) : undefined;
 
+    // Authored room-graph floor (the set-piece citadel): its rooms/doors/decor
+    // replace the single-room shell entirely. Walls come from the SAME segment
+    // helper the sim derives collision from, so they cannot drift apart.
+    if (layout.rooms) {
+      await ensureInfernalDecorAssets();
+      this.placeAuthoredFloor(p, layout, variant);
+      this.placeAuthoredWalls(p, layout, variant);
+      this.placeAuthoredRelief(group, layout);
+      const liftAt = (x: number, z: number): number =>
+        authoredLiftAt(layout.rooms ?? [], layout.doors ?? [], x, z);
+      const light = (x: number, z: number, color: number, y?: number, scale?: number): void =>
+        this.addInfernalLight(group, x, z, color, y, scale);
+      if (variant === 'lastkeep') {
+        // The keep's stories light differently: the undercroft (the one
+        // dungeon-flavored story) keeps the crypt's cold blue flame while the
+        // lived-in floors above burn warm candle-orange, so the same decor
+        // list splits by the story its position sits on.
+        const decor = layout.decor ?? [];
+        buildInfernalDecor(
+          group,
+          decor.filter((d) => liftAt(d.x, d.z) < 1.6),
+          TORCH_COLORS.crypt,
+          light,
+          liftAt,
+        );
+        buildInfernalDecor(
+          group,
+          decor.filter((d) => liftAt(d.x, d.z) >= 1.6),
+          torch,
+          light,
+          liftAt,
+        );
+        // The lived-in furnishing: kcas bookcases, tables, benches, kegs,
+        // banners, and mounted torches instanced along the authored room walls.
+        await ensureLastKeepDressing();
+        buildLastKeepDressing(group, light, this.lowGfx);
+      } else {
+        buildInfernalDecor(group, layout.decor ?? [], torch, light, liftAt);
+      }
+      this.placeDais(group, p, layout, variant, torch, daisRaised);
+      if (opts?.hazards?.length) {
+        this.placeBlackwaterPools(group, opts.hazards, opts?.hazardStyle ?? 'lava', liftAt);
+      }
+      if (layout.illusionWalls?.length) {
+        this.placeIllusionWalls(group, layout.illusionWalls, variant);
+      }
+      // The authored floor honours its InteriorStyle's stone grade (the base kit
+      // reads as grey crypt otherwise). Scoped to this path: the procedural rift
+      // floors keep the look they shipped with; the keep grades its stone warm.
+      this.emit(group, p, variant, {
+        wall: opts?.style?.wallTint ?? (variant === 'lastkeep' ? KEEP_WALL_TINT : undefined),
+        floor: opts?.style?.floorTint ?? (variant === 'lastkeep' ? KEEP_FLOOR_TINT : undefined),
+      });
+      group.position.set(ox, 0, oz);
+      this.scene.add(group);
+      return group;
+    }
+
     this.placeFloor(p, layout, variant);
     this.placeWalls(p, layout, variant, arenaWalls);
-    this.placePillarsAndTorches(group, p, layout, variant);
+    this.placePillarsAndTorches(group, p, layout, variant, torch);
     this.placeTombs(p, layout, variant);
     this.placeStubs(p, layout.stubs, variant);
-    this.placeDais(group, p, layout, variant);
+    this.placeDais(group, p, layout, variant, torch, daisRaised);
     this.placeAisleClutter(p, layout, variant);
     this.placeWallDressing(p, layout, variant, arenaWalls);
     if (variant === 'temple') {
@@ -753,9 +875,12 @@ export class DungeonInteriors {
           this.addTorchGlow(group, x, z, color, y, scale),
         );
       } else {
-        this.placeBlackwaterPools(group, opts.hazards);
+        this.placeBlackwaterPools(group, opts.hazards, opts?.hazardStyle ?? 'blackwater');
       }
     }
+    if (opts?.iceZone) this.placeIceSheet(group, opts.iceZone);
+    if (opts?.platform) this.placeRiftPlatform(group, layout, opts.platform);
+    if (layout.illusionWalls?.length) this.placeIllusionWalls(group, layout.illusionWalls, variant);
     if (variant === 'delve_marsh' || variant === 'delve_marsh_apse') {
       if (opts?.moduleId && isLitanyModuleId(opts.moduleId)) {
         // Dry islands render ON TOP of the pool overlays so the sim's
@@ -771,6 +896,7 @@ export class DungeonInteriors {
     }
     group.position.set(ox, 0, oz);
     this.scene.add(group);
+    return group;
   }
 
   update(camX: number, camY: number, camZ: number, eyeX: number, eyeY: number, eyeZ: number): void {
@@ -857,25 +983,44 @@ export class DungeonInteriors {
   // rest of the interior.
   private placeBlackwaterPools(
     group: THREE.Group,
-    hazards: Array<{ x: number; z: number; r: number }>,
+    hazards: Array<{ x: number; z: number; r: number; rx?: number; rz?: number }>,
+    style: 'blackwater' | 'lava' = 'blackwater',
+    liftAt?: (x: number, z: number) => number,
   ): void {
+    // Rift lava reuses the delve blackwater overlay with a molten palette: the
+    // sim damage model (tickRiftHazards) mirrors tickDelveBlackwater, so the
+    // hazard reads identically, only the colour changes. Bands can be ellipses
+    // (rx/rz), so the disc is a unit circle scaled to match the sim footprint.
+    const pal =
+      style === 'lava'
+        ? { pool: 0xd83410, poolOpacity: 0.9, rim: 0xffca4a, glow: 0xff5a1e }
+        : { pool: 0x0a1a12, poolOpacity: 0.82, rim: 0x3fae5a, glow: 0x2f8f4f };
     for (const h of hazards) {
+      const rx = h.rx ?? h.r;
+      const rz = h.rz ?? h.r;
+      const y0 = liftAt?.(h.x, h.z) ?? 0;
       const pool = new THREE.Mesh(
-        new THREE.CircleGeometry(h.r, 28).rotateX(-Math.PI / 2).translate(h.x, 0.12, h.z),
+        new THREE.CircleGeometry(1, 28)
+          .rotateX(-Math.PI / 2)
+          .scale(rx, 1, rz)
+          .translate(h.x, 0.12 + y0, h.z),
         new THREE.MeshBasicMaterial({
-          color: 0x0a1a12,
+          color: pal.pool,
           transparent: true,
-          opacity: 0.82,
+          opacity: pal.poolOpacity,
           depthWrite: false,
         }),
       );
       pool.renderOrder = 1; // floats over the floor tiles
       group.add(pool);
-      // Bog-green rim so the edge of the hazard is unmistakable.
+      // A hot/bog rim so the edge of the hazard is unmistakable.
       const rim = new THREE.Mesh(
-        new THREE.RingGeometry(h.r * 0.82, h.r, 32).rotateX(-Math.PI / 2).translate(h.x, 0.14, h.z),
+        new THREE.RingGeometry(0.82, 1, 32)
+          .rotateX(-Math.PI / 2)
+          .scale(rx, 1, rz)
+          .translate(h.x, 0.14 + y0, h.z),
         new THREE.MeshBasicMaterial({
-          color: 0x3fae5a,
+          color: pal.rim,
           transparent: true,
           opacity: 0.5,
           side: THREE.DoubleSide,
@@ -885,7 +1030,171 @@ export class DungeonInteriors {
       );
       rim.renderOrder = 2;
       group.add(rim);
-      this.addTorchGlow(group, h.x, h.z, 0x2f8f4f, 0.3, h.r * 0.6);
+      this.addTorchGlow(
+        group,
+        h.x,
+        h.z,
+        pal.glow,
+        (style === 'lava' ? 0.55 : 0.3) + y0,
+        Math.max(rx, rz) * 0.6,
+      );
+    }
+  }
+
+  // The ice-slide slick: a pale, faintly glowing frost sheet the player skates
+  // across (the sim gives it near-zero friction). Cosmetic only; the slide is
+  // resolved server-side in updateRiftTriggers.
+  private placeIceSheet(
+    group: THREE.Group,
+    zone: { x: number; z: number; hw: number; hd: number },
+  ): void {
+    // A brighter frost margin peeks out around the inner sheet, giving the slick
+    // a clean glowing border so its edge (where you regain footing) reads.
+    const halo = new THREE.Mesh(
+      new THREE.PlaneGeometry(zone.hw * 2 + 1.4, zone.hd * 2 + 1.4)
+        .rotateX(-Math.PI / 2)
+        .translate(zone.x, 0.07, zone.z),
+      new THREE.MeshBasicMaterial({
+        color: 0x9fe8ff,
+        transparent: true,
+        opacity: 0.4,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    );
+    halo.renderOrder = 1;
+    group.add(halo);
+    const sheet = new THREE.Mesh(
+      new THREE.PlaneGeometry(zone.hw * 2, zone.hd * 2)
+        .rotateX(-Math.PI / 2)
+        .translate(zone.x, 0.09, zone.z),
+      new THREE.MeshBasicMaterial({
+        color: 0xdff6ff,
+        transparent: true,
+        opacity: 0.5,
+        depthWrite: false,
+      }),
+    );
+    sheet.renderOrder = 2;
+    group.add(sheet);
+  }
+
+  // The rift raised "sanctum" tier: a full-width staircase (rampZ0 to rampZ1) up to
+  // a raised rear deck at `height`. Built in instance-local space (the group is
+  // seated at the instance origin), and the deck top lands at y=height so it lines
+  // up with the sim height field (riftPlatformLift): the player stands ON it.
+  // Illusion (fake) walls: solid-looking stone panels that carry NO collider (the
+  // sim omits them from layoutColliders), so the player walks through them into the
+  // hidden treasure pocket. Rendered as a plain stone box matching the murky wall
+  // read; a curious explorer pushing into the "dead end" passes clean through.
+  private placeIllusionWalls(group: THREE.Group, walls: WallStub[], variant: Variant): void {
+    const mat = new THREE.MeshLambertMaterial({
+      color: variant === 'temple' ? 0x3a4a52 : 0x54525c,
+      emissive: 0x080810,
+    });
+    for (const w of walls) {
+      const panel = new THREE.Mesh(
+        new THREE.BoxGeometry(w.hw * 2, DUNGEON_WALL_HEIGHT, w.hd * 2),
+        mat,
+      );
+      panel.position.set(w.x, DUNGEON_WALL_HEIGHT / 2, w.z);
+      panel.castShadow = true;
+      panel.receiveShadow = true;
+      group.add(panel);
+    }
+  }
+
+  /** Solid risers under every lifted authored room, plus stair runs across each
+   * door that joins rooms of different lift. Box tops follow the same linear
+   * ramp authoredLiftAt gives the sim, so what you climb is what the sim
+   * stands you on (the sub-step mismatch is the platform stairs' own). */
+  private placeAuthoredRelief(group: THREE.Group, layout: DungeonLayout): void {
+    const rooms = layout.rooms ?? [];
+    const doors = layout.doors ?? [];
+    if (!rooms.some((r) => (r.lift ?? 0) !== 0)) return;
+    const mat = new THREE.MeshLambertMaterial({ color: 0x4a4652, emissive: 0x0a0a12 });
+    for (const r of rooms) {
+      const lift = r.lift ?? 0;
+      if (lift <= 0) continue;
+      // Top sits a hair below the tile tops so the slab never z-fights them.
+      const riser = new THREE.Mesh(
+        new THREE.BoxGeometry(r.x1 - r.x0 + 2, lift - 0.02, r.z1 - r.z0 + 2),
+        mat,
+      );
+      riser.position.set((r.x0 + r.x1) / 2, (lift - 0.02) / 2, (r.z0 + r.z1) / 2);
+      riser.receiveShadow = true;
+      group.add(riser);
+    }
+    for (const d of doors) {
+      const south = rooms.find((r) => r.z1 === d.z && d.x >= r.x0 && d.x <= r.x1);
+      const north = rooms.find((r) => r.z0 === d.z && d.x >= r.x0 && d.x <= r.x1);
+      if (south && north) {
+        const a = south.lift ?? 0;
+        const b = north.lift ?? 0;
+        if (a === b) continue;
+        const h = doorRampHalf(d.hd, b - a);
+        const width = d.hw * 2 + 1;
+        const steps = Math.max(4, Math.min(16, Math.round((2 * h) / 0.9)));
+        const depth = (2 * h) / steps;
+        for (let i = 0; i < steps; i++) {
+          const zMid = d.z - h + (i + 0.5) * depth;
+          const top = Math.max(0.05, a + ((b - a) * (i + 0.5)) / steps);
+          const step = new THREE.Mesh(new THREE.BoxGeometry(width, top, depth + 0.05), mat);
+          step.position.set(d.x, top / 2, zMid);
+          step.receiveShadow = true;
+          group.add(step);
+        }
+        continue;
+      }
+      const west = rooms.find((r) => r.x1 === d.x && d.z >= r.z0 && d.z <= r.z1);
+      const east = rooms.find((r) => r.x0 === d.x && d.z >= r.z0 && d.z <= r.z1);
+      if (west && east) {
+        const a = west.lift ?? 0;
+        const b = east.lift ?? 0;
+        if (a === b) continue;
+        const h = doorRampHalf(d.hw, b - a);
+        const width = d.hd * 2 + 1;
+        const steps = Math.max(4, Math.min(16, Math.round((2 * h) / 0.9)));
+        const depth = (2 * h) / steps;
+        for (let i = 0; i < steps; i++) {
+          const xMid = d.x - h + (i + 0.5) * depth;
+          const top = Math.max(0.05, a + ((b - a) * (i + 0.5)) / steps);
+          const step = new THREE.Mesh(new THREE.BoxGeometry(depth + 0.05, top, width), mat);
+          step.position.set(xMid, top / 2, d.z);
+          step.receiveShadow = true;
+          group.add(step);
+        }
+      }
+    }
+  }
+
+  private placeRiftPlatform(
+    group: THREE.Group,
+    layout: DungeonLayout,
+    platform: { rampZ0: number; rampZ1: number; height: number },
+  ): void {
+    const { rampZ0, rampZ1, height } = platform;
+    const halfW = Math.min((layout.wallX ?? 18) - 0.5, 22);
+    const mat = new THREE.MeshLambertMaterial({ color: 0x4a4652, emissive: 0x0a0a12 });
+    // Raised rear deck: a solid riser from the floor up to the platform surface.
+    const deckDepth = Math.max(2, layout.zMax - rampZ1);
+    const deck = new THREE.Mesh(new THREE.BoxGeometry(halfW * 2, height, deckDepth), mat);
+    deck.position.set(0, height / 2, rampZ1 + deckDepth / 2);
+    deck.receiveShadow = true;
+    group.add(deck);
+    // Full-width staircase rising 0 to height; each step's top approximates the
+    // linear lift at its centre (the tiny sub-step mismatch is imperceptible). Step
+    // count scales with the ramp length (~2yd tread) so both a short steep sanctum
+    // and a long gentle climb read as proper stairs, not a few giant blocks.
+    const rampLen = rampZ1 - rampZ0;
+    const steps = Math.max(5, Math.min(20, Math.round(rampLen / 2.2)));
+    const stepDepth = rampLen / steps;
+    for (let i = 0; i < steps; i++) {
+      const topY = (height * (i + 1)) / steps;
+      const step = new THREE.Mesh(new THREE.BoxGeometry(halfW * 2, topY, stepDepth + 0.05), mat);
+      step.position.set(0, topY / 2, rampZ0 + (i + 0.5) * stepDepth);
+      step.receiveShadow = true;
+      group.add(step);
     }
   }
 
@@ -978,6 +1287,10 @@ export class DungeonInteriors {
     if (interior === 'nythraxis') return 'nythraxis';
     if (interior === 'sanctum') return 'sanctum';
     if (interior === 'temple') return 'temple';
+    // The Last Keep gets its own warm castle grade (clean stone, candle light,
+    // kcas furniture). Explicit so the overflow band's origin x can never
+    // accidentally trip the bastion-band check below.
+    if (interior === 'lastkeep') return 'lastkeep';
     const bastionX = instanceOrigin(1, 0).x;
     if (Math.abs(ox - bastionX) < 250) return 'bastion';
     return 'crypt';
@@ -1009,42 +1322,37 @@ export class DungeonInteriors {
   // Cached per pack + surface (wall vs floor), built once per DungeonInteriors
   // instance and reused for every marsh room, never cloned per room or mesh.
   private marshMaterial(pack: Pack, surface: 'wall' | 'floor'): THREE.Material {
-    return this.tintedMaterial(
-      surface === 'wall' ? this.marshWallMats : this.marshFloorMats,
-      pack,
-      surface === 'wall' ? MARSH_WALL_TINT : MARSH_FLOOR_TINT,
-    );
+    return this.tintedMaterial(pack, surface === 'wall' ? MARSH_WALL_TINT : MARSH_FLOOR_TINT);
   }
 
   private drownedMaterial(pack: Pack, surface: 'wall' | 'floor'): THREE.Material {
-    return this.tintedMaterial(
-      surface === 'wall' ? this.drownedWallMats : this.drownedFloorMats,
-      pack,
-      surface === 'wall' ? DROWNED_WALL_TINT : DROWNED_FLOOR_TINT,
-    );
+    return this.tintedMaterial(pack, surface === 'wall' ? DROWNED_WALL_TINT : DROWNED_FLOOR_TINT);
   }
 
-  private tintedMaterial(
-    cache: Map<Pack, THREE.Material>,
-    pack: Pack,
-    tint: number,
-  ): THREE.Material {
-    let mat = cache.get(pack);
+  /** A pack material multiplied by an arbitrary 0xRRGGBB grade, cached per
+   * (pack, tint). The same trick marshMaterial plays, generalized so an authored
+   * floor can carry its InteriorStyle's wall/floor tint. */
+  private tintedMaterial(pack: Pack, tint: number): THREE.Material {
+    const key = `${pack}:${tint}`;
+    let mat = this.tintedMats.get(key);
     if (mat) return mat;
-    // this.material(pack) is itself already a clone of the immutable GLB cache
-    // source (see material() above); clone again so the tint never mutates the
-    // shared pack material every other variant instances from.
+    // this.material(pack) is already a clone of the immutable GLB cache source;
+    // clone again so the tint never mutates the shared pack material.
     const base = this.material(pack).clone() as
       | THREE.MeshLambertMaterial
       | THREE.MeshStandardMaterial;
     base.color.multiply(new THREE.Color(tint));
-    if (base instanceof THREE.MeshStandardMaterial) base.roughness = Math.max(base.roughness, 0.92);
     mat = base;
-    cache.set(pack, mat);
+    this.tintedMats.set(key, mat);
     return mat;
   }
 
-  private emit(group: THREE.Group, p: Placements, variant: Variant): void {
+  private emit(
+    group: THREE.Group,
+    p: Placements,
+    variant: Variant,
+    tints?: { wall?: number; floor?: number },
+  ): void {
     const isMarsh = variant === 'delve_marsh' || variant === 'delve_marsh_apse';
     for (const [kind, mats] of p.byKind) {
       const asset = moduleAssets.get(kind);
@@ -1059,6 +1367,10 @@ export class DungeonInteriors {
       let mat = this.material(asset.pack);
       if (isMarsh && WALL_PILLAR_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'wall');
       else if (isMarsh && RECEIVER_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'floor');
+      else if (tints?.wall !== undefined && WALL_PILLAR_KINDS.has(kind))
+        mat = this.tintedMaterial(asset.pack, tints.wall);
+      else if (tints?.floor !== undefined && RECEIVER_KINDS.has(kind))
+        mat = this.tintedMaterial(asset.pack, tints.floor);
       else if (variant === 'arena_drowned' && WALL_PILLAR_KINDS.has(kind))
         mat = this.drownedMaterial(asset.pack, 'wall');
       else if (variant === 'arena_drowned' && RECEIVER_KINDS.has(kind))
@@ -1191,6 +1503,18 @@ export class DungeonInteriors {
         t,
       );
     }
+    if (variant === 'lastkeep') {
+      // a KEPT castle floor: whole flags with decorated insets, no dirt, no
+      // weeds, no grates (the undercroft cells re-key to the crypt mix)
+      return pickKind(
+        [
+          ['floor_tile_large', 72],
+          ['floor_tile_large_rocks', 3],
+          ['quad', 25],
+        ],
+        t,
+      );
+    }
     if (isDelveVariant(variant)) {
       // collapsed reliquary: grave-dust over cracked flags, more dirt and rubble
       return pickKind(
@@ -1258,6 +1582,20 @@ export class DungeonInteriors {
         t,
       );
     }
+    if (variant === 'lastkeep') {
+      // swept castle flags: mostly whole slabs. The decorated tile carries a
+      // baked candle cluster, so its share stays LOW: a lit votive here and
+      // there reads lived-in, a hall full of them reads like a vigil.
+      return pickKind(
+        [
+          ['floor_tile_small', 70],
+          ['floor_tile_small_decorated', 12],
+          ['floor_tile_small_broken_A', 9],
+          ['floor_tile_small_broken_B', 9],
+        ],
+        t,
+      );
+    }
     return pickKind(
       [
         ['floor_tile_small', 40],
@@ -1312,6 +1650,136 @@ export class DungeonInteriors {
     }
   }
 
+  // Authored room-graph floor: tile each room's rectangle with the SAME
+  // variant-keyed floor modules the procedural rooms use, masked to the union of
+  // the rooms (so the solid rock between them stays bare).
+  private placeAuthoredFloor(p: Placements, layout: DungeonLayout, variant: Variant): void {
+    const rooms = layout.rooms ?? [];
+    if (rooms.length === 0) return;
+    const doors = layout.doors ?? [];
+    const quarter = Math.PI / 2;
+    const inside = (x: number, z: number): boolean =>
+      rooms.some((r) => x >= r.x0 - 1 && x <= r.x1 + 1 && z >= r.z0 - 1 && z <= r.z1 + 1);
+    // Per-room raised floors: a tile sits at its room's lift; a cell whose exact
+    // lift differs (a door ramp band) is left to the relief stairs instead.
+    const roomLift = (x: number, z: number): number =>
+      rooms.find((r) => x >= r.x0 - 1 && x <= r.x1 + 1 && z >= r.z0 - 1 && z <= r.z1 + 1)?.lift ??
+      0;
+    const inRampBand = (x: number, z: number): boolean =>
+      Math.abs(authoredLiftAt(rooms, doors, x, z) - roomLift(x, z)) > 0.01;
+    const minX = Math.min(...rooms.map((r) => r.x0)) - 2;
+    const maxX = Math.max(...rooms.map((r) => r.x1)) + 2;
+    const minZ = Math.min(...rooms.map((r) => r.z0)) - 2;
+    const maxZ = Math.max(...rooms.map((r) => r.z1)) + 2;
+    // The Last Keep's undercroft (lift below the state floor) keeps the crypt's
+    // cracked, weeded flags while the lived-in stories above tile clean: the
+    // per-cell room lift already says which story a tile belongs to.
+    const cellVariant = (x: number, z: number): Variant =>
+      variant === 'lastkeep' && roomLift(x, z) < 1.6 ? 'crypt' : variant;
+    for (let z = minZ; z <= maxZ; z += FLOOR_CELL) {
+      for (let x = minX; x <= maxX; x += FLOOR_CELL) {
+        if (!inside(x, z) || inRampBand(x, z)) continue;
+        const y = FLOOR_Y + roomLift(x, z);
+        let kind = this.floorKind(cellVariant(x, z), hash2(x * 1.31, z));
+        if (kind === 'grate') kind = 'floor_tile_large'; // no pits in an authored floor
+        if (kind === 'quad') {
+          for (const dx of [-1, 1]) {
+            for (const dz of [-1, 1]) {
+              if (!inside(x + dx, z + dz) || inRampBand(x + dx, z + dz)) continue;
+              const sub = this.floorQuadKind(cellVariant(x + dx, z + dz), hash2(x + dx, z + dz));
+              const rot = Math.floor(hash2(z + dz, x + dx) * 4) * quarter;
+              p.add(sub, x + dx, FLOOR_Y + roomLift(x + dx, z + dz), z + dz, rot);
+            }
+          }
+          continue;
+        }
+        const rot = Math.floor(hash2(z, x) * 4) * quarter;
+        p.add(kind, x, y, z, rot);
+      }
+    }
+  }
+
+  // Authored walls: one run of ~8u modules along every wall segment the sim's
+  // `authoredWallSegments` produced (doorway gaps already subtracted), each turned
+  // to face into the room it borders. The fitted wall ends frame each opening on
+  // their own: placing a nominal "arched wall" in the gap visually sealed doors
+  // even though the shared sim collider correctly left them open.
+  private placeAuthoredWalls(p: Placements, layout: DungeonLayout, variant: Variant): void {
+    const rooms = layout.rooms ?? [];
+    const doors = layout.doors ?? [];
+    const bannerEvery = variant === 'crypt' ? 4 : 3;
+    const isKeep = variant === 'lastkeep';
+    const openAt = (x: number, z: number): boolean =>
+      rooms.some((r) => x > r.x0 && x < r.x1 && z > r.z0 && z < r.z1);
+    // Highest lift among the rooms a wall segment borders: says which story the
+    // wall belongs to (the keep's undercroft keeps cracked crypt stone, and the
+    // lookout's parapet row is shortened so it stays an OPEN rooftop).
+    const segMaxLift = (seg: WallSeg): number => {
+      let best = 0;
+      for (const r of rooms) {
+        const touches =
+          seg.axis === 'x'
+            ? (r.z0 === seg.fixed || r.z1 === seg.fixed) && r.x1 > seg.a && r.x0 < seg.b
+            : (r.x0 === seg.fixed || r.x1 === seg.fixed) && r.z1 > seg.a && r.z0 < seg.b;
+        if (touches) best = Math.max(best, r.lift ?? 0);
+      }
+      return best;
+    };
+    const segRy = (seg: WallSeg): number => {
+      const mid = (seg.a + seg.b) / 2;
+      if (seg.axis === 'x') return openAt(mid, seg.fixed + 1.5) ? 0 : Math.PI;
+      return openAt(seg.fixed + 1.5, mid) ? Math.PI / 2 : -Math.PI / 2;
+    };
+    let i = 0;
+    for (const seg of authoredWallSegments(rooms, doors)) {
+      const cells = fitAuthoredWallSegment(seg.a, seg.b, 8);
+      // Face the wall detail into an adjacent room (either one, when it is shared).
+      const ry = segRy(seg);
+      const segVariant: Variant = isKeep && segMaxLift(seg) < 1.6 ? 'crypt' : variant;
+      for (const cell of cells) {
+        const t = cell.center;
+        const x = seg.axis === 'x' ? t : seg.fixed;
+        const z = seg.axis === 'x' ? seg.fixed : t;
+        const kind = this.wallKind(segVariant, hash2(x * 13.7, z));
+        const scale: [number, number, number] = [cell.length / 4, MODULE_SCALE, MODULE_SCALE];
+        p.add(kind, x, 0, z, ry, scale);
+        // The keep hangs its red kcas banners from the lastkeep dressing pass
+        // instead of the kit's crypt hangings.
+        if (!isKeep && i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
+          const banner = hash2(z, x * 7.3) < 0.5 ? 'banner_red' : 'banner_triple_red';
+          p.add(banner, x, 0, z, ry, scale);
+        }
+        i++;
+      }
+    }
+    if (!isKeep) return;
+    // ---- The Last Keep's SECOND wall storey ----
+    // One 8u module row is only wall-top 8, which the residence floor (lift 6)
+    // and tower would poke straight through. Stack a second row at y=8 so the
+    // state floor soars (13u of wall over its 3.0 floor) and the residence
+    // keeps 10u. The row is cut by the SAME door openings as the base row:
+    // capping a low doorway looks like a lintel but puts the chase camera
+    // inside the solid cap whenever it trails the player through a door (the
+    // cap carries no collider, so the boom happily enters it and the frame
+    // blacks out). Tall open archways cost that lintel read but keep every
+    // doorway camera-safe. Segments bordering the lookout (lift 9) shorten to
+    // a parapet so the tower top stays an open rooftop.
+    for (const seg of authoredWallSegments(rooms, doors)) {
+      const maxLift = segMaxLift(seg);
+      const ry = segRy(seg);
+      const upperVariant: Variant = maxLift < 1.6 ? 'crypt' : 'lastkeep';
+      const sy = maxLift >= 8 ? 0.75 : MODULE_SCALE; // lookout parapet: 3u, not 8u
+      for (const cell of fitAuthoredWallSegment(seg.a, seg.b, 8)) {
+        const t = cell.center;
+        const x = seg.axis === 'x' ? t : seg.fixed;
+        const z = seg.axis === 'x' ? seg.fixed : t;
+        let kind = this.wallKind(upperVariant, hash2(x * 7.1, z * 3.3));
+        if (kind === 'wall_arched') kind = 'wall'; // no archways floating at mid-wall
+        p.add(kind, x, DUNGEON_WALL_HEIGHT, z, ry, [cell.length / 4, sy, MODULE_SCALE]);
+      }
+    }
+  }
+
   private wallKind(variant: Variant, t: number): string {
     if (variant === 'arena_drowned') return this.wallKind('temple', t);
     if (variant === 'bastion') {
@@ -1347,6 +1815,20 @@ export class DungeonInteriors {
           ['wall_cracked', 18],
           ['wall_arched', 12],
           ['wall_archedwindow_gated', 12],
+        ],
+        t,
+      );
+    }
+    if (variant === 'lastkeep') {
+      // the kept castle: clean coursed masonry, engaged pillars, arched bays
+      // and the odd barred window, and NO cracked stone (the undercroft's wall
+      // runs re-key to the crypt mix in placeAuthoredWalls)
+      return pickKind(
+        [
+          ['wall', 56],
+          ['wall_pillar', 24],
+          ['wall_arched', 13],
+          ['wall_archedwindow_gated', 7],
         ],
         t,
       );
@@ -1441,43 +1923,48 @@ export class DungeonInteriors {
       return;
     }
     const bannerEvery = variant === 'crypt' ? 4 : 3;
-    const wallX = layout.wallX ?? DUNGEON_WALL_X;
-    const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
+    // Exact collider-run coverage (see dungeon_wall_segments.ts): each side/end
+    // run is split into equal segments and one module is scaled to each span,
+    // so the drawn shell always matches the collision shell (the legacy fixed
+    // 8u grid left visual corner gaps whenever endWallHw was not module-aligned,
+    // which a rift's arbitrary wallX + 1 almost never is).
+    const shell = rectShellWallSegments(layout, DUNGEON_WALL_X, DUNGEON_END_WALL_HW);
     for (const side of [-1, 1]) {
       const target = arenaWalls
         ? side < 0
           ? arenaWalls.left.placements
           : arenaWalls.right.placements
         : p;
-      const ry = side < 0 ? Math.PI / 2 : -Math.PI / 2; // detail + banners face the room
+      const segments = side < 0 ? shell.left : shell.right;
       let i = 0;
-      for (let z = layout.zMin; z <= layout.zMax + 2; z += 8, i++) {
-        const kind = this.wallKind(variant, hash2(side * 13.7, z));
-        target.add(kind, side * wallX, 0, z, ry, MODULE_SCALE);
+      for (const seg of segments) {
+        const kind = this.wallKind(variant, hash2(side * 13.7, seg.z));
+        target.add(kind, seg.x, 0, seg.z, seg.ry, [seg.halfLength / 2, MODULE_SCALE, MODULE_SCALE]);
         if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
           target.add(
-            this.bannerKind(variant, hash2(z, side * 7.3)),
-            side * wallX,
+            this.bannerKind(variant, hash2(seg.z, side * 7.3)),
+            seg.x,
             0,
-            z,
-            ry,
+            seg.z,
+            seg.ry,
             MODULE_SCALE,
           );
         }
+        i++;
       }
     }
     for (const end of [
-      { z: layout.zMin, ry: 0 },
-      { z: layout.zMax, ry: Math.PI },
+      { segments: shell.front, atMin: true },
+      { segments: shell.back, atMin: false },
     ]) {
       const target = arenaWalls
-        ? end.z === layout.zMin
+        ? end.atMin
           ? arenaWalls.front.placements
           : arenaWalls.back.placements
         : p;
-      for (let x = -endWallHw + 4; x <= endWallHw - 4; x += 8) {
-        const kind = this.wallKind(variant, hash2(x, end.z * 3.1));
-        target.add(kind, x, 0, end.z, end.ry, MODULE_SCALE);
+      for (const seg of end.segments) {
+        const kind = this.wallKind(variant, hash2(seg.x, seg.z * 3.1));
+        target.add(kind, seg.x, 0, seg.z, seg.ry, [seg.halfLength / 2, MODULE_SCALE, MODULE_SCALE]);
       }
     }
     // back wall banners flank the boss dais
@@ -1532,6 +2019,7 @@ export class DungeonInteriors {
     p: Placements,
     layout: DungeonLayout,
     variant: Variant,
+    torch?: TorchColors,
   ): void {
     const kind =
       variant === 'sanctum' ||
@@ -1540,7 +2028,7 @@ export class DungeonInteriors {
       variant === 'delve_hall'
         ? 'pillar_decorated'
         : 'pillar';
-    const colors = TORCH_COLORS[variant];
+    const colors = torch ?? TORCH_COLORS[variant];
     for (const pt of layout.pillars) {
       const faceAisle = pt.x < 0 ? Math.PI / 2 : -Math.PI / 2;
       p.add(kind, pt.x, 0, pt.z, faceAisle, [PILLAR_XZ_SCALE, MODULE_SCALE, PILLAR_XZ_SCALE]);
@@ -1619,6 +2107,29 @@ export class DungeonInteriors {
     glow.scale.setScalar(scale);
     glow.renderOrder = 1; // after the floor it floats over
     group.add(glow);
+  }
+
+  /** A real, budgeted light plus its baked floor pool for the authored citadel.
+   * The nearest GFX-tier allowance shines; the rest remain zero-intensity, so the
+   * richer authored lighting does not expand the forward-render light budget. */
+  private addInfernalLight(
+    group: THREE.Group,
+    x: number,
+    z: number,
+    colorHex: number,
+    y = 0.7,
+    scale = 1,
+  ): void {
+    this.addTorchGlow(group, x, z, colorHex, y, scale);
+    const base = this.lowGfx ? 10 : DUNGEON_LIGHT_INTENSITY * Math.min(1.35, 0.55 + scale * 0.3);
+    const distance = this.lowGfx
+      ? 20
+      : DUNGEON_LIGHT_DISTANCE * Math.min(1.25, 0.65 + scale * 0.18);
+    const light = new THREE.PointLight(colorHex, base, distance, 2);
+    light.userData.baseIntensity = base;
+    light.position.set(x, Math.max(2.8, y + 1.8), z);
+    group.add(light);
+    this.fireLights.push(light);
   }
 
   // Wall-side obstacles at +-19 (OBB 2.2 x 4.2): sarcophagi in the crypt and
@@ -1728,21 +2239,36 @@ export class DungeonInteriors {
       }
       return;
     }
-    const archZ = new Set<number>();
+    // Derive every pier face from the stub's own collider OBB
+    // (dungeon_wall_segments.ts). The legacy branch hardcoded the classic
+    // crypt/sanctum geometry (cap at |x| 6, faces spanning |x| 5..23), which a
+    // parameterized rift waist (passage half 7 to 8.5, piers out to a variable
+    // wallX) turned into a phantom wall panel INSIDE the open passage plus an
+    // uncovered invisible collider strip beyond |x| 23. Evaluated at the
+    // classic stub geometry (hw 9 around |x| 14) these segments reproduce the
+    // old faces exactly.
+    const archAt = new Map<number, number>();
     for (const s of stubs) {
-      const sign = s.x < 0 ? -1 : 1;
-      // passage-facing cap (length 2*hd along z)
-      p.add('wall', sign * 6, 0, s.z, Math.PI / 2, [s.hd / 2, MODULE_SCALE, MODULE_SCALE]);
-      // front/back faces, two 9u modules from |x| 5..23, flush inside the OBB
-      for (const fz of [s.z - s.hd + 1, s.z + s.hd - 1]) {
-        const ry = fz < s.z ? 0 : Math.PI;
-        p.add('wall_pillar', sign * 9.5, 0, fz, ry, [2.25, MODULE_SCALE, MODULE_SCALE]);
-        p.add('wall', sign * 18.5, 0, fz, ry, [2.25, MODULE_SCALE, MODULE_SCALE]);
+      const faces = stubFaceSegments(s);
+      for (const seg of faces.caps) {
+        p.add('wall', seg.x, 0, seg.z, seg.ry, [seg.halfLength / 2, MODULE_SCALE, MODULE_SCALE]);
       }
-      archZ.add(s.z);
+      let i = 0;
+      for (const seg of faces.faces) {
+        // Alternate the classic pillar-then-wall reading along each face.
+        const kind = i % 2 === 0 ? 'wall_pillar' : 'wall';
+        p.add(kind, seg.x, 0, seg.z, seg.ry, [seg.halfLength / 2, MODULE_SCALE, MODULE_SCALE]);
+        i++;
+      }
+      const prior = archAt.get(s.z);
+      archAt.set(s.z, prior === undefined ? faces.innerFaceX : Math.min(prior, faces.innerFaceX));
     }
     if (variant === 'sanctum' || variant === 'temple') {
-      for (const z of archZ) p.add('arch', 0, 0, z, 0, [2.6, 1.9, 2.0]);
+      // The arch module spans ~10.4u; only span passages it actually fits
+      // (classic half-5 aisles). A wider rift passage gets no floating arch.
+      for (const [z, innerFaceX] of archAt) {
+        if (innerFaceX <= 5.5) p.add('arch', 0, 0, z, 0, [2.6, 1.9, 2.0]);
+      }
     }
   }
 
@@ -1755,12 +2281,17 @@ export class DungeonInteriors {
     p: Placements,
     layout: DungeonLayout,
     variant: Variant,
+    torch?: TorchColors,
+    daisRaisedOverride?: boolean,
   ): void {
     const d = layout.dais;
+    const glow = (torch ?? TORCH_COLORS[variant]).light;
     // The arena and Nythraxis raid keep flat fighting floors: no raised platform
-    // or rim clutter to visually disagree with the walkable sim collision.
-    if (!dungeonDaisHasRaisedPlatform(variant)) {
-      this.addTorchGlow(group, d.x, d.z, TORCH_COLORS[variant].light, 0.07, 2.4);
+    // or rim clutter to visually disagree with the walkable sim collision. A rift
+    // style can force either shape (daisRaisedOverride) independent of the kit.
+    const raised = daisRaisedOverride ?? dungeonDaisHasRaisedPlatform(variant);
+    if (!raised) {
+      this.addTorchGlow(group, d.x, d.z, glow, 0.07, 2.4);
       return;
     }
     const quarter = Math.PI / 2;
@@ -1768,14 +2299,18 @@ export class DungeonInteriors {
       for (let z = -16; z <= 16; z += 4) {
         if (Math.hypot(x, z) > d.r) continue;
         const rot = Math.floor(hash2(x, z) * 4) * quarter;
-        // The foundation piece is 2u tall natively: y-scale it to exactly the
-        // sim's dais height so the visual top IS the floor the body stands on.
-        p.add('floor_foundation_allsides', d.x + x, 0, d.z + z, rot, [1.85, DAIS_HEIGHT / 2, 1.85]);
+        // y-scale = DAIS_PLATFORM_HEIGHT / 2 (2u blocks): ground cues (the
+        // death-zone danger ring) lift by the same shared constant.
+        p.add('floor_foundation_allsides', d.x + x, 0, d.z + z, rot, [
+          1.85,
+          DAIS_PLATFORM_HEIGHT / 2,
+          1.85,
+        ]);
       }
     }
     // ritual glow pooled on the dais top so the boss stage never reads as a
     // black slab (torch pillars stop short of the back chamber)
-    this.addTorchGlow(group, d.x, d.z, TORCH_COLORS[variant].light, 0.68, 1.6);
+    this.addTorchGlow(group, d.x, d.z, glow, 0.68, 1.6);
     // rim decor (small, walk-through by design)
     const rim = d.r - 1.6;
     for (let i = 0; i < 6; i++) {

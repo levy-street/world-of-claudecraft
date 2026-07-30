@@ -26,6 +26,10 @@ function uniqueViolation(): Error {
 
 class FakeMapsDb implements MapsDb {
   rows = new Map<number, MapRecord>();
+  // Records every adminUnpublish audit payload the service passed down, so a
+  // test can assert the resource id / admin id / reason actually reached the
+  // db layer (the shape content_moderation_db.ts's real INSERT would receive).
+  adminUnpublishAudits: { id: number; adminAccountId: number; reason: string }[] = [];
   private nextId = 1;
 
   private countFor(accountId: number): number {
@@ -139,6 +143,21 @@ class FakeMapsDb implements MapsDb {
     const map = this.rows.get(id);
     if (!map || (accountId !== null && map.accountId !== accountId)) return false;
     map.status = status;
+    return true;
+  }
+
+  async adminUnpublish(
+    id: number,
+    audit: { adminAccountId: number; reason: string },
+  ): Promise<boolean> {
+    const map = this.rows.get(id);
+    if (!map) return false;
+    map.status = 'private';
+    this.adminUnpublishAudits.push({
+      id,
+      adminAccountId: audit.adminAccountId,
+      reason: audit.reason,
+    });
     return true;
   }
 
@@ -450,9 +469,22 @@ describe('publish / visibility / delete', () => {
   it('adminUnpublish forces any map private regardless of owner', async () => {
     const map = await createOk(1, 'Moderated');
     await service.setPublished(1, map.id, true);
-    expect(await service.adminUnpublish(map.id)).toBe(true);
+    expect(await service.adminUnpublish(map.id, { adminAccountId: 9, reason: 'reported' })).toBe(
+      true,
+    );
     expect(db.rows.get(map.id)?.status).toBe('private');
-    expect(await service.adminUnpublish(999)).toBe(false);
+    expect(await service.adminUnpublish(999, { adminAccountId: 9, reason: 'reported' })).toBe(
+      false,
+    );
+  });
+
+  it('adminUnpublish threads the acting admin and reason down to the db layer for audit', async () => {
+    const map = await createOk(1, 'Moderated');
+    await service.setPublished(1, map.id, true);
+    await service.adminUnpublish(map.id, { adminAccountId: 42, reason: 'inappropriate content' });
+    expect(db.adminUnpublishAudits).toEqual([
+      { id: map.id, adminAccountId: 42, reason: 'inappropriate content' },
+    ]);
   });
 
   it('getMapForViewer: owner always, others and anonymous only when public', async () => {

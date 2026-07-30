@@ -14,13 +14,22 @@
 //  - delve + lockpick:         delve_lockpick
 //  - loot roll:                solo_warrior (death->rollLoot), party_loot (need/greed)
 //  - loot distribution (L1):   l1_loot_distribution (fair-split remainder draw, need/greed/pass, personal/looter-takes-all)
+//  - master loot:              master_loot (assign direct/duplicate-pid/convert, tie-break draw)
 //
 // All drives are MOVE-safe: they only call public Sim methods + the documented
 // internal plumbing the existing tests use (createMob/addEntity, dealDamage,
 // mobSwing, spawnDelveModule), never reaching into not-yet-extracted internals
 // in a way the sim itself does not already expose.
 
-import { arenaOrigin, DELVES, instanceOrigin, MOBS, PROPS, QUESTS } from '../../src/sim/data';
+import {
+  arenaOrigin,
+  DELVES,
+  DUNGEON_X_THRESHOLD,
+  instanceOrigin,
+  MOBS,
+  PROPS,
+  QUESTS,
+} from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';
 import { solveLockActions } from '../../src/sim/lockpick';
 import { gatherCastDurationSec } from '../../src/sim/professions/gathering';
@@ -1506,6 +1515,143 @@ function l1LootDistribution(): Scenario {
       // b claims the personal slot and the returned-to-corpse openToAll item.
       sim.lootCorpse(mob.id, b);
       rec.snapshot('after-loot-b');
+      rec.tick(2);
+    },
+  };
+}
+
+// Master loot: a 4-member party on master loot over a corpse carrying three
+// copies of a threshold-meeting drop, driving the three assignment arms below
+// AND both places master loot reaches the shared rng stream (#2523: nothing
+// in this file used to touch assignMasterLoot / setPartyLootMaster at all, so a
+// reordered master-loot draw was invisible to the draw-order digest):
+//  - DIRECT GRANT: a single assigned target takes the item, drawing NOTHING;
+//  - DUPLICATE PID: a pid named twice collapses to that same single-target grant
+//    instead of converting into a one-player roll, the exact input class whose
+//    draw sequence #2505 (PR #2521) changed;
+//  - CONVERSION: a multi-target assignment reopens the roll as a need/greed
+//    contest over a strict SUBSET of the candidates (b/c/d, never the looter a),
+//    whose three submitLootRoll ctx.rng.int(1,100) draws TIE at the top, so
+//    resolveLootRoll's tie-break ctx.rng.int(0, tiedWinners.length - 1) -- the
+//    draw a master-loot resolution can reach and a plain need/greed roll usually
+//    does not -- lands in the log too.
+// The seed is load-bearing: 1091 makes those three rolls tie (b and c both roll
+// 97, d rolls 43), and a sweep of 1031 to 1230 found only two others that tie at
+// all (1165, 1170). Nothing is ticked before the resolution, so the tie hangs
+// only off the ctor + join draws, not off ambient world simulation; if a future
+// change to those moves the stream, the coverage test's draw-delta assertion
+// fails loudly and the seed must be re-swept (record the scenario for each
+// candidate seed and keep one whose resolution spends FOUR draws, three need
+// rolls plus the tie-break) rather than the tie assertion dropped. The payoff is
+// that the WHOLE scenario
+// draws exactly four times, all four of them master-loot draws, so its draw
+// digest is a near-pure instrument for this slice.
+// NOT driven here, and all zero-draw, so they would need a state-side pin rather
+// than a draw delta (tests/loot_master_sim.test.ts covers each directly): the
+// empty-target refusal that leaves the prompt open (#2526), the rejection of a
+// caller who is not the master looter, the departed-single-target convert, the
+// MASTER_LOOT_TIMEOUT convert in resolveLootRoll, removePlayerFromLootRolls's
+// master-looter convert, and setPartyLootMaster's non-leader error arm.
+function masterLoot(): Scenario {
+  return {
+    name: 'master_loot',
+    coverage: [
+      'setPartyLootMaster enable + threshold change',
+      'startMasterLootRoll (threshold met, masterLoot prompt to the looter only)',
+      'assignMasterLoot direct grant (single target, no rng draw)',
+      'assignMasterLoot duplicate pid dedupes to the direct grant (#2505)',
+      'convertMasterRollToNeedGreed over a candidate subset',
+      'resolveLootRoll tie-break rng.int over tied need rolls',
+    ],
+    // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge. This branch
+    // never touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
+    // here); its extra content just moves the shared rng before the rolls, and at
+    // 1091 the need rolls stopped TYING. The tie is the whole point of the
+    // scenario's last coverage line (resolveLootRoll's tie-break rng.int), so the
+    // seed is re-hunted to keep two rollers level rather than re-recorded to
+    // whatever the new draw happens to be.
+    build: () => new Sim({ seed: 1326, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const a = sim.addPlayer('warrior', 'Aaa');
+      const b = sim.addPlayer('mage', 'Bbb');
+      const c = sim.addPlayer('rogue', 'Ccc');
+      const d = sim.addPlayer('priest', 'Ddd');
+      sim.partyInvite(b, a);
+      sim.partyAccept(b);
+      sim.partyInvite(c, a);
+      sim.partyAccept(c);
+      sim.partyInvite(d, a);
+      sim.partyAccept(d);
+      teleport(sim, sim.entities.get(a)!, 20, 20);
+      teleport(sim, sim.entities.get(b)!, 21, 20);
+      teleport(sim, sim.entities.get(c)!, 22, 20);
+      teleport(sim, sim.entities.get(d)!, 23, 20);
+      // Leader-only switch, both message arms: enable (looter 0 = pinned to the
+      // leader, a) above the drop's quality, then lower the threshold onto it.
+      sim.setPartyLootMaster(true, 0, 'epic', a);
+      sim.setPartyLootMaster(true, 0, 'uncommon', a);
+      const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, {
+        x: 20,
+        y: terrainHeight(20, 22, sim.cfg.seed),
+        z: 22,
+      }) as AnyEntity;
+      mob.dead = true;
+      mob.lootable = true;
+      mob.tappedById = a;
+      mob.lootRecipientIds = [a, b, c, d];
+      // Three uncommon copies: one per assignment arm below. Master loot outranks
+      // need-greed in awardSharedLootItem, so each copy opens a curate-phase roll.
+      mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 3 }] };
+      sim.addEntity(mob);
+      rec.track(mob.id);
+      sim.lootCorpse(mob.id, a);
+      rec.snapshot('master-rolls-open');
+      const rollIds = [
+        ...new Set(
+          (rec.allEvents as { type: string; rollId?: number }[])
+            .filter((e) => e.type === 'masterLoot')
+            .map((e) => e.rollId as number),
+        ),
+      ];
+      rec.notes.rollIds = rollIds;
+      rec.notes.pids = { a, b, c, d };
+      // A candidate trying to vote on a roll still in its curate phase is refused
+      // by submitLootRoll's master-loot guard, and refused BEFORE the int(1,100)
+      // draw. This frame pins that the attempt costs zero draws, so hoisting that
+      // draw above the guard (the classic early-bail reorder) reddens the gate.
+      // BOTH choice kinds are tried: a 'need' would draw if the guard let it
+      // through (so the rng stream detects that), but a 'pass' never draws at any
+      // callsite, so nothing in the trace would notice a guard that admitted one.
+      // The recorded choice count below is what covers that second arm; it is read
+      // from pendingLootRolls, which the trace deliberately never samples.
+      if (rollIds[2] !== undefined) {
+        sim.submitLootRoll(rollIds[2], 'need', d);
+        sim.submitLootRoll(rollIds[2], 'pass', b);
+        const pending = (sim as any).pendingLootRolls as Map<
+          number,
+          { choices: Map<number, unknown> }
+        >;
+        rec.notes.refusedChoiceCount = pending.get(rollIds[2])?.choices.size ?? -1;
+      }
+      rec.snapshot('curate-phase-vote-refused');
+      // Arm 1: one target -> direct grant to b. No rng draw.
+      if (rollIds[0] !== undefined) sim.assignMasterLoot(rollIds[0], [b], a);
+      rec.snapshot('assigned-direct');
+      // Arm 2: c named twice -> deduped to the same direct grant. No rng draw.
+      if (rollIds[1] !== undefined) sim.assignMasterLoot(rollIds[1], [c, c], a);
+      rec.snapshot('assigned-duplicate-pid');
+      // Arm 3: three targets -> the roll converts to need/greed for that subset.
+      if (rollIds[2] !== undefined) sim.assignMasterLoot(rollIds[2], [b, c, d], a);
+      rec.snapshot('assigned-converted');
+      // The third submit fills the choice map and resolves: three int(1,100)
+      // draws, then the tie-break int(0,1) between b and c.
+      if (rollIds[2] !== undefined) {
+        sim.submitLootRoll(rollIds[2], 'need', b);
+        sim.submitLootRoll(rollIds[2], 'need', c);
+        sim.submitLootRoll(rollIds[2], 'need', d);
+      }
+      rec.snapshot('roll-resolved');
       rec.tick(2);
     },
   };
@@ -3409,17 +3555,20 @@ function mobLifecycle(): Scenario {
       rec.notes.addDespawned = !sim.entities.has(add.id);
       rec.snapshot('respawn');
 
-      // 5) Dungeon mob stays dead: spawnPos past DUNGEON_X_THRESHOLD (600) -> the
-      // corpse-tick respawn gate is skipped, the mob never respawns into the wild.
+      // 5) Dungeon mob stays dead: spawnPos past DUNGEON_X_THRESHOLD -> the
+      // corpse-tick respawn gate is skipped, the mob never respawns into the
+      // wild. (The threshold moved east with the instance plane in the world
+      // grid stage 2; place relative to it, not at a literal x.)
+      const dungeonX = DUNGEON_X_THRESHOLD + 100;
       const dungeonMob = spawnMob(
         sim,
         'forest_wolf',
         5,
-        700,
-        terrainHeight(700, 300, sim.cfg.seed),
+        dungeonX,
+        terrainHeight(dungeonX, 300, sim.cfg.seed),
         300,
       );
-      dungeonMob.spawnPos = { x: 700, y: dungeonMob.pos.y, z: 300 };
+      dungeonMob.spawnPos = { x: dungeonX, y: dungeonMob.pos.y, z: 300 };
       rec.track(dungeonMob.id);
       lethal(sim, player, dungeonMob);
       dungeonMob.corpseTimer = 0;
@@ -4331,9 +4480,13 @@ function cardDuel(): Scenario {
 // Seed HUNTED (bounded scan from seed 1 upward over this exact drive sequence, not
 // committed) so the vestments proc draw lands under the capped 15 percent
 // masterwork chance and the proc fires inside the recorded run; only the found
-// literal is pinned here. Spare seeds 23 and 34 were also verified to fire the proc
-// for this drive.
-function professionsCraft(seed = 21): Scenario {
+// literal is pinned here. Re-hunted after the new-realm quest pass shifted the
+// construction-time draw stream (quest camps + escort NPC spawns across the new
+// realms), and again after the Eastbrook camp respacing thinned the zone-1 camp
+// counts (fewer camp mobs means fewer construction-time draws, which moves every
+// later draw). Spare seeds 36 and 39 were also verified to fire the proc for this
+// drive.
+function professionsCraft(seed = 10): Scenario {
   return {
     name: 'professions_craft',
     coverage: [
@@ -4545,6 +4698,7 @@ export const SCENARIOS: Scenario[] = [
   partyLoot(),
   partyRaid(),
   l1LootDistribution(),
+  masterLoot(),
   entityRoster(),
   delveDeath(),
   fiestaMidcastKill(),

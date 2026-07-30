@@ -129,11 +129,12 @@ export class NameplatePainter {
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
+      // the saddle lift rides the anchor so a mounted player's plate clears the head
       const plan = nameplatePlanInto(
         this.plan,
         e,
         p,
-        v.height,
+        v.height + v.mountLift,
         showNameplates,
         showOwnNameplate,
         showPlayerNameplates,

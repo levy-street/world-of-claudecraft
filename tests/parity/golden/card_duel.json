@@ -8,13 +8,13 @@
     "createCardHand rng draw (match start, both sides)",
     "drawOne rng draw (round resolution, both sides)"
   ],
-  "draws": 42,
-  "drawDigest": "9f48aefb",
+  "draws": 44,
+  "drawDigest": "5d52aee1",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 415,
+      "nextId": 820,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,100 +28,100 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 417,
-      "state": "f3601aa9",
-      "events": "5b3a32e3",
+      "nextId": 822,
+      "state": "9259ddf1",
+      "events": "4cf3f611",
       "rng": {
         "draws": 38,
-        "digest": "d9daf66f"
+        "digest": "90bc014b"
       }
     },
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 417,
-      "state": "4b2d444a",
+      "nextId": 822,
+      "state": "62f4d796",
       "events": "741638a5",
       "rng": {
         "draws": 38,
-        "digest": "d9daf66f"
+        "digest": "90bc014b"
       }
     },
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 417,
-      "state": "3008fb50",
+      "nextId": 822,
+      "state": "b718a3a4",
       "events": "741638a5",
       "rng": {
         "draws": 38,
-        "digest": "d9daf66f"
+        "digest": "90bc014b"
       }
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 417,
-      "state": "3f7b21f1",
-      "events": "18091e3e",
+      "nextId": 822,
+      "state": "06e64c15",
+      "events": "511e9b10",
       "rng": {
         "draws": 38,
-        "digest": "d9daf66f"
+        "digest": "90bc014b"
       }
     },
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 417,
-      "state": "2c11092e",
+      "nextId": 822,
+      "state": "00cb12fe",
       "events": "741638a5",
       "rng": {
         "draws": 38,
-        "digest": "d9daf66f"
+        "digest": "90bc014b"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 417,
-      "state": "f60b6567",
+      "nextId": 822,
+      "state": "a7277807",
       "events": "741638a5",
       "rng": {
         "draws": 38,
-        "digest": "d9daf66f"
+        "digest": "90bc014b"
       }
     },
     {
       "tick": 35,
       "time": 1.75,
-      "nextId": 417,
-      "state": "1099a48f",
+      "nextId": 822,
+      "state": "3fb8f01b",
       "events": "741638a5",
       "rng": {
         "draws": 38,
-        "digest": "d9daf66f"
+        "digest": "90bc014b"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 417,
-      "state": "ae94b392",
+      "nextId": 822,
+      "state": "4c4f9b52",
       "events": "741638a5",
       "rng": {
         "draws": 38,
-        "digest": "d9daf66f"
+        "digest": "90bc014b"
       }
     },
     {
       "tick": 41,
       "time": 2.05,
-      "nextId": 417,
-      "state": "ee9af90f",
+      "nextId": 822,
+      "state": "8f53d03b",
       "events": "741638a5",
       "rng": {
-        "draws": 42,
-        "digest": "9f48aefb"
+        "draws": 44,
+        "digest": "5d52aee1"
       },
       "label": "final",
       "players": [
@@ -157,7 +157,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -212,7 +212,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 416,
+          "entityId": 821,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -251,7 +251,7 @@
               "name": "Battle Stance",
               "remaining": 3597.95,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -264,7 +264,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 101.05,
           "hp": 100,
-          "id": 415,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -314,7 +314,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 101.05,
           "hp": 54,
-          "id": 416,
+          "id": 821,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

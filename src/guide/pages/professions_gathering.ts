@@ -135,7 +135,7 @@ function rareSection(): string {
 function corpseSection(): string {
   return `<section class="guide-block" id="prof-corpse">
       <h2>${esc(t('guide.professions.harvestTitle'))}</h2>
-      ${paras('guide.professions.harvestBody')}
+      ${paras('guide.professions.harvestBodyChoice')}
       <h3>${esc(t('guide.professions.focusTitle'))}</h3>
       ${paras('guide.professions.focusBody')}
     </section>`;

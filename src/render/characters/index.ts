@@ -13,6 +13,13 @@ export type { PreviewFramingName } from './preview_framing';
 export type { AnimState } from './visual';
 export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
 
+/** Build a rideable mount's visual: no skin, no held weapon, authored colours
+ *  (mount defs carry no tint). The caller gates on mountAssetsReady() first:
+ *  mount GLBs are lazyPreload and resolvedGltf throws when not yet fetched. */
+export function createMountVisual(visualKey: string): CharacterVisual {
+  return new CharacterVisual(visualKey, 0xffffff, 0, null, null);
+}
+
 /** Build the visual for an entity (or an explicit shapeshift/polymorph form key).
  *  Returns null when the visual's assets are unavailable (a missed preload, a
  *  lazy fetch that has not landed): callers skip that entity's view for the

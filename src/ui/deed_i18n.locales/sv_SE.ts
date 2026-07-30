@@ -745,4 +745,12 @@ export const table: DeedLocaleTable = {
     name: 'Rivningsgården',
     desc: 'Bärga 50 utrustningspjäser tillbaka till råmaterial.',
   },
+  dgn_wildheart_basin: {
+    name: 'Bassängen bits tillbaka',
+    desc: 'Besegra Zulgar, Bassängens röst, i Vildhjärtats bassäng.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroisk: Vildhjärtats bassäng',
+    desc: 'Besegra Zulgar, Bassängens röst, i Vildhjärtats bassäng på heroisk svårighetsgrad.',
+  },
 };

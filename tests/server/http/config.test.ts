@@ -29,6 +29,7 @@ describe('loadConfig', () => {
     expect(cfg.dispatch).toBe('new');
     expect(cfg.port).toBe(8787);
     expect(cfg.allowDevCommands).toBe(false);
+    expect(cfg.provisionTestAccounts).toBe(false);
     expect(cfg.turnstileSecret).toBe('');
     expect(cfg.maxWsPerIpHard).toBe(20);
     expect(cfg.maxPlayersPerRealm).toBe(5000);
@@ -42,6 +43,9 @@ describe('loadConfig', () => {
     expect(cfg.playSessionRetentionDays).toBe(180);
     expect(cfg.accountIpAssociationRetentionDays).toBe(730);
     expect(cfg.playerActivityRetentionDays).toBe(400);
+    expect(cfg.passwordResetRequestRetentionDays).toBe(30);
+    expect(cfg.emailChangeRequestRetentionDays).toBe(30);
+    expect(cfg.emailLogRetentionDays).toBe(90);
     expect(cfg.retentionSweepUtcHour).toBe(5);
     expect(cfg.retentionSweepMaxRowsPerRun).toBe(50000);
     expect(cfg.requireWebLogin).toBe(false);
@@ -180,6 +184,41 @@ describe('loadConfig', () => {
     expect(loadConfig({ ...MIN_ENV, ALLOW_DEV_COMMANDS: '0' }).allowDevCommands).toBe(false);
   });
 
+  it('strictly parses PROVISION_TEST_ACCOUNTS and keeps it off by default', () => {
+    expect(loadConfig({ ...MIN_ENV }).provisionTestAccounts).toBe(false);
+    expect(loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: '' }).provisionTestAccounts).toBe(
+      false,
+    );
+    expect(loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: '0' }).provisionTestAccounts).toBe(
+      false,
+    );
+    expect(loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: 'false' }).provisionTestAccounts).toBe(
+      false,
+    );
+    expect(loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: '1' }).provisionTestAccounts).toBe(
+      true,
+    );
+    expect(loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: 'TRUE' }).provisionTestAccounts).toBe(
+      true,
+    );
+    expect(() => loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: 'yes' })).toThrow(
+      /PROVISION_TEST_ACCOUNTS/,
+    );
+  });
+
+  it('parses COMMUNITY_TEST_RIFTS strictly and defaults it off', () => {
+    expect(loadConfig({ ...MIN_ENV }).communityTestRifts).toBe(false);
+    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: '1' }).communityTestRifts).toBe(true);
+    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'true' }).communityTestRifts).toBe(true);
+    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: '0' }).communityTestRifts).toBe(false);
+    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'FALSE' }).communityTestRifts).toBe(
+      false,
+    );
+    expect(() => loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'yes' })).toThrow(
+      /COMMUNITY_TEST_RIFTS/,
+    );
+  });
+
   it('reads the numeric and string overrides', () => {
     const cfg = loadConfig({
       ...MIN_ENV,
@@ -237,7 +276,7 @@ describe('loadConfig', () => {
     expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: ' 0 ' }).maxPlayersPerRealm).toBe(0);
   });
 
-  it('reads the six retention day keys on the chat-log contract: empty is the default, whitespace is keep-forever', () => {
+  it('reads the nine retention day keys on the chat-log contract: empty is the default, whitespace is keep-forever', () => {
     const cases = [
       {
         key: 'DAILY_REWARD_EVENTS_RETENTION_DAYS',
@@ -253,6 +292,17 @@ describe('loadConfig', () => {
         dflt: 730,
       },
       { key: 'PLAYER_ACTIVITY_RETENTION_DAYS', field: 'playerActivityRetentionDays', dflt: 400 },
+      {
+        key: 'PASSWORD_RESET_REQUEST_RETENTION_DAYS',
+        field: 'passwordResetRequestRetentionDays',
+        dflt: 30,
+      },
+      {
+        key: 'EMAIL_CHANGE_REQUEST_RETENTION_DAYS',
+        field: 'emailChangeRequestRetentionDays',
+        dflt: 30,
+      },
+      { key: 'EMAIL_LOG_RETENTION_DAYS', field: 'emailLogRetentionDays', dflt: 90 },
     ] as const;
     for (const { key, field, dflt } of cases) {
       // A set value overrides the default.

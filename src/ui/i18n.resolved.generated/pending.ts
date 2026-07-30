@@ -11,27 +11,33 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "es_ES": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "fr_FR": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "fr_CA": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "en_CA": [],
   "it_IT": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "de_DE": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "zh_CN": [],
@@ -40,39 +46,48 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "nl_NL": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "pl_PL": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "id_ID": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "tr_TR": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "sv_SE": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "vi_VN": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ],
   "da_DK": [
     "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
     "hudChrome.mailbox.result.noMailBound"
   ]
 };

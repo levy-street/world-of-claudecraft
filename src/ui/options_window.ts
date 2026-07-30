@@ -179,6 +179,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   leaderboard: 'game.leaderboard.title',
   calendar: 'hudChrome.calendar.keybindLabel',
   crafting: 'hudChrome.crafting.title',
+  mount: 'hudChrome.keybinds.mount',
   deeds: 'hudChrome.deeds.title',
   professions: 'hudChrome.professions.title',
 };
@@ -193,7 +194,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
 export interface OptionsWindowDeps {
   /** The #options-menu root (Hud owns the id; the painter stays instance-parameterized). */
   root(): HTMLElement;
-  /** The live world (offline Sim or online ClientWorld mirror); read only for the bug-report info. */
+  /** The live world (offline Sim or online ClientWorld mirror); reads bug-report info and dispatches recovery. */
   world(): IWorld;
   /** The options seam main.ts wires after Input exists (null until attached). */
   options(): OptionsHooks | null;
@@ -320,11 +321,17 @@ export class OptionsWindow {
   private perfSettings: PerfOverlaySettingsPanel | null = null;
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
+  // Tracked separately from the root's inline `display` (rather than reading
+  // it back, the char-window precedent): the Performance sub-view needs
+  // `display: flex` (its scroll wrapper needs a flex column, issue 2569)
+  // while every other sub-view stays `block`, so no single string value means
+  // "open" any more (the deeds/bank-window precedent for the same reason).
+  private opened = false;
 
   constructor(private readonly deps: OptionsWindowDeps) {}
 
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.opened;
   }
 
   toggle(): void {
@@ -343,8 +350,8 @@ export class OptionsWindow {
     this.view = 'main';
     this.capturingKey = null;
     this.keybindNote = '';
+    this.opened = true;
     this.render();
-    this.deps.root().style.display = 'block';
     music.pauseForMenu();
     audio.click();
   }
@@ -353,6 +360,7 @@ export class OptionsWindow {
   // the panel, drop the key-capture + tooltip + perf overlay placement, resume
   // music, and return focus to the opener (WCAG 2.2 AA).
   close(): void {
+    this.opened = false;
     this.deps.root().style.display = 'none';
     this.capturingKey = null;
     this.deps.options()?.perfOverlay.setPlacement(false);
@@ -434,6 +442,14 @@ export class OptionsWindow {
     // buildTitle (it rerender()s internally, which would drop a listener added
     // here).
     el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());
+    // Performance is the one sub-view whose scroll wrapper needs a flex column
+    // (`.perf-scroll`, components.css, issue 2569); every other sub-view stays
+    // the plain block card. render() re-runs on every navigation (goBack, a
+    // menu entry), so this always reflects the CURRENT view, not just the one
+    // active when the window first opened. A perf control's own self-rerender
+    // (perf_overlay_settings.ts) rebuilds only its own subtree and never
+    // touches this display value, which is already correct while that view stays open.
+    if (this.opened) el.style.display = this.view === 'performance' ? 'flex' : 'block';
   }
 
   // Return to the Game Menu root without closing the window. The title-bar back
@@ -478,6 +494,9 @@ export class OptionsWindow {
           this.render();
         } else if (a.kind === 'logout') {
           this.deps.options()?.logout();
+        } else if (a.kind === 'unstuck') {
+          this.deps.world().unstuck();
+          this.close();
         } else {
           this.close();
         }
@@ -1233,10 +1252,6 @@ export class OptionsWindow {
       infoRow(t('hudChrome.bugReport.position'), coords);
     body.appendChild(infoEl);
 
-    // Capture once when the form opens so the screenshot reflects what the player
-    // saw, not a later frame. null when capture is unavailable/failed.
-    const shot = hooks.capture();
-
     const descLabel = document.createElement('label');
     descLabel.className = 'bug-label';
     descLabel.setAttribute('for', 'bug-desc');
@@ -1249,8 +1264,26 @@ export class OptionsWindow {
     desc.setAttribute('aria-describedby', 'bug-error');
     body.append(descLabel, desc);
 
-    let includeShot = shot !== null;
-    if (shot) {
+    // Start the framebuffer copy in an idle slot after the form itself can paint.
+    // Renderer.captureScreenshot copies the live WebGL frame synchronously inside
+    // that slot, then JPEG-encodes asynchronously. The promise is also the submit
+    // gate, so a very fast submit cannot silently omit a capture still in flight.
+    let includeShot = true;
+    const shotHost = document.createElement('div');
+    shotHost.hidden = true;
+    body.appendChild(shotHost);
+    const capturePromise = new Promise<string | null>((resolve) => {
+      const capture = (): void => {
+        void hooks.capture().then(resolve, () => resolve(null));
+      };
+      const idleWindow = window as typeof window & {
+        requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
+      };
+      if (idleWindow.requestIdleCallback) idleWindow.requestIdleCallback(capture, { timeout: 500 });
+      else window.setTimeout(capture, 0);
+    }).then((shot) => {
+      includeShot = shot !== null;
+      if (!shot || !shotHost.isConnected) return shot;
       const shotWrap = document.createElement('div');
       shotWrap.className = 'bug-shot';
       const img = document.createElement('img');
@@ -1280,8 +1313,10 @@ export class OptionsWindow {
       name.textContent = t('hudChrome.bugReport.includeScreenshot');
       toggleRow.append(name, toggle);
       shotWrap.append(toggleRow, img);
-      body.appendChild(shotWrap);
-    }
+      shotHost.hidden = false;
+      shotHost.replaceChildren(shotWrap);
+      return shot;
+    });
 
     const error = document.createElement('div');
     error.className = 'report-error';
@@ -1313,24 +1348,29 @@ export class OptionsWindow {
       }
       submit.disabled = true;
       error.textContent = '';
-      const sentShot = includeShot && shot !== null;
-      hooks
-        .submit({ description, screenshot: includeShot ? shot : null, meta: hooks.collectMeta() })
-        .then(({ screenshotStored }) => {
-          // Be honest when the server dropped a screenshot the player asked to send.
-          const droppedShot = sentShot && !screenshotStored;
-          this.deps.log(
-            t(
-              droppedShot ? 'hudChrome.bugReport.submittedNoShot' : 'hudChrome.bugReport.submitted',
-            ),
-          );
-          this.view = 'main';
-          this.render();
-        })
-        .catch((err: unknown) => {
-          submit.disabled = false;
-          error.textContent = this.localizeBugReportError(err);
-        });
+      void capturePromise.then((shot) => {
+        if (!body.isConnected) return;
+        const sentShot = includeShot && shot !== null;
+        hooks
+          .submit({ description, screenshot: includeShot ? shot : null, meta: hooks.collectMeta() })
+          .then(({ screenshotStored }) => {
+            // Be honest when the server dropped a screenshot the player asked to send.
+            const droppedShot = sentShot && !screenshotStored;
+            this.deps.log(
+              t(
+                droppedShot
+                  ? 'hudChrome.bugReport.submittedNoShot'
+                  : 'hudChrome.bugReport.submitted',
+              ),
+            );
+            this.view = 'main';
+            this.render();
+          })
+          .catch((err: unknown) => {
+            submit.disabled = false;
+            error.textContent = this.localizeBugReportError(err);
+          });
+      });
     });
 
     this.deps

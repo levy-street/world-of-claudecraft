@@ -8,10 +8,12 @@ import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from '../browser_path.mjs';
+import { enterOfflineGame } from '../enter_offline_game.mjs';
 import { worldAuthMessage } from '../lib/world_auth.mjs';
 import { attributeFreezes, frameStats, normalizeReport } from './metrics.mjs';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const BOT_JOIN_CONCURRENCY = 8;
 const CLASSES = [
   'warrior',
   'paladin',
@@ -23,6 +25,13 @@ const CLASSES = [
   'druid',
   'shaman',
 ];
+
+function characterNameToken(value) {
+  return String(value)
+    .replace(/\d/g, (digit) => 'abcdefghij'[Number(digit)])
+    .replace(/[^a-z]/gi, 'a')
+    .toLowerCase();
+}
 
 // Injected once per session. A rAF loop records per-frame {dt, programs, views}
 // plus longtasks (so the profiler gets real 1%/0.1% lows + freeze attribution),
@@ -167,11 +176,11 @@ class Bot {
       .split('')
       .map((d) => 'abcdefghij'[+d])
       .join('');
-    this.name = `Pb${uniq}${li}`;
+    this.name = `Pb${characterNameToken(uniq)}${li}`;
     this.uniq = uniq;
+    this.ip = `9.${(i >> 8) & 255}.${i & 255}.7`;
   }
   async join() {
-    const xff = `172.16.${Math.floor(this.i / 254)}.${(this.i % 254) + 1}`;
     const reg = await api(
       this.server,
       '/api/register',
@@ -181,7 +190,7 @@ class Bot {
         email: `prof_${this.uniq}_${this.i}@example.com`,
       },
       undefined,
-      xff,
+      this.ip,
     );
     this.token = reg.body.token;
     if (!this.token)
@@ -191,25 +200,43 @@ class Bot {
       '/api/characters',
       { name: this.name, class: this.cls },
       this.token,
-      xff,
+      this.ip,
     );
     this.charId = char.body.id;
     if (!this.charId)
       throw new Error(`charcreate ${this.i}: ${JSON.stringify(char.body).slice(0, 80)}`);
     await new Promise((resolve, reject) => {
-      this.ws = new WebSocket(`${this.wsBase}/ws`);
-      const to = setTimeout(() => reject(new Error('join timeout')), 12000);
+      this.ws = new WebSocket(`${this.wsBase}/ws`, {
+        headers: { 'X-Forwarded-For': this.ip },
+      });
+      let settled = false;
+      let to;
+      const finish = (error) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(to);
+        if (error) {
+          this.close();
+          reject(error);
+        } else {
+          resolve();
+        }
+      };
+      to = setTimeout(() => finish(new Error('join timeout')), 30000);
       this.ws.on('open', () =>
         this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId))),
       );
       this.ws.on('message', (data) => {
-        const m = JSON.parse(String(data));
-        if (m.t === 'hello') {
-          clearTimeout(to);
-          resolve();
+        try {
+          const m = JSON.parse(String(data));
+          if (m.t === 'hello') finish();
+          else if (m.t === 'error') finish(new Error(m.error || 'websocket authentication failed'));
+        } catch (error) {
+          finish(error);
         }
       });
-      this.ws.on('error', reject);
+      this.ws.on('error', finish);
+      this.ws.on('close', () => finish(new Error('socket closed before hello')));
     });
   }
   cmd(p) {
@@ -241,10 +268,11 @@ export class Profiler {
     this.targetFps = opts.targetFps ?? 60;
     this.browserPath = opts.browserPath ?? process.env.BROWSER_PATH ?? BROWSER_PATH;
     this.shotDir = opts.shotDir ?? process.env.PROF_SHOT ?? null; // screenshot each sample (overlay visible)
-    this.uniq = (process.env.PROF_UNIQ ?? String(Math.floor(performance.now())) + 'x')
+    this.uniq = (process.env.PROF_UNIQ ?? `${Date.now().toString(36)}${process.pid.toString(36)}`)
       .replace(/[^a-z0-9]/gi, '')
-      .slice(-6);
+      .slice(-10);
     this.bots = [];
+    this.nextBotIndex = 0;
     this.mode = 'offline';
   }
 
@@ -264,6 +292,10 @@ export class Profiler {
         '--disable-gpu-vsync',
         '--disable-frame-rate-limit',
         '--autoplay-policy=no-user-gesture-required',
+        // Chrome-for-Testing's default Wayland ozone can hang window creation on
+        // nvidia desktops (e.g. after a suspend/resume); XWayland is reliable and
+        // renders on the same GPU. Only where XWayland actually exists.
+        ...(process.env.WAYLAND_DISPLAY && process.env.DISPLAY ? ['--ozone-platform=x11'] : []),
       ],
     });
     this.page = await this.browser.newPage();
@@ -288,14 +320,11 @@ export class Profiler {
         waitUntil: 'domcontentloaded',
         timeout: 60000,
       });
-      await page.waitForSelector('#char-name', { timeout: 60000 });
-      await page.$eval('#char-name', (el) => {
-        el.value = 'Probe';
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        el.dispatchEvent(new Event('change', { bubbles: true }));
-      });
-      await page.$eval(`#offline-select .mini-class[data-class="${cls}"]`, (el) => el.click());
-      await page.$eval('#btn-start-offline', (el) => el.click());
+      // Canonical entry flow (scripts/enter_offline_game.mjs): Play Offline ->
+      // name -> class -> Enter World -> Welcome Screen Continue -> intro/tutorial
+      // dismissal. The Welcome Screen (#ws-continue) has gated world entry since
+      // the v0.27.0 merge; driving it by hand here would drift again.
+      await enterOfflineGame(page, { charClass: cls, charName: 'Probe', settleMs: 0 });
     } else {
       const u = `prof_cam_${this.uniq}`;
       await api(
@@ -340,7 +369,10 @@ export class Profiler {
         timeout: 12000,
         polling: 200,
       });
-      const nm = `Pcam${this.uniq}`;
+      // Character names accept letters only; the profiler uniqueness token is
+      // timestamp-derived and normally contains digits. Map those digits to
+      // stable letters so the real client validation reaches createCharacter.
+      const nm = `Pcam${characterNameToken(this.uniq)}`;
       await page.evaluate(
         (nm, cls) => {
           const n = document.querySelector('#new-char-name');
@@ -364,12 +396,56 @@ export class Profiler {
           row?.querySelector('.enter-world-btn') ?? document.querySelector('.enter-world-btn')
         )?.click();
       }, nm);
+      // The post-login Welcome Screen gates world entry (index.html only): click
+      // through Continue once the world connection enables it. No-op where absent.
+      await page
+        .waitForSelector('#ws-continue:not([disabled])', { visible: true, timeout: 20000 })
+        .catch(() => {});
+      await page.evaluate(() => {
+        const btn = document.querySelector('#ws-continue');
+        if (btn && !btn.disabled) btn.click();
+      });
     }
-    await page.waitForFunction(() => window.__game?.world?.player && window.__game?.perf?.report, {
-      timeout: 30000,
-      polling: 300,
-    });
+    try {
+      await page.waitForFunction(
+        () => window.__game?.world?.player && window.__game?.perf?.report,
+        {
+          timeout: 30000,
+          polling: 300,
+        },
+      );
+    } catch (err) {
+      // Dump the boot state on timeout: a silent stall here (start panel still up,
+      // Welcome Screen uncontinued, loading screen stuck) is otherwise undebuggable.
+      const state = await page
+        .evaluate(() => ({
+          hasGame: Boolean(window.__game),
+          welcomeVisible: (() => {
+            const ws = document.querySelector('#welcome-screen');
+            return ws ? getComputedStyle(ws).display !== 'none' : null;
+          })(),
+          wsContinueDisabled: document.querySelector('#ws-continue')?.disabled ?? null,
+          loadingVisible:
+            document.querySelector('#loading-screen')?.classList.contains('visible') ?? null,
+          loadingStatus: document.querySelector('#ls-status')?.textContent ?? '',
+          fatalText: document.querySelector('#fatal-overlay, .fatal-overlay')?.textContent ?? '',
+          startScreenDisplay: document.querySelector('#start-screen')?.style.display ?? '',
+        }))
+        .catch(() => 'evaluate failed');
+      throw new Error(`Timed out waiting for world boot: ${JSON.stringify(state)}`, {
+        cause: err,
+      });
+    }
     await sleep(1500);
+    // The camera-choice prompt is scheduled after the loading fade. With a
+    // zero-settle canonical entry there can be a brief overlay-free gap where
+    // dismissEntryOverlays returns, followed by the prompt appearing later and
+    // suspending movement mid-scenario (the play route then stalls near spawn).
+    // Re-dismiss after the world settle, immediately before profiling begins.
+    await page.evaluate(() => {
+      document.querySelector('button.tut-skip')?.click();
+      document.querySelector('.camera-prompt-confirm')?.click();
+    });
     await page.evaluate(COLLECTOR);
     this.center = await page.evaluate(() => ({
       x: window.__game.world.player.pos.x,
@@ -471,19 +547,26 @@ export class Profiler {
     if (this.mode !== 'online') throw new Error('spawnCrowd needs online mode');
     const c = this.center;
     const batch = [];
-    for (let i = this.bots.length; i < n; i++)
-      batch.push(new Bot(this.server, this.wsBase, this.uniq, i));
-    await Promise.all(
-      batch.map((b) =>
-        b
-          .join()
-          .then(() => {
-            b.place(c.x, c.z, radius);
-            this.bots.push(b);
-          })
-          .catch((e) => this.log(`  bot ${b.i}: ${String(e).slice(0, 60)}`)),
-      ),
-    );
+    const missing = Math.max(0, n - this.bots.length);
+    for (let count = 0; count < missing; count++)
+      batch.push(new Bot(this.server, this.wsBase, this.uniq, this.nextBotIndex++));
+    for (let start = 0; start < batch.length; start += BOT_JOIN_CONCURRENCY) {
+      const chunk = batch.slice(start, start + BOT_JOIN_CONCURRENCY);
+      await Promise.all(
+        chunk.map((b) =>
+          b
+            .join()
+            .then(() => {
+              b.place(c.x, c.z, radius);
+              this.bots.push(b);
+            })
+            .catch((e) => {
+              b.close();
+              this.log(`  bot ${b.i}: ${String(e).slice(0, 60)}`);
+            }),
+        ),
+      );
+    }
     for (const b of this.bots) b.place(c.x, c.z, radius);
     return this.bots.length;
   }
@@ -572,8 +655,42 @@ export class Profiler {
       } catch {
         /* ignore */
       }
-      return { x: p.pos.x, z: p.pos.z, zone };
+      const visible = (selector) => {
+        const el = document.querySelector(selector);
+        return Boolean(el && getComputedStyle(el).display !== 'none');
+      };
+      return {
+        x: p.pos.x,
+        z: p.pos.z,
+        zone,
+        suspended: Boolean(g.input?.suspendMovement),
+        modal: Boolean(g.hud?.isModalOpen?.()),
+        cameraPrompt: visible('#camera-mode-prompt, .camera-prompt'),
+        tutorial: visible('.tutorial-overlay, #tutorial-overlay'),
+        activeElement: document.activeElement?.id || document.activeElement?.tagName || '',
+      };
     });
+  }
+
+  // A first-run prompt can be scheduled after the spawn cinematic, i.e. after
+  // enter() already dismissed overlays. Re-check during traversal so a delayed
+  // tutorial/camera prompt cannot silently turn a 60s route into a stationary
+  // benchmark. Only known entry overlays are touched; unexpected modals remain
+  // visible and are reported by _pos instead of being hidden by the profiler.
+  async _dismissTraversalOverlays() {
+    const dismissed = await this.page.evaluate(() => {
+      let count = 0;
+      for (const selector of ['button.tut-skip', '.camera-prompt-confirm']) {
+        const button = document.querySelector(selector);
+        if (button && getComputedStyle(button).display !== 'none') {
+          button.click();
+          count++;
+        }
+      }
+      return count;
+    });
+    if (dismissed > 0) await this.setMove({ forward: true });
+    return dismissed;
   }
   async _face(f) {
     await this.page.evaluate((f) => {
@@ -634,6 +751,7 @@ export class Profiler {
     const trail = [];
     while (performance.now() - t0 < ms) {
       await sleep(2500);
+      await this._dismissTraversalOverlays();
       const pos = await this._pos();
       const moved = Math.hypot(pos.x - last.x, pos.z - last.z);
       trail.push({
@@ -643,6 +761,12 @@ export class Profiler {
         zone: pos.zone,
       });
       if (moved < 2.5) {
+        if (pos.suspended || pos.modal) {
+          this.log(
+            `  INPUT BLOCKED suspended=${pos.suspended} modal=${pos.modal} ` +
+              `camera=${pos.cameraPrompt} tutorial=${pos.tutorial} active=${pos.activeElement}`,
+          );
+        }
         // stuck on terrain/water: escalate the turn each consecutive stall so it
         // breaks free instead of hugging the same wall
         stuck++;
@@ -725,6 +849,7 @@ export class Profiler {
     const events = [];
     const trail = [];
     while (performance.now() - t0 < ms) {
+      await this._dismissTraversalOverlays();
       await this.page.keyboard.press(keys[k++ % keys.length]); // cast the next ability
       if (tick % 2 === 0) await this.jump();
       if (tick % 3 === 0)
@@ -742,6 +867,12 @@ export class Profiler {
         zone: pos.zone,
       });
       if (moved < 2.5) {
+        if (pos.suspended || pos.modal) {
+          this.log(
+            `  INPUT BLOCKED suspended=${pos.suspended} modal=${pos.modal} ` +
+              `camera=${pos.cameraPrompt} tutorial=${pos.tutorial} active=${pos.activeElement}`,
+          );
+        }
         stuck++;
         facing += 1.7 + stuck * 0.6;
         await this._face(facing);

@@ -58,7 +58,8 @@ describe('Cauterize', () => {
 
   it('the burn ticks 5% max HP per second while it rides', () => {
     const { sim, p } = mage('fire');
-    hit(sim, enemy(sim), p, 999_999);
+    // Keep the burn isolated from an active mob's ordinary melee swings.
+    hit(sim, null, p, 999_999);
     const afterSave = p.hp; // 2500
     for (let i = 0; i < 20; i++) sim.tick(); // 1 second -> one 5% tick
     expect(afterSave - p.hp).toBe(Math.round(p.maxHp * 0.05)); // 500 burned

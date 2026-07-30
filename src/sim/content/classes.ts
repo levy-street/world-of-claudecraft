@@ -2849,7 +2849,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     spendsCombo: true,
-    effects: [{ type: 'dot', total: 96, duration: 16, interval: 2 }],
+    // 16 base + 16/combo point: totals 96 at 5 combo points, same max payoff as
+    // the old flat total, but now scales with combo points banked like every
+    // other finisher in this kit.
+    // Deliberate divergence from classic Rupture, which scales its DURATION
+    // with combo points (8 sec plus 2 sec per point) at a roughly flat per-tick
+    // value. This world's 1 to 20 level band compresses fight lengths, so a
+    // fixed 16 sec window with a combo-scaled tick reads better and keeps the
+    // bleed comparable to the other finishers here. Do not "fix" it back to
+    // duration scaling without retuning the whole rogue bleed budget.
+    effects: [{ type: 'dot', total: 16, duration: 16, interval: 2, perCombo: 16 }],
     description: 'Finishing move that wounds the target, causing it to bleed for $d over 16 sec.',
   },
   vanish: {
@@ -4948,7 +4957,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     spendsCombo: true,
     requiresForm: 'cat',
-    effects: [{ type: 'dot', total: 60, duration: 12, interval: 2 }],
+    // 10 base + 10/combo point: totals 60 at 5 combo points, same max payoff as
+    // the old flat total, but now scales with combo points banked like every
+    // other finisher in this kit.
+    effects: [{ type: 'dot', total: 10, duration: 12, interval: 2, perCombo: 10 }],
     description:
       'Finishing move that causes $d Bleed damage over 12 sec. Consumes combo points. Wolf Form only.',
   },
@@ -6322,7 +6334,12 @@ function scaleEffect(
       // fraction again would double-apply the talent/global damage modifier.
       return eff.directPct
         ? { ...eff }
-        : { ...eff, total: Math.round(eff.total * dmgMult * dotMult + flat) };
+        : {
+            ...eff,
+            total: Math.round(eff.total * dmgMult * dotMult + flat),
+            perCombo:
+              eff.perCombo === undefined ? undefined : Math.round(eff.perCombo * dmgMult * dotMult),
+          };
     case 'aoeDamage':
     case 'aoeHeal':
       return {
@@ -6440,7 +6457,12 @@ function scaleEffect(
 // mods stack on top and also tune cost / cast time / cooldown.
 function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   const am = mods.abilities[entry.def.id];
-  const physical = entry.def.school === 'physical';
+  // The melee bucket also covers hunter's ranged-AP shots regardless of magic school:
+  // `scalesWith: 'ranged'` is exclusively set on hunter abilities (arcane_shot, serpent_sting,
+  // and wyvern_sting are non-physical), so this widening cannot reach any other class's
+  // melee/spell split. Without it, Marksmanship's Iron Aim ("ranged ability damage") silently
+  // never applied to Arcane Shot, the spec's arcane-school nuke.
+  const physical = entry.def.school === 'physical' || entry.def.scalesWith === 'ranged';
   const globalDmg = physical ? mods.global.meleeDmgPct : mods.global.spellDmgPct;
   const dmgMult = 1 + globalDmg + (am?.dmgPct ?? 0);
   const healMult = 1 + mods.global.healPct + (am?.dmgPct ?? 0);

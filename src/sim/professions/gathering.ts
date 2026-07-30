@@ -87,16 +87,49 @@ export const NODE_MATERIAL_TABLE: Record<
     eastbrook_vale: { itemId: 'copper_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
     mirefen_marsh: { itemId: 'iron_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
     thornpeak_heights: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    veiled_hollow: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    drakelands: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    frostveil: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    amberfall: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    willowfen: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    nightbloom: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    wraithwood: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    galecrest: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    palmreach: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    evergarden: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    farshore_isle: { itemId: 'iron_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
   },
   wood: {
     eastbrook_vale: { itemId: 'ironbark_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
     mirefen_marsh: { itemId: 'ashwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
     thornpeak_heights: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    veiled_hollow: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    drakelands: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    frostveil: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    amberfall: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    willowfen: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    nightbloom: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    wraithwood: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    galecrest: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    palmreach: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    evergarden: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    farshore_isle: { itemId: 'ashwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
   },
   herb: {
     eastbrook_vale: { itemId: 'silverleaf_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
     mirefen_marsh: { itemId: 'goldleaf_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
     thornpeak_heights: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    veiled_hollow: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    drakelands: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    frostveil: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    amberfall: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    willowfen: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    nightbloom: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    wraithwood: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    galecrest: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    palmreach: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    evergarden: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
+    farshore_isle: { itemId: 'goldleaf_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
   },
 };
 
@@ -763,9 +796,10 @@ export function harvestFamilyYieldsItem(component: string): boolean {
  * silence. No new string, no new event, no new wire or IWorld member.
  *
  * Deliberately NOT a narrowing inside effectiveFocusComponents: this one moves
- * nothing on a MIXED corpse, so the concentration-bonus denominator
- * (`taggedComponents.length - effectiveChosen.length`) and the #2509 refusal are
- * untouched on all nine of them. The one knock-on it does have is wanted:
+ * nothing on a MIXED corpse, so the concentration bonus and the #2509 refusal
+ * were untouched on all nine of them. (#2514 has since moved that bonus on
+ * purpose, in yieldingFocusComponents below; this predicate still moves
+ * nothing on a mixed corpse.) The one knock-on it does have is wanted:
  * pruneCorpseLoot (loot/loot_roll.ts) reads the same predicate, so an emptied
  * all-unmapped corpse now takes the fast collapse arm instead of holding a
  * 30-second grace window open for a harvest that can never come.
@@ -790,9 +824,16 @@ export function resolveCorpseHarvest(currentClaimedBy: number | null, pid: numbe
 // Per-corpse focus picker (#1142): concentrate vs spread tradeoff.
 //
 // At a harvestable corpse the player chooses which tagged component(s) to
-// extract. Choosing FEWER components concentrates the effort and yields a
+// extract. Extracting FEWER components concentrates the effort and yields a
 // measurably higher tier per component than spreading across every tagged
 // type on the same corpse.
+//
+// "Extracting", not "choosing", and the difference is #2514's whole ruling: a
+// tagged family with no item behind it is never extracted, so checking or
+// unchecking it changes nothing. On a corpse carrying exactly ONE mapped
+// family that leaves no choice at all, and every legal pick there lands the
+// same outcome. harvestConcentrationBonus below owns that rule and states it
+// in full.
 
 /** Component yield tiers, worst to best. Independent of `ItemDef['quality']`
  * (a harvest yield is a raw material, not necessarily an equippable item),
@@ -812,8 +853,11 @@ export const HARVEST_TIERS: readonly HarvestTier[] = [
 
 // Base per-tier roll weights (poor..legendary), used unshifted when the player
 // spreads across every tagged component on the corpse (zero concentration).
-// Tune here, not inline in the roll.
-const BASE_TIER_WEIGHTS: readonly number[] = [40, 30, 15, 10, 4, 1];
+// Tune here, not inline in the roll. Exported so tests can pin the table and
+// derive the expected yield per bonus from it rather than hard-coding a second
+// copy of these numbers (the #2514 content-shape guard in
+// tests/mob_component_tags.test.ts does exactly that).
+export const BASE_TIER_WEIGHTS: readonly number[] = [40, 30, 15, 10, 4, 1];
 
 export interface FocusHarvestYield {
   readonly component: string;
@@ -841,8 +885,11 @@ export interface FocusHarvestYield {
  *     roll two signed yields (#2474).
  *   - A tag the corpse does not carry counts for NOTHING. Measured against the
  *     raw count it padded the pick past the `>= taggedComponents.length` spread
- *     threshold, so `['hide','junk']` on a two-tag corpse spread across every
- *     family at bonus 0 where `['hide']` concentrates on hide (#2504).
+ *     threshold, so `['hide','junk']` on a two-tag ALL-MAPPED corpse spread
+ *     across every family at bonus 0 where `['hide']` concentrates on hide
+ *     (#2504). The bonus-0 half of that is archaeology on a mixed corpse, where
+ *     the spread carries a bonus of its own (#2514); the sanitization it
+ *     describes is unchanged on every shape.
  * After the narrowing that second test can only ever be an equality: `picked`
  * is a deduped subset of the tags, so it can exceed their count only if the
  * tags themselves repeat, which tests/mob_component_tags.test.ts forbids. That
@@ -861,10 +908,14 @@ export interface FocusHarvestYield {
  * same frame already spread. Scope, so the sentence above is not read as more
  * than it is: this covers a tag the corpse does not CARRY. A tag it carries
  * that HARVEST_COMPONENT_ITEMS does not map (claw, tusk, gills, horn) is a
- * different case and is handled a different way: it stays in the pick here,
- * because dropping it would move the concentration-bonus denominator below,
- * and the command boundary REFUSES the harvest pre-claim when the surviving
- * pick maps to no item at all (#2509, src/sim/interaction.ts harvestCorpse).
+ * different case and is still handled a different way: it survives THIS
+ * function, because two later readers need to see it. The command boundary
+ * REFUSES the harvest pre-claim when the surviving pick maps to no item at all
+ * (#2509, forfeitsEveryMappedYield and src/sim/interaction.ts harvestCorpse),
+ * and that refusal is only expressible over a pick that still names the
+ * unmapped families. Only then is it dropped, by yieldingFocusComponents
+ * (#2514), which is what the tier rolls and the concentration bonus read: an
+ * unmapped family is never extracted, so it never dilutes the bonus.
  *
  * First occurrence wins (Set iteration is insertion-ordered) and the narrowing
  * preserves that order, so tag ORDER is untouched: it is the order the yields,
@@ -925,18 +976,162 @@ export function forfeitsEveryMappedYield(
 }
 
 /**
- * Resolve a per-corpse focus harvest: one independent tier roll per chosen
- * component, each roll's weight table shifted upward by a concentration bonus.
+ * The families a focus pick actually EXTRACTS: the effective pick, minus every
+ * family HARVEST_COMPONENT_ITEMS does not map. This is the set the tier rolls,
+ * the grants and the pre-claim capacity gate all iterate, so a family with no
+ * item behind it costs no rng draw and produces no yield entry.
+ *
+ * #2514, and the ruling is stated in full on harvestConcentrationBonus below.
+ * Deliberately a SECOND function rather than a narrowing folded into
+ * effectiveFocusComponents: that one answers "what did the player's pick name,
+ * once sanitized", which is what #2509's forfeitsEveryMappedYield refusal and
+ * the spread threshold are both written against, and folding this in would
+ * silently retire that refusal (an all-unmapped pick would sanitize to the
+ * empty pick and spread, exactly the silent claim-burning #2509 closed).
+ */
+export function yieldingFocusComponents(
+  taggedComponents: readonly string[],
+  chosen: readonly string[],
+): readonly string[] {
+  return effectiveFocusComponents(taggedComponents, chosen).filter(harvestFamilyYieldsItem);
+}
+
+/**
+ * The concentration bonus one focus pick earns: how much of this corpse's
+ * breadth the harvest gives up, in tier shifts, clamped to
+ * `[0, HARVEST_TIERS.length - 1]`.
+ *
+ * THE #2514 RULING, next to the formula it governs. The bonus counts families
+ * the harvest could not extract, and a family with no item behind it (claw,
+ * tusk, gills, horn) is NEVER extracted, whether or not the player checked it.
+ * So it is always forfeited breadth: the numerator is yieldingFocusComponents,
+ * not the raw effective pick.
+ *
+ * Before: the numerator was the effective pick itself, so checking Claw beside
+ * Hide on old_greyjaw (hide, fang, claw) cost a full tier on hide and returned
+ * nothing for claw. Measured at seed 5, `['hide']` gave bonus 2 (rough_hide 4
+ * plus a signed pristine_hide) and `['hide','claw']` gave bonus 1 (rough_hide 3):
+ * the player paid a tier and a specimen roll to tick a box that can only ever
+ * come back empty. Nine shipped templates mix mapped and unmapped families and
+ * on sethrael_palecoil (hide, claw, horn) two of the three boxes carried that
+ * cost. After: `['hide','claw']` is byte-identical to `['hide']`.
+ *
+ * Why THIS numerator and not a matching move of the denominator to the mapped
+ * tag count: the denominator is the corpse's ADVERTISED breadth, what it
+ * carries, and that half is not new. It has read `taggedComponents.length`
+ * since #1142, so "an extra tag is worth an extra tier to whoever concentrates"
+ * was already the shipped rule: `['hide']` on old_greyjaw (3 tags) is bonus 2
+ * today where `['hide']` on forest_wolf (2 tags) is bonus 1. #2514 does not
+ * introduce that, it extends it to the picks that were paying for breadth they
+ * never received. Moving the denominator too would make the single-mapped
+ * shapes (the three `gills, hide` murlocs, sethrael_palecoil) permanently
+ * bonus-0, a NERF on the very templates this issue is about, and it would make
+ * the bonus SHRINK when content ships.
+ *
+ * The tension with #2513, stated rather than left for a reader to find: that
+ * issue called an unmapped tag inert data and masked a corpse made of nothing
+ * else. Here an unmapped tag is not inert, it is breadth the harvest cannot
+ * reach, and it raises the bonus. Both readings are the same rule seen from two
+ * sides (a family with no item is never extracted), and the two never disagree
+ * about the same question: #2513 answers "is there anything here", #2514
+ * answers "how much of what is here does this pick give up".
+ *
+ * The knock-on that ruling has, and its guard: adding a decorative unmapped tag
+ * to a mob is a balance edit, because it widens the denominator. Bounded on
+ * shipped content, where a corpse's default harvest still pays no more than it
+ * would if every tag it carries had an item behind it, and pinned as exactly
+ * that property (tests/mob_component_tags.test.ts), which reds on the first
+ * template shaped so it would not. The bound is a property of the shape
+ * (tag count vs mapped count), not of the change, so it is checked rather than
+ * assumed.
+ *
+ * As written the change is bounded on both sides, which is the balance
+ * argument for making it at all:
+ *   - No ceiling moves. Every pick a caller can actually harvest on has
+ *     `extracted.length >= 1` (the #2509 and #2513 refusals take the rest,
+ *     BEFORE this is asked), so its bonus never exceeds `tags.length - 1`,
+ *     which is exactly the bonus a player who already knew which rows were dead
+ *     got today by checking one box. That bound is a statement about the gated
+ *     call sites, not about this function: asked raw about a pick that extracts
+ *     nothing (`(['hide','fang','claw'], ['claw'])`, or any pick on an
+ *     all-unmapped corpse) it answers `tags.length`, one above the bound, and
+ *     resolveCorpseFocusHarvest then rolls nothing at all with it.
+ *   - No pick's EXPECTED value gets worse. `extracted` is a subset of the
+ *     effective pick, so the new bonus is >= the old one for every pick on
+ *     every corpse. Per-seed outcomes are a different statement and a weaker
+ *     one: the draw position moves (next bullet), so a given seed can land a
+ *     smaller plain stack than it used to. One of the re-measured literals is
+ *     exactly that (mudfin_murloc at seed 5: rough_hide 4 and no specimen
+ *     before, rough_hide 3 plus a signed pristine_hide after).
+ *   - The eight all-mapped tagged templates and the 101 untagged ones do not
+ *     move at all: with nothing to filter, `extracted` IS the effective pick.
+ *   - Only tier QUANTITY moves. The signed/specimen jackpot comes from
+ *     rollCorpseMaterialRarity, a fixed-baseline roll this bonus never feeds,
+ *     and it is already drawn once per granted family. What does move is the
+ *     draw POSITION: an unmapped family no longer burns a tier roll, and
+ *     ctx.rng is the WORLD's single stream, not a per-corpse one, so the first
+ *     mixed-corpse harvest after this ships re-phases every draw that follows
+ *     it in that world. Determinism is untouched (same seed plus same command
+ *     sequence gives the same world) and no golden or replay drives
+ *     harvestCorpse, so nothing downstream is pinned to the old phase; what it
+ *     means in practice is that which harvests happen to mint a specimen is
+ *     reshuffled symmetrically rather than made more or less likely.
+ *   - It is self-healing. The day claw/tusk/gills/horn get items, every number
+ *     returns to today's, with no code change.
+ *
+ * What is deliberately retired, because "the equivalence survives" must not be
+ * read as "nothing moved": on a mixed corpse bonus 0, the unshifted
+ * BASE_TIER_WEIGHTS roll #1141 shipped as the spread, is no longer REACHABLE.
+ * The widest pick available on those nine templates is now bonus 1 (2 on
+ * sethrael_palecoil), because part of their breadth is unreachable content. On
+ * the four templates carrying exactly one mapped family (the three murlocs and
+ * sethrael_palecoil) that collapses every legal pick to one identical outcome,
+ * so the picker there stops being a choice, which is honest: a picker offering
+ * one live row and one dead one never was one.
+ *
+ * The "an explicit full cover spreads exactly like an empty pick" equivalence
+ * SURVIVES, and is pinned: both still collapse to `taggedComponents` inside
+ * effectiveFocusComponents, so both extract the same set and earn the same
+ * bonus. It also WIDENS: on a mixed corpse a cover of just the mapped families
+ * now lands in the same class (old_greyjaw `[]`, `['hide','fang','claw']` and
+ * `['hide','fang']` are one world). What moved is the value the class shares
+ * (old_greyjaw: bonus 0 before, bonus 1 now), not the equality.
+ */
+export function harvestConcentrationBonus(
+  taggedComponents: readonly string[],
+  chosen: readonly string[],
+): number {
+  return concentrationBonusFor(
+    taggedComponents.length,
+    yieldingFocusComponents(taggedComponents, chosen).length,
+  );
+}
+
+/** The clamp itself, so the exported reader above and any future caller cannot
+ *  write two copies of the tier ceiling. The NUMERATOR is not shared here: the
+ *  roll below asks harvestConcentrationBonus itself, which is what actually
+ *  keeps the client's `concentrated` hint and the sim's bonus from diverging.
+ *  Sharing only the clamp would let a second exclusion reason land in one and
+ *  not the other, with nothing to red. */
+function concentrationBonusFor(taggedCount: number, extractedCount: number): number {
+  return Math.max(0, Math.min(HARVEST_TIERS.length - 1, taggedCount - extractedCount));
+}
+
+/**
+ * Resolve a per-corpse focus harvest: one independent tier roll per EXTRACTED
+ * component, each roll's weight table shifted upward by the concentration bonus
+ * above.
  *
  * Formula (monotonic, documented, no invented balance numbers beyond the base
- * weight table above): `bonus = taggedComponents.length - effectiveChosen.length`,
- * clamped to `[0, HARVEST_TIERS.length - 1]`. Each component's tier index is
- * `min(rolledIndex + bonus, HARVEST_TIERS.length - 1)`. Choosing every tagged
- * component gives `bonus = 0` (an unshifted roll, the pre-#1142 "spread"
- * behavior); choosing strictly fewer components out of the same tagged set
- * can only raise the shift, never lower it, so concentrating on fewer
- * components always yields an equal-or-higher expected tier per component
- * than spreading wider on the same corpse.
+ * weight table above): each component's tier index is
+ * `min(rolledIndex + bonus, HARVEST_TIERS.length - 1)`. Covering every tagged
+ * component on a corpse whose tags ALL map to an item gives `bonus = 0` (an
+ * unshifted roll, the pre-#1142 "spread" behavior); choosing strictly fewer
+ * components out of the same tagged set can only raise the shift, never lower
+ * it, so concentrating on fewer components always yields an equal-or-higher
+ * expected tier per component than spreading wider on the same corpse. On a
+ * corpse that also carries an unmapped family, bonus 0 is unreachable: see the
+ * ruling on harvestConcentrationBonus above, which owns that.
  *
  * Backward compatibility: an empty `chosen` (no selection made) or a `chosen`
  * that covers every tagged component both default to spreading across all of
@@ -944,20 +1139,25 @@ export function forfeitsEveryMappedYield(
  * `chosen` naming only tags this corpse does not carry sanitizes to the empty
  * pick, and spreads for that same reason (#2504); see effectiveFocusComponents.
  *
- * Pure: draws only from the passed-in `Rng`, one draw per yielded component,
- * in `effectiveChosen` order.
+ * Pure: draws only from the passed-in `Rng`, one draw per EXTRACTED component
+ * (#2514: an unmapped family costs no draw at all), in
+ * `yieldingFocusComponents` order. That filter imposes no order of its own, so
+ * this is still the effective pick's order: a strict subset yields in the
+ * PICK's order and the spread arm in the corpse's tag order, which is the order
+ * the grants and the harvestResult ledger land in (#2457).
  */
 export function resolveCorpseFocusHarvest(
   taggedComponents: readonly string[],
   chosen: readonly string[],
   rng: Rng,
 ): FocusHarvestYield[] {
-  const effectiveChosen = effectiveFocusComponents(taggedComponents, chosen);
-  const bonus = Math.max(
-    0,
-    Math.min(HARVEST_TIERS.length - 1, taggedComponents.length - effectiveChosen.length),
-  );
-  return effectiveChosen.map((component) => ({ component, tier: rollFocusTier(rng, bonus) }));
+  const extracted = yieldingFocusComponents(taggedComponents, chosen);
+  // The exported reader, not a second numerator that happens to agree today:
+  // its one other caller is the picker's view-core, and a hint that disagreed
+  // with the roll would be a lie with nothing to red. One extra pure call on a
+  // cold command path, no rng touched.
+  const bonus = harvestConcentrationBonus(taggedComponents, chosen);
+  return extracted.map((component) => ({ component, tier: rollFocusTier(rng, bonus) }));
 }
 
 /** How many of the mapped item a yielded tier grants: 1 (poor) through 6 (legendary). */

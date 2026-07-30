@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  hasAuthoritativeSelfPositionDiscontinuity,
   SELF_MOTION_CAP_MAX_MS,
   SELF_MOTION_CAP_MIN_MS,
   SELF_MOTION_SNAP_DIST_SQ,
   type SelfMotionFrame,
   SelfMotionPredictor,
+  updateSelfRenderFallback,
 } from '../src/render/self_motion';
 import { Sim } from '../src/sim/sim';
 import { type Entity, type MoveInput, RUN_SPEED } from '../src/sim/types';
@@ -158,6 +160,71 @@ class Lab {
 }
 
 describe('SelfMotionPredictor', () => {
+  it('recognizes only the local completed-unstuck event as an authoritative discontinuity', () => {
+    const completed = {
+      type: 'unstuck',
+      phase: 'completed',
+      pid: 7,
+      reason: 'nearest_graveyard',
+      area: { kind: 'overworld', id: 'eastbrook_vale' },
+      origin: { x: 0, y: 0, z: 0, localX: 0, localZ: 0 },
+      destination: { x: 0, y: 0, z: 4, localX: 0, localZ: 4 },
+      duration: 10,
+      distance: 4,
+    } as const;
+    expect(hasAuthoritativeSelfPositionDiscontinuity([completed], 7)).toBe(true);
+    expect(hasAuthoritativeSelfPositionDiscontinuity([completed], 8)).toBe(false);
+    expect(
+      hasAuthoritativeSelfPositionDiscontinuity(
+        [{ type: 'unstuck', phase: 'countdown', seconds: 4 }],
+        7,
+      ),
+    ).toBe(false);
+  });
+
+  it('snaps both predictive and fallback poses on a sub-threshold authoritative recovery', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+    teleport(sim, 0, -40);
+    const self = {
+      ...sim.player,
+      pos: { ...sim.player.pos },
+      prevPos: { ...sim.player.prevPos },
+    };
+    const frame: SelfMotionFrame = {
+      enabled: true,
+      moveInput: mi({ forward: true }),
+      displayFacing: 0,
+      echoMs: 100,
+      jitterMs: 0,
+      alpha: 1,
+      frameDt: 0.05,
+    };
+    const predictive = new SelfMotionPredictor(SEED);
+    const ordinary = new SelfMotionPredictor(SEED);
+    for (let i = 0; i < 2; i++) {
+      predictive.step(self, frame);
+      ordinary.step(self, frame);
+    }
+
+    // Four yards is deliberately below the renderer's normal six-yard snap
+    // threshold. The explicit completed-unstuck discontinuity must still win.
+    self.pos = { ...self.pos, z: self.pos.z + 4 };
+    self.prevPos = { ...self.pos };
+    const ordinaryPose = ordinary.step(self, frame);
+    const snappedPose = predictive.step(self, frame, true);
+    expect(Math.abs((ordinaryPose?.z ?? self.pos.z) - self.pos.z)).toBeGreaterThan(0.1);
+    expect(snappedPose).toEqual(self.pos);
+    expect(predictive.leadMs).toBe(0);
+
+    const fallbackPose = { x: 0, y: 0, z: 0 };
+    updateSelfRenderFallback(fallbackPose, 0, 0, 4, true, 1 / 60, true, false);
+    expect(fallbackPose.z).toBeGreaterThan(0);
+    expect(fallbackPose.z).toBeLessThan(4);
+    fallbackPose.z = 0;
+    updateSelfRenderFallback(fallbackPose, 0, 0, 4, true, 1 / 60, true, true);
+    expect(fallbackPose).toEqual({ x: 0, y: 0, z: 4 });
+  });
+
   it('moves the pose the moment intent is pressed, long before the server does', () => {
     const lab = new Lab(120);
     lab.frame();

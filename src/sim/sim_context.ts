@@ -21,6 +21,8 @@ import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { MobScanCounters } from './mob/scan_counters';
 import type { PendingProjectile } from './projectile_travel';
+import type { NaturalRiftPortal } from './rift/portals';
+import type { RiftEvent, RiftInstance } from './rift/types';
 import type { Rng } from './rng';
 import type {
   ArenaMatch,
@@ -52,6 +54,7 @@ import type {
   Entity,
   EquipSlot,
   ErrorReason,
+  EscortRunState,
   GatherNodeDef,
   ItemInstancePayload,
   PendingResurrection,
@@ -123,6 +126,24 @@ export interface SimContextPrimitives {
   // Session-only manual-reset cooldowns keyed by durable character identity and
   // dungeon id. Unlike party instance keys, these survive relogs and party reforming.
   readonly dungeonResetLocks: Map<string, { availableAt: number; claimId: number }>;
+  // Procedural Rift instance pool (seeded in the Sim ctor). Live view: the backing
+  // array stays Sim-owned; rift/runs.ts mutates slot fields in place.
+  readonly riftInstances: RiftInstance[];
+  // Shared natural-world Rift events. Multiple group instances can point at one
+  // eventId; race.ts performs the authoritative first-clear claim in place.
+  readonly riftEvents: RiftEvent[];
+  nextRiftInstanceId: number;
+  // rift-portal registry, appended to on rift_portal spawn; null until built.
+  // Read-write: rift/runs.ts lazily assigns the array on first build (like dungeonDoorIds).
+  riftPortalIds: number[] | null;
+  // Open world-spawned ranked rift portals (rift/portals.ts scheduler). Live view:
+  // the backing array stays Sim-owned, mutated in place (push/splice).
+  readonly naturalRiftPortals: NaturalRiftPortal[];
+  // Natural-portal spawn ordinal: seeds each spawn's dedicated Rng and paces the
+  // sim-time cadence. Read-write (the scheduler increments it).
+  riftPortalSpawnCount: number;
+  // Deterministically sampled next scheduler deadline (sim seconds).
+  riftPortalNextAt: number;
   // live arena bouts keyed by every participant pid (A2); release-spirit early-bails
   // when the dead player is mid-bout.
   readonly arenaMatches: Map<number, ArenaMatch>;
@@ -142,6 +163,10 @@ export interface SimContextPrimitives {
   // temporary host-owned tick profiler probe); the rest defaulted.
   readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
     Pick<SimConfig, 'world' | 'perfLap'>;
+  // Per-Sim key for the rift collision registry in colliders.ts (rift/runs.ts
+  // registers regions under it, rift-aware collision reads pass it). Per INSTANCE,
+  // not per seed: two same-seed Sims in one process must stay isolated.
+  readonly riftCollisionToken: number;
   // A2 duel + arena state. Live views: the backing fields stay on Sim (mutated in
   // place / reassigned), like E1's delayedEvents. The three queues are REASSIGNED by
   // the matchmaker's filter, so they are read-write; the maps/set and the match-id
@@ -160,6 +185,9 @@ export interface SimContextPrimitives {
   arenaQueueYumi5: ArenaQueueUnit[];
   readonly yumiBusySlots: Set<number>;
   readonly yumiCatMatches: Map<number, ArenaMatch>;
+  // Escort quest runs keyed by EscortDef id (src/sim/escort.ts owns every
+  // mutation; the backing map stays on Sim). Live view.
+  readonly escortRuns: Map<string, EscortRunState>;
   // I2a delve runs: the live run pool (seeded in the Sim ctor, never reassigned) and
   // the transient pet stash both stay Sim-owned (the disconnect path + serializePet
   // poke them); exposed here as live views the run module reads/mutates in place.
@@ -276,6 +304,19 @@ export interface SimContextCallbacks {
   leaveDungeon(pid?: number): boolean;
   resetDungeonInstances(pid?: number): void;
   inheritDungeonResetLocks(pid: number): void;
+  // Procedural Rift entry/exit (dev command + interaction click path). The per-tick
+  // drivers (updateRiftTriggers/updateRiftInstances) are called directly from tick();
+  // these two are on the seam so foreign callers reach them through ctx.
+  enterRift(
+    seed: number,
+    baseLevel: number,
+    pid?: number,
+    returnPos?: { x: number; z: number },
+    portal?: Entity,
+  ): void;
+  leaveRift(pid?: number): void;
+  /** Open an off-path hidden rift treasure chest (interact -> loot, no lockpick). */
+  riftOpenTreasure(objectId: number, pid?: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void;
   awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void;
@@ -302,7 +343,7 @@ export interface SimContextCallbacks {
     // the Chronomancy Temporal Echo conversion; area Arcane damage heals the
     // marked ally at a reduced rate. Defaults false.
     aoe?: boolean,
-  ): void;
+  ): number;
   handleDeath(entity: Entity, killer: Entity | null): void;
   cancelCast(entity: Entity): void;
   pushbackCast(entity: Entity): void;
@@ -580,6 +621,18 @@ export interface SimContextCallbacks {
   swingIntervalMult(e: Entity): number;
   mobCanSwim(template: { family?: string; canSwim?: boolean } | undefined): boolean;
   resolveMovePoint(nx: number, nz: number, r: number, e: Entity): { x: number; z: number };
+  // Exact swept player movement resolver, exposed for the local unstuck search.
+  // Keeping the from-point and fence flag preserves the normal movement rules,
+  // including delve bounds/doors and thin-wall anti-tunnelling.
+  resolvePlayerMove(
+    fromX: number,
+    fromZ: number,
+    nx: number,
+    nz: number,
+    r: number,
+    e: Entity,
+    ignoreFences?: boolean,
+  ): { x: number; z: number };
   // From-point collision resolve (walls/fences/delve bounds) for swept teleports
   // (repositionToAim/blinkForward): same body Sim movement uses, exposed on the seam.
   resolveMove(
@@ -676,6 +729,24 @@ export interface SimContextCallbacks {
   tickLockpickTimeout(run: DelveRun): void;
   startDelveRaiseDeadChannel(run: DelveRun, boss: Entity, mobId: string, count: number): boolean;
 
+  // Riding lesson (src/sim/mounts_training.ts): a session that lives directly on
+  // PlayerMeta rather than a shared DelveRun. tickMountTraining is the per-tick
+  // driver (called next to updateMountTransition in the coordinator's per-player
+  // loop: it succeeds the lesson once the player is in the training steed's
+  // saddle); abandonMountTraining tears down a leaving player's IN_PROGRESS
+  // session (called from the removePlayer leave path, mirroring abandonLockpick).
+  tickMountTraining(meta: PlayerMeta): void;
+  abandonMountTraining(meta: PlayerMeta): void;
+
+  // Show-jumping race (src/sim/mount_race.ts): a strictly per-player session on
+  // PlayerMeta.mountRace. tickMountRace is the per-tick driver (called from the
+  // coordinator's per-player loop after movement, so the tick's prevPos -> pos
+  // segment is what gate crossings are detected on). There is no abandon
+  // callback: the driver voids a run itself on death/dismount/leaving, and a
+  // leaving player's session simply dies with their PlayerMeta (nothing external
+  // references it).
+  tickMountRace(meta: PlayerMeta): void;
+
   // C4a casting lifecycle (src/sim/combat/casting_lifecycle.ts) consumes these; all
   // still on Sim. `runEffects` is the C4b boundary (the moved applyAbility +
   // applyChannelTick reach the actual ability resolution only through here).
@@ -690,6 +761,7 @@ export interface SimContextCallbacks {
   tameError(p: Entity, target: Entity): string | null;
   standUp(p: Entity): void;
   breakGhostWolf(e: Entity): void;
+  forceDismount(e: Entity): void;
   startAutoAttack(pid?: number): void;
   revivePet(pid?: number): void;
   completeFishing(p: Entity, meta: PlayerMeta): void;
@@ -849,6 +921,15 @@ export interface SimContextCallbacks {
   markDeedsDirty(pid: number): void;
   grantDeed(meta: PlayerMeta, deedId: string, opts?: { retro?: boolean }): boolean;
 
+  // Vale Cup <-> Arena queue exclusion (owned by social/vale_cup.ts). True when
+  // pid is seated in a live Vale Cup match (rated or practice) or waiting in a
+  // Vale Cup bracket queue. social/arena.ts calls this from arenaQueueJoin and
+  // the 1v1/2v2/fiesta prune predicates so a player already committed to Vale
+  // Cup can never be pulled into an Arena queue or match, and vice versa (the
+  // mirror check, isArenaQueued, is a direct import since vale_cup.ts already
+  // imports arena.ts one direction).
+  vcupSeatedOrQueued(pid: number): boolean;
+
   // The Vale Cup sport-move arms (owned by social/vale_cup.ts; consumed by
   // combat/effect_dispatch.ts). All three silently no-op unless the caster is
   // seated in the live Sowfield match's play phase. vcupBallKick launches the
@@ -951,6 +1032,39 @@ export function createSimContext(host: SimContextHost): SimContext {
     get dungeonResetLocks() {
       return host.dungeonResetLocks;
     },
+    get riftInstances() {
+      return host.riftInstances;
+    },
+    get riftEvents() {
+      return host.riftEvents;
+    },
+    get nextRiftInstanceId() {
+      return host.nextRiftInstanceId;
+    },
+    set nextRiftInstanceId(v) {
+      host.nextRiftInstanceId = v;
+    },
+    get riftPortalIds() {
+      return host.riftPortalIds;
+    },
+    set riftPortalIds(v) {
+      host.riftPortalIds = v;
+    },
+    get naturalRiftPortals() {
+      return host.naturalRiftPortals;
+    },
+    get riftPortalSpawnCount() {
+      return host.riftPortalSpawnCount;
+    },
+    set riftPortalSpawnCount(v) {
+      host.riftPortalSpawnCount = v;
+    },
+    get riftPortalNextAt() {
+      return host.riftPortalNextAt;
+    },
+    set riftPortalNextAt(v) {
+      host.riftPortalNextAt = v;
+    },
     get arenaMatches() {
       return host.arenaMatches;
     },
@@ -965,6 +1079,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get cfg() {
       return host.cfg;
+    },
+    get riftCollisionToken() {
+      return host.riftCollisionToken;
     },
     get trades() {
       return host.trades;
@@ -1007,6 +1124,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get yumiCatMatches() {
       return host.yumiCatMatches;
+    },
+    get escortRuns() {
+      return host.escortRuns;
     },
     get nextArenaMatchId() {
       return host.nextArenaMatchId;
@@ -1089,6 +1209,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     instanceClaimIdAt: host.instanceClaimIdAt,
     enterDungeon: host.enterDungeon,
     leaveDungeon: host.leaveDungeon,
+    enterRift: host.enterRift,
+    leaveRift: host.leaveRift,
+    riftOpenTreasure: host.riftOpenTreasure,
     resetDungeonInstances: host.resetDungeonInstances,
     inheritDungeonResetLocks: host.inheritDungeonResetLocks,
     dungeonDifficulty: host.dungeonDifficulty,
@@ -1206,6 +1329,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     swingIntervalMult: host.swingIntervalMult,
     mobCanSwim: host.mobCanSwim,
     resolveMovePoint: host.resolveMovePoint,
+    resolvePlayerMove: host.resolvePlayerMove,
     resolveMove: host.resolveMove,
     updatePet: host.updatePet,
     isDelveCompanionMob: host.isDelveCompanionMob,
@@ -1246,6 +1370,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     abandonLockpick: host.abandonLockpick,
     tickLockpickTimeout: host.tickLockpickTimeout,
     startDelveRaiseDeadChannel: host.startDelveRaiseDeadChannel,
+    tickMountTraining: host.tickMountTraining,
+    abandonMountTraining: host.abandonMountTraining,
+    tickMountRace: host.tickMountRace,
     resolvedAbility: host.resolvedAbility,
     playerGcdFor: host.playerGcdFor,
     isFriendlyTo: host.isFriendlyTo,
@@ -1255,6 +1382,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     tameError: host.tameError,
     standUp: host.standUp,
     breakGhostWolf: host.breakGhostWolf,
+    forceDismount: host.forceDismount,
     startAutoAttack: host.startAutoAttack,
     revivePet: host.revivePet,
     completeFishing: host.completeFishing,
@@ -1302,6 +1430,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     markVisited: host.markVisited,
     markDeedsDirty: host.markDeedsDirty,
     grantDeed: host.grantDeed,
+    // Vale Cup <-> Arena queue exclusion (points at social/vale_cup.ts).
+    vcupSeatedOrQueued: host.vcupSeatedOrQueued,
     // The Vale Cup sport-move arms (points at social/vale_cup.ts).
     vcupBallKick: host.vcupBallKick,
     vcupBallPass: host.vcupBallPass,
