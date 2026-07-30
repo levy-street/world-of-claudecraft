@@ -210,6 +210,60 @@ export const TARGETS = [
     },
   },
   {
+    key: 'talents-spec-panel',
+    label: 'Talents window spec panel (spec description + mastery text)',
+    when: [
+      'sim/content/talents_classic',
+      'sim/content/spec_baselines',
+      'ui/talents_window',
+      'ui/talent_i18n',
+    ],
+    variants: [
+      {
+        key: 'priest-shadow-desktop',
+        charClass: 'priest',
+        charName: 'Vesperine',
+        specId: 'shadow',
+      },
+    ],
+    // Level to 20, pick the spec, open the talents window on its spec tab, and
+    // clip to the window: the spec cards carry the mastery prose this target
+    // exists to review.
+    async capture(page, variant) {
+      await page.keyboard.press('Escape');
+      await wait(400);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+      });
+      await wait(300);
+      const ready = await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return false;
+        sim.setPlayerLevel?.(20, player.id);
+        sim.setSpec?.(shot.specId);
+        game.hud.toggleTalents?.();
+        return true;
+      }, variant);
+      if (!ready) throw new Error('offline sim not reachable');
+      const open = await pollForSize(page, '#talents-window', 20, 250);
+      if (!open) throw new Error('talents window did not open');
+      await page.evaluate(() => {
+        const tabs = Array.from(document.querySelectorAll('#talents-window .tal-tab'));
+        tabs[0]?.click(); // the spec tab is first
+      });
+      await wait(500);
+      const masteryShown = await page.evaluate(() => {
+        const panel = document.querySelector('#talents-window .ts-panel.sel .ts-det-mastery');
+        return !!panel && (panel.textContent ?? '').length > 0;
+      });
+      if (!masteryShown) throw new Error('selected spec panel mastery text not visible');
+      return { clip: '#talents-window' };
+    },
+  },
+  {
     key: 'inventory',
     label: 'Inventory / bags',
     when: ['ui/bags', 'ui/inventory', 'ui/item', 'ui/vendor', 'ui/loot', 'sim/content/items'],
