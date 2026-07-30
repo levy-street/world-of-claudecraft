@@ -29,8 +29,10 @@ import {
   skinEmissiveTexture,
   skinTexture,
   tintedFarMaterials,
+  wingsProp,
 } from './assets';
 import { buildHalo } from './halo';
+import { attachWings, removeWings } from './wings';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
@@ -1181,6 +1183,23 @@ export class CharacterVisual {
     this.weaponItemId = weaponItemId;
     if (!this.def.weaponSlots?.length) return;
     this.reattachHeldWeapon();
+  }
+
+  /** Toggle the wings back-cosmetic (Entity.wings): a static prop seated on the
+   *  upper spine bone (wings.ts). Returns false when the prop's GLB is not yet
+   *  cached (wingsProp kicks the lazy fetch); the renderer's diff retries on a
+   *  later frame instead of throwing on the render path. */
+  setWings(on: boolean): boolean {
+    if (!on) {
+      if (removeWings(this.model)) this.rebuildCasters();
+      return true;
+    }
+    const scene = wingsProp();
+    if (!scene) return false;
+    removeWings(this.model); // idempotent: never stack two props
+    if (!attachWings(this.model, scene)) return true; // no spine bone: nothing to wear
+    this.rebuildCasters();
+    return true;
   }
 
   /** Swap the actual offhand. When neither the old nor the new offhand mirrors the

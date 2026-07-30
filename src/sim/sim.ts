@@ -1394,6 +1394,9 @@ export interface CharacterState {
   beard?: boolean;
   hairColor?: number;
   faceColor?: number;
+  // Wings back-cosmetic toggle (players; render-only, like beard). Optional so
+  // pre-wings saves load with the slot empty.
+  wings?: boolean;
   // Pending skin-select event rank (JSONB; optional so older saves load as null).
   pendingSkinRank?: SkinRank | null;
   pendingSkinCatalog?: SkinCatalog | null;
@@ -2354,6 +2357,7 @@ export class Sim {
       player.face = s.face;
       player.hairStyle = s.hairStyle;
       player.beard = s.beard;
+      player.wings = s.wings;
       player.hairColor = s.hairColor;
       player.faceColor = s.faceColor;
       meta.xp = s.xp;
@@ -3157,6 +3161,7 @@ export class Sim {
       face: e.face || undefined,
       hairStyle: e.hairStyle || undefined,
       beard: e.beard || undefined,
+      wings: e.wings || undefined,
       hairColor: e.hairColor,
       faceColor: e.faceColor,
       pendingSkinRank: meta.pendingSkinRank,
@@ -3361,6 +3366,16 @@ export class Sim {
     e.beard = beard;
     e.hairColor = hairColor;
     e.faceColor = faceColor;
+    return true;
+  }
+
+  /** Toggle the wings back-cosmetic (players; render-only, like setPlayerHead).
+   *  Persisted by serializeCharacter and synced in identity fields (wg), so the
+   *  sim never reads it but both hosts render it. Backs the /dev wings cheat. */
+  setPlayerWings(pid: number, wings: boolean): boolean {
+    const e = this.entities.get(pid);
+    if (e?.kind !== 'player') return false;
+    e.wings = wings;
     return true;
   }
 
@@ -4328,6 +4343,10 @@ export class Sim {
       // notice is the /join /leave chat-log line. Both stay on Sim. (hasPendingSocialInvite
       // already bound above; isRooted/moveSpeedMult/swingIntervalMult are M2 bindings above.)
       setPlayerLevel: sim.setPlayerLevel.bind(sim),
+      // "/dev mech" cheat: the same authoritative skin setter the char sheet uses.
+      setPlayerSkin: sim.setPlayerSkin.bind(sim),
+      // "/dev wings" cheat: toggles the render-only wings back-cosmetic.
+      setPlayerWings: sim.setPlayerWings.bind(sim),
       notice: sim.notice.bind(sim),
       // Dev-only test-dummy spawner backing "/dev bot <name>" in social/chat.ts.
       spawnDevBot: sim.spawnDevBot.bind(sim),

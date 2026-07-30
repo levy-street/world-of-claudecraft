@@ -3165,6 +3165,10 @@ export interface Entity extends ClientMirroredEntityFields {
   face?: number; // 0 = default/male face, 1 = female, etc. (index into cosmetics.faces)
   hairStyle?: number;
   beard?: boolean;
+  // Wings back-cosmetic slot (players only, render-only, like beard): toggles the
+  // wings prop on the back bone. Persisted in CharacterState and synced in
+  // identity fields (wg). The sim never reads it.
+  wings?: boolean;
   // Cosmetic colour tints (hex 0xRRGGBB). hairColor recolours the hair+beard+brow
   // group; faceColor multiplies the face/skin. undefined = the model default.
   hairColor?: number;

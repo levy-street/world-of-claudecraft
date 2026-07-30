@@ -755,6 +755,12 @@ export interface SimContextCallbacks {
   // emits. Both stay on Sim. (hasPendingSocialInvite is already declared above; isRooted/
   // moveSpeedMult/swingIntervalMult are M2 decls above -> all deduped.)
   setPlayerLevel(level: number, pid?: number): void;
+  // Backs the "/dev mech" cheat (handleDevChat, gated by devCommands): the same
+  // server-authoritative skin setter the character sheet uses (clamps the index,
+  // gates the armored catalog), so the cheat can never bypass validation.
+  setPlayerSkin(pid: number, skin: number, catalog?: SkinCatalog): boolean;
+  // Backs the "/dev wings" cheat: toggles the render-only wings back-cosmetic.
+  setPlayerWings(pid: number, wings: boolean): boolean;
   notice(pid: number, text: string, color?: string): void;
   // Dev-only test-dummy spawner backing "/dev bot <name>" (handleDevChat, gated by
   // devCommands). Adds a stationary whisperable player near the primary; returns the
@@ -1280,6 +1286,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     syncPetAspect: host.syncPetAspect,
     // G2 social plumbing passthroughs (hasPendingSocialInvite already bound above; deduped).
     setPlayerLevel: host.setPlayerLevel,
+    setPlayerSkin: host.setPlayerSkin,
+    setPlayerWings: host.setPlayerWings,
     notice: host.notice,
     spawnDevBot: host.spawnDevBot,
     spawnDevVendor: host.spawnDevVendor,

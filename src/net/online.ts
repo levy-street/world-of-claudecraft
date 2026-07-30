@@ -188,6 +188,7 @@ export interface CharacterSummary {
   face?: number;
   hairStyle?: number;
   beard?: boolean;
+  wings?: boolean;
   hairColor?: number;
   faceColor?: number;
 }
@@ -2412,6 +2413,8 @@ export class ClientWorld implements IWorld {
         e.face = w.fac ?? 0;
         e.hairStyle = w.hs ?? 0;
         e.beard = !!w.bd;
+        // Absolute like bd: absent on a full record = wings off.
+        e.wings = !!w.wg;
         e.hairColor = typeof w.hcl === 'number' ? w.hcl : undefined;
         e.faceColor = typeof w.fcl === 'number' ? w.fcl : undefined;
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)

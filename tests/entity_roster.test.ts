@@ -337,6 +337,8 @@ function makeCtx() {
     syncPetAspect: vi.fn(),
     // G2 social plumbing (hasPendingSocialInvite already stubbed above; deduped).
     setPlayerLevel: vi.fn(),
+    setPlayerSkin: vi.fn(() => true),
+    setPlayerWings: vi.fn(() => true),
     notice: vi.fn(),
     spawnDevBot: vi.fn(),
     spawnDevVendor: vi.fn(),

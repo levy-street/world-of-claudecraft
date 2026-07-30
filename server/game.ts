@@ -931,6 +931,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.face) out.fac = e.face;
   if (e.hairStyle) out.hs = e.hairStyle;
   if (e.beard) out.bd = 1;
+  if (e.wings) out.wg = 1; // wings back-cosmetic (render-only, like bd)
   if (e.hairColor !== undefined) out.hcl = e.hairColor;
   if (e.faceColor !== undefined) out.fcl = e.faceColor;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)

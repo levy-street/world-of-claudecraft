@@ -85,7 +85,7 @@ import {
   preloadTrainingDummyAssets,
   trainingDummyAssetsReady,
 } from './characters/assets';
-import { skinCount, visualKeyFor } from './characters/manifest';
+import { isMechVisualKey, skinCount, visualKeyFor } from './characters/manifest';
 import {
   playerRangedAttackAlreadyStarted,
   playerRangedAttackStartsAtLaunch,
@@ -673,6 +673,7 @@ export interface EntityView {
   offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
   weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
   weaponStowed: boolean; // last-rendered sheathe state (Z key), diffed for live stow toggles
+  wings: boolean; // last-rendered wings back-cosmetic, diffed for live toggles
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
@@ -4318,7 +4319,7 @@ export class Renderer {
       // budget slot every frame, and clearing it when the fetch RESOLVES
       // keeps pop-in at the next frame after readiness (only a rejected
       // fetch waits out the full cooldown).
-      if (visualKey === 'player_mech' && !mechAssetsReady()) {
+      if (isMechVisualKey(visualKey) && !mechAssetsReady()) {
         void preloadMechAssets()
           .then(() => this.viewCreateRetry.markSucceeded(e.id, 'view'))
           .catch((err) =>
@@ -4585,6 +4586,7 @@ export class Renderer {
       // Born false so the per-frame diff below sheathes an already-stowed entity
       // (a peer entering interest) on its first sync.
       weaponStowed: false,
+      wings: false,
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
@@ -4666,7 +4668,7 @@ export class Renderer {
     if (nextKey === v.visualKey) return;
     const retrySlot = `base:${nextKey}`;
     if (!this.viewCreateRetry.canAttempt(e.id, retrySlot, performance.now())) return;
-    if (nextKey === 'player_mech' && !mechAssetsReady()) {
+    if (isMechVisualKey(nextKey) && !mechAssetsReady()) {
       // in-flight cooldown; cleared on fetch resolution so the swap lands the
       // next frame after readiness (see the createView gates)
       void preloadMechAssets()
@@ -4698,6 +4700,7 @@ export class Renderer {
     v.offhandItemId = e.offhandItemId; // next was built holding the current offhand
     v.weaponSkinId = null; // next was built skinless; the per-frame diff re-applies it
     v.weaponStowed = false; // next was built drawn (fresh stow transition); the diff re-sheathes
+    v.wings = false; // next was built wingless; the per-frame diff re-attaches
     v.group.add(next.root);
     this.reconcileViewLights(v);
   }
@@ -5596,6 +5599,14 @@ export class Renderer {
       if (e.skin !== v.skin) {
         v.skin = e.skin;
         v.visual.setSkin(e.skin);
+      }
+
+      // live wings toggle (the wings back-cosmetic; /dev wings or a peer's toggle).
+      // setWings reports false while the prop GLB is still fetching: leave the
+      // diff open so it retries on a later frame instead of dropping the toggle.
+      if ((e.wings ?? false) !== v.wings) {
+        const wanted = e.wings ?? false;
+        if (v.visual.setWings(wanted)) v.wings = wanted;
       }
 
       // live held-weapon swap — equipped mainhand changed (self equip or a peer's
