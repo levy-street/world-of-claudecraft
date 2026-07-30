@@ -21,11 +21,13 @@ const TRANSCODER_PATH = '/basis/';
 let ktx2: KTX2Loader | null = null;
 
 function detectViaThrowawayContext(loader: KTX2Loader): void {
-  const canvas = document.createElement('canvas');
-  canvas.width = 1;
-  canvas.height = 1;
   let probe: THREE.WebGLRenderer | null = null;
   try {
+    // Node test hosts drive loadGltf without a DOM; they take the RGBA
+    // fallback config below instead of a context probe.
+    const canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = 1;
     probe = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
     loader.detectSupport(probe);
   } catch {
