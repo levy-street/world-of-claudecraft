@@ -1,5 +1,6 @@
 import { DEV_KIT_ROLES } from '../sim/content/dev_kit_roles';
 import { GATHERING_PROFESSIONS } from '../sim/content/professions';
+import { MECH_CHROMAS } from '../sim/content/skins';
 import { DUNGEONS, ITEMS, MOBS, QUESTS } from '../sim/data';
 import { ALL_CLASSES, MAX_LEVEL } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -8,6 +9,7 @@ import {
   type DevCommandAction,
   type DevCommandCategory,
   filteredDevActions,
+  MECH_CHROMA_SWATCHES,
 } from './dev_command_view';
 import {
   DEV_ITEM_PICKER_LIMIT,
@@ -18,7 +20,9 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
+import { mechChromaName } from './hud/cosmetics';
 import { getLanguage, type SupportedLanguage, type TranslationKey, t } from './i18n';
+import { QUALITY_COLOR } from './icons';
 import { svgIcon } from './ui_icons';
 
 // Localized candidate list for the item picker, built once on first use. 672 items
@@ -114,7 +118,7 @@ function itemPickerField(): string {
   </label>`;
 }
 
-function actionFields(actionId: string): string {
+function actionFields(actionId: string, mechChromaValue = '0'): string {
   switch (actionId) {
     case 'level':
       return textField('devCommand.fields.level', 'level', String(MAX_LEVEL), 'number');
@@ -145,6 +149,23 @@ function actionFields(actionId: string): string {
       );
     case 'gold':
       return textField('devCommand.fields.gold', 'gold', '100', 'number');
+    case 'mech':
+      // A two-tone swatch per Combat Mech chroma (rarity-ringed, instant apply
+      // on click) plus Off to return to the class body. The hidden field keeps
+      // the action's command() contract: swatch clicks stamp it before running,
+      // and the Run button re-applies the last pick.
+      return `<div class="dev-command-field"><span>${esc(t('devCommand.fields.chroma'))}</span>
+        <input type="hidden" data-dev-field="mechChroma" value="${esc(mechChromaValue)}">
+        <div class="dev-mech-swatches">${MECH_CHROMAS.map((chroma, index) => {
+          const [body, trim] = MECH_CHROMA_SWATCHES[chroma.id] ?? ['#888888', '#444444'];
+          const label = `${mechChromaName(chroma.id)} (${t(`itemUi.quality.${chroma.rank}` as TranslationKey)})`;
+          return `<button type="button" class="dev-mech-swatch" data-dev-mech-chroma="${index}"
+            title="${esc(label)}" aria-label="${esc(label)}"
+            style="background:linear-gradient(135deg,${esc(body)} 0 55%,${esc(trim)} 55% 100%);border-color:${esc(QUALITY_COLOR[chroma.rank] ?? '#888888')}"></button>`;
+        }).join('')}
+        <button type="button" class="dev-mech-swatch dev-mech-swatch-off" data-dev-mech-chroma="off"
+          title="${esc(t('devCommand.mechOff'))}" aria-label="${esc(t('devCommand.mechOff'))}">${svgIcon('close')}</button>
+        </div></div>`;
     case 'quest':
       return selectField(
         'devCommand.fields.quest',
@@ -184,8 +205,8 @@ function actionFields(actionId: string): string {
   }
 }
 
-function actionHtml(action: DevCommandAction): string {
-  const fields = actionFields(action.id);
+function actionHtml(action: DevCommandAction, mechChromaValue = '0'): string {
+  const fields = actionFields(action.id, mechChromaValue);
   return `<article class="dev-command-card" data-dev-action="${esc(action.id)}">
     <div class="dev-command-card-copy"><h3>${esc(t(action.labelKey))}</h3><p>${esc(t(action.descriptionKey))}</p></div>
     ${fields ? `<div class="dev-command-fields">${fields}</div>` : ''}
@@ -197,6 +218,8 @@ export class DevCommandWindow {
   private rootEl: HTMLElement | null = null;
   private category: DevCommandCategory = 'player';
   private query = '';
+  /** Last-picked mech chroma swatch ('0'..'14' or 'off'); survives re-renders. */
+  private mechChroma = '0';
   private notice = '';
   private returnFocus: HTMLElement | null = null;
 
@@ -418,7 +441,7 @@ export class DevCommandWindow {
       <nav class="dev-command-tabs" aria-label="${esc(t('devCommand.categoryNavAria'))}">${CATEGORIES.map((category) => `<button type="button" data-dev-category="${category.id}" aria-pressed="${category.id === this.category}">${esc(t(category.labelKey))}</button>`).join('')}</nav>
       <label class="dev-command-search"><span>${esc(t('devCommand.filterLabel'))}</span><input type="search" data-dev-search value="${esc(this.query)}" placeholder="${esc(t('devCommand.filterPlaceholder'))}"></label>
     </div>
-    <div class="dev-command-grid">${actions.length ? actions.map(actionHtml).join('') : `<div class="dev-command-empty">${esc(t('devCommand.noMatches'))}</div>`}</div>
+    <div class="dev-command-grid">${actions.length ? actions.map((action) => actionHtml(action, this.mechChroma)).join('') : `<div class="dev-command-empty">${esc(t('devCommand.noMatches'))}</div>`}</div>
     <footer class="dev-command-footer"><span>${esc(t('devCommand.serverRequirement'))}</span><output aria-live="polite">${esc(this.notice)}</output></footer>`;
 
     root.querySelector('[data-dev-close]')?.addEventListener('click', () => this.close());
@@ -438,6 +461,17 @@ export class DevCommandWindow {
       });
     for (const button of root.querySelectorAll<HTMLButtonElement>('[data-dev-run]')) {
       button.addEventListener('click', () => this.run(button.dataset.devRun ?? ''));
+    }
+    // Mech chroma swatches apply instantly: remember the pick (render rebuilds
+    // the hidden field from it, so the Run button re-applies the last swatch)
+    // and route through the same run() plumbing.
+    for (const button of root.querySelectorAll<HTMLButtonElement>('[data-dev-mech-chroma]')) {
+      button.addEventListener('click', () => {
+        this.mechChroma = button.dataset.devMechChroma ?? '0';
+        const field = root.querySelector<HTMLInputElement>('[data-dev-field="mechChroma"]');
+        if (field) field.value = this.mechChroma;
+        this.run('mech');
+      });
     }
     // The give action's combobox is re-created by every innerHTML rewrite above, so
     // its listeners have to be re-attached here rather than once at construction.

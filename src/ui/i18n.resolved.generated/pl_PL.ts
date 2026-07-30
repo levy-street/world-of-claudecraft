@@ -46,6 +46,7 @@ export const pl_PL: EnTranslations = {
     "itemUnknown": "Żaden przedmiot nie ma takiego identyfikatora.",
     "itemHeroicTag": "Heroiczny",
     "kitCurrentSpec": "Obecna specjalizacja",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Cheaty serwera nadal wymagają ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Wybierz prawidłowe wartości przed uruchomieniem tego polecenia.",
     "sent": "Wysłano: {command}",
@@ -64,7 +65,8 @@ export const pl_PL: EnTranslations = {
       "dungeon": "Loch",
       "difficulty": "Poziom trudności",
       "name": "Nazwa",
-      "spec": "Specjalizacja"
+      "spec": "Specjalizacja",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Normalny",
@@ -130,6 +132,10 @@ export const pl_PL: EnTranslations = {
       "gold": {
         "label": "Dodaj złoto",
         "description": "Dodaj złoto do obecnej sakiewki."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Ukończ zadanie",

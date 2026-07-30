@@ -24,6 +24,7 @@ import {
   type PreviewFramingName,
 } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
+import { isMechVisualKey } from '../render/characters/manifest';
 import { onPortraitsReady } from '../render/characters/portrait';
 import { catalogForVisualKey } from '../render/characters/preview_appearance';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
@@ -2532,6 +2533,11 @@ export class Hud {
       return false;
     const title = target.closest('.panel-title');
     if (title && win.contains(title)) return true;
+    // The dev Command Center has a custom header instead of a .panel-title;
+    // drag by it so the window can be moved off the character while testing
+    // cosmetics (its buttons are already excluded above).
+    const devHeader = target.closest('.dev-command-header');
+    if (devHeader && win.contains(devHeader)) return true;
     return win.id === 'map-window' && target === win;
   }
 
@@ -12458,7 +12464,7 @@ export class Hud {
       this.sim.player.skin ?? 0,
       this.sim.player.skinCatalog ?? 'class',
     );
-    if (preview.visualKey !== 'player_mech') {
+    if (!isMechVisualKey(preview.visualKey)) {
       this.mountCharPreview(container, this.sim.cfg.playerClass, preview.skin, preview.visualKey);
       return;
     }
@@ -12473,7 +12479,7 @@ export class Hud {
           this.sim.player.skin ?? 0,
           this.sim.player.skinCatalog ?? 'class',
         );
-        if (currentPreview.visualKey === 'player_mech') {
+        if (isMechVisualKey(currentPreview.visualKey)) {
           this.mountCharPreview(
             container,
             this.sim.cfg.playerClass,
@@ -12593,7 +12599,7 @@ export class Hud {
       this.mountSharedPreview(container, {
         cls: params.cls,
         skin: preview.skin,
-        previewKey: preview.visualKey === 'player_mech' ? preview.visualKey : undefined,
+        previewKey: isMechVisualKey(preview.visualKey) ? preview.visualKey : undefined,
         mainhand: params.mainhand,
         offhand: params.offhand,
         weaponSkinId: params.weaponSkinId,
@@ -12604,7 +12610,7 @@ export class Hud {
         faceColor: params.faceColor,
         framing: 'inspect',
       });
-    if (preview.visualKey !== 'player_mech') {
+    if (!isMechVisualKey(preview.visualKey)) {
       mount();
       return;
     }

@@ -46,6 +46,7 @@ export const vi_VN: EnTranslations = {
     "itemUnknown": "Không có vật phẩm nào có mã đó.",
     "itemHeroicTag": "Anh Hùng",
     "kitCurrentSpec": "Chuyên Môn Hiện Tại",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Lệnh gian lận phía máy chủ vẫn cần ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Hãy chọn giá trị hợp lệ trước khi chạy lệnh này.",
     "sent": "Đã gửi: {command}",
@@ -64,7 +65,8 @@ export const vi_VN: EnTranslations = {
       "dungeon": "Hầm Ngục",
       "difficulty": "Độ Khó",
       "name": "Tên",
-      "spec": "Chuyên Môn"
+      "spec": "Chuyên Môn",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Thường",
@@ -130,6 +132,10 @@ export const vi_VN: EnTranslations = {
       "gold": {
         "label": "Thêm vàng",
         "description": "Thêm vàng vào túi tiền hiện tại."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Hoàn thành nhiệm vụ",

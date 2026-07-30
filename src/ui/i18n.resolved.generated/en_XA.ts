@@ -46,6 +46,7 @@ export const en_XA: EnTranslations = {
     "itemUnknown": "[Ñó íţéɱ ĥáš ţĥáţ íð.]",
     "itemHeroicTag": "[Ĥéŕóíç]",
     "kitCurrentSpec": "[Çúŕŕéñţ šþéç]",
+    "mechOff": "[Óƒƒ (çļášš ƀóðý)]",
     "serverRequirement": "[Šéŕʋéŕ çĥéáţš šţíļļ ŕéɋúíŕé ÁĻĻÓŴ_ÐÉƲ_ÇÓⱮⱮÁÑÐŠ=1.]",
     "invalidValues": "[Çĥóóšé ʋáļíð ʋáļúéš ƀéƒóŕé ŕúññíñĝ ţĥíš çóɱɱáñð.]",
     "sent": "[Šéñţ: {command}]",
@@ -64,7 +65,8 @@ export const en_XA: EnTranslations = {
       "dungeon": "[Ðúñĝéóñ]",
       "difficulty": "[Ðíƒƒíçúļţý]",
       "name": "[Ñáɱé]",
-      "spec": "[Šþéç]"
+      "spec": "[Šþéç]",
+      "chroma": "[Çĥŕóɱá]"
     },
     "difficulty": {
       "normal": "[Ñóŕɱáļ]",
@@ -130,6 +132,10 @@ export const en_XA: EnTranslations = {
       "gold": {
         "label": "[Áðð ĝóļð]",
         "description": "[Áðð ĝóļð ţó ţĥé çúŕŕéñţ þúŕšé.]"
+      },
+      "mech": {
+        "label": "[Çóɱƀáţ Ɱéçĥ šķíñ]",
+        "description": "[Ŵéáŕ ţĥé Çóɱƀáţ Ɱéçĥ çóšɱéţíç ƀóðý íñ á çĥóšéñ çĥŕóɱá, óŕ ţáķé íţ óƒƒ.]"
       },
       "quest": {
         "label": "[Çóɱþļéţé ɋúéšţ]",

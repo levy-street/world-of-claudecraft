@@ -46,6 +46,7 @@ export const pt_BR: EnTranslations = {
     "itemUnknown": "Nenhum item tem esse id.",
     "itemHeroicTag": "Heroico",
     "kitCurrentSpec": "Especialização atual",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Os comandos de trapaça do servidor ainda exigem ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Escolha valores válidos antes de executar este comando.",
     "sent": "Enviado: {command}",
@@ -64,7 +65,8 @@ export const pt_BR: EnTranslations = {
       "dungeon": "Masmorra",
       "difficulty": "Dificuldade",
       "name": "Nome",
-      "spec": "Especialização"
+      "spec": "Especialização",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Normal",
@@ -130,6 +132,10 @@ export const pt_BR: EnTranslations = {
       "gold": {
         "label": "Adicionar ouro",
         "description": "Adiciona ouro à bolsa atual."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Concluir missão",

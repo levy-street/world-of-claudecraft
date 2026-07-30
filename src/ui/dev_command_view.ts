@@ -1,5 +1,28 @@
+import { MECH_CHROMAS } from '../sim/content/skins';
 import { MAX_LEVEL } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
+
+/** Presentational two-tone chips for the dev mech-chroma swatch grid, keyed by
+ *  MECH_CHROMAS id: [body, trim] hex, the canonical palette constants the
+ *  chroma generators use (tmp/chroma_work). Dev tooling only: the real look is
+ *  the texture; these just make the grid scannable. */
+export const MECH_CHROMA_SWATCHES: Readonly<Record<string, readonly [string, string]>> = {
+  amber_crimson: ['#dd9636', '#b23a2e'],
+  crimson_amber: ['#b23a2e', '#dd9636'],
+  cyan_magenta: ['#3f868e', '#9c4870'],
+  magenta_cyan: ['#9c4870', '#3f868e'],
+  orange_steel: ['#bb6736', '#3b6ea5'],
+  steel_orange: ['#3b6ea5', '#bb6736'],
+  forest_pink: ['#4e7a3a', '#b06684'],
+  pink_forest: ['#b06684', '#4e7a3a'],
+  amethyst_silver: ['#5e2f96', '#b9c1cb'],
+  ivory_copper: ['#ddd3bd', '#c2764a'],
+  onyx_gold: ['#1c2026', '#cda033'],
+  imperial_crimson: ['#be3330', '#d8a232'],
+  imperial_gold: ['#d8a232', '#b7c1cc'],
+  vanguard_azure: ['#3d70ae', '#b7c1cc'],
+  vanguard_chrome: ['#c6d1de', '#d8a232'],
+};
 
 export type DevCommandCategory =
   | 'player'
@@ -162,6 +185,19 @@ export const DEV_COMMAND_ACTIONS: readonly DevCommandAction[] = [
     labelKey: 'devCommand.actions.gold.label',
     descriptionKey: 'devCommand.actions.gold.description',
     command: (values) => `/dev gold ${boundedInteger(values, 'gold', 1, 100000, 100)}`,
+  },
+  {
+    id: 'mech',
+    category: 'player',
+    labelKey: 'devCommand.actions.mech.label',
+    descriptionKey: 'devCommand.actions.mech.description',
+    // The select's value is a MECH_CHROMAS index, or 'off' to return to the
+    // class body; blank falls back to chroma 0.
+    command: (values) => {
+      const choice = String(values.mechChroma ?? '').trim();
+      if (choice === 'off') return '/dev mech off';
+      return `/dev mech ${boundedInteger(values, 'mechChroma', 0, MECH_CHROMAS.length - 1, 0)}`;
+    },
   },
   {
     id: 'quest',

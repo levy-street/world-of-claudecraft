@@ -46,6 +46,7 @@ export const sv_SE: EnTranslations = {
     "itemUnknown": "Inget föremål har detta id.",
     "itemHeroicTag": "Heroisk",
     "kitCurrentSpec": "Aktuell specialisering",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Serverfusk kräver fortfarande ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Välj giltiga värden innan du kör kommandot.",
     "sent": "Skickat: {command}",
@@ -64,7 +65,8 @@ export const sv_SE: EnTranslations = {
       "dungeon": "Fängelsehåla",
       "difficulty": "Svårighetsgrad",
       "name": "Namn",
-      "spec": "Specialisering"
+      "spec": "Specialisering",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Normal",
@@ -130,6 +132,10 @@ export const sv_SE: EnTranslations = {
       "gold": {
         "label": "Lägg till guld",
         "description": "Lägg till guld i den aktuella börsen."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Slutför uppdrag",

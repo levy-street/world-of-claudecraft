@@ -46,6 +46,7 @@ export const fr_CA: EnTranslations = {
     "itemUnknown": "Aucun objet ne correspond à cet id.",
     "itemHeroicTag": "Héroïque",
     "kitCurrentSpec": "Spécialisation actuelle",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Les commandes de triche du serveur exigent toujours ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Choisissez des valeurs valides avant d’exécuter cette commande.",
     "sent": "Envoyé : {command}",
@@ -64,7 +65,8 @@ export const fr_CA: EnTranslations = {
       "dungeon": "Donjon",
       "difficulty": "Difficulté",
       "name": "Nom",
-      "spec": "Spécialisation"
+      "spec": "Spécialisation",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Normal",
@@ -130,6 +132,10 @@ export const fr_CA: EnTranslations = {
       "gold": {
         "label": "Ajouter de l’or",
         "description": "Ajoute de l’or à la bourse actuelle."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Accomplir la quête",

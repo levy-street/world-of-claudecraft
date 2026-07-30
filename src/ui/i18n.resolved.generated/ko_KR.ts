@@ -46,6 +46,7 @@ export const ko_KR: EnTranslations = {
     "itemUnknown": "해당 ID를 가진 아이템이 없습니다.",
     "itemHeroicTag": "영웅",
     "kitCurrentSpec": "현재 전문화",
+    "mechOff": "Off (class body)",
     "serverRequirement": "서버 치트 기능에는 여전히 ALLOW_DEV_COMMANDS=1이 필요합니다.",
     "invalidValues": "명령을 실행하기 전에 올바른 값을 선택하세요.",
     "sent": "전송됨: {command}",
@@ -64,7 +65,8 @@ export const ko_KR: EnTranslations = {
       "dungeon": "던전",
       "difficulty": "난이도",
       "name": "이름",
-      "spec": "전문화"
+      "spec": "전문화",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "일반",
@@ -130,6 +132,10 @@ export const ko_KR: EnTranslations = {
       "gold": {
         "label": "골드 추가",
         "description": "현재 소지금에 골드를 추가합니다."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "퀘스트 완료",

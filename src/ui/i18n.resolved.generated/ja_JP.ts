@@ -46,6 +46,7 @@ export const ja_JP: EnTranslations = {
     "itemUnknown": "そのIDのアイテムはありません。",
     "itemHeroicTag": "ヒロイック",
     "kitCurrentSpec": "現在のスペック",
+    "mechOff": "Off (class body)",
     "serverRequirement": "サーバーのチート機能には引き続き ALLOW_DEV_COMMANDS=1 が必要です。",
     "invalidValues": "実行する前に有効な値を選択してください。",
     "sent": "送信済み：{command}",
@@ -64,7 +65,8 @@ export const ja_JP: EnTranslations = {
       "dungeon": "ダンジョン",
       "difficulty": "難易度",
       "name": "名前",
-      "spec": "スペック"
+      "spec": "スペック",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "ノーマル",
@@ -130,6 +132,10 @@ export const ja_JP: EnTranslations = {
       "gold": {
         "label": "ゴールドを追加",
         "description": "現在の所持金にゴールドを追加します。"
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "クエストを完了",

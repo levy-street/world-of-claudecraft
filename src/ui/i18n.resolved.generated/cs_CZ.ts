@@ -46,6 +46,7 @@ export const cs_CZ: EnTranslations = {
     "itemUnknown": "Žádný předmět nemá toto id.",
     "itemHeroicTag": "Hrdinské",
     "kitCurrentSpec": "Aktuální specializace",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Serverové cheaty stále vyžadují ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Před spuštěním tohoto příkazu vyber platné hodnoty.",
     "sent": "Odesláno: {command}",
@@ -64,7 +65,8 @@ export const cs_CZ: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Obtížnost",
       "name": "Jméno",
-      "spec": "Specializace"
+      "spec": "Specializace",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Normální",
@@ -130,6 +132,10 @@ export const cs_CZ: EnTranslations = {
       "gold": {
         "label": "Přidat zlato",
         "description": "Přidej zlato do aktuálního měšce."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Dokončit úkol",

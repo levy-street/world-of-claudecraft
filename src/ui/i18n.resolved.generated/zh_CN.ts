@@ -46,6 +46,7 @@ export const zh_CN: EnTranslations = {
     "itemUnknown": "没有该 ID 对应的物品。",
     "itemHeroicTag": "英雄",
     "kitCurrentSpec": "当前专精",
+    "mechOff": "Off (class body)",
     "serverRequirement": "服务器作弊功能仍需 ALLOW_DEV_COMMANDS=1。",
     "invalidValues": "运行此命令前请选择有效值。",
     "sent": "已发送：{command}",
@@ -64,7 +65,8 @@ export const zh_CN: EnTranslations = {
       "dungeon": "地下城",
       "difficulty": "难度",
       "name": "名称",
-      "spec": "专精"
+      "spec": "专精",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "普通",
@@ -130,6 +132,10 @@ export const zh_CN: EnTranslations = {
       "gold": {
         "label": "添加金币",
         "description": "向当前钱袋添加金币。"
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "完成任务",

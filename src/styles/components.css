@@ -12334,6 +12334,43 @@
     color: var(--color-text);
     background: var(--panel-base);
   }
+  /* Mech chroma swatch grid (the dev Command Center's mech action): one
+     two-tone chip per chroma, ringed in its rarity color, instant apply on
+     click. The chip background is an inline gradient (dynamic per chroma,
+     the same pattern as the char-sheet .skin-swatch chips). */
+  /* Deterministic 8-column grid, NOT flex-wrap: the command grid freezes each
+     card's row height against the fields' intrinsic (unwrapped) height, so a
+     wrapping flexbox overflows the already-sized card. Fixed columns give the
+     swatch strip its true two-row height at sizing time. */
+  .dev-command-field:has(.dev-mech-swatches) {
+    grid-column: 1 / -1;
+  }
+  .dev-mech-swatches {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 5px;
+  }
+  .dev-mech-swatch {
+    height: 24px;
+    padding: 0;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .dev-mech-swatch:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px #0009;
+  }
+  .dev-mech-swatch-off {
+    background: var(--panel-base);
+    color: var(--color-text-muted);
+    display: grid;
+    place-items: center;
+  }
+  .dev-mech-swatch-off svg {
+    width: 12px;
+    height: 12px;
+  }
   /* Item picker combobox. Replaces a native <select> over all ~672 ITEMS, which
      rendered taller than the viewport and covered its own window. Reuses the
      .soc-suggest / .soc-sugg-item visual treatment from the social panel so no new

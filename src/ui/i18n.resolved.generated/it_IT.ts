@@ -46,6 +46,7 @@ export const it_IT: EnTranslations = {
     "itemUnknown": "Nessun oggetto ha quell'ID.",
     "itemHeroicTag": "Eroico",
     "kitCurrentSpec": "Specializzazione attuale",
+    "mechOff": "Off (class body)",
     "serverRequirement": "I trucchi del server richiedono comunque ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Scegli valori validi prima di eseguire questo comando.",
     "sent": "Inviato: {command}",
@@ -64,7 +65,8 @@ export const it_IT: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Difficoltà",
       "name": "Nome",
-      "spec": "Specializzazione"
+      "spec": "Specializzazione",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Normale",
@@ -130,6 +132,10 @@ export const it_IT: EnTranslations = {
       "gold": {
         "label": "Aggiungi oro",
         "description": "Aggiunge oro alla borsa attuale."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Completa missione",

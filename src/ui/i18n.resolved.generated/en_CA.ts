@@ -46,6 +46,7 @@ export const en_CA: EnTranslations = {
     "itemUnknown": "No item has that id.",
     "itemHeroicTag": "Heroic",
     "kitCurrentSpec": "Current spec",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Choose valid values before running this command.",
     "sent": "Sent: {command}",
@@ -64,7 +65,8 @@ export const en_CA: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Difficulty",
       "name": "Name",
-      "spec": "Spec"
+      "spec": "Spec",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Normal",
@@ -130,6 +132,10 @@ export const en_CA: EnTranslations = {
       "gold": {
         "label": "Add gold",
         "description": "Add gold to the current purse."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Complete quest",

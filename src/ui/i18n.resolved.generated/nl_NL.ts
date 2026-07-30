@@ -46,6 +46,7 @@ export const nl_NL: EnTranslations = {
     "itemUnknown": "Geen voorwerp heeft dat id.",
     "itemHeroicTag": "Heroïsch",
     "kitCurrentSpec": "Huidige spec",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Servercheats vereisen nog steeds ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Kies geldige waarden voordat je deze opdracht uitvoert.",
     "sent": "Verzonden: {command}",
@@ -64,7 +65,8 @@ export const nl_NL: EnTranslations = {
       "dungeon": "Kerker",
       "difficulty": "Moeilijkheidsgraad",
       "name": "Naam",
-      "spec": "Spec"
+      "spec": "Spec",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Normaal",
@@ -130,6 +132,10 @@ export const nl_NL: EnTranslations = {
       "gold": {
         "label": "Goud toevoegen",
         "description": "Voeg goud toe aan de huidige beurs."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Missie voltooien",

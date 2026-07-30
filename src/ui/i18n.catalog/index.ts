@@ -113,6 +113,7 @@ export const en = {
     itemUnknown: 'No item has that id.',
     itemHeroicTag: 'Heroic',
     kitCurrentSpec: 'Current spec',
+    mechOff: 'Off (class body)',
     serverRequirement: 'Server cheats still require ALLOW_DEV_COMMANDS=1.',
     invalidValues: 'Choose valid values before running this command.',
     sent: 'Sent: {command}',
@@ -132,6 +133,7 @@ export const en = {
       difficulty: 'Difficulty',
       name: 'Name',
       spec: 'Spec',
+      chroma: 'Chroma',
     },
     difficulty: { normal: 'Normal', heroic: 'Heroic' },
     actions: {
@@ -174,6 +176,10 @@ export const en = {
         description: 'Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only.',
       },
       gold: { label: 'Add gold', description: 'Add gold to the current purse.' },
+      mech: {
+        label: 'Combat Mech skin',
+        description: 'Wear the Combat Mech cosmetic body in a chosen chroma, or take it off.',
+      },
       quest: { label: 'Complete quest', description: 'Complete a specific quest by id.' },
       quests: {
         label: 'Complete active quests',

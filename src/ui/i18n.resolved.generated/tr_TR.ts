@@ -46,6 +46,7 @@ export const tr_TR: EnTranslations = {
     "itemUnknown": "O kimliğe sahip öğe yok.",
     "itemHeroicTag": "Kahramanca",
     "kitCurrentSpec": "Mevcut uzmanlık",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Sunucu hileleri için yine de ALLOW_DEV_COMMANDS=1 gerekir.",
     "invalidValues": "Bu komutu çalıştırmadan önce geçerli değerler seç.",
     "sent": "Gönderildi: {command}",
@@ -64,7 +65,8 @@ export const tr_TR: EnTranslations = {
       "dungeon": "Zindan",
       "difficulty": "Zorluk",
       "name": "Ad",
-      "spec": "Uzmanlık"
+      "spec": "Uzmanlık",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Normal",
@@ -130,6 +132,10 @@ export const tr_TR: EnTranslations = {
       "gold": {
         "label": "Altın ekle",
         "description": "Mevcut keseye altın ekle."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Görevi tamamla",

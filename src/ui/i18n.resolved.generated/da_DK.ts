@@ -46,6 +46,7 @@ export const da_DK: EnTranslations = {
     "itemUnknown": "Ingen genstand har det id.",
     "itemHeroicTag": "Heroisk",
     "kitCurrentSpec": "Nuværende specialisering",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Serverfusk kræver stadig ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Vælg gyldige værdier, før du kører kommandoen.",
     "sent": "Sendt: {command}",
@@ -64,7 +65,8 @@ export const da_DK: EnTranslations = {
       "dungeon": "Fangekælder",
       "difficulty": "Sværhedsgrad",
       "name": "Navn",
-      "spec": "Specialisering"
+      "spec": "Specialisering",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Normal",
@@ -130,6 +132,10 @@ export const da_DK: EnTranslations = {
       "gold": {
         "label": "Tilføj guld",
         "description": "Føj guld til den aktuelle pung."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Fuldfør opgave",

@@ -1256,8 +1256,70 @@ describe('chat module (direct, no Sim)', () => {
     expect(chatMod.handleDevChat(ctx, '/dev', 1)).toBe(null);
     // Every subcommand the parser accepts must be listed, so the help can never
     // silently drift behind the commands again (the "/dev bot" omission this pins).
-    for (const cmd of ['level', 'tp', 'give', 'gold', 'quest', 'quests', 'bot'])
+    for (const cmd of ['level', 'tp', 'give', 'gold', 'mech', 'wings', 'quest', 'quests', 'bot'])
       expect(help, `help omits /dev ${cmd}`).toContain(`/dev ${cmd}`);
+  });
+
+  it('/dev wings toggles the wings back-cosmetic, with explicit on/off forms', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const pid = sim.addPlayer('warrior', 'WingTester');
+    sim.drainEvents();
+
+    // Bare form flips; the entity starts wingless.
+    sim.chat('/dev wings', pid);
+    expect(sim.entities.get(pid)?.wings).toBe(true);
+    sim.chat('/dev wings', pid);
+    expect(sim.entities.get(pid)?.wings).toBe(false);
+
+    sim.chat('/dev wings on', pid);
+    expect(sim.entities.get(pid)?.wings).toBe(true);
+    expect(
+      sim
+        .drainEvents()
+        .some((e: any) => e.type === 'log' && String(e.text).includes('[dev] Wings ON')),
+    ).toBe(true);
+    sim.chat('/dev wings off', pid);
+    expect(sim.entities.get(pid)?.wings).toBe(false);
+
+    // Render-only cosmetic persists with the character.
+    sim.chat('/dev wings on', pid);
+    expect(sim.serializeCharacter(pid)?.wings).toBe(true);
+  });
+
+  it('/dev mech wears the Combat Mech skin and /dev mech off reverts to the class body', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const pid = sim.addPlayer('warrior', 'MechTester');
+    sim.drainEvents();
+
+    // Chroma index goes through the same authoritative setter the char sheet uses.
+    sim.chat('/dev mech 3', pid);
+    expect(sim.players.get(pid)?.skinCatalog).toBe('mech');
+    expect(sim.players.get(pid)?.skin).toBe(3);
+    expect(sim.entities.get(pid)?.skinCatalog).toBe('mech');
+    expect(sim.entities.get(pid)?.skin).toBe(3);
+    expect(
+      sim
+        .drainEvents()
+        .some((e: any) => e.type === 'log' && String(e.text).startsWith('[dev] Combat Mech on')),
+    ).toBe(true);
+
+    // A chroma outside MECH_CHROMAS is refused with usage; the state stays put.
+    sim.chat('/dev mech 99', pid);
+    expect(sim.players.get(pid)?.skin).toBe(3);
+    expect(
+      sim
+        .drainEvents()
+        .some((e: any) => e.type === 'error' && String(e.text).includes('/dev mech')),
+    ).toBe(true);
+
+    // Bare "/dev mech" defaults to chroma 0.
+    sim.chat('/dev mech', pid);
+    expect(sim.players.get(pid)?.skinCatalog).toBe('mech');
+    expect(sim.players.get(pid)?.skin).toBe(0);
+
+    sim.chat('/dev mech off', pid);
+    expect(sim.players.get(pid)?.skinCatalog).toBe('class');
+    expect(sim.players.get(pid)?.skin).toBe(0);
   });
 });
 

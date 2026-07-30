@@ -46,6 +46,7 @@ export const ru_RU: EnTranslations = {
     "itemUnknown": "Нет предмета с таким идентификатором.",
     "itemHeroicTag": "Героический",
     "kitCurrentSpec": "Текущая специализация",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Для серверных читов всё ещё требуется ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Выберите допустимые значения перед запуском этой команды.",
     "sent": "Отправлено: {command}",
@@ -64,7 +65,8 @@ export const ru_RU: EnTranslations = {
       "dungeon": "Подземелье",
       "difficulty": "Сложность",
       "name": "Имя",
-      "spec": "Специализация"
+      "spec": "Специализация",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Обычная",
@@ -130,6 +132,10 @@ export const ru_RU: EnTranslations = {
       "gold": {
         "label": "Добавить золото",
         "description": "Добавить золото в текущий кошелёк."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Выполнить задание",

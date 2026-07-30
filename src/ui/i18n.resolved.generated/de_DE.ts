@@ -46,6 +46,7 @@ export const de_DE: EnTranslations = {
     "itemUnknown": "Kein Gegenstand hat diese ID.",
     "itemHeroicTag": "Heroisch",
     "kitCurrentSpec": "Aktuelle Spezialisierung",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Server-Cheats erfordern weiterhin ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Wähle gültige Werte, bevor du diesen Befehl ausführst.",
     "sent": "Gesendet: {command}",
@@ -64,7 +65,8 @@ export const de_DE: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Schwierigkeitsgrad",
       "name": "Name",
-      "spec": "Spezialisierung"
+      "spec": "Spezialisierung",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Normal",
@@ -130,6 +132,10 @@ export const de_DE: EnTranslations = {
       "gold": {
         "label": "Gold hinzufügen",
         "description": "Gold zum aktuellen Geldbeutel hinzufügen."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Quest abschließen",

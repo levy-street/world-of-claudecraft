@@ -1,5 +1,6 @@
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { GATHERING_PROFESSIONS } from './content/professions';
+import { MECH_CHROMAS } from './content/skins';
 import { DUNGEONS, ITEMS, MOBS } from './data';
 import { applyDevKit } from './dev_kit';
 import { createMob } from './entity';
@@ -224,6 +225,42 @@ export function handleDevChat(
     return null;
   }
 
+  // /dev mech [chroma|off]: preview the Combat Mech cosmetic body without owning a
+  // chroma plate (skin-test cheat). Routes through the same authoritative setter the
+  // character sheet uses; the optional chroma is an index into MECH_CHROMAS.
+  const mechMatch = /^\/(?:dev\s+mech|devmech)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (mechMatch) {
+    const arg = mechMatch[1]?.toLowerCase();
+    if (arg === 'off') {
+      ctx.setPlayerSkin(pid, 0, 'class');
+      emitDevLog(ctx, pid, '[dev] Combat Mech off; back to the class body.');
+      return null;
+    }
+    const chroma = arg === undefined ? 0 : Number(arg);
+    if (!Number.isInteger(chroma) || chroma < 0 || chroma >= MECH_CHROMAS.length) {
+      ctx.error(pid, `[dev] Usage: /dev mech [0-${MECH_CHROMAS.length - 1}|off].`);
+      return null;
+    }
+    ctx.setPlayerSkin(pid, chroma, 'mech');
+    emitDevLog(
+      ctx,
+      pid,
+      `[dev] Combat Mech on (chroma ${chroma}: ${MECH_CHROMAS[chroma].id}). /dev mech off to revert.`,
+    );
+    return null;
+  }
+
+  // /dev wings [on|off]: toggle the wings back-cosmetic (bare form flips it).
+  const wingsMatch = /^\/(?:dev\s+wings|devwings)(?:\s+(on|off))?\s*$/i.exec(raw);
+  if (wingsMatch) {
+    const entity = ctx.entities.get(pid);
+    if (!entity) return null;
+    const next = wingsMatch[1] === undefined ? !entity.wings : wingsMatch[1].toLowerCase() === 'on';
+    ctx.setPlayerWings(pid, next);
+    emitDevLog(ctx, pid, `[dev] Wings ${next ? 'ON' : 'OFF'}.`);
+    return null;
+  }
+
   const goldMatch = /^\/(?:dev\s+gold|devgold)\s+(\d+)\s*$/i.exec(raw);
   if (goldMatch) {
     const gold = clampInteger(Number(goldMatch[1]), 1, 100000);
@@ -432,7 +469,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev cascade, /dev sandbox, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev gold, /dev mech, /dev wings, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev cascade, /dev sandbox, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

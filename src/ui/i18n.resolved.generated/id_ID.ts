@@ -46,6 +46,7 @@ export const id_ID: EnTranslations = {
     "itemUnknown": "Tidak ada barang dengan id itu.",
     "itemHeroicTag": "Heroik",
     "kitCurrentSpec": "Spesialisasi saat ini",
+    "mechOff": "Off (class body)",
     "serverRequirement": "Perintah curang server tetap memerlukan ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Pilih nilai yang valid sebelum menjalankan perintah ini.",
     "sent": "Terkirim: {command}",
@@ -64,7 +65,8 @@ export const id_ID: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Tingkat kesulitan",
       "name": "Nama",
-      "spec": "Spesialisasi"
+      "spec": "Spesialisasi",
+      "chroma": "Chroma"
     },
     "difficulty": {
       "normal": "Normal",
@@ -130,6 +132,10 @@ export const id_ID: EnTranslations = {
       "gold": {
         "label": "Tambah emas",
         "description": "Tambahkan emas ke dompet saat ini."
+      },
+      "mech": {
+        "label": "Combat Mech skin",
+        "description": "Wear the Combat Mech cosmetic body in a chosen chroma, or take it off."
       },
       "quest": {
         "label": "Selesaikan misi",
