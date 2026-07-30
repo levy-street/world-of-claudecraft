@@ -3877,6 +3877,8 @@ export type SceneRigCameraShot =
   | {
       kind: 'attach';
       target: string;
+      /** Authored time until the next camera composition, for midpoint sampling. */
+      dur?: number;
       fallbackFrame: SceneAttachFrame;
       /** Camera position in the target's local frame. */
       offset: SceneRigPoint;

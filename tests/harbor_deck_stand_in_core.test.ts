@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  authoritativeDeckRigVisible,
   deckStandInAction,
   deckStandInParentTransform,
   disposeDeckStandIn,
@@ -12,6 +13,12 @@ const HARBOR_SOURCE = readFileSync(new URL('../src/render/harbor.ts', import.met
 const RENDERER_SOURCE = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 
 describe('harbor deck stand-in core', () => {
+  it('keeps the authoritative rig visible whenever the scene camera is inactive', () => {
+    expect(authoritativeDeckRigVisible(true, true)).toBe(false);
+    expect(authoritativeDeckRigVisible(true, false)).toBe(true);
+    expect(authoritativeDeckRigVisible(false, true)).toBe(true);
+  });
+
   it('builds only while a ship prop cue is live and keeps one existing visual', () => {
     expect(deckStandInAction(false, false, true)).toBe('idle');
     expect(deckStandInAction(true, false, true)).toBe('build');
@@ -84,7 +91,12 @@ describe('harbor deck stand-in render wiring', () => {
     expect(RENDERER_SOURCE).toContain(
       'const harborDeckStandInActive = updateHarborShips(this.sim.player, dt);',
     );
-    expect(RENDERER_SOURCE).toContain('v.group.visible = !harborDeckStandInActive;');
+    expect(RENDERER_SOURCE).toContain(
+      'v.group.visible = authoritativeDeckRigVisible(\n' +
+        '          harborDeckStandInActive,\n' +
+        '          this.sceneCameraFocus !== null,\n' +
+        '        );',
+    );
     expect(HARBOR_SOURCE).toContain(
       'updateStandIn: (visual, dt) => visual.update(dt, DECK_STAND_IN_IDLE_STATE, false)',
     );

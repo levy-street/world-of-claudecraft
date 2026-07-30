@@ -1694,7 +1694,8 @@ async function startGame(
     propCue: (target, cue, startSec) => cueHarborShip(target, cue, startSec),
     propReset: () => resetHarborShipCues(),
     releaseInputLockMirror: () => online?.releaseSceneInputLockMirror(),
-    attachmentFrame: (target, out) => harborShipAttachFrame(target, out),
+    attachmentFrame: (target, out, presentationTimeSec) =>
+      harborShipAttachFrame(target, out, presentationTimeSec),
     reducedMotion: () =>
       settings.get('reduceMotion') || (sceneReducedMotionMedia?.matches ?? false),
   });
@@ -3931,7 +3932,7 @@ async function startGame(
     sceneFocus.x = pose.focusX;
     sceneFocus.y = pose.focusY;
     sceneFocus.z = pose.focusZ;
-    renderer.sceneCameraFocus = sceneFocus;
+    renderer.sceneCameraFocus = sceneDirector.cameraActive() ? sceneFocus : null;
   };
   // "Reduce motion" is the EFFECTIVE flag (the OS prefers-reduced-motion query OR the
   // in-game switch, the ui_effects_profile model): the intro is exactly the kind of
