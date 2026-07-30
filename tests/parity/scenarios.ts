@@ -1563,14 +1563,17 @@ function masterLoot(): Scenario {
       'convertMasterRollToNeedGreed over a candidate subset',
       'resolveLootRoll tie-break rng.int over tied need rolls',
     ],
-    // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge. This branch
+    // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge, then
+    // 1326 -> 1488 by the v0.32.1 realm loot-table fill (the restored Galecrest
+    // quest camps append four world-gen draws at construction). This branch
     // never touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
     // here); its extra content just moves the shared rng before the rolls, and at
-    // 1091 the need rolls stopped TYING. The tie is the whole point of the
+    // the old seed the need rolls stopped TYING. The tie is the whole point of the
     // scenario's last coverage line (resolveLootRoll's tie-break rng.int), so the
-    // seed is re-hunted to keep two rollers level rather than re-recorded to
-    // whatever the new draw happens to be.
-    build: () => new Sim({ seed: 1326, playerClass: 'warrior', noPlayer: true }),
+    // seed is re-hunted to keep two rollers level (and Bbb the winner, so the
+    // held() pins stand) rather than re-recorded to whatever the new draw
+    // happens to be.
+    build: () => new Sim({ seed: 1488, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       const a = sim.addPlayer('warrior', 'Aaa');
@@ -4484,9 +4487,10 @@ function cardDuel(): Scenario {
 // construction-time draw stream (quest camps + escort NPC spawns across the new
 // realms), and again after the Eastbrook camp respacing thinned the zone-1 camp
 // counts (fewer camp mobs means fewer construction-time draws, which moves every
-// later draw). Spare seeds 36 and 39 were also verified to fire the proc for this
-// drive.
-function professionsCraft(seed = 10): Scenario {
+// later draw). Re-hunted 10 -> 21 for the v0.32.1 realm loot-table fill (the
+// restored Galecrest quest camps append four world-gen draws at construction).
+// Spare seeds 29 and 35 were also verified to fire the proc for this drive.
+function professionsCraft(seed = 21): Scenario {
   return {
     name: 'professions_craft',
     coverage: [

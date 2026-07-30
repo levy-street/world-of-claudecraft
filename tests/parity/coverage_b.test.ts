@@ -202,11 +202,12 @@ describe('coverage: each scenario fires its subsystem', () => {
     const needRolls = evs
       .filter((e) => e.type === 'loot' && e.pid === a && /^Need Roll - /.test(text(e)))
       .map((e) => Number(/^Need Roll - (\d+)/.exec(text(e))?.[1]));
-    // Re-seeded 1091 -> 1326 by the v0.32.0 base merge: the tie SHAPE is preserved
-    // (the same two rollers level at the same 97), only the third roll and the
-    // tie-break's winner moved, because this branch's content shifts the shared rng
-    // and not master-loot logic itself.
-    expect(needRolls).toEqual([97, 97, 85]); // b and c tie at the top, d below
+    // Re-seeded 1091 -> 1326 by the v0.32.0 base merge, then 1326 -> 1488 by the
+    // v0.32.1 realm loot-table fill: the tie SHAPE is preserved (two rollers level
+    // at the top with the third below, and Bbb still the tie-break winner), only
+    // the literal roll values moved, because this branch's content shifts the
+    // shared rng and not master-loot logic itself.
+    expect(needRolls).toEqual([44, 44, 32]); // b and c tie at the top, d below
     // The tie-break picked b, and that outcome is the one observable effect of the
     // master-loot-only draw, so it is pinned by name and by winning roll. WHICH of
     // the tied rollers wins is the rng's call and may move with the seed; that a
