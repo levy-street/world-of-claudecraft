@@ -1,7 +1,7 @@
 import type { SimEvent } from '../src/sim/types';
 
 // Serialize-once assembly for the events fan-out. routeEvents sends a near-identical
-// { t: 'events', list: [...] } frame to every recipient session, but the underlying
+// { t: 'events', time, list: [...] } frame to every recipient session, but the underlying
 // SimEvent objects are shared and, apart from the once-per-batch sender-flair stamp
 // applied before this runs, identical for every recipient. Stringifying the frame per
 // session was therefore O(sessions x events) serialization where O(events) plus
@@ -23,9 +23,12 @@ export function serializeEventFragments(events: readonly SimEvent[]): string[] {
 }
 
 // Assemble one session's events frame from the pre-serialized fragments it selected.
-// Byte-identical to JSON.stringify({ t: 'events', list: [...the selected events...] }):
-// that object serializes as {"t":"events","list":[<frag0>,<frag1>,...]} where each
-// <fragN> is JSON.stringify of the event, which is exactly what this concatenates.
-export function assembleEventsFrame(selectedFragments: readonly string[]): string {
-  return `{"t":"events","list":[${selectedFragments.join(',')}]}`;
+// Byte-identical to JSON.stringify({ t: 'events', time, list: selectedEvents }).
+// The authoritative time precedes the events so the client can advance its mirrored
+// presentation clock before any scene op from the batch becomes drainable.
+export function assembleEventsFrame(
+  selectedFragments: readonly string[],
+  presentationTime: number,
+): string {
+  return `{"t":"events","time":${presentationTime},"list":[${selectedFragments.join(',')}]}`;
 }

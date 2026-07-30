@@ -1687,6 +1687,7 @@ export class GameServer {
       t: 'spectate',
       name: target.name,
       pid: target.pid,
+      time: round2(this.sim.time),
       sceneState: this.sim.sceneReconnectStateFor(target.pid),
       sceneChoiceState: this.sim.sceneChoiceReconnectStateFor(target.pid),
     });
@@ -1721,6 +1722,7 @@ export class GameServer {
       t: 'spectate',
       name: null,
       pid: moderator.pid,
+      time: round2(this.sim.time),
       sceneState: this.sim.sceneReconnectStateFor(moderator.pid),
       sceneChoiceState: this.sim.sceneChoiceReconnectStateFor(moderator.pid),
     });
@@ -3049,6 +3051,7 @@ export class GameServer {
       // Epoch ms of an active chat mute, or null. Lets the client show status
       // at login; sending is still gated server-side regardless.
       chatMutedUntil: session.chatMutedUntil ?? null,
+      time: round2(this.sim.time),
       sceneState: this.sim.sceneReconnectStateFor(pid),
       sceneChoiceState: this.sim.sceneChoiceReconnectStateFor(pid),
     });
@@ -3134,6 +3137,7 @@ export class GameServer {
       realm: REALM,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
+      time: round2(this.sim.time),
       sceneState: this.sim.sceneReconnectStateFor(session.pid),
       sceneChoiceState: this.sim.sceneChoiceReconnectStateFor(session.pid),
     });
@@ -6786,7 +6790,7 @@ export class GameServer {
     // Serialize each event exactly once for the whole batch (after the flair stamp
     // above, so the fragment carries the final wire shape). Every recipient's frame is
     // then assembled by joining the fragments it selects, index-aligned with `events`,
-    // instead of re-stringifying a per-session { t:'events', list } object. Byte-for-byte
+    // instead of re-stringifying a per-session { t:'events', time, list } object. Byte-for-byte
     // identical to the old per-session JSON.stringify; only the fan-out cost changes.
     // INVARIANT: nothing in the per-session loop below may mutate a SimEvent after this
     // point, or a recipient's fragment would stop matching its event. The one in-loop
@@ -6794,6 +6798,7 @@ export class GameServer {
     // tracking context and never the event; the once-per-batch flair stamp above is the
     // only event mutation and correctly precedes this serialization.
     const fragments = serializeEventFragments(events);
+    const presentationTime = round2(this.sim.time);
     // Guard each session: a throw while routing events to one player must not
     // drop this tick's events for every other session (server/CLAUDE.md).
     forEachGuarded(
@@ -6893,8 +6898,10 @@ export class GameServer {
           }
         }
         // sendRaw (not send) so the pre-serialized fragments are not re-stringified;
-        // the assembled string is byte-identical to send({ t:'events', list: events }).
-        if (mine.length > 0) this.sendRaw(session, assembleEventsFrame(mine));
+        // the assembled string is byte-identical to send({ t:'events', time, list: events }).
+        if (mine.length > 0) {
+          this.sendRaw(session, assembleEventsFrame(mine, presentationTime));
+        }
       },
       (err, session) =>
         console.error(`[events] failed to route events for pid ${session.pid}, skipping:`, err),
