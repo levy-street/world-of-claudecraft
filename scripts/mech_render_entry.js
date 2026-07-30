@@ -83,7 +83,7 @@ window.renderMech = async (glbB64, texB64) => {
   await parseOnce(glbB64);
 
   // build chroma texture (glTF baseColor conventions: sRGB, flipY=false)
-  const img = await loadImage('data:image/png;base64,' + texB64);
+  const img = await loadImage(`data:image/png;base64,${texB64}`);
   const tex = new THREE.Texture(img);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.flipY = false;

@@ -145,8 +145,8 @@ function init(glbB64) {
 window.renderEpic = async (glbB64, albedoB64, emisB64) => {
   if (!inited) await init(glbB64);
   const [aImg, eImg] = await Promise.all([
-    loadImage('data:image/png;base64,' + albedoB64),
-    loadImage('data:image/png;base64,' + emisB64),
+    loadImage(`data:image/png;base64,${albedoB64}`),
+    loadImage(`data:image/png;base64,${emisB64}`),
   ]);
   if (material.map) material.map.dispose();
   if (material.emissiveMap) material.emissiveMap.dispose();
