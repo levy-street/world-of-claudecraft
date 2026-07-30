@@ -17,11 +17,9 @@ describe('character appearance picker', () => {
       { kind: 'class', label: 2 },
       { kind: 'class', label: 3 },
       { kind: 'class', label: 4 },
-      { kind: 'class', label: 5 },
-      { kind: 'class', label: 6 },
-      { kind: 'mech', label: 7 },
+      { kind: 'mech', label: 5 },
     ]);
-    expect(options[6]).toMatchObject({
+    expect(options[4]).toMatchObject({
       kind: 'mech',
       skin: 0,
       chromaId: 'amber_crimson',
