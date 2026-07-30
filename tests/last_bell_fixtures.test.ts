@@ -239,6 +239,7 @@ describe('Last Bell campaign fixtures', () => {
       x: shotOp.shot.lookAt.point.x,
       z: shotOp.shot.lookAt.point.z,
     }).toEqual({ x: statue.x, z: statue.z });
+    expect(shotOp.shot.subjectRef).toBe(statue.key);
 
     const statueCollider = colliderInternalsForTest
       .staticWorldColliders(seed)
