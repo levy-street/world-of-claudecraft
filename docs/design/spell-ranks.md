@@ -211,6 +211,7 @@
 | shadow_word_pain | 1 | 4 | 25 | inst | dot 30/18s (6×5) |
 | | **2** | **10** | 38 | inst | dot **54/18s** (6×9) |
 | | **3** | **16** | 55 | inst | dot **84/18s** (6×14) |
+| | **4** | **20** | 72 | inst | dot **122/18s** (2026-07 shadow rebalance, see below) |
 | power_word_shield | 1 | 6 | 45 | inst, 6cd | absorb 48/30s |
 | | **2** | **12** | 70 | inst, 6cd | absorb **90** |
 | | **3** | **18** | 100 | inst, 6cd | absorb **145** |
@@ -226,10 +227,22 @@
 | Ability | Learn | Cost | Cast/CD | Effects |
 |---|---|---|---|---|
 | `heal` | 14 | 95 | 2.5s | heal 165–195; **R2 @ L20**: cost 130, heal 230–270 |
-| `mind_flay` | 16 | 45 | 3s channel ×3 ticks | drainTick 12–12 `healFrac: 0` + slow 0.5/3s (reuses drainTick — no new type) |
+| `mind_flay` | 16 | 45 | 3s channel ×3 ticks | drainTick 12–12 `healFrac: 0` + slow 0.5/3s (reuses drainTick — no new type); **R2 @ L20**: cost 58, drainTick 17 (2026-07 shadow rebalance) |
 | `flash_heal` | 20 | 75 | 1.5s | heal 120–142 |
 
 **Sanity** — L14: SWP R2 (54) + Smite R3 avg 47 ×5 ≈ 289 → ~6 casts ✓. L20: SWP R3 (84) + MB R3 (~90) + 3× Smite R4 (~213) ≈ 387 + wand-less white → ~5–6 GCDs ✓.
+
+### 2026-07 shadow rebalance: the missing shadow cap ranks
+
+The Vespers kit flatlined into the cap: Dirge of Decay topped at rank 3
+(level 16) and Litany of Woe never ranked past its learn level, while every
+peer caster filler kept ranking to 20. scripts/caster_dps_probe.ts measured
+shadow at 34.4 sustained DPS against 43.9 elemental / 40.7 affliction. The
+fix follows the cap-rank recipe above (~1.45x the prior top, cost ~1.3x):
+shadow_word_pain R4 at 20 (cost 72, dot 122/18s) and mind_flay R2 at 20
+(cost 58, drainTick 17). Sub-cap ranks pinned untouched, so leveling is
+unchanged. Companion mechanic and full measurements:
+`docs/design/shadow-rebalance-2026-07.md`.
 
 ---
 

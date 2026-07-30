@@ -163,10 +163,17 @@ describe('Dark Descant on a live Sim', () => {
     channelFlays(sim, p, 2);
     expect(p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(false);
 
-    // The 3rd flay press fires Dark Descant: 3 sec refunded (which clears the
-    // ~2 sec that naturally remain at this point) and the empower aura armed.
+    // Pin the refund MAGNITUDE, not just "it got shorter": let the 2nd channel
+    // fully drain first, then stretch the remaining cooldown to a known 6 sec
+    // right before the 3rd press, so the 3 sec refund cannot be confused with
+    // the cooldown draining naturally to zero. Only a couple of sim ticks
+    // elapse between the set and the proc firing on the press.
+    for (let i = 0; i < 20 * 5 && (p.castingAbility || p.channeling); i++) sim.tick();
+    p.cooldowns.set('mind_blast', 6);
     channelFlays(sim, p, 1);
-    expect(p.cooldowns.get('mind_blast')).toBeUndefined();
+    expect(p.cooldowns.get('mind_blast')).toBeDefined();
+    expect(p.cooldowns.get('mind_blast')!).toBeGreaterThan(2.5);
+    expect(p.cooldowns.get('mind_blast')!).toBeLessThanOrEqual(3);
     const empower = p.auras.find((a) => a.kind === 'next_cast_instant');
     expect(empower).toBeDefined();
     expect(empower?.name).toBe('Dark Descant');
@@ -192,6 +199,46 @@ describe('Dark Descant on a live Sim', () => {
     expect(auraConsumedOnPress).toBe(true);
     expect(hit).toBe(true);
     expect(castBar).toBe(false);
+  });
+
+  it('the loop re-arms: consuming the empowered Mindfracture does not disturb the counter', () => {
+    const { sim, p } = shadowRig();
+    // First cycle: proc, then consume the instant Mindfracture.
+    channelFlays(sim, p, 3);
+    expect(p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(true);
+    for (let i = 0; i < 20 * 5 && (p.castingAbility || p.channeling); i++) sim.tick();
+    for (let i = 0; i < 20; i++) sim.tick();
+    sim.castAbility('mind_blast');
+    sim.tick();
+    expect(p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(false);
+    // Second cycle: the counter reset on fire, so exactly 3 more full channels
+    // re-arm it (the empowered mind_blast press must not have advanced or
+    // corrupted the flay counter; the G1 free-cast rule and this proc's
+    // trigger scope keep the two buttons independent).
+    channelFlays(sim, p, 2);
+    expect(p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(false);
+    channelFlays(sim, p, 1);
+    expect(p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(true);
+  });
+
+  it('a cancelled channel still counts: the press is the trigger, not the full channel', () => {
+    const { sim, p } = shadowRig();
+    // castNth counts at cast time (the press), pinned here so a future engine
+    // change that moves the count to channel completion fails loudly instead
+    // of silently slowing the loop's cadence. Count real castStart events, not
+    // press attempts: a press inside the GCD is rejected and must not count.
+    let started = 0;
+    for (let i = 0; i < 20 * 30 && started < 3; i++) {
+      if (!p.castingAbility && !p.channeling) sim.castAbility('mind_flay');
+      for (const ev of sim.tick()) {
+        if (ev.type === 'castStart' && ev.ability === 'mind_flay') {
+          started++;
+          (sim as Record<string, any>).cancelCast(p);
+        }
+      }
+    }
+    expect(started).toBe(3);
+    expect(p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(true);
   });
 
   it('a holy priest channelling Litany of Woe never hears the Descant', () => {

@@ -4,7 +4,10 @@
 // seconds (the same fight length as scripts/fury_dps_probe.ts so the meters are
 // comparable). Auto-equipped leveling gear for every spec, own self-buffs only.
 // Built for the shadow-priest rebalance: run the same file on both trees and
-// compare. npx tsx scripts/caster_dps_probe.ts
+// compare. NOT the balance framework's 180-second three-profile parity gate
+// (docs/design/spell-balance-framework.md): a relative sustained meter only,
+// and the frost rotation is a floor (its proc weaving is not modeled).
+// npx tsx scripts/caster_dps_probe.ts
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
