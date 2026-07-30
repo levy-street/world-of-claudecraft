@@ -345,10 +345,7 @@ function blackTickCoveredCut<Beat extends string>(
   at: Beat,
   shot: SceneCameraShotDef,
 ): SceneTimelineEntry<Beat>[] {
-  return [
-    { at: beat(at, -DT), kind: 'fade', to: 'black', dur: 0 },
-    coveredCut(at, shot),
-  ];
+  return [{ at: beat(at, -DT), kind: 'fade', to: 'black', dur: 0 }, coveredCut(at, shot)];
 }
 
 function arrivalPierTimeline(
@@ -524,11 +521,7 @@ registerScene(
     id: 'scn_lb_q0_voyage',
     beats: Q0_VOYAGE_BEATS,
     releaseMargin: 0,
-    timeline: [
-      ...voyageTimeline(OUTBOUND, true),
-      ...q0StoryTimeline(),
-      ...releaseTimeline(),
-    ],
+    timeline: [...voyageTimeline(OUTBOUND, true), ...q0StoryTimeline(), ...releaseTimeline()],
   }),
 );
 

@@ -586,8 +586,7 @@ describe('the voyage cinematic', () => {
     for (const scene of [out, back, q0]) {
       expect(
         scene.ops.some(
-          (op) =>
-            op.at === 0 && op.kind === 'fade' && op.to === 'black' && op.dur === 0,
+          (op) => op.at === 0 && op.kind === 'fade' && op.to === 'black' && op.dur === 0,
         ),
       ).toBe(true);
       const finalFade = scene.ops.filter((op) => op.kind === 'fade').at(-1);
