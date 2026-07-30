@@ -71,7 +71,10 @@ import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
-const CORPSE_DURATION = 60;
+// Exported so the respawn policy's guard can check it against the zone tiers:
+// updateMob defers an in-place respawn while a corpse is still lootable, so the
+// effective delay is max(tier, this). See tests/respawn_policy.test.ts.
+export const CORPSE_DURATION = 60;
 // Self attack-speed buff a wounded frenzyOnHit mob gains; sole user maybeFrenzyOnHit.
 const BLOOD_FRENZY_AURA_ID = 'blood_frenzy';
 const VICTORY_RUSH_WINDOW = 20;
