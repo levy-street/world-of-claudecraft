@@ -333,6 +333,47 @@ describe('graphics tier resolution', () => {
     expect(nativeAndroid.maxPooledCharacterVisuals).toBe(Number.POSITIVE_INFINITY);
   });
 
+  it('applies the 4 GB-class tight-memory rung only with the hint, and only on native iOS', () => {
+    const nativeIos = {
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+      nativeApp: true,
+      platform: 'ios' as const,
+    };
+    const tight = gfxInternalsForTest.settingsFor('medium', { ...nativeIos, tightMemory: true });
+    const standard = gfxInternalsForTest.settingsFor('medium', nativeIos);
+    const tightWeb = gfxInternalsForTest.settingsFor('medium', {
+      ...nativeIos,
+      nativeApp: false,
+      tightMemory: true,
+    });
+
+    expect(tight.tightMemory).toBe(true);
+    expect(tight.pixelRatioCap).toBe(1.0);
+    // Reuses the Advanced sub-knob's lean grass values (34 / 3.8): the leanest
+    // grass the game already ships, so the rung adds no new visual floor.
+    expect(tight.grassRadius).toBe(34);
+    expect(tight.grassStep).toBe(3.8);
+    expect(tight.maxPooledCharacterVisuals).toBe(4);
+    // Collision-bearing tree/rock placement fairness holds on the tight rung too.
+    expect(tight.leanFoliage).toBe(false);
+    expect(tight.nativeIosMemoryProfile).toBe(true);
+
+    // Without the hint the standard native profile is exactly what it was: a
+    // device the shell cannot measure keeps today's behaviour, byte for byte.
+    expect(standard.tightMemory).toBe(false);
+    expect(standard.pixelRatioCap).toBe(1.25);
+    expect(standard.grassRadius).toBe(52);
+    expect(standard.grassStep).toBe(2.75);
+    expect(standard.maxPooledCharacterVisuals).toBe(6);
+
+    // The rung is scoped to the packaged iOS shell: the hint only exists where
+    // the native bridge measured it (or an entry crash stamped the marker).
+    expect(tightWeb.tightMemory).toBe(false);
+    expect(tightWeb.pixelRatioCap).toBeGreaterThan(1.0);
+  });
+
   it('never raises the native iOS light bound from an Advanced low-effects override', () => {
     const advanced = gfxInternalsForTest.settingsFor('high', {
       maxTouchPoints: 5,

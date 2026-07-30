@@ -17,6 +17,7 @@
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		504EC31A1FED79650016851F /* AppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3191FED79650016851F /* AppViewController.swift */; };
 		504EC3201FED79650016851F /* NativeAppUpdatePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC31F1FED79650016851F /* NativeAppUpdatePlugin.swift */; };
+		504EC3D2DEC0DE0016851F02 /* NativeDeviceInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3D1DEC0DE0016851F01 /* NativeDeviceInfoPlugin.swift */; };
 		504EC3221FED79650016851F /* NativeAppleAuthPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3211FED79650016851F /* NativeAppleAuthPlugin.swift */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 /* End PBXBuildFile section */
@@ -33,6 +34,7 @@
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		504EC3191FED79650016851F /* AppViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewController.swift; sourceTree = "<group>"; };
 		504EC31F1FED79650016851F /* NativeAppUpdatePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAppUpdatePlugin.swift; sourceTree = "<group>"; };
+		504EC3D1DEC0DE0016851F01 /* NativeDeviceInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeDeviceInfoPlugin.swift; sourceTree = "<group>"; };
 		504EC3211FED79650016851F /* NativeAppleAuthPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAppleAuthPlugin.swift; sourceTree = "<group>"; };
 		504EC3231FED79650016851F /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 				504EC3191FED79650016851F /* AppViewController.swift */,
 				504EC3090FED79650016851F /* NativeAttestationPlugin.swift */,
 				504EC31F1FED79650016851F /* NativeAppUpdatePlugin.swift */,
+				504EC3D1DEC0DE0016851F01 /* NativeDeviceInfoPlugin.swift */,
 				504EC3211FED79650016851F /* NativeAppleAuthPlugin.swift */,
 				504EC3231FED79650016851F /* App.entitlements */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
@@ -173,6 +176,7 @@
 				504EC31A1FED79650016851F /* AppViewController.swift in Sources */,
 				504EC3091FED79650016851F /* NativeAttestationPlugin.swift in Sources */,
 				504EC3201FED79650016851F /* NativeAppUpdatePlugin.swift in Sources */,
+				504EC3D2DEC0DE0016851F02 /* NativeDeviceInfoPlugin.swift in Sources */,
 				504EC3221FED79650016851F /* NativeAppleAuthPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

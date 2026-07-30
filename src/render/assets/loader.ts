@@ -125,6 +125,15 @@ export function releaseGltf(url: string): void {
   gltfCache.delete(assetUrl(url));
 }
 
+/** The texture twin of releaseGltf: drop a loadTexture entry once its pixels
+ *  have been copied into a consumer-owned surface (e.g. the VFX sprite atlas),
+ *  so the decoded source image can be garbage-collected. Pass the SAME opts the
+ *  load used - they are part of the cache key. A later loadTexture re-fetches. */
+export function releaseTexture(url: string, opts: { srgb?: boolean; repeat?: boolean } = {}): void {
+  const resolved = assetUrl(url);
+  texCache.delete(`${resolved}|${opts.srgb ? 's' : 'l'}|${opts.repeat ? 'r' : 'c'}`);
+}
+
 // One shared decode worker (created lazily): fetch + RGBE parse of an 8MB 2k
 // HDRI is over a second of pure CPU, a measured full-frame stall every time
 // zone streaming brought in a new biome's sky. Requests are matched by id;

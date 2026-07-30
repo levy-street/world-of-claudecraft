@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { PlayerClass } from '../../sim/types';
 import { assetsReady } from '../assets/preload';
 import { trackWebGLContext } from '../context_release';
+import { ensureSkinTexture } from './assets';
 import { VISUALS } from './manifest';
 import { type PortraitFraming, portraitFrameParams } from './portrait_framing';
 import { CharacterVisual } from './visual';
@@ -124,6 +125,14 @@ export function visualPortraitDataUrl(
   if (cached) return cached;
   if (!assetsAreReady) return null;
 
+  // The packaged iOS shell defers the boot skin-atlas sweep (assets.ts), so a
+  // non-default skin's atlas may not be resident yet. Still render (the body
+  // falls back to the embedded default colours) but do NOT cache: the ensure
+  // kicked here resolves shortly, and the next call re-renders with the real
+  // atlas instead of pinning the wrong colours for the whole session. On eager
+  // platforms the atlas is resident and ensureSkinTexture returns null.
+  const atlasPending = ensureSkinTexture(visualKey, skin) !== null;
+
   let visual: CharacterVisual | null = null;
   try {
     ensureRig();
@@ -171,7 +180,7 @@ export function visualPortraitDataUrl(
 
     renderer!.render(scene!, camera!);
     const url = renderer!.domElement.toDataURL('image/png');
-    cache.set(key, url);
+    if (!atlasPending) cache.set(key, url);
     return url;
   } catch (err) {
     if (import.meta.env?.DEV) console.warn(`[portrait] failed for ${key}`, err);
