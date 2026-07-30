@@ -11,10 +11,22 @@ rotating rune circle does in the ARPGs this convention comes from.
 
 ## What it is
 
-A ground rune disc plus two flanking crescents, drawn under the character running
-the buff. The disc turns slowly, the crescents counter-turn, and the whole thing
-breathes at about 1.6 rad/s. It fades in over 0.3s and out over 0.24s, so
-swapping auras reads as a change rather than a pop.
+Two short arcs of light flanking the character at torso height, plus a small
+anchor ring at the feet. The arcs carry the read and the ring only grounds them.
+Both ride on the character, so the aura travels with whoever is running it.
+
+The first pass had this backwards: a wide ground disc with a long crescent sweep
+centred on the body. In a real scene that reads as a hoop the character is
+standing inside, like a decal on the floor, which is the opposite of an aura. The
+arcs were shortened to under a quarter turn, pulled in to the shoulders and
+stretched vertically, and the disc was cut to roughly half its radius and a third
+of its opacity.
+
+The arcs are yawed towards the camera every frame. They are flat geometry, so a
+fixed plane leaves them edge-on and invisible from most angles.
+
+The ring turns slowly and the whole thing breathes at about 1.6 rad/s. It fades
+in over 0.3s and out over 0.24s, so swapping auras reads as a change, not a pop.
 
 ## What it is not
 

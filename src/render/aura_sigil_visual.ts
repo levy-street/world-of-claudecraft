@@ -67,9 +67,9 @@ interface SigilPalette {
 // One palette per magic school, so an aura added to any existing exclusive group
 // is coloured correctly without touching this file.
 const PALETTES: Record<AuraSigilSchool, SigilPalette> = {
-  holy: { rune: 0xffe9a8, crescent: 0xfff6d6 },
-  physical: { rune: 0xffb066, crescent: 0xffd9b0 },
-  nature: { rune: 0x86e07a, crescent: 0xd2f5c8 },
+  holy: { rune: 0xffc94a, crescent: 0xffe08a },
+  physical: { rune: 0xff8a3c, crescent: 0xffb877 },
+  nature: { rune: 0x5fd44e, crescent: 0x9ff08c },
   fire: { rune: 0xff7a3c, crescent: 0xffc48a },
   frost: { rune: 0x6fd4ff, crescent: 0xc9f0ff },
   arcane: { rune: 0xc08cff, crescent: 0xe6d3ff },
@@ -78,11 +78,17 @@ const PALETTES: Record<AuraSigilSchool, SigilPalette> = {
 
 // Shared across every sigil in the scene: geometry is identical for all of them
 // and only the materials differ, so a raid of paladins costs one allocation each.
-const RUNE_GEOMETRY = new THREE.RingGeometry(0.58, 0.92, 48);
-const RUNE_EDGE_GEOMETRY = new THREE.RingGeometry(0.96, 1, 48);
-// A quarter-arc of a circle centred on the character; two of them, mirrored,
-// read as the pair of crescents flanking the body.
-const CRESCENT_GEOMETRY = new THREE.TorusGeometry(0.62, 0.028, 6, 40, Math.PI * 0.5);
+// A small anchor ring at the feet. Deliberately tight to the body: a wide
+// disc reads as a ground decal the character happens to stand on, and the
+// aura is supposed to ride WITH them.
+const RUNE_GEOMETRY = new THREE.RingGeometry(0.34, 0.5, 40);
+const RUNE_EDGE_GEOMETRY = new THREE.RingGeometry(0.53, 0.57, 40);
+// One SHORT arc, swept about the +x axis. Two instances, the second rotated a
+// half turn, sit at the character's left and right shoulders. Kept under a
+// quarter turn of sweep so it reads as a crescent beside the body rather
+// than a hoop around it.
+const CRESCENT_SWEEP = Math.PI * 0.4;
+const CRESCENT_GEOMETRY = new THREE.TorusGeometry(0.5, 0.036, 8, 32, CRESCENT_SWEEP);
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
@@ -158,7 +164,7 @@ export class AuraSigilVisual {
     this.runeMaterial = new THREE.MeshBasicMaterial({
       color: palette.rune,
       transparent: true,
-      opacity: 0.42,
+      opacity: 0.8,
       depthWrite: false,
       side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending,
@@ -193,9 +199,12 @@ export class AuraSigilVisual {
       blending: THREE.AdditiveBlending,
     });
     this.crescents.name = 'aura-sigil-crescents';
-    this.crescents.position.y = 0.98;
-    // Two arcs of the same circle, centred on +x and -x, so they frame the body.
-    const rotations = [-Math.PI * 0.25, Math.PI * 0.75] as const;
+    // Torso height, and stretched vertically so each arc is a tall thin blade of
+    // light beside the shoulder rather than a fat circle segment.
+    this.crescents.position.y = 1.02;
+    this.crescents.scale.set(1, 1.45, 1);
+    // Centre one sweep on +x and the mirror on -x.
+    const rotations = [-CRESCENT_SWEEP / 2, Math.PI - CRESCENT_SWEEP / 2] as const;
     for (let i = 0; i < rotations.length; i++) {
       const arc = new THREE.Mesh(CRESCENT_GEOMETRY, this.crescentMaterial);
       arc.name = `aura-sigil-crescent-${i + 1}`;
@@ -229,12 +238,15 @@ export class AuraSigilVisual {
    * @param dt       seconds since the last frame
    * @param opacity  player's aura-sigil opacity setting (0..1)
    * @param scale    player's aura-sigil scale setting
+   * @param faceYaw  world yaw from this character towards the camera, so the
+   *                 flat crescents never present their edge to the viewer
    */
   update(
     state: AuraSigilState | null,
     dt: number,
     opacity: number,
     scale: number,
+    faceYaw: number,
   ): void {
     if (this.disposed) return;
     const delta = Math.max(0, dt);
@@ -261,15 +273,20 @@ export class AuraSigilVisual {
     // A slow breath keeps the sigil alive without pulling the eye off combat.
     const breath = 0.92 + 0.08 * Math.sin(this.elapsed * 1.6);
 
-    this.runeMaterial.opacity = 0.42 * strength * breath;
-    this.edgeMaterial.opacity = 0.55 * strength;
-    this.crescentMaterial.opacity = 0.7 * strength * breath;
+    // Tuned against a lit town scene: the earlier values were technically
+    // present but unreadable at a glance, which defeats the whole point.
+    // The crescents carry the read; the ring only grounds them.
+    this.runeMaterial.opacity = 0.34 * strength * breath;
+    this.edgeMaterial.opacity = 0.5 * strength;
+    this.crescentMaterial.opacity = 1 * strength * breath;
 
     this.content.scale.setScalar(this.baseScale * Math.max(0.1, scale) * (0.86 + 0.14 * eased));
-    // The disc turns; the crescents counter-turn a little slower.
+    // The disc turns freely, but the crescents are a flat pair of arcs: left to
+    // a fixed plane they go edge-on and vanish from most camera angles, so they
+    // are yawed to present their face to the viewer every frame.
     this.rune.rotation.z = this.elapsed * 0.35;
     this.edge.rotation.z = -this.elapsed * 0.22;
-    this.crescents.rotation.y = -this.elapsed * 0.18;
+    this.crescents.rotation.y = faceYaw;
   }
 
   /** True once a faded-out sigil has nothing left to draw and can be released. */
@@ -290,6 +307,7 @@ export function syncAuraSigilVisual(
   dt: number,
   opacity: number,
   scale: number,
+  faceYaw: number,
 ): AuraSigilVisual | null {
   let current = visual;
   if (state && !current) {
@@ -297,7 +315,7 @@ export function syncAuraSigilVisual(
     parent.add(current.group);
   }
   if (!current) return null;
-  current.update(state, dt, opacity, scale);
+  current.update(state, dt, opacity, scale, faceYaw);
   if (!state && current.finished) {
     current.dispose();
     return null;

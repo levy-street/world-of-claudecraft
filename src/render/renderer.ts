@@ -7244,6 +7244,11 @@ export class Renderer {
         dt,
         this.auraSigilOpacity,
         this.auraSigilScale,
+        // Yaw from this character towards the camera. v.group carries the
+        // entity's own facing, so subtract it to keep the arcs camera-facing
+        // no matter which way the character turns.
+        Math.atan2(this.camera.position.x - e.pos.x, this.camera.position.z - e.pos.z) -
+          v.group.rotation.y,
       );
       const iceBlockActivated = v.iceBlockVisual?.activatedThisFrame === true;
 
