@@ -786,7 +786,7 @@ export function harvestFamilyYieldsItem(component: string): boolean {
  * pick's length.
  *
  * Answering on mapped families instead retires that whole class rather than
- * reporting it: the corpse takes the SAME path as the 101 shipped templates
+ * reporting it: the corpse takes the SAME path as the many shipped templates
  * that carry no component tags at all, so the picker and the interact prompt
  * never offer it (src/sim/corpse_interaction.ts, src/game/corpse_loot_availability.ts,
  * src/ui/hud/loot/corpse_harvest_view.ts all read this predicate), and an

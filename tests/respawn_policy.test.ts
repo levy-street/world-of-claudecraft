@@ -1,6 +1,7 @@
 // Pins the open-world respawn policy (src/sim/respawn_policy.ts): the level-band
 // tiers, the precedence chain around them, and the death site that consumes it.
 import { describe, expect, it } from 'vitest';
+import { CORPSE_DURATION } from '../src/sim/combat/damage';
 import { instanceOrigin, MOBS, ZONES, zoneAt, zoneContaining } from '../src/sim/data';
 import {
   baseRespawnSecondsAt,
@@ -14,7 +15,7 @@ import {
   trashRespawnSecondsForZone,
 } from '../src/sim/respawn_policy';
 import { Sim } from '../src/sim/sim';
-import type { ZoneDef } from '../src/sim/types';
+import { DT, type ZoneDef } from '../src/sim/types';
 
 // A minimal ZoneDef the tier function can read; only levelRange and the optional
 // override matter to it, so the rest is inert filler.
@@ -281,6 +282,40 @@ describe('the death site consumes the policy', () => {
     if (!mob) throw new Error('no forest_wolf spawned');
     sim.dealDamage(null, mob, 99_999, false, 'physical', null, 'hit');
     expect(mob.respawnTimer).toBe(2);
+  });
+
+  it('is not pushed out by the corpse window, which the yield model assumes', () => {
+    // updateMob defers an in-place respawn while the corpse is still lootable,
+    // so the effective delay is max(tier, corpse window). Giving coinless trash
+    // harvest tags makes those corpses lootable where they were not, which would
+    // silently stretch the delay if the corpse window ever exceeded a tier.
+    // CORPSE_DURATION is 60 and the fastest tier is 60, so the tier still wins
+    // everywhere; farm_yield prices camps on the tier alone and stays correct.
+    expect(CORPSE_DURATION).toBeLessThanOrEqual(TRASH_RESPAWN_SECONDS_LOW);
+    expect(CORPSE_DURATION).toBeLessThanOrEqual(TRASH_RESPAWN_SECONDS_MID);
+    expect(CORPSE_DURATION).toBeLessThanOrEqual(TRASH_RESPAWN_SECONDS_HIGH);
+
+    // ...and end to end: a harvestable Eastbrook beast is back on the 60s tier,
+    // not 60 plus a corpse window.
+    const sim = new Sim({ seed: 20061, playerClass: 'warrior', noPlayer: true });
+    const wolf = [...sim.entities.values()].find(
+      (e) => e.kind === 'mob' && e.templateId === 'forest_wolf',
+    );
+    if (!wolf) throw new Error('no forest_wolf spawned');
+    expect(MOBS.forest_wolf.componentTags?.length).toBeGreaterThan(0);
+    sim.dealDamage(null, wolf, 99_999, false, 'physical', null, 'hit');
+    expect(wolf.dead).toBe(true);
+    expect(wolf.respawnTimer).toBe(TRASH_RESPAWN_SECONDS_LOW);
+    const deadline = Math.ceil(TRASH_RESPAWN_SECONDS_LOW / DT) + 4;
+    let revivedAt: number | null = null;
+    for (let i = 0; i < deadline && revivedAt === null; i++) {
+      sim.tick();
+      if (!wolf.dead) revivedAt = sim.time;
+    }
+    expect(revivedAt).not.toBeNull();
+    // Within one tick of the tier, so no corpse window was added on top.
+    expect(revivedAt as number).toBeGreaterThanOrEqual(TRASH_RESPAWN_SECONDS_LOW);
+    expect(revivedAt as number).toBeLessThan(TRASH_RESPAWN_SECONDS_LOW + 1);
   });
 
   it('still caps corpse decay at a fixed template respawn (the training dummy)', () => {
