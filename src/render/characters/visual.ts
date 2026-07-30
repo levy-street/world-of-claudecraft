@@ -37,6 +37,7 @@ import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
+import { configureTightBoneTextures } from './skin_gpu_layout';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { weaponAttackStyle } from './weapon_attack_style_core';
 import {
@@ -366,6 +367,7 @@ export class CharacterVisual {
     // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
     // the held weapon model, so the visual is born holding the right weapon.
     this.model = assembleModel(this.def, weaponItemId, offhandItemId);
+    configureTightBoneTextures(this.model);
     applyMaterials(
       this.model,
       this.def,
@@ -1117,6 +1119,7 @@ export class CharacterVisual {
       this.stow.attached,
     );
     for (const payload of payloads) {
+      configureTightBoneTextures(payload);
       applyMaterials(
         payload,
         this.def,
@@ -1173,6 +1176,7 @@ export class CharacterVisual {
    *  re-pin skin orientation, re-run the material pass, re-snapshot originals,
    *  and rebuild the skin VFX on the payloads that now exist. */
   private finishWeaponAttach(payloads: THREE.Object3D[]): void {
+    for (const payload of payloads) configureTightBoneTextures(payload);
     // Ranged skins take a root-relative orientation pin (position always rides
     // the hand): a bow aims upright WHILE the shot one-shot plays (the string
     // hand rolls a glued bow sideways mid-draw); a bow-slot gun carries muzzle
