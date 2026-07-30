@@ -45,6 +45,7 @@ import type { IWorld } from '../world_api';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
+import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { attachBankerChestToNpcView } from './banker_chest';
 import { type BirdsView, buildBirds } from './birds';
@@ -86,6 +87,7 @@ import {
 } from './characters/anim_state';
 import { logAssetMissOnce } from './characters/asset_miss_log';
 import {
+  characterResidencySources,
   mechAssetsReady,
   mountAssetsReady,
   preloadMechAssets,
@@ -153,6 +155,7 @@ import {
   buildFoliageMaterialPrewarmGroup,
   type FoliagePerfStats,
   type FoliageView,
+  foliageResidencySources,
 } from './foliage';
 import {
   type FrostNovaRootVisual,
@@ -229,7 +232,7 @@ import {
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
 } from './prewarm_policy';
-import { buildPropMaterialPrewarmGroup, buildProps } from './props';
+import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
 import { isOwnedPetHostile } from './reaction';
@@ -2020,6 +2023,37 @@ export class Renderer {
     this.flames.push(...stationProps.flames);
     this.fireLights.push(...stationProps.fireLights);
     bd('stations');
+    // One residency table at the end of the build (dev console): where the
+    // decoded bytes sit at exactly the point the iPhone 17 Pro is killed.
+    // Scene first so shared buffers/images attribute to the live world, then
+    // the caches so only their EXCLUSIVE retention shows as theirs.
+    console.info(
+      formatResidencyBudget(
+        residencyBudget([
+          { label: 'scene', objects: [this.scene] },
+          {
+            label: 'char parse cache',
+            objects: characterResidencySources().parsedScenes,
+          },
+          {
+            label: 'prop extract cache',
+            geometries: propResidencySources().extractedGeometries,
+          },
+          {
+            label: 'prop parse cache',
+            objects: propResidencySources().parsedScenes,
+          },
+          {
+            label: 'foliage extract cache',
+            geometries: foliageResidencySources().extractedGeometries,
+          },
+          {
+            label: 'foliage parse cache',
+            objects: foliageResidencySources().parsedScenes,
+          },
+        ]),
+      ),
+    );
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each

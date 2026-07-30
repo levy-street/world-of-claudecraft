@@ -448,6 +448,17 @@ if (typeof window !== 'undefined') {
   }
 }
 
+/** Dev-channel residency accounting sources (see assets/residency_budget.ts). */
+export function propResidencySources(): {
+  extractedGeometries: THREE.BufferGeometry[];
+  parsedScenes: THREE.Object3D[];
+} {
+  return {
+    extractedGeometries: [...extractCache.values()].flatMap((a) => a.parts.map((p) => p.geo)),
+    parsedScenes: [...loadedProps.values()].map((g) => g.scene),
+  };
+}
+
 /** Test-only window into the preload/prewarm key sets (see tests/render_asset_preload). */
 export const propPreloadInternalsForTest = {
   allPropKeys: ALL_PROP_KEYS,

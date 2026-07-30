@@ -742,6 +742,11 @@ export function mountAssetsReady(visualKey: string): boolean {
   return !!def && gltfByUrl.has(assetUrl(def.url));
 }
 
+/** Dev-channel residency accounting sources (see assets/residency_budget.ts). */
+export function characterResidencySources(): { parsedScenes: THREE.Object3D[] } {
+  return { parsedScenes: [...gltfByUrl.values()].map((g) => g.scene) };
+}
+
 function resolvedGltf(url: string): GLTF {
   const resolvedUrl = assetUrl(url);
   const g = gltfByUrl.get(resolvedUrl);

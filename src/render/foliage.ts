@@ -617,6 +617,17 @@ function bakeGeometry(mesh: THREE.Mesh): THREE.BufferGeometry {
   return out;
 }
 
+/** Dev-channel residency accounting sources (see assets/residency_budget.ts). */
+export function foliageResidencySources(): {
+  extractedGeometries: THREE.BufferGeometry[];
+  parsedScenes: THREE.Object3D[];
+} {
+  return {
+    extractedGeometries: [...extractedParts.values()].flatMap((ps) => ps.map((p) => p.geometry)),
+    parsedScenes: [...loadedModels.values()].map((g) => g.scene),
+  };
+}
+
 function extractParts(url: string): ModelPart[] {
   const cached = extractedParts.get(url);
   if (cached) return cached;
