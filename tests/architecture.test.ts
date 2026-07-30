@@ -282,6 +282,8 @@ const RENDER_PURE_CORES = [
   'src/render/camera_director_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
+  'src/render/character_effects_core.ts',
+  'src/render/character_view_core.ts',
   'src/render/chunk_residency_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
@@ -315,6 +317,7 @@ const RENDER_PURE_CORES = [
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/zone_feature_visibility_core.ts',
+  'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
 

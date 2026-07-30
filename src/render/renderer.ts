@@ -67,10 +67,13 @@ import {
 } from './camera_feel_core';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import {
-  characterRecklessnessActive,
-  characterSanguineAuraActive,
-  characterSoulRendActive,
-} from './character_effects';
+  addCharacterEffectAura,
+  CHARACTER_EFFECT_RECKLESSNESS,
+  CHARACTER_EFFECT_SANGUINE,
+  CHARACTER_EFFECT_SOUL_REND,
+  hasCharacterEffect,
+} from './character_effects_core';
+import { characterViewOutsideHysteresis } from './character_view_core';
 import {
   type AnimState,
   type CharacterVisual,
@@ -7116,9 +7119,28 @@ export class Renderer {
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
       if (!e) continue;
+      // Distance rejection comes before effect/state derivation. Retained views
+      // outside the 80/96 yard visibility hysteresis rendered nothing before
+      // and still render nothing, so their aura and actionability work can wait.
+      const cdx = e.pos.x - p.pos.x,
+        cdz = e.pos.z - p.pos.z;
+      const d2 = cdx * cdx + cdz * cdz;
+      const isSelf = id === p.id;
+      if (
+        !isSelf &&
+        characterViewOutsideHysteresis(
+          v.group.visible,
+          d2,
+          this.entityViewCreateRangeSq,
+          this.entityViewDestroyRangeSq,
+        )
+      ) {
+        v.group.visible = false;
+        continue;
+      }
       // form swaps (polymorph sheep, druid forms) — computed up front because
       // the shadow gates below must not run the base rig's proxy under a form.
-      // One pass over the aura list instead of six .some() scans per entity per
+      // One pass over the aura list instead of repeated .some() scans per entity per
       // frame; the flag combination below preserves the original precedence.
       let hasPoly = false;
       let hasBear = false;
@@ -7134,7 +7156,9 @@ export class Renderer {
       let temporalHourglassMode: TemporalHourglassMode | null = null;
       let hasFrostNovaRoot = false;
       let mageBarrierState: MageBarrierState | null = null;
+      let characterEffects = 0;
       for (const a of e.auras) {
+        characterEffects = addCharacterEffectAura(characterEffects, a);
         if (a.kind === 'polymorph') hasPoly = true;
         if (a.kind === 'form_bear') hasBear = true;
         if (a.id === 'ghost_wolf') hasGhostWolf = true;
@@ -7163,11 +7187,9 @@ export class Renderer {
       const travel = !polyed && !bear && !cat && hasTravelForm;
       const fireballForm = !polyed && !bear && !cat && !travel && hasFireballForm;
       const _stealthed = hasStealth;
-      // distance cull: far rigs are invisible specks but cost real draw calls
-      const cdx = e.pos.x - p.pos.x,
-        cdz = e.pos.z - p.pos.z;
-      const d2 = cdx * cdx + cdz * cdz;
-      const isSelf = id === p.id;
+      const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
+      const hasSanguineAura = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SANGUINE);
+      const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
       // Pose carries information the player acts on (own feedback, the read on
       // the current target, pet combat, a cast windup telegraph) rather than
       // mere cosmetic smoothness: such an entity is exempt from BOTH the cadence
@@ -7191,20 +7213,13 @@ export class Renderer {
         v.visual?.setShadow(true);
         v.visual?.setProxyShadow(false);
       }
-      if (id !== p.id) {
+      if (!isSelf) {
         // Per-frame visibility uses the same create/destroy hysteresis as view
         // retention (above) so a rig hovering right at the draw edge
         // doesn't toggle visible/invisible every frame — that hard cutoff is the
         // actual on-screen boundary flicker. group.visible carries last frame's
         // state: once shown, keep it until past the 96yd destroy radius (where
         // the view is torn down anyway); while hidden, show only within 80yd.
-        const showCutoff = v.group.visible
-          ? this.entityViewDestroyRangeSq
-          : this.entityViewCreateRangeSq;
-        if (d2 > showCutoff) {
-          v.group.visible = false;
-          continue;
-        }
         // hidden until its shaders finish linking off-thread (async-compile gate);
         // the object branch below may still re-hide loot
         v.group.visible = !v.compilePending;
@@ -7461,7 +7476,7 @@ export class Renderer {
         v.visual.setWeaponSkin(e.weaponSkinId);
         this.reconcileViewLights(v);
       }
-      v.visual.setWeaponAura(characterSanguineAuraActive(e));
+      v.visual.setWeaponAura(hasSanguineAura);
 
       // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
       // props between the hands and the on-back pose (self or a peer)
@@ -7560,7 +7575,7 @@ export class Renderer {
         e.ghost || // a released player spirit renders translucent (the ghost run)
         e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
       active.setGhost(ghost);
-      active.setSoulRend(characterSoulRendActive(e));
+      active.setSoulRend(hasSoulRend);
       // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
       // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
       // Metamorphosis also grows the body via Entity.scale in the sim.
@@ -8063,10 +8078,10 @@ export class Renderer {
           dt,
         );
       }
-      if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
+      if (hasSoulRend) {
         this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
       }
-      if (characterRecklessnessActive(e)) {
+      if (hasRecklessness) {
         this.vfx.recklessFlame(e.id, dt);
         if (!v.recklessOn) {
           v.recklessOn = true;
