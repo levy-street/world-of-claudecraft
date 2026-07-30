@@ -93,6 +93,10 @@ const CINEMATIC_VERTICAL_FOV_DEG = 60;
 const CINEMATIC_FRAME_ASPECT = 16 / 9;
 // Overlay opacity must reach this value before a camera jump is hidden.
 const FULL_BLACK_OPACITY = 1;
+// Every camera cut needs one full sim tick of black leading into the cut.
+const MIN_FULL_BLACK_CUT_SLACK_SECONDS = 1 / 20;
+// Authored times within this tolerance are treated as lying on a scene boundary.
+const SCENE_TIME_EPSILON_SECONDS = 1e-7;
 // The authoritative player collider is a 0.5-yard radius, and the visual is about 2.6 yards tall.
 const PLAYER_BODY_RADIUS_YARDS = 0.5;
 const PLAYER_BODY_HEIGHT_YARDS = 2.6;
@@ -120,6 +124,10 @@ type MechanicalCheck =
   | 'cut.bracketing'
   | 'cut.finalRelease'
   | 'cut.releaseDelta'
+  | 'cut.fadeSlack'
+  | 'fade.symmetry'
+  | 'timing.opWithinDuration'
+  | 'cut.teardown'
   | 'continuity.shipScreenDirection'
   | 'continuity.standInHandoff'
   | 'prop.segment'
@@ -132,13 +140,59 @@ interface LegacyExemption {
   readonly reason: string;
 }
 
-const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [];
+// P1.3 must clear every row while re-authoring the voyage fades.
+const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
+  {
+    sceneId: 'scn_lb_ferry_depart_back',
+    check: 'cut.fadeSlack',
+    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_back',
+    check: 'fade.symmetry',
+    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_out',
+    check: 'cut.fadeSlack',
+    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+  },
+  {
+    sceneId: 'scn_lb_ferry_depart_out',
+    check: 'fade.symmetry',
+    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+  },
+  {
+    sceneId: 'scn_lb_q0_ashore',
+    check: 'cut.fadeSlack',
+    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+  },
+  {
+    sceneId: 'scn_lb_q0_ashore',
+    check: 'fade.symmetry',
+    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
+    check: 'cut.fadeSlack',
+    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+  },
+  {
+    sceneId: 'scn_lb_q0_voyage',
+    check: 'fade.symmetry',
+    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+  },
+];
 
 interface TimedSceneOp {
   readonly index: number;
   readonly at: number;
   readonly op: SceneWireOp;
 }
+
+type TimedCameraOp = TimedSceneOp & {
+  readonly op: Extract<SceneWireOp, { kind: 'camera' }>;
+};
 
 interface EntityPoint {
   readonly x: number;
@@ -156,6 +210,7 @@ interface CapturedScene {
   readonly seed: number;
   readonly duration: number;
   readonly ops: readonly TimedSceneOp[];
+  readonly authoredOps: readonly SceneOpDef[];
   readonly frames: ReadonlyMap<number, SceneFrame>;
 }
 
@@ -214,12 +269,31 @@ const SYNTHETIC_REVERSED_BOW_ARRIVAL_CUE = 'scn_test_lint_arrival_bow_bad';
 const SYNTHETIC_MISSED_BERTH_ARRIVAL_CUE = 'scn_test_lint_arrival_berth_bad';
 const SYNTHETIC_CROSSWIND_ARRIVAL_CUE = 'scn_test_lint_arrival_travel_bad';
 
+interface SyntheticCameraSceneOptions {
+  readonly hideRelease?: boolean;
+  readonly coverFirstCut?: boolean;
+  readonly clearReleaseFade?: boolean;
+  readonly includeRelease?: boolean;
+  readonly includeUnlock?: boolean;
+  readonly includeLetterboxOff?: boolean;
+  readonly extraOps?: readonly SceneOpDef[];
+}
+
 function syntheticCameraScene(
   id: string,
   duration: number,
   cameraOps: readonly SceneOpDef[],
-  hideRelease = true,
+  options: SyntheticCameraSceneOptions = {},
 ): SceneDef {
+  const {
+    hideRelease = true,
+    coverFirstCut = true,
+    clearReleaseFade = true,
+    includeRelease = true,
+    includeUnlock = true,
+    includeLetterboxOff = true,
+    extraOps = [],
+  } = options;
   const releaseAt = duration - 0.1;
   return {
     id,
@@ -227,15 +301,95 @@ function syntheticCameraScene(
     ops: [
       { at: 0, kind: 'inputLock', on: true },
       { at: 0, kind: 'letterbox', on: true },
+      ...(coverFirstCut
+        ? ([{ at: 0, kind: 'fade', to: 'black', dur: 0 }] satisfies SceneOpDef[])
+        : []),
       ...cameraOps,
-      ...(hideRelease
+      ...(coverFirstCut
+        ? ([
+            {
+              // Authored t=0 ops emit on the first tick, so clear on the following tick.
+              at: MIN_FULL_BLACK_CUT_SLACK_SECONDS * 2,
+              kind: 'fade',
+              to: 'clear',
+              dur: 0,
+            },
+          ] satisfies SceneOpDef[])
+        : []),
+      ...(hideRelease && includeRelease
         ? ([{ at: duration - 0.2, kind: 'fade', to: 'black', dur: 0 }] satisfies SceneOpDef[])
         : []),
-      { at: releaseAt, kind: 'camera', shot: { kind: 'release' } },
-      { at: releaseAt, kind: 'inputLock', on: false },
-      { at: releaseAt, kind: 'letterbox', on: false },
+      ...(includeRelease
+        ? ([{ at: releaseAt, kind: 'camera', shot: { kind: 'release' } }] satisfies SceneOpDef[])
+        : []),
+      ...(includeUnlock
+        ? ([{ at: releaseAt, kind: 'inputLock', on: false }] satisfies SceneOpDef[])
+        : []),
+      ...(includeLetterboxOff
+        ? ([{ at: releaseAt, kind: 'letterbox', on: false }] satisfies SceneOpDef[])
+        : []),
+      ...(hideRelease && clearReleaseFade && includeRelease
+        ? ([
+            {
+              at: releaseAt + MIN_FULL_BLACK_CUT_SLACK_SECONDS,
+              kind: 'fade',
+              to: 'clear',
+              dur: 0,
+            },
+          ] satisfies SceneOpDef[])
+        : []),
+      ...extraOps,
     ],
   };
+}
+
+const SYNTHETIC_GRAMMAR_CAMERA_OPS = [
+  {
+    at: 0,
+    kind: 'camera',
+    shot: {
+      kind: 'dolly',
+      points: [{ x: 0, z: 0, height: 100 }],
+      lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
+      dur: 1.6,
+    },
+  },
+] satisfies readonly SceneOpDef[];
+
+// These independent fixture values pin the exact 20 Hz tick boundary.
+const SYNTHETIC_ONE_TICK_BLACK_SLACK_SECONDS = 0.05;
+const SYNTHETIC_SUB_TICK_BLACK_SLACK_SECONDS = 0.04;
+
+function syntheticFadeSlackScene(id: string, blackSlackSeconds: number): SceneDef {
+  const cutAt = SYNTHETIC_ONE_TICK_BLACK_SLACK_SECONDS * 2;
+  return syntheticCameraScene(
+    id,
+    1.8,
+    [
+      {
+        at: cutAt,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 0, z: 0, height: 100 }],
+          lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
+          dur: 1.6,
+        },
+      },
+    ],
+    {
+      coverFirstCut: false,
+      extraOps: [
+        { at: cutAt - blackSlackSeconds, kind: 'fade', to: 'black', dur: 0 },
+        {
+          at: cutAt + SYNTHETIC_ONE_TICK_BLACK_SLACK_SECONDS,
+          kind: 'fade',
+          to: 'clear',
+          dur: 0,
+        },
+      ],
+    },
+  );
 }
 
 const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
@@ -496,7 +650,7 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
           },
         },
       ],
-      false,
+      { hideRelease: false },
     ),
     expectedCheck: 'cut.releaseDelta',
   },
@@ -666,6 +820,119 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     expectedCheck: 'continuity.standInHandoff',
     expectedMeasured: 'deck stand-in handed off outside full black',
   },
+  {
+    def: syntheticFadeSlackScene(
+      'scn_test_lint_fade_slack_tick_pass',
+      SYNTHETIC_ONE_TICK_BLACK_SLACK_SECONDS,
+    ),
+    expectedCheck: null,
+  },
+  {
+    def: syntheticFadeSlackScene(
+      'scn_test_lint_fade_slack_bad',
+      SYNTHETIC_SUB_TICK_BLACK_SLACK_SECONDS,
+    ),
+    expectedCheck: 'cut.fadeSlack',
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_fade_symmetry_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      { clearReleaseFade: false },
+    ),
+    expectedCheck: 'fade.symmetry',
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_fade_symmetry_at_end_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      {
+        clearReleaseFade: false,
+        extraOps: [{ at: 1.7, kind: 'fade', to: 'clear', dur: 0 }],
+      },
+    ),
+    expectedCheck: 'fade.symmetry',
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_op_timing_at_end_pass',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      {
+        extraOps: [{ at: 1.7, kind: 'music', directive: 'silence' }],
+      },
+    ),
+    expectedCheck: null,
+    playerStart: { x: 0, z: 0 },
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_op_timing_above_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      {
+        extraOps: [{ at: 1.75, kind: 'music', directive: 'silence' }],
+      },
+    ),
+    expectedCheck: 'timing.opWithinDuration',
+    playerStart: { x: 0, z: 0 },
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_op_timing_below_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      {
+        extraOps: [{ at: -0.05, kind: 'music', directive: 'silence' }],
+      },
+    ),
+    expectedCheck: 'timing.opWithinDuration',
+    playerStart: { x: 0, z: 0 },
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_op_timing_nonfinite_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      {
+        extraOps: [{ at: Number.NaN, kind: 'music', directive: 'silence' }],
+      },
+    ),
+    expectedCheck: 'timing.opWithinDuration',
+    playerStart: { x: 0, z: 0 },
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_release_missing_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      { includeRelease: false },
+    ),
+    expectedCheck: 'cut.teardown',
+    expectedMeasured: 'release=false, inputUnlock=true, letterboxOff=true',
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_unlock_missing_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      { includeUnlock: false },
+    ),
+    expectedCheck: 'cut.teardown',
+    expectedMeasured: 'release=true, inputUnlock=false, letterboxOff=true',
+  },
+  {
+    def: syntheticCameraScene(
+      'scn_test_lint_letterbox_off_missing_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      { includeLetterboxOff: false },
+    ),
+    expectedCheck: 'cut.teardown',
+    expectedMeasured: 'release=true, inputUnlock=true, letterboxOff=false',
+  },
 ];
 
 const PROP_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> = {
@@ -713,6 +980,7 @@ const RENDERER_SOURCE = readFileSync(new URL('../src/render/renderer.ts', import
 let SimConstructor: typeof import('../src/sim/sim').Sim;
 let playRegisteredScene: typeof import('../src/sim/scenes/scenes').playSceneForPlayer;
 let readRegisteredSceneIds: typeof import('../src/sim/scenes/scenes').registeredSceneIds;
+let readRegisteredScene: typeof import('../src/sim/scenes/scenes').sceneById;
 let registerSceneForLinter: typeof import('../src/sim/scenes/scenes').registerScene;
 let sampleTerrainHeight: typeof import('../src/sim/world').terrainHeight;
 let spawnSquadForLinter: typeof import('../src/sim/squad/squad').spawnSquad;
@@ -736,6 +1004,7 @@ async function loadLinterRuntime(): Promise<void> {
   SimConstructor = simModule.Sim;
   playRegisteredScene = scenesModule.playSceneForPlayer;
   readRegisteredSceneIds = scenesModule.registeredSceneIds;
+  readRegisteredScene = scenesModule.sceneById;
   registerSceneForLinter = scenesModule.registerScene;
   spawnSquadForLinter = squadModule.spawnSquad;
   sampleTerrainHeight = worldModule.terrainHeight;
@@ -786,6 +1055,8 @@ function captureScene(
   actorIds: readonly string[] = [],
   playerStart?: { x: number; z: number },
 ): CapturedScene {
+  const authored = readRegisteredScene(id);
+  expect(authored, `registered scene ${id} has no authored definition`).toBeDefined();
   const sim = new SimConstructor({
     seed: WORLD_SEED,
     playerClass: 'warrior',
@@ -853,6 +1124,7 @@ function captureScene(
     seed: sim.cfg.seed,
     duration: duration ?? 0,
     ops,
+    authoredOps: authored?.ops ?? [],
     frames,
   };
 }
@@ -979,6 +1251,7 @@ function captureSyntheticControl(def: SceneDef): CapturedScene {
     seed: WORLD_SEED,
     duration: def.duration,
     ops,
+    authoredOps: sortedOps,
     frames,
   };
 }
@@ -1297,10 +1570,125 @@ function opKind(op: SceneWireOp): string {
   return op.kind === 'camera' ? `camera/${op.shot.kind}` : op.kind;
 }
 
+function authoredOpKind(op: SceneOpDef): string {
+  return op.kind === 'camera' ? `camera/${op.shot.kind}` : op.kind;
+}
+
 function violationMessage(violation: Violation): string {
   return `${violation.sceneId} op ${violation.opIndex} (${violation.opKind}) at ${violation.time.toFixed(
     2,
   )}s: ${violation.check} requires ${violation.threshold}, measured ${violation.measured}`;
+}
+
+function fadeOpacityAfterSceneOps(
+  scene: CapturedScene,
+  time: number,
+  beforeIndex = Number.POSITIVE_INFINITY,
+): number {
+  const overlay = createSceneOverlayState();
+  const precedingOps = scene.ops
+    .filter((timed) => timed.index < beforeIndex && timed.at <= time + SCENE_TIME_EPSILON_SECONDS)
+    .sort((a, b) => a.at - b.at || a.index - b.index);
+  for (const timed of precedingOps) {
+    sceneOverlayView(overlay, timed.at);
+    overlayApplyOp(overlay, timed.op, timed.at);
+  }
+  return sceneOverlayView(overlay, time).fadeOpacity;
+}
+
+function lintFilmGrammar(
+  scene: CapturedScene,
+  cameraOps: readonly TimedCameraOp[],
+  report: (violation: Violation) => void,
+): void {
+  for (const [index, op] of scene.authoredOps.entries()) {
+    if (
+      !Number.isFinite(op.at) ||
+      op.at < -SCENE_TIME_EPSILON_SECONDS ||
+      op.at > scene.duration + SCENE_TIME_EPSILON_SECONDS
+    ) {
+      report({
+        sceneId: scene.id,
+        check: 'timing.opWithinDuration',
+        opIndex: index + 1,
+        opKind: authoredOpKind(op),
+        time: op.at,
+        threshold: `an authored at from 0.00s through ${scene.duration.toFixed(2)}s`,
+        measured: `${op.at.toFixed(2)}s`,
+      });
+    }
+  }
+
+  for (const [index, op] of scene.authoredOps.entries()) {
+    if (op.kind !== 'fade' || op.to !== 'black') continue;
+    const hasLaterClear = scene.authoredOps
+      .slice(index + 1)
+      .some(
+        (candidate) =>
+          candidate.kind === 'fade' && candidate.to === 'clear' && candidate.at < scene.duration,
+      );
+    if (!hasLaterClear) {
+      report({
+        sceneId: scene.id,
+        check: 'fade.symmetry',
+        opIndex: index + 1,
+        opKind: authoredOpKind(op),
+        time: op.at,
+        threshold: 'a later authored fade/clear before scene end',
+        measured: `fade/black has no later clear before ${scene.duration.toFixed(2)}s`,
+      });
+    }
+  }
+
+  const firstAuthoredCamera = scene.authoredOps.find((op) => op.kind === 'camera');
+  for (const [cutIndex, cut] of cameraOps.entries()) {
+    const isSceneStartCut =
+      cutIndex === 0 &&
+      firstAuthoredCamera?.kind === 'camera' &&
+      firstAuthoredCamera.at <= SCENE_TIME_EPSILON_SECONDS;
+    const slackStart = isSceneStartCut
+      ? cut.at
+      : Math.max(0, cut.at - MIN_FULL_BLACK_CUT_SLACK_SECONDS);
+    const startOpacity = fadeOpacityAfterSceneOps(scene, slackStart, cut.index);
+    const cutOpacity = fadeOpacityAfterSceneOps(scene, cut.at);
+    if (startOpacity < FULL_BLACK_OPACITY || cutOpacity < FULL_BLACK_OPACITY) {
+      report({
+        sceneId: scene.id,
+        check: 'cut.fadeSlack',
+        opIndex: cut.index,
+        opKind: opKind(cut.op),
+        time: cut.at,
+        threshold: `${MIN_FULL_BLACK_CUT_SLACK_SECONDS.toFixed(
+          2,
+        )}s of full black spanning the cut, bounded by scene start`,
+        measured: `fade ${startOpacity.toFixed(3)} at ${slackStart.toFixed(
+          2,
+        )}s and ${cutOpacity.toFixed(3)} after co-timed cut ops`,
+      });
+    }
+  }
+
+  const hasAuthoredShot = scene.authoredOps.some(
+    (op) => op.kind === 'camera' && op.shot.kind !== 'release',
+  );
+  if (!hasAuthoredShot) return;
+  const hasRelease = scene.authoredOps.some(
+    (op) => op.kind === 'camera' && op.shot.kind === 'release',
+  );
+  const hasUnlock = scene.authoredOps.some((op) => op.kind === 'inputLock' && !op.on);
+  const hasLetterboxOff = scene.authoredOps.some((op) => op.kind === 'letterbox' && !op.on);
+  if (hasRelease && hasUnlock && hasLetterboxOff) return;
+  const context =
+    [...scene.ops].reverse().find((timed) => timed.op.kind === 'end') ?? scene.ops.at(-1);
+  report({
+    sceneId: scene.id,
+    check: 'cut.teardown',
+    opIndex: context?.index ?? scene.authoredOps.length,
+    opKind: context ? opKind(context.op) : 'scene',
+    time: scene.duration,
+    threshold: 'authored camera/release, input unlock, and letterbox off ops',
+    measured: `release=${hasRelease}, inputUnlock=${hasUnlock}, letterboxOff=${hasLetterboxOff}`,
+  });
 }
 
 function lintScene(scene: CapturedScene, report: (violation: Violation) => void): CameraSample[] {
@@ -1311,16 +1699,15 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
   for (const timed of scene.ops) {
     if (timed.op.kind === 'prop') propTargets.add(timed.op.target);
   }
-  const cameraOps = scene.ops.filter(
-    (timed): timed is TimedSceneOp & { op: Extract<SceneWireOp, { kind: 'camera' }> } =>
-      timed.op.kind === 'camera',
-  );
+  const cameraOps = scene.ops.filter((timed): timed is TimedCameraOp => timed.op.kind === 'camera');
   const shotOps = cameraOps.filter((timed) => timed.op.shot.kind !== 'release');
   const finalRelease = cameraOps.at(-1);
   const endOp =
     [...scene.ops].reverse().find((timed) => timed.op.kind === 'end') ?? scene.ops.at(-1);
   const releases: ReleaseDelta[] = [];
   const samples: CameraSample[] = [];
+
+  lintFilmGrammar(scene, cameraOps, report);
 
   for (const shot of shotOps) {
     const nextCamera = cameraOps.find(
@@ -1887,7 +2274,52 @@ describe('cinematic shot mechanical gate', () => {
 
   it('samples every registered scene at 20 Hz against the mechanical rubric', async () => {
     await loadLinterRuntime();
-    expect(LEGACY_EXEMPTIONS, 'C5 scenes must pass without legacy exemptions').toEqual([]);
+    expect(
+      MIN_FULL_BLACK_CUT_SLACK_SECONDS,
+      'fade slack must stay exactly one 20 Hz sim tick',
+    ).toBe(SYNTHETIC_ONE_TICK_BLACK_SLACK_SECONDS);
+    expect(LEGACY_EXEMPTIONS, 'P1.3 voyage exemption inventory must stay exact').toEqual([
+      {
+        sceneId: 'scn_lb_ferry_depart_back',
+        check: 'cut.fadeSlack',
+        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_back',
+        check: 'fade.symmetry',
+        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_out',
+        check: 'cut.fadeSlack',
+        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+      },
+      {
+        sceneId: 'scn_lb_ferry_depart_out',
+        check: 'fade.symmetry',
+        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+      },
+      {
+        sceneId: 'scn_lb_q0_ashore',
+        check: 'cut.fadeSlack',
+        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+      },
+      {
+        sceneId: 'scn_lb_q0_ashore',
+        check: 'fade.symmetry',
+        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
+        check: 'cut.fadeSlack',
+        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
+      },
+      {
+        sceneId: 'scn_lb_q0_voyage',
+        check: 'fade.symmetry',
+        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
+      },
+    ]);
     // A renderer lens change must update the linter's framing calculations.
     expect(RENDERER_SOURCE).toContain('CAMERA_BASE_FOV = 60');
     const modelBounds = harborShipLocalBounds(GULLHAVEN_HARBOR.berth);
