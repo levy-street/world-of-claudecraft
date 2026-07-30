@@ -9727,6 +9727,66 @@ export const en_XA: EnTranslations = {
       "last_keep_signet": {
         "name": "[Šíĝñéţ óƒ ţĥé Ļášţ Ķééþ]"
       },
+      "slag_tempered_sabatons": {
+        "name": "[Šļáĝ-Ţéɱþéŕéð Šáƀáţóñš]"
+      },
+      "glasswalker_treads": {
+        "name": "[Ĝļáššŵáļķéŕ Ţŕéáðš]"
+      },
+      "twice_fired_slippers": {
+        "name": "[Ţŵíçé-Ƒíŕéð Šļíþþéŕš]"
+      },
+      "stokebrand_striders": {
+        "name": "[Šţóķéƀŕáñð Šţŕíðéŕš]"
+      },
+      "saans_stoking_iron": {
+        "name": "[Šááñ'š Šţóķíñĝ Íŕóñ]"
+      },
+      "glassblowers_shiv": {
+        "name": "[Ĝļáššƀļóŵéŕ'š Šĥíʋ]"
+      },
+      "sluicebearer": {
+        "name": "[Šļúíçéƀéáŕéŕ]"
+      },
+      "cindertoad_signet": {
+        "name": "[Çíñðéŕţóáð Šíĝñéţ]"
+      },
+      "ring_of_the_first_quench": {
+        "name": "[Ŕíñĝ óƒ ţĥé Ƒíŕšţ Ɋúéñçĥ]"
+      },
+      "coalglow_band": {
+        "name": "[Çóáļĝļóŵ Ɓáñð]"
+      },
+      "crownforged_warleggings": {
+        "name": "[Çŕóŵñƒóŕĝéð Ŵáŕļéĝĝíñĝš]"
+      },
+      "nighttalon_prowlers": {
+        "name": "[Ñíĝĥţţáļóñ Þŕóŵļéŕš]"
+      },
+      "soulflame_kilt": {
+        "name": "[Šóúļƒļáɱé Ķíļţ]"
+      },
+      "stormcallers_legwraps": {
+        "name": "[Šţóŕɱçáļļéŕ'š Ļéĝŵŕáþš]"
+      },
+      "the_even_temper": {
+        "name": "[Ţĥé Éʋéñ Ţéɱþéŕ]"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "[Çíñðéŕáŕç, Óðŕéññ'š Ŕóð]"
+      },
+      "twicetempered_girdle": {
+        "name": "[Ţŵíçéţéɱþéŕéð Ĝíŕðļé]"
+      },
+      "ashwalk_sandals": {
+        "name": "[Ášĥŵáļķ Šáñðáļš]"
+      },
+      "quenchsilk_cord": {
+        "name": "[Ɋúéñçĥšíļķ Çóŕð]"
+      },
+      "slakeleather_belt": {
+        "name": "[Šļáķéļéáţĥéŕ Ɓéļţ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

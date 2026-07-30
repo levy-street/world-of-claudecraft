@@ -9727,6 +9727,66 @@ export const ja_JP: EnTranslations = {
       "last_keep_signet": {
         "name": "最後の砦の印章"
       },
+      "slag_tempered_sabatons": {
+        "name": "Slag-Tempered Sabatons"
+      },
+      "glasswalker_treads": {
+        "name": "Glasswalker Treads"
+      },
+      "twice_fired_slippers": {
+        "name": "Twice-Fired Slippers"
+      },
+      "stokebrand_striders": {
+        "name": "Stokebrand Striders"
+      },
+      "saans_stoking_iron": {
+        "name": "Saan's Stoking Iron"
+      },
+      "glassblowers_shiv": {
+        "name": "Glassblower's Shiv"
+      },
+      "sluicebearer": {
+        "name": "Sluicebearer"
+      },
+      "cindertoad_signet": {
+        "name": "Cindertoad Signet"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Ring of the First Quench"
+      },
+      "coalglow_band": {
+        "name": "Coalglow Band"
+      },
+      "crownforged_warleggings": {
+        "name": "Crownforged Warleggings"
+      },
+      "nighttalon_prowlers": {
+        "name": "Nighttalon Prowlers"
+      },
+      "soulflame_kilt": {
+        "name": "Soulflame Kilt"
+      },
+      "stormcallers_legwraps": {
+        "name": "Stormcaller's Legwraps"
+      },
+      "the_even_temper": {
+        "name": "The Even Temper"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Cinderarc, Odrenn's Rod"
+      },
+      "twicetempered_girdle": {
+        "name": "Twicetempered Girdle"
+      },
+      "ashwalk_sandals": {
+        "name": "Ashwalk Sandals"
+      },
+      "quenchsilk_cord": {
+        "name": "Quenchsilk Cord"
+      },
+      "slakeleather_belt": {
+        "name": "Slakeleather Belt"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
