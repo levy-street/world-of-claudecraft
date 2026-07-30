@@ -1508,6 +1508,7 @@ describe('chat speaker titles (Book of Deeds)', () => {
       expect(m.channel).toBe('yell');
       expect('fromTitle' in m).toBe(false);
       expect('classId' in m).toBe(false);
+      expect(m.authoredSpeaker).toEqual({ kind: 'mob', templateId: 'forest_wolf' });
     }
   });
 

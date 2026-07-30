@@ -324,4 +324,42 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     expect(meta.questLog.get('q_undermount_ledger')?.counts).toEqual([1, 3, 1]);
     expect(meta.questLog.get('q_undermount_ledger')?.state).toBe('ready');
   });
+
+  it.each([
+    ['q_undermount_heat', 'rune faces', 1],
+    ['q_undermount_ledger', 'dig opposition', 3],
+  ] as const)('restores %s quest-local %s after save and reload', (questId, _label, countSize) => {
+    const source = makeSim(79);
+    const sourcePid = source.addPlayer('warrior', 'Runeseeker');
+    metaOf(source, sourcePid).questLog.set(questId, {
+      questId,
+      counts: Array.from({ length: countSize }, () => 0),
+      state: 'active',
+    });
+    const state = source.serializeCharacter(sourcePid);
+    if (!state) throw new Error('missing serialized character');
+
+    const restored = makeSim(83);
+    restored.addPlayer('warrior', 'Runeseeker', { state });
+    const entities = [...restored.entities.values()] as AnyEntity[];
+    if (questId === 'q_undermount_heat') {
+      expect(
+        entities.filter(
+          (entity) => entity.kind === 'object' && entity.objectItemId === UNDERMOUNT_RUNE_ITEM_ID,
+        ),
+      ).toHaveLength(3);
+    } else {
+      expect(entities.filter((entity) => entity.templateId === UNDERMOUNT_FOREMAN_ID)).toHaveLength(
+        1,
+      );
+      expect(
+        entities.filter(
+          (entity) =>
+            entity.templateId === 'wyrmcult_zealot' &&
+            Math.abs(entity.pos.x + 186) < 15 &&
+            Math.abs(entity.pos.z - 613) < 8,
+        ),
+      ).toHaveLength(3);
+    }
+  });
 });

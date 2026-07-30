@@ -468,6 +468,7 @@ import {
   onNodeGatheredForQuests,
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
+import { ensureUndermountPrequestEntities } from './quests/undermount_prequest';
 import {
   type NaturalRiftPortal,
   RIFT_PORTAL_FIRST_AT,
@@ -2644,7 +2645,7 @@ export class Sim {
         // tick op dereferences QUESTS[qp.questId].objectives and TypeErrors inside
         // the server tick (quest_credit.ts + interactNpcForQuests). questsDone is
         // membership-only (never dereferenced), so it is preserved as history below.
-        if (q.state !== 'done' && QUESTS[q.questId])
+        if (q.state !== 'done' && QUESTS[q.questId]) {
           meta.questLog.set(q.questId, {
             questId: q.questId,
             counts: [...q.counts],
@@ -2652,6 +2653,8 @@ export class Sim {
             ...(q.selection === undefined ? {} : { selection: q.selection }),
             ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
           });
+          if (q.state === 'active') ensureUndermountPrequestEntities(this.ctx, q.questId);
+        }
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
       if (s.talents)

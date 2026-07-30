@@ -21,6 +21,7 @@ export function emitMobYell(ctx: SimContext, mob: Entity, text: string, range = 
     text,
     channel: 'yell' as const,
     entityId: mob.id,
+    authoredSpeaker: { kind: 'mob' as const, templateId: mob.templateId },
   };
   for (const meta of ctx.players.values()) {
     const p = ctx.entities.get(meta.entityId);

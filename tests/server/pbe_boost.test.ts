@@ -41,7 +41,12 @@ import { canEquipItem, canEquipItemInSlot, isShieldItem } from '../../src/sim/eq
 import { meetsLevelRequirement } from '../../src/sim/item_level_req';
 import type { CharacterState } from '../../src/sim/sim';
 import { Sim } from '../../src/sim/sim';
-import { type EquipSlot, type PlayerClass, xpToReachLevel } from '../../src/sim/types';
+import {
+  type EquipSlot,
+  type ItemDef,
+  type PlayerClass,
+  xpToReachLevel,
+} from '../../src/sim/types';
 
 // Deterministic stand-in for crypto.randomInt so name/skin tests are stable.
 // Uses the HIGH bits of the LCG state: the low bits have tiny periods and
@@ -149,6 +154,24 @@ describe('bisKit (true best-in-slot over the whole PvE ladder)', () => {
           }
         }
       }
+    }
+  });
+
+  it('rejects a cosmetic item that would otherwise win a real role-kit slot', () => {
+    const trapId = 'test_cosmetic_bis_trap';
+    const mutableItems = ITEMS as Record<string, ItemDef>;
+    mutableItems[trapId] = {
+      ...ITEMS.runeseekers_lantern,
+      id: trapId,
+      name: 'Cosmetic BiS Trap',
+      spellPower: 100000,
+      cosmeticOnly: true,
+    };
+    try {
+      const frost = roleOf('mage', 'frost');
+      expect(Object.values(bisKitForRole('mage', frost))).not.toContain(trapId);
+    } finally {
+      delete mutableItems[trapId];
     }
   });
 
