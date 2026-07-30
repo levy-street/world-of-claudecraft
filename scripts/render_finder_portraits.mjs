@@ -68,8 +68,9 @@ const dataBuilt = await esbuild.build({
   logLevel: 'silent',
 });
 const dataUrl = `data:text/javascript;base64,${Buffer.from(dataBuilt.outputFiles[0].text).toString('base64')}`;
-const { FINDER_ACTIVITIES, MOBS, VISUALS, visualKeyFor, MOB_PORTRAIT_ALIASES } =
-  await import(dataUrl);
+const { FINDER_ACTIVITIES, MOBS, VISUALS, visualKeyFor, MOB_PORTRAIT_ALIASES } = await import(
+  dataUrl
+);
 
 // One job per distinct encounter mob id or mob template, resolved through the
 // same visual manifest the game renderer uses (model spec + entity/fixed tint).
