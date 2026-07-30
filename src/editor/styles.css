@@ -471,6 +471,108 @@ input[type="range"] {
   overflow: hidden;
 }
 
+.ed-cinematic-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: #000;
+}
+
+.ed-cinematic {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 4;
+  display: flex;
+  width: min(360px, calc(100% - 24px));
+  max-height: calc(100% - 24px);
+  flex-direction: column;
+  color: var(--ed-text);
+  background: rgba(21, 23, 27, 0.96);
+  border: 1px solid var(--ed-line);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.ed-cinematic-head,
+.ed-cinematic-transport,
+.ed-cinematic-readouts {
+  display: flex;
+  align-items: center;
+}
+
+.ed-cinematic-head {
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--ed-line);
+}
+
+.ed-cinematic-title {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.ed-cinematic-body {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: 9px;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.ed-cinematic-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: var(--ed-muted);
+  font-size: 12px;
+}
+
+.ed-cinematic-field select,
+.ed-cinematic-output {
+  width: 100%;
+}
+
+.ed-cinematic-transport {
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ed-cinematic-time,
+.ed-cinematic-readouts {
+  color: var(--ed-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
+
+.ed-cinematic-readouts {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ed-cinematic-status {
+  min-height: 16px;
+  margin: 0;
+  color: var(--ed-muted);
+  font-size: 11px;
+}
+
+.ed-cinematic-output {
+  min-height: 170px;
+  resize: vertical;
+  color: var(--ed-text);
+  background: var(--ed-bg);
+  border: 1px solid var(--ed-line);
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
 /* Full-stage overlay while the 3D engine loads its assets. */
 .ed-3d-loading {
   position: absolute;
@@ -670,6 +772,7 @@ input[type="range"] {
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 4;
   max-height: 260px;
   display: flex;
   flex-direction: column;

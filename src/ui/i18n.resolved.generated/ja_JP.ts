@@ -4952,6 +4952,30 @@ export const ja_JP: EnTranslations = {
     "inspector": {
       "label": "ツールオプション"
     },
+    "cinematic": {
+      "title": "シネマティック",
+      "show": "パネルを表示",
+      "hide": "パネルを隠す",
+      "scene": "シーン",
+      "sceneOption": "{id}（{seconds}秒）",
+      "time": "時間",
+      "timeReadout": "{current} / {duration}秒",
+      "play": "再生",
+      "pause": "一時停止",
+      "authoredCamera": "演出カメラ",
+      "fade": "フェード：{percent}%",
+      "letterboxOn": "レターボックス：オン",
+      "letterboxOff": "レターボックス：オフ",
+      "capture": "キーフレームを取得",
+      "copy": "ブロックをコピー",
+      "output": "生成されたカメラ取得データ",
+      "unavailable": "3Dビューポートを読み込み中",
+      "seedMismatch": "取得には正式なワールドシードが必要です",
+      "captureSavedCopied": "保存してコピーしました",
+      "captureSaved": "保存しました。下にブロックを表示しています",
+      "captureCopyOnly": "コピーしました。開発用ライターは利用できません",
+      "captureReady": "下にブロックを表示しています"
+    },
     "brush": {
       "title": "ブラシ",
       "size": "ブラシサイズ",

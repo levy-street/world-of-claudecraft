@@ -10,6 +10,7 @@ import { loadBrowserslistFloors } from './scripts/browserslist_targets.mjs';
 // Untyped zero-dep build helper (same convention as the other scripts/*.mjs tools).
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
+import { handleCinematicCaptureDevRequest } from './src/editor/cinematic_capture_dev_server_core';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
 
@@ -203,7 +204,10 @@ function musicEditorSavePlugin() {
         use: (
           route: string,
           fn: (
-            req: { method?: string; on: (ev: string, cb: (chunk?: unknown) => void) => void },
+            req: {
+              method?: string;
+              on: (ev: string, cb: (chunk?: unknown) => void) => void;
+            },
             res: { statusCode: number; end: (body?: string) => void },
           ) => void,
         ) => void;
@@ -297,6 +301,38 @@ function musicEditorSavePlugin() {
   };
 }
 
+// Dev-only fixed-path writer for the map editor's Cinematic panel. The browser
+// sends one bounded structured capture, and the server formats the complete
+// generated file. It cannot choose a path or inject arbitrary TypeScript.
+function cinematicCaptureSavePlugin() {
+  return {
+    name: 'woc-cinematic-capture-save',
+    configureServer(server: {
+      middlewares: {
+        use: (
+          route: string,
+          fn: (
+            req: {
+              method?: string;
+              headers?: Record<string, string | readonly string[] | undefined>;
+              on: (ev: string, cb: (chunk?: unknown) => void) => void;
+            },
+            res: { statusCode: number; end: (body?: string) => void },
+          ) => void,
+        ) => void;
+      };
+    }) {
+      server.middlewares.use('/__editor/cinematic-capture', (req, res) => {
+        handleCinematicCaptureDevRequest(req, res, {
+          writeSource: (source) => {
+            writeFileSync(path.resolve(root, 'src/editor/cinematic_captures.generated.ts'), source);
+          },
+        });
+      });
+    },
+  };
+}
+
 export default defineConfig({
   base: '/',
   // The Svelte plugin only transforms the standalone admin entry. The testing
@@ -307,6 +343,7 @@ export default defineConfig({
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
     musicEditorSavePlugin(),
+    cinematicCaptureSavePlugin(),
   ],
   resolve: { alias: { '#bot-detector': botDetectorImpl } },
   define: {
