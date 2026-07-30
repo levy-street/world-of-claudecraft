@@ -134,6 +134,51 @@ export function resetDevKitCache(): void {
  *  - never sourced from Sanctum itself, the encounter under test
  *  - must be class-legal AND level-legal at 20
  */
+// The raid tier dresses a tester the way a raid-READY character arrives at the
+// Undermount: heroic five-man gear, badge gear, and Nythraxis-era raid drops up
+// to source level DEV_KIT_RAID_SOURCE_CAP. It exists for raid E2E proofs (the
+// ten-bot Undermount clear): a fresh-20 kit wipes by design against content the
+// PRD tunes for ilvl 29 groups. Rules that stay from the fresh tier: equippable
+// gear only, never PvP/WARFARE gear, never a RETIRED id, class/level legal.
+// New exclusion: never the Undermount's OWN loot (the encounter under test).
+export const DEV_KIT_RAID_SOURCE_CAP = 29;
+const RAID_TIER_QUALITIES: ReadonlySet<string> = new Set([
+  'poor',
+  'common',
+  'uncommon',
+  'rare',
+  'epic',
+]);
+const UNDERMOUNT_WING_IDS = ['undermount_wing1', 'undermount_wing2', 'undermount_wing3'];
+let undermountLoot: Set<string> | null = null;
+function undermountLootIds(): ReadonlySet<string> {
+  if (!undermountLoot) {
+    undermountLoot = new Set(UNDERMOUNT_WING_IDS.flatMap((id) => [...dungeonLootIds(id)]));
+  }
+  return undermountLoot;
+}
+
+export function isRaidTierItem(cls: PlayerClass, item: ItemDef): boolean {
+  if (!item.slot) return false;
+  if (item.kind !== 'weapon' && item.kind !== 'armor' && item.kind !== 'held_offhand') return false;
+  if (!RAID_TIER_QUALITIES.has(item.quality ?? '')) return false;
+  if (RETIRED_HEROIC_ITEM_IDS.has(item.id)) return false;
+  if (
+    item.pvpOffenseRating !== undefined ||
+    item.pvpDefenseRating !== undefined ||
+    item.priceHonor !== undefined
+  )
+    return false;
+  const source = itemSourceLevel(item.id);
+  if (source !== undefined && source > DEV_KIT_RAID_SOURCE_CAP) return false;
+  if (undermountLootIds().has(item.id) || undermountLootIds().has(item.heroicOf ?? ''))
+    return false;
+  if (!canEquipItem(cls, item)) return false;
+  if (item.requiredClass && !item.requiredClass.includes(cls)) return false;
+  return meetsLevelRequirement(DEV_KIT_LEVEL, item);
+}
+const RETIRED_HEROIC_ITEM_IDS: ReadonlySet<string> = new Set(Object.keys(RETIRED_HEROIC_ITEMS));
+
 export function isFreshTwentyItem(cls: PlayerClass, item: ItemDef): boolean {
   if (!item.slot) return false;
   if (item.kind !== 'weapon' && item.kind !== 'armor' && item.kind !== 'held_offhand') return false;
@@ -241,11 +286,18 @@ export interface DevKit {
  * Weapons are resolved before armor so a two-hander does not get chosen for mainhand
  * and then silently displace a shield the tank preset also picked.
  */
-export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
+export type DevKitTier = 'fresh' | 'raid';
+
+export function buildDevKit(
+  cls: PlayerClass,
+  spec: string,
+  tier: DevKitTier = 'fresh',
+): DevKit | null {
   const role = devKitRole(cls, spec);
   if (!role) return null;
 
-  const pool = Object.values(ITEMS).filter((item) => isFreshTwentyItem(cls, item));
+  const inTier = tier === 'raid' ? isRaidTierItem : isFreshTwentyItem;
+  const pool = Object.values(ITEMS).filter((item) => inTier(cls, item));
   const score = (item: ItemDef): number => roleItemScore(role, item);
   const equip: Partial<Record<EquipSlot, string>> = {};
 
@@ -350,8 +402,9 @@ export function applyDevKit(
   cls: PlayerClass,
   spec: string,
   pid?: number,
+  tier: DevKitTier = 'fresh',
 ): DevKitApplied | null {
-  const kit = buildDevKit(cls, spec);
+  const kit = buildDevKit(cls, spec, tier);
   if (!kit) return null;
 
   let bagsEquipped = 0;

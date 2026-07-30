@@ -253,11 +253,12 @@ export function handleDevChat(
   // the named spec (defaulting to the one currently specced). GEAR ONLY: level, spec
   // and talents are deliberately untouched, so a tester can vary gear and level
   // independently instead of the two being welded together.
-  const kitMatch = /^\/(?:dev\s+kit|devkit)(?:\s+(\S+))?\s*$/i.exec(raw);
+  const kitMatch = /^\/(?:dev\s+kit|devkit)(?:\s+(\S+))?(?:\s+(fresh|raid))?\s*$/i.exec(raw);
   if (kitMatch) {
     const meta = ctx.players.get(pid);
     if (!meta) return null;
     const spec = kitMatch[1] ?? meta.talents.spec;
+    const tier = (kitMatch[2]?.toLowerCase() ?? 'fresh') as 'fresh' | 'raid';
     if (!spec) {
       ctx.error(pid, '[dev] No spec chosen; pass one, e.g. /dev kit fury.');
       return null;
@@ -267,7 +268,7 @@ export function handleDevChat(
       ctx.error(pid, `[dev] '${spec}' is not a ${meta.cls} spec. Try: ${known}.`);
       return null;
     }
-    const applied = applyDevKit(ctx, meta.cls, spec, pid);
+    const applied = applyDevKit(ctx, meta.cls, spec, pid, tier);
     if (!applied) {
       ctx.error(pid, `[dev] No kit for ${meta.cls} ${spec}.`);
       return null;
@@ -275,7 +276,7 @@ export function handleDevChat(
     emitDevLog(
       ctx,
       pid,
-      `[dev] Equipped the fresh-20 ${meta.cls} ${spec} kit: ${applied.slots} pieces and ${applied.bagsEquipped} bags.`,
+      `[dev] Equipped the ${tier === 'raid' ? 'raid-ready' : 'fresh-20'} ${meta.cls} ${spec} kit: ${applied.slots} pieces and ${applied.bagsEquipped} bags.`,
     );
     return null;
   }
