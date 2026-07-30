@@ -27,7 +27,12 @@ function nearestMob(sim: Sim, templateId: string): Entity {
 
 describe('lightning bolt visual', () => {
   it('emits fx:lightning from caster to target and still deals damage', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'shaman' });
+    // Seed re-hunted 42 -> 1 by the v0.32.1 realm loot-table fill: the shifted
+    // shared stream turned seed 42's one Arc Bolt into a full resist (amount 0,
+    // kind resist), a degenerate run for the damage half of the claim. The fx
+    // assertions held either way; the hunt requires the whole original shape
+    // (lightning fx, no projectile fx, damage lands), which seed 1 restores.
+    const sim = new Sim({ seed: 1, playerClass: 'shaman' });
     const p = sim.player;
     const wolf = nearestMob(sim, 'forest_wolf');
     // Stand next to the wolf and face it.

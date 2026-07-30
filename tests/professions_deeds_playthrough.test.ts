@@ -166,10 +166,13 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       if (sim.lastCraftResult.masterwork === true) procAt = i;
       else purgeItem('eastbrook_ritual_vestments'); // keep the bags clear between attempts
     }
-    // Hunted literal (seed 4242, this exact beat order, re-recorded after the
-    // Eastbrook camp respacing thinned the zone-1 camp counts, which shifts every
-    // world-gen draw downstream): the proc lands on attempt index 3.
-    expect(procAt).toBe(3);
+    // Hunted literal (seed 4242, this exact beat order): re-hunted 3 -> 0 by
+    // the v0.32.1 realm loot-table fill (the four restored Galecrest quest
+    // camps spawn 12 mobs: 60 construction draws plus ongoing idle-wander
+    // draws, shifting the shared stream): the proc lands on attempt index 0.
+    // Beat 1 already pinned that the run's FIRST craft does not proc, so the
+    // Masterwright moment is still distinct.
+    expect(procAt).toBe(0);
     expect(meta.deedStats.counters.masterworksCrafted).toBe(1);
     const evs = sim.tick();
     const ev = deedEvents(evs).find((e) => e.deedId === 'prog_masterwright');
@@ -259,10 +262,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false);
   });
 
-  // 90s budget: the re-hunted koi session sits at index 26 in the shared
+  // 90s budget: the re-hunted koi session sits at index 14 in the shared
   // stream, and every session ticks the REAL world to its bite.
   // Raised timeout (the climb_slope idiom): this beat drives thousands of
-  // REAL world ticks (27 bite-and-reel sessions plus bounded combat waits),
+  // REAL world ticks (15 bite-and-reel sessions plus bounded combat waits),
   // which overruns the 5s default under CI/core contention; every loop is
   // guard-bounded, so a genuine hang still terminates into a failed pin.
   it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', {
@@ -295,11 +298,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         sawBiteOnKoiSession = bit;
       }
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded after the
-    // Eastbrook camp respacing merged into this branch, which thins the zone-1
-    // camp counts and shifts every world-gen draw downstream, so neither
-    // parent's recording holds): the koi bites on session index 29.
-    expect(koiSession).toBe(29);
+    // Hunted literal (seed 4242, after every beat above): re-hunted 29 -> 14
+    // by the v0.32.1 realm loot-table fill (12 new camp mobs draw at
+    // construction and wander every tick, shifting the shared stream): the
+    // koi bites on session index 14.
+    expect(koiSession).toBe(14);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -312,10 +315,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Bank the run's loot: the hunts need free bags for the x5 windfalls, and
     // no later beat reads the inventory. Pure state cleanup, zero draws.
     meta.inventory.length = 0;
-    // Hunted literals (seed 4242, after every beat above, re-recorded after the
-    // Eastbrook camp respacing merged into this branch, which shifts every
-    // world-gen draw downstream): the harvest index where each flavor's 1-in-90
-    // event fires under the shared stream.
+    // Hunted literals (seed 4242, after every beat above): re-hunted by the
+    // v0.32.1 realm loot-table fill, which shifts the shared stream (ore
+    // 122 -> 41, wood 7 -> 4, herb 159 -> 49): the harvest index where each
+    // flavor's 1-in-90 event fires under the shared stream.
     // #2343: each hunt's harvest needs its profession's tool in bags. The
     // tier-1 tools ride the whole beat (purgeItem never touches them) and
     // addItem draws no rng, so the hunted hitAt literals hold.
@@ -325,18 +328,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 122 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 41 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 7,
+        hitAt: 4,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 159,
+        hitAt: 49,
       },
     ];
     for (const hunt of hunts) {
@@ -393,10 +396,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       sim.harvestCorpse(mob.id, ['hide'], pid);
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded after the
-    // Eastbrook camp respacing merged into this branch): the rare-or-better
-    // rarity roll that mints the signed specimen lands on attempt index 7.
-    expect(hitAt).toBe(7);
+    // Hunted literal (seed 4242, after every beat above): re-hunted 7 -> 3 by
+    // the v0.32.1 realm loot-table fill, which shifts the shared stream: the
+    // rare-or-better rarity roll that mints the signed specimen lands on
+    // attempt index 3.
+    expect(hitAt).toBe(3);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

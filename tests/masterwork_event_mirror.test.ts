@@ -9,15 +9,16 @@ import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 
-// Hunted proc seed, pinned (re-recorded after the Eastbrook camp respacing
-// thinned the zone-1 camp counts and shifted the camp-driven world-gen draw
-// sequence): with a fresh warrior (tailoring 0, no archetype, no self-signed
+// Hunted proc seed, pinned (re-hunted 2 -> 8 by the v0.32.1 realm loot-table
+// fill: the four new camps spawn 12 mobs, 60 construction draws at 5 per mob
+// plus their ongoing per-tick idle-wander draws, shifting the shared rng
+// stream): with a fresh warrior (tailoring 0, no archetype, no self-signed
 // reagent, not specialized) the first craft of
 // recipe_eastbrook_ritual_vestments draws under the 3 percent base masterwork
 // chance at this seed. Pre-verified against this exact grant order (3x
-// linen_scrap then 1x spider_leg, then the craft); seeds 37, 45, 113, and 116
-// also land, kept on record here as spares.
-const PROC_SEED = 2;
+// linen_scrap then 1x spider_leg, then the craft); seeds 37, 101, 119, and
+// 190 also land, kept on record here as spares.
+const PROC_SEED = 8;
 const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';
 const ITEM_ID = 'eastbrook_ritual_vestments';
 
@@ -55,7 +56,7 @@ function feed(client: ClientWorld, ev: unknown): void {
 }
 
 describe('offline Sim host', () => {
-  it('a procced craft emits the id-exact masterwork event and the getter reflects it (seed 2)', () => {
+  it('a procced craft emits the id-exact masterwork event and the getter reflects it (seed 8)', () => {
     const { sim, pid, events } = craftMasterwork();
     // Exactly one proc event, ids only, pid = crafter entity id on both keys.
     expect(events).toEqual([

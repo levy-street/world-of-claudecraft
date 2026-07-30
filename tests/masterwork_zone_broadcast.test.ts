@@ -54,15 +54,16 @@ const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';
 const ITEM_ID = 'eastbrook_ritual_vestments';
 
 // Hunted proc seed, pinned (the professions_masterwork suite idiom: only the
-// pinned literal is committed), re-recorded after the Eastbrook camp respacing
-// thinned the zone-1 camp counts and shifted the camp-driven world-gen draw
-// sequence. With tailoring as the active archetype and skill 200 the single
-// output-side draw procs at 0.14; at this seed, with this exact setup order
-// (three extra players added, then the archetype accept, the skill poke, 3x
-// linen_scrap, 1x spider_leg, then the craft), the first craft procs. Position
-// pokes after setup draw nothing, so both placements below share the identical
-// stream. Spare hunted seeds on record: 21, 23, 27, 28.
-const PROC_SEED = 2;
+// pinned literal is committed), re-hunted 2 -> 29 by the v0.32.1 realm
+// loot-table fill (the four new camps spawn 12 mobs, 60 construction draws at
+// 5 per mob plus their ongoing per-tick idle-wander draws, shifting the
+// shared rng stream). With tailoring as the active archetype and skill 200
+// the single output-side draw procs at 0.14; at this seed, with this exact
+// setup order (three extra players added, then the archetype accept, the
+// skill poke, 3x linen_scrap, 1x spider_leg, then the craft), the first craft
+// procs. Position pokes after setup draw nothing, so both placements below
+// share the identical stream. Spare hunted seeds on record: 7, 8, 22, 37.
+const PROC_SEED = 29;
 
 // One procced craft with an audience: a bystander in the crafter's zone, a
 // player parked in instance space, and a player moved to a different overworld
