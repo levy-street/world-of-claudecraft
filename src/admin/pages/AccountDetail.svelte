@@ -9,9 +9,11 @@
     forceRename,
     type PendingAction,
   } from '../moderation_actions';
+  import AccountFlairControls from '../components/AccountFlairControls.svelte';
   import AccountModerationActions from '../components/AccountModerationActions.svelte';
   import AccountNote from '../components/AccountNote.svelte';
   import ChatModerationControls from '../components/ChatModerationControls.svelte';
+  import DailyRewardsModerationControls from '../components/DailyRewardsModerationControls.svelte';
   import ModerationActionPrompt from '../components/ModerationActionPrompt.svelte';
   import ModerationHistory from '../components/ModerationHistory.svelte';
 
@@ -54,19 +56,6 @@
     }
   }
 
-  // Resetting strikes is reversible and skips confirmation. Lifting a mute goes through
-  // the audited chat action prompt because it changes an active moderation state.
-  async function direct(endpoint: string): Promise<void> {
-    try {
-      await apiPost(endpoint, {});
-      onChanged();
-    } catch (err) {
-      if (!auth.handleAuthFailure(err)) {
-        window.alert(err instanceof Error ? localizeAdminError(err.message) : t('alert.actionFailed'));
-      }
-    }
-  }
-
   async function confirmForceRename(values: { reason: string; expiry: string }): Promise<void> {
     const character = selectedCharacter;
     if (!character) return;
@@ -79,11 +68,9 @@
 <div class="account-detail">
   {#if includeAdminControls}
     <AccountModerationActions target={detail} onSubmit={submitPending} />
-    <ChatModerationControls
-      target={detail}
-      onSubmit={submitPending}
-      onReset={() => direct(`/admin/api/moderation/accounts/${detail.id}/reset-strikes`)}
-    />
+    <ChatModerationControls target={detail} onSubmit={submitPending} />
+    <DailyRewardsModerationControls target={detail} onSubmit={submitPending} />
+    <AccountFlairControls target={detail} onSubmit={submitPending} />
   {/if}
 
   <div class="detail-grid">

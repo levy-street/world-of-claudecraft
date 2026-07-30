@@ -252,25 +252,37 @@ describe('anti-farm level-diff scaling', () => {
 // -------------------------------------------------------------------------
 
 describe('cosmetic milestones', () => {
-  it('unlocks, emits, and persists the first milestone', () => {
+  // Milestones unified into the Book of Deeds: crossing a threshold marks the
+  // player dirty, the tick-tail evaluator grants the prog_ deed, and the grant
+  // dual-writes the legacy unlockedMilestones set. deedUnlocked is the single
+  // grant event; the legacy milestoneUnlocked emit is gone.
+  it('unlocks at the tick tail, emits deedUnlocked, and dual-writes the legacy set', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     const first = MILESTONES[0];
-    sim.events.length = 0;
     sim.grantXp(first.lifetimeXp + 1);
+    const evs = sim.tick();
     expect(sim.unlockedMilestones).toContain(first.id);
-    expect(
-      sim.events.some((e: any) => e.type === 'milestoneUnlocked' && e.milestoneId === first.id),
-    ).toBe(true);
+    expect(evs.some((e: any) => e.type === 'deedUnlocked' && e.deedId === `prog_${first.id}`)).toBe(
+      true,
+    );
+    expect(evs.some((e: any) => e.type === 'milestoneUnlocked')).toBe(false);
   });
 
   it('does not re-unlock a milestone already earned', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     sim.grantXp(MILESTONES[0].lifetimeXp + 1);
-    sim.events.length = 0;
+    sim.tick();
     sim.grantXp(1000);
-    expect(sim.events.some((e: any) => e.type === 'milestoneUnlocked')).toBe(false);
+    const evs = sim.tick();
+    expect(
+      evs.some(
+        (e: any) =>
+          e.type === 'milestoneUnlocked' ||
+          (e.type === 'deedUnlocked' && e.deedId === `prog_${MILESTONES[0].id}`),
+      ),
+    ).toBe(false);
   });
 });
 
@@ -299,6 +311,34 @@ describe('prestige', () => {
     sim.setPlayerLevel(10);
     expect(sim.prestige()).toBe(false);
     expect(sim.prestigeRank).toBe(0);
+  });
+
+  // Regression (issue #2137): the character sheet only repaints on a small
+  // explicit set of triggers, and prestige used to emit only a chat 'log' line,
+  // so an already-open sheet kept showing the stale rank. The rank rides every
+  // self snapshot, so the client always HAS the new value; what it lacked was a
+  // signal telling it when to repaint. This event is that signal (the 'honor'
+  // precedent), so a successful prestige must emit exactly one carrying the new
+  // rank, and a refused one must emit none.
+  it('emits a personal prestige event carrying the new rank (issue #2137)', () => {
+    const sim = makeSim('warrior');
+    sim.setPlayerLevel(MAX_LEVEL);
+    sim.grantXp(PRESTIGE_XP_PER_RANK);
+    sim.drainEvents();
+
+    expect(sim.prestige()).toBe(true);
+    const events = sim.drainEvents().filter((e) => e.type === 'prestige');
+    expect(events).toEqual([{ type: 'prestige', pid: sim.playerId, rank: 1 }]);
+    expect(sim.prestigeRank).toBe(1);
+  });
+
+  it('emits no prestige event when the gate refuses', () => {
+    const sim = makeSim('warrior');
+    sim.setPlayerLevel(10);
+    sim.drainEvents();
+
+    expect(sim.prestige()).toBe(false);
+    expect(sim.drainEvents().filter((e) => e.type === 'prestige')).toEqual([]);
   });
 });
 
@@ -354,6 +394,7 @@ describe('persistence', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     sim.grantXp(MILESTONES[0].lifetimeXp + 5);
+    sim.tick(); // milestone deeds grant (and dual-write the legacy set) at the tick tail
     sim.prestige();
     const state = sim.serializeCharacter(sim.playerId)!;
     expect(state.lifetimeXp).toBeGreaterThan(0);

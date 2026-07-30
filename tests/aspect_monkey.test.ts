@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
+import { Sim } from '../src/sim/sim';
 
 describe('Aspect of the Monkey', () => {
-  it('is a hunter nature self-buff learned at level 10', () => {
+  it('is a hunter nature self-buff learned at level 5', () => {
     const def = ABILITIES['aspect_of_the_monkey'];
     expect(def).toBeTruthy();
     expect(def.class).toBe('hunter');
-    expect(def.learnLevel).toBe(10);
+    expect(def.learnLevel).toBe(5);
     expect(def.school).toBe('nature');
     expect(def.requiresTarget).toBe(false);
     expect(def.effects).toEqual([
@@ -15,11 +15,11 @@ describe('Aspect of the Monkey', () => {
     ]);
   });
 
-  it('is unknown at level 9 and known from level 10 in the hunter kit', () => {
-    const at9 = abilitiesKnownAt('hunter', 9).map((k) => k.def.id);
-    const at10 = abilitiesKnownAt('hunter', 10).map((k) => k.def.id);
-    expect(at9).not.toContain('aspect_of_the_monkey');
-    expect(at10).toContain('aspect_of_the_monkey');
+  it('is unknown at level 4 and known from level 5 in the hunter kit', () => {
+    const at4 = abilitiesKnownAt('hunter', 4).map((k) => k.def.id);
+    const at5 = abilitiesKnownAt('hunter', 5).map((k) => k.def.id);
+    expect(at4).not.toContain('aspect_of_the_monkey');
+    expect(at5).toContain('aspect_of_the_monkey');
   });
 
   it('raises the hunter dodge chance by 8% when cast', () => {

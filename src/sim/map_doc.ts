@@ -28,7 +28,10 @@ export const MAX_PLACEMENTS = 4000;
 export const MAX_CAMPS = 600;
 export const MAX_NPCS = 200;
 export const MAX_OBJECTS = 400;
-export const MAX_ZONES = 12;
+// The built-in grid world ships 14 zones (the original strip plus the east/west
+// realm columns), so the editor's zone cap sits above that with headroom for a
+// few custom zones. (It was 12 in the 3-zone-strip era.)
+export const MAX_ZONES = 24;
 export const MAX_ROADS = 64;
 export const MAX_ROAD_POINTS = 256;
 export const MAX_NAME_LENGTH = 60;

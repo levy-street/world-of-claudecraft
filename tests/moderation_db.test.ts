@@ -1,5 +1,5 @@
 import type { PoolClient, QueryResult, QueryResultRow } from 'pg';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 type TestQuery = (
   text: string,
@@ -27,7 +27,12 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  reactivateAccountAudited,
   recordInGameAction,
+  resetChatStrikesAudited,
+  setDailyRewardsBan,
+  setDailyRewardsIpBan,
+  setOnAccountModerated,
 } from '../server/moderation_db';
 
 const { query, connect } = db;
@@ -326,6 +331,90 @@ describe('moderation report helpers', () => {
     expect(client.query.mock.calls[2][0]).toBe('ROLLBACK');
   });
 
+  it('rejects reactivation without a reason', async () => {
+    await expect(
+      reactivateAccountAudited({ accountId: 2, adminAccountId: 1, reason: '   ' }),
+    ).rejects.toThrow(/reason/);
+    expect(query).not.toHaveBeenCalled();
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it('reactivates an account and writes an audit action in one transaction', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await reactivateAccountAudited({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'appeal accepted',
+    });
+
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(client.query.mock.calls[0][0]).toBe('BEGIN');
+    expect(client.query.mock.calls[1][0]).toMatch(/deactivated_at = NULL/);
+    expect(client.query.mock.calls[1][1]).toEqual([2]);
+    expect(client.query.mock.calls[2][0]).toMatch(/account_moderation_actions/);
+    expect(client.query.mock.calls[2][1]).toEqual([2, 1, 'reactivate', 'appeal accepted', null]);
+    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+    expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects a chat-strikes reset without a reason', async () => {
+    await expect(
+      resetChatStrikesAudited({ accountId: 2, adminAccountId: 1, reason: '' }),
+    ).rejects.toThrow(/reason/);
+    expect(query).not.toHaveBeenCalled();
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it('resets chat strikes and writes an audit action when the account exists', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([], 1)) // UPDATE, one row
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    const found = await resetChatStrikesAudited({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'appeal accepted',
+    });
+
+    expect(found).toBe(true);
+    expect(client.query.mock.calls[1][0]).toMatch(/chat_strikes = 0/);
+    expect(client.query.mock.calls[1][1]).toEqual([2]);
+    expect(client.query.mock.calls[2][0]).toMatch(/account_moderation_actions/);
+    expect(client.query.mock.calls[2][1]).toEqual([
+      2,
+      1,
+      'chat_strikes_reset',
+      'appeal accepted',
+      null,
+    ]);
+    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+  });
+
+  it('skips the audit row and returns false for an unknown account', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([], 0)) // UPDATE, no rows
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    const found = await resetChatStrikesAudited({
+      accountId: 999,
+      adminAccountId: 1,
+      reason: 'appeal accepted',
+    });
+
+    expect(found).toBe(false);
+    const stmts = client.query.mock.calls.map((c) => String(c[0]));
+    expect(stmts.some((s) => s.includes('account_moderation_actions'))).toBe(false);
+    expect(stmts).toEqual(['BEGIN', expect.stringMatching(/chat_strikes = 0/), 'COMMIT']);
+  });
+
   it('requires a moderation reason for suspend and ban actions', async () => {
     await expect(
       moderateAccount({
@@ -458,6 +547,136 @@ describe('moderation report helpers', () => {
     expect(params).toEqual([2, 1, 'note', 'watching for repeat behavior', null]);
   });
 
+  it('persists and audits a Daily Rewards ban atomically', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await setDailyRewardsBan({
+      accountId: 2,
+      adminAccountId: 1,
+      banned: true,
+      reason: 'automated play',
+    });
+
+    expect(client.query.mock.calls.map((call) => call[0])).toEqual([
+      'BEGIN',
+      expect.stringContaining('INSERT INTO daily_reward_bans'),
+      expect.stringContaining('INSERT INTO account_moderation_actions'),
+      'COMMIT',
+    ]);
+    expect(client.query.mock.calls[2][1]).toEqual([
+      2,
+      1,
+      'daily_rewards_ban',
+      'automated play',
+      null,
+    ]);
+  });
+
+  it('persists a timed Daily Rewards ban and its audited expiry', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([]))
+      .mockResolvedValueOnce(queryResult([{ expires_at: '2026-07-16T06:00:00.000Z' }]))
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await setDailyRewardsBan({
+      accountId: 2,
+      adminAccountId: 1,
+      banned: true,
+      reason: 'automated play',
+      durationHours: 6,
+    });
+
+    expect(client.query.mock.calls[1][0]).toContain('expires_at');
+    expect(client.query.mock.calls[1][1]).toEqual([2, 'automated play', 1, 6]);
+    expect(client.query.mock.calls[2][1]).toEqual([
+      2,
+      1,
+      'daily_rewards_ban',
+      'automated play',
+      '2026-07-16T06:00:00.000Z',
+    ]);
+  });
+
+  it('rejects an invalid Daily Rewards ban duration before opening a transaction', async () => {
+    await expect(
+      setDailyRewardsBan({
+        accountId: 2,
+        adminAccountId: 1,
+        banned: true,
+        reason: 'automated play',
+        durationHours: 0,
+      }),
+    ).rejects.toThrow('daily rewards ban duration must be between 1 and 8760 hours');
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it.each([true, '12', [12]])(
+    'rejects non-number Daily Rewards ban duration %j',
+    async (durationHours) => {
+      await expect(
+        setDailyRewardsBan({
+          accountId: 2,
+          adminAccountId: 1,
+          banned: true,
+          reason: 'automated play',
+          durationHours,
+        }),
+      ).rejects.toThrow('daily rewards ban duration must be between 1 and 8760 hours');
+      expect(connect).not.toHaveBeenCalled();
+    },
+  );
+
+  it('removes and audits a Daily Rewards ban atomically', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([]))
+      .mockResolvedValueOnce(queryResult([], 1))
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await setDailyRewardsBan({
+      accountId: 2,
+      adminAccountId: 1,
+      banned: false,
+      reason: 'appeal accepted',
+    });
+
+    expect(client.query.mock.calls[1][0]).toContain('DELETE FROM daily_reward_bans');
+    expect(client.query.mock.calls[2][1]).toEqual([
+      2,
+      1,
+      'daily_rewards_unban',
+      'appeal accepted',
+      null,
+    ]);
+  });
+
+  it('persists and audits a Daily Rewards IP ban atomically', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await setDailyRewardsIpBan({
+      accountId: 2,
+      adminAccountId: 1,
+      ip: '203.0.113.4',
+      banned: true,
+      reason: 'multi-account abuse',
+    });
+
+    expect(client.query.mock.calls[1][0]).toContain('INSERT INTO daily_reward_ip_bans');
+    expect(client.query.mock.calls[1][1]).toEqual(['203.0.113.4', 'multi-account abuse', 1]);
+    expect(client.query.mock.calls[2][1]).toEqual([
+      2,
+      1,
+      'daily_rewards_ip_ban',
+      'multi-account abuse (IP: 203.0.113.4)',
+      null,
+    ]);
+  });
+
   it('records in-game kick and kill actions without changing account state', async () => {
     query.mockResolvedValue(queryResult([], 1));
 
@@ -520,5 +739,298 @@ describe('moderation report helpers', () => {
     expect(stmts).toContain('ROLLBACK');
     expect(stmts).not.toContain('COMMIT');
     expect(client.release).toHaveBeenCalledTimes(1);
+  });
+});
+
+// The daily-rewards ban writes feed the daily_reward_excluded_accounts view
+// that every ranked daily-board read embeds, so both fire the same
+// post-commit hook moderateAccount fires: main.ts wires it to bust the board
+// caches. These pin the firing contract per write arm: exactly once, only
+// after COMMIT, and never on a failed or rejected write.
+describe('moderation bust hook wiring', () => {
+  afterEach(() => {
+    setOnAccountModerated(null);
+  });
+
+  function statements(client: ReturnType<typeof clientStub>): string[] {
+    return client.query.mock.calls.map((call) => String(call[0]));
+  }
+
+  it('fires exactly once, after COMMIT, for an untimed daily-rewards ban', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const statementsAtHook: string[][] = [];
+    const hook = vi.fn(() => {
+      statementsAtHook.push(statements(client));
+    });
+    setOnAccountModerated(hook);
+
+    await setDailyRewardsBan({
+      accountId: 2,
+      adminAccountId: 1,
+      banned: true,
+      reason: 'automated play',
+    });
+
+    expect(hook).toHaveBeenCalledTimes(1);
+    // The transaction had already committed when the hook ran.
+    expect(statementsAtHook[0]).toContain('COMMIT');
+  });
+
+  it('fires exactly once, after COMMIT, for a timed daily-rewards ban', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([{ expires_at: '2026-07-17T06:00:00.000Z' }]))
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const statementsAtHook: string[][] = [];
+    const hook = vi.fn(() => {
+      statementsAtHook.push(statements(client));
+    });
+    setOnAccountModerated(hook);
+
+    await setDailyRewardsBan({
+      accountId: 2,
+      adminAccountId: 1,
+      banned: true,
+      reason: 'automated play',
+      durationHours: 24,
+    });
+
+    expect(hook).toHaveBeenCalledTimes(1);
+    // The timed arm shares the untimed arm's epilogue; pin the ordering anyway
+    // so a split of the two paths cannot silently fire pre-commit.
+    expect(statementsAtHook[0]).toContain('COMMIT');
+  });
+
+  it('fires exactly once when a daily-rewards ban is lifted', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([], 1)) // DELETE removes the ban row
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const statementsAtHook: string[][] = [];
+    const hook = vi.fn(() => {
+      statementsAtHook.push(statements(client));
+    });
+    setOnAccountModerated(hook);
+
+    await setDailyRewardsBan({
+      accountId: 2,
+      adminAccountId: 1,
+      banned: false,
+      reason: 'appeal accepted',
+    });
+
+    expect(hook).toHaveBeenCalledTimes(1);
+    // The lift shares the ban epilogue today; pin the ordering anyway so a
+    // future split of the arms cannot silently fire pre-commit.
+    expect(statementsAtHook[0]).toContain('COMMIT');
+  });
+
+  it('fires once for a daily-rewards IP ban and once for its lift', async () => {
+    const statementsAtHook: string[][] = [];
+    let activeClient!: ReturnType<typeof clientStub>;
+    const hook = vi.fn(() => {
+      statementsAtHook.push(statements(activeClient));
+    });
+    setOnAccountModerated(hook);
+
+    const banClient = clientStub();
+    activeClient = banClient;
+    connect.mockResolvedValueOnce(banClient as unknown as PoolClient);
+    await setDailyRewardsIpBan({
+      accountId: 2,
+      adminAccountId: 1,
+      ip: '203.0.113.4',
+      banned: true,
+      reason: 'multi-account abuse',
+    });
+    // Asserted after EACH arm, so a never-firing arm and a double-firing arm
+    // both redden instead of masking each other in a running total. The IP
+    // arm carries its own epilogue copy, so it gets its own COMMIT-ordering
+    // pin too instead of leaning on the ban arm's.
+    expect(hook).toHaveBeenCalledTimes(1);
+    expect(statementsAtHook[0]).toContain('COMMIT');
+
+    const unbanClient = clientStub();
+    unbanClient.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([], 1)) // DELETE removes the IP ban row
+      .mockResolvedValue(queryResult([]));
+    activeClient = unbanClient;
+    connect.mockResolvedValueOnce(unbanClient as unknown as PoolClient);
+    await setDailyRewardsIpBan({
+      accountId: 2,
+      adminAccountId: 1,
+      ip: '203.0.113.4',
+      banned: false,
+      reason: 'appeal accepted',
+    });
+    expect(hook).toHaveBeenCalledTimes(2);
+    expect(statementsAtHook[1]).toContain('COMMIT');
+  });
+
+  it('does not fire when the ban transaction fails', async () => {
+    const client = clientStub();
+    client.query.mockImplementation(async (text: string) => {
+      if (text.includes('INSERT INTO daily_reward_bans')) throw new Error('boom');
+      return queryResult([]);
+    });
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const hook = vi.fn();
+    setOnAccountModerated(hook);
+
+    await expect(
+      setDailyRewardsBan({
+        accountId: 2,
+        adminAccountId: 1,
+        banned: true,
+        reason: 'automated play',
+      }),
+    ).rejects.toThrow('boom');
+
+    expect(hook).not.toHaveBeenCalled();
+    expect(statements(client)).toContain('ROLLBACK');
+  });
+
+  it('does not fire when validation rejects before any write', async () => {
+    const hook = vi.fn();
+    setOnAccountModerated(hook);
+
+    await expect(
+      setDailyRewardsBan({ accountId: 2, adminAccountId: 1, banned: true, reason: '   ' }),
+    ).rejects.toThrow(/reason/);
+    await expect(
+      setDailyRewardsBan({
+        accountId: 2,
+        adminAccountId: 1,
+        banned: true,
+        reason: 'automated play',
+        durationHours: 0,
+      }),
+    ).rejects.toThrow(/between 1 and 8760 hours/);
+
+    expect(hook).not.toHaveBeenCalled();
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  // The IP arm duplicates the epilogue in its own function rather than
+  // sharing setDailyRewardsBan's, so the ban arm's negatives do not protect
+  // it: each failure path gets its own pin.
+  it('does not fire when the IP-ban transaction fails', async () => {
+    const client = clientStub();
+    client.query.mockImplementation(async (text: string) => {
+      if (text.includes('INSERT INTO daily_reward_ip_bans')) throw new Error('ip boom');
+      return queryResult([]);
+    });
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const hook = vi.fn();
+    setOnAccountModerated(hook);
+
+    await expect(
+      setDailyRewardsIpBan({
+        accountId: 2,
+        adminAccountId: 1,
+        ip: '203.0.113.4',
+        banned: true,
+        reason: 'multi-account abuse',
+      }),
+    ).rejects.toThrow('ip boom');
+    expect(hook).not.toHaveBeenCalled();
+    expect(statements(client)).toContain('ROLLBACK');
+
+    // The unban arm's not-banned throw happens inside the transaction too.
+    const unbanClient = clientStub();
+    unbanClient.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([], 0)) // DELETE matches no ban row
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(unbanClient as unknown as PoolClient);
+    await expect(
+      setDailyRewardsIpBan({
+        accountId: 2,
+        adminAccountId: 1,
+        ip: '203.0.113.4',
+        banned: false,
+        reason: 'appeal accepted',
+      }),
+    ).rejects.toThrow(/not banned/);
+    expect(hook).not.toHaveBeenCalled();
+    expect(statements(unbanClient)).toContain('ROLLBACK');
+  });
+
+  it('does not fire when IP-ban validation rejects before any write', async () => {
+    const hook = vi.fn();
+    setOnAccountModerated(hook);
+
+    await expect(
+      setDailyRewardsIpBan({
+        accountId: 2,
+        adminAccountId: 1,
+        ip: '  ',
+        banned: true,
+        reason: 'x',
+      }),
+    ).rejects.toThrow();
+    await expect(
+      setDailyRewardsIpBan({
+        accountId: 2,
+        adminAccountId: 1,
+        ip: '203.0.113.4',
+        banned: true,
+        reason: '   ',
+      }),
+    ).rejects.toThrow();
+
+    expect(hook).not.toHaveBeenCalled();
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it('a throwing hook never turns a committed IP ban into an error', async () => {
+    setOnAccountModerated(() => {
+      throw new Error('hook exploded');
+    });
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await expect(
+      setDailyRewardsIpBan({
+        accountId: 2,
+        adminAccountId: 1,
+        ip: '203.0.113.4',
+        banned: true,
+        reason: 'multi-account abuse',
+      }),
+    ).resolves.toBeUndefined();
+
+    expect(statements(client)).toContain('COMMIT');
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  it('a throwing hook never turns a committed ban into an error', async () => {
+    setOnAccountModerated(() => {
+      throw new Error('hook exploded');
+    });
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await expect(
+      setDailyRewardsBan({
+        accountId: 2,
+        adminAccountId: 1,
+        banned: true,
+        reason: 'automated play',
+      }),
+    ).resolves.toBeUndefined();
+
+    expect(statements(client)).toContain('COMMIT');
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
   });
 });

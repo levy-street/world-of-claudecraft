@@ -12,6 +12,7 @@ export type AdminPage =
   | 'accounts'
   | 'characters'
   | 'moderation'
+  | 'moderation-history'
   | 'suspicious-players'
   | 'detection-calibration'
   | 'antibot-config'
@@ -19,6 +20,7 @@ export type AdminPage =
   | 'chat-filter'
   | 'blocked-ips'
   | 'bug-reports'
+  | 'unstuck-reports'
   | 'staff';
 
 export interface AdminNavItem {
@@ -64,6 +66,7 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     defaultPage: 'moderation',
     items: [
       { id: 'moderation', labelKey: 'nav.reports', permission: 'moderation.read' },
+      { id: 'moderation-history', labelKey: 'nav.history', permission: 'moderation.read' },
       { id: 'shared-ips', labelKey: 'nav.sharedIps', permission: 'moderation.read' },
       { id: 'blocked-ips', labelKey: 'nav.blockedIps', permission: 'moderation.read' },
       { id: 'chat-filter', labelKey: 'nav.chatFilter', permission: 'moderation.read' },
@@ -91,7 +94,10 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     id: 'support',
     labelKey: 'nav.support',
     defaultPage: 'bug-reports',
-    items: [{ id: 'bug-reports', labelKey: 'nav.bugReports', permission: 'support.read' }],
+    items: [
+      { id: 'bug-reports', labelKey: 'nav.bugReports', permission: 'support.read' },
+      { id: 'unstuck-reports', labelKey: 'nav.unstuckReports', permission: 'support.read' },
+    ],
   },
   {
     id: 'administration',

@@ -14,12 +14,14 @@ import type { Entity, SimEvent } from '../src/sim/types';
 type Invite = { fromPid: number; expires: number };
 
 // A minimal SimContext that supplies only what PartyMachine reads: resolve/players/
-// error/emit/time + the trade/duel invite maps + dropPartyMarkers. The rest of the
-// seam is irrelevant to the party machine and left unimplemented.
+// error/emit/time + the trade/duel invite maps + readyChecks + dropPartyMarkers. The
+// rest of the seam is irrelevant to the party machine and left unimplemented.
 function makeCtx() {
   const players = new Map<number, PlayerMeta>();
   const tradeInvites = new Map<number, Invite>();
   const duelInvites = new Map<number, Invite>();
+  const readyChecks = new Map();
+  const pendingLootRolls = new Map();
   const events: SimEvent[] = [];
   const errors: { pid: number; text: string }[] = [];
   const droppedMarkers: number[] = [];
@@ -38,6 +40,12 @@ function makeCtx() {
     get duelInvites() {
       return duelInvites;
     },
+    get readyChecks() {
+      return readyChecks;
+    },
+    get pendingLootRolls() {
+      return pendingLootRolls;
+    },
     resolve(pid?: number) {
       if (pid === undefined) return null;
       const meta = players.get(pid);
@@ -46,6 +54,8 @@ function makeCtx() {
     error(pid: number, text: string) {
       errors.push({ pid, text });
     },
+    bumpDeedStat() {},
+    inheritDungeonResetLocks() {},
     emit(ev: SimEvent) {
       events.push(ev);
     },
@@ -74,6 +84,66 @@ function makeCtx() {
 
 const logTexts = (events: SimEvent[]): string[] =>
   events.filter((e) => e.type === 'log').map((e) => (e as { text: string }).text);
+
+describe('PartyMachine: dungeon finder formation', () => {
+  it('runs reset-lock inheritance for every finder-merged member', () => {
+    const t = makeCtx();
+    const leader = t.addPlayer(1, 'L');
+    const member = t.addPlayer(2, 'M');
+    const solo = t.addPlayer(3, 'S');
+    (t.ctx as any).entities = { has: () => true };
+    const inherited: number[] = [];
+    (t.ctx as any).inheritDungeonResetLocks = (pid: number) => inherited.push(pid);
+    const party = new PartyMachine(t.ctx);
+    party.partyInvite(member, leader);
+    party.partyAccept(member);
+    // The invite join inherits too; isolate the finder merge below.
+    inherited.length = 0;
+
+    const formed = party.formDungeonFinderGroup(
+      [
+        { partyId: party.partyOf(leader)!.id, leaderPid: leader, members: [leader, member] },
+        { partyId: null, leaderPid: solo, members: [solo] },
+      ],
+      { raid: false },
+    );
+
+    expect(formed).not.toBeNull();
+    expect(formed!.members).toEqual([leader, member, solo]);
+    expect(inherited).toEqual([solo]);
+  });
+
+  it('refuses to form a raid one member over RAID_MAX, and forms it at RAID_MAX', () => {
+    // The formation seam is the SECOND way a roster grows (partyAccept is the
+    // other, pinned in tests/social.test.ts by an eleventh raider bouncing off a
+    // full raid). Both had to stay capped for server/game.ts to bound the
+    // masterAssign pid list at RAID_MAX (#2524): a roster the finder could push
+    // past ten would make that wire cap start rejecting honest frames, silently.
+    // Both sides of the boundary, since a refusal alone cannot tell a cap of ten
+    // from a cap of two.
+    const form = (size: number) => {
+      const t = makeCtx();
+      const pids = Array.from({ length: size }, (_, i) => t.addPlayer(i + 1, `P${i}`));
+      (t.ctx as any).entities = { has: () => true };
+      const party = new PartyMachine(t.ctx);
+      const formed = party.formDungeonFinderGroup(
+        pids.map((pid) => ({ partyId: null, leaderPid: pid, members: [pid] })),
+        { raid: true },
+      );
+      return { formed, pids, party };
+    };
+
+    const over = form(11); // RAID_MAX + 1
+    expect(over.formed).toBeNull();
+    // Refused BEFORE anything mutated: nobody is left holding a half-built group.
+    for (const pid of over.pids) expect(over.party.partyOf(pid)).toBeNull();
+
+    const at = form(10); // RAID_MAX exactly
+    expect(at.formed).not.toBeNull();
+    expect(at.formed!.members).toEqual(at.pids);
+    expect(at.formed!.raid).toBe(true);
+  });
+});
 
 describe('PartyMachine: formation', () => {
   it('invite -> accept forms a party with leader + member, both resolving via partyOf', () => {
@@ -212,6 +282,51 @@ describe('PartyMachine: raid conversion + groups', () => {
       'A raid with more than five members cannot convert back to a party.',
     );
     expect(party.partyOf(leader)!.raid).toBe(true);
+  });
+
+  it('a departure preserves every other member manually-assigned raid subgroup', () => {
+    const t = makeCtx();
+    const leader = t.addPlayer(1, 'L');
+    for (let i = 2; i <= 9; i++) t.addPlayer(i, `M${i}`);
+    const party = new PartyMachine(t.ctx);
+    // Fill a party of five, convert to raid (which lifts the cap to ten), then
+    // invite the rest so the raid ends up with 9 members total.
+    for (let i = 2; i <= 5; i++) {
+      party.partyInvite(i, leader);
+      party.partyAccept(i);
+    }
+    party.convertPartyToRaid(leader);
+    for (let i = 6; i <= 9; i++) {
+      party.partyInvite(i, leader);
+      party.partyAccept(i);
+    }
+    const p = party.partyOf(leader)!;
+    expect(p.members.length).toBe(9);
+    // Normalized on conversion: members 1-5 -> group 1 (full), 6-8 -> group 2.
+    expect(p.raidGroups.get(5)).toBe(1);
+    expect(p.raidGroups.get(6)).toBe(2);
+
+    // The leader manually swaps member 5 into group 2 and member 6 into group 1
+    // (e.g. to balance healers across subgroups for an upcoming raid mechanic).
+    party.moveRaidMember(5, 2, leader);
+    party.moveRaidMember(6, 1, leader);
+    expect(p.raidGroups.get(5)).toBe(2);
+    expect(p.raidGroups.get(6)).toBe(1);
+
+    // A totally unrelated member (9, untouched by the swap) leaves the raid.
+    party.partyLeave(9);
+
+    // Only the departing member's own slot is gone; the manual swap, and every
+    // other member's subgroup, must survive untouched.
+    expect(p.raidGroups.has(9)).toBe(false);
+    expect(p.raidGroups.get(5)).toBe(2);
+    expect(p.raidGroups.get(6)).toBe(1);
+    expect(p.raidGroups.get(1)).toBe(1);
+    expect(p.raidGroups.get(2)).toBe(1);
+    expect(p.raidGroups.get(3)).toBe(1);
+    expect(p.raidGroups.get(4)).toBe(1);
+    expect(p.raidGroups.get(7)).toBe(2);
+    expect(p.raidGroups.get(8)).toBe(2);
   });
 });
 

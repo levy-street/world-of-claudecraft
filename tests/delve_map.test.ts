@@ -1,4 +1,4 @@
-// Unit tests for src/ui/delve_map.ts: pure logic, no DOM/canvas.
+// Unit tests for src/ui/hud/delve/delve_map.ts: pure logic, no DOM/canvas.
 import { describe, expect, it } from 'vitest';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId } from '../src/sim/delve_layout';
 import { isLitanyModuleId, litanyModuleGeometry } from '../src/sim/delve_litany_layout';
@@ -9,7 +9,7 @@ import {
   delveSchematicPlayer,
   delveSchematicStatic,
   playerDelveLocal,
-} from '../src/ui/delve_map';
+} from '../src/ui/hud/delve/delve_map';
 
 // ---- Label composition -------------------------------------------------------
 

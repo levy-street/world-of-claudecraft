@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 
 const openPlaySession = vi.fn(async () => 1);
@@ -27,8 +28,11 @@ import { type ClientSession, GameServer } from '../server/game';
 import { LINKDEAD_GRACE_MS, planJoin } from '../server/linkdead';
 import {
   isTransientReconnectRejection,
+  isTransientTimeoutRejection,
   MAX_CONFLICT_REJECTIONS,
+  MAX_TIMEOUT_REJECTIONS,
   RECONNECT_CONFLICT_ERROR,
+  RECONNECT_TIMEOUT_ERROR,
 } from '../src/net/reconnect_policy';
 
 function fakeWs() {
@@ -159,22 +163,39 @@ describe('linkdead grace lifecycle', () => {
 
   it('resumes the held session on a same-character re-join: same pid, fresh socket, full re-sync', () => {
     const server = new GameServer();
+    const setTrackingConnection = vi.spyOn((server as any).botDetector, 'setTrackingConnection');
     const ws = fakeWs();
     const session = expectJoined(server.join(ws, 11, 101, 'Comeback', 'warrior', null));
+    expect(setTrackingConnection).not.toHaveBeenCalled();
     server.handleMessage(
       session,
       JSON.stringify({ t: 'input', seq: 9, mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0 } }),
     );
     session.sentEnts.set(4242, {} as any);
     dropSocket(server, session, ws);
+    expect(setTrackingConnection).toHaveBeenCalledTimes(1);
+    expect(setTrackingConnection).toHaveBeenCalledWith(session.botTrackingContext, false);
 
     const ws2 = fakeWs();
-    const resumed = expectJoined(server.join(ws2, 11, 101, 'Comeback', 'warrior', null));
+    const resumeMeta = {
+      ip: '203.0.113.45',
+      userAgent: 'Mozilla/5.0 linkdead-test',
+      clientSeed: 'seed-after-resume',
+    };
+    const resumed = expectJoined(
+      server.join(ws2, 11, 101, 'Comeback', 'warrior', null, false, resumeMeta),
+    );
 
     expect(resumed).toBe(session);
     expect(resumed.linkdead).toBe(false);
     expect(resumed.graceUntil).toBe(0);
     expect(resumed.ws).toBe(ws2);
+    expect(setTrackingConnection).toHaveBeenCalledTimes(2);
+    expect(setTrackingConnection).toHaveBeenLastCalledWith(
+      session.botTrackingContext,
+      true,
+      resumeMeta,
+    );
     // per-connection wire/input state restarts so the new client gets a full
     // snapshot and its input sequence (restarting at 1) is acked correctly
     expect(resumed.lastInputSeq).toBe(0);
@@ -416,6 +437,86 @@ describe('reconnect policy (client-side conflict tolerance)', () => {
       maxPerAccount: 1,
     });
     expect(plan).toEqual({ action: 'reject', error: RECONNECT_CONFLICT_ERROR });
+  });
+
+  it('tolerates the auth-timeout rejection only while a reconnect is in flight', () => {
+    expect(isTransientTimeoutRejection('authentication timed out', 1, 0)).toBe(true);
+    // a fresh character-select join (not reconnecting) must stay fatal
+    expect(isTransientTimeoutRejection('authentication timed out', 0, 0)).toBe(false);
+  });
+
+  it('gives up after its own bounded run of timeout rejections, and pins both bounds', () => {
+    expect(
+      isTransientTimeoutRejection('authentication timed out', 5, MAX_TIMEOUT_REJECTIONS - 1),
+    ).toBe(true);
+    expect(isTransientTimeoutRejection('authentication timed out', 5, MAX_TIMEOUT_REJECTIONS)).toBe(
+      false,
+    );
+    // the two transient windows carry different, literally-pinned bounds, so a
+    // silent change to either reds here
+    expect(MAX_TIMEOUT_REJECTIONS).toBe(20);
+    expect(MAX_CONFLICT_REJECTIONS).toBe(8);
+  });
+
+  it('keeps the timeout and conflict predicates independent by string and by counter', () => {
+    // cross-string: neither predicate fires on the other's wire string
+    expect(isTransientTimeoutRejection(RECONNECT_CONFLICT_ERROR, 3, 0)).toBe(false);
+    expect(isTransientReconnectRejection(RECONNECT_TIMEOUT_ERROR, 3, 0)).toBe(false);
+    // cross-counter: each predicate bounds on its OWN counter. At a rejection count
+    // of 8 (the conflict bound) the timeout predicate is still transient (its bound
+    // is 20), while the conflict predicate has already given up. A shared counter
+    // or a swapped bound would flip one of these.
+    expect(isTransientTimeoutRejection(RECONNECT_TIMEOUT_ERROR, 3, MAX_CONFLICT_REJECTIONS)).toBe(
+      true,
+    );
+    expect(
+      isTransientReconnectRejection(RECONNECT_CONFLICT_ERROR, 3, MAX_CONFLICT_REJECTIONS),
+    ).toBe(false);
+  });
+
+  it('pins the auth-timeout wire string byte-identical to the server literal', () => {
+    // Must equal the server's WS_AUTH_ERROR.authTimedOut value (server/ws_auth.ts,
+    // sent by the first-frame auth timer in onConnection).
+    expect(RECONNECT_TIMEOUT_ERROR).toBe('authentication timed out');
+    // That table is a private const, not exported, so the server side is pinned
+    // by source text: renaming or rewording the table entry there reds this test
+    // until the client constant moves in the same change (the conflict literal
+    // gets the equivalent guard through the planJoin call above).
+    const wsAuthSource = readFileSync(new URL('../server/ws_auth.ts', import.meta.url), 'utf8');
+    expect(wsAuthSource).toContain("authTimedOut: 'authentication timed out',");
+    // The conflict literal has a SECOND live server copy in this same table
+    // (the lease-acquire reject), which the planJoin call above cannot see:
+    // pin it in the same source scan so rewording only that copy cannot
+    // silently turn tolerated reconnect conflicts fatal.
+    expect(wsAuthSource).toContain("alreadyInWorld: 'character already in world',");
+  });
+
+  it('never tolerates any other server rejection under the timeout predicate', () => {
+    expect(isTransientTimeoutRejection('character taken over', 3, 0)).toBe(false);
+    expect(isTransientTimeoutRejection('not authenticated', 3, 0)).toBe(false);
+    expect(isTransientTimeoutRejection(undefined, 3, 0)).toBe(false);
+  });
+
+  it('treats the realm-full rejection as FATAL under both predicates (a fresh join is not retried)', () => {
+    // The realm admission cap refusal (server/ws_auth.ts WS_AUTH_ERROR.realmFull,
+    // the exact literal 'realm is full') matches NEITHER transient predicate, so a
+    // reconnect gives up rather than hammering a realm that is at capacity. Pinned
+    // mid-retry (attempts 3) with fresh rejection counters (0) so the false result
+    // comes from the string not matching, not from a spent bound.
+    expect(isTransientReconnectRejection('realm is full', 3, 0)).toBe(false);
+    expect(isTransientTimeoutRejection('realm is full', 3, 0)).toBe(false);
+  });
+
+  it('treats the too-many-connections refusal as FATAL under both predicates (the refusal is not retried)', () => {
+    // The per-IP hard-limit refusal (server/ws_auth.ts WS_AUTH_ERROR.tooManyConnections,
+    // the exact literal 'too many connections from your network') matches NEITHER transient
+    // predicate, so a reconnect surfaces it to the player instead of silently hammering the
+    // same network cap. Pinned mid-retry (attempts 3) with fresh rejection counters (0) so
+    // the false result comes from the string not matching, not from a spent bound.
+    expect(isTransientReconnectRejection('too many connections from your network', 3, 0)).toBe(
+      false,
+    );
+    expect(isTransientTimeoutRejection('too many connections from your network', 3, 0)).toBe(false);
   });
 });
 

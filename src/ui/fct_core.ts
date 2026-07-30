@@ -32,17 +32,18 @@ export type FctKind =
   | 'damage-done-ability'
   | 'damage-done-auto'
   | 'damage-taken'
+  | 'absorb'
   | 'heal'
   | 'xp'
   | 'rested-xp'
+  | 'honor'
   | 'self-note';
 
 /**
  * The combat-DAMAGE FCT kinds: the high-volume floaters (one per hit, the AoE / boss
- * burst spam) and the ONLY kinds that can crit. The low-tier drop-non-crit gate
- * applies ONLY to these, so a low-preset player still sees crit hits PLUS every low-volume
- * informational floater (xp, rested-xp, self-note) and avoidance word (miss, dodge); only
- * the non-crit damage-number spam (the actual cost driver) is shed.
+ * burst spam) and the ONLY kinds that can crit. This taxonomy classifies a floater as a
+ * damage NUMBER (versus an avoidance word or an informational floater like xp / self-note);
+ * every kind still spawns on every tier (no tier drops a damage number).
  */
 export const DAMAGE_FCT_KINDS: ReadonlySet<FctKind> = new Set<FctKind>([
   'damage-done-ability',
@@ -50,7 +51,7 @@ export const DAMAGE_FCT_KINDS: ReadonlySet<FctKind> = new Set<FctKind>([
   'damage-taken',
 ]);
 
-/** Whether `kind` is a combat-damage floater (the low-tier drop-non-crit target). */
+/** Whether `kind` is a combat-damage floater (a damage number, not a word/info floater). */
 export function isDamageFctKind(kind: FctKind): boolean {
   return DAMAGE_FCT_KINDS.has(kind);
 }
@@ -70,9 +71,11 @@ export type FctColorToken =
   | 'damage-done-ability'
   | 'damage-done-auto'
   | 'damage-taken'
+  | 'absorb'
   | 'heal'
   | 'xp'
   | 'rested-xp'
+  | 'honor'
   | 'self-note';
 
 /**
@@ -135,6 +138,12 @@ export interface FctDescriptor {
 export const FCT_JITTER_RANGE = 30;
 /** Entry lifetime in ms. Live fct(): setTimeout(() => el.remove(), 1250). */
 export const FCT_TTL_MS = 1250;
+/**
+ * XP / rested-xp floaters live longer than a combat number: they are informational
+ * (not a high-volume per-hit spam), so a slightly longer read window makes the reward
+ * actually legible instead of fading as fast as a damage tick.
+ */
+export const FCT_XP_TTL_MS = 1800;
 /** Head offset above the entity origin, scaled by entity scale. Live fct(): pos.y + 2.2 * scale. */
 export const FCT_ANCHOR_HEAD_OFFSET = 2.2;
 /**
@@ -159,7 +168,7 @@ function colorToken(kind: FctKind, isSelf: boolean): FctColorToken {
       // (self grey / other white) so it needs no new CSS class.
       return isSelf ? 'miss-self' : 'miss-other';
     default:
-      // The seven non-avoidance kinds are their own color token 1:1; isSelf never
+      // Non-avoidance kinds are their own color token 1:1; isSelf never
       // changes their color in the live fct(), so it is ignored here.
       return kind;
   }
@@ -182,6 +191,6 @@ export function describeFct(event: FctEvent, jitter01: number): FctDescriptor {
     crit: event.crit,
     anchor: { x: pos.x, y: pos.y + FCT_ANCHOR_HEAD_OFFSET * scale, z: pos.z },
     jitterOffset: jitter01 * FCT_JITTER_RANGE - FCT_JITTER_RANGE / 2,
-    ttlMs: FCT_TTL_MS,
+    ttlMs: event.kind === 'xp' || event.kind === 'rested-xp' ? FCT_XP_TTL_MS : FCT_TTL_MS,
   };
 }

@@ -109,19 +109,47 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
   });
 
   it('party-member rows (role=button tap targets)', () => {
-    const frames = el('div', { id: 'party-frames' });
+    const frames = el('div', { id: 'party-frames', class: 'party-expanded' });
+    const rows = el('div', { class: 'party-rows' });
     const row = el('div', { class: 'party-frame', role: 'button', tabindex: '0' });
-    frames.appendChild(row);
+    rows.appendChild(row);
+    frames.appendChild(rows);
     document.body.appendChild(frames);
     expectAtLeastFloor(row, 'party-frame');
   });
 
-  it('the party leave button', () => {
-    const frames = el('div', { id: 'party-frames' });
-    const leave = el('button', { id: 'party-leave' });
-    frames.appendChild(leave);
+  it('keeps a full raid roster reachable inside the landscape viewport', () => {
+    const frames = el('div', {
+      id: 'party-frames',
+      class: 'party-expanded party-style-raid',
+    });
+    const chip = el('button', { id: 'party-chip' });
+    chip.textContent = 'Party';
+    const rows = el('div', { class: 'party-rows' });
+    for (let i = 0; i < 19; i++) {
+      const row = el('div', { class: 'party-frame', role: 'button', tabindex: '0' });
+      row.textContent = `Member ${i + 1}`;
+      rows.appendChild(row);
+    }
+    frames.append(chip, rows);
     document.body.appendChild(frames);
-    expectAtLeastFloor(leave, '#party-leave');
+
+    const rect = rows.getBoundingClientRect();
+    expect(rect.right).toBeLessThanOrEqual(window.innerWidth + EPSILON);
+    expect(rect.bottom).toBeLessThanOrEqual(window.innerHeight + EPSILON);
+    expect(rows.scrollHeight).toBeGreaterThan(rows.clientHeight);
+    rows.scrollTop = rows.scrollHeight;
+    expect(rows.scrollTop).toBeGreaterThan(0);
+  });
+
+  it('the Leave Party context-menu action', () => {
+    const menu = el('div', { id: 'ctx-menu', class: 'panel' });
+    menu.style.display = 'block';
+    const leave = el('div', { class: 'ctx-item', 'data-act': 'leave-party' });
+    leave.textContent = 'Leave Party';
+    menu.appendChild(leave);
+    document.body.appendChild(menu);
+    expectAtLeastFloor(leave, '[data-act="leave-party"]');
   });
 
   it('the mobile More-tray close button', () => {
@@ -135,12 +163,28 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     expectAtLeastFloor(close, '#mobile-more-close');
   });
 
-  it('the community HUD toggle', () => {
-    const menu = el('details', { id: 'community-menu' });
-    const toggle = el('summary', { class: 'community-toggle' });
-    menu.appendChild(toggle);
-    document.body.appendChild(menu);
-    expectAtLeastFloor(toggle, '.community-toggle');
+  it('the always-present Donate button in the mobile More tray', () => {
+    document.body.className = 'mobile-touch game-active mobile-more-open';
+    const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });
+    const grid = el('div', { id: 'mobile-extra-grid' });
+    const donate = el('button', { id: 'mobile-donate', class: 'mobile-btn' });
+    donate.textContent = 'Donate';
+    grid.appendChild(donate);
+    tray.appendChild(grid);
+    document.body.appendChild(tray);
+    expectAtLeastFloor(donate, '#mobile-donate');
+  });
+
+  it('the Crafting button in the mobile More tray', () => {
+    document.body.className = 'mobile-touch game-active mobile-more-open';
+    const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });
+    const grid = el('div', { id: 'mobile-extra-grid' });
+    const crafting = el('button', { id: 'mobile-crafting', class: 'mobile-btn' });
+    crafting.textContent = 'Crafting';
+    grid.appendChild(crafting);
+    tray.appendChild(grid);
+    document.body.appendChild(tray);
+    expectAtLeastFloor(crafting, '#mobile-crafting');
   });
 
   it('the movement / camera joystick', () => {
@@ -165,6 +209,15 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     zoom.style.height = '32px';
     document.body.appendChild(zoom);
     expectAtLeastFloor(zoom, '.map-zoom-btn');
+  });
+
+  it('the profession quest selection control', () => {
+    const label = el('label', { class: 'qd-profession-choice' });
+    const select = el('select') as HTMLSelectElement;
+    select.appendChild(document.createElement('option'));
+    label.appendChild(select);
+    document.body.appendChild(label);
+    expectAtLeastFloor(select, '.qd-profession-choice select');
   });
 });
 

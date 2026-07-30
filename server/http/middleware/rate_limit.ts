@@ -24,8 +24,15 @@ import {
   CARD_UPLOAD_MAX_PER_MINUTE,
   CHARACTER_MUTATION_MAX_PER_MINUTE,
   type CharacterMutationAction,
+  CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+  CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+  CLAUDIUM_SPEND_MAX_PER_MINUTE,
+  type ClaudiumMutationAction,
   cardUploadRateLimited,
   characterMutationRateLimited,
+  claudiumMutationRateLimited,
+  claudiumPreAuthRateLimited,
   DISCORD_MAX_PER_MINUTE,
   discordRateLimited,
   MAP_MUTATION_MAX_PER_MINUTE,
@@ -37,6 +44,8 @@ import {
   rateLimitNow,
   rateLimitTier2Store,
   reportsCreateRateLimited,
+  STEAM_LINK_MAX_PER_MINUTE,
+  steamLinkRateLimited,
   WALLET_LINK_MAX_PER_MINUTE,
   WINDOW_MS,
   WOC_BALANCE_MAX_PER_MINUTE,
@@ -202,6 +211,18 @@ export const CARD_UPLOAD_POLICY: RateLimitPolicy = {
   tier2: 'global',
 };
 
+// Steam link attempts (POST /api/steam/link). 'ip+account' (mounts BEHIND the
+// route's auth guard) and deliberately tight: every allowed attempt is an
+// upstream AuthenticateUserTicket call against the Steam Web API.
+export const STEAM_LINK_POLICY: RateLimitPolicy = {
+  name: 'steam_link',
+  keyClass: 'ip+account',
+  limit: STEAM_LINK_MAX_PER_MINUTE,
+  windowSeconds: WINDOW_SECONDS,
+  tier1: (ctx) => steamLinkRateLimited(ctx.req, ctxAccountId(ctx)),
+  tier2: 'global',
+};
+
 export const WALLET_LINK_POLICY: RateLimitPolicy = {
   name: 'wallet_link',
   keyClass: 'ip+account',
@@ -210,6 +231,78 @@ export const WALLET_LINK_POLICY: RateLimitPolicy = {
   tier1: (ctx) => walletLinkRateLimited(ctx.req, ctxAccountId(ctx)),
   tier2: 'global',
 };
+
+function claudiumMutationPolicy(
+  name: string,
+  action: ClaudiumMutationAction,
+  limit: number,
+): RateLimitPolicy {
+  return {
+    name,
+    keyClass: 'ip+account',
+    limit,
+    windowSeconds: WINDOW_SECONDS,
+    tier1: (ctx) => claudiumMutationRateLimited(ctx.req, ctxAccountId(ctx), action),
+    tier2: 'global',
+  };
+}
+
+function claudiumPreAuthPolicy(
+  name: string,
+  action: ClaudiumMutationAction,
+  limit: number,
+): RateLimitPolicy {
+  return {
+    name,
+    keyClass: 'ip',
+    limit,
+    windowSeconds: WINDOW_SECONDS,
+    tier1: (ctx) => claudiumPreAuthRateLimited(ctx.req, action),
+    tier2: 'global',
+  };
+}
+
+export const CLAUDIUM_PURCHASE_PRE_AUTH_POLICY: RateLimitPolicy = claudiumPreAuthPolicy(
+  'claudium_purchase_pre_auth',
+  'purchase',
+  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+);
+export const CLAUDIUM_QUOTE_PRE_AUTH_POLICY: RateLimitPolicy = claudiumPreAuthPolicy(
+  'claudium_quote_pre_auth',
+  'quote',
+  CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+);
+export const CLAUDIUM_CONFIRM_PRE_AUTH_POLICY: RateLimitPolicy = claudiumPreAuthPolicy(
+  'claudium_confirm_pre_auth',
+  'confirm',
+  CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+);
+export const CLAUDIUM_SPEND_PRE_AUTH_POLICY: RateLimitPolicy = claudiumPreAuthPolicy(
+  'claudium_spend_pre_auth',
+  'spend',
+  CLAUDIUM_SPEND_MAX_PER_MINUTE,
+);
+
+export const CLAUDIUM_PURCHASE_POLICY: RateLimitPolicy = claudiumMutationPolicy(
+  'claudium_purchase',
+  'purchase',
+  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+);
+export const CLAUDIUM_QUOTE_POLICY: RateLimitPolicy = claudiumMutationPolicy(
+  'claudium_quote',
+  'quote',
+  CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+);
+export const CLAUDIUM_CONFIRM_POLICY: RateLimitPolicy = claudiumMutationPolicy(
+  'claudium_confirm',
+  'confirm',
+  CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+);
+export const CLAUDIUM_SPEND_POLICY: RateLimitPolicy = claudiumMutationPolicy(
+  'claudium_spend',
+  'spend',
+  CLAUDIUM_SPEND_MAX_PER_MINUTE,
+);
 
 // The character-mutation policies. Each is 'ip+account' (so it must be
 // mounted BEHIND the route's auth guard, which populates ctx.account) and runs the

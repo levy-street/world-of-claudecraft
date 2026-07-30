@@ -13,12 +13,19 @@ export interface ItemSetTooltipModel {
 }
 
 export function itemSetMemberCounts(): Record<string, number> {
-  const counts: Record<string, number> = {};
+  const membersBySet = new Map<string, Set<string>>();
   for (const item of Object.values(ITEMS)) {
     if (!item.set) continue;
-    counts[item.set] = (counts[item.set] ?? 0) + 1;
+    const members = membersBySet.get(item.set) ?? new Set<string>();
+    // A set's piece count is its number of distinct SLOTS: the normal item, its
+    // auto-generated heroic variant, and any bespoke heroic raid piece for the same
+    // slot are all one collectible piece (you wear one helmet). Keying on slot keeps
+    // the "X/N" denominator honest (e.g. the 4-slot t2 sets read /4, not an inflated
+    // count from the parallel heroic-variant ids).
+    members.add(item.slot ?? item.id);
+    membersBySet.set(item.set, members);
   }
-  return counts;
+  return Object.fromEntries([...membersBySet].map(([setId, members]) => [setId, members.size]));
 }
 
 export function itemSetTooltipModel(args: {

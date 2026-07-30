@@ -1,0 +1,101 @@
+import { archetypeTitleText, craftNameText } from './char_window';
+import { esc } from './esc';
+import { formatNumber, t } from './i18n';
+import { archetypeImageUrl } from './profession_art';
+import type { ProfessionIdentityModel } from './profession_identity_view';
+
+function ceilingText(ceiling: 'unlimited' | 'rare' | 'common'): string {
+  return t(
+    ceiling === 'unlimited'
+      ? 'hudChrome.crafting.identity.ceilingUnlimited'
+      : ceiling === 'rare'
+        ? 'hudChrome.crafting.identity.ceilingRare'
+        : 'hudChrome.crafting.identity.ceilingCommon',
+  );
+}
+
+function roleText(role: 'major' | 'hobby' | 'dormant' | 'unattuned'): string {
+  return t(
+    role === 'major'
+      ? 'hudChrome.crafting.identity.roleMajor'
+      : role === 'hobby'
+        ? 'hudChrome.crafting.identity.roleHobby'
+        : role === 'dormant'
+          ? 'hudChrome.crafting.identity.roleDormant'
+          : 'hudChrome.crafting.identity.roleUnattuned',
+  );
+}
+
+export function renderProfessionIdentityCard(
+  parent: HTMLElement,
+  identity: ProfessionIdentityModel,
+): void {
+  const title = t('hudChrome.crafting.identity.title');
+  const card = document.createElement('section');
+  card.className = 'profession-identity-card';
+  card.setAttribute('role', 'region');
+  card.setAttribute('aria-label', title);
+
+  if (identity.state === 'syncing') {
+    card.innerHTML = `<h3>${esc(title)}</h3><p>${esc(t('hudChrome.crafting.identity.syncing'))}</p>`;
+    parent.appendChild(card);
+    return;
+  }
+
+  const summary = identity.summary;
+  const attuned = identity.state !== 'unattuned' && summary.majors !== null;
+  const crestUrl = attuned ? archetypeImageUrl(summary.pairId) : null;
+  const headingHtml =
+    `<div class="profession-identity-heading">` +
+    `${crestUrl ? `<img class="profession-archetype-crest" src="${esc(crestUrl)}" alt="" draggable="false">` : ''}` +
+    `<h3>${esc(title)}</h3></div>`;
+  const summaryHtml =
+    identity.state === 'unattuned' || !summary.majors
+      ? `<p>${esc(t('hudChrome.crafting.identity.unattuned'))}</p>`
+      : `<dl class="profession-identity-summary"><dt>${esc(t('hudChrome.crafting.identity.titleLabel'))}</dt><dd>${esc(archetypeTitleText(summary.pairId))}</dd><dt>${esc(t('hudChrome.crafting.identity.majorsLabel'))}</dt><dd>${esc(summary.majors.map(craftNameText).join(' + '))}</dd><dt>${esc(t('hudChrome.crafting.identity.hobbyLabel'))}</dt><dd>${esc(craftNameText(summary.hobbyCraft))}</dd><dt>${esc(t('hudChrome.crafting.identity.historyLabel'))}</dt><dd>${esc(t('hudChrome.crafting.identity.history', { pairs: formatNumber(summary.attunedPairCount, { maximumFractionDigits: 0 }), returns: formatNumber(summary.returnCount, { maximumFractionDigits: 0 }) }))}</dd></dl>`;
+  // The make-amends return cost (closing the 2039 preview gap): shown
+  // only while attuned, the same requiredAmendsProgress figure the quest
+  // attunement preview and the professions window's switch-cost line render.
+  const returnCostHtml = attuned
+    ? `<p class="profession-identity-returncost">${esc(t('hudChrome.crafting.attunementReturnCost', { cost: formatNumber(summary.returnCost, { maximumFractionDigits: 0 }) }))}</p>`
+    : '';
+
+  const skillRows = identity.skills
+    .map((row) => {
+      const label = craftNameText(row.craftId);
+      const detail = t('hudChrome.crafting.identity.skillAria', {
+        craft: label,
+        skill: formatNumber(row.skill, { maximumFractionDigits: 0 }),
+        tier: formatNumber(row.tier, { maximumFractionDigits: 0 }),
+        role: roleText(row.role),
+        ceiling: ceilingText(row.ceiling),
+      });
+      return `<li class="profession-skill-row role-${row.role}" aria-label="${esc(detail)}"><span>${esc(label)}</span><span>${esc(formatNumber(row.skill, { maximumFractionDigits: 0 }))}</span><span>${esc(roleText(row.role))}</span><span>${esc(ceilingText(row.ceiling))}</span></li>`;
+    })
+    .join('');
+
+  // Visual column headers only: aria-hidden because every skill row already
+  // carries the complete skillAria sentence, so exposing the headers too would
+  // double-read the table for screen readers.
+  const skillHeader = skillRows
+    ? `<li class="profession-skill-header" aria-hidden="true"><span>${esc(t('hudChrome.crafting.identity.colCraft'))}</span><span>${esc(t('hudChrome.crafting.identity.colSkill'))}</span><span>${esc(t('hudChrome.crafting.identity.colRole'))}</span><span>${esc(t('hudChrome.crafting.identity.colCap'))}</span></li>`
+    : '';
+
+  const tutorial = identity.tutorial
+    ? `<p class="profession-identity-tutorial">${esc(t('hudChrome.crafting.identity.tutorial', { skill: formatNumber(identity.tutorial.targetSkill, { maximumFractionDigits: 0 }) }))}</p>`
+    : '';
+  const nudges = identity.nudges
+    .map((nudge) =>
+      nudge.type === 'nearTier'
+        ? `<li>${esc(t('hudChrome.crafting.identity.nearTier', { craft: craftNameText(nudge.craftId), points: formatNumber(nudge.points, { maximumFractionDigits: 0 }) }))}</li>`
+        : `<li>${esc(t('hudChrome.crafting.identity.dormantKnowledge', { craft: craftNameText(nudge.craftId) }))}</li>`,
+    )
+    .join('');
+
+  // Two-column card: the narrative half (heading, summary, return cost,
+  // tutorial, nudges) beside the skill table, so the card reads as a compact
+  // hero instead of a tall stack (the wrapper is layout-only; every child
+  // keeps its class and semantics).
+  card.innerHTML = `<div class="profession-identity-main">${headingHtml}${summaryHtml}${returnCostHtml}${tutorial}${nudges ? `<ul class="profession-identity-nudges" role="list">${nudges}</ul>` : ''}</div><ul class="profession-skill-list" role="list">${skillHeader}${skillRows}</ul>`;
+  parent.appendChild(card);
+}

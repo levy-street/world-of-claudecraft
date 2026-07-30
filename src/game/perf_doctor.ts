@@ -1,14 +1,36 @@
+import { classifyGpuRenderer, isWeakIntegratedGpu } from '../render/gfx';
+import { isSoftwareRendererName } from '../render/software_renderer';
+
 export type PerfSuggestionSeverity = 'info' | 'warning' | 'critical';
 
+// The complete suggestion-id catalog, in the analyzer's emit-priority order.
+// These ids are the CLIENT-COMPUTED fleet dimension (packet 0 ruling R14): the
+// perf reporter sends them on the beacon and the server validates against its
+// own deliberate copy (KNOWN_PERF_SUGGESTION_IDS in server/perf_report.ts;
+// server/ cannot import src/game, and tests/perf_suggestion_id_parity.test.ts
+// pins the two catalogs equal).
+export const PERF_SUGGESTION_IDS = [
+  'hardware-acceleration',
+  'integrated-gpu',
+  'high-dpi',
+  'forced-high-graphics',
+  'low-memory',
+  'browser-stalls',
+  'heap-pressure',
+  'context-loss',
+] as const;
+
+export type PerfSuggestionId = (typeof PERF_SUGGESTION_IDS)[number];
+
 export interface PerfSuggestion {
-  id: string;
+  id: PerfSuggestionId;
   severity: PerfSuggestionSeverity;
   title: string;
   body: string;
   action?: { label: string; href: string };
 }
 
-interface PerfDoctorSnapshot {
+export interface PerfDoctorSnapshot {
   frameMs: { p95: number; long50: number };
   windows: { last10s: { frames: number; fps: number; frameMs: { p95: number; long50: number } } };
   renderer: {
@@ -45,29 +67,61 @@ function lowGraphicsHref(search: string): string {
   return `${path}${qs ? `?${qs}` : ''}${hash}`;
 }
 
-function isSoftwareRenderer(glRenderer: string): boolean {
-  return /swiftshader|llvmpipe|software/i.test(glRenderer);
-}
-
 function isBadFrameWindow(s: PerfDoctorSnapshot): boolean {
   const w = s.windows.last10s;
   return w.frames !== 0 && (w.fps < 45 || w.frameMs.p95 >= 28 || w.frameMs.long50 >= 3);
 }
 
+/**
+ * An adapter name that classifies as an INTEGRATED part via gfx.ts's GPU
+ * classification (ruling R15): the named mid-integrated families (Iris Xe,
+ * integrated Radeons, desktop UHD 7xx) plus the weak-integrated Intel list.
+ * The generic weak arm is deliberately excluded: it also matches old MOBILE
+ * SoCs (Adreno 3xx, Mali-T), where "switch to the gaming GPU" is nonsense.
+ */
+function isIntegratedGpuName(name: string): boolean {
+  return classifyGpuRenderer(name) === 'midIntegrated' || isWeakIntegratedGpu(name);
+}
+
+// This module used to be a dev-only diagnostics LIBRARY with no live importer;
+// since packet 0 phase 05 it has two: perf_reporter.ts computes the suggestion
+// ids for the fleet beacon (ruling R14) and perf_nudge.ts drives the player
+// nudge toast from them (ruling R16). Only the IDS ride those consumers; the
+// title/body strings stay English dev diagnostics by design (the toast renders
+// its own t() keys, see src/ui/perf_nudge_view.ts), so they never go through t().
 export function analyzePerfSuggestions(
   s: PerfDoctorSnapshot,
   search = typeof location !== 'undefined' ? location.search : '',
+  env: { desktopShell: boolean } = { desktopShell: false },
 ): PerfSuggestion[] {
   const out: PerfSuggestion[] = [];
   const badFrames = isBadFrameWindow(s);
   const renderer = s.renderer;
 
-  if (renderer && isSoftwareRenderer(renderer.glRenderer)) {
+  if (renderer && isSoftwareRendererName(renderer.glRenderer)) {
     out.push({
       id: 'hardware-acceleration',
       severity: 'critical',
-      title: 'Browser is using software rendering',
-      body: 'The game is not using the real GPU. Enable hardware acceleration in your browser settings, then fully restart the browser.',
+      title: 'Software rendering (no real GPU)',
+      body: 'The game is not running on a real GPU. Update your graphics drivers. On Windows, set the game to High performance under Settings > System > Display > Graphics; in a browser, enable hardware acceleration and restart it.',
+    });
+  } else if (
+    badFrames &&
+    renderer &&
+    isIntegratedGpuName(renderer.glRenderer) &&
+    !env.desktopShell
+  ) {
+    // Hybrid-GPU laptops (brainstorm finding 16): the browser binds the
+    // integrated GPU even when a discrete one exists. Mutually exclusive with
+    // 'hardware-acceleration' (software classification wins, ruling R15), and
+    // never inside the desktop shell, which already forces the dGPU (PR #1991).
+    // Copy is conditional on purpose: the adapter string cannot prove a
+    // discrete GPU exists, only that the session is NOT on one.
+    out.push({
+      id: 'integrated-gpu',
+      severity: 'warning',
+      title: 'Running on the integrated (power-saving) GPU',
+      body: 'This session is rendering on an integrated GPU. If this computer also has a gaming GPU, the browser is not using it: on Windows, set your browser to High performance under Settings > System > Display > Graphics and restart it. The desktop app picks the gaming GPU automatically.',
     });
   }
 

@@ -9,7 +9,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-const src = readFileSync(new URL('../src/ui/questlog_window.ts', import.meta.url), 'utf8');
+const src = readFileSync(
+  new URL('../src/ui/hud/quest/questlog_window.ts', import.meta.url),
+  'utf8',
+);
 const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 describe('questlog_window: WCAG chrome (dialog + rows + focus-return)', () => {

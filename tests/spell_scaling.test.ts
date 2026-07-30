@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   abilityScalingPower,
+  absorbBonus,
   channelSpellCoeff,
   channelTickBonus,
   directHealBonus,
@@ -8,6 +9,7 @@ import {
   directSpellCoeff,
   dotTickBonus,
   dotTotalCoeff,
+  HEALING_SP_SCALE,
   hotTickBonus,
 } from '../src/sim/spell_scaling';
 import type { AbilityDef } from '../src/sim/types';
@@ -121,32 +123,45 @@ describe('dotTickBonus', () => {
 });
 
 describe('directHealBonus', () => {
-  it('scales heals off Spell Power at the direct coeff, instants use the 1.5 floor', () => {
+  it('scales heals off DOUBLE Spell Power (1 healing per int) at the direct coeff', () => {
     const sp = 200;
     expect(directHealBonus(sp, 0)).toBe(
-      Math.round(sp * (SPELL_COEFF_MIN_CAST / SPELL_COEFF_DIVISOR)),
+      Math.round(sp * HEALING_SP_SCALE * (SPELL_COEFF_MIN_CAST / SPELL_COEFF_DIVISOR)),
     );
-    expect(directHealBonus(sp, 3.0)).toBe(Math.round(sp * (3.0 / 3.5)));
-    expect(directHealBonus(sp, 3.5)).toBe(sp); // a 3.5s+ heal takes the full Spell Power
+    expect(directHealBonus(sp, 3.0)).toBe(Math.round(sp * HEALING_SP_SCALE * (3.0 / 3.5)));
+    expect(directHealBonus(sp, 3.5)).toBe(sp * HEALING_SP_SCALE); // full coeff at 3.5s+
   });
 
-  it('never takes an AP scale-down (heals are pure Spell Power)', () => {
-    // Same Spell Power and cast time as a full-coeff nuke: heal takes the full 1.0.
+  it('takes exactly HEALING_SP_SCALE times the equivalent nuke rider (no AP path)', () => {
+    // Same Spell Power and cast time as a full-coeff nuke: the heal takes the
+    // healing scale on top, the 2026-07 healers-vs-heroics rebalance.
     const sp = 300;
-    expect(directHealBonus(sp, 3.5)).toBe(directHitBonus(sp, def({ school: 'holy' }), 3.5));
+    expect(HEALING_SP_SCALE).toBe(2);
+    expect(directHealBonus(sp, 3.5)).toBe(
+      HEALING_SP_SCALE * directHitBonus(sp, def({ school: 'holy' }), 3.5),
+    );
+  });
+});
+
+describe('absorbBonus', () => {
+  it('adds the authored fraction of Spell Power to a shield (mage barriers: no heal scale)', () => {
+    expect(absorbBonus(123, 0.5)).toBe(62);
+    expect(absorbBonus(80, 0)).toBe(0);
   });
 });
 
 describe('hotTickBonus', () => {
-  it('splits the total DoT coefficient across HoT ticks off Spell Power', () => {
+  it('splits the total DoT coefficient across HoT ticks off DOUBLE Spell Power', () => {
     const sp = 150;
     // duration 12, interval 3 -> 4 ticks, total coeff 12/15
-    expect(hotTickBonus(sp, 12, 3)).toBe(Math.round((sp * (12 / 15)) / 4));
+    expect(hotTickBonus(sp, 12, 3)).toBe(Math.round((sp * HEALING_SP_SCALE * (12 / 15)) / 4));
   });
 
-  it('matches dotTickBonus for a pure (holy/nature) spell but without any AP path', () => {
+  it('takes HEALING_SP_SCALE times the equivalent DoT tick (no AP path)', () => {
     const sp = 210;
-    expect(hotTickBonus(sp, 15, 3)).toBe(dotTickBonus(sp, def({ school: 'nature' }), 15, 3));
+    expect(hotTickBonus(sp, 15, 3)).toBe(
+      HEALING_SP_SCALE * dotTickBonus(sp, def({ school: 'nature' }), 15, 3),
+    );
   });
 });
 

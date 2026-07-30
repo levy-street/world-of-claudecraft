@@ -6,7 +6,36 @@ import { localizeServerText, tServer } from '../src/ui/server_i18n';
 // re-render them in the active locale (friends/guild/world/who/moderation).
 describe('server-sent message localization', () => {
   const samples: string[] = [
+    // The two chat-suppression tiers. These are emitted from server/social.ts and
+    // server/game.ts, which the S3 drift guard only partially scans, so pin every
+    // one of them here: a drift between the emit literal and the server_i18n regex
+    // ships English to all 22 locales with an otherwise green gate.
+    // IGNORE tier (chat-only)
+    'Mira is now ignored.',
+    'Mira is no longer ignored.',
+    'Mira is already ignored.',
+    'Your ignore list is full.',
+    'You cannot ignore yourself.',
+    "No character named 'Zzz' on your ignore list.",
+    'Mira is not on your ignore list.',
+    'Your ignore list is empty.',
+    'Ignored (2): Mira, Bob',
+    'Usage: /ignore <name>, /unignore <name>, /ignorelist.',
+    // BLOCK tier (the heavy tool)
+    'Mira is now blocked.',
+    'Mira is no longer blocked.',
+    'Mira is already blocked.',
+    'Your block list is full.',
+    'You cannot block yourself.',
+    "No character named 'Zzz' on your block list.",
+    'Mira is not on your block list.',
+    'Your block list is empty.',
+    'Blocked (1): Mira',
+    'Usage: /block <name>, /unblock <name>, /blocklist.',
+    'You are blocking Mira. Remove them from your block list first.',
+    'Your block list is still loading. Try /who again in a moment.',
     'Mira added to friends.',
+    'You cannot add Mira as a friend.',
     'Your friends list is full.',
     "No character named 'Zzz' exists.",
     'Bob has joined the guild.',
@@ -32,8 +61,22 @@ describe('server-sent message localization', () => {
     'Stopped spectating.',
     'Zephyr is no longer online; spectate ended.',
     'Local chat is unavailable while spectating.',
+    'Usage: /jail ["<name>" <minutes> [reason]]',
+    'Usage: /unjail ["<name>"]',
+    'A moderator has moved you to jail for 10 minutes.',
+    'Your jail sentence has ended.',
+    'A moderator has released you from jail.',
+    'Moved to jail visitor area.',
+    'Returned from jail visitor area.',
+    'You are not visiting jail.',
     'Kicked Bob.',
     'Killed Bob.',
+    'Jailed Bob.',
+    'Jailed Bob for 10 minutes.',
+    'Released Bob from jail.',
+    'Bob is already jailed.',
+    'Bob is not jailed.',
+    'You cannot do that while jailed.',
     'Required Bob to rename.',
     'Muted Bob for 5 minutes.',
     'Suspended Bob for 30 minutes.',
@@ -162,6 +205,12 @@ describe('in-game moderation strings round-trip through localizeServerText', () 
     },
     { input: 'Kicked Bob.', es: 'Has expulsado a Bob.', de: 'Bob wurde entfernt.' },
     { input: 'Killed Bob.', es: 'Has matado a Bob.', de: 'Bob wurde getötet.' },
+    { input: 'Jailed Bob.', es: 'Has encarcelado a Bob.', de: 'Bob wurde eingesperrt.' },
+    {
+      input: 'Released Bob from jail.',
+      es: 'Has liberado a Bob de la cárcel.',
+      de: 'Bob wurde aus dem Gefängnis entlassen.',
+    },
     {
       input: 'Muted Bob for 5 minutes.',
       es: 'Has silenciado a Bob durante 5 minutos.',
@@ -183,6 +232,8 @@ describe('in-game moderation strings round-trip through localizeServerText', () 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
       expect(localizeServerText('Kicked Zephyr.')).toContain('Zephyr');
+      expect(localizeServerText('Jailed Zephyr.')).toContain('Zephyr');
+      expect(localizeServerText('Released Zephyr from jail.')).toContain('Zephyr');
       expect(localizeServerText('Now spectating Zephyr.')).toContain('Zephyr');
       expect(localizeServerText('Zephyr is no longer online; spectate ended.')).toContain('Zephyr');
     }

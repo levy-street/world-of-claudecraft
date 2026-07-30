@@ -27,7 +27,15 @@ function charRow(over: Partial<CharacterRow> = {}): CharacterRow {
 }
 
 function xpRow(name: string, lifetimeXp: number): LifetimeXpLeaderRow {
-  return { name, class: 'warrior', level: 60, realm: 'test-realm', lifetimeXp, prestigeRank: 0 };
+  return {
+    name,
+    class: 'warrior',
+    level: 60,
+    realm: 'test-realm',
+    lifetimeXp,
+    prestigeRank: 0,
+    activeTitle: null,
+  };
 }
 
 describe('FakeCharactersDb', () => {

@@ -38,6 +38,11 @@ export const SETTING_RANGES = {
   // a wider FOV shows more of the world (good for situational awareness) while
   // a narrower one zooms in. Purely a comfort/visibility preference.
   cameraFov: { min: 55, max: 100, def: 60 },
+  // Camera zoom distance (Input.camDist), remembered across sessions like the other
+  // camera settings. Range mirrors Input.zoomBy's clamp; def 12 is the shipped starting
+  // distance. Set by the wheel/pinch zoom (persisted debounced from main.ts), applied back
+  // to Input on boot via the startup apply-all loop and on Reset (issue 1657).
+  cameraZoom: { min: 3, max: 22, def: 12 },
   renderScale: { min: 0.5, max: 1, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
   // on by default: post-cap players see their overflow/virtual-level bar; turn
@@ -117,6 +122,19 @@ export const SETTING_RANGES = {
   // The target frame's twin of playerFrameScale, via --target-frame-scale.
   // Same children-zoom trick (the frame itself is drag-positioned). 1.0 = stock.
   targetFrameScale: { min: 0.7, max: 1.15, def: 1 },
+  // WoW-style party/raid frame profile. Width/height are CSS pixels before the
+  // independent scale; columns and spacing let raids grow across rather than
+  // covering the whole left edge. style: 0 automatic, 1 classic, 2 raid frames.
+  // healthTextMode: 0 none, 1 percent, 2 current, 3 current/max.
+  // partyFrameSort: 0 group, 1 role, 2 name.
+  partyFrameStyle: { min: 0, max: 2, def: 0 },
+  partyFrameScale: { min: 0.7, max: 1.4, def: 1 },
+  partyFrameWidth: { min: 120, max: 260, def: 170 },
+  partyFrameHeight: { min: 30, max: 72, def: 42 },
+  partyFrameSpacing: { min: 0, max: 12, def: 4 },
+  partyFrameColumns: { min: 1, max: 5, def: 1 },
+  partyFrameHealthText: { min: 0, max: 3, def: 1 },
+  partyFrameSort: { min: 0, max: 2, def: 0 },
 } as const;
 
 export const BOOL_SETTINGS = {
@@ -159,6 +177,10 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // on by default: slot 0 shows the classic fixed Attack (auto-attack) toggle.
+  // Turning it off (or right-clicking the Attack button) removes it from the bar,
+  // freeing slot 0 and its keybind to hold a normal assignable action.
+  showAttackButton: { def: true },
   // off by default: walk-by proximity autoloot (loot corpses just by walking
   // past them). Auto-grabbing loot can feel jarring, so it is opt-in and classic
   // deliberate looting stays the default. Gates the client AutoLoot pass in
@@ -176,6 +198,17 @@ export const BOOL_SETTINGS = {
   // vacated top spot) so incoming debuffs keep one glanceable classic corner.
   // Desktop only; the mobile layout keeps its own aura placement.
   aurasOnPlayerFrame: { def: false },
+  // on by default: Clique-style mouseover casting. Pressing an action-bar key
+  // for a friendly (heal/buff) ability while the cursor is over a party frame
+  // casts it on the hovered member without touching the current target (read
+  // live by Hud.castSlot). Off restores the classic target-else-self routing.
+  mouseoverCast: { def: true },
+  // Party/raid frame display profile. Health is always visible; these switches
+  // choose the supporting information layered around it.
+  partyFrameShowResource: { def: true },
+  partyFrameShowAbsorbs: { def: true },
+  partyFrameShowAuras: { def: true },
+  partyFrameShowSelf: { def: false },
 
   // --- Interface & Comfort pack (booleans). ---
   // off by default: drop every HUD cross-fade / panel animation, for players
@@ -207,11 +240,16 @@ export const BOOL_SETTINGS = {
   // Purely a local display preference: the badge is still earned and broadcast
   // either way, this only controls whether THIS client renders it.
   showDevBadges: { def: true },
-  // off by default (the classic self-view keeps no plate over your head): when
-  // on, render your OWN overhead nameplate (name, level, guild, hp, $WOC holder
-  // tier, dev badge, linked-Discord PFP) exactly as other players see it, so you
-  // can see how your character presents. Purely a local display preference.
-  showOwnNameplate: { def: false },
+  // on by default: render your OWN overhead nameplate (name, level, guild, hp,
+  // $WOC holder tier, dev badge, linked-Discord PFP) exactly as other players see
+  // it, so Discord linking and other flair changes have immediate visual feedback.
+  // Purely a local display preference; players can turn it off for the classic view.
+  showOwnNameplate: { def: true },
+  // on by default: render OTHER players' overhead nameplates. Off hides them
+  // (the current target stays visible so a clicked player is still readable),
+  // decluttering crowded hubs on short mobile viewports. Purely a local display
+  // preference; mob nameplates and unit frames are unaffected.
+  showPlayerNameplates: { def: true },
   // off by default: invert the vertical axis of mouselook (push mouse forward
   // to look down), the classic flight-sim preference.
   invertLookY: { def: false },
@@ -223,11 +261,23 @@ export const BOOL_SETTINGS = {
   // players who want them back can re-enable. Independent of the SFX volume
   // slider — jump/land/splash/swim and combat one-shots are unaffected.
   footstepSfx: { def: false },
+  // on by default (no change out of the box): the discrete interface and feedback
+  // cues, the loot-roll/looted "ding", level-up, quest, whisper, polymorph, death,
+  // and denied-action beeps, plus the combat miss/dodge/parry avoid cues. Players
+  // who find these repetitive can silence just this family without touching the SFX
+  // volume slider or the spatial world sounds (impacts, casts, footsteps, ambience).
+  interfaceSfx: { def: true },
   // on by default: a brief OSRS-style ground marker (an expanding ring plus a
   // crossed "X") where you left-click in the world, gold for a normal click and
   // red when the click lands on a hostile. Purely a local presentation cue; it
   // never touches sim state. Off removes the marker entirely.
   clickFeedback: { def: true },
+  // off by default (the classic behavior: a left-click on empty ground clears
+  // your target). When on, a ground left-click keeps the current target, so
+  // click-to-move players can reposition without deselecting; the target still
+  // drops by targeting something else, target death, or range/stealth as normal.
+  // Read by the pick handler via shouldClearTargetOnGroundClick (target_click.ts).
+  stickyTarget: { def: false },
   // off by default: swap the looping landing-page trailer for a static, dimmed,
   // high-contrast backdrop so the start-screen text stays legible (and the
   // 5.7 MB video is never fetched). Forced on regardless for phones / Save-Data /
@@ -237,6 +287,10 @@ export const BOOL_SETTINGS = {
   // to just its "Quests (N)" header. Toggled by clicking the tracker header; kept
   // here so the choice persists across sessions like the other HUD preferences.
   questTrackerCollapsed: { def: false },
+  // off by default (expanded): when on, the on-screen Book of Deeds watchlist
+  // tracker is collapsed to just its header. Toggled by clicking the tracker
+  // header (the quest-tracker convention); kept here so the choice persists.
+  deedTrackerCollapsed: { def: false },
   // off by default: append an "Item Level N" (plus power score) line to every item
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.
@@ -246,6 +300,16 @@ export const BOOL_SETTINGS = {
   // applied in main.ts. Purely a display preference; the slots stay reachable via
   // their keybinds either way, so the row being hidden never disables those abilities.
   showSecondaryActionBar: { def: false },
+  // off by default: reveals the third desktop action bar row (#actionbar3, slots
+  // 23..33). main.ts enforces that this row can only remain enabled while the
+  // secondary row is visible. Mobile exposes the same slots through ring pages.
+  showThirdActionBar: { def: false },
+  // off by default: the classic "target of target" mini-frame. When on, and you have
+  // a target, a small unit frame under the target frame shows who YOUR target is
+  // targeting (a mob's aggro target, a player's selected target). Purely a display
+  // preference read by the HUD's target-frame update; the id it reads already rides
+  // the wire, and the frame hides itself when the target-of-target is unknown.
+  showTargetOfTarget: { def: false },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },
@@ -274,11 +338,36 @@ interface Range {
 const STORE_KEY = 'woc_settings';
 const NUMERIC_KEYS = Object.keys(SETTING_RANGES) as NumericSettingKey[];
 const BOOL_KEYS = Object.keys(BOOL_SETTINGS) as BoolSettingKey[];
+// Mirrors PHONE_TOUCH_QUERY in mobile_controls.ts without importing that DOM-heavy
+// module into the pure settings core.
+const DEFAULT_TOUCH_INTERFACE_QUERY =
+  '(pointer: coarse) and (hover: none), (pointer: coarse) and (max-width: 940px), (pointer: coarse) and (max-height: 760px)';
 
 function clampNumeric(key: NumericSettingKey, v: number): number {
   const r = SETTING_RANGES[key];
   if (!Number.isFinite(v)) return r.def;
   return Math.min(r.max, Math.max(r.min, v));
+}
+
+function defaultTouchInterface(): boolean {
+  try {
+    if (typeof document !== 'undefined' && document.body.classList.contains('native-app'))
+      return true;
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+    return window.matchMedia(DEFAULT_TOUCH_INTERFACE_QUERY).matches;
+  } catch {
+    return false;
+  }
+}
+
+function defaultBoolSetting(
+  key: BoolSettingKey,
+  values: Pick<GameSettings, 'interfaceMode'>,
+): boolean {
+  if (key !== 'showPlayerNameplates') return BOOL_SETTINGS[key].def;
+  if (values.interfaceMode >= 2) return false;
+  if (values.interfaceMode >= 1) return true;
+  return !defaultTouchInterface();
 }
 
 export type ClickMoveMouseButton = 0 | 2;
@@ -313,7 +402,7 @@ export class Settings {
     }
     for (const key of BOOL_KEYS) {
       const v = raw[key];
-      out[key] = typeof v === 'boolean' ? v : BOOL_SETTINGS[key].def;
+      out[key] = typeof v === 'boolean' ? v : defaultBoolSetting(key, out);
     }
     return out;
   }
@@ -350,9 +439,26 @@ export class Settings {
     return v as GameSettings[K];
   }
 
-  reset(): void {
-    for (const key of NUMERIC_KEYS) this.values[key] = SETTING_RANGES[key].def;
-    for (const key of BOOL_KEYS) this.values[key] = BOOL_SETTINGS[key].def;
+  /** Restore defaults. With no `keys`, every setting resets (the historical
+   *  behavior). With `keys`, only those keys reset, so a caller that owns just
+   *  one sub-view (e.g. the options window's per-panel footer) can offer a
+   *  "Reset to Defaults" that does not silently wipe settings the player
+   *  never saw (issue 2341). */
+  reset(keys?: readonly (keyof GameSettings)[]): void {
+    if (!keys) {
+      for (const key of NUMERIC_KEYS) this.values[key] = SETTING_RANGES[key].def;
+      for (const key of BOOL_KEYS) this.values[key] = defaultBoolSetting(key, this.values);
+      this.save();
+      return;
+    }
+    for (const key of keys) {
+      if ((BOOL_KEYS as readonly string[]).includes(key as string)) {
+        const boolKey = key as BoolSettingKey;
+        this.values[boolKey] = defaultBoolSetting(boolKey, this.values);
+      } else if ((NUMERIC_KEYS as readonly string[]).includes(key as string)) {
+        this.values[key as NumericSettingKey] = SETTING_RANGES[key as NumericSettingKey].def;
+      }
+    }
     this.save();
   }
 }

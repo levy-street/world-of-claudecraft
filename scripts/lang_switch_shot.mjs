@@ -1,8 +1,9 @@
 // Screenshots for the in-game language switcher (Options > Interface).
 // Enters the offline world, opens the Esc menu, navigates to Interface, captures the
 // new Language picker, then switches to Spanish to prove the live in-game relocalization.
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
@@ -18,13 +19,17 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
-page.on('console', (m) => { if (m.type() === 'error') errors.push('CONSOLE: ' + m.text()); });
+page.on('console', (m) => {
+  if (m.type() === 'error') errors.push('CONSOLE: ' + m.text());
+});
 
 await page.goto(URL, { waitUntil: 'networkidle0', timeout: 30000 });
 await page.evaluate(() => document.querySelector('#btn-offline').click());
 await sleep(300);
 await page.type('#char-name', 'Thorgar');
-await page.evaluate(() => document.querySelector('#offline-select .mini-class[data-class="warrior"]').click());
+await page.evaluate(() =>
+  document.querySelector('#offline-select .mini-class[data-class="warrior"]').click(),
+);
 await sleep(200);
 await page.evaluate(() => document.querySelector('#btn-start-offline').click());
 await sleep(3500);
@@ -38,8 +43,15 @@ async function openInterface() {
   const clicked = await page.evaluate(() => {
     const btns = [...document.querySelectorAll('#options-menu .opt-btn')];
     // Interface is the 3rd menu entry; click the one matching its current label.
-    const target = btns.find((b) => /Interface|Interfaz|Interfaccia|Benutzer|界面|인터페이스|インターフェース|Интерфейс/i.test(b.textContent || ''));
-    if (target) { target.click(); return true; }
+    const target = btns.find((b) =>
+      /Interface|Interfaz|Interfaccia|Benutzer|界面|인터페이스|インターフェース|Интерфейс/i.test(
+        b.textContent || '',
+      ),
+    );
+    if (target) {
+      target.click();
+      return true;
+    }
     return false;
   });
   await sleep(400);
@@ -55,7 +67,10 @@ const box = await page.evaluate(() => {
   const r = el.getBoundingClientRect();
   return { x: r.x, y: r.y, w: r.width, h: r.height };
 });
-await page.screenshot({ path: 'tmp/lang_picker_en.png', clip: { x: box.x, y: box.y, width: box.w, height: box.h } });
+await page.screenshot({
+  path: 'tmp/lang_picker_en.png',
+  clip: { x: box.x, y: box.y, width: box.w, height: box.h },
+});
 
 // Switch to Spanish via the picker and dispatch the change event.
 await page.evaluate(() => {
@@ -70,12 +85,19 @@ const box2 = await page.evaluate(() => {
   const r = el.getBoundingClientRect();
   return { x: r.x, y: r.y, w: r.width, h: r.height };
 });
-await page.screenshot({ path: 'tmp/lang_picker_es.png', clip: { x: box2.x, y: box2.y, width: box2.w, height: box2.h } });
+await page.screenshot({
+  path: 'tmp/lang_picker_es.png',
+  clip: { x: box2.x, y: box2.y, width: box2.w, height: box2.h },
+});
 
 const labels = await page.evaluate(() => {
   const names = [...document.querySelectorAll('#options-menu .set-name')].map((n) => n.textContent);
   const sel = document.querySelector('#options-menu .set-lang-select');
-  return { firstRow: names[0], selectValue: sel?.value, title: document.querySelector('#options-menu .panel-title span')?.textContent };
+  return {
+    firstRow: names[0],
+    selectValue: sel?.value,
+    title: document.querySelector('#options-menu .panel-title span')?.textContent,
+  };
 });
 console.log('after switch:', JSON.stringify(labels));
 console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'no console/page errors');

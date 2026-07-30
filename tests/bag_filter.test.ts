@@ -5,6 +5,7 @@ import {
   BAG_CATEGORIES,
   type BagFilterState,
   bagFilterIsDefault,
+  bagOrderIsManual,
   DEFAULT_BAG_FILTER,
   parseBagFilter,
   serializeBagFilter,
@@ -34,6 +35,13 @@ const ITEMS: Record<string, ItemDef> = {
   rod: { id: 'rod', name: 'Fishing Rod', kind: 'tool', quality: 'common' },
   keystone: { id: 'keystone', name: 'Crypt Keystone', kind: 'quest', quality: 'common' },
   relic: { id: 'relic', name: 'Ancient Relic', kind: 'armor', slot: 'chest', quality: 'legendary' },
+  reins: {
+    id: 'reins',
+    name: 'Reins of the Valorsteed',
+    kind: 'mount',
+    mount: 'valorsteed',
+    quality: 'common',
+  },
 } as unknown as Record<string, ItemDef>;
 
 const lookup = (id: string): ItemDef | undefined => ITEMS[id];
@@ -84,6 +92,18 @@ describe('applyBagFilter — category filtering', () => {
   it('keeps only quest items', () => {
     const out = applyBagFilter(INV, lookup, { category: 'quest', sort: 'recent', search: '' });
     expect(ids(out)).toEqual(['keystone']);
+  });
+
+  it('keeps only mounts (reins items)', () => {
+    // A local inventory so the shared INV-based order/quality/name assertions
+    // above stay stable; only this case exercises the mount category.
+    const inv: InvSlot[] = [
+      { itemId: 'blade', count: 1 },
+      { itemId: 'reins', count: 1 },
+      { itemId: 'potion', count: 1 },
+    ];
+    const out = applyBagFilter(inv, lookup, { category: 'mount', sort: 'recent', search: '' });
+    expect(ids(out)).toEqual(['reins']);
   });
 
   it('drops slots whose item is missing from the table', () => {
@@ -177,6 +197,10 @@ describe('BAG_CATEGORIES', () => {
     expect(BAG_CATEGORIES[0]).toBe('all');
     expect(new Set(BAG_CATEGORIES).size).toBe(BAG_CATEGORIES.length);
   });
+
+  it('includes the mounts category', () => {
+    expect(BAG_CATEGORIES).toContain('mount');
+  });
 });
 
 describe('bagFilterIsDefault (shared by the bags grid and the bank window)', () => {
@@ -191,5 +215,23 @@ describe('bagFilterIsDefault (shared by the bags grid and the bank window)', () 
     expect(bagFilterIsDefault(state({ category: 'weapon' }))).toBe(false);
     expect(bagFilterIsDefault(state({ search: 'x' }))).toBe(false);
     expect(bagFilterIsDefault(state({ search: '   ' }))).toBe(true);
+  });
+});
+
+describe('bagOrderIsManual (the reorder gate)', () => {
+  // Dragging a stack onto a cell only means "put it there" while the view PRESERVES the
+  // inventory array order. A quality/name sort REORDERS the view, so a cell names no
+  // array position and the sort would put both stacks straight back: that view refuses
+  // the drop (with a toast). A category chip or a search only HIDES stacks, leaving the
+  // survivors in array order, so a swap between two visible stacks stays coherent there.
+  it('is true only for the pristine view, the one that shows the bag REAL cells', () => {
+    expect(bagOrderIsManual({ category: 'all', sort: 'recent', search: '' })).toBe(true);
+  });
+
+  it('is false for any derived view: its squares are rows, not bag positions', () => {
+    expect(bagOrderIsManual({ category: 'all', sort: 'quality', search: '' })).toBe(false);
+    expect(bagOrderIsManual({ category: 'all', sort: 'name', search: '' })).toBe(false);
+    expect(bagOrderIsManual({ category: 'weapon', sort: 'recent', search: '' })).toBe(false);
+    expect(bagOrderIsManual({ category: 'all', sort: 'recent', search: 'clo' })).toBe(false);
   });
 });

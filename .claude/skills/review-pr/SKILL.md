@@ -102,7 +102,9 @@ sub `CLAUDE.md` files are the source of truth; this is the checklist.
 - Migration: schema is inline DDL re-applied every boot. Changes must be additive +
   idempotent (`ADD COLUMN IF NOT EXISTS`); JSONB load stays back-compat (old rows lack
   the field). Flag destructive/non-idempotent DDL. Hand to `migration-safety` /
-  `privacy-security-review` agents for anything non-trivial.
+  `privacy-security-review` agents for anything non-trivial. When the diff changes SQL, a
+  database call site, indexes, query cadence/cardinality, pool or lock behavior, timeout
+  policy, or stored-data growth, hand the scaling angle to `database-performance-reviewer`.
 - Privacy: no `password_hash` or other accounts' data returned to the client.
 - CLAUDE.md requires tests for sim/server behavior changes. A server change with no test
   is a finding.
@@ -122,13 +124,13 @@ locale at release time.**
   locales present for `tsc`; that is structural, not a policy violation, and still not
   something to flag.
 
-**The standard stale-base i18n conflict.** When the only true conflicts are
-`src/ui/i18n.resolved.generated/pending.ts`, `src/ui/i18n.resolved.sha256`, and
-`src/ui/i18n.status.summary.json`, that is mechanical regen churn, not a design problem.
-Say so, and note the fix: merge the base and re-run the i18n build
-(`i18n:build` / `i18n:admin` / `i18n:scan` / `i18n:hash --write`). A hand-edited or
-malformed generated artifact (e.g. an `i18n.resolved.sha256` that is not exactly one
-line) is a different thing and IS a blocker.
+**The standard stale-base i18n conflict.** When the only true conflicts are committed
+line-item locale slices (`src/ui/i18n.resolved.generated/pending.ts` and its sibling
+slices, the admin slices included), that is mechanical regen churn, not a design
+problem. Say so, and note the fix: merge the base and re-run the i18n build
+(`i18n:build` / `i18n:admin` / `i18n:scan`). A hand-edited or malformed generated
+slice (e.g. a `pending.ts` with rows out of sorted order, or a slice that embeds a
+count, hash, or timestamp) is a different thing and IS a blocker.
 
 ## Step 3: Verify against the real code, and confirm before you accuse
 
@@ -176,7 +178,8 @@ with severity. Then YOU verify the consequential findings (Step 3) and write/pos
 review in your own voice. Do not let a subagent author the final review prose or post it,
 the voice and the verify-before-accuse bar are yours to hold. Prefer the purpose-built
 agents (`architecture-reviewer` for `src/sim/` determinism + the `SimContext` seam,
-`cross-platform-sync`, `migration-safety`, `privacy-security-review`, `qa-checklist`) for
+`cross-platform-sync`, `migration-safety`, `database-performance-reviewer`,
+`privacy-security-review`, `qa-checklist`) for
 their domains.
 
 ## Quick reference: domain -> first things to check
@@ -188,4 +191,4 @@ their domains.
 | `src/render/**` | reads not mutates; own module; per-frame cost |
 | `src/ui/**` + `index.html` | IWorld seam; own module; play.html CSS parity; a11y/mobile; i18n |
 | `server/**` routes/db | token-scoped auth; parameterized SQL; additive idempotent DDL; no oversharing; tests |
-| i18n strings | English `t()` in catalog only; all other locales are release-time maintainer work, do not flag; generated-trio conflict = regen |
+| i18n strings | English `t()` in catalog only; all other locales are release-time maintainer work, do not flag; line-item slice conflict = regen |

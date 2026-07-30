@@ -51,7 +51,7 @@ describe('IWorld hobbyCraft read surface (#1294)', () => {
     expect(sim.hobbyCraft).toBe(oppositeCraft(CRAFT_A).id);
   });
 
-  it('c. switching the active archetype updates the hobby to match the new opposite craft', () => {
+  it('c. switching the active archetype re-derives the deterministic default hobby for the new pair', () => {
     const sim = makeSim();
     sim.acceptArchetypeQuest(CRAFT_A);
     expect(sim.hobbyCraft).toBe(oppositeCraft(CRAFT_A).id);
@@ -61,7 +61,18 @@ describe('IWorld hobbyCraft read surface (#1294)', () => {
     const switched = sim.switchArchetype(CRAFT_B);
     expect(switched).toBe(true);
 
-    expect(sim.hobbyCraft).toBe(oppositeCraft(CRAFT_B).id);
+    // CRAFT_B is alchemy: its combo-aware default pair is alchemy+engineering,
+    // whose two opposite candidates are enchanting (opposite alchemy) and
+    // inscription (opposite engineering). With zero retained skill,
+    // defaultHobbyForPair tie-breaks by ring order to inscription. Pinned as
+    // literals so a change to the pair-default or hobby-default rule reddens
+    // here deliberately (see tests/professions_archetype.test.ts for the
+    // skill-preference arm).
+    const meta = (
+      sim as unknown as { players: Map<number, { archetype: { pairedMajor: string } }> }
+    ).players.get(sim.playerId)!;
+    expect(meta.archetype.pairedMajor).toBe('engineering');
+    expect(sim.hobbyCraft).toBe('inscription');
   });
 
   it('d. per-pid read surface (hobbyCraftFor) matches the primary-player getter', () => {

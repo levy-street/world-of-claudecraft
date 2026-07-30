@@ -8,7 +8,7 @@
 import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DESKTOP_LOGIN_TTL_MS } from '../../server/desktop_login';
 import {
   ASSET_UPLOAD_POLICY,
@@ -17,11 +17,20 @@ import {
   CHARACTER_DELETE_POLICY,
   CHARACTER_RENAME_POLICY,
   CHARACTER_TAKEOVER_POLICY,
+  CLAUDIUM_CONFIRM_POLICY,
+  CLAUDIUM_CONFIRM_PRE_AUTH_POLICY,
+  CLAUDIUM_PURCHASE_POLICY,
+  CLAUDIUM_PURCHASE_PRE_AUTH_POLICY,
+  CLAUDIUM_QUOTE_POLICY,
+  CLAUDIUM_QUOTE_PRE_AUTH_POLICY,
+  CLAUDIUM_SPEND_POLICY,
+  CLAUDIUM_SPEND_PRE_AUTH_POLICY,
   DISCORD_POLICY,
   MAP_MUTATION_POLICY,
   PUBLIC_READ_POLICY,
   type RateLimitPolicy,
   REPORTS_CREATE_POLICY,
+  STEAM_LINK_POLICY,
   WALLET_LINK_POLICY,
   WOC_BALANCE_POLICY,
 } from '../../server/http/middleware/rate_limit';
@@ -33,20 +42,39 @@ import {
   REQUEST_TIMEOUT_MS,
 } from '../../server/http/server_timeouts';
 import { DEFAULT_JSON_BODY_MAX_BYTES } from '../../server/http_util';
+import { LIST_READ_BURST, LIST_READ_REFILL_PER_SECOND } from '../../server/list_read_guard';
 import {
+  MSG_LANE_CHAT_BURST,
+  MSG_LANE_CHAT_REFILL_PER_SECOND,
+  MSG_LANE_COMMAND_BURST,
+  MSG_LANE_COMMAND_REFILL_PER_SECOND,
+  MSG_LANE_MOVEMENT_BURST,
+  MSG_LANE_MOVEMENT_REFILL_PER_SECOND,
+} from '../../server/msg_lanes';
+import {
+  MSG_ABUSE_KICK_SECONDS,
+  MSG_ABUSE_SECOND_DROP_FLOOR,
+  MSG_ABUSE_WINDOW_SECONDS,
+  MSG_BYTE_BURST,
+  MSG_BYTE_REFILL_PER_SECOND,
   MSG_RATE_BURST,
   MSG_RATE_REFILL_PER_SECOND,
-  MSG_RATE_VIOLATIONS_FOR_KICK,
+  MSG_SEQ_GAP_SANITY,
 } from '../../server/msg_rate_limit';
 import {
   ASSET_UPLOAD_MAX_PER_MINUTE,
   AUTH_MAX_PER_MINUTE,
   CARD_UPLOAD_MAX_PER_MINUTE,
   CHARACTER_MUTATION_MAX_PER_MINUTE,
+  CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+  CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+  CLAUDIUM_SPEND_MAX_PER_MINUTE,
   DISCORD_MAX_PER_MINUTE,
   MAP_MUTATION_MAX_PER_MINUTE,
   PUBLIC_READ_MAX_PER_MINUTE,
   REPORTS_CREATE_MAX_PER_MINUTE,
+  STEAM_LINK_MAX_PER_MINUTE,
   WALLET_LINK_MAX_PER_MINUTE,
   WINDOW_MS,
   WOC_BALANCE_MAX_PER_MINUTE,
@@ -136,6 +164,60 @@ describe('rate-limit POLICIES derive from the limiter constants and hold their v
       name: 'wallet_link',
       source: WALLET_LINK_MAX_PER_MINUTE,
       limit: 10,
+    },
+    {
+      policy: CLAUDIUM_PURCHASE_PRE_AUTH_POLICY,
+      name: 'claudium_purchase_pre_auth',
+      source: CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+      limit: 10,
+    },
+    {
+      policy: CLAUDIUM_QUOTE_PRE_AUTH_POLICY,
+      name: 'claudium_quote_pre_auth',
+      source: CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+      limit: 20,
+    },
+    {
+      policy: CLAUDIUM_CONFIRM_PRE_AUTH_POLICY,
+      name: 'claudium_confirm_pre_auth',
+      source: CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+      limit: 60,
+    },
+    {
+      policy: CLAUDIUM_SPEND_PRE_AUTH_POLICY,
+      name: 'claudium_spend_pre_auth',
+      source: CLAUDIUM_SPEND_MAX_PER_MINUTE,
+      limit: 30,
+    },
+    {
+      policy: CLAUDIUM_PURCHASE_POLICY,
+      name: 'claudium_purchase',
+      source: CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+      limit: 10,
+    },
+    {
+      policy: CLAUDIUM_QUOTE_POLICY,
+      name: 'claudium_quote',
+      source: CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+      limit: 20,
+    },
+    {
+      policy: CLAUDIUM_CONFIRM_POLICY,
+      name: 'claudium_confirm',
+      source: CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+      limit: 60,
+    },
+    {
+      policy: CLAUDIUM_SPEND_POLICY,
+      name: 'claudium_spend',
+      source: CLAUDIUM_SPEND_MAX_PER_MINUTE,
+      limit: 30,
+    },
+    {
+      policy: STEAM_LINK_POLICY,
+      name: 'steam_link',
+      source: STEAM_LINK_MAX_PER_MINUTE,
+      limit: 5,
     },
     {
       policy: CHARACTER_CREATE_POLICY,
@@ -232,11 +314,142 @@ describe('byte caps + page sizes hold their literal values', () => {
     expect(DAILY_OPS_LEADERBOARD_PAGE_SIZE).toBe(50);
   });
 
-  it('msg-rate trio + desktop-login TTL', () => {
-    expect(MSG_RATE_BURST).toBe(60);
-    expect(MSG_RATE_REFILL_PER_SECOND).toBe(40);
-    expect(MSG_RATE_VIOLATIONS_FOR_KICK).toBe(200);
+  it('inbound gate constants + desktop-login TTL', () => {
+    expect(MSG_RATE_BURST).toBe(180);
+    expect(MSG_RATE_REFILL_PER_SECOND).toBe(120);
+    expect(MSG_BYTE_BURST).toBe(131_072); // 128 KiB
+    expect(MSG_BYTE_REFILL_PER_SECOND).toBe(65_536); // 64 KiB
+    expect(MSG_ABUSE_WINDOW_SECONDS).toBe(10);
+    expect(MSG_ABUSE_KICK_SECONDS).toBe(5);
+    expect(MSG_ABUSE_SECOND_DROP_FLOOR).toBe(30);
+    expect(MSG_SEQ_GAP_SANITY).toBe(1000);
     expect(DESKTOP_LOGIN_TTL_MS).toBe(300_000); // 5 min
+  });
+
+  it('inbound lane constants', () => {
+    expect(MSG_LANE_MOVEMENT_REFILL_PER_SECOND).toBe(90);
+    expect(MSG_LANE_MOVEMENT_BURST).toBe(120);
+    expect(MSG_LANE_COMMAND_REFILL_PER_SECOND).toBe(30);
+    expect(MSG_LANE_COMMAND_BURST).toBe(60);
+    expect(MSG_LANE_CHAT_REFILL_PER_SECOND).toBe(4);
+    expect(MSG_LANE_CHAT_BURST).toBe(8);
+  });
+
+  it('list-read guard constants', () => {
+    expect(LIST_READ_BURST).toBe(10);
+    expect(LIST_READ_REFILL_PER_SECOND).toBe(1);
+  });
+});
+
+describe('db pool timeouts hold their literal values and the query_timeout layering', () => {
+  it('pins each literal and the strict layering the SET LOCAL exemption depends on', async () => {
+    const {
+      DB_POOL_CONNECT_TIMEOUT_MS,
+      DB_STATEMENT_TIMEOUT_MS,
+      DB_HEAVY_STATEMENT_TIMEOUT_MS,
+      DB_QUERY_TIMEOUT_MS,
+      getPoolClientErrorCount,
+      pool,
+    } = await import('../../server/db');
+    // (b) values: each named timeout holds its literal.
+    expect(DB_POOL_CONNECT_TIMEOUT_MS).toBe(5_000);
+    expect(DB_STATEMENT_TIMEOUT_MS).toBe(15_000);
+    expect(DB_HEAVY_STATEMENT_TIMEOUT_MS).toBe(60_000);
+    expect(DB_QUERY_TIMEOUT_MS).toBe(65_000);
+    // (a) derivation: the client-side backstop is defined as heavy + 5s, pinned as a
+    // relation so the two cannot silently drift together (the constant-self-comparison
+    // trap). query_timeout is per-connection and cannot be lifted by SET LOCAL, so it
+    // MUST sit strictly above the heaviest server-side allowance or it would kill the
+    // very queries runWithStatementTimeout raises the heavy allowance for.
+    expect(DB_QUERY_TIMEOUT_MS).toBe(DB_HEAVY_STATEMENT_TIMEOUT_MS + 5_000);
+    expect(DB_QUERY_TIMEOUT_MS).toBeGreaterThan(DB_HEAVY_STATEMENT_TIMEOUT_MS);
+    // The ladder: heavy > default > connect wait, so an exempted read gets real
+    // headroom, an ordinary query is bounded tighter, and a checkout fails fastest.
+    expect(DB_HEAVY_STATEMENT_TIMEOUT_MS).toBeGreaterThan(DB_STATEMENT_TIMEOUT_MS);
+    expect(DB_STATEMENT_TIMEOUT_MS).toBeGreaterThan(DB_POOL_CONNECT_TIMEOUT_MS);
+    // The idle-client error handler is actually REGISTERED on the real pool (this
+    // suite does not mock pg), not just present in source: emitting the pool's
+    // 'error' event runs it, so the counter the getter exposes advances by one. An
+    // unregistered handler would instead let node throw on an unhandled 'error'.
+    const before = getPoolClientErrorCount();
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    pool.emit('error', new Error('idle client boom'));
+    errSpy.mockRestore();
+    expect(getPoolClientErrorCount()).toBe(before + 1);
+  });
+
+  it('runWithStatementTimeout rejects a non-integer or negative timeout before touching the pool', async () => {
+    // SET LOCAL cannot bind a parameter, so the timeout is interpolated into the
+    // statement text as an integer; the safe-integer validation is therefore the
+    // injection guard. It must throw BEFORE any client is checked out (so a bad
+    // value can never reach the SQL, and fn never runs).
+    const { runWithStatementTimeout } = await import('../../server/db');
+    const fn = vi.fn();
+    await expect(runWithStatementTimeout(-1, fn)).rejects.toThrow(/non-negative safe integer/);
+    await expect(runWithStatementTimeout(1.5, fn)).rejects.toThrow(/non-negative safe integer/);
+    await expect(runWithStatementTimeout(Number.NaN, fn)).rejects.toThrow(
+      /non-negative safe integer/,
+    );
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it('runWithStatementTimeout opens the transaction before the raise and unwinds on error', async () => {
+    // BEGIN must precede SET LOCAL (outside a transaction SET LOCAL is a silent
+    // no-op, leaving the heavy read on the 15s default), fn's statements must run
+    // on the SAME checked-out client, and both exits must return the client to
+    // the pool: a leaked client on the heavy path eats one of the 10 slots
+    // forever. Recorded on a stubbed checkout, no database touched.
+    const { runWithStatementTimeout, pool } = await import('../../server/db');
+    const calls: string[] = [];
+    let released = 0;
+    const client = {
+      query: (text: string) => {
+        calls.push(text);
+        return Promise.resolve({ rows: [], rowCount: 0 });
+      },
+      release: () => {
+        released++;
+      },
+    };
+    const connectSpy = vi.spyOn(pool, 'connect').mockResolvedValue(client as never);
+    try {
+      const out = await runWithStatementTimeout(1234, async (query) => {
+        await query('SELECT 1');
+        return 'ok';
+      });
+      expect(out).toBe('ok');
+      expect(calls).toEqual(['BEGIN', 'SET LOCAL statement_timeout = 1234', 'SELECT 1', 'COMMIT']);
+      expect(released).toBe(1);
+
+      // fn rejects: ROLLBACK (never COMMIT), the original error rethrows, and the
+      // client is STILL released.
+      calls.length = 0;
+      await expect(
+        runWithStatementTimeout(1234, async () => {
+          throw new Error('boom');
+        }),
+      ).rejects.toThrow('boom');
+      expect(calls).toEqual(['BEGIN', 'SET LOCAL statement_timeout = 1234', 'ROLLBACK']);
+      expect(released).toBe(2);
+
+      // A ROLLBACK that itself fails (dead connection) must neither mask the
+      // original error nor skip the release.
+      calls.length = 0;
+      client.query = (text: string) => {
+        calls.push(text);
+        return text === 'ROLLBACK'
+          ? Promise.reject(new Error('conn gone'))
+          : Promise.resolve({ rows: [], rowCount: 0 });
+      };
+      await expect(
+        runWithStatementTimeout(1234, async () => {
+          throw new Error('original');
+        }),
+      ).rejects.toThrow('original');
+      expect(released).toBe(3);
+    } finally {
+      connectSpy.mockRestore();
+    }
   });
 });
 
@@ -251,6 +464,18 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
   const dbSrc = read('server/db.ts');
   const reportsSrc = read('server/reports.ts');
   const dailySrc = read('server/daily_rewards.ts');
+  const unstuckDbSrc = read('server/unstuck_db.ts');
+  const unstuckRecordsSrc = read('server/unstuck_records.ts');
+  const retentionSrc = read('server/play_session_retention_db.ts');
+
+  // Slice a function BODY: from its declaration to the next top-level export,
+  // so a neighbor's match can never satisfy a body that lost its own.
+  const bodyOf = (source: string, decl: string): string => {
+    const start = source.indexOf(decl);
+    expect(start, `${decl} not found`).toBeGreaterThan(-1);
+    const next = source.indexOf('\nexport ', start + decl.length);
+    return next === -1 ? source.slice(start) : source.slice(start, next);
+  };
 
   it('the WS maxPayload references WS_MAX_PAYLOAD_BYTES, defined once', () => {
     expect(mainSrc).toContain('maxPayload: WS_MAX_PAYLOAD_BYTES');
@@ -293,9 +518,256 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(mainSrc).not.toContain('setTimeout(r, 2000)');
   });
 
+  it('wires the bounded unstuck retention prune at boot and daily maintenance', () => {
+    expect(unstuckDbSrc).toContain(
+      'export const UNSTUCK_REPORT_RETENTION_DAYS = UNSTUCK_REPORT_MAX_DAYS;',
+    );
+    expect(unstuckDbSrc).toContain('export const UNSTUCK_REPORT_PRUNE_BATCH_SIZE = 10_000;');
+    expect(unstuckDbSrc).toContain('export const UNSTUCK_REPORT_PRUNE_MAX_BATCHES = 10;');
+    expect(unstuckDbSrc).toContain('pg_try_advisory_lock($1::int)');
+    expect(unstuckDbSrc).toContain('LIMIT $2');
+    expect(mainSrc).toContain('const prunedUnstuckReports = await pruneUnstuckReports(pool);');
+    expect(mainSrc).toContain('void pruneUnstuckReports(pool).catch((err) =>');
+    expect(count(mainSrc, 'pruneUnstuckReports(pool)')).toBe(2);
+  });
+
+  it('bounds unstuck inserts and the shutdown drain with named timeouts', () => {
+    expect(unstuckDbSrc).toContain('export const UNSTUCK_INSERT_QUERY_TIMEOUT_MS = 1_000;');
+    expect(unstuckDbSrc).toContain('query_timeout: UNSTUCK_INSERT_QUERY_TIMEOUT_MS');
+    expect(unstuckRecordsSrc).toContain('export const UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS = 5_000;');
+    expect(mainSrc).toContain(
+      'const unstuckReportsDrained = await stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS);',
+    );
+    expect(mainSrc).not.toContain('await unstuckRecordsIdle();');
+  });
+
+  it('bounds unstuck recorder memory and rate-limits overflow warnings', () => {
+    expect(unstuckRecordsSrc).toContain('export const UNSTUCK_RECORD_MAX_PENDING = 256;');
+    expect(unstuckRecordsSrc).toContain(
+      'export const UNSTUCK_RECORD_OVERFLOW_WARN_INTERVAL_MS = 60_000;',
+    );
+    expect(unstuckRecordsSrc).toContain('queueState.pending >= UNSTUCK_RECORD_MAX_PENDING');
+  });
+
   it('the pg pool max references DB_POOL_MAX_CLIENTS', () => {
     expect(dbSrc).toContain('max: DB_POOL_MAX_CLIENTS');
     expect(dbSrc).not.toContain('max: 10 }');
+  });
+
+  it('the pg pool timeouts wire the named constants at construction, never a re-inlined literal', () => {
+    // Pool construction reads each timeout from its named constant.
+    expect(dbSrc).toContain('connectionTimeoutMillis: DB_POOL_CONNECT_TIMEOUT_MS');
+    expect(dbSrc).toContain('statement_timeout: DB_STATEMENT_TIMEOUT_MS');
+    expect(dbSrc).toContain('query_timeout: DB_QUERY_TIMEOUT_MS');
+    // No re-inlined magic number at the construction call site (the owner defs above
+    // are `= 5000` / `= 15_000` / `= DB_HEAVY_STATEMENT_TIMEOUT_MS + 5000`, never the
+    // `key: literal` spellings banned here).
+    expect(dbSrc).not.toContain('connectionTimeoutMillis: 5000');
+    expect(dbSrc).not.toContain('statement_timeout: 15000');
+    expect(dbSrc).not.toContain('query_timeout: 65000');
+  });
+
+  it('an idle pooled-client error is handled, never left to crash the process', () => {
+    expect(dbSrc).toContain("pool.on('error'");
+  });
+
+  it('every heavy-aggregate call site runs through the raised allowance, per function body', () => {
+    // Dropping runWithStatementTimeout at ONE call site silently reverts that
+    // read to the 15s session default while its own suite stays green (the
+    // suites answer BEGIN/SET LOCAL and forward the real query through the same
+    // spy), so pin each function BODY to the wrapper via the shared bodyOf.
+    for (const decl of [
+      'export async function topArenaRatings',
+      'export async function topLifetimeXp',
+      'export async function topGuilds',
+      'export async function deedsBoardRanked',
+      'export async function saveCharacterState',
+    ]) {
+      expect(bodyOf(dbSrc, decl)).toContain(
+        'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+      );
+    }
+    // saveCharacterAndMarketState owns its escrow transaction and inlines the raise.
+    expect(bodyOf(dbSrc, 'export async function saveCharacterAndMarketState')).toContain(
+      'SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}',
+    );
+    const adminSrc = read('server/admin_db.ts');
+    expect(bodyOf(adminSrc, 'export async function overviewCounts')).toContain(
+      'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+    );
+    expect(bodyOf(read('server/deeds_db.ts'), 'export async function deedRarityCounts')).toContain(
+      'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+    );
+    // The on-demand admin reads carry the wrapper in the body that owns their
+    // heaviest scan: sessionsByDay and accountDetail wrap directly; clientPerfSummary
+    // runs its whole roll-up as ONE GROUPING SETS statement inside its own wrapper
+    // call. The batched retention prunes (db.ts) stay on the default allowance;
+    // batching is what makes the default safe for them (pinned below).
+    for (const decl of [
+      'export async function sessionsByDay',
+      'export async function clientPerfSummary',
+      'export async function accountDetail',
+    ]) {
+      expect(bodyOf(adminSrc, decl)).toContain(
+        'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+      );
+    }
+    // clientPerfSummary collapsed its seven serialized reads into one GROUPING SETS
+    // statement issued through the bound query; pin the collapsed shape so the
+    // roll-up cannot silently split back out or drop to a bare pool read outside
+    // the raised transaction without reddening this.
+    const perfSummaryBody = bodyOf(adminSrc, 'export async function clientPerfSummary');
+    expect(perfSummaryBody).toContain('runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS');
+    expect(perfSummaryBody).toContain('GROUPING SETS');
+    expect(perfSummaryBody).not.toContain('pool.query');
+    // accountDetail wraps ONLY the account row whose correlated play_sessions sum
+    // grows without bound; its four LIMIT-capped companion reads stay on the default.
+    // Slice from the wrapper to the next pool.query and require the playtime
+    // aggregate inside it, so moving the wrapper onto one of the capped reads (and
+    // silently dropping the unbounded scan back to the default) reddens this.
+    const accountDetailBody = bodyOf(adminSrc, 'export async function accountDetail');
+    const wrapStart = accountDetailBody.indexOf(
+      'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+    );
+    expect(wrapStart).toBeGreaterThan(-1);
+    const nextPoolQuery = accountDetailBody.indexOf('pool.query', wrapStart);
+    const wrappedRead =
+      nextPoolQuery === -1
+        ? accountDetailBody.slice(wrapStart)
+        : accountDetailBody.slice(wrapStart, nextPoolQuery);
+    expect(wrappedRead).toContain('playtime_seconds');
+    expect(wrappedRead).toContain('FROM accounts');
+    expect(wrappedRead).toContain('WHERE id = $1');
+    // The retention prunes are deliberately NOT heavy call sites anymore: each call
+    // is one bounded DELETE batch on the default allowance, and the sweep drives
+    // iteration. Batching is what makes the default safe; re-wrapping would be a
+    // regression to the timed-out-forever one-shot DELETE.
+    expect(bodyOf(dbSrc, 'export async function pruneChatLogsBatch')).not.toContain(
+      'runWithStatementTimeout',
+    );
+    expect(bodyOf(dbSrc, 'export async function pruneClientPerfReportsBatch')).not.toContain(
+      'runWithStatementTimeout',
+    );
+  });
+
+  it('the play-session retention prunes stay batched on the default allowance', () => {
+    // A batch primitive must never regress to an unbatched one-shot DELETE on
+    // the heavy allowance: each call is ONE bounded batch (LIMIT $2) and the
+    // sweep drives iteration, which is what makes the default statement
+    // timeout safe here.
+    const foldBody = bodyOf(retentionSrc, 'export async function prunePlaySessionsBatch');
+    const agingBody = bodyOf(retentionSrc, 'export async function pruneAccountIpAssociationsBatch');
+    expect(foldBody).not.toContain('runWithStatementTimeout');
+    expect(agingBody).not.toContain('runWithStatementTimeout');
+    expect(foldBody).toContain('LIMIT $2');
+    expect(agingBody).toContain('LIMIT $2');
+    // The fold prunes on session age (started_at) and the aging prune on link
+    // age (last_seen_at); pin each body's cutoff predicate so the two can
+    // never swap.
+    expect(foldBody).toContain("started_at < now() - ($1 || ' days')::interval");
+    expect(agingBody).toContain("last_seen_at < now() - ($1 || ' days')::interval");
+  });
+
+  it('the player-activity retention prune stays batched on the default allowance', () => {
+    // Same contract as the sibling prunes: one bounded batch per call (LIMIT $2)
+    // on the default statement timeout, with the sweep driving iteration.
+    const metricsSrc = read('server/player_metrics_db.ts');
+    const body = bodyOf(metricsSrc, 'export async function prunePlayerActivityDailyBatch');
+    expect(body).not.toContain('runWithStatementTimeout');
+    expect(body).toContain('LIMIT $2');
+    // The cutoff rides the UTC activity-day clock the writers stamp; pin the
+    // literal so the reward-clock helper (a different day boundary) can never
+    // swap in.
+    expect(body).toContain("day < (now() AT TIME ZONE 'UTC')::date - $1::int");
+  });
+
+  it('the retention floor stays strictly above the admin activity window', () => {
+    // The fold must never delete a session an admin activity chart still
+    // counts. Extract both literals from source so a widened admin window
+    // (server/admin.ts) that overtakes the floor reddens this pin.
+    const adminModuleSrc = read('server/admin.ts');
+    const windowMatch = adminModuleSrc.match(/const ACTIVITY_WINDOW_DAYS = (\d+);/);
+    const floorMatch = retentionSrc.match(
+      /export const PLAY_SESSION_RETENTION_FLOOR_DAYS = (\d+);/,
+    );
+    expect(windowMatch).not.toBeNull();
+    expect(floorMatch).not.toBeNull();
+    expect(Number(floorMatch?.[1])).toBeGreaterThan(Number(windowMatch?.[1]));
+  });
+
+  it('the player character-select read stays on the default statement timeout', () => {
+    // db.ts listCharacters is the login-path character-select read: it deliberately
+    // stays on the 15s default so it fails fast during a database brownout rather than
+    // pinning a client for up to the heavy allowance. It must NEVER gain the wrapper.
+    expect(bodyOf(dbSrc, 'export async function listCharacters')).not.toContain(
+      'runWithStatementTimeout',
+    );
+  });
+
+  it('the character-select read joins the lifetime rollup so folds never shrink playtime', () => {
+    // The fold deletes old sessions after folding them into play_session_totals;
+    // without this join every player's character-select playtime and last-played
+    // would silently shrink after the first fold. Pin the exact rollup terms.
+    const body = bodyOf(dbSrc, 'export async function listCharacters');
+    expect(body).toContain('LEFT JOIN play_session_totals totals');
+    expect(body).toContain('ON totals.account_id = c.account_id AND totals.character_id = c.id');
+    expect(body).toContain('GREATEST(ps.last_played, totals.last_played)');
+    expect(body).toContain(
+      'COALESCE(ps.playtime_seconds, 0) + COALESCE(totals.playtime_seconds, 0)',
+    );
+  });
+
+  it('the account data export includes the retention rollups', () => {
+    // play_session_totals and account_ip_associations are stored personal data;
+    // a data export that omits them is unfaithful once raw sessions fold away.
+    const body = bodyOf(dbSrc, 'export async function exportAccountData');
+    expect(body).toContain('FROM play_session_totals');
+    expect(body).toContain('FROM account_ip_associations');
+  });
+
+  it('topLifetimeXp predicates and orders on the bare indexed lifetime-XP expression', () => {
+    // The two lifetime-XP expression indexes are built on the bare
+    // ((state->>'lifetimeXp')::bigint); a COALESCE-wrapped WHERE or an
+    // alias-based ORDER BY cannot match them, which silently reverts every 30s
+    // leaderboard cache refresh to a full characters scan plus sort. dbSrc is
+    // RAW source text, so the pins below match the unevaluated
+    // ${LIFETIME_XP_EXPR} token exactly as it sits inside the template literal.
+    expect(dbSrc).toContain(`const LIFETIME_XP_EXPR = "((state->>'lifetimeXp')::bigint)";`);
+    const body = bodyOf(dbSrc, 'export async function topLifetimeXp');
+    // One WHERE filter and one ORDER BY per arm (realm and global): two each,
+    // so a reversion of a single arm reddens this too.
+    expect(count(body, '${LIFETIME_XP_EXPR} >')).toBe(2);
+    expect(count(body, '${LIFETIME_XP_EXPR} DESC')).toBe(2);
+    // The old shapes must not return. COALESCE stays legal ONLY as the
+    // SELECT-list output value (followed by ' AS'), never as the filter.
+    expect(body).not.toContain(`COALESCE((state->>'lifetimeXp')::bigint, 0) >`);
+    expect(body).not.toContain('ORDER BY lifetime_xp DESC');
+    // NULLS LAST would re-break index usability (a DESC index defaults to
+    // NULLS FIRST). Scoped to this body: listCharacterNamesForSitemap keeps
+    // its own NULLS LAST deliberately.
+    expect(body).not.toContain('NULLS LAST');
+    // Tie the index DDL to the same constant so query and index cannot drift:
+    // the SCHEMA region spanning both CREATE INDEX statements carries the
+    // token once per index.
+    const idxStart = dbSrc.indexOf('CREATE INDEX IF NOT EXISTS characters_lifetime_xp');
+    expect(idxStart).toBeGreaterThan(-1);
+    const globalStart = dbSrc.indexOf('CREATE INDEX IF NOT EXISTS characters_lifetime_xp_global');
+    expect(globalStart).toBeGreaterThan(idxStart);
+    const idxRegion = dbSrc.slice(idxStart, dbSrc.indexOf(';', globalStart) + 1);
+    expect(count(idxRegion, '${LIFETIME_XP_EXPR} DESC')).toBe(2);
+  });
+
+  it('the heavy-statement exemption interpolates the named constant and validates the integer', () => {
+    // runWithStatementTimeout is the single SET LOCAL site; it interpolates the raw
+    // integer (SET LOCAL cannot bind a parameter) after a safe-integer guard, which
+    // is the injection guard. The named heavy constant is what the exempt call sites
+    // pass, never a re-inlined 60000.
+    expect(dbSrc).toMatch(/SET LOCAL statement_timeout = \$\{timeoutMs\}/);
+    expect(dbSrc).toContain('Number.isSafeInteger(timeoutMs)');
+    expect(dbSrc).toMatch(/SET LOCAL statement_timeout = \$\{DB_HEAVY_STATEMENT_TIMEOUT_MS\}/);
+    // Boot DDL disables the timeout entirely for its advisory-lock-serialized wait.
+    expect(dbSrc).toContain('SET LOCAL statement_timeout = 0');
+    expect(dbSrc).not.toContain('SET LOCAL statement_timeout = 60000');
   });
 
   it('the rateLimited default budget binds AUTH_MAX_PER_MINUTE, not a re-inlined 20', () => {

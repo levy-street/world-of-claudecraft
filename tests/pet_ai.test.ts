@@ -1,18 +1,41 @@
 import { describe, expect, it } from 'vitest';
-import { petFollow, petPickTarget, petRangedAttack, updatePet } from '../src/sim/pet/pet_ai';
+import { BUILTIN_WORLD } from '../src/sim/data';
+import {
+  petFollow,
+  petPickTarget,
+  petRangedAttack,
+  startWaterJet,
+  updatePet,
+} from '../src/sim/pet/pet_ai';
 import { Sim } from '../src/sim/sim';
-import { dist2d, type Entity } from '../src/sim/types';
+import { dist2d, type Entity, type WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 // Direct unit tests for the extracted pet-AI module (P1a). They drive the moved
 // functions through the real Sim.ctx seam (so the still-on-Sim helpers they reach
 // back for resolve), pinning the slice's behavior independent of the parity golden.
 
+// The pets and hostiles under test are adopted/flagged wild mobs (any mob will
+// do; the tests place and level them explicitly), so keep the real forest_wolf
+// camps as that mob supply and strip the rest of the ambient world
+// (subsystem-world pattern, see tests/dot_final_tick.test.ts).
+const PET_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((c) => c.mobId === 'forest_wolf'),
+  npcs: {},
+  groundObjects: [],
+};
+
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 
 function world(): { sim: AnySim; pid: number; owner: AnyEntity } {
-  const sim = new Sim({ seed: 7, playerClass: 'hunter', noPlayer: true }) as AnySim;
+  const sim = new Sim({
+    seed: 7,
+    playerClass: 'hunter',
+    noPlayer: true,
+    world: PET_TEST_WORLD,
+  }) as AnySim;
   const pid = sim.addPlayer('hunter', 'Owner');
   const owner = sim.entities.get(pid) as AnyEntity;
   return { sim, pid, owner };
@@ -75,7 +98,12 @@ function wildHostile2(sim: AnySim, exclude: number[]): [AnyEntity, AnyEntity] {
 // PLAYER is a valid petPickTarget candidate (the grid holds every kind, and the admit
 // predicates carry no kind === 'mob' restriction on ownerOffense).
 function startedDuelHunter(): { sim: AnySim; a: number; b: number } {
-  const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true }) as AnySim;
+  const sim = new Sim({
+    seed: 7,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: PET_TEST_WORLD,
+  }) as AnySim;
   const a = sim.addPlayer('hunter', 'Aleph', { autoEquip: true });
   const b = sim.addPlayer('mage', 'Bet', { autoEquip: true });
   const move = (pid: number, x: number, z: number): void => {
@@ -111,7 +139,10 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
     pet.petMode = 'passive'; // petPickTarget returns null -> the heel arm runs
     pet.aggroTargetId = null;
     isolate(sim, [pid, pet.id]);
-    place(owner, 0, 0);
+    // Keep this direct heel assertion on an obstacle-free lane. The Eastbrook
+    // landmark lot covers the old (20, 0) fixture, where correct A* routing can
+    // initially step away from the owner while going around the building.
+    place(owner, 0, 30);
     place(pet, owner.pos.x + 20, owner.pos.z);
     sim.rebucket(pet);
     const d0 = dist2d(pet.pos, owner.pos);
@@ -168,6 +199,88 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
     }
     expect(landed).toBe(true);
     expect(target.hp).toBeLessThan(target.maxHp); // the bolt never misses (crit-only roll)
+  });
+
+  it('Water Jet is a real channel that slows, blocks bolts, and breaks out of range', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    const target = wildHostile(sim, [pet.id]);
+    pet.templateId = 'water_elemental';
+    pet.petMode = 'defensive';
+    pet.aggroTargetId = target.id;
+    isolate(sim, [pid, pet.id, target.id]);
+    place(owner, 0, 0);
+    place(pet, 1, 0);
+    place(target, 10, 0);
+    const ranged = {
+      range: 25,
+      school: 'frost' as const,
+      jet: { total: 30, duration: 4, interval: 1, slow: 0.6, cooldown: 8 },
+    };
+    startWaterJet(sim.ctx, pet, target, ranged.jet);
+    const start = sim.drainEvents();
+    expect(start.some((e) => e.type === 'spellfx' && e.fx === 'bubbleBeam')).toBe(true);
+    expect(pet.castingAbility).toBe('water_jet');
+    expect(pet.channeling).toBe(true);
+    expect(
+      target.auras.some(
+        (a) => a.id === 'water_jet_slow' && a.sourceId === pet.id && a.value === 0.6,
+      ),
+    ).toBe(true);
+
+    const remaining = pet.castRemaining;
+    updatePet(sim.ctx, pet);
+    expect(pet.castRemaining).toBeLessThan(remaining);
+    expect(sim.drainEvents().some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(
+      false,
+    );
+
+    place(target, 40, 0);
+    updatePet(sim.ctx, pet);
+    expect(pet.castingAbility).toBeNull();
+    expect(pet.channeling).toBe(false);
+    expect(target.auras.some((a) => a.id === 'water_jet' || a.id === 'water_jet_slow')).toBe(false);
+    expect(
+      sim
+        .drainEvents()
+        .some((e) => e.type === 'spellfx' && e.fx === 'bubbleBeam' && e.duration === 0),
+    ).toBe(true);
+  });
+
+  it('auto-casts Water Jet on cooldown only while its autocast is armed', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    const target = wildHostile(sim, [pet.id]);
+    pet.templateId = 'water_elemental';
+    pet.petMode = 'defensive';
+    pet.aggroTargetId = target.id;
+    isolate(sim, [pid, pet.id, target.id]);
+    place(owner, 0, 0);
+    place(pet, 1, 0);
+    place(target, 8, 0); // inside the 25yd jet range
+    pet.petTauntTimer = 0; // the jet reuses petTauntTimer as its cooldown: available
+
+    // Autocast OFF: the AI does its ranged attacks but never starts the jet itself.
+    pet.petAutoWaterJet = false;
+    updatePet(sim.ctx, pet);
+    expect(pet.castingAbility).not.toBe('water_jet');
+
+    // Arm autocast: the next AI tick with the jet off cooldown starts the channel.
+    pet.petAutoWaterJet = true;
+    pet.petTauntTimer = 0;
+    updatePet(sim.ctx, pet);
+    expect(pet.castingAbility).toBe('water_jet');
+    expect(pet.channeling).toBe(true);
+  });
+
+  it('setPetAutoWaterJet toggles the flag on a jet-bearing pet', () => {
+    const { sim, pid } = world();
+    const pet = adopt(sim, pid);
+    pet.templateId = 'water_elemental';
+    sim.setPetAutoWaterJet(true, pid);
+    expect(pet.petAutoWaterJet).toBe(true);
+    sim.setPetAutoWaterJet(false, pid);
+    expect(pet.petAutoWaterJet).toBe(false);
   });
 
   it('petFollow clears the cached path once the pet is at heel distance', () => {

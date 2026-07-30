@@ -10,15 +10,22 @@
 // lives in unit_portrait.ts (and is unit-tested there).
 // ---------------------------------------------------------------------------
 
-import { iconCanvas } from './icons';
 import { playerPortraitDataUrl } from '../render/characters/portrait';
-import { PlayerClass } from '../sim/types';
-import { PORTRAIT_CSS_SIZE, CREST_OVERSCAN, portraitBackingPx, overscanRect } from './unit_portrait';
+import type { PlayerClass } from '../sim/types';
+import { iconCanvas } from './icons';
+import {
+  CREST_OVERSCAN,
+  overscanRect,
+  PORTRAIT_CSS_SIZE,
+  portraitBackingPx,
+} from './unit_portrait';
 
 /** Default device-pixel-ratio probe (1 outside the browser, e.g. under vitest). */
 function defaultDpr(): number {
   return typeof devicePixelRatio !== 'undefined' ? devicePixelRatio : 1;
 }
+
+const HEADSHOT_CACHE_MAX = 32;
 
 /**
  * Owns painting for the unit-frame portrait canvases. One instance is shared by
@@ -28,6 +35,21 @@ export class UnitPortraitPainter {
   private readonly imgCache = new Map<string, HTMLImageElement>();
 
   constructor(private readonly dpr: () => number = defaultDpr) {}
+
+  private cachedImage(url: string): HTMLImageElement | undefined {
+    const img = this.imgCache.get(url);
+    if (!img) return undefined;
+    this.imgCache.delete(url);
+    this.imgCache.set(url, img);
+    return img;
+  }
+
+  private rememberImage(url: string, img: HTMLImageElement): void {
+    this.imgCache.set(url, img);
+    if (this.imgCache.size <= HEADSHOT_CACHE_MAX) return;
+    const oldest = this.imgCache.keys().next().value;
+    if (oldest !== undefined) this.imgCache.delete(oldest);
+  }
 
   /** Size the canvas backing store for the current DPR (clearing it) and return
    *  a ready 2D context plus the backing px to draw at. */
@@ -59,19 +81,29 @@ export class UnitPortraitPainter {
   /** Paint a 3D-headshot data URL. The decode is async even for a data URL, so
    *  tag the canvas with the desired URL and only draw if it still matches on
    *  load (the framed unit may have changed mid-decode). */
-  drawHeadshot(canvas: HTMLCanvasElement, url: string): void {
+  drawHeadshot(canvas: HTMLCanvasElement, url: string, onError?: () => void): void {
     canvas.dataset.portrait = url;
     const draw = (img: HTMLImageElement) => {
       if (canvas.dataset.portrait !== url) return; // unit changed mid-decode
       const { ctx, size } = this.begin(canvas);
       ctx.drawImage(img, 0, 0, size, size);
     };
-    const cached = this.imgCache.get(url);
-    if (cached?.complete && cached.naturalWidth) { draw(cached); return; }
+    const fail = () => {
+      if (canvas.dataset.portrait !== url) return; // unit changed mid-decode
+      this.imgCache.delete(url);
+      onError?.();
+    };
+    const cached = this.cachedImage(url);
+    if (cached?.complete) {
+      if (cached.naturalWidth) draw(cached);
+      else fail();
+      return;
+    }
     const img = cached ?? new Image();
     img.addEventListener('load', () => draw(img), { once: true });
+    img.addEventListener('error', fail, { once: true });
     if (!cached) {
-      this.imgCache.set(url, img);
+      this.rememberImage(url, img);
       img.src = url;
     }
   }

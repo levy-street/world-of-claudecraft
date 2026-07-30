@@ -13,16 +13,16 @@ The wallet-linking client uses Reown AppKit. The installed `@reown/*` packages
 listed below declare `SEE LICENSE IN LICENSE.md`; their packaged license file is
 the Reown Community License Agreement, release date 25 August 2025:
 
-- `@reown/appkit` 1.8.21
-- `@reown/appkit-adapter-solana` 1.8.21
-- `@reown/appkit-common` 1.8.21
-- `@reown/appkit-controllers` 1.8.21
-- `@reown/appkit-pay` 1.8.21
-- `@reown/appkit-polyfills` 1.8.21
-- `@reown/appkit-scaffold-ui` 1.8.21
-- `@reown/appkit-ui` 1.8.21
-- `@reown/appkit-utils` 1.8.21
-- `@reown/appkit-wallet` 1.8.21
+- `@reown/appkit` 1.8.22
+- `@reown/appkit-adapter-solana` 1.8.22
+- `@reown/appkit-common` 1.8.22
+- `@reown/appkit-controllers` 1.8.22
+- `@reown/appkit-pay` 1.8.22
+- `@reown/appkit-polyfills` 1.8.22
+- `@reown/appkit-scaffold-ui` 1.8.22
+- `@reown/appkit-ui` 1.8.22
+- `@reown/appkit-utils` 1.8.22
+- `@reown/appkit-wallet` 1.8.22
 
 Required notice:
 
@@ -204,6 +204,25 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## TweetNaCl.js
+
+Package: `tweetnacl` 1.0.3.
+
+License: Unlicense / public domain dedication
+
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or distribute this
+software, either in source code form or as a compiled binary, for any purpose,
+commercial or non-commercial, and by any means.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ## buffer
 

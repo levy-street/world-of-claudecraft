@@ -12,6 +12,8 @@ import {
   type SocialTransport,
   validateGuildName,
 } from '../server/social';
+import type { ChatSenderFlair } from '../src/sim/account_flair';
+import type { SimEvent } from '../src/sim/types';
 
 // ---------------------------------------------------------------------------
 // In-memory fakes — let us exercise the full SocialService logic (friends,
@@ -19,15 +21,22 @@ import {
 // ---------------------------------------------------------------------------
 
 class FakeDb implements SocialDb {
-  private chars = new Map<number, CharInfo>();
+  private chars = new Map<number, CharInfo & { activeTitle: string | null }>();
   private friends = new Map<number, Set<number>>();
   blocks = new Map<number, Set<number>>();
+  ignores = new Map<number, Set<number>>();
   private guilds = new Map<number, string>();
   private members = new Map<number, { guildId: number; rank: GuildRank }>();
   private nextGuildId = 1;
 
   addChar(id: number, name: string, cls = 'warrior', level = 10, realm = 'Claudemoon'): void {
-    this.chars.set(id, { id, name, cls, level, realm });
+    this.chars.set(id, { id, name, cls, level, realm, activeTitle: null });
+  }
+
+  // Test helper mirroring the state->>'activeTitle' column read (a deed id or null).
+  setActiveTitle(id: number, deedId: string | null): void {
+    const c = this.chars.get(id);
+    if (c) c.activeTitle = deedId;
   }
 
   async findCharacterByName(name: string): Promise<CharInfo | null> {
@@ -49,7 +58,7 @@ class FakeDb implements SocialDb {
   async removeFriend(c: number, f: number): Promise<void> {
     this.friends.get(c)?.delete(f);
   }
-  async listFriends(c: number): Promise<CharInfo[]> {
+  async listFriends(c: number): Promise<(CharInfo & { activeTitle: string | null })[]> {
     return [...(this.friends.get(c) ?? [])].map((id) => this.chars.get(id)!).filter(Boolean);
   }
   async whoFriended(c: number): Promise<number[]> {
@@ -70,6 +79,22 @@ class FakeDb implements SocialDb {
   }
   async blockedIds(c: number): Promise<number[]> {
     return [...(this.blocks.get(c) ?? [])];
+  }
+
+  async addIgnore(c: number, m: number): Promise<void> {
+    (this.ignores.get(c) ?? this.ignores.set(c, new Set()).get(c)!).add(m);
+  }
+  async removeIgnore(c: number, m: number): Promise<void> {
+    this.ignores.get(c)?.delete(m);
+  }
+  async listIgnores(c: number): Promise<CharRef[]> {
+    return [...(this.ignores.get(c) ?? [])].map((id) => {
+      const ch = this.chars.get(id)!;
+      return { id: ch.id, name: ch.name };
+    });
+  }
+  async ignoredIds(c: number): Promise<number[]> {
+    return [...(this.ignores.get(c) ?? [])];
   }
 
   async createGuildWithLeader(
@@ -120,7 +145,9 @@ class FakeDb implements SocialDb {
   }
   async guildMembers(
     guildId: number,
-  ): Promise<(CharInfo & { rank: GuildRank; lastLogin: string | null })[]> {
+  ): Promise<
+    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  > {
     return [...this.members.entries()]
       .filter(([, m]) => m.guildId === guildId)
       .map(([cid, m]) => ({
@@ -132,6 +159,15 @@ class FakeDb implements SocialDb {
   guildCount(): number {
     return this.guilds.size;
   } // test helper: detect orphaned guilds
+
+  // guild billboard (motd)
+  private motds = new Map<number, { motd: string; motdSetBy: string }>();
+  async setGuildMotd(guildId: number, motd: string, setBy: string): Promise<void> {
+    this.motds.set(guildId, { motd, motdSetBy: setBy });
+  }
+  async guildMotd(guildId: number): Promise<{ motd: string; motdSetBy: string }> {
+    return this.motds.get(guildId) ?? { motd: '', motdSetBy: '' };
+  }
 
   // guild calendar events
   private events = new Map<number, GuildEventRow & { guildId: number }>();
@@ -177,6 +213,7 @@ class FakeTransport implements SocialTransport {
   delivered = new Map<number, SocialEvent[]>();
   snapshotCount = new Map<number, number>();
   blockSets = new Map<number, number[]>();
+  ignoreSets = new Map<number, number[]>();
 
   constructor(private db: FakeDb) {}
 
@@ -214,8 +251,29 @@ class FakeTransport implements SocialTransport {
   onBlocksChanged(id: number, ids: number[]): void {
     this.blockSets.set(id, ids);
   }
-  isIgnoring(recipientId: number, senderCharacterId: number): boolean {
+  founded: number[] = [];
+  onGuildFounded(id: number): void {
+    this.founded.push(id);
+  }
+  isBlocking(recipientId: number, senderCharacterId: number): boolean {
     return !!this.db.blocks.get(recipientId)?.has(senderCharacterId);
+  }
+  notLoaded = new Set<number>();
+  blockListLoaded(characterId: number): boolean {
+    return !this.notLoaded.has(characterId);
+  }
+  onIgnoresChanged(id: number, ids: number[]): void {
+    this.ignoreSets.set(id, ids);
+  }
+  isIgnoringChat(recipientId: number, senderCharacterId: number): boolean {
+    return !!this.db.ignores.get(recipientId)?.has(senderCharacterId);
+  }
+  // Operator-set account flair of the sender, attached to guild/officer chat at
+  // fan-out. Per-character, so a test can give one speaker flair and assert it
+  // rides their guild line; an unset character has none, like an ordinary player.
+  flair = new Map<number, ChatSenderFlair>();
+  chatFlairFor(senderCharacterId: number): ChatSenderFlair | undefined {
+    return this.flair.get(senderCharacterId);
   }
 
   eventsFor(id: number): SocialEvent[] {
@@ -368,6 +426,61 @@ describe('friends', () => {
     expect(h.tx.textFor(1).join()).toMatch(/Bet has come online/);
     expect(h.tx.snapshotCount.get(1)).toBe(1);
   });
+
+  it('does not notify a watcher the actor has blocked (stale friend-of-me edge)', async () => {
+    // 1 has 2 on their friends list (a "watches 2" edge); 2 then blocks 1, which
+    // only cleans 2's OWN friend edge, never 1's, so 1 keeps watching 2 unless
+    // announcePresence itself checks the block.
+    await h.svc.friendAdd(h.actor(1), 'Bet');
+    h.tx.setOnline(1);
+    await h.db.addBlock(2, 1); // Bet blocks Aleph directly (bypassing blockAdd's own-edge cleanup)
+    h.tx.clear();
+    await h.svc.announcePresence(h.actor(2), true);
+    expect(h.tx.textFor(1)).toHaveLength(0);
+    expect(h.tx.snapshotCount.get(1) ?? 0).toBe(0);
+  });
+
+  it('does not notify a watcher who has blocked the actor', async () => {
+    await h.svc.friendAdd(h.actor(1), 'Bet');
+    h.tx.setOnline(1);
+    await h.db.addBlock(1, 2); // Aleph (the watcher) blocks Bet (the actor)
+    h.tx.clear();
+    await h.svc.announcePresence(h.actor(2), true);
+    expect(h.tx.textFor(1)).toHaveLength(0);
+    expect(h.tx.snapshotCount.get(1) ?? 0).toBe(0);
+  });
+
+  it('hides live presence for a friend who has blocked the viewer (stale one-directional edge)', async () => {
+    await h.svc.friendAdd(h.actor(1), 'Bet'); // Aleph friends Bet
+    h.tx.setOnline(2, { zone: 'Mirewood', status: 'online', x: 5, z: 9 });
+    await h.svc.blockAdd(h.actor(2), 'Aleph'); // Bet blocks Aleph; Aleph's own edge to Bet survives
+    const snap = await h.svc.snapshot(1);
+    expect(snap.friends.map((f) => f.name)).toEqual(['Bet']);
+    expect(snap.friends[0].online).toBe(false);
+    expect(snap.friends[0].x).toBeUndefined();
+    expect(snap.friends[0].zone).toBeUndefined();
+  });
+
+  it('fails closed on a snapshot when the friend has a persisted block but their live block list has not loaded yet (#2437)', async () => {
+    await h.svc.friendAdd(h.actor(1), 'Bet'); // Aleph friends Bet
+    await h.db.addBlock(2, 1); // Bet has persisted a block on Aleph
+    h.tx.setOnline(2, { zone: 'Mirewood', status: 'online', x: 5, z: 9 });
+    h.tx.notLoaded.add(2); // but Bet's session block list has not loaded yet
+    const snap = await h.svc.snapshot(1);
+    expect(snap.friends[0].online).toBe(false);
+    expect(snap.friends[0].x).toBeUndefined();
+    expect(snap.friends[0].zone).toBeUndefined();
+  });
+
+  it('does not notify or refresh a watcher whose own block list has not loaded yet (#2437)', async () => {
+    await h.svc.friendAdd(h.actor(1), 'Bet'); // Aleph watches Bet
+    h.tx.setOnline(1);
+    h.tx.notLoaded.add(1); // Aleph's session block list has not loaded yet
+    h.tx.clear();
+    await h.svc.announcePresence(h.actor(2), true);
+    expect(h.tx.textFor(1)).toHaveLength(0);
+    expect(h.tx.snapshotCount.get(1) ?? 0).toBe(0);
+  });
 });
 
 describe('ignore / block', () => {
@@ -376,6 +489,8 @@ describe('ignore / block', () => {
     h = setup();
     h.add(1, 'Aleph');
     h.add(2, 'Bet');
+    // a third party, so the mute tests can assert the two tiers stay independent
+    h.add(3, 'Gimel');
   });
 
   it('blocks a player and surfaces the updated block set to the transport', async () => {
@@ -399,10 +514,20 @@ describe('ignore / block', () => {
     expect(h.tx.blockSets.get(1)).toEqual([]);
   });
 
+  it('pushes a snapshot refresh to the blocked target too, not just the actor (#2437)', async () => {
+    h.tx.setOnline(2);
+    h.tx.clear();
+    await h.svc.blockAdd(h.actor(1), 'Bet');
+    expect(h.tx.snapshotCount.get(2)).toBe(1);
+    h.tx.clear();
+    await h.svc.blockRemove(h.actor(1), 'Bet');
+    expect(h.tx.snapshotCount.get(2)).toBe(1);
+  });
+
   it('does not claim success when unignoring someone who is not ignored', async () => {
     await h.svc.blockRemove(h.actor(1), 'Bet');
-    expect(h.tx.errorsFor(1).join()).toMatch(/not on your ignore list/i);
-    expect(h.tx.textFor(1).join()).not.toMatch(/no longer ignored/i);
+    expect(h.tx.errorsFor(1).join()).toMatch(/not on your block list/i);
+    expect(h.tx.textFor(1).join()).not.toMatch(/no longer blocked/i);
   });
 
   it('refuses to block yourself', async () => {
@@ -410,14 +535,111 @@ describe('ignore / block', () => {
     expect(h.tx.errorsFor(1).join()).toMatch(/yourself/i);
   });
 
-  it('refuses to friend a player you are ignoring', async () => {
+  // --- ignores: the chat-only tier ------------------------------------------
+  // An ignore must behave like a block in the plumbing (persisted, surfaced to the
+  // transport so routeEvents can enforce it) and UNLIKE a block everywhere the
+  // two tiers are supposed to differ.
+
+  it('ignores a player and surfaces the updated mute set to the transport', async () => {
+    await h.svc.ignoreAdd(h.actor(1), 'Bet');
+    expect((await h.svc.snapshot(1)).ignores.map((m) => m.name)).toEqual(['Bet']);
+    // this is the set GameServer copies into session.ignoredIds; without it the
+    // chat filter has nothing to enforce
+    expect(h.tx.ignoreSets.get(1)).toEqual([2]);
+  });
+
+  it('ignoring someone does NOT remove them from friends (a block does)', async () => {
+    // The load-bearing difference between the two tiers: ignoring a chatty friend
+    // is a normal thing to want, so it must not quietly unfriend them.
+    await h.svc.friendAdd(h.actor(1), 'Bet');
+    await h.svc.ignoreAdd(h.actor(1), 'Bet');
+    const snap = await h.svc.snapshot(1);
+    expect(snap.friends.map((f) => f.name)).toEqual(['Bet']);
+    expect(snap.ignores.map((m) => m.name)).toEqual(['Bet']);
+    // and the contrast: blocking DOES evict them
+    await h.svc.blockAdd(h.actor(1), 'Bet');
+    expect((await h.svc.snapshot(1)).friends).toHaveLength(0);
+  });
+
+  it('ignoring someone leaves the block list alone, and vice versa', async () => {
+    await h.svc.ignoreAdd(h.actor(1), 'Bet');
+    expect((await h.svc.snapshot(1)).blocks).toHaveLength(0);
+    await h.svc.blockAdd(h.actor(1), 'Gimel');
+    const snap = await h.svc.snapshot(1);
+    expect(snap.ignores.map((m) => m.name)).toEqual(['Bet']);
+    expect(snap.blocks.map((b) => b.name)).toEqual(['Gimel']);
+  });
+
+  it('unignores and clears the transport ignore set', async () => {
+    await h.svc.ignoreAdd(h.actor(1), 'Bet');
+    await h.svc.ignoreRemove(h.actor(1), 'Bet');
+    expect((await h.svc.snapshot(1)).ignores).toHaveLength(0);
+    expect(h.tx.ignoreSets.get(1)).toEqual([]);
+  });
+
+  it('does not claim success when unignoring someone who is not ignored', async () => {
+    await h.svc.ignoreRemove(h.actor(1), 'Bet');
+    expect(h.tx.errorsFor(1).join()).toMatch(/not on your ignore list/i);
+    expect(h.tx.textFor(1).join()).not.toMatch(/no longer ignored/i);
+  });
+
+  it('refuses to ignore yourself', async () => {
+    await h.svc.ignoreAdd(h.actor(1), 'Aleph');
+    expect(h.tx.errorsFor(1).join()).toMatch(/yourself/i);
+    expect((await h.svc.snapshot(1)).ignores).toHaveLength(0);
+  });
+
+  it('refuses to ignore the same player twice', async () => {
+    await h.svc.ignoreAdd(h.actor(1), 'Bet');
+    h.tx.clear();
+    await h.svc.ignoreAdd(h.actor(1), 'Bet');
+    expect(h.tx.errorsFor(1).join()).toMatch(/already ignored/i);
+    expect((await h.svc.snapshot(1)).ignores).toHaveLength(1);
+  });
+
+  // These two readouts are the exact strings src/ui/server_i18n.ts matches with
+  // /^Your mute list is empty\.$/ and /^Muted \((\d+)\): (.+)$/, so pin them.
+  it('/ignorelist reads out the empty list', async () => {
+    await h.svc.ignoreList(h.actor(1));
+    expect(h.tx.textFor(1).join()).toBe('Your ignore list is empty.');
+  });
+
+  it('/ignorelist reads out the ignored names in the localizable format', async () => {
+    await h.svc.ignoreAdd(h.actor(1), 'Bet');
+    await h.svc.ignoreAdd(h.actor(1), 'Gimel');
+    h.tx.clear();
+    await h.svc.ignoreList(h.actor(1));
+    expect(h.tx.textFor(1).join()).toBe('Ignored (2): Bet, Gimel');
+  });
+
+  it('/blocklist reads out the blocked names in the localizable format', async () => {
+    await h.svc.blockList(h.actor(1));
+    expect(h.tx.textFor(1).join()).toBe('Your block list is empty.');
+    await h.svc.blockAdd(h.actor(1), 'Bet');
+    h.tx.clear();
+    await h.svc.blockList(h.actor(1));
+    expect(h.tx.textFor(1).join()).toBe('Blocked (1): Bet');
+  });
+
+  it('refuses to friend a player you are BLOCKING (an ignore is fine)', async () => {
     await h.svc.blockAdd(h.actor(1), 'Bet');
     h.tx.clear();
     await h.svc.friendAdd(h.actor(1), 'Bet');
-    expect(h.tx.errorsFor(1).join()).toMatch(/ignoring/i);
+    expect(h.tx.errorsFor(1).join()).toMatch(/blocking/i);
     const snap = await h.svc.snapshot(1);
     expect(snap.friends).toHaveLength(0);
     expect(snap.blocks.map((b) => b.name)).toEqual(['Bet']);
+  });
+
+  it('refuses a friend add when the TARGET has blocked the actor, even while offline', async () => {
+    // Bet blocked Aleph; Aleph never sees Bet's own block list, so this must be
+    // checked server-side regardless of who is currently online. A blocked
+    // stalker must not be able to re-add the blocker and keep tracking them.
+    await h.db.addBlock(2, 1); // Bet (target) has blocked Aleph (actor)
+    await h.svc.friendAdd(h.actor(1), 'Bet');
+    expect(h.tx.errorsFor(1)).toHaveLength(1);
+    const snap = await h.svc.snapshot(1);
+    expect(snap.friends).toHaveLength(0);
   });
 });
 
@@ -476,6 +698,37 @@ describe('guilds', () => {
     expect(h.tx.snapshotCount.get(1) ?? 0).toBe(1); // exactly one refresh, not two
   });
 
+  it('does not refresh a guildmate the actor has blocked (guild membership survives a block)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.blockAdd(h.actor(2), 'Aleph'); // Bet blocks the actor; guild membership is untouched
+    h.tx.clear();
+    await h.svc.announcePresence(h.actor(1), true);
+    expect(h.tx.snapshotCount.get(2) ?? 0).toBe(0);
+  });
+
+  it("hides a blocked guildmate's live presence in the guild roster, in either block direction", async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    h.tx.setOnline(2, { zone: 'Mirewood', status: 'online', x: 1, z: 2 });
+    // Aleph (the viewer) blocks guildmate Bet; guild membership is untouched.
+    await h.svc.blockAdd(h.actor(1), 'Bet');
+    let snap = await h.svc.snapshot(1);
+    let bet = snap.guild?.members.find((m) => m.name === 'Bet');
+    expect(bet).toBeDefined();
+    expect(bet?.online).toBe(false);
+
+    await h.svc.blockRemove(h.actor(1), 'Bet');
+    // Now the reverse: Bet blocks Aleph (the viewer) instead.
+    await h.svc.blockAdd(h.actor(2), 'Aleph');
+    snap = await h.svc.snapshot(1);
+    bet = snap.guild?.members.find((m) => m.name === 'Bet');
+    expect(bet).toBeDefined();
+    expect(bet?.online).toBe(false);
+  });
+
   it('rejects an invalid or duplicate guild name', async () => {
     await h.svc.guildCreate(h.actor(1), 'no');
     expect(h.tx.errorsFor(1).join()).toMatch(/3-24 letters/);
@@ -483,6 +736,22 @@ describe('guilds', () => {
     h.tx.clear();
     await h.svc.guildCreate(h.actor(2), 'iron vanguard');
     expect(h.tx.errorsFor(2).join()).toMatch(/already exists/i);
+  });
+
+  it('fires onGuildFounded exactly once, on the committed create only (the soc_guild_founded feed)', async () => {
+    // Every refusal arm must stay silent: an invalid name, then a real
+    // founding, then a duplicate name, then a create while already guilded.
+    await h.svc.guildCreate(h.actor(1), 'no');
+    expect(h.tx.founded).toEqual([]);
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    expect(h.tx.founded).toEqual([1]);
+    await h.svc.guildCreate(h.actor(2), 'iron vanguard');
+    await h.svc.guildCreate(h.actor(1), 'Second Banner');
+    expect(h.tx.founded).toEqual([1]);
+    // A JOIN never counts as founding.
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    expect(h.tx.founded).toEqual([1]);
   });
 
   it('invites, accepts, and broadcasts the join to all members', async () => {
@@ -618,6 +887,91 @@ describe('guilds', () => {
     expect(h.tx.eventsFor(3)).toHaveLength(0); // Gimel is not in the guild
   });
 
+  it('the snapshot carries each friend and roster member activeTitle (deed id or null)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.friendAdd(h.actor(1), 'Gimel');
+    h.db.setActiveTitle(2, 'prog_veteran');
+    h.db.setActiveTitle(3, null);
+    const snap = await h.svc.snapshot(1);
+    const bet = snap.guild?.members.find((m) => m.name === 'Bet');
+    const aleph = snap.guild?.members.find((m) => m.name === 'Aleph');
+    expect(bet?.activeTitle).toBe('prog_veteran');
+    expect(aleph?.activeTitle).toBeNull();
+    const gimel = snap.friends.find((f) => f.name === 'Gimel');
+    expect(gimel?.activeTitle).toBeNull();
+    h.db.setActiveTitle(3, 'hid_saul_footnote');
+    const snap2 = await h.svc.snapshot(1);
+    expect(snap2.friends.find((f) => f.name === 'Gimel')?.activeTitle).toBe('hid_saul_footnote');
+  });
+
+  it('stamps the sender title (a deed id) on guild and officer chat, omitted when untitled', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    h.tx.clear();
+    // titled sender: the deed ID rides fromTitle on every delivered copy
+    const titled = { ...h.actor(1), activeTitle: 'prog_veteran' };
+    expect(await h.svc.guildChat(titled, 'hail')).toBe(true);
+    for (const id of [1, 2]) {
+      const line = h.tx.eventsFor(id).find((e) => e.type === 'chat')!;
+      expect(line.type === 'chat' && line.fromTitle).toBe('prog_veteran');
+    }
+    // untitled sender (null and absent alike): the key is omitted entirely
+    h.tx.clear();
+    expect(await h.svc.guildChat({ ...h.actor(1), activeTitle: null }, 'plain')).toBe(true);
+    const plain = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
+    expect('fromTitle' in plain).toBe(false);
+    // officer chat stamps the same way, and omits the key untitled
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    h.tx.clear();
+    expect(await h.svc.officerChat(titled, 'ranks')).toBe(true);
+    const officer = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
+    expect(officer.type === 'chat' && officer.fromTitle).toBe('prog_veteran');
+    h.tx.clear();
+    expect(await h.svc.officerChat({ ...h.actor(1), activeTitle: null }, 'bare')).toBe(true);
+    const bareOfficer = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
+    expect('fromTitle' in bareOfficer).toBe(false);
+  });
+
+  it('keeps the chat fromTitle field type identical across SocialEvent and SimEvent', () => {
+    // The guild/officer relay frame is its own union member (no fromPid), but
+    // the client casts it into the one SimEvent switch, so the title field
+    // must stay assignment-compatible in both directions.
+    type SocialTitle = Extract<SocialEvent, { type: 'chat' }>['fromTitle'];
+    type SimTitle = Extract<SimEvent, { type: 'chat' }>['fromTitle'];
+    const a: SocialTitle = 'prog_veteran' as SimTitle;
+    const b: SimTitle = 'prog_veteran' as SocialTitle;
+    expect(a).toBe(b);
+  });
+
+  it('stamps the sender class on guild and officer chat, omitted with no live meta', async () => {
+    // classId rides the guild/officer relay the same way fromTitle does (the
+    // same fix, for the same interest-scope reason): actorFor(session) reads
+    // it off the LIVE sim meta in game.ts, so a test actor built without a
+    // `cls` (no live meta) omits the key, and one built with it carries it.
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    h.tx.clear();
+    const withClass = { ...h.actor(1), cls: 'warrior' as const };
+    expect(await h.svc.guildChat(withClass, 'hail')).toBe(true);
+    for (const id of [1, 2]) {
+      const line = h.tx.eventsFor(id).find((e) => e.type === 'chat')!;
+      expect(line.type === 'chat' && line.classId).toBe('warrior');
+    }
+    h.tx.clear();
+    expect(await h.svc.guildChat(h.actor(1), 'no live meta')).toBe(true);
+    const noMeta = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
+    expect('classId' in noMeta).toBe(false);
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    h.tx.clear();
+    expect(await h.svc.officerChat(withClass, 'ranks')).toBe(true);
+    const officer = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
+    expect(officer.type === 'chat' && officer.classId).toBe('warrior');
+  });
+
   it('suppresses guild chat from a player the recipient ignores', async () => {
     await h.svc.guildCreate(h.actor(1), 'Knights');
     await h.svc.guildInvite(h.actor(1), 'Bet');
@@ -647,6 +1001,119 @@ describe('guilds', () => {
     expect(await h.svc.officerChat(h.actor(1), 'officers only')).toBe(true);
     expect(h.tx.eventsFor(1).some((e) => e.type === 'chat' && e.channel === 'officer')).toBe(true);
     expect(h.tx.eventsFor(2)).toHaveLength(0);
+  });
+
+  // Guild and officer chat fan out through tx.deliver and NEVER pass the
+  // routeEvents chat filter, so they must consult the ignore list here. Without
+  // these two call sites, ignoring a guildmate does nothing in the one channel you
+  // actually read them in, and the routeEvents tests would still be green.
+  it('suppresses guild chat from a player the recipient has IGNORED', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.guildInvite(h.actor(1), 'Gimel');
+    await h.svc.guildAccept(h.actor(3));
+    // Bet ignores Aleph (an ignore, NOT a block: they are still guildmates and Bet
+    // has not ignored them)
+    await h.svc.ignoreAdd(h.actor(2), 'Aleph');
+    h.tx.clear();
+
+    expect(await h.svc.guildChat(h.actor(1), 'hello guild')).toBe(true);
+
+    // the speaker still sees their own line, and an uninvolved member hears it
+    expect(h.tx.eventsFor(1).some((e) => e.type === 'chat' && e.text === 'hello guild')).toBe(true);
+    expect(h.tx.eventsFor(3).some((e) => e.type === 'chat' && e.text === 'hello guild')).toBe(true);
+    // Bet, who ignored Aleph, receives nothing
+    expect(h.tx.eventsFor(2)).toHaveLength(0);
+  });
+
+  it('suppresses officer chat from an officer the recipient has IGNORED', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.ignoreAdd(h.actor(2), 'Aleph');
+    h.tx.clear();
+
+    expect(await h.svc.officerChat(h.actor(1), 'officers only')).toBe(true);
+
+    expect(h.tx.eventsFor(1).some((e) => e.type === 'chat' && e.channel === 'officer')).toBe(true);
+    expect(h.tx.eventsFor(2)).toHaveLength(0);
+  });
+
+  it('an unignored guildmate still hears guild chat (the negative)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    h.tx.clear();
+
+    expect(await h.svc.guildChat(h.actor(1), 'hello guild')).toBe(true);
+    expect(h.tx.eventsFor(2).some((e) => e.type === 'chat' && e.text === 'hello guild')).toBe(true);
+  });
+
+  // Guild and officer chat fan out through tx.deliver and NEVER pass through
+  // routeEvents, which is where every OTHER channel gets its sender flair attached.
+  // So these two call sites are the only thing that puts an [AI] tag or a streamer's
+  // links on a guild/officer line: drop them and a flagged account speaking in the
+  // one channel their guild actually reads arrives bare, with no entity record to
+  // fall back on if they are outside the recipient's interest scope.
+  const SPEAKER_FLAIR = {
+    ai: true,
+    links: { twitch: 'https://twitch.tv/someone' },
+  } as const;
+
+  it('attaches the SPEAKER flair to guild chat, for every recipient', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    // Aleph (character 1) is a flagged account; Bet is not.
+    h.tx.flair.set(1, { ...SPEAKER_FLAIR });
+    h.tx.clear();
+
+    expect(await h.svc.guildChat(h.actor(1), 'hello guild')).toBe(true);
+
+    const heard = h.tx.eventsFor(2).find((e) => e.type === 'chat');
+    expect(heard).toBeDefined();
+    expect(heard?.type === 'chat' && heard.flair).toEqual(SPEAKER_FLAIR);
+    // The speaker's own echo carries it too (the event is built once for the fan-out).
+    const echo = h.tx.eventsFor(1).find((e) => e.type === 'chat');
+    expect(echo?.type === 'chat' && echo.flair).toEqual(SPEAKER_FLAIR);
+  });
+
+  it('attaches the SPEAKER flair to officer chat', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    h.tx.flair.set(1, { ...SPEAKER_FLAIR });
+    h.tx.clear();
+
+    expect(await h.svc.officerChat(h.actor(1), 'officers only')).toBe(true);
+
+    const heard = h.tx.eventsFor(2).find((e) => e.type === 'chat');
+    expect(heard?.type === 'chat' && heard.channel).toBe('officer');
+    expect(heard?.type === 'chat' && heard.flair).toEqual(SPEAKER_FLAIR);
+  });
+
+  it('leaves an UNFLAGGED speaker guild/officer line bare (no flair key at all)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    // No h.tx.flair entry for Aleph: an ordinary player.
+    h.tx.clear();
+
+    expect(await h.svc.guildChat(h.actor(1), 'hello guild')).toBe(true);
+    expect(await h.svc.officerChat(h.actor(1), 'officers only')).toBe(true);
+
+    // undefined, NOT {}. The absence is what keeps an ordinary chat line
+    // byte-unchanged on the wire, and what the client reads as "no evidence"
+    // rather than "this sender has no flair".
+    for (const e of h.tx.eventsFor(2)) {
+      if (e.type !== 'chat') continue;
+      expect(e.flair, e.channel).toBeUndefined();
+    }
+    expect(h.tx.eventsFor(2).filter((e) => e.type === 'chat')).toHaveLength(2);
   });
 
   it('blocks guild chat from a non-member', async () => {
@@ -921,5 +1388,211 @@ describe('guild calendar events', () => {
     });
     expect(h.tx.snapshotCount.get(2) ?? 0).toBeGreaterThan(0);
     expect(h.tx.snapshotCount.get(3) ?? 0).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Guild billboard (motd): officer-gated set/clear, the server clamp, the
+// snapshot lane, and the structured motdResult outcomes the client localizes.
+// ---------------------------------------------------------------------------
+
+describe('guild billboard (motd)', () => {
+  // Leader (1) + officer (2) + member (3), officers/member online, motdResult
+  // lane cleared; the seatedGuild recipe from the calendar suite.
+  async function seatedGuild() {
+    const h = setup();
+    h.add(1, 'Lead');
+    h.add(2, 'Officer');
+    h.add(3, 'Member');
+    h.tx.setOnline(2);
+    h.tx.setOnline(3);
+    await h.svc.guildCreate(h.actor(1), 'Night Watch');
+    await h.svc.guildInvite(h.actor(1), 'Officer');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.guildInvite(h.actor(1), 'Member');
+    await h.svc.guildAccept(h.actor(3));
+    await h.svc.guildSetRank(h.actor(1), 'Officer', 'officer');
+    h.tx.clear();
+    return h;
+  }
+
+  function resultsFor(h: Awaited<ReturnType<typeof seatedGuild>>, id: number): string[] {
+    return h.tx
+      .eventsFor(id)
+      .filter((e) => e.type === 'motdResult')
+      .map((e: any) => e.code);
+  }
+
+  it('lets an officer set the billboard; the snapshot carries text + setter', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildSetMotd(h.actor(2), 'Raid night Friday. Discord: discord.gg/example');
+    expect(resultsFor(h, 2)).toEqual(['set']);
+    const snap = await h.svc.snapshot(3);
+    expect(snap.guild?.motd).toBe('Raid night Friday. Discord: discord.gg/example');
+    expect(snap.guild?.motdSetBy).toBe('Officer');
+  });
+
+  it('lets the leader set the billboard', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildSetMotd(h.actor(1), 'Welcome to Night Watch');
+    expect(resultsFor(h, 1)).toEqual(['set']);
+    const snap = await h.svc.snapshot(1);
+    expect(snap.guild?.motd).toBe('Welcome to Night Watch');
+    expect(snap.guild?.motdSetBy).toBe('Lead');
+  });
+
+  it('denies a plain member with notOfficer and writes nothing', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildSetMotd(h.actor(1), 'Original');
+    h.tx.clear();
+    await h.svc.guildSetMotd(h.actor(3), 'Member takeover');
+    expect(resultsFor(h, 3)).toEqual(['notOfficer']);
+    const snap = await h.svc.snapshot(3);
+    expect(snap.guild?.motd).toBe('Original');
+    expect(snap.guild?.motdSetBy).toBe('Lead');
+  });
+
+  it('denies a character with no guild with notInGuild', async () => {
+    const h = await seatedGuild();
+    h.add(9, 'Loner');
+    await h.svc.guildSetMotd(h.actor(9), 'Hello?');
+    expect(resultsFor(h, 9)).toEqual(['notInGuild']);
+  });
+
+  it('trims and clamps the text to 240 characters (241 in, 240 stored)', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildSetMotd(h.actor(2), `  ${'x'.repeat(241)}  `);
+    const snap = await h.svc.snapshot(2);
+    expect(snap.guild?.motd).toBe('x'.repeat(240));
+    expect(snap.guild?.motd).toHaveLength(240);
+  });
+
+  it('never stores a lone surrogate when the clamp lands inside an astral pair', async () => {
+    const h = await seatedGuild();
+    // 239 ascii chars + an astral codepoint (2 UTF-16 units): the 240 slice
+    // would cut the pair in half; the stored text drops the orphaned half.
+    await h.svc.guildSetMotd(h.actor(2), `${'x'.repeat(239)}\u{1F600}`);
+    const snap = await h.svc.snapshot(2);
+    expect(snap.guild?.motd).toBe('x'.repeat(239));
+    // and a well-formed message is untouched
+    expect([...(snap.guild?.motd ?? '')].every((c) => !/[\uD800-\uDFFF]/.test(c))).toBe(true);
+  });
+
+  it('an empty (or whitespace-only) message clears the billboard and its attribution', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildSetMotd(h.actor(2), 'Something');
+    await h.svc.guildSetMotd(h.actor(1), '   ');
+    expect(resultsFor(h, 1)).toEqual(['set']);
+    const snap = await h.svc.snapshot(2);
+    expect(snap.guild?.motd).toBe('');
+    expect(snap.guild?.motdSetBy).toBe('');
+  });
+
+  it('pushes a fresh snapshot to every ONLINE guild member, and not to outsiders', async () => {
+    const h = await seatedGuild();
+    h.add(9, 'Loner');
+    h.tx.setOnline(9);
+    await h.svc.guildSetMotd(h.actor(2), 'Meeting at dusk');
+    expect(h.tx.snapshotCount.get(2) ?? 0).toBeGreaterThan(0);
+    expect(h.tx.snapshotCount.get(3) ?? 0).toBeGreaterThan(0);
+    expect(h.tx.snapshotCount.get(9) ?? 0).toBe(0);
+  });
+
+  it('a fresh guild starts with an empty billboard', async () => {
+    const h = await seatedGuild();
+    const snap = await h.svc.snapshot(1);
+    expect(snap.guild?.motd).toBe('');
+    expect(snap.guild?.motdSetBy).toBe('');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Deed unlock broadcast: marquee unlocks fan out to online guildmates and to
+// the players who friended the earner. The caller (game.ts) owns the marquee
+// bar, the retro gate, and the opt-out; this layer owns audience resolution,
+// the ignore filter, and the id-based event shape.
+// ---------------------------------------------------------------------------
+
+describe('broadcastDeedUnlock', () => {
+  // Earner 1 leads a guild seating 2 and 3; 4 follows the earner from outside
+  // the guild; 5 is unrelated.
+  async function deedSetup() {
+    const h = setup();
+    h.add(1, 'Earner');
+    h.add(2, 'Guildie');
+    h.add(3, 'Officerin');
+    h.add(4, 'Follower');
+    h.add(5, 'Stranger');
+    for (const id of [1, 2, 3, 4, 5]) h.tx.setOnline(id);
+    const created = await h.db.createGuildWithLeader('Bookbinders', 1);
+    if ('error' in created) throw new Error('guild seed failed');
+    await h.db.addGuildMemberAtomic(created.guildId, 2, 'member', 50);
+    await h.db.addGuildMemberAtomic(created.guildId, 3, 'officer', 50);
+    await h.db.addFriend(4, 1); // 4 put the earner on THEIR list
+    return h;
+  }
+
+  it('delivers one id-based frame to online guildmates and followers, never the earner', async () => {
+    const h = await deedSetup();
+    await h.svc.broadcastDeedUnlock(h.actor(1), 'prog_veteran');
+    // The exact wire shape: ids and the earner's name only. Pinning the FULL
+    // object also proves no `text` field rides along (the server never sends
+    // English for this event; the client composes the visible line).
+    const expected = { type: 'deedBroadcast', characterName: 'Earner', deedId: 'prog_veteran' };
+    expect(h.tx.eventsFor(2)).toEqual([expected]);
+    expect(h.tx.eventsFor(3)).toEqual([expected]);
+    expect(h.tx.eventsFor(4)).toEqual([expected]);
+    expect(h.tx.eventsFor(1)).toEqual([]); // the earner's toast is client-side
+    expect(h.tx.eventsFor(5)).toEqual([]); // strangers never hear it
+  });
+
+  it('skips offline members and recipients who ignore the earner', async () => {
+    const h = await deedSetup();
+    h.tx.setOffline(2);
+    await h.db.addBlock(3, 1); // 3 ignores the earner
+    await h.svc.broadcastDeedUnlock(h.actor(1), 'cmb_thunzharr');
+    expect(h.tx.eventsFor(2)).toEqual([]);
+    expect(h.tx.eventsFor(3)).toEqual([]);
+    expect(h.tx.eventsFor(4)).toHaveLength(1);
+  });
+
+  it('skips a recipient the earner has ignored', async () => {
+    const h = await deedSetup();
+    await h.db.addBlock(1, 2); // the earner blocks guildmate 2
+    await h.db.addBlock(1, 4); // and follower 4 (blockAdd cannot unfriend THEIR edge)
+    await h.svc.broadcastDeedUnlock(h.actor(1), 'prog_veteran');
+    expect(h.tx.eventsFor(2)).toEqual([]);
+    expect(h.tx.eventsFor(4)).toEqual([]);
+    expect(h.tx.eventsFor(3)).toHaveLength(1); // unblocked guildmate still hears it
+  });
+
+  it('delivers exactly once to a follower who is also a guildmate', async () => {
+    const h = await deedSetup();
+    await h.db.addFriend(2, 1); // guildmate 2 also follows the earner
+    await h.svc.broadcastDeedUnlock(h.actor(1), 'prog_veteran');
+    expect(h.tx.eventsFor(2)).toHaveLength(1);
+  });
+
+  it('is a quiet no-op for a guildless earner nobody follows', async () => {
+    const h = setup();
+    h.add(9, 'Hermit');
+    h.tx.setOnline(9);
+    await h.svc.broadcastDeedUnlock(h.actor(9), 'prog_veteran');
+    expect(h.tx.delivered.size).toBe(0);
+  });
+
+  it('keeps the SocialEvent and SimEvent declarations structurally identical', () => {
+    // The event is declared in BOTH unions (SocialEvent for server delivery,
+    // SimEvent so the one client event switch stays well-typed) and the client
+    // casts one to the other on the events-frame passthrough. A field added or
+    // retyped on either side alone reds tsc here: the literal must satisfy the
+    // SocialEvent arm AND annotate as the SimEvent arm, and flow back.
+    const fromSocial: Extract<SimEvent, { type: 'deedBroadcast' }> = {
+      type: 'deedBroadcast',
+      characterName: 'Earner',
+      deedId: 'prog_veteran',
+    } satisfies Extract<SocialEvent, { type: 'deedBroadcast' }>;
+    const fromSim: Extract<SocialEvent, { type: 'deedBroadcast' }> = fromSocial;
+    expect(fromSim).toEqual(fromSocial);
   });
 });

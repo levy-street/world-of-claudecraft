@@ -109,14 +109,17 @@ class WoWClassicEnv(gym.Env):
             self._episode_seed = seed
         else:
             self._episode_seed = int(self.np_random.integers(0, 2**31 - 1))
-        res = self._request(
-            {
-                "cmd": "reset",
-                "seed": self._episode_seed,
-                "player_class": self.player_class,
-                "config": self._config,
-            }
-        )
+        request: dict[str, Any] = {
+            "cmd": "reset",
+            "seed": self._episode_seed,
+            "player_class": self.player_class,
+            "config": self._config,
+        }
+        if options and "player_level" in options:
+            request["player_level"] = options["player_level"]
+        if options and "talents" in options:
+            request["talents"] = options["talents"]
+        res = self._request(request)
         obs = np.asarray(res["obs"], dtype=np.float32)
         return obs, res.get("info", {})
 

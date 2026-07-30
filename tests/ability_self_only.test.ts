@@ -1,4 +1,4 @@
-// Truth table for the "Self only" tooltip classifier (src/ui/ability_self_only.ts).
+// Truth table for the "Self only" tooltip classifier (src/ui/hud/action_bar/ability_self_only.ts).
 //
 // A spellbook/action-bar tooltip shows a "Self only" requirement line when an
 // ability can ONLY ever be cast on the caster. That cannot be read off
@@ -8,7 +8,10 @@
 // data so a future ability or an edit to the allowlist can't silently mislabel.
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
-import { isSelfOnlyAbility, SELF_ONLY_EFFECT_TYPES } from '../src/ui/ability_self_only';
+import {
+  isSelfOnlyAbility,
+  SELF_ONLY_EFFECT_TYPES,
+} from '../src/ui/hud/action_bar/ability_self_only';
 
 describe('isSelfOnlyAbility', () => {
   // Pin the allowlist to literals: growing or shrinking it is a deliberate change
@@ -42,11 +45,12 @@ describe('isSelfOnlyAbility', () => {
     ['bloodrage', true], // selfDamagePctMax + gainResource
     ['summon_imp', true], // summonDemon
     ['dismiss_pet', true], // dismissPet
-    // Empty-effects abilities are special-cased elsewhere (bag items / the pet), so
-    // `[].every(...)` must NOT read as self-only. This is the regression the fix pins.
+    // Empty-effects bag abilities are special-cased elsewhere, so `[].every(...)`
+    // must NOT read as self-only. This is the regression the fix pins.
     ['conjure_water', false],
     ['conjure_food', false],
-    ['revive_pet', false],
+    // Patch Up acts on the hunter's companion, not the hunter.
+    ['revive_pet', false], // hot
     // Hostile self-centered AoEs: `requiresTarget` false but not caster-only.
     ['frost_nova', false], // aoeRoot
     ['arcane_explosion', false], // aoeDamage

@@ -12,6 +12,7 @@
 // north, so the pitch's long axis runs east-west and the goals face east/west.
 // Sim layer: no three.js imports.
 import type { Collider } from './colliders';
+import { VC_PRACTICE_X } from './data';
 
 // ---------------------------------------------------------------------------
 // Site footprint
@@ -57,8 +58,10 @@ export const GOAL_DEPTH = 2.5; // net pocket depth behind the goal line
 export const GOAL_Z_MIN = PITCH_CENTER.z - GOAL_HALF_W;
 export const GOAL_Z_MAX = PITCH_CENTER.z + GOAL_HALF_W;
 // Crossbar height (matches the rendered goal frame, vale_cup_stadium.ts goalPostH):
-// a ball crossing the line ABOVE this sails over and does not score, which is the
-// accuracy cost of an over-powered charged shot.
+// a ball crossing the line ABOVE this does not score, which is the accuracy cost
+// of an over-powered charged shot. The crossbar and the frame above it are SOLID,
+// so an over-the-bar shot banks back into play off the frame rather than escaping
+// through the open mouth (see reflectOffGoalFrame in vale_cup_ball.ts).
 export const GOAL_HEIGHT = 2.5;
 
 // Goal lines (the scoring planes): west goal belongs to team A, east to team B.
@@ -80,9 +83,11 @@ export interface VcWallSegment {
 }
 
 // Every board line the ball banks off, in world coordinates. The goal mouths
-// are open (no segment) so shots roll into the net pockets; the pockets' own
-// back/side walls stop the ball dead (the module treats pocket hits as goal
-// settle, not a bank).
+// are open BELOW the crossbar (no segment) so shots roll into the net pockets;
+// the pockets' own back/side walls stop the ball dead (the module treats pocket
+// hits as goal settle, not a bank). ABOVE the crossbar the goal frame is solid:
+// an over-the-bar shot banks back into play off it (reflectOffGoalFrame in
+// vale_cup_ball.ts), so a ballooned shot never escapes the arena.
 export const PITCH_WALLS: VcWallSegment[] = [
   // north board (inward normal points south, -z)
   { x1: PITCH.xMin, z1: PITCH.zMax, x2: PITCH.xMax, z2: PITCH.zMax, nx: 0, nz: -1 },
@@ -177,7 +182,7 @@ export function isAtSowfield(x: number, z: number): boolean {
  * Inside the full stadium footprint including the flatten's falloff apron. This
  * is the same rectangle that keeps procedural trees/rocks off the shell
  * (world.ts generateDecorations), reused to keep wild grass tufts, ground
- * plants, and ambient critters off the pitch and its immediate surrounds so the
+ * plants and other ambient dressing off the pitch and its immediate surrounds so the
  * Sowfield reads as a proper mown football ground.
  */
 export function isInSowfieldShell(x: number, z: number): boolean {
@@ -199,16 +204,16 @@ export function isOnPitch(x: number, z: number): boolean {
 // pitch far from the one physical Sowfield, so many run at once without touching
 // the real match. Each copy is the SAME pitch geometry shifted by an ORIGIN
 // offset (the real Sowfield match uses {0,0}); match code adds match.origin to
-// every geometry read. Origins sit far past every gameplay instance band and
-// 400yd apart, so interest scoping (~130yd) keeps each practice pitch fully
-// private and clear of all other entities. Practice players are clamped to their
-// copy's pitch, so the region's collider routing out there never matters.
+// every geometry read. Origins sit in the flat instance plane at VC_PRACTICE_X
+// (data.ts), a dedicated band between the delve and rift bands, 400yd apart, so
+// interest scoping (~130yd) keeps each practice pitch fully private and clear of
+// all other entities. Practice players are clamped to their copy's pitch, so the
+// region's collider routing out there never matters.
 export const VC_PRACTICE_SLOTS = 8; // max concurrent practice matches per realm
-const VC_PRACTICE_BASE_X = 30000;
 const VC_PRACTICE_SLOT_DZ = 400;
 
 export function vcPracticeOrigin(slot: number): { x: number; z: number } {
-  return { x: VC_PRACTICE_BASE_X, z: slot * VC_PRACTICE_SLOT_DZ };
+  return { x: VC_PRACTICE_X, z: slot * VC_PRACTICE_SLOT_DZ };
 }
 
 // ---------------------------------------------------------------------------

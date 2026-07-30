@@ -20,6 +20,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 18,
     moveSpeed: 6.5,
     aggroRadius: 12,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [
       { copper: 90, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.8 },
@@ -78,6 +86,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     maxLevel: 9,
     family: 'undead',
     elite: true,
+    // Named mid-boss: the boss CC/snare immunity rule applies on both
+    // difficulties even without the boss: true flag (see morthen).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 110,
     hpPerLevel: 24,
     dmgBase: 9,
@@ -86,6 +98,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 22,
     moveSpeed: 7,
     aggroRadius: 14,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [
       { copper: 400, chance: 1 },
       { itemId: 'quilted_trousers', chance: 0.4 },
@@ -102,6 +122,11 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'undead',
     elite: true,
     boss: true,
+    // Endgame-instance bosses can be neither controlled nor kited on EITHER
+    // difficulty (the heroic entity stamp in instances/difficulty.ts stays as
+    // belt and braces): the normal-difficulty economy retune assumes swings land.
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 230,
     hpPerLevel: 32,
     dmgBase: 11,
@@ -141,6 +166,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 18,
     moveSpeed: 6.5,
     aggroRadius: 12,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [
       { copper: 150, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.7 },
@@ -188,6 +221,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 7.5,
     aggroRadius: 12,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [], // summoned add — nothing to loot
     scale: 0.95,
     color: 0x6fae9e,
@@ -199,6 +240,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     maxLevel: 13,
     family: 'undead',
     elite: true,
+    // Named mid-boss: CC- and snare-immune on both difficulties (see morthen).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 120,
     hpPerLevel: 26,
     dmgBase: 11,
@@ -207,6 +251,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 24,
     moveSpeed: 7,
     aggroRadius: 14,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [
       { copper: 800, chance: 1 },
       { itemId: 'trollhide_leggings', chance: 0.5, rollGroup: 'olen_guaranteed_uncommon' },
@@ -228,6 +280,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'humanoid',
     elite: true,
     boss: true,
+    // Boss rule: CC- and snare-immune on both difficulties (see morthen).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 240,
     hpPerLevel: 34,
     dmgBase: 12,
@@ -273,6 +328,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 22,
     moveSpeed: 6.5,
     aggroRadius: 12,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [
       { copper: 300, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.6 },
@@ -302,6 +365,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'cracked_wyrm_scale', chance: 0.5 },
       { itemId: 'gravewyrm_mantle', chance: 0.05, rollGroup: 'drakonid_bonus' },
       { itemId: 'gravewyrm_gauntlets', chance: 0.05, rollGroup: 'drakonid_bonus' },
+      { itemId: 'gravewyrm_thornmaul', chance: 0.05 },
     ],
     scale: 1.45,
     color: 0x567d46, // Korzul's rig at 0.8x his bulk
@@ -320,6 +384,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 7,
     aggroRadius: 12,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [], // summoned add — nothing to loot
     scale: 1.0,
     color: 0xc8cfc8,
@@ -331,6 +403,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     maxLevel: 20,
     family: 'ogre',
     elite: true,
+    // Named mid-boss: CC- and snare-immune on both difficulties (see morthen).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 260,
     hpPerLevel: 36,
     dmgBase: 14,
@@ -367,6 +442,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     maxLevel: 20,
     family: 'humanoid',
     elite: true,
+    // Named mid-boss: CC- and snare-immune on both difficulties (see morthen).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 230,
     hpPerLevel: 33,
     dmgBase: 13,
@@ -401,6 +479,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'dragonkin',
     elite: true,
     boss: true,
+    // Boss rule: CC- and snare-immune on both difficulties (see morthen).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 420,
     hpPerLevel: 48,
     dmgBase: 15,
@@ -409,7 +490,26 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 34,
     moveSpeed: 7,
     aggroRadius: 18,
-    aoePulse: { min: 30, max: 42, radius: 14, every: 8, name: 'Necrotic Shockwave' },
+    // Grave Inferno (2026-07): the old Necrotic Shockwave aoePulse hit every
+    // melee for an unavoidable, unmitigated 570-798 each 8s. Replaced by a
+    // Geddon-style stationary channel: 8s rooted, no melee, four escalating
+    // fire pulses (base x1/2/3/4 x the per-mob mechanic multiplier), 14yd.
+    // Moving out at the windup eats the small first pulse or nothing.
+    // The 50% hp gate (2026-07-26) guarantees the channel fires once per kill
+    // on BOTH difficulties: a group out-pacing the 30s cadence used to skip
+    // the mechanic entirely. One gate only, and it lands before the 30% enrage
+    // so the burn phase never stacks on enraged melee.
+    infernoChannel: {
+      every: 30,
+      duration: 8,
+      pulses: 4,
+      min: 7,
+      max: 9,
+      radius: 14,
+      name: 'Grave Inferno',
+      school: 'fire',
+      atHpPct: [0.5],
+    },
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
       { copper: 50000, chance: 1 },
@@ -428,6 +528,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'deathlords_dread_visage', chance: 0.04, rollGroup: 'korzul_bonus' },
       { itemId: 'necromancers_soulspire_mantle', chance: 0.04, rollGroup: 'korzul_bonus' },
       { itemId: 'wyrmshadow_talongrips', chance: 0.04, rollGroup: 'korzul_bonus' },
+      { itemId: 'nightfangs_greatstaff', chance: 0.05, rollGroup: 'korzul_bonus' },
+      { itemId: 'wildgrowth_leggings', chance: 0.05, rollGroup: 'korzul_bonus' },
+      { itemId: 'grovewardens_grips', chance: 0.05, rollGroup: 'korzul_bonus' },
+      { itemId: 'verdant_walkers', chance: 0.05, rollGroup: 'korzul_bonus' },
     ],
     scale: 1.8,
     color: 0x3d5c45,
@@ -454,6 +558,96 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     scale: 1.25,
     color: 0xc7c0b2,
   },
+  nythraxis_heroic_warrior_add: {
+    id: 'nythraxis_heroic_warrior_add',
+    name: 'Spirit of Aldren',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'undead',
+    elite: true,
+    ccImmune: true,
+    hpBase: 150,
+    hpPerLevel: 28,
+    dmgBase: 26,
+    dmgPerLevel: 5.6,
+    attackSpeed: 2.2,
+    armorPerLevel: 24,
+    moveSpeed: 10,
+    aggroRadius: 14,
+    cleave: { radius: 8, mult: 0.55, name: 'Royal Cleave' },
+    loot: [],
+    scale: 1.25,
+    color: 0xc7c0b2,
+  },
+  nythraxis_heroic_priest_add: {
+    id: 'nythraxis_heroic_priest_add',
+    name: 'Spirit of Malric',
+    quietMechanics: true,
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'undead',
+    elite: true,
+    // Deliberately CC-able (unlike the other adds): the raid MUST stun/silence him
+    // to break his escalating heal channel. See channelHeal and the priest-add
+    // exemption in the Nythraxis control-immunity gate (sim.applyAura).
+    ccImmune: false,
+    // Squishy: low health so a focused raid can burn him, but his heal is strong,
+    // so stunning/silencing is usually the better answer than racing his HP.
+    hpBase: 80,
+    hpPerLevel: 14,
+    dmgBase: 12,
+    dmgPerLevel: 2.6,
+    attackSpeed: 2.4,
+    armorPerLevel: 14,
+    moveSpeed: 9.5,
+    aggroRadius: 14,
+    // Escalating channeled heal on Nythraxis. Tuned against ~550 raid DPS (10 x
+    // ~55) at the heroic gear level: the adds inherit mechanicHealMult (1.6), so
+    // the raw 400 -> 1800 ramp lands ~640 (a light drain early) up to ~2880 per 3s
+    // at cap (~960 HPS, ~1.7x raid DPS). Ignoring Malric a few ticks lets the boss
+    // gain ground; a stun/incapacitate/silence resets the ramp. Even a max-geared
+    // raid (~850 DPS) cannot out-damage a capped channel, so the interrupt stays
+    // mandatory rather than optional.
+    channelHeal: {
+      radius: 45,
+      // 4s per cast: slow enough that each heal is a visible, reactable channel (the
+      // old 3s felt too fast), with the per-heal amount cut ~20% so he is not
+      // out-healing a fair raid DPS check.
+      every: 4,
+      baseHeal: 320,
+      rampAdd: 240,
+      maxHeal: 1440,
+      name: "Malric's Mending",
+      school: 'shadow',
+    },
+    loot: [],
+    scale: 1.18,
+    color: 0x6b4a89,
+  },
+  nythraxis_heroic_rogue_add: {
+    id: 'nythraxis_heroic_rogue_add',
+    name: 'Spirit of Voss',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'undead',
+    elite: true,
+    // Untauntable (ignoreTaunt) but CC-able: the raid cannot tank-lock him onto a
+    // target, they have to stun/root him off the healers. Low health so a peel
+    // plus CC handles him. See the controllable-add exemption in sim.applyAura.
+    ccImmune: false,
+    hpBase: 90,
+    hpPerLevel: 16,
+    dmgBase: 16,
+    dmgPerLevel: 3.4,
+    attackSpeed: 2.0,
+    armorPerLevel: 16,
+    moveSpeed: 8,
+    aggroRadius: 14,
+    ignoreTaunt: true,
+    loot: [],
+    scale: 1.12,
+    color: 0x776f83,
+  },
   // Brother Aldric is now a dynamically-spawned NPC (see NPCS.brother_aldric_raid
   // in zone3.ts and spawnNythraxisAldric in sim.ts), not a mob.
   nythraxis_scourge_of_thornpeak: {
@@ -465,6 +659,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     elite: true,
     boss: true,
     ccImmune: true,
+    // Boss rule: snare-immune on both difficulties too (the raid boss was
+    // ccImmune from day one but still slowable on normal; see morthen).
+    slowImmune: true,
     // 60k on normal (createMob applies the 2.3x elite factor); heroic scales
     // this via the nythraxis_boss_arena healthMultiplier.
     hpBase: 60000 / 2.3,
@@ -475,34 +672,45 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 42,
     moveSpeed: 10.5,
     aggroRadius: 22,
+    // Each nythraxis_drop_* rollGroup is exclusive (one partitioned rng draw per
+    // group) and sums to exactly 1.00. The offhand/two-hander epics ride the
+    // existing four groups, one per group, with the set-piece chances rebalanced.
     loot: [
       { copper: 150000, chance: 1 },
       { itemId: 'deathless_heartwood', chance: 0.03, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.17, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'nighttalon_crown', chance: 0.16, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'soulflame_cowl', chance: 0.16, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'stormcallers_crown', chance: 0.16, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.16, rollGroup: 'nythraxis_drop_1' },
-      { itemId: 'soulflame_mantle', chance: 0.16, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'bonewrought_greatsword', chance: 0.13, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'soulflame_cowl', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'stormcallers_crown', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
+      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_1' },
       { itemId: 'kingsbane_last_oath', chance: 0.03, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'crownforged_warspaulders', chance: 0.17, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.16, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'soulflame_mantle', chance: 0.16, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.16, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'nighttalon_crown', chance: 0.16, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'stormcallers_spaulders', chance: 0.16, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.17, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'nighttalon_crown', chance: 0.17, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'soulflame_cowl', chance: 0.17, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'stormcallers_crown', chance: 0.17, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.16, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'soulflame_mantle', chance: 0.16, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'soulflame_mantle', chance: 0.17, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'crownforged_warspaulders', chance: 0.17, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.17, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'stormcallers_spaulders', chance: 0.17, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.16, rollGroup: 'nythraxis_drop_4' },
-      { itemId: 'nighttalon_crown', chance: 0.16, rollGroup: 'nythraxis_drop_4' },
+      { itemId: 'bonewrought_bulwark', chance: 0.13, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'crownforged_warspaulders', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'stormcallers_spaulders', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
+      { itemId: 'wraithfire_orb', chance: 0.16, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'soulflame_cowl', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'stormcallers_crown', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'direfang_greatblade', chance: 0.16, rollGroup: 'nythraxis_drop_4' },
+      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
+      { itemId: 'crownforged_warspaulders', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
+      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
+      { itemId: 'stormcallers_spaulders', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
+      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
+      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
+      // The feral ladder's top rung rides its own bonus group: a fifth,
+      // independent draw so the four guaranteed groups above keep their exact
+      // 1.00 partitions (a 25% bonus shot, never displacing a set piece).
+      { itemId: 'maul_of_the_scourged_wilds', chance: 0.25, rollGroup: 'nythraxis_drop_5' },
     ],
     scale: 3.1,
     color: 0x221b2d,
@@ -674,8 +882,8 @@ const BASTION_SPAWN_LIST: DungeonSpawn[] = [
 // (75-115) and the Wyrm's Hollow (115+) — with Korgath holding the first
 // waist, Velkhar the second, and Korzul on the great dais at the end.
 const SANCTUM_SPAWN_LIST: DungeonSpawn[] = [
-  { mobId: 'sanctum_boneguard', x: -3, z: 16 },
-  { mobId: 'sanctum_boneguard', x: 3, z: 17 },
+  { mobId: 'sanctum_boneguard', x: -3, z: 20 },
+  { mobId: 'sanctum_boneguard', x: 3, z: 21 },
   { mobId: 'sanctum_boneguard', x: -8, z: 30 },
   { mobId: 'sanctum_drakonid', x: -4, z: 31 },
   { mobId: 'sanctum_drakonid', x: 7, z: 44 },
@@ -718,10 +926,13 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     name: 'The Hollow Crypt',
     index: 0,
     doorPos: { x: 80, z: 90 }, // entrance portal at the chapel ruin
-    entry: { x: 0, z: 4 },
+    // Arrive back near the exit portal so the first pack (z 18+) is outside aggro
+    // range on entry: no mob can pull the moment you zone in. See dungeon_entry_clearance test.
+    entry: { x: 0, z: -2 },
     exitOffset: { x: 0, z: -6 },
     spawns: CRYPT_SPAWN_LIST,
     interior: 'crypt',
+    tombDressing: 'coffins',
     suggestedPlayers: 5,
     enterText: 'You descend into the Hollow Crypt...',
     leaveText: 'You climb back into daylight.',
@@ -731,10 +942,11 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     name: 'The Sunken Bastion',
     index: 1,
     doorPos: { x: 45, z: 515 }, // drowned keep south of the Gravecaller camp
-    entry: { x: 0, z: 4 },
+    entry: { x: 0, z: -2 }, // clear-of-aggro arrival (see dungeon_entry_clearance test)
     exitOffset: { x: 0, z: -6 },
     spawns: BASTION_SPAWN_LIST,
     interior: 'crypt',
+    tombDressing: 'cargo',
     suggestedPlayers: 5,
     enterText: 'You wade down into the Sunken Bastion...',
     leaveText: 'You climb out of the drowning dark.',
@@ -744,7 +956,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     name: 'Gravewyrm Sanctum',
     index: 2,
     doorPos: { x: 0, z: 858 }, // sealed gate in the graveyard, off the Sanctum Approach slope
-    entry: { x: 0, z: 4 },
+    entry: { x: 0, z: -2 }, // clear-of-aggro arrival (see dungeon_entry_clearance test)
     exitOffset: { x: 0, z: -6 },
     spawns: SANCTUM_SPAWN_LIST,
     interior: 'sanctum',
@@ -784,9 +996,41 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
       },
     ],
     interior: 'crypt',
+    tombDressing: 'coffins',
     suggestedPlayers: 1,
     enterText: 'You cross the threshold of the Abandoned Crypt.',
     leaveText: 'You return to the cold air of Thornpeak.',
+  },
+  the_last_keep: {
+    id: 'the_last_keep',
+    name: 'The Last Keep',
+    // Overflow band: indexes 0..7 are taken (temple 3, orkadia 6, wildheart 7),
+    // so the keep claims 8 (instanceOrigin: DUNGEON_OVERFLOW_X_BASE + 600).
+    index: 8,
+    // On the ward terrace at the keep's west front: clear of the keep's
+    // decor collider (r 8.5 at 421,2003), of both ward step tops, and of
+    // the terrace mid-walk, so neither the leave-drop (z - 4) nor casual
+    // foot traffic clips a collider or the 2yd door trigger (castle_layout)
+    doorPos: { x: 413.5, z: 2016.5 },
+    // Arrival just inside the entrance hall's south end, 4yd north of the exit
+    // portal so zoning in never lands inside the exit's 2yd door trigger.
+    entry: { x: 0, z: -5 },
+    exitOffset: { x: 0, z: -9 },
+    // Zero combat, zero loot by design: the keep is a place to walk, not a
+    // fight (the zero-spawn Nythraxis attunement crypt is the precedent). It is
+    // deliberately absent from FINDER_ACTIVITIES, so the Dungeon Finder never
+    // queues a group into an empty instance (orkadia/wildheart precedent: the
+    // finder catalogue is explicit, not derived from DUNGEONS).
+    spawns: [],
+    objects: [
+      // the hall's keepsake: a signet dropped by the garrison that never
+      // came home, on the entrance hall floor east of the door
+      { itemId: 'last_keep_signet', name: 'Signet of the Last Keep', x: 4, z: 0 },
+    ],
+    interior: 'lastkeep',
+    suggestedPlayers: 1,
+    enterText: 'You step into the cold, silent halls of the Last Keep.',
+    leaveText: 'You pull the keep door shut and step back into the Drakelands wind.',
   },
   nythraxis_boss_arena: {
     id: 'nythraxis_boss_arena',
@@ -807,6 +1051,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
       { itemId: 'bastion_ward_stone', name: 'Threshold Wardstone', x: 0, z: 63 },
     ],
     interior: 'nythraxis',
+    tombDressing: 'coffins',
     suggestedPlayers: 10,
     enterText: 'You pass through the sealed royal door.',
     leaveText: 'You return to the cold air of Thornpeak.',

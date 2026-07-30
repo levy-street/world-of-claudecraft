@@ -61,6 +61,18 @@ describe('buildBankView', () => {
     expect(view.emptyCells).toBe(24); // emptyCells === capacity for an empty bank
   });
 
+  it('passes the per-copy instance payload through to the slot model (tooltip lines)', () => {
+    const instance = { signer: 'Anna', rolled: { masterwork: true, stats: { str: 2 } } };
+    const slots: InvSlot[] = [
+      { itemId: 'sword', count: 1, instance },
+      { itemId: 'potion', count: 5 },
+    ];
+    const view = buildBankView(bankInfo({ slots, capacity: 24 }), lookup);
+    if (view.kind !== 'bank') throw new Error('expected bank');
+    expect(view.slots[0].instance).toBe(instance);
+    expect(view.slots[1].instance).toBeUndefined();
+  });
+
   it('projects the occupied grid preserving order, count display, and quality', () => {
     const slots: InvSlot[] = [
       { itemId: 'sword', count: 1 }, // count 1 -> showCount false, quality rare

@@ -24,7 +24,8 @@ const {
   withCspHeader,
   ALLOWED_PERMISSIONS,
 } = require('./shell_guards.cjs');
-const { resolveDesktopConfig } = require('./desktop_config.cjs');
+const { resolveDesktopConfig, walletConnectionSupported } = require('./desktop_config.cjs');
+const { createSteamShell } = require('./steam.cjs');
 const { PRODUCTION_API_ORIGIN } = require('./update_guard.cjs');
 const {
   MAX_FORWARDED_ERRORS,
@@ -37,6 +38,32 @@ const { initLogging } = require('./logging.cjs');
 const { DEFAULT_SHELL_STRINGS, sanitizeShellStrings } = require('./shell_strings.cjs');
 const { attachRendererCrashRecovery, installProcessCrashGuards } = require('./crash_guard.cjs');
 const { initUpdater } = require('./updater.cjs');
+const {
+  forceHighPerformanceGpu,
+  PRIME_RELAUNCH_MARKER,
+  relaunchForLinuxPrime,
+  summarizeGpuDevices,
+} = require('./gpu_preference.cjs');
+const {
+  buildWalletHandoffBrowserUrl,
+  parseWalletHandoffDeepLink,
+} = require('./wallet_handoff.cjs');
+
+// On a Linux hybrid-graphics laptop, the PRIME render-offload env vars (DRI_PRIME,
+// __NV_PRIME_RENDER_OFFLOAD, etc; see electron/gpu_preference.cjs) only reach the GPU
+// process if they are present in THIS process's environment from birth: Electron's Linux
+// GPU process forks from a zygote that already exec'd (and snapshotted its environ) before
+// any of this script's lines run, so a later process.env write is invisible to it. This is
+// the earliest point re-exec can happen (before crash reporting, logging, or any window are
+// set up in this soon-to-exit process), and it must run before app 'ready'. log: console
+// because file logging is deliberately not initialized yet in this soon-to-exit process; the
+// durable main.log evidence is the relaunched-child line the child writes below.
+if (relaunchForLinuxPrime({ log: console })) {
+  // process.exit stops the main script before any statement below runs, so this
+  // soon-to-be-replaced process never sets up crash reporting, logging, or a window
+  // (app.exit would also exit promptly, but process.exit depends on nothing).
+  process.exit(0);
+}
 
 const APP_ORIGIN = 'app://worldofclaudecraft';
 // The Vite dev server URL is a DEV-ONLY seam (electron-dev.mjs sets it): its
@@ -50,6 +77,7 @@ const appOrigins = appNavigationOrigins(APP_ORIGIN, devServerUrl);
 const deepLinkProtocol = 'worldofclaudecraft';
 let mainWindow = null;
 let pendingLoginCode = null;
+let pendingWalletHandoffCode = null;
 // Session cap counter for the renderer console mirror (used by the
 // 'console-message' handler in createMainWindow).
 let consoleLinesMirrored = 0;
@@ -66,8 +94,9 @@ function readPackagedMetadata() {
     return null;
   }
 }
+const packagedMetadata = readPackagedMetadata();
 const desktopConfig = resolveDesktopConfig({
-  packagedMetadata: readPackagedMetadata(),
+  packagedMetadata,
   env: process.env,
   isPackaged: app.isPackaged,
 });
@@ -103,6 +132,20 @@ crashReporter.start({
 // diagnosable; the renderer's warnings/errors and uncaught exceptions are
 // mirrored into the same file below.
 const { log, filePath: logFilePath } = initLogging({ isPackaged: app.isPackaged });
+
+// The durable evidence that the Linux PRIME relaunch happened: the parent that spawned us
+// exited before logging existed, so the CHILD records it (docs/desktop-release.md points
+// its GPU verification checklist at this line).
+if (process.platform === 'linux' && process.env[PRIME_RELAUNCH_MARKER] === '1') {
+  log.info('[gpu] running as PRIME-relaunched child (Linux discrete-GPU offload env active)');
+}
+
+// Force the discrete high-performance GPU on hybrid (Optimus) systems, with zero user
+// action. Runs before app 'ready' (so the Chromium switches are read) and before any
+// window (so the Windows per-app preference beats the GPU process this launch). See
+// electron/gpu_preference.cjs for the two levers and why the client-side
+// powerPreference:'high-performance' hint is not enough on Windows.
+forceHighPerformanceGpu({ app, log });
 
 // Player-visible strings for main-process dialogs (crash recovery): the
 // renderer pushes t()-localized values via 'desktop-set-strings'
@@ -270,7 +313,11 @@ function createMainWindow() {
 
   // Report GPU status once the page has loaded (and the renderer has created its WebGL
   // context), by when getGPUFeatureStatus and getGPUInfo have settled to the real values.
-  mainWindow.webContents.once('did-finish-load', logGpuStatus);
+  // Bound with .on, not .once: a GPU-process crash followed by the crash-recovery
+  // auto-reload is exactly when the adapter can flip to the WARP software fallback, and a
+  // .once here would keep only the pre-crash healthy reading in the log. logGpuStatus
+  // dedupes an unchanged renderer line itself.
+  mainWindow.webContents.on('did-finish-load', logGpuStatus);
 
   // Crash recovery for the game view: bounded auto-reload, then an i18n
   // Reload/Quit dialog (electron/crash_guard.cjs).
@@ -336,6 +383,10 @@ function openDesktopLogin() {
   shell.openExternal(url.toString());
 }
 
+function openDesktopWalletHandoff(code) {
+  return shell.openExternal(buildWalletHandoffBrowserUrl(apiOrigin, code));
+}
+
 function deliverLoginCode(code) {
   pendingLoginCode = code;
   if (!mainWindow) return;
@@ -344,7 +395,21 @@ function deliverLoginCode(code) {
   mainWindow.focus();
 }
 
+function deliverWalletHandoffCode(code) {
+  pendingWalletHandoffCode = code;
+  if (process.platform === 'darwin') app.focus({ steal: true });
+  if (!mainWindow) return;
+  mainWindow.webContents.send('desktop-wallet-handoff-code', code);
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.focus();
+}
+
 function handleDeepLink(url) {
+  const walletHandoff = parseWalletHandoffDeepLink(url);
+  if (walletHandoff) {
+    deliverWalletHandoffCode(walletHandoff.code);
+    return;
+  }
   let parsed;
   try {
     parsed = new URL(url);
@@ -362,6 +427,49 @@ function handleDeepLink(url) {
 // or foreign-origin sender is rejected with null.
 const trustedSender = (event) => isTrustedSender(event.senderFrame, appOrigins);
 
+// Steam link tickets (electron/steam.cjs). Inert on website builds: the shell
+// only lazy-requires steamworks.js when the distribution stamp says 'steam'
+// (or the unpackaged WOC_STEAM_DEV=1 dev loop), and getLinkTicket() answers
+// null on every failure path instead of throwing across IPC.
+const steamShell = createSteamShell({
+  distribution: desktopConfig.distribution,
+  packagedMetadata,
+  env: process.env,
+  isPackaged: app.isPackaged,
+  log,
+});
+
+ipcMain.handle('desktop-steam-link-ticket', async (event) => {
+  if (!trustedSender(event)) return null;
+  return await steamShell.getLinkTicket();
+});
+
+// The renderer signals that a link attempt has settled (POST /api/steam/link
+// resolved or rejected) so the shell can CancelAuthTicket the live handle
+// promptly (Valve's contract), rather than waiting for the next mint or process
+// exit. Idempotent; inert on website builds (no live handle ever exists).
+ipcMain.handle('desktop-steam-link-settled', (event) => {
+  if (!trustedSender(event)) return null;
+  steamShell.cancelLinkTicket();
+  return null;
+});
+
+// Whether this shell can mint link tickets at all (steam distribution or the
+// unpackaged dev loop): the renderer hides the Link button when false instead
+// of offering a click whose ticket can never exist (website builds). Computed
+// without loading steamworks.js.
+ipcMain.handle('desktop-steam-capability', (event) => {
+  if (!trustedSender(event)) return false;
+  return steamShell.enabled;
+});
+
+// WalletConnect is available in the website-distributed desktop shell but is
+// intentionally absent from Steam until that distribution enables it.
+ipcMain.handle('desktop-wallet-capability', (event) => {
+  if (!trustedSender(event)) return false;
+  return walletConnectionSupported(desktopConfig);
+});
+
 ipcMain.handle('desktop-login-open-browser', (event) => {
   if (!trustedSender(event)) return null;
   openDesktopLogin();
@@ -372,6 +480,23 @@ ipcMain.handle('desktop-login-take-code', (event) => {
   if (!trustedSender(event)) return null;
   const code = pendingLoginCode;
   pendingLoginCode = null;
+  return code;
+});
+
+ipcMain.handle('desktop-wallet-open-browser', async (event, code) => {
+  if (!trustedSender(event)) return false;
+  try {
+    await openDesktopWalletHandoff(code);
+    return true;
+  } catch {
+    return false;
+  }
+});
+
+ipcMain.handle('desktop-wallet-take-code', (event) => {
+  if (!trustedSender(event)) return null;
+  const code = pendingWalletHandoffCode;
+  pendingWalletHandoffCode = null;
   return code;
 });
 
@@ -423,10 +548,15 @@ if (!singleInstance) {
 // status, 'enabled' means hardware; 'software only' or 'disabled' means Chromium fell back to
 // SwiftShader, which a WebGL game must not silently run on. getGPUInfo('complete') resolves
 // the actual adapter (glRenderer names the real GPU, e.g. "Apple M1", vs "SwiftShader") and
-// auxAttributes.softwareRendering is Chromium's own verdict. This MUST run after the GPU
-// process has reported (call it on the window's did-finish-load, not at whenReady, where
-// getGPUFeatureStatus can still return a pre-initialization 'disabled_off'). Dev-channel
-// diagnostics only (the log file), never user-facing.
+// auxAttributes.softwareRendering is Chromium's own verdict; its gpuDevice list is the one
+// line that settles a hybrid-laptop support ticket from a single player-supplied main.log
+// (both adapters present, wrong one active means the gpu_preference.cjs levers did not take
+// effect). This MUST run after the GPU process has reported (call it on the window's
+// did-finish-load, not at whenReady, where getGPUFeatureStatus can still return a
+// pre-initialization 'disabled_off'). Runs again after every reload (crash recovery); an
+// unchanged renderer reading is deduped to keep the log quiet. Dev-channel diagnostics only
+// (the log file), never user-facing.
+let lastGpuRendererLog = '';
 function logGpuStatus() {
   try {
     const status = app.getGPUFeatureStatus();
@@ -446,10 +576,23 @@ function logGpuStatus() {
       if (aux.softwareRendering) {
         log.warn('[gpu] GPU process reports softwareRendering: the game is on a CPU rasterizer');
       }
-      log.info('[gpu] active renderer', {
+      const { devices, discreteInactive } = summarizeGpuDevices(info?.gpuDevice);
+      const line = {
         glRenderer: aux.glRenderer,
         glVendor: aux.glVendor,
-      });
+        adapters: devices,
+      };
+      const key = JSON.stringify(line);
+      if (key === lastGpuRendererLog) return;
+      lastGpuRendererLog = key;
+      log.info('[gpu] active renderer', line);
+      if (discreteInactive) {
+        log.warn(
+          '[gpu] a discrete GPU is present but INACTIVE: the OS bound the integrated or ' +
+            'software adapter, so the per-app preference and the Chromium switch did not ' +
+            'take effect on this machine',
+        );
+      }
     },
     (err) => log.error('[gpu] could not read gpu info', err),
   );

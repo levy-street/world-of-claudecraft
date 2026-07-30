@@ -75,7 +75,13 @@ export const RELAY_COMMANDS: readonly RelayCommand[] = [
 ];
 
 export function relayCommandById(id: string): RelayCommand | undefined {
-  return RELAY_COMMANDS.find((c) => c.id === id.toLowerCase());
+  const key = id.toLowerCase();
+  const exact = RELAY_COMMANDS.find((c) => c.id === key);
+  if (exact) return exact;
+  // Accept a natural plural ("!events" -> event, "!lfgs" -> lfg) only when the exact
+  // word is unknown, so "!event" written as "!events" still posts.
+  if (key.endsWith('s')) return RELAY_COMMANDS.find((c) => c.id === key.slice(0, -1));
+  return undefined;
 }
 
 /**

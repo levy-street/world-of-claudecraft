@@ -11,7 +11,15 @@ export type ModerationChatCommand =
   | { kind: 'ban'; name: string | null; reason: string }
   | { kind: 'suspend'; name: string | null; minutes: number | null; reason: string }
   | { kind: 'spectate'; name: string | null }
-  | { kind: 'unspectate' };
+  | { kind: 'unspectate' }
+  | {
+      kind: 'jail';
+      name: string | null;
+      minutes: number | null;
+      reason: string | null;
+      malformed: boolean;
+    }
+  | { kind: 'unjail'; name: string | null; malformed: boolean };
 
 function cleanReason(raw: string): string {
   const reason = raw.trim().slice(0, MODERATION_COMMAND_REASON_MAX);
@@ -62,6 +70,50 @@ function parseSpectateName(rest: string): string | null {
   return parsed?.rest === '' ? parsed.name : null;
 }
 
+function parseOptionalQuotedName(rest: string): { name: string | null; malformed: boolean } {
+  const trimmed = rest.trim();
+  if (!trimmed) return { name: null, malformed: false };
+  const parsed = parseQuotedName(trimmed);
+  if (!parsed || parsed.rest !== '') return { name: null, malformed: true };
+  return { name: parsed.name, malformed: parsed.name === null };
+}
+
+// /jail: no arguments = the moderator's own jail visit. Jailing a player
+// REQUIRES a quoted name and a sentence length in minutes (there is no
+// indefinite form; that ambiguity invited mistakes), then an optional reason,
+// quoted or bare. Anything else is malformed (the usage notice).
+function parseJailArguments(rest: string): {
+  name: string | null;
+  minutes: number | null;
+  reason: string | null;
+  malformed: boolean;
+} {
+  const trimmed = rest.trim();
+  if (!trimmed) return { name: null, minutes: null, reason: null, malformed: false };
+  const invalid = { name: null, minutes: null, reason: null, malformed: true };
+  const parsed = parseQuotedName(trimmed);
+  if (!parsed || parsed.name === null) return invalid;
+  const match = /^(\d+)(?:\s+([\s\S]*))?$/.exec(parsed.rest);
+  const minutes = match ? Number(match[1]) : null;
+  if (
+    minutes === null ||
+    !Number.isSafeInteger(minutes) ||
+    minutes < 1 ||
+    minutes > MODERATION_COMMAND_MINUTES_MAX
+  ) {
+    return invalid;
+  }
+  let reasonRaw = (match?.[2] ?? '').trim();
+  const quoted = /^"([^"]*)"$/.exec(reasonRaw);
+  if (quoted) reasonRaw = quoted[1].trim();
+  return {
+    name: parsed.name,
+    minutes,
+    reason: reasonRaw ? cleanReason(reasonRaw) : null,
+    malformed: false,
+  };
+}
+
 // Invalid arguments remain parsed commands so they are intercepted instead of
 // leaking into ordinary chat. The policy service returns the usage notice.
 export function parseModerationChatCommand(text: string): ModerationChatCommand | null {
@@ -95,5 +147,13 @@ export function parseModerationChatCommand(text: string): ModerationChatCommand 
     return { kind: 'spectate', name: parseSpectateName(spectate[1] ?? '') };
   }
   if (/^\/unspectate$/i.test(trimmed)) return { kind: 'unspectate' };
+  const jail = /^\/jail(?:\s+([\s\S]*))?$/i.exec(trimmed);
+  if (jail) {
+    return { kind: 'jail', ...parseJailArguments(jail[1] ?? '') };
+  }
+  const unjail = /^\/unjail(?:\s+([\s\S]*))?$/i.exec(trimmed);
+  if (unjail) {
+    return { kind: 'unjail', ...parseOptionalQuotedName(unjail[1] ?? '') };
+  }
   return null;
 }

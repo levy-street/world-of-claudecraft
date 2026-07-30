@@ -14,13 +14,13 @@
 // (vitest.browser.config.ts, chromium) runs it.
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DelveMapPainter } from '../../src/ui/delve_map_painter';
+import { DelveMapPainter } from '../../src/ui/hud/delve/delve_map_painter';
 import { makeWriterFacet, type PainterHostWriters } from '../../src/ui/painter_host';
 import type { IWorld } from '../../src/world_api';
 import { cleanup, host } from './_harness';
 
 // The six `--color-delve-*` tokens the painter resolves via getComputedStyle. The NAMES
-// mirror DELVE_COLOR_TOKENS in src/ui/delve_map_painter.ts; the VALUE we set for each is the
+// mirror DELVE_COLOR_TOKENS in src/ui/hud/delve/delve_map_painter.ts; the VALUE we set for each is the
 // token name itself (the tokens ARE the values). This keeps the test free of an
 // out-of-band hex (no magic-color literal duplicating tokens.css), while the painter still
 // reads a non-empty string for every token. The value is not a valid CSS color, so Canvas

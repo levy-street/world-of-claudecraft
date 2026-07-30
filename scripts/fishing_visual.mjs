@@ -2,8 +2,9 @@
 // Boots the offline game, fishes at Mirror Lake in Eastbrook Vale, and captures
 // the cast, the varied catches in the combat log, and the bags window.
 // Needs `npm run dev` (:5173). PNGs land in tmp/.
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
@@ -32,7 +33,8 @@ const spot = await page.evaluate(() => {
   const g = window.__game;
   const sim = g.sim;
   const p = sim.player;
-  p.maxHp = 99999; p.hp = 99999;
+  p.maxHp = 99999;
+  p.hp = 99999;
   sim.addItem('simple_fishing_pole', 1);
   const LAKE = { x: -92, z: 88 };
   for (let r = 22; r <= 50; r += 1) {
@@ -41,7 +43,9 @@ const spot = await page.evaluate(() => {
       const x = LAKE.x + Math.cos(a) * r;
       const z = LAKE.z + Math.sin(a) * r;
       const facing = Math.atan2(LAKE.x - x, LAKE.z - z);
-      p.pos.x = x; p.pos.z = z; p.prevPos = { ...p.pos };
+      p.pos.x = x;
+      p.pos.z = z;
+      p.prevPos = { ...p.pos };
       p.facing = facing;
       g.input.camYaw = facing;
       sim.events = [];
@@ -56,7 +60,7 @@ await new Promise((r) => setTimeout(r, 1200));
 await page.screenshot({ path: 'tmp/fishing_01_cast.png' });
 
 // Reel in a generous variety of catches so the log + bags show the new content.
-// Keep rolling until the rare Glimmerfin Koi appears so the log shows it.
+// Keep rolling until the rare Sunglint Koi appears so the log shows it.
 await page.evaluate(() => {
   const sim = window.__game.sim;
   const meta = sim.meta(sim.player.id);

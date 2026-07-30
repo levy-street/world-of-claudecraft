@@ -15,13 +15,14 @@ describe('/gear command', () => {
   it('lists equipped slots in a fixed order and marks empty ones', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
-    // A fresh warrior starts with a main hand and a chest piece, no legs/feet.
+    // A fresh warrior starts with a main hand, a buckler, and a chest piece.
     sim.tick();
     sim.chat('/gear', a);
     const text = errorText(sim.tick());
     expect(text).toBeDefined();
-    expect(text).toMatch(/^Equipped \(2\/8\):/);
+    expect(text).toMatch(/^Equipped \(3\/9\):/);
     expect(text).toContain('Main Hand:');
+    expect(text).toContain('Off Hand:');
     expect(text).toContain('Chest:');
     expect(text).toContain('Helmet: (empty)');
     expect(text).toContain('Shoulder: (empty)');
@@ -29,8 +30,9 @@ describe('/gear command', () => {
     expect(text).toContain('Legs: (empty)');
     expect(text).toContain('Gloves: (empty)');
     expect(text).toContain('Feet: (empty)');
-    // fixed slot order: main hand before chest before legs before feet
-    expect(text!.indexOf('Main Hand')).toBeLessThan(text!.indexOf('Chest'));
+    // fixed slot order: main hand before off hand before chest before legs before feet
+    expect(text!.indexOf('Main Hand')).toBeLessThan(text!.indexOf('Off Hand'));
+    expect(text!.indexOf('Off Hand')).toBeLessThan(text!.indexOf('Chest'));
     expect(text!.indexOf('Chest')).toBeLessThan(text!.indexOf('Legs'));
     expect(text!.indexOf('Legs')).toBeLessThan(text!.indexOf('Feet'));
   });
@@ -41,6 +43,7 @@ describe('/gear command', () => {
     const meta = sim.players.get(a)!;
     meta.equipment = {
       mainhand: 'worn_sword',
+      offhand: 'eastbrook_buckler',
       helmet: 'cryptbone_helm',
       shoulder: 'cryptbone_pauldrons',
       chest: 'recruit_tunic',
@@ -52,8 +55,9 @@ describe('/gear command', () => {
     sim.tick();
     sim.chat('/gear', a);
     const text = errorText(sim.tick());
-    expect(text).toMatch(/^Equipped \(8\/8\):/);
+    expect(text).toMatch(/^Equipped \(9\/9\):/);
     expect(text).toContain('Pitted Shortsword');
+    expect(text).toContain('Eastbrook Buckler');
     expect(text).toContain('Quilted Trousers');
     expect(text).not.toContain('(empty)');
   });

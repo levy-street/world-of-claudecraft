@@ -8,6 +8,7 @@ import {
   bagQualityKey,
   bagShiftLinks,
   bagStackIndex,
+  bagsMoneyRowStale,
   bagsWindowShown,
   bagTooltipHintKey,
   bankDepositOpensPrompt,
@@ -38,6 +39,13 @@ const ITEMS: Record<string, ItemDef> = {
   bound: { kind: 'armor', name: 'Bound Plate', quality: 'uncommon', noMarketList: true } as ItemDef,
   rod: { kind: 'tool', name: 'Fishing Rod', use: { type: 'fishing' } } as ItemDef,
   soulbound: { kind: 'quest', name: 'Soulbound Key', quality: 'epic', noDiscard: true } as ItemDef,
+  mark: {
+    kind: 'tool',
+    name: 'Heroic Mark',
+    quality: 'rare',
+    soulbound: true,
+    noDiscard: true,
+  } as ItemDef,
 };
 const lookup: ItemLookup = (id) => ITEMS[id];
 
@@ -83,6 +91,14 @@ describe('bagDestroyAction', () => {
     expect(bagDestroyAction(ITEMS.soulbound, NO_MODE)).toBe('discardBlocked');
   });
 
+  it('protects a soulbound noDiscard item (Heroic Mark) from destruction too', () => {
+    expect(bagDestroyAction(ITEMS.mark, NO_MODE)).toBe('discardBlocked');
+  });
+
+  it('lets bound equipment be destroyed so an accidental honor purchase cannot clog bags', () => {
+    expect(bagDestroyAction({ kind: 'armor', soulbound: true }, NO_MODE)).toBe('discard');
+  });
+
   it('is inert in every transactional mode (their own click/contextmenu owns the slot)', () => {
     for (const mode of [
       'tradeOpen',
@@ -118,6 +134,36 @@ describe('bagItemAction priority order', () => {
     expect(bagItemAction(ITEMS.sword, { ...NO_MODE, petFeed: true })).toBe('petFeedBlocked');
     expect(bagItemAction(ITEMS.questItem, NO_MODE)).toBe('discardQuest');
     expect(bagItemAction(ITEMS.potion, NO_MODE)).toBe('use');
+  });
+});
+
+describe('soulbound transfer affordances', () => {
+  it('blocks trade, mail, market, and vendor clicks instead of staging a Heroic Mark transfer', () => {
+    expect([
+      bagItemAction(ITEMS.mark, { ...NO_MODE, tradeOpen: true }),
+      bagItemAction(ITEMS.mark, { ...NO_MODE, mailAttach: true }),
+      bagItemAction(ITEMS.mark, { ...NO_MODE, marketSell: true }),
+      bagItemAction(ITEMS.mark, { ...NO_MODE, vendorOpen: true }),
+    ]).toEqual([
+      'transferBlockedSoulbound',
+      'transferBlockedSoulbound',
+      'transferBlockedSoulbound',
+      'transferBlockedSoulbound',
+    ]);
+  });
+
+  it('labels every blocked transfer as soulbound instead of advertising the action', () => {
+    expect([
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, tradeOpen: true }),
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, mailAttach: true }),
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, marketSell: true }),
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, vendorOpen: true }),
+    ]).toEqual([
+      'hudChrome.itemSoulbound',
+      'hudChrome.itemSoulbound',
+      'hudChrome.itemSoulbound',
+      'hudChrome.itemSoulbound',
+    ]);
   });
 });
 
@@ -364,5 +410,48 @@ describe('ClientWorld-vs-Sim parity', () => {
     const cliInv = JSON.parse(JSON.stringify(simInv)) as InvSlot[];
     const filter = { ...DEFAULT_BAG_FILTER, sort: 'quality' as const };
     expect(buildBagGrid(simInv, lookup, filter)).toEqual(buildBagGrid(cliInv, lookup, filter));
+  });
+});
+
+// The purse-staleness decision behind the bag money row (issue #2373). This is the
+// whole polarity of the fix in one pure predicate, which is the point: driven as a
+// truth table here, an inverted gate or an inverted diff cannot survive, where a
+// source-text pin on the call site would match the negated form just as happily.
+describe('bagsMoneyRowStale', () => {
+  it('is TRUE only when a shown window is painting a purse that moved', () => {
+    // The issue's repro: the window is up, the auctioneer just paid out.
+    expect(bagsMoneyRowStale('flex', 5000, 1000)).toBe(true);
+  });
+
+  it('is FALSE when the purse did not move (no repaint under the player)', () => {
+    // Load-bearing: this runs on the 500ms band, so a predicate that ignored the
+    // purse would rebuild the money row twice a second forever.
+    expect(bagsMoneyRowStale('flex', 5000, 5000)).toBe(false);
+  });
+
+  it('is FALSE for a hidden window even when the purse moved', () => {
+    expect(bagsMoneyRowStale('none', 5000, 1000)).toBe(false);
+  });
+
+  it('is FALSE for a never-opened window, whose cold display is empty (issue #1538)', () => {
+    // The raw `!== 'none'` form that the older bags call sites copy reads '' as
+    // shown, which would paint a window the player has never opened.
+    expect(bagsMoneyRowStale('', 5000, 1000)).toBe(false);
+  });
+
+  it('converges from the -1 cold sentinel, which no real purse can equal', () => {
+    // A window shown without a paint behind it must not be left stale, and a
+    // zero-copper player must still arm rather than compare equal by accident.
+    expect(bagsMoneyRowStale('flex', 0, -1)).toBe(true);
+  });
+
+  it('fires on a DEBIT as well as a credit (a trainer fee, a vendor buy)', () => {
+    // `!==`, not `>`: money leaving the purse goes just as stale as money arriving.
+    expect(bagsMoneyRowStale('flex', 1000, 5000)).toBe(true);
+  });
+
+  it('is not pinned to the current shown value', () => {
+    // Mirrors bagsWindowShown's own contract: guard the hidden values, not 'flex'.
+    expect(bagsMoneyRowStale('block', 5000, 1000)).toBe(true);
   });
 });

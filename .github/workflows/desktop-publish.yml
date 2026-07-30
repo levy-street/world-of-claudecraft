@@ -7,10 +7,12 @@ name: Desktop publish
 #   - macOS: signed + notarized universal dmg + zip + blockmap, SHA256SUMS-mac,
 #     and latest-mac.yml. Requires the Apple signing secrets; the job refuses
 #     to publish an ad-hoc build.
-# Windows stays on the manual runbook until Azure Artifact Signing is
-# provisioned. The full runbook, including the one-time R2 and Apple
-# provisioning these jobs depend on, is docs/desktop-release.md
-# ("Publishing from CI").
+#   - Windows: the Azure-Key-Vault-signed universal NSIS installer (one exe
+#     covering x64 + arm64) + its blockmap + the per-arch zips,
+#     SHA256SUMS-windows, and latest.yml. Requires the Azure Key Vault signing
+#     secrets; the job refuses to publish an unsigned build.
+# The full runbook, including the one-time R2, Apple, and Azure provisioning
+# these jobs depend on, is docs/desktop-release.md ("Publishing from CI").
 #
 # Triggers:
 #   - a release tag (v<version>) pushed to a commit that is on main; the tag
@@ -331,3 +333,231 @@ jobs:
           put "SHA256SUMS-mac" text/plain "no-cache,max-age=60"
           put "latest-mac.yml" text/yaml "no-cache,max-age=60"
           echo "Published macOS ${VERSION} to https://updates.worldofclaudecraft.com/desktop/"
+
+  windows:
+    name: Build and publish Windows artifacts
+    needs: verify
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    # The runner's default shell is pwsh; the R2 upload and verification steps
+    # keep the same bash + put() shape as the linux/mac jobs, so default the
+    # whole job to bash (present on the windows runners). The one step that
+    # genuinely needs PowerShell (Get-AuthenticodeSignature) overrides back.
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      # HARD DEPENDENCY: an unsigned installer trips SmartScreen hard and
+      # taints publisher reputation, so this job refuses to run unsigned
+      # rather than publish an unsigned build. These five secrets activate
+      # the Azure Key Vault sign hook (scripts/electron-win-sign.mjs) inside
+      # scripts/electron-builder-config.mjs; checked before the long
+      # install/build. The timestamp/digest secrets are optional (the hook
+      # defaults them to DigiCert + sha256).
+      - name: Verify signing secrets are configured
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_KEY_VAULT_URL: ${{ secrets.AZURE_KEY_VAULT_URL }}
+          AZURE_KEY_VAULT_CERTIFICATE: ${{ secrets.AZURE_KEY_VAULT_CERTIFICATE }}
+        run: |
+          missing=""
+          for name in AZURE_TENANT_ID AZURE_CLIENT_ID AZURE_CLIENT_SECRET AZURE_KEY_VAULT_URL AZURE_KEY_VAULT_CERTIFICATE; do
+            if [ -z "${!name}" ]; then missing="${missing} ${name}"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "Azure Key Vault signing secrets are not configured:${missing}. See docs/desktop-release.md (Publishing from CI)." >&2
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The sign hook shells out to the AzureSignTool dotnet global tool; the
+      # runner's dotnet tools directory is already on PATH.
+      - name: Install AzureSignTool
+        run: dotnet tool install --global AzureSignTool
+
+      # Full website-channel build: the Windows target matrix from
+      # package.json "build" is nsis + zip for x64 + arm64, and with no nsis
+      # block electron-builder's buildUniversalInstaller default emits ONE
+      # combined installer covering both arches, plus latest.yml. Every
+      # signable file (the installer, the app exe inside the per-arch zips,
+      # the uninstaller) is signed by the hook as electron-builder emits it.
+      - name: Build signed Windows desktop artifacts
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_KEY_VAULT_URL: ${{ secrets.AZURE_KEY_VAULT_URL }}
+          AZURE_KEY_VAULT_CERTIFICATE: ${{ secrets.AZURE_KEY_VAULT_CERTIFICATE }}
+          CODE_SIGN_TIMESTAMP_URL: ${{ secrets.CODE_SIGN_TIMESTAMP_URL }}
+          CODE_SIGN_FILE_DIGEST: ${{ secrets.CODE_SIGN_FILE_DIGEST }}
+          CODE_SIGN_TIMESTAMP_DIGEST: ${{ secrets.CODE_SIGN_TIMESTAMP_DIGEST }}
+        run: npm run electron:build
+
+      # Mirrors the mac job's signature gate: a build whose installer is not
+      # Authenticode-Valid must fail here, never publish. The installer name
+      # comes from the feed, not a pinned literal (docs/desktop-release.md:
+      # verify the emitted name from latest.yml rather than assume it).
+      - name: Verify Authenticode signature
+        shell: pwsh
+        run: |
+          $feed = Get-Content release/latest.yml -Raw
+          $names = [regex]::Matches($feed, '(?m)^\s*(?:-\s*)?(?:url|path):\s*"?([^"\s]+)"?') |
+            ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique
+          $exes = @($names | Where-Object { $_ -like '*.exe' })
+          if ($exes.Count -eq 0) {
+            Write-Error 'latest.yml lists no installer to verify; refusing to publish.'
+            exit 1
+          }
+          foreach ($name in $exes) {
+            $sig = Get-AuthenticodeSignature -FilePath "release/$name"
+            if ($sig.Status -ne 'Valid') {
+              Write-Error "release/$name Authenticode status is $($sig.Status), not Valid; refusing to publish an unsigned build."
+              exit 1
+            }
+            Write-Output "release/$name signed by $($sig.SignerCertificate.Subject) (status: $($sig.Status))"
+          }
+
+      # Checksums so Windows users can validate their download; bare filenames
+      # for "sha256sum -c", named per-platform like the other jobs.
+      - name: Generate SHA256SUMS-windows
+        run: |
+          cd release
+          sha256sum *.exe *.zip > SHA256SUMS-windows
+          cat SHA256SUMS-windows
+
+      # Unlike the linux/mac jobs this does NOT pin literal filenames: the
+      # universal-NSIS installer name is defined by what electron-builder
+      # emitted into latest.yml (docs/desktop-release.md), so the feed is the
+      # source of truth and every file it references must exist, carry this
+      # release's version, and (for the installer) have its blockmap. A
+      # dev*.yml misbake fails here instead of publishing. Runs on dry runs
+      # too, so a rehearsal proves the same contract a release relies on.
+      - name: Verify expected artifacts
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if [ ! -f release/latest.yml ]; then
+            echo "release/latest.yml was not produced (a dev-origin misbake emits dev.yml instead); refusing to publish." >&2
+            ls release >&2
+            exit 1
+          fi
+          if ls release/dev*.yml >/dev/null 2>&1; then
+            echo "dev-channel feed files found next to latest.yml; the build was not baked for production. Refusing to publish." >&2
+            ls release >&2
+            exit 1
+          fi
+          FEED_FILES="$(node -e '
+            const text = require("fs").readFileSync("release/latest.yml", "utf8");
+            const names = new Set();
+            for (const m of text.matchAll(/^\s*(?:-\s*)?(?:url|path):\s*"?([^"\s]+)"?\s*$/gm)) names.add(m[1]);
+            console.log([...names].join("\n"));
+          ')"
+          if [ -z "$FEED_FILES" ]; then
+            echo "latest.yml lists no artifacts; refusing to publish." >&2
+            exit 1
+          fi
+          FOUND_EXE=0
+          while IFS= read -r file; do
+            if [ ! -f "release/${file}" ]; then
+              echo "latest.yml references ${file}, which was not produced; refusing to publish a partial release." >&2
+              ls release >&2
+              exit 1
+            fi
+            case "$file" in
+              *"${VERSION}"*) ;;
+              *)
+                echo "latest.yml references ${file}, which does not carry version ${VERSION}; stale feed or half-bumped release." >&2
+                exit 1
+                ;;
+            esac
+            case "$file" in
+              *.exe)
+                FOUND_EXE=1
+                if [ ! -f "release/${file}.blockmap" ]; then
+                  echo "Installer blockmap release/${file}.blockmap was not produced; differential updates would break." >&2
+                  exit 1
+                fi
+                ;;
+            esac
+          done <<< "$FEED_FILES"
+          if [ "$FOUND_EXE" != "1" ]; then
+            echo "latest.yml lists no NSIS installer; refusing to publish." >&2
+            exit 1
+          fi
+          if [ ! -f release/SHA256SUMS-windows ]; then
+            echo "release/SHA256SUMS-windows was not produced." >&2
+            exit 1
+          fi
+
+      - name: Attach artifacts to the run (dry run only)
+        if: github.event_name == 'workflow_dispatch' && !inputs.publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-windows
+          retention-days: 7
+          path: |
+            release/*.exe
+            release/*.exe.blockmap
+            release/*.zip
+            release/SHA256SUMS-windows
+            release/latest.yml
+
+      # Same rules as the other uploads: immutable caching for the versioned
+      # artifacts, near-uncached checksum + feed, and the feed file
+      # (latest.yml) uploads LAST. Versioned names come from the feed plus the
+      # per-arch zips, matching the verification above.
+      - name: Upload to the update host (R2)
+        if: github.event_name == 'push' || inputs.publish
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_EC2_METADATA_DISABLED: 'true'
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          if [ -z "$R2_ACCOUNT_ID" ] || [ -z "$R2_BUCKET" ] || [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+            echo "R2 secrets are not configured (R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY). See docs/desktop-release.md." >&2
+            exit 1
+          fi
+          VERSION="$(node -p "require('./package.json').version")"
+          ENDPOINT="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          put() {
+            aws s3 cp "release/$1" "s3://${R2_BUCKET}/desktop/$1" \
+              --endpoint-url "$ENDPOINT" --content-type "$2" --cache-control "$3"
+          }
+          for file in release/world-of-claudecraft-"${VERSION}"-win-*.zip; do
+            put "$(basename "$file")" application/zip "public,max-age=31536000,immutable"
+          done
+          FEED_FILES="$(node -e '
+            const text = require("fs").readFileSync("release/latest.yml", "utf8");
+            const names = new Set();
+            for (const m of text.matchAll(/^\s*(?:-\s*)?(?:url|path):\s*"?([^"\s]+)"?\s*$/gm)) names.add(m[1]);
+            console.log([...names].join("\n"));
+          ')"
+          while IFS= read -r file; do
+            case "$file" in *.zip) continue ;; esac
+            put "$file" application/octet-stream "public,max-age=31536000,immutable"
+            if [ -f "release/${file}.blockmap" ]; then
+              put "${file}.blockmap" application/octet-stream "public,max-age=31536000,immutable"
+            fi
+          done <<< "$FEED_FILES"
+          put "SHA256SUMS-windows" text/plain "no-cache,max-age=60"
+          put "latest.yml" text/yaml "no-cache,max-age=60"
+          echo "Published Windows ${VERSION} to https://updates.worldofclaudecraft.com/desktop/"

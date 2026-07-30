@@ -39,6 +39,11 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
   const systemNotices: { session: Session; text: string }[] = [];
   const spectated: { moderator: Session; target: Session }[] = [];
   const unspectated: Session[] = [];
+  const jailVisits: Session[] = [];
+  const jailVisitExits: Session[] = [];
+  const jailed: { moderator: Session; target: Session; minutes: number }[] = [];
+  const unjailed: { moderator: Session; target: Session }[] = [];
+  const jailedPids = new Set<number>();
   const recordAction = vi.fn<ModerationAudit['recordAction']>(async () => {});
   const mute = vi.fn<ModerationAudit['mute']>(async () => {});
   const ban = vi.fn<ModerationAudit['ban']>(async () => {});
@@ -57,6 +62,17 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
     killEntity: (entityId) => killed.push(entityId),
     enterSpectate: (moderator, target) => spectated.push({ moderator, target }),
     exitSpectate: (moderator) => unspectated.push(moderator),
+    enterJailVisit: (moderator) => jailVisits.push(moderator),
+    exitJailVisit: (moderator) => jailVisitExits.push(moderator),
+    isJailed: (session) => jailedPids.has(session.pid),
+    jail: (moderator, target, minutes) => {
+      jailedPids.add(target.pid);
+      jailed.push({ moderator, target, minutes });
+    },
+    unjail: (moderator, target) => {
+      jailedPids.delete(target.pid);
+      unjailed.push({ moderator, target });
+    },
   };
 
   const service = new ModerationService(host, { recordAction, mute, ban, suspend, forceRename });
@@ -70,6 +86,11 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
     systemNotices,
     spectated,
     unspectated,
+    jailVisits,
+    jailVisitExits,
+    jailed,
+    unjailed,
+    jailedPids,
     recordAction,
     mute,
     ban,
@@ -285,6 +306,101 @@ describe('ModerationService', () => {
       { moderator: actor, target: second },
     ]);
     expect(context.unspectated).toEqual([actor]);
+    expect(context.recordAction).not.toHaveBeenCalled();
+  });
+
+  it('visits and leaves jail without an audit write', () => {
+    const actor = admin(1, 11);
+    const context = setup({ actor });
+
+    expect(context.service.handleChatCommand(actor, '/jail')).toBe(true);
+    expect(context.service.handleChatCommand(actor, '/unjail')).toBe(true);
+
+    expect(context.jailVisits).toEqual([actor]);
+    expect(context.jailVisitExits).toEqual([actor]);
+    expect(context.recordAction).not.toHaveBeenCalled();
+  });
+
+  it('audits jail and unjail before applying their live effect', async () => {
+    const actor = admin(1, 11);
+    const target = player(2, 22);
+    const context = setup({ actor, sessions: [target] });
+
+    expect(context.service.handleChatCommand(actor, '/jail "Player2" 5')).toBe(true);
+    expect(context.jailed).toEqual([]);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(context.recordAction).toHaveBeenCalledWith({
+      action: 'jail',
+      accountId: 22,
+      adminAccountId: 11,
+      reason: 'Jailed by in-game moderator command (5 minutes)',
+    });
+    expect(context.jailed).toEqual([{ moderator: actor, target, minutes: 5 }]);
+    expect(context.systemNotices.map((notice) => notice.text)).toContain(
+      'Jailed Player2 for 5 minutes.',
+    );
+
+    expect(context.service.handleChatCommand(actor, '/unjail "Player2"')).toBe(true);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(context.recordAction).toHaveBeenCalledWith({
+      action: 'unjail',
+      accountId: 22,
+      adminAccountId: 11,
+      reason: 'Released by in-game moderator command',
+    });
+    expect(context.unjailed).toEqual([{ moderator: actor, target }]);
+    expect(context.systemNotices.map((notice) => notice.text)).toContain(
+      'Released Player2 from jail.',
+    );
+  });
+
+  it('carries a custom reason into the audit record', async () => {
+    const actor = admin(1, 11);
+    const target = player(2, 22);
+    const context = setup({ actor, sessions: [target] });
+
+    expect(context.service.handleChatCommand(actor, '/jail "Player2" 10 being a nuisance')).toBe(
+      true,
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(context.recordAction).toHaveBeenCalledWith({
+      action: 'jail',
+      accountId: 22,
+      adminAccountId: 11,
+      reason: 'being a nuisance (10 minutes)',
+    });
+    expect(context.jailed).toEqual([{ moderator: actor, target, minutes: 10 }]);
+    expect(context.systemNotices.map((notice) => notice.text)).toContain(
+      'Jailed Player2 for 10 minutes.',
+    );
+  });
+
+  it('guards malformed jail commands and duplicate jail state', () => {
+    const actor = admin(1, 11);
+    const target = player(2, 22);
+    const context = setup({ actor, sessions: [target] });
+    context.jailedPids.add(target.pid);
+
+    context.service.handleChatCommand(actor, '/jail Player2');
+    context.service.handleChatCommand(actor, '/jail "Player2"');
+    context.service.handleChatCommand(actor, '/jail "Player2" 5');
+    context.service.handleChatCommand(actor, '/unjail Missing');
+    context.jailedPids.delete(target.pid);
+    context.service.handleChatCommand(actor, '/unjail "Player2"');
+
+    expect(context.notices.map((notice) => notice.text)).toEqual([
+      'Usage: /jail ["<name>" <minutes> [reason]]',
+      'Usage: /jail ["<name>" <minutes> [reason]]',
+      'Player2 is already jailed.',
+      'Usage: /unjail ["<name>"]',
+      'Player2 is not jailed.',
+    ]);
     expect(context.recordAction).not.toHaveBeenCalled();
   });
 

@@ -10,19 +10,25 @@
 // document.head and reads the route + the i18n runtime; no app state.
 
 import {
-  getLanguage, languageTag, t, formatNumber, supportedLanguages,
+  formatNumber,
+  getLanguage,
+  languageTag,
+  supportedLanguages,
   type TranslationKey,
+  t,
 } from '../ui/i18n';
-import { hrefFor, type GuideRoute } from './routes';
-import { GLOSSARY_TERMS } from './pages/glossary';
-import { GUIDE_CLASSES } from './content.generated';
+import { GUIDE_CLASSES, GUIDE_PROF_PAGES } from './content.generated';
 import { LEVEL_CAP } from './data';
+import { GLOSSARY_TERMS } from './pages/glossary';
+import { craftById, craftLabel } from './pages/professions_craft';
+import { gatheringById, gatheringLabel } from './pages/professions_gathering';
+import { type GuideRoute, hrefFor } from './routes';
 
 // The site origin. Matches index.html's canonical/og:url host exactly.
 const ORIGIN = 'https://worldofclaudecraft.com';
 const LOGO = `${ORIGIN}/woc_logo_square.webp`;
 const GITHUB_URL = 'https://github.com/levy-street/world-of-claudecraft';
-const DISCORD_URL = 'https://discord.gg/GjhnUsBtw';
+const DISCORD_URL = 'https://discord.com/invite/worldofclaudecraft';
 
 // The newcomer FAQ on /guide/faq, kept in lockstep with pages/faq.ts so the FAQPage
 // JSON-LD answers the same questions the visible page does. cap rows splice the level
@@ -83,12 +89,33 @@ interface RouteHeadInput {
   detailId: string | null;
 }
 
+// Professions detail pages (/wiki/professions/<id>): each detail id's lead key
+// doubles as its meta description, the same reuse the section routes practice.
+function profDescription(detailId: string): string {
+  if (craftById(detailId)) return t(`guide.profPages.craftIntro.${detailId}` as TranslationKey);
+  if (gatheringById(detailId))
+    return t(`guide.profPages.gatherIntro.${detailId}` as TranslationKey);
+  if (detailId === 'economy') return t('guide.profPages.econ.intro');
+  return t('guide.profPages.faq.intro');
+}
+
+/** The localized breadcrumb leaf for one professions detail id. */
+function profLeafLabel(detailId: string): string {
+  if (craftById(detailId)) return craftLabel(detailId);
+  if (gatheringById(detailId)) return gatheringLabel(detailId);
+  if (detailId === 'economy') return t('guide.profPages.econ.title');
+  return t('guide.profPages.faq.title');
+}
+
 /** Resolve a route's meta description from its descKey, or '' when none. */
 function descriptionForRoute(route: GuideRoute | null, detailId: string | null): string {
   if (!route) return t('guide.notFound.body');
   // Class detail pages: build from the class name + its lore (the character-creation copy).
   if (route.id === 'classes' && detailId && GUIDE_CLASSES.some((c) => c.id === detailId)) {
     return `${className(detailId)}: ${classLore(detailId)}`;
+  }
+  if (route.id === 'professions' && detailId && GUIDE_PROF_PAGES.includes(detailId)) {
+    return profDescription(detailId);
   }
   return route.descKey ? t(route.descKey) : t('guide.tagline');
 }
@@ -101,13 +128,17 @@ export function applyRouteHead(input: RouteHeadInput): void {
   const { route, sub, title, detailId } = input;
   const lang = getLanguage();
   const inLanguage = languageTag(lang);
-  // Only the classes route has real detail pages. A trailing param on any other route (or
-  // an unknown class id) is a junk deep path, so canonicalize it back to the section rather
-  // than self-canonicalizing onto the junk URL, and drop the junk breadcrumb leaf.
-  const isClassDetail = route?.id === 'classes' && detailId != null
-    && GUIDE_CLASSES.some((c) => c.id === detailId);
-  const effectiveDetailId = isClassDetail ? detailId : null;
-  const canonSub = route ? (isClassDetail ? `${route.sub}/${detailId}` : route.sub) : sub;
+  // Only the classes and professions routes have real detail pages. A trailing param on
+  // any other route (or an unknown detail id) is a junk deep path, so canonicalize it back
+  // to the section rather than self-canonicalizing onto the junk URL, and drop the junk
+  // breadcrumb leaf.
+  const isClassDetail =
+    route?.id === 'classes' && detailId != null && GUIDE_CLASSES.some((c) => c.id === detailId);
+  const isProfDetail =
+    route?.id === 'professions' && detailId != null && GUIDE_PROF_PAGES.includes(detailId);
+  const isRealDetail = isClassDetail || isProfDetail;
+  const effectiveDetailId = isRealDetail ? detailId : null;
+  const canonSub = route ? (isRealDetail ? `${route.sub}/${detailId}` : route.sub) : sub;
   const url = guideUrl(canonSub);
   const description = descriptionForRoute(route, effectiveDetailId);
   // og:/twitter: titles use the page title without the " - brand" suffix when we can,
@@ -123,7 +154,9 @@ export function applyRouteHead(input: RouteHeadInput): void {
   setMetaName('twitter:title', socialTitle);
   setMetaName('twitter:description', description);
   applyAlternates(canonSub);
-  setStructuredData(buildStructuredData(route, canonSub, url, description, inLanguage, effectiveDetailId));
+  setStructuredData(
+    buildStructuredData(route, canonSub, url, description, inLanguage, effectiveDetailId),
+  );
 }
 
 // ----- head node helpers (query-or-create, then update in place) -----
@@ -229,7 +262,11 @@ function videoGameNode(description: string, inLanguage: string): Record<string, 
 
 // The visible breadcrumb is Guide / Group / Page (+ leaf on a detail page). The group has
 // no page of its own, so it is a name-only list item; the rest carry their absolute URL.
-function breadcrumbNode(route: GuideRoute, sub: string, detailId: string | null): Record<string, unknown> {
+function breadcrumbNode(
+  route: GuideRoute,
+  sub: string,
+  detailId: string | null,
+): Record<string, unknown> {
   const items: Record<string, unknown>[] = [];
   let position = 1;
   items.push(crumb(position++, t('guide.breadcrumb.home'), guideUrl('')));
@@ -241,9 +278,12 @@ function breadcrumbNode(route: GuideRoute, sub: string, detailId: string | null)
   // to the section and the leaf is the detail title.
   items.push(crumb(position++, t(route.navKey), guideUrl(route.sub)));
   if (isDetail) {
-    const leaf = route.id === 'classes' && GUIDE_CLASSES.some((c) => c.id === detailId)
-      ? className(detailId)
-      : detailId;
+    const leaf =
+      route.id === 'classes' && GUIDE_CLASSES.some((c) => c.id === detailId)
+        ? className(detailId)
+        : route.id === 'professions'
+          ? profLeafLabel(detailId)
+          : detailId;
     items.push(crumb(position++, leaf, guideUrl(sub)));
   }
   return { '@type': 'BreadcrumbList', itemListElement: items };

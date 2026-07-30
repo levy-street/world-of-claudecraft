@@ -1,16 +1,37 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { assertFamiliesKnown } from '../scripts/wiki/family_guard.mjs';
+import { BIND_ACTIONS } from '../src/game/keybinds';
 import {
   GUIDE_CLASSES,
+  GUIDE_DEEDS,
   GUIDE_DELVES,
+  GUIDE_DRUID_FORMS,
+  GUIDE_DUNGEONS,
   GUIDE_FAMILIES,
   GUIDE_MODELS,
+  GUIDE_PROF_ARCHETYPES,
+  GUIDE_PROF_CRAFTS,
+  GUIDE_PROF_CURVE,
+  GUIDE_PROF_ECONOMY,
+  GUIDE_PROF_ENCHANTING,
+  GUIDE_PROF_GATHERING,
+  GUIDE_PROF_MASTERWORK,
+  GUIDE_PROF_PAGES,
+  GUIDE_PROF_RING,
+  GUIDE_PROF_STATIONS,
   GUIDE_WARLOCK_PETS,
+  GUIDE_ZONES,
 } from '../src/guide/content.generated';
 import { pageFor } from '../src/guide/pages';
+import { controls as controlsPage } from '../src/guide/pages/controls';
+import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
+import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
+import { professions as professionsPage } from '../src/guide/pages/professions';
+import { world as worldPage } from '../src/guide/pages/world';
 import {
   GUIDE_BASE,
   GUIDE_ROUTES,
@@ -20,8 +41,64 @@ import {
   topbarRoutes,
   toSub,
 } from '../src/guide/routes';
-import { MOBS } from '../src/sim/data';
-import { setLanguage, t } from '../src/ui/i18n';
+import { buildIndex, rank } from '../src/guide/search';
+import { DEEDS } from '../src/sim/content/deeds';
+import { ENCHANTS } from '../src/sim/content/enchants';
+import { GATHER_NODES } from '../src/sim/content/gather_nodes';
+import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import {
+  CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
+  CRAFT_RING,
+  CRAFT_THROTTLE_MAX_PER_WINDOW,
+  CRAFT_THROTTLE_WINDOW_SECONDS,
+  GATHERING_PROFESSION_IDS,
+  GATHERING_PROFESSIONS,
+  PERK_THRESHOLDS,
+  STATION_TYPE_BY_CRAFT,
+  STATIONS,
+} from '../src/sim/content/professions';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
+import {
+  WORK_ORDER_CADENCE_TICKS,
+  WORK_ORDER_PAYOUT_FRACTION,
+} from '../src/sim/professions/cadence';
+import { UNBIND_FEE_BY_QUALITY_TIER } from '../src/sim/professions/commission';
+import {
+  ARMOR_SECONDARY_BY_TYPE,
+  TIMBER_WEAPON_TYPES,
+} from '../src/sim/professions/disenchant_reagents';
+import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/enchanting';
+import { FISHING_GAIN_SCHEDULE } from '../src/sim/professions/fishing';
+import {
+  GATHER_RARE_EVENT_CHANCE,
+  GATHER_RARE_EVENT_YIELD_MULT,
+} from '../src/sim/professions/gather_events';
+import {
+  GATHER_CAST_BAND_REDUCTION_SEC,
+  GATHER_CAST_BASE_SEC,
+  GATHER_CAST_FLOOR_SEC,
+  GATHER_CAST_TOOL_TIER_REDUCTION_SEC,
+  GATHER_GAIN_TIER_STEP,
+} from '../src/sim/professions/gathering';
+import {
+  MASTERWORK_BASE_CHANCE,
+  MASTERWORK_CHANCE_CAP,
+  MASTERWORK_PER_TIER_ABOVE_CHANCE,
+  MASTERWORK_SIGNED_CHANCE,
+  MASTERWORK_SPECIALIZATION_CHANCE,
+} from '../src/sim/professions/masterwork';
+import { SALVAGE_MATERIAL_BY_QUALITY } from '../src/sim/professions/salvage';
+import { TRAINING_FEE_BY_TIER, trainingFeeFor } from '../src/sim/professions/training';
+import {
+  TIER_SKILL_STEP,
+  tierForSkill,
+  tierProgressMultiplier,
+} from '../src/sim/professions/wheel';
+import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
+import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import { guideStrings } from '../src/ui/i18n.catalog/guide';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const publicPath = (url: string): string => resolve(repoRoot, 'public', url.replace(/^\//, ''));
@@ -249,6 +326,7 @@ describe('Guide model viewer asset integrity', () => {
   it('resolves every class, warlock pet, and creature model key in GUIDE_MODELS', () => {
     const keys = new Set<string>();
     for (const c of GUIDE_CLASSES) if (c.model) keys.add(c.model);
+    for (const d of GUIDE_DRUID_FORMS) if (d.model) keys.add(d.model);
     for (const p of GUIDE_WARLOCK_PETS) if (p.model) keys.add(p.model);
     for (const f of GUIDE_FAMILIES) for (const c of f.creatures) if (c.model) keys.add(c.model);
     expect(keys.size).toBeGreaterThan(0);
@@ -358,6 +436,603 @@ describe('Guide bestiary spoiler safety', () => {
   });
 });
 
+// The bestiary walks the canonical MOBS registry, and CAMPS is itself a growing merge.
+// These gates tie the published bestiary to the camp registry, so a camped creature a
+// player can walk into is never unlisted even as new world columns and mob modules land.
+// NOTE: the exclusion filters below (elite/boss, ambient, warlock_, vision, fixture) mirror the
+// generator's own filters in scripts/wiki/build_content.mjs; the two lists must move
+// together, or this completeness gate and the published set silently diverge.
+describe('Guide bestiary completeness', () => {
+  const published = new Set(GUIDE_FAMILIES.flatMap((f) => f.creatures.map((c) => c.templateId)));
+  const isFixture = (m: { dummy?: boolean }) => !!m.dummy;
+
+  it('keys the fixture exclusion off the sim dummy flag (pinned to the training dummy)', () => {
+    // The generator excludes fixtures by the template's own dummy flag, so a zero-damage
+    // real creature (caster- or hazard-only) can never silently vanish from the bestiary.
+    expect(MOBS.training_dummy?.dummy).toBe(true);
+    expect(published.has('training_dummy')).toBe(false);
+  });
+
+  it('fails loudly on a family with no FAMILY_ORDER slot (the generator guard throws)', () => {
+    expect(() => assertFamiliesKnown({ beast: new Map() }, ['beast', 'spider'])).not.toThrow();
+    expect(() => assertFamiliesKnown({ gryphon: new Map() }, ['beast', 'spider'])).toThrow(
+      /gryphon/,
+    );
+  });
+
+  it('publishes every camped, wild, non-fixture creature', () => {
+    const missing: string[] = [];
+    for (const camp of CAMPS) {
+      const m = MOBS[camp.mobId];
+      if (!m || m.elite || m.boss) continue;
+      if (m.ambient) continue; // ambient decoration (stable horses), not a wild creature
+      if (camp.mobId.startsWith('warlock_')) continue;
+      if (/vision/i.test(camp.mobId) || /^Vision\b/.test(m.name)) continue;
+      if (isFixture(m)) continue; // inert practice fixtures (the training dummy)
+      if (!published.has(camp.mobId)) missing.push(`${camp.mobId} (${m.family})`);
+    }
+    expect(missing, `camped creatures missing from the bestiary: ${missing.join(', ')}`).toEqual(
+      [],
+    );
+  });
+
+  it('publishes no inert practice fixture as a creature', () => {
+    const fixtures = [...published].filter((id) => MOBS[id] && isFixture(MOBS[id]));
+    expect(fixtures, `inert fixtures leaked into the bestiary: ${fixtures.join(', ')}`).toEqual([]);
+  });
+
+  it('gives every zone a non-empty resident family list drawn from the bestiary', () => {
+    const familyNames = new Set(GUIDE_FAMILIES.map((f) => f.family));
+    for (const z of GUIDE_ZONES) {
+      expect(z.families.length, `zone ${z.id} lists no resident families`).toBeGreaterThan(0);
+      for (const fam of z.families) {
+        expect(familyNames.has(fam), `zone ${z.id} lists unknown family ${fam}`).toBe(true);
+      }
+    }
+  });
+
+  // The decisive geography pin: burrowers' level band OVERLAPS the marsh's, but every
+  // burrower camp sits outside the marsh z-band, so a regression from camp-geography
+  // back to level-band overlap would re-list burrower here and fail this literal. The
+  // full list is pinned so any silent derivation change surfaces as a reviewable diff.
+  it('derives marsh residents from camp geography, never level-band overlap', () => {
+    const marsh = GUIDE_ZONES.find((z) => z.id === 'mirefen_marsh');
+    expect(marsh).toBeDefined();
+    expect(marsh?.families).not.toContain('burrower');
+    expect(marsh?.families).toEqual(['beast', 'spider', 'mudfin', 'humanoid', 'troll', 'undead']);
+  });
+
+  it('renders the residents cross-links into the bestiary on the world page', () => {
+    setLanguage('en');
+    const html = worldPage.render({ params: [], sub: 'world', titleKey: 'guide.nav.world' });
+    // The marsh card links its troll residents to the bestiary's own family anchor,
+    // with the localized family label as the link text.
+    expect(html).toContain(`href="${hrefFor('bestiary')}#fam-troll"`);
+    expect(html).toContain('>Trolls</a>');
+    // And the geography fix holds at the render layer too: no burrower link on marsh.
+    // (Burrowers still render for the zones that really camp them.)
+    const marshCard = html.slice(html.indexOf('id="zone-marsh"'), html.indexOf('id="zone-peaks"'));
+    expect(marshCard.length).toBeGreaterThan(0);
+    expect(marshCard).not.toContain('#fam-burrower');
+    expect(html).toContain('#fam-burrower');
+  });
+});
+
+// The Book of Deeds page renders entirely from GUIDE_DEEDS, derived from the sim DEEDS table.
+// Its load-bearing invariant is spoiler safety: hidden deeds must never reach the public wiki,
+// and no criteria internals (the trigger, or the desc, which names instanced bosses and
+// encounter mechanics) may be baked. These gates fail the build instead of silently leaking a
+// secret if a future catalog edit or a generator change drops the hidden filter or emits desc.
+describe('Guide deeds spoiler safety', () => {
+  it('excludes every hidden deed from the generated content entirely', () => {
+    // Iterate the SIM table (not the already-filtered guide list): if the generator's hidden
+    // filter were deleted, a hidden deed's id and name would appear here and fail the assert.
+    const hidden = Object.values(DEEDS).filter((d) => d.hidden);
+    expect(hidden.length).toBeGreaterThan(0); // the catalog has hidden deeds; this guard is meaningful
+    for (const d of hidden) {
+      for (const needle of [d.id, d.name, d.desc]) {
+        expect(
+          generatedSource.includes(needle),
+          `hidden deed "${d.id}" leaked "${needle}" into content.generated.ts`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  it('emits exactly the non-hidden deeds, each mapping back to a real def', () => {
+    const expected = Object.values(DEEDS)
+      .filter((d) => !d.hidden)
+      .map((d) => d.id)
+      .sort();
+    expect(expected.length).toBeGreaterThan(0);
+    expect([...GUIDE_DEEDS].map((d) => d.id).sort()).toEqual(expected);
+    for (const gd of GUIDE_DEEDS) {
+      const def = DEEDS[gd.id];
+      expect(def, `GUIDE_DEEDS has an unknown deed id "${gd.id}"`).toBeDefined();
+      expect(def.hidden, `hidden deed "${gd.id}" reached the public catalog`).toBeFalsy();
+    }
+  });
+
+  it('bakes no trigger or desc field (criteria and internals stay off the wiki)', () => {
+    // Exact field allowlist: ANY smuggled field (trigger, desc, the internal border slug,
+    // or anything a future generator edit adds) fails here by name.
+    const allowedFields = new Set([
+      'id',
+      'name',
+      'category',
+      'renown',
+      'feat',
+      'rewardTitle',
+      'rewardBorder',
+      // The painted-crest URL for art-backed deeds. Computed after the hidden filter and
+      // pointing only at /ui/deeds art the game client already ships publicly.
+      'crest',
+    ]);
+    for (const gd of GUIDE_DEEDS) {
+      expect('trigger' in gd, `deed "${gd.id}" leaked its trigger`).toBe(false);
+      expect('desc' in gd, `deed "${gd.id}" leaked its desc`).toBe(false);
+      for (const k of Object.keys(gd)) {
+        expect(allowedFields.has(k), `deed "${gd.id}" emitted unexpected field "${k}"`).toBe(true);
+      }
+    }
+  });
+
+  it('bakes a crest URL for exactly the art-backed public deeds', () => {
+    for (const gd of GUIDE_DEEDS) {
+      if (DEED_IMAGE_IDS.has(gd.id)) {
+        expect(gd.crest, `art-backed deed "${gd.id}" is missing its crest`).toBe(
+          `/ui/deeds/${gd.id}.webp`,
+        );
+      } else {
+        expect(gd.crest, `artless deed "${gd.id}" grew a crest`).toBeUndefined();
+      }
+    }
+    // The ledger actually lights up: a meaningful share of the roll carries art.
+    expect(GUIDE_DEEDS.filter((d) => d.crest).length).toBeGreaterThan(100);
+  });
+
+  it("bakes no deed's desc text into the generated source, hidden or not", () => {
+    // The stronger form of the desc-omission guard: NOT just hidden deeds. Public dungeon,
+    // combat, and delve descs also name instanced bosses and per-encounter mechanics, which the
+    // wiki withholds. If the generator ever emitted desc under any field name, a full desc
+    // sentence would appear in the source text and fail here.
+    for (const d of Object.values(DEEDS)) {
+      expect(
+        generatedSource.includes(d.desc),
+        `deed "${d.id}" desc leaked into content.generated.ts`,
+      ).toBe(false);
+    }
+  });
+
+  it('maps the cosmetic reward to the sim value, not another field', () => {
+    // A title deed carries its sim reward TEXT (not the kind or a slug); a border deed carries
+    // rewardBorder:true and no title. Pins value correctness the freshness gate cannot (a
+    // consistently-wrong mapping regenerates identically).
+    const title = GUIDE_DEEDS.find((d) => d.id === 'prog_veteran');
+    expect(DEEDS.prog_veteran.reward).toEqual({ kind: 'title', text: 'Veteran' });
+    expect(title?.rewardTitle).toBe('Veteran');
+    expect(title?.rewardBorder).toBeUndefined();
+
+    const border = GUIDE_DEEDS.find((d) => d.id === 'prog_prestige_10');
+    expect(DEEDS.prog_prestige_10.reward?.kind).toBe('border');
+    expect(border?.rewardBorder).toBe(true);
+    expect(border?.rewardTitle).toBeUndefined();
+  });
+
+  it('surfaces only grounded, cosmetic-safe fields for each deed', () => {
+    const allowed = new Set([
+      'progression',
+      'combat',
+      'dungeon',
+      'delve',
+      'chronicle',
+      'collection',
+      'pvp',
+      'social',
+      'exploration',
+      'feat',
+    ]);
+    for (const gd of GUIDE_DEEDS) {
+      expect(gd.name.length).toBeGreaterThan(0);
+      expect(
+        allowed.has(gd.category),
+        `deed "${gd.id}" has off-list category "${gd.category}"`,
+      ).toBe(true);
+      expect(gd.category).not.toBe('hidden');
+      expect([0, 5, 10, 25, 50]).toContain(gd.renown);
+      expect(typeof gd.feat).toBe('boolean');
+      // The reward is optional and cosmetic-only, and never both a title and a border at once.
+      expect(gd.rewardTitle !== undefined && gd.rewardBorder !== undefined).toBe(false);
+      if (gd.rewardTitle !== undefined) expect(gd.rewardTitle.length).toBeGreaterThan(0);
+      if (gd.rewardBorder !== undefined) expect(gd.rewardBorder).toBe(true);
+    }
+    // Feats carry zero Renown by design; a non-zero feat here would be a content or mapping bug.
+    for (const gd of GUIDE_DEEDS) if (gd.feat) expect(gd.renown).toBe(0);
+    // Both a title reward and a border reward exist in the public set, so the mapping is exercised.
+    expect(GUIDE_DEEDS.some((d) => d.rewardTitle)).toBe(true);
+    expect(GUIDE_DEEDS.some((d) => d.rewardBorder)).toBe(true);
+    expect(GUIDE_DEEDS.some((d) => d.feat)).toBe(true);
+  });
+
+  it('resolves the deeds nav + page keys in English', () => {
+    setLanguage('en');
+    for (const k of [
+      'guide.nav.deeds',
+      'guide.deedsPage.intro',
+      'guide.deedsPage.howHeading',
+      'guide.deedsPage.howBody',
+      'guide.deedsPage.renownHeading',
+      'guide.deedsPage.renownBody',
+      'guide.deedsPage.rewardsHeading',
+      'guide.deedsPage.rewardsBody',
+      'guide.deedsPage.chroniclesHeading',
+      'guide.deedsPage.chroniclesBody',
+      'guide.deedsPage.featsHeading',
+      'guide.deedsPage.featsBody',
+      'guide.deedsPage.catalogHeading',
+      'guide.deedsPage.catalogBody',
+      'guide.deedsPage.standingsNote',
+      'guide.deedsPage.colName',
+      'guide.deedsPage.colRenown',
+      'guide.deedsPage.colReward',
+      'guide.deedsPage.featTag',
+      'guide.deedsPage.rewardBorder',
+      'guide.deedsPage.cat.progression',
+      'guide.deedsPage.cat.combat',
+      'guide.deedsPage.cat.dungeon',
+      'guide.deedsPage.cat.delve',
+      'guide.deedsPage.cat.chronicle',
+      'guide.deedsPage.cat.collection',
+      'guide.deedsPage.cat.pvp',
+      'guide.deedsPage.cat.social',
+      'guide.deedsPage.cat.exploration',
+      'guide.deedsPage.cat.feat',
+    ]) {
+      expect(t(k as never).length).toBeGreaterThan(0);
+    }
+    // The first Chronicler is sanctioned flavor: the page names Saul.
+    expect(t('guide.deedsPage.chroniclesBody' as never)).toContain('Saul');
+    // The Renown standings live on the Leaderboard's Renown tab, NOT in the Book of
+    // Deeds window; the corrected copy is pinned so the old misdirection cannot return.
+    expect(t('guide.deedsPage.standingsNote' as never)).toContain('Leaderboard');
+    expect(t('guide.deedsPage.standingsNote' as never)).not.toContain('Book of Deeds');
+    expect(t('guide.glossary.renownDef' as never)).toContain('Leaderboard');
+    // The Book, Renown, and titles are character-scoped; only the realm leaderboard
+    // aggregates Renown across an account (each deed counted once). The old copy wrongly
+    // said deeds are "shown across your whole account" and feed the "same collection", so
+    // the corrected phrasing is pinned against the CATALOG source (the resolved English
+    // table is regenerated centrally) so the account-wide misstatement cannot return.
+    expect(guideStrings.deedsPage.howBody).not.toContain('across your whole account');
+    expect(guideStrings.deedsPage.howBody).not.toContain('same collection');
+    expect(guideStrings.deedsPage.howBody).toContain('builds a Book of their own');
+    expect(guideStrings.deedsPage.howBody).toContain(
+      'only the realm leaderboard gathers your Renown',
+    );
+    // The per-category heading is a translator-controlled format, not a hardcoded join.
+    expect(t('guide.deedsPage.catHeading' as never, { label: 'Combat', count: '7' })).toBe(
+      'Combat (7)',
+    );
+    // The two cell labels are pinned as English literals so the render test's
+    // t()-on-both-sides checks stay anchored to real values, not just key resolution.
+    expect(t('guide.deedsPage.rewardBorder' as never)).toBe('Border');
+    expect(t('guide.deedsPage.featTag' as never)).toBe('Feat');
+  });
+
+  it('pins the deeds route wiring to literals', () => {
+    const route = GUIDE_ROUTES.find((r) => r.id === 'deeds');
+    expect(route?.sub).toBe('deeds');
+    expect(route?.navKey).toBe('guide.nav.deeds');
+    expect(route?.group).toBe('compendium');
+  });
+
+  it('renders the whole page: correct per-category counts, no hidden or boss leak', () => {
+    setLanguage('en');
+    // GuidePage.render requires a PageContext; this page renders the same for any ctx
+    // (the route wiring itself is pinned in its own test above).
+    const html = deedsPage.render({ params: [], sub: 'deeds', titleKey: 'guide.nav.deeds' });
+    expect(html.length).toBeGreaterThan(0);
+    expect((html.match(/<h1>/g) ?? []).length).toBe(1);
+    // one row per public deed (the name cell renders exactly once per row)
+    expect((html.match(/class="guide-deed-name"/g) ?? []).length).toBe(GUIDE_DEEDS.length);
+    // every non-empty category renders its heading with a live count; this exercises the render
+    // path and resolves all ten guide.deedsPage.cat.* keys (a missing one throws in test mode).
+    for (const cat of [
+      'progression',
+      'combat',
+      'dungeon',
+      'delve',
+      'chronicle',
+      'collection',
+      'pvp',
+      'social',
+      'exploration',
+      'feat',
+    ]) {
+      const n = GUIDE_DEEDS.filter((d) => d.category === cat).length;
+      expect(n, `category ${cat} unexpectedly empty`).toBeGreaterThan(0);
+      const label = t(`guide.deedsPage.cat.${cat}` as never);
+      expect(html, `heading for ${cat}`).toContain(`${label} (${n})`);
+    }
+    // the title-reward, border-reward, and feat-tag render paths are all exercised
+    expect(html).toContain('Veteran');
+    expect(html).toContain('guide-deed-feat');
+    expect(html.includes(t('guide.deedsPage.rewardBorder'))).toBe(true);
+    // sanctioned Chronicler flavor
+    expect(html).toContain('Saul');
+    // no hidden deed and no boss:true name reaches the rendered page
+    for (const d of Object.values(DEEDS).filter((x) => x.hidden)) {
+      for (const needle of [d.id, d.name, d.desc]) {
+        expect(html.includes(needle), `hidden "${d.id}" leaked "${needle}"`).toBe(false);
+      }
+    }
+    for (const name of Object.values(MOBS)
+      .filter((m) => m.boss)
+      .map((m) => m.name)) {
+      expect(html.includes(name), `boss "${name}" leaked into the rendered page`).toBe(false);
+    }
+  });
+
+  it('survives an empty catalog: sections self-omit, one category renders one section', () => {
+    setLanguage('en');
+    // Empty list => no catalog sections at all (the page then shows the explainer alone).
+    expect(catalogSections([])).toBe('');
+    // A single-category list renders exactly that one section, not the others.
+    const [first] = GUIDE_DEEDS.filter((d) => d.category === 'progression');
+    expect(first).toBeDefined();
+    const one = catalogSections(first ? [first] : []);
+    expect(one).toContain(`${t('guide.deedsPage.cat.progression')} (1)`);
+    expect(one).not.toContain(t('guide.deedsPage.cat.combat'));
+  });
+
+  it('never leaks the boss display name or an encounter mechanic, case-insensitively', () => {
+    // Hardening pin for a refuted spoiler finding: the raid boss display name and
+    // its encounter mechanics never reach the generated wiki, but the scans above
+    // are case-sensitive, so a future generator change that lower-cased or
+    // title-cased one would slip past. The bare 'nythraxis' id-slug and its crest
+    // path (/ui/deeds/dgn_nythraxis*.webp) are the recorded maintainer tolerance
+    // (an id spoils nothing; see the module-graph containment test), so this scans
+    // only the forms that DO spoil: the full display name (with its comma and
+    // title, which no id-slug carries) and the two encounter mechanic strings.
+    const haystack = generatedSource.toLowerCase();
+    for (const secret of ['Nythraxis, Scourge of Thornpeak', 'Deathless Rage', 'Soul Rend']) {
+      expect(
+        haystack.includes(secret.toLowerCase()),
+        `spoiler string "${secret}" leaked into content.generated.ts`,
+      ).toBe(false);
+    }
+  });
+});
+
+// The site search folds the haystack and the needle through the ACTIVE locale, not
+// a locale-agnostic toLowerCase, so a Turkish label that starts with the dotted
+// capital I still matches a query typed in plain ASCII (the deeds-window pattern).
+describe('Guide search locale-insensitive folding', () => {
+  it('matches a Turkish label typed without the dotted capital I (tr_TR)', async () => {
+    // 'Insansilar-with-dotted-capital-I'.toLowerCase() injects a combining dot
+    // after the i, so a locale-agnostic fold never matches a typed plain 'insan'.
+    await ensureLocaleLoaded('tr_TR');
+    try {
+      setLanguage('tr_TR');
+      const humanoid = t('guide.family.humanoid.name' as never);
+      // Guard the premise: the label really begins with the dotted capital I
+      // (U+0130), the letter whose locale-agnostic lowercase breaks the match.
+      expect(humanoid.charCodeAt(0)).toBe(0x0130);
+      const hits = rank(buildIndex(), 'insan');
+      expect(hits.some((e) => e.label === humanoid)).toBe(true);
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('still finds an English entry after the fold change (regression)', () => {
+    setLanguage('en');
+    const hits = rank(buildIndex(), 'first steps');
+    expect(hits.some((e) => e.label === 'First Steps')).toBe(true);
+  });
+});
+
+// The gates above prove hidden deeds stay out of content.generated.ts, but the built wiki
+// also serves every chunk its module graph produces: eager chunks are modulepreloaded from
+// the guide entry, and a dynamic import() starts a lazy chunk that is still built, served,
+// and one click away for a wiki reader. If the guide entry can reach
+// src/sim/content/deeds.ts through value imports on EITHER kind of edge, Rollup bakes the
+// whole catalog (hidden names, descs, criteria) into a chunk the public wiki serves. This
+// walk pins the seam at the source level (the architecture.test.ts convention: scan
+// sources, never run a build inside the suite).
+describe('Guide module-graph spoiler containment', () => {
+  const ASSET_SPEC_RE = /\.(css|json|webp|png|jpg|jpeg|svg|glsl|wasm|mjs)$/;
+
+  const resolveRelative = (fromFile: string, spec: string): string | null => {
+    if (!spec.startsWith('./') && !spec.startsWith('../')) return null;
+    if (ASSET_SPEC_RE.test(spec)) return null;
+    const base = resolve(dirname(fromFile), spec);
+    for (const candidate of [base, `${base}.ts`, `${base}.tsx`, resolve(base, 'index.ts')]) {
+      if (/\.tsx?$/.test(candidate) && existsSync(candidate)) return candidate;
+    }
+    // A silent miss would shrink the walked graph and turn the guard vacuous.
+    throw new Error(`guide graph walk cannot resolve "${spec}" from ${fromFile}`);
+  };
+
+  // Value imports, eager AND lazy: import ... from, bare side-effect imports,
+  // export ... from, and dynamic import() with a literal spec. Type-only
+  // statements (import type / export type) are erased at build time. A dynamic
+  // import() does not color the entry's eager (modulepreloaded) graph, but its
+  // lazy chunk is still built and served to wiki readers, so containment walks
+  // it exactly like an eager edge; a computed spec would hide a chunk from the
+  // walk, so it fails loudly instead of silently shrinking the graph.
+  const valueImportSpecs = (source: string, fromFile: string): string[] => {
+    // One alternation pass: a line comment consumes any "/*" inside it (a
+    // path glob in prose) and a block comment consumes any "//", so neither
+    // strip can eat real code between mismatched markers.
+    const code = source.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, '');
+    const specs: string[] = [];
+    for (const re of [
+      /^[ \t]*import\s+([^'";]*?from\s+)?['"]([^'"]+)['"]/gm,
+      /^[ \t]*export\s+([^'";]*?)from\s+['"]([^'"]+)['"]/gm,
+    ]) {
+      for (const m of code.matchAll(re)) {
+        if (/^type[\s{]/.test((m[1] ?? '').trim())) continue;
+        specs.push(m[2]);
+      }
+    }
+    for (const m of code.matchAll(/\bimport\s*\(\s*(['"]([^'"]+)['"]\s*\))?/g)) {
+      if (m[1] === undefined) {
+        throw new Error(
+          `guide graph walk found a non-literal dynamic import() in ${fromFile}; ` +
+            'use a string-literal spec so the containment walk can follow the lazy chunk',
+        );
+      }
+      specs.push(m[2]);
+    }
+    return specs;
+  };
+
+  it('collects dynamic import() literals and refuses computed specs (lazy chunks are served too)', () => {
+    expect(valueImportSpecs("const { X } = await import('./scene');", 'inline.ts')).toEqual([
+      './scene',
+    ]);
+    expect(valueImportSpecs("import type { X } from './types_only';", 'inline.ts')).toEqual([]);
+    expect(() => valueImportSpecs('const m = await import(specVar);', 'inline.ts')).toThrow(
+      /non-literal dynamic import/,
+    );
+  });
+
+  it('never reaches the deeds catalog from the guide entry (chunk-color containment)', () => {
+    const entry = resolve(repoRoot, 'src/guide/main.ts');
+    const forbidden = resolve(repoRoot, 'src/sim/content/deeds.ts');
+    const parent = new Map<string, string>();
+    const reached = new Set<string>([entry]);
+    const queue = [entry];
+    while (queue.length > 0) {
+      const file = queue.shift() as string;
+      for (const spec of valueImportSpecs(readFileSync(file, 'utf8'), file)) {
+        const target = resolveRelative(file, spec);
+        if (target === null || reached.has(target)) continue;
+        reached.add(target);
+        parent.set(target, file);
+        queue.push(target);
+      }
+    }
+    // Walker sanity: the graph is real, it still reaches the sim/data.ts
+    // aggregate (via icons.ts and the entity localizers), and the lazy arm
+    // actually walks: viewer/scene.ts is reachable ONLY through the dynamic
+    // import in viewer/mount.ts (every static import of it is type-only), so
+    // dropping the import() collection must red this line.
+    expect(reached.size).toBeGreaterThan(50);
+    expect(reached.has(resolve(repoRoot, 'src/sim/data.ts'))).toBe(true);
+    expect(reached.has(resolve(repoRoot, 'src/guide/viewer/scene.ts'))).toBe(true);
+
+    let chain = '';
+    if (reached.has(forbidden)) {
+      const hops: string[] = [forbidden];
+      let cursor: string | undefined = forbidden;
+      while (cursor !== undefined && cursor !== entry) {
+        cursor = parent.get(cursor);
+        if (cursor !== undefined) hops.unshift(cursor);
+      }
+      chain = hops.map((p) => p.slice(repoRoot.length)).join(' -> ');
+    }
+    expect(
+      reached.has(forbidden),
+      `src/sim/content/deeds.ts is reachable from the guide entry: ${chain}`,
+    ).toBe(false);
+
+    // And no hidden deed prose rides ANY module the guide graph reaches (a
+    // future aggregate or a copied table would re-leak the secret without
+    // touching content/deeds.ts). Bare ids are tolerated by maintainer
+    // judgment: deed_image_ids.ts carries them for the committed crest art,
+    // and an id alone spoils nothing.
+    const hidden = Object.values(DEEDS).filter((d) => d.hidden);
+    expect(hidden.length).toBeGreaterThan(0);
+    for (const file of reached) {
+      const source = readFileSync(file, 'utf8');
+      for (const d of hidden) {
+        for (const needle of [d.name, d.desc]) {
+          expect(
+            source.includes(needle),
+            `hidden deed "${d.id}" prose leaked into guide-reachable ${file.slice(repoRoot.length)}`,
+          ).toBe(false);
+        }
+      }
+    }
+  });
+});
+
+// The Book of Deeds sits on two shared guide surfaces beyond its own page: the controls
+// reference (the window bind) and the dungeons page's related links. The controls row mirrors
+// the game's real default bind (src/game/keybinds.ts), so a changed shipped default reds this
+// test instead of silently drifting the public reference.
+describe('Guide deeds cross-page surfaces', () => {
+  it('lists the Book of Deeds bind on the controls page, matching the in-game default', () => {
+    setLanguage('en');
+    const deedsBind = BIND_ACTIONS.find((a) => a.id === 'deeds');
+    expect(deedsBind?.defaults).toEqual(['Shift+KeyZ']);
+    expect(t('guide.controls.deeds')).toBe('Book of Deeds');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    // the key glyph and the label render inside one table row
+    expect(html).toContain('<kbd>Shift+Z</kbd></td><td>Book of Deeds</td>');
+  });
+
+  it('cross-links the deeds catalog from the dungeons page', () => {
+    setLanguage('en');
+    const html = dungeonsPage.render({
+      params: [],
+      sub: 'dungeons',
+      titleKey: 'guide.nav.dungeons',
+    });
+    expect(html).toContain(`href="${hrefFor('deeds')}"`);
+  });
+
+  it('documents heroic mode on the dungeons page with a search anchor per dungeon', () => {
+    setLanguage('en');
+    const html = dungeonsPage.render({
+      params: [],
+      sub: 'dungeons',
+      titleKey: 'guide.nav.dungeons',
+    });
+    // The heroic explainer renders (difficulty, Marks economy, daily rhythm), and the
+    // difficulty-transition escape hatch renders beside it (Reset All Instances).
+    expect(html).toContain('Heroic mode');
+    expect(html).toContain('Heroic Marks');
+    expect(html).toContain('/dungeon heroic');
+    expect(html).toContain('/dungeon reset');
+    // Every generated dungeon card carries its deep-link anchor for site search.
+    for (const d of GUIDE_DUNGEONS) {
+      expect(html, `dungeon card missing anchor id "dungeon-${d.id}"`).toContain(
+        `id="dungeon-${d.id}"`,
+      );
+    }
+  });
+
+  it('documents the new default binds on the controls page', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>T</kbd></td><td>Crafting</td>');
+    expect(html).toContain('<kbd>Y</kbd></td><td>Vale Cup</td>');
+    expect(html).toContain('<kbd>I</kbd></td><td>Event Calendar</td>');
+    expect(html).toContain('<kbd>U</kbd></td><td>Discord</td>');
+    expect(html).toContain('<kbd>Ctrl+1</kbd> <kbd>Ctrl+5</kbd>');
+  });
+
+  it('keeps the documented binds in step with the game defaults', () => {
+    const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
+    expect(defaults.get('crafting')).toEqual(['KeyT']);
+    expect(defaults.get('valecup')).toEqual(['KeyY']);
+    expect(defaults.get('calendar')).toEqual(['KeyI']);
+    expect(defaults.get('discord')).toEqual(['KeyU']);
+    expect(defaults.get('petAttack')).toEqual(['Ctrl+Digit1']);
+    expect(defaults.get('petAggressive')).toEqual(['Ctrl+Digit5']);
+  });
+});
+
 // The bestiary, class, warlock, and gallery pages show a pre-rendered still
 // (public/guide-stills) as the default image of each figure. The generator bakes a `still`
 // URL for every figure with a model; these guards fail the build if a figure is missing its
@@ -366,6 +1041,7 @@ describe('Guide model stills', () => {
   it('bakes a still url for every figure that has a model', () => {
     const missing: string[] = [];
     for (const c of GUIDE_CLASSES) if (c.model && !c.still) missing.push(`class ${c.id}`);
+    for (const d of GUIDE_DRUID_FORMS) if (d.model && !d.still) missing.push(`form ${d.id}`);
     for (const p of GUIDE_WARLOCK_PETS) if (p.model && !p.still) missing.push(`pet ${p.id}`);
     for (const f of GUIDE_FAMILIES) {
       for (const c of f.creatures)
@@ -377,6 +1053,7 @@ describe('Guide model stills', () => {
   it('ships a committed WebP on disk for every baked still url', () => {
     const stills = new Set<string>();
     for (const c of GUIDE_CLASSES) if (c.still) stills.add(c.still);
+    for (const d of GUIDE_DRUID_FORMS) if (d.still) stills.add(d.still);
     for (const p of GUIDE_WARLOCK_PETS) if (p.still) stills.add(p.still);
     for (const f of GUIDE_FAMILIES) for (const c of f.creatures) if (c.still) stills.add(c.still);
     expect(stills.size).toBeGreaterThan(0);
@@ -392,6 +1069,7 @@ describe('Guide model stills', () => {
     const basename = (url: string): string => url.split('/').pop() ?? '';
     const referenced = new Set<string>();
     for (const c of GUIDE_CLASSES) if (c.still) referenced.add(basename(c.still));
+    for (const d of GUIDE_DRUID_FORMS) if (d.still) referenced.add(basename(d.still));
     for (const p of GUIDE_WARLOCK_PETS) if (p.still) referenced.add(basename(p.still));
     for (const f of GUIDE_FAMILIES)
       for (const c of f.creatures) if (c.still) referenced.add(basename(c.still));
@@ -404,5 +1082,665 @@ describe('Guide model stills', () => {
     expect(orphans, `orphan stills with no figure (delete them): ${orphans.join(', ')}`).toEqual(
       [],
     );
+  });
+
+  it('publishes exactly the three named druid forms (the gallery label map mirrors this)', () => {
+    // models.ts labels forms through its FORM_NAME literal map; a fourth form added in
+    // the generator would silently render as "Druid Forms" unless this pin reds first.
+    expect(GUIDE_DRUID_FORMS.map((d) => d.id)).toEqual(['form_bear', 'form_cat', 'form_travel']);
+  });
+});
+
+// Content pins for corrections whose old, wrong copy every other gate would accept:
+// key resolution and render tests only prove a string exists, not that it is true.
+describe('Guide corrected-prose pins', () => {
+  it('names the graveyard keeper by its in-game name on every death surface', () => {
+    setLanguage('en');
+    expect(t('guide.glossary.spiritHealerTerm' as never)).toBe('The Pale Keeper');
+    for (const key of [
+      'guide.combat.deathBody',
+      'guide.howToPlay.deathBody',
+      'guide.wishPage.i2Body',
+    ]) {
+      expect(t(key as never), key).toContain('Pale Keeper');
+      expect(t(key as never), key).not.toContain('Spirit Healer');
+    }
+  });
+
+  it('keeps the delve death exception on the combat death rules', () => {
+    setLanguage('en');
+    expect(t('guide.combat.deathBody' as never)).toContain('Delves are the exception');
+  });
+});
+
+// ============================================================================
+// Professions reference accuracy (Professions 2.0 wiki arm).
+//
+// NUMERIC-TRANSPARENCY CARVE-OUT (a maintainer ruling):
+// the professions sections of the wiki publish EXACT numbers, skill
+// requirements, gain-state boundaries, band thresholds, caps, fees,
+// rare-event odds, and vendor prices, because a crafting reference that hides
+// its numbers is useless. This carve-out is scoped to the GUIDE_PROF_*
+// sections ONLY: the delve/bestiary no-digit spoiler guards above stay
+// untouched and keep applying to their own sections, and narrative content
+// remains spoiler-light everywhere. Every published number below maps back to
+// the live sim def, so the wiki can never drift from the game.
+// ============================================================================
+describe('Guide professions generated content accuracy', () => {
+  const EARNABLE_CRAFT_IDS = [
+    'engineering',
+    'alchemy',
+    'cooking',
+    'leatherworking',
+    'tailoring',
+    'enchanting',
+    'weaponcrafting',
+    'armorcrafting',
+  ];
+
+  it('covers the full ring, honest about the two wave-one content-empty crafts', () => {
+    expect(GUIDE_PROF_RING.map((c) => c.id)).toEqual(CRAFT_RING.map((c) => c.id));
+    for (const c of GUIDE_PROF_RING) {
+      const def = CRAFT_RING.find((r) => r.id === c.id);
+      expect(c.name).toBe(def?.name);
+      expect(c.pole).toBe(def?.pole);
+      expect(c.maxSkill).toBe(def?.maxSkill);
+      expect(c.maxSkill).toBe(125); // every wave-one craft caps at 125
+    }
+    expect(GUIDE_PROF_RING.filter((c) => !c.hasContent).map((c) => c.id)).toEqual([
+      'inscription',
+      'jewelcrafting',
+    ]);
+    expect(GUIDE_PROF_CRAFTS.map((c) => c.id)).toEqual(EARNABLE_CRAFT_IDS);
+  });
+
+  it('emits only allowlisted fields on every craft and recipe row (the GUIDE_DEEDS pattern)', () => {
+    const craftFields = new Set([
+      'id',
+      'name',
+      'pole',
+      'maxSkill',
+      'station',
+      'masters',
+      'specialization',
+      'recipes',
+    ]);
+    const recipeFields = new Set([
+      'id',
+      'name',
+      'skillReq',
+      'tier',
+      'station',
+      'acquisition',
+      'feeCopper',
+      'materials',
+      'output',
+      'combo',
+      'gain',
+    ]);
+    for (const c of GUIDE_PROF_CRAFTS) {
+      for (const k of Object.keys(c)) {
+        expect(craftFields.has(k), `craft "${c.id}" emitted unexpected field "${k}"`).toBe(true);
+      }
+      for (const r of c.recipes) {
+        for (const k of Object.keys(r)) {
+          expect(recipeFields.has(k), `recipe "${r.id}" emitted unexpected field "${k}"`).toBe(
+            true,
+          );
+        }
+        for (const m of r.materials) expect(Object.keys(m).sort()).toEqual(['count', 'name']);
+        expect(Object.keys(r.output).sort()).toEqual(['count', 'name', 'quality']);
+        if (r.combo) expect(Object.keys(r.combo).sort()).toEqual(['crafts', 'minTier']);
+        expect(Object.keys(r.gain).sort()).toEqual(['minimalAt', 'reducedAt', 'zeroAt']);
+      }
+    }
+  });
+
+  it('maps every recipe row back to the sim def with matching numbers', () => {
+    for (const c of GUIDE_PROF_CRAFTS) {
+      const simIds = ALL_RECIPES.filter((r) => r.professionId === c.id)
+        .map((r) => r.id)
+        .sort();
+      expect(c.recipes.map((r) => r.id).sort()).toEqual(simIds);
+      for (const row of c.recipes) {
+        const def = ALL_RECIPES.find((r) => r.id === row.id);
+        expect(def, `recipe row "${row.id}" has no sim def`).toBeDefined();
+        if (!def) continue;
+        expect(row.skillReq).toBe(def.skillReq);
+        expect(row.tier).toBe(tierForSkill(def.skillReq));
+        expect(row.station).toBe(def.stationType ?? null);
+        expect(row.acquisition).toBe(def.acquisition?.includes('trainer') ? 'trainer' : 'known');
+        expect(row.feeCopper).toBe(def.acquisition?.includes('trainer') ? trainingFeeFor(def) : 0);
+        expect(row.materials).toEqual(
+          def.reagents.map((g) => ({ name: ITEMS[g.itemId].name, count: g.count })),
+        );
+        expect(row.output.name).toBe(ITEMS[def.resultItemId].name);
+        expect(row.output.count).toBe(def.resultCount);
+        expect(row.output.quality).toBe(ITEMS[def.resultItemId].quality ?? 'common');
+        if (def.comboRequirement) {
+          expect(row.combo).toEqual({
+            crafts: [def.comboRequirement.craftA, def.comboRequirement.craftB],
+            minTier: def.comboRequirement.minTier,
+          });
+        } else {
+          expect(row.combo).toBeNull();
+        }
+        // The gain boundaries are DECISIVE against the real curve: one skill
+        // point below each boundary still pays the higher rate, and the
+        // boundary itself drops to exactly 0.5 / 0.25 / 0.
+        const rTier = tierForSkill(def.skillReq);
+        expect(tierProgressMultiplier(tierForSkill(row.gain.reducedAt - 1), rTier)).toBe(1);
+        expect(tierProgressMultiplier(tierForSkill(row.gain.reducedAt), rTier)).toBe(0.5);
+        expect(tierProgressMultiplier(tierForSkill(row.gain.minimalAt), rTier)).toBe(0.25);
+        expect(tierProgressMultiplier(tierForSkill(row.gain.zeroAt), rTier)).toBe(0);
+      }
+    }
+  });
+
+  it('pins the spot literals a consistently-wrong regeneration would keep wrong', () => {
+    // The rare-tier warblade: trainer-taught at the forge, 1 gold to learn,
+    // gain fading at 75 / 100 / 125 (tier 2 recipe, TIER_SKILL_STEP 25).
+    const wc = GUIDE_PROF_CRAFTS.find((c) => c.id === 'weaponcrafting');
+    const warblade = wc?.recipes.find((r) => r.id === 'recipe_thorium_warblade');
+    expect(warblade?.name).toBe('Osmium Warblade');
+    expect(warblade?.skillReq).toBe(50);
+    expect(warblade?.station).toBe('forge');
+    expect(warblade?.acquisition).toBe('trainer');
+    expect(warblade?.feeCopper).toBe(10000);
+    expect(warblade?.gain).toEqual({ reducedAt: 75, minimalAt: 100, zeroAt: 125 });
+    expect(TIER_SKILL_STEP).toBe(25);
+    // A grandfathered tool recipe: known to everyone, no fee, tier 3.
+    const eng = GUIDE_PROF_CRAFTS.find((c) => c.id === 'engineering');
+    const pick = eng?.recipes.find((r) => r.id === 'recipe_thorium_mining_pick');
+    expect(pick?.acquisition).toBe('known');
+    expect(pick?.feeCopper).toBe(0);
+    expect(pick?.gain).toEqual({ reducedAt: 100, minimalAt: 125, zeroAt: 150 });
+    // Specialization: skill 75, 20 percent material discount, from content.
+    for (const c of GUIDE_PROF_CRAFTS) {
+      expect(c.specialization.at).toBe(PERK_THRESHOLDS[c.id].specializedSkillThreshold);
+      expect(c.specialization.at).toBe(75);
+      expect(c.specialization.materialDiscountPct).toBe(
+        PERK_THRESHOLDS[c.id].materialDiscountPct * 100,
+      );
+      expect(c.specialization.materialDiscountPct).toBe(20);
+    }
+  });
+
+  it('grounds each craft station and its resident masters in the sim tables', () => {
+    for (const c of GUIDE_PROF_CRAFTS) {
+      expect(c.station).toBe(STATION_TYPE_BY_CRAFT[c.id] ?? null);
+      const simMasters = STATIONS.filter((s) => s.type === c.station);
+      expect(c.masters.length).toBe(c.station ? simMasters.length : 0);
+      for (const m of c.masters) {
+        const npc = Object.values(NPCS).find((n) => n.name === m.name);
+        expect(npc, `master "${m.name}" is not a real NPC`).toBeDefined();
+      }
+    }
+    // Enchanting has no station and no station masters (content fact).
+    const ench = GUIDE_PROF_CRAFTS.find((c) => c.id === 'enchanting');
+    expect(ench?.station).toBeNull();
+    expect(ench?.masters).toEqual([]);
+    // The stations block mirrors the sim table (six stations, radius 20).
+    expect(GUIDE_PROF_STATIONS.radius).toBe(20);
+    expect(GUIDE_PROF_STATIONS.stations.map((s) => s.id)).toEqual(STATIONS.map((s) => s.id));
+    for (const s of GUIDE_PROF_STATIONS.stations) {
+      const def = STATIONS.find((d) => d.id === s.id);
+      expect(s.type).toBe(def?.type);
+      const master = def ? NPCS[def.masterNpcId] : undefined;
+      expect(s.master?.name).toBe(master?.name);
+    }
+  });
+
+  it('lists the ten archetype pairs with ring-true craft ids', () => {
+    expect(GUIDE_PROF_ARCHETYPES).toHaveLength(10);
+    const ringIds = new Set(CRAFT_RING.map((c) => c.id));
+    for (const a of GUIDE_PROF_ARCHETYPES) {
+      expect(a.pairId).toBe(`${a.crafts[0]}+${a.crafts[1]}`);
+      for (const id of a.crafts) expect(ringIds.has(id), `pair craft "${id}" off-ring`).toBe(true);
+      // Every pair title resolves as a real localized key.
+      expect(t(`hudChrome.archetypePair.${a.pairId}` as never).length).toBeGreaterThan(0);
+    }
+    expect(GUIDE_PROF_ARCHETYPES.some((a) => a.pairId === 'weaponcrafting+armorcrafting')).toBe(
+      true,
+    );
+  });
+});
+
+describe('Guide professions gathering accuracy', () => {
+  it('covers the four gathering professions with grounded caps and bands', () => {
+    expect(GUIDE_PROF_GATHERING.map((g) => g.id)).toEqual([...GATHERING_PROFESSION_IDS]);
+    for (const g of GUIDE_PROF_GATHERING) {
+      expect(g.maxSkill).toBe(
+        GATHERING_PROFESSIONS[g.id as keyof typeof GATHERING_PROFESSIONS].maxSkill,
+      );
+      expect(g.bands).toEqual([0, 100, 200]);
+    }
+    expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'mining')?.maxSkill).toBe(100);
+    expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing')?.maxSkill).toBe(200);
+  });
+
+  it('aggregates every world node into its zone row (tool tier = node tier)', () => {
+    const typeFor: Record<string, string> = { mining: 'ore', logging: 'wood', herbalism: 'herb' };
+    for (const g of GUIDE_PROF_GATHERING) {
+      if (g.id === 'fishing') continue;
+      const simNodes = GATHER_NODES.filter((n) => n.type === typeFor[g.id]);
+      const total = (g.nodes ?? []).reduce((sum, row) => sum + row.count, 0);
+      expect(total, `${g.id} node count drifted`).toBe(simNodes.length);
+      for (const row of g.nodes ?? []) {
+        expect(row.toolTier).toBe(row.tier);
+        const zone = ZONES.find((z) => z.name === row.zone);
+        expect(zone, `node row zone "${row.zone}" is not a real zone`).toBeDefined();
+        const simCount = simNodes.filter(
+          (n) => n.zoneId === zone?.id && n.tier === row.tier,
+        ).length;
+        expect(row.count).toBe(simCount);
+      }
+      expect(g.respawnSeconds).toBe(120);
+    }
+    // Spot pin: Thornpeak ships one tier-3 node per gathering type.
+    const mining = GUIDE_PROF_GATHERING.find((g) => g.id === 'mining');
+    const t3 = mining?.nodes?.find((n) => n.tier === 3);
+    expect(t3).toEqual({
+      zone: 'Thornpeak Heights',
+      tier: 3,
+      toolTier: 3,
+      count: 1,
+      material: 'Osmium Ore',
+    });
+  });
+
+  it('mirrors the tool and rod ladders with live vendor prices', () => {
+    // Every gatherTool ItemDef appears exactly once, in its own profession's
+    // ladder, with the def's tier/quality/buyValue.
+    for (const [itemId, def] of Object.entries(ITEMS)) {
+      const use = def.use;
+      if (use?.type !== 'gatherTool') continue;
+      const ladder = GUIDE_PROF_GATHERING.find((g) => g.id === use.professionId);
+      const rows = (ladder?.tools ?? []).filter((tool) => tool.name === def.name);
+      expect(rows, `tool "${itemId}" missing from its ladder`).toHaveLength(1);
+      expect(rows[0].tier).toBe(use.tier);
+      expect(rows[0].quality).toBe(def.quality ?? 'common');
+      expect(rows[0].priceCopper).toBe(def.buyValue ?? null);
+      if (def.buyValue != null) {
+        const stocked = Object.values(NPCS).some((n) => n.vendorItems?.includes(itemId));
+        expect(stocked, `vendor tool "${itemId}" is stocked by no NPC`).toBe(true);
+        expect(rows[0].vendors.length).toBeGreaterThan(0);
+      } else {
+        expect(rows[0].craftedBy).toBe(
+          ALL_RECIPES.find((r) => r.resultItemId === itemId)?.professionId,
+        );
+      }
+    }
+    // The rod ladder: simple pole tier 1, Ironreel t2 at 60c, Silverstream t3
+    // at 150c, all at Trader Wilkes.
+    const fishing = GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing');
+    expect(fishing?.tools.map((tool) => [tool.name, tool.tier, tool.priceCopper])).toEqual([
+      ['Simple Fishing Pole', 1, 20],
+      ['Ironreel Fishing Rod', 2, 60],
+      ['Silverstream Fishing Rod', 3, 150],
+    ]);
+    for (const rod of fishing?.tools ?? []) {
+      expect(
+        rod.vendors.some((v) => v.name === 'Trader Wilkes' || v.name === 'Fisherman Brandt'),
+      ).toBe(true);
+    }
+  });
+
+  it('publishes the exact fishing rhythm, gain schedule, and per-band tables', () => {
+    const f = GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing')?.fishing;
+    expect(f).toBeDefined();
+    if (!f) return;
+    expect(f.biteMinSec).toBe(3);
+    expect(f.biteMaxSec).toBe(8);
+    expect(f.rodBiteReductionSec).toBe(1.5);
+    expect(f.reelWindowSec).toBe(3);
+    expect(f.reelRodBonusSec).toBe(0.75);
+    expect(f.sessionCapSec).toBe(15);
+    expect(f.schedule).toEqual(
+      FISHING_GAIN_SCHEDULE.map((row) => ({ below: row.belowProficiency, gain: row.gain })),
+    );
+    expect(f.schedule).toEqual([
+      { below: 50, gain: 1 },
+      { below: 100, gain: 0.5 },
+      { below: 150, gain: 0.1 },
+      { below: 200, gain: 0.02 },
+    ]);
+    expect(f.junkCutoff).toBe(100);
+    expect(f.rareCatch).toBe('Sunglint Koi');
+    // Band tables mirror the sim tables row for row; weights sum to exactly
+    // 100 per table, so the published pct IS the real probability; band b
+    // needs rod tier b + 1.
+    expect(f.bandTables).toHaveLength(FISHING_TABLES_BY_BAND.length);
+    for (const [band, byZone] of FISHING_TABLES_BY_BAND.entries()) {
+      const pub = f.bandTables[band];
+      expect(pub.rodTierRequired).toBe(band + 1);
+      expect(pub.minProficiency).toBe([0, 100, 200][band]);
+      for (const [zoneId, rows] of Object.entries(byZone)) {
+        const zoneName = ZONES.find((z) => z.id === zoneId)?.name ?? zoneId;
+        const pubZone = pub.zones.find((z) => z.zone === zoneName);
+        expect(pubZone, `band ${band} missing zone ${zoneId}`).toBeDefined();
+        expect(pubZone?.rows).toEqual(
+          rows.map((r) => ({
+            name: r.itemId ? ITEMS[r.itemId].name : null,
+            pct: r.weight,
+            quality: r.itemId ? (ITEMS[r.itemId].quality ?? 'common') : null,
+          })),
+        );
+        expect(pubZone?.rows.reduce((sum, r) => sum + r.pct, 0)).toBe(100);
+      }
+    }
+    // The koi odds stay flat across bands: 3 percent in the Vale and marsh,
+    // 4 in Thornpeak (its odds never scale with skill).
+    for (const band of f.bandTables) {
+      for (const zone of band.zones) {
+        const koi = zone.rows.find((r) => r.name === 'Sunglint Koi');
+        expect(koi?.pct).toBe(zone.zone === 'Thornpeak Heights' ? 4 : 3);
+      }
+    }
+  });
+
+  it('publishes the exact shared curve, cast, and rare-event numbers', () => {
+    const c = GUIDE_PROF_CURVE;
+    expect(c.tierStep).toBe(TIER_SKILL_STEP);
+    expect(c.multipliers).toEqual({ full: 1, reduced: 0.5, minimal: 0.25, none: 0 });
+    expect(c.gatherTierStep).toBe(GATHER_GAIN_TIER_STEP);
+    expect(c.cast).toEqual({
+      baseSec: GATHER_CAST_BASE_SEC,
+      floorSec: GATHER_CAST_FLOOR_SEC,
+      toolTierReductionSec: GATHER_CAST_TOOL_TIER_REDUCTION_SEC,
+      bandReductionSec: GATHER_CAST_BAND_REDUCTION_SEC,
+    });
+    expect(c.cast).toEqual({
+      baseSec: 2.5,
+      floorSec: 1.5,
+      toolTierReductionSec: 0.4,
+      bandReductionSec: 0.15,
+    });
+    expect(c.rareEvent.oneIn).toBe(Math.round(1 / GATHER_RARE_EVENT_CHANCE));
+    expect(c.rareEvent.oneIn).toBe(90);
+    expect(c.rareEvent.yieldMult).toBe(GATHER_RARE_EVENT_YIELD_MULT);
+    expect(c.rareEvent.yieldMult).toBe(5);
+    expect(c.rareEvent.flavors).toEqual({
+      ore: 'pristine_vein',
+      wood: 'ancient_heartwood',
+      herb: 'moonlit_bloom',
+    });
+    // The corpse specimen chance: the rare+ share of the corpse rarity roll
+    // at its fixed baseline (40 * 0.4 / 100 = 16 percent).
+    expect(c.specimenChancePct).toBe(16);
+  });
+});
+
+describe('Guide professions enchanting and economy accuracy', () => {
+  it('mirrors the enchant table, tiered structurally from the reagents', () => {
+    const e = GUIDE_PROF_ENCHANTING;
+    expect(e.enchants.map((row) => row.id).sort()).toEqual(Object.keys(ENCHANTS).sort());
+    for (const row of e.enchants) {
+      const def = ENCHANTS[row.id];
+      expect(row.name).toBe(def.name);
+      expect(row.slot).toBe(def.itemSlot);
+      expect(row.reagents).toEqual(
+        def.reagents.map((g) => ({ name: ITEMS[g.itemId].name, count: g.count })),
+      );
+      expect(row.bonus).toEqual(
+        Object.entries(def.statBonus).map(([stat, value]) => ({ stat, value })),
+      );
+      // Tier is structural: shard = Greater, typed secondary = Runed.
+      const hasShard = def.reagents.some((g) => g.itemId === 'arcane_shard');
+      expect(row.tier === 'greater').toBe(hasShard);
+    }
+    // The five Runed consumer enchants (the only typed-secondary sink).
+    expect(
+      e.enchants
+        .filter((row) => row.tier === 'runed')
+        .map((row) => row.id)
+        .sort(),
+    ).toEqual([
+      'enchant_chest_runeweave',
+      'enchant_helmet_runed_links',
+      'enchant_legs_runed_hide',
+      'enchant_weapon_runed_edge',
+      'enchant_weapon_runed_focus',
+    ]);
+    expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(6);
+  });
+
+  it('mirrors the disenchant, typed-secondary, and salvage yield maps', () => {
+    const e = GUIDE_PROF_ENCHANTING;
+    expect(e.disenchantByQuality).toEqual(
+      Object.entries(DISENCHANT_MATERIAL_BY_QUALITY).map(([quality, m]) => ({
+        quality,
+        material: ITEMS[m].name,
+      })),
+    );
+    expect(e.disenchantByQuality).toEqual([
+      { quality: 'common', material: 'Chime Dust' },
+      { quality: 'uncommon', material: 'Chime Dust' },
+      { quality: 'rare', material: 'Chime Essence' },
+      { quality: 'epic', material: 'Chime Shard' },
+      { quality: 'legendary', material: 'Chime Shard' },
+    ]);
+    expect(e.typedSecondaries.armor).toEqual(
+      Object.entries(ARMOR_SECONDARY_BY_TYPE).map(([armorType, m]) => ({
+        armorType,
+        material: ITEMS[m].name,
+      })),
+    );
+    expect(e.typedSecondaries.meleeWeapons).toBe(ITEMS.resonant_steel.name);
+    expect(e.typedSecondaries.timberWeapons.material).toBe(ITEMS.resonant_timber.name);
+    expect(e.typedSecondaries.timberWeapons.families).toEqual([...TIMBER_WEAPON_TYPES].sort());
+    expect(e.typedSecondaries.counts).toEqual({ rare: 1, epicMin: 1, epicMax: 2 });
+    expect(e.salvageByQuality).toEqual(
+      Object.entries(SALVAGE_MATERIAL_BY_QUALITY).map(([quality, m]) => ({
+        quality,
+        material: ITEMS[m].name,
+      })),
+    );
+  });
+
+  it('publishes the exact fees, throttle, masterwork odds, and market cut', () => {
+    const e = GUIDE_PROF_ECONOMY;
+    expect(e.craftFeeCopperPerBudgetPoint).toBe(CRAFT_GOLD_SINK_COPPER_PER_BUDGET);
+    expect(e.craftFeeCopperPerBudgetPoint).toBe(2);
+    expect(e.actionThrottle).toEqual({
+      windowSeconds: CRAFT_THROTTLE_WINDOW_SECONDS,
+      maxActions: CRAFT_THROTTLE_MAX_PER_WINDOW,
+    });
+    expect(e.actionThrottle).toEqual({ windowSeconds: 60, maxActions: 10 });
+    expect(e.marketCutPct).toBe(Math.round(MARKET_CUT * 100));
+    expect(e.marketCutPct).toBe(5);
+    expect(e.listingDepositCopper).toBe(MARKET_LISTING_DEPOSIT_COPPER);
+    expect(e.listingDepositCopper).toBe(0);
+    expect(e.trainingFeeCopperByTier).toEqual([...TRAINING_FEE_BY_TIER]);
+    expect(e.trainingFeeCopperByTier).toEqual([0, 2500, 10000, 40000, 160000]);
+    expect(e.unbindFeeCopper).toEqual({
+      uncommon: UNBIND_FEE_BY_QUALITY_TIER[0],
+      rare: UNBIND_FEE_BY_QUALITY_TIER[1],
+      epic: UNBIND_FEE_BY_QUALITY_TIER[2],
+    });
+    expect(e.unbindFeeCopper).toEqual({ uncommon: 2500, rare: 10000, epic: 40000 });
+    const mw = GUIDE_PROF_MASTERWORK;
+    expect(mw.basePct).toBe(Math.round(MASTERWORK_BASE_CHANCE * 100));
+    expect(mw.perTierAbovePct).toBe(Math.round(MASTERWORK_PER_TIER_ABOVE_CHANCE * 100));
+    expect(mw.signedReagentPct).toBe(Math.round(MASTERWORK_SIGNED_CHANCE * 100));
+    expect(mw.specializedPct).toBe(Math.round(MASTERWORK_SPECIALIZATION_CHANCE * 100));
+    expect(mw.capPct).toBe(Math.round(MASTERWORK_CHANCE_CAP * 100));
+    expect(mw).toEqual({
+      basePct: 3,
+      perTierAbovePct: 1,
+      signedReagentPct: 2,
+      specializedPct: 3,
+      capPct: 15,
+    });
+  });
+
+  it('lists every work order on the shared cadence, coin matching the payout formula', () => {
+    const wo = GUIDE_PROF_ECONOMY.workOrders;
+    expect(wo.cadenceMinutes).toBe(WORK_ORDER_CADENCE_TICKS / 20 / 60);
+    expect(wo.cadenceMinutes).toBe(30);
+    // Literal arm first so the constant-derived checks below are never
+    // self-referential: the fraction itself is the pinned contract.
+    expect(WORK_ORDER_PAYOUT_FRACTION).toBe(0.5);
+    expect(wo.payoutPctOfVendorValue).toBe(WORK_ORDER_PAYOUT_FRACTION * 100);
+    expect(wo.payoutPctOfVendorValue).toBe(50);
+    const simOrders = Object.values(QUESTS).filter(
+      (q) =>
+        q.repeatCadenceTicks === WORK_ORDER_CADENCE_TICKS &&
+        (q.objectives ?? []).length > 0 &&
+        q.objectives.every((o) => o.type === 'collect'),
+    );
+    expect(simOrders.length).toBeGreaterThanOrEqual(6);
+    expect(wo.orders.map((o) => o.id).sort()).toEqual(simOrders.map((q) => q.id).sort());
+    for (const order of wo.orders) {
+      const quest = QUESTS[order.id];
+      const obj = quest.objectives[0];
+      expect(obj.type).toBe('collect');
+      if (obj.type !== 'collect') continue;
+      expect(order.name).toBe(quest.name);
+      expect(order.master).toBe(NPCS[quest.giverNpcId]?.name ?? '');
+      expect(order.count).toBe(obj.count);
+      expect(order.material).toBe(ITEMS[obj.itemId].name);
+      // The payout formula, from the sim's own constant
+      // (its 0.5 value is literal-pinned above).
+      const vendorValue = (ITEMS[obj.itemId].sellValue ?? 0) * obj.count;
+      expect(order.coinCopper, `work order "${order.id}" coin off-formula`).toBe(
+        Math.floor(WORK_ORDER_PAYOUT_FRACTION * vendorValue),
+      );
+      expect(order.coinCopper).toBe(quest.copperReward ?? 0);
+    }
+  });
+});
+
+describe('Guide professions pages and routes', () => {
+  const ctx = (params: string[]) => ({
+    params,
+    sub: 'professions',
+    titleKey: 'guide.nav.professions' as const,
+  });
+
+  it('derives the detail-page list from the generated data', () => {
+    expect(GUIDE_PROF_PAGES).toEqual([
+      ...GUIDE_PROF_CRAFTS.map((c) => c.id),
+      ...GUIDE_PROF_GATHERING.map((g) => g.id),
+      'economy',
+      'faq',
+    ]);
+  });
+
+  it('renders every detail page with exactly one h1 and real generated tables', () => {
+    setLanguage('en');
+    for (const id of GUIDE_PROF_PAGES) {
+      const html = professionsPage.render(ctx([id]));
+      expect((html.match(/<h1>/g) ?? []).length, `page "${id}" h1 count`).toBe(1);
+      expect(html).not.toContain('guide-notfound');
+    }
+    // The craft page really renders its recipe rows.
+    const weapon = professionsPage.render(ctx(['weaponcrafting']));
+    expect(weapon).toContain('Osmium Warblade');
+    expect((weapon.match(/class="guide-prof-recipe/g) ?? []).length).toBe(
+      GUIDE_PROF_CRAFTS.find((c) => c.id === 'weaponcrafting')?.recipes.length,
+    );
+    // The enchanting route rides the craft module with its own sections.
+    const ench = professionsPage.render(ctx(['enchanting']));
+    expect(ench).toContain('Enchant Weapon - Runed Edge');
+    expect(ench).toContain('Chime Shard');
+    expect(ench).toContain('id="prof-disenchant"');
+    // The fishing page renders all three band tables and the koi.
+    const fishing = professionsPage.render(ctx(['fishing']));
+    expect(fishing).toContain('Sunglint Koi');
+    expect(fishing).toContain('id="fish-band-2"');
+    // The economy page renders the work orders.
+    const econ = professionsPage.render(ctx(['economy']));
+    expect(econ).toContain('Forge Work Order');
+    // An unknown id renders the inline not-found, never a blank page.
+    expect(professionsPage.render(ctx(['nonsense']))).toContain('guide-notfound');
+  });
+
+  it('rewrites the overview into the hub: ring cards, links, and honesty about empty crafts', () => {
+    setLanguage('en');
+    const html = professionsPage.render(ctx([]));
+    expect((html.match(/<h1>/g) ?? []).length).toBe(1);
+    for (const id of GUIDE_PROF_PAGES) {
+      expect(html, `overview missing link to "${id}"`).toContain(
+        `href="${hrefFor(`professions/${id}`)}"`,
+      );
+    }
+    // The two content-empty crafts appear but do NOT link anywhere.
+    expect(html).not.toContain(`href="${hrefFor('professions/jewelcrafting')}"`);
+    expect(html).not.toContain(`href="${hrefFor('professions/inscription')}"`);
+    expect(html).toContain(t('guide.professions.comingSoon'));
+    // All ten archetype pair titles render.
+    for (const a of GUIDE_PROF_ARCHETYPES) {
+      expect(html).toContain(t(`hudChrome.archetypePair.${a.pairId}` as never));
+    }
+  });
+
+  it('lists every professions detail page in the sitemap', () => {
+    const origin = 'https://worldofclaudecraft.com';
+    for (const id of GUIDE_PROF_PAGES) {
+      const loc = `${origin}${hrefFor(`professions/${id}`)}`;
+      expect(sitemapXml, `sitemap missing professions page "${id}"`).toContain(`<loc>${loc}</loc>`);
+    }
+  });
+
+  it('indexes the professions detail pages in site search', () => {
+    setLanguage('en');
+    const index = buildIndex();
+    expect(index.some((e) => e.href === hrefFor('professions/weaponcrafting'))).toBe(true);
+    expect(index.some((e) => e.href === hrefFor('professions/fishing'))).toBe(true);
+    const hits = rank(index, 'weaponcrafting');
+    expect(hits.some((e) => e.href === hrefFor('professions/weaponcrafting'))).toBe(true);
+  });
+
+  it('resolves the new professions keys in English', () => {
+    setLanguage('en');
+    for (const k of [
+      'guide.professions.ringHeading',
+      'guide.professions.ringWaveNote',
+      'guide.professions.gatherHubHeading',
+      'guide.professions.archetypesHeading',
+      'guide.professions.curveHeading',
+      'guide.professions.provenanceHeading',
+      'guide.professions.stationsHeading',
+      'guide.profPages.back',
+      'guide.profPages.recipesHeading',
+      'guide.profPages.masteryHeading',
+      'guide.profPages.masterworkHeading',
+      'guide.profPages.trainingHeading',
+      'guide.profPages.specializationHeading',
+      'guide.profPages.ench.disenchantHeading',
+      'guide.profPages.ench.enchantsHeading',
+      'guide.profPages.ench.salvageHeading',
+      'guide.profPages.rhythmHeading',
+      'guide.profPages.nodesHeading',
+      'guide.profPages.toolsHeading',
+      'guide.profPages.bandsHeading',
+      'guide.profPages.rareHeading',
+      'guide.profPages.fish.biteHeading',
+      'guide.profPages.fish.tablesHeading',
+      'guide.profPages.econ.title',
+      'guide.profPages.econ.feesHeading',
+      'guide.profPages.econ.workOrdersHeading',
+      'guide.profPages.faq.title',
+    ]) {
+      expect(t(k as never).length, k).toBeGreaterThan(0);
+    }
+    for (const c of GUIDE_PROF_CRAFTS) {
+      expect(t(`guide.profPages.craftIntro.${c.id}` as never).length).toBeGreaterThan(0);
+    }
+    for (const g of GUIDE_PROF_GATHERING) {
+      expect(t(`guide.profPages.gatherIntro.${g.id}` as never).length).toBeGreaterThan(0);
+    }
+    for (let n = 1; n <= 8; n += 1) {
+      expect(t(`guide.profPages.faq.q${n}` as never).length).toBeGreaterThan(0);
+      expect(t(`guide.profPages.faq.a${n}` as never).length).toBeGreaterThan(0);
+    }
+    // Format keys stay translator-controlled, pinned as literals.
+    expect(t('guide.profPages.matFmt' as never, { name: 'Copper Ore', count: '4' })).toBe(
+      'Copper Ore x4',
+    );
+    expect(
+      t('guide.profPages.gainFmt' as never, { reduced: '75', minimal: '100', zero: '125' }),
+    ).toBe('75 / 100 / 125');
   });
 });

@@ -25,8 +25,8 @@ import { LOCALE_LOADERS, SUPPORTED_LANGUAGES } from './i18n.resolved.generated/l
 import { pending } from './i18n.resolved.generated/pending';
 
 // Re-export the dense per-locale objects so const-importers of './i18n' keep an unchanged
-// surface: the S3 guard (tests/localization_fixes.test.ts) and the SHA harness
-// (scripts/i18n_resolved_hash.mjs) read every locale const by name. This is a PURE
+// surface: the S3 guard (tests/localization_fixes.test.ts) and the byte-equivalence
+// diagnostic (scripts/i18n_resolved_hash.mjs) read every locale const by name. This is a PURE
 // re-export (export-from, NO local binding): the app runtime references none of these names
 // through './i18n' - every read-path below (t, translationValue, hasTranslation, tOptional)
 // reads the lazy `resident` table instead - so Rollup drops the unused re-export and
@@ -91,6 +91,17 @@ let currentLanguage: SupportedLanguage = 'en';
 // the shipped bundle entirely.
 const DEV_PSEUDO_LOCALE = 'en_XA';
 let pseudoActive = false;
+
+/** Whether the dev-only en_XA pseudo-locale is active (accent-push + brackets on
+ *  English, {placeholders} preserved). The `!import.meta.env.PROD` guard mirrors
+ *  tableFor, so a release build statically resolves this to `false` and any
+ *  consumer's pseudo branch tree-shakes away. Player text that resolves its
+ *  English OUTSIDE the catalog table (deed names/descs/titles come from the sim
+ *  content table, so tableFor never pseudo-folds them) consults this to fold at
+ *  render time (src/ui/deed_i18n.ts). */
+export function isPseudoActive(): boolean {
+  return !import.meta.env.PROD && pseudoActive;
+}
 
 export function isSupportedLanguage(value: string): value is SupportedLanguage {
   return SUPPORTED_SET.has(value);

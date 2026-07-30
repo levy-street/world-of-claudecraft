@@ -77,9 +77,10 @@
 }
 </script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Self-hosted webfonts (SIL OFL, see CREDITS.md): the @font-face rules live in the
+     guide stylesheet; preload only the two above-the-fold critical faces. -->
+<link rel="preload" as="font" type="font/woff2" href="/fonts/cinzel-400-700-latin.woff2" crossorigin />
+<link rel="preload" as="font" type="font/woff2" href="/fonts/alegreya-sans-400-latin.woff2" crossorigin />
 
 <!-- LCP: the overview hero backdrop. Preload it high-priority since the SPA renders the
      hero after the module parses, so the image is not otherwise parser-discoverable. -->

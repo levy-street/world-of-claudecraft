@@ -45,7 +45,21 @@ import {
 import { passesTurnstile } from '../server/turnstile';
 import { isWebClientRequest } from '../server/web_login_guard';
 import { buildWebSocketAuthMessage, buildWebSocketUrl } from '../src/net/online';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
+import type { WorldContent } from '../src/sim/types';
+
+// The one Sim-backed test here only round-trips a serialized character; no
+// assertion reads ambient world content, so strip camps/npcs/ground objects
+// to keep construction cheap (the dot_final_tick subsystem-world pattern).
+const GM_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
+import { ONLINE_WORLD_AUTH_TYPE, ONLINE_WORLD_LAYOUT_VERSION } from '../src/world_api';
 
 function fakeReq(headers: Record<string, string>, remoteAddress: string) {
   const req: any = new EventEmitter();
@@ -72,6 +86,15 @@ function withUsernameBanlist(env: { inline?: string; file?: string }, test: () =
 }
 
 describe('websocket authentication', () => {
+  it('pins the strict world-layout auth epoch for symmetric mixed-release rejection', () => {
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(3);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-3');
+    // The previous layout-gated server accepts only `auth-world-2`, so the new
+    // client discriminator must remain necessarily unrecognizable to it.
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-2');
+  });
+
   it('keeps bearer tokens out of the websocket URL', () => {
     const url = buildWebSocketUrl('https:', 'worldofclaudecraft.com');
 
@@ -81,19 +104,21 @@ describe('websocket authentication', () => {
 
   it('sends credentials as an auth message instead of query params', () => {
     expect(buildWebSocketAuthMessage('a'.repeat(64), 42)).toEqual({
-      t: 'auth',
+      t: ONLINE_WORLD_AUTH_TYPE,
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: '',
+      timerWire: 2,
     });
   });
 
   it('carries the client seed when one is supplied', () => {
     expect(buildWebSocketAuthMessage('a'.repeat(64), 42, 'seed-123')).toEqual({
-      t: 'auth',
+      t: ONLINE_WORLD_AUTH_TYPE,
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: 'seed-123',
+      timerWire: 2,
     });
   });
 });
@@ -539,12 +564,17 @@ describe('gm privilege boundaries', () => {
   });
 
   it('does not restore gm privilege from client-controlled saved character state', () => {
-    const source = new Sim({ seed: 42, playerClass: 'warrior' });
+    const source = new Sim({ seed: 42, playerClass: 'warrior', world: GM_TEST_WORLD });
     const state = source.serializeCharacter(source.playerId) as any;
     state.gm = true;
     state.is_gm = true;
 
-    const target = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const target = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: GM_TEST_WORLD,
+    });
     const pid = target.addPlayer('warrior', 'Tester', { state });
 
     expect(target.entities.get(pid)?.gm).not.toBe(true);

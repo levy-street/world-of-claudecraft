@@ -30,7 +30,7 @@ function derive(cls: PlayerClass, level: number, mut?: (m: TalentModifiers) => v
     mods = emptyModifiers();
     mut(mods);
   }
-  recalcPlayerStats(e, cls, {}, mods);
+  recalcPlayerStats(e, cls, {}, mods, {});
   return {
     str: e.stats.str,
     agi: e.stats.agi,

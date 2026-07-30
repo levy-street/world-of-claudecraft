@@ -5,6 +5,7 @@
 //  - multiple classes:        warrior / mage / rogue / hunter / warlock / paladin
 //  - meleeSwing weaponStrike:  heroic_strike (warrior), sinister_strike (rogue)
 //  - auto-attack + mobSwing:   solo_warrior (mob swings back)
+//  - frost proc draw order:    frost_proc_orb (Frozen Orb pulses + one proc-producing frostbolt)
 //  - frenzy + on-hit affix:    affix_mob (old_greyjaw frenzyOnHit + ridge_stalker bleed)
 //  - mob-swing affix cascade:  mob_swing_affixes (stun/venom/silence/rampage + friendly-pet short-circuit, M3)
 //  - pets:                     hunter_pet (updateRangedPetAttack), warlock_pet (mobSwing pet arm + applyTaunt)
@@ -13,16 +14,26 @@
 //  - delve + lockpick:         delve_lockpick
 //  - loot roll:                solo_warrior (death->rollLoot), party_loot (need/greed)
 //  - loot distribution (L1):   l1_loot_distribution (fair-split remainder draw, need/greed/pass, personal/looter-takes-all)
+//  - master loot:              master_loot (assign direct/duplicate-pid/convert, tie-break draw)
 //
 // All drives are MOVE-safe: they only call public Sim methods + the documented
 // internal plumbing the existing tests use (createMob/addEntity, dealDamage,
 // mobSwing, spawnDelveModule), never reaching into not-yet-extracted internals
 // in a way the sim itself does not already expose.
 
-import { arenaOrigin, DELVES, instanceOrigin, MOBS, PROPS, QUESTS } from '../../src/sim/data';
+import {
+  arenaOrigin,
+  DELVES,
+  DUNGEON_X_THRESHOLD,
+  instanceOrigin,
+  MOBS,
+  PROPS,
+  QUESTS,
+} from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';
 import { enterDungeon } from '../../src/sim/instances/dungeons';
 import { solveLockActions } from '../../src/sim/lockpick';
+import { gatherCastDurationSec } from '../../src/sim/professions/gathering';
 import { Sim } from '../../src/sim/sim';
 import { addThreat } from '../../src/sim/threat';
 import {
@@ -40,12 +51,18 @@ import {
   xpForLevel,
 } from '../../src/sim/types';
 import { terrainHeight } from '../../src/sim/world';
+import { OPEN_FIELD } from '../helpers/open_field';
 import type { Recorder, Scenario } from './record';
 
 // ----- shared helpers ---------------------------------------------------------
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
+
+// Combat-only fixtures need a deterministic patch that does not overlap a town
+// landmark. This south-field anchor keeps their authored relative spacing while
+// decoupling the scenarios from Eastbrook's southeast civic lot.
+const EASTBROOK_PARITY_OPEN_FIELD = { x: 2, z: -21 } as const;
 
 // Move an entity to (x,z) on the terrain and keep the spatial grid consistent —
 // the same idiom every existing scenario test uses.
@@ -161,6 +178,7 @@ function soloMage(): Scenario {
       sim.setPlayerLevel(10);
       const p = sim.player as AnyEntity;
       beef(p);
+      teleport(sim, p, OPEN_FIELD.x, OPEN_FIELD.z);
       const mob = spawnMob(sim, 'forest_wolf', 5, p.pos.x, p.pos.y, p.pos.z + 18);
       beef(mob, 9000);
       rec.track(mob.id);
@@ -174,6 +192,55 @@ function soloMage(): Scenario {
         rec.tick(16);
         face(p, mob);
       }
+    },
+  };
+}
+
+// Committed-Frost draw coverage: Frozen Orb reaches its pulse damage and Icicle
+// path, then the seed-pinned Rimelance impact grants both random procs. The
+// shared-rng digest therefore catches either proc draw moving or disappearing.
+function frostProcOrb(): Scenario {
+  return {
+    name: 'frost_proc_orb',
+    coverage: [
+      'class:mage (committed frost)',
+      'Frozen Orb pulse damage + Icicle generation',
+      'Fingers of Frost proc draw from frostbolt',
+      'Brain Freeze proc draw from frostbolt',
+    ],
+    build: () => new Sim({ seed: 43, playerClass: 'mage', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(20);
+      sim.setSpec('frost');
+      const p = sim.player as AnyEntity;
+      const mob = spawnMob(sim, 'training_dummy', 20, p.pos.x, p.pos.y, p.pos.z + 4);
+      beef(mob, 500000);
+      mob.aiState = 'idle';
+      rec.track(mob.id);
+      face(p, mob);
+      sim.targetEntity(mob.id);
+
+      p.resource = p.maxResource;
+      sim.castAbility('frozen_orb');
+      rec.tick(30);
+
+      p.gcdRemaining = 0;
+      p.resource = p.maxResource;
+      sim.castAbility('frostbolt');
+      for (let tick = 0; tick < 100; tick++) {
+        const events = rec.tick(1);
+        if (p.auras.some((aura) => aura.kind === 'fingers_of_frost')) {
+          rec.notes.sawFingersOfFrost = true;
+        }
+        if (p.auras.some((aura) => aura.kind === 'brain_freeze')) {
+          rec.notes.sawBrainFreeze = true;
+        }
+        if (events.some((event) => event.type === 'damage' && event.ability === 'Rimelance')) {
+          break;
+        }
+      }
+      rec.snapshot('frost-procs');
     },
   };
 }
@@ -294,6 +361,7 @@ function mobSwingAffixes(): Scenario {
       const sim = rec.sim as AnySim;
       sim.setPlayerLevel(16);
       const p = sim.player as AnyEntity;
+      teleport(sim, p, EASTBROOK_PARITY_OPEN_FIELD.x, EASTBROOK_PARITY_OPEN_FIELD.z);
       // beef() does not stick on a player (applyAura -> recalcPlayerStats resets maxHp,
       // and several affixes ride negative buff_* drains); top the player up right before
       // each swing so it survives every draw, mirroring mob_locomotion's reviveTarget.
@@ -497,6 +565,7 @@ function petAi(): Scenario {
       const sim = rec.sim as AnySim;
       sim.setPlayerLevel(12);
       const p = sim.player as AnyEntity;
+      teleport(sim, p, OPEN_FIELD.x, OPEN_FIELD.z);
       beef(p);
 
       // Emberkin (petRanged demon): pre-targeted on a beefed wolf inside bolt range so
@@ -1244,6 +1313,16 @@ function drownedLitany(): Scenario {
         addThreat(boss, p.id, 5000);
         aggroOnto(boss, p);
         sim.startAutoAttack();
+        // `beef` is a synthetic parity-only health override. Live stat-aura
+        // recalculation can legitimately restore the authored max HP during the
+        // pull, so refresh the override one tick at a time; otherwise a single
+        // Tolling Bell can kill the driver before Blackwater Mark is exercised.
+        const bossTicks = (ticks: number) => {
+          for (let i = 0; i < ticks; i++) {
+            rec.tick(1);
+            beef(p);
+          }
+        };
         // Past the 70% gate -> cantor phase 1 (shield adds), then ride out the
         // 14s mark timer + ~12s first volley window on the driver's rng draws.
         sim.dealDamage(
@@ -1257,7 +1336,7 @@ function drownedLitany(): Scenario {
           true,
         );
         for (let round = 0; round < 15; round++) {
-          rec.tick(20);
+          bossTicks(20);
           if (!boss.dead) face(p, boss);
         }
         rec.notes.marksSeen = (run.nhaliaBoss?.marks?.length ?? 0) as number;
@@ -1271,7 +1350,7 @@ function drownedLitany(): Scenario {
           const m = sim.entities.get(id) as AnyEntity | undefined;
           if (m && !m.dead && m.templateId === 'drowned_cantor') lethal(sim, p, m);
         }
-        rec.tick(20);
+        bossTicks(20);
         sim.dealDamage(
           p,
           boss,
@@ -1282,7 +1361,7 @@ function drownedLitany(): Scenario {
           'hit',
           true,
         );
-        rec.tick(40);
+        bossTicks(40);
         sim.dealDamage(
           p,
           boss,
@@ -1293,7 +1372,7 @@ function drownedLitany(): Scenario {
           'hit',
           true,
         );
-        rec.tick(40);
+        bossTicks(40);
         lethal(sim, p, boss);
       }
       rec.tick(6); // reliquary + shrines rise, rite awaits the intensity choice
@@ -1437,6 +1516,143 @@ function l1LootDistribution(): Scenario {
       // b claims the personal slot and the returned-to-corpse openToAll item.
       sim.lootCorpse(mob.id, b);
       rec.snapshot('after-loot-b');
+      rec.tick(2);
+    },
+  };
+}
+
+// Master loot: a 4-member party on master loot over a corpse carrying three
+// copies of a threshold-meeting drop, driving the three assignment arms below
+// AND both places master loot reaches the shared rng stream (#2523: nothing
+// in this file used to touch assignMasterLoot / setPartyLootMaster at all, so a
+// reordered master-loot draw was invisible to the draw-order digest):
+//  - DIRECT GRANT: a single assigned target takes the item, drawing NOTHING;
+//  - DUPLICATE PID: a pid named twice collapses to that same single-target grant
+//    instead of converting into a one-player roll, the exact input class whose
+//    draw sequence #2505 (PR #2521) changed;
+//  - CONVERSION: a multi-target assignment reopens the roll as a need/greed
+//    contest over a strict SUBSET of the candidates (b/c/d, never the looter a),
+//    whose three submitLootRoll ctx.rng.int(1,100) draws TIE at the top, so
+//    resolveLootRoll's tie-break ctx.rng.int(0, tiedWinners.length - 1) -- the
+//    draw a master-loot resolution can reach and a plain need/greed roll usually
+//    does not -- lands in the log too.
+// The seed is load-bearing: 1091 makes those three rolls tie (b and c both roll
+// 97, d rolls 43), and a sweep of 1031 to 1230 found only two others that tie at
+// all (1165, 1170). Nothing is ticked before the resolution, so the tie hangs
+// only off the ctor + join draws, not off ambient world simulation; if a future
+// change to those moves the stream, the coverage test's draw-delta assertion
+// fails loudly and the seed must be re-swept (record the scenario for each
+// candidate seed and keep one whose resolution spends FOUR draws, three need
+// rolls plus the tie-break) rather than the tie assertion dropped. The payoff is
+// that the WHOLE scenario
+// draws exactly four times, all four of them master-loot draws, so its draw
+// digest is a near-pure instrument for this slice.
+// NOT driven here, and all zero-draw, so they would need a state-side pin rather
+// than a draw delta (tests/loot_master_sim.test.ts covers each directly): the
+// empty-target refusal that leaves the prompt open (#2526), the rejection of a
+// caller who is not the master looter, the departed-single-target convert, the
+// MASTER_LOOT_TIMEOUT convert in resolveLootRoll, removePlayerFromLootRolls's
+// master-looter convert, and setPartyLootMaster's non-leader error arm.
+function masterLoot(): Scenario {
+  return {
+    name: 'master_loot',
+    coverage: [
+      'setPartyLootMaster enable + threshold change',
+      'startMasterLootRoll (threshold met, masterLoot prompt to the looter only)',
+      'assignMasterLoot direct grant (single target, no rng draw)',
+      'assignMasterLoot duplicate pid dedupes to the direct grant (#2505)',
+      'convertMasterRollToNeedGreed over a candidate subset',
+      'resolveLootRoll tie-break rng.int over tied need rolls',
+    ],
+    // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge. This branch
+    // never touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
+    // here); its extra content just moves the shared rng before the rolls, and at
+    // 1091 the need rolls stopped TYING. The tie is the whole point of the
+    // scenario's last coverage line (resolveLootRoll's tie-break rng.int), so the
+    // seed is re-hunted to keep two rollers level rather than re-recorded to
+    // whatever the new draw happens to be.
+    build: () => new Sim({ seed: 1326, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const a = sim.addPlayer('warrior', 'Aaa');
+      const b = sim.addPlayer('mage', 'Bbb');
+      const c = sim.addPlayer('rogue', 'Ccc');
+      const d = sim.addPlayer('priest', 'Ddd');
+      sim.partyInvite(b, a);
+      sim.partyAccept(b);
+      sim.partyInvite(c, a);
+      sim.partyAccept(c);
+      sim.partyInvite(d, a);
+      sim.partyAccept(d);
+      teleport(sim, sim.entities.get(a)!, 20, 20);
+      teleport(sim, sim.entities.get(b)!, 21, 20);
+      teleport(sim, sim.entities.get(c)!, 22, 20);
+      teleport(sim, sim.entities.get(d)!, 23, 20);
+      // Leader-only switch, both message arms: enable (looter 0 = pinned to the
+      // leader, a) above the drop's quality, then lower the threshold onto it.
+      sim.setPartyLootMaster(true, 0, 'epic', a);
+      sim.setPartyLootMaster(true, 0, 'uncommon', a);
+      const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, {
+        x: 20,
+        y: terrainHeight(20, 22, sim.cfg.seed),
+        z: 22,
+      }) as AnyEntity;
+      mob.dead = true;
+      mob.lootable = true;
+      mob.tappedById = a;
+      mob.lootRecipientIds = [a, b, c, d];
+      // Three uncommon copies: one per assignment arm below. Master loot outranks
+      // need-greed in awardSharedLootItem, so each copy opens a curate-phase roll.
+      mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 3 }] };
+      sim.addEntity(mob);
+      rec.track(mob.id);
+      sim.lootCorpse(mob.id, a);
+      rec.snapshot('master-rolls-open');
+      const rollIds = [
+        ...new Set(
+          (rec.allEvents as { type: string; rollId?: number }[])
+            .filter((e) => e.type === 'masterLoot')
+            .map((e) => e.rollId as number),
+        ),
+      ];
+      rec.notes.rollIds = rollIds;
+      rec.notes.pids = { a, b, c, d };
+      // A candidate trying to vote on a roll still in its curate phase is refused
+      // by submitLootRoll's master-loot guard, and refused BEFORE the int(1,100)
+      // draw. This frame pins that the attempt costs zero draws, so hoisting that
+      // draw above the guard (the classic early-bail reorder) reddens the gate.
+      // BOTH choice kinds are tried: a 'need' would draw if the guard let it
+      // through (so the rng stream detects that), but a 'pass' never draws at any
+      // callsite, so nothing in the trace would notice a guard that admitted one.
+      // The recorded choice count below is what covers that second arm; it is read
+      // from pendingLootRolls, which the trace deliberately never samples.
+      if (rollIds[2] !== undefined) {
+        sim.submitLootRoll(rollIds[2], 'need', d);
+        sim.submitLootRoll(rollIds[2], 'pass', b);
+        const pending = (sim as any).pendingLootRolls as Map<
+          number,
+          { choices: Map<number, unknown> }
+        >;
+        rec.notes.refusedChoiceCount = pending.get(rollIds[2])?.choices.size ?? -1;
+      }
+      rec.snapshot('curate-phase-vote-refused');
+      // Arm 1: one target -> direct grant to b. No rng draw.
+      if (rollIds[0] !== undefined) sim.assignMasterLoot(rollIds[0], [b], a);
+      rec.snapshot('assigned-direct');
+      // Arm 2: c named twice -> deduped to the same direct grant. No rng draw.
+      if (rollIds[1] !== undefined) sim.assignMasterLoot(rollIds[1], [c, c], a);
+      rec.snapshot('assigned-duplicate-pid');
+      // Arm 3: three targets -> the roll converts to need/greed for that subset.
+      if (rollIds[2] !== undefined) sim.assignMasterLoot(rollIds[2], [b, c, d], a);
+      rec.snapshot('assigned-converted');
+      // The third submit fills the choice map and resolves: three int(1,100)
+      // draws, then the tie-break int(0,1) between b and c.
+      if (rollIds[2] !== undefined) {
+        sim.submitLootRoll(rollIds[2], 'need', b);
+        sim.submitLootRoll(rollIds[2], 'need', c);
+        sim.submitLootRoll(rollIds[2], 'need', d);
+      }
+      rec.snapshot('roll-resolved');
       rec.tick(2);
     },
   };
@@ -1865,8 +2081,10 @@ function questCollectTurnIn(): Scenario {
       const sim = rec.sim as AnySim;
       const p = sim.player as AnyEntity;
       const quest = QUESTS.q_boars;
-      const item = quest.objectives[0].itemId as string; // boar_hide
-      const need = quest.objectives[0].count; // 5
+      const objective = quest.objectives[0];
+      if (objective.type !== 'collect') throw new Error('q_boars must collect boar_hide');
+      const item = objective.itemId;
+      const need = objective.count; // 5
       const npc = [...sim.entities.values()].find(
         (e: AnyEntity) => e.kind === 'npc' && e.templateId === quest.giverNpcId,
       ) as AnyEntity | undefined;
@@ -2003,7 +2221,7 @@ function partyRaid(): Scenario {
 
 // Talent application (G1a): exercise every sim-side talent method (applyTalents /
 // respec / saveLoadout + switchLoadout / setSpec) on a max-level warrior so the flat
-// `talentMods` struct re-bakes and the known-ability list flips on each change. Drives
+// canonical row modifiers re-bake and the known-ability list flips on each change. Drives
 // NO rng (talent application is deterministic validation + struct baking), so the draw
 // digest stays empty/byte-identical across the extraction. Pure snapshots, no ticks, so
 // the player never enters combat and the talent-lock guard never trips.
@@ -2011,10 +2229,10 @@ function talentsProgression(): Scenario {
   return {
     name: 'talents_progression',
     coverage: [
-      'applyTalents valid spec build (G1a) + recomputeTalents flat-struct bake',
-      'respec wipes ranks, keeps spec',
+      'applyTalents valid spec+rows build (G1a) + recomputeTalents flat-struct bake',
+      'respec wipes row choices, keeps spec',
       'saveLoadout (object-alloc overload) + switchLoadout (2 of 4 slots)',
-      'setSpec drops the prior spec tree points',
+      'setSpec preserves class-wide row choices',
       'refreshKnownAbilities(announce=false): known-ability list flips per change',
     ],
     sampleEvery: 2,
@@ -2025,27 +2243,126 @@ function talentsProgression(): Scenario {
       // (1) Apply a valid Arms build: the flat talentMods bakes + known list changes.
       sim.applyTalents({
         spec: 'arms',
-        ranks: { war_cruelty: 2, arms_imp_overpower: 2 },
-        choices: {},
+        rows: {
+          5: 'war_row_double_charge',
+          8: 'war_row_die_by_the_sword',
+        },
       });
       rec.snapshot('apply-arms');
-      // (2) Respec: ranks wiped, spec retained, stats revert.
+      // (2) Respec: row choices wiped, spec retained.
       sim.respec();
       rec.snapshot('respec');
       // (3) Save the respec'd build as a loadout (the HUD positional-alloc overload),
       // apply a different build, then switch back to slot 0.
       sim.saveLoadout('Arms', ['mortal_strike', 'overpower', null], {
         spec: 'arms',
-        ranks: { arms_imp_overpower: 2 },
-        choices: {},
+        rows: { 8: 'war_row_die_by_the_sword' },
       });
-      sim.applyTalents({ spec: 'arms', ranks: { war_cruelty: 3 }, choices: {} });
+      sim.applyTalents({ spec: 'arms', rows: { 8: 'war_row_victory_rush' } });
       rec.snapshot('second-build');
       sim.switchLoadout(0);
       rec.snapshot('switch-loadout');
-      // (4) Set spec to Fury: the prior (Arms) spec tree's points drop; class points stay.
+      // (4) Set spec to Fury: the class-wide level-8 choice stays selected.
       sim.setSpec('fury');
       rec.snapshot('set-spec');
+    },
+  };
+}
+
+// The four newest warrior choice-row talents end to end, pinning their rng draw
+// sites in global stream order: Double Charge's spend + sequential recharge
+// bookkeeping (abilityCharges via casting_lifecycle / updateTimers),
+// Intimidating Shout's aoeFear flee-heading draws with Lingering Dread's break
+// threshold armed, Victory Rush's on-kill window aura + selfHealPctMax heal,
+// and Bladestorm's self-centered channel (per-tick position pulse + damage
+// draws). Restored from the pre-revert payload (f274835b1^): pickRowTalent(row
+// index) became selectTalentRow(row LEVEL), and the payload's
+// entity.charges.get(id).spent bookkeeping moved to Entity.abilityCharges.
+function warriorRowCapstones(): Scenario {
+  return {
+    name: 'warrior_row_capstones',
+    coverage: [
+      'double charge: two spends while one recharge runs',
+      'aoeFear headings + Lingering Dread breakThreshold',
+      'victory rush on-kill window + selfHealPctMax',
+      'bladestorm self-centered channel ticks',
+    ],
+    sampleEvery: 4,
+    build: () => new Sim({ seed: 1015, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(MAX_LEVEL);
+      sim.selectTalentRow(5, 'war_row_double_charge');
+      sim.selectTalentRow(8, 'war_row_victory_rush');
+      sim.selectTalentRow(11, 'war_row_lingering_dread');
+      sim.selectTalentRow(20, 'war_row_bladestorm');
+      const p = sim.player as AnyEntity;
+      beef(p);
+      // Anchor everything on the nearest ambient camp mob's clearing: known
+      // walkable, line-of-sight-clear ground (charging from the raw spawn
+      // point hits props at this seed).
+      const anchor = [...sim.entities.values()].find(
+        (e) => (e as AnyEntity).kind === 'mob' && !(e as AnyEntity).dead,
+      ) as AnyEntity;
+      const ax = anchor.pos.x;
+      const az = anchor.pos.z;
+      const mobA = spawnMob(sim, 'forest_wolf', 8, ax, anchor.pos.y, az);
+      const mobB = spawnMob(sim, 'forest_wolf', 8, ax + 3, anchor.pos.y, az);
+      beef(mobA, 8000);
+      beef(mobB, 8000);
+      rec.track(mobA.id);
+      rec.track(mobB.id);
+      // Double Charge: two back-to-back charges while the first recharge runs.
+      teleport(sim, p, ax - 12, az);
+      sim.targetEntity(mobA.id);
+      face(p, mobA);
+      sim.castAbility('charge');
+      rec.tick(8);
+      teleport(sim, p, mobB.pos.x - 12, mobB.pos.z);
+      sim.targetEntity(mobB.id);
+      face(p, mobB);
+      sim.castAbility('charge');
+      // Coverage anchor: both stored uses spent while one recharge timer runs
+      // (the classic single-cooldown gate would have blocked cast #2).
+      const chargeState = p.abilityCharges?.charge;
+      rec.notes.chargeSpent = chargeState
+        ? chargeState.maxCharges - chargeState.charges
+        : undefined;
+      rec.notes.chargeRecharging = (chargeState?.recharge ?? 0) > 0;
+      rec.snapshot('double-charge-spent');
+      rec.tick(8);
+      // Intimidating Shout with the Lingering Dread threshold armed: both wolves
+      // are inside the 8yd shout (two flee-heading rng draws).
+      teleport(sim, p, mobA.pos.x - 3, mobA.pos.z);
+      p.resource = 50;
+      p.gcdRemaining = 0;
+      sim.castAbility('intimidating_shout');
+      rec.snapshot('feared');
+      rec.tick(8);
+      // Victory Rush: a lethal blow opens the window; the strike on a fresh
+      // dummy heals 20% of max health and consumes it.
+      const prey = spawnMob(sim, 'forest_wolf', 2, p.pos.x + 2, p.pos.y, p.pos.z);
+      rec.track(prey.id);
+      sim.targetEntity(prey.id);
+      face(p, prey);
+      lethal(sim, p, prey);
+      const dummy = spawnMob(sim, 'forest_wolf', 8, p.pos.x + 2.5, p.pos.y, p.pos.z);
+      beef(dummy, 9000);
+      rec.track(dummy.id);
+      sim.targetEntity(dummy.id);
+      face(p, dummy);
+      p.hp = Math.floor(p.maxHp * 0.6);
+      p.gcdRemaining = 0;
+      sim.castAbility('victory_rush');
+      rec.snapshot('victory-rush');
+      // Bladestorm: the self-centered channel pulses around the caster; the
+      // dummy stands inside the storm for its full duration.
+      p.resource = p.maxResource;
+      p.gcdRemaining = 0;
+      sim.castAbility('bladestorm');
+      rec.tick(20 * 5);
+      rec.snapshot('bladestorm-done');
+      rec.tick(4);
     },
   };
 }
@@ -2720,6 +3037,10 @@ function nythraxisFullPull(): Scenario {
       const sim = rec.sim as AnySim;
       const tankPid = sim.addPlayer('warrior', 'NyxTank') as number;
       sim.setPlayerLevel(MAX_LEVEL, tankPid);
+      // Exercise the winning tank identity explicitly. A level-cap raid tank
+      // with no committed specialization is not a representative v0.26 player
+      // state and bypasses Protection's equipment/mastery revalidation.
+      sim.setSpec('prot', tankPid);
       (sim.players.get(tankPid) as any).questsDone.add('q_nythraxis_bound_guardian'); // attune
       const dpsPids: number[] = [];
       for (let i = 0; i < 4; i++) {
@@ -2753,19 +3074,30 @@ function nythraxisFullPull(): Scenario {
 
       // Tank in melee in front of the throne; four mages stacked tightly behind him
       // (within Soul Rend's 5yd stack range so a triple mark splits the damage three
-      // ways and nobody is one-shot).
+      // ways and nobody is one-shot; Soul Rend scales with maxHp, so the ROOM_HP
+      // pool below does not cover an unsplit mark, only the stack split does).
       floorTeleport(tank, boss.pos.x, boss.pos.z - 6, boss.pos.y);
       const dps = dpsPids.map((pid) => sim.entities.get(pid) as AnyEntity);
       dps.forEach((e, i) => {
         floorTeleport(e, boss.spawnPos.x + (i - 1.5), boss.spawnPos.z - 20, boss.pos.y);
       });
       const room = [tank, ...dps];
+      // The parity fixture pins draw order: deaths skip an entity's rng draws and
+      // derail the recorded stream, and the retuned normal boss one-shots the
+      // ungeared starter-kit fixture tank. Give the whole room a non-lethal hp
+      // pool so no single tick's damage can kill anyone. The pool is re-applied
+      // in topUp (not set once) because recalcPlayerStats reverts maxHp on any
+      // player aura expiry. Soul Rend and Deathless Rage scale with maxHp, so
+      // their relative behavior is unchanged.
+      const ROOM_HP = 50_000;
       const topUp = () => {
         for (const e of room) {
-          e.hp = e.maxHp;
+          e.maxHp = ROOM_HP;
+          e.hp = ROOM_HP;
           e.dead = false;
         }
       };
+      topUp(); // arm the hp pool before the first tick
       // Tick n times, restoring every room player to full after each tick so the
       // room is never empty at the next updateNythraxisEncounter wipe check.
       const step = (n: number) => {
@@ -2783,8 +3115,9 @@ function nythraxisFullPull(): Scenario {
       step(1); // init the encounter (intro yells)
       rec.snapshot('engage');
 
-      // ----- Phase 1: Gravebreaker (rng.range) + a forced Raise Fallen add wave -----
-      step(20 * 2); // ~2s: gravebreakerTimer (1.5) elapses -> rng.range draw + front cone
+      // ----- Phase 1: Gravebreaker (charged auto-attack) + a forced Raise Fallen add wave -----
+      (boss.nythraxis as any).gravebreakerTimer = DT; // arm the charge next tick...
+      step(20 * 2); // ...and release it on the next LANDED swing (front-cone splash)
       (boss.nythraxis as any).raiseFallenTimer = DT; // fire the add wave next tick
       step(1);
       const adds = [...sim.entities.values()].filter(
@@ -2942,13 +3275,21 @@ function c3AuraRunner(): Scenario {
       p.fiveSecondRule = 99;
       p.hp = Math.max(1, p.maxHp - 600);
       p.resource = Math.max(0, p.maxResource - 300);
-      p.eating = { itemId: 'parity_food', kind: 'food', hpPer2s: 90, manaPer2s: 0, remaining: 6 };
+      p.eating = {
+        itemId: 'parity_food',
+        kind: 'food',
+        hpPer2s: 90,
+        manaPer2s: 0,
+        remaining: 6,
+        ticksElapsed: 0,
+      };
       p.drinking = {
         itemId: 'parity_drink',
         kind: 'drink',
         hpPer2s: 0,
         manaPer2s: 50,
         remaining: 6,
+        ticksElapsed: 0,
       };
       p.auras.push(
         aura({
@@ -3215,17 +3556,20 @@ function mobLifecycle(): Scenario {
       rec.notes.addDespawned = !sim.entities.has(add.id);
       rec.snapshot('respawn');
 
-      // 5) Dungeon mob stays dead: spawnPos past DUNGEON_X_THRESHOLD (600) -> the
-      // corpse-tick respawn gate is skipped, the mob never respawns into the wild.
+      // 5) Dungeon mob stays dead: spawnPos past DUNGEON_X_THRESHOLD -> the
+      // corpse-tick respawn gate is skipped, the mob never respawns into the
+      // wild. (The threshold moved east with the instance plane in the world
+      // grid stage 2; place relative to it, not at a literal x.)
+      const dungeonX = DUNGEON_X_THRESHOLD + 100;
       const dungeonMob = spawnMob(
         sim,
         'forest_wolf',
         5,
-        700,
-        terrainHeight(700, 300, sim.cfg.seed),
+        dungeonX,
+        terrainHeight(dungeonX, 300, sim.cfg.seed),
         300,
       );
-      dungeonMob.spawnPos = { x: 700, y: dungeonMob.pos.y, z: 300 };
+      dungeonMob.spawnPos = { x: dungeonX, y: dungeonMob.pos.y, z: 300 };
       rec.track(dungeonMob.id);
       lethal(sim, player, dungeonMob);
       dungeonMob.corpseTimer = 0;
@@ -3380,6 +3724,9 @@ function c4bEffectDispatch(): Scenario {
       ];
       for (const pid of [warrior, mage, rogue, paladin, druid, warlock])
         sim.setPlayerLevel(20, pid);
+      // Armor Shear is an authored Protection ability in the winning Warrior
+      // kit; make the scenario's intended dispatch arm reachable explicitly.
+      sim.setSpec('prot', warrior);
       for (const [x, e] of cells) {
         teleport(sim, e, x, -45);
         beef(e, 50000);
@@ -3428,6 +3775,9 @@ function c4bEffectDispatch(): Scenario {
       rec.snapshot('warrior-sunder');
 
       // --- mage: arcane_explosion (aoeDamage per-target rng.range over 2 mobs) ---
+      // Aetherburst is Chronomancer-gated (owner spec split 2026-07-14); commit the
+      // arcane spec so it stays known, the same idiom as the warrior's prot above.
+      sim.setSpec('arcane', mage);
       const mobM1 = spawnMob(sim, 'forest_wolf', 8, eMage.pos.x + 2, eMage.pos.y, eMage.pos.z + 1);
       const mobM2 = spawnMob(sim, 'forest_wolf', 8, eMage.pos.x - 2, eMage.pos.y, eMage.pos.z + 2);
       for (const m of [mobM1, mobM2]) {
@@ -3484,6 +3834,50 @@ function c4bEffectDispatch(): Scenario {
       sim.targetEntity(druid, druid); // self-target the friendly hot
       sim.castAbility('rejuvenation', druid); // hot
       rec.snapshot('druid-moonfire-forms');
+    },
+  };
+}
+
+// Hit-rating parity pair: the same seeded mage casts once at a +3 target, with and
+// without four authored Hit pieces. The coverage test compares the two traces'
+// shared-RNG count + digest. Gear changes the existing spell-hit threshold and the
+// sampled entity state, but must not insert, remove, or reorder a draw.
+function hitRatingHeroic(withHitGear: boolean): Scenario {
+  return {
+    name: withHitGear ? 'hit_rating_heroic_geared' : 'hit_rating_heroic_ungeared',
+    coverage: [
+      'Hit rating from authored gear vs a +3 target',
+      'same shared-RNG draw count/order as the ungeared spell-resist path',
+    ],
+    sampleEvery: 10,
+    build: () => new Sim({ seed: 1021, playerClass: 'mage' }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(20);
+      if (withHitGear) {
+        for (const itemId of [
+          'shadowpulse_handwraps',
+          'sash_of_the_sunken_court',
+          'lunar_choir_leggings',
+          'lunar_tide_greatstaff',
+        ]) {
+          sim.addItem(itemId, 1);
+          sim.equipItem(itemId);
+        }
+      }
+      const p = sim.player as AnyEntity;
+      beef(p, 50000);
+      const mob = spawnMob(sim, 'forest_wolf', 23, p.pos.x, p.pos.y, p.pos.z + 2);
+      beef(mob, 50000);
+      mob.aiState = 'idle';
+      rec.track(mob.id);
+      face(p, mob);
+      sim.targetEntity(mob.id);
+      p.resource = p.maxResource;
+      sim.castAbility('fireball');
+      rec.tick(120);
+      rec.snapshot('fireball-landed');
+      rec.notes.mobId = mob.id;
     },
   };
 }
@@ -3639,12 +4033,28 @@ function marketRoundTrip(): Scenario {
 
       // 2) browse filter narrows to the wolf_fang listing, then clears.
       sim.marketSearch(
-        { search: 'wolf', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 },
+        {
+          search: 'wolf',
+          itemType: 'all',
+          subtype: 'all',
+          armorClass: 'all',
+          primaryStat: 'all',
+          rarity: 'all',
+          page: 0,
+        },
         seller,
       );
       rec.snapshot('searched');
       sim.marketSearch(
-        { search: '', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 },
+        {
+          search: '',
+          itemType: 'all',
+          subtype: 'all',
+          armorClass: 'all',
+          primaryStat: 'all',
+          rarity: 'all',
+          page: 0,
+        },
         seller,
       );
       rec.snapshot('search-cleared');
@@ -3745,6 +4155,12 @@ function inventoryVendor(): Scenario {
       sim.addItem('elixir_of_the_bear', 1, buyer);
       sim.useItem('elixir_of_the_bear', buyer);
       rec.snapshot('quaffed-elixir');
+      // A second same-stat elixir pins the per-kind exclusivity path (the
+      // shared elixir_buff_sta id replaces the Bear aura, last drunk wins,
+      // plus the fade event for the displaced different-name aura).
+      sim.addItem('elixir_of_the_serpent', 1, buyer);
+      sim.useItem('elixir_of_the_serpent', buyer);
+      rec.snapshot('quaffed-second-elixir');
 
       // 5) discard one of a gray stack.
       sim.addItem('wolf_fang', 3, buyer);
@@ -3761,7 +4177,7 @@ function inventoryVendor(): Scenario {
       rec.snapshot('sold-junk');
 
       // 8) buy one back (copper spend + addItemSilent + onInventoryChangedForQuests).
-      sim.buyBackItem('wolf_fang', buyer);
+      sim.buyBackItem('wolf_fang', undefined, undefined, buyer);
       rec.snapshot('bought-back');
     },
   };
@@ -4008,9 +4424,261 @@ function chatSocial(): Scenario {
   };
 }
 
+// Card Duel minigame: queue two players at the Card Master, let the tick
+// matchmake them, then play out one full round of cards. Exercises the rng
+// draws createCardHand (two, on match start) and drawOne (two, per round)
+// so they land in the golden trace instead of never being captured (no prior
+// scenario ever queued two players for this system).
+function cardDuel(): Scenario {
+  return {
+    name: 'card_duel',
+    coverage: [
+      'Card Duel minigame: queue + matchmake at the Card Master',
+      'createCardHand rng draw (match start, both sides)',
+      'drawOne rng draw (round resolution, both sides)',
+    ],
+    sampleEvery: 5,
+    build: () => new Sim({ seed: 1010, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const a = sim.addPlayer('warrior', 'Aleph');
+      const b = sim.addPlayer('mage', 'Bet');
+      teleport(sim, sim.entities.get(a)!, 13, 2);
+      teleport(sim, sim.entities.get(b)!, 13, 2);
+      sim.joinCardDuelQueue(a);
+      sim.joinCardDuelQueue(b);
+      rec.tick(1); // updateCardDuelQueue() matchmakes the pair (createCardHand x2)
+      const match = sim.cardDuelMatchFor(a);
+      if (match) {
+        sim.playCardInDuel(match.handA.hand[0], a);
+        sim.playCardInDuel(match.handB.hand[0], b); // resolves the round (drawOne x2)
+      }
+      rec.tick(20 * 2);
+    },
+  };
+}
+
+// Professions 2.0 craft path (the masterwork model). The parity net had ZERO
+// craft coverage (grep craft: no hits before this), so the whole craft
+// rng/draw-order/event contract was invisible to the goldens. This scenario pins
+// it permanently in one deterministic sequence with a snapshot after each craft:
+//  1. a DENIAL (no materials) draws no rng and stamps an ok:false lastCraftResult;
+//  2. a plain deterministic craft (recipe_minor_healing_potion) draws EXACTLY ONE
+//     rng at the retired-quality-roll position -- the masterwork proc roll -- and,
+//     because a consumable (potion) def can never masterwork, grants the def
+//     quality (common) with no masterwork effect;
+//  3. a masterwork PROC craft (recipe_eastbrook_ritual_vestments) fires the proc:
+//     it mints a signed instance carrying rolled.masterwork + the baked tier-delta
+//     stats, emits the personal `masterwork` SimEvent, and stashes
+//     PlayerMeta.lastMasterwork -- the whole point of the scenario;
+//  4. one more plain craft so the golden shows the draw stream continuing normally
+//     (one draw per successful craft) after the proc.
+// All setup runs in drive() so the rng observer catches every draw. The craft path
+// draws ctx.rng, which is the shared this.rng the recorder observes, so the single
+// proc draw per successful craft lands in the draw-order digest and the denial adds
+// none. Total observed draws: 3 (one per successful craft; the denial draws zero).
+//
+// Seed HUNTED (bounded scan from seed 1 upward over this exact drive sequence, not
+// committed) so the vestments proc draw lands under the capped 15 percent
+// masterwork chance and the proc fires inside the recorded run; only the found
+// literal is pinned here. Re-hunted after the new-realm quest pass shifted the
+// construction-time draw stream (quest camps + escort NPC spawns across the new
+// realms), and again after the Eastbrook camp respacing thinned the zone-1 camp
+// counts (fewer camp mobs means fewer construction-time draws, which moves every
+// later draw). Spare seeds 36 and 39 were also verified to fire the proc for this
+// drive.
+function professionsCraft(seed = 10): Scenario {
+  return {
+    name: 'professions_craft',
+    coverage: [
+      'class:warrior (crafter)',
+      'craft denial (insufficient_materials): draws zero rng, lastCraftResult ok:false',
+      'plain craft (recipe_minor_healing_potion): one masterwork-proc draw, no masterwork effect (consumable def), lastCraftResult quality common',
+      'masterwork proc craft (recipe_eastbrook_ritual_vestments, tailoring major @ skill 200): the single proc draw fires',
+      'masterwork effect: signed instance rolled.masterwork + baked tier-delta stats, masterwork SimEvent, PlayerMeta.lastMasterwork',
+      'lastCraftResult mirror fields (quality + masterwork?) on a proc',
+      'post-proc plain craft: the draw stream continues (one draw per successful craft)',
+    ],
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: false }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid) as any;
+      rec.notes.pid = pid;
+
+      // Step 1: DENIAL. No materials held -> insufficient_materials; the denial
+      // path returns before the proc draw, so it draws zero rng.
+      sim.craftItem('recipe_minor_healing_potion', false, pid);
+      rec.snapshot('craft-denied');
+
+      // Step 2: plain deterministic craft. The single proc draw happens on the
+      // success path, but a consumable (potion) def can never masterwork, so the
+      // effect is gated off; the output is the def quality (common).
+      // Economy rework: the potion now also consumes
+      // silverleaf_herb x2 (addItem draws no rng, so the draw stream and its
+      // digest are unchanged; the golden state moves only via the new grants).
+      sim.addItem('linen_scrap', 1, pid);
+      sim.addItem('spider_leg', 1, pid);
+      sim.addItem('silverleaf_herb', 2, pid);
+      sim.craftItem('recipe_minor_healing_potion', false, pid);
+      rec.snapshot('craft-plain');
+
+      // Step 3: masterwork PROC. Tailoring as the active archetype (a MAJOR craft,
+      // unlimited empowerment ceiling) at skill 200 (tier 8, far above the recipe's
+      // tier 0) plus the self-signed consumed reagent push the proc chance to the
+      // capped 0.15; the equippable uncommon int/spi vestments pass the effect gate
+      // (uncommon bumps to rare, under the major ceiling), so the hunted seed's
+      // single proc draw fires the effect.
+      sim.acceptArchetypeQuest('tailoring');
+      meta.craftSkills.tailoring = 200;
+      // The one self-signed linen scrap satisfies the whole linen requirement (the
+      // #1145 minus-one reduction composes with the #1134 specialization discount:
+      // 3 -> 2 -> floor(2 * 0.8) = 1) and feeds the signed-reagent proc-chance
+      // input (any-signed since the 2026-07-17 ruling; a self-signed copy still
+      // qualifies), mirroring the crafting suite's proc test.
+      sim.addItemInstance('linen_scrap', { signer: meta.name }, pid);
+      sim.addItem('spider_leg', 1, pid);
+      // Economy rework: the vestments recipe gained cloth and
+      // thread volume (grants draw no rng; only golden state rows move).
+      sim.addItem('homespun_cloth', 3, pid);
+      sim.addItem('spool_of_thread', 5, pid);
+      sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
+      rec.snapshot('craft-masterwork');
+
+      // Step 4: one more plain craft so the golden shows the draw stream continuing
+      // normally (one draw) after the proc.
+      sim.addItem('linen_scrap', 1, pid);
+      sim.addItem('spider_leg', 1, pid);
+      sim.addItem('silverleaf_herb', 2, pid);
+      sim.craftItem('recipe_minor_healing_potion', false, pid);
+      rec.snapshot('craft-plain-2');
+    },
+  };
+}
+
+// Gathering (Professions 2.0, re-shaped for the gather
+// cast): the zone-material harvest path. harvestNode now STARTS a cast
+// (draw-free) and the draws, grant, and events land at completion on the
+// tick path, so every harvest ticks the cast out with the exact duration
+// from the shipped constants. Pins the completion-time two-draw contract
+// (draw #1 rollMaterialRarity, draw #2 rollGatherRareEvent) in the
+// draw-order digest, the zero-draw cooldown denial, the proficiency-0
+// fungible grant, the max-proficiency signed yield, and a hunted rare-event
+// hit (gatherRareEvent zone broadcast + x5 signed yield + gatherResult
+// qty/rareEvent payload) inside a fixed 100-harvest window. The cast loop
+// ticks ~5000 times, so frames ride the labelled snapshots plus a coarse
+// cadence (the heavy-scenario budget precedent).
+//
+// Seed HUNTED (bounded scan from seed 1 upward over this exact drive
+// sequence, not committed) so the herb window's rare-event draw hits inside
+// the recorded run with all 102 casts resolving: no bags-full denial and no
+// cast-cancelling interference; only the found literal is pinned here.
+function professionsGather(seed = 1): Scenario {
+  // Worst-case gather cast: tier-1 node, tier-1 tool, band 0 (#2343: every
+  // harvest needs the matching tool; a tier-1 tool at a tier-1 node keeps
+  // the full base duration). Shorter casts (band reductions as proficiency
+  // accrues) still complete inside this fixed window; surplus ticks are
+  // plain world ticks.
+  const castTicks = Math.ceil(gatherCastDurationSec(1, 1, 0) / DT) + 1;
+  return {
+    name: 'professions_gather',
+    coverage: [
+      'class:warrior (gatherer)',
+      'tier-1 tools in bags satisfy the #2343 always-require-tool gate',
+      'gather cast start: harvestNode begins the cast draw-free',
+      'granted harvest at cast completion: exactly two rng draws (rarity roll then rare-event roll)',
+      'cooldown denial: zero rng draws, no cast',
+      'proficiency-0 grant: common rarity, fungible zone material (copper_ore)',
+      'max-proficiency wood harvest: rarity ladder off the proficiency ceiling',
+      'rare gather event: hunted hit in the herb window, gatherRareEvent fanout + x5 signed yield',
+      'gatherResult qty/rareEvent payload fields',
+    ],
+    sampleEvery: 500,
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid) as any;
+      const p = sim.player as AnyEntity;
+
+      // No mob interference: mob damage cancels a gather cast mid-drive, so
+      // the drive silences the world's mobs up front (deterministic,
+      // recorded state, the test-suite despawnMobs idiom).
+      for (const e of (sim.entities as Map<number, AnyEntity>).values()) {
+        if (e.kind !== 'mob') continue;
+        e.dead = true;
+        e.hp = 0;
+        e.aiState = 'dead';
+        e.respawnTimer = 9999;
+        e.corpseTimer = 9999;
+        e.inCombat = false;
+      }
+
+      // The three tier-1 tools (#2343: every node harvest needs its
+      // profession's tool in bags). addItem draws no rng, so the grant is
+      // digest-invisible beyond the sampled inventory contents.
+      sim.addItem('copper_mining_pick', 1, pid);
+      sim.addItem('handaxe', 1, pid);
+      sim.addItem('gathering_sickle', 1, pid);
+
+      // Step 1: proficiency-0 ore harvest (common, fungible grant, resolved
+      // at cast completion on the tick path) plus a post-completion second
+      // attempt denied by the player's own cooldown, which must add ZERO
+      // draws to the digest.
+      teleport(sim, p, -70, -53); // ore_eastbrook_1
+      sim.harvestNode('ore_eastbrook_1', pid);
+      rec.tick(castTicks); // the cast completes inside this window
+      sim.harvestNode('ore_eastbrook_1', pid); // denied: own timer, no draw
+      rec.snapshot('harvest-ore-common-and-denial');
+      rec.tick(2);
+
+      // Step 2: max-proficiency wood harvest: the rarity roll runs at the
+      // proficiency ceiling (zero common weight), so the rolled tier plus the
+      // signed-or-fungible grant shape land in the state sample.
+      meta.gatheringProficiency.logging = 100;
+      teleport(sim, p, -62, 8); // wood_eastbrook_1
+      sim.harvestNode('wood_eastbrook_1', pid);
+      rec.tick(castTicks);
+      rec.snapshot('harvest-wood-max-proficiency');
+      rec.tick(2);
+
+      // Step 3: the rare-event window. Repeated herb casts with the
+      // per-player cooldown cleared advance the shared stream exactly two
+      // draws per completed harvest. Two per-iteration resets keep the
+      // 100-cast window from ever hitting the bags-full deny at a cast
+      // start (which would skip a harvest and shift the stream): the
+      // proficiency reset pins the window at band 0 (the pre-gather-cast window ran
+      // at an undrained proficiency 0 anyway), and the retention filter
+      // sheds the accumulating common stacks while keeping the NEWEST eight
+      // signed instances, so a hunted hit's forced-signed x5 yield (all
+      // moonlit-bloom sheenleaf) survives into the final inventory sample
+      // even when the window hits more than once. The hunted seed's FIRST
+      // rare event lands inside this window (gatherRareEvent + x5 yield).
+      teleport(sim, p, -86, 90); // herb_eastbrook_1
+      for (let i = 0; i < 100; i++) {
+        meta.gatheringProficiency.herbalism = 0;
+        // The retention filter keeps the three tools (ahead of the gate,
+        // #2343) plus the newest eight signed instances, shedding the
+        // accumulating common stacks exactly as before.
+        const TOOL_IDS = ['copper_mining_pick', 'handaxe', 'gathering_sickle'];
+        meta.inventory = [
+          ...meta.inventory.filter((s: any) => TOOL_IDS.includes(s.itemId)),
+          ...meta.inventory.filter((s: any) => s.instance?.signer !== undefined).slice(-8),
+        ];
+        delete meta.nodeHarvestReadyAt.herb_eastbrook_1;
+        sim.harvestNode('herb_eastbrook_1', pid);
+        rec.tick(castTicks);
+      }
+      rec.snapshot('rare-event-window');
+      rec.tick(2);
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
+  frostProcOrb(),
   soloRogue(),
   affixMob(),
   mobSwingAffixes(),
@@ -4020,6 +4688,7 @@ export const SCENARIOS: Scenario[] = [
   petCommands(),
   paladinConsecration(),
   arena1v1(),
+  cardDuel(),
   fiesta(),
   fiestaPowerups(),
   duelToWinner(),
@@ -4030,6 +4699,7 @@ export const SCENARIOS: Scenario[] = [
   partyLoot(),
   partyRaid(),
   l1LootDistribution(),
+  masterLoot(),
   entityRoster(),
   delveDeath(),
   fiestaMidcastKill(),
@@ -4040,6 +4710,7 @@ export const SCENARIOS: Scenario[] = [
   questCollectTurnIn(),
   questLinkAbandon(),
   talentsProgression(),
+  warriorRowCapstones(),
   multiClassHeal(),
   mobLocomotion(),
   delveProgression(),
@@ -4051,6 +4722,8 @@ export const SCENARIOS: Scenario[] = [
   mobLifecycle(),
   targetingMarkers(),
   c4bEffectDispatch(),
+  hitRatingHeroic(false),
+  hitRatingHeroic(true),
   c5AutoAttack(),
   marketRoundTrip(),
   inventoryVendor(),
@@ -4058,6 +4731,8 @@ export const SCENARIOS: Scenario[] = [
   g1bXpPrestige(),
   playerTrade(),
   chatSocial(),
+  professionsCraft(),
+  professionsGather(),
   undermountOdrenn(),
 ];
 

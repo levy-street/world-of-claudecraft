@@ -10,8 +10,15 @@
 //  - Taunt/Growl set the caster's threat to the table's top value and force
 //    the mob to attack the caster for 3 seconds
 import type { Entity } from './types';
+import { dist2d } from './types';
 
 export const MELEE_SWITCH_MULT = 1.1;
+// Boss-summoned adds spawn with this much threat on the boss's current target
+// (the tank): enough that normal healing cannot peel a fresh wave, low enough
+// that sustained DPS focus still rips one loose. Consumed by Sim.spawnBossAdds
+// (the five-man summoners) AND the Nythraxis encounter-script spawners, so the
+// two paths cannot drift. Pinned by tests/summon_threat_seed.test.ts.
+export const SUMMONED_ADD_THREAT_SEED = 750;
 export const RANGED_SWITCH_MULT = 1.3;
 export const HEAL_THREAT_FACTOR = 0.5;
 export const DEFENSIVE_STANCE_THREAT_MULT = 1.3;
@@ -41,12 +48,31 @@ export function threatModifier(source: Entity, school: string): number {
 }
 
 export function stealthDetectionMultiplier(observerLevel: number, stealthedLevel: number): number {
-  const raw = STEALTH_DETECTION_MULT + (observerLevel - stealthedLevel) * STEALTH_DETECTION_PER_LEVEL;
+  const raw =
+    STEALTH_DETECTION_MULT + (observerLevel - stealthedLevel) * STEALTH_DETECTION_PER_LEVEL;
   return Math.max(STEALTH_DETECTION_MIN_MULT, Math.min(STEALTH_DETECTION_MAX_MULT, raw));
 }
 
-export function stealthDetectionRadius(observer: Entity, stealthed: Entity, baseRadius: number): number {
+export function stealthDetectionRadius(
+  observer: Entity,
+  stealthed: Entity,
+  baseRadius: number,
+): number {
   return baseRadius * stealthDetectionMultiplier(observer.level, stealthed.level);
+}
+
+export function hasEscapeStealth(target: Entity): boolean {
+  return target.auras.some((a) => a.id === 'vanish' && a.kind === 'stealth');
+}
+
+export function canDetectStealthedTarget(
+  observer: Entity,
+  target: Entity,
+  baseRadius: number,
+): boolean {
+  if (!target.auras.some((a) => a.kind === 'stealth')) return true;
+  if (hasEscapeStealth(target)) return false;
+  return dist2d(observer.pos, target.pos) <= stealthDetectionRadius(observer, target, baseRadius);
 }
 
 export function addThreat(mob: Entity, sourceId: number, amount: number): void {
@@ -58,6 +84,17 @@ export function clearThreat(mob: Entity): void {
   mob.threat.clear();
   mob.forcedTargetId = null;
   mob.forcedTargetTimer = 0;
+}
+
+/** Remove ONE attacker from the hate table (they left the instance or otherwise
+ *  stopped existing for this mob). A taunt lock (forcedTargetId) pointing at
+ *  that attacker is released with the entry. */
+export function dropThreat(mob: Entity, sourceId: number): void {
+  mob.threat.delete(sourceId);
+  if (mob.forcedTargetId === sourceId) {
+    mob.forcedTargetId = null;
+    mob.forcedTargetTimer = 0;
+  }
 }
 
 /** Highest threat value on the table (0 when empty) — taunt matches this. */

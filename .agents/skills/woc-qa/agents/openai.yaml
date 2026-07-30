@@ -1,0 +1,6 @@
+interface:
+  display_name: "World of ClaudeCraft QA"
+  short_description: "Coordinate scoped tests and specialist review"
+  default_prompt: "Use $woc-qa to validate the current World of ClaudeCraft changes and report whether they are ready."
+policy:
+  allow_implicit_invocation: true

@@ -15,6 +15,7 @@ import { CLASSES } from '../sim/data';
 import {
   type AuraKind,
   armorReduction,
+  type CoreStats,
   type PlayerClass,
   SPELL_POWER_PER_INT,
   type Stats,
@@ -48,7 +49,10 @@ export type StatId =
   | 'critChance'
   | 'dodge'
   | 'critRating'
-  | 'hasteRating';
+  | 'hasteRating'
+  | 'hitRating'
+  | 'parry'
+  | 'warfare';
 
 /** A single contribution line. `value` is already in the unit the line displays
  *  (attack power as an integer, percents as a percent number like 1.1, etc.). */
@@ -99,7 +103,7 @@ export interface StatSource {
 /** One equipped item's stat contribution, as the HUD reads it from ITEMS. */
 export interface GearStatSource {
   name: string;
-  stats?: Partial<Pick<Stats, 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor'>>;
+  stats?: Partial<CoreStats>;
   spellPower?: number;
 }
 
@@ -117,6 +121,9 @@ export interface StatTooltipModel {
   isPrimary: boolean;
   /** The stat's current displayed value (header / informational). */
   statValue: number;
+  /** The two live effects summarized by the single player-facing Warfare stat. */
+  warfareDamageIncrease?: number;
+  warfareDamageReduction?: number;
   effects: StatEffect[];
   /** Show "Of little benefit to your class." (Int/Spi on a non-mana class). */
   minorForClass: boolean;
@@ -146,6 +153,11 @@ export interface StatTooltipInput {
   critRating: number;
   /** entity.hasteRating, the accumulated haste rating from gear + set bonuses. */
   hasteRating: number;
+  /** entity.hitRating, the accumulated hit rating from gear + set bonuses. */
+  hitRating: number;
+  /** The warrior's front-arc parry chance, 0..1 (warriorParryChance from
+   *  Strength); every other class stays at 0. */
+  parryChance: number;
   /** Weapon damage-per-second exactly as the panel computes it. */
   dps: number;
   /** Equipped items contributing stats, for the gear source line (HUD maps from
@@ -160,6 +172,7 @@ export interface StatTooltipInput {
 const AGI_ARMOR_PER_POINT = 2; // entity.ts: s.armor += s.agi * 2
 const AGI_CRIT_PER_POINT = 0.0005; // entity.ts: critChance = 0.05 + s.agi * 0.0005
 const AGI_DODGE_PER_POINT = 0.0005; // entity.ts: dodgeChance = 0.05 + s.agi * 0.0005
+const STR_PARRY_PER_POINT = 0.0005; // warrior_hit_table.ts: parry = 0.05 + str * 0.0005
 const HUNTER_RANGED_AP_PER_AGI = 2; // entity.ts: rangedPower = s.agi * 2 (hunter)
 const INT_SPELLCRIT_PER_POINT = 0.0008; // sim.ts spellCrit(): 0.05 + int * 0.0008
 const AP_PER_DPS = 14; // sim.ts: attackPower / 14 = bonus dps
@@ -240,6 +253,8 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
   let dpsApproxNote = false;
   let isPrimary = true;
   let statValue = 0;
+  let warfareDamageIncrease: number | undefined;
+  let warfareDamageReduction: number | undefined;
 
   switch (stat) {
     case 'str': {
@@ -326,6 +341,14 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
       baseChanceNote = true;
       break;
     }
+    case 'parry': {
+      // Front-only avoidance, shown as a percent like dodge (the warrior starts
+      // at a base chance and scales with Strength; other classes stay at 0).
+      isPrimary = false;
+      statValue = input.parryChance * 100;
+      baseChanceNote = input.parryChance > 0;
+      break;
+    }
     case 'critRating': {
       isPrimary = false;
       statValue = input.critRating;
@@ -336,12 +359,26 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
       statValue = input.hasteRating;
       break;
     }
+    case 'hitRating': {
+      isPrimary = false;
+      statValue = input.hitRating;
+      break;
+    }
+    case 'warfare': {
+      isPrimary = false;
+      statValue = stats.pvpOffense * 100;
+      warfareDamageIncrease = stats.pvpOffense * 100;
+      warfareDamageReduction = stats.pvpDefense * 100;
+      break;
+    }
   }
 
   return {
     stat,
     isPrimary,
     statValue,
+    warfareDamageIncrease,
+    warfareDamageReduction,
     effects,
     minorForClass,
     baseChanceNote,
@@ -365,13 +402,13 @@ const PRIMARY_BUFF_KINDS: Record<'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor'
 
 /** Base value of a primary attribute (or armor) from class + level, before any
  *  gear / buff / talent layer. Mirrors recalcPlayerStats' opening derivation. */
-function basePrimary(cls: PlayerClass, key: keyof Stats, level: number): number {
+function basePrimary(cls: PlayerClass, key: keyof CoreStats, level: number): number {
   const def = CLASSES[cls];
   return def.baseStats[key] + def.statsPerLevel[key] * (level - 1);
 }
 
 /** Sum the contribution of one attribute (or spellPower) across equipped gear. */
-function gearTotal(gear: GearStatSource[], key: keyof Stats | 'spellPower'): number {
+function gearTotal(gear: GearStatSource[], key: keyof CoreStats | 'spellPower'): number {
   let total = 0;
   for (const g of gear) {
     if (key === 'spellPower') total += g.spellPower ?? 0;
@@ -475,6 +512,16 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
       }
       return finish(input.dodgeChance * 100, 0.1);
     }
+    case 'parry': {
+      // Warrior-only: base 5% plus Strength scaling (warrior_hit_table.ts).
+      // Non-parry classes show a bare 0 with no misleading base line.
+      if (input.parryChance > 0) {
+        sources.push({ kind: 'base', value: 5 });
+        const fromStr = stats.str * STR_PARRY_PER_POINT * 100;
+        if (fromStr !== 0) sources.push({ kind: 'attributes', value: fromStr, fromStat: 'str' });
+      }
+      return finish(input.parryChance * 100, 0.1);
+    }
     // The dps cell is an estimate the panel computes from weapon + AP; it has no
     // clean per-source attribution, so it shows none (just its approximate note).
     case 'dps':
@@ -483,6 +530,8 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
     // description carries the meaning, so no per-source breakdown line.
     case 'critRating':
     case 'hasteRating':
+    case 'hitRating':
+    case 'warfare':
       return sources;
   }
 }

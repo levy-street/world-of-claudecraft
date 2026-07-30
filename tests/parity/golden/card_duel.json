@@ -1,0 +1,359 @@
+{
+  "scenario": "card_duel",
+  "seed": 1010,
+  "sampleEvery": 5,
+  "ticks": 41,
+  "coverage": [
+    "Card Duel minigame: queue + matchmake at the Card Master",
+    "createCardHand rng draw (match start, both sides)",
+    "drawOne rng draw (round resolution, both sides)"
+  ],
+  "draws": 44,
+  "drawDigest": "5d52aee1",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 820,
+      "state": "5bc471b0",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [],
+      "entities": []
+    },
+    {
+      "tick": 5,
+      "time": 0.25,
+      "nextId": 822,
+      "state": "9259ddf1",
+      "events": "4cf3f611",
+      "rng": {
+        "draws": 38,
+        "digest": "90bc014b"
+      }
+    },
+    {
+      "tick": 10,
+      "time": 0.5,
+      "nextId": 822,
+      "state": "62f4d796",
+      "events": "741638a5",
+      "rng": {
+        "draws": 38,
+        "digest": "90bc014b"
+      }
+    },
+    {
+      "tick": 15,
+      "time": 0.75,
+      "nextId": 822,
+      "state": "b718a3a4",
+      "events": "741638a5",
+      "rng": {
+        "draws": 38,
+        "digest": "90bc014b"
+      }
+    },
+    {
+      "tick": 20,
+      "time": 1,
+      "nextId": 822,
+      "state": "06e64c15",
+      "events": "511e9b10",
+      "rng": {
+        "draws": 38,
+        "digest": "90bc014b"
+      }
+    },
+    {
+      "tick": 25,
+      "time": 1.25,
+      "nextId": 822,
+      "state": "00cb12fe",
+      "events": "741638a5",
+      "rng": {
+        "draws": 38,
+        "digest": "90bc014b"
+      }
+    },
+    {
+      "tick": 30,
+      "time": 1.5,
+      "nextId": 822,
+      "state": "a7277807",
+      "events": "741638a5",
+      "rng": {
+        "draws": 38,
+        "digest": "90bc014b"
+      }
+    },
+    {
+      "tick": 35,
+      "time": 1.75,
+      "nextId": 822,
+      "state": "3fb8f01b",
+      "events": "741638a5",
+      "rng": {
+        "draws": 38,
+        "digest": "90bc014b"
+      }
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 822,
+      "state": "4c4f9b52",
+      "events": "741638a5",
+      "rng": {
+        "draws": 38,
+        "digest": "90bc014b"
+      }
+    },
+    {
+      "tick": 41,
+      "time": 2.05,
+      "nextId": 822,
+      "state": "8f53d03b",
+      "events": "741638a5",
+      "rng": {
+        "draws": 44,
+        "digest": "5d52aee1"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 820,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 821,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.95,
+              "school": "physical",
+              "sourceId": 820
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 101.05,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 101.05,
+          "hp": 100,
+          "id": 820,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 13,
+            "y": 1.5,
+            "z": 2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 101.05,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 101.05,
+          "hp": 54,
+          "id": 821,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 13,
+            "y": 1.5,
+            "z": 2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        }
+      ]
+    }
+  ]
+}

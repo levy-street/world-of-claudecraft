@@ -3,6 +3,7 @@ import {
   DISCORD_SPECIAL_ROLES,
   specialRoleByKey,
   specialRoleByName,
+  specialRoleChatTag,
   specialRoleColor,
   topSpecialRole,
 } from '../src/sim/discord_roles';
@@ -59,6 +60,44 @@ describe('discord special roles - guild role name matching', () => {
       expect(specialRoleByName(name)).toBeUndefined();
     }
   });
+
+  it('resolves the Senior Mods and Junior Mods guild roles to their own keys', () => {
+    expect(specialRoleByName('Senior Mods')?.key).toBe('seniormods');
+    expect(specialRoleByName('senior mods')?.key).toBe('seniormods');
+    expect(specialRoleByName('Senior Mod')?.key).toBe('seniormods');
+    expect(specialRoleByName('Senior Moderator')?.key).toBe('seniormods');
+    expect(specialRoleByName('Senior Moderators')?.key).toBe('seniormods');
+    expect(specialRoleByName('Sr Mod')?.key).toBe('seniormods');
+    expect(specialRoleByName('Sr Mods')?.key).toBe('seniormods');
+    expect(specialRoleByName('Junior Mods')?.key).toBe('juniormods');
+    expect(specialRoleByName('junior mods')?.key).toBe('juniormods');
+    expect(specialRoleByName('Junior Mod')?.key).toBe('juniormods');
+    expect(specialRoleByName('Junior Moderator')?.key).toBe('juniormods');
+    expect(specialRoleByName('Junior Moderators')?.key).toBe('juniormods');
+    expect(specialRoleByName('Jr Mod')?.key).toBe('juniormods');
+    expect(specialRoleByName('Jr Mods')?.key).toBe('juniormods');
+    // The tiered mod roles are separate roles, not aliases that collapse into Mods.
+    expect(specialRoleByName('Senior Mods')?.key).not.toBe('mods');
+    expect(specialRoleByName('Junior Mods')?.key).not.toBe('mods');
+    expect(specialRoleByName('Mods')?.key).toBe('mods');
+  });
+
+  it('resolves the SHILL and LEGEND community roles case-insensitively', () => {
+    expect(specialRoleByName('SHILL')?.key).toBe('shill');
+    expect(specialRoleByName('shill')?.key).toBe('shill');
+    expect(specialRoleByName('Shills')?.key).toBe('shill');
+    expect(specialRoleByName('LEGEND')?.key).toBe('legend');
+    expect(specialRoleByName('legend')?.key).toBe('legend');
+    expect(specialRoleByName('Legends')?.key).toBe('legend');
+  });
+
+  it('resolves the Content Creator guild role and its variants', () => {
+    expect(specialRoleByName('Content Creator')?.key).toBe('contentcreator');
+    expect(specialRoleByName('content creator')?.key).toBe('contentcreator');
+    expect(specialRoleByName('Content Creators')?.key).toBe('contentcreator');
+    expect(specialRoleByName('Creator')?.key).toBe('contentcreator');
+    expect(specialRoleByName('Creators')?.key).toBe('contentcreator');
+  });
 });
 
 describe('discord special roles - priority', () => {
@@ -95,6 +134,43 @@ describe('discord special roles - priority', () => {
     expect(topSpecialRole(['Core Dev', 'Admin'])?.key).toBe('admin');
   });
 
+  it('slots Senior Mods above Mods and Junior Mods below Mods, all below staff', () => {
+    const devs = specialRoleByKey('devs');
+    const seniormods = specialRoleByKey('seniormods');
+    const mods = specialRoleByKey('mods');
+    const juniormods = specialRoleByKey('juniormods');
+    const artists = specialRoleByKey('artists');
+    expect(seniormods).toBeDefined();
+    expect(juniormods).toBeDefined();
+    expect(devs!.priority).toBeGreaterThan(seniormods!.priority);
+    expect(seniormods!.priority).toBeGreaterThan(mods!.priority);
+    expect(mods!.priority).toBeGreaterThan(juniormods!.priority);
+    expect(juniormods!.priority).toBeGreaterThan(artists!.priority);
+  });
+
+  it('ranks the community roles below Artists: Content Creator, then LEGEND, then SHILL', () => {
+    const artists = specialRoleByKey('artists');
+    const contentcreator = specialRoleByKey('contentcreator');
+    const legend = specialRoleByKey('legend');
+    const shill = specialRoleByKey('shill');
+    expect(contentcreator).toBeDefined();
+    expect(legend).toBeDefined();
+    expect(shill).toBeDefined();
+    expect(artists!.priority).toBeGreaterThan(contentcreator!.priority);
+    expect(contentcreator!.priority).toBeGreaterThan(legend!.priority);
+    expect(legend!.priority).toBeGreaterThan(shill!.priority);
+  });
+
+  it('picks the top role for members who mix staff, mod-tier, and community roles', () => {
+    expect(topSpecialRole(['SHILL', 'Senior Mods'])?.key).toBe('seniormods');
+    expect(topSpecialRole(['Junior Mods', 'Mods'])?.key).toBe('mods');
+    expect(topSpecialRole(['Senior Mods', 'Devs'])?.key).toBe('devs');
+    expect(topSpecialRole(['LEGEND', 'SHILL'])?.key).toBe('legend');
+    expect(topSpecialRole(['Content Creator', 'LEGEND'])?.key).toBe('contentcreator');
+    expect(topSpecialRole(['Member', 'SHILL'])?.key).toBe('shill');
+    expect(topSpecialRole(['Content Creator', 'Artist'])?.key).toBe('artists');
+  });
+
   it('keeps priorities unique so the top pick is deterministic', () => {
     const priorities = DISCORD_SPECIAL_ROLES.map((r) => r.priority);
     expect(new Set(priorities).size).toBe(priorities.length);
@@ -111,6 +187,15 @@ describe('discord special roles - catalog integrity', () => {
     for (const tagKey of Object.keys(tags)) {
       expect(keys.has(tagKey), `stale roleTag entry '${tagKey}' has no catalog role`).toBe(true);
     }
+  });
+
+  it('ships the exact English tag labels for the new mod-tier and community roles', () => {
+    const tags = hudChromeStrings.discord.roleTag as Record<string, string>;
+    expect(tags.seniormods).toBe('Senior Mod');
+    expect(tags.juniormods).toBe('Junior Mod');
+    expect(tags.contentcreator).toBe('Content Creator');
+    expect(tags.legend).toBe('LEGEND');
+    expect(tags.shill).toBe('SHILL');
   });
 
   it('gives every role a color and unique key and matcher names', () => {
@@ -139,5 +224,26 @@ describe('discord role tag labels - single source', () => {
     }
     expect(discordRoleTagKey('not-a-role')).toBeUndefined();
     expect(discordRoleTagKey(undefined)).toBeUndefined();
+  });
+});
+
+describe('discord special roles - the chat-tag staff set', () => {
+  it('pins exactly the staff roles as chat-tagged (the anti-impersonation set)', () => {
+    // The chat tag is a pure authority signal: adding a community role here
+    // (or dropping a staff one) must be a deliberate, reviewable change.
+    const tagged = DISCORD_SPECIAL_ROLES.filter((r) => r.chatTag).map((r) => r.key);
+    expect(tagged).toEqual([
+      'levyst',
+      'admin',
+      'coredevs',
+      'devs',
+      'seniormods',
+      'mods',
+      'juniormods',
+    ]);
+    expect(specialRoleChatTag('mods')).toBe(true);
+    expect(specialRoleChatTag('legend')).toBe(false);
+    expect(specialRoleChatTag('shill')).toBe(false);
+    expect(specialRoleChatTag(undefined)).toBe(false);
   });
 });

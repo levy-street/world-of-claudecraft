@@ -20,9 +20,15 @@ import {
   moveBetweenContainers,
   sanitizeBankState,
 } from '../src/sim/bank';
-import { ITEMS, QUESTS } from '../src/sim/data';
+import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { Entity, InvSlot, ItemInstancePayload, SimEvent } from '../src/sim/types';
+import type {
+  Entity,
+  InvSlot,
+  ItemInstancePayload,
+  SimEvent,
+  WorldContent,
+} from '../src/sim/types';
 
 // The full 12-tier ladder, pinned as literals (never compared to the exported
 // constant, which would be a zero-protection self-comparison).
@@ -32,6 +38,17 @@ const CAPS = [30, 36, 42, 48, 54, 60, 66, 72, 78, 84, 90, 96]; // 24 + 6*(tier+1
 
 // The three Gilded Strongbox bursars (banker NPCs), one per town hub.
 const BANKERS = ['bursar_fernando', 'bursar_petra_vell', 'bursar_aldous_crane'] as const;
+
+// Bank command tests need real banker definitions and terrain, not the hundreds
+// of unrelated ambient entities spawned by the full continent. In particular,
+// the 50-seed conservation property used to spend almost all of its time in
+// Sim construction instead of exercising a bank operation.
+const BANK_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: Object.fromEntries(BANKERS.map((id) => [id, BUILTIN_WORLD.npcs[id]])),
+  groundObjects: [],
+};
 
 // Resolve a banker's LIVE entity by templateId: content coords run through
 // findSafePos/groundPos at spawn, so the runtime position can differ from the
@@ -71,7 +88,12 @@ function moveFarFromBankers(sim: Sim, pid = sim.playerId): void {
 // The command-suite assertions never read position, so the move is invisible to them; the
 // far-refusal cases below move away explicitly.
 const makeSim = (seed = 42) => {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: false,
+    world: BANK_TEST_WORLD,
+  });
   moveToBanker(sim);
   return sim;
 };
@@ -79,7 +101,8 @@ const meta = (sim: Sim, pid = sim.playerId) => sim.meta(pid)!;
 
 // A multiplayer world (no default player) for the banker interaction
 // tests, mirroring the tests/mail.test.ts makeWorld idiom.
-const makeBankWorld = (seed = 42) => new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+const makeBankWorld = (seed = 42) =>
+  new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: BANK_TEST_WORLD });
 
 // Distinct gear ids (stackSize 1) for filling containers with non-mergeable entries.
 const GEAR_IDS = Object.values(ITEMS)
@@ -205,6 +228,42 @@ describe('deposit rules', () => {
     expect(m.inventory.find((s) => s.itemId === 'wolf_fang' && s.instance)!.instance).toEqual({
       signer: 'Ana',
     });
+  });
+
+  it('a deposit merges into an existing byte-equal bank stack and a withdraw merges back', () => {
+    const sim = makeSim();
+    const m = meta(sim);
+    // Seed the bank with a signed stack of 2, then deposit another byte-equal copy.
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang' && s.instance));
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang' && s.instance));
+    const banked = m.bank.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(banked).toHaveLength(1);
+    expect(banked[0].count).toBe(3);
+    expect(banked[0].instance).toEqual({ signer: 'Ana' });
+    // The return trip: with a byte-equal stack already in the bags, the
+    // withdrawal merges back instead of opening a second carried slot.
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.bankWithdraw(m.bank.inventory.findIndex((s) => s.instance));
+    const carried = m.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(carried).toHaveLength(1);
+    expect(carried[0].count).toBe(4);
+    expect(carried[0].instance).toEqual({ signer: 'Ana' });
+    expect(m.bank.inventory.some((s) => s.itemId === 'wolf_fang')).toBe(false);
+  });
+
+  it('a differently-signed deposit still lands in its own bank slot', () => {
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang'));
+    sim.addItemInstance('wolf_fang', { signer: 'Bru' }, sim.playerId);
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang'));
+    const banked = m.bank.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(banked).toHaveLength(2);
+    expect(banked.map((s) => s.instance?.signer).sort()).toEqual(['Ana', 'Bru']);
   });
 
   it('refuses a deposit at capacity and refuses a partial-fit deposit entirely (all-or-nothing)', () => {
@@ -478,6 +537,50 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     expect(dst[1]).toEqual({ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } });
   });
 
+  it('merges an instanced move into a byte-equal destination stack', () => {
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }];
+    const dst: InvSlot[] = [
+      { itemId: 'wolf_fang', count: 5 },
+      { itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } },
+    ];
+    // Destination is at capacity: only the byte-equal stack's room admits it.
+    expect(moveBetweenContainers(src, 0, undefined, dst, 2)).toEqual({ moved: 3 });
+    expect(src).toEqual([]);
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 5 },
+      { itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } },
+    ]);
+  });
+
+  it('refuses an instanced move all-or-nothing when the byte-equal room cannot take it whole', () => {
+    // 19 + 3 would overflow the 20-cap stack and no free slot exists: nothing moves.
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 19, instance: { signer: 'Ana' } }];
+    const srcSnap = clone(src);
+    const dstSnap = clone(dst);
+    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+    });
+    expect(src).toEqual(srcSnap);
+    expect(dst).toEqual(dstSnap);
+    // AT the boundary: exactly one unit of room admits exactly a one-unit move.
+    const one: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } }];
+    expect(moveBetweenContainers(one, 0, undefined, dst, 1)).toEqual({ moved: 1 });
+    expect(dst).toEqual([{ itemId: 'wolf_fang', count: 20, instance: { signer: 'Ana' } }]);
+  });
+
+  it('a differently-signed instanced move still demands its own free destination slot', () => {
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Bru' } }];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } }];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+    });
+    expect(moveBetweenContainers(src, 0, undefined, dst, 2)).toEqual({ moved: 1 });
+    expect(dst).toHaveLength(2);
+  });
+
   it('refuses a distinct-item move into a full destination (no_fit) and mutates nothing', () => {
     const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 5 }];
     const dst: InvSlot[] = [{ itemId: 'linen_scrap', count: 1 }];
@@ -562,9 +665,18 @@ describe('conservation seed sweeps', () => {
     let sawBagsFullRefusal = false;
     let sawCannotAfford = false;
 
+    // The bank operations do not consume Sim RNG and every scripted sequence has
+    // its own test-side seed. Reuse one real Sim/banker and reset only the state
+    // under test; constructing 50 identical continents adds no coverage.
+    const sim = makeSim(1);
+    const m = meta(sim);
+    const initialInventory = clone(m.inventory);
+
     for (let seed = 1; seed <= 50; seed++) {
-      const sim = makeSim(seed);
-      const m = meta(sim);
+      m.inventory = clone(initialInventory);
+      m.bank = { inventory: [], purchasedSlots: 0, bonusSlots: 0 };
+      m.copper = 0;
+      sim.drainEvents();
       sim.addItem('wolf_fang', 12);
       sim.addItem('linen_scrap', 7);
       sim.addItem('baked_bread', 5);
@@ -636,7 +748,12 @@ describe('conservation seed sweeps', () => {
 describe('determinism', () => {
   it('the same fixed bank-op script over 300 ticks yields identical state + events', () => {
     function run() {
-      const sim = new Sim({ seed: 123, playerClass: 'warrior', autoEquip: false });
+      const sim = new Sim({
+        seed: 123,
+        playerClass: 'warrior',
+        autoEquip: false,
+        world: BANK_TEST_WORLD,
+      });
       moveToBanker(sim); // proximity gate: the scripted bank ops need a banker in reach
       const m = sim.meta(sim.playerId)!;
       m.copper = LADDER_TOTAL;
@@ -685,10 +802,22 @@ describe('persistence and back-compat', () => {
     m.copper = 4242;
 
     const s1 = sim.serializeCharacter(sim.playerId)!;
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid2 = sim2.addPlayer('warrior', 'Saver', { state: s1 });
     const s2 = sim2.serializeCharacter(pid2)!;
-    expect(s2).toEqual(s1);
+    // The Book of Deeds legitimately enriches a save across a load: joining
+    // seeds the discovery ledger from held items (the hand-stuffed bank rows
+    // above bypassed the addItem hub) and back-credits state predicates (12
+    // purchased slots earns the first-expansion deed). Everything else must
+    // round-trip byte-equal.
+    const { deeds: _d1, deedStats: _ds1, renown: _r1, ...bankRest1 } = s1;
+    const { deeds: _d2, deedStats: _ds2, renown: _r2, ...bankRest2 } = s2;
+    expect(bankRest2).toEqual(bankRest1);
     expect(s2.bank).toEqual({
       inventory: m.bank.inventory,
       purchasedSlots: 12,
@@ -703,7 +832,12 @@ describe('persistence and back-compat', () => {
       { itemId: 'worn_sword', count: 1, instance: { signer: 'Cyd', charges: { z: 2 } } },
     ];
     const s1 = sim.serializeCharacter(sim.playerId)!;
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid2 = sim2.addPlayer('warrior', 'Saver', { state: s1 });
     const m2 = meta(sim2, pid2);
     // Mutate the SOURCE sim's banked payload; the loaded copy must be untouched.
@@ -754,7 +888,12 @@ describe('persistence and back-compat', () => {
     const state = sim.serializeCharacter(sim.playerId)!;
     const legacy = JSON.parse(JSON.stringify(state)) as Record<string, unknown>;
     delete legacy.bank;
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     let pid = -1;
     expect(() => {
       pid = sim2.addPlayer('warrior', 'Legacy', { state: legacy as never });
@@ -773,7 +912,12 @@ describe('persistence and back-compat', () => {
     const sim = makeSim();
     const state = sim.serializeCharacter(sim.playerId)! as { bank?: unknown };
     state.bank = { inventory: gearSlots(30), purchasedSlots: 0, bonusSlots: 0 };
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid = sim2.addPlayer('warrior', 'Hoarder', { state: state as never });
     const m2 = meta(sim2, pid);
     moveToBanker(sim2, pid); // proximity gate: the deposit/withdraw below need a banker in reach
@@ -814,7 +958,12 @@ describe('persistence and back-compat', () => {
       purchasedSlots: 7, // floored to the 6-grid
       bonusSlots: -2, // clamped to 0
     };
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid = sim2.addPlayer('warrior', 'Tampered', { state: state as never });
     expect(meta(sim2, pid).bank).toEqual({
       inventory: [
@@ -863,11 +1012,13 @@ describe('sanitizeBankState', () => {
     ]);
   });
 
-  it('clamps count to Math.max(1, floor) and forces instanced entries to count 1', () => {
+  it('clamps count to Math.max(1, floor) and caps an instanced entry at its stack size', () => {
     const raw = {
       inventory: [
         { itemId: 'wolf_fang', count: -5 },
         { itemId: 'wolf_fang', count: 2.9 },
+        // worn_sword is an UNSTACKED weapon (stackSize 1): the pre-12d force-1
+        // behavior falls out of the stack-cap clamp.
         { itemId: 'worn_sword', count: 5, instance: { signer: 'Ana' } },
       ],
       purchasedSlots: 0,
@@ -877,6 +1028,35 @@ describe('sanitizeBankState', () => {
     expect(out[0].count).toBe(1);
     expect(out[1].count).toBe(2);
     expect(out[2]).toEqual({ itemId: 'worn_sword', count: 1, instance: { signer: 'Ana' } });
+  });
+
+  it('preserves a counted instanced stack while still flooring and capping garbage', () => {
+    const raw = {
+      inventory: [
+        // A legitimate identical-payload stack: count survives the load intact.
+        { itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } },
+        // AT the cap (stackSize 20) survives; one past it clamps back to 20
+        // (a merge can only ever have reached the cap).
+        { itemId: 'wolf_fang', count: 20, instance: { signer: 'Ana' } },
+        { itemId: 'wolf_fang', count: 21, instance: { signer: 'Ana' } },
+        // Garbage floors to 1 exactly like the fungible arm.
+        { itemId: 'wolf_fang', count: -5, instance: { signer: 'Ana' } },
+        // A charge-bearing payload stays one-per-slot regardless of count: a
+        // counted stack shares ONE payload object, so a tampered count would
+        // mint shared-charge copies.
+        { itemId: 'wolf_fang', count: 4, instance: { signer: 'Ana', charges: { zap: 2 } } },
+        // An unknown item def (removed content) is dormant recoverable data:
+        // the merge-legal ceiling does not apply (12d QA), but the charge cap
+        // still does (the shared-payload dupe guard is def-independent).
+        { itemId: 'unknown_id_xyz', count: 30, instance: { signer: 'Ana' } },
+        { itemId: 'unknown_id_xyz', count: 4, instance: { charges: { zap: 1 } } },
+      ],
+      purchasedSlots: 0,
+      bonusSlots: 0,
+    };
+    const out = sanitizeBankState(raw).inventory;
+    expect(out.map((s) => s.count)).toEqual([3, 20, 20, 1, 1, 30, 1]);
+    expect(out[0]).toEqual({ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } });
   });
 
   it('floors purchasedSlots to a multiple of 6 within [0, 72]', () => {
@@ -1242,14 +1422,19 @@ describe('server-stamped bank bonus', () => {
     meta(sim).bank.bonusSlots = 6;
     const saved = sim.serializeCharacter(sim.playerId)!;
 
-    const up = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const up = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true, world: BANK_TEST_WORLD });
     const upPid = up.addPlayer('warrior', 'Linked', {
       state: saved,
       bankBonus: { bonusSlots: 16, sources: SOURCES },
     });
     expect(meta(up, upPid).bank.bonusSlots).toBe(16);
 
-    const down = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const down = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const downPid = down.addPlayer('warrior', 'Unlinked', {
       state: saved,
       bankBonus: { bonusSlots: 2, sources: [] },
@@ -1269,7 +1454,12 @@ describe('server-stamped bank bonus', () => {
     const sim = makeSim();
     meta(sim).bank.bonusSlots = 5;
     const saved = sim.serializeCharacter(sim.playerId)!;
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid2 = sim2.addPlayer('warrior', 'Offline', { state: saved });
     expect(meta(sim2, pid2).bank.bonusSlots).toBe(5);
     expect(meta(sim2, pid2).bankBonusSources).toEqual([]);
@@ -1279,7 +1469,12 @@ describe('server-stamped bank bonus', () => {
     const sim = makeSim();
     const saved = sim.serializeCharacter(sim.playerId)!;
     delete (saved as { bank?: unknown }).bank; // a save from before the bank existed
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid2 = sim2.addPlayer('warrior', 'Ancient', {
       state: saved,
       bankBonus: { bonusSlots: 4, sources: SOURCES.slice(0, 2) },
@@ -1299,7 +1494,12 @@ describe('server-stamped bank bonus', () => {
 
     // Rejoin after every account fact was unlinked: the stamp drops to 0, so the
     // 30 banked stacks now sit over the 24-slot capacity. Tolerated, never trimmed.
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid2 = sim2.addPlayer('warrior', 'Shrunk', {
       state: saved,
       bankBonus: { bonusSlots: 0, sources: [] },

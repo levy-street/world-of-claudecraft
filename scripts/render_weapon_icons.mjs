@@ -8,7 +8,7 @@
 //   npx esbuild scripts/weapon_render_entry.js --bundle --format=iife --outfile=tmp/weapon_render_bundle.js
 // Run:
 //   node scripts/render_weapon_icons.mjs [srcDir=tmp/weapon_src] [outDir] [px=128]
-import { readFileSync, readdirSync, mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
@@ -29,36 +29,61 @@ const html = `<!doctype html><html><head><meta charset="utf8"><style>html,body{m
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
-  args: ['--use-angle=swiftshader', '--use-gl=angle', '--ignore-gpu-blocklist', '--no-sandbox', '--enable-webgl'],
+  args: [
+    '--use-angle=swiftshader',
+    '--use-gl=angle',
+    '--ignore-gpu-blocklist',
+    '--no-sandbox',
+    '--enable-webgl',
+  ],
 });
 const page = await browser.newPage();
 let pageErr = 0;
-page.on('pageerror', (e) => { pageErr++; console.error('PAGEERR', e.message); });
-page.on('console', (m) => { if (m.type() === 'error') console.error('CONSOLE', m.text()); });
+page.on('pageerror', (e) => {
+  pageErr++;
+  console.error('PAGEERR', e.message);
+});
+page.on('console', (m) => {
+  if (m.type() === 'error') console.error('CONSOLE', m.text());
+});
 
 await page.setContent(html, { waitUntil: 'load' });
 await page.waitForFunction('window.__ready === true', { timeout: 20000 });
 
 // Downscale the 256px render to PX with a smoothing pass, in-page.
 async function downscale(dataUrl) {
-  return page.evaluate(async (url, px) => {
-    const img = new Image();
-    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
-    const c = document.createElement('canvas'); c.width = px; c.height = px;
-    const cx = c.getContext('2d');
-    cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = 'high';
-    cx.drawImage(img, 0, 0, px, px);
-    return c.toDataURL('image/jpeg', 0.84);
-  }, dataUrl, PX);
+  return page.evaluate(
+    async (url, px) => {
+      const img = new Image();
+      await new Promise((res, rej) => {
+        img.onload = res;
+        img.onerror = rej;
+        img.src = url;
+      });
+      const c = document.createElement('canvas');
+      c.width = px;
+      c.height = px;
+      const cx = c.getContext('2d');
+      cx.imageSmoothingEnabled = true;
+      cx.imageSmoothingQuality = 'high';
+      cx.drawImage(img, 0, 0, px, px);
+      return c.toDataURL('image/jpeg', 0.84);
+    },
+    dataUrl,
+    PX,
+  );
 }
 
-const files = readdirSync(SRC).filter((f) => f.endsWith('.glb')).sort();
+const files = readdirSync(SRC)
+  .filter((f) => f.endsWith('.glb'))
+  .sort();
 let n = 0;
 for (const f of files) {
   const b64 = readFileSync(path.join(SRC, f)).toString('base64');
   let full;
   try {
-    full = await page.evaluate((b) => window.renderWeapon(b), b64);
+    const renderPx = Math.max(256, PX * 2);
+    full = await page.evaluate((b, size) => window.renderWeapon(b, size), b64, renderPx);
   } catch (e) {
     console.error(`FAILED ${f}: ${e.message}`);
     continue;

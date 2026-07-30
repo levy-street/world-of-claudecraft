@@ -1,20 +1,25 @@
 import { describe, expect, it, vi } from 'vitest';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
   activeLootRolls,
   awardSharedLootItem,
+  CORPSE_INTERACT_GRACE_SECONDS,
   distributeLootCopper,
   lootRollGroupStatus,
   lootSlotVisibleTo,
   partyLootCandidatesForMob,
+  pickRollGroupWinner,
   pruneCorpseLoot,
   rollLoot,
   submitLootRoll,
 } from '../src/sim/loot/loot_roll';
+import { isHarvestableCorpse } from '../src/sim/professions/gathering';
+import { Rng } from '../src/sim/rng';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Entity, LootSlot, SimEvent } from '../src/sim/types';
+import type { Entity, LootEntry, LootSlot, SimEvent } from '../src/sim/types';
 
 // Direct unit tests for the extracted loot-distribution module (L1). These drive the
 // module's exported `(ctx, ...)` functions through `sim.ctx` (the real SimContext
@@ -93,6 +98,113 @@ describe('loot_roll: rollLoot producer (drop-rate determinism)', () => {
     const rate = dropRate(1234, 'bastion_revenant', 'mistveil_cord', 8000);
     expect(rate).toBeGreaterThan(0.04);
     expect(rate).toBeLessThan(0.08);
+  });
+
+  // Reproduces the raid-loot duplicate bug: Nythraxis has 4 independent rollGroups
+  // (2 helm slots, 2 shoulder slots) and several items (e.g. soulflame_mantle,
+  // crownforged_dreadhelm, nighttalon_crown/shoulderguards) appear in every one of
+  // them. With no cross-group duplicate guard, a single kill can hand out the same
+  // piece twice (or more), so a 9-person raid's 4 drops can collapse to 2-3 distinct
+  // items instead of a spread. This must never happen: every item awarded by one
+  // rollLoot call is unique.
+  it('never awards the same item id twice from one kill (raid boss, cross-group dedup)', () => {
+    // Reuse one Sim/player and re-seed only the rng between draws (constructing a
+    // fresh Sim per iteration is what pushed this over the shared-runner default
+    // test timeout in CI). 60 independent draws is already far past the ~57%
+    // per-kill duplicate rate the unfixed table produced.
+    const template = MOBS.nythraxis_scourge_of_thornpeak;
+    const sim = makeSim(0);
+    const pid = sim.addPlayer('warrior', 'Looter');
+    const meta = playerMeta(sim, pid);
+    for (let seed = 0; seed < 60; seed++) {
+      sim.rng = new Rng(seed);
+      const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
+      rollLoot(sim.ctx, mob, meta);
+      const ids = (mob.loot?.items ?? []).map((s) => s.itemId);
+      // Every one of the 4 groups sums to 100% chance, so a kill must never come
+      // up empty; asserting this keeps the uniqueness check below from passing
+      // vacuously against a 0-item corpse.
+      expect(ids.length).toBeGreaterThan(0);
+      expect(new Set(ids).size).toBe(ids.length);
+    }
+  });
+});
+
+describe('loot_roll: rollLoot sets lootable for a harvestable corpse with empty loot', () => {
+  // Regression test: a mob template whose loot table is entirely chance-based
+  // (no guaranteed copper/item) but carries componentTags mapping to a real
+  // harvest item must still end up lootable=true after rollLoot, so
+  // corpseInteractionAvailability offers the harvest interaction. Before the
+  // fix, rollLoot only set mob.lootable inside `if (copper > 0 || items.length
+  // > 0)`, leaving it false (the baseEntity default) whenever every chance
+  // roll failed, even though isHarvestableCorpse(componentTags) is true.
+  const TEMPLATE_ID = 'test_harvest_only_empty_loot';
+
+  it('sets mob.lootable = true even when every chance-based loot entry fails to roll', () => {
+    (MOBS as Record<string, (typeof MOBS)['forest_wolf']>)[TEMPLATE_ID] = {
+      ...MOBS.forest_wolf,
+      id: TEMPLATE_ID,
+      // No guaranteed { copper, chance: 1 } entry: every entry is chance-based.
+      loot: [{ itemId: 'wolf_fang', chance: 0.45 }],
+      componentTags: ['hide'],
+    };
+    try {
+      const sim = makeSim(1);
+      const pid = sim.addPlayer('warrior', 'Looter');
+      const meta = playerMeta(sim, pid);
+      const template = MOBS[TEMPLATE_ID];
+      expect(isHarvestableCorpse(template.componentTags)).toBe(true);
+      const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
+      // Force every chance-based roll to fail, so the regular loot table
+      // produces zero copper and zero items.
+      const chanceSpy = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(false);
+      rollLoot(sim.ctx, mob, meta);
+      chanceSpy.mockRestore();
+      expect(mob.loot).toBeNull();
+      expect(mob.lootable).toBe(true);
+    } finally {
+      delete (MOBS as Record<string, unknown>)[TEMPLATE_ID];
+    }
+  });
+});
+
+describe('loot_roll: pickRollGroupWinner (cross-group fall-forward)', () => {
+  it('returns the plain partition winner when nothing in the group was awarded yet', () => {
+    const group: LootEntry[] = [
+      { itemId: 'a', chance: 0.5 },
+      { itemId: 'b', chance: 0.5 },
+    ];
+    expect(pickRollGroupWinner(0.1, group, new Set())?.itemId).toBe('a');
+    expect(pickRollGroupWinner(0.6, group, new Set())?.itemId).toBe('b');
+  });
+
+  it('falls forward to the next entry in the SAME group on a collision, preserving the drop', () => {
+    const group = [
+      { itemId: 'a', chance: 0.5 },
+      { itemId: 'b', chance: 0.5 },
+    ];
+    // roll=0.1 partitions to 'a'; 'a' is already awarded elsewhere this kill, so
+    // the slot must still produce 'b' rather than dropping nothing.
+    expect(pickRollGroupWinner(0.1, group, new Set(['a']))?.itemId).toBe('b');
+  });
+
+  it('wraps around the group when the collision is near the end', () => {
+    const group = [
+      { itemId: 'a', chance: 0.34 },
+      { itemId: 'b', chance: 0.33 },
+      { itemId: 'c', chance: 0.33 },
+    ];
+    // roll=0.9 partitions to 'c'; both 'c' and 'a' are already awarded, so the
+    // wraparound scan must land on 'b'.
+    expect(pickRollGroupWinner(0.9, group, new Set(['c', 'a']))?.itemId).toBe('b');
+  });
+
+  it('returns null only when every entry in the group is already awarded', () => {
+    const group = [
+      { itemId: 'a', chance: 0.5 },
+      { itemId: 'b', chance: 0.5 },
+    ];
+    expect(pickRollGroupWinner(0.1, group, new Set(['a', 'b']))).toBeNull();
   });
 });
 
@@ -202,6 +314,111 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
     // The roll is closed and no longer offered to anyone.
     expect(activeLootRolls(sim.ctx, a)).toHaveLength(0);
   });
+
+  it('removes a logged-out candidate before resolving so their winning item is conserved', () => {
+    const { sim, a, b, c } = partyOfThree();
+    const mob = deadCorpse(sim, a, [a, b, c], {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    });
+    awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, playerMeta(sim, a));
+    // Starting a roll removes the source item from ordinary corpse loot. Keep
+    // only a returned slot as the conservation signal.
+    mob.loot = { copper: 0, items: [] };
+    const rollId = lootRollEvent(sim).rollId;
+
+    submitLootRoll(sim.ctx, rollId, 'need', a);
+    sim.removePlayer(a); // explicit logout forfeits the unresolved roll
+    submitLootRoll(sim.ctx, rollId, 'pass', b);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+
+    expect((sim as any).pendingLootRolls.has(rollId)).toBe(false);
+    const returned = mob.loot?.items.find((s) => s.itemId === 'greyjaw_hide_boots');
+    expect(returned).toMatchObject({ count: 1, openToAll: true });
+  });
+
+  it('resolves a two-needer roll when the leaver was the last undecided candidate, awarding a live winner', () => {
+    const resolveHolder = (seed: number) => {
+      const { sim, a, b, c } = partyOfThree(seed);
+      const mob = deadCorpse(sim, a, [a, b, c], {
+        copper: 0,
+        items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+      });
+      awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, playerMeta(sim, a));
+      // The roll pulls the item off the corpse; model that so a wrong
+      // return-to-corpse would surface as a leftover slot.
+      mob.loot = { copper: 0, items: [] };
+      const rollId = lootRollEvent(sim).rollId;
+      submitLootRoll(sim.ctx, rollId, 'need', b);
+      submitLootRoll(sim.ctx, rollId, 'need', c);
+      // `a` never answered: the leave itself is the last-candidate trigger that
+      // runs resolveLootRoll (the only leave-path branch that resolves a roll).
+      sim.removePlayer(a);
+      expect((sim as any).pendingLootRolls.has(rollId)).toBe(false);
+      expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
+      // Won by a live needer, not scattered back to the corpse.
+      expect(mob.loot?.items.find((s) => s.itemId === 'greyjaw_hide_boots')).toBeUndefined();
+      const holder = [b, c].find((pid) => sim.countItem('greyjaw_hide_boots', pid) === 1);
+      return holder ?? -1;
+    };
+    const winner = resolveHolder(2024);
+    expect(winner).not.toBe(-1);
+    expect(resolveHolder(2024)).toBe(winner); // deterministic per seed
+  });
+
+  it('draws the resolve-time tie-break on the leave path when the two remaining needers tie', () => {
+    const { sim, a, b, c } = partyOfThree();
+    const mob = deadCorpse(sim, a, [a, b, c], {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    });
+    awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, playerMeta(sim, a));
+    mob.loot = { copper: 0, items: [] };
+    const rollId = lootRollEvent(sim).rollId;
+    // Force both needers to the same d100 so resolveLootRoll must break the tie;
+    // delegate every other draw so the unrelated leave teardown stays deterministic.
+    const realInt = sim.ctx.rng.int.bind(sim.ctx.rng);
+    const int = vi.spyOn(sim.ctx.rng, 'int').mockImplementation((min: number, max: number) => {
+      if (min === 1 && max === 100) return 50; // tie the two needers
+      if (min === 0 && max === 1) return 1; // tie-break selects the second contender
+      return realInt(min, max);
+    });
+
+    submitLootRoll(sim.ctx, rollId, 'need', b);
+    submitLootRoll(sim.ctx, rollId, 'need', c);
+    sim.removePlayer(a); // the leave resolves the tied roll and must draw the tie-break
+
+    expect(int).toHaveBeenCalledWith(0, 1); // the resolve-time tie-break fired on the leave path
+    expect((sim as any).pendingLootRolls.has(rollId)).toBe(false);
+    // Exactly one live needer holds it; the leaver never does.
+    expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
+    expect(sim.countItem('greyjaw_hide_boots', b) + sim.countItem('greyjaw_hide_boots', c)).toBe(1);
+  });
+
+  it('returns the item if an abruptly missing winner bypassed normal leave reconciliation', () => {
+    const { sim, a, b, c } = partyOfThree();
+    const mob = deadCorpse(sim, a, [a, b, c], {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    });
+    awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, playerMeta(sim, a));
+    mob.loot = { copper: 0, items: [] };
+    const rollId = lootRollEvent(sim).rollId;
+    submitLootRoll(sim.ctx, rollId, 'need', a);
+
+    // Defensive path only: normal logout calls removePlayerFromLootRolls first.
+    sim.entities.delete(a);
+    sim.players.delete(a);
+    submitLootRoll(sim.ctx, rollId, 'greed', b);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+
+    expect((sim as any).pendingLootRolls.has(rollId)).toBe(false);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
+    expect(mob.loot?.items.find((slot) => slot.itemId === 'greyjaw_hide_boots')).toMatchObject({
+      count: 1,
+      openToAll: true,
+    });
+  });
 });
 
 describe('loot_roll: group roll status + resolution broadcast (module entry)', () => {
@@ -244,7 +461,7 @@ describe('loot_roll: group roll status + resolution broadcast (module entry)', (
     }
   });
 
-  it('broadcasts every need/greed roll to the whole party at resolution, then the winner line', () => {
+  it('reveals only the need rolls at resolution when anyone needed, then the winner line', () => {
     const { sim, a, b, c, rollId } = openRoll();
     submitLootRoll(sim.ctx, rollId, 'greed', b);
     submitLootRoll(sim.ctx, rollId, 'need', a);
@@ -256,9 +473,9 @@ describe('loot_roll: group roll status + resolution broadcast (module entry)', (
     for (const viewer of [a, b, c]) {
       const texts = lootTexts(viewer);
       const needLine = texts.find((t) => t.startsWith('Need Roll - '));
-      const greedLine = texts.find((t) => t.startsWith('Greed Roll - '));
       expect(needLine).toMatch(/^Need Roll - \d+ for \[\[i:greyjaw_hide_boots\]\] by Aaa$/);
-      expect(greedLine).toMatch(/^Greed Roll - \d+ for \[\[i:greyjaw_hide_boots\]\] by Bbb$/);
+      // A need makes the greed rolls outcome-irrelevant, so they are not revealed.
+      expect(texts.some((t) => t.startsWith('Greed Roll - '))).toBe(false);
       // Winner line still closes the roll, after the per-roller reveals.
       const winLine = texts.find((t) => t.includes(' wins '));
       expect(winLine).toMatch(/^Aaa wins \[\[i:greyjaw_hide_boots\]\] \(\d+\)$/);
@@ -268,6 +485,28 @@ describe('loot_roll: group roll status + resolution broadcast (module entry)', (
     expect(lootTexts(a).some((t) => t.includes('by Ccc'))).toBe(false);
     // Resolved roll leaves the group status.
     expect(lootRollGroupStatus(sim.ctx, a)).toHaveLength(0);
+  });
+
+  it('still reveals every greed roll to the whole party when nobody needed', () => {
+    const { sim, a, b, c, rollId } = openRoll();
+    submitLootRoll(sim.ctx, rollId, 'greed', a);
+    submitLootRoll(sim.ctx, rollId, 'greed', b);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+    const lootTexts = (pid: number) =>
+      sim.events
+        .filter((e): e is Extract<SimEvent, { type: 'loot' }> => e.type === 'loot' && e.pid === pid)
+        .map((e) => e.text);
+    for (const viewer of [a, b, c]) {
+      const texts = lootTexts(viewer);
+      const greedLines = texts.filter((t) => t.startsWith('Greed Roll - '));
+      expect(greedLines).toHaveLength(2);
+      expect(greedLines[0]).toMatch(/^Greed Roll - \d+ for \[\[i:greyjaw_hide_boots\]\] by Aaa$/);
+      expect(greedLines[1]).toMatch(/^Greed Roll - \d+ for \[\[i:greyjaw_hide_boots\]\] by Bbb$/);
+      expect(texts.some((t) => t.startsWith('Need Roll - '))).toBe(false);
+      const winLine = texts.find((t) => t.includes(' wins '));
+      expect(winLine).toMatch(/^(Aaa|Bbb) wins \[\[i:greyjaw_hide_boots\]\] \(\d+\)$/);
+      expect(texts.indexOf(greedLines[1])).toBeLessThan(texts.indexOf(winLine as string));
+    }
   });
 
   it('hides a curate-phase master roll from the group status', () => {
@@ -333,9 +572,44 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
     expect(lootSlotVisibleTo({ itemId: 'x', count: 1 }, 6)).toBe(true);
   });
 
-  it('pruneCorpseLoot clears an emptied corpse and clamps the corpse timer down', () => {
+  it('pruneCorpseLoot keeps an emptied corpse open for its unclaimed harvest (grace arm)', () => {
+    // forest_wolf carries componentTags and the claim is untaken,
+    // so the emptied corpse stays lootable for the interact-grace window
+    // instead of collapsing (the respawn gate ends it at corpseTimer 0).
     const sim = makeSim();
     const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.corpseTimer = 60;
+    mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+    sim.entities.set(mob.id, mob);
+    pruneCorpseLoot(sim.ctx, mob);
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(true);
+    expect(CORPSE_INTERACT_GRACE_SECONDS).toBe(30);
+    expect(mob.corpseTimer).toBe(CORPSE_INTERACT_GRACE_SECONDS);
+  });
+
+  it('pruneCorpseLoot collapses an emptied corpse whose harvest claim is spent (fast arm)', () => {
+    const sim = makeSim();
+    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.corpseTimer = 60;
+    mob.harvestClaimedBy = 7;
+    mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+    sim.entities.set(mob.id, mob);
+    pruneCorpseLoot(sim.ctx, mob);
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(false);
+    expect(mob.corpseTimer).toBe(4);
+  });
+
+  it('pruneCorpseLoot collapses an emptied corpse with no harvest half at all (fast arm)', () => {
+    // warlock_imp carries no componentTags (#1140): nothing to keep open for.
+    expect(MOBS.warlock_imp.componentTags).toBeUndefined();
+    const sim = makeSim();
+    const mob = createMob(sim.nextId++, MOBS.warlock_imp, 2, { x: 0, y: 0, z: 0 });
     mob.dead = true;
     mob.lootable = true;
     mob.corpseTimer = 60;
@@ -347,11 +621,137 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
     expect(mob.corpseTimer).toBe(4);
   });
 
+  it('pruneCorpseLoot collapses an emptied corpse whose every family is unmapped (#2513)', () => {
+    // The fourth arm, and the reason the harvest half is isHarvestableCorpse
+    // here and not a tag COUNT. fen_troll carries claw and tusk, neither
+    // mapped, so the command boundary refuses a harvest and the claim can never
+    // be spent. Counting tags held the 30s grace window open forever waiting on
+    // it, which is worse than the pre-#2513 world where a player could at least
+    // burn the claim to collapse the corpse.
+    expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
+    expect(isHarvestableCorpse(MOBS.fen_troll.componentTags)).toBe(false);
+    const sim = makeSim();
+    const mob = createMob(sim.nextId++, MOBS.fen_troll, 12, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.corpseTimer = 60;
+    // The claim is UNSPENT, which is the state the grace arm used to key on:
+    // the arm is chosen by the corpse's families, not by the claim.
+    expect(mob.harvestClaimedBy).toBeNull();
+    mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+    sim.entities.set(mob.id, mob);
+    pruneCorpseLoot(sim.ctx, mob);
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(false);
+    expect(mob.corpseTimer).toBe(4);
+    // The discriminator, identical rig and identical unspent claim: a corpse
+    // with a MAPPED family still takes the grace arm, so this is the predicate
+    // narrowing and not the grace arm being deleted.
+    const wolf = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    wolf.dead = true;
+    wolf.lootable = true;
+    wolf.corpseTimer = 60;
+    wolf.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+    sim.entities.set(wolf.id, wolf);
+    pruneCorpseLoot(sim.ctx, wolf);
+    expect(wolf.lootable).toBe(true);
+    expect(wolf.corpseTimer).toBe(CORPSE_INTERACT_GRACE_SECONDS);
+  });
+
   it('partyLootCandidatesForMob prefers the death-time recipient snapshot', () => {
     const { sim, a, b, c } = partyOfThree();
     const mob = deadCorpse(sim, a, [a, c], { copper: 0, items: [] });
     const ids = partyLootCandidatesForMob(sim.ctx, mob).map((m) => m.entityId);
     expect(ids).toEqual([a, c]);
     expect(ids).not.toContain(b);
+  });
+});
+
+describe('loot_roll: heroic-append cross-group dedup arm', () => {
+  // The heroic-append branch in rollLoot shares pickRollGroupWinner and
+  // awardedItemIds with the base-table branch, and this is exercised directly
+  // above. What is NOT covered by real content is the case that arm exists to
+  // guard: a heroic table sharing an item id with the base table (or with
+  // itself across a rollGroup) for the SAME mob. Today no such overlap exists,
+  // which is exactly why a future content edit could silently reintroduce a
+  // duplicate award with zero coverage; pin the disjointness invariant so any
+  // future edit that breaks it fails loudly here instead.
+  it('never shares an item id across a mob’s own heroic rollGroups', () => {
+    const problems: string[] = [];
+    for (const [mobId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
+      const seenPerGroup = new Map<string, Set<string>>();
+      for (const entry of entries) {
+        if (!entry.rollGroup || !entry.itemId) continue;
+        for (const [otherGroup, ids] of seenPerGroup) {
+          if (otherGroup === entry.rollGroup) continue;
+          if (ids.has(entry.itemId)) {
+            problems.push(
+              `${mobId}: ${entry.itemId} appears in both ${otherGroup} and ${entry.rollGroup}`,
+            );
+          }
+        }
+        const set = seenPerGroup.get(entry.rollGroup) ?? new Set<string>();
+        set.add(entry.itemId);
+        seenPerGroup.set(entry.rollGroup, set);
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+
+  it('never shares an item id with the same mob’s base loot table', () => {
+    const problems: string[] = [];
+    for (const [mobId, heroicEntries] of Object.entries(HEROIC_BOSS_LOOT)) {
+      const template = MOBS[mobId];
+      if (!template) continue;
+      const baseIds = new Set(
+        template.loot.flatMap((entry: LootEntry) => (entry.itemId ? [entry.itemId] : [])),
+      );
+      for (const entry of heroicEntries) {
+        if (entry.itemId && baseIds.has(entry.itemId)) {
+          problems.push(`${mobId}: heroic entry ${entry.itemId} also appears in the base table`);
+        }
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+
+  // Direct exercise of the heroic-append arm's dedup path (should-fix from
+  // review: the arm was reachable in code but untested, since no real heroic
+  // table currently collides -- confirmed by the disjointness pins above).
+  // Temporarily substitutes a synthetic two-group heroic table for one real
+  // boss id, engineered to collide by construction, so the SAME code path
+  // rollLoot runs against real content is proven to fall forward here too.
+  it('falls forward inside the heroic-append branch on a forced collision', () => {
+    const template = MOBS.morthen;
+    const original = HEROIC_BOSS_LOOT.morthen;
+    HEROIC_BOSS_LOOT.morthen = [
+      { itemId: 'collision_item', chance: 1, rollGroup: 'heroic_test_1' },
+      { itemId: 'collision_item', chance: 0.5, rollGroup: 'heroic_test_2' },
+      { itemId: 'other_item', chance: 0.5, rollGroup: 'heroic_test_2' },
+    ];
+    try {
+      const sim = makeSim(0);
+      const pid = sim.addPlayer('warrior', 'Looter');
+      const meta = playerMeta(sim, pid);
+      const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
+      sim.ctx.instances.push({
+        id: -1,
+        dungeonId: 'hollow_crypt',
+        difficulty: 'heroic',
+        partyKey: 'test-party',
+        mobIds: [mob.id],
+      } as unknown as (typeof sim.ctx.instances)[number]);
+      // heroic_test_1's single entry always wins (chance 1); heroic_test_2's
+      // roll of 0.1 partitions to its own collision_item entry (index 0,
+      // chance 0.5), which is already awarded by heroic_test_1, so it must
+      // fall forward to other_item rather than dropping nothing.
+      vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.1);
+      rollLoot(sim.ctx, mob, meta);
+      const ids = (mob.loot?.items ?? []).map((s) => s.itemId);
+      expect(ids.filter((id) => id === 'collision_item').length).toBe(1);
+      expect(ids).toContain('other_item');
+    } finally {
+      HEROIC_BOSS_LOOT.morthen = original;
+    }
   });
 });

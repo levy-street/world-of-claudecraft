@@ -1,7 +1,7 @@
 // Chat timestamps — the pure formatting helper behind the classic-WoW "Show
 // Timestamps" interface option. DOM-free, so it's snapshot-tested directly.
 import { describe, expect, it } from 'vitest';
-import { clampChatClock, formatChatTimestamp } from '../src/ui/chat_timestamp';
+import { clampChatClock, formatChatTimestamp } from '../src/ui/hud/chat/chat_timestamp';
 
 // Build a Date at a fixed local wall-clock time (year/month/day are irrelevant
 // — only hours/minutes are formatted).

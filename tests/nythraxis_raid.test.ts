@@ -3,11 +3,32 @@ import { nextRaidResetMs } from '../server/raid_reset';
 import { visualKeyFor } from '../src/render/characters/manifest';
 import { dungeonDaisHasRaisedPlatform } from '../src/render/dungeon';
 import { isBlocked } from '../src/sim/colliders';
-import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
+import { nythraxisGravebreakerOnMobSwing } from '../src/sim/encounters/nythraxis';
+import { isShieldItem } from '../src/sim/equipment_rules';
+import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
-import { type Aura, dist2d, type Entity } from '../src/sim/types';
+import {
+  type Aura,
+  armorReduction,
+  dist2d,
+  type Entity,
+  type WorldContent,
+} from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+
+// The raid assertions run inside the Nythraxis instance band (x > 3000): the
+// boss, adds, Aldric, and wardstones are all spawned by the encounter/dungeon
+// code from the global registries, never from the overworld placements. So
+// spawning every ambient realm mob only makes each tick scan unrelated
+// overworld AI (the fiesta/arena subsystem-world precedent).
+const NYTHRAXIS_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
 
 type TickEvent = ReturnType<Sim['tick']>[number];
 type TimedEvent = { at: number; event: TickEvent };
@@ -33,7 +54,14 @@ function isDamageEvent(event: TickEvent): event is DamageEvent {
 }
 
 function makeWorld(lockoutNowMs?: () => number, raidResetMs?: (nowMs: number) => number) {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, lockoutNowMs, raidResetMs });
+  return new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    noPlayer: true,
+    lockoutNowMs,
+    raidResetMs,
+    world: NYTHRAXIS_TEST_WORLD,
+  });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
@@ -181,16 +209,62 @@ describe('Nythraxis raid encounter', () => {
     expect(MOBS.nythraxis_scourge_of_thornpeak.dmgPerLevel).toBeCloseTo(11.4);
     expect(MOBS.nythraxis_skeleton_warrior.dmgBase).toBeCloseTo(26);
     expect(MOBS.nythraxis_skeleton_warrior.dmgPerLevel).toBeCloseTo(5.6);
+    expect(MOBS.nythraxis_heroic_warrior_add).toMatchObject({
+      family: 'undead',
+      elite: true,
+      ccImmune: true,
+      minLevel: 20,
+      maxLevel: 20,
+      dmgBase: 26,
+      dmgPerLevel: 5.6,
+    });
+    // Malric: CC-able (must be stunned/silenced to break his heal channel), squishy,
+    // and channels an escalating heal on the boss instead of a shield.
+    expect(MOBS.nythraxis_heroic_priest_add).toMatchObject({
+      family: 'undead',
+      elite: true,
+      ccImmune: false,
+      minLevel: 20,
+      maxLevel: 20,
+      channelHeal: expect.objectContaining({
+        every: 4,
+        baseHeal: 320,
+        rampAdd: 240,
+        maxHeal: 1440,
+      }),
+    });
+    expect(MOBS.nythraxis_heroic_priest_add.wardAllies).toBeUndefined();
+    // Voss: untauntable but CC-able, medium damage, low health.
+    expect(MOBS.nythraxis_heroic_rogue_add).toMatchObject({
+      family: 'undead',
+      elite: true,
+      ccImmune: false,
+      minLevel: 20,
+      maxLevel: 20,
+      ignoreTaunt: true,
+      dmgBase: 16,
+    });
 
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Tank');
     const origin = enterRaid(sim, pid);
     expect(sim.entities.get(pid)!.pos.x).toBeGreaterThan(3000);
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
-    expect(boss.maxHp).toBe(60000);
-    expect(boss.weapon.min).toBe(325);
-    expect(boss.weapon.max).toBe(507);
+    // Normal-raid retune (NORMAL_DUNGEON_TUNING): doubled health (was 60000)
+    // and the 5x per-mob damage multiplier (weapon was 325-507).
+    expect(boss.maxHp).toBe(120000);
+    expect(boss.weapon.min).toBe(1624);
+    expect(boss.weapon.max).toBe(2537);
     expect(visualKeyFor(boss)).toBe('skel_golem');
+    expect(
+      visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_warrior_add' } as Entity),
+    ).toBe('skel_warrior');
+    expect(visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_priest_add' } as Entity)).toBe(
+      'skel_necromancer',
+    );
+    expect(visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_rogue_add' } as Entity)).toBe(
+      'skel_rogue',
+    );
     expect(boss.scale).toBeGreaterThanOrEqual(3);
     expect(boss.facing).toBe(Math.PI);
     const wards = objects(sim, 'bastion_ward_stone', origin);
@@ -241,20 +315,33 @@ describe('Nythraxis raid encounter', () => {
   });
 
   it('defines four Nythraxis equipment drops with 3 percent legendary rolls', () => {
-    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot.filter((entry) => entry.itemId);
+    // Equipment drops only: the collectible mount reins (kind 'mount') is its
+    // own independent draw outside the four roll groups, pinned by tests/mounts.test.ts.
+    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot.filter(
+      (entry) => entry.itemId && ITEMS[entry.itemId]?.kind !== 'mount',
+    );
     const groups = new Map<string, typeof loot>();
     for (const entry of loot) {
-      expect(entry.rollGroup).toMatch(/^nythraxis_drop_[1-4]$/);
+      expect(entry.rollGroup).toMatch(/^nythraxis_drop_[1-5]$/);
       const group = entry.rollGroup!;
       groups.set(group, [...(groups.get(group) ?? []), entry]);
       expect(ITEMS[entry.itemId!], entry.itemId).toBeTruthy();
     }
 
-    expect(groups.size).toBe(4);
-    for (const entries of groups.values()) {
+    expect(groups.size).toBe(5);
+    for (const [name, entries] of groups) {
       const total = entries.reduce((sum, entry) => sum + entry.chance, 0);
-      expect(total).toBeCloseTo(1, 5);
+      // nythraxis_drop_5 is the feral ladder's bonus draw (maul_of_the_scourged_wilds):
+      // a single independent 25% roll on top of the four guaranteed equipment
+      // groups, which keep their exact 1.00 partitions untouched.
+      if (name === 'nythraxis_drop_5') {
+        expect(entries.map((entry) => entry.itemId)).toEqual(['maul_of_the_scourged_wilds']);
+        expect(total).toBe(0.25);
+      } else {
+        expect(total).toBeCloseTo(1, 5);
+      }
     }
+    expect(ITEMS.maul_of_the_scourged_wilds.requiredClass).toEqual(['druid']);
 
     for (const itemId of ['deathless_heartwood', 'kingsbane_last_oath']) {
       const item = ITEMS[itemId];
@@ -284,6 +371,51 @@ describe('Nythraxis raid encounter', () => {
     expect(ITEMS.soulflame_mantle.requiredClass).toEqual(['mage', 'priest', 'warlock', 'druid']);
     expect(ITEMS.stormcallers_crown.requiredClass).toEqual(['shaman']);
     expect(ITEMS.stormcallers_spaulders.requiredClass).toEqual(['shaman']);
+  });
+
+  it('drops the offhand-slot and two-hander epics at item level 29 (raid source)', () => {
+    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot;
+    for (const id of [
+      'bonewrought_greatsword',
+      'direfang_greatblade',
+      'bonewrought_bulwark',
+      'wraithfire_orb',
+    ]) {
+      const item = ITEMS[id];
+      expect(item.quality, id).toBe('epic');
+      // Raid source: 20 (boss level) + 6 (epic) + 3 (raid bonus) = item level 29,
+      // with the realized primary stats exactly on that tier's budget (the 2H
+      // weapons carry the doubled TWOHAND_STAT_MULT mainhand budget).
+      expect(itemLevel(item), id).toBe(29);
+      expect(primaryStatSum(item), id).toBe(expectedStatBudget(item));
+      expect(
+        loot.some((entry) => entry.itemId === id),
+        id,
+      ).toBe(true);
+    }
+    // The two-handers occupy both hands; the offhand pieces fill the slot the
+    // set never covered. The bulwark uses the v0.26 shield idiom (kind 'armor'
+    // + shield marker), the orb the held_offhand kind.
+    expect(ITEMS.bonewrought_greatsword).toMatchObject({ hand: 'twohand', slot: 'mainhand' });
+    expect(ITEMS.direfang_greatblade).toMatchObject({ hand: 'twohand', slot: 'mainhand' });
+    // A bespoke hunter lock: the agi 2H must never reach the rogue group.
+    expect(ITEMS.direfang_greatblade.requiredClass).toEqual(['hunter']);
+    expect(isShieldItem(ITEMS.bonewrought_bulwark)).toBe(true);
+    expect(ITEMS.bonewrought_bulwark).toMatchObject({
+      kind: 'armor',
+      armorType: 'mail',
+      slot: 'offhand',
+      shield: true,
+      blockValue: 30,
+    });
+    expect(ITEMS.wraithfire_orb).toMatchObject({ kind: 'held_offhand', slot: 'offhand' });
+    // The ilvl-29 raid seed rating (one rating at 20): Hit for the physical
+    // pieces, crit (never Hit) for the healer-inclusive caster orb.
+    expect(ITEMS.bonewrought_greatsword.hitRating).toBe(20);
+    expect(ITEMS.direfang_greatblade.hitRating).toBe(20);
+    expect(ITEMS.bonewrought_bulwark.hitRating).toBe(20);
+    expect(ITEMS.wraithfire_orb.critRating).toBe(20);
+    expect(ITEMS.wraithfire_orb.hitRating ?? 0).toBe(0);
   });
 
   it('keeps Nythraxis fixed at his throne facing the entrance before pull', () => {
@@ -321,7 +453,7 @@ describe('Nythraxis raid encounter', () => {
       const relic = objects(sim, itemId, origin)[0];
       expect(relic, itemId).toBeTruthy();
       teleport(sim, pid, relic.pos.x, relic.pos.z);
-      sim.pickUpObject(relic.id, pid);
+      expect(sim.pickUpObject(relic.id, pid)).toBe(true);
       expect(mob(sim, summonId), summonId).toBeTruthy();
     }
   });
@@ -379,11 +511,13 @@ describe('Nythraxis raid encounter', () => {
     tank.hp = tank.maxHp;
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
     boss.moveSpeed = 0;
-    boss.swingTimer = 999;
-    teleport(sim, tankPid, origin.x, origin.z + 36);
+    boss.swingTimer = 0;
+    // In melee so the charged Gravebreaker (armed at 12s) releases on a landed
+    // swing while the opening dialogue is still in scope.
+    teleport(sim, tankPid, boss.pos.x, boss.pos.z + 2);
     engage(boss, tank);
 
-    const events = collectEventsForSeconds(sim, 12);
+    const events = collectEventsForSeconds(sim, 18);
     const bossYells = events
       .filter(isTimedChatEvent)
       .filter((row) => row.event.from === boss.name && row.event.channel === 'yell');
@@ -423,8 +557,8 @@ describe('Nythraxis raid encounter', () => {
     tank.hp = tank.maxHp;
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
     boss.moveSpeed = 0;
-    boss.swingTimer = 999;
-    teleport(sim, tankPid, origin.x, origin.z + 36);
+    boss.swingTimer = 0;
+    teleport(sim, tankPid, boss.pos.x, boss.pos.z + 2);
     engage(boss, tank);
     boss.nythraxis = {
       phase: 2,
@@ -437,6 +571,7 @@ describe('Nythraxis raid encounter', () => {
       dialogueToken: 0,
       gravebreakerTimer: 1.5,
       gravebreakerCasts: 0,
+      gravebreakerCharged: false,
       raiseFallenTimer: 999,
       soulRendTimer: 999,
       soulRendMarks: [],
@@ -462,15 +597,27 @@ describe('Nythraxis raid encounter', () => {
       .filter(isTimedChatEvent)
       .filter((row) => row.event.text === 'Kneel before your king' && row.event.from === boss.name);
 
-    expect(gravebreakerFx).toHaveLength(6);
-    expect(kneelYells).toHaveLength(2);
-    expect(kneelYells[0].at).toBeGreaterThanOrEqual(25);
-    expect(kneelYells[0].at).toBeCloseTo(gravebreakerFx[2].at, 5);
-    expect(kneelYells[1].at).toBeCloseTo(gravebreakerFx[5].at, 5);
-    expect(kneelYells[1].at - kneelYells[0].at).toBeGreaterThanOrEqual(35);
+    // Releases ride landed swings now: cadence-driven (12s) but
+    // swing-quantized (2.6s swings that can miss). A release the previous
+    // wait DELAYED compresses the next gap by that wait, so the per-gap
+    // floor is the cadence minus two swings of quantization slack (one
+    // phase, one miss), and the telescoped first-to-last span pins the true
+    // cadence RATE without any per-gap stream luck. At least 5 releases fit
+    // in 66s, and the kneel line lands on every third RELEASE.
+    expect(gravebreakerFx.length).toBeGreaterThanOrEqual(5);
+    for (let i = 1; i < gravebreakerFx.length; i++) {
+      expect(gravebreakerFx[i].at - gravebreakerFx[i - 1].at).toBeGreaterThanOrEqual(12 - 2 * 2.6);
+    }
+    const first = gravebreakerFx[0];
+    const last = gravebreakerFx[gravebreakerFx.length - 1];
+    expect(last.at - first.at).toBeGreaterThanOrEqual((gravebreakerFx.length - 1) * 12 - 2 * 2.6);
+    expect(kneelYells).toHaveLength(Math.floor(gravebreakerFx.length / 3));
+    kneelYells.forEach((yell, i) => {
+      expect(yell.at).toBeCloseTo(gravebreakerFx[i * 3 + 2].at, 5);
+    });
   });
 
-  it('deals normal Gravebreaker damage to the tank and 150 percent to secondary cone targets', () => {
+  it('splashes cone bystanders at 150 percent of the swing roll, never the swing target', () => {
     const sim = makeWorld();
     const tankPid = sim.addPlayer('warrior', 'Tank');
     const origin = enterRaid(sim, tankPid);
@@ -498,8 +645,9 @@ describe('Nythraxis raid encounter', () => {
       transitionReleased: false,
       dialogueBusyUntil: 0,
       dialogueToken: 0,
-      gravebreakerTimer: 0,
+      gravebreakerTimer: 999,
       gravebreakerCasts: 0,
+      gravebreakerCharged: true,
       raiseFallenTimer: 999,
       soulRendTimer: 999,
       soulRendMarks: [],
@@ -512,7 +660,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
     };
 
-    const events = sim.tick();
+    sim.drainEvents();
+    nythraxisGravebreakerOnMobSwing(sim.ctx, boss, tank, 1000, false);
+    const events = sim.drainEvents();
     const gravebreakerHits = events
       .filter(isDamageEvent)
       .filter(
@@ -521,12 +671,17 @@ describe('Nythraxis raid encounter', () => {
     const tankHit = gravebreakerHits.find((ev) => ev.targetId === tank.id);
     const secondaryHit = gravebreakerHits.find((ev) => ev.targetId === secondary.id);
 
-    expect(tankHit?.amount).toBeGreaterThan(0);
-    expect(secondaryHit?.amount).toBeGreaterThan(0);
-    expect(secondaryHit!.amount / tankHit!.amount).toBeCloseTo(1.5, 1);
+    // The swing target takes only the swing itself; the cone bystander takes
+    // 1.5x of the (un-crit) swing roll after their own armor step.
+    const expected = Math.max(
+      1,
+      Math.round(1000 * 1.5 * (1 - armorReduction(sim.ctx.effectiveArmor(secondary), boss.level))),
+    );
+    expect(tankHit).toBeUndefined();
+    expect(secondaryHit?.amount).toBe(expected);
   });
 
-  it('only hits players in front of Nythraxis with Gravebreaker placement', () => {
+  it('only splashes players in front of Nythraxis, never the swing target', () => {
     const sim = makeWorld();
     const tankPid = sim.addPlayer('warrior', 'Tank');
     const origin = enterRaid(sim, tankPid);
@@ -557,8 +712,9 @@ describe('Nythraxis raid encounter', () => {
       transitionReleased: false,
       dialogueBusyUntil: 0,
       dialogueToken: 0,
-      gravebreakerTimer: 0,
+      gravebreakerTimer: 999,
       gravebreakerCasts: 0,
+      gravebreakerCharged: true,
       raiseFallenTimer: 999,
       soulRendTimer: 999,
       soulRendMarks: [],
@@ -571,7 +727,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
     };
 
-    const events = sim.tick();
+    sim.drainEvents();
+    nythraxisGravebreakerOnMobSwing(sim.ctx, boss, tank, 1000, false);
+    const events = sim.drainEvents();
     const gravebreakerHits = events
       .filter(isDamageEvent)
       .filter(
@@ -581,9 +739,8 @@ describe('Nythraxis raid encounter', () => {
     const besideTankHit = gravebreakerHits.find((ev) => ev.targetId === besideTank.id);
     const behindHit = gravebreakerHits.find((ev) => ev.targetId === behind.id);
 
-    expect(tankHit?.amount).toBeGreaterThan(0);
-    expect(besideTankHit?.amount).toBeGreaterThan(tankHit!.amount);
-    expect(besideTankHit!.amount / tankHit!.amount).toBeCloseTo(1.5, 1);
+    expect(tankHit).toBeUndefined();
+    expect(besideTankHit?.amount).toBeGreaterThan(0);
     expect(behindHit).toBeUndefined();
   });
 
@@ -627,8 +784,9 @@ describe('Nythraxis raid encounter', () => {
       transitionReleased: false,
       dialogueBusyUntil: 0,
       dialogueToken: 0,
-      gravebreakerTimer: 0,
+      gravebreakerTimer: 999,
       gravebreakerCasts: 0,
+      gravebreakerCharged: true,
       raiseFallenTimer: 999,
       soulRendTimer: 999,
       soulRendMarks: [],
@@ -641,14 +799,16 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
     };
 
-    const events = sim.tick();
+    sim.drainEvents();
+    nythraxisGravebreakerOnMobSwing(sim.ctx, boss, tank, 1000, false);
+    const events = sim.drainEvents();
     const gravebreakerHits = events
       .filter(isDamageEvent)
       .filter(
         (ev) => ev.sourceId === boss.id && ev.ability === 'Gravebreaker' && ev.kind === 'hit',
       );
 
-    expect(gravebreakerHits.some((ev) => ev.targetId === tank.id)).toBe(true);
+    expect(gravebreakerHits.some((ev) => ev.targetId === tank.id)).toBe(false);
     expect(gravebreakerHits.some((ev) => ev.targetId === inside.id)).toBe(true);
     expect(gravebreakerHits.some((ev) => ev.targetId === outside.id)).toBe(false);
   });
@@ -674,8 +834,9 @@ describe('Nythraxis raid encounter', () => {
       transitionReleased: false,
       dialogueBusyUntil: (sim as unknown as { time: number }).time + 30,
       dialogueToken: 1,
-      gravebreakerTimer: 0,
+      gravebreakerTimer: 999,
       gravebreakerCasts: 2,
+      gravebreakerCharged: true,
       raiseFallenTimer: 999,
       soulRendTimer: 999,
       soulRendMarks: [],
@@ -688,7 +849,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
     };
 
-    const events = sim.tick();
+    sim.drainEvents();
+    nythraxisGravebreakerOnMobSwing(sim.ctx, boss, tank, 1000, false);
+    const events = sim.drainEvents();
 
     expect(
       events.some(
@@ -1650,6 +1813,27 @@ describe('Nythraxis raid encounter', () => {
       add.swingTimer = 0;
       add.threat.set(tank.id, 1000);
     }
+    adds[0].auras.push({
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'incapacitate',
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      sourceId: tank.id,
+      school: 'shadow',
+    });
+    adds[1].auras.push({
+      id: 'polymorph',
+      name: 'Polymorph',
+      kind: 'polymorph',
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      sourceId: tank.id,
+      school: 'arcane',
+    });
+    const transitionAddPositions = adds.map((add) => ({ ...add.pos }));
 
     boss.hp = Math.floor(boss.maxHp * 0.69);
     sim.tick();
@@ -1669,6 +1853,9 @@ describe('Nythraxis raid encounter', () => {
     ).toBe(false);
     expect(tank.hp).toBe(transitionHp);
     expect(boss.nythraxis?.phase).toBe('transition');
+    expect(adds.map((add, index) => dist2d(add.pos, transitionAddPositions[index]))).toEqual([
+      0, 0,
+    ]);
   });
 
   it('stuns active pets during the Aldric transition so they cannot keep attacking', () => {
@@ -1726,8 +1913,9 @@ describe('Nythraxis raid encounter', () => {
       (e) => e.kind === 'mob' && e.templateId === 'nythraxis_skeleton_warrior' && !e.dead,
     );
     expect(adds).toHaveLength(2);
-    expect(adds[0].weapon.min).toBe(159);
-    expect(adds[0].weapon.max).toBe(248);
+    // 5x normal-raid retune (weapon was 159-248 before the economy pass).
+    expect(adds[0].weapon.min).toBe(794);
+    expect(adds[0].weapon.max).toBe(1241);
   });
 
   it('stages Aldric transition dialogue without interrupting itself before Soul Rend opens phase two after a settle delay', () => {
@@ -2308,7 +2496,7 @@ describe('Nythraxis raid encounter', () => {
     const ward = objects(sim, 'bastion_ward_stone', origin)[0];
     const pid = sim.addPlayer('priest', 'Clicker');
     teleport(sim, pid, ward.pos.x, ward.pos.z);
-    sim.pickUpObject(ward.id, pid);
+    expect(sim.pickUpObject(ward.id, pid)).toBe(true);
 
     const channel = boss.nythraxis!.wardChannels.find((c) => c.objectId === ward.id)!;
     expect(channel.playerId).toBe(pid);
@@ -2317,6 +2505,7 @@ describe('Nythraxis raid encounter', () => {
     expect(
       sim.players.get(pid)!.inventory.some((slot) => slot?.itemId === 'bastion_ward_stone'),
     ).toBe(false);
+    expect(sim.pickUpObject(ward.id, pid)).toBe(false);
   });
 
   it('never leashes/resets when kited — keeps chasing instead of evading home', () => {
@@ -2407,6 +2596,67 @@ describe('Nythraxis raid encounter', () => {
     now = reset + 1; // just past the daily reset boundary
     sim.enterDungeon('nythraxis_boss_arena', tankPid);
     expect(tank.pos.x).toBeGreaterThan(3000); // lockout lifted, re-entry allowed
+  });
+
+  it('the kill locks EVERY raid member, even one who never entered the arena', () => {
+    const now = Date.UTC(2025, 5, 29, 16, 0, 0);
+    const reset = nextRaidResetMs(now);
+    const sim = makeWorld(
+      () => now,
+      (nowMs) => nextRaidResetMs(nowMs),
+    );
+    const tankPid = sim.addPlayer('warrior', 'Tank');
+    // enterRaid moves only the tank through the door: the raid fills stay at the
+    // world spawn, outside the arena and the boss room. A member who released
+    // (or camped the door) must still be locked by the kill, or one unlocked
+    // raider re-claims the arena for the whole locked raid.
+    enterRaid(sim, tankPid);
+    const tank = sim.entities.get(tankPid)!;
+    const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
+    engage(boss, tank);
+    killMob(sim, boss, tank);
+
+    const members = sim.partyOf(tankPid)!.members;
+    expect(members.length).toBeGreaterThanOrEqual(5);
+    for (const pid of members) {
+      // The fills really are outside the arena footprint (never zoned in), so
+      // this exercises the party-membership arm, not the position arm.
+      if (pid !== tankPid) {
+        expect(sim.entities.get(pid)!.pos.x, `fill ${pid} outside`).toBeLessThan(3000);
+      }
+      expect(sim.players.get(pid)!.raidLockouts.get('nythraxis_boss_arena'), `pid ${pid}`).toBe(
+        reset,
+      );
+    }
+  });
+
+  it('a raider who left the raid while parked in a side wing is still locked by the kill', () => {
+    const now = Date.UTC(2025, 5, 29, 16, 0, 0);
+    const reset = nextRaidResetMs(now);
+    const sim = makeWorld(
+      () => now,
+      (nowMs) => nextRaidResetMs(nowMs),
+    );
+    const tankPid = sim.addPlayer('warrior', 'Tank');
+    const origin = enterRaid(sim, tankPid);
+    // Bring one raider inside and park them in the east wing: inside the arena
+    // walls (the 260yd boss room) but OUTSIDE the generic 120-wide instance
+    // footprint, then have them leave the raid. Neither the group arm nor the
+    // footprint arm of the sweep sees them, so only the room-radius union does.
+    const wingPid = sim.partyOf(tankPid)!.members.find((pid) => pid !== tankPid)!;
+    sim.enterDungeon('nythraxis_boss_arena', wingPid);
+    teleport(sim, wingPid, origin.x + 200, origin.z + 82);
+    const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
+    const wing = sim.entities.get(wingPid)!;
+    expect(Math.abs(wing.pos.x - origin.x)).toBeGreaterThan(120); // outside the footprint
+    expect(dist2d(wing.pos, boss.spawnPos)).toBeLessThanOrEqual(260); // inside the room
+    sim.partyLeave(wingPid);
+    expect(sim.partyOf(wingPid)).toBeNull();
+
+    const tank = sim.entities.get(tankPid)!;
+    engage(boss, tank);
+    killMob(sim, boss, tank);
+    expect(sim.players.get(wingPid)!.raidLockouts.get('nythraxis_boss_arena')).toBe(reset);
   });
 
   it('a heroic kill locks the :heroic key only; the normal raid stays open that day', () => {

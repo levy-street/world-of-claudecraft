@@ -111,6 +111,26 @@ describe('FakeRes body + lifecycle', () => {
     res.end('done');
     expect(() => res.write('late')).toThrow(/after end/);
   });
+
+  it('waits for asynchronous end without polling scheduler turns', async () => {
+    const res = new FakeRes();
+    const waiting = res.waitForEnd(100);
+    setTimeout(() => res.end('later'), 5);
+
+    await waiting;
+    expect(res.body).toBe('later');
+  });
+
+  it('returns immediately when the response already ended', async () => {
+    const res = new FakeRes();
+    res.end('done');
+    await expect(res.waitForEnd(1)).resolves.toBeUndefined();
+  });
+
+  it('fails on elapsed time when a response never ends', async () => {
+    const res = new FakeRes();
+    await expect(res.waitForEnd(5)).rejects.toThrow('did not end within 5ms');
+  });
 });
 
 describe('makeReq', () => {

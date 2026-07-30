@@ -2,14 +2,18 @@ import { describe, expect, it } from 'vitest';
 import {
   addNote,
   banAccount,
+  banDailyRewards,
   chatMuteCustom,
   chatMuteHours,
   forceRename,
   liftChatMute,
+  moderateDailyRewardsIp,
+  resetChatStrikes,
   resetPassword,
   suspendCustom,
   suspendHours,
   unbanAccount,
+  unbanDailyRewards,
   unsuspendAccount,
 } from '../../src/admin/moderation_actions';
 
@@ -45,6 +49,43 @@ describe('moderation_actions', () => {
     expect(built.pending.danger).toBe(true);
   });
 
+  it('builds reason-required Daily Rewards ban and unban requests', () => {
+    expect(banDailyRewards(42, '')).toEqual({ errorKey: 'alert.noteRequired' });
+    expect(unbanDailyRewards(42, '')).toEqual({ errorKey: 'alert.noteRequired' });
+    const ban = banDailyRewards(42, 'automated play');
+    const unban = unbanDailyRewards(42, 'appeal accepted');
+    if (!('pending' in ban) || !('pending' in unban)) throw new Error('expected pending');
+    expect(ban.pending.endpoint).toBe('/admin/api/moderation/accounts/42/daily-rewards-ban');
+    expect(ban.pending.body).toEqual({ reason: 'automated play' });
+    expect(ban.pending.danger).toBe(true);
+    expect(unban.pending.endpoint).toBe('/admin/api/moderation/accounts/42/daily-rewards-unban');
+    expect(unban.pending.body).toEqual({ reason: 'appeal accepted' });
+  });
+
+  it('builds a timed Daily Rewards ban with a whole-hour duration', () => {
+    const timed = banDailyRewards(42, 'automated play', 12);
+    if (!('pending' in timed)) throw new Error('expected pending');
+    expect(timed.pending.body).toEqual({ reason: 'automated play', durationHours: 12 });
+
+    expect(banDailyRewards(42, 'automated play', 0)).toEqual({
+      errorKey: 'alert.dailyRewardsBanDurationInvalid',
+    });
+    expect(banDailyRewards(42, 'automated play', 1.5)).toEqual({
+      errorKey: 'alert.dailyRewardsBanDurationInvalid',
+    });
+  });
+
+  it('builds reason-required Daily Rewards IP ban requests', () => {
+    expect(moderateDailyRewardsIp(42, '203.0.113.4', true, '')).toEqual({
+      errorKey: 'alert.noteRequired',
+    });
+    const built = moderateDailyRewardsIp(42, '203.0.113.4', true, 'multi-account abuse');
+    if (!('pending' in built)) throw new Error('expected pending');
+    expect(built.pending.endpoint).toBe('/admin/api/moderation/accounts/42/daily-rewards-ip-ban');
+    expect(built.pending.body).toEqual({ ip: '203.0.113.4', reason: 'multi-account abuse' });
+    expect(built.pending.danger).toBe(true);
+  });
+
   it('builds an unsuspend request without changing ban state', () => {
     const built = unsuspendAccount(42, 'appeal accepted');
     if (!('pending' in built)) throw new Error('expected pending');
@@ -73,6 +114,17 @@ describe('moderation_actions', () => {
     const built = liftChatMute(42, 'appeal accepted');
     if (!('pending' in built)) throw new Error('expected pending');
     expect(built.pending.endpoint).toBe('/admin/api/moderation/accounts/42/lift-mute');
+    expect(built.pending.body).toEqual({ reason: 'appeal accepted' });
+  });
+
+  it('requires a reason to reset chat strikes', () => {
+    expect(resetChatStrikes(42, '')).toEqual({ errorKey: 'alert.noteRequired' });
+  });
+
+  it('builds an audited chat strikes reset request', () => {
+    const built = resetChatStrikes(42, 'appeal accepted');
+    if (!('pending' in built)) throw new Error('expected pending');
+    expect(built.pending.endpoint).toBe('/admin/api/moderation/accounts/42/reset-strikes');
     expect(built.pending.body).toEqual({ reason: 'appeal accepted' });
   });
 

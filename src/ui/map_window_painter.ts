@@ -3,23 +3,45 @@
 // The imperative half of the pure-core + painter split: the pure geometry lives
 // in map_window_view.ts (buildOverworldMapModel, unit-tested there); this module
 // turns that flat draw model into actual canvas draws. It owns the 2D context, the
-// cached whole-world decorations, and the localized text + color resolution. The
+// cached current-zone decorations, and the localized text + color resolution. The
 // delve branch of the map is owned by delve_map_painter.ts; Hud picks the
 // branch with mapWindowMode and only routes the overworld branch here, so the two
 // painters never duplicate each other's marker drawing.
 //
 // CADENCE (preserved from the inline site): the map redraws while open from
 // hud.update()'s mediumHud band (>=250ms) behind the `display === 'block'` guard,
-// blitting the cached terrain background (Hud-owned, prewarmed) each redraw. This
-// painter does not change that call site or cadence; it only owns the draw.
+// blitting the cached terrain background (Hud-owned, prewarmed) each redraw. Hud
+// also redraws it out of band on open, on zoom, on the Dungeon Finder's "Show on
+// Map", and once per drag-pan pointermove, which is UNTHROTTLED (no rAF coalesce,
+// no dirty check). Mobile pinch-zoom repaints just as often through its own
+// pointermove listener on the same canvas, which routes via map_pinch_zoom's
+// onZoom into zoomMap. So a drag or a pinch repaints at the pointer-event rate,
+// and reading this painter as a cold ~4Hz on-open path holds only while nobody is
+// touching the map. This painter does not change any of those call sites or the
+// cadence; it only owns the draw.
+//
+// TEXT: every label draws as a cached offscreen sprite (text_sprite_cache), never
+// through the canvas text API. Each canvas text entry point re-resolves font state
+// against the document, so a per-item text loop costs in proportion to how dirty
+// the style tree is; hoisting `ctx.font` above the loop does NOT fix that, and only
+// leaving the text API does (the measured numbers and the mechanism live in the
+// text_sprite_cache header and src/ui/CLAUDE.md). minimap_painter does the same for
+// its three fixed NPC glyphs. This painter's labels are localized, open-ended
+// strings (dungeon and POI names, player names), which is why the cache it holds is
+// measured, bounded and evicting rather than a fixed per-glyph table.
+//
+// The seven per-redraw TextSpriteStyle literals below are deliberate: they close
+// over the colors resolved for THIS redraw, so they cannot be module constants,
+// and seven object literals plus one key string per label is far less work than
+// the text API they replace. Do not trade them for a color-diffing memo.
 //
 // NO-MAGIC-VALUES: a 2D context cannot read CSS vars, so the
 // painter resolves the `--color-map-*` tokens via getComputedStyle ONCE per redraw
 // (cached for the frame, never per-marker); every other literal (font, radius,
 // line width, label offset, triangle geometry) is a named constant.
 
-import type { ZoneDef } from '../sim/data';
-import { type Decoration, generateDecorations } from '../sim/world';
+import { getActiveWorldContent, type ZoneDef } from '../sim/data';
+import { type Decoration, generateDecorationsInBounds } from '../sim/world';
 import type { IWorld } from '../world_api';
 import { dungeonDisplayName, zoneDisplayName, zonePoiLabel } from './entity_i18n';
 import { formatNumber } from './i18n';
@@ -31,6 +53,7 @@ import {
   type MapViewRect,
   type OverworldMapModel,
 } from './map_window_view';
+import { TextSpriteCache, type TextSpriteStyle } from './text_sprite_cache';
 
 // Label / title typography (Georgia, matching the inline site verbatim).
 const TITLE_FONT = 'bold 16px Georgia';
@@ -52,6 +75,11 @@ const PLAYER_ARROW_HALF_WIDTH = 5;
 const PLAYER_ARROW_BASE_Y = 6;
 // Building footprint outline width in the detail overlay.
 const BUILDING_LINE_WIDTH = 1;
+// Dungeon Finder "Show on Map" highlight: a steady double ring (no animation,
+// reduced-motion safe) around the pinged entrance.
+const PING_RADIUS_INNER = 9;
+const PING_RADIUS_OUTER = 14;
+const PING_LINE_WIDTH = 3;
 // Active-quest objective area (the translucent quest-POI blob) ring width.
 const QUEST_AREA_LINE_WIDTH = 2;
 // The numbered quest badge on each area (the WoW-style gold circle whose
@@ -65,10 +93,12 @@ const QUEST_BADGE_TEXT_LIFT = 4; // px above the arc center to optically center 
 // The `--color-map-*` design tokens the painter resolves once per redraw. These
 // mirror the colors the inline overworld-map render used verbatim.
 const MAP_COLOR_TOKENS = {
+  ocean: '--color-map-ocean',
   label: '--color-map-label',
   outline: '--color-map-outline',
   portalDot: '--color-map-portal-dot',
   portalLabel: '--color-map-portal-label',
+  ping: '--color-map-ping',
   npcQuest: '--color-map-npc-quest',
   questAreaFill: '--color-map-quest-area-fill',
   questAreaStroke: '--color-map-quest-area-stroke',
@@ -81,6 +111,7 @@ const MAP_COLOR_TOKENS = {
   tree: '--color-map-tree',
   oak: '--color-map-oak',
   buildingOutline: '--color-map-building-outline',
+  buildingArmoury: '--color-map-building-armoury',
   buildingChapel: '--color-map-building-chapel',
   buildingInn: '--color-map-building-inn',
   buildingHouse: '--color-map-building-house',
@@ -95,16 +126,24 @@ const MAP_COLOR_TOKENS = {
 
 type MapColors = Record<keyof typeof MAP_COLOR_TOKENS, string>;
 
-/** Inputs for one overworld redraw. The cached terrain bg + the committed zone are
- *  Hud-owned (Hud keys the bg cache by zone); the painter owns the decorations. */
+/** The current zone's cached map background plus the world rect it covers. */
+export interface MapZoneBg {
+  canvas: HTMLCanvasElement;
+  region: { minX: number; maxX: number; minZ: number; maxZ: number };
+}
+
+/** Inputs for one overworld redraw. The cached terrain bg + the committed zone
+ *  are Hud-owned (Hud keys the bg cache by zone); the painter owns the
+ *  decorations. Only the committed zone background can reach the painter. */
 export interface MapPaintOptions {
   zone: ZoneDef;
-  /** The cached terrain background canvas for the committed zone. */
-  bg: HTMLCanvasElement;
+  zoneBg: MapZoneBg;
   /** The square map-canvas side in px. */
   canvasSize: number;
   zoom: number;
   center: { x: number; z: number } | null;
+  /** Dungeon Finder "Show on Map" highlight in world coords, or null. */
+  ping?: { x: number; z: number } | null;
 }
 
 /** What the painter reports back so Hud can update its drag state + cursor,
@@ -119,13 +158,23 @@ export interface MapPaintResult {
 
 /**
  * Owns painting the overworld map onto the map-window canvas. One instance is
- * built by Hud; it caches the whole-world decorations once (generated from the
- * seed) and reuses them across redraws.
+ * built by Hud; it caches decorations per zone and reuses them across redraws.
  */
 export class MapWindowPainter {
-  // Cached trees/rocks for the whole world, generated once from the world seed
-  // (matches the inline site's lazy this.mapDecorations cache).
-  private decorations: Decoration[] | null = null;
+  private decorationsByZone = new Map<string, Decoration[]>();
+  // Every on-canvas label, rasterized once per (font, fill, outline, text) and
+  // blitted thereafter. Held on the instance (Hud builds one painter and keeps
+  // it) so the sprites survive across redraws; it trims itself back to its
+  // budget at each redraw boundary.
+  private readonly labels = new TextSpriteCache();
+
+  /** Drop the cached label sprites on a language switch: every label re-resolves
+   *  to a new string, so the old rasters can never be reused and would only sit
+   *  in the budget until eviction worked them out. Hud calls this from its
+   *  woc:languagechange handler, like the other in-place relocalizers. */
+  relocalize(): void {
+    this.labels.clear();
+  }
 
   /** Read the map color tokens in one getComputedStyle pass (a 2D
    *  context can only read a CSS var this way; never per-marker). */
@@ -145,17 +194,23 @@ export class MapWindowPainter {
     world: IWorld,
     opts: MapPaintOptions,
   ): MapPaintResult {
-    if (!this.decorations) this.decorations = generateDecorations(world.cfg.seed);
+    let decorations = this.decorationsByZone.get(opts.zone.id);
+    if (!decorations) {
+      decorations = generateDecorationsInBounds(world.cfg.seed, opts.zoneBg.region);
+      this.decorationsByZone.set(opts.zone.id, decorations);
+    }
     const model = buildOverworldMapModel({
       world,
+      props: getActiveWorldContent().props,
       zone: opts.zone,
       zoom: opts.zoom,
       center: opts.center,
       canvasSize: opts.canvasSize,
-      decorations: this.decorations,
+      decorations,
+      ping: opts.ping ?? null,
     });
     const colors = this.resolveColors();
-    this.draw(ctx, model, opts.bg, opts.canvasSize, colors);
+    this.draw(ctx, model, opts.zoneBg, opts.canvasSize, colors);
     return {
       view: model.view,
       cursor: model.cursor,
@@ -167,23 +222,32 @@ export class MapWindowPainter {
   private draw(
     ctx: CanvasRenderingContext2D,
     model: OverworldMapModel,
-    bg: HTMLCanvasElement,
+    zoneBg: MapZoneBg,
     S: number,
     colors: MapColors,
   ): void {
-    // Blit the matching sub-rect of the cached terrain (note: +X is map-left).
+    // Reclaim any label sprites the last redraws left over the budget, before
+    // this redraw asks for its own (never mid-redraw: see text_sprite_cache).
+    this.labels.beginRedraw();
+
+    // Open ocean under everything, then composite only the current zone's cached
+    // terrain at its world position (+X is map-left, +Z map-down).
+    // Smoothing stays ON for the scaled terrain blit, which is exactly why every
+    // label blit below rounds its destination.
+    const r = model.region;
+    const spanX = r.maxX - r.minX;
+    const spanZ = r.maxZ - r.minZ;
     ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(
-      bg,
-      model.blit.sxFrac * bg.width,
-      model.blit.syFrac * bg.height,
-      model.blit.swFrac * bg.width,
-      model.blit.shFrac * bg.height,
-      0,
-      0,
-      S,
-      S,
-    );
+    ctx.fillStyle = colors.ocean;
+    ctx.fillRect(0, 0, S, S);
+    {
+      const b = zoneBg.region;
+      const destX = ((r.maxX - b.maxX) / spanX) * S;
+      const destY = ((r.maxZ - b.maxZ) / spanZ) * S;
+      const destW = ((b.maxX - b.minX) / spanX) * S;
+      const destH = ((b.maxZ - b.minZ) / spanZ) * S;
+      ctx.drawImage(zoneBg.canvas, destX, destY, destW, destH);
+    }
 
     if (model.detail) this.drawDetail(ctx, model.detail, colors);
 
@@ -203,72 +267,109 @@ export class MapWindowPainter {
       // Numbered badges: one gold circle per quest served by the area, its
       // number matching the quest side list (acceptance order). Centered on
       // the blob, laid out side by side when one camp serves several quests.
-      ctx.font = QUEST_BADGE_FONT;
-      ctx.textAlign = 'center';
       ctx.lineWidth = QUEST_BADGE_LINE_WIDTH;
       ctx.strokeStyle = colors.outline;
+      ctx.fillStyle = colors.questBadgeFill;
+      // The one label on the map with no outline: it sits on its own gold disc.
+      const badgeNumber: TextSpriteStyle = {
+        font: QUEST_BADGE_FONT,
+        fill: colors.questBadgeText,
+      };
       for (const area of model.questAreas) {
         const n = area.numbers.length;
         for (let i = 0; i < n; i++) {
           const bx = area.mx + (i - (n - 1) / 2) * (QUEST_BADGE_RADIUS * 2 + QUEST_BADGE_GAP);
-          ctx.fillStyle = colors.questBadgeFill;
           ctx.beginPath();
           ctx.arc(bx, area.my, QUEST_BADGE_RADIUS, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
-          ctx.fillStyle = colors.questBadgeText;
-          ctx.fillText(
+          this.labels.draw(
+            ctx,
             formatNumber(area.numbers[i], { maximumFractionDigits: 0 }),
             bx,
             area.my + QUEST_BADGE_TEXT_LIFT,
+            badgeNumber,
           );
         }
       }
     }
 
     // Zone title (drawn on-canvas; the world map has no DOM zone label).
-    ctx.font = TITLE_FONT;
-    ctx.textAlign = 'center';
-    ctx.strokeStyle = colors.outline;
-    ctx.lineWidth = LABEL_LINE_WIDTH;
-    ctx.fillStyle = colors.label;
-    const zoneName = zoneDisplayName(model.zoneId);
-    ctx.strokeText(zoneName, S / 2, TITLE_BASELINE_Y);
-    ctx.fillText(zoneName, S / 2, TITLE_BASELINE_Y);
+    this.labels.draw(ctx, zoneDisplayName(model.zoneId), S / 2, TITLE_BASELINE_Y, {
+      font: TITLE_FONT,
+      fill: colors.label,
+      stroke: colors.outline,
+      lineWidth: LABEL_LINE_WIDTH,
+    });
 
-    // POI labels (outline + label color carried from the title).
-    ctx.font = LABEL_FONT;
+    // POI labels (the title's outline + label color, one size down).
+    const poiLabel: TextSpriteStyle = {
+      font: LABEL_FONT,
+      fill: colors.label,
+      stroke: colors.outline,
+      lineWidth: LABEL_LINE_WIDTH,
+    };
     for (const poi of model.pois) {
-      const text = zonePoiLabel(poi.zoneId, poi.poiIndex);
-      ctx.strokeText(text, poi.mx, poi.my);
-      ctx.fillText(text, poi.mx, poi.my);
+      this.labels.draw(ctx, zonePoiLabel(poi.zoneId, poi.poiIndex), poi.mx, poi.my, poiLabel);
     }
 
-    // Dungeon entrance portals: a purple dot plus the dungeon name above it.
+    // Dungeon entrance portals: a purple dot plus the dungeon name above it. The
+    // dot's own outline is the label outline at the label width, which the title
+    // block used to leave behind on ctx; it is named here instead.
+    ctx.fillStyle = colors.portalDot;
+    ctx.strokeStyle = colors.outline;
+    ctx.lineWidth = LABEL_LINE_WIDTH;
+    const portalName: TextSpriteStyle = {
+      font: PORTAL_NAME_FONT,
+      fill: colors.portalLabel,
+      stroke: colors.outline,
+      lineWidth: LABEL_LINE_WIDTH,
+    };
     for (const portal of model.portals) {
-      ctx.fillStyle = colors.portalDot;
       ctx.beginPath();
       ctx.arc(portal.mx, portal.my, PORTAL_DOT_RADIUS, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
-      ctx.fillStyle = colors.portalLabel;
-      ctx.font = PORTAL_NAME_FONT;
-      const dungeonName = dungeonDisplayName(portal.dungeonId);
-      ctx.strokeText(dungeonName, portal.mx, portal.my - PORTAL_NAME_OFFSET_Y);
-      ctx.fillText(dungeonName, portal.mx, portal.my - PORTAL_NAME_OFFSET_Y);
+      this.labels.draw(
+        ctx,
+        dungeonDisplayName(portal.dungeonId),
+        portal.mx,
+        portal.my - PORTAL_NAME_OFFSET_Y,
+        portalName,
+      );
     }
 
-    // Quest-giver glyphs ('?' turn-in ready, '!' available). Color + font are
-    // loop-invariant, so set them once before the loop, not per glyph (assigning
-    // ctx.font re-parses the font string each time). The next text-drawing layer
-    // (allies) sets its own font/fillStyle, so the carried-over portal-name font
-    // is never read by a draw in between (pixel-identical to the inline original).
-    ctx.fillStyle = colors.npcQuest;
-    ctx.font = NPC_GLYPH_FONT;
+    // Dungeon Finder "Show on Map" highlight: a steady double ring around the
+    // pinged entrance (drawn over the portal dot; no animation by design).
+    if (model.ping) {
+      ctx.strokeStyle = colors.ping;
+      ctx.lineWidth = PING_LINE_WIDTH;
+      ctx.beginPath();
+      ctx.arc(model.ping.mx, model.ping.my, PING_RADIUS_INNER, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(model.ping.mx, model.ping.my, PING_RADIUS_OUTER, 0, Math.PI * 2);
+      ctx.stroke();
+      // Restore BOTH stroke settings, not just the width. Leaving the ping color
+      // behind tinted every later outline on this canvas (the player arrow, and
+      // the quest-giver glyphs before they became sprites) for as long as a
+      // "Show on Map" ping was live.
+      ctx.strokeStyle = colors.outline;
+      ctx.lineWidth = LABEL_LINE_WIDTH;
+    }
+
+    // Quest-giver glyphs ('?' turn-in ready, '!' available): two sprites for the
+    // life of a resolved color set. The anchor is untouched, so the hover
+    // hit-test (npcMarkerAt, over the same mx/my) still lines up with the glyph.
+    const npcGlyph: TextSpriteStyle = {
+      font: NPC_GLYPH_FONT,
+      fill: colors.npcQuest,
+      stroke: colors.outline,
+      lineWidth: LABEL_LINE_WIDTH,
+    };
     for (const npc of model.npcs) {
       const glyph = npc.ready ? NPC_GLYPH_READY : NPC_GLYPH_AVAILABLE;
-      ctx.strokeText(glyph, npc.mx, npc.my);
-      ctx.fillText(glyph, npc.mx, npc.my);
+      this.labels.draw(ctx, glyph, npc.mx, npc.my, npcGlyph);
     }
 
     // Local player facing arrow.
@@ -290,19 +391,29 @@ export class MapWindowPainter {
     // Online allies: friends green, guild members blue (model dedups + orders).
     if (model.allies.length > 0) {
       ctx.lineWidth = LABEL_LINE_WIDTH;
-      ctx.font = ALLY_FONT;
-      ctx.textAlign = 'center';
+      ctx.strokeStyle = colors.outline;
+      // Two name styles, one per ally color; the dot keeps the same color.
+      const friendName: TextSpriteStyle = {
+        font: ALLY_FONT,
+        fill: colors.allyFriend,
+        stroke: colors.outline,
+        lineWidth: LABEL_LINE_WIDTH,
+      };
+      const guildName: TextSpriteStyle = { ...friendName, fill: colors.allyGuild };
       for (const ally of model.allies) {
-        const color = ally.kind === 'friend' ? colors.allyFriend : colors.allyGuild;
-        ctx.fillStyle = color;
-        ctx.strokeStyle = colors.outline;
+        const friend = ally.kind === 'friend';
+        ctx.fillStyle = friend ? colors.allyFriend : colors.allyGuild;
         ctx.beginPath();
         ctx.arc(ally.mx, ally.my, ALLY_DOT_RADIUS, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
-        ctx.fillStyle = color;
-        ctx.strokeText(ally.name, ally.mx, ally.my - ALLY_NAME_OFFSET_Y);
-        ctx.fillText(ally.name, ally.mx, ally.my - ALLY_NAME_OFFSET_Y);
+        this.labels.draw(
+          ctx,
+          ally.name,
+          ally.mx,
+          ally.my - ALLY_NAME_OFFSET_Y,
+          friend ? friendName : guildName,
+        );
       }
     }
   }
@@ -322,11 +433,13 @@ export class MapWindowPainter {
     ctx.strokeStyle = colors.buildingOutline;
     for (const b of detail.buildings) {
       ctx.fillStyle =
-        b.kind === 'chapel'
-          ? colors.buildingChapel
-          : b.kind === 'inn'
-            ? colors.buildingInn
-            : colors.buildingHouse;
+        b.kind === 'armoury'
+          ? colors.buildingArmoury
+          : b.kind === 'chapel'
+            ? colors.buildingChapel
+            : b.kind === 'inn'
+              ? colors.buildingInn
+              : colors.buildingHouse;
       ctx.beginPath();
       ctx.moveTo(b.points[0].mx, b.points[0].my);
       for (let i = 1; i < b.points.length; i++) ctx.lineTo(b.points[i].mx, b.points[i].my);

@@ -65,6 +65,13 @@ export interface UnitFrameElements {
    *  elsewhere (the player name is set at login, not on the hot path). A frame
    *  whose name changes per unit (target/party) supplies it. */
   name?: HTMLElement;
+  /** The title-decoration spans around the name (Book of Deeds display title),
+   *  written from the view's pre-localized titlePre/titlePost strings; omitted
+   *  by frames without a title surface (player, party), which then pay zero
+   *  writes. A supplying instance keeps `name` pointing at a TEXT-ONLY sibling
+   *  node (setText clobbers children). */
+  titlePre?: HTMLElement;
+  titlePost?: HTMLElement;
   /** The absorb-shield overlay; omitted by a frame with no shield bar (party). */
   absorb?: HTMLElement;
   /** The resource bar group; omitted by a frame with no resource bar (target). */
@@ -117,6 +124,8 @@ export class UnitFramePainter {
       this.writers.setDisplay(this.el.frame, this.opts.shownDisplay);
     }
     if (this.el.name) this.writers.setText(this.el.name, view.name);
+    if (this.el.titlePre) this.writers.setText(this.el.titlePre, view.titlePre);
+    if (this.el.titlePost) this.writers.setText(this.el.titlePost, view.titlePost);
     this.gatePortrait(view.portraitKey);
     this.writers.setText(this.el.level, view.levelText ?? '');
     this.writers.setTransform(this.el.hpFill, this.barScaleX(view.hpFrac));

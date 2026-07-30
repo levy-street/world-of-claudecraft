@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { castBarState, consumeBarState } from '../src/render/cast_bar';
+import { castBarState, consumeBarState, mountSummonBarState } from '../src/render/cast_bar';
+import { MOUNT_SUMMON_SECONDS } from '../src/sim/mounts';
 import { CONSUME_DURATION, type Consuming, type Entity } from '../src/sim/types';
 
 // castBarState reads only a handful of cast fields, so a minimal partial entity
@@ -64,6 +65,24 @@ describe('overhead cast bar', () => {
     expect(unknown.label).toBe('made_up_spell');
   });
 
+  it('renders fishing as a CONSTANT full waiting bar and the gather cast as a normal fill', () => {
+    // The fishing fill is pinned at 1 REGARDLESS of the broadcast decay: the
+    // bar must carry no session-progress information (the bite is the bobber
+    // plus the cue). castRemaining 7.5 of 15 would fill 0.5 on the generic
+    // path; fishing must stay 1.
+    const fish = castBarState(
+      caster({ castingAbility: 'fishing', castRemaining: 7.5, castTotal: 15 }),
+    );
+    expect(fish.fill).toBe(1);
+    // The gather cast rides the generic filling path (public state, honest
+    // bar): 1.25 of 2.5 remaining reads as half done.
+    const gather = castBarState(
+      caster({ castingAbility: 'gathering', castRemaining: 1.25, castTotal: 2.5 }),
+    );
+    expect(gather.fishing).toBe(false);
+    expect(gather.fill).toBe(0.5);
+  });
+
   it('carries custom raid mechanic cast ids for renderer localization', () => {
     const rage = castBarState(
       caster({
@@ -100,10 +119,24 @@ describe('overhead cast bar', () => {
 // the target's whole story, so eat/drink rides here, not on castBarState. The core
 // stays i18n-free, emitting only the `mode` discriminator the painter localizes.
 function food(remaining: number): Consuming {
-  return { itemId: 'roasted_boar', kind: 'food', hpPer2s: 40, manaPer2s: 0, remaining };
+  return {
+    itemId: 'roasted_boar',
+    kind: 'food',
+    hpPer2s: 40,
+    manaPer2s: 0,
+    remaining,
+    ticksElapsed: 0,
+  };
 }
 function drink(remaining: number): Consuming {
-  return { itemId: 'spring_water', kind: 'drink', hpPer2s: 0, manaPer2s: 30, remaining };
+  return {
+    itemId: 'spring_water',
+    kind: 'drink',
+    hpPer2s: 0,
+    manaPer2s: 30,
+    remaining,
+    ticksElapsed: 0,
+  };
 }
 
 describe('overhead eat/drink overlay', () => {
@@ -157,6 +190,59 @@ describe('overhead eat/drink overlay', () => {
     const a = consumeBarState(food(8), drink(3));
     const b = consumeBarState(food(8), drink(3));
     expect(a).toEqual(b);
+  });
+});
+
+// mountSummonBarState: the player-only mount summon channel bar. Hidden during a
+// dismount channel (mountCastKey === '') and when mountCastRemaining is 0 or
+// negative. Drains like a channel over MOUNT_SUMMON_SECONDS. The mountKey is the
+// stable discriminator; the painter resolves the localized mount name.
+describe('mount summon bar', () => {
+  it('is hidden when mountCastKey is empty (no summon or dismount channel)', () => {
+    const s = mountSummonBarState(0, '');
+    expect(s.visible).toBe(false);
+  });
+
+  it('is hidden when mountCastKey is empty even if time remains (dismount channel)', () => {
+    // A dismount channel has mountCastKey === '': the summon bar must NOT show.
+    const s = mountSummonBarState(0.5, '');
+    expect(s.visible).toBe(false);
+  });
+
+  it('is hidden when remaining is zero even if a key is set', () => {
+    expect(mountSummonBarState(0, 'valorsteed').visible).toBe(false);
+  });
+
+  it('shows a full bar at the start of a summon (full MOUNT_SUMMON_SECONDS remaining)', () => {
+    const s = mountSummonBarState(MOUNT_SUMMON_SECONDS, 'valorsteed');
+    expect(s.visible).toBe(true);
+    expect(s.fill).toBeCloseTo(1);
+    expect(s.mountKey).toBe('valorsteed');
+    expect(s.remaining).toBeCloseTo(MOUNT_SUMMON_SECONDS);
+  });
+
+  it('drains the fill toward zero as time ticks down', () => {
+    // Half the summon time elapsed -> half-full (draining channel).
+    const s = mountSummonBarState(MOUNT_SUMMON_SECONDS / 2, 'grag_bear');
+    expect(s.visible).toBe(true);
+    expect(s.fill).toBeCloseTo(0.5);
+    expect(s.mountKey).toBe('grag_bear');
+  });
+
+  it('clamps fill to 0..1 against transient overshoot', () => {
+    expect(mountSummonBarState(MOUNT_SUMMON_SECONDS + 5, 'valorsteed').fill).toBe(1);
+    expect(mountSummonBarState(-1, 'valorsteed').visible).toBe(false);
+  });
+
+  it('is deterministic: same inputs give the same output', () => {
+    const a = mountSummonBarState(0.75, 'stormfeather_griffin');
+    const b = mountSummonBarState(0.75, 'stormfeather_griffin');
+    expect(a).toEqual(b);
+  });
+
+  it('carries the correct mountKey for the painter to localize', () => {
+    const epic = mountSummonBarState(1.0, 'thunderstrut_gobbler');
+    expect(epic.mountKey).toBe('thunderstrut_gobbler');
   });
 });
 
@@ -214,6 +300,7 @@ describe('ClientWorld-vs-Sim parity', () => {
       hpPer2s: 0,
       manaPer2s: 0,
       remaining: 9,
+      ticksElapsed: 0,
     };
     const clientDrink: Consuming = {
       itemId: '',
@@ -221,6 +308,7 @@ describe('ClientWorld-vs-Sim parity', () => {
       hpPer2s: 0,
       manaPer2s: 0,
       remaining: 5,
+      ticksElapsed: 0,
     };
     const sim = consumeBarState(simEat, simDrink);
     const client = consumeBarState(clientEat, clientDrink);

@@ -7,10 +7,17 @@ import {
   completeTame,
   feedPet,
   healPet,
+  petAttack,
   petOf,
+  petTaunt,
+  petTauntReadout,
+  petWaterJet,
+  renamePet,
   restorePet,
   revivePet,
   serializePet,
+  setPetAutoTaunt,
+  setPetAutoWaterJet,
   setPetMode,
   summonPet,
 } from '../src/sim/pet/pet_commands';
@@ -48,6 +55,110 @@ function spawnWolf(sim: AnySim, near: AnyEntity, level = 2): AnyEntity {
 }
 
 describe('pet_commands module (P1b)', () => {
+  it('an unbreakable owner movement lock blocks every user-issued pet command', () => {
+    const { sim, hid, hunter } = hunterWorld();
+    const tame = spawnWolf(sim, hunter);
+    completeTame(sim.ctx, hunter, tame);
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    const target = spawnWolf(sim, hunter);
+    hunter.targetId = target.id;
+    sim.ctx.applyAura(hunter, {
+      id: 'scripted_boss_lock',
+      name: 'Scripted Boss Lock',
+      kind: 'root',
+      value: 0,
+      remaining: 10,
+      duration: 10,
+      sourceId: target.id,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+
+    // Revival is immediate rather than tick-driven, so it must be rejected at the
+    // command boundary instead of waiting for the encounter to mark the pet again.
+    pet.dead = true;
+    pet.hp = 0;
+    revivePet(sim.ctx, hid);
+    expect(pet.dead).toBe(true);
+    expect(pet.hp).toBe(0);
+
+    // Put the pet back into a neutral live state as a system/encounter operation,
+    // then prove every direct control surface remains side-effect free.
+    pet.dead = false;
+    pet.hp = Math.floor(pet.maxHp * 0.5);
+    pet.aiState = 'idle';
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+    pet.petTauntTimer = 0;
+    pet.petManualTauntPending = false;
+    sim.addItem('baked_bread', 1, hid);
+    const breadBefore = sim.countItem('baked_bread', hid);
+
+    petAttack(sim.ctx, hid);
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(target.threat.has(pet.id)).toBe(false);
+
+    petTaunt(sim.ctx, hid);
+    expect(pet.petTauntTimer).toBe(0);
+    expect(pet.petManualTauntPending).toBe(false);
+    expect(target.forcedTargetId).not.toBe(pet.id);
+
+    feedPet(sim.ctx, 'baked_bread', hid);
+    expect(sim.countItem('baked_bread', hid)).toBe(breadBefore);
+    expect(pet.auras.some((a) => a.id === 'feed_pet')).toBe(false);
+
+    setPetMode(sim.ctx, 'aggressive', hid);
+    setPetAutoTaunt(sim.ctx, true, hid);
+    expect(pet.petMode).toBe('defensive');
+    expect(pet.petAutoTaunt).toBe(false);
+
+    // Exercise the mage-only active/autocast seam on the same owned entity.
+    pet.templateId = 'water_elemental';
+    setPetAutoWaterJet(sim.ctx, true, hid);
+    petWaterJet(sim.ctx, hid);
+    expect(pet.petAutoWaterJet).toBe(false);
+    expect(pet.castingAbility).toBeNull();
+    expect(pet.petTauntTimer).toBe(0);
+    expect(target.auras.some((a) => a.id === 'water_jet')).toBe(false);
+
+    const nameBefore = pet.name;
+    renamePet(sim.ctx, 'Locked', hid);
+    abandonPet(sim.ctx, hid);
+    expect(pet.name).toBe(nameBefore);
+    expect(sim.entities.has(pet.id)).toBe(true);
+  });
+
+  it('an unbreakable owner movement lock cannot spend mana or arm Demon Heal', () => {
+    const sim = new Sim({ seed: 12, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const pid = sim.addPlayer('warlock', 'Demonist') as number;
+    const owner = sim.entities.get(pid) as AnyEntity;
+    summonPet(sim.ctx, owner, 'emberkin');
+    const pet = petOf(sim.ctx, pid) as AnyEntity;
+    pet.hp = Math.max(1, pet.maxHp - 50);
+    owner.resource = owner.maxResource;
+    sim.ctx.applyAura(owner, {
+      id: 'scripted_boss_lock',
+      name: 'Scripted Boss Lock',
+      kind: 'root',
+      value: 0,
+      remaining: 10,
+      duration: 10,
+      sourceId: pet.id,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+    const manaBefore = owner.resource;
+    const gcdBefore = owner.gcdRemaining;
+
+    healPet(sim.ctx, pid);
+
+    expect(owner.resource).toBe(manaBefore);
+    expect(owner.gcdRemaining).toBe(gcdBefore);
+    expect(owner.castingAbility).toBeNull();
+    expect(owner.channeling).toBe(false);
+  });
+
   it('hunter lifecycle: tame -> setMode -> feed -> revive -> abandon', () => {
     const { sim, hid, hunter } = hunterWorld();
     const wolf = spawnWolf(sim, hunter);
@@ -192,6 +303,64 @@ describe('pet_commands module (P1b)', () => {
     expect(freshVw.id).not.toBe(woundedId);
     expect(freshVw.hp).toBe(freshVw.maxHp);
     expect(sim.entities.has(woundedId)).toBe(false);
+  });
+
+  it('petTaunt is a permanent no-op for a ranged warlock pet, near or far (never gets stuck pending)', () => {
+    const sim = new Sim({ seed: 21, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const wpid = sim.addPlayer('warlock', 'Demonist') as number;
+    sim.setPlayerLevel(12, wpid);
+    const warlock = sim.entities.get(wpid) as AnyEntity;
+    summonPet(sim.ctx, warlock, 'emberkin');
+    const pet = petOf(sim.ctx, wpid) as AnyEntity;
+    expect(pet.templateId).toBe('emberkin');
+    const target = spawnWolf(sim, warlock);
+    warlock.targetId = target.id;
+
+    // Inside PET_TAUNT_RANGE: the old bug called ctx.applyTaunt(pet, target) directly,
+    // forcing mob aggro onto a squishy ranged caster pet that was never meant to tank.
+    pet.pos = { ...target.pos };
+    petTaunt(sim.ctx, wpid);
+    expect(target.forcedTargetId).not.toBe(pet.id);
+    expect(pet.petManualTauntPending).toBe(false);
+    expect(pet.petTauntTimer).toBe(0);
+
+    // Outside PET_TAUNT_RANGE (the pet's normal ranged standoff): the old bug latched
+    // petManualTauntPending = true, and pet_ai's consume condition also required
+    // !ranged, so a ranged pet could never clear it: a permanently-stuck no-op.
+    pet.pos = { x: target.pos.x + 24, y: target.pos.y, z: target.pos.z };
+    petTaunt(sim.ctx, wpid);
+    expect(pet.petManualTauntPending).toBe(false);
+    expect(target.forcedTargetId).not.toBe(pet.id);
+  });
+
+  it('setPetAutoTaunt cannot arm auto-taunt on a ranged warlock pet', () => {
+    const sim = new Sim({ seed: 22, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const wpid = sim.addPlayer('warlock', 'Demonist') as number;
+    const warlock = sim.entities.get(wpid) as AnyEntity;
+    summonPet(sim.ctx, warlock, 'spellhound');
+    const pet = petOf(sim.ctx, wpid) as AnyEntity;
+    expect(pet.templateId).toBe('spellhound');
+    setPetAutoTaunt(sim.ctx, true, wpid);
+    expect(pet.petAutoTaunt).toBe(false);
+    expect(petTauntReadout(sim.ctx, warlock)).toBe('This pet cannot taunt.');
+  });
+
+  it('petTaunt/setPetAutoTaunt/petTauntReadout stay no-op for the mage Water Elemental (regression)', () => {
+    const sim = new Sim({ seed: 23, playerClass: 'mage', noPlayer: true }) as AnySim;
+    const pid = sim.addPlayer('mage', 'Frostbite') as number;
+    const mage = sim.entities.get(pid) as AnyEntity;
+    summonPet(sim.ctx, mage, 'water_elemental');
+    const pet = petOf(sim.ctx, pid) as AnyEntity;
+    expect(pet.templateId).toBe('water_elemental');
+    setPetAutoTaunt(sim.ctx, true, pid);
+    expect(pet.petAutoTaunt).toBe(false);
+    expect(petTauntReadout(sim.ctx, mage)).toBe('This pet cannot taunt.');
+    const target = spawnWolf(sim, mage);
+    mage.targetId = target.id;
+    pet.pos = { ...target.pos };
+    petTaunt(sim.ctx, pid);
+    expect(target.forcedTargetId).not.toBe(pet.id);
+    expect(pet.petManualTauntPending).toBe(false);
   });
 
   it('is deterministic on seeded replay (same seed + same drive => identical state)', () => {

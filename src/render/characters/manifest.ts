@@ -3,7 +3,9 @@
 // Pure data + dispatch — no three.js imports, no loading.
 
 import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
-import { MOBS } from '../../sim/data';
+import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
+import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
+import { ITEMS, MOBS } from '../../sim/data';
 import type { Entity, PlayerClass } from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
@@ -20,6 +22,10 @@ export interface ClipMap {
   run: string;
   /** one-shot swing clips, rotated per attack */
   attack: string[];
+  /** Optional per-ability swing or cast-gesture override. */
+  attackByAbility?: Record<string, string>;
+  /** Optional weapon-style override for plain auto attacks. */
+  attackByHand?: { twohand?: string; dualwield?: string };
   death: string;
   /** hit-react one-shots (optional — spider/raptor rigs have none) */
   hit?: string[];
@@ -34,6 +40,9 @@ export interface ClipMap {
   walkBack?: string;
   /** one-shot played on respawn (skeleton awaken / boss taunt) */
   flourish?: string;
+  /** arm gesture for the Z-key sheathe toggle; the held-prop swap lands at its
+   *  midpoint (see visual.ts setWeaponStowed). Absent = snap with no gesture. */
+  stow?: string;
   /** player-facing overhead emote one-shots; clips are sourced from the GLB. */
   emote?: Partial<Record<OverheadEmoteId, EmoteClipSpec>>;
 }
@@ -64,10 +73,14 @@ export interface VisualDef {
   attach?: AttachDef[];
   /** Indices into `attach` whose model is replaced by the entity's equipped mainhand
    *  weapon (mapped via ITEM_WEAPON_VARIANTS). undefined/empty = the held weapon never
-   *  changes with gear (hunter keeps its crossbow; mobs/NPCs are fixed). Usually [0]
-   *  (the mainhand); the rogue lists [0, 1] so a dagger shows in BOTH hands. A fixed
-   *  offhand left off this list stays as authored (the warlock spellbook). */
+   *  changes with gear (hunter keeps its crossbow; mobs/NPCs are fixed). A fixed
+   *  offhand left off this list stays authored (the warlock spellbook); a live
+   *  equipped offhand uses `offhandSlot` below. */
   weaponSlots?: number[];
+  /** Index into `attach` replaced by the entity's actual equipped offhand. Kept
+   *  separate from `weaponSlots` so mainhand cosmetics cannot overwrite a live
+   *  shield or second weapon. */
+  offhandSlot?: number;
   /** material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
@@ -86,12 +99,20 @@ export interface VisualDef {
    *  flip the standalone weapon files carry). Node name as authored in the GLB;
    *  applied as a local-space rotation (radians) after the bind transform. */
   weaponFix?: { node: string; rotX?: number; rotY?: number; rotZ?: number }[];
+  /** Glowing ring parented behind the head bone (the priest's Light halo).
+   *  Value is the glow color; geometry/placement live in halo.ts. */
+  halo?: number;
+  /** Halo placement overrides, head-bone space (defaults in halo.ts): lift
+   *  above the bone and ring radius, for models whose headgear the default
+   *  ring would clip. */
+  haloUpOffset?: number;
+  haloRadius?: number;
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
  *  which slots swap to the equipped item). Lets a cosmetic body adopt a different
  *  class's hand layout without cloning the whole def. */
-export type WeaponLayoutOverride = Pick<VisualDef, 'attach' | 'weaponSlots'>;
+export type WeaponLayoutOverride = Pick<VisualDef, 'attach' | 'weaponSlots' | 'offhandSlot'>;
 
 // ---------------------------------------------------------------------------
 // Clip sets per source rig family
@@ -130,6 +151,10 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
   sitIdle: 'Sit_Floor_Idle',
   swim: 'Lie_Idle',
   jump: 'Jump_Idle',
+  // The trimmed player GLBs ship no dedicated sheathe clip; the 1H chop WINDUP
+  // (the clip's first ~40%, cut at the swap point by visual.ts) reaches over the
+  // shoulder toward the back, which reads as grabbing/planting the hilt.
+  stow: '1H_Melee_Attack_Chop',
   emote: KAYKIT_EMOTES,
 });
 
@@ -156,6 +181,23 @@ const animal = (attack: string[]): ClipMap => ({
   hit: ['Idle_HitReact_Left', 'Idle_HitReact_Right'],
   death: 'Death',
 });
+
+// Rideable mounts. The Tripo-lane rigs (bear, toad, griffin) ship clips baked
+// locally by scripts/bake_mount_gaits.mjs (the Tripo quadruped retarget was
+// near-static, 4-5 animated joints), which authors Idle/Walk/Run/Death gait
+// cycles directly against each rig's bind pose. The horse and the gobbler
+// ship AUTHORED clips from their source models, renamed to these same four
+// names at import time. The clipless prop-lane mounts resolve no actions from
+// this map and rest in their generated standing pose (procedural bob in
+// src/render/mount_visuals.ts). No attack one-shots: the RIDER swings, the
+// mount does not.
+const MOUNT_RIGGED: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: [],
+  death: 'Death',
+};
 
 // Custom baked wolf rig (wolf_basic/greyjaw, Dog_Animation donor skeleton): the
 // animal() core plus the donor's Sit/Fall clips so player wolf forms sit and
@@ -188,6 +230,19 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
+// Tripo biped rig. These creatures come through the current biped
+// pipeline, which retargets and bakes the complete game vocabulary directly.
+const TRIPO_BIPED_FULL_RIG: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  hit: ['Hit'],
+  death: 'Death',
+  cast: 'Cast',
+  jump: 'Jump',
+};
+
 // 2023 enemy rig (goblin/giant)
 const ENEMY7: ClipMap = {
   idle: 'Idle',
@@ -208,12 +263,45 @@ const FLOATING: ClipMap = {
   death: 'Death',
 };
 
+// 2023 enemy rig variant with a bite attack and no run clip (yeti)
+const ENEMY_BITE: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Walk',
+  attack: ['Bite_Front'],
+  hit: ['HitRecieve'],
+  death: 'Death',
+};
+
+// Procedurally authored Water Elemental. Node transforms ripple its layered
+// translucent body and drive the hands through the Waterbolt casting motion.
+const WATER_ELEMENTAL: ClipMap = {
+  idle: 'Idle',
+  walk: 'Move',
+  run: 'Move',
+  // Waterbolt uses the short one-shot Cast attack; Water Jet holds this
+  // dedicated forward-arms loop for its full server-authoritative channel.
+  cast: 'Channel',
+  attack: ['Cast'],
+  hit: ['Hit'],
+  death: 'Death',
+};
+
 const SPIDER: ClipMap = {
   idle: 'Spider_Idle',
   walk: 'Spider_Walk',
   run: 'Spider_Walk',
   attack: ['Spider_Attack'],
   death: 'Spider_Death', // no hit-react in asset
+};
+
+// Velociraptor rig (velociraptor.glb): like the spider, no hit-react clips
+const RAPTOR: ClipMap = {
+  idle: 'Velociraptor_Idle',
+  walk: 'Velociraptor_Walk',
+  run: 'Velociraptor_Run',
+  attack: ['Velociraptor_Attack'],
+  death: 'Velociraptor_Death',
 };
 
 // Chicken-cow rig (chicken_cow.glb, procedurally authored — see
@@ -261,14 +349,58 @@ const PLAYERS = 'models/chars/players';
 const ENEMIES = 'models/chars/enemies';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
+const MOUNTS_DIR = 'models/mounts';
+
+const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
+  eastbrook_buckler: 'shield_round',
+  highwatch_wallshield: 'shield_square',
+  bonewrought_bulwark: 'shield_square',
+  pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
+};
+
+function itemModelKey(
+  itemId: string | null | undefined,
+  extra: Readonly<Record<string, string>> = {},
+): string | null {
+  if (!itemId) return null;
+  const baseId = ITEMS[itemId]?.heroicOf;
+  return (
+    ITEM_WEAPON_VARIANTS[itemId] ??
+    extra[itemId] ??
+    (baseId ? (ITEM_WEAPON_VARIANTS[baseId] ?? extra[baseId]) : undefined) ??
+    null
+  );
+}
 
 /** GLB url for an equipped mainhand item's held weapon model, or null if the item
  *  has no mapped model (then the class default attach is kept). Mirrors the bag
  *  icon via the shared ITEM_WEAPON_VARIANTS map, so held weapon == inventory icon. */
 export function itemWeaponModelUrl(itemId: string | null | undefined): string | null {
-  if (!itemId) return null;
-  const key = ITEM_WEAPON_VARIANTS[itemId];
+  const key = itemModelKey(itemId);
   return key ? `${WEAPONS}/${key}.glb` : null;
+}
+
+/** GLB url for an actual equipped offhand. One-handed weapons reuse the shared
+ *  inventory/held-model map; shields use the narrow render-only table above. */
+export function itemOffhandModelUrl(itemId: string | null | undefined): string | null {
+  const key = itemModelKey(itemId, ITEM_OFFHAND_MODELS);
+  return key ? `${WEAPONS}/${key}.glb` : null;
+}
+
+/** GLB url the offhand slot should render: the active weapon skin's model when it
+ *  mirrors onto a matching-type offhand weapon (a rogue's second dagger
+ *  under a dagger skin), otherwise the equipped offhand item's own model. A shield,
+ *  held offhand (orb/tome), or different-type offhand weapon never mirrors, so it
+ *  keeps its item model; null when the offhand has no mapped model. The mirror
+ *  decision is the pure sim rule, so server and clients agree on both hands. */
+export function offhandModelUrl(
+  offhandItemId: string | null | undefined,
+  weaponSkinId: string | null | undefined,
+): string | null {
+  if (offhandMirrorsWeaponSkin(weaponSkinId, offhandItemId)) {
+    return weaponSkinModelUrl(weaponSkinId);
+  }
+  return itemOffhandModelUrl(offhandItemId);
 }
 
 /** Distinct held-weapon GLB urls (one per variant), for the boot preload sweep so
@@ -276,6 +408,25 @@ export function itemWeaponModelUrl(itemId: string | null | undefined): string | 
  *  an un-preloaded url). */
 export function itemWeaponModelUrls(): string[] {
   return [...new Set(Object.values(ITEM_WEAPON_VARIANTS).map((key) => `${WEAPONS}/${key}.glb`))];
+}
+
+function itemOffhandModelUrls(): string[] {
+  return [...new Set(Object.values(ITEM_OFFHAND_MODELS).map((key) => `${WEAPONS}/${key}.glb`))];
+}
+
+/** GLB url for a Season 1 Armory weapon-skin cosmetic, or null for no/unknown
+ *  skin. The skin model replaces the equipped item's held model (same bone, its
+ *  own KAYKIT_WEAPON_ACCESSORY grip family + WEAPON_GRIP_OVERRIDES fine-tune). */
+export function weaponSkinModelUrl(skinId: string | null | undefined): string | null {
+  if (!skinId) return null;
+  const def = WEAPON_SKINS[skinId];
+  return def ? `${WEAPONS}/${def.model}.glb` : null;
+}
+
+/** Distinct weapon-skin GLB urls, preloaded like item weapon models: any nearby
+ *  player can have a skin applied, and the attach path is synchronous. */
+export function weaponSkinModelUrls(): string[] {
+  return [...new Set(Object.values(WEAPON_SKINS).map((def) => `${WEAPONS}/${def.model}.glb`))];
 }
 
 const LOW_URL_ALIAS: Record<string, string> = {
@@ -315,49 +466,70 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/knight/alt_a.png`,
     `${SKINS_DIR}/knight/alt_b.png`,
     `${SKINS_DIR}/knight/alt_c.png`,
+    `${SKINS_DIR}/knight/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/knight/alt_suit_chrome.png`,
   ],
-  player_paladin: [null, `${SKINS_DIR}/paladin/alt_a.png`],
+  player_paladin: [
+    null,
+    `${SKINS_DIR}/paladin/alt_a.png`,
+    `${SKINS_DIR}/paladin/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/paladin/alt_suit_chrome.png`,
+  ],
   player_hunter: [
     null,
     `${SKINS_DIR}/ranger/alt_a.png`,
     `${SKINS_DIR}/ranger/alt_b.png`,
     `${SKINS_DIR}/ranger/alt_c.png`,
+    `${SKINS_DIR}/ranger/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/ranger/alt_suit_chrome.png`,
   ],
   player_rogue: [
     null,
     `${SKINS_DIR}/rogue/alt_a.png`,
     `${SKINS_DIR}/rogue/alt_b.png`,
     `${SKINS_DIR}/rogue/alt_c.png`,
+    `${SKINS_DIR}/rogue/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/rogue/alt_suit_chrome.png`,
   ],
   player_priest: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
   player_mage: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
   player_warlock: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
   player_shaman: [
     null,
     `${SKINS_DIR}/barbarian/alt_a.png`,
     `${SKINS_DIR}/barbarian/alt_b.png`,
     `${SKINS_DIR}/barbarian/alt_c.png`,
+    `${SKINS_DIR}/barbarian/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/barbarian/alt_suit_chrome.png`,
   ],
   player_druid: [
     null,
     `${SKINS_DIR}/druid/alt_a.png`,
     `${SKINS_DIR}/druid/alt_b.png`,
     `${SKINS_DIR}/druid/alt_c.png`,
+    `${SKINS_DIR}/druid/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/druid/alt_suit_chrome.png`,
   ],
   // Combat Mech chromas — every index is a real full-model texture (no null
   // default; the embedded base texture is not one of the rewards).
@@ -409,25 +581,65 @@ export const VISUALS: Record<string, VisualDef> = {
   player_warrior: {
     url: `${PLAYERS}/knight.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      attackByHand: {
+        twohand: '2H_Melee_Attack_Chop',
+        dualwield: 'Dualwield_Melee_Attack_Chop',
+      },
+      attackByAbility: {
+        mortal_strike: '2H_Melee_Attack_Chop',
+        execute: '2H_Melee_Attack_Chop',
+        slam: '2H_Melee_Attack_Chop',
+        red_harvest: '2H_Melee_Attack_Chop',
+        breachmaker: '2H_Melee_Attack_Chop',
+        shield_slam: '2H_Melee_Attack_Chop',
+        raging_gale: 'Dualwield_Melee_Attack_Chop',
+        bloodthirst: 'Dualwield_Melee_Attack_Chop',
+        cleave: '1H_Melee_Attack_Chop',
+        thunder_clap: '1H_Melee_Attack_Chop',
+        faultline: '1H_Melee_Attack_Chop',
+        revenge: '1H_Melee_Attack_Chop',
+        heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
+        overpower: '1H_Melee_Attack_Slice_Diagonal',
+        hamstring: '1H_Melee_Attack_Slice_Diagonal',
+        sanguine_aura: 'Spellcast_Raise',
+        raised_guard: 'Block',
+      },
+    },
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
-    attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
+    attach: [
+      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    ],
     weaponSlots: [0],
+    offhandSlot: 1,
   },
   player_paladin: {
     url: `${PLAYERS}/paladin.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+    },
     // dedicated paladin model (helmeted variant) — ships its own Cape + Helmet
     // meshes and texture, so no show-list/tint. Shield + paladin hammer arrive
     // in the weapons pass; the gripped axe holds the slot until then.
-    attach: [{ url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' }],
+    attach: [
+      { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },
+    ],
     weaponSlots: [0],
+    offhandSlot: 1,
   },
   player_hunter: {
     url: `${PLAYERS}/ranger.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Ranged_Shoot']),
+    // Bow-draw clips for the Season 1 bow skins (scripts/build_bow_anims.mjs):
+    // with a bow displayed the shot plays a draw instead of the crossbow
+    // shoulder-aim (visual.ts weaponSkinAttackClips).
+    animUrls: [`${PLAYERS}/bow_anims.glb`],
     // dedicated ranger model — the quiver is a built-in mesh, so it's no longer
     // a separate chest attachment
     attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
@@ -441,12 +653,25 @@ export const VISUALS: Record<string, VisualDef> = {
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.l' },
     ],
-    weaponSlots: [0, 1], // dual-wield: the equipped weapon shows in BOTH hands (mostly daggers)
+    weaponSlots: [0],
+    offhandSlot: 1,
   },
   player_priest: {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
+    // The priest's Light: a warm golden halo ring above the crown. The mage
+    // model's pointed hat is canon here, and at the default lift the ring
+    // plane crosses the hat cone where it is wide, clipping through it; +0.15
+    // raises the plane to the cone tip, where the default-size ring clears it
+    // on every side (tuned by screenshot against the current mage.glb; a hat
+    // reshape in an asset update means re-tuning). Kept just below the hat's
+    // bounding-box top so portrait/turntable framing is unchanged for priests.
+    halo: 0xffd766,
+    haloUpOffset: 1.45,
+    // show is a no-op for the hat/cape: the current mage.glb rigs every
+    // accessory as a SkinnedMesh, and the allowlist filter (assets.ts) only
+    // hides non-skinned nodes, so the hat always renders. Sanctioned look.
     show: [],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
@@ -456,10 +681,17 @@ export const VISUALS: Record<string, VisualDef> = {
   player_shaman: {
     url: `${PLAYERS}/barbarian.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+    },
     show: ['Barbarian_BearHat'], // v2 barbarian renamed Hat→BearHat and dropped the round shield mesh
-    attach: [{ url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' }],
+    attach: [
+      { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    ],
     weaponSlots: [0],
+    offhandSlot: 1,
     tint: 0x6f8fc9,
     tintStrength: 0.4,
   },
@@ -467,8 +699,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
-    // no Mage_Hat on players: the brim hides the whole body from the default
-    // chase-camera pitch (NPC mages keep theirs — they're seen from the side)
+    // The hat and cape render regardless of this list: the current mage.glb
+    // rigs every accessory as a SkinnedMesh, and the show allowlist
+    // (assets.ts) only hides non-skinned nodes. The hatted silhouette is the
+    // sanctioned mage look; listing Mage_Cape is inert but kept as intent.
     show: ['Mage_Cape'],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
@@ -545,6 +779,90 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: CHICKEN_COW,
   },
 
+  // -- rideable mounts (src/sim/content/mounts.ts catalog) -------------------
+  // All lazyPreload: fetched on the first sight of a mounted player
+  // (preloadMountAssets in assets.ts), never in the boot sweep. Baked
+  // textures, no tint. Seat heights + procedural bob live in
+  // src/render/mount_visuals.ts. Heights are deliberately imposing (a mount
+  // should tower over the 2.6 humanoid the way a horse towers over a person);
+  // walkRef/runRef foot-match each model's Walk/Run cycle cadence (baked or
+  // authored) to mounted ground speed.
+  // The horse ships AUTHORED gait clips (Idle/Walk/Run baked from the source
+  // model's own animation set, Sleep repurposed as Death), not the procedural
+  // bake_mount_gaits.mjs cycles the Tripo mounts carry; walkRef/runRef are
+  // re-matched to its 1.03s walk / 0.40s gallop cadence.
+  mount_valorsteed: {
+    url: `${MOUNTS_DIR}/valorsteed.glb`,
+    height: 3.8,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.3,
+    runRef: 12,
+    lazyPreload: true,
+  },
+  mount_grag_bear: {
+    url: `${MOUNTS_DIR}/grag_bear.glb`,
+    height: 4.0,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.6,
+    runRef: 9,
+    lazyPreload: true,
+  },
+  mount_stalkglider_snail: {
+    url: `${MOUNTS_DIR}/stalkglider_snail.glb`,
+    height: 3.1,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  mount_aether_hover_cycle: {
+    url: `${MOUNTS_DIR}/aether_hover_cycle.glb`,
+    height: 2.3,
+    clips: MOUNT_RIGGED,
+    hover: 0.6,
+    lazyPreload: true,
+  },
+  mount_shadowjump_toad: {
+    url: `${MOUNTS_DIR}/shadowjump_toad.glb`,
+    height: 3.2,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.6,
+    runRef: 9,
+    lazyPreload: true,
+  },
+  mount_stormfeather_griffin: {
+    url: `${MOUNTS_DIR}/stormfeather_griffin.glb`,
+    height: 4.1,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.6,
+    runRef: 9,
+    lazyPreload: true,
+  },
+  // Epic world-boss turkey: one authored strut cycle serves as BOTH Walk and
+  // Run (plus a baked breathing Idle), so the run reference is deliberately
+  // low; at full mounted speed the strut plays fast, which is the joke.
+  mount_thunderstrut_gobbler: {
+    url: `${MOUNTS_DIR}/thunderstrut_gobbler.glb`,
+    height: 3.5,
+    clips: MOUNT_RIGGED,
+    walkRef: 1.8,
+    runRef: 4.5,
+    lazyPreload: true,
+  },
+
+  // Ambient Highwatch stable horse (sim mob 'stable_horse', MOB_KEYS below). Reuses
+  // the Valorsteed GLB + its authored gait clips so it renders and ambles as a real
+  // horse through the STANDARD mob-visual path, never a humanoid capsule. Unlike the
+  // rider mounts this is NOT lazyPreload: a mob body is built synchronously by
+  // createCharacterVisual (which throws on a not-yet-fetched asset), so it must be
+  // in the boot sweep. Shorter than the imposing 3.8 ridden Valorsteed so loose
+  // paddock horses read at a natural size; no tint (authored colours).
+  mob_stable_horse: {
+    url: `${MOUNTS_DIR}/valorsteed.glb`,
+    height: 2.9,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.3,
+    runRef: 12,
+  },
+
   // -- mob families --------------------------------------------------------
   mob_wolf: {
     // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton
@@ -556,6 +874,28 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: WOLF_BAKED,
     tint: 'entity',
     tintStrength: 0.35,
+  },
+  // The Gleamfolk pixie villager (Veiled Hollow): Tripo biped from the user's
+  // game-style concept, auto-rigged, clips renamed to the game vocabulary at
+  // bake time. A light entity tint gives individual villagers variety.
+  mob_mushroom_pixie: {
+    url: `${CREATURES}/mushroom_pixie.glb`,
+    height: HUMANOID_H, // villagers stand player-height, cap and all
+    // The Tripo rig rests facing +x; yaw swings the model onto the game's
+    // +z-forward convention so walking and combat face the right way.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+    tint: 'entity',
+    tintStrength: 0.2,
   },
   greyjaw: {
     // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton;
@@ -613,7 +953,60 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_stag: {
     url: `${CREATURES}/stag.glb`,
     height: 1.9,
-    clips: animal(['Attack_Headbutt', 'Attack']),
+    // Attack_Kick, not 'Attack': the rig ships no clip by that name, so every
+    // second swing in the rotation resolved to nothing and played no animation
+    // at all (the repainted siblings below always had it right).
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  // the Veiled Hollow stags: the shipped stag rig repainted to the approved
+  // concepts (tmp/make_hollow_stags.mjs): dusk coats baked into the materials
+  // and the antlers split onto their own emissive amethyst material, so no
+  // entity tint (a wash would muddy the baked palette and the antler glow)
+  mob_veiled_stag: {
+    url: `${CREATURES}/veiled_stag.glb`,
+    height: 1.9,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
+  mob_gleamstag: {
+    url: `${CREATURES}/gleamstag.glb`,
+    height: 1.9,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
+  // the does: the same rig with the antler mesh removed and a softer coat
+  mob_veiled_doe: {
+    url: `${CREATURES}/veiled_doe.glb`,
+    height: 1.6,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
+  // Aurelhorn keeps the bull's bulk (height) but joins the herd's species:
+  // the same repainted stag rig in the patriarch's gold
+  mob_aurelhorn: {
+    url: `${CREATURES}/aurelhorn.glb`,
+    height: 2.1,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+  },
+  // Training dummy: the immortal practice target (zone3.ts training_dummy,
+  // hpBase 999999, no drops). Custom Tripo humanoid auto-rigged onto the
+  // biped skeleton, KAYKIT_CLIP_PLAN vocabulary. The dummy never casts or
+  // jumps (sim's dummy handling holds it stationary and ability-less), so
+  // those two clips are stripped from the shipped GLB rather than carried as
+  // dead weight. It appears in exactly one hub (zone3.ts, count: 1, radius:
+  // 0), so it is lazy-preloaded rather than joining every client's eager
+  // boot set.
+  mob_training_dummy: {
+    url: `${CREATURES}/training_dummy.glb`,
+    height: 2.3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+    },
+    lazyPreload: true,
     tint: 'entity',
     tintStrength: 0.35,
   },
@@ -634,6 +1027,14 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: BIPED14,
     tint: 0x5a4030,
     tintStrength: 0.5,
+  },
+  // the same rig worn honestly: an ice-white yeti for the Frostveil
+  mob_yeti: {
+    url: `${CREATURES}/yetialt.glb`,
+    height: 2.5,
+    clips: BIPED14,
+    tint: 'entity',
+    tintStrength: 0.55,
   },
   mob_spider: {
     url: `${CREATURES}/spider.glb`,
@@ -671,6 +1072,48 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.2, // skin washes pink fast
   },
+  // Five Wildheart troll silhouettes use the same complete biped vocabulary,
+  // but preserve their woven cloth, bone paint, feathers, and jungle palette.
+  mob_wildheart_stalker: {
+    url: `${CREATURES}/wildheart_stalker.glb`,
+    height: 2.5,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
+  mob_wildheart_ravager: {
+    url: `${CREATURES}/wildheart_ravager.glb`,
+    height: 2.7,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
+  mob_wildheart_hexcaller: {
+    url: `${CREATURES}/wildheart_hexcaller.glb`,
+    height: 2.5,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
+  mob_wildheart_beastmaster: {
+    url: `${CREATURES}/wildheart_beastmaster.glb`,
+    height: 3,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.03,
+  },
+  mob_wildheart_high_priest: {
+    url: `${CREATURES}/wildheart_high_priest.glb`,
+    height: 3.2,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.03,
+  },
   mob_elemental: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.2,
@@ -678,6 +1121,13 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: FLOATING,
     tint: 'entity',
     tintStrength: 0.4,
+  },
+  mob_water_elemental: {
+    url: `${CREATURES}/water_elemental.glb`,
+    height: 2.65,
+    hover: 0.12,
+    clips: WATER_ELEMENTAL,
+    attackTimeScale: 1.1,
   },
   mob_dragonkin: {
     url: `${CREATURES}/dragonevolved.glb`,
@@ -731,6 +1181,100 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: FLOATING,
     tint: 'entity',
     tintStrength: 0.25,
+  },
+  // the Nightbloom's realm-only rigs, all first appearances: the moonfleece
+  // herds (alpaca), the gloam striders (velociraptor), and the hovering
+  // masked nightkin (tribal, a flying rig: they drift rather than walk)
+  mob_alpaca: {
+    url: `${CREATURES}/alpaca.glb`,
+    height: 1.7,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  mob_raptor: {
+    url: `${CREATURES}/velociraptor.glb`,
+    height: 1.6,
+    clips: RAPTOR,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  mob_nightkin: {
+    url: `${CREATURES}/tribal.glb`,
+    height: 1.9,
+    hover: 0.3,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  // the Veiled Hollow's spirits: the ghost rig, entity-tinted (teal hollow
+  // remnants and the ice wisp still wear it)
+  mob_ghost: {
+    url: `${CREATURES}/ghost.glb`,
+    height: 1.6,
+    hover: 0.4,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.55,
+  },
+  // the Hollow wisps: bespoke static meshes from the approved concepts
+  // (user-generated via Tripo). No rig on purpose: they drift and hover,
+  // and every clip lookup null-guards, so FLOATING names simply no-op.
+  // Baked palettes, so no entity tint. Front faces +x off the generator;
+  // yaw turns it to the +z game convention.
+  mob_glimmerwisp: {
+    url: `${CREATURES}/glimmerwisp.glb`,
+    height: 1.6,
+    hover: 0.4,
+    clips: FLOATING,
+    yaw: -Math.PI / 2,
+  },
+  mob_duskwisp: {
+    url: `${CREATURES}/duskwisp.glb`,
+    height: 1.6,
+    hover: 0.4,
+    clips: FLOATING,
+    yaw: -Math.PI / 2,
+  },
+  // spore-borne mushroom folk: the glub blob drifting just above the glade
+  mob_glub: {
+    url: `${CREATURES}/glubevolved.glb`,
+    height: 1.4,
+    hover: 0.15,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.45,
+  },
+  // the Hollow's wandering bosses: two more rigs no other zone uses
+  mob_crab: {
+    url: `${CREATURES}/crabenemy.glb`,
+    height: 1.7,
+    clips: ENEMY_BITE,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  mob_bull: {
+    url: `${CREATURES}/bull.glb`,
+    height: 2.1,
+    // the bull rig has no plain Idle clip; grazing IS its idle
+    clips: {
+      idle: 'Eating',
+      walk: 'Walk',
+      run: 'Gallop',
+      attack: ['Attack_Headbutt', 'Attack_Kick'],
+      hit: ['Idle_HitReact_Left', 'Idle_HitReact_Right'],
+      death: 'Death',
+    },
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  // mossy treant: the shaggy yeti under a bark-green entity wash
+  mob_treant: {
+    url: `${CREATURES}/yeti.glb`,
+    height: 2.6,
+    clips: ENEMY_BITE,
+    tint: 'entity',
+    tintStrength: 0.72, // the white pelt needs a heavy wash to read as moss
   },
   mob_demonalt: {
     url: `${CREATURES}/demonalt.glb`,
@@ -834,6 +1378,16 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: skeletonClips(['2H_Melee_Attack_Chop']),
     tint: 'entity',
     tintStrength: 0.25,
+  },
+  // The Infernal Citadel's Magus Vel'Kor: the same necromancer rig, but drenched in
+  // its entity colour (the shared skel_necromancer tints at 0.25 and stays
+  // bone-white, which reads as a snowdrift under the citadel's blood-red grade).
+  rift_ritualist: {
+    url: `${ENEMIES}/necromancer.glb`,
+    height: 2.5,
+    clips: skeletonClips(['2H_Melee_Attack_Chop']),
+    tint: 'entity',
+    tintStrength: 0.8,
   },
   skel_golem: {
     url: `${ENEMIES}/skeleton_golem.glb`,
@@ -968,6 +1522,23 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['2H_Melee_Attack_Chop']),
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
   },
+  // The three zone Chroniclers (Saul, Osric Fenn, Zenzie): one shared
+  // scholarly-mage silhouette (hat, staff, open ledger in the off hand,
+  // the warlock spellbook grip) with the per-NPC entity tint carrying each
+  // identity. When the bespoke chronicler .glb files arrive, split this into
+  // one def per chronicler with its own url.
+  npc_chronicler: {
+    url: `${PLAYERS}/mage.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['2H_Melee_Attack_Chop']),
+    show: ['Mage_Hat'],
+    attach: [
+      { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
+    ],
+    tint: 'entity',
+    tintStrength: 0.55,
+  },
   // Reedbound Acolyte (The Drowned Litany trash mob): Stone Cantor model from
   // the Raid 02 asset batch. The earlier Meshy mesh (reedbound_acolyte.glb) was
   // realistically proportioned and clashed with the chunky KayKit-style rigs;
@@ -1010,10 +1581,23 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  wildheart_stalker: 'mob_wildheart_stalker',
+  wildheart_ravager: 'mob_wildheart_ravager',
+  wildheart_hexcaller: 'mob_wildheart_hexcaller',
+  wildheart_beastmaster: 'mob_wildheart_beastmaster',
+  wildheart_high_priest: 'mob_wildheart_high_priest',
+  // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
+  // above) so it renders as an animated horse, not a humanoid.
+  stable_horse: 'mob_stable_horse',
+  // Dawnhold's garrison: the armored knight body (helmet, cape, sword), not
+  // the humanoid family's hooded outlaw fallback.
+  hedge_knight: 'npc_knight',
   // Protect Yumi objective cat: the dedicated Meshy familiar
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
+  training_dummy: 'mob_training_dummy',
   emberkin: 'mob_demon',
+  water_elemental: 'mob_water_elemental',
   gloomshade: 'mob_demon',
   duskborn: 'mob_demon',
   warlock_imp: 'mob_demon_flying',
@@ -1058,6 +1642,9 @@ const MOB_KEYS: Record<string, string> = {
   sanctum_boneguard: 'skel_warrior',
   nythraxis_scourge_of_thornpeak: 'skel_golem',
   nythraxis_skeleton_warrior: 'skel_warrior',
+  nythraxis_heroic_warrior_add: 'skel_warrior',
+  nythraxis_heroic_priest_add: 'skel_necromancer',
+  nythraxis_heroic_rogue_add: 'skel_rogue',
   brother_aldric_raid: 'npc_aldric',
   hollow_acolyte: 'skel_mage',
   sexton_marrow: 'skel_mage',
@@ -1072,9 +1659,67 @@ const MOB_KEYS: Record<string, string> = {
   fallen_captain_aldren: 'skel_warrior',
   corrupted_priest_malric: 'skel_necromancer',
   deathstalker_voss: 'skel_rogue',
+  // The Nythraxis phase-2 heroic court is Aldren / Malric / Voss risen again, so
+  // the "Spirit of X" adds reuse each character's crypt visual above. Without these
+  // the ids fall through to FAMILY_KEYS.undead (skel_minion) and the whole court
+  // renders as identical generic skeletons. See spawnNythraxisHeroicAdds.
   vision_aldren_warrior: 'player_warrior',
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',
+  // the Veiled Hollow: stags use the real stag rig instead of the beast-family
+  // wolf; the court guardians borrow the golem rig as stone constructs; the
+  // spirits, mushroom folk, and treants get realm-only rigs (ghost, glub,
+  // yeti) that appear nowhere in the outer three zones
+  veiled_stag: 'mob_veiled_stag',
+  veiled_doe: 'mob_veiled_doe',
+  gleamstag: 'mob_gleamstag',
+  gilded_stag: 'mob_stag',
+  gloam_fox: 'mob_fox',
+  orchard_treant: 'mob_treant',
+  lily_wisp: 'mob_ghost',
+  ancient_guardian: 'skel_golem',
+  waking_warden: 'skel_golem',
+  glimmerwisp: 'mob_glimmerwisp',
+  duskwisp: 'mob_duskwisp',
+  ice_wisp: 'mob_ghost',
+  frostmane_yeti: 'mob_yeti',
+  // Frostveil quest pass: Wren renders as a tinted villager (escort NPC, mob-kind
+  // so the escort driver can walk her); the howlers ride the beast/wolf fallback.
+  apprentice_wren: 'npc_villager',
+  sporeling_gatherer: 'mob_glub',
+  corrupted_sporeling: 'mob_glub',
+  mushroom_pixie: 'mob_mushroom_pixie',
+  treant_elder: 'mob_treant',
+  old_marrowshell: 'mob_crab',
+  aurelhorn: 'mob_aurelhorn',
+  // the Nightbloom: silver herds, night-running raptors, hovering star folk;
+  // the Barrow King borrows the armored skeleton the other revenants wear
+  moonfleece_grazer: 'mob_alpaca',
+  gloam_strider: 'mob_raptor',
+  nightkin_stargazer: 'mob_nightkin',
+  barrow_king: 'skel_warrior',
+  // the Wraithwood: drifting wraiths on the ghost rig, walking haunted
+  // trees on the treant's, and the hooded Huntsman on the crypt rogue's
+  // (the widowsilk spinners take the spider family default)
+  wood_wraith: 'mob_ghost',
+  gravenbark_shambler: 'mob_treant',
+  pale_huntsman: 'skel_rogue',
+  // the Palmreach: coral crabs, jungle boars, and the carved-stone guardian
+  // (the canopy weavers take the spider family default)
+  tide_scuttler: 'mob_crab',
+  thicket_boar: 'mob_boar',
+  idol_guardian: 'skel_golem',
+  topiary_stag: 'mob_stag',
+  the_topiary_bull: 'mob_bull',
+  moor_ram: 'mob_alpaca',
+  shoal_scuttler: 'mob_crab',
+  // The Wreck Warden walks as Mogger's hulking bruiser body, not a skeleton.
+  the_wreck_warden: 'mob_bruiser',
+  // The Infernal Citadel: the pact cult reads as robed casters, not the `undead`
+  // family's default skeleton minion. Its demons keep the family fallback
+  // (mob_demonalt), re-tinted deep red by the templates.
+  rift_pact_acolyte: 'mob_dark_caster',
+  rift_boss_ritualist: 'rift_ritualist',
 };
 
 const FAMILY_KEYS: Record<string, string> = {
@@ -1089,10 +1734,17 @@ const FAMILY_KEYS: Record<string, string> = {
   elemental: 'mob_elemental',
   dragonkin: 'mob_dragonkin',
   demon: 'mob_demonalt',
+  // deepfen_spearjaw already has an explicit MOB_KEYS override to mob_spearjaw
+  // (visualKeyFor checks MOB_KEYS first), so this default stays unreachable
+  // for it even after its family retag. It only matters for a future reptile
+  // mob with no override of its own; reuse the same model so that fallback
+  // is sane too.
+  reptile: 'mob_spearjaw',
 };
 
 const NPC_KEYS: Record<string, string> = {
   bursar_fernando: 'npc_fernando',
+  card_master: 'npc_villager_robed',
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',
   captain_thessaly: 'npc_knight',
@@ -1110,9 +1762,29 @@ const NPC_KEYS: Record<string, string> = {
   quartermaster_bree: 'npc_villager',
   brother_halven: 'npc_reliquary_keeper',
   brother_halven_marsh: 'npc_reliquary_keeper',
+  chronicler_saul: 'npc_chronicler',
+  chronicler_osric_fenn: 'npc_chronicler',
+  chronicler_edda_hartwell: 'npc_chronicler',
   // The graveyard angel: a robed figure, rendered translucent (ethereal) with a
   // holy shimmer by the renderer (see the spirit_healer branches there).
   spirit_healer: 'npc_villager_robed',
+  // Eldergleam, the Veiled Hollow
+  keeper_saelwyn: 'npc_mage',
+  loremother_bryn: 'npc_villager_robed',
+  provisioner_fenna: 'npc_villager',
+  wardsmith_orun: 'npc_smith',
+  archivist_tullo: 'npc_villager_robed',
+  // Professions 2.0 station masters: existing looks only (no new GLBs). The
+  // forge and toolworks masters wear the smith's work apron; the weaver and
+  // alchemist match the robed apothecary/herbalist look; the cook and tanner
+  // read as working townsfolk.
+  forgemistress_darva: 'npc_smith',
+  tinker_gizzel: 'npc_smith',
+  weaver_ottilie: 'npc_villager_robed',
+  alchemist_verane: 'npc_villager_robed',
+  cook_marlow: 'npc_villager',
+  tanner_hesk: 'npc_villager',
+  huntsman_deral: 'npc_scout',
 };
 
 export function visualKeyFor(e: Entity): string {
@@ -1139,8 +1811,13 @@ export function visualKeyFor(e: Entity): string {
  *  as a player entity's templateId, so this applies the same offline and online. */
 export function mechHeldWeaponOverride(cls: PlayerClass): WeaponLayoutOverride | null {
   const classDef = VISUALS[`player_${cls}`];
-  if (!classDef || (classDef.weaponSlots?.length ?? 0) < 2) return null;
-  return { attach: classDef.attach, weaponSlots: classDef.weaponSlots };
+  if (!classDef || ((classDef.weaponSlots?.length ?? 0) < 2 && classDef.offhandSlot === undefined))
+    return null;
+  return {
+    attach: classDef.attach,
+    weaponSlots: classDef.weaponSlots,
+    offhandSlot: classDef.offhandSlot,
+  };
 }
 
 /** Every glb the manifest can reference (for preloading). */
@@ -1155,6 +1832,10 @@ export function manifestUrls(): string[] {
   // Equipped-weapon models a player may swap to at runtime (any nearby player's
   // gear), so they are resolved-and-ready when setWeapon attaches them.
   for (const url of itemWeaponModelUrls()) urls.add(url);
+  for (const url of itemOffhandModelUrls()) urls.add(url);
+  // Season 1 Armory weapon-skin models: also attachable on any nearby player at
+  // any moment (account-wide cosmetics), so they preload with the same sweep.
+  for (const url of weaponSkinModelUrls()) urls.add(url);
   return [...urls];
 }
 

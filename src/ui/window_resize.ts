@@ -4,7 +4,7 @@
 // scrolls away with the content; the grip visual is a background layer on
 // `.window.window-resizable`, see src/styles/layout.css).
 //
-// Event-driven chrome like the hud.ts window drag (not a per-frame painter):
+// Event-driven chrome like window_drag.ts (not a per-frame painter):
 // document-level pointer delegation, pointer capture on the window, and the
 // same visual-vs-author space correction (see src/ui/ui_scale.ts). Owned state
 // is one pending/active session; everything else is injected via deps (never Hud).
@@ -166,6 +166,12 @@ export function installWindowResize(deps: WindowResizeDeps): () => void {
     session.startY = ev.clientY;
     session.engaged = true;
     el.classList.add('window-resizing');
+    // From here the window owns an explicit width/height, so its content must
+    // follow that box instead of the viewport-relative cap it was authored with.
+    // Unlike window-resizing this is permanent for the session: it drives the
+    // .window-fill contract in src/styles/components.css, and it lives on the
+    // window element, so it survives the innerHTML rebuilds the painters do.
+    el.classList.add('window-sized');
     // Opts the window into the viewport-resize re-clamp pass hud.ts runs.
     el.dataset.windowMoved = '1';
     try {

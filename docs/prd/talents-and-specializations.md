@@ -72,7 +72,7 @@ Point economy → nodes in 3 flavors (passive modifier / granted active / choice
 
 ## 4. Current state in the codebase
 
-> **Re-verified against `fix/discord-bug-batch` (PR #131) on top of Release v0.4, 2026-06-14.** Since the first draft, v0.4 merged **arena (Ashen Coliseum), the World Market, i18n, and a `src/ui/hotbar.ts` module**. Three consequences for this PRD: (1) all new UI strings must go through i18n `t()`; (2) loadout action-bar swapping should reuse the pure hotbar helpers; (3) arena is now a real **respec-lock context** and a live **balance surface** for ability-modifying talents.
+> **Re-verified against `fix/discord-bug-batch` (PR #131) on top of Release v0.4, 2026-06-14.** Since the first draft, v0.4 merged **arena (Ashen Coliseum), the World Market, i18n, and a `src/ui/hotbar.ts` module** (now `src/ui/hud/action_bar/hotbar.ts`). Three consequences for this PRD: (1) all new UI strings must go through i18n `t()`; (2) loadout action-bar swapping should reuse the pure hotbar helpers; (3) arena is now a real **respec-lock context** and a live **balance surface** for ability-modifying talents.
 
 | Concern | Location | Notes |
 |---|---|---|
@@ -89,7 +89,7 @@ Point economy → nodes in 3 flavors (passive modifier / granted active / choice
 | Serialize / deserialize | `src/sim/sim.ts:536` (`serializeCharacter`) / `:428` (`addPlayer`) | |
 | DB schema / save / autosave | `server/db.ts:42` (`state JSONB`), `:315` (`saveCharacterState`), `server/game.ts:38, 382-384` | 30s autosave |
 | UI panels (DOM) | `src/ui/hud.ts` — `attachTooltip()` `:217`, char sheet `toggleChar()`/`renderChar()` `:1907`/`:1910`, `buildActionBar()` `:428` | vanilla DOM; toggle/render pattern to model a Talent panel on |
-| **Hotbar helpers (new)** | `src/ui/hotbar.ts` | pure, unit-tested `placeAbilityOnSlot()` / `clearSlot()` — **reuse for loadout action-bar swaps** |
+| **Hotbar helpers (new)** | `src/ui/hud/action_bar/hotbar.ts` | pure, unit-tested `placeAbilityOnSlot()` / `clearSlot()`; **reuse for loadout action-bar swaps** |
 | Action-bar slot persistence | `src/ui/hud.ts:346` (`slotMapKey`), saved at `:382` | per-class slot map in localStorage |
 | i18n string helper (new) | `src/ui/i18n.ts:1886` | `t(key)` — **all talent UI strings must register here**, not hardcoded |
 | Keybinds | `src/game/keybinds.ts` (`STORE_KEY` `:64`) | char 'C', spellbook 'P', etc. — add 'N' for talents |
@@ -177,7 +177,7 @@ Point economy → nodes in 3 flavors (passive modifier / granted active / choice
 
 ### 6.7 Loadouts
 - **FR-7.1** Save multiple named loadouts per character (target ~5–10), each = full talent allocation + spec + action-bar slot map.
-- **FR-7.2** Switch loadout freely out of combat; switching also swaps the action bar — reuse the per-class slot-map storage (`hud.ts:346`) and the pure `placeAbilityOnSlot()`/`clearSlot()` helpers in `src/ui/hotbar.ts`.
+- **FR-7.2** Switch loadout freely out of combat; switching also swaps the action bar: reuse the per-class slot-map storage in `src/ui/hud/action_bar/action_bar_controller.ts` and the pure `placeAbilityOnSlot()`/`clearSlot()` helpers in `src/ui/hud/action_bar/hotbar.ts` (its exported `loadoutKnownAbilityIds()` and `applyLoadoutBar()` now implement the bar swap).
 - **FR-7.3** Loadouts persisted in `CharacterState`.
 
 ### 6.8 UI

@@ -75,8 +75,12 @@ describe('unitFrameView: the present / hidden gate', () => {
       resText: '',
       levelText: null,
       name: '',
+      titlePre: '',
+      titlePost: '',
       portraitKey: '',
       absorbFrac: 0,
+      absorbStartFrac: 0,
+      absorbSizeFrac: 0,
       absorbOvershield: false,
       dead: false,
       outOfRange: false,
@@ -123,9 +127,9 @@ describe('unitFrameView: TWO-DESCRIPTOR contract (the FULL field set)', () => {
     expect(v.outOfRange).toBe(false);
   });
 
-  it('drives a TARGET-shaped descriptor: no resource bar (resClass none), boss level glyph, dead, no shield', () => {
-    // A dead boss target: present and shown, but with no resource bar, a skull glyph
-    // for the level, "Dead" hp text, and a null absorb input. The player instance
+  it('drives a TARGET-shaped descriptor: no resource bar, numeric boss level, dead, no shield', () => {
+    // A dead boss target: present and shown, but with no resource bar, a numeric
+    // level over the CSS emblem, "Dead" hp text, and a null absorb input. The player instance
     // never sees these values; the target instance fills them in with no core
     // change.
     const v = unitFrameView({
@@ -135,7 +139,7 @@ describe('unitFrameView: TWO-DESCRIPTOR contract (the FULL field set)', () => {
       resourceKind: 'none',
       resFrac: 0,
       resText: '',
-      levelText: '☠', // the boss skull glyph
+      levelText: '62',
       name: 'Nythraxis',
       portraitKey: 'mob:nythraxis',
       absorb: null,
@@ -145,7 +149,7 @@ describe('unitFrameView: TWO-DESCRIPTOR contract (the FULL field set)', () => {
     expect(v.present).toBe(true);
     expect(v.resClass).toBe('none');
     expect(v.hpText).toBe('Dead');
-    expect(v.levelText).toBe('☠');
+    expect(v.levelText).toBe('62');
     expect(v.dead).toBe(true);
     expect(v.absorbFrac).toBe(0);
   });
@@ -227,5 +231,23 @@ describe('unit_frame core stays DOM-free, i18n-free, and id-free (no single-inst
     expect(code).not.toMatch(/#pf-/);
     expect(code).not.toMatch(/player-frame/);
     expect(code).not.toMatch(/querySelector|getElementById/);
+  });
+});
+
+describe('unitFrameView: the title decoration pass-through (Book of Deeds)', () => {
+  it('passes titlePre/titlePost through pre-localized, verbatim', () => {
+    const v = unitFrameView(playerDescriptor({ titlePre: '', titlePost: ' [Veteran]' }));
+    expect(v.titlePre).toBe('');
+    expect(v.titlePost).toBe(' [Veteran]');
+    // A prefix-placing locale flows the same way (the core knows no layout).
+    const pre = unitFrameView(playerDescriptor({ titlePre: '[Veterano] ', titlePost: '' }));
+    expect(pre.titlePre).toBe('[Veterano] ');
+    expect(pre.titlePost).toBe('');
+  });
+
+  it('defaults both to empty when the instance passes no title fields (player, party)', () => {
+    const v = unitFrameView(playerDescriptor());
+    expect(v.titlePre).toBe('');
+    expect(v.titlePost).toBe('');
   });
 });

@@ -1,7 +1,7 @@
 import { QUESTS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import type { QuestDef, QuestProgress } from '../types';
+import { type QuestDef, type QuestProgress, questObjectiveRequired } from '../types';
 import { finalizeQuestAccept, questState, turnInQuestCore } from './quest_commands';
 
 // /dev quest-completion cheats (gated by ctx.devCommands / ALLOW_DEV_COMMANDS). They
@@ -19,22 +19,26 @@ function satisfyTrackedQuestForDev(
 ): void {
   let collectChanged = false;
   quest.objectives.forEach((obj, index) => {
+    const required = questObjectiveRequired(quest, qp, index);
     if (obj.type === 'collect' && obj.itemId) {
       const have = ctx.countItem(obj.itemId, meta.entityId);
-      if (have < obj.count) {
-        ctx.addItem(obj.itemId, obj.count - have, meta.entityId);
+      if (have < required) {
+        ctx.addItem(obj.itemId, required - have, meta.entityId);
         collectChanged = true;
       }
       return;
     }
-    const next = Math.max(qp.counts[index] ?? 0, obj.count);
+    const next = Math.max(qp.counts[index] ?? 0, required);
     if (next !== qp.counts[index]) {
       meta.counters.questProgress += next - (qp.counts[index] ?? 0);
       qp.counts[index] = next;
       ctx.emit({
         type: 'questProgress',
         questId: qp.questId,
-        text: `${obj.label}: ${qp.counts[index]}/${obj.count}`,
+        objectiveIndex: index,
+        current: qp.counts[index],
+        required,
+        text: `${obj.label}: ${qp.counts[index]}/${required}`,
         pid: meta.entityId,
       });
     }
@@ -84,6 +88,36 @@ export function completeQuestForDev(ctx: SimContext, questId: string, pid?: numb
   const r = ctx.resolve(pid);
   if (!r) return false;
   return completeTrackedQuestForDev(ctx, questId, r.meta);
+}
+
+// [dev] /dev attune: mark EVERY quest complete so all requiresQuest / attunement
+// gates open (notably the Nythraxis raid door, which checks
+// questsDone.has('q_nythraxis_bound_guardian')). Unlike the per-quest cheats this
+// does not run the accept/turn-in reward flow (which would flood a 16-slot bag with
+// dozens of reward items); it just stamps questsDone and drops in-progress trackers.
+// The raid entry check reads questsDone server-side, so attunement takes effect at
+// once; wireRev is bumped so the client's quest log reflects it promptly.
+export function completeAllQuestsForDev(ctx: SimContext, pid?: number): number {
+  const r = ctx.resolve(pid);
+  if (!r) return 0;
+  const meta = r.meta;
+  let added = 0;
+  for (const questId of Object.keys(QUESTS)) {
+    if (!meta.questsDone.has(questId)) {
+      meta.questsDone.add(questId);
+      added++;
+    }
+  }
+  // Do NOT clear the quest log: it is persisted CharacterState, and wiping every
+  // in-progress quest is a destructive, irreversible edit to the character. Stamping
+  // questsDone is enough to open every requiresQuest / attunement gate.
+  if (added > 0) meta.wireRev++;
+  ctx.emit({
+    type: 'log',
+    text: `[dev] Attuned: marked ${added} quests complete (in-progress quests untouched).`,
+    pid: meta.entityId,
+  });
+  return added;
 }
 
 export function completeCurrentQuestsForDev(ctx: SimContext, pid?: number): number {

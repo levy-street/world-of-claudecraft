@@ -1,7 +1,11 @@
 // Pure presentation logic for the overhead spell cast/channel bar. Kept DOM-free
 // (and free of i18n: no t()/tEntity here) so the fill + label rules stay
 // unit-testable without a WebGL context. The renderer turns this into DOM and
-// resolves the visible text (fishing label vs. ability name) via i18n.
+// resolves the visible text (fishing/gathering label vs. ability name) via
+// i18n. Fishing shows a constant full waiting bar (the bite is signaled by
+// the bobber + cue, never by the bar); the gather cast fills like any
+// hardcast and its label rides `label` + castDisplayName.
+import { MOUNT_SUMMON_SECONDS } from '../sim/mounts';
 import { CONSUME_DURATION, type Consuming, type Entity, FISHING_CAST_ID } from '../sim/types';
 
 export interface CastBarState {
@@ -27,7 +31,11 @@ export function castBarState(e: Entity): CastBarState {
   // corpses, doors/crates, and idle entities show nothing; guard the divide too
   if (e.dead || e.kind === 'object' || !e.castingAbility || e.castTotal <= 0) return HIDDEN;
   const remaining = Math.max(0, Math.min(1, e.castRemaining / e.castTotal));
-  const fill = e.channeling ? remaining : 1 - remaining;
+  // Fishing (Professions 2.0) renders a CONSTANT full waiting bar:
+  // the bite moment is the bobber + cue, and the bar must carry no bite (or
+  // session-progress) information a modified client could read timing off.
+  // The gather cast is an ordinary filling hardcast through the generic path.
+  const fill = e.castingAbility === FISHING_CAST_ID ? 1 : e.channeling ? remaining : 1 - remaining;
   return {
     visible: true,
     channel: e.channeling,
@@ -62,6 +70,47 @@ export interface ConsumeBarState {
 }
 
 const CONSUME_HIDDEN: ConsumeBarState = { visible: false, fill: 0, mode: 'eat', remaining: 0 };
+
+/** Mount summon channel state. Only the PLAYER sees this bar: the summon is
+ *  player-initiated and the cast is cancelled by any movement input (handled
+ *  in player_motion.ts). The bar drains like a channel over MOUNT_SUMMON_SECONDS.
+ *  `mountKey` is the stable discriminator the painter localizes to the mount name;
+ *  absent (empty) means no active summon. */
+export interface MountSummonBarState {
+  /** Whether the summon bar should be shown this frame. */
+  visible: boolean;
+  /** 0..1 fraction; 1.0 at cast start, draining to 0 on completion. */
+  fill: number;
+  /** The mount key being summoned (e.g. 'valorsteed'), for the painter to localize. */
+  mountKey: string;
+  /** Seconds remaining, for the timer text. */
+  remaining: number;
+}
+
+const MOUNT_SUMMON_HIDDEN: MountSummonBarState = {
+  visible: false,
+  fill: 0,
+  mountKey: '',
+  remaining: 0,
+};
+
+/** Derive the player's mount summon bar state from the entity's mountCastRemaining
+ *  and mountCastKey. Shown when mountCastKey is non-empty (summon in progress);
+ *  hidden during a dismount channel (mountCastKey === ''). */
+export function mountSummonBarState(
+  mountCastRemaining: number,
+  mountCastKey: string,
+): MountSummonBarState {
+  // mountCastKey is '' during a dismount channel; only show the summon bar during
+  // an actual summon (key is the target mount's key).
+  if (!mountCastKey || mountCastRemaining <= 0) return MOUNT_SUMMON_HIDDEN;
+  return {
+    visible: true,
+    fill: Math.max(0, Math.min(1, mountCastRemaining / MOUNT_SUMMON_SECONDS)),
+    mountKey: mountCastKey,
+    remaining: mountCastRemaining,
+  };
+}
 
 /**
  * Derive the player's eat/drink overlay from the food/drink timers. Food and

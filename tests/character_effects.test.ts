@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { characterSoulRendActive } from '../src/render/character_effects';
+import {
+  characterRecklessnessActive,
+  characterSanguineAuraActive,
+  characterSoulRendActive,
+} from '../src/render/character_effects';
 import type { Entity } from '../src/sim/types';
 
 function entity(partial: Partial<Entity>): Entity {
@@ -74,17 +78,51 @@ function entity(partial: Partial<Entity>): Entity {
 describe('character visual effects', () => {
   it('detects Soul Rend as a model-level effect instead of a nameplate marker', () => {
     expect(characterSoulRendActive(entity({ auras: [] }))).toBe(false);
-    expect(characterSoulRendActive(entity({
-      auras: [{
-        id: 'nythraxis_soul_rend',
-        name: 'Soul Rend',
-        kind: 'vulnerability',
-        remaining: 8,
-        duration: 8,
-        value: 0,
-        sourceId: 2,
-        school: 'shadow',
-      }],
-    }))).toBe(true);
+    expect(
+      characterSoulRendActive(
+        entity({
+          auras: [
+            {
+              id: 'nythraxis_soul_rend',
+              name: 'Soul Rend',
+              kind: 'vulnerability',
+              remaining: 8,
+              duration: 8,
+              value: 0,
+              sourceId: 2,
+              school: 'shadow',
+            },
+          ],
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('routes winning Warrior aura identities to their authored render layers', () => {
+    const sanguine = {
+      id: 'sanguine_aura',
+      name: 'Sanguine Aura',
+      kind: 'sanguine',
+      remaining: 12,
+      duration: 12,
+      value: 0.1,
+      sourceId: 1,
+      school: 'physical',
+    } as const;
+    const reckless = {
+      id: 'recklessness',
+      name: 'Recklessness',
+      kind: 'buff_reckless',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: 1,
+      school: 'physical',
+    } as const;
+
+    expect(characterSanguineAuraActive(entity({ auras: [sanguine] }))).toBe(true);
+    expect(characterRecklessnessActive(entity({ auras: [reckless] }))).toBe(true);
+    expect(characterSanguineAuraActive(entity({ auras: [reckless] }))).toBe(false);
+    expect(characterRecklessnessActive(entity({ auras: [sanguine] }))).toBe(false);
   });
 });

@@ -89,6 +89,7 @@ export class GamepadManager {
     this.kind = 'generic';
     this.prevPressed.fill(false);
     this.input.clearGamepadMove();
+    this.input.setGamepadLookActive(false);
     this.hideCursor();
   }
 
@@ -134,6 +135,7 @@ export class GamepadManager {
       this.kind = 'generic';
       this.prevPressed.fill(false);
       this.input.clearGamepadMove();
+      this.input.setGamepadLookActive(false);
       this.hideCursor();
       this.cb.onConnectionChange?.();
     }
@@ -174,6 +176,7 @@ export class GamepadManager {
     // stale edge on return.
     if (!this.windowFocused()) {
       this.input.clearGamepadMove();
+      this.input.setGamepadLookActive(false);
       this.hideCursor();
       this.prevPressed = cur;
       return;
@@ -186,6 +189,7 @@ export class GamepadManager {
       // lingering stick movement (a non-modal window like bags doesn't freeze
       // movement on its own) and skip camera/ability dispatch.
       this.input.clearGamepadMove();
+      this.input.setGamepadLookActive(false);
       this.updateCursor(pad, cur, dt);
       this.prevPressed = cur;
       return;
@@ -197,11 +201,15 @@ export class GamepadManager {
     const ly = pad.axes[AXIS.LEFT_Y] ?? 0;
     this.input.setGamepadMove(stickToMoveFlags(lx, ly, this.deadzone));
 
-    // Camera: right stick.
+    // Camera: right stick. A non-centered stick also turns the player, the
+    // same way the touch camera joystick does (setGamepadLookActive folds into
+    // Input.isMouselookActive()); without this a gamepad-only player could
+    // orbit the free camera but never actually turn to face a new direction.
     const rx = pad.axes[AXIS.RIGHT_X] ?? 0;
     const ry = pad.axes[AXIS.RIGHT_Y] ?? 0;
     const look = stickToLook(rx, ry, this.deadzone, this.camSpeed, this.invertY, dt);
     this.input.applyGamepadLook(look.yaw, look.pitch);
+    this.input.setGamepadLookActive(look.active);
 
     // Edge actions: one-shot on each button's rising edge.
     for (const idx of risingEdges(this.prevPressed, cur)) {

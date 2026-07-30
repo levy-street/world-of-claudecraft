@@ -17,6 +17,7 @@ import {
   FCT_JITTER_RANGE,
   FCT_RISE_PX,
   FCT_TTL_MS,
+  FCT_XP_TTL_MS,
   type FctColorToken,
   type FctEvent,
   type FctKind,
@@ -73,9 +74,11 @@ describe('describeFct: color token by kind + flags', () => {
     'damage-done-ability': { self: 'damage-done-ability', other: 'damage-done-ability' },
     'damage-done-auto': { self: 'damage-done-auto', other: 'damage-done-auto' },
     'damage-taken': { self: 'damage-taken', other: 'damage-taken' },
+    absorb: { self: 'absorb', other: 'absorb' },
     heal: { self: 'heal', other: 'heal' },
     xp: { self: 'xp', other: 'xp' },
     'rested-xp': { self: 'rested-xp', other: 'rested-xp' },
+    honor: { self: 'honor', other: 'honor' },
     'self-note': { self: 'self-note', other: 'self-note' },
   };
 
@@ -114,17 +117,17 @@ describe('describeFct: color token by kind + flags', () => {
   });
 });
 
-describe('describeFct: ttl is a pure function of kind (constant across kinds)', () => {
-  it('emits the named ttl constant for every kind, regardless of crit/jitter', () => {
+describe('describeFct: ttl is a pure function of kind (constant across kinds, excluding xp/rested-xp)', () => {
+  it('emits the named ttl constant for every kind except xp/rested-xp, regardless of crit/jitter', () => {
     for (const kind of [
       'miss',
       'dodge',
       'damage-done-ability',
       'damage-done-auto',
       'damage-taken',
+      'absorb',
       'heal',
-      'xp',
-      'rested-xp',
+      'honor',
       'self-note',
     ] as FctKind[]) {
       const d = describeFct(makeEvent({ kind, crit: true }), 0.9);
@@ -132,9 +135,18 @@ describe('describeFct: ttl is a pure function of kind (constant across kinds)', 
     }
   });
 
+  it('xp / rested-xp get the longer, distinct XP ttl (an informational reward, not a per-hit number)', () => {
+    for (const kind of ['xp', 'rested-xp'] as FctKind[]) {
+      const d = describeFct(makeEvent({ kind, crit: true }), 0.9);
+      expect(d.ttlMs).toBe(FCT_XP_TTL_MS);
+      expect(FCT_XP_TTL_MS).toBeGreaterThan(FCT_TTL_MS);
+    }
+  });
+
   it('pins the named constants to the live fct() values', () => {
     expect(FCT_JITTER_RANGE).toBe(30);
     expect(FCT_TTL_MS).toBe(1250);
+    expect(FCT_XP_TTL_MS).toBe(1800);
     expect(FCT_ANCHOR_HEAD_OFFSET).toBe(2.2);
     expect(FCT_RISE_PX).toBe(76);
   });
@@ -199,7 +211,7 @@ describe('describeFct: ClientWorld-vs-Sim parity', () => {
   });
 });
 
-describe('isDamageFctKind: the combat-damage taxonomy (drop-non-crit target)', () => {
+describe('isDamageFctKind: the combat-damage taxonomy (damage-number classifier)', () => {
   it('classifies exactly the three damage-number kinds as damage', () => {
     expect([...DAMAGE_FCT_KINDS].sort()).toEqual([
       'damage-done-ability',
@@ -212,7 +224,17 @@ describe('isDamageFctKind: the combat-damage taxonomy (drop-non-crit target)', (
   it('treats informational / avoidance floaters as NON-damage (kept on low)', () => {
     // These are the low-volume floaters the low-tier drop must NOT shed: progression,
     // the self-note UX hint, heals, and avoidance words.
-    const nonDamage: FctKind[] = ['miss', 'dodge', 'heal', 'xp', 'rested-xp', 'self-note'];
+    const nonDamage: FctKind[] = [
+      'miss',
+      'dodge',
+      'resist',
+      'absorb',
+      'heal',
+      'xp',
+      'rested-xp',
+      'honor',
+      'self-note',
+    ];
     for (const kind of nonDamage) expect(isDamageFctKind(kind)).toBe(false);
   });
 });

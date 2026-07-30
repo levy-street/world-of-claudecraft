@@ -3,10 +3,24 @@
 // polymorphed into a baby llama" griefing path can never regress.
 import { describe, expect, it } from 'vitest';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { AbilityDef, Entity, Vec3 } from '../src/sim/types';
+import type { AbilityDef, Entity, Vec3, WorldContent } from '../src/sim/types';
 import { dist2d } from '../src/sim/types';
+
+// Duel / diminishing-returns tests need two players and nothing else: the DR
+// timelines tick a minute-plus of world time, and spawning the whole 14-zone
+// continent made every one of those ticks pay for the full MMO. Keep every
+// terrain-relevant field identical to BUILTIN_WORLD while stripping only the
+// constructor-spawned ambient entities. The two tests that DO need real world
+// content (a non-hostile NPC, a hostile camp mob) build their own full Sim.
+const DUEL_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
 
 function twoPlayers(clsA = 'mage', clsB = 'warrior') {
   const sim = new Sim({
@@ -14,6 +28,7 @@ function twoPlayers(clsA = 'mage', clsB = 'warrior') {
     playerClass: clsA as any,
     playerName: 'Caster',
     autoEquip: true,
+    world: DUEL_TEST_WORLD,
   });
   const aPid = sim.primaryId;
   const bPid = sim.addPlayer(clsB as any, 'Victim', { autoEquip: true });
@@ -180,10 +195,21 @@ describe('PvP control abilities in active duels', () => {
     { cls: 'druid', ability: 'entangling_roots', aura: 'root' },
   ])('$ability works on hostile players', ({ cls, ability, aura }) => {
     const { sim, aPid, b } = startDuel(cls, 'warrior');
-    if (ability === 'polymorph') b.hp = Math.max(1, b.maxHp - 120);
 
-    sim.castAbility(ability, aPid);
-    finishCast(sim, aPid);
+    // A spell-hit roll precedes the application, so a cast can resist; retry
+    // until one lands (like the DR-ladder tests) so the invariant under test,
+    // "CC is LEGAL between duelists", stays stable wherever the shared world
+    // RNG stream happens to sit (new content shifts it).
+    for (let attempt = 0; attempt < 12; attempt++) {
+      if (ability === 'polymorph') b.hp = Math.max(1, b.maxHp - 120);
+      const caster = sim.entities.get(aPid)!;
+      caster.gcdRemaining = 0;
+      caster.cooldowns.delete(ability);
+      caster.resource = caster.maxResource;
+      sim.castAbility(ability, aPid);
+      finishCast(sim, aPid);
+      if (b.auras.some((au) => au.kind === aura)) break;
+    }
 
     expect(b.auras.some((au) => au.kind === aura)).toBe(true);
     if (ability === 'polymorph') expect(b.hp).toBe(b.maxHp);
@@ -232,14 +258,22 @@ describe('PvP control abilities in active duels', () => {
     for (let i = 0; i < 20 * 61; i++) sim.tick();
 
     expect(castPolymorph()).toBe(10);
-  });
+  }, 90_000);
 
   it('makes feared hostile players run in a deterministic panic direction', () => {
     const { sim, aPid, b } = startDuel('warlock', 'warrior', 20);
 
     const start = pos(b);
-    sim.castAbility('fear', aPid);
-    finishCast(sim, aPid);
+    // Retry a resisted bolt until one lands (see the DR-ladder tests): the
+    // subject here is the panic RUN, not the spell-hit roll.
+    for (let attempt = 0; attempt < 12; attempt++) {
+      const warlock = sim.entities.get(aPid)!;
+      warlock.gcdRemaining = 0;
+      warlock.resource = warlock.maxResource;
+      sim.castAbility('fear', aPid);
+      finishCast(sim, aPid);
+      if (b.auras.some((aura) => aura.id === 'fear_incap')) break;
+    }
 
     const fear = b.auras.find((aura) => aura.id === 'fear_incap' && aura.kind === 'incapacitate');
     expect(fear?.duration).toBe(8);
@@ -280,9 +314,9 @@ describe('PvP control abilities in active duels', () => {
     for (let i = 0; i < 20 * 61; i++) sim.tick();
 
     expect(castFear()).toBe(8);
-  });
+  }, 90_000);
 
-  it('diminishes repeated duel stuns to full, half, quarter, then immune, resetting after 18s', () => {
+  it('duel stuns land at full duration on every repeat (stun DR exemption)', () => {
     const { sim, aPid, b } = startDuel('paladin', 'warrior', 20);
 
     // Hammer of Justice at level 20 is rank 2: a 4s instant stun. As with Fear, a
@@ -303,24 +337,12 @@ describe('PvP control abilities in active duels', () => {
       return dur;
     };
 
-    expect(castStun()).toBe(4); // 100%
-    expect(castStun()).toBe(2); // 50%
-    expect(castStun()).toBe(1); // 25%
-
-    // Fourth stun in the window is fully diminished: the target is immune, so no
-    // stun aura lands at all (the chain-stun lock is broken).
-    b.auras = b.auras.filter((aura) => aura.id !== 'hammer_of_justice_stun');
-    const pala = sim.entities.get(aPid)!;
-    pala.gcdRemaining = 0;
-    pala.resource = pala.maxResource;
-    pala.cooldowns.delete('hammer_of_justice');
-    sim.castAbility('hammer_of_justice', aPid);
-    finishCast(sim, aPid);
-    expect(b.auras.some((aura) => aura.id === 'hammer_of_justice_stun')).toBe(false);
-
-    // The category resets after the 18s window, restoring full duration.
-    b.auras = b.auras.filter((aura) => aura.id !== 'hammer_of_justice_stun');
-    for (let i = 0; i < 20 * 19; i++) sim.tick();
+    // Balance pass (maintainer): player stuns are EXEMPT from PvP diminishing
+    // returns (they are short flat durations behind real cooldowns); every
+    // repeat lands at full duration. Fear/polymorph/root keep their ladders.
+    expect(castStun()).toBe(4);
+    expect(castStun()).toBe(4);
+    expect(castStun()).toBe(4);
     expect(castStun()).toBe(4);
   });
 
@@ -350,11 +372,11 @@ describe('PvP control abilities in active duels', () => {
       return dur;
     };
 
-    // The controlled stun is unaffected by the spent opener chain: full duration,
-    // then diminishes only within its own controlled bucket.
-    expect(castStun()).toBe(4); // 100%, not diminished by the opener bucket
-    expect(castStun()).toBe(2); // 50%
-    expect(castStun()).toBe(1); // 25%
+    // The controlled stun is unaffected by the spent opener chain, and with
+    // the stun-DR exemption every repeat stays full length.
+    expect(castStun()).toBe(4);
+    expect(castStun()).toBe(4);
+    expect(castStun()).toBe(4);
   });
 
   it('does not diminish PvE stuns: a stun on a mob keeps full duration on repeat', () => {

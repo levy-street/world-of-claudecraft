@@ -24,12 +24,14 @@
 import type { UiEffectsTier } from './ui_effects_profile';
 
 // ---------------------------------------------------------------------------
-// FCT: max-concurrent live floaters, per-text lifetime scale, drop-non-crit.
+// FCT: max-concurrent live floaters + per-text lifetime scale.
 // The FctPainter pre-allocates a fixed pool (FCT_POOL_CAP) and evicts the oldest
-// at the live cap; on low the live cap is tighter, the TTL is shorter, and non-crit
-// floaters are not spawned at all. (Crit EMPHASIS on low, the scale/pop, is a separate
-// axis already handled in CSS via [data-fx-level="low"] .fct.crit, hud.css; this
-// drop-non-crit knob is the orthogonal spawn-cull axis, so the two do not collide.)
+// at the live cap; on low the live cap is tighter and the TTL is shorter, so a burst
+// sheds sooner. Every floater is still SPAWNED on every tier (low never refuses a damage
+// number: hiding the player's own hits removed their primary combat feedback), so the pool
+// cap + TTL are the only FCT cost knobs. (Crit EMPHASIS on low, the scale/pop, is a separate
+// axis handled in CSS via [data-fx-level="low"] .fct.crit, hud.css; it keeps the number and
+// only drops the pop, so it never hides information.)
 // ---------------------------------------------------------------------------
 
 /** Max simultaneous live FCT floaters on low (tighter than the full FCT_POOL_CAP, so a
@@ -53,14 +55,6 @@ export function fctMaxConcurrent(tier: UiEffectsTier, poolCap: number): number {
  *  (byte-identical); low shortens. */
 export function fctTtlScale(tier: UiEffectsTier): number {
   return tier === 'low' ? FCT_TTL_SCALE_LOW : FCT_TTL_SCALE_FULL;
-}
-
-/** Whether non-crit DAMAGE-NUMBER floaters are dropped (not spawned) at `tier`. Only low
- *  drops them. The painter scopes this to the damage kinds (fct_core isDamageFctKind), so
- *  crits always spawn (their number is never refused) and the low-volume informational
- *  floaters (xp, self-note) and avoidance words (miss, dodge) are kept on every tier. */
-export function fctDropNonCrit(tier: UiEffectsTier): boolean {
-  return tier === 'low';
 }
 
 // ---------------------------------------------------------------------------

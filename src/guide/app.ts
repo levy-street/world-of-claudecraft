@@ -3,15 +3,20 @@
 // and focus in sync on every navigation and language switch.
 
 import {
-  ensureLocaleLoaded, getLanguage, setLanguage, languageTag, t,
-  type SupportedLanguage, type TranslationKey,
+  ensureLocaleLoaded,
+  getLanguage,
+  languageTag,
+  type SupportedLanguage,
+  setLanguage,
+  type TranslationKey,
+  t,
 } from '../ui/i18n';
 import { buildChrome, type GuideChrome } from './chrome';
-import { GuideRouter } from './router';
-import { matchRoute, type GuideRoute } from './routes';
-import { pageFor, placeholderHtml, notFoundHtml, type PageContext } from './pages';
-import { breadcrumbHtml, sequenceHtml, mountToc } from './nav_aids';
 import { applyRouteHead } from './head';
+import { breadcrumbHtml, mountToc, sequenceHtml } from './nav_aids';
+import { notFoundHtml, type PageContext, pageFor, placeholderHtml } from './pages';
+import { GuideRouter } from './router';
+import { type GuideRoute, matchRoute } from './routes';
 
 const RTL_LANGS = new Set(['ar', 'he', 'fa', 'ur']);
 function isRtl(tag: string): boolean {
@@ -56,12 +61,42 @@ export class GuideApp {
   private async changeLanguage(lang: SupportedLanguage): Promise<void> {
     await ensureLocaleLoaded(lang);
     setLanguage(lang);
-    this.rebuildChrome();
-    this.applyDocumentLang();
-    this.navigate(window.location.pathname);
+    // The chrome rebuild rides the same transition as the page swap, so the whole
+    // relocalization lands as one cross-fade instead of the chrome popping first.
+    this.withViewTransition(() => {
+      this.rebuildChrome();
+      this.applyDocumentLang();
+      // Preserve the fragment across the relocalize so a language switch on a
+      // deep-linked section re-scrolls to that anchor, not back to the top.
+      this.renderRoute(window.location.pathname + window.location.hash);
+    });
   }
 
   private navigate(pathname: string): void {
+    this.withViewTransition(() => this.renderRoute(pathname));
+  }
+
+  // Cross-fade DOM swaps through the View Transitions API where it exists. The initial
+  // render and reduced-motion readers get the plain swap, and the API falls back to it
+  // untransitioned everywhere else. A swap error must still surface: the transition
+  // would otherwise turn it into a silently rejected updateCallbackDone.
+  private withViewTransition(swap: () => void): void {
+    const vt = (
+      document as Partial<{
+        startViewTransition: (cb: () => void) => { updateCallbackDone: Promise<void> };
+      }>
+    ).startViewTransition;
+    if (!this.firstNav && vt && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      vt.call(document, swap).updateCallbackDone.catch((err: unknown) => {
+        // eslint-disable-next-line no-console
+        console.error('Guide navigation failed mid transition', err);
+      });
+    } else {
+      swap();
+    }
+  }
+
+  private renderRoute(pathname: string): void {
     // Tear down the previous page's listeners before swapping its DOM out.
     this.runPageCleanup();
     const match = matchRoute(pathname);
@@ -93,7 +128,8 @@ export class GuideApp {
       } else {
         const isDetail = params.length > 0;
         const leaf = dynamicTitle ?? t(route.navKey);
-        this.chrome.mainEl.innerHTML = breadcrumbHtml(route, isDetail, leaf) + pageHtml + sequenceHtml(route);
+        this.chrome.mainEl.innerHTML =
+          breadcrumbHtml(route, isDetail, leaf) + pageHtml + sequenceHtml(route);
       }
       if (page?.mount) this.addCleanup(page.mount(this.chrome.mainEl, ctx));
       if (!isHome) this.addCleanup(mountToc(this.chrome.mainEl));
@@ -125,10 +161,14 @@ export class GuideApp {
   private focusMain(pathname: string): void {
     const hashIndex = pathname.indexOf('#');
     const hash = hashIndex >= 0 ? pathname.slice(hashIndex) : '';
+    // Instant, never smooth: this runs inside the view-transition callback, and a
+    // smooth scroll still in flight when the new-state snapshot is taken would fade
+    // to a mid-scroll frame. Landing a NEW page at its position instantly is also the
+    // native cross-page behavior.
     if (hash.length > 1) {
       const target = this.chrome.mainEl.querySelector(hash);
       if (target) {
-        (target as HTMLElement).scrollIntoView();
+        (target as HTMLElement).scrollIntoView({ behavior: 'instant', block: 'start' });
         return;
       }
     }
@@ -139,7 +179,7 @@ export class GuideApp {
       this.firstNav = false;
       return;
     }
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'instant' });
     this.chrome.mainEl.focus({ preventScroll: true });
   }
 }

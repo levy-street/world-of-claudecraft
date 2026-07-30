@@ -4,6 +4,9 @@
 // order, the matchmaking guard loops, the ~28-field fighter reset, and the
 // player-facing emit literals are preserved EXACTLY (the parity gate's full-state
 // trace + rng draw-order log proves it).
+// Post-move sanctioned deviation: readyArenaFighter's targetId reset is
+// conditional at the countdown-end call site (keepValidTargetPids); see the
+// comment at that field.
 //
 // Arena/duel state stays on Sim and is reached through SimContext live views
 // (`arenaMatches` from E1; `arenaQueue1v1`/`arenaQueue2v2`/`arenaQueueFiesta`/
@@ -18,22 +21,56 @@
 // are consumed here via SimContext callbacks (points-at Sim until A3 flips them).
 
 import { ARENA_SLOT_COUNT, arenaOrigin, DUNGEON_X_THRESHOLD } from '../data';
-import {
-  ARENA_SPAWN_A,
-  ARENA_SPAWN_B,
-  ARENA_SPAWNS_A_2v2,
-  ARENA_SPAWNS_B_2v2,
-} from '../dungeon_layout';
+import * as deedsMod from '../deeds';
+import { arenaMapForSlot } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
-import type { ArenaMatch, ArenaQueueUnit, PlayerMeta } from '../sim';
+import { awardFiestaCompletionHonor, awardRankedArenaWinHonor, honorTeamIdentity } from '../pvp';
+import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
   type ArenaCombatant,
   type ArenaFormat,
   type ArenaStanding,
+  type CrowdControlDrCategory,
+  type CrowdControlDrState,
   DT,
   type Entity,
+  emptyMoveInput,
 } from '../types';
+import { clearCooldownsPreservingUnstuck } from '../unstuck_cooldown';
+
+// Deep-copy the CC diminishing-return map so a snapshot never shares mutable
+// state objects with the live entity (values are re-derived each restore).
+// Exported: vale_cup.ts reuses this to restore its own pre-match pools
+// (mirroring this same free-full-restore fix, see snapshotArenaReturnPools).
+export function cloneCcDr(
+  src: Map<CrowdControlDrCategory, CrowdControlDrState>,
+): Map<CrowdControlDrCategory, CrowdControlDrState> {
+  const out = new Map<CrowdControlDrCategory, CrowdControlDrState>();
+  for (const [k, v] of src) out.set(k, { ...v });
+  return out;
+}
+
+// Deep-copy the recharge-model charge pools (Entity.abilityCharges) so a
+// snapshot never shares mutable state objects with the live entity. Exported
+// for the same reason as cloneCcDr above.
+export function cloneAbilityCharges(
+  src: Entity['abilityCharges'],
+): ArenaReturnPools['abilityCharges'] {
+  const out: ArenaReturnPools['abilityCharges'] = {};
+  if (src) for (const [id, state] of Object.entries(src)) out[id] = { ...state };
+  return out;
+}
+
+export function snapshotArenaReturnPools(e: Entity): ArenaReturnPools {
+  return {
+    hp: e.hp,
+    resource: e.resource,
+    cooldowns: new Map(e.cooldowns),
+    abilityCharges: cloneAbilityCharges(e.abilityCharges),
+    ccDr: cloneCcDr(e.ccDr),
+  };
+}
 
 // Ashen Coliseum 1v1 arena tuning consts (moved with the slice). FIESTA_COUNTDOWN
 // is the only Fiesta const the ranked match-start path needs; the rest of the
@@ -83,6 +120,10 @@ export function arenaQueueJoin(
     return;
   }
   if (ctx.arenaMatches.has(id)) {
+    ctx.error(id, 'You are already in an arena match.');
+    return;
+  }
+  if (ctx.vcupSeatedOrQueued(id)) {
     ctx.error(id, 'You are already in an arena match.');
     return;
   }
@@ -169,6 +210,10 @@ export function arenaQueueJoin(
         ctx.error(id, `${mMeta.name} is already in the arena queue.`);
         return;
       }
+      if (ctx.vcupSeatedOrQueued(mPid)) {
+        ctx.error(id, `${mMeta.name} is already in an arena match.`);
+        return;
+      }
       if (ctx.duels.has(mPid)) {
         ctx.error(id, `${mMeta.name} cannot queue while dueling.`);
         return;
@@ -234,6 +279,10 @@ export function arenaQueueJoin(
     }
     if (isArenaQueued(ctx, mPid)) {
       ctx.error(id, `${mMeta.name} is already in the arena queue.`);
+      return;
+    }
+    if (ctx.vcupSeatedOrQueued(mPid)) {
+      ctx.error(id, `${mMeta.name} is already in an arena match.`);
       return;
     }
     if (ctx.duels.has(mPid)) {
@@ -376,7 +425,26 @@ export function arenaDequeue(ctx: SimContext, pid: number): boolean {
   return false;
 }
 
-export function freeArenaSlot(ctx: SimContext): number | null {
+// Arena slots host fixed maps by parity (EVEN = Ashen Coliseum, ODD = The
+// Drowned Court; ARENA_MAPS in dungeon_layout.ts). Slot choice is fully
+// deterministic and rng-free:
+// - Ranked (1v1/2v2) rotates maps by preferring the parity of the id the next
+//   match will take (nextArenaMatchId % 2), falling back to any free slot when
+//   the preferred parity is fully busy.
+// - Fiesta is HARD-pinned to even (Coliseum) slots: its ring tuning never
+//   meets the Drowned Court. When every even slot is busy the bout waits for
+//   one rather than spilling onto an odd slot.
+export function freeArenaSlot(ctx: SimContext, format?: ArenaFormat): number | null {
+  if (format === 'fiesta') {
+    for (let i = 0; i < ARENA_SLOT_COUNT; i += 2) {
+      if (!ctx.arenaBusySlots.has(i)) return i;
+    }
+    return null;
+  }
+  const preferred = ((ctx.nextArenaMatchId % 2) + 2) % 2;
+  for (let i = preferred; i < ARENA_SLOT_COUNT; i += 2) {
+    if (!ctx.arenaBusySlots.has(i)) return i;
+  }
   for (let i = 0; i < ARENA_SLOT_COUNT; i++) {
     if (!ctx.arenaBusySlots.has(i)) return i;
   }
@@ -528,7 +596,9 @@ export function updateArena(ctx: SimContext): void {
       if (match.timer <= 0) {
         match.state = 'active';
         match.timer = 0;
-        for (const e of fighters) readyArenaFighter(ctx, e, { clearPrep: false });
+        const matchPids = arenaAllPids(match);
+        for (const e of fighters)
+          readyArenaFighter(ctx, e, { clearPrep: false, keepValidTargetPids: matchPids });
         for (const mPid of arenaAllPids(match)) {
           ctx.emit({
             type: 'log',
@@ -578,9 +648,21 @@ export function matchmakeArena1v1(ctx: SimContext): void {
   while (guard-- > 0) {
     ctx.arenaQueue1v1 = ctx.arenaQueue1v1.filter((id) => {
       const e = ctx.entities.get(id);
-      return !!e && !e.dead && !ctx.arenaMatches.has(id);
+      // A queued player who walked into a dungeon/instance is not matchable: the
+      // bout would teleport them back inside fully restored (issue #1600). Same
+      // x-band test the queue-join guard uses. Also drop anyone who slipped into
+      // a Vale Cup match/queue after joining here (arenaQueueJoin already blocks
+      // this at entry; this is the defense-in-depth re-check for paths that seat
+      // a player into Vale Cup without going through that guard, e.g. practice).
+      return (
+        !!e &&
+        !e.dead &&
+        !ctx.arenaMatches.has(id) &&
+        e.pos.x <= DUNGEON_X_THRESHOLD &&
+        !ctx.vcupSeatedOrQueued(id)
+      );
     });
-    if (ctx.arenaQueue1v1.length < 2 || freeArenaSlot(ctx) === null) return;
+    if (ctx.arenaQueue1v1.length < 2 || freeArenaSlot(ctx, '1v1') === null) return;
     const aPid = ctx.arenaQueue1v1[0];
     const aRating = arenaRatingForPid(ctx, aPid, '1v1');
     let bPid = -1,
@@ -604,7 +686,17 @@ export function pruneTeamQueue(ctx: SimContext, fmt: '2v2' | 'fiesta'): void {
   const keep = (unit: ArenaQueueUnit) =>
     unit.pids.every((id) => {
       const e = ctx.entities.get(id);
-      return !!e && !e.dead && !ctx.arenaMatches.has(id);
+      // Drop the whole unit if any member walked into a dungeon/instance while
+      // queued: the bout would return them inside fully restored (issue #1600).
+      // Also drop the unit if a member slipped into a Vale Cup match/queue
+      // after joining here (see matchmakeArena1v1's matching comment).
+      return (
+        !!e &&
+        !e.dead &&
+        !ctx.arenaMatches.has(id) &&
+        e.pos.x <= DUNGEON_X_THRESHOLD &&
+        !ctx.vcupSeatedOrQueued(id)
+      );
     });
   if (fmt === 'fiesta') ctx.arenaQueueFiesta = ctx.arenaQueueFiesta.filter(keep);
   else ctx.arenaQueue2v2 = ctx.arenaQueue2v2.filter(keep);
@@ -634,7 +726,7 @@ export function matchmakeTeamFormat(ctx: SimContext, fmt: '2v2' | 'fiesta'): voi
   let guard = ARENA_SLOT_COUNT + 1;
   while (guard-- > 0) {
     pruneTeamQueue(ctx, fmt);
-    if (freeArenaSlot(ctx) === null) return;
+    if (freeArenaSlot(ctx, fmt) === null) return;
     const queue = fmt === 'fiesta' ? ctx.arenaQueueFiesta : ctx.arenaQueue2v2;
 
     const premades = queue.filter((u) => u.pids.length === 2);
@@ -709,7 +801,7 @@ export function startArenaMatch(
   teamA: number[],
   teamB: number[],
 ): void {
-  const slot = freeArenaSlot(ctx);
+  const slot = freeArenaSlot(ctx, format);
   const allPids = [...teamA, ...teamB];
   const entities = allPids.map((pid) => ctx.entities.get(pid));
   const metas = allPids.map((pid) => ctx.players.get(pid));
@@ -729,9 +821,14 @@ export function startArenaMatch(
   }
   ctx.arenaBusySlots.add(slot);
   const returns = new Map<number, { x: number; z: number; facing: number }>();
+  // Snapshot each fighter's recovery pools NOW, before the clean-slate reset
+  // below, so returnFromArena restores what they walked in with instead of a free
+  // full restore (issue #1600). Fiesta captures the pre-standardization pools.
+  const preMatchPools = new Map<number, ArenaReturnPools>();
   for (let i = 0; i < allPids.length; i++) {
     const e = entities[i]!;
     returns.set(allPids[i], { x: e.pos.x, z: e.pos.z, facing: e.facing });
+    preMatchPools.set(allPids[i], snapshotArenaReturnPools(e));
   }
   const isFiesta = format === 'fiesta';
   const countdown = isFiesta ? FIESTA_COUNTDOWN : ARENA_COUNTDOWN;
@@ -744,19 +841,26 @@ export function startArenaMatch(
     state: 'countdown',
     timer: countdown,
     returns,
+    preMatchPools,
     ratingA: arenaTeamRating(ctx, teamA, format),
     ratingB: arenaTeamRating(ctx, teamB, format),
     defeated: new Set(),
+    resultRecorded: false,
+    practice: isFiesta && metas.some((meta) => meta?.isFiestaBot === true),
+    honorTeamAKey: honorTeamIdentity(ctx, teamA),
+    honorTeamBKey: honorTeamIdentity(ctx, teamB),
     fiesta: isFiesta ? ctx.createFiestaState() : undefined,
   };
   for (const pid of allPids) ctx.arenaMatches.set(pid, match);
   const origin = arenaOrigin(slot);
+  // Spawns come from the slot's fixed map (parity-selected, never rng).
+  const map = arenaMapForSlot(slot);
   if (format === '1v1') {
-    placeInArena(ctx, entities[0]!, origin, ARENA_SPAWN_A);
-    placeInArena(ctx, entities[1]!, origin, ARENA_SPAWN_B);
+    placeInArena(ctx, entities[0]!, origin, map.spawnA);
+    placeInArena(ctx, entities[1]!, origin, map.spawnB);
   } else {
-    placeTeamInArena(ctx, teamA, origin, ARENA_SPAWNS_A_2v2);
-    placeTeamInArena(ctx, teamB, origin, ARENA_SPAWNS_B_2v2);
+    placeTeamInArena(ctx, teamA, origin, map.spawnsA2v2);
+    placeTeamInArena(ctx, teamB, origin, map.spawnsB2v2);
   }
   // Fiesta: everyone fights at a balanced level 20 — standardize before the
   // clean-slate reset so countdown stats/abilities already reflect it.
@@ -769,9 +873,13 @@ export function startArenaMatch(
   }
   for (const e of entities) resetForArena(ctx, e!);
   emitArenaFound(ctx, match);
+  // Each map gets its own bout-start line (both literals stay verbatim here
+  // so the client's exact-match localizer keeps re-localizing them).
   const stepText = isFiesta
     ? 'Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!'
-    : 'You step onto the sands of the Ashen Coliseum.';
+    : map.id === 'drowned_court'
+      ? 'You step onto the flooded stones of the Drowned Court.'
+      : 'You step onto the sands of the Ashen Coliseum.';
   for (const mPid of allPids) {
     ctx.emit({ type: 'arenaCountdown', seconds: countdown, pid: mPid });
     ctx.emit({
@@ -836,36 +944,62 @@ export function resetForArena(ctx: SimContext, e: Entity): void {
   readyArenaFighter(ctx, e, { clearPrep: true });
 }
 
-export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep: boolean }): void {
+export function readyArenaFighter(
+  ctx: SimContext,
+  e: Entity,
+  opts: { clearPrep: boolean; keepValidTargetPids?: readonly number[] },
+): void {
   e.dead = false;
   if (opts.clearPrep) {
     // Arena is a clean competitive slate: unlike the overworld/delve death paths it
     // intentionally strips ALL auras (including The Keeper's Toll) so a PvE penalty
     // never carries into a normalized match.
     e.auras = [];
-    e.cooldowns.clear();
+    clearCooldownsPreservingUnstuck(e.cooldowns);
+    e.abilityCharges = undefined; // charge pools refill (recreated lazily at full)
     e.ccDr.clear();
   }
   const meta = ctx.players.get(e.id);
-  if (meta) recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
+  if (meta)
+    recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   e.hp = e.maxHp;
   e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
-  e.targetId = null;
+  // Target retention is a separate concern from clearPrep (clean slate vs
+  // fight-start top-off): only the countdown-end call site passes
+  // keepValidTargetPids, so a selection made during prep survives the gates
+  // opening iff it points at a current fighter of this match. Every other
+  // reset (match creation, Fiesta/Yumi respawns) still clears the selection.
+  // Retention is by player pid only (a Protect Yumi cat familiar is
+  // deliberately out of scope), and a kept target can never be dead: every
+  // kept pid is a fighter revived by this same countdown-end loop.
+  e.targetId =
+    e.targetId !== null && opts.keepValidTargetPids?.includes(e.targetId) ? e.targetId : null;
   e.autoAttack = false;
+  // Drop any held movement intent so a fighter placed/respawned into the arena does
+  // not drift from a stale forward/back flag with no key held (issue 1651); bots
+  // already reset theirs on spawn.
+  if (meta) Object.assign(meta.moveInput, emptyMoveInput());
   e.queuedOnSwing = null;
   delete e.queuedOnSwingFree;
+  delete e.queuedOnSwingCostMultiplier;
   e.queuedCastAbility = null;
   e.queuedCastAim = null;
   e.castingAbility = null;
   e.castRemaining = 0;
   e.castTargetId = null;
   e.channeling = false;
+  // Hidden per-cast gathering state ends with the cast it belongs to (the
+  // parity samplers rely on inert values outside a live cast).
+  e.gatherCastNodeId = '';
+  e.fishBiteAtTick = 0;
+  e.fishReelDeadlineTick = 0;
   e.comboPoints = 0;
   e.comboUntil = -1;
   e.gcdRemaining = 0;
   e.swingTimer = 0;
   e.chargeTargetId = null;
   e.chargePath = [];
+  if (e.leap !== undefined) e.leap = null;
   e.followTargetId = null;
   e.combatTimer = 99;
   e.inCombat = false;
@@ -883,6 +1017,13 @@ export function endArenaMatch(
   winnerTeam: 'A' | 'B' | null,
   reason: 'defeat' | 'timeout' | 'forfeit',
 ): void {
+  if (match.resultRecorded) {
+    // A disconnect during the five-second aftermath must clean up the instance,
+    // but must never score Elo or honor a second time.
+    if (reason === 'forfeit') returnFromArena(ctx, match);
+    return;
+  }
+  match.resultRecorded = true;
   const ratingA0 = match.ratingA;
   const ratingB0 = match.ratingB;
   // Fiesta and Protect Yumi are unranked play: they never move the Elo ladder.
@@ -901,6 +1042,8 @@ export function endArenaMatch(
   const scoreTeam = (team: 'A' | 'B', delta: number, won: boolean | null) => {
     const pids = team === 'A' ? match.teamA : match.teamB;
     const enemies = team === 'A' ? match.teamB : match.teamA;
+    const opponentTeamKey =
+      (team === 'A' ? match.honorTeamBKey : match.honorTeamAKey) ?? honorTeamIdentity(ctx, enemies);
     const enemyNames = enemies.map((pid) => ctx.players.get(pid)?.name ?? '?').join(' & ');
     for (const pid of pids) {
       const meta = ctx.players.get(pid);
@@ -915,8 +1058,12 @@ export function endArenaMatch(
           delta,
           won,
         ));
+        if (won === true) awardRankedArenaWinHonor(ctx, meta, match.format, opponentTeamKey);
       } else {
         ratingBefore = ratingAfter = arenaStanding(meta, match.format).rating;
+        if (match.fiesta && !match.practice && reason !== 'forfeit') {
+          awardFiestaCompletionHonor(ctx, meta, opponentTeamKey, won === true);
+        }
       }
       ctx.emit({
         type: 'arenaEnd',
@@ -940,6 +1087,11 @@ export function endArenaMatch(
   const wonB = winnerTeam === null ? null : winnerTeam === 'B';
   scoreTeam('A', deltaA, wonA);
   scoreTeam('B', -deltaA, wonB);
+
+  // Ranked standings feed the meter deeds; the Fiesta end-of-bout moments
+  // resolve while augment picks are still on the meta. A forfeit is not a
+  // completed bout (a timeout is: the bout ran its full clock).
+  deedsMod.onArenaMatchEndForDeeds(ctx, match, winnerTeam, reason !== 'forfeit');
 
   if (reason === 'forfeit') {
     returnFromArena(ctx, match);
@@ -995,9 +1147,29 @@ export function returnFromArena(ctx: SimContext, match: ArenaMatch): void {
       if (meta) {
         ctx.fiestaRestoreChar(meta, e);
         ctx.clearFiestaAugments(meta, e);
+        // The evaluator skips standardized fighters; re-evaluate at the real
+        // level after restore.
+        ctx.markDeedsDirty(meta.entityId);
       }
     }
     resetForArena(ctx, e);
+    // The bout is a parenthesis, not a rest stop: undo the clean-slate full
+    // restore and hand back exactly the HP, resource, cooldowns, and CC DR the fighter
+    // carried in, so an arena match can never be farmed as a free heal, mana
+    // refill, or cooldown reset (issue #1600). recalcPlayerStats already ran
+    // inside resetForArena, so maxHp/maxResource are current for the clamp. Auras
+    // stay cleared (the documented arena clean-slate).
+    const pools = match.preMatchPools?.get(pid);
+    if (pools) {
+      e.cooldowns = new Map(pools.cooldowns);
+      e.abilityCharges =
+        Object.keys(pools.abilityCharges).length > 0
+          ? cloneAbilityCharges(pools.abilityCharges)
+          : undefined;
+      e.ccDr = cloneCcDr(pools.ccDr);
+      e.hp = Math.max(0, Math.min(pools.hp, e.maxHp));
+      e.resource = Math.max(0, Math.min(pools.resource, e.maxResource));
+    }
     e.pos = ctx.groundPos(ret.x, ret.z);
     e.prevPos = { ...e.pos };
     e.facing = ret.facing;

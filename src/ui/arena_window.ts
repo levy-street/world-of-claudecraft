@@ -17,6 +17,7 @@
 // skipping the DOM rebuild when the content signature is unchanged.
 
 import { audio } from '../game/audio';
+import type { ArenaMapId } from '../sim/dungeon_layout';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, IWorld } from '../world_api';
 import {
@@ -37,6 +38,13 @@ import { svgIcon } from './ui_icons';
 
 // Best-effort all-time ladder pull is throttled per bracket to this interval.
 const LEADERBOARD_REFETCH_MS = 15000;
+
+// Exhaustive by construction: adding a third ArenaMapId reds tsc here instead
+// of silently rendering the wrong map name.
+const ARENA_MAP_KEY: Record<ArenaMapId, 'hud.arena.map.coliseum' | 'hud.arena.map.drownedCourt'> = {
+  coliseum: 'hud.arena.map.coliseum',
+  drowned_court: 'hud.arena.map.drownedCourt',
+};
 
 // Render-skip sentinel for the offline panel: once-per-open guard so the static offline
 // note is not rebuilt every ~250ms mediumHud tick. The live signature is always
@@ -240,7 +248,7 @@ export class ArenaWindow {
       bracketTabs +
       rank +
       this.partyHtml(view.party) +
-      this.actionHtml(view.action, view.bracket) +
+      this.actionHtml(view.action, view.bracket, view.matchMap) +
       practice +
       `<div class="arena-sub">${esc(t('hud.arena.ladderOnline'))}</div>` +
       this.ladderHtml(view.ladder) +
@@ -277,9 +285,19 @@ export class ArenaWindow {
     return '';
   }
 
-  private actionHtml(action: ArenaAction, bracket: ArenaFormat): string {
+  private actionHtml(
+    action: ArenaAction,
+    bracket: ArenaFormat,
+    matchMap: ArenaMapId | null,
+  ): string {
     if (action.kind === 'in-match') {
-      return `<div class="arena-queue-status">${svgIcon('arena')} ${esc(t('hud.arena.matchInProgress', { name: action.oppName }))}</div>`;
+      // the bout's fixed map (slot-parity selected), shown from queue pop on
+      const mapRow = matchMap
+        ? `<div class="arena-note arena-map">${esc(
+            t('hud.arena.mapName', { name: t(ARENA_MAP_KEY[matchMap]) }),
+          )}</div>`
+        : '';
+      return `<div class="arena-queue-status">${svgIcon('arena')} ${esc(t('hud.arena.matchInProgress', { name: action.oppName }))}</div>${mapRow}`;
     }
     if (action.kind === 'queued') {
       return (

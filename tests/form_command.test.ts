@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { AuraKind, SimEvent } from '../src/sim/types';
+import type { AuraKind, SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -36,16 +36,30 @@ function lastReply(sim: Sim, cmd: string, pid: number): string {
 
 describe('/form command', () => {
   it('reports no form or stance by default', () => {
+    // Warriors now auto-wear a stance, so the no-form default uses a paladin.
+    const sim = makeWorld();
+    const a = sim.addPlayer('paladin', 'Aleph');
+    sim.tick();
+    expect(lastReply(sim, '/form', a)).toBe('You are not in any form or stance.');
+  });
+
+  it('reports the battle stance a fresh warrior auto-wears', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
     sim.tick();
-    expect(lastReply(sim, '/form', a)).toBe('You are not in any form or stance.');
+    expect(lastReply(sim, '/form', a)).toBe('You are in Battle Stance.');
   });
 
   it('names a warrior defensive stance', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
     sim.tick();
+    // Arms may hold Guarded Stance; swap the auto-worn Battle Stance for it so
+    // the per-tick stance reconcile leaves the pushed aura in place.
+    sim.setPlayerLevel(10, a);
+    expect(sim.setSpec('arms', a)).toBe(true);
+    const e = sim.entities.get(a)!;
+    e.auras = e.auras.filter((au) => au.kind !== 'battle_stance');
     giveForm(sim, a, 'defensive_stance', 'Defensive Stance');
     expect(lastReply(sim, '/form', a)).toBe('You are in Defensive Stance.');
   });

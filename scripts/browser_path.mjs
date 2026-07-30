@@ -1,23 +1,11 @@
 // Resolves a local Chromium-family browser binary for puppeteer-core.
 // Override with BROWSER_PATH=/path/to/browser if yours lives elsewhere.
-import fs from 'node:fs';
+// The candidate list and the non-throwing resolver live in
+// browser_path_resolve.mjs; this module keeps the load-time throw for the many
+// screenshot/E2E scripts that cannot run without a browser.
+import { findBrowserPath } from './browser_path_resolve.mjs';
 
-const CANDIDATES = [
-  process.env.BROWSER_PATH,
-  // macOS
-  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
-  '/Applications/Chromium.app/Contents/MacOS/Chromium',
-  // Windows
-  'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
-  'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-  // Linux
-  '/usr/bin/google-chrome',
-  '/usr/bin/chromium-browser',
-  '/usr/bin/chromium',
-].filter(Boolean);
-
-export const BROWSER_PATH = CANDIDATES.find((p) => fs.existsSync(p));
+export const BROWSER_PATH = findBrowserPath();
 
 if (!BROWSER_PATH) {
   throw new Error(

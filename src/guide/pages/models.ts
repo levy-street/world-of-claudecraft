@@ -3,11 +3,12 @@
 // so the page costs nothing until it mounts and only ever holds one WebGL context.
 
 import { esc } from '../../ui/esc';
-import { t } from '../../ui/i18n';
+import { type TranslationKey, t } from '../../ui/i18n';
 import { iconDataUrl } from '../../ui/icons';
 import { classCrest, className } from '../class_view';
 import {
   GUIDE_CLASSES,
+  GUIDE_DRUID_FORMS,
   GUIDE_FAMILIES,
   GUIDE_MODELS,
   GUIDE_WARLOCK_PETS,
@@ -69,6 +70,22 @@ function creatureOptions(): ModelOption[] {
   return dedupeByModel(all);
 }
 
+// Druid form figures are unnamed in the generated data; label them like picker chrome.
+const FORM_NAME: Record<string, TranslationKey> = {
+  form_bear: 'guide.models.formBear',
+  form_cat: 'guide.models.formCat',
+  form_travel: 'guide.models.formTravel',
+};
+
+function formOptions(): ModelOption[] {
+  return GUIDE_DRUID_FORMS.map((f) => ({
+    modelKey: f.model,
+    name: t(FORM_NAME[f.id] ?? 'guide.models.groupForms'),
+    tint: f.tint,
+    still: f.still,
+  }));
+}
+
 function petOptions(): ModelOption[] {
   return dedupeByModel(
     GUIDE_WARLOCK_PETS.map((p) => ({
@@ -98,7 +115,11 @@ function optionHtml(o: ModelOption): string {
 }
 
 function groupHtml(
-  labelKey: 'guide.models.groupClasses' | 'guide.models.groupCreatures' | 'guide.models.groupPets',
+  labelKey:
+    | 'guide.models.groupClasses'
+    | 'guide.models.groupForms'
+    | 'guide.models.groupCreatures'
+    | 'guide.models.groupPets',
   options: ModelOption[],
 ): string {
   if (options.length === 0) return '';
@@ -113,6 +134,7 @@ export const models: GuidePage = {
   titleKey: 'guide.models.title',
   render() {
     const classes = classOptions();
+    const forms = formOptions();
     const creatures = creatureOptions();
     const pets = petOptions();
     return `
@@ -122,6 +144,7 @@ export const models: GuidePage = {
         <div class="guide-gallery">
           <div class="guide-gallery-picker" role="group" aria-label="${esc(t('guide.models.pickerLabel'))}">
             ${groupHtml('guide.models.groupClasses', classes)}
+            ${groupHtml('guide.models.groupForms', forms)}
             ${groupHtml('guide.models.groupCreatures', creatures)}
             ${groupHtml('guide.models.groupPets', pets)}
           </div>
@@ -180,6 +203,10 @@ export const models: GuidePage = {
 
     if (!hasWebGL()) {
       if (fallback) fallback.hidden = false;
+      // No model to drag, so the turntable hint would mislead; the still is the content here,
+      // so it also gets a real alt (the shared WebGL path keeps alt="" while merely loading).
+      const hint = root.querySelector<HTMLElement>('.guide-gallery-hint');
+      if (hint) hint.hidden = true;
       // No turntable: the picker still browses the baked 2D stills (the buttons stay live, not
       // inert), swapping the selected figure's still into the stage poster.
       const showStill = (btn: HTMLElement): void => {
@@ -187,8 +214,11 @@ export const models: GuidePage = {
           b.setAttribute('aria-pressed', 'false');
         });
         btn.setAttribute('aria-pressed', 'true');
-        if (caption) caption.textContent = btn.dataset.name ?? '';
+        const name = btn.dataset.name ?? '';
+        if (caption) caption.textContent = name;
         showPoster(btn.dataset.still);
+        if (poster)
+          poster.alt = btn.dataset.still && name ? t('guide.viewer.posterAlt', { name }) : '';
       };
       const onPick = (e: Event): void => {
         const btn = (e.target as HTMLElement).closest<HTMLElement>('.guide-gallery-opt');

@@ -237,6 +237,44 @@ export const COPIED_ALLOW_IDS = [
   'admin::sv_SE::tickPerf.ms',
   'admin::tr_TR::tickPerf.ms',
   'admin::vi_VN::tickPerf.ms',
+  // "streamer" is the borrowed term these locales actually use for the role; the
+  // native calques ("retransmisor", "nadawca", "uitzender") are not what a Spanish,
+  // Polish or Dutch operator would ever say. Translating it would be worse
+  // localization than leaving the loanword, so these are cognates, not omissions.
+  // Locales that DO have a real native word for it (fr "streameur", tr "yayinci",
+  // ru, ja, ko, zh) are translated normally and are deliberately absent here.
+  'admin::cs_CZ::accounts.badgeStreamer',
+  'admin::da_DK::accounts.badgeStreamer',
+  'admin::es::accounts.badgeStreamer',
+  'admin::es_ES::accounts.badgeStreamer',
+  'admin::id_ID::accounts.badgeStreamer',
+  'admin::it_IT::accounts.badgeStreamer',
+  'admin::nl_NL::accounts.badgeStreamer',
+  'admin::pl_PL::accounts.badgeStreamer',
+  'admin::pt_BR::accounts.badgeStreamer',
+  'admin::sv_SE::accounts.badgeStreamer',
+  'admin::vi_VN::accounts.badgeStreamer',
+  'admin::cs_CZ::detail.streamerLabel',
+  'admin::da_DK::detail.streamerLabel',
+  'admin::de_DE::detail.streamerLabel',
+  'admin::es::detail.streamerLabel',
+  'admin::es_ES::detail.streamerLabel',
+  'admin::id_ID::detail.streamerLabel',
+  'admin::it_IT::detail.streamerLabel',
+  'admin::nl_NL::detail.streamerLabel',
+  'admin::pl_PL::detail.streamerLabel',
+  'admin::pt_BR::detail.streamerLabel',
+  'admin::sv_SE::detail.streamerLabel',
+  'admin::vi_VN::detail.streamerLabel',
+  // Unstuck-reports dashboard (v0.32.0). Three genuine cognates rather than
+  // re-coined words: French "Destination" and German "Hotspots" are the normal
+  // terms in those languages, and Indonesian "area" is a standard loanword.
+  // fr_CA carries no own row for colDestination, so it inherits fr_FR's value
+  // and needs its own shadow entry (the same pairing as who.statusCombat above).
+  'admin::fr_FR::unstuckReports.colDestination',
+  'admin::fr_CA::unstuckReports.colDestination',
+  'admin::de_DE::unstuckReports.hotspotsTitle',
+  'admin::id_ID::unstuckReports.areaId',
 ];
 
 export const V07_SLASH = [
@@ -288,12 +326,16 @@ export const V07_SLASH = [
   'Threat is only tracked on enemies; Aki is not one.',
   'Threat on Aki (5): Aki.',
   'Time played this session: Aki.',
+  'Total time played: Aki.',
   'Unknown command: Aki. Type /help for a list.',
   'Vendor buyback (5): Aki. Repurchase at any merchant.',
   'You are Aki.',
   'You are airborne and rising — Akiyd above the ground.',
   'You are falling — Akiyd above the ground.Aki',
-  'You are fishing — Akis of Akis remaining.',
+  // Gather-cast rewords: the fishing readout dropped its countdown (no bite
+  // leak) and the gather cast readout joined the same /cast backstop surface.
+  'You are fishing. Waiting for a bite.',
+  'You are gathering: Akis of Akis remaining.',
   'You are in Aki (levels Aki–Aki) at (5, 5).',
   'You are in Aki.',
   'You are in combat (enemies still engaged).',
@@ -330,7 +372,20 @@ export const V07_SLASH = [
   'Your vendor buyback list is empty.',
   'Zones (5): Aki.',
   '[dev] Added Akig to your purse.',
+  '[dev] Found no seed of that kind. Try again.',
+  '[dev] God mode ON (invulnerable).',
   '[dev] Level set to 5.',
+  '[dev] Opened a Aki-rank portal to Aki (5 floors, L5). Walk through it.',
+  '[dev] Seed Aki is not infernal; using Aki.',
+  '[dev] Smite mode OFF.',
+  '[dev] Smite mode ON (one-shot everything).',
   '[dev] Teleported to Aki, Aki.',
   "[dev] Unknown item 'Aki'.",
+  '[dev] Spawned the Test Quartermaster (free epic gear) next to you.',
+  '[dev] Could not spawn the test vendor.',
+  '[dev] God mode ON.',
+  '[dev] God mode OFF.',
+  '[dev] Attuned: marked 5 quests complete (in-progress quests untouched).',
+  '[dev] Raid lockouts cleared.',
+  '[dev] Entering Nythraxis raid (Aki).',
 ];

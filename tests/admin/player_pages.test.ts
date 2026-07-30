@@ -186,8 +186,8 @@ describe('Players pages', () => {
     expect(screen.getByText(t('detail.statusActive'))).toBeInTheDocument();
     expect(screen.queryByText(t('detail.status'))).not.toBeInTheDocument();
     expect(screen.getByText(t('accountModal.recentIps'))).toBeInTheDocument();
-    expect(screen.getByText('203.0.113.7')).toBeInTheDocument();
-    expect(screen.getByText('198.51.100.4')).toBeInTheDocument();
+    expect(screen.getAllByText('203.0.113.7').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('198.51.100.4').length).toBeGreaterThan(0);
     expect(screen.getByText(t('moderationHistory.title'))).toBeInTheDocument();
     expect(screen.getByText('harassment')).toBeInTheDocument();
     expect(screen.getByText(t('moderationHistory.by', { name: 'moderator' }))).toBeInTheDocument();

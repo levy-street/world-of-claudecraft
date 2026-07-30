@@ -51,7 +51,8 @@ describe('hud.css - ambient loops gate on --fx-ambient-anim + --motion-scale', (
   it('gives every ambient loop a play-state token (paused at low/reduced)', () => {
     const playStates =
       hudCss.match(/animation-play-state: var\(--fx-ambient-anim, running\);/g) ?? [];
-    expect(playStates.length).toBe(7); // combat-flash, rest, talent, fiesta, party-badge, daily-rewards chest + icon
+    // combat-flash, rest, talent, fiesta, party-badge, daily-rewards chest + icon, ai-tag
+    expect(playStates.length).toBe(8);
   });
 
   it('calms each ambient duration by --motion-scale (near-zero, never 0, under reduced-motion)', () => {
@@ -71,6 +72,19 @@ describe('hud.css - the death-warning vignette holds full tint on ALL THREE calm
     // 0%-keyframe a paused animation would freeze on).
     const holds = hudCss.match(/animation: none;\s*opacity: var\(--lhv-opacity\);/g) ?? [];
     expect(holds.length).toBe(3);
+  });
+});
+
+describe('hud.css - Reduce Motion never hides the damage numbers', () => {
+  it('drops the FCT rise outright and holds full opacity (a 0.01ms forwards rise would freeze on the opacity-0 end keyframe, hiding every number for its pooled lifetime)', () => {
+    const rule = hudCss.match(/body\.reduce-motion \.fct \{[^}]*\}/);
+    expect(rule).not.toBeNull();
+    // Same shape as the low-health-vignette calming axes: animation off, value held.
+    expect(rule?.[0]).toContain('animation: none !important;');
+    expect(rule?.[0]).toContain('opacity: 1;');
+    // The old shed (finish-the-rise-instantly) must be gone: forwards fill lands it
+    // on the invisible end frame.
+    expect(rule?.[0]).not.toContain('animation-duration');
   });
 });
 

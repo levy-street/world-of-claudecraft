@@ -1,7 +1,12 @@
+// FIRST import on purpose: loads .env before realm.ts (or any other module
+// with an import-time process.env read) evaluates. See server/env.ts.
+import './env';
 import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
 import { WebSocketServer } from 'ws';
+import { DEEDS } from '../src/sim/content/deeds';
+import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -12,7 +17,13 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
-import type { GuildLeaderboardEntry, LeaderboardEntry } from '../src/world_api';
+import {
+  type DeedsLeaderboardEntry,
+  type DeedsLeaderboardSelf,
+  type GuildLeaderboardEntry,
+  type LeaderboardEntry,
+  ONLINE_WORLD_AUTH_TYPE,
+} from '../src/world_api';
 import {
   configureAccountRuntime,
   handleAccount2faDisable,
@@ -25,16 +36,33 @@ import {
   handleAccountExport,
   handleAccountLogout,
   handleAccountMarketing,
+  handleAccountPasswordForgot,
+  handleAccountPasswordReset,
   handleAccountSetEmail,
   handleAccountSetInitialEmail,
   handleAccountWhoami,
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
 } from './account';
-import { configureAdminRuntime, handleAdminApi } from './admin';
-import { currentSitePresenceUsers, recordSitePresenceSample } from './admin_db';
+import { configureAdminPlayersCap, configureAdminRuntime, handleAdminApi } from './admin';
+import {
+  currentSitePresenceUsers,
+  distinctOnlineSampleRealms,
+  foldOnlinePeak,
+  pruneOnlineSamplesBatch,
+  pruneSitePresenceSamplesBatch,
+  pruneSitePresenceSessionsBatch,
+  recordSitePresenceSample,
+} from './admin_db';
 import { permissionsForRoles } from './admin_permissions';
 import { loadAntibotConfig } from './antibot_config_db';
+import {
+  configureAppleAuthRuntime,
+  handleAppleLogin,
+  handleAppleLoginLink,
+  handleAppleLoginNew,
+} from './apple_auth';
+import { pruneApplePendingLogins } from './apple_auth_db';
 import {
   hashPassword,
   newToken,
@@ -49,22 +77,38 @@ import { configureAuthRuntime } from './auth_routes';
 import { computeBankBonus } from './bank_entitlements';
 import { bankLedgerIdle } from './bank_ledger';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
-import { characterSheet, type SheetRank } from './character_sheet';
-import { configureCharactersRuntime } from './characters';
-import { handleDailyRewardApi, handleDailyRewardInternalApi } from './daily_rewards';
+import { createCachedRead } from './cached_read';
+import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
+import { buildCharacterList, configureCharactersRuntime } from './characters';
 import {
+  claudiumPreAuthMutationRateLimited,
+  configureClaudiumRuntime,
+  handleClaudiumApi,
+  handleClaudiumStripeWebhook,
+} from './claudium';
+import { configureCommunityTestAccounts } from './community_test_accounts';
+import {
+  bustDailyRewardBoardCache,
+  dailyRewardEventsCutoffDay,
+  handleDailyRewardApi,
+  handleDailyRewardInternalApi,
+} from './daily_rewards';
+import { pruneDailyRewardEventsBatch } from './daily_rewards_db';
+import {
+  type ArenaLeaderRow,
   accountAndScopeForToken,
   accountById,
-  accountForToken,
   acquireCharacterLease,
   bankBonusFactsForAccount,
   type CharacterRow,
   characterCountsByRealm,
+  charactersForDeedsBoard,
   chatMuteStatusForAccount,
   closeOrphanSessions,
   createAccount,
   createCharacterCapped,
   createCompanionToken,
+  deedsBoardRanked,
   deleteCharacter,
   ensureSchema,
   findAccount,
@@ -72,6 +116,7 @@ import {
   getAccountsCount,
   getCharacter,
   getCharacterById,
+  getCharactersCount,
   guildNameForCharacter,
   isAdminAccount,
   lifetimeXpRankForCharacter,
@@ -79,11 +124,12 @@ import {
   listCharacters,
   listCompanionTokens,
   loadAccountCosmetics,
+  loadWorldState,
   moderationStatusForAccount,
   pool,
   primarySlugForAccount,
-  pruneChatLogs,
-  pruneClientPerfReports,
+  pruneChatLogsBatch,
+  pruneClientPerfReportsBatch,
   reclaimDeactivatedName,
   referralCountForAccount,
   releaseAllCharacterLeases,
@@ -91,6 +137,7 @@ import {
   renameCharacter,
   revokeCompanionToken,
   saveToken,
+  saveWorldState,
   scopeAllowsMutation,
   searchCharacters,
   setAccountEmail,
@@ -100,6 +147,20 @@ import {
   topLifetimeXp,
   touchLogin,
 } from './db';
+import { configureDeedsRuntime } from './deeds';
+import {
+  buildDeedsBoardEntries,
+  DEEDS_BOARD_ENTRY_FLOOR,
+  deedsBoardSelf,
+  type RankedDeedsAccount,
+} from './deeds_board';
+import {
+  DEEDS_BOARD_DEMAND_TTL_MS,
+  singleFlight,
+  warmDeedsBoardIfDemanded,
+} from './deeds_board_warm';
+import { deedRarityCounts, recentDeedsForCharacter } from './deeds_db';
+import { deedRecordsIdle, publicRarityPayload } from './deeds_records';
 import {
   type DesktopLoginRouteDeps,
   handleDesktopLoginExchange,
@@ -113,6 +174,7 @@ import {
   handleDiscordStart,
   handleDiscordStatus,
   handleDiscordUnlink,
+  handleNativeDiscordExchange,
 } from './discord';
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
@@ -129,7 +191,6 @@ import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
 import { handleClientError } from './http/client_error';
-import { registerClientPerfMetrics } from './http/client_perf_metrics';
 import { type Config, DEFAULT_DISPATCH, type DispatchMode, loadConfig } from './http/config';
 import {
   type ApiDelegate,
@@ -139,7 +200,13 @@ import {
 } from './http/dispatch';
 import { type GameStateSource, registerGameStateMetrics } from './http/game_metrics';
 import { setGameMetricsCounters } from './http/game_signals';
-import { handleLivez, handleMetricsGate, handleReadyz, markDraining } from './http/health';
+import {
+  handleLivez,
+  handleMetricsGate,
+  handleReadyz,
+  markDraining,
+  registerLivenessSource,
+} from './http/health';
 import { type Logger, logger } from './http/logger';
 import { createHttpMetrics } from './http/metrics';
 import { teeMetricSink } from './http/middleware/metric_sink';
@@ -156,7 +223,13 @@ import {
 import { configureInternalRuntime, handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
-import { configureLeaderboardRuntime, type ReleaseEntry } from './leaderboard';
+import {
+  buildDeedsBoard,
+  configureLeaderboardRuntime,
+  type ReleaseEntry,
+  readArenaLeaderboard,
+  readProjectStats,
+} from './leaderboard';
 import { MAX_MAP_SAVE_BYTES } from './maps';
 import {
   mapDeleteCore,
@@ -173,17 +246,23 @@ import {
   cleanReportReason,
   createPlayerReport,
   createSuspiciousRegistrationReport,
+  setOnAccountModerated,
 } from './moderation_db';
 import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
 import { handlePerfReport } from './perf_report';
 import {
+  pruneAccountIpAssociationsBatch,
+  prunePlaySessionsBatch,
+} from './play_session_retention_db';
+import {
   captureReferral,
   cardUploadContentLengthTooLarge,
   handleCardRoutes,
   handleCardUpload,
 } from './player_card';
+import { prunePlayerActivityDailyBatch } from './player_metrics_db';
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 import {
@@ -199,16 +278,31 @@ import {
   recordAuthFailure,
   requestIp,
   setRateLimitTier2Store,
+  walletLinkRateLimited,
   wocBalanceRateLimited,
 } from './ratelimit';
 import { createPgRateLimitStore } from './ratelimit_db';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
+import { createRetentionSweep, RETENTION_SWEEP_BATCH_SIZE } from './retention_sweep';
+import { resolveSfxOverlayFile } from './sfx_overlay';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { adminRolesForAccount } from './staff_db';
-import { cacheControlFor, etagFor, isNotModified } from './static_cache';
+import {
+  cacheControlFor,
+  etagFor,
+  isNotModified,
+  isPublicSfxPath,
+  requestedSfxBlobHash,
+  requestedSfxVersion,
+  sfxBlobIntegrityMatches,
+} from './static_cache';
+import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
+import { stopSteamMirror } from './steam/mirror';
 import { passesTurnstile } from './turnstile';
+import { pruneUnstuckReports, UNSTUCK_REPORT_RETENTION_DAYS } from './unstuck_db';
+import { stopUnstuckRecords, UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS } from './unstuck_records';
 import { MAX_ASSET_BYTES } from './user_assets';
 import {
   assetBytesCore,
@@ -218,6 +312,10 @@ import {
 } from './user_assets_routes';
 import {
   configureWalletRuntime,
+  handleDesktopWalletHandoffClaim,
+  handleDesktopWalletHandoffComplete,
+  handleDesktopWalletHandoffCreate,
+  handleDesktopWalletHandoffResult,
   handleWalletChallenge,
   handleWalletGet,
   handleWalletLink,
@@ -251,7 +349,19 @@ export function resetActiveConfigForTests(): void {
   activeConfigCache = null;
 }
 
+// The realm player cap advertised on /api/status, canonicalized for the wire: a
+// configured 0 or negative (the cap disabled) is normalized to 0 so the field is
+// always a non-negative count. Both /api/status arms (the legacy handleApi twin
+// below and the migrated statusHandler via the injected leaderboard runtime) read
+// it here, so the players_cap field stays byte-identical across the two arms.
+function canonicalPlayersCap(): number {
+  return Math.max(0, activeConfig().maxPlayersPerRealm);
+}
+
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
+const SFX_PACK_DIR = process.env.SFX_PACK_DIR?.trim()
+  ? path.resolve(process.env.SFX_PACK_DIR.trim())
+  : null;
 // Pretty URLs that serve standalone static HTML pages.
 const STATIC_PAGE_ALIASES = new Map([
   ['/links', '/links.html'],
@@ -262,6 +372,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/social-media-links/', '/links.html'],
   ['/play', '/play.html'],
   ['/play/', '/play.html'],
+  ['/wallet-handoff', '/wallet-handoff.html'],
+  ['/wallet-handoff/', '/wallet-handoff.html'],
   ['/privacy', '/privacy.html'],
   ['/privacy/', '/privacy.html'],
   ['/terms', '/terms.html'],
@@ -298,8 +410,8 @@ const WS_MAX_PAYLOAD_BYTES = 16 * 1024;
 // up (~1 minute total at 30 attempts x 2s).
 const DB_BOOT_MAX_ATTEMPTS = 30; // attempts (count)
 const DB_BOOT_RETRY_MS = 2_000;
-// Low-frequency background prune (OAuth grants/states, chat logs, perf reports)
-// runs once a day.
+// Low-frequency background prune (OAuth grants/states, pending logins) runs once
+// a day; the retention-table prunes run in the nightly retention sweep instead.
 const DAILY_PRUNE_INTERVAL_MS = 24 * 3600 * 1000;
 
 // The live GameServer, constructed on FIRST TOUCH via liveGame() (the
@@ -312,7 +424,9 @@ const DAILY_PRUNE_INTERVAL_MS = 24 * 3600 * 1000;
 // lazily instead of at module load.
 let gameInstance: GameServer | null = null;
 function liveGame(): GameServer {
-  gameInstance ??= new GameServer();
+  gameInstance ??= new GameServer({
+    communityTestRifts: activeConfig().communityTestRifts,
+  });
   return gameInstance;
 }
 
@@ -338,6 +452,15 @@ const LEADERBOARD_TTL_MS = 30_000;
 // Cache the full exposed depth (LEADERBOARD_MAX) once per scope; the REST handler
 // pages through it as an in-memory slice, so no extra query per page click.
 const LEADERBOARD_SIZE = LEADERBOARD_MAX;
+// Monotonic generation counter for every player-derived board cache. A refresh
+// captures it before its first await and installs its result only if it is still
+// unchanged when the read returns; bustBoardCaches (the moderation hook) bumps
+// it. This closes a lost-bust race: a ban landing while a refresh is in flight
+// would otherwise be overwritten by that refresh's pre-ban snapshot for up to
+// one TTL cycle. The in-flight caller still gets the computed snapshot; the cache
+// is left null so the NEXT read triggers a fresh refresh whose SQL delists the
+// account via ELIGIBLE_ACCOUNT_SQL.
+let boardEpoch = 0;
 // One cache per scope: 'realm' for the in-game panel, 'global' for the
 // cross-realm home-page board.
 const leaderboardCache: Record<
@@ -349,6 +472,7 @@ const leaderboardCache: Record<
 };
 
 async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
+  const epoch = boardEpoch;
   const rows = await topLifetimeXp(LEADERBOARD_SIZE, { global: scope === 'global' });
   const entries: LeaderboardEntry[] = rows.map((r, i) => ({
     rank: i + 1,
@@ -358,17 +482,36 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     virtualLevel: virtualLevel(r.lifetimeXp),
     lifetimeXp: r.lifetimeXp,
     prestigeRank: r.prestigeRank,
+    // a deed id (never display text); the client localizes via deed_i18n
+    title: r.activeTitle,
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
-  leaderboardCache[scope] = { at: Date.now(), entries };
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
+  if (boardEpoch === epoch) leaderboardCache[scope] = { at: Date.now(), entries };
   return entries;
 }
+
+// Single-flight per scope, keyed on boardEpoch so a moderation bust (which bumps
+// boardEpoch) drops any in-flight pre-ban refresh: a post-bust reader no longer
+// joins that flight and receives its pre-ban snapshot, it starts a fresh delisting
+// read. Both read paths (the inline getter and the warm loop) share these, so a
+// warm tick landing on an inline read cannot run the query twice.
+const refreshLeaderboardShared: Record<'realm' | 'global', () => Promise<LeaderboardEntry[]>> = {
+  realm: singleFlight(
+    () => refreshLeaderboard('realm'),
+    () => boardEpoch,
+  ),
+  global: singleFlight(
+    () => refreshLeaderboard('global'),
+    () => boardEpoch,
+  ),
+};
 
 async function getLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
   const cached = leaderboardCache[scope];
   if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.entries;
   try {
-    return await refreshLeaderboard(scope);
+    return await refreshLeaderboardShared[scope]();
   } catch (err) {
     console.error(`leaderboard refresh failed (${scope}):`, err);
     return cached?.entries ?? [];
@@ -389,6 +532,7 @@ const guildLeaderboardCache: Record<
 async function refreshGuildLeaderboard(
   scope: 'realm' | 'global',
 ): Promise<GuildLeaderboardEntry[]> {
+  const epoch = boardEpoch;
   const rows = await topGuilds(LEADERBOARD_SIZE, { global: scope === 'global' });
   const entries: GuildLeaderboardEntry[] = rows.map((r, i) => ({
     rank: i + 1,
@@ -398,20 +542,325 @@ async function refreshGuildLeaderboard(
     topLevel: r.topLevel,
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
-  guildLeaderboardCache[scope] = { at: Date.now(), entries };
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
+  if (boardEpoch === epoch) guildLeaderboardCache[scope] = { at: Date.now(), entries };
   return entries;
 }
+
+const refreshGuildLeaderboardShared: Record<
+  'realm' | 'global',
+  () => Promise<GuildLeaderboardEntry[]>
+> = {
+  realm: singleFlight(
+    () => refreshGuildLeaderboard('realm'),
+    () => boardEpoch,
+  ),
+  global: singleFlight(
+    () => refreshGuildLeaderboard('global'),
+    () => boardEpoch,
+  ),
+};
 
 async function getGuildLeaderboard(scope: 'realm' | 'global'): Promise<GuildLeaderboardEntry[]> {
   const cached = guildLeaderboardCache[scope];
   if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.entries;
   try {
-    return await refreshGuildLeaderboard(scope);
+    return await refreshGuildLeaderboardShared[scope]();
   } catch (err) {
     console.error(`guild leaderboard refresh failed (${scope}):`, err);
     return cached?.entries ?? [];
   }
 }
+
+// Arena ladder cache. Per FORMAT ('1v1' | '2v2', the only two the public ladder
+// serves; the wider ArenaFormat union never reaches here, so an unrecognized
+// ?format value can never mint a third cache slot), same compute-once /
+// serve-from-memory shape as the player and guild boards above. Wired into
+// bustBoardCaches below because the ladder is character-faced and
+// moderation-visible: a ban delists immediately in-process while cross-process
+// peers converge within one TTL, the same tradeoff the other boards already make.
+// readArenaLeaderboard (server/leaderboard.ts) is the INNER read, so
+// ARENA_LEADERBOARD_LIMIT stays the one place the ladder depth is set.
+const arenaLeaderboardCache: Record<
+  '1v1' | '2v2',
+  { at: number; leaders: ArenaLeaderRow[] } | null
+> = {
+  '1v1': null,
+  '2v2': null,
+};
+
+async function refreshArena(format: '1v1' | '2v2'): Promise<ArenaLeaderRow[]> {
+  const epoch = boardEpoch;
+  const { leaders } = await readArenaLeaderboard({ topArenaRatings }, format);
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
+  if (boardEpoch === epoch) arenaLeaderboardCache[format] = { at: Date.now(), leaders };
+  return leaders;
+}
+
+// Single-flight per format, keyed on boardEpoch exactly like the player/guild
+// refreshes, so a moderation bust (which bumps boardEpoch) drops any in-flight
+// pre-ban arena refresh instead of handing a post-bust reader its pre-ban snapshot.
+const refreshArenaShared: Record<'1v1' | '2v2', () => Promise<ArenaLeaderRow[]>> = {
+  '1v1': singleFlight(
+    () => refreshArena('1v1'),
+    () => boardEpoch,
+  ),
+  '2v2': singleFlight(
+    () => refreshArena('2v2'),
+    () => boardEpoch,
+  ),
+};
+
+async function getArenaLeaderboard(format: '1v1' | '2v2'): Promise<ArenaLeaderRow[]> {
+  const cached = arenaLeaderboardCache[format];
+  if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.leaders;
+  try {
+    return await refreshArenaShared[format]();
+  } catch (err) {
+    console.error(`arena leaderboard refresh failed (${format}):`, err);
+    return cached?.leaders ?? [];
+  }
+}
+
+// Renown (deeds) board cache. Same compute-once/serve-from-memory shape as
+// the boards above, but ONE entry, not one per scope: the board is
+// account-level and accounts span realms, so it is GLOBAL-ONLY by design.
+// `entries` is the public, display-character-faced list (paged by the route;
+// NEVER carries an account id); `ranked` keeps the accountId-keyed ranking
+// INTERNALLY for the self-rank read, and totalRanked is the pre-cap total the
+// percentile uses.
+interface DeedsBoardCache {
+  at: number;
+  entries: DeedsLeaderboardEntry[];
+  ranked: RankedDeedsAccount[];
+  totalRanked: number;
+}
+let deedsBoardCache: DeedsBoardCache | null = null;
+// Wall-clock ms of the last actual deeds-board request in THIS process, 0 before
+// the first. Stamped on the shared read path (ensureDeedsBoard) and read by the
+// warm loop's demand gate so the full-table board read only runs while someone is
+// viewing (see deeds_board_warm.ts). Per-process like the board caches: peer
+// realm processes gate their own warm loops off their own local demand.
+let deedsBoardLastRequestAt = 0;
+
+async function refreshDeedsBoard(): Promise<DeedsBoardCache> {
+  const epoch = boardEpoch;
+  // Renown values are content-owned (never in SQL), so hand the whole content
+  // table to the SQL roll-up as two parallel arrays plus the floor. deedsBoardRanked
+  // aggregates IN Postgres and returns only the ranked accounts, 1:1 with the
+  // former computeDeedsBoard(rows).ranked shape.
+  const deedIds = Object.keys(DEEDS);
+  const renowns = deedIds.map((id) => DEEDS[id].renown);
+  const board = await deedsBoardRanked(deedIds, renowns, DEEDS_BOARD_ENTRY_FLOOR);
+  if (board.unknownDeedIds.length > 0) {
+    // Rows for removed/renamed content are skipped, never scored; surface the
+    // ids so a content rename is noticed instead of silently shrinking scores.
+    console.error('deeds board: skipping unknown deed ids:', board.unknownDeedIds.join(', '));
+  }
+  // buildDeedsBoardEntries faces each ranked account with its display
+  // character and SKIPS an account whose character vanished mid-refresh
+  // (deleted between the row read and this fill; the rows cascade away by the
+  // next refresh), never minting a blank row.
+  const entries = buildDeedsBoardEntries(
+    board.ranked,
+    await charactersForDeedsBoard(board.ranked.map((a) => a.displayCharacterId)),
+  );
+  const cache: DeedsBoardCache = {
+    at: Date.now(),
+    entries,
+    ranked: board.ranked,
+    totalRanked: board.totalRanked,
+  };
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch);
+  // the in-flight caller still gets this snapshot, the next read self-corrects.
+  if (boardEpoch === epoch) deedsBoardCache = cache;
+  return cache;
+}
+
+// Single-flight on the board refresh, covering BOTH read paths: the inline
+// read (ensureDeedsBoard) and the demand-warm loop. The board read is the one
+// full-table roll-up here, so callers racing a cold or just-expired cache (a
+// login-page storm on a fresh process, or a warm tick landing on an inline
+// request, since the warm interval equals the cache TTL) must share ONE
+// refresh: concurrent flights would multiply the most expensive query the
+// process has, and the slower flight would overwrite a newer snapshot with a
+// fresher timestamp. The flight is keyed on boardEpoch like the leaderboard
+// and arena flights: the board is character-faced, and a plain flight let a
+// reader arriving AFTER a moderation bust join the in-flight pre-ban refresh
+// and be served a just-banned account's character for one read; keyed, the
+// bust (which bumps the epoch) makes that reader start a fresh, delisting
+// read instead, and the install guard above declines the pre-ban snapshot.
+const refreshDeedsBoardShared = singleFlight(refreshDeedsBoard, () => boardEpoch);
+
+// Freshness gate shared by the two board reads below: serve the cache inside
+// the TTL, else refresh, else stale-serve (or null before the first success).
+async function ensureDeedsBoard(): Promise<DeedsBoardCache | null> {
+  // Mark demand on every board read (fresh-cache hit included): this is the one
+  // chokepoint both dispatch arms funnel through, and it is never on the warm
+  // path, so the stamp measures real viewer demand and nothing else. It keeps the
+  // warm loop refreshing the board for DEEDS_BOARD_DEMAND_TTL_MS after the last
+  // request; a cold or stale request still refreshes inline just below.
+  deedsBoardLastRequestAt = Date.now();
+  if (deedsBoardCache && Date.now() - deedsBoardCache.at < LEADERBOARD_TTL_MS) {
+    return deedsBoardCache;
+  }
+  try {
+    return await refreshDeedsBoardShared();
+  } catch (err) {
+    console.error('deeds board refresh failed:', err);
+    return deedsBoardCache;
+  }
+}
+
+async function getDeedsLeaderboard(): Promise<DeedsLeaderboardEntry[]> {
+  return (await ensureDeedsBoard())?.entries ?? [];
+}
+
+async function deedsSelfRank(accountId: number): Promise<DeedsLeaderboardSelf | null> {
+  const cache = await ensureDeedsBoard();
+  return cache ? deedsBoardSelf(cache.ranked, accountId) : null;
+}
+
+// Moderation delisting in THIS process is immediate, never TTL-bound: null
+// EVERY cached board scope after a successful moderateAccount of any action
+// kind, so a ban delists and an unban relists on the next read here. In the
+// process-per-realm fleet, PEER realm processes keep their own caches and
+// converge within one LEADERBOARD_TTL_MS (the boards' pre-existing staleness
+// ceiling); the SQL exclusion makes their next refresh correct. The arena ladder
+// is now cached per format (arenaLeaderboardCache), so it is busted here too: its
+// former fleet-wide exactness becomes in-process-immediate delisting plus
+// TTL-bounded peer convergence, the same tradeoff every other board already made.
+// The daily-rewards board is cached in-process behind dailyRewardService's board
+// cache (daily_rewards_board_cache.ts, same TTL tradeoff), so it is busted below
+// with the rest. Bumping boardEpoch as well as nulling the caches closes the
+// lost-bust race: a refresh already in flight when this fires will decline to
+// install its pre-ban snapshot (see boardEpoch), so a ban cannot be masked for up
+// to a TTL cycle.
+function bustBoardCaches(): void {
+  boardEpoch++;
+  leaderboardCache.realm = null;
+  leaderboardCache.global = null;
+  guildLeaderboardCache.realm = null;
+  guildLeaderboardCache.global = null;
+  arenaLeaderboardCache['1v1'] = null;
+  arenaLeaderboardCache['2v2'] = null;
+  deedsBoardCache = null;
+  bustDailyRewardBoardCache();
+}
+setOnAccountModerated(bustBoardCaches);
+
+// Deed rarity cache. Same compute-once/serve-from-memory shape as the boards
+// above, one entry (the aggregate is global/cross-realm by design). 5 minutes:
+// rarity moves slowly and the refresh scans character_deeds, so the 30 s board
+// TTL is tighter than this read needs. Stale-on-error like the boards; with
+// nothing cached yet a failed refresh serves the empty aggregate (the endpoint
+// stays 200 and clients simply render no rarity lines).
+const DEEDS_RARITY_TTL_MS = 5 * 60_000;
+let deedsRarityCache: {
+  at: number;
+  payload: import('../src/world_api').DeedsRarity;
+} | null = null;
+
+// Single-flight the rarity refresh so a login-page storm on a cold or just-expired
+// cache runs the two full-table aggregate scans (deedRarityCounts) once, not once
+// per caller. publicRarityPayload strips hidden deeds at refresh time, before the
+// cache install, so the anonymous endpoint never enumerates a hidden deed.
+// deedsRarityCache is deliberately NOT wired into bustBoardCaches (rarity is not
+// moderation-visible in the delisting sense); if it is ever added there, the same
+// boardEpoch capture-before-install guard the leaderboard refreshes carry must be
+// added in that same change.
+const refreshDeedsRarityShared = singleFlight(
+  async (): Promise<import('../src/world_api').DeedsRarity> => {
+    const payload = publicRarityPayload(await deedRarityCounts());
+    deedsRarityCache = { at: Date.now(), payload };
+    return payload;
+  },
+);
+
+async function getDeedsRarity(): Promise<import('../src/world_api').DeedsRarity> {
+  if (deedsRarityCache && Date.now() - deedsRarityCache.at < DEEDS_RARITY_TTL_MS) {
+    return deedsRarityCache.payload;
+  }
+  try {
+    return await refreshDeedsRarityShared();
+  } catch (err) {
+    console.error('deeds rarity refresh failed:', err);
+    return deedsRarityCache?.payload ?? { totalEligible: 0, earned: {} };
+  }
+}
+
+// Project-stats counters cache. Unlike the player/guild/arena boards, the
+// COUNT(*) reads over accounts and characters are moderation-INVARIANT (a ban or
+// unban never changes a row count, only eligibility), so they need NO bust or
+// epoch wiring, the same call getDeedsRarity's cache makes above. They are a
+// single-key read, so they ride createCachedRead (server/cached_read.ts) directly
+// rather than the per-scope singleFlight the boards use. 60s TTL (the D11
+// exception): both are slow-moving marketing counters, not moderation-sensitive
+// ranked lists, so a minute of staleness is fine. ONE cache holds the whole
+// readProjectStats body (server/leaderboard.ts, the INNER read), so a cold burst
+// costs one shared flight with exactly one getAccountsCount and one
+// getCharactersCount read between both getters; players_online is a live
+// per-request value the handler re-attaches, so the inner read gets a throwaway 0
+// for players_online that the getters discard.
+const PROJECT_STATS_TTL_MS = 60_000;
+const projectStatsCache = createCachedRead(
+  () => readProjectStats({ getAccountsCount, getCharactersCount }, 0, REALM),
+  { ttlMs: PROJECT_STATS_TTL_MS },
+);
+
+async function getAccountsCreatedCount(): Promise<number> {
+  try {
+    return (await projectStatsCache.read()).accounts_created;
+  } catch (err) {
+    // Only a never-warmed cache reaches here (createCachedRead stale-serves the
+    // last counts on a later failure). Serve 0 rather than 500, the same
+    // degrade-not-throw contract getLeaderboard / getDeedsRarity already ship, so
+    // /api/project-stats stays 200 when the db is unreachable.
+    console.error('accounts-created count refresh failed:', err);
+    return 0;
+  }
+}
+
+async function getCharactersCreatedCount(): Promise<number> {
+  try {
+    return (await projectStatsCache.read()).characters_created;
+  } catch (err) {
+    console.error('characters-created count refresh failed:', err);
+    return 0;
+  }
+}
+
+// Test-only handle for the board-read single-flight suite. Not used in production:
+// it exposes the module-private board getters, their shared flights, the bust
+// hook, and a cache reset so a unit test can exercise the real single-flight
+// (concurrency, rejection-not-cached, stale-serve, and the bust-mid-flight
+// joiner-eviction) without driving through the runtime injection seams (which
+// would replace the function under test with a fake).
+export const boardReadTestSeam = {
+  getDeedsRarity,
+  getDeedsLeaderboard,
+  getLeaderboard,
+  getGuildLeaderboard,
+  getArenaLeaderboard,
+  getAccountsCreatedCount,
+  getCharactersCreatedCount,
+  refreshDeedsRarityShared,
+  refreshLeaderboardShared,
+  refreshGuildLeaderboardShared,
+  refreshArenaShared,
+  bustBoardCaches,
+  reset(): void {
+    leaderboardCache.realm = null;
+    leaderboardCache.global = null;
+    guildLeaderboardCache.realm = null;
+    guildLeaderboardCache.global = null;
+    arenaLeaderboardCache['1v1'] = null;
+    arenaLeaderboardCache['2v2'] = null;
+    deedsBoardCache = null;
+    deedsRarityCache = null;
+    projectStatsCache.bust();
+  },
+};
 
 // ---------------------------------------------------------------------------
 // News & Updates: GitHub Releases proxy (read-only, public).
@@ -500,47 +949,29 @@ function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | 
 
 // The character-list response shared by the full-session GET /api/characters and
 // the read-scoped GET /api/me/characters, so both stay byte-identical.
-function characterListPayload(chars: CharacterRow[]): {
-  realm: string;
-  characters: {
-    id: number;
-    name: string;
-    class: PlayerClass;
-    level: number;
-    skin: number;
-    online: boolean;
-    forceRename: boolean;
-    lastPlayed: string | null;
-    playtimeSeconds: number;
-    skinCatalog: 'class' | 'mech';
-    mainhandItemId: string | null;
-  }[];
-} {
-  return {
-    realm: REALM,
-    characters: chars.map((c) => ({
-      id: c.id,
-      name: c.name,
-      class: c.class,
-      level: c.level,
-      skin: c.state?.skin ?? 0,
-      online: [...liveGame().clients.values()].some((s) => s.characterId === c.id),
-      forceRename: c.force_rename,
-      lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
-      playtimeSeconds: Number(c.playtime_seconds ?? 0),
-      // Real appearance for the char-select 3D preview (the client renders the
-      // Combat Mech cosmetic body and the equipped mainhand, matching the world).
-      skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
-      mainhandItemId: c.state?.equipment?.mainhand ?? null,
-    })),
-  };
+function characterListPayload(
+  chars: CharacterRow[],
+  weaponSkinLoadout: Record<string, string>,
+): unknown {
+  // Delegates to the RouteDef arm's shared builder (review follow-up on the
+  // weaponSkinId addition): one implementation means the retained legacy arm
+  // and the new pipeline CANNOT diverge in payload shape, and the behavioral
+  // route tests in tests/server/characters.test.ts cover both by construction.
+  // Only the online scan stays legacy-owned (the same live-session scan main
+  // injects into the RouteDef runtime as isCharacterOnline).
+  return buildCharacterList(
+    chars,
+    (characterId) => [...liveGame().clients.values()].some((s) => s.characterId === characterId),
+    weaponSkinLoadout,
+  );
 }
 
 async function bearerAccount(req: http.IncomingMessage): Promise<number | null> {
   const auth = req.headers.authorization ?? '';
   const m = /^Bearer ([a-f0-9]{64})$/.exec(auth);
   if (!m) return null;
-  return accountForToken(m[1]);
+  const info = await accountAndScopeForToken(m[1]);
+  return info?.accountId ?? null;
 }
 
 // Account + token scope for the bearer (or null when unauthenticated). The scope
@@ -643,8 +1074,8 @@ const MIME: Record<string, string> = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
+  '.mp3': 'audio/mpeg',
 };
-
 // The admin dashboard is reached via the admin.* subdomain (Caddy proxies it
 // to this same port) or /admin for local dev. The hostname only picks which
 // HTML shell is served, the admin API itself is gated by admin tokens.
@@ -655,7 +1086,15 @@ function isAdminRequest(req: http.IncomingMessage): boolean {
 }
 
 function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void {
-  let urlPath = (req.url ?? '/').split('?')[0];
+  let requestUrl: URL;
+  try {
+    requestUrl = new URL(req.url ?? '/', 'http://static.local');
+  } catch {
+    res.writeHead(400, { 'Content-Type': 'text/plain' });
+    res.end('invalid request target');
+    return;
+  }
+  let urlPath = requestUrl.pathname;
   // The curated Guide is the site wiki: a client-routed SPA served at /wiki with its
   // own shell, so deep paths (/wiki/classes/...) fall back to guide.html rather than the
   // game's index.html. (It previously 302'd to a standalone MediaWiki; that is retired.)
@@ -667,8 +1106,33 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
   // normalize once and reuse for BOTH file resolution and cache policy,
   // otherwise /assets/../x would serve a mutable file with immutable caching
   urlPath = path.posix.normalize(urlPath).replace(/^([.][.][/\\])+/, '');
-  const file = path.join(STATIC_DIR, urlPath);
-  const stats = file.startsWith(STATIC_DIR) && fs.existsSync(file) ? fs.statSync(file) : null;
+  const overlayFile = resolveSfxOverlayFile(SFX_PACK_DIR, urlPath);
+  const file = overlayFile ?? path.join(STATIC_DIR, urlPath);
+  const cachePath = `${urlPath}${requestUrl.search}`;
+  const requestedVersion = requestedSfxVersion(cachePath);
+  const requestedBlobHash = requestedSfxBlobHash(cachePath);
+  const needsVerifiedSfx = requestedVersion !== null || requestedBlobHash !== null;
+  let verifiedSfx: StaticSfxSnapshot | null = null;
+  let stats: fs.Stats | null = null;
+  if (overlayFile !== null || file.startsWith(STATIC_DIR)) {
+    try {
+      if (needsVerifiedSfx) {
+        verifiedSfx = readStaticSfxSnapshot(file);
+        stats = verifiedSfx.stats;
+      } else {
+        // statSync is already the existence check. Keeping it inside this catch
+        // closes the former existsSync-to-statSync disappearance race.
+        stats = fs.statSync(file);
+      }
+    } catch {
+      if (needsVerifiedSfx) {
+        res.writeHead(404, { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' });
+        res.end('SFX asset changed during integrity verification');
+        return;
+      }
+      stats = null;
+    }
+  }
   if (!stats?.isFile()) {
     // Asset paths must 404, not SPA-fall-back: a missing .glb served as index.html
     // surfaces as a cryptic GLTFLoader parse error instead of a clear 404.
@@ -690,8 +1154,14 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
   }
   const isReadMethod = req.method === 'GET' || req.method === 'HEAD';
   const etag = etagFor(stats);
+  const actualSfxHash = verifiedSfx?.hash;
+  if (!sfxBlobIntegrityMatches(cachePath, actualSfxHash)) {
+    res.writeHead(404, { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' });
+    res.end('content-addressed SFX blob failed integrity verification');
+    return;
+  }
   const validators = {
-    'Cache-Control': cacheControlFor(urlPath),
+    'Cache-Control': cacheControlFor(cachePath, actualSfxHash),
     ETag: etag,
     'Last-Modified': stats.mtime.toUTCString(),
   };
@@ -703,11 +1173,15 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
   res.writeHead(200, {
     ...validators,
     'Content-Type': MIME[path.extname(file)] ?? 'application/octet-stream',
-    'Content-Length': stats.size,
+    'Content-Length': verifiedSfx?.bytes.length ?? stats.size,
   });
   if (req.method === 'HEAD') {
-    // don't read a multi-MB asset from disk just to discard the bytes
+    // Versioned SFX was already snapshotted for integrity, but HEAD sends no body.
     res.end();
+    return;
+  }
+  if (verifiedSfx !== null) {
+    res.end(verifiedSfx.bytes);
     return;
   }
   fs.createReadStream(file).pipe(res);
@@ -769,7 +1243,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (
       activeConfig().requireWebLogin &&
       req.method === 'POST' &&
-      (url === '/api/register' || url === '/api/login') &&
+      (url === '/api/register' ||
+        url === '/api/login' ||
+        url === '/api/account/password/forgot' ||
+        url === '/api/account/password/reset') &&
       !isWebClientRequest(req)
     ) {
       return json(res, 403, {
@@ -961,7 +1438,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // via exchange, so create requires a full active session too
       // (bearerActiveAccount: read and companion tokens answer 403 'this token
       // is read-only'), where the pre-fix handler resolved the scope-blind
-      // accountForToken. Mirrored on
+      // identity-only token resolver. Mirrored on
       // the RouteDef twin (server/desktop_login_routes.ts); the
       // desktopLoginCreateFullScope known deviation records the change.
       const accountId = await bearerActiveAccount(req, res);
@@ -980,13 +1457,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'GET' && url === '/api/me/characters') {
       const accountId = await bearerReadAccount(req, res);
       if (accountId === null) return;
-      return json(res, 200, characterListPayload(await listCharacters(accountId)));
+      return json(
+        res,
+        200,
+        characterListPayload(
+          await listCharacters(accountId),
+          (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+        ),
+      );
     }
     if (url === '/api/characters') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       if (req.method === 'GET') {
-        return json(res, 200, characterListPayload(await listCharacters(accountId)));
+        return json(
+          res,
+          200,
+          characterListPayload(
+            await listCharacters(accountId),
+            (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+          ),
+        );
       }
       if (req.method === 'POST') {
         const body = await readBody(req);
@@ -1080,9 +1571,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const row = await getCharacterById(target.characterId);
       if (!row)
         return json(res, 404, { error: 'character not found', code: 'character.not_found' });
-      const [guild, rank] = await Promise.all([
+      const [guild, rank, deedsRecent] = await Promise.all([
         guildNameForCharacter(row.id),
         lifetimeXpRankForCharacter(row.id),
+        recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
       ]);
       return json(
         res,
@@ -1094,6 +1586,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           origin: publicOrigin(req),
           guild,
           rank: toSheetRank(rank),
+          deedsRecent,
         }),
       );
     }
@@ -1104,9 +1597,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const row = await getCharacter(accountId, Number(ownerSheetMatch[1]));
       if (!row)
         return json(res, 404, { error: 'character not found', code: 'character.not_found' });
-      const [guild, rank] = await Promise.all([
+      const [guild, rank, deedsRecent] = await Promise.all([
         guildNameForCharacter(row.id),
         lifetimeXpRankForCharacter(row.id),
+        recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
       ]);
       return json(
         res,
@@ -1118,6 +1612,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           origin: publicOrigin(req),
           guild,
           rank: toSheetRank(rank),
+          deedsRecent,
         }),
       );
     }
@@ -1349,19 +1844,49 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return await handlePerfReport(req, res);
     }
     if (req.method === 'GET' && url === '/api/project-stats') {
-      const accountsCount = await getAccountsCount();
+      // Accounts-created COUNT served from the shared cache getter (the same 60s
+      // cache the migrated projectStatsHandler reads); players_online stays a live
+      // per-request read, so it is re-attached here rather than cached. Rate-limited
+      // per IP like its migrated twin (same public-read budget, same 429 body).
+      if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate limited' });
+      const [accountsCreated, charactersCreated] = await Promise.all([
+        getAccountsCreatedCount(),
+        getCharactersCreatedCount(),
+      ]);
       return json(res, 200, {
-        accounts_created: accountsCount,
+        accounts_created: accountsCreated,
+        characters_created: charactersCreated,
         players_online: liveGame().clients.size,
         realm: REALM,
       });
     }
     if (req.method === 'GET' && url === '/api/status') {
+      // steam.enabled is the capability advert clients read before rendering any
+      // Steam link UI. HARDCODED false on the legacy ladder: the Steam surface
+      // exists only as RouteDefs (server/steam/routes.ts), which the legacy arm
+      // never serves, so every /api/steam/* 404s here. Advertising the capability
+      // on an arm that then 404s it would strand a client into a dead link flow.
+      // Under the default 'new' dispatch the migrated statusHandler
+      // (server/leaderboard.ts) reads the real steamEnabled(), where the routes
+      // are live. This is a deliberate divergence from the new arm under
+      // STEAM_ENABLED=1 (pinned in tests/server/http/parity.test.ts).
       return json(res, 200, {
         ok: true,
         realm: REALM,
         players_online: liveGame().clients.size,
+        // The configured realm player cap so the client realm list can display
+        // honestly; 0 means the cap is disabled. Dual-arm edit: the migrated
+        // statusHandler (server/leaderboard.ts) carries the same players_cap field.
+        players_cap: canonicalPlayersCap(),
         names: [...liveGame().clients.values()].map((s) => s.name),
+        steam: { enabled: false },
+        // The /dev GUI capability advert. NOT hardcoded like steam.enabled above:
+        // the dev_* cheats ride the websocket dispatcher, which this arm serves
+        // exactly as the migrated one does, so advertising the real env here
+        // strands nobody. Dual-arm edit: the migrated statusHandler
+        // (server/leaderboard.ts) carries the same dev_commands field. Read live
+        // per request, mirroring the /api/perf gate just below.
+        dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
       });
     }
     // Dev-only world-loop perf profile (per-phase tick p95/max), for the load
@@ -1370,10 +1895,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return json(res, 200, liveGame().perfProfile());
     }
     if (req.method === 'GET' && url === '/api/arena/leaderboard') {
-      // public all-time Ashen Coliseum ladder (top rated characters)
+      // public all-time Ashen Coliseum ladder (top rated characters), served from
+      // the shared per-format cache getter (the same cache the migrated
+      // arenaLeaderboardHandler reads), so the ladder query runs at most once per
+      // TTL per format instead of once per request. Rate-limited per IP like its
+      // migrated twin (same public-read budget, same 429 body).
+      if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate limited' });
       const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
-      const format = params.get('format') === '2v2' ? '2v2' : '1v1';
-      return json(res, 200, { format, leaders: await topArenaRatings(20, format) });
+      const format: '1v1' | '2v2' = params.get('format') === '2v2' ? '2v2' : '1v1';
+      return json(res, 200, { format, leaders: await getArenaLeaderboard(format) });
     }
     if (req.method === 'GET' && url === '/api/leaderboard') {
       // lifetime-XP leaderboard (Max-Level XP Overflow), served from the
@@ -1416,6 +1946,23 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           metric: 'landedCommits',
           ...devSlice,
         });
+      }
+      // ?board=deeds is the Renown board: ACCOUNTS ranked by lifetime deed
+      // Renown, character-faced. GLOBAL-ONLY by design (accounts span realms),
+      // so ?scope is accepted and ignored and the body always carries scope
+      // 'global' (buildDeedsBoard fixes it). The bearer is resolved LENIENTLY
+      // here, the legacy arms' shape (cf. the realms arm): a missing, invalid,
+      // or locked token serves the board anonymously with no self row, while
+      // the router-owned arm validates a present token (the labeled
+      // authz-gap-close divergence class); anonymous and valid-token responses
+      // are byte-identical on both dispatch paths via the shared builder.
+      if (params.get('board') === 'deeds') {
+        const deedsEntries = await getDeedsLeaderboard();
+        const deedsPageSize = Number(params.get('pageSize')) || LEADERBOARD_PAGE_SIZE;
+        const deedsPage = Number(params.get('page')) || 0;
+        const bearer = await bearerScopeAccount(req).catch(() => null);
+        const self = bearer ? await deedsSelfRank(bearer.accountId) : null;
+        return json(res, 200, buildDeedsBoard(REALM, deedsEntries, deedsPage, deedsPageSize, self));
       }
       const entries = await getLeaderboard(scope);
       // Legacy ?limit=N (home-page board): top N as a single page, no paging UI.
@@ -1474,9 +2021,18 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
       return handleAccountChangePassword(req, res, accountId, callerToken);
     }
+    // Password reset is for users who are locked out, so both routes are
+    // unauthenticated (rate-limited + web-login guarded above, and each handler is
+    // written to never reveal whether an account exists).
+    if (req.method === 'POST' && url === '/api/account/password/forgot') {
+      return handleAccountPasswordForgot(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/account/password/reset') {
+      return handleAccountPasswordReset(req, res);
+    }
     if (req.method === 'POST' && url === '/api/account/logout') {
       const callerToken = bearerToken(req);
-      if (!callerToken || (await accountForToken(callerToken)) === null)
+      if (!callerToken || (await accountAndScopeForToken(callerToken)) === null)
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
       return handleAccountLogout(res, callerToken);
     }
@@ -1573,6 +2129,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleEmailUnsubscribe(res, token);
     }
     // Non-custodial Solana wallet linking, all account-scoped.
+    if (req.method === 'POST' && url === '/api/desktop-wallet/create') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (!walletLinkRateLimited(req, accountId).allowed) {
+        return json(res, 429, { error: 'rate limited' });
+      }
+      return handleDesktopWalletHandoffCreate(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-wallet/claim') {
+      if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate_limited' });
+      return handleDesktopWalletHandoffClaim(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-wallet/complete') {
+      if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate_limited' });
+      return handleDesktopWalletHandoffComplete(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-wallet/result') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleDesktopWalletHandoffResult(req, res, accountId);
+    }
     if (req.method === 'POST' && url === '/api/wallet/link/challenge') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
@@ -1593,16 +2170,26 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
     }
+    if (req.method === 'POST' && url === '/api/auth/apple') {
+      return handleAppleLogin(req, res, await readBody(req));
+    }
+    if (req.method === 'POST' && url === '/api/auth/apple/login/new') {
+      return handleAppleLoginNew(req, res, await readBody(req), (ip) => liveGame().isIpBlocked(ip));
+    }
+    if (req.method === 'POST' && url === '/api/auth/apple/login/link') {
+      return handleAppleLoginLink(req, res, await readBody(req));
+    }
     // Discord integration: OAuth login/link, link status, unlink. `start` returns
     // the authorize URL (the browser then navigates to Discord); `callback` is the
     // discord.com -> us redirect (no auth/Origin, so it is NOT gated by the
     // web-login guard, which is login/register-only). Mutations go through
     // bearerActiveAccount; the dedicated Discord rate-limit bucket guards them.
     if (req.method === 'POST' && url === '/api/auth/discord/start') {
-      const mode =
-        new URL(req.url ?? '/', 'http://localhost').searchParams.get('mode') === 'link'
-          ? 'link'
-          : 'login';
+      const discordStartUrl = new URL(req.url ?? '/', 'http://localhost');
+      const mode = discordStartUrl.searchParams.get('mode') === 'link' ? 'link' : 'login';
+      const native = discordStartUrl.searchParams.get('native') === '1';
+      const nativeChallenge = discordStartUrl.searchParams.get('challenge') ?? undefined;
+      const desktop = mode === 'login' && discordStartUrl.searchParams.get('desktop') === '1';
       let accountId: number | null = null;
       if (mode === 'link') {
         accountId = await bearerActiveAccount(req, res);
@@ -1610,10 +2197,18 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       }
       if (!discordRateLimited(req, accountId ?? 0).allowed)
         return json(res, 429, { error: 'rate limited' });
-      return handleDiscordStart(req, res, { mode, accountId });
+      const body = native ? await readBody(req) : {};
+      return handleDiscordStart(req, res, {
+        mode,
+        accountId,
+        native,
+        nativeChallenge,
+        nativeAttestation: body.nativeAttestation,
+        desktop,
+      });
     }
     if (req.method === 'GET' && url === '/api/auth/discord/callback') {
-      return handleDiscordCallback(req, res);
+      return handleDiscordCallback(req, res, (ip) => liveGame().isIpBlocked(ip));
     }
     // First-time-login chooser endpoints. Unauthenticated like /callback: the
     // authorization is the single-use pending-login token (minted only after a
@@ -1624,6 +2219,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'POST' && url === '/api/auth/discord/login/link') {
       return handleDiscordLoginLink(req, res, (ip) => liveGame().isIpBlocked(ip));
+    }
+    if (req.method === 'POST' && url === '/api/auth/discord/native/exchange') {
+      return handleNativeDiscordExchange(req, res);
     }
     if (req.method === 'GET' && url === '/api/discord') {
       const accountId = await bearerActiveAccount(req, res);
@@ -1685,6 +2283,18 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleDailyRewardApi(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/claudium/stripe/webhook') {
+      return handleClaudiumStripeWebhook(req, res);
+    }
+    if (url.startsWith('/api/claudium')) {
+      const preAuthLimit = claudiumPreAuthMutationRateLimited(req);
+      if (preAuthLimit && !preAuthLimit.allowed) {
+        return json(res, 429, { error: 'rate_limited' });
+      }
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleClaudiumApi(req, res, accountId);
     }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {
@@ -1840,16 +2450,23 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
 
 // Inject the main.ts runtime the ported public-read handlers (server/leaderboard.ts)
 // need but cannot import without a cycle: the live online count + dev perf profile
-// off the GameServer, the three cache-fronted readers (unchanged: the same TTL
-// caches the legacy arms use), the releases feed's repo + cap, and the two
-// request-shaped helpers. Done at module load, before any request, so the static
-// `routes` array registry.ts already spread in can serve.
+// off the GameServer, the cache-fronted board and stats readers (unchanged: the
+// same TTL caches the legacy arms use, arena and the project-stats count included),
+// the releases feed's repo + cap, and the two request-shaped helpers. Done at module
+// load, before any request, so the static `routes` array registry.ts already spread
+// in can serve.
 configureLeaderboardRuntime({
   playersOnline: () => liveGame().clients.size,
+  playersCap: canonicalPlayersCap,
   perfProfile: () => liveGame().perfProfile(),
   getLeaderboard,
   getGuildLeaderboard,
   getDevLeaderboard: () => topContributors(),
+  getDeedsLeaderboard,
+  deedsSelfRank,
+  getArenaLeaderboard,
+  getAccountsCreatedCount,
+  getCharactersCreatedCount,
   getReleases,
   // A getter, not a value: configureLeaderboardRuntime runs at module load (before
   // startServer primes the config), but leaderboard.ts reads rt.githubRepo only at
@@ -1863,6 +2480,13 @@ configureLeaderboardRuntime({
   toSheetRank,
 });
 
+// Inject the main.ts runtime the deeds handlers (server/deeds.ts) need but
+// cannot import without a cycle: the cache-fronted global rarity read. Done at
+// module load, before any request, mirroring configureLeaderboardRuntime above.
+configureDeedsRuntime({
+  deedsRarity: getDeedsRarity,
+});
+
 // Inject the main.ts runtime the ported auth handlers (server/auth_routes.ts) need
 // but cannot import without a cycle: the live IP-block gate off the GameServer, the
 // one Turnstile / native-attestation decision, and the request-metadata stamp. Done
@@ -1874,6 +2498,9 @@ configureAuthRuntime({
   // legacy handleApi arm above.
   passesTurnstile: (req, body) => passesTurnstile(req, body, activeConfig().turnstileSecret),
   requestMetadata,
+});
+configureAppleAuthRuntime({
+  isIpBlocked: (ip) => liveGame().isIpBlocked(ip),
 });
 
 // Inject the main.ts runtime the ported character handlers (server/characters.ts) need
@@ -1937,6 +2564,13 @@ configureReportsRuntime({
 configureDiscordRuntime({
   isIpBlocked: (ip) => liveGame().isIpBlocked(ip),
   grantCosmetic: (accountId, chromaId) => liveGame().grantMechChromaToAccount(accountId, chromaId),
+});
+
+// Claudium routes mirror weapon-skin purchases into account cosmetics live (the
+// same deferred liveGame() closure pattern as the Discord hooks above).
+configureClaudiumRuntime({
+  grantWeaponSkins: (accountId, skinIds) =>
+    liveGame().grantWeaponSkinsToAccount(accountId, skinIds),
 });
 
 // configureAdminRuntime(game) and configureInternalRuntime(game) pass the live
@@ -2113,10 +2747,11 @@ function applyCorsAndPreflight(
   res: http.ServerResponse,
   isApi: boolean,
   publicCorsPath: boolean,
+  publicSfxPath: boolean,
 ): boolean {
-  if (publicCorsPath) publicCors(res);
+  if (publicCorsPath || publicSfxPath) publicCors(res);
   else if (isApi) maybeCors(req, res);
-  if (req.method === 'OPTIONS' && (isApi || publicCorsPath)) {
+  if (req.method === 'OPTIONS' && (isApi || publicCorsPath || publicSfxPath)) {
     res.writeHead(204);
     res.end();
     return true;
@@ -2147,7 +2782,8 @@ export function routeHttpRequest(req: http.IncomingMessage, res: http.ServerResp
   // origin so browser-origin companion apps can call them client-side; every
   // other /api route keeps the narrow realm/native allowlist.
   const publicCorsPath = isPublicCorsPath(path);
-  if (applyCorsAndPreflight(req, res, isApi, publicCorsPath)) return;
+  const publicSfxPath = isPublicSfxPath(url);
+  if (applyCorsAndPreflight(req, res, isApi, publicCorsPath, publicSfxPath)) return;
   // Operational health + metrics endpoints, ahead of the /internal/ arm so they
   // answer even while the rest of the surface drains. GET-only exact matches on
   // the query-stripped path (mirroring the /sitemap-characters.xml arm below);
@@ -2187,6 +2823,7 @@ export async function startServer(): Promise<http.Server> {
   // primes activeConfig() for the request path (a request-time read returns this
   // same memoized Config).
   const config = activeConfig();
+  configureCommunityTestAccounts(config.provisionTestAccounts);
   // Point the contributor-stats reader at the one boot Config, replacing its former
   // duplicate GITHUB_REPO/GITHUB_TOKEN module reads (configure<Domain>Runtime).
   configureGithubContributorsRuntime({
@@ -2217,6 +2854,10 @@ export async function startServer(): Promise<http.Server> {
   // handleAdminApi / handleInternalApi ladders stay intact as the flag-off rollback
   // paths (and are the corresponding dispatchers' delegates).
   configureAdminRuntime(game);
+  // The admin overview's realm player cap: canonicalPlayersCap needs no game instance
+  // (unlike AdminRuntime), so it rides its own seam, fed the SAME canonical source
+  // /api/status uses, keeping the cap byte-identical across the status and overview reads.
+  configureAdminPlayersCap(canonicalPlayersCap);
   configureInternalRuntime(game);
   // Bot detector: replay this realm's saved config overrides onto the fresh
   // detector. Boot applies what it can; a stale entry (schema drift after a
@@ -2231,16 +2872,15 @@ export async function startServer(): Promise<http.Server> {
   }
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
-  const pruned = await pruneChatLogs(config.chatLogRetentionDays);
-  if (pruned > 0)
-    console.log(`pruned ${pruned} chat log row(s) older than ${config.chatLogRetentionDays} days`);
-  const prunedPerfReports = await pruneClientPerfReports(config.perfReportRetentionDays);
-  if (prunedPerfReports > 0)
+  const prunedUnstuckReports = await pruneUnstuckReports(pool);
+  if (prunedUnstuckReports > 0)
     console.log(
-      `pruned ${prunedPerfReports} client perf report row(s) older than ${config.perfReportRetentionDays} days`,
+      `pruned ${prunedUnstuckReports} unstuck report row(s) older than ${UNSTUCK_REPORT_RETENTION_DAYS} days`,
     );
+  await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
+  await game.loadRifts();
   await game.loadChatFilter();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();
@@ -2248,11 +2888,8 @@ export async function startServer(): Promise<http.Server> {
     .then((count) => recordSitePresenceSample(count))
     .catch((err) => console.error('site presence sample failed:', err));
   setInterval(() => {
-    void pruneChatLogs(config.chatLogRetentionDays).catch((err) =>
-      console.error('chat log prune failed:', err),
-    );
-    void pruneClientPerfReports(config.perfReportRetentionDays).catch((err) =>
-      console.error('perf report prune failed:', err),
+    void pruneUnstuckReports(pool).catch((err) =>
+      console.error('unstuck report prune failed:', err),
     );
     void pruneExpiredOAuthGrants(pool).catch((err) =>
       console.error('oauth grant prune failed:', err),
@@ -2262,6 +2899,9 @@ export async function startServer(): Promise<http.Server> {
     );
     void pruneDiscordPendingLogins(pool).catch((err) =>
       console.error('discord pending login prune failed:', err),
+    );
+    void pruneApplePendingLogins(pool).catch((err) =>
+      console.error('apple pending login prune failed:', err),
     );
     void pruneGitHubOAuthStates(pool).catch((err) =>
       console.error('github oauth state prune failed:', err),
@@ -2283,17 +2923,32 @@ export async function startServer(): Promise<http.Server> {
   // keep both leaderboard caches warm so the first viewer never waits on the
   // query and it never recomputes per request (PR-3)
   const warmLeaderboards = () => {
-    void refreshLeaderboard('realm').catch((err) =>
-      console.error('leaderboard refresh failed (realm):', err),
-    );
-    void refreshLeaderboard('global').catch((err) =>
-      console.error('leaderboard refresh failed (global):', err),
-    );
-    void refreshGuildLeaderboard('realm').catch((err) =>
-      console.error('guild leaderboard refresh failed (realm):', err),
-    );
-    void refreshGuildLeaderboard('global').catch((err) =>
-      console.error('guild leaderboard refresh failed (global):', err),
+    void refreshLeaderboardShared
+      .realm()
+      .catch((err) => console.error('leaderboard refresh failed (realm):', err));
+    void refreshLeaderboardShared
+      .global()
+      .catch((err) => console.error('leaderboard refresh failed (global):', err));
+    void refreshGuildLeaderboardShared
+      .realm()
+      .catch((err) => console.error('guild leaderboard refresh failed (realm):', err));
+    void refreshGuildLeaderboardShared
+      .global()
+      .catch((err) => console.error('guild leaderboard refresh failed (global):', err));
+    // Demand-gated: the Renown board is a full-table roll-up, so keep it warm
+    // only while it is actually being viewed (a request within
+    // DEEDS_BOARD_DEMAND_TTL_MS). An idle board pays nothing here; a cold or stale
+    // request still refreshes inline on its own read path (ensureDeedsBoard), then
+    // this loop keeps it fresh until demand lapses again.
+    warmDeedsBoardIfDemanded(
+      () => {
+        void refreshDeedsBoardShared().catch((err) =>
+          console.error('deeds board refresh failed:', err),
+        );
+      },
+      deedsBoardLastRequestAt,
+      Date.now(),
+      DEEDS_BOARD_DEMAND_TTL_MS,
     );
   };
   warmLeaderboards();
@@ -2321,7 +2976,7 @@ export async function startServer(): Promise<http.Server> {
   const wss = new WebSocketServer({ noServer: true, maxPayload: WS_MAX_PAYLOAD_BYTES });
   const wsAuth = createWsAuth({
     game,
-    accountForToken,
+    accountAndScopeForToken,
     moderationStatusForAccount,
     getCharacter,
     chatMuteStatusForAccount,
@@ -2334,6 +2989,7 @@ export async function startServer(): Promise<http.Server> {
     bufferHandshakeMessages,
     requestMetadata,
     maxWsPerIpHard: config.maxWsPerIpHard,
+    maxPlayersPerRealm: config.maxPlayersPerRealm,
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
@@ -2352,25 +3008,104 @@ export async function startServer(): Promise<http.Server> {
     simEntities: () => game.sim.entities.size,
     simTickHz: () => game.simTickHz(),
     tickPhaseMillis: () => game.tickPhaseMillis(),
+    lastTickAt: () => game.lastTickAt(),
+    loopStartedAt: () => game.loopStartedAt(),
   };
   setGameMetricsCounters(registerGameStateMetrics(httpMetrics.registry, gameStateSource));
+  // Hand the same live source to /livez, so a wedged loop answers 503 from outside
+  // the process. Registered HERE rather than read from the route arm: the /livez arm
+  // must never touch liveGame() (a health probe constructing a GameServer is the bug
+  // tests/server/game_boot_order.test.ts pins against).
+  registerLivenessSource(gameStateSource);
 
-  // The app-aggregate /metrics collectors (Phase 3 business, Phase 4 client-perf):
-  // each registers bounded gauges on the SAME exporter registry and runs ONE cached
-  // Postgres aggregate on a fixed interval, so a scrape publishes the cached snapshot
-  // and never queries the DB. start() kicks off an immediate refresh plus the
-  // interval (both unref()'d); shutdown stops them below.
+  // Business gauges use isolated, staggered, timeout-protected engagement and
+  // funnel snapshots every 15 minutes. Scrapes publish only cached data and never
+  // query Postgres. Client FPS stays available in the admin tooling but is
+  // intentionally not polled for the business dashboard.
   const businessMetrics = registerBusinessMetrics(httpMetrics.registry);
-  const clientPerfMetrics = registerClientPerfMetrics(httpMetrics.registry);
   businessMetrics.start();
-  clientPerfMetrics.start();
 
   game.start();
   server.listen(config.port, () => {
     console.log(`World of ClaudeCraft server listening on http://localhost:${config.port}`);
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);
-    console.log(`  WS:   /ws, then first message {t:"auth",token,character}`);
+    console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
   });
+
+  // Off-peak batched retention. The sweep self-clocks once per UTC day behind a
+  // database advisory lock, so with several processes exactly one sweeps; each
+  // primitive below is one bounded DELETE batch and the sweep drives iteration.
+  const retentionSweep = createRetentionSweep({
+    connect: () => pool.connect(),
+    utcHour: config.retentionSweepUtcHour,
+    maxRowsPerRun: config.retentionSweepMaxRowsPerRun,
+    batchSize: RETENTION_SWEEP_BATCH_SIZE,
+    // The persisted marker keeps a mid-day deploy or restart from re-running the
+    // sweep at peak: it is consulted under the advisory lock and written only
+    // after a completed sweep.
+    loadLastSweepDay: async () => {
+      const stored = await loadWorldState<{ day?: unknown }>('retention_sweep:last_run');
+      return typeof stored?.day === 'string' ? stored.day : null;
+    },
+    saveLastSweepDay: async (day) => {
+      await saveWorldState('retention_sweep:last_run', { day });
+    },
+    tables: [
+      { name: 'chat_logs', pruneBatch: (n) => pruneChatLogsBatch(config.chatLogRetentionDays, n) },
+      {
+        name: 'client_perf_reports',
+        pruneBatch: (n) => pruneClientPerfReportsBatch(config.perfReportRetentionDays, n),
+      },
+      {
+        name: 'daily_reward_events',
+        pruneBatch: async (n) => {
+          // The reward day rolls at a configured UTC offset, not midnight, so the
+          // cutoff comes from the reward clock (null means retention is off).
+          const cutoff = await dailyRewardEventsCutoffDay(config.dailyRewardEventsRetentionDays);
+          if (cutoff === null) return 0;
+          return pruneDailyRewardEventsBatch(cutoff, n);
+        },
+      },
+      {
+        // The activity day is the UTC calendar day the metrics writers stamp,
+        // so the primitive derives its own UTC cutoff (no reward-clock helper).
+        name: 'player_activity_daily',
+        pruneBatch: (n) =>
+          prunePlayerActivityDailyBatch(pool, config.playerActivityRetentionDays, n),
+      },
+      {
+        name: 'admin_site_presence_samples',
+        pruneBatch: (n) => pruneSitePresenceSamplesBatch(config.sitePresenceRetentionDays, n),
+      },
+      {
+        name: 'site_presence_sessions',
+        pruneBatch: (n) => pruneSitePresenceSessionsBatch(config.sitePresenceRetentionDays, n),
+      },
+      // The play-session fold feeds account_ip_associations, so the feeder table
+      // is swept before the ager in the same run.
+      {
+        name: 'play_sessions',
+        pruneBatch: (n) => prunePlaySessionsBatch(pool, config.playSessionRetentionDays, n),
+      },
+      {
+        name: 'account_ip_associations',
+        pruneBatch: (n) =>
+          pruneAccountIpAssociationsBatch(pool, config.accountIpAssociationRetentionDays, n),
+      },
+    ],
+    // The fold precondition makes sample pruning lossless; skip the whole group
+    // when retention is off so quiet configs write nothing to world_state.
+    onlineSamples:
+      config.onlineSamplesRetentionDays > 0
+        ? {
+            listRealms: () => distinctOnlineSampleRealms(),
+            foldPeak: (realm) => foldOnlinePeak(realm),
+            pruneBatch: (realm, n) =>
+              pruneOnlineSamplesBatch(realm, config.onlineSamplesRetentionDays, n),
+          }
+        : undefined,
+  });
+  retentionSweep.start();
 
   const shutdown = async () => {
     // Flip readiness to draining FIRST so /readyz answers 503 and a load balancer
@@ -2381,12 +3116,16 @@ export async function startServer(): Promise<http.Server> {
     // Stop the app-aggregate metric collectors so no refresh query races the pool
     // close below (their intervals are unref()'d, but an in-flight tick could still
     // fire before pool.end()).
-    businessMetrics.stop();
-    clientPerfMetrics.stop();
+    await businessMetrics.stop();
+    game.beginShutdown();
+    // Same rationale for the retention sweep: an in-flight prune batch must not
+    // race the pool close below.
+    await retentionSweep.stop();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();
     await game.saveMail();
+    await game.saveRifts();
     await game.endAllPlaySessions();
     // Drain any bank_ledger writes still queued on the FIFO tail BEFORE the lease
     // sweep: once the leases drop, a replacement process can load the same character
@@ -2397,6 +3136,24 @@ export async function startServer(): Promise<http.Server> {
     // transient mismatch). Rejections log inside the writer, so the drain never
     // throws.
     await bankLedgerIdle();
+    // Drain the character_deeds FIFO too: saveAll above already persisted every
+    // blob, and an insert still queued here would be rejected by pool.end() and
+    // go missing until that character's next login (the join reconcile is the
+    // only heal). Rejections log inside the writer, so the drain never throws.
+    await deedRecordsIdle();
+    // Stop accepted /unstuck report intake and drain only to a finite deadline.
+    // Per-query timeouts bound an active write; deadline expiry aborts retry
+    // delays and drops queued telemetry before the shared pool closes.
+    const unstuckReportsDrained = await stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS);
+    if (!unstuckReportsDrained) console.warn('unstuck report drain deadline reached');
+    // Stop and drain the Steam mirror's in-memory push FIFO too (right after the
+    // deeds records it observes): an unlock still queued here would be lost on
+    // pool.end(), and the next reconcile (on link or on login) is its only
+    // replay. stopSteamMirror flips the shutdown flag and races the drain tail
+    // against a 5s deadline, so a stuck upstream cannot hang the shutdown;
+    // failures are swallowed inside the worker, so this never throws. A no-op
+    // when the mirror is dark.
+    await stopSteamMirror(5000);
     // Drop every character load lease this process holds so a clean restart can
     // reload its characters immediately instead of waiting out the lease TTL.
     // Runs before pool.end(); a failure here must not abort the shutdown, so log

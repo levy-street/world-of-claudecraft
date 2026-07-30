@@ -24,11 +24,16 @@ export interface ModerationHost<TSession extends ModerationSession> {
   killEntity(entityId: number): void;
   enterSpectate(moderator: TSession, target: TSession): void;
   exitSpectate(moderator: TSession): void;
+  enterJailVisit(moderator: TSession): void;
+  exitJailVisit(moderator: TSession): void;
+  isJailed(session: TSession): boolean;
+  jail(moderator: TSession, target: TSession, minutes: number): void;
+  unjail(moderator: TSession, target: TSession): void;
 }
 
 export interface ModerationAudit {
   recordAction(input: {
-    action: 'kick' | 'kill';
+    action: 'kick' | 'kill' | 'jail' | 'unjail';
     accountId: number;
     adminAccountId: number;
     reason: string;
@@ -57,6 +62,8 @@ const BAN_MESSAGE = 'This account has been banned.';
 const SUSPEND_MESSAGE = 'This account is suspended.';
 const RENAME_MESSAGE = 'A moderator requires one of your characters to be renamed.';
 const NO_PERMISSION_MESSAGE = "You don't have permission to do that.";
+const JAIL_REASON = 'Jailed by in-game moderator command';
+const UNJAIL_REASON = 'Released by in-game moderator command';
 
 type ModerationCommandKind = NonNullable<ReturnType<typeof parseModerationChatCommand>>['kind'];
 
@@ -120,6 +127,12 @@ export class ModerationService<TSession extends ModerationSession> {
         break;
       case 'unspectate':
         this.host.exitSpectate(actor);
+        break;
+      case 'jail':
+        this.jail(actor, command.name, command.minutes, command.reason, command.malformed);
+        break;
+      case 'unjail':
+        this.unjail(actor, command.name, command.malformed);
         break;
     }
     return true;
@@ -244,6 +257,74 @@ export class ModerationService<TSession extends ModerationSession> {
       return;
     }
     this.host.enterSpectate(actor, target);
+  }
+
+  // Jailing always carries an explicit sentence: /jail "<name>" <minutes>
+  // [reason]. The bare /jail is the moderator's own visit; there is no
+  // indefinite form (early release is /unjail).
+  private jail(
+    actor: TSession,
+    name: string | null,
+    minutes: number | null,
+    reason: string | null,
+    malformed: boolean,
+  ): void {
+    if (malformed) {
+      this.host.notice(actor, 'Usage: /jail ["<name>" <minutes> [reason]]');
+      return;
+    }
+    if (!name) {
+      this.host.enterJailVisit(actor);
+      return;
+    }
+    if (minutes === null) return; // unreachable: the parser rejects a name without minutes
+    const target = this.resolveNamedTarget(actor, name);
+    if (!target) return;
+    if (this.host.isJailed(target)) {
+      this.host.notice(actor, `${target.name} is already jailed.`);
+      return;
+    }
+    void this.audit
+      .recordAction({
+        action: 'jail',
+        accountId: target.accountId,
+        adminAccountId: actor.accountId,
+        reason: `${reason ?? JAIL_REASON} (${formatDuration(minutes * 60)})`,
+      })
+      .then(() => {
+        this.host.jail(actor, target, minutes);
+        this.host.systemNotice(actor, `Jailed ${target.name} for ${formatDuration(minutes * 60)}.`);
+      })
+      .catch((err) => logger.error({ err }, 'failed to audit in-game jail'));
+  }
+
+  private unjail(actor: TSession, name: string | null, malformed: boolean): void {
+    if (malformed) {
+      this.host.notice(actor, 'Usage: /unjail ["<name>"]');
+      return;
+    }
+    if (!name) {
+      this.host.exitJailVisit(actor);
+      return;
+    }
+    const target = this.resolveNamedTarget(actor, name);
+    if (!target) return;
+    if (!this.host.isJailed(target)) {
+      this.host.notice(actor, `${target.name} is not jailed.`);
+      return;
+    }
+    void this.audit
+      .recordAction({
+        action: 'unjail',
+        accountId: target.accountId,
+        adminAccountId: actor.accountId,
+        reason: UNJAIL_REASON,
+      })
+      .then(() => {
+        this.host.unjail(actor, target);
+        this.host.systemNotice(actor, `Released ${target.name} from jail.`);
+      })
+      .catch((err) => logger.error({ err }, 'failed to audit in-game unjail'));
   }
 
   private resolveNamedTarget(actor: TSession, name: string | null): TSession | null {

@@ -55,7 +55,7 @@ function equipSet(sim: Sim, equipment: Record<string, string>): AnyEntity {
   if (!meta) throw new Error('missing player meta');
   p.level = 20;
   Object.assign(meta.equipment, equipment);
-  recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
+  recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
   return p;
 }
 
@@ -198,7 +198,7 @@ describe('spellCast set procs (Soulblaze, tier-2 casters)', () => {
     const p = sim.player as AnyEntity;
     const meta = internals.players.get(p.id)!;
     p.level = 20;
-    recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
+    recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
     // Wire the resolved 4-piece proc directly (soulflame pieces mirror the
     // necromancers slot layout; the resolver mapping is pinned above).
     p.setProcs = aggregateSetBonuses(new Map([[SET_SOULFLAME, 4]])).procs;

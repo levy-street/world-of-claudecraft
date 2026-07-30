@@ -1,5 +1,5 @@
 // Pure discrimination for floating-combat-text spawns: the SimEvent -> FctEvent SHAPING
-// half of the FCT split. The 8 hud.ts spawn sites assembled the { kind, isSelf, crit }
+// half of the FCT split. The hud.ts spawn sites assemble the { kind, isSelf, crit }
 // triple inline; this lifts that decision (which is the only non-trivial part: the damage
 // source/target priority, the ability vs auto split, the miss/dodge self-vs-other colour
 // flag) into one deterministic, testable function. Host-agnostic and DOM/clock/i18n-free
@@ -18,17 +18,19 @@ import type { FctKind } from './fct_core';
 export type FctSpawnSource =
   | {
       readonly type: 'damage';
-      /** The damage event's kind: an avoidance word (miss/dodge/resist) or a landed hit. */
-      readonly damageKind: 'miss' | 'dodge' | 'resist' | 'hit';
+      /** The damage event's kind: an avoidance word (miss/dodge/parry/resist) or a landed hit. */
+      readonly damageKind: 'miss' | 'dodge' | 'parry' | 'resist' | 'hit';
       /** Whether an ability fired (a landed hit splits damage-done into -ability vs -auto). */
       readonly ability: boolean;
       readonly crit: boolean;
       readonly isPlayerSource: boolean;
       readonly isPlayerTarget: boolean;
     }
+  | { readonly type: 'absorb' }
   | { readonly type: 'heal'; readonly crit: boolean; readonly isPlayerTarget: boolean }
   | { readonly type: 'xp' }
   | { readonly type: 'rested-xp' }
+  | { readonly type: 'honor' }
   | { readonly type: 'self-note' };
 
 /** The discriminator the painter spawns with (the text + target are spread on at the call site). */
@@ -49,8 +51,18 @@ export function fctSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
   switch (src.type) {
     case 'damage': {
       // Avoidance words always float; self vs other only flips the colour token.
-      if (src.damageKind === 'miss' || src.damageKind === 'dodge' || src.damageKind === 'resist')
-        return { kind: src.damageKind, isSelf: src.isPlayerTarget, crit: false };
+      // Parry reuses the dodge colour token (its own word is spread on at the call site).
+      if (
+        src.damageKind === 'miss' ||
+        src.damageKind === 'dodge' ||
+        src.damageKind === 'parry' ||
+        src.damageKind === 'resist'
+      )
+        return {
+          kind: src.damageKind === 'parry' ? 'dodge' : src.damageKind,
+          isSelf: src.isPlayerTarget,
+          crit: false,
+        };
       // A landed hit: the player dealing it (and not to itself) floats damage-done; the
       // player taking it floats damage-taken; a hit between two non-player entities floats
       // nothing (the live site's `if (isPlayerSource && !isPlayerTarget) ... else if
@@ -64,12 +76,16 @@ export function fctSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
       if (src.isPlayerTarget) return { kind: 'damage-taken', isSelf: true, crit: src.crit };
       return null;
     }
+    case 'absorb':
+      return { kind: 'absorb', isSelf: true, crit: false };
     case 'heal':
       return { kind: 'heal', isSelf: src.isPlayerTarget, crit: src.crit };
     case 'xp':
       return { kind: 'xp', isSelf: true, crit: false };
     case 'rested-xp':
       return { kind: 'rested-xp', isSelf: true, crit: false };
+    case 'honor':
+      return { kind: 'honor', isSelf: true, crit: false };
     case 'self-note':
       return { kind: 'self-note', isSelf: true, crit: false };
   }

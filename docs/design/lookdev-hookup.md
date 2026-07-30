@@ -10,7 +10,8 @@ true per-biome HDRI PMREMs with the small change below.
 `SkyView` (src/render/sky.ts) now exposes:
 
 ```ts
-envTexture(biome: BiomeId): THREE.DataTexture | null; // raw 2k equirect (unclamped), null on low tier
+envTexture(biome: BiomeId): THREE.DataTexture | null; // raw 1k equirect (unclamped PMREM source), null on low tier
+domeTexture(biome: BiomeId): THREE.Texture | null;     // dome-sampled equirect (2k on high/ultra)
 envRotationY(biome: BiomeId): number;                 // aligns the IBL sun with the dome's
 biomeAt(z: number): { from: BiomeId; to: BiomeId; t: number }; // dome cross-fade state
 ```

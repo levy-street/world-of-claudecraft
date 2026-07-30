@@ -1,12 +1,12 @@
 // World / zones: a schematic south-to-north map plus a card per zone, fed from sim zone
 // data (name, level band, hub town, point-of-interest labels) with curated, spoiler-safe
-// blurbs. Resident creature families are derived from the bestiary level bands and link
-// into it. Place and hub names are the English sim source (proper nouns), like creature
-// and class names elsewhere in the guide.
+// blurbs. Resident creature families come from the generated camp geography and link
+// into the bestiary. Place and hub names are the English sim source (proper nouns), like
+// creature and class names elsewhere in the guide.
 
 import { esc } from '../../ui/esc';
 import { formatNumber, type TranslationKey, t } from '../../ui/i18n';
-import { GUIDE_FAMILIES, GUIDE_ZONES, type GuideZoneInfo } from '../content.generated';
+import { GUIDE_ZONES, type GuideZoneInfo } from '../content.generated';
 import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
 import { loreFigure, loreQuote, pageHeader, related } from './ui';
@@ -25,12 +25,11 @@ const familyName = (family: string): string => t(`guide.family.${family}.name` a
 const bandLabel = (z: GuideZoneInfo): string =>
   t('guide.home.world.levels', { min: formatNumber(z.min), max: formatNumber(z.max) });
 
-// Which creature families live in a zone: any family with a creature whose level band
-// overlaps the zone's. Drives the spoiler-safe "who you will meet" cross-links.
+// Which creature families live in a zone: generated from camp geography (a family is a
+// resident only where it has a real camp), so a zone card cannot send a reader hunting
+// a family that does not spawn there. Drives the spoiler-safe "who you will meet" links.
 function residentFamilies(z: GuideZoneInfo): string[] {
-  return GUIDE_FAMILIES.filter((fam) =>
-    fam.creatures.some((c) => c.min <= z.max && c.max >= z.min),
-  ).map((fam) => fam.family);
+  return z.families;
 }
 
 function mapHtml(): string {
@@ -108,6 +107,11 @@ export const world: GuidePage = {
             ${loreFigure('Brother Aldric', 'guide.lore.aldricRole', 'guide.lore.aldricBody')}
             ${loreFigure('Scout Maren', 'guide.lore.marenRole', 'guide.lore.marenBody')}
           </div>
+        </section>
+
+        <section class="guide-block">
+          <h2>${esc(t('guide.worldPage.worldBossTitle'))}</h2>
+          <p>${esc(t('guide.worldPage.worldBossBody'))}</p>
         </section>
 
         <section class="guide-block">

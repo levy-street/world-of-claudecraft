@@ -207,7 +207,7 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     name: 'Deepfen Spearjaw',
     minLevel: 12,
     maxLevel: 13,
-    family: 'beast',
+    family: 'reptile',
     hpBase: 38,
     hpPerLevel: 11,
     dmgBase: 6,

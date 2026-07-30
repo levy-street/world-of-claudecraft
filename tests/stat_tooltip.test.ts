@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { warriorParryChance } from '../src/sim/combat/warrior_hit_table';
 import { CLASSES } from '../src/sim/content/classes';
-import { ITEMS } from '../src/sim/data';
+import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
 import { recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, armorReduction, type PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, armorReduction, type PlayerClass, type WorldContent } from '../src/sim/types';
 import {
   agiMeleeApPerPoint,
   buildStatTooltip,
@@ -19,12 +20,22 @@ import {
   weaponDps,
 } from '../src/ui/stat_tooltip';
 
+// Every assertion reads player-derived stats (stats/equipment/auras), never
+// ambient world content, so strip camps/npcs/ground objects to keep each Sim
+// construction cheap (same subsystem-world pattern as tests/dot_final_tick.test.ts).
+const STAT_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 // A gear-free, buff-free, talent-free player: autoEquip defaults to false, so the
 // derived stats are a clean function of class base + per-level growth. That lets
 // us reconcile the tooltip's per-stat breakdown against the ONE place the sim
 // derives stats (recalcPlayerStats), so the displayed numbers cannot drift.
 function freshPlayer(cls: PlayerClass, level: number) {
-  const sim = new Sim({ seed: 1, playerClass: cls });
+  const sim = new Sim({ seed: 1, playerClass: cls, world: STAT_TEST_WORLD });
   sim.setPlayerLevel(level);
   return sim.player;
 }
@@ -40,6 +51,8 @@ function inputFor(cls: PlayerClass, p: ReturnType<typeof freshPlayer>): StatTool
     dodgeChance: p.dodgeChance,
     critRating: p.critRating,
     hasteRating: p.hasteRating,
+    hitRating: p.hitRating,
+    parryChance: cls === 'warrior' ? warriorParryChance(p.stats.str) : 0,
     dps: 0,
   };
 }
@@ -74,7 +87,7 @@ describe('stat tooltip math reconciles with recalcPlayerStats', () => {
       });
 
       it(`${cls} L${level}: agility armor is the agi*2 portion of total armor`, () => {
-        const sim = new Sim({ seed: 1, playerClass: cls });
+        const sim = new Sim({ seed: 1, playerClass: cls, world: STAT_TEST_WORLD });
         sim.setPlayerLevel(level);
         const p = sim.player;
         const def = CLASSES[cls];
@@ -302,6 +315,8 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
       dodgeChance: p.dodgeChance,
       critRating: p.critRating,
       hasteRating: p.hasteRating,
+      hitRating: p.hitRating,
+      parryChance: cls === 'warrior' ? warriorParryChance(p.stats.str) : 0,
       dps: 0,
       gear,
       buffs,
@@ -324,7 +339,7 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
   for (const cls of ALL_CLASSES) {
     for (const level of [1, 20]) {
       it(`${cls} L${level}: every cell's sources sum to its displayed value`, () => {
-        const sim = new Sim({ seed: 1, playerClass: cls });
+        const sim = new Sim({ seed: 1, playerClass: cls, world: STAT_TEST_WORLD });
         sim.setPlayerLevel(level);
         const input = inputWithGear(sim, cls);
         for (const stat of STATS) {
@@ -340,7 +355,7 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
   }
 
   it('itemizes a flat buff by name and folds talents into the remainder', () => {
-    const sim = new Sim({ seed: 1, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', world: STAT_TEST_WORLD });
     sim.setPlayerLevel(20);
     const p = sim.player;
     // A flat +20 Stamina buff (e.g. Power Word: Fortitude) must appear as its own
@@ -355,7 +370,7 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
       sourceId: p.id,
       school: 'holy',
     });
-    recalcPlayerStats(p, 'warrior', sim.equipment);
+    recalcPlayerStats(p, 'warrior', sim.equipment, undefined, {});
     const input = inputWithGear(sim, 'warrior');
     const sta = buildStatTooltip('sta', input);
     const buffLine = sta.sources.find((s) => s.kind === 'buff');
@@ -366,7 +381,7 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
   });
 
   it('spellPower breaks down into Intellect + flat gear/buff Spell Power', () => {
-    const sim = new Sim({ seed: 1, playerClass: 'mage' });
+    const sim = new Sim({ seed: 1, playerClass: 'mage', world: STAT_TEST_WORLD });
     sim.setPlayerLevel(20);
     const p = sim.player;
     const model = buildStatTooltip('spellPower', inputWithGear(sim, 'mage'));
@@ -376,7 +391,7 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
     const sum = model.sources.reduce((acc, s) => acc + s.value, 0);
     expect(sum).toBe(p.spellPower);
     // non-casters get the minor-benefit note on the spell power cell
-    const warriorSim = new Sim({ seed: 1, playerClass: 'warrior' });
+    const warriorSim = new Sim({ seed: 1, playerClass: 'warrior', world: STAT_TEST_WORLD });
     warriorSim.setPlayerLevel(20);
     expect(buildStatTooltip('spellPower', inputWithGear(warriorSim, 'warrior')).minorForClass).toBe(
       true,
@@ -384,7 +399,7 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
   });
 
   it('cat-form druid attributes armor to the Agility that fed it (before the form bonus)', () => {
-    const sim = new Sim({ seed: 1, playerClass: 'druid' });
+    const sim = new Sim({ seed: 1, playerClass: 'druid', world: STAT_TEST_WORLD });
     sim.setPlayerLevel(20);
     const p = sim.player;
     p.auras.push({
@@ -397,7 +412,7 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
       sourceId: p.id,
       school: 'physical',
     });
-    recalcPlayerStats(p, 'druid', sim.equipment);
+    recalcPlayerStats(p, 'druid', sim.equipment, undefined, {});
     const armor = buildStatTooltip('armor', inputWithGear(sim, 'druid'));
     // recalc adds armor from Agility BEFORE Cat Form raises Agility (max(2, floor(lvl/2))),
     // so the "From Agility" line must exclude that bonus - and the lines still reconcile.
@@ -421,5 +436,25 @@ describe('rating stat cells', () => {
     // rating cells show the value + description, no per-source breakdown line
     expect(crit.sources).toEqual([]);
     expect(haste.sources).toEqual([]);
+  });
+
+  it('summarizes both capped PvP effects in one Warfare stat', () => {
+    const p = freshPlayer('warrior', 20);
+    const input = inputFor('warrior', p);
+    input.stats = {
+      ...input.stats,
+      pvpOffense: 0.2,
+      pvpDefense: 0.137,
+    };
+
+    const warfare = buildStatTooltip('warfare', input);
+    expect(warfare.statValue).toBe(20);
+    expect(warfare.warfareDamageIncrease).toBe(20);
+    expect(warfare.warfareDamageReduction).toBeCloseTo(13.7, 6);
+    expect(warfare.isPrimary).toBe(false);
+    expect(warfare.effects).toEqual([]);
+    // Warfare fractions are already derived from all equipped ratings and capped
+    // by recalcPlayerStats, so inventing a second source breakdown here would lie.
+    expect(warfare.sources).toEqual([]);
   });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { stepCameraOcclusion, type CameraOcclusionState } from '../src/render/camera_collision';
+import { type CameraOcclusionState, stepCameraOcclusion } from '../src/render/camera_collision';
 
 const PULL_IN = 10;
 const PULL_OUT = 6;
@@ -8,8 +8,23 @@ const BASE_FOV = 60;
 const MAX_FOV = 98;
 const DT = 1 / 60;
 
-function step(state: CameraOcclusionState, hard: number, soft: number, dt = DT): CameraOcclusionState {
-  return stepCameraOcclusion(state, hard, soft, dt, PULL_IN, PULL_OUT, SOFT_WEIGHT, BASE_FOV, MAX_FOV);
+function step(
+  state: CameraOcclusionState,
+  hard: number,
+  soft: number,
+  dt = DT,
+): CameraOcclusionState {
+  return stepCameraOcclusion(
+    state,
+    hard,
+    soft,
+    dt,
+    PULL_IN,
+    PULL_OUT,
+    SOFT_WEIGHT,
+    BASE_FOV,
+    MAX_FOV,
+  );
 }
 
 describe('camera collision smoothing', () => {

@@ -14,6 +14,7 @@
 import { randomBytes } from 'node:crypto';
 import pg from 'pg';
 import WebSocket from 'ws';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 try {
   process.loadEnvFile?.();
@@ -60,16 +61,16 @@ const CLASSES = [
 ];
 
 const SPOTS = [
-  { name: 'wolves west', x: -15, z: 55, radius: 22 },
-  { name: 'wolves east', x: 20, z: 70, radius: 20 },
-  { name: 'boars south', x: 55, z: 12, radius: 22 },
-  { name: 'boars ridge', x: 80, z: -15, radius: 18 },
-  { name: 'spiders', x: -60, z: 5, radius: 22 },
-  { name: 'murlocs', x: -75, z: 57, radius: 14 },
-  { name: 'rats', x: -82, z: -62, radius: 20 },
-  { name: 'bandits west', x: 65, z: -65, radius: 24 },
+  { name: 'wolves west', x: -27, z: 71, radius: 28.5 },
+  { name: 'wolves east', x: 24, z: 70, radius: 26 },
+  { name: 'boars south', x: 63, z: 16, radius: 26 },
+  { name: 'boars ridge', x: 84, z: -27, radius: 23.5 },
+  { name: 'spiders', x: -68, z: 2, radius: 28.5 },
+  { name: 'murlocs', x: -75, z: 57, radius: 15 },
+  { name: 'rats', x: -82, z: -62, radius: 33 },
+  { name: 'bandits west', x: 50, z: -72, radius: 28.5 },
   { name: 'bandits east', x: 90, z: -90, radius: 16 },
-  { name: 'bones', x: 80, z: 78, radius: 18 },
+  { name: 'bones', x: 82, z: 78, radius: 28.5 },
   { name: 'prowlers west', x: -40, z: 230, radius: 22 },
   { name: 'prowlers east', x: 35, z: 225, radius: 20 },
   { name: 'deepfen west', x: -82, z: 273, radius: 15 },
@@ -275,7 +276,7 @@ class LoadBot {
         ws.close();
       }, 10_000);
       ws.on('open', () => {
-        ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.characterId }));
+        ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)));
       });
       ws.on('message', (buf) => {
         let msg;
@@ -294,7 +295,13 @@ class LoadBot {
           return;
         }
         if (msg.t === 'error') {
-          fail(new Error(`${this.name} auth failed: ${msg.error ?? 'unknown websocket error'}`));
+          const hint =
+            msg.error === 'too many connections from your network'
+              ? ' Increase MAX_WS_PER_IP_HARD, restart the server, and close extra local sessions.'
+              : '';
+          fail(
+            new Error(`${this.name} auth failed: ${msg.error ?? 'unknown websocket error'}${hint}`),
+          );
           ws.close();
           return;
         }
@@ -316,13 +323,9 @@ class LoadBot {
         this.closed = true;
         this.connected = false;
         if (!settled) {
-          const hint =
-            code === 1008
-              ? ` Increase MAX_WS_PER_IP_HARD, restart the server, and close extra local sessions.`
-              : '';
           fail(
             new Error(
-              `${this.name} closed before hello: code=${code} reason="${this.closeReason || 'none'}".${hint}`,
+              `${this.name} closed before hello: code=${code} reason="${this.closeReason || 'none'}".`,
             ),
           );
         }

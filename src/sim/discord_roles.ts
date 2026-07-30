@@ -1,7 +1,8 @@
 // Shared, host-agnostic catalog of the staff/special Discord roles that get a
-// colored name + a tag in game. Only these six are surfaced (everyone else has
-// the default name color and no tag). Pure data so the server, the renderer, and
-// the bot all agree on the key set without crossing host boundaries.
+// colored name + a tag in game. Only the roles in this catalog are surfaced
+// (everyone else has the default name color and no tag). Pure data so the
+// server, the renderer, and the bot all agree on the key set without crossing
+// host boundaries.
 //
 // `name` is the exact Discord role name the bot matches; `key` is the stable
 // wire/storage token; `color` tints the in-world nameplate; the player-facing tag
@@ -18,6 +19,12 @@ export interface DiscordSpecialRole {
   color: string;
   /** Higher wins when a member holds more than one special role. */
   priority: number;
+  /** Staff roles only: the server stamps this role onto the holder's chat
+   *  lines as the anti-impersonation tag. Community roles (Artist, Content
+   *  Creator, LEGEND, SHILL) stay nameplate-only so the chat tag remains a
+   *  pure authority signal; diluting it with flair roles would teach players
+   *  that a colored bracket means "has some role" instead of "is staff". */
+  chatTag?: true;
 }
 
 // Matching is by role NAME, so a guild-side rename silently breaks the link
@@ -26,36 +33,72 @@ export interface DiscordSpecialRole {
 // stays on the staff green because the guild's Admin role is the renamed Mods
 // role and a Discord rename keeps the role's color.
 export const DISCORD_SPECIAL_ROLES: readonly DiscordSpecialRole[] = [
-  { key: 'levyst', name: 'Levy St', aliases: ['Levy Street'], color: '#ff6b6b', priority: 6 },
+  {
+    key: 'levyst',
+    name: 'Levy St',
+    aliases: ['Levy Street'],
+    color: '#ff6b6b',
+    priority: 11,
+    chatTag: true,
+  },
   {
     key: 'admin',
     name: 'Admin',
     aliases: ['Admins', 'Administrator', 'Administrators'],
     color: '#57d98a',
-    priority: 5,
+    priority: 10,
+    chatTag: true,
   },
   {
     key: 'coredevs',
     name: 'Core Dev',
     aliases: ['Core Devs', 'Core Developer', 'Core Developers', 'CoreDev'],
     color: '#bc00ff',
-    priority: 4,
+    priority: 9,
+    chatTag: true,
   },
   {
     key: 'devs',
     name: 'Devs',
     aliases: ['Dev', 'Developer', 'Developers'],
     color: '#7c8cff',
-    priority: 3,
+    priority: 8,
+    chatTag: true,
+  },
+  {
+    key: 'seniormods',
+    name: 'Senior Mods',
+    aliases: ['Senior Mod', 'Senior Moderator', 'Senior Moderators', 'Sr Mod', 'Sr Mods'],
+    color: '#2eb872',
+    priority: 7,
+    chatTag: true,
   },
   {
     key: 'mods',
     name: 'Mods',
     aliases: ['Mod', 'Moderator', 'Moderators'],
     color: '#57d98a',
-    priority: 2,
+    priority: 6,
+    chatTag: true,
   },
-  { key: 'artists', name: 'Artists', aliases: ['Artist'], color: '#ff85d8', priority: 1 },
+  {
+    key: 'juniormods',
+    name: 'Junior Mods',
+    aliases: ['Junior Mod', 'Junior Moderator', 'Junior Moderators', 'Jr Mod', 'Jr Mods'],
+    color: '#9ce8b6',
+    priority: 5,
+    chatTag: true,
+  },
+  { key: 'artists', name: 'Artists', aliases: ['Artist'], color: '#ff85d8', priority: 4 },
+  {
+    key: 'contentcreator',
+    name: 'Content Creator',
+    aliases: ['Content Creators', 'Creator', 'Creators'],
+    color: '#4fc3f7',
+    priority: 3,
+  },
+  { key: 'legend', name: 'LEGEND', aliases: ['Legends'], color: '#ff8000', priority: 2 },
+  { key: 'shill', name: 'SHILL', aliases: ['Shills'], color: '#ffd166', priority: 1 },
 ] as const;
 
 const BY_KEY = new Map(DISCORD_SPECIAL_ROLES.map((r) => [r.key, r]));
@@ -86,6 +129,12 @@ export function topSpecialRole(roleNames: readonly string[]): DiscordSpecialRole
     if (role && (!best || role.priority > best.priority)) best = role;
   }
   return best;
+}
+
+/** Whether a stored role key is a STAFF role whose chat lines carry the
+ *  anti-impersonation tag (the server-side stamp gate; see chatTag above). */
+export function specialRoleChatTag(key: string | undefined | null): boolean {
+  return !!(key && BY_KEY.get(key)?.chatTag);
 }
 
 /** Nameplate color for a stored role key, or null when it is not a special role. */

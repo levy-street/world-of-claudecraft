@@ -1,0 +1,6 @@
+interface:
+  display_name: "Extract and Test"
+  short_description: "Implement behavior through tested module seams"
+  default_prompt: "Use $woc-extract-and-test to implement this World of ClaudeCraft change with a clean module boundary and focused tests."
+policy:
+  allow_implicit_invocation: true

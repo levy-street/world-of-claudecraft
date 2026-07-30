@@ -36,6 +36,14 @@ const en: Record<EmailTemplateKey, EmailTemplate> = {
       'Your account password was just changed and all other devices were signed out.\n\n' +
       'If this was not you, reset your password and contact support immediately.',
   },
+  password_reset: {
+    subject: `Reset your ${BRAND} password`,
+    text:
+      'Hi {{username}},\n\n' +
+      'We received a request to reset your account password. Open this link to choose a new one:\n\n' +
+      '{{resetUrl}}\n\n' +
+      'The link expires soon and can be used once. If you did not request this, you can ignore this message; your password stays the same.',
+  },
   email_change_verify: {
     subject: `Confirm your new ${BRAND} email`,
     text:

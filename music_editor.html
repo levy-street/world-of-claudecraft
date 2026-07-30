@@ -2,9 +2,12 @@
 <html lang="en">
 <!-- World of ClaudeCraft music editor (dev tool, English-only like the perf
      overlay; never part of a production build). Serves the REAL note data from
-     buildMusicThemes() through the REAL MusicSynth and mix chain, lets you
+     buildMusicThemes() through the REAL MusicSynth and the authoring mix chain
+     (the render pipeline's; the game itself streams remasters), lets you
      re-voice, re-level, move, and delete notes, and saves your edits to
-     src/game/music_overrides.generated.ts so the game and render tool use them.
+     src/game/music_overrides.generated.ts so the render tool picks them up
+     (the shipped game streams the remastered mp3 renders from
+     public/audio/music/, so re-render and re-remaster after editing).
      Open under npm run dev: http://localhost:PORT/music_editor.html -->
 <head>
   <meta charset="utf-8" />

@@ -5,11 +5,17 @@
 // Renders an HTML string (both call sites build their UI via innerHTML), then
 // hydrates: while the character GLBs are still preloading the chip shows the
 // class crest as a placeholder and upgrades to the real portrait once ready.
-import { t } from './i18n';
+
+import {
+  onPortraitsReady,
+  type PortraitFraming,
+  playerPortraitDataUrl,
+  portraitsReady,
+} from '../render/characters/portrait';
+import type { PlayerClass } from '../sim/types';
 import { esc } from './esc';
+import { t } from './i18n';
 import { iconDataUrl } from './icons';
-import { PlayerClass } from '../sim/types';
-import { playerPortraitDataUrl, onPortraitsReady, portraitsReady } from '../render/characters/portrait';
 
 export type PortraitVariant = 'sm' | 'md' | 'lg';
 
@@ -21,6 +27,15 @@ export interface PortraitChipOpts {
   variant?: PortraitVariant;
   /** Show the small class-crest badge in the corner (default true). */
   badge?: boolean;
+  /** Which slice of the model to show (default 'headshot'). Pass 'body' for a
+   *  normal 3/4 figure framing where the chip is shown large, e.g. the
+   *  Inspect window, so it does not read as an over-zoomed helmet crop. */
+  framing?: PortraitFraming;
+  /** Omit the potentially large data URL from generated HTML and let
+   *  hydratePortraits assign it after the subtree is mounted. Useful for dense
+   *  repeated grids where embedding one cached portrait dozens of times would
+   *  create multi-megabyte innerHTML strings. Assets must already be ready. */
+  deferSource?: boolean;
 }
 
 /** Class crest data URL — the placeholder before the 3D portrait is ready and
@@ -32,18 +47,27 @@ function crestUrl(cls: PlayerClass): string {
 /** Build a portrait-chip HTML string. Call {@link hydratePortraits} on the
  *  container afterwards (or rely on the global ready hook to upgrade it). */
 export function portraitChipHtml(opts: PortraitChipOpts): string {
-  const { cls, skin = 0, name, variant = 'sm', badge = true } = opts;
-  const portrait = playerPortraitDataUrl(cls, skin);
-  const src = portrait ?? crestUrl(cls);
-  const pending = portrait ? '' : ' data-portrait-pending="1"';
-  const fallbackCls = portrait ? '' : ' is-fallback';
+  const {
+    cls,
+    skin = 0,
+    name,
+    variant = 'sm',
+    badge = true,
+    framing = 'headshot',
+    deferSource = false,
+  } = opts;
+  const portrait = deferSource ? null : playerPortraitDataUrl(cls, skin, framing);
+  const src = deferSource ? null : (portrait ?? crestUrl(cls));
+  const source = src ? ` src="${src}"` : '';
+  const pending = portrait && !deferSource ? '' : ' data-portrait-pending="1"';
+  const fallbackCls = portrait && !deferSource ? '' : ' is-fallback';
   const alt = esc(t('character.portraitAlt', { name }));
   const badgeHtml = badge
     ? `<img class="portrait-badge" src="${crestUrl(cls)}" alt="" aria-hidden="true" draggable="false">`
     : '';
   return (
-    `<span class="portrait-chip portrait-${variant}${fallbackCls}" data-class="${cls}" data-cls="${cls}" data-skin="${skin}"${pending}>` +
-    `<span class="portrait-ring"><img class="portrait-img" src="${src}" alt="${alt}" draggable="false"></span>` +
+    `<span class="portrait-chip portrait-${variant}${fallbackCls}" data-class="${cls}" data-cls="${cls}" data-skin="${skin}" data-framing="${framing}"${pending}>` +
+    `<span class="portrait-ring"><img class="portrait-img"${source} alt="${alt}" loading="lazy" decoding="async" draggable="false"></span>` +
     badgeHtml +
     `</span>`
   );
@@ -57,10 +81,15 @@ export function hydratePortraits(root: ParentNode = document): void {
     const cls = chip.dataset.cls as PlayerClass | undefined;
     if (!cls) return;
     const skin = Number(chip.dataset.skin ?? 0) || 0;
-    const url = playerPortraitDataUrl(cls, skin);
+    const framing = (chip.dataset.framing as PortraitFraming | undefined) ?? 'headshot';
+    const url = playerPortraitDataUrl(cls, skin, framing);
     if (!url) return;
     const img = chip.querySelector<HTMLImageElement>('.portrait-img');
-    if (img) img.src = url;
+    if (img) {
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.src = url;
+    }
     chip.classList.remove('is-fallback');
     chip.removeAttribute('data-portrait-pending');
   });

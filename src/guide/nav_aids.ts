@@ -4,9 +4,9 @@
 // headings, so pages stay free of navigation chrome. The TOC is a DOM enhancement the app
 // mounts after render and tears down on navigate.
 
-import { t, type TranslationKey } from '../ui/i18n';
 import { esc } from '../ui/esc';
-import { GUIDE_BASE, hrefFor, groupedRoutes, type GuideRoute, type GuideGroup } from './routes';
+import { type TranslationKey, t } from '../ui/i18n';
+import { GUIDE_BASE, type GuideGroup, type GuideRoute, groupedRoutes, hrefFor } from './routes';
 
 const groupLabel = (g: GuideGroup): string => t(`guide.groups.${g}` as TranslationKey);
 
@@ -36,12 +36,13 @@ export function sequenceHtml(route: GuideRoute): string {
   const prev = seq[i - 1];
   const next = seq[i + 1];
   if (!prev && !next) return '';
-  const link = (r: GuideRoute | undefined, dir: 'prev' | 'next'): string => r
-    ? `<a class="guide-seq-link guide-seq-${dir}" href="${esc(hrefFor(r.sub))}">
+  const link = (r: GuideRoute | undefined, dir: 'prev' | 'next'): string =>
+    r
+      ? `<a class="guide-seq-link guide-seq-${dir}" href="${esc(hrefFor(r.sub))}">
         <span class="guide-seq-dir">${esc(t(`guide.seq.${dir}` as TranslationKey))}</span>
         <span class="guide-seq-name">${esc(t(r.navKey))}</span>
       </a>`
-    : '<span class="guide-seq-spacer"></span>';
+      : '<span class="guide-seq-spacer"></span>';
   return `<nav class="guide-seq" aria-label="${esc(t('guide.seq.label'))}">${link(prev, 'prev')}${link(next, 'next')}</nav>`;
 }
 
@@ -53,30 +54,60 @@ export function sequenceHtml(route: GuideRoute): string {
 export function mountToc(main: HTMLElement): (() => void) | void {
   const article = main.querySelector('.guide-article');
   if (!article) return;
-  const heads = Array.from(article.querySelectorAll<HTMLHeadingElement>(':scope > h2, :scope > section > h2'));
+  const heads = Array.from(
+    article.querySelectorAll<HTMLHeadingElement>(':scope > h2, :scope > section > h2'),
+  );
   if (heads.length < 3) return;
 
-  heads.forEach((h, idx) => { if (!h.id) h.id = `sec-${idx + 1}`; });
+  heads.forEach((h, idx) => {
+    if (!h.id) h.id = `sec-${idx + 1}`;
+  });
   const items = heads
-    .map((h) => `<li><a href="#${esc(h.id)}" data-toc="${esc(h.id)}">${esc(h.textContent ?? '')}</a></li>`)
+    .map(
+      (h) =>
+        `<li><a href="#${esc(h.id)}" data-toc="${esc(h.id)}">${esc(h.textContent ?? '')}</a></li>`,
+    )
     .join('');
   const toc = document.createElement('nav');
   toc.className = 'guide-toc';
   toc.setAttribute('aria-label', t('guide.toc.heading'));
   toc.innerHTML = `<span class="guide-toc-h">${esc(t('guide.toc.heading'))}</span><ul>${items}</ul>`;
 
+  // Placement: inline after the h1 on narrow viewports (the current reading order), or
+  // a sticky end-side rail on wide ones, where the scrollspy highlight stays visible
+  // while reading. Re-placed live if the viewport crosses the rail breakpoint.
   const h1 = article.querySelector(':scope > h1');
-  if (h1) h1.insertAdjacentElement('afterend', toc);
-  else article.prepend(toc);
+  const rail = typeof matchMedia === 'function' ? matchMedia('(min-width: 1240px)') : null;
+  const place = () => {
+    const asRail = !!rail?.matches;
+    toc.classList.toggle('guide-toc-rail', asRail);
+    main.classList.toggle('guide-has-toc-rail', asRail);
+    if (asRail) main.prepend(toc);
+    else if (h1) h1.insertAdjacentElement('afterend', toc);
+    else article.prepend(toc);
+  };
+  place();
+  rail?.addEventListener('change', place);
 
   const links = new Map(
-    Array.from(toc.querySelectorAll<HTMLAnchorElement>('[data-toc]')).map((a) => [a.dataset.toc ?? '', a]),
+    Array.from(toc.querySelectorAll<HTMLAnchorElement>('[data-toc]')).map((a) => [
+      a.dataset.toc ?? '',
+      a,
+    ]),
   );
   const setActive = (id: string) => {
-    links.forEach((a) => a.classList.remove('is-active'));
+    links.forEach((a) => {
+      a.classList.remove('is-active');
+    });
     links.get(id)?.classList.add('is-active');
   };
-  if (typeof IntersectionObserver === 'undefined') return;
+  // The toc node is discarded with the article on navigation, but the rail-grid class
+  // lives on the persistent <main>, so cleanup must strip it.
+  const unplace = () => {
+    rail?.removeEventListener('change', place);
+    main.classList.remove('guide-has-toc-rail');
+  };
+  if (typeof IntersectionObserver === 'undefined') return unplace;
   const observer = new IntersectionObserver(
     (entries) => {
       const visible = entries.filter((e) => e.isIntersecting);
@@ -84,6 +115,11 @@ export function mountToc(main: HTMLElement): (() => void) | void {
     },
     { rootMargin: '-15% 0px -75% 0px' },
   );
-  heads.forEach((h) => observer.observe(h));
-  return () => observer.disconnect();
+  heads.forEach((h) => {
+    observer.observe(h);
+  });
+  return () => {
+    observer.disconnect();
+    unplace();
+  };
 }

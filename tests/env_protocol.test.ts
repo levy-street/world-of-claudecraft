@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { ACTIONS, NUM_ACTIONS, encodeObs, obsSize } from '../src/sim/obs';
+import {
+  MAX_INPUT_LINE_LENGTH,
+  parseTalentResetRequest,
+  validateAction,
+  validatePlayerClass,
+  validatePlayerLevel,
+} from '../headless/protocol';
 import { CLASSES } from '../src/sim/data';
+import { ACTIONS, encodeObs, NUM_ACTIONS, obsSize } from '../src/sim/obs';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES } from '../src/sim/types';
-import { MAX_INPUT_LINE_LENGTH, validateAction, validatePlayerClass } from '../headless/protocol';
 
 describe('headless environment protocol validation', () => {
   it('accepts only integer action ids from the declared action space', () => {
@@ -30,6 +36,46 @@ describe('headless environment protocol validation', () => {
     expect(validatePlayerClass(null)).toBeNull();
     expect(validatePlayerClass(0)).toBeNull();
     expect(validatePlayerClass('Warrior')).toBeNull(); // case-sensitive
+  });
+
+  it('accepts only safe playable starting levels', () => {
+    expect(validatePlayerLevel(1)).toBe(1);
+    expect(validatePlayerLevel(20)).toBe(20);
+    for (const value of [0, 21, 1.5, Number.NaN, Number.POSITIVE_INFINITY, '5', null]) {
+      expect(validatePlayerLevel(value)).toBeNull();
+    }
+  });
+
+  it('parses one strict canonical talent allocation for a reset', () => {
+    const canonical = {
+      player_level: 20,
+      talents: { spec: 'arms', rows: { 5: 'war_row_double_charge' } },
+    };
+
+    expect(parseTalentResetRequest(canonical)).toEqual({
+      ok: true,
+      playerLevel: 20,
+      talents: canonical.talents,
+    });
+    expect(parseTalentResetRequest({})).toEqual({ ok: true, playerLevel: 1 });
+  });
+
+  it('rejects malformed levels and every legacy or dual-model talent reset shape', () => {
+    expect(parseTalentResetRequest({ player_level: 1.5 })).toEqual({
+      ok: false,
+      error: 'invalid player_level: expected integer 1-20',
+    });
+    for (const talents of [
+      { spec: 'arms', ranks: {}, choices: {} },
+      { spec: 'arms', rows: {}, rowPicks: [] },
+      { spec: 'arms', rows: {}, unknown: true },
+      undefined,
+    ]) {
+      expect(parseTalentResetRequest({ talents })).toEqual({
+        ok: false,
+        error: 'invalid talents: expected canonical spec/rows allocation',
+      });
+    }
   });
 
   it('builds an identical-shape, full-size, finite observation for every class', () => {

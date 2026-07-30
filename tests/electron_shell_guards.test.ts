@@ -77,6 +77,11 @@ describe('navigationAllowed', () => {
     expect(navigationAllowed(turnstile, true, main)).toBe(false);
     expect(navigationAllowed(turnstile, false, main)).toBe(true);
   });
+  it('allows WalletConnect verification only as an embedded subframe', () => {
+    const verify = 'https://verify.walletconnect.com/session';
+    expect(navigationAllowed(verify, true, main)).toBe(false);
+    expect(navigationAllowed(verify, false, main)).toBe(true);
+  });
   it('denies a malformed navigation URL', () => {
     expect(navigationAllowed('::: not a url', true, main)).toBe(false);
   });
@@ -170,11 +175,28 @@ describe('buildContentSecurityPolicy', () => {
     expect(directive('connect-src')).toContain('blob:');
   });
 
+  it('allows the matching WebSocket origin for a local HTTP API', () => {
+    const localCsp = buildContentSecurityPolicy({ apiOrigin: 'http://127.0.0.1:8787' });
+    const localConnectSrc = localCsp.split('; ').find((entry) => entry.startsWith('connect-src '));
+
+    expect(localConnectSrc).toContain('http://127.0.0.1:8787');
+    expect(localConnectSrc).toContain('ws://127.0.0.1:8787');
+  });
+
   it('mirrors the web build: Google Fonts, worker blobs, and the Turnstile frame', () => {
     expect(csp).toContain("style-src 'self' 'unsafe-inline' https://fonts.googleapis.com");
     expect(csp).toContain("font-src 'self' https://fonts.gstatic.com");
     expect(csp).toContain("worker-src 'self' blob:");
     expect(csp).toContain('frame-src https://challenges.cloudflare.com');
+  });
+
+  it('allows only the WalletConnect transport, modal images, fonts, and verification frames', () => {
+    expect(directive('connect-src')).toContain('https://*.walletconnect.com');
+    expect(directive('connect-src')).toContain('wss://*.walletconnect.com');
+    expect(directive('connect-src')).toContain('https://api.web3modal.org');
+    expect(directive('img-src')).toContain('https://secure.walletconnect.com');
+    expect(directive('font-src')).toContain('https://fonts.reown.com');
+    expect(directive('frame-src')).toContain('https://verify.walletconnect.com');
   });
 });
 

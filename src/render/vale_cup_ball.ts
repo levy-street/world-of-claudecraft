@@ -1,9 +1,9 @@
 // The boarball: bespoke visual for the 'vale_cup_ball' entity (an inert
 // bell-pattern mob the Vale Cup sim module drives; without this carve-out the
-// renderer would dress it as a generic mob rig). A stitched-leather procedural
-// sphere with a hide CanvasTexture, client-side roll rotation derived from
-// per-frame position deltas (axis = up x velocity, pure helper below), a soft
-// contact-shadow blob, and a small module-owned dust pool for fast rolls.
+// renderer would dress it as a generic mob rig). A round, machined soccer-ball
+// procedural sphere with a CanvasTexture, client-side roll rotation derived
+// from per-frame position deltas (axis = up x velocity, pure helper below), a
+// soft contact-shadow blob, and a small module-owned dust pool for fast rolls.
 //
 // Sharing contract: texture + materials + the dust pool are MODULE-level and
 // never disposed (renderer.removeView only disposes per-view geometry, which
@@ -354,7 +354,8 @@ function glowTexture(): THREE.CanvasTexture {
   const size = 64;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
-  const g = canvas.getContext('2d')!;
+  const g = canvas.getContext('2d');
+  if (!g) return new THREE.CanvasTexture(canvas);
   const grd = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
   grd.addColorStop(0, 'rgba(255,255,255,1)');
   grd.addColorStop(0.4, 'rgba(255,244,214,0.55)');

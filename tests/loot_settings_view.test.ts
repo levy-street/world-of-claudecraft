@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { lootSettingsView } from '../src/ui/loot_settings_view';
+import { lootSettingsView } from '../src/ui/hud/loot/loot_settings_view';
 import type { PartyInfo, PartyMemberInfo } from '../src/world_api';
 
 const member = (pid: number, name: string): PartyMemberInfo => ({

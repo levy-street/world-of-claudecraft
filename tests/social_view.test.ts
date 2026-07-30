@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { PlayerClass } from '../src/sim/types';
 import {
+  blockRows,
   friendRows,
+  type GuildRosterItem,
+  guildRosterItems,
   guildView,
   ignoreRows,
   raidView,
@@ -33,6 +36,7 @@ function friend(over: Partial<FriendInfo> & { name: string }): FriendInfo {
     realm: 'Test',
     online: true,
     ...over,
+    activeTitle: over.activeTitle ?? null,
   };
 }
 
@@ -66,6 +70,7 @@ const SOCIAL: SocialInfo = {
     friend({ name: 'Borin', online: false }),
   ],
   blocks: [{ id: 9, name: 'Spammer' }],
+  ignores: [{ id: 11, name: 'Chatterbox' }],
   guild: {
     id: 7,
     name: 'Wolves',
@@ -132,8 +137,12 @@ describe('per-tab row models', () => {
     expect(rows[1].dot).toBe('off');
   });
 
-  it('derives ignore rows', () => {
-    expect(ignoreRows(SOCIAL).map((r) => r.name)).toEqual(['Spammer']);
+  it('derives the two player tiers from their OWN lists, never from each other', () => {
+    // The Ignored and Blocked tabs render one tier each. A cross-wire that fed
+    // blocks into the Ignored tab (or vice versa) trips on either row set.
+    expect(blockRows(SOCIAL).map((r) => r.name)).toEqual(['Spammer']);
+    expect(blockRows(null)).toEqual([]);
+    expect(ignoreRows(SOCIAL).map((r) => r.name)).toEqual(['Chatterbox']);
     expect(ignoreRows(null)).toEqual([]);
   });
 
@@ -156,6 +165,51 @@ describe('per-tab row models', () => {
     expect(guildView({ ...SOCIAL, guild: null }, 'Me').guild).toBeNull();
   });
 
+  it('passes the billboard through and resolves canEditMotd per rank', () => {
+    const withMotd = (rank: 'leader' | 'officer' | 'member'): SocialInfo => ({
+      ...SOCIAL,
+      guild: {
+        ...(SOCIAL.guild as GuildInfo),
+        rank,
+        motd: 'Raid night Friday. Discord: discord.gg/example',
+        motdSetBy: 'Gizzelda',
+      },
+    });
+    const asLeader = guildView(withMotd('leader'), 'Me').guild!;
+    expect(asLeader.motd).toBe('Raid night Friday. Discord: discord.gg/example');
+    expect(asLeader.motdSetBy).toBe('Gizzelda');
+    expect(asLeader.canEditMotd).toBe(true);
+    expect(guildView(withMotd('officer'), 'Off').guild!.canEditMotd).toBe(true);
+    expect(guildView(withMotd('member'), 'Grunt').guild!.canEditMotd).toBe(false);
+  });
+
+  it('defaults missing billboard fields to empty strings (older-server frames)', () => {
+    // SOCIAL.guild is cast and carries no motd fields, the pre-billboard shape.
+    const v = guildView(SOCIAL, 'Me').guild!;
+    expect(v.motd).toBe('');
+    expect(v.motdSetBy).toBe('');
+  });
+
+  it('passes each row activeTitle through as a DEED ID (null untitled), both tabs', () => {
+    const social: SocialInfo = {
+      ...SOCIAL,
+      friends: [friend({ name: 'Titled', activeTitle: 'prog_veteran' }), friend({ name: 'Plain' })],
+      guild: {
+        ...(SOCIAL.guild as GuildInfo),
+        members: [
+          guildMember({ name: 'MTitled', rank: 'member', activeTitle: 'hid_saul_footnote' }),
+          guildMember({ name: 'MPlain', rank: 'member' }),
+        ],
+      },
+    };
+    const friends = friendRows(social);
+    expect(friends.find((r) => r.name === 'Titled')?.activeTitle).toBe('prog_veteran');
+    expect(friends.find((r) => r.name === 'Plain')?.activeTitle).toBeNull();
+    const rows = guildView(social, 'Me').guild!.rows;
+    expect(rows.find((r) => r.name === 'MTitled')?.activeTitle).toBe('hid_saul_footnote');
+    expect(rows.find((r) => r.name === 'MPlain')?.activeTitle).toBeNull();
+  });
+
   it('maps each member last_login into the guild row (null when unknown)', () => {
     const iso = '2026-01-02T03:04:05.000Z';
     const social: SocialInfo = {
@@ -171,6 +225,115 @@ describe('per-tab row models', () => {
     const rows = guildView(social, 'Me').guild!.rows;
     expect(rows.find((r) => r.name === 'Seen')?.lastLogin).toBe(iso);
     expect(rows.find((r) => r.name === 'NeverSeen')?.lastLogin).toBeNull();
+  });
+});
+
+describe('guildRosterItems (online-first grouping + hide-offline filter)', () => {
+  // Build guild rows through guildView so the grouping is tested against the REAL row
+  // models the painter consumes (not a hand-shaped stand-in). Viewer is 'Nobody' so no
+  // row is self (irrelevant to grouping, which keys only on `online`).
+  function roster(members: Array<{ name: string; online: boolean }>) {
+    const social: SocialInfo = {
+      ...SOCIAL,
+      guild: {
+        ...(SOCIAL.guild as GuildInfo),
+        members: members.map((m) =>
+          guildMember({ name: m.name, rank: 'member', online: m.online }),
+        ),
+      },
+    };
+    return guildView(social, 'Nobody').guild!.rows;
+  }
+
+  it('groups online members first, then offline, each header carrying its count', () => {
+    const rows = roster([
+      { name: 'A', online: false },
+      { name: 'B', online: true },
+      { name: 'C', online: false },
+      { name: 'D', online: true },
+    ]);
+    // Online group keeps the source order (B before D); offline keeps it too (A before C).
+    expect(guildRosterItems(rows, false)).toEqual([
+      { kind: 'header', group: 'online', count: 2 },
+      { kind: 'member', row: rows.find((r) => r.name === 'B') },
+      { kind: 'member', row: rows.find((r) => r.name === 'D') },
+      { kind: 'header', group: 'offline', count: 2 },
+      { kind: 'member', row: rows.find((r) => r.name === 'A') },
+      { kind: 'member', row: rows.find((r) => r.name === 'C') },
+    ]);
+  });
+
+  it('renders exactly one group for an all-online roster (no empty Offline header)', () => {
+    const rows = roster([
+      { name: 'A', online: true },
+      { name: 'B', online: true },
+    ]);
+    const items = guildRosterItems(rows, false);
+    expect(items.filter((i) => i.kind === 'header')).toEqual([
+      { kind: 'header', group: 'online', count: 2 },
+    ]);
+    expect(items.some((i) => i.kind === 'header' && i.group === 'offline')).toBe(false);
+  });
+
+  it('renders exactly one group for an all-offline roster (no empty Online header)', () => {
+    const rows = roster([
+      { name: 'A', online: false },
+      { name: 'B', online: false },
+    ]);
+    const items = guildRosterItems(rows, false);
+    expect(items.filter((i) => i.kind === 'header')).toEqual([
+      { kind: 'header', group: 'offline', count: 2 },
+    ]);
+    expect(items.some((i) => i.kind === 'header' && i.group === 'online')).toBe(false);
+  });
+
+  it('hide-offline drops the offline header AND its member rows, leaving online intact', () => {
+    const rows = roster([
+      { name: 'On1', online: true },
+      { name: 'Off1', online: false },
+      { name: 'On2', online: true },
+    ]);
+    expect(guildRosterItems(rows, true)).toEqual([
+      { kind: 'header', group: 'online', count: 2 },
+      { kind: 'member', row: rows.find((r) => r.name === 'On1') },
+      { kind: 'member', row: rows.find((r) => r.name === 'On2') },
+    ]);
+    // No offline row (or its header) survives the filter.
+    const hidden = guildRosterItems(rows, true);
+    expect(hidden.some((i) => i.kind === 'member' && i.row.name === 'Off1')).toBe(false);
+    expect(hidden.some((i) => i.kind === 'header' && i.group === 'offline')).toBe(false);
+  });
+
+  it('hide-offline on an all-offline roster yields an empty roster (the toggle still lets it back)', () => {
+    const rows = roster([{ name: 'A', online: false }]);
+    expect(guildRosterItems(rows, true)).toEqual([]);
+  });
+
+  it('online header count reflects real online membership, unaffected by the hide-offline filter', () => {
+    const rows = roster([
+      { name: 'A', online: true },
+      { name: 'B', online: false },
+    ]);
+    const onlineHeader = (its: GuildRosterItem[]) =>
+      its.find((i) => i.kind === 'header' && i.group === 'online');
+    expect(onlineHeader(guildRosterItems(rows, false))).toEqual({
+      kind: 'header',
+      group: 'online',
+      count: 1,
+    });
+    expect(onlineHeader(guildRosterItems(rows, true))).toEqual({
+      kind: 'header',
+      group: 'online',
+      count: 1,
+    });
+  });
+
+  it('is a pure projection (same rows -> deeply-equal grouping)', () => {
+    const rows = roster([
+      { name: 'A', online: true },
+      { name: 'B', online: false },
+    ]);
+    expect(guildRosterItems(rows, false)).toEqual(guildRosterItems(rows, false));
   });
 });
 
@@ -262,7 +425,7 @@ describe('ClientWorld-vs-Sim parity', () => {
   it('yields identical row + signature models from a Sim-shaped and a mirror-shaped source', () => {
     const sim = simShaped();
     const cli = clientShaped();
-    for (const tab of ['friends', 'guild', 'ignore', 'raid'] as SocialTab[]) {
+    for (const tab of ['friends', 'guild', 'ignore', 'block', 'raid'] as SocialTab[]) {
       expect(socialStructSig(tab, sim.social, sim.party)).toBe(
         socialStructSig(tab, cli.social, cli.party),
       );

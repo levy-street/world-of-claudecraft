@@ -51,6 +51,8 @@ export const valeCup: GuidePage = {
             `${callout(esc(t('guide.valeCupPage.howTruce')), { variant: 'note' })}` +
             `<p>${esc(t('guide.valeCupPage.spectateBody'))}</p>`,
         )}
+        ${section('guide.valeCupPage.bettingHeading', `<p>${esc(t('guide.valeCupPage.bettingBody'))}</p>`)}
+        ${section('guide.valeCupPage.practiceHeading', `<p>${esc(t('guide.valeCupPage.practiceBody'))}</p>`)}
         ${section(
           'guide.valeCupPage.nationsHeading',
           `<p>${esc(t('guide.valeCupPage.nationsBody'))}</p><div class="guide-beat-grid">${nations}</div>`,

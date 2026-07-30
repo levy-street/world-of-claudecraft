@@ -1,5 +1,9 @@
+import type { NetPipelineSummary } from '../net/net_pipeline_stats';
+import { type AssetTimingSnapshot, assetTimingSnapshot } from '../render/assets/stats';
 import type { Renderer } from '../render/renderer';
-import { assetTimingSnapshot, type AssetTimingSnapshot } from '../render/assets/stats';
+import { createHeapSawtooth, type HeapSawtoothSummary } from './heap_sawtooth';
+import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
+import { createWorstWindow, type WorstWindowSummary } from './worst_window';
 
 export interface PerfSnapshot {
   seconds: number;
@@ -9,12 +13,22 @@ export interface PerfSnapshot {
   windows: {
     last10s: { seconds: number; frames: number; fps: number; frameMs: PerfSnapshot['frameMs'] };
     last30s: { seconds: number; frames: number; fps: number; frameMs: PerfSnapshot['frameMs'] };
+    // Worst 10 s window since the reporter last drained it (ruling R5):
+    // worst-per-report-interval, so a hitch storm survives the cumulative
+    // dilution and the frame ring's eviction. Null before the first 1 Hz tick.
+    worst10s: WorstWindowSummary | null;
   };
   mainMs: Record<string, { count: number; avg: number; p95: number; max: number }>;
   renderer: ReturnType<Renderer['perfStats']> | null;
   hud: { hotDomWrites: number; hotDomSkippedWrites: number; hotDomSkipRate: number } | null;
   assets: AssetTimingSnapshot;
   network: { connected: boolean; snapInterval: number; lastSnapAge: number; alpha: number } | null;
+  // Always-on aggregate counters (ruling R9), unlike the overlay-gated
+  // `network` block above: null offline, populated online even with the
+  // overlay disabled so every fleet perf report carries them.
+  netPipeline: NetPipelineSummary | null;
+  // Always-on 1 Hz heap sawtooth (ruling R10); null off Chromium.
+  heapSawtooth: HeapSawtoothSummary | null;
   input: {
     intents: number;
     lastKind: string;
@@ -26,8 +40,21 @@ export interface PerfSnapshot {
     debug?: PerfInputDebugState | null;
   };
   browser: {
-    longTasks: { count: number; totalMs: number; avg: number; p95: number; max: number; lastAge: number };
-    memory: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number; usedMB: number; limitMB: number } | null;
+    longTasks: {
+      count: number;
+      totalMs: number;
+      avg: number;
+      p95: number;
+      max: number;
+      lastAge: number;
+    };
+    memory: {
+      usedJSHeapSize: number;
+      totalJSHeapSize: number;
+      jsHeapSizeLimit: number;
+      usedMB: number;
+      limitMB: number;
+    } | null;
     visibilityState: string;
   };
   device: {
@@ -181,11 +208,6 @@ export interface DevPerfTrace {
   longTasks: DevLongTaskRecord[];
 }
 
-interface FrameSample {
-  at: number;
-  ms: number;
-}
-
 function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return 0;
   const idx = Math.min(sorted.length - 1, Math.max(0, Math.ceil(sorted.length * p) - 1));
@@ -200,7 +222,12 @@ function summarize(values: number[]): { count: number; avg: number; p95: number;
   if (values.length === 0) return { count: 0, avg: 0, p95: 0, max: 0 };
   const sorted = [...values].sort((a, b) => a - b);
   const total = values.reduce((a, b) => a + b, 0);
-  return { count: values.length, avg: round(total / values.length), p95: round(percentile(sorted, 0.95)), max: round(sorted[sorted.length - 1]) };
+  return {
+    count: values.length,
+    avg: round(total / values.length),
+    p95: round(percentile(sorted, 0.95)),
+    max: round(sorted[sorted.length - 1]),
+  };
 }
 
 function summarizeFrames(values: number[]): PerfSnapshot['frameMs'] {
@@ -216,12 +243,9 @@ function summarizeFrames(values: number[]): PerfSnapshot['frameMs'] {
   };
 }
 
-function pushSample(values: number[], sample: number): void {
-  values.push(sample);
-  if (values.length > MAX_SAMPLES) values.splice(0, values.length - MAX_SAMPLES);
-}
-
-function renderStallCategories(rendererFrame: NonNullable<RendererStats['lastFrame']>): DevRenderStallCategory[] {
+function renderStallCategories(
+  rendererFrame: NonNullable<RendererStats['lastFrame']>,
+): DevRenderStallCategory[] {
   const categories = rendererFrame.renderDiagnostics.categories;
   return Object.entries(categories)
     .map(([name, stat]) => ({
@@ -233,7 +257,7 @@ function renderStallCategories(rendererFrame: NonNullable<RendererStats['lastFra
       materials: stat.materials,
       materialSamples: stat.materialSamples.slice(0, 4),
     }))
-    .sort((a, b) => (b.triangles - a.triangles) || (b.draws - a.draws) || a.name.localeCompare(b.name))
+    .sort((a, b) => b.triangles - a.triangles || b.draws - a.draws || a.name.localeCompare(b.name))
     .slice(0, DEV_TRACE_STALL_CATEGORY_LIMIT);
 }
 
@@ -293,7 +317,10 @@ function sanitizeTraceDetail(detail?: Record<string, unknown>): DevTraceDetail |
     } else if (typeof value === 'boolean' || value === null) {
       out[cleanKey] = value;
     } else if (Array.isArray(value)) {
-      out[cleanKey] = value.slice(0, 8).map((v) => String(v).slice(0, 40)).join(',');
+      out[cleanKey] = value
+        .slice(0, 8)
+        .map((v) => String(v).slice(0, 40))
+        .join(',');
     } else if (value !== undefined) {
       out[cleanKey] = String(value).slice(0, 120);
     }
@@ -303,7 +330,12 @@ function sanitizeTraceDetail(detail?: Record<string, unknown>): DevTraceDetail |
 }
 
 function isLoopbackHostname(hostname: string): boolean {
-  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname === '[::1]';
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    hostname === '[::1]'
+  );
 }
 
 export function localDevPerfTraceEnabled(): boolean {
@@ -320,24 +352,34 @@ export class PerfMonitor {
   private startedAt = performance.now();
   private lastOverlayAt = 0;
   private frames = 0;
-  private frameMs: number[] = [];
+  private frameMs = new NumberSampleRing(MAX_SAMPLES);
   private lastFrameMs = 0;
-  private frameWindow: FrameSample[] = [];
-  private buckets: Record<TimedBucket, number[]> = { renderer: [], hud: [], events: [], sim: [] };
+  private frameWindow = new TimedNumberSampleRing(MAX_SAMPLES);
+  private buckets: Record<TimedBucket, NumberSampleRing> = {
+    renderer: new NumberSampleRing(MAX_SAMPLES),
+    hud: new NumberSampleRing(MAX_SAMPLES),
+    events: new NumberSampleRing(MAX_SAMPLES),
+    sim: new NumberSampleRing(MAX_SAMPLES),
+  };
   private lastBucketMs: Record<TimedBucket, number> = { renderer: 0, hud: 0, events: 0, sim: 0 };
   private lastSnapshot: PerfSnapshot | null = null;
   private network: PerfSnapshot['network'] = null;
+  private netPipelineSource: { summary(): NetPipelineSummary } | null = null;
+  private heapSawtooth = createHeapSawtooth({
+    readUsedHeapBytes: () => this.memorySnapshot()?.usedJSHeapSize ?? null,
+  });
+  private worstWindow = createWorstWindow();
   private inputIntents = 0;
   private lastInputAt = 0;
   private lastInputKind = '';
   private pendingFrameAt = 0;
   private pendingSendAt = 0;
   private pendingVisibleAt = 0;
-  private inputToFrameMs: number[] = [];
-  private inputToSendMs: number[] = [];
-  private inputToEchoMs: number[] = [];
-  private inputToVisibleMs: number[] = [];
-  private longTaskMs: number[] = [];
+  private inputToFrameMs = new NumberSampleRing(MAX_SAMPLES);
+  private inputToSendMs = new NumberSampleRing(MAX_SAMPLES);
+  private inputToEchoMs = new NumberSampleRing(MAX_SAMPLES);
+  private inputToVisibleMs = new NumberSampleRing(MAX_SAMPLES);
+  private longTaskMs = new NumberSampleRing(MAX_SAMPLES);
   private longTaskTotalMs = 0;
   private lastLongTaskAt = 0;
   private longTaskObserver: PerformanceObserver | null = null;
@@ -347,10 +389,14 @@ export class PerfMonitor {
   private devTraceSpans: DevPerfTraceSpan[] = [];
   private devLongTasks: DevLongTaskRecord[] = [];
 
-  constructor(private renderer: Renderer | null, private hud: { perfStats(): PerfSnapshot['hud'] } | null = null) {
+  constructor(
+    private renderer: Renderer | null,
+    private hud: { perfStats(): PerfSnapshot['hud'] } | null = null,
+  ) {
     const params = new URLSearchParams(location.search);
     this.traceEnabled = localDevPerfTraceEnabled();
-    this.enabled = this.traceEnabled || params.has('perf') || localStorage.getItem('woc_perf') === '1';
+    this.enabled =
+      this.traceEnabled || params.has('perf') || localStorage.getItem('woc_perf') === '1';
     if (this.enabled) {
       this.mountOverlay();
     }
@@ -373,9 +419,9 @@ export class PerfMonitor {
     this.frames++;
     const ms = Math.min(250, Math.max(0, dt * 1000));
     this.lastFrameMs = ms;
-    pushSample(this.frameMs, ms);
-    this.frameWindow.push({ at: now, ms });
-    while (this.frameWindow.length && now - this.frameWindow[0].at > MAX_WINDOW_MS) this.frameWindow.shift();
+    this.frameMs.push(ms);
+    this.frameWindow.push(now, ms);
+    this.frameWindow.pruneBefore(now - MAX_WINDOW_MS);
   }
 
   markInputIntent(kind: 'move' | 'look' | 'zoom', now = performance.now()): void {
@@ -390,36 +436,39 @@ export class PerfMonitor {
 
   markInputFrame(now = performance.now()): void {
     if (!this.enabled || this.pendingFrameAt <= 0) return;
-    pushSample(this.inputToFrameMs, now - this.pendingFrameAt);
+    this.inputToFrameMs.push(now - this.pendingFrameAt);
     this.pendingFrameAt = 0;
   }
 
   markInputSent(now = performance.now()): void {
     if (!this.enabled || this.pendingSendAt <= 0) return;
-    pushSample(this.inputToSendMs, now - this.pendingSendAt);
+    this.inputToSendMs.push(now - this.pendingSendAt);
     this.pendingSendAt = 0;
   }
 
   markInputEcho(ms: number): void {
     if (!this.enabled || !Number.isFinite(ms) || ms < 0) return;
-    pushSample(this.inputToEchoMs, ms);
+    this.inputToEchoMs.push(ms);
   }
 
   markInputVisible(now = performance.now()): void {
     if (!this.enabled || this.pendingVisibleAt <= 0) return;
-    pushSample(this.inputToVisibleMs, now - this.pendingVisibleAt);
+    this.inputToVisibleMs.push(now - this.pendingVisibleAt);
     this.pendingVisibleAt = 0;
   }
 
   time<T>(bucket: TimedBucket, fn: () => T): T {
-    if (!this.enabled) return fn();
+    // Bucket recording is deliberately UNGATED (packet 0, finding 20): the
+    // four mainMs buckets ride in every fleet report, overlay on or off. The
+    // overlay mount, the markInput* chain, and the dev-trace spans (gated
+    // inside recordDevTraceSpan) stay behind their flags.
     const start = performance.now();
     try {
       return fn();
     } finally {
       const ms = performance.now() - start;
       this.lastBucketMs[bucket] = round(ms);
-      pushSample(this.buckets[bucket], ms);
+      this.buckets[bucket].push(ms);
       this.recordDevTraceSpan(bucket, start, ms, 'bucket');
     }
   }
@@ -439,6 +488,38 @@ export class PerfMonitor {
     this.network = stats;
   }
 
+  setNetPipelineSource(source: { summary(): NetPipelineSummary } | null): void {
+    // Deliberately NOT gated on this.enabled, unlike setNetwork above: the
+    // fleet story rides always-on aggregate counters (ruling R9); only the
+    // overlay and the dev-trace spans stay gated. Takes the stats SOURCE, not
+    // a built summary: summary() allocates, so snapshot() draws it lazily at
+    // its 1 Hz cadence instead of the caller paying it every animation frame.
+    this.netPipelineSource = source;
+  }
+
+  /**
+   * Reset the worst-10s interval. Only the reporter calls this, and only
+   * after a SUCCESSFUL send (ruling R5), so a failed post never loses the
+   * retained hitch storm; snapshot() itself stays a pure read.
+   */
+  drainWorstWindow(): void {
+    this.worstWindow.drain();
+  }
+
+  /**
+   * Feed an externally timed span into the dev trace on the 'external' span
+   * kind. Dev traces only: a no-op unless perfTrace is active (the internal
+   * recorder gates on traceEnabled), so it costs nothing in the fleet.
+   */
+  recordExternalSpan(
+    name: string,
+    startMs: number,
+    durationMs: number,
+    detail?: Record<string, unknown>,
+  ): void {
+    this.recordDevTraceSpan(name, startMs, durationMs, 'external', detail);
+  }
+
   private recordDevTraceSpan(
     name: string,
     startMs: number,
@@ -446,7 +527,8 @@ export class PerfMonitor {
     kind: DevPerfTraceSpan['kind'],
     detail?: Record<string, unknown>,
   ): void {
-    if (!this.traceEnabled || !Number.isFinite(durationMs) || durationMs < DEV_TRACE_SPAN_MIN_MS) return;
+    if (!this.traceEnabled || !Number.isFinite(durationMs) || durationMs < DEV_TRACE_SPAN_MIN_MS)
+      return;
     const startRel = Math.max(0, startMs - this.startedAt);
     const span: DevPerfTraceSpan = {
       atMs: round(startRel + durationMs),
@@ -466,15 +548,16 @@ export class PerfMonitor {
   }
 
   private observeLongTasks(): void {
-    const supported = typeof PerformanceObserver !== 'undefined'
-      && Array.isArray(PerformanceObserver.supportedEntryTypes)
-      && PerformanceObserver.supportedEntryTypes.includes('longtask');
+    const supported =
+      typeof PerformanceObserver !== 'undefined' &&
+      Array.isArray(PerformanceObserver.supportedEntryTypes) &&
+      PerformanceObserver.supportedEntryTypes.includes('longtask');
     if (!supported) return;
     try {
       this.longTaskObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           const duration = Math.max(0, entry.duration || 0);
-          pushSample(this.longTaskMs, duration);
+          this.longTaskMs.push(duration);
           this.longTaskTotalMs += duration;
           this.lastLongTaskAt = entry.startTime + duration;
           if (this.traceEnabled) this.recordDevLongTask(entry);
@@ -487,9 +570,11 @@ export class PerfMonitor {
   }
 
   private memorySnapshot(): PerfSnapshot['browser']['memory'] {
-    const memory = (performance as Performance & {
-      memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number };
-    }).memory;
+    const memory = (
+      performance as Performance & {
+        memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number };
+      }
+    ).memory;
     if (!memory) return null;
     const mib = 1024 * 1024;
     return {
@@ -505,14 +590,16 @@ export class PerfMonitor {
     const withAttribution = entry as PerformanceEntry & {
       attribution?: Array<Partial<DevLongTaskAttribution>>;
     };
-    const attribution = (withAttribution.attribution ?? []).slice(0, DEV_TRACE_ATTRIBUTION_LIMIT).map((a) => ({
-      name: String(a.name ?? '').slice(0, 80),
-      entryType: String(a.entryType ?? '').slice(0, 40),
-      containerType: String(a.containerType ?? '').slice(0, 40),
-      containerName: String(a.containerName ?? '').slice(0, 80),
-      containerId: String(a.containerId ?? '').slice(0, 80),
-      containerSrc: String(a.containerSrc ?? '').slice(0, 160),
-    }));
+    const attribution = (withAttribution.attribution ?? [])
+      .slice(0, DEV_TRACE_ATTRIBUTION_LIMIT)
+      .map((a) => ({
+        name: String(a.name ?? '').slice(0, 80),
+        entryType: String(a.entryType ?? '').slice(0, 40),
+        containerType: String(a.containerType ?? '').slice(0, 40),
+        containerName: String(a.containerName ?? '').slice(0, 80),
+        containerId: String(a.containerId ?? '').slice(0, 80),
+        containerSrc: String(a.containerSrc ?? '').slice(0, 160),
+      }));
     const startMs = Math.max(0, entry.startTime - this.startedAt);
     this.devLongTasks.push({
       startMs: round(startMs),
@@ -542,9 +629,10 @@ export class PerfMonitor {
         }
       }
       for (const span of this.devTraceSpans) {
-        const delta = taskMid >= span.startMs && taskMid <= span.endMs
-          ? 0
-          : Math.min(Math.abs(taskMid - span.startMs), Math.abs(taskMid - span.endMs));
+        const delta =
+          taskMid >= span.startMs && taskMid <= span.endMs
+            ? 0
+            : Math.min(Math.abs(taskMid - span.startMs), Math.abs(taskMid - span.endMs));
         if (delta < nearestSpanDelta) {
           nearestSpan = span;
           nearestSpanDelta = delta;
@@ -552,28 +640,28 @@ export class PerfMonitor {
       }
       return nearest
         ? {
-          ...task,
-          nearestFrameAtMs: nearest.atMs,
-          nearestFrameMs: nearest.frameMs,
-          nearestFrameDeltaMs: round(nearestDelta),
-          ...(nearestSpan
-            ? {
-              nearestSpanName: nearestSpan.name,
-              nearestSpanMs: nearestSpan.durationMs,
-              nearestSpanDeltaMs: round(nearestSpanDelta),
-            }
-            : {}),
-        }
+            ...task,
+            nearestFrameAtMs: nearest.atMs,
+            nearestFrameMs: nearest.frameMs,
+            nearestFrameDeltaMs: round(nearestDelta),
+            ...(nearestSpan
+              ? {
+                  nearestSpanName: nearestSpan.name,
+                  nearestSpanMs: nearestSpan.durationMs,
+                  nearestSpanDeltaMs: round(nearestSpanDelta),
+                }
+              : {}),
+          }
         : {
-          ...task,
-          ...(nearestSpan
-            ? {
-              nearestSpanName: nearestSpan.name,
-              nearestSpanMs: nearestSpan.durationMs,
-              nearestSpanDeltaMs: round(nearestSpanDelta),
-            }
-            : {}),
-        };
+            ...task,
+            ...(nearestSpan
+              ? {
+                  nearestSpanName: nearestSpan.name,
+                  nearestSpanMs: nearestSpan.durationMs,
+                  nearestSpanDeltaMs: round(nearestSpanDelta),
+                }
+              : {}),
+          };
     });
   }
 
@@ -585,7 +673,14 @@ export class PerfMonitor {
     const rendererSubmit = rendererFrame?.phaseMs.submit ?? 0;
     const rendererWorld = rendererFrame?.phaseMs.world ?? 0;
     const rendererEntities = rendererFrame?.phaseMs.entities ?? 0;
-    const scoreMs = Math.max(this.lastFrameMs, bucketMax, rendererTotal, rendererSubmit, rendererWorld, rendererEntities);
+    const scoreMs = Math.max(
+      this.lastFrameMs,
+      bucketMax,
+      rendererTotal,
+      rendererSubmit,
+      rendererWorld,
+      rendererEntities,
+    );
     const reasons: string[] = [];
     if (this.lastFrameMs >= DEV_TRACE_MIN_FRAME_MS) reasons.push('frame-gap');
     if (bucketMax >= DEV_TRACE_MIN_FRAME_MS) reasons.push('main-bucket');
@@ -597,35 +692,36 @@ export class PerfMonitor {
     const memory = this.memorySnapshot();
     const devRendererFrame = rendererFrame
       ? (() => {
-        const { renderDiagnostics: _renderDiagnostics, ...frame } = rendererFrame;
-        return frame;
-      })()
+          const { renderDiagnostics: _renderDiagnostics, ...frame } = rendererFrame;
+          return frame;
+        })()
       : null;
-    const stallAttribution = renderer && rendererFrame
-      ? renderStallAttribution(renderer, rendererFrame)
-      : undefined;
+    const stallAttribution =
+      renderer && rendererFrame ? renderStallAttribution(renderer, rendererFrame) : undefined;
     const frame: DevPerfTraceFrame = {
       atMs: round(now - this.startedAt),
       frameMs: round(this.lastFrameMs),
       scoreMs: round(scoreMs),
       reasons,
       mainMs: { ...this.lastBucketMs },
-      renderer: renderer ? {
-        calls: renderer.calls,
-        triangles: renderer.triangles,
-        textures: renderer.textures,
-        programs: renderer.programs,
-        views: renderer.views,
-        renderScale: renderer.renderScale,
-        effectiveRenderScale: renderer.effectiveRenderScale,
-        renderBudget: renderer.renderBudget,
-        qualityBuckets: renderer.qualityBuckets,
-        pixelRatio: renderer.pixelRatio,
-        width: renderer.width,
-        height: renderer.height,
-        foliage: renderer.foliage,
-        lastFrame: devRendererFrame,
-      } : null,
+      renderer: renderer
+        ? {
+            calls: renderer.calls,
+            triangles: renderer.triangles,
+            textures: renderer.textures,
+            programs: renderer.programs,
+            views: renderer.views,
+            renderScale: renderer.renderScale,
+            effectiveRenderScale: renderer.effectiveRenderScale,
+            renderBudget: renderer.renderBudget,
+            qualityBuckets: renderer.qualityBuckets,
+            pixelRatio: renderer.pixelRatio,
+            width: renderer.width,
+            height: renderer.height,
+            foliage: renderer.foliage,
+            lastFrame: devRendererFrame,
+          }
+        : null,
       browser: {
         longTaskCount: this.longTaskMs.length,
         longTaskTotalMs: round(this.longTaskTotalMs),
@@ -635,7 +731,9 @@ export class PerfMonitor {
       ...(stallAttribution ? { stallAttribution } : {}),
     };
     this.devTraceFrames.push(frame);
-    this.devTraceFrames.sort((a, b) => b.scoreMs - a.scoreMs || b.frameMs - a.frameMs || a.atMs - b.atMs);
+    this.devTraceFrames.sort(
+      (a, b) => b.scoreMs - a.scoreMs || b.frameMs - a.frameMs || a.atMs - b.atMs,
+    );
     if (this.devTraceFrames.length > DEV_TRACE_WORST_FRAME_LIMIT) {
       this.devTraceFrames.length = DEV_TRACE_WORST_FRAME_LIMIT;
     }
@@ -645,26 +743,44 @@ export class PerfMonitor {
     if (this.traceEnabled) this.recordDevTraceFrame(now);
     if (now - this.lastOverlayAt < 1000) return;
     this.lastOverlayAt = now;
-    this.lastSnapshot = this.snapshot(now);
+    // 1 Hz heap sample from the UNGATED tick path (ruling R10): the sawtooth
+    // rides in every fleet report, overlay on or off.
+    this.heapSawtooth.sample(now);
+    // 1 Hz worst-10s evaluation, also ungated (ruling R5): snapshot() stays a
+    // pure read of the retained window; only the reporter drains it.
+    this.worstWindow.observe(
+      this.frameWindow.entries().map((entry) => ({ at: entry.at, ms: entry.value })),
+      now,
+    );
+    // Production telemetry reports on its own 75 s / 5 min cadence. Without a
+    // visible diagnostic overlay there is nothing to ASSEMBLE every second:
+    // doing so sorted every history and copied renderer stats for no consumer.
+    // The two trackers above stay ungated: the fleet report reads them whether
+    // or not the overlay is up.
     if (!this.enabled) return;
+    this.lastSnapshot = this.snapshot(now);
     this.renderOverlay(this.lastSnapshot);
   }
 
   snapshot(now = performance.now()): PerfSnapshot {
     const seconds = Math.max(0.001, (now - this.startedAt) / 1000);
     const mainMs = Object.fromEntries(
-      (Object.keys(this.buckets) as TimedBucket[]).map((key) => [key, summarize(this.buckets[key])]),
+      (Object.keys(this.buckets) as TimedBucket[]).map((key) => [
+        key,
+        summarize(this.buckets[key].toArray()),
+      ]),
     );
     const windowSummary = (windowMs: number): PerfSnapshot['windows']['last10s'] => {
-      const samples = this.frameWindow.filter((s) => now - s.at <= windowMs);
-      const span = samples.length > 1
-        ? Math.max(0.001, (samples[samples.length - 1].at - samples[0].at) / 1000)
-        : Math.min(seconds, windowMs / 1000);
+      const samples = this.frameWindow.snapshotSince(now - windowMs);
+      const span =
+        samples.values.length > 1 && samples.firstAt !== null && samples.lastAt !== null
+          ? Math.max(0.001, (samples.lastAt - samples.firstAt) / 1000)
+          : Math.min(seconds, windowMs / 1000);
       return {
         seconds: round(Math.min(seconds, windowMs / 1000)),
-        frames: samples.length,
-        fps: round(samples.length / Math.max(0.001, span)),
-        frameMs: summarizeFrames(samples.map((s) => s.ms)),
+        frames: samples.values.length,
+        fps: round(samples.values.length / Math.max(0.001, span)),
+        frameMs: summarizeFrames(samples.values),
       };
     };
     const inputDebug = this.readInputDebug();
@@ -672,29 +788,32 @@ export class PerfMonitor {
       seconds: round(seconds),
       frames: this.frames,
       fps: round(this.frames / seconds),
-      frameMs: summarizeFrames(this.frameMs),
+      frameMs: summarizeFrames(this.frameMs.toArray()),
       windows: {
         last10s: windowSummary(10_000),
         last30s: windowSummary(30_000),
+        worst10s: this.worstWindow.current(),
       },
       mainMs: mainMs as PerfSnapshot['mainMs'],
       renderer: this.renderer?.perfStats() ?? null,
       hud: this.hud?.perfStats() ?? null,
       assets: assetTimingSnapshot(),
       network: this.network,
+      netPipeline: this.netPipelineSource?.summary() ?? null,
+      heapSawtooth: this.heapSawtooth.summary(),
       input: {
         intents: this.inputIntents,
         lastKind: this.lastInputKind,
         lastIntentAge: this.lastInputAt > 0 ? round(now - this.lastInputAt) : -1,
-        intentToFrame: summarize(this.inputToFrameMs),
-        intentToSend: summarize(this.inputToSendMs),
-        sendToEcho: summarize(this.inputToEchoMs),
-        intentToVisible: summarize(this.inputToVisibleMs),
+        intentToFrame: summarize(this.inputToFrameMs.toArray()),
+        intentToSend: summarize(this.inputToSendMs.toArray()),
+        sendToEcho: summarize(this.inputToEchoMs.toArray()),
+        intentToVisible: summarize(this.inputToVisibleMs.toArray()),
         ...(inputDebug ? { debug: inputDebug } : {}),
       },
       browser: {
         longTasks: {
-          ...summarize(this.longTaskMs),
+          ...summarize(this.longTaskMs.toArray()),
           totalMs: round(this.longTaskTotalMs),
           lastAge: this.lastLongTaskAt > 0 ? round(now - this.lastLongTaskAt) : -1,
         },
@@ -748,21 +867,24 @@ export class PerfMonitor {
   reset(): void {
     this.startedAt = performance.now();
     this.frames = 0;
-    this.frameMs = [];
-    this.frameWindow = [];
-    this.buckets = { renderer: [], hud: [], events: [], sim: [] };
+    this.frameMs.clear();
+    this.frameWindow.clear();
+    for (const samples of Object.values(this.buckets)) samples.clear();
     this.lastSnapshot = null;
+    this.netPipelineSource = null;
+    this.heapSawtooth.reset();
+    this.worstWindow.drain();
     this.inputIntents = 0;
     this.lastInputAt = 0;
     this.lastInputKind = '';
     this.pendingFrameAt = 0;
     this.pendingSendAt = 0;
     this.pendingVisibleAt = 0;
-    this.inputToFrameMs = [];
-    this.inputToSendMs = [];
-    this.inputToEchoMs = [];
-    this.inputToVisibleMs = [];
-    this.longTaskMs = [];
+    this.inputToFrameMs.clear();
+    this.inputToSendMs.clear();
+    this.inputToEchoMs.clear();
+    this.inputToVisibleMs.clear();
+    this.longTaskMs.clear();
     this.longTaskTotalMs = 0;
     this.lastLongTaskAt = 0;
     this.lastFrameMs = 0;
@@ -819,7 +941,9 @@ export class PerfMonitor {
       `assets wait ${s.assets.preload.waitMs}ms  gltf ${gltf?.count ?? 0}/${gltf?.p95Ms ?? 0}ms  hdr ${hdr?.count ?? 0}/${hdr?.p95Ms ?? 0}ms  tex ${tex?.count ?? 0}/${tex?.p95Ms ?? 0}ms`,
       `input f ${s.input.intentToFrame.p95}ms  send ${s.input.intentToSend.p95}ms  echo ${s.input.sendToEcho.p95}ms  vis ${s.input.intentToVisible.p95}ms`,
       `gl ${r?.glRenderer ? r.glRenderer.slice(0, 34) : '-'}  lost ${r?.contextLost ?? 0}`,
-      net ? `net ${net.connected ? 'up' : 'down'} snap ${net.snapInterval}ms age ${net.lastSnapAge}ms a ${net.alpha}` : 'net offline',
+      net
+        ? `net ${net.connected ? 'up' : 'down'} snap ${net.snapInterval}ms age ${net.lastSnapAge}ms a ${net.alpha}`
+        : 'net offline',
       'click: copy json',
     ].join('\n');
   }

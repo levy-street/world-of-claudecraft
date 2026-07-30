@@ -60,7 +60,7 @@ describe('syncAppViewport', () => {
     expect(props['--app-vh']).toBe('700px');
   });
 
-  it('uses window inner dimensions on the stable (touch, game-active) viewport, ignoring visualViewport', () => {
+  it('uses window inner dimensions on the stable landscape (touch, game-active) viewport', () => {
     const { win, props } = fakeWin({
       innerWidth: 1194,
       innerHeight: 905,
@@ -71,6 +71,32 @@ describe('syncAppViewport', () => {
     syncAppViewport(win as unknown as Window);
     expect(props['--app-vw']).toBe('1194px');
     expect(props['--app-vh']).toBe('905px');
+  });
+
+  it('uses the visible viewport for the portrait rotate prompt so Safari chrome does not cover it', () => {
+    const { win, props } = fakeWin({
+      innerWidth: 390,
+      innerHeight: 844,
+      visualViewport: { width: 390, height: 724 },
+      gameActive: true,
+      touch: true,
+    });
+    syncAppViewport(win as unknown as Window);
+    expect(props['--app-vw']).toBe('390px');
+    expect(props['--app-vh']).toBe('724px');
+  });
+
+  it('keeps the stable portrait game viewport while the keyboard owns the visual viewport', () => {
+    const { win, props } = fakeWin({
+      innerWidth: 390,
+      innerHeight: 844,
+      visualViewport: { width: 390, height: 420 },
+      gameActive: true,
+      touch: true,
+    });
+    syncAppViewport(win as unknown as Window);
+    expect(props['--app-vw']).toBe('390px');
+    expect(props['--app-vh']).toBe('844px');
   });
 
   it('normalizes a stale scaled visual viewport after a landscape-to-portrait rotation', () => {

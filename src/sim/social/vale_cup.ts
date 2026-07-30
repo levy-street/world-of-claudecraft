@@ -24,6 +24,7 @@ import type {
   VcMatchInfo,
   VcPhase,
   VcRosterPlayer,
+  VcSharedCupInfo,
 } from '../../world_api/vale_cup';
 import { isStunned } from '../combat/cc';
 import {
@@ -32,16 +33,18 @@ import {
   VALE_CUP_BALL_TEMPLATE_ID,
   vcNation,
 } from '../content/vale_cup';
-import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS, NPCS } from '../data';
+import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS } from '../data';
+import * as deedsMod from '../deeds';
 import { createMob, createNpc, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
-import type { PlayerMeta } from '../sim';
+import type { ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
   DT,
   dist2d,
   type Entity,
   MELEE_RANGE,
+  type NpcDef,
   type SportRole,
   type VcBracket,
   type VcNationId,
@@ -72,7 +75,13 @@ import {
   VC_SPAWNS_B,
   vcPracticeOrigin,
 } from '../vale_cup_layout';
-import { arenaCombatants } from './arena';
+import {
+  arenaCombatants,
+  cloneAbilityCharges,
+  cloneCcDr,
+  isArenaQueued,
+  snapshotArenaReturnPools,
+} from './arena';
 
 // ---------------------------------------------------------------------------
 // Tuning constants (fiesta style: all at the top).
@@ -225,6 +234,12 @@ export interface VcMatch {
   kickoffTeam: 'A' | 'B';
   kickoffGraceUntil: number; // sim.time the whistle grace ends (long boots clamp)
   returns: Map<number, { x: number; z: number; facing: number }>;
+  // Pre-match HP/resource/cooldown/CC DR pools keyed by pid, snapshotted before
+  // the sport-kit clean-slate reset and restored on teardown, so a Vale Cup
+  // match (rated or practice) can never be farmed as a free full HP/mana/
+  // cooldown restore. Mirrors ArenaMatch.preMatchPools (issue #1600); optional
+  // only for compatibility with synthetic/legacy VcMatch fixtures.
+  preMatchPools?: Map<number, ArenaReturnPools>;
   ball: VcBallState | null; // spawned at kickoff, despawned at match end
   pocket: 'west' | 'east' | null; // which net the celebrating ball settles in
   pendingWinner: 'A' | 'B' | null | undefined; // decided during 'goal' celebrate
@@ -353,14 +368,18 @@ function deserterUntil(ctx: SimContext, name: string): number {
 
 // ---------------------------------------------------------------------------
 // World init: Groundskeeper Bram at the Sowfield gate (reserved id, see above).
-// The caller (the Sim ctor) resolves `safe` through the SAME findSafePos path
-// the generic NPC surface-placement loop uses, so Bram is nudged out of water
-// or a building exactly like every other NPC; only his id allocation differs.
+// The caller (the Sim ctor) supplies both the configured world's definition and
+// a `safe` point resolved through the SAME findSafePos path the generic NPC
+// surface-placement loop uses. Bram can therefore neither leak from built-in
+// content nor spawn inside water/buildings; only his id allocation differs.
 // ---------------------------------------------------------------------------
 
-export function spawnGroundskeeper(ctx: SimContext, safe: { x: number; z: number }): void {
-  const def = NPCS.groundskeeper_bram;
-  if (!def || ctx.entities.has(VALE_CUP_BRAM_ID)) return;
+export function spawnGroundskeeper(
+  ctx: SimContext,
+  def: NpcDef,
+  safe: { x: number; z: number },
+): void {
+  if (ctx.entities.has(VALE_CUP_BRAM_ID)) return;
   const npc = createNpc(VALE_CUP_BRAM_ID, def, ctx.groundPos(safe.x, safe.z));
   ctx.addEntity(npc);
 }
@@ -419,7 +438,7 @@ export function vcupQueueJoin(
     return;
   }
   const match = ctx.vcup.match;
-  if ((match && vcupTeamOf(match, id)) || ctx.arenaMatches.has(id)) {
+  if ((match && vcupTeamOf(match, id)) || ctx.arenaMatches.has(id) || isArenaQueued(ctx, id)) {
     ctx.error(id, 'You are already in an arena match.');
     return;
   }
@@ -475,7 +494,11 @@ export function vcupQueueJoin(
       ctx.error(id, `${mMeta.name} cannot queue while dead.`);
       return;
     }
-    if ((match && vcupTeamOf(match, mPid)) || ctx.arenaMatches.has(mPid)) {
+    if (
+      (match && vcupTeamOf(match, mPid)) ||
+      ctx.arenaMatches.has(mPid) ||
+      isArenaQueued(ctx, mPid)
+    ) {
       ctx.error(id, `${mMeta.name} is already in an arena match.`);
       return;
     }
@@ -557,8 +580,10 @@ export function vcupSetRole(ctx: SimContext, role: SportRole, pid?: number): voi
   queued.unit.roles[id] = normalizeRole(role, queued.bracket);
 }
 
-// Drop units whose members died, vanished, or got seated elsewhere (arena
-// matchmaker prune pattern).
+// Drop units whose members died, vanished, got seated elsewhere, or walked
+// into a dungeon/instance while queued (arena matchmaker prune pattern,
+// issue #1600's x-band recheck: the bout would return them inside fully
+// restored otherwise).
 export function vcupPruneQueue(ctx: SimContext, bracket: VcBracket): void {
   const match = ctx.vcup.match;
   ctx.vcup.queues[bracket] = ctx.vcup.queues[bracket].filter((unit) =>
@@ -566,6 +591,7 @@ export function vcupPruneQueue(ctx: SimContext, bracket: VcBracket): void {
       const e = ctx.entities.get(id);
       if (!e || e.dead) return false;
       if (ctx.arenaMatches.has(id)) return false;
+      if (e.pos.x > DUNGEON_X_THRESHOLD) return false;
       return !(match && vcupTeamOf(match, id));
     }),
   );
@@ -719,7 +745,7 @@ export function valeCupRestore(ctx: SimContext, meta: PlayerMeta, e: Entity): vo
   meta.sportRole = null;
   meta.known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
   meta.wireRev++;
-  recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
+  recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   restorePetFromDelveStash(ctx, meta.entityId);
 }
 
@@ -828,9 +854,15 @@ export function startCupMatch(
   for (const pid of sideA.pids) sideA.roles[pid] = roles[pid];
   for (const pid of sideB.pids) sideB.roles[pid] = roles[pid];
   const returns = new Map<number, { x: number; z: number; facing: number }>();
+  // Snapshot each fighter's recovery pools NOW, before the sport-kit clean-slate
+  // reset below (valeCupStandardize -> ctx.resetForArena), so teardownCupMatch
+  // restores what they walked in with instead of a free full restore (mirrors
+  // arena.ts's startArenaMatch, issue #1600).
+  const preMatchPools = new Map<number, ArenaReturnPools>();
   for (let i = 0; i < allPids.length; i++) {
     const e = entities[i] as Entity;
     returns.set(allPids[i], { x: e.pos.x, z: e.pos.z, facing: e.facing });
+    preMatchPools.set(allPids[i], snapshotArenaReturnPools(e));
   }
   // Guild banner entries carried from the queue (rated matches only credit these;
   // bots and practice never populate a guild, so the map is empty there).
@@ -867,6 +899,7 @@ export function startCupMatch(
     kickoffTeam: 'A',
     kickoffGraceUntil: 0,
     returns,
+    preMatchPools,
     ball: null,
     pocket: null,
     pendingWinner: undefined,
@@ -1045,6 +1078,19 @@ function onGoal(ctx: SimContext, match: VcMatch, scoringTeam: 'A' | 'B'): void {
     x: c.x,
     z: c.z,
   });
+  // Deed credit mirrors the scorer banner: the scoring team's last kicker
+  // within the kick window, else its last toucher; an own goal credits nobody.
+  // Must resolve here, before resetBallToCenter wipes the attribution.
+  const ball = match.ball;
+  let scorerPid: number | null = null;
+  if (ball) {
+    if (ball.lastKickTeam === scoringTeam && ctx.time - ball.lastKickAt <= VC_SCORER_KICK_WINDOW) {
+      scorerPid = ball.lastKickPid ?? null;
+    } else if (ball.lastTouchTeam === scoringTeam) {
+      scorerPid = ball.lastTouchPid ?? null;
+    }
+  }
+  deedsMod.onCupGoalForDeeds(ctx, match, scoringTeam, scorerPid);
   // 'A' scores into the EAST goal; the ball settles in that pocket.
   match.pocket = scoringTeam === 'A' ? 'east' : 'west';
   match.kickoffTeam = scoringTeam === 'A' ? 'B' : 'A';
@@ -1103,6 +1149,8 @@ function applyStanding(ctx: SimContext, match: VcMatch, winner: 'A' | 'B' | null
         creditGuildResult(ctx, match, pid, 'loss');
       }
       match.resolved.add(pid);
+      // The standing just moved and roles/scores are final: deed credit now.
+      deedsMod.onCupStandingForDeeds(ctx, match, pid, team, winner);
     }
   }
 }
@@ -1206,6 +1254,9 @@ export function endCupMatch(ctx: SimContext, match: VcMatch, winner: 'A' | 'B' |
       pid,
     });
   }
+  // Seated fighters with a recorded personal touch see the match out; also
+  // drops the per-match deed memory.
+  deedsMod.onCupMatchEndForDeeds(ctx, match);
   match.phase = 'over';
   match.timer = VC_OVER_DELAY;
 }
@@ -1219,7 +1270,24 @@ function teardownCupMatch(ctx: SimContext, match: VcMatch): void {
     const e = ctx.entities.get(pid);
     if (!meta || !e) continue;
     valeCupRestore(ctx, meta, e);
-    ctx.resetForArena(e); // wipes sport_* cooldowns; the arena accepts the same tradeoff
+    ctx.resetForArena(e); // clean slate first: wipes sport_* cooldowns too
+    // The match is a parenthesis, not a rest stop: undo the clean-slate full
+    // restore and hand back exactly the HP, resource, cooldowns, and CC DR the
+    // fighter carried in, so a Vale Cup match (rated or practice) can never be
+    // farmed as a free heal, mana refill, or cooldown reset (mirrors arena.ts's
+    // returnFromArena, issue #1600). recalcPlayerStats already ran inside
+    // resetForArena, so maxHp/maxResource are current for the clamp.
+    const pools = match.preMatchPools?.get(pid);
+    if (pools) {
+      e.cooldowns = new Map(pools.cooldowns);
+      e.abilityCharges =
+        Object.keys(pools.abilityCharges).length > 0
+          ? cloneAbilityCharges(pools.abilityCharges)
+          : undefined;
+      e.ccDr = cloneCcDr(pools.ccDr);
+      e.hp = Math.max(0, Math.min(pools.hp, e.maxHp));
+      e.resource = Math.max(0, Math.min(pools.resource, e.maxResource));
+    }
     const ret = match.returns.get(pid);
     if (ret) {
       e.pos = ctx.groundPos(ret.x, ret.z);
@@ -1289,6 +1357,17 @@ export function vcupMatchOf(ctx: SimContext, pid: number): VcMatch | null {
   const match = ctx.vcup.match;
   if (match && vcupTeamOf(match, pid)) return match;
   return ctx.vcup.practices.find((p) => vcupTeamOf(p, pid)) ?? null;
+}
+
+// True when pid is seated in ANY live Vale Cup match (the rated Sowfield match
+// or a private practice instance) or is waiting in a Vale Cup bracket queue.
+// Consumed by social/arena.ts (via the ctx.vcupSeatedOrQueued SimContext
+// callback) to keep the Arena and Vale Cup queues mutually exclusive: a
+// player mid-match or mid-queue in one system must never be pulled into the
+// other (arena.ts never imports this module directly, unlike the reverse:
+// vcupQueueJoin above calls isArenaQueued via a direct import).
+export function vcupSeatedOrQueued(ctx: SimContext, pid: number): boolean {
+  return vcupMatchOf(ctx, pid) !== null || vcupQueuedUnitOf(ctx, pid) !== null;
 }
 
 // ---------------------------------------------------------------------------
@@ -1363,6 +1442,7 @@ export function vcupBallKick(
   ball.lastKickAt = ctx.time;
   ball.lastTouchPid = caster.id;
   ball.lastTouchTeam = team;
+  deedsMod.onCupTouchForDeeds(ctx, match, caster.id);
   writeBallEntity(ctx, ball);
 }
 
@@ -1374,6 +1454,7 @@ function gripBall(ctx: SimContext, match: VcMatch, keeper: Entity, team: 'A' | '
   if (towardOwnGoal > VC_SAVE_SHOT_SPEED) {
     const name = ctx.players.get(keeper.id)?.name ?? '';
     ctx.emit({ type: 'vcupSave', keeperName: name, x: keeper.pos.x, z: keeper.pos.z });
+    deedsMod.onCupSaveForDeeds(ctx, match, keeper.id);
   }
   ball.holderPid = keeper.id;
   ball.holdUntil = ctx.time + VC_GRIP_HOLD;
@@ -1382,6 +1463,7 @@ function gripBall(ctx: SimContext, match: VcMatch, keeper: Entity, team: 'A' | '
   ball.vz = 0;
   ball.lastTouchPid = keeper.id;
   ball.lastTouchTeam = team;
+  deedsMod.onCupTouchForDeeds(ctx, match, keeper.id);
 }
 
 export function vcupSportDash(
@@ -1549,6 +1631,7 @@ export function vcupBallPass(
   ball.lastKickAt = ctx.time;
   ball.lastTouchPid = caster.id;
   ball.lastTouchTeam = team;
+  deedsMod.onCupTouchForDeeds(ctx, match, caster.id);
   writeBallEntity(ctx, ball);
 }
 
@@ -1617,6 +1700,7 @@ export function vcupShoot(
   ball.lastKickAt = ctx.time;
   ball.lastTouchPid = caster.id;
   ball.lastTouchTeam = team;
+  deedsMod.onCupTouchForDeeds(ctx, match, caster.id);
   writeBallEntity(ctx, ball);
 }
 
@@ -1717,6 +1801,7 @@ function updateBallContacts(ctx: SimContext, match: VcMatch): void {
       ) {
         ball.lastTouchPid = pid;
         ball.lastTouchTeam = team;
+        deedsMod.onCupTouchForDeeds(ctx, match, pid);
         continue;
       }
       // Dribbling: running into the ball carries it along.
@@ -1724,6 +1809,7 @@ function updateBallContacts(ctx: SimContext, match: VcMatch): void {
         if (applyDribbleNudge(ball, e.pos.x - e.prevPos.x, e.pos.z - e.prevPos.z)) {
           ball.lastTouchPid = pid;
           ball.lastTouchTeam = team;
+          deedsMod.onCupTouchForDeeds(ctx, match, pid);
         }
       }
     }
@@ -2137,7 +2223,32 @@ function guildBoard(ctx: SimContext): { name: string; wins: number; losses: numb
   return rows.slice(0, VC_BOARD_SIZE);
 }
 
-export function cupInfoFor(ctx: SimContext, pid: number): CupInfo | null {
+// The realm-wide fragment of CupInfo (queue sizes, the live strip, the winners
+// and guild boards, who is practicing), computed once and shared across every
+// viewer in a broadcast pass. `live` is RAW (no per-viewer practice suppression;
+// cupInfoFor reapplies that). Draws no rng, reads only sim state.
+export function cupSharedInfoFor(ctx: SimContext): VcSharedCupInfo {
+  const vc = ctx.vcup;
+  // Same read order as the pre-extraction cupInfoFor (practicing, then queue
+  // sizes): both are pure, rng-free reads, so the order is cosmetic, but keeping
+  // it verbatim makes this a strict move, not a rewrite.
+  const practicing = vc.practices
+    .map((p) => ctx.players.get(p.practice?.ownerPid ?? -1)?.name ?? '')
+    .filter((n) => n.length > 0);
+  const queueSizes: Record<VcBracket, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  for (const bracket of VC_BRACKETS) {
+    queueSizes[bracket] = vc.queues[bracket].reduce((n, u) => n + u.pids.length, 0);
+  }
+  return {
+    queueSizes,
+    live: vc.match ? liveMatchInfo(vc.match) : null,
+    board: winnersBoard(ctx),
+    guildBoard: guildBoard(ctx),
+    practicing,
+  };
+}
+
+export function cupInfoFor(ctx: SimContext, pid: number, shared?: VcSharedCupInfo): CupInfo | null {
   const meta = ctx.players.get(pid);
   if (!meta) return null;
   const vc = ctx.vcup;
@@ -2150,15 +2261,10 @@ export function cupInfoFor(ctx: SimContext, pid: number): CupInfo | null {
   // `match` so every "am I playing?" gate that keys off cupInfo.match is untouched.
   const e = ctx.entities.get(pid);
   const spectate = !match && vc.match && e && isAtSowfield(e.pos.x, e.pos.z) ? vc.match : null;
-  // Names of everyone currently off in a private practice instance (the HUD shows
-  // this in the Sowfield region so walk-ups see who is practicing).
-  const practicing = vc.practices
-    .map((p) => ctx.players.get(p.practice?.ownerPid ?? -1)?.name ?? '')
-    .filter((n) => n.length > 0);
-  const queueSizes: Record<VcBracket, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-  for (const bracket of VC_BRACKETS) {
-    queueSizes[bracket] = vc.queues[bracket].reduce((n, u) => n + u.pids.length, 0);
-  }
+  // The realm-wide fields (queue sizes, live strip, boards, practicing) are the
+  // same for every viewer; take the shared fragment if the caller already built
+  // it this pass, else compute it here.
+  const s = shared ?? cupSharedInfoFor(ctx);
   const until = deserterUntil(ctx, meta.name);
   return {
     standing: { wins: meta.vcupWins, losses: meta.vcupLosses, draws: meta.vcupDraws },
@@ -2173,19 +2279,20 @@ export function cupInfoFor(ctx: SimContext, pid: number): CupInfo | null {
         ? (queued.unit.roles[pid] ?? null)
         : meta.sportRole,
     position: queued ? vcupQueuePosition(ctx, pid, queued.bracket) : 0,
-    queueSizes,
+    queueSizes: s.queueSizes,
     deserterFor: until > 0 ? Math.ceil(until - ctx.time) : 0,
     match: match ? matchInfoFor(ctx, match, pid) : null,
     spectate: spectate ? matchInfoFor(ctx, spectate, pid) : null,
     betRecord: { wins: meta.vcupBetWins, losses: meta.vcupBetLosses, net: meta.vcupBetNet },
     // The Sowfield's running match, for the persistent indicator, EXCEPT to a
     // player off in a private practice instance: they should not see the other
-    // (main) game's live strip overlaid on their own bout.
-    live: vc.match && !match?.practice ? liveMatchInfo(vc.match) : null,
-    board: winnersBoard(ctx),
-    guildBoard: guildBoard(ctx),
+    // (main) game's live strip overlaid on their own bout. The shared fragment's
+    // `live` is RAW (realm-wide); this reapplies the per-viewer suppression.
+    live: match?.practice ? null : s.live,
+    board: s.board,
+    guildBoard: s.guildBoard,
     myGuild: e?.guild || null,
     guildStanding: { wins: meta.vcupGuildWins, losses: meta.vcupGuildLosses },
-    practicing,
+    practicing: s.practicing,
   };
 }

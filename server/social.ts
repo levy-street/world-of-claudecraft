@@ -8,13 +8,16 @@
 // whoever happens to be online without knowing about sockets). game.ts wires
 // the real Postgres + socket implementations in.
 
+import type { ChatSenderFlair } from '../src/sim/account_flair';
+import type { PlayerClass } from '../src/sim/types';
+
 export type GuildRank = 'leader' | 'officer' | 'member';
 
 // Where a character is and what they're doing, for friend/guild rosters.
 // `realm` is the world/shard the character lives on (stored per character so
 // it survives logout and is ready for future cross-realm play); `zone` and
 // `status` are only meaningful while the character is online.
-export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead';
+export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead' | 'afk';
 
 export interface Presence {
   zone: string;
@@ -35,6 +38,9 @@ export interface CharInfo extends CharRef {
 }
 
 export interface FriendEntry extends CharInfo {
+  // The selected Book of Deeds title: a deed id (never display text; the
+  // client localizes through deed_i18n), null when untitled.
+  activeTitle: string | null;
   online: boolean;
   zone?: string;
   status?: PresenceStatus;
@@ -47,6 +53,8 @@ export interface GuildMemberEntry extends CharInfo {
   // ISO-8601 timestamp of the member's most recent world-entry, or null if never
   // recorded. Serialized server-side (server/social_db.ts) and shown in the roster.
   lastLogin: string | null;
+  // The selected Book of Deeds title (a deed id, null untitled), as on FriendEntry.
+  activeTitle: string | null;
   online: boolean;
   zone?: string;
   status?: PresenceStatus;
@@ -69,6 +77,10 @@ export interface GuildView {
   id: number;
   name: string;
   rank: GuildRank;
+  // The guild billboard: a short officer-set message pinned atop the Guild tab
+  // ('' when unset), with the setter's display name for attribution.
+  motd: string;
+  motdSetBy: string;
   members: GuildMemberEntry[];
   events: GuildEventRow[];
 }
@@ -76,6 +88,7 @@ export interface GuildView {
 export interface SocialSnapshot {
   friends: FriendEntry[];
   blocks: CharRef[];
+  ignores: CharRef[];
   guild: GuildView | null;
 }
 
@@ -87,13 +100,20 @@ export interface SocialDb {
   // friends (one-directional, classic style: no acceptance needed)
   addFriend(charId: number, friendId: number): Promise<void>;
   removeFriend(charId: number, friendId: number): Promise<void>;
-  listFriends(charId: number): Promise<CharInfo[]>;
+  // activeTitle is the friend's selected Book of Deeds title (a deed id the
+  // client localizes, never English; the charactersForDeedsBoard read shape).
+  listFriends(charId: number): Promise<(CharInfo & { activeTitle: string | null })[]>;
   whoFriended(charId: number): Promise<number[]>; // reverse lookup
   // blocks (one-directional ignore)
   addBlock(charId: number, blockedId: number): Promise<void>;
   removeBlock(charId: number, blockedId: number): Promise<void>;
   listBlocks(charId: number): Promise<CharRef[]>;
   blockedIds(charId: number): Promise<number[]>;
+  // ignores (one-directional, chat-only; may coexist with a friendship)
+  addIgnore(charId: number, ignoredId: number): Promise<void>;
+  removeIgnore(charId: number, ignoredId: number): Promise<void>;
+  listIgnores(charId: number): Promise<CharRef[]>;
+  ignoredIds(charId: number): Promise<number[]>;
   // guilds (a character belongs to at most one)
   // create the guild and seat its leader in one transaction, so a racing or
   // duplicate create packet can never orphan a leaderless guild
@@ -116,7 +136,12 @@ export interface SocialDb {
   setGuildRank(charId: number, rank: GuildRank): Promise<void>;
   guildMembers(
     guildId: number,
-  ): Promise<(CharInfo & { rank: GuildRank; lastLogin: string | null })[]>;
+  ): Promise<
+    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  >;
+  // guild billboard (motd): the officer-set message + setter name on the guilds row
+  setGuildMotd(guildId: number, motd: string, setBy: string): Promise<void>;
+  guildMotd(guildId: number): Promise<{ motd: string; motdSetBy: string }>;
   // guild calendar events (the event calendar's guild lane)
   guildEvents(guildId: number, fromDay: string): Promise<GuildEventRow[]>;
   guildEventCount(guildId: number, fromDay: string): Promise<number>;
@@ -135,6 +160,16 @@ export interface SocialDb {
 export interface SocialActor {
   characterId: number;
   name: string;
+  // The actor's selected Book of Deeds title (a deed id, never display text),
+  // read from the LIVE sim meta by the caller (game.ts actorFor). Absent when
+  // the actor has no live meta or no title: an untitled relay line beats a
+  // stale db read. SocialService itself stays sim-ignorant.
+  activeTitle?: string | null;
+  // The actor's class, read from the LIVE sim meta the same way activeTitle
+  // is: guild/officer chat has no live entity for most recipients (guildmates
+  // are frequently far outside interest scope), so the class rides the relay
+  // event exactly like the title rather than being looked up client-side.
+  cls?: PlayerClass;
 }
 
 // Presence + delivery, provided by game.ts. Keeps this module ignorant of
@@ -152,19 +187,65 @@ export interface SocialTransport {
   pushSnapshot(characterId: number): void;
   // a character's block set changed; refresh the in-memory chat filter
   onBlocksChanged(characterId: number, blockedIds: number[]): void;
-  // true if `recipientId` has `senderCharacterId` on their ignore list, so
+  // a character's ignore set changed; refresh the in-memory chat filter
+  onIgnoresChanged(characterId: number, ignoredIds: number[]): void;
+  // the character just FOUNDED a guild (create committed, never a join or a
+  // refused create): the transport owner credits the founder's deed stat
+  // (guildsFounded is the one server-produced DeedStatKey; see its doc in
+  // src/sim/types.ts)
+  onGuildFounded(characterId: number): void;
+  // true if `recipientId` has `senderCharacterId` on their BLOCK list, so
   // guild/officer chat can honour the same filter say/whisper already apply
-  isIgnoring(recipientId: number, senderCharacterId: number): boolean;
+  isBlocking(recipientId: number, senderCharacterId: number): boolean;
+  // true once `characterId`'s persisted block list has finished loading into
+  // the live session (or the character is offline, where there is nothing to
+  // load and no live presence to leak). While a just-joined character's block
+  // list is still loading, isBlocking() above answers false for them the same
+  // way an unset Set would, so a caller that skips this check can briefly
+  // disclose presence across a block the target already placed. Mirrors the
+  // canShowInWho fail-closed guard (server/game.ts) for the presence() /
+  // announcePresence() paths in this file.
+  blockListLoaded(characterId: number): boolean;
+  // true if `recipientId` has `senderCharacterId` on their IGNORE list. Guild and
+  // officer chat fan out through deliver() and never pass the routeEvents chat
+  // filter, so they must consult the ignore list here, exactly as for blocks.
+  isIgnoringChat(recipientId: number, senderCharacterId: number): boolean;
+  // The sender's operator-set account flair (AI mark + streamer links), or undefined
+  // for an ordinary player. For the SAME reason as isIgnoringChat above: guild and
+  // officer chat never pass through routeEvents (which attaches flair to every other
+  // chat channel), so without this a guild line from a streamer would arrive bare.
+  chatFlairFor(senderCharacterId: number): ChatSenderFlair | undefined;
 }
 
 export type SocialEvent =
   | { type: 'log'; text: string; color?: string }
   | { type: 'error'; text: string }
-  | { type: 'chat'; from: string; text: string; channel: 'guild' | 'officer' }
+  // `flair` mirrors the SimEvent chat variant (src/sim/types.ts): the SENDER's
+  // account flair, attached at fan-out and absent for an ordinary player.
+  // fromTitle mirrors the sim chat event's optional field (a deed id the
+  // client localizes through deed_i18n, never display text); omitted for an
+  // untitled sender.
+  // classId mirrors the sim chat event's optional field the same way: the
+  // sender's class, absent only when the actor has no live meta.
+  | {
+      type: 'chat';
+      from: string;
+      fromTitle?: string;
+      text: string;
+      channel: 'guild' | 'officer';
+      flair?: ChatSenderFlair;
+      classId?: PlayerClass;
+    }
   | { type: 'guildInvite'; fromName: string; guildName: string }
   // Structured guild-calendar outcome; the client renders the visible line
   // from the code (the sim's mailResult convention, so no server English here).
-  | { type: 'calendarResult'; code: CalendarResultCode };
+  | { type: 'calendarResult'; code: CalendarResultCode }
+  // Structured guild-billboard outcome, same convention as calendarResult.
+  | { type: 'motdResult'; code: MotdResultCode }
+  // A guildmate's or followed friend's marquee deed unlock. Carries the deed
+  // ID only, never English (the client composes the line from deed_i18n plus
+  // its own chrome key, the calendarResult convention).
+  | { type: 'deedBroadcast'; characterName: string; deedId: string };
 
 export type CalendarResultCode =
   | 'created'
@@ -175,11 +256,18 @@ export type CalendarResultCode =
   | 'calendarFull'
   | 'eventGone';
 
+// Guild billboard command outcomes ('set' is the success; the rest refusals).
+export type MotdResultCode = 'set' | 'notInGuild' | 'notOfficer';
+
 const FRIEND_LIMIT = 50;
 const BLOCK_LIMIT = 50;
+const IGNORE_LIMIT = 50;
 const GUILD_MEMBER_LIMIT = 100;
 const GUILD_INVITE_TTL_MS = 60_000;
 const GUILD_MESSAGE_MAX = 200;
+// Guild billboard: the officer-set message pinned atop the Guild tab.
+// Server-clamped; '' clears the billboard.
+export const GUILD_MOTD_MAX = 240;
 // Guild calendar: caps + input bounds. Events are UTC-day keyed ('YYYY-MM-DD',
 // matching the sim's utcDay convention) and may be booked up to a year out.
 const GUILD_EVENT_LIMIT = 25; // upcoming events per guild
@@ -239,46 +327,69 @@ export class SocialService {
   // -------------------------------------------------------------------------
 
   async snapshot(charId: number): Promise<SocialSnapshot> {
-    const [friends, blocks, membership] = await Promise.all([
+    const [friends, blocks, ignores, membership] = await Promise.all([
       this.db.listFriends(charId),
       this.db.listBlocks(charId),
+      this.db.listIgnores(charId),
       this.db.guildMembership(charId),
     ]);
+    const blockedByViewer = new Set(blocks.map((b) => b.id));
     let guild: GuildView | null = null;
     if (membership) {
       const fromDay = shiftDay(this.todayIso(), -GUILD_EVENT_KEEP_PAST_DAYS);
-      const [members, events] = await Promise.all([
+      const [members, events, motd] = await Promise.all([
         this.db.guildMembers(membership.guildId),
         this.db.guildEvents(membership.guildId, fromDay),
+        this.db.guildMotd(membership.guildId),
       ]);
       guild = {
         id: membership.guildId,
         name: membership.guildName,
         rank: membership.rank,
+        motd: motd.motd,
+        motdSetBy: motd.motdSetBy,
         members: members
-          .map((m) => ({ ...m, ...this.presence(m.id) }))
+          .map((m) => ({ ...m, ...this.presence(charId, m.id, blockedByViewer) }))
           .sort((a, b) => rankOrder(a.rank) - rankOrder(b.rank) || a.name.localeCompare(b.name)),
         events,
       };
     }
     return {
       friends: friends
-        .map((f) => ({ ...f, ...this.presence(f.id) }))
+        .map((f) => ({ ...f, ...this.presence(charId, f.id, blockedByViewer) }))
         .sort((a, b) => Number(b.online) - Number(a.online) || a.name.localeCompare(b.name)),
       blocks,
+      ignores,
       guild,
     };
   }
 
   // Collapse a character's online presence into the fields a roster row needs.
-  private presence(charId: number): {
+  // A friend or guild edge can survive a block on either side (blockAdd only
+  // ever cleans the blocker's OWN outgoing friend edge, and never touches guild
+  // membership at all), so this hides live position and online status the same
+  // way canShowInWho already hides /who visibility: bidirectionally, and
+  // regardless of which side added the other or blocked the other.
+  private presence(
+    viewerCharId: number,
+    otherCharId: number,
+    viewerBlockedIds: Set<number>,
+  ): {
     online: boolean;
     zone?: string;
     status?: PresenceStatus;
     x?: number;
     z?: number;
   } {
-    const loc = this.tx.locationOf(charId);
+    if (
+      otherCharId !== viewerCharId &&
+      (viewerBlockedIds.has(otherCharId) ||
+        !this.tx.blockListLoaded(otherCharId) ||
+        this.tx.isBlocking(otherCharId, viewerCharId))
+    ) {
+      return { online: false };
+    }
+    const loc = this.tx.locationOf(otherCharId);
     return loc
       ? { online: true, zone: loc.zone, status: loc.status, x: loc.x, z: loc.z }
       : { online: false };
@@ -330,13 +441,28 @@ export class SocialService {
     if (blocks.some((b) => b.id === target.id)) {
       this.err(
         actor.characterId,
-        `You are ignoring ${target.name}. Remove them from your ignore list first.`,
+        `You are blocking ${target.name}. Remove them from your block list first.`,
       );
       return;
     }
     const friends = await this.db.listFriends(actor.characterId);
     if (friends.some((f) => f.id === target.id)) {
       this.err(actor.characterId, `${target.name} is already your friend.`);
+      return;
+    }
+    // A block is meant to be mutual (canShowInWho, broadcastDeedUnlock, and
+    // guildInvite all enforce it both ways): if the TARGET has blocked the
+    // actor, refuse the add too, or a blocked stalker could re-add the person
+    // who blocked them and keep live-tracking their position and online
+    // status through the one-directional friend list. The target may be
+    // offline, so this reads the DB rather than the live session set. This
+    // check runs AFTER the "already your friend" check above so re-running
+    // `/friend add` on an existing friend edge always answers the same way,
+    // even once the target blocks the actor: keeping the reply stable there
+    // avoids handing a blocker-detection oracle to an already-added friend.
+    const targetBlockedIds = await this.db.blockedIds(target.id);
+    if (targetBlockedIds.includes(actor.characterId)) {
+      this.err(actor.characterId, `You cannot add ${target.name} as a friend.`);
       return;
     }
     if (friends.length >= FRIEND_LIMIT) {
@@ -365,12 +491,31 @@ export class SocialService {
   }
 
   // Called by game.ts when a character logs in/out, so friends watching them
-  // see a come-online / go-offline notice (and refresh their panel).
+  // see a come-online / go-offline notice (and refresh their panel). Filtered
+  // bidirectionally by block, the same as broadcastDeedUnlock: a friend-of-me
+  // or guild edge on the OTHER side survives a block (blockAdd only cleans the
+  // blocker's own outgoing friend edge, never guild membership), so without
+  // this a blocked stalker (or someone the actor blocked) would keep hearing
+  // the actor's login/logout and getting their panel refreshed with the
+  // actor's live position.
   async announcePresence(actor: SocialActor, online: boolean): Promise<void> {
-    const watchers = await this.db.whoFriended(actor.characterId);
+    const [watchers, actorBlockedIds] = await Promise.all([
+      this.db.whoFriended(actor.characterId),
+      this.db.blockedIds(actor.characterId),
+    ]);
+    const actorBlocked = new Set(actorBlockedIds);
+    // Fail closed the same way presence() does: while otherId's own block
+    // list is still loading (a just-joined watcher or guildmate), we cannot
+    // yet tell whether they blocked the actor, so treat that as a block
+    // rather than deliver the notice or refresh their panel.
+    const blockedPair = (otherId: number): boolean =>
+      actorBlocked.has(otherId) ||
+      !this.tx.blockListLoaded(otherId) ||
+      this.tx.isBlocking(otherId, actor.characterId);
     const notified = new Set<number>();
     for (const watcherId of watchers) {
       if (!this.tx.isOnline(watcherId)) continue;
+      if (blockedPair(watcherId)) continue;
       this.tx.deliver(watcherId, [
         {
           type: 'log',
@@ -389,6 +534,7 @@ export class SocialService {
       const members = await this.db.guildMembers(membership.guildId);
       for (const m of members) {
         if (m.id === actor.characterId || notified.has(m.id) || !this.tx.isOnline(m.id)) continue;
+        if (blockedPair(m.id)) continue;
         this.push(m.id);
         notified.add(m.id);
       }
@@ -403,41 +549,121 @@ export class SocialService {
     const target = await this.resolveTarget(actor, name);
     if (!target) return;
     if (target.id === actor.characterId) {
-      this.err(actor.characterId, 'You cannot ignore yourself.');
+      this.err(actor.characterId, 'You cannot block yourself.');
       return;
     }
     const blocks = await this.db.listBlocks(actor.characterId);
     if (blocks.some((b) => b.id === target.id)) {
-      this.err(actor.characterId, `${target.name} is already ignored.`);
+      this.err(actor.characterId, `${target.name} is already blocked.`);
       return;
     }
     if (blocks.length >= BLOCK_LIMIT) {
-      this.err(actor.characterId, 'Your ignore list is full.');
+      this.err(actor.characterId, 'Your block list is full.');
       return;
     }
     await this.db.addBlock(actor.characterId, target.id);
-    // ignoring someone also drops them from your friends list
+    // blocking someone also drops them from your friends list
     await this.db.removeFriend(actor.characterId, target.id);
-    this.info(actor.characterId, `${target.name} is now ignored.`);
+    this.info(actor.characterId, `${target.name} is now blocked.`);
     this.tx.onBlocksChanged(actor.characterId, await this.db.blockedIds(actor.characterId));
     this.push(actor.characterId);
+    // The target's own panel must lose the actor's presence too, or it stays
+    // frozen "online" on their side for the rest of the session (#2437).
+    this.push(target.id);
   }
 
   async blockRemove(actor: SocialActor, name: string): Promise<void> {
     const target = await this.db.findCharacterByName(String(name ?? '').trim());
     if (!target) {
-      this.err(actor.characterId, `No character named '${name}' on your ignore list.`);
+      this.err(actor.characterId, `No character named '${name}' on your block list.`);
       return;
     }
     const blocks = await this.db.listBlocks(actor.characterId);
     if (!blocks.some((b) => b.id === target.id)) {
-      this.err(actor.characterId, `${target.name} is not on your ignore list.`);
+      this.err(actor.characterId, `${target.name} is not on your block list.`);
       return;
     }
     await this.db.removeBlock(actor.characterId, target.id);
-    this.info(actor.characterId, `${target.name} is no longer ignored.`);
+    this.info(actor.characterId, `${target.name} is no longer blocked.`);
     this.tx.onBlocksChanged(actor.characterId, await this.db.blockedIds(actor.characterId));
     this.push(actor.characterId);
+    this.push(target.id);
+  }
+
+  // "/blocklist": echo the blocked names back to the actor.
+  async blockList(actor: SocialActor): Promise<void> {
+    const blocks = await this.db.listBlocks(actor.characterId);
+    if (blocks.length === 0) {
+      this.info(actor.characterId, 'Your block list is empty.');
+      return;
+    }
+    this.info(
+      actor.characterId,
+      `Blocked (${blocks.length}): ${blocks.map((b) => b.name).join(', ')}`,
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // Ignores (chat-only). A block is the heavy tool: it also drops invites, mail,
+  // whispers, and /who visibility. An ignore only hides their public chat from
+  // you, so unlike a block it deliberately does NOT evict them from your friends
+  // list: ignoring a chatty friend is a normal thing to want.
+  //
+  // NOT called a "mute": a mute in this game is the ADMIN account silence
+  // (/mute "<name>" <minutes>, accounts.chat_muted_until), which is a staff
+  // moderation action against a player, not a player's own preference.
+  // -------------------------------------------------------------------------
+
+  async ignoreAdd(actor: SocialActor, name: string): Promise<void> {
+    const target = await this.resolveTarget(actor, name);
+    if (!target) return;
+    if (target.id === actor.characterId) {
+      this.err(actor.characterId, 'You cannot ignore yourself.');
+      return;
+    }
+    const ignores = await this.db.listIgnores(actor.characterId);
+    if (ignores.some((i) => i.id === target.id)) {
+      this.err(actor.characterId, `${target.name} is already ignored.`);
+      return;
+    }
+    if (ignores.length >= IGNORE_LIMIT) {
+      this.err(actor.characterId, 'Your ignore list is full.');
+      return;
+    }
+    await this.db.addIgnore(actor.characterId, target.id);
+    this.info(actor.characterId, `${target.name} is now ignored.`);
+    this.tx.onIgnoresChanged(actor.characterId, await this.db.ignoredIds(actor.characterId));
+    this.push(actor.characterId);
+  }
+
+  async ignoreRemove(actor: SocialActor, name: string): Promise<void> {
+    const target = await this.db.findCharacterByName(String(name ?? '').trim());
+    if (!target) {
+      this.err(actor.characterId, `No character named '${name}' on your ignore list.`);
+      return;
+    }
+    const ignores = await this.db.listIgnores(actor.characterId);
+    if (!ignores.some((i) => i.id === target.id)) {
+      this.err(actor.characterId, `${target.name} is not on your ignore list.`);
+      return;
+    }
+    await this.db.removeIgnore(actor.characterId, target.id);
+    this.info(actor.characterId, `${target.name} is no longer ignored.`);
+    this.tx.onIgnoresChanged(actor.characterId, await this.db.ignoredIds(actor.characterId));
+    this.push(actor.characterId);
+  }
+
+  // "/ignorelist": echo the ignored names back to the actor as a chat readout.
+  async ignoreList(actor: SocialActor): Promise<void> {
+    const ignores = await this.db.listIgnores(actor.characterId);
+    if (ignores.length === 0) {
+      this.info(actor.characterId, 'Your ignore list is empty.');
+      return;
+    }
+    this.info(
+      actor.characterId,
+      `Ignored (${ignores.length}): ${ignores.map((i) => i.name).join(', ')}`,
+    );
   }
 
   // -------------------------------------------------------------------------
@@ -460,6 +686,10 @@ export class SocialService {
       );
       return;
     }
+    // Founder credit rides the transport seam: soc_guild_founded reads the
+    // guildsFounded deed stat, which only this success arm may ever produce
+    // (a refused create above must never reach it).
+    this.tx.onGuildFounded(actor.characterId);
     this.info(
       actor.characterId,
       `You found the guild <${name}>! You are its Guild Master.`,
@@ -506,7 +736,7 @@ export class SocialService {
     // From the inviter's side this is indistinguishable from an ordinary
     // decline (guildDecline is silent): the usual confirmation, then nothing.
     // No pending state is created, so other guilds can still invite the target.
-    if (this.tx.isIgnoring(target.id, actor.characterId)) {
+    if (this.tx.isBlocking(target.id, actor.characterId)) {
       this.info(actor.characterId, `You have invited ${target.name} to the guild.`);
       return;
     }
@@ -740,16 +970,62 @@ export class SocialService {
       this.err(actor.characterId, 'You are not in a guild.');
       return false;
     }
-    const event: SocialEvent = { type: 'chat', from: actor.name, text, channel: 'guild' };
+    // Built once for the whole fan-out, title and flair included: both belong to the
+    // sender, not the recipient, so they are identical for every member who receives
+    // the line.
+    const event: SocialEvent = {
+      type: 'chat',
+      from: actor.name,
+      ...(actor.activeTitle ? { fromTitle: actor.activeTitle } : {}),
+      ...(actor.cls ? { classId: actor.cls } : {}),
+      text,
+      channel: 'guild',
+      flair: this.tx.chatFlairFor(actor.characterId),
+    };
     const members = await this.db.guildMembers(membership.guildId);
     for (const m of members) {
       if (!this.tx.isOnline(m.id)) continue;
-      // a player who ignores the speaker does not see their guild chat (the
-      // speaker always sees their own line); mirrors say/whisper filtering
-      if (m.id !== actor.characterId && this.tx.isIgnoring(m.id, actor.characterId)) continue;
+      // a player who blocks or ignores the speaker does not see their guild chat
+      // (the speaker always sees their own line); mirrors say/whisper filtering.
+      // Guild chat never passes through routeEvents, so the ignore check has to
+      // happen here or ignoring a guildmate would do nothing in this channel.
+      if (m.id !== actor.characterId && this.tx.isBlocking(m.id, actor.characterId)) continue;
+      if (m.id !== actor.characterId && this.tx.isIgnoringChat(m.id, actor.characterId)) continue;
       this.tx.deliver(m.id, [event]);
     }
     return true;
+  }
+
+  // Fan one marquee deed unlock out to the earner's online guildmates and the
+  // players who friended the earner (friends are one-directional: whoever put
+  // the earner on THEIR list chose to follow them, the position-push rule).
+  // Pure delivery: the caller (game.ts) has already applied the marquee bar,
+  // the retro gate, and the earner's opt-out; this resolves the audience and
+  // filters it BIDIRECTIONALLY: each recipient's block list is honoured like
+  // guild chat (a deed unlock is not chat, so the lighter chat-only ignore does
+  // not hide it), and the earner's own block list also excludes a recipient
+  // (blockAdd only unfriends the earner's edge, so a blocked follower would
+  // otherwise stay in whoFriended and keep hearing these). The earner never
+  // receives it (their own toast is client-side from the sim event).
+  async broadcastDeedUnlock(actor: SocialActor, deedId: string): Promise<void> {
+    const event: SocialEvent = { type: 'deedBroadcast', characterName: actor.name, deedId };
+    const [membership, followerIds, earnerBlockedIds] = await Promise.all([
+      this.db.guildMembership(actor.characterId),
+      this.db.whoFriended(actor.characterId),
+      this.db.blockedIds(actor.characterId),
+    ]);
+    const earnerBlocked = new Set(earnerBlockedIds);
+    const audience = new Set<number>(followerIds);
+    if (membership) {
+      for (const m of await this.db.guildMembers(membership.guildId)) audience.add(m.id);
+    }
+    for (const id of audience) {
+      if (id === actor.characterId) continue;
+      if (!this.tx.isOnline(id)) continue;
+      if (this.tx.isBlocking(id, actor.characterId)) continue;
+      if (earnerBlocked.has(id)) continue;
+      this.tx.deliver(id, [event]);
+    }
   }
 
   // Officer chat (/o): officers + Guild Master only, delivered to the same.
@@ -767,12 +1043,22 @@ export class SocialService {
       this.err(actor.characterId, 'Only officers and the Guild Master can use officer chat.');
       return false;
     }
+    const event: SocialEvent = {
+      type: 'chat',
+      from: actor.name,
+      ...(actor.activeTitle ? { fromTitle: actor.activeTitle } : {}),
+      ...(actor.cls ? { classId: actor.cls } : {}),
+      text,
+      channel: 'officer',
+      flair: this.tx.chatFlairFor(actor.characterId),
+    };
     const members = await this.db.guildMembers(membership.guildId);
     for (const m of members) {
       if ((m.rank === 'officer' || m.rank === 'leader') && this.tx.isOnline(m.id)) {
-        // honour the recipient's ignore list, just like guild/say/whisper
-        if (m.id !== actor.characterId && this.tx.isIgnoring(m.id, actor.characterId)) continue;
-        this.tx.deliver(m.id, [{ type: 'chat', from: actor.name, text, channel: 'officer' }]);
+        // honour the recipient's block and ignore lists, just like guild/say/whisper
+        if (m.id !== actor.characterId && this.tx.isBlocking(m.id, actor.characterId)) continue;
+        if (m.id !== actor.characterId && this.tx.isIgnoringChat(m.id, actor.characterId)) continue;
+        this.tx.deliver(m.id, [event]);
       }
     }
     return true;
@@ -831,6 +1117,40 @@ export class SocialService {
     }
     await this.db.createGuildEvent(membership.guildId, actor.characterId, day, hour, title, note);
     this.calendarResult(actor.characterId, 'created');
+    await this.pushGuild(membership.guildId);
+  }
+
+  // -------------------------------------------------------------------------
+  // Guild billboard (motd)
+  // -------------------------------------------------------------------------
+
+  private motdResult(charId: number, code: MotdResultCode): void {
+    this.tx.deliver(charId, [{ type: 'motdResult', code }]);
+  }
+
+  // Set (or clear, with '') the guild billboard. Officers + the Guild Master
+  // only; the text is server-clamped and the wire layer has already run the
+  // mute/rate/content gates (game.ts, the guild_event_create stack).
+  async guildSetMotd(actor: SocialActor, rawText: string): Promise<void> {
+    const membership = await this.db.guildMembership(actor.characterId);
+    if (!membership) {
+      this.motdResult(actor.characterId, 'notInGuild');
+      return;
+    }
+    if (membership.rank === 'member') {
+      this.motdResult(actor.characterId, 'notOfficer');
+      return;
+    }
+    let text = String(rawText ?? '')
+      .trim()
+      .slice(0, GUILD_MOTD_MAX);
+    // The clamp slices UTF-16 code units, so a boundary landing inside a
+    // surrogate pair (emoji-class codepoint) would store a lone surrogate that
+    // pg encodes as U+FFFD; drop the orphaned half instead.
+    const last = text.charCodeAt(text.length - 1);
+    if (last >= 0xd800 && last <= 0xdbff) text = text.slice(0, -1);
+    await this.db.setGuildMotd(membership.guildId, text, text === '' ? '' : actor.name);
+    this.motdResult(actor.characterId, 'set');
     await this.pushGuild(membership.guildId);
   }
 

@@ -8,13 +8,13 @@
     "multi-player PlayerMeta sampling",
     "classes:warrior,mage"
   ],
-  "draws": 482,
-  "drawDigest": "b4688c48",
+  "draws": 939,
+  "drawDigest": "af8b96e6",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
+      "nextId": 820,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 409,
-      "state": "046541fa",
-      "events": "34e5f386",
+      "nextId": 822,
+      "state": "9884b754",
+      "events": "a3f9939c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,56 +39,56 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 409,
-      "state": "e9cf469a",
-      "events": "723b7bd0",
+      "nextId": 822,
+      "state": "32baf887",
+      "events": "2c039fe2",
       "rng": {
-        "draws": 34,
-        "digest": "a750ddeb"
+        "draws": 70,
+        "digest": "398ef7f5"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 409,
-      "state": "d5c30712",
-      "events": "ad51fec8",
+      "nextId": 822,
+      "state": "0715ea0b",
+      "events": "7155ff1e",
       "rng": {
-        "draws": 134,
-        "digest": "e12cceee"
+        "draws": 286,
+        "digest": "deb1f4c6"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 409,
-      "state": "cb355a12",
-      "events": "7b4d7618",
+      "nextId": 822,
+      "state": "7ba989c8",
+      "events": "8ffa842a",
       "rng": {
-        "draws": 254,
-        "digest": "07655741"
+        "draws": 521,
+        "digest": "6dce0318"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 409,
-      "state": "36df64d5",
-      "events": "2ecf8121",
+      "nextId": 822,
+      "state": "255f613d",
+      "events": "9385e914",
       "rng": {
-        "draws": 384,
-        "digest": "9a9a7293"
+        "draws": 766,
+        "digest": "ccf3476c"
       }
     },
     {
       "tick": 142,
       "time": 7.1,
-      "nextId": 409,
-      "state": "941ec9ad",
+      "nextId": 822,
+      "state": "6236b24a",
       "events": "741638a5",
       "rng": {
-        "draws": 482,
-        "digest": "b4688c48"
+        "draws": 939,
+        "digest": "af8b96e6"
       },
       "label": "final",
       "players": [
@@ -110,26 +110,60 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 54
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "pvp_arena_first_match",
+              ""
+            ],
+            [
+              "pvp_arena_first_win",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 25,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "totalWins": 1,
+            "winsByOpponent": {
+              "1v1:[\"name:bet\"]": 1
+            }
+          },
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeHonor": 25,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 15,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -153,13 +187,36 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "deaths": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_fall",
+              ""
+            ],
+            [
+              "pvp_arena_first_match",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 821,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -174,9 +231,10 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 10,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -185,26 +243,40 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.95,
+              "school": "physical",
+              "sourceId": 820
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 101.05,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fiveSecondRule": 106.1,
-          "hp": 90,
-          "id": 407,
+          "hp": 100,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 90,
+          "maxHp": 100,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 9600,
-            "z": -1264
+            "x": 103600,
+            "z": -1148
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -216,10 +288,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -240,7 +312,7 @@
           "dodgeChance": 0.056,
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
-          "id": 408,
+          "id": 821,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -251,8 +323,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 9600,
-            "z": -1232
+            "x": 103600,
+            "z": -1108
           },
           "potionCooldownUntil": -1,
           "resource": 195,

@@ -1,4 +1,4 @@
-import { closeSync, existsSync, openSync, readdirSync, readSync } from 'node:fs';
+import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -60,6 +60,37 @@ const webpFiles = (): string[] =>
 describe('class ability webp icons', () => {
   it('has image-backed ability ids wired (guards the fixture)', () => {
     expect(ABILITY_IMAGE_IDS.size).toBeGreaterThan(0);
+  });
+
+  it('uses the owner-provided Fireball Form and Counterspell artwork', () => {
+    expect(abilityImageUrl('fireball_form')).toBe('/ui/skills/mage/fireball_form.webp');
+    expect(abilityImageUrl('counterspell')).toBe('/ui/skills/mage/counterspell.webp');
+
+    const mapping = JSON.parse(
+      readFileSync(path.join(skillsDir, 'mage', 'mapping.json'), 'utf8'),
+    ) as {
+      abilities: Array<{ abilityId: string; sourceFile: string; output: string }>;
+    };
+    const requested = new Map(
+      mapping.abilities
+        .filter(({ abilityId }) => ['fireball_form', 'counterspell'].includes(abilityId))
+        .map(({ abilityId, sourceFile, output }) => [abilityId, { sourceFile, output }]),
+    );
+    expect(Object.fromEntries(requested)).toEqual({
+      fireball_form: {
+        sourceFile: 'owner-provided artwork (Fireball Form)',
+        output: 'fireball_form.webp',
+      },
+      counterspell: {
+        sourceFile: 'owner-provided artwork (Counterspell)',
+        output: 'counterspell.webp',
+      },
+    });
+  });
+
+  it('uses the owner-provided painted icons for both Chronomancy abilities', () => {
+    expect(abilityImageUrl('collective_reversal')).toBe('/ui/skills/mage/collective_reversal.webp');
+    expect(abilityImageUrl('temporal_hourglass')).toBe('/ui/skills/mage/temporal_hourglass.webp');
   });
 
   it('A) every image-backed ability id resolves to a committed, valid .webp', () => {

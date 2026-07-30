@@ -13,6 +13,7 @@
   import AccountDetail from './AccountDetail.svelte';
   import AccountModerationActions from '../components/AccountModerationActions.svelte';
   import ChatModeration from '../components/ChatModeration.svelte';
+  import DailyRewardsModerationControls from '../components/DailyRewardsModerationControls.svelte';
   import IpBlockSection from '../components/IpBlockSection.svelte';
   import ModerationActionPrompt from '../components/ModerationActionPrompt.svelte';
 
@@ -117,12 +118,12 @@
 
     {#if auth.can('moderation.act')}
       <AccountModerationActions target={detail.account} onSubmit={submitPending} />
+      <DailyRewardsModerationControls target={detail.account} onSubmit={submitPending} />
 
       <ChatModeration
         account={detail.account}
         chat={detail.chat}
         onSubmit={submitPending}
-        onReset={() => direct(`/admin/api/moderation/accounts/${accountId}/reset-strikes`)}
       />
     {/if}
 

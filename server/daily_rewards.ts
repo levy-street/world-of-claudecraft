@@ -9,7 +9,19 @@ import type {
   DailyRewardSpinResult,
   DailyRewardStatus,
 } from '../src/world_api';
-import { type DailyRewardDb, type DailyRewardTaskSeed, PgDailyRewardDb } from './daily_rewards_db';
+import { DailyRewardScheduleCache } from './daily_reward_schedule';
+import { DAILY_REWARD_BOARD_TTL_MS, DailyRewardBoardCache } from './daily_rewards_board_cache';
+import {
+  type DailyRewardDb,
+  type DailyRewardInternalPayoutRow,
+  type DailyRewardPayoutActor,
+  type DailyRewardPayoutAttemptRow,
+  type DailyRewardScoreRow,
+  type DailyRewardTaskSeed,
+  PgDailyRewardDb,
+  REWARD_DAY_SHAPE,
+} from './daily_rewards_db';
+import { buildSeedKey, runSeedOnce } from './daily_rewards_seed_gate';
 import { accountAndScopeForToken, moderationStatusForAccount, walletForAccount } from './db';
 import { ctxAccountId } from './http/context';
 import { type BearerActiveGuardDb, createActiveGuard } from './http/middleware/bearer_active_guard';
@@ -20,12 +32,14 @@ import {
 } from './http/middleware/require_internal_secret';
 import type { Ctx, RouteDef } from './http/types';
 import { json, readBody } from './http_util';
+import { REALM } from './realm';
 import { cachedWocBalance } from './woc_balance';
 
 const DEFAULT_MIN_USD = 20;
 const DEFAULT_POOL_USD = 150;
 const DEFAULT_ACTIVE_SECONDS = 120;
-const DEFAULT_DAY_START_UTC_MINUTES = 21 * 60;
+const DEFAULT_DAY_START_UTC_MINUTES = 22 * 60;
+const MAX_DAILY_REWARD_TASKS = 100;
 const DEFAULT_CONFIG_TTL_MS = 5 * 60_000;
 const DAILY_REWARD_CONFIG_TTL_MS = Number(
   process.env.WOC_DAILY_REWARD_CONFIG_TTL_MS ?? DEFAULT_CONFIG_TTL_MS,
@@ -82,7 +96,9 @@ interface RuntimeConfigCache {
 
 interface Eligibility {
   eligible: boolean;
-  reason: 'eligible' | 'no_wallet' | 'under_minimum' | 'price_unavailable';
+  reason: 'eligible' | 'no_wallet' | 'under_minimum' | 'price_unavailable' | 'banned';
+  banReason: string | null;
+  banExpiresAt: string | null;
   walletPubkey: string | null;
   wocBalance: number | null;
   wocUsdPrice: number | null;
@@ -91,6 +107,7 @@ interface Eligibility {
 }
 
 export interface DailyRewardRuntimeConfig {
+  enabled: boolean;
   minUsd: number;
   prizePoolUsd: number;
   prizePoolSol: number | null;
@@ -103,6 +120,9 @@ export interface DailyRewardRuntimeConfig {
 
 let runtimeConfigCache: RuntimeConfigCache | null = null;
 let runtimeConfigFailureLog: { key: string; at: number } | null = null;
+const dailyRewardScheduleCache = new DailyRewardScheduleCache(fetchDailyRewardSchedule, {
+  ttlMs: DAILY_REWARD_CONFIG_TTL_MS,
+});
 
 export function utcRewardDay(now = new Date()): string {
   return now.toISOString().slice(0, 10);
@@ -121,6 +141,12 @@ export function addRewardDays(day: string, offset: number): string {
   return new Date(start + offset * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 }
 
+function isRewardDay(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = Date.parse(`${value}T00:00:00.000Z`);
+  return Number.isFinite(parsed) && new Date(parsed).toISOString().slice(0, 10) === value;
+}
+
 export function nextUtcResetIso(
   day: string,
   dayStartUtcMinutes = DEFAULT_DAY_START_UTC_MINUTES,
@@ -137,6 +163,7 @@ export function dailyRewardPayoutSplits(): readonly number[] {
 
 export function resetDailyRewardPriceCacheForTests(): void {
   runtimeConfigCache = null;
+  dailyRewardScheduleCache.reset();
 }
 
 function finitePositive(value: unknown): number | null {
@@ -206,6 +233,7 @@ function parseTaskPayload(payload: unknown): DailyRewardTaskSeed[] {
       ? (payload as { tasks: unknown[] }).tasks
       : [];
   const tasks = rawTasks
+    .slice(0, MAX_DAILY_REWARD_TASKS)
     .map((task, index) => sanitizeTaskDefinition(task, index))
     .filter((task): task is DailyRewardTaskSeed => task !== null);
   return tasks.length > 0 ? tasks : DEFAULT_TASKS;
@@ -213,6 +241,7 @@ function parseTaskPayload(payload: unknown): DailyRewardTaskSeed[] {
 
 function fallbackRuntimeConfig(): DailyRewardRuntimeConfig {
   return {
+    enabled: true,
     minUsd: DEFAULT_MIN_USD,
     prizePoolUsd: DEFAULT_POOL_USD,
     prizePoolSol: null,
@@ -224,10 +253,20 @@ function fallbackRuntimeConfig(): DailyRewardRuntimeConfig {
   };
 }
 
+function featuredDailyRewardTaskName(config: DailyRewardRuntimeConfig): string {
+  const [task] = config.tasks
+    .filter((candidate) => candidate.active !== false)
+    .sort((left, right) => left.sortOrder - right.sortOrder);
+  return task?.title ?? DEFAULT_TASKS[0].title;
+}
+
 function parseRuntimeConfigPayload(payload: unknown): DailyRewardRuntimeConfig {
   const record = payload && typeof payload === 'object' ? (payload as Record<string, unknown>) : {};
   const fallback = fallbackRuntimeConfig();
   return {
+    // A configured authority must affirmatively enable rewards. Older/malformed
+    // service responses fail closed; the no-service local path uses fallbackRuntimeConfig.
+    enabled: record.enabled === true,
     minUsd: finitePositive(record.minUsd) ?? finitePositive(record.min_usd) ?? fallback.minUsd,
     prizePoolUsd:
       finitePositive(record.prizePoolUsd) ??
@@ -248,6 +287,53 @@ function parseRuntimeConfigPayload(payload: unknown): DailyRewardRuntimeConfig {
   };
 }
 
+function parseStrictRuntimeConfigPayload(
+  payload: unknown,
+  expectedDay: string,
+): DailyRewardRuntimeConfig {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new Error('config response must be an object');
+  }
+  const record = payload as Record<string, unknown>;
+  if (record.day !== expectedDay) throw new Error('config response day did not match request');
+
+  const minUsd = finitePositive(record.minUsd);
+  const prizePoolUsd = finitePositive(record.prizePoolUsd);
+  const activeSeconds = finitePositive(record.activeSeconds);
+  const dayStartUtcMinutes = finiteDayStartUtcMinutes(record.dayStartUtcMinutes);
+  if (
+    typeof record.enabled !== 'boolean' ||
+    minUsd === null ||
+    prizePoolUsd === null ||
+    activeSeconds === null ||
+    dayStartUtcMinutes === null
+  ) {
+    throw new Error('config response contained invalid required fields');
+  }
+  if (!Array.isArray(record.tasks) || record.tasks.length === 0) {
+    throw new Error('config response contained no task definitions');
+  }
+  if (record.tasks.length > MAX_DAILY_REWARD_TASKS) {
+    throw new Error('config response contained too many task definitions');
+  }
+  const tasks = record.tasks.map((task, index) => sanitizeTaskDefinition(task, index));
+  if (tasks.some((task) => task === null)) {
+    throw new Error('config response contained an invalid task definition');
+  }
+
+  return {
+    enabled: record.enabled,
+    minUsd,
+    prizePoolUsd,
+    prizePoolSol: finitePositive(record.prizePoolSol),
+    wocUsdPrice: finitePositive(record.wocUsdPrice),
+    solUsdPrice: finitePositive(record.solUsdPrice),
+    activeSeconds,
+    dayStartUtcMinutes,
+    tasks: tasks as DailyRewardTaskSeed[],
+  };
+}
+
 function dailyRewardServiceSecret(): string {
   // Dedicated secret only: never fall back to RESTART_COUNTDOWN_SECRET. That is an
   // unrelated ops secret, and reusing it would let its holder call the daily-rewards
@@ -258,6 +344,11 @@ function dailyRewardServiceSecret(): string {
 
 function dailyRewardServiceUrl(): string {
   return (process.env.WOC_DAILY_REWARD_SERVICE_URL ?? '').trim();
+}
+
+function dailyRewardServiceHeaders(): Record<string, string> {
+  const secret = dailyRewardServiceSecret();
+  return secret ? { 'x-woc-daily-reward-secret': secret } : {};
 }
 
 function runtimeConfigFailureMessage(err: unknown): string {
@@ -294,36 +385,66 @@ function logRuntimeConfigFailure(err: unknown): void {
   console.warn(`[daily-rewards] using fallback config: ${message}`);
 }
 
+async function fetchDailyRewardSchedule(): Promise<number> {
+  const serviceUrl = dailyRewardServiceUrl();
+  if (!serviceUrl) return DEFAULT_DAY_START_UTC_MINUTES;
+  const url = new URL('/daily-schedule', serviceUrl.endsWith('/') ? serviceUrl : `${serviceUrl}/`);
+  const res = await fetch(url, {
+    headers: dailyRewardServiceHeaders(),
+    signal: AbortSignal.timeout(5000),
+  });
+  if (!res.ok) throw new Error(`schedule request failed: ${res.status}`);
+  const payload = (await res.json()) as Record<string, unknown>;
+  const minutes = finiteDayStartUtcMinutes(payload.dayStartUtcMinutes);
+  if (minutes === null) throw new Error('schedule response contained an invalid day start');
+  return minutes;
+}
+
+async function fetchDailyRewardRuntimeConfig(
+  day: string,
+  strict = false,
+): Promise<DailyRewardRuntimeConfig> {
+  const serviceUrl = dailyRewardServiceUrl();
+  if (!serviceUrl) return fallbackRuntimeConfig();
+  const url = new URL('/daily-config', serviceUrl.endsWith('/') ? serviceUrl : `${serviceUrl}/`);
+  url.searchParams.set('day', day);
+  const res = await fetch(url, {
+    headers: dailyRewardServiceHeaders(),
+    signal: AbortSignal.timeout(5000),
+  });
+  if (!res.ok) throw new Error(`config request failed: ${res.status}`);
+  const payload = await res.json();
+  return strict
+    ? parseStrictRuntimeConfigPayload(payload, day)
+    : parseRuntimeConfigPayload(payload);
+}
+
 export async function dailyRewardRuntimeConfig(
   day = utcRewardDay(),
+  requireFresh = false,
 ): Promise<DailyRewardRuntimeConfig> {
   const now = Date.now();
   if (
+    !requireFresh &&
     runtimeConfigCache &&
     runtimeConfigCache.day === day &&
     now - runtimeConfigCache.at < DAILY_REWARD_CONFIG_TTL_MS
   ) {
     return runtimeConfigCache.config;
   }
-  const serviceUrl = dailyRewardServiceUrl();
-  if (!serviceUrl) {
-    const config = fallbackRuntimeConfig();
-    runtimeConfigCache = { day, config, at: now };
-    return config;
-  }
   try {
-    const url = new URL('/daily-config', serviceUrl.endsWith('/') ? serviceUrl : `${serviceUrl}/`);
-    url.searchParams.set('day', day);
-    const secret = dailyRewardServiceSecret();
-    const headers: Record<string, string> = secret ? { 'x-woc-daily-reward-secret': secret } : {};
-    const res = await fetch(url, { headers, signal: AbortSignal.timeout(5000) });
-    if (!res.ok) throw new Error(`config request failed: ${res.status}`);
-    const config = parseRuntimeConfigPayload(await res.json());
+    const config = await fetchDailyRewardRuntimeConfig(day, requireFresh);
     runtimeConfigCache = { day, config, at: now };
     return config;
   } catch (err) {
+    if (requireFresh) throw err;
     logRuntimeConfigFailure(err);
-    return runtimeConfigCache?.day === day ? runtimeConfigCache.config : fallbackRuntimeConfig();
+    if (dailyRewardServiceUrl()) {
+      const config = { ...fallbackRuntimeConfig(), enabled: false };
+      runtimeConfigCache = { day, config, at: now };
+      return config;
+    }
+    return fallbackRuntimeConfig();
   }
 }
 
@@ -339,11 +460,66 @@ async function dailyRewardClock(now = new Date()): Promise<{
   day: string;
   config: DailyRewardRuntimeConfig;
 }> {
-  const provisionalDay = utcRewardDay(now);
-  const provisionalConfig = await dailyRewardRuntimeConfig(provisionalDay);
-  const day = rewardDayForDate(now, provisionalConfig.dayStartUtcMinutes);
-  if (day === provisionalDay) return { day, config: provisionalConfig };
-  return { day, config: await dailyRewardRuntimeConfig(day) };
+  let dayStartUtcMinutes: number;
+  try {
+    dayStartUtcMinutes = await dailyRewardScheduleCache.read();
+  } catch (error) {
+    if (!dailyRewardServiceUrl()) throw error;
+    logRuntimeConfigFailure(error);
+    dayStartUtcMinutes = DEFAULT_DAY_START_UTC_MINUTES;
+  }
+  const day = rewardDayForDate(now, dayStartUtcMinutes);
+  const config = await dailyRewardRuntimeConfig(day);
+  return { day, config: { ...config, dayStartUtcMinutes } };
+}
+
+export async function currentDailyRewardDay(now = new Date()): Promise<string> {
+  return (await dailyRewardClock(now)).day;
+}
+
+// Single-slot memo for dailyRewardEventsCutoffDay, keyed on (UTC day, clamped
+// retention). Resolving the current reward day can require schedule and config
+// requests, so a catch-up sweep must not repeat that work for every batch. The
+// key uses the plain UTC day, never the reward day: resolving the reward day is
+// exactly the work being avoided.
+let cutoffMemo: { utcDay: string; days: number; cutoff: string } | null = null;
+
+export function resetDailyRewardEventsCutoffMemoForTests(): void {
+  cutoffMemo = null;
+}
+
+// The pure cutoff derivation, split out so the fail-closed arm is directly
+// testable. FAIL CLOSED on a malformed anchor day: addRewardDays' fallback for
+// an unparseable day string is TODAY, which passes the prune's own
+// REWARD_DAY_SHAPE guard and would turn a parse failure into a cutoff that
+// deletes the entire ledger before today. currentDailyRewardDay cannot emit
+// such a value today (its days are toISOString-derived), so this is
+// defense-in-depth on an irreversible delete path, not a live-bug fix.
+export function dailyRewardEventsCutoffFromAnchor(anchorDay: string, days: number): string | null {
+  if (!REWARD_DAY_SHAPE.test(anchorDay)) return null;
+  return addRewardDays(anchorDay, -days);
+}
+
+// The retention cutoff for the daily_reward_events ledger, as a reward-clock day
+// string, or null when retention is off (0 or negative = keep forever). Fractional
+// values clamp to at least one day: 0.5 must never floor to a cutoff of "today",
+// which would delete the entire ledger before today. The cutoff must come from the
+// reward clock (the day boundary sits at a configured UTC offset, not midnight),
+// which is why this lives here and not in the sweep wiring.
+export async function dailyRewardEventsCutoffDay(
+  retentionDays: number,
+  now = new Date(),
+): Promise<string | null> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return null;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const utcDay = utcRewardDay(now);
+  if (cutoffMemo && cutoffMemo.utcDay === utcDay && cutoffMemo.days === days) {
+    return cutoffMemo.cutoff;
+  }
+  const cutoff = dailyRewardEventsCutoffFromAnchor(await currentDailyRewardDay(now), days);
+  if (cutoff === null) return null; // malformed anchor: keep the ledger, cache nothing
+  cutoffMemo = { utcDay, days, cutoff };
+  return cutoff;
 }
 
 async function prizePoolSol(config: DailyRewardRuntimeConfig): Promise<number | null> {
@@ -362,6 +538,8 @@ export async function dailyRewardEligibility(
     return {
       eligible: false,
       reason: 'no_wallet',
+      banReason: null,
+      banExpiresAt: null,
       walletPubkey: null,
       wocBalance: null,
       wocUsdPrice: runtimeConfig.wocUsdPrice,
@@ -377,6 +555,8 @@ export async function dailyRewardEligibility(
     return {
       eligible: false,
       reason: 'price_unavailable',
+      banReason: null,
+      banExpiresAt: null,
       walletPubkey: wallet.pubkey,
       wocBalance: balance,
       wocUsdPrice: price,
@@ -388,6 +568,8 @@ export async function dailyRewardEligibility(
   return {
     eligible: usdValue >= runtimeConfig.minUsd,
     reason: usdValue >= runtimeConfig.minUsd ? 'eligible' : 'under_minimum',
+    banReason: null,
+    banExpiresAt: null,
     walletPubkey: wallet.pubkey,
     wocBalance: balance,
     wocUsdPrice: price,
@@ -407,7 +589,7 @@ function pickSpinOutcome(seed = Math.random()): (typeof SPIN_OUTCOMES)[number] {
 }
 
 function leaderboardView(
-  rows: Awaited<ReturnType<DailyRewardDb['leaderboard']>>,
+  rows: DailyRewardScoreRow[],
   accountId: number | null,
 ): DailyRewardLeaderboardEntry[] {
   return rows.map((row) => ({
@@ -564,38 +746,106 @@ function currentTaskMultiplier(
 export class DailyRewardService {
   constructor(private readonly db: DailyRewardDb = new PgDailyRewardDb()) {}
 
+  // One ranked snapshot per TTL window serves the four board reads status()
+  // assembles; every board-changing write below busts it (see recordPoints
+  // and spin), and main.ts busts it from the moderation hook.
+  private readonly boardCache = new DailyRewardBoardCache(
+    (day) => this.db.leaderboardSnapshot(day),
+    { ttlMs: DAILY_REWARD_BOARD_TTL_MS },
+  );
+
+  private async eligibility(
+    accountId: number,
+    config: DailyRewardRuntimeConfig,
+  ): Promise<Eligibility> {
+    const ban = await this.db.banForAccount(accountId);
+    if (ban) {
+      return {
+        eligible: false,
+        reason: 'banned',
+        banReason: ban.reason,
+        banExpiresAt: ban.expiresAt,
+        walletPubkey: null,
+        wocBalance: null,
+        wocUsdPrice: config.wocUsdPrice,
+        usdValue: null,
+        minUsd: config.minUsd,
+      };
+    }
+    return dailyRewardEligibility(accountId, config);
+  }
+
   async activeSeconds(day?: string): Promise<number> {
     if (day) return (await dailyRewardRuntimeConfig(day)).activeSeconds;
     return (await dailyRewardClock()).config.activeSeconds;
   }
 
+  // The single seed path every method funnels through. The seed gate runs the
+  // ensureDay + seedTasks write pair at most once per (day, realm, config) key,
+  // so status, spin, recordOnlineMinute, the five gameplay recorders, and the
+  // finalize path (via ensureActiveDay) all share one gate per day instead of
+  // each re-issuing the pair on every call.
+  private async ensureSeeded(day: string, config: DailyRewardRuntimeConfig): Promise<void> {
+    await runSeedOnce(buildSeedKey(day, REALM, config), async () => {
+      await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
+      await this.db.seedTasks(day, config.tasks);
+    });
+  }
+
   async ensureActiveDay(day = utcRewardDay()): Promise<DailyRewardRuntimeConfig> {
     const config = await dailyRewardRuntimeConfig(day);
-    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
-    await this.db.seedTasks(day, config.tasks);
+    if (config.enabled) await this.ensureSeeded(day, config);
     return config;
   }
 
   async status(accountId: number): Promise<DailyRewardStatus> {
     const { day, config } = await dailyRewardClock();
-    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
-    await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!config.enabled) {
+      return {
+        enabled: false,
+        day,
+        resetAt: nextUtcResetIso(day, config.dayStartUtcMinutes),
+        prizePoolUsd: config.prizePoolUsd,
+        prizePoolSol: config.prizePoolSol,
+        eligibility: {
+          eligible: false,
+          reason: 'price_unavailable',
+          banReason: null,
+          banExpiresAt: null,
+          walletPubkey: null,
+          wocBalance: null,
+          wocUsdPrice: config.wocUsdPrice,
+          usdValue: null,
+          minUsd: config.minUsd,
+        },
+        score: 0,
+        rank: null,
+        spin: { claimed: false, points: null, outcomeKey: null, claimedAt: null },
+        tasks: [],
+        leaderboard: [],
+        leaderboardTotal: 0,
+      };
+    }
+    await this.ensureSeeded(day, config);
+    const eligibility = await this.eligibility(accountId, config);
+    // The four ranked reads come from the board cache (one snapshot per TTL
+    // window); the per-account reads stay live on the db.
     const [score, rank, spin, tasks, leaders, leaderboardTotal, onlineMinutes] = await Promise.all([
       this.db.scoreForAccount(day, accountId),
-      this.db.rankForAccount(day, accountId),
+      this.boardCache.rankForAccount(day, accountId),
       this.db.spinForAccount(day, accountId),
       this.db.tasksForAccount(day, accountId),
-      this.db.leaderboard(day, accountId, 10),
-      this.db.leaderboardTotal(day),
+      this.boardCache.leaderboard(day, 10),
+      this.boardCache.leaderboardTotal(day),
       this.db.onlineMinutesForAccount(day, accountId),
     ]);
     const leaderboardRows = [...leaders];
     if (rank !== null && rank > 10) {
-      const viewerRow = await this.db.leaderboardRowForAccount(day, accountId);
+      const viewerRow = await this.boardCache.leaderboardRowForAccount(day, accountId);
       if (viewerRow) leaderboardRows.push(viewerRow);
     }
     return {
+      enabled: true,
       day,
       resetAt: nextUtcResetIso(day, config.dayStartUtcMinutes),
       prizePoolUsd: config.prizePoolUsd,
@@ -622,6 +872,8 @@ export class DailyRewardService {
     };
   }
 
+  // Deliberately a live db read, never the board cache: both the player and
+  // ops arms page beyond the cached top slice and tolerate no cache-page drift.
   async leaderboardPage(
     day: string,
     page: number,
@@ -643,9 +895,9 @@ export class DailyRewardService {
     accountId: number,
   ): Promise<DailyRewardSpinResult | { error: string; status: number }> {
     const { day, config } = await dailyRewardClock();
-    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
-    await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!config.enabled) return { error: 'daily rewards are disabled', status: 409 };
+    await this.ensureSeeded(day, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible)
       return { error: 'daily rewards are locked for this wallet', status: 403 };
     const existing = await this.db.spinForAccount(day, accountId);
@@ -653,19 +905,49 @@ export class DailyRewardService {
     const outcome = pickSpinOutcome();
     const recorded = await this.db.recordSpin(day, accountId, outcome.key, outcome.points);
     if (!recorded) return { error: 'daily spin already claimed', status: 409 };
-    await this.db.addPoints(day, accountId, 'spin', outcome.points, 'spin', {
-      outcome: outcome.key,
-    });
+    // recordSpin atomically records both the claim and its score while holding
+    // the open-day lock, so finalization can never land between those writes.
+    this.boardCache.bust();
     const status = await this.status(accountId);
     return { ...status, awardedPoints: outcome.points, outcomeKey: outcome.key };
   }
 
+  // The one point-event write path: every recorder funnels through here so
+  // the board cache is busted exactly when the ranked board could have
+  // changed. The two guards: a duplicate event (recorded false) wrote
+  // nothing, and a non-positive event (recordOnlineMinute's zero-point
+  // per-minute marker) never changes the ranked board (every ranked read
+  // filters points > 0). If a negative-point clawback is ever added it could
+  // lower a still-ranked row, so widen the guard to points !== 0 with it.
+  private async recordPoints(
+    day: string,
+    accountId: number,
+    kind: string,
+    points: number,
+    idempotencyKey: string,
+    meta?: Record<string, unknown>,
+  ): Promise<boolean> {
+    const recorded = await this.db.addPoints(day, accountId, kind, points, idempotencyKey, meta);
+    if (recorded && points > 0) this.boardCache.bust();
+    return recorded;
+  }
+
+  /** Drop the in-process board snapshot so the next ranked read refreshes. */
+  bustBoardCache(): void {
+    this.boardCache.bust();
+  }
+
+  /** Board-cache refresh telemetry for the metrics surface (unwired for now). */
+  boardCacheStats(): { refreshes: number; lastRefreshMs: number | null } {
+    return this.boardCache.stats();
+  }
+
   async recordOnlineMinute(accountId: number, activeAt: Date = new Date()): Promise<void> {
     const { day, config } = await dailyRewardClock(activeAt);
-    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
-    await this.db.seedTasks(day, config.tasks);
+    if (!config.enabled) return;
+    await this.ensureSeeded(day, config);
     const minute = activeAt.toISOString().slice(0, 16);
-    await this.db.addPoints(day, accountId, 'online', 0, `online:${minute}`, {
+    await this.recordPoints(day, accountId, 'online', 0, `online:${minute}`, {
       minute,
     });
   }
@@ -678,9 +960,9 @@ export class DailyRewardService {
   ): Promise<number> {
     if (!questId) return 0;
     const { day, config } = await dailyRewardClock(completedAt);
-    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
-    await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!config.enabled) return 0;
+    await this.ensureSeeded(day, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'quest_completion');
     if (tasks.length === 0) return 0;
@@ -696,7 +978,7 @@ export class DailyRewardService {
         questId,
       );
       const awarded = repeatQuestPoints(points, priorCompletions);
-      const recorded = await this.db.addPoints(
+      const recorded = await this.recordPoints(
         day,
         accountId,
         'task',
@@ -729,15 +1011,15 @@ export class DailyRewardService {
       completedAt?: Date;
     },
   ): Promise<number> {
-    // Protect Yumi (yumi3/yumi5) is an unranked objective mode: its bouts do
-    // not count toward the arena daily-reward task (maintainer decision;
-    // fiesta keeps its historical counting behavior).
-    if (result.format === 'yumi3' || result.format === 'yumi5') return 0;
+    // One-player teams are too easy to coordinate for daily-reward scoring.
+    // Protect Yumi (yumi3/yumi5) is also an unranked objective mode. Fiesta
+    // keeps its historical counting behavior.
+    if (result.format === '1v1' || result.format === 'yumi3' || result.format === 'yumi5') return 0;
     const completedAt = result.completedAt ?? new Date();
     const { day, config } = await dailyRewardClock(completedAt);
-    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
-    await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!config.enabled) return 0;
+    await this.ensureSeeded(day, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'arena_result');
     if (tasks.length === 0) return 0;
@@ -750,7 +1032,7 @@ export class DailyRewardService {
         : numberConfig(taskConfig, 'lossBasePoints', 10);
       const { points, multiplier } = onlineMultiplierPoints(basePoints, taskConfig, onlineMinutes);
       if (points <= 0) continue;
-      const recorded = await this.db.addPoints(
+      const recorded = await this.recordPoints(
         day,
         accountId,
         'task',
@@ -782,9 +1064,9 @@ export class DailyRewardService {
   ): Promise<number> {
     if (!DELVES[delveId]) return 0;
     const { day, config } = await dailyRewardClock(completedAt);
-    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
-    await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!config.enabled) return 0;
+    await this.ensureSeeded(day, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'delve_clear');
     if (tasks.length === 0) return 0;
@@ -793,7 +1075,7 @@ export class DailyRewardService {
     for (const task of tasks) {
       const clearPoints = delveClearPoints(task, delveId, tierId, onlineMinutes);
       if (!clearPoints || clearPoints.points <= 0) continue;
-      const recorded = await this.db.addPoints(
+      const recorded = await this.recordPoints(
         day,
         accountId,
         'task',
@@ -829,9 +1111,9 @@ export class DailyRewardService {
   ): Promise<number> {
     if (!DELVES[delveId]) return 0;
     const { day, config } = await dailyRewardClock(openedAt);
-    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
-    await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!config.enabled) return 0;
+    await this.ensureSeeded(day, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'delve_clear');
     if (tasks.length === 0) return 0;
@@ -840,7 +1122,7 @@ export class DailyRewardService {
     for (const task of tasks) {
       const chestPoints = delveChestOpenPoints(task, chestTier, bountiful, onlineMinutes);
       if (!chestPoints || chestPoints.points <= 0) continue;
-      const recorded = await this.db.addPoints(
+      const recorded = await this.recordPoints(
         day,
         accountId,
         'task',
@@ -869,8 +1151,9 @@ export class DailyRewardService {
 
   // Vale Cup daily task: wins only. Rated wins use the full task value; bot-filled
   // and practice wins use a much smaller base so they can contribute without competing
-  // with real ranked match rewards. The match id keys the dedupe row, so one match
-  // yields at most one grant per account.
+  // with real ranked match rewards. The GameServer supplies one UUID and completion time
+  // per live match object, so every winner and retry shares an identity while a restarted
+  // server gets a fresh identity even when the sim reuses its in-memory numeric match id.
   async recordValeCupResult(
     accountId: number,
     result: {
@@ -880,16 +1163,20 @@ export class DailyRewardService {
       rated?: boolean;
       hasBots?: boolean;
       practice?: boolean;
-      completedAt?: Date;
+      completionId?: string;
+      completedAt: Date;
     },
   ): Promise<number> {
+    if (result.bracket === 1) return 0;
     if (!result.won) return 0;
     if (result.rated === false && result.hasBots !== true && result.practice !== true) return 0;
-    const completedAt = result.completedAt ?? new Date();
+    const completedAt = result.completedAt;
+    const completedAtIso = completedAt.toISOString();
+    const completionId = result.completionId?.trim() || null;
     const { day, config } = await dailyRewardClock(completedAt);
-    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
-    await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!config.enabled) return 0;
+    await this.ensureSeeded(day, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'vale_cup_result');
     if (tasks.length === 0) return 0;
@@ -911,17 +1198,19 @@ export class DailyRewardService {
       if (points <= 0) continue;
       const outcomeKey =
         result.practice === true ? 'practice_win' : reducedMatch ? 'bot_win' : 'win';
-      const recorded = await this.db.addPoints(
+      const recorded = await this.recordPoints(
         day,
         accountId,
         'task',
         points,
-        `task:${task.taskId}:vale_cup:${result.matchId}:${outcomeKey}`,
+        `task:${task.taskId}:vale_cup:${result.matchId}:${outcomeKey}:${completionId ?? completedAtIso}`,
         {
           taskId: task.taskId,
           taskType: task.type,
           bracket: result.bracket,
           matchId: result.matchId,
+          completionId,
+          completedAt: completedAtIso,
           won: true,
           matchType: result.practice === true ? 'practice' : reducedMatch ? 'bot' : 'ranked',
           rated: result.rated !== false,
@@ -959,8 +1248,23 @@ export class DailyRewardService {
   }
 
   async discordWinnerAnnouncements(limit = 1): Promise<unknown> {
-    await this.finalizePreviousDay();
-    return { days: await this.db.unannouncedWinnerDays(limit) };
+    const days = await this.db.unannouncedWinnerDays(limit);
+    const rewardDays = [...new Set(days.flatMap((day) => [day.day, addRewardDays(day.day, 1)]))];
+    const taskNames = new Map(
+      await Promise.all(
+        rewardDays.map(
+          async (day) =>
+            [day, featuredDailyRewardTaskName(await dailyRewardRuntimeConfig(day))] as const,
+        ),
+      ),
+    );
+    return {
+      days: days.map((day) => ({
+        ...day,
+        taskName: taskNames.get(day.day) ?? DEFAULT_TASKS[0].title,
+        nextTaskName: taskNames.get(addRewardDays(day.day, 1)) ?? DEFAULT_TASKS[0].title,
+      })),
+    };
   }
 
   async markDiscordWinnersAnnounced(
@@ -975,19 +1279,64 @@ export class DailyRewardService {
     return ok ? { ok: true } : { error: 'reward day not found', status: 404 };
   }
 
-  async finalizePreviousDay(now = new Date()): Promise<void> {
-    const { day } = await dailyRewardClock(now);
-    const previous = addRewardDays(day, -1);
-    const config = await this.ensureActiveDay(previous);
-    await this.db.finalizeDay(previous, config.prizePoolUsd, DAILY_REWARD_SPLITS);
+  async finalizeRewardDay(
+    body: unknown,
+    now = new Date(),
+  ): Promise<
+    | { ok: true; day: string; outcome: 'finalized' | 'already_finalized' }
+    | { error: string; status: number }
+  > {
+    const record = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
+    const day = typeof record.day === 'string' ? record.day : '';
+    if (!isRewardDay(day)) return { error: 'invalid reward day', status: 400 };
+    if (!dailyRewardServiceUrl()) {
+      return { error: 'daily reward config unavailable', status: 503 };
+    }
+
+    let config: DailyRewardRuntimeConfig;
+    try {
+      // Money-moving actions consume one fresh, strictly decoded snapshot. Its
+      // boundary, pool, tasks, and requested day therefore cannot come from
+      // different dashboard revisions.
+      config = await dailyRewardRuntimeConfig(day, true);
+    } catch (error) {
+      console.error(
+        '[daily-rewards] finalization blocked: authoritative config unavailable',
+        error,
+      );
+      return { error: 'daily reward config unavailable', status: 503 };
+    }
+    const currentDay = rewardDayForDate(now, config.dayStartUtcMinutes);
+    if (day >= currentDay) return { error: 'reward day has not closed', status: 409 };
+
+    // This read is only an optimization for retrying an already-completed day.
+    // It deliberately follows closure validation, so even inconsistent legacy
+    // rows cannot bypass the authoritative cutoff. A miss is never trusted for
+    // exclusivity; finalizeDay's conditional UPDATE remains authoritative.
+    if (await this.db.dayFinalized(day, REALM)) {
+      return { ok: true, day, outcome: 'already_finalized' };
+    }
+    await this.ensureSeeded(day, config);
+    const startedAt = Date.now();
+    const outcome = await this.db.finalizeDay(day, config.prizePoolUsd, DAILY_REWARD_SPLITS);
+    console.info(
+      `[daily-rewards] finalize day=${day} realm=${REALM} outcome=${outcome} durationMs=${Date.now() - startedAt}`,
+    );
+    return { ok: true, day, outcome };
   }
 
-  async pendingPayouts(limit = 20): Promise<unknown> {
-    await this.finalizePreviousDay();
-    return { payouts: await this.db.pendingPayouts(limit) };
+  async pendingPayouts(limit = 20, day?: string): Promise<unknown> {
+    return { payouts: await this.db.pendingPayouts(limit, day) };
   }
 
-  async markPayout(body: unknown): Promise<{ ok: true } | { error: string; status: number }> {
+  async markPayout(body: unknown): Promise<
+    | {
+        ok: true;
+        payout?: DailyRewardInternalPayoutRow;
+        attempt?: DailyRewardPayoutAttemptRow;
+      }
+    | { error: string; status: number }
+  > {
     const record = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
     const day = typeof record.day === 'string' ? record.day : '';
     const rank = Number(record.rank);
@@ -997,11 +1346,123 @@ export class DailyRewardService {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || !Number.isInteger(rank) || rank < 1 || rank > 10) {
       return { error: 'invalid payout target', status: 400 };
     }
-    if (status !== 'paid' && status !== 'failed')
+    if (
+      !['processing', 'paid', 'failed', 'resend_processing', 'resent', 'resend_failed'].includes(
+        status,
+      )
+    )
       return { error: 'invalid payout status', status: 400 };
+    if (
+      ['processing', 'paid', 'resend_processing', 'resent', 'resend_failed'].includes(status) &&
+      !txSignature
+    ) {
+      return { error: 'transaction signature is required', status: 400 };
+    }
+    const signedTransaction =
+      typeof record.signedTransaction === 'string' ? record.signedTransaction : null;
+    if (signedTransaction && signedTransaction.length > 5000) {
+      return { error: 'signed transaction is too large', status: 400 };
+    }
+    const operationId = typeof record.operationId === 'string' ? record.operationId.trim() : '';
+    if (status.startsWith('resend') || status === 'resent') {
+      if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$/.test(operationId)) {
+        return { error: 'valid resend operation id is required', status: 400 };
+      }
+    }
+    if (status === 'processing') {
+      const result = await this.db.claimPayout(day, rank, txSignature as string, signedTransaction);
+      if (result.outcome === 'not_found') return { error: 'payout not found', status: 404 };
+      if (result.outcome === 'invalid_status') {
+        return { error: 'payout cannot be claimed', status: 409 };
+      }
+      return { ok: true, payout: result.payout };
+    }
+    if (status === 'resend_processing') {
+      const result = await this.db.claimPayoutResend(
+        day,
+        rank,
+        operationId,
+        txSignature as string,
+        signedTransaction,
+      );
+      if (result.outcome === 'not_found') return { error: 'paid payout not found', status: 404 };
+      if (result.outcome === 'invalid_status') {
+        return { error: 'only paid payouts can be resent', status: 409 };
+      }
+      return { ok: true, attempt: result.attempt };
+    }
+    if (status === 'resent' || status === 'resend_failed') {
+      const ok = await this.db.markPayoutResend(
+        day,
+        rank,
+        operationId,
+        status === 'resent' ? 'paid' : 'failed',
+        txSignature as string,
+        error,
+      );
+      return ok ? { ok: true } : { error: 'resend attempt not found', status: 404 };
+    }
     const ok = await this.db.markPayout(day, rank, status, txSignature, error);
     return ok ? { ok: true } : { error: 'payout not found', status: 404 };
   }
+
+  async voidPayout(
+    body: unknown,
+  ): Promise<
+    { ok: true; payout: DailyRewardInternalPayoutRow } | { error: string; status: number }
+  > {
+    const record = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
+    const target = payoutModerationTarget(record);
+    if ('error' in target) return target;
+    const reason = typeof record.reason === 'string' ? record.reason.trim() : '';
+    if (reason.length < 3 || reason.length > 500) {
+      return { error: 'invalid void reason', status: 400 };
+    }
+    const actor = payoutModerationActor(record);
+    if (!actor) return { error: 'invalid payout actor', status: 400 };
+    const result = await this.db.voidPayout(target.day, target.rank, reason, actor);
+    if (result.outcome === 'not_found') return { error: 'payout not found', status: 404 };
+    if (result.outcome === 'invalid_status') {
+      return { error: 'payout cannot be voided', status: 409 };
+    }
+    return { ok: true, payout: result.payout };
+  }
+
+  async restorePayout(
+    body: unknown,
+  ): Promise<
+    { ok: true; payout: DailyRewardInternalPayoutRow } | { error: string; status: number }
+  > {
+    const record = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
+    const target = payoutModerationTarget(record);
+    if ('error' in target) return target;
+    const actor = payoutModerationActor(record);
+    if (!actor) return { error: 'invalid payout actor', status: 400 };
+    const result = await this.db.restorePayout(target.day, target.rank, actor);
+    if (result.outcome === 'not_found') return { error: 'payout not found', status: 404 };
+    if (result.outcome === 'invalid_status') {
+      return { error: 'payout cannot be restored', status: 409 };
+    }
+    return { ok: true, payout: result.payout };
+  }
+}
+
+function payoutModerationTarget(
+  record: Record<string, unknown>,
+): { day: string; rank: number } | { error: string; status: 400 } {
+  const day = typeof record.day === 'string' ? record.day : '';
+  const rank = Number(record.rank);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || !Number.isInteger(rank) || rank < 1 || rank > 10) {
+    return { error: 'invalid payout target', status: 400 };
+  }
+  return { day, rank };
+}
+
+function payoutModerationActor(record: Record<string, unknown>): DailyRewardPayoutActor | null {
+  const id = typeof record.actorId === 'string' ? record.actorId.trim() : '';
+  const username = typeof record.actorUsername === 'string' ? record.actorUsername.trim() : '';
+  if (!id || id.length > 200 || !username || username.length > 100) return null;
+  return { id, username };
 }
 
 function secretsMatch(actual: string, expected: string): boolean {
@@ -1019,6 +1480,13 @@ function internalAuthorized(req: http.IncomingMessage): boolean {
 }
 
 export const dailyRewardService = new DailyRewardService();
+
+// main.ts wires this into bustBoardCaches: the board cache is instance-scoped
+// on the module singleton above, so a bust exported from the cache module
+// itself would hold no handle to the live instance.
+export function bustDailyRewardBoardCache(): void {
+  dailyRewardService.bustBoardCache();
+}
 
 export async function handleDailyRewardApi(
   req: http.IncomingMessage,
@@ -1069,9 +1537,24 @@ export async function handleDailyRewardInternalApi(
     json(res, 401, { success: false, data: null, error: 'not authenticated' });
     return true;
   }
+  if (req.method === 'POST' && url.pathname === '/internal/daily-rewards/finalize') {
+    const result = await dailyRewardService.finalizeRewardDay(await readBody(req));
+    if ('error' in result) {
+      json(res, result.status, { success: false, data: null, error: result.error });
+    } else {
+      json(res, 200, { success: true, data: result, error: null });
+    }
+    return true;
+  }
   if (req.method === 'POST' && url.pathname === '/internal/daily-rewards/pending-payouts') {
+    const requestedDay = url.searchParams.get('day');
+    if (requestedDay !== null && !/^\d{4}-\d{2}-\d{2}$/.test(requestedDay)) {
+      json(res, 400, { success: false, data: null, error: 'invalid reward day' });
+      return true;
+    }
     const data = await dailyRewardService.pendingPayouts(
       Number(url.searchParams.get('limit')) || DAILY_OPS_PENDING_PAYOUTS_LIMIT,
+      requestedDay ?? undefined,
     );
     json(res, 200, { success: true, data, error: null });
     return true;
@@ -1101,6 +1584,24 @@ export async function handleDailyRewardInternalApi(
     else json(res, 200, { success: true, data: result, error: null });
     return true;
   }
+  if (req.method === 'POST' && url.pathname === '/internal/daily-rewards/void-payout') {
+    const result = await dailyRewardService.voidPayout(await readBody(req));
+    if ('error' in result) {
+      json(res, result.status, { success: false, data: null, error: result.error });
+    } else {
+      json(res, 200, { success: true, data: result, error: null });
+    }
+    return true;
+  }
+  if (req.method === 'POST' && url.pathname === '/internal/daily-rewards/restore-payout') {
+    const result = await dailyRewardService.restorePayout(await readBody(req));
+    if ('error' in result) {
+      json(res, result.status, { success: false, data: null, error: result.error });
+    } else {
+      json(res, 200, { success: true, data: result, error: null });
+    }
+    return true;
+  }
   json(res, 404, { success: false, data: null, error: 'unknown endpoint' });
   return true;
 }
@@ -1111,10 +1612,13 @@ export async function handleDailyRewardInternalApi(
 //   GET  /api/daily-rewards/leaderboard            paginated daily leaderboard (JSON)
 //   POST /api/daily-rewards/spin                   player spin (JSON)
 //   GET  /api/daily-rewards/history                payout history (JSON)
+//   POST /internal/daily-rewards/finalize          close one explicit reward day
 //   POST /internal/daily-rewards/pending-payouts   payout service ops
 //   POST /internal/daily-rewards/payout-history    payout service ops
 //   POST /internal/daily-rewards/leaderboard       payout service ops
 //   POST /internal/daily-rewards/mark-payout       payout service ops
+//   POST /internal/daily-rewards/void-payout       payout moderation ops
+//   POST /internal/daily-rewards/restore-payout    payout moderation ops
 // The legacy dispatch stays as the flag-off rollback path until the ladder-deletion PR: the
 // main.ts prefix arm (startsWith('/api/daily-rewards'), bearerActiveAccount
 // BEFORE delegating) for the player family, and the /internal composite
@@ -1131,7 +1635,7 @@ export async function handleDailyRewardInternalApi(
 // dailyRewardsOpsBodyValidationRemap deviation). Off-table shapes (wrong
 // method, unknown subpath, the no-slash '/api/daily-rewardsX' sibling, HEAD)
 // resolve unmatched and delegate to the ladder unchanged. v0.20.0 grew each
-// family by its paginated leaderboard read (four player + four ops routes).
+// family by its paginated leaderboard read (four player + seven ops routes).
 //
 // The player guard is the shared legacy-body createActiveGuard (mirrors the
 // prefix arm's bearerActiveAccount byte-for-byte). The ops gate is the
@@ -1142,7 +1646,7 @@ export async function handleDailyRewardInternalApi(
 // internalAuthorized check (same env + header, per request), which passes
 // whenever the gate passed; keeping the core's check intact is what keeps the
 // composite delegate's legacy behavior frozen. NO rate limiter on any of the
-// eight (legacy has none; spin's only guards are the one-spin-per-day 409 and
+// eleven (legacy has none; spin's only guards are the one-spin-per-day 409 and
 // the wallet-eligibility 403, and adding a throttle is a maintainer fork, not
 // a silent add).
 // dailyRewardService stays module-owned and importable by game.ts regardless of
@@ -1178,7 +1682,7 @@ export function resetDailyRewardDbForTests(): void {
 /** Full active session gate (mirrors the prefix arm's bearerActiveAccount). */
 const activeGuard = createActiveGuard(() => dailyRewardGuardDb());
 
-/** The fail-closed payout-service gate, one instance shared by the four ops routes. */
+/** The fail-closed payout-service gate, one instance shared by the seven ops routes. */
 const dailyRewardOpsGate = requireInternalSecretFailClosed({
   header: DAILY_REWARD_SECRET_HEADER,
   envVar: DAILY_REWARD_SECRET_ENV,
@@ -1233,6 +1737,14 @@ export const routes: RouteDef[] = [
   },
   {
     method: 'POST',
+    path: '/internal/daily-rewards/finalize',
+    surface: 'internal',
+    meta: { envelope: 'admin' },
+    middleware: [dailyRewardOpsGate],
+    handler: dailyRewardOpsHandler,
+  },
+  {
+    method: 'POST',
     path: '/internal/daily-rewards/pending-payouts',
     surface: 'internal',
     meta: { envelope: 'admin' },
@@ -1258,6 +1770,22 @@ export const routes: RouteDef[] = [
   {
     method: 'POST',
     path: '/internal/daily-rewards/mark-payout',
+    surface: 'internal',
+    meta: { envelope: 'admin' },
+    middleware: [dailyRewardOpsGate],
+    handler: dailyRewardOpsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/internal/daily-rewards/void-payout',
+    surface: 'internal',
+    meta: { envelope: 'admin' },
+    middleware: [dailyRewardOpsGate],
+    handler: dailyRewardOpsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/internal/daily-rewards/restore-payout',
     surface: 'internal',
     meta: { envelope: 'admin' },
     middleware: [dailyRewardOpsGate],

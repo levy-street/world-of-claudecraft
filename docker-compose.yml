@@ -27,6 +27,8 @@ services:
       args:
         # Build-time public client config inlined into the bundle (see .env.example).
         VITE_TURNSTILE_SITEKEY: ${VITE_TURNSTILE_SITEKEY:-}
+        VITE_REOWN_PROJECT_ID: ${VITE_REOWN_PROJECT_ID:-}
+        VITE_WALLET_DISABLED: ${VITE_WALLET_DISABLED:-}
     container_name: eastbrook-game
     restart: unless-stopped
     depends_on:
@@ -35,6 +37,27 @@ services:
     environment:
       DATABASE_URL: postgres://eastbrook:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env. See .env.example.}@postgres:5432/eastbrook
       PORT: "8787"
+      # Runtime: node flags for the game process, chiefly the V8 heap ceiling
+      # (--max-old-space-size). Node sizes its default old-space from TOTAL SYSTEM
+      # memory, not from the container's cgroup limit, so on a box larger than
+      # mem_limit an unset heap flag lets V8 grow past the limit and get OOM-killed
+      # mid-tick by the kernel. Sizing the heap UNDER mem_limit means an overrun
+      # kills the container (which docker then restarts) instead of the host OOM
+      # killer wedging the box. Empty (unset) keeps node's own defaults: the
+      # recommended production value lives in .env.example, never baked in here.
+      NODE_OPTIONS: ${NODE_OPTIONS:-}
+      # Runtime: the realm player admission cap. A fresh WebSocket join is refused
+      # once the realm holds this many sessions (server/ws_auth.ts); /api/status
+      # advertises the value so the client realm list can show Full honestly. Empty
+      # (unset) yields the built-in default of 5000; an explicit 0 disables the cap.
+      MAX_PLAYERS_PER_REALM: ${MAX_PLAYERS_PER_REALM:-}
+      # Community test realms can opt in to a ready-made level-20 roster for
+      # every newly created account. The production-safe default is disabled.
+      PROVISION_TEST_ACCOUNTS: ${PROVISION_TEST_ACCOUNTS:-0}
+      # PBE only: boost registrations to a BiS roster and top existing
+      # characters up to the current BiS kit at world join (server/pbe_boost.ts).
+      # NEVER set in production. The production-safe default is disabled.
+      PBE_BOOST_ACCOUNTS: ${PBE_BOOST_ACCOUNTS:-}
       # Target the game server 302-redirects /wiki to when hit directly (not via the
       # reverse proxy). Public origin in prod; localhost fallback for local dev.
       WIKI_URL: ${WIKI_URL:-http://localhost:8080/wiki/index.php/Main_Page}
@@ -64,12 +87,15 @@ services:
       # heartbeat log line (tickHz, per-phase p95/max) plus over-budget stutter
       # traces. Off by default so production logs stay quiet.
       PERF_TICK_LOG: ${PERF_TICK_LOG:-}
+      # Runtime: opt-in public-test Rift population. Empty leaves normal policy on.
+      COMMUNITY_TEST_RIFTS: ${COMMUNITY_TEST_RIFTS:-}
       # Runtime: bearer token that gates GET /metrics (server/http/health.ts).
       # Empty (unset) leaves the endpoint feature-off (404); a non-empty value
       # turns it on behind Authorization: Bearer <token>. Set on the host .env by
       # the monitoring deploy so Prometheus can scrape the RED + process metrics.
       METRICS_TOKEN: ${METRICS_TOKEN:-}
-      # Runtime: protects the loopback-only deploy countdown endpoint.
+      # Runtime: the ONLY gate on the deploy countdown endpoint (nothing
+      # restricts /internal/* to loopback), so treat it as a real secret.
       RESTART_COUNTDOWN_SECRET: ${RESTART_COUNTDOWN_SECRET:-}
       # Runtime: Discord OAuth + the secret-gated game <-> Discord bot channel.
       DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
@@ -92,15 +118,85 @@ services:
       WOC_DAILY_REWARD_SERVICE_URL: ${WOC_DAILY_REWARD_SERVICE_URL:-}
       WOC_DAILY_REWARD_SERVICE_SECRET: ${WOC_DAILY_REWARD_SERVICE_SECRET:-}
       WOC_DAILY_REWARD_CONFIG_TTL_MS: ${WOC_DAILY_REWARD_CONFIG_TTL_MS:-}
+      WOC_ECONOMY_SERVICE_URL: ${WOC_ECONOMY_SERVICE_URL:-}
+      WOC_ECONOMY_INTERNAL_SECRET: ${WOC_ECONOMY_INTERNAL_SECRET:-}
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL:-}
+      WOC_MINT: ${WOC_MINT:-}
       META_CAPI_PIXEL_ID: ${META_CAPI_PIXEL_ID:-}
       META_CAPI_ACCESS_TOKEN: ${META_CAPI_ACCESS_TOKEN:-}
       META_CAPI_TEST_EVENT_CODE: ${META_CAPI_TEST_EVENT_CODE:-}
       META_CAPI_API_VERSION: ${META_CAPI_API_VERSION:-}
-      # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
+      # Runtime: outbound email (server/email/sender.ts). All empty → console
+      # transport (mail is logged, not sent). EMAIL_PROVIDER=ses selects AWS SES
+      # (needs EMAIL_SES_REGION or AWS_REGION plus EMAIL_FROM; credentials via the
+      # SDK default chain: IAM instance role, or the AWS_* keys below). Otherwise
+      # EMAIL_API_URL+EMAIL_API_KEY+EMAIL_FROM selects the generic HTTP transport.
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      EMAIL_BASE_URL: ${EMAIL_BASE_URL:-}
+      EMAIL_SES_REGION: ${EMAIL_SES_REGION:-}
+      AWS_REGION: ${AWS_REGION:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      EMAIL_API_URL: ${EMAIL_API_URL:-}
+      EMAIL_API_KEY: ${EMAIL_API_KEY:-}
+      # Optional Steam account link and Book of Deeds achievement mirror.
+      STEAM_ENABLED: ${STEAM_ENABLED:-}
+      STEAM_APP_ID: ${STEAM_APP_ID:-}
+      STEAM_WEB_API_KEY: ${STEAM_WEB_API_KEY:-}
+      # Optional deployable SFX packs live outside the image. Export from SFX
+      # Studio, run its installer against the host overlay root, and this server
+      # reads only the stable runtime manifest plus immutable audio blobs here.
+      SFX_PACK_DIR: /app/sfx-runtime/audio/sfx
+    # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
     ports:
       - "127.0.0.1:8787:8787"
     volumes:
       - ${EASTBROOK_MEDIA_DIR:-./media-cache}:/app/dist/media
+      - ${EASTBROOK_SFX_DIR:-./sfx-runtime}:/app/sfx-runtime:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # Exec form with a node one-liner, deliberately unlike the CMD-SHELL healthcheck
+    # the postgres service uses above: the runtime image is a Debian slim base
+    # (node:26-slim) and has no curl or wget, but it does ship node. The probe hits
+    # /livez and nothing else. /livez reports a WEDGED game loop, not merely a live
+    # process, so it catches the failure
+    # `restart: unless-stopped` cannot see (that policy only acts on process exit), and
+    # it deliberately stays 200 while the server drains, so a graceful shutdown is never
+    # misread as a wedge. /readyz flips to 503 while draining and would do exactly that.
+    # The probe must exit nonzero on BOTH a non-200 status and a refused connection,
+    # hence the explicit statusCode check and the 'error' handler: a bare http.get exits
+    # 0 on a 503 and throws on a refusal. start_period covers a cold boot (the DB retry
+    # loop, the schema sweep, the cache warms); failures inside it do not spend retries.
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:8787/livez',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 60s
+    # Time docker allows between SIGTERM and SIGKILL. Covers the realistic shutdown
+    # path: the character/market/mail saves, ending play sessions, the bank-ledger and
+    # deed-record drains, the Steam mirror's 5s deadline, releasing character leases and
+    # closing the pool, with headroom over the runbook's `docker compose stop -t 60
+    # game` fallback. It is not a strict bound: an adversarial worst case (a character
+    # save riding the 65s driver backstop, plus the deadline-free FIFO drains) can still
+    # run past it and be killed.
+    stop_grace_period: 75s
+    # Container memory ceiling. The default suits a host with about 8 GiB of RAM: 5 GiB
+    # here holds the recommended 4096 MiB V8 heap (NODE_OPTIONS above) plus native and
+    # buffer overhead, and still leaves room for the database container and the OS.
+    # Resize it to the host you are running on. Without a ceiling a runaway game process
+    # can starve the database and the OS and take the whole host down rather than just
+    # itself. mem_limit is the direct runtime Compose Spec key
+    # and is honored unconditionally by `docker compose up`; prefer it over the
+    # swarm-shaped deploy.resources.limits.memory block, which Compose v2 does honor for
+    # `up` but which is the swarm surface (and was a silent no-op under compose v1).
+    mem_limit: 5g
+    # Pin swap to the memory limit so the container cannot lean on host swap: docker
+    # defaults total memory+swap to twice mem_limit when this is unset, so on a host with
+    # swap a leaking process would thrash up to 5g of swap before the OOM kill, which is
+    # slower and messier than the clean in-container kill the limit exists to produce.
+    memswap_limit: 5g
 
   discord-bot:
     image: eastbrook-game:${EASTBROOK_IMAGE_TAG:-local}

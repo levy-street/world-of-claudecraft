@@ -3,6 +3,7 @@ import type { DailyRewardHistory, DailyRewardStatus } from '../world_api';
 export type DailyRewardsView =
   | { kind: 'loading' }
   | { kind: 'error'; message: string }
+  | { kind: 'disabled' }
   | {
       kind: 'ready';
       status: DailyRewardStatus;
@@ -16,9 +17,20 @@ export type DailyRewardsInput =
   | { kind: 'error'; message: string }
   | { kind: 'status'; status: DailyRewardStatus; history: DailyRewardHistory };
 
+export function dailyRewardTaskDescription(
+  type: string,
+  description: string,
+  oneVsOneRestriction: string,
+): string {
+  return type === 'arena_result' || type === 'vale_cup_result'
+    ? `${description} ${oneVsOneRestriction}`
+    : description;
+}
+
 export function buildDailyRewardsView(input: DailyRewardsInput): DailyRewardsView {
   if (input.kind === 'loading') return { kind: 'loading' };
   if (input.kind === 'error') return { kind: 'error', message: input.message };
+  if (input.status.enabled === false) return { kind: 'disabled' };
   return {
     kind: 'ready',
     status: input.status,

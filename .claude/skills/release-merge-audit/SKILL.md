@@ -25,13 +25,19 @@ you write.
 
 ## Step 1: identify the merge and its delta
 
-The merge commit is the argument if given, else the most recent RELEASE merge:
+The merge commit is the argument if given, else the most recent RELEASE merge. Both subject
+forms occur in this history: the plain form (`Merge branch 'release/v0.23.0' ...`) and the far
+more common remote-tracking form (`Merge remote-tracking branch 'origin/release/v0.25.0' ...`,
+also with `upstream/` or `up/`). Match both:
 
 ```sh
-git log --merges --grep="Merge branch 'release/" -1 --format=%H HEAD
+git log --merges -1 --format='%H %s' \
+  --grep="branch '\(origin/\|upstream/\|up/\)\?release/" HEAD
 ```
 
-(a bare `git log --merges -1` can grab an unrelated merge, e.g. a main-merge). The audit
+Print `%s` and read it: hand-written subjects (e.g. `merge: resync with release/v0.23.0`) do
+not match this grep, and a bare `git log --merges -1` can grab an unrelated merge, e.g. a
+main-merge, so when in doubt pass the commit explicitly. The audit
 assumes a true two-parent merge commit; a squash-merged release has no `^2`, so pass the
 commit explicitly and treat its own diff as the incoming delta. The incoming delta (what the
 release brought, relative to the branch):
@@ -94,13 +100,12 @@ added (Step 4), bindings re-checked (Step 5), premises corrected (Step 6), each 
 Apply the fixes in the same change with a parity/regression test per divergence, then run the
 targeted suites plus `npx tsc --noEmit` (or `npm run gate` if the merge was large).
 
-One recurring merge-mechanics trap to check every time (it has reddened the gate twice on the
-bank-system branch, once on a v0.22.0 merge and once on a v0.23.0 merge): when a merge
-conflicts on the generated i18n artifacts and BOTH sides changed catalog keys, taking either
-side of `src/ui/i18n.resolved.sha256` leaves a stale baseline, and `npm run i18n:gen` does NOT
-rewrite it (the merged union table hashes to a value neither parent had). After regenerating,
-run `node scripts/i18n_resolved_hash.mjs --write` and confirm
-`npx vitest run tests/i18n_resolved_equivalence.test.ts` is green, in the SAME merge commit.
+One i18n merge-mechanics note: the aggregate baseline (`src/ui/i18n.resolved.sha256`) and the
+status summary (`src/ui/i18n.status.summary.json`) are no longer committed (removed by the
+2026-07-14 degit change), so a merge where both sides changed catalog keys only needs
+`npm run i18n:gen` to reconcile the committed line-item slices. The historical stale-baseline
+trap (taking either side of the aggregate left a hash neither parent had, needing a manual
+re-baseline) applies only when auditing merges on branches that predate that change.
 
 A second recurring trap (reddened the gate on a later v0.23.0 merge into the bank-system
 branch): a release-authored test that drives GameServer mocks `../server/db` with the export

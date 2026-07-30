@@ -1,0 +1,33 @@
+{
+  "note": "Tripo-generated Veiled Hollow flora. Raw sources in tmp/asset_src/tripo/ (regenerate via Tripo). Glow is baked in albedo; emissive is applied at load in realm_flora.ts.",
+  "items": [
+    {
+      "src": "tmp/asset_src/tripo/purple+mushroom+3d+model.glb",
+      "out": "models/props/mushroom_giant_purple.glb",
+      "type": "static",
+      "maxTex": 1024,
+      "simplify": 0.7
+    },
+    {
+      "src": "tmp/asset_src/tripo/glowing+mushrooms+3d+model.glb",
+      "out": "models/props/mushroom_glow_cluster.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.35
+    },
+    {
+      "src": "tmp/asset_src/tripo/glowing+flower+3d+model.glb",
+      "out": "models/props/flower_glow.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.32
+    },
+    {
+      "src": "tmp/asset_src/tripo/low+poly+flowering+shrub+v23d+model.glb",
+      "out": "models/props/shrub_flowering.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.2
+    }
+  ]
+}

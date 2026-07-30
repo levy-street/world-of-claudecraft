@@ -13,12 +13,16 @@ import type { Aura } from '../sim/types';
 export interface AbsorbBarInput {
   hp: number;
   maxHp: number;
-  auras: Aura[];
+  auras?: Aura[];
+  /** Compact pre-summed value used by party snapshots, which do not carry full auras. */
+  total?: number;
 }
 
 export interface AbsorbBarView {
   total: number; // summed remaining absorb across all active shields
-  fillFrac: number; // 0..1 width of the shield overlay = (hp + absorb)/maxHp, clamped
+  fillFrac: number; // 0..1 right edge of the shield overlay, kept for callers/tests
+  startFrac: number; // 0..1 left edge of the visible shield segment
+  sizeFrac: number; // 0..1 width of the visible shield segment
   overshield: boolean; // absorb reaches/passes the bar's right edge (fully shielded)
 }
 
@@ -33,10 +37,13 @@ export function absorbTotal(auras: Aura[]): number {
 export function absorbBarView(input: AbsorbBarInput): AbsorbBarView {
   const max = Math.max(1, input.maxHp);
   const hp = Math.max(0, input.hp);
-  const total = absorbTotal(input.auras);
+  const hpFrac = clamp01(hp / max);
+  const total = Math.max(0, input.total ?? absorbTotal(input.auras ?? []));
   const fillFrac = clamp01((hp + total) / max);
+  const sizeFrac = total > 0 ? clamp01(total / max) : 0;
   const overshield = total > 0 && hp + total >= max;
-  return { total, fillFrac, overshield };
+  const startFrac = overshield ? clamp01(1 - sizeFrac) : hpFrac;
+  return { total, fillFrac, startFrac, sizeFrac, overshield };
 }
 
 function clamp01(v: number): number {

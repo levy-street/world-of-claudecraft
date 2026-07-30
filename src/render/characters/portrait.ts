@@ -3,7 +3,10 @@ import type { PlayerClass } from '../../sim/types';
 import { assetsReady } from '../assets/preload';
 import { trackWebGLContext } from '../context_release';
 import { VISUALS } from './manifest';
+import { type PortraitFraming, portraitFrameParams } from './portrait_framing';
 import { CharacterVisual } from './visual';
+
+export type { PortraitFraming } from './portrait_framing';
 
 // ---------------------------------------------------------------------------
 // Portrait factory — a 2D "profile photo" rendered from the real 3D character
@@ -32,11 +35,10 @@ const PORTRAIT_ANIM_STATE = {
   sitting: false,
 };
 
-// Head-and-shoulders framing. Models stand at the origin facing +Z, but their
-// rigs differ in height/proportion, so the camera is fit to each model's own
-// bounding box (rather than fixed coords) — the face always lands in the upper
-// third with a little headroom.
-const CAM_FOV = 26;
+// Models stand at the origin facing +Z, but their rigs differ in
+// height/proportion, so the camera is fit to each model's own bounding box
+// (rather than fixed coords), per the fov/target/extent fractions from
+// portraitFrameParams (see portrait_framing.ts for the per-framing values).
 const scratchBox = new THREE.Box3();
 const scratchCenter = new THREE.Vector3();
 const scratchSize = new THREE.Vector3();
@@ -76,8 +78,10 @@ function ensureRig(): void {
   trackWebGLContext(renderer);
 
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(CAM_FOV, 1, 0.1, 100);
-  // Position/aim is recomputed per-model from its bounding box in the capture.
+  // fov/position/aim are recomputed per-model per-framing from its bounding
+  // box in the capture (see portraitFrameParams); the constructor fov is a
+  // placeholder, always overwritten before the first render.
+  camera = new THREE.PerspectiveCamera(portraitFrameParams('headshot').fov, 1, 0.1, 100);
 
   mount = new THREE.Group();
   scene.add(mount);
@@ -97,8 +101,12 @@ function ensureRig(): void {
  * GLBs are not preloaded yet. Cached after the first render. Callers should
  * fall back to a class crest while null and upgrade via {@link onPortraitsReady}.
  */
-export function playerPortraitDataUrl(cls: PlayerClass, skin = 0): string | null {
-  return visualPortraitDataUrl(`player_${cls}`, skin);
+export function playerPortraitDataUrl(
+  cls: PlayerClass,
+  skin = 0,
+  framing: PortraitFraming = 'headshot',
+): string | null {
+  return visualPortraitDataUrl(`player_${cls}`, skin, framing);
 }
 
 /**
@@ -106,8 +114,12 @@ export function playerPortraitDataUrl(cls: PlayerClass, skin = 0): string | null
  * so cosmetic-only bodies can be previewed as swatch thumbnails. The asset must
  * already be loaded (callers preload first); returns null until then.
  */
-export function visualPortraitDataUrl(visualKey: string, skin = 0): string | null {
-  const key = `${visualKey}:${skin}`;
+export function visualPortraitDataUrl(
+  visualKey: string,
+  skin = 0,
+  framing: PortraitFraming = 'headshot',
+): string | null {
+  const key = `${visualKey}:${skin}:${framing}`;
   const cached = cache.get(key);
   if (cached) return cached;
   if (!assetsAreReady) return null;
@@ -121,8 +133,8 @@ export function visualPortraitDataUrl(visualKey: string, skin = 0): string | nul
     // Settle the rig into a stable idle frame before measuring/capturing.
     visual.update(0.4, PORTRAIT_ANIM_STATE, true);
 
-    // Frame the head/shoulders from the model's own bounds so every class —
-    // tall or short, helmeted or bare — lands the same in the circle.
+    // Frame the model from its own bounds so every class (tall or short,
+    // helmeted or bare) lands the same in the circle/card.
     scratchBox.setFromObject(visual.root);
     scratchBox.getCenter(scratchCenter);
     scratchBox.getSize(scratchSize);
@@ -148,11 +160,14 @@ export function visualPortraitDataUrl(visualKey: string, skin = 0): string | nul
       scratchBox.getSize(scratchSize);
     }
     const h = scratchSize.y || 1.8;
-    const targetY = scratchBox.max.y - 0.3 * h; // look lower so the head/shoulders sit higher in the frame
-    const extent = 0.44 * h; // vertical slice to show: head + shoulders (tighter = subject fills more)
-    const dist = extent / 2 / Math.tan((CAM_FOV * Math.PI) / 180 / 2);
+    const { fov, targetYFromFeetFrac, extentFrac } = portraitFrameParams(framing);
+    camera!.fov = fov;
+    const targetY = scratchBox.min.y + targetYFromFeetFrac * h;
+    const extent = extentFrac * h;
+    const dist = extent / 2 / Math.tan((fov * Math.PI) / 180 / 2);
     camera!.position.set(scratchCenter.x + 0.04 * h, targetY + 0.02 * h, scratchBox.max.z + dist);
     camera!.lookAt(scratchCenter.x, targetY, scratchCenter.z);
+    camera!.updateProjectionMatrix();
 
     renderer!.render(scene!, camera!);
     const url = renderer!.domElement.toDataURL('image/png');

@@ -3,7 +3,13 @@
 // forwards DISPATCH events to a handler. The protocol opcode/payload logic lives
 // in the pure ./logic module so it is unit-tested; this file is the IO shell.
 import { WebSocket } from 'ws';
-import { GATEWAY_OP, heartbeatIntervalMs, identifyPayload, resumePayload } from './logic';
+import {
+  GATEWAY_OP,
+  heartbeatIntervalMs,
+  identifyPayload,
+  requestGuildMembersPayload,
+  resumePayload,
+} from './logic';
 
 export interface GatewayHandlers {
   onDispatch(type: string, data: Record<string, unknown>): void;
@@ -27,6 +33,16 @@ export class Gateway {
     private gatewayUrl: string,
     private handlers: GatewayHandlers,
   ) {}
+
+  /**
+   * Request a guild's full member list (op 8). Discord streams the members back
+   * as GUILD_MEMBERS_CHUNK dispatches, so offline members (omitted from
+   * GUILD_CREATE for large guilds) are delivered. Safe to call once the socket is
+   * open (after IDENTIFY / GUILD_CREATE); a no-op if the socket is not open yet.
+   */
+  requestGuildMembers(guildId: string): void {
+    this.send(requestGuildMembersPayload(guildId));
+  }
 
   connect(resume = false): void {
     this.resuming = resume && this.sessionId !== null;

@@ -38,6 +38,11 @@ function bareClient(pid: number): { client: ClientWorld; sent: any[] } {
   c.partyInfo = null;
   c.tradeInfo = null;
   c.duelInfo = null;
+  // Vale Cup mirrors: the constructor initializes both to null, but bareClient
+  // bypasses it (Object.create), so seed them here as the real field initializers
+  // would (recomputeCupInfo distinguishes null from a real fragment).
+  c.lastVcupRemainder = null;
+  c.lastVcupShared = null;
   c.cupInfo = null;
   c.sportRole = null;
   c.lastSnapAt = 0;
@@ -85,6 +90,8 @@ function apply(client: ClientWorld, self: Record<string, unknown>): void {
   (client as any).applySnapshot({ t: 'snap', ents: [], self });
 }
 
+// The public CupInfo recomposeCupInfo must rebuild from the two wire fragments
+// below (with liveHidden false, so `live` is the shared strip verbatim).
 function sampleCup(): CupInfo {
   return {
     standing: { wins: 3, losses: 1, draws: 0 },
@@ -107,22 +114,109 @@ function sampleCup(): CupInfo {
   };
 }
 
-describe('vcup self delta guard (absent keeps prior, null clears)', () => {
-  it('mirrors s.vcup onto cupInfo and keeps the prior mirror when omitted', () => {
-    const { client } = bareClient(1);
-    const cup = sampleCup();
-    apply(client, selfRecord(1, { vcup: cup }));
-    expect(client.cupInfo).toEqual(cup);
+// The per-viewer remainder on the `vcup` wire key (the realm-wide fields are
+// stripped off and ride `vcupb`; a wire-only liveHidden flag is added).
+function sampleRemainder(liveHidden = false): Record<string, unknown> {
+  return {
+    standing: { wins: 3, losses: 1, draws: 0 },
+    queued: true,
+    bracket: 3,
+    nation: 'vale',
+    role: 'striker',
+    position: 1,
+    deserterFor: 0,
+    match: null,
+    spectate: null,
+    betRecord: { wins: 0, losses: 0, net: 0 },
+    myGuild: 'Wheat Kings',
+    guildStanding: { wins: 2, losses: 1 },
+    liveHidden,
+  };
+}
 
-    // delta-omitted snapshot: the prior mirror survives, by reference
+// The realm-wide fragment on the `vcupb` wire key (VcSharedCupInfo).
+function sampleShared(): Record<string, unknown> {
+  return {
+    queueSizes: { 1: 0, 2: 0, 3: 2, 4: 0, 5: 0 },
+    live: null,
+    board: [{ name: 'Booter', wins: 3 }],
+    guildBoard: [{ name: 'Wheat Kings', wins: 2, losses: 1 }],
+    practicing: [],
+  };
+}
+
+describe('vcup self delta guard (absent keeps prior, null clears)', () => {
+  it('recomposes cupInfo from vcup + vcupb and keeps the prior mirror when both omitted', () => {
+    const { client } = bareClient(1);
+    apply(client, selfRecord(1, { vcup: sampleRemainder(), vcupb: sampleShared() }));
+    expect(client.cupInfo).toEqual(sampleCup());
+
+    // delta-omitted snapshot (neither key present): the prior mirror survives, by
+    // reference (recomputeCupInfo is not called when both keys are absent)
     const ref = client.cupInfo;
     apply(client, selfRecord(1));
     expect(client.cupInfo).toBe(ref);
   });
 
-  it('clears cupInfo on an explicit null (the arena pass-through semantics)', () => {
+  it('safely no-ops when a lone vcup arrives before any vcupb (shared never seen)', () => {
     const { client } = bareClient(1);
-    apply(client, selfRecord(1, { vcup: sampleCup() }));
+    // A vcup remainder with no vcupb ever decoded: recomputeCupInfo must bail on the
+    // `shared === null` guard rather than throw on shared.queueSizes, leaving cupInfo
+    // null. The server ships both keys together on every gate-open and resync, so this
+    // is a can't-happen safe degradation; pin it so a dropped guard is caught.
+    expect(() => apply(client, selfRecord(1, { vcup: sampleRemainder() }))).not.toThrow();
+    expect(client.cupInfo).toBeNull();
+  });
+
+  it('keeps the shared fragment when only vcup ships on a later tick, and vice versa', () => {
+    const { client } = bareClient(1);
+    apply(client, selfRecord(1, { vcup: sampleRemainder(), vcupb: sampleShared() }));
+    expect(client.cupInfo).toEqual(sampleCup());
+
+    // a later per-viewer-only update (queue slot advanced): the shared mirror is
+    // preserved, so the realm-wide fields stay intact
+    apply(client, selfRecord(1, { vcup: { ...sampleRemainder(), position: 2 } }));
+    expect(client.cupInfo?.position).toBe(2);
+    expect(client.cupInfo?.queueSizes).toEqual({ 1: 0, 2: 0, 3: 2, 4: 0, 5: 0 });
+    expect(client.cupInfo?.board).toEqual([{ name: 'Booter', wins: 3 }]);
+
+    // a later shared-only update (queue count moved): the per-viewer remainder is
+    // preserved, so my slot stays intact
+    apply(
+      client,
+      selfRecord(1, { vcupb: { ...sampleShared(), queueSizes: { 1: 0, 2: 0, 3: 3, 4: 0, 5: 0 } } }),
+    );
+    expect(client.cupInfo?.queueSizes['3']).toBe(3);
+    expect(client.cupInfo?.position).toBe(2);
+  });
+
+  it('reapplies liveHidden: a practice viewer never sees the shared live strip', () => {
+    const { client } = bareClient(1);
+    const live = {
+      id: 7,
+      bracket: 2 as const,
+      clock: 30,
+      scoreA: 1,
+      scoreB: 0,
+      nationA: 'vale' as const,
+      nationB: 'moon' as const,
+    };
+    // liveHidden true: the viewer is off in a private practice instance, so the
+    // shared strip is suppressed even though vcupb carries a running match
+    apply(
+      client,
+      selfRecord(1, { vcup: sampleRemainder(true), vcupb: { ...sampleShared(), live } }),
+    );
+    expect(client.cupInfo?.live).toBeNull();
+    // a later non-practice remainder (liveHidden false) reveals the same strip
+    // (the shared mirror is preserved across the vcup-only tick)
+    apply(client, selfRecord(1, { vcup: sampleRemainder(false) }));
+    expect(client.cupInfo?.live).toEqual(live);
+  });
+
+  it('clears cupInfo on an explicit vcup null (the arena pass-through semantics)', () => {
+    const { client } = bareClient(1);
+    apply(client, selfRecord(1, { vcup: sampleRemainder(), vcupb: sampleShared() }));
     expect(client.cupInfo).not.toBeNull();
     apply(client, selfRecord(1, { vcup: null }));
     expect(client.cupInfo).toBeNull();

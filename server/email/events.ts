@@ -12,6 +12,7 @@ export type EmailCategory = 'transactional' | 'marketing';
 export type EmailEvent =
   | 'account_created'
   | 'password_changed'
+  | 'password_reset'
   | 'email_change_verify'
   | 'email_change_notice'
   | 'account_deleted'
@@ -31,6 +32,7 @@ export type EmailTemplateKey = EmailEvent;
 export interface EmailData {
   account_created: { username: string };
   password_changed: { username: string };
+  password_reset: { username: string; resetUrl: string };
   email_change_verify: { username: string; newEmail: string; verifyUrl: string };
   email_change_notice: { username: string; newEmail: string };
   account_deleted: { username: string };
@@ -55,6 +57,7 @@ export const DEFAULT_EMAIL_LOCALE = 'en';
 export const EVENT_CATEGORY: Record<EmailEvent, EmailCategory> = {
   account_created: 'transactional',
   password_changed: 'transactional',
+  password_reset: 'transactional',
   email_change_verify: 'transactional',
   email_change_notice: 'transactional',
   account_deleted: 'transactional',

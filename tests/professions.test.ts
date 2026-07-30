@@ -5,24 +5,67 @@ import {
   craftById,
   oppositeCraft,
 } from '../src/sim/content/professions';
+import { COMBO_RECIPES } from '../src/sim/content/recipes';
+import { ARCHETYPE_PAIR_TARGETS, archetypePairId } from '../src/sim/professions/archetype';
 
 describe('professions craft ring', () => {
-  it('defines exactly the ten production crafts', () => {
+  it('defines exactly the ten production crafts in the design-doc ring order', () => {
     expect(CRAFT_RING).toHaveLength(10);
     const ids = CRAFT_RING.map((c) => c.id);
     expect(new Set(ids).size).toBe(10);
+    // The canonical order from the professions design doc (#1148), adopted by
+    // the Professions 2.0 ring reorder. Pinned as literals deliberately: a
+    // reorder changes every adjacency, opposite, hobby default, and persisted
+    // pair id, so it must redden here and be re-pinned consciously.
     expect(ids).toEqual([
-      'armorcrafting',
-      'weaponcrafting',
-      'jewelcrafting',
-      'alchemy',
       'engineering',
+      'alchemy',
       'cooking',
+      'leatherworking',
+      'tailoring',
       'inscription',
       'enchanting',
-      'tailoring',
-      'leatherworking',
+      'jewelcrafting',
+      'weaponcrafting',
+      'armorcrafting',
     ]);
+  });
+
+  it('pins the ten canonical adjacent-pair ids in ring order', () => {
+    // Persisted surface: these exact strings are stored in saves
+    // (ArchetypeState.attunedPairs) and sent on the wire, so any change here
+    // is a save-format change and must be deliberate.
+    expect([...ARCHETYPE_PAIR_TARGETS]).toEqual([
+      'engineering+alchemy',
+      'alchemy+cooking',
+      'cooking+leatherworking',
+      'leatherworking+tailoring',
+      'tailoring+inscription',
+      'inscription+enchanting',
+      'enchanting+jewelcrafting',
+      'jewelcrafting+weaponcrafting',
+      'weaponcrafting+armorcrafting',
+      'armorcrafting+engineering',
+    ]);
+  });
+
+  it('every content combo recipe pair stays ring-adjacent and canonically attunable', () => {
+    // A future ring reorder that breaks the adjacency of a COMBO_RECIPES pair
+    // would strand that recipe behind the common ceiling with no attunable
+    // pair able to craft it. Iterate the REAL content entries so new combo
+    // recipes are covered automatically.
+    const withCombo = COMBO_RECIPES.filter((recipe) => recipe.comboRequirement);
+    expect(withCombo.length).toBeGreaterThan(0);
+    for (const recipe of withCombo) {
+      const { craftA, craftB } = recipe.comboRequirement!;
+      expect(
+        adjacentCrafts(craftA).map((c) => c.id),
+        `${recipe.id}: ${craftA} and ${craftB} must be ring-adjacent`,
+      ).toContain(craftB);
+      const pairId = archetypePairId(craftA, craftB);
+      expect(pairId, `${recipe.id}: ${craftA}+${craftB} must form a canonical pair`).not.toBeNull();
+      expect(ARCHETYPE_PAIR_TARGETS).toContain(pairId as string);
+    }
   });
 
   it('every craft has a pole tag from the four poles', () => {

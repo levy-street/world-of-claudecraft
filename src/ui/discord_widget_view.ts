@@ -4,7 +4,7 @@
 // presence + feature flag) and returns the structure the widget draws (which
 // mode, which swag rows are claimable, the voice roster). The thin consumer
 // (discord_widget.ts) maps the stable keys to t() and paints. Unit-tested in
-// tests/discord_widget_view.test.ts. Mirrors src/ui/vendor_view.ts.
+// tests/discord_widget_view.test.ts. Mirrors src/ui/hud/vendor/vendor_view.ts.
 import {
   canClaimSwag,
   DISCORD_STATUS_DEFS,

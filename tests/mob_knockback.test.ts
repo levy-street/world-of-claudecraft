@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { arenaOrigin, MOBS } from '../src/sim/data';
-import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
+import { ARENA_SLOT_COUNT, arenaOrigin, MOBS } from '../src/sim/data';
+import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { createMob } from '../src/sim/entity';
+import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 
 const SEED = 5150;
@@ -73,26 +74,34 @@ describe('Knockback on-hit affix (Crushing Sweep)', () => {
     }
   });
 
-  it('a knockback aimed at a thin arena wall cannot tunnel the victim outside the pit', () => {
+  it.each(
+    Array.from({ length: ARENA_SLOT_COUNT }, (_, slot) =>
+      [-1, 1].map((side) => ({ side, slot })),
+    ).flat(),
+  )('a knockback cannot tunnel through side $side in arena slot $slot', ({ side, slot }) => {
     const sim = makeSim();
     const p = sim.entities.get(sim.playerId)!;
-    // instance-local coordinates near the arena's +x side wall (centreline at
-    // DUNGEON_WALL_X, half-thickness 1): the player stands just inside it.
-    const o = arenaOrigin(0);
-    p.pos.x = o.x + DUNGEON_WALL_X - 1.1;
-    p.pos.z = o.z + 0;
+    const o = arenaOrigin(slot);
+    const insideLimit = DUNGEON_WALL_X - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
+    const startDistance = insideLimit - 0.1;
+
+    p.pos.x = o.x + side * startDistance;
+    p.pos.z = o.z;
     p.pos.y = 0;
-    // mob on the far (-x) side of the player so the shove drives it straight
-    // into and, pre-fix, through the wall.
-    const mob = createMob(900704, MOBS.marrowlord_varkas, p.level, {
-      x: o.x + DUNGEON_WALL_X - 5,
+    // Put the mob toward the arena centre so the shove points directly at
+    // the chosen side wall. The large displacement exercises the swept
+    // knockback path, including the west-wall routing boundary.
+    const mob = createMob(900704 + slot * 2 + (side > 0 ? 1 : 0), MOBS.marrowlord_varkas, p.level, {
+      x: o.x + side * (startDistance - 5),
       y: 0,
       z: o.z,
     });
+
     (sim as any).applyKnockback(mob, p, 8);
-    // the wall's outer face sits at DUNGEON_WALL_X + 1; the victim must never
-    // land past it, no matter how large the shove.
-    expect(p.pos.x).toBeLessThan(o.x + DUNGEON_WALL_X + 1);
+
+    const finalDistance = side * (p.pos.x - o.x);
+    expect(finalDistance).toBeGreaterThanOrEqual(startDistance - 1e-6);
+    expect(finalDistance).toBeLessThanOrEqual(insideLimit + 1e-6);
   });
 
   it('a mob without knockback never displaces the player', () => {

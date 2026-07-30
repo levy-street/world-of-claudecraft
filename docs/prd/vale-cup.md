@@ -175,8 +175,13 @@ Render
   trail at speed); goal fireworks via a new per-particle-color Vfx method.
 
 Tests
-- vale_cup.test.ts (queue/nations/roles/kit swap round-trip/kickoff/goal/
-  golden goal/desertion/restore/persistence safety), vale_cup_ball.test.ts
+- the vale_cup suites, split along describe boundaries for CI shard balance
+  (2026-07-15): vale_cup_match.test.ts (queue/nations/roles/kickoff/goal/
+  golden goal/desertion), vale_cup_bots.test.ts (showcase, backfill,
+  practice staging), vale_cup_meta.test.ts (betting, kit swap round-trip,
+  restore/persistence safety, determinism, parallel private practice, guild
+  banners and the guild leaderboard), with the shared staging helpers
+  in vale_cup_util.ts, vale_cup_ball.test.ts
   (physics determinism: friction, bounce reflection, dribble nudge, goal plane;
   rng draw accounting via Rng.setObserver, professions test precedent),
   vale_cup_online.test.ts (wire, arena_online template), view-core tests for

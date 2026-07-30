@@ -5,7 +5,7 @@
 // never drift from shipped content.
 
 import { describe, expect, it } from 'vitest';
-import { CAMPS, GROUND_OBJECTS, MOBS, QUESTS } from '../src/sim/data';
+import { CAMPS, GATHER_NODES, GROUND_OBJECTS, MOBS, QUESTS } from '../src/sim/data';
 import { questObjectiveAreas, questObjectivesForMob } from '../src/sim/quest_targets';
 import type { QuestDef, QuestProgress } from '../src/sim/types';
 
@@ -26,12 +26,11 @@ function activeLog(quest: QuestDef, counts?: number[]): Map<string, QuestProgres
 // rename fails loudly here rather than silently testing nothing.
 function requireKillQuest(): { quest: QuestDef; mobId: string; objIndex: number } {
   for (const q of Object.values(QUESTS)) {
-    const i = q.objectives.findIndex(
-      (o) => o.type === 'kill' && !!o.targetMobId && CAMPS.some((c) => c.mobId === o.targetMobId),
-    );
-    if (i >= 0) {
-      const mobId = q.objectives[i].targetMobId;
-      if (mobId) return { quest: q, mobId, objIndex: i };
+    for (const [i, objective] of q.objectives.entries()) {
+      if (objective.type !== 'kill') continue;
+      if (CAMPS.some((camp) => camp.mobId === objective.targetMobId)) {
+        return { quest: q, mobId: objective.targetMobId, objIndex: i };
+      }
     }
   }
   throw new Error('expected a kill quest whose target mob has camps');
@@ -53,7 +52,8 @@ function requireLootCollectQuest(): { quest: QuestDef; mobId: string } {
 function requireGroundObjectQuest(): { quest: QuestDef; itemId: string } {
   for (const q of Object.values(QUESTS)) {
     for (const o of q.objectives) {
-      const itemId = o.type === 'collect' ? o.itemId : o.targetObjectItemId;
+      const itemId =
+        o.type === 'collect' ? o.itemId : o.type === 'interact' ? o.targetObjectItemId : undefined;
       if (itemId && GROUND_OBJECTS.some((g) => g.itemId === itemId && g.positions.length > 0))
         return { quest: q, itemId };
     }
@@ -143,6 +143,21 @@ describe('questObjectiveAreas', () => {
       def.positions.every((p) => Math.hypot(p.x - a.center.x, p.z - a.center.z) <= a.radius + 1e-9),
     );
     expect(containing, 'expected one area enclosing the whole object cluster').toBeTruthy();
+  });
+
+  it('marks every node of a gather objective type', () => {
+    const quest = QUESTS.q_prof_intro;
+    const objectiveIndex = quest.objectives.findIndex((objective) => objective.type === 'gather');
+    expect(objectiveIndex).toBeGreaterThanOrEqual(0);
+    const areas = questObjectiveAreas(activeLog(quest));
+    const oreNodes = GATHER_NODES.filter((node) => node.type === 'ore');
+    for (const node of oreNodes) {
+      const area = areas.find(
+        (candidate) => candidate.center.x === node.pos.x && candidate.center.z === node.pos.z,
+      );
+      expect(area, `gather node ${node.id} should have an objective area`).toBeTruthy();
+      expect(area?.objectives).toContainEqual({ questId: quest.id, objectiveIndex });
+    }
   });
 
   it('never emits duplicate circles across a multi-quest log', () => {

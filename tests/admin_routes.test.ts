@@ -53,14 +53,24 @@ describe('admin route permission map', () => {
     expect(permissionForAdminRoute('GET', '/admin/api/overview')).toBe('analytics.read');
     expect(permissionForAdminRoute('GET', '/admin/api/provider-usage')).toBe('ops_usage.read');
     expect(permissionForAdminRoute('GET', '/admin/api/accounts/42')).toBe('accounts.read');
+    expect(permissionForAdminRoute('GET', '/admin/api/accounts/42/daily-rewards-events')).toBe(
+      'accounts.read',
+    );
     expect(permissionForAdminRoute('POST', '/admin/api/accounts/42/reset-password')).toBe(
       'accounts.password',
     );
     expect(permissionForAdminRoute('GET', '/admin/api/blocked-ips')).toBe('moderation.read');
+    expect(permissionForAdminRoute('GET', '/admin/api/moderation/history')).toBe('moderation.read');
     expect(permissionForAdminRoute('POST', '/admin/api/blocked-ips')).toBe('ipblocks.manage');
     expect(permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/ban')).toBe(
       'moderation.act',
     );
+    expect(
+      permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/daily-rewards-ban'),
+    ).toBe('moderation.act');
+    expect(
+      permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/daily-rewards-ip-ban'),
+    ).toBe('moderation.act');
     expect(permissionForAdminRoute('POST', '/admin/api/chat-filter/config')).toBe(
       'chatfilter.manage',
     );

@@ -8,6 +8,7 @@ import { type AccountMailTarget, recordEmailLog } from '../db';
 import { logger } from '../http/logger';
 import { selectSender } from './sender';
 import { EmailService } from './service';
+import { hashEmailToken, makeEmailToken } from './tokens';
 
 export type { EmailCategory, EmailEvent } from './events';
 export type { EmailSender, OutboundEmail } from './sender';
@@ -52,10 +53,30 @@ export function emailChangeVerifyUrl(token: string, env?: NodeJS.ProcessEnv): st
   return `${emailBaseUrl(env)}/api/account/email/verify?token=${encodeURIComponent(token)}`;
 }
 
+// Unlike the email-verify link (which hits a JSON API route), the reset link
+// lands on the client page so the logged-out user can type a new password; the
+// client reads the ?reset= token at load.
+export function passwordResetUrl(token: string, env?: NodeJS.ProcessEnv): string {
+  return `${emailBaseUrl(env)}/?reset=${encodeURIComponent(token)}`;
+}
+
 type Target = Pick<AccountMailTarget, 'id' | 'username' | 'email' | 'locale' | 'marketing_opt_in'>;
 
+// Provider errors can quote the recipient address (for example SES's
+// "Email address is not verified: a@b.com"), so scrub anything address-shaped
+// before the message reaches the ops log. The full address is still available
+// in the email_log audit table, which is the intended PII home.
+const ADDRESS_RE = /[^\s@<>,;:"'()[\]]+@[^\s@<>,;:"'()[\]]+\.[^\s@<>,;:"'()[\]]+/g;
+
+function scrubAddresses(text: string): string {
+  return text.replace(ADDRESS_RE, '[email redacted]');
+}
+
 function fire(p: Promise<unknown>): void {
-  void p.catch((err) => logger.error({ err }, 'email send failed'));
+  void p.catch((err) => {
+    const msg = err instanceof Error ? err.message : String(err);
+    logger.error({ err: scrubAddresses(msg) }, 'email send failed');
+  });
 }
 
 export function emailAccountCreated(t: Target): void {
@@ -78,6 +99,18 @@ export function emailPasswordChanged(t: Target): void {
       locale: t.locale,
       accountId: t.id,
       data: { username: t.username },
+    }),
+  );
+}
+
+export function emailPasswordReset(t: Target, resetUrl: string): void {
+  fire(
+    getEmailService().send({
+      event: 'password_reset',
+      to: t.email,
+      locale: t.locale,
+      accountId: t.id,
+      data: { username: t.username, resetUrl },
     }),
   );
 }

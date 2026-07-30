@@ -3,7 +3,7 @@ import type { LootRollGroupStatus } from '../src/sim/types';
 import {
   computeLootRollStatusRows,
   lootRollStatusFingerprint,
-} from '../src/ui/loot_roll_status_view';
+} from '../src/ui/hud/loot/loot_roll_status_view';
 
 // Unit tests for the pure loot-roll vote-strip core: prompt/watch row split,
 // self marking, and the render-on-change fingerprint. No DOM; the hud is a
@@ -64,6 +64,11 @@ describe('computeLootRollStatusRows', () => {
       1,
     );
     expect([full[0].answered, full[0].total]).toEqual([0, 10]);
+  });
+
+  it('keeps only actionable prompt rows when the mobile monitor disables watch rows', () => {
+    const rows = computeLootRollStatusRows([status(), status({ rollId: 8 })], [8], 2, false);
+    expect(rows.map((row) => [row.rollId, row.hasPrompt])).toEqual([[8, true]]);
   });
 });
 

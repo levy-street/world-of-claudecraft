@@ -14,9 +14,12 @@ import { COMMAND_FACETS, COMMAND_NAMES, DISPATCH_ONLY_COMMANDS } from '../src/wo
 const W6_TAGS: Readonly<Record<string, string>> = {
   cast: 'IWorldCombat',
   castSlot: 'IWorldCombat',
+  releaseEmpowered: 'IWorldCombat',
   attack: 'IWorldCombat',
   stopattack: 'IWorldCombat',
   release: 'IWorldCombat',
+  unstuck: 'IWorldCombat',
+  resurrect_respond: 'IWorldCombat',
   target: 'IWorldTargeting',
   tab: 'IWorldTargeting',
   targetNearestFriendly: 'IWorldTargeting',
@@ -69,6 +72,7 @@ const W7_TAGS: Readonly<Record<string, string>> = {
   applyTalents: 'IWorldTalents',
   respec: 'IWorldTalents',
   setSpec: 'IWorldTalents',
+  selectTalentRow: 'IWorldTalents',
   saveLoadout: 'IWorldTalents',
   switchLoadout: 'IWorldTalents',
   deleteLoadout: 'IWorldTalents',
@@ -110,6 +114,7 @@ const W8_TAGS: Readonly<Record<string, string>> = {
   pet_rename: 'IWorldPet',
   pet_revive: 'IWorldPet',
   pet_attack: 'IWorldPet',
+  pet_water_jet: 'IWorldPet',
   pet_taunt: 'IWorldPet',
   pet_auto_taunt: 'IWorldPet',
   pet_feed: 'IWorldPet',
@@ -317,5 +322,36 @@ describe('command facet tags (bank)', () => {
 
   it('does not tag bankInfo (proximity-gated snapshot read, no wire command)', () => {
     expect('bankInfo' in tags).toBe(false);
+  });
+});
+
+// Deeds: append the Book of Deeds cluster's tag. The table-consistency
+// invariants in the W6 block above (no orphan tag, no dispatch-only leak)
+// already cover the new entry; this block pins the exact facet for the one
+// title-selection command and that the four snapshot reads stay untagged.
+// Append-only: never edit a tag.
+const DEEDS_TAGS: Readonly<Record<string, string>> = {
+  deed_set_title: 'IWorldDeeds',
+};
+
+describe('command facet tags (deeds)', () => {
+  const tags = COMMAND_FACETS as Readonly<Record<string, string>>;
+
+  it('tags the title-selection command with the IWorldDeeds facet', () => {
+    for (const [cmd, facet] of Object.entries(DEEDS_TAGS)) {
+      expect(tags[cmd], `facet tag for '${cmd}'`).toBe(facet);
+    }
+  });
+
+  it('preserves the snake_case wire string (never normalized to camelCase)', () => {
+    expect('deed_set_title' in tags).toBe(true);
+    expect('deedSetTitle' in tags).toBe(false);
+    expect('setActiveTitle' in tags).toBe(false);
+  });
+
+  it('does not tag the snapshot reads (deedsEarned/deedStats/renown/activeTitle)', () => {
+    for (const read of ['deedsEarned', 'deedStats', 'renown', 'activeTitle']) {
+      expect(read in tags, `${read} should be untagged (no wire command)`).toBe(false);
+    }
   });
 });

@@ -77,4 +77,9 @@ describe('resolveDirectPickEntityId', () => {
     ]);
     expect(resolveDirectPickEntityId([20, 10], map)).toBeNull();
   });
+
+  it('keeps a dead player directly pickable for combat resurrection targeting', () => {
+    const map = entities([{ id: 30, kind: 'player', dead: true, lootable: false }]);
+    expect(resolveDirectPickEntityId([30], map)).toBe(30);
+  });
 });

@@ -23,14 +23,31 @@ class FakeHTMLElement {
   focusable: boolean;
   dataClose: boolean;
   id: string;
+  tagName: string;
+  type: string;
+  name: string;
+  checked: boolean;
 
   constructor(
-    opts: { focusable?: boolean; dataClose?: boolean; visible?: boolean; id?: string } = {},
+    opts: {
+      focusable?: boolean;
+      dataClose?: boolean;
+      visible?: boolean;
+      id?: string;
+      tagName?: string;
+      type?: string;
+      name?: string;
+      checked?: boolean;
+    } = {},
   ) {
     this.focusable = opts.focusable ?? false;
     this.dataClose = opts.dataClose ?? false;
     this.visible = opts.visible ?? true;
     this.id = opts.id ?? '';
+    this.tagName = opts.tagName ?? 'div';
+    this.type = opts.type ?? '';
+    this.name = opts.name ?? '';
+    this.checked = opts.checked ?? false;
   }
 
   append(...kids: FakeHTMLElement[]): this {
@@ -175,6 +192,31 @@ describe('FocusManager Tab trap cycle', () => {
     expect(fakeDoc.activeElement).toBe(x); // the X (data-close) IS in the cycle
     tab(); // forward off the X wraps to the first control
     expect(fakeDoc.activeElement).toBe(a);
+  });
+
+  it('treats a named radio group as one native Tab stop', () => {
+    const root = new FakeHTMLElement();
+    const mouse = new FakeHTMLElement({
+      focusable: true,
+      tagName: 'input',
+      type: 'radio',
+      name: 'camera-mode',
+      checked: true,
+    });
+    const classic = new FakeHTMLElement({
+      focusable: true,
+      tagName: 'input',
+      type: 'radio',
+      name: 'camera-mode',
+    });
+    const confirm = new FakeHTMLElement({ focusable: true, tagName: 'button' });
+    root.append(mouse, classic, confirm);
+    new FocusManager().open({ root: () => el(root) });
+    fakeDoc.activeElement = mouse;
+
+    expect(tab()).toBe(true);
+    expect(fakeDoc.activeElement).toBe(confirm);
+    expect(classic).not.toBe(fakeDoc.activeElement);
   });
 
   it('wraps backward off the first element to the last (Shift+Tab)', () => {

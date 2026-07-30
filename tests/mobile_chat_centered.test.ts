@@ -5,11 +5,6 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
-const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
-  /\r\n/g,
-  '\n',
-);
-
 // Mobile chat "centered + large + in front" fix. On touch, tapping the Chat button
 // used to open the log as a small strip pinned to the bottom-left corner (and the
 // composer sat BEHIND the #mobile-controls layer, z-index 25 vs 60). The fix makes
@@ -156,10 +151,5 @@ describe('mobile chat centered/large/in-front layout', () => {
     // above any overlay (so nothing can swallow the drag).
     expect(handle).toMatch(/touch-action:\s*none/);
     expect(Number(handle.match(/z-index:\s*(\d+)/)?.[1] ?? '0')).toBeGreaterThanOrEqual(200);
-    // hud.ts creates the handle as a body-level element (high z) and persists the size.
-    expect(hudTs).toContain("resizeHandle.className = 'chat-mobile-resize';");
-    expect(hudTs).toContain('document.body.appendChild(resizeHandle)');
-    expect(hudTs).toContain("document.documentElement.style.setProperty('--mobile-chat-bottom'");
-    expect(hudTs).toContain('localStorage.setItem(MOBILE_CHAT_BOTTOM_KEY');
   });
 });

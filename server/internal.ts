@@ -9,6 +9,7 @@ import { drainActivity } from './discord_activity';
 import {
   accountForDiscord,
   discordForAccount,
+  discordIdsWithGuildFlair,
   grantRewardPoints,
   loadRewardState,
   setDiscordGuildMember,
@@ -227,6 +228,15 @@ async function handleDiscordInternal(
     return ok(res, { updated });
   }
 
+  // GET /internal/discord/flaired-ids -> the discord ids whose stored link still
+  // carries guild membership or a special-role key. The bot diffs this against a
+  // COMPLETE live roster to clear flair for members who left while it was offline
+  // (clears go back through the member + members-meta endpoints, so this stays a
+  // pure read and a truncated request body can never mass-clear anything).
+  if (req.method === 'GET' && url.pathname === '/internal/discord/flaired-ids') {
+    return ok(res, { ids: await discordIdsWithGuildFlair(pool) });
+  }
+
   return fail(res, 404, 'unknown endpoint');
 }
 
@@ -251,10 +261,11 @@ function sanitizeVoiceMember(m: unknown): {
 }
 
 // ── Route table ────────────────────────────
-// All 11 handleInternalApi endpoints as RouteDefs for the shared dispatcher:
-// the deploy-gated restart-countdown plus the 10 Discord-bot-gated routes
+// All 12 handleInternalApi endpoints as RouteDefs for the shared dispatcher:
+// the deploy-gated restart-countdown plus the 11 Discord-bot-gated routes
 // (including the two daily-rewards-winners routes added after the original
-// count of 9). PARITY-FIRST: each thin handler REPRODUCES its frozen
+// count of 9, and flaired-ids, added after the migration on BOTH arms per the
+// dual-edit rule). PARITY-FIRST: each thin handler REPRODUCES its frozen
 // legacy branch above byte-for-byte (same imported data cores, same clamps and
 // truncations, same ok()/fail() envelope bodies), and the secret gates move to
 // the requireInternalSecret middleware, which writes the SAME legacy bodies
@@ -523,6 +534,16 @@ export const routes: RouteDef[] = [
         updated++;
       }
       return ok(ctx.res, { updated });
+    },
+  },
+  {
+    method: 'GET',
+    path: '/internal/discord/flaired-ids',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: async (ctx) => {
+      return ok(ctx.res, { ids: await discordIdsWithGuildFlair(pool) });
     },
   },
 ];

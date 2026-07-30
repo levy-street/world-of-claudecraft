@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
   type AnimState,
+  advanceSwimBlend,
   desiredBaseState,
+  isSwimmingAtDepth,
   locomotionTimeScale,
   pickProxyHeight,
+  SWIM_ENTER_FEET_DEPTH,
+  SWIM_EXIT_FEET_DEPTH,
+  shouldTriggerWaterImpact,
+  waterContactFrameMode,
 } from '../src/render/characters/anim_state';
 import { MOVE_HOLD_TIME, newLocoTrack, updateLocomotion } from '../src/render/locomotion';
 
@@ -144,6 +150,46 @@ describe('gait hysteresis (run vs walk)', () => {
   });
 });
 
+describe('swim animation stability', () => {
+  it('uses separate enter and exit depths so waterline noise cannot flap the pose', () => {
+    expect(isSwimmingAtDepth(false, false, SWIM_ENTER_FEET_DEPTH - 0.01, 2)).toBe(false);
+    expect(isSwimmingAtDepth(false, false, SWIM_ENTER_FEET_DEPTH, 0.8)).toBe(true);
+    expect(isSwimmingAtDepth(true, false, SWIM_EXIT_FEET_DEPTH + 0.01, 0.61)).toBe(true);
+    expect(isSwimmingAtDepth(true, false, SWIM_EXIT_FEET_DEPTH - 0.01, 2)).toBe(false);
+    expect(isSwimmingAtDepth(true, true, 2, 2)).toBe(false);
+  });
+
+  it('fires one impact for contact, water landing, and entering the swim state', () => {
+    expect(shouldTriggerWaterImpact(false, false, false, false, false)).toBe(true);
+    expect(shouldTriggerWaterImpact(true, true, false, false, false)).toBe(true);
+    expect(shouldTriggerWaterImpact(true, false, false, false, true)).toBe(true);
+    expect(shouldTriggerWaterImpact(true, false, false, true, true)).toBe(false);
+    expect(shouldTriggerWaterImpact(true, true, true, false, false)).toBe(false);
+  });
+
+  it('suspends a culled contact and seeds it silently when visible again', () => {
+    expect(waterContactFrameMode(false, true, true)).toBe('track');
+    expect(waterContactFrameMode(false, false, true)).toBe('forget');
+    expect(waterContactFrameMode(false, true, false)).toBe('seed');
+    expect(waterContactFrameMode(true, true, true)).toBe('forget');
+  });
+
+  it('eases model lift in and out without a one-frame vertical pop', () => {
+    let blend = advanceSwimBlend(0, true, FPS);
+    expect(blend).toBeGreaterThan(0);
+    expect(blend).toBeLessThan(0.2);
+    for (let i = 0; i < 120; i++) blend = advanceSwimBlend(blend, true, FPS);
+    expect(blend).toBeCloseTo(1, 4);
+
+    const firstExitFrame = advanceSwimBlend(blend, false, FPS);
+    expect(firstExitFrame).toBeGreaterThan(0.8);
+    expect(firstExitFrame).toBeLessThan(blend);
+    blend = firstExitFrame;
+    for (let i = 0; i < 150; i++) blend = advanceSwimBlend(blend, false, FPS);
+    expect(blend).toBeCloseTo(0, 4);
+  });
+});
+
 describe('locomotion animation state', () => {
   it('uses authored walkBack for normal humanoid backpedal', () => {
     const state = { ...BASE_ANIM_STATE, moving: true, backwards: true, speed: 3 };
@@ -162,6 +208,17 @@ describe('locomotion animation state', () => {
     };
     expect(desiredBaseState(state, true)).toBe('run');
     expect(locomotionTimeScale('run', state)).toBeLessThan(0);
+  });
+
+  it('lets a self-centered Warrior whirl override cast and movement poses', () => {
+    const state = {
+      ...BASE_ANIM_STATE,
+      moving: true,
+      running: true,
+      casting: true,
+      spinning: true,
+    };
+    expect(desiredBaseState(state, true)).toBe('spin');
   });
 });
 

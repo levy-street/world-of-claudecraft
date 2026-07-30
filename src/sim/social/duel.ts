@@ -169,6 +169,10 @@ export function endDuel(ctx: SimContext, duel: DuelState, winnerPid: number | nu
     const winner = winnerPid === duel.a ? aMeta : bMeta;
     const loser = winnerPid === duel.a ? bMeta : aMeta;
     ctx.emit({ type: 'duelEnd', winnerName: winner.name, loserName: loser.name });
+    // Only decided duels count; timed-out or cancelled duels resolve with a
+    // null winner and count nothing.
+    ctx.bumpDeedStat(winner, 'duelsWon', 1);
+    ctx.bumpDeedStat(loser, 'duelsLost', 1);
   } else if (aMeta && bMeta) {
     for (const dPid of [duel.a, duel.b]) {
       ctx.emit({ type: 'log', text: 'The duel has ended.', color: '#fa6', pid: dPid });

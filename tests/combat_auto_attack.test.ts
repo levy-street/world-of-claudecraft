@@ -17,42 +17,52 @@ import {
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
-import { Sim } from '../src/sim/sim';
-import type { Entity, PlayerClass } from '../src/sim/types';
+import { type PlayerMeta, Sim } from '../src/sim/sim';
+import { type Aura, DT, type Entity, type PlayerClass, type SimEvent } from '../src/sim/types';
+import { placePlayerInOpenField } from './helpers/open_field';
 
-type AnySim = Sim & Record<string, any>;
-type AnyEntity = Entity & Record<string, any>;
-type Ev = {
-  type?: string;
-  kind?: string;
-  school?: string;
-  ability?: string | null;
-  sourceId?: number;
-  targetId?: number;
-  amount?: number;
-  crit?: boolean;
-};
+type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
+
+function isDamageEvent(event: SimEvent): event is DamageEvent {
+  return event.type === 'damage';
+}
 
 function makeSim(
   cls: PlayerClass,
   level: number,
   seed = 7,
-): { sim: AnySim; p: AnyEntity; meta: any } {
-  const sim = new Sim({ seed, playerClass: cls, autoEquip: true }) as AnySim;
+): { sim: Sim; p: Entity; meta: PlayerMeta } {
+  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
   sim.setPlayerLevel(level);
-  const p = sim.player as AnyEntity;
+  // Ranged fixtures place their target relative to the player, so stand on
+  // empty ground: the town is furnished and would block the shot lane.
+  placePlayerInOpenField(sim);
+  const p = sim.player;
   const meta = sim.players.get(p.id);
+  if (!meta) throw new Error('test player metadata missing');
   p.resource = p.maxResource;
   return { sim, p, meta };
 }
 
+// The proc-before-thorns ordering tests can only observe their ordering on a swing
+// that CONNECTS, so they need a seed whose hit-table roll lands above the floor miss
+// chance. This is a hunted fixture, not a tuning value: scan upward and keep the
+// first seed whose first post-construction draw clears the miss floor for all three
+// arms (paladin, shaman, rogue). Re-hunt it whenever an upstream draw site moves.
+// Re-hunted after the Eastbrook camp respacing thinned the zone-1 camp counts, which
+// removes construction-time draws and shifts every later draw: at the previous 26014
+// the roll fell to 0.0034, under the 1.2 percent floor, so the swing missed and the
+// premise vanished (the miss-chance math itself was unchanged). Spares on record:
+// 26016 through 26020 all connect for this drive.
+const CONNECTING_SWING_SEED = 26015;
+
 // An idle hostile mob, beefed, in front of the player at distance dz, targeted + faced.
-function spawnDummy(sim: AnySim, p: AnyEntity, level = 5, dz = 2): AnyEntity {
-  const mob = createMob(sim.nextId++, MOBS['forest_wolf'], level, {
+function spawnDummy(sim: Sim, p: Entity, level = 5, dz = 2): Entity {
+  const mob = createMob(sim.nextId++, MOBS.forest_wolf, level, {
     x: p.pos.x,
     y: p.pos.y,
     z: p.pos.z + dz,
-  }) as AnyEntity;
+  });
   mob.maxHp = 500000;
   mob.hp = 500000;
   mob.hostile = true;
@@ -64,10 +74,10 @@ function spawnDummy(sim: AnySim, p: AnyEntity, level = 5, dz = 2): AnyEntity {
 }
 
 // Capture the event stream. ctx.emit is late-bound, so swapping sim.emit is observed.
-function capture(sim: AnySim): Ev[] {
-  const events: Ev[] = [];
-  const orig = (sim as any).emit.bind(sim);
-  (sim as any).emit = (e: Ev) => {
+function capture(sim: Sim): SimEvent[] {
+  const events: SimEvent[] = [];
+  const orig = sim.emit.bind(sim);
+  sim.emit = (e: SimEvent) => {
     events.push(e);
     orig(e);
   };
@@ -77,7 +87,12 @@ function capture(sim: AnySim): Ev[] {
 // Ranged/spell damage now lands when the projectile arrives (projectile_travel), not
 // the tick it is fired. Advance the sim until the captured stream shows the awaited
 // event (or a tick cap), so a deferred Auto Shot / Wand bolt has time to connect.
-function landProjectiles(sim: AnySim, events: Ev[], pred: (e: Ev) => boolean, maxTicks = 40) {
+function landProjectiles(
+  sim: Sim,
+  events: SimEvent[],
+  pred: (e: SimEvent) => boolean,
+  maxTicks = 40,
+) {
   for (let i = 0; i < maxTicks && !events.some(pred); i++) sim.tick();
 }
 
@@ -110,6 +125,66 @@ describe('auto_attack meleeSwing: the white-hit table', () => {
     );
   });
 
+  it('slow one-hand auto attacks hit harder per swing than fast one-hand attacks at the same weapon damage budget', () => {
+    const hitWithSpeed = (speed: number): number => {
+      const { sim, p } = makeSim('warrior', 12);
+      const mob = spawnDummy(sim, p, 1);
+      p.attackPower = 0;
+      p.critChance = 0;
+      mob.stats = { ...mob.stats, armor: 0 };
+      sim.rng.next = () => 0.9; // clears miss/dodge/parry/block and crit; fixed weapon roll
+      const events = capture(sim);
+
+      const connected = meleeSwing(sim.ctx, p, mob, 0, null, {
+        cannotBeDodged: true,
+        weapon: { min: 20, max: 20, speed },
+        autoAttackHand: 'onehand',
+      });
+
+      expect(connected).toBe(true);
+      const hit = events.find(
+        (e): e is DamageEvent => isDamageEvent(e) && e.kind === 'hit' && e.sourceId === p.id,
+      );
+      expect(hit?.amount).toBeGreaterThan(0);
+      return hit?.amount ?? 0;
+    };
+
+    const fast = hitWithSpeed(1);
+    const slow = hitWithSpeed(3);
+    expect(slow).toBeGreaterThan(fast);
+    expect({ fast, slow }).toEqual({ fast: 10, slow: 30 });
+  });
+
+  it('a comparable two-hand auto attack hits harder per swing than a one-hand auto attack', () => {
+    const hitWithHand = (autoAttackHand: 'onehand' | 'twohand'): number => {
+      const { sim, p } = makeSim('warrior', 12);
+      const mob = spawnDummy(sim, p, 1);
+      p.attackPower = 0;
+      p.critChance = 0;
+      mob.stats = { ...mob.stats, armor: 0 };
+      sim.rng.next = () => 0.9; // clears miss/dodge/parry/block and crit; fixed weapon roll
+      const events = capture(sim);
+
+      const connected = meleeSwing(sim.ctx, p, mob, 0, null, {
+        cannotBeDodged: true,
+        weapon: { min: 20, max: 20, speed: 2 },
+        autoAttackHand,
+      });
+
+      expect(connected).toBe(true);
+      const hit = events.find(
+        (e): e is DamageEvent => isDamageEvent(e) && e.kind === 'hit' && e.sourceId === p.id,
+      );
+      expect(hit?.amount).toBeGreaterThan(0);
+      return hit?.amount ?? 0;
+    };
+
+    const oneHand = hitWithHand('onehand');
+    const twoHand = hitWithHand('twohand');
+    expect(twoHand).toBeGreaterThan(oneHand);
+    expect({ oneHand, twoHand }).toEqual({ oneHand: 20, twoHand: 23 });
+  });
+
   it('a 100% blind forces a miss: returns false, emits a miss, deals no damage', () => {
     const { sim, p } = makeSim('warrior', 12);
     const mob = spawnDummy(sim, p, 1);
@@ -122,7 +197,7 @@ describe('auto_attack meleeSwing: the white-hit table', () => {
       value: 1,
       sourceId: 999,
       school: 'physical',
-    } as any);
+    } satisfies Aura);
     const events = capture(sim);
     const hp0 = mob.hp;
     const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
@@ -137,7 +212,8 @@ describe('auto_attack meleeSwing: the white-hit table', () => {
     const { sim, p } = makeSim('warrior', 30); // high level -> floor miss chance (0.005)
     const targetPid = sim.addPlayer('rogue', 'Dodgy') as number;
     sim.setPlayerLevel(1, targetPid);
-    const target = sim.entities.get(targetPid) as AnyEntity;
+    const target = sim.entities.get(targetPid);
+    if (!target) throw new Error('test target missing');
     target.dodgeChance = 1; // player target -> dodgeChance read straight from the field
     p.overpowerUntil = 0;
     const events = capture(sim);
@@ -150,15 +226,200 @@ describe('auto_attack meleeSwing: the white-hit table', () => {
   });
 });
 
+describe('auto_attack meleeSwing: landed talent procs resolve before retaliation', () => {
+  const addImbue = (player: Entity): void => {
+    player.auras.push({
+      id: 'test_imbue',
+      name: 'Test Imbue',
+      kind: 'imbue',
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      sourceId: player.id,
+      school: 'nature',
+    });
+  };
+
+  const addThorns = (target: Entity, value: number): void => {
+    target.auras.push({
+      id: 'test_thorns',
+      name: 'Punishing Thorns',
+      kind: 'thorns',
+      remaining: 30,
+      duration: 30,
+      value,
+      sourceId: target.id,
+      school: 'nature',
+    });
+  };
+
+  it('lets Imbued Lifeblood save its owner from otherwise lethal thorns', () => {
+    const { sim, p } = makeSim('shaman', 20, 1756);
+    expect(sim.applyTalents({ spec: null, rows: { 5: 'sha_r5_imbue_mastery' } })).toBe(true);
+    const mob = spawnDummy(sim, p, 1);
+    addImbue(p);
+    addThorns(mob, 10);
+    p.mainhandItemId = null;
+    p.hp = 5;
+    const events = capture(sim);
+    const draws: number[] = [];
+    sim.rng.setObserver((value: number) => draws.push(value));
+
+    const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
+    sim.rng.setObserver(null);
+
+    const healIndex = events.findIndex(
+      (event) => event.type === 'heal2' && event.ability === 'Imbued Lifeblood',
+    );
+    const thornsIndex = events.findIndex(
+      (event) =>
+        event.type === 'damage' &&
+        event.sourceId === mob.id &&
+        event.targetId === p.id &&
+        event.ability === 'Punishing Thorns',
+    );
+    expect(connected).toBe(true);
+    expect(healIndex).toBeGreaterThan(-1);
+    expect(thornsIndex).toBeGreaterThan(healIndex);
+    expect(p.dead).toBe(false);
+    expect(p.hp).toBeGreaterThan(0);
+    // Hit table, weapon roll, swing crit, then Lifeblood's normal heal-crit roll.
+    expect(draws).toHaveLength(4);
+  });
+
+  it.each([
+    {
+      name: 'Oathwheel cooldown refund',
+      cls: 'paladin' as const,
+      row: { 14: 'pal_r14_righteous_cause' },
+      prepare: (player: Entity) => player.cooldowns.set('judgement', 5),
+      read: (player: Entity) => player.cooldowns.get('judgement'),
+      expected: 4.5,
+    },
+    {
+      name: 'Imbued Tempo cooldown refund',
+      cls: 'shaman' as const,
+      row: { 14: 'sha_r14_weapon_fury' },
+      prepare: (player: Entity) => player.cooldowns.set('earth_shock', 5),
+      read: (player: Entity) => player.cooldowns.get('earth_shock'),
+      expected: 4.5,
+    },
+  ])('applies $name before thorns without changing the shared RNG trace', (testCase) => {
+    const run = (active: boolean) => {
+      const { sim, p } = makeSim(testCase.cls, 20, CONNECTING_SWING_SEED);
+      if (active) {
+        expect(sim.applyTalents({ spec: null, rows: testCase.row })).toBe(true);
+      }
+      const mob = spawnDummy(sim, p, 1);
+      addImbue(p);
+      addThorns(mob, 1);
+      p.mainhandItemId = null;
+      testCase.prepare(p);
+      let valueAtRetaliation: unknown;
+      const dealDamage = sim.ctx.dealDamage;
+      sim.ctx.dealDamage = ((source: Entity | null, target: Entity, ...args: unknown[]) => {
+        if (source?.id === mob.id && target.id === p.id && args[3] === 'Punishing Thorns') {
+          valueAtRetaliation = testCase.read(p);
+        }
+        return (dealDamage as (...callArgs: unknown[]) => unknown)(source, target, ...args);
+      }) as typeof sim.ctx.dealDamage;
+      const draws: number[] = [];
+      sim.rng.setObserver((value: number) => draws.push(value));
+
+      const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
+      sim.rng.setObserver(null);
+
+      expect(connected).toBe(true);
+      return { draws, valueAtRetaliation };
+    };
+
+    const baseline = run(false);
+    const active = run(true);
+    expect(active.valueAtRetaliation).toBe(testCase.expected);
+    expect(active.draws).toEqual(baseline.draws);
+    expect(active.draws).toHaveLength(3);
+  });
+
+  it('Venom Dividend rolls its chance before thorns and pays only on success', () => {
+    // Balance pass: the flat 5-per-swing became the Combat Potency shape (20%
+    // chance for 10 energy), so the proc now draws exactly one rng roll per
+    // poisoned swing; the roll resolves before the thorns retaliation.
+    const run = (active: boolean) => {
+      const { sim, p } = makeSim('rogue', 20, CONNECTING_SWING_SEED);
+      if (active) {
+        expect(sim.applyTalents({ spec: null, rows: { 14: 'rog_r14_deadly_brew' } })).toBe(true);
+      }
+      const mob = spawnDummy(sim, p, 1);
+      addImbue(p);
+      addThorns(mob, 1);
+      p.mainhandItemId = null;
+      p.resource = 0;
+      let valueAtRetaliation: unknown;
+      const dealDamage = sim.ctx.dealDamage;
+      sim.ctx.dealDamage = ((source: Entity | null, target: Entity, ...args: unknown[]) => {
+        if (source?.id === mob.id && target.id === p.id && args[3] === 'Punishing Thorns') {
+          valueAtRetaliation = p.resource;
+        }
+        return (dealDamage as (...callArgs: unknown[]) => unknown)(source, target, ...args);
+      }) as typeof sim.ctx.dealDamage;
+      const draws: number[] = [];
+      sim.rng.setObserver((value: number) => draws.push(value));
+      const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
+      sim.rng.setObserver(null);
+      expect(connected).toBe(true);
+      return { draws, valueAtRetaliation, resource: p.resource };
+    };
+
+    const baseline = run(false);
+    const active = run(true);
+    expect(active.draws).toHaveLength(baseline.draws.length + 1); // the chance roll
+    expect(active.valueAtRetaliation).toBe(active.resource); // resolved before thorns
+    expect([0, 10]).toContain(active.resource); // pays 10 or nothing, never 5
+  });
+});
+
 describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
   it('Auto Shot is a physical projectile (armor-mitigated)', () => {
     const { sim, p } = makeSim('hunter', 12);
     const mob = spawnDummy(sim, p, 8, 20);
     const events = capture(sim);
     rangedSwing(sim.ctx, p, mob, { min: 5, max: 9, speed: 2.3 });
-    expect(events.some((e) => e.type === 'spellfx' && e.school === 'physical')).toBe(true);
+    expect(
+      events.some(
+        (e) =>
+          e.type === 'spellfx' && e.school === 'physical' && e.attackAnimation === 'ranged-shot',
+      ),
+    ).toBe(true);
+    landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
+    expect(
+      events.some(
+        (e) =>
+          e.type === 'damage' && e.ability === 'Auto Shot' && e.attackAnimationStarted === true,
+      ),
+    ).toBe(true);
+  });
+
+  it('Auto Shot launches on the swing tick without adding a universal draw delay', () => {
+    const { sim, p } = makeSim('hunter', 12);
+    const mob = spawnDummy(sim, p, 8, 20);
+    const events = capture(sim);
+    rangedSwing(sim.ctx, p, mob, { min: 5, max: 9, speed: 2.3 });
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(true);
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'windup')).toBe(false);
+    // Damage still lands on ARRIVAL, never on the swing tick.
+    expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(false);
     landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
     expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(true);
+  });
+
+  it('Wand keeps its instant tracer: projectile fx on the swing tick, no windup', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const mob = spawnDummy(sim, p, 8, 15);
+    const events = capture(sim);
+    rangedSwing(sim.ctx, p, mob, { min: 3, max: 6, speed: 1.8, wand: true, school: 'arcane' });
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(true);
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'windup')).toBe(false);
+    expect(events.some((e) => 'attackAnimation' in e)).toBe(false);
   });
 
   it('Wand is an arcane bolt (no dead zone, ignores armor)', () => {
@@ -176,12 +437,35 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
       events.some((e) => e.type === 'damage' && e.ability === 'Wand' && e.school === 'arcane'),
     ).toBe(true);
   });
+
+  it('a dodgy target does not dodge Auto Shot outside melee range', () => {
+    const { sim, p } = makeSim('hunter', 30);
+    const targetPid = sim.addPlayer('rogue', 'Dodgy');
+    const target = sim.entities.get(targetPid);
+    if (target?.kind !== 'player') throw new Error('test target missing');
+    target.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + 20 };
+    target.dodgeChance = 1;
+    target.stats = { ...target.stats, armor: 0 };
+    p.rangedPower = 0;
+    p.critChance = 0;
+    const events = capture(sim);
+
+    rangedSwing(sim.ctx, p, target, { min: 10, max: 10, speed: 2 });
+    landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
+
+    const shot = events.find(
+      (e): e is DamageEvent => isDamageEvent(e) && e.ability === 'Auto Shot',
+    );
+    expect(shot?.kind).toBe('hit');
+    expect(shot?.amount).toBeGreaterThan(0);
+    expect(events.some((e) => e.type === 'damage' && e.kind === 'dodge')).toBe(false);
+  });
 });
 
 describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
   it('a hunter at range takes the ranged branch (Auto Shot), arming ranged-speed cadence', () => {
     const { sim, p, meta } = makeSim('hunter', 12);
-    const mob = spawnDummy(sim, p, 8, 20); // beyond the 8yd dead zone, within 35
+    spawnDummy(sim, p, 8, 20); // beyond the 8yd dead zone, within 35
     p.autoAttack = true;
     p.swingTimer = 0;
     const events = capture(sim);
@@ -193,7 +477,7 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
 
   it('a warrior in melee takes the melee branch, arming weapon-speed cadence', () => {
     const { sim, p, meta } = makeSim('warrior', 12);
-    const mob = spawnDummy(sim, p, 5, 2); // within MELEE_RANGE
+    spawnDummy(sim, p, 5, 2); // within MELEE_RANGE
     p.autoAttack = true;
     p.swingTimer = 0;
     const events = capture(sim);
@@ -202,6 +486,28 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
       events.some((e) => e.type === 'damage' && e.school === 'physical' && e.sourceId === p.id),
     ).toBe(true);
     expect(p.swingTimer).toBeCloseTo(p.weapon.speed * sim.swingIntervalMult(p));
+  });
+
+  it('a ranged attacker whose swing timer is still up does NOT fire (once per weapon interval, not per tick)', () => {
+    // Regression (restored from the pre-revert payload): the dual-wield-aware
+    // guard sits AFTER the ranged branch, so a ranged attacker needs its own
+    // swing-timer gate before it or it re-enters and fires on all 20 ticks per
+    // second.
+    const { sim, p, meta } = makeSim('hunter', 12);
+    spawnDummy(sim, p, 8, 20);
+    p.autoAttack = true;
+    p.swingTimer = 0;
+    const shots = (evs: SimEvent[]): SimEvent[] =>
+      evs.filter((e) => e.type === 'spellfx' && e.fx === 'projectile' && e.sourceId === p.id);
+    // First tick: one legitimate shot fired, and the timer is armed to the interval.
+    const first = capture(sim);
+    updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(shots(first)).toHaveLength(1);
+    expect(p.swingTimer).toBeGreaterThan(0);
+    // Next 10 ticks (0.5s, still well inside a ~2.3s interval): no further shots.
+    const rest = capture(sim);
+    for (let i = 0; i < 10; i++) updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(shots(rest)).toHaveLength(0);
   });
 
   it('the swing timer decrements every tick even while not auto-attacking', () => {
@@ -236,7 +542,7 @@ describe('auto_attack Auto Shot scales off the equipped weapon (ranged DPS)', ()
     const shoot = (weaponMin: number, weaponMax: number): number => {
       const { sim, p, meta } = makeSim('hunter', 20, 3);
       const mob = spawnDummy(sim, p, 1, 20); // far below level -> floored miss chance
-      mob.armor = 0; // isolate the weapon-damage signal from armor mitigation
+      mob.stats = { ...mob.stats, armor: 0 }; // isolate the weapon-damage signal from armor mitigation
       p.critChance = 0; // no crit variance
       p.weapon = { min: weaponMin, max: weaponMax, speed: 2 };
       p.autoAttack = true;
@@ -278,6 +584,17 @@ describe('auto_attack start/stopAutoAttack', () => {
     startAutoAttack(sim.ctx, p.id);
     expect(p.autoAttack).toBe(true);
     expect(mob.aggroTargetId).toBe(p.id); // idle mob pulled into combat (ctx.aggroMob)
+  });
+
+  it('silently no-ops on a target that just died (no spurious "Invalid attack target." toast)', () => {
+    const { sim, p } = makeSim('warrior', 12);
+    const mob = spawnDummy(sim, p, 5, 2);
+    mob.dead = true; // the engaging spell landed the killing blow this same tick
+    p.targetId = mob.id;
+    const events = capture(sim);
+    startAutoAttack(sim.ctx, p.id);
+    expect(p.autoAttack).toBe(false); // no engage on a corpse
+    expect(events.some((e) => e.type === 'error')).toBe(false); // and NO error toast
   });
 
   it('stopAutoAttack clears the flag', () => {
@@ -329,8 +646,8 @@ describe('auto_attack determinism', () => {
       const mob = spawnDummy(sim, p, 10, 2);
       p.autoAttack = true;
       const dmg: number[] = [];
-      const orig = (sim as any).emit.bind(sim);
-      (sim as any).emit = (e: Ev) => {
+      const orig = sim.emit.bind(sim);
+      sim.emit = (e: SimEvent) => {
         if (e.type === 'damage' && e.sourceId === p.id) dmg.push(e.amount ?? 0);
         orig(e);
       };
@@ -386,7 +703,7 @@ describe('rangedSwing damage: the 0.6 weapon coefficient is Auto Shot only', () 
     for (let i = 0; i < 400 && sim.ctx.pendingProjectiles.length > 0; i++)
       advancePendingProjectiles(sim.ctx);
     const hits = events.filter(
-      (e) => e.type === 'damage' && e.ability === 'Auto Shot' && e.kind === 'hit',
+      (e): e is DamageEvent => isDamageEvent(e) && e.ability === 'Auto Shot' && e.kind === 'hit',
     );
     expect(hits.length).toBeGreaterThan(10);
     expect(hits.some((h) => !h.crit)).toBe(true);
@@ -404,7 +721,7 @@ describe('rangedSwing damage: the 0.6 weapon coefficient is Auto Shot only', () 
     for (let i = 0; i < 400 && sim.ctx.pendingProjectiles.length > 0; i++)
       advancePendingProjectiles(sim.ctx);
     const hits = events.filter(
-      (e) => e.type === 'damage' && e.ability === 'Wand' && e.kind === 'hit',
+      (e): e is DamageEvent => isDamageEvent(e) && e.ability === 'Wand' && e.kind === 'hit',
     );
     expect(hits.length).toBeGreaterThan(10);
     expect(hits.some((h) => !h.crit)).toBe(true);
@@ -418,8 +735,11 @@ describe('rangedSwing damage: the 0.6 weapon coefficient is Auto Shot only', () 
 // just a melee swing. A caster's wand bolt does NOT swing the mainhand, so it never
 // rolls the mainhand's proc.
 describe('rangedSwing fires weaponHit procs (Thronebane on a hunter Auto Shot)', () => {
-  const chainArcs = (events: Ev[]) =>
-    events.filter((e) => e.type === 'damage' && e.ability === 'Chain Arc' && e.school === 'nature');
+  const chainArcs = (events: SimEvent[]): DamageEvent[] =>
+    events.filter(
+      (e): e is DamageEvent =>
+        isDamageEvent(e) && e.ability === 'Chain Arc' && e.school === 'nature',
+    );
 
   it('a hunter wielding Thronebane procs Chain Arc off Auto Shot', () => {
     const { sim, p } = makeSim('hunter', 20);

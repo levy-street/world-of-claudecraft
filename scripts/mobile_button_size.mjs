@@ -10,6 +10,7 @@ import { BROWSER_PATH as EDGE } from './browser_path.mjs';
 import { enterOfflineGame } from './enter_offline_game.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
+const CHAR_NAME = 'Thumbster';
 fs.mkdirSync('tmp', { recursive: true });
 
 // A landscape phone: width<940 keeps us inside PHONE_TOUCH_QUERY, landscape
@@ -39,12 +40,32 @@ page.on('console', (msg) => {
 });
 
 await page.goto(URL, { waitUntil: 'networkidle0', timeout: 30000 });
-await enterOfflineGame(page, { charClass: 'warrior', charName: 'Thumbster', settleMs: 2500 });
+await page.evaluate((name) => {
+  localStorage.setItem(`woc_spawn_intro_seen:offline:warrior:${name}`, '1');
+}, CHAR_NAME);
+await enterOfflineGame(page, { charClass: 'warrior', charName: CHAR_NAME, settleMs: 2500 });
 
 // Force the touch layer on. Headless Chromium doesn't always report
 // (pointer: coarse), so we apply the same body class MobileControls would.
 await page.evaluate(() => document.body.classList.add('mobile-touch'));
-await new Promise((r) => setTimeout(r, 200));
+await page.waitForFunction(
+  () => {
+    const ui = document.getElementById('ui');
+    const controls = document.getElementById('mobile-controls');
+    const chat = document.getElementById('mobile-chat');
+    if (!ui || !controls || !chat) return false;
+    const uiStyle = getComputedStyle(ui);
+    const controlsStyle = getComputedStyle(controls);
+    const chatRect = chat.getBoundingClientRect();
+    return (
+      uiStyle.display !== 'none' &&
+      controlsStyle.display !== 'none' &&
+      chatRect.width > 0 &&
+      chatRect.height > 0
+    );
+  },
+  { timeout: 15000 },
+);
 const touchOn = await page.evaluate(() => document.body.classList.contains('mobile-touch'));
 console.log('mobile-touch active:', touchOn);
 

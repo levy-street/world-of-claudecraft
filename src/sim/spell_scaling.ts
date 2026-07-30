@@ -1,6 +1,7 @@
 // Spell Power scaling: the pure, host-agnostic coefficient math that turns a
 // caster's Spell Power (or an attacker's Attack Power, for "attack spells") into
-// the flat damage added to a spell hit, channel tick, DoT tick, or AoE hit.
+// the flat amount added to a spell hit, heal, absorb, channel tick, DoT tick,
+// or AoE hit.
 //
 // Classic-era model:
 //   - direct nuke: coeff = clamp(castTime, 1.5, 7) / 3.5 (instants use the 1.5 floor)
@@ -81,13 +82,37 @@ export function directHitBonus(
   return Math.round(power * coeff * powerScale(def));
 }
 
+// Healing scales off DOUBLE Spell Power: with SPELL_POWER_PER_INT at 0.5 this
+// is exactly 1 healing per point of Intellect (the WoW-classic "healing gets
+// twice the spell power budget" convention). Part of the 2026-07 healers-vs-
+// heroics rebalance: pools and mob damage had outscaled heals, and spell power
+// was only 20-30% of heal output, so healing takes a bigger share of the stat.
+// Damage spells are untouched (they keep the 1x rider in directHitBonus).
+export const HEALING_SP_SCALE = 2;
+
 // Flat bonus added to ONE direct heal. Healing always scales off Spell Power at
 // the full cast-time coefficient with no AP scale-down (heals are never "attack
 // spells"): instants use the 1.5 floor, like a direct nuke. `castTimeSec` is the
 // rank-resolved cast time (res.castTime), so higher ranks and talent-hastened
-// heals scale correctly.
-export function directHealBonus(spellPower: number, castTimeSec: number): number {
-  return Math.round(spellPower * directSpellCoeff(castTimeSec));
+// heals scale correctly. `aoe` applies the same per-target coefficient penalty
+// AoE damage takes, so multi-target heals do not triple-dip Spell Power.
+export function directHealBonus(spellPower: number, castTimeSec: number, aoe = false): number {
+  return Math.round(
+    spellPower *
+      HEALING_SP_SCALE *
+      directSpellCoeff(castTimeSec) *
+      (aoe ? SPELL_AOE_COEFF_MULT : 1),
+  );
+}
+
+// Flat bonus added to an absorb shield with an explicitly authored coefficient.
+// Shields without a coefficient remain fixed by rank.
+// NOTE: deliberately NOT scaled by HEALING_SP_SCALE. The only shields with an
+// authored coefficient are the mage personal barriers (damage-class
+// survivability, not healing); the healer shield (Psalm of Warding) carries no
+// coefficient and scales through its rank amounts instead.
+export function absorbBonus(spellPower: number, coefficient: number): number {
+  return Math.max(0, Math.round(spellPower * coefficient));
 }
 
 // Flat bonus added to ONE HoT tick: the total DoT coefficient (duration / 15)
@@ -96,7 +121,7 @@ export function directHealBonus(spellPower: number, castTimeSec: number): number
 export function hotTickBonus(spellPower: number, durationSec: number, intervalSec: number): number {
   const ticks = intervalSec > 0 ? Math.max(1, durationSec / intervalSec) : 1;
   const coeff = dotTotalCoeff(durationSec) / ticks;
-  return Math.round(spellPower * coeff);
+  return Math.round(spellPower * HEALING_SP_SCALE * coeff);
 }
 
 // Flat bonus added to ONE channel tick (e.g. each Arcane Missile / Mind Flay tick).

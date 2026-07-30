@@ -1,8 +1,7 @@
 // Scrub credential-shaped substrings out of text that is about to become PUBLIC, for
-// example the AI reviewer's final message before it is posted as a PR comment
-// (ai_review.mjs). The agent's prompt embeds an attacker-controlled fork-PR diff, so
-// its output can be prompt-injected into echoing secrets; this scrubber is the last
-// line of defense before the text leaves the workflow.
+// example a structured AI review before it becomes a public PR comment. Model output
+// is untrusted even when the prompt and filesystem are isolated, so this scrubber is
+// the last line of defense before text leaves the workflow.
 //
 // Deliberately conservative: only well-known credential shapes plus caller-supplied
 // exact literals are redacted. There is deliberately NO generic long-hex rule, because

@@ -12,6 +12,7 @@ const BLOCKS = [
   ['guide.combat.hitTitle', 'guide.combat.hitBody'],
   ['guide.combat.mitigationTitle', 'guide.combat.mitigationBody'],
   ['guide.combat.resourcesTitle', 'guide.combat.resourcesBody'],
+  ['guide.combat.queueTitle', 'guide.combat.queueBody'],
 ] as const;
 
 export const combat: GuidePage = {
@@ -34,6 +35,7 @@ export const combat: GuidePage = {
           <h2>${esc(t('guide.combat.effectsTitle'))}</h2>
           <p>${esc(t('guide.combat.effectsBody'))}</p>
           <p>${esc(t('guide.combat.ccBody'))}</p>
+          <p>${esc(t('guide.combat.metersBody'))}</p>
         </section>
         <section class="guide-block">
           <h2>${esc(t('guide.combat.deathTitle'))}</h2>

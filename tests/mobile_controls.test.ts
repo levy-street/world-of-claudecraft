@@ -6,9 +6,13 @@ import {
   HAPTICS_STORE_KEY,
   interfaceModeFromSetting,
   isChatLongPress,
+  isMoveAutorunNear,
+  isMoveAutorunPush,
   isPhoneTouchDevice,
   isRecenterDoubleTap,
   loadHapticsEnabled,
+  MOVE_AUTORUN_REVEAL_THRESHOLD,
+  MOVE_AUTORUN_THRESHOLD,
   MobileControls,
   mapJoystickVector,
   mapLookVector,
@@ -88,6 +92,20 @@ describe('mapJoystickVector', () => {
     // a tiny push that's neutral by default registers with a narrow deadzone
     const narrow = mapJoystickVector(0, -0.15, 0.1);
     expect(narrow.forward).toBe(true);
+  });
+});
+
+describe('isMoveAutorunPush', () => {
+  it('requires a strong upward push into the top joystick band', () => {
+    expect(isMoveAutorunPush(-MOVE_AUTORUN_THRESHOLD)).toBe(true);
+    expect(isMoveAutorunPush(-MOVE_AUTORUN_THRESHOLD + 0.01)).toBe(false);
+    expect(isMoveAutorunPush(0)).toBe(false);
+  });
+
+  it('reveals the round target before the lock threshold', () => {
+    expect(isMoveAutorunNear(-MOVE_AUTORUN_REVEAL_THRESHOLD)).toBe(true);
+    expect(isMoveAutorunNear(-MOVE_AUTORUN_REVEAL_THRESHOLD + 0.01)).toBe(false);
+    expect(isMoveAutorunPush(-MOVE_AUTORUN_REVEAL_THRESHOLD)).toBe(false);
   });
 });
 
@@ -219,30 +237,23 @@ describe('mapLookVector', () => {
   });
 });
 
+describe('pinchZoomDelta', () => {
+  it('ignores small two-finger distance jitter', () => {
+    expect(pinchZoomDelta(120, 130)).toBe(0);
+    expect(pinchZoomDelta(120, 109)).toBe(0);
+  });
+
+  it('zooms in when fingers spread apart and out when they pinch together', () => {
+    expect(pinchZoomDelta(100, 150)).toBeCloseTo(-1.33);
+    expect(pinchZoomDelta(150, 100)).toBeCloseTo(1.33);
+  });
+});
+
 // (clampJoystickOrigin was removed: clamping the floating origin into the
 // 132px capture zone, which cannot contain the 140/128px wheel, pinned the
 // origin away from the thumb and made every off-center touchdown instantly
 // walk the character: the issue #1229 drift. The origin is now the raw touch
 // point; the integration tests below pin the new contract.)
-
-describe('pinchZoomDelta', () => {
-  it('returns zero when the pinch distance is unchanged', () => {
-    expect(pinchZoomDelta(120, 120)).toBe(0);
-  });
-
-  it('zooms in (negative delta) when the fingers spread apart', () => {
-    expect(pinchZoomDelta(100, 150, 0.04)).toBeCloseTo(-2);
-  });
-
-  it('zooms out (positive delta) when the fingers pinch together', () => {
-    expect(pinchZoomDelta(150, 100, 0.04)).toBeCloseTo(2);
-  });
-
-  it('scales the delta by the magnitude of the spread', () => {
-    expect(pinchZoomDelta(100, 110, 0.04)).toBeCloseTo(-0.4);
-    expect(pinchZoomDelta(100, 200, 0.04)).toBeCloseTo(-4);
-  });
-});
 
 describe('haptics', () => {
   const makeStore = (initial: Record<string, string> = {}) => {
@@ -321,10 +332,13 @@ class FakeClassList {
 
 class FakeElement extends EventTarget {
   classList = new FakeClassList();
+  dataset: Record<string, string> = {};
   style: {
     transform: string;
     left: string;
     top: string;
+    right: string;
+    bottom: string;
     display: string;
     overflowY: string;
     height: string;
@@ -332,6 +346,8 @@ class FakeElement extends EventTarget {
     transform: '',
     left: '',
     top: '',
+    right: '',
+    bottom: '',
     display: '',
     overflowY: '',
     height: '',
@@ -342,6 +358,7 @@ class FakeElement extends EventTarget {
   value = '';
   blur(): void {}
   private captured = new Set<number>();
+  private captureGeneration = new Map<number, number>();
   /** Selectors this element (or a simulated ancestor) matches, for closest();
    *  drives touch_router.ts's isInteractiveHudElement checks in tests. */
   matchedSelectors: string[] = [];
@@ -357,11 +374,41 @@ class FakeElement extends EventTarget {
   }
 
   setPointerCapture(pointerId: number): void {
+    this.captureGeneration.set(pointerId, (this.captureGeneration.get(pointerId) ?? 0) + 1);
     this.captured.add(pointerId);
   }
 
   releasePointerCapture(pointerId: number): void {
+    if (!this.captured.has(pointerId)) return;
+    const releasedGeneration = this.captureGeneration.get(pointerId) ?? 0;
     this.captured.delete(pointerId);
+    // Real browsers dispatch lostpointercapture for both an explicit
+    // releasePointerCapture() call and an implicit capture loss (spec
+    // behavior), and do so as a separate task rather than re-entrantly within
+    // the releasePointerCapture() call itself. The fake DOM previously stayed
+    // silent here, which is why the pinch-vs-swipe-look echo regression
+    // (releaseSwipeLook's own release tearing down a just-started pinch) went
+    // uncaught: queue it with queueMicrotask so callers observe the same
+    // non-reentrant timing as a real browser instead of synchronous recursion.
+    queueMicrotask(() => {
+      // A new capture established before the pending loss is dispatched
+      // supersedes the old release. Browsers do not emit that stale loss for
+      // the new capture generation, so the fake must not either.
+      if (
+        this.captured.has(pointerId) ||
+        this.captureGeneration.get(pointerId) !== releasedGeneration
+      )
+        return;
+      this.dispatchEvent(
+        Object.defineProperties(
+          new Event('lostpointercapture', { bubbles: true, cancelable: true }),
+          {
+            pointerId: { value: pointerId },
+            pointerType: { value: 'touch' },
+          },
+        ),
+      );
+    });
   }
 
   hasPointerCapture(pointerId: number): boolean {
@@ -408,13 +455,19 @@ function installMobileControlDom(): {
   canvas: FakeElement;
   moveZone: FakeElement;
   moveJoystick: FakeElement;
+  autorunTarget: FakeElement;
   cameraJoystick: FakeElement;
   jumpButton: FakeElement;
+  moreButton: FakeElement;
+  moreModal: FakeElement;
   emoteButton: FakeElement;
+  mountButton: FakeElement;
   discordButton: FakeElement;
   donateButton: FakeElement;
+  chatButton: FakeElement;
   windowTarget: EventTarget;
 } {
+  const autorunTarget = new FakeElement();
   const elements = new Map<string, FakeElement>([
     [
       'game-canvas',
@@ -427,12 +480,17 @@ function installMobileControlDom(): {
     ],
     ['mobile-move-joystick', new FakeElement()],
     ['mobile-move-stick', new FakeElement()],
+    ['mobile-autorun-target', autorunTarget],
     ['mobile-camera-joystick', new FakeElement()],
     ['mobile-camera-stick', new FakeElement()],
     ['mobile-jump', new FakeElement()],
+    ['mobile-more', new FakeElement()],
+    ['mobile-extra-controls', new FakeElement()],
     ['mobile-emote', new FakeElement()],
+    ['mobile-mounts', new FakeElement()],
     ['mobile-discord', new FakeElement()],
     ['mobile-donate', new FakeElement()],
+    ['mobile-chat', new FakeElement()],
     // The chat composer, so exitChatReply (value clear + blur) is exercised in the
     // fake DOM: the setActive draft-survival test reads its .value.
     ['chat-input', new FakeElement()],
@@ -443,7 +501,10 @@ function installMobileControlDom(): {
     matchMedia(query: string): FakeMediaQueryList;
   };
   windowTarget.matchMedia = () => new FakeMediaQueryList();
-
+  Object.defineProperties(windowTarget, {
+    innerWidth: { value: 390, configurable: true },
+    innerHeight: { value: 844, configurable: true },
+  });
   const documentFake = documentTarget as EventTarget & {
     body: FakeElement;
     visibilityState: DocumentVisibilityState;
@@ -460,11 +521,16 @@ function installMobileControlDom(): {
     canvas: elements.get('game-canvas')!,
     moveZone: elements.get('mobile-move-zone')!,
     moveJoystick: elements.get('mobile-move-joystick')!,
+    autorunTarget,
     cameraJoystick: elements.get('mobile-camera-joystick')!,
     jumpButton: elements.get('mobile-jump')!,
+    moreButton: elements.get('mobile-more')!,
+    moreModal: elements.get('mobile-extra-controls')!,
     emoteButton: elements.get('mobile-emote')!,
+    mountButton: elements.get('mobile-mounts')!,
     discordButton: elements.get('mobile-discord')!,
     donateButton: elements.get('mobile-donate')!,
+    chatButton: elements.get('mobile-chat')!,
     windowTarget,
   };
 }
@@ -489,7 +555,6 @@ function mobileCallbacks() {
     onCycleTarget: noop,
     onJump: noop,
     onInteract: noop,
-    onAutorun: () => false,
     onChat: noop,
     onChatOpen: noop,
     onChatClose: noop,
@@ -499,20 +564,191 @@ function mobileCallbacks() {
     onDonate: noop,
     onEmotes: noop,
     onArena: noop,
+    onDungeonFinder: noop,
     onValeCup: noop,
     onQuestLog: noop,
     onCharacter: noop,
     onBags: noop,
+    onCrafting: noop,
     onSpellbook: noop,
     onTalents: noop,
     onMap: noop,
     onLeaderboard: noop,
     onDailyRewards: noop,
+    onMountToggle: noop,
+    onDeeds: noop,
+    onProfessions: noop,
     onNameplates: () => false,
     onMusic: () => true,
     onRecenterCamera: noop,
+    onGroundAimMove: () => false,
+    onGroundAimTap: () => false,
   };
 }
+
+describe('MobileControls ground placement tap', () => {
+  const inputWithoutLook = () =>
+    ({
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: () => {},
+      zoomBy: () => {},
+    }) as unknown as Input;
+
+  it('moves and commits an active reticle without turning the same drag into camera look', () => {
+    const { canvas } = installMobileControlDom();
+    const moves: Array<{ x: number; y: number }> = [];
+    const taps: Array<{ x: number; y: number }> = [];
+    const lookDeltas: Array<{ x: number; y: number }> = [];
+    const callbacks = {
+      ...mobileCallbacks(),
+      onGroundAimMove: (x: number, y: number) => {
+        moves.push({ x, y });
+        return true;
+      },
+      onGroundAimTap: (x: number, y: number) => {
+        taps.push({ x, y });
+        return true;
+      },
+    };
+    const input = inputWithoutLook();
+    input.applyTouchLookDelta = (x: number, y: number) => lookDeltas.push({ x, y });
+    new MobileControls(input, callbacks).start();
+
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 70,
+        pointerType: 'touch',
+        clientX: 320,
+        clientY: 180,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointerup', {
+        pointerId: 70,
+        pointerType: 'touch',
+        clientX: 322,
+        clientY: 181,
+      }),
+    );
+    expect(taps).toEqual([{ x: 322, y: 181 }]);
+    expect(moves).toEqual([{ x: 320, y: 180 }]);
+
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 71,
+        pointerType: 'touch',
+        clientX: 200,
+        clientY: 160,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 71,
+        pointerType: 'touch',
+        clientX: 260,
+        clientY: 160,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointerup', {
+        pointerId: 71,
+        pointerType: 'touch',
+        clientX: 260,
+        clientY: 160,
+      }),
+    );
+    expect(moves).toEqual([
+      { x: 320, y: 180 },
+      { x: 200, y: 160 },
+      { x: 260, y: 160 },
+    ]);
+    expect(taps).toEqual([
+      { x: 322, y: 181 },
+      { x: 260, y: 160 },
+    ]);
+    expect(lookDeltas).toEqual([]);
+
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 72,
+        pointerType: 'touch',
+        clientX: 300,
+        clientY: 170,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointercancel', {
+        pointerId: 72,
+        pointerType: 'touch',
+        clientX: 340,
+        clientY: 170,
+      }),
+    );
+    expect(taps).toHaveLength(2);
+  });
+
+  it('commits a slow ground-target drag when the release arrives on the window path', () => {
+    const { canvas, windowTarget } = installMobileControlDom();
+    const moves: Array<{ x: number; y: number }> = [];
+    const taps: Array<{ x: number; y: number }> = [];
+    const lookDeltas: Array<{ x: number; y: number }> = [];
+    const callbacks = {
+      ...mobileCallbacks(),
+      onGroundAimMove: (x: number, y: number) => {
+        moves.push({ x, y });
+        return true;
+      },
+      onGroundAimTap: (x: number, y: number) => {
+        taps.push({ x, y });
+        return true;
+      },
+    };
+    const input = inputWithoutLook();
+    input.applyTouchLookDelta = (x: number, y: number) => lookDeltas.push({ x, y });
+    const nowSpy = vi.spyOn(performance, 'now').mockReturnValue(1000);
+    try {
+      new MobileControls(input, callbacks).start();
+
+      canvas.dispatchEvent(
+        pointerEvent('pointerdown', {
+          pointerId: 73,
+          pointerType: 'touch',
+          clientX: 200,
+          clientY: 300,
+        }),
+      );
+      canvas.dispatchEvent(
+        pointerEvent('pointermove', {
+          pointerId: 73,
+          pointerType: 'touch',
+          clientX: 260,
+          clientY: 340,
+        }),
+      );
+      nowSpy.mockReturnValue(1000 + RECENTER_DOUBLE_TAP_MS + 1);
+      windowTarget.dispatchEvent(
+        pointerEvent('pointerup', {
+          pointerId: 73,
+          pointerType: 'touch',
+          clientX: 260,
+          clientY: 340,
+        }),
+      );
+
+      expect(moves).toEqual([
+        { x: 200, y: 300 },
+        { x: 260, y: 340 },
+      ]);
+      expect(taps).toEqual([{ x: 260, y: 340 }]);
+      expect(lookDeltas).toEqual([]);
+    } finally {
+      nowSpy.mockRestore();
+    }
+  });
+});
 
 describe('MobileControls setActive draft survival', () => {
   const noopInputForActive = () =>
@@ -557,6 +793,128 @@ describe('MobileControls setActive draft survival', () => {
 });
 
 describe('MobileControls pointer lifecycle', () => {
+  it('engages autorun when the move joystick is pushed into the high round target', () => {
+    const { autorunTarget, moveZone, windowTarget } = installMobileControlDom();
+    let autorunOn = false;
+    let clearCount = 0;
+    const input = {
+      get autorun() {
+        return autorunOn;
+      },
+      setTouchMove: (move: TouchMoveInput) => {
+        if (move.forward || move.back || move.strafeLeft || move.strafeRight) autorunOn = false;
+      },
+      clearTouchMove: () => {
+        clearCount += 1;
+      },
+      setAutorun: (on: boolean) => {
+        autorunOn = on;
+        return autorunOn;
+      },
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 14, clientX: 100, clientY: 100 }),
+    );
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 14, clientX: 100, clientY: 25 }),
+    );
+
+    expect(autorunOn).toBe(false);
+    expect(autorunTarget.classList.contains('near')).toBe(true);
+    expect(autorunTarget.classList.contains('locked')).toBe(false);
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 14, clientX: 100, clientY: -5 }),
+    );
+
+    expect(autorunOn).toBe(true);
+    expect(autorunTarget.classList.contains('locked')).toBe(true);
+    expect(clearCount).toBeGreaterThan(0);
+
+    windowTarget.dispatchEvent(pointerEvent('pointerup', { pointerId: 14 }));
+
+    expect(autorunOn).toBe(true);
+    expect(autorunTarget.classList.contains('near')).toBe(true);
+    expect(autorunTarget.classList.contains('locked')).toBe(true);
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 15, clientX: 100, clientY: 100 }),
+    );
+
+    expect(autorunOn).toBe(false);
+    expect(autorunTarget.classList.contains('near')).toBe(false);
+    expect(autorunTarget.classList.contains('locked')).toBe(false);
+  });
+
+  it('cancels a locked autorun when the same joystick drag leaves the target', () => {
+    const { autorunTarget, moveZone } = installMobileControlDom();
+    let autorunOn = false;
+    const input = {
+      get autorun() {
+        return autorunOn;
+      },
+      setTouchMove: (move: TouchMoveInput) => {
+        if (move.forward || move.back || move.strafeLeft || move.strafeRight) autorunOn = false;
+      },
+      clearTouchMove: () => {},
+      setAutorun: (on: boolean) => {
+        autorunOn = on;
+        return autorunOn;
+      },
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 16, clientX: 100, clientY: 100 }),
+    );
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 16, clientX: 100, clientY: -5 }),
+    );
+    expect(autorunOn).toBe(true);
+    expect(autorunTarget.classList.contains('locked')).toBe(true);
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 16, clientX: 102, clientY: 84 }),
+    );
+
+    expect(autorunOn).toBe(false);
+    expect(autorunTarget.classList.contains('near')).toBe(false);
+    expect(autorunTarget.classList.contains('locked')).toBe(false);
+  });
+
+  it('syncs an external autorun reset into the round target UI', () => {
+    const { autorunTarget } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    const controls = new MobileControls(input, mobileCallbacks());
+    controls.start();
+
+    controls.syncAutorun(true);
+
+    expect(autorunTarget.classList.contains('near')).toBe(true);
+    expect(autorunTarget.classList.contains('locked')).toBe(true);
+
+    autorunTarget.classList.add('near', 'locked');
+
+    controls.syncAutorun(false);
+
+    expect(autorunTarget.classList.contains('near')).toBe(false);
+    expect(autorunTarget.classList.contains('locked')).toBe(false);
+  });
+
   it('clears movement when the active pointer ends outside the joystick element', () => {
     const { moveZone, windowTarget } = installMobileControlDom();
     let lastMove: TouchMoveInput | null = null;
@@ -892,6 +1250,29 @@ describe('MobileControls pointer lifecycle', () => {
     expect(emotes).toBe(1);
   });
 
+  it('fires the mount callback when the More-tray Mount button is tapped', () => {
+    const { mountButton } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    let mountToggles = 0;
+    const callbacks = {
+      ...mobileCallbacks(),
+      onMountToggle: () => {
+        mountToggles += 1;
+      },
+    };
+    new MobileControls(input, callbacks).start();
+
+    mountButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+
+    expect(mountToggles).toBe(1);
+  });
+
   it('fires the Discord callback when the on-screen Discord button is tapped', () => {
     const { discordButton } = installMobileControlDom();
     const input = {
@@ -972,6 +1353,25 @@ describe('MobileControls pointer lifecycle', () => {
     );
 
     expect(document.body.classList.contains('mobile-more-open')).toBe(false);
+  });
+
+  it('keeps the More drawer centered when opened', () => {
+    const { moreButton, moreModal } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+    new MobileControls(input, mobileCallbacks()).start();
+
+    moreButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+
+    expect(moreModal.style.left).toBe('50%');
+    expect(moreModal.style.top).toBe('50%');
+    expect(moreModal.style.right).toBe('auto');
+    expect(moreModal.style.bottom).toBe('auto');
+    expect(moreModal.style.transform).toBe('translate(-50%, -50%)');
   });
 
   it('fires the Jump callback immediately on pointerdown without double-firing the generated click', () => {
@@ -1073,7 +1473,82 @@ describe('MobileControls pointer lifecycle', () => {
     ]);
   });
 
-  it('cancels canvas swipe rotation when a second finger starts pinch zoom', () => {
+  it('resets swipe-look rotation when the browser silently drops pointer capture (iOS gesture interruption)', () => {
+    // Regression test for issue #1892: iOS Safari can invalidate an active
+    // touch's pointer capture (a system gesture, Control Center swipe, or an
+    // alert) WITHOUT firing pointerup or pointercancel. If only those two
+    // events reset swipe-look state, the camera is left permanently latched
+    // into "rotate" mode (setTouchLook(true) never flips back), which reads
+    // to the player as the camera getting stuck spinning or losing normal
+    // rotate/zoom control. `lostpointercapture` is the one event guaranteed
+    // to fire when capture is lost, so the canvas must reset on it exactly
+    // like `moveSurface`/`cameraJoystick` already do (mobile_controls.ts).
+    const { canvas } = installMobileControlDom();
+    const lookActive: boolean[] = [];
+    const lookVectors: Array<{ x: number; y: number }> = [];
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: (active: boolean) => {
+        lookActive.push(active);
+      },
+      setTouchLookVector: (look: { x: number; y: number }) => {
+        lookVectors.push(look);
+      },
+      applyTouchLookDelta: () => {},
+      zoomBy: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 33,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 33,
+        pointerType: 'touch',
+        clientX: 140,
+        clientY: 120,
+      }),
+    );
+    expect(lookActive).toEqual([true]);
+
+    // No pointerup/pointercancel: the browser just drops capture.
+    canvas.dispatchEvent(
+      pointerEvent('lostpointercapture', { pointerId: 33, pointerType: 'touch' }),
+    );
+
+    expect(lookActive).toEqual([true, false]);
+    expect(lookVectors.at(-1)).toEqual({ x: 0, y: 0 });
+
+    // A fresh single-finger swipe afterward must rotate normally again, not
+    // stay locked out.
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 34,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 34,
+        pointerType: 'touch',
+        clientX: 140,
+        clientY: 120,
+      }),
+    );
+    expect(lookActive).toEqual([true, false, true]);
+  });
+
+  it('cancels canvas swipe rotation when a second finger starts guarded pinch zoom', () => {
     const { canvas } = installMobileControlDom();
     const deltas: Array<{ dx: number; dy: number }> = [];
     const zooms: number[] = [];
@@ -1138,7 +1613,155 @@ describe('MobileControls pointer lifecycle', () => {
 
     expect(deltas).toEqual([{ dx: 16, dy: 0 }]);
     expect(lookActive).toEqual([true, false]);
+    expect(zooms).toHaveLength(2);
+    expect(zooms[0]).toBeGreaterThan(0);
+    expect(zooms[1]).toBeLessThan(0);
+  });
+
+  it('keeps a pinch alive when the takeover release echoes back as lostpointercapture', async () => {
+    // Regression test: releaseSwipeLook() calls releasePointerCapture() on the
+    // swipe-look pointer when a second finger lands (onPinchDown at size 2).
+    // That explicit release also fires lostpointercapture per spec, exactly
+    // like an implicit iOS capture loss. Without the releasingCaptureForPointer
+    // guard, the canvas lostpointercapture handler (mobile_controls.ts:429)
+    // treats that echo as a real capture loss and runs onPinchEnd for the
+    // pointer that just became part of the pinch, deleting it from
+    // pinchPointers and nulling pinchPrevDist: the pinch that just started is
+    // dead on arrival and stays dead (only pointerdown re-adds a pointer).
+    //
+    // The fake DOM's releasePointerCapture() queues its lostpointercapture echo
+    // with queueMicrotask to match real non-reentrant browser timing, so this
+    // test must await a microtask tick before asserting: a synchronous body
+    // returns before the echo (and thus the guard) ever runs, which is why an
+    // earlier version of this test still passed with the guard's early-return
+    // removed. Flushing the microtask queue here is what makes it decisive.
+    const { canvas } = installMobileControlDom();
+    const zooms: number[] = [];
+    const lookActive: boolean[] = [];
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: (active: boolean) => {
+        lookActive.push(active);
+      },
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: () => {},
+      zoomBy: (delta: number) => {
+        zooms.push(delta);
+      },
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    // First finger: starts swipe-look (moves past the deadzone so lookActive
+    // latches true and pointer capture is actually held, matching the fake
+    // DOM's captured-set guard on releasePointerCapture).
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 41,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 41,
+        pointerType: 'touch',
+        clientX: 130,
+        clientY: 100,
+      }),
+    );
+    expect(lookActive).toEqual([true]);
+
+    // Second finger lands: triggers the pinch takeover, which releases the
+    // first finger's swipe-look capture and echoes lostpointercapture for it.
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 42,
+        pointerType: 'touch',
+        clientX: 200,
+        clientY: 100,
+      }),
+    );
+    // Let the fake DOM's queued lostpointercapture echo actually fire before
+    // asserting, otherwise the guard it exercises never runs and this test
+    // would pass whether or not the production code has the fix.
+    await Promise.resolve();
+    expect(lookActive).toEqual([true, false]);
+
+    // The pinch must survive the echo: a move on both fingers should still
+    // register as a guarded pinch zoom, not be silently dropped.
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 41,
+        pointerType: 'touch',
+        clientX: 90,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 42,
+        pointerType: 'touch',
+        clientX: 210,
+        clientY: 100,
+      }),
+    );
+
     expect(zooms.length).toBeGreaterThan(0);
+  });
+
+  it('does not zoom for small two-finger jitter', () => {
+    const { canvas } = installMobileControlDom();
+    const zooms: number[] = [];
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: () => {},
+      zoomBy: (delta: number) => {
+        zooms.push(delta);
+      },
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 23,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 24,
+        pointerType: 'touch',
+        clientX: 200,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 23,
+        pointerType: 'touch',
+        clientX: 105,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 24,
+        pointerType: 'touch',
+        clientX: 196,
+        clientY: 100,
+      }),
+    );
+
+    expect(zooms).toEqual([]);
   });
 
   it('blocks swipe-look from starting over interactive HUD chrome (a button/window)', () => {
@@ -1289,7 +1912,7 @@ describe('MobileControls pointer lifecycle', () => {
     expect(lookActive).toEqual([true, false]);
   });
 
-  it('ends an active pinch-zoom gesture when a window opens mid-gesture', () => {
+  it('ends an active pinch gesture when a window opens mid-gesture', () => {
     const { canvas } = installMobileControlDom();
     const zooms: number[] = [];
     const input = {
@@ -1325,13 +1948,13 @@ describe('MobileControls pointer lifecycle', () => {
       pointerEvent('pointermove', {
         pointerId: 50,
         pointerType: 'touch',
-        clientX: 90,
+        clientX: 80,
         clientY: 100,
       }),
     );
-    expect(zooms.length).toBe(1);
+    expect(zooms).toHaveLength(1);
 
-    // A window opens mid-gesture: the next move must stop zooming.
+    // A window opens mid-gesture: the next move must stop tracking zoom.
     document.body.classList.add('mobile-window-open');
     canvas.dispatchEvent(
       pointerEvent('pointermove', {
@@ -1342,10 +1965,10 @@ describe('MobileControls pointer lifecycle', () => {
       }),
     );
 
-    expect(zooms.length).toBe(1);
+    expect(zooms).toHaveLength(1);
 
     // The pinch state was released, so even a further move from the surviving
-    // pointer (post window-close) must not resume zooming on its own.
+    // pointer (post window-close) must not resume the gesture on its own.
     document.body.classList.remove('mobile-window-open');
     canvas.dispatchEvent(
       pointerEvent('pointermove', {
@@ -1355,7 +1978,7 @@ describe('MobileControls pointer lifecycle', () => {
         clientY: 100,
       }),
     );
-    expect(zooms.length).toBe(1);
+    expect(zooms).toHaveLength(1);
   });
 
   it('never starts tracking a fresh pinch while a mobile window/menu is open', () => {
@@ -1491,6 +2114,420 @@ describe('MobileControls pointer lifecycle', () => {
       }),
     );
     expect(lookActive).toEqual([true, false, false]);
+  });
+
+  it('window blur mid-pinch clears the pinch tracking so a later single-finger swipe still works (Android app pinch-stuck bug)', () => {
+    const { canvas, windowTarget } = installMobileControlDom();
+    const lookActive: boolean[] = [];
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: (active: boolean) => lookActive.push(active),
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: () => {},
+      zoomBy: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    // Two fingers land on the canvas: a pinch-zoom gesture starts.
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 61,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 62,
+        pointerType: 'touch',
+        clientX: 200,
+        clientY: 100,
+      }),
+    );
+
+    // The app loses focus mid-gesture (e.g. a native Android sheet/dialog
+    // triggered by the interact/loot button) without ever delivering
+    // pointerup/pointercancel for either finger.
+    (windowTarget as unknown as EventTarget).dispatchEvent(new Event('blur'));
+
+    // A fresh single-finger swipe afterward must work normally: the stale
+    // two-finger pinch state must not still be guarding swipe-look.
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 63,
+        pointerType: 'touch',
+        clientX: 150,
+        clientY: 150,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 63,
+        pointerType: 'touch',
+        clientX: 166,
+        clientY: 150,
+      }),
+    );
+
+    // releaseCamera's unconditional setTouchLook(false) fires first (existing
+    // blur behavior); the fix under test is that the third finger's swipe
+    // still activates afterward instead of being blocked by stale pinch state.
+    expect(lookActive).toEqual([false, true]);
+  });
+});
+
+describe('MobileControls pinch lifecycle after camera zoom', () => {
+  function gestureRecorder(): {
+    input: Input;
+    deltas: Array<{ dx: number; dy: number }>;
+    zooms: number[];
+  } {
+    const deltas: Array<{ dx: number; dy: number }> = [];
+    const zooms: number[] = [];
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: (dx: number, dy: number) => {
+        deltas.push({ dx, dy });
+      },
+      zoomBy: (delta: number) => {
+        zooms.push(delta);
+      },
+    } as unknown as Input;
+    return { input, deltas, zooms };
+  }
+
+  function touch(target: EventTarget, type: string, pointerId: number, x: number, y: number): void {
+    target.dispatchEvent(
+      pointerEvent(type, { pointerId, pointerType: 'touch', clientX: x, clientY: y }),
+    );
+  }
+
+  it('restores camera rotation when a pinch finger lifts over HUD chrome', () => {
+    const { canvas, windowTarget } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 31, 140, 300);
+    touch(canvas, 'pointerdown', 32, 260, 300);
+    touch(canvas, 'pointermove', 31, 160, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+    const zoomsDuringPinch = zooms.length;
+
+    windowTarget.dispatchEvent(
+      pointerEvent('pointerup', {
+        pointerId: 31,
+        pointerType: 'touch',
+        clientX: 80,
+        clientY: 600,
+      }),
+    );
+    touch(windowTarget, 'pointerup', 32, 260, 300);
+
+    touch(canvas, 'pointerdown', 33, 150, 300);
+    touch(canvas, 'pointermove', 33, 190, 300);
+    touch(canvas, 'pointermove', 33, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms.length).toBe(zoomsDuringPinch);
+  });
+
+  it('restores camera rotation when browser gesture takeover cancels the pinch', () => {
+    const { canvas, windowTarget } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    let recenters = 0;
+    new MobileControls(input, {
+      ...mobileCallbacks(),
+      onRecenterCamera: () => {
+        recenters += 1;
+      },
+    }).start();
+
+    // Seed the first half of a valid recenter double-tap. The inherited pinch
+    // finger below must not be accepted as its second half when it is canceled.
+    touch(canvas, 'pointerdown', 30, 100, 300);
+    touch(canvas, 'pointerup', 30, 100, 300);
+
+    touch(canvas, 'pointerdown', 34, 140, 300);
+    touch(canvas, 'pointerdown', 35, 260, 300);
+    touch(canvas, 'pointermove', 34, 160, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+    const zoomsDuringPinch = zooms.length;
+
+    windowTarget.dispatchEvent(
+      pointerEvent('pointercancel', { pointerId: 34, pointerType: 'touch' }),
+    );
+    windowTarget.dispatchEvent(
+      pointerEvent('pointercancel', { pointerId: 35, pointerType: 'touch' }),
+    );
+
+    touch(canvas, 'pointerdown', 36, 150, 300);
+    touch(canvas, 'pointermove', 36, 190, 300);
+    touch(canvas, 'pointermove', 36, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms.length).toBe(zoomsDuringPinch);
+    expect(recenters).toBe(0);
+  });
+
+  it('hands the remaining finger to camera drag when a pinch becomes one finger', () => {
+    const { canvas } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 41, 140, 300);
+    touch(canvas, 'pointerdown', 42, 260, 300);
+    touch(canvas, 'pointermove', 41, 160, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+    const zoomsDuringPinch = zooms.length;
+
+    touch(canvas, 'pointerup', 41, 160, 300);
+    touch(canvas, 'pointermove', 42, 300, 300);
+    expect(deltas).toEqual([]);
+    touch(canvas, 'pointermove', 42, 340, 300);
+    expect(deltas).toEqual([{ dx: 40, dy: 0 }]);
+    touch(canvas, 'pointermove', 42, 380, 300);
+    touch(canvas, 'pointerup', 42, 380, 300);
+
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms.length).toBe(zoomsDuringPinch);
+  });
+
+  it('keeps pinch zoom tracking when a pinch move arrives on the window path', () => {
+    const { canvas, windowTarget } = installMobileControlDom();
+    const { input, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 43, 140, 300);
+    touch(canvas, 'pointerdown', 44, 260, 300);
+    touch(windowTarget, 'pointermove', 44, 320, 300);
+
+    expect(zooms.length).toBe(1);
+    expect(Math.abs(zooms[0] ?? 0)).toBeGreaterThan(0);
+  });
+
+  it('keeps an adopted ground-target finger on the ground aim path after pinch', () => {
+    const { canvas } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    const aimMoves: Array<{ x: number; y: number }> = [];
+    const aimTaps: Array<{ x: number; y: number }> = [];
+    new MobileControls(input, {
+      ...mobileCallbacks(),
+      onGroundAimMove: (x: number, y: number) => {
+        aimMoves.push({ x, y });
+        return true;
+      },
+      onGroundAimTap: (x: number, y: number) => {
+        aimTaps.push({ x, y });
+        return true;
+      },
+    }).start();
+
+    touch(canvas, 'pointerdown', 45, 140, 300);
+    expect(aimMoves).toEqual([{ x: 140, y: 300 }]);
+    touch(canvas, 'pointerdown', 46, 260, 300);
+    touch(canvas, 'pointermove', 46, 300, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+
+    touch(canvas, 'pointerup', 46, 300, 300);
+    touch(canvas, 'pointermove', 45, 180, 320);
+
+    expect(aimMoves[aimMoves.length - 1]).toEqual({ x: 180, y: 320 });
+    expect(deltas).toEqual([]);
+    expect(aimTaps).toEqual([]);
+  });
+
+  it('does not commit a ground-target tap when an adopted pinch survivor lifts', () => {
+    const { canvas } = installMobileControlDom();
+    const { input } = gestureRecorder();
+    let aimTaps = 0;
+    new MobileControls(input, {
+      ...mobileCallbacks(),
+      onGroundAimMove: () => true,
+      onGroundAimTap: () => {
+        aimTaps += 1;
+        return true;
+      },
+    }).start();
+
+    touch(canvas, 'pointerdown', 46, 140, 300);
+    touch(canvas, 'pointerdown', 47, 260, 300);
+    touch(canvas, 'pointerup', 47, 260, 300);
+    touch(canvas, 'pointerup', 46, 140, 300);
+
+    expect(aimTaps).toBe(0);
+  });
+
+  it('clears pinch tracking on blur before the next touch', () => {
+    const { canvas, windowTarget } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 51, 140, 300);
+    touch(canvas, 'pointerdown', 52, 260, 300);
+    (windowTarget as unknown as EventTarget).dispatchEvent(new Event('blur'));
+
+    touch(canvas, 'pointerdown', 53, 150, 300);
+    touch(canvas, 'pointermove', 53, 190, 300);
+    touch(canvas, 'pointermove', 53, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms).toEqual([]);
+  });
+
+  it('clears pinch tracking when the document becomes hidden', () => {
+    const { canvas } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 54, 140, 300);
+    touch(canvas, 'pointerdown', 55, 260, 300);
+
+    const hiddenDocument = document as unknown as EventTarget & {
+      visibilityState: DocumentVisibilityState;
+    };
+    hiddenDocument.visibilityState = 'hidden';
+    hiddenDocument.dispatchEvent(new Event('visibilitychange'));
+
+    touch(canvas, 'pointerdown', 56, 150, 300);
+    touch(canvas, 'pointermove', 56, 190, 300);
+    touch(canvas, 'pointermove', 56, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms).toEqual([]);
+  });
+
+  it('handles a genuine capture loss after a pinch survivor is re-captured', async () => {
+    const { canvas } = installMobileControlDom();
+    const { input, deltas } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 57, 140, 300);
+    touch(canvas, 'pointermove', 57, 180, 300);
+    touch(canvas, 'pointerdown', 58, 260, 300);
+    deltas.length = 0;
+
+    // Lift the second finger before the deliberate release echo for pointer 57
+    // runs. Re-capturing 57 supersedes that pending echo in real browsers.
+    touch(canvas, 'pointerup', 58, 260, 300);
+    await Promise.resolve();
+
+    // Simulate a later implicit capture loss. It must finalize the adopted
+    // swipe instead of being swallowed by the stale deliberate-release guard.
+    canvas.releasePointerCapture(57);
+    await Promise.resolve();
+
+    touch(canvas, 'pointerdown', 59, 150, 300);
+    touch(canvas, 'pointermove', 59, 190, 300);
+    touch(canvas, 'pointermove', 59, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+  });
+
+  it('keeps the normal full pinch cycle intact', () => {
+    const { canvas } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 61, 140, 300);
+    touch(canvas, 'pointerdown', 62, 260, 300);
+    touch(canvas, 'pointermove', 61, 160, 300);
+    touch(canvas, 'pointerup', 62, 260, 300);
+    touch(canvas, 'pointerup', 61, 160, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+    const zoomsDuringPinch = zooms.length;
+
+    touch(canvas, 'pointerdown', 63, 150, 300);
+    touch(canvas, 'pointermove', 63, 190, 300);
+    touch(canvas, 'pointermove', 63, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms.length).toBe(zoomsDuringPinch);
+  });
+
+  it('re-baselines the surviving pair on a three to two finger transition', () => {
+    const { canvas } = installMobileControlDom();
+    const { input, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 71, 100, 300);
+    touch(canvas, 'pointerdown', 72, 200, 300);
+    touch(canvas, 'pointerdown', 73, 500, 300);
+    const zoomsBeforeLift = zooms.length;
+
+    touch(canvas, 'pointerup', 71, 100, 300);
+    touch(canvas, 'pointermove', 72, 201, 300);
+    expect(zooms.length).toBe(zoomsBeforeLift);
+
+    touch(canvas, 'pointermove', 72, 300, 300);
+    expect(zooms.length).toBe(zoomsBeforeLift + 1);
+    expect(zooms[zooms.length - 1]).toBeGreaterThan(0);
+  });
+});
+
+describe('MobileControls chat button long-press', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const noopInput = () =>
+    ({
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: () => {},
+      zoomBy: () => {},
+    }) as unknown as Input;
+
+  it('toggles the log peek on an uninterrupted long press, and releasing afterward does not also open the composer', () => {
+    vi.useFakeTimers();
+    const { chatButton } = installMobileControlDom();
+    const chatOpens: string[] = [];
+    const callbacks = { ...mobileCallbacks(), onChatOpen: () => chatOpens.push('open') };
+    new MobileControls(noopInput(), callbacks).start();
+
+    chatButton.dispatchEvent(pointerEvent('pointerdown', { pointerId: 1 }));
+    vi.advanceTimersByTime(CHAT_LONG_PRESS_MS);
+    expect(document.body.classList.contains('mobile-chatlog-peek')).toBe(true);
+
+    chatButton.dispatchEvent(pointerEvent('pointerup', { pointerId: 1 }));
+    expect(document.body.classList.contains('mobile-chatlog-peek')).toBe(true);
+    expect(chatOpens).toEqual([]);
+  });
+
+  it('cancels a pending long press on window blur so it never fires blind once the timer elapses', () => {
+    vi.useFakeTimers();
+    const { chatButton, windowTarget } = installMobileControlDom();
+    const chatOpens: string[] = [];
+    const callbacks = { ...mobileCallbacks(), onChatOpen: () => chatOpens.push('open') };
+    new MobileControls(noopInput(), callbacks).start();
+
+    chatButton.dispatchEvent(pointerEvent('pointerdown', { pointerId: 2 }));
+    // Interrupt well before the long-press threshold elapses, as an app/tab
+    // switch mid-gesture would.
+    vi.advanceTimersByTime(CHAT_LONG_PRESS_MS - 100);
+    (windowTarget as unknown as EventTarget).dispatchEvent(new Event('blur'));
+
+    // Advance well past the original deadline: without the fix the backgrounded
+    // setTimeout would still fire here and toggle the peek blind.
+    vi.advanceTimersByTime(CHAT_LONG_PRESS_MS);
+    expect(document.body.classList.contains('mobile-chatlog-peek')).toBe(false);
+    expect(chatOpens).toEqual([]);
+  });
+
+  it('cancels a pending long press when the tab is hidden (visibilitychange) so it never fires blind once the timer elapses', () => {
+    vi.useFakeTimers();
+    const { chatButton } = installMobileControlDom();
+    new MobileControls(noopInput(), mobileCallbacks()).start();
+
+    chatButton.dispatchEvent(pointerEvent('pointerdown', { pointerId: 3 }));
+    vi.advanceTimersByTime(CHAT_LONG_PRESS_MS - 100);
+
+    (document as unknown as { visibilityState: string }).visibilityState = 'hidden';
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    vi.advanceTimersByTime(CHAT_LONG_PRESS_MS);
+    expect(document.body.classList.contains('mobile-chatlog-peek')).toBe(false);
   });
 });
 

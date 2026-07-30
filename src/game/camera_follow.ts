@@ -49,13 +49,15 @@ export function cameraIsManual(mouselookActive: boolean, mouseCameraMode: boolea
 }
 
 export function cameraFollowShouldSettle(mi: CameraFollowMoveInput, clickMoving: boolean): boolean {
-  return clickMoving
-    || mi.forward
-    || mi.back
-    || mi.turnLeft
-    || mi.turnRight
-    || mi.strafeLeft
-    || mi.strafeRight;
+  return (
+    clickMoving ||
+    mi.forward ||
+    mi.back ||
+    mi.turnLeft ||
+    mi.turnRight ||
+    mi.strafeLeft ||
+    mi.strafeRight
+  );
 }
 
 export function wrapAngle(d: number): number {
@@ -92,12 +94,15 @@ export function updateFollowCameraYaw(input: CameraFollowInput): CameraFollowRes
   if (!input.mouselook && !input.cameraDriven) {
     if (input.orbiting) return { camYaw, lastInterpFacing: input.interpFacing };
     let targetYaw = camYaw;
-    if (input.lastInterpFacing !== null && !input.clickMoving) targetYaw += wrapAngle(input.interpFacing - input.lastInterpFacing);
+    if (input.lastInterpFacing !== null && !input.clickMoving)
+      targetYaw += wrapAngle(input.interpFacing - input.lastInterpFacing);
     if (input.moving && !input.orbiting) {
       const delta = wrapAngle(input.interpFacing - targetYaw);
       const clickMoveScale = input.clickMoving ? clickMoveSettleScale(Math.abs(delta)) : 1;
       const rate = input.clickMoving ? CLICK_MOVE_SETTLE_RATE * clickMoveScale : SETTLE_RATE;
-      const maxStep = input.clickMoving ? CLICK_MOVE_MAX_SETTLE_STEP * clickMoveScale : MAX_SETTLE_STEP;
+      const maxStep = input.clickMoving
+        ? CLICK_MOVE_MAX_SETTLE_STEP * clickMoveScale
+        : MAX_SETTLE_STEP;
       const step = delta * (1 - Math.exp(-Math.max(0, input.frameDt) * rate));
       targetYaw += clamp(step, -maxStep, maxStep);
     }

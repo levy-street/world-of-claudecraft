@@ -145,9 +145,9 @@ export function uiEffectsTokens(profile: UiEffectsProfile): Record<string, strin
  *  only the crit emphasis is gated off at the low tier). Takes the published tier
  *  STRING (= `profile.tier`, what `document.documentElement.dataset.fxLevel` holds)
  *  rather than a profile object. The resolver above derives `profile.allowFctCrit` from
- *  it (and the diff-guard compares that field); the FCT painter's own per-element crit
- *  gate ships separately via `fctDropNonCrit` (src/game/ui_tier_knobs.ts), so this helper
- *  is the resolver-side rule, not the painter call site. */
+ *  it (and the diff-guard compares that field). This gates only the crit scale/pop
+ *  EMPHASIS; the painter never refuses a damage number on any tier (a low player still
+ *  sees every hit they land), so this helper is the resolver-side cosmetic rule only. */
 export function uiEffectsAllowFctCrit(fxLevel: string | null | undefined): boolean {
   return fxLevel !== 'low';
 }

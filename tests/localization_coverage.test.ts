@@ -2,7 +2,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
-import { QUEST_LETTERS } from '../src/sim/content/letters';
+import { DEEDS } from '../src/sim/content/deeds';
+import {
+  GUILD_TREND_LETTERS,
+  MASTER_TIER_LETTERS,
+  QUEST_LETTERS,
+} from '../src/sim/content/letters';
 import {
   ABILITIES,
   CLASSES,
@@ -16,6 +21,13 @@ import {
 } from '../src/sim/data';
 import type { PlayerClass } from '../src/sim/types';
 import { abilityBuffValue } from '../src/ui/ability_damage';
+import {
+  deedDesc,
+  deedName,
+  deedTitleText,
+  deedTranslationManifest,
+  ensureDeedLocalesLoaded,
+} from '../src/ui/deed_i18n';
 import {
   assertEntityTranslationsReady,
   entityTranslationFallbackLog,
@@ -48,6 +60,7 @@ import {
   pl_PL,
   pt_BR,
   ru_RU,
+  type SupportedLanguage,
   setLanguage,
   supportedLanguages,
   sv_SE,
@@ -61,6 +74,7 @@ import {
 import {
   hasTalentTitleOverride,
   renderTalentManifestEntry,
+  type TalentTranslationManifestEntry,
   talentTranslationManifest,
 } from '../src/ui/talent_i18n';
 
@@ -98,16 +112,25 @@ const locales: Record<string, typeof en> = {
 const RELEASE_TIER = process.env.I18N_RELEASE_TIER === '1';
 
 describe('i18n Localization Key Coverage', () => {
-  // Lazy locale flip: non-en locales are no longer statically resident. This suite
-  // setLanguage(non-en)s and reads synchronously via t()/tEntity/formatMoney/talent helpers,
-  // so make every supported locale resident up front - the test-harness mirror of the
-  // bootstrap's await-before-paint. Each setLanguage(lang) read then resolves the localized
-  // table instead of the English fallback.
+  // Lazy locale flip: non-en locales (and the deed locale tables, which ride their own
+  // dynamically imported chunk) are no longer statically resident. This suite
+  // setLanguage(non-en)s and reads synchronously via t()/tEntity/formatMoney/talent/deed
+  // helpers, so make every supported locale resident up front - the test-harness mirror of
+  // the bootstrap's await-before-paint. Each setLanguage(lang) read then resolves the
+  // localized table instead of the English fallback.
   beforeAll(async () => {
-    await Promise.all(supportedLanguages.map((lang) => ensureLocaleLoaded(lang)));
+    await Promise.all(
+      supportedLanguages.flatMap((lang) => [
+        ensureLocaleLoaded(lang),
+        ensureDeedLocalesLoaded(lang),
+      ]),
+    );
   });
 
-  const placeholderPattern = /\b(TODO|TBD|FIXME|PLACEHOLDER|TRANSLATE|LOREM)\b/i;
+  // Case-sensitive on purpose: leftover markers are uppercase by convention,
+  // and the case-insensitive form false-fails ordinary vocabulary in several
+  // locales (Spanish and Portuguese "todo").
+  const placeholderPattern = /\b(TODO|TBD|FIXME|PLACEHOLDER|TRANSLATE|LOREM)\b/;
   const shellKeys: TranslationKey[] = [
     'seo.title',
     'seo.description',
@@ -379,6 +402,7 @@ describe('i18n Localization Key Coverage', () => {
     price: '1g 20s',
     proceeds: '95s',
     quality: 'Rare',
+    quest: 'A Trade for Every Hand',
     rating: 1513,
     range: 30,
     rank: 2,
@@ -753,7 +777,11 @@ describe('i18n Localization Key Coverage', () => {
     expect(entityCount('class', 'description')).toBe(Object.keys(CLASSES).length);
     expect(entityCount('ability', 'name')).toBe(Object.keys(ABILITIES).length);
     expect(entityCount('ability', 'description')).toBe(Object.keys(ABILITIES).length);
-    expect(entityCount('item', 'name')).toBe(Object.keys(ITEMS).length);
+    // Heroic upgraded variants (heroicOf) have no name key: they share the base
+    // item name, so they are excluded from the entity manifest.
+    expect(entityCount('item', 'name')).toBe(
+      Object.values(ITEMS).filter((i) => !i.heroicOf).length,
+    );
     expect(entityCount('mob', 'name')).toBe(Object.keys(MOBS).length);
     expect(entityCount('npc', 'name')).toBe(Object.keys(NPCS).length);
     expect(entityCount('npc', 'title')).toBe(Object.keys(NPCS).length);
@@ -819,7 +847,8 @@ describe('i18n Localization Key Coverage', () => {
     expect(classAbilityEntries).toHaveLength(
       Object.keys(CLASSES).length * 2 + Object.keys(ABILITIES).length * 2,
     );
-    expect(missingEntityTranslationsForGroups(['classAbility'])).toHaveLength(0);
+    const missingClassAbilities = missingEntityTranslationsForGroups(['classAbility']);
+    expect(missingClassAbilities, JSON.stringify(missingClassAbilities, null, 2)).toHaveLength(0);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -867,32 +896,36 @@ describe('i18n Localization Key Coverage', () => {
 
     // Hard data-regression pin. The sentinel check above proves the {buff} token
     // survives interpolation everywhere but is value-agnostic, so it cannot catch
-    // a silent balance change. commanding_shout is the ability the old blanket $b
-    // pin actually meant: its $b resolves to its rank-1 Stamina buff via the same
-    // picker hud.ts feeds the token. Pinning the literal fails if the datum (or
-    // the picker) changes, and rendering with it confirms the EN description
+    // a silent balance change. Iron Bellow is the winning Warrior's baseline
+    // raid-buff ability: its $b resolves to its rank-1 attack-power percentage via
+    // the same picker hud.ts feeds the token. Pinning the literal fails if the datum
+    // (or the picker) changes, and rendering with it confirms the EN description
     // interpolates the real number instead of a stale hardcoded one.
-    const commandingShout = abilitiesKnownAt('warrior', ABILITIES.commanding_shout.learnLevel).find(
-      (known) => known.def.id === 'commanding_shout' && known.rank === 1,
+    const battleShout = abilitiesKnownAt('warrior', ABILITIES.battle_shout.learnLevel).find(
+      (known) => known.def.id === 'battle_shout' && known.rank === 1,
     );
-    expect(commandingShout, 'commanding_shout rank 1 resolves').toBeTruthy();
-    const commandingShoutBuff = abilityBuffValue(commandingShout!);
-    expect(commandingShoutBuff, 'commanding_shout rank-1 Stamina buff').toBe(6);
+    if (!battleShout) throw new Error('battle_shout rank 1 did not resolve');
+    const battleShoutBuff = abilityBuffValue(battleShout);
+    expect(battleShoutBuff, 'battle_shout rank-1 attack-power buff').toBe(10);
     setLanguage('en');
-    const commandingShoutDesc = tEntity({
+    const battleShoutDesc = tEntity({
       kind: 'ability',
-      id: 'commanding_shout',
+      id: 'battle_shout',
       field: 'description',
-      values: { buff: String(commandingShoutBuff) },
+      values: { buff: String(battleShoutBuff) },
     });
-    expect(commandingShoutDesc).toContain('6');
-    expect(commandingShoutDesc).not.toContain('{buff}');
+    expect(battleShoutDesc).toContain('10');
+    expect(battleShoutDesc).not.toContain('{buff}');
   });
 
   it('should provide every item translation in every locale without canonical fallbacks', () => {
     const itemEntries = entityTranslationManifest().filter((entry) => entry.group === 'item');
-    expect(itemEntries).toHaveLength(Object.keys(ITEMS).length);
-    expect(missingEntityTranslationsForGroups(['classAbility', 'item'])).toHaveLength(0);
+    // Heroic upgraded variants (heroicOf) carry no name key: they share the base
+    // item name (see itemDisplayName), so they are not in the manifest.
+    const namedItems = Object.values(ITEMS).filter((i) => !i.heroicOf).length;
+    expect(itemEntries).toHaveLength(namedItems);
+    const missingItems = missingEntityTranslationsForGroups(['item']);
+    expect(missingItems, JSON.stringify(missingItems, null, 2)).toHaveLength(0);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -975,7 +1008,8 @@ describe('i18n Localization Key Coverage', () => {
 
     expect(missingEntityTranslationsForGroups(['classAbility', 'item'])).toHaveLength(0);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
-    expect(missingEntityTranslationsForGroups(['world'])).toHaveLength(0);
+    const missingWorld = missingEntityTranslationsForGroups(['world']);
+    expect(missingWorld, JSON.stringify(missingWorld, null, 2)).toHaveLength(0);
     expect(
       missingEntityTranslationsForGroups(['classAbility', 'item', 'itemSet', 'world']),
     ).toHaveLength(0);
@@ -998,8 +1032,17 @@ describe('i18n Localization Key Coverage', () => {
       ZONES.reduce((sum, zone) => sum + zone.pois.length, 0) +
       Object.keys(DUNGEONS).length * 3 +
       Object.keys(DELVES).length * 3 +
-      // Ravenpost authored letters: welcome + quest letters, 3 fields each.
-      (1 + Object.keys(QUEST_LETTERS).length) * 3;
+      // Ravenpost authored letters: welcome + Heroic Marks reward + mastery
+      // reset notice + quest letters + Guild trend letters + master tier
+      // letters (keyed pair -> tier), 3 fields each.
+      (3 +
+        Object.keys(QUEST_LETTERS).length +
+        Object.keys(GUILD_TREND_LETTERS).length +
+        Object.values(MASTER_TIER_LETTERS).reduce(
+          (sum, tiers) => sum + Object.keys(tiers).length,
+          0,
+        )) *
+        3;
     expect(worldEntries).toHaveLength(expectedWorldCount);
 
     for (const lang of supportedLanguages) {
@@ -1064,6 +1107,64 @@ describe('i18n Localization Key Coverage', () => {
     setLanguage('en');
   });
 
+  it('keeps generated talent effect labels out of English fallback in translated locales', () => {
+    const englishEffectFragments = [
+      'damage-over-time damage',
+      'heal-over-time healing',
+      'melee haste',
+      'pet damage',
+      'damage redirected to pet',
+    ];
+    const descriptions = talentTranslationManifest().filter(
+      (entry) => entry.field === 'description',
+    );
+
+    for (const lang of supportedLanguages) {
+      if (lang === 'en' || lang === 'en_CA') continue;
+      setLanguage(lang);
+      const rendered = descriptions.map(renderTalentManifestEntry).join('\n').toLowerCase();
+      for (const fragment of englishEffectFragments) {
+        expect(rendered, `${lang}: copied English talent effect label ${fragment}`).not.toContain(
+          fragment,
+        );
+      }
+    }
+
+    setLanguage('en');
+  });
+
+  it('renders the mobile Store label in every locale', () => {
+    const expected: Record<SupportedLanguage, string> = {
+      en: 'Store',
+      en_CA: 'Store',
+      es: 'Tienda',
+      es_ES: 'Tienda',
+      fr_FR: 'Boutique',
+      fr_CA: 'Boutique',
+      it_IT: 'Negozio',
+      de_DE: 'Shop',
+      zh_CN: '商店',
+      zh_TW: '商店',
+      ko_KR: '상점',
+      ja_JP: 'ストア',
+      pt_BR: 'Loja',
+      ru_RU: 'Магазин',
+      cs_CZ: 'Obchod',
+      nl_NL: 'Winkel',
+      pl_PL: 'Sklep',
+      id_ID: 'Toko',
+      tr_TR: 'Mağaza',
+      sv_SE: 'Butik',
+      vi_VN: 'Cửa hàng',
+      da_DK: 'Butik',
+    };
+    for (const lang of supportedLanguages) {
+      setLanguage(lang);
+      expect(t('hudChrome.mobile.dailyRewards'), lang).toBe(expected[lang]);
+    }
+    setLanguage('en');
+  });
+
   it('should provide talent content translations for every supported locale', () => {
     const talentEntries = talentTranslationManifest();
     expect(talentEntries.length).toBeGreaterThan(250);
@@ -1113,36 +1214,168 @@ describe('i18n Localization Key Coverage', () => {
     // RELEASE-TIER ONLY: specific real-translation spot-checks (would render the
     // English fill, not these strings, for an untranslated key on a PR).
     if (RELEASE_TIER) {
+      const rowEntry = (
+        optionId: string,
+        field: 'name' | 'description',
+      ): TalentTranslationManifestEntry => {
+        const entry = talentEntries.find(
+          (candidate) => candidate.id.endsWith(`.${optionId}`) && candidate.field === field,
+        );
+        if (!entry) throw new Error(`Missing talent manifest entry: ${optionId}.${field}`);
+        return entry;
+      };
+      const requiredTalentEntry = (id: string, field: 'name' | 'description') => {
+        const entry = talentEntries.find(
+          (candidate) => candidate.id === id && candidate.field === field,
+        );
+        if (!entry) throw new Error(`Missing talent manifest entry: ${id}.${field}`);
+        return entry;
+      };
+
       setLanguage('es');
+      expect(renderTalentManifestEntry(rowEntry('war_row_double_charge', 'name'))).toContain(
+        'Carga doble',
+      );
       expect(
-        renderTalentManifestEntry(
-          talentEntries.find((entry) => entry.id === 'war_toughness' && entry.field === 'name')!,
-        ),
-      ).toContain('Dureza');
-      expect(
-        renderTalentManifestEntry(
-          talentEntries.find(
-            (entry) => entry.id === 'arms.mastery' && entry.field === 'description',
-          )!,
-        ),
+        renderTalentManifestEntry(rowEntry('war_row_blood_offering', 'description')),
       ).toContain('daño');
 
       setLanguage('zh_CN');
-      expect(
-        renderTalentManifestEntry(
-          talentEntries.find((entry) => entry.id === 'war_cruelty' && entry.field === 'name')!,
-        ),
-      ).toContain('残忍');
+      expect(renderTalentManifestEntry(rowEntry('war_row_blood_offering', 'name'))).toContain(
+        '战斗精通',
+      );
 
       setLanguage('ko_KR');
+      expect(renderTalentManifestEntry(rowEntry('war_row_second_wind', 'description'))).toContain(
+        '생명력',
+      );
       expect(
         renderTalentManifestEntry(
-          talentEntries.find(
-            (entry) => entry.id === 'prot_choice.pc_last_stand' && entry.field === 'description',
-          )!,
+          requiredTalentEntry('11.hun_r11_survival_instincts', 'description'),
         ),
       ).toContain('생명력');
     }
+
+    setLanguage('en');
+  });
+
+  // Deed names and reward titles that legitimately equal English in a locale,
+  // recorded as deliberate cross-language cognates (Veteran, Champion, Paragon,
+  // and Gladiator are those languages' own words; Marginalia is Latin; nl keeps
+  // the poker term Full House). This list IS the recording mechanism: a deed
+  // name or title that matches English WITHOUT a row here is an accidental
+  // leak at the release gate. Dialect locales list their rendered result
+  // (es_ES and fr_CA resolve through their base tables plus overrides).
+  const deedCognateAllowlist: Record<string, readonly string[]> = {
+    es: ['soc_market_magnate.title'],
+    es_ES: ['soc_market_magnate.title'],
+    fr_FR: ['prog_champion.name', 'prog_champion.title', 'dlv_lore_journal.name'],
+    fr_CA: ['prog_champion.name', 'prog_champion.title', 'dlv_lore_journal.name'],
+    it_IT: ['soc_market_magnate.title'],
+    de_DE: [
+      'prog_veteran.name',
+      'prog_veteran.title',
+      'prog_champion.name',
+      'prog_champion.title',
+      'prog_paragon.name',
+      'prog_paragon.title',
+      'pvp_arena_1v1_1900.name',
+      'pvp_arena_1v1_1900.title',
+    ],
+    pt_BR: ['prog_paragon.name', 'prog_paragon.title'],
+    nl_NL: [
+      'dlv_lore_journal.name',
+      'pvp_arena_1v1_1900.name',
+      'pvp_arena_1v1_1900.title',
+      'soc_full_house.name',
+    ],
+    pl_PL: ['dlv_lore_journal.name', 'pvp_arena_1v1_1900.name', 'pvp_arena_1v1_1900.title'],
+    id_ID: [
+      'prog_veteran.name',
+      'prog_veteran.title',
+      'pvp_arena_1v1_1900.name',
+      'pvp_arena_1v1_1900.title',
+    ],
+    sv_SE: [
+      'prog_veteran.name',
+      'prog_veteran.title',
+      'pvp_arena_1v1_1900.name',
+      'pvp_arena_1v1_1900.title',
+    ],
+    da_DK: [
+      'prog_veteran.name',
+      'prog_veteran.title',
+      'pvp_arena_1v1_1900.name',
+      'pvp_arena_1v1_1900.title',
+    ],
+  };
+
+  it('should provide deed content translations for every supported locale', () => {
+    const deedEntries = deedTranslationManifest();
+    // name + desc per deed, plus one title entry per title deed (30 as of
+    // Professions 2.0; tests/deeds_content.test.ts pins the count).
+    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 30);
+
+    for (const lang of supportedLanguages) {
+      setLanguage(lang);
+      for (const entry of deedEntries) {
+        const rendered =
+          entry.field === 'name'
+            ? deedName(entry.id)
+            : entry.field === 'desc'
+              ? deedDesc(entry.id)
+              : deedTitleText(entry.id);
+        expect(rendered.trim().length, `${lang}.${entry.id}.${entry.field}`).toBeGreaterThan(0);
+        // RELEASE-TIER ONLY (copied-English deed prose): an unfilled deed desc
+        // renders the authored English fallback, which is legal on a PR (the
+        // English-only contributor rule) and blocked only at the release gate.
+        if (RELEASE_TIER && lang !== 'en' && lang !== 'en_CA' && entry.field === 'desc') {
+          expect(
+            copiedEnglishComparable(rendered),
+            `${lang}.${entry.id}.desc should not copy canonical English deed prose`,
+          ).not.toBe(copiedEnglishComparable(entry.source));
+        }
+        // Deed NAMES and reward TITLES must not leak English either. A value may
+        // legitimately equal English only as a deliberate cross-language cognate
+        // recorded in deedCognateAllowlist above; a match WITHOUT such a row is
+        // an accidental leak (e.g. a new deed the locale tables do not yet cover).
+        if (
+          RELEASE_TIER &&
+          lang !== 'en' &&
+          lang !== 'en_CA' &&
+          entry.field !== 'desc' &&
+          !(deedCognateAllowlist[lang] ?? []).includes(`${entry.id}.${entry.field}`)
+        ) {
+          expect(
+            copiedEnglishComparable(rendered),
+            `${lang}.${entry.id}.${entry.field} leaks English with no deedCognateAllowlist row`,
+          ).not.toBe(copiedEnglishComparable(entry.source));
+        }
+      }
+      // The five milestone titles are locked to the established game.milestone.*
+      // renderings in every locale (milestones unified into deeds: one prestige
+      // system, one vocabulary).
+      for (const [deedId, milestoneKey] of [
+        ['prog_veteran', 'game.milestone.veteran'],
+        ['prog_champion', 'game.milestone.champion'],
+        ['prog_paragon', 'game.milestone.paragon'],
+        ['prog_mythic', 'game.milestone.mythic'],
+        ['prog_eternal', 'game.milestone.eternal'],
+      ] as [string, TranslationKey][]) {
+        expect(deedTitleText(deedId), `${lang} ${deedId} title`).toBe(t(milestoneKey));
+      }
+    }
+
+    // Real-translation spot pins (these would render the English fill if the
+    // locale tables were dropped or the language wiring broke).
+    setLanguage('de_DE');
+    expect(deedName('prog_first_steps')).toBe('Erste Schritte');
+    setLanguage('ja_JP');
+    expect(deedName('prog_first_steps')).toBe('はじめの一歩');
+    setLanguage('zh_CN');
+    expect(deedName('prog_first_steps')).toBe('千里之行');
+    setLanguage('ru_RU');
+    expect(deedTitleText('prog_veteran')).toBe('Ветеран');
 
     setLanguage('en');
   });

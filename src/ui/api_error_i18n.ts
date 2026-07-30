@@ -107,6 +107,16 @@ export const API_ERROR_KEYS = {
   'discord.swag_claimed': 'apiError.discord.swag_claimed',
   'discord.swag_tier': 'apiError.discord.swag_tier',
   'discord.swag_points': 'apiError.discord.swag_points',
+  'deeds.invalid_input': 'apiError.deeds.invalid_input',
+
+  // steam: the env-gated Steam link family (server/steam/).
+  'steam.disabled': 'apiError.steam.disabled',
+  'steam.invalid_ticket': 'apiError.steam.invalid_ticket',
+  'steam.banned': 'apiError.steam.banned',
+  'steam.already_linked': 'apiError.steam.already_linked',
+  'steam.account_taken': 'apiError.steam.account_taken',
+  'steam.upstream': 'apiError.steam.upstream',
+  'wallet.handoff_invalid': 'apiError.wallet.handoff_invalid',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */
@@ -166,12 +176,53 @@ function resolveByCode(code: string, params: Record<string, unknown> | undefined
   return t(key);
 }
 
+// A failed fetch (connection refused, DNS failure, or an offline device) rejects
+// with a TypeError and no stable error code. Engines word that TypeError differently,
+// so recognize their known messages without treating arbitrary application Errors
+// containing words such as "load failed" as transport failures.
+const TRANSPORT_FAILURE_MESSAGES = new Set([
+  'failed to fetch',
+  'load failed', // Safari
+  'fetch failed', // Node / undici (the underlying cause is e.g. ECONNREFUSED)
+  'network request failed',
+  'the network connection was lost',
+]);
+
+// True for a fetch transport failure, or for the empty gateway response produced
+// when a reverse/dev proxy cannot reach its backend. An explicit server error body
+// remains a diagnostic even when it uses the same gateway status.
+function isTransportFailure(err: unknown): boolean {
+  // A problem body with a stable code came from the application server. RFC
+  // problem bodies omit the legacy `error` field, so ApiError's message is the
+  // same generic status text as an empty proxy response; the code is what
+  // distinguishes those cases.
+  if (errorCode(err) !== undefined) return false;
+  const status =
+    err && typeof err === 'object' && typeof (err as { status?: unknown }).status === 'number'
+      ? (err as { status: number }).status
+      : undefined;
+  const message = technicalErrorMessage(err).trim().toLowerCase();
+  if (status !== undefined) {
+    return (
+      (status === 502 || status === 503 || status === 504) &&
+      message === `request failed (${status})`
+    );
+  }
+  if (!(err instanceof TypeError)) return false;
+  const normalized = message.replace(/[.!]+$/, '');
+  return normalized.includes('networkerror') || TRANSPORT_FAILURE_MESSAGES.has(normalized);
+}
+
 export function userFacingApiError(err: unknown): string {
   const code = errorCode(err);
   if (code) {
     const byCode = resolveByCode(code, errorParams(err));
     if (byCode !== null) return byCode;
   }
+
+  // The server was unreachable (fetch rejected). Surface the same localized connection
+  // message the WebSocket-drop path already uses, not the raw browser diagnostic.
+  if (isTransportFailure(err)) return t('loading.connectionLost');
 
   // --- Prose fallback (old-ladder routes, until the ladder is removed). Moved verbatim from
   // src/main.ts; each arm re-localizes a stable English source string. ---
@@ -234,6 +285,8 @@ export function userFacingApiError(err: unknown): string {
     return t('hudChrome.account.errPasswordLong');
   if (normalized === 'that is already your email address')
     return t('hudChrome.account.errEmailUnchanged');
+  // Password-reset ("forgot password") link is invalid or expired (server/account.ts).
+  if (normalized === 'invalid or expired link') return t('hudChrome.auth.resetErrInvalid');
   if (
     normalized === 'that code is not valid, try again' ||
     normalized === 'invalid authentication code'
@@ -263,6 +316,24 @@ export function userFacingApiError(err: unknown): string {
   // WebSocket disconnect reasons surfaced through the fatal overlay (net/online.ts).
   if (normalized === 'connection to the server was lost.') return t('loading.connectionLost');
   if (normalized === 'rejected by server') return t('loading.connectionRejected');
+  // The inbound flood kick. 'message rate exceeded' is a byte-exact wire contract
+  // with server/msg_rate_limit.ts (MSG_RATE_KICK_REASON), passed by both limiter
+  // kick arms in server/game.ts and deliberately session-fatal: reconnect_policy
+  // has no transient arm for it, since an immediately reconnecting flooder
+  // re-floods (lockstep pinned by tests/localization_fixes.test.ts).
+  if (normalized === 'message rate exceeded') return t('loading.messageRateExceeded');
+  // The realm admission cap refused a fresh join. 'realm is full' is a byte-exact
+  // wire contract with server/ws_auth.ts (WS_AUTH_ERROR).
+  if (normalized === 'realm is full') return t('loading.realmFull');
+  // The per-IP connection cap refused the handshake. 'too many connections from your
+  // network' is a byte-exact wire contract with server/ws_auth.ts (WS_AUTH_ERROR).
+  if (normalized === 'too many connections from your network')
+    return t('loading.tooManyConnections');
+  // A rolling deploy paired client and server binaries whose authoritative
+  // world layouts disagree. The wire literal remains actionable to legacy
+  // clients that lack this matcher; current clients render the localized form.
+  if (normalized === 'game and server versions are incompatible. reload or update, then try again.')
+    return t('loading.incompatibleWorldVersion');
   // NOTE: protocol/transport diagnostics ('bad auth message', 'authentication timed out',
   // etc.) are intentionally NOT translated, they are developer/diagnostic errors and must
   // stay English so browser logs and support reports match the server source.

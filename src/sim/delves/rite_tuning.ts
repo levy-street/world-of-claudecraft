@@ -1,8 +1,8 @@
 // Shared Drowned Reliquary Rite difficulty tuning: the ONE source both the sim
 // controller (drowned_litany_rite.ts) and the HUD difficulty popup
-// (src/ui/rite_window.ts) read, so the popup's advertised numbers can never
+// (src/ui/hud/delve/rite_window.ts) read, so the popup's advertised numbers can never
 // desync from the sim. Pure data, no sim state and no DOM, mirroring how
-// src/sim/lockpick.ts feeds src/ui/lockpick_panel.ts.
+// src/sim/lockpick.ts feeds src/ui/hud/delve/lockpick_panel.ts.
 
 import type { LootTier } from '../lockpick';
 import type { RiteIntensity } from '../types';

@@ -167,4 +167,20 @@ export const apiErrorStrings = {
     // reuses hudChrome.discord.swag.needPoints
     swag_points: 'Not enough points.',
   },
+  deeds: {
+    invalid_input: 'Invalid input.',
+  },
+  // steam: the env-gated Steam link family (server/steam/). Linking mirrors
+  // deed unlocks to Steam achievements; it is never a sign-in method.
+  steam: {
+    disabled: 'Steam linking is not available right now.',
+    invalid_ticket: 'Steam could not verify this link request. Try again from the desktop app.',
+    banned: 'That Steam account cannot be linked.',
+    already_linked: 'Your account already has a linked Steam account.',
+    account_taken: 'That Steam account is already linked to another account.',
+    upstream: 'Steam did not respond. Try again in a moment.',
+  },
+  wallet: {
+    handoff_invalid: 'That wallet authorization expired or could not be verified. Try again.',
+  },
 };

@@ -27,30 +27,32 @@ import type * as http from 'node:http';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
+  paginateDeedsLeaderboard,
   paginateDevLeaderboard,
   paginateGuildLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
 import type { ArenaFormat } from '../src/sim/types';
 import type {
+  DeedsLeaderboardEntry,
+  DeedsLeaderboardSelf,
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
   LeaderboardEntry,
 } from '../src/world_api';
-import { characterSheet, type SheetRank } from './character_sheet';
+import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   type ArenaLeaderRow,
   type CharacterRow,
   type CharacterSearchRow,
   characterCountsByRealm,
   findCharacterReportTargetByName,
-  getAccountsCount,
   getCharacterById,
   guildNameForCharacter,
   lifetimeXpRankForCharacter,
   searchCharacters,
-  topArenaRatings,
 } from './db';
+import { type RecentDeedRow, recentDeedsForCharacter } from './deeds_db';
 import { requireAccount } from './http/middleware/require_account';
 import type { Ctx, RouteDef } from './http/types';
 import { json } from './http_util';
@@ -58,6 +60,10 @@ import type { LiveReportTarget } from './moderation_db';
 import { recordUsageMetric } from './provider_usage';
 import { publicReadRateLimited } from './ratelimit';
 import { REALM, REALM_DIRECTORY } from './realm';
+// From the config module directly (not the ./steam barrel): the barrel drags
+// routes.ts and its load-time middleware construction into this module's
+// graph, which partial db mocks in tests cannot serve.
+import { steamEnabled } from './steam/config';
 
 // ---------------------------------------------------------------------------
 // Named constants (single source of truth for the query decoders + fixed args).
@@ -77,6 +83,8 @@ const LEADERBOARD_SCOPE_GLOBAL = 'global';
 const LEADERBOARD_GUILD_BOARD = 'guilds';
 /** The ?board value that selects the open-source contributor (developer) board. */
 const LEADERBOARD_DEV_BOARD = 'devs';
+/** The ?board value that selects the Renown (deeds) board. */
+const LEADERBOARD_DEEDS_BOARD = 'deeds';
 /** Upper bound for the legacy ?limit=N single-page board (mirrors LEADERBOARD_MAX). */
 export const LEADERBOARD_LEGACY_LIMIT_MAX = LEADERBOARD_MAX;
 /** How many arena ranks the public ladder returns (mirrors the legacy fixed arg). */
@@ -111,13 +119,16 @@ export interface ReleaseEntry {
 /**
  * The main.ts-owned runtime the public-read handlers depend on but cannot import
  * without a cycle: the live online-player count and dev perf profile off the
- * GameServer, the three cache-fronted readers (unchanged: same TTL cache the
+ * GameServer, the cache-fronted board and stats readers (the same TTL caches the
  * legacy arms use, so cache behavior is identical on both dispatch paths), the
  * releases feed's repo + display cap, and the two request-shaped helpers.
  */
 export interface LeaderboardRuntime {
   /** game.clients.size, for project-stats and status. */
   playersOnline(): number;
+  /** The configured realm player cap for /api/status, canonicalized to a
+   *  non-negative count (0 when the cap is disabled). */
+  playersCap(): number;
   /** game.perfProfile(), for the dev-gated /api/perf route. */
   perfProfile(): unknown;
   /** Cache-fronted player leaderboard read (main.ts getLeaderboard). */
@@ -126,6 +137,20 @@ export interface LeaderboardRuntime {
   getGuildLeaderboard(scope: LeaderboardScope): Promise<GuildLeaderboardEntry[]>;
   /** Cache-fronted contributor (developer) leaderboard read (main.ts topContributors). */
   getDevLeaderboard(): Promise<DevLeaderboardEntry[]>;
+  /** Cache-fronted Renown (deeds) board read (main.ts getDeedsLeaderboard):
+   *  the FULL pre-cap public entry list; the handler pages it. */
+  getDeedsLeaderboard(): Promise<DeedsLeaderboardEntry[]>;
+  /** The caller's Renown-board standing off the same cache, null when unranked. */
+  deedsSelfRank(accountId: number): Promise<DeedsLeaderboardSelf | null>;
+  /** Cache-fronted arena ladder read (main.ts getArenaLeaderboard): the leader
+   *  rows for ONE format; the handler re-attaches the { format, leaders } envelope. */
+  getArenaLeaderboard(format: '1v1' | '2v2'): Promise<ArenaLeaderRow[]>;
+  /** Cache-fronted accounts-created count for project-stats (main.ts
+   *  getAccountsCreatedCount): the moderation-invariant COUNT(*), its own 60s TTL. */
+  getAccountsCreatedCount(): Promise<number>;
+  /** Cache-fronted characters-created count for project-stats (main.ts
+   *  getCharactersCreatedCount): realm-scoped COUNT(*), same 60s TTL. */
+  getCharactersCreatedCount(): Promise<number>;
   /** Cache-fronted GitHub releases proxy read (main.ts getReleases). */
   getReleases(): Promise<ReleaseEntry[]>;
   /** The repo slug the releases feed reports (main.ts GITHUB_REPO). */
@@ -197,8 +222,11 @@ export function decodeLegacyLimit(raw: string | undefined): number {
   );
 }
 
-/** ?format=2v2 -> '2v2'; anything else (incl. absent) -> 1v1. */
-export function decodeArenaFormat(raw: string | undefined): ArenaFormat {
+/** ?format=2v2 -> '2v2'; anything else (incl. absent) -> 1v1. The public ladder
+ *  only ever serves these two formats, so the return narrows below the wider
+ *  ArenaFormat union: an unrecognized ?format value can never mint a third arena
+ *  cache slot on either dispatch arm. */
+export function decodeArenaFormat(raw: string | undefined): '1v1' | '2v2' {
   return raw === ARENA_FORMAT_2V2 ? ARENA_FORMAT_2V2 : ARENA_FORMAT_DEFAULT;
 }
 
@@ -259,6 +287,31 @@ export function buildGuildBoard(
   return { realm, scope, board: 'guilds', metric: 'guildLifetimeXp', ...slice };
 }
 
+/**
+ * The Renown (deeds) board body: its own golden case. Account-level and
+ * therefore GLOBAL-ONLY (Renown counts each deed once per ACCOUNT and accounts
+ * span realms, so a realm scope is not well defined): the body always carries
+ * scope 'global' whatever ?scope said. `self` rides only when the route
+ * resolved an authenticated caller who is on the board.
+ */
+export function buildDeedsBoard(
+  realm: string,
+  entries: readonly DeedsLeaderboardEntry[],
+  page: number,
+  pageSize: number,
+  self: DeedsLeaderboardSelf | null,
+): unknown {
+  const slice = paginateDeedsLeaderboard(entries as DeedsLeaderboardEntry[], page, pageSize);
+  return {
+    realm,
+    scope: LEADERBOARD_SCOPE_GLOBAL,
+    board: 'deeds',
+    metric: 'renown',
+    ...slice,
+    ...(self ? { self } : {}),
+  };
+}
+
 /** The contributor (developer) board body: the dev-metric slice, its own golden case. */
 export function buildDevBoard(
   realm: string,
@@ -275,9 +328,12 @@ export function buildDevBoard(
 // Read functions (host-agnostic; take a narrow Db interface, no ctx/req/res).
 // The FakeCharactersDb / FakeLeaderboardDb (tests/server/helpers/fake_db.ts)
 // satisfy the relevant subset structurally, so these are unit-tested against the
-// fakes. The db-touching routes (arena, search, realms, project-stats,
-// sheet) go through these; the leaderboard/guild/releases routes read through the
-// injected cache-fronted runtime and the pure builders above instead.
+// fakes. The search, realms, and sheet routes call these directly through the
+// dbReads bundle; the leaderboard/guild/releases routes AND now the arena ladder
+// and project-stats count read through the injected cache-fronted runtime instead.
+// readArenaLeaderboard and readProjectStats stay here as the main.ts cache's INNER
+// reads (main.ts wraps them in a TTL + single-flight getter), so the arena depth
+// (ARENA_LEADERBOARD_LIMIT) and the project-stats body shape are still owned here.
 // ---------------------------------------------------------------------------
 
 /** DB read the arena ladder needs. */
@@ -331,9 +387,10 @@ export async function readRealms(
   return { current: realm, realms: directory, characters };
 }
 
-/** DB read project-stats needs (account-scoped, so not on the character Db). */
+/** DB read project-stats needs (account-scoped for accounts; realm-scoped for characters). */
 interface ProjectStatsReadDb {
   getAccountsCount(): Promise<number>;
+  getCharactersCount(realm: string): Promise<number>;
 }
 
 /** GET /api/project-stats body. */
@@ -341,9 +398,22 @@ export async function readProjectStats(
   db: ProjectStatsReadDb,
   playersOnline: number,
   realm: string,
-): Promise<{ accounts_created: number; players_online: number; realm: string }> {
-  const accountsCount = await db.getAccountsCount();
-  return { accounts_created: accountsCount, players_online: playersOnline, realm };
+): Promise<{
+  accounts_created: number;
+  characters_created: number;
+  players_online: number;
+  realm: string;
+}> {
+  const [accountsCount, charactersCount] = await Promise.all([
+    db.getAccountsCount(),
+    db.getCharactersCount(realm),
+  ]);
+  return {
+    accounts_created: accountsCount,
+    characters_created: charactersCount,
+    players_online: playersOnline,
+    realm,
+  };
 }
 
 /** DB reads the public character sheet needs. */
@@ -352,6 +422,7 @@ interface PublicSheetDb {
   getCharacterById(characterId: number): Promise<CharacterRow | null>;
   guildNameForCharacter(characterId: number): Promise<string | null>;
   lifetimeXpRankForCharacter(characterId: number): Promise<{ rank: number; total: number } | null>;
+  recentDeedsForCharacter(characterId: number, limit: number): Promise<RecentDeedRow[]>;
 }
 
 /** The non-DB inputs the public sheet needs (realm, share origin, rank shaper). */
@@ -376,9 +447,10 @@ export async function readPublicSheet(
   if (!target) return { status: 404, body: { error: 'character not found' } };
   const row = await db.getCharacterById(target.characterId);
   if (!row) return { status: 404, body: { error: 'character not found' } };
-  const [guild, rank] = await Promise.all([
+  const [guild, rank, deedsRecent] = await Promise.all([
     db.guildNameForCharacter(row.id),
     db.lifetimeXpRankForCharacter(row.id),
+    db.recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
   ]);
   return {
     status: 200,
@@ -389,24 +461,27 @@ export async function readPublicSheet(
       origin: deps.origin,
       guild,
       rank: deps.toSheetRank(rank),
+      deedsRecent,
     }),
   };
 }
 
 // The real db.ts reads, bundled once so each thin handler passes the same object
 // to its read function. The read functions only touch the subset they type. The
-// active bundle is a `let` behind a test-only setter so the two handlers that
-// ALWAYS hit the db (arena, project-stats) can be driven with a FakeDb; production
-// never calls the setter, so REAL_DB_READS is the only runtime binding.
+// active bundle is a `let` behind a test-only setter so the search / realms / sheet
+// handlers that hit the db can be driven with a FakeDb; production never calls the
+// setter, so REAL_DB_READS is the only runtime binding. The arena ladder and the
+// project-stats count no longer ride this bundle: both read through the
+// cache-fronted runtime (rt.getArenaLeaderboard / rt.getAccountsCreatedCount), like
+// the leaderboard and guild boards, so their db reads run at most once per TTL.
 const REAL_DB_READS = {
-  topArenaRatings,
   searchCharacters,
   characterCountsByRealm,
-  getAccountsCount,
   findCharacterReportTargetByName,
   getCharacterById,
   guildNameForCharacter,
   lifetimeXpRankForCharacter,
+  recentDeedsForCharacter,
 };
 let dbReads = REAL_DB_READS;
 
@@ -450,6 +525,27 @@ async function leaderboardHandler(ctx: Ctx): Promise<void> {
     json(ctx.res, 200, buildDevBoard(REALM, scope, entries, page, pageSize));
     return;
   }
+  // The Renown (deeds) board fork. GLOBAL-ONLY like the dev board is
+  // realm-agnostic: the decoder stays lenient (?scope is accepted and ignored)
+  // and buildDeedsBoard fixes scope 'global'. Auth is OPTIONAL and composed
+  // IN-HANDLER, never as route middleware: mounting optionalReadAccount on the
+  // shared route would newly 401 present-but-invalid tokens on the existing
+  // boards, breaking their parity. Here an anonymous caller gets the board
+  // with no self row; a present token is validated per module convention
+  // (malformed -> 401 auth.token_missing, unknown -> 401 auth.token_invalid,
+  // locked -> 403) and a ranked caller gets their self row. The legacy
+  // main.ts arm serves the same body with the lenient legacy bearer shape
+  // (the authz-gap-close divergence class).
+  if (firstQueryValue(ctx.query.board) === LEADERBOARD_DEEDS_BOARD) {
+    await optionalReadAccount(ctx, async () => {
+      const entries = await rt.getDeedsLeaderboard();
+      const page = decodePage(firstQueryValue(ctx.query.page));
+      const pageSize = decodePageSize(firstQueryValue(ctx.query.pageSize));
+      const self = ctx.account ? await rt.deedsSelfRank(ctx.account.accountId) : null;
+      json(ctx.res, 200, buildDeedsBoard(REALM, entries, page, pageSize, self));
+    });
+    return;
+  }
   const entries = await rt.getLeaderboard(scope);
   const limitParam = firstQueryValue(ctx.query.limit);
   if (limitParam !== undefined) {
@@ -461,9 +557,19 @@ async function leaderboardHandler(ctx: Ctx): Promise<void> {
   json(ctx.res, 200, buildStandardBoard(REALM, scope, entries, page, pageSize));
 }
 
-/** GET /api/arena/leaderboard: the public all-time Ashen Coliseum ladder. */
+/** GET /api/arena/leaderboard: the public all-time Ashen Coliseum ladder,
+ *  served from the per-format cache-fronted runtime (the same cache the legacy
+ *  main.ts arm reads), so the ladder query runs at most once per TTL per format.
+ *  Rate-limited in-handler with publicReadRateLimited (the same per-IP public-read
+ *  budget the search and sheet routes use); the 429 keeps the { error: 'rate
+ *  limited' } body shape. */
 async function arenaLeaderboardHandler(ctx: Ctx): Promise<void> {
-  json(ctx.res, 200, await readArenaLeaderboard(dbReads, firstQueryValue(ctx.query.format)));
+  if (!publicReadRateLimited(ctx.req).allowed) {
+    json(ctx.res, 429, { error: 'rate limited' });
+    return;
+  }
+  const format = decodeArenaFormat(firstQueryValue(ctx.query.format));
+  json(ctx.res, 200, { format, leaders: await useRuntime().getArenaLeaderboard(format) });
 }
 
 /** GET /api/releases: the News & Updates feed, mirrored from GitHub, cache-served. */
@@ -475,20 +581,56 @@ async function releasesHandler(ctx: Ctx): Promise<void> {
   json(ctx.res, 200, { repo: rt.githubRepo, releases: entries.slice(0, limit) });
 }
 
-/** GET /api/project-stats: accounts created, players online, realm. */
+/** GET /api/project-stats: characters created, players online, realm. The
+ *  characters-created COUNT is served from the cache-fronted runtime (the same 60s
+ *  cache the legacy main.ts arm reads); players_online stays a live per-request
+ *  read, so it is re-attached here rather than cached. Now an anonymous DB-fronted
+ *  read, it carries publicReadRateLimited in-handler (the same per-IP public-read
+ *  budget the search and sheet routes use); the 429 keeps the { error: 'rate
+ *  limited' } body shape. */
 async function projectStatsHandler(ctx: Ctx): Promise<void> {
+  if (!publicReadRateLimited(ctx.req).allowed) {
+    json(ctx.res, 429, { error: 'rate limited' });
+    return;
+  }
   const rt = useRuntime();
-  json(ctx.res, 200, await readProjectStats(dbReads, rt.playersOnline(), REALM));
+  const [accountsCreated, charactersCreated] = await Promise.all([
+    rt.getAccountsCreatedCount(),
+    rt.getCharactersCreatedCount(),
+  ]);
+  json(ctx.res, 200, {
+    accounts_created: accountsCreated,
+    characters_created: charactersCreated,
+    players_online: rt.playersOnline(),
+    realm: REALM,
+  });
 }
 
 /**
  * GET /api/status: the public realm + online snapshot. LABELED knownDeviation
  * (status-name-list-trim): the online player name-list the legacy arm returned is
  * dropped here, so the public endpoint exposes counts only, not who is online.
+ * steam.enabled is the capability advert clients read before rendering any
+ * Steam link UI (dual-arm edit: the legacy main.ts twin carries the same field).
+ * players_cap is the configured realm player cap (0 when disabled), also a dual-arm
+ * edit: the legacy main.ts twin carries the same field with the same semantics.
+ * dev_commands is the capability advert for the /dev GUI: the dev_* cheats ride the
+ * WEBSOCKET dispatcher, which both ladders serve identically, so unlike steam.enabled
+ * this one reports the real env on BOTH arms (dual-arm edit: the legacy main.ts twin
+ * carries the same field). Read live per request, mirroring the /api/perf gate. It
+ * advertises only; every cheat is still re-gated server-side on each message, so a
+ * forged true buys a client nothing.
  */
 async function statusHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
-  json(ctx.res, 200, { ok: true, realm: REALM, players_online: rt.playersOnline() });
+  json(ctx.res, 200, {
+    ok: true,
+    realm: REALM,
+    players_online: rt.playersOnline(),
+    players_cap: rt.playersCap(),
+    steam: { enabled: steamEnabled() },
+    dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
+  });
 }
 
 /**

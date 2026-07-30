@@ -69,20 +69,35 @@ export function statEffectText(e: StatEffect, deps: StatTooltipI18n): string {
   }
 }
 
-// Crit and dodge are shown as percents (one decimal); every other stat's source
-// values are whole numbers.
+// Crit, dodge, and parry are shown as percents (one decimal); every other
+// stat's source values are whole numbers.
 const isPercentStat = (model: StatTooltipModel) =>
-  model.stat === 'critChance' || model.stat === 'dodge';
+  model.stat === 'critChance' ||
+  model.stat === 'dodge' ||
+  model.stat === 'parry' ||
+  model.stat === 'warfare';
 
 /** The catalog key for a stat's display name. Most reuse the shared
  *  itemUi.stats.* labels; Spell Power is a character-sheet-only stat whose label
  *  lives in the English-only HUD-chrome domain instead. */
 export function statNameKey(stat: StatTooltipModel['stat']): string {
-  // Character-sheet-only stats (no item carries a labeled line for them) keep their
-  // label in the English-only HUD-chrome domain instead of the item-stats catalog.
-  return stat === 'spellPower' || stat === 'critRating' || stat === 'hasteRating'
+  // Character-sheet rating labels live in the HUD-chrome domain instead of the
+  // core item-stats catalog (WARFARE items author ratings, not final percentages).
+  return stat === 'spellPower' ||
+    stat === 'critRating' ||
+    stat === 'hasteRating' ||
+    stat === 'hitRating' ||
+    stat === 'warfare'
     ? `hudChrome.statInfo.names.${stat}`
     : `itemUi.stats.${stat}`;
+}
+
+function statDescriptionText(model: StatTooltipModel, deps: StatTooltipI18n): string {
+  if (model.stat !== 'warfare') return deps.t(`hudChrome.statInfo.desc.${model.stat}`);
+  return deps.t('hudChrome.statInfo.desc.warfare', {
+    increase: dec1(deps, model.warfareDamageIncrease ?? model.statValue),
+    reduction: dec1(deps, model.warfareDamageReduction ?? model.statValue),
+  });
 }
 
 /** The localized text of one upstream source line: "Base: 40", "From Agility:
@@ -153,7 +168,7 @@ export function statSourcesHeader(model: StatTooltipModel, deps: StatTooltipI18n
  *  talents), then any note lines. */
 export function statTooltipHtml(model: StatTooltipModel, deps: StatTooltipI18n): string {
   let html = `<div class="tt-title">${esc(deps.t(statNameKey(model.stat)))}</div>`;
-  html += `<div class="tt-body">${esc(deps.t(`hudChrome.statInfo.desc.${model.stat}`))}</div>`;
+  html += `<div class="tt-body">${esc(statDescriptionText(model, deps))}</div>`;
   const header = statBreakdownHeader(model, deps);
   if (header) html += `<div class="tt-bd-head">${esc(header)}</div>`;
   for (const e of model.effects) {
@@ -175,7 +190,7 @@ export function statTooltipHtml(model: StatTooltipModel, deps: StatTooltipI18n):
  *  sighted-only tooltip. The stat name is omitted here because the cell's own
  *  visible text already names it. */
 export function statTooltipAria(model: StatTooltipModel, deps: StatTooltipI18n): string {
-  const parts = [deps.t(`hudChrome.statInfo.desc.${model.stat}`)];
+  const parts = [statDescriptionText(model, deps)];
   const header = statBreakdownHeader(model, deps);
   if (header) parts.push(header);
   for (const e of model.effects) parts.push(statEffectText(e, deps));
@@ -186,28 +201,51 @@ export function statTooltipAria(model: StatTooltipModel, deps: StatTooltipI18n):
   return parts.join(' ');
 }
 
-/** The stat cell's displayed value text: a one-decimal percent for crit/dodge,
- *  a one-decimal number for the dps estimate, otherwise a whole number. Sourced
- *  from model.statValue so the cell and the tooltip it opens cannot disagree. */
+/** The stat cell's displayed value text: a one-decimal percent for
+ *  crit/dodge/parry, a one-decimal number for the dps estimate, otherwise a
+ *  whole number. Sourced from model.statValue so the cell and the tooltip it
+ *  opens cannot disagree. */
 export function statValueText(model: StatTooltipModel, deps: StatTooltipI18n): string {
-  if (model.stat === 'critChance' || model.stat === 'dodge')
+  if (model.stat === 'warfare') {
+    return deps.t('hudChrome.statInfo.warfareValue', {
+      increase: dec1(deps, model.warfareDamageIncrease ?? model.statValue),
+      reduction: dec1(deps, model.warfareDamageReduction ?? model.statValue),
+    });
+  }
+  if (model.stat === 'critChance' || model.stat === 'dodge' || model.stat === 'parry')
     return `${dec1(deps, model.statValue)}%`;
   if (model.stat === 'dps') return dec1(deps, model.statValue);
   return int0(deps, model.statValue);
 }
 
-/** Build one focusable character-sheet stat cell: "Name: <b>value</b>" plus a
- *  visually-hidden, aria-describedby breakdown carrying the same live numbers as
- *  the (sighted-only) floating tooltip. The HUD attaches the tooltip afterwards
- *  by matching the data-stat attribute. The value comes from formatNumber, so it
- *  is left unescaped (digits / separators / percent only). */
-export function statCellHtml(model: StatTooltipModel, deps: StatTooltipI18n): string {
+/** Layout options for a stat cell. `colon: false` drops the "Name:" colon (the
+ *  showcase sheet's tiles + Offense/Defense panels position the label and value
+ *  with flexbox, so the literal separator is redundant); everything else about
+ *  the cell (data-stat, tabindex, the aria-describedby breakdown) is unchanged. */
+export interface StatCellOptions {
+  colon?: boolean;
+}
+
+/** Build one focusable character-sheet stat cell: "Name: <b>value</b>" (or
+ *  "Name <b>value</b>" with `colon: false`) plus a visually-hidden,
+ *  aria-describedby breakdown carrying the same live numbers as the
+ *  (sighted-only) floating tooltip. The HUD attaches the tooltip afterwards by
+ *  matching the data-stat attribute. The value comes from formatNumber, so it is
+ *  left unescaped (digits / separators / percent only). */
+export function statCellHtml(
+  model: StatTooltipModel,
+  deps: StatTooltipI18n,
+  opts?: StatCellOptions,
+): string {
   const name = esc(deps.t(statNameKey(model.stat)));
   const value = statValueText(model, deps);
   const aria = esc(statTooltipAria(model, deps));
+  // Default keeps the classic "Name:" colon; the showcase sheet passes colon:false
+  // and lets flex layout separate the label from the value.
+  const sep = opts?.colon === false ? ' ' : ': ';
   return (
     `<span class="stat-cell" data-stat="${model.stat}" tabindex="0" aria-describedby="statdesc-${model.stat}">` +
-    `${name}: <b>${value}</b>` +
+    `${name}${sep}<b>${value}</b>` +
     `<span id="statdesc-${model.stat}" class="visually-hidden">${aria}</span></span>`
   );
 }

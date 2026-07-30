@@ -63,6 +63,12 @@ describe('resurrection: aurasSurvivingDeath predicate', () => {
     expect(survivors[0].id).toBe(RESURRECTION_SICKNESS_ID);
   });
 
+  it('keeps encounter-owned unbreakable control until its script releases it', () => {
+    const scriptedStun = { ...aura('scripted_stun'), unbreakableControl: true } as const;
+
+    expect(aurasSurvivingDeath([aura('rejuvenation'), scriptedStun])).toEqual([scriptedStun]);
+  });
+
   it('returns an empty list when nothing survives', () => {
     expect(aurasSurvivingDeath([aura('rejuvenation')])).toEqual([]);
     expect(aurasSurvivingDeath([])).toEqual([]);

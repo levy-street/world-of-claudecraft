@@ -1,5 +1,8 @@
 import * as THREE from 'three';
+import { NATIVE_APP } from '../client_origin';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
+import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
+import { isSoftwareRendererName } from './software_renderer';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
 // scattered LOW_GFX ternaries.
@@ -14,7 +17,10 @@ import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 //      anything unrecognized -> medium), so the 3D tier matches the medium data-fx-level fallback
 
 export type GfxTier = 'low' | 'medium' | 'high' | 'ultra';
-export const GFX_CONFIG_VERSION = 14;
+// v18: composer-tier draw counts became real (draw_stats_core accumulator);
+// fleet dashboards segment the rendererCalls/rendererTriangles semantics
+// change on this version (packet 0 ruling R2).
+export const GFX_CONFIG_VERSION = 18;
 
 export const GFX_BUCKET_IDS = [
   'resolution',
@@ -54,6 +60,8 @@ export interface GfxRuntimeHints {
   coarsePointer: boolean;
   narrowViewport: boolean;
   gpuRenderer?: string;
+  nativeApp?: boolean;
+  platform?: 'ios' | 'android' | 'other';
   graphicsPreset?: number;
   terrainDetail?: number;
   foliageDensity?: number;
@@ -76,6 +84,8 @@ export interface GfxSettings {
   readonly msaaSamples: number;
   /** devicePixelRatio is capped here — 2.5 everywhere is a silent perf killer */
   readonly pixelRatioCap: number;
+  /** Directional sun shadow pass. Disabled where its duplicate scene draw is unsafe. */
+  readonly dynamicShadows: boolean;
   readonly shadowMap: number;
   /** PBR MeshStandardMaterial; low keeps Lambert */
   readonly standardMaterials: boolean;
@@ -88,6 +98,29 @@ export interface GfxSettings {
   readonly terrainSplat: boolean;
   readonly windSway: boolean;
   readonly maxPointLights: number;
+  /**
+   * Memory-ceiling profile for phone-class browsers (see isConstrainedBrowser). iOS WebKit
+   * (Safari AND the native WKWebView shell: every iOS browser shares the engine) kills the
+   * whole WebContent process when a tab crosses its per-process memory limit, and the world
+   * entry's synchronous scene build is the allocation spike that crosses it. When set, the
+   * tier sheds the biggest one-shot GPU allocations (shadow-map resolution, composer MSAA,
+   * pixel-ratio cap, backdrop mips, deferred IBL prefilter) WITHOUT changing what the player
+   * can see or react to: every knob here is cosmetic sharpness only (fairness rule).
+   */
+  readonly constrainedMemory: boolean;
+  /** Packaged iOS WKWebView profile that bounds retained GPU resources independently of FPS. */
+  readonly nativeIosMemoryProfile: boolean;
+  /** Global cap for inactive skinned character rigs retained for reuse. */
+  readonly maxPooledCharacterVisuals: number;
+  /**
+   * Linear range multiplier for the animated far character band (`crowd_lod.ts`):
+   * how much further than the articulated band a rig keeps animating at a low
+   * cadence before it collapses to the frozen single-draw far mesh. 1 keeps the
+   * pre-existing straight-to-frozen behaviour, which is what phone-class and
+   * software profiles want; the crowd knee and the frame-budget pressure ease it
+   * back to 1 on their own, so this is only the per-tier ceiling.
+   */
+  readonly farCharacterAnimScale: number;
 }
 
 export interface GfxRuntimeBudget {
@@ -180,16 +213,86 @@ export const GFX_BUDGETS: Record<GfxTier, GfxRuntimeBudget> = {
 
 export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
   low: {
-    resolution: { min: 0.55, baseline: 1.0, max: 1.0, roi: 0.88, cost: 'gpu', governable: true },
-    grass: { min: 0.62, baseline: 0.9, max: 1.0, roi: 0.9, cost: 'gpu', governable: true },
-    foliage: { min: 0.68, baseline: 0.9, max: 1.0, roi: 0.84, cost: 'gpu', governable: true },
-    props: { min: 0.35, baseline: 0.5, max: 0.62, roi: 0.58, cost: 'mixed', governable: false },
-    lighting: { min: 0.78, baseline: 1.0, max: 1.0, roi: 0.72, cost: 'gpu', governable: true },
-    materials: { min: 0.3, baseline: 0.45, max: 0.58, roi: 0.78, cost: 'gpu', governable: false },
-    waterSky: { min: 0.35, baseline: 0.7, max: 0.8, roi: 0.82, cost: 'gpu', governable: false },
-    vfx: { min: 0.84, baseline: 1.0, max: 1.0, roi: 0.9, cost: 'mixed', governable: true },
-    characters: { min: 1.0, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
-    weapons: { min: 1.0, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
+    resolution: {
+      min: 0.55,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.88,
+      cost: 'gpu',
+      governable: true,
+    },
+    grass: {
+      min: 0.62,
+      baseline: 0.9,
+      max: 1.0,
+      roi: 0.9,
+      cost: 'gpu',
+      governable: true,
+    },
+    foliage: {
+      min: 0.68,
+      baseline: 0.9,
+      max: 1.0,
+      roi: 0.84,
+      cost: 'gpu',
+      governable: true,
+    },
+    props: {
+      min: 0.35,
+      baseline: 0.5,
+      max: 0.62,
+      roi: 0.58,
+      cost: 'mixed',
+      governable: false,
+    },
+    lighting: {
+      min: 0.78,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.72,
+      cost: 'gpu',
+      governable: true,
+    },
+    materials: {
+      min: 0.3,
+      baseline: 0.45,
+      max: 0.58,
+      roi: 0.78,
+      cost: 'gpu',
+      governable: false,
+    },
+    waterSky: {
+      min: 0.35,
+      baseline: 0.7,
+      max: 0.8,
+      roi: 0.82,
+      cost: 'gpu',
+      governable: false,
+    },
+    vfx: {
+      min: 0.84,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.9,
+      cost: 'mixed',
+      governable: true,
+    },
+    characters: {
+      min: 1.0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 1.0,
+      cost: 'mixed',
+      governable: false,
+    },
+    weapons: {
+      min: 1.0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 1.0,
+      cost: 'mixed',
+      governable: false,
+    },
     worldStreaming: {
       min: 0.25,
       baseline: 0.5,
@@ -198,19 +301,96 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'cpu',
       governable: true,
     },
-    ui: { min: 0.75, baseline: 0.9, max: 1.0, roi: 0.86, cost: 'cpu', governable: false },
+    ui: {
+      min: 0.75,
+      baseline: 0.9,
+      max: 1.0,
+      roi: 0.86,
+      cost: 'cpu',
+      governable: false,
+    },
   },
   medium: {
-    resolution: { min: 0.55, baseline: 1.0, max: 1.0, roi: 0.88, cost: 'gpu', governable: true },
-    grass: { min: 0.5, baseline: 0.78, max: 0.9, roi: 0.86, cost: 'gpu', governable: true },
-    foliage: { min: 0.5, baseline: 0.74, max: 0.86, roi: 0.64, cost: 'gpu', governable: true },
-    props: { min: 0.55, baseline: 0.7, max: 0.82, roi: 0.58, cost: 'mixed', governable: false },
-    lighting: { min: 0.45, baseline: 0.72, max: 0.82, roi: 0.7, cost: 'gpu', governable: true },
-    materials: { min: 0.62, baseline: 0.78, max: 0.9, roi: 0.78, cost: 'gpu', governable: false },
-    waterSky: { min: 0.55, baseline: 0.78, max: 0.9, roi: 0.82, cost: 'gpu', governable: false },
-    vfx: { min: 0.58, baseline: 0.8, max: 0.9, roi: 0.7, cost: 'mixed', governable: true },
-    characters: { min: 0.86, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
-    weapons: { min: 1.0, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
+    resolution: {
+      min: 0.55,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.88,
+      cost: 'gpu',
+      governable: true,
+    },
+    grass: {
+      min: 0.5,
+      baseline: 0.78,
+      max: 0.9,
+      roi: 0.86,
+      cost: 'gpu',
+      governable: true,
+    },
+    foliage: {
+      min: 0.5,
+      baseline: 0.74,
+      max: 0.86,
+      roi: 0.64,
+      cost: 'gpu',
+      governable: true,
+    },
+    props: {
+      min: 0.55,
+      baseline: 0.7,
+      max: 0.82,
+      roi: 0.58,
+      cost: 'mixed',
+      governable: false,
+    },
+    lighting: {
+      min: 0.45,
+      baseline: 0.72,
+      max: 0.82,
+      roi: 0.7,
+      cost: 'gpu',
+      governable: true,
+    },
+    materials: {
+      min: 0.62,
+      baseline: 0.78,
+      max: 0.9,
+      roi: 0.78,
+      cost: 'gpu',
+      governable: false,
+    },
+    waterSky: {
+      min: 0.55,
+      baseline: 0.78,
+      max: 0.9,
+      roi: 0.82,
+      cost: 'gpu',
+      governable: false,
+    },
+    vfx: {
+      min: 0.58,
+      baseline: 0.8,
+      max: 0.9,
+      roi: 0.7,
+      cost: 'mixed',
+      governable: true,
+    },
+    characters: {
+      min: 0.86,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 1.0,
+      cost: 'mixed',
+      governable: false,
+    },
+    weapons: {
+      min: 1.0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 1.0,
+      cost: 'mixed',
+      governable: false,
+    },
     worldStreaming: {
       min: 0.42,
       baseline: 0.7,
@@ -219,19 +399,96 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'cpu',
       governable: true,
     },
-    ui: { min: 0.82, baseline: 1.0, max: 1.0, roi: 0.86, cost: 'cpu', governable: false },
+    ui: {
+      min: 0.82,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.86,
+      cost: 'cpu',
+      governable: false,
+    },
   },
   high: {
-    resolution: { min: 0.6, baseline: 1.0, max: 1.0, roi: 0.88, cost: 'gpu', governable: true },
-    grass: { min: 0.6, baseline: 0.88, max: 1.0, roi: 0.86, cost: 'gpu', governable: true },
-    foliage: { min: 0.6, baseline: 0.9, max: 1.0, roi: 0.72, cost: 'gpu', governable: true },
-    props: { min: 0.7, baseline: 0.88, max: 1.0, roi: 0.58, cost: 'mixed', governable: false },
-    lighting: { min: 0.62, baseline: 0.9, max: 1.0, roi: 0.7, cost: 'gpu', governable: true },
-    materials: { min: 0.75, baseline: 0.92, max: 1.0, roi: 0.78, cost: 'gpu', governable: false },
-    waterSky: { min: 0.72, baseline: 0.92, max: 1.0, roi: 0.82, cost: 'gpu', governable: false },
-    vfx: { min: 0.68, baseline: 0.92, max: 1.0, roi: 0.7, cost: 'mixed', governable: true },
-    characters: { min: 0.9, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
-    weapons: { min: 1.0, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
+    resolution: {
+      min: 0.6,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.88,
+      cost: 'gpu',
+      governable: true,
+    },
+    grass: {
+      min: 0.6,
+      baseline: 0.88,
+      max: 1.0,
+      roi: 0.86,
+      cost: 'gpu',
+      governable: true,
+    },
+    foliage: {
+      min: 0.6,
+      baseline: 0.9,
+      max: 1.0,
+      roi: 0.72,
+      cost: 'gpu',
+      governable: true,
+    },
+    props: {
+      min: 0.7,
+      baseline: 0.88,
+      max: 1.0,
+      roi: 0.58,
+      cost: 'mixed',
+      governable: false,
+    },
+    lighting: {
+      min: 0.62,
+      baseline: 0.9,
+      max: 1.0,
+      roi: 0.7,
+      cost: 'gpu',
+      governable: true,
+    },
+    materials: {
+      min: 0.75,
+      baseline: 0.92,
+      max: 1.0,
+      roi: 0.78,
+      cost: 'gpu',
+      governable: false,
+    },
+    waterSky: {
+      min: 0.72,
+      baseline: 0.92,
+      max: 1.0,
+      roi: 0.82,
+      cost: 'gpu',
+      governable: false,
+    },
+    vfx: {
+      min: 0.68,
+      baseline: 0.92,
+      max: 1.0,
+      roi: 0.7,
+      cost: 'mixed',
+      governable: true,
+    },
+    characters: {
+      min: 0.9,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 1.0,
+      cost: 'mixed',
+      governable: false,
+    },
+    weapons: {
+      min: 1.0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 1.0,
+      cost: 'mixed',
+      governable: false,
+    },
     worldStreaming: {
       min: 0.55,
       baseline: 0.88,
@@ -240,21 +497,112 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'cpu',
       governable: true,
     },
-    ui: { min: 0.86, baseline: 1.0, max: 1.0, roi: 0.86, cost: 'cpu', governable: false },
+    ui: {
+      min: 0.86,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.86,
+      cost: 'cpu',
+      governable: false,
+    },
   },
   ultra: {
-    resolution: { min: 0.68, baseline: 1.0, max: 1.0, roi: 0.88, cost: 'gpu', governable: true },
-    grass: { min: 0.78, baseline: 1.0, max: 1.0, roi: 0.86, cost: 'gpu', governable: true },
-    foliage: { min: 0.78, baseline: 1.0, max: 1.0, roi: 0.72, cost: 'gpu', governable: true },
-    props: { min: 0.86, baseline: 1.0, max: 1.0, roi: 0.58, cost: 'mixed', governable: false },
-    lighting: { min: 0.78, baseline: 1.0, max: 1.0, roi: 0.7, cost: 'gpu', governable: true },
-    materials: { min: 0.86, baseline: 1.0, max: 1.0, roi: 0.78, cost: 'gpu', governable: false },
-    waterSky: { min: 0.86, baseline: 1.0, max: 1.0, roi: 0.82, cost: 'gpu', governable: false },
-    vfx: { min: 0.86, baseline: 1.0, max: 1.0, roi: 0.7, cost: 'mixed', governable: true },
-    characters: { min: 0.94, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
-    weapons: { min: 1.0, baseline: 1.0, max: 1.0, roi: 1.0, cost: 'mixed', governable: false },
-    worldStreaming: { min: 0.7, baseline: 1.0, max: 1.0, roi: 0.62, cost: 'cpu', governable: true },
-    ui: { min: 0.9, baseline: 1.0, max: 1.0, roi: 0.86, cost: 'cpu', governable: false },
+    resolution: {
+      min: 0.68,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.88,
+      cost: 'gpu',
+      governable: true,
+    },
+    grass: {
+      min: 0.78,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.86,
+      cost: 'gpu',
+      governable: true,
+    },
+    foliage: {
+      min: 0.78,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.72,
+      cost: 'gpu',
+      governable: true,
+    },
+    props: {
+      min: 0.86,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.58,
+      cost: 'mixed',
+      governable: false,
+    },
+    lighting: {
+      min: 0.78,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.7,
+      cost: 'gpu',
+      governable: true,
+    },
+    materials: {
+      min: 0.86,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.78,
+      cost: 'gpu',
+      governable: false,
+    },
+    waterSky: {
+      min: 0.86,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.82,
+      cost: 'gpu',
+      governable: false,
+    },
+    vfx: {
+      min: 0.86,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.7,
+      cost: 'mixed',
+      governable: true,
+    },
+    characters: {
+      min: 0.94,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 1.0,
+      cost: 'mixed',
+      governable: false,
+    },
+    weapons: {
+      min: 1.0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 1.0,
+      cost: 'mixed',
+      governable: false,
+    },
+    worldStreaming: {
+      min: 0.7,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.62,
+      cost: 'cpu',
+      governable: true,
+    },
+    ui: {
+      min: 0.9,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.86,
+      cost: 'cpu',
+      governable: false,
+    },
   },
 };
 
@@ -316,21 +664,27 @@ export function configureMaskedDoubleSidedVegetationMaterial<T extends THREE.Mat
   return mat;
 }
 
-function settingsFor(
-  tier: GfxTier,
-  hints?: Pick<
-    GfxRuntimeHints,
-    | 'search'
-    | 'graphicsPreset'
-    | 'terrainDetail'
-    | 'foliageDensity'
-    | 'effectsQuality'
-    | 'shadowQuality'
-    | 'gpuRenderer'
-  >,
-): GfxSettings {
+function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettings {
   const bucketBands = GFX_BUCKET_BANDS[tier];
   const weakIntegratedGpu = isWeakIntegratedGpu(hints?.gpuRenderer);
+  // WKWebView's WebContent/GPU process has a hard resident-memory ceiling which is independent
+  // of frame rate. The runtime governor can reduce draw cost after a slow submit, but it cannot
+  // reclaim already-created textures, programs, materials, or rigs. Keep the player's selected
+  // tier (and its density/VFX progression) while routing the packaged iOS app through the
+  // bounded-residency material/world path from scene construction onward.
+  const nativeIosMemoryProfile = hints?.nativeApp === true && hints.platform === 'ios';
+  // Phone-class browsers live under a hard per-process memory ceiling (iOS WebKit evicts the
+  // WebContent process outright); shed the largest one-shot GPU allocations there. Shadow-map
+  // texels, MSAA, and DPR are cosmetic sharpness only, so this never crosses the
+  // graphics-settings fairness line.
+  const constrainedMemory =
+    nativeIosMemoryProfile ||
+    isConstrainedBrowser({
+      deviceMemory: hints?.deviceMemory,
+      maxTouchPoints: hints?.maxTouchPoints ?? 0,
+      coarsePointer: hints?.coarsePointer ?? false,
+      narrowViewport: hints?.narrowViewport ?? false,
+    });
   let settings: GfxSettings = {
     graphicsConfigVersion: GFX_CONFIG_VERSION,
     tier,
@@ -338,28 +692,84 @@ function settingsFor(
     bucketBaselines: bucketBaselines(bucketBands),
     budget: GFX_BUDGETS[tier],
     autoGovernor: shouldUseAutoGovernor(tier, hints?.search ?? ''),
-    composer: tier === 'high' || tier === 'ultra',
+    composer: !nativeIosMemoryProfile && (tier === 'high' || tier === 'ultra'),
     // N8AO runs on both composer tiers: half-res + Low quality on high keeps
     // it ~1ms-class on real GPUs; ultra gets full-res Medium
-    ao: tier === 'high' || tier === 'ultra',
-    msaaSamples: tier === 'high' || tier === 'ultra' ? 4 : 0,
-    pixelRatioCap: tier === 'low' ? 1.48 : tier === 'medium' ? 1.48 : tier === 'high' ? 1.75 : 2.5,
-    shadowMap: tier === 'low' ? 2048 : tier === 'medium' ? 2560 : 4096,
-    standardMaterials: tier === 'medium' || tier === 'high' || tier === 'ultra',
-    lowPlus: tier === 'low',
+    ao: !nativeIosMemoryProfile && (tier === 'high' || tier === 'ultra'),
+    msaaSamples: (tier === 'high' || tier === 'ultra') && !constrainedMemory ? 4 : 0,
+    pixelRatioCap: nativeIosMemoryProfile
+      ? 1.25
+      : constrainedMemory
+        ? 1.48
+        : tier === 'low' || tier === 'medium'
+          ? 1.48
+          : tier === 'high'
+            ? 1.75
+            : 2.5,
+    // Shadows are cosmetic and duplicate the visible scene draw. Both constrained browsers and
+    // the stricter native-iOS residency profile remove that duplicate pass.
+    dynamicShadows: tier !== 'low' && !constrainedMemory,
+    shadowMap: nativeIosMemoryProfile
+      ? 1024
+      : tier === 'low'
+        ? 2048
+        : tier === 'medium'
+          ? constrainedMemory
+            ? 1536
+            : 2560
+          : constrainedMemory
+            ? 2048
+            : 4096,
+    standardMaterials:
+      !nativeIosMemoryProfile && (tier === 'medium' || tier === 'high' || tier === 'ultra'),
+    lowPlus: tier === 'low' || nativeIosMemoryProfile,
+    // Tree and rock placement must match across clients because those decorations
+    // occlude world sightlines. Keep the constrained profile on the full placement
+    // set and reduce only non-occluding grass below.
     leanFoliage: tier === 'low' || (tier === 'medium' && weakIntegratedGpu),
-    grassRadius: tier === 'low' ? 80 : tier === 'medium' ? 76 : 82,
-    grassStep: tier === 'low' ? 2.05 : tier === 'medium' ? 2.0 : 1.8,
-    terrainSplat: tier === 'medium' || tier === 'high' || tier === 'ultra',
+    grassRadius: nativeIosMemoryProfile
+      ? 52
+      : tier === 'low'
+        ? 80
+        : tier === 'medium'
+          ? constrainedMemory
+            ? 62
+            : 76
+          : 82,
+    grassStep: nativeIosMemoryProfile
+      ? 2.75
+      : tier === 'low'
+        ? 2.05
+        : tier === 'medium'
+          ? constrainedMemory
+            ? 2.35
+            : 2.0
+          : 1.8,
+    terrainSplat:
+      !nativeIosMemoryProfile && (tier === 'medium' || tier === 'high' || tier === 'ultra'),
     windSway: true,
-    maxPointLights: 6,
+    maxPointLights: nativeIosMemoryProfile ? 2 : constrainedMemory ? 3 : 6,
+    constrainedMemory,
+    nativeIosMemoryProfile,
+    maxPooledCharacterVisuals: nativeIosMemoryProfile ? 6 : Number.POSITIVE_INFINITY,
+    // Extra articulated rigs are skinning + draw-call cost, so the phone-class
+    // memory profiles and the low tier (which includes software GL) opt out and
+    // keep the straight-to-frozen far LOD.
+    farCharacterAnimScale:
+      tier === 'low' || constrainedMemory || nativeIosMemoryProfile ? 1 : FAR_ANIM_RANGE_SCALE_MAX,
   };
   if (hints?.graphicsPreset === PRESET_ADVANCED) {
     if ((hints.terrainDetail ?? 1) < 0.5) settings = { ...settings, terrainSplat: false };
     if ((hints.foliageDensity ?? 1) < 0.5)
       settings = { ...settings, grassRadius: 34, grassStep: 3.8 };
     if ((hints.effectsQuality ?? 1) < EFFECTS_QUALITY_LOW_CUTOFF)
-      settings = { ...settings, composer: false, ao: false, msaaSamples: 0, maxPointLights: 3 };
+      settings = {
+        ...settings,
+        composer: false,
+        ao: false,
+        msaaSamples: 0,
+        maxPointLights: Math.min(settings.maxPointLights, 3),
+      };
     if ((hints.shadowQuality ?? 1) < 0.5) settings = { ...settings, shadowMap: 1024 };
   }
   return settings;
@@ -442,6 +852,8 @@ function runtimeHints(): GfxRuntimeHints {
         ? matchMedia('(max-width: 940px)').matches || matchMedia('(max-height: 760px)').matches
         : false,
     gpuRenderer: probeGpuRenderer(),
+    nativeApp: NATIVE_APP,
+    platform: mobilePlatformFromNavigator(nav),
     graphicsPreset: storedNumericSetting('graphicsPreset'),
     terrainDetail: storedNumericSetting('terrainDetail'),
     foliageDensity: storedNumericSetting('foliageDensity'),
@@ -450,7 +862,25 @@ function runtimeHints(): GfxRuntimeHints {
   };
 }
 
-export function isConstrainedBrowser(hints: GfxRuntimeHints): boolean {
+function mobilePlatformFromNavigator(
+  nav: Pick<Navigator, 'userAgent' | 'platform' | 'maxTouchPoints'> | null,
+): 'ios' | 'android' | 'other' {
+  if (!nav) return 'other';
+  if (
+    /iPad|iPhone|iPod/.test(nav.userAgent) ||
+    (nav.platform === 'MacIntel' && nav.maxTouchPoints > 1)
+  )
+    return 'ios';
+  if (/Android/.test(nav.userAgent)) return 'android';
+  return 'other';
+}
+
+export function isConstrainedBrowser(
+  hints: Pick<
+    GfxRuntimeHints,
+    'deviceMemory' | 'maxTouchPoints' | 'coarsePointer' | 'narrowViewport'
+  >,
+): boolean {
   if (hints.deviceMemory !== undefined && hints.deviceMemory <= 4) return true;
   return hints.maxTouchPoints > 0 && (hints.coarsePointer || hints.narrowViewport);
 }
@@ -468,6 +898,7 @@ export function isConstrainedBrowser(hints: GfxRuntimeHints): boolean {
 export type GpuClass =
   | 'software'
   | 'strongDesktop'
+  | 'appleSilicon'
   | 'flagshipMobile'
   | 'midIntegrated'
   | 'midMobile'
@@ -477,21 +908,25 @@ export type GpuClass =
 export function classifyGpuRenderer(name: string | undefined): GpuClass {
   const n = (name ?? '').toLowerCase();
   if (!n) return 'unknown';
-  // Software rasterizers (no real GPU): always the lowest tier. The bare "software" token is kept
-  // in lockstep with isSoftwareGL below so the two software detectors never disagree: a string like
-  // "Apple Software Renderer" must classify as software here (-> low) so the device-aware 3D tier and
-  // the data-fx-level HUD tier both land on low, never one low and one medium.
-  if (/swiftshader|llvmpipe|basic render|softpipe|microsoft basic|software/.test(n))
-    return 'software';
+  // Software rasterizers (no real GPU): always the lowest tier. The token set lives in
+  // src/render/software_renderer.ts (SOFTWARE_RENDERER_PATTERN), shared by every adapter-name
+  // software detector (this, isSoftwareGL below, perf_doctor, perf_reporter) so they never disagree:
+  // a string like "Apple Software Renderer" or the WARP "Microsoft Basic Render Driver" must classify
+  // as software here (-> low) so the device-aware 3D tier and the data-fx-level HUD tier both land on
+  // low, never one low and one medium. (n is already lowercased; the /i pattern makes that fine.)
+  if (isSoftwareRendererName(n)) return 'software';
   // The older Intel integrated parts the codebase already names as weak (kept AHEAD of the
   // mid-integrated bucket so an Iris Plus 6xx / UHD 6xx / HD 5xx-6xx stays weak, consistent with
   // the existing leanFoliage treatment in settingsFor).
   if (isWeakIntegratedGpu(name)) return 'weak';
-  // Strong desktop discrete + Apple Silicon. The `(\(tm\))?` tolerates the "(TM)" some Windows
-  // drivers print after "Radeon" ("Radeon(TM) RX 580").
-  if (
-    /\b(rtx|gtx)\b|geforce|radeon(\(tm\))?\s?(rx|pro|vii)|\barc\b|\bnvidia\b|apple\s?m[1-9]/.test(n)
-  )
+  // Apple Silicon (M1..M9). Split out of strongDesktop: these are thermally constrained laptop
+  // SoCs (the MacBook form factor has no active-cooling headroom), so the resolver defaults them
+  // to the safe middle tier rather than ultra (issue 1676). Kept AHEAD of strongDesktop, whose
+  // regex no longer claims `apple m`. A player can still pick ultra manually.
+  if (/apple\s?m[1-9]/.test(n)) return 'appleSilicon';
+  // Strong desktop discrete. The `(\(tm\))?` tolerates the "(TM)" some Windows drivers print
+  // after "Radeon" ("Radeon(TM) RX 580").
+  if (/\b(rtx|gtx)\b|geforce|radeon(\(tm\))?\s?(rx|pro|vii)|\barc\b|\bnvidia\b/.test(n))
     return 'strongDesktop';
   // Recent flagship mobile.
   if (
@@ -561,6 +996,12 @@ export function resolveDefaultGraphicsPreset(hints: GfxRuntimeHints): number {
   if (gpu === 'strongDesktop' && !isMobile) return ampleOrUnknownMem ? PRESET_ULTRA : PRESET_HIGH;
   // A strong/flagship GPU on a touch device: capped at HIGH (ultra is desktop-only) for thermals.
   if (gpu === 'flagshipMobile' || (gpu === 'strongDesktop' && isMobile)) return PRESET_HIGH;
+  // Apple Silicon: an M-series iPad (touch) keeps the mobile HIGH cap above; an M-series Mac
+  // (non-touch) defaults to the safe middle. These SoCs can render high, but the thermally
+  // constrained MacBook form factor overheats and drains battery on a sustained ultra load, so
+  // medium is the right auto-default (the runtime governor can still climb; ultra stays a manual
+  // opt-in). Issue 1676.
+  if (gpu === 'appleSilicon') return isMobile ? PRESET_HIGH : PRESET_MEDIUM;
   if (gpu === 'midIntegrated' || gpu === 'midMobile') return PRESET_MEDIUM;
   if (
     gpu === 'unknown' &&
@@ -638,7 +1079,7 @@ function rendererName(webgl: THREE.WebGLRenderer): string {
 }
 
 export function isSoftwareGL(webgl: THREE.WebGLRenderer): boolean {
-  return /swiftshader|llvmpipe|software/i.test(rendererName(webgl));
+  return isSoftwareRendererName(rendererName(webgl));
 }
 
 export function isWeakIntegratedGpu(name: string | undefined): boolean {
@@ -651,6 +1092,16 @@ export function isWeakIntegratedGpu(name: string | undefined): boolean {
   );
 }
 
+// The resolved software-GL verdict from the live GL context, cached at initGfxTier
+// so a player-facing "no real GPU" notice can consume it without re-probing. False
+// until initGfxTier runs (module-load best-guess never had a context).
+let softwareGlDetected = false;
+
+/** True when the live WebGL context resolved to a software rasterizer (set in initGfxTier). */
+export function gfxSoftwareRendering(): boolean {
+  return softwareGlDetected;
+}
+
 // Best-guess settings from the URL alone (so module-load consumers see sane
 // values); initGfxTier() re-resolves once the GL context exists. The renderer
 // MUST call initGfxTier() right after creating its WebGLRenderer and before
@@ -659,17 +1110,20 @@ export let GFX: GfxSettings = settingsFor(tierFromHints(runtimeHints(), false), 
 
 export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
   const hints = { ...runtimeHints(), gpuRenderer: rendererName(webgl) };
-  const tier = tierFromHints(hints, isSoftwareGL(webgl));
+  softwareGlDetected = isSoftwareGL(webgl);
+  const tier = tierFromHints(hints, softwareGlDetected);
   GFX = settingsFor(tier, hints);
   return tier;
 }
 
 export const gfxInternalsForTest = {
   settingsFor,
+  mobilePlatformFromNavigator,
   probeGpuRenderer,
   resetGpuRendererProbe: () => {
     gpuRendererProbed = false;
     probedGpuRenderer = undefined;
+    softwareGlDetected = false;
   },
 };
 
@@ -691,6 +1145,7 @@ export const SUN_DIR = SUN_ANCHOR.clone().normalize();
 export interface SurfaceMatOpts {
   color?: number;
   map?: THREE.Texture;
+  vertexColors?: boolean;
   normalMap?: THREE.Texture;
   /** PBR roughness map (high/ultra only; ignored on the Lambert tier) */
   roughnessMap?: THREE.Texture;
@@ -747,6 +1202,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
     ? new THREE.MeshStandardMaterial({
         color: opts.color ?? 0xffffff,
         map: opts.map ?? null,
+        vertexColors: opts.vertexColors ?? false,
         normalMap: opts.normalMap ?? null,
         roughnessMap: opts.roughnessMap ?? null,
         aoMap: opts.aoMap ?? null,
@@ -760,6 +1216,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
     : new THREE.MeshLambertMaterial({
         color: opts.color ?? 0xffffff,
         map: opts.map ?? null,
+        vertexColors: opts.vertexColors ?? false,
         flatShading: opts.flatShading ?? false,
         emissive: opts.emissive ?? 0x000000,
         emissiveIntensity: opts.emissiveIntensity ?? 1,

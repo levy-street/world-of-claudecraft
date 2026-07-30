@@ -29,12 +29,22 @@ describe('loadConfig', () => {
     expect(cfg.dispatch).toBe('new');
     expect(cfg.port).toBe(8787);
     expect(cfg.allowDevCommands).toBe(false);
+    expect(cfg.provisionTestAccounts).toBe(false);
     expect(cfg.turnstileSecret).toBe('');
     expect(cfg.maxWsPerIpHard).toBe(20);
+    expect(cfg.maxPlayersPerRealm).toBe(5000);
     expect(cfg.githubRepo).toBe('levy-street/world-of-claudecraft');
     expect(cfg.githubToken).toBe('');
     expect(cfg.chatLogRetentionDays).toBe(90);
     expect(cfg.perfReportRetentionDays).toBe(14);
+    expect(cfg.dailyRewardEventsRetentionDays).toBe(400);
+    expect(cfg.onlineSamplesRetentionDays).toBe(90);
+    expect(cfg.sitePresenceRetentionDays).toBe(90);
+    expect(cfg.playSessionRetentionDays).toBe(180);
+    expect(cfg.accountIpAssociationRetentionDays).toBe(730);
+    expect(cfg.playerActivityRetentionDays).toBe(400);
+    expect(cfg.retentionSweepUtcHour).toBe(5);
+    expect(cfg.retentionSweepMaxRowsPerRun).toBe(50000);
     expect(cfg.requireWebLogin).toBe(false);
     expect(cfg.metricsToken).toBe('');
   });
@@ -171,6 +181,41 @@ describe('loadConfig', () => {
     expect(loadConfig({ ...MIN_ENV, ALLOW_DEV_COMMANDS: '0' }).allowDevCommands).toBe(false);
   });
 
+  it('strictly parses PROVISION_TEST_ACCOUNTS and keeps it off by default', () => {
+    expect(loadConfig({ ...MIN_ENV }).provisionTestAccounts).toBe(false);
+    expect(loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: '' }).provisionTestAccounts).toBe(
+      false,
+    );
+    expect(loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: '0' }).provisionTestAccounts).toBe(
+      false,
+    );
+    expect(loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: 'false' }).provisionTestAccounts).toBe(
+      false,
+    );
+    expect(loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: '1' }).provisionTestAccounts).toBe(
+      true,
+    );
+    expect(loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: 'TRUE' }).provisionTestAccounts).toBe(
+      true,
+    );
+    expect(() => loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: 'yes' })).toThrow(
+      /PROVISION_TEST_ACCOUNTS/,
+    );
+  });
+
+  it('parses COMMUNITY_TEST_RIFTS strictly and defaults it off', () => {
+    expect(loadConfig({ ...MIN_ENV }).communityTestRifts).toBe(false);
+    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: '1' }).communityTestRifts).toBe(true);
+    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'true' }).communityTestRifts).toBe(true);
+    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: '0' }).communityTestRifts).toBe(false);
+    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'FALSE' }).communityTestRifts).toBe(
+      false,
+    );
+    expect(() => loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'yes' })).toThrow(
+      /COMMUNITY_TEST_RIFTS/,
+    );
+  });
+
   it('reads the numeric and string overrides', () => {
     const cfg = loadConfig({
       ...MIN_ENV,
@@ -200,7 +245,7 @@ describe('loadConfig', () => {
   it('treats a SET-BUT-EMPTY numeric as unset (default), a documented deploy hazard', () => {
     // DELIBERATE semantic pin: before loadConfig, main.ts used Number(env.KEY ?? default),
     // so 'CHAT_LOG_RETENTION_DAYS=' (an empty .env placeholder line) meant
-    // Number('') = 0 = keep chat logs forever (pruneChatLogs(0) no-ops). numberOr
+    // Number('') = 0 = keep chat logs forever (the prune no-ops at 0). numberOr
     // now reads empty as unset, so the SAME env line means the 90-day default and
     // pruning turns ON. The pre-ship deploy-env audit and the DEPLOY.md env-hygiene
     // note carry this; keep-forever is an EXPLICIT 'CHAT_LOG_RETENTION_DAYS=0' now.
@@ -210,6 +255,127 @@ describe('loadConfig', () => {
     expect(cfg.port).toBe(8787);
     // An explicit 0 is preserved: the keep-forever contract stays reachable.
     expect(loadConfig({ ...MIN_ENV, CHAT_LOG_RETENTION_DAYS: '0' }).chatLogRetentionDays).toBe(0);
+  });
+
+  it('reads MAX_PLAYERS_PER_REALM: a number overrides, empty or whitespace is the default, 0 passes through', () => {
+    // A set value overrides the default.
+    expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: '75' }).maxPlayersPerRealm).toBe(75);
+    // Set-but-empty (a stray '.env' placeholder line) reads as unset -> the default.
+    expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: '' }).maxPlayersPerRealm).toBe(5000);
+    // Whitespace-only is trimmed to unset -> the default: Number('   ') is 0, so an
+    // untrimmed read would take a stray-spaces line as an explicit 0 and silently
+    // DISABLE the cap (fail-open, the unsafe direction for this key).
+    expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: '   ' }).maxPlayersPerRealm).toBe(5000);
+    // An explicit 0 passes through numberOr unchanged: the disable rule lives at the
+    // admission site (server/ws_auth.ts, a cap > 0 test), never in the loader. Stray
+    // spaces around the 0 do not hide the intent.
+    expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: '0' }).maxPlayersPerRealm).toBe(0);
+    expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: ' 0 ' }).maxPlayersPerRealm).toBe(0);
+  });
+
+  it('reads the six retention day keys on the chat-log contract: empty is the default, whitespace is keep-forever', () => {
+    const cases = [
+      {
+        key: 'DAILY_REWARD_EVENTS_RETENTION_DAYS',
+        field: 'dailyRewardEventsRetentionDays',
+        dflt: 400,
+      },
+      { key: 'ONLINE_SAMPLES_RETENTION_DAYS', field: 'onlineSamplesRetentionDays', dflt: 90 },
+      { key: 'SITE_PRESENCE_RETENTION_DAYS', field: 'sitePresenceRetentionDays', dflt: 90 },
+      { key: 'PLAY_SESSION_RETENTION_DAYS', field: 'playSessionRetentionDays', dflt: 180 },
+      {
+        key: 'ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS',
+        field: 'accountIpAssociationRetentionDays',
+        dflt: 730,
+      },
+      { key: 'PLAYER_ACTIVITY_RETENTION_DAYS', field: 'playerActivityRetentionDays', dflt: 400 },
+    ] as const;
+    for (const { key, field, dflt } of cases) {
+      // A set value overrides the default.
+      expect(loadConfig({ ...MIN_ENV, [key]: '7' })[field]).toBe(7);
+      // Set-but-empty (a stray '.env' placeholder line) reads as unset -> the default.
+      expect(loadConfig({ ...MIN_ENV, [key]: '' })[field]).toBe(dflt);
+      // Whitespace-only reads as 0 (Number('   ') is 0) DELIBERATELY: for a
+      // destructive delete, keep-forever is the SAFE side (NOT the default, NOT
+      // prune-now), so the read stays untrimmed, unlike MAX_PLAYERS_PER_REALM.
+      expect(loadConfig({ ...MIN_ENV, [key]: '   ' })[field]).toBe(0);
+      // An explicit 0 is preserved: the keep-forever contract stays reachable.
+      expect(loadConfig({ ...MIN_ENV, [key]: '0' })[field]).toBe(0);
+      // Garbage ('abc' reads as NaN) falls back to the default, numberOr's
+      // fail-safe direction: a NaN must never reach the cutoff computation.
+      expect(loadConfig({ ...MIN_ENV, [key]: 'abc' })[field]).toBe(dflt);
+    }
+  });
+
+  it('reads RETENTION_SWEEP_UTC_HOUR trimmed, keeps an explicit 0 live, and range-validates 0..23', () => {
+    // A set value overrides the default.
+    expect(loadConfig({ ...MIN_ENV, RETENTION_SWEEP_UTC_HOUR: '7' }).retentionSweepUtcHour).toBe(7);
+    // Empty AND whitespace-only both read as unset -> the default: a whitespace-derived
+    // 0 would silently move the sweep to 00:00 UTC, next to the nightly pg_dump window.
+    expect(loadConfig({ ...MIN_ENV, RETENTION_SWEEP_UTC_HOUR: '' }).retentionSweepUtcHour).toBe(5);
+    expect(loadConfig({ ...MIN_ENV, RETENTION_SWEEP_UTC_HOUR: '   ' }).retentionSweepUtcHour).toBe(
+      5,
+    );
+    // An explicit 0 is a live value: a midnight sweep stays reachable, spaces or not.
+    expect(loadConfig({ ...MIN_ENV, RETENTION_SWEEP_UTC_HOUR: '0' }).retentionSweepUtcHour).toBe(0);
+    expect(loadConfig({ ...MIN_ENV, RETENTION_SWEEP_UTC_HOUR: ' 0 ' }).retentionSweepUtcHour).toBe(
+      0,
+    );
+    // An hour outside 0..23, or a fractional one, is garbage, not a preference:
+    // fall back to the default the way numberOr does, never throw.
+    expect(loadConfig({ ...MIN_ENV, RETENTION_SWEEP_UTC_HOUR: '24' }).retentionSweepUtcHour).toBe(
+      5,
+    );
+    expect(loadConfig({ ...MIN_ENV, RETENTION_SWEEP_UTC_HOUR: '-1' }).retentionSweepUtcHour).toBe(
+      5,
+    );
+    expect(loadConfig({ ...MIN_ENV, RETENTION_SWEEP_UTC_HOUR: '5.5' }).retentionSweepUtcHour).toBe(
+      5,
+    );
+    // Non-numeric garbage exercises numberOr's NaN arm (the cases above all
+    // route through the range check instead): fall back, never throw.
+    expect(loadConfig({ ...MIN_ENV, RETENTION_SWEEP_UTC_HOUR: 'abc' }).retentionSweepUtcHour).toBe(
+      5,
+    );
+  });
+
+  it('reads RETENTION_SWEEP_MAX_ROWS_PER_RUN trimmed, keeping an explicit 0 as a live zero budget', () => {
+    // A set value overrides the default.
+    expect(
+      loadConfig({ ...MIN_ENV, RETENTION_SWEEP_MAX_ROWS_PER_RUN: '200000' })
+        .retentionSweepMaxRowsPerRun,
+    ).toBe(200000);
+    // Empty AND whitespace-only both read as unset -> the default: a whitespace-derived
+    // 0 would silently disable the nightly sweep (fail-dangerous, so the read is trimmed).
+    expect(
+      loadConfig({ ...MIN_ENV, RETENTION_SWEEP_MAX_ROWS_PER_RUN: '' }).retentionSweepMaxRowsPerRun,
+    ).toBe(50000);
+    expect(
+      loadConfig({ ...MIN_ENV, RETENTION_SWEEP_MAX_ROWS_PER_RUN: '   ' })
+        .retentionSweepMaxRowsPerRun,
+    ).toBe(50000);
+    // An explicit 0 passes through as a live zero budget, spaces or not.
+    expect(
+      loadConfig({ ...MIN_ENV, RETENTION_SWEEP_MAX_ROWS_PER_RUN: '0' }).retentionSweepMaxRowsPerRun,
+    ).toBe(0);
+    expect(
+      loadConfig({ ...MIN_ENV, RETENTION_SWEEP_MAX_ROWS_PER_RUN: ' 0 ' })
+        .retentionSweepMaxRowsPerRun,
+    ).toBe(0);
+    // A negative value is a finite number, so numberOr passes it through as -5.
+    // The safety lives where it is unit-tested, the sweep's budget verdict: the
+    // budget reads as already spent before the first batch (0 >= -5 is
+    // stop-budget), so a negative budget issues zero batches, exactly like 0
+    // (tests/retention_sweep.test.ts).
+    expect(
+      loadConfig({ ...MIN_ENV, RETENTION_SWEEP_MAX_ROWS_PER_RUN: '-5' })
+        .retentionSweepMaxRowsPerRun,
+    ).toBe(-5);
+    // Non-numeric garbage exercises numberOr's NaN arm: fall back, never throw.
+    expect(
+      loadConfig({ ...MIN_ENV, RETENTION_SWEEP_MAX_ROWS_PER_RUN: 'abc' })
+        .retentionSweepMaxRowsPerRun,
+    ).toBe(50000);
   });
 
   it('returns a frozen Config whose fields cannot be mutated', () => {

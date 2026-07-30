@@ -1,10 +1,10 @@
-// Pure helpers behind the rewritten lockpick window (src/ui/lockpick_window.ts).
+// Pure helpers behind the rewritten lockpick window (src/ui/hud/delve/lockpick_window.ts).
 // The window itself is a thin DOM consumer (no unit test, per the vendor recipe);
 // the only branching logic worth isolating is the timer-reset decision and the
 // per-frame repaint signature.
 
 import { describe, expect, it } from 'vitest';
-import { lockpickRenderSig, lockpickTimerKey } from '../src/ui/lockpick_panel';
+import { lockpickRenderSig, lockpickTimerKey } from '../src/ui/hud/delve/lockpick_panel';
 import type { LockpickView } from '../src/world_api';
 
 const base: LockpickView = {

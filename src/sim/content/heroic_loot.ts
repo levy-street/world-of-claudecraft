@@ -17,17 +17,49 @@
 // than a single token piece.
 
 import type { ItemDef, LootEntry } from '../types';
+import { FERAL } from './items';
 
 // Source level the heroic drop table reads as in the item-level index: the
 // dungeons are level-20 content and heroic is the tier above (+5), so the
 // epic pieces land at item level 31 (25 + the epic bump of 6).
 export const HEROIC_LOOT_SOURCE_LEVEL = 25;
 
+// The 10-player heroic raid (Heroic Nythraxis) is one tier ABOVE the five-man
+// heroics: its drop table registers at source level 27 so its epics land at item
+// level 33 and its legendaries at 37 (27 + the quality bump). Its heroic set
+// pieces are the same collectible slots as the five-man versions, only rescaled
+// to this raid tier. See buildHeroicVariants + the item-level source index.
+export const NYTHRAXIS_RAID_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
+export const NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL = 27;
+
+// Combat-rating allowance for the ilvl-31 five-player heroic set: ONE rating
+// (hit/crit/haste) per piece, the tier's differentiator over ilvl 26/28 gear.
+// The three Heroic Nythraxis weapons below are item level 33 instead and carry the
+// raid tier's 65-point primary plus a 20-point complementary secondary. Ratings are
+// off the primary-stat budget (like spellPower), so stat sums stay budget-enforced.
+// Roughly half the set is Hit (the Heroic +3 answer); crit/haste fill throughput by
+// archetype; healer-facing pieces never take Hit (heals are not resisted by level).
+// The ilvl 33/37 raid variants scale these up + add a secondary rating (see
+// heroic_variants.ts). See docs/prd/combat-ratings-and-jewelry.md.
+const ARMOR_RATING = 40; // 40 rating = 4.0%
+const FIVE_MAN_WEAPON_RATING = 50; // 50 rating = 5.0%
+const RAID_WEAPON_PRIMARY_RATING = 65; // 65 rating = 6.5%
+const RAID_SECONDARY_RATING = 20; // 20 rating = 2.0%
+
 const HEAVY = ['warrior', 'paladin', 'shaman'] as ItemDef['requiredClass']; // plate/mail
 const HEAL_MAIL = ['paladin', 'shaman'] as ItemDef['requiredClass']; // int/spi mail wearers
+const HEAL_LEATHER = ['druid'] as ItemDef['requiredClass']; // int/spi leather wearers
 const AGILE = ['rogue', 'hunter'] as ItemDef['requiredClass'];
 const AGILE_WILD = ['rogue', 'hunter', 'druid'] as ItemDef['requiredClass'];
 const CASTER = ['mage', 'priest', 'warlock', 'druid'] as ItemDef['requiredClass'];
+const CASTER_WEAPON_CLASSES = [
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'paladin',
+  'druid',
+] as ItemDef['requiredClass'];
 
 export const HEROIC_ITEMS: Record<string, ItemDef> = {
   // ================= Heroic Hollow Crypt: Morthen =================
@@ -40,6 +72,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 335, str: 12, sta: 10 },
+    hitRating: ARMOR_RATING,
     sellValue: 14000,
     requiredClass: HEAVY,
   },
@@ -52,6 +85,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 52, int: 9, spi: 6 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: CASTER,
   },
@@ -64,6 +98,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 96, agi: 9, sta: 5 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: AGILE,
   },
@@ -76,6 +111,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 292, str: 10, sta: 8 },
+    hitRating: ARMOR_RATING,
     sellValue: 12000,
     requiredClass: HEAVY,
   },
@@ -88,6 +124,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 44, int: 8, spi: 6 },
+    critRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: CASTER,
   },
@@ -100,6 +137,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 100, agi: 9, sta: 6 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: AGILE_WILD,
   },
@@ -111,8 +149,9 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     requiredLevel: 20,
-    weapon: { min: 24, max: 40, speed: 1.8 },
+    weapon: { min: 22, max: 36, speed: 1.8, dagger: true },
     stats: { agi: 13, sta: 9 },
+    critRating: FIVE_MAN_WEAPON_RATING,
     sellValue: 15000,
     requiredClass: AGILE,
   },
@@ -125,6 +164,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 148, agi: 10, sta: 6 },
+    critRating: ARMOR_RATING,
     sellValue: 11000,
     requiredClass: AGILE_WILD,
   },
@@ -137,6 +177,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 48, int: 9, sta: 6 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: CASTER,
   },
@@ -149,6 +190,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 240, str: 9, sta: 7 },
+    critRating: ARMOR_RATING,
     sellValue: 11000,
     requiredClass: HEAVY,
   },
@@ -161,6 +203,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 168, agi: 10, sta: 8 },
+    critRating: ARMOR_RATING,
     sellValue: 12000,
     requiredClass: AGILE,
   },
@@ -173,6 +216,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 56, int: 9, spi: 7 },
+    hasteRating: ARMOR_RATING,
     sellValue: 11000,
     requiredClass: CASTER,
   },
@@ -184,10 +228,11 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     requiredLevel: 20,
-    weapon: { min: 30, max: 50, speed: 3.0 },
+    weapon: { min: 36, max: 60, speed: 3.0 },
     stats: { int: 13, spi: 9 },
+    hitRating: FIVE_MAN_WEAPON_RATING,
     sellValue: 15000,
-    requiredClass: CASTER,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   tidewoven_trousers: {
     id: 'tidewoven_trousers',
@@ -198,6 +243,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 132, agi: 12, sta: 8 },
+    hitRating: ARMOR_RATING,
     sellValue: 12000,
     requiredClass: AGILE,
   },
@@ -210,6 +256,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 292, int: 10, spi: 8 },
+    hasteRating: ARMOR_RATING,
     sellValue: 12000,
     requiredClass: HEAL_MAIL,
   },
@@ -222,6 +269,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 72, int: 12, spi: 8 },
+    hitRating: ARMOR_RATING,
     sellValue: 12000,
     requiredClass: CASTER,
   },
@@ -234,6 +282,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 240, int: 9, spi: 7 },
+    critRating: ARMOR_RATING,
     sellValue: 11000,
     requiredClass: HEAL_MAIL,
   },
@@ -246,6 +295,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 212, str: 8, sta: 6 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: HEAVY,
   },
@@ -257,8 +307,9 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     requiredLevel: 20,
-    weapon: { min: 26, max: 44, speed: 2.6 },
+    weapon: { min: 31, max: 52, speed: 2.6 },
     stats: { str: 13, sta: 9 },
+    critRating: FIVE_MAN_WEAPON_RATING,
     sellValue: 15000,
     requiredClass: HEAVY,
   },
@@ -271,6 +322,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 90, int: 12, spi: 10 },
+    critRating: ARMOR_RATING,
     sellValue: 14000,
     requiredClass: CASTER,
   },
@@ -283,6 +335,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 104, agi: 9, sta: 6 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: AGILE_WILD,
   },
@@ -295,6 +348,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 224, str: 9, sta: 6 },
+    critRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: HEAVY,
   },
@@ -307,6 +361,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 224, str: 9, sta: 6 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: HEAVY,
   },
@@ -319,8 +374,68 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 224, int: 9, spi: 6 },
+    hasteRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: HEAL_MAIL,
+  },
+  // ================= Heroic leather caster line (druid int/spi) =================
+  lunarward_cinch: {
+    id: 'lunarward_cinch',
+    name: 'Lunarward Cinch',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'waist',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Item level 31 heroic-only drop: waist budget 15.
+    stats: { armor: 100, int: 9, spi: 6 },
+    hasteRating: ARMOR_RATING,
+    sellValue: 9500,
+    requiredClass: HEAL_LEATHER,
+  },
+  dreamroot_boots: {
+    id: 'dreamroot_boots',
+    name: 'Dreamroot Boots',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'feet',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Item level 31 heroic-only drop: feet budget 14.
+    stats: { armor: 96, int: 8, spi: 6 },
+    critRating: ARMOR_RATING,
+    sellValue: 9500,
+    requiredClass: HEAL_LEATHER,
+  },
+  stormbark_mantle: {
+    id: 'stormbark_mantle',
+    name: 'Stormbark Mantle',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'shoulder',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Item level 31 heroic-only drop: shoulder budget 16.
+    stats: { armor: 148, int: 9, spi: 5, sta: 2 },
+    critRating: ARMOR_RATING,
+    sellValue: 11000,
+    requiredClass: HEAL_LEATHER,
+  },
+  wildsoul_maul: {
+    id: 'wildsoul_maul',
+    name: 'Wildsoul Maul',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Item level 31 heroic-only feral two-hander: 2H dps on the weaponDpsBudget(31)
+    // x TWOHAND_DPS_MULT curve (~18.4 at speed 3.6), stat budget 29.
+    weapon: { min: 55, max: 78, speed: 3.6 },
+    stats: { str: 13, agi: 9, sta: 7 },
+    hitRating: FIVE_MAN_WEAPON_RATING,
+    sellValue: 15000,
+    requiredClass: FERAL,
   },
   // ================= Heroic Nythraxis, Scourge of Thornpeak (raid) =================
   scepter_of_the_deathless_court: {
@@ -330,11 +445,57 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     requiredLevel: 20,
-    weapon: { min: 22, max: 38, speed: 2.4 },
-    stats: { int: 12, spi: 10 },
+    weapon: { min: 29, max: 51, speed: 2.4 },
+    stats: { int: 13, spi: 10 },
+    hasteRating: RAID_WEAPON_PRIMARY_RATING,
+    critRating: RAID_SECONDARY_RATING,
     sellValue: 16000,
     requiredClass: CASTER,
   },
+  deathless_greatblade: {
+    id: 'deathless_greatblade',
+    name: 'Deathless Greatblade',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    requiredLevel: 20,
+    // 2H dps premium at the raid tier: weaponDpsBudget(33) = 16.6 x
+    // TWOHAND_DPS_MULT -> 19.1 dps.
+    weapon: { min: 52, max: 78, speed: 3.4 },
+    // v0.27.1 re-budget: round(primaryStatBudget(33, epic, mainhand) = 23 x
+    // TWOHAND_STAT_MULT) = 30 points; the dps premium is the 2H's compensation.
+    stats: { str: 18, sta: 12 },
+    hitRating: RAID_WEAPON_PRIMARY_RATING,
+    critRating: RAID_SECONDARY_RATING,
+    sellValue: 16000,
+    requiredClass: HEAVY,
+  },
+  stormcallers_focus: {
+    id: 'stormcallers_focus',
+    name: "Stormcaller's Focus",
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    requiredLevel: 20,
+    weapon: { min: 31, max: 52, speed: 2.5 },
+    stats: { int: 14, spi: 9 },
+    hasteRating: RAID_WEAPON_PRIMARY_RATING,
+    critRating: RAID_SECONDARY_RATING,
+    sellValue: 16000,
+    requiredClass: HEAL_MAIL,
+  },
+};
+
+// RETIRED, save-compat only. v0.25.0 replaced the standalone heroic Nythraxis
+// armor drops with the heroic loot swap and deleted these four defs, orphaning
+// the ids players earned during the v0.24.x window: an equipped orphan rendered
+// its paperdoll slot as Empty and granted zero stats while the id sat dormant
+// in the persisted save. Item ids that ever reached a player are permanent API:
+// these defs (byte-identical to v0.24.2) exist so those saves resolve again,
+// and they must NEVER return to a loot table, vendor, or the heroic variant
+// builder (tests/retired_heroic_items.test.ts pins all of that).
+export const RETIRED_HEROIC_ITEMS: Record<string, ItemDef> = {
   deathless_warguard_legmail: {
     id: 'deathless_warguard_legmail',
     name: 'Deathless Warguard Legmail',
@@ -371,18 +532,6 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     sellValue: 14000,
     requiredClass: AGILE_WILD,
   },
-  deathless_greatblade: {
-    id: 'deathless_greatblade',
-    name: 'Deathless Greatblade',
-    kind: 'weapon',
-    slot: 'mainhand',
-    quality: 'epic',
-    requiredLevel: 20,
-    weapon: { min: 40, max: 62, speed: 3.4 },
-    stats: { str: 13, sta: 9 },
-    sellValue: 16000,
-    requiredClass: HEAVY,
-  },
   soulforged_warplate: {
     id: 'soulforged_warplate',
     name: 'Soulforged Warplate',
@@ -395,63 +544,93 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     sellValue: 14000,
     requiredClass: HEAL_MAIL,
   },
-  stormcallers_focus: {
-    id: 'stormcallers_focus',
-    name: "Stormcaller's Focus",
-    kind: 'weapon',
-    slot: 'mainhand',
-    quality: 'epic',
-    requiredLevel: 20,
-    weapon: { min: 20, max: 36, speed: 2.5 },
-    stats: { int: 13, spi: 9 },
-    sellValue: 16000,
-    requiredClass: HEAL_MAIL,
-  },
 };
 
 // Heroic-only drop tables per final boss, TWO rollGroups each (chances inside a
 // group sum to 1.0, so exactly one item drops per group => two heroic epics per
 // heroic kill). loot_roll.ts rolls these only for a heroic-claimed instance.
+// Heroic mount drop rates per rarity tier. These are APPENDED after all gear
+// roll-group draws so the gear draw-order stays byte-identical to non-mount runs.
+// Green (UNCOMMON) mounts: 0.5% per heroic clear on their single boss. The tier
+// name finally matches the item colour: these used to be quality 'common' (white),
+// which made "green mount" a misnomer for the whole life of the feature.
+const HEROIC_GREEN_MOUNT_CHANCE = 0.005;
+// Blue (rare) mounts: 0.1% per heroic clear everywhere (their paired five-man
+// boss and the Nythraxis heroic raid, which adds both blues so every
+// heroic-raider has a path to each). A rifts pays the same 0.1%, so a rift is
+// never a cheaper route to a mount than the content it belongs to.
+const HEROIC_BLUE_MOUNT_CHANCE = 0.001;
+const HEROIC_RAID_BLUE_MOUNT_CHANCE = 0.001;
+
 export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   morthen: [
-    { itemId: 'morthens_cryptforged_hauberk', chance: 0.34, rollGroup: 'morthen_heroic' },
-    { itemId: 'shadowpulse_handwraps', chance: 0.33, rollGroup: 'morthen_heroic' },
-    { itemId: 'bonechill_striders', chance: 0.33, rollGroup: 'morthen_heroic' },
+    { itemId: 'morthens_cryptforged_hauberk', chance: 0.25, rollGroup: 'morthen_heroic' },
+    { itemId: 'shadowpulse_handwraps', chance: 0.25, rollGroup: 'morthen_heroic' },
+    { itemId: 'bonechill_striders', chance: 0.25, rollGroup: 'morthen_heroic' },
+    { itemId: 'lunarward_cinch', chance: 0.25, rollGroup: 'morthen_heroic' },
     { itemId: 'cryptplate_helm', chance: 0.34, rollGroup: 'morthen_heroic2' },
     { itemId: 'shadowpulse_slippers', chance: 0.33, rollGroup: 'morthen_heroic2' },
     { itemId: 'bonechill_cord', chance: 0.33, rollGroup: 'morthen_heroic2' },
+    // Uncommon mount (0.5%): heroic-gated only, never on a normal table.
+    { itemId: 'reins_stormfeather_griffin', chance: HEROIC_GREEN_MOUNT_CHANCE },
   ],
   vael_the_mistcaller: [
     { itemId: 'mistcallers_fang', chance: 0.34, rollGroup: 'vael_heroic' },
     { itemId: 'tidebound_spaulders', chance: 0.33, rollGroup: 'vael_heroic' },
     { itemId: 'sash_of_the_sunken_court', chance: 0.33, rollGroup: 'vael_heroic' },
-    { itemId: 'mistforged_pauldrons', chance: 0.34, rollGroup: 'vael_heroic2' },
-    { itemId: 'tideguard_faceguard', chance: 0.33, rollGroup: 'vael_heroic2' },
-    { itemId: 'sunken_court_mantle', chance: 0.33, rollGroup: 'vael_heroic2' },
+    { itemId: 'mistforged_pauldrons', chance: 0.25, rollGroup: 'vael_heroic2' },
+    { itemId: 'tideguard_faceguard', chance: 0.25, rollGroup: 'vael_heroic2' },
+    { itemId: 'sunken_court_mantle', chance: 0.25, rollGroup: 'vael_heroic2' },
+    { itemId: 'dreamroot_boots', chance: 0.25, rollGroup: 'vael_heroic2' },
+    // Uncommon mount (0.5%): heroic-gated only, never on a normal table.
+    { itemId: 'reins_shadowjump_toad', chance: HEROIC_GREEN_MOUNT_CHANCE },
   ],
   ysolei: [
-    { itemId: 'lunar_tide_greatstaff', chance: 0.34, rollGroup: 'ysolei_heroic' },
-    { itemId: 'tidewoven_trousers', chance: 0.33, rollGroup: 'ysolei_heroic' },
-    { itemId: 'choirmothers_casque', chance: 0.33, rollGroup: 'ysolei_heroic' },
+    { itemId: 'lunar_tide_greatstaff', chance: 0.25, rollGroup: 'ysolei_heroic' },
+    { itemId: 'tidewoven_trousers', chance: 0.25, rollGroup: 'ysolei_heroic' },
+    { itemId: 'choirmothers_casque', chance: 0.25, rollGroup: 'ysolei_heroic' },
+    { itemId: 'stormbark_mantle', chance: 0.25, rollGroup: 'ysolei_heroic' },
     { itemId: 'lunar_choir_leggings', chance: 0.34, rollGroup: 'ysolei_heroic2' },
     { itemId: 'choir_blessed_spaulders', chance: 0.33, rollGroup: 'ysolei_heroic2' },
     { itemId: 'tideworn_warboots', chance: 0.33, rollGroup: 'ysolei_heroic2' },
+    // Rare mount (0.1%): heroic-gated only, never on a normal table.
+    { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
   ],
   korzul_the_gravewyrm: [
     { itemId: 'gravewyrm_cleaver', chance: 0.34, rollGroup: 'korzul_heroic' },
     { itemId: 'shroud_of_the_gravewyrm', chance: 0.33, rollGroup: 'korzul_heroic' },
     { itemId: 'sanctum_prowlers_grips', chance: 0.33, rollGroup: 'korzul_heroic' },
-    { itemId: 'gravewyrm_claws', chance: 0.34, rollGroup: 'korzul_heroic2' },
-    { itemId: 'gravescale_girdle', chance: 0.33, rollGroup: 'korzul_heroic2' },
-    { itemId: 'wyrmchoir_handwraps', chance: 0.33, rollGroup: 'korzul_heroic2' },
+    { itemId: 'gravewyrm_claws', chance: 0.25, rollGroup: 'korzul_heroic2' },
+    { itemId: 'gravescale_girdle', chance: 0.25, rollGroup: 'korzul_heroic2' },
+    { itemId: 'wyrmchoir_handwraps', chance: 0.25, rollGroup: 'korzul_heroic2' },
+    { itemId: 'wildsoul_maul', chance: 0.25, rollGroup: 'korzul_heroic2' },
+    // Rare mount (0.1%): heroic-gated only, never on a normal table.
+    { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
   ],
   nythraxis_scourge_of_thornpeak: [
-    { itemId: 'scepter_of_the_deathless_court', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'deathless_warguard_legmail', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'soulrend_diadem', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'scourgehide_carapace', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'deathless_greatblade', chance: 0.34, rollGroup: 'nythraxis_heroic2' },
-    { itemId: 'soulforged_warplate', chance: 0.33, rollGroup: 'nythraxis_heroic2' },
-    { itemId: 'stormcallers_focus', chance: 0.33, rollGroup: 'nythraxis_heroic2' },
+    // The heroic set pieces and legendaries come free from the heroic loot swap:
+    // the raid boss's normal set-piece and legendary drops auto-upgrade to their
+    // raid-tier (item level 33/37) heroic variants in a heroic claim
+    // (loot/loot_roll.ts + heroic_variants.ts). This table adds only the
+    // heroic-ONLY extras the normal table never carries: the three bespoke raid
+    // weapons, one of which drops per heroic kill (chances sum to 1.0), plus the
+    // blue and green mount secondary paths (same per-mount rate as their five-man
+    // sources; the raid offers both of each so every heroic raider has a path).
+    { itemId: 'deathless_greatblade', chance: 0.34, rollGroup: 'nythraxis_heroic_weapon' },
+    {
+      itemId: 'scepter_of_the_deathless_court',
+      chance: 0.33,
+      rollGroup: 'nythraxis_heroic_weapon',
+    },
+    { itemId: 'stormcallers_focus', chance: 0.33, rollGroup: 'nythraxis_heroic_weapon' },
+    // Blue mount secondary paths on the heroic raid (0.1% each, equal per-mount
+    // to the five-man rate; both blues available so aggregate ~0.2%); the primary
+    // path for each is its five-man heroic boss. Epic mounts are rift S-only.
+    { itemId: 'reins_grag_bear', chance: HEROIC_RAID_BLUE_MOUNT_CHANCE },
+    { itemId: 'reins_stalkglider_snail', chance: HEROIC_RAID_BLUE_MOUNT_CHANCE },
+    // Uncommon mount secondary paths on the heroic raid (0.5% each), mirroring the
+    // five-man uncommon paths; every heroic raider has a path to each.
+    { itemId: 'reins_stormfeather_griffin', chance: HEROIC_GREEN_MOUNT_CHANCE },
+    { itemId: 'reins_shadowjump_toad', chance: HEROIC_GREEN_MOUNT_CHANCE },
   ],
 };

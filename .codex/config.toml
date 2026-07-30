@@ -1,0 +1,11 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+# Keep model, effort, permissions, auth, and provider choices at the user or session
+# layer. This project config only makes canonical repository guidance discoverable and
+# bounds native parallelism.
+project_doc_fallback_filenames = ["CLAUDE.md"]
+project_doc_max_bytes = 65536
+
+[agents]
+max_threads = 6
+max_depth = 1

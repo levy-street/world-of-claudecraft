@@ -119,6 +119,11 @@ const fakeStorage = {
   removeItem: (k: string) => void store.delete(k),
 };
 
+// The live UI Scale getUiScale() reads back through getComputedStyle('--ui-scale').
+// Default 1 keeps every existing assertion (scale is a no-op); one test drives it
+// to 1.25 to prove the drag write is divided into #ui author space.
+let uiScaleStub = 1;
+
 // biome-ignore lint/suspicious/noExplicitAny: module handle loaded after the globals exist
 let MovableFrame: any;
 
@@ -126,11 +131,15 @@ beforeAll(async () => {
   (globalThis as Record<string, unknown>).document = fakeDocument;
   (globalThis as Record<string, unknown>).window = fakeWindow;
   (globalThis as Record<string, unknown>).localStorage = fakeStorage;
+  (globalThis as Record<string, unknown>).getComputedStyle = () => ({
+    getPropertyValue: (p: string) => (p === '--ui-scale' ? String(uiScaleStub) : ''),
+  });
   ({ MovableFrame } = await import('../src/ui/movable_frame'));
 });
 
 beforeEach(() => {
   store.clear();
+  uiScaleStub = 1;
   fakeDocument.body = new FakeEl();
 });
 
@@ -214,6 +223,37 @@ describe('MovableFrame', () => {
     fakeDocument.body.dispatch('pointerup', pointer());
     expect(fakeDocument.body.classList.contains('player-frame-dragging')).toBe(false);
     expect(JSON.parse(store.get(KEY) ?? '{}')).toEqual({ left: 440, top: 300 });
+  });
+
+  it('at UI Scale 1.25 the drag write is divided into #ui author space, persisted spot is not', () => {
+    uiScaleStub = 1.25;
+    const { frame, btn } = makeFrame();
+    btn.dispatch('click', pointer()); // unlock
+    // rect (40,500) → grab offset (60,20); move the pointer to (500,320) so the
+    // frame's VISUAL top-left tracks to (440,300) under the cursor.
+    frame.dispatch('pointerdown', pointer({ clientX: 100, clientY: 520 }));
+    fakeDocument.body.dispatch('pointermove', pointer({ clientX: 500, clientY: 320 }));
+    // style.left/top are author lengths #ui's zoom re-multiplies: 440/1.25, 300/1.25.
+    expect(frame.style.left).toBe('352px');
+    expect(frame.style.top).toBe('240px');
+    // The persisted spot stays in visual space (unchanged vs scale 1) so it renders
+    // at the same visual place after a reload at any UI Scale.
+    fakeDocument.body.dispatch('pointerup', pointer());
+    expect(JSON.parse(store.get(KEY) ?? '{}')).toEqual({ left: 440, top: 300 });
+  });
+
+  it('reapplies a persisted visual position immediately when UI Scale changes live', () => {
+    store.set(KEY, JSON.stringify({ left: 300, top: 200 }));
+    const { frame, mover } = makeFrame();
+    expect(frame.style.left).toBe('300px');
+    expect(frame.style.top).toBe('200px');
+
+    uiScaleStub = 1.25;
+    mover.reapplyPosition();
+
+    expect(frame.style.left).toBe('240px');
+    expect(frame.style.top).toBe('160px');
+    expect(JSON.parse(store.get(KEY) ?? '{}')).toEqual({ left: 300, top: 200 });
   });
 
   it('a drag is clamped inside the viewport margin', () => {

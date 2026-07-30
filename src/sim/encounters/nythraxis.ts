@@ -25,16 +25,16 @@
 // directly (already pure); everything that touches not-yet-owned Sim state routes
 // through the seam.
 
-import { isStunned } from '../combat/cc';
+import { isStunned, isUnbreakableControlAura } from '../combat/cc';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
+import * as deedsMod from '../deeds';
 import { createMob, createNpc } from '../entity';
-import { applyHeroicMobTuning, mobTemplateForDungeonDifficulty } from '../instances/difficulty';
-import { heroicLockoutId } from '../instances/dungeons';
+import { applyDungeonMobTuning, mobTemplateForDungeonDifficulty } from '../instances/difficulty';
+import { heroicLockoutId, instanceLockoutMetas } from '../instances/dungeons';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { clearThreat, threatEntries } from '../threat';
+import { addThreat, clearThreat, SUMMONED_ADD_THREAT_SEED, threatEntries } from '../threat';
 import {
-  type Aura,
   type AuraKind,
   angleTo,
   armorReduction,
@@ -44,8 +44,10 @@ import {
   INTERACT_RANGE,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
+  NYTHRAXIS_ROOM_RADIUS,
   normAngle,
   OBJECT_RESPAWN,
+  questObjectiveRequired,
   type SimEvent,
   type Vec3,
   YELL_RANGE,
@@ -57,8 +59,9 @@ const NYTHRAXIS_RELIC_SUMMONS: Record<string, string> = {
   royal_seal: 'deathstalker_voss',
 };
 const _NYTHRAXIS_CRYPT_QUESTS = new Set(['q_nythraxis_sealed_crypt', 'q_nythraxis_bound_guardian']);
-// NYTHRAXIS_BOSS_ID / NYTHRAXIS_ADD_ID live in types.ts (shared with mob/locomotion.ts;
-// the dungeon raid-door seal in instances/dungeons.ts also reads NYTHRAXIS_BOSS_ID).
+// NYTHRAXIS_BOSS_ID / NYTHRAXIS_ADD_ID / NYTHRAXIS_ROOM_RADIUS live in types.ts
+// (shared with mob/locomotion.ts and deeds.ts; the dungeon raid-door seal in
+// instances/dungeons.ts also reads NYTHRAXIS_BOSS_ID).
 const NYTHRAXIS_ALDRIC_ID = 'brother_aldric_raid';
 const _NYTHRAXIS_FINAL_QUEST_ID = 'q_nythraxis_scourges_end';
 const NYTHRAXIS_WARDSTONE_ITEM_ID = 'bastion_ward_stone';
@@ -69,6 +72,7 @@ const NYTHRAXIS_WARDSTONE_RANGE = 100;
 const NYTHRAXIS_GRAVEBREAKER_EVERY = 12;
 const NYTHRAXIS_GRAVEBREAKER_RANGE = 11;
 const NYTHRAXIS_GRAVEBREAKER_HALF_ARC = Math.PI / 3;
+const NYTHRAXIS_GRAVEBREAKER_SPLASH_MULT = 1.5;
 const NYTHRAXIS_OPENER_SECOND_YELL_DELAY = 4;
 const NYTHRAXIS_DIALOGUE_LINE_SECONDS = 2.6;
 // Raise Fallen add-wave cadence, both difficulties (heroic scales the ADDS,
@@ -104,12 +108,16 @@ const NYTHRAXIS_DEATHLESS_EVERY = 45;
 const NYTHRAXIS_DEATHLESS_CAST = 10;
 const NYTHRAXIS_DEATHLESS_CHANNEL = 5;
 const NYTHRAXIS_DEATHLESS_STUN = 5;
+const NYTHRAXIS_HEROIC_SUMMON_CHANNEL = 3;
+const NYTHRAXIS_DREAD_CURSE_EVERY = 15;
+const NYTHRAXIS_DREAD_CURSE_DURATION = 45;
+const NYTHRAXIS_DREAD_CURSE_PER_STACK = 0.1;
+const NYTHRAXIS_DREAD_CURSE_MAX_STACKS = 10;
 const NYTHRAXIS_DEATHLESS_SOUL_REND_LOCKOUT = 15;
 const NYTHRAXIS_PHASE_TWO_SETTLE_DELAY = 5;
 const NYTHRAXIS_TRANSITION_DURATION = 21;
-const NYTHRAXIS_TRANSITION_STUN = 21.5;
+const NYTHRAXIS_TRANSITION_CONTROL_GRACE = 0.5;
 const NYTHRAXIS_FINAL_STAND_HP = 0.05;
-const NYTHRAXIS_ROOM_RADIUS = 260;
 // Brother Aldric enters on the door side of the arena (the raid's side, lower z
 // than the boss spawn) and walks toward the boss. Distances are yards in front
 // of the boss spawn: appears 50yd out, walks up to 30yd out (between door + boss).
@@ -117,6 +125,39 @@ const NYTHRAXIS_ALDRIC_SPAWN_DIST = 50;
 const NYTHRAXIS_ALDRIC_WALK_DIST = 30;
 const NYTHRAXIS_PARTY_INTERACT_RANGE = 30;
 const NYTHRAXIS_VISION_LINE_DELAY = 5;
+const NYTHRAXIS_HEROIC_ADD_IDS = [
+  'nythraxis_heroic_warrior_add',
+  'nythraxis_heroic_priest_add',
+  'nythraxis_heroic_rogue_add',
+] as const;
+
+function isNythraxisRaidAddTemplate(templateId: string): boolean {
+  return (
+    templateId === NYTHRAXIS_ADD_ID ||
+    NYTHRAXIS_HEROIC_ADD_IDS.includes(templateId as (typeof NYTHRAXIS_HEROIC_ADD_IDS)[number])
+  );
+}
+
+// True while any member of the heroic court (Aldren / Malric / Voss) is still
+// alive OR a summon channel is in flight. The phase-2 re-summon is gated on this
+// so a raid that does not clear the court inside a Deathless Rage cycle does NOT
+// stack a second (then third) set of adds, which would be unwinnable and grow the
+// entity count without bound.
+function nythraxisHeroicCourtPending(
+  ctx: SimContext,
+  st: NonNullable<Entity['nythraxis']>,
+): boolean {
+  if ((st.heroicSummonChannelRemaining ?? 0) > 0) return true;
+  for (const e of ctx.entities.values()) {
+    if (
+      e.kind === 'mob' &&
+      !e.dead &&
+      NYTHRAXIS_HEROIC_ADD_IDS.includes(e.templateId as (typeof NYTHRAXIS_HEROIC_ADD_IDS)[number])
+    )
+      return true;
+  }
+  return false;
+}
 
 // ----- CC-immunity predicates (consumed by the hot applyAura path on Sim) ---------
 
@@ -127,22 +168,26 @@ export function isNythraxisControlAura(ctx: SimContext, kind: AuraKind): boolean
 export function isNythraxisRaidEnemy(target: Entity): boolean {
   return (
     target.kind === 'mob' &&
-    (target.templateId === NYTHRAXIS_BOSS_ID || target.templateId === NYTHRAXIS_ADD_ID)
+    (target.templateId === NYTHRAXIS_BOSS_ID || isNythraxisRaidAddTemplate(target.templateId))
   );
 }
 
-export function isNythraxisScriptedControl(target: Entity, aura: Aura): boolean {
+// The two Nythraxis adds the raid is MEANT to control (their templates carry
+// ccImmune: false): Malric the priest (stun/silence to break his heal channel)
+// and Voss the stalker (untauntable, so root/stun him off the healers). The
+// scripted control-immunity gate exempts both; the warrior add stays CC-immune.
+export function isNythraxisControllableAdd(target: Entity): boolean {
   return (
     target.kind === 'mob' &&
-    (target.templateId === NYTHRAXIS_ADD_ID || target.ownerId !== null) &&
-    aura.id === 'nythraxis_transition_stun'
+    (target.templateId === 'nythraxis_heroic_priest_add' ||
+      target.templateId === 'nythraxis_heroic_rogue_add')
   );
 }
 
 // ----- skeleton-warrior add AI (consumed by mob retarget on Sim) ------------------
 
 export function findNythraxisBossForAdd(ctx: SimContext, add: Entity): Entity | null {
-  if (add.kind !== 'mob' || add.templateId !== NYTHRAXIS_ADD_ID) return null;
+  if (add.kind !== 'mob' || !isNythraxisRaidAddTemplate(add.templateId)) return null;
   for (const e of ctx.entities.values()) {
     if (e.kind !== 'mob' || e.templateId !== NYTHRAXIS_BOSS_ID || e.dead) continue;
     if (e.summonedIds.includes(add.id) || dist2d(e.spawnPos, add.spawnPos) < 1) return e;
@@ -172,18 +217,19 @@ export function scheduleNythraxisAddDespawnIfBossReset(ctx: SimContext, add: Ent
 // ----- boss-death dialogue hook (fired from updateMob's dead-branch via ctx) -------
 
 export function onBossDeath(ctx: SimContext, mob: Entity): void {
-  if (mob.templateId === NYTHRAXIS_BOSS_ID && mob.nythraxis && !mob.nythraxis.deathSpoken) {
-    mob.nythraxis.deathSpoken = true;
-    mob.nythraxis.phase = 'dead';
-    nythraxisDialogueSet(ctx, mob, [
-      { speaker: 'nythraxis', text: 'Malric...', delay: 0 },
-      {
-        speaker: 'nythraxis',
-        text: 'What have you done',
-        delay: NYTHRAXIS_DIALOGUE_LINE_SECONDS,
-      },
-    ]);
-  }
+  if (mob.templateId !== NYTHRAXIS_BOSS_ID || !mob.nythraxis) return;
+  if (mob.nythraxis.deathSpoken) return;
+  clearNythraxisTransitionControl(ctx, mob);
+  mob.nythraxis.deathSpoken = true;
+  mob.nythraxis.phase = 'dead';
+  nythraxisDialogueSet(ctx, mob, [
+    { speaker: 'nythraxis', text: 'Malric...', delay: 0 },
+    {
+      speaker: 'nythraxis',
+      text: 'What have you done',
+      delay: NYTHRAXIS_DIALOGUE_LINE_SECONDS,
+    },
+  ]);
 }
 
 // ----- encounter lifecycle --------------------------------------------------------
@@ -199,8 +245,9 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
       transitionReleased: false,
       dialogueBusyUntil: 0,
       dialogueToken: 0,
-      gravebreakerTimer: 1.5,
+      gravebreakerTimer: NYTHRAXIS_GRAVEBREAKER_EVERY,
       gravebreakerCasts: 0,
+      gravebreakerCharged: false,
       raiseFallenTimer: NYTHRAXIS_RAISE_FALLEN_EVERY,
       soulRendTimer: NYTHRAXIS_SOUL_REND_EVERY,
       soulRendMarks: [],
@@ -219,13 +266,14 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
 export function resetNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   for (const p of playersInNythraxisRoom(ctx, boss)) {
     p.auras = p.auras.filter(
-      (a) => a.id !== 'nythraxis_soul_rend' && a.id !== 'nythraxis_transition_stun',
+      (a) =>
+        a.id !== 'nythraxis_soul_rend' &&
+        a.id !== 'nythraxis_transition_stun' &&
+        a.id !== 'nythraxis_dread_curse',
     );
     clearNythraxisWardChannelCast(p);
   }
-  for (const e of nythraxisTransitionStunTargets(ctx, boss)) {
-    if (e.kind !== 'player') e.auras = e.auras.filter((a) => a.id !== 'nythraxis_transition_stun');
-  }
+  clearNythraxisTransitionControl(ctx, boss);
   const aldric = findNythraxisAldric(ctx, boss);
   if (aldric) ctx.dropEntity(aldric.id);
   for (const ward of nythraxisDeathlessChannelObjects(ctx, boss)) {
@@ -297,6 +345,7 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
     return;
   }
   if (st.phase === 'dead') return;
+  if (st.phase === 1 || st.phase === 2) updateNythraxisDreadCurse(ctx, boss, st);
 
   const hpFrac = boss.hp / Math.max(1, boss.maxHp);
   if (st.phase === 1 && hpFrac <= NYTHRAXIS_PHASE_TWO_HP) {
@@ -336,6 +385,19 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
 
   if (st.deathlessStunRemaining > 0) {
     st.deathlessStunRemaining = Math.max(0, st.deathlessStunRemaining - DT);
+    // Interrupted Deathless Rage: the court rises again once the boss shakes off
+    // the wardstone stun, but only if the previous court has fallen.
+    if (
+      st.deathlessStunRemaining <= 0 &&
+      isHeroicNythraxis(ctx, boss) &&
+      !nythraxisHeroicCourtPending(ctx, st)
+    ) {
+      startNythraxisHeroicSummon(ctx, boss, st);
+    }
+    return;
+  }
+  if ((st.heroicSummonChannelRemaining ?? 0) > 0) {
+    updateNythraxisHeroicSummon(ctx, boss, st);
     return;
   }
   if (st.deathlessCastRemaining > 0) {
@@ -479,18 +541,43 @@ export function playersInNythraxisRoom(ctx: SimContext, boss: Entity): Entity[] 
 export function nythraxisTransitionStunTargets(ctx: SimContext, boss: Entity): Entity[] {
   return [...ctx.entities.values()].filter(
     (e) =>
-      !e.dead &&
-      dist2d(e.pos, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS &&
       (e.kind === 'player' ||
-        (e.kind === 'mob' && (e.templateId === NYTHRAXIS_ADD_ID || e.ownerId !== null))),
+        (e.kind === 'mob' && (isNythraxisRaidAddTemplate(e.templateId) || e.ownerId !== null))) &&
+      willBeInNythraxisRoomAfterResurrection(ctx, boss, e),
   );
 }
 
+function willBeInNythraxisRoomAfterResurrection(
+  ctx: SimContext,
+  boss: Entity,
+  entity: Entity,
+): boolean {
+  if (dist2d(entity.pos, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS) return true;
+  if (entity.kind !== 'player' || !entity.dead) return false;
+  const offer = ctx.pendingResurrections.get(entity.id);
+  if (!offer || ctx.time >= offer.expiresAt) return false;
+  const caster = ctx.entities.get(offer.casterId);
+  const destination =
+    caster?.kind === 'player' && !caster.dead ? caster.pos : offer.fallbackDestination;
+  return dist2d(destination, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS;
+}
+
 export function nythraxisRoomMetas(ctx: SimContext, boss: Entity): PlayerMeta[] {
+  // Membership (the lockout roster), so the circle is clipped to the boss
+  // slot's own z band, the same clip the deed task window applies: arena
+  // slots sit 500 apart in z with the spawn skewed high, so the raw circle
+  // reaches into the next slot's band. The in-room combat queries above keep
+  // the raw circle (their cross-slot reach is behind arena walls the movement
+  // resolver enforces, and they never confer credit or a lockout).
+  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
+  const origin = inst ? ctx.instanceOriginOf(inst) : null;
   const out: PlayerMeta[] = [];
   for (const meta of ctx.players.values()) {
+    if (meta.leaving) continue;
     const p = ctx.entities.get(meta.entityId);
-    if (p && dist2d(p.pos, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS) out.push(meta);
+    if (!p || dist2d(p.pos, boss.spawnPos) > NYTHRAXIS_ROOM_RADIUS) continue;
+    if (origin !== null && Math.abs(p.pos.z - origin.z) >= 250) continue;
+    out.push(meta);
   }
   out.sort((a, b) => a.entityId - b.entityId);
   return out;
@@ -506,21 +593,102 @@ export function grantNythraxisLockout(ctx: SimContext, boss: Entity): void {
   const lockId = isHeroicNythraxis(ctx, boss)
     ? heroicLockoutId('nythraxis_boss_arena')
     : 'nythraxis_boss_arena';
-  for (const meta of nythraxisRoomMetas(ctx, boss)) {
+  // The kill locks the UNION of the room and the claim sweep. The claim sweep
+  // (instanceLockoutMetas) covers the whole owning raid group plus anyone
+  // inside the generic instance footprint: a raider who released, camped the
+  // entrance, or never zoned in must not stay unlocked, or one unlocked member
+  // re-claims the arena for the locked raid. The room metas stay in the union
+  // because the arena interior is WIDER than the generic 120-yd footprint
+  // (walls at roughly +/-230 local x): a raider who left the raid while parked
+  // in a side wing sits outside both claim arms yet can still hold the tap and
+  // its rewards, so the 260-yd boss room must keep locking them.
+  const roomMetas = nythraxisRoomMetas(ctx, boss);
+  const lockoutMetas = new Map<number, PlayerMeta>();
+  for (const meta of roomMetas) lockoutMetas.set(meta.entityId, meta);
+  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
+  if (inst) {
+    for (const meta of instanceLockoutMetas(ctx, inst)) lockoutMetas.set(meta.entityId, meta);
+  }
+  for (const meta of lockoutMetas.values()) {
     meta.raidLockouts.set(lockId, until);
   }
+  // Raid deed credit stays scoped to the boss room roster.
+  deedsMod.onNythraxisKillForDeeds(ctx, boss, roomMetas);
+}
+
+export function updateNythraxisDreadCurse(
+  ctx: SimContext,
+  boss: Entity,
+  st: NonNullable<Entity['nythraxis']>,
+): void {
+  if (!isHeroicNythraxis(ctx, boss)) return;
+  const target = boss.aggroTargetId !== null ? ctx.entities.get(boss.aggroTargetId) : null;
+  if (!target || target.dead || target.kind !== 'player') return;
+  if (st.dreadCurseTargetId !== target.id) {
+    st.dreadCurseTargetId = target.id;
+    st.dreadCurseStacks = 0;
+  }
+  st.dreadCurseTimer = (st.dreadCurseTimer ?? NYTHRAXIS_DREAD_CURSE_EVERY) - DT;
+  if (st.dreadCurseTimer > 0) return;
+  st.dreadCurseTimer = NYTHRAXIS_DREAD_CURSE_EVERY;
+  st.dreadCurseStacks = Math.min(NYTHRAXIS_DREAD_CURSE_MAX_STACKS, (st.dreadCurseStacks ?? 0) + 1);
+  const value = Math.min(1, st.dreadCurseStacks * NYTHRAXIS_DREAD_CURSE_PER_STACK);
+  ctx.applyAura(target, {
+    id: 'nythraxis_dread_curse',
+    name: 'Dread Curse',
+    kind: 'vulnerability',
+    remaining: NYTHRAXIS_DREAD_CURSE_DURATION,
+    duration: NYTHRAXIS_DREAD_CURSE_DURATION,
+    value,
+    stacks: st.dreadCurseStacks,
+    sourceId: boss.id,
+    school: 'shadow',
+  });
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: boss.id,
+    targetId: target.id,
+    school: 'shadow',
+    fx: 'projectile',
+  });
 }
 
 // ----- phase-one mechanics --------------------------------------------------------
 
+// Gravebreaker is a CHARGED AUTO-ATTACK: this cadence only ARMS it. The next
+// melee swing the boss actually LANDS releases the splash (the on-swing hook
+// below, reached from runMobSwingAffixes), so it can never stack on top of a
+// separate swing, the tank-facing hit goes through the normal hit table, and
+// avoidance (dodge/parry/miss) holds the charge for the next swing. The old
+// free-standing cast fired its first arc at 1.5s on the pull, stacking with
+// the opening swing into a tank-killing burst no heal could beat.
 export function updateNythraxisGravebreaker(
-  ctx: SimContext,
-  boss: Entity,
+  _ctx: SimContext,
+  _boss: Entity,
   st: NonNullable<Entity['nythraxis']>,
 ): void {
   st.gravebreakerTimer -= DT;
   if (st.gravebreakerTimer > 0) return;
   st.gravebreakerTimer = NYTHRAXIS_GRAVEBREAKER_EVERY;
+  st.gravebreakerCharged = true;
+}
+
+// Release a charged Gravebreaker off a LANDED boss swing. `rawDmg` is the
+// swing's own pre-armor roll (crit/enrage already folded in by the mobSwing
+// shell), so the release draws NO extra rng. The swing target takes only the
+// swing itself; everyone else inside the 11yd frontal arc takes the splash at
+// 1.5x, armor-mitigated per victim. The splash never crits: a critting swing
+// doubles the primary hit only, so the un-crit basis is restored here.
+export function nythraxisGravebreakerOnMobSwing(
+  ctx: SimContext,
+  boss: Entity,
+  target: Entity,
+  rawDmg: number,
+  crit: boolean,
+): void {
+  const st = boss.nythraxis;
+  if (!st?.gravebreakerCharged) return;
+  st.gravebreakerCharged = false;
   st.gravebreakerCasts = (st.gravebreakerCasts ?? 0) + 1;
   if (st.gravebreakerCasts % 3 === 0)
     nythraxisSay(ctx, boss, 'nythraxis', 'Kneel before your king');
@@ -531,20 +699,30 @@ export function updateNythraxisGravebreaker(
     school: 'physical',
     fx: 'nova',
   });
-  let rawDmg =
-    ctx.rng.range(boss.weapon.min, boss.weapon.max) +
-    (ctx.effectiveAttackPower(boss) / 14) * boss.weapon.speed;
-  const enrage = MOBS[boss.templateId]?.enrage;
-  if (boss.enraged && enrage) rawDmg *= enrage.dmgMult;
+  const splashBasis = crit ? rawDmg / 2 : rawDmg;
   for (const p of playersInNythraxisRoom(ctx, boss)) {
+    if (p.id === target.id) continue;
     const d = dist2d(p.pos, boss.pos);
     if (d > NYTHRAXIS_GRAVEBREAKER_RANGE) continue;
     const delta = Math.abs(normAngle(angleTo(boss.pos, p.pos) - boss.facing));
     if (delta > NYTHRAXIS_GRAVEBREAKER_HALF_ARC) continue;
-    const mult = p.id === boss.aggroTargetId ? 1 : 1.5;
-    const mitigated = rawDmg * mult * (1 - armorReduction(ctx.effectiveArmor(p), boss.level));
-    const dmg = Math.max(1, Math.round(mitigated));
-    ctx.dealDamage(boss, p, dmg, false, 'physical', 'Gravebreaker', 'hit', true);
+    const mitigated =
+      splashBasis *
+      NYTHRAXIS_GRAVEBREAKER_SPLASH_MULT *
+      (1 - armorReduction(ctx.effectiveArmor(p), boss.level));
+    ctx.dealDamage(
+      boss,
+      p,
+      Math.max(1, Math.round(mitigated)),
+      false,
+      'physical',
+      'Gravebreaker',
+      'hit',
+      true,
+    );
+    // Every splash victim is off-target by construction: the arc hit taints
+    // the positioning task exactly as before.
+    deedsMod.onBossSplashHitForDeeds(ctx, boss);
   }
 }
 
@@ -591,14 +769,93 @@ export function spawnNythraxisAdds(ctx: SimContext, boss: Entity): void {
   const victim = victimId !== null ? ctx.entities.get(victimId) : null;
   for (const pos of spawnPoints) {
     const add = createMob(ctx.nextId++, spawnTemplate, spawnTemplate.maxLevel, pos);
-    applyHeroicMobTuning(add, inst?.dungeonId ?? '', difficulty);
+    applyDungeonMobTuning(add, inst?.dungeonId ?? '', difficulty);
     add.spawnPos = { ...boss.spawnPos };
     add.tappedById = boss.tappedById;
     ctx.addEntity(add);
     boss.summonedIds.push(add.id);
     inst?.mobIds.push(add.id);
-    if (victim && !victim.dead && victim.kind === 'player') ctx.aggroMob(add, victim, false);
+    if (victim && !victim.dead && victim.kind === 'player') {
+      ctx.aggroMob(add, victim, false);
+      // The same real tank lead spawnBossAdds seeds (aggroMob only planted 1
+      // point): without it the first heal peeled every wave onto the healer.
+      addThreat(add, victim.id, SUMMONED_ADD_THREAT_SEED - 1);
+    }
   }
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: boss.id,
+    targetId: boss.id,
+    school: 'shadow',
+    fx: 'nova',
+  });
+}
+
+export function startNythraxisHeroicSummon(
+  ctx: SimContext,
+  boss: Entity,
+  st: NonNullable<Entity['nythraxis']>,
+): void {
+  st.heroicSummonChannelRemaining = NYTHRAXIS_HEROIC_SUMMON_CHANNEL;
+  boss.castingAbility = 'nythraxis_heroic_summon';
+  boss.castTotal = NYTHRAXIS_HEROIC_SUMMON_CHANNEL;
+  boss.castRemaining = NYTHRAXIS_HEROIC_SUMMON_CHANNEL;
+  boss.castTargetId = null;
+  boss.channeling = true;
+  nythraxisSay(ctx, boss, 'nythraxis', 'My court rises again', true);
+}
+
+export function updateNythraxisHeroicSummon(
+  ctx: SimContext,
+  boss: Entity,
+  st: NonNullable<Entity['nythraxis']>,
+): void {
+  st.heroicSummonChannelRemaining = Math.max(0, (st.heroicSummonChannelRemaining ?? 0) - DT);
+  boss.castingAbility = 'nythraxis_heroic_summon';
+  boss.castTotal = NYTHRAXIS_HEROIC_SUMMON_CHANNEL;
+  boss.castRemaining = st.heroicSummonChannelRemaining;
+  boss.castTargetId = null;
+  boss.channeling = true;
+  if ((st.heroicSummonChannelRemaining ?? 0) > 0) return;
+  boss.castingAbility = null;
+  boss.castRemaining = 0;
+  boss.castTotal = 0;
+  boss.castTargetId = null;
+  boss.channeling = false;
+  spawnNythraxisHeroicAdds(ctx, boss);
+}
+
+export function spawnNythraxisHeroicAdds(ctx: SimContext, boss: Entity): void {
+  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
+  const spawnPoints = [
+    ctx.groundPos(boss.pos.x - 8, boss.pos.z + 8),
+    ctx.groundPos(boss.pos.x, boss.pos.z + 10),
+    ctx.groundPos(boss.pos.x + 8, boss.pos.z + 8),
+  ];
+  const victimId = boss.aggroTargetId ?? threatEntries(boss, 1)[0]?.[0] ?? null;
+  const victim = victimId !== null ? ctx.entities.get(victimId) : null;
+  NYTHRAXIS_HEROIC_ADD_IDS.forEach((templateId, index) => {
+    const template = MOBS[templateId];
+    if (!template) return;
+    const spawnTemplate = mobTemplateForDungeonDifficulty(
+      template,
+      inst?.dungeonId ?? '',
+      inst?.difficulty ?? 'heroic',
+    );
+    const add = createMob(ctx.nextId++, spawnTemplate, spawnTemplate.maxLevel, spawnPoints[index]);
+    applyDungeonMobTuning(add, inst?.dungeonId ?? '', inst?.difficulty ?? 'heroic');
+    add.spawnPos = { ...boss.spawnPos };
+    add.tappedById = boss.tappedById;
+    ctx.addEntity(add);
+    boss.summonedIds.push(add.id);
+    inst?.mobIds.push(add.id);
+    if (victim && !victim.dead && victim.kind === 'player') {
+      ctx.aggroMob(add, victim, false);
+      // The same real tank lead spawnBossAdds seeds (aggroMob only planted 1
+      // point): without it the first heal peeled every wave onto the healer.
+      addThreat(add, victim.id, SUMMONED_ADD_THREAT_SEED - 1);
+    }
+  });
   ctx.emit({
     type: 'spellfx',
     sourceId: boss.id,
@@ -642,24 +899,14 @@ export function startNythraxisTransition(
     school: 'physical',
     fx: 'nova',
   });
-  for (const e of nythraxisTransitionStunTargets(ctx, boss)) {
-    ctx.applyAura(e, {
-      id: 'nythraxis_transition_stun',
-      name: 'Shuddering Stomp',
-      kind: 'stun',
-      remaining: NYTHRAXIS_TRANSITION_STUN,
-      duration: NYTHRAXIS_TRANSITION_STUN,
-      value: 0,
-      sourceId: boss.id,
-      school: 'physical',
-    });
-  }
+  applyNythraxisTransitionControl(ctx, boss, st);
+  const transitionControlDuration = st.transitionTimer + NYTHRAXIS_TRANSITION_CONTROL_GRACE;
   ctx.applyAura(boss, {
     id: 'nythraxis_transition_pause',
     name: 'Shuddering Stomp',
     kind: 'stun',
-    remaining: NYTHRAXIS_TRANSITION_STUN,
-    duration: NYTHRAXIS_TRANSITION_STUN,
+    remaining: transitionControlDuration,
+    duration: transitionControlDuration,
     value: 0,
     sourceId: boss.id,
     school: 'physical',
@@ -668,6 +915,51 @@ export function startNythraxisTransition(
   lightNythraxisWardstones(ctx, boss);
   nythraxisDialogueSet(ctx, boss, transitionLines, false, true);
   st.transitionCues = [];
+}
+
+function applyNythraxisTransitionControl(
+  ctx: SimContext,
+  boss: Entity,
+  st: NonNullable<Entity['nythraxis']>,
+): void {
+  const transitionControlDuration = st.transitionTimer + NYTHRAXIS_TRANSITION_CONTROL_GRACE;
+  for (const e of nythraxisTransitionStunTargets(ctx, boss)) {
+    if (
+      e.auras.some(
+        (aura) =>
+          aura.id === 'nythraxis_transition_stun' &&
+          aura.kind === 'stun' &&
+          aura.sourceId === boss.id &&
+          aura.remaining > st.transitionTimer &&
+          isUnbreakableControlAura(aura),
+      )
+    )
+      continue;
+    // Generic aura application recalculates player stats; for a dead ghost that
+    // temporarily zeros the full grey display pools established on release.
+    // This control has no stat payload, so preserve those display-only values.
+    const ghostDisplay = e.kind === 'player' && e.dead && e.ghost ? [e.hp, e.resource] : null;
+    ctx.applyAura(e, {
+      id: 'nythraxis_transition_stun',
+      name: 'Shuddering Stomp',
+      kind: 'stun',
+      remaining: transitionControlDuration,
+      duration: transitionControlDuration,
+      value: 0,
+      sourceId: boss.id,
+      school: 'physical',
+      unbreakableControl: true,
+    });
+    if (ghostDisplay) [e.hp, e.resource] = ghostDisplay;
+  }
+}
+
+function clearNythraxisTransitionControl(ctx: SimContext, boss: Entity): void {
+  for (const entity of ctx.entities.values()) {
+    entity.auras = entity.auras.filter(
+      (aura) => aura.id !== 'nythraxis_transition_stun' || aura.sourceId !== boss.id,
+    );
+  }
 }
 
 export function spawnNythraxisAldric(ctx: SimContext, boss: Entity): void {
@@ -697,6 +989,7 @@ export function updateNythraxisTransition(
   boss: Entity,
   st: NonNullable<Entity['nythraxis']>,
 ): void {
+  applyNythraxisTransitionControl(ctx, boss, st);
   const aldric = findNythraxisAldric(ctx, boss);
   if (aldric) {
     const dest = ctx.groundPos(boss.spawnPos.x, boss.spawnPos.z - NYTHRAXIS_ALDRIC_WALK_DIST);
@@ -710,9 +1003,7 @@ export function updateNythraxisTransition(
   st.soulRendTimer = NYTHRAXIS_PHASE_TWO_SETTLE_DELAY;
   st.deathlessTimer = NYTHRAXIS_PHASE_TWO_SETTLE_DELAY + 15;
   boss.auras = boss.auras.filter((a) => a.id !== 'nythraxis_transition_pause');
-  for (const e of nythraxisTransitionStunTargets(ctx, boss)) {
-    e.auras = e.auras.filter((a) => a.id !== 'nythraxis_transition_stun');
-  }
+  clearNythraxisTransitionControl(ctx, boss);
 }
 
 export function lightNythraxisWardstones(ctx: SimContext, boss: Entity): void {
@@ -911,6 +1202,8 @@ export function updateNythraxisDeathlessRage(
   const ragePct = isHeroicNythraxis(ctx, boss)
     ? NYTHRAXIS_DEATHLESS_PCT_HEROIC
     : NYTHRAXIS_DEATHLESS_PCT;
+  // The cast resolved uninterrupted: the wardens task fails for this attempt.
+  deedsMod.onDeathlessRageResolvedForDeeds(ctx, boss);
   for (const p of playersInNythraxisRoom(ctx, boss)) {
     ctx.dealDamage(
       boss,
@@ -922,6 +1215,12 @@ export function updateNythraxisDeathlessRage(
       'hit',
       true,
     );
+  }
+  // Heroic: an uninterrupted Deathless Rage (the pillar cast) raises the court
+  // right after it lands, and it repeats each Deathless Rage cycle in phase 2 -
+  // but only once the previous court has fallen, so the adds never stack.
+  if (isHeroicNythraxis(ctx, boss) && !nythraxisHeroicCourtPending(ctx, st)) {
+    startNythraxisHeroicSummon(ctx, boss, st);
   }
 }
 
@@ -1096,23 +1395,27 @@ export function interactObjectForQuests(ctx: SimContext, obj: Entity, meta: Play
         const killIdx = quest.objectives.findIndex(
           (o) => o.type === 'kill' && o.targetMobId === 'bound_guardian',
         );
-        if (killIdx >= 0 && qp.counts[killIdx] < quest.objectives[killIdx].count) {
+        if (killIdx >= 0 && qp.counts[killIdx] < questObjectiveRequired(quest, qp, killIdx)) {
           summonQuestMob(ctx, 'bound_guardian', obj.pos, meta.entityId);
         }
       }
       // The interact objective itself (and its one-time vision) only credits once.
-      if (qp.counts[objectiveIndex] >= objective.count) return;
+      if (qp.counts[objectiveIndex] >= questObjectiveRequired(quest, qp, objectiveIndex)) return;
       const shared = sharedNythraxisObjectParticipants(ctx, meta, obj, qp.questId, objectiveIndex);
       for (const member of shared) {
         const memberQp = member.questLog.get(qp.questId);
         if (memberQp?.state !== 'active') continue;
-        if (memberQp.counts[objectiveIndex] >= objective.count) continue;
+        const required = questObjectiveRequired(quest, memberQp, objectiveIndex);
+        if (memberQp.counts[objectiveIndex] >= required) continue;
         memberQp.counts[objectiveIndex]++;
         member.counters.questProgress++;
         ctx.emit({
           type: 'questProgress',
           questId: memberQp.questId,
-          text: `${objective.label}: ${memberQp.counts[objectiveIndex]}/${objective.count}`,
+          objectiveIndex,
+          current: memberQp.counts[objectiveIndex],
+          required,
+          text: `${objective.label}: ${memberQp.counts[objectiveIndex]}/${required}`,
           pid: member.entityId,
         });
         ctx.checkQuestReady(memberQp, member);

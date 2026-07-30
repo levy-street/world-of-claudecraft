@@ -3,7 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { AUGMENTS } from '../src/sim/content/augments';
-import { TALENTS } from '../src/sim/content/talents';
+import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
+import { ROW_TREES, TALENTS } from '../src/sim/content/talents';
 import { ABILITIES, DUNGEONS, ITEM_SETS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { en } from '../src/ui/i18n.resolved.generated/en';
 
@@ -211,6 +212,10 @@ const TREE_ENTRIES = DENYLIST.filter((e) => e.treeOnly);
 const KEEP_EXEMPTIONS: { entry: string; value: string; fieldIncludes: string }[] = [
   { entry: 'Weapon Mastery', value: 'Weapon Mastery', fieldIncludes: 'arms_tactical_mastery' },
   { entry: 'Weapon Mastery', value: 'Weapon Mastery', fieldIncludes: 'combat_weapon_mastery' },
+  // The release handoff explicitly preserves the winning Warrior option's authored
+  // stable name. Scope the exception to that one canonical option id; any other
+  // reintroduction of the phrase must still fail this gate.
+  { entry: 'Second Wind', value: 'Second Wind', fieldIncludes: 'war_row_second_wind' },
   { entry: 'Toughness', value: 'Toughness', fieldIncludes: 'aug_toughness' },
   { entry: 'Stormcaller', value: 'Stormcaller', fieldIncludes: 'holderTiers.stormcaller' },
   { entry: 'Berserker', value: 'Berserker', fieldIncludes: 'pow_berserker' },
@@ -332,9 +337,9 @@ function collectViolations(): Violation[] {
     scanNameValue(`abilities.${id}.name`, id, a.name, false, out);
   }
 
-  // Talents: spec/tree names, mastery names, node names, choice-option names.
-  for (const [cls, ct] of Object.entries(TALENTS)) {
-    if (!ct) continue;
+  // Talents: spec names, mastery names, and every canonical row-option name.
+  for (const cls of Object.keys(TALENTS) as (keyof typeof TALENTS)[]) {
+    const ct = TALENTS[cls];
     for (const spec of ct.specs) {
       scanNameValue(`talents.${cls}.specs.${spec.id}.name`, spec.id, spec.name, true, out);
       scanNameValue(
@@ -345,13 +350,26 @@ function collectViolations(): Violation[] {
         out,
       );
     }
-    for (const node of ct.nodes) {
-      scanNameValue(`talents.${cls}.nodes.${node.id}.name`, node.id, node.name, false, out);
-      for (const choice of node.choices ?? []) {
+    for (const row of ROW_TREES[cls]) {
+      for (const option of row.options) {
         scanNameValue(
-          `talents.${cls}.nodes.${node.id}.choices.${choice.id}.name`,
-          choice.id,
-          choice.name,
+          `talents.${cls}.rows.${row.level}.options.${option.id}.name`,
+          option.id,
+          option.name,
+          false,
+          out,
+        );
+      }
+    }
+  }
+  // Choice rows replaced the node trees: every row option name is player-visible.
+  for (const [cls, rows] of Object.entries(CHOICE_ROWS)) {
+    for (const row of rows.rows) {
+      for (const option of row.options) {
+        scanNameValue(
+          `choiceRows.${cls}.${row.level}.${option.id}.name`,
+          option.id,
+          option.name,
           false,
           out,
         );
@@ -423,6 +441,7 @@ function collectViolations(): Violation[] {
   // Amendment #4: ability/talent tooltip DESCRIPTION prose (PROSE_SCAN set).
   scanDescriptions(ABILITIES, 'abilities', out);
   scanDescriptions(TALENTS, 'talents', out);
+  scanDescriptions(ROW_TREES, 'talentRows', out);
 
   // Amendment #4: scripted encounter/delve DIALOGUE (prose-scan the string
   // literals of the source files, since the lines are inline, not exported).

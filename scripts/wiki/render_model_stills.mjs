@@ -57,7 +57,7 @@ if (bundleJs.includes('import.meta')) {
 
 // 2) Load the baked Guide content (the figure set + model specs) by bundling the generated
 //    module to a data URL, the same trick build_content.mjs uses (never import raw .ts).
-const dataEntry = `export { GUIDE_CLASSES, GUIDE_WARLOCK_PETS, GUIDE_FAMILIES, GUIDE_MODELS } from './src/guide/content.generated.ts';`;
+const dataEntry = `export { GUIDE_CLASSES, GUIDE_DRUID_FORMS, GUIDE_WARLOCK_PETS, GUIDE_FAMILIES, GUIDE_MODELS } from './src/guide/content.generated.ts';`;
 const dataBuilt = await esbuild.build({
   stdin: {
     contents: dataEntry,
@@ -72,7 +72,8 @@ const dataBuilt = await esbuild.build({
   logLevel: 'silent',
 });
 const dataUrl = `data:text/javascript;base64,${Buffer.from(dataBuilt.outputFiles[0].text).toString('base64')}`;
-const { GUIDE_CLASSES, GUIDE_WARLOCK_PETS, GUIDE_FAMILIES, GUIDE_MODELS } = await import(dataUrl);
+const { GUIDE_CLASSES, GUIDE_DRUID_FORMS, GUIDE_WARLOCK_PETS, GUIDE_FAMILIES, GUIDE_MODELS } =
+  await import(dataUrl);
 
 // Flatten every figure to a distinct (model, tint) render job, deduped by still key.
 const jobs = new Map();
@@ -82,6 +83,7 @@ const addFigure = (model, tint) => {
   if (!jobs.has(key)) jobs.set(key, { key, model, tint: tint ?? null });
 };
 for (const c of GUIDE_CLASSES) addFigure(c.model, c.tint);
+for (const d of GUIDE_DRUID_FORMS) addFigure(d.model, d.tint);
 for (const p of GUIDE_WARLOCK_PETS) addFigure(p.model, p.tint);
 for (const f of GUIDE_FAMILIES) for (const c of f.creatures) addFigure(c.model, c.tint);
 

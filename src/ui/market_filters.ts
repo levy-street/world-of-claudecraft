@@ -6,20 +6,28 @@
 // `MarketFilters` type that models the three dropdowns.
 
 import type {
+  MarketArmorClassFilter,
   MarketItemTypeFilter,
+  MarketPrimaryStatFilter,
   MarketRarityFilter,
   MarketSubtypeFilter,
 } from '../sim/market_query';
 
 export {
   defaultMarketQuery,
+  MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ARMOR_TYPE_FILTERS,
+  MARKET_BAG_SIZE_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
   MARKET_PAGE_SIZE,
+  MARKET_PRIMARY_STAT_FILTERS,
   MARKET_RARITY_FILTERS,
   MARKET_WEAPON_TYPE_FILTERS,
+  type MarketArmorClassFilter,
   type MarketArmorTypeFilter,
+  type MarketBagSizeFilter,
   type MarketItemTypeFilter,
+  type MarketPrimaryStatFilter,
   type MarketQuery,
   type MarketRarityFilter,
   type MarketSubtypeFilter,
@@ -27,9 +35,11 @@ export {
   sanitizeMarketQuery,
 } from '../sim/market_query';
 
-/** The three browse-tab dropdown filters (no search / page; that lives in MarketQuery). */
+/** The browse-tab dropdown filters (no search / page; that lives in MarketQuery). */
 export interface MarketFilters {
   itemType: MarketItemTypeFilter;
   subtype?: MarketSubtypeFilter;
+  armorClass?: MarketArmorClassFilter;
+  primaryStat?: MarketPrimaryStatFilter;
   rarity: MarketRarityFilter;
 }

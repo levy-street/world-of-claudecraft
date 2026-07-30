@@ -14,7 +14,7 @@
 import { describe, expect, it } from 'vitest';
 import { QUESTS } from '../src/sim/data';
 import type { PlayerClass, QuestProgress } from '../src/sim/types';
-import { buildQuestLogView, type QuestLogInput } from '../src/ui/questlog_view';
+import { buildQuestLogView, type QuestLogInput } from '../src/ui/hud/quest/questlog_view';
 
 // Two real quests with at least one objective, so the detail panel is exercised.
 const [QUEST_A, QUEST_B] = Object.values(QUESTS).filter((q) => q.objectives.length >= 1);

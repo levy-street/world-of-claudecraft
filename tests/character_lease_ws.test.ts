@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // the two character-lease functions, so the handshake drives with no live
 // database and no module mock: the lease fns are vi.fn spies on the deps object.
 import { createWsAuth } from '../server/ws_auth';
+import { ONLINE_WORLD_AUTH_TYPE } from '../src/world_api';
 
 const ALREADY_IN_WORLD = 'character already in world';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -23,7 +24,8 @@ function fakeWs() {
   };
 }
 
-const authFrame = (character: number) => JSON.stringify({ t: 'auth', token: 'tok', character });
+const authFrame = (character: number) =>
+  JSON.stringify({ t: ONLINE_WORLD_AUTH_TYPE, token: 'tok', character });
 const fakeReq = () => ({}) as any;
 
 // Build a full WsAuthDeps bag whose cheap checks all pass, so a handshake reaches
@@ -45,7 +47,7 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     return opts.joinResult ?? session;
   });
   const hasSessionSpy = vi.fn((_characterId: number) => opts.hasSession ?? false);
-  const acquireSpy = vi.fn(async (_characterId: number, _nonce: string) => {
+  const acquireSpy = vi.fn(async (_characterId: number, _accountId: number, _nonce: string) => {
     return opts.acquireResult ?? true;
   });
   const releaseSpy = vi.fn(async (_characterId: number, _nonce?: string) => {});
@@ -63,7 +65,7 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
   };
   const deps: any = {
     game,
-    accountForToken: vi.fn(async () => 1),
+    accountAndScopeForToken: vi.fn(async () => ({ accountId: 1, scope: 'full' as const })),
     moderationStatusForAccount: vi.fn(async () => ({ locked: false, chatStrikes: 0 })),
     getCharacter: vi.fn(async () => character),
     chatMuteStatusForAccount: vi.fn(async () => ({ mutedUntil: null, reason: null })),
@@ -76,6 +78,8 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     bufferHandshakeMessages: () => () => {},
     requestMetadata: () => ({ ip: '1.2.3.4', userAgent: 'test' }),
     maxWsPerIpHard: 100,
+    // Realm admission cap disabled: this file exercises the lease arm, not the cap.
+    maxPlayersPerRealm: 0,
     acquireCharacterLease: acquireSpy,
     releaseCharacterLease: releaseSpy,
     bankBonusForAccount: bankBonusSpy,
@@ -116,6 +120,25 @@ describe('ws auth character load lease', () => {
     expect(joinSpy).toHaveBeenCalledTimes(1);
   });
 
+  it('acquires with the AUTHENTICATED account id, never the client-sent character id', async () => {
+    // Distinct fixtures: getCharacter yields character 7, the scoped token lookup
+    // yields account 1, so a positional swap of the two args cannot pass unnoticed.
+    const { deps, acquireSpy, joinSpy } = makeDeps();
+    const { ws } = fakeWs();
+
+    await createWsAuth(deps).authenticateWebSocket(ws, authFrame(7), fakeReq());
+
+    expect(acquireSpy).toHaveBeenCalledTimes(1);
+    const [characterId, accountId, nonce] = acquireSpy.mock.calls[0];
+    // The ownership-checked character id first, the token-resolved account id
+    // second, the per-join nonce third. Seeding the account arm from a
+    // client-controlled value would let a caller reclaim a foreign account's lease.
+    expect(characterId).toBe(7);
+    expect(accountId).toBe(1);
+    expect(nonce).toMatch(UUID_RE);
+    expect(joinSpy).toHaveBeenCalledTimes(1);
+  });
+
   it('acquires with a uuid nonce then joins, passing that same nonce into the session meta', async () => {
     const { deps, joinSpy, acquireSpy, releaseSpy } = makeDeps();
     const { ws, sent } = fakeWs();
@@ -123,7 +146,7 @@ describe('ws auth character load lease', () => {
     await createWsAuth(deps).authenticateWebSocket(ws, authFrame(7), fakeReq());
 
     expect(acquireSpy).toHaveBeenCalledTimes(1);
-    const nonce = acquireSpy.mock.calls[0][1];
+    const nonce = acquireSpy.mock.calls[0][2];
     expect(nonce).toMatch(UUID_RE);
     expect(joinSpy).toHaveBeenCalledTimes(1);
     // The 8th game.join arg is the meta bag; the lease nonce rides into the session
@@ -144,7 +167,7 @@ describe('ws auth character load lease', () => {
 
     await createWsAuth(deps).authenticateWebSocket(ws, authFrame(7), fakeReq());
 
-    const nonce = acquireSpy.mock.calls[0][1];
+    const nonce = acquireSpy.mock.calls[0][2];
     expect(releaseSpy).toHaveBeenCalledTimes(1);
     // Fenced with the SAME nonce it acquired with, so it can only delete its own row.
     expect(releaseSpy.mock.calls[0]).toEqual([7, nonce]);

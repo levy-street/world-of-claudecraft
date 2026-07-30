@@ -67,7 +67,14 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase9_pa
 
 // routeHttpRequest is synchronous fire-and-forget (void apiEntry(req, res)), so a
 // dispatch must poll res.writableEnded before the captured triple is readable.
-const MAX_POLL_TICKS = 5000;
+const MAX_POLL_TICKS = 200_000;
+// The comment above assumes the dummy DATABASE_URL is unreachable so DB-touching
+// requests (the leaderboard corpus entries) reject fast. A contributor whose local
+// dev Postgres happens to be listening on the same port instead gets a REAL cold
+// boot (ensureSchema's advisory-lock DDL) plus real queries for the whole corpus,
+// which can outrun vitest's default 10s hookTimeout. Give this hook real headroom
+// so it is correct either way, not just when nothing answers on that port.
+const PARITY_HOOK_TIMEOUT_MS = 120_000;
 // The /api/perf dev gate reads process.env.ALLOW_DEV_COMMANDS per request.
 const DEV_COMMANDS_ENV = 'ALLOW_DEV_COMMANDS';
 // Content-Length header sentinel: far above the player-card byte cap, so the
@@ -139,6 +146,13 @@ const API_REQUEST_CORPUS: readonly ApiRequestSpec[] = [
   // BOTH passes, proving the migrated leaderboardHandler devs fork is byte-identical
   // to the legacy handleApi arm.
   { name: 'leaderboard_devs', method: 'GET', url: '/api/leaderboard?board=devs' },
+  // ?board=deeds (the account-level Renown board): dual-served like the other
+  // boards, so the anonymous shape must stay byte-identical on both dispatch
+  // paths (the shared buildDeedsBoard builder + the same main.ts cache). Only
+  // the present-but-invalid bearer diverges (legacy lenient-anonymous vs the
+  // router-validated 401), the authz-gap-close class, and a token lookup is a
+  // db read so it cannot live in this db-free corpus anyway.
+  { name: 'leaderboard_deeds', method: 'GET', url: '/api/leaderboard?board=deeds' },
   { name: 'leaderboard_scope_global', method: 'GET', url: '/api/leaderboard?scope=global' },
   { name: 'leaderboard_scope_realm', method: 'GET', url: '/api/leaderboard?scope=realm' },
   { name: 'leaderboard_limit5', method: 'GET', url: '/api/leaderboard?limit=5' },
@@ -148,6 +162,14 @@ const API_REQUEST_CORPUS: readonly ApiRequestSpec[] = [
   // GET is deferred to the ladder deletion). This pins it: a HEAD to a migrated
   // GET route must 404 on BOTH paths, with no divergence and no known-deviation.
   { name: 'leaderboard_head_404', method: 'HEAD', url: '/api/leaderboard' },
+
+  // Arena ladder + project-stats: a TTL cache now fronts each, so a cold-cache db
+  // error degrades deterministically (an empty ladder / accounts_created 0) on BOTH
+  // arms identically, graduating them out of the SKIPPED list into the byte-parity
+  // corpus. Rate-limited on both arms with the same public-read budget (isolate()
+  // resets the bucket per pass, so both arms see a fresh 200).
+  { name: 'arena_default', method: 'GET', url: '/api/arena/leaderboard' },
+  { name: 'project_stats', method: 'GET', url: '/api/project-stats' },
 
   // --- binary request class, player card (characterization block 5) -----------
   {
@@ -284,17 +306,12 @@ function isolate(): void {
 type MainModule = typeof import('../../../server/main');
 
 // A Dispatch that BAKES IN the /api dispatch mode: it flips the flag (legacy vs
-// new) via the test-only setter, drives the real routeHttpRequest, then polls
-// res.writableEnded (routeHttpRequest is synchronous fire-and-forget).
+// new) via the test-only setter and drives the real routeHttpRequest. The shared
+// captureResponse helper waits on FakeRes's end signal.
 function makeModedDispatch(main: MainModule, mode: 'legacy' | 'new'): Dispatch {
-  return async (req, res) => {
+  return (req, res) => {
     main.setApiDispatchModeForTests(mode);
     main.routeHttpRequest(req, res);
-    let ticks = 0;
-    while (!(res as unknown as { writableEnded: boolean }).writableEnded) {
-      if (ticks++ > MAX_POLL_TICKS) throw new Error('response never ended');
-      await new Promise((r) => setImmediate(r));
-    }
   };
 }
 
@@ -360,7 +377,7 @@ beforeAll(async () => {
 
   const fixtures = API_REQUEST_CORPUS.map(specToFixture);
   report = await runParity({ oldDispatch, newDispatch, fixtures });
-});
+}, PARITY_HOOK_TIMEOUT_MS);
 
 afterAll(async () => {
   const main = (await import('../../../server/main')) as MainModule;
@@ -421,6 +438,91 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     expect(oldCap.status).toBe(405);
     expect(newCap.status).toBe(oldCap.status);
     expect(stableStringify(newCap)).toBe(stableStringify(oldCap));
+  });
+
+  it('the /api/status steam advert DIVERGES under STEAM_ENABLED=1: false on legacy, true on new', async () => {
+    // The Steam surface exists only as registry RouteDefs (server/steam/routes.ts),
+    // which the legacy ladder never serves, so every /api/steam/* 404s on the legacy
+    // arm. The legacy /api/status arm therefore HARDCODES steam.enabled=false:
+    // advertising a capability whose routes 404 on that same arm would strand a
+    // client into a dead link flow. The migrated statusHandler reads the real
+    // steamEnabled(), where the routes are live. So under the flag this is a
+    // DELIBERATE divergence, not a parity break. Only the steam field is compared
+    // (the names[] list is the separate labeled name-list-trim deviation). With the
+    // flag OFF both arms read false, which is why the corpus status_get row (and the
+    // legacy golden) stay clean; this covers the ON state.
+    const { oldCap, newCap } = await captureWithEnv({ STEAM_ENABLED: '1' }, () =>
+      makeReq({ method: 'GET', url: '/api/status' }),
+    );
+    expect(oldCap.status).toBe(200);
+    expect(newCap.status).toBe(200);
+    expect(JSON.parse(oldCap.body as string).steam).toEqual({ enabled: false });
+    expect(JSON.parse(newCap.body as string).steam).toEqual({ enabled: true });
+  });
+
+  it('the /api/status dev_commands advert AGREES on both arms under ALLOW_DEV_COMMANDS=1', async () => {
+    // Unlike steam.enabled directly above, dev_commands must NOT diverge: the dev_*
+    // cheats ride the WEBSOCKET dispatcher, which both ladders serve identically, so
+    // there is no arm on which advertising true would strand a client. /api/status is
+    // a known-deviation route (the name-list trim), so the corpus filter masks the
+    // whole path and only this explicit case can catch the two arms drifting apart.
+    // The corpus runs with the env OFF, so this covers the ON state, where a
+    // one-armed edit would show up as a tester whose /dev GUI appears or vanishes
+    // depending on which dispatch the realm happens to be running.
+    const { oldCap, newCap } = await captureWithEnv({ ALLOW_DEV_COMMANDS: '1' }, () =>
+      makeReq({ method: 'GET', url: '/api/status' }),
+    );
+    expect(oldCap.status).toBe(200);
+    expect(newCap.status).toBe(200);
+    expect(JSON.parse(oldCap.body as string).dev_commands).toBe(true);
+    expect(JSON.parse(newCap.body as string).dev_commands).toBe(true);
+  });
+
+  it('the /api/status players_cap AGREES on both arms and clamps a negative cap to 0', async () => {
+    // players_cap is served by BOTH arms through the same canonicalPlayersCap
+    // (the legacy handleApi twin inline, the migrated statusHandler via the
+    // injected leaderboard runtime), but /api/status is a known-deviation path
+    // (the name-list trim), so the corpus filter masks the WHOLE route: a
+    // players_cap drift between the arms would pass the corpus silently. This is
+    // the dedicated cross-arm agreement pin, in the steam-advert test's shape.
+    // The config is memoized at first read, so each scenario drops the cache
+    // before capturing and restores it after (later tests re-memoize the
+    // harness default). The negative scenario also exercises the
+    // canonicalPlayersCap Math.max(0, ...) clamp, asserted nowhere else: a
+    // negative configured cap must advertise 0 (cap disabled), never a negative.
+    const main = (await import('../../../server/main')) as MainModule;
+    const capsUnder = async (value: string) => {
+      main.resetActiveConfigForTests();
+      try {
+        const { oldCap, newCap } = await captureWithEnv({ MAX_PLAYERS_PER_REALM: value }, () =>
+          makeReq({ method: 'GET', url: '/api/status' }),
+        );
+        expect(oldCap.status).toBe(200);
+        expect(newCap.status).toBe(200);
+        return {
+          legacy: JSON.parse(oldCap.body as string).players_cap,
+          migrated: JSON.parse(newCap.body as string).players_cap,
+        };
+      } finally {
+        main.resetActiveConfigForTests();
+      }
+    };
+    expect(await capsUnder('250')).toEqual({ legacy: 250, migrated: 250 });
+    expect(await capsUnder('-5')).toEqual({ legacy: 0, migrated: 0 });
+  });
+
+  it('the Steam link surface 404s on the legacy ladder but is served on the new arm', async () => {
+    // /api/steam/status is a registry-only RouteDef. Under legacy dispatch the ladder
+    // has no such arm, so it falls through to 404; under new dispatch the router
+    // serves it. With STEAM_ENABLED=1 and no bearer the served handler answers 401 at
+    // the read-tier auth gate (BEARER pattern miss, before any db read), which is the
+    // point: NON-404 proves the route exists on the new arm. This is the concrete
+    // reason the legacy /api/status advert must read false.
+    const { oldCap, newCap } = await captureWithEnv({ STEAM_ENABLED: '1' }, () =>
+      makeReq({ method: 'GET', url: '/api/steam/status' }),
+    );
+    expect(oldCap.status).toBe(404);
+    expect(newCap.status).not.toBe(404);
   });
 
   it('GET /api/perf-report is identical old-vs-new and is a 404 (re-pins the masked /api/perf-report)', async () => {
@@ -637,13 +739,17 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     expect(stableStringify(newCap)).toBe(stableStringify(oldCap));
   });
 
-  // The two chooser routes (login/new + login/link) are ALSO masked by
+  // The two chooser routes (login/new + login/link) and native exchange are ALSO masked by
   // newLimiterDiscord but have no corpus fixture (every non-429 branch reads the db:
   // the pending-login token lookup is the first thing after the body). Their one
   // deterministic, db-free branch is the shared handler self-limit (checked BEFORE
   // the body read on both the legacy arm and the RouteDef), so each is re-pinned by
   // draining the discord bucket before each pass and proving the 429 byte-identical.
-  for (const chooserPath of ['/api/auth/discord/login/new', '/api/auth/discord/login/link']) {
+  for (const chooserPath of [
+    '/api/auth/discord/login/new',
+    '/api/auth/discord/login/link',
+    '/api/auth/discord/native/exchange',
+  ]) {
     it(`POST ${chooserPath} with a drained bucket is identical old-vs-new and is a 429 (re-pins masked chooser route)`, async () => {
       const drainedCapture = async (dispatch: Dispatch) => {
         isolate();
@@ -1262,6 +1368,24 @@ describe('/api + /internal late-arrival dispatch parity (legacy flag vs new flag
     expect(stableStringify(newCap)).toBe(stableStringify(oldCap));
   });
 
+  it('POST /internal/daily-rewards/finalize with a wrong secret is the fail-closed 401, identical old-vs-new', async () => {
+    const { oldCap, newCap } = await captureWithEnv({ [DAILY_ENV]: PARITY_SECRET }, () =>
+      makeReq({
+        method: 'POST',
+        url: '/internal/daily-rewards/finalize',
+        headers: { [DAILY_HEADER]: 'wrong-secret' },
+        body: { day: '2026-07-01' },
+      }),
+    );
+    expect(oldCap.status).toBe(401);
+    expect(JSON.parse(oldCap.body as string)).toEqual({
+      success: false,
+      data: null,
+      error: 'not authenticated',
+    });
+    expect(stableStringify(newCap)).toBe(stableStringify(oldCap));
+  });
+
   it('POST /internal/daily-rewards/pending-payouts with a wrong secret is the fail-closed 401, identical old-vs-new', async () => {
     const { oldCap, newCap } = await captureWithEnv({ [DAILY_ENV]: PARITY_SECRET }, () =>
       makeReq({
@@ -1387,11 +1511,14 @@ describe('/api + /internal late-arrival dispatch parity (legacy flag vs new flag
 // -----------------------------------------------------------------------------
 // SKIPPED requests (present in characterization.test.ts or on the surface, but not
 // replayed here) and why:
-//   - GET /api/project-stats, GET /api/arena/leaderboard, GET /api/woc/balance,
-//     GET /api/email/unsubscribe?token=<non-empty>, GET /api/search WITH a bearer,
-//     and every populated leaderboard/character/account success body: all reach
-//     pool.query against the pool-less test db (hang or pool-500), so they are not
-//     db-free contract paths. Deferred exactly as characterization defers them.
+//   - GET /api/woc/balance, GET /api/email/unsubscribe?token=<non-empty>,
+//     GET /api/search WITH a bearer, and every populated leaderboard/character/
+//     account success body: all reach pool.query against the pool-less test db (hang
+//     or pool-500), so they are not db-free contract paths. Deferred exactly as
+//     characterization defers them. (GET /api/project-stats and
+//     GET /api/arena/leaderboard graduated OUT of this list: a TTL cache now fronts
+//     each, so the cold-cache read degrades deterministically and both are replayed
+//     old-vs-new in the corpus above.)
 //   - GET /api/auth/discord/callback SUCCESS bounce: embeds a live session token in
 //     inlined HTML the normalizer returns verbatim (non-deterministic + a privacy
 //     flag); only the error bounce is replayed.

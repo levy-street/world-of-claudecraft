@@ -34,6 +34,7 @@ import {
   VC_PRACTICE_SLOTS,
   vcPracticeOrigin,
 } from '../vale_cup_layout';
+import { isArenaQueued } from './arena';
 import * as valeCupMod from './vale_cup';
 import {
   VC_BACKFILL_WAIT,
@@ -198,6 +199,14 @@ export function startValeCupPractice(sim: Sim, bracket: VcBracket, pid?: number)
     return;
   }
   if (ctx.arenaMatches.has(id)) {
+    ctx.error(id, 'You are already in an arena match.');
+    return;
+  }
+  // Waiting in an arena queue counts too: this entry point seats the player
+  // directly, so without this guard a Protect Yumi / duel unit could still be
+  // matched around them and double-seat them across both systems. Symmetric
+  // with arenaQueueJoin's ctx.vcupSeatedOrQueued check in the other direction.
+  if (isArenaQueued(ctx, id)) {
     ctx.error(id, 'You are already in an arena match.');
     return;
   }

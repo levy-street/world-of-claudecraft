@@ -31,6 +31,7 @@ import {
   lockpickPresetFor,
 } from '../content/delves/lockpick_tiers';
 import { DELVES } from '../data';
+import * as deedsMod from '../deeds';
 import {
   ANTE_TO_PAGES,
   ANTE_TO_STEP_TIMEOUT_MS,
@@ -385,6 +386,7 @@ function lockpickSucceed(ctx: SimContext, run: DelveRun, session: LockSession): 
     lootTier: session.lootTier,
     pid: session.ownerId,
   });
+  deedsMod.onLockpickSuccessForDeeds(ctx, session.ownerId, session.ante, isCoffer);
   run.lockpick = null;
 }
 

@@ -18,9 +18,15 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now.
 
 import {
+  DELVES,
   dungeonAt,
   isDelvePos,
+  isRiftPos,
   OVERWORLD_GRAVEYARDS,
+  PLAYER_START,
+  RIFT_REGION_HALF_X,
+  RIFT_REGION_HALF_Z,
+  riftInstanceOrigin,
   SPIRIT_HEALER,
   SPIRIT_HEALER_NPC_ID,
 } from './data';
@@ -34,7 +40,7 @@ import {
 } from './resurrection';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { dist2d, type Entity, type Vec3 } from './types';
+import { dist2d, type Entity, emptyMoveInput, type Vec3 } from './types';
 
 // --- tuning -----------------------------------------------------------------
 // A released spirit runs faster than the living, ignoring slows (a ghost cannot be
@@ -58,11 +64,17 @@ export { RESURRECTION_SICKNESS_ID };
 
 // --- graveyard selection ----------------------------------------------------
 
-// Nearest overworld graveyard to a position (pure: a scan of the static list).
-export function nearestOverworldGraveyard(x: number, z: number): { x: number; z: number } {
-  let best = OVERWORLD_GRAVEYARDS[0];
+// Nearest overworld graveyard to a position. Worlds without authored graveyards
+// fall back to their own start point rather than leaking a built-in town anchor.
+export function nearestOverworldGraveyard(
+  x: number,
+  z: number,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  fallback: { x: number; z: number } = PLAYER_START,
+): { x: number; z: number } {
+  let best: { x: number; z: number } = fallback;
   let bestD = Infinity;
-  for (const g of OVERWORLD_GRAVEYARDS) {
+  for (const g of graveyards) {
     const dx = g.x - x;
     const dz = g.z - z;
     const d = dx * dx + dz * dz;
@@ -79,17 +91,50 @@ export function nearestOverworldGraveyard(x: number, z: number): { x: number; z:
 // ghost runs its spirit back to the door and re-enters to resurrect at the entrance, so
 // no Spirit Healer stands inside an instance. Outdoors it is the nearest overworld
 // graveyard to where the body fell.
-function ghostGraveyard(p: Entity): { x: number; z: number } {
+function ghostGraveyard(
+  ctx: SimContext,
+  p: Entity,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  fallback: { x: number; z: number } = PLAYER_START,
+): { x: number; z: number } {
   const dungeon = dungeonAt(p.pos.x);
-  if (dungeon) return nearestOverworldGraveyard(dungeon.doorPos.x, dungeon.doorPos.z);
-  return nearestOverworldGraveyard(p.pos.x, p.pos.z);
+  if (dungeon) {
+    return nearestOverworldGraveyard(dungeon.doorPos.x, dungeon.doorPos.z, graveyards, fallback);
+  }
+  const delve = ctx.delveRunForPlayer(p.id);
+  if (delve && isDelvePos(p.pos.x)) {
+    const door = DELVES[delve.delveId]?.doorPos;
+    if (door) return nearestOverworldGraveyard(door.x, door.z, graveyards, fallback);
+  }
+  // A rift death returns the spirit to the overworld graveyard nearest where the
+  // player STEPPED THROUGH the portal (the instance's returnPos), not the far-off
+  // rift band (which would resolve to whatever zone happens to be nearest in raw
+  // world space). Scanned off ctx.riftInstances to avoid a rift/runs import cycle.
+  if (isRiftPos(p.pos.x)) {
+    for (const inst of ctx.riftInstances) {
+      if (inst.partyKey === null) continue;
+      const o = riftInstanceOrigin(inst.slot, inst.floorIndex);
+      if (
+        Math.abs(p.pos.x - o.x) <= RIFT_REGION_HALF_X &&
+        Math.abs(p.pos.z - o.z) <= RIFT_REGION_HALF_Z
+      ) {
+        return nearestOverworldGraveyard(inst.returnPos.x, inst.returnPos.z, graveyards, fallback);
+      }
+    }
+  }
+  return nearestOverworldGraveyard(p.pos.x, p.pos.z, graveyards, fallback);
 }
 
 // --- release / resurrect ----------------------------------------------------
 
 // Release the spirit: leave the body where it fell and rise as a ghost at the
 // nearest graveyard. Replaces the old instant-respawn-at-graveyard behavior.
-export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
+export function releasePlayerSpirit(
+  ctx: SimContext,
+  pid?: number,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  fallback: { x: number; z: number } = PLAYER_START,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
@@ -100,19 +145,64 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
     releaseSpiritInDelve(ctx, meta.entityId);
     return;
   }
-  // Mark where the body lies, then send the spirit to the graveyard.
-  p.corpsePos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
+  releaseAtNearestGraveyard(ctx, meta, p, true, graveyards, fallback);
+}
+
+/**
+ * Finish Unstuck through the ordinary graveyard/Pale Keeper loop. Unlike a
+ * normal death, the abandoned body cannot be used for a penalty-free corpse
+ * resurrection: the player must accept The Keeper's Toll at the graveyard.
+ */
+export function releasePlayerSpiritForUnstuck(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r?.e.dead || r.e.ghost) return;
+  releaseAtNearestGraveyard(ctx, r.meta, r.e, false);
+}
+
+/**
+ * Finish Unstuck for a player who was ALREADY dead when they invoked it. The
+ * graveyard/Pale Keeper loop has nothing left to offer a body that cannot reach
+ * its corpse or an angel, so pull them to the graveyard and resurrect them there
+ * on exactly the Spirit Healer's terms: RES_HEALER_HP_FRACTION of their pools
+ * plus The Keeper's Toll. Unstuck only saves them the walk, never the toll, so it
+ * can never be the cheap way out of a death.
+ */
+export function reviveAtGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r?.e.dead) return;
+  const { meta, e: p } = r;
+  // Resolve the graveyard before the revive moves the body out of its instance band.
+  const gy = ghostGraveyard(ctx, p);
+  reviveAt(ctx, meta, p, { x: gy.x, y: p.pos.y, z: gy.z }, RES_HEALER_HP_FRACTION, true);
+  ctx.emit({ type: 'respawn', pid: meta.entityId });
+}
+
+function releaseAtNearestGraveyard(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  p: Entity,
+  leaveCorpse: boolean,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  fallback: { x: number; z: number } = PLAYER_START,
+): void {
+  // Resolve the graveyard before moving the entity out of its instance band.
+  const gy = ghostGraveyard(ctx, p, graveyards, fallback);
+  p.corpsePos = leaveCorpse ? { x: p.pos.x, y: p.pos.y, z: p.pos.z } : null;
+  p.corpseInstanceId = leaveCorpse ? ctx.instanceClaimIdAt(p.pos) : null;
   p.ghost = true; // p.dead stays true
-  const gy = ghostGraveyard(p);
   p.pos = ctx.groundPos(gy.x, gy.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.facing = 0;
+  // Whatever movement keys were held at the moment of death must not carry over: the
+  // ghost is teleported to the graveyard and should sit still until the player actually
+  // presses a key again, not keep walking in the last held direction.
+  Object.assign(meta.moveInput, emptyMoveInput());
   // The Keeper's Toll (Resurrection Sickness) persists through death and release: it
   // cannot be shed by dying. Every other aura clears when the spirit is released.
   p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   // A ghost shows a full (greyed) bar even though it is still `dead`. recalc forces
   // hp to 0 while dead, so set the display pools afterward.
   p.hp = p.maxHp;
@@ -121,6 +211,7 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   p.autoAttack = false;
   p.queuedOnSwing = null;
   delete p.queuedOnSwingFree;
+  delete p.queuedOnSwingCostMultiplier;
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
   p.combatTimer = 99;
@@ -143,16 +234,17 @@ export function resurrectAtCorpse(ctx: SimContext, pid?: number): void {
 }
 
 // Resurrect at the Spirit Healer: instant, in place, but with Resurrection Sickness.
-export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): void {
+export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean {
   const r = ctx.resolve(pid);
-  if (!r) return;
+  if (!r) return false;
   const { meta, e: p } = r;
-  if (!p.dead || !p.ghost) return;
-  if (!spiritHealerInRange(ctx, p)) return;
+  if (!p.dead || !p.ghost) return false;
+  if (!spiritHealerInRange(ctx, p)) return false;
   // The Spirit Healer always inflicts Resurrection Sickness and returns you at only
   // RES_HEALER_HP_FRACTION of your pools (the corpse run is the penalty-free choice).
   reviveAt(ctx, meta, p, p.pos, RES_HEALER_HP_FRACTION, true);
   ctx.emit({ type: 'respawn', pid: meta.entityId });
+  return true;
 }
 
 // Resurrect a ghost that ran its spirit back and re-entered its instance: penalty-free,
@@ -165,8 +257,19 @@ export function resurrectOnInstanceReentry(
   p: Entity,
   pos: Vec3,
 ): void {
+  // Unstuck deliberately abandons its corpse so the Pale Keeper toll cannot be
+  // bypassed by walking the ghost through an unrelated instance entrance.
+  if (!p.corpsePos || p.corpseInstanceId === null) return;
   reviveAt(ctx, meta, p, pos, RES_HP_FRACTION, false);
   ctx.emit({ type: 'respawn', pid: meta.entityId });
+}
+
+export function revivePlayerAt(ctx: SimContext, pid: number, pos: Vec3, hpFrac = 1): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const wasDead = r.e.dead || r.e.ghost;
+  reviveAt(ctx, r.meta, r.e, pos, hpFrac, false);
+  if (wasDead) ctx.emit({ type: 'respawn', pid: r.meta.entityId });
 }
 
 // Whether a Spirit Healer NPC stands within reach of the spirit.
@@ -191,15 +294,20 @@ function reviveAt(
   p.dead = false;
   p.ghost = false;
   p.corpsePos = null;
+  p.corpseInstanceId = null;
   p.pos = ctx.groundPos(pos.x, pos.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.facing = 0;
+  // As with the release above: a held movement key at the moment the revive lands must
+  // not carry over, or the freshly-revived body immediately walks off in whatever
+  // direction was last held (this is what made revived players drift with no input).
+  Object.assign(meta.moveInput, emptyMoveInput());
   // Keep The Keeper's Toll across the revive (it persists through death); a healer
   // resurrection refreshes it to full duration via applyResurrectionSickness below.
   p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   p.hp = Math.max(1, Math.round(p.maxHp * hpFrac));
   p.resource = p.resourceType === 'mana' ? Math.round(p.maxResource * hpFrac) : 0;
   p.targetId = null;
@@ -244,6 +352,11 @@ export function spawnSpiritHealerAt(ctx: SimContext, x: number, z: number): numb
 }
 
 // Place an angel at every overworld graveyard. Called once from the Sim ctor.
-export function spawnOverworldSpiritHealers(ctx: SimContext): void {
-  for (const g of OVERWORLD_GRAVEYARDS) spawnSpiritHealerAt(ctx, g.x, g.z);
+export function spawnOverworldSpiritHealers(
+  ctx: SimContext,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+): void {
+  for (const g of graveyards) {
+    spawnSpiritHealerAt(ctx, g.x, g.z);
+  }
 }

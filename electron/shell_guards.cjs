@@ -57,7 +57,13 @@ function appNavigationOrigins(appOrigin, devServerUrl) {
 
 // Third-party origins the app legitimately embeds in a SUBFRAME only (never the main
 // frame): the Cloudflare Turnstile bot-gate renders in its own cross-origin iframe.
-const EMBEDDED_SUBFRAME_ORIGINS = new Set(['https://challenges.cloudflare.com']);
+const EMBEDDED_SUBFRAME_ORIGINS = new Set([
+  'https://challenges.cloudflare.com',
+  'https://secure.walletconnect.com',
+  'https://secure.walletconnect.org',
+  'https://verify.walletconnect.com',
+  'https://verify.walletconnect.org',
+]);
 
 // Decide whether a navigation to `url` is permitted. Main-frame navigations may only
 // target the app or dev origin (the top-level hijack surface that setWindowOpenHandler
@@ -89,14 +95,33 @@ const CSP_ORIGINS = {
     'https://www.googletagmanager.com',
     'https://connect.facebook.net',
     'https://www.facebook.com',
+    'https://*.walletconnect.com',
+    'wss://*.walletconnect.com',
+    'https://*.walletconnect.org',
+    'wss://*.walletconnect.org',
+    'https://api.web3modal.org',
+    'https://pulse.walletconnect.org',
   ],
   // tracking-pixel image beacons.
-  img: ['https://www.google-analytics.com', 'https://www.facebook.com'],
+  img: [
+    'https://www.google-analytics.com',
+    'https://www.facebook.com',
+    'https://secure.walletconnect.com',
+    'https://secure.walletconnect.org',
+    'https://api.web3modal.org',
+  ],
   // Cloudflare Turnstile: api.js (script) plus the challenge iframe (frame).
   turnstile: 'https://challenges.cloudflare.com',
   // Google Fonts: the stylesheet origin (style-src) and the font-file origin (font-src).
   fontsStyle: 'https://fonts.googleapis.com',
   fontsFile: 'https://fonts.gstatic.com',
+  reownFonts: 'https://fonts.reown.com',
+  walletFrames: [
+    'https://secure.walletconnect.com',
+    'https://secure.walletconnect.org',
+    'https://verify.walletconnect.com',
+    'https://verify.walletconnect.org',
+  ],
 };
 
 // Extract a CSP source-hash (`sha256-<base64>`) for every INLINE <script> in html
@@ -124,8 +149,20 @@ function extractInlineScriptHashes(html) {
 // Build the Content-Security-Policy string served on every app:// response. Strict
 // same-origin by default; script-src stays hash-based ('unsafe-inline' is never used)
 // with 'wasm-unsafe-eval' for Three.js WASM (never 'unsafe-eval'); connect-src lists
-// the HTTPS API origin and wss: explicitly; a blob worker-src covers decoder workers.
+// the API and matching WebSocket origins explicitly; a blob worker-src covers decoder workers.
 // The third-party origins index.html uses are allow-listed per directive.
+function deriveWebSocketOrigin(apiOrigin) {
+  try {
+    const url = new URL(apiOrigin);
+    if (url.protocol === 'http:') url.protocol = 'ws:';
+    else if (url.protocol === 'https:') url.protocol = 'wss:';
+    else return null;
+    return `${url.protocol}//${url.host}`;
+  } catch {
+    return null;
+  }
+}
+
 function buildContentSecurityPolicy({ apiOrigin, scriptHashes = [] } = {}) {
   const hashPart = scriptHashes.map((h) => `'${h}'`).join(' ');
   const scriptSrc = [
@@ -140,7 +177,13 @@ function buildContentSecurityPolicy({ apiOrigin, scriptHashes = [] } = {}) {
   // by turning them into blob: object URLs and then fetch()ing those URLs (a connect-src
   // request, not img-src). Without blob: here every model renders untextured. img-src and
   // worker-src already list blob: for the same reason (texture <img> decode, decoder workers).
-  const connectSrc = ["connect-src 'self' blob:", apiOrigin, 'wss:', ...CSP_ORIGINS.connect]
+  const connectSrc = [
+    "connect-src 'self' blob:",
+    apiOrigin,
+    deriveWebSocketOrigin(apiOrigin),
+    'wss:',
+    ...CSP_ORIGINS.connect,
+  ]
     .filter(Boolean)
     .join(' ');
   const imgSrc = ["img-src 'self' data: blob:", apiOrigin, ...CSP_ORIGINS.img]
@@ -152,9 +195,9 @@ function buildContentSecurityPolicy({ apiOrigin, scriptHashes = [] } = {}) {
     connectSrc,
     imgSrc,
     `style-src 'self' 'unsafe-inline' ${CSP_ORIGINS.fontsStyle}`,
-    `font-src 'self' ${CSP_ORIGINS.fontsFile}`,
+    `font-src 'self' ${CSP_ORIGINS.fontsFile} ${CSP_ORIGINS.reownFonts}`,
     "worker-src 'self' blob:",
-    `frame-src ${CSP_ORIGINS.turnstile}`,
+    `frame-src ${CSP_ORIGINS.turnstile} ${CSP_ORIGINS.walletFrames.join(' ')}`,
     "object-src 'none'",
     "base-uri 'none'",
     "frame-ancestors 'none'",

@@ -3,10 +3,12 @@
 // death (guaranteed winner, unranked), win + cleanup, and determinism.
 
 import { describe, expect, it } from 'vitest';
-import { yumiMazeOrigin } from '../src/sim/data';
+import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, yumiMazeOrigin } from '../src/sim/data';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
+import { isArenaQueued, updateArena } from '../src/sim/social/arena';
 import {
+  matchmakeYumiFormat,
   packYumiTeams,
   pickYumiCells,
   resolveYumiTiebreak,
@@ -14,12 +16,22 @@ import {
   YUMI_SUDDEN_AT,
   YUMI_TELEPORT_EVERY,
 } from '../src/sim/social/yumi';
-import type { Entity, SimEvent } from '../src/sim/types';
+import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { teleportPoints, YUMI_TELEPORT_MIN_SEP, yumiMazeLayout } from '../src/sim/yumi_maze_layout';
 
+// Yumi assertions exercise queued players, the maze slots, and the cats the
+// match itself spawns. Spawning every ambient realm mob only makes each tick
+// scan unrelated overworld AI (the fiesta/arena subsystem-world precedent).
+const YUMI_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld(seed = 42) {
-  return new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: YUMI_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
@@ -153,6 +165,29 @@ describe('yumi: queue and matchmaking', () => {
       ),
     ).toBe(true);
     expect(sim.arenaQueueYumi3.length).toBe(0);
+  });
+
+  it('prunes a queued player who walked into a dungeon/instance mid-queue (issue #1600 x-band recheck)', () => {
+    // The join-time instance guard only blocks queuing FROM inside an instance;
+    // matchmaking itself must recheck the guard every pass, mirroring the
+    // sibling arena 1v1/2v2/fiesta queues (arena.ts matchmakeArena1v1 /
+    // pruneTeamQueue), or a player who wanders into a dungeon mid-queue stays a
+    // valid candidate and gets teleported out of the instance into the maze,
+    // fully restored, when the match pops.
+    const sim = makeWorld();
+    const inside = sim.addPlayer('warrior', 'Inside');
+    const outside = sim.addPlayer('mage', 'Outside');
+    teleport(sim, inside, 0, -40);
+    teleport(sim, outside, 4, -40);
+    sim.arenaQueueJoin(inside, 'yumi3');
+    sim.arenaQueueJoin(outside, 'yumi3');
+    // Move the queued player past the instance x-band WITHOUT entering a real
+    // dungeon, so the entry-dequeue path does not mask the prune under test.
+    teleport(sim, inside, DUNGEON_X_THRESHOLD + 50, -40);
+    sim.tick();
+    expect(sim.arenaMatchFor(inside)).toBeNull();
+    expect(isArenaQueued(sim.ctx, inside)).toBe(false); // pruned
+    expect(isArenaQueued(sim.ctx, outside)).toBe(true); // the honest queuer waits
   });
 
   it('packs premades and solos FIFO first-fit', () => {
@@ -477,6 +512,60 @@ describe('yumi: sudden death', () => {
 });
 
 describe('yumi: win and cleanup', () => {
+  it('restores the exact HP, resource, cooldown, and CC DR pools carried into the match', () => {
+    const sim = makeWorld();
+    const classes = ['warrior', 'mage', 'rogue', 'priest', 'hunter', 'druid'] as const;
+    const pids = classes.map((cls, i) => sim.addPlayer(cls, `Restore${i}`));
+    pids.forEach((pid, i) => {
+      teleport(sim, pid, i * 4, -40);
+      sim.arenaQueueJoin(pid, 'yumi3');
+    });
+
+    const trackedPid = pids[1];
+    const tracked = sim.entities.get(trackedPid)!;
+    tracked.hp = Math.floor(tracked.maxHp * 0.4);
+    tracked.resource = Math.floor(tracked.maxResource * 0.3);
+    tracked.cooldowns.set('fireball', 7);
+    tracked.abilityCharges = {
+      arcane_missiles: { charges: 1, maxCharges: 2, recharge: 8, rechargeLength: 8 },
+    };
+    tracked.ccDr.set('openerStun', { stage: 2, resetAt: 123.5 });
+    const expected = {
+      hp: tracked.hp,
+      resource: tracked.resource,
+      cooldowns: new Map(tracked.cooldowns),
+      abilityCharges: Object.fromEntries(
+        Object.entries(tracked.abilityCharges).map(([abilityId, state]) => [
+          abilityId,
+          { ...state },
+        ]),
+      ),
+      ccDr: new Map([...tracked.ccDr].map(([category, state]) => [category, { ...state }])),
+    };
+
+    matchmakeYumiFormat(sim.ctx, 'yumi3');
+    const match = sim.arenaMatchFor(trackedPid)!;
+    expect(match.preMatchPools?.get(trackedPid)).toEqual(expected);
+    expect(tracked.hp).toBe(tracked.maxHp);
+    expect(tracked.resource).toBe(tracked.maxResource);
+    expect(tracked.cooldowns.size).toBe(0);
+    expect(tracked.abilityCharges).toBeUndefined();
+    expect(tracked.ccDr.size).toBe(0);
+
+    for (let i = 0; i < 200 && match.state !== 'active'; i++) updateArena(sim.ctx);
+    expect(match.state).toBe('active');
+    const { catB } = cats(sim, match);
+    sim.dealDamage(tracked, catB, catB.hp + 100_000, false, 'arcane', null, 'hit');
+    for (let i = 0; i < 200 && sim.arenaMatchFor(trackedPid); i++) updateArena(sim.ctx);
+
+    expect(sim.arenaMatchFor(trackedPid)).toBeNull();
+    expect(tracked.hp).toBe(expected.hp);
+    expect(tracked.resource).toBe(expected.resource);
+    expect(tracked.cooldowns).toEqual(expected.cooldowns);
+    expect(tracked.abilityCharges).toEqual(expected.abilityCharges);
+    expect(tracked.ccDr).toEqual(expected.ccDr);
+  });
+
   it('killing the enemy cat wins the match; everything tears down', () => {
     const { sim, match, pids } = startYumi3();
     const { catB } = cats(sim, match);

@@ -7,6 +7,8 @@
 // Zero DOM/browser/Three.js imports here (this is `src/sim/`, guarded by
 // tests/architecture.test.ts). No randomness: pure declarative shapes.
 
+import type { StationType } from './stations';
+
 export type ProfessionCategory = 'gathering' | 'crafting' | 'secondary';
 
 // A profession itself (mining, herbalism, alchemy, cooking, ...). Content
@@ -43,14 +45,18 @@ export interface ProfessionRecipeRecord {
   resultCount: number;
   reagents: readonly ProfessionReagent[];
   skillReq: number;
-  // Skill at which the recipe stops granting skill-ups ("grey"/trivial).
-  trivialAt: number;
   // Base item-level budget this recipe's output is balanced against (issue
   // #1127). Informational for now: the higher-tier gating (P4), the wheel
   // (P5), and archetype-exclusive combos (P8) read this later to scale the
   // quality roll and gate access. A common-tier recipe always has skillReq 0
   // per the free-floor rule.
   itemLevelBudget: number;
+  // Effective content level for the profession-XP green/gray curve
+  // (professions/profession_xp.ts craftActionXp). Seeded from
+  // itemLevelBudget at authoring time (same numeric scale as character
+  // level) and hand-adjusted where a recipe's intended character level
+  // clearly diverges from its gold-sink budget.
+  level: number;
   // Dual-craft requirement (issue #1132): a combo recipe exclusive to one
   // specific adjacent pair on the CRAFT_RING (src/sim/content/professions.ts
   // adjacentCrafts). When present, the crafting player must hold BOTH
@@ -73,14 +79,25 @@ export interface ProfessionRecipeRecord {
   // professions/crafting.ts acquireRecipe) via one of the listed sources
   // before it can be crafted, independent of the player's tier/skill: knowing
   // a recipe and being able to craft it at tier are orthogonal gates.
+  //
+  // AUTHORING DEFAULT (Professions 2.0): trained, not known. Every
+  // newly authored recipe (any id NOT in
+  // professions/training.ts PRE_TRAINING_RECIPE_IDS) MUST carry a non-empty
+  // acquisition list; omitting the field is reserved for that
+  // grandfathered set and is never correct for new content (a new recipe with
+  // no list would be silently known to every character with no learn step).
   acquisition?: readonly ('trainer' | 'drop' | 'quest')[];
-  // Station-bound crafting (issue #1297): true only for the tier-4/5 recipes
-  // that require the player to be present at the level-20 crafting hub (see
-  // ../professions/crafting_hub.ts + content/professions.ts CRAFTING_HUB_*).
-  // Absent (the default) for every common-tier and combo recipe today: the
-  // free floor stays field-craftable, matching the existing "common tier
-  // never costs anything beyond materials" rule.
-  requiresHubStation?: boolean;
+  // Station-bound crafting (Professions 2.0, the hands-vs-stations
+  // split; supersedes #1297's requiresHubStation boolean and its level-20
+  // hub). Present only on a recipe that must be crafted AT a station of this
+  // type (see ../professions/stations.ts + content/professions.ts STATIONS),
+  // or beside the crafter's own active mobile station whose craft maps to
+  // it. Absent (the default) for every common-tier and combo recipe today:
+  // the free floor stays field-craftable ("hands" recipes, see
+  // content/recipes.ts FIELD_RECIPES), matching the existing "common tier
+  // never costs anything beyond materials" rule. There is NO level arm: the
+  // old hub's level-20 gate retired with it (2026-07-17 maintainer ruling).
+  stationType?: StationType;
 }
 
 // One performed craft (a runtime instance of a RecipeRecord being worked),

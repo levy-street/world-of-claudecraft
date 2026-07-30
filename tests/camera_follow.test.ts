@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { cameraFollowShouldSettle, cameraIsManual, updateFollowCameraYaw, wrapAngle } from '../src/game/camera_follow';
+import {
+  cameraFollowShouldSettle,
+  cameraIsManual,
+  updateFollowCameraYaw,
+  wrapAngle,
+} from '../src/game/camera_follow';
 
 describe('camera follow', () => {
   it('wraps angles to the shortest signed turn', () => {
@@ -81,14 +86,19 @@ describe('camera follow', () => {
   });
 
   it('treats keyboard turning as active follow movement', () => {
-    expect(cameraFollowShouldSettle({
-      forward: false,
-      back: false,
-      strafeLeft: false,
-      strafeRight: false,
-      turnLeft: true,
-      turnRight: false,
-    }, false)).toBe(true);
+    expect(
+      cameraFollowShouldSettle(
+        {
+          forward: false,
+          back: false,
+          strafeLeft: false,
+          strafeRight: false,
+          turnLeft: true,
+          turnRight: false,
+        },
+        false,
+      ),
+    ).toBe(true);
   });
 
   it('does not auto-follow while the camera drives the facing (mouse-camera move)', () => {
@@ -139,8 +149,8 @@ describe('camera follow', () => {
   it('treats mouse-camera mode as manual control even though mouselook reports false', () => {
     // Right-mouse mouselook already counts as manual; Mouse Camera mode reports
     // mouselook=false on desktop but must be folded in so it takes the same path.
-    expect(cameraIsManual(true, false)).toBe(true);   // classic right-mouse mouselook
-    expect(cameraIsManual(false, true)).toBe(true);   // Mouse Camera mode (always on)
+    expect(cameraIsManual(true, false)).toBe(true); // classic right-mouse mouselook
+    expect(cameraIsManual(false, true)).toBe(true); // Mouse Camera mode (always on)
     expect(cameraIsManual(true, true)).toBe(true);
     expect(cameraIsManual(false, false)).toBe(false); // classic, hands off — follow runs
   });
@@ -158,18 +168,23 @@ describe('camera follow', () => {
       let intended = Math.PI;
       let lastInterpFacing: number | null = camYaw;
       for (let f = 0; f < 90; f++) {
-        camYaw += dragPerFrame;        // the player's drag this frame
-        intended += dragPerFrame;      // where the drag actually asked the camera to point
+        camYaw += dragPerFrame; // the player's drag this frame
+        intended += dragPerFrame; // where the drag actually asked the camera to point
         const next = updateFollowCameraYaw({
-          camYaw, interpFacing: camYaw, frameDt: dt, lastInterpFacing,
-          mouselook: manual, moving: true, orbiting: false,
+          camYaw,
+          interpFacing: camYaw,
+          frameDt: dt,
+          lastInterpFacing,
+          mouselook: manual,
+          moving: true,
+          orbiting: false,
         });
         camYaw = next.camYaw;
         lastInterpFacing = next.lastInterpFacing;
       }
       return Math.abs(wrapAngle(camYaw - intended));
     };
-    expect(simulate(true)).toBeCloseTo(0, 6);   // fixed: camera goes exactly where dragged
+    expect(simulate(true)).toBeCloseTo(0, 6); // fixed: camera goes exactly where dragged
     expect(simulate(false)).toBeGreaterThan(0.5); // old wiring: drifts >0.5 rad (~30°+)
   });
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-**English** · [Español](docs/i18n/CONTRIBUTING.es.md) · [Español (España)](docs/i18n/CONTRIBUTING.es_ES.md) · [Français](docs/i18n/CONTRIBUTING.fr_FR.md) · [Français (Canada)](docs/i18n/CONTRIBUTING.fr_CA.md) · [Italiano](docs/i18n/CONTRIBUTING.it_IT.md) · [Deutsch](docs/i18n/CONTRIBUTING.de_DE.md) · [简体中文](docs/i18n/CONTRIBUTING.zh_CN.md) · [繁體中文](docs/i18n/CONTRIBUTING.zh_TW.md) · [한국어](docs/i18n/CONTRIBUTING.ko_KR.md) · [日本語](docs/i18n/CONTRIBUTING.ja_JP.md) · [Português (Brasil)](docs/i18n/CONTRIBUTING.pt_BR.md) · [Русский](docs/i18n/CONTRIBUTING.ru_RU.md) · [Nederlands](docs/i18n/CONTRIBUTING.nl_NL.md) · [Polski](docs/i18n/CONTRIBUTING.pl_PL.md) · [Bahasa Indonesia](docs/i18n/CONTRIBUTING.id_ID.md) · [Türkçe](docs/i18n/CONTRIBUTING.tr_TR.md) · [Svenska](docs/i18n/CONTRIBUTING.sv_SE.md) · [Tiếng Việt](docs/i18n/CONTRIBUTING.vi_VN.md) · [Dansk](docs/i18n/CONTRIBUTING.da_DK.md)
+**English** · [Español](docs/i18n/CONTRIBUTING.es.md) · [Español (España)](docs/i18n/CONTRIBUTING.es_ES.md) · [Français](docs/i18n/CONTRIBUTING.fr_FR.md) · [Français (Canada)](docs/i18n/CONTRIBUTING.fr_CA.md) · [Italiano](docs/i18n/CONTRIBUTING.it_IT.md) · [Deutsch](docs/i18n/CONTRIBUTING.de_DE.md) · [简体中文](docs/i18n/CONTRIBUTING.zh_CN.md) · [繁體中文](docs/i18n/CONTRIBUTING.zh_TW.md) · [한국어](docs/i18n/CONTRIBUTING.ko_KR.md) · [日本語](docs/i18n/CONTRIBUTING.ja_JP.md) · [Português (Brasil)](docs/i18n/CONTRIBUTING.pt_BR.md) · [Русский](docs/i18n/CONTRIBUTING.ru_RU.md) · [Čeština](docs/i18n/CONTRIBUTING.cs_CZ.md) · [Nederlands](docs/i18n/CONTRIBUTING.nl_NL.md) · [Polski](docs/i18n/CONTRIBUTING.pl_PL.md) · [Bahasa Indonesia](docs/i18n/CONTRIBUTING.id_ID.md) · [Türkçe](docs/i18n/CONTRIBUTING.tr_TR.md) · [Svenska](docs/i18n/CONTRIBUTING.sv_SE.md) · [Tiếng Việt](docs/i18n/CONTRIBUTING.vi_VN.md) · [Dansk](docs/i18n/CONTRIBUTING.da_DK.md)
 
 </div>
 
@@ -13,7 +13,7 @@ dungeon: it all counts, and you're welcome here.
 
 This guide will help you get set up and make your first contribution a smooth one.
 You don't need to be an expert. If anything is unclear, ask on
-[Discord](https://discord.gg/GjhnUsBtw) and someone will be happy to help.
+[Discord](https://discord.com/invite/worldofclaudecraft) and someone will be happy to help.
 
 By participating, you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
@@ -37,7 +37,8 @@ There's a place for everyone here:
 
 ## Getting started
 
-You'll need [Node.js 22+](https://nodejs.org/) and npm. For the multiplayer server
+You'll need [Node.js 26](https://nodejs.org/) and npm, the versions CI and the
+production image use. Older majors are untested. For the multiplayer server
 you'll also want [Docker](https://www.docker.com/) to run Postgres.
 
 ```bash
@@ -48,25 +49,83 @@ cd world-of-claudecraft
 # 2. Install dependencies
 npm ci
 
-# 3. Run the offline client (no server or database needed)
+# 3. Point git at the repository hooks (once per clone)
+git config core.hooksPath .githooks
+
+# 4. Run the offline client (no server or database needed)
 npm run dev          # open the URL it prints (usually http://localhost:5173)
 ```
 
 That's enough to play the offline world and work on most things. To run the full
-online stack:
+online stack you need a database password in your environment first:
 
 ```bash
+cp .env.example .env
+# set POSTGRES_PASSWORD and point DATABASE_URL at the same password
 npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
 npm run server       # build and run the authoritative game server on :8787
 npm run dev          # in another terminal; the client proxies to the server
 ```
 
+If you plan to run the full gate below, install the browser it drives once:
+`npx playwright install chromium`.
+
 The [README](README.md) has the full host, develop, and play guide, and the
 `CLAUDE.md` files throughout the repo document the conventions for each area.
 
+### TypeScript toolchain
+
+Type checking runs on TypeScript 7, the native compiler: `npx tsc --noEmit` works
+exactly as before and a full repo check now takes a few seconds instead of tens of
+seconds. The install is the official dual alias: the `typescript` package resolves
+the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
+`svelte-check` still consumes that API, while `@typescript/native` provides the
+`tsc` binary. Things to know:
+
+- **Editors.** VS Code needs the "TypeScript 7" marketplace extension
+  (`TypeScriptTeam.native-preview`) for native language service support until the
+  built-in support ships; it toggles via the `js/ts.experimental.useTsgo` setting,
+  and its "Disable TypeScript 7 Language Server" command is the sanctioned
+  fallback to the TypeScript 6 tsserver. JetBrains IDEs auto-detect the native
+  server only under the `@typescript/native-preview` package name, so they will
+  not pick it up from this repo's `@typescript/native` alias; their bundled
+  TypeScript 6 support works fine.
+- **Useful tsc flags.** `--checkers N` sets the parallel type-checker worker count
+  (default 4; results are identical at any count): lower it to cap memory on a
+  constrained runner, raise it on a many-core machine, and measure either way,
+  since more is not always faster. `--singleThreaded` disables all parallelism.
+  Checking a single file ad hoc (`npx tsc somefile.ts`) errors when the directory
+  has a `tsconfig.json`; pass `--ignoreConfig` for the old behavior.
+- **Lockfile.** Regenerate `package-lock.json` only with
+  `npx npm@10 install --package-lock-only`: the file uses npm-10 semantics, and
+  newer npm majors (including the npm 11 that CI's Node 26 bundles) silently drop
+  `svelte-check`'s nested optional-peer entries, which desyncs `npm ci` in CI.
+  Plain `npm ci` is safe under any npm major. After regenerating, confirm
+  `npm ci --dry-run` is in sync under both npm 10 and your workstation's npm.
+- **When to revisit.** Collapse the dual alias back to a single `typescript`
+  dependency once BOTH hold: the TypeScript 7.1 stable JS API has shipped
+  (TypeScript 7.0 ships no JS API at all; the replacement is tracked in
+  microsoft/typescript-go issue 2824), and sveltejs/language-tools issue 3063 has
+  closed with a released `svelte-check` that adopts it. svelte-check's
+  experimental `--tsgo` modes do not lift its TypeScript 6 API requirement, and
+  its in-progress TypeScript 7 loading (language-tools PR 3073) reads the
+  `@typescript/native` alias this repo already uses, so no rename is needed.
+
 ## Making your change
 
-1. **Create a branch** off `main`: `feature/<short-slug>` or `fix/<short-slug>`.
+1. **Start from the latest release branch, and never from `main`.** Active work is
+   integrated on a `release/vX.Y.Z` branch; `main` trails it and is not the base for
+   contributions. Find the newest one and branch off it:
+
+   ```bash
+   git fetch origin
+   git branch -r --list 'origin/release/*' | sort -V | tail -1   # the newest release branch
+   git switch -c feature/<short-slug> origin/release/vX.Y.Z
+   ```
+
+   Always run that lookup rather than copying a version number out of this guide:
+   release branches turn over often, and the newest one moves with every release.
+   Branches are named `feature/<short-slug>` or `fix/<short-slug>`.
 2. **Make focused commits.** Smaller, self-contained changes are easier to review
    and merge than large ones.
 3. **Add or update tests** for any behavior you change in `src/sim/` or `server/`.
@@ -86,24 +145,46 @@ root [`CLAUDE.md`](CLAUDE.md), but the short version:
   `performance.now` in sim logic. The same seed always produces the same world.
 - **Gameplay math follows classic-era MMO formulas** (rage, hit tables, armor, XP
   curves). Please don't invent balance numbers. Cite the formula instead.
+- **New logic lands as its own small, tested module behind an existing seam**,
+  rather than being appended to one of the large coordinator files. Data the
+  renderer or HUD reads crosses the `IWorld` interface (`src/world_api/`) and is
+  implemented in both the offline and online worlds; a new simulation system goes
+  behind `SimContext`; a new REST endpoint is a route module you can scaffold with
+  `npm run new:endpoint`.
 - **Don't hand-edit generated files** such as `*.generated.ts`. Regenerate them
   through the build.
+- **House copy style: no em dashes, en dashes, or emojis** anywhere, in code,
+  comments, docs, commit messages, PR text, or player-facing copy. Use commas,
+  colons, parentheses, or "to" for ranges. A pre-push check scans your diff and
+  blocks the push on a hit.
 - **Never commit secrets** or a `.env` file, and never enable `ALLOW_DEV_COMMANDS`
   in a production path, since it unlocks cheats.
 
+### Code style
+
+Formatting is [Biome](https://biomejs.dev/), configured in `biome.json`: 2-space
+indent, 100-column lines, single quotes, trailing commas. Format only the files
+you touched (`npx @biomejs/biome check --write <your-file.ts>`) and check them
+with `npm run ci:changed`. CI gates changed files only, so please don't reformat
+the wider tree: a repo-wide run surfaces long-standing debt that is not yours to
+fix.
+
 ## Before you open a pull request
 
-Please run these locally. They're the same checks CI runs:
+Run the repository gate locally. It is the same contract CI enforces:
 
 ```bash
-npm test                    # Vitest suite
-npx tsc --noEmit            # TypeScript typecheck (the project is strict)
-npm run security:gate       # malicious-code release gate (high-severity signatures; also asserted by npm test)
-npm run build               # production client build
+npm run gate
 ```
 
-If you changed server or headless code, also run `npm run build:server` and
-`npm run build:env`.
+While iterating, run a single suite (`npx vitest run tests/sim.test.ts`) and
+`npm run ci:changed` for formatting; `npm test` runs everything, and the suite map
+is in `tests/CLAUDE.md`. The full `npm run gate` covers generated-artifact
+freshness, the malware scan, formatting on changed files, the sound-effect
+conformance check, the whole test suite, a real-browser regression pass, the
+strict typecheck, and the client, server, and headless builds. The layered
+checks, from the pre-push floor up, are described in
+[`docs/qa-gate.md`](docs/qa-gate.md).
 
 Then test your change on both desktop and mobile, including a phone-sized viewport
 in portrait and landscape, if it touches anything players see. Touch targets
@@ -112,15 +193,23 @@ are documented in [`src/ui/CLAUDE.md`](src/ui/CLAUDE.md).
 
 ## Opening the pull request
 
-Push your branch and open a PR against `main`. The
+Push your branch and open a PR **targeting the same latest `release/vX.Y.Z` branch
+you started from. Never target `main`**, which is a release-time integration branch
+rather than the contribution base. GitHub will often preselect `main` for you, so
+change the base branch before you submit. The
 [pull request template](.github/PULL_REQUEST_TEMPLATE.md) will guide you through a
 short checklist. Please fill it in:
 
 - Describe **what** changed and **why**.
 - Link any related issue (for example, "Closes #123").
 - Add **screenshots or a clip for UI changes**, on desktop and mobile.
-- Confirm tests, typecheck, and the build pass, and that new strings are
-  translated.
+- Confirm `npm run gate` passes and new player-facing strings follow the English-first
+  contributor policy below.
+
+On your PR, CI runs formatting and linting over your changed files, the full test
+suite across four parallel shards, a browser regression pass, and the typecheck plus
+the client, server, and headless builds. That matches what `npm run gate` runs
+locally, so a green gate is a good predictor of a green PR.
 
 A green CI run and a complete checklist are what we look for before merging. A
 maintainer may suggest changes. That's a normal, collaborative part of the
@@ -128,23 +217,25 @@ process, not a rejection. We aim to be kind and constructive in review, and we a
 the same of you.
 
 > Commit messages and PR titles follow [Conventional Commits](https://www.conventionalcommits.org/)
-> with a scope where it fits (`feat(talents): ...`, `fix(net): ...`). It's a
-> convention we like rather than a strict requirement. Clear, descriptive messages
-> matter more than perfect formatting.
+> with a scope (`feat(talents): ...`, `fix(net): ...`). Every commit also carries a
+> body: after a blank line, one to four plain sentences saying what changed and why,
+> wrapped near 72 columns. A title on its own is not enough.
 
 <a id="localization"></a>
 
 ## Localization
 
-World of ClaudeCraft ships in many languages, and we keep it that way as the game
-grows. Every player-visible string is translated into every supported locale.
+World of ClaudeCraft ships in many languages. Every player-visible string must be a
+translation key, while feature contributors normally add only the English source.
 
 - All user-facing text is a `t()` key. Add new English copy to the matching
   per-domain module under [`src/ui/i18n.catalog/`](src/ui/i18n.catalog/) (new HUD
   chrome goes in `hud_chrome.ts`), then render it with `t('dotted.key', values)`.
   English-only is exactly right for a feature PR: the maintainer fills the other
   locales at release, so you do not edit the `src/ui/i18n.locales/` overlays and you
-  never leave an English placeholder or a `// TODO` in one.
+  never leave an English placeholder or a `// TODO` in one. The M16 exception is a new
+  wordy English value, which also needs the five non-Latin fills described in
+  [`src/ui/CLAUDE.md`](src/ui/CLAUDE.md).
 - Numbers, money, dates, units, and percentages go through the formatters
   (`formatNumber`, `formatMoney`, `formatDateTime`, `Intl`) rather than manual
   string building.
@@ -152,6 +243,9 @@ grows. Every player-visible string is translated into every supported locale.
   language-agnostic, must be re-localized at the client boundary in the same
   change. The guard test `npx vitest run tests/localization_fixes.test.ts`
   enforces this.
+- After adding or changing any string, run `npm run i18n:gen` and commit the
+  regenerated bundles in the same change. The gate and CI both diff the committed
+  artifacts against a fresh regeneration, so a stale bundle fails the build.
 
 So add your strings in English and open the PR; you do not need to translate them
 yourself. If you would like to help with translations, see the next section.
@@ -163,14 +257,21 @@ yourself. If you would like to help with translations, see the next section.
 Want to improve a language, or help bring the game to a new one? You don't need to
 write any game code to do it:
 
-1. Translations live in the per-language overlay files under
-   [`src/ui/i18n.locales/`](src/ui/i18n.locales/) (one per locale); the English keys
-   they mirror are defined in [`src/ui/i18n.catalog/`](src/ui/i18n.catalog/).
+1. Most player-facing translations live in the per-language overlay files under
+   [`src/ui/i18n.locales/`](src/ui/i18n.locales/) (one per locale), mirroring the
+   English keys in [`src/ui/i18n.catalog/`](src/ui/i18n.catalog/). Text emitted by
+   the simulation and the server is translated in `src/ui/sim_i18n.ts` and
+   `src/ui/server_i18n.ts`, talent copy in the `talent_i18n` modules, and the admin
+   dashboard has its own set under `src/admin/i18n.locales/`.
 2. Improve existing translations, or fill in any that read awkwardly.
-3. Run `npx tsc --noEmit` to confirm nothing is missing, then open a PR.
+3. Run `npm run i18n:gen`, commit the regenerated bundles alongside your overlay
+   edit, then run the localization suites
+   (`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`)
+   and open a PR. A type check alone will not tell you whether a key is missing,
+   since the overlays are intentionally sparse.
 
 To propose a brand-new locale, or to discuss tone and terminology, start a thread
-on [Discord](https://discord.gg/GjhnUsBtw) and we'll help you wire it up. Native
+on [Discord](https://discord.com/invite/worldofclaudecraft) and we'll help you wire it up. Native
 and fluent speakers are especially welcome. Good translations make the game feel
 like home for players everywhere.
 
@@ -184,17 +285,57 @@ Please use the [issue templates](https://github.com/levy-street/world-of-claudec
   mobile).
 - **Feature request.** Describe the problem you're trying to solve, not just the
   solution. Context helps us design the right thing.
+- **Security vulnerabilities.** Please don't open a public issue. Report them
+  privately by following [SECURITY.md](SECURITY.md), and we'll work with you on a
+  fix and on disclosure.
 
 ## Getting help
 
 Stuck, or just want to say hi? Join the
-[community Discord](https://discord.gg/GjhnUsBtw). No question is too small, and
+[community Discord](https://discord.com/invite/worldofclaudecraft). No question is too small, and
 new contributors are always welcome.
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the
-project's [MIT License](LICENSE), the same license that covers the project.
+By contributing code, you agree that your code contributions will be licensed
+under the project's [MIT License](LICENSE), the same license that covers the
+project.
+
+The MIT License means what it says: anyone may use, modify, and redistribute the
+code, commercially or not. Our
+[Terms of Service](https://worldofclaudecraft.com/terms) govern the hosted game
+we operate at worldofclaudecraft.com (accounts, conduct, virtual items) and do
+not restrict the rights the MIT License gives you or anyone else in this code.
+The "World of ClaudeCraft" and "Levy Street" names and branding are not covered
+by the MIT License.
+
+Original creative assets (sound recordings, music, art, and similar authored
+works) are the exception. If you contribute an original asset you created, you
+may instead keep copyright and contribute it under a license of your choice
+(for example CC BY-NC 4.0), provided that:
+
+- the license, the asset paths it covers, and your attribution are recorded in
+  the license table in [CREDITS.md](CREDITS.md) as part of the same pull
+  request, and
+- it includes at minimum a perpetual, royalty-free grant to Levy Street to use
+  the assets commercially in World of ClaudeCraft, including official releases
+  and the in-game store.
+
+For assets listed in the CREDITS.md table, that recorded license controls over
+the project's default MIT license.
+
+**Media assets with no CREDITS.md entry are not licensed under MIT.** The
+register is still being completed, so a missing entry means the terms are
+unrecorded, not that the asset is free to take. This is deliberate: it stops an
+unregistered contribution being given away by default. Code is the other way
+around, and anything not carved out in CREDITS.md is MIT.
+
+That is exactly why the register entry is not optional paperwork. If you
+contribute an asset without a CREDITS.md row, nobody downstream can use it and
+we have no record of what you granted us. Record the **Redistribution** column
+honestly too. It is what tells someone forking this project whether they may
+pass your asset on, and some rows are marked "No, permission required" precisely
+because they may not.
 
 ---
 

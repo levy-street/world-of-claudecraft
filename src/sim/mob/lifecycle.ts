@@ -28,10 +28,12 @@
 // through the seam, all of which still resolve on Sim.
 
 import { MOBS } from '../data';
+import * as deedsMod from '../deeds';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import { dist2d, type Entity, NYTHRAXIS_BOSS_ID } from '../types';
 import { groundHeight } from '../world';
+import { resetMobCharge } from './charge';
 
 const PACK_FRENZY_AURA_ID = 'pack_frenzy'; // attack-speed buff granted to surviving packmates
 
@@ -72,13 +74,31 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   // the hate table so loot rights never carry across lives.
   mob.bossDamagers.clear();
   despawnSummonedAdds(ctx, mob);
+  // A respawn ends the attempt; the deed window re-arms.
+  deedsMod.resetDeedEncounter(ctx, mob);
+  // The respawn reuses the entity id: an UNCREDITED death (untapped, or a
+  // non-player kill) skips the credited-kill taint consumption, so drop any
+  // kill-order taint here or the fresh mender spawns pre-denied. Respawn only:
+  // the evade reset deliberately keeps the taint (a deliberate post-move fix,
+  // not part of the verbatim extraction; draws no rng).
+  deedsMod.clearMenderTaint(ctx, mob.id);
   mob.firedSummons = 0;
   mob.enraged = false;
   mob.healedThisPull = false;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
+  // A mid-flight inferno channel dies with the life; the cadence reseeds and
+  // the hp gates re-arm alongside firedSummons above.
+  mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;
+  mob.infernoRemaining = 0;
+  mob.infernoPulsesFired = 0;
+  mob.infernoGatesFired = 0;
+  // Charge resets READY (cooldown 0), not telegraphed: a fresh life opens with it.
+  resetMobCharge(mob);
   mob.mendTimer = MOBS[mob.templateId]?.mendAlly?.every ?? 0;
   mob.wardTimer = MOBS[mob.templateId]?.wardAllies?.every ?? 0;
+  mob.channelTimer = MOBS[mob.templateId]?.channelHeal?.every ?? 0;
+  mob.channelRamp = 0;
   mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
   mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
   mob.warcryTimer = MOBS[mob.templateId]?.warcry?.every ?? 0;
@@ -177,6 +197,7 @@ export function armDeathThroes(ctx: SimContext, dead: Entity): void {
     text: `${dead.name} begins to swell — get clear!`,
     color: '#9acd32',
     entityId: dead.id,
+    telegraph: true,
   });
 }
 
@@ -194,11 +215,15 @@ export function detonateCorpse(ctx: SimContext, dead: Entity): void {
     color: '#9acd32',
     entityId: dead.id,
   });
+  const damagedPids: number[] = [];
   for (const meta of ctx.players.values()) {
     const pe = ctx.entities.get(meta.entityId);
     if (pe && !pe.dead && dist2d(pe.pos, dead.pos) <= dt.radius) {
       const dmg = Math.round(ctx.rng.range(dt.min, dt.max));
       ctx.dealDamage(dead, pe, dmg, false, school, dt.name, 'hit', true);
+      damagedPids.push(pe.id);
     }
   }
+  // A clean bloat kill means the blast caught nobody it credits.
+  deedsMod.onBloatDetonatedForDeeds(ctx, dead, damagedPids);
 }

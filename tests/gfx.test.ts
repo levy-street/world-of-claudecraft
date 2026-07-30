@@ -1,6 +1,8 @@
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { NAMEPLATE_INTERVAL_LOW_SEC, nameplateIntervalSec } from '../src/game/ui_tier_knobs';
+import { FAR_ANIM_RANGE_SCALE_MAX } from '../src/render/crowd_lod';
 import {
   classifyGpuRenderer,
   configureMaskedDoubleSidedVegetationMaterial,
@@ -12,6 +14,7 @@ import {
   gfxInternalsForTest,
   graphicsPresetLabel,
   isConstrainedBrowser,
+  isSoftwareGL,
   isWeakIntegratedGpu,
   resolveDefaultGraphicsPreset,
   shouldUseAutoGovernor,
@@ -52,10 +55,20 @@ describe('graphics tier resolution', () => {
   });
 
   it('treats phone-class and low-memory browsers as constrained', () => {
-    expect(isConstrainedBrowser({ ...desktop, maxTouchPoints: 1, coarsePointer: true })).toBe(true);
-    expect(isConstrainedBrowser({ ...desktop, maxTouchPoints: 1, narrowViewport: true })).toBe(
-      true,
-    );
+    expect(
+      isConstrainedBrowser({
+        ...desktop,
+        maxTouchPoints: 1,
+        coarsePointer: true,
+      }),
+    ).toBe(true);
+    expect(
+      isConstrainedBrowser({
+        ...desktop,
+        maxTouchPoints: 1,
+        narrowViewport: true,
+      }),
+    ).toBe(true);
     expect(isConstrainedBrowser({ ...desktop, deviceMemory: 4 })).toBe(true);
     expect(isConstrainedBrowser({ ...desktop, maxTouchPoints: 1 })).toBe(false);
     expect(isConstrainedBrowser(desktop)).toBe(false);
@@ -72,7 +85,12 @@ describe('graphics tier resolution', () => {
     // a URL-forced tier always wins, even on a touch device or software GL
     expect(
       tierFromHints(
-        { ...desktop, search: '?gfx=high', maxTouchPoints: 1, coarsePointer: true },
+        {
+          ...desktop,
+          search: '?gfx=high',
+          maxTouchPoints: 1,
+          coarsePointer: true,
+        },
         false,
       ),
     ).toBe('high');
@@ -164,12 +182,14 @@ describe('graphics tier resolution', () => {
     const ultra = gfxInternalsForTest.settingsFor('ultra');
 
     expect(low.standardMaterials).toBe(false);
+    expect(low.dynamicShadows).toBe(false);
     expect(low.leanFoliage).toBe(true);
     expect(low.lowPlus).toBe(true);
     expect(low.composer).toBe(false);
     expect(low.ao).toBe(false);
 
     expect(medium.standardMaterials).toBe(true);
+    expect(medium.dynamicShadows).toBe(true);
     expect(medium.leanFoliage).toBe(false);
     expect(medium.lowPlus).toBe(false);
     expect(mediumIris.standardMaterials).toBe(true);
@@ -183,6 +203,7 @@ describe('graphics tier resolution', () => {
     expect(medium.pixelRatioCap).toBeLessThan(high.pixelRatioCap);
 
     expect(high.standardMaterials).toBe(true);
+    expect(high.dynamicShadows).toBe(true);
     expect(high.composer).toBe(true);
     expect(high.ao).toBe(true);
     expect(high.msaaSamples).toBe(4);
@@ -202,6 +223,164 @@ describe('graphics tier resolution', () => {
     );
   });
 
+  it('sheds the memory-spike knobs on constrained (phone-class) browsers, cosmetics only', () => {
+    // A phone-class hint set (touch + coarse pointer): matches iOS WebKit, whose
+    // per-process memory ceiling kills the WebContent process at world entry.
+    const phone = {
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+    };
+    const medium = gfxInternalsForTest.settingsFor('medium', phone);
+    const high = gfxInternalsForTest.settingsFor('high', phone);
+    const ultra = gfxInternalsForTest.settingsFor('ultra', phone);
+    const desktopMedium = gfxInternalsForTest.settingsFor('medium');
+    const desktopHigh = gfxInternalsForTest.settingsFor('high');
+
+    expect(medium.constrainedMemory).toBe(true);
+    expect(desktopMedium.constrainedMemory).toBe(false);
+    expect(medium.dynamicShadows).toBe(false);
+    expect(high.dynamicShadows).toBe(false);
+    expect(ultra.dynamicShadows).toBe(false);
+    expect(desktopMedium.dynamicShadows).toBe(true);
+
+    // The big one-shot GPU allocations shrink...
+    expect(medium.shadowMap).toBe(1536);
+    expect(high.shadowMap).toBe(2048);
+    expect(ultra.shadowMap).toBe(2048);
+    expect(high.msaaSamples).toBe(0);
+    expect(ultra.msaaSamples).toBe(0);
+    expect(high.pixelRatioCap).toBe(1.48);
+    expect(ultra.pixelRatioCap).toBe(1.48);
+
+    // ...while actionable information remains untouched (fairness rule). The constrained
+    // profile keeps the Medium material/terrain identity and all entity visibility, while
+    // shedding cosmetic shadow and grass work that duplicates millions of triangles.
+    expect(medium.standardMaterials).toBe(desktopMedium.standardMaterials);
+    expect(medium.terrainSplat).toBe(desktopMedium.terrainSplat);
+    expect(medium.leanFoliage).toBe(false);
+    expect(medium.grassRadius).toBe(62);
+    expect(medium.grassStep).toBe(2.35);
+    expect(medium.maxPointLights).toBe(3);
+    expect(high.composer).toBe(desktopHigh.composer);
+    expect(high.ao).toBe(desktopHigh.ao);
+
+    // Low deviceMemory alone (Chromium's clamped signal) also lands constrained.
+    const lowMem = gfxInternalsForTest.settingsFor('medium', {
+      maxTouchPoints: 0,
+      coarsePointer: false,
+      narrowViewport: false,
+      deviceMemory: 4,
+    });
+    expect(lowMem.constrainedMemory).toBe(true);
+    expect(lowMem.dynamicShadows).toBe(false);
+    expect(lowMem.shadowMap).toBe(1536);
+    expect(lowMem.leanFoliage).toBe(false);
+    expect(lowMem.grassRadius).toBe(62);
+    expect(lowMem.grassStep).toBe(2.35);
+    expect(lowMem.maxPointLights).toBe(3);
+  });
+
+  it('uses the bounded-residency renderer profile for the packaged native iOS app', () => {
+    const nativeIos = {
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+      nativeApp: true,
+      platform: 'ios' as const,
+    };
+    const medium = gfxInternalsForTest.settingsFor('medium', nativeIos);
+    const high = gfxInternalsForTest.settingsFor('high', nativeIos);
+    const mobileWeb = gfxInternalsForTest.settingsFor('medium', {
+      ...nativeIos,
+      nativeApp: false,
+    });
+    const nativeAndroid = gfxInternalsForTest.settingsFor('medium', {
+      ...nativeIos,
+      platform: 'android',
+    });
+
+    expect(medium.tier).toBe('medium');
+    expect(medium.nativeIosMemoryProfile).toBe(true);
+    expect(medium.standardMaterials).toBe(false);
+    expect(medium.lowPlus).toBe(true);
+    // Collision-bearing tree/rock placement stays identical to other Medium clients.
+    expect(medium.leanFoliage).toBe(false);
+    expect(medium.terrainSplat).toBe(false);
+    expect(medium.composer).toBe(false);
+    expect(medium.ao).toBe(false);
+    expect(medium.dynamicShadows).toBe(false);
+    expect(medium.msaaSamples).toBe(0);
+    expect(medium.shadowMap).toBe(1024);
+    expect(medium.pixelRatioCap).toBeLessThanOrEqual(1.25);
+    expect(medium.grassRadius).toBeLessThan(62);
+    expect(medium.grassStep).toBeGreaterThan(2.35);
+    expect(medium.maxPointLights).toBe(2);
+    expect(medium.maxPooledCharacterVisuals).toBe(6);
+
+    // Higher labels can retain their density/bucket progression, but they must not
+    // re-enable WKWebView's unbounded GPU-residency features.
+    expect(high.nativeIosMemoryProfile).toBe(true);
+    expect(high.standardMaterials).toBe(false);
+    expect(high.terrainSplat).toBe(false);
+    expect(high.composer).toBe(false);
+    expect(high.dynamicShadows).toBe(false);
+
+    expect(mobileWeb.nativeIosMemoryProfile).toBe(false);
+    expect(mobileWeb.standardMaterials).toBe(true);
+    expect(nativeAndroid.nativeIosMemoryProfile).toBe(false);
+    expect(nativeAndroid.standardMaterials).toBe(true);
+    expect(nativeAndroid.maxPooledCharacterVisuals).toBe(Number.POSITIVE_INFINITY);
+  });
+
+  it('never raises the native iOS light bound from an Advanced low-effects override', () => {
+    const advanced = gfxInternalsForTest.settingsFor('high', {
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+      nativeApp: true,
+      platform: 'ios',
+      graphicsPreset: 5,
+      effectsQuality: 0,
+    });
+    expect(advanced.maxPointLights).toBe(2);
+  });
+
+  it('detects the packaged runtime platform from shipping navigator values', () => {
+    expect(
+      gfxInternalsForTest.mobilePlatformFromNavigator({
+        userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',
+        platform: 'iPhone',
+        maxTouchPoints: 5,
+      }),
+    ).toBe('ios');
+    expect(
+      gfxInternalsForTest.mobilePlatformFromNavigator({
+        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+        platform: 'MacIntel',
+        maxTouchPoints: 5,
+      }),
+    ).toBe('ios');
+    expect(
+      gfxInternalsForTest.mobilePlatformFromNavigator({
+        userAgent: 'Mozilla/5.0 (Linux; Android 16)',
+        platform: 'Linux armv8l',
+        maxTouchPoints: 5,
+      }),
+    ).toBe('android');
+    expect(
+      gfxInternalsForTest.mobilePlatformFromNavigator({
+        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 15_0)',
+        platform: 'MacIntel',
+        maxTouchPoints: 0,
+      }),
+    ).toBe('other');
+
+    const source = readFileSync(new URL('../src/render/gfx.ts', import.meta.url), 'utf8');
+    expect(source).toContain('nativeApp: NATIVE_APP');
+    expect(source).toContain('platform: mobilePlatformFromNavigator(nav)');
+  });
+
   it('detects older Intel integrated GPUs and lows the unset 3D tier instead of defaulting ultra', () => {
     expect(
       isWeakIntegratedGpu(
@@ -213,7 +392,10 @@ describe('graphics tier resolution', () => {
     // ceiling), instead of the old unset -> ultra default that ignored the GPU string entirely.
     expect(
       tierFromHints(
-        { ...desktop, gpuRenderer: 'ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)' },
+        {
+          ...desktop,
+          gpuRenderer: 'ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)',
+        },
         false,
       ),
     ).toBe('low');
@@ -221,9 +403,12 @@ describe('graphics tier resolution', () => {
 
   it('classifies GPU renderer strings into device-capability buckets', () => {
     expect(classifyGpuRenderer('ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)')).toBe('strongDesktop');
+    // Apple Silicon is its own class (split from strongDesktop) so it can default to the safe
+    // middle rather than ultra on thermally constrained MacBooks (issue 1676).
     expect(classifyGpuRenderer('ANGLE (Apple, ANGLE Metal Renderer: Apple M2)')).toBe(
-      'strongDesktop',
+      'appleSilicon',
     );
+    expect(classifyGpuRenderer('Apple M1 Pro')).toBe('appleSilicon');
     // AMD discrete + Intel Arc desktop -> strongDesktop (the "(TM)" Windows drivers print is tolerated)
     expect(classifyGpuRenderer('ANGLE (AMD, AMD Radeon RX 6800 XT Direct3D11 vs_5_0 ps_5_0)')).toBe(
       'strongDesktop',
@@ -241,6 +426,13 @@ describe('graphics tier resolution', () => {
     expect(classifyGpuRenderer('Google SwiftShader')).toBe('software');
     expect(classifyGpuRenderer('Mesa llvmpipe (LLVM 15.0.7, 256 bits)')).toBe('software');
     expect(classifyGpuRenderer('Apple Software Renderer')).toBe('software');
+    // WARP, the Windows D3D11 software fallback Chromium 141 switched to after removing the
+    // SwiftShader WebGL path: caught via its "Microsoft Basic Render" tokens, not a bare "warp".
+    expect(
+      classifyGpuRenderer(
+        'ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0)',
+      ),
+    ).toBe('software');
     // the codebase's named weak-integrated parts stay weak (checked before mid-integrated)
     expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)')).toBe('weak');
     expect(classifyGpuRenderer('Adreno (TM) 330')).toBe('weak');
@@ -270,14 +462,43 @@ describe('graphics tier resolution', () => {
     expect(classifyGpuRenderer('')).toBe('unknown');
   });
 
+  it('isSoftwareGL reads the live GL context and flags WARP + SwiftShader, not a real GPU', () => {
+    const fakeRenderer = (rendererString: string): THREE.WebGLRenderer => {
+      const getParameter = vi.fn(() => rendererString);
+      const getExtension = vi.fn((name: string) =>
+        name === 'WEBGL_debug_renderer_info' ? { UNMASKED_RENDERER_WEBGL: 0x9246 } : null,
+      );
+      const gl = { getExtension, getParameter };
+      return { getContext: () => gl } as unknown as THREE.WebGLRenderer;
+    };
+    // WARP is now caught here too (the narrow /swiftshader|llvmpipe|software/ used to miss it).
+    expect(
+      isSoftwareGL(
+        fakeRenderer('ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0)'),
+      ),
+    ).toBe(true);
+    expect(isSoftwareGL(fakeRenderer('Google SwiftShader'))).toBe(true);
+    expect(isSoftwareGL(fakeRenderer('Mesa/X.org llvmpipe (LLVM 15.0.6, 256 bits)'))).toBe(true);
+    expect(isSoftwareGL(fakeRenderer('ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)'))).toBe(false);
+  });
+
   describe('resolveDefaultGraphicsPreset: device-aware first-run default (medium fallback)', () => {
     // preset numbers: 1 low, 2 medium, 3 high, 4 ultra (never 5/advanced as an auto-default).
-    const phone: GfxRuntimeHints = { ...desktop, maxTouchPoints: 5, coarsePointer: true };
+    const phone: GfxRuntimeHints = {
+      ...desktop,
+      maxTouchPoints: 5,
+      coarsePointer: true,
+    };
 
     it('falls back to MEDIUM for a masked/unknown or mid GPU with no corroborating signal', () => {
       expect(resolveDefaultGraphicsPreset(desktop)).toBe(2); // no GPU/mem/cores -> medium
       expect(resolveDefaultGraphicsPreset({ ...desktop, gpuRenderer: 'Apple GPU' })).toBe(2); // masked
-      expect(resolveDefaultGraphicsPreset({ ...desktop, gpuRenderer: 'Intel Iris Xe' })).toBe(2); // mid
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          gpuRenderer: 'Intel Iris Xe',
+        }),
+      ).toBe(2); // mid
       // AMD Ryzen iGPU desktop (ample RAM + cores) must bucket midIntegrated -> MEDIUM, NOT be
       // promoted to HIGH via the unknown-desktop branch (the "(TM)" misclassification regression).
       expect(
@@ -291,9 +512,12 @@ describe('graphics tier resolution', () => {
     });
 
     it('drops a software or weak GPU to LOW (only the GPU class can low, never RAM/cores)', () => {
-      expect(resolveDefaultGraphicsPreset({ ...desktop, gpuRenderer: 'Google SwiftShader' })).toBe(
-        1,
-      );
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          gpuRenderer: 'Google SwiftShader',
+        }),
+      ).toBe(1);
       // a bare "software" renderer (e.g. Apple's GPU-disabled fallback) lows on BOTH paths, even on
       // a Chrome box with ample mem+cores (where the old asymmetry would have persisted it HIGH).
       expect(
@@ -307,25 +531,70 @@ describe('graphics tier resolution', () => {
       expect(tierFromHints({ ...desktop, gpuRenderer: 'Apple Software Renderer' }, false)).toBe(
         'low',
       );
-      expect(resolveDefaultGraphicsPreset({ ...desktop, gpuRenderer: 'Adreno (TM) 330' })).toBe(1);
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          gpuRenderer: 'Adreno (TM) 330',
+        }),
+      ).toBe(1);
       // entry-level Mali-G52 budget phone -> LOW (must not be shadowed into the mid Mali bucket)
       expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Mali-G52' })).toBe(1);
       // PITFALL 1: a thin RAM/core count NEVER pulls a tier down (a flagship iPhone reports
       // cores=2 / mem=undefined); an unknown GPU with low mem+cores stays MEDIUM, not low.
       expect(resolveDefaultGraphicsPreset({ ...desktop, deviceMemory: 2 })).toBe(2);
       expect(
-        resolveDefaultGraphicsPreset({ ...desktop, deviceMemory: 4, hardwareConcurrency: 2 }),
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          deviceMemory: 4,
+          hardwareConcurrency: 2,
+        }),
       ).toBe(2);
     });
 
     it('caps mobile at HIGH: flagship / strong-on-touch -> HIGH, weak phone -> LOW, else MEDIUM', () => {
       expect(
-        resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Adreno (TM) 740', deviceMemory: 8 }),
+        resolveDefaultGraphicsPreset({
+          ...phone,
+          gpuRenderer: 'Adreno (TM) 740',
+          deviceMemory: 8,
+        }),
       ).toBe(3); // flagship phone
-      // an M-series iPad (strong GPU on a touch device) is capped at HIGH (ultra is desktop-only)
+      // an M-series iPad (Apple Silicon on a touch device) is capped at HIGH (ultra is desktop-only);
+      // the touch cap is unchanged by the MacBook thermal default (issue 1676).
       expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Apple M2' })).toBe(3);
-      expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Adreno (TM) 330' })).toBe(1); // old phone
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...phone,
+          gpuRenderer: 'Adreno (TM) 330',
+        }),
+      ).toBe(1); // old phone
       expect(resolveDefaultGraphicsPreset(phone)).toBe(2); // typical/unknown phone -> medium
+    });
+
+    it('defaults Apple Silicon Macs to MEDIUM, not ultra (thermally constrained laptops, issue 1676)', () => {
+      // A MacBook (Apple Silicon on a non-touch device) with ample RAM+cores would have earned
+      // ULTRA under the old strongDesktop bucket; it now defaults to the safe middle so the fanless
+      // form factor does not sit pinned at ultra. Ample corroborating signal must NOT promote it.
+      for (const gpuRenderer of ['ANGLE (Apple, ANGLE Metal Renderer: Apple M2)', 'Apple M3 Max']) {
+        expect(
+          resolveDefaultGraphicsPreset({
+            ...desktop,
+            gpuRenderer,
+            deviceMemory: 8,
+            hardwareConcurrency: 16,
+          }),
+        ).toBe(2);
+      }
+      // Non-regression: a real strong desktop discrete GPU still reaches ULTRA (the split did not
+      // demote NVIDIA/AMD/Arc).
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)',
+          deviceMemory: 8,
+          hardwareConcurrency: 16,
+        }),
+      ).toBe(4);
     });
 
     it('rewards a strong desktop: ULTRA with a corroborating signal (or unreported mem), else HIGH', () => {
@@ -353,11 +622,19 @@ describe('graphics tier resolution', () => {
 
     it('raises an unknown desktop GPU to HIGH only with ample RAM AND cores', () => {
       expect(
-        resolveDefaultGraphicsPreset({ ...desktop, deviceMemory: 8, hardwareConcurrency: 12 }),
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          deviceMemory: 8,
+          hardwareConcurrency: 12,
+        }),
       ).toBe(3);
       // ample on only one axis is not enough for the unknown bucket -> MEDIUM
       expect(
-        resolveDefaultGraphicsPreset({ ...desktop, deviceMemory: 8, hardwareConcurrency: 4 }),
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          deviceMemory: 8,
+          hardwareConcurrency: 4,
+        }),
       ).toBe(2);
     });
 
@@ -387,7 +664,9 @@ describe('graphics tier resolution', () => {
       const getContext = vi.fn(() =>
         renderer === undefined ? null : { getExtension, getParameter },
       );
-      vi.stubGlobal('document', { createElement: vi.fn(() => ({ getContext })) });
+      vi.stubGlobal('document', {
+        createElement: vi.fn(() => ({ getContext })),
+      });
     }
     afterEach(() => {
       vi.unstubAllGlobals();
@@ -459,5 +738,39 @@ describe('graphics tier resolution', () => {
     expect(mat.forceSinglePass).toBe(true);
     expect(mat.depthTest).toBe(true);
     expect(mat.depthWrite).toBe(true);
+  });
+});
+
+// The animated far character band (crowd_lod.ts) is skinning + draw-call cost, so
+// its per-tier ceiling opts out exactly where extra rigs are unaffordable. A tier
+// that silently regained the extension would push articulated rigs out to ~75yd on
+// software GL and phone WebKit, which is the profile the frozen far mesh exists for.
+describe('animated far character band: per-tier ceiling', () => {
+  it('opts the low tier and software GL out (straight-to-frozen far LOD)', () => {
+    expect(gfxInternalsForTest.settingsFor('low', desktop).farCharacterAnimScale).toBe(1);
+  });
+
+  it('extends the band on the desktop tiers', () => {
+    for (const tier of ['medium', 'high', 'ultra'] as const) {
+      const scale = gfxInternalsForTest.settingsFor(tier, desktop).farCharacterAnimScale;
+      expect(scale).toBe(FAR_ANIM_RANGE_SCALE_MAX);
+      expect(scale).toBeGreaterThan(1);
+    }
+  });
+
+  it('opts the phone memory profiles out on every tier', () => {
+    const nativeIos: GfxRuntimeHints = {
+      search: '',
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+      nativeApp: true,
+      platform: 'ios',
+    };
+    const constrained: GfxRuntimeHints = { ...nativeIos, nativeApp: false, deviceMemory: 2 };
+    for (const tier of ['medium', 'high', 'ultra'] as const) {
+      expect(gfxInternalsForTest.settingsFor(tier, nativeIos).farCharacterAnimScale).toBe(1);
+      expect(gfxInternalsForTest.settingsFor(tier, constrained).farCharacterAnimScale).toBe(1);
+    }
   });
 });

@@ -1,5 +1,5 @@
 // Player-rebindable controls. Every bindable game action, movement, camera,
-// targeting, interface windows, and the 23 action-bar slots, lives in one
+// targeting, interface windows, and the 34 action-bar slots, lives in one
 // registry, and the Keybinds map holds up to two KeyboardEvent.codes per
 // action (primary + secondary, e.g. W and ArrowUp both Move Forward). Input
 // dispatches edge actions and polls held (movement) actions through this map;
@@ -10,6 +10,8 @@
 //
 // Escape is deliberately NOT a bindable action: it always opens/closes the
 // game menu, so it stays out of the registry and is refused by bind().
+
+import { repairStoredBindings } from './keybinds_repair';
 
 export type BindKind = 'held' | 'edge';
 
@@ -27,8 +29,8 @@ export interface BindAction {
   allowShared?: boolean;
 }
 
-// slot 0 is Attack, 1..11 the primary ability bar, 12..22 the secondary bar.
-export const ACTION_BAR_SLOTS = 23;
+// Slot 0 is Attack. Slots 1..11, 12..22, and 23..33 are the three ability rows.
+export const ACTION_BAR_SLOTS = 34;
 
 const SLOT_DEFAULTS = [
   'Digit1',
@@ -57,6 +59,19 @@ const SLOT_DEFAULTS = [
   'Numpad9',
   'Numpad0',
   'NumpadDecimal',
+  // Third bar (slots 23..33): shifted numpad bindings keep the row distinct
+  // while preserving the same physical layout as the secondary bar.
+  'Shift+Numpad1',
+  'Shift+Numpad2',
+  'Shift+Numpad3',
+  'Shift+Numpad4',
+  'Shift+Numpad5',
+  'Shift+Numpad6',
+  'Shift+Numpad7',
+  'Shift+Numpad8',
+  'Shift+Numpad9',
+  'Shift+Numpad0',
+  'Shift+NumpadDecimal',
 ];
 
 export const BIND_ACTIONS: BindAction[] = [
@@ -165,7 +180,16 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyV'],
   },
   { id: 'talents', label: 'Talents', category: 'Interface', kind: 'edge', defaults: ['KeyN'] },
-  { id: 'meters', label: 'Damage Meters', category: 'Interface', kind: 'edge', defaults: ['KeyH'] },
+  // Every bare letter is claimed by another default (see the KeyZ note on
+  // Book of Deeds below), so Damage Meters parks on the shifted layer of its
+  // thematically nearest key (H, "hate"/threat), like deeds does on Z.
+  {
+    id: 'meters',
+    label: 'Damage Meters',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyH'],
+  },
   {
     id: 'social',
     label: 'Friends & Guild',
@@ -181,11 +205,28 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyG'],
   },
   {
+    // Shift+KeyI: bare KeyI belongs to Calendar (unchanged).
+    id: 'dungeonFinder',
+    label: 'Dungeon Finder',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyI'],
+  },
+  {
     id: 'valecup',
     label: 'Vale Cup',
     category: 'Interface',
     kind: 'edge',
     defaults: ['KeyY'],
+  },
+  // Mount / dismount toggle: Backquote avoids the release-owned KeyZ layers
+  // for weapon sheathing and the Book of Deeds.
+  {
+    id: 'mount',
+    label: 'Mount / Dismount',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Backquote'],
   },
   {
     id: 'leaderboard',
@@ -208,6 +249,25 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyU'],
   },
+  // The Book of Deeds parks on the shifted layer of KeyZ, like Damage Meters
+  // does on H and the Shift+digit secondary bar. Rebindable like any other action.
+  {
+    id: 'deeds',
+    label: 'Book of Deeds',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyZ'],
+  },
+  // Professions parks on the shifted layer of KeyP like Deeds does on Z:
+  // every bare letter default is already taken, and Shift+P keeps the
+  // Spellbook's plain P untouched. Rebindable like any action.
+  {
+    id: 'professions',
+    label: 'Professions',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyP'],
+  },
   {
     id: 'chat',
     label: 'Open Chat',
@@ -222,11 +282,51 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'held',
     defaults: ['KeyX'],
   },
+  {
+    id: 'sheathe',
+    label: 'Sheathe/Unsheathe Weapon',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['KeyZ'],
+  },
+  // Pet bar (hunter/warlock pet commands). Bound to Ctrl + 1..5 by default, so the
+  // action-bar 1..5 stay free; every one is rebindable like any other action. The
+  // handlers live in main.ts (onPet -> the IWorld pet commands).
+  {
+    id: 'petAttack',
+    label: 'Pet: Attack',
+    category: 'Pet',
+    kind: 'edge',
+    defaults: ['Ctrl+Digit1'],
+  },
+  { id: 'petStop', label: 'Pet: Stop', category: 'Pet', kind: 'edge', defaults: ['Ctrl+Digit2'] },
+  { id: 'petTaunt', label: 'Pet: Taunt', category: 'Pet', kind: 'edge', defaults: ['Ctrl+Digit3'] },
+  {
+    id: 'petDefensive',
+    label: 'Pet: Defensive',
+    category: 'Pet',
+    kind: 'edge',
+    defaults: ['Ctrl+Digit4'],
+  },
+  {
+    id: 'petAggressive',
+    label: 'Pet: Aggressive',
+    category: 'Pet',
+    kind: 'edge',
+    defaults: ['Ctrl+Digit5'],
+  },
   // Action bar (slot 0 = Attack)
   ...SLOT_DEFAULTS.map(
     (code, i): BindAction => ({
       id: `slot${i}`,
-      label: i === 0 ? 'Attack' : i <= 11 ? `Action Bar ${i + 1}` : `Secondary Bar ${i - 11}`,
+      label:
+        i === 0
+          ? 'Attack'
+          : i <= 11
+            ? `Action Bar ${i + 1}`
+            : i <= 22
+              ? `Secondary Bar ${i - 11}`
+              : `Third Bar ${i - 22}`,
       category: 'Action Bar',
       kind: 'edge',
       defaults: [code],
@@ -386,6 +486,22 @@ export function keyLabel(combo: string | null): string {
   return head + codeLabel(code);
 }
 
+/**
+ * Compact keycap form of a binding label for the tiny UI keycaps (a side-menu
+ * button is 34px wide): lowercase, with modifier words shortened to classic
+ * one-letter prefixes, so "Shift+Z" reads "s-z" and stays inside the cap.
+ * Full-length surfaces (aria labels, tooltips, the keybind options rows) keep
+ * keyLabel/primaryLabel untouched.
+ */
+export function keyCapLabel(label: string): string {
+  return label
+    .toLowerCase()
+    .replace(/shift\+/g, 's-')
+    .replace(/ctrl\+/g, 'c-')
+    .replace(/alt\+/g, 'a-')
+    .replace(/meta\+/g, 'm-');
+}
+
 export class Keybinds {
   // actionId -> [primary, secondary] codes (either may be null)
   private map = new Map<string, (string | null)[]>();
@@ -415,8 +531,16 @@ export class Keybinds {
     // still seeds rather than dropping to bare defaults; the legacy blob is only
     // ever read here, never overwritten.
     let obj = readBindingsBlob(this.storeKey);
-    if (!obj && this.storeKey !== KEY_PREFIX) obj = readBindingsBlob(KEY_PREFIX);
+    if (!obj && this.storeKey !== KEY_PREFIX) {
+      obj = readBindingsBlob(KEY_PREFIX);
+    }
     if (!obj) return;
+    // One-time, signature-keyed repair of profiles corrupted by reverted layout
+    // changes (Q/E strafe overhaul; targetFriendly/meters KeyH collision). It
+    // deletes only the exact corrupted keys so they re-seed to current defaults
+    // below, and leaves every other stored value (including deliberate remaps)
+    // untouched. See keybinds_repair.ts.
+    repairStoredBindings(obj);
     // Apply stored codes over the defaults, but only for known actions and
     // never letting one code land on two actions (first writer keeps it).
     // Actions absent from the stored blob (e.g. ones added in a later release
@@ -430,12 +554,12 @@ export class Keybinds {
       const shared = actionAllowsShared(a.id);
       for (let i = 0; i < SLOTS_PER_ACTION; i++) {
         const v = entry[i];
+        if (typeof v !== 'string' || isReservedCode(v)) continue;
         // Shared actions keep their code even if another action already claimed
         // it, and never claim it themselves, so the overlap survives a round-trip.
-        if (typeof v === 'string' && !isReservedCode(v) && (shared || !claimed.has(v))) {
-          slots[i] = v;
-          if (!shared) claimed.add(v);
-        }
+        if (!shared && claimed.has(v)) continue;
+        slots[i] = v;
+        if (!shared) claimed.add(v);
       }
       this.map.set(a.id, slots);
     }

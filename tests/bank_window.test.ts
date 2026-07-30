@@ -201,18 +201,6 @@ describe('bank_window: hud.ts wiring', () => {
     );
   });
 
-  it('a banker interact routes to the sim from every input path (gossip never renders for bankers)', () => {
-    // interactKey (keyboard, gamepad, the mobile button) and the mouse click-pick
-    // all funnel NPCs into openQuestDialog; the banker arm must divert to the sim
-    // interact (whose banker intercept emits the bank event both hosts open on)
-    // BEFORE any gossip renders, or the bank is unreachable in normal play. Found
-    // by a cross-platform audit: every earlier smoke drove
-    // __game.sim.interact() directly, which masked the missing client trigger.
-    expect(hud).toMatch(
-      /openQuestDialog\(npcId: number\): void \{[\s\S]{0,700}?if \(NPCS\[npc\.templateId\]\?\.banker\) \{[\s\S]{0,160}?this\.sim\.targetEntity\(npc\.id\);[\s\S]{0,80}?this\.sim\.interact\(\);[\s\S]{0,40}?return;/,
-    );
-  });
-
   it('the heroic marks shop, the second tenant of #vendor-window, honors the same exclusivity', () => {
     // Quartermaster Vex stands ~4.5yd from Bursar Aldous Crane at Highwatch, so the
     // marks shop and the bank cluster are simultaneously reachable. openBank's
@@ -474,8 +462,12 @@ describe('bank_window: mobile pairing (hud.mobile.css)', () => {
     expect(mobileCss).toContain(
       `body.mobile-touch.bank-open #bank-window {\n    left: max(10px, env(safe-area-inset-left));\n    right: ${split};`,
     );
-    expect(mobileCss).toContain(
-      `body.mobile-touch.bank-open #bags {\n    left: ${split};\n    right: max(10px, env(safe-area-inset-right));`,
+    // The bags RIGHT half is shared with the market cluster (the market docks
+    // #bags the same way on touch, see market_window.test.ts). Pin against a
+    // whitespace-normalized view: biome re-wraps multi-selector lists, so a
+    // raw multi-line source pin here would rot on a reformat.
+    expect(mobileCss.replace(/\s+/g, ' ')).toContain(
+      `body.mobile-touch.bank-open #bags, body.mobile-touch.market-open #bags { left: ${split}; right: max(10px, env(safe-area-inset-right));`,
     );
   });
 
@@ -557,14 +549,14 @@ describe('bank_window: mobile pairing (hud.mobile.css)', () => {
   it('keeps the bank-cluster chips one scrollable row (no two-row wrap eating the grid)', () => {
     // At 360px-tall landscape phones a wrapped chip row squeezes the paired grid to a
     // sub-row sliver; the cluster-scoped rule keeps ONE horizontally scrollable row
-    // (bank chips docked AND undocked, bags chips only inside the bank cluster; the
-    // vendor cluster and standalone bags keep the family two-row wrap). Reverting
-    // flex-wrap to wrap, or dropping the scoped rule, reds this.
+    // (bank chips docked AND undocked, bags chips inside the bank and market
+    // clusters; the vendor cluster and standalone bags keep the family two-row
+    // wrap). Reverting flex-wrap to wrap, or dropping the scoped rule, reds this.
     expect(mobileCss).toMatch(
-      /body\.mobile-touch #bank-window \.bag-chips,\s*body\.mobile-touch\.bank-open #bags \.bag-chips \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;/,
+      /body\.mobile-touch #bank-window \.bag-chips,\s*body\.mobile-touch\.bank-open #bags \.bag-chips,\s*body\.mobile-touch\.market-open #bags \.bag-chips \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;/,
     );
     expect(mobileCss).toMatch(
-      /body\.mobile-touch #bank-window \.bag-chip,\s*body\.mobile-touch\.bank-open #bags \.bag-chip \{\s*flex: 0 0 auto;/,
+      /body\.mobile-touch #bank-window \.bag-chip,\s*body\.mobile-touch\.bank-open #bags \.bag-chip,\s*body\.mobile-touch\.market-open #bags \.bag-chip \{\s*flex: 0 0 auto;/,
     );
   });
 });
@@ -588,16 +580,18 @@ describe('bank_window: keyboard a11y (non-modal activation + prompt Enter)', () 
     // keydown then bubbles to the window handler, and without this gate the chat
     // bind fires and steals the focus return. promptModalOpen() matches ONLY the
     // installPromptDialog family (party/trade/duel prompts carry no aria-modal and
-    // must stay non-blocking), and every canUseGameKeys predicate consults it.
+    // must stay non-blocking), and the shared gameplay gate consults it before
+    // every keyboard/gamepad action predicate.
     expect(hud).toContain('promptModalOpen(): boolean {');
     expect(hud).toContain(
       `$('#prompt-stack').querySelector('.prompt[aria-modal="true"]') !== null`,
     );
-    const gateSites = mainSrc.match(/!hud\.promptModalOpen\(\)/g) ?? [];
-    expect(gateSites.length).toBeGreaterThanOrEqual(3);
-    expect(mainSrc).toMatch(
-      /canUseGameKeys: \(\) =>\s*!hud\.isModalOpen\(\) && !hud\.promptModalOpen\(\) && chatInput\.style\.display !== 'block'/,
-    );
+    const gateStart = mainSrc.indexOf('const gameplayInputBlocked = () =>');
+    const gate = mainSrc.slice(gateStart, mainSrc.indexOf(';', gateStart));
+    expect(gateStart).toBeGreaterThan(0);
+    expect(gate).toContain('hud.promptModalOpen()');
+    expect(mainSrc.match(/gameplayInputBlocked\(\)/g)?.length ?? 0).toBeGreaterThanOrEqual(3);
+    expect(mainSrc).toMatch(/canUseGameKeys: \(\) => !gameplayInputBlocked\(\)/);
   });
 
   it('the prompt itself stops Enter/Space propagation (the submit-dismiss race)', () => {

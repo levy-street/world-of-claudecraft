@@ -54,6 +54,10 @@ describe('delves quest tracker layout', () => {
     expect(wrapperRule).toContain('position: absolute');
     expect(wrapperRule).toContain('display: flex');
     expect(wrapperRule).toContain('flex-direction: column');
+    // Above #side-buttons (z-index: 19): without this, the rail's icon strip
+    // paints over the tracker text again on short viewports, and nothing
+    // else in the suite catches it (the hitbox fix below is independent).
+    expect(wrapperRule).toMatch(/z-index:\s*20;/);
 
     const questRule = /#quest-tracker\s*\{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
     const delveRule = /#delve-tracker\s*\{([^}]*)\}/.exec(hudCss)?.[1] ?? '';

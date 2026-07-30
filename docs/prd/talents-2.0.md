@@ -230,6 +230,88 @@ Reasons:
 So the whole player-facing model is: pick a spec at 10 (signature ability +
 mastery), pick 1 of 3 at levels 5/8/11/14/17/20. Nothing else.
 
+### All-27 extension (owner: 2026-07-07)
+
+Owner extended impactful masteries to every spec. The prior PR B pass already
+covered 10 specs; this follow-up updates the remaining 13. Warrior arms,
+warrior fury, warrior protection, and shaman elemental were already strong
+and remain unchanged.
+
+| Spec | New mastery fields |
+|---|---|
+| paladin/protection | global: threatPct 0.5; stats: armorPct 0.2 |
+| paladin/retribution | global: meleeDmgPct 0.2, spellDmgPct 0.2 |
+| hunter/marksmanship | global: meleeDmgPct 0.2; stats: crit 0.03 |
+| hunter/survival | global: meleeDmgPct 0.15; stats: agiPct 0.15 |
+| mage/arcane | global: spellDmgPct 0.15, spellHastePct 0.1 |
+| rogue/assassination | global: dotDmgPct 0.2; stats: crit 0.03 |
+| rogue/subtlety | global: critDmgPct 0.4; stats: agiPct 0.1 |
+| priest/holy | global: healPct 0.2 |
+| priest/shadow | global: dotDmgPct 0.15, spellDmgPct 0.1 |
+| shaman/enhancement | global: meleeHastePct 0.1, meleeDmgPct 0.1 |
+| druid/balance | global: spellDmgPct 0.15, spellHastePct 0.1 |
+| druid/feral | global: meleeDmgPct 0.15, dotDmgPct 0.15, threatPct 0.2 |
+| warlock/destruction | global: critDmgPct 0.5; stats: crit 0.02 |
+
+### Mastery rating readiness (owner directive 2026-07-07)
+
+Every spec's mastery must be improvable by a FUTURE mastery stat (an item
+rating like haste/crit rating; NOT implemented yet). The model, WoW-style:
+each spec has exactly ONE designated scalable mastery axis; the rating
+multiplies that axis's magnitude (the shipped value is the base at zero
+rating); any other component of the mastery (armor, max health, the static
+secondary) does NOT scale. The rating lands in a later itemization PR; this
+section fixes the per-spec axis NOW so no mastery ships in a shape the
+rating cannot scale. Owner exemplars: combat scales its 10% attack speed,
+frost scales its 25% Frost spell damage, fire scales how much harder its
+crits land.
+
+Frost was reshaped for this (2026-07-07): its mastery is now "+25% Frost
+spell damage" via ability-scoped mods on the frost kit (frostbolt,
+frost_nova; ability-scoped so the mage's fire/arcane baseline spells stay
+untouched) plus the static +10% armor. The crit-vs-rooted-or-chilled
+identity moves to a Shatter-style row option in the flip content (the P4
+machinery stays).
+
+The designated scalable axis per spec (base value = shipped magnitude):
+
+| Spec | Scalable axis | Base |
+|---|---|---|
+| warrior/arms | melee ability damage (meleeDmgPct) | 15% |
+| warrior/fury | crit chance (crit) | 10% |
+| warrior/prot | threat (threatPct) | 50% |
+| paladin/holy | heal crit damage (critDmgPct on heals) | +50% (2x) |
+| paladin/protection | threat (threatPct) | 50% |
+| paladin/retribution | Holy + physical ability damage (paired meleeDmgPct + spellDmgPct, scale together) | 20% |
+| hunter/beast_mastery | pet damage (petDmgPct) | 35% |
+| hunter/marksmanship | physical ability damage (meleeDmgPct) | 20% |
+| hunter/survival | physical ability damage (meleeDmgPct) | 15% |
+| mage/arcane | spell damage (spellDmgPct) | 15% |
+| mage/fire | spell crit damage (critDmgPct) | +50% (2x) |
+| mage/frost | Frost spell damage (frost-kit ability dmgPct) | 25% |
+| rogue/assassination | bleed damage (dotDmgPct) | 20% |
+| rogue/combat | attack speed (meleeHastePct) | 10% |
+| rogue/subtlety | crit damage (critDmgPct) | +40% |
+| priest/discipline | shield absorb (absorbPct) | 30% |
+| priest/holy | healing done (healPct) | 20% |
+| priest/shadow | damage-over-time damage (dotDmgPct) | 15% |
+| shaman/elemental | spell damage (spellDmgPct) | 15% |
+| shaman/enhancement | attack speed (meleeHastePct) | 10% |
+| shaman/restoration | heal mana efficiency (heal-kit costPct) | -20% |
+| warlock/affliction | damage-over-time damage (dotDmgPct) | 20% |
+| warlock/demonology | damage redirected to demon (petDmgSharePct) | 20% |
+| warlock/destruction | spell crit damage (critDmgPct) | +50% (2x) |
+| druid/balance | spell damage (spellDmgPct) | 15% |
+| druid/feral | melee ability damage (meleeDmgPct) | 15% |
+| druid/restoration | heal-over-time healing (hotHealPct) | 25% |
+
+Implementation note for the future rating PR: the axis is a CONVENTION over
+the existing mastery effect data (scale the named field, or the named
+per-ability set for frost and resto shaman), applied where masteries
+accumulate (the same level-scaling multiplier site in content/talents.ts).
+No new SpecDef field ships until that PR needs one; do not pre-add
+scaffolding.
+
 ### Spec signature fairness (audit + fix)
 
 Audit method: a signature is REAL only if its ability id is absent from
@@ -320,6 +402,109 @@ then signature fairness under the existing system (PR3), then the dormant
 row engine + UI (PR4), and only then the full 6-row tree flip (PR5).
 
 ---
+
+## Part 2b: S2 reconciliation of the built row content (owner-directed, 2026-07-07)
+
+The flip ships as ONE PR (the original PR5 shape): the row engine (S1) plus
+the 54 rows / 162 options (S2) together, since a dormant engine has no
+player value and every extra PR pays the fork-CI approval tax. The engine
+lands and is fully gated INSIDE the PR before the content commits stack on
+it. The content source is the BUILT rows on feature/talents-2-0-fun-pass
+(choice_rows_classic.ts, 162 options), reconciled against the shipped
+#1543 base by the four rules below. This section is the reconciliation:
+apply it verbatim when porting.
+
+### Rule 1: no row option may grant a spec signature (3 hits, replacements)
+
+Rows are class-wide; granting one spec's signature to the other two specs
+destroys signature identity. The three offenders and their replacements
+(each keeps the row's theme and the "changes a combat decision" bar):
+
+- war_r14_mortal_strike (granted mortal_strike, the arms signature).
+  REPLACE: "Crippling Blows" [mod]: Bladed Gyre (whirlwind) also applies
+  the hamstring slow to everything it hits (addEffects, P5 machinery).
+  Keeps the r14 damage-row theme without touching the signature.
+- pal_r14_crusader_strike (granted crusader_strike, the ret signature).
+  REPLACE: "Swift Verdicts" [mod]: Verdict (judgement) cooldown -40% and
+  cost -20%. Plain-but-strong, per the one-plain-option-per-row rule.
+- wlk_r20_metamorphosis (granted metamorphosis, the demonology signature).
+  REPLACE: "Grimoire of Haste" [mod]: your demon gains +20% attack speed
+  and +10% damage (pet buff vocabulary from the Dread Aspect rework).
+
+### Rule 2: names adopt the LOCKED NAME-MAP coinages (42 hits, pure lookup)
+
+Every denylisted option name already has a locked replacement in
+ip-refactor/NAME-MAP.md; no fresh coinage is needed or allowed:
+
+Amplify Curse=Deepened Hex, Ancestral Guidance=Guiding Spirits,
+Ardent Defender=Deathless Ardor, Bane=Hastened Doom,
+Berserker Rage=Seething Fury, Concussion=Fault Line,
+Demonic Resilience=Unyielding Pact, Desperate Prayer=Last Prayer,
+Deterrence=Bristleguard, Efficiency=Lean Quiver,
+Elemental Fury=Earthen Fury, Fel Concentration=Unbroken Focus,
+Ferocity=Redmaw, Furor=Wildsurge, Improved Corruption=Improved Blackrot,
+Improved Fortitude=Improved Litany of Resolve,
+Improved Ghost Wolf=Improved Shadewolf, Improved Gouge=Improved Eye Jab,
+Improved Life Tap=Improved Hard Bargain,
+Improved Lightning Shield=Improved Thunder Ward,
+Improved Renew=Improved Lingering Grace, Improved Wrath=Improved Wildbolt,
+Inner Focus=Stilled Mind, Innervate=Lifesap, Last Stand=Eleventh Hour,
+Meditation=Nocturns, Metamorphosis=Dread Aspect (option replaced anyway,
+Rule 1), Mortal Strike=Maiming Strike (option replaced anyway, Rule 1),
+Permafrost=Deep Rime, Preparation=Contingency,
+Presence of Mind=Racing Mind, Relentless Strikes=Ceaseless Cuts,
+Ruin=Desolation, Seal Fate=Final Notice, Shadow Mastery=Umbral Mastery,
+Shadowstep=Shadeslip, Shatter=Brittlebreak (COLLISION, see Rule 4),
+Silence=Silent Treatment, Survival Instincts=Deathless Will,
+Thick Hide=Calloused Hide, Vampiric Embrace=Leeching Dirge,
+Whirlwind=Bladed Gyre.
+
+Granted NEW ability defs in the rows (glaive_toss, kill_shot,
+roll_the_bones, sw_death, drain_soul, tigers_fury, ...) are NOT on the
+denylist scanner but MUST NOT ship verbatim WoW names either (the scanner
+gap): coin each in the NAME-MAP voice at port time and extend the map.
+
+### Rule 3: retune against the shipped masteries (numbers)
+
+The fun-pass rows were tuned against the interim flat masteries
+(+15-25% everywhere). The shipped identity masteries are similar in
+effective magnitude, and an axis-overlap scan of all 162 options found
+ZERO options stacking a class's designated mastery-rating axis through
+global fields, so the bulk of the numbers stand. The specific retunes:
+
+- No row option may add to its class's designated mastery axis (the
+  Mastery rating readiness table above): the future rating must be the
+  only way to scale that axis. Enforce in review at port time; the S2 port
+  adds a guard test mirroring the axis scan.
+- mag frost rows: the crit-vs-rooted/chilled identity moves here (the
+  Shatter-style option), since the frost mastery is now Frost-kit damage.
+  Option effect: critVsRooted 0.15 (the P4 machinery is live and unused).
+- Permafrost (now Deep Rime): keep the fun-pass PRD's crank verdict
+  (chill slow 0.4 to 2.0 equivalent, re-expressed against current chill
+  values at port time).
+- rogue combat rows: any flat melee-damage option is fine (the mastery
+  axis is attack SPEED); an attack-speed option is NOT (axis overlap).
+  The fun-pass rows have none; keep it that way.
+- resto shaman rows: mana-cost options must not stack the heal-kit
+  costPct axis; throughput or utility options only.
+- The caster school-band starting values (open question at the bottom of
+  the fun-pass PRD) are now ANSWERED by the mastery axes: a school-band
+  row option is allowed only for schools OFF the spec's axis (e.g. a fire
+  mage frost-utility band), never amplifying the axis school.
+
+### Rule 4: display-name collisions to resolve at port time
+
+- "Brittlebreak" is BOTH the frost mastery name and the map's locked
+  rename for the Shatter talent. The mastery keeps it (shipped); the
+  Shatter-style row option needs a distinct name: use "Deep Rime" for the
+  chill option and coin the crit-vs-controlled option fresh in the map
+  voice at port time (extend the NAME-MAP with the new row).
+- "Gloamveil" is the shadow mastery AND the map's Shadowform rename; the
+  ability shipped as "Gloamveil Form" (#1543). Row options referencing the
+  form use "Gloamveil Form".
+- The 5 ground spells (Flamestrike, Rain of Fire, Volley, Hurricane,
+  Earthquake) are baseline since #1064; the built rows already replaced
+  their old option slots, verify no regression at port.
 
 ## Part 3: Row content, all 9 classes (fable draft, numbers illustrative;
 warrior + mage are the pilot and land first)

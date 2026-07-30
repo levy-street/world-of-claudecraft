@@ -4,23 +4,45 @@
 // and rename rekeying. Pure sim tests: construct a Sim, advance fixed ticks.
 
 import { describe, expect, it } from 'vitest';
-import { QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/content/letters';
+import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_LETTER, QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/content/letters';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import {
+  MAIL_ATTACHMENT_EXPIRY_SECONDS,
   MAIL_DELIVERY_SECONDS,
   MAIL_MAX_ATTACHMENTS,
   MAIL_POSTAGE,
 } from '../src/sim/mail/post_office';
 import { Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
+import type { SimEvent, WorldContent } from '../src/sim/types';
 
-const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+// Mailboxes are system-owned and still spawn with this fixture. Ambient camps,
+// NPCs and quest objects are irrelevant to delivery/index invariants and would
+// turn every simulated minute into a continent-wide AI benchmark.
+const MAIL_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
+const makeWorld = () =>
+  new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: MAIL_TEST_WORLD });
 
 function moveToMailbox(sim: Sim, pid: number): void {
   const box = sim.entities.get(sim.postOffice.mailboxIds[0]);
   const p = sim.entities.get(pid);
   if (!box || !p) throw new Error('missing mailbox or player');
   p.pos = { ...box.pos };
+  p.prevPos = { ...p.pos };
+  sim.rebucket(p);
+}
+
+function moveAwayFromMailboxes(sim: Sim, pid: number): void {
+  const p = sim.entities.get(pid);
+  if (!p) throw new Error('missing player');
+  p.pos = sim.groundPos(50, 0);
   p.prevPos = { ...p.pos };
   sim.rebucket(p);
 }
@@ -114,6 +136,29 @@ describe('sending a letter', () => {
     ).toBe(true);
   });
 
+  it('streams older delivered mail beyond the first fifty rows so it can be opened', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 100_000;
+    moveToMailbox(sim, alice);
+
+    for (let i = 0; i < 60; i++) {
+      sim.mailSend('Bob', `Letter ${i}`, `Body ${i}`, 0, [], alice);
+    }
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    moveToMailbox(sim, bob);
+
+    const info = sim.mailInfoFor(bob);
+    expect(info).not.toBeNull();
+    expect(info?.totalCount).toBe(61);
+    expect(info?.messages).toHaveLength(61);
+    expect(info?.messages.some((m) => m.subject === 'Letter 0')).toBe(true);
+    expect(info?.messages.some((m) => m.subject === 'Letter 59')).toBe(true);
+  });
+
   it('refuses what the post refuses', () => {
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
@@ -128,7 +173,9 @@ describe('sending a letter', () => {
       return r && r.type === 'mailResult' ? r.code : null;
     };
 
-    // Away from any mailbox.
+    // The rebuilt Eastbrook mailbox is intentionally close to the fresh start,
+    // so move to an explicit non-service point for the proximity denial.
+    moveAwayFromMailboxes(sim, alice);
     sim.mailSend('Alice', 'x', 'y', 0, [], alice);
     expect(lastCode()).toBe('tooFar');
 
@@ -292,7 +339,7 @@ describe('taking attachments against bag capacity (finding 2)', () => {
     expect(empty?.items ?? []).toHaveLength(0);
   });
 
-  it('does not start the expiry clock while a partially-taken letter still holds parcels', () => {
+  it('does not start the emptied clock while a partially-taken letter still holds parcels', () => {
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
     const bob = sim.addPlayer('mage', 'Bob');
@@ -302,6 +349,7 @@ describe('taking attachments against bag capacity (finding 2)', () => {
     aliceMeta.copper = 10_000;
     sim.addItem('roasted_boar', 2, alice);
     moveToMailbox(sim, alice);
+    const sentAt = sim.time;
     sim.mailSend('Bob', 'Held', 'Wait for room.', 0, [{ itemId: 'roasted_boar', count: 2 }], alice);
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
 
@@ -314,95 +362,107 @@ describe('taking attachments against bag capacity (finding 2)', () => {
     // biome-ignore lint/suspicious/noExplicitAny: reach into the book to inspect the raw expiry.
     const raw = (sim.postOffice as any).mail.find((m: { id: number }) => m.id === gift.id);
     expect(raw.items).toHaveLength(1);
-    // Attachments remain, so the expiry clock is still paused (Infinity).
-    expect(Number.isFinite(raw.expiresAt)).toBe(false);
+    // Attachments remain: the letter stays on its original attachment window,
+    // neither emptied-clock started nor window restarted by the partial take.
+    expect(raw.expiresAt).toBe(sentAt + MAIL_ATTACHMENT_EXPIRY_SECONDS);
   });
 });
 
 describe('unread index equivalence (finding 4)', () => {
-  it('matches the linear scan across sends, deliveries, reads, takes, deletes, renames and expiries', () => {
-    const sim = makeWorld();
-    const alice = sim.addPlayer('warrior', 'Alice');
-    const bob = sim.addPlayer('mage', 'Bob');
-    const aliceMeta = sim.meta(alice);
-    const bobMeta = sim.meta(bob);
-    if (!aliceMeta || !bobMeta) throw new Error('no meta');
-    aliceMeta.copper = 100_000;
+  // This drives sim.tick() one tick at a time across several full mail-delivery
+  // windows, checking the maintained unread index against a linear-scan oracle
+  // after EVERY tick. That is a lot of synchronous work for vitest's 5s default
+  // under worker-pool CPU contention, though it is sub-second in isolation; give
+  // it real headroom instead of flaking.
+  const UNREAD_INDEX_TEST_TIMEOUT_MS = 20_000;
 
-    // biome-ignore lint/suspicious/noExplicitAny: read the raw book to replay the old scan.
-    const po = sim.postOffice as any;
-    // The former linear scan, kept here as the oracle the maintained index must
-    // reproduce byte-for-byte.
-    const refUnread = (pid: number): number => {
-      const meta = sim.meta(pid);
-      if (!meta) return 0;
-      const now = sim.time;
-      const key = String(meta.characterId ?? meta.entityId);
-      let n = 0;
-      for (const m of po.mail as { read: boolean; deliverAt: number; recipientKey: string }[]) {
-        if (
-          !m.read &&
-          now >= m.deliverAt &&
-          (m.recipientKey === key || m.recipientKey === meta.name)
-        )
-          n++;
-      }
-      return n;
-    };
-    const check = (): void => {
-      expect(sim.mailUnreadFor(alice)).toBe(refUnread(alice));
-      expect(sim.mailUnreadFor(bob)).toBe(refUnread(bob));
-    };
+  it(
+    'matches the linear scan across sends, deliveries, reads, takes, deletes, renames and expiries',
+    () => {
+      const sim = makeWorld();
+      const alice = sim.addPlayer('warrior', 'Alice');
+      const bob = sim.addPlayer('mage', 'Bob');
+      const aliceMeta = sim.meta(alice);
+      const bobMeta = sim.meta(bob);
+      if (!aliceMeta || !bobMeta) throw new Error('no meta');
+      aliceMeta.copper = 100_000;
 
-    check(); // welcome letters delivered immediately
-    moveToMailbox(sim, alice);
-    sim.addItem('roasted_boar', 6, alice);
+      // biome-ignore lint/suspicious/noExplicitAny: read the raw book to replay the old scan.
+      const po = sim.postOffice as any;
+      // The former linear scan, kept here as the oracle the maintained index must
+      // reproduce byte-for-byte.
+      const refUnread = (pid: number): number => {
+        const meta = sim.meta(pid);
+        if (!meta) return 0;
+        const now = sim.time;
+        const key = String(meta.characterId ?? meta.entityId);
+        let n = 0;
+        for (const m of po.mail as { read: boolean; deliverAt: number; recipientKey: string }[]) {
+          if (
+            !m.read &&
+            now >= m.deliverAt &&
+            (m.recipientKey === key || m.recipientKey === meta.name)
+          )
+            n++;
+        }
+        return n;
+      };
+      const check = (): void => {
+        expect(sim.mailUnreadFor(alice)).toBe(refUnread(alice));
+        expect(sim.mailUnreadFor(bob)).toBe(refUnread(bob));
+      };
 
-    // Two letters to Bob, still in flight.
-    sim.mailSend('Bob', 'A', 'a', 100, [], alice);
-    check();
-    sim.mailSend('Bob', 'B', 'b', 0, [{ itemId: 'roasted_boar', count: 2 }], alice);
-    check();
+      check(); // welcome letters delivered immediately
+      moveToMailbox(sim, alice);
+      sim.addItem('roasted_boar', 6, alice);
 
-    // Advance ONE tick at a time across the delivery boundary: the index must be
-    // byte-identical to the scan at every tick, including the exact delivery tick.
-    for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) {
-      sim.tick();
+      // Two letters to Bob, still in flight.
+      sim.mailSend('Bob', 'A', 'a', 100, [], alice);
       check();
-    }
+      sim.mailSend('Bob', 'B', 'b', 0, [{ itemId: 'roasted_boar', count: 2 }], alice);
+      check();
 
-    moveToMailbox(sim, bob);
-    const letterA = sim.mailInfoFor(bob)?.messages.find((m) => m.subject === 'A');
-    const letterB = sim.mailInfoFor(bob)?.messages.find((m) => m.subject === 'B');
-    if (!letterA || !letterB) throw new Error('letters not delivered');
+      // Advance ONE tick at a time across the delivery boundary: the index must be
+      // byte-identical to the scan at every tick, including the exact delivery tick.
+      for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) {
+        sim.tick();
+        check();
+      }
 
-    sim.mailMarkRead(letterA.id, bob);
-    check();
-    sim.mailTake(letterA.id, bob); // coin taken, A now empty and read
-    check();
-    sim.mailDelete(letterA.id, bob); // delete the emptied, read letter
-    check();
-    sim.mailTake(letterB.id, bob); // takes the boars, marks read
-    check();
+      moveToMailbox(sim, bob);
+      const letterA = sim.mailInfoFor(bob)?.messages.find((m) => m.subject === 'A');
+      const letterB = sim.mailInfoFor(bob)?.messages.find((m) => m.subject === 'B');
+      if (!letterA || !letterB) throw new Error('letters not delivered');
 
-    // Rename path: a name-keyed offline letter folded onto the stable id key.
-    sim.mailSendResolved({ key: 'Ghost', name: 'Ghost' }, 'Ghostly', 'boo', 0, [], alice);
-    for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) sim.tick();
-    check();
-    // Fold the Ghost-keyed letter onto Bob (his mail key is his entity id here).
-    expect(sim.rekeyMailOwner(bob, 'Ghost', 'Bob')).toBe(true);
-    check();
+      sim.mailMarkRead(letterA.id, bob);
+      check();
+      sim.mailTake(letterA.id, bob); // coin taken, A now empty and read
+      check();
+      sim.mailDelete(letterA.id, bob); // delete the emptied, read letter
+      check();
+      sim.mailTake(letterB.id, bob); // takes the boars, marks read
+      check();
 
-    // Expiry path: force an unread plain letter to expire and prune.
-    sim.mailSend('Bob', 'Expireme', 'bye', 0, [], alice);
-    for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) sim.tick();
-    check();
-    const doomed = po.mail.find((m: { subject: string }) => m.subject === 'Expireme');
-    doomed.expiresAt = sim.time + 0.5;
-    tickFor(sim, 2);
-    expect(po.mail.some((m: { subject: string }) => m.subject === 'Expireme')).toBe(false);
-    check();
-  });
+      // Rename path: a name-keyed offline letter folded onto the stable id key.
+      sim.mailSendResolved({ key: 'Ghost', name: 'Ghost' }, 'Ghostly', 'boo', 0, [], alice);
+      for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) sim.tick();
+      check();
+      // Fold the Ghost-keyed letter onto Bob (his mail key is his entity id here).
+      expect(sim.rekeyMailOwner(bob, 'Ghost', 'Bob')).toBe(true);
+      check();
+
+      // Expiry path: force an unread plain letter to expire and prune.
+      sim.mailSend('Bob', 'Expireme', 'bye', 0, [], alice);
+      for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) sim.tick();
+      check();
+      const doomed = po.mail.find((m: { subject: string }) => m.subject === 'Expireme');
+      doomed.expiresAt = sim.time + 0.5;
+      tickFor(sim, 2);
+      expect(po.mail.some((m: { subject: string }) => m.subject === 'Expireme')).toBe(false);
+      check();
+    },
+    UNREAD_INDEX_TEST_TIMEOUT_MS,
+  );
 
   it('rebuilds a byte-identical index after a serialize/load round-trip', () => {
     const sim = makeWorld();
@@ -449,7 +509,14 @@ describe('unread index equivalence (finding 4)', () => {
 
 describe('quest thank-you letters', () => {
   it('the giver writes after an authored quest turn-in', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+    // QUESTS is a static data table (src/sim/data), not world content, so the
+    // dev turn-in and its thank-you letter work in the mailbox-only world too.
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: true,
+      world: MAIL_TEST_WORLD,
+    });
     const pid = sim.primaryId;
     expect(QUEST_LETTERS.q_wolves).toBeDefined();
     expect(sim.completeQuestForDev('q_wolves', pid)).toBe(true);
@@ -460,6 +527,31 @@ describe('quest thank-you letters', () => {
     expect(letter).toBeDefined();
     expect(letter?.kind).toBe('npc');
     expect(letter?.copper).toBe(QUEST_LETTERS.q_wolves.copper);
+  });
+});
+
+describe('the Heroic Marks reward letter (mailHeroicMarks)', () => {
+  it('books a system letter carrying the exact mark count as its attachment', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Backline');
+    sim.postOffice.mailHeroicMarks(pid, HEROIC_MARK_ITEM_ID, 3);
+    tickFor(sim, 1);
+    moveToMailbox(sim, pid);
+    const info = sim.mailInfoFor(pid);
+    const letter = info?.messages.find((m) => m.letterId === HEROIC_MARK_LETTER.letterId);
+    expect(letter).toBeDefined();
+    expect(letter?.kind).toBe('system');
+    expect(letter?.items).toEqual([{ itemId: HEROIC_MARK_ITEM_ID, count: 3 }]);
+  });
+
+  it('refuses an unknown recipient and a non-positive count', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Backline');
+    const before = (sim.postOffice as any).mail.length;
+    sim.postOffice.mailHeroicMarks(999999, HEROIC_MARK_ITEM_ID, 3); // no such player
+    sim.postOffice.mailHeroicMarks(pid, HEROIC_MARK_ITEM_ID, 0);
+    sim.postOffice.mailHeroicMarks(pid, HEROIC_MARK_ITEM_ID, -2);
+    expect((sim.postOffice as any).mail.length).toBe(before);
   });
 });
 

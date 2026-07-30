@@ -33,19 +33,10 @@ import { goldenContentTypeMismatch } from './content_type_consistency';
 // connects, so every contract path captured here returns before touching it.
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase3_aoi';
 
-// routeHttpRequest is synchronous fire-and-forget (void handleX(req, res)), so we
-// poll res.writableEnded before reading the captured response.
-const MAX_TICKS = 5000;
-
 async function loadDispatch(): Promise<Dispatch> {
   const main = await import('../../../server/main');
-  return async (req, res) => {
+  return (req, res) => {
     main.routeHttpRequest(req, res);
-    let ticks = 0;
-    while (!(res as unknown as { writableEnded: boolean }).writableEnded) {
-      if (ticks++ > MAX_TICKS) throw new Error('response never ended');
-      await new Promise((r) => setImmediate(r));
-    }
   };
 }
 
@@ -387,9 +378,13 @@ describe('characterization: internal handleInternalApi', () => {
 // -----------------------------------------------------------------------------
 describe('characterization: internal handleDailyRewardInternalApi (late-arrival backfill)', () => {
   const OPS_ROUTES = [
+    { path: '/internal/daily-rewards/finalize', name: 'daily_rewards_finalize' },
     { path: '/internal/daily-rewards/pending-payouts', name: 'daily_rewards_pending_payouts' },
     { path: '/internal/daily-rewards/payout-history', name: 'daily_rewards_payout_history' },
+    { path: '/internal/daily-rewards/leaderboard', name: 'daily_rewards_leaderboard' },
     { path: '/internal/daily-rewards/mark-payout', name: 'daily_rewards_mark_payout' },
+    { path: '/internal/daily-rewards/void-payout', name: 'daily_rewards_void_payout' },
+    { path: '/internal/daily-rewards/restore-payout', name: 'daily_rewards_restore_payout' },
   ] as const;
 
   // Fail-closed gate, captured PER ROUTE: with the env secret UNSET the family

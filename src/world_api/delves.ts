@@ -1,5 +1,6 @@
 import type { Ante, LootTier, PickAction, VisibleCell } from '../sim/lockpick';
 import type { DelveObjectiveState, RiteIntensity } from '../sim/types';
+import type { WorldInteractionOutcome } from './interaction';
 
 /** Drowned Reliquary Rite progress, surfaced so the HUD can guide the player:
  * choose = the reliquary is up and waits for a difficulty pick, playback = the
@@ -82,7 +83,7 @@ export interface DelveShopOfferView {
 export interface IWorldDelves {
   enterDelve(delveId: string, tierId: string): void;
   leaveDelve(): void;
-  delveInteract(objectId: number): void;
+  delveInteract(objectId: number): WorldInteractionOutcome;
   companionUpgrade(companionId: string): void;
   delveBuyShopItem(delveId: string, itemId: string): void;
   // Brother Halven's Marks-vendor stock for a delve, resolved against the viewer's

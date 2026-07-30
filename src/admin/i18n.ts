@@ -182,6 +182,7 @@ export function t(key: string, params?: Record<string, string | number>): string
 // purpose (the localization design principle: only operator-facing UI is translated).
 const ADMIN_ERROR_KEYS: Record<string, string> = {
   'too many attempts, wait a minute and try again': 'error.tooManyAttempts',
+  'too many failed attempts, wait a few minutes and try again': 'error.tooManyFailedAttempts',
   'invalid username or password': 'error.invalidCredentials',
   'this account does not have admin access': 'error.noAdminAccess',
   'admin accounts cannot be suspended or banned': 'error.cannotModerateAdmin',
@@ -196,6 +197,7 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'moderation reason is required': 'error.moderationReasonRequired',
   'suspension expiry must be in the future': 'error.moderationExpiryFuture',
   'character not found': 'error.characterNotFound',
+  'invalid streamer link': 'error.invalidStreamerLink',
   'admin accounts cannot be chat muted': 'error.cannotChatMuteAdmin',
   'tier must be "soft" or "hard"': 'error.invalidWordTier',
   'word is empty after normalization': 'error.wordEmptyAfterNormalization',

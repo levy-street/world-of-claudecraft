@@ -22,6 +22,44 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
+  it('maps the player tooltip view to its focused hover target', () => {
+    const plan = classifyDiff(['src/ui/player_tooltip_view.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual(['player-tooltip']);
+  });
+
+  it('captures both the market overview and expanded armor filters for market window changes', () => {
+    const plan = classifyDiff(['src/ui/market_window.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
+      'market-window',
+      'market-armor-filters',
+    ]);
+    expect(plan.specific[1].variants).toEqual([
+      { key: 'desktop' },
+      { key: 'mobile', mobile: true },
+    ]);
+  });
+
+  it('captures expanded armor filters for every market-specific UI module', () => {
+    for (const path of [
+      'src/ui/market_window.ts',
+      'src/ui/market_view.ts',
+      'src/ui/market_filters.ts',
+    ]) {
+      const keys = classifyDiff([path]).specific.map((target: { key: string }) => target.key);
+      expect(keys).toContain('market-armor-filters');
+    }
+  });
+
+  it('maps the tank cooldown regression suite to its focused visual target', () => {
+    const plan = classifyDiff(['tests/tank_defensive_cds.test.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual(['tank-defensive-cds']);
+    // paladin-desktop, druid-desktop, paladin-mobile.
+    expect(plan.specific[0].variants).toHaveLength(3);
+  });
+
   it('maps a zone/terrain change to the world-map target', () => {
     const plan = classifyDiff(['src/render/terrain.ts']);
     expect(plan.specific.map((t: { key: string }) => t.key)).toContain('world-map');
@@ -37,6 +75,12 @@ describe('classifyDiff', () => {
   it('adds the mobile HUD when the visual change touches the mobile surface', () => {
     const plan = classifyDiff(['src/styles/hud.mobile.css']);
     expect(plan.generic).toEqual(['hud-desktop', 'hud-mobile']);
+  });
+
+  it('keeps the desktop HUD fallback for the shared component stylesheet', () => {
+    const plan = classifyDiff(['src/styles/components.css']);
+    expect(plan.specific).toHaveLength(0);
+    expect(plan.generic).toEqual(['hud-desktop']);
   });
 
   it('does not treat an i18n text-table change as visual', () => {
@@ -62,6 +106,13 @@ describe('classifyDiff', () => {
     );
     expect(keys).toEqual(['inventory', 'world-map']);
   });
+
+  it('stages a complete profession identity for refresh-aware captures', () => {
+    const target = resolveTargets(['src/ui/professions_window.ts']).find(
+      (candidate: { key: string }) => candidate.key === 'professions',
+    );
+    expect(target?.capture.toString()).toContain('knownRecipes: []');
+  });
 });
 
 describe('diffChangedPaths', () => {
@@ -86,9 +137,12 @@ describe('diffChangedPaths', () => {
   });
 
   it('a DELETED visual file still classifies as a visual change', () => {
+    // src/game/mobile_controls.ts is visual (VISUAL_PREFIXES) and mobile (isMobilePath)
+    // but maps to no specific window target's `when` list, so this stays a pure
+    // generic-fallback probe.
     const diff = section(
-      'a/src/styles/hud.mobile.css b/src/styles/hud.mobile.css',
-      'a/src/styles/hud.mobile.css',
+      'a/src/game/mobile_controls.ts b/src/game/mobile_controls.ts',
+      'a/src/game/mobile_controls.ts',
       '/dev/null',
     );
     const plan = classifyDiff(diffChangedPaths(diff));

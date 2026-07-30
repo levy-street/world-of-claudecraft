@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { redactSecrets } from '../scripts/redact_secrets.mjs';
 
-// Guards the output scrubber ai_review.mjs runs over the agent's final message before
-// it is posted as a PUBLIC PR comment. The agent's prompt embeds an attacker-controlled
-// fork-PR diff, so credential-shaped output (or the run's actual secrets, passed in as
-// extraLiterals) must never survive into the comment. The scrubber is deliberately
+// Guards the output scrubber post_ai_review.mjs runs over the final message before it is
+// posted as a PUBLIC PR comment. Credential-shaped output, or the run's actual secrets
+// passed as extraLiterals, must never survive into the comment. The scrubber is deliberately
 // conservative: git shas and ordinary prose must pass through untouched.
 
 const REDACTED = '[redacted]';
@@ -100,7 +99,7 @@ describe('redactSecrets: extraLiterals', () => {
     expect(redactedCount).toBe(2);
   });
 
-  it('redacts a JSON-blob literal such as a CODEX_AUTH_JSON value', () => {
+  it('redacts a serialized credential blob supplied as an exact literal', () => {
     const literal = '{"access":"opaque-value-1234","kind":"oauth"}';
     const { text, redactedCount } = redactSecrets(`dump: ${literal}`, [literal]);
     expect(text).toBe(`dump: ${REDACTED}`);

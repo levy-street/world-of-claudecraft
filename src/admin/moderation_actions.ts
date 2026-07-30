@@ -139,6 +139,25 @@ export function liftChatMute(accountId: number, note: string): Built {
   };
 }
 
+// Reset an account's chat strikes to zero. Audited server-side (an account moderation
+// action row records who and why), so it requires a reason like every other audited
+// action rather than firing on a bare click.
+export function resetChatStrikes(accountId: number, note: string): Built {
+  if (!note) return { errorKey: 'alert.noteRequired' };
+  return {
+    pending: {
+      title: t('dialog.confirmResetChatStrikes'),
+      rows: [
+        accountRow(accountId),
+        { label: t('dialog.action'), value: t('dialog.actionResetChatStrikes') },
+        reasonRow(note),
+      ],
+      endpoint: `/admin/api/moderation/accounts/${accountId}/reset-strikes`,
+      body: { reason: note },
+    },
+  };
+}
+
 // A free-form moderator note. Non-punitive and additive only: it posts to the note
 // endpoint, which appends to the audit log without changing account state. The note
 // text rides in `reason` for parity with the other actions; the inline form submits
@@ -209,6 +228,80 @@ export function unbanAccount(accountId: number, note: string): Built {
       ],
       endpoint: `/admin/api/moderation/accounts/${accountId}/unban`,
       body: { reason: note },
+    },
+  };
+}
+
+export function banDailyRewards(accountId: number, note: string, durationHours?: number): Built {
+  if (!note) return { errorKey: 'alert.noteRequired' };
+  if (
+    durationHours !== undefined &&
+    (!Number.isInteger(durationHours) || durationHours < 1 || durationHours > 8760)
+  ) {
+    return { errorKey: 'alert.dailyRewardsBanDurationInvalid' };
+  }
+  const durationRow =
+    durationHours === undefined
+      ? { label: t('dialog.length'), value: t('detail.dailyRewardsPermanent') }
+      : {
+          label: t('dialog.length'),
+          value: t('detail.lengthHours', { count: durationHours }),
+        };
+  return {
+    pending: {
+      title: t('dialog.confirmDailyRewardsBan'),
+      rows: [
+        accountRow(accountId),
+        { label: t('dialog.action'), value: t('dialog.actionDailyRewardsBan') },
+        durationRow,
+        reasonRow(note),
+      ],
+      endpoint: `/admin/api/moderation/accounts/${accountId}/daily-rewards-ban`,
+      body: durationHours === undefined ? { reason: note } : { reason: note, durationHours },
+      danger: true,
+    },
+  };
+}
+
+export function unbanDailyRewards(accountId: number, note: string): Built {
+  if (!note) return { errorKey: 'alert.noteRequired' };
+  return {
+    pending: {
+      title: t('dialog.confirmDailyRewardsUnban'),
+      rows: [
+        accountRow(accountId),
+        { label: t('dialog.action'), value: t('dialog.actionDailyRewardsUnban') },
+        reasonRow(note),
+      ],
+      endpoint: `/admin/api/moderation/accounts/${accountId}/daily-rewards-unban`,
+      body: { reason: note },
+    },
+  };
+}
+
+export function moderateDailyRewardsIp(
+  accountId: number,
+  ip: string,
+  banned: boolean,
+  note: string,
+): Built {
+  if (!note) return { errorKey: 'alert.noteRequired' };
+  const action = banned
+    ? t('dialog.actionDailyRewardsIpBan')
+    : t('dialog.actionDailyRewardsIpUnban');
+  return {
+    pending: {
+      title: banned ? t('dialog.confirmDailyRewardsIpBan') : t('dialog.confirmDailyRewardsIpUnban'),
+      rows: [
+        accountRow(accountId),
+        { label: t('blockedIps.colIp'), value: ip },
+        { label: t('dialog.action'), value: action },
+        reasonRow(note),
+        ...(banned ? [{ label: t('dialog.warning'), value: t('blockedIps.sharedIpWarning') }] : []),
+      ],
+      endpoint: `/admin/api/moderation/accounts/${accountId}/daily-rewards-ip-${banned ? 'ban' : 'unban'}`,
+      body: { ip, reason: note },
+      danger: banned,
     },
   };
 }

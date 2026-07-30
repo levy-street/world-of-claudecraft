@@ -1,9 +1,48 @@
 import { describe, expect, it } from 'vitest';
-import { isBlocked, pathCrossesFence, resolveMovement, resolvePosition } from '../src/sim/colliders';
-import { Sim } from '../src/sim/sim';
-import { findPath, findPlayerPath, PLAYER_SWIM_DEPTH, resolvePlayerDestination } from '../src/sim/pathfind';
-import { groundHeight, WATER_LEVEL } from '../src/sim/world';
+import {
+  isBlocked,
+  pathCrossesFence,
+  resolveMovement,
+  resolvePosition,
+} from '../src/sim/colliders';
 import { PROPS } from '../src/sim/data';
+import { EASTBROOK_BUILDINGS_BY_ID, EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
+import {
+  findPath,
+  findPlayerPath,
+  PLAYER_SWIM_DEPTH,
+  resolvePlayerDestination,
+} from '../src/sim/pathfind';
+import { Sim } from '../src/sim/sim';
+import { groundHeight, WATER_LEVEL } from '../src/sim/world';
+
+const TEST_FENCE_PLACEMENT = EASTBROOK_LAYOUT.fences.find(
+  (fence) => fence.id === 'eastbrook_fence_market_outer',
+);
+if (!TEST_FENCE_PLACEMENT) throw new Error('missing Eastbrook market-edge fence');
+const TEST_FENCE = {
+  x1: TEST_FENCE_PLACEMENT.start.x,
+  z1: TEST_FENCE_PLACEMENT.start.z,
+  x2: TEST_FENCE_PLACEMENT.end.x,
+  z2: TEST_FENCE_PLACEMENT.end.z,
+} as const;
+
+function acrossFence(distance: number): {
+  from: { x: number; z: number };
+  to: { x: number; z: number };
+} {
+  const mx = (TEST_FENCE.x1 + TEST_FENCE.x2) / 2;
+  const mz = (TEST_FENCE.z1 + TEST_FENCE.z2) / 2;
+  const dx = TEST_FENCE.x2 - TEST_FENCE.x1;
+  const dz = TEST_FENCE.z2 - TEST_FENCE.z1;
+  const length = Math.hypot(dx, dz);
+  const nx = -dz / length;
+  const nz = dx / length;
+  return {
+    from: { x: mx - nx * distance, z: mz - nz * distance },
+    to: { x: mx + nx * distance, z: mz + nz * distance },
+  };
+}
 
 describe('player pathfinding', () => {
   it('smooths open-grid A* stair steps into one direct movement leg', () => {
@@ -36,12 +75,13 @@ describe('player pathfinding', () => {
 
   it('resolves click destinations inside buildings to the nearest walkable outside point', () => {
     const seed = 20061;
-    const target = resolvePlayerDestination(seed, { x: 10, z: 12 });
+    const center = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank.position;
+    const target = resolvePlayerDestination(seed, center);
 
-    expect(isBlocked(seed, 10, 12)).toBe(true);
+    expect(isBlocked(seed, center.x, center.z)).toBe(true);
     expect(isBlocked(seed, target.x, target.z)).toBe(false);
-    expect(Math.hypot(target.x - 10, target.z - 12)).toBeGreaterThan(0.5);
-    expect(Math.hypot(target.x - 10, target.z - 12)).toBeLessThan(6);
+    expect(Math.hypot(target.x - center.x, target.z - center.z)).toBeGreaterThan(0.5);
+    expect(Math.hypot(target.x - center.x, target.z - center.z)).toBeLessThan(6);
   });
 
   it('snaps a water click to shore for walkers but keeps it for swimmers', () => {
@@ -76,10 +116,10 @@ describe('player pathfinding', () => {
 
   it('treats fence runs as movement blockers', () => {
     const seed = 20061;
-    expect(isBlocked(seed, 19, 10)).toBe(true);
+    const { from, to } = acrossFence(6);
+    const midpoint = { x: (from.x + to.x) / 2, z: (from.z + to.z) / 2 };
+    expect(isBlocked(seed, midpoint.x, midpoint.z)).toBe(true);
 
-    const from = { x: 13, z: 7 };
-    const to = { x: 25, z: 13 };
     const path = findPlayerPath(seed, from, to);
 
     expect(path.length).toBeGreaterThan(1);
@@ -88,8 +128,7 @@ describe('player pathfinding', () => {
 
   it('routes over a fence when the mover can jump it (click-to-move)', () => {
     const seed = 20061;
-    const from = { x: 13, z: 7 };
-    const to = { x: 25, z: 13 };
+    const { from, to } = acrossFence(6);
 
     const anySegmentCrossesFence = (path: { x: number; z: number }[]) => {
       let prev = from;
@@ -109,7 +148,7 @@ describe('player pathfinding', () => {
   it('blocks normal player movement through fences', () => {
     const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
     const p = sim.player;
-    const fence = { x1: 16, z1: 16, x2: 22, z2: 4 };
+    const fence = TEST_FENCE;
     const mx = (fence.x1 + fence.x2) / 2;
     const mz = (fence.z1 + fence.z2) / 2;
     const dx = fence.x2 - fence.x1;
@@ -134,7 +173,7 @@ describe('player pathfinding', () => {
   it('lets a jumping player clear a fence', () => {
     const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
     const p = sim.player;
-    const fence = { x1: 16, z1: 16, x2: 22, z2: 4 };
+    const fence = TEST_FENCE;
     const mx = (fence.x1 + fence.x2) / 2;
     const mz = (fence.z1 + fence.z2) / 2;
     const dx = fence.x2 - fence.x1;
@@ -161,7 +200,7 @@ describe('player pathfinding', () => {
 
   it('sweeps movement segments so a long step cannot tunnel through a fence', () => {
     const seed = 20061;
-    const fence = { x1: 16, z1: 16, x2: 22, z2: 4 };
+    const fence = TEST_FENCE;
     const mx = (fence.x1 + fence.x2) / 2;
     const mz = (fence.z1 + fence.z2) / 2;
     const dx = fence.x2 - fence.x1;
@@ -179,7 +218,7 @@ describe('player pathfinding', () => {
 
   it('lets the player stand close to the fence face without crossing it', () => {
     const seed = 20061;
-    const fence = { x1: 16, z1: 16, x2: 22, z2: 4 };
+    const fence = TEST_FENCE;
     const mx = (fence.x1 + fence.x2) / 2;
     const mz = (fence.z1 + fence.z2) / 2;
     const dx = fence.x2 - fence.x1;

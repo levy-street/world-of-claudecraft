@@ -123,6 +123,31 @@ export interface CupInfo {
   practicing: string[];
 }
 
+// The realm-wide fragment of CupInfo: identical for every viewer, so it can be
+// built and serialized once per broadcast pass instead of once per viewer.
+// `live` here is the RAW Sowfield running match; the per-viewer practice
+// suppression (a player off in a private practice instance must not see the main
+// game's strip) is reapplied on top of this fragment in cupInfoFor, never baked
+// in here (this function has no pid to check).
+export interface VcSharedCupInfo {
+  queueSizes: Record<VcBracket, number>;
+  live: VcLiveMatch | null;
+  board: VcBoardEntry[];
+  guildBoard: VcGuildBoardEntry[];
+  practicing: string[];
+}
+
+// The per-viewer remainder of CupInfo, shipped under the `vcup` wire key while
+// the realm-wide fields ride `vcupb` as VcSharedCupInfo. `liveHidden` is a
+// wire-internal flag (true when this viewer is off in a private practice
+// instance and must not see the Sowfield live strip): the client reapplies it as
+// `live = liveHidden ? null : shared.live` on recompose and never surfaces it on
+// CupInfo. Not part of the IWorldValeCup facet; render/ui read CupInfo, not this.
+export type VcViewerReadout = Omit<
+  CupInfo,
+  'queueSizes' | 'live' | 'board' | 'guildBoard' | 'practicing'
+> & { liveHidden: boolean };
+
 export interface IWorldValeCup {
   // null = online mirror not yet synced
   cupInfo: CupInfo | null;

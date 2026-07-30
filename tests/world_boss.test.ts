@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
+import { EASTBROOK_BUILDINGS_BY_ID, localToWorld } from '../src/sim/eastbrook_layout';
 import { respawnMob } from '../src/sim/mob/lifecycle';
 import { resetEvadingMob } from '../src/sim/mob/locomotion';
 import { combatProfileForMob, scaledDefaultMobMeleeRange } from '../src/sim/mob_combat';
 import { Sim } from '../src/sim/sim';
-import type { Entity, SimEvent } from '../src/sim/types';
+import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
 import {
   isWorldBossLootEligible,
   markWorldBossLooted,
@@ -17,6 +18,16 @@ import {
 const BOSS_ID = 'thunzharr_waking_peak';
 const DAY = '2026-06-28';
 
+// World bosses are scheduler-spawned and do not depend on ambient camps/NPCs.
+// Keeping those entities out makes the 40-seed personal-loot property measure
+// loot behavior rather than repeatedly constructing the whole continent.
+const WORLD_BOSS_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 // Minimal PlayerMeta stand-in for the pure lockout-gate helpers (they touch only
 // .raidLockouts). Cast through unknown to satisfy the full PlayerMeta type.
 function fakeMeta() {
@@ -26,7 +37,13 @@ function fakeMeta() {
 }
 
 function makeSim(seed = 7) {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+  return new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: true,
+    noPlayer: true,
+    world: WORLD_BOSS_TEST_WORLD,
+  });
 }
 
 function findBoss(sim: Sim): Entity | undefined {
@@ -210,6 +227,7 @@ describe('world boss raid-tier combat (melee, Stormcall hardcast, yells)', () =>
     let sawCastBar = false;
     let castYell = false;
     let unleashed = false;
+    let wasCasting = false;
     // 40s cadence + 3.5s cast, with slack for chase/knockback interruptions.
     for (let t = 0; t < 20 * 60 && !unleashed; t++) {
       // Step back into melee after every Tectonic Heave shove, and keep chipping
@@ -220,14 +238,17 @@ describe('world boss raid-tier combat (melee, Stormcall hardcast, yells)', () =>
         (sim as any).dealDamage(p, boss, 1, false, 'physical', 'Chip', 'hit', true);
       }
       const events = sim.tick();
-      if (boss.castingAbility === 'thunzharr_stormcall') {
+      const castingNow = boss.castingAbility === 'thunzharr_stormcall';
+      if (castingNow) {
         sawCastBar = true;
         expect(boss.castTotal).toBeCloseTo(3.5, 5);
       }
       if (chatYells(events).some((e) => /The storm answers my call!/.test((e as any).text)))
         castYell = true;
-      if (events.some((e) => e.type === 'log' && /unleashes Stormcall!$/.test((e as any).text)))
-        unleashed = true;
+      // The quiet world boss no longer barks "unleashes Stormcall!", so the spell
+      // landing is the falling edge of the cast bar: casting last tick, cleared now.
+      if (wasCasting && !castingNow) unleashed = true;
+      wasCasting = castingNow;
     }
     expect(sawCastBar).toBe(true);
     expect(castYell).toBe(true);
@@ -364,16 +385,18 @@ describe('world boss personal loot', () => {
 
   it('caps gear at one Tier-2 piece per contributor (never a glove AND a belt in one kill)', () => {
     let anyGearDropped = false;
-    // Sweep many seeds/contributors: the invariant (<= 1 gear each) must hold on every
-    // roll, and across the sweep gear must actually drop (so the cap is not vacuous).
-    for (let seed = 1; seed <= 40; seed++) {
-      const sim = makeSim(seed);
-      sim.utcDay = DAY;
-      const pids = [
-        sim.addPlayer('warrior', 'Ada'),
-        sim.addPlayer('mage', 'Bru'),
-        sim.addPlayer('rogue', 'Cyd'),
-      ];
+    const sim = makeSim(1);
+    sim.utcDay = DAY;
+    const pids = [
+      sim.addPlayer('warrior', 'Ada'),
+      sim.addPlayer('mage', 'Bru'),
+      sim.addPlayer('rogue', 'Cyd'),
+    ];
+    // Forty consecutive bosses exercise 120 deterministic personal loot rolls.
+    // A fresh continent per roll does not affect loot and used to dominate the
+    // property runtime, so reuse the same authoritative Sim and advance its RNG.
+    for (let roll = 1; roll <= 40; roll++) {
+      (sim as any).worldBossEntityIds[0] = null;
       const { boss } = spawnBossNow(sim);
       killWith(sim, boss, pids);
       const items = boss.loot?.items ?? [];
@@ -386,6 +409,7 @@ describe('world boss personal loot', () => {
         expect(gear.length).toBeLessThanOrEqual(1);
         if (gear.length === 1) anyGearDropped = true;
       }
+      (sim as any).dropEntity(boss.id);
     }
     expect(anyGearDropped).toBe(true);
   });
@@ -780,21 +804,59 @@ describe('world boss is imposing and loud', () => {
   });
 });
 
+describe('world boss keeps a quiet combat log (quietMechanics)', () => {
+  it('opts into quiet mechanics and a battle cry about every 45s', () => {
+    expect(MOBS[BOSS_ID]?.quietMechanics).toBe(true);
+    expect(MOBS[BOSS_ID]?.battleYells?.every).toBe(45);
+  });
+
+  it('fires its mechanics without ever barking "unleashes X" or "becomes enraged" to the log', () => {
+    const sim = makeSim();
+    const tank = sim.addPlayer('warrior', 'Tank');
+    const { boss } = spawnBossNow(sim);
+    const p = (sim as any).entities.get(tank) as Entity;
+    p.gm = true; // survive the raid-tier melee so the pull runs for real seconds
+    p.maxHp = p.hp = 1_000_000;
+    let barks = 0;
+    let bossSpellfx = 0;
+    for (let t = 0; t < 20 * 60; t++) {
+      p.pos = { x: boss.pos.x + 2, z: boss.pos.z, y: boss.pos.y };
+      if (t % 10 === 0) (sim as any).dealDamage(p, boss, 1, false, 'physical', 'Chip', 'hit', true);
+      // Drop him under the 20% enrage threshold partway through so the enrage
+      // path (which also barked "becomes enraged!") runs during the sample.
+      if (t === 20 * 30) boss.hp = Math.floor(boss.maxHp * 0.15);
+      for (const e of sim.tick()) {
+        if (e.type === 'log' && /unleashes|becomes enraged/i.test((e as any).text)) barks++;
+        if (e.type === 'spellfx' && (e as any).sourceId === boss.id) bossSpellfx++;
+      }
+    }
+    expect(barks).toBe(0); // the log stayed quiet...
+    expect(bossSpellfx).toBeGreaterThan(0); // ...but the mechanics (spellfx novas) still fired
+  });
+});
+
 describe('world boss pathing (phases through obstacles)', () => {
   it('walks a dead-straight chase line through a building collider', () => {
     const sim = makeSim();
     const { boss } = spawnBossNow(sim);
-    // The zone1 house at (10, 12) is a 7x6 OBB collider. Park the boss south of
-    // it and march him due north straight through: with phasesThroughObstacles
-    // his x never deviates and he arrives on the straight-line tick budget. A
-    // sliding mover would have to fan around the OBB (x deviates) or stall.
-    boss.pos = { x: 10, z: 2, y: 0 };
-    const dest = { x: 10, z: 22, y: 0 };
+    const bank = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank;
+    const start = localToWorld(
+      bank.position,
+      bank.rotation,
+      0,
+      bank.nativeDimensions.depth / 2 + 5,
+    );
+    const end = localToWorld(bank.position, bank.rotation, 0, -bank.nativeDimensions.depth / 2 - 5);
+    boss.pos = { ...start, y: 0 };
+    const dest = { ...end, y: 0 };
     let arrived = false;
-    const straightTicks = Math.ceil(20 / (boss.moveSpeed * (1 / 20))) + 2;
+    const lineLength = Math.hypot(end.x - start.x, end.z - start.z);
+    const straightTicks = Math.ceil(lineLength / (boss.moveSpeed * (1 / 20))) + 2;
     for (let t = 0; t < straightTicks && !arrived; t++) {
       arrived = (sim as any).moveToward(boss, dest, boss.moveSpeed);
-      expect(Math.abs(boss.pos.x - 10)).toBeLessThan(1e-6);
+      const cross =
+        (boss.pos.x - start.x) * (end.z - start.z) - (boss.pos.z - start.z) * (end.x - start.x);
+      expect(Math.abs(cross) / lineLength).toBeLessThan(1e-6);
     }
     expect(arrived).toBe(true);
   });
@@ -804,10 +866,25 @@ describe('world boss pathing (phases through obstacles)', () => {
     const { boss } = spawnBossNow(sim);
     // Reuse the boss entity but masquerade as an unflagged template: the gate
     // reads MOBS[templateId], so a plain wolf template must NOT phase.
+    const bank = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank;
+    const start = localToWorld(
+      bank.position,
+      bank.rotation,
+      0,
+      bank.nativeDimensions.depth / 2 + 0.7,
+    );
+    const end = localToWorld(bank.position, bank.rotation, 0, -bank.nativeDimensions.depth / 2 - 5);
     boss.templateId = 'forest_wolf';
-    boss.pos = { x: 10, z: 8, y: 0 };
-    (sim as any).moveToward(boss, { x: 10, z: 22, y: 0 }, 7);
-    const deflected = Math.abs(boss.pos.x - 10) > 1e-6 || Math.abs(boss.pos.z - 8) < 0.3;
+    boss.pos = { ...start, y: 0 };
+    (sim as any).moveToward(boss, { ...end, y: 0 }, 7);
+    const lineLength = Math.hypot(end.x - start.x, end.z - start.z);
+    const progress =
+      ((boss.pos.x - start.x) * (end.x - start.x) + (boss.pos.z - start.z) * (end.z - start.z)) /
+      lineLength;
+    const cross =
+      ((boss.pos.x - start.x) * (end.z - start.z) - (boss.pos.z - start.z) * (end.x - start.x)) /
+      lineLength;
+    const deflected = Math.abs(cross) > 1e-6 || progress < 0.3;
     expect(deflected).toBe(true);
   });
 
@@ -817,7 +894,7 @@ describe('world boss pathing (phases through obstacles)', () => {
 });
 
 describe('world boss summons erupt centered on him and engage immediately', () => {
-  it('spawns adds on the boss, aggroed on his target, leashing to his spawn point', () => {
+  it('spawns adds on the boss, aggroed on his target, anchored where they erupted', () => {
     const sim = makeSim();
     const tank = sim.addPlayer('warrior', 'Tank');
     const { boss } = spawnBossNow(sim);
@@ -839,9 +916,47 @@ describe('world boss summons erupt centered on him and engage immediately', () =
       expect(add.aggroTargetId).toBe(tank);
       expect(add.inCombat).toBe(true);
       expect(add.aiState === 'chase' || add.aiState === 'attack').toBe(true);
-      // Kited too far, they run home to the boss's ORIGINAL spawn point.
-      expect(add.spawnPos.x).toBeCloseTo(boss.spawnPos.x, 5);
-      expect(add.spawnPos.z).toBeCloseTo(boss.spawnPos.z, 5);
+      // Anchored where they ERUPTED (the tight cluster on the boss, before the
+      // add's first chase step): kited from here, the leash walks them back to
+      // this point beside the fight.
+      expect(Math.hypot(add.spawnPos.x - boss.pos.x, add.spawnPos.z - boss.pos.z)).toBeLessThan(2);
+      expect(add.leashAnchor).not.toBeNull();
+    }
+  });
+
+  it('adds hatched from a KITED boss engage instead of leashing home instantly', () => {
+    const sim = makeSim();
+    const tank = sim.addPlayer('warrior', 'Tank');
+    const { boss } = spawnBossNow(sim);
+    const pt = (sim as any).entities.get(tank) as Entity;
+    pt.maxHp = pt.hp = 1_000_000;
+    // Drag the fight well past the open-world leash radius (45) from his spawn,
+    // as a kiter does; his own anchor refreshes from the player's hits.
+    boss.pos = {
+      x: boss.spawnPos.x + 80,
+      z: boss.spawnPos.z,
+      y: boss.pos.y,
+    };
+    boss.prevPos = { ...boss.pos };
+    (sim as any).rebucket(boss);
+    pt.pos = { x: boss.pos.x + 10, z: boss.pos.z, y: boss.pos.y };
+    pt.prevPos = { ...pt.pos };
+    (sim as any).rebucket(pt);
+    (sim as any).dealDamage(pt, boss, 50, false, 'physical', 'Chip', 'hit', true);
+    boss.hp = Math.floor(boss.maxHp * 0.6);
+    sim.tick();
+    const adds = [...(sim as any).entities.values()].filter(
+      (e: Entity) => e.templateId === 'thunzharr_stormling' && !e.dead,
+    );
+    expect(adds).toHaveLength(2);
+    // The old behavior anchored adds to the boss's ORIGINAL spawn, so hatching
+    // 80yd out put them instantly past their leash: first engaged tick flipped
+    // them to evade with a wiped hate table and they never swung at anyone.
+    for (let t = 0; t < 20; t++) sim.tick();
+    for (const add of adds) {
+      expect(add.aiState === 'chase' || add.aiState === 'attack').toBe(true);
+      expect(add.aggroTargetId).toBe(tank);
+      expect(add.threat.size).toBeGreaterThan(0);
     }
   });
 });

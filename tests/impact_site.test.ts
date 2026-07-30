@@ -6,6 +6,7 @@ import {
   impactSiteVisualY,
   MIREFEN_IMPACT_SITE,
 } from '../src/render/impact_site';
+import { impactCraterTerrainBlend } from '../src/render/impact_terrain';
 import { zoneAt } from '../src/sim/data';
 import {
   groundHeight,
@@ -14,16 +15,15 @@ import {
   terrainHeight,
   WATER_LEVEL,
 } from '../src/sim/world';
-import { impactCraterTerrainBlend } from '../src/render/impact_terrain';
 
 const SEED = 42;
 
 describe('Mirefen impact site', () => {
-  it('is placed around Brother Aldric\'s reported western Mirefen wall base', () => {
+  it("is placed around Brother Aldric's reported western Mirefen wall base", () => {
     expect(MIREFEN_IMPACT_SITE.x).toBeGreaterThanOrEqual(148);
     expect(MIREFEN_IMPACT_SITE.x).toBeLessThan(152);
     expect(MIREFEN_IMPACT_SITE.z).toBe(295);
-    expect(zoneAt(MIREFEN_IMPACT_SITE.z).id).toBe('mirefen_marsh');
+    expect(zoneAt(MIREFEN_IMPACT_SITE.x, MIREFEN_IMPACT_SITE.z).id).toBe('mirefen_marsh');
 
     const impactY = terrainHeight(MIREFEN_IMPACT_SITE.x, MIREFEN_IMPACT_SITE.z, SEED);
     const wallY = terrainHeight(MIREFEN_IMPACT_SITE.x + 4, MIREFEN_IMPACT_SITE.z, SEED);
@@ -39,26 +39,50 @@ describe('Mirefen impact site', () => {
 
   it('carves a broad authoritative crater depression into the terrain', () => {
     const centerY = groundHeight(MIREFEN_IMPACT_CRATER.x, MIREFEN_IMPACT_CRATER.z, SEED);
-    expect(mirefenImpactCraterOffset(MIREFEN_IMPACT_CRATER.x, MIREFEN_IMPACT_CRATER.z)).toBeLessThan(-2);
+    expect(
+      mirefenImpactCraterOffset(MIREFEN_IMPACT_CRATER.x, MIREFEN_IMPACT_CRATER.z),
+    ).toBeLessThan(-2);
     expect(centerY).toBeGreaterThan(WATER_LEVEL + 0.75);
 
     const outerX = MIREFEN_IMPACT_CRATER.x - MIREFEN_IMPACT_CRATER.radius * 1.1;
-    expect(Math.abs(mirefenImpactCraterOffset(outerX, MIREFEN_IMPACT_CRATER.z))).toBeLessThan(0.001);
+    expect(Math.abs(mirefenImpactCraterOffset(outerX, MIREFEN_IMPACT_CRATER.z))).toBeLessThan(
+      0.001,
+    );
 
-    const leftLipY = terrainHeight(MIREFEN_IMPACT_CRATER.x - MIREFEN_IMPACT_CRATER.bowlRadius, MIREFEN_IMPACT_CRATER.z, SEED);
-    const rightLipY = terrainHeight(MIREFEN_IMPACT_CRATER.x + MIREFEN_IMPACT_CRATER.bowlRadius, MIREFEN_IMPACT_CRATER.z, SEED);
+    const leftLipY = terrainHeight(
+      MIREFEN_IMPACT_CRATER.x - MIREFEN_IMPACT_CRATER.bowlRadius,
+      MIREFEN_IMPACT_CRATER.z,
+      SEED,
+    );
+    const rightLipY = terrainHeight(
+      MIREFEN_IMPACT_CRATER.x + MIREFEN_IMPACT_CRATER.bowlRadius,
+      MIREFEN_IMPACT_CRATER.z,
+      SEED,
+    );
     expect(centerY).toBeLessThan(leftLipY - 0.45);
     expect(centerY).toBeLessThan(rightLipY - 0.45);
-    expect(mirefenImpactCraterOffset(MIREFEN_IMPACT_CRATER.x + MIREFEN_IMPACT_CRATER.bowlRadius, MIREFEN_IMPACT_CRATER.z)).toBeGreaterThan(0.25);
+    expect(
+      mirefenImpactCraterOffset(
+        MIREFEN_IMPACT_CRATER.x + MIREFEN_IMPACT_CRATER.bowlRadius,
+        MIREFEN_IMPACT_CRATER.z,
+      ),
+    ).toBeGreaterThan(0.25);
   });
 
   it('keeps the crater deformation smooth enough for terrain mesh interpolation', () => {
     const maxLowDetailStep = 4.4;
     const maxVerticalChangeAcrossLowDetailStep = 1.25;
     for (const zStep of [-1, 0, 1]) {
-      for (let x = MIREFEN_IMPACT_CRATER.x - MIREFEN_IMPACT_CRATER.radius; x <= MIREFEN_IMPACT_CRATER.x + MIREFEN_IMPACT_CRATER.radius; x += maxLowDetailStep) {
+      for (
+        let x = MIREFEN_IMPACT_CRATER.x - MIREFEN_IMPACT_CRATER.radius;
+        x <= MIREFEN_IMPACT_CRATER.x + MIREFEN_IMPACT_CRATER.radius;
+        x += maxLowDetailStep
+      ) {
         const a = mirefenImpactCraterOffset(x, MIREFEN_IMPACT_CRATER.z + zStep * maxLowDetailStep);
-        const b = mirefenImpactCraterOffset(x + maxLowDetailStep, MIREFEN_IMPACT_CRATER.z + zStep * maxLowDetailStep);
+        const b = mirefenImpactCraterOffset(
+          x + maxLowDetailStep,
+          MIREFEN_IMPACT_CRATER.z + zStep * maxLowDetailStep,
+        );
         expect(Math.abs(a - b)).toBeLessThan(maxVerticalChangeAcrossLowDetailStep);
       }
     }
@@ -88,8 +112,14 @@ describe('Mirefen impact site', () => {
 
   it('matches terrain tinting to the physical crater bowl and lip', () => {
     const center = impactCraterTerrainBlend(MIREFEN_IMPACT_CRATER.x, MIREFEN_IMPACT_CRATER.z);
-    const lip = impactCraterTerrainBlend(MIREFEN_IMPACT_CRATER.x + MIREFEN_IMPACT_CRATER.bowlRadius, MIREFEN_IMPACT_CRATER.z);
-    const outside = impactCraterTerrainBlend(MIREFEN_IMPACT_CRATER.x + MIREFEN_IMPACT_CRATER.radius + 1, MIREFEN_IMPACT_CRATER.z);
+    const lip = impactCraterTerrainBlend(
+      MIREFEN_IMPACT_CRATER.x + MIREFEN_IMPACT_CRATER.bowlRadius,
+      MIREFEN_IMPACT_CRATER.z,
+    );
+    const outside = impactCraterTerrainBlend(
+      MIREFEN_IMPACT_CRATER.x + MIREFEN_IMPACT_CRATER.radius + 1,
+      MIREFEN_IMPACT_CRATER.z,
+    );
 
     expect(center.ash).toBeGreaterThan(0.75);
     expect(center.scorch).toBeGreaterThan(lip.scorch);

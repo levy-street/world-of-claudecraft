@@ -6,6 +6,7 @@ const HANDLE = {} as unknown as BotTrackingContext;
 export function createBotDetector(): BotDetector {
   return {
     createTrackingContext: (_ref, _meta) => HANDLE,
+    setTrackingConnection: () => {},
     releaseTrackingContext: () => {},
     observeCommand: () => {},
     observeEvent: () => {},

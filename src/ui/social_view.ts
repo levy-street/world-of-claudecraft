@@ -20,7 +20,7 @@ import type {
   SocialInfo,
 } from '../world_api';
 
-export type SocialTab = 'friends' | 'guild' | 'ignore' | 'raid';
+export type SocialTab = 'friends' | 'guild' | 'ignore' | 'block' | 'raid';
 
 /** Structural identity of the panel: which tab, online or not, and the guild
  *  membership/rank (which changes the footer) plus the raid roster shape.
@@ -49,10 +49,13 @@ export interface FriendRow {
   cls: string;
   level: number;
   online: boolean;
-  /** Status dot kind: 'off' | 'online' | 'combat' | 'dungeon' | 'dead'. */
+  /** Status dot kind: 'off' | 'online' | 'combat' | 'dungeon' | 'dead' | 'afk'. */
   dot: string;
   status: string | undefined;
   zone: string | undefined;
+  /** The selected Book of Deeds title as a DEED ID (null untitled); the
+   *  painter localizes through deed_i18n.ts and hides on ''. */
+  activeTitle: string | null;
 }
 
 /** Friends-tab rows in source order. */
@@ -66,6 +69,7 @@ export function friendRows(social: SocialInfo | null): FriendRow[] {
     dot: socialDot(f.online, f.status),
     status: f.status,
     zone: f.zone,
+    activeTitle: f.activeTitle ?? null,
   }));
 }
 
@@ -73,10 +77,16 @@ export interface IgnoreRow {
   name: string;
 }
 
-/** Ignore-tab rows in source order. */
-export function ignoreRows(social: SocialInfo | null): IgnoreRow[] {
+/** Blocked-tab rows in source order: the BLOCKED list (the heavy tier). */
+export function blockRows(social: SocialInfo | null): IgnoreRow[] {
   const blocks = social?.blocks ?? [];
   return blocks.map((b) => ({ name: b.name }));
+}
+
+/** Blocked-tab rows in source order: the IGNORED list (chat-only, the light tier). */
+export function ignoreRows(social: SocialInfo | null): IgnoreRow[] {
+  const ignores = social?.ignores ?? [];
+  return ignores.map((i) => ({ name: i.name }));
 }
 
 export interface GuildRow {
@@ -91,6 +101,9 @@ export interface GuildRow {
    *  The painter formats it (relative/date) and localizes; the core just
    *  passes it through. */
   lastLogin: string | null;
+  /** The selected Book of Deeds title as a DEED ID (null untitled), as on
+   *  FriendRow. */
+  activeTitle: string | null;
   /** This member's guild rank key ('leader' | 'officer' | 'member'). */
   rank: string;
   /** True when this row is the viewing player. */
@@ -110,7 +123,19 @@ export interface GuildRow {
 
 export interface GuildView {
   /** Null when the viewer has no guild (the tab shows the empty state). */
-  guild: { name: string; rank: string; memberCount: number; rows: GuildRow[] } | null;
+  guild: {
+    name: string;
+    rank: string;
+    memberCount: number;
+    /** The guild billboard message ('' when unset) and its setter's display
+     *  name ('' when unset). The painter escapes the text; never linkified. */
+    motd: string;
+    motdSetBy: string;
+    /** True iff the viewer may edit the billboard (rank leader or officer);
+     *  UX only, the server enforces the real gate. */
+    canEditMotd: boolean;
+    rows: GuildRow[];
+  } | null;
 }
 
 /** Guild-tab view: the header (name + viewer rank + count) and per-member rows
@@ -133,6 +158,7 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
       status: m.status,
       zone: m.zone,
       lastLogin: m.lastLogin ?? null,
+      activeTitle: m.activeTitle ?? null,
       rank: m.rank,
       self,
       canWhisper: m.online && !self,
@@ -142,7 +168,50 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
       canKick,
     };
   });
-  return { guild: { name: guild.name, rank: me, memberCount: guild.members.length, rows } };
+  return {
+    guild: {
+      name: guild.name,
+      rank: me,
+      memberCount: guild.members.length,
+      motd: guild.motd ?? '',
+      motdSetBy: guild.motdSetBy ?? '',
+      canEditMotd: me === 'leader' || me === 'officer',
+      rows,
+    },
+  };
+}
+
+export type GuildRosterGroup = 'online' | 'offline';
+
+/** A guild-roster render item for the grouped view: either a group HEADER carrying
+ *  the group's member count, or a single MEMBER row. */
+export type GuildRosterItem =
+  | { kind: 'header'; group: GuildRosterGroup; count: number }
+  | { kind: 'member'; row: GuildRow };
+
+/**
+ * Group a guild roster online-first: an "online" header (+ count) over the online
+ * members, then an "offline" header (+ count) over the offline members. Preserves
+ * the source order within each group (guildView's secondary sort). Empty groups emit
+ * NO header (never an empty "Offline (0)"), so an all-online or all-offline roster
+ * renders exactly one group. `hideOffline` drops the offline header AND its rows
+ * entirely (the online header's count still reflects the real online membership, since
+ * the filter only suppresses the offline group's rendering). A DOM-free, i18n-free
+ * pure projection: the painter localizes each header and formats the count.
+ */
+export function guildRosterItems(rows: GuildRow[], hideOffline: boolean): GuildRosterItem[] {
+  const online = rows.filter((r) => r.online);
+  const offline = rows.filter((r) => !r.online);
+  const items: GuildRosterItem[] = [];
+  if (online.length > 0) {
+    items.push({ kind: 'header', group: 'online', count: online.length });
+    for (const row of online) items.push({ kind: 'member', row });
+  }
+  if (!hideOffline && offline.length > 0) {
+    items.push({ kind: 'header', group: 'offline', count: offline.length });
+    for (const row of offline) items.push({ kind: 'member', row });
+  }
+  return items;
 }
 
 export interface RaidMemberRow {

@@ -15,51 +15,115 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `anim_state.ts`: pure, three-free pose math: the `AnimState` (renderer-derived
   input) + `BaseState` types and `desiredBaseState()`/`locomotionTimeScale()` that
   `visual.ts` delegates to.
-- `assets.ts`: module-import preloads every `manifestUrls()` GLB via
-  `registerPreload`; `prepareVisual(key)` memoizes normalize transform, resolved
-  clips, click-capsule radius, and a baked idle-pose geo (far-LOD/shadow proxy).
+- `assets.ts`: module-import preloads `characterPreloadUrls()` via
+  `registerPreload`: the tier-INDEPENDENT union of every graphics tier's URL
+  set (placement resolves URLs against the LIVE tier after import froze the
+  guess; see the P0 comment in `manifest.ts` and
+  `tests/render_asset_preload.test.ts`). `prepareVisual(key)` memoizes
+  normalize transform, resolved clips, click-capsule radius, and a baked
+  idle-pose geo (far-LOD/shadow proxy). `charactersReady()` is a narrower gate
+  than the site-wide `assetsReady()`: only this file's boot GLBs + skin atlases,
+  with its own retry loop (delayed, backed off between outer attempts) so a
+  transient failure anywhere else on the site can never permanently blank the
+  landing character-creation preview (`src/main.ts` awaits it there instead of
+  `assetsReady()`; see `tests/character_preview_boot.test.ts`).
+- `asset_miss_log.ts`: once-per-key dev logging for character-asset failures in
+  per-frame render paths; `createCharacterVisual` returns null on such a
+  failure so callers skip the view for the frame instead of stalling the
+  renderer (`tests/character_visual_fail_soft.test.ts`).
+- `halo.ts`: the class halo (the priest's Light): `buildHalo(color, upOffset,
+  radius)`, driven by `VisualDef.halo` plus the optional
+  `haloUpOffset`/`haloRadius` placement overrides (defaults live here; the
+  priest overrides only the lift, for hat clearance). Texture, per-color
+  materials, and
+  per-radius geometries are shared never-disposed caches; radii must come from
+  static `VisualDef` values so the cache keys stay bounded. `visual.ts` parents
+  the mesh to the head bone and keeps it out of the shadow-caster sweeps
+  (`tests/character_halo.test.ts`).
+- `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
+  one draw per material (`assets.ts` `assembleModel` calls it). Read its
+  header bind-pose proof before touching bone inverses.
 - `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/ghost
   plumbing, one-shot triggers, death/revive edge logic.
 - `preview.ts`: `CharacterPreview`, the character-creation turntable (own scene/
-  camera/loop), driven from `src/main.ts`.
+  camera/loop), driven from `src/main.ts`; `preview_appearance.ts` resolves a
+  `PreviewAppearance` (class, skin, mech, mainhand, offhand) to its visual key and
+  independent held-item layout.
 - `portrait.ts`: offscreen-WebGL headshot factory: renders a (class/visual-key, skin)
-  head-and-shoulders PNG from the real model, caches the data URL. Consumed by
-  `src/main.ts`, `src/ui/unit_portrait_painter.ts`, `src/ui/hud.ts`, `portrait_chip.ts`.
+  PNG at the requested `PortraitFraming` from the real model, caches the data URL.
+- `weapon_grip.ts`: pure, three-free per-weapon grip nudges
+  (`WEAPON_GRIP_OVERRIDES`) layered on the family `VariantGrip`; shared with
+  the asset pipeline's live inspector.
+- `weapon_skin_materials.ts`: tracks and disposes the materials a displayed
+  weapon skin owns (`tests/weapon_skin_materials.test.ts`).
+- `skin_attack.ts`: skin-driven attack-clip substitution (a bow skin swaps
+  the hunter's crossbow shot); pure over the skin catalog
+  (`tests/weapon_skins.test.ts`).
+- `back_grips.ts`: back-carry transforms for sheathed weapons on the chest
+  bone; pure data + math (`tests/back_grips.test.ts`).
+- `stow_transition.ts`: the sheathe-transition state machine (defers the
+  hands-to-back prop swap to the gesture midpoint); pure
+  (`tests/stow_transition.test.ts`).
+- `portrait_framing.ts`: pure camera-framing math per `PortraitFraming`
+  (headshot chip vs 3/4 body, e.g. the Inspect window) for `portrait.ts`
+  (`tests/portrait_framing.test.ts`).
 - `index.ts`: public exports + `createCharacterVisual(e, formKey?)` factory.
 
-## Families & keys
-~12 creature families plus 9 player classes, forms, skeletons, humanoid mobs,
-and NPCs, all in `VISUALS`. Dispatch precedence in `visualKeyFor`: players to
+## Keys & dispatch
+Every drawable is a `VisualDef` in `VISUALS` (player classes, creature families,
+humanoid mobs, NPCs, forms). Dispatch precedence in `visualKeyFor`: players to
 `player_<class>` (or `player_mech` for the mech skin catalog); mobs to
-`MOB_KEYS[templateId]` then `FAMILY_KEYS[MOBS[id].family]`
-(beast/humanoid/murloc/spider/kobold/undead/troll/ogre/elemental/dragonkin/demon),
-falling back to `mob_bandit`; NPCs to `NPC_KEYS` (default `npc_villager`). Forms
+`MOB_KEYS[templateId]`, then `FAMILY_KEYS[MOBS[id].family]` (the family ids
+live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
 (`form_sheep`/`form_bear`/`form_cat`/`form_travel`) are passed explicitly by the renderer.
 
 ## Animation
 - `AnimState` (the renderer-derived input) and `BaseState`
-  (`idle|walk|walkBack|run|cast|swim|sit|jump`) live in `anim_state.ts`, which
+  (`idle|walk|walkBack|run|cast|spin|swim|sit|jump`) live in `anim_state.ts`, which
   also owns `desiredBaseState()` (pose selection) and `locomotionTimeScale()`
-  (foot-speed matching). Clip *names* are per source rig in `ClipMap` factories:
-  `kaykit`, `skeletonClips`, `animal`, `BIPED14`, `ENEMY7`, `FLOATING`, `SPIDER`.
-  Names differ per rig (e.g. KayKit `Walking_A`, Quaternius `Gallop`),
-  `baseAction()` falls back gracefully.
+  (foot-speed matching). Clip *names* are per source rig in the `ClipMap`
+  factories (`manifest.ts`); names differ per rig (e.g. KayKit `Walking_A`,
+  Quaternius `Gallop`), `baseAction()` falls back gracefully.
 - **`src/render/renderer.ts` is the sole driver.** It builds `AnimState` each
   frame (swimming/sitting derived there, sim is unaware), calls `update(dt, s,
-  animate)`, fires `playAttack()`/`playHit()` from sim events, and toggles
-  `setFar`/`setShadow`/`setProxyShadow`/`setGhost`. Don't drive visuals elsewhere.
+  animate)`, fires `playAttack()`/`playHit()` from sim events, and toggles live
+  held items and effects. Don't drive visuals elsewhere.
+- **Crowd scaling / LOD bands:** the renderer consults `src/render/crowd_lod.ts`
+  (pure, unit-tested) for the shadow/anim-cadence ranges as rig counts climb,
+  and for where `setFar` swaps the rig for the baked idle-pose mesh. Between the
+  articulated band and that swap sits the animated far band: the rig keeps its
+  clips at a low cadence (the mixer integrates the skipped time via `pendingDt`,
+  so the clip plays at its real speed, just at fewer pose updates) instead of
+  freezing. The policy is cosmetic-only and exempts anything a player reacts to
+  from BOTH the cadence and the frozen mesh.
 - Death/revive are **edge-triggered locally** from `s.dead` (clamped one-shot);
   `flourish` plays on respawn. One-shots clamp on the last frame, see the
   T-pose-pop comment in `playOneShot`.
+- **Never leave the rig at zero weight.** A SkinnedMesh renders BIND pose (the
+  T-pose) whenever the mixer's scheduled actions sum below 1, and the base-state
+  fade only runs on an EDGE, so a partner-less `fadeIn` sticks for as long as a
+  held state (strafe/cast/walk) lasts. Start every clip through `beginAction`
+  (crossfade only when the outgoing action still drives the rig, else snap to
+  full weight); the per-frame `scanAnimRepair` watchdog (`anim_state.ts`) is the
+  backstop that re-drives the base pose after 3 starved frames.
 
-## Adding things
-- **New family/key:** add a `VisualDef` to `VISUALS` (existing `ClipMap` or a new
-  factory if the rig's clip names differ) and wire `FAMILY_KEYS`/`MOB_KEYS`/`NPC_KEYS`.
-  `manifestUrls()` auto-preloads `url` + `attach[].url` (skipping `lazyPreload`
-  defs), so drop the GLB under `public/models/...` and run the media-manifest build.
+## Adding things (module-first: where NEW work lands, and its test)
+- **New family/key:** a declarative `VisualDef` in `VISUALS` (existing `ClipMap`
+  or a new factory if the rig's clip names differ), wired via
+  `FAMILY_KEYS`/`MOB_KEYS`/`NPC_KEYS`. `manifestUrls()` auto-preloads `url` +
+  `attach[].url` + `animUrls` (skipping `lazyPreload` defs), so drop the GLB
+  under `public/models/...` and run the media-manifest build.
 - **New animation state:** add the field to `AnimState`, extend `BaseState` +
   `desiredBaseState()` (`anim_state.ts`), `baseAction()`, and `ClipMap`/`clipNamesOf()`,
-  then have the renderer set the new flag.
+  then have the renderer set the new flag. New pose LOGIC goes in the pure
+  `anim_state.ts` half a Vitest imports directly, never inline in `visual.ts`.
+- **Tests:** `tests/visual_manifest.test.ts` pins the `VISUALS`/clip contract,
+  `tests/character_clipmaps.test.ts` gates every ClipMap name against the clips
+  actually in the shipped GLB (both graphics tiers), `tests/character_anim_state.test.ts`
+  the pure pose/watchdog math, `tests/character_tpose_repair.test.ts` the live
+  mixer weights across death, respawn and repeated swings. Fix bugs test-first:
+  reproduce there (or in `tests/rig_merge.test.ts` for merge math), then the
+  smallest change that turns it green.
 
 ## Gotchas / never
 - KayKit GLBs ship **every** accessory visible: `VisualDef.show` is an allowlist

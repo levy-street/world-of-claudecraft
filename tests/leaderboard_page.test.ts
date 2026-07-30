@@ -17,6 +17,7 @@ function makeEntries(n: number): LeaderboardEntry[] {
     virtualLevel: 20,
     lifetimeXp: (n - i) * 1000,
     prestigeRank: 0,
+    title: null,
   }));
 }
 

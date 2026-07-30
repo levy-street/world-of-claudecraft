@@ -113,6 +113,49 @@ describe('mailbox_window: recipient autocomplete wiring', () => {
   });
 });
 
+describe('mailbox_window: parcel quantity stepper (#1444, PR #1695 review)', () => {
+  it('routes +/- clamping through the clampParcelQty view helper', () => {
+    expect(painter).toContain('clampParcelQty(');
+  });
+
+  it('the ceiling excludes instanced (non-fungible) copies, matching the sim send-path check', () => {
+    expect(painter).toMatch(/inventory\.filter\(\(s\) => s\.itemId === itemId && !s\.instance\)/);
+  });
+
+  it('renders both stepper aria-labels', () => {
+    expect(painter).toContain('parcelQtyDecreaseAria');
+    expect(painter).toContain('parcelQtyIncreaseAria');
+  });
+
+  it('the stepper only renders once more than one is owned', () => {
+    expect(painter).toContain('owned > 1');
+  });
+
+  it('the +/- buttons truly disable (not just visually) at the floor/ceiling', () => {
+    expect(painter).toMatch(/minus\.disabled = slot\.count <= 1/);
+    expect(painter).toMatch(/plus\.disabled = slot\.count >= owned/);
+  });
+
+  it('the quantity value is an aria-live region so screen readers hear the new count', () => {
+    expect(painter).toMatch(/qty\.setAttribute\('aria-live', 'polite'\)/);
+  });
+
+  it('the item name is keyboard-focusable so its tooltip is Tab-reachable', () => {
+    expect(painter).toMatch(/name\.tabIndex = 0/);
+  });
+
+  it('keys every parcel control by item + role, so a rebuild can refocus the equivalent', () => {
+    // Titled for what it checks: that the KEYS are written, in the shape the ladder
+    // splits on. Where focus actually LANDS is behavioral and lives in
+    // tests/mailbox_window_focus.test.ts; this file only reads source text.
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:minus`/);
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:plus`/);
+    // The qty input was missing from this list, and it is the rung the ladder prefers.
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:qty`/);
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:remove`/);
+  });
+});
+
 describe('mailbox_window: house style', () => {
   it('uses no em or en dashes (ASCII separators only)', () => {
     expect(painter.includes('\u2014'), 'em dash found').toBe(false);

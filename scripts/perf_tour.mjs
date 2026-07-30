@@ -5,6 +5,8 @@ import path from 'node:path';
 import puppeteer from 'puppeteer-core';
 
 import { BROWSER_PATH } from './browser_path.mjs';
+import { enterOfflineGame } from './enter_offline_game.mjs';
+import { perfTourEntryOptions } from './perf_tour_entry_options.mjs';
 
 const BASE_URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const VIEWPORT_MODE = process.env.PERF_VIEWPORT ?? 'both';
@@ -110,39 +112,8 @@ function isIgnorableConsoleError(text) {
 async function bootOffline(page, viewport) {
   await page.setViewport(viewport);
   await page.goto(perfUrl(), { waitUntil: 'domcontentloaded', timeout: NAV_TIMEOUT_MS });
-  await page.waitForSelector('#btn-offline', { timeout: 30000 });
-  await page.$eval('#btn-offline', (el) => el.click());
-  await page.waitForSelector('#char-name', { timeout: 30000 });
-  await page.$eval(
-    '#char-name',
-    (el, value) => {
-      el.value = value;
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true }));
-    },
-    viewport.label === 'mobile' ? 'MobilePerf' : 'DesktopPerf',
-  );
-  await page.$eval('#offline-select .mini-class[data-class="warrior"]', (el) => el.click());
-  await page.$eval('#btn-start-offline', (el) => el.click());
-  if (viewport.isMobile) {
-    // The touch boot raises the #mobile-preflight "play in landscape fullscreen"
-    // overlay, and prepareWorldEntry() awaits its Continue button before entering the
-    // world. Dismiss it so the world boots (same as the offline E2E scripts); the
-    // fullscreen / orientation-lock requests it fires both swallow their rejection in
-    // headless, so this is safe.
-    await page
-      .waitForSelector('#mobile-preflight-continue', { visible: true, timeout: 30000 })
-      .catch(() => {});
-    await page.evaluate(() => {
-      document.querySelector('#mobile-preflight-continue')?.click();
-    });
-  }
-  try {
-    await page.waitForFunction(
-      () => Boolean(window.__game?.sim?.player && window.__game?.perf?.report),
-      { timeout: BOOT_TIMEOUT_MS },
-    );
-  } catch (err) {
+  const gameBooted = await enterOfflineGame(page, perfTourEntryOptions(viewport, BOOT_TIMEOUT_MS));
+  if (!gameBooted) {
     const state = await page.evaluate(() => {
       const visiblePanel =
         [
@@ -167,9 +138,7 @@ async function bootOffline(page, viewport) {
         fatalText: fatal?.textContent ?? '',
       };
     });
-    throw new Error(`Timed out waiting for offline world boot: ${JSON.stringify(state)}`, {
-      cause: err,
-    });
+    throw new Error(`Timed out waiting for offline world boot: ${JSON.stringify(state)}`);
   }
   await sleep(SETTLE_MS);
 }
@@ -379,6 +348,7 @@ function summarizeResult(result) {
     lastLabel: last?.label ?? '',
     fps: lastReport.fps ?? 0,
     fps10s: lastReport.windows?.last10s?.fps ?? 0,
+    frames: lastReport.frames ?? 0,
     frameP95: lastReport.frameMs?.p95 ?? 0,
     frameP95_10s: lastReport.windows?.last10s?.frameMs?.p95 ?? 0,
     frameLong50: lastReport.frameMs?.long50 ?? 0,
@@ -589,10 +559,19 @@ async function runViewport(browser, viewport) {
 
 fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
 
+// PERF_GPU=1 opts into a HEADED browser on the real GPU; the default stays the
+// headless swiftshader software path (portable, deterministic-ish, CI-shaped).
+// The real-GPU mode exists for the R13 honest-gate baseline captures
+// (frameLong50 / tourMinFrames in tests/hud_perf_budget.baseline.md), which are
+// same-machine values that would be meaningless under software rasterization.
+const PERF_GPU = process.env.PERF_GPU === '1';
+
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
-  headless: 'new',
-  args: ['--window-size=1600,900', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+  headless: PERF_GPU ? false : 'new',
+  args: PERF_GPU
+    ? ['--window-size=1600,900', '--ignore-gpu-blocklist', '--enable-gpu']
+    : ['--window-size=1600,900', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });
 
 const startedAt = new Date().toISOString();
@@ -610,6 +589,7 @@ const artifact = {
   generatedAt: startedAt,
   baseUrl: BASE_URL,
   url: perfUrl(),
+  gpuMode: PERF_GPU ? 'real-gpu-headed' : 'swiftshader-headless',
   scenario: PERF_SCENARIO,
   stepMs: STEP_MS,
   settleMs: SETTLE_MS,

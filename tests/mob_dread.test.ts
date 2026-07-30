@@ -66,6 +66,35 @@ describe('Dread fear-on-hit affix', () => {
     expect(p.auras.some((a) => a.id === 'fear_incap')).toBe(true);
     // updateFearMovement returns true while the fear is active and no root holds.
     expect((sim as any).updateFearMovement(p)).toBe(true);
+    const fear = p.auras.find((a) => a.id === 'fear_incap')!;
+    fear.unbreakableControl = true;
+    expect((sim as any).updateFearMovement(p)).toBe(true);
+  });
+
+  it('unbreakable encounter control freezes an already-feared player', () => {
+    const sim = makeSim();
+    const p = sim.entities.get(sim.playerId)!;
+    p.maxHp = 100000;
+    p.hp = 100000;
+    const mob = createMob(900604, dreadCarrier(), 12, { x: 0, y: 0, z: 0 });
+    for (let i = 0; i < 60 && !p.auras.some((a) => a.id === 'fear_incap'); i++) {
+      p.hp = p.maxHp;
+      (sim as any).mobSwing(mob, p);
+    }
+    expect(p.auras.some((a) => a.id === 'fear_incap')).toBe(true);
+    p.auras.push({
+      id: 'scripted_stun',
+      name: 'Scripted Stun',
+      kind: 'stun',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: mob.id,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+
+    expect((sim as any).updateFearMovement(p)).toBe(false);
   });
 
   it('a friendly pet swing (hostile=false) never fears the party', () => {

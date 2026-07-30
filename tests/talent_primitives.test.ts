@@ -298,6 +298,7 @@ describe('talent primitive P3: empower next', () => {
 
   it('next_cast_free zeroes exactly one cost and is consumed', () => {
     const { sim, p } = makeSim('mage');
+    expect(sim.setSpec('fire')).toBe(true); // fire_blast is DPS-spec kit now
     spawnTarget(sim, p);
     p.resource = 0;
     p.auras.push(aura('next_cast_free'));
@@ -365,7 +366,20 @@ describe('talent primitive P3: empower next', () => {
     // so the free charge must not be consumed at cast start or the player would
     // pay full price anyway. Regression for the start-consume bug.
     const { sim, p } = makeSim('mage');
-    spawnTarget(sim, p);
+    // A STATIONARY target: a wandering wolf can stroll behind the market
+    // furniture during the cast plus flight, and this test is about the
+    // billing, not about town sight lines.
+    const dummy = createMob(sim.nextId++, MOBS.training_dummy, 20, {
+      x: p.pos.x,
+      y: p.pos.y,
+      z: p.pos.z + 4,
+    });
+    dummy.maxHp = 50000;
+    dummy.hp = 50000;
+    dummy.hostile = true;
+    sim.addEntity(dummy);
+    p.facing = Math.atan2(dummy.pos.x - p.pos.x, dummy.pos.z - p.pos.z);
+    sim.targetEntity(dummy.id, p.id);
     p.resource = 0;
     p.auras.push(aura('next_cast_free'));
 
@@ -387,6 +401,7 @@ describe('talent primitive P3: empower next', () => {
 
   it('a channel neither shortens from next_cast_instant nor consumes the charge', () => {
     const { sim, p } = makeSim('mage');
+    expect(sim.setSpec('arcane')).toBe(true); // Aether Darts is Chronomancy-only.
     spawnTarget(sim, p);
     p.auras.push(aura('next_cast_instant'));
 
@@ -466,12 +481,17 @@ describe('talent primitive P2: cast while moving', () => {
     const mods = emptyModifiers();
     mods.abilities.fireball = {
       dmgPct: 0,
+      dmgPctVsDotted: 0,
       flatDmg: 0,
       costPct: 0,
       cooldownPct: 0,
+      critPct: 0,
+      cooldownFlat: 0,
       castPct: 0,
       buffPct: 0,
       castWhileMoving: true,
+      damagePushbackImmune: false,
+      bonusCharges: 0,
       addEffects: [],
     };
     const fb = abilitiesKnownAt('mage', 20, mods).find((k) => k.def.id === 'fireball');
@@ -540,12 +560,17 @@ describe('talent primitives P4/P5', () => {
     const originalEffects = ABILITIES.fireball.effects;
     mods.abilities.fireball = {
       dmgPct: 0,
+      dmgPctVsDotted: 0,
       flatDmg: 0,
       costPct: 0,
       cooldownPct: 0,
+      critPct: 0,
+      cooldownFlat: 0,
       castPct: 0,
       buffPct: 0,
       castWhileMoving: false,
+      damagePushbackImmune: false,
+      bonusCharges: 0,
       addEffects: [added],
     };
 

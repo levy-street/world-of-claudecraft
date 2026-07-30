@@ -24,7 +24,7 @@ walk that ends in "all passed" wastes a large token budget. Gate yourself before
 any file:
 
 1. Get the changed files only (cheap): `git diff --cached --name-only`, or if nothing is
-   staged, `git diff --name-only "$(git merge-base HEAD main)"..HEAD`.
+   staged, `git diff --name-only "$(git merge-base HEAD "$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null || echo origin/main)")"..HEAD`.
 2. You are IN SCOPE if any changed path is under `server/`, `src/admin/`, or `src/net/`,
    is a deploy/build/secret file (`Dockerfile*`, `docker-compose*`, `*.env*`, a CI yml,
    `DEPLOY.md`), or is under `src/sim/` (for the determinism-as-integrity check, rule 10).
@@ -51,6 +51,18 @@ your reading on `server/` (`game.ts`, `db.ts`, `auth.ts`, `social_db.ts`, `admin
 `account.ts`, the `email/` modules, `internal.ts`, `ip_block.ts` / `ip_block_db.ts`,
 `avatar.ts`, `native_attestation.ts`, `web_login_guard.ts`, the `bot_detector/` modules) and
 `src/admin/`, but check any file the diff touches.
+
+**The REST pipeline seam.** New REST endpoints are `RouteDef` modules registered in
+`server/http/registry.ts`, never inline handlers in `server/main.ts` (the inline ladder is
+the retained legacy arm, kept for the `API_DISPATCH=legacy` rollback). For a migrated or new
+route, verify auth / ownership / rate limiting as DECLARED middleware and route meta, not
+in-handler code: `require_account` / `require_admin` / `require_internal_secret` /
+`require_owned` (an ownerScope `'account'` denial is a 404 anti-enumeration response and
+MUST carry a loader; `assertNoOwnedRouteShadowing` in `server/http/registry.ts` guards the
+:id routes at build time), plus `bearer_active_guard`, `origin_check`, `rate_limit`, and
+`turnstile` under `server/http/middleware/`. Metric labels stay bounded (policy / kind /
+route TEMPLATE): never label with an ip, account, token, or concrete id. Read
+`server/http/CLAUDE.md` whenever the diff touches `server/http/` or a routes-table file.
 
 ---
 
@@ -105,9 +117,13 @@ production.
   or non-constant-time comparison of secrets.
 - Name and password validation (length, charset) must run server-side before use; flag
   validation that exists only on the client.
-- The anti-bot gate is `passesTurnstile` in `server/main.ts` (wrapping `verifyTurnstile` from
-  `server/turnstile.ts`), covering registration/login. Flag any new auth entry point, including
-  OAuth consent / device-code and wallet-link, that bypasses it.
+- The anti-bot gate is `passesTurnstile` (`server/turnstile.ts`; it also accepts a verified
+  native-app attestation, `server/native_attestation.ts`), consumed by the legacy `main.ts`
+  handlers AND by the pipeline middleware `server/http/middleware/turnstile.ts`, which is how
+  a `RouteDef` endpoint gets the check (declared per-route on register/login, never a global
+  prologue). For a new RouteDef auth endpoint verify the turnstile middleware is declared on
+  the route; flag any new auth entry point, including OAuth consent / device-code and
+  wallet-link, that declares neither.
 - OAuth2 (`server/oauth.ts` / `oauth_db.ts`): tokens are read-scoped. Flag a read-scoped token
   accepted where a full session token is required, a mutating route reachable with a read token,
   or a dropped PKCE / `state` parameter.
@@ -132,8 +148,11 @@ production.
 - New WebSocket commands and REST endpoints validate every argument (type, range, length,
   ownership) before acting. Flag unbounded strings, unchecked indices into bags/equipment,
   or array lengths read straight from the wire.
-- Rate limiting (`server/ratelimit.ts`) is applied to expensive or abusable actions (auth,
-  chat, market, social spam). Flag a new abusable endpoint with no limit.
+- Rate limiting is applied to expensive or abusable actions (auth, chat, market, social
+  spam): on a RouteDef endpoint it is the declared `rate_limit` middleware
+  (`server/http/middleware/rate_limit.ts`, backed by `server/ratelimit.ts` and the tier-2 pg
+  store); the legacy arm calls `server/ratelimit.ts` in-handler. Flag a new abusable endpoint
+  with no limit on its arm.
 - WebSocket handshake buffering (`server/ws_buffer.ts`) bounds the number of queued pre-auth
   frames (`MAX_HANDSHAKE_FRAMES`), not per-message byte size; flag a new pre-auth path that
   buffers unbounded frames. For oversized inbound payloads, check the `ws` server's own
@@ -144,10 +163,12 @@ production.
 - A player can only act on their own character/inventory/quests. Flag any handler that
   takes a target id from the client and mutates it without an ownership check (IDOR).
 - Admin endpoints under `/admin/api/*` (`server/admin.ts`, `server/admin_db.ts`, `src/admin/`)
-  must resolve the caller via `adminAccountId` / `isAdminAccount` (account `is_admin = TRUE`),
-  not by trusting the `admin.` hostname (routing is not authorization). Flag any `/admin/api/*`
-  route that skips that check, or any admin action reachable by a normal player. The admin
-  dashboard is in scope (operators are users).
+  have two arms: migrated RouteDefs declare the `require_admin` middleware
+  (`server/http/middleware/require_admin.ts`, the primary gate); the retained legacy handlers
+  resolve the caller via `adminAccountId` / `isAdminAccount` (account `is_admin = TRUE`).
+  Neither arm may trust the `admin.` hostname (routing is not authorization). Flag any
+  `/admin/api/*` route that declares/calls neither, or any admin action reachable by a normal
+  player. The admin dashboard is in scope (operators are users).
 - Moderation actions (bans, mutes, chat filter, reports in `server/moderation_db.ts` /
   `server/chat_log.ts` / `server/chat_filter_db.ts`) must be admin-gated and must not expose
   reporter identity to the reported player.
@@ -184,9 +205,9 @@ production.
 
 ### 10. Determinism as Integrity (WARNING)
 
-- `src/sim/` must use `Rng` only (no `Math.random` / `Date.now` / `performance.now`). A
-  nondeterministic sim is an integrity bug: it desyncs the authoritative server from clients
-  and the RL env. Flag any such call introduced into `src/sim/`.
+- Covered by the step-3 scan you already ran (`Math.random` / `Date.now` / `performance.now`
+  added to `src/sim/`) and the standing guard `tests/architecture.test.ts`. Flag any hit; no
+  further reading needed.
 
 ---
 

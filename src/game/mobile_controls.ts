@@ -32,15 +32,17 @@ const DEADZONE = 0.22;
 // screen. Cosmetic only: never fed into the input math (see onMoveDown).
 const MOVE_JOYSTICK_FLOAT_RADIUS = 48;
 const CAMERA_SENSITIVITY = 0.8;
+export const MOVE_AUTORUN_REVEAL_THRESHOLD = 1.45;
+export const MOVE_AUTORUN_THRESHOLD = 2.05;
 // TODO: a dedicated deadzone/smoothing setting for swipe-look is deferred (plan
 // decision 7); touchLookSpeed already covers sensitivity for both the camera
 // joystick and swipe-look, so this constant stays a fixed tuning value for now.
 const SWIPE_LOOK_DEADZONE_PX = 6;
-// Pinch: each pixel the two fingers spread/close maps to this many yards of
-// camera distance. Tuned so a comfortable thumb-to-finger pinch sweeps roughly
-// the full 3..22yd zoom range in one gesture.
-const PINCH_ZOOM_SCALE = 0.04;
-
+// Ignore small two-finger jitter before treating the gesture as intentional
+// camera zoom. The sensitivity is deliberately lower than the old pinch path so
+// a comfortable spread/pinch changes camera distance gradually.
+const PINCH_ZOOM_DEADZONE_PX = 12;
+const PINCH_ZOOM_SENSITIVITY = 0.035;
 // Haptic feedback: short Vibration-API buzzes so touch actions feel physical.
 // On by default (own localStorage key, like music's ev_music_on); try/catch +
 // feature-detect guarded so it no-ops on desktop and under Vitest/jsdom.
@@ -114,7 +116,6 @@ export interface MobileControlCallbacks {
   onCycleTarget(): void;
   onJump(): void;
   onInteract(): void;
-  onAutorun(): boolean;
   /** Open the composer focused (raise the keyboard): the keybind / whisper path. */
   onChat(): void;
   /** Open the centered read view: composer bar visible but NOT focused (no keyboard). */
@@ -129,23 +130,39 @@ export interface MobileControlCallbacks {
   onDonate(): void;
   onEmotes(): void;
   onArena(): void;
+  onDungeonFinder(): void;
   /** Open the Vale Cup window (queue/roster board for the boarball minigame). */
   onValeCup(): void;
   onQuestLog(): void;
   onCharacter(): void;
   onBags(): void;
+  /** Open the Crafting window, folded into the More tray on mobile. */
+  onCrafting(): void;
   onSpellbook(): void;
   onTalents(): void;
   onMap(): void;
   onLeaderboard(): void;
   /** Open the Daily Rewards chest, folded into the More tray on mobile. */
   onDailyRewards(): void;
+  /** Open the Book of Deeds window, folded into the More tray on mobile. */
+  onDeeds(): void;
+  /** Mount / dismount the picked mount directly, in the More tray (the pick
+   *  itself changes in the character sheet's mount picker). */
+  onMountToggle(): void;
+  /** Open the Professions window, folded into the More tray on mobile. */
+  onProfessions(): void;
   /** Toggle world nameplates; returns the new on/off state to sync the button glow. */
   onNameplates(): boolean;
   /** Toggle background music; returns whether music is now enabled. */
   onMusic(): boolean;
   /** Double-tap the camera joystick: snap the camera back behind the character. */
   onRecenterCamera(): void;
+  /** Move an active ground-target reticle to this canvas point. Returns true when
+   * targeting owns the pointer, so the same drag never rotates the camera. */
+  onGroundAimMove(x: number, y: number): boolean;
+  /** Commit an active ground-target spell when the finger is released. Returns
+   * true when targeting consumed the gesture, so it cannot also recenter camera. */
+  onGroundAimTap(x: number, y: number): boolean;
 }
 
 /**
@@ -232,6 +249,14 @@ export function mapJoystickVector(x: number, y: number, deadzone = DEADZONE): To
   };
 }
 
+export function isMoveAutorunPush(y: number, threshold = MOVE_AUTORUN_THRESHOLD): boolean {
+  return y <= -threshold;
+}
+
+export function isMoveAutorunNear(y: number, threshold = MOVE_AUTORUN_REVEAL_THRESHOLD): boolean {
+  return y <= -threshold;
+}
+
 export class MobileControls {
   private active = false;
   private hapticsOn = loadHapticsEnabled();
@@ -258,13 +283,27 @@ export class MobileControls {
   private moveOriginY = 0;
   /** Rendered (transform-scaled) wheel radius: the input throw distance. */
   private moveRadius = 1;
+  private moveAutorunLocked = false;
   /** Layout (pre-transform) wheel radius: what style.left/top and the stick's
    *  translate use; the --joy-scale transform scales those visually. */
   private moveStickRadius = 1;
 
-  // two-finger pinch-to-zoom on the game view (phones have no scroll wheel)
+  // Track two-finger canvas gestures for guarded camera zoom and to suppress
+  // swipe-look while both fingers are down. Touches that begin on HUD chrome are
+  // owned by the router and never reach this canvas path.
   private pinchPointers = new Map<number, { x: number; y: number }>();
   private pinchPrevDist: number | null = null;
+  // Pointer ids for which releaseSwipeLook() has just performed its own
+  // deliberate releasePointerCapture() call. An explicit release also fires
+  // lostpointercapture per spec (same as an implicit one), and when a second
+  // finger lands mid pinch, onPinchDown -> releaseSwipeLook releases the
+  // swipe-look pointer's capture. Without this guard, the canvas
+  // lostpointercapture handler treats that echo as a real capture loss and
+  // tears down the pinch that just started (deletes the pointer, nulls
+  // pinchPrevDist), so the pinch is dead on arrival. Each id is consumed
+  // (deleted) by the handler the first time its echo is seen, rather than
+  // cleared on a timer, since the echo is not guaranteed to be synchronous.
+  private readonly releasingCaptureForPointer = new Set<number>();
   private swipeLookPointer: number | null = null;
   private swipeLookStartX = 0;
   private swipeLookStartY = 0;
@@ -273,6 +312,11 @@ export class MobileControls {
   private swipeLookActive = false;
   private swipeLookDownAt = 0;
   private lastSwipeTapAt = 0;
+  // A finger inherited from a pinch may have moved outside the canvas before
+  // the other finger lifted. Resync its first live move before rotating, and
+  // never treat that inherited pointer as a camera-recenter tap.
+  private swipeLookResync = false;
+  private swipeLookAdopted = false;
 
   private chatPressTimer: ReturnType<typeof setTimeout> | null = null;
   private chatLongFired = false;
@@ -285,7 +329,7 @@ export class MobileControls {
   private moveStick = document.getElementById('mobile-move-stick') as HTMLElement | null;
   private cameraJoystick = document.getElementById('mobile-camera-joystick') as HTMLElement | null;
   private cameraStick = document.getElementById('mobile-camera-stick') as HTMLElement | null;
-  private autorunButton = document.getElementById('mobile-autorun') as HTMLElement | null;
+  private autorunTarget = document.getElementById('mobile-autorun-target') as HTMLElement | null;
 
   constructor(
     private input: Input,
@@ -364,41 +408,36 @@ export class MobileControls {
     window.addEventListener('pointermove', (e) => {
       this.onMoveMove(e);
       this.onCameraMove(e);
+      this.onPinchMove(e);
     });
     window.addEventListener('pointerup', (e) => {
+      this.onPinchEnd(e);
+      this.onSwipeLookEnd(e);
       this.onMoveEnd(e);
       this.onCameraEnd(e);
     });
     window.addEventListener('pointercancel', (e) => {
+      this.onPinchEnd(e);
+      this.onSwipeLookEnd(e);
       this.onMoveEnd(e);
       this.onCameraEnd(e);
     });
     window.addEventListener('blur', () => {
       this.releaseMove();
       this.releaseCamera();
-      this.releaseSwipeLook();
+      this.releasePinch();
       this.touchOwners.releaseAll();
+      this.cancelChatPress();
     });
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         this.releaseMove();
         this.releaseCamera();
-        this.releaseSwipeLook();
+        this.releasePinch();
         this.touchOwners.releaseAll();
+        this.cancelChatPress();
       }
     });
-
-    if (this.autorunButton) {
-      // bindTouchTap, not 'click': a click never fires for a non-primary
-      // touch, and Autorun is tapped mid-steer by definition.
-      bindTouchTap(this.autorunButton, (e) => {
-        if (!this.active) return;
-        e.preventDefault();
-        triggerHaptic(HAPTIC_TAP, this.hapticsOn);
-        const on = this.callbacks.onAutorun();
-        this.autorunButton?.classList.toggle('active', on);
-      });
-    }
 
     this.canvas?.addEventListener('pointerdown', (e) => {
       this.onPinchDown(e);
@@ -413,6 +452,22 @@ export class MobileControls {
       this.onSwipeLookEnd(e);
     });
     this.canvas?.addEventListener('pointercancel', (e) => {
+      this.onPinchEnd(e);
+      this.onSwipeLookEnd(e);
+    });
+    // iOS Safari can silently invalidate an active touch's pointer capture (a
+    // system gesture, Control Center swipe, an alert) WITHOUT ever firing
+    // pointerup or pointercancel. Without this, swipe-look/pinch state stays
+    // latched (setTouchLook never flips back), which reads to the player as
+    // the camera getting stuck spinning or losing rotate/zoom control
+    // (issue #1892). `lostpointercapture` is the one event guaranteed to
+    // fire when capture is lost, so treat it exactly like pointercancel here,
+    // mirroring the moveSurface/cameraJoystick handlers above.
+    this.canvas?.addEventListener('lostpointercapture', (e) => {
+      // Ignore the echo from releaseSwipeLook()'s own deliberate release (see
+      // releasingCaptureForPointer above): that release is already handled
+      // inline and must not also run onPinchEnd/onSwipeLookEnd here.
+      if (this.releasingCaptureForPointer.delete(e.pointerId)) return;
       this.onPinchEnd(e);
       this.onSwipeLookEnd(e);
     });
@@ -442,15 +497,20 @@ export class MobileControls {
     this.bindButton('mobile-donate', () => this.callbacks.onDonate());
     this.bindButton('mobile-emote', () => this.callbacks.onEmotes());
     this.bindButton('mobile-arena', () => this.callbacks.onArena());
+    this.bindButton('mobile-dfinder', () => this.callbacks.onDungeonFinder());
     this.bindButton('mobile-valecup', () => this.callbacks.onValeCup());
     this.bindButton('mobile-quest', () => this.callbacks.onQuestLog());
     this.bindButton('mobile-char', () => this.callbacks.onCharacter());
     this.bindButton('mobile-bags', () => this.callbacks.onBags());
+    this.bindButton('mobile-crafting', () => this.callbacks.onCrafting());
     this.bindButton('mobile-spellbook', () => this.callbacks.onSpellbook());
     this.bindButton('mobile-talents', () => this.callbacks.onTalents());
     this.bindButton('mobile-map', () => this.callbacks.onMap());
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());
     this.bindButton('mobile-daily-rewards', () => this.callbacks.onDailyRewards());
+    this.bindButton('mobile-deeds', () => this.callbacks.onDeeds());
+    this.bindButton('mobile-mounts', () => this.callbacks.onMountToggle());
+    this.bindButton('mobile-professions', () => this.callbacks.onProfessions());
     const nameplatesBtn = document.getElementById('mobile-nameplates');
     this.bindButton('mobile-nameplates', () => {
       const on = this.callbacks.onNameplates();
@@ -466,8 +526,12 @@ export class MobileControls {
     this.bindHapticsToggle('mobile-haptics');
     this.bindButton('mobile-more', () => {
       const open = !document.body.classList.contains('mobile-more-open');
-      this.root?.classList.toggle('expanded', open);
-      document.body.classList.toggle('mobile-more-open', open);
+      if (!open) {
+        this.closeMoreModal();
+        return;
+      }
+      this.root?.classList.add('expanded');
+      document.body.classList.add('mobile-more-open');
       if (open) {
         const modal = document.getElementById('mobile-extra-controls');
         if (modal) {
@@ -492,7 +556,6 @@ export class MobileControls {
     document.body.classList.toggle('mobile-touch', active);
     if (!active) {
       this.root?.classList.remove('expanded');
-      this.autorunButton?.classList.remove('active');
       document.body.classList.remove(
         'mobile-more-open',
         'mobile-chat-open',
@@ -537,6 +600,12 @@ export class MobileControls {
       triggerHaptic(HAPTIC_TAP, this.hapticsOn);
       if (button.closest('#mobile-extra-controls')) {
         this.closeMoreModal();
+        // Establish the More trigger as the destination window's return target
+        // before its synchronous callback captures focus. The body-class
+        // observer then releases the old More trap without restoring it and
+        // focuses the newly opened window, avoiding focus inside aria-hidden
+        // More content during the modal-to-modal handoff.
+        document.getElementById('mobile-more')?.focus();
       }
       cb();
     };
@@ -605,17 +674,11 @@ export class MobileControls {
   private bindChatButton(id: string): void {
     const button = document.getElementById(id);
     if (!button) return;
-    const cancel = () => {
-      if (this.chatPressTimer !== null) {
-        clearTimeout(this.chatPressTimer);
-        this.chatPressTimer = null;
-      }
-    };
     button.addEventListener('pointerdown', (e) => {
       if (!this.active) return;
       e.preventDefault();
       this.chatLongFired = false;
-      cancel();
+      this.cancelChatPress();
       this.chatPressTimer = setTimeout(() => {
         this.chatLongFired = true;
         this.chatPressTimer = null;
@@ -625,11 +688,25 @@ export class MobileControls {
     button.addEventListener('pointerup', (e) => {
       if (!this.active) return;
       e.preventDefault();
-      cancel();
+      this.cancelChatPress();
       if (!this.chatLongFired) this.tapChat();
     });
-    button.addEventListener('pointercancel', cancel);
-    button.addEventListener('pointerleave', cancel);
+    button.addEventListener('pointercancel', () => this.cancelChatPress());
+    button.addEventListener('pointerleave', () => this.cancelChatPress());
+  }
+
+  /** Cancel a pending chat long-press timer (a tap or drag off the button, or the
+   *  gesture being interrupted before it completes) so it can never fire blind
+   *  after the fact. Only touches chatLongFired while the timer is still pending
+   *  (it is already false there); once the timer has fired, chatPressTimer is
+   *  already null and this is a no-op, so a completed long press is never
+   *  reopened as a tap by a later release. */
+  private cancelChatPress(): void {
+    if (this.chatPressTimer !== null) {
+      clearTimeout(this.chatPressTimer);
+      this.chatPressTimer = null;
+      this.chatLongFired = false;
+    }
   }
 
   /** Toggle the read-only chat-log peek. Opening a peek closes the full chat first (so a
@@ -710,6 +787,11 @@ export class MobileControls {
     this.moveOriginY = e.clientY;
     this.moveRadius = renderedRadius;
     this.moveStickRadius = layoutRadius;
+    this.moveAutorunLocked = false;
+    this.syncMoveAutorunTarget('hidden');
+    // Autorun is a latch from the previous joystick drag; a fresh grab is a new
+    // movement intent, so it cancels the latch before steering.
+    if (this.input.autorun) this.input.setAutorun(false);
     // The wheel's DRAWN position floats toward the thumb but is clamped to stay
     // within MOVE_JOYSTICK_FLOAT_RADIUS of its resting spot, so a touch anywhere
     // in the (much larger) move zone no longer teleports the visible wheel clear
@@ -753,9 +835,28 @@ export class MobileControls {
     // radius while the input throw above used the rendered one.
     this.moveStick.style.transform = `translate(${(x * this.moveStickRadius * 0.46).toFixed(1)}px, ${(y * this.moveStickRadius * 0.46).toFixed(1)}px)`;
     const move = mapJoystickVector(x, y, this.moveDeadzone);
+    const inAutorunTarget = isMoveAutorunPush(rawY);
+    if (this.moveAutorunLocked && inAutorunTarget) {
+      this.input.clearTouchMove();
+      this.input.setAutorun(true);
+      this.syncMoveAutorunTarget('locked');
+      return;
+    }
+    if (this.moveAutorunLocked && !inAutorunTarget) {
+      this.moveAutorunLocked = false;
+      this.input.setAutorun(false);
+    }
+    if (inAutorunTarget) {
+      this.moveAutorunLocked = true;
+      this.input.clearTouchMove();
+      this.input.setAutorun(true);
+      this.syncMoveAutorunTarget('locked');
+      return;
+    }
     this.input.setTouchMove(move);
-    // setTouchMove cancels autorun on forward/back input — keep the button glow honest.
-    if (move.forward || move.back) this.autorunButton?.classList.remove('active');
+    const moving = move.forward || move.back || move.strafeLeft || move.strafeRight;
+    if (moving && this.input.autorun) this.input.setAutorun(false);
+    this.syncMoveAutorunTarget(isMoveAutorunNear(rawY) ? 'near' : 'hidden');
   }
 
   private onMoveEnd(e: PointerEvent): void {
@@ -777,6 +878,8 @@ export class MobileControls {
       }
     }
     this.joyPointer = null;
+    this.moveAutorunLocked = false;
+    this.syncMoveAutorunTarget(this.input.autorun ? 'locked' : 'hidden');
     this.input.clearTouchMove();
     if (this.moveStick) this.moveStick.style.transform = '';
     if (this.moveJoystick) {
@@ -784,6 +887,16 @@ export class MobileControls {
       this.moveJoystick.style.left = '';
       this.moveJoystick.style.top = '';
     }
+  }
+
+  private syncMoveAutorunTarget(state: 'hidden' | 'near' | 'locked'): void {
+    this.autorunTarget?.classList.toggle('near', state === 'near' || state === 'locked');
+    this.autorunTarget?.classList.toggle('locked', state === 'locked');
+  }
+
+  syncAutorun(on: boolean): void {
+    this.moveAutorunLocked = false;
+    this.syncMoveAutorunTarget(on ? 'locked' : 'hidden');
   }
 
   private onCameraDown(e: PointerEvent): void {
@@ -897,7 +1010,8 @@ export class MobileControls {
   private onPinchMove(e: PointerEvent): void {
     if (!this.active || !this.pinchPointers.has(e.pointerId)) return;
     // A window opening mid-gesture ends the pinch immediately: menuOpen means
-    // every touch is now the modal's, so the gesture must stop zooming.
+    // every touch is now the modal's, so the gesture must stop suppressing camera
+    // swipes.
     if (document.body.classList.contains('mobile-window-open')) {
       this.releasePinch();
       return;
@@ -906,14 +1020,57 @@ export class MobileControls {
     if (this.pinchPointers.size === 2 && this.pinchPrevDist !== null) {
       e.preventDefault();
       const cur = this.currentPinchDist();
-      this.input.zoomBy(pinchZoomDelta(this.pinchPrevDist, cur));
-      this.pinchPrevDist = cur;
+      const zoomDelta = pinchZoomDelta(this.pinchPrevDist, cur);
+      if (zoomDelta !== 0) {
+        this.input.zoomBy(zoomDelta);
+        this.pinchPrevDist = cur;
+      }
     }
   }
 
   private onPinchEnd(e: PointerEvent): void {
-    this.pinchPointers.delete(e.pointerId);
+    // Canvas releases also reach the window listener, so only the first event
+    // for this pointer may change the gesture state.
+    if (!this.pinchPointers.delete(e.pointerId)) return;
     if (this.pinchPointers.size < 2) this.pinchPrevDist = null;
+    else this.pinchPrevDist = this.currentPinchDist();
+
+    if (
+      !this.active ||
+      this.pinchPointers.size !== 1 ||
+      this.swipeLookPointer !== null ||
+      this.lookPointer !== null ||
+      document.body.classList.contains('mobile-window-open')
+    )
+      return;
+
+    const remainingId = this.pinchPointers.keys().next().value;
+    if (remainingId === undefined) return;
+    const position = this.pinchPointers.get(remainingId);
+    if (!position) return;
+
+    const owner = this.touchOwners.get(remainingId);
+    const adoptedOwner = owner === 'groundAim' ? 'groundAim' : 'camera';
+    this.touchOwners.set(remainingId, adoptedOwner);
+    this.swipeLookPointer = remainingId;
+    this.swipeLookStartX = position.x;
+    this.swipeLookStartY = position.y;
+    this.swipeLookLastX = position.x;
+    this.swipeLookLastY = position.y;
+    this.swipeLookActive = false;
+    this.swipeLookDownAt = this.now();
+    this.swipeLookResync = true;
+    this.swipeLookAdopted = true;
+    // Re-capturing the surviving finger supersedes the deliberate release
+    // performed when the pinch began. Browsers may then suppress that older
+    // lostpointercapture event, so its marker must not be allowed to swallow a
+    // later, genuine capture loss for the newly adopted camera drag.
+    this.releasingCaptureForPointer.delete(remainingId);
+    try {
+      this.canvas?.setPointerCapture(remainingId);
+    } catch {
+      /* synthetic test event */
+    }
   }
 
   private releasePinch(): void {
@@ -941,7 +1098,8 @@ export class MobileControls {
     const target = e.target as unknown as TouchRouterTarget | null;
     const menuOpen = document.body.classList.contains('mobile-window-open');
     if (!isCameraDragAllowedAt(target, menuOpen)) return;
-    this.touchOwners.set(e.pointerId, 'camera');
+    const groundAimOwnsPointer = this.callbacks.onGroundAimMove(e.clientX, e.clientY);
+    this.touchOwners.set(e.pointerId, groundAimOwnsPointer ? 'groundAim' : 'camera');
     this.swipeLookPointer = e.pointerId;
     this.swipeLookStartX = e.clientX;
     this.swipeLookStartY = e.clientY;
@@ -958,6 +1116,19 @@ export class MobileControls {
 
   private onSwipeLookMove(e: PointerEvent): void {
     if (
+      this.active &&
+      e.pointerId === this.swipeLookPointer &&
+      this.touchOwners.get(e.pointerId) === 'groundAim'
+    ) {
+      if (document.body.classList.contains('mobile-window-open')) {
+        this.releaseSwipeLook();
+        return;
+      }
+      this.callbacks.onGroundAimMove(e.clientX, e.clientY);
+      e.preventDefault();
+      return;
+    }
+    if (
       !this.active ||
       e.pointerId !== this.swipeLookPointer ||
       this.pinchPointers.size > 1 ||
@@ -967,6 +1138,14 @@ export class MobileControls {
     // A window opening mid-drag ends the swipe-look drag immediately.
     if (document.body.classList.contains('mobile-window-open')) {
       this.releaseSwipeLook();
+      return;
+    }
+    if (this.swipeLookResync) {
+      this.swipeLookResync = false;
+      this.swipeLookStartX = e.clientX;
+      this.swipeLookStartY = e.clientY;
+      this.swipeLookLastX = e.clientX;
+      this.swipeLookLastY = e.clientY;
       return;
     }
     const totalDx = e.clientX - this.swipeLookStartX;
@@ -986,8 +1165,18 @@ export class MobileControls {
   }
 
   private onSwipeLookEnd(e: PointerEvent): void {
+    const owner = this.touchOwners.get(e.pointerId);
     this.touchOwners.release(e.pointerId);
     if (e.pointerId !== this.swipeLookPointer) return;
+    if (owner === 'groundAim') {
+      e.preventDefault();
+      if (!this.swipeLookAdopted && e.type === 'pointerup') {
+        this.callbacks.onGroundAimTap(e.clientX, e.clientY);
+      }
+      this.lastSwipeTapAt = 0;
+      this.releaseSwipeLook();
+      return;
+    }
     if (this.swipeLookActive) e.preventDefault();
     // Double-tap-to-recenter on the swipe-look path: the camera joystick is
     // opt-in (hidden by default, settings.mobileCameraJoystick), so this is
@@ -995,7 +1184,15 @@ export class MobileControls {
     // never crossed the swipe deadzone (never became a drag); two of those in
     // quick succession recenter the camera, mirroring the joystick logic.
     const now = this.now();
-    const quickTap = !this.swipeLookActive && now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
+    const quickTap =
+      !this.swipeLookAdopted &&
+      !this.swipeLookActive &&
+      now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
+    if (quickTap && this.callbacks.onGroundAimTap(e.clientX, e.clientY)) {
+      this.lastSwipeTapAt = 0;
+      this.releaseSwipeLook();
+      return;
+    }
     if (quickTap && isRecenterDoubleTap(this.lastSwipeTapAt, now, this.swipeLookActive)) {
       this.callbacks.onRecenterCamera();
       this.lastSwipeTapAt = 0;
@@ -1009,6 +1206,7 @@ export class MobileControls {
     if (this.swipeLookPointer !== null) {
       try {
         if (this.canvas?.hasPointerCapture?.(this.swipeLookPointer)) {
+          this.releasingCaptureForPointer.add(this.swipeLookPointer);
           this.canvas.releasePointerCapture(this.swipeLookPointer);
         }
       } catch {
@@ -1021,6 +1219,8 @@ export class MobileControls {
       this.input.setTouchLookVector({ x: 0, y: 0 });
     }
     this.swipeLookActive = false;
+    this.swipeLookResync = false;
+    this.swipeLookAdopted = false;
   }
 }
 
@@ -1029,15 +1229,15 @@ export function mapLookVector(x: number, y: number, deadzone = DEADZONE): { x: n
   return { x: x * CAMERA_SENSITIVITY, y: y * CAMERA_SENSITIVITY };
 }
 
-/**
- * Camera-distance delta for a pinch frame, in yards. Fingers spreading apart
- * (curDist > prevDist) zooms IN, i.e. returns a negative delta to shrink camDist;
- * pinching together zooms out. Matches the sign convention of the wheel handler.
- */
 export function pinchZoomDelta(
   prevDist: number,
   curDist: number,
-  scale = PINCH_ZOOM_SCALE,
+  sensitivity = PINCH_ZOOM_SENSITIVITY,
+  deadzonePx = PINCH_ZOOM_DEADZONE_PX,
 ): number {
-  return (prevDist - curDist) * scale;
+  const delta = curDist - prevDist;
+  const abs = Math.abs(delta);
+  if (abs <= deadzonePx) return 0;
+  const adjusted = abs - deadzonePx;
+  return -Math.sign(delta) * adjusted * sensitivity;
 }

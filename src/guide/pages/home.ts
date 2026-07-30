@@ -2,10 +2,10 @@
 // teasers for classes, the world, group content, and a short FAQ, in the spirit of
 // kintara.gg. Every string is a t() key; every number goes through formatNumber.
 
-import { t, formatNumber } from '../../ui/i18n';
 import { esc } from '../../ui/esc';
+import { formatNumber, t } from '../../ui/i18n';
+import { CLASS_CHIPS, LEVEL_CAP, ZONE_TEASERS } from '../data';
 import { hrefFor } from '../routes';
-import { CLASS_CHIPS, ZONE_TEASERS, LEVEL_CAP } from '../data';
 import type { GuidePage } from './types';
 
 function heroHtml(): string {
@@ -30,11 +30,13 @@ function pillarsHtml(): string {
     ['guide.home.what.pillarOpenTitle', 'guide.home.what.pillarOpenBody'],
   ] as const;
   const cards = pillars
-    .map(([title, body]) => `
+    .map(
+      ([title, body]) => `
       <div class="guide-pillar">
         <h3>${esc(t(title))}</h3>
         <p>${esc(t(body))}</p>
-      </div>`)
+      </div>`,
+    )
     .join('');
   return `
     <section class="guide-section" aria-labelledby="guide-what-h">
@@ -44,12 +46,12 @@ function pillarsHtml(): string {
 }
 
 function classesHtml(): string {
-  const chips = CLASS_CHIPS
-    .map((c) => `
+  const chips = CLASS_CHIPS.map(
+    (c) => `
       <a class="guide-class-chip" href="${esc(hrefFor('classes'))}" style="--class-color:${esc(c.color)}">
         <span class="guide-class-name">${esc(t(c.nameKey))}</span>
-      </a>`)
-    .join('');
+      </a>`,
+  ).join('');
   return `
     <section class="guide-section" aria-labelledby="guide-classes-h">
       <h2 class="guide-section-h" id="guide-classes-h">${esc(t('guide.home.classes.heading'))}</h2>
@@ -60,16 +62,16 @@ function classesHtml(): string {
 }
 
 function worldHtml(): string {
-  const cards = ZONE_TEASERS
-    .map((z) => `
+  const cards = ZONE_TEASERS.map(
+    (z) => `
       <a class="guide-zone-card guide-zone-${esc(z.id)}" href="${esc(hrefFor('world'))}">
         <div class="guide-zone-body">
           <span class="guide-zone-band">${esc(t('guide.home.world.levels', { min: formatNumber(z.min), max: formatNumber(z.max) }))}</span>
           <h3 class="guide-zone-name">${esc(t(z.nameKey))}</h3>
           <p class="guide-zone-blurb">${esc(t(z.blurbKey))}</p>
         </div>
-      </a>`)
-    .join('');
+      </a>`,
+  ).join('');
   return `
     <section class="guide-section" aria-labelledby="guide-world-h">
       <h2 class="guide-section-h" id="guide-world-h">${esc(t('guide.home.world.heading'))}</h2>
@@ -86,11 +88,13 @@ function groupHtml(): string {
     ['guide.home.group.arenaTitle', 'guide.home.group.arenaBody'],
   ] as const;
   const html = cards
-    .map(([title, body]) => `
+    .map(
+      ([title, body]) => `
       <div class="guide-group-card">
         <h3>${esc(t(title))}</h3>
         <p>${esc(t(body))}</p>
-      </div>`)
+      </div>`,
+    )
     .join('');
   return `
     <section class="guide-section" aria-labelledby="guide-group-h">
@@ -109,11 +113,13 @@ function faqHtml(): string {
     ['guide.home.faq.q4', t('guide.home.faq.a4', { cap: formatNumber(LEVEL_CAP) })],
   ] as const;
   const items = qa
-    .map(([q, a]) => `
+    .map(
+      ([q, a]) => `
       <details class="guide-faq-item">
         <summary>${esc(t(q))}</summary>
         <p>${esc(a)}</p>
-      </details>`)
+      </details>`,
+    )
     .join('');
   return `
     <section class="guide-section" aria-labelledby="guide-faq-h">
@@ -129,7 +135,7 @@ function communityHtml(): string {
       <p class="guide-section-sub">${esc(t('guide.home.community.body'))}</p>
       <div class="guide-community-cta">
         <a class="guide-cta" href="/play">${esc(t('guide.home.community.play'))}</a>
-        <a class="guide-cta guide-cta-ghost" href="https://discord.gg/GjhnUsBtw" target="_blank" rel="noopener">${esc(t('guide.home.community.discord'))}</a>
+        <a class="guide-cta guide-cta-ghost" href="https://discord.com/invite/worldofclaudecraft" target="_blank" rel="noopener">${esc(t('guide.home.community.discord'))}</a>
         <a class="guide-cta guide-cta-ghost" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener">${esc(t('guide.home.community.github'))}</a>
       </div>
     </section>`;

@@ -4,19 +4,67 @@
 // attenuate with distance and pan with direction relative to the camera.
 //
 // Decoupled, like audio/music/voice: its own AudioContext + AudioListener,
-// driven by the `sfxVolume` setting. Efficient by construction — one decoded
-// AudioBuffer per clip shared across every source, a hard concurrency cap, a
-// per-key cooldown, and a tiny pool of persistent looping sources for ambience
-// and sustained spell casts (cross-faded by gain, never restarted).
+// driven by the `sfxVolume` setting. Efficient by construction: one decoded
+// AudioBuffer per clip shared across every source, startup-only preloading with
+// lazy context loads, a hard concurrency cap, a per-key cooldown, and a tiny
+// pool of persistent looping sources for ambience and sustained spell casts.
 
+import { apiUrl } from '../client_origin';
 import type { BiomeId } from '../sim/types';
-import { SFX_CLIPS } from './sfx_manifest.generated';
+import {
+  SFX_CATALOG_HASH,
+  SFX_CLIPS,
+  SFX_RUNTIME_PACK_URL,
+  type SfxEntry,
+} from './sfx_manifest.generated';
+import { loadRuntimeSfxPack } from './sfx_runtime_pack';
+import { type WaterElementalCue, waterElementalSamples } from './water_elemental_audio';
 
 const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies this
 const MAX_VOICES = 24; // concurrent one-shot sources (frame-budget guard)
 const REF_DISTANCE = 5; // world units at which a sound is at full volume
 const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/skipped
 const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
+const POINT_AMBIENCE_GAIN = 0.18;
+// amb_forge's custom recording still reads quiet in-game even with the
+// catalog's keyTrimDb ceiling (scripts/sfx/sfx_gain_map.json) applied at its
+// full sanctioned +5dB, the maximum true-peak headroom under the shared
+// -6dBFS conform ceiling (the recording's own peak sits at -6.0 dBTP after
+// conform: a percussive hammer-strike signal has little room left under that
+// engine-wide floor). This mix target REPLACES POINT_AMBIENCE_GAIN for forge
+// only (campfire is unaffected), and stacks with the manifest's +5dB entry
+// gain in loop()'s mixedTarget: 0.625 (this) * 1.778 (the +5dB trim,
+// SFX_GAIN_LIMITS.amb_forge) = ~1.11, tuned by ear against the +5dB trim
+// alone (~0.32 effective, still too quiet).
+const FORGE_AMBIENCE_GAIN = 0.625;
+const FOOTSTEP_CUES: Partial<Record<string, string>> = {
+  grass: 'foot_grass',
+  dirt: 'foot_dirt',
+  stone: 'foot_stone',
+  wood: 'foot_wood',
+  snow: 'foot_snow',
+  water: 'foot_water',
+};
+
+function assetCacheKey(key: string, variantIndex: number): string {
+  return variantIndex === 0 ? key : `${key}:${variantIndex}`;
+}
+
+function retainDecodedBuffer(
+  ctx: AudioContext,
+  decoded: AudioBuffer,
+  spatial: boolean,
+): AudioBuffer {
+  if (!spatial || !(decoded.numberOfChannels > 1)) return decoded;
+  const mono = ctx.createBuffer(1, decoded.length, decoded.sampleRate);
+  const output = mono.getChannelData(0);
+  const scale = 1 / decoded.numberOfChannels;
+  for (let channel = 0; channel < decoded.numberOfChannels; channel++) {
+    const input = decoded.getChannelData(channel);
+    for (let frame = 0; frame < decoded.length; frame++) output[frame] += input[frame] * scale;
+  }
+  return mono;
+}
 
 export interface PlayOpts {
   gain?: number; // 0..1 multiplier (default 1)
@@ -24,7 +72,7 @@ export interface PlayOpts {
   cooldown?: number; // min seconds between plays of this key (default 0.03)
   jitter?: boolean; // randomize rate/gain slightly (default true)
   // Percussive amplitude envelope. `release` truncates the clip to a crisp
-  // transient that fully decays within `attack + release` seconds — used by fast
+  // transient that fully decays within `attack + release` seconds, used by fast
   // retriggered sounds (footsteps) so successive plays of the same sample don't
   // pile up and comb-filter into a metallic ring. 0 (default) plays the clip flat.
   attack?: number; // fade-in seconds (default 0 = instant)
@@ -36,21 +84,47 @@ interface LoopSlot {
   src: AudioBufferSourceNode;
   gain: GainNode;
   panner: PannerNode | null;
-  target: number; // last commanded gain — skip re-arming the ramp when unchanged
+  target: number; // last commanded gain; skip re-arming the ramp when unchanged
+  x?: number;
+  y?: number;
+  z?: number;
+}
+
+interface PendingLoop {
+  key: string;
+  target: number;
+  x?: number;
+  y?: number;
+  z?: number;
+}
+
+interface AmbientPointSource {
+  readonly id: string;
+  readonly kind: 'campfire' | 'forge';
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
 }
 
 class Sfx {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
+  private clips: Record<string, SfxEntry> = SFX_CLIPS;
+  private clipsReady: Promise<void> | null = null;
   private buffers = new Map<string, AudioBuffer>();
+  private loading = new Map<string, Promise<AudioBuffer | null>>();
+  private failedLoads = new Set<string>();
+  private pendingOneShots = new Set<string>();
+  private lastVariant = new Map<string, number>(); // last played index per key (no-repeat-biased random)
+  private pendingLoops = new Map<string, PendingLoop>();
+  private pendingLoopLoads = new Map<string, string>();
+  private pendingLoopVariants = new Map<string, number>();
   private vol = 0.8;
   private active = 0;
   private lastPlay = new Map<string, number>();
   private loops = new Map<string, LoopSlot>();
-  private ready = false;
   private footstepsOn = false; // off by default; driven by the footstepSfx setting
   private lx = 0;
-  private ly = 0;
   private lz = 0; // cached listener position
 
   /** Set SFX volume (0..1). Shares the `sfxVolume` slider with `audio`. */
@@ -66,7 +140,8 @@ class Sfx {
     this.footstepsOn = on;
   }
 
-  /** Create the context + listener and decode every clip. Gated on a user gesture
+  /** Create the context + listener and decode the small startup working set.
+   *  Context-specific clips load once on first use. Gated on a user gesture
    *  (called from enterWorld alongside audio.init()). Safe to call repeatedly. */
   init(): void {
     if (this.ctx) return;
@@ -84,36 +159,136 @@ class Sfx {
         l.upY.value = 1;
         l.upZ.value = 0;
       } else if (l.setOrientation) l.setOrientation(0, 0, -1, 0, 1, 0);
-      void this.preload();
+      this.installProceduralBuffers();
+      if (typeof window !== 'undefined') {
+        this.clipsReady = loadRuntimeSfxPack(
+          apiUrl(SFX_RUNTIME_PACK_URL),
+          SFX_CATALOG_HASH,
+          SFX_CLIPS,
+        ).then((clips) => {
+          this.clips = clips;
+        });
+      }
+      void this.preloadStartup();
     } catch {
       this.ctx = null;
     }
   }
 
-  private async preload(): Promise<void> {
+  private entry(key: string): SfxEntry | undefined {
+    return this.clips[key];
+  }
+
+  private authoredPlaybackRate(key: string): number {
+    return this.entry(key)?.playbackRate ?? 1;
+  }
+
+  // Weighted so the immediately previous variant is heavily deprioritized, not
+  // outright excluded. A hard exclusion on a 2-take pool degenerates into rigid
+  // A-B-A-B alternation, which reads as just as metronomic as the round-robin
+  // it replaces; a low but nonzero weight keeps a small pool sounding genuinely
+  // random while still making an audible back-to-back repeat rare.
+  private static readonly REPEAT_VARIANT_WEIGHT = 0.15;
+
+  /** No-repeat-biased random variant selection. Picks a weighted-random usable
+   *  variant each play; the immediately previous one is downweighted (not
+   *  excluded) so it can still recur occasionally, just rarely, instead of
+   *  double-hitting on a predictable cadence. A variant that failed to load is
+   *  skipped entirely, same as the old round-robin scan. */
+  private nextVariantIndex(key: string): number {
+    const count = Math.max(1, this.entry(key)?.variants.length ?? 1);
+    const usable: number[] = [];
+    for (let index = 0; index < count; index++) {
+      if (!this.failedLoads.has(assetCacheKey(key, index))) usable.push(index);
+    }
+    if (usable.length === 0) return 0;
+    if (usable.length === 1) return usable[0];
+    const last = this.lastVariant.get(key);
+    const weights = usable.map((index) => (index === last ? Sfx.REPEAT_VARIANT_WEIGHT : 1));
+    const total = weights.reduce((sum, weight) => sum + weight, 0);
+    let roll = Math.random() * total;
+    for (let i = 0; i < usable.length; i++) {
+      roll -= weights[i];
+      if (roll <= 0) return usable[i];
+    }
+    return usable[usable.length - 1];
+  }
+
+  private commitVariant(key: string, variantIndex: number): void {
+    this.lastVariant.set(key, variantIndex);
+  }
+
+  private loadBuffer(key: string, variantIndex = 0): Promise<AudioBuffer | null> {
+    const ctx = this.ctx;
+    const cacheKey = assetCacheKey(key, variantIndex);
+    const cached = this.buffers.get(cacheKey);
+    if (cached) return Promise.resolve(cached);
+    if (this.failedLoads.has(cacheKey)) return Promise.resolve(null);
+    const inFlight = this.loading.get(cacheKey);
+    if (inFlight) return inFlight;
+    if (!ctx) return Promise.resolve(null);
+    const request = (async () => {
+      try {
+        if (this.clipsReady) await this.clipsReady;
+        const entry = this.entry(key);
+        const variant = entry?.variants[variantIndex];
+        if (!entry || !variant) {
+          this.failedLoads.add(cacheKey);
+          return null;
+        }
+        const res = await fetch(variant.url);
+        if (!res.ok) {
+          this.failedLoads.add(cacheKey);
+          return null;
+        }
+        const decoded = await ctx.decodeAudioData(await res.arrayBuffer());
+        // Positional cues are intentional point sources. Fold them to mono so
+        // PannerNode builds the spatial stereo image from one retained channel,
+        // without another lossy asset transcode.
+        const buf = retainDecodedBuffer(ctx, decoded, entry.spatial);
+        this.buffers.set(cacheKey, buf);
+        return buf;
+      } catch {
+        this.failedLoads.add(cacheKey);
+        return null;
+      } finally {
+        this.loading.delete(cacheKey);
+      }
+    })();
+    this.loading.set(cacheKey, request);
+    return request;
+  }
+
+  private async preloadStartup(): Promise<void> {
+    if (this.clipsReady) await this.clipsReady;
+    await Promise.all(
+      Object.keys(this.clips).flatMap((key) =>
+        this.entry(key)?.preload === 'startup'
+          ? (this.entry(key)?.variants ?? []).map((_variant, index) => this.loadBuffer(key, index))
+          : [],
+      ),
+    );
+  }
+
+  private installProceduralBuffers(): void {
     const ctx = this.ctx;
     if (!ctx) return;
-    await Promise.all(
-      Object.entries(SFX_CLIPS).map(async ([key, entry]) => {
-        try {
-          const res = await fetch(entry.url);
-          if (!res.ok) return;
-          const buf = await ctx.decodeAudioData(await res.arrayBuffer());
-          this.buffers.set(key, buf);
-        } catch {
-          /* missing/corrupt clip: that key just stays silent */
-        }
-      }),
-    );
-    // Procedurally synthesized beds/one-shots (no clip files; the Vale Cup
-    // crowd is generated, not recorded, keeping the shipped audio set as-is).
     try {
       this.buffers.set('amb_crowd', this.makeCrowdBuffer(ctx, 6, false));
       this.buffers.set('vcup_crowd_roar', this.makeCrowdBuffer(ctx, 2.6, true));
+      for (const cue of [
+        'aggro',
+        'attack',
+        'death',
+      ] as const satisfies readonly WaterElementalCue[]) {
+        const samples = waterElementalSamples(cue, ctx.sampleRate);
+        const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
+        buffer.getChannelData(0).set(samples);
+        this.buffers.set(`mob_water_elemental_${cue}`, buffer);
+      }
     } catch {
-      /* stub AudioContext in tests: the keys just stay silent */
+      /* minimal AudioContext stubs may not implement buffer synthesis */
     }
-    this.ready = this.buffers.size > 0;
   }
 
   /** Procedural crowd noise. Bed mode is a seamless 6s murmur loop (filtered
@@ -125,37 +300,32 @@ class Sfx {
     const buf = ctx.createBuffer(2, len, sr);
     for (let ch = 0; ch < 2; ch++) {
       const data = buf.getChannelData(ch);
-      let lpDeep = 0; // ~200Hz body: the massed-voices rumble
-      let lpMid = 0; // ~900Hz band: chatter/consonants
+      let lpDeep = 0;
+      let lpMid = 0;
       const phase = ch * 1.9;
       for (let i = 0; i < len; i++) {
         const w = Math.random() * 2 - 1;
         lpDeep += 0.026 * (w - lpDeep);
         lpMid += 0.11 * (w - lpMid);
         const t = i / len;
-        // integer cycle counts so the loop wraps without a click
         const swell =
           0.62 +
           0.22 * Math.sin(2 * Math.PI * 3 * t + phase) +
           0.16 * Math.sin(2 * Math.PI * 7 * t + phase * 1.31);
         const voiceBand = (lpMid - lpDeep) * 0.9;
-        let s = (lpDeep * 2.2 + voiceBand) * swell;
+        let sample = (lpDeep * 2.2 + voiceBand) * swell;
         if (roar) {
-          // crescendo fast, hold, tail off; brighter than the bed
-          const env = t < 0.18 ? t / 0.18 : t < 0.55 ? 1 : 1 - (t - 0.55) / 0.45;
-          s = (lpDeep * 1.6 + voiceBand * 2.4 + w * 0.06) * env * 1.5;
+          const envelope = t < 0.18 ? t / 0.18 : t < 0.55 ? 1 : 1 - (t - 0.55) / 0.45;
+          sample = (lpDeep * 1.6 + voiceBand * 2.4 + w * 0.06) * envelope * 1.5;
         }
-        data[i] = Math.max(-1, Math.min(1, s));
+        data[i] = Math.max(-1, Math.min(1, sample));
       }
       if (!roar) {
-        // equal-power crossfade of the tail into the head: noise itself is not
-        // periodic, so the loop seam still needs blending
         const fade = Math.floor(0.25 * sr);
         for (let i = 0; i < fade; i++) {
-          const f = i / fade;
-          const a = Math.sqrt(1 - f);
-          const b = Math.sqrt(f);
-          data[len - fade + i] = data[len - fade + i] * a + data[i] * b;
+          const amount = i / fade;
+          data[len - fade + i] =
+            data[len - fade + i] * Math.sqrt(1 - amount) + data[i] * Math.sqrt(amount);
         }
       }
     }
@@ -167,7 +337,6 @@ class Sfx {
     const ctx = this.ctx;
     if (!ctx) return;
     this.lx = x;
-    this.ly = y;
     this.lz = z;
     const l = ctx.listener;
     if (l.positionX) {
@@ -192,7 +361,9 @@ class Sfx {
   }
 
   private makePanner(x: number, y: number, z: number): PannerNode {
-    const p = this.ctx!.createPanner();
+    const ctx = this.ctx;
+    if (!ctx) throw new Error('audio context is unavailable');
+    const p = ctx.createPanner();
     p.panningModel = 'equalpower'; // cheap; HRTF is overkill for an MMO crowd
     p.distanceModel = 'linear';
     p.refDistance = REF_DISTANCE;
@@ -202,7 +373,40 @@ class Sfx {
     return p;
   }
 
-  /** Squared distance from the listener — callers can pre-cull, but playAt also
+  /** True when a compiled/runtime entry or procedural buffer exists. HUD uses
+   *  this to prefer disk-discovered mob subfamily cues over family fallbacks. */
+  hasVariants(key: string): boolean {
+    if (this.buffers.has(key)) return true;
+    const entry = this.entry(key);
+    return !!entry?.variants.some(
+      (_variant, index) => !this.failedLoads.has(assetCacheKey(key, index)),
+    );
+  }
+
+  /** True when EVERY variant of a key is already decoded and resident, so a
+   *  caller expecting playback THIS event (not a lazy-loaded 0.12s race) can
+   *  check before playing, e.g. a rare crit-only cue that a warm-but-similar
+   *  cue can fall back to on a cold cache. Checking only variant 0 would miss
+   *  that playAt's round-robin cursor can land on a still-cold later variant. */
+  isBuffered(key: string): boolean {
+    const count = Math.max(1, this.entry(key)?.variants.length ?? 1);
+    for (let index = 0; index < count; index++) {
+      if (!this.buffers.has(assetCacheKey(key, index))) return false;
+    }
+    return true;
+  }
+
+  /** Fire-and-forget warm of EVERY variant of a key. Safe to call repeatedly;
+   *  loadBuffer is idempotent once cached, in flight, or failed. Lets a
+   *  frequently-triggered cue (e.g. a mob's attack bark) also warm a rare
+   *  sibling cue (its hurt reaction) that would otherwise race a cold fetch
+   *  the first time it is actually needed. */
+  preload(key: string): void {
+    const count = Math.max(1, this.entry(key)?.variants.length ?? 1);
+    for (let index = 0; index < count; index++) void this.loadBuffer(key, index);
+  }
+
+  /** Squared distance from the listener. Callers can pre-cull, but playAt also
    *  guards internally so a far event is a cheap no-op. */
   private tooFar(x: number, z: number): boolean {
     const dx = x - this.lx,
@@ -210,25 +414,59 @@ class Sfx {
     return dx * dx + dz * dz > MAX_DISTANCE_SQ;
   }
 
-  /** Positional one-shot at world (x,y,z). */
-  playAt(key: string, x: number, y: number, z: number, opts?: PlayOpts): void {
+  /** Positional one-shot at world (x,y,z). Returns whether this call actually
+   *  scheduled a sound: false if the audio context is not yet initialized,
+   *  out of range, an unbuffered clip still loading, the voice cap, or a
+   *  per-key cooldown block. A caller that only wants to know "did MY
+   *  attempt make a sound, not some other source that beat me to this key's
+   *  cooldown" (e.g. the mob idle-bark sweep's per-entity cooldown stamping,
+   *  see src/ui/mob_idle_sfx.ts) needs this instead of firing blind. */
+  playAt(key: string, x: number, y: number, z: number, opts?: PlayOpts): boolean {
     const ctx = this.ctx,
       master = this.master;
-    if (!ctx || !master) return;
-    if (this.tooFar(x, z)) return;
-    const buf = this.buffers.get(key);
-    if (!buf || this.active >= MAX_VOICES) return;
+    if (!ctx || !master) return false;
+    if (this.tooFar(x, z)) return false;
+    const variantIndex = this.nextVariantIndex(key);
+    const cacheKey = assetCacheKey(key, variantIndex);
+    const buf = this.buffers.get(cacheKey);
+    if (!buf) {
+      if (!this.pendingOneShots.has(cacheKey)) {
+        this.pendingOneShots.add(cacheKey);
+        const requestedAt = ctx.currentTime;
+        void this.loadBuffer(key, variantIndex).then((loaded) => {
+          this.pendingOneShots.delete(cacheKey);
+          if (loaded && this.ctx && this.ctx.currentTime - requestedAt < 0.12) {
+            this.playAt(key, x, y, z, opts);
+          }
+        });
+      }
+      return false;
+    }
+    if (this.active >= MAX_VOICES) return false;
     const now = ctx.currentTime;
     const cd = opts?.cooldown ?? 0.03;
-    if (now - (this.lastPlay.get(key) ?? -1) < cd) return;
+    // -Infinity, not -1: a fresh key (never played) must never be blocked, at
+    // any cooldown length. A -1 sentinel worked by accident while every
+    // cooldown here stayed under 1s (now - -1 was always >= cooldown); a
+    // longer cooldown (e.g. audio.error()'s 1.5s) can make now - -1 itself
+    // read as "still on cooldown" moments after AudioContext starts, wrongly
+    // swallowing the very first play of that key.
+    if (now - (this.lastPlay.get(key) ?? Number.NEGATIVE_INFINITY) < cd) return false;
     this.lastPlay.set(key, now);
+    this.commitVariant(key, variantIndex);
 
     const jitter = opts?.jitter !== false;
     const src = ctx.createBufferSource();
     src.buffer = buf;
-    src.playbackRate.value = (opts?.rate ?? 1) * (jitter ? 1 + (Math.random() * 2 - 1) * 0.06 : 1);
+    src.playbackRate.value =
+      (opts?.rate ?? 1) *
+      this.authoredPlaybackRate(key) *
+      (jitter ? 1 + (Math.random() * 2 - 1) * 0.06 : 1);
     const g = ctx.createGain();
-    const peak = (opts?.gain ?? 1) * (jitter ? 1 + (Math.random() * 2 - 1) * 0.1 : 1);
+    const peak =
+      (opts?.gain ?? 1) *
+      (this.entry(key)?.gain ?? 1) *
+      (jitter ? 1 + (Math.random() * 2 - 1) * 0.1 : 1);
     const panner = this.makePanner(x, y, z);
     src.connect(g).connect(panner).connect(master);
     this.active++;
@@ -239,6 +477,7 @@ class Sfx {
       panner.disconnect();
     };
     this.applyEnvelope(src, g, peak, now, opts);
+    return true;
   }
 
   /** Set the gain envelope on a one-shot source and start it. With no
@@ -281,14 +520,44 @@ class Sfx {
     const ctx = this.ctx,
       master = this.master;
     if (!ctx || !master) return;
-    const buf = this.buffers.get(key);
-    if (!buf || this.active >= MAX_VOICES) return;
+    const variantIndex = this.nextVariantIndex(key);
+    const cacheKey = assetCacheKey(key, variantIndex);
+    const buf = this.buffers.get(cacheKey);
+    if (!buf) {
+      if (!this.pendingOneShots.has(cacheKey)) {
+        this.pendingOneShots.add(cacheKey);
+        const requestedAt = ctx.currentTime;
+        void this.loadBuffer(key, variantIndex).then((loaded) => {
+          this.pendingOneShots.delete(cacheKey);
+          if (loaded && this.ctx && this.ctx.currentTime - requestedAt < 0.25) {
+            this.playUi(key, opts);
+          }
+        });
+      }
+      return;
+    }
+    if (this.active >= MAX_VOICES) return;
+    const now = ctx.currentTime;
+    const cd = opts?.cooldown ?? 0;
+    // -Infinity sentinel: see the matching comment on playAt's cooldown check.
+    if (cd > 0 && now - (this.lastPlay.get(key) ?? Number.NEGATIVE_INFINITY) < cd) return;
+    // Unlike playAt (which always stamps lastPlay, since it defaults cd to
+    // 0.03), playUi only stamps it when a cooldown was actually requested:
+    // playUi's cooldown defaults to 0 (opt-in only, see the line above), so an
+    // uncooled key has nothing to stamp against and no reason to pay the map
+    // write. This is a deliberate difference in bookkeeping semantics for the
+    // same shared map, not a bug.
+    if (cd > 0) this.lastPlay.set(key, now);
+    this.commitVariant(key, variantIndex);
     const jitter = opts?.jitter !== false;
     const src = ctx.createBufferSource();
     src.buffer = buf;
-    src.playbackRate.value = (opts?.rate ?? 1) * (jitter ? 1 + (Math.random() * 2 - 1) * 0.05 : 1);
+    src.playbackRate.value =
+      (opts?.rate ?? 1) *
+      this.authoredPlaybackRate(key) *
+      (jitter ? 1 + (Math.random() * 2 - 1) * 0.05 : 1);
     const g = ctx.createGain();
-    g.gain.value = opts?.gain ?? 1;
+    g.gain.value = (opts?.gain ?? 1) * (this.entry(key)?.gain ?? 1);
     src.connect(g).connect(master);
     this.active++;
     src.onended = () => {
@@ -309,39 +578,81 @@ class Sfx {
     const ctx = this.ctx,
       master = this.master;
     if (!ctx || !master) return;
-    const positional = x !== undefined;
+    const positional = x !== undefined && y !== undefined && z !== undefined;
     let slot = this.loops.get(id);
     if (slot && slot.key !== key) {
       this.unloop(id, 0);
       slot = undefined;
     }
     if (!slot) {
-      const buf = this.buffers.get(key);
-      if (!buf) return;
+      const pending = this.pendingLoops.get(id);
+      const pendingVariant = pending?.key === key ? this.pendingLoopVariants.get(id) : undefined;
+      const variantIndex = pendingVariant ?? this.nextVariantIndex(key);
+      const cacheKey = assetCacheKey(key, variantIndex);
+      const buf = this.buffers.get(cacheKey);
+      if (!buf) {
+        if (this.failedLoads.has(cacheKey)) {
+          this.pendingLoops.delete(id);
+          this.pendingLoopLoads.delete(id);
+          this.pendingLoopVariants.delete(id);
+          return;
+        }
+        this.pendingLoops.set(id, { key, target, x, y, z });
+        this.pendingLoopVariants.set(id, variantIndex);
+        if (this.pendingLoopLoads.get(id) !== key) {
+          this.pendingLoopLoads.set(id, key);
+          void this.loadBuffer(key, variantIndex).then((loaded) => {
+            if (this.pendingLoopLoads.get(id) !== key) return;
+            this.pendingLoopLoads.delete(id);
+            const pending = this.pendingLoops.get(id);
+            if (!loaded) {
+              if (pending?.key === key) {
+                this.pendingLoops.delete(id);
+                this.pendingLoopVariants.delete(id);
+              }
+              return;
+            }
+            if (!pending || pending.key !== key) return;
+            this.pendingLoops.delete(id);
+            this.loop(id, key, pending.target, pending.x, pending.y, pending.z);
+          });
+        }
+        return;
+      }
       const src = ctx.createBufferSource();
       src.buffer = buf;
       src.loop = true;
+      src.playbackRate.value = this.authoredPlaybackRate(key);
       const g = ctx.createGain();
       g.gain.value = 0;
-      const panner = positional ? this.makePanner(x!, y!, z!) : null;
+      const panner = positional ? this.makePanner(x, y, z) : null;
       if (panner) src.connect(g).connect(panner).connect(master);
       else src.connect(g).connect(master);
       src.start();
-      slot = { key, src, gain: g, panner, target: -1 };
+      this.commitVariant(key, variantIndex);
+      this.pendingLoopVariants.delete(id);
+      slot = { key, src, gain: g, panner, target: -1, x, y, z };
       this.loops.set(id, slot);
-    } else if (positional && slot.panner) {
-      this.setPannerPos(slot.panner, x!, y!, z!);
+    } else if (positional && slot.panner && (slot.x !== x || slot.y !== y || slot.z !== z)) {
+      this.setPannerPos(slot.panner, x, y, z);
+      slot.x = x;
+      slot.y = y;
+      slot.z = z;
     }
-    // Only (re)arm the ramp when the target actually changes — loop() is called
+    // Only (re)arm the ramp when the target actually changes. loop() is called
     // every frame for active ambience, so this keeps the hot path allocation-free.
-    if (slot.target !== target) {
-      slot.target = target;
-      slot.gain.gain.setTargetAtTime(target, ctx.currentTime, 0.25);
+    const mixedTarget = target * (this.entry(key)?.gain ?? 1);
+    if (slot.target !== mixedTarget) {
+      slot.target = mixedTarget;
+      slot.gain.gain.setTargetAtTime(mixedTarget, ctx.currentTime, 0.25);
     }
   }
 
   /** Fade a loop out and free it. */
   unloop(id: string, fade = 0.4): void {
+    this.pendingLoops.delete(id);
+    this.pendingLoopLoads.delete(id);
+    this.pendingLoopVariants.delete(id);
     const slot = this.loops.get(id);
     const ctx = this.ctx;
     if (!slot || !ctx) return;
@@ -399,14 +710,29 @@ class Sfx {
     if (!this.footstepsOn) return; // silenced by default (footstepSfx setting)
     this.footTick = (this.footTick + 1) & 1;
     const foot = this.footTick === 0 ? 0.97 : 1.04; // left/right
-    this.playAt(`foot_${surface}`, x, y, z, {
-      gain: running ? 0.8 : 0.55,
+    const key = FOOTSTEP_CUES[surface];
+    if (!key) return;
+    this.playAt(key, x, y, z, {
+      gain: running ? 0.5 : 0.35,
       rate: (running ? 1.06 : 1) * foot,
       cooldown: 0.05,
       release: running ? 0.17 : 0.22, // < the tightest stride gap (~0.22s at run)
     });
   }
   private footTick = 0;
+
+  /** One custom stride for a running mount. This is part of the world SFX mix,
+   *  independent of the optional on-foot footstep toggle. */
+  mountRun(x: number, y: number, z: number, mountKey: string, _self: boolean): void {
+    const key = `mount_run_${mountKey}`;
+    if (!(key in SFX_CLIPS)) return;
+    this.playAt(key, x, y, z, {
+      gain: 0.85,
+      rate: 1,
+      cooldown: 0.05,
+      release: 0.44,
+    });
+  }
 
   /** Jump / land / water-entry / swim-stroke. */
   movement(
@@ -429,7 +755,19 @@ class Sfx {
 
   private ambient(key: string, target: number): void {
     if (target > 0) this.loop(key, key, target);
-    else if (this.loops.has(key)) this.unloop(key, 0.7);
+    else this.unloop(key, 0.7);
+  }
+
+  private pointAmbient(source: AmbientPointSource): void {
+    if (this.tooFar(source.x, source.z)) {
+      if (this.loops.has(source.id) || this.pendingLoops.has(source.id)) {
+        this.unloop(source.id, 0.7);
+      }
+      return;
+    }
+    const key = source.kind === 'campfire' ? 'amb_campfire' : 'amb_forge';
+    const gain = source.kind === 'forge' ? FORGE_AMBIENCE_GAIN : POINT_AMBIENCE_GAIN;
+    this.loop(source.id, key, gain, source.x, source.y, source.z);
   }
 
   /** Cross-fade the global ambience loops to match the player's surroundings.
@@ -440,25 +778,63 @@ class Sfx {
     inDungeon: boolean,
     precip: 'snow' | 'rain' | null,
     nearWater: boolean,
-    crowd: number,
+    crowd = 0,
+    points: readonly AmbientPointSource[] = [],
   ): void {
     this.ambient('amb_dungeon', inDungeon ? 0.3 : 0);
     // Sowfield crowd murmur (procedural bed): quiet chatter on the grounds,
     // swelling while a match is live (the renderer passes 0 / ~0.4 / 1).
     this.ambient('amb_crowd', crowd > 0 ? 0.08 + 0.18 * Math.min(1, crowd) : 0);
     this.ambient('amb_wind_vale', !inDungeon && (biome === 'vale' || biome === 'beach') ? 0.12 : 0);
-    this.ambient('amb_birds', !inDungeon && biome === 'vale' ? 0.1 : 0);
     this.ambient(
-      'amb_wind_marsh',
-      !inDungeon && (biome === 'marsh' || biome === 'cave') ? 0.13 : 0,
+      'amb_birds',
+      !inDungeon &&
+        (biome === 'vale' || biome === 'jungle' || biome === 'garden' || biome === 'gale')
+        ? 0.12
+        : 0,
     );
-    this.ambient(
-      'amb_wind_peaks',
-      !inDungeon && (biome === 'peaks' || biome === 'desert' || biome === 'volcano') ? 0.18 : 0,
-    );
-    this.ambient('amb_rain', precip === 'rain' ? 0.11 : 0); // sharp clip — kept very low
+    // The dusk realm shares the marsh's low still-air bed, kept quieter: a
+    // sheltered valley, no open-ridge wind. ...and the ember wastes a faint
+    // dry-air version of the same bed. Cave (paint-only) borrows the marsh bed.
+    const marshBed =
+      biome === 'marsh' || biome === 'cave'
+        ? 0.13
+        : biome === 'dusk'
+          ? 0.07
+          : biome === 'ember'
+            ? 0.05
+            : biome === 'amber'
+              ? 0.09
+              : biome === 'fen'
+                ? 0.11
+                : biome === 'night'
+                  ? 0.06 // hushed still night air
+                  : biome === 'haunt'
+                    ? 0.14 // the wood breathes: thick still air
+                    : biome === 'jungle'
+                      ? 0.1 // humid insect drone
+                      : biome === 'garden'
+                        ? 0.07 // bees in the beds
+                        : 0;
+    this.ambient('amb_wind_marsh', !inDungeon ? marshBed : 0);
+    // the Frostveil shares the peaks' ridge wind, a touch stronger in the mist;
+    // desert/volcano (paint-only) borrow the peaks ridge bed too. 0.12 matches
+    // amb_wind_vale's mix target: peaks/vale/marsh are generated to the same
+    // -14ish LUFS target, and the old 0.18 was a player-reported "too loud"
+    // complaint at Thornpeak Heights traced to this constant alone.
+    const peaksBed =
+      biome === 'peaks' || biome === 'desert' || biome === 'volcano'
+        ? 0.12
+        : biome === 'frost'
+          ? 0.2
+          : biome === 'gale'
+            ? 0.24
+            : 0;
+    this.ambient('amb_wind_peaks', !inDungeon ? peaksBed : 0);
+    this.ambient('amb_rain', precip === 'rain' ? 0.11 : 0); // sharp clip, kept very low
     this.ambient('amb_snow', precip === 'snow' ? 0.13 : 0);
     this.ambient('amb_water', nearWater ? 0.18 : 0);
+    for (let i = 0; i < points.length; i++) this.pointAmbient(points[i]);
   }
 
   // --- Vale Cup one-shots (HUD-armed on vcupGoal/vcupEnd events) -----------

@@ -16,8 +16,9 @@
 // (enforced by tests/architecture.test.ts). This module draws NO rng.
 
 import type { BankInfo } from '../world_api';
-import { addStacked, bagCapacity, bagsFullError, countFit } from './bags';
+import { addStacked, bagCapacity, bagsFullError, countFit, instancedCountCap } from './bags';
 import { ITEMS } from './data';
+import * as deedsMod from './deeds';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
 
@@ -74,8 +75,11 @@ export interface MoveResult {
  *
  *  - `count` undefined = the whole stack.
  *  - An instanced slot (#1165 per-instance payload) moves as ONE indivisible unit
- *    regardless of count: it never merges with a dest stack (a deep clone is pushed
- *    into a fresh slot), so it needs one free dest slot or refuses 'no_fit'.
+ *    regardless of count (its units can never be split from their payload).
+ *    Identical-payload stacking: the units merge into a byte-equal
+ *    mergeable dest stack with room and otherwise land in a fresh deep-cloned
+ *    dest slot (countFit/addStacked carry the payload), refusing 'no_fit' only
+ *    when the whole count cannot land.
  *  - A fungible slot reuses the bags.ts stacking rules (countFit/addStacked): the
  *    move fits only when every requested copy fits, then tops up dest stacks and
  *    appends fresh ones. A partial count decrements the source; a whole-stack move
@@ -92,11 +96,14 @@ export function moveBetweenContainers(
   }
   const slot = source[sourceIndex];
 
-  // Instanced: the whole slot moves as one unit (a per-instance payload can never be
-  // split or merged), so it always needs a fresh dest slot.
+  // Instanced: the whole slot moves as one unit (a per-instance payload can never
+  // be split from its units), merging into a byte-equal dest stack when one has
+  // room and taking a fresh (deep-cloned) dest slot otherwise.
   if (slot.instance) {
-    if (dest.length >= destCapacity) return { moved: 0, refusal: 'no_fit' };
-    dest.push(cloneInvSlot(slot));
+    if (countFit(dest, destCapacity, slot.itemId, slot.count, slot.instance) < slot.count) {
+      return { moved: 0, refusal: 'no_fit' };
+    }
+    addStacked(dest, slot.itemId, slot.count, slot.instance);
     source.splice(sourceIndex, 1);
     return { moved: slot.count };
   }
@@ -125,6 +132,16 @@ function nearBanker(ctx: SimContext, e: Entity): boolean {
     if (b && b.kind === 'npc' && dist2d(e.pos, b.pos) <= BANKER_RANGE) return true;
   }
   return false;
+}
+
+/** The in-reach banker's templateId, or null when none: the same scan as
+ *  nearBanker, resolved to an identity for the deeds NPC ledger. */
+function nearBankerTemplateId(ctx: SimContext, p: Entity): string | null {
+  for (const id of ctx.bankerIds) {
+    const b = ctx.entities.get(id);
+    if (b && b.kind === 'npc' && dist2d(p.pos, b.pos) <= BANKER_RANGE) return b.templateId;
+  }
+  return null;
 }
 
 /** Deposit a carried-inventory slot into the bank. Quest items are refused (they
@@ -165,6 +182,9 @@ export function bankDeposit(
   }
   if (result.refusal) return; // 'invalid': malformed input (cheat/desync), no player line
   ctx.onInventoryChangedForQuests(meta);
+  // A completed deposit is banker business; the gate above guarantees a banker.
+  const bankerId = nearBankerTemplateId(ctx, p);
+  if (bankerId) deedsMod.onBankerBusinessForDeeds(ctx, meta, bankerId);
 }
 
 /** Withdraw a bank slot back into the carried inventory: the mirror of deposit,
@@ -200,6 +220,9 @@ export function bankWithdraw(
   }
   if (result.refusal) return; // 'invalid': malformed input (cheat/desync), no player line
   ctx.onInventoryChangedForQuests(meta);
+  // A completed withdrawal is banker business; the gate above guarantees a banker.
+  const bankerId = nearBankerTemplateId(ctx, p);
+  if (bankerId) deedsMod.onBankerBusinessForDeeds(ctx, meta, bankerId);
 }
 
 /** Buy the next 6-slot bank expansion for exact copper, non-refundable. Blocked at
@@ -229,6 +252,11 @@ export function bankBuySlots(ctx: SimContext, pid?: number): void {
   meta.copper -= price;
   meta.bank.purchasedSlots += BANK_EXPANSION_SLOTS;
   ctx.notice(meta.entityId, 'You purchase additional bank slots.');
+  // A completed expansion is banker business; the gate above guarantees a banker.
+  const bankerId = nearBankerTemplateId(ctx, p);
+  if (bankerId) deedsMod.onBankerBusinessForDeeds(ctx, meta, bankerId);
+  // purchasedSlots feeds a deed meter, so re-check this player's triggers.
+  ctx.markDeedsDirty(meta.entityId);
 }
 
 /** The proximity-gated bank snapshot the IWorld seam exposes (the mailInfoFor
@@ -274,8 +302,15 @@ export function sanitizeBankState(raw: unknown): BankState {
       const e = entry as { itemId?: unknown; count?: unknown; instance?: unknown };
       if (typeof e.itemId !== 'string' || e.itemId === '') continue;
       const hasInstance = !!e.instance && typeof e.instance === 'object';
-      // An instanced slot forces count 1: a count above 1 would mint payload copies.
-      const count = hasInstance ? 1 : Math.max(1, Math.floor(Number(e.count)) || 1);
+      // The shared tamper ceiling (bags.ts instancedCountCap, also applied to
+      // the carried-inventory hydration in Sim.addPlayer): merge-legal stack
+      // cap for a counted instanced slot, 1 for a charge-bearing payload, and
+      // an unknown item def stays dormant uncapped data like the plain arm.
+      const instanceCap = instancedCountCap(
+        ITEMS[e.itemId],
+        hasInstance ? (e.instance as InvSlot['instance']) : undefined,
+      );
+      const count = Math.min(instanceCap, Math.max(1, Math.floor(Number(e.count)) || 1));
       const slot: InvSlot = hasInstance
         ? { itemId: e.itemId, count, instance: e.instance as InvSlot['instance'] }
         : { itemId: e.itemId, count };

@@ -8,18 +8,48 @@
 // This pins the two outliers the framework caught and fixed (Pyroblast, Starfire)
 // so a future damage edit cannot quietly make a slow nuke worthless again.
 import { describe, expect, it } from 'vitest';
-import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { ABILITIES, abilitiesKnownAt, type KnownAbility } from '../src/sim/content/classes';
+import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import type { PlayerClass } from '../src/sim/types';
 import { GCD, MAX_LEVEL } from '../src/sim/types';
 
 // Base damage per second of occupancy (avg hit / effective cast), ignoring Spell
 // Power and crit (which scale every nuke about equally). The pure proportionality
 // signal.
+// The mage DPS kit is spec-gated since Chronomancy: resolve mage nukes under a
+// fire-spec build (fire keeps every nuke this file compares).
+const FIRE_MODS = computeTalentModifiers('mage', {
+  ...emptyAllocation(),
+  spec: 'fire',
+} as never);
+
 function nukeBaseDps(cls: PlayerClass, id: string): number {
-  const k = abilitiesKnownAt(cls, MAX_LEVEL).find((a) => a.def.id === id)!;
+  const mods = cls === 'mage' ? FIRE_MODS : undefined;
+  const k = abilitiesKnownAt(cls, MAX_LEVEL, mods).find((a) => a.def.id === id)!;
   const dd = k.effects.find((e) => e.type === 'directDamage') as { min: number; max: number };
   const avg = (dd.min + dd.max) / 2;
   return avg / Math.max(k.castTime, GCD);
+}
+
+function averageHealing(known: KnownAbility): number {
+  let total = 0;
+  for (const effect of known.effects) {
+    if (effect.type === 'heal') total += (effect.min + effect.max) / 2;
+    if (effect.type === 'hot') total += effect.total;
+  }
+  return total;
+}
+
+function manaPerAverageHeal(cls: PlayerClass, id: string): number {
+  const known = abilitiesKnownAt(cls, MAX_LEVEL).find((a) => a.def.id === id);
+  if (!known) throw new Error(`${cls} is missing ${id}`);
+  return known.cost / averageHealing(known);
+}
+
+function median(values: number[]): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
 }
 
 describe('nuke damage is proportional to cast time (the balance framework rule)', () => {
@@ -46,5 +76,35 @@ describe('nuke damage is proportional to cast time (the balance framework rule)'
       // best per-second; below that it is never worth a global cooldown.
       expect(dps[i] / best, `${ids[i]} vs best`).toBeGreaterThan(0.6);
     }
+  });
+});
+
+describe('healer primary mana efficiency', () => {
+  const level20PeerHeals = [
+    ['priest', 'lesser_heal'],
+    ['priest', 'heal'],
+    ['priest', 'flash_heal'],
+    ['shaman', 'healing_wave'],
+    ['druid', 'healing_touch'],
+    ['druid', 'regrowth'],
+  ] as const satisfies readonly (readonly [PlayerClass, string])[];
+
+  it('pins the tuned Mending Light rank costs', () => {
+    const holyLight = ABILITIES.holy_light;
+    expect([holyLight.cost, ...(holyLight.ranks ?? []).map((rank) => rank.cost)]).toEqual([
+      25, 50, 70, 117,
+    ]);
+  });
+
+  it('keeps level 20 Mending Light within the peer healer efficiency band', () => {
+    const peerRatios = level20PeerHeals.map(([cls, id]) => manaPerAverageHeal(cls, id));
+    const peerMedian = median(peerRatios);
+    const paladinRatio = manaPerAverageHeal('paladin', 'holy_light');
+    const priestHealRatio = manaPerAverageHeal('priest', 'heal');
+
+    expect(paladinRatio).toBeGreaterThanOrEqual(peerMedian * 0.9);
+    expect(paladinRatio).toBeLessThanOrEqual(peerMedian * 1.1);
+    expect(paladinRatio).toBeGreaterThanOrEqual(priestHealRatio * 0.9);
+    expect(paladinRatio).toBeLessThanOrEqual(priestHealRatio * 1.1);
   });
 });

@@ -14,7 +14,7 @@ import {
   type PartyRowSlot,
   partyRowHandlers,
 } from '../src/ui/party_frame_row';
-import type { PartyFrameMember } from '../src/ui/party_frames';
+import { DEFAULT_PARTY_FRAME_DISPLAY, type PartyFrameMember } from '../src/ui/party_frames';
 import { PartyFramesPainter } from '../src/ui/party_frames_painter';
 
 // The crest icon's procedural path needs a canvas; the pool only needs a string. A
@@ -65,6 +65,7 @@ describe('partyRowHandlers: the closures read the LIVE slot, never a captured me
     level: 10,
     hp: 1,
     mhp: 1,
+    absorb: 0,
     res: 0,
     mres: 0,
     rtype: 'mana',
@@ -83,6 +84,7 @@ describe('partyRowHandlers: the closures read the LIVE slot, never a captured me
     const handlers = partyRowHandlers(slot, {
       onTarget: (pid) => targets.push(pid),
       onContextMenu: (pid, name) => menus.push([pid, name]),
+      onHover: () => {},
     });
 
     handlers.click();
@@ -104,6 +106,7 @@ describe('partyRowHandlers: the closures read the LIVE slot, never a captured me
     const handlers = partyRowHandlers(slot, {
       onTarget: (pid) => targets.push(pid),
       onContextMenu: (pid, _name, x, y) => menus.push([pid, x, y]),
+      onHover: () => {},
     });
     for (const key of ['Enter', ' ']) {
       handlers.keydown({ key, preventDefault() {} } as unknown as KeyboardEvent);
@@ -253,6 +256,7 @@ const member = (over: Partial<PartyFrameMember> & { pid: number }): PartyFrameMe
   level: 20,
   hp: 50,
   mhp: 100,
+  absorb: 0,
   res: 30,
   mres: 100,
   rtype: 'mana',
@@ -270,7 +274,7 @@ describe('createPartyRow: decorative badges + relocalize hook (a11y + live langu
     createPartyRow(
       fakeDoc,
       recordingFacet().writers,
-      { onTarget() {}, onContextMenu() {} },
+      { onTarget() {}, onContextMenu() {}, onHover() {} },
       member({ pid: 1 }),
       auraDeps,
     );
@@ -319,7 +323,6 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
   let calls: Call[];
   let painter: PartyFramesPainter;
   let targeted: number[];
-  let leftParty: number;
   let toggles: number;
 
   beforeEach(() => {
@@ -327,7 +330,6 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     const facet = recordingFacet();
     calls = facet.calls;
     targeted = [];
-    leftParty = 0;
     toggles = 0;
     painter = new PartyFramesPainter(
       facet.writers,
@@ -336,10 +338,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
         classCss: () => 'var(--cls)',
         onTarget: (pid) => targeted.push(pid),
         onContextMenu: () => {},
-        onLeave: () => {
-          leftParty++;
-        },
-        leaveLabel: () => 'Leave Party',
+        onHover: () => {},
         chipLabel: () => 'Party',
         onToggleCollapse: () => {
           toggles++;
@@ -367,7 +366,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(rowA.listeners.keydown).toHaveLength(1);
 
     // Re-sync the SAME member (a stat changed): the row is reused, not rebuilt.
-    painter.sync([member({ pid: 2, name: 'Alice', hp: 10 })], 1, false);
+    painter.sync([member({ pid: 2, name: 'Alice', hp: 10, absorb: 15 })], 1, false);
     expect(rows()[0]).toBe(rowA);
     expect(rowA.listeners.click).toHaveLength(1);
 
@@ -396,8 +395,12 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
         member({
           pid: 2,
           auras: [
+            { id: 'weapon_imbue', kind: 'imbue' },
+            { id: 'well_fed', kind: 'buff_sta' },
+            { id: 'arcane_intellect', kind: 'buff_int_pct' },
+            { id: 'temporal_exhaustion', kind: 'sated' },
             { id: 'power_word_shield', kind: 'absorb' },
-            { id: 'rend', kind: 'dot' },
+            { id: 'deep_wounds', kind: 'dot' },
           ],
         }),
       ],
@@ -411,23 +414,96 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(strip).toBeTruthy();
     const icons = () =>
       strip.childNodes.filter((c: FakeEl) => String(c.className).includes('buff'));
+    // Passive maintenance buffs such as warrior stances do not compete with
+    // actionable healer effects in the compact frame.
     expect(icons()).toHaveLength(2);
     // the shield wears off: the strip's keyed pool detaches its node
-    painter.sync([member({ pid: 2, auras: [{ id: 'rend', kind: 'dot' }] })], 1, false);
+    painter.sync([member({ pid: 2, auras: [{ id: 'deep_wounds', kind: 'dot' }] })], 1, false);
     expect(icons()).toHaveLength(1);
     // a member with no auras (or an older server omitting the field) paints an empty strip
     painter.sync([member({ pid: 2 })], 1, false);
     expect(icons()).toHaveLength(0);
   });
 
-  it('orders rows in member order with the leave button last', () => {
+  it('orders rows without a fixed leave button beneath the frames', () => {
     painter.sync([member({ pid: 2 }), member({ pid: 3 }), member({ pid: 4 })], 1, false);
     const kids = container.childNodes;
     expect(rows()).toHaveLength(3); // three member rows inside the wrapper
-    expect(kids[kids.length - 1].tagName).toBe('BUTTON'); // leave button last (container child)
+    expect(kids.some((child) => child.id === 'party-leave')).toBe(false);
   });
 
-  it('reconciles DOM order on reorder + partial-membership churn, reusing the SAME nodes, leave last', () => {
+  it('toggles the raid-frame presentation for automatic raids and forced party use', () => {
+    painter.sync([member({ pid: 2 })], 1, true, DEFAULT_PARTY_FRAME_DISPLAY);
+    expect(
+      calls.some(
+        (call) =>
+          call.m === 'toggleClass' && call.args[0] === 'party-style-raid' && call.args[1] === true,
+      ),
+    ).toBe(true);
+
+    calls.length = 0;
+    painter.sync([member({ pid: 2 })], 1, false, {
+      ...DEFAULT_PARTY_FRAME_DISPLAY,
+      presentation: 2,
+    });
+    expect(
+      calls.some(
+        (call) =>
+          call.m === 'toggleClass' && call.args[0] === 'party-style-raid' && call.args[1] === true,
+      ),
+    ).toBe(true);
+
+    calls.length = 0;
+    painter.sync([member({ pid: 2 })], 1, true, {
+      ...DEFAULT_PARTY_FRAME_DISPLAY,
+      presentation: 1,
+    });
+    expect(
+      calls.some(
+        (call) =>
+          call.m === 'toggleClass' && call.args[0] === 'party-style-raid' && call.args[1] === false,
+      ),
+    ).toBe(true);
+  });
+
+  it('honors the resource, absorb, and aura visibility toggles', () => {
+    painter.sync(
+      [
+        member({
+          pid: 2,
+          hp: 50,
+          mhp: 100,
+          absorb: 25,
+          auras: [{ id: 'power_word_shield', kind: 'absorb' }],
+        }),
+      ],
+      1,
+      false,
+      {
+        ...DEFAULT_PARTY_FRAME_DISPLAY,
+        showResource: false,
+        showAbsorbs: false,
+        showAuras: false,
+      },
+    );
+    expect(
+      calls.some(
+        (call) =>
+          call.m === 'toggleClass' && call.args[0] === 'pf-hide-resource' && call.args[1] === true,
+      ),
+    ).toBe(true);
+    expect(
+      calls.some(
+        (call) =>
+          call.m === 'toggleClass' && call.args[0] === 'pf-hide-auras' && call.args[1] === true,
+      ),
+    ).toBe(true);
+    expect(
+      calls.some((call) => call.m === 'setTransform' && call.args[0] === 'scaleX(0.000)'),
+    ).toBe(true);
+  });
+
+  it('reconciles DOM order on reorder + partial-membership churn, reusing the SAME nodes', () => {
     painter.sync([member({ pid: 2 }), member({ pid: 3 }), member({ pid: 4 })], 1, false);
     const [r2, r3, r4] = rows();
     // Reorder to 4,2,3 (e.g. a raid group-swap flips the sort): same nodes moved into
@@ -438,14 +514,14 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(reordered[0]).toBe(r4);
     expect(reordered[1]).toBe(r2);
     expect(reordered[2]).toBe(r3);
-    expect(container.childNodes[container.childNodes.length - 1].tagName).toBe('BUTTON');
-    // The middle member (pid 2) leaves: the remaining two keep their order, leave last.
+    expect(container.childNodes).toHaveLength(1);
+    // The middle member (pid 2) leaves: the remaining two keep their order.
     painter.sync([member({ pid: 4 }), member({ pid: 3 })], 1, false);
     const trimmed = rows();
     expect(trimmed).toHaveLength(2);
     expect(trimmed[0]).toBe(r4);
     expect(trimmed[1]).toBe(r3);
-    expect(container.childNodes[container.childNodes.length - 1].tagName).toBe('BUTTON');
+    expect(container.childNodes).toHaveLength(1);
   });
 
   it('a steady-state rebuild (same members + order) moves no node, so a focused row keeps its place', () => {
@@ -490,7 +566,16 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     painter.setBelowTarget(true);
     painter.sync(
       [
-        member({ pid: 2, name: 'Alice', dead: 0, inCombat: 1, hp: 50, mhp: 100, oor: false }),
+        member({
+          pid: 2,
+          name: 'Alice',
+          dead: 0,
+          inCombat: 1,
+          hp: 50,
+          mhp: 100,
+          absorb: 25,
+          oor: false,
+        }),
         member({ pid: 3, name: 'Bob', dead: 1, oor: false }),
         member({ pid: 4, name: 'Cora', dead: 0, inCombat: 0, oor: true }),
       ],
@@ -513,6 +598,14 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     // A combat member is NOT also dead (dead wins), so its combat is on but dead off.
     // The hp bar keeps the inline .toFixed(3) precision via formatScaleX.
     expect(has('setTransform', (c) => /^scaleX\(\d\.\d{3}\)$/.test(String(c.args[0])))).toBe(true);
+    // Party frames reuse the shared UnitFramePainter's classic absorb overlay (a
+    // left-origin scaleX to (hp + absorb) / maxHp), matching the player and target
+    // frames, so there is no positioned --absorb-start segment here.
+    expect(has('setStyleProp', (c) => c.args[0] === '--absorb-start')).toBe(false);
+    expect(has('setTransform', (c) => c.args[0] === 'scaleX(0.750)')).toBe(true);
+    // The compact party row never appends the absorb total to the HP text (that is a
+    // player/target-frame affordance), so "(25)" must not appear.
+    expect(has('setText', (c) => String(c.args[0]).includes('(25)'))).toBe(false);
     // The leader star is its OWN aria-hidden write (★), and the level element
     // (.lead-num) holds the bare number (20), never the old concatenated '★20'. Both
     // route through the elided setText (no raw write on the hot path).
@@ -522,8 +615,6 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(has('setText', (c) => c.args[0] === 'Alice')).toBe(true);
     // Outside raid, no group label is emitted (the group span stays empty).
     expect(has('setText', (c) => c.args[0] === 'Group 1')).toBe(false);
-    // The leave label is set (and re-localizable) through setText.
-    expect(has('setText', (c) => c.args[0] === 'Leave Party')).toBe(true);
     // Badges toggle via setDisplay (the forced-colors-safe icon cue): dead/combat/oor
     // each show at least once across the three members.
     expect(has('setDisplay', (c) => c.args[0] === '')).toBe(true);
@@ -551,20 +642,6 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     calls.length = 0;
     painter.relocalize();
     expect(calls.some((c) => c.m === 'setText' && c.args[0] === 'Group 2')).toBe(true);
-  });
-
-  it('relocalize() re-localizes the leave label in place (the live language-switch hook)', () => {
-    painter.sync([member({ pid: 2 })], 1, false);
-    calls.length = 0;
-    painter.relocalize();
-    expect(calls.some((c) => c.m === 'setText' && c.args[0] === 'Leave Party')).toBe(true);
-  });
-
-  it('the leave button click leaves the party', () => {
-    painter.sync([member({ pid: 2 })], 1, false);
-    const leave = container.childNodes.find((c) => c.tagName === 'BUTTON');
-    leave?.fire('click', {});
-    expect(leftParty).toBe(1);
   });
 
   // ---- The mobile collapse chip (setCollapse). ----
@@ -632,20 +709,20 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(toggles).toBe(1);
   });
 
-  it('keeps the chip first even after a member sync (chip, then rows wrapper, leave last)', () => {
+  it('keeps the chip first even after a member sync (chip, then rows wrapper)', () => {
     painter.setCollapse(true, true, false, false);
     painter.sync([member({ pid: 2 }), member({ pid: 3 })], 1, false);
     const kids = container.childNodes;
     expect(kids[0].id).toBe(chipId);
     expect(rows()).toHaveLength(2); // the two member rows live inside the wrapper
-    expect(kids[kids.length - 1].tagName).toBe('BUTTON'); // leave last
+    expect(kids[kids.length - 1]).toBe(wrapperOf());
   });
 
   it('F1: an expanded party seats the chip alone on its line, no member frame beside it', () => {
     // The pre-restructure grid put the chip in column 1 and auto-flowed a member frame
     // into the cell beside it (column 2 row 1). With the rows nested in the .party-rows
     // wrapper, the chip is a lone container child: its ONLY direct-child siblings are the
-    // wrapper and the Leave button, and every member frame sits INSIDE the wrapper.
+    // wrapper, and every member frame sits INSIDE the wrapper.
     painter.setCollapse(true, true, false, false); // mobile, expanded
     painter.sync([member({ pid: 2 }), member({ pid: 3 }), member({ pid: 4 })], 1, false);
     const kids = container.childNodes;
@@ -659,9 +736,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     // All three member rows nest inside the wrapper; the chip is not among them.
     expect(rows()).toHaveLength(3);
     expect(wrap.childNodes.some((c) => c.id === chipId)).toBe(false);
-    // Leave button is the container's last child, after the rows wrapper.
-    expect(kids[kids.length - 1].tagName).toBe('BUTTON');
-    expect(container.childNodes.indexOf(wrap)).toBeLessThan(kids.length - 1);
+    expect(kids[kids.length - 1]).toBe(wrap);
   });
 
   it('yields entirely while mobile chat is open: chip removed, no expanded class', () => {
