@@ -2407,6 +2407,17 @@
   ],
   "generatedBatches": [
     {
+      "source": "OpenAI built-in image generation, 2026-07-29",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "existing World of ClaudeCraft item icons: gravewyrm_sigil.webp, weathered_ledger_page.webp, valefire_lantern.webp",
+      "commonPrompt": "Painted fantasy MMORPG item icon, one centered object, clear silhouette, dark radial backdrop, no text, logos, watermark, or border",
+      "itemIds": [
+        "runeseekers_lantern",
+        "undermount_foreman_ledger",
+        "undermount_rune_rubbing"
+      ]
+    },
+    {
       "source": "OpenAI built-in image generation",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
       "styleReference": "existing painted WebP catalog in public/ui/items/",

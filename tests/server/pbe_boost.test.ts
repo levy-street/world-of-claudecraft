@@ -140,6 +140,18 @@ describe('bisKit (true best-in-slot over the whole PvE ladder)', () => {
     }
   });
 
+  it('no role kit of any class contains a cosmetic item', () => {
+    for (const cls of BOOST_CLASSES) {
+      for (const role of CLASS_ROLES[cls]) {
+        for (const itemId of Object.values(bisKitForRole(cls, role))) {
+          if (itemId) {
+            expect(ITEMS[itemId].cosmeticOnly, `${cls} ${role.id} ${itemId}`).not.toBe(true);
+          }
+        }
+      }
+    }
+  });
+
   it('picks the argmax of classItemScore per slot (chest, every class)', () => {
     for (const cls of BOOST_CLASSES) {
       const kit = bisKit(cls);

@@ -40,6 +40,7 @@ import {
   isShieldItem,
   weaponHand,
 } from '../src/sim/equipment_rules';
+import { isItemLevelEligible } from '../src/sim/item_level';
 import { meetsLevelRequirement } from '../src/sim/item_level_req';
 import { type CharacterState, Sim } from '../src/sim/sim';
 import type { EquipSlot, ItemDef, PlayerClass } from '../src/sim/types';
@@ -297,11 +298,7 @@ export function classItemScore(cls: PlayerClass, item: ItemDef): number {
 }
 
 function eligibleForBoost(cls: PlayerClass, item: ItemDef): boolean {
-  if (!item.slot) return false;
-  // Shields are kind 'armor' with shield=true on this branch (isShieldItem).
-  if (item.kind !== 'weapon' && item.kind !== 'armor' && item.kind !== 'held_offhand') {
-    return false;
-  }
+  if (!isItemLevelEligible(item)) return false;
   // WARFARE (honor vendor) gear only: PvP-budgeted pieces are never PvE BiS.
   if (item.pvpOffenseRating !== undefined || item.pvpDefenseRating !== undefined) return false;
   if (item.priceHonor !== undefined) return false;
