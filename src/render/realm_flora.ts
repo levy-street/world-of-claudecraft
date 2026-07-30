@@ -33,6 +33,7 @@ import {
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { cloneGeometryForBake } from './geometry_bake_clone';
 import { GFX, surfaceMat } from './gfx';
 import { MIST_DRIFT_AMPLITUDE, SEA_LIGHT_RAYS, SEA_MIST_BANKS } from './sea_mist_core';
 
@@ -73,13 +74,7 @@ for (const url of new Set([...MUSHROOM_URLS, BOULDER_URL, ...SEA_ROCK_URLS])) {
       gltf.scene.traverse((obj) => {
         const mesh = obj as THREE.Mesh;
         if (!mesh.isMesh) return;
-        const src = mesh.geometry;
-        const geo = new THREE.BufferGeometry();
-        for (const name of ['position', 'normal', 'uv']) {
-          const attr = src.getAttribute(name);
-          if (attr) geo.setAttribute(name, attr.clone());
-        }
-        if (src.index) geo.setIndex(src.index.clone());
+        const geo = cloneGeometryForBake(mesh.geometry);
         geo.applyMatrix4(mesh.matrixWorld);
         parts.push({ geometry: geo, material: mesh.material as THREE.Material });
       });
