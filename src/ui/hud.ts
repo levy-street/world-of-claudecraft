@@ -21,7 +21,11 @@ import { castBarState, consumeBarState, mountSummonBarState } from '../render/ca
 import { CharacterPreview, type PreviewFramingName } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
 import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
-import { onPortraitsReady, playerPortraitDataUrl } from '../render/characters/portrait';
+import {
+  onPortraitsReady,
+  onPortraitUpdate,
+  playerPortraitDataUrl,
+} from '../render/characters/portrait';
 import { currentDayNightPhase } from '../render/day_night_clock';
 import { globalDayness, skyTintForDayness } from '../render/day_night_core';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
@@ -1798,6 +1802,7 @@ export class Hud {
       closeTop: () => this.closeAll(),
       hideTooltip: () => this.hideTooltip(),
       onPortraitsReady,
+      onPortraitUpdate,
       preloadMechAssets: () => {
         if (!this.mechAssetsPromise) this.mechAssetsPromise = preloadMechAssets();
         return this.mechAssetsPromise;
@@ -1886,6 +1891,31 @@ export class Hud {
       this.drawPlayerFramePortrait();
       this.targetFramePainter.invalidatePortrait();
       this.totFramePainter.invalidatePortrait();
+    });
+    onPortraitUpdate((visualKey, skin) => {
+      const playerClass = visualKey.startsWith('player_')
+        ? (visualKey.slice('player_'.length) as PlayerClass)
+        : null;
+      if (!playerClass) return;
+      if (playerClass === this.sim.cfg.playerClass && skin === (this.sim.player.skin ?? 0)) {
+        this.drawPlayerFramePortrait();
+      }
+      const target = this.targetPortraitSubject;
+      if (
+        target?.kind === 'player' &&
+        target.templateId === playerClass &&
+        (target.skin ?? 0) === skin
+      ) {
+        this.targetFramePainter.invalidatePortrait();
+      }
+      const targetOfTarget = this.totPortraitSubject;
+      if (
+        targetOfTarget?.kind === 'player' &&
+        targetOfTarget.templateId === playerClass &&
+        (targetOfTarget.skin ?? 0) === skin
+      ) {
+        this.totFramePainter.invalidatePortrait();
+      }
     });
     const mm = $('#minimap') as unknown as HTMLCanvasElement;
     this.minimapCtx = require2dContext(mm);

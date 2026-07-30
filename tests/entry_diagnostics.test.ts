@@ -3,7 +3,9 @@ import {
   checkpointActiveEntryDiagnostics,
   createEntryDiagnosticsController,
   type EntryDiagnosticPersistence,
+  resumeActiveEntryDiagnostics,
   stopActiveEntryDiagnostics,
+  suspendActiveEntryDiagnostics,
 } from '../src/game/entry_diagnostics';
 
 function harness() {
@@ -153,6 +155,28 @@ describe('entry diagnostics controller', () => {
     controller.checkpoint('window-error');
     controller.renderedFrame(10_000);
     expect(events).toEqual(['start:2', 'scene-build-start', 'clear']);
+  });
+
+  it('clears while hidden and restores the last entry checkpoint on foreground', () => {
+    const { controller, events } = harness();
+    controller.start(2);
+    controller.checkpoint('assets-await', { phase: 'assets' });
+    suspendActiveEntryDiagnostics();
+    controller.checkpoint('renderer-built');
+    controller.renderedFrame(1_000);
+    controller.markStable();
+    resumeActiveEntryDiagnostics();
+    expect(events).toEqual([
+      'start:2',
+      'scene-build-start',
+      'assets-await',
+      'clear',
+      'start:2',
+      'assets-await',
+      'runtime-stable',
+    ]);
+    controller.markStable();
+    expect(events.at(-1)).toBe('runtime-stable');
   });
 
   it('uses wall time for persisted checkpoints rather than animation time', () => {

@@ -484,17 +484,18 @@ for (const [key, list] of Object.entries(SKINS)) {
   if (VISUALS[key]?.lazyPreload) continue;
   for (const u of list) if (u) bootSkinUrls.add(u);
 }
-// The packaged iOS shell defers the whole alternate-atlas sweep out of the boot
-// gate: ~34 1024x1024 atlases decode to well over 100 MB of RGBA inside the same
-// WebContent process whose jetsam ceiling the entry spike already presses against
-// (the iPhone 13 entry-kill report), and almost all of them are OTHER players'
-// cosmetics. skinTexture() fails soft to the embedded default and every apply
-// site heals through ensureSkinTexture() (visual.ts constructor + setSkin,
-// portrait.ts before its one-shot snapshot), so a deferred atlas costs a briefly
-// default-coloured body, never a crash or a stall. nativeIosMemoryProfile derives
-// from hints only (never the tier), so this import-time read cannot drift from
-// the live profile the way an import-time TIER read would (the farmCrate P0).
-const eagerSkinAtlases = !GFX.nativeIosMemoryProfile;
+// The packaged iOS shell, plus iOS Safari after a confirmed entry kill, defers
+// the whole alternate-atlas sweep out of the boot gate: ~34 1024x1024 atlases
+// decode to well over 100 MB of RGBA inside the same WebContent process whose
+// jetsam ceiling the entry spike already presses against (the iPhone 13 report),
+// and almost all of them are OTHER players' cosmetics. skinTexture() fails soft
+// to the embedded default and every apply site heals through ensureSkinTexture()
+// (visual.ts constructor + setSkin, portrait.ts before its one-shot snapshot),
+// so a deferred atlas costs a brief fallback, never a crash or a stall. Both
+// profile hints derive from static boot signals (never the tier), so this
+// import-time read cannot drift from the live profile the way an import-time
+// TIER read would (the farmCrate P0).
+const eagerSkinAtlases = !(GFX.nativeIosMemoryProfile || GFX.tightMemory);
 if (eagerSkinAtlases) {
   for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
 }

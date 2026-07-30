@@ -19,6 +19,7 @@ const mainSource = read('../src/main.ts');
 const assetsSource = read('../src/render/characters/assets.ts');
 const visualSource = read('../src/render/characters/visual.ts');
 const portraitSource = read('../src/render/characters/portrait.ts');
+const portraitChipSource = read('../src/ui/portrait_chip.ts');
 const vfxSource = read('../src/render/vfx.ts');
 
 describe('entry probe covers the await window', () => {
@@ -74,7 +75,9 @@ describe('tight-memory residency diet', () => {
 
 describe('deferred skin atlases on the packaged iOS shell', () => {
   it('gates the boot atlas sweep on the hint-stable native profile', () => {
-    expect(assetsSource).toContain('const eagerSkinAtlases = !GFX.nativeIosMemoryProfile;');
+    expect(assetsSource).toContain(
+      'const eagerSkinAtlases = !(GFX.nativeIosMemoryProfile || GFX.tightMemory);',
+    );
     // The character-preview gate must not re-await atlases the boot deferred.
     expect(assetsSource).toContain('const missingSkins = eagerSkinAtlases');
   });
@@ -84,10 +87,11 @@ describe('deferred skin atlases on the packaged iOS shell', () => {
   });
 
   it('never caches a portrait rendered while its atlas is still in flight', () => {
-    expect(portraitSource).toContain(
-      'const atlasPending = ensureSkinTexture(visualKey, skin) !== null;',
-    );
-    expect(portraitSource).toContain('if (!atlasPending) cache.set(key, url);');
+    expect(portraitSource).toContain('const atlasPending = ensureSkinTexture(visualKey, skin);');
+    expect(portraitSource).toContain('if (atlasPending) {');
+    expect(portraitSource).toContain('return null;');
+    expect(portraitChipSource).toContain('onPortraitUpdate((visualKey, skin) => {');
+    expect(mainSource).toContain('refreshStartSkinPickerPortraits(');
   });
 });
 
@@ -125,8 +129,10 @@ describe('native device-memory bridge', () => {
   it('exposes physical memory from the shell and registers the plugin', () => {
     expect(pluginSource).toContain('ProcessInfo.processInfo.physicalMemory');
     expect(pluginSource).toContain('"physicalMemoryBytes"');
+    expect(pluginSource).toContain('public let jsName = "NativeDeviceInfo"');
     expect(pluginSource).toContain('CAPPluginMethod(name: "getMemoryInfo"');
     expect(controllerSource).toContain('registerPluginInstance(NativeDeviceInfoPlugin())');
+    expect(mainSource).toContain('void primeNativeDeviceMemoryHint();');
   });
 
   it('compiles the plugin into the app target', () => {

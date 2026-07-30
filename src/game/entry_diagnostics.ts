@@ -38,6 +38,8 @@ export interface EntryDiagnosticsController {
   checkpoint: (checkpoint: EntryCheckpoint, diagnostics?: EntryDiagnostics) => void;
   renderedFrame: (now: number) => void;
   markStable: (message?: string) => void;
+  suspend: () => void;
+  resume: () => void;
   stop: (message?: string) => void;
 }
 
@@ -64,12 +66,18 @@ export function createEntryDiagnosticsController(options: {
   let nextRenderCheckpointAt = 0;
   let stickyCheckpoint: EntryCheckpoint | null = null;
   let stable = false;
+  let suspended = false;
+  let activePreset = 0;
+  let lastCheckpoint: EntryCheckpoint | null = null;
+  let lastDiagnostics: EntryDiagnostics = {};
+  let stableOnResume = false;
+  let stableOnResumeMessage: string | undefined;
 
   const checkpoint = (
     nextCheckpoint: EntryCheckpoint,
     diagnostics: EntryDiagnostics = options.renderSnapshot(),
   ): void => {
-    if (!armed) return;
+    if (!armed || suspended) return;
     const resetTarget = STICKY_RESETS.get(nextCheckpoint);
     if (stickyCheckpoint && STICKY_CHECKPOINTS.has(nextCheckpoint)) return;
     if (
@@ -82,23 +90,31 @@ export function createEntryDiagnosticsController(options: {
     if (STICKY_CHECKPOINTS.has(nextCheckpoint)) stickyCheckpoint = nextCheckpoint;
     if (resetTarget === stickyCheckpoint) stickyCheckpoint = null;
     persistence.checkpoint(nextCheckpoint, wallNow(), diagnostics);
+    lastCheckpoint = nextCheckpoint;
+    lastDiagnostics = diagnostics;
     log(`[entry-diag] checkpoint=${nextCheckpoint}`, diagnostics);
   };
 
   const controller: EntryDiagnosticsController = {
     start(preset): void {
       armed = true;
+      suspended = false;
+      activePreset = preset;
       frame = 0;
       nextRenderCheckpointAt = 0;
       stickyCheckpoint = null;
       stable = false;
+      lastCheckpoint = null;
+      lastDiagnostics = {};
+      stableOnResume = false;
+      stableOnResumeMessage = undefined;
       activeController = controller;
       persistence.start(preset, wallNow());
       checkpoint('scene-build-start', options.baseSnapshot());
     },
     checkpoint,
     renderedFrame(now): void {
-      if (!armed || stable) return;
+      if (!armed || suspended || stable) return;
       frame++;
       if (frame !== 1 && now < nextRenderCheckpointAt) return;
       checkpoint(frame === 1 ? 'first-frame' : 'rendering', {
@@ -109,15 +125,44 @@ export function createEntryDiagnosticsController(options: {
     },
     markStable(message): void {
       if (!armed || stable) return;
+      if (suspended) {
+        stableOnResume = true;
+        stableOnResumeMessage = message;
+        return;
+      }
       checkpoint('runtime-stable');
       stable = true;
       if (message) log(message);
     },
+    suspend(): void {
+      if (!armed || suspended) return;
+      suspended = true;
+      persistence.clear();
+    },
+    resume(): void {
+      if (!armed || !suspended) return;
+      suspended = false;
+      persistence.start(activePreset, wallNow());
+      if (lastCheckpoint) {
+        persistence.checkpoint(lastCheckpoint, wallNow(), lastDiagnostics);
+      }
+      if (stableOnResume) {
+        const message = stableOnResumeMessage;
+        stableOnResume = false;
+        stableOnResumeMessage = undefined;
+        controller.markStable(message);
+      }
+    },
     stop(message): void {
       if (!armed) return;
       armed = false;
+      suspended = false;
       stickyCheckpoint = null;
       stable = false;
+      lastCheckpoint = null;
+      lastDiagnostics = {};
+      stableOnResume = false;
+      stableOnResumeMessage = undefined;
       if (activeController === controller) activeController = null;
       persistence.clear();
       if (message) log(message);
@@ -135,4 +180,12 @@ export function checkpointActiveEntryDiagnostics(
 
 export function stopActiveEntryDiagnostics(message?: string): void {
   activeController?.stop(message);
+}
+
+export function suspendActiveEntryDiagnostics(): void {
+  activeController?.suspend();
+}
+
+export function resumeActiveEntryDiagnostics(): void {
+  activeController?.resume();
 }

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { DEVICE_MEMORY_GB_KEY, ENTRY_TIGHT_MODE_KEY } from '../src/device_memory_hint';
 import { NAMEPLATE_INTERVAL_LOW_SEC, nameplateIntervalSec } from '../src/game/ui_tier_knobs';
 import { FAR_ANIM_RANGE_SCALE_MAX } from '../src/render/crowd_lod';
 import {
@@ -333,7 +334,7 @@ describe('graphics tier resolution', () => {
     expect(nativeAndroid.maxPooledCharacterVisuals).toBe(Number.POSITIVE_INFINITY);
   });
 
-  it('applies the 4 GB-class tight-memory rung only with the hint, and only on native iOS', () => {
+  it('applies the 4 GB-class tight-memory rung to native iOS and recovered iOS web', () => {
     const nativeIos = {
       maxTouchPoints: 5,
       coarsePointer: true,
@@ -346,6 +347,11 @@ describe('graphics tier resolution', () => {
     const tightWeb = gfxInternalsForTest.settingsFor('medium', {
       ...nativeIos,
       nativeApp: false,
+      tightMemory: true,
+    });
+    const tightAndroid = gfxInternalsForTest.settingsFor('medium', {
+      ...nativeIos,
+      platform: 'android',
       tightMemory: true,
     });
 
@@ -368,10 +374,33 @@ describe('graphics tier resolution', () => {
     expect(standard.grassStep).toBe(2.75);
     expect(standard.maxPooledCharacterVisuals).toBe(6);
 
-    // The rung is scoped to the packaged iOS shell: the hint only exists where
-    // the native bridge measured it (or an entry crash stamped the marker).
-    expect(tightWeb.tightMemory).toBe(false);
-    expect(tightWeb.pixelRatioCap).toBeGreaterThan(1.0);
+    // A foreground entry crash also stamps the marker for iOS Safari, which
+    // shares WKWebView's WebContent memory ceiling and needs the same lower rung.
+    expect(tightWeb.tightMemory).toBe(true);
+    expect(tightWeb.pixelRatioCap).toBe(1.0);
+    expect(tightAndroid.tightMemory).toBe(false);
+  });
+
+  it('carries cached memory and recovery markers into the synchronous runtime hints', () => {
+    const originalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+    const values = new Map<string, string>([
+      [DEVICE_MEMORY_GB_KEY, '4'],
+      [ENTRY_TIGHT_MODE_KEY, JSON.stringify({ at: Date.now() })],
+    ]);
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem: (key: string) => values.get(key) ?? null,
+        setItem: (key: string, value: string) => void values.set(key, value),
+        removeItem: (key: string) => void values.delete(key),
+      },
+    });
+    try {
+      expect(gfxInternalsForTest.runtimeHints().tightMemory).toBe(true);
+    } finally {
+      if (originalStorage) Object.defineProperty(globalThis, 'localStorage', originalStorage);
+      else delete (globalThis as { localStorage?: Storage }).localStorage;
+    }
   });
 
   it('never raises the native iOS light bound from an Advanced low-effects override', () => {

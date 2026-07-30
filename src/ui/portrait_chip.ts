@@ -8,6 +8,7 @@
 
 import {
   onPortraitsReady,
+  onPortraitUpdate,
   type PortraitFraming,
   playerPortraitDataUrl,
   portraitsReady,
@@ -75,12 +76,17 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
 
 /** Swap any still-pending placeholder chips under `root` for the real 3D
  *  portrait. Safe to call repeatedly; a no-op until assets are ready. */
-export function hydratePortraits(root: ParentNode = document): void {
+export function hydratePortraits(
+  root: ParentNode = document,
+  onlyClass?: PlayerClass,
+  onlySkin?: number,
+): void {
   if (!portraitsReady()) return;
   root.querySelectorAll<HTMLElement>('.portrait-chip[data-portrait-pending]').forEach((chip) => {
     const cls = chip.dataset.cls as PlayerClass | undefined;
     if (!cls) return;
     const skin = Number(chip.dataset.skin ?? 0) || 0;
+    if (onlyClass && (cls !== onlyClass || skin !== onlySkin)) return;
     const framing = (chip.dataset.framing as PortraitFraming | undefined) ?? 'headshot';
     const url = playerPortraitDataUrl(cls, skin, framing);
     if (!url) return;
@@ -97,3 +103,7 @@ export function hydratePortraits(root: ParentNode = document): void {
 
 // Once the GLBs finish loading, upgrade every placeholder currently on screen.
 onPortraitsReady(() => hydratePortraits(document));
+onPortraitUpdate((visualKey, skin) => {
+  if (!visualKey.startsWith('player_')) return;
+  hydratePortraits(document, visualKey.slice('player_'.length) as PlayerClass, skin);
+});

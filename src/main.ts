@@ -44,7 +44,9 @@ import {
 import {
   checkpointActiveEntryDiagnostics,
   createEntryDiagnosticsController,
+  resumeActiveEntryDiagnostics,
   stopActiveEntryDiagnostics,
+  suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
@@ -170,7 +172,11 @@ import { assetsReady } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
 import { charactersReady, preloadMechAssets } from './render/characters/assets';
 import { skinCount } from './render/characters/manifest';
-import { onPortraitsReady, playerPortraitDataUrl } from './render/characters/portrait';
+import {
+  onPortraitsReady,
+  onPortraitUpdate,
+  playerPortraitDataUrl,
+} from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
 import { setDayNightPhaseOverride } from './render/day_night_clock';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
@@ -308,6 +314,7 @@ import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
 import { createSpectateBadge } from './ui/spectate_badge';
+import { refreshStartSkinPickerPortraits } from './ui/start_skin_picker_portraits';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
 import { shouldShowStorePromo } from './ui/store_promo_card';
 import { talentRowOptionIconRef } from './ui/talent_icons';
@@ -4276,6 +4283,10 @@ function refreshOnlineSkins(cls: PlayerClass): void {
     characterPreview?.setSkin(i);
   });
 }
+
+onPortraitUpdate((visualKey, skin) => {
+  refreshStartSkinPickerPortraits(document, visualKey, skin, playerPortraitDataUrl);
+});
 
 function updatePreviewContainer(panelId: string): void {
   if (!characterPreview) return;
@@ -9576,8 +9587,12 @@ function wireStartScreens(): void {
       // A page that leaves the foreground mid-entry was not killed by a foreground
       // memory spike: a later eviction while backgrounded (or a deliberate reload,
       // which also fires pagehide) must not read as an entry crash next boot.
-      stopActiveEntryDiagnostics();
-      clearEntryProbe();
+      suspendActiveEntryDiagnostics();
+    } else {
+      // A hidden page can resume the same entry attempt. Re-arm the probe with
+      // its last durable checkpoint before the awaits or scene build continue,
+      // so a later foreground WebContent kill still advances the recovery ladder.
+      resumeActiveEntryDiagnostics();
     }
   };
   document.addEventListener('visibilitychange', restampResumeMarker);

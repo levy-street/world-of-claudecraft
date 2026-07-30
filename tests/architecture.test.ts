@@ -1128,6 +1128,7 @@ const UI_DOM_MODULES = [
   'src/ui/social_window.ts',
   'src/ui/spectate_badge.ts',
   'src/ui/spellbook_window.ts',
+  'src/ui/start_skin_picker_portraits.ts',
   'src/ui/steam_link.ts',
   'src/ui/store_stack_diag.ts',
   'src/ui/talents_window.ts',

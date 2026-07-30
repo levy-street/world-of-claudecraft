@@ -686,11 +686,10 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
   // tier (and its density/VFX progression) while routing the packaged iOS app through the
   // bounded-residency material/world path from scene construction onward.
   const nativeIosMemoryProfile = hints?.nativeApp === true && hints.platform === 'ios';
-  // The stricter 4 GB-class rung. Gated on the native profile: the hint only exists
-  // where the native shell can measure physicalMemory (or where an entry-crash
-  // recovery stamped the marker), and the residency knobs it tightens are the ones
-  // the native profile already owns.
-  const tightMemoryProfile = nativeIosMemoryProfile && hints?.tightMemory === true;
+  // The stricter 4 GB-class rung. The native shell can measure physicalMemory,
+  // while either native WKWebView or iOS Safari can stamp the same marker after
+  // a foreground entry kill. Both WebKit hosts share the WebContent ceiling.
+  const tightMemoryProfile = hints?.platform === 'ios' && hints?.tightMemory === true;
   // Phone-class browsers live under a hard per-process memory ceiling (iOS WebKit evicts the
   // WebContent process outright); shed the largest one-shot GPU allocations there. Shadow-map
   // texels, MSAA, and DPR are cosmetic sharpness only, so this never crosses the
@@ -1150,6 +1149,7 @@ export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
 
 export const gfxInternalsForTest = {
   settingsFor,
+  runtimeHints,
   mobilePlatformFromNavigator,
   probeGpuRenderer,
   resetGpuRendererProbe: () => {
