@@ -274,6 +274,7 @@ const UI_PURE_CORES = [
 // (Date.now stays in the renderer that calls it), so a Vitest can drive any
 // moment of the cycle.
 const RENDER_PURE_CORES = [
+  'src/render/ability_vfx_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/camera_boom_core.ts',
   'src/render/camera_director_core.ts',

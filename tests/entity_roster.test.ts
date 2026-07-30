@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createDeedRuntime } from '../src/sim/deeds';
 import { createMob } from '../src/sim/entity';
+import type { DelayedEvent } from '../src/sim/entity_roster';
 import {
   addEntityToRoster,
   drainDelayedEvents,
@@ -18,13 +19,14 @@ import {
   tickGroundAoEs,
 } from '../src/sim/entity_roster';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
+import type { PendingProjectile } from '../src/sim/projectile_travel';
 import { Rng } from '../src/sim/rng';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { createVcState } from '../src/sim/social/vale_cup';
 import { SpatialGrid } from '../src/sim/spatial';
 import type { Entity } from '../src/sim/types';
 
-type AnyEntity = Entity & Record<string, any>;
+type AnyEntity = Entity & Record<string, unknown>;
 
 // A SpatialGrid contains `e` iff a radius query around its position finds its id.
 function gridHas(grid: SpatialGrid, e: Entity): boolean {
@@ -49,8 +51,8 @@ function makeCtx() {
   const players = new Map();
   const cfg = { seed: 1 } as unknown as SimContextHost['cfg'];
   const clock = { time: 0, tick: 0 };
-  let delayedEvents: { at: number; event: any; guard?: () => boolean }[] = [];
-  let pendingProjectiles: any[] = [];
+  let delayedEvents: DelayedEvent[] = [];
+  let pendingProjectiles: PendingProjectile[] = [];
   const emit = vi.fn();
   const clearEntityMarker = vi.fn();
   const pulseGroundAoE = vi.fn();
@@ -506,7 +508,7 @@ describe('entity_roster: despawn prologue (isolated ctx)', () => {
     const t = makeCtx();
     t.clock.time = 50;
     const m = mob(220, 1, 1);
-    m.overheadEmoteId = 'laugh' as any;
+    m.overheadEmoteId = 'laugh' as Entity['overheadEmoteId'];
     m.overheadEmoteUntil = 49; // already past
     addEntityToRoster(t.ctx, m);
     runDespawnDecay(t.ctx);
@@ -551,7 +553,8 @@ describe('entity_roster: ground-AoE drain (isolated ctx)', () => {
       interval: 1,
       tickTimer: 0,
       school: 'holy',
-      ability: 'consecration',
+      ability: 'Consecration',
+      abilityId: 'consecration',
       ...over,
     };
   }

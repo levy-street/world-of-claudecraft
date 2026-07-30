@@ -730,13 +730,19 @@ export const VISUALS: Record<string, VisualDef> = {
         slam: '2H_Melee_Attack_Chop',
         red_harvest: '2H_Melee_Attack_Chop',
         breachmaker: '2H_Melee_Attack_Chop',
-        shield_slam: '2H_Melee_Attack_Chop',
+        // Shieldcrack slams the SHIELD (offhand arm), not the sword: the
+        // synthesized bash (scripts/_add_shield_bash_anim.mjs) drives the
+        // left arm carrying the handslot.l shield; the weapon hand stays back.
+        shield_slam: 'Shield_Bash',
         raging_gale: 'Dualwield_Melee_Attack_Chop',
         bloodthirst: 'Dualwield_Melee_Attack_Chop',
-        cleave: '1H_Melee_Attack_Chop',
+        // Reaping Arc and Revenge hit everything in the frontal arc: the
+        // synthesized flat reap (scripts/_add_sweep_slice_anim.mjs), not the
+        // top-to-bottom chop (owner: "sideways sword sweep").
+        cleave: '1H_Melee_Attack_Slice_Horizontal',
+        revenge: '1H_Melee_Attack_Slice_Horizontal',
         thunder_clap: '1H_Melee_Attack_Chop',
         faultline: '1H_Melee_Attack_Chop',
-        revenge: '1H_Melee_Attack_Chop',
         heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
         overpower: '1H_Melee_Attack_Slice_Diagonal',
         hamstring: '1H_Melee_Attack_Slice_Diagonal',
@@ -982,7 +988,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0xd08b45,
     tintStrength: 0.35,
   },
-  // Druid Travel Form: a daft chicken-cow hybrid (custom GLB). No tint — its
+  // Druid Travel Form: a daft chicken-cow hybrid (custom GLB). No tint: its
   // authored cow-spots/comb/beak colours carry the look.
   form_travel: {
     url: `${CREATURES}/chicken_cow.glb`,

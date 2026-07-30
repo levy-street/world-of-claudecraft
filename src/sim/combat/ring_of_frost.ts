@@ -35,6 +35,7 @@ export function spawnRingOfFrost(
     tickTimer: effect.ring.duration,
     school: 'frost',
     ability: abilityName,
+    abilityId,
     frostRing: {
       id: `${source.id}:${Math.round(ctx.time / DT)}`,
       abilityId,
