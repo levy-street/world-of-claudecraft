@@ -106,6 +106,9 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     abilities: {
       shadow_word_pain: { dmgPct: 0.24, costPct: -0.1 },
       mind_blast: { dmgPct: 0.18, costPct: -0.1 },
+      // 2026-07 shadow-vs-casters rebalance: the shadow filler joins the
+      // baseline (it was the one rotational button with no entry).
+      mind_flay: { dmgPct: 0.15, costPct: -0.1 },
     },
   },
   'shaman/elemental': {
