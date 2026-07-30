@@ -13520,7 +13520,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram se vrací domů",
-        "text": "Můj Bram vzal loď ráno, kdy se otevřel síťový průlom, a moře ho vyvrhlo někam za Přístavištní mys. Slyšela jsem ho před třemi nocemi, {playerName}, jak volá přes vodu, a byla jsem příliš vyděšená na to, abych šla. Stále jsem příliš vyděšená. Prosím. Jeho loď leží ztroskotaná na severním pobřeží. Doveď ho ke mně domů.",
+        "text": "Můj Bram vzal loď ráno, kdy se otevřel síťový průlom, a moře ho vyvrhlo někam za Přístavištní mys. Slyšela jsem ho před třemi nocemi, {playerName}, jak volá přes vodu, a byla jsem příliš vyděšená na to, abych šla. Stále jsem příliš vyděšená. Prosím. Jeho loď leží ztroskotaná na jižním pobřeží. Doveď ho ke mně domů.",
         "completion": "Brame! Přivedl jsi mi ho zpátky celého, {playerName}. Oba jsme plakali a ani jeden z nás se nestydí. Ať už si průlomy z tohoto ostrova vezmou příště cokoliv, mou rodinu nedostanou. Už ne.",
         "objectives": {
           "0": {

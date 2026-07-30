@@ -4463,7 +4463,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Nelayan Bram diantar pulang dengan selamat ke Gullhaven',
   'entities.quests.q_fs_bram_come_home.text':
-    'Bram-ku membawa perahu keluar pagi ketika celah jaring itu terbuka, dan laut melemparkannya kembali entah di mana melewati titik Dermaga. Aku mendengarnya tiga malam lalu, {playerName}, memanggil dari atas air, dan aku terlalu takut untuk pergi. Aku masih terlalu takut. Kumohon. Perahunya terdampar hancur di pesisir utara. Antarkan dia pulang padaku.',
+    'Bram-ku membawa perahu keluar pagi ketika celah jaring itu terbuka, dan laut melemparkannya kembali entah di mana melewati titik Dermaga. Aku mendengarnya tiga malam lalu, {playerName}, memanggil dari atas air, dan aku terlalu takut untuk pergi. Aku masih terlalu takut. Kumohon. Perahunya terdampar hancur di pesisir selatan. Antarkan dia pulang padaku.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Pulang ke Rumah',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Sepuluh lebih sedikit, dan para buruh ladang sudah berdebat siapa yang keluar duluan. Ini tak akan bertahan lama, celah-celah itu tak pernah beristirahat lama, tapi kota yang bisa makan adalah kota yang bertahan.',

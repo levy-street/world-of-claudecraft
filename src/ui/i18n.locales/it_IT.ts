@@ -8664,7 +8664,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'La strada rialzata regge, e Tam ha ancora fiato a sufficienza per scherzare sui tre rintocchi. Bene. Siamo un’isola sotto assedio, {playerName}, e ogni paio di mani che attraversa quella barra di sabbia è un paio che le fratture devono superare prima di raggiungere la mia gente. Benvenuto a Gullhaven.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Torna a Casa',
   'entities.quests.q_fs_bram_come_home.text':
-    'Il mio Bram ha preso la barca la mattina in cui si è aperta la frattura delle reti, e il mare lo ha rigettato da qualche parte oltre la punta dell’Approdo. L’ho sentito tre notti fa, {playerName}, chiamare sull’acqua, ed ero troppo spaventata per andare. Sono ancora troppo spaventata. Ti prego. La sua barca giace naufragata sulla costa nord. Riportamelo a casa.',
+    'Il mio Bram ha preso la barca la mattina in cui si è aperta la frattura delle reti, e il mare lo ha rigettato da qualche parte oltre la punta dell’Approdo. L’ho sentito tre notti fa, {playerName}, chiamare sull’acqua, ed ero troppo spaventata per andare. Sono ancora troppo spaventata. Ti prego. La sua barca giace naufragata sulla costa sud. Riportamelo a casa.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Pescatore Bram riportato sano e salvo a Gullhaven',
   'entities.quests.q_fs_bram_come_home.completion':

@@ -8241,7 +8241,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Rybář Bram bezpečně doveden domů do Racčího přístavu',
   'entities.quests.q_fs_bram_come_home.text':
-    'Můj Bram vzal loď ráno, kdy se otevřel síťový průlom, a moře ho vyvrhlo někam za Přístavištní mys. Slyšela jsem ho před třemi nocemi, {playerName}, jak volá přes vodu, a byla jsem příliš vyděšená na to, abych šla. Stále jsem příliš vyděšená. Prosím. Jeho loď leží ztroskotaná na severním pobřeží. Doveď ho ke mně domů.',
+    'Můj Bram vzal loď ráno, kdy se otevřel síťový průlom, a moře ho vyvrhlo někam za Přístavištní mys. Slyšela jsem ho před třemi nocemi, {playerName}, jak volá přes vodu, a byla jsem příliš vyděšená na to, abych šla. Stále jsem příliš vyděšená. Prosím. Jeho loď leží ztroskotaná na jižním pobřeží. Doveď ho ke mně domů.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram se vrací domů',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'O deset méně, a polní dělníci se už hádají, kdo vyjde jako první. Nevydrží to dlouho, průlomy nikdy dlouho neodpočívají, ale město, které jí, je město, které vydrží.',

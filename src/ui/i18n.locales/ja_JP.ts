@@ -4615,7 +4615,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': '守将コールファストに報告した',
   'entities.quests.q_fs_bram_come_home.title': 'ブラムを家へ',
   'entities.quests.q_fs_bram_come_home.text':
-    'うちのブラムは、網場の裂け目が開いたあの朝に船を出して、海は船着き場の岬の先のどこかに彼を打ち返した。三晩前に聞いたんだ、{playerName}、水の向こうから呼ぶ声を。なのに怖くて行けなかった。今でも怖い。お願いだ。彼の船は北の岸で難破している。彼を家まで連れて帰っておくれ。',
+    'うちのブラムは、網場の裂け目が開いたあの朝に船を出して、海は船着き場の岬の先のどこかに彼を打ち返した。三晩前に聞いたんだ、{playerName}、水の向こうから呼ぶ声を。なのに怖くて行けなかった。今でも怖い。お願いだ。彼の船は南の岸で難破している。彼を家まで連れて帰っておくれ。',
   'entities.quests.q_fs_bram_come_home.completion':
     'ブラム！五体満足で連れ帰ってくれたんだね、{playerName}。ふたりして泣いたけど、どちらも恥じてなんかいないよ。裂け目どもが次にこの島から何を奪おうと、うちの家族だけは渡さない。もう二度と。',
   'entities.quests.q_fs_bram_come_home.objectives.0.label': '漁師ブラムをカモメ港まで送り届けた',

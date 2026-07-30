@@ -8530,7 +8530,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': 'Informa al Guardián Coalfast',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Vuelve a Casa',
   'entities.quests.q_fs_bram_come_home.text':
-    'Mi Bram sacó el bote la mañana en que se abrió la brecha de las redes, y el mar lo devolvió en algún lugar pasado el Embarcadero. Lo oí hace tres noches, {playerName}, llamando sobre el agua, y tuve demasiado miedo para ir. Todavía tengo demasiado miedo. Por favor. Su bote yace naufragado en la orilla norte. Tráelo caminando de vuelta a mí.',
+    'Mi Bram sacó el bote la mañana en que se abrió la brecha de las redes, y el mar lo devolvió en algún lugar pasado el Embarcadero. Lo oí hace tres noches, {playerName}, llamando sobre el agua, y tuve demasiado miedo para ir. Todavía tengo demasiado miedo. Por favor. Su bote yace naufragado en la orilla sur. Tráelo caminando de vuelta a mí.',
   'entities.quests.q_fs_bram_come_home.completion':
     '¡Bram! Me lo trajiste de vuelta entero, {playerName}. Los dos lloramos y ninguno se avergüenza de ello. Lo que sea que las brechas le quiten a esta isla la próxima vez, no se llevarán a mi familia. Ya no.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':

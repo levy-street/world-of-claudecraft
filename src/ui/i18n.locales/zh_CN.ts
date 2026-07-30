@@ -4442,7 +4442,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '布拉姆！你把他完完整整地带回来了，{playerName}。我们俩都哭了，谁也不觉得丢人。往后裂隙不管再从这座岛夺走什么，都别想夺走我的家人。再也不会了。',
   'entities.quests.q_fs_bram_come_home.objectives.0.label': '已护送渔民布拉姆平安回到鸥港',
   'entities.quests.q_fs_bram_come_home.text':
-    '晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在北岸。把他领回家，交到我手上。',
+    '晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在南岸。把他领回家，交到我手上。',
   'entities.quests.q_fs_bram_come_home.title': '布拉姆回家',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     '少了十个，雇工们已经在争谁第一个下田了。这撑不了多久，裂隙从不会安分太久，但吃得上饭的镇子，就是守得住的镇子。',

@@ -394,7 +394,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
     name: 'Bram Come Home',
     giverNpcId: 'fisher_nell',
     turnInNpcId: 'fisher_nell',
-    text: 'My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, $N, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the north shore. Walk him home to me.',
+    text: 'My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, $N, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the south shore. Walk him home to me.',
     completionText:
       'Bram! You brought him back to me whole, $N. We both wept and neither of us is ashamed. Whatever the breaks take from this island next, they do not get my family. Not anymore.',
     objectives: [
@@ -542,10 +542,15 @@ export const FARSHORE_OBJECTS: GroundObjectDef[] = [
 ];
 
 // Bram Come Home (q_fs_bram_come_home): Fisher Bram shelters in his wrecked
-// boat on the north shore past the Landing point and walks the shore road
+// boat on the south shore past the Landing point and walks the shore road
 // home to Gullhaven, through the wretches that comb the wrack and the
 // stalkers that hunt the road at dusk. Waypoints hug the authored shore
 // roads above (the Landing -> Gullhaven leg).
+//
+// Bearings follow the ENGINE convention the map and compass render (+z north,
+// +x WEST, so east is -x). Bram's post at z -8 has open sea 8 yards to the
+// SOUTH and none within 90 yards north of it, so this is the isle's south
+// shore, and it lies 22 yards south of the Landing.
 export const FARSHORE_ESCORTS: Record<string, EscortDef> = {
   esc_fs_bram: {
     id: 'esc_fs_bram',

@@ -10173,7 +10173,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Fischer Bram sicher nach Gullhaven heimgebracht',
   'entities.quests.q_fs_bram_come_home.text':
-    'Mein Bram nahm das Boot hinaus an dem Morgen, als sich der Netzriss öffnete, und das Meer warf ihn irgendwo hinter der Landspitze zurück. Ich hörte ihn vor drei Nächten, {playerName}, rufend über das Wasser, und ich hatte zu viel Angst zu gehen. Ich habe immer noch zu viel Angst. Bitte. Sein Boot liegt zerschellt am Nordufer. Bring ihn heim zu mir.',
+    'Mein Bram nahm das Boot hinaus an dem Morgen, als sich der Netzriss öffnete, und das Meer warf ihn irgendwo hinter der Landspitze zurück. Ich hörte ihn vor drei Nächten, {playerName}, rufend über das Wasser, und ich hatte zu viel Angst zu gehen. Ich habe immer noch zu viel Angst. Bitte. Sein Boot liegt zerschellt am Südufer. Bring ihn heim zu mir.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram, komm heim',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Zehn weniger, und die Feldarbeiter streiten schon darüber, wer zuerst hinausgeht. Es wird nicht von Dauer sein, die Risse ruhen nie lange, aber eine Stadt, die isst, ist eine Stadt, die hält.',

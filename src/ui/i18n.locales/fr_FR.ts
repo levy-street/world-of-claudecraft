@@ -9119,7 +9119,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Pêcheur Bram ramené sain et sauf à Gullhaven',
   'entities.quests.q_fs_bram_come_home.text':
-    "Mon Bram a pris le bateau le matin où la brèche-des-filets s'est ouverte, et la mer l'a rejeté quelque part au-delà de la pointe du Débarcadère. Je l'ai entendu il y a trois nuits, {playerName}, appeler par-dessus l'eau, et j'étais trop effrayée pour y aller. Je le suis encore. Je vous en prie. Son bateau gît naufragé sur la rive nord. Ramenez-le-moi.",
+    "Mon Bram a pris le bateau le matin où la brèche-des-filets s'est ouverte, et la mer l'a rejeté quelque part au-delà de la pointe du Débarcadère. Je l'ai entendu il y a trois nuits, {playerName}, appeler par-dessus l'eau, et j'étais trop effrayée pour y aller. Je le suis encore. Je vous en prie. Son bateau gît naufragé sur la rive sud. Ramenez-le-moi.",
   'entities.quests.q_fs_bram_come_home.title': 'Que Bram revienne',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Dix de moins, et les ouvriers agricoles se disputent déjà pour savoir qui sort en premier. Cela ne durera pas, les brèches ne se reposent jamais longtemps, mais une ville qui mange est une ville qui tient.',

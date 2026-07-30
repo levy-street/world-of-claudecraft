@@ -4541,7 +4541,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_the_three_bells.objectives.0.label': '已敲響警鐘',
   'entities.quests.q_fs_bram_come_home.title': '布蘭姆回家',
   'entities.quests.q_fs_bram_come_home.text':
-    '網裂開的那個早晨，我的布蘭姆把船撐了出去，海把他拋回了登岸碼頭岬角外的什麼地方。三天前的夜裡，{playerName}，我聽見他隔著水喊，而我怕得不敢去。現在我還是不敢。求求你。他的船擱淺在北岸。陪他走回家，回到我身邊。',
+    '網裂開的那個早晨，我的布蘭姆把船撐了出去，海把他拋回了登岸碼頭岬角外的什麼地方。三天前的夜裡，{playerName}，我聽見他隔著水喊，而我怕得不敢去。現在我還是不敢。求求你。他的船擱淺在南岸。陪他走回家，回到我身邊。',
   'entities.quests.q_fs_bram_come_home.completion':
     '布蘭姆！你把他完完整整地帶回了我身邊，{playerName}。我們倆都哭了，誰也不覺得羞。無論裂口接下來要從這座島奪走什麼，它們奪不走我的家人。再也不能了。',
   'entities.quests.q_fs_bram_come_home.objectives.0.label': '已護送漁夫布蘭姆安全回到鷗港',

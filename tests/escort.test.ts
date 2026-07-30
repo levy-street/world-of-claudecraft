@@ -3,9 +3,11 @@
 // waves that attack the escortee and pause the walk, failure + respawn, and
 // the success credit that readies the quest.
 import { describe, expect, it } from 'vitest';
+import { visualKeyFor } from '../src/render/characters/manifest';
 import { ESCORTS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { groundHeight, WATER_LEVEL } from '../src/sim/world';
 
 const ESCORT_ID = 'esc_fv_wren';
 const QUEST_ID = 'q_fv_seeing_wren_home';
@@ -93,6 +95,41 @@ describe('escort content integrity', () => {
     const text = QUESTS.q_fv_seeing_wren_home.text;
     expect(text).toContain('northeast of the Aurora Steps');
     expect(text).not.toContain('southwest');
+  });
+
+  // Bram is the other escort whose text carries a bearing. His post sits on the
+  // isle's SOUTH shore: open sea a few yards south of it and none within 60
+  // yards north. Sampled here rather than asserted from prose, and stable
+  // across seeds (the macro coastline is authored, the seed only adds noise).
+  it("puts Bram's wreck on the shore the terrain actually has", () => {
+    const post = ESCORTS.esc_fs_bram.start;
+    const seaDistance = (dz: number): number => {
+      for (let d = 0; d <= 200; d += 2) {
+        if (groundHeight(post.x, post.z + dz * d, 1337) < WATER_LEVEL) return d;
+      }
+      return Number.POSITIVE_INFINITY;
+    };
+
+    expect(seaDistance(-1)).toBeLessThan(20);
+    expect(seaDistance(1)).toBeGreaterThan(60);
+
+    const text = QUESTS.q_fs_bram_come_home.text;
+    expect(text).toContain('on the south shore');
+    expect(text).not.toContain('north shore');
+  });
+
+  // Every escortee needs an explicit body in the character manifest. The
+  // humanoid family default is the hooded outlaw (mob_bandit), so an
+  // unregistered escortee reads as the bandits the player is protecting them
+  // from: only Wren was registered, and Mosley, Suli and Bram were not.
+  it('gives every escortee an explicit character model, never the outlaw fallback', () => {
+    for (const def of Object.values(ESCORTS)) {
+      const key = visualKeyFor({ kind: 'mob', templateId: def.npcMobId } as Entity);
+      expect(key, `${def.id} escortee model`).not.toBe('mob_bandit');
+      expect(key.startsWith('npc_'), `${def.id} escortee model is ${key}`).toBe(true);
+      // The body is shared, so each escortee's own tint is what tells them apart.
+      expect(MOBS[def.npcMobId].color, `${def.id} tint`).toBeTypeOf('number');
+    }
   });
 });
 

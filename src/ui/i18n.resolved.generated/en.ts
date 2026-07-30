@@ -13520,7 +13520,7 @@ export const en: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Come Home",
-        "text": "My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, {playerName}, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the north shore. Walk him home to me.",
+        "text": "My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, {playerName}, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the south shore. Walk him home to me.",
         "completion": "Bram! You brought him back to me whole, {playerName}. We both wept and neither of us is ashamed. Whatever the breaks take from this island next, they do not get my family. Not anymore.",
         "objectives": {
           "0": {

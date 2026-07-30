@@ -13520,7 +13520,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram kommer hem",
-        "text": "Min Bram tog ut båten morgonen nätbräschen öppnades, och havet kastade tillbaka honom någonstans bortom Landningsudden. Jag hörde honom för tre nätter sedan, {playerName}, ropande över vattnet, och jag var för rädd för att gå. Jag är fortfarande för rädd. Snälla. Hans båt ligger vrakad på norra stranden. För honom hem till mig.",
+        "text": "Min Bram tog ut båten morgonen nätbräschen öppnades, och havet kastade tillbaka honom någonstans bortom Landningsudden. Jag hörde honom för tre nätter sedan, {playerName}, ropande över vattnet, och jag var för rädd för att gå. Jag är fortfarande för rädd. Snälla. Hans båt ligger vrakad på södra stranden. För honom hem till mig.",
         "completion": "Bram! Du förde honom tillbaka till mig hel, {playerName}. Vi grät båda och ingen av oss skäms. Vad bräscherna än tar från denna ö härnäst, de får inte min familj. Inte längre.",
         "objectives": {
           "0": {

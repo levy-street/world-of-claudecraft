@@ -13520,7 +13520,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Que Bram revienne",
-        "text": "Mon Bram a pris le bateau le matin où la brèche-des-filets s'est ouverte, et la mer l'a rejeté quelque part au-delà de la pointe du Débarcadère. Je l'ai entendu il y a trois nuits, {playerName}, appeler par-dessus l'eau, et j'étais trop effrayée pour y aller. Je le suis encore. Je vous en prie. Son bateau gît naufragé sur la rive nord. Ramenez-le-moi.",
+        "text": "Mon Bram a pris le bateau le matin où la brèche-des-filets s'est ouverte, et la mer l'a rejeté quelque part au-delà de la pointe du Débarcadère. Je l'ai entendu il y a trois nuits, {playerName}, appeler par-dessus l'eau, et j'étais trop effrayée pour y aller. Je le suis encore. Je vous en prie. Son bateau gît naufragé sur la rive sud. Ramenez-le-moi.",
         "completion": "Bram ! Vous me l'avez ramené entier, {playerName}. Nous avons tous les deux pleuré, et aucun de nous n'en a honte. Quoi que les brèches prennent ensuite à cette île, elles n'auront pas ma famille. Plus jamais.",
         "objectives": {
           "0": {

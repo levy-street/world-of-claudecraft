@@ -13520,7 +13520,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Komt Thuis",
-        "text": "Mijn Bram nam de boot mee de ochtend dat de nettenbreuk opende, en de zee wierp hem ergens voorbij de Aanlegpunt terug. Ik hoorde hem drie nachten geleden, {playerName}, roepend over het water, en ik was te bang om te gaan. Ik ben nog steeds te bang. Alsjeblieft. Zijn boot ligt vergaan op de noordoever. Breng hem lopend naar mij terug.",
+        "text": "Mijn Bram nam de boot mee de ochtend dat de nettenbreuk opende, en de zee wierp hem ergens voorbij de Aanlegpunt terug. Ik hoorde hem drie nachten geleden, {playerName}, roepend over het water, en ik was te bang om te gaan. Ik ben nog steeds te bang. Alsjeblieft. Zijn boot ligt vergaan op de zuidoever. Breng hem lopend naar mij terug.",
         "completion": "Bram! Je hebt hem heel bij me teruggebracht, {playerName}. We hebben allebei gehuild en geen van ons schaamt zich ervoor. Wat de breuken ook hierna van dit eiland nemen, mijn familie krijgen ze niet. Niet meer.",
         "objectives": {
           "0": {

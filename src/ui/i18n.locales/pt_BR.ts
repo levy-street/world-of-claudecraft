@@ -8502,7 +8502,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'A calçada resiste, e Tam ainda tem fôlego suficiente para brincar sobre as três badaladas. Bom. Somos uma ilha sitiada, {playerName}, e cada par de mãos que atravessa aquele banco de areia é um par que as brechas precisam superar antes de alcançar meu povo. Bem-vindo a Gullhaven.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Volta para Casa',
   'entities.quests.q_fs_bram_come_home.text':
-    'Meu Bram levou o barco na manhã em que a brecha das redes se abriu, e o mar o jogou de volta em algum lugar além da ponta do Desembarque. Eu o ouvi três noites atrás, {playerName}, chamando sobre a água, e fiquei com medo demais para ir. Ainda estou com medo demais. Por favor. O barco dele jaz naufragado na costa norte. Traga-o de volta para casa comigo.',
+    'Meu Bram levou o barco na manhã em que a brecha das redes se abriu, e o mar o jogou de volta em algum lugar além da ponta do Desembarque. Eu o ouvi três noites atrás, {playerName}, chamando sobre a água, e fiquei com medo demais para ir. Ainda estou com medo demais. Por favor. O barco dele jaz naufragado na costa sul. Traga-o de volta para casa comigo.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Pescador Bram levado em segurança de volta a Gullhaven',
   'entities.quests.q_fs_bram_come_home.completion':

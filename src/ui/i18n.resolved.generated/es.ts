@@ -13520,7 +13520,7 @@ export const es: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Vuelve a Casa",
-        "text": "Mi Bram sacó el bote la mañana en que se abrió la brecha de las redes, y el mar lo devolvió en algún lugar pasado el Embarcadero. Lo oí hace tres noches, {playerName}, llamando sobre el agua, y tuve demasiado miedo para ir. Todavía tengo demasiado miedo. Por favor. Su bote yace naufragado en la orilla norte. Tráelo caminando de vuelta a mí.",
+        "text": "Mi Bram sacó el bote la mañana en que se abrió la brecha de las redes, y el mar lo devolvió en algún lugar pasado el Embarcadero. Lo oí hace tres noches, {playerName}, llamando sobre el agua, y tuve demasiado miedo para ir. Todavía tengo demasiado miedo. Por favor. Su bote yace naufragado en la orilla sur. Tráelo caminando de vuelta a mí.",
         "completion": "¡Bram! Me lo trajiste de vuelta entero, {playerName}. Los dos lloramos y ninguno se avergüenza de ello. Lo que sea que las brechas le quiten a esta isla la próxima vez, no se llevarán a mi familia. Ya no.",
         "objectives": {
           "0": {

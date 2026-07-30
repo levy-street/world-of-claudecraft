@@ -13520,7 +13520,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Eve Dönüyor",
-        "text": "Bram'ım, ağ gediği açıldığı sabah tekneyi çıkardı, ve deniz onu İskele noktasının ötesinde bir yere geri fırlattı. Onu üç gece önce duydum, {playerName}, suyun üzerinden sesleniyordu, ve gitmeye çok korktum. Hala çok korkuyorum. Lütfen. Teknesi kuzey kıyısında parçalanmış yatıyor. Onu bana eve getir.",
+        "text": "Bram'ım, ağ gediği açıldığı sabah tekneyi çıkardı, ve deniz onu İskele noktasının ötesinde bir yere geri fırlattı. Onu üç gece önce duydum, {playerName}, suyun üzerinden sesleniyordu, ve gitmeye çok korktum. Hala çok korkuyorum. Lütfen. Teknesi güney kıyısında parçalanmış yatıyor. Onu bana eve getir.",
         "completion": "Bram! Onu bana sağ salim getirdin, {playerName}. İkimiz de ağladık ve hiçbirimiz utanmıyoruz. Gedikler bu adadan bundan sonra ne alırsa alsın, ailemi alamazlar. Artık olmaz.",
         "objectives": {
           "0": {

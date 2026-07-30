@@ -13520,7 +13520,7 @@ export const id_ID: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Pulang ke Rumah",
-        "text": "Bram-ku membawa perahu keluar pagi ketika celah jaring itu terbuka, dan laut melemparkannya kembali entah di mana melewati titik Dermaga. Aku mendengarnya tiga malam lalu, {playerName}, memanggil dari atas air, dan aku terlalu takut untuk pergi. Aku masih terlalu takut. Kumohon. Perahunya terdampar hancur di pesisir utara. Antarkan dia pulang padaku.",
+        "text": "Bram-ku membawa perahu keluar pagi ketika celah jaring itu terbuka, dan laut melemparkannya kembali entah di mana melewati titik Dermaga. Aku mendengarnya tiga malam lalu, {playerName}, memanggil dari atas air, dan aku terlalu takut untuk pergi. Aku masih terlalu takut. Kumohon. Perahunya terdampar hancur di pesisir selatan. Antarkan dia pulang padaku.",
         "completion": "Bram! Kau membawanya kembali padaku utuh, {playerName}. Kami berdua menangis dan tak satu pun dari kami malu. Apa pun yang diambil celah-celah itu dari pulau ini selanjutnya, mereka tak akan mendapatkan keluargaku. Tidak lagi.",
         "objectives": {
           "0": {

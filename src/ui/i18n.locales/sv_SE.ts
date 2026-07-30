@@ -8298,7 +8298,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Fiskaren Bram säkert hemförd till Måshamn',
   'entities.quests.q_fs_bram_come_home.text':
-    'Min Bram tog ut båten morgonen nätbräschen öppnades, och havet kastade tillbaka honom någonstans bortom Landningsudden. Jag hörde honom för tre nätter sedan, {playerName}, ropande över vattnet, och jag var för rädd för att gå. Jag är fortfarande för rädd. Snälla. Hans båt ligger vrakad på norra stranden. För honom hem till mig.',
+    'Min Bram tog ut båten morgonen nätbräschen öppnades, och havet kastade tillbaka honom någonstans bortom Landningsudden. Jag hörde honom för tre nätter sedan, {playerName}, ropande över vattnet, och jag var för rädd för att gå. Jag är fortfarande för rädd. Snälla. Hans båt ligger vrakad på södra stranden. För honom hem till mig.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram kommer hem',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Tio färre, och fältarbetarna bråkar redan om vem som går ut först. Det kommer inte vara för alltid, bräscherna vilar aldrig länge, men en stad som äter är en stad som håller.',

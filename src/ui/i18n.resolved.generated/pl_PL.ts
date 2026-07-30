@@ -13520,7 +13520,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Wraca do Domu",
-        "text": "Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na północnym brzegu. Odprowadź go do mnie do domu.",
+        "text": "Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na południowym brzegu. Odprowadź go do mnie do domu.",
         "completion": "Bram! Przyprowadziłeś go do mnie całego, {playerName}. Oboje płakaliśmy i żadne z nas się tego nie wstydzi. Cokolwiek wyłomy zabiorą z tej wyspy następnym razem, nie dostaną mojej rodziny. Już nie.",
         "objectives": {
           "0": {

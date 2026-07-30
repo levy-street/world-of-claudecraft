@@ -13520,7 +13520,7 @@ export const it_IT: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Torna a Casa",
-        "text": "Il mio Bram ha preso la barca la mattina in cui si è aperta la frattura delle reti, e il mare lo ha rigettato da qualche parte oltre la punta dell’Approdo. L’ho sentito tre notti fa, {playerName}, chiamare sull’acqua, ed ero troppo spaventata per andare. Sono ancora troppo spaventata. Ti prego. La sua barca giace naufragata sulla costa nord. Riportamelo a casa.",
+        "text": "Il mio Bram ha preso la barca la mattina in cui si è aperta la frattura delle reti, e il mare lo ha rigettato da qualche parte oltre la punta dell’Approdo. L’ho sentito tre notti fa, {playerName}, chiamare sull’acqua, ed ero troppo spaventata per andare. Sono ancora troppo spaventata. Ti prego. La sua barca giace naufragata sulla costa sud. Riportamelo a casa.",
         "completion": "Bram! Me lo hai riportato intero, {playerName}. Abbiamo pianto entrambi e nessuno dei due se ne vergogna. Qualunque cosa le fratture prenderanno da quest’isola in futuro, non avranno la mia famiglia. Mai più.",
         "objectives": {
           "0": {

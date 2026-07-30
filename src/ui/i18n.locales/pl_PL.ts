@@ -8487,7 +8487,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Rybak Bram bezpiecznie odprowadzony do Gullhaven',
   'entities.quests.q_fs_bram_come_home.text':
-    'Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na północnym brzegu. Odprowadź go do mnie do domu.',
+    'Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na południowym brzegu. Odprowadź go do mnie do domu.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Wraca do Domu',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Dziesięciu mniej, a robotnicy polowi już kłócą się o to, kto pierwszy wyjdzie. To nie potrwa długo, wyłomy nigdy nie odpoczywają długo, ale miasto, które je, to miasto, które przetrwa.',

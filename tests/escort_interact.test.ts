@@ -159,6 +159,43 @@ describe('decideEscortPress', () => {
   });
 });
 
+// The fix is data-driven (the core reads ESCORTS), which is the whole point:
+// four escort quests shipped with the same dead press, in four different zones,
+// and only one of them was reported. Any escort added later is covered the
+// moment its def lands, and this loop fails if that ever stops being true.
+describe('every escort def in the game is startable from the client', () => {
+  it.each(Object.values(ESCORTS).map((def) => [def.id, def] as const))('%s', (_id, def) => {
+    const player = playerAt(def.start.x + 1, def.start.z);
+    const escortee = entity({
+      id: 2,
+      kind: 'mob',
+      templateId: def.npcMobId,
+      pos: { x: def.start.x, y: 0, z: def.start.z },
+    });
+    const log = new Map([
+      [def.questId, { questId: def.questId, counts: [0], state: 'active' as const }],
+    ]);
+
+    expect(decideEscortPress(player.pos, entities(player, escortee), log)).toEqual({
+      kind: 'start',
+      entityId: escortee.id,
+    });
+    // ...and the same press is inert for a player not on that quest.
+    expect(decideEscortPress(player.pos, entities(player, escortee), new Map())).toEqual({
+      kind: 'none',
+    });
+  });
+
+  it('covers all four shipped escorts, so a fifth cannot be missed silently', () => {
+    expect(Object.keys(ESCORTS).sort()).toEqual([
+      'esc_fs_bram',
+      'esc_fv_wren',
+      'esc_pr_navigator',
+      'esc_ww_mosley',
+    ]);
+  });
+});
+
 describe('handleEscortPress', () => {
   function rig() {
     const calls: string[] = [];

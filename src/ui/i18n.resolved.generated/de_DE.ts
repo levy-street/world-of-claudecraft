@@ -13520,7 +13520,7 @@ export const de_DE: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram, komm heim",
-        "text": "Mein Bram nahm das Boot hinaus an dem Morgen, als sich der Netzriss öffnete, und das Meer warf ihn irgendwo hinter der Landspitze zurück. Ich hörte ihn vor drei Nächten, {playerName}, rufend über das Wasser, und ich hatte zu viel Angst zu gehen. Ich habe immer noch zu viel Angst. Bitte. Sein Boot liegt zerschellt am Nordufer. Bring ihn heim zu mir.",
+        "text": "Mein Bram nahm das Boot hinaus an dem Morgen, als sich der Netzriss öffnete, und das Meer warf ihn irgendwo hinter der Landspitze zurück. Ich hörte ihn vor drei Nächten, {playerName}, rufend über das Wasser, und ich hatte zu viel Angst zu gehen. Ich habe immer noch zu viel Angst. Bitte. Sein Boot liegt zerschellt am Südufer. Bring ihn heim zu mir.",
         "completion": "Bram! Du hast ihn mir unversehrt zurückgebracht, {playerName}. Wir haben beide geweint, und keiner von uns schämt sich dafür. Was auch immer die Risse dieser Insel als Nächstes nehmen, meine Familie bekommen sie nicht. Nicht mehr.",
         "objectives": {
           "0": {

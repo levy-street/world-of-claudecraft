@@ -8664,7 +8664,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Dæmningen holder, og Tam har stadig ånde nok til at spøge om treslaget. Godt. Vi er en ø under belejring, {playerName}, og hvert par hænder, der krydser den sandbanke, er et par, bruddene skal igennem, før de når mit folk. Velkommen til Mågehavn.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Kommer Hjem',
   'entities.quests.q_fs_bram_come_home.text':
-    'Min Bram tog båden ud den morgen, net-bruddet åbnede sig, og havet kastede ham tilbage et sted forbi Landgangspynten. Jeg hørte ham tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Vær sød. Hans båd ligger vraget på nordkysten. Følg ham hjem til mig.',
+    'Min Bram tog båden ud den morgen, net-bruddet åbnede sig, og havet kastede ham tilbage et sted forbi Landgangspynten. Jeg hørte ham tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Vær sød. Hans båd ligger vraget på sydkysten. Følg ham hjem til mig.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Fisker Bram bragt sikkert hjem til Mågehavn',
   'entities.quests.q_fs_bram_come_home.completion':

@@ -4418,7 +4418,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     "Balıkçı Bram Gullhaven'a Güvenle Ulaştırıldı",
   'entities.quests.q_fs_bram_come_home.text':
-    "Bram'ım, ağ gediği açıldığı sabah tekneyi çıkardı, ve deniz onu İskele noktasının ötesinde bir yere geri fırlattı. Onu üç gece önce duydum, {playerName}, suyun üzerinden sesleniyordu, ve gitmeye çok korktum. Hala çok korkuyorum. Lütfen. Teknesi kuzey kıyısında parçalanmış yatıyor. Onu bana eve getir.",
+    "Bram'ım, ağ gediği açıldığı sabah tekneyi çıkardı, ve deniz onu İskele noktasının ötesinde bir yere geri fırlattı. Onu üç gece önce duydum, {playerName}, suyun üzerinden sesleniyordu, ve gitmeye çok korktum. Hala çok korkuyorum. Lütfen. Teknesi güney kıyısında parçalanmış yatıyor. Onu bana eve getir.",
   'entities.quests.q_fs_bram_come_home.title': 'Bram Eve Dönüyor',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'On tane eksik, ve tarla işçileri şimdiden kimin önce çıkacağı konusunda tartışıyor. Bu uzun sürmeyecek, gedikler asla uzun süre dinlenmez, ama yemek yiyen bir kasaba, direnen bir kasabadır.',

@@ -4529,7 +4529,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Ngư Dân Bram được đưa về Gullhaven an toàn',
   'entities.quests.q_fs_bram_come_home.text':
-    'Bram của tôi đã đưa thuyền ra khơi vào sáng hôm vết rạn ở khu lưới mở ra, và biển đã ném anh ấy trở lại đâu đó qua khỏi mũi Bến Tàu. Tôi nghe thấy anh ấy ba đêm trước, {playerName}, gọi vọng qua mặt nước, và tôi đã quá sợ hãi để đi. Tôi vẫn còn quá sợ hãi. Làm ơn. Thuyền của anh ấy đang đắm trên bờ bắc. Hãy dẫn anh ấy về nhà cho tôi.',
+    'Bram của tôi đã đưa thuyền ra khơi vào sáng hôm vết rạn ở khu lưới mở ra, và biển đã ném anh ấy trở lại đâu đó qua khỏi mũi Bến Tàu. Tôi nghe thấy anh ấy ba đêm trước, {playerName}, gọi vọng qua mặt nước, và tôi đã quá sợ hãi để đi. Tôi vẫn còn quá sợ hãi. Làm ơn. Thuyền của anh ấy đang đắm trên bờ nam. Hãy dẫn anh ấy về nhà cho tôi.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Trở Về Nhà',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Bớt đi mười kẻ, và những người làm ruộng đã bắt đầu tranh cãi xem ai sẽ ra ngoài trước. Việc này sẽ không kéo dài, những vết rạn chẳng bao giờ nghỉ ngơi lâu, nhưng một thị trấn có cái ăn là một thị trấn trụ vững.',

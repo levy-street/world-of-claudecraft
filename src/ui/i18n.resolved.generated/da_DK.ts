@@ -13520,7 +13520,7 @@ export const da_DK: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Kommer Hjem",
-        "text": "Min Bram tog båden ud den morgen, net-bruddet åbnede sig, og havet kastede ham tilbage et sted forbi Landgangspynten. Jeg hørte ham tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Vær sød. Hans båd ligger vraget på nordkysten. Følg ham hjem til mig.",
+        "text": "Min Bram tog båden ud den morgen, net-bruddet åbnede sig, og havet kastede ham tilbage et sted forbi Landgangspynten. Jeg hørte ham tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Vær sød. Hans båd ligger vraget på sydkysten. Følg ham hjem til mig.",
         "completion": "Bram! Du bragte ham tilbage til mig hel, {playerName}. Vi græd begge, og ingen af os skammer sig. Hvad end bruddene tager fra denne ø næste gang, får de ikke min familie. Ikke mere.",
         "objectives": {
           "0": {
