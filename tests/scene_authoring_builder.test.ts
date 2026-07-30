@@ -139,20 +139,31 @@ describe('scene authoring builder', () => {
     expect(scene.duration).toBe(3.5);
   });
 
-  it('covers a scene-start cut without emitting a negative time', () => {
+  it('rejects a covered cut without enough perceptual fade lead', () => {
+    expect(() =>
+      buildScene({
+        id: 'scn_test_scene_start_cut',
+        beats: { opening: 0 },
+        releaseMargin: 0,
+        timeline: [coveredCut('opening', FOCUS_SHOT)],
+      }),
+    ).toThrow('coveredCut at 0s requires at least 0.45s for the fade floor');
+  });
+
+  it('accepts a covered cut at the exact perceptual fade lead boundary', () => {
     const scene = buildScene({
-      id: 'scn_test_scene_start_cut',
-      beats: { opening: 0 },
+      id: 'scn_test_boundary_covered_cut',
+      beats: { opening: 0.45 },
       releaseMargin: 0,
       timeline: [coveredCut('opening', FOCUS_SHOT)],
     });
 
-    expect(scene.ops).toEqual([
-      { at: 0, kind: 'fade', to: 'black', dur: 0 },
-      { at: 0, kind: 'fade', to: 'black', dur: 0 },
-      { at: 0, kind: 'camera', shot: FOCUS_SHOT },
-      { at: 0.1, kind: 'fade', to: 'clear', dur: 0.4 },
-    ]);
+    expect(scene.ops[0]).toEqual({
+      at: 0,
+      kind: 'fade',
+      to: 'black',
+      dur: 0.4,
+    });
   });
 
   it('keeps a tail clear authored before the derived scene end', () => {
@@ -161,9 +172,9 @@ describe('scene authoring builder', () => {
       beats: { release: 2 },
       releaseMargin: 0.4,
       timeline: [
-        { at: beat('release', -0.5), kind: 'fade', to: 'black', dur: 0.2 },
+        { at: beat('release', -0.5), kind: 'fade', to: 'black', dur: 0.4 },
         { at: 'release', kind: 'letterbox', on: false },
-        fadeInTail(beat('release', 0.1), 0.3),
+        fadeInTail(beat('release', 0.1), 0.4),
       ],
     });
 
@@ -171,9 +182,9 @@ describe('scene authoring builder', () => {
       at: 2.1,
       kind: 'fade',
       to: 'clear',
-      dur: 0.3,
+      dur: 0.4,
     });
-    expect(scene.duration).toBe(2.8);
+    expect(scene.duration).toBe(2.9);
     expect(scene.ops.at(-1)?.at).toBeLessThan(scene.duration);
   });
 
@@ -220,15 +231,15 @@ describe('scene authoring builder', () => {
     expect(scene.ops).toStrictEqual([{ at: 1, kind: 'camera', shot: DOLLY_SHOT }]);
   });
 
-  it('requires fadeInTail to leave one tick before scene end', () => {
+  it('requires fadeInTail to meet the perceptual fade floor', () => {
     expect(() =>
       buildScene({
         id: 'scn_test_instant_fade_tail',
         beats: { tail: 1 },
         releaseMargin: 0,
-        timeline: [fadeInTail('tail', 0)],
+        timeline: [fadeInTail('tail', 0.3)],
       }),
-    ).toThrow('fadeInTail duration must be at least one sim tick');
+    ).toThrow('fadeInTail duration must be at least 0.4s');
   });
 
   it('rejects a fade authored after fadeInTail', () => {
@@ -264,13 +275,13 @@ describe('scene authoring builder', () => {
           target: 'harbor_ship_mainland',
           cue: LB_PROP_CUE_PARK,
         },
-        fadeInTail(beat('release', 0.2), 0.3),
+        fadeInTail(beat('release', 0.2), 0.4),
       ],
     });
 
     expect(scene).toStrictEqual({
       id: 'scn_test_builder_golden',
-      duration: 3,
+      duration: 3.1,
       ops: [
         { at: 0, kind: 'letterbox', on: true },
         { at: 0.2, kind: 'music', directive: 'lb_harbor_ambience' },
@@ -284,7 +295,7 @@ describe('scene authoring builder', () => {
           target: 'harbor_ship_mainland',
           cue: 'lb_prop_cue_park',
         },
-        { at: 2.2, kind: 'fade', to: 'clear', dur: 0.3 },
+        { at: 2.2, kind: 'fade', to: 'clear', dur: 0.4 },
       ],
     });
     expect(Object.getPrototypeOf(scene)).toBe(Object.prototype);
