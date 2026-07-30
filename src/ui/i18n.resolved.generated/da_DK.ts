@@ -3525,14 +3525,6 @@ export const da_DK: EnTranslations = {
         "name": "Krybdyr",
         "desc": "Koldblodede jægere med en hvislen og et snap, der er helt deres egne, og som adskiller sig fra de varmblodede dyr."
       },
-      "murloc": {
-        "name": "Kvækfinner",
-        "desc": "Kvækkende fiskefolk fra søbred og tidevandspøl, hurtige til at sværme om alt, der vader for tæt på."
-      },
-      "kobold": {
-        "name": "Skælme",
-        "desc": "Flakkende ådselsædere og ånder fra lysning og hæk, mere til gene end fare, indtil de samles i flok."
-      },
       "demon": {
         "name": "Dæmoner",
         "desc": "Angribere fra hinsides rifterne, lutter ild og ondskab. Hvor en står, er et brud aldrig langt væk."

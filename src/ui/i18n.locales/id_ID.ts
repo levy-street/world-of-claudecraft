@@ -5733,12 +5733,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Penyerbu dari luar rift, sepenuhnya api dan kebencian. Di mana pun satu berdiri, sebuah celah tak pernah jauh.',
   'guide.family.demon.name': 'Iblis',
-  'guide.family.kobold.desc':
-    'Pemulung kecil yang berlarian dan roh-roh nakal dari tanah lapang dan pagar semak, lebih mengganggu daripada mengancam sampai mereka berkumpul dalam jumlah besar.',
-  'guide.family.kobold.name': 'Berandal',
-  'guide.family.murloc.desc':
-    'Bangsa ikan yang bersuara serak dari tepi danau dan kolam pasang surut, cepat menyerbu apa pun yang mengarungi terlalu dekat.',
-  'guide.family.murloc.name': 'Sirip Kodok',
   'guide.faqPage.a1':
     'Ya. Seluruh permainan gratis dimainkan hingga batas level, dan kode sumbernya terbuka di GitHub.',
   'guide.faqPage.a10':

@@ -6187,12 +6187,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.name': 'Demoni',
   'guide.family.demon.desc':
     'Invasori da oltre gli squarci, tutto fuoco e rancore. Dove uno si trova, una breccia non è mai lontana.',
-  'guide.family.kobold.name': 'Birbanti',
-  'guide.family.kobold.desc':
-    'Spazzini guizzanti e folletti di radure e siepi, più fastidiosi che pericolosi finché non si radunano in gran numero.',
-  'guide.family.murloc.name': 'Gracidopinne',
-  'guide.family.murloc.desc':
-    'Gracidanti genti-pesce di rive lacustri e pozze di marea, pronti a sciamare su chiunque si avvicini troppo.',
   'guide.faqPage.a1':
     "Sì. L'intero gioco è gratuito fino al livello massimo, e il codice sorgente è aperto su GitHub.",
   'guide.faqPage.a2':

@@ -3525,14 +3525,6 @@ export const es: EnTranslations = {
         "name": "Reptilidos",
         "desc": "Cazadores de sangre fria con su propio silbido y mordisco, bien distintos de las bestias de sangre caliente."
       },
-      "murloc": {
-        "name": "Aletacroantes",
-        "desc": "Gente-pez croante de orillas de lago y charcas de marea, rápidos para enjambrarse sobre cualquiera que vadee demasiado cerca."
-      },
-      "kobold": {
-        "name": "Bribones",
-        "desc": "Carroñeros correteantes y duendes de claros y setos, más molestia que amenaza hasta que se juntan en número."
-      },
       "demon": {
         "name": "Demonios",
         "desc": "Invasores de más allá de las brechas, todo fuego y rencor. Donde uno se planta, una brecha nunca está lejos."

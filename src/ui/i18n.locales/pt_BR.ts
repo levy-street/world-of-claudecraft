@@ -6072,12 +6072,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.name': 'Demônios',
   'guide.family.demon.desc':
     'Invasores de além das fendas, todo fogo e rancor. Onde um se encontra, uma brecha nunca está longe.',
-  'guide.family.kobold.name': 'Traquinas',
-  'guide.family.kobold.desc':
-    'Batedores ágeis e duendes de clareiras e cercas vivas, mais incômodos que perigosos até se juntarem em grande número.',
-  'guide.family.murloc.name': 'Coaxa-barbatanas',
-  'guide.family.murloc.desc':
-    'Gente-peixe coaxante de margens de lagos e poças de maré, rápida em enxamear qualquer um que se aproxime demais.',
   'guide.faqPage.a1':
     'Sim. O jogo inteiro é gratuito até o nível máximo, e o código-fonte é aberto no GitHub.',
   'guide.faqPage.a2':

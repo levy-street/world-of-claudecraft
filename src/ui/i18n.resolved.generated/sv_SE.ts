@@ -3525,14 +3525,6 @@ export const sv_SE: EnTranslations = {
         "name": "Reptiler",
         "desc": "Kallblodiga jägare med ett eget väsande och ett snäppande bett, skilda från de varmblodiga djuren."
       },
-      "murloc": {
-        "name": "Kväkfenor",
-        "desc": "Kväkande fiskfolk från sjöstrand och tidvattenspöl, snabba att svärma allt som vadar för nära."
-      },
-      "kobold": {
-        "name": "Skälmar",
-        "desc": "Krypande asätare och älvor från glänta och häck, mer besvärliga än farliga tills de samlas i antal."
-      },
       "demon": {
         "name": "Demoner",
         "desc": "Inkräktare bortom revorna, idel eld och ondska. Där en står är en bräsch aldrig långt borta."

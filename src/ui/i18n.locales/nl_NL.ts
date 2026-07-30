@@ -5061,12 +5061,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Indringers van voorbij de rifts, louter vuur en venijn. Waar er een staat, is een breuk nooit ver weg.',
   'guide.family.demon.name': 'Demonen',
-  'guide.family.kobold.desc':
-    'Scharrelende plunderaars en geesten van open plek en heg, meer overlast dan gevaar tot ze zich in aantal verzamelen.',
-  'guide.family.kobold.name': 'Kwelgeesten',
-  'guide.family.murloc.desc':
-    'Krassende vismensen van oever en getijdenpoel, snel om te zwermen op alles wat te dicht bij het water waadt.',
-  'guide.family.murloc.name': 'Kwaakvinnen',
   'guide.faqPage.a1':
     'Ja. Het hele spel is gratis te spelen tot aan de niveaulimiet, en de broncode is openbaar op GitHub.',
   'guide.faqPage.a10':

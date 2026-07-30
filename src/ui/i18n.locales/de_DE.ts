@@ -10776,12 +10776,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Eindringlinge von jenseits der Risse, ganz Feuer und Bosheit. Wo einer steht, ist ein Durchbruch nie fern.',
   'guide.family.demon.name': 'Dämonen',
-  'guide.family.kobold.desc':
-    'Huschende Aasfresser und Wichte aus Lichtung und Hecke, eher lästig als bedrohlich, bis sie sich in großer Zahl versammeln.',
-  'guide.family.kobold.name': 'Schelme',
-  'guide.family.murloc.desc':
-    'Quakendes Fischvolk aus Seeufern und Gezeitentümpeln, schnell dabei, alles zu überfallen, das zu nah heranwatet.',
-  'guide.family.murloc.name': 'Quakflossen',
   'guide.home.world.amberBlurb':
     'Hinter den westlichen Klippen ein Herbst, der niemals endet, und Laternen auf einem goldenen See.',
   'guide.home.world.amberName': 'Der Bernsteinfall',

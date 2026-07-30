@@ -6763,12 +6763,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.duskGreeter': '守り手セルウィン、エルダーグリーム',
   'guide.worldPage.duskPlaceNotes':
     'エルダーグリームは大樹の下に集う。ダスクフォール洞窟とその見晴らし台が入り口であり、谷を初めて望む場所でもある。長老樹の森と星降りの盆地は静かな南を守り、沈んだ宮廷は東で草に覆われた遺跡を抱え、輝きの深みと水晶の浅瀬は北で淡く光る。',
-  'guide.family.murloc.name': 'クロークフィン',
-  'guide.family.murloc.desc':
-    '湖岸や潮だまりに棲む、しわがれ声の魚人たち。近づきすぎた者には、すぐさま群れをなして襲いかかります。',
-  'guide.family.kobold.name': 'いたずら小妖',
-  'guide.family.kobold.desc':
-    '林間や生け垣をちょろちょろと駆け回る、漁り屋の小妖たち。数が揃うまでは、脅威というより厄介者です。',
   'guide.family.demon.name': 'デーモン',
   'guide.family.demon.desc':
     '裂け目の彼方から来た侵略者たち。その身は炎と悪意のかたまりです。一体がいるところ、次元の裂け目は決して遠くありません。',

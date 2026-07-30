@@ -6477,11 +6477,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.duskGreeter': '守护者塞尔文，古辉镇',
   'guide.worldPage.duskPlaceNotes':
     '古辉镇聚居在巨树之下。暮落洞穴与其瞭望台是入口，也是初见山谷的地方；古木林地与星落盆地守着宁静的南方；沉没王庭在东面藏着草木蔓生的废墟；辉光深处与水晶浅滩则在北方闪着微光。',
-  'guide.family.murloc.name': '蛙鳍族',
-  'guide.family.murloc.desc': '湖岸与潮池间呱呱叫的鱼人族群，谁涉水靠得太近，它们便会一拥而上。',
-  'guide.family.kobold.name': '林间小妖',
-  'guide.family.kobold.desc':
-    '在林间空地与树篱下窜来窜去的拾荒者和小妖精，单个不过讨人嫌，聚成一群才成祸患。',
   'guide.family.demon.name': '恶魔',
   'guide.family.demon.desc':
     '来自裂隙彼端的入侵者，浑身是火焰与怨毒。只要有一只现身，裂口就绝不会远。',

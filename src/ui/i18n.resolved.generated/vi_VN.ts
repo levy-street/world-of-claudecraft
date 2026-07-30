@@ -3525,14 +3525,6 @@ export const vi_VN: EnTranslations = {
         "name": "Bò Sát",
         "desc": "Những thợ săn máu lạnh với tiếng rít và cú đớp rất riêng của chúng, khác biệt hoàn toàn so với các dã thú máu nóng."
       },
-      "murloc": {
-        "name": "Vây Ộp Oạp",
-        "desc": "Giống người cá biết kêu ộp oạp sống ở bờ hồ và vũng nước triều, nhanh chóng vây lấy bất cứ thứ gì lội đến quá gần."
-      },
-      "kobold": {
-        "name": "Tiểu Yêu",
-        "desc": "Những kẻ nhặt nhạnh lăng xăng và tinh linh của bãi cỏ, bờ giậu, phiền toái nhiều hơn là nguy hiểm, cho đến khi chúng tụ tập đông đảo."
-      },
       "demon": {
         "name": "Ác Ma",
         "desc": "Những kẻ xâm lược đến từ bên kia các vết rạn, toàn thân là lửa và ác ý. Nơi nào có một kẻ trong chúng đứng, nơi đó không bao giờ cách xa một vết rạn."

@@ -7311,12 +7311,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Vetřelci zpoza trhlin, samý oheň a zloba. Kde jeden stojí, průlom není nikdy daleko.',
   'guide.family.demon.name': 'Démoni',
-  'guide.family.kobold.desc':
-    'Pobíhající mrchožrouti a víly mýtin a živých plotů, spíš otrava než hrozba, dokud se nesejdou ve velkém počtu.',
-  'guide.family.kobold.name': 'Skrčci',
-  'guide.family.murloc.desc':
-    'Kvákající rybí lid jezerních břehů a přílivových tůní, rychle se hrnoucí na cokoliv, co se přiblíží příliš blízko.',
-  'guide.family.murloc.name': 'Kvákoploutví',
   'guide.worldPage.heading': 'Svět',
   'guide.worldPage.intro':
     'World of ClaudeCraft je jedna souvislá země, kterou přecházíš pěšky, tři zóny položené od jihu k severu. Není tu rychlé cestování, takže cesta je součástí dobrodružství.',

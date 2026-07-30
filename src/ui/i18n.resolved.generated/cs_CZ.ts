@@ -3525,14 +3525,6 @@ export const cs_CZ: EnTranslations = {
         "name": "Plazi",
         "desc": "Studenokrevní lovci s vlastním syčením a lupem čelistí, odlišní od teplokrevných bestií."
       },
-      "murloc": {
-        "name": "Kvákoploutví",
-        "desc": "Kvákající rybí lid jezerních břehů a přílivových tůní, rychle se hrnoucí na cokoliv, co se přiblíží příliš blízko."
-      },
-      "kobold": {
-        "name": "Skrčci",
-        "desc": "Pobíhající mrchožrouti a víly mýtin a živých plotů, spíš otrava než hrozba, dokud se nesejdou ve velkém počtu."
-      },
       "demon": {
         "name": "Démoni",
         "desc": "Vetřelci zpoza trhlin, samý oheň a zloba. Kde jeden stojí, průlom není nikdy daleko."

@@ -3525,14 +3525,6 @@ export const it_IT: EnTranslations = {
         "name": "Rettili",
         "desc": "Cacciatori a sangue freddo con un sibilo e uno scatto tutti loro, ben distinti dalle bestie a sangue caldo."
       },
-      "murloc": {
-        "name": "Gracidopinne",
-        "desc": "Gracidanti genti-pesce di rive lacustri e pozze di marea, pronti a sciamare su chiunque si avvicini troppo."
-      },
-      "kobold": {
-        "name": "Birbanti",
-        "desc": "Spazzini guizzanti e folletti di radure e siepi, più fastidiosi che pericolosi finché non si radunano in gran numero."
-      },
       "demon": {
         "name": "Demoni",
         "desc": "Invasori da oltre gli squarci, tutto fuoco e rancore. Dove uno si trova, una breccia non è mai lontana."

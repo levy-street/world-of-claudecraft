@@ -3525,14 +3525,6 @@ export const de_DE: EnTranslations = {
         "name": "Reptilien",
         "desc": "Kaltblutige Jaeger mit ihrem ganz eigenen Zischen und Schnappen, deutlich verschieden von den warmblutigen Bestien."
       },
-      "murloc": {
-        "name": "Quakflossen",
-        "desc": "Quakendes Fischvolk aus Seeufern und Gezeitentümpeln, schnell dabei, alles zu überfallen, das zu nah heranwatet."
-      },
-      "kobold": {
-        "name": "Schelme",
-        "desc": "Huschende Aasfresser und Wichte aus Lichtung und Hecke, eher lästig als bedrohlich, bis sie sich in großer Zahl versammeln."
-      },
       "demon": {
         "name": "Dämonen",
         "desc": "Eindringlinge von jenseits der Risse, ganz Feuer und Bosheit. Wo einer steht, ist ein Durchbruch nie fern."

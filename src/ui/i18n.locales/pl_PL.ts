@@ -5062,12 +5062,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Najeźdźcy zza szczelin, sami z ognia i złośliwości. Gdzie stoi jeden z nich, wyłom nigdy nie jest daleko.',
   'guide.family.demon.name': 'Demony',
-  'guide.family.kobold.desc':
-    'Krzątające się padlinożerne stworki i chochliki polan oraz żywopłotów, bardziej uciążliwe niż groźne, dopóki nie zbiorą się w większej liczbie.',
-  'guide.family.kobold.name': 'Urwisy',
-  'guide.family.murloc.desc':
-    'Rechoczący rybi lud brzegów jeziora i przypływowych sadzawek, chętnie rojący się wokół każdego, kto podejdzie zbyt blisko wody.',
-  'guide.family.murloc.name': 'Rechotopłetwi',
   'guide.faqPage.a1':
     'Tak. Cała gra jest darmowa do maksymalnego poziomu, a kod źródłowy jest otwarty na GitHubie.',
   'guide.faqPage.a10':

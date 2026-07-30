@@ -3525,14 +3525,6 @@ export const pt_BR: EnTranslations = {
         "name": "Répteis",
         "desc": "Caçadores de sangue frio com seu próprio silvo e bote, distintos das criaturas de sangue quente."
       },
-      "murloc": {
-        "name": "Coaxa-barbatanas",
-        "desc": "Gente-peixe coaxante de margens de lagos e poças de maré, rápida em enxamear qualquer um que se aproxime demais."
-      },
-      "kobold": {
-        "name": "Traquinas",
-        "desc": "Batedores ágeis e duendes de clareiras e cercas vivas, mais incômodos que perigosos até se juntarem em grande número."
-      },
       "demon": {
         "name": "Demônios",
         "desc": "Invasores de além das fendas, todo fogo e rancor. Onde um se encontra, uma brecha nunca está longe."

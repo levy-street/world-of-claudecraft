@@ -4826,12 +4826,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Angribere fra hinsides rifterne, lutter ild og ondskab. Hvor en står, er et brud aldrig langt væk.',
   'guide.family.demon.name': 'Dæmoner',
-  'guide.family.kobold.desc':
-    'Flakkende ådselsædere og ånder fra lysning og hæk, mere til gene end fare, indtil de samles i flok.',
-  'guide.family.kobold.name': 'Skælme',
-  'guide.family.murloc.desc':
-    'Kvækkende fiskefolk fra søbred og tidevandspøl, hurtige til at sværme om alt, der vader for tæt på.',
-  'guide.family.murloc.name': 'Kvækfinner',
   'guide.faqPage.a1':
     'Ja. Hele spillet er gratis at spille til niveaugrænsen, og kildekoden er åben på GitHub.',
   'guide.faqPage.a10':

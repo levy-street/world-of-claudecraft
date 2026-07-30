@@ -6758,12 +6758,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.duskGreeter': '수호자 샐윈, 엘더글림',
   'guide.worldPage.duskPlaceNotes':
     '엘더글림은 큰 나무 아래 모여 있다. 황혼 동굴과 그 전망대는 들어가는 길이자 골짜기를 처음 내려다보는 곳이다. 고대나무 숲과 별내림 분지는 고요한 남쪽을 지키고, 가라앉은 궁정은 동쪽에 수풀 우거진 폐허를 품으며, 빛나는 심처와 수정 여울은 북쪽에서 은은히 빛난다.',
-  'guide.family.murloc.name': '개굴지느러미족',
-  'guide.family.murloc.desc':
-    '호숫가와 조수 웅덩이에 사는 개골거리는 물고기 인간들로, 물가에 너무 가까이 들어오는 것은 무엇이든 재빨리 떼 지어 덮칩니다.',
-  'guide.family.kobold.name': '장난꾸러기 정령',
-  'guide.family.kobold.desc':
-    '숲속 공터와 산울타리를 종종거리며 뒤지는 약탈꾼과 요정들로, 수가 모이기 전까지는 위협이라기보다 골칫거리에 가깝습니다.',
   'guide.family.demon.name': '악마',
   'guide.family.demon.desc':
     '균열 너머에서 온 침략자들로, 온통 불길과 악의뿐입니다. 악마 하나가 서 있는 곳이라면, 균열이 결코 멀지 않습니다.',

@@ -4938,12 +4938,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Inkräktare bortom revorna, idel eld och ondska. Där en står är en bräsch aldrig långt borta.',
   'guide.family.demon.name': 'Demoner',
-  'guide.family.kobold.desc':
-    'Krypande asätare och älvor från glänta och häck, mer besvärliga än farliga tills de samlas i antal.',
-  'guide.family.kobold.name': 'Skälmar',
-  'guide.family.murloc.desc':
-    'Kväkande fiskfolk från sjöstrand och tidvattenspöl, snabba att svärma allt som vadar för nära.',
-  'guide.family.murloc.name': 'Kväkfenor',
   'guide.faqPage.a1':
     'Ja. Hela spelet är gratis att spela ända till nivåtaket, och källkoden är öppen på GitHub.',
   'guide.faqPage.a10':

@@ -3525,14 +3525,6 @@ export const tr_TR: EnTranslations = {
         "name": "Sürüngenler",
         "desc": "Kendi özgün tıslaması ve ısırışıyla soğukkanlı avcılar; sıcakkanlı yaratıklardan tamamen farklı bir türdür."
       },
-      "murloc": {
-        "name": "Vırakyüzgeçler",
-        "desc": "Göl kıyısının ve gelgit havuzlarının vraklayan balık halkı, fazla yaklaşan her şeyin üzerine çabucak üşüşür."
-      },
-      "kobold": {
-        "name": "Yaramazlar",
-        "desc": "Çayırların ve çitlerin telaşlı leş yiyicileri ve cinleri, sayıca çoğalana kadar tehlikeden çok baş belasıdırlar."
-      },
       "demon": {
         "name": "İblisler",
         "desc": "Yarıkların ötesinden gelen istilacılar, tepeden tırnağa ateş ve kin doludurlar. Biri nerede durursa, bir gedik asla uzak değildir."

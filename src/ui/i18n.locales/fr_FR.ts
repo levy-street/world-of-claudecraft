@@ -6766,12 +6766,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.name': 'Démons',
   'guide.family.demon.desc':
     "Des envahisseurs venus d'au-delà des failles, tout de feu et de rancune. Là où l'un se dresse, une brèche n'est jamais loin.",
-  'guide.family.kobold.name': 'Chenapans',
-  'guide.family.kobold.desc':
-    "Charognards agiles et lutins des clairières et des haies, plus nuisance que menace, jusqu'à ce qu'ils se regroupent en nombre.",
-  'guide.family.murloc.name': 'Coasse-Palmes',
-  'guide.family.murloc.desc':
-    "Peuple-poisson coassant des rives et des bassins de marée, prompt à submerger quiconque s'aventure trop près.",
   'guide.faqPage.a1':
     "Oui. Tout le jeu est gratuit jusqu'au niveau maximum, et le code source est ouvert sur GitHub.",
   'guide.faqPage.a2':

@@ -791,14 +791,6 @@ export const guideStrings = {
       name: 'Reptiles',
       desc: 'Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts.',
     },
-    murloc: {
-      name: 'Croakfins',
-      desc: 'Croaking fish-folk of lake shore and tide pool, quick to swarm anything that wades too close.',
-    },
-    kobold: {
-      name: 'Scamps',
-      desc: 'Skittering scavengers and sprites of glade and hedgerow, more nuisance than menace until they gather in numbers.',
-    },
     demon: {
       name: 'Demons',
       desc: 'Invaders from beyond the rifts, all fire and spite. Where one stands, a breach is never far.',

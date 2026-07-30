@@ -3525,14 +3525,6 @@ export const pl_PL: EnTranslations = {
         "name": "Gady",
         "desc": "Zimnokrwiste drapieżniki o własnym syczeniu i kłapaniu, odmienne od ciepłokrwistych bestii."
       },
-      "murloc": {
-        "name": "Rechotopłetwi",
-        "desc": "Rechoczący rybi lud brzegów jeziora i przypływowych sadzawek, chętnie rojący się wokół każdego, kto podejdzie zbyt blisko wody."
-      },
-      "kobold": {
-        "name": "Urwisy",
-        "desc": "Krzątające się padlinożerne stworki i chochliki polan oraz żywopłotów, bardziej uciążliwe niż groźne, dopóki nie zbiorą się w większej liczbie."
-      },
       "demon": {
         "name": "Demony",
         "desc": "Najeźdźcy zza szczelin, sami z ognia i złośliwości. Gdzie stoi jeden z nich, wyłom nigdy nie jest daleko."

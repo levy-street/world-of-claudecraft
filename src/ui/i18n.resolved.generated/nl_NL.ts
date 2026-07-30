@@ -3525,14 +3525,6 @@ export const nl_NL: EnTranslations = {
         "name": "Reptielen",
         "desc": "Koudbloedige jagers met een eigen sis en snap, onderscheiden van de warmbloedige dieren."
       },
-      "murloc": {
-        "name": "Kwaakvinnen",
-        "desc": "Krassende vismensen van oever en getijdenpoel, snel om te zwermen op alles wat te dicht bij het water waadt."
-      },
-      "kobold": {
-        "name": "Kwelgeesten",
-        "desc": "Scharrelende plunderaars en geesten van open plek en heg, meer overlast dan gevaar tot ze zich in aantal verzamelen."
-      },
       "demon": {
         "name": "Demonen",
         "desc": "Indringers van voorbij de rifts, louter vuur en venijn. Waar er een staat, is een breuk nooit ver weg."

@@ -6063,12 +6063,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.name': 'Demonios',
   'guide.family.demon.desc':
     'Invasores de más allá de las brechas, todo fuego y rencor. Donde uno se planta, una brecha nunca está lejos.',
-  'guide.family.kobold.name': 'Bribones',
-  'guide.family.kobold.desc':
-    'Carroñeros correteantes y duendes de claros y setos, más molestia que amenaza hasta que se juntan en número.',
-  'guide.family.murloc.name': 'Aletacroantes',
-  'guide.family.murloc.desc':
-    'Gente-pez croante de orillas de lago y charcas de marea, rápidos para enjambrarse sobre cualquiera que vadee demasiado cerca.',
   'guide.faqPage.a1':
     'Sí. El juego completo es gratuito hasta el nivel máximo, y el código fuente es abierto en GitHub.',
   'guide.faqPage.a2':

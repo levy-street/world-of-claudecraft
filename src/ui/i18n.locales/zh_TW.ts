@@ -6477,12 +6477,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.duskGreeter': '守護者塞爾文，古輝鎮',
   'guide.worldPage.duskPlaceNotes':
     '古輝鎮聚居在巨樹之下。暮落洞穴與其瞭望台是入口，也是初見山谷的地方；古木林地與星落盆地守著寧靜的南方；沉沒王庭在東面藏著草木蔓生的廢墟；輝光深處與水晶淺灘則在北方閃著微光。',
-  'guide.family.murloc.name': '蛙鰭族',
-  'guide.family.murloc.desc':
-    '棲息於湖岸與潮池、呱呱作響的魚族，任何涉水太近之物都會迅速引來牠們成群圍攻。',
-  'guide.family.kobold.name': '林間小妖',
-  'guide.family.kobold.desc':
-    '竄行於林間空地與樹籬間的拾荒者與小妖，在成群聚集之前，與其說是威脅，不如說是麻煩。',
   'guide.family.demon.name': '惡魔',
   'guide.family.demon.desc':
     '來自裂隙彼端的入侵者，渾身是烈焰與怨毒。凡有一隻現身之處，裂口必不在遠處。',

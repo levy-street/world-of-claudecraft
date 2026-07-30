@@ -3525,14 +3525,6 @@ export const fr_CA: EnTranslations = {
         "name": "Reptiles",
         "desc": "Des chasseurs à sang froid dotés d'un sifflement et d'un claquement qui leur sont propres, distincts des créatures à sang chaud."
       },
-      "murloc": {
-        "name": "Coasse-Palmes",
-        "desc": "Peuple-poisson coassant des rives et des bassins de marée, prompt à submerger quiconque s'aventure trop près."
-      },
-      "kobold": {
-        "name": "Chenapans",
-        "desc": "Charognards agiles et lutins des clairières et des haies, plus nuisance que menace, jusqu'à ce qu'ils se regroupent en nombre."
-      },
       "demon": {
         "name": "Démons",
         "desc": "Des envahisseurs venus d'au-delà des failles, tout de feu et de rancune. Là où l'un se dresse, une brèche n'est jamais loin."

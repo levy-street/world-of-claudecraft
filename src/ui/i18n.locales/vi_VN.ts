@@ -5792,12 +5792,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Những kẻ xâm lược đến từ bên kia các vết rạn, toàn thân là lửa và ác ý. Nơi nào có một kẻ trong chúng đứng, nơi đó không bao giờ cách xa một vết rạn.',
   'guide.family.demon.name': 'Ác Ma',
-  'guide.family.kobold.desc':
-    'Những kẻ nhặt nhạnh lăng xăng và tinh linh của bãi cỏ, bờ giậu, phiền toái nhiều hơn là nguy hiểm, cho đến khi chúng tụ tập đông đảo.',
-  'guide.family.kobold.name': 'Tiểu Yêu',
-  'guide.family.murloc.desc':
-    'Giống người cá biết kêu ộp oạp sống ở bờ hồ và vũng nước triều, nhanh chóng vây lấy bất cứ thứ gì lội đến quá gần.',
-  'guide.family.murloc.name': 'Vây Ộp Oạp',
   'guide.faqPage.a1':
     'Đúng vậy. Cả trò chơi đều miễn phí chơi đến cấp tối đa, và mã nguồn được mở trên GitHub.',
   'guide.faqPage.a10':

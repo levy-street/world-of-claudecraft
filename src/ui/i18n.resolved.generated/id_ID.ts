@@ -3525,14 +3525,6 @@ export const id_ID: EnTranslations = {
         "name": "Reptil",
         "desc": "Pemburu berdarah dingin dengan desis dan cakitan khas mereka sendiri, berbeda dari hewan berdarah panas."
       },
-      "murloc": {
-        "name": "Sirip Kodok",
-        "desc": "Bangsa ikan yang bersuara serak dari tepi danau dan kolam pasang surut, cepat menyerbu apa pun yang mengarungi terlalu dekat."
-      },
-      "kobold": {
-        "name": "Berandal",
-        "desc": "Pemulung kecil yang berlarian dan roh-roh nakal dari tanah lapang dan pagar semak, lebih mengganggu daripada mengancam sampai mereka berkumpul dalam jumlah besar."
-      },
       "demon": {
         "name": "Iblis",
         "desc": "Penyerbu dari luar rift, sepenuhnya api dan kebencian. Di mana pun satu berdiri, sebuah celah tak pernah jauh."

@@ -5664,12 +5664,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Yarıkların ötesinden gelen istilacılar, tepeden tırnağa ateş ve kin doludurlar. Biri nerede durursa, bir gedik asla uzak değildir.',
   'guide.family.demon.name': 'İblisler',
-  'guide.family.kobold.desc':
-    'Çayırların ve çitlerin telaşlı leş yiyicileri ve cinleri, sayıca çoğalana kadar tehlikeden çok baş belasıdırlar.',
-  'guide.family.kobold.name': 'Yaramazlar',
-  'guide.family.murloc.desc':
-    'Göl kıyısının ve gelgit havuzlarının vraklayan balık halkı, fazla yaklaşan her şeyin üzerine çabucak üşüşür.',
-  'guide.family.murloc.name': 'Vırakyüzgeçler',
   'guide.faqPage.a1':
     "Evet. Oyunun tamamı seviye sınırına kadar ücretsiz oynanabilir ve kaynak kodu GitHub'da açıktır.",
   'guide.faqPage.a10':
