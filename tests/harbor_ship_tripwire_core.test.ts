@@ -21,6 +21,7 @@ function harbor(id: string, x: number, z: number): HarborDef {
     },
     shipDecks: [{ x, z, y: 2, hw: 4, hd: 8 }],
     shipRails: [],
+    shipBlockers: [],
     gangplank: { x, z, facing: 0 },
     boarding: { x, z },
     deckArrival: { x, z },
