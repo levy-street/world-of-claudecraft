@@ -1410,13 +1410,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // The 0.32.0 version sync bumped package-lock.json, a fingerprinted input to
-    // all five Eastbrook seals, so every source fingerprint moved, the composite
-    // polish provenance followed, and this seal follows the composite. Every
+    // The Undermount raid merge moved src/render/renderer.ts (the molten-forge
+    // lighting rig), a fingerprinted input to the composite polish provenance,
+    // so the composite moved and this seal follows the composite. Every
     // measured value (frame timings, draw stats, triangle and scenario numbers)
     // is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '008e65982c08975408b9c975368a59d7384c063196db22af8f8345658f73463e',
+      '4474517bac49ca1b33410604c9a4b95fbb16324d69809346f983c1390e9775bf',
     );
   });
 
