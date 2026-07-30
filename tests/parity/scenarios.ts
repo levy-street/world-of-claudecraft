@@ -1565,8 +1565,8 @@ function masterLoot(): Scenario {
     ],
     // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge, then
     // 1326 -> 1488 by the v0.32.1 realm loot-table fill (the four restored
-    // Galecrest quest camps spawn 12 mobs of construction-time world-gen
-    // draws, moving every later draw). This branch
+    // Galecrest quest camps spawn 12 mobs: 60 construction draws, 5 per mob,
+    // plus their ongoing idle-wander draws, moving every later draw). This branch
     // never touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
     // here); its extra content just moves the shared rng before the rolls, and at
     // the old seed the need rolls stopped TYING. The tie is the whole point of the
@@ -3845,6 +3845,11 @@ function c4bEffectDispatch(): Scenario {
 // without four authored Hit pieces. The coverage test compares the two traces'
 // shared-RNG count + digest. Gear changes the existing spell-hit threshold and the
 // sampled entity state, but must not insert, remove, or reorder a draw.
+// Seed re-hunted 1021 -> 1000 by the v0.32.1 realm loot-table fill: the shifted
+// stream turned BOTH arms into a full resist at 1021, a degenerate trace with no
+// power to tell geared from ungeared. The hunt requires the base shape back:
+// both arms land, the geared arm out-damages the ungeared one, and the two arms
+// keep an identical draw count.
 function hitRatingHeroic(withHitGear: boolean): Scenario {
   return {
     name: withHitGear ? 'hit_rating_heroic_geared' : 'hit_rating_heroic_ungeared',
@@ -3853,7 +3858,7 @@ function hitRatingHeroic(withHitGear: boolean): Scenario {
       'same shared-RNG draw count/order as the ungeared spell-resist path',
     ],
     sampleEvery: 10,
-    build: () => new Sim({ seed: 1021, playerClass: 'mage' }),
+    build: () => new Sim({ seed: 1000, playerClass: 'mage' }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       sim.setPlayerLevel(20);
@@ -4488,10 +4493,11 @@ function cardDuel(): Scenario {
 // construction-time draw stream (quest camps + escort NPC spawns across the new
 // realms), and again after the Eastbrook camp respacing thinned the zone-1 camp
 // counts (fewer camp mobs means fewer construction-time draws, which moves every
-// later draw). Re-hunted 10 -> 21 for the v0.32.1 realm loot-table fill (the
-// four restored Galecrest quest camps spawn 12 mobs at construction, each
-// drawing world-gen rng, which moves every later draw). Spare seeds 29 and 35
-// were also verified to fire the proc for this drive.
+// later draw). Re-hunted 10 -> 21 for the v0.32.1 realm loot-table fill: the
+// four restored Galecrest quest camps spawn 12 mobs, 60 construction draws
+// (5 per mob) plus their ongoing idle-wander draws every tick, which moves
+// every later draw. Spare seeds 29 and 35 were also verified to fire the proc
+// for this drive.
 function professionsCraft(seed = 21): Scenario {
   return {
     name: 'professions_craft',

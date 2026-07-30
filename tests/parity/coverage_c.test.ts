@@ -134,11 +134,22 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(geared.rec.sim.player.hitRating).toBe(170);
     const gearedMob = (geared.rec.sim as any).entities.get(geared.rec.notes.mobId);
     expect(gearedMob.level - geared.rec.sim.player.level).toBe(3);
-    expect(
-      geared.rec.allEvents.some(
-        (e: Ev) => e.type === 'damage' && e.sourceId === geared.rec.sim.player.id,
-      ),
-    ).toBe(true);
+    // The geared cast must LAND (kind 'hit', real damage), and it must
+    // out-damage the ungeared arm: that difference is the pair's whole power
+    // to discriminate hit gear from none. A bare some(type === 'damage') is
+    // satisfied by a kind:'resist' amount:0 event, which is exactly the
+    // degenerate all-resist trace a stream shift once re-minted here
+    // unnoticed; the seed is re-hunted instead (see hitRatingHeroic).
+    const playerDamage = (arm: typeof geared) =>
+      (arm.rec.allEvents as Ev[]).filter(
+        (e) => e.type === 'damage' && e.sourceId === arm.rec.sim.player.id,
+      );
+    expect(playerDamage(geared).some((e) => e.kind === 'hit' && (e.amount as number) > 0)).toBe(
+      true,
+    );
+    const total = (arm: typeof geared) =>
+      playerDamage(arm).reduce((sum, e) => sum + ((e.amount as number) ?? 0), 0);
+    expect(total(geared)).toBeGreaterThan(total(ungeared));
 
     expect(geared.trace.draws).toBe(ungeared.trace.draws);
     expect(geared.trace.drawDigest).toBe(ungeared.trace.drawDigest);

@@ -8,8 +8,8 @@
     "multi-player PlayerMeta sampling",
     "classes:warrior,mage"
   ],
-  "draws": 969,
-  "drawDigest": "9d7513e7",
+  "draws": 964,
+  "drawDigest": "4b0f3031",
   "frames": [
     {
       "tick": 0,
@@ -87,8 +87,8 @@
       "state": "c9e5fc79",
       "events": "741638a5",
       "rng": {
-        "draws": 969,
-        "digest": "9d7513e7"
+        "draws": 964,
+        "digest": "4b0f3031"
       },
       "label": "final",
       "players": [
