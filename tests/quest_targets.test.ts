@@ -6,6 +6,7 @@
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { CAMPS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from '../src/sim/data';
+import { nodeMaterialFor } from '../src/sim/professions/gathering';
 import {
   questGiverNpcMarkers,
   questObjectiveAreas,
@@ -198,8 +199,18 @@ describe('questObjectiveAreas', () => {
       else delete QUESTS[TEST_QUEST_ID];
     });
 
-    it('resolves the ground-object cluster feeding the item, same as a collect objective', () => {
-      const { itemId } = requireGroundObjectQuest();
+    it('resolves the gather node whose material yields the item, matching the credit path', () => {
+      // Credit for a gather objective only ever flows through
+      // onNodeGatheredForQuests, fired from harvesting a matching node
+      // (src/sim/professions/gathering.ts). The itemId-only shape must
+      // therefore pin the same nodes the nodeType arm above would, found by
+      // walking GATHER_NODES through nodeMaterialFor rather than mob camps or
+      // ground-object clusters, which never grant this objective's credit.
+      const targetNode = GATHER_NODES.find((n) => nodeMaterialFor(n.type, n.zoneId).itemId);
+      expect(targetNode).toBeTruthy();
+      if (!targetNode) return;
+      const itemId = nodeMaterialFor(targetNode.type, targetNode.zoneId).itemId;
+
       const quest: QuestDef = {
         id: TEST_QUEST_ID,
         name: 'Test Gather ItemId Only',
@@ -215,20 +226,32 @@ describe('questObjectiveAreas', () => {
       };
       QUESTS[TEST_QUEST_ID] = quest;
 
-      const def = GROUND_OBJECTS.find((g) => g.itemId === itemId && g.positions.length > 0);
-      expect(def).toBeTruthy();
-      if (!def) return;
-
       const areas = questObjectiveAreas(activeLog(quest));
-      const containing = areas.find((a) =>
-        def.positions.every(
-          (p) => Math.hypot(p.x - a.center.x, p.z - a.center.z) <= a.radius + 1e-9,
-        ),
+      const nodesYieldingItem = GATHER_NODES.filter(
+        (n) => nodeMaterialFor(n.type, n.zoneId).itemId === itemId,
       );
-      expect(containing, 'expected one area enclosing the whole object cluster').toBeTruthy();
-      expect(
-        containing?.objectives.some((o) => o.questId === TEST_QUEST_ID && o.objectiveIndex === 0),
-      ).toBe(true);
+      expect(nodesYieldingItem.length).toBeGreaterThan(0);
+      for (const node of nodesYieldingItem) {
+        const area = areas.find((a) => a.center.x === node.pos.x && a.center.z === node.pos.z);
+        expect(area, `gather node ${node.id} should have an objective area`).toBeTruthy();
+        expect(
+          area?.objectives.some((o) => o.questId === TEST_QUEST_ID && o.objectiveIndex === 0),
+        ).toBe(true);
+      }
+
+      // Negative case: a ground-object cluster or mob camp tagged with the
+      // same itemId (if any exist) must NOT produce an area, since neither
+      // path grants this objective's credit and a pin there would mislead
+      // the player into farming a source that never advances the quest.
+      const groundDef = GROUND_OBJECTS.find((g) => g.itemId === itemId && g.positions.length > 0);
+      if (groundDef) {
+        const misleadingArea = areas.find((a) =>
+          groundDef.positions.every(
+            (p) => Math.hypot(p.x - a.center.x, p.z - a.center.z) <= a.radius + 1e-9,
+          ),
+        );
+        expect(misleadingArea).toBeUndefined();
+      }
     });
   });
 });

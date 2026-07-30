@@ -13,13 +13,10 @@ import { describe, expect, it } from 'vitest';
 import {
   CAMPS,
   DELVE_X_MIN,
-  DUNGEON_LIST,
   PROPS,
   QUESTS,
   STRIP_MAX_X,
   STRIP_MIN_X,
-  WORLD_MAX_X,
-  WORLD_MIN_X,
   ZONES,
 } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
@@ -551,10 +548,9 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     });
   });
 
-  it('drops player, NPC, and ally markers outside the committed zone', () => {
+  it('drops player and ally markers outside the committed zone', () => {
     const world = makeOverworldWorld('client') as unknown as {
       player: { pos: { x: number; z: number } };
-      entities: Map<number, { pos: { x: number; z: number } }>;
       socialInfo: {
         friends: { x?: number; z?: number }[];
         guild: { members: { x?: number; z?: number }[] };
@@ -562,15 +558,30 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     };
     const outsideX = ZONE_MAX_X + 50;
     world.player.pos.x = outsideX;
-    const npc = world.entities.get(2);
-    if (!npc) throw new Error('expected seeded npc');
-    npc.pos.x = outsideX;
     for (const friend of world.socialInfo.friends) friend.x = outsideX;
     for (const member of world.socialInfo.guild.members) member.x = outsideX;
     const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
     expect(model.player).toBeNull();
-    expect(model.npcs).toEqual([]);
     expect(model.allies).toEqual([]);
+  });
+
+  it('drops an npc quest-giver glyph outside the committed zone z-band (static content, not x-scoped)', () => {
+    // questGiverNpcMarkers resolves from static NPCS content, so unlike the
+    // player/ally markers above it is never x-scoped or interest-radius
+    // limited: buildOverworldMapModel's only zone filter for it is the
+    // z-band (marker.pos.z vs zone.zMin/zMax).
+    const world = makeOverworldWorld('client');
+    const outsideZone = { ...ZONE, zMin: ZONE.zMax + 1000, zMax: ZONE.zMax + 2000 };
+    const model = buildOverworldMapModel({
+      world,
+      props: PROPS,
+      zone: outsideZone,
+      zoom: 1,
+      center: null,
+      canvasSize: CANVAS,
+      decorations: NO_DECOR,
+    });
+    expect(model.npcs).toEqual([]);
   });
 
   it('uses a rectangular column zone as the sole frame, with ocean letterboxing', () => {

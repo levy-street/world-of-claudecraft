@@ -15,19 +15,13 @@
 // Markers carry the identity (zoneId / poiIndex / dungeonId / cls)
 // the painter needs to resolve their localized text, never the resolved string.
 
-import {
-  DUNGEON_LIST,
-  isDelvePos,
-  STRIP_MAX_X,
-  STRIP_MIN_X,
-  type ZoneDef,
-} from '../sim/data';
+import { DUNGEON_LIST, isDelvePos, STRIP_MAX_X, STRIP_MIN_X, type ZoneDef } from '../sim/data';
 import {
   type QuestObjectiveRef,
   questGiverNpcMarkers,
   questObjectiveAreas,
 } from '../sim/quest_targets';
-import { type BuildingDef, type ZonePropsDef } from '../sim/types';
+import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import type { Decoration } from '../sim/world';
 import type { FriendInfo, IWorld } from '../world_api';
 import { overworldDungeonPortals } from './map_dungeon_portals';
