@@ -2055,7 +2055,7 @@ export class Hud {
       document,
       container: $('#ui'),
       world: () => this.sim,
-      now: () => performance.now(),
+      now: () => this.sim.presentationTime,
       writers: this.writerFacet,
       openFocusTrap: (root) => this.focusManager.open({ root: () => root }),
       skip: () => this.sim.sceneSkip(),

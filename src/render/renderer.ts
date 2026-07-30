@@ -2419,7 +2419,9 @@ export class Renderer {
     // static world geometry like the props above. The ships un-freeze
     // themselves only while a departure scene's cast-off cue is live
     // (cueHarborShip / resetShip in ./harbor.ts).
-    const harbors = buildHarbors(this.sim.cfg.seed);
+    const harbors = buildHarbors(this.sim.cfg.seed, {
+      nowSec: () => this.sim.presentationTime,
+    });
     setRenderCategory(harbors.group, 'props');
     this.scene.add(harbors.group);
     freezeStaticMatrices(harbors.group);

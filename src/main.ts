@@ -1885,10 +1885,10 @@ async function startGame(
       : null;
   const sceneDirector = new SceneDirector({
     world: () => world,
-    nowSec: () => performance.now() / 1000,
+    nowSec: () => world.presentationTime,
     musicSilence: (on) => music.setSceneSilence(on),
     playDirective: (directive) => playSceneDirectiveSfx(directive),
-    propCue: (target, cue) => cueHarborShip(target, cue),
+    propCue: (target, cue, startSec) => cueHarborShip(target, cue, startSec),
     propReset: () => resetHarborShipCues(),
     attachmentFrame: (target, out) => harborShipAttachFrame(target, out),
     reducedMotion: () =>

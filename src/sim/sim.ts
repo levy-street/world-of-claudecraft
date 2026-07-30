@@ -10907,9 +10907,12 @@ export class Sim {
     return scenesMod.requestSceneSkip(this.ctx, pid);
   }
 
-  // IWorldScenes facet adapter: the local player's skip request. Omitting the
-  // pid resolves the primary player (ctx.resolve), matching how the other
-  // facet commands resolve the offline player.
+  // IWorldScenes facet adapters: presentation reads the same simulation clock
+  // the scene authority advances, and commands resolve the local primary player.
+  get presentationTime(): number {
+    return this.time;
+  }
+
   sceneSkip(): void {
     scenesMod.requestSceneSkip(this.ctx);
   }

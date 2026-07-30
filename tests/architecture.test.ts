@@ -141,6 +141,22 @@ const DOM_GLOBAL_RE = /\b(document|window|navigator|localStorage|sessionStorage)
 const DOM_GLOBAL_VALUE_RE =
   /\btypeof\s+(?:document|window|navigator|localStorage|sessionStorage)\b|\binstanceof\s+(?:Document|Window|Navigator|Storage)\b|(?:[=(]|\breturn\b)\s*(?:document|window|navigator|localStorage|sessionStorage)\s*[),;]/;
 const NONDETERMINISM_RE = /\b(Math\.random|Date\.now|performance\.now)\b/;
+const SCENE_WALL_CLOCK_RE = /\b(?:performance\.now|Date\.now)\b|\bnew\s+Date\s*\(\s*\)/;
+
+// Explicit scene-presentation clock surface. The impure adapters own the injected
+// clock reads, while the pure evaluators own camera, overlay, choice, and prop
+// timing. Keeping the list named prevents a moved subtitle or cue clock from
+// silently falling outside the one-clock guard.
+const SCENE_PRESENTATION_CLOCK_FILES = [
+  join(repoRoot, 'src', 'game', 'scene_director.ts'),
+  join(repoRoot, 'src', 'game', 'scene_director_core.ts'),
+  join(repoRoot, 'src', 'ui', 'hud', 'scene', 'scene_controller.ts'),
+  join(repoRoot, 'src', 'ui', 'hud', 'scene', 'scene_overlay_view.ts'),
+  join(repoRoot, 'src', 'ui', 'hud', 'scene', 'scene_choice_view.ts'),
+  join(repoRoot, 'src', 'render', 'harbor.ts'),
+  join(repoRoot, 'src', 'render', 'harbor_ship_cue_registry.ts'),
+  join(repoRoot, 'src', 'render', 'prop_path_core.ts'),
+];
 
 const simFiles = walk(simRoot);
 
@@ -658,6 +674,42 @@ describe('src/sim architecture invariants', () => {
       violations,
       `all sim randomness/time goes through Rng (src/sim/rng.ts) and the sim clock:\n${violations.join('\n')}`,
     ).toEqual([]);
+  });
+});
+
+describe('scene presentation clock invariant', () => {
+  it('keeps the explicit scene timing modules on the mirrored world clock', () => {
+    for (const file of SCENE_PRESENTATION_CLOCK_FILES) {
+      expect(existsSync(file), `${relative(repoRoot, file)} is missing from the clock scan`).toBe(
+        true,
+      );
+    }
+    const violations = scanLines(SCENE_PRESENTATION_CLOCK_FILES, SCENE_WALL_CLOCK_RE);
+    expect(
+      violations,
+      `scene presentation must not read wall-clock time:\n${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('pins every wall-clock spelling the scene scan bans', () => {
+    for (const positive of ['performance.now()', 'Date.now()', 'new Date()']) {
+      expect(SCENE_WALL_CLOCK_RE.test(positive), positive).toBe(true);
+    }
+    expect(SCENE_WALL_CLOCK_RE.test('new Date(timestamp)')).toBe(false);
+  });
+
+  it('composes every injected presentation clock from IWorld.presentationTime', () => {
+    const mainSource = stripComments(readFileSync(join(repoRoot, 'src', 'main.ts'), 'utf8'));
+    const hudSource = stripComments(readFileSync(join(repoRoot, 'src', 'ui', 'hud.ts'), 'utf8'));
+    const rendererSource = stripComments(
+      readFileSync(join(repoRoot, 'src', 'render', 'renderer.ts'), 'utf8'),
+    );
+
+    expect(mainSource).toMatch(/nowSec:\s*\(\)\s*=>\s*world\.presentationTime/);
+    expect(hudSource).toMatch(/now:\s*\(\)\s*=>\s*this\.sim\.presentationTime/);
+    expect(rendererSource).toMatch(
+      /buildHarbors\(this\.sim\.cfg\.seed,\s*\{\s*nowSec:\s*\(\)\s*=>\s*this\.sim\.presentationTime,\s*\}\)/,
+    );
   });
 });
 

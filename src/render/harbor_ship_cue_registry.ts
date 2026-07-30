@@ -44,15 +44,19 @@ export class HarborShipCueRegistry<TSegment, THandle extends HarborShipCueHandle
     this.apply(target, handle, pending.cue, pending.startSec);
   }
 
-  cue(target: string, cue: string): void {
+  cue(target: string, cue: string, startSec = this.options.nowSec()): void {
     const handle = this.handles.get(target);
-    const startSec = this.options.nowSec();
     if (!handle) {
       this.pending.set(target, { cue, startSec });
       return;
     }
     this.pending.delete(target);
     this.apply(target, handle, cue, startSec);
+  }
+
+  /** Elapsed authoritative presentation time for one active handle. */
+  elapsedSec(handle: THandle): number | null {
+    return handle.cueStartSec === null ? null : this.options.nowSec() - handle.cueStartSec;
   }
 
   resetAll(): void {

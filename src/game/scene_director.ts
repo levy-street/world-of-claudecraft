@@ -21,14 +21,14 @@ import type { SceneAttachmentResolver } from './scene_rig_core';
 
 export interface SceneDirectorDeps {
   world: () => IWorld;
-  /** Monotonic seconds (the frame loop's clock). */
+  /** Authoritative mirrored simulation clock in seconds. */
   nowSec: () => number;
   /** Hard-silence / restore the music engine (MusicDirector.setSceneSilence). */
   musicSilence: (on: boolean) => void;
   /** Sampled interpretation of a music directive (scene_sfx.ts). */
   playDirective?: (directive: string) => void;
   /** Route a prop target and path segment id to the renderer. */
-  propCue?: (target: string, cue: string) => void;
+  propCue?: (target: string, cue: string, startSec: number) => void;
   /** Scene teardown: every prop cue back to rest. */
   propReset?: () => void;
   /** Live world frame of a scene attachment target, when its renderer owns one. */
@@ -64,14 +64,15 @@ export class SceneDirector {
       // Offline hands the WHOLE tick batch over, so another local player's
       // personal events must be dropped here (same gate as hud.handleEvents).
       if (ev.pid !== undefined && ev.pid !== world.playerId) continue;
-      const directive = applySceneOp(this.state, ev.op, this.deps.nowSec());
+      const eventNowSec = ev.presentationTime ?? this.deps.nowSec();
+      const directive = applySceneOp(this.state, ev.op, eventNowSec);
       if (directive !== null) {
         const action = sceneMusicAction(directive);
         if (action === 'silence') this.deps.musicSilence(true);
         else if (action === 'resume') this.deps.musicSilence(false);
         else this.deps.playDirective?.(directive);
       }
-      if (ev.op.kind === 'prop') this.deps.propCue?.(ev.op.target, ev.op.cue);
+      if (ev.op.kind === 'prop') this.deps.propCue?.(ev.op.target, ev.op.cue, eventNowSec);
       // A skipped scene drops its remaining presentation ops (a scheduled
       // 'resume' included), so the end op always restores the music and
       // parks every prop cue.

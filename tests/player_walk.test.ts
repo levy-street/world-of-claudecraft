@@ -114,11 +114,12 @@ describe('playerWalk scene op', () => {
     expect(skipped.player.pos).toEqual(watched.player.pos);
 
     if (!wire) expect.unreachable('playerWalk wire op missing');
-    const frame = assembleEventsFrame(serializeEventFragments([wire]));
+    const frame = assembleEventsFrame(serializeEventFragments([wire]), 3.5);
     const client = Object.create(ClientWorld.prototype) as ClientWorld;
     (client as unknown as { eventQueue: SimEvent[] }).eventQueue = [];
     (client as unknown as { onMessage(raw: string): void }).onMessage(frame);
-    expect(client.drainEvents()).toEqual([wire]);
+    expect(client.presentationTime).toBe(3.5);
+    expect(client.drainEvents()).toEqual([{ ...wire, presentationTime: 3.5 }]);
   });
 
   it('clears an unfinished walk unconditionally when the scene ends', () => {

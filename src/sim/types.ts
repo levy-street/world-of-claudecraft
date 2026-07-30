@@ -4481,7 +4481,11 @@ export interface SceneChoiceReconnectState {
   remainingSeconds: number | null;
 }
 
-export type SimEvent = { pid?: number } & (
+export type SimEvent = {
+  pid?: number;
+  /** Client-only authoritative seconds attached while decoding scene wire frames. */
+  presentationTime?: number;
+} & (
   | {
       type: 'damage';
       sourceId: number;

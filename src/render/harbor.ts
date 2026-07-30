@@ -380,10 +380,15 @@ interface HarborShipHandle {
   baseZ: number;
   baseRot: number;
   shipScale: number;
-  /** performance.now()/1000 when the active segment started, or null. */
+  /** Mirrored simulation seconds when the active segment started, or null. */
   cueStartSec: number | null;
   segment: PropPathSegment | null;
   deckStandIn: CharacterVisual | null;
+}
+
+export interface HarborSceneDeps {
+  /** Authoritative mirrored simulation clock in seconds. */
+  nowSec: () => number;
 }
 
 // Ship-local yards for the 60-yard grand ferry. The authored shipDecks center
@@ -409,8 +414,10 @@ const DECK_STAND_IN_IDLE_STATE: AnimState = {
 
 const PROP_PATH_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> =
   LAST_BELL_PROP_PATH_SEGMENTS;
+// buildHarbors installs its renderer's IWorld clock before registering ships.
+let harborSceneNowSec = () => 0;
 const SHIP_CUES = new HarborShipCueRegistry<PropPathSegment, HarborShipHandle>({
-  nowSec: () => performance.now() / 1000,
+  nowSec: () => harborSceneNowSec(),
   segmentForCue: (cue) => PROP_PATH_SEGMENTS[cue],
   activate: (handle, segment, startSec) => {
     handle.segment = segment;
@@ -437,9 +444,10 @@ export function harborShipAttachFrame(
 ): SceneAttachFrame | null {
   const handle = SHIP_CUES.get(target);
   if (!handle) return null;
+  const elapsedSec = SHIP_CUES.elapsedSec(handle);
   const pose =
-    handle.cueStartSec !== null && handle.segment !== null
-      ? propPathPoseAt(handle.segment, performance.now() / 1000 - handle.cueStartSec, CUE_POSE)
+    elapsedSec !== null && handle.segment !== null
+      ? propPathPoseAt(handle.segment, elapsedSec, CUE_POSE)
       : null;
   return composeHarborShipAttachFrame(handle, pose, out);
 }
@@ -448,8 +456,8 @@ export function harborShipAttachFrame(
  *  unknown cues park a known ship, so load races and authored mistakes never
  *  crash the client. The ship's matrix auto-update is enabled ONLY while a cue
  *  is live, so harbors stay inside the freezeStaticMatrices contract otherwise. */
-export function cueHarborShip(target: string, cue: string): void {
-  SHIP_CUES.cue(target, cue);
+export function cueHarborShip(target: string, cue: string, startSec: number): void {
+  SHIP_CUES.cue(target, cue, startSec);
 }
 
 /** Scene teardown: every ship back at its berth. */
@@ -489,13 +497,10 @@ function createDeckStandIn(handle: HarborShipHandle, player: Entity): CharacterV
 }
 
 function updateHarborShipMotion(handle: HarborShipHandle): void {
-  if (handle.cueStartSec !== null && handle.segment !== null) {
+  const elapsedSec = SHIP_CUES.elapsedSec(handle);
+  if (elapsedSec !== null && handle.segment !== null) {
     handle.group.matrixAutoUpdate = true;
-    const pose = propPathPoseAt(
-      handle.segment,
-      performance.now() / 1000 - handle.cueStartSec,
-      CUE_POSE,
-    );
+    const pose = propPathPoseAt(handle.segment, elapsedSec, CUE_POSE);
     const frame = composeHarborShipAttachFrame(handle, pose, SHIP_UPDATE_FRAME);
     handle.group.position.set(frame.position.x, frame.position.y, frame.position.z);
     handle.group.rotation.y = frame.yaw;
@@ -546,7 +551,8 @@ function buildShip(parent: THREE.Group, harbor: HarborDef): void {
 }
 
 /** Build every authored harbor of the active world into one static group. */
-export function buildHarbors(seed: number): { group: THREE.Group } {
+export function buildHarbors(seed: number, deps: HarborSceneDeps): { group: THREE.Group } {
+  harborSceneNowSec = deps.nowSec;
   const group = new THREE.Group();
   group.name = 'harbors';
   SHIP_CUES.clearHandles();
