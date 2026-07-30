@@ -195,17 +195,35 @@ describe('post-entry mob-body streaming (packaged iOS)', () => {
   // 1024-class atlases) is carved out of the boot gate on the packaged shell and
   // streamed after prewarm, through the fail-soft view-create seam (#2079).
   // Measured before this: WebContent at 1.54 GB pre-renderer on an iPhone 17 Pro.
-  it('streams only mob bodies, never anything the char-select preview builds directly', () => {
+  it('streams mob bodies and Armory skin models; base weapons stay in the gate', () => {
     expect(assetsSource).toContain(
       "const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];",
     );
-    // Scoped to the packaged shell: everywhere else the gate keeps the full set.
-    expect(assetsSource).toContain('GFX.nativeIosMemoryProfile\n  ? allPreloadUrls.filter');
+    // Weapon SKINS stream (cosmetic, degradable); the BASE item weapons do not,
+    // so the player's own hands are never empty at spawn and the degrade path
+    // below always has a resident fallback.
+    expect(assetsSource).toContain('const streamedSkinUrls = new Set(weaponSkinModelUrls());');
     // The preview gate sweeps the GATE set, so the launcher never awaits or
-    // re-fetches a streamed mob body.
+    // re-fetches streamed content.
     expect(assetsSource).toContain(
-      'const preloadUrls = allPreloadUrls.filter((u) => !streamedUrls.includes(u));',
+      'const preloadUrls = allPreloadUrls.filter((u) => !streamedUrlSet.has(u));',
     );
+  });
+
+  it('degrades a not-yet-resident skin to the base weapon instead of throwing', () => {
+    // All three attach resolvers route their skin url through residentOrEnsure,
+    // which kicks the fetch and returns null so the resident fallback applies.
+    expect(assetsSource).toContain(
+      'residentOrEnsure(weaponSkinModelUrl(weaponSkinId)) ?? itemWeaponModelUrl(weaponItemId)',
+    );
+    expect(assetsSource).toContain(
+      'const resident = residentOrEnsure(url) ?? itemOffhandModelUrl(offhandItemId);',
+    );
+    expect(assetsSource).toContain(
+      'const url = residentOrEnsure(weaponSkinModelUrl(weaponSkinId));',
+    );
+    // The launcher ensures the roster's own skins on demand (the mech pattern).
+    expect(mainSource).toContain('ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));');
   });
 
   it('starts the stream after prewarm, not inside the entry gate', () => {

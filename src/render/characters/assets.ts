@@ -27,6 +27,7 @@ import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from '.
 import {
   type AttachDef,
   characterPreloadUrls,
+  itemOffhandModelUrl,
   itemWeaponModelUrl,
   offhandModelUrl,
   SKIN_EMISSIVE,
@@ -36,6 +37,7 @@ import {
   visibleAttachmentsForGraphics,
   visualAssetUrlForGraphics,
   weaponSkinModelUrl,
+  weaponSkinModelUrls,
 } from './manifest';
 import { mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
@@ -389,7 +391,8 @@ function swapAttachDef(
   weaponItemId: string | null | undefined,
   weaponSkinId: string | null | undefined = null,
 ): AttachDef {
-  const url = weaponSkinModelUrl(weaponSkinId) ?? itemWeaponModelUrl(weaponItemId);
+  const url =
+    residentOrEnsure(weaponSkinModelUrl(weaponSkinId)) ?? itemWeaponModelUrl(weaponItemId);
   return url ? { url, bone: base.bone } : base;
 }
 
@@ -404,7 +407,10 @@ function offhandAttachDef(
   weaponSkinId: string | null | undefined = null,
 ): AttachDef | null {
   const url = offhandModelUrl(offhandItemId, weaponSkinId);
-  return url ? { url, bone: base.bone } : null;
+  // The mirrored-skin arm of offhandModelUrl can name a streamed skin GLB; the
+  // item's own offhand model is always resident, so degrade to it.
+  const resident = residentOrEnsure(url) ?? itemOffhandModelUrl(offhandItemId);
+  return resident ? { url: resident, bone: base.bone } : null;
 }
 
 // Classes without weaponSlots keep a FIXED weapon visual (the hunter's ranged
@@ -429,7 +435,9 @@ function rangedSkinAttachDef(base: AttachDef, weaponSkinId: string | null): Atta
   if (!weaponSkinId) return null;
   const def = WEAPON_SKINS[weaponSkinId];
   if (!def || (def.weaponType !== 'bow' && def.weaponType !== 'crossbow')) return null;
-  const url = weaponSkinModelUrl(weaponSkinId);
+  const url = residentOrEnsure(weaponSkinModelUrl(weaponSkinId));
+  // Not resident yet: no override, the fixed class weapon renders until the
+  // skin GLB streams in and the next rebuild applies it.
   return url ? { url, bone: weaponSkinAttachBone(weaponSkinHandling(def), base.bone) } : null;
 }
 
@@ -469,10 +477,45 @@ const allPreloadUrls = characterPreloadUrls(GFX.standardMaterials);
 // DIRECTLY (not through the fail-soft factory), so a missing held-weapon GLB
 // there would throw.
 const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
+// Armory weapon-SKIN models stream too (64 of the 78 weapon files): they are
+// cosmetic replacements for base weapons that always stay in the gate, so a
+// wearer whose skin GLB has not arrived yet degrades to their base weapon (the
+// swapAttachDef guard below) instead of throwing. Base item weapons stay
+// resident so the player's own hands are never empty at spawn.
+const streamedSkinUrls = new Set(weaponSkinModelUrls());
 const streamedUrls = GFX.nativeIosMemoryProfile
-  ? allPreloadUrls.filter((u) => STREAMED_URL_PREFIXES.some((p) => u.includes(p)))
+  ? allPreloadUrls.filter(
+      (u) => STREAMED_URL_PREFIXES.some((p) => u.includes(p)) || streamedSkinUrls.has(u),
+    )
   : [];
-const preloadUrls = allPreloadUrls.filter((u) => !streamedUrls.includes(u));
+const streamedUrlSet = new Set(streamedUrls);
+const preloadUrls = allPreloadUrls.filter((u) => !streamedUrlSet.has(u));
+
+/** True when a character GLB is resident and attach/build paths may resolve it. */
+function characterAssetResident(url: string): boolean {
+  return gltfByUrl.has(assetUrl(url));
+}
+
+/** Kick a streamed character GLB (memoized by loadGltf) and index it on arrival. */
+export function ensureCharacterUrl(url: string | null | undefined): void {
+  if (!url || characterAssetResident(url)) return;
+  void loadGltf(url)
+    .then((g) => {
+      gltfByUrl.set(url, g);
+    })
+    .catch(() => undefined);
+}
+
+/** A streamed url that has not arrived yet must degrade, never throw: return
+ *  null so the caller falls back (base weapon / no ranged override) and kick
+ *  the fetch so the cosmetic appears on the next swap or view rebuild. Eager
+ *  platforms never take the branch: their streamed set is empty. */
+function residentOrEnsure(url: string | null): string | null {
+  if (!url) return null;
+  if (!streamedUrlSet.has(url) || characterAssetResident(url)) return url;
+  ensureCharacterUrl(url);
+  return null;
+}
 
 for (const url of preloadUrls) {
   registerPreload(

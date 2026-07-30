@@ -173,10 +173,11 @@ import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
 import {
   charactersReady,
+  ensureCharacterUrl,
   preloadMechAssets,
   startStreamedCharacterPreloads,
 } from './render/characters/assets';
-import { skinCount } from './render/characters/manifest';
+import { skinCount, weaponSkinModelUrl } from './render/characters/manifest';
 import {
   onPortraitsReady,
   onPortraitUpdate,
@@ -5699,6 +5700,13 @@ const activeClassDetailsTimeouts: Record<string, number | null> = {};
 
 // The char-select roster row's real, in-world appearance for the 3D preview.
 function charselectAppearance(c: CharacterSummary): PreviewAppearance {
+  // The packaged iOS shell streams the Armory weapon-skin GLBs after world
+  // entry instead of holding all of them at the launcher, so the preview of a
+  // character wearing one needs ITS skin fetched on demand (the mech lazy-load
+  // pattern). Memoized and a no-op when resident or on eager platforms; a
+  // preview built in the race window shows the base weapon and picks the skin
+  // up on the next selection change.
+  ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
   return {
     cls: c.class,
     skin: c.skin ?? 0,
