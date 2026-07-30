@@ -2546,6 +2546,15 @@ export interface DungeonDef {
    * `dungeon_layout.ts` layoutColliders.
    */
   tombDressing?: 'coffins' | 'cargo';
+  /**
+   * Opt in to the premature-boss-pull punish: aggroing this dungeon's final
+   * boss while ANY of the instance's other mobs is still alive and idle pulls
+   * every one of them onto the puller at once (instances/boss_chain_pull.ts).
+   * Absent, a boss pull behaves classically (only the boss and its own social
+   * radius). Deliberately per dungeon rather than global: it turns skipping
+   * trash from a shortcut into a wipe, which is a per-dungeon design choice.
+   */
+  bossChainPull?: boolean;
   suggestedPlayers: number;
   enterText: string;
   leaveText: string;
@@ -3342,6 +3351,18 @@ export interface Entity extends ClientMirroredEntityFields {
   // multiply by these AFTER the rng draw. undefined = 1 (normal difficulty).
   mechanicDamageMult?: number;
   mechanicHealMult?: number;
+  // Ranged petSpell scaling for a TUNED instance spawn, the third fire-time
+  // multiplier beside the two above. A hostile mob's petSpell damage is rolled
+  // from the base MOBS table and multiplied by petDamageMult, which returns a
+  // flat 1 for any mob with no owner, so NEITHER the spawn-time template
+  // transform (which only moves dmgBase/dmgPerLevel, i.e. melee) nor
+  // mechanicDamageMult can reach it. Without this a petSpell caster is immune
+  // to dungeon tuning, and since a caster stands and casts instead of meleeing
+  // (mob/combat_profile.ts updateCasterCombat) that is its ENTIRE damage
+  // output. Set from NormalDungeonTuning.rangedDamageMultiplierByMob;
+  // undefined = 1 (untuned, and every heroic spawn, which keeps its shipped
+  // calibration).
+  rangedDamageMult?: number;
   // Entity-level CC/snare immunity, the per-spawn twin of the MobTemplate
   // ccImmune/slowImmune flags (which are read from the base MOBS table, so a
   // spawn-time template transform cannot grant them). Heroic instances set

@@ -436,6 +436,7 @@ export type { MailSave } from './mail/post_office';
 export type { MarketSave } from './market';
 
 import { updateSwimFatigue } from './fatigue';
+import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
 import {
   applyDungeonMobTuning,
   mobLevelForDungeonDifficulty,
@@ -6558,6 +6559,16 @@ export class Sim {
       mob.yelledEngage = true;
       emitMobYell(this.ctx, mob, engageYell, MOBS[mob.templateId]?.battleYells?.range);
     }
+    // Premature-boss-pull punish, for the dungeons that opt in: pulling the boss
+    // with trash still standing brings the whole instance. Gated on a
+    // player-driven pull, like the engage yell above.
+    //
+    // Deliberately BEFORE the social block: both skip a mob that is no longer
+    // idle, so whichever runs first owns the leash anchor, and only the chain
+    // pull's puller-anchored leash lets a mob from the far end of the field
+    // actually reach the fight. Reordering these two would quietly shorten the
+    // leash on every mob they both claim.
+    if (playerPull) chainPullInstanceOnBossAggro(this.ctx, mob, target);
     if (social) {
       const family = MOBS[mob.templateId]?.family;
       const pullRadius = (family && SOCIAL_PULL_RADIUS[family]) ?? DEFAULT_SOCIAL_PULL_RADIUS;
@@ -6770,9 +6781,14 @@ export class Sim {
         });
         this.enterCombat(pet, target);
       } else {
+        // rangedDamageMult is the instance-tuning factor for a HOSTILE petSpell
+        // caster (undefined, so 1, for every player pet and every untuned or
+        // heroic spawn). Applied after the rng draw like the mechanic
+        // multipliers, so the shared draw order is unchanged.
         const dmg = Math.round(
           this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1) *
-            this.petDamageMult(pet),
+            this.petDamageMult(pet) *
+            (pet.rangedDamageMult ?? 1),
         );
         this.dealDamage(pet, target, Math.max(1, dmg), false, spell.school, spell.name, 'hit');
       }

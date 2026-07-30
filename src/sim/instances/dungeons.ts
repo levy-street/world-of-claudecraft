@@ -858,16 +858,23 @@ export function instanceSlotAt(ctx: SimContext, pos: Vec3): number | null {
   return instanceInfoAt(ctx, pos)?.slot ?? null;
 }
 
+/** The live slot whose claim footprint contains `pos`, or null. Same envelope as
+ *  instanceInfoAt below, exposed for the callers that need the slot's own STATE
+ *  (its mobIds roster) and not just its identity: see
+ *  instances/boss_chain_pull.ts. */
+export function instanceAt(ctx: SimContext, pos: Vec3): InstanceSlot | null {
+  for (const inst of ctx.instances) {
+    if (instanceClaimContains(inst, pos)) return inst;
+  }
+  return null;
+}
+
 export function instanceInfoAt(
   ctx: SimContext,
   pos: Vec3,
 ): { slot: number; dungeonId: string } | null {
-  for (const inst of ctx.instances) {
-    if (instanceClaimContains(inst, pos)) {
-      return { slot: inst.slot, dungeonId: inst.dungeonId };
-    }
-  }
-  return null;
+  const inst = instanceAt(ctx, pos);
+  return inst ? { slot: inst.slot, dungeonId: inst.dungeonId } : null;
 }
 
 // Authoritative: is `pos` physically inside one of the two Nythraxis raid
