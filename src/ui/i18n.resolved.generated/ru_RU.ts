@@ -4952,6 +4952,30 @@ export const ru_RU: EnTranslations = {
     "inspector": {
       "label": "Параметры инструмента"
     },
+    "cinematic": {
+      "title": "Кинематографическая сцена",
+      "show": "Показать панель",
+      "hide": "Скрыть панель",
+      "scene": "Сцена",
+      "sceneOption": "{id} ({seconds} с)",
+      "time": "Время",
+      "timeReadout": "{current} / {duration} с",
+      "play": "Воспроизвести",
+      "pause": "Пауза",
+      "authoredCamera": "Постановочная камера",
+      "fade": "Затемнение: {percent}%",
+      "letterboxOn": "Широкий формат: включен",
+      "letterboxOff": "Широкий формат: выключен",
+      "capture": "Захватить ключевой кадр",
+      "copy": "Копировать блок",
+      "output": "Созданный снимок камеры",
+      "unavailable": "Загрузка области просмотра 3D",
+      "seedMismatch": "Для захвата нужен рабочий ключ мира",
+      "captureSavedCopied": "Сохранено и скопировано",
+      "captureSaved": "Сохранено, блок готов ниже",
+      "captureCopyOnly": "Скопировано, средство записи разработки недоступно",
+      "captureReady": "Блок готов ниже"
+    },
     "brush": {
       "title": "Кисть",
       "size": "Размер кисти",

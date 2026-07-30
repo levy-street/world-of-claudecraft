@@ -4960,6 +4960,30 @@ export const fr_FR: EnTranslations = {
     "inspector": {
       "label": "Options de l'outil"
     },
+    "cinematic": {
+      "title": "Cinematic",
+      "show": "Show panel",
+      "hide": "Hide panel",
+      "scene": "Scene",
+      "sceneOption": "{id} ({seconds}s)",
+      "time": "Time",
+      "timeReadout": "{current} / {duration}s",
+      "play": "Play",
+      "pause": "Pause",
+      "authoredCamera": "Authored camera",
+      "fade": "Fade: {percent}%",
+      "letterboxOn": "Letterbox: on",
+      "letterboxOff": "Letterbox: off",
+      "capture": "Capture keyframe",
+      "copy": "Copy block",
+      "output": "Generated camera capture",
+      "unavailable": "3D viewport loading",
+      "seedMismatch": "Capture needs the shipping world seed",
+      "captureSavedCopied": "Saved and copied",
+      "captureSaved": "Saved; block ready below",
+      "captureCopyOnly": "Copied; dev writer unavailable",
+      "captureReady": "Block ready below"
+    },
     "brush": {
       "title": "Pinceau",
       "size": "Taille du pinceau",

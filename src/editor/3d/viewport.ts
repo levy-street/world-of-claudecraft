@@ -13,14 +13,28 @@ import { WORLD_SEED } from '../../sim/world_seed';
 // content and pushes render updates.
 
 import * as THREE from 'three';
-import { assetsReady, beginDeferredPreloads } from '../../render/assets/preload';
+import { assetsReady } from '../../render/assets/preload';
+import { cueHarborShip, resetHarborShipCues } from '../../render/harbor';
 import { type SeatRegion, unionRegion } from '../../render/placed_assets';
 import { Renderer } from '../../render/renderer';
 import { FENCE_HALF_DEPTH } from '../../sim/colliders';
+import type { SceneDef } from '../../sim/scenes/registry';
 import { Sim } from '../../sim/sim';
 import { type BlockerDef, DT } from '../../sim/types';
-import { terrainHeight } from '../../sim/world';
+import { groundHeight, terrainHeight } from '../../sim/world';
+import {
+  type CinematicCameraCapture,
+  createCinematicCameraCapture,
+} from '../cinematic_capture_core';
+import { CinematicPanel } from '../cinematic_panel';
+import {
+  type CinematicCameraPose,
+  type CinematicScrubFrame,
+  cinematicLivePoseFromCamera,
+  evaluateCinematicScrubFrame,
+} from '../cinematic_scrub_core';
 import { type CustomMap, customMapToWorldContent, placementsToRenderAssets } from '../custom_map';
+import { saveCinematicCameraCapture } from '../net';
 import { EditorCamera } from './editor_camera';
 
 export interface EditRegion {
@@ -55,6 +69,9 @@ export interface Editor3DHooks {
   // Shift+wheel (rotate) / Alt+wheel (scale) over the stage while a placement
   // is selected. True consumes the event; false falls through to camera zoom.
   onTransformWheel(kind: 'rotate' | 'scale', deltaY: number): boolean;
+  /** Round 2 extension seam: violation gizmos evaluate from the same selected
+   *  scene definition and fixed scrub time after each deterministic seek. */
+  onCinematicFrame?(timeSec: number, scene: SceneDef): void;
 }
 
 const SPAWN_RING_COLOR = 0x3fd0ff;
@@ -80,6 +97,18 @@ export class Editor3DViewport {
   private canvas!: HTMLCanvasElement;
   private nameplates!: HTMLDivElement;
   private readonly cam = new EditorCamera();
+  private readonly cinematicPanel: CinematicPanel;
+  private cinematicFrame: CinematicScrubFrame | null = null;
+  private cinematicBaseSceneId: string | null = null;
+  private cinematicBaseLive = cinematicLivePoseFromCamera({
+    position: { x: 0, y: 0, z: 0 },
+    target: { x: 0, y: 0, z: 1 },
+  });
+  private cinematicCameraEnabled = true;
+  private readonly cinematicCamera = {
+    pos: new THREE.Vector3(),
+    target: new THREE.Vector3(),
+  };
   private sim: Sim | null = null;
   private renderer: Renderer | null = null;
   private raf = 0;
@@ -148,6 +177,13 @@ export class Editor3DViewport {
   ) {
     this.map = map;
     this.createSurfaces();
+    this.cinematicPanel = new CinematicPanel(this.parent, {
+      evaluate: (scene, timeSec) => this.evaluateCinematicFrame(scene, timeSec),
+      setAuthoredCamera: (on) => this.setCinematicCameraEnabled(on),
+      capture: (scene, timeSec, capturedAt) =>
+        this.captureCinematicCamera(scene, timeSec, capturedAt),
+      saveCapture: saveCinematicCameraCapture,
+    });
   }
 
   private createSurfaces(): void {
@@ -202,6 +238,7 @@ export class Editor3DViewport {
     const hub = this.map.content.zones[0]?.hub ?? { x: 0, z: 0 };
     this.cam.target.set(hub.x, terrainHeight(hub.x, hub.z, this.seed), hub.z);
     this.attachEvents();
+    this.cinematicPanel.setReady(true);
     if (this.visible) {
       this.lastT = performance.now();
       this.loop();
@@ -542,6 +579,7 @@ export class Editor3DViewport {
     if (v === this.visible) return;
     this.visible = v;
     if (!v) {
+      this.cinematicPanel.pause();
       cancelAnimationFrame(this.raf);
       this.raf = 0;
       return;
@@ -609,6 +647,7 @@ export class Editor3DViewport {
     cancelAnimationFrame(this.raf);
     this.detachEvents();
     this.teardownEngine();
+    this.cinematicPanel.dispose();
   }
 
   // Free the GL context and remove the surfaces. A fresh canvas is needed for a
@@ -616,6 +655,10 @@ export class Editor3DViewport {
   private teardownEngine(): void {
     cancelAnimationFrame(this.raf);
     this.raf = 0;
+    this.cinematicPanel.setReady(false);
+    resetHarborShipCues();
+    this.cinematicFrame = null;
+    this.cinematicBaseSceneId = null;
     if (this.renderer) {
       const renderer = this.renderer;
       renderer.editorCam = null;
@@ -638,36 +681,130 @@ export class Editor3DViewport {
     this.nameplates?.remove();
   }
 
+  // ---- cinematic panel ----------------------------------------------------
+
+  private evaluateCinematicFrame(scene: SceneDef, timeSec: number): CinematicScrubFrame | null {
+    if (!this.sim) return null;
+    if (this.cinematicBaseSceneId !== scene.id) {
+      this.cinematicBaseSceneId = scene.id;
+      this.cinematicBaseLive = cinematicLivePoseFromCamera(this.freeCameraPose());
+    }
+    const frame = evaluateCinematicScrubFrame(scene, timeSec, {
+      live: this.cinematicBaseLive,
+      groundY: (x, z) => groundHeight(x, z, this.seed),
+      actorPoint: (actorId) => {
+        for (const entity of this.sim?.entities.values() ?? []) {
+          if (entity.squadActorId === actorId) return { ...entity.pos };
+        }
+        return null;
+      },
+    });
+    this.cinematicFrame = frame;
+    this.sim.time = frame.timeSec;
+    resetHarborShipCues();
+    for (const cue of frame.propCues) {
+      cueHarborShip(cue.target, cue.cue, cue.startedAt);
+    }
+    if (frame.camera) {
+      this.cinematicCamera.pos.set(
+        frame.camera.position.x,
+        frame.camera.position.y,
+        frame.camera.position.z,
+      );
+      this.cinematicCamera.target.set(
+        frame.camera.target.x,
+        frame.camera.target.y,
+        frame.camera.target.z,
+      );
+    }
+    this.hooks.onCinematicFrame?.(frame.timeSec, scene);
+    return frame;
+  }
+
+  private setCinematicCameraEnabled(on: boolean): void {
+    this.cinematicCameraEnabled = on;
+    if (on) this.cinematicBaseSceneId = null;
+  }
+
+  private captureCinematicCamera(
+    scene: SceneDef,
+    timeSec: number,
+    capturedAt: string,
+  ): CinematicCameraCapture | null {
+    if (!this.sim) return null;
+    const pose =
+      this.cinematicCameraEnabled && this.cinematicFrame?.camera
+        ? this.authoredCameraPose()
+        : this.freeCameraPose();
+    return createCinematicCameraCapture({
+      sceneId: scene.id,
+      timeSec,
+      seed: this.seed,
+      capturedAt,
+      pose,
+      groundY: (x, z) => groundHeight(x, z, this.seed),
+    });
+  }
+
+  private authoredCameraPose(): CinematicCameraPose {
+    return {
+      position: {
+        x: this.cinematicCamera.pos.x,
+        y: this.cinematicCamera.pos.y,
+        z: this.cinematicCamera.pos.z,
+      },
+      target: {
+        x: this.cinematicCamera.target.x,
+        y: this.cinematicCamera.target.y,
+        z: this.cinematicCamera.target.z,
+      },
+    };
+  }
+
+  private freeCameraPose(): CinematicCameraPose {
+    const pose = this.cam.pose();
+    return {
+      position: { x: pose.pos.x, y: pose.pos.y, z: pose.pos.z },
+      target: { x: pose.target.x, y: pose.target.y, z: pose.target.z },
+    };
+  }
+
   // ---- loop ---------------------------------------------------------------
 
   private loop = (): void => {
     this.raf = 0;
     if (this.disposed || !this.visible || !this.renderer || !this.sim) return;
     const now = performance.now();
-    const dt = Math.min(0.05, (now - this.lastT) / 1000);
+    const elapsedSec = Math.max(0, (now - this.lastT) / 1000);
+    const dt = Math.min(0.05, elapsedSec);
     this.lastT = now;
 
     this.applyKeys(dt);
+    this.cinematicPanel.advance(elapsedSec);
     // Free camera: the target floats; only soft-floor it just above the
     // (possibly sculpted) terrain so it can never dive under the ground.
-    const ground = terrainHeight(this.cam.target.x, this.cam.target.z, this.seed);
-    if (this.cam.target.y < ground + 0.5) this.cam.target.y = ground + 0.5;
+    const authoredCamera =
+      this.cinematicCameraEnabled && this.cinematicFrame?.camera ? this.cinematicCamera : null;
+    const lodTarget = authoredCamera?.target ?? this.cam.target;
+    const freeGround = terrainHeight(this.cam.target.x, this.cam.target.z, this.seed);
+    if (this.cam.target.y < freeGround + 0.5) this.cam.target.y = freeGround + 0.5;
+    const lodGround = terrainHeight(lodTarget.x, lodTarget.z, this.seed);
     // Teleport the frozen player (hidden below) to the ground under the camera
     // target so foliage LOD stays populated under the cursor (the
     // renderer re-centers dressing on the player).
     const player = this.sim.player;
     if (player) {
-      player.pos.x = this.cam.target.x;
-      player.pos.z = this.cam.target.z;
-      player.pos.y = ground;
+      player.pos.x = lodTarget.x;
+      player.pos.z = lodTarget.z;
+      player.pos.y = lodGround;
     }
-    this.renderer.editorCam = this.cam.pose();
+    this.renderer.editorCam = authoredCamera ?? this.cam.pose();
     this.renderer.sync(1, DT, null);
     // The player is an LOD anchor, not editable content: keep its model out of
     // the scene (its view is built lazily by sync, so re-hide every frame).
     if (player) {
       const view = this.renderer.views.get(player.id);
-      if (view && view.group.visible) view.group.visible = false;
+      if (view?.group.visible) view.group.visible = false;
     }
     this.raf = requestAnimationFrame(this.loop);
   };

@@ -4952,6 +4952,30 @@ export const zh_CN: EnTranslations = {
     "inspector": {
       "label": "工具选项"
     },
+    "cinematic": {
+      "title": "电影场景",
+      "show": "显示面板",
+      "hide": "隐藏面板",
+      "scene": "场景",
+      "sceneOption": "{id}（{seconds} 秒）",
+      "time": "时间",
+      "timeReadout": "{current} / {duration} 秒",
+      "play": "播放",
+      "pause": "暂停",
+      "authoredCamera": "使用编排镜头",
+      "fade": "淡出：{percent}%",
+      "letterboxOn": "宽银幕：开启",
+      "letterboxOff": "宽银幕：关闭",
+      "capture": "捕获关键帧",
+      "copy": "复制区块",
+      "output": "已生成的镜头捕获",
+      "unavailable": "3D 视口加载中",
+      "seedMismatch": "捕获需要正式世界种子",
+      "captureSavedCopied": "已保存并复制",
+      "captureSaved": "已保存，区块已在下方生成",
+      "captureCopyOnly": "已复制，开发写入器不可用",
+      "captureReady": "区块已在下方生成"
+    },
     "brush": {
       "title": "笔刷",
       "size": "笔刷大小",

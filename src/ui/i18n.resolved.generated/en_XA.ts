@@ -4952,6 +4952,30 @@ export const en_XA: EnTranslations = {
     "inspector": {
       "label": "[Ţóóļ óþţíóñš]"
     },
+    "cinematic": {
+      "title": "[Çíñéɱáţíç]",
+      "show": "[Šĥóŵ þáñéļ]",
+      "hide": "[Ĥíðé þáñéļ]",
+      "scene": "[Šçéñé]",
+      "sceneOption": "[{id} ({seconds}š)]",
+      "time": "[Ţíɱé]",
+      "timeReadout": "[{current} / {duration}š]",
+      "play": "[Þļáý]",
+      "pause": "[Þáúšé]",
+      "authoredCamera": "[Áúţĥóŕéð çáɱéŕá]",
+      "fade": "[Ƒáðé: {percent}%]",
+      "letterboxOn": "[Ļéţţéŕƀóẋ: óñ]",
+      "letterboxOff": "[Ļéţţéŕƀóẋ: óƒƒ]",
+      "capture": "[Çáþţúŕé ķéýƒŕáɱé]",
+      "copy": "[Çóþý ƀļóçķ]",
+      "output": "[Ĝéñéŕáţéð çáɱéŕá çáþţúŕé]",
+      "unavailable": "[3Ð ʋíéŵþóŕţ ļóáðíñĝ]",
+      "seedMismatch": "[Çáþţúŕé ñééðš ţĥé šĥíþþíñĝ ŵóŕļð šééð]",
+      "captureSavedCopied": "[Šáʋéð áñð çóþíéð]",
+      "captureSaved": "[Šáʋéð; ƀļóçķ ŕéáðý ƀéļóŵ]",
+      "captureCopyOnly": "[Çóþíéð; ðéʋ ŵŕíţéŕ úñáʋáíļáƀļé]",
+      "captureReady": "[Ɓļóçķ ŕéáðý ƀéļóŵ]"
+    },
     "brush": {
       "title": "[Ɓŕúšĥ]",
       "size": "[Ɓŕúšĥ šížé]",

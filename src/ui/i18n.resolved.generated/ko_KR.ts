@@ -4952,6 +4952,30 @@ export const ko_KR: EnTranslations = {
     "inspector": {
       "label": "도구 옵션"
     },
+    "cinematic": {
+      "title": "시네마틱",
+      "show": "패널 표시",
+      "hide": "패널 숨기기",
+      "scene": "장면",
+      "sceneOption": "{id} ({seconds}초)",
+      "time": "시간",
+      "timeReadout": "{current} / {duration}초",
+      "play": "재생",
+      "pause": "일시 정지",
+      "authoredCamera": "연출 카메라",
+      "fade": "페이드: {percent}%",
+      "letterboxOn": "레터박스: 켜짐",
+      "letterboxOff": "레터박스: 꺼짐",
+      "capture": "키프레임 캡처",
+      "copy": "블록 복사",
+      "output": "생성된 카메라 캡처",
+      "unavailable": "3D 뷰포트 불러오는 중",
+      "seedMismatch": "캡처에는 정식 월드 시드가 필요합니다",
+      "captureSavedCopied": "저장하고 복사했습니다",
+      "captureSaved": "저장했습니다. 아래에 블록이 준비되었습니다",
+      "captureCopyOnly": "복사했습니다. 개발용 기록기를 사용할 수 없습니다",
+      "captureReady": "아래에 블록이 준비되었습니다"
+    },
     "brush": {
       "title": "브러시",
       "size": "브러시 크기",
