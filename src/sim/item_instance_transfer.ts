@@ -1,12 +1,14 @@
 // Instanced-transfer rules for the exchange pipes OUTSIDE the face-to-face
 // trade: World Market listings and Ravenpost mail (the #1165 completion).
-// Everything a player may freely hand over in a trade window is also listable
-// and mailable WITH its payload intact; the one lock rule is shared here so the
-// two pipes can never drift. trade.ts keeps its own narrower isTradeLocked
-// (boundTo only): an ARMED copy (bindOnTrade, not yet stamped) may still trade
-// in person, where the stamp lands on the recipient, but it must never ride an
-// anonymous pipe where no stamp can land (a bind-on-trade windfall is not
-// resellable or mail-launderable).
+// The one per-copy lock rule is shared here so the two pipes can never
+// drift: an ARMED copy (bindOnTrade, not yet stamped) or a bound copy
+// (boundTo) never rides an anonymous pipe where no stamp can land (a
+// bind-on-trade windfall is not resellable or mail-launderable). trade.ts
+// keeps its own per-copy lock, isTradeLocked (boundTo only), so an armed
+// copy may still trade in person, where the stamp lands on the recipient.
+// trade.ts also carries a def-level exclusion of its own (RIFT_GEAR_ITEMS);
+// the pipes cover that family through each pipe's def-level rules instead
+// (every rift gear def carries noMarketList).
 //
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no rng, no clock
 // (enforced by tests/architecture.test.ts). Pure bookkeeping, zero draws.
