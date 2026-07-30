@@ -150,6 +150,7 @@ const SCENE_WALL_CLOCK_RE = /\b(?:performance\.now|Date\.now)\b|\bnew\s+Date\s*\
 const SCENE_PRESENTATION_CLOCK_FILES = [
   join(repoRoot, 'src', 'game', 'scene_director.ts'),
   join(repoRoot, 'src', 'game', 'scene_director_core.ts'),
+  join(repoRoot, 'src', 'game', 'scene_teardown_watchdog_core.ts'),
   join(repoRoot, 'src', 'ui', 'hud', 'scene', 'scene_controller.ts'),
   join(repoRoot, 'src', 'ui', 'hud', 'scene', 'scene_overlay_view.ts'),
   join(repoRoot, 'src', 'ui', 'hud', 'scene', 'scene_choice_view.ts'),
@@ -400,6 +401,12 @@ const UI_PURE_CORES = [
   'src/game/graphics_rebuild_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
+  // Last Bell scene playback core: lives in src/game (its consumer is the
+  // frame loop, not the HUD) but holds the same pure-core contract, like the
+  // two src/game entries above.
+  'src/game/scene_director_core.ts',
+  'src/game/scene_rig_core.ts',
+  'src/game/scene_teardown_watchdog_core.ts',
   'src/ui/trade_view.ts',
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
   'src/ui/safe_local_storage.ts',

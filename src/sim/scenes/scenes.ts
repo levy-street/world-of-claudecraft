@@ -70,6 +70,8 @@ export interface ScenePlayback {
   startedAt: number;
   /** Index-aligned with the def's ops (sorted by `at` at registration). */
   emitted: boolean[];
+  /** Every pid that received this playback's start op. */
+  startedAudience: Set<number>;
   skipRequested: Set<number>;
   /** Personal shared-world playback: the audience is exactly this player,
    * camera points are world coords, and actor ops are unavailable. */
@@ -104,7 +106,7 @@ function participants(ctx: SimContext, playback: ScenePlayback): Entity[] {
 export function sceneReconnectStateFor(ctx: SimContext, pid: number): SceneReconnectState | null {
   let active: ScenePlayback | null = null;
   for (const playback of ctx.scenePlaybacks.values()) {
-    if (!participants(ctx, playback).some((participant) => participant.id === pid)) continue;
+    if (!playback.startedAudience.has(pid)) continue;
     if (active === null || playback.startedAt >= active.startedAt) active = playback;
   }
   if (active === null) return null;
@@ -162,6 +164,7 @@ export function playSceneForPlayer(ctx: SimContext, pid: number, sceneId: string
     dungeonId: '',
     startedAt: ctx.time,
     emitted: def.ops.map(() => false),
+    startedAudience: new Set(),
     skipRequested: new Set(),
     audiencePid: pid,
   };
@@ -182,6 +185,7 @@ export function playScene(ctx: SimContext, claimId: number, sceneId: string): bo
     dungeonId: inst.dungeonId,
     startedAt: ctx.time,
     emitted: def.ops.map(() => false),
+    startedAudience: new Set(),
     skipRequested: new Set(),
   };
   ctx.scenePlaybacks.set(claimId, playback);
@@ -192,6 +196,46 @@ export function playScene(ctx: SimContext, claimId: number, sceneId: string): bo
 function emitToAudience(ctx: SimContext, playback: ScenePlayback, op: SceneWireOp): void {
   for (const p of participants(ctx, playback)) {
     ctx.emit({ type: 'scene', sceneId: playback.sceneId, op, pid: p.id });
+    if (op.kind === 'start') playback.startedAudience.add(p.id);
+  }
+}
+
+function emitTerminalToStartedAudience(
+  ctx: SimContext,
+  playback: ScenePlayback,
+  op: SceneWireOp,
+): void {
+  for (const pid of playback.startedAudience) {
+    ctx.emit({ type: 'scene', sceneId: playback.sceneId, op, pid });
+  }
+}
+
+export function isSceneTerminalTeardownOp(op: SceneWireOp): boolean {
+  switch (op.kind) {
+    case 'end':
+      return true;
+    case 'camera':
+      return op.shot.kind === 'release';
+    case 'letterbox':
+    case 'inputLock':
+      return !op.on;
+    case 'fade':
+      return op.to === 'clear';
+    case 'music':
+      return op.directive === 'resume';
+    default:
+      return false;
+  }
+}
+
+function emitResolvedOp(ctx: SimContext, playback: ScenePlayback, op: SceneWireOp): void {
+  if (isSceneTerminalTeardownOp(op)) {
+    emitTerminalToStartedAudience(ctx, playback, op);
+    return;
+  }
+  for (const participant of participants(ctx, playback)) {
+    if (!playback.startedAudience.has(participant.id)) continue;
+    ctx.emit({ type: 'scene', sceneId: playback.sceneId, op, pid: participant.id });
   }
 }
 
@@ -302,6 +346,7 @@ function resolveAndApply(
       const z = origin ? origin.z + op.to.z : op.to.z;
       const to = ctx.groundPos(x, z);
       for (const player of participants(ctx, playback)) {
+        if (!playback.startedAudience.has(player.id)) continue;
         if (applyOnly) {
           placePlayerAtWalkEndpoint(ctx, player, to);
         } else {
@@ -357,7 +402,7 @@ function finishScene(ctx: SimContext, playback: ScenePlayback, skipped: boolean)
   // End is unconditional teardown, including stale walk state whose player
   // entity disappeared before the endpoint could be placed.
   clearScriptedPlayerWalks(ctx, playback.claimId);
-  emitToAudience(ctx, playback, { kind: 'end' });
+  emitTerminalToStartedAudience(ctx, playback, { kind: 'end' });
   ctx.scenePlaybacks.delete(playback.claimId);
 }
 
@@ -367,7 +412,9 @@ export function requestSceneSkip(ctx: SimContext, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
   for (const playback of ctx.scenePlaybacks.values()) {
-    const audience = participants(ctx, playback);
+    const audience = participants(ctx, playback).filter((participant) =>
+      playback.startedAudience.has(participant.id),
+    );
     if (!audience.some((p) => p.id === r.meta.entityId)) continue;
     playback.skipRequested.add(r.meta.entityId);
     const living = audience.filter((p) => !p.dead);
@@ -388,6 +435,7 @@ export function updateScenes(ctx: SimContext): void {
     const def = sceneById(playback.sceneId);
     if (!def) {
       clearScriptedPlayerWalks(ctx, playback.claimId);
+      emitTerminalToStartedAudience(ctx, playback, { kind: 'end' });
       ctx.scenePlaybacks.delete(playback.claimId);
       continue;
     }
@@ -400,6 +448,7 @@ export function updateScenes(ctx: SimContext): void {
       );
     if (!claimAlive) {
       clearScriptedPlayerWalks(ctx, playback.claimId);
+      emitTerminalToStartedAudience(ctx, playback, { kind: 'end' });
       ctx.scenePlaybacks.delete(playback.claimId);
       continue;
     }
@@ -408,7 +457,7 @@ export function updateScenes(ctx: SimContext): void {
       if (playback.emitted[i] || def.ops[i].at > elapsed) continue;
       playback.emitted[i] = true;
       const wire = resolveAndApply(ctx, playback, def.ops[i], false);
-      if (wire) emitToAudience(ctx, playback, wire);
+      if (wire) emitResolvedOp(ctx, playback, wire);
     }
     if (elapsed >= def.duration) finishScene(ctx, playback, false);
   }

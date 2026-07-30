@@ -1892,6 +1892,7 @@ async function startGame(
     playDirective: (directive) => playSceneDirectiveSfx(directive),
     propCue: (target, cue, startSec) => cueHarborShip(target, cue, startSec),
     propReset: () => resetHarborShipCues(),
+    releaseInputLockMirror: () => online?.releaseSceneInputLockMirror(),
     attachmentFrame: (target, out) => harborShipAttachFrame(target, out),
     reducedMotion: () =>
       settings.get('reduceMotion') || (sceneReducedMotionMedia?.matches ?? false),
