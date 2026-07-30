@@ -1861,6 +1861,19 @@ export class Renderer {
     // first (a bounded reorder inside each zone build) rather than wherever
     // row-major order happens to reach them. (Sprite clouds are gone: the
     // per-biome HDRI skies carry the cloudscape now.)
+    // Dev-channel build-phase telemetry (English, console.info, Release-silent):
+    // the iPhone 17 Pro WebContent kill now lands INSIDE this constructor, after
+    // every preload completes, so localizing which build phase tips the memory
+    // ceiling requires a marker between phases. Wall-clock only, no allocation.
+    const bdStart = performance.now();
+    let bdLast = bdStart;
+    const bd = (phase: string): void => {
+      const now = performance.now();
+      console.info(
+        `[build-diag] ${phase} +${(now - bdLast).toFixed(0)}ms (total ${(now - bdStart).toFixed(0)}ms)`,
+      );
+      bdLast = now;
+    };
     this.terrainView = buildTerrain(this.sim.cfg.seed, {
       x: this.sim.player.pos.x,
       z: this.sim.player.pos.z,
@@ -1870,14 +1883,17 @@ export class Renderer {
     // Terrain chunks never move after build (the LOD update only toggles
     // visibility): stop their per-frame matrix recompose (static_matrix.ts).
     freezeStaticMatrices(this.terrainView.group);
+    bd('terrain');
     this.waterView = buildWater(this.sim.cfg.seed, this.webgl);
     setRenderCategory(this.waterView.group, 'water');
     this.scene.add(this.waterView.group);
     freezeStaticMatrices(this.waterView.group); // water animates via uniforms, never transforms
+    bd('water');
 
     this.foliage = buildFoliage(this.sim.cfg.seed);
     setRenderCategory(this.foliage.group, 'foliage');
     this.scene.add(this.foliage.group);
+    bd('foliage');
     this.fish = buildFish(this.sim.cfg.seed, (x, z, radius, strength) => {
       this.waterView.addSplash(x, z, radius, strength);
       const level = waterLevelAt(x, z);
@@ -1899,6 +1915,7 @@ export class Renderer {
     );
     setRenderCategory(props.group, 'props');
     this.scene.add(props.group);
+    bd('props');
     // The light budget must exist BEFORE any attachZoneFeature call: a static
     // feature that ships glowLights pushes into it during the loop below.
     this.fireLights = props.fireLights;
@@ -1932,6 +1949,7 @@ export class Renderer {
     // campfire flicker + ember pass.
     this.valeCupStadium = buildValeCupStadium(this.sim.cfg.seed);
     this.scene.add(this.valeCupStadium.group);
+    bd('vale-cup');
     // The private practice-pitch copy (shown at a far instance origin when the
     // local player is practicing; positioned/toggled by valeCupStadium.update).
     this.scene.add(this.valeCupStadium.practiceGroup);
@@ -1966,6 +1984,7 @@ export class Renderer {
     this.eastbrookTownView = buildEastbrookTownView(this.sim.cfg.seed);
     setRenderCategory(this.eastbrookTownView.group, 'props');
     this.scene.add(this.eastbrookTownView.group);
+    bd('eastbrook-town');
     freezeStaticMatrices(this.eastbrookTownView.group);
 
     // Map-editor play-test: freely placed GLB models (cosmetic, render-only). Loads
@@ -1989,6 +2008,7 @@ export class Renderer {
     // Baked into world space at build with no per-frame update(), same as props.
     freezeStaticMatrices(gatherNodes.group);
     this.gatherNodeMeshes = gatherNodes.group.children;
+    bd('jail-gather');
 
     // Crafting-station scenery (Professions 2.0): static, except the kitchens
     // fire, whose flame + light join the campfire flicker/ember pass above.
@@ -1999,6 +2019,7 @@ export class Renderer {
     for (const flame of stationProps.flames) flame.matrixAutoUpdate = true;
     this.flames.push(...stationProps.flames);
     this.fireLights.push(...stationProps.fireLights);
+    bd('stations');
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
