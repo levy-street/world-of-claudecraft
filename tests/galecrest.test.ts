@@ -36,9 +36,10 @@ describe('Galecrest zone registration', () => {
     expect(zoneAt(hub.x, hub.z).id).toBe('galecrest');
     expect(terrainHeight(hub.x, hub.z, SEED)).toBeGreaterThan(WATER_LEVEL);
     expect(terrainHeight(graveyard.x, graveyard.z, SEED)).toBeGreaterThan(WATER_LEVEL);
-    // GALECREST_QUEST_CAMPS is deliberately absent: the drowned deckhands
-    // stand in the Wreckfields surf below the waterline by design (they rise
-    // from their wrecks at low tide), so the dry-ground sweep excludes them.
+    // GALECREST_QUEST_CAMPS is deliberately absent: the drowned deckhand camp
+    // at (306, 618) stands in the Wreckfields surf below the waterline by
+    // design (they rise from their wrecks at low tide), so the dry-ground
+    // sweep excludes both deckhand camps rather than special-casing one.
     const allCamps = [...GALECREST_CAMPS, ...GALECREST_RESTORED_QUEST_CAMPS];
     for (const camp of allCamps) {
       expect(zoneAt(camp.center.x, camp.center.z).id).toBe('galecrest');

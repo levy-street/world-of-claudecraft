@@ -635,8 +635,8 @@ export const GALECREST_QUEST_CAMPS: CampDef[] = [
 // CAMPS array in data.ts (the same tail-append draw-order rule as above). The
 // wisps take back their original Mirror Tarn downs camp at (284, 578) plus the
 // freed ram spot on the Howling Downs; the scuttlers hold the cliff road by
-// the Shear, east of the stable paddock (STABLE_PADDOCK x2 = 426) and clear of
-// the coastline (galeLandness >= 0.57 at both centers).
+// the Shear, clear of the stable paddock (both centers at x > STABLE_PADDOCK
+// x2 = 426) and of the coastline (galeLandness >= 0.57 at both centers).
 export const GALECREST_RESTORED_QUEST_CAMPS: CampDef[] = [
   { mobId: 'gale_wisp', center: { x: 284, z: 578 }, radius: 10, count: 4 },
   { mobId: 'gale_wisp', center: { x: 250, z: 320 }, radius: 5, count: 2 },

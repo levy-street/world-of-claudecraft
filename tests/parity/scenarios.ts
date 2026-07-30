@@ -1564,8 +1564,9 @@ function masterLoot(): Scenario {
       'resolveLootRoll tie-break rng.int over tied need rolls',
     ],
     // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge, then
-    // 1326 -> 1488 by the v0.32.1 realm loot-table fill (the restored Galecrest
-    // quest camps append four world-gen draws at construction). This branch
+    // 1326 -> 1488 by the v0.32.1 realm loot-table fill (the four restored
+    // Galecrest quest camps spawn 12 mobs of construction-time world-gen
+    // draws, moving every later draw). This branch
     // never touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
     // here); its extra content just moves the shared rng before the rolls, and at
     // the old seed the need rolls stopped TYING. The tie is the whole point of the
@@ -4488,8 +4489,9 @@ function cardDuel(): Scenario {
 // realms), and again after the Eastbrook camp respacing thinned the zone-1 camp
 // counts (fewer camp mobs means fewer construction-time draws, which moves every
 // later draw). Re-hunted 10 -> 21 for the v0.32.1 realm loot-table fill (the
-// restored Galecrest quest camps append four world-gen draws at construction).
-// Spare seeds 29 and 35 were also verified to fire the proc for this drive.
+// four restored Galecrest quest camps spawn 12 mobs at construction, each
+// drawing world-gen rng, which moves every later draw). Spare seeds 29 and 35
+// were also verified to fire the proc for this drive.
 function professionsCraft(seed = 21): Scenario {
   return {
     name: 'professions_craft',
