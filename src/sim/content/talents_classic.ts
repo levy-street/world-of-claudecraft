@@ -269,8 +269,31 @@ const PRIEST_SPECS: SpecDef[] = [
     'A damage caster built around Shadow damage over time and mind spells.',
     'shadowform',
     'Gloamveil',
-    'Increases your damage-over-time damage by 15% and your spell damage by 10%.',
-    { global: { dotDmgPct: 0.15, spellDmgPct: 0.1 } },
+    'Increases your damage-over-time damage by 15% and your spell damage by 10%. Every 3rd Litany of Woe sounds a Dark Descant: 3 sec of Mindfracture cooldown is refunded and your next Mindfracture within 8 sec is instant.',
+    {
+      global: { dotDmgPct: 0.15, spellDmgPct: 0.1 },
+      // Dark Descant, the shadow tempo loop (2026-07 shadow-vs-casters
+      // rebalance): sustained Litany of Woe pressure hastens Mindfracture and
+      // makes the next one castable on the move. Lives on the mastery (the
+      // documented spec surface) because the spec-baseline table is pinned
+      // passive-only. The percent bonuses above level-scale via the mastery
+      // multiplier; a proc has no magnitude to scale, so it is simply active
+      // from spec unlock. castNth with no chance draws no rng.
+      proc: {
+        id: 'pri_shadow_dark_descant',
+        name: 'Dark Descant',
+        trigger: { on: 'castNth', n: 3, abilities: ['mind_flay'] },
+        responses: [
+          { kind: 'cooldownRefund', ability: 'mind_blast', seconds: 3 },
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_instant',
+            abilities: ['mind_blast'],
+            duration: 8,
+          },
+        ],
+      },
+    },
   ),
 ];
 

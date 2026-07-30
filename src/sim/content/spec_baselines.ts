@@ -120,6 +120,11 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ability: [
         { ability: 'shadow_word_pain', dmgPct: 0.24, costPct: -0.1 },
         { ability: 'mind_blast', dmgPct: 0.18, costPct: -0.1 },
+        // 2026-07 shadow-vs-casters rebalance: the filler carried zero baseline
+        // help while Dirge and Mindfracture did; it is 40% of shadow's output.
+        // (The Dark Descant proc from the same pass lives on the Gloamveil
+        // mastery, not here: this table is pinned passive-only.)
+        { ability: 'mind_flay', dmgPct: 0.15, costPct: -0.1 },
       ],
     },
   },

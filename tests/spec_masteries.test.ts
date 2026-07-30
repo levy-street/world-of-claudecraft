@@ -144,8 +144,25 @@ describe('spec masteries', () => {
     expect(TALENTS.priest?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
       global: { healPct: 0.2 },
     });
+    // 2026-07 shadow rebalance: the mastery also carries the Dark Descant
+    // proc (the flay-to-Mindfracture tempo loop); behavior pinned in
+    // tests/shadow_priest_rebalance.test.ts.
     expect(TALENTS.priest?.specs.find((s) => s.id === 'shadow')?.mastery.effect).toEqual({
       global: { dotDmgPct: 0.15, spellDmgPct: 0.1 },
+      proc: {
+        id: 'pri_shadow_dark_descant',
+        name: 'Dark Descant',
+        trigger: { on: 'castNth', n: 3, abilities: ['mind_flay'] },
+        responses: [
+          { kind: 'cooldownRefund', ability: 'mind_blast', seconds: 3 },
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_instant',
+            abilities: ['mind_blast'],
+            duration: 8,
+          },
+        ],
+      },
     });
     expect(TALENTS.shaman?.specs.find((s) => s.id === 'enhancement')?.mastery.effect).toEqual({
       global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 },

@@ -3545,6 +3545,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 55,
         effects: [{ type: 'dot', total: 84, duration: 18, interval: 3 }],
       },
+      // 2026-07 shadow-vs-casters rebalance: the missing level-20 cap rank
+      // (the healers-wave recipe: ~1.45x the prior top, cost ~1.3x, so damage
+      // per mana improves with the rank). Sub-cap ranks untouched, so leveling
+      // is unchanged; scripts/caster_dps_probe.ts anchors the value.
+      {
+        rank: 4,
+        level: 20,
+        cost: 72,
+        effects: [{ type: 'dot', total: 122, duration: 18, interval: 3 }],
+      },
     ],
     description: 'A word of darkness causes $d Shadow damage over 18 sec.',
   },
@@ -3644,6 +3654,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: true,
     effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0 }],
+    // 2026-07 shadow-vs-casters rebalance: the shadow filler's only rank was
+    // level 14, so it flatlined into the cap while every peer filler kept
+    // ranking. Cap rank per the healers-wave recipe (~1.4x, cost ~1.3x);
+    // scripts/caster_dps_probe.ts anchors the value.
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 58,
+        effects: [{ type: 'drainTick', min: 17, max: 17, healFrac: 0 }],
+      },
+    ],
     description:
       "Assaults the target's mind with Shadow energy, causing $d Shadow damage each second for 3 sec.",
   },
