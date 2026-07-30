@@ -3247,9 +3247,12 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // one that stopped refusing, moves one of them. The total is every subset of
     // every tagged template (it grew with the templates #1584 added), stated so a
     // shrunk sweep reads as wrong rather than merely smaller.
-    expect(spent).toBe(86);
+    // Spent rose 86 to 152 with the farm-economy pass, which gave 15 coinless
+    // trash templates their mapped harvest tags; refused is untouched because
+    // that arm counts all-unmapped corpses, which the pass did not add to.
+    expect(spent).toBe(152);
     expect(refused).toBe(16);
-    expect(spent + refused).toBe(102);
+    expect(spent + refused).toBe(168);
   });
 
   // The six mapped families and their item ids, spelled out. Deriving them from
@@ -3332,7 +3335,9 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // release's 35/92 together with this branch's extra mobs (the rift bestiary),
     // so the counts rise while the property above is what actually holds the line.
     expect(unmappedOffered).toBe(37);
-    expect(extracted).toBe(113);
+    // 113 to 217 for the same reason as the spend census above: more mapped
+    // families in the corpus, none of them unmapped, so only this half moves.
+    expect(extracted).toBe(217);
   });
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {
