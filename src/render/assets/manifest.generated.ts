@@ -302,7 +302,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/chars/players/rogue_male_v02.glb": "/media/models/chars/players/rogue_male_v02.76189bcf4a23.glb",
   "models/chars/players/rogue_mech.glb": "/media/models/chars/players/rogue_mech.0495f49e8acf.glb",
   "models/chars/players/shaman_lvl20.glb": "/media/models/chars/players/shaman_lvl20.5d3d4740857d.glb",
-  "models/chars/players/shaman_male_v02.glb": "/media/models/chars/players/shaman_male_v02.d2caec23d8c8.glb",
+  "models/chars/players/shaman_male_v02.glb": "/media/models/chars/players/shaman_male_v02.db92b86a996a.glb",
   "models/chars/players/shaman_mech.glb": "/media/models/chars/players/shaman_mech.62af83a89d91.glb",
   "models/chars/players/warlock_lvl20.glb": "/media/models/chars/players/warlock_lvl20.d0c7a51fb220.glb",
   "models/chars/players/warlock_male_v02.glb": "/media/models/chars/players/warlock_male_v02.b19af204126b.glb",
