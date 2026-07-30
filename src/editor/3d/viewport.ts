@@ -18,15 +18,26 @@ import { cueHarborShip, resetHarborShipCues } from '../../render/harbor';
 import { type SeatRegion, unionRegion } from '../../render/placed_assets';
 import { Renderer } from '../../render/renderer';
 import { FENCE_HALF_DEPTH } from '../../sim/colliders';
+import { PLAYER_START } from '../../sim/data';
+import {
+  RIDER_HARBOR_BY_TEMPLATE,
+  settledPlayerHarborForScene,
+  settledPlayerStartForScene,
+} from '../../sim/scenes/lint_core';
 import type { SceneDef } from '../../sim/scenes/registry';
 import { Sim } from '../../sim/sim';
 import { type BlockerDef, DT } from '../../sim/types';
-import { groundHeight, terrainHeight } from '../../sim/world';
+import { groundHeight, terrainHeight, WATER_LEVEL } from '../../sim/world';
 import {
   type CinematicCameraCapture,
   createCinematicCameraCapture,
 } from '../cinematic_capture_core';
-import { CinematicPanel } from '../cinematic_panel';
+import {
+  type CinematicGizmoEntity,
+  cinematicGizmoActorIds,
+  evaluateCinematicGizmoFrame,
+} from '../cinematic_gizmo_core';
+import { CinematicPanel, type CinematicPanelFrame } from '../cinematic_panel';
 import {
   type CinematicCameraPose,
   type CinematicScrubFrame,
@@ -35,6 +46,7 @@ import {
 } from '../cinematic_scrub_core';
 import { type CustomMap, customMapToWorldContent, placementsToRenderAssets } from '../custom_map';
 import { saveCinematicCameraCapture } from '../net';
+import { CinematicGizmoLayer } from './cinematic_gizmos';
 import { EditorCamera } from './editor_camera';
 
 export interface EditRegion {
@@ -109,6 +121,7 @@ export class Editor3DViewport {
     pos: new THREE.Vector3(),
     target: new THREE.Vector3(),
   };
+  private cinematicGizmos: CinematicGizmoLayer | null = null;
   private sim: Sim | null = null;
   private renderer: Renderer | null = null;
   private raf = 0;
@@ -220,12 +233,8 @@ export class Editor3DViewport {
       playerClass: 'warrior',
       world: { ...world, placements: undefined },
     });
-    // Polite far-vista pacing: this construction happens against live editor
-    // frames on every document load, never behind an opaque curtain, so the
-    // eager macrotask build lane must stay off (see RendererCreateOptions).
-    this.renderer = new Renderer(this.sim, this.canvas, this.nameplates, {
-      eagerFarVista: false,
-    });
+    this.renderer = new Renderer(this.sim, this.canvas, this.nameplates);
+    this.cinematicGizmos = new CinematicGizmoLayer(this.renderer.scene);
     this.renderer.placedAssets.rebuildAll(placementsToRenderAssets(this.map.placements), true);
     // A fresh build reflects the whole document: drop any hidden-time debts
     // (before the spawn ring below, which must build even while hidden).
@@ -659,6 +668,8 @@ export class Editor3DViewport {
     resetHarborShipCues();
     this.cinematicFrame = null;
     this.cinematicBaseSceneId = null;
+    this.cinematicGizmos?.dispose();
+    this.cinematicGizmos = null;
     if (this.renderer) {
       const renderer = this.renderer;
       renderer.editorCam = null;
@@ -683,7 +694,7 @@ export class Editor3DViewport {
 
   // ---- cinematic panel ----------------------------------------------------
 
-  private evaluateCinematicFrame(scene: SceneDef, timeSec: number): CinematicScrubFrame | null {
+  private evaluateCinematicFrame(scene: SceneDef, timeSec: number): CinematicPanelFrame | null {
     if (!this.sim) return null;
     if (this.cinematicBaseSceneId !== scene.id) {
       this.cinematicBaseSceneId = scene.id;
@@ -717,8 +728,44 @@ export class Editor3DViewport {
         frame.camera.target.z,
       );
     }
+    const actorIds = cinematicGizmoActorIds(scene);
+    const entities: CinematicGizmoEntity[] = [];
+    const settledPlayerHarbor = settledPlayerHarborForScene(scene.id);
+    const playerStart =
+      settledPlayerStartForScene(scene.id) ?? this.map.playerStart ?? PLAYER_START;
+    entities.push({
+      key: 'player',
+      label: 'player',
+      point: {
+        x: playerStart.x,
+        y: groundHeight(playerStart.x, playerStart.z, this.seed),
+        z: playerStart.z,
+      },
+      riderHarborId: settledPlayerHarbor?.id,
+    });
+    for (const entity of this.sim.entities.values()) {
+      const riderHarborId = RIDER_HARBOR_BY_TEMPLATE.get(entity.templateId);
+      const sceneActor = entity.squadActorId !== undefined && actorIds.has(entity.squadActorId);
+      if (riderHarborId === undefined && !sceneActor) continue;
+      entities.push({
+        key: `entity:${entity.id}`,
+        label:
+          entity.squadActorId !== undefined
+            ? `scene actor ${entity.squadActorId}`
+            : entity.templateId,
+        point: { ...entity.pos },
+        riderHarborId,
+      });
+    }
+    const gizmoFrame = evaluateCinematicGizmoFrame(scene, frame, {
+      seed: this.seed,
+      waterLevel: this.map.waterLevel ?? WATER_LEVEL,
+      entities,
+      terrainHeight,
+    });
+    this.cinematicGizmos?.update(gizmoFrame);
     this.hooks.onCinematicFrame?.(frame.timeSec, scene);
-    return frame;
+    return { ...frame, violations: gizmoFrame.violations };
   }
 
   private setCinematicCameraEnabled(on: boolean): void {
