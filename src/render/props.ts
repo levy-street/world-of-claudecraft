@@ -522,10 +522,10 @@ function convertMaterial(
 ): THREE.Material {
   const s = src as THREE.MeshStandardMaterial; // basic (unlit) shares the fields we read
   const ov = MAT_OVERRIDES[`${kit}:${s.name}`] ?? MAT_OVERRIDES[s.name];
-  // hasVertexColors must key the cache: kits share material names between
-  // COLOR_0 meshes (trim 'Vertex' props) and colorless ones — a shared
-  // vertexColors:true material would render the colorless meshes black
-  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}`;
+  // hasVertexColors and side must key the cache: kits share material names
+  // between COLOR_0 meshes (trim 'Vertex' props) and colorless ones, and GLBs
+  // may reuse a name for both single-sided and double-sided surfaces.
+  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${s.side}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}`;
   const cached = matConvCache.get(key);
   if (cached) return cached;
   const color =
@@ -574,6 +574,8 @@ function convertMaterial(
   matConvCache.set(key, mat);
   return mat;
 }
+
+export const propMaterialInternalsForTest = { convertMaterial };
 
 /** parts of a loaded asset, world-baked (incl. yaw), origin centered at the
  *  footprint center with min-y at 0, materials converted + deduped.
