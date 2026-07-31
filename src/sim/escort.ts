@@ -177,15 +177,6 @@ function fireAmbushes(ctx: SimContext, def: EscortDef, state: EscortRunState, np
       // ambushIds' live count and wedge (or re-attack) a still-walking run.
       mob.summonedAdd = true;
       ctx.addEntity(mob);
-      // A wave mob belongs to the RUN, not to the world: it was never placed by
-      // a CAMP, so it must never respawn in place. Without this a killed
-      // ambusher came back as a permanent orphan spawn (handleDeath gives every
-      // mob a respawnTimer and updateMob revives it), so each run silently added
-      // its whole wave to the zone forever. That is the mob-pile players
-      // reported along the escort routes in the July zones.
-      // It also keeps the walk honest: a wave that revived mid-run would make
-      // liveAmbushCount non-zero again and pause the escortee indefinitely.
-      mob.runScoped = true;
       // Commit the wave to the escortee, social_aggro-style; player damage
       // out-threats the seed immediately via the normal pull-over rules.
       mob.aiState = 'chase';
