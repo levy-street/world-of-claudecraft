@@ -46,6 +46,9 @@ describe('heroic tuning data contract', () => {
       'hollow_crypt',
       'nythraxis_boss_arena',
       'sunken_bastion',
+      'undermount_wing1',
+      'undermount_wing2',
+      'undermount_wing3',
       'wildheart_basin',
     ]);
     expect(
@@ -57,6 +60,9 @@ describe('heroic tuning data contract', () => {
       gravewyrm_sanctum: 'korzul_the_gravewyrm',
       wildheart_basin: 'wildheart_high_priest',
       nythraxis_boss_arena: 'nythraxis_scourge_of_thornpeak',
+      undermount_wing1: 'saan_the_stoker',
+      undermount_wing2: 'odrenn_the_temperer',
+      undermount_wing3: 'volzharr_buried_furnace',
     });
     for (const tuning of Object.values(HEROIC_DUNGEON_TUNING)) {
       expect(tuning.level).toBe(22);
@@ -75,6 +81,9 @@ describe('heroic tuning data contract', () => {
       gravewyrm_sanctum: 1,
       wildheart_basin: 1,
       nythraxis_boss_arena: 3,
+      undermount_wing1: 3,
+      undermount_wing2: 3,
+      undermount_wing3: 3,
     });
   });
 
@@ -111,6 +120,9 @@ describe('heroic tuning data contract', () => {
       // summoned 250 floor through damageMultiplierByMob, so the raid's
       // addDamageMultiplier stays an inert mirror of damageMultiplier.
       nythraxis_boss_arena: [3.2, 7.25, 7.25, 1.2],
+      undermount_wing1: [3.2, 7.25, 7.25, 1.2],
+      undermount_wing2: [3.2, 7.25, 7.25, 1.2],
+      undermount_wing3: [3.2, 7.25, 7.25, 1.2],
     });
   });
 });
@@ -243,6 +255,10 @@ describe('boss templates are CC and snare immune on BOTH difficulties', () => {
       'ysolei',
       'korzul_the_gravewyrm',
       'nythraxis_scourge_of_thornpeak',
+      'vosh_the_glazier',
+      'saan_the_stoker',
+      'odrenn_the_temperer',
+      'volzharr_buried_furnace',
     ].sort();
     const instanceTemplates = [
       ...Object.values(DUNGEON_MOBS),

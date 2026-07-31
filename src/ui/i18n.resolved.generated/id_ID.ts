@@ -9741,6 +9741,111 @@ export const id_ID: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Sepatu Baja Tempa Terak"
+      },
+      "glasswalker_treads": {
+        "name": "Sepatu Penapak Kaca"
+      },
+      "twice_fired_slippers": {
+        "name": "Selop Bakar Dua Kali"
+      },
+      "stokebrand_striders": {
+        "name": "Sepatu Cap Pengobar"
+      },
+      "saans_stoking_iron": {
+        "name": "Besi Pengobar Saan"
+      },
+      "glassblowers_shiv": {
+        "name": "Belati Peniup Kaca"
+      },
+      "sluicebearer": {
+        "name": "Pembawa Pintu Air"
+      },
+      "cindertoad_signet": {
+        "name": "Cincin Meterai Katak Bara"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Cincin Pendinginan Pertama"
+      },
+      "coalglow_band": {
+        "name": "Cincin Cahaya Arang"
+      },
+      "crownforged_warleggings": {
+        "name": "Celana Perang Tempaan Mahkota"
+      },
+      "nighttalon_prowlers": {
+        "name": "Sepatu Pengendap Cakar Malam"
+      },
+      "soulflame_kilt": {
+        "name": "Rok Api Jiwa"
+      },
+      "stormcallers_legwraps": {
+        "name": "Balutan Kaki Pemanggil Badai"
+      },
+      "the_even_temper": {
+        "name": "Temperamen Seimbang"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Busur Bara, Tongkat Odrenn"
+      },
+      "twicetempered_girdle": {
+        "name": "Sabuk Tempa Ganda"
+      },
+      "ashwalk_sandals": {
+        "name": "Sandal Penapak Abu"
+      },
+      "quenchsilk_cord": {
+        "name": "Tali Sutra Pendingin"
+      },
+      "slakeleather_belt": {
+        "name": "Sabuk Kulit Pendingin"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Pelindung Dada Tempa Mahkota"
+      },
+      "nighttalon_emberweave": {
+        "name": "Tenun Bara Cakar Malam"
+      },
+      "soulflame_vestments": {
+        "name": "Jubah Api Jiwa"
+      },
+      "stormcallers_hauberk": {
+        "name": "Baju Zirah Pemanggil Badai"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Batu Buku Jari Volzharr"
+      },
+      "magmastrider_greaves": {
+        "name": "Pelindung Kaki Pelangkah Magma"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Balutan Kaki Lantai yang Bangkit"
+      },
+      "forgeheat_cinch": {
+        "name": "Ikat Pinggang Panas Tempa"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Pemecah Inti, Jantung Bawah Gunung"
+      },
+      "the_last_restraint": {
+        "name": "Kekang Terakhir"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Cincin Pendinginan Kesembilan"
+      },
+      "moltenheart_chroma": {
+        "name": "Jantung Lebur"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -10682,6 +10787,24 @@ export const id_ID: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Bencana Thornpeak"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Arwah Buku Catatan"
       },
@@ -11233,6 +11356,11 @@ export const id_ID: EnTranslations = {
         "name": "Pengintai Maren",
         "title": "Pengintai Marsekal",
         "greeting": "Langkah senyap dan pedang pendek membuatmu tetap bernapas di sini. Bicara cepat - aku harus segera kembali ke rerumputan rawa."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Kapten Thessaly",
@@ -12028,6 +12156,42 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vael sang Fogbinder dibunuh"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const id_ID: EnTranslations = {
         "enterText": "Kau melewati pintu kerajaan yang tersegel.",
         "leaveText": "Kau kembali ke udara dingin Thornpeak."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "Cekungan Hati Liar",
         "enterText": "Hujan hangat mendesis di atas batu tua. Wildheart Basin terbuka di hadapanmu.",
@@ -14367,7 +14546,8 @@ export const id_ID: EnTranslations = {
         "name": "Regalia Bonewrought",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
         "bonus3": "Meningkatkan kekuatan sebesar 15, stamina sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
-        "bonus4": "Serangan kritis senjatamu menyerpihkan target dengan Serpih Tulang, membuatnya berdarah sebesar 8 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
+        "bonus4": "Serangan kritis senjatamu menyerpihkan target dengan Serpih Tulang, membuatnya berdarah sebesar 8 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.",
+        "bonus5": "Meningkatkan peluang serangan kritis sebesar 3%."
       },
       "deathlord": {
         "name": "Perlengkapan Tempur Barrowlord",
@@ -14389,19 +14569,22 @@ export const id_ID: EnTranslations = {
         "name": "Perlengkapan Kulit Direfang",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
         "bonus3": "Meningkatkan kelincahan sebesar 15, peluang kritis sebesar 2%, serta kecepatan serangan dan rapal sebesar 15%.",
-        "bonus4": "Serangan kritis senjatamu mengoyakkan Cabikan Kasar, membuat target berdarah sebesar 6 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
+        "bonus4": "Serangan kritis senjatamu mengoyakkan Cabikan Kasar, membuat target berdarah sebesar 6 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.",
+        "bonus5": "Meningkatkan peluang serangan kritis sebesar 3%."
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
         "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
         "bonus3": "Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
-        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik."
+        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik.",
+        "bonus5": "Meningkatkan peluang serangan kritis mantra sebesar 3%."
       },
       "stormcallers": {
         "name": "Jubah Galecall",
         "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
         "bonus3": "Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
-        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik."
+        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik.",
+        "bonus5": "Meningkatkan peluang serangan kritis mantra sebesar 3%."
       },
       "vale_arcanist": {
         "name": "Perlengkapan Arkanis Lembah",

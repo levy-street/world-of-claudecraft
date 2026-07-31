@@ -405,4 +405,46 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(signedUnits).toBeGreaterThanOrEqual(rareGather!.qty);
     expect(signed.length).toBeLessThanOrEqual(Math.ceil(signedUnits / 20));
   });
+
+  it('undermount_volzharr: vents, ember consume, Eruption, and scheduler all fire', () => {
+    const scenario = SCENARIOS.find((entry) => entry.name === 'undermount_volzharr')!;
+    const { rec, trace } = record(scenario);
+    const notes = rec.notes as Record<string, any>;
+    const bossId = notes.bossId as number;
+    const cinderlingIds = notes.cinderlingIds as number[];
+    const pull = trace.frames.find((frame) => frame.label === 'volzharr-pull');
+    const trackedCinderlings = (pull?.entities as Ev[] | undefined)?.filter(
+      (entity) => entity.templateId === 'undermount_cinderling',
+    );
+    const windup = rec.allEvents.filter(
+      (event: Ev) => event.type === 'spellfx' && event.sourceId === bossId && event.fx === 'windup',
+    );
+    const eruptionDamage = rec.allEvents.filter(
+      (event: Ev) =>
+        event.type === 'damage' &&
+        event.sourceId === bossId &&
+        event.ability === 'Undermount Eruption',
+    );
+
+    expect(notes.ventCount).toBe(1);
+    expect(notes.ventPulseTimerAfter).toBeCloseTo(0.95, 5);
+    expect(notes.ventPulseInterval).toBe(1);
+    expect(notes.ventPulseDamage).toEqual([15, 15]);
+    expect(cinderlingIds).toHaveLength(8);
+    expect(new Set(cinderlingIds).size).toBe(8);
+    expect(trackedCinderlings).toHaveLength(8);
+    expect(cinderlingIds).toContain(notes.shamblerId);
+    expect(notes.shamblerMoved).toBe(true);
+    expect(notes.shamblerConsumed).toBe(true);
+    expect(notes.emberfeedStacks).toBe(1);
+    expect(notes.eruptionWindups).toBe(1);
+    expect(windup).toHaveLength(1);
+    expect(notes.tremorSuppressedDuringEruption).toBe(true);
+    expect(notes.eruptionDamageEvents).toBe(eruptionDamage.length);
+    expect(eruptionDamage.length).toBeGreaterThanOrEqual(1);
+    expect(notes.eruptTelegraphUntil).toBe(0);
+    expect(notes.tremorSuppressedAfterEruption).toBe(false);
+    expect(notes.tremorTimerAfterEruption).toBeCloseTo(0.4, 5);
+    expect(notes.eruptTimerAfterEruption).toBeCloseTo(41.9, 5);
+  });
 });

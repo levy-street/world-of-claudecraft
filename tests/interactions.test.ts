@@ -9,6 +9,7 @@ import {
   isAttackHoverTarget,
   shouldApproachPickedEntity,
 } from '../src/game/interactions';
+import { YUMI_MAZE_X } from '../src/sim/data';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
 
 function stubEntity(partial: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
@@ -178,7 +179,7 @@ describe('activePvpOpponentIds', () => {
       entityId,
       hp: 5000,
       maxHp: 5000,
-      x: 8400,
+      x: YUMI_MAZE_X,
       z: -1250,
       alive: true,
     });

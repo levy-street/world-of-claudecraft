@@ -1046,6 +1046,11 @@ export const VOICE_ALIAS = {
   brother_aldric_raid: 'brother_aldric',
   scout_maren_highwatch: 'scout_maren',
   brother_halven_marsh: 'brother_halven',
+  // Interim reuse, not a recurring character: the Undermount dig narrator
+  // speaks with the Thornpeak loremaster's dry scholar voice until a bespoke
+  // Maerin voice is designed at release (voice design needs the ElevenLabs
+  // key; see gen_npc_voices.mjs). Replace with a VOICE_PROMPTS entry then.
+  runeseeker_maerin: 'loremaster_caddis',
 };
 
 /** Resolve any NPC content id to the id of the voice that should speak for it. */

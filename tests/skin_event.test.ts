@@ -5,6 +5,8 @@ import {
   EVENT_SKIN_TIERS,
   EVENT_SKIN_TOKEN_ID,
   MECH_CHROMAS,
+  MOLTENHEART_CHROMA_ID,
+  MOLTENHEART_CHROMA_ITEM_ID,
   mechChromaItemId,
   rankAllowsSkin,
   rollSkinRank,
@@ -145,6 +147,23 @@ describe('cosmetic skin-select event', () => {
     expect(sim.player.skin).toBe(0);
     expect(sim.player.skinCatalog).toBe('mech');
     expect(sim.countItem('amber_crimson_armor_plate')).toBe(0);
+  });
+
+  it('consumes Moltenheart to unlock Imperial Crimson and can return and reuse it', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'shaman', playerName: 'Moltenheart' });
+    expect(mechChromaItemId(MOLTENHEART_CHROMA_ID)).toBe(MOLTENHEART_CHROMA_ITEM_ID);
+    sim.addItem(MOLTENHEART_CHROMA_ITEM_ID, 1);
+
+    sim.useItem(MOLTENHEART_CHROMA_ITEM_ID);
+
+    expect(sim.accountCosmetics.mechChromaIds).toContain(MOLTENHEART_CHROMA_ID);
+    expect(sim.player.skinCatalog).toBe('mech');
+    expect(sim.countItem(MOLTENHEART_CHROMA_ITEM_ID)).toBe(0);
+    expect((sim as any).unequipMechChroma(MOLTENHEART_CHROMA_ID)).toBe(true);
+    expect(sim.countItem(MOLTENHEART_CHROMA_ITEM_ID)).toBe(1);
+    sim.useItem(MOLTENHEART_CHROMA_ITEM_ID);
+    expect(sim.accountCosmetics.mechChromaIds).toContain(MOLTENHEART_CHROMA_ID);
+    expect(sim.countItem(MOLTENHEART_CHROMA_ITEM_ID)).toBe(0);
   });
 
   it('unequips a mech cosmetic account-wide and returns the specific item', () => {

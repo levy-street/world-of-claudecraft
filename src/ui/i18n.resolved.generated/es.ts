@@ -9741,6 +9741,111 @@ export const es: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Escarpes Templados en Escoria"
+      },
+      "glasswalker_treads": {
+        "name": "Botas Caminacristal"
+      },
+      "twice_fired_slippers": {
+        "name": "Zapatillas de Doble Cocción"
+      },
+      "stokebrand_striders": {
+        "name": "Botas Marca de Ascua"
+      },
+      "saans_stoking_iron": {
+        "name": "Atizador de Saan"
+      },
+      "glassblowers_shiv": {
+        "name": "Navaja del Soplador de Vidrio"
+      },
+      "sluicebearer": {
+        "name": "Portador de la Esclusa"
+      },
+      "cindertoad_signet": {
+        "name": "Sello del Sapo de Ascua"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Anillo del Primer Temple"
+      },
+      "coalglow_band": {
+        "name": "Sortija de Rescoldo"
+      },
+      "crownforged_warleggings": {
+        "name": "Perneras de guerra Forjacorona"
+      },
+      "nighttalon_prowlers": {
+        "name": "Botas de Acecho Garra Nocturna"
+      },
+      "soulflame_kilt": {
+        "name": "Falda Llama de Alma"
+      },
+      "stormcallers_legwraps": {
+        "name": "Vendas de piernas del Invocatormentas"
+      },
+      "the_even_temper": {
+        "name": "El Temple Sereno"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Arco de Ascua, vara de Odrenn"
+      },
+      "twicetempered_girdle": {
+        "name": "Cinturón de Doble Temple"
+      },
+      "ashwalk_sandals": {
+        "name": "Sandalias Caminaceniza"
+      },
+      "quenchsilk_cord": {
+        "name": "Cordón de Seda Templada"
+      },
+      "slakeleather_belt": {
+        "name": "Cinturón de Cuero Templado"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Coraza Forjacorona"
+      },
+      "nighttalon_emberweave": {
+        "name": "Tejido de Ascuas Garranocturna"
+      },
+      "soulflame_vestments": {
+        "name": "Vestiduras Llama de Alma"
+      },
+      "stormcallers_hauberk": {
+        "name": "Camisote del Invocatormentas"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Piedra de Nudillos de Volzharr"
+      },
+      "magmastrider_greaves": {
+        "name": "Grebas Zancamagma"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Vendas del Suelo Despierto"
+      },
+      "forgeheat_cinch": {
+        "name": "Faja de Calor de Forja"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Rompenúcleos, Corazón de la Submontaña"
+      },
+      "the_last_restraint": {
+        "name": "La Última Atadura"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Sortija de la Novena Templanza"
+      },
+      "moltenheart_chroma": {
+        "name": "Corazón Fundido"
+      },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"
       },
@@ -10682,6 +10787,24 @@ export const es: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Azote de Thornpeak"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Espectro del registro"
       },
@@ -11233,6 +11356,11 @@ export const es: EnTranslations = {
         "name": "Exploradora Maren",
         "title": "Exploradora del mariscal",
         "greeting": "Pies silenciosos y una hoja corta te mantienen con vida. Habla rápido: debo volver a los juncos."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Capitana Thessaly",
@@ -12028,6 +12156,42 @@ export const es: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vael el Fogbinder abatido"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const es: EnTranslations = {
         "enterText": "Cruzas la puerta real sellada.",
         "leaveText": "Regresas al aire frío de Thornpeak."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "La Cuenca del Corazón Salvaje",
         "enterText": "Una lluvia cálida sisea sobre piedra vieja. El Wildheart Basin se abre ante ti.",
@@ -14367,7 +14546,8 @@ export const es: EnTranslations = {
         "name": "Equipo de batalla Bonewrought",
         "bonus2": "Aumenta el poder de ataque en 40.",
         "bonus3": "Aumenta la fuerza en 15, el aguante en 15 y la velocidad de ataque y de lanzamiento en 15%.",
-        "bonus4": "Tus golpes críticos con el arma astillan al objetivo con Astilla de Hueso, haciéndolo sangrar 8 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces."
+        "bonus4": "Tus golpes críticos con el arma astillan al objetivo con Astilla de Hueso, haciéndolo sangrar 8 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.",
+        "bonus5": "Aumenta un 3 % la probabilidad de golpe crítico."
       },
       "deathlord": {
         "name": "Equipo de batalla de Barrowlord",
@@ -14389,19 +14569,22 @@ export const es: EnTranslations = {
         "name": "Atuendo de cuero Direfang",
         "bonus2": "Aumenta el poder de ataque en 40.",
         "bonus3": "Aumenta la agilidad en 15, la probabilidad de crítico en 2% y la velocidad de ataque y de lanzamiento en 15%.",
-        "bonus4": "Tus golpes críticos con el arma abren un Tajo Desgarrado, haciendo sangrar al objetivo 6 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces."
+        "bonus4": "Tus golpes críticos con el arma abren un Tajo Desgarrado, haciendo sangrar al objetivo 6 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.",
+        "bonus5": "Aumenta un 3 % la probabilidad de golpe crítico."
       },
       "soulflame": {
         "name": "Vestiduras de Wraithfire",
         "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus3": "Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.",
-        "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s."
+        "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s.",
+        "bonus5": "Aumenta un 3 % la probabilidad de golpe crítico con hechizos."
       },
       "stormcallers": {
         "name": "Vestiduras de Galecall",
         "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus3": "Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.",
-        "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s."
+        "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s.",
+        "bonus5": "Aumenta un 3 % la probabilidad de golpe crítico con hechizos."
       },
       "vale_arcanist": {
         "name": "Vestiduras del Arcanista del Valle",

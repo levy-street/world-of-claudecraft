@@ -43,6 +43,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   direfang_greatblade: 'sword',
   hoarfrost_edge: 'sword',
   wildheart_tuskblade: 'sword',
+  corebreaker_heart_of_the_undermount: 'sword',
   // Daggers
   rusty_dagger: 'dagger',
   whetted_iron_dirk: 'dagger',
@@ -73,6 +74,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   duskfang_dirk: 'dagger',
   wildheart_fangknife: 'dagger',
   voidsong_dirk: 'dagger',
+  glassblowers_shiv: 'dagger',
   // Maces
   training_mace: 'mace',
   copper_flanged_mace: 'mace',
@@ -90,6 +92,8 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   gravewyrm_thornmaul: 'mace',
   maul_of_the_scourged_wilds: 'mace',
   wildsoul_maul: 'mace',
+  sluicebearer: 'mace',
+  the_even_temper: 'mace',
   // Axes
   rusty_hatchet: 'axe',
   copper_bearded_axe: 'axe',
@@ -128,6 +132,8 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   nightfangs_greatstaff: 'staff',
   gleamwood_stave: 'staff',
   wildheart_hexwood_staff: 'staff',
+  saans_stoking_iron: 'staff',
+  the_last_restraint: 'staff',
   // Wands
   drowned_tide_scepter: 'wand',
   palecoil_rod: 'wand',
@@ -136,6 +142,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   nhalias_litany_rod: 'wand',
   scepter_of_the_deathless_court: 'wand',
   stormcallers_focus: 'wand',
+  cinderarc_odrenns_rod: 'wand',
   // Polearms (no skins target these)
   tidereaver_gaff: 'polearm',
   ironbark_boar_spear: 'polearm',

@@ -36,6 +36,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   bonewrought_greatsword: 'adv_sword_2handed_color', // EPIC: Nythraxis raid 2H
   direfang_greatblade: 'adv_sword_2handed_color', // EPIC: Nythraxis hunter 2H
   wildheart_tuskblade: 'adv_sword_2handed_color',
+  corebreaker_heart_of_the_undermount: 'adv_sword_2handed_color',
 
   // ---- daggers (only 4 models for ~21 daggers; spread as evenly as art allows)-
   rusty_dagger: 'dagger_a',
@@ -67,6 +68,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   mistcallers_fang: 'adv_dagger', // EPIC: Heroic Vael dagger
   wildheart_fangknife: 'adv_dagger',
   voidsong_dirk: 'adv_dagger', // LEGENDARY: the S-rift caster dirk
+  glassblowers_shiv: 'adv_dagger',
 
   // ---- staves (staff_a..d + adv_staff + adv_druid_staff) ----------------------
   gnarled_staff: 'staff_a',
@@ -94,6 +96,8 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   emberglass_warstaff: 'adv_staff', // WARFARE caster main hand
   lunar_tide_greatstaff: 'adv_staff', // EPIC: Heroic Ysolei staff
   wildheart_hexwood_staff: 'adv_druid_staff',
+  saans_stoking_iron: 'adv_staff',
+  the_last_restraint: 'adv_staff',
 
   // ---- wands (1H caster: scepters / rods / foci) ------------------------------
   drowned_tide_scepter: 'wand_a',
@@ -103,6 +107,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   nhalias_litany_rod: 'wand_b',
   stormcallers_focus: 'wand_b', // EPIC: Nythraxis raid caster focus
   scepter_of_the_deathless_court: 'adv_wand', // EPIC: Nythraxis raid scepter
+  cinderarc_odrenns_rod: 'adv_wand',
 
   // ---- maces (only 4 hammer models for ~9 maces) -----------------------------
   training_mace: 'hammer_a',
@@ -121,6 +126,8 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   gravewyrm_thornmaul: 'hammer_d', // feral ladder maul
   maul_of_the_scourged_wilds: 'hammer_d', // feral ladder, Nythraxis raid rung
   wildsoul_maul: 'hammer_d', // feral ladder, heroic-only ilvl 31 rung
+  sluicebearer: 'hammer_c',
+  the_even_temper: 'hammer_d',
 
   // ---- axes (axe_a..d + adv axes) --------------------------------------------
   rusty_hatchet: 'axe_a',

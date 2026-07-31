@@ -58,9 +58,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 225 deeds worth 2760 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(225);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2760);
+  it('ships exactly 232 deeds worth 2875 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(232);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2875);
   });
 
   it('ships the audited per-category counts', () => {
@@ -69,7 +69,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(byCategory).toEqual({
       progression: 50,
       combat: 10,
-      dungeon: 29,
+      dungeon: 36,
       delve: 13,
       chronicle: 28,
       collection: 28,
@@ -130,7 +130,64 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'chr_peaks_rares_ii',
       'chr_gleamstag',
       'chr_hollow_rares',
+      // The Undermount raid deeds append after the current release tail.
+      'dgn_undermount_kiln_keepers',
+      'dgn_undermount_kiln_keepers_heroic',
+      'dgn_undermount_odrenn',
+      'dgn_undermount_odrenn_heroic',
+      'dgn_undermount_volzharr',
+      'dgn_undermount_full_descent',
+      'dgn_undermount_volzharr_heroic',
     ]);
+    expect(DEEDS.dgn_undermount_kiln_keepers.renown).toBe(10);
+    expect(DEEDS.dgn_undermount_kiln_keepers.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'undermount_wing1',
+      count: 1,
+    });
+    expect(DEEDS.dgn_undermount_kiln_keepers_heroic.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'undermount_wing1',
+      difficulty: 'heroic',
+      count: 1,
+    });
+    expect(DEEDS.dgn_undermount_odrenn.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'undermount_wing2',
+      count: 1,
+    });
+    expect(DEEDS.dgn_undermount_odrenn_heroic.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'undermount_wing2',
+      difficulty: 'heroic',
+      count: 1,
+    });
+    expect(DEEDS.dgn_undermount_volzharr).toMatchObject({
+      renown: 25,
+      trigger: { kind: 'dungeonClears', dungeonId: 'undermount_wing3', count: 1 },
+      reward: { kind: 'title', text: 'the Mountainbreaker' },
+    });
+    expect(DEEDS.dgn_undermount_full_descent).toMatchObject({
+      renown: 25,
+      trigger: {
+        kind: 'meta',
+        deedIds: [
+          'dgn_undermount_kiln_keepers',
+          'dgn_undermount_odrenn',
+          'dgn_undermount_volzharr',
+        ],
+        raidLockoutIds: ['undermount_wing1', 'undermount_wing2', 'undermount_wing3'],
+      },
+    });
+    expect(DEEDS.dgn_undermount_volzharr_heroic).toMatchObject({
+      renown: 25,
+      trigger: {
+        kind: 'dungeonClears',
+        dungeonId: 'undermount_wing3',
+        difficulty: 'heroic',
+        count: 1,
+      },
+    });
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin.trigger).toEqual({
@@ -305,14 +362,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.prog_ringwright).toBeUndefined();
   });
 
-  it('ships exactly 30 titles and 3 borders', () => {
+  it('ships exactly 31 titles and 3 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    expect(titles.length).toBe(30);
+    expect(titles.length).toBe(31);
     expect(borders.length).toBe(3);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(30);
+    expect(new Set(titleTexts).size).toBe(31);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual(['curators_gilt', 'deepward', 'prestige_laurels']);
   });
@@ -357,7 +414,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Marrowshell, Aurelhorn), all uncredited camp rares found by the same
   // coverage test after rebasing onto release/v0.33.0. No shipped trigger or
   // renown changed.
-  const FROZEN_CATALOG_SHA256 = '15329b9c0bed71a46d009cb9dbe38db889dd55b235682f88001b775ae2c41fd1';
+  // Re-baselined for seven appended Undermount raid deeds after that release
+  // tail. No shipped trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '6d5f2532b39205e8733d68f731cd62cd69e6859c8c7c6e11026890732f3dd605';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -451,19 +510,21 @@ describe('retro fallback proof sets stay anchored to the real tables', () => {
     expect(retroArm).toContain("'prog_guildsworn'");
   });
 
-  it('the creditable mob-level ceiling is the S-rank rift pin', () => {
+  it('the creditable mob-level ceiling is the Undermount capstone pin', () => {
     // Giantslayer's stranded heal keys on the highest level a creditable mob
-    // can ever spawn at. S-rank rift floors run mobs up to RIFT_MAX_MOB_LEVEL
-    // (the game-wide ceiling; at 23 the +5-level kill is out of reach at the
-    // level-20 cap, so capped players take the stranded retro-grant instead);
-    // heroic instances pin every mob to one shared level below it; outside
-    // those no spawnable template exceeds the player cap. The only templates
-    // authored above the ceiling can never be credited: warlock and mage pets
-    // sync to their owner's level and die outside kill credit (combat/damage.ts
-    // owned-pet early return), and the Yumi cat's damage is intercepted before
-    // the death path (social/yumi.ts).
+    // can ever spawn at. The Undermount raid capstone (Volzharr, level 26) is
+    // the game-wide ceiling, which keeps the +5-level kill reachable at the
+    // level-20 cap (no stranded retro-grant). Below it: S-rank rift floors run
+    // mobs up to RIFT_MAX_MOB_LEVEL (23), heroic instances pin every mob to
+    // one shared level below that, and outside those no spawnable template
+    // exceeds the raid tier. The only templates authored above the player cap
+    // that can never be credited: warlock and mage pets sync to their owner's
+    // level and die outside kill credit (combat/damage.ts owned-pet early
+    // return), and the Yumi cat's damage is intercepted before the death path
+    // (social/yumi.ts).
     const heroicLevels = Object.values(HEROIC_DUNGEON_TUNING).map((t) => t.level);
-    expect(RIFT_MAX_MOB_LEVEL).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    expect(MOBS.volzharr_buried_furnace.maxLevel).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    expect(RIFT_MAX_MOB_LEVEL).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
     expect(Math.max(...heroicLevels)).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
     expect(RIFT_LEVEL_CAP).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
     const neverCreditable = new Set([
@@ -546,12 +607,12 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and chr_peaks_rares_ii
-    // closes the tail, and either moving would signal a reorder
+    // literals: prog_first_steps opens the catalog and the final Undermount
+    // heroic deed closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_hollow_rares');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_undermount_volzharr_heroic');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

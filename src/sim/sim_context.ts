@@ -578,6 +578,7 @@ export interface SimContextCallbacks {
   delveRunForMob(mobId: number): DelveRun | null;
   onDelveBossDefeated(run: DelveRun): void;
   grantNythraxisLockout(boss: Entity): void;
+  onUndermountBossDeath(boss: Entity): void;
   frenzyPackmates(dead: Entity): void;
   armDeathThroes(dead: Entity): void;
   // C1's grantXp level-up path AND G1a's talent application (progression/talents.ts) both
@@ -653,6 +654,10 @@ export interface SimContextCallbacks {
   updateBossMechanics(mob: Entity): void;
   updateNythraxisEncounter(boss: Entity): void;
   resetNythraxisEncounter(boss: Entity): void;
+  updateOdrennEncounter(boss: Entity): void;
+  resetOdrennEncounter(boss: Entity): void;
+  updateVolzharrEncounter(boss: Entity): void;
+  resetVolzharrEncounter(boss: Entity): void;
   despawnSummonedAdds(boss: Entity): void;
   updateFearMovement(e: Entity): boolean;
   delveDetectMult(player: Entity): number;
@@ -1313,6 +1318,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     delveRunForMob: host.delveRunForMob,
     onDelveBossDefeated: host.onDelveBossDefeated,
     grantNythraxisLockout: host.grantNythraxisLockout,
+    onUndermountBossDeath: host.onUndermountBossDeath,
     frenzyPackmates: host.frenzyPackmates,
     armDeathThroes: host.armDeathThroes,
     refreshKnownAbilities: host.refreshKnownAbilities,
@@ -1339,6 +1345,10 @@ export function createSimContext(host: SimContextHost): SimContext {
     updateBossMechanics: host.updateBossMechanics,
     updateNythraxisEncounter: host.updateNythraxisEncounter,
     resetNythraxisEncounter: host.resetNythraxisEncounter,
+    updateOdrennEncounter: host.updateOdrennEncounter,
+    resetOdrennEncounter: host.resetOdrennEncounter,
+    updateVolzharrEncounter: host.updateVolzharrEncounter,
+    resetVolzharrEncounter: host.resetVolzharrEncounter,
     despawnSummonedAdds: host.despawnSummonedAdds,
     updateFearMovement: host.updateFearMovement,
     delveDetectMult: host.delveDetectMult,

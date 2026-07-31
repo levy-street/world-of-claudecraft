@@ -28,7 +28,13 @@ import { queueGatheringGrant } from '../src/sim/professions/gathering';
 import { turnInQuestCore } from '../src/sim/quests/quest_commands';
 import { type ArenaMatch, type CharacterState, Sim } from '../src/sim/sim';
 import * as duelMod from '../src/sim/social/duel';
-import { type Entity, MAX_LEVEL, MILESTONES, type SimEvent } from '../src/sim/types';
+import {
+  type DeedTrigger,
+  type Entity,
+  MAX_LEVEL,
+  MILESTONES,
+  type SimEvent,
+} from '../src/sim/types';
 
 function makeSim(seed = 42): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -272,6 +278,23 @@ describe('trigger kinds grant once, with negatives', () => {
     expect(checkDeedTrigger(meta, e, { kind: 'quests', questIds: ['qa', 'qb'] })).toBe(false);
     meta.questsDone.add('qb');
     expect(checkDeedTrigger(meta, e, { kind: 'quests', questIds: ['qa', 'qb'] })).toBe(true);
+  });
+
+  it('meta: a lockout-window requirement needs every lockout to share one reset', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    for (const id of ['wing1', 'wing2', 'wing3']) meta.deedsEarned.set(id, '');
+    const trigger: DeedTrigger = {
+      kind: 'meta',
+      deedIds: ['wing1', 'wing2', 'wing3'],
+      raidLockoutIds: ['undermount_wing1', 'undermount_wing2', 'undermount_wing3'],
+    };
+    meta.raidLockouts.set('undermount_wing1', 1000);
+    meta.raidLockouts.set('undermount_wing2', 1000);
+    meta.raidLockouts.set('undermount_wing3', 2000);
+    expect(checkDeedTrigger(meta, e, trigger)).toBe(false);
+    meta.raidLockouts.set('undermount_wing3', 1000);
+    expect(checkDeedTrigger(meta, e, trigger)).toBe(true);
   });
 
   it('quests (plural): the Thornpeak chain needs all five, the crypt deed its one', () => {
@@ -703,24 +726,22 @@ describe('retro on join', () => {
     expect(sim2.players.get(pid2)!.deedsEarned.has('exp_something_shiny')).toBe(false);
   });
 
-  it('Giantslayer auto-heals for capped players now that S-rank is flat 23 (deed stranded)', () => {
-    // MAX_CREDITABLE_MOB_LEVEL was lowered from 25 to 23 when S-rank was
-    // re-tuned to a flat level 23 (no ramp to 25). A capped player (level 20)
-    // can never be hit by a mob five levels up (20+5=25>23), so the deed is
-    // permanently stranded and retroFallbackGrants auto-heals it at join time.
-    // Giantslayer is no longer earnable inside S-rank rifts (maintainer-accepted).
+  it('Giantslayer no longer auto-heals: the Undermount ceiling keeps it earnable at cap', () => {
+    // MAX_CREDITABLE_MOB_LEVEL rose from 23 to 26 when the Undermount raid
+    // shipped its level-26 capstone (Volzharr). A capped player (level 20,
+    // needing a level-25 kill) is no longer stranded (20+5=25 <= 26), so the
+    // retro auto-heal must NOT fire at join; the live kill site against the
+    // raid tier is the grant path again.
     const sim = makeSim();
     const capped = sim.addPlayer('warrior', 'Capped', {
       state: { ...veteranState(), level: 20 },
     });
-    // Auto-heal fires at join for the capped player (level 20+5=25 > 23).
-    expect(sim.players.get(capped)!.deedsEarned.has('cmb_giantslayer')).toBe(true);
-    // A level-17 player (17+5=22 <= 23) is still below the threshold: not yet stranded.
+    expect(sim.players.get(capped)!.deedsEarned.has('cmb_giantslayer')).toBe(false);
+    // Sub-cap players are of course not stranded either.
     const notStranded = sim.addPlayer('warrior', 'NotStranded', {
       state: { ...veteranState(), level: 17 },
     });
     expect(sim.players.get(notStranded)!.deedsEarned.has('cmb_giantslayer')).toBe(false);
-    // A level-18 player (18+5=23, not strictly greater) is also not stranded yet.
     const edge = sim.addPlayer('warrior', 'Edge', { state: { ...veteranState(), level: 18 } });
     expect(sim.players.get(edge)!.deedsEarned.has('cmb_giantslayer')).toBe(false);
     // The live kill site still grants on a killing blow five levels up (for sub-cap players).

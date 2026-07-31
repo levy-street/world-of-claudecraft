@@ -57,6 +57,7 @@ const dataEntry = `
   export { FINDER_ACTIVITIES } from './src/sim/content/dungeon_finder.ts';
   export { MOBS } from './src/sim/data.ts';
   export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
+  export { MOB_PORTRAIT_ALIASES } from './src/ui/target_portrait_view.ts';
 `;
 const dataBuilt = await esbuild.build({
   stdin: { contents: dataEntry, resolveDir: root, sourcefile: 'portraits-data.ts', loader: 'ts' },
@@ -67,7 +68,9 @@ const dataBuilt = await esbuild.build({
   logLevel: 'silent',
 });
 const dataUrl = `data:text/javascript;base64,${Buffer.from(dataBuilt.outputFiles[0].text).toString('base64')}`;
-const { FINDER_ACTIVITIES, MOBS, VISUALS, visualKeyFor } = await import(dataUrl);
+const { FINDER_ACTIVITIES, MOBS, VISUALS, visualKeyFor, MOB_PORTRAIT_ALIASES } = await import(
+  dataUrl
+);
 
 // One job per distinct encounter mob id or mob template, resolved through the
 // same visual manifest the game renderer uses (model spec + entity/fixed tint).
@@ -106,7 +109,9 @@ for (const activity of FINDER_ACTIVITIES) {
     addJob(enc.mobId, true);
   }
 }
-for (const mobId of Object.keys(MOBS)) addJob(mobId, false);
+for (const mobId of Object.keys(MOBS)) {
+  if (!MOB_PORTRAIT_ALIASES[mobId]) addJob(mobId, false);
+}
 
 // 3) Serve public/ + the harness, same-origin (mirrors render_model_stills.mjs).
 const HARNESS = `<!doctype html><html><head><meta charset="utf8"><style>html,body{margin:0;background:transparent}</style></head><body><script src="/__portraits_bundle.js"></script></body></html>`;

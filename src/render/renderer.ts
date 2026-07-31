@@ -276,6 +276,8 @@ import { uploadDataTextureInChunks } from './texture_upload';
 import { sparkleTexture } from './textures';
 import { targetIntensity } from './travel_speed_fx';
 import { TravelSpeedFxPainter } from './travel_speed_fx_painter';
+import { UndermountDecals } from './undermount_decals';
+import { isVolzharrEruptionWindup } from './undermount_decals_core';
 import {
   BALL_RADIUS,
   buildValeCupBall,
@@ -509,6 +511,14 @@ const YUMI_MAZE_SUN_INTENSITY = 1.2;
 const YUMI_MAZE_HEMI_INTENSITY = 0.42;
 const YUMI_MAZE_ENV_INTENSITY = 0.28;
 const YUMI_MAZE_RIM_BOOST = 1.7;
+// The Undermount is a molten forge chamber, not a crypt. Warm ambient
+// light keeps its large wings readable while torches retain contrast.
+const UNDERMOUNT_SUN_INTENSITY = 0.9;
+const UNDERMOUNT_HEMI_INTENSITY = 0.6;
+const UNDERMOUNT_ENV_INTENSITY = 0.16;
+const UNDERMOUNT_RIM_BOOST = 1.8;
+const UNDERMOUNT_HEMI_SKY_COLOR = 0xffb060;
+const UNDERMOUNT_HEMI_GROUND_COLOR = 0x3a1206;
 const WILDHEART_SUN_INTENSITY = 1.55;
 const WILDHEART_HEMI_INTENSITY = 0.68;
 const WILDHEART_ENV_INTENSITY = 0.32;
@@ -1478,6 +1488,7 @@ export class Renderer {
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
+  private undermountDecals!: UndermountDecals;
   private readonly mageBarrierStateScratch: MageBarrierState = {
     theme: 'frost',
     value: 0,
@@ -2278,6 +2289,9 @@ export class Renderer {
       });
     });
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
+    this.undermountDecals = new UndermountDecals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
     this.vfx = new Vfx(this.scene, (id, frac) => {
@@ -3739,6 +3753,9 @@ export class Renderer {
     }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
+    this.undermountDecals.syncVents(this.sim.activeUndermountVents);
+    this.undermountDecals.syncEntities(this.sim.entities.values(), this.views, this.camera);
+    this.undermountDecals.update(dt, this.reducedMotion());
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);
@@ -4936,6 +4953,10 @@ export class Renderer {
   handleEvent(ev: SimEvent): void {
     switch (ev.type) {
       case 'spellfx': {
+        const undermountSource = this.sim.entities.get(ev.sourceId);
+        if (isVolzharrEruptionWindup(ev, undermountSource?.templateId) && undermountSource) {
+          this.undermountDecals.beginEruption(undermountSource.pos.x, undermountSource.pos.z);
+        }
         if (ev.fx === 'blinkStep') {
           // A teleport step (Flickerstep / Shadowstep): reset the cached self
           // position so the body snaps to the authoritative destination. A
@@ -6185,6 +6206,7 @@ export class Renderer {
     | 'dungeon'
     | 'temple'
     | 'nythraxis'
+    | 'undermount'
     | 'delve'
     | 'yumiMaze'
     | 'underwater'
@@ -6396,10 +6418,9 @@ export class Renderer {
   private updateAmbience(px: number, camY: number, dt: number): void {
     const inside = px > DUNGEON_X_THRESHOLD;
     const pz = this.sim.player.pos.z;
-    // Private Vale Cup practice instance: the pitch sits far out in an instance
-    // band (which would otherwise read as a delve), so give it its own futuristic
-    // skybox + matching fog instead of the delve murk. Detected by the match's
-    // non-zero pitch origin (the real Sowfield match is {0,0}).
+    // Private Vale Cup practice instance: the pitch sits beyond the capped
+    // instance bands, so give it its own futuristic skybox and matching fog.
+    // Detect it by the match's non-zero origin (the real Sowfield match is {0,0}).
     const po = this.sim.cupInfo?.match?.origin;
     const inPractice = !!po && (po.x !== 0 || po.z !== 0);
     if (inPractice) {
@@ -6536,6 +6557,7 @@ export class Renderer {
       inside && !inDelve && !inYumiMaze && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
+    const inUndermount = interior === 'undermount';
     // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
     // sky dome and the daylight rig and only swaps in its own field haze.
     const inWildheartField = interior === 'wildheart';
@@ -6550,15 +6572,17 @@ export class Renderer {
             ? 'temple'
             : inNythraxis
               ? 'nythraxis'
-              : inWildheartField
-                ? 'wildheartField'
-                : inLastKeep
-                  ? 'lastkeep'
-                  : inside
-                    ? 'dungeon'
-                    : camY < waterLevelAt(px, pz) - 0.05
-                      ? 'underwater'
-                      : 'outdoor';
+              : inUndermount
+                ? 'undermount'
+                : inWildheartField
+                  ? 'wildheartField'
+                  : inLastKeep
+                    ? 'lastkeep'
+                    : inside
+                      ? 'dungeon'
+                      : camY < waterLevelAt(px, pz) - 0.05
+                        ? 'underwater'
+                        : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -6606,6 +6630,10 @@ export class Renderer {
         fog.color.setHex(0x020106);
         fog.near = 20;
         fog.far = 80;
+      } else if (desired === 'undermount') {
+        fog.color.setHex(0x1a0a05);
+        fog.near = 22;
+        fog.far = 95;
       } else if (desired === 'wildheartField') {
         // Sunlit humid depth keeps the full caldera readable while the rear
         // shrine and limestone shell settle into a warm green atmospheric veil.
@@ -6636,7 +6664,7 @@ export class Renderer {
       } else if (desired === 'practice') {
         // The private practice pitch under its futuristic sky: tint the fog to
         // the sky variant and push it well back so the pitch reads clear and lit
-        // (NOT the delve murk this instance band would otherwise get).
+        // without inheriting another instance ambience.
         fog.color.setHex(this.valeCupSky.fogFor(this.practiceSkyVariant()));
         fog.near = 60;
         fog.far = 420;
@@ -6653,6 +6681,9 @@ export class Renderer {
       // interiors must not leak daylight: drop sun + sky ambient + IBL
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead — silhouettes must split from the murk.
+      const moltenForge = desired === 'undermount';
+      this.hemi.color.setHex(moltenForge ? UNDERMOUNT_HEMI_SKY_COLOR : 0xdcefff);
+      this.hemi.groundColor.setHex(moltenForge ? UNDERMOUNT_HEMI_GROUND_COLOR : 0x465f39);
       if (!this.lowGfx) {
         const mazeNight = desired === 'yumiMaze';
         const wildheartSun = desired === 'wildheartField';
@@ -6665,42 +6696,50 @@ export class Renderer {
         // The maze runs its own night rig; otherwise returning outdoors restores the
         // full daylight rig scaled by the current day/night grade, so stepping out
         // of a cave at night stays night.
-        this.sun.intensity = mazeNight
-          ? YUMI_MAZE_SUN_INTENSITY
-          : wildheartSun
-            ? WILDHEART_SUN_INTENSITY
-            : keepHearth
-              ? LASTKEEP_SUN_INTENSITY
-              : underground
-                ? DUNGEON_SUN_INTENSITY
-                : SUN_INTENSITY * this.dnGrade.lightScale;
-        this.hemi.intensity = mazeNight
-          ? YUMI_MAZE_HEMI_INTENSITY
-          : wildheartSun
-            ? WILDHEART_HEMI_INTENSITY
-            : keepHearth
-              ? LASTKEEP_HEMI_INTENSITY
-              : underground
-                ? DUNGEON_HEMI_INTENSITY
-                : HEMI_INTENSITY * this.dnGrade.lightScale;
-        this.scene.environmentIntensity = mazeNight
-          ? YUMI_MAZE_ENV_INTENSITY
-          : wildheartSun
-            ? WILDHEART_ENV_INTENSITY
-            : keepHearth
-              ? LASTKEEP_ENV_INTENSITY
-              : underground
-                ? DUNGEON_ENV_INTENSITY
-                : this.envOutdoorIntensity * this.dnGrade.lightScale;
-        sharedUniforms.uRimBoost.value = mazeNight
-          ? YUMI_MAZE_RIM_BOOST
-          : wildheartSun
-            ? WILDHEART_RIM_BOOST
-            : keepHearth
-              ? LASTKEEP_RIM_BOOST
-              : underground
-                ? DUNGEON_RIM_BOOST
-                : 1;
+        this.sun.intensity = moltenForge
+          ? UNDERMOUNT_SUN_INTENSITY
+          : mazeNight
+            ? YUMI_MAZE_SUN_INTENSITY
+            : wildheartSun
+              ? WILDHEART_SUN_INTENSITY
+              : keepHearth
+                ? LASTKEEP_SUN_INTENSITY
+                : underground
+                  ? DUNGEON_SUN_INTENSITY
+                  : SUN_INTENSITY * this.dnGrade.lightScale;
+        this.hemi.intensity = moltenForge
+          ? UNDERMOUNT_HEMI_INTENSITY
+          : mazeNight
+            ? YUMI_MAZE_HEMI_INTENSITY
+            : wildheartSun
+              ? WILDHEART_HEMI_INTENSITY
+              : keepHearth
+                ? LASTKEEP_HEMI_INTENSITY
+                : underground
+                  ? DUNGEON_HEMI_INTENSITY
+                  : HEMI_INTENSITY * this.dnGrade.lightScale;
+        this.scene.environmentIntensity = moltenForge
+          ? UNDERMOUNT_ENV_INTENSITY
+          : mazeNight
+            ? YUMI_MAZE_ENV_INTENSITY
+            : wildheartSun
+              ? WILDHEART_ENV_INTENSITY
+              : keepHearth
+                ? LASTKEEP_ENV_INTENSITY
+                : underground
+                  ? DUNGEON_ENV_INTENSITY
+                  : this.envOutdoorIntensity * this.dnGrade.lightScale;
+        sharedUniforms.uRimBoost.value = moltenForge
+          ? UNDERMOUNT_RIM_BOOST
+          : mazeNight
+            ? YUMI_MAZE_RIM_BOOST
+            : wildheartSun
+              ? WILDHEART_RIM_BOOST
+              : keepHearth
+                ? LASTKEEP_RIM_BOOST
+                : underground
+                  ? DUNGEON_RIM_BOOST
+                  : 1;
         if (wildheartSun) {
           this.sun.color.setHex(0xffd48c);
           this.hemi.color.setHex(0xd8ebca);
@@ -8259,6 +8298,9 @@ export class Renderer {
     }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
+    this.undermountDecals.syncVents(this.sim.activeUndermountVents);
+    this.undermountDecals.syncEntities(this.sim.entities.values(), this.views, this.camera);
+    this.undermountDecals.update(dt, this.reducedMotion());
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);

@@ -9741,6 +9741,111 @@ export const zh_CN: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "惊雷撼地者点火钥匙"
       },
+      "slag_tempered_sabatons": {
+        "name": "渣淬护胫"
+      },
+      "glasswalker_treads": {
+        "name": "踏玻之靴"
+      },
+      "twice_fired_slippers": {
+        "name": "二次烧制便鞋"
+      },
+      "stokebrand_striders": {
+        "name": "炉印行靴"
+      },
+      "saans_stoking_iron": {
+        "name": "萨安拨火棍"
+      },
+      "glassblowers_shiv": {
+        "name": "玻璃匠短刀"
+      },
+      "sluicebearer": {
+        "name": "持闸者"
+      },
+      "cindertoad_signet": {
+        "name": "烬蟾徽戒"
+      },
+      "ring_of_the_first_quench": {
+        "name": "初淬之戒"
+      },
+      "coalglow_band": {
+        "name": "煤光指环"
+      },
+      "crownforged_warleggings": {
+        "name": "冠铸战腿甲"
+      },
+      "nighttalon_prowlers": {
+        "name": "夜爪潜行靴"
+      },
+      "soulflame_kilt": {
+        "name": "魂焰战裙"
+      },
+      "stormcallers_legwraps": {
+        "name": "唤雷者裹腿"
+      },
+      "the_even_temper": {
+        "name": "平衡之淬"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "烬弧，奥德伦之杖"
+      },
+      "twicetempered_girdle": {
+        "name": "双淬腰带"
+      },
+      "ashwalk_sandals": {
+        "name": "踏灰凉鞋"
+      },
+      "quenchsilk_cord": {
+        "name": "淬火丝绳"
+      },
+      "slakeleather_belt": {
+        "name": "淬革腰带"
+      },
+      "undermount_rune_rubbing": {
+        "name": "地底熔炉符文拓片"
+      },
+      "undermount_foreman_ledger": {
+        "name": "地底熔炉工头账簿"
+      },
+      "runeseekers_lantern": {
+        "name": "寻符者提灯"
+      },
+      "crownforged_heartplate": {
+        "name": "冠铸心甲"
+      },
+      "nighttalon_emberweave": {
+        "name": "夜爪烬织衣"
+      },
+      "soulflame_vestments": {
+        "name": "魂焰法衣"
+      },
+      "stormcallers_hauberk": {
+        "name": "唤风者锁甲"
+      },
+      "volzharrs_knucklestone": {
+        "name": "沃尔扎尔的拳骨石"
+      },
+      "magmastrider_greaves": {
+        "name": "熔岩行者胫甲"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "苏醒地面的裹足"
+      },
+      "forgeheat_cinch": {
+        "name": "锻炉热力束带"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "碎核者，山下之心"
+      },
+      "the_last_restraint": {
+        "name": "最后的束缚"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "第九次淬火之戒"
+      },
+      "moltenheart_chroma": {
+        "name": "熔火之心"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -10682,6 +10787,24 @@ export const zh_CN: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荆峰之灾"
       },
+      "vosh_the_glazier": {
+        "name": "玻匠沃什"
+      },
+      "saan_the_stoker": {
+        "name": "司炉萨安"
+      },
+      "odrenn_the_temperer": {
+        "name": "回火者奥德伦"
+      },
+      "volzharr_buried_furnace": {
+        "name": "沃尔扎尔，埋藏熔炉"
+      },
+      "undermount_cinderling": {
+        "name": "余烬灵"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "巨龙教团挖掘监工"
+      },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"
       },
@@ -11233,6 +11356,11 @@ export const zh_CN: EnTranslations = {
         "name": "玛伦斥候",
         "title": "元帅的斥候",
         "greeting": "安静的脚步和短刃能保命。快说，我得回芦苇地去。"
+      },
+      "runeseeker_maerin": {
+        "name": "寻符者梅林",
+        "title": "流浪考古学家",
+        "greeting": "他们告诉我这是一个死去邪教的锻炉，{className}。死物不会烧得这么热。下面一定有什么值得吃尽这些烟尘。"
       },
       "captain_thessaly": {
         "name": "瑟萨莉队长",
@@ -12028,6 +12156,42 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败缚雾者维尔"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "不该存在的热量",
+        "text": "这道裂隙周围的石头热得足以让木炭字迹模糊，{playerName}。趁邪教还没再次掩埋它们，拓下三块裸露符文面的纹样。如果图案重复，我们就能知道下方藏着什么。",
+        "completion": "所有线条都向内转折。这些不是铁匠的工印，{playerName}。它们是结界，而且有什么东西正从下方割开它们。",
+        "objectives": {
+          "0": {
+            "label": "已拓印符文"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "邪教埋藏之物",
+        "text": "发掘工头把工作账簿贴身保管，营地里的狂信徒负责守卫。把它带给我，{playerName}。我要知道每块锭、每份口粮和每笔工钱都去了哪里。",
+        "completion": "向下。每一块锭，每一点余烬，全都耗在我们脚下，{playerName}。锻炉没有为地表生产任何东西。它在喂养山中埋藏的存在。",
+        "objectives": {
+          "0": {
+            "label": "已击杀 Wyrmcult 发掘工头"
+          },
+          "1": {
+            "label": "已击杀 Wyrmcult 守卫"
+          },
+          "2": {
+            "label": "已找回工头账簿"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "进入地底山",
+        "text": "账簿证实发掘场下还有第二处工事，每批货物都指向下方。准备好时来找我，{playerName}。我要加入这次下行。",
+        "completion": "带上这盏灯。它没有附魔，只有稳定的火焰，但我们在下面需要一束诚实的光。无论你是否完成这条任务链，团队入口都会开放。",
+        "objectives": {
+          "0": {
+            "label": "与寻符者梅林交谈"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const zh_CN: EnTranslations = {
         "enterText": "你穿过封印的王室之门。",
         "leaveText": "你回到荆峰的寒冷空气中。"
       },
+      "undermount_wing1": {
+        "name": "地底山: 下行",
+        "enterText": "你下到荆峰之下，进入玻璃般的黑暗。",
+        "leaveText": "你从地底山的下行路爬回。"
+      },
+      "undermount_wing2": {
+        "name": "地底山: 回火",
+        "enterText": "锤击声在回火宝库中回荡。",
+        "leaveText": "你从回响的炉道撤退。"
+      },
+      "undermount_wing3": {
+        "name": "地底山: 苏醒",
+        "enterText": "被埋的熔炉在深处躁动。",
+        "leaveText": "你从苏醒的热浪中撤离。"
+      },
       "wildheart_basin": {
         "name": "荒野之心盆地",
         "enterText": "温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。",
@@ -14367,7 +14546,8 @@ export const zh_CN: EnTranslations = {
         "name": "骨铸战装",
         "bonus2": "攻击强度提高 40 点。",
         "bonus3": "力量提高 15 点，耐力提高 15 点，攻击速度和施法速度提高 15%。",
-        "bonus4": "你的武器致命一击会使目标产生“骨刺”，每 2 秒流血 8 点伤害，持续 12 秒。最多叠加 3 层。"
+        "bonus4": "你的武器致命一击会使目标产生“骨刺”，每 2 秒流血 8 点伤害，持续 12 秒。最多叠加 3 层。",
+        "bonus5": "暴击几率提高3%。"
       },
       "deathlord": {
         "name": "冢主战甲",
@@ -14389,19 +14569,22 @@ export const zh_CN: EnTranslations = {
         "name": "恐牙皮甲",
         "bonus2": "攻击强度提高 40 点。",
         "bonus3": "敏捷提高 15 点，致命一击几率提高 2%，攻击速度和施法速度提高 15%。",
-        "bonus4": "你的武器致命一击会撕开“撕裂伤口”，使目标每 2 秒流血 6 点伤害，持续 12 秒。最多叠加 3 层。"
+        "bonus4": "你的武器致命一击会撕开“撕裂伤口”，使目标每 2 秒流血 6 点伤害，持续 12 秒。最多叠加 3 层。",
+        "bonus5": "暴击几率提高3%。"
       },
       "soulflame": {
         "name": "魂焰法衣",
         "bonus2": "法术强度提高 20 点。受到伤害不再延迟你的施法（施法延迟抗性 100%）。",
         "bonus3": "智力提高 15 点，精神提高 15 点，攻击速度和施法速度提高 15%。",
-        "bonus4": "你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。"
+        "bonus4": "你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。",
+        "bonus5": "法术暴击几率提高3%。"
       },
       "stormcallers": {
         "name": "唤风法衣",
         "bonus2": "法术强度提高 20 点。受到伤害不再延迟你的施法（施法延迟抗性 100%）。",
         "bonus3": "智力提高 15 点，精神提高 15 点，攻击速度和施法速度提高 15%。",
-        "bonus4": "你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。"
+        "bonus4": "你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。",
+        "bonus5": "法术暴击几率提高3%。"
       },
       "vale_arcanist": {
         "name": "谷地秘法师法衣",

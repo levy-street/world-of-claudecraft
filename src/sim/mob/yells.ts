@@ -14,6 +14,12 @@ import { dist2d, type Entity, YELL_RANGE } from '../types';
 // `range` widens the broadcast for a "loud" boss (a booming voice heard across the
 // zone); it defaults to YELL_RANGE for every ordinary mob.
 export function emitMobYell(ctx: SimContext, mob: Entity, text: string, range = YELL_RANGE): void {
+  const authoredSpeaker =
+    mob.kind === 'npc'
+      ? { kind: 'npc' as const, templateId: mob.templateId }
+      : mob.kind === 'mob' && mob.ownerId === null
+        ? { kind: 'mob' as const, templateId: mob.templateId }
+        : undefined;
   const event = {
     type: 'chat' as const,
     fromPid: mob.id,
@@ -21,6 +27,7 @@ export function emitMobYell(ctx: SimContext, mob: Entity, text: string, range = 
     text,
     channel: 'yell' as const,
     entityId: mob.id,
+    ...(authoredSpeaker ? { authoredSpeaker } : {}),
   };
   for (const meta of ctx.players.values()) {
     const p = ctx.entities.get(meta.entityId);

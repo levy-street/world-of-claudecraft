@@ -78,6 +78,7 @@ import {
   type AccountCosmetics,
   type ActiveFrostRing,
   type ActiveTemporalHourglass,
+  type ActiveUndermountVent,
   type ArenaInfo,
   type BankInfo,
   type CardMinigameInfo,
@@ -1640,6 +1641,7 @@ export class ClientWorld implements IWorld {
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
+  activeUndermountVents: ActiveUndermountVent[] = [];
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render
   private invChanged = false;
@@ -2426,6 +2428,28 @@ export class ClientWorld implements IWorld {
               radius: hourglass.r as number,
               duration: hourglass.dur as number,
               remaining: Math.min(hourglass.rem as number, hourglass.dur as number),
+            },
+          ];
+        })
+      : [];
+    this.activeUndermountVents = Array.isArray(snap.undermountVents)
+      ? snap.undermountVents.flatMap((value: unknown): ActiveUndermountVent[] => {
+          if (!value || typeof value !== 'object') return [];
+          const vent = value as Record<string, unknown>;
+          if (
+            typeof vent.id !== 'string' ||
+            ![vent.x, vent.z, vent.r].every(
+              (entry) => typeof entry === 'number' && Number.isFinite(entry),
+            ) ||
+            (vent.r as number) <= 0
+          )
+            return [];
+          return [
+            {
+              id: vent.id,
+              x: vent.x as number,
+              z: vent.z as number,
+              radius: vent.r as number,
             },
           ];
         })

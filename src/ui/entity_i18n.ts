@@ -60,6 +60,7 @@ export type EntityTranslationField =
   | 'bonus2'
   | 'bonus3'
   | 'bonus4'
+  | 'bonus5'
   | 'sender'
   | 'subject'
   | 'body';
@@ -71,7 +72,7 @@ export type EntityTranslationRequest =
   | {
       kind: 'itemSet';
       id: string;
-      field: 'name' | 'bonus2' | 'bonus3' | 'bonus4';
+      field: 'name' | 'bonus2' | 'bonus3' | 'bonus4' | 'bonus5';
       values?: InterpolationValues;
     }
   | { kind: 'mob'; id: string; field: 'name'; values?: InterpolationValues }
@@ -239,7 +240,14 @@ function canonicalEntityText(request: EntityTranslationRequest): string {
       const set = ITEM_SETS[request.id];
       if (!set) return request.id;
       if (request.field === 'name') return set.name;
-      const pieces = request.field === 'bonus2' ? 2 : request.field === 'bonus3' ? 3 : 4;
+      const pieces =
+        request.field === 'bonus2'
+          ? 2
+          : request.field === 'bonus3'
+            ? 3
+            : request.field === 'bonus4'
+              ? 4
+              : 5;
       return set.bonuses.find((b) => b.pieces === pieces)?.text ?? request.id;
     }
     case 'mob':
@@ -465,10 +473,11 @@ export function entityTranslationManifest(): EntityTranslationManifestEntry[] {
   for (const set of Object.values(ITEM_SETS).sort(compareById)) {
     // Only tiers the set actually has: the leveling haste kits carry a single
     // 3-piece tier, so registering a bonus2 row would emit an id-fallback string.
-    const fields: ('name' | 'bonus2' | 'bonus3' | 'bonus4')[] = ['name'];
+    const fields: ('name' | 'bonus2' | 'bonus3' | 'bonus4' | 'bonus5')[] = ['name'];
     if (set.bonuses.some((b) => b.pieces === 2)) fields.push('bonus2');
     if (set.bonuses.some((b) => b.pieces === 3)) fields.push('bonus3');
     if (set.bonuses.some((b) => b.pieces === 4)) fields.push('bonus4');
+    if (set.bonuses.some((b) => b.pieces === 5)) fields.push('bonus5');
     for (const field of fields) {
       entries.push(
         entry(

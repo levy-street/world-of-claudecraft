@@ -1,0 +1,1404 @@
+{
+  "scenario": "undermount_odrenn",
+  "seed": 1031,
+  "sampleEvery": 20,
+  "ticks": 60,
+  "coverage": [
+    "encounters/odrenn.ts full script: geography marks + hysteresis flip across the centerline",
+    "mixed-mark Tempering Clash burn (two players astride the line inside burn range)",
+    "Cinder Arc: the one ctx.rng seed draw + deterministic nearest-neighbor chain walk",
+    "Tempering stacking haste self-buff cadence; locomotion dispatch by templateId"
+  ],
+  "draws": 136,
+  "drawDigest": "4b1f3274",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 822,
+      "state": "5bc471b0",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [],
+      "entities": []
+    },
+    {
+      "tick": 20,
+      "time": 1,
+      "nextId": 827,
+      "state": "a120d623",
+      "events": "3310de72",
+      "rng": {
+        "draws": 6,
+        "digest": "7360e6a1"
+      }
+    },
+    {
+      "tick": 30,
+      "time": 1.5,
+      "nextId": 827,
+      "state": "a03024e2",
+      "events": "87710bfd",
+      "rng": {
+        "draws": 6,
+        "digest": "7360e6a1"
+      },
+      "label": "odrenn-marks-burn",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 25,
+            "damageTaken": 496
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 25
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 822,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "undermountCleared": [
+            "undermount_wing1"
+          ]
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 322
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 823,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "undermountCleared": [
+            "undermount_wing1"
+          ]
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3598.5,
+              "school": "physical",
+              "sourceId": 822
+            },
+            {
+              "duration": 2,
+              "id": "odrenn_scorched",
+              "kind": "vulnerability",
+              "name": "Scorched",
+              "remaining": 2,
+              "school": "fire",
+              "sourceId": 824
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 44.201238,
+          "fiveSecondRule": 100.5,
+          "hp": 899504,
+          "id": 822,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 116804,
+            "y": 26.801238,
+            "z": -1218
+          },
+          "potionCooldownUntil": -1,
+          "resource": 22.733333,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "auras": [
+            {
+              "duration": 2,
+              "id": "odrenn_chilled",
+              "kind": "vulnerability",
+              "name": "Chilled",
+              "remaining": 2,
+              "school": "frost",
+              "sourceId": 824
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 44.393607,
+          "fiveSecondRule": 100.5,
+          "hp": 899678,
+          "id": 823,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900000,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 116796,
+            "y": 26.993607,
+            "z": -1218
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aggroTargetId": 822,
+          "aiState": "attack",
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 2.677945,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 47975,
+          "id": 824,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 116800,
+            "z": -1210
+          },
+          "level": 24,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 48000,
+          "moveSpeed": 7,
+          "odrenn": {
+            "arcTimer": 18.5,
+            "enrageTimer": 43.5
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 116801.408723,
+            "z": -1212.817446
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 10.75,
+          "spawnPos": {
+            "x": 116800,
+            "z": -1210
+          },
+          "stats": {
+            "armor": 782
+          },
+          "swingTimer": 1.2,
+          "tappedById": 822,
+          "templateId": "odrenn_the_temperer",
+          "threat": [
+            [
+              822,
+              26
+            ]
+          ],
+          "weapon": {
+            "max": 563,
+            "min": 360,
+            "speed": 2.6
+          }
+        }
+      ]
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 827,
+      "state": "d49ba1ff",
+      "events": "b7a872f4",
+      "rng": {
+        "draws": 6,
+        "digest": "7360e6a1"
+      }
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 827,
+      "state": "d49ba1ff",
+      "events": "741638a5",
+      "rng": {
+        "draws": 6,
+        "digest": "7360e6a1"
+      },
+      "label": "odrenn-flip",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 25,
+            "damageTaken": 496
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 25
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 822,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "undermountCleared": [
+            "undermount_wing1"
+          ]
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 322
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 823,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "undermountCleared": [
+            "undermount_wing1"
+          ]
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3598,
+              "school": "physical",
+              "sourceId": 822
+            },
+            {
+              "duration": 2,
+              "id": "odrenn_chilled",
+              "kind": "vulnerability",
+              "name": "Chilled",
+              "remaining": 2,
+              "school": "frost",
+              "sourceId": 824
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 0.5,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 44.49883,
+          "fiveSecondRule": 101,
+          "hp": 899504,
+          "id": 822,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 116794,
+            "y": 42.69883,
+            "z": -1218
+          },
+          "potionCooldownUntil": -1,
+          "resource": 22.733333,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "auras": [
+            {
+              "duration": 2,
+              "id": "odrenn_chilled",
+              "kind": "vulnerability",
+              "name": "Chilled",
+              "remaining": 2,
+              "school": "frost",
+              "sourceId": 824
+            }
+          ],
+          "combatTimer": 0.5,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 44.393607,
+          "fiveSecondRule": 101,
+          "hp": 899678,
+          "id": 823,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900000,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 116796,
+            "y": 13.193607,
+            "z": -1218
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aggroTargetId": 822,
+          "aiState": "attack",
+          "combatTimer": 0.5,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.1812,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 47975,
+          "id": 824,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 116800,
+            "z": -1210
+          },
+          "level": 24,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 48000,
+          "moveSpeed": 7,
+          "odrenn": {
+            "arcTimer": 18,
+            "enrageTimer": 43
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 116798.827561,
+            "z": -1214.623021
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 10.45,
+          "spawnPos": {
+            "x": 116800,
+            "z": -1210
+          },
+          "stats": {
+            "armor": 782
+          },
+          "swingTimer": 0.7,
+          "tappedById": 822,
+          "templateId": "odrenn_the_temperer",
+          "threat": [
+            [
+              822,
+              26
+            ]
+          ],
+          "weapon": {
+            "max": 563,
+            "min": 360,
+            "speed": 2.6
+          }
+        }
+      ]
+    },
+    {
+      "tick": 60,
+      "time": 3,
+      "nextId": 827,
+      "state": "823413f0",
+      "events": "d0485486",
+      "rng": {
+        "draws": 136,
+        "digest": "4b1f3274"
+      }
+    },
+    {
+      "tick": 60,
+      "time": 3,
+      "nextId": 827,
+      "state": "823413f0",
+      "events": "741638a5",
+      "rng": {
+        "draws": 136,
+        "digest": "4b1f3274"
+      },
+      "label": "odrenn-arc-temper",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 25,
+            "damageTaken": 929
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 25
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 822,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "undermountCleared": [
+            "undermount_wing1"
+          ]
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 2041175,
+            "deaths": 1
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "deaths": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_fall",
+              ""
+            ],
+            [
+              "hid_fall_death",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 823,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 10,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "undermountCleared": [
+            "undermount_wing1"
+          ]
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597,
+              "school": "physical",
+              "sourceId": 822
+            },
+            {
+              "duration": 2,
+              "id": "odrenn_chilled",
+              "kind": "vulnerability",
+              "name": "Chilled",
+              "remaining": 2,
+              "school": "frost",
+              "sourceId": 824
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 0.25,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 44.49883,
+          "fiveSecondRule": 102,
+          "hp": 899071,
+          "id": 822,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 116794,
+            "y": 27.09883,
+            "z": -1218
+          },
+          "potionCooldownUntil": -1,
+          "resource": 42.579167,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 0.95,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 102,
+          "id": 823,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900000,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 116796,
+            "z": -1218
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aggroTargetId": 822,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "odrenn_temper",
+              "kind": "buff_haste",
+              "name": "Tempering",
+              "remaining": 3599.05,
+              "school": "fire",
+              "sourceId": 824,
+              "stacks": 1,
+              "value": 0.06
+            }
+          ],
+          "combatTimer": 0.25,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.1812,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 47975,
+          "id": 824,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 116800,
+            "z": -1210
+          },
+          "level": 24,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 48000,
+          "moveSpeed": 7,
+          "odrenn": {
+            "arcTimer": 19.05,
+            "enrageStacks": 1,
+            "enrageTimer": 44.1
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 116798.827561,
+            "z": -1214.623021
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 9.45,
+          "spawnPos": {
+            "x": 116800,
+            "z": -1210
+          },
+          "stats": {
+            "armor": 782
+          },
+          "swingTimer": 2.35,
+          "tappedById": 822,
+          "templateId": "odrenn_the_temperer",
+          "threat": [
+            [
+              822,
+              26
+            ]
+          ],
+          "weapon": {
+            "max": 563,
+            "min": 360,
+            "speed": 2.6
+          }
+        }
+      ]
+    },
+    {
+      "tick": 60,
+      "time": 3,
+      "nextId": 827,
+      "state": "823413f0",
+      "events": "741638a5",
+      "rng": {
+        "draws": 136,
+        "digest": "4b1f3274"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 25,
+            "damageTaken": 929
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 25
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 822,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "undermountCleared": [
+            "undermount_wing1"
+          ]
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 2041175,
+            "deaths": 1
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "deaths": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_fall",
+              ""
+            ],
+            [
+              "hid_fall_death",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 823,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 10,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "undermountCleared": [
+            "undermount_wing1"
+          ]
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597,
+              "school": "physical",
+              "sourceId": 822
+            },
+            {
+              "duration": 2,
+              "id": "odrenn_chilled",
+              "kind": "vulnerability",
+              "name": "Chilled",
+              "remaining": 2,
+              "school": "frost",
+              "sourceId": 824
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 0.25,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 44.49883,
+          "fiveSecondRule": 102,
+          "hp": 899071,
+          "id": 822,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 116794,
+            "y": 27.09883,
+            "z": -1218
+          },
+          "potionCooldownUntil": -1,
+          "resource": 42.579167,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 0.95,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 102,
+          "id": 823,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 900000,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 116796,
+            "z": -1218
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aggroTargetId": 822,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "odrenn_temper",
+              "kind": "buff_haste",
+              "name": "Tempering",
+              "remaining": 3599.05,
+              "school": "fire",
+              "sourceId": 824,
+              "stacks": 1,
+              "value": 0.06
+            }
+          ],
+          "combatTimer": 0.25,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.1812,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 47975,
+          "id": 824,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 116800,
+            "z": -1210
+          },
+          "level": 24,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 48000,
+          "moveSpeed": 7,
+          "odrenn": {
+            "arcTimer": 19.05,
+            "enrageStacks": 1,
+            "enrageTimer": 44.1
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 116798.827561,
+            "z": -1214.623021
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 9.45,
+          "spawnPos": {
+            "x": 116800,
+            "z": -1210
+          },
+          "stats": {
+            "armor": 782
+          },
+          "swingTimer": 2.35,
+          "tappedById": 822,
+          "templateId": "odrenn_the_temperer",
+          "threat": [
+            [
+              822,
+              26
+            ]
+          ],
+          "weapon": {
+            "max": 563,
+            "min": 360,
+            "speed": 2.6
+          }
+        }
+      ]
+    }
+  ]
+}

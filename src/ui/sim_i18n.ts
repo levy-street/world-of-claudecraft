@@ -494,6 +494,39 @@ const baseEnTable = {
   'aura.wintersChill': "Winter's Chill",
   'aura.icicles': 'Icicles',
   'aura.perfectMoment': 'Perfect Moment',
+  // Undermount keeper and Odrenn encounter names. These surface as aura
+  // events, target-frame effects, and boss mechanic combat-log labels.
+  'aura.glazing': 'Glazing',
+  'aura.emberfeed': 'Emberfeed',
+  'aura.forgeheat': 'Forgeheat',
+  'aura.searingGrip': 'Searing Grip',
+  'mechanic.ventFissure': 'Vent Fissure',
+  'mechanic.undermountEruption': 'Undermount Eruption',
+  'aura.embersComeHome': 'The Embers Come Home',
+  'dialogue.maerinCraft':
+    "This craftsmanship... a whole guild's work, for a cult of arsonists? Something down here is worth hiding behind all this.",
+  'dialogue.maerinLedger':
+    'Beast provisions, wages, kennel feed... and the signature page torn out. Someone left in a hurry. North.',
+  'dialogue.maerinAsleep':
+    'They are not making anything. They are keeping something ASLEEP until they are ready.',
+  'dialogue.maerinRestraints':
+    'These are not summoning wards. They are RESTRAINTS, and we have been CUTTING them. Every keeper we killed was a lock.',
+  'dialogue.maerinGo':
+    'There was never a factory. There was only ever him, and a very good disguise. Go.',
+  'dialogue.maerinHalfFormed': 'Half-formed. We killed him before the forge could finish its work.',
+  'dialogue.maerinVein': 'The fire is receding north along the vein. This is not over.',
+  'mechanic.cinderToad': 'Cinder-Toad',
+  'mechanic.anneal': 'Anneal',
+  'aura.kilnFury': 'Kiln Fury',
+  'aura.scorched': 'Scorched',
+  'aura.chilled': 'Chilled',
+  'aura.tempering': 'Tempering',
+  'mechanic.temperingClash': 'Tempering Clash',
+  'mechanic.cinderArc': 'Cinder Arc',
+  'mechanic.temperSweep': 'Temper Sweep',
+  'mechanic.forgeDraft': 'Forge Draft',
+  'mechanic.glasscutArc': 'Glasscut Arc',
+  'mechanic.kilnflarePulse': 'Kilnflare Pulse',
   // Card Duel minigame (Card Master NPC, src/sim/social/card_duel.ts).
   'log.cardDuelQueued': 'You queue for a Card Duel.',
   'log.cardDuelLeftQueue': 'You leave the Card Duel queue.',
@@ -802,6 +835,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': 'Silt Hide',
     'aura.demoralized': 'Demoralized',
     'aura.resurrectionSickness': "The Keeper's Toll",
+    'aura.glazing': 'Glazing',
+    'aura.emberfeed': 'Emberfeed',
+    'aura.forgeheat': 'Forgeheat',
+    'aura.searingGrip': 'Searing Grip',
+    'mechanic.ventFissure': 'Vent Fissure',
+    'mechanic.undermountEruption': 'Undermount Eruption',
+    'aura.embersComeHome': 'The Embers Come Home',
+    'dialogue.maerinCraft':
+      "This craftsmanship... a whole guild's work, for a cult of arsonists? Something down here is worth hiding behind all this.",
+    'dialogue.maerinLedger':
+      'Beast provisions, wages, kennel feed... and the signature page torn out. Someone left in a hurry. North.',
+    'dialogue.maerinAsleep':
+      'They are not making anything. They are keeping something ASLEEP until they are ready.',
+    'dialogue.maerinRestraints':
+      'These are not summoning wards. They are RESTRAINTS, and we have been CUTTING them. Every keeper we killed was a lock.',
+    'dialogue.maerinGo':
+      'There was never a factory. There was only ever him, and a very good disguise. Go.',
+    'dialogue.maerinHalfFormed':
+      'Half-formed. We killed him before the forge could finish its work.',
+    'dialogue.maerinVein': 'The fire is receding north along the vein. This is not over.',
+    'mechanic.cinderToad': 'Cinder-Toad',
+    'mechanic.anneal': 'Anneal',
+    'aura.kilnFury': 'Kiln Fury',
+    'aura.scorched': 'Scorched',
+    'aura.chilled': 'Chilled',
+    'aura.tempering': 'Tempering',
+    'mechanic.temperingClash': 'Tempering Clash',
+    'mechanic.cinderArc': 'Cinder Arc',
+    'mechanic.temperSweep': 'Temper Sweep',
+    'mechanic.forgeDraft': 'Forge Draft',
+    'mechanic.glasscutArc': 'Glasscut Arc',
+    'mechanic.kilnflarePulse': 'Kilnflare Pulse',
     'aura.unstuckSickness': 'Unstuck Sickness',
   },
   es: {
@@ -1217,6 +1282,37 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.enraged': 'Enfurecido',
     'aura.icicles': 'Carámbanos',
     'aura.perfectMoment': 'Momento perfecto',
+    'aura.glazing': 'Esmaltado',
+    'aura.emberfeed': 'Alimentación de Brasas',
+    'aura.forgeheat': 'Calor de Forja',
+    'aura.searingGrip': 'Agarre Abrasador',
+    'mechanic.ventFissure': 'Fisura de Ventilación',
+    'mechanic.undermountEruption': 'Erupción del Bajomonte',
+    'aura.embersComeHome': 'Las Brasas Vuelven a Casa',
+    'dialogue.maerinCraft':
+      '¿Esta artesanía... el trabajo de todo un gremio, para un culto de incendiarios? Algo aquí abajo merece estar oculto detrás de todo esto.',
+    'dialogue.maerinLedger':
+      'Provisiones para bestias, salarios, alimento para las perreras... y la página de firmas arrancada. Alguien se marchó con prisa. Hacia el norte.',
+    'dialogue.maerinAsleep':
+      'No están fabricando nada. Mantienen algo DORMIDO hasta estar preparados.',
+    'dialogue.maerinRestraints':
+      'Estas no son runas de invocación. Son ATADURAS, y las hemos estado CORTANDO. Cada guardián que matamos era un cerrojo.',
+    'dialogue.maerinGo': 'Nunca hubo una fábrica. Solo estuvo él, y un disfraz muy bueno. Id.',
+    'dialogue.maerinHalfFormed':
+      'A medio formar. Lo matamos antes de que la forja pudiera terminar su trabajo.',
+    'dialogue.maerinVein': 'El fuego retrocede hacia el norte por la veta. Esto no ha terminado.',
+    'mechanic.cinderToad': 'Sapo de ascuas',
+    'mechanic.anneal': 'Recocido',
+    'aura.kilnFury': 'Furia del horno',
+    'aura.scorched': 'Abrasado',
+    'aura.chilled': 'Enfriado',
+    'aura.tempering': 'Templado',
+    'mechanic.temperingClash': 'Choque de temple',
+    'mechanic.cinderArc': 'Arco de ascuas',
+    'mechanic.temperSweep': 'Barrido de temple',
+    'mechanic.forgeDraft': 'Ráfaga de la forja',
+    'mechanic.glasscutArc': 'Arco cortavidrio',
+    'mechanic.kilnflarePulse': 'Pulso de llamarada del horno',
   },
   es_ES: {
     'error.mountTrainInProgress': 'Ya hay una lección de equitación en curso.',
@@ -1631,6 +1727,37 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Frío Invernal',
     'aura.icicles': 'Carámbanos',
     'aura.perfectMoment': 'Momento perfecto',
+    'aura.glazing': 'Esmaltado',
+    'aura.emberfeed': 'Alimentación de Brasas',
+    'aura.forgeheat': 'Calor de Forja',
+    'aura.searingGrip': 'Agarre Abrasador',
+    'mechanic.ventFissure': 'Fisura de Ventilación',
+    'mechanic.undermountEruption': 'Erupción del Bajomonte',
+    'aura.embersComeHome': 'Las Brasas Vuelven a Casa',
+    'dialogue.maerinCraft':
+      '¿Esta artesanía... el trabajo de todo un gremio, para un culto de incendiarios? Algo aquí abajo merece estar oculto detrás de todo esto.',
+    'dialogue.maerinLedger':
+      'Provisiones para bestias, salarios, alimento para las perreras... y la página de firmas arrancada. Alguien se marchó con prisa. Hacia el norte.',
+    'dialogue.maerinAsleep':
+      'No están fabricando nada. Mantienen algo DORMIDO hasta estar preparados.',
+    'dialogue.maerinRestraints':
+      'Estas no son runas de invocación. Son ATADURAS, y las hemos estado CORTANDO. Cada guardián que matamos era un cerrojo.',
+    'dialogue.maerinGo': 'Nunca hubo una fábrica. Solo estuvo él, y un disfraz muy bueno. Id.',
+    'dialogue.maerinHalfFormed':
+      'A medio formar. Lo matamos antes de que la forja pudiera terminar su trabajo.',
+    'dialogue.maerinVein': 'El fuego retrocede hacia el norte por la veta. Esto no ha terminado.',
+    'mechanic.cinderToad': 'Sapo de ascuas',
+    'mechanic.anneal': 'Recocido',
+    'aura.kilnFury': 'Furia del horno',
+    'aura.scorched': 'Abrasado',
+    'aura.chilled': 'Enfriado',
+    'aura.tempering': 'Templado',
+    'mechanic.temperingClash': 'Choque de temple',
+    'mechanic.cinderArc': 'Arco de ascuas',
+    'mechanic.temperSweep': 'Barrido de temple',
+    'mechanic.forgeDraft': 'Ráfaga de la forja',
+    'mechanic.glasscutArc': 'Arco cortavidrio',
+    'mechanic.kilnflarePulse': 'Pulso de llamarada del horno',
   },
   fr_FR: {
     'error.mountTrainInProgress': "Une leçon d'équitation est déjà en cours.",
@@ -2051,6 +2178,39 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Froid hivernal',
     'aura.icicles': 'Stalactites de glace',
     'aura.perfectMoment': 'Moment parfait',
+    'aura.glazing': 'Émaillage',
+    'aura.emberfeed': 'Nourriture de Braises',
+    'aura.forgeheat': 'Chaleur de Forge',
+    'aura.searingGrip': 'Étreinte Ardente',
+    'mechanic.ventFissure': "Fissure d'Évent",
+    'mechanic.undermountEruption': 'Éruption du Sous-Mont',
+    'aura.embersComeHome': 'Les Braises Rentrent',
+    'dialogue.maerinCraft':
+      "Ce savoir-faire... le travail de toute une guilde, pour un culte d'incendiaires ? Quelque chose ici-bas mérite d'être caché derrière tout ceci.",
+    'dialogue.maerinLedger':
+      "Provisions pour les bêtes, salaires, nourriture des chenils... et la page des signatures arrachée. Quelqu'un est parti en hâte. Au nord.",
+    'dialogue.maerinAsleep':
+      "Ils ne fabriquent rien. Ils maintiennent quelque chose ENDORMI jusqu'à ce qu'ils soient prêts.",
+    'dialogue.maerinRestraints':
+      'Ce ne sont pas des runes d’invocation. Ce sont des ENTRAVES, et nous les avons COUPÉES. Chaque gardien tué était un verrou.',
+    'dialogue.maerinGo':
+      "Il n'y a jamais eu d'usine. Il n'y a jamais eu que lui, et un très bon déguisement. Allez.",
+    'dialogue.maerinHalfFormed':
+      "À moitié formé. Nous l'avons tué avant que la forge ne termine son œuvre.",
+    'dialogue.maerinVein':
+      "Le feu se retire vers le nord le long de la veine. Ce n'est pas terminé.",
+    'mechanic.cinderToad': 'Crapaud de braise',
+    'mechanic.anneal': 'Recuit',
+    'aura.kilnFury': 'Fureur du four',
+    'aura.scorched': 'Brûlé',
+    'aura.chilled': 'Refroidi',
+    'aura.tempering': 'Trempe',
+    'mechanic.temperingClash': 'Choc de trempe',
+    'mechanic.cinderArc': 'Arc de braise',
+    'mechanic.temperSweep': 'Balayage de trempe',
+    'mechanic.forgeDraft': 'Souffle de forge',
+    'mechanic.glasscutArc': 'Arc coupe-verre',
+    'mechanic.kilnflarePulse': 'Pulsation du four ardent',
   },
   fr_CA: {
     'error.mountTrainInProgress': "Une leçon d'équitation est déjà en cours.",
@@ -2471,6 +2631,39 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Froid hivernal',
     'aura.icicles': 'Stalactites de glace',
     'aura.perfectMoment': 'Moment parfait',
+    'aura.glazing': 'Émaillage',
+    'aura.emberfeed': 'Nourriture de Braises',
+    'aura.forgeheat': 'Chaleur de Forge',
+    'aura.searingGrip': 'Étreinte Ardente',
+    'mechanic.ventFissure': "Fissure d'Évent",
+    'mechanic.undermountEruption': 'Éruption du Sous-Mont',
+    'aura.embersComeHome': 'Les Braises Rentrent',
+    'dialogue.maerinCraft':
+      "Ce savoir-faire... le travail de toute une guilde, pour un culte d'incendiaires ? Quelque chose ici-bas mérite d'être caché derrière tout ceci.",
+    'dialogue.maerinLedger':
+      "Provisions pour les bêtes, salaires, nourriture des chenils... et la page des signatures arrachée. Quelqu'un est parti en hâte. Au nord.",
+    'dialogue.maerinAsleep':
+      "Ils ne fabriquent rien. Ils maintiennent quelque chose ENDORMI jusqu'à ce qu'ils soient prêts.",
+    'dialogue.maerinRestraints':
+      'Ce ne sont pas des runes d’invocation. Ce sont des ENTRAVES, et nous les avons COUPÉES. Chaque gardien tué était un verrou.',
+    'dialogue.maerinGo':
+      "Il n'y a jamais eu d'usine. Il n'y a jamais eu que lui, et un très bon déguisement. Allez.",
+    'dialogue.maerinHalfFormed':
+      "À moitié formé. Nous l'avons tué avant que la forge ne termine son œuvre.",
+    'dialogue.maerinVein':
+      "Le feu se retire vers le nord le long de la veine. Ce n'est pas terminé.",
+    'mechanic.cinderToad': 'Crapaud de braise',
+    'mechanic.anneal': 'Recuit',
+    'aura.kilnFury': 'Fureur du four',
+    'aura.scorched': 'Brûlé',
+    'aura.chilled': 'Refroidi',
+    'aura.tempering': 'Trempe',
+    'mechanic.temperingClash': 'Choc de trempe',
+    'mechanic.cinderArc': 'Arc de braise',
+    'mechanic.temperSweep': 'Balayage de trempe',
+    'mechanic.forgeDraft': 'Souffle de forge',
+    'mechanic.glasscutArc': 'Arc coupe-verre',
+    'mechanic.kilnflarePulse': 'Pulsation du four ardent',
   },
   en_CA: {
     'log.seaFatigue': 'The open sea saps your strength. Swim back to shore!',
@@ -2660,6 +2853,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': 'Might of the Boar',
     'aura.elixirVenomfire': 'Vipersear Vigor',
     'aura.elixirSerpent': 'Might of the Serpent',
+    'aura.glazing': 'Glazing',
+    'aura.emberfeed': 'Emberfeed',
+    'aura.forgeheat': 'Forgeheat',
+    'aura.searingGrip': 'Searing Grip',
+    'mechanic.ventFissure': 'Vent Fissure',
+    'mechanic.undermountEruption': 'Undermount Eruption',
+    'aura.embersComeHome': 'The Embers Come Home',
+    'dialogue.maerinCraft':
+      "This craftsmanship... a whole guild's work, for a cult of arsonists? Something down here is worth hiding behind all this.",
+    'dialogue.maerinLedger':
+      'Beast provisions, wages, kennel feed... and the signature page torn out. Someone left in a hurry. North.',
+    'dialogue.maerinAsleep':
+      'They are not making anything. They are keeping something ASLEEP until they are ready.',
+    'dialogue.maerinRestraints':
+      'These are not summoning wards. They are RESTRAINTS, and we have been CUTTING them. Every keeper we killed was a lock.',
+    'dialogue.maerinGo':
+      'There was never a factory. There was only ever him, and a very good disguise. Go.',
+    'dialogue.maerinHalfFormed':
+      'Half-formed. We killed him before the forge could finish its work.',
+    'dialogue.maerinVein': 'The fire is receding north along the vein. This is not over.',
+    'mechanic.cinderToad': 'Cinder-Toad',
+    'mechanic.anneal': 'Anneal',
+    'aura.kilnFury': 'Kiln Fury',
+    'aura.scorched': 'Scorched',
+    'aura.chilled': 'Chilled',
+    'aura.tempering': 'Tempering',
+    'mechanic.temperingClash': 'Tempering Clash',
+    'mechanic.cinderArc': 'Cinder Arc',
+    'mechanic.temperSweep': 'Temper Sweep',
+    'mechanic.forgeDraft': 'Forge Draft',
+    'mechanic.glasscutArc': 'Glasscut Arc',
+    'mechanic.kilnflarePulse': 'Kilnflare Pulse',
   },
   it_IT: {
     'error.mountTrainInProgress': 'È già in corso una lezione di equitazione.',
@@ -3075,6 +3300,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Gelo Invernale',
     'aura.icicles': 'Ghiaccioli',
     'aura.perfectMoment': 'Momento Perfetto',
+    'aura.glazing': 'Smaltatura',
+    'aura.emberfeed': 'Nutrimento delle Braci',
+    'aura.forgeheat': 'Calore della Forgia',
+    'aura.searingGrip': 'Morsa Rovente',
+    'mechanic.ventFissure': 'Fessura di Sfogo',
+    'mechanic.undermountEruption': 'Eruzione del Sottomonte',
+    'aura.embersComeHome': 'Le Braci Tornano a Casa',
+    'dialogue.maerinCraft':
+      "Questa maestria... il lavoro di un'intera gilda, per un culto di incendiari? Quaggiù c'è qualcosa che vale la pena nascondere dietro tutto questo.",
+    'dialogue.maerinLedger':
+      'Provviste per bestie, salari, mangime per i canili... e la pagina delle firme strappata. Qualcuno è partito in fretta. A nord.',
+    'dialogue.maerinAsleep':
+      'Non stanno fabbricando nulla. Tengono qualcosa ADDORMENTATO finché non saranno pronti.',
+    'dialogue.maerinRestraints':
+      'Queste non sono rune di evocazione. Sono VINCOLI, e noi li abbiamo TAGLIATI. Ogni custode ucciso era una serratura.',
+    'dialogue.maerinGo':
+      "Non c'è mai stata una fabbrica. C'era soltanto lui, e un ottimo travestimento. Andate.",
+    'dialogue.maerinHalfFormed':
+      'Formato a metà. Lo abbiamo ucciso prima che la forgia potesse finire il suo lavoro.',
+    'dialogue.maerinVein': 'Il fuoco si ritira a nord lungo la vena. Non è finita.',
+    'mechanic.cinderToad': 'Rospo di brace',
+    'mechanic.anneal': 'Ricottura',
+    'aura.kilnFury': 'Furia della fornace',
+    'aura.scorched': 'Bruciato',
+    'aura.chilled': 'Raffreddato',
+    'aura.tempering': 'Tempra',
+    'mechanic.temperingClash': 'Scontro di tempra',
+    'mechanic.cinderArc': 'Arco di brace',
+    'mechanic.temperSweep': 'Spazzata di tempra',
+    'mechanic.forgeDraft': 'Soffio della forgia',
+    'mechanic.glasscutArc': 'Arco tagliavetro',
+    'mechanic.kilnflarePulse': 'Impulso della fornace ardente',
   },
   de_DE: {
     'error.mountTrainInProgress': 'Es läuft bereits eine Reitstunde.',
@@ -3494,6 +3751,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Winterkälte',
     'aura.icicles': 'Eiszapfen',
     'aura.perfectMoment': 'Perfekter Moment',
+    'aura.glazing': 'Glasur',
+    'aura.emberfeed': 'Glutnahrung',
+    'aura.forgeheat': 'Schmiedehitze',
+    'aura.searingGrip': 'Sengender Griff',
+    'mechanic.ventFissure': 'Entlüftungsspalte',
+    'mechanic.undermountEruption': 'Unterberg-Ausbruch',
+    'aura.embersComeHome': 'Die Glut Kehrt Heim',
+    'dialogue.maerinCraft':
+      'Diese Handwerkskunst... die Arbeit einer ganzen Gilde, für einen Kult von Brandstiftern? Etwas hier unten ist es wert, hinter all dem verborgen zu werden.',
+    'dialogue.maerinLedger':
+      'Bestienvorräte, Löhne, Zwingerfutter... und die Unterschriftsseite herausgerissen. Jemand brach eilig auf. Nach Norden.',
+    'dialogue.maerinAsleep':
+      'Sie stellen nichts her. Sie halten etwas im SCHLAF, bis sie bereit sind.',
+    'dialogue.maerinRestraints':
+      'Das sind keine Beschwörungsrunen. Es sind FESSELN, und wir haben sie DURCHTRENNT. Jeder getötete Hüter war ein Schloss.',
+    'dialogue.maerinGo': 'Es gab nie eine Fabrik. Es gab nur ihn und eine sehr gute Tarnung. Geht.',
+    'dialogue.maerinHalfFormed':
+      'Halb geformt. Wir töteten ihn, bevor die Schmiede ihr Werk vollenden konnte.',
+    'dialogue.maerinVein':
+      'Das Feuer zieht sich entlang der Ader nach Norden zurück. Es ist nicht vorbei.',
+    'mechanic.cinderToad': 'Glutkröte',
+    'mechanic.anneal': 'Ausglühen',
+    'aura.kilnFury': 'Ofenwut',
+    'aura.scorched': 'Versengt',
+    'aura.chilled': 'Unterkühlt',
+    'aura.tempering': 'Härtung',
+    'mechanic.temperingClash': 'Härtungskonflikt',
+    'mechanic.cinderArc': 'Glutbogen',
+    'mechanic.temperSweep': 'Härtungsschwung',
+    'mechanic.forgeDraft': 'Essewind',
+    'mechanic.glasscutArc': 'Glasschnittbogen',
+    'mechanic.kilnflarePulse': 'Ofenglutpuls',
   },
   zh_CN: {
     'error.mountTrainInProgress': '骑乘课程已在进行中。',
@@ -3892,6 +4181,35 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': '凛冬之寒',
     'aura.icicles': '冰锥',
     'aura.perfectMoment': '完美时刻',
+    'aura.glazing': '上釉',
+    'aura.emberfeed': '余烬滋养',
+    'aura.forgeheat': '锻炉热力',
+    'aura.searingGrip': '灼热之握',
+    'mechanic.ventFissure': '喷口裂隙',
+    'mechanic.undermountEruption': '地底山喷发',
+    'aura.embersComeHome': '余烬归巢',
+    'dialogue.maerinCraft':
+      '这种工艺...竟是整个行会为一群纵火狂完成的杰作？这里藏着某种值得用这一切掩护的东西。',
+    'dialogue.maerinLedger':
+      '野兽口粮、工钱、犬舍饲料...签名页却被撕掉了。有人匆忙离开。去了北方。',
+    'dialogue.maerinAsleep': '他们什么也没在制造。他们只是在准备好之前让某个东西继续沉睡。',
+    'dialogue.maerinRestraints':
+      '这些不是召唤符文，而是束缚，而我们一直在割断它们。每个被我们杀死的守卫都是一把锁。',
+    'dialogue.maerinGo': '从来没有什么工厂。这里只有他，以及一层绝妙的伪装。去吧。',
+    'dialogue.maerinHalfFormed': '尚未成形。我们在锻炉完成工作前杀死了他。',
+    'dialogue.maerinVein': '火焰正沿着矿脉向北退去。这还没有结束。',
+    'mechanic.cinderToad': '烬火蟾蜍',
+    'mechanic.anneal': '退火',
+    'aura.kilnFury': '窑炉之怒',
+    'aura.scorched': '灼烧',
+    'aura.chilled': '寒冷',
+    'aura.tempering': '淬炼',
+    'mechanic.temperingClash': '淬炼冲突',
+    'mechanic.cinderArc': '烬火弧',
+    'mechanic.temperSweep': '淬炼横扫',
+    'mechanic.forgeDraft': '锻炉气流',
+    'mechanic.glasscutArc': '玻璃切割弧',
+    'mechanic.kilnflarePulse': '窑焰脉冲',
   },
   zh_TW: {
     'error.mountTrainInProgress': '騎乘課程已在進行中。',
@@ -4290,6 +4608,35 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': '凜冬之寒',
     'aura.icicles': '冰錐',
     'aura.perfectMoment': '完美時刻',
+    'aura.glazing': '上釉',
+    'aura.emberfeed': '餘燼滋養',
+    'aura.forgeheat': '鍛爐熱力',
+    'aura.searingGrip': '灼熱之握',
+    'mechanic.ventFissure': '噴口裂隙',
+    'mechanic.undermountEruption': '地底山噴發',
+    'aura.embersComeHome': '餘燼歸巢',
+    'dialogue.maerinCraft':
+      '這種工藝...竟是整個行會為一群縱火狂完成的傑作？這裡藏著某種值得用這一切掩護的東西。',
+    'dialogue.maerinLedger':
+      '野獸口糧、工錢、犬舍飼料...簽名頁卻被撕掉了。有人匆忙離開。去了北方。',
+    'dialogue.maerinAsleep': '他們什麼也沒在製造。他們只是在準備好之前讓某個東西繼續沉睡。',
+    'dialogue.maerinRestraints':
+      '這些不是召喚符文，而是束縛，而我們一直在割斷它們。每個被我們殺死的守衛都是一把鎖。',
+    'dialogue.maerinGo': '從來沒有什麼工廠。這裡只有他，以及一層絕妙的偽裝。去吧。',
+    'dialogue.maerinHalfFormed': '尚未成形。我們在鍛爐完成工作前殺死了他。',
+    'dialogue.maerinVein': '火焰正沿著礦脈向北退去。這還沒有結束。',
+    'mechanic.cinderToad': '燼火蟾蜍',
+    'mechanic.anneal': '退火',
+    'aura.kilnFury': '窯爐之怒',
+    'aura.scorched': '灼燒',
+    'aura.chilled': '寒冷',
+    'aura.tempering': '淬鍊',
+    'mechanic.temperingClash': '淬鍊衝突',
+    'mechanic.cinderArc': '燼火弧',
+    'mechanic.temperSweep': '淬鍊橫掃',
+    'mechanic.forgeDraft': '鍛爐氣流',
+    'mechanic.glasscutArc': '玻璃切割弧',
+    'mechanic.kilnflarePulse': '窯焰脈衝',
   },
   ko_KR: {
     'error.mountTrainInProgress': '기승 수업이 이미 진행 중입니다.',
@@ -4697,6 +5044,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': '겨울의 한기',
     'aura.icicles': '고드름',
     'aura.perfectMoment': '완벽한 순간',
+    'aura.glazing': '유약 코팅',
+    'aura.emberfeed': '불씨 먹이',
+    'aura.forgeheat': '용광로 열기',
+    'aura.searingGrip': '타오르는 손아귀',
+    'mechanic.ventFissure': '분출구 균열',
+    'mechanic.undermountEruption': '언더마운트 분출',
+    'aura.embersComeHome': '불씨의 귀환',
+    'dialogue.maerinCraft':
+      '이 솜씨... 방화범 교단을 위해 길드 전체가 만든 작품이라고요? 이 모든 것 뒤에 숨길 만큼 중요한 무언가가 아래에 있습니다.',
+    'dialogue.maerinLedger':
+      '야수 보급품, 임금, 사육장 먹이... 서명 페이지는 뜯겨 나갔군요. 누군가 급히 떠났습니다. 북쪽으로요.',
+    'dialogue.maerinAsleep':
+      '그들은 아무것도 만들고 있지 않습니다. 준비될 때까지 무언가를 계속 잠재우고 있습니다.',
+    'dialogue.maerinRestraints':
+      '이것은 소환 룬이 아닙니다. 구속구였고, 우리는 그것을 계속 잘라 냈습니다. 우리가 죽인 모든 수호자는 자물쇠였습니다.',
+    'dialogue.maerinGo':
+      '공장은 처음부터 없었습니다. 오직 그와 아주 훌륭한 위장만 있었죠. 가십시오.',
+    'dialogue.maerinHalfFormed':
+      '절반만 형성됐습니다. 용광로가 작업을 끝내기 전에 우리가 그를 죽였습니다.',
+    'dialogue.maerinVein': '불길이 광맥을 따라 북쪽으로 물러갑니다. 아직 끝나지 않았습니다.',
+    'mechanic.cinderToad': '잿불 두꺼비',
+    'mechanic.anneal': '풀림',
+    'aura.kilnFury': '가마의 분노',
+    'aura.scorched': '그을림',
+    'aura.chilled': '냉각',
+    'aura.tempering': '담금질',
+    'mechanic.temperingClash': '담금질 충돌',
+    'mechanic.cinderArc': '잿불 호',
+    'mechanic.temperSweep': '담금질 휩쓸기',
+    'mechanic.forgeDraft': '용광로 기류',
+    'mechanic.glasscutArc': '유리 절단 호',
+    'mechanic.kilnflarePulse': '가마불 파동',
   },
   ja_JP: {
     'error.mountTrainInProgress': '騎乗レッスンはすでに進行中です。',
@@ -5113,6 +5492,35 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': '冬の凍え',
     'aura.icicles': '氷柱',
     'aura.perfectMoment': '完璧な瞬間',
+    'aura.glazing': '施釉',
+    'aura.emberfeed': '残り火の糧',
+    'aura.forgeheat': '炉熱',
+    'aura.searingGrip': '灼熱の握撃',
+    'mechanic.ventFissure': '噴気亀裂',
+    'mechanic.undermountEruption': 'アンダーマウント噴火',
+    'aura.embersComeHome': '残り火の帰還',
+    'dialogue.maerinCraft':
+      'この技巧...放火魔の教団のために、ギルド総出で作ったというのか？このすべてで隠すほど価値のある何かが下にある。',
+    'dialogue.maerinLedger':
+      '獣の食料、賃金、犬舎の餌...そして署名のページは破り取られている。誰かが急いで去った。北へ。',
+    'dialogue.maerinAsleep': '彼らは何も作っていない。準備が整うまで、何かを眠らせている。',
+    'dialogue.maerinRestraints':
+      'これは召喚のルーンではない。拘束具だ。そして私たちはそれを切り続けていた。倒した番人はすべて錠だった。',
+    'dialogue.maerinGo': '工場など最初からなかった。いたのは彼と、見事な偽装だけだ。行け。',
+    'dialogue.maerinHalfFormed': '半ばしか形を成していない。炉が仕事を終える前に倒せた。',
+    'dialogue.maerinVein': '炎が鉱脈に沿って北へ退いている。まだ終わっていない。',
+    'mechanic.cinderToad': '熾火ガエル',
+    'mechanic.anneal': '焼鈍',
+    'aura.kilnFury': '窯炉の激怒',
+    'aura.scorched': '灼熱',
+    'aura.chilled': '冷気',
+    'aura.tempering': '焼入れ',
+    'mechanic.temperingClash': '焼入れの衝突',
+    'mechanic.cinderArc': '熾火の弧',
+    'mechanic.temperSweep': '焼入れ薙ぎ',
+    'mechanic.forgeDraft': '鍛炉の風',
+    'mechanic.glasscutArc': 'ガラス切断の弧',
+    'mechanic.kilnflarePulse': '窯炎の波動',
   },
   pt_BR: {
     'error.mountTrainInProgress': 'Uma aula de equitação já está em andamento.',
@@ -5527,6 +5935,37 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Frio do Inverno',
     'aura.icicles': 'Pingentes de Gelo',
     'aura.perfectMoment': 'Momento Perfeito',
+    'aura.glazing': 'Esmaltagem',
+    'aura.emberfeed': 'Alimentação de Brasas',
+    'aura.forgeheat': 'Calor da Forja',
+    'aura.searingGrip': 'Aperto Abrasador',
+    'mechanic.ventFissure': 'Fissura de Ventilação',
+    'mechanic.undermountEruption': 'Erupção do Submonte',
+    'aura.embersComeHome': 'As Brasas Voltam para Casa',
+    'dialogue.maerinCraft':
+      'Este trabalho... obra de uma guilda inteira, para um culto de incendiários? Há algo aqui embaixo que vale ser escondido por tudo isto.',
+    'dialogue.maerinLedger':
+      'Provisões para feras, salários, ração dos canis... e a página de assinaturas arrancada. Alguém partiu com pressa. Para o norte.',
+    'dialogue.maerinAsleep':
+      'Eles não estão fabricando nada. Estão mantendo algo ADORMECIDO até estarem prontos.',
+    'dialogue.maerinRestraints':
+      'Estas não são runas de invocação. São AMARRAS, e nós as CORTAMOS. Cada guardião que matamos era uma fechadura.',
+    'dialogue.maerinGo': 'Nunca houve uma fábrica. Havia apenas ele e um disfarce muito bom. Vão.',
+    'dialogue.maerinHalfFormed':
+      'Formado pela metade. Nós o matamos antes que a forja terminasse seu trabalho.',
+    'dialogue.maerinVein': 'O fogo está recuando para o norte pela veia. Isto não terminou.',
+    'mechanic.cinderToad': 'Sapo de Brasa',
+    'mechanic.anneal': 'Recozimento',
+    'aura.kilnFury': 'Fúria do Forno',
+    'aura.scorched': 'Chamuscado',
+    'aura.chilled': 'Resfriado',
+    'aura.tempering': 'Têmpera',
+    'mechanic.temperingClash': 'Choque de Têmpera',
+    'mechanic.cinderArc': 'Arco de Brasa',
+    'mechanic.temperSweep': 'Varredura de Têmpera',
+    'mechanic.forgeDraft': 'Corrente da Forja',
+    'mechanic.glasscutArc': 'Arco Corta-Vidro',
+    'mechanic.kilnflarePulse': 'Pulso da Chama do Forno',
   },
   ru_RU: {
     'error.mountTrainInProgress': 'Урок верховой езды уже идёт.',
@@ -5942,6 +6381,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Зимний холод',
     'aura.icicles': 'Сосульки',
     'aura.perfectMoment': 'Идеальный миг',
+    'aura.glazing': 'Глазурование',
+    'aura.emberfeed': 'Питание Углями',
+    'aura.forgeheat': 'Жар Горна',
+    'aura.searingGrip': 'Опаляющая Хватка',
+    'mechanic.ventFissure': 'Жерловая Трещина',
+    'mechanic.undermountEruption': 'Извержение Подгорья',
+    'aura.embersComeHome': 'Угли Возвращаются Домой',
+    'dialogue.maerinCraft':
+      'Такое мастерство... работа целой гильдии ради культа поджигателей? Здесь внизу есть нечто, что стоило скрыть за всем этим.',
+    'dialogue.maerinLedger':
+      'Припасы для зверей, жалованье, корм для питомников... а страница с подписями вырвана. Кто-то ушел в спешке. На север.',
+    'dialogue.maerinAsleep':
+      'Они ничего не производят. Они держат нечто ВО СНЕ, пока не будут готовы.',
+    'dialogue.maerinRestraints':
+      'Это не руны призыва. Это ОКОВЫ, и мы их РАЗРУБАЛИ. Каждый убитый хранитель был замком.',
+    'dialogue.maerinGo':
+      'Никакой фабрики никогда не было. Был только он и очень хорошая маскировка. Идите.',
+    'dialogue.maerinHalfFormed':
+      'Сформирован лишь наполовину. Мы убили его прежде, чем горн завершил работу.',
+    'dialogue.maerinVein': 'Огонь отступает на север вдоль жилы. Это еще не конец.',
+    'mechanic.cinderToad': 'Углежаб',
+    'mechanic.anneal': 'Отжиг',
+    'aura.kilnFury': 'Ярость горна',
+    'aura.scorched': 'Опалён',
+    'aura.chilled': 'Охлаждён',
+    'aura.tempering': 'Закалка',
+    'mechanic.temperingClash': 'Столкновение закалки',
+    'mechanic.cinderArc': 'Угольная дуга',
+    'mechanic.temperSweep': 'Размашистая закалка',
+    'mechanic.forgeDraft': 'Сквозняк кузни',
+    'mechanic.glasscutArc': 'Стеклорежущая дуга',
+    'mechanic.kilnflarePulse': 'Импульс горнила',
   },
   ...BASE_NEW,
   cs_CZ: {
@@ -6060,6 +6531,36 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Chlad zimy',
     'aura.icicles': 'Rampouchy',
     'aura.perfectMoment': 'Dokonalý okamžik',
+    'aura.glazing': 'Glazování',
+    'aura.emberfeed': 'Živení Uhlíky',
+    'aura.forgeheat': 'Žár Výhně',
+    'aura.searingGrip': 'Spalující sevření',
+    'mechanic.ventFissure': 'Průduchová Puklina',
+    'mechanic.undermountEruption': 'Erupce Podhoří',
+    'aura.embersComeHome': 'Uhlíky se Vracejí Domů',
+    'dialogue.maerinCraft':
+      'Takové řemeslo... práce celého cechu pro kult žhářů? Něco tady dole stojí za to skrýt za tím vším.',
+    'dialogue.maerinLedger':
+      'Zásoby pro šelmy, mzdy, krmivo pro kotce... a stránka s podpisy je vytržená. Někdo odešel ve spěchu. Na sever.',
+    'dialogue.maerinAsleep': 'Nic nevyrábějí. Udržují něco VE SPÁNKU, dokud nebudou připraveni.',
+    'dialogue.maerinRestraints':
+      'To nejsou vyvolávací runy. Jsou to POUTA a my je PŘETÍNALI. Každý zabitý strážce byl zámek.',
+    'dialogue.maerinGo': 'Žádná továrna nikdy nebyla. Byl jen on a velmi dobré přestrojení. Jděte.',
+    'dialogue.maerinHalfFormed':
+      'Napůl zformovaný. Zabili jsme ho dřív, než kovárna dokončila svou práci.',
+    'dialogue.maerinVein': 'Oheň ustupuje podél žíly na sever. Tohle neskončilo.',
+    'mechanic.cinderToad': 'Žhavá ropucha',
+    'mechanic.anneal': 'Žíhání',
+    'aura.kilnFury': 'Zuřivost pece',
+    'aura.scorched': 'Sežehnutý',
+    'aura.chilled': 'Zchlazený',
+    'aura.tempering': 'Kalení',
+    'mechanic.temperingClash': 'Střet kalení',
+    'mechanic.cinderArc': 'Žhavý oblouk',
+    'mechanic.temperSweep': 'Kalicí smet',
+    'mechanic.forgeDraft': 'Výheňský průvan',
+    'mechanic.glasscutArc': 'Sklořezný oblouk',
+    'mechanic.kilnflarePulse': 'Pulz žáru pece',
   },
   nl_NL: {
     'error.emptyLoadoutName': 'De naam van een build mag niet leeg zijn.',
@@ -6176,6 +6677,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Winterkilte',
     'aura.icicles': 'IJspegels',
     'aura.perfectMoment': 'Volmaakt Ogenblik',
+    'aura.glazing': 'Glazuren',
+    'aura.emberfeed': 'Sintelvoeding',
+    'aura.forgeheat': 'Smederijhitte',
+    'aura.searingGrip': 'Verzengende Greep',
+    'mechanic.ventFissure': 'Luchtspleet',
+    'mechanic.undermountEruption': 'Ondermount-uitbarsting',
+    'aura.embersComeHome': 'De Sintels Komen Thuis',
+    'dialogue.maerinCraft':
+      'Dit vakmanschap... het werk van een heel gilde, voor een sekte brandstichters? Iets hier beneden is het waard om achter dit alles te verbergen.',
+    'dialogue.maerinLedger':
+      'Beestenvoorraden, lonen, kennelvoer... en de handtekeningenpagina eruit gescheurd. Iemand vertrok haastig. Naar het noorden.',
+    'dialogue.maerinAsleep': 'Ze maken niets. Ze houden iets IN SLAAP tot ze er klaar voor zijn.',
+    'dialogue.maerinRestraints':
+      'Dit zijn geen oproepingsrunen. Het zijn BOEIEN, en wij hebben ze DOORGESNEDEN. Elke bewaker die we doodden was een slot.',
+    'dialogue.maerinGo':
+      'Er was nooit een fabriek. Er was alleen hij en een heel goede vermomming. Ga.',
+    'dialogue.maerinHalfFormed':
+      'Half gevormd. We doodden hem voordat de smidse haar werk kon voltooien.',
+    'dialogue.maerinVein':
+      'Het vuur trekt zich langs de ader naar het noorden terug. Dit is niet voorbij.',
+    'mechanic.cinderToad': 'Sintelkikker',
+    'mechanic.anneal': 'Uitgloeien',
+    'aura.kilnFury': 'Ovenwoede',
+    'aura.scorched': 'Verschroeid',
+    'aura.chilled': 'Verkoeld',
+    'aura.tempering': 'Harden',
+    'mechanic.temperingClash': 'Hardingsbotsing',
+    'mechanic.cinderArc': 'Sintelboog',
+    'mechanic.temperSweep': 'Hardingszwaai',
+    'mechanic.forgeDraft': 'Smederijtocht',
+    'mechanic.glasscutArc': 'Glassnijboog',
+    'mechanic.kilnflarePulse': 'Ovenvlampuls',
   },
   pl_PL: {
     'error.emptyLoadoutName': 'Nazwa buildu nie może być pusta.',
@@ -6295,6 +6828,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Chłód zimy',
     'aura.icicles': 'Sople lodu',
     'aura.perfectMoment': 'Idealna chwila',
+    'aura.glazing': 'Szkliwienie',
+    'aura.emberfeed': 'Żerowanie Żaru',
+    'aura.forgeheat': 'Żar Kuźni',
+    'aura.searingGrip': 'Palący Uścisk',
+    'mechanic.ventFissure': 'Szczelina Wentylacyjna',
+    'mechanic.undermountEruption': 'Erupcja Podgórza',
+    'aura.embersComeHome': 'Żar Wraca do Domu',
+    'dialogue.maerinCraft':
+      'Takie rzemiosło... dzieło całej gildii dla kultu podpalaczy? Coś tutaj jest warte ukrycia za tym wszystkim.',
+    'dialogue.maerinLedger':
+      'Zapasy dla bestii, płace, karma dla psiarni... a strona z podpisami wyrwana. Ktoś odszedł w pośpiechu. Na północ.',
+    'dialogue.maerinAsleep':
+      'Oni niczego nie produkują. Utrzymują coś W UŚPIENIU, dopóki nie będą gotowi.',
+    'dialogue.maerinRestraints':
+      'To nie są runy przyzwania. To WIĘZY, a my je PRZECINALIŚMY. Każdy zabity strażnik był zamkiem.',
+    'dialogue.maerinGo':
+      'Nigdy nie było żadnej fabryki. Był tylko on i bardzo dobre przebranie. Idźcie.',
+    'dialogue.maerinHalfFormed':
+      'Uformowany tylko częściowo. Zabiliśmy go, zanim kuźnia skończyła pracę.',
+    'dialogue.maerinVein': 'Ogień cofa się żyłą na północ. To jeszcze nie koniec.',
+    'mechanic.cinderToad': 'Żarropucha',
+    'mechanic.anneal': 'Wyżarzanie',
+    'aura.kilnFury': 'Furia pieca',
+    'aura.scorched': 'Osmalony',
+    'aura.chilled': 'Wychłodzony',
+    'aura.tempering': 'Hartowanie',
+    'mechanic.temperingClash': 'Starcie hartowania',
+    'mechanic.cinderArc': 'Łuk żaru',
+    'mechanic.temperSweep': 'Zamaszyste hartowanie',
+    'mechanic.forgeDraft': 'Ciąg kuźni',
+    'mechanic.glasscutArc': 'Łuk cięcia szkła',
+    'mechanic.kilnflarePulse': 'Puls płomienia pieca',
   },
   id_ID: {
     'error.emptyLoadoutName': 'Nama bangun tidak boleh kosong.',
@@ -6412,6 +6977,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Hawa Musim Dingin',
     'aura.icicles': 'Kerucut Es',
     'aura.perfectMoment': 'Momen Sempurna',
+    'aura.glazing': 'Pelapisan Kaca',
+    'aura.emberfeed': 'Santapan Bara',
+    'aura.forgeheat': 'Panas Tempa',
+    'aura.searingGrip': 'Cengkeraman Membara',
+    'mechanic.ventFissure': 'Retakan Ventilasi',
+    'mechanic.undermountEruption': 'Erupsi Undermount',
+    'aura.embersComeHome': 'Bara Pulang',
+    'dialogue.maerinCraft':
+      'Keahlian ini... karya seluruh serikat untuk kultus pembakar? Ada sesuatu di bawah sini yang layak disembunyikan di balik semua ini.',
+    'dialogue.maerinLedger':
+      'Persediaan binatang, upah, pakan kandang... dan halaman tanda tangan disobek. Seseorang pergi terburu-buru. Ke utara.',
+    'dialogue.maerinAsleep':
+      'Mereka tidak membuat apa pun. Mereka menjaga sesuatu tetap TERTIDUR sampai siap.',
+    'dialogue.maerinRestraints':
+      'Ini bukan rune pemanggilan. Ini PENGEKANG, dan kita telah MEMOTONGNYA. Setiap penjaga yang kita bunuh adalah kunci.',
+    'dialogue.maerinGo':
+      'Tidak pernah ada pabrik. Hanya ada dia dan penyamaran yang sangat baik. Pergilah.',
+    'dialogue.maerinHalfFormed':
+      'Baru terbentuk separuh. Kita membunuhnya sebelum bengkel menyelesaikan pekerjaannya.',
+    'dialogue.maerinVein': 'Api menyusut ke utara mengikuti uratnya. Ini belum selesai.',
+    'mechanic.cinderToad': 'Kodok Bara',
+    'mechanic.anneal': 'Penganilan',
+    'aura.kilnFury': 'Amarah Tungku',
+    'aura.scorched': 'Hangus',
+    'aura.chilled': 'Dingin',
+    'aura.tempering': 'Penyepuhan',
+    'mechanic.temperingClash': 'Benturan Penyepuhan',
+    'mechanic.cinderArc': 'Busur Bara',
+    'mechanic.temperSweep': 'Sapuan Penyepuhan',
+    'mechanic.forgeDraft': 'Hembusan Tempa',
+    'mechanic.glasscutArc': 'Busur Pemotong Kaca',
+    'mechanic.kilnflarePulse': 'Denyut Nyala Tungku',
   },
   tr_TR: {
     'error.emptyLoadoutName': 'Derleme adı boş olamaz.',
@@ -6529,6 +7126,37 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Kış Soğuğu',
     'aura.icicles': 'Buz Sarkıtları',
     'aura.perfectMoment': 'Mükemmel An',
+    'aura.glazing': 'Sırlama',
+    'aura.emberfeed': 'Kor Besleme',
+    'aura.forgeheat': 'Ocak Isısı',
+    'aura.searingGrip': 'Yakıcı Kavrayış',
+    'mechanic.ventFissure': 'Havalandırma Yarığı',
+    'mechanic.undermountEruption': 'Undermount Patlaması',
+    'aura.embersComeHome': 'Korlar Eve Dönüyor',
+    'dialogue.maerinCraft':
+      'Bu işçilik... kundakçı bir tarikat için bütün bir loncanın emeği mi? Aşağıda tüm bunların ardına saklanmaya değer bir şey var.',
+    'dialogue.maerinLedger':
+      'Canavar erzakı, ücretler, kulübe yemi... imza sayfası da koparılmış. Biri aceleyle ayrılmış. Kuzeye.',
+    'dialogue.maerinAsleep':
+      'Hiçbir şey üretmiyorlar. Hazır olana kadar bir şeyi UYKUDA tutuyorlar.',
+    'dialogue.maerinRestraints':
+      'Bunlar çağırma rünleri değil. Bunlar BAĞLAR ve biz onları KESİYORDUK. Öldürdüğümüz her muhafız bir kilitti.',
+    'dialogue.maerinGo':
+      'Hiçbir zaman fabrika yoktu. Yalnızca o ve çok iyi bir kılık vardı. Gidin.',
+    'dialogue.maerinHalfFormed': 'Yarı biçimlenmişti. Ocak işini bitirmeden onu öldürdük.',
+    'dialogue.maerinVein': 'Ateş damar boyunca kuzeye çekiliyor. Bu bitmedi.',
+    'mechanic.cinderToad': 'Kor Kurbağası',
+    'mechanic.anneal': 'Tavlama',
+    'aura.kilnFury': 'Fırın Hiddeti',
+    'aura.scorched': 'Kavrulmuş',
+    'aura.chilled': 'Soğutulmuş',
+    'aura.tempering': 'Menevişleme',
+    'mechanic.temperingClash': 'Meneviş Çarpışması',
+    'mechanic.cinderArc': 'Kor Yayı',
+    'mechanic.temperSweep': 'Meneviş Savuruşu',
+    'mechanic.forgeDraft': 'Ocak Esintisi',
+    'mechanic.glasscutArc': 'Cam Kesen Yay',
+    'mechanic.kilnflarePulse': 'Fırın Alevi Darbesi',
   },
   sv_SE: {
     'error.emptyLoadoutName': 'Byggets namn får inte vara tomt.',
@@ -6645,6 +7273,37 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Vinterns köld',
     'aura.icicles': 'Istappar',
     'aura.perfectMoment': 'Perfekt ögonblick',
+    'aura.glazing': 'Glasering',
+    'aura.emberfeed': 'Glödmatning',
+    'aura.forgeheat': 'Smedjehetta',
+    'aura.searingGrip': 'Brännande Grepp',
+    'mechanic.ventFissure': 'Ventilspricka',
+    'mechanic.undermountEruption': 'Undermount-utbrott',
+    'aura.embersComeHome': 'Glöden Kommer Hem',
+    'dialogue.maerinCraft':
+      'Detta hantverk... ett helt skrås arbete för en kult av mordbrännare? Något här nere är värt att gömma bakom allt detta.',
+    'dialogue.maerinLedger':
+      'Bestproviant, löner, kennelfoder... och signatursidan utriven. Någon gav sig av i hast. Norrut.',
+    'dialogue.maerinAsleep': 'De tillverkar ingenting. De håller något SOVANDE tills de är redo.',
+    'dialogue.maerinRestraints':
+      'Detta är inte åkallningsrunor. De är BOJOR, och vi har HUGGIT AV dem. Varje väktare vi dödade var ett lås.',
+    'dialogue.maerinGo':
+      'Det fanns aldrig någon fabrik. Det fanns bara han och en mycket bra förklädnad. Gå.',
+    'dialogue.maerinHalfFormed':
+      'Halvt formad. Vi dödade honom innan smedjan kunde avsluta sitt arbete.',
+    'dialogue.maerinVein': 'Elden drar sig norrut längs ådern. Det här är inte över.',
+    'mechanic.cinderToad': 'Glödpadda',
+    'mechanic.anneal': 'Glödgning',
+    'aura.kilnFury': 'Ugnsraseri',
+    'aura.scorched': 'Svedd',
+    'aura.chilled': 'Nedkyld',
+    'aura.tempering': 'Härdning',
+    'mechanic.temperingClash': 'Härdningskrock',
+    'mechanic.cinderArc': 'Glödbåge',
+    'mechanic.temperSweep': 'Härdningssvep',
+    'mechanic.forgeDraft': 'Smedjedrag',
+    'mechanic.glasscutArc': 'Glasskärarbåge',
+    'mechanic.kilnflarePulse': 'Ugnsflamspuls',
   },
   vi_VN: {
     'error.emptyLoadoutName': 'Tên build không được để trống.',
@@ -6760,6 +7419,37 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Giá Lạnh Mùa Đông',
     'aura.icicles': 'Nhũ Băng',
     'aura.perfectMoment': 'Khoảnh Khắc Hoàn Hảo',
+    'aura.glazing': 'Tráng Men',
+    'aura.emberfeed': 'Nuôi Dưỡng Than Hồng',
+    'aura.forgeheat': 'Nhiệt Lò Rèn',
+    'aura.searingGrip': 'Cú Siết Thiêu Đốt',
+    'mechanic.ventFissure': 'Khe Phun',
+    'mechanic.undermountEruption': 'Núi Ngầm Phun Trào',
+    'aura.embersComeHome': 'Than Hồng Trở Về',
+    'dialogue.maerinCraft':
+      'Tay nghề này... công sức của cả một nghiệp đoàn cho giáo phái phóng hỏa sao? Có thứ dưới đây đáng để giấu sau tất cả những thứ này.',
+    'dialogue.maerinLedger':
+      'Lương thực cho thú, tiền công, thức ăn chuồng chó... và trang chữ ký đã bị xé. Ai đó đã vội vã rời đi. Về phía bắc.',
+    'dialogue.maerinAsleep':
+      'Chúng không chế tạo gì cả. Chúng đang giữ một thứ NGỦ YÊN cho đến khi sẵn sàng.',
+    'dialogue.maerinRestraints':
+      'Đây không phải rune triệu hồi. Chúng là XIỀNG XÍCH, và ta đã CẮT chúng. Mỗi kẻ canh giữ bị giết là một ổ khóa.',
+    'dialogue.maerinGo': 'Chưa từng có nhà máy. Chỉ có hắn và một lớp ngụy trang rất giỏi. Đi đi.',
+    'dialogue.maerinHalfFormed':
+      'Mới thành hình một nửa. Ta đã giết hắn trước khi lò rèn hoàn tất công việc.',
+    'dialogue.maerinVein': 'Ngọn lửa đang rút về phía bắc dọc theo mạch. Chuyện này chưa kết thúc.',
+    'mechanic.cinderToad': 'Cóc Than Hồng',
+    'mechanic.anneal': 'Ủ Nhiệt',
+    'aura.kilnFury': 'Cuồng Nộ Lò Nung',
+    'aura.scorched': 'Thiêu Cháy',
+    'aura.chilled': 'Ướp Lạnh',
+    'aura.tempering': 'Tôi Luyện',
+    'mechanic.temperingClash': 'Xung Đột Tôi Luyện',
+    'mechanic.cinderArc': 'Cung Than Hồng',
+    'mechanic.temperSweep': 'Quét Tôi Luyện',
+    'mechanic.forgeDraft': 'Luồng Gió Lò Rèn',
+    'mechanic.glasscutArc': 'Cung Cắt Kính',
+    'mechanic.kilnflarePulse': 'Xung Lửa Lò Nung',
   },
   da_DK: {
     'error.emptyLoadoutName': 'Navnet på et build må ikke være tomt.',
@@ -6876,6 +7566,38 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Vinterens Kulde',
     'aura.icicles': 'Istapper',
     'aura.perfectMoment': 'Perfekt Øjeblik',
+    'aura.glazing': 'Glasering',
+    'aura.emberfeed': 'Glødeføde',
+    'aura.forgeheat': 'Smedjehede',
+    'aura.searingGrip': 'Brændende Greb',
+    'mechanic.ventFissure': 'Ventilspalte',
+    'mechanic.undermountEruption': 'Undermount-udbrud',
+    'aura.embersComeHome': 'Gløderne Kommer Hjem',
+    'dialogue.maerinCraft':
+      'Dette håndværk... et helt laugs arbejde for en kult af brandstiftere? Noget hernede er værd at skjule bag alt dette.',
+    'dialogue.maerinLedger':
+      'Forsyninger til bæster, lønninger, kennelfoder... og underskriftssiden revet ud. Nogen rejste i hast. Mod nord.',
+    'dialogue.maerinAsleep':
+      'De fremstiller ingenting. De holder noget SOVENDE, indtil de er klar.',
+    'dialogue.maerinRestraints':
+      'Det er ikke påkaldelsesruner. Det er LÆNKER, og vi har SKÅRET dem over. Hver vogter vi dræbte var en lås.',
+    'dialogue.maerinGo':
+      'Der var aldrig en fabrik. Der var kun ham og en meget god forklædning. Gå.',
+    'dialogue.maerinHalfFormed':
+      'Halvt formet. Vi dræbte ham, før smedjen kunne afslutte sit arbejde.',
+    'dialogue.maerinVein': 'Ilden trækker sig nordpå langs åren. Det her er ikke slut.',
+    'mechanic.cinderToad': 'Glødtudse',
+    'mechanic.anneal': 'Udglødning',
+    'aura.kilnFury': 'Ovnraseri',
+    'aura.scorched': 'Svedet',
+    'aura.chilled': 'Nedkølet',
+    'aura.tempering': 'Hærdning',
+    'mechanic.temperingClash': 'Hærdningssammenstød',
+    'mechanic.cinderArc': 'Glødebue',
+    'mechanic.temperSweep': 'Hærdningsfejning',
+    'mechanic.forgeDraft': 'Smedjetræk',
+    'mechanic.glasscutArc': 'Glasskærebue',
+    'mechanic.kilnflarePulse': 'Ovnflammeimpuls',
   },
 };
 
@@ -7601,6 +8323,25 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   "Winter's Chill": 'aura.wintersChill',
   Icicles: 'aura.icicles',
   'Perfect Moment': 'aura.perfectMoment',
+  Glazing: 'aura.glazing',
+  Emberfeed: 'aura.emberfeed',
+  Forgeheat: 'aura.forgeheat',
+  'Searing Grip': 'aura.searingGrip',
+  'Vent Fissure': 'mechanic.ventFissure',
+  'Undermount Eruption': 'mechanic.undermountEruption',
+  'The Embers Come Home': 'aura.embersComeHome',
+  'Cinder-Toad': 'mechanic.cinderToad',
+  Anneal: 'mechanic.anneal',
+  'Kiln Fury': 'aura.kilnFury',
+  Scorched: 'aura.scorched',
+  Chilled: 'aura.chilled',
+  Tempering: 'aura.tempering',
+  'Tempering Clash': 'mechanic.temperingClash',
+  'Cinder Arc': 'mechanic.cinderArc',
+  'Temper Sweep': 'mechanic.temperSweep',
+  'Forge Draft': 'mechanic.forgeDraft',
+  'Glasscut Arc': 'mechanic.glasscutArc',
+  'Kilnflare Pulse': 'mechanic.kilnflarePulse',
   // Talent-proc buff/ward names (choice rows).
   'Searing Light': 'aura.searingLight',
   'Lingering Grace': 'aura.lingeringGraceWard',
@@ -8389,7 +9130,8 @@ type RaidExtraKey =
   | 'royalDoorSealed'
   | 'locked'
   | 'engagedSealed'
-  | 'mustFall';
+  | 'mustFall'
+  | 'wingSealed';
 
 export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>> = {
   en: {
@@ -8410,6 +9152,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: 'You are locked to Nythraxis Raid Arena.',
     engagedSealed: 'Nythraxis is engaged - the royal door has sealed shut.',
     mustFall: 'The royal door is sealed - Nythraxis must fall first.',
+    wingSealed: 'The way down is sealed. The wing above must fall first.',
   },
   en_CA: {
     converted: 'Your party has converted to a raid group.',
@@ -8429,6 +9172,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: 'You are locked to Nythraxis Raid Arena.',
     engagedSealed: 'Nythraxis is engaged - the royal door has sealed shut.',
     mustFall: 'The royal door is sealed - Nythraxis must fall first.',
+    wingSealed: 'The way down is sealed. The wing above must fall first.',
   },
   es: {
     converted: 'Tu grupo se ha convertido en una banda.',
@@ -8448,6 +9192,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: 'Estas vinculado a la Arena de banda de Nythraxis.',
     engagedSealed: 'Nythraxis esta en combate; la puerta real se ha sellado.',
     mustFall: 'La puerta real esta sellada; Nythraxis debe caer primero.',
+    wingSealed: 'El camino hacia abajo esta sellado. El ala de arriba debe caer primero.',
   },
   es_ES: {
     converted: 'Tu grupo se ha convertido en una banda.',
@@ -8467,6 +9212,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: 'Estas vinculado a la Arena de banda de Nythraxis.',
     engagedSealed: 'Nythraxis esta en combate; la puerta real se ha sellado.',
     mustFall: 'La puerta real esta sellada; Nythraxis debe caer primero.',
+    wingSealed: 'El camino hacia abajo esta sellado. El ala de arriba debe caer primero.',
   },
   fr_FR: {
     converted: 'Votre groupe est devenu un raid.',
@@ -8486,6 +9232,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: 'Vous etes lie a larene de raid de Nythraxis.',
     engagedSealed: 'Nythraxis est engage; la porte royale sest scellee.',
     mustFall: 'La porte royale est scellee; Nythraxis doit tomber dabord.',
+    wingSealed: 'La descente est scellee. Laile au-dessus doit dabord tomber.',
   },
   fr_CA: {
     converted: 'Votre groupe est devenu un raid.',
@@ -8505,6 +9252,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: 'Vous etes lie a larene de raid de Nythraxis.',
     engagedSealed: 'Nythraxis est engage; la porte royale sest scellee.',
     mustFall: 'La porte royale est scellee; Nythraxis doit tomber dabord.',
+    wingSealed: 'La descente est scellee. Laile au-dessus doit dabord tomber.',
   },
   it_IT: {
     converted: 'Il tuo gruppo e diventato un raid.',
@@ -8524,6 +9272,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: 'Sei vincolato all Arena raid di Nythraxis.',
     engagedSealed: 'Nythraxis e in combattimento; la porta reale si e sigillata.',
     mustFall: 'La porta reale e sigillata; Nythraxis deve cadere prima.',
+    wingSealed: 'La via verso il basso e sigillata. Lala superiore deve cadere prima.',
   },
   de_DE: {
     converted: 'Eure Gruppe wurde in einen Schlachtzug umgewandelt.',
@@ -8544,6 +9293,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: 'Ihr seid an die Nythraxis-Schlachtzugsarena gebunden.',
     engagedSealed: 'Nythraxis ist im Kampf; die koenigliche Tuer hat sich versiegelt.',
     mustFall: 'Die koenigliche Tuer ist versiegelt; Nythraxis muss zuerst fallen.',
+    wingSealed: 'Der Weg nach unten ist versiegelt. Der Fluegel darueber muss zuerst fallen.',
   },
   zh_CN: {
     converted: '你的队伍已转换为团队。',
@@ -8563,6 +9313,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: '你已锁定到尼瑟拉克斯团队竞技场。',
     engagedSealed: '尼瑟拉克斯已进入战斗；王室之门已经封闭。',
     mustFall: '王室之门已封闭；必须先击败尼瑟拉克斯。',
+    wingSealed: '下行之路已被封印。必须先攻陷上层侧翼。',
   },
   zh_TW: {
     converted: '你的隊伍已轉換為團隊。',
@@ -8582,6 +9333,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: '你已鎖定到尼瑟拉克斯團隊競技場。',
     engagedSealed: '尼瑟拉克斯已進入戰鬥；王室之門已經封閉。',
     mustFall: '王室之門已封閉；必須先擊敗尼瑟拉克斯。',
+    wingSealed: '下行之路已被封印。必須先攻陷上層側翼。',
   },
   ko_KR: {
     converted: '파티가 공격대 그룹으로 전환되었습니다.',
@@ -8601,6 +9353,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: '니트락시스 공격대 투기장에 귀속되어 있습니다.',
     engagedSealed: '니트락시스가 전투 중입니다. 왕실 문이 봉인되었습니다.',
     mustFall: '왕실 문이 봉인되었습니다. 먼저 니트락시스를 쓰러뜨려야 합니다.',
+    wingSealed: '아래로 가는 길이 봉인되어 있습니다. 먼저 위쪽 별관을 함락해야 합니다.',
   },
   ja_JP: {
     converted: 'パーティがレイドグループに変換されました。',
@@ -8620,6 +9373,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: 'ナイスラクシスのレイドアリーナにロックされています。',
     engagedSealed: 'ナイスラクシスが戦闘中です。王家の扉は封印されました。',
     mustFall: '王家の扉は封印されています。先にナイスラクシスを倒さねばなりません。',
+    wingSealed: '下への道は封印されています。先に上の翼を攻略せねばなりません。',
   },
   pt_BR: {
     converted: 'Seu grupo foi convertido em raide.',
@@ -8639,6 +9393,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: 'Voce esta salvo na Arena de Raide de Nythraxis.',
     engagedSealed: 'Nythraxis esta em combate; a porta real se selou.',
     mustFall: 'A porta real esta selada; Nythraxis deve cair primeiro.',
+    wingSealed: 'O caminho para baixo esta selado. A ala acima deve cair primeiro.',
   },
   ru_RU: {
     converted: 'Ваша группа преобразована в рейд.',
@@ -8658,6 +9413,7 @@ export const RAID_EXTRA: Record<SupportedLanguage, Record<RaidExtraKey, string>>
     locked: 'Вы привязаны к рейдовой арене Нитраксиса.',
     engagedSealed: 'Нитраксис уже в бою; королевская дверь запечаталась.',
     mustFall: 'Королевская дверь запечатана; сначала должен пасть Нитраксис.',
+    wingSealed: 'Путь вниз запечатан. Сначала должно пасть крыло выше.',
   },
   ...RAID_NEW,
 };
@@ -9074,6 +9830,38 @@ const RULES: Rule[] = [
   {
     re: /^The royal door is sealed — Nythraxis must fall first\.$/,
     build: () => tRaidExtra('mustFall'),
+  },
+  {
+    re: /^The way down is sealed\. The wing above must fall first\.$/,
+    build: () => tRaidExtra('wingSealed'),
+  },
+  {
+    re: /^This craftsmanship\.\.\. a whole guild's work, for a cult of arsonists\? Something down here is worth hiding behind all this\.$/,
+    build: () => tSim('dialogue.maerinCraft'),
+  },
+  {
+    re: /^Beast provisions, wages, kennel feed\.\.\. and the signature page torn out\. Someone left in a hurry\. North\.$/,
+    build: () => tSim('dialogue.maerinLedger'),
+  },
+  {
+    re: /^They are not making anything\. They are keeping something ASLEEP until they are ready\.$/,
+    build: () => tSim('dialogue.maerinAsleep'),
+  },
+  {
+    re: /^These are not summoning wards\. They are RESTRAINTS, and we have been CUTTING them\. Every keeper we killed was a lock\.$/,
+    build: () => tSim('dialogue.maerinRestraints'),
+  },
+  {
+    re: /^There was never a factory\. There was only ever him, and a very good disguise\. Go\.$/,
+    build: () => tSim('dialogue.maerinGo'),
+  },
+  {
+    re: /^Half-formed\. We killed him before the forge could finish its work\.$/,
+    build: () => tSim('dialogue.maerinHalfFormed'),
+  },
+  {
+    re: /^The fire is receding north along the vein\. This is not over\.$/,
+    build: () => tSim('dialogue.maerinVein'),
   },
   {
     re: /^You join the Ashen Coliseum 2v2 queue\. Stand by for opponents[.…]{1,3}$/,

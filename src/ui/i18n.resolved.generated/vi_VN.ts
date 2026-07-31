@@ -9741,6 +9741,111 @@ export const vi_VN: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Ủng Thép Tôi Bằng Xỉ"
+      },
+      "glasswalker_treads": {
+        "name": "Giày Bộ Hành Kính"
+      },
+      "twice_fired_slippers": {
+        "name": "Dép Nung Hai Lần"
+      },
+      "stokebrand_striders": {
+        "name": "Giày Dấu Khều Lửa"
+      },
+      "saans_stoking_iron": {
+        "name": "Que Khều Lò của Saan"
+      },
+      "glassblowers_shiv": {
+        "name": "Dao Găm của Thợ Thổi Thủy Tinh"
+      },
+      "sluicebearer": {
+        "name": "Kẻ Mang Cửa Cống"
+      },
+      "cindertoad_signet": {
+        "name": "Ấn Nhẫn Cóc Than Hồng"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Nhẫn Lần Tôi Đầu Tiên"
+      },
+      "coalglow_band": {
+        "name": "Nhẫn Ánh Than"
+      },
+      "crownforged_warleggings": {
+        "name": "Giáp Chân Chiến Trận Rèn Vương Miện"
+      },
+      "nighttalon_prowlers": {
+        "name": "Giày Rình Dạ Trảo"
+      },
+      "soulflame_kilt": {
+        "name": "Váy Hồn Hỏa"
+      },
+      "stormcallers_legwraps": {
+        "name": "Vải Quấn Chân của Triệu Bão Sư"
+      },
+      "the_even_temper": {
+        "name": "Độ Tôi Cân Bằng"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Cung Than Hồng, Trượng của Odrenn"
+      },
+      "twicetempered_girdle": {
+        "name": "Đai Tôi Hai Lần"
+      },
+      "ashwalk_sandals": {
+        "name": "Dép Bộ Hành Tro"
+      },
+      "quenchsilk_cord": {
+        "name": "Dây Lụa Tôi"
+      },
+      "slakeleather_belt": {
+        "name": "Thắt Lưng Da Tôi"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Giáp Ngực Tim Rèn Vương Miện"
+      },
+      "nighttalon_emberweave": {
+        "name": "Vải Dệt Than Hồng Móng Đêm"
+      },
+      "soulflame_vestments": {
+        "name": "Lễ Phục Lửa Linh Hồn"
+      },
+      "stormcallers_hauberk": {
+        "name": "Áo Giáp Lưới Người Gọi Bão"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Đá Đấm Tay của Volzharr"
+      },
+      "magmastrider_greaves": {
+        "name": "Giáp Chân Bước Dung Nham"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Vải Quấn Chân của Sàn Thức Tỉnh"
+      },
+      "forgeheat_cinch": {
+        "name": "Đai Nhiệt Lò Rèn"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Kẻ Phá Lõi, Trái Tim Dưới Núi"
+      },
+      "the_last_restraint": {
+        "name": "Gông Xiềng Cuối Cùng"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Nhẫn Tôi Luyện Thứ Chín"
+      },
+      "moltenheart_chroma": {
+        "name": "Trái Tim Nóng Chảy"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -10682,6 +10787,24 @@ export const vi_VN: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Tai Họa Đỉnh Gai"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Oan Hồn Sổ Sách"
       },
@@ -11233,6 +11356,11 @@ export const vi_VN: EnTranslations = {
         "name": "Trinh Sát Maren",
         "title": "Trinh Sát Của Cảnh Trưởng",
         "greeting": "Bước chân nhẹ và một con dao ngắn sẽ giữ ngươi còn thở ngoài này. Nói nhanh lên, ta phải quay lại đám lau sậy."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Đội Trưởng Thessaly",
@@ -12028,6 +12156,42 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Đã hạ Vael Fogbinder"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const vi_VN: EnTranslations = {
         "enterText": "Bạn đi qua cánh cửa hoàng gia niêm phong.",
         "leaveText": "Bạn trở lại không khí lạnh giá của Đỉnh Gai."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "Lòng Chảo Trái Tim Hoang Dã",
         "enterText": "Mưa ấm rít trên nền đá cổ. The Wildheart Basin mở ra trước mắt bạn.",
@@ -14367,7 +14546,8 @@ export const vi_VN: EnTranslations = {
         "name": "Bộ Lễ Phục Bonewrought",
         "bonus2": "Tăng sức mạnh tấn công thêm 40.",
         "bonus3": "Tăng sức mạnh thêm 15, thể lực thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
-        "bonus4": "Các đòn chí mạng bằng vũ khí của bạn găm Dằm Xương vào mục tiêu, khiến nó chảy máu nhận 8 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần."
+        "bonus4": "Các đòn chí mạng bằng vũ khí của bạn găm Dằm Xương vào mục tiêu, khiến nó chảy máu nhận 8 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần.",
+        "bonus5": "Tăng 3% cơ hội chí mạng."
       },
       "deathlord": {
         "name": "Bộ Chiến Barrowlord",
@@ -14389,19 +14569,22 @@ export const vi_VN: EnTranslations = {
         "name": "Bộ Da Direfang",
         "bonus2": "Tăng sức mạnh tấn công thêm 40.",
         "bonus3": "Tăng nhanh nhẹn thêm 15, tỉ lệ chí mạng thêm 2% và tốc độ tấn công cùng thi triển thêm 15%.",
-        "bonus4": "Các đòn chí mạng bằng vũ khí của bạn xé ra một Vết Rách Toạc, khiến mục tiêu chảy máu nhận 6 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần."
+        "bonus4": "Các đòn chí mạng bằng vũ khí của bạn xé ra một Vết Rách Toạc, khiến mục tiêu chảy máu nhận 6 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần.",
+        "bonus5": "Tăng 3% cơ hội chí mạng."
       },
       "soulflame": {
         "name": "Lễ Phục Wraithfire",
         "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
-        "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây."
+        "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây.",
+        "bonus5": "Tăng 3% cơ hội chí mạng của phép thuật."
       },
       "stormcallers": {
         "name": "Áo Lễ Galecall",
         "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
-        "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây."
+        "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây.",
+        "bonus5": "Tăng 3% cơ hội chí mạng của phép thuật."
       },
       "vale_arcanist": {
         "name": "Bộ Arcanist Thung Khê",

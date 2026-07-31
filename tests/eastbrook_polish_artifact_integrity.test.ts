@@ -614,10 +614,15 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
+// The merged release plus Undermount source fingerprints moved the composite
+// polish provenance swept through this accepted metadata file. Every measured
+// value is byte-identical, and no capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '9b60516cf6211514769ac4aa3b9332225c1467041058df9bf59f75c275894766';
+  '970acd8b7361582a32cf8de1e5211cc0e78929f378c65d656c8dacb4a1a82e77';
+// The merged release plus Undermount renderer source fingerprints require the
+// composite seal for the merged tree, after sweeping all four evidence records.
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '7f24de520e03f40270acc24511859b21b0b140c502c9a014b2e92240b22db4cc';
+  'e0f9dcb08446beb92c4204de40e35c9bd76f2fb3020aaf881daafacf28412797';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1474,14 +1479,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // The release/v0.33.0 resync of the draw-call diet branch moved the
-    // runtimeRender.renderer.sha256 leaf (census hooks and the diet's batching
-    // seams merged over the streaming and cull deltas), so the composite
-    // polish provenance followed, and this seal follows the composite. Every
-    // measured value (frame timings, draw stats, triangle and scenario
+    // The merged release plus Undermount source fingerprints moved the
+    // composite polish provenance, so this seal follows the scoped sweep.
+    // Every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'c6b30c373d3859af42636a8c4a723bdca3044278c30f5d98fd178b158d2834fe',
+      'f8d84b5810ba7682e08c9fc5ebc6b332ca8687a1a82b80d0e98fe5ba02fdcebb',
     );
   });
 

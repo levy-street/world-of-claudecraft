@@ -9741,6 +9741,111 @@ export const ko_KR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "테러스파크 시동 열쇠"
       },
+      "slag_tempered_sabatons": {
+        "name": "광재뜨임 철갑장화"
+      },
+      "glasswalker_treads": {
+        "name": "유리길 장화"
+      },
+      "twice_fired_slippers": {
+        "name": "두 번 구운 덧신"
+      },
+      "stokebrand_striders": {
+        "name": "화부낙인 장화"
+      },
+      "saans_stoking_iron": {
+        "name": "사안의 화로 부지깽이"
+      },
+      "glassblowers_shiv": {
+        "name": "유리장이의 칼"
+      },
+      "sluicebearer": {
+        "name": "수문지기"
+      },
+      "cindertoad_signet": {
+        "name": "불씨두꺼비 인장"
+      },
+      "ring_of_the_first_quench": {
+        "name": "첫 뜨임의 반지"
+      },
+      "coalglow_band": {
+        "name": "숯불빛 반지"
+      },
+      "crownforged_warleggings": {
+        "name": "왕관벼림 전투 다리갑옷"
+      },
+      "nighttalon_prowlers": {
+        "name": "밤발톱 잠행화"
+      },
+      "soulflame_kilt": {
+        "name": "영혼불꽃 킬트"
+      },
+      "stormcallers_legwraps": {
+        "name": "폭풍소환사의 다리싸개"
+      },
+      "the_even_temper": {
+        "name": "고른 뜨임"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "불씨활, 오드렌의 지팡이"
+      },
+      "twicetempered_girdle": {
+        "name": "두 번 뜨인 요대"
+      },
+      "ashwalk_sandals": {
+        "name": "잿길 샌들"
+      },
+      "quenchsilk_cord": {
+        "name": "뜨임비단 끈"
+      },
+      "slakeleather_belt": {
+        "name": "식힘가죽 허리띠"
+      },
+      "undermount_rune_rubbing": {
+        "name": "언더마운트 룬 탁본"
+      },
+      "undermount_foreman_ledger": {
+        "name": "언더마운트 작업반장의 장부"
+      },
+      "runeseekers_lantern": {
+        "name": "룬추적자의 등불"
+      },
+      "crownforged_heartplate": {
+        "name": "왕관벼림 심장갑옷"
+      },
+      "nighttalon_emberweave": {
+        "name": "밤갈퀴 잿불매듭"
+      },
+      "soulflame_vestments": {
+        "name": "영혼불꽃 예복"
+      },
+      "stormcallers_hauberk": {
+        "name": "폭풍소환사의 사슬갑옷"
+      },
+      "volzharrs_knucklestone": {
+        "name": "볼자르의 주먹돌"
+      },
+      "magmastrider_greaves": {
+        "name": "용암걸음 경갑"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "깨어나는 바닥의 발싸개"
+      },
+      "forgeheat_cinch": {
+        "name": "용광로 열기 허리띠"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "핵파괴자, 산아래의 심장"
+      },
+      "the_last_restraint": {
+        "name": "마지막 구속"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "아홉 번째 담금질의 고리"
+      },
+      "moltenheart_chroma": {
+        "name": "용융심장"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -10682,6 +10787,24 @@ export const ko_KR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "나이트락시스, 손피크의 재앙"
       },
+      "vosh_the_glazier": {
+        "name": "유리장이 보쉬"
+      },
+      "saan_the_stoker": {
+        "name": "화부 사안"
+      },
+      "odrenn_the_temperer": {
+        "name": "뜨임장이 오드렌"
+      },
+      "volzharr_buried_furnace": {
+        "name": "묻힌 용광로 볼자르"
+      },
+      "undermount_cinderling": {
+        "name": "잿불정령"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "고룡교단 발굴 감독관"
+      },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
       },
@@ -11233,6 +11356,11 @@ export const ko_KR: EnTranslations = {
         "name": "정찰병 마렌",
         "title": "원수의 정찰병",
         "greeting": "조용한 발걸음과 짧은 칼날이 목숨을 지킵니다. 빨리 말하십시오. 갈대밭으로 돌아가야 합니다."
+      },
+      "runeseeker_maerin": {
+        "name": "룬추적자 매린",
+        "title": "떠도는 고고학자",
+        "greeting": "그들은 이곳이 죽은 교단의 대장간이라고 했습니다, {className}. 죽은 것은 이렇게 뜨겁게 달아오르지 않죠. 저 아래에는 이 모든 연기를 감수할 만한 무언가가 있습니다."
       },
       "captain_thessaly": {
         "name": "대장 테살리",
@@ -12028,6 +12156,42 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "안개엮는자 바엘 처치"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "있어서는 안 될 열기",
+        "text": "이 균열 주변의 돌은 목탄이 번질 만큼 뜨겁습니다, {playerName}. 교단이 다시 묻기 전에 드러난 세 룬 면을 탁본해 오십시오. 무늬가 반복되면 아래에 무엇이 있는지 알 수 있습니다.",
+        "completion": "선이 모두 안쪽으로 향합니다. 대장장이의 작업 표식이 아닙니다, {playerName}. 결계이며, 무언가가 아래에서 베어 내고 있습니다.",
+        "objectives": {
+          "0": {
+            "label": "룬 탁본 채취"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "교단이 묻은 것",
+        "text": "발굴 감독은 작업 장부를 몸에 지니고 야영지의 광신도들이 지킵니다. 가져오십시오, {playerName}. 모든 주괴와 식량과 임금이 어디로 가는지 알고 싶습니다.",
+        "completion": "아래입니다. 모든 주괴와 잿불이 우리 발밑에서 쓰입니다, {playerName}. 용광로는 지상에 아무것도 만들지 않습니다. 산이 묻은 존재를 먹이고 있습니다.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult 발굴 감독 처치"
+          },
+          "1": {
+            "label": "Wyrmcult 경비병 처치"
+          },
+          "2": {
+            "label": "감독의 장부 회수"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "언더마운트로",
+        "text": "장부는 발굴지 아래의 두 번째 작업장을 확인해 주며 모든 운송품이 아래를 향합니다. 준비되면 말하십시오, {playerName}. 저도 하강에 합류하겠습니다.",
+        "completion": "이 등불을 가져가십시오. 마법은 없고 흔들리지 않는 불꽃뿐이지만 아래에서는 정직한 빛이 필요합니다. 이 연속 퀘스트를 건너뛰어도 공격대 입구는 열려 있습니다.",
+        "objectives": {
+          "0": {
+            "label": "룬추적자 매린과 대화"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const ko_KR: EnTranslations = {
         "enterText": "봉인된 왕실 문을 지나갑니다.",
         "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
       },
+      "undermount_wing1": {
+        "name": "언더마운트: 하강",
+        "enterText": "당신은 쏜피크 아래로 내려가 유리 같은 어둠 속으로 들어갑니다.",
+        "leaveText": "당신은 언더마운트의 하강로에서 기어올라옵니다."
+      },
+      "undermount_wing2": {
+        "name": "언더마운트: 뜨임",
+        "enterText": "망치질 소리가 뜨임 금고에 울려 퍼집니다.",
+        "leaveText": "당신은 울리는 화로길에서 물러납니다."
+      },
+      "undermount_wing3": {
+        "name": "언더마운트: 깨어남",
+        "enterText": "묻힌 용광로가 깊은 곳에서 꿈틀거립니다.",
+        "leaveText": "당신은 깨어나는 열기에서 물러납니다."
+      },
       "wildheart_basin": {
         "name": "야생심장 분지",
         "enterText": "따뜻한 비가 오래된 돌 위에서 치익 소리를 냅니다. 야생심장 분지가 눈앞에 펼쳐집니다.",
@@ -14367,7 +14546,8 @@ export const ko_KR: EnTranslations = {
         "name": "뼈벼림 전투장비",
         "bonus2": "전투력이 40만큼 증가합니다.",
         "bonus3": "힘이 15, 체력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
-        "bonus4": "무기 치명타 적중 시 대상에게 \"뼈 파편\"을 남겨 12초 동안 2초마다 8의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다."
+        "bonus4": "무기 치명타 적중 시 대상에게 \"뼈 파편\"을 남겨 12초 동안 2초마다 8의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다.",
+        "bonus5": "치명타 확률이 3% 증가합니다."
       },
       "deathlord": {
         "name": "고분군주의 전투장비",
@@ -14389,19 +14569,22 @@ export const ko_KR: EnTranslations = {
         "name": "흉포송곳니 가죽장비",
         "bonus2": "전투력이 40만큼 증가합니다.",
         "bonus3": "민첩이 15, 치명타 확률이 2% 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
-        "bonus4": "무기 치명타 적중 시 \"찢어진 상처\"를 내어 대상이 12초 동안 2초마다 6의 출혈 피해를 입습니다. 최대 3번 중첩됩니다."
+        "bonus4": "무기 치명타 적중 시 \"찢어진 상처\"를 내어 대상이 12초 동안 2초마다 6의 출혈 피해를 입습니다. 최대 3번 중첩됩니다.",
+        "bonus5": "치명타 확률이 3% 증가합니다."
       },
       "soulflame": {
         "name": "망령불꽃 의복",
         "bonus2": "주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).",
         "bonus3": "지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
-        "bonus4": "주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다."
+        "bonus4": "주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다.",
+        "bonus5": "주문 치명타 확률이 3% 증가합니다."
       },
       "stormcallers": {
         "name": "강풍부름 의복",
         "bonus2": "주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).",
         "bonus3": "지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
-        "bonus4": "주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다."
+        "bonus4": "주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다.",
+        "bonus5": "주문 치명타 확률이 3% 증가합니다."
       },
       "vale_arcanist": {
         "name": "계곡 비전술사의 예복",

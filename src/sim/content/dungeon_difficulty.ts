@@ -332,4 +332,40 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     finalBossId: 'nythraxis_scourge_of_thornpeak',
     marksPerParticipant: 3,
   },
+  // Undermount's first two 10-player wings use the standing heroic raid
+  // multipliers (tuning). Wing 1 settlement is duo-aware in the instance layer;
+  // finalBossId remains a real member of the wing for the shared table contract.
+  undermount_wing1: {
+    id: 'undermount_wing1',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 3.2,
+    damageMultiplier: 7.25,
+    addDamageMultiplier: 7.25,
+    armorMultiplier: 1.2,
+    finalBossId: 'saan_the_stoker',
+    marksPerParticipant: 3,
+  },
+  undermount_wing2: {
+    id: 'undermount_wing2',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 3.2,
+    damageMultiplier: 7.25,
+    addDamageMultiplier: 7.25,
+    armorMultiplier: 1.2,
+    finalBossId: 'odrenn_the_temperer',
+    marksPerParticipant: 3,
+  },
+  undermount_wing3: {
+    id: 'undermount_wing3',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 3.2,
+    damageMultiplier: 7.25,
+    addDamageMultiplier: 7.25,
+    armorMultiplier: 1.2,
+    finalBossId: 'volzharr_buried_furnace',
+    marksPerParticipant: 3,
+  },
 };

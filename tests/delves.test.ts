@@ -144,16 +144,17 @@ describe('delve spatial band', () => {
   });
 
   it('isDelvePos covers the full room footprint west of DELVE_X_MIN (regression: camera yank bug)', () => {
-    // Rooms are ~50 u wide, centred at DELVE_X_MIN (4800). Delve side walls sit at
+    // Rooms are ~50 u wide, centred at DELVE_X_MIN. Delve side walls sit at
     // instance-local |x| = 25 (delve_layout WALL_X), collider outer face at |x| = 26,
-    // i.e. world-x = 4774 (slot 0). Before DELVE_BAND_X_MIN, the west half of the room
-    // was misclassified as isArenaPos, yanking the camera toward the arena band.
+    // so the west outer face is DELVE_X_MIN - 26. Before DELVE_BAND_X_MIN, the west
+    // half of the room was misclassified as isArenaPos, yanking the camera toward
+    // the arena band.
     const origin = delveOrigin(0, 0); // { x: DELVE_X_MIN, z: ... }
 
     // West half of the room must still be a delve pos
-    expect(isDelvePos(origin.x - 2)).toBe(true); // 4798, exact repro coordinate
+    expect(isDelvePos(origin.x - 2)).toBe(true); // exact repro offset
     expect(isDelvePos(origin.x - 22)).toBe(true); // walkable west edge
-    expect(isDelvePos(origin.x - 26)).toBe(true); // west wall outer face (4774)
+    expect(isDelvePos(origin.x - 26)).toBe(true); // west wall outer face
     expect(isDelvePos(origin.x)).toBe(true); // room centre
     expect(isDelvePos(origin.x + 22)).toBe(true); // walkable east edge
     expect(isDelvePos(origin.x + 26)).toBe(true); // wall outer face east
@@ -169,10 +170,10 @@ describe('delve spatial band', () => {
 
     // delveAt resolves correctly across the whole west half of the room
     expect(delveAt(origin.x - 2)?.index).toBe(0); // DELVE_X_MIN - 2
-    expect(delveAt(origin.x - 26)?.index).toBe(0); // west wall outer face (4774)
+    expect(delveAt(origin.x - 26)?.index).toBe(0); // west wall outer face
     expect(delveAt(origin.x)?.index).toBe(0); // room centre
 
-    // Arena still classifies correctly (arena instances live at ARENA_X = 4200)
+    // Arena still classifies correctly at its exported origin.
     expect(isArenaPos(ARENA_X)).toBe(true);
     expect(isDelvePos(ARENA_X)).toBe(false);
   });

@@ -5,7 +5,7 @@ import {
   type InstanceMusicInput,
   instanceMusicDecision,
 } from '../src/game/instance_music';
-import { DELVE_X_MIN, ZONES } from '../src/sim/data';
+import { DELVE_X_MIN, DUNGEONS, instanceOrigin, ZONES } from '../src/sim/data';
 import { SOWFIELD_CENTER } from '../src/sim/vale_cup_layout';
 
 const eastbrookFixture = ZONES.find((zone) => zone.id === 'eastbrook_vale');
@@ -66,6 +66,25 @@ describe('instance music policy', () => {
       'dungeon_hollow_crypt',
     );
     expect(port.update).toHaveBeenLastCalledWith('dungeon_hollow_crypt', false);
+  });
+
+  it('selects a distinct existing stream palette for each Undermount wing', () => {
+    const expected = {
+      undermount_wing1: 'dungeon_hollow_crypt',
+      undermount_wing2: 'dungeon_sunken_bastion',
+      undermount_wing3: 'dungeon_gravewyrm_sanctum',
+    } as const;
+    for (const [dungeonId, zone] of Object.entries(expected)) {
+      const dungeon = DUNGEONS[dungeonId];
+      const decision = instanceMusicDecision(
+        input({
+          playerPos: instanceOrigin(dungeon.index, 0),
+          inDungeon: true,
+        }),
+      );
+      expect(decision.instanceId).toBe(dungeonId);
+      expect(decision.zone).toBe(zone);
+    }
   });
 
   it('selects the Sowfield music zone and follows its public match phase', () => {

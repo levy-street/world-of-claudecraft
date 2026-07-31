@@ -9741,6 +9741,111 @@ export const de_DE: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Schlackengehärtete Sabatons"
+      },
+      "glasswalker_treads": {
+        "name": "Glaswanderer-Tritte"
+      },
+      "twice_fired_slippers": {
+        "name": "Zweifach gebrannte Pantoffeln"
+      },
+      "stokebrand_striders": {
+        "name": "Schürbrand-Tritte"
+      },
+      "saans_stoking_iron": {
+        "name": "Saans Schüreisen"
+      },
+      "glassblowers_shiv": {
+        "name": "Glasbläser-Shiv"
+      },
+      "sluicebearer": {
+        "name": "Schleusenträger"
+      },
+      "cindertoad_signet": {
+        "name": "Glutkröten-Siegelring"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Ring der ersten Abschreckung"
+      },
+      "coalglow_band": {
+        "name": "Kohlenglut-Reif"
+      },
+      "crownforged_warleggings": {
+        "name": "Kronengeschmiedete Kriegsbeinkleider"
+      },
+      "nighttalon_prowlers": {
+        "name": "Nachtkrallen-Pirschstiefel"
+      },
+      "soulflame_kilt": {
+        "name": "Seelenflammen-Kilt"
+      },
+      "stormcallers_legwraps": {
+        "name": "Beinwickel des Sturmberufers"
+      },
+      "the_even_temper": {
+        "name": "Das ausgeglichene Gemüt"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Glutbogen, Odrenns Rute"
+      },
+      "twicetempered_girdle": {
+        "name": "Doppelt gehärteter Gürtel"
+      },
+      "ashwalk_sandals": {
+        "name": "Aschenwanderer-Sandalen"
+      },
+      "quenchsilk_cord": {
+        "name": "Härterseiden-Schnur"
+      },
+      "slakeleather_belt": {
+        "name": "Löschledergürtel"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Kronengeschmiedeter Herzpanzer"
+      },
+      "nighttalon_emberweave": {
+        "name": "Nachtkrallen-Glutgewebe"
+      },
+      "soulflame_vestments": {
+        "name": "Seelenflammengewänder"
+      },
+      "stormcallers_hauberk": {
+        "name": "Hauberk des Sturmberufers"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharrs Knöchelstein"
+      },
+      "magmastrider_greaves": {
+        "name": "Magmaschreiter-Beinschienen"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Fußwickel des erwachenden Bodens"
+      },
+      "forgeheat_cinch": {
+        "name": "Schmiedehitze-Gurt"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Kernbrecher, Herz des Unterbergs"
+      },
+      "the_last_restraint": {
+        "name": "Die letzte Fessel"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Band der neunten Abschreckung"
+      },
+      "moltenheart_chroma": {
+        "name": "Schmelzherz"
+      },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
       },
@@ -10682,6 +10787,24 @@ export const de_DE: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Geißel von Thornpeak"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Verzeichnisgespenst"
       },
@@ -11233,6 +11356,11 @@ export const de_DE: EnTranslations = {
         "name": "Späherin Maren",
         "title": "Späherin des Marschalls",
         "greeting": "Leise Schritte und eine kurze Klinge halten dich am Leben. Sprich schnell, ich muss zurück ins Schilf."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Hauptmann Thessaly",
@@ -12028,6 +12156,42 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vael der Fogbinder getötet"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const de_DE: EnTranslations = {
         "enterText": "Ihr durchschreitet die versiegelte königliche Tür.",
         "leaveText": "Ihr kehrt in die kalte Luft von Thornpeak zurück."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "Das Wildherzbecken",
         "enterText": "Warmer Regen zischt auf altem Stein. The Wildheart Basin öffnet sich vor dir.",
@@ -14367,7 +14546,8 @@ export const de_DE: EnTranslations = {
         "name": "Bonewrought-Kriegstracht",
         "bonus2": "Erhöht Angriffskraft um 40.",
         "bonus3": "Erhöht Stärke um 15, Ausdauer um 15 sowie Angriffs- und Zaubertempo um 15%.",
-        "bonus4": "Eure kritischen Waffentreffer zersplittern das Ziel mit Knochensplitter und lassen es 12 Sek. lang alle 2 Sek. 8 Schaden bluten. Stapelt sich bis zu 3-mal."
+        "bonus4": "Eure kritischen Waffentreffer zersplittern das Ziel mit Knochensplitter und lassen es 12 Sek. lang alle 2 Sek. 8 Schaden bluten. Stapelt sich bis zu 3-mal.",
+        "bonus5": "Erhöht die kritische Trefferchance um 3 %."
       },
       "deathlord": {
         "name": "Barrowlord-Kriegstracht",
@@ -14389,19 +14569,22 @@ export const de_DE: EnTranslations = {
         "name": "Direfang-Pelz",
         "bonus2": "Erhöht Angriffskraft um 40.",
         "bonus3": "Erhöht Beweglichkeit um 15, kritische Trefferchance um 2% sowie Angriffs- und Zaubertempo um 15%.",
-        "bonus4": "Eure kritischen Waffentreffer reißen eine Zerfetzte Wunde und lassen das Ziel 12 Sek. lang alle 2 Sek. 6 Schaden bluten. Stapelt sich bis zu 3-mal."
+        "bonus4": "Eure kritischen Waffentreffer reißen eine Zerfetzte Wunde und lassen das Ziel 12 Sek. lang alle 2 Sek. 6 Schaden bluten. Stapelt sich bis zu 3-mal.",
+        "bonus5": "Erhöht die kritische Trefferchance um 3 %."
       },
       "soulflame": {
         "name": "Wraithfire-Gewänder",
         "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.",
-        "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht."
+        "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht.",
+        "bonus5": "Erhöht die kritische Zaubertrefferchance um 3 %."
       },
       "stormcallers": {
         "name": "Galecall-Gewänder",
         "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.",
-        "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht."
+        "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht.",
+        "bonus5": "Erhöht die kritische Zaubertrefferchance um 3 %."
       },
       "vale_arcanist": {
         "name": "Ornat des Talarkanisten",

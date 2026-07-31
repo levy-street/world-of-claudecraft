@@ -24,6 +24,10 @@ import {
   HEROIC_LOOT_SOURCE_LEVEL,
   NYTHRAXIS_RAID_BOSS_ID,
   NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL,
+  UNDERMOUNT_RAID_BOSS_IDS,
+  UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL,
+  VOLZHARR_RAID_BOSS_ID,
+  VOLZHARR_RAID_LOOT_SOURCE_LEVEL,
 } from './content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
 import { FURY_STOCK, WARFARE_SOURCE_LEVEL } from './content/pvp_honor';
@@ -212,17 +216,31 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // copies of base dungeon drops read one tier up (source 22), so their epics land
   // at item level 28 and rares at 25. Registered here so a variant's tooltip level
   // and budget derive from the index like any other drop. The exception is the
-  // heroic RAID: the Nythraxis raid boss's own set pieces and legendaries upgrade
-  // to the raid tier (source 27, item level 33/37), anchored on the raid boss's
-  // normal loot so the auto-swap in a heroic claim reads the raid tier too.
+  // heroic RAID: Nythraxis uses source 27 (item level 33/37), while the later
+  // Undermount wing 1 and 2 epics use source 31 (item level 37). Both tiers are
+  // anchored on their raid bosses' normal loot tables.
   const raidBases = new Set(
     (MOBS[NYTHRAXIS_RAID_BOSS_ID]?.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
+  );
+  const undermountRaidBases = new Set(
+    UNDERMOUNT_RAID_BOSS_IDS.flatMap((bossId) =>
+      (MOBS[bossId]?.loot ?? []).flatMap((entry) => (entry.itemId ? [entry.itemId] : [])),
+    ),
+  );
+  const volzharrRaidBases = new Set(
+    (MOBS[VOLZHARR_RAID_BOSS_ID]?.loot ?? []).flatMap((entry) =>
+      entry.itemId ? [entry.itemId] : [],
+    ),
   );
   for (const item of Object.values(ITEMS)) {
     if (!item.heroicOf) continue;
     const src = raidBases.has(item.heroicOf)
       ? NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL
-      : HEROIC_VARIANT_SOURCE_LEVEL;
+      : undermountRaidBases.has(item.heroicOf)
+        ? UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL
+        : volzharrRaidBases.has(item.heroicOf)
+          ? VOLZHARR_RAID_LOOT_SOURCE_LEVEL
+          : HEROIC_VARIANT_SOURCE_LEVEL;
     bump(item.id, src, false);
   }
   // Rift-only clear-time epics and legendaries: gated behind B+/A/S final-boss
@@ -273,7 +291,9 @@ export function itemFromRaid(itemId: string): boolean {
 // item-level readout or stat budget.
 export function isItemLevelEligible(item: ItemDef): boolean {
   return (
-    !!item.slot && (item.kind === 'armor' || item.kind === 'weapon' || item.kind === 'held_offhand')
+    !item.cosmeticOnly &&
+    !!item.slot &&
+    (item.kind === 'armor' || item.kind === 'weapon' || item.kind === 'held_offhand')
   );
 }
 

@@ -588,6 +588,75 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('en');
   });
 
+  it('every Undermount wing 1 and 2 mechanic resolves through the aura matcher', () => {
+    setLanguage('zh_CN');
+    for (const name of [
+      'Glazing',
+      'Cinder-Toad',
+      'Anneal',
+      'Kiln Fury',
+      'Scorched',
+      'Chilled',
+      'Tempering',
+      'Tempering Clash',
+      'Cinder Arc',
+      'Temper Sweep',
+      'Forge Draft',
+    ]) {
+      expect(localizeSimAuraName(name), name).not.toBeNull();
+    }
+    setLanguage('en');
+  });
+
+  it('every required Volzharr mechanic resolves in every locale', () => {
+    setLanguage('en');
+    for (const name of [
+      'Emberfeed',
+      'Forgeheat',
+      'Searing Grip',
+      'Vent Fissure',
+      'Undermount Eruption',
+      'The Embers Come Home',
+    ]) {
+      expect(localizeSimAuraName(name), `en: ${name}`).toBe(name);
+    }
+    for (const lang of supportedLanguages) {
+      setLanguage(lang);
+      for (const name of [
+        'Emberfeed',
+        'Forgeheat',
+        'Searing Grip',
+        'Vent Fissure',
+        'Undermount Eruption',
+        'The Embers Come Home',
+      ]) {
+        expect(localizeSimAuraName(name), `${lang}: ${name}`).not.toBeNull();
+      }
+    }
+    setLanguage('en');
+  });
+
+  it('every Maerin corpse line resolves through a matcher in every locale', () => {
+    const lines = [
+      "This craftsmanship... a whole guild's work, for a cult of arsonists? Something down here is worth hiding behind all this.",
+      'Beast provisions, wages, kennel feed... and the signature page torn out. Someone left in a hurry. North.',
+      'They are not making anything. They are keeping something ASLEEP until they are ready.',
+      'These are not summoning wards. They are RESTRAINTS, and we have been CUTTING them. Every keeper we killed was a lock.',
+      'There was never a factory. There was only ever him, and a very good disguise. Go.',
+      'Half-formed. We killed him before the forge could finish its work.',
+      'The fire is receding north along the vein. This is not over.',
+    ];
+    setLanguage('en');
+    for (const line of lines) expect(localizeSimText(line), `en: ${line}`).toBe(line);
+    for (const lang of supportedLanguages) {
+      setLanguage(lang);
+      for (const line of lines) {
+        expect(localizeSimText(line), `${lang}: ${line}`).not.toBeNull();
+      }
+    }
+    setLanguage('en');
+  });
+
   it('helper-returned pet error strings resolve through the matcher (the S3 scanner cannot see them)', () => {
     // noPetError (src/sim/pet/pet_commands.ts) builds its string inside a ternary,
     // and the delve arm 'Pets are not allowed inside the delves.' is a literal in

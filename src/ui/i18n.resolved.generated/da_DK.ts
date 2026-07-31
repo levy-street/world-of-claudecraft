@@ -9741,6 +9741,111 @@ export const da_DK: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Slaggehærdede sabatons"
+      },
+      "glasswalker_treads": {
+        "name": "Glasvandrerens støvler"
+      },
+      "twice_fired_slippers": {
+        "name": "Dobbeltbrændte tøfler"
+      },
+      "stokebrand_striders": {
+        "name": "Ildmærkets vandrestøvler"
+      },
+      "saans_stoking_iron": {
+        "name": "Saans ildrager"
+      },
+      "glassblowers_shiv": {
+        "name": "Glaspusterens daggert"
+      },
+      "sluicebearer": {
+        "name": "Slusebæreren"
+      },
+      "cindertoad_signet": {
+        "name": "Glødetudsens signet"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Den første hærdnings ring"
+      },
+      "coalglow_band": {
+        "name": "Kulglødsring"
+      },
+      "crownforged_warleggings": {
+        "name": "Kronesmedede krigsbenklæder"
+      },
+      "nighttalon_prowlers": {
+        "name": "Nattekloens snigestøvler"
+      },
+      "soulflame_kilt": {
+        "name": "Sjæleflammekilt"
+      },
+      "stormcallers_legwraps": {
+        "name": "Stormkalderens benvikler"
+      },
+      "the_even_temper": {
+        "name": "Det jævne temperament"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Glødebue, Odrenns stav"
+      },
+      "twicetempered_girdle": {
+        "name": "Dobbelthærdet bælte"
+      },
+      "ashwalk_sandals": {
+        "name": "Askevandrerens sandaler"
+      },
+      "quenchsilk_cord": {
+        "name": "Hærdningssilkesnor"
+      },
+      "slakeleather_belt": {
+        "name": "Hærdet læderbælte"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Kronesmedet hjertebrynje"
+      },
+      "nighttalon_emberweave": {
+        "name": "Nattalons glødevæv"
+      },
+      "soulflame_vestments": {
+        "name": "Sjæleflammegevandter"
+      },
+      "stormcallers_hauberk": {
+        "name": "Stormkalderens ringbrynje"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharrs knosten"
+      },
+      "magmastrider_greaves": {
+        "name": "Magmavandrerens benskinner"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Fodvikler fra det vågnende gulv"
+      },
+      "forgeheat_cinch": {
+        "name": "Smedjevarmt livbælte"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Kerneknuser, Underbjergets hjerte"
+      },
+      "the_last_restraint": {
+        "name": "Den sidste lænke"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Ring fra den niende køling"
+      },
+      "moltenheart_chroma": {
+        "name": "Smeltehjerte"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },
@@ -10682,6 +10787,24 @@ export const da_DK: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Tornetops Svøbe"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Regnskabsgenfærd"
       },
@@ -11233,6 +11356,11 @@ export const da_DK: EnTranslations = {
         "name": "Spejder Maren",
         "title": "Marskallens Spejder",
         "greeting": "Stille fødder og en kort klinge holder dig i live herude. Tal hurtigt - jeg skal tilbage i sivene."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Kaptajn Thessaly",
@@ -12028,6 +12156,42 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vael Fogbinderen dræbt"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const da_DK: EnTranslations = {
         "enterText": "Du passerer gennem den forseglede kongelige dør.",
         "leaveText": "Du vender tilbage til Tornetops kolde luft."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "Vildhjertebassinet",
         "enterText": "Varm regn hvisler mod gammel sten. Vildhjertebassinet åbner sig foran dig.",
@@ -14367,7 +14546,8 @@ export const da_DK: EnTranslations = {
         "name": "Bonewrought regalier",
         "bonus2": "Øger angrebskraft med 40.",
         "bonus3": "Øger styrke med 15, udholdenhed med 15 og angrebs- og magihastighed med 15%.",
-        "bonus4": "Dine kritiske våbenslag splintrer målet med Bensplint og påfører 8 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange."
+        "bonus4": "Dine kritiske våbenslag splintrer målet med Bensplint og påfører 8 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange.",
+        "bonus5": "Øger chancen for kritiske træffere med 3 %."
       },
       "deathlord": {
         "name": "Barrowlord kampudstyr",
@@ -14389,19 +14569,22 @@ export const da_DK: EnTranslations = {
         "name": "Direfang pels",
         "bonus2": "Øger angrebskraft med 40.",
         "bonus3": "Øger smidighed med 15, kritisk chance med 2% og angrebs- og magihastighed med 15%.",
-        "bonus4": "Dine kritiske våbenslag river en Laset Flænge og påfører 6 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange."
+        "bonus4": "Dine kritiske våbenslag river en Laset Flænge og påfører 6 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange.",
+        "bonus5": "Øger chancen for kritiske træffere med 3 %."
       },
       "soulflame": {
         "name": "Wraithfire regalier",
         "bonus2": "Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).",
         "bonus3": "Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.",
-        "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek."
+        "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek.",
+        "bonus5": "Øger chancen for kritiske træffere med besværgelser med 3 %."
       },
       "stormcallers": {
         "name": "Galecall klæder",
         "bonus2": "Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).",
         "bonus3": "Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.",
-        "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek."
+        "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek.",
+        "bonus5": "Øger chancen for kritiske træffere med besværgelser med 3 %."
       },
       "vale_arcanist": {
         "name": "Dalarkanistens klæder",

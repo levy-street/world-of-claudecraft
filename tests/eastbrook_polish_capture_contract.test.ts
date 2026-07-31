@@ -360,12 +360,12 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned: the review's roof-course offset fix and the
-      // makeOpenPitchedRoof coupling guard touched buildings_commerce.js, a
-      // pinned townAsset source-fingerprint input, so this composite mints
-      // fresh even though the fix only changes the bank's own geometry by a
-      // few millimeters and adds a runtime assertion. No recapture.
-      fingerprint: '7f24de520e03f40270acc24511859b21b0b140c502c9a014b2e92240b22db4cc',
+      // Deliberately re-pinned for the combined release and Undermount tree.
+      // The release moved pinned town and renderer inputs, while Undermount
+      // adds renderer-only raid decals. The scoped provenance recipe sweeps
+      // those current source hashes without changing captured measurements.
+      // No recapture.
+      fingerprint: 'e0f9dcb08446beb92c4204de40e35c9bd76f2fb3020aaf881daafacf28412797',
       components: {
         captureContract: {
           id: 'polish-v2',

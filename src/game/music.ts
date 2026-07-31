@@ -108,6 +108,11 @@ const DUNGEON_MUSIC: Record<string, MusicZone> = {
   hollow_crypt: 'dungeon_hollow_crypt',
   sunken_bastion: 'dungeon_sunken_bastion',
   gravewyrm_sanctum: 'dungeon_gravewyrm_sanctum',
+  // TODO(release): replace these palette-matched stand-ins when bespoke
+  // Undermount wing tracks have been composed, reviewed, and supplied.
+  undermount_wing1: 'dungeon_hollow_crypt',
+  undermount_wing2: 'dungeon_sunken_bastion',
+  undermount_wing3: 'dungeon_gravewyrm_sanctum',
 };
 
 export function dungeonMusicZoneForDungeon(dungeonId: string): MusicZone {

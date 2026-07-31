@@ -83,7 +83,8 @@ await page.waitForFunction(
   },
   { timeout: 30000, polling: 300 },
 );
-const start = await page.evaluate(() => {
+const start = await page.evaluate(async () => {
+  const { isYumiMazePos } = await import('/src/sim/data.ts');
   const sim = window.__game.sim;
   const m = sim.arenaMatchFor(sim.playerId);
   const y = m.yumi;
@@ -94,12 +95,13 @@ const start = await page.evaluate(() => {
     slot: m.slot,
     px: Math.round(sim.player.pos.x),
     pz: Math.round(sim.player.pos.z),
+    inYumiBand: isYumiMazePos(sim.player.pos.x),
     catA: { hp: catA?.hp, x: catA?.pos.x, z: catA?.pos.z },
     catB: { hp: catB?.hp, x: catB?.pos.x, z: catB?.pos.z },
   };
 });
 check('yumi3 match active', start.format === 'yumi3', JSON.stringify(start));
-check('player teleported into the maze band', start.px >= 8000, `px=${start.px}`);
+check('player teleported into the maze band', start.inYumiBand, `px=${start.px}`);
 check('both cats at 5000 hp', start.catA.hp === 5000 && start.catB.hp === 5000);
 check('seated ' + JSON.stringify(seated.pids ? seated.pids.length : 0) + ' fighters', true);
 
@@ -185,15 +187,15 @@ await page.bringToFront();
 await page.keyboard.down('w');
 await sleep(2500);
 await page.keyboard.up('w');
-const contained = await page.evaluate(() => {
+const contained = await page.evaluate(async () => {
+  const { yumiMazeOrigin } = await import('/src/sim/data.ts');
   const sim = window.__game.sim;
   const m = sim.arenaMatchFor(sim.playerId);
-  // maze origin: slot along z at x 8400; footprint half extent
-  // 13 cells * 6.75yd / 2 + shell = ~44.9 (mirror of yumiMazeLayout)
-  const ox = 8400;
-  const oz = -1250 + m.slot * 200;
-  const lx = sim.player.pos.x - ox;
-  const lz = sim.player.pos.z - oz;
+  // The footprint half extent is 13 cells * 6.75yd / 2 + shell = about 44.9
+  // (mirror of yumiMazeLayout).
+  const origin = yumiMazeOrigin(m.slot);
+  const lx = sim.player.pos.x - origin.x;
+  const lz = sim.player.pos.z - origin.z;
   return {
     lx: Math.round(lx * 10) / 10,
     lz: Math.round(lz * 10) / 10,
@@ -357,16 +359,18 @@ await page.screenshot({ path: 'tmp/yumi_victory.png' });
 
 // Aftermath: everyone returns, cats despawn, the slot frees.
 await sleep(6500);
-const torn = await page.evaluate(() => {
+const torn = await page.evaluate(async () => {
+  const { isYumiMazePos } = await import('/src/sim/data.ts');
   const sim = window.__game.sim;
   return {
     match: sim.arenaMatchFor(sim.playerId) === null,
     px: Math.round(sim.player.pos.x),
+    inYumiBand: isYumiMazePos(sim.player.pos.x),
   };
 });
 check(
   'match torn down and player returned home',
-  torn.match && torn.px < 8000,
+  torn.match && !torn.inYumiBand,
   JSON.stringify(torn),
 );
 

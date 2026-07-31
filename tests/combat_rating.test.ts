@@ -215,10 +215,9 @@ describe('combat-rating tier ladder', () => {
         (ilvl === 37 && item.heroicOf !== undefined)
       );
     });
-    // 13 pre-existing pieces plus the 5 generated heroic raid variants of the
-    // normal-raid epics (greatsword, greatblade, bulwark, orb, and the feral
-    // ladder capstone maul_of_the_scourged_wilds).
-    expect(heroicRaidGear).toHaveLength(18);
+    // 13 direct or pre-existing pieces, 5 generated Nythraxis variants, and
+    // 20 generated Undermount wing 1 and 2 variants.
+    expect(heroicRaidGear).toHaveLength(38);
     for (const item of heroicRaidGear) {
       const ilvl = itemLevel(item);
       const expectedPrimary = ilvl === 37 ? 70 : item.weapon ? 65 : 55;

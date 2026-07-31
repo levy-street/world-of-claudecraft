@@ -24,6 +24,9 @@ export const INTERIOR_LAYOUTS: Record<string, DungeonLayout> = {
   sanctum: SANCTUM_LAYOUT,
   temple: TEMPLE_LAYOUT,
   nythraxis: NYTHRAXIS_LAYOUT,
+  // The Undermount raid wings reuse the Nythraxis sanctum room plan for both
+  // collision and floor elevation (the renderer redresses the interior).
+  undermount: NYTHRAXIS_LAYOUT,
 };
 
 export interface DungeonInstanceFrame {

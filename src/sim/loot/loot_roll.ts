@@ -32,6 +32,7 @@
 import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
 import { heroicVariantId } from '../content/heroic_variants';
 import { ITEMS, MOBS, QUESTS } from '../data';
+import { undermountBossCompletesWing, undermountWingByBoss } from '../encounters/undermount';
 import { formatMoney } from '../format_money';
 import { itemLevel } from '../item_level';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
@@ -207,6 +208,11 @@ export function rollLoot(
 ): void {
   const template = MOBS[mob.templateId];
   if (!template) return;
+  // Both Kiln-Keepers carry the same static table so heroic variant discovery
+  // remains content-driven, but only the death that completes the wing rolls it.
+  if (undermountWingByBoss(mob.templateId)?.bossMobIds.length === 2) {
+    if (!undermountBossCompletesWing(ctx, mob)) return;
+  }
   let copper = 0;
   const items: LootSlot[] = [];
   const rolledGroups = new Set<string>();

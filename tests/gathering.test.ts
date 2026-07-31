@@ -265,11 +265,11 @@ describe('isHarvestableCorpse', () => {
     // harvestable components instead of coin, so 15 previously untagged
     // templates gained mapped tags (tests/economy_yield.test.ts enforces it).
     expect(included).toHaveLength(36);
-    // ...and the untagged templates are counted rather than assumed: 184 of them
-    // ship, all excluded before this change and all excluded after it, which is
-    // the path fen_troll now joins instead of getting one of its own.
+    // ...and the untagged templates are counted rather than assumed: 190 ship
+    // after the six Undermount raid and prequest templates join the release
+    // catalog, all excluded like the other bosses and quest minibosses.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(184);
+    expect(untagged).toHaveLength(190);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

@@ -8,6 +8,7 @@
 // existence predicates over the whole table for the per-band coverage, so
 // future additions grow the table without breaking the pins.
 import { describe, expect, it } from 'vitest';
+import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { DUNGEONS, ITEMS, MOBS } from '../src/sim/data';
 import { canEquipItem, isShieldItem, weaponArchetypeForItem } from '../src/sim/equipment_rules';
 import { weaponDpsBudget } from '../src/sim/item_budget';
@@ -283,13 +284,7 @@ describe('itemization coverage: the int/spi shield and the low-level held offhan
 
 describe('itemization coverage: heroic variants are only built from heroic-eligible instances', () => {
   it('every heroic variant has its base in a heroic-eligible mob loot table', () => {
-    const heroicInstanceIds = new Set([
-      'hollow_crypt',
-      'sunken_bastion',
-      'drowned_temple',
-      'gravewyrm_sanctum',
-      'nythraxis_boss_arena',
-    ]);
+    const heroicInstanceIds = new Set(Object.keys(HEROIC_DUNGEON_TUNING));
     const heroicEligibleMobs = new Set<string>();
     for (const def of Object.values(DUNGEONS)) {
       if (!heroicInstanceIds.has(def.id)) continue;

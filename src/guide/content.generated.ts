@@ -2042,11 +2042,35 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "name": "The Wildheart Basin"
   },
   {
-    "id": "raid",
+    "id": "nythraxis_boss_arena",
     "isRaid": true,
     "suggestedPlayers": 10,
     "min": 20,
     "max": 20
+  },
+  {
+    "id": "undermount_wing1",
+    "isRaid": true,
+    "suggestedPlayers": 10,
+    "min": 24,
+    "max": 24,
+    "name": "Undermount: The Descent"
+  },
+  {
+    "id": "undermount_wing2",
+    "isRaid": true,
+    "suggestedPlayers": 10,
+    "min": 24,
+    "max": 24,
+    "name": "Undermount: The Tempering"
+  },
+  {
+    "id": "undermount_wing3",
+    "isRaid": true,
+    "suggestedPlayers": 10,
+    "min": 24,
+    "max": 26,
+    "name": "Undermount: The Waking"
   }
 ];
 
@@ -4705,6 +4729,56 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "The Herd Remembers",
     "category": "chronicle",
     "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_undermount_kiln_keepers",
+    "name": "What Walks Out of the Kiln",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_undermount_kiln_keepers_heroic",
+    "name": "Heroic: The Descent",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_undermount_odrenn",
+    "name": "An Even Temper",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_undermount_odrenn_heroic",
+    "name": "Heroic: The Tempering",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_undermount_volzharr",
+    "name": "The Mountainbreaker",
+    "category": "dungeon",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "the Mountainbreaker"
+  },
+  {
+    "id": "dgn_undermount_full_descent",
+    "name": "The Full Descent",
+    "category": "dungeon",
+    "renown": 25,
+    "feat": false
+  },
+  {
+    "id": "dgn_undermount_volzharr_heroic",
+    "name": "Heroic: The Waking",
+    "category": "dungeon",
+    "renown": 25,
     "feat": false
   }
 ];

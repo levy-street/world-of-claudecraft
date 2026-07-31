@@ -26,6 +26,7 @@
 import { computeTalentModifiers } from '../content/talents';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
+import { undermountWingByBoss } from '../encounters/undermount';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
@@ -1152,6 +1153,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         mobId: 'reliquary_bonewalker',
       });
     }
+    if (undermountWingByBoss(e.templateId)) ctx.onUndermountBossDeath(e);
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
     // Respawn cadence is the zone's, not one flat world timer: the policy leaf

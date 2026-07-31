@@ -9741,6 +9741,111 @@ export const ja_JP: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "テラースパークの始動キー"
       },
+      "slag_tempered_sabatons": {
+        "name": "鉱滓焼入れのサバトン"
+      },
+      "glasswalker_treads": {
+        "name": "玻璃歩きの足具"
+      },
+      "twice_fired_slippers": {
+        "name": "二度焼きの室内履き"
+      },
+      "stokebrand_striders": {
+        "name": "火熾し印の足具"
+      },
+      "saans_stoking_iron": {
+        "name": "サーンの火掻き棒"
+      },
+      "glassblowers_shiv": {
+        "name": "玻璃職人のシヴ"
+      },
+      "sluicebearer": {
+        "name": "水門担ぎ"
+      },
+      "cindertoad_signet": {
+        "name": "熾火蛙の印章"
+      },
+      "ring_of_the_first_quench": {
+        "name": "最初の焼入れの指輪"
+      },
+      "coalglow_band": {
+        "name": "炭火の指輪"
+      },
+      "crownforged_warleggings": {
+        "name": "王冠鍛造の戦脚甲"
+      },
+      "nighttalon_prowlers": {
+        "name": "夜爪の忍び靴"
+      },
+      "soulflame_kilt": {
+        "name": "魂炎のキルト"
+      },
+      "stormcallers_legwraps": {
+        "name": "嵐呼びの脚巻き"
+      },
+      "the_even_temper": {
+        "name": "平静なる焼き戻し"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "炎弧、オドレンの杖"
+      },
+      "twicetempered_girdle": {
+        "name": "二度焼き戻しの腰帯"
+      },
+      "ashwalk_sandals": {
+        "name": "灰歩きのサンダル"
+      },
+      "quenchsilk_cord": {
+        "name": "焼入れ絹の紐"
+      },
+      "slakeleather_belt": {
+        "name": "冷まし革のベルト"
+      },
+      "undermount_rune_rubbing": {
+        "name": "アンダーマウントのルーン拓本"
+      },
+      "undermount_foreman_ledger": {
+        "name": "アンダーマウント監督官の帳簿"
+      },
+      "runeseekers_lantern": {
+        "name": "ルーンシーカーのランタン"
+      },
+      "crownforged_heartplate": {
+        "name": "クラウンフォージの心胸甲"
+      },
+      "nighttalon_emberweave": {
+        "name": "ナイトタロンの残り火織り"
+      },
+      "soulflame_vestments": {
+        "name": "ソウルフレイムの祭服"
+      },
+      "stormcallers_hauberk": {
+        "name": "ストームコーラーのホーバーク"
+      },
+      "volzharrs_knucklestone": {
+        "name": "ヴォルザールの拳石"
+      },
+      "magmastrider_greaves": {
+        "name": "マグマストライダーの脚甲"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "目覚める床の足布"
+      },
+      "forgeheat_cinch": {
+        "name": "フォージヒートの帯"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "コアブレイカー、地下山の心臓"
+      },
+      "the_last_restraint": {
+        "name": "最後の拘束"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "第九冷却の指輪"
+      },
+      "moltenheart_chroma": {
+        "name": "モルテンハート"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -10682,6 +10787,24 @@ export const ja_JP: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "ナイスラクシス、ソーンピークの災厄"
       },
+      "vosh_the_glazier": {
+        "name": "玻璃職人ヴォシュ"
+      },
+      "saan_the_stoker": {
+        "name": "火焚きサーン"
+      },
+      "odrenn_the_temperer": {
+        "name": "焼き戻し師オドレン"
+      },
+      "volzharr_buried_furnace": {
+        "name": "埋もれた炉ヴォルザール"
+      },
+      "undermount_cinderling": {
+        "name": "燼の子"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "ワームカルト発掘監督"
+      },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"
       },
@@ -11233,6 +11356,11 @@ export const ja_JP: EnTranslations = {
         "name": "斥候マレン",
         "title": "元帥の斥候",
         "greeting": "静かな足取りと短い刃が命を守ります。手短に。葦原へ戻らねばなりません。"
+      },
+      "runeseeker_maerin": {
+        "name": "ルーン探しのメイリン",
+        "title": "放浪の考古学者",
+        "greeting": "ここは死んだ教団の鍛炉だと聞かされたよ、{className}。死んだものがここまで熱を出すはずがない。下にはこの煙すべてに見合う何かがある。"
       },
       "captain_thessaly": {
         "name": "隊長テサリー",
@@ -12028,6 +12156,42 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "フォグバインダーのヴァエルを討伐"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "あるはずのない熱",
+        "text": "この裂け目の石は木炭がにじむほど熱い、{playerName}。教団が再び埋める前に、露出した三つのルーン面から拓本を取ってくれ。模様が繰り返すなら、下に何があるか分かる。",
+        "completion": "線はすべて内側へ向かっている。これは鍛冶師の作業印ではない、{playerName}。結界だ。そして何かが下から切り裂いている。",
+        "objectives": {
+          "0": {
+            "label": "ルーンの拓本を採取"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "教団が埋めたもの",
+        "text": "発掘監督は作業台帳を肌身離さず持ち、野営地の狂信者が守っている。持ってきてくれ、{playerName}。地金も食料も賃金も、どこへ行くのか知りたい。",
+        "completion": "下だ。地金ひとつ、残り火ひとつ、すべてが私たちの下で費やされている、{playerName}。鍛炉は地上に何も生み出していない。山が埋めたものに餌を与えている。",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult の発掘監督を討伐"
+          },
+          "1": {
+            "label": "Wyrmcult の護衛を討伐"
+          },
+          "2": {
+            "label": "監督の台帳を回収"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "アンダーマウントへ",
+        "text": "台帳は発掘場の下に第二の工区があると示し、すべての積荷が下を指している。準備ができたら話しかけてくれ、{playerName}。私も降下に加わる。",
+        "completion": "この灯を持っていけ。魔力はなく、ただ安定した炎があるだけだが、下では正直な光が必要になる。この連続クエストを終えていなくても、レイド入口は開いている。",
+        "objectives": {
+          "0": {
+            "label": "ルーン探しのメイリンと話す"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const ja_JP: EnTranslations = {
         "enterText": "封印された王家の扉を通り抜けます。",
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
       },
+      "undermount_wing1": {
+        "name": "アンダーマウント: 降下",
+        "enterText": "あなたはソーンピークの下へ降り、硝子のような闇へ入る。",
+        "leaveText": "あなたはアンダーマウントの降下路から登り戻る。"
+      },
+      "undermount_wing2": {
+        "name": "アンダーマウント: 焼き戻し",
+        "enterText": "槌音が焼き戻しの宝物庫に響き渡る。",
+        "leaveText": "あなたは鳴り響く炉道から退く。"
+      },
+      "undermount_wing3": {
+        "name": "アンダーマウント: 目覚め",
+        "enterText": "埋もれた炉が深みで身じろぎする。",
+        "leaveText": "あなたは目覚めつつある熱から退く。"
+      },
       "wildheart_basin": {
         "name": "ワイルドハート盆地",
         "enterText": "温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。",
@@ -14367,7 +14546,8 @@ export const ja_JP: EnTranslations = {
         "name": "ボーンロートの戦装束",
         "bonus2": "攻撃力が40上昇します。",
         "bonus3": "筋力が15、スタミナが15上昇し、攻撃速度と詠唱速度が15%上昇します。",
-        "bonus4": "武器のクリティカルヒットで対象に「ボーンスプリンター」を刻み、2秒ごとに8ダメージの出血を12秒間与えます。最大3回まで累積します。"
+        "bonus4": "武器のクリティカルヒットで対象に「ボーンスプリンター」を刻み、2秒ごとに8ダメージの出血を12秒間与えます。最大3回まで累積します。",
+        "bonus5": "クリティカル率が3%上昇する。"
       },
       "deathlord": {
         "name": "バロウロードの戦装束",
@@ -14389,19 +14569,22 @@ export const ja_JP: EnTranslations = {
         "name": "ダイアファングの革装束",
         "bonus2": "攻撃力が40上昇します。",
         "bonus3": "敏捷性が15、クリティカル率が2%上昇し、攻撃速度と詠唱速度が15%上昇します。",
-        "bonus4": "武器のクリティカルヒットで「裂けた傷」を与え、対象に2秒ごとに6ダメージの出血を12秒間与えます。最大3回まで累積します。"
+        "bonus4": "武器のクリティカルヒットで「裂けた傷」を与え、対象に2秒ごとに6ダメージの出血を12秒間与えます。最大3回まで累積します。",
+        "bonus5": "クリティカル率が3%上昇する。"
       },
       "soulflame": {
         "name": "レイスファイアの法衣",
         "bonus2": "呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。",
         "bonus3": "知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。",
-        "bonus4": "呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。"
+        "bonus4": "呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。",
+        "bonus5": "呪文のクリティカル率が3%上昇する。"
       },
       "stormcallers": {
         "name": "ゲイルコールの法衣",
         "bonus2": "呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。",
         "bonus3": "知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。",
-        "bonus4": "呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。"
+        "bonus4": "呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。",
+        "bonus5": "呪文のクリティカル率が3%上昇する。"
       },
       "vale_arcanist": {
         "name": "谷の秘術師の装束",

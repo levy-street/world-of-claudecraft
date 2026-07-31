@@ -10,11 +10,13 @@ import {
   buildDevKit,
   DEV_KIT_EXCLUDED_DUNGEON,
   DEV_KIT_LEVEL,
+  DEV_KIT_RAID_SOURCE_CAP,
   dungeonLootIds,
   isFreshTwentyItem,
+  isRaidTierItem,
 } from '../src/sim/dev_kit';
 import { canDualWield, isShieldItem } from '../src/sim/equipment_rules';
-import { itemFromRaid } from '../src/sim/item_level';
+import { itemFromRaid, itemSourceLevel } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, type PlayerClass } from '../src/sim/types';
 
@@ -160,6 +162,59 @@ describe('fresh-20 item pool', () => {
         if (!item.requiredClass?.includes(cls)) expect(isFreshTwentyItem(cls, item)).toBe(false);
       }
     }
+  });
+});
+
+describe('raid-tier item pool', () => {
+  // The raid tier exists so the ten-bot Undermount E2E measures the ENCOUNTER:
+  // a fresh-20 kit wipes by design against content the PRD tunes for ilvl 29
+  // groups. Same fail-closed rules as fresh where they still apply, plus one new
+  // exclusion: never the Undermount's own loot, the thing the run exists to earn.
+  it('never puts the Undermount raid loot, a retired heroic, or PvP gear in any kit', () => {
+    const undermount = new Set(
+      ['undermount_wing1', 'undermount_wing2', 'undermount_wing3'].flatMap((id) => [
+        ...dungeonLootIds(id),
+      ]),
+    );
+    expect(undermount.size).toBeGreaterThan(0);
+    const retired = new Set(Object.keys(RETIRED_HEROIC_ITEMS));
+    const pvp = new Set(Object.keys(WARFARE_ITEMS));
+    const violations: string[] = [];
+    for (const { cls, spec } of everySpec()) {
+      for (const [slot, id] of Object.entries(buildDevKit(cls, spec, 'raid')?.equip ?? {})) {
+        const item = ITEMS[id];
+        if (undermount.has(id) || undermount.has(item?.heroicOf ?? '')) {
+          violations.push(`${cls}/${spec} ${slot}=${id} (undermount loot)`);
+        }
+        if (retired.has(id)) violations.push(`${cls}/${spec} ${slot}=${id} (retired heroic)`);
+        if (pvp.has(id)) violations.push(`${cls}/${spec} ${slot}=${id} (pvp)`);
+      }
+    }
+    expect(violations).toEqual([]);
+  });
+
+  it('caps the pool at source level DEV_KIT_RAID_SOURCE_CAP', () => {
+    for (const item of Object.values(ITEMS)) {
+      const source = itemSourceLevel(item.id);
+      if (source !== undefined && source > DEV_KIT_RAID_SOURCE_CAP) {
+        for (const cls of ALL_CLASSES) expect(isRaidTierItem(cls, item)).toBe(false);
+      }
+    }
+  });
+
+  it('dresses every one of the 27 specs strictly better than the fresh tier', () => {
+    // The whole point of the tier: if no kit ever reaches past the fresh filter,
+    // the raid word is a no-op and the E2E is measuring undertuned gear again.
+    const flat: string[] = [];
+    for (const { cls, spec } of everySpec()) {
+      const equip = buildDevKit(cls, spec, 'raid')?.equip ?? {};
+      const beyondFresh = Object.values(equip).some((id) => {
+        const item = ITEMS[id];
+        return item !== undefined && !isFreshTwentyItem(cls, item);
+      });
+      if (!beyondFresh) flat.push(`${cls}/${spec}`);
+    }
+    expect(flat).toEqual([]);
   });
 });
 
@@ -313,6 +368,34 @@ describe('/dev kit against a real Sim', () => {
     for (const slot of ['helmet', 'chest', 'legs', 'mainhand'] as const) {
       expect(meta?.equipment?.[slot], slot).toBeTruthy();
     }
+  });
+
+  it('accepts a bare raid tier word with no spec, using the current spec', () => {
+    // The tier is independently selectable: /dev kit raid must not bind
+    // "raid" to the spec group and error (#2671 review minor).
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', devCommands: true });
+    sim.setPlayerLevel(DEV_KIT_LEVEL);
+    const meta = sim.players.get(sim.playerId);
+    if (meta) meta.talents.spec = 'prot';
+    sim.chat('/dev kit raid');
+    const equip = sim.players.get(sim.playerId)?.equipment ?? {};
+    const beyondFresh = Object.values(equip).some((id) => {
+      const item = id ? ITEMS[id] : undefined;
+      return item !== undefined && !isFreshTwentyItem('warrior', item);
+    });
+    expect(beyondFresh).toBe(true);
+  });
+
+  it('accepts a trailing raid tier word and equips past the fresh quality cap', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', devCommands: true });
+    sim.setPlayerLevel(DEV_KIT_LEVEL);
+    sim.chat('/dev kit prot raid');
+    const equip = sim.players.get(sim.playerId)?.equipment ?? {};
+    const beyondFresh = Object.values(equip).some((id) => {
+      const item = id ? ITEMS[id] : undefined;
+      return item !== undefined && !isFreshTwentyItem('warrior', item);
+    });
+    expect(beyondFresh).toBe(true);
   });
 
   it('leaves level and spec alone: this is a GEAR command', () => {

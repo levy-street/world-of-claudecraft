@@ -9741,6 +9741,111 @@ export const tr_TR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Cürufla Suverilmiş Savaş Çizmeleri"
+      },
+      "glasswalker_treads": {
+        "name": "Camyürüyen Çizmeleri"
+      },
+      "twice_fired_slippers": {
+        "name": "İki Kez Pişirilmiş Terlikler"
+      },
+      "stokebrand_striders": {
+        "name": "Körük Damgası Çizmeleri"
+      },
+      "saans_stoking_iron": {
+        "name": "Saan’ın Ateş Demiri"
+      },
+      "glassblowers_shiv": {
+        "name": "Cam Üfleyicinin Hançeri"
+      },
+      "sluicebearer": {
+        "name": "Savak Taşıyıcı"
+      },
+      "cindertoad_signet": {
+        "name": "Köz Kurbağası Mührü"
+      },
+      "ring_of_the_first_quench": {
+        "name": "İlk Suvermenin Yüzüğü"
+      },
+      "coalglow_band": {
+        "name": "Kömür Parıltısı Halkası"
+      },
+      "crownforged_warleggings": {
+        "name": "Taçdövme Savaş Tozlukları"
+      },
+      "nighttalon_prowlers": {
+        "name": "Gecepençesi Sinsi Çizmeleri"
+      },
+      "soulflame_kilt": {
+        "name": "Ruhalevi İskoç Eteği"
+      },
+      "stormcallers_legwraps": {
+        "name": "Fırtınaçağıranın Bacak Sargıları"
+      },
+      "the_even_temper": {
+        "name": "Dengeli Suverme"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Kor Yay, Odrenn’in Asası"
+      },
+      "twicetempered_girdle": {
+        "name": "İki Kez Suverilmiş Kuşak"
+      },
+      "ashwalk_sandals": {
+        "name": "Külyürüyen Sandaletleri"
+      },
+      "quenchsilk_cord": {
+        "name": "Suverilmiş İpek Kordon"
+      },
+      "slakeleather_belt": {
+        "name": "Suverilmiş Deri Kemeri"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Taçdövme Yürek Zırhı"
+      },
+      "nighttalon_emberweave": {
+        "name": "Gecepençesi Kor Dokuması"
+      },
+      "soulflame_vestments": {
+        "name": "Ruhalevi Cübbeleri"
+      },
+      "stormcallers_hauberk": {
+        "name": "Fırtınaçağıranın Zırhlı Gömleği"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharr’ın Yumruk Taşı"
+      },
+      "magmastrider_greaves": {
+        "name": "Magmayürüyen Baldırlıkları"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Uyanan Zeminin Ayak Sargıları"
+      },
+      "forgeheat_cinch": {
+        "name": "Ocak Isısı Kuşağı"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Çekirdekkıran, Alt Dağın Yüreği"
+      },
+      "the_last_restraint": {
+        "name": "Son Bağ"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Dokuzuncu Suverme Yüzüğü"
+      },
+      "moltenheart_chroma": {
+        "name": "Erimiş Yürek"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -10682,6 +10787,24 @@ export const tr_TR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Dikenzirve Belası"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Defter Hayaleti"
       },
@@ -11233,6 +11356,11 @@ export const tr_TR: EnTranslations = {
         "name": "İzci Maren",
         "title": "Mareşalin İzcisi",
         "greeting": "Sessiz adımlar ve kısa bir bıçak burada nefes almanı sağlar. Çabuk konuş, sazlıklara dönmem gerek."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Kaptan Thessaly",
@@ -12028,6 +12156,42 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fogbinder Vael öldürüldü"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const tr_TR: EnTranslations = {
         "enterText": "Mühürlü kraliyet kapısından geçersin.",
         "leaveText": "Dikenzirve'nin soğuk havasına geri dönersin."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "Yaban Yürek Çukuru",
         "enterText": "Ilık yağmur eski taşların üzerinde tıslıyor. Yaban Yürek Çukuru önünde açılıyor.",
@@ -14367,7 +14546,8 @@ export const tr_TR: EnTranslations = {
         "name": "Bonewrought Kıyafetleri",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus3": "Gücü 15, dayanıklılığı 15, saldırı ve büyü hızını %15 artırır.",
-        "bonus4": "Silah kritik vuruşların hedefi Kemikkıymık ile parçalar, 12 sn boyunca her 2 sn'de 8 kanama hasarı verir. 3 kata kadar üst üste binebilir."
+        "bonus4": "Silah kritik vuruşların hedefi Kemikkıymık ile parçalar, 12 sn boyunca her 2 sn'de 8 kanama hasarı verir. 3 kata kadar üst üste binebilir.",
+        "bonus5": "Kritik vuruş şansını %3 artırır."
       },
       "deathlord": {
         "name": "Barrowlord Savaş Takımı",
@@ -14389,19 +14569,22 @@ export const tr_TR: EnTranslations = {
         "name": "Direfang Postu",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus3": "Çevikliği 15, kritik şansını %2, saldırı ve büyü hızını %15 artırır.",
-        "bonus4": "Silah kritik vuruşların bir Pürüzlü Yarık açar, hedefi 12 sn boyunca her 2 sn'de 6 kanama hasarıyla kanatır. 3 kata kadar üst üste binebilir."
+        "bonus4": "Silah kritik vuruşların bir Pürüzlü Yarık açar, hedefi 12 sn boyunca her 2 sn'de 6 kanama hasarıyla kanatır. 3 kata kadar üst üste binebilir.",
+        "bonus5": "Kritik vuruş şansını %3 artırır."
       },
       "soulflame": {
         "name": "Wraithfire Kıyafetleri",
         "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus3": "Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.",
-        "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır."
+        "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır.",
+        "bonus5": "Büyülerin kritik vuruş şansını %3 artırır."
       },
       "stormcallers": {
         "name": "Galecall Cübbeleri",
         "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus3": "Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.",
-        "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır."
+        "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır.",
+        "bonus5": "Büyülerin kritik vuruş şansını %3 artırır."
       },
       "vale_arcanist": {
         "name": "Vadi Arkanisti giysileri",

@@ -788,6 +788,14 @@ describe('dungeon instance placement and targetability', () => {
         sim.players.get(sim.playerId)?.questsDone.add('q_nythraxis_bound_guardian');
         formRaid(sim);
       }
+      if (dungeon.id === 'undermount_wing2' || dungeon.id === 'undermount_wing3') {
+        // Wings 2 and 3 are sealed until the wing above falls (encounters/
+        // undermount.ts undermountWingSealed); seed the permanent clears the
+        // way a progressing raid would carry them so placement is testable.
+        const meta = sim.players.get(sim.playerId);
+        meta?.undermountCleared.add('undermount_wing1');
+        meta?.undermountCleared.add('undermount_wing2');
+      }
       sim.enterDungeon(dungeon.id);
       const p = sim.player;
       expect(p.pos.x, `${dungeon.id} entry is not inside an instance`).toBeGreaterThan(

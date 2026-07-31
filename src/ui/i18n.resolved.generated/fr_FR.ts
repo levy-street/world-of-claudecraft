@@ -9741,6 +9741,111 @@ export const fr_FR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Solerets trempés dans le laitier"
+      },
+      "glasswalker_treads": {
+        "name": "Bottines marcheverre"
+      },
+      "twice_fired_slippers": {
+        "name": "Mules cuites deux fois"
+      },
+      "stokebrand_striders": {
+        "name": "Bottines marque-braise"
+      },
+      "saans_stoking_iron": {
+        "name": "Tisonnier de Saan"
+      },
+      "glassblowers_shiv": {
+        "name": "Surin du souffleur de verre"
+      },
+      "sluicebearer": {
+        "name": "Porte-écluse"
+      },
+      "cindertoad_signet": {
+        "name": "Chevalière crapaud-de-braise"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Anneau de la première trempe"
+      },
+      "coalglow_band": {
+        "name": "Anneau lueur-de-charbon"
+      },
+      "crownforged_warleggings": {
+        "name": "Jambières de guerre Forgécouronne"
+      },
+      "nighttalon_prowlers": {
+        "name": "Bottines de rôdeur Serre-de-nuit"
+      },
+      "soulflame_kilt": {
+        "name": "Kilt Flamme-d'âme"
+      },
+      "stormcallers_legwraps": {
+        "name": "Bandelettes d'Appel-tempête"
+      },
+      "the_even_temper": {
+        "name": "Le Tempérament égal"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Arc-de-braise, bâton d’Odrenn"
+      },
+      "twicetempered_girdle": {
+        "name": "Ceinturon à double trempe"
+      },
+      "ashwalk_sandals": {
+        "name": "Sandales marchecendre"
+      },
+      "quenchsilk_cord": {
+        "name": "Cordon de soie trempée"
+      },
+      "slakeleather_belt": {
+        "name": "Ceinture en cuir trempé"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Cuirasse du Cœur Forgé-couronne"
+      },
+      "nighttalon_emberweave": {
+        "name": "Tissebraise Serre-de-nuit"
+      },
+      "soulflame_vestments": {
+        "name": "Habits Flamme-d’âme"
+      },
+      "stormcallers_hauberk": {
+        "name": "Haubert de l’Appel-tempête"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Pierre de poing de Volzharr"
+      },
+      "magmastrider_greaves": {
+        "name": "Grèves Marche-magma"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Bandelettes du Sol éveillé"
+      },
+      "forgeheat_cinch": {
+        "name": "Ceinture Chaleur de forge"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Brise-cœur, Cœur du Sous-mont"
+      },
+      "the_last_restraint": {
+        "name": "La Dernière Entrave"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Anneau de la Neuvième Trempe"
+      },
+      "moltenheart_chroma": {
+        "name": "Cœur en fusion"
+      },
       "conjured_water4": {
         "name": "Eau de source invoquée"
       },
@@ -10682,6 +10787,24 @@ export const fr_FR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Fléau de Thornpeak"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Spectre du registre"
       },
@@ -11233,6 +11356,11 @@ export const fr_FR: EnTranslations = {
         "name": "Éclaireuse Maren",
         "title": "Éclaireuse du maréchal",
         "greeting": "Des pas silencieux et une lame courte vous gardent en vie. Parlez vite, je dois retourner aux roseaux."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Capitaine Thessaly",
@@ -12028,6 +12156,42 @@ export const fr_FR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vael le Fogbinder tué"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const fr_FR: EnTranslations = {
         "enterText": "Vous franchissez la porte royale scellée.",
         "leaveText": "Vous retrouvez l'air froid de Thornpeak."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "Le Bassin du Cœur Sauvage",
         "enterText": "Une pluie tiède crépite sur la pierre ancienne. The Wildheart Basin s'ouvre devant vous.",
@@ -14367,7 +14546,8 @@ export const fr_FR: EnTranslations = {
         "name": "Tenue d'apparat Bonewrought",
         "bonus2": "Augmente la puissance d'attaque de 40.",
         "bonus3": "Augmente la force de 15, l'endurance de 15 et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois."
+        "bonus4": "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
+        "bonus5": "Augmente de 3 % les chances de coup critique."
       },
       "deathlord": {
         "name": "Tenue de guerre de Barrowlord",
@@ -14389,19 +14569,22 @@ export const fr_FR: EnTranslations = {
         "name": "Peau de Direfang",
         "bonus2": "Augmente la puissance d'attaque de 40.",
         "bonus3": "Augmente l'agilité de 15, les chances de critique de 2% et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos coups critiques d'arme ouvrent une Entaille déchiquetée, infligeant à la cible 6 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois."
+        "bonus4": "Vos coups critiques d'arme ouvrent une Entaille déchiquetée, infligeant à la cible 6 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
+        "bonus5": "Augmente de 3 % les chances de coup critique."
       },
       "soulflame": {
         "name": "Tenue d'apparat Wraithfire",
         "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
         "bonus3": "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s."
+        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s.",
+        "bonus5": "Augmente de 3 % les chances de coup critique des sorts."
       },
       "stormcallers": {
         "name": "Vêtements de Galecall",
         "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
         "bonus3": "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s."
+        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s.",
+        "bonus5": "Augmente de 3 % les chances de coup critique des sorts."
       },
       "vale_arcanist": {
         "name": "Tenue de l'arcaniste du Val",

@@ -9741,6 +9741,111 @@ export const en_CA: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Slag-Tempered Sabatons"
+      },
+      "glasswalker_treads": {
+        "name": "Glasswalker Treads"
+      },
+      "twice_fired_slippers": {
+        "name": "Twice-Fired Slippers"
+      },
+      "stokebrand_striders": {
+        "name": "Stokebrand Striders"
+      },
+      "saans_stoking_iron": {
+        "name": "Saan's Stoking Iron"
+      },
+      "glassblowers_shiv": {
+        "name": "Glassblower's Shiv"
+      },
+      "sluicebearer": {
+        "name": "Sluicebearer"
+      },
+      "cindertoad_signet": {
+        "name": "Cindertoad Signet"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Ring of the First Quench"
+      },
+      "coalglow_band": {
+        "name": "Coalglow Band"
+      },
+      "crownforged_warleggings": {
+        "name": "Crownforged Warleggings"
+      },
+      "nighttalon_prowlers": {
+        "name": "Nighttalon Prowlers"
+      },
+      "soulflame_kilt": {
+        "name": "Soulflame Kilt"
+      },
+      "stormcallers_legwraps": {
+        "name": "Stormcaller's Legwraps"
+      },
+      "the_even_temper": {
+        "name": "The Even Temper"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Cinderarc, Odrenn's Rod"
+      },
+      "twicetempered_girdle": {
+        "name": "Twicetempered Girdle"
+      },
+      "ashwalk_sandals": {
+        "name": "Ashwalk Sandals"
+      },
+      "quenchsilk_cord": {
+        "name": "Quenchsilk Cord"
+      },
+      "slakeleather_belt": {
+        "name": "Slakeleather Belt"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Crownforged Heartplate"
+      },
+      "nighttalon_emberweave": {
+        "name": "Nighttalon Emberweave"
+      },
+      "soulflame_vestments": {
+        "name": "Soulflame Vestments"
+      },
+      "stormcallers_hauberk": {
+        "name": "Stormcaller's Hauberk"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharr's Knucklestone"
+      },
+      "magmastrider_greaves": {
+        "name": "Magmastrider Greaves"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Footwraps of the Waking Floor"
+      },
+      "forgeheat_cinch": {
+        "name": "Forgeheat Cinch"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Corebreaker, Heart of the Undermount"
+      },
+      "the_last_restraint": {
+        "name": "The Last Restraint"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Band of the Ninth Quench"
+      },
+      "moltenheart_chroma": {
+        "name": "Moltenheart"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },
@@ -10682,6 +10787,24 @@ export const en_CA: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Scourge of Thornpeak"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Ledger Wraith"
       },
@@ -11233,6 +11356,11 @@ export const en_CA: EnTranslations = {
         "name": "Scout Maren",
         "title": "Marshal's Scout",
         "greeting": "Quiet feet and a short blade keep you breathing out here. Speak quick - I am due back in the reeds."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Captain Thessaly",
@@ -12028,6 +12156,42 @@ export const en_CA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vael the Fogbinder slain"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const en_CA: EnTranslations = {
         "enterText": "You pass through the sealed royal door.",
         "leaveText": "You return to the cold air of Thornpeak."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "The Wildheart Basin",
         "enterText": "Warm rain hisses on old stone. The Wildheart Basin opens before you.",
@@ -14367,7 +14546,8 @@ export const en_CA: EnTranslations = {
         "name": "Bonewrought Regalia",
         "bonus2": "Increases attack power by 40.",
         "bonus3": "Increases Strength by 15, Stamina by 15, and attack and casting speed by 7.5%.",
-        "bonus4": "Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus4": "Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times.",
+        "bonus5": "Increases critical strike chance by 3%."
       },
       "deathlord": {
         "name": "Barrowlord Battlegear",
@@ -14389,19 +14569,22 @@ export const en_CA: EnTranslations = {
         "name": "Direfang Pelt",
         "bonus2": "Increases attack power by 40.",
         "bonus3": "Increases Agility by 15, critical strike chance by 1%, and attack and casting speed by 7.5%.",
-        "bonus4": "Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus4": "Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.",
+        "bonus5": "Increases critical strike chance by 3%."
       },
       "soulflame": {
         "name": "Wraithfire Regalia",
         "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.",
-        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
+        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec.",
+        "bonus5": "Increases spell critical strike chance by 3%."
       },
       "stormcallers": {
         "name": "Galecall Vestments",
         "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.",
-        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
+        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec.",
+        "bonus5": "Increases spell critical strike chance by 3%."
       },
       "vale_arcanist": {
         "name": "Vale Arcanist's Regalia",

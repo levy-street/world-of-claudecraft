@@ -154,6 +154,7 @@ import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_windo
 import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
 import { activeCharacterAppearancePreview } from './character_appearance';
 import { chatBubbleStyle } from './chat_bubble_style';
+import { chatDialoguePresentation } from './chat_dialogue_i18n';
 import {
   ignoreKey,
   type PlayerSocialFlags,
@@ -401,7 +402,11 @@ import {
   itemNumber,
   itemStatName,
 } from './item_instance_tooltip';
-import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
+import {
+  itemSetBonusField,
+  itemSetMemberCounts,
+  itemSetTooltipModel,
+} from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
@@ -5192,7 +5197,8 @@ export class Hud {
     const name = tEntity({ kind: 'itemSet', id: model.setId, field: 'name' });
     let html = `<div class="tt-set-name">${esc(t('hudChrome.itemSet.header', { name, have: formatNumber(model.equippedPieces, { maximumFractionDigits: 0 }), total: formatNumber(model.totalPieces, { maximumFractionDigits: 0 }) }))}</div>`;
     for (const tier of model.bonusTiers) {
-      const field = tier.pieces === 2 ? 'bonus2' : tier.pieces === 3 ? 'bonus3' : 'bonus4';
+      const field = itemSetBonusField(tier.pieces);
+      if (!field) continue;
       const text = tEntity({ kind: 'itemSet', id: model.setId, field });
       html += `<div class="tt-set-bonus${tier.active ? ' active' : ''}">${esc(t('hudChrome.itemSet.bonusLine', { pieces: formatNumber(tier.pieces, { maximumFractionDigits: 0 }), bonus: text }))}</div>`;
     }
@@ -10491,6 +10497,10 @@ export class Hud {
           // consulting the local list here as well would resurrect stale ignores
           // the player has since cleared from their account.
           if (this.sim.socialInfo === null && this.localIgnoredNames.has(ignoreKey(ev.from))) break;
+          const dialogue = chatDialoguePresentation(
+            ev,
+            typeof ev.entityId === 'number' ? this.sim.entities.get(ev.entityId) : undefined,
+          );
           switch (ev.channel) {
             case 'party':
               this.chatLogFrom(
@@ -10506,8 +10516,8 @@ export class Hud {
               break;
             case 'yell':
               this.chatLogFrom(
-                ev.from,
-                ev.text,
+                dialogue.from,
+                dialogue.text,
                 CHAT_TEMPLATE_KEYS.yell,
                 'yell',
                 ev.fromPid,
@@ -10643,7 +10653,8 @@ export class Hud {
           const bubbleStyle = ev.channel === undefined ? null : chatBubbleStyle(ev.channel);
           const bubbleSpeakerId = ev.entityId ?? ev.fromPid;
           if (bubbleStyle && typeof bubbleSpeakerId === 'number') {
-            const masked = this.maskChat(this.chatLinkPlainText(ev.text));
+            const bubbleText = ev.channel === 'yell' ? dialogue.text : ev.text;
+            const masked = this.maskChat(this.chatLinkPlainText(bubbleText));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;
             this.renderer.showChatBubble(bubbleSpeakerId, bubble, bubbleStyle);
           }

@@ -9741,6 +9741,111 @@ export const cs_CZ: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Struskou kalené sabatony"
+      },
+      "glasswalker_treads": {
+        "name": "Boty sklochodce"
+      },
+      "twice_fired_slippers": {
+        "name": "Dvakrát pálené střevíce"
+      },
+      "stokebrand_striders": {
+        "name": "Boty žhavého cejchu"
+      },
+      "saans_stoking_iron": {
+        "name": "Saanův pohrabáč"
+      },
+      "glassblowers_shiv": {
+        "name": "Sklářovo šídlo"
+      },
+      "sluicebearer": {
+        "name": "Stavidlonoš"
+      },
+      "cindertoad_signet": {
+        "name": "Pečetní prsten žhavé ropuchy"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Prsten prvního zakalení"
+      },
+      "coalglow_band": {
+        "name": "Prsten uhelné záře"
+      },
+      "crownforged_warleggings": {
+        "name": "Korunou kované válečné nohavice"
+      },
+      "nighttalon_prowlers": {
+        "name": "Boty nočního spáru"
+      },
+      "soulflame_kilt": {
+        "name": "Kilt plamene duše"
+      },
+      "stormcallers_legwraps": {
+        "name": "Ovinovačky vyvolávače bouří"
+      },
+      "the_even_temper": {
+        "name": "Rovnoměrný popust"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Žhavý oblouk, Odrennův prut"
+      },
+      "twicetempered_girdle": {
+        "name": "Dvakrát kalený pás"
+      },
+      "ashwalk_sandals": {
+        "name": "Sandály popelochodce"
+      },
+      "quenchsilk_cord": {
+        "name": "Šňůra z kalicího hedvábí"
+      },
+      "slakeleather_belt": {
+        "name": "Opasek z kalicí kůže"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Korunokovaná hrudní zbroj"
+      },
+      "nighttalon_emberweave": {
+        "name": "Žhavotkanina Nočního spáru"
+      },
+      "soulflame_vestments": {
+        "name": "Roucha plamene duše"
+      },
+      "stormcallers_hauberk": {
+        "name": "Hauberk Volatele bouří"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharrův pěstní kámen"
+      },
+      "magmastrider_greaves": {
+        "name": "Holenice lávochodce"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Ovinutí Probuzené podlahy"
+      },
+      "forgeheat_cinch": {
+        "name": "Pás žáru výhně"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Drtič jádra, Srdce Podhory"
+      },
+      "the_last_restraint": {
+        "name": "Poslední zábrana"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Prsten devátého zchlazení"
+      },
+      "moltenheart_chroma": {
+        "name": "Žhavé srdce"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -10682,6 +10787,24 @@ export const cs_CZ: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, metla Thornpeaku"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Přízrak pohřební knihy"
       },
@@ -11233,6 +11356,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Zvědka Maren",
         "title": "Maršálova zvědka",
         "greeting": "Tiché kroky a krátká čepel tě tady udrží naživu. Mluv rychle, mám se vrátit do rákosí."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Kapitánka Thessaly",
@@ -12028,6 +12156,42 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vael Mlhovazač zabit"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const cs_CZ: EnTranslations = {
         "enterText": "Procházíš zapečetěnými královskými dveřmi.",
         "leaveText": "Vracíš se do chladného vzduchu Thornpeaku."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "Kotlina Divokého srdce",
         "enterText": "Teplý déšť syčí na starém kameni. Kotlina Divokého srdce se otevírá před tebou.",
@@ -14367,7 +14546,8 @@ export const cs_CZ: EnTranslations = {
         "name": "Regálie z kosti",
         "bonus2": "Zvyšuje sílu útoku o 40.",
         "bonus3": "Zvyšuje sílu o 15, výdrž o 15 a rychlost útoku i sesílání o 15 %.",
-        "bonus4": "Kritické zásahy tvé zbraně roztříští cíl efektem Kostitříska a způsobí mu krvácení za 8 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát."
+        "bonus4": "Kritické zásahy tvé zbraně roztříští cíl efektem Kostitříska a způsobí mu krvácení za 8 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát.",
+        "bonus5": "Zvyšuje šanci na kritický zásah o 3 %."
       },
       "deathlord": {
         "name": "Bojová výbava mohylového pána",
@@ -14389,19 +14569,22 @@ export const cs_CZ: EnTranslations = {
         "name": "Kožešina děsivého tesáku",
         "bonus2": "Zvyšuje sílu útoku o 40.",
         "bonus3": "Zvyšuje obratnost o 15, šanci na kritický zásah o 2 % a rychlost útoku i sesílání o 15 %.",
-        "bonus4": "Kritické zásahy tvé zbraně vytrhnou Rozšklebenou ránu a způsobí cíli krvácení za 6 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát."
+        "bonus4": "Kritické zásahy tvé zbraně vytrhnou Rozšklebenou ránu a způsobí cíli krvácení za 6 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát.",
+        "bonus5": "Zvyšuje šanci na kritický zásah o 3 %."
       },
       "soulflame": {
         "name": "Regálie přízračného ohně",
         "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus3": "Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.",
-        "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s."
+        "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s.",
+        "bonus5": "Zvyšuje šanci na kritický zásah kouzlem o 3 %."
       },
       "stormcallers": {
         "name": "Roucha volání vichru",
         "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus3": "Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.",
-        "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s."
+        "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s.",
+        "bonus5": "Zvyšuje šanci na kritický zásah kouzlem o 3 %."
       },
       "vale_arcanist": {
         "name": "Regálie arkánisty z údolí",

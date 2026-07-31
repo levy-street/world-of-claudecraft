@@ -78,6 +78,12 @@ export const MECH_CHROMAS: readonly MechChroma[] = [
 export const ALDRIC_MECH_CHROMA_ID = 'amber_crimson';
 export const ALDRIC_MECH_CHROMA_ITEM_ID = 'amber_crimson_armor_plate';
 
+// Volzharr's ultra-rare Moltenheart token unlocks the existing epic
+// Imperial Crimson mech chroma. The alias keeps the raid drop's PRD name while
+// reusing the shipped skin-select primitive and a real render-backed chroma.
+export const MOLTENHEART_CHROMA_ID = 'imperial_crimson';
+export const MOLTENHEART_CHROMA_ITEM_ID = 'moltenheart_chroma';
+
 /** Ordinal of a rank (0 = lowest). Higher unlocks everything at or below it. */
 export function skinRankOrder(rank: SkinRank): number {
   return SKIN_RANKS.indexOf(rank);
@@ -106,6 +112,7 @@ export function mechChromaSkinIndex(chromaId: string): number {
 }
 
 export function mechChromaItemId(chromaId: string): string | null {
+  if (chromaId === MOLTENHEART_CHROMA_ID) return MOLTENHEART_CHROMA_ITEM_ID;
   return MECH_CHROMAS.some((chroma) => chroma.id === chromaId) ? `${chromaId}_armor_plate` : null;
 }
 

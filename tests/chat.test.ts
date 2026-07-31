@@ -3,7 +3,7 @@ import { ClientWorld } from '../src/net/online';
 import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
 import { BUILTIN_WORLD, MOBS, NPCS, zoneAt } from '../src/sim/data';
 import { grantDeed } from '../src/sim/deeds';
-import { createMob } from '../src/sim/entity';
+import { createMob, createNpc } from '../src/sim/entity';
 import { emitMobYell } from '../src/sim/mob/yells';
 import { ownedMounts } from '../src/sim/mounts';
 import { Sim } from '../src/sim/sim';
@@ -1509,6 +1509,25 @@ describe('chat speaker titles (Book of Deeds)', () => {
       expect(m.channel).toBe('yell');
       expect('fromTitle' in m).toBe(false);
       expect('classId' in m).toBe(false);
+      expect(m.authoredSpeaker).toEqual({ kind: 'mob', templateId: 'forest_wolf' });
+    }
+  });
+
+  it('an NPC yell carries NPC authored identity', () => {
+    const sim = makeWorld();
+    const player = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, player, 0, -40);
+    const npc = createNpc(sim.nextId++, NPCS.runeseeker_maerin, { x: 0, y: 0, z: -40 });
+    sim.entities.set(npc.id, npc);
+
+    emitMobYell(sim.ctx, npc, 'The way is open.', 1e9);
+    const messages = chatEvents(sim.tick()).filter((event) => event.from === npc.name);
+    expect(messages).not.toHaveLength(0);
+    for (const message of messages) {
+      expect(message.authoredSpeaker).toEqual({
+        kind: 'npc',
+        templateId: 'runeseeker_maerin',
+      });
     }
   });
 

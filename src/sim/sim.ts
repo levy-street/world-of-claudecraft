@@ -195,6 +195,9 @@ import { despawnMobsForDev } from './dev_commands';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
 import { arenaMapForSlot } from './dungeon_layout';
 import * as nythraxis from './encounters/nythraxis';
+import * as odrenn from './encounters/odrenn';
+import * as undermount from './encounters/undermount';
+import * as volzharr from './encounters/volzharr';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
 // delves/runs.ts + render/dungeon.ts; W11 dropped the stranded sim.ts import. I2a's delve
@@ -468,7 +471,12 @@ import {
   onNodeGatheredForQuests,
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
-import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
+import { ensureUndermountPrequestEntities } from './quests/undermount_prequest';
+import {
+  type NaturalRiftPortal,
+  RIFT_PORTAL_FIRST_AT,
+  updateRiftPortals as updateRiftPortalsImpl,
+} from './rift/portals';
 import {
   enchantRiftItem as enchantRiftItemImpl,
   type RiftForgeResult,
@@ -1241,6 +1249,11 @@ export interface PlayerMeta {
   // parity samples and character persistence do not churn on a default.
   dungeonDifficulty?: DungeonDifficulty;
   raidLockouts: Map<string, number>; // dungeon id -> epoch ms expiry
+  // Permanent Undermount raid progress: the set of wing dungeonIds whose boss
+  // this character has cleared. Gates the sealed door to the next wing (unlike
+  // raidLockouts, this never resets). Session-only for now; persistence is a
+  // follow-up (see docs/prd/furnace-lair-raid.md).
+  undermountCleared: Set<string>;
   // Transient presence status. Set by /afk and /dnd, cleared when the player
   // chats again. Session-only — never persisted, so it resets on login.
   away: AwayStatus | null;
@@ -1580,6 +1593,9 @@ export interface CharacterState {
   deedStats?: SavedDeedStats;
   activeTitle?: string | null;
   renown?: number;
+  // Undermount wing unseals (character-scoped raid progression), absent
+  // until the first wing clear.
+  undermountCleared?: string[];
 }
 
 export interface PetState {
@@ -1787,6 +1803,11 @@ export class Sim {
   private devSandboxIds: number[] = [];
   private pendingMobRespawns: PendingMobRespawn[] = [];
   private groundAoEs: GroundAoE[] = [];
+  // Vent records are immutable after placement. Keep their IWorld projection
+  // stable between topology changes so a 60 Hz renderer does not rebuild arrays,
+  // records, string ids, and an ordinal map while the sim advances at 20 Hz.
+  private undermountVentEffects: GroundAoE[] = [];
+  private undermountVentView: import('../world_api/combat').ActiveUndermountVent[] = [];
   get activeFrostRings(): ActiveFrostRing[] {
     const rings: ActiveFrostRing[] = [];
     for (const effect of this.groundAoEs) {
@@ -1819,6 +1840,36 @@ export class Sim {
       });
     }
     return hourglasses;
+  }
+  get activeUndermountVents(): import('../world_api/combat').ActiveUndermountVent[] {
+    let count = 0;
+    let topologyChanged = false;
+    for (const effect of this.groundAoEs) {
+      if (effect.remaining <= 0 || effect.ability !== 'Vent Fissure') continue;
+      if (this.undermountVentEffects[count] !== effect) topologyChanged = true;
+      count++;
+    }
+    if (count !== this.undermountVentEffects.length) topologyChanged = true;
+    if (!topologyChanged) return this.undermountVentView;
+
+    const effects: GroundAoE[] = [];
+    const view: import('../world_api/combat').ActiveUndermountVent[] = [];
+    const ordinalBySource = new Map<number, number>();
+    for (const effect of this.groundAoEs) {
+      if (effect.remaining <= 0 || effect.ability !== 'Vent Fissure') continue;
+      const ordinal = ordinalBySource.get(effect.sourceId) ?? 0;
+      ordinalBySource.set(effect.sourceId, ordinal + 1);
+      effects.push(effect);
+      view.push({
+        id: `${effect.sourceId}:${ordinal}`,
+        x: effect.pos.x,
+        z: effect.pos.z,
+        radius: effect.radius,
+      });
+    }
+    this.undermountVentEffects = effects;
+    this.undermountVentView = view;
+    return this.undermountVentView;
   }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.
@@ -2512,6 +2563,7 @@ export class Sim {
       loadouts: [],
       activeLoadout: -1,
       raidLockouts: new Map(),
+      undermountCleared: new Set(),
       away: null,
       mountTraining: null,
       mountRace: null,
@@ -2660,7 +2712,7 @@ export class Sim {
         // tick op dereferences QUESTS[qp.questId].objectives and TypeErrors inside
         // the server tick (quest_credit.ts + interactNpcForQuests). questsDone is
         // membership-only (never dereferenced), so it is preserved as history below.
-        if (q.state !== 'done' && QUESTS[q.questId])
+        if (q.state !== 'done' && QUESTS[q.questId]) {
           meta.questLog.set(q.questId, {
             questId: q.questId,
             counts: [...q.counts],
@@ -2668,6 +2720,8 @@ export class Sim {
             ...(q.selection === undefined ? {} : { selection: q.selection }),
             ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
           });
+          if (q.state === 'active') ensureUndermountPrequestEntities(this.ctx, q.questId);
+        }
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
       if (s.talents)
@@ -2773,6 +2827,14 @@ export class Sim {
       }
       if (s.heroicDaily) {
         meta.heroicDaily = { date: s.heroicDaily.date, marked: new Set(s.heroicDaily.marked) };
+      }
+      // Undermount wing unseals are progression, not session state: without
+      // this a relog after clearing wing 1 re-seals wing 2 while the daily
+      // lockout blocks re-clearing wing 1.
+      if (Array.isArray(s.undermountCleared)) {
+        for (const id of s.undermountCleared) {
+          if (typeof id === 'string') meta.undermountCleared.add(id);
+        }
       }
       // The Book of Deeds. Earned days load verbatim; the legacy milestone set
       // unions into the earned map (milestone unification); renown is
@@ -3484,6 +3546,11 @@ export class Sim {
       // so pre-deed saves stay byte-equal until the system engages. The
       // legacy unlockedMilestones above stays dual-written for one release.
       ...(meta.deedsEarned.size > 0 ? { deeds: Object.fromEntries(meta.deedsEarned) } : {}),
+      // Undermount wing unseals: conditional-when-empty like the deed fields
+      // so pre-raid saves stay byte-equal.
+      ...(meta.undermountCleared.size > 0
+        ? { undermountCleared: [...meta.undermountCleared] }
+        : {}),
       ...(() => {
         const deedStats = serializeDeedStats(meta.deedStats);
         return deedStats ? { deedStats } : {};
@@ -4554,6 +4621,7 @@ export class Sim {
       // N1: grantNythraxisLockout now lives in encounters/nythraxis.ts; late-bound arrow
       // (handleDeath in combat/damage.ts reaches it via ctx on the boss-death path).
       grantNythraxisLockout: (boss) => nythraxis.grantNythraxisLockout(sim.ctx, boss),
+      onUndermountBossDeath: (boss) => undermount.onUndermountBossDeath(sim.ctx, boss),
       // frenzyPackmates / armDeathThroes flipped points-at to mob/lifecycle (M4); their
       // late-bound lifecycle arrows live in the death-lifecycle block below.
       refreshKnownAbilities: sim.refreshKnownAbilities.bind(sim),
@@ -4590,6 +4658,11 @@ export class Sim {
       // arrow (mob/locomotion.ts updateMob drives it via ctx). resetNythraxisEncounter
       // keeps its .bind delegate (foreign callers + a test reach sim.resetNythraxisEncounter).
       updateNythraxisEncounter: (boss) => nythraxis.updateNythraxisEncounter(sim.ctx, boss),
+      // Undermount wings 2 and 3 (same late-bound pattern; driven from mob/locomotion.ts).
+      updateOdrennEncounter: (boss) => odrenn.updateOdrennEncounter(sim.ctx, boss),
+      resetOdrennEncounter: (boss) => odrenn.resetOdrennEncounter(sim.ctx, boss),
+      updateVolzharrEncounter: (boss) => volzharr.updateVolzharrEncounter(sim.ctx, boss),
+      resetVolzharrEncounter: (boss) => volzharr.resetVolzharrEncounter(sim.ctx, boss),
       resetNythraxisEncounter: sim.resetNythraxisEncounter.bind(sim),
       updateFearMovement: sim.updateFearMovement.bind(sim),
       // M4 mob death lifecycle: the five execution bodies live in mob/lifecycle.ts;

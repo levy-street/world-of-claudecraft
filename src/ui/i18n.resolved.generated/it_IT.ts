@@ -9741,6 +9741,111 @@ export const it_IT: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Calzari Temprati nella Scoria"
+      },
+      "glasswalker_treads": {
+        "name": "Calzari Passavetro"
+      },
+      "twice_fired_slippers": {
+        "name": "Pantofole Cotte Due Volte"
+      },
+      "stokebrand_striders": {
+        "name": "Calzari del Marchio Ardente"
+      },
+      "saans_stoking_iron": {
+        "name": "Attizzatoio di Saan"
+      },
+      "glassblowers_shiv": {
+        "name": "Stiletto del Soffiatore di Vetro"
+      },
+      "sluicebearer": {
+        "name": "Portachiusa"
+      },
+      "cindertoad_signet": {
+        "name": "Sigillo del Rospo di Brace"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Anello della Prima Tempra"
+      },
+      "coalglow_band": {
+        "name": "Anello del Bagliore di Carbone"
+      },
+      "crownforged_warleggings": {
+        "name": "Gambali da Guerra Forgiacorona"
+      },
+      "nighttalon_prowlers": {
+        "name": "Calzari Artiglio Notturno"
+      },
+      "soulflame_kilt": {
+        "name": "Gonnellino Fiammanima"
+      },
+      "stormcallers_legwraps": {
+        "name": "Fasce da gamba del Chiamatempeste"
+      },
+      "the_even_temper": {
+        "name": "La Tempra Equanime"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Arco di Brace, verga di Odrenn"
+      },
+      "twicetempered_girdle": {
+        "name": "Cinturone a Doppia Tempra"
+      },
+      "ashwalk_sandals": {
+        "name": "Sandali Passacenere"
+      },
+      "quenchsilk_cord": {
+        "name": "Cordone di Seta Temprata"
+      },
+      "slakeleather_belt": {
+        "name": "Cintura di Cuoio Temprato"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Corazza del Cuore Forgiacorona"
+      },
+      "nighttalon_emberweave": {
+        "name": "Tessibrace Artiglionotturno"
+      },
+      "soulflame_vestments": {
+        "name": "Vesti Fiamma dell’Anima"
+      },
+      "stormcallers_hauberk": {
+        "name": "Usbergo dell’Invocatore delle Tempeste"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Pietra da Nocche di Volzharr"
+      },
+      "magmastrider_greaves": {
+        "name": "Schinieri Passomagma"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Fasce del Pavimento Risvegliato"
+      },
+      "forgeheat_cinch": {
+        "name": "Cintura Calore della Forgia"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Spezzanucleo, Cuore del Sottomonte"
+      },
+      "the_last_restraint": {
+        "name": "L’Ultimo Vincolo"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Anello della Nona Tempra"
+      },
+      "moltenheart_chroma": {
+        "name": "Cuore Fuso"
+      },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
       },
@@ -10682,6 +10787,24 @@ export const it_IT: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Flagello di Thornpeak"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Spettro del Registro"
       },
@@ -11233,6 +11356,11 @@ export const it_IT: EnTranslations = {
         "name": "Esploratrice Maren",
         "title": "Esploratrice del maresciallo",
         "greeting": "Passi silenziosi e una lama corta ti tengono in vita. Parla in fretta: devo tornare alle canne."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Capitano Thessaly",
@@ -12028,6 +12156,42 @@ export const it_IT: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vael il Fogbinder ucciso"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const it_IT: EnTranslations = {
         "enterText": "Oltrepassi la porta reale sigillata.",
         "leaveText": "Torni nell'aria fredda di Thornpeak."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "Il Bacino di Wildheart",
         "enterText": "Una pioggia calda sibila sulla pietra antica. Il Bacino di Wildheart si apre davanti a te.",
@@ -14367,7 +14546,8 @@ export const it_IT: EnTranslations = {
         "name": "Tenuta da battaglia Bonewrought",
         "bonus2": "Aumenta la potenza d'attacco di 40.",
         "bonus3": "Aumenta la forza di 15, la vigoria di 15 e la velocità d'attacco e di lancio del 15%.",
-        "bonus4": "I colpi critici della tua arma scheggiano il bersaglio con Scheggiaossa, facendolo sanguinare per 8 danni ogni 2 sec per 12 sec. Si accumula fino a 3 volte."
+        "bonus4": "I colpi critici della tua arma scheggiano il bersaglio con Scheggiaossa, facendolo sanguinare per 8 danni ogni 2 sec per 12 sec. Si accumula fino a 3 volte.",
+        "bonus5": "Aumenta del 3% la probabilità di colpo critico."
       },
       "deathlord": {
         "name": "Tenuta da battaglia di Barrowlord",
@@ -14389,19 +14569,22 @@ export const it_IT: EnTranslations = {
         "name": "Tenuta di cuoio Direfang",
         "bonus2": "Aumenta la potenza d'attacco di 40.",
         "bonus3": "Aumenta l'agilità di 15, la probabilità di critico del 2% e la velocità d'attacco e di lancio del 15%.",
-        "bonus4": "I colpi critici della tua arma aprono uno Squarcio Frastagliato, facendo sanguinare il bersaglio per 6 danni ogni 2 sec per 12 sec. Si accumula fino a 3 volte."
+        "bonus4": "I colpi critici della tua arma aprono uno Squarcio Frastagliato, facendo sanguinare il bersaglio per 6 danni ogni 2 sec per 12 sec. Si accumula fino a 3 volte.",
+        "bonus5": "Aumenta del 3% la probabilità di colpo critico."
       },
       "soulflame": {
         "name": "Paramenti Wraithfire",
         "bonus2": "Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).",
         "bonus3": "Aumenta l'intelletto di 15, lo spirito di 15 e la velocità d'attacco e di lancio del 15%.",
-        "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec."
+        "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec.",
+        "bonus5": "Aumenta del 3% la probabilità di colpo critico degli incantesimi."
       },
       "stormcallers": {
         "name": "Vesti Galecall",
         "bonus2": "Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).",
         "bonus3": "Aumenta l'intelletto di 15, lo spirito di 15 e la velocità d'attacco e di lancio del 15%.",
-        "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec."
+        "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec.",
+        "bonus5": "Aumenta del 3% la probabilità di colpo critico degli incantesimi."
       },
       "vale_arcanist": {
         "name": "Tenuta dell'Arcanista della Valle",

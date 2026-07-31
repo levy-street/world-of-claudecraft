@@ -57,7 +57,7 @@ import {
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
-import { sharedUniforms } from './gfx';
+import { sharedUniforms, surfaceMat } from './gfx';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { radialGlowTexture } from './textures';
@@ -69,6 +69,68 @@ const FLAME_EMISSIVE_HIGH = 2.2;
 const DUNGEON_LIGHT_Y = 6.4;
 const DUNGEON_LIGHT_INTENSITY = 46;
 const DUNGEON_LIGHT_DISTANCE = 34;
+// Dark warm basalt: the floor field stays scorched and legible while the lava
+// veins and molten props carry the glow (a uniformly glowing floor reads flat
+// and sandy, not like a forge bed).
+const UNDERMOUNT_FLOOR_TINT = 0x2e2620;
+const UNDERMOUNT_FLOOR_EMISSIVE = 0xff5a1e;
+const UNDERMOUNT_FLOOR_EMISSIVE_INTENSITY = 0.35;
+const UNDERMOUNT_LAVA_BASE = 0x260603;
+const UNDERMOUNT_LAVA_EMISSIVE = 0xff5a10;
+const UNDERMOUNT_LAVA_EMISSIVE_INTENSITY = 2.2;
+
+// Fixed normalized paths keep every Undermount wing deterministic while
+// scaling the magma network to the unusually wide authored room bounds.
+const UNDERMOUNT_LAVA_PATHS = [
+  [
+    [-0.9, 0.16],
+    [-0.73, 0.23],
+    [-0.57, 0.19],
+    [-0.4, 0.29],
+    [-0.22, 0.24],
+    [-0.08, 0.34],
+  ],
+  [
+    [0.08, 0.12],
+    [0.24, 0.2],
+    [0.39, 0.16],
+    [0.55, 0.27],
+    [0.72, 0.21],
+    [0.9, 0.31],
+  ],
+  [
+    [-0.84, 0.55],
+    [-0.67, 0.49],
+    [-0.49, 0.58],
+    [-0.31, 0.52],
+    [-0.14, 0.63],
+  ],
+  [
+    [0.12, 0.58],
+    [0.3, 0.64],
+    [0.46, 0.57],
+    [0.62, 0.68],
+    [0.8, 0.61],
+    [0.9, 0.72],
+  ],
+  [
+    [-0.45, 0.58],
+    [-0.48, 0.7],
+    [-0.38, 0.81],
+    [-0.48, 0.9],
+  ],
+  [
+    [0.55, 0.27],
+    [0.61, 0.4],
+    [0.54, 0.5],
+    [0.64, 0.57],
+  ],
+] as const;
+
+const UNDERMOUNT_LAVA_POOLS = [
+  { x: -0.62, z: 0.36, scaleX: 1.25, scaleZ: 0.75, rotation: 0.24 },
+  { x: 0.6, z: 0.78, scaleX: 1.0, scaleZ: 0.9, rotation: -0.31 },
+] as const;
 
 const MODULE_SCALE = 2; // KayKit walls are 4u tall/long -> 8u at our room scale
 const FLOOR_CELL = 4; // kit floor tiles are 4x4 at MODULE_SCALE 1
@@ -89,6 +151,7 @@ export type DungeonInteriorVariant =
   // only its undercroft rooms keep the crypt's cracked stone and cold flame.
   | 'lastkeep'
   | 'nythraxis'
+  | 'undermount'
   // Collapsed Reliquary delve sub-themes (share the ember crypt-stone base, see
   // isDelveVariant; differ only in wall-side props, clutter, and the dais).
   | 'delve_ossuary'
@@ -120,10 +183,10 @@ export function isArenaVariant(variant: DungeonInteriorVariant): boolean {
 }
 
 export function dungeonDaisHasRaisedPlatform(variant: DungeonInteriorVariant): boolean {
-  // Flat fighting floors: the arena pits, the Nythraxis raid, and the delve
-  // trash rooms (their "dais" marker is only the exit threshold). The delve
-  // finale keeps a raised boss stage for Deacon Varric.
-  if (isArenaVariant(variant) || variant === 'nythraxis') return false;
+  // Flat fighting floors: the arena pits, the Nythraxis and Undermount raids,
+  // and the delve trash rooms (their "dais" marker is only the exit threshold).
+  // The delve finale keeps a raised boss stage for Deacon Varric.
+  if (isArenaVariant(variant) || variant === 'nythraxis' || variant === 'undermount') return false;
   if (variant === 'delve_ossuary' || variant === 'delve_bell' || variant === 'delve_hall')
     return false;
   // marsh trash rooms are flat fighting floors like the other delve trash; the
@@ -153,6 +216,7 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   // crypt's cold blue, split per story in the authored build path).
   lastkeep: { flame: 0xffc27a, emissive: 0xcc6a1e, light: 0xffa14e },
   nythraxis: { flame: 0x8f5cff, emissive: 0x4b1c9a, light: 0x7b4dff },
+  undermount: { flame: 0xffb24a, emissive: 0xe0521a, light: 0xffc266 },
   // delve reliquaries burn with grave-ember red: warm coals over cold stone
   delve_ossuary: { flame: 0xff7a3c, emissive: 0xcc3a14, light: 0xff6a3c },
   delve_bell: { flame: 0xff7a3c, emissive: 0xcc3a14, light: 0xff6a3c },
@@ -321,6 +385,21 @@ const BITS_MODELS = [
   'arch',
 ] as const;
 
+const FORGE_PROPS = [
+  'forge_hearth',
+  'cauldron',
+  'anvil',
+  'bonfire',
+  'ore_rocks',
+  'weapon_stand',
+] as const;
+const forgeScenes = new Map<string, THREE.Group>();
+function loadForgeProp(name: string): Promise<void> {
+  return loadGltf(`models/props/${name}.glb`).then((g) => {
+    forgeScenes.set(name, g.scene);
+  });
+}
+
 type Pack = 'kit' | 'bits';
 
 interface ModuleAsset {
@@ -384,6 +463,7 @@ export function ensureDungeonAssets(): Promise<void> {
   dungeonAssetsPromise ??= Promise.all([
     ...KIT_MODELS.map((name) => loadModuleAsset(name, 'kit')),
     ...BITS_MODELS.map((name) => loadModuleAsset(name, 'bits')),
+    ...FORGE_PROPS.map((name) => loadForgeProp(name)),
   ]).then(() => undefined);
   return dungeonAssetsPromise;
 }
@@ -656,7 +736,13 @@ export class DungeonInteriors {
   private glowDecalTex: THREE.Texture | null = null;
   private glowDecalMats = new Map<number, THREE.MeshBasicMaterial>();
   private flameGeo: THREE.BufferGeometry | null = null;
+  private undermountLavaVeinGeo: THREE.BufferGeometry | null = null;
+  private undermountLavaPoolGeo: THREE.BufferGeometry | null = null;
+  private undermountLavaMat: THREE.Material | null = null;
   private packMats = new Map<Pack, THREE.Material>();
+  // Undermount molten floor receivers: emissive clones of packMats keyed by
+  // pack (not a flat tint, so they cannot ride the tintedMats cache below).
+  private undermountFloorMats = new Map<Pack, THREE.Material>();
   /**
    * Every tinted grade of a pack material, keyed `${pack}:${tint}`: the marsh
    * and Drowned Court wall/floor tints and any authored InteriorStyle grade all
@@ -714,6 +800,11 @@ export class DungeonInteriors {
     );
     water.frustumCulled = false;
     group.add(water);
+    // Undermount lava uses one shared emissive program for veins and pools.
+    this.undermountLavaVeinGeo ??= new THREE.BoxGeometry(1, 0.06, 1);
+    const lava = new THREE.Mesh(this.undermountLavaVeinGeo, this.undermountLavaMaterial());
+    lava.frustumCulled = false;
+    group.add(lava);
     // Torch-glow decal: one MeshBasic program shared by every variant's colour.
     this.addTorchGlow(group, 0, 0, TORCH_COLORS.crypt.light);
     return group;
@@ -779,16 +870,24 @@ export class DungeonInteriors {
               arenaMapForSlot(arenaOriginAt(oz).slot).layout
             : interior === 'nythraxis'
               ? NYTHRAXIS_LAYOUT
-              : interior === 'lastkeep'
-                ? // The Last Keep: an authored room-graph castle interior; its
-                  // rooms/doors/decor route the build through the authored path
-                  // below, exactly like the citadel's set-piece floors.
-                  LASTKEEP_LAYOUT
-                : CRYPT_LAYOUT);
+              : interior === 'undermount'
+                ? NYTHRAXIS_LAYOUT
+                : interior === 'lastkeep'
+                  ? // The Last Keep: an authored room-graph castle interior; its
+                    // rooms/doors/decor route the build through the authored path
+                    // below, exactly like the citadel's set-piece floors.
+                    LASTKEEP_LAYOUT
+                  : CRYPT_LAYOUT);
     const variant = opts?.style?.kit ?? opts?.variant ?? this.variantFor(interior, ox, oz);
     const torch = opts?.style?.torch ?? TORCH_COLORS[variant];
     const daisRaised = opts?.style?.daisRaised;
     const group = new THREE.Group();
+    // Undermount wings read as a warm molten kiln: a hemisphere fill + amber
+    // ambient lift the otherwise torch-only room out of the dark-arena black.
+    if (variant === 'undermount') {
+      group.add(new THREE.HemisphereLight(0xffb060, 0x421205, 1.0));
+      group.add(new THREE.AmbientLight(0xff7a2e, 0.4));
+    }
     const p = new Placements();
     const arenaWalls = isArenaVariant(variant) ? this.pendingArenaWalls(layout, ox, oz) : undefined;
 
@@ -854,11 +953,16 @@ export class DungeonInteriors {
     this.placeFloor(p, layout, variant);
     this.placeWalls(p, layout, variant, arenaWalls);
     this.placePillarsAndTorches(group, p, layout, variant, torch);
-    this.placeTombs(p, layout, variant);
+    if (variant !== 'undermount') this.placeTombs(p, layout, variant);
     this.placeStubs(p, layout.stubs, variant);
     this.placeDais(group, p, layout, variant, torch, daisRaised);
-    this.placeAisleClutter(p, layout, variant);
-    this.placeWallDressing(p, layout, variant, arenaWalls);
+    if (variant === 'undermount') {
+      this.placeUndermountLava(group, layout);
+      this.placeUndermountForge(group, layout);
+    } else {
+      this.placeAisleClutter(p, layout, variant);
+      this.placeWallDressing(p, layout, variant, arenaWalls);
+    }
     if (variant === 'temple') {
       this.placeFloodwater(group, layout);
       this.placeAquaticDressing(group, layout);
@@ -910,6 +1014,159 @@ export class DungeonInteriors {
       for (const m of h.mats) {
         m.mat.colorWrite = !hide;
         m.mat.depthWrite = hide ? false : m.depthWrite;
+      }
+    }
+  }
+
+  private placeUndermountLava(group: THREE.Group, layout: DungeonLayout): void {
+    const halfX = layout.floorHalfX ?? (layout.wallX ?? DUNGEON_WALL_X) - 1;
+    const zSpan = Math.max(1, layout.zMax - layout.zMin);
+    const transform = new THREE.Object3D();
+    const segmentCount = UNDERMOUNT_LAVA_PATHS.reduce((count, path) => count + path.length - 1, 0);
+
+    this.undermountLavaVeinGeo ??= new THREE.BoxGeometry(1, 0.06, 1);
+    const veins = new THREE.InstancedMesh(
+      this.undermountLavaVeinGeo,
+      this.undermountLavaMaterial(),
+      segmentCount,
+    );
+    let segmentIndex = 0;
+    for (let pathIndex = 0; pathIndex < UNDERMOUNT_LAVA_PATHS.length; pathIndex++) {
+      const path = UNDERMOUNT_LAVA_PATHS[pathIndex];
+      for (let pointIndex = 1; pointIndex < path.length; pointIndex++) {
+        const start = path[pointIndex - 1];
+        const end = path[pointIndex];
+        const ax = start[0] * halfX;
+        const az = layout.zMin + start[1] * zSpan;
+        const bx = end[0] * halfX;
+        const bz = layout.zMin + end[1] * zSpan;
+        const dx = bx - ax;
+        const dz = bz - az;
+        const length = Math.hypot(dx, dz);
+        const width = 1.2 + ((pathIndex + pointIndex) % 3) * 0.35;
+
+        transform.position.set((ax + bx) / 2, 0.065, (az + bz) / 2);
+        transform.rotation.set(0, Math.atan2(-dz, dx), 0);
+        transform.scale.set(length + width * 0.4, 1, width);
+        transform.updateMatrix();
+        veins.setMatrixAt(segmentIndex++, transform.matrix);
+      }
+    }
+    veins.name = 'undermount-lava-veins';
+    veins.instanceMatrix.needsUpdate = true;
+    veins.computeBoundingSphere();
+    veins.renderOrder = 1;
+    group.add(veins);
+
+    this.undermountLavaPoolGeo ??= new THREE.CircleGeometry(1, 32).rotateX(-Math.PI / 2);
+    const pools = new THREE.InstancedMesh(
+      this.undermountLavaPoolGeo,
+      this.undermountLavaMaterial(),
+      UNDERMOUNT_LAVA_POOLS.length,
+    );
+    const poolRadius = Math.max(6, Math.min(11, halfX * 0.05));
+    for (let i = 0; i < UNDERMOUNT_LAVA_POOLS.length; i++) {
+      const spec = UNDERMOUNT_LAVA_POOLS[i];
+      const x = spec.x * halfX;
+      const z = layout.zMin + spec.z * zSpan;
+      transform.position.set(x, 0.08, z);
+      transform.rotation.set(0, spec.rotation, 0);
+      transform.scale.set(poolRadius * spec.scaleX, 1, poolRadius * spec.scaleZ);
+      transform.updateMatrix();
+      pools.setMatrixAt(i, transform.matrix);
+
+      this.addTorchGlow(group, x, z, UNDERMOUNT_LAVA_EMISSIVE, 0.11, poolRadius / 5.5);
+      const baseIntensity = this.lowGfx ? 9 : 18;
+      const light = new THREE.PointLight(
+        UNDERMOUNT_LAVA_EMISSIVE,
+        baseIntensity,
+        this.lowGfx ? 30 : 48,
+        2,
+      );
+      light.userData.baseIntensity = baseIntensity;
+      light.position.set(x, 2.8, z);
+      group.add(light);
+      this.fireLights.push(light);
+    }
+    pools.name = 'undermount-lava-pools';
+    pools.instanceMatrix.needsUpdate = true;
+    pools.computeBoundingSphere();
+    pools.renderOrder = 1;
+    group.add(pools);
+  }
+
+  // Fixed, authored forge dressing for the Undermount raid interior: hearths,
+  // cauldrons, anvils, bonfires, ore piles, and weapon stands flanking the
+  // central fight lane (all placements keep |x| >= 18 and stay out of the boss
+  // box at z 30..50, |x| < 16). Deterministic, no rng; scenes are cloned from
+  // the immutable loader cache and emissive materials are cloned before mutation.
+  private placeUndermountForge(group: THREE.Group, _layout: DungeonLayout): void {
+    const FORGE_LAYOUT: Array<{
+      prop: (typeof FORGE_PROPS)[number];
+      x: number;
+      z: number;
+      scale: number;
+      yaw: number;
+      emissive?: number;
+      glow?: number; // glow = torch-glow scale
+    }> = [
+      {
+        prop: 'forge_hearth',
+        x: -46,
+        z: 72,
+        scale: 2.2,
+        yaw: Math.PI / 2,
+        emissive: 0xff5a10,
+        glow: 2.2,
+      },
+      {
+        prop: 'forge_hearth',
+        x: 46,
+        z: 72,
+        scale: 2.2,
+        yaw: -Math.PI / 2,
+        emissive: 0xff5a10,
+        glow: 2.2,
+      },
+      { prop: 'cauldron', x: -24, z: 96, scale: 7, yaw: 0, emissive: 0xff7a12, glow: 1.3 },
+      { prop: 'cauldron', x: 24, z: 96, scale: 7, yaw: 0, emissive: 0xff7a12, glow: 1.3 },
+      { prop: 'cauldron', x: 0, z: 108, scale: 8, yaw: 0, emissive: 0xff7a12, glow: 1.5 },
+      { prop: 'anvil', x: -38, z: 62, scale: 2.4, yaw: Math.PI / 3, glow: 0 },
+      { prop: 'anvil', x: 38, z: 62, scale: 2.4, yaw: -Math.PI / 3, glow: 0 },
+      { prop: 'bonfire', x: -58, z: 34, scale: 2.2, yaw: 0, glow: 1.6 },
+      { prop: 'bonfire', x: 58, z: 34, scale: 2.2, yaw: 0, glow: 1.6 },
+      { prop: 'ore_rocks', x: -56, z: 90, scale: 2.4, yaw: 0.4, glow: 0 },
+      { prop: 'ore_rocks', x: 56, z: 90, scale: 2.4, yaw: -0.4, glow: 0 },
+      { prop: 'weapon_stand', x: -50, z: 18, scale: 2.2, yaw: Math.PI / 2, glow: 0 },
+      { prop: 'weapon_stand', x: 50, z: 18, scale: 2.2, yaw: -Math.PI / 2, glow: 0 },
+    ];
+    for (const entry of FORGE_LAYOUT) {
+      const src = forgeScenes.get(entry.prop);
+      if (!src) continue;
+      const obj = src.clone(true);
+      obj.position.set(entry.x, 0, entry.z);
+      obj.rotation.y = entry.yaw;
+      obj.scale.setScalar(entry.scale);
+      if (entry.emissive !== undefined) {
+        const applyEmissive = (mat: THREE.Material): THREE.Material => {
+          const m = mat.clone() as THREE.MeshStandardMaterial;
+          if ('emissive' in m && m.emissive) {
+            m.emissive.setHex(entry.emissive!);
+            m.emissiveIntensity = 1.4;
+          }
+          return m;
+        };
+        obj.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          mesh.material = Array.isArray(mesh.material)
+            ? mesh.material.map(applyEmissive)
+            : applyEmissive(mesh.material);
+        });
+      }
+      group.add(obj);
+      if (entry.glow && entry.glow > 0) {
+        this.addTorchGlow(group, entry.x, entry.z, entry.emissive ?? 0xff5a10, 0.09, entry.glow);
       }
     }
   }
@@ -1288,6 +1545,7 @@ export class DungeonInteriors {
         : 'arena';
     }
     if (interior === 'nythraxis') return 'nythraxis';
+    if (interior === 'undermount') return 'undermount';
     if (interior === 'sanctum') return 'sanctum';
     if (interior === 'temple') return 'temple';
     // The Last Keep gets its own warm castle grade (clean stone, candle light,
@@ -1350,6 +1608,40 @@ export class DungeonInteriors {
     return mat;
   }
 
+  private undermountFloorMaterial(pack: Pack): THREE.Material {
+    let mat = this.undermountFloorMats.get(pack);
+    if (mat) return mat;
+    // Keep the KayKit atlas tile detail (via the map) but drive the tint dark:
+    // a warm basalt charcoal so the wing floor reads as a scorched forge bed,
+    // not the light sandstone the raw crypt tile color gives. The map modulates
+    // this color, so the tile grooves stay legible while the field goes dark and
+    // the lava veins / molten props glow against it.
+    const src = packSourceMaterial.get(pack);
+    mat = surfaceMat({
+      color: UNDERMOUNT_FLOOR_TINT,
+      map: src?.map ?? undefined,
+      roughness: Math.max(0.9, src?.roughness ?? 0.95),
+      metalness: 0,
+      emissive: UNDERMOUNT_FLOOR_EMISSIVE,
+      emissiveIntensity: UNDERMOUNT_FLOOR_EMISSIVE_INTENSITY,
+    });
+    this.undermountFloorMats.set(pack, mat);
+    return mat;
+  }
+
+  private undermountLavaMaterial(): THREE.Material {
+    if (this.undermountLavaMat) return this.undermountLavaMat;
+    this.undermountLavaMat = surfaceMat({
+      color: UNDERMOUNT_LAVA_BASE,
+      roughness: 0.55,
+      metalness: 0,
+      emissive: UNDERMOUNT_LAVA_EMISSIVE,
+      emissiveIntensity: UNDERMOUNT_LAVA_EMISSIVE_INTENSITY,
+      side: THREE.DoubleSide,
+    });
+    return this.undermountLavaMat;
+  }
+
   private emit(
     group: THREE.Group,
     p: Placements,
@@ -1364,11 +1656,13 @@ export class DungeonInteriors {
         console.warn(`dungeon: unknown module kind '${kind}'`);
         continue;
       }
-      // Marsh wall/pillar/floor stone gets a wet-mossy / peat tint (see
-      // marshMaterial); every other kind (banners, torches, props) and every
-      // other variant keep the plain shared pack material unchanged.
+      // Undermount floor receivers glow molten. Marsh wall/pillar/floor stone
+      // gets a wet-mossy / peat tint (see marshMaterial). All remaining kinds
+      // and variants keep the plain shared pack material unchanged.
       let mat = this.material(asset.pack);
-      if (isMarsh && WALL_PILLAR_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'wall');
+      if (variant === 'undermount' && RECEIVER_KINDS.has(kind))
+        mat = this.undermountFloorMaterial(asset.pack);
+      else if (isMarsh && WALL_PILLAR_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'wall');
       else if (isMarsh && RECEIVER_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'floor');
       else if (tints?.wall !== undefined && WALL_PILLAR_KINDS.has(kind))
         mat = this.tintedMaterial(asset.pack, tints.wall);
@@ -2289,9 +2583,10 @@ export class DungeonInteriors {
   ): void {
     const d = layout.dais;
     const glow = (torch ?? TORCH_COLORS[variant]).light;
-    // The arena and Nythraxis raid keep flat fighting floors: no raised platform
-    // or rim clutter to visually disagree with the walkable sim collision. A rift
-    // style can force either shape (daisRaisedOverride) independent of the kit.
+    // The arena and the Nythraxis and Undermount raids keep flat fighting floors:
+    // no raised platform or rim clutter to visually disagree with the walkable sim
+    // collision. A rift style can force either shape (daisRaisedOverride)
+    // independent of the kit.
     const raised = daisRaisedOverride ?? dungeonDaisHasRaisedPlatform(variant);
     if (!raised) {
       this.addTorchGlow(group, d.x, d.z, glow, 0.07, 2.4);

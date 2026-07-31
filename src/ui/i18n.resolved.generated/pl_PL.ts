@@ -9741,6 +9741,111 @@ export const pl_PL: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Trzewiki Hartowane Żużlem"
+      },
+      "glasswalker_treads": {
+        "name": "Buty Szkłochodu"
+      },
+      "twice_fired_slippers": {
+        "name": "Dwukrotnie Wypalane Pantofle"
+      },
+      "stokebrand_striders": {
+        "name": "Buty Żagwiowego Piętna"
+      },
+      "saans_stoking_iron": {
+        "name": "Pogrzebacz Saana"
+      },
+      "glassblowers_shiv": {
+        "name": "Nóż Dmuchacza Szkła"
+      },
+      "sluicebearer": {
+        "name": "Śluzonośca"
+      },
+      "cindertoad_signet": {
+        "name": "Sygnet Żarnej Ropuchy"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Pierścień Pierwszego Hartowania"
+      },
+      "coalglow_band": {
+        "name": "Pierścień Węglowego Blasku"
+      },
+      "crownforged_warleggings": {
+        "name": "Koronokute nogawice bojowe"
+      },
+      "nighttalon_prowlers": {
+        "name": "Buty Nocnego Szpona"
+      },
+      "soulflame_kilt": {
+        "name": "Kilt duszopłomienia"
+      },
+      "stormcallers_legwraps": {
+        "name": "Owijki Przywoływacza Burz"
+      },
+      "the_even_temper": {
+        "name": "Równy Hart"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Łuk Żaru, różdżka Odrenna"
+      },
+      "twicetempered_girdle": {
+        "name": "Podwójnie Hartowany Pas"
+      },
+      "ashwalk_sandals": {
+        "name": "Sandały Popiołochodu"
+      },
+      "quenchsilk_cord": {
+        "name": "Sznur Hartowanego Jedwabiu"
+      },
+      "slakeleather_belt": {
+        "name": "Pas z Hartowanej Skóry"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Napierśnik Serca Koronokutych"
+      },
+      "nighttalon_emberweave": {
+        "name": "Żarotkanina Nocnego Szponu"
+      },
+      "soulflame_vestments": {
+        "name": "Szaty Płomienia Duszy"
+      },
+      "stormcallers_hauberk": {
+        "name": "Kolczuga Wzywającego Burze"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Kamień Pięści Volzharra"
+      },
+      "magmastrider_greaves": {
+        "name": "Nagolenniki Magmowego Kroku"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Owijacze Budzącej się Posadzki"
+      },
+      "forgeheat_cinch": {
+        "name": "Pas Żaru Kuźni"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Łamacz Rdzenia, Serce Podgórza"
+      },
+      "the_last_restraint": {
+        "name": "Ostatnie Więzy"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Pierścień Dziewiątego Hartowania"
+      },
+      "moltenheart_chroma": {
+        "name": "Stopione Serce"
+      },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
       },
@@ -10682,6 +10787,24 @@ export const pl_PL: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Plaga Ciernistego Szczytu"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Widmo Ksiąg"
       },
@@ -11233,6 +11356,11 @@ export const pl_PL: EnTranslations = {
         "name": "Zwiadowczyni Maren",
         "title": "Zwiadowczyni Marszałka",
         "greeting": "Ciche stopy i krótkie ostrze utrzymają cię przy życiu tutaj. Mów szybko - mam wracać w trzcinowiska."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Kapitan Thessaly",
@@ -12028,6 +12156,42 @@ export const pl_PL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vael Fogbinder pokonany"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const pl_PL: EnTranslations = {
         "enterText": "Przechodzisz przez zapieczętowane królewskie wrota.",
         "leaveText": "Wracasz w zimne powietrze Ciernistego Szczytu."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "Kotlina Dzikiego Serca",
         "enterText": "Ciepły deszcz syczy na starym kamieniu. Kotlina Dzikiego Serca otwiera się przed tobą.",
@@ -14367,7 +14546,8 @@ export const pl_PL: EnTranslations = {
         "name": "Regalia Bonewrought",
         "bonus2": "Zwiększa siłę ataku o 40.",
         "bonus3": "Zwiększa siłę o 15, wytrzymałość o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
-        "bonus4": "Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 8 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy."
+        "bonus4": "Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 8 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy.",
+        "bonus5": "Zwiększa szansę na trafienie krytyczne o 3%."
       },
       "deathlord": {
         "name": "Rynsztunek bojowy Barrowlorda",
@@ -14389,19 +14569,22 @@ export const pl_PL: EnTranslations = {
         "name": "Skóra Direfang",
         "bonus2": "Zwiększa siłę ataku o 40.",
         "bonus3": "Zwiększa zręczność o 15, szansę na trafienie krytyczne o 2% oraz szybkość ataku i rzucania zaklęć o 15%.",
-        "bonus4": "Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 6 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy."
+        "bonus4": "Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 6 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy.",
+        "bonus5": "Zwiększa szansę na trafienie krytyczne o 3%."
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
         "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
-        "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s."
+        "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s.",
+        "bonus5": "Zwiększa szansę na krytyczne trafienie zaklęciem o 3%."
       },
       "stormcallers": {
         "name": "Szaty Galecall",
         "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
-        "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s."
+        "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s.",
+        "bonus5": "Zwiększa szansę na krytyczne trafienie zaklęciem o 3%."
       },
       "vale_arcanist": {
         "name": "Szaty Arkanisty z Doliny",

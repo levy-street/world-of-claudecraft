@@ -4908,6 +4908,109 @@ describe('Temporal Hourglass snapshot parity', () => {
   });
 });
 
+describe('Undermount vent snapshot parity', () => {
+  it('reuses the Sim vent projection until its active vent topology changes', () => {
+    const sim = new Sim({ seed: 1032, playerClass: 'warrior', noPlayer: true });
+    const activeVent = {
+      sourceId: 9876,
+      pos: { x: 3, y: 0, z: 5 },
+      radius: 4,
+      min: 15,
+      max: 15,
+      remaining: 36000,
+      interval: 1,
+      tickTimer: 1,
+      school: 'fire',
+      ability: 'Vent Fissure',
+    };
+    const groundAoEs = (sim as unknown as { groundAoEs: Array<typeof activeVent> }).groundAoEs;
+    groundAoEs.push(activeVent);
+
+    const first = sim.activeUndermountVents;
+    expect(first).toEqual([{ id: '9876:0', x: 3, z: 5, radius: 4 }]);
+    expect(sim.activeUndermountVents).toBe(first);
+
+    groundAoEs.push(
+      { ...activeVent, sourceId: 9877, ability: 'Consecration' },
+      { ...activeVent, sourceId: 9878, remaining: 0 },
+    );
+    expect(sim.activeUndermountVents).toBe(first);
+
+    const secondVent = { ...activeVent, sourceId: 9879, pos: { x: 7, y: 0, z: 9 } };
+    groundAoEs.push(secondVent);
+    const second = sim.activeUndermountVents;
+    expect(second).not.toBe(first);
+    expect(second).toEqual([
+      { id: '9876:0', x: 3, z: 5, radius: 4 },
+      { id: '9879:0', x: 7, z: 9, radius: 4 },
+    ]);
+    expect(sim.activeUndermountVents).toBe(second);
+
+    secondVent.remaining = 0;
+    const third = sim.activeUndermountVents;
+    expect(third).not.toBe(second);
+    expect(third).toEqual([{ id: '9876:0', x: 3, z: 5, radius: 4 }]);
+  });
+
+  it('mirrors authoritative vents and clears vents missing from the next snapshot', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      undermountVents: [{ id: '9:0', x: 3, z: 5, r: 4 }],
+    });
+    expect(client.activeUndermountVents).toEqual([{ id: '9:0', x: 3, z: 5, radius: 4 }]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeUndermountVents).toEqual([]);
+  });
+
+  it.each([
+    ['a non-array payload', { id: '9:0', x: 3, z: 5, r: 4 }],
+    ['a non-string id', [{ id: 9, x: 3, z: 5, r: 4 }]],
+    ['a non-finite x', [{ id: '9:0', x: Number.NaN, z: 5, r: 4 }]],
+    ['a non-finite z', [{ id: '9:0', x: 3, z: Number.POSITIVE_INFINITY, r: 4 }]],
+    ['a non-finite radius', [{ id: '9:0', x: 3, z: 5, r: Number.NaN }]],
+    ['a zero radius', [{ id: '9:0', x: 3, z: 5, r: 0 }]],
+    ['a negative radius', [{ id: '9:0', x: 3, z: 5, r: -1 }]],
+  ])('rejects %s from the vent wire', (_label, undermountVents) => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [], undermountVents });
+    expect(client.activeUndermountVents).toEqual([]);
+  });
+
+  it('includes the vent-radius boundary and excludes farther Volzharr vents', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Ventwire', 'warrior');
+    const player = server.sim.entities.get(session.pid)!;
+    const pushVent = (sourceId: number, xOffset: number): void => {
+      (server.sim as any).groundAoEs.push({
+        sourceId,
+        pos: { x: player.pos.x + xOffset, y: player.pos.y, z: player.pos.z },
+        radius: 4,
+        min: 15,
+        max: 15,
+        remaining: 36000,
+        interval: 1,
+        tickTimer: 1,
+        school: 'fire',
+        ability: 'Vent Fissure',
+      });
+    };
+    pushVent(9876, 4);
+    pushVent(9877, 134);
+    pushVent(9878, 134.1);
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).undermountVents).toEqual([
+      { id: '9876:0', x: expect.any(Number), z: expect.any(Number), r: 4 },
+      { id: '9877:0', x: expect.any(Number), z: expect.any(Number), r: 4 },
+    ]);
+  });
+});
+
 describe('authoritative interaction command outcomes', () => {
   it.each([
     ['loot', { id: -1 }],

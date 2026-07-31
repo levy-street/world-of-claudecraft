@@ -12,6 +12,23 @@ export interface ItemSetTooltipModel {
   bonusTiers: ItemSetTooltipTier[];
 }
 
+export type ItemSetBonusField = 'bonus2' | 'bonus3' | 'bonus4' | 'bonus5';
+
+export function itemSetBonusField(pieces: number): ItemSetBonusField | null {
+  switch (pieces) {
+    case 2:
+      return 'bonus2';
+    case 3:
+      return 'bonus3';
+    case 4:
+      return 'bonus4';
+    case 5:
+      return 'bonus5';
+    default:
+      return null;
+  }
+}
+
 export function itemSetMemberCounts(): Record<string, number> {
   const membersBySet = new Map<string, Set<string>>();
   for (const item of Object.values(ITEMS)) {

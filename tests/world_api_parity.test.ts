@@ -108,6 +108,7 @@ export const IWORLD_MEMBERS = [
   { name: 'known', kind: 'data' },
   { name: 'activeFrostRings', kind: 'data' },
   { name: 'activeTemporalHourglasses', kind: 'data' },
+  { name: 'activeUndermountVents', kind: 'data' },
   { name: 'questLog', kind: 'data' },
   { name: 'questsDone', kind: 'data' },
   // --- commands + read-returning methods ---
@@ -496,9 +497,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
     // activeMasterLootRolls, leaving 274; the rift floor timer HUD adds
     // riftEventMsRemaining and the instance-payload pipes add
-    // marketListInstance, leaving 276.
-    expect(IWORLD_MEMBERS.length).toBe(276);
-    expect(DATA_MEMBERS.length).toBe(72);
+    // marketListInstance, while Undermount adds the vent readout, leaving 277.
+    expect(IWORLD_MEMBERS.length).toBe(277);
+    expect(DATA_MEMBERS.length).toBe(73);
     expect(METHOD_MEMBERS.length).toBe(204);
   });
   it('has no duplicate member names', () => {
@@ -523,6 +524,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeMobileStationCraft',
       'activeTemporalHourglasses',
       'activeTitle',
+      'activeUndermountVents',
       'applyEnchant',
       'applyTalents',
       'archetypeTitle',
@@ -797,6 +799,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeMobileStationCraft',
       'activeTemporalHourglasses',
       'activeTitle',
+      'activeUndermountVents',
       'archetypeTitle',
       'arenaInfo',
       'bagCapacity',
@@ -1146,6 +1149,7 @@ const FACET_COMBAT = [
   'known',
   'activeFrostRings',
   'activeTemporalHourglasses',
+  'activeUndermountVents',
   'castAbility',
   'castAbilityAt',
   'castAbilityBySlot',
@@ -1612,8 +1616,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(276);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(276);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(277);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(277);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

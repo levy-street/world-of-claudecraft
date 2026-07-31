@@ -9741,6 +9741,111 @@ export const nl_NL: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Slakgetemperde laarzen"
+      },
+      "glasswalker_treads": {
+        "name": "Glasloper-schoenen"
+      },
+      "twice_fired_slippers": {
+        "name": "Dubbelgebakken pantoffels"
+      },
+      "stokebrand_striders": {
+        "name": "Pookbrand-stappers"
+      },
+      "saans_stoking_iron": {
+        "name": "Saans pookijzer"
+      },
+      "glassblowers_shiv": {
+        "name": "Glasblazersmes"
+      },
+      "sluicebearer": {
+        "name": "Sluisdrager"
+      },
+      "cindertoad_signet": {
+        "name": "Sintelpadsignet"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Ring van de eerste afkoeling"
+      },
+      "coalglow_band": {
+        "name": "Koolgloedband"
+      },
+      "crownforged_warleggings": {
+        "name": "Kroongesmede oorlogsbeenkappen"
+      },
+      "nighttalon_prowlers": {
+        "name": "Nachtklauwsluipers"
+      },
+      "soulflame_kilt": {
+        "name": "Zielsvlamkilt"
+      },
+      "stormcallers_legwraps": {
+        "name": "Beenwikkels van de Stormroeper"
+      },
+      "the_even_temper": {
+        "name": "Het Gelijkmatige Temperament"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Sintelboog, Odrenns roede"
+      },
+      "twicetempered_girdle": {
+        "name": "Dubbelgetemperde gordel"
+      },
+      "ashwalk_sandals": {
+        "name": "Asloper-sandalen"
+      },
+      "quenchsilk_cord": {
+        "name": "Koelzijdesnoer"
+      },
+      "slakeleather_belt": {
+        "name": "Koellederen riem"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Kroon gesmede hartplaat"
+      },
+      "nighttalon_emberweave": {
+        "name": "Nachtklauw-gloedweefsel"
+      },
+      "soulflame_vestments": {
+        "name": "Zielvlamgewaden"
+      },
+      "stormcallers_hauberk": {
+        "name": "Stormroepers maliënkolder"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharrs knokkelsteen"
+      },
+      "magmastrider_greaves": {
+        "name": "Magmawandelaar-scheenplaten"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Voetwindsels van de Ontwakende Vloer"
+      },
+      "forgeheat_cinch": {
+        "name": "Smederijhitte-gordel"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Kernbreker, Hart van de Onderberg"
+      },
+      "the_last_restraint": {
+        "name": "De Laatste Boei"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Ring van de Negende Koeling"
+      },
+      "moltenheart_chroma": {
+        "name": "Smelthart"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },
@@ -10682,6 +10787,24 @@ export const nl_NL: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Gesel van Doorntop"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Grootboek-Schim"
       },
@@ -11233,6 +11356,11 @@ export const nl_NL: EnTranslations = {
         "name": "Verkenner Maren",
         "title": "Verkenner van de Maarschalk",
         "greeting": "Stille voeten en een kort zwaard houden je hier in leven. Spreek snel, ik word terug in het riet verwacht."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Kapitein Thessaly",
@@ -12028,6 +12156,42 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vael de Fogbinder gedood"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const nl_NL: EnTranslations = {
         "enterText": "Je gaat door de verzegelde koninklijke deur.",
         "leaveText": "Je keert terug naar de koude lucht van Doorntop."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "Het Wildhartbekken",
         "enterText": "Warme regen sist op oude steen. Het Wildhartbekken opent zich voor je.",
@@ -14367,7 +14546,8 @@ export const nl_NL: EnTranslations = {
         "name": "Bonewrought-Regalia",
         "bonus2": "Verhoogt aanvalskracht met 40.",
         "bonus3": "Verhoogt kracht met 15, uithoudingsvermogen met 15 en aanvals- en spreuksnelheid met 15%.",
-        "bonus4": "Je kritieke wapentreffers splinteren het doelwit met Beensplinter, waardoor het 8 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer."
+        "bonus4": "Je kritieke wapentreffers splinteren het doelwit met Beensplinter, waardoor het 8 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer.",
+        "bonus5": "Verhoogt de kans op een kritieke treffer met 3%."
       },
       "deathlord": {
         "name": "Barrowlord-Strijduitrusting",
@@ -14389,19 +14569,22 @@ export const nl_NL: EnTranslations = {
         "name": "Direfang-Pels",
         "bonus2": "Verhoogt aanvalskracht met 40.",
         "bonus3": "Verhoogt behendigheid met 15, kritieke kans met 2% en aanvals- en spreuksnelheid met 15%.",
-        "bonus4": "Je kritieke wapentreffers rijten een Rafelige Snee, waardoor het doelwit 6 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer."
+        "bonus4": "Je kritieke wapentreffers rijten een Rafelige Snee, waardoor het doelwit 6 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer.",
+        "bonus5": "Verhoogt de kans op een kritieke treffer met 3%."
       },
       "soulflame": {
         "name": "Wraithfire-Regalia",
         "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
         "bonus3": "Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.",
-        "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec."
+        "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec.",
+        "bonus5": "Verhoogt de kans op een kritieke spreuktreffer met 3%."
       },
       "stormcallers": {
         "name": "Galecall-Gewaden",
         "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
         "bonus3": "Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.",
-        "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec."
+        "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec.",
+        "bonus5": "Verhoogt de kans op een kritieke spreuktreffer met 3%."
       },
       "vale_arcanist": {
         "name": "Gewaden van de Dal-arcanist",

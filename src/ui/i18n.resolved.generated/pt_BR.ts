@@ -9741,6 +9741,111 @@ export const pt_BR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "slag_tempered_sabatons": {
+        "name": "Escarpes Temperados em Escória"
+      },
+      "glasswalker_treads": {
+        "name": "Botas Anda-Vidro"
+      },
+      "twice_fired_slippers": {
+        "name": "Pantufas de Dupla Queima"
+      },
+      "stokebrand_striders": {
+        "name": "Botas Marca de Braseiro"
+      },
+      "saans_stoking_iron": {
+        "name": "Atiçador de Saan"
+      },
+      "glassblowers_shiv": {
+        "name": "Faca do Soprador de Vidro"
+      },
+      "sluicebearer": {
+        "name": "Portador da Comporta"
+      },
+      "cindertoad_signet": {
+        "name": "Sinete do Sapo de Brasa"
+      },
+      "ring_of_the_first_quench": {
+        "name": "Anel da Primeira Têmpera"
+      },
+      "coalglow_band": {
+        "name": "Anel do Brilho de Carvão"
+      },
+      "crownforged_warleggings": {
+        "name": "Perneiras de Guerra Forjacoroa"
+      },
+      "nighttalon_prowlers": {
+        "name": "Botas de Espreita Garra Noturna"
+      },
+      "soulflame_kilt": {
+        "name": "Kilt Chama d'Alma"
+      },
+      "stormcallers_legwraps": {
+        "name": "Faixas de Perna do Chamatormenta"
+      },
+      "the_even_temper": {
+        "name": "A Têmpera Equilibrada"
+      },
+      "cinderarc_odrenns_rod": {
+        "name": "Arco de Brasa, Bastão de Odrenn"
+      },
+      "twicetempered_girdle": {
+        "name": "Cinturão de Dupla Têmpera"
+      },
+      "ashwalk_sandals": {
+        "name": "Sandálias Anda-Cinzas"
+      },
+      "quenchsilk_cord": {
+        "name": "Cordão de Seda Temperada"
+      },
+      "slakeleather_belt": {
+        "name": "Cinto de Couro Temperado"
+      },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
+      "crownforged_heartplate": {
+        "name": "Peitoral Coração Forjacoroa"
+      },
+      "nighttalon_emberweave": {
+        "name": "Trama de Brasas Garra Noturna"
+      },
+      "soulflame_vestments": {
+        "name": "Vestes Chama da Alma"
+      },
+      "stormcallers_hauberk": {
+        "name": "Cota do Invocador de Tempestades"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Pedra de Punho de Volzharr"
+      },
+      "magmastrider_greaves": {
+        "name": "Grevas Passomagma"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Faixas do Chão Desperto"
+      },
+      "forgeheat_cinch": {
+        "name": "Cinturão Calor da Forja"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Quebra-núcleo, Coração do Submonte"
+      },
+      "the_last_restraint": {
+        "name": "A Última Restrição"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Anel da Nona Têmpera"
+      },
+      "moltenheart_chroma": {
+        "name": "Coração Fundido"
+      },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
       },
@@ -10682,6 +10787,24 @@ export const pt_BR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Flagelo de Thornpeak"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
+      },
       "reliquary_ledger_wraith": {
         "name": "Espectro do Registro"
       },
@@ -11233,6 +11356,11 @@ export const pt_BR: EnTranslations = {
         "name": "Batedora Maren",
         "title": "Batedora do marechal",
         "greeting": "Passos silenciosos e uma lâmina curta mantêm você vivo. Fale depressa: preciso voltar aos juncos."
+      },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
       },
       "captain_thessaly": {
         "name": "Capitã Thessaly",
@@ -12028,6 +12156,42 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vael, o Fogbinder, abatido"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
+        "objectives": {
+          "0": {
+            "label": "Rune rubbings taken"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },
@@ -14148,6 +14312,21 @@ export const pt_BR: EnTranslations = {
         "enterText": "Você atravessa a porta real selada.",
         "leaveText": "Você retorna ao ar frio de Thornpeak."
       },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
+      },
       "wildheart_basin": {
         "name": "A Bacia de Wildheart",
         "enterText": "Uma chuva quente sibila sobre a pedra antiga. A Bacia de Wildheart se abre diante de você.",
@@ -14367,7 +14546,8 @@ export const pt_BR: EnTranslations = {
         "name": "Traje de Batalha Bonewrought",
         "bonus2": "Aumenta o poder de ataque em 40.",
         "bonus3": "Aumenta a força em 15, o vigor em 15 e a velocidade de ataque e de lançamento em 15%.",
-        "bonus4": "Seus acertos críticos com armas estilhaçam o alvo com Estilhaço Ósseo, causando 8 de sangramento a cada 2 s por 12 s. Acumula até 3 vezes."
+        "bonus4": "Seus acertos críticos com armas estilhaçam o alvo com Estilhaço Ósseo, causando 8 de sangramento a cada 2 s por 12 s. Acumula até 3 vezes.",
+        "bonus5": "Aumenta em 3% a chance de acerto crítico."
       },
       "deathlord": {
         "name": "Traje de Batalha Barrowlord",
@@ -14389,19 +14569,22 @@ export const pt_BR: EnTranslations = {
         "name": "Traje de Couro Direfang",
         "bonus2": "Aumenta o poder de ataque em 40.",
         "bonus3": "Aumenta a agilidade em 15, a chance de crítico em 2% e a velocidade de ataque e de lançamento em 15%.",
-        "bonus4": "Seus acertos críticos com armas abrem um Corte Dilacerado, causando 6 de sangramento no alvo a cada 2 s por 12 s. Acumula até 3 vezes."
+        "bonus4": "Seus acertos críticos com armas abrem um Corte Dilacerado, causando 6 de sangramento no alvo a cada 2 s por 12 s. Acumula até 3 vezes.",
+        "bonus5": "Aumenta em 3% a chance de acerto crítico."
       },
       "soulflame": {
         "name": "Vestes Wraithfire",
         "bonus2": "Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).",
         "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.",
-        "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s."
+        "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s.",
+        "bonus5": "Aumenta em 3% a chance de acerto crítico com feitiços."
       },
       "stormcallers": {
         "name": "Vestes Galecall",
         "bonus2": "Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).",
         "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.",
-        "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s."
+        "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s.",
+        "bonus5": "Aumenta em 3% a chance de acerto crítico com feitiços."
       },
       "vale_arcanist": {
         "name": "Vestes do Arcanista do Vale",

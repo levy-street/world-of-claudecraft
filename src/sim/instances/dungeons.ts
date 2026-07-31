@@ -17,6 +17,11 @@
 
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
+import {
+  undermountBossCompletesWing,
+  undermountWing,
+  undermountWingSealed,
+} from '../encounters/undermount';
 import { createGroundObject, createMob } from '../entity';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -40,7 +45,13 @@ import {
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
 const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
-const RAID_ALLOWED_DUNGEON_IDS = new Set(['nythraxis_crypt', 'nythraxis_boss_arena']);
+const RAID_ALLOWED_DUNGEON_IDS = new Set([
+  'nythraxis_crypt',
+  'nythraxis_boss_arena',
+  'undermount_wing1',
+  'undermount_wing2',
+  'undermount_wing3',
+]);
 const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena']);
 
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
@@ -236,6 +247,14 @@ export function enterDungeon(
     ctx.error(r.meta.entityId, 'You must convert your party to a raid group first.');
     return false;
   }
+  if (
+    undermountWing(dungeonId) &&
+    undermountWingSealed(r.meta.undermountCleared, dungeonId) &&
+    !bypass
+  ) {
+    ctx.error(r.meta.entityId, 'The way down is sealed. The wing above must fall first.');
+    return false;
+  }
   if (dungeonId === 'nythraxis_boss_arena' && !canEnterNythraxisRaid(r.meta) && !bypass) {
     ctx.error(r.meta.entityId, 'The royal door is sealed to you.');
     return false;
@@ -411,9 +430,15 @@ function isRaidLocked(ctx: SimContext, meta: PlayerMeta, dungeonId: string): boo
 function heroicFinalBossAlive(ctx: SimContext, inst: InstanceSlot): boolean {
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
   if (!tuning) return false;
+  const wing = undermountWing(inst.dungeonId);
   for (const id of inst.mobIds) {
     const e = ctx.entities.get(id);
-    if (e && e.templateId === tuning.finalBossId && !e.dead) return true;
+    if (
+      e &&
+      !e.dead &&
+      (wing ? wing.bossMobIds.includes(e.templateId) : e.templateId === tuning.finalBossId)
+    )
+      return true;
   }
   return false;
 }
@@ -790,7 +815,12 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
   if (inst?.difficulty !== 'heroic') return;
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
-  if (!tuning || mob.templateId !== tuning.finalBossId) return;
+  if (!tuning) return;
+  const wing = undermountWing(inst.dungeonId);
+  const completesClaim = wing
+    ? wing.bossMobIds.includes(mob.templateId) && undermountBossCompletesWing(ctx, mob)
+    : mob.templateId === tuning.finalBossId;
+  if (!completesClaim) return;
   const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
   const rewardWindow = heroicRewardWindowToken(lockedUntil);
   // recipients is the death-time participation snapshot (damage.ts): it is empty
@@ -878,8 +908,7 @@ export function instanceInfoAt(
   return inst ? { slot: inst.slot, dungeonId: inst.dungeonId } : null;
 }
 
-// Authoritative: is `pos` physically inside one of the two Nythraxis raid
-// instances (the crypt approach or the boss arena), regardless of raid-GROUP
+// Authoritative: is `pos` physically inside a raid instance, regardless of raid-GROUP
 // membership. Used to silently gate walk-by autoloot (interaction.ts): a rogue
 // looter leaving the raid, or a raid party staging pre-pull in the open world,
 // must not trigger it.

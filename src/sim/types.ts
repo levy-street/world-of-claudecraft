@@ -699,6 +699,9 @@ interface BaseItemDef {
   // reward tokens can opt into permanent storage. Enforced in social/trade.ts,
   // mail/post_office.ts, market.ts, and items.ts.
   soulbound?: boolean;
+  // Equipped presentation-only reward. It may occupy a visible equipment slot,
+  // but it is not combat gear and therefore has no item level or stat budget.
+  cosmeticOnly?: true;
   // Vendor service entry: buying this "item" teaches the riding skill instead of
   // adding anything to the bags (items.ts buyItem delegates to learnRiding, which
   // owns every gate: already trained, level, the 80g fee). Only the stablemaster
@@ -2540,7 +2543,7 @@ export interface DungeonDef {
   exitOffset: { x: number; z: number }; // exit portal (instance-local)
   spawns: DungeonSpawn[];
   objects?: DungeonObjectSpawn[];
-  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis' | 'wildheart' | 'lastkeep'; // renderer + collider interior builder key
+  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis' | 'wildheart' | 'lastkeep' | 'undermount'; // renderer + collider interior builder key
   /**
    * What dresses this dungeon's wall-side obstacle slots (matches the render
    * variant): coffins get one standable lid, cargo splits into the crate
@@ -3394,6 +3397,8 @@ export interface Entity extends ClientMirroredEntityFields {
   mobChargeTargetId?: number | null; // dash victim; null/undefined = not dashing
   healedThisPull: boolean; // desperation self-heal already used this pull
   nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
+  odrenn?: import('./encounters/odrenn').OdrennEncounterState; // sim-only state, Undermount wing 2
+  volzharr?: import('./encounters/volzharr').VolzharrEncounterState; // sim-only state, Undermount wing 3
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
@@ -4036,6 +4041,10 @@ export type SimEvent = { pid?: number } & (
         | 'emote'
         | 'roll';
       entityId?: number;
+      // Authenticated authored-speaker identity for NPC and mob yells. This
+      // travels with the event because online interest snapshots can arrive
+      // after a spawn-tick yell, or omit a distant loud speaker entirely.
+      authoredSpeaker?: { kind: 'npc' | 'mob'; templateId: string };
       to?: string;
       // Account flair of the SENDER, attached by the server at fan-out (the sim
       // never sets it). Sparse: absent for a normal player, so an ordinary chat
@@ -5453,8 +5462,10 @@ export type DeedTrigger =
   | { kind: 'visit'; markId: string }
   | { kind: 'visits'; markIds: string[]; count?: number }
   // All listed deeds earned, plus (optionally) all listed quests done. The
-  // quest arm exists for the Chronicle chapters, which mix both.
-  | { kind: 'meta'; deedIds: string[]; questIds?: string[] }
+  // quest arm exists for the Chronicle chapters, which mix both. When
+  // raidLockoutIds is present, every listed lockout must point at the same
+  // authoritative reset boundary, proving the clears happened in one window.
+  | { kind: 'meta'; deedIds: string[]; questIds?: string[]; raidLockoutIds?: string[] }
   // A numeric reading over persisted state at or above amount.
   | { kind: 'meter'; meter: DeedMeterId; amount: number }
   // A boolean predicate over persisted state.

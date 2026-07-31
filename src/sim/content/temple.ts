@@ -839,7 +839,7 @@ export const TEMPLE_DUNGEON_DEFS: Record<string, DungeonDef> = {
   drowned_temple: {
     id: 'drowned_temple',
     name: 'The Drowned Temple',
-    index: 3, // instance origin x = 900 + 3*600 = 2700 (clear of the arena band)
+    index: 3, // instance origin x = 900 + 3*600 = 2700 (arena band starts at x 9600)
     doorPos: { ...MOONGATE_POS }, // the moongate on the Glimmermere shore
     entry: { x: 0, z: -2 }, // clear-of-aggro arrival (see dungeon_entry_clearance test)
     exitOffset: { x: 0, z: -6 },
