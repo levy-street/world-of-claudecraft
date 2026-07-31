@@ -206,16 +206,17 @@ describe('Last Bell harbors', () => {
     // The crossing keepers stand ON DECK at the top of each gangplank,
     // close enough to the boarding point to hand out the crossing quest
     // (acceptQuest requires the giver nearby).
-    for (const [name, harbor] of [
-      ['Ferryman Ewald', MAINLAND_HARBOR],
-      ['Ferrykeeper Odda', GULLHAVEN_HARBOR],
+    for (const [templateId, harbor] of [
+      ['ferryman_ewald', MAINLAND_HARBOR],
+      ['ferryman_ewald_gullhaven', GULLHAVEN_HARBOR],
     ] as const) {
-      const npc = [...sim.entities.values()].find((e) => e.name === name);
-      expect(npc, name).toBeTruthy();
+      const npc = [...sim.entities.values()].find((e) => e.templateId === templateId);
+      expect(npc, templateId).toBeTruthy();
       if (npc) {
+        expect(npc.name).toBe('Ferryman Ewald');
         const b = harbor.boarding;
-        expect(Math.hypot(npc.pos.x - b.x, npc.pos.z - b.z), name).toBeLessThan(6);
-        expect(harborDeckAt(harbor, npc.pos.x, npc.pos.z), name).toBeTruthy();
+        expect(Math.hypot(npc.pos.x - b.x, npc.pos.z - b.z), templateId).toBeLessThan(6);
+        expect(harborDeckAt(harbor, npc.pos.x, npc.pos.z), templateId).toBeTruthy();
       }
     }
   });

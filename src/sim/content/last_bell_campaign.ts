@@ -69,9 +69,17 @@ const EWALD_POST = {
   z: MAINLAND_HARBOR.boarding.z - 0.9,
 } as const;
 
-const ODDA_POST = {
+const GULLHAVEN_EWALD_POST = {
   x: GULLHAVEN_HARBOR.boarding.x - 0.9,
   z: GULLHAVEN_HARBOR.boarding.z + 1.5,
+} as const;
+
+const EWALD_IDENTITY = {
+  name: 'Ferryman Ewald',
+  title: 'The Farshore Crossing',
+  color: 0x4a5a7a,
+  greeting:
+    'The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather.',
 } as const;
 
 export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
@@ -79,8 +87,7 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
   // anyway: the ferry is how a proven hand reaches a besieged island.
   ferryman_ewald: {
     id: 'ferryman_ewald',
-    name: 'Ferryman Ewald',
-    title: 'The Farshore Crossing',
+    ...EWALD_IDENTITY,
     // His post is ON DECK at the top of the gangplank: he greets riders as
     // they step aboard, and stands close enough to the boarding point to
     // hand out Q0. The harbor layout is the single anchor source.
@@ -89,29 +96,23 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
       MAINLAND_HARBOR.gangplank.x - EWALD_POST.x,
       MAINLAND_HARBOR.gangplank.z - EWALD_POST.z,
     ),
-    color: 0x4a5a7a,
     // Q0 is accepted automatically on the first crossing, but the canonical
     // giver link still belongs on Ewald for quest integrity, save repair, and
     // any host that opens the normal quest surface before boarding.
     questIds: ['q_lb_q0_ashore'],
-    greeting:
-      'The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather.',
   },
-  // The island side of the crossing: keeps the Gullhaven gangplank the way
-  // Ewald keeps the mainland one. The return leg has a face too.
-  ferrykeeper_odda: {
-    id: 'ferrykeeper_odda',
-    name: 'Ferrykeeper Odda',
-    title: 'The Farshore Crossing',
-    pos: ODDA_POST,
+  // The same Ewald identity at the island end, following the classic MMO
+  // convention that the ferryman crosses with his boat. A second template id
+  // is required because the fixture spawner places each template once.
+  ferryman_ewald_gullhaven: {
+    id: 'ferryman_ewald_gullhaven',
+    ...EWALD_IDENTITY,
+    pos: GULLHAVEN_EWALD_POST,
     facing: Math.atan2(
-      GULLHAVEN_HARBOR.gangplank.x - ODDA_POST.x,
-      GULLHAVEN_HARBOR.gangplank.z - ODDA_POST.z,
+      GULLHAVEN_HARBOR.gangplank.x - GULLHAVEN_EWALD_POST.x,
+      GULLHAVEN_HARBOR.gangplank.z - GULLHAVEN_EWALD_POST.z,
     ),
-    color: 0x4a5a7a,
     questIds: [],
-    greeting:
-      'Mainland-bound? The ship goes when you are aboard, not before. And if you hear the bell start counting while we cast off, do not ask me to turn her around: nobody rows toward a three-toll.',
   },
   // Runs the militia line at the Watch Meadow. Operational, unsentimental,
   // knows exactly what his line can and cannot kill.

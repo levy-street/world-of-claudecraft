@@ -10,7 +10,10 @@ import { describe, expect, it } from 'vitest';
 import { PROP_ASSET_DEFS, propPlacementInternalsForTest } from '../src/render/props';
 import { colliderInternalsForTest } from '../src/sim/colliders';
 import { FARSHORE_PROPS } from '../src/sim/content/farshore';
-import { LAST_BELL_CAMPAIGN_QUESTS } from '../src/sim/content/last_bell_campaign';
+import {
+  LAST_BELL_CAMPAIGN_NPCS,
+  LAST_BELL_CAMPAIGN_QUESTS,
+} from '../src/sim/content/last_bell_campaign';
 import { ZONE1_PROPS } from '../src/sim/content/zone1';
 import { PROPS } from '../src/sim/data';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
@@ -85,23 +88,46 @@ describe('Last Bell campaign fixtures', () => {
   });
 
   it.each([
-    ['Ferryman Ewald', 'ferryman_ewald', MAINLAND_HARBOR],
-    ['Ferrykeeper Odda', 'ferrykeeper_odda', GULLHAVEN_HARBOR],
-  ] as const)('%s faces the gangway boarding entry', (_name, templateId, harbor) => {
-    const sim = makeSim();
-    const keeper = fixtures(sim, templateId)[0];
-    expect(keeper).toBeDefined();
-    if (!keeper) return;
+    ['mainland', 'ferryman_ewald', MAINLAND_HARBOR],
+    ['Gullhaven', 'ferryman_ewald_gullhaven', GULLHAVEN_HARBOR],
+  ] as const)(
+    'Ewald at the %s post faces the gangway boarding entry',
+    (_post, templateId, harbor) => {
+      const sim = makeSim();
+      const keeper = fixtures(sim, templateId)[0];
+      expect(keeper).toBeDefined();
+      if (!keeper) return;
 
-    const expectedYaw = Math.atan2(
-      harbor.gangplank.x - keeper.pos.x,
-      harbor.gangplank.z - keeper.pos.z,
-    );
-    const yawError = Math.atan2(
-      Math.sin(keeper.facing - expectedYaw),
-      Math.cos(keeper.facing - expectedYaw),
-    );
-    expect(Math.abs(yawError)).toBeLessThan(KEEPER_FACING_EPSILON_RADIANS);
+      const expectedYaw = Math.atan2(
+        harbor.gangplank.x - keeper.pos.x,
+        harbor.gangplank.z - keeper.pos.z,
+      );
+      const yawError = Math.atan2(
+        Math.sin(keeper.facing - expectedYaw),
+        Math.cos(keeper.facing - expectedYaw),
+      );
+      expect(Math.abs(yawError)).toBeLessThan(KEEPER_FACING_EPSILON_RADIANS);
+    },
+  );
+
+  it('presents one Ewald identity at both posts and preserves the canonical Q0 giver', () => {
+    const mainland = LAST_BELL_CAMPAIGN_NPCS.ferryman_ewald;
+    const gullhaven = LAST_BELL_CAMPAIGN_NPCS.ferryman_ewald_gullhaven;
+
+    expect({
+      name: gullhaven.name,
+      title: gullhaven.title,
+      color: gullhaven.color,
+      greeting: gullhaven.greeting,
+    }).toEqual({
+      name: mainland.name,
+      title: mainland.title,
+      color: mainland.color,
+      greeting: mainland.greeting,
+    });
+    expect(mainland.questIds).toContain('q_lb_q0_ashore');
+    expect(gullhaven.questIds).not.toContain('q_lb_q0_ashore');
+    expect(LAST_BELL_CAMPAIGN_QUESTS.q_lb_q0_ashore.giverNpcId).toBe('ferryman_ewald');
   });
 
   it('ignores interact on the Breach: it is scenery, not a device', () => {
@@ -167,10 +193,12 @@ describe('Last Bell campaign fixtures', () => {
     // The cinematic begins on the destination ship and walks the rider down
     // the gangplank. Step back aboard to take the return fare immediately.
     teleport(sim, GULLHAVEN_HARBOR.boarding.x, GULLHAVEN_HARBOR.boarding.z);
-    const odda = [...sim.entities.values()].find((e) => e.templateId === 'ferrykeeper_odda');
-    expect(odda).toBeTruthy();
-    if (!odda) return;
-    sim.player.targetId = odda.id;
+    const islandEwald = [...sim.entities.values()].find(
+      (e) => e.templateId === 'ferryman_ewald_gullhaven',
+    );
+    expect(islandEwald).toBeTruthy();
+    if (!islandEwald) return;
+    sim.player.targetId = islandEwald.id;
     sim.interact();
     expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_back', 'pay')).toBe(true);
     expect(meta.copper).toBe(5);

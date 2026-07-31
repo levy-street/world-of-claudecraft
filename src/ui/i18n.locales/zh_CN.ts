@@ -10146,10 +10146,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.ferryman_ewald.title': '远岸航线',
   'entities.npcs.ferryman_ewald.greeting':
     '要去远岸，是吗？如今已经没人为了捕鱼过海了，朋友。准备好就上船；抵岸后留心钟声，镇上的人听钟，就像你听风辨天气一样。',
-  'entities.npcs.ferrykeeper_odda.name': '渡船守·奥达',
-  'entities.npcs.ferrykeeper_odda.title': '远岸航线',
-  'entities.npcs.ferrykeeper_odda.greeting':
-    '要回大陆？你上船，我们才启航，绝不会提前。如果解缆时钟声开始计数，别求我掉头：没人会朝三响钟划去。',
+  'entities.npcs.ferryman_ewald_gullhaven.name': '摆渡人·埃瓦尔德',
+  'entities.npcs.ferryman_ewald_gullhaven.title': '远岸航线',
+  'entities.npcs.ferryman_ewald_gullhaven.greeting':
+    '要去远岸，是吗？如今已经没人为了捕鱼过海了，朋友。准备好就上船；抵岸后留心钟声，镇上的人听钟，就像你听风辨天气一样。',
   'entities.npcs.sergeant_marsh.name': '马什中士',
   'entities.npcs.sergeant_marsh.title': '城镇民兵',
   'entities.npcs.sergeant_marsh.greeting':

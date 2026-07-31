@@ -10806,10 +10806,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.ferryman_ewald.title': 'Переправа на Дальний Берег',
   'entities.npcs.ferryman_ewald.greeting':
     'На Дальний Берег, значит? Ради рыбалки туда давно уже никто не ездит, друг. Поднимайся на борт, когда будешь готов, и прислушайся к колоколу после высадки: жители города слушают его так же, как ты следишь за погодой.',
-  'entities.npcs.ferrykeeper_odda.name': 'Смотрительница парома Одда',
-  'entities.npcs.ferrykeeper_odda.title': 'Переправа на Дальний Берег',
-  'entities.npcs.ferrykeeper_odda.greeting':
-    'На материк? Корабль отправится, когда ты будешь на борту, не раньше. И если колокол начнёт отсчёт, пока мы отдаём швартовы, не проси меня повернуть назад: никто не гребёт навстречу третьему удару.',
+  'entities.npcs.ferryman_ewald_gullhaven.name': 'Паромщик Эвальд',
+  'entities.npcs.ferryman_ewald_gullhaven.title': 'Переправа на Дальний Берег',
+  'entities.npcs.ferryman_ewald_gullhaven.greeting':
+    'На Дальний Берег, значит? Ради рыбалки туда давно уже никто не ездит, друг. Поднимайся на борт, когда будешь готов, и прислушайся к колоколу после высадки: жители города слушают его так же, как ты следишь за погодой.',
   'entities.npcs.sergeant_marsh.name': 'Сержант Марш',
   'entities.npcs.sergeant_marsh.title': 'Городское ополчение',
   'entities.npcs.sergeant_marsh.greeting':

@@ -10150,10 +10150,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.ferryman_ewald.title': '遠岸航線',
   'entities.npcs.ferryman_ewald.greeting':
     '要去遠岸，是嗎？如今已經沒人為了捕魚渡海了，朋友。準備好就上船；抵岸後留心鐘聲，鎮上的人聽鐘，就像你聽風辨天氣一樣。',
-  'entities.npcs.ferrykeeper_odda.name': '渡船守 歐妲',
-  'entities.npcs.ferrykeeper_odda.title': '遠岸航線',
-  'entities.npcs.ferrykeeper_odda.greeting':
-    '要回大陸？你上船，我們才啟航，絕不會提前。如果解纜時鐘聲開始計數，別求我掉頭：沒人會朝三響鐘划去。',
+  'entities.npcs.ferryman_ewald_gullhaven.name': '渡船夫 艾瓦德',
+  'entities.npcs.ferryman_ewald_gullhaven.title': '遠岸航線',
+  'entities.npcs.ferryman_ewald_gullhaven.greeting':
+    '要去遠岸，是嗎？如今已經沒人為了捕魚渡海了，朋友。準備好就上船；抵岸後留心鐘聲，鎮上的人聽鐘，就像你聽風辨天氣一樣。',
   'entities.npcs.sergeant_marsh.name': '馬許中士',
   'entities.npcs.sergeant_marsh.title': '城鎮民兵',
   'entities.npcs.sergeant_marsh.greeting':
