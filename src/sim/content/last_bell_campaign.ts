@@ -208,31 +208,31 @@ registerChoice({
 // Scenes
 // ---------------------------------------------------------------------------
 
-const PIER_SHOT_SECONDS = 5;
 const LAST_BELL_HARBOR_LINE_SECONDS = 4.75;
 const LAST_BELL_PLINTH_LINE_SECONDS = 7.5;
 const LAST_BELL_TOLL_LINE_SECONDS = 6.5;
+const LANDING_SHOT_SECONDS = 6;
 
 const VOYAGE_CORE_BEATS = {
   castOff: 0.2,
   castOffCut: MIN_PERCEPTUAL_FADE_SECONDS + DT,
   openWater: 4.2,
   seaArrival: 8.5,
-  pier: 15.5,
+  park: 15.5,
 } as const;
 
 const RERIDE_BEATS = {
   ...VOYAGE_CORE_BEATS,
-  release: 20.5,
-  end: 21.5,
+  release: 21.5,
+  end: 21.95,
 } as const;
 
 const Q0_VOYAGE_BEATS = {
   ...VOYAGE_CORE_BEATS,
-  statue: 21,
-  toll: 28.8,
-  release: 35.7,
-  end: 36.7,
+  statue: 15.5,
+  toll: 23.4,
+  release: 30.3,
+  end: 31.3,
 } as const;
 
 const Q0_DOORWAY_BEATS = {
@@ -257,12 +257,11 @@ interface VoyageDirection {
     readonly arrival: LastBellPropPathSegmentId;
   };
   readonly sternOffset: { x: number; y: number; z: number };
-  readonly sideOffset: { x: number; y: number; z: number };
   readonly bowOffset: { x: number; y: number; z: number };
   readonly arrivalLookAt: { x: number; y: number; z: number };
   readonly walkTo: { x: number; z: number };
   readonly walkSpeed: number;
-  readonly pierShot: SceneDollyShotDef;
+  readonly landingShot: SceneDollyShotDef;
 }
 
 const OUTBOUND: VoyageDirection = {
@@ -272,23 +271,28 @@ const OUTBOUND: VoyageDirection = {
   arrivalTarget: 'harbor_ship_gullhaven',
   segmentIds: LAST_BELL_VOYAGE_SEGMENT_IDS.out,
   sternOffset: { x: -20, y: 16, z: 22 },
-  sideOffset: { x: 6.6, y: 18, z: -28 },
   bowOffset: { x: 6.6, y: 20, z: -20 },
   arrivalLookAt: { x: 24, y: 8.6, z: 0 },
   walkTo: { x: GULLHAVEN_HARBOR.gangplank.x, z: GULLHAVEN_HARBOR.gangplank.z },
   walkSpeed: 2.75,
-  pierShot: {
+  landingShot: {
     kind: 'dolly',
     points: [
-      { x: 723.5, z: 98.5, height: 16.448243 },
-      { x: 723.5, z: 102.5, height: 16.441451 },
+      { x: 693, z: 113.9, height: 23.659148 },
+      { x: 693, z: 96.5, height: 24.096469 },
+      { x: 701, z: 86.5, height: 25.597703 },
+      { x: 719, z: 86.5, height: 25.045709 },
+      { x: 725, z: 93.5, height: 22.685134 },
       { x: 723.5, z: 105.109175, height: 15.369799 },
     ],
     lookAt: {
       kind: 'spline',
       points: [
-        { x: GULLHAVEN_HARBOR.deckArrival.x, z: GULLHAVEN_HARBOR.deckArrival.z, height: 2 },
-        { x: 718, z: 115.5, height: 2 },
+        { x: 713, z: 96.5, height: 13.597597 },
+        { x: 715, z: 100.5, height: 1 },
+        { x: 717, z: 104.5, height: 1.12 },
+        { x: 719, z: 108.5, height: 1.24 },
+        { x: 721.5, z: 112.5, height: 14.660648 },
         {
           x: GULLHAVEN_HARBOR.gangplank.x,
           z: GULLHAVEN_HARBOR.gangplank.z,
@@ -296,7 +300,7 @@ const OUTBOUND: VoyageDirection = {
         },
       ],
     },
-    dur: PIER_SHOT_SECONDS,
+    dur: LANDING_SHOT_SECONDS,
   },
 };
 
@@ -307,23 +311,28 @@ const RETURN: VoyageDirection = {
   arrivalTarget: 'harbor_ship_mainland',
   segmentIds: LAST_BELL_VOYAGE_SEGMENT_IDS.back,
   sternOffset: { x: -20, y: 16, z: -22 },
-  sideOffset: { x: 6.6, y: 18, z: 28 },
   bowOffset: { x: 6.6, y: 20, z: 20 },
   arrivalLookAt: { x: 24, y: 8.6, z: 0 },
   walkTo: { x: MAINLAND_HARBOR.gangplank.x, z: MAINLAND_HARBOR.gangplank.z },
   walkSpeed: 2.75,
-  pierShot: {
+  landingShot: {
     kind: 'dolly',
     points: [
-      { x: 230.4, z: -66, height: 16.448243 },
-      { x: 230.4, z: -62, height: 16.441451 },
+      { x: 260.5, z: -50.6, height: 23.67159 },
+      { x: 260.5, z: -68, height: 24.393817 },
+      { x: 252.5, z: -78, height: 25.647641 },
+      { x: 234.5, z: -78, height: 25.962952 },
+      { x: 228.5, z: -71, height: 18.562805 },
       { x: 230.4, z: -59.390825, height: 15.369799 },
     ],
     lookAt: {
       kind: 'spline',
       points: [
-        { x: 240.5, z: -50.6, height: 2 },
-        { x: 235, z: -49, height: 2 },
+        { x: 240.5, z: -68, height: 12.804822 },
+        { x: 238.5, z: -64, height: 0.92 },
+        { x: 236.5, z: -60, height: 0.96 },
+        { x: 234.5, z: -56, height: 1 },
+        { x: 232.5, z: -52, height: 12.471553 },
         {
           x: MAINLAND_HARBOR.gangplank.x,
           z: MAINLAND_HARBOR.gangplank.z,
@@ -331,7 +340,7 @@ const RETURN: VoyageDirection = {
         },
       ],
     },
-    dur: PIER_SHOT_SECONDS,
+    dur: LANDING_SHOT_SECONDS,
   },
 };
 
@@ -353,15 +362,14 @@ function attachShot(
   };
 }
 
-function arrivalPierTimeline(
+function arrivalTimeline(
   direction: VoyageDirection,
   includeHarborLine: boolean,
 ): SceneTimelineEntry<VoyageCoreBeat>[] {
   const timeline: SceneTimelineEntry<VoyageCoreBeat>[] = [
-    { at: 'pier', kind: 'prop', target: direction.arrivalTarget, cue: LB_PROP_CUE_PARK },
-    coveredCut('pier', direction.pierShot),
+    { at: 'park', kind: 'prop', target: direction.arrivalTarget, cue: LB_PROP_CUE_PARK },
     {
-      at: beat('pier', 0.4),
+      at: 'park',
       kind: 'playerWalk',
       to: direction.walkTo,
       speed: direction.walkSpeed,
@@ -369,12 +377,14 @@ function arrivalPierTimeline(
   ];
   if (includeHarborLine) {
     timeline.push({
-      at: beat('pier', 0.5),
+      at: beat('seaArrival', 1.7),
       kind: 'line',
       speaker: '',
       key: 'lb.q0.scene.harbor',
       dur: LAST_BELL_HARBOR_LINE_SECONDS,
     });
+  } else {
+    timeline.push(coveredCut('park', direction.landingShot));
   }
   return timeline;
 }
@@ -387,12 +397,6 @@ function voyageTimeline(
     { at: 0, kind: 'letterbox', on: true },
     { at: 0, kind: 'inputLock', on: true },
     { at: 0, kind: 'music', directive: 'lb_harbor_ambience' },
-    {
-      at: 0,
-      kind: 'fade',
-      to: 'black',
-      dur: MIN_PERCEPTUAL_FADE_SECONDS,
-    },
     {
       at: 'castOff',
       kind: 'prop',
@@ -413,7 +417,7 @@ function voyageTimeline(
     },
     coveredCut(
       'openWater',
-      attachShot(direction.departureTarget, direction.departureHarbor, direction.sideOffset),
+      attachShot(direction.departureTarget, direction.departureHarbor, direction.sternOffset),
     ),
     {
       at: 'seaArrival',
@@ -430,7 +434,7 @@ function voyageTimeline(
         direction.arrivalLookAt,
       ),
     ),
-    ...arrivalPierTimeline(direction, includeHarborLine),
+    ...arrivalTimeline(direction, includeHarborLine),
   ];
 }
 
