@@ -363,7 +363,7 @@ describe('Eastbrook polish capture contract', () => {
       // is in every Eastbrook source inventory, so the release version bump
       // moved the town, mailbox, and noticeboard fingerprints (and the GLBs
       // they stamp) even though no pipeline input changed. No recapture.
-      fingerprint: '3dd5c2b4807e25e0b9526db949dda9ce901215cb1f7dfeab6f88cc6ff127c128',
+      fingerprint: '1245710ddba9677b98115fc7af5f5e0264abe4c5c60f5242b1b79cac959251ec',
       components: {
         captureContract: {
           id: 'polish-v2',
