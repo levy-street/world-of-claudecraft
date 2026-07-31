@@ -21,6 +21,7 @@ import {
   structuralSnapshot,
   weaponVfxModelKeys,
 } from '../scripts/assets/lib/glb_texture_compression_core.mjs';
+import { patchBasisTranscoderSource } from '../scripts/patch_basis_transcoder.mjs';
 import { WEAPON_VFX } from '../src/render/weapon_vfx';
 
 const ROOT = path.resolve(__dirname, '..');
@@ -84,26 +85,40 @@ describe('GLB texture KTX2 compression', () => {
   });
 
   it('ships the basis transcoder and wires KTX2Loader into the runtime loader', () => {
+    const vendoredDir = path.join(
+      ROOT,
+      'node_modules',
+      'three',
+      'examples',
+      'jsm',
+      'libs',
+      'basis',
+    );
     for (const f of ['basis_transcoder.js', 'basis_transcoder.wasm']) {
-      const shipped = path.join(ROOT, 'public', 'basis', f);
-      expect(fs.existsSync(shipped), `public/basis/${f}`).toBe(true);
-      // The copies must match the installed three's transcoder byte for byte:
-      // KTX2Loader and its worker expect this exact ABI, and a three bump that
-      // changes it would otherwise fail every GLB parse with no red test.
-      const vendored = path.join(
-        ROOT,
-        'node_modules',
-        'three',
-        'examples',
-        'jsm',
-        'libs',
-        'basis',
-        f,
-      );
-      expect(fs.readFileSync(shipped).equals(fs.readFileSync(vendored)), `${f} matches three`).toBe(
-        true,
-      );
+      expect(fs.existsSync(path.join(ROOT, 'public', 'basis', f)), `public/basis/${f}`).toBe(true);
     }
+    // The wasm must match the installed three's transcoder byte for byte:
+    // KTX2Loader and its worker expect this exact ABI, and a three bump that
+    // changes it would otherwise fail every GLB parse with no red test.
+    expect(
+      fs
+        .readFileSync(path.join(ROOT, 'public', 'basis', 'basis_transcoder.wasm'))
+        .equals(fs.readFileSync(path.join(vendoredDir, 'basis_transcoder.wasm'))),
+      'basis_transcoder.wasm matches three',
+    ).toBe(true);
+    // The JS glue ships with the eval-free embind patch applied (the Electron
+    // shell CSP has no 'unsafe-eval'; see scripts/patch_basis_transcoder.mjs
+    // and tests/basis_transcoder_csp.test.ts). Pin shipped === patch(vendored)
+    // so a three bump still turns red until the patcher is re-run, keeping the
+    // ABI-drift protection the plain byte pin used to give.
+    expect(
+      fs.readFileSync(path.join(ROOT, 'public', 'basis', 'basis_transcoder.js'), 'utf8'),
+      'basis_transcoder.js is patch(vendored)',
+    ).toBe(
+      patchBasisTranscoderSource(
+        fs.readFileSync(path.join(vendoredDir, 'basis_transcoder.js'), 'utf8'),
+      ),
+    );
     const loaderSrc = fs.readFileSync(
       path.join(ROOT, 'src', 'render', 'assets', 'loader.ts'),
       'utf8',
