@@ -114,13 +114,20 @@ export const LANTERN_FLAME = {
  * as the same flame at different sizes.
  */
 export const TORCH_FLAME = {
-  perLantern: 11,
-  rise: 0.38,
-  radius: 0.14,
-  size: 84,
+  perLantern: 14,
+  rise: 0.42,
+  radius: 0.17,
+  /**
+   * Pixels at 1yd, and much larger than the lamp's 62. Sized from the shot, not
+   * from taste: at the lamp's size a wall torch ten yards off came back as two
+   * warm pixels in the cage, which is not a lit torch, it is a smudge. These
+   * motes are additive over stone that daylight already renders bright, so the
+   * flame has to be big enough to win against its own background.
+   */
+  size: 205,
   cycleSec: 1.6,
   colorCore: 0xfff3c4,
-  colorEdge: 0xff8a1e,
+  colorEdge: 0xff7a12,
 } as const;
 
 /** Seeds per mote packed into the `aSeed` vec4. */
