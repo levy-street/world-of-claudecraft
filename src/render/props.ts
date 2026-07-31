@@ -548,7 +548,13 @@ function convertMaterial(
   // hasVertexColors must key the cache: kits share material names between
   // COLOR_0 meshes (trim 'Vertex' props) and colorless ones — a shared
   // vertexColors:true material would render the colorless meshes black
-  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}`;
+  // The alpha cutout and sidedness the asset authored (glTF alphaMode MASK +
+  // alphaCutoff + doubleSided, already resolved by GLTFLoader) must survive the
+  // rebuild, and must key the cache: almost every prop is solid geometry, but a
+  // cutout one (the placeable oak's leaf cards) renders as opaque quads without
+  // them, and would otherwise share a cached material with an opaque namesake.
+  const alphaTest = s.alphaTest ?? 0;
+  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}|a${alphaTest}|d${s.side}`;
   const cached = matConvCache.get(key);
   if (cached) return cached;
   const color =
@@ -568,6 +574,8 @@ function convertMaterial(
     mat = new THREE.MeshStandardMaterial({
       color,
       map,
+      alphaTest,
+      side: s.side,
       vertexColors: hasVertexColors,
       flatShading: hollow,
       normalMap: s.normalMap ?? null,
@@ -584,6 +592,8 @@ function convertMaterial(
     mat = new THREE.MeshLambertMaterial({
       color,
       map,
+      alphaTest,
+      side: s.side,
       vertexColors: hasVertexColors,
       flatShading: hollow,
       emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
@@ -2636,3 +2646,5 @@ function normalizedStaticGeometry(source: THREE.BufferGeometry): THREE.BufferGeo
 }
 
 export const propStaticMergeInternalsForTest = { mergeStaticMeshes };
+
+export const propMaterialInternalsForTest = { convertMaterial };
