@@ -127,6 +127,9 @@ legality), `cooldown_persist.ts` (cooldown save/load), `unstuck_cooldown.ts` (th
 recovery timer across competitive resets), `tab_target.ts`/`assist.ts`/
 `dead_target.ts` (target cycling, /assist, dead-target selectability), `flee_speed.ts`,
 `mob/scan_counters.ts` (the per-tick mob scan-visit tally the server reads post-tick),
+`mob/mechanic_spacing.ts` (the rift boss shared mechanic spacing lock and its
+oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
+`runMobAttackMechanics` drivers),
 `lockpick.ts` (the minigame core behind `delves/lockpick_controller.ts`), `map_doc.ts`
 (the custom-map document/validator), `geometry2d.ts`, `market_query.ts`,
 `market_listing_ids.ts` (the World Market's id allocator: the reserved house band plus

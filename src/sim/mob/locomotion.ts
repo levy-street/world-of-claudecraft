@@ -73,6 +73,7 @@ import {
 import { updateMobCombatProfile } from './combat_profile';
 import {
   claimMechanicSpacing,
+  mechanicSlotHeld,
   mechanicSpacingBlocked,
   resetMechanicSpacing,
   tickMechanicSpacing,
@@ -595,8 +596,10 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   // S=4, rift/ranks.ts). Inert for every non-rift mob.
   // Rift bosses additionally share ONE spacing lock across the player-facing
   // drivers below (mechanic_spacing.ts, armed only when rift/runs.ts stamped
-  // riftMechanicSpacing): a due mechanic holds while the lock runs and fires
-  // the tick it clears, so two mechanics never land on top of each other.
+  // riftMechanicSpacing): a due mechanic holds at due while the lock runs (its
+  // timer drifts negative, aging it) and the oldest-due mechanic fires as the
+  // lock clears, so two mechanics never land on top of each other and no
+  // driver is starved by the fixed driver order on a saturated kit.
   tickMechanicSpacing(mob);
   // Grave Inferno cadence: melee-gated like every other boss mechanic. At
   // zero the channel arms and updateInfernoChannel owns subsequent ticks.
@@ -641,9 +644,9 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   const pulse = MOBS[mob.templateId]?.aoePulse;
   if (pulse && !riftMechanicSuppressed(mob, 'aoePulse')) {
     mob.pulseTimer -= DT;
-    if (mob.pulseTimer <= 0 && mechanicSpacingBlocked(mob)) {
-      mob.pulseTimer = 0; // hold at due: fire the tick the shared lock clears
-    } else if (mob.pulseTimer <= 0) {
+    // Held (lock running, or an older-due sibling first): no reset, the timer
+    // keeps drifting negative until this driver's turn at the shared slot.
+    if (mob.pulseTimer <= 0 && !mechanicSlotHeld(mob, 'aoePulse')) {
       mob.pulseTimer = pulse.every;
       claimMechanicSpacing(mob);
       const school = pulse.school ?? 'shadow';
@@ -676,9 +679,8 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   const stomp = MOBS[mob.templateId]?.stomp;
   if (stomp && !riftMechanicSuppressed(mob, 'stomp')) {
     mob.stompTimer -= DT;
-    if (mob.stompTimer <= 0 && mechanicSpacingBlocked(mob)) {
-      mob.stompTimer = 0; // hold at due: fire the tick the shared lock clears
-    } else if (mob.stompTimer <= 0) {
+    // Held: no reset, the timer ages negative until this driver's slot turn.
+    if (mob.stompTimer <= 0 && !mechanicSlotHeld(mob, 'stomp')) {
       mob.stompTimer = stomp.every;
       claimMechanicSpacing(mob);
       const school = stomp.school ?? 'physical';
@@ -749,11 +751,15 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       }
     } else {
       mob.bigCastTimer -= DT;
-      // The shared spacing lock holds a due cast the same way a live cast bar
-      // does: the timer keeps drifting negative and the cast starts the tick
-      // both clear. Starting arms the lock for the cast time plus one spacing
-      // window, so no instant lands mid-telegraph or right on the detonation.
-      if (mob.bigCastTimer <= 0 && mob.castingAbility === null && !mechanicSpacingBlocked(mob)) {
+      // The shared spacing slot holds a due cast the same way a live cast bar
+      // does: the timer keeps drifting negative and the cast starts on this
+      // driver's slot turn. Starting arms the lock for the cast time plus one
+      // spacing window, so no instant lands mid-telegraph or on the detonation.
+      if (
+        mob.bigCastTimer <= 0 &&
+        mob.castingAbility === null &&
+        !mechanicSlotHeld(mob, 'bigCast')
+      ) {
         mob.bigCastTimer = bigCast.every + bigCast.castTime;
         claimMechanicSpacing(mob, bigCast.castTime);
         mob.castingAbility = bigCast.castId;
@@ -800,13 +806,10 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
     } else {
       mob[timerKey] -= DT;
       if (mob[timerKey] <= 0) {
-        // Shared spacing lock: hold at due, BEFORE the cycle reset below (the
-        // cast-exclusivity bail deliberately burns its cycle; a lock-blocked
-        // zone instead casts the tick the lock clears).
-        if (mechanicSpacingBlocked(mob)) {
-          mob[timerKey] = 0;
-          return;
-        }
+        // Shared spacing slot: hold at due BEFORE the cycle reset below (the
+        // cast-exclusivity bail deliberately burns its cycle; a held zone does
+        // not, its timer ages negative until its slot turn).
+        if (mechanicSlotHeld(mob, tmplKey)) return;
         mob[timerKey] = def.every + def.castTime;
         // Skip if already casting (cast exclusivity: two death zones must not stack).
         if (mob.castingAbility !== null) return;
@@ -906,9 +909,8 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   const terrify = MOBS[mob.templateId]?.terrify;
   if (terrify && !riftMechanicSuppressed(mob, 'terrify')) {
     mob.terrifyTimer -= DT;
-    if (mob.terrifyTimer <= 0 && mechanicSpacingBlocked(mob)) {
-      mob.terrifyTimer = 0; // hold at due: fire the tick the shared lock clears
-    } else if (mob.terrifyTimer <= 0) {
+    // Held: no reset, the timer ages negative until this driver's slot turn.
+    if (mob.terrifyTimer <= 0 && !mechanicSlotHeld(mob, 'terrify')) {
       mob.terrifyTimer = terrify.every;
       claimMechanicSpacing(mob);
       const school = terrify.school ?? 'shadow';
@@ -931,7 +933,11 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         const heading = ctx.rng.range(-Math.PI, Math.PI);
         // The boss's current target is exempt: fearing the one player holding
         // the boss sends it careening through the group, and stacked onto any
-        // other mechanic that is unplayable. The tank holds their ground.
+        // other mechanic that is unplayable. The tank holds their ground. This
+        // covers EVERY terrify carrier (rift and dungeon alike), and it means
+        // a solo player, as their own tank, is never feared by this driver.
+        // When a pet or escort NPC holds aggro no player is exempt (the boss
+        // stays anchored to the pet, so the tank-fear chaos cannot happen).
         if (pe.id === mob.aggroTargetId) continue;
         ctx.applyAura(pe, {
           id: 'fear_incap',
