@@ -197,7 +197,6 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
       { copper: 100, chance: 1 },
       { itemId: 'linen_scrap', chance: 0.3 },
     ],
-    loot: [{ copper: 100, chance: 1 }],
     scale: 1.0,
     color: 0xb8c4d0, // burnished plate
   },
@@ -241,7 +240,6 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
       { copper: 100, chance: 1 },
       { itemId: 'tangled_weed', chance: 1 },
     ],
-    loot: [{ copper: 100, chance: 1 }],
     scale: 1.45,
     color: 0x2e6a34,
   },

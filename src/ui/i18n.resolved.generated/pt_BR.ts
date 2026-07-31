@@ -340,11 +340,14 @@ export const pt_BR: EnTranslations = {
       "menuButton": "Desbloqueio",
       "help": "Recuperação: /unstuck inicia uma contagem regressiva parado para movê-lo até um local seguro alcançável nas proximidades.",
       "helpAtGraveyard": "Recuperação: /unstuck inicia uma contagem regressiva parado, depois envia seu espírito ao cemitério mais próximo. Retornar pelo Guardião Pálido exige o Tributo do Guardião.",
+      "helpUnstuckSickness": "Recuperação: /unstuck inicia uma contagem regressiva parado, depois leva você ao cemitério mais próximo, reanimando você se havia caído. O Mal do Desbloqueio permanece por até 5 minutos.",
       "started": "Desbloqueio em {seconds} segundos. Mover-se, lutar, sofrer dano ou iniciar outra ação o cancela.",
       "countdown": "Desbloqueio: {seconds}",
       "completed": "Movido para o local seguro alcançável mais próximo.",
       "completedAtGraveyard": "Seu espírito retornou ao cemitério mais próximo. Fale com o Guardião Pálido para aceitar o Tributo do Guardião.",
       "revivedAtGraveyard": "Você foi levado de volta ao cemitério mais próximo e reanimado. O Tributo do Guardião pesa sobre você.",
+      "movedToGraveyard": "Você foi levado ao cemitério mais próximo. O Mal do Desbloqueio pesa sobre você.",
+      "revivedAtGraveyardUnstuck": "Você foi levado ao cemitério mais próximo e reanimado. O Mal do Desbloqueio pesa sobre você.",
       "cancelledMoved": "Desbloqueio cancelado porque você se moveu.",
       "cancelledDamaged": "Desbloqueio cancelado porque você sofreu dano.",
       "cancelledCombat": "Desbloqueio cancelado porque você entrou em combate.",
@@ -884,6 +887,13 @@ export const pt_BR: EnTranslations = {
       "lockedToast": "Você está bloqueado em {raid}. Desbloqueia em {time}.",
       "heroicName": "{name} Heroico",
       "heroicLocked": "Você está vinculado a {name} Heroico."
+    },
+    "riftTracker": {
+      "title": "Fenda",
+      "floor": "Andar {current} de {total}",
+      "closesIn": "Fecha em {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "compass": {
       "N": "N",
@@ -2117,7 +2127,7 @@ export const pt_BR: EnTranslations = {
         "noRecipient": "Ninguém com esse nome possui caixa de correio aqui.",
         "tooManyParcels": "Uma carta carrega no máximo {count} encomendas.",
         "noMailQuestItems": "Você não pode enviar itens de missão pelo correio.",
-        "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailBound": "Esse item está vinculado e não pode ser enviado pelo correio.",
         "notEnoughItems": "Você não tem tantos assim para enviar.",
         "cantAffordPostage": "Você não pode pagar a postagem.",
         "recipientBoxFull": "A caixa de correio do destinatário está cheia.",
@@ -2926,6 +2936,9 @@ export const pt_BR: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Essa autorização de carteira expirou ou não pôde ser verificada. Tente novamente."
+    },
+    "ota_updates": {
+      "invalid_input": "Entrada inválida."
     }
   },
   "guide": {
@@ -3525,14 +3538,6 @@ export const pt_BR: EnTranslations = {
       "reptile": {
         "name": "Répteis",
         "desc": "Caçadores de sangue frio com seu próprio silvo e bote, distintos das criaturas de sangue quente."
-      },
-      "murloc": {
-        "name": "Coaxa-barbatanas",
-        "desc": "Gente-peixe coaxante de margens de lagos e poças de maré, rápida em enxamear qualquer um que se aproxime demais."
-      },
-      "kobold": {
-        "name": "Traquinas",
-        "desc": "Batedores ágeis e duendes de clareiras e cercas vivas, mais incômodos que perigosos até se juntarem em grande número."
       },
       "demon": {
         "name": "Demônios",
@@ -6474,12 +6479,12 @@ export const pt_BR: EnTranslations = {
       "arenaQueueTrading": "Termine sua troca antes de entrar na fila.",
       "arenaQueueInstance": "Você não pode entrar na fila dentro de uma instância.",
       "tradeInProgress": "Já há uma troca em andamento.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Esse jogador já está em uma troca.",
       "tradeTooFar": "O alvo está longe demais para trocar.",
       "tradeExpired": "A solicitação de troca expirou.",
       "tradeFailed": "Troca falhou: itens ou dinheiro não estão mais disponíveis.",
       "tradeBound": "Esse item está vinculado e não pode ser negociado.",
-      "marketListBound": "That item is bound and cannot be listed."
+      "marketListBound": "Esse item está vinculado e não pode ser colocado à venda."
     },
     "logs": {
       "standUp": "Você se levanta.",
@@ -6835,7 +6840,8 @@ export const pt_BR: EnTranslations = {
       "incomplete": "Essa missão não está concluída.",
       "giverMissing": "Quem oferece essa missão não está por perto.",
       "turnInMissing": "A entrega dessa missão não está por perto.",
-      "tooFar": "Você está longe demais."
+      "tooFar": "Você está longe demais.",
+      "escortAway": "Sua escolta não está em seu posto agora. Ela voltará para lá em breve."
     }
   },
   "itemUi": {
@@ -12838,7 +12844,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Levando Wren para Casa",
-        "text": "Minha aprendiz Wren saiu para percorrer a linha do Goldmelt há dois dias e nunca voltou. Encontrei suas pegadas, ela está escondida sob os marcos da estrada a sudoeste da Escadaria da Aurora, com medo demais dos lobos para se mover. Não posso deixar o pântano, {playerName}. Leve-a até o acampamento de Veyla na Escadaria. Ela estará segura sob as luzes.",
+        "text": "Minha aprendiz Wren saiu para percorrer a linha do Goldmelt há dois dias e nunca voltou. Encontrei suas pegadas, ela está escondida sob os marcos da estrada a nordeste da Escadaria da Aurora, com medo demais dos lobos para se mover. Não posso deixar o pântano, {playerName}. Leve-a até o acampamento de Veyla na Escadaria. Ela estará segura sob as luzes.",
         "completion": "A garota está dentro, envolta em metade dos meus cobertores e conversando com as estrelas no céu. Você fez algo gentil hoje, {playerName}. Os Confins não veem muitos gestos assim.",
         "objectives": {
           "0": {
@@ -13522,7 +13528,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Volta para Casa",
-        "text": "Meu Bram levou o barco na manhã em que a brecha das redes se abriu, e o mar o jogou de volta em algum lugar além da ponta do Desembarque. Eu o ouvi três noites atrás, {playerName}, chamando sobre a água, e fiquei com medo demais para ir. Ainda estou com medo demais. Por favor. O barco dele jaz naufragado na costa norte. Traga-o de volta para casa comigo.",
+        "text": "Meu Bram levou o barco na manhã em que a brecha das redes se abriu, e o mar o jogou de volta em algum lugar além da ponta do Desembarque. Eu o ouvi três noites atrás, {playerName}, chamando sobre a água, e fiquei com medo demais para ir. Ainda estou com medo demais. Por favor. O barco dele jaz naufragado na costa sul. Traga-o de volta para casa comigo.",
         "completion": "Bram! Você o trouxe de volta para mim inteiro, {playerName}. Nós dois choramos e nenhum de nós tem vergonha disso. O que quer que as brechas levem desta ilha a seguir, não vão levar minha família. Nunca mais.",
         "objectives": {
           "0": {

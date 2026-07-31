@@ -210,7 +210,6 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
       { copper: 90, chance: 1 },
       { itemId: 'chipped_tusk', chance: 0.4 },
     ],
-    loot: [{ copper: 90, chance: 1 }],
     scale: 1.15,
     color: 0xb07040,
   },

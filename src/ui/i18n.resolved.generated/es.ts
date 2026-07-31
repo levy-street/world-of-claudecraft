@@ -340,11 +340,14 @@ export const es: EnTranslations = {
       "menuButton": "Desatascar",
       "help": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria para llevarte a un punto seguro accesible cercano.",
       "helpAtGraveyard": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria y luego envía tu espíritu al cementerio más cercano. Volver a través del Guardián Pálido requiere el Tañido del Guardián.",
+      "helpUnstuckSickness": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria y luego te traslada al cementerio más cercano, reviviéndote si habías caído. Te deja con el Mal de desatasco durante un máximo de 5 minutos.",
       "started": "Desatascar en {seconds} segundos. Moverte, luchar, recibir daño o iniciar otra acción lo cancela.",
       "countdown": "Desatascar: {seconds}",
       "completed": "Trasladado al punto seguro accesible más cercano.",
       "completedAtGraveyard": "Tu espíritu ha regresado al cementerio más cercano. Habla con el Guardián Pálido para aceptar el Tañido del Guardián.",
       "revivedAtGraveyard": "Has sido devuelto al cementerio más cercano y revivido. El Tañido del Guardián pesa sobre ti.",
+      "movedToGraveyard": "Has sido trasladado al cementerio más cercano. El Mal de desatasco pesa sobre ti.",
+      "revivedAtGraveyardUnstuck": "Has sido trasladado al cementerio más cercano y revivido. El Mal de desatasco pesa sobre ti.",
       "cancelledMoved": "Desatascar se canceló porque te moviste.",
       "cancelledDamaged": "Desatascar se canceló porque recibiste daño.",
       "cancelledCombat": "Desatascar se canceló porque entraste en combate.",
@@ -884,6 +887,13 @@ export const es: EnTranslations = {
       "lockedToast": "Estás bloqueado en {raid}. Se desbloquea en {time}.",
       "heroicName": "{name} Heroico",
       "heroicLocked": "Estás bloqueado en {name} Heroico."
+    },
+    "riftTracker": {
+      "title": "Brecha",
+      "floor": "Piso {current} de {total}",
+      "closesIn": "Se cierra en {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "compass": {
       "N": "N",
@@ -2117,7 +2127,7 @@ export const es: EnTranslations = {
         "noRecipient": "Nadie con ese nombre tiene buzón aquí.",
         "tooManyParcels": "Una carta lleva como máximo {count} paquetes.",
         "noMailQuestItems": "No puedes enviar objetos de misión por correo.",
-        "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailBound": "Ese objeto está vinculado y no puede enviarse por correo.",
         "notEnoughItems": "No tienes tantos para enviar.",
         "cantAffordPostage": "No puedes costear el franqueo.",
         "recipientBoxFull": "Su buzón está lleno.",
@@ -2926,6 +2936,9 @@ export const es: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "La autorización de la cartera ha caducado o no se ha podido verificar. Inténtalo de nuevo."
+    },
+    "ota_updates": {
+      "invalid_input": "Entrada no válida."
     }
   },
   "guide": {
@@ -3525,14 +3538,6 @@ export const es: EnTranslations = {
       "reptile": {
         "name": "Reptilidos",
         "desc": "Cazadores de sangre fria con su propio silbido y mordisco, bien distintos de las bestias de sangre caliente."
-      },
-      "murloc": {
-        "name": "Aletacroantes",
-        "desc": "Gente-pez croante de orillas de lago y charcas de marea, rápidos para enjambrarse sobre cualquiera que vadee demasiado cerca."
-      },
-      "kobold": {
-        "name": "Bribones",
-        "desc": "Carroñeros correteantes y duendes de claros y setos, más molestia que amenaza hasta que se juntan en número."
       },
       "demon": {
         "name": "Demonios",
@@ -6474,12 +6479,12 @@ export const es: EnTranslations = {
       "arenaQueueTrading": "Termina tu comercio antes de entrar en cola.",
       "arenaQueueInstance": "No puedes entrar en cola desde una instancia.",
       "tradeInProgress": "Ya hay un comercio en curso.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Ese jugador ya está comerciando.",
       "tradeTooFar": "El objetivo está demasiado lejos para comerciar.",
       "tradeExpired": "La solicitud de comercio ha expirado.",
       "tradeFailed": "Comercio fallido: los objetos o el dinero ya no están disponibles.",
       "tradeBound": "Ese objeto está vinculado y no puede comerciarse.",
-      "marketListBound": "That item is bound and cannot be listed."
+      "marketListBound": "Ese objeto está vinculado y no puede ponerse a la venta."
     },
     "logs": {
       "standUp": "Te pones de pie.",
@@ -6835,7 +6840,8 @@ export const es: EnTranslations = {
       "incomplete": "Esa misión no está completada.",
       "giverMissing": "El dador de esa misión no está cerca.",
       "turnInMissing": "La entrega de esa misión no está cerca.",
-      "tooFar": "Está demasiado lejos."
+      "tooFar": "Está demasiado lejos.",
+      "escortAway": "Tu escolta no está en su puesto ahora mismo. Volverá allí en breve."
     }
   },
   "itemUi": {
@@ -12838,7 +12844,7 @@ export const es: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Llevando a Wren a Casa",
-        "text": "Mi aprendiz Wren salió a recorrer la línea del Goldmelt hace dos días y nunca volvió. Encontré sus huellas, está refugiada bajo los mojones al suroeste de los Escalones de la Aurora, demasiado asustada de los lobos para moverse. No puedo dejar la ciénaga, {playerName}. Llévala al campamento de Veyla en los Escalones. Estará a salvo bajo las luces.",
+        "text": "Mi aprendiz Wren salió a recorrer la línea del Goldmelt hace dos días y nunca volvió. Encontré sus huellas, está refugiada bajo los mojones al noreste de los Escalones de la Aurora, demasiado asustada de los lobos para moverse. No puedo dejar la ciénaga, {playerName}. Llévala al campamento de Veyla en los Escalones. Estará a salvo bajo las luces.",
         "completion": "La chica está dentro, envuelta en la mitad de mis mantas y hablándole a las estrellas hasta bajarlas del cielo. Hiciste algo bondadoso hoy, {playerName}. El Reach no ve muchos gestos así.",
         "objectives": {
           "0": {
@@ -13522,7 +13528,7 @@ export const es: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Vuelve a Casa",
-        "text": "Mi Bram sacó el bote la mañana en que se abrió la brecha de las redes, y el mar lo devolvió en algún lugar pasado el Embarcadero. Lo oí hace tres noches, {playerName}, llamando sobre el agua, y tuve demasiado miedo para ir. Todavía tengo demasiado miedo. Por favor. Su bote yace naufragado en la orilla norte. Tráelo caminando de vuelta a mí.",
+        "text": "Mi Bram sacó el bote la mañana en que se abrió la brecha de las redes, y el mar lo devolvió en algún lugar pasado el Embarcadero. Lo oí hace tres noches, {playerName}, llamando sobre el agua, y tuve demasiado miedo para ir. Todavía tengo demasiado miedo. Por favor. Su bote yace naufragado en la orilla sur. Tráelo caminando de vuelta a mí.",
         "completion": "¡Bram! Me lo trajiste de vuelta entero, {playerName}. Los dos lloramos y ninguno se avergüenza de ello. Lo que sea que las brechas le quiten a esta isla la próxima vez, no se llevarán a mi familia. Ya no.",
         "objectives": {
           "0": {

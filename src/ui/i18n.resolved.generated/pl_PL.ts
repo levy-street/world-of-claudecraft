@@ -340,11 +340,14 @@ export const pl_PL: EnTranslations = {
       "menuButton": "Wyzwolenie",
       "help": "Ratunek: /unstuck rozpoczyna nieruchome odliczanie, które przeniesie cię do pobliskiego, osiągalnego bezpiecznego miejsca.",
       "helpAtGraveyard": "Ratunek: /unstuck rozpoczyna nieruchome odliczanie, a następnie wysyła twojego ducha na najbliższy cmentarz. Powrót przez Bladego Strażnika wymaga Opłaty Strażnika.",
+      "helpUnstuckSickness": "Ratunek: /unstuck rozpoczyna nieruchome odliczanie, a następnie przenosi cię na najbliższy cmentarz i wskrzesza, jeśli padłeś. Choroba Wyzwolenia pozostaje na tobie do 5 minut.",
       "started": "Wyzwolenie za {seconds} sekund. Poruszenie się, walka, otrzymanie obrażeń lub rozpoczęcie innej czynności anuluje je.",
       "countdown": "Wyzwolenie: {seconds}",
       "completed": "Przeniesiono do najbliższego osiągalnego bezpiecznego miejsca.",
       "completedAtGraveyard": "Twój duch powrócił na najbliższy cmentarz. Porozmawiaj z Bladym Strażnikiem, aby przyjąć Opłatę Strażnika.",
       "revivedAtGraveyard": "Zostałeś przeniesiony na najbliższy cmentarz i wskrzeszony. Opłata Strażnika ciąży na tobie.",
+      "movedToGraveyard": "Zostałeś przeniesiony na najbliższy cmentarz. Choroba Wyzwolenia ciąży na tobie.",
+      "revivedAtGraveyardUnstuck": "Zostałeś przeniesiony na najbliższy cmentarz i wskrzeszony. Choroba Wyzwolenia ciąży na tobie.",
       "cancelledMoved": "Wyzwolenie anulowane, ponieważ się poruszyłeś.",
       "cancelledDamaged": "Wyzwolenie anulowane, ponieważ otrzymałeś obrażenia.",
       "cancelledCombat": "Wyzwolenie anulowane, ponieważ wszedłeś do walki.",
@@ -884,6 +887,13 @@ export const pl_PL: EnTranslations = {
       "lockedToast": "Jesteś przypisany do rajdu {raid}. Odblokowanie za {time}.",
       "heroicName": "Heroiczny {name}",
       "heroicLocked": "Jesteś przypisany do heroicznego {name}."
+    },
+    "riftTracker": {
+      "title": "Szczelina",
+      "floor": "Piętro {current} z {total}",
+      "closesIn": "Zamyka się za {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "compass": {
       "N": "Pn",
@@ -2117,7 +2127,7 @@ export const pl_PL: EnTranslations = {
         "noRecipient": "Nikt o tym imieniu nie ma tu skrzynki pocztowej.",
         "tooManyParcels": "List mieści najwyżej {count} paczek.",
         "noMailQuestItems": "Nie możesz wysyłać pocztą przedmiotów zadań.",
-        "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailBound": "Ten przedmiot jest przywiązany i nie można go wysłać pocztą.",
         "notEnoughItems": "Nie masz aż tylu do wysłania.",
         "cantAffordPostage": "Nie stać cię na opłatę pocztową.",
         "recipientBoxFull": "Skrzynka odbiorcy jest pełna.",
@@ -2926,6 +2936,9 @@ export const pl_PL: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie."
+    },
+    "ota_updates": {
+      "invalid_input": "Nieprawidłowe dane."
     }
   },
   "guide": {
@@ -3525,14 +3538,6 @@ export const pl_PL: EnTranslations = {
       "reptile": {
         "name": "Gady",
         "desc": "Zimnokrwiste drapieżniki o własnym syczeniu i kłapaniu, odmienne od ciepłokrwistych bestii."
-      },
-      "murloc": {
-        "name": "Rechotopłetwi",
-        "desc": "Rechoczący rybi lud brzegów jeziora i przypływowych sadzawek, chętnie rojący się wokół każdego, kto podejdzie zbyt blisko wody."
-      },
-      "kobold": {
-        "name": "Urwisy",
-        "desc": "Krzątające się padlinożerne stworki i chochliki polan oraz żywopłotów, bardziej uciążliwe niż groźne, dopóki nie zbiorą się w większej liczbie."
       },
       "demon": {
         "name": "Demony",
@@ -6474,12 +6479,12 @@ export const pl_PL: EnTranslations = {
       "arenaQueueTrading": "Zakończ wymianę przed dołączeniem do kolejki.",
       "arenaQueueInstance": "Nie możesz dołączyć do kolejki będąc wewnątrz instancji.",
       "tradeInProgress": "Wymiana już trwa.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Ten gracz już prowadzi wymianę.",
       "tradeTooFar": "Cel jest zbyt daleko, by handlować.",
       "tradeExpired": "Prośba o wymianę wygasła.",
       "tradeFailed": "Wymiana nieudana: przedmioty lub pieniądze są już niedostępne.",
       "tradeBound": "Ten przedmiot jest przywiązany i nie można go wymienić.",
-      "marketListBound": "That item is bound and cannot be listed."
+      "marketListBound": "Ten przedmiot jest przywiązany i nie można go wystawić na sprzedaż."
     },
     "logs": {
       "standUp": "Wstajesz.",
@@ -6835,7 +6840,8 @@ export const pl_PL: EnTranslations = {
       "incomplete": "To zadanie nie jest ukończone.",
       "giverMissing": "Tego zleceniodawcy nie ma w pobliżu.",
       "turnInMissing": "Miejsca oddania tego zadania nie ma w pobliżu.",
-      "tooFar": "Za daleko."
+      "tooFar": "Za daleko.",
+      "escortAway": "Osoba, którą masz eskortować, nie jest teraz na miejscu. Wróci tam wkrótce."
     }
   },
   "itemUi": {
@@ -12838,7 +12844,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Odprowadzenie Wren do Domu",
-        "text": "Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na południowy zachód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.",
+        "text": "Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na północny wschód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.",
         "completion": "Dziewczyna jest w środku, owinięta w połowę moich koców i gadająca tak, że gwiazdy pospadałyby z nieba. Zrobiłeś dziś coś dobrego, {playerName}. Kraina niewiele takich rzeczy widuje.",
         "objectives": {
           "0": {
@@ -13522,7 +13528,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Wraca do Domu",
-        "text": "Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na północnym brzegu. Odprowadź go do mnie do domu.",
+        "text": "Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na południowym brzegu. Odprowadź go do mnie do domu.",
         "completion": "Bram! Przyprowadziłeś go do mnie całego, {playerName}. Oboje płakaliśmy i żadne z nas się tego nie wstydzi. Cokolwiek wyłomy zabiorą z tej wyspy następnym razem, nie dostaną mojej rodziny. Już nie.",
         "objectives": {
           "0": {
