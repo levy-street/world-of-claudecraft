@@ -75,7 +75,11 @@ import {
 } from './game/interactions';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
-import { newKeyboardTurnState, stepKeyboardTurnFacing } from './game/keyboard_turn_facing';
+import {
+  type KeyboardTurnArgs,
+  newKeyboardTurnState,
+  stepKeyboardTurnFacing,
+} from './game/keyboard_turn_facing';
 import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
 import { shouldUseStaticBackdrop } from './game/landing_backdrop';
 import { createLandingThemeAudio } from './game/landing_theme';
@@ -98,6 +102,7 @@ import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
+import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
   type GameSettings,
   normalizeClickMoveButton,
@@ -3219,6 +3224,15 @@ async function startGame(
   // channel, passed through on the one engage-edge frame so the server still
   // sees a manual turn (breaks /follow, marks anti-AFK activity).
   const kbTurn = newKeyboardTurnState();
+  const kbTurnArgs: KeyboardTurnArgs = {
+    turnLeft: false,
+    turnRight: false,
+    turnAllowed: false,
+    sentFacing: null,
+    serverFacing: 0,
+    echoMs: 0,
+    frameDt: 0,
+  };
   function updateCamera(frameDt: number, interpFacing: number): void {
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
@@ -3380,8 +3394,8 @@ async function startGame(
     return { mi, facing };
   }
 
-  function partyMemberIds(): Set<number> {
-    const ids = new Set<number>();
+  function partyMemberIds(ids: Set<number>): Set<number> {
+    ids.clear();
     for (const m of world.partyInfo?.members ?? []) {
       if (m.pid !== world.playerId) ids.add(m.pid);
     }
@@ -3394,6 +3408,8 @@ async function startGame(
   // hovered mob dying or turning hostile updates without waiting for a re-pick.
   const hoverPickGate = new HoverPickGate();
   let hoverPickedId: number | null = null;
+  const hoverPartyMemberIds = new Set<number>();
+  const hoverPvpOpponentIds = new Set<number>();
 
   function updateHoverCursor(): void {
     if (!input.hoverActive || input.isDragging() || hud.isModalOpen()) {
@@ -3405,8 +3421,10 @@ async function startGame(
       hoverPickedId = renderer.pick(input.hoverX, input.hoverY);
     }
     const entity = hoverPickedId !== null ? world.entities.get(hoverPickedId) : undefined;
-    const pvpOpponents = activePvpOpponentIds(world);
-    input.setHoverCursor(hoverCursorKind(entity, world.playerId, partyMemberIds(), pvpOpponents));
+    const pvpOpponents = activePvpOpponentIds(world, hoverPvpOpponentIds);
+    input.setHoverCursor(
+      hoverCursorKind(entity, world.playerId, partyMemberIds(hoverPartyMemberIds), pvpOpponents),
+    );
     // WoW-style mouseover tooltip (name / level / creature type) for a mob under
     // the cursor, reusing the same (gated) pick this function already does for
     // the hover-cursor kind above; the tooltip content still re-resolves every
@@ -3506,6 +3524,21 @@ async function startGame(
     getApm: () => inputMeter.apm(performance.now()),
   });
 
+  function visualFacingFor(
+    mi: ReturnType<typeof input.readMoveInput>,
+    baseFacing: number,
+  ): number | null {
+    return !movementFrozen() ? diagonalMovementVisualFacing(mi, baseFacing) : null;
+  }
+
+  const perfNetworkStats = {
+    connected: false,
+    snapInterval: 0,
+    lastSnapAge: -1,
+    alpha: 0,
+  };
+  const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
+
   function frame(now: number): void {
     requestAnimationFrame(frame);
     maybeWarmCurrentZone();
@@ -3540,15 +3573,26 @@ async function startGame(
       mobileControls.syncAutorun(false);
     }
     playerWasDead = playerDead;
-    perf.trace('input.updateTouchLook', () => input.updateTouchLook(frameDt), {
-      frameDtMs: frameDt * 1000,
-    });
-    perf.trace('input.gamepad', () => gamepad.poll(frameDt), {
-      frameDtMs: frameDt * 1000,
-    });
-    perf.trace('input.hoverCursor', () => updateHoverCursor(), {
-      active: input.hoverActive,
-    });
+    const frameDtMs = frameDt * 1000;
+    let traceStart = perf.startTrace();
+    try {
+      input.updateTouchLook(frameDt);
+    } finally {
+      perf.finishTrace('input.updateTouchLook', traceStart, 'frameDtMs', frameDtMs);
+    }
+    traceStart = perf.startTrace();
+    try {
+      gamepad.poll(frameDt);
+    } finally {
+      perf.finishTrace('input.gamepad', traceStart, 'frameDtMs', frameDtMs);
+    }
+    const hoverActive = input.hoverActive;
+    traceStart = perf.startTrace();
+    try {
+      updateHoverCursor();
+    } finally {
+      perf.finishTrace('input.hoverCursor', traceStart, 'active', hoverActive);
+    }
     perf.markInputFrame(performance.now());
 
     const mouselook = intro === null && input.isMouselookActive() && !movementFrozen();
@@ -3582,10 +3626,6 @@ async function startGame(
       ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
       : null;
 
-    const visualFacingFor = (
-      mi: ReturnType<typeof input.readMoveInput>,
-      baseFacing: number,
-    ): number | null => (!movementFrozen() ? diagonalMovementVisualFacing(mi, baseFacing) : null);
     if (offlineSim) {
       acc += frameDt;
       // Supply the UTC day for the delve daily reset (the sim never reads the wall
@@ -3602,30 +3642,43 @@ async function startGame(
         if (stepFacing !== null) offlineSim.player.facing = stepFacing;
         offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
         perf.markInputSent(performance.now());
-        const events = perf.time('sim', () =>
-          perf.trace('sim.tick', () => offlineSim.tick(), { mode: 'offline' }),
-        );
-        perf.time('events', () =>
-          perf.trace('hud.handleEvents', () => hud.handleEvents(events), {
-            mode: 'offline',
-            events: events.length,
-          }),
-        );
+        const simStart = perf.startTime();
+        let events: ReturnType<typeof offlineSim.tick>;
+        traceStart = perf.startTrace();
+        try {
+          events = offlineSim.tick();
+        } finally {
+          perf.finishTrace('sim.tick', traceStart, 'mode', 'offline');
+          perf.finishTime('sim', simStart);
+        }
+        const eventsLength = events.length;
+        const eventsStart = perf.startTime();
+        traceStart = perf.startTrace();
+        try {
+          hud.handleEvents(events);
+        } finally {
+          perf.finishTrace(
+            'hud.handleEvents',
+            traceStart,
+            'mode',
+            'offline',
+            'events',
+            eventsLength,
+          );
+          perf.finishTime('events', eventsStart);
+        }
         // A tick consumed the latched release facing (movementFacing fed
         // stepFacing above); drop it so it is not re-applied next frame.
         pendingReleaseFacing = null;
         acc -= DT;
       }
       const pp = offlineSim.player;
-      perf.trace(
-        'camera.follow',
-        () =>
-          updateCamera(frameDt, pp.prevFacing + wrapAngle(pp.facing - pp.prevFacing) * (acc / DT)),
-        {
-          mode: 'offline',
-          frameDtMs: frameDt * 1000,
-        },
-      );
+      traceStart = perf.startTrace();
+      try {
+        updateCamera(frameDt, pp.prevFacing + wrapAngle(pp.facing - pp.prevFacing) * (acc / DT));
+      } finally {
+        perf.finishTrace('camera.follow', traceStart, 'mode', 'offline', 'frameDtMs', frameDtMs);
+      }
       introCameraTick(now);
       renderer.camYaw = input.camYaw;
       renderer.camPitch = input.camPitch;
@@ -3635,21 +3688,41 @@ async function startGame(
       const offlineRenderFacing =
         visualFacingFor(input.readMoveInput(), movementFacing ?? offlineSim.player.facing) ??
         movementFacing;
-      perf.time('renderer', () =>
-        perf.trace(
+      const offlineAlpha = acc / DT;
+      const offlineViews = renderer.views.size;
+      const rendererStart = perf.startTime();
+      traceStart = perf.startTrace();
+      try {
+        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null);
+      } finally {
+        perf.finishTrace(
           'renderer.sync',
-          () => renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null),
-          {
-            mode: 'offline',
-            views: renderer.views.size,
-            alpha: acc / DT,
-          },
-        ),
-      );
-      perf.trace('ui.clickMoveMarker', () => updateClickMoveMarker());
+          traceStart,
+          'mode',
+          'offline',
+          'views',
+          offlineViews,
+          'alpha',
+          offlineAlpha,
+        );
+        perf.finishTime('renderer', rendererStart);
+      }
+      traceStart = perf.startTrace();
+      try {
+        updateClickMoveMarker();
+      } finally {
+        perf.finishTrace('ui.clickMoveMarker', traceStart);
+      }
       perf.markInputVisible(performance.now());
       if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-      perf.time('hud', () => perf.trace('hud.update', () => hud.update(), { mode: 'offline' }));
+      const hudStart = perf.startTime();
+      traceStart = perf.startTrace();
+      try {
+        hud.update();
+      } finally {
+        perf.finishTrace('hud.update', traceStart, 'mode', 'offline');
+        perf.finishTime('hud', hudStart);
+      }
       perf.tick(now);
       entryDiagnostics.renderedFrame(now);
       return;
@@ -3683,15 +3756,14 @@ async function startGame(
     // stutter this feature has chased). The turn flags are zeroed on the wire
     // while the local heading owns the channel, or the server would integrate
     // the turn a second time on top of the streamed facing.
-    const kbFacing = stepKeyboardTurnFacing(kbTurn, {
-      turnLeft: resolved.mi.turnLeft,
-      turnRight: resolved.mi.turnRight,
-      turnAllowed: net.spectating === null && !movementFrozen() && !isStunned(pe),
-      sentFacing: foreignFacing,
-      serverFacing: interpServerFacing,
-      echoMs: onlineInputEchoMs,
-      frameDt,
-    });
+    kbTurnArgs.turnLeft = resolved.mi.turnLeft;
+    kbTurnArgs.turnRight = resolved.mi.turnRight;
+    kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isStunned(pe);
+    kbTurnArgs.sentFacing = foreignFacing;
+    kbTurnArgs.serverFacing = interpServerFacing;
+    kbTurnArgs.echoMs = onlineInputEchoMs;
+    kbTurnArgs.frameDt = frameDt;
+    const kbFacing = stepKeyboardTurnFacing(kbTurn, kbTurnArgs);
     // wireFacing, not kbFacing: only input-derived headings go on the wire.
     // Streaming the seam/glide corrections (which chase the mirror) would
     // close a feedback loop through the server that at high RTT never
@@ -3727,29 +3799,53 @@ async function startGame(
       drainedEvents,
       net.playerId,
     );
-    perf.time('events', () =>
-      perf.trace('hud.handleEvents', () => hud.handleEvents(drainedEvents), {
-        mode: 'online',
-        events: drainedEvents.length,
-      }),
-    );
+    const drainedEventsLength = drainedEvents.length;
+    const eventsStart = perf.startTime();
+    traceStart = perf.startTrace();
+    try {
+      hud.handleEvents(drainedEvents);
+    } finally {
+      perf.finishTrace(
+        'hud.handleEvents',
+        traceStart,
+        'mode',
+        'online',
+        'events',
+        drainedEventsLength,
+      );
+      perf.finishTime('events', eventsStart);
+    }
     if (net.consumeProfanityChanged()) {
-      perf.trace('hud.setProfanityWords', () => hud.setProfanityWords(net.profanityWords), {
-        words: net.profanityWords.length,
-      });
+      const profanityWordsLength = net.profanityWords.length;
+      traceStart = perf.startTrace();
+      try {
+        hud.setProfanityWords(net.profanityWords);
+      } finally {
+        perf.finishTrace('hud.setProfanityWords', traceStart, 'words', profanityWordsLength);
+      }
     }
     if (net.consumeInventoryChanged()) {
-      perf.trace('hud.onInventoryChanged', () => hud.onInventoryChanged());
+      traceStart = perf.startTrace();
+      try {
+        hud.onInventoryChanged();
+      } finally {
+        perf.finishTrace('hud.onInventoryChanged', traceStart);
+      }
     }
     if (net.consumeCosmeticsChanged()) {
-      perf.trace('hud.onCosmeticsChanged', () => hud.onCosmeticsChanged());
+      traceStart = perf.startTrace();
+      try {
+        hud.onCosmeticsChanged();
+      } finally {
+        perf.finishTrace('hud.onCosmeticsChanged', traceStart);
+      }
     }
-    perf.setNetwork({
-      connected: net.connected,
-      snapInterval: Math.round(net.snapInterval),
-      lastSnapAge: net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1,
-      alpha: Math.round(alpha * 100) / 100,
-    });
+    perfNetworkStats.connected = net.connected;
+    perfNetworkStats.snapInterval = Math.round(net.snapInterval);
+    perfNetworkStats.lastSnapAge =
+      net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1;
+    perfNetworkStats.alpha = Math.round(alpha * 100) / 100;
+    perf.setNetwork(perfNetworkStats);
     // Always-on net-pipeline counters (net_pipeline_stats.ts): fold the
     // snapshots-applied-since-last-frame count, then publish the stats source
     // UNGATED (ruling R9), unlike the overlay-gated setNetwork above; the
@@ -3765,9 +3861,8 @@ async function startGame(
     // a delve (the portcullis door clamps are not mirrored client-side).
     const selfMotion: SelfMotionFrame | null = SELF_MOTION_DISABLED
       ? null
-      : {
-          enabled:
-            net.spectating === null &&
+      : selfMotionFrameBuffer.write(
+          net.spectating === null &&
             !movementFrozen() &&
             !playerImmobilized() &&
             !isDelvePos(pe.pos.x) &&
@@ -3780,53 +3875,84 @@ async function startGame(
             // not re-simulate: predicting a fall through it would fight the
             // authoritative pull-up and show the correction as a stutter.
             pe.climbing !== true,
-          moveInput: resolved.mi,
-          displayFacing: netFacing ?? interpServerFacing,
-          echoMs: onlineInputEchoMs,
-          jitterMs: onlineJitterMs,
+          resolved.mi,
+          netFacing ?? interpServerFacing,
+          onlineInputEchoMs,
+          onlineJitterMs,
           alpha,
           frameDt,
-        };
-    perf.trace('camera.follow', () => updateCamera(frameDt, kbFacing ?? interpServerFacing), {
-      mode: 'online',
-      alpha,
-      frameDtMs: frameDt * 1000,
-      lastSnapAge: net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1,
-    });
+        );
+    const cameraLastSnapAge = net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1;
+    traceStart = perf.startTrace();
+    try {
+      updateCamera(frameDt, kbFacing ?? interpServerFacing);
+    } finally {
+      perf.finishTrace(
+        'camera.follow',
+        traceStart,
+        'mode',
+        'online',
+        'alpha',
+        alpha,
+        'frameDtMs',
+        frameDtMs,
+        'lastSnapAge',
+        cameraLastSnapAge,
+      );
+    }
     introCameraTick(now);
     renderer.camYaw = input.camYaw;
     renderer.camPitch = input.camPitch;
     renderer.camDist = input.camDist;
     syncGroundAimReticle();
-    perf.time('renderer', () =>
-      perf.trace(
+    const onlineViews = renderer.views.size;
+    const rendererStart = perf.startTime();
+    traceStart = perf.startTrace();
+    try {
+      renderer.sync(
+        alpha,
+        frameDt,
+        // netFacing (mouselook, keyboard turn, click-move, release latch)
+        // is applied server-side the moment it arrives, so the model may
+        // show it immediately; without it the click-move yaw would lag
+        // the predicted position by a round trip and corners would slide.
+        net.spectating === null ? onlineRenderFacing : null,
+        adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
+        selfMotion,
+        selfAuthoritativeDiscontinuity,
+      );
+    } finally {
+      perf.finishTrace(
         'renderer.sync',
-        () =>
-          renderer.sync(
-            alpha,
-            frameDt,
-            // netFacing (mouselook, keyboard turn, click-move, release latch)
-            // is applied server-side the moment it arrives, so the model may
-            // show it immediately; without it the click-move yaw would lag
-            // the predicted position by a round trip and corners would slide.
-            net.spectating === null ? onlineRenderFacing : null,
-            adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
-            selfMotion,
-            selfAuthoritativeDiscontinuity,
-          ),
-        {
-          mode: 'online',
-          views: renderer.views.size,
-          alpha,
-          frameDtMs: frameDt * 1000,
-        },
-      ),
-    );
-    perf.trace('ui.clickMoveMarker', () => updateClickMoveMarker());
+        traceStart,
+        'mode',
+        'online',
+        'views',
+        onlineViews,
+        'alpha',
+        alpha,
+        'frameDtMs',
+        frameDtMs,
+      );
+      perf.finishTime('renderer', rendererStart);
+    }
+    traceStart = perf.startTrace();
+    try {
+      updateClickMoveMarker();
+    } finally {
+      perf.finishTrace('ui.clickMoveMarker', traceStart);
+    }
     maybeShowImmobileNote(now);
     perf.markInputVisible(performance.now());
     if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-    perf.time('hud', () => perf.trace('hud.update', () => hud.update(), { mode: 'online' }));
+    const hudStart = perf.startTime();
+    traceStart = perf.startTrace();
+    try {
+      hud.update();
+    } finally {
+      perf.finishTrace('hud.update', traceStart, 'mode', 'online');
+      perf.finishTime('hud', hudStart);
+    }
     perf.tick(now);
     entryDiagnostics.renderedFrame(now);
   }

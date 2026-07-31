@@ -130,6 +130,25 @@ describe('perf monitor heap sawtooth sampling', () => {
 });
 
 describe('perf monitor external dev-trace spans', () => {
+  it('does not inspect primitive trace details while tracing is disabled', () => {
+    const disabled = new PerfMonitor(null);
+    let inspected = 0;
+    const detailValue = {
+      toString: () => {
+        inspected++;
+        return 'value';
+      },
+    };
+    disabled.finishTrace('frame.scope', 0, 'value', detailValue);
+    expect(inspected).toBe(0);
+
+    installBrowserGlobals('?perfTrace=1');
+    const enabled = new PerfMonitor(null);
+    enabled.finishTrace('frame.scope', performance.now() - 20, 'mode', 'online', 'events', 3);
+    const span = enabled.snapshot(1000).devTrace?.spans.find((item) => item.name === 'frame.scope');
+    expect(span?.detail).toEqual({ mode: 'online', events: 3 });
+  });
+
   it('records external spans on the external kind when the dev trace is active', () => {
     installBrowserGlobals('?perfTrace=1');
     const perf = new PerfMonitor(null);
