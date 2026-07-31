@@ -6,13 +6,13 @@
   "coverage": [
     "attack arm aoePulse rng.range(pulse.min,pulse.max) + spellfx (mogger Ground Pound)",
     "attack arm War Stomp rng.range(stomp.min,stomp.max) + stomp_stun aura (korgath)",
-    "attack arm Banshee terrify rng.range(-PI,PI) fear facing + fear_incap aura (sister_nhalia)",
+    "attack arm Banshee terrify rng.range(-PI,PI) fear facing + fear_incap aura on the non-tank bystander; the aggro target is exempt (sister_nhalia)",
     "idle arm wander draws (range(0,2PI) heading + range(2,9) radius -> groundPos wanderTarget)",
     "evade arm arrival -> resetEvadingMob (rng.range(2,8), full-heal, clearThreat, telegraph re-arm)",
     "cowardly flee: maybeFlee at FLEE_HP_THRESHOLD -> flee arm (fleeMoveSpeed run-away)"
   ],
-  "draws": 16,
-  "drawDigest": "e889d488",
+  "draws": 18,
+  "drawDigest": "9f203d69",
   "frames": [
     {
       "tick": 0,
@@ -31,12 +31,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 822,
-      "state": "284cfc1a",
-      "events": "d4dc68ec",
+      "nextId": 823,
+      "state": "5b855915",
+      "events": "d1d1093d",
       "rng": {
-        "draws": 4,
-        "digest": "47ee7f72"
+        "draws": 5,
+        "digest": "a0521195"
       },
       "label": "aoe-pulse",
       "players": [
@@ -84,6 +84,63 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 15
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 821,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
             }
           ],
           "mailWelcomed": true,
@@ -161,6 +218,56 @@
           }
         },
         {
+          "aiState": "idle",
+          "attackPower": 10,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 999985,
+          "id": 821,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
           "aggroTargetId": 820,
           "aiState": "attack",
           "comboUntil": -1,
@@ -171,7 +278,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 821,
+          "id": 822,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -210,12 +317,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 823,
-      "state": "f3ae088c",
-      "events": "7661d95a",
+      "nextId": 824,
+      "state": "e18d3b32",
+      "events": "1064b0d7",
       "rng": {
-        "draws": 8,
-        "digest": "1c25486e"
+        "draws": 10,
+        "digest": "181f0e45"
       },
       "label": "war-stomp",
       "players": [
@@ -234,7 +341,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 165
+            "damageTaken": 181
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -272,6 +379,63 @@
             "rows": {}
           },
           "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 42
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 821,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -295,7 +459,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 822
+              "sourceId": 823
             }
           ],
           "blockChance": 0.05,
@@ -306,7 +470,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999892,
+          "hp": 999876,
           "id": 820,
           "inCombat": true,
           "kind": "player",
@@ -325,7 +489,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 16.39,
+          "resource": 17.27,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -349,6 +513,67 @@
           }
         },
         {
+          "aiState": "idle",
+          "attackPower": 10,
+          "auras": [
+            {
+              "duration": 1.5,
+              "id": "stomp_stun",
+              "kind": "stun",
+              "name": "Shuddering Stomp",
+              "remaining": 1.5,
+              "school": "physical",
+              "sourceId": 823
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 999973,
+          "id": 821,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
           "aggroTargetId": 820,
           "aiState": "attack",
           "comboUntil": -1,
@@ -359,7 +584,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 821,
+          "id": 822,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -404,7 +629,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 822,
+          "id": 823,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -442,12 +667,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 824,
-      "state": "5fc367f7",
-      "events": "54f1b012",
+      "nextId": 825,
+      "state": "e676717d",
+      "events": "e8976d41",
       "rng": {
-        "draws": 13,
-        "digest": "df24ecbe"
+        "draws": 15,
+        "digest": "010d678b"
       },
       "label": "terrify",
       "players": [
@@ -466,7 +691,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 357
+            "damageTaken": 200
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -504,6 +729,63 @@
             "rows": {}
           },
           "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 66
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 821,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -527,18 +809,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 822
-            },
-            {
-              "breaksOnDamage": true,
-              "duration": 3,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Keening Wail",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 823,
-              "value": 1.584361
+              "sourceId": 823
             }
           ],
           "blockChance": 0.05,
@@ -549,7 +820,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999808,
+          "hp": 999981,
           "id": 820,
           "inCombat": true,
           "kind": "player",
@@ -568,7 +839,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 33.99,
+          "resource": 19.011667,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -592,6 +863,78 @@
           }
         },
         {
+          "aiState": "idle",
+          "attackPower": 10,
+          "auras": [
+            {
+              "duration": 1.5,
+              "id": "stomp_stun",
+              "kind": "stun",
+              "name": "Shuddering Stomp",
+              "remaining": 1.5,
+              "school": "physical",
+              "sourceId": 823
+            },
+            {
+              "breaksOnDamage": true,
+              "duration": 3,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Keening Wail",
+              "remaining": 3,
+              "school": "shadow",
+              "sourceId": 824,
+              "value": -1.932876
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 999976,
+          "id": 821,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
           "aggroTargetId": 820,
           "aiState": "attack",
           "comboUntil": -1,
@@ -602,7 +945,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 821,
+          "id": 822,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -647,7 +990,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 822,
+          "id": 823,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -691,7 +1034,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 823,
+          "id": 824,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -730,12 +1073,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 825,
-      "state": "ba0c0cee",
+      "nextId": 826,
+      "state": "7202ee09",
       "events": "741638a5",
       "rng": {
-        "draws": 15,
-        "digest": "010d678b"
+        "draws": 17,
+        "digest": "25182436"
       },
       "label": "idle-wander",
       "players": [
@@ -754,7 +1097,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 357
+            "damageTaken": 200
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -792,6 +1135,63 @@
             "rows": {}
           },
           "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 66
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 821,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -815,18 +1215,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 822
-            },
-            {
-              "breaksOnDamage": true,
-              "duration": 3,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Keening Wail",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 823,
-              "value": 1.584361
+              "sourceId": 823
             }
           ],
           "blockChance": 0.05,
@@ -837,7 +1226,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999808,
+          "hp": 999981,
           "id": 820,
           "inCombat": true,
           "kind": "player",
@@ -856,7 +1245,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 33.99,
+          "resource": 19.011667,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -880,6 +1269,78 @@
           }
         },
         {
+          "aiState": "idle",
+          "attackPower": 10,
+          "auras": [
+            {
+              "duration": 1.5,
+              "id": "stomp_stun",
+              "kind": "stun",
+              "name": "Shuddering Stomp",
+              "remaining": 1.5,
+              "school": "physical",
+              "sourceId": 823
+            },
+            {
+              "breaksOnDamage": true,
+              "duration": 3,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Keening Wail",
+              "remaining": 3,
+              "school": "shadow",
+              "sourceId": 824,
+              "value": -1.932876
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 999976,
+          "id": 821,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
           "aggroTargetId": 820,
           "aiState": "attack",
           "comboUntil": -1,
@@ -890,7 +1351,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 821,
+          "id": 822,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -935,7 +1396,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 822,
+          "id": 823,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -979,7 +1440,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 823,
+          "id": 824,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1020,12 +1481,12 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.456126,
+          "facing": -0.572491,
           "fallStartY": 6.781719,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 824,
+          "id": 825,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1035,9 +1496,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.911375,
-            "y": 6.792022,
-            "z": 299.891623
+            "x": 299.924158,
+            "y": 6.745963,
+            "z": 300.117678
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1050,9 +1511,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 297.88148,
-            "y": 6.918564,
-            "z": 297.409308
+            "x": 296.831949,
+            "y": 5.968227,
+            "z": 304.915607
           },
           "wanderTimer": 30,
           "weapon": {
@@ -1066,12 +1527,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 826,
-      "state": "59459ba5",
+      "nextId": 827,
+      "state": "110c66a9",
       "events": "741638a5",
       "rng": {
-        "draws": 16,
-        "digest": "e889d488"
+        "draws": 18,
+        "digest": "9f203d69"
       },
       "label": "evade-reset",
       "players": [
@@ -1090,7 +1551,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 357
+            "damageTaken": 200
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -1128,6 +1589,63 @@
             "rows": {}
           },
           "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 66
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 821,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -1151,18 +1669,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 822
-            },
-            {
-              "breaksOnDamage": true,
-              "duration": 3,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Keening Wail",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 823,
-              "value": 1.584361
+              "sourceId": 823
             }
           ],
           "blockChance": 0.05,
@@ -1173,7 +1680,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999808,
+          "hp": 999981,
           "id": 820,
           "inCombat": true,
           "kind": "player",
@@ -1192,7 +1699,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 33.99,
+          "resource": 19.011667,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1216,6 +1723,78 @@
           }
         },
         {
+          "aiState": "idle",
+          "attackPower": 10,
+          "auras": [
+            {
+              "duration": 1.5,
+              "id": "stomp_stun",
+              "kind": "stun",
+              "name": "Shuddering Stomp",
+              "remaining": 1.5,
+              "school": "physical",
+              "sourceId": 823
+            },
+            {
+              "breaksOnDamage": true,
+              "duration": 3,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Keening Wail",
+              "remaining": 3,
+              "school": "shadow",
+              "sourceId": 824,
+              "value": -1.932876
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 999976,
+          "id": 821,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
           "aggroTargetId": 820,
           "aiState": "attack",
           "comboUntil": -1,
@@ -1226,7 +1805,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 821,
+          "id": 822,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1271,7 +1850,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 822,
+          "id": 823,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -1315,7 +1894,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 823,
+          "id": 824,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1356,12 +1935,12 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.456126,
+          "facing": -0.572491,
           "fallStartY": 6.781719,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 824,
+          "id": 825,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1371,9 +1950,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.911375,
-            "y": 6.792022,
-            "z": 299.891623
+            "x": 299.924158,
+            "y": 6.745963,
+            "z": 300.117678
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1386,9 +1965,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 297.88148,
-            "y": 6.918564,
-            "z": 297.409308
+            "x": 296.831949,
+            "y": 5.968227,
+            "z": 304.915607
           },
           "wanderTimer": 30,
           "weapon": {
@@ -1408,7 +1987,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 825,
+          "id": 826,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1432,7 +2011,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 7.453312,
+          "wanderTimer": 4.3831,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1444,12 +2023,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 827,
-      "state": "faf9b064",
-      "events": "408ca6a7",
+      "nextId": 828,
+      "state": "24adcc0f",
+      "events": "df42e58c",
       "rng": {
-        "draws": 16,
-        "digest": "e889d488"
+        "draws": 18,
+        "digest": "9f203d69"
       },
       "label": "flee-panic",
       "players": [
@@ -1468,7 +2047,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 357
+            "damageTaken": 200
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -1506,6 +2085,63 @@
             "rows": {}
           },
           "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 66
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 821,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -1529,18 +2165,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 822
-            },
-            {
-              "breaksOnDamage": true,
-              "duration": 3,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Keening Wail",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 823,
-              "value": 1.584361
+              "sourceId": 823
             }
           ],
           "blockChance": 0.05,
@@ -1570,7 +2195,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 33.99,
+          "resource": 19.011667,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1594,6 +2219,78 @@
           }
         },
         {
+          "aiState": "idle",
+          "attackPower": 10,
+          "auras": [
+            {
+              "duration": 1.5,
+              "id": "stomp_stun",
+              "kind": "stun",
+              "name": "Shuddering Stomp",
+              "remaining": 1.5,
+              "school": "physical",
+              "sourceId": 823
+            },
+            {
+              "breaksOnDamage": true,
+              "duration": 3,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Keening Wail",
+              "remaining": 3,
+              "school": "shadow",
+              "sourceId": 824,
+              "value": -1.932876
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 1000000,
+          "id": 821,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
           "aggroTargetId": 820,
           "aiState": "attack",
           "comboUntil": -1,
@@ -1604,7 +2301,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 821,
+          "id": 822,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1649,7 +2346,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 822,
+          "id": 823,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -1693,7 +2390,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 823,
+          "id": 824,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1734,12 +2431,12 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.456126,
+          "facing": -0.572491,
           "fallStartY": 6.781719,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 824,
+          "id": 825,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1749,9 +2446,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.911375,
-            "y": 6.792022,
-            "z": 299.891623
+            "x": 299.924158,
+            "y": 6.745963,
+            "z": 300.117678
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1764,9 +2461,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 297.88148,
-            "y": 6.918564,
-            "z": 297.409308
+            "x": 296.831949,
+            "y": 5.968227,
+            "z": 304.915607
           },
           "wanderTimer": 30,
           "weapon": {
@@ -1786,7 +2483,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 825,
+          "id": 826,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1810,7 +2507,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 7.453312,
+          "wanderTimer": 4.3831,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1831,7 +2528,7 @@
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 826,
+          "id": 827,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1867,12 +2564,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 827,
-      "state": "169791d9",
+      "nextId": 828,
+      "state": "45d655d4",
       "events": "741638a5",
       "rng": {
-        "draws": 16,
-        "digest": "e889d488"
+        "draws": 18,
+        "digest": "9f203d69"
       },
       "label": "flee-run",
       "players": [
@@ -1891,7 +2588,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 357
+            "damageTaken": 200
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -1929,6 +2626,63 @@
             "rows": {}
           },
           "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 66
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 821,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -1952,18 +2706,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 822
-            },
-            {
-              "breaksOnDamage": true,
-              "duration": 3,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Keening Wail",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 823,
-              "value": 1.584361
+              "sourceId": 823
             }
           ],
           "blockChance": 0.05,
@@ -1993,7 +2736,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 33.99,
+          "resource": 19.011667,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2017,6 +2760,78 @@
           }
         },
         {
+          "aiState": "idle",
+          "attackPower": 10,
+          "auras": [
+            {
+              "duration": 1.5,
+              "id": "stomp_stun",
+              "kind": "stun",
+              "name": "Shuddering Stomp",
+              "remaining": 1.5,
+              "school": "physical",
+              "sourceId": 823
+            },
+            {
+              "breaksOnDamage": true,
+              "duration": 3,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Keening Wail",
+              "remaining": 3,
+              "school": "shadow",
+              "sourceId": 824,
+              "value": -1.932876
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 1000000,
+          "id": 821,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
           "aggroTargetId": 820,
           "aiState": "attack",
           "comboUntil": -1,
@@ -2027,7 +2842,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 821,
+          "id": 822,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2072,7 +2887,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 822,
+          "id": 823,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -2116,7 +2931,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 823,
+          "id": 824,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -2157,12 +2972,12 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.456126,
+          "facing": -0.572491,
           "fallStartY": 6.781719,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 824,
+          "id": 825,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2172,9 +2987,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.911375,
-            "y": 6.792022,
-            "z": 299.891623
+            "x": 299.924158,
+            "y": 6.745963,
+            "z": 300.117678
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2187,9 +3002,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 297.88148,
-            "y": 6.918564,
-            "z": 297.409308
+            "x": 296.831949,
+            "y": 5.968227,
+            "z": 304.915607
           },
           "wanderTimer": 30,
           "weapon": {
@@ -2209,7 +3024,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 825,
+          "id": 826,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2233,7 +3048,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 7.453312,
+          "wanderTimer": 4.3831,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2255,7 +3070,7 @@
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 826,
+          "id": 827,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2291,12 +3106,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 827,
-      "state": "169791d9",
+      "nextId": 828,
+      "state": "45d655d4",
       "events": "741638a5",
       "rng": {
-        "draws": 16,
-        "digest": "e889d488"
+        "draws": 18,
+        "digest": "9f203d69"
       },
       "label": "final",
       "players": [
@@ -2315,7 +3130,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 357
+            "damageTaken": 200
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -2353,6 +3168,63 @@
             "rows": {}
           },
           "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 66
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 821,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -2376,18 +3248,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 822
-            },
-            {
-              "breaksOnDamage": true,
-              "duration": 3,
-              "id": "fear_incap",
-              "kind": "incapacitate",
-              "name": "Keening Wail",
-              "remaining": 3,
-              "school": "shadow",
-              "sourceId": 823,
-              "value": 1.584361
+              "sourceId": 823
             }
           ],
           "blockChance": 0.05,
@@ -2417,7 +3278,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 33.99,
+          "resource": 19.011667,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2441,6 +3302,78 @@
           }
         },
         {
+          "aiState": "idle",
+          "attackPower": 10,
+          "auras": [
+            {
+              "duration": 1.5,
+              "id": "stomp_stun",
+              "kind": "stun",
+              "name": "Shuddering Stomp",
+              "remaining": 1.5,
+              "school": "physical",
+              "sourceId": 823
+            },
+            {
+              "breaksOnDamage": true,
+              "duration": 3,
+              "id": "fear_incap",
+              "kind": "incapacitate",
+              "name": "Keening Wail",
+              "remaining": 3,
+              "school": "shadow",
+              "sourceId": 824,
+              "value": -1.932876
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 1000000,
+          "id": 821,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
           "aggroTargetId": 820,
           "aiState": "attack",
           "comboUntil": -1,
@@ -2451,7 +3384,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 821,
+          "id": 822,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2496,7 +3429,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 822,
+          "id": 823,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -2540,7 +3473,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 823,
+          "id": 824,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -2581,12 +3514,12 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.456126,
+          "facing": -0.572491,
           "fallStartY": 6.781719,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 824,
+          "id": 825,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2596,9 +3529,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.911375,
-            "y": 6.792022,
-            "z": 299.891623
+            "x": 299.924158,
+            "y": 6.745963,
+            "z": 300.117678
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2611,9 +3544,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 297.88148,
-            "y": 6.918564,
-            "z": 297.409308
+            "x": 296.831949,
+            "y": 5.968227,
+            "z": 304.915607
           },
           "wanderTimer": 30,
           "weapon": {
@@ -2633,7 +3566,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 825,
+          "id": 826,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2657,7 +3590,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 7.453312,
+          "wanderTimer": 4.3831,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2679,7 +3612,7 @@
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 826,
+          "id": 827,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
