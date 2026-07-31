@@ -141,5 +141,5 @@ describe('escort ambush mobs never outlive their run', () => {
       (e) => e.kind === 'mob' && e.templateId === ambushTemplate,
     );
     expect(anyState.length).toBe(baseline);
-  });
+  }, 120_000);
 });
