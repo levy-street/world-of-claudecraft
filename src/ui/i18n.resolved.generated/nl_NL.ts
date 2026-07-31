@@ -9566,6 +9566,18 @@ export const nl_NL: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Slagtandmes van Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Beestenspeer van de Slagtandheer"
+      },
+      "bloodmane_warleggings": {
+        "name": "Bloedmanen-Oorlogsbeenkappen"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Rankklauw-Sluipbroek"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Zonnebeen-Rituele Sarong"
+      },
       "thick_winter_pelt": {
         "name": "Dikke Wintervacht"
       },
@@ -10309,6 +10321,18 @@ export const nl_NL: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Wurmkoor-Handwindsels"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tuniek van de Bekkensluiper"
+      },
+      "verdant_heart_vestment": {
+        "name": "Gewaad van het Groene Hart"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Zonnebeen-Rituele Maliënkolder"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Grootslagtand van het Bekken"
       },
       "deathless_greatblade": {
         "name": "Doodloos Grootzwaard"

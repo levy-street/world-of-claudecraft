@@ -9566,6 +9566,18 @@ export const pl_PL: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Kłonóż Zulgara"
       },
+      "fanglords_beastspear": {
+        "name": "Włócznia Bestii Kłolorda"
+      },
+      "bloodmane_warleggings": {
+        "name": "Wojenne Nogawice Krwistej Grzywy"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Pnączoszponie Spodnie Skradania"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Słonecznokościsty Sarong Rytualny"
+      },
       "thick_winter_pelt": {
         "name": "Gruba Zimowa Skóra"
       },
@@ -10309,6 +10321,18 @@ export const pl_PL: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Owijki żmijowego chóru"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunika Tropiciela z Kotliny"
+      },
+      "verdant_heart_vestment": {
+        "name": "Szata Zieleniejącego Serca"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Słonecznokoścista Kolczuga Rytualna"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Wielki Kieł Kotliny"
       },
       "deathless_greatblade": {
         "name": "Nieśmiertelne wielkie ostrze"

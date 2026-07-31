@@ -4442,6 +4442,14 @@ export const ITEM_ART_PENDING = new Set<string>([
   'stormsunder_hood',
   'voidscar_handwraps',
   'voidweave_mantle',
+  // heroic_loot.ts (Wildheart Basin Tier-2 loot pass; armor art not commissioned yet)
+  'basin_stalkers_tunic',
+  'sunbone_ritual_hauberk',
+  'verdant_heart_vestment',
+  // wildheart.ts (Zulgar's guaranteed uncommon trio; armor art not commissioned yet)
+  'bloodmane_warleggings',
+  'sunbone_ritual_sarong',
+  'vineclaw_stalking_breeches',
   // willowfen.ts
   'bridgemere_toll_chest',
   'eelskin_mudwaders',

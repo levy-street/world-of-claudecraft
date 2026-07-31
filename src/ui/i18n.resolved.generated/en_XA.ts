@@ -9566,6 +9566,18 @@ export const en_XA: EnTranslations = {
       "wildheart_fangknife": {
         "name": "[Ƒáñĝķñíƒé óƒ Žúļĝáŕ]"
       },
+      "fanglords_beastspear": {
+        "name": "[Ƒáñĝļóŕð'š Ɓéášţšþéáŕ]"
+      },
+      "bloodmane_warleggings": {
+        "name": "[Ɓļóóðɱáñé Ŵáŕļéĝĝíñĝš]"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "[Ʋíñéçļáŵ Šţáļķíñĝ Ɓŕééçĥéš]"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "[Šúñƀóñé Ŕíţúáļ Šáŕóñĝ]"
+      },
       "thick_winter_pelt": {
         "name": "[Ţĥíçķ Ŵíñţéŕ Þéļţ]"
       },
@@ -10309,6 +10321,18 @@ export const en_XA: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "[Ŵýŕɱçĥóíŕ Ĥáñðŵŕáþš]"
+      },
+      "basin_stalkers_tunic": {
+        "name": "[Ɓášíñ Šţáļķéŕ'š Ţúñíç]"
+      },
+      "verdant_heart_vestment": {
+        "name": "[Ʋéŕðáñţ-Ĥéáŕţ Ʋéšţɱéñţ]"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "[Šúñƀóñé Ŕíţúáļ Ĥáúƀéŕķ]"
+      },
+      "greatfang_of_the_basin": {
+        "name": "[Ĝŕéáţƒáñĝ óƒ ţĥé Ɓášíñ]"
       },
       "deathless_greatblade": {
         "name": "[Ðéáţĥļéšš Ĝŕéáţƀļáðé]"

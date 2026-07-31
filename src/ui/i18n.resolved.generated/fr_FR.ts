@@ -9566,6 +9566,18 @@ export const fr_FR: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Couteau-croc de Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Épieu de bêtes du Seigneur des crocs"
+      },
+      "bloodmane_warleggings": {
+        "name": "Jambières de guerre Crin-de-sang"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Culottes de traque Griffe-de-liane"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sarong rituel Os-solaire"
+      },
       "thick_winter_pelt": {
         "name": "Épaisse fourrure d'hiver"
       },
@@ -10309,6 +10321,18 @@ export const fr_FR: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Bandes de mains du Choeur du Wyrm"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunique du traqueur du Bassin"
+      },
+      "verdant_heart_vestment": {
+        "name": "Vêtement du Cœur-verdoyant"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Haubert rituel Os-solaire"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Grand-croc du Bassin"
       },
       "deathless_greatblade": {
         "name": "Grande lame immortelle"

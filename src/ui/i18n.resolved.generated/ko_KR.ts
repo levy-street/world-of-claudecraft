@@ -9566,6 +9566,18 @@ export const ko_KR: EnTranslations = {
       "wildheart_fangknife": {
         "name": "줄가르의 송곳니칼"
       },
+      "fanglords_beastspear": {
+        "name": "송곳니 군주의 야수창"
+      },
+      "bloodmane_warleggings": {
+        "name": "피갈기 전쟁 다리보호구"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "덩굴발톱 잠행 바지"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "태양뼈 의식 사롱"
+      },
       "thick_winter_pelt": {
         "name": "두꺼운 겨울 모피"
       },
@@ -10309,6 +10321,18 @@ export const ko_KR: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "용노래 손싸개"
+      },
+      "basin_stalkers_tunic": {
+        "name": "분지 추적자의 튜닉"
+      },
+      "verdant_heart_vestment": {
+        "name": "신록의 심장 예복"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "태양뼈 의식 사슬갑옷"
+      },
+      "greatfang_of_the_basin": {
+        "name": "분지의 대송곳니"
       },
       "deathless_greatblade": {
         "name": "불사 대검"

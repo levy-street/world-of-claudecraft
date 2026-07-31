@@ -437,6 +437,67 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     sellValue: 15000,
     requiredClass: FERAL,
   },
+  // ================= Heroic Wildheart Basin: Zulgar =================
+  basin_stalkers_tunic: {
+    id: 'basin_stalkers_tunic',
+    name: "Basin Stalker's Tunic",
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Fills the agi-leather chest hole left by the retired scourgehide_carapace,
+    // which was AGILE_WILD: feral druids lost their only ilvl-31 agi-leather
+    // chest in that retirement too, so the replacement keeps their access.
+    stats: { armor: 172, agi: 13, sta: 9 },
+    hitRating: ARMOR_RATING,
+    sellValue: 14000,
+    requiredClass: AGILE_WILD,
+  },
+  verdant_heart_vestment: {
+    id: 'verdant_heart_vestment',
+    name: 'Verdant-Heart Vestment',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    // The first druid int-leather chest anywhere in the game.
+    stats: { armor: 172, int: 13, spi: 9 },
+    hasteRating: ARMOR_RATING,
+    sellValue: 14000,
+    requiredClass: HEAL_LEATHER,
+  },
+  sunbone_ritual_hauberk: {
+    id: 'sunbone_ritual_hauberk',
+    name: 'Sunbone Ritual Hauberk',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Fills the int-mail chest hole left by the retired soulforged_warplate.
+    stats: { armor: 335, int: 12, spi: 10 },
+    hasteRating: ARMOR_RATING,
+    sellValue: 14000,
+    requiredClass: HEAL_MAIL,
+  },
+  greatfang_of_the_basin: {
+    id: 'greatfang_of_the_basin',
+    name: 'Greatfang of the Basin',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    requiredLevel: 20,
+    // The first five-man HEAVY two-hander: 2H dps on the weaponDpsBudget(31) x
+    // TWOHAND_DPS_MULT curve (~18.4 at speed 3.4), stat budget 29.
+    weapon: { min: 50, max: 75, speed: 3.4 },
+    stats: { str: 17, sta: 12 },
+    hitRating: FIVE_MAN_WEAPON_RATING,
+    sellValue: 15000,
+    requiredClass: HEAVY,
+  },
   // ================= Heroic Nythraxis, Scourge of Thornpeak (raid) =================
   scepter_of_the_deathless_court: {
     id: 'scepter_of_the_deathless_court',
@@ -606,6 +667,19 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'wildsoul_maul', chance: 0.25, rollGroup: 'korzul_heroic2' },
     // Rare mount (0.1%): heroic-gated only, never on a normal table.
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
+  ],
+  wildheart_high_priest: [
+    { itemId: 'basin_stalkers_tunic', chance: 0.34, rollGroup: 'wildheart_heroic' },
+    { itemId: 'verdant_heart_vestment', chance: 0.33, rollGroup: 'wildheart_heroic' },
+    { itemId: 'sunbone_ritual_hauberk', chance: 0.33, rollGroup: 'wildheart_heroic' },
+    // The second group re-lists the two retired-hole chests as extra paths. A
+    // repeated winner is safe: pickRollGroupWinner (loot/loot_roll.ts) falls
+    // forward to the next non-awarded entry in this group, so the kill still
+    // pays two DISTINCT epics (greatfang is only ever in this group, so the
+    // fall-forward always terminates).
+    { itemId: 'greatfang_of_the_basin', chance: 0.34, rollGroup: 'wildheart_heroic2' },
+    { itemId: 'basin_stalkers_tunic', chance: 0.33, rollGroup: 'wildheart_heroic2' },
+    { itemId: 'sunbone_ritual_hauberk', chance: 0.33, rollGroup: 'wildheart_heroic2' },
   ],
   nythraxis_scourge_of_thornpeak: [
     // The heroic set pieces and legendaries come free from the heroic loot swap:

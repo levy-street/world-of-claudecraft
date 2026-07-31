@@ -9566,6 +9566,18 @@ export const da_DK: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Hugtandskniv fra Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Hugtandherrens Bæstspyd"
+      },
+      "bloodmane_warleggings": {
+        "name": "Blodmanke-Krigsbenskinner"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Rankeklo-Snigebukser"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Solben-Ritualsarong"
+      },
       "thick_winter_pelt": {
         "name": "Tyk Vinterpels"
       },
@@ -10309,6 +10321,18 @@ export const da_DK: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Ormekor-Håndomvikling"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Bassinsnigerens Tunika"
+      },
+      "verdant_heart_vestment": {
+        "name": "Grønhjerte-Klædning"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Solben-Ritualbrynje"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Bassinets Storhugtand"
       },
       "deathless_greatblade": {
         "name": "Udødelig Storklinge"

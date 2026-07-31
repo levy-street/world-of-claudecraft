@@ -36,6 +36,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   bonewrought_greatsword: 'adv_sword_2handed_color', // EPIC: Nythraxis raid 2H
   direfang_greatblade: 'adv_sword_2handed_color', // EPIC: Nythraxis hunter 2H
   wildheart_tuskblade: 'adv_sword_2handed_color',
+  greatfang_of_the_basin: 'adv_sword_2handed_color', // EPIC: Heroic Zulgar 2H
 
   // ---- daggers (only 4 models for ~21 daggers; spread as evenly as art allows)-
   rusty_dagger: 'dagger_a',
@@ -139,4 +140,5 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   fen_reaver_glaive: 'scythe', // "Reaver" -> reaper scythe
   tidereaver_gaff: 'spear_a', // a gaff is a hooked spear
   ironbark_boar_spear: 'spear_a', // crafted 2H spear
+  fanglords_beastspear: 'spear_a', // RARE: the basin Beastmaster's boar spear
 };

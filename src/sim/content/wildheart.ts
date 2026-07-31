@@ -40,6 +40,57 @@ export const WILDHEART_ITEMS: Record<string, ItemDef> = {
     sellValue: 8000,
     requiredClass: ['rogue', 'hunter'],
   },
+  // The Beastmaster's signature rare: item level 23 (source 20 + rare 3). 2H dps
+  // on the weaponDpsBudget(23) x TWOHAND_DPS_MULT curve (~15.6 at speed 3.2);
+  // stat budget round(13 x TWOHAND_STAT_MULT) = 17.
+  fanglords_beastspear: {
+    id: 'fanglords_beastspear',
+    name: "Fanglord's Beastspear",
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'rare',
+    weapon: { min: 40, max: 60, speed: 3.2 },
+    stats: { str: 7, agi: 5, sta: 5 },
+    sellValue: 3200,
+    requiredClass: ['warrior', 'hunter', 'shaman', 'paladin'],
+  },
+  // Zulgar's guaranteed uncommon trio (the Korzul boneplate/revenant/nightwalk
+  // pattern, one per armor class): legs at item level 21, budget
+  // round(21 x 0.55 x 0.9 x 0.7) = 7, armor ~0.9x the Sanctum uncommon chests.
+  bloodmane_warleggings: {
+    id: 'bloodmane_warleggings',
+    name: 'Bloodmane Warleggings',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'legs',
+    quality: 'uncommon',
+    stats: { armor: 153, str: 3, sta: 4 },
+    sellValue: 800,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
+  },
+  vineclaw_stalking_breeches: {
+    id: 'vineclaw_stalking_breeches',
+    name: 'Vineclaw Stalking Breeches',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'legs',
+    quality: 'uncommon',
+    stats: { armor: 95, agi: 5, sta: 2 },
+    sellValue: 800,
+    requiredClass: ['rogue', 'hunter'],
+  },
+  sunbone_ritual_sarong: {
+    id: 'sunbone_ritual_sarong',
+    name: 'Sunbone Ritual Sarong',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'legs',
+    quality: 'uncommon',
+    stats: { armor: 55, int: 4, spi: 3 },
+    sellValue: 800,
+    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+  },
 };
 
 export const WILDHEART_MOBS: Record<string, MobTemplate> = {
@@ -79,7 +130,10 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       windup: 0.55,
     },
     componentTags: ['hide', 'fang'],
-    loot: [{ copper: 360, chance: 1 }],
+    loot: [
+      { copper: 360, chance: 1 },
+      { itemId: 'chipped_tusk', chance: 0.35 },
+    ],
     scale: 1.85,
     color: 0x4f7651,
   },
@@ -113,7 +167,10 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     },
     cleave: { radius: 6.5, mult: 0.5, name: 'Tusk Sweep' },
     componentTags: ['hide', 'fang'],
-    loot: [{ copper: 450, chance: 1 }],
+    loot: [
+      { copper: 450, chance: 1 },
+      { itemId: 'chipped_tusk', chance: 0.4 },
+    ],
     scale: 2,
     color: 0x78513f,
   },
@@ -151,7 +208,10 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       school: 'nature',
     },
     componentTags: ['hide', 'horn'],
-    loot: [{ copper: 430, chance: 1 }],
+    loot: [
+      { copper: 430, chance: 1 },
+      { itemId: 'chipped_tusk', chance: 0.45 },
+    ],
     scale: 1.9,
     color: 0x688057,
   },
@@ -199,7 +259,12 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       school: 'physical',
     },
     componentTags: ['hide', 'fang'],
-    loot: [{ copper: 1000, chance: 1 }],
+    loot: [
+      { copper: 2500, chance: 1 },
+      // Guaranteed troll trophy junk: the Grubjaw rare convention (zone2.ts).
+      { itemId: 'chipped_tusk', chance: 1 },
+      { itemId: 'fanglords_beastspear', chance: 0.12 },
+    ],
     scale: 2.35,
     color: 0x485b3d,
   },
@@ -232,9 +297,18 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 55000, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.8 },
-      { itemId: 'wildheart_tuskblade', chance: 0.06, rollGroup: 'wildheart_bonus' },
-      { itemId: 'wildheart_hexwood_staff', chance: 0.06, rollGroup: 'wildheart_bonus' },
-      { itemId: 'wildheart_fangknife', chance: 0.06, rollGroup: 'wildheart_bonus' },
+      // Guaranteed uncommon (chances sum to 1.0, exactly one drops): the Korzul
+      // korzul_guaranteed_uncommon pattern, one piece per armor class.
+      { itemId: 'bloodmane_warleggings', chance: 0.34, rollGroup: 'zulgar_guaranteed_uncommon' },
+      {
+        itemId: 'vineclaw_stalking_breeches',
+        chance: 0.33,
+        rollGroup: 'zulgar_guaranteed_uncommon',
+      },
+      { itemId: 'sunbone_ritual_sarong', chance: 0.33, rollGroup: 'zulgar_guaranteed_uncommon' },
+      { itemId: 'wildheart_tuskblade', chance: 0.09, rollGroup: 'wildheart_bonus' },
+      { itemId: 'wildheart_hexwood_staff', chance: 0.09, rollGroup: 'wildheart_bonus' },
+      { itemId: 'wildheart_fangknife', chance: 0.09, rollGroup: 'wildheart_bonus' },
     ],
     scale: 2.8,
     color: 0x566f45,

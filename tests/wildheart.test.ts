@@ -7,11 +7,20 @@ import { VISUALS } from '../src/render/characters/manifest';
 import { resolvePosition } from '../src/sim/colliders';
 import { DEEDS } from '../src/sim/content/deeds';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { heroicVariantId } from '../src/sim/content/heroic_variants';
 import {
   WILDHEART_DUNGEON_DEFS,
   WILDHEART_ITEMS,
   WILDHEART_MOBS,
 } from '../src/sim/content/wildheart';
+import {
+  primaryStatBudget,
+  TWOHAND_DPS_MULT,
+  TWOHAND_STAT_MULT,
+  weaponDpsBudget,
+} from '../src/sim/item_budget';
+import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import {
   BUILTIN_WORLD,
   DUNGEON_OVERFLOW_X_BASE,
@@ -98,7 +107,11 @@ describe('Wildheart Basin dungeon content', () => {
     expect(boss.aoePulse?.name).toBe('Wildheart Pulse');
     expect(boss.knockback?.name).toBe('Jaguar Roar');
     expect(boss.enrage?.belowHpPct).toBe(0.3);
-    const epicIds = Object.keys(WILDHEART_ITEMS).sort();
+    // Filtered by quality, not Object.keys: the Tier-2 loot pass added the rare
+    // beastspear and the guaranteed uncommon trio alongside the three epics.
+    const epicIds = Object.keys(WILDHEART_ITEMS)
+      .filter((id) => WILDHEART_ITEMS[id].quality === 'epic')
+      .sort();
     expect(epicIds).toEqual([
       'wildheart_fangknife',
       'wildheart_hexwood_staff',
@@ -243,12 +256,9 @@ describe('Wildheart Basin dungeon content', () => {
     expect(meta.deedsEarned.has('dgn_wildheart_basin')).toBe(true);
     expect(meta.deedsEarned.has('dgn_wildheart_basin_heroic')).toBe(false);
 
-    onDungeonFinalBossKilledForDeeds(
-      sim.ctx,
-      boss,
-      { difficulty: 'heroic' } as InstanceSlot,
-      [meta],
-    );
+    onDungeonFinalBossKilledForDeeds(sim.ctx, boss, { difficulty: 'heroic' } as InstanceSlot, [
+      meta,
+    ]);
     expect(meta.deedStats.dungeonClears['wildheart_basin:heroic']).toBe(1);
     sim.tick();
     expect(meta.deedsEarned.has('dgn_wildheart_basin_heroic')).toBe(true);
@@ -278,5 +288,192 @@ describe('Wildheart Basin dungeon content', () => {
     // Without the flag the gatekeeper wedges on the toppled-relic colliders
     // at the Sunken Idol's heart, ~0.4yd past its own reach, and never swings.
     expect(MOBS.idol_guardian?.phasesThroughObstacles).toBe(true);
+  });
+});
+
+describe('Wildheart Basin Tier-2 loot pass', () => {
+  const dps = (id: string) => {
+    const w = ITEMS[id].weapon;
+    if (!w) throw new Error(`${id} is not a weapon`);
+    return (w.min + w.max) / 2 / w.speed;
+  };
+
+  it('the Beastmaster rare beastspear is budget-exact at item level 23', () => {
+    const item = ITEMS.fanglords_beastspear;
+    expect(item.quality).toBe('rare');
+    expect(itemLevel(item)).toBe(23);
+    // Budget computed from the formulas, not literals: rare mainhand line x the
+    // two-hand stat premium.
+    const budget = Math.round(primaryStatBudget(23, 'rare', 'mainhand') * TWOHAND_STAT_MULT);
+    expect(expectedStatBudget(item)).toBe(budget);
+    expect(primaryStatSum(item)).toBe(budget);
+    // 2H dps rides the TWOHAND_DPS_MULT premium over the one-hand curve.
+    expect(Math.abs(dps(item.id) - weaponDpsBudget(23) * TWOHAND_DPS_MULT)).toBeLessThan(0.3);
+  });
+
+  it("Zulgar's guaranteed uncommon trio is budget-exact at item level 21, one per armor class", () => {
+    const trio = ['bloodmane_warleggings', 'vineclaw_stalking_breeches', 'sunbone_ritual_sarong'];
+    const armorTypes = trio.map((id) => {
+      const item = ITEMS[id];
+      expect(item.quality, id).toBe('uncommon');
+      expect(item.kind === 'armor' && item.slot === 'legs', id).toBe(true);
+      expect(itemLevel(item), id).toBe(21);
+      expect(expectedStatBudget(item), id).toBe(primaryStatBudget(21, 'uncommon', 'legs'));
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
+      return item.kind === 'armor' ? item.armorType : undefined;
+    });
+    expect(new Set(armorTypes)).toEqual(new Set(['mail', 'leather', 'cloth']));
+  });
+
+  it('the four heroic Zulgar epics are budget-exact at item level 31 with one rating each', () => {
+    for (const id of [
+      'basin_stalkers_tunic',
+      'verdant_heart_vestment',
+      'sunbone_ritual_hauberk',
+      'greatfang_of_the_basin',
+    ]) {
+      const item = ITEMS[id];
+      expect(item.quality, id).toBe('epic');
+      expect(itemLevel(item), `${id} ilvl`).toBe(31);
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
+      const ratings = [item.hitRating, item.critRating, item.hasteRating].filter(
+        (r) => r !== undefined && r > 0,
+      );
+      expect(ratings, `${id} carries exactly one combat rating`).toHaveLength(1);
+    }
+    // The 2H stat premium and dps premium, from the formulas.
+    expect(expectedStatBudget(ITEMS.greatfang_of_the_basin)).toBe(
+      Math.round(primaryStatBudget(31, 'epic', 'mainhand') * TWOHAND_STAT_MULT),
+    );
+    expect(
+      Math.abs(dps('greatfang_of_the_basin') - weaponDpsBudget(31) * TWOHAND_DPS_MULT),
+    ).toBeLessThan(0.3);
+  });
+
+  it("pins Zulgar's roll groups: guaranteed uncommon sums to 1.0, wildheart_bonus to 0.27", () => {
+    const loot = MOBS.wildheart_high_priest.loot ?? [];
+    const groupSum = (group: string) =>
+      loot.filter((e) => e.rollGroup === group).reduce((a, e) => a + e.chance, 0);
+    expect(loot.filter((e) => e.rollGroup === 'zulgar_guaranteed_uncommon')).toHaveLength(3);
+    expect(groupSum('zulgar_guaranteed_uncommon')).toBeCloseTo(1.0, 9);
+    expect(groupSum('wildheart_bonus')).toBeCloseTo(0.27, 9);
+    expect(loot.some((e) => e.copper === 55000 && e.chance === 1)).toBe(true);
+    expect(loot.some((e) => e.itemId === 'bone_fragments' && e.chance === 0.8)).toBe(true);
+  });
+
+  it('adds the troll trophy junk on the trash line and the rare-convention Beastmaster', () => {
+    const tuskChance = (mobId: string) =>
+      (MOBS[mobId].loot ?? []).find((e) => e.itemId === 'chipped_tusk')?.chance;
+    expect(tuskChance('wildheart_stalker')).toBe(0.35);
+    expect(tuskChance('wildheart_ravager')).toBe(0.4);
+    expect(tuskChance('wildheart_hexcaller')).toBe(0.45);
+    // Rare-trophy convention (Grubjaw): a guaranteed tusk plus the signature rare.
+    expect(tuskChance('wildheart_beastmaster')).toBe(1);
+    const beastmaster = MOBS.wildheart_beastmaster.loot ?? [];
+    expect(beastmaster.some((e) => e.copper === 2500 && e.chance === 1)).toBe(true);
+    expect(beastmaster.some((e) => e.itemId === 'fanglords_beastspear' && e.chance === 0.12)).toBe(
+      true,
+    );
+  });
+
+  it('registers the heroic drop table: two roll groups, each summing to exactly 1.0', () => {
+    const entries = HEROIC_BOSS_LOOT.wildheart_high_priest;
+    expect(entries).toBeDefined();
+    const groupSum = (group: string) =>
+      entries.filter((e) => e.rollGroup === group).reduce((a, e) => a + e.chance, 0);
+    expect(groupSum('wildheart_heroic')).toBeCloseTo(1.0, 9);
+    expect(groupSum('wildheart_heroic2')).toBeCloseTo(1.0, 9);
+    // Every entry belongs to one of the two groups (no stray chance rolls), and
+    // the group names never collide with the base table's 'wildheart_bonus'.
+    for (const e of entries) {
+      expect(['wildheart_heroic', 'wildheart_heroic2']).toContain(e.rollGroup);
+    }
+    // The greatfang lives ONLY in the second group: the cross-group duplicate
+    // guard (pickRollGroupWinner) falls forward within a group, so a repeated
+    // chest winner always lands on a non-awarded entry and every heroic kill
+    // still pays two DISTINCT epics.
+    expect(
+      entries.filter((e) => e.itemId === 'greatfang_of_the_basin').map((e) => e.rollGroup),
+    ).toEqual(['wildheart_heroic2']);
+  });
+
+  it('registers the basin as a heroic instance: its epic/rare drops mint heroic variants', () => {
+    // Epic bases read item level 28 (source 22 + epic 6), the rare 25.
+    for (const id of ['wildheart_tuskblade', 'wildheart_hexwood_staff', 'wildheart_fangknife']) {
+      const variant = ITEMS[heroicVariantId(id)];
+      expect(variant, `heroic variant of ${id}`).toBeDefined();
+      expect(variant.heroicOf).toBe(id);
+      expect(itemLevel(variant), `${variant.id} ilvl`).toBe(28);
+    }
+    const rareVariant = ITEMS[heroicVariantId('fanglords_beastspear')];
+    expect(rareVariant).toBeDefined();
+    expect(itemLevel(rareVariant)).toBe(25);
+    // Uncommons never mint variants.
+    expect(ITEMS[heroicVariantId('bloodmane_warleggings')]).toBeUndefined();
+  });
+
+  // Kills Zulgar with one direct overkill hit and returns his corpse. Mirrors
+  // the killKorzul harness in tests/heroic_loot_flair.test.ts.
+  function killZulgar(seed: number, difficulty: 'normal' | 'heroic'): Entity {
+    const sim = makeSim(seed);
+    const pid = sim.addPlayer('warrior', 'Looter');
+    if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', pid);
+    expect(enterDungeon(sim.ctx, 'wildheart_basin', pid)).toBe(true);
+    const instance = (sim.instances as { dungeonId: string; mobIds: number[] }[]).find(
+      (i) => i.dungeonId === 'wildheart_basin',
+    );
+    if (!instance) throw new Error('Wildheart instance was not claimed');
+    const zulgar = instance.mobIds
+      .map((id) => sim.entities.get(id))
+      .find((e): e is Entity => e?.templateId === 'wildheart_high_priest');
+    if (!zulgar) throw new Error('Zulgar did not spawn');
+    const p = sim.entities.get(pid) as Entity;
+    p.pos = { x: zulgar.pos.x + 1, y: zulgar.pos.y, z: zulgar.pos.z };
+    p.prevPos = { ...p.pos };
+    sim.rebucket(p);
+    (sim as unknown as { dealDamage: Function }).dealDamage(
+      p,
+      zulgar,
+      zulgar.hp + 100,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+    expect(zulgar.dead, `seed ${seed}`).toBe(true);
+    return zulgar;
+  }
+
+  it('pays copper plus exactly one guaranteed uncommon when a party kills Zulgar', () => {
+    const trio = new Set([
+      'bloodmane_warleggings',
+      'vineclaw_stalking_breeches',
+      'sunbone_ritual_sarong',
+    ]);
+    // Several seeds so the pin holds across roll outcomes, not one lucky draw.
+    for (const seed of [3, 11, 42]) {
+      const zulgar = killZulgar(seed, 'normal');
+      expect(zulgar.loot, `seed ${seed} has loot`).toBeTruthy();
+      expect(zulgar.loot?.copper, `seed ${seed} copper`).toBeGreaterThan(0);
+      const uncommons = (zulgar.loot?.items ?? []).filter((s) => trio.has(s.itemId));
+      expect(uncommons, `seed ${seed}: exactly one guaranteed uncommon`).toHaveLength(1);
+    }
+  });
+
+  it('pays exactly two DISTINCT heroic epics per heroic Zulgar kill (the dup-path shape)', () => {
+    // The second roll group re-lists two chests from the first, so this pin is
+    // what proves pickRollGroupWinner's fall-forward keeps the two guaranteed
+    // drops distinct instead of voiding a duplicate.
+    const heroicIds = new Set(
+      HEROIC_BOSS_LOOT.wildheart_high_priest.flatMap((e) => (e.itemId ? [e.itemId] : [])),
+    );
+    for (const seed of [3, 11, 42, 97, 123]) {
+      const zulgar = killZulgar(seed, 'heroic');
+      const drops = (zulgar.loot?.items ?? [])
+        .map((s) => s.itemId)
+        .filter((id) => heroicIds.has(id));
+      expect(drops, `seed ${seed}: two heroic epics`).toHaveLength(2);
+      expect(new Set(drops).size, `seed ${seed}: the two epics are distinct`).toBe(2);
+    }
   });
 });

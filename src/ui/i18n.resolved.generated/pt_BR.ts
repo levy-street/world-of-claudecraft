@@ -9566,6 +9566,18 @@ export const pt_BR: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Adaga-Presa de Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Lança de Feras do Senhor das Presas"
+      },
+      "bloodmane_warleggings": {
+        "name": "Perneiras de Guerra Crina de Sangue"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Calções de Tocaia Garra-de-Vinha"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sarongue Ritual Ossossol"
+      },
       "thick_winter_pelt": {
         "name": "Pelagem Invernal Espessa"
       },
@@ -10309,6 +10321,18 @@ export const pt_BR: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Faixas de Mãos do Coro dos Vermes"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Túnica do Perseguidor da Bacia"
+      },
+      "verdant_heart_vestment": {
+        "name": "Vestimenta do Coração Verdejante"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Cota de Malha Ritual Ossossol"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Grande Presa da Bacia"
       },
       "deathless_greatblade": {
         "name": "Grande Lâmina Imortal"

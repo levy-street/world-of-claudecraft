@@ -9566,6 +9566,18 @@ export const vi_VN: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Dao Nanh Của Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Thương Săn Thú Của Lãnh Chúa Nanh"
+      },
+      "bloodmane_warleggings": {
+        "name": "Quần Chiến Bờm Máu"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Quần Rình Rập Vuốt Dây Leo"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Xà Rông Nghi Lễ Xương Mặt Trời"
+      },
       "thick_winter_pelt": {
         "name": "Da Lông Mùa Đông Dày"
       },
@@ -10309,6 +10321,18 @@ export const vi_VN: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Quấn Tay Hợp Ca Long"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Áo Chẽn Kẻ Rình Rập Vùng Trũng"
+      },
+      "verdant_heart_vestment": {
+        "name": "Lễ Phục Trái Tim Xanh Tươi"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Áo Giáp Lưới Nghi Lễ Xương Mặt Trời"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Nanh Lớn Của Vùng Trũng"
       },
       "deathless_greatblade": {
         "name": "Đại Kiếm Bất Tử"

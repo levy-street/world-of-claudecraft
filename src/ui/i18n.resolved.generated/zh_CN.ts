@@ -9566,6 +9566,18 @@ export const zh_CN: EnTranslations = {
       "wildheart_fangknife": {
         "name": "祖尔加的獠牙匕首"
       },
+      "fanglords_beastspear": {
+        "name": "獠牙领主的兽矛"
+      },
+      "bloodmane_warleggings": {
+        "name": "血鬃战争护腿"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "藤爪潜行马裤"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "日骨仪式纱笼"
+      },
       "thick_winter_pelt": {
         "name": "厚实的冬季毛皮"
       },
@@ -10309,6 +10321,18 @@ export const zh_CN: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "龙唱裹手"
+      },
+      "basin_stalkers_tunic": {
+        "name": "盆地潜猎者外衣"
+      },
+      "verdant_heart_vestment": {
+        "name": "翠心法衣"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "日骨仪式锁甲"
+      },
+      "greatfang_of_the_basin": {
+        "name": "盆地巨牙"
       },
       "deathless_greatblade": {
         "name": "不死巨刃"
