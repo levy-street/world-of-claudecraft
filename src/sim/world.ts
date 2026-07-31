@@ -1,5 +1,5 @@
-import { beaconSpiralLift } from './beacon_spiral';
 import { bgFieldHeightLocal } from './battleground_field';
+import { beaconSpiralLift } from './beacon_spiral';
 import {
   castleLift,
   castlePadTarget,

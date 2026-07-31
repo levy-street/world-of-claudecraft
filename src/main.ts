@@ -1607,6 +1607,7 @@ async function startGame(
             break;
           case 'bgFlag':
             bgFlagKey();
+            break;
           case 'mount':
             // Ride the pick immediately (every player always has one; the
             // character sheet's picker is where the pick changes).
@@ -1853,6 +1854,7 @@ async function startGame(
         break;
       case 'bgFlag':
         bgFlagKey();
+        break;
       case 'mount':
         world.toggleMounted();
         break;
