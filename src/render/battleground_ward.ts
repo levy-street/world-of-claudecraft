@@ -30,8 +30,14 @@ import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 /** How tall the gate ward stands. Above the keep wall's own crown would read as
  *  a dome; this stops just under it so the ward reads as filling the doorway. */
 const GATE_WARD_H = 6.2;
-/** Yards of ward either side of the mouth's own span, so it meets the jambs. */
-const GATE_WARD_PAD = 0.6;
+/**
+ * How far INSIDE the keep's own half-width the ward stops. The mouth is not the
+ * full keep width: a gate drum stands at each end of it (dressing.mjs, scale
+ * 1.55 at x = +-KEEP_HALF_X, centred on this very plane), so a ward built to
+ * the full span buries its outer yards inside both towers and lights them up
+ * from within. It has to end short of the drums, in the clear doorway.
+ */
+const GATE_WARD_INSET = 2.4;
 /** The grave ward's height and how far it stands off the plot's rails. */
 const GRAVE_WARD_H = 3.4;
 const GRAVE_WARD_PAD = 0.5;
@@ -51,6 +57,7 @@ const WARD_VERTEX = `
 const WARD_FRAGMENT = `
   uniform float uTime;
   uniform vec3 uColor;
+  uniform vec3 uGlow;
   uniform float uAlpha;
   varying vec2 vUv;
   void main() {
@@ -66,26 +73,39 @@ const WARD_FRAGMENT = `
     float edgeX = smoothstep(0.0, 0.05, vUv.x) * smoothstep(1.0, 0.95, vUv.x);
     // A brighter seam right at the threshold line the player is being held at.
     float seam = smoothstep(0.12, 0.0, abs(vUv.y - 0.06));
-    float a = uAlpha * edgeX * (edgeY * (0.12 + 0.7 * bands * drift) + 0.5 * seam);
+    // A solid-ish veil with brighter bands travelling through it: the veil is
+    // what makes the barrier read at a glance, the bands are what make it read
+    // as held rather than as a pane of glass.
+    float band = bands * drift;
+    float body = edgeY * (0.55 + 0.45 * band) + 0.6 * seam;
+    float a = uAlpha * edgeX * clamp(body, 0.0, 1.0);
     if (a < 0.01) discard;
-    gl_FragColor = vec4(uColor, a);
+    gl_FragColor = vec4(mix(uColor, uGlow, band * 0.7 + seam * 0.5), a);
   }
 `;
 
+/**
+ * A ward reads DARKER than the stone behind it, never brighter. Additive
+ * blending was the first cut and it washed pale grey masonry out instead of
+ * veiling it, which made the barrier hard to see precisely where it mattered.
+ * Normal blending over a deepened team colour gives it body.
+ */
 function wardMaterial(color: number, alpha: number): THREE.ShaderMaterial {
+  const deep = new THREE.Color(color).multiplyScalar(0.45);
   return markSharedMaterial(
     new THREE.ShaderMaterial({
       vertexShader: WARD_VERTEX,
       fragmentShader: WARD_FRAGMENT,
       uniforms: {
         uTime: sharedUniforms.uTime,
-        uColor: { value: new THREE.Color(color) },
+        uColor: { value: deep },
+        uGlow: { value: new THREE.Color(color) },
         uAlpha: { value: alpha },
       },
       transparent: true,
       depthWrite: false,
       side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.NormalBlending,
     }),
   ) as THREE.ShaderMaterial;
 }
@@ -112,12 +132,12 @@ export function buildBgWards(): BgWardView {
   const owned: (THREE.BufferGeometry | THREE.Material)[] = [];
 
   // --- the gate wards: one sheet across each keep mouth ----------------------
-  const gateW = (KEEP_HALF_X + GATE_WARD_PAD) * 2;
+  const gateW = (KEEP_HALF_X - GATE_WARD_INSET) * 2;
   const gateGeo = markSharedGeometry(new THREE.PlaneGeometry(gateW, GATE_WARD_H));
   owned.push(gateGeo);
   const gates: THREE.Mesh[] = [];
   for (const base of BG_BASES) {
-    const mat = wardMaterial(BG_TEAM_COLORS[base.team], 0.34);
+    const mat = wardMaterial(BG_TEAM_COLORS[base.team], 0.72);
     owned.push(mat);
     const mesh = new THREE.Mesh(gateGeo, mat);
     // The mouth line: KEEP_MOUTH_DZ field-side of the flag stand.
@@ -136,7 +156,7 @@ export function buildBgWards(): BgWardView {
     // Open-ended so it reads as a curtain around the yard, not a capsule.
     const r = Math.max(plot.hw, plot.hd) + GRAVE_WARD_PAD;
     const geo = markSharedGeometry(new THREE.CylinderGeometry(r, r, GRAVE_WARD_H, 20, 1, true));
-    const mat = wardMaterial(BG_TEAM_COLORS[team], 0.3);
+    const mat = wardMaterial(BG_TEAM_COLORS[team], 0.5);
     owned.push(geo, mat);
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(plot.x, GRAVE_WARD_H / 2, plot.z);

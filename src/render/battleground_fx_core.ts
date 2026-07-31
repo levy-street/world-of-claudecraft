@@ -13,9 +13,16 @@ export type BgFlagFxKind = 'pickup' | 'capture' | 'return';
 // Carried flag: mounted on the carrier's BACK like a war banner (offset
 // behind the body along facing, slight raise) and leaned. No bob: the tiny
 // high-frequency bounce read as jitter against the walk cycle (owner call).
-export const BG_CARRY_TILT = 0.6; // radians off vertical
-export const BG_CARRY_BACK = 0.35; // yards behind the carrier
-export const BG_CARRY_RAISE = 0.1;
+//
+// The lean is deliberately SHALLOW. It began at 0.6 rad (34 degrees), which was
+// fine over the old thin stick but reads as a pike carried across the body once
+// the pole has real thickness and a spear point on it: the standard should ride
+// upright over the shoulder, with just enough tilt to say it is slung rather
+// than planted. The raise goes with it, so the butt of a longer pole clears the
+// ground instead of dragging through the carrier's heels.
+export const BG_CARRY_TILT = 0.32; // radians off vertical
+export const BG_CARRY_BACK = 0.42; // yards behind the carrier
+export const BG_CARRY_RAISE = 0.5;
 
 // Rune gem: a slow spin with a gentle hover so it reads as a pickup from afar.
 export const BG_RUNE_SPIN_RADS = 0.9; // radians per second

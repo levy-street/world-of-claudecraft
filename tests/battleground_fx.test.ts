@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   BG_CARRY_BACK,
+  BG_CARRY_RAISE,
   BG_CARRY_TILT,
   BG_RUNE_BOB_AMP,
   classifyFlagTransition,
@@ -40,9 +41,14 @@ describe('classifyFlagTransition', () => {
 
 describe('pose math', () => {
   it('carried mount: a real tilt and a real back offset, no bob constants', () => {
-    expect(BG_CARRY_TILT).toBeGreaterThan(0.3);
-    expect(BG_CARRY_TILT).toBeLessThan(1.2);
+    // A real lean, but a SHALLOW one: past roughly 25 degrees the standard
+    // reads as a pike carried across the body rather than slung over a
+    // shoulder, which is what the first pass at 0.6 looked like.
+    expect(BG_CARRY_TILT).toBeGreaterThan(0.15);
+    expect(BG_CARRY_TILT).toBeLessThan(0.45);
     expect(BG_CARRY_BACK).toBeGreaterThan(0);
+    // Lifted enough that a full-length pole's butt clears the ground.
+    expect(BG_CARRY_RAISE).toBeGreaterThan(0.3);
   });
 
   it('rune gem: spin advances monotonically, hover stays bounded', () => {
