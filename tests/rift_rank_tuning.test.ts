@@ -389,6 +389,11 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
       sim.player.prevPos = { ...sim.player.pos };
       sim.player.hp = sim.player.maxHp;
       boss.deathZoneCastTimer = 0.01;
+      // The warm-up ticks fired other kit mechanics (aoePulse lands on the
+      // first engaged tick) which armed the shared spacing lock; the zone
+      // under test must fire from a clear lock, as it would in a real fight
+      // once the spacing window has passed.
+      boss.mechanicLockTimer = 0;
       inst.bossDeathZones = [];
       sim.tick();
       return { sim, inst, boss };
@@ -490,6 +495,9 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     sim.player.hp = sim.player.maxHp;
     p2.hp = p2.maxHp;
     boss.deathZoneStrikeTimer = 0.01;
+    // Clear the shared spacing lock the warm-up mechanics armed, so the
+    // barrage under test fires on the very next tick.
+    boss.mechanicLockTimer = 0;
     inst.bossDeathZones = [];
     sim.tick();
     expect(inst.bossDeathZones, 'one zone per living member at S').toHaveLength(2);

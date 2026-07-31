@@ -23,6 +23,7 @@ import {
 import { layoutColliders } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
 import type { LootTier } from '../lockpick';
+import { RIFT_MECHANIC_SPACING_SEC } from '../mob/mechanic_spacing';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
@@ -301,8 +302,15 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
     // Authored set-piece floors (the Infernal Citadel) are C-only hand-tuned
     // content; their bosses run their full kit at every rank and must not be
     // capped by the procedural rank budget.
-    if ((spawn.boss || spawn.miniboss) && !isSetPieceRift(inst.seed, inst.baseLevel)) {
-      mob.riftMechanicLimit = RIFT_RANK_MECHANIC_BUDGET[rank];
+    if (spawn.boss || spawn.miniboss) {
+      // Shared mechanic spacing (mob/mechanic_spacing.ts): a rift boss never
+      // lands two mechanics on top of each other. Stamped on EVERY rift boss,
+      // including the citadel set-piece (the budget exemption below is about
+      // kit SIZE, not about letting mechanics stack).
+      mob.riftMechanicSpacing = RIFT_MECHANIC_SPACING_SEC;
+      if (!isSetPieceRift(inst.seed, inst.baseLevel)) {
+        mob.riftMechanicLimit = RIFT_RANK_MECHANIC_BUDGET[rank];
+      }
     }
     // Per-run re-grade: a fresh tint (and a little scale variance) so the same
     // template reads as a different creature across rifts. Model + mechanics are

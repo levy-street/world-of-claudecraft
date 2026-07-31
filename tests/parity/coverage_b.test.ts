@@ -458,6 +458,8 @@ describe('coverage: each scenario fires its subsystem', () => {
     // the moment each arm fired; the CC does not persist to the end without a tick).
     expect(n.stompStunLanded).toBe(true);
     expect(n.fearLanded).toBe(true);
+    // The terrify tank exemption: the boss's current aggro target never fears.
+    expect(n.tankFearLanded).toBe(false);
     // War Stomp + terrify each emit an 'unleashes' combat-log line (>= 2 total).
     expect(
       ev.filter(
