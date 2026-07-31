@@ -5,7 +5,7 @@ import {
   gizmoState,
   hullGizmo,
 } from '../src/editor/cinematic_gizmo_core';
-import { MAINLAND_HARBOR } from '../src/sim/harbor_layout';
+import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 import { cameraGeometry, HARBOR_HULL_FOOTPRINTS } from '../src/sim/scenes/lint_core';
 import type { SceneDef } from '../src/sim/scenes/registry';
 import { WATER_LEVEL } from '../src/sim/world';
@@ -129,9 +129,9 @@ describe('editor cinematic gizmo core', () => {
             key: 'player',
             label: 'player',
             point: {
-              x: 725.4,
+              x: GULLHAVEN_HARBOR.deckArrival.x,
               y: 0.72,
-              z: 132.5,
+              z: GULLHAVEN_HARBOR.deckArrival.z,
             },
             riderHarborId: 'gullhaven',
           },

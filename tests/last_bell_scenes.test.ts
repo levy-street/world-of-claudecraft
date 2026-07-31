@@ -540,7 +540,7 @@ describe('the voyage cinematic', () => {
         ease: 'linear',
       },
       outArrival: {
-        start: { x: -40, y: 0, z: -13, yaw: -Math.PI / 2 },
+        start: { x: -40, y: 0, z: -13, yaw: -1.4 },
         end: { x: 0, y: 0, z: 0, yaw: 0 },
         duration: 7,
         ease: 'linear',
@@ -558,7 +558,7 @@ describe('the voyage cinematic', () => {
         ease: 'linear',
       },
       backArrival: {
-        start: { x: -40, y: 0, z: 13, yaw: Math.PI / 2 },
+        start: { x: -40, y: 0, z: 13, yaw: 1.4 },
         end: { x: 0, y: 0, z: 0, yaw: 0 },
         duration: 7,
         ease: 'linear',
@@ -579,14 +579,14 @@ describe('the voyage cinematic', () => {
     }).toEqual({ out: 21.5, back: 21.5, q0: 36.7 });
     const cameraTimes = (scene: typeof out): number[] =>
       scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.at] : []));
-    expect(cameraTimes(out)).toEqual([0.2, 4.2, 8.5, 15.5, 20.5]);
-    expect(cameraTimes(back)).toEqual([0.2, 4.2, 8.5, 15.5, 20.5]);
-    expect(cameraTimes(q0)).toEqual([0.2, 4.2, 8.5, 15.5, 21, 28.8, 35.7]);
+    expect(cameraTimes(out)).toEqual([0.45, 4.2, 8.5, 15.5, 20.5]);
+    expect(cameraTimes(back)).toEqual([0.45, 4.2, 8.5, 15.5, 20.5]);
+    expect(cameraTimes(q0)).toEqual([0.45, 4.2, 8.5, 15.5, 21, 28.8, 35.7]);
 
     for (const scene of [out, back, q0]) {
       expect(
         scene.ops.some(
-          (op) => op.at === 0 && op.kind === 'fade' && op.to === 'black' && op.dur === 0,
+          (op) => op.at === 0 && op.kind === 'fade' && op.to === 'black' && op.dur === 0.4,
         ),
       ).toBe(true);
       const finalFade = scene.ops.filter((op) => op.kind === 'fade').at(-1);
@@ -680,10 +680,9 @@ describe('the voyage cinematic', () => {
           ? [{ at: op.at, dur: op.dur }]
           : [],
       );
-      expect(pierFade).toHaveLength(2);
-      expect(pierFade.map((op) => op.dur)).toEqual([0.4, 0]);
+      expect(pierFade).toHaveLength(1);
+      expect(pierFade.map((op) => op.dur)).toEqual([0.4]);
       expect(pierFade[0]?.at).toBeCloseTo(15.05, 8);
-      expect(pierFade[1]?.at).toBeCloseTo(15.45, 8);
     }
 
     const arrivalCutKinds = (scene: typeof out) =>
@@ -788,12 +787,7 @@ describe('the voyage cinematic', () => {
     expect(sim.player.pos).toEqual(
       sim.groundPos(GULLHAVEN_HARBOR.gangplank.x, GULLHAVEN_HARBOR.gangplank.z),
     );
-    board(
-      sim,
-      GULLHAVEN_HARBOR.boarding.x,
-      GULLHAVEN_HARBOR.boarding.z,
-      'ch_lb_ferry_fare_back',
-    );
+    board(sim, GULLHAVEN_HARBOR.boarding.x, GULLHAVEN_HARBOR.boarding.z, 'ch_lb_ferry_fare_back');
     const ops = sceneOps(collect(sim, 10 * 20));
     expect(ops.length).toBeGreaterThan(0);
     expect(ops.every((e) => e.sceneId === 'scn_lb_ferry_depart_back')).toBe(true);
@@ -861,12 +855,7 @@ describe('the voyage cinematic', () => {
   it('skipping a return re-ride applies the un-emitted mainland walk endpoint', () => {
     const sim = makeRider();
     sim.ctx.players.get(sim.playerId)?.questsDone.add(Q0);
-    board(
-      sim,
-      GULLHAVEN_HARBOR.boarding.x,
-      GULLHAVEN_HARBOR.boarding.z,
-      'ch_lb_ferry_fare_back',
-    );
+    board(sim, GULLHAVEN_HARBOR.boarding.x, GULLHAVEN_HARBOR.boarding.z, 'ch_lb_ferry_fare_back');
     collect(sim, 4);
     expect(requestSceneSkip(sim.ctx)).toBe(true);
     const ops = sceneOps(collect(sim, 2));

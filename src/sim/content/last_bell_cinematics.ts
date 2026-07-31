@@ -37,7 +37,7 @@ export const LAST_BELL_PROP_PATH_SEGMENTS = {
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.arrival]: {
-    start: { x: -40, y: 0, z: -13, yaw: -Math.PI / 2 },
+    start: { x: -40, y: 0, z: -13, yaw: -1.4 },
     end: { x: 0, y: 0, z: 0, yaw: 0 },
     duration: 7,
     ease: 'linear',
@@ -55,7 +55,7 @@ export const LAST_BELL_PROP_PATH_SEGMENTS = {
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.arrival]: {
-    start: { x: -40, y: 0, z: 13, yaw: Math.PI / 2 },
+    start: { x: -40, y: 0, z: 13, yaw: 1.4 },
     end: { x: 0, y: 0, z: 0, yaw: 0 },
     duration: 7,
     ease: 'linear',

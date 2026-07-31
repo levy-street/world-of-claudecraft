@@ -133,10 +133,9 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   marshReeds: { url: '/models/props/reeds.glb', kit: 'nature' },
   dockPlatform: { url: '/models/props/dock_platform.glb', kit: 'pirate' },
   rowboat: { url: '/models/props/rowboat.glb', kit: 'pirate' },
-  // The harbor ferry ship (docs/prd/last-bell-harbor.md H1): pipeline-generated
-  // (Tripo, see CREDITS.md), flat walkable main deck; moored at each harbor's
-  // berth and placed by render/harbor.ts, whose walkable shipDecks in
-  // src/sim/harbor_layout.ts are measured from THIS model's deck plane.
+  // The harbor ferry ship: a deterministic procedural GLB whose factory also
+  // generates the walkable deck, rail opening, and blocker plan consumed by
+  // src/sim/harbor_layout.ts. The stable asset id and URL stay unchanged.
   harborShip: { url: '/models/props/grand_ferry_ship.glb', kit: 'pirate' },
   graveRound: { url: '/models/props/gravestone_round.glb', kit: 'grave' },
   graveCross: { url: '/models/props/gravestone_cross.glb', kit: 'grave' },
@@ -546,6 +545,7 @@ function convertMaterial(
     mat = new THREE.MeshStandardMaterial({
       color,
       map,
+      side: s.side,
       vertexColors: hasVertexColors,
       flatShading: hollow,
       normalMap: s.normalMap ?? null,
@@ -562,6 +562,7 @@ function convertMaterial(
     mat = new THREE.MeshLambertMaterial({
       color,
       map,
+      side: s.side,
       vertexColors: hasVertexColors,
       flatShading: hollow,
       emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),

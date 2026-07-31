@@ -6,11 +6,19 @@ import {
   deckStandInParentTransform,
   disposeDeckStandIn,
 } from '../src/render/harbor_deck_stand_in_core';
+import { GRAND_FERRY_SHIP_PLAN } from '../src/sim/grand_ferry_ship_plan.generated';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 import { WATER_LEVEL } from '../src/sim/world';
 
 const HARBOR_SOURCE = readFileSync(new URL('../src/render/harbor.ts', import.meta.url), 'utf8');
 const RENDERER_SOURCE = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+const STANDARD_SHIP_SCALE =
+  GRAND_FERRY_SHIP_PLAN.standardBerth.length / GRAND_FERRY_SHIP_PLAN.model.length;
+const GENERATED_DECK_ATTACH = {
+  x: GRAND_FERRY_SHIP_PLAN.deck.x * STANDARD_SHIP_SCALE,
+  y: (GRAND_FERRY_SHIP_PLAN.deck.y - GRAND_FERRY_SHIP_PLAN.model.keelY) * STANDARD_SHIP_SCALE,
+  z: GRAND_FERRY_SHIP_PLAN.deck.z * STANDARD_SHIP_SCALE,
+};
 
 describe('harbor deck stand-in core', () => {
   it('keeps the authoritative rig visible whenever the scene camera is inactive', () => {
@@ -35,7 +43,7 @@ describe('harbor deck stand-in core', () => {
   });
 
   it('preserves the authored world offset and player scale under the scaled ship parent', () => {
-    const shipScale = 60 / 36.39;
+    const shipScale = STANDARD_SHIP_SCALE;
     const transform = deckStandInParentTransform(
       { x: 6.6, y: 7.72, z: -1.25, yaw: Math.PI / 2 },
       shipScale,
@@ -50,14 +58,13 @@ describe('harbor deck stand-in core', () => {
   });
 
   it('places the authored attach point at both harbor deck centers and deck height', () => {
-    const attach = { x: 6.6, y: 7.72, z: 0 };
     for (const harbor of [MAINLAND_HARBOR, GULLHAVEN_HARBOR]) {
       const deck = harbor.shipDecks[0];
       const cos = Math.cos(harbor.berth.rot);
       const sin = Math.sin(harbor.berth.rot);
-      const worldX = harbor.berth.x + attach.x * cos + attach.z * sin;
-      const worldZ = harbor.berth.z - attach.x * sin + attach.z * cos;
-      const worldY = WATER_LEVEL - harbor.berth.draft + attach.y;
+      const worldX = harbor.berth.x + GENERATED_DECK_ATTACH.x * cos + GENERATED_DECK_ATTACH.z * sin;
+      const worldZ = harbor.berth.z - GENERATED_DECK_ATTACH.x * sin + GENERATED_DECK_ATTACH.z * cos;
+      const worldY = WATER_LEVEL - harbor.berth.draft + GENERATED_DECK_ATTACH.y;
 
       expect(worldX).toBeCloseTo(deck.x);
       expect(worldZ).toBeCloseTo(deck.z);
@@ -81,7 +88,14 @@ describe('harbor deck stand-in core', () => {
 describe('harbor deck stand-in render wiring', () => {
   it('builds the local appearance through the public character builder entry point', () => {
     expect(HARBOR_SOURCE).toContain(
-      'const HARBOR_SHIP_DECK_STAND_IN_ATTACH = {\n  x: 6.6,\n  y: 7.72,\n  z: 0,\n  yaw: Math.PI / 2,\n}',
+      "import { GRAND_FERRY_SHIP_PLAN } from '../sim/grand_ferry_ship_plan.generated';",
+    );
+    expect(HARBOR_SOURCE).toContain('const HARBOR_SHIP_STANDARD_SCALE =');
+    expect(HARBOR_SOURCE).toContain(
+      'x: GRAND_FERRY_SHIP_PLAN.deck.x * HARBOR_SHIP_STANDARD_SCALE,',
+    );
+    expect(HARBOR_SOURCE).toContain(
+      '(GRAND_FERRY_SHIP_PLAN.deck.y - GRAND_FERRY_SHIP_PLAN.model.keelY) * HARBOR_SHIP_STANDARD_SCALE,',
     );
     expect(HARBOR_SOURCE).toContain("from './characters';");
     expect(HARBOR_SOURCE).toContain('const visual = createCharacterVisual(player);');
