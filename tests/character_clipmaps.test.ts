@@ -87,6 +87,10 @@ function requiredClipNames(clips: ClipMap): string[] {
     ...(clips.hit ?? []),
     ...Object.values(clips.attackByAbility ?? {}),
     ...Object.values(clips.attackByHand ?? {}),
+    // The archer cycle names three real clips; releaseArmAt is a fraction.
+    clips.rangedBow?.draw,
+    clips.rangedBow?.hold,
+    clips.rangedBow?.release,
   ].filter((name): name is string => !!name);
 }
 
@@ -116,6 +120,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'attackByAbility',
   'attackByHand',
   'emote',
+  'rangedBow',
 ]);
 
 /**

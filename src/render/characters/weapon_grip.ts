@@ -86,9 +86,13 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
   // handoff position files (gripOverride + gripAttackOverride, blended during
   // the draw animation); only the idle grip is registered until the engine
   // grows a second-pose slot.
+  // Re-seated for the v04 hunter's left handslot frame like fletcher_s_guild_bow
+  // below (the old rot compensated the pre-v04 rig's handslot axes and lay the
+  // bow flat on this one): the same riser-in-fist reference carry; the aim
+  // seat blends in via visual.ts BOW_AIM_ADJUST_QUAT during the bow cycle.
   winterbite: {
-    pos: [-0.0439, -0.0034, 0.0066],
-    rot: [-164.6994, -29.0522, -148.7048],
+    pos: [-0.05, 0, 0],
+    rot: [174, 0, 122],
     scale: 1.05,
   },
   cinderlatch: {
@@ -120,7 +124,15 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
     scale: 1.1,
   },
   lacquered_rod: { pos: [0.0606, 0.1259, -0.0094], rot: [0, 0, -46.2693] },
-  fletcher_s_guild_bow: { pos: [-0.2237, 0, 0.0851] },
+  // The reference CARRY, seated against the v04 hunter's LEFT handslot (bows
+  // always attach left, so the rot composes on the identity base, no mirror):
+  // the riser IN the fist (the old 0.22 X offset compensated the pre-v04 rig
+  // and floated the bow beside the hand), limbs plumb vertical, string to the
+  // body. Solved analytically against the idle fist frames (stable within 2
+  // degrees across the cycle). The AIMING fist needs a different seat;
+  // CharacterVisual blends the hand-local aim adjustment in while the bow
+  // cycle is engaged (visual.ts BOW_AIM_ADJUST_QUAT).
+  fletcher_s_guild_bow: { pos: [-0.05, 0, 0], rot: [174, 0, 122] },
   shard_of_everwinter: { pos: [0, 0.0687, 0.1538], rot: [35.7041, 0, 0] },
 };
 

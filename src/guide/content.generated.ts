@@ -9741,7 +9741,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 3.12,
     "attach": [
       {
-        "url": "models/weapons/crossbow_1handed.glb",
+        "url": "models/weapons/fletcher_s_guild_bow.glb",
         "bone": "handslot.l"
       }
     ]

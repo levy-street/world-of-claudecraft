@@ -1408,14 +1408,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       fingerprint.update('\0');
     }
     expect(acceptedFiles).toHaveLength(4);
-    // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
-    // performance evidence files, which carry the composite polish provenance.
-    // The v0.32.0 catch-up merge changed src/render/renderer.ts (the one moved
-    // component), so the composite polish provenance moved and this seal follows.
-    // measured value (frame timings, draw stats, triangle and scenario numbers)
-    // is byte-identical, and no capture was retaken.
+    // Deliberately re-pinned for the hunter bow-cycle renderer integration:
+    // renderer.ts is a polish provenance input, so its digest sweep moved the
+    // composite these records carry. No capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'a4c1409c3483a0e78c750a2228e4e2edd08251fdb2c41071fa3953e928b9e278',
+      '78c8b5259f939e3e83ac799708300436f67af2773fa7b315d78d136ff784f091',
     );
   });
 

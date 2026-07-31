@@ -434,10 +434,15 @@ function offhandAttachDef(
   return url ? { url, bone: base.bone } : null;
 }
 
-// Classes without weaponSlots keep a FIXED weapon visual (the hunter's ranged
-// crossbow). A bow/crossbow skin replaces that fixed attach instead of a
-// swappable slot, so those attaches join the swap/stale cycle too.
-const RANGED_SWAP_BASENAMES = new Set(['crossbow_1handed', 'crossbow_2handed']);
+// Classes without weaponSlots keep a FIXED weapon visual (the hunter's default
+// bow; the mech suits' crossbows). A bow/crossbow skin replaces that fixed
+// attach instead of a swappable slot, so those attaches join the swap/stale
+// cycle too.
+const RANGED_SWAP_BASENAMES = new Set([
+  'crossbow_1handed',
+  'crossbow_2handed',
+  'fletcher_s_guild_bow',
+]);
 
 function attachBasename(att: AttachDef): string {
   return modelBasename(att.url);
@@ -863,6 +868,19 @@ function attachAllProps(
     const payload = attachProp(root, bone, att, swapKind, stowed);
     if (isWeapon || (isOffhandSwap && offhandSkinned)) payloads.push(payload);
   }
+  return payloads;
+}
+
+/** The live mainhand weapon payload roots on an assembled model (the tag
+ *  attachAllProps/setHeldWeapon stamp on swap and fixed-ranged attaches), for
+ *  callers that need them right after a construction-time assemble: the
+ *  orientation pins must exist from the first frame, not only after the first
+ *  gear/skin diff (the char-select preview never diffs). */
+export function heldWeaponPayloads(root: THREE.Object3D): THREE.Object3D[] {
+  const payloads: THREE.Object3D[] = [];
+  root.traverse((o) => {
+    if (o.userData[SWAP_WEAPON_TAG]) payloads.push(o);
+  });
   return payloads;
 }
 

@@ -476,6 +476,10 @@ export class CharacterPreview {
     // Update animations inside visual
     if (this.currentVisual) {
       this.currentVisual.update(dt, PREVIEW_ANIM_STATE, true);
+      // Weapon-skin VFX and the ranged orientation pins (the hunter's upright
+      // bow carry) advance here too, like the world renderer and the armory
+      // preview do: without it a pinned bow lies flat off the idle fist.
+      this.currentVisual.updateWeaponVfx(dt);
     }
 
     this.renderer.render(this.scene, this.camera);

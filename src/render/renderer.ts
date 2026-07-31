@@ -48,6 +48,7 @@ import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
+import { ArrowProjectiles } from './arrow_projectiles';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { attachBankerChestToNpcView } from './banker_chest';
 import { type BirdsView, buildBirds } from './birds';
@@ -98,6 +99,7 @@ import {
   preloadTrainingDummyAssets,
   trainingDummyAssetsReady,
 } from './characters/assets';
+import { writeBowShotInputs } from './characters/bow_cycle';
 import { isMechVisualKey, skinCount, visualKeyFor } from './characters/manifest';
 import {
   playerRangedAttackAlreadyStarted,
@@ -282,7 +284,7 @@ import { nationColors } from './vale_cup_flags';
 import { ValeCupPracticeSky } from './vale_cup_practice_sky';
 import { buildValeCupStadium, type ValeCupStadiumView } from './vale_cup_stadium';
 import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_team_ring';
-import { SCHOOL_COLORS, Vfx } from './vfx';
+import { type EntityAnchor, SCHOOL_COLORS, Vfx } from './vfx';
 import { ViewCreateRetryGate } from './view_create_retry';
 import { type WarriorCastVisualPlan, warriorCastVisualPlan } from './warrior_cast_fx_core';
 import { RecklessSkullPainter } from './warrior_cast_fx_painter';
@@ -1451,6 +1453,8 @@ export class Renderer {
   // see src/render/ability_vfx/).
   private abilityVfx: AbilityVfx;
   private abilityVfxFx: AbilityVfxFx;
+  /** Flying arrow meshes for physical ranged shots (replaces the magic comet). */
+  arrowProjectiles: ArrowProjectiles;
   private lightPulses: LightPulses;
   // Flash a pooled talent-moment point light at an entity's feet (see
   // light_pulses.ts); bound once in the constructor over the views map.
@@ -2205,7 +2209,7 @@ export class Renderer {
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
-    const vfxAnchor = (id: number, frac: number) => {
+    const vfxAnchor: EntityAnchor = (id, frac) => {
       const v = this.views.get(id);
       if (!v) return null;
       const e = this.sim.entities.get(id);
@@ -2213,6 +2217,7 @@ export class Renderer {
       return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
     };
     this.vfx = new Vfx(this.scene, vfxAnchor);
+    this.arrowProjectiles = new ArrowProjectiles(this.scene, vfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.abilityVfxFx = new AbilityVfxFx(this.scene, this.camera, vfxAnchor, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
@@ -3670,6 +3675,7 @@ export class Renderer {
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
     this.abilityVfx.update(dt);
+    this.arrowProjectiles.update(dt);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
@@ -4991,13 +4997,27 @@ export class Renderer {
           this.triggerAttack(ev.sourceId);
           break;
         }
-        // Player ranged attacks begin when their projectile launches. The live
-        // CharacterVisual chooses the authored crossbow/default clip or the bow
-        // skin's cosmetic draw override without changing the sim timeline.
+        // Player ranged attacks begin when their projectile launches. A rig
+        // with the bow-native cycle (v04 hunter) looses its drawn arrow, snap
+        // aligned to this event (bow_cycle.ts); any other rig plays the
+        // authored ranged one-shot or the bow skin's cosmetic draw override.
         if (ev.fx === 'projectile' && ev.attackAnimation === 'ranged-shot') {
           const source = this.sim.entities.get(ev.sourceId);
-          if (playerRangedAttackStartsAtLaunch(source?.kind, ev.attackAnimation))
-            this.triggerAttack(ev.sourceId);
+          if (playerRangedAttackStartsAtLaunch(source?.kind, ev.attackAnimation)) {
+            const view = this.views.get(ev.sourceId);
+            const vis = view ? this.activeVisual(view) : null;
+            if (!vis?.notifyRangedLaunch()) this.triggerAttack(ev.sourceId);
+          }
+        } else if (ev.fx === 'projectile') {
+          // Arrow-carried spell shots (a hunter's stings): a bow-cycle rig
+          // looses its nocked arrow for these too; every other class's
+          // projectile spell is a no-op here (no cycle to notify).
+          const source = this.sim.entities.get(ev.sourceId);
+          if (source?.kind === 'player') {
+            const view = this.views.get(ev.sourceId);
+            const vis = view ? this.activeVisual(view) : null;
+            vis?.notifyRangedLaunch();
+          }
         }
         const warriorCast = warriorCastVisualPlan(ev.fx, ev.ability);
         if (warriorCast?.kind === 'shout') {
@@ -5010,7 +5030,16 @@ export class Renderer {
           gvis?.playGesture(warriorCast.abilityId);
           break;
         }
-        if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
+        if (
+          ev.fx === 'projectile' &&
+          ev.attackAnimation === 'ranged-shot' &&
+          this.bowCycleAt(ev.sourceId)
+        )
+          // a bow-cycle rig's physical shot flies a real arrow; every other
+          // 'ranged-shot' source (a warrior's hurled Storm Bolt, the mech's
+          // arm cannon) keeps the physical comet
+          this.arrowProjectiles.spawn(ev.sourceId, ev.targetId);
+        else if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'heavyBolt')
           // Pyroblast's boulder: the same homing comet, doubled up.
           this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 2);
@@ -6154,6 +6183,13 @@ export class Renderer {
     this.attackTriggerCount++;
     if (isSpinAttackAbility(abilityId)) visual.playWhirl();
     else visual.playAttack(abilityId);
+  }
+
+  /** The entity's live visual runs the bow-native ranged cycle (bow_cycle.ts). */
+  private bowCycleAt(entityId: number): boolean {
+    const v = this.views.get(entityId);
+    const visual = v ? this.activeVisual(v) : null;
+    return visual?.hasBowCycle === true;
   }
 
   private playShoutFx(
@@ -7805,6 +7841,21 @@ export class Renderer {
         st.running = false;
         st.airborne = false;
       }
+      // bow-cycle facts (v04 hunter): projectile casts engage for everyone
+      // (castRemaining is replicated); auto-shot prediction is self-only. Mobs
+      // and NPCs skip the target lookup (the writer zeroes their fields), and
+      // the distance stays plain sqrt: this runs for every visible player
+      // every frame.
+      let bowTargetDist: number | null = null;
+      if (e.kind === 'player' && e.targetId !== null) {
+        const bowTarget = this.sim.entities.get(e.targetId);
+        if (bowTarget && !bowTarget.dead) {
+          const bdx = bowTarget.pos.x - e.pos.x;
+          const bdz = bowTarget.pos.z - e.pos.z;
+          bowTargetDist = Math.sqrt(bdx * bdx + bdz * bdz);
+        }
+      }
+      writeBowShotInputs(st, e, isSelf, bowTargetDist);
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;
@@ -8323,6 +8374,7 @@ export class Renderer {
       this.time,
     );
     this.abilityVfx.update(dt);
+    this.arrowProjectiles.update(dt);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
