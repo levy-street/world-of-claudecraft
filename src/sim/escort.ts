@@ -6,9 +6,10 @@
 //   idle -> (interact with the quest active) -> walking -> ambush (paused
 //   until the wave is dead) -> ... -> final waypoint -> credit + despawn ->
 //   respawn after def.respawnSeconds. Escortee death fails the run the same
-//   respawn way, so the quest is simply retried. A wave mob that evades (its
-//   hate table cleared by the leash reset) is re-committed to the escortee by
-//   the driver, so a kited wave can never wedge the walk until the timeout.
+//   respawn way, so the quest is simply retried. A wave mob that evades keeps
+//   its normal leash contract (it walks home and resets); once it lands idle
+//   with an empty hate table the driver re-commits it to the escortee, so a
+//   kited wave can never wedge the walk until the timeout.
 //
 // The escortee is an ordinary non-hostile mob entity, so it rides the normal
 // entity snapshot to clients with no new wire plumbing. Players cannot attack
@@ -170,6 +171,11 @@ function fireAmbushes(ctx: SimContext, def: EscortDef, state: EscortRunState, np
         npc.pos.z + Math.cos(angle) * radius,
       );
       const mob = createMob(ctx.nextId++, template, template.minLevel, pos);
+      // A slain wave mob unravels once its corpse decays (the summoned-add arm
+      // in mob/locomotion.ts) instead of riding the generic in-place respawn:
+      // a wave that respawned 25s after being cut down would re-enter
+      // ambushIds' live count and wedge (or re-attack) a still-walking run.
+      mob.summonedAdd = true;
       ctx.addEntity(mob);
       // Commit the wave to the escortee, social_aggro-style; player damage
       // out-threats the seed immediately via the normal pull-over rules.
@@ -183,10 +189,15 @@ function fireAmbushes(ctx: SimContext, def: EscortDef, state: EscortRunState, np
   }
 }
 
-// A live wave mob whose evade reset wiped its hate table (idle or walking
-// home, no threat entries) re-commits to the escortee, mirroring the spawn
-// seed in fireAmbushes. Never touches an engaged mob (threat non-empty) or a
-// fleeing one (a flee keeps its table). Draws no rng.
+// A live wave mob whose evade completed (it walked home, resetEvadingMob ran,
+// and it now sits idle with an empty hate table) re-commits to the escortee,
+// mirroring the spawn seed in fireAmbushes. Strictly `idle`: touching the
+// `evade` state would fire on the leash-break tick itself (the leash prelude
+// clears threat and enters `evade` in one step, and this driver runs later
+// the same tick), re-anchoring the leash at the kite spot and making the wave
+// leash-immune. Waiting for `idle` preserves the full walk-home reset. Never
+// touches an engaged mob (threat non-empty) or a fleeing one (a flee keeps
+// its table). Draws no rng.
 function recommitEvadedAmbushers(
   ctx: SimContext,
   run: NonNullable<EscortRunState['run']>,
@@ -195,7 +206,7 @@ function recommitEvadedAmbushers(
   for (const id of run.ambushIds) {
     const mob = ctx.entities.get(id);
     if (!mob || mob.dead) continue;
-    if (mob.aiState !== 'idle' && mob.aiState !== 'evade') continue;
+    if (mob.aiState !== 'idle') continue;
     if (mob.threat.size > 0) continue;
     mob.aiState = 'chase';
     mob.aggroTargetId = npc.id;
@@ -287,9 +298,9 @@ export function updateEscorts(ctx: SimContext): void {
     }
     // An ambush wave holds the walk: the escortee waits while any of its
     // attackers still stands. A wave mob that EVADED (a player kited it past
-    // its leash, then died, stealthed, or ran) comes home with a cleared hate
-    // table and would otherwise idle beside the waiting escortee until the
-    // run timeout: re-commit it to the escortee so the wave resumes the
+    // its leash, then died, stealthed, or ran) walks home, resets, and lands
+    // idle with a cleared hate table; it would otherwise stand there until
+    // the run timeout: re-commit it to the escortee so the wave resumes the
     // attack and the run always resolves one way or the other.
     if (liveAmbushCount(ctx, run) > 0) {
       recommitEvadedAmbushers(ctx, run, npc);
