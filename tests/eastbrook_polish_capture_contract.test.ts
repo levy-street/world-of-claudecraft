@@ -360,7 +360,12 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      fingerprint: '55350ff7362bd39ecc4952a088d03f42573a70db9cf757a264a9d68fb5dfded2',
+      // Deliberately re-pinned: the review's roof-course offset fix and the
+      // makeOpenPitchedRoof coupling guard touched buildings_commerce.js, a
+      // pinned townAsset source-fingerprint input, so this composite mints
+      // fresh even though the fix only changes the bank's own geometry by a
+      // few millimeters and adds a runtime assertion. No recapture.
+      fingerprint: 'abbc67001854b668e89116cea18b28ae0a7fd3856fe2709535c36768614f3682',
       components: {
         captureContract: {
           id: 'polish-v2',

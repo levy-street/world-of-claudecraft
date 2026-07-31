@@ -32,11 +32,29 @@ function addTimberBracket(buckets, x, y, z, mirror = 1) {
   addBeamXY(buckets, 'timber', [x, y - 0.42], [x + mirror * 0.38, y], z, 0.1, 0.12, P.timberDark);
 }
 
+// makePitchedRoof's first 4 triangles (12 indices) are the two slope quads on
+// both ridge axes today; the last 4 are the gable end caps this bank canopy
+// deliberately drops (open underside, see addBankVaultAlcove/teller-bay
+// canopy callers). This assumes makePitchedRoof keeps emitting the slopes
+// first with no local guard of its own, so if that ordering ever changes the
+// bank would silently ship wrong roof geometry with only the GLB sha pin,
+// several steps removed, to notice. The assertion below catches a reorder
+// immediately: the 4 sliced slope triangles must reference all 6 of the
+// roof's vertices (the two full slope faces do; either gable cap alone only
+// touches 3 or 4 of them), so a reorder that swaps in cap triangles instead
+// fails loudly here rather than shipping silently.
 function makeOpenPitchedRoof(width, depth, eaveY, peakY, ridgeAxis) {
   const geometry = makePitchedRoof(width, depth, eaveY, peakY, ridgeAxis);
   const index = geometry.getIndex();
   if (!index) throw new Error('bank roof geometry is missing its index');
-  geometry.setIndex(Array.from(index.array).slice(0, 12));
+  const sloped = Array.from(index.array).slice(0, 12);
+  const referenced = new Set(sloped);
+  if (referenced.size !== 6) {
+    throw new Error(
+      `bank open roof: expected the first 4 triangles to reference all 6 roof vertices (slopes only), got ${referenced.size}; makePitchedRoof's triangle order may have changed`,
+    );
+  }
+  geometry.setIndex(sloped);
   geometry.computeVertexNormals();
   return geometry;
 }
@@ -230,6 +248,14 @@ function addBankMainRoofBargeboards(buckets, options) {
   }
 }
 
+// Matches addRoofCourses' surface offset (shared.js) so the bank's courses sit
+// as far off the roof as every other building's, instead of the 0.003 this
+// used to use: an order of magnitude tighter, which review measured as only
+// a few post-quantization steps clear of the roof surface itself (a real
+// z-fighting risk at range, since the town has no logarithmic depth buffer
+// and is drawn well past the depth-precision distance where that gap matters).
+const ROOF_COURSE_SURFACE_OFFSET = 0.025;
+
 function addBankMainRoofCourses(buckets, width, depth, eaveY, peakY, centerZ) {
   const rise = peakY - eaveY;
   const halfDepth = depth / 2;
@@ -241,10 +267,16 @@ function addBankMainRoofCourses(buckets, width, depth, eaveY, peakY, centerZ) {
       const halfCourse = 0.006;
       const lowerFraction = fraction - halfCourse;
       const upperFraction = fraction + halfCourse;
-      const lowerY = eaveY + rise * lowerFraction + normalY * 0.003;
-      const upperY = eaveY + rise * upperFraction + normalY * 0.003;
-      const lowerZ = centerZ + side * halfDepth * (1 - lowerFraction) + side * normalZ * 0.003;
-      const upperZ = centerZ + side * halfDepth * (1 - upperFraction) + side * normalZ * 0.003;
+      const lowerY = eaveY + rise * lowerFraction + normalY * ROOF_COURSE_SURFACE_OFFSET;
+      const upperY = eaveY + rise * upperFraction + normalY * ROOF_COURSE_SURFACE_OFFSET;
+      const lowerZ =
+        centerZ +
+        side * halfDepth * (1 - lowerFraction) +
+        side * normalZ * ROOF_COURSE_SURFACE_OFFSET;
+      const upperZ =
+        centerZ +
+        side * halfDepth * (1 - upperFraction) +
+        side * normalZ * ROOF_COURSE_SURFACE_OFFSET;
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute(
         'position',
@@ -394,10 +426,11 @@ function addBankVaultAlcove(buckets, centerX, facadeZ) {
   addGeometry(buckets, 'roof', makeOpenPitchedRoof(1.4, 0.82, 2.62, 3.02, 'x'), P.roofDeep, {
     position: [centerX, 0, facadeZ + 0.18],
   });
-  for (const x of [centerX + 0.6]) {
-    addBox(buckets, 'timber', [0.16, 1.92, 0.17], [x, 1.66, facadeZ + 0.4], P.timberDark);
-    addBox(buckets, 'stone', [0.3, 0.36, 0.31], [x, 0.68, facadeZ + 0.4], P.stoneLight);
-  }
+  // One pier only, deliberately not a mirrored pair: the alcove sits at the
+  // teller bay's edge, so a mirror pier at centerX - 0.6 would land inside
+  // the teller bay itself.
+  addBox(buckets, 'timber', [0.16, 1.92, 0.17], [centerX + 0.6, 1.66, facadeZ + 0.4], P.timberDark);
+  addBox(buckets, 'stone', [0.3, 0.36, 0.31], [centerX + 0.6, 0.68, facadeZ + 0.4], P.stoneLight);
   addBox(buckets, 'timber', [1.52, 0.14, 0.14], [centerX, 2.62, facadeZ + 0.58], P.timberDark);
 }
 
