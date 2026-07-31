@@ -1416,7 +1416,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // measured value (frame timings, draw stats, triangle and scenario numbers)
     // is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '5cfaae2d85a20f775c4893babd26b48d27a6403c1b4a3bb0917826f8e91a615f',
+      'ec4d9c4d25f53230e2090e7c59958c97c9fa0cad0fd823ade13b01059cfd6381',
     );
   });
 

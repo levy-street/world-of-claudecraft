@@ -1872,9 +1872,13 @@ export class Renderer {
     let bdLast = bdStart;
     const bd = (phase: string): void => {
       const now = performance.now();
-      console.info(
-        `[build-diag] ${phase} +${(now - bdLast).toFixed(0)}ms (total ${(now - bdStart).toFixed(0)}ms)`,
-      );
+      // Gated like [load-diag] and the residency table: dev browsers plus the
+      // native iOS profile under diagnosis, never the production web console.
+      if (import.meta.env.DEV || GFX.nativeIosMemoryProfile) {
+        console.info(
+          `[build-diag] ${phase} +${(now - bdLast).toFixed(0)}ms (total ${(now - bdStart).toFixed(0)}ms)`,
+        );
+      }
       bdLast = now;
     };
     this.terrainView = buildTerrain(this.sim.cfg.seed, {

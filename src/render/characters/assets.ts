@@ -965,6 +965,11 @@ export function setHeldOffhand(
 export function weaponSkinDisplayModel(skinId: string): THREE.Object3D | null {
   const url = weaponSkinModelUrl(skinId);
   if (!url) return null;
+  // Streamed skin not arrived yet (packaged iOS: the Armory prewarm starts
+  // microseconds after the stream pass): degrade to null, which the preview
+  // rig treats as unavailable, and kick the fetch. Throwing here lost the
+  // whole 29-skin warmup and could escape an ArmoryInspect click handler.
+  if (residentOrEnsure(url) === null) return null;
   const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(url).scene));
   payload.traverse((o) => {
     const mesh = o as THREE.Mesh;

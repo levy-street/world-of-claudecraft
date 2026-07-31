@@ -226,6 +226,22 @@ describe('post-entry mob-body streaming (packaged iOS)', () => {
     expect(mainSource).toContain('ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));');
   });
 
+  it('degrades a not-yet-resident skin in the Armory display-model path', () => {
+    // weaponSkinDisplayModel feeds the store preview (prewarm loops every skin
+    // id microseconds after the stream pass starts): a non-resident streamed
+    // skin returns null (the rig treats it as unavailable) instead of letting
+    // resolvedGltf throw away the whole warmup or escape a click handler.
+    expect(assetsSource).toContain('if (residentOrEnsure(url) === null) return null;');
+    // The preview recovers on reselect: same-skin no-op only while a rig exists.
+    const previewSource = readFileSync(
+      new URL('../src/render/armory_preview.ts', import.meta.url),
+      'utf8',
+    );
+    expect(previewSource).toContain(
+      'if (disposed || (next === skinId && (next === null || activeWeaponRig !== null))) return;',
+    );
+  });
+
   it('re-arms a failed streamed body fetch from the visual-build miss path', () => {
     // A streamed body whose one-shot stream fetch failed must not stay
     // invisible for the session: resolvedGltf kicks the fetch again before its
