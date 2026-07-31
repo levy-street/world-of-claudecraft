@@ -169,6 +169,9 @@ the following taxonomy.
   all authored.
 - `continuity.shipScreenDirection`: a moving ship keeps its horizontal
   screen direction across adjacent shots unless full black separates them.
+- `continuity.berthPose`: a departure starts at its rendered parked berth
+  pose, and an arrival ends there, within the named position and yaw
+  tolerances derived from the harbor berth.
 - `continuity.standInHandoff`: the moving deck stand-in hands back to the
   real player only under full black.
 

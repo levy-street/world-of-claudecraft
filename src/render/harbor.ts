@@ -25,6 +25,7 @@ import {
   type HarborDef,
   type HarborRail,
   type HarborRamp,
+  harborShipParkedPose,
   harborSurfaceHeight,
 } from '../sim/harbor_layout';
 import type { Entity, SceneAttachFrame } from '../sim/types';
@@ -666,10 +667,11 @@ export const updateHarborShips = createHarborShipUpdater<Entity, CharacterVisual
 function buildShip(parent: THREE.Group, harbor: HarborDef): void {
   const ship = propAsset('harborShip');
   const scale = harbor.berth.length / ship.size.x;
+  const parked = harborShipParkedPose(harbor.berth, WATER_LEVEL);
   const g = new THREE.Group();
-  g.position.set(harbor.berth.x, WATER_LEVEL - harbor.berth.draft, harbor.berth.z);
+  g.position.set(parked.x, parked.y, parked.z);
   g.scale.setScalar(scale);
-  g.rotation.y = harbor.berth.rot;
+  g.rotation.y = parked.yaw;
   parent.add(g);
   const shipVisual = addAsset(g, ship);
   if (harbor.berth.mirrorZ) shipVisual.scale.z = -1;
@@ -678,17 +680,17 @@ function buildShip(parent: THREE.Group, harbor: HarborDef): void {
     target,
     harbor,
     group: g,
-    baseX: harbor.berth.x,
-    baseY: WATER_LEVEL - harbor.berth.draft,
-    baseZ: harbor.berth.z,
-    baseRot: harbor.berth.rot,
+    baseX: parked.x,
+    baseY: parked.y,
+    baseZ: parked.z,
+    baseRot: parked.yaw,
     frame: {
       position: {
-        x: harbor.berth.x,
-        y: WATER_LEVEL - harbor.berth.draft,
-        z: harbor.berth.z,
+        x: parked.x,
+        y: parked.y,
+        z: parked.z,
       },
-      yaw: harbor.berth.rot,
+      yaw: parked.yaw,
     },
     shipDecks: harbor.shipDecks,
     displaced: false,
