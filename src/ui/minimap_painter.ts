@@ -252,6 +252,10 @@ export class MinimapPainter {
     private readonly classColor: (cls: string) => string,
     private readonly localizeZone: (zoneId: string) => string,
     private readonly localizeRift: (name: string, rank: string | null) => string,
+    /** The battleground's own name. The band sits far off the overworld plane,
+     *  so localizeZone would resolve it to whatever zone its coordinates happen
+     *  to land nearest, which reads as the last town the player stood in. */
+    private readonly battlegroundName: () => string,
   ) {}
 
   /** Resolve the minimap color tokens in one getComputedStyle pass (a 2D
@@ -425,7 +429,7 @@ export class MinimapPainter {
     const S = MINIMAP_SIZE;
     const pxPerYard = MINIMAP_BASE_SCALE * zoom;
     const model = this.markers.build(world, S, pxPerYard);
-    this.writers.setText(zoneLabelEl, this.localizeZone(model.zoneId));
+    this.writers.setText(zoneLabelEl, this.battlegroundName());
     const p = world.player;
     const o = bgOriginAt(p.pos.z);
     const bg = this.ensureBattlegroundBg(colors);

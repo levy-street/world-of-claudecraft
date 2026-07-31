@@ -819,6 +819,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.launcherTitle': 'PvP:鴉裂谷與競技場',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': '鴉裂谷',
+  'hudChrome.bg.blurb':
+    '兩座廢棄的要塞隔著棘峰下的圍牆山谷遙遙相望：緋紅在南，蔚藍在北，而兩者之間的古老廢墟庭院，誰都不曾真正佔據。每方五人，各持一面戰旗，先將對方戰旗奪回己方五次者贏得戰場。',
   'hudChrome.bg.modeTag': '5v5奪旗戰',
   'hudChrome.bg.offlineNote': '鴉裂谷正在同步。待王國回應後即可排隊。',
   'hudChrome.bg.ratingSummary': '評分。{wins}勝 / {losses}敗',

@@ -844,6 +844,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.launcherTitle': 'PvP: 레이븐리프트와 투기장',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': '레이븐리프트',
+  'hudChrome.bg.blurb':
+    '가시봉 아래 성벽으로 둘러싸인 분지를 사이에 두고 두 폐허가 된 요새가 마주 본다. 남쪽은 크림슨, 북쪽은 애저, 그 사이의 오래된 폐허 안뜰은 아직 누구도 차지하지 못했다. 5대 5, 깃발은 하나씩. 상대의 깃발을 먼저 다섯 번 가져오는 쪽이 전장을 차지한다.',
   'hudChrome.bg.modeTag': '5v5 깃발 뺏기',
   'hudChrome.bg.offlineNote': '레이븐리프트 동기화 중입니다. 서버 응답 후 대기열이 열립니다.',
   'hudChrome.bg.ratingSummary': '레이팅. {wins}승 / {losses}패',

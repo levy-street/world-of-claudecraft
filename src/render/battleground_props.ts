@@ -26,7 +26,18 @@ import { surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 const FLAG_POLE_H = 3.2;
-const FLAG_POLE_R = 0.055;
+// The pole reads as a WAR STANDARD, not a stick: thick enough to have weight at
+// the distance a flag is usually seen from (across a chamber), socketed in a
+// stone foot, banded in gold, and finished with a spear point rather than the
+// bare ball it used to carry.
+const FLAG_POLE_R = 0.075;
+const FLAG_FOOT_R = 0.3;
+const FLAG_FOOT_H = 0.2;
+const FLAG_BAND_R = FLAG_POLE_R * 1.35;
+const FLAG_BAND_H = 0.07;
+const FLAG_FINIAL_H = 0.42;
+const FLAG_FINIAL_R = FLAG_POLE_R * 1.9;
+const FLAG_GOLD = 0xd8b34a;
 const PENNANT_W = 1.15;
 const PENNANT_H = 0.75;
 const PENNANT_BLOOM_BOOST = 1.6; // high-tier color multiplier (bloom pop only)
@@ -64,7 +75,10 @@ export type BgObjectRefs =
 
 let flagPoleGeo: THREE.CylinderGeometry | null = null;
 let pennantGeo: THREE.ShapeGeometry | null = null;
-let flagFinialGeo: THREE.SphereGeometry | null = null;
+let flagFinialGeo: THREE.ConeGeometry | null = null;
+let flagFootGeo: THREE.CylinderGeometry | null = null;
+let flagBandGeo: THREE.CylinderGeometry | null = null;
+let flagCollarGeo: THREE.SphereGeometry | null = null;
 let carryRingGeo: THREE.RingGeometry | null = null;
 let runeDiscGeo: THREE.CircleGeometry | null = null;
 let runeGemGeo: THREE.BoxGeometry | null = null;
@@ -269,8 +283,15 @@ export function buildBattlegroundObject(
   // lean pivot the fx pass tips over the carrier's shoulder while carried; the
   // ring under it flags the carrier at a glance from any angle.
   flagPoleGeo ??= markSharedGeometry(
-    new THREE.CylinderGeometry(FLAG_POLE_R, FLAG_POLE_R * 1.5, FLAG_POLE_H, 6),
+    new THREE.CylinderGeometry(FLAG_POLE_R * 0.85, FLAG_POLE_R * 1.15, FLAG_POLE_H, 10),
   );
+  flagFootGeo ??= markSharedGeometry(
+    new THREE.CylinderGeometry(FLAG_FOOT_R * 0.78, FLAG_FOOT_R, FLAG_FOOT_H, 12),
+  );
+  flagBandGeo ??= markSharedGeometry(
+    new THREE.CylinderGeometry(FLAG_BAND_R, FLAG_BAND_R, FLAG_BAND_H, 10),
+  );
+  flagCollarGeo ??= markSharedGeometry(new THREE.SphereGeometry(FLAG_POLE_R * 1.5, 10, 8));
   if (!pennantGeo) {
     // A swallowtail pennant (hoist at the pole, V notch on the fly), not the
     // old bare rectangle: the flag itself should read as a war banner.
@@ -283,20 +304,35 @@ export function buildBattlegroundObject(
     shape.closePath();
     pennantGeo = markSharedGeometry(new THREE.ShapeGeometry(shape));
   }
-  flagFinialGeo ??= markSharedGeometry(new THREE.SphereGeometry(FLAG_POLE_R * 2.4, 8, 6));
+  // A spear point, not a bead: the silhouette that makes it read as a standard.
+  flagFinialGeo ??= markSharedGeometry(new THREE.ConeGeometry(FLAG_FINIAL_R, FLAG_FINIAL_H, 10));
   carryRingGeo ??= markSharedGeometry(
     new THREE.RingGeometry(CARRY_RING_INNER, CARRY_RING_OUTER, 24),
   );
   const lean = new THREE.Group();
   lean.rotation.order = 'YXZ'; // yaw to the carrier first, then tilt back
-  const pole = new THREE.Mesh(flagPoleGeo, surfaceMat({ color: 0x5a4632, roughness: 0.9 }));
+  const pole = new THREE.Mesh(flagPoleGeo, surfaceMat({ color: 0x4a3728, roughness: 0.85 }));
   pole.position.y = FLAG_POLE_H / 2;
   lean.add(pole);
+  // The socketed stone foot sits OUTSIDE the lean pivot: the pole tips over a
+  // carrier's shoulder, but the plinth it was pulled out of does not travel.
+  const foot = new THREE.Mesh(flagFootGeo, surfaceMat({ color: 0x6c6357, roughness: 0.95 }));
+  foot.position.y = FLAG_FOOT_H / 2;
+  group.add(foot);
+  // Two gold ferrules banding the shaft, the detail that sells the weight.
+  for (const y of [FLAG_POLE_H * 0.28, FLAG_POLE_H * 0.62]) {
+    const band = new THREE.Mesh(flagBandGeo, gemMaterial(FLAG_GOLD));
+    band.position.y = y;
+    lean.add(band);
+  }
   const pennant = new THREE.Mesh(pennantGeo, pennantMaterial(color, lowGfx));
   pennant.position.set(FLAG_POLE_R, FLAG_POLE_H - PENNANT_H / 2 - 0.1, 0);
   lean.add(pennant);
-  const finial = new THREE.Mesh(flagFinialGeo, gemMaterial(0xd8b34a));
-  finial.position.y = FLAG_POLE_H + 0.06;
+  const collar = new THREE.Mesh(flagCollarGeo, gemMaterial(FLAG_GOLD));
+  collar.position.y = FLAG_POLE_H + 0.02;
+  lean.add(collar);
+  const finial = new THREE.Mesh(flagFinialGeo, gemMaterial(FLAG_GOLD));
+  finial.position.y = FLAG_POLE_H + FLAG_FINIAL_H / 2 + 0.08;
   lean.add(finial);
   group.add(lean);
   const ring = new THREE.Mesh(carryRingGeo, glowMaterial(color));
@@ -310,5 +346,5 @@ export function buildBattlegroundObject(
   if (team !== null) {
     group.userData.bg = { kind: 'flag', team, color, lean, ring } satisfies BgObjectRefs;
   }
-  return { group, height: FLAG_POLE_H + 0.4 };
+  return { group, height: FLAG_POLE_H + FLAG_FINIAL_H + 0.2 };
 }

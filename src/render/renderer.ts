@@ -6901,6 +6901,22 @@ export class Renderer {
   /** Is the camera under real sky? The overworld, Wildheart's open field, and
    *  the Thornhollow Fields hollow all render the dome; every enclosed state
    *  (dungeon, temple, rift, underwater) does not. */
+  /** Drive the field wards off the live match view: the form-up gate while the
+   *  countdown holds, and the grave ward while the player waits as a spirit.
+   *  Only visibility flags, so this is cheap enough for the per-frame block. */
+  private updateBgWards(): void {
+    if (this.bgViews.size === 0) return;
+    const match = this.sim.bgInfo?.match ?? null;
+    const me = this.sim.playerId;
+    const mine = match?.players.find((p) => p.pid === me) ?? null;
+    const state = {
+      countdown: match?.state === 'countdown',
+      ghost: Boolean(match && match.state === 'active' && mine?.dead),
+      myTeam: match ? match.myTeam : null,
+    };
+    for (const view of this.bgViews.values()) view.setWardState(state);
+  }
+
   private isOpenAirFog(): boolean {
     return (
       this.fogState === 'outdoor' ||
@@ -8324,6 +8340,7 @@ export class Renderer {
     );
     worldStart = markWorldPhase('water', worldStart);
     this.bgFx.update(this.time);
+    this.updateBgWards();
     this.vfx.update(dt);
     // Racing line (cosmetic; reads the self race view only).
     this.raceLine.update(this.sim.mountRaceView(), this.time, dt);

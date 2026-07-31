@@ -1002,6 +1002,7 @@ export const fr_FR: EnTranslations = {
     },
     "bg": {
       "title": "Thornhollow Fields",
+      "blurb": "Two ruined keeps face each other across a walled hollow under Thornpeak: Crimson to the south, Azure to the north, and the old Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry five of theirs home takes the field.",
       "modeTag": "5v5 Capture the Flag",
       "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
       "ratingSummary": "Rating. {wins} wins / {losses} losses",

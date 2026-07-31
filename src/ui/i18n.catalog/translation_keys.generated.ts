@@ -6234,6 +6234,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.bank.withdrawQuantityInput'
   | 'hudChrome.bank.withdrawQuantityTitle'
   | 'hudChrome.bg.azure'
+  | 'hudChrome.bg.blurb'
   | 'hudChrome.bg.board.assists'
   | 'hudChrome.bg.board.captures'
   | 'hudChrome.bg.board.deaths'

@@ -342,6 +342,7 @@ export class ArenaWindow {
   }
 
   private bgBodyHtml(view: Extract<BgWindowView, { kind: 'live' }>): string {
+    const blurb = `<div class="bg-blurb">${esc(t('hudChrome.bg.blurb'))}</div>`;
     const rank =
       `<div class="bg-rank"><span class="rating">${esc(num(view.rating))}</span>` +
       `<span class="wl">${esc(
@@ -352,7 +353,7 @@ export class ArenaWindow {
       view.allTime && view.allTime.length > 0
         ? `<div class="bg-sub">${esc(t('hudChrome.bg.ladderAllTime'))}</div>${this.bgLadderHtml(view.allTime)}`
         : `<div class="bg-sub">${esc(t('hudChrome.bg.ladderAllTime'))}</div><div class="ladder-empty">${esc(t('hudChrome.bg.noRanked'))}</div>`;
-    return rank + this.bgActionHtml(view.action) + allTimeSection;
+    return blurb + rank + this.bgActionHtml(view.action) + allTimeSection;
   }
 
   private bgActionHtml(action: BgWindowAction): string {

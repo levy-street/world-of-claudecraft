@@ -818,6 +818,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.launcherTitle': 'PvP:鸦裂谷与竞技场',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': '鸦裂谷',
+  'hudChrome.bg.blurb':
+    '两座废弃的要塞隔着索恩峰下的围墙山谷遥遥相望：绯红在南，蔚蓝在北，而两者之间的古老废墟庭院，谁都不曾真正占据。每方五人，各持一面战旗，先将对方战旗夺回本方五次者赢得战场。',
   'hudChrome.bg.modeTag': '5v5夺旗战',
   'hudChrome.bg.offlineNote': '鸦裂谷正在同步。待王国响应后即可排队。',
   'hudChrome.bg.ratingSummary': '评分。{wins}胜 / {losses}负',

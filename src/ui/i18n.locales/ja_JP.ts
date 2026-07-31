@@ -846,6 +846,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.launcherTitle': 'PvP:レイヴンリフトと闘技場',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': 'レイヴンリフト',
+  'hudChrome.bg.blurb':
+    'ソーンピークの麓、壁に囲まれた窪地を挟んで二つの廃城が向かい合う。南に真紅、北に蒼藍、その間には未だどちらの手にも落ちていない古い廃墟の中庭が横たわる。五対五、旗は各一本。相手の旗を五度持ち帰った側が戦場を制する。',
   'hudChrome.bg.modeTag': '5v5キャプチャー・ザ・フラッグ',
   'hudChrome.bg.offlineNote': 'レイヴンリフトは同期中です。レルムの応答後にキューが開きます。',
   'hudChrome.bg.ratingSummary': 'レーティング。{wins}勝 / {losses}敗',

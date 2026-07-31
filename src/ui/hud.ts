@@ -3850,6 +3850,7 @@ export class Hud {
     (zoneId) => zoneDisplayName(zoneId),
     (name, rank) =>
       rank ? t('hud.core.riftLabelRanked', { name, rank }) : t('hud.core.riftLabel', { name }),
+    () => t('hudChrome.bg.title'),
   );
   private readonly presentationBag: PainterHostPresentation = {
     itemIcon: (item) => this.itemIcon(item),

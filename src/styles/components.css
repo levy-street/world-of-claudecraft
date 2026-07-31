@@ -8574,9 +8574,32 @@
   }
 
   /* ---------- Thornhollow Fields (the merged PvP window's primary tab) ---------- */
+  /* The mode tag sits BESIDE the field's name, and both live in the title row's
+     display font. Left inline it wrapped mid-phrase ("5v5 Capture the / Flag")
+     on a narrow panel and pushed the close button around, so the tag drops to
+     its own line as a subtitle instead of competing for the same one. */
+  #arena-window #arena-title {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    min-width: 0;
+  }
   #arena-window .bg-mode-tag {
     color: #998d6a;
     font-size: 11px;
+    font-family: var(--ui-font);
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+  /* The two-sentence pitch under the tab strip: what the place is, then what
+     the match is. Body font, not the display face, so it reads as prose. */
+  #arena-window .bg-blurb {
+    font-family: var(--ui-font);
+    font-size: 12px;
+    line-height: 1.5;
+    color: #b6ad93;
+    margin: 8px 0 10px;
   }
   .bg-sub {
     font-family: var(--title-font);

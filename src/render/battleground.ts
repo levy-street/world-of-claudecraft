@@ -33,6 +33,7 @@ import { buildLanternFlames } from './battleground_lantern_fx';
 import { TORCH_FLAME, TORCH_HEAD_LOCAL } from './battleground_lantern_fx_core';
 import { type BgPlacementsView, buildBattlegroundPlacements } from './battleground_placements';
 import { type BgTerrainView, buildBattlegroundTerrain } from './battleground_terrain';
+import { type BgWardState, type BgWardView, buildBgWards } from './battleground_ward';
 import { ensureDungeonAssets } from './dungeon';
 import { GFX } from './gfx';
 import { freezeStaticMatrices } from './static_matrix';
@@ -94,6 +95,9 @@ export interface BattlegroundLightHooks {
 
 export interface BattlegroundView {
   group: THREE.Group;
+  /** Drive the field's state-dependent wards (the form-up gate, the grave
+   *  ward). Cheap and idempotent: it only sets visibility flags. */
+  setWardState(state: BgWardState): void;
   dispose(): void;
 }
 
@@ -223,6 +227,8 @@ export function buildBattleground(
   group.position.set(origin.x, 0, origin.z);
 
   let terrain: BgTerrainView | null = null;
+  let wards: BgWardView | null = null;
+  let pendingWard: BgWardState | null = null;
   let placements: BgPlacementsView | null = null;
   const owned: (THREE.BufferGeometry | THREE.Material)[] = [];
   const lights: THREE.PointLight[] = [];
@@ -241,6 +247,12 @@ export function buildBattleground(
         return;
       }
       group.add(terrain.group);
+
+      // The wards go up with the ground: they are the visible half of rules the
+      // sim already enforces, so they must not wait on the art stream.
+      wards = buildBgWards();
+      group.add(wards.group);
+      if (pendingWard) wards.setState(pendingWard);
 
       placements = await buildBattlegroundPlacements(bgAssetGroups(), { lowGfx: opts.lowGfx });
       if (disposed) {
@@ -301,9 +313,16 @@ export function buildBattleground(
 
   return {
     group,
+    setWardState(state: BgWardState): void {
+      // The field streams in, so a state that arrives before the wards exist is
+      // remembered rather than dropped.
+      if (wards) wards.setState(state);
+      else pendingWard = state;
+    },
     dispose(): void {
       disposed = true;
       group.removeFromParent();
+      wards?.dispose();
       terrain?.dispose();
       placements?.dispose();
       for (const light of lights) light.dispose();

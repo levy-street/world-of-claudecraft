@@ -337,6 +337,7 @@ function newPainter(): MinimapPainter {
     () => 'cls-color',
     (zoneId: string) => zoneId,
     (name: string, rank: string | null) => (rank ? `${name} ${rank}` : name),
+    () => 'Thornhollow Fields',
   );
 }
 
