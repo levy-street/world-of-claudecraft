@@ -21,7 +21,10 @@ import {
   structuralSnapshot,
   weaponVfxModelKeys,
 } from '../scripts/assets/lib/glb_texture_compression_core.mjs';
-import { patchBasisTranscoderSource } from '../scripts/patch_basis_transcoder.mjs';
+import {
+  patchBasisTranscoderSource,
+  VENDORED_TRANSCODER_DIR,
+} from '../scripts/patch_basis_transcoder.mjs';
 import { WEAPON_VFX } from '../src/render/weapon_vfx';
 
 const ROOT = path.resolve(__dirname, '..');
@@ -85,15 +88,7 @@ describe('GLB texture KTX2 compression', () => {
   });
 
   it('ships the basis transcoder and wires KTX2Loader into the runtime loader', () => {
-    const vendoredDir = path.join(
-      ROOT,
-      'node_modules',
-      'three',
-      'examples',
-      'jsm',
-      'libs',
-      'basis',
-    );
+    const vendoredDir = path.join(ROOT, ...VENDORED_TRANSCODER_DIR);
     for (const f of ['basis_transcoder.js', 'basis_transcoder.wasm']) {
       expect(fs.existsSync(path.join(ROOT, 'public', 'basis', f)), `public/basis/${f}`).toBe(true);
     }

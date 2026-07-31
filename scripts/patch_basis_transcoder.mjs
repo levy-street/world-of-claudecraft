@@ -37,8 +37,11 @@ const REPLACEMENTS = {
   __emval_get_method_caller: `function __emval_get_method_caller(argCount,argTypes){var types=__emval_lookupTypes(argCount,argTypes);var retType=types[0];var argN=argCount-1;var invokerFunction=function(handle,name,destructors,args){var offset=0;var callArgs=new Array(argN);for(var i=0;i<argN;++i){callArgs[i]=types[i+1].readValueFromPointer(args+offset);offset+=types[i+1]["argPackAdvance"]}var rv=handle[name].apply(handle,callArgs);for(var i=0;i<argN;++i){if(types[i+1]["deleteObject"]){types[i+1]["deleteObject"](callArgs[i])}}if(!retType.isVoid){return retType.toWireType(destructors,rv)}};return __emval_addMethodCaller(invokerFunction)}`,
 };
 
+// The paren is part of the marker so a prefix-renamed site (an upstream
+// craftInvokerFunctionV2) throws "not found" instead of silently patching the
+// wrong function and leaving dangling call sites behind a green pin.
 function extractFunction(source, name) {
-  const marker = `function ${name}`;
+  const marker = `function ${name}(`;
   const start = source.indexOf(marker);
   if (start < 0) throw new Error(`patch_basis_transcoder: ${name} not found`);
   if (source.indexOf(marker, start + 1) >= 0) {
@@ -56,6 +59,25 @@ function extractFunction(source, name) {
   return source.slice(start, i + 1);
 }
 
+/** Behavior-shaped scan for dynamic-code use of the Function constructor:
+ *  matches `new Function(`, `new_(Function,`, and a bare `Function("...")`
+ *  call, while skipping identifiers that merely end in Function (the file has
+ *  dozens, e.g. createNamedFunction). The one construct it deliberately does
+ *  not match is emval_get_global's `{return Function}` reference, which is
+ *  unreachable in every host with globalThis and never CALLS the constructor
+ *  at that site. */
+export const DYNAMIC_FUNCTION_CALL = /(^|[^\w.$])Function\s*[(,]/;
+
+/** Any eval reference at all, including indirect `(0,eval)(...)` and
+ *  `globalThis.eval(...)`, both CSP-blocked exactly like the direct form.
+ *  Callers strip the banner first ("eval-free", "unsafe-eval"). */
+export const EVAL_REFERENCE = /\beval\b/;
+
+/** Strip the WoC banner so the scans above see only transcoder code. */
+export function withoutBanner(source) {
+  return source.startsWith('/*') ? source.slice(source.indexOf('*/') + 2) : source;
+}
+
 /** Pure transform: three's vendored transcoder source in, patched source out.
  *  Throws when a site is missing or a dynamic-code marker survives, so a
  *  three bump that reshapes embind fails loudly instead of shipping evals. */
@@ -70,25 +92,35 @@ export function patchBasisTranscoderSource(source) {
     }
     out = out.replace(original, replacement);
   }
-  if (out.includes('new Function') || out.includes('new_(Function')) {
+  if (DYNAMIC_FUNCTION_CALL.test(out) || EVAL_REFERENCE.test(out)) {
     throw new Error('patch_basis_transcoder: dynamic-code markers remain after patching');
+  }
+  // Compile-only syntax check: the brace matcher above is string-literal
+  // blind, so prove the spliced output still parses before anyone ships it
+  // (never invoked; Function wraps the source as an uncalled function body).
+  try {
+    new Function(out);
+  } catch (err) {
+    throw new Error(`patch_basis_transcoder: patched output does not parse: ${err}`);
   }
   return BANNER + out;
 }
 
+/** Shared locations, so the pin test and the CLI cannot drift apart. */
+export const VENDORED_TRANSCODER_DIR = [
+  'node_modules',
+  'three',
+  'examples',
+  'jsm',
+  'libs',
+  'basis',
+];
+export const SHIPPED_TRANSCODER_DIR = ['public', 'basis'];
+
 const isMain = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
 if (isMain) {
-  const vendored = path.join(
-    ROOT,
-    'node_modules',
-    'three',
-    'examples',
-    'jsm',
-    'libs',
-    'basis',
-    'basis_transcoder.js',
-  );
-  const shipped = path.join(ROOT, 'public', 'basis', 'basis_transcoder.js');
+  const vendored = path.join(ROOT, ...VENDORED_TRANSCODER_DIR, 'basis_transcoder.js');
+  const shipped = path.join(ROOT, ...SHIPPED_TRANSCODER_DIR, 'basis_transcoder.js');
   const patched = patchBasisTranscoderSource(fs.readFileSync(vendored, 'utf8'));
   fs.writeFileSync(shipped, patched);
   console.log(`patched ${shipped} (${patched.length} chars) from three's vendored transcoder`);
