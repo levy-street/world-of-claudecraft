@@ -47,9 +47,9 @@ function boardMainland(sim: Sim): void {
 
 function boardGullhaven(sim: Sim): void {
   teleport(sim, GULLHAVEN_HARBOR.boarding.x, GULLHAVEN_HARBOR.boarding.z);
-  const odda = keeper(sim, 'ferrykeeper_odda');
-  expect(odda).toBeTruthy();
-  sim.player.targetId = odda?.id ?? null;
+  const islandEwald = keeper(sim, 'ferryman_ewald_gullhaven');
+  expect(islandEwald).toBeTruthy();
+  sim.player.targetId = islandEwald?.id ?? null;
   sim.interact();
 }
 
@@ -211,13 +211,13 @@ describe('the ferry fare', () => {
     expect(sim.player.pos.x).toBeGreaterThan(200);
   });
 
-  it('talking to either gangplank keeper opens the fare; the offer map pins both', () => {
+  it('talking to either Ewald post opens the fare; the offer map pins both', () => {
     // The one source of truth the gossip button and the sim talk arm share.
     expect(ferryFareOfferFor('ferryman_ewald')).toEqual({
       choiceId: OUT,
       promptKey: 'lb.fare.promptOut',
     });
-    expect(ferryFareOfferFor('ferrykeeper_odda')).toEqual({
+    expect(ferryFareOfferFor('ferryman_ewald_gullhaven')).toEqual({
       choiceId: BACK,
       promptKey: 'lb.fare.promptBack',
     });
@@ -232,11 +232,13 @@ describe('the ferry fare', () => {
     expect(sim.ctx.activeChoices.get(-sim.playerId)?.choiceId).toBe(OUT);
     expect(answerSceneChoice(sim.ctx, OUT, 'decline')).toBe(true);
 
-    const odda = [...sim.entities.values()].find((e) => e.templateId === 'ferrykeeper_odda');
-    expect(odda).toBeTruthy();
-    if (!odda) return;
-    teleport(sim, odda.pos.x + 1, odda.pos.z + 1);
-    sim.player.targetId = odda.id;
+    const islandEwald = [...sim.entities.values()].find(
+      (e) => e.templateId === 'ferryman_ewald_gullhaven',
+    );
+    expect(islandEwald).toBeTruthy();
+    if (!islandEwald) return;
+    teleport(sim, islandEwald.pos.x + 1, islandEwald.pos.z + 1);
+    sim.player.targetId = islandEwald.id;
     sim.interact();
     expect(sim.ctx.activeChoices.get(-sim.playerId)?.choiceId).toBe(BACK);
   });

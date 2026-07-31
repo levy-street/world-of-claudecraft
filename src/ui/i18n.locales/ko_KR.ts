@@ -10618,10 +10618,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.ferryman_ewald.title': '건너편 해안 나루',
   'entities.npcs.ferryman_ewald.greeting':
     '건너편 해안으로 가나? 이제 고기잡이 때문에 건너는 사람은 아무도 없어, 친구. 준비되면 배에 타게. 도착하면 종소리를 잘 들어. 그 마을 사람들은 자네가 날씨를 살피듯 종소리를 듣거든.',
-  'entities.npcs.ferrykeeper_odda.name': '나루지기 오다',
-  'entities.npcs.ferrykeeper_odda.title': '건너편 해안 나루',
-  'entities.npcs.ferrykeeper_odda.greeting':
-    '본토로 가나? 배는 자네가 탄 뒤에 떠나. 그전에는 안 가. 밧줄을 풀 때 종이 횟수를 세기 시작해도 돌아가 달라고 하지는 마. 세 번 울리는 종을 향해 노를 젓는 사람은 없으니까.',
+  'entities.npcs.ferryman_ewald_gullhaven.name': '뱃사공 에발트',
+  'entities.npcs.ferryman_ewald_gullhaven.title': '건너편 해안 나루',
+  'entities.npcs.ferryman_ewald_gullhaven.greeting':
+    '건너편 해안으로 가나? 이제 고기잡이 때문에 건너는 사람은 아무도 없어, 친구. 준비되면 배에 타게. 도착하면 종소리를 잘 들어. 그 마을 사람들은 자네가 날씨를 살피듯 종소리를 듣거든.',
   'entities.npcs.sergeant_marsh.name': '마시 중사',
   'entities.npcs.sergeant_marsh.title': '마을 민병대',
   'entities.npcs.sergeant_marsh.greeting':

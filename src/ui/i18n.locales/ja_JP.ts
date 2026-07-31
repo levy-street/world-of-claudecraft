@@ -10625,10 +10625,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.ferryman_ewald.title': '対岸への渡し',
   'entities.npcs.ferryman_ewald.greeting':
     '対岸へ行くのか？ もう漁のために渡る者はいないよ、旅人。支度ができたら乗りな。着いたら鐘に気をつけろ。あの町の者は、天気を読むように鐘の音を聞く。',
-  'entities.npcs.ferrykeeper_odda.name': '船守オッダ',
-  'entities.npcs.ferrykeeper_odda.title': '対岸への渡し',
-  'entities.npcs.ferrykeeper_odda.greeting':
-    '本土行きかい？ 船はあんたが乗ってから出す。それより前には出さない。綱を解く最中に鐘が数え始めても、引き返せとは言わないでおくれ。三つ鐘へ向かって漕ぐ者はいないんだ。',
+  'entities.npcs.ferryman_ewald_gullhaven.name': '渡し守エーヴァルト',
+  'entities.npcs.ferryman_ewald_gullhaven.title': '対岸への渡し',
+  'entities.npcs.ferryman_ewald_gullhaven.greeting':
+    '対岸へ行くのか？ もう漁のために渡る者はいないよ、旅人。支度ができたら乗りな。着いたら鐘に気をつけろ。あの町の者は、天気を読むように鐘の音を聞く。',
   'entities.npcs.sergeant_marsh.name': 'マーシュ軍曹',
   'entities.npcs.sergeant_marsh.title': '町の民兵',
   'entities.npcs.sergeant_marsh.greeting':
