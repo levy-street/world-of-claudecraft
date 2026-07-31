@@ -2872,6 +2872,45 @@
   .mt-row.aggro {
     border-color: #c0392b;
   }
+  /* A bar whose split says more than the bar does: pressing it opens that
+     member's spell rows in the panel (a pet has no bar of its own, so this is
+     where its casts are read). The caret is the affordance; it is drawn, never
+     a glyph, so it carries no text to localize. */
+  .mt-row.mt-expandable {
+    cursor: var(--cursor-point);
+  }
+  .mt-row.mt-expandable .mt-label {
+    left: 14px;
+  }
+  .mt-row.mt-expandable .mt-label::before {
+    content: "";
+    position: absolute;
+    left: -10px;
+    top: 6px;
+    border: 3px solid transparent;
+    border-left-color: #e8dcc0;
+    filter: drop-shadow(1px 1px 1px #000);
+  }
+  .mt-row.mt-expandable.mt-open .mt-label::before {
+    left: -11px;
+    top: 8px;
+    border-left-color: transparent;
+    border-top-color: #e8dcc0;
+  }
+  /* One row of an open member's split: the same bar shape, shorter and indented
+     under the member it belongs to, with a dimmed copy of their class color. */
+  .mt-row.mt-arow {
+    height: 14px;
+    margin-left: 10px;
+    background: #100d0a;
+  }
+  .mt-row.mt-arow .mt-label,
+  .mt-row.mt-arow .mt-num {
+    line-height: 14px;
+    font-size: 10px;
+    font-weight: normal;
+    color: #e2d8c0;
+  }
   .mt-fill {
     position: absolute;
     inset: 0;

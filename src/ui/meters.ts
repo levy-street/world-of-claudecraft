@@ -12,8 +12,10 @@
 //
 // A controlled pet (hunter, warlock, mage) is NOT its own row: its output folds
 // into its owner's, the way a real damage meter reports a hunter. The pet's
-// name survives on the per-ability breakdown entries, so hovering the owner's
-// bar still shows exactly what the pet contributed.
+// name survives on the per-ability breakdown entries, and that split is painted
+// INTO the panel under the owner's bar ("Emberkin: Firebolt"), not only into the
+// hover tooltip: your own bar starts open, so a solo pet class reads what the
+// pet contributed without knowing to hover. Any bar opens and closes on press.
 
 import { CLASSES } from '../sim/data';
 import type { SimEvent } from '../sim/types';
@@ -30,6 +32,7 @@ import {
 } from './meters_breakdown_view';
 import { MeterFrame } from './meters_frame';
 import { METER_FRAME_LIMITS, TABBED_METER_FRAME_LIMITS } from './meters_frame_core';
+import { buildMeterList } from './meters_list_view';
 import { buildMeterTabMenu, type MeterMenuRow } from './meters_menu_view';
 import { buildMeterRows, type MeterPet, type MeterTab } from './meters_rows_view';
 import type { SimpleMenuItem } from './simple_context_menu';
@@ -312,19 +315,22 @@ export interface MetersDeps {
 type Pet = MeterPet;
 
 /**
- * One pooled bar. Rows are reused across renders (never rebuilt from
- * innerHTML) so the tooltip can be attached ONCE per node: rebuilding the row
- * under the cursor at the 4Hz render cadence would drop the hover and make the
- * breakdown flicker. The tooltip closure reads `pid`/`name` LIVE off this
- * record instead of capturing them.
+ * One pooled line: a member's bar, or one row of an open member's split. Lines
+ * are reused across renders (never rebuilt from innerHTML) so the tooltip can be
+ * attached ONCE per node: rebuilding the row under the cursor at the 4Hz render
+ * cadence would drop the hover and make the breakdown flicker. The tooltip
+ * closure and the click handler read `pid`/`name`/`kind` LIVE off this record
+ * instead of capturing them.
  */
 interface MeterRowNodes {
   el: HTMLElement;
   fill: HTMLElement;
   label: HTMLElement;
   num: HTMLElement;
+  /** the member this line belongs to (an ability line carries its owner) */
   pid: number;
   name: string;
+  kind: 'member' | 'ability';
 }
 
 /** What a panel needs from its owner: the shared data and the live world. */
@@ -368,6 +374,8 @@ export class MetersPanel {
   private readonly hintEl: HTMLElement;
   private rowPool: MeterRowNodes[] = [];
   private frame: MeterFrame | null = null;
+  /** Explicit expand/collapse choices; anything absent takes the default. */
+  private readonly expandOverride = new Map<number, boolean>();
 
   constructor(
     private readonly spec: PanelSpec,
@@ -589,31 +597,132 @@ export class MetersPanel {
       aggroPid,
     });
 
-    this.syncRowPool(rows.length);
-    rows.forEach(({ tally, value, fill, hasAggro }, i) => {
-      const row = this.rowPool[i];
-      row.pid = tally.pid;
-      row.name = tally.name;
-      row.el.style.display = 'block';
-      row.fill.style.width = `${Math.max(4, fill * 100)}%`;
-      const color = tally.cls && (CLASSES as Record<string, { color: number }>)[tally.cls]?.color;
-      row.fill.style.background = color ? `#${color.toString(16).padStart(6, '0')}cc` : '#888888cc';
-      row.label.textContent = tally.name;
-      row.num.textContent = isThreat ? fmtNum(value) : fmtPerSecondRow(value, value / enc.duration);
-      row.el.classList.toggle('aggro', hasAggro);
+    // A member's split is painted INTO the panel under their bar, not only into
+    // the hover tooltip: a pet has no bar of its own, so on the tooltip alone a
+    // solo pet class saw one bar with their own name and no trace of the pet.
+    const byContributor = isThreat && liveThreat !== null;
+    const lines = buildMeterList(
+      rows.map((row) => ({
+        row,
+        // buildMeterRows narrows the tally to what the bar model reads; the
+        // split needs the per-ability maps, which live on the record itself.
+        entries: this.entriesFor(
+          enc.tallies.get(row.tally.pid),
+          liveThreat,
+          byContributor,
+          petsByOwner ?? EMPTY_PETS,
+        ),
+        expanded: this.isExpanded(row.tally.pid),
+      })),
+      enc.duration,
+    );
+
+    this.syncRowPool(lines.length);
+    // An ability line inherits its owner's bar color (dimmed) so the member and
+    // their split read as one block; carried down the list rather than looked up
+    // again, since the core emits every split directly under its own bar.
+    let ownerColor = MEMBER_FALLBACK_COLOR;
+    let ownerName = '';
+    lines.forEach((line, i) => {
+      const node = this.rowPool[i];
+      node.el.style.display = 'block';
+      if (line.kind === 'member') {
+        const { tally, value, fill, hasAggro } = line.row;
+        ownerColor = classColor(tally.cls);
+        ownerName = tally.name;
+        node.kind = 'member';
+        node.pid = tally.pid;
+        node.name = tally.name;
+        node.el.classList.remove('mt-arow');
+        node.el.classList.toggle('aggro', hasAggro);
+        node.el.classList.toggle('mt-expandable', line.expandable);
+        node.el.classList.toggle('mt-open', line.expanded);
+        // Only a bar that HAS a split is a toggle. Announcing "collapsed" on a
+        // bar with nothing to open would promise an action that does nothing.
+        if (line.expandable) {
+          node.el.setAttribute('role', 'button');
+          node.el.setAttribute('aria-expanded', line.expanded ? 'true' : 'false');
+        } else {
+          node.el.removeAttribute('role');
+          node.el.removeAttribute('aria-expanded');
+        }
+        node.fill.style.width = `${Math.max(4, fill * 100)}%`;
+        node.fill.style.background = `${ownerColor}cc`;
+        node.label.textContent = tally.name;
+        node.num.textContent = isThreat
+          ? fmtNum(value)
+          : fmtPerSecondRow(value, value / enc.duration);
+        return;
+      }
+      node.kind = 'ability';
+      node.pid = line.ownerPid;
+      node.name = ownerName;
+      node.el.classList.add('mt-arow');
+      node.el.classList.remove('aggro', 'mt-expandable', 'mt-open');
+      node.el.removeAttribute('role');
+      node.el.removeAttribute('aria-expanded');
+      node.fill.style.width = `${Math.max(2, line.row.fill * 100)}%`;
+      node.fill.style.background = `${ownerColor}55`;
+      node.label.textContent = breakdownRowLabel(line.row, ownerName, byContributor);
+      node.num.textContent = breakdownRowValue(line.row);
     });
-    for (let i = rows.length; i < this.rowPool.length; i++) {
+    for (let i = lines.length; i < this.rowPool.length; i++) {
       this.rowPool[i].el.style.display = 'none';
     }
   }
 
-  /** Grow the pooled bars to `count` rows, attaching each row's tooltip once. */
+  /**
+   * The raw contributions behind one member's bar: their per-ability split on
+   * the damage/healing tabs, or, while a live hate table is driving the threat
+   * tab, one entry per contributor (the member plus each of their pets), which
+   * is what that column actually sums.
+   */
+  private entriesFor(
+    tally: MemberTally | undefined,
+    liveThreat: Map<number, number> | null,
+    byContributor: boolean,
+    // Passed in rather than re-read: render() already scanned the entity map
+    // once for this frame, and this now runs per MEMBER, not per hover.
+    petsByOwner: Map<number, Pet[]>,
+  ): BreakdownEntry[] {
+    if (!tally) return [];
+    if (byContributor && liveThreat) {
+      return [
+        { ability: null, petName: null, amount: liveThreat.get(tally.pid) ?? 0 },
+        ...(petsByOwner.get(tally.pid) ?? []).map((pet) => ({
+          ability: null,
+          petName: pet.name,
+          amount: liveThreat.get(pet.pid) ?? 0,
+        })),
+      ];
+    }
+    return [...(this.tab === 'heal' ? tally.healByAbility : tally.dmgByAbility).values()];
+  }
+
+  /** Whether this panel has `pid`'s split open. */
+  private isExpanded(pid: number): boolean {
+    const chosen = this.expandOverride.get(pid);
+    if (chosen !== undefined) return chosen;
+    // Default: your OWN bar starts open. Solo (the case where the folded pet is
+    // invisible, since the owner is then the only bar) that is the whole point;
+    // in a party every other member stays one line until asked.
+    return pid === this.host.world.player.id;
+  }
+
+  /** Open/close one member's split. Bound to the bar, so it is a player choice. */
+  private toggleExpanded(pid: number): void {
+    this.expandOverride.set(pid, !this.isExpanded(pid));
+    this.render(true);
+  }
+
+  /** Grow the pooled lines to `count`, attaching each line's tooltip once. */
   private syncRowPool(count: number): void {
     while (this.rowPool.length < count) {
       const el = document.createElement('div');
       el.className = 'mt-row';
       // Focusable so the breakdown is reachable by keyboard, not hover only
-      // (attachTooltip shows on focusin and on a mobile long-press).
+      // (attachTooltip shows on focusin and on a mobile long-press), and so the
+      // expand toggle has a keyboard path.
       el.tabIndex = 0;
       const fill = document.createElement('div');
       fill.className = 'mt-fill';
@@ -622,10 +731,21 @@ export class MetersPanel {
       const num = document.createElement('span');
       num.className = 'mt-num';
       el.append(fill, label, num);
-      const row: MeterRowNodes = { el, fill, label, num, pid: -1, name: '' };
+      const row: MeterRowNodes = { el, fill, label, num, pid: -1, name: '', kind: 'member' };
       this.rowPool.push(row);
       this.rowsEl.appendChild(el);
       this.host.attachTooltip(el, () => this.breakdownHtml(row));
+      // Pooled node, so the handler reads the record LIVE: which member this
+      // line carries changes every render. Only a bar toggles; a line inside a
+      // split is a readout, not a control.
+      el.addEventListener('click', () => {
+        if (row.kind === 'member') this.toggleExpanded(row.pid);
+      });
+      el.addEventListener('keydown', (ev) => {
+        if (row.kind !== 'member' || (ev.key !== 'Enter' && ev.key !== ' ')) return;
+        ev.preventDefault();
+        this.toggleExpanded(row.pid);
+      });
     }
   }
 
@@ -648,21 +768,12 @@ export class MetersPanel {
     const liveThreat = mob && !mob.dead && mob.threat.size > 0 ? mob.threat : null;
     const byContributor = isThreat && liveThreat !== null;
 
-    let entries: BreakdownEntry[];
-    if (byContributor && liveThreat) {
-      entries = [
-        { ability: null, petName: null, amount: liveThreat.get(tally.pid) ?? 0 },
-        ...(this.host.petsByOwner().get(tally.pid) ?? []).map((pet) => ({
-          ability: null,
-          petName: pet.name,
-          amount: liveThreat.get(pet.pid) ?? 0,
-        })),
-      ];
-    } else {
-      entries = [...(this.tab === 'heal' ? tally.healByAbility : tally.dmgByAbility).values()];
-    }
-
-    const model = buildMeterBreakdown(entries, enc.duration);
+    // A hover is a one-off, so this is the one place that pays for its own pet
+    // scan; the per-frame path hands render()'s single scan down instead.
+    const model = buildMeterBreakdown(
+      this.entriesFor(tally, liveThreat, byContributor, this.host.petsByOwner()),
+      enc.duration,
+    );
     const summary = t('hudChrome.meters.breakdownSummary', {
       tab: t(TAB_LABEL_KEY[isThreat && !byContributor ? 'dmg' : this.tab]),
       value: isThreat ? fmtNum(model.total) : fmtPerSecondRow(model.total, model.perSecond),
@@ -675,15 +786,7 @@ export class MetersPanel {
 
   private breakdownRowHtml(row: BreakdownRow, memberName: string, byContributor: boolean): string {
     const label = breakdownRowLabel(row, memberName, byContributor);
-    const value = t('hudChrome.meters.breakdownRow', {
-      value: fmtNum(row.amount),
-      percent: t('hudChrome.meters.percent', {
-        value: formatNumber(Math.round(row.share * 100), {
-          maximumFractionDigits: 0,
-          useGrouping: false,
-        }),
-      }),
-    });
+    const value = breakdownRowValue(row);
     return (
       `<div class="mt-tip-row">` +
       `<span class="mt-tip-bar" style="width:${Math.max(2, row.fill * 100)}%"></span>` +
@@ -895,6 +998,34 @@ export class Meters {
       if (panel.isOpen || force) panel.render(force && panel.isOpen);
     }
   }
+}
+
+// Bar color for a member with no class (an unresolved row), kept next to the
+// class lookup so the two cannot drift.
+const MEMBER_FALLBACK_COLOR = '#888888';
+
+// Stand-in for the pet scan the damage and healing tabs never make: those tabs
+// split by ability, so no lookup is ever performed against it.
+const EMPTY_PETS: Map<number, Pet[]> = new Map();
+
+/** `#rrggbb` for a class id, alpha left to the caller. */
+function classColor(cls: string | null): string {
+  const color = cls && (CLASSES as Record<string, { color: number }>)[cls]?.color;
+  return color ? `#${color.toString(16).padStart(6, '0')}` : MEMBER_FALLBACK_COLOR;
+}
+
+// "{value} ({percent}%)" cell for one split row, shared by the in-panel line and
+// the hover tooltip so the two readouts of the same number cannot disagree.
+function breakdownRowValue(row: BreakdownRow): string {
+  return t('hudChrome.meters.breakdownRow', {
+    value: fmtNum(row.amount),
+    percent: t('hudChrome.meters.percent', {
+      value: formatNumber(Math.round(row.share * 100), {
+        maximumFractionDigits: 0,
+        useGrouping: false,
+      }),
+    }),
+  });
 }
 
 // Row label: the folded tail, a threat contributor (the member or one of their

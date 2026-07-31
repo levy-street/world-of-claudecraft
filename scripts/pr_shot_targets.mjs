@@ -1364,8 +1364,8 @@ export const TARGETS = [
   },
   {
     key: 'meters',
-    label: 'Damage meters: bars plus the per-ability hover breakdown',
-    when: ['ui/meters', 'meters_breakdown'],
+    label: 'Damage meters: bars plus the per-ability split, in the panel and on hover',
+    when: ['ui/meters', 'meters_breakdown', 'meters_list'],
     variants: [
       { key: 'desktop', charClass: 'warlock', charName: 'Nyxaris' },
       { key: 'mobile', charClass: 'warlock', charName: 'Nyxaris', mobile: true },
