@@ -5,7 +5,17 @@ import {
   WATER_FOAM_WIDTH_YARDS,
   WATER_SEABED_CLAMP_YARDS,
 } from '../src/render/water_core';
+import { HARBOR_TERRAIN_EDITS } from '../src/sim/harbor_layout';
 import { waterLevel } from '../src/sim/world';
+
+// The authored harbor berth basins are deliberately carved deeper than any
+// natural coastline so the grand ferry's hull can float; the colour ramp
+// clamps inside them by design. The natural-coast scan below excludes those
+// authored regions, derived from the same terrain-edit data the world uses.
+const BASIN_EDITS = HARBOR_TERRAIN_EDITS.filter((e) => e.mode === 'level' && e.delta <= -6);
+function insideAuthoredBasin(x: number, z: number): boolean {
+  return BASIN_EDITS.some((e) => Math.hypot(x - e.x, z - e.z) <= e.radius + 1);
+}
 
 // The water surface look is tuned against real coastline geometry, so the
 // geometry it assumes is pinned here. A terrain change that breaks one of these
@@ -43,6 +53,7 @@ describe('coastline geometry the water surface is tuned against', () => {
     let deepest = 0;
     for (let x = -600; x <= 600; x += 37) {
       for (let z = -600; z <= 2400; z += 53) {
+        if (insideAuthoredBasin(x, z)) continue;
         deepest = Math.max(deepest, shoreDepthAt(x, z, SEED));
       }
     }

@@ -125,21 +125,22 @@ describe('generated chunk geometry is stable', () => {
     expect(inRect.length).toBe(36);
     expect(gapFill.length).toBe(22);
 
-    // Re-minted for the natural-relief heightfield plus the shared height
-    // lattice in terrain_chunk_build.ts (vertex normals now difference the
-    // lattice at the chunk's own spacing instead of a fixed 1.5yd stencil).
-    // Both were intended, reviewed visual changes. Re-minted again for the
-    // gather-node placement fix (herb_eastbrook_4 moved off the boarball
-    // pitch to (6,-69) is the move these chunks see): an authored node pos
-    // is a calm-anchor world fixture, so the pads around the old and new
-    // spots reshape nearby vertices. Localization checked against the dense
-    // height atlas (tests/terrain_height_parity.test.ts fixture, re-minted
-    // in the same commit): the whole ten-node placement fix moves 146 of
-    // its 140639 points, 0.1 percent, all inside the moved nodes' pad
-    // footprints.
-    expect(digestOf(inRect)).toBe('5a5e1a89378552ec5e52321c657d923b');
-    // The gap super-chunks take the same re-mint.
-    expect(digestOf(gapFill)).toBe('0a6da9382c9bc0a9d6c7adcc752fb27b');
+    // Re-minted for the Eastbrook camp respacing (PR #2584, maintainer-ordered):
+    // camp radii drive the terrain flatten aprons, so the deliberate, reviewed
+    // spread of the starter camps regrades the Vale rect. The prior pin
+    // (6f7fb63da247a5eb272dd9d7a42a5fcd) dated from before that change; the
+    // gap-cell fill must still not perturb a single byte of in-rect geometry.
+    // Re-minted for the asymmetric campaign bounds: the same positions/colors
+    // now carry UVs normalized over WORLD_MIN_X..WORLD_MAX_X instead of the
+    // obsolete symmetric -WORLD_MAX_X..WORLD_MAX_X range.
+    expect(digestOf(inRect)).toBe('6e57b2b3457fd7612e6ace78247a2f22');
+    // The gap super-chunks' own pin. Re-mint ONLY for a deliberate, reviewed
+    // visual change.
+    // Re-minted for the ferry fidelity program's harbor terrain edits: the
+    // mainland shore pad and re-authored berth basins (HARBOR_TERRAIN_EDITS,
+    // F2.1/F2.2) deliberately regrade gap chunks around both harbors. The
+    // in-rect Eastbrook pin above is untouched: not one Vale byte moved.
+    expect(digestOf(gapFill)).toBe('d964238382e709c9ac24c4afbc0d15fc');
 
     terrain.cancelStreaming();
   });

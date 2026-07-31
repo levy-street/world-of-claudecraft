@@ -21,7 +21,9 @@ const SURFACE_PINS: readonly SeedSurfacePin[] = [
     name: 'shot linter',
     path: './cinematic_shots.test.ts',
     importSource: "import { WORLD_SEED } from '../src/world_seed.mjs';",
-    referenceCount: 6,
+    // 9 = the six original sites plus the three hullWorldCollision calls the
+    // ferry program's generated-plan hull arms added (F1.3, F2.3).
+    referenceCount: 9,
   },
   {
     name: 'trajectory report',
