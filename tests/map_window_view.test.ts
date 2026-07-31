@@ -565,17 +565,36 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     expect(model.allies).toEqual([]);
   });
 
-  it('drops an npc quest-giver glyph outside the committed zone z-band (static content, not x-scoped)', () => {
+  it('drops an npc quest-giver glyph outside the committed zone z-band (static content, not entity-scoped)', () => {
     // questGiverNpcMarkers resolves from static NPCS content, so unlike the
-    // player/ally markers above it is never x-scoped or interest-radius
-    // limited: buildOverworldMapModel's only zone filter for it is the
-    // z-band (marker.pos.z vs zone.zMin/zMax).
+    // player/ally markers above it is never interest-radius limited, but it
+    // is still zone-scoped the same way every other marker family is: the
+    // shared inZone/inView(x,z) test, not z alone.
     const world = makeOverworldWorld('client');
     const outsideZone = { ...ZONE, zMin: ZONE.zMax + 1000, zMax: ZONE.zMax + 2000 };
     const model = buildOverworldMapModel({
       world,
       props: PROPS,
       zone: outsideZone,
+      zoom: 1,
+      center: null,
+      canvasSize: CANVAS,
+      decorations: NO_DECOR,
+    });
+    expect(model.npcs).toEqual([]);
+  });
+
+  it('drops an npc quest-giver glyph inside the zone z-band but outside its x-range', () => {
+    // Zones are not z-disjoint (a z band can hold multiple zones side by
+    // side), so the x test is load bearing: a giver whose z falls inside
+    // this zone's band but whose x falls outside its x-range must still be
+    // culled, not just projected off-canvas.
+    const world = makeOverworldWorld('client');
+    const outsideXZone = { ...ZONE, xMin: ZONE_MAX_X + 1000, xMax: ZONE_MAX_X + 2000 };
+    const model = buildOverworldMapModel({
+      world,
+      props: PROPS,
+      zone: outsideXZone,
       zoom: 1,
       center: null,
       canvasSize: CANVAS,

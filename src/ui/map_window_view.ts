@@ -433,7 +433,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // radius never hides a distant giver's '!'/'?' glyph.
   const npcs: MapNpcMarker[] = [];
   for (const marker of questGiverNpcMarkers((q) => world.questState(q))) {
-    if (marker.pos.z < zone.zMin || marker.pos.z >= zone.zMax) continue;
+    if (!inZone(marker.pos.x, marker.pos.z) || !inView(marker.pos.x, marker.pos.z)) continue;
     const { mx, my } = toMap(marker.pos.x, marker.pos.z);
     npcs.push({ mx, my, ready: marker.ready, quests: marker.quests });
   }
