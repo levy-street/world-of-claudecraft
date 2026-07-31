@@ -2278,7 +2278,6 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 50,
     trigger: { kind: 'meter', meter: 'bgCaptures', amount: 100 },
   },
-
 };
 
 for (const def of Object.values(DEEDS)) {
