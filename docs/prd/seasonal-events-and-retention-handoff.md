@@ -2,12 +2,12 @@
 
 | | |
 |---|---|
-| **Status** | BLOCKED pending the Levy portfolio and schedule decision. PR A (S1, S2) has no zone dependency but is not authorized merely because it is technically independent. Fair slices (S3 to S8) are additionally blocked on PR #2321 (feature/procedural-dungeons, the Amberfall zone) and go through a PBE round before any release. |
+| **Status** | READY FOR THE LEVY CONVERSATION. The Amberfall zone content landed in `release/v0.33.0` at `src/sim/content/amberfall.ts`, merged through `src/sim/data.ts` into the `ZONES` table. PR A (S1, S2) is technically independent but is not authorized. Dispatch still requires Levy's portfolio, schedule, and civil-time decisions, plus a commitment to a PBE round for fair slices S3 to S8. |
 | **Portfolio lane** | Proposed fourth approval candidate, the support layer after a new tentpole. This is not Levy approval. |
-| **Dispatch gate** | Levy approves the civil-time policy, fixture schedule, and this portfolio slot. Scheduler/calendar go first; recipes and extra games are cut before the fair meter, derby, lantern launch, or anti-FOMO contract. |
+| **Dispatch gate** | Levy approves the civil-time policy, fixture schedule, and this portfolio slot, and commits the fair slices to a PBE round. Scheduler/calendar go first; recipes and extra games are cut before the fair meter, derby, lantern launch, or anti-FOMO contract. |
 | **Source PRD** | `docs/prd/seasonal-events-and-retention.md` (implementation notes + File plan inside are verified and binding) |
 | **Scope** | The season/fixture window scheduler, the weekly calendar surface, the fair (stalls, turn-in meter, derby, lantern launch, games, deeds, skins, recipes). NO calendar HUD window (separate UI PRD), NO vanity-pet system (deferred), NO Vale Cup exhibition (cut; the Cup gets a fixture day). |
-| **Verified against** | 2026-07-25: origin/release/v0.30.0 (c1a7f42f1) and, for Amberfall anchors only, origin/feature/procedural-dungeons (0084f3dad). Revalidate every anchor against the active release branch before implementation; trust symbols, not line numbers. |
+| **Verified against** | 2026-07-25: origin/release/v0.30.0 (c1a7f42f1) for non-zone machinery. Amberfall was reverified on `release/v0.33.0` at `src/sim/content/amberfall.ts`, merged through `src/sim/data.ts` into the `ZONES` table. Revalidate every anchor against the active release branch before implementation; trust symbols, not line numbers. |
 | **Executor routing** | Claude uses `extract-and-test` and `qa-checklist`; Codex uses `$woc-extract-and-test` and `$woc-qa`. Persistence work requires database-performance and persistence review; render/UI and sim reviews follow the changed surface. No slice depends on a named model. |
 
 ---
@@ -74,7 +74,9 @@ work-order copper, unchanged (the payout fraction is an economy constant).
 
 ## 2. Verified hook-point map (re-find every anchor before editing)
 
-All rows verified on origin/release/v0.30.0 except the Amberfall rows (branch only).
+All non-zone rows were verified on `origin/release/v0.30.0`. The Amberfall rows were
+reverified on `release/v0.33.0` at `src/sim/content/amberfall.ts`, merged through
+`src/sim/data.ts` into the `ZONES` table.
 
 | Concern | Anchor |
 |---|---|
@@ -91,7 +93,7 @@ All rows verified on origin/release/v0.30.0 except the Amberfall rows (branch on
 | Mail | `src/sim/content/letters.ts`: `LetterDef` and `QUEST_LETTERS` as the record template; delivery via `src/sim/mail/post_office.ts` and `PostOffice`, with letterId client localization. |
 | Noticeboards | `src/sim/content/noticeboards.ts`: `NOTICEBOARDS` and `noticeboardDefByEntityId`. Town Focus is an interaction precedent only; seasonal persistence and shared wire use the rows above. |
 | Content merge | `src/sim/data.ts` imports the zone content modules. New content modules merge here. |
-| Amberfall (branch #2321 ONLY) | `src/sim/content/amberfall.ts`: Lanternmere, the Great Mere POI, `reeve_ottoline`, `waywatcher_sorrel`, `ferrymaster_caddow`, `orchardist_pomeline`, and the existing `stalls` prop records. Fair placements are ADDITIVE to this file. |
+| Amberfall (`release/v0.33.0`) | `src/sim/content/amberfall.ts`, merged through `src/sim/data.ts` into the `ZONES` table: Lanternmere, the Great Mere POI, `reeve_ottoline`, `waywatcher_sorrel`, `ferrymaster_caddow`, `orchardist_pomeline`, and the existing `stalls` prop records. Fair placements are ADDITIVE to this file. |
 | SimContext seam | `src/sim/sim_context.ts`; new system modules take `ctx: SimContext`, backing state lives on `Sim` as a live ctx view (`src/sim/CLAUDE.md`). |
 | IWorld | `src/world_api.ts` + per-facet files in `src/world_api/` (e.g. `daily_rewards.ts` as a facet template); parity pin `tests/world_api_parity.test.ts`. |
 | ClientWorld | `src/net/online.ts`: `applySnapshot` self and global mirrors. |
@@ -102,7 +104,9 @@ All rows verified on origin/release/v0.30.0 except the Amberfall rows (branch on
 ## 3. Slices
 
 Dependency order: S1 -> S2 (PR A, ships first, release-branch base) ; S3 -> S4 -> (S5,
-S6, S7 in any order) -> S8. S3 onward stack on #2321 and follow the PRD's PR B/C/D
+S6, S7 in any order) -> S8. The zone dependency for S3 onward is satisfied in
+`release/v0.33.0` at `src/sim/content/amberfall.ts`, merged through
+`src/sim/data.ts` into the `ZONES` table. These slices follow the PRD's PR B/C/D
 staging: S3+S4 = PR B, S5+S6 = PR C, S7+S8 = PR D.
 S2, S4, S6, and S8 close their PR boundaries. Each closeout carries that
 PR's Deeds and pins, English catalog and any M16 work, sim matcher rows, wiki
@@ -317,8 +321,10 @@ export interface SeasonWindowState {
   fair must confer zero gameplay information or advantage at any tier
   (`docs/design/graphics-settings-fairness.md`).
 - **G7, worktree discipline.** Other sessions carry uncommitted WIP; build each slice
-  in a fresh worktree off the active release branch (fair slices off the #2321
-  branch until it merges), branch `feature/seasonal-s<N>-<slug>`.
+  in a fresh worktree off the active release branch. The fair zone content is already
+  present in `release/v0.33.0` at `src/sim/content/amberfall.ts`, merged through
+  `src/sim/data.ts` into the `ZONES` table. Use branch
+  `feature/seasonal-s<N>-<slug>`.
 - **G8, realm state is one row and one writer.** Key exactly `seasonal:<realm>`;
   one live object on Sim; at most one write in flight plus one trailing dirty write.
   No per-turn-in query, no PlayerMeta copy, no derived timestamp in the save.

@@ -1,9 +1,12 @@
 # PRD: Seasonal events and retention, the Amberfall Harvest Fair and the weekly calendar
 
-Status: DRAFT pass 1 (2026-07-25), for discussion with Levy. Numbers
-marked (tuning) are proposals. The retention program the maintainer asked
-for: cosmetic, social, and convenience rewards only; no daily-chore
-psychology; agent-completable; a village fair, not a battle pass.
+Status: READY FOR THE LEVY CONVERSATION. The Amberfall zone content landed in
+`release/v0.33.0` at `src/sim/content/amberfall.ts`, merged through
+`src/sim/data.ts` into the `ZONES` table. Dispatch still requires Levy to approve
+the schedule, civil-time policy, and portfolio slot, plus a commitment to a PBE
+round for the fair. Numbers marked (tuning) are proposals. The retention program
+the maintainer asked for: cosmetic, social, and convenience rewards only; no
+daily-chore psychology; agent-completable; a village fair, not a battle pass.
 
 ## One-line pitch
 
@@ -22,8 +25,11 @@ moment worth coming back for, and missing either costs only the fun.
   enter through a later slice.
 - First schedule cut: recipes and additional fairground games go before the meter, derby,
   lantern launch, or anti-FOMO rules.
-- Next-stage gate: Levy approves the schedule and civil-time policy. Fair slices also wait
-  for PR #2321 and require PBE. The proposed portfolio position is not approval.
+- Next-stage gate: the Amberfall zone content landed in `release/v0.33.0` at
+  `src/sim/content/amberfall.ts`, merged through `src/sim/data.ts` into the `ZONES`
+  table. Levy still must approve the schedule, civil-time policy, and portfolio slot,
+  and the fair still requires a committed PBE round. The proposed portfolio position
+  is not approval.
 
 ## Why retention content, and the anti-FOMO stance
 
@@ -44,11 +50,12 @@ than a lockout timer," never "a punishment for logging out." Hard rules:
 ## The Amberfall Harvest Fair
 
 A two-week window in Lanternmere and on the Great Mere, recurring every 8
-real weeks (tuning). Hard dependency: the Amberfall zone ships only on the
-new-realms branch (PR #2321, feature/procedural-dungeons); the fair stacks
-on it and must not contradict the authored zone (Lanternmere, the Great
-Mere, the Gilded Orchard, Harvest Hollow, and the resident cast: Reeve
-Ottoline, Ferrymaster Caddow, Orchardist Pomeline, Waywatcher Sorrel).
+real weeks (tuning). The Amberfall zone dependency is satisfied: its content
+landed in `release/v0.33.0` at `src/sim/content/amberfall.ts`, merged through
+`src/sim/data.ts` into the `ZONES` table. The fair stacks on that authored zone
+and must not contradict Lanternmere, the Great Mere, the Gilded Orchard,
+Harvest Hollow, or the resident cast: Reeve Ottoline, Ferrymaster Caddow,
+Orchardist Pomeline, and Waywatcher Sorrel.
 
 ### Fairground stalls
 
@@ -152,10 +159,12 @@ HUD window is a flagged dependency for a separate UI PRD.
 
 ## Implementation notes: verified existing machinery, reused
 
-All verified on origin/release/v0.30.0 by reading each module:
+All non-zone machinery verified on `origin/release/v0.30.0` by reading each module.
+The Amberfall zone anchor was reverified on `release/v0.33.0`:
 
-- Amberfall zone: src/sim/content/amberfall.ts (the #2321 branch only),
-  hub, lakes, props, NPCs, and quest chains as cited throughout.
+- Amberfall zone: `src/sim/content/amberfall.ts`, merged through
+  `src/sim/data.ts` into the `ZONES` table on `release/v0.33.0`, with the hub,
+  lakes, props, NPCs, and quest chains cited throughout.
 - Repeatable-quest cadence: src/sim/professions/cadence.ts (CadenceMap,
   WORK_ORDER_CADENCE_TICKS, persisted and clamped on load) driving zone1's
   work orders via repeatCadenceTicks. There is NO per-day daily-quest
@@ -261,8 +270,10 @@ authorization.
    versioned seasonal realm save and full server lifecycle, calendar data,
    gate-driven visiting peddler stall, lazy per-character letter reconciliation,
    noticeboard surface, shared wire seam, and tests.
-2. PR B (needs #2321): fair core: stalls, turn-in meter, fair quests and
-   NPC placements, fair deeds, English catalog rows, and M16 fills.
+2. PR B (Amberfall zone dependency satisfied in `release/v0.33.0` at
+   `src/sim/content/amberfall.ts`, merged through `src/sim/data.ts` into the
+   `ZONES` table): fair core: stalls, turn-in meter, fair quests and NPC
+   placements, fair deeds, English catalog rows, and M16 fills.
 3. PR C: derby plus lantern launch, their deeds, VFX, screenshot evidence.
 4. PR D: games, skins, recipes (if approved), remaining deeds and titles.
 
@@ -325,8 +336,9 @@ Files MODIFIED:
   placeholder tiers), `src/sim/content/card_master.ts` (fair desk
   placement), `src/sim/content/letters.ts`, `src/sim/content/deeds.ts`
   (append) + `tests/deeds_content` pins.
-- `src/sim/content/amberfall.ts` (branch #2321 file): stall props and
-  fair NPC placements only, additive.
+- `src/sim/content/amberfall.ts` on `release/v0.33.0`, merged through
+  `src/sim/data.ts` into the `ZONES` table: stall props and fair NPC placements
+  only, additive.
 - `src/ui/sim_i18n.ts` (event text keys), `src/ui/i18n.catalog/` +
   English item rows plus five non-Latin overlays for M16 prose, regenerated
   resolved files; noticeboard content record; `CREDITS.md` for any new
