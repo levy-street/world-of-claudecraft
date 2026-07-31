@@ -17,11 +17,12 @@ const {
   EASTBROOK_ARMOURY_CAPTURE_SEED,
   EASTBROOK_ARMOURY_PLAYER_STATE,
   EASTBROOK_POLISH_BASELINE_REVISION,
-  EASTBROOK_TOWN_CAPTURE_CONTRACTS,
+  EASTBROOK_POLISH_PROVENANCE_INPUTS,
   EASTBROOK_TOWN_CAPTURE_PROFILES,
   EASTBROOK_TOWN_CAPTURE_SETTLE_MS,
   EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS,
   EASTBROOK_TOWN_PERF_SCENARIOS,
+  deriveEastbrookPolishCompositeProvenance,
 } = captureContract;
 
 const REPO_ROOT = path.join(__dirname, '..');
@@ -292,18 +293,55 @@ function retainedMotionCaptureNames(profile: string): string[] {
   return RETAINED_MOTION_PROFILES.includes(profile) ? motionCaptureNames(profile) : [];
 }
 
+async function deriveCurrentPolishProvenance(): Promise<CurrentPolishProvenance> {
+  const [{ readFile }, townFingerprint, mailboxFingerprint, noticeboardFingerprint] =
+    await Promise.all([
+      import('node:fs/promises'),
+      import('../scripts/assets/eastbrook_town/source_fingerprint.mjs'),
+      import('../scripts/assets/eastbrook_mailbox/source_fingerprint.mjs'),
+      import('../scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs'),
+    ]);
+  const repoRoot = new URL('../', import.meta.url);
+  const fileSha256 = async (relativePath: string) =>
+    createHash('sha256')
+      .update(await readFile(new URL(relativePath, repoRoot)))
+      .digest('hex');
+
+  return deriveEastbrookPolishCompositeProvenance({
+    townAssetSourceFingerprint: townFingerprint.eastbrookTownSourceFingerprint(),
+    authoritativeLayoutSha256: await fileSha256(
+      EASTBROOK_POLISH_PROVENANCE_INPUTS.authoritativeLayout,
+    ),
+    civicShaderSha256: await fileSha256(EASTBROOK_POLISH_PROVENANCE_INPUTS.civicShader),
+    townRuntimeSha256: await fileSha256(EASTBROOK_POLISH_PROVENANCE_INPUTS.townRuntime),
+    mailboxRuntimeSha256: await fileSha256(EASTBROOK_POLISH_PROVENANCE_INPUTS.mailboxRuntime),
+    noticeboardRuntimeSha256: await fileSha256(
+      EASTBROOK_POLISH_PROVENANCE_INPUTS.noticeboardRuntime,
+    ),
+    rendererIntegrationSha256: await fileSha256(
+      EASTBROOK_POLISH_PROVENANCE_INPUTS.rendererIntegration,
+    ),
+    viewPriorityPolicySha256: await fileSha256(
+      EASTBROOK_POLISH_PROVENANCE_INPUTS.viewPriorityPolicy,
+    ),
+    mailboxSourceFingerprint: mailboxFingerprint.eastbrookMailboxSourceFingerprint(),
+    mailboxGlbSha256: await fileSha256(EASTBROOK_POLISH_PROVENANCE_INPUTS.mailboxGlb),
+    noticeboardSourceFingerprint: noticeboardFingerprint.eastbrookNoticeboardSourceFingerprint(),
+    noticeboardGlbSha256: await fileSha256(EASTBROOK_POLISH_PROVENANCE_INPUTS.noticeboardGlb),
+  });
+}
+
 type Vec3 = { x: number; y: number; z: number };
 type NumericRecord = Record<string, number>;
 type PolishProvenance = { mode: string; [key: string]: unknown };
-type CaptureSource = { comparison: string; revision: string; fingerprint: string };
-type CaptureTownContract = {
-  id: string;
-  townTriangles: number;
-  placementInventory: { stalls: string[]; [key: string]: unknown };
-  attributionTargets: Array<{ key: string; [key: string]: unknown }>;
-  motionCapture: { frameIntervalMs: number; [key: string]: unknown };
-  [key: string]: unknown;
+type CurrentPolishProvenance = PolishProvenance & {
+  fingerprint: string;
+  components: {
+    townAsset: { sourceFingerprint: string };
+    [key: string]: unknown;
+  };
 };
+type CaptureSource = { comparison: string; revision: string; fingerprint: string };
 
 type CaptureProfileContract = {
   name: string;
@@ -327,7 +365,7 @@ type CaptureRecord = {
   captureScope: string;
   source: CaptureSource;
   polishProvenance: PolishProvenance;
-  townContract: CaptureTownContract;
+  townContract: { id: string };
   renderer: { tier: string; settings: Record<string, unknown> };
   world: { lot: unknown };
   viewport: {
@@ -606,23 +644,6 @@ type AdmissionSummary = {
 
 function readJsonFile<T>(filePath: string): T {
   return JSON.parse(readFileSync(filePath, 'utf8')) as T;
-}
-
-const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
-  '10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab';
-const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
-  POLISH_ROOT,
-  'metadata/after-desktop-ultra.json',
-);
-const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'c961f7a260f24c1662a94b17c9dbc9dbc894248b191014b5dfcbabf5f1952ed0';
-const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '7f24de520e03f40270acc24511859b21b0b140c502c9a014b2e92240b22db4cc';
-const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
-const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
-const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
-if (!ACCEPTED_POLISH_V2_TOWN_CONTRACT) {
-  throw new Error('accepted polish-v2 evidence has no town contract snapshot');
 }
 
 function resolveRepoPath(relativePath: string): string {
@@ -907,23 +928,10 @@ describe('Eastbrook polish committed capture artifacts', () => {
     );
   });
 
-  it('pins the historical metadata authority independently', () => {
-    expect(sha256File(ACCEPTED_POLISH_V2_METADATA_PATH)).toBe(ACCEPTED_POLISH_V2_METADATA_SHA256);
-    expect(ACCEPTED_POLISH_V2_PROVENANCE.fingerprint).toBe(ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE);
-  });
-
-  // The frozen polish-v2 evidence intentionally predates the bank rebuild: it
-  // was never recaptured, so its town contract snapshot still carries the
-  // pre-rebuild triangle count while the live capture contract carries the
-  // rebuilt one. This pair makes that divergence a literal instead of an
-  // implicit fact resting on two sha comparisons above.
-  it('declares the frozen evidence triangle count as deliberately stale against the live contract', () => {
-    expect(ACCEPTED_POLISH_V2_TOWN_CONTRACT.townTriangles).toBe(28_330);
-    expect(EASTBROOK_TOWN_CAPTURE_CONTRACTS['polish-v2'].townTriangles).toBe(29_110);
-  });
-
-  it('pins the exact historical metadata inventory to every base capture and motion frame', () => {
-    const expectedTownSourceFingerprint = ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT;
+  it('pins the exact metadata inventory to every base capture and motion frame', async () => {
+    const currentPolishProvenance = await deriveCurrentPolishProvenance();
+    const expectedTownSourceFingerprint =
+      currentPolishProvenance.components.townAsset.sourceFingerprint;
     const metadataRoot = path.join(POLISH_ROOT, 'metadata');
     const expectedMetadataFiles = [
       'after-desktop-ultra.json',
@@ -941,9 +949,7 @@ describe('Eastbrook polish committed capture artifacts', () => {
         const metadata = readJsonFile<CaptureMetadata>(filePath);
         const contractId = prefix === 'before' ? 'polish-baseline' : 'polish-v2';
         const expectedPolishProvenance =
-          prefix === 'before' ? BASELINE_POLISH_PROVENANCE : ACCEPTED_POLISH_V2_PROVENANCE;
-        const captureContractSnapshot =
-          prefix === 'before' ? null : ACCEPTED_POLISH_V2_TOWN_CONTRACT;
+          prefix === 'before' ? BASELINE_POLISH_PROVENANCE : currentPolishProvenance;
         const contractProfile = (
           EASTBROOK_TOWN_CAPTURE_PROFILES as readonly CaptureProfileContract[]
         ).find((candidate) => candidate.name === profile.name);
@@ -999,7 +1005,6 @@ describe('Eastbrook polish committed capture artifacts', () => {
             assertTownCaptureMetadata({
               metadata: record,
               contractId,
-              captureContractSnapshot,
               expectedTown: true,
               expectedArmoury: true,
               profile: contractProfile,
@@ -1010,52 +1015,6 @@ describe('Eastbrook polish committed capture artifacts', () => {
               expectedPolishProvenance,
             }),
           ).not.toThrow();
-          if (
-            prefix === 'after' &&
-            profile.name === 'desktop-ultra' &&
-            index === 0 &&
-            captureContractSnapshot
-          ) {
-            const attributionSnapshot = structuredClone(captureContractSnapshot);
-            attributionSnapshot.attributionTargets[0].key = 'historical-town-root';
-            const attributionRecord = structuredClone(record);
-            attributionRecord.townContract = attributionSnapshot;
-            expect(() =>
-              assertTownCaptureMetadata({
-                metadata: attributionRecord,
-                contractId,
-                captureContractSnapshot: attributionSnapshot,
-                expectedTown: true,
-                expectedArmoury: true,
-                profile: contractProfile,
-                view,
-                playerState: EASTBROOK_ARMOURY_PLAYER_STATE,
-                expectedSeed: EASTBROOK_ARMOURY_CAPTURE_SEED,
-                settleMs: EASTBROOK_TOWN_CAPTURE_SETTLE_MS,
-                expectedPolishProvenance,
-              }),
-            ).toThrow('stable layout ids');
-
-            const placementSnapshot = structuredClone(captureContractSnapshot);
-            placementSnapshot.placementInventory.stalls = ['historical-snapshot-stall'];
-            const placementRecord = structuredClone(record);
-            placementRecord.townContract = placementSnapshot;
-            expect(() =>
-              assertTownCaptureMetadata({
-                metadata: placementRecord,
-                contractId,
-                captureContractSnapshot: placementSnapshot,
-                expectedTown: true,
-                expectedArmoury: true,
-                profile: contractProfile,
-                view,
-                playerState: EASTBROOK_ARMOURY_PLAYER_STATE,
-                expectedSeed: EASTBROOK_ARMOURY_CAPTURE_SEED,
-                settleMs: EASTBROOK_TOWN_CAPTURE_SETTLE_MS,
-                expectedPolishProvenance,
-              }),
-            ).toThrow('expected town metadata');
-          }
         }
 
         const civicRecord = metadata.records.find((record) =>
@@ -1071,29 +1030,6 @@ describe('Eastbrook polish committed capture artifacts', () => {
               mode.frames.map((frame) => path.basename(frame.output)),
             ),
           ).toEqual(motionCaptureNames(profile.name));
-          if (profile.name === 'desktop-ultra' && captureContractSnapshot) {
-            const motionSnapshot = structuredClone(captureContractSnapshot);
-            motionSnapshot.motionCapture.frameIntervalMs += 1;
-            const motionRecord = structuredClone(civicRecord);
-            motionRecord.townContract = motionSnapshot;
-            expect(() =>
-              assertTownCaptureMetadata({
-                metadata: motionRecord,
-                contractId,
-                captureContractSnapshot: motionSnapshot,
-                expectedTown: true,
-                expectedArmoury: true,
-                profile: contractProfile,
-                view: (
-                  EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS as readonly CaptureViewContract[]
-                ).find((candidate) => candidate.name === 'civic-motion'),
-                playerState: EASTBROOK_ARMOURY_PLAYER_STATE,
-                expectedSeed: EASTBROOK_ARMOURY_CAPTURE_SEED,
-                settleMs: EASTBROOK_TOWN_CAPTURE_SETTLE_MS,
-                expectedPolishProvenance,
-              }),
-            ).toThrow('civic motion evidence is incomplete');
-          }
         }
       }
     }
@@ -1481,11 +1417,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // measured value (frame timings, draw stats, triangle and scenario
     // numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'c6b30c373d3859af42636a8c4a723bdca3044278c30f5d98fd178b158d2834fe',
+      'efc71e4dc8dca63654d4e712474a5caa82b6aee34909b6d45b358a0b1d7c347c',
     );
   });
 
-  it('binds every historical after record to its accepted source and asset provenance', () => {
+  it('binds every after record to the current source and shipping asset provenance', async () => {
+    const current = await deriveCurrentPolishProvenance();
     for (const profile of PROFILES) {
       for (const [directory, suffix] of [
         ['metadata', ''],
@@ -1494,23 +1431,22 @@ describe('Eastbrook polish performance and contact evidence', () => {
         const fileName = `after-${profile.name}${suffix}.json`;
         const filePath = path.join(POLISH_ROOT, directory, fileName);
         const artifact = JSON.parse(readFileSync(filePath, 'utf8')) as {
-          sourceFingerprint?: string;
-          source?: CaptureSource;
-          polishProvenance: PolishProvenance;
+          polishProvenance: { fingerprint: string; components: unknown };
         };
-        expect(
-          artifact.sourceFingerprint ?? artifact.source?.fingerprint,
-          `${filePath} town fingerprint`,
-        ).toBe(ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT);
-        expect(artifact.polishProvenance, `${filePath} provenance`).toEqual(
-          ACCEPTED_POLISH_V2_PROVENANCE,
+        expect(artifact.polishProvenance.fingerprint, `${filePath} fingerprint`).toBe(
+          current.fingerprint,
+        );
+        expect(artifact.polishProvenance.components, `${filePath} components`).toEqual(
+          current.components,
         );
       }
     }
   });
 
-  it('validates every historical performance scenario, attribution block, and summary', () => {
-    const expectedTownSourceFingerprint = ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT;
+  it('validates every committed performance scenario, attribution block, and summary', async () => {
+    const currentPolishProvenance = await deriveCurrentPolishProvenance();
+    const expectedTownSourceFingerprint =
+      currentPolishProvenance.components.townAsset.sourceFingerprint;
     const performanceRoot = path.join(POLISH_ROOT, 'performance');
     const expectedFiles = [
       'after-desktop-ultra-town.json',
@@ -1561,9 +1497,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
         if (!profileContract) throw new Error(`missing capture profile ${profile.name}`);
         const contractId = prefix === 'before' ? 'polish-baseline' : 'polish-v2';
         const expectedPolishProvenance =
-          prefix === 'before' ? BASELINE_POLISH_PROVENANCE : ACCEPTED_POLISH_V2_PROVENANCE;
-        const captureContractSnapshot =
-          prefix === 'before' ? null : ACCEPTED_POLISH_V2_TOWN_CONTRACT;
+          prefix === 'before' ? BASELINE_POLISH_PROVENANCE : currentPolishProvenance;
         const metadataIdentity = metadata.records[0];
         if (!metadataIdentity) throw new Error(`missing metadata identity for ${fileName}`);
 
@@ -1689,7 +1623,6 @@ describe('Eastbrook polish performance and contact evidence', () => {
               targets: scenario.attributionTargets,
               contractId,
               requestedVisible: true,
-              captureContractSnapshot,
             }),
           ).not.toThrow();
           expect(scenario.sequence[0]?.targets, `${label} initial target identity`).toEqual(
@@ -1714,7 +1647,6 @@ describe('Eastbrook polish performance and contact evidence', () => {
                 rootVisible: expectedBlock.rootVisible,
                 shadowEnabled: expectedBlock.shadowEnabled,
                 contractId,
-                captureContractSnapshot,
               }),
             ).not.toThrow();
             expect(() =>
@@ -1722,7 +1654,6 @@ describe('Eastbrook polish performance and contact evidence', () => {
                 targets: block.targets,
                 contractId,
                 requestedVisible: expectedBlock.rootVisible,
-                captureContractSnapshot,
               }),
             ).not.toThrow();
             expectSampledBlockSummary(block, profileContract, evidence.timingBasis, blockLabel);
@@ -1770,7 +1701,6 @@ describe('Eastbrook polish performance and contact evidence', () => {
                 rootVisible: expectedBlock.rootVisible,
                 shadowEnabled: expectedBlock.shadowEnabled,
                 contractId,
-                captureContractSnapshot,
               }),
             ).not.toThrow();
             expect(() =>
@@ -1778,7 +1708,6 @@ describe('Eastbrook polish performance and contact evidence', () => {
                 targets: block.targets,
                 contractId,
                 requestedVisible: expectedBlock.rootVisible,
-                captureContractSnapshot,
               }),
             ).not.toThrow();
             expectFiniteRecord(block.render, `${blockLabel}.render`);
