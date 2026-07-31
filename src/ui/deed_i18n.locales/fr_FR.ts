@@ -855,6 +855,22 @@ export const table: DeedLocaleTable = {
     name: 'Héroïque : le Bassin du Cœur Sauvage',
     desc: 'Vainquez Zulgar, Voix du Bassin, dans le Bassin du Cœur Sauvage en difficulté héroïque.',
   },
+  chr_marsh_rares_ii: {
+    name: 'Le Glouton, porté au compte',
+    desc: 'Tuer Grubjaw le Glouton, une quatrième terreur nommée du Marais de Mirefen oubliée du premier décompte.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'D’autres noms gravés dans le roc',
+    desc: 'Tuer le Vieux Cragmaw et le Seigneur des éclats Kazzix, deux terreurs nommées de plus des Hauteurs de Thornpeak oubliées du premier décompte.',
+  },
+  chr_gleamstag: {
+    name: 'La légende qui ne frappait jamais la première',
+    desc: 'Tuer le Cerf-Miroitant, un élite rare et farouche qui n’attaque que si on l’accule.',
+  },
+  chr_hollow_rares: {
+    name: 'Le troupeau se souvient',
+    desc: 'Tuer le Vieux Marrowshell et Aurelhorn, Premier du Troupeau, les deux boss rares errants du Vallon.',
+  },
 };
 
 // fr_CA rides this base table plus the delve-vocabulary override layer

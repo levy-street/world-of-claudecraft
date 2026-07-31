@@ -7,6 +7,7 @@ node_modules
 # build outputs
 dist/
 dist-env/
+dist-ota/
 dist-server/
 release/
 release-steam/

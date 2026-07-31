@@ -20,7 +20,7 @@ import * as THREE from 'three';
 import type { StationDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 import { type StationPropKind, stationPropPlacements } from './stations_core';
 
@@ -80,7 +80,7 @@ const loadedStationGltf = new Map<StationPropKind, THREE.Group>();
 
 if (typeof window !== 'undefined') {
   for (const [kind, url] of Object.entries(STATION_ASSET_URL) as [StationPropKind, string][]) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url).then((gltf) => {
         loadedStationGltf.set(kind, gltf.scene);
       }),

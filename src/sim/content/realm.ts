@@ -210,7 +210,10 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 9,
     aggroRadius: 0, // grazes in peace
-    loot: [{ itemId: 'gleaming_antler', chance: 0.55, questId: 'q_gleaming_antlers' }],
+    loot: [
+      { copper: 45, chance: 1 },
+      { itemId: 'gleaming_antler', chance: 0.55, questId: 'q_gleaming_antlers' },
+    ],
     scale: 1.0,
     color: 0xb9a3cf,
     componentTags: ['hide', 'meat'],

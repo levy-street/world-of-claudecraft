@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   loadTexture: vi.fn(),
   releaseGltf: vi.fn(),
   registerPreload: vi.fn(),
+  registerDeferredPreload: vi.fn((start: () => unknown) => start()),
 }));
 
 vi.mock('../src/render/assets/loader', () => ({
@@ -16,6 +17,7 @@ vi.mock('../src/render/assets/loader', () => ({
 
 vi.mock('../src/render/assets/preload', () => ({
   registerPreload: mocks.registerPreload,
+  registerDeferredPreload: mocks.registerDeferredPreload,
 }));
 
 afterEach(() => {
@@ -42,8 +44,8 @@ describe('Eastbrook Grand Armoury preload', () => {
     expect(mocks.loadGltf).toHaveBeenCalledWith('/models/props/eastbrook_grand_armoury.glb');
     expect(mocks.loadTexture).toHaveBeenCalledTimes(1);
     expect(mocks.loadTexture).toHaveBeenCalledWith('/textures/eastbrook_surface_atlas.webp');
-    expect(mocks.registerPreload).toHaveBeenCalledTimes(2);
-    const registered = mocks.registerPreload.mock.calls.map(([promise]) => promise);
+    expect(mocks.registerDeferredPreload).toHaveBeenCalledTimes(2);
+    const registered = mocks.registerDeferredPreload.mock.results.map((r) => r.value);
     expect(registered.every((promise) => promise instanceof Promise)).toBe(true);
     await Promise.all(registered);
 

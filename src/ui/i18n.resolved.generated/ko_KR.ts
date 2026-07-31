@@ -340,11 +340,14 @@ export const ko_KR: EnTranslations = {
       "menuButton": "갇힘 탈출",
       "help": "탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.",
       "helpAtGraveyard": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 영혼을 가장 가까운 묘지로 보냅니다. 되살아나려면 영혼 치유사에게서 수호자의 대가를 받아야 합니다.",
+      "helpUnstuckSickness": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 가장 가까운 묘지로 이동시키며 쓰러져 있었다면 부활시킵니다. 최대 5분 동안 탈출의 후유증이 남습니다.",
       "started": "{seconds}초 후 탈출합니다. 이동, 전투, 피해를 받거나 다른 행동을 시작하면 취소됩니다.",
       "countdown": "갇힘 탈출: {seconds}",
       "completed": "도달할 수 있는 가장 가까운 안전한 위치로 이동했습니다.",
       "completedAtGraveyard": "영혼이 가장 가까운 묘지로 돌아왔습니다. 영혼 치유사에게 말을 걸어 수호자의 대가를 받으세요.",
       "revivedAtGraveyard": "가장 가까운 묘지로 옮겨져 부활했습니다. 수호자의 대가가 당신을 짓누릅니다.",
+      "movedToGraveyard": "가장 가까운 묘지로 이동했습니다. 탈출의 후유증이 당신을 짓누릅니다.",
+      "revivedAtGraveyardUnstuck": "가장 가까운 묘지로 이동해 부활했습니다. 탈출의 후유증이 당신을 짓누릅니다.",
       "cancelledMoved": "이동해서 갇힘 탈출이 취소되었습니다.",
       "cancelledDamaged": "피해를 받아 갇힘 탈출이 취소되었습니다.",
       "cancelledCombat": "전투에 진입해 갇힘 탈출이 취소되었습니다.",
@@ -884,6 +887,13 @@ export const ko_KR: EnTranslations = {
       "lockedToast": "{raid}에 잠겨 있습니다. {time} 후 해제됩니다.",
       "heroicName": "영웅: {name}",
       "heroicLocked": "영웅 난이도 {name}에 귀속되었습니다."
+    },
+    "riftTracker": {
+      "title": "균열",
+      "floor": "{total}층 중 {current}층",
+      "closesIn": "균열이 {time} 후 닫힙니다",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "compass": {
       "N": "북",
@@ -2991,6 +3001,9 @@ export const ko_KR: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요."
+    },
+    "ota_updates": {
+      "invalid_input": "입력이 올바르지 않습니다."
     }
   },
   "guide": {
@@ -6890,7 +6903,8 @@ export const ko_KR: EnTranslations = {
       "incomplete": "그 퀘스트는 완료되지 않았습니다.",
       "giverMissing": "그 퀘스트를 주는 대상이 근처에 없습니다.",
       "turnInMissing": "그 퀘스트를 보고할 대상이 근처에 없습니다.",
-      "tooFar": "너무 멉니다."
+      "tooFar": "너무 멉니다.",
+      "escortAway": "호송할 대상이 지금 자리에 없습니다. 잠시 후 그곳으로 돌아옵니다."
     }
   },
   "itemUi": {
@@ -12893,7 +12907,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "렌을 바래다주는 길",
-        "text": "내 견습생 렌이 이틀 전에 금빛눈녹이 길을 살피러 나갔다가 돌아오지 않았네. 발자국은 찾았어. 오로라 계단 남서쪽 길표지 아래 웅크리고 있는데, 늑대가 무서워 꼼짝을 못 하고 있지. 나는 늪을 비울 수가 없네, {playerName}. 그 아이를 계단 위 베일라의 야영지까지 데려다주게. 빛 아래라면 안전할 걸세.",
+        "text": "내 견습생 렌이 이틀 전에 금빛눈녹이 길을 살피러 나갔다가 돌아오지 않았네. 발자국은 찾았어. 오로라 계단 북동쪽 길표지 아래 웅크리고 있는데, 늑대가 무서워 꼼짝을 못 하고 있지. 나는 늪을 비울 수가 없네, {playerName}. 그 아이를 계단 위 베일라의 야영지까지 데려다주게. 빛 아래라면 안전할 걸세.",
         "completion": "그 아이는 안에 있네. 내 담요를 절반이나 두르고서 하늘의 별을 다 헤아릴 기세로 떠들고 있지. 오늘 자네는 고운 일을 했어, {playerName}. 서리장막 봉우리에서는 좀처럼 보기 힘든 일이라네.",
         "objectives": {
           "0": {
@@ -13577,7 +13591,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "브람아 돌아오렴",
-        "text": "그물 균열이 열리던 아침에 우리 브람이 배를 몰고 나갔는데, 바다가 그이를 선착장 곶 너머 어딘가로 내던졌어요. 사흘 전 밤에 그이가 물 너머로 부르는 소리를 들었어요, {playerName}. 그런데도 나는 무서워서 가지 못했어요. 지금도 무서워요. 부탁이에요. 그이의 배가 북쪽 물가에 부서져 있어요. 그이를 집까지 데려다주세요.",
+        "text": "그물 균열이 열리던 아침에 우리 브람이 배를 몰고 나갔는데, 바다가 그이를 선착장 곶 너머 어딘가로 내던졌어요. 사흘 전 밤에 그이가 물 너머로 부르는 소리를 들었어요, {playerName}. 그런데도 나는 무서워서 가지 못했어요. 지금도 무서워요. 부탁이에요. 그이의 배가 남쪽 물가에 부서져 있어요. 그이를 집까지 데려다주세요.",
         "completion": "브람! 그이를 성한 몸으로 데려다주셨군요, {playerName}. 우리 둘 다 울었지만 부끄럽지 않아요. 균열이 이 섬에서 다음에 무엇을 앗아 가든, 내 가족만은 안 돼요. 이제 다시는요.",
         "objectives": {
           "0": {

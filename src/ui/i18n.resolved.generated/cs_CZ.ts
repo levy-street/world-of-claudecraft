@@ -340,11 +340,14 @@ export const cs_CZ: EnTranslations = {
       "menuButton": "Vyproštění",
       "help": "Záchrana: /unstuck spustí nehybné odpočítávání, které tě přemístí na nedaleké dostupné bezpečné místo.",
       "helpAtGraveyard": "Záchrana: /unstuck spustí nehybné odpočítávání a poté pošle tvého ducha na nejbližší hřbitov. Návrat přes Bledého strážce vyžaduje Strážcovo mýtné.",
+      "helpUnstuckSickness": "Záchrana: /unstuck spustí nehybné odpočítávání a poté tě přenese na nejbližší hřbitov, a pokud jsi padl, oživí tě. Nemoc z vyproštění na tobě zůstane až 5 minut.",
       "started": "Vyproštění za {seconds} sekund. Pohyb, boj, utrpění zranění nebo zahájení jiné akce ho zruší.",
       "countdown": "Vyproštění: {seconds}",
       "completed": "Přemístěno na nejbližší dostupné bezpečné místo.",
       "completedAtGraveyard": "Tvůj duch se vrátil na nejbližší hřbitov. Promluv s Bledým strážcem a přijmi Strážcovo mýtné.",
       "revivedAtGraveyard": "Byl jsi vrácen na nejbližší hřbitov a oživen. Strážcovo mýtné na tobě leží.",
+      "movedToGraveyard": "Byl jsi přenesen na nejbližší hřbitov. Nemoc z vyproštění na tobě leží.",
+      "revivedAtGraveyardUnstuck": "Byl jsi přenesen na nejbližší hřbitov a oživen. Nemoc z vyproštění na tobě leží.",
       "cancelledMoved": "Vyproštění zrušeno, protože ses pohnul.",
       "cancelledDamaged": "Vyproštění zrušeno, protože jsi utrpěl zranění.",
       "cancelledCombat": "Vyproštění zrušeno, protože jsi vstoupil do boje.",
@@ -884,6 +887,13 @@ export const cs_CZ: EnTranslations = {
       "lockedToast": "Jsi uzamčen(a) k {raid}. Odemkne se za {time}.",
       "heroicName": "{name} (hrdinská)",
       "heroicLocked": "Jsi uzamčen(a) k hrdinské verzi {name}."
+    },
+    "riftTracker": {
+      "title": "Trhlina",
+      "floor": "Patro {current} z {total}",
+      "closesIn": "Zavře se za {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "compass": {
       "N": "S",
@@ -2182,7 +2192,7 @@ export const cs_CZ: EnTranslations = {
         "noRecipient": "Nikdo s tímto jménem zde poštovní schránku nemá.",
         "tooManyParcels": "Dopis unese nejvýše {count} balíků.",
         "noMailQuestItems": "Úkolové předměty nelze posílat poštou.",
-        "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailBound": "Tento předmět je vázaný a nelze ho poslat poštou.",
         "notEnoughItems": "Nemáš tolik kusů k odeslání.",
         "cantAffordPostage": "Nemůžeš si dovolit poštovné.",
         "recipientBoxFull": "Jejich poštovní schránka je plná.",
@@ -2991,6 +3001,9 @@ export const cs_CZ: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu."
+    },
+    "ota_updates": {
+      "invalid_input": "Neplatný vstup."
     }
   },
   "guide": {
@@ -6529,12 +6542,12 @@ export const cs_CZ: EnTranslations = {
       "arenaQueueTrading": "Před zařazením do fronty dokonči obchod.",
       "arenaQueueInstance": "Z instance se nemůžeš zařadit do fronty.",
       "tradeInProgress": "Obchod už probíhá.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Tento hráč už obchoduje.",
       "tradeTooFar": "Cíl je příliš daleko pro obchod.",
       "tradeExpired": "Žádost o obchod vypršela.",
       "tradeFailed": "Obchod selhal: předměty nebo peníze už nejsou dostupné.",
       "tradeBound": "Tento předmět je vázaný a nelze ho vyměnit.",
-      "marketListBound": "That item is bound and cannot be listed."
+      "marketListBound": "Tento předmět je vázaný a nelze ho nabídnout k prodeji."
     },
     "logs": {
       "standUp": "Vstáváš.",
@@ -6890,7 +6903,8 @@ export const cs_CZ: EnTranslations = {
       "incomplete": "Tento úkol není dokončený.",
       "giverMissing": "Tento zadavatel úkolu není poblíž.",
       "turnInMissing": "Místo pro odevzdání tohoto úkolu není poblíž.",
-      "tooFar": "Příliš daleko."
+      "tooFar": "Příliš daleko.",
+      "escortAway": "Ten, koho máš doprovodit, teď není na svém místě. Za chvíli se tam vrátí."
     }
   },
   "itemUi": {
@@ -12893,7 +12907,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Doprovodit Wren domů",
-        "text": "Má učednice Wren šla před dvěma dny projít linii Zlatotání a nikdy se nevrátila. Našel jsem její stopy, schovává se pod cestními značkami jihozápadně od Schodů polární záře, příliš vyděšená z vlků na to, aby se hnula. Nemohu opustit bažinu, {playerName}. Doveď ji do tábora Veyly na schodech. Bude v bezpečí pod světly.",
+        "text": "Má učednice Wren šla před dvěma dny projít linii Zlatotání a nikdy se nevrátila. Našel jsem její stopy, schovává se pod cestními značkami severovýchodně od Schodů polární záře, příliš vyděšená z vlků na to, aby se hnula. Nemohu opustit bažinu, {playerName}. Doveď ji do tábora Veyly na schodech. Bude v bezpečí pod světly.",
         "completion": "Ta dívka je uvnitř, zabalená do poloviny mých přikrývek a povídá si s hvězdami na obloze. Udělal jsi dnes dobrou věc, {playerName}. Kraj takových moc nevídá.",
         "objectives": {
           "0": {
@@ -13577,7 +13591,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram se vrací domů",
-        "text": "Můj Bram vzal loď ráno, kdy se otevřel síťový průlom, a moře ho vyvrhlo někam za Přístavištní mys. Slyšela jsem ho před třemi nocemi, {playerName}, jak volá přes vodu, a byla jsem příliš vyděšená na to, abych šla. Stále jsem příliš vyděšená. Prosím. Jeho loď leží ztroskotaná na severním pobřeží. Doveď ho ke mně domů.",
+        "text": "Můj Bram vzal loď ráno, kdy se otevřel síťový průlom, a moře ho vyvrhlo někam za Přístavištní mys. Slyšela jsem ho před třemi nocemi, {playerName}, jak volá přes vodu, a byla jsem příliš vyděšená na to, abych šla. Stále jsem příliš vyděšená. Prosím. Jeho loď leží ztroskotaná na jižním pobřeží. Doveď ho ke mně domů.",
         "completion": "Brame! Přivedl jsi mi ho zpátky celého, {playerName}. Oba jsme plakali a ani jeden z nás se nestydí. Ať už si průlomy z tohoto ostrova vezmou příště cokoliv, mou rodinu nedostanou. Už ne.",
         "objectives": {
           "0": {

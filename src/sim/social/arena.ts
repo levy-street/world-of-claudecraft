@@ -38,6 +38,7 @@ import {
   emptyMoveInput,
 } from '../types';
 import { clearCooldownsPreservingUnstuck } from '../unstuck_cooldown';
+import { duelFor } from './duel';
 
 // Deep-copy the CC diminishing-return map so a snapshot never shares mutable
 // state objects with the live entity (values are re-derived each restore).
@@ -131,7 +132,7 @@ export function arenaQueueJoin(
     ctx.error(id, 'You cannot queue for the arena while dead.');
     return;
   }
-  if (ctx.duels.has(id)) {
+  if (duelFor(ctx, id) !== null) {
     ctx.error(id, 'You cannot queue while dueling.');
     return;
   }
@@ -214,7 +215,7 @@ export function arenaQueueJoin(
         ctx.error(id, `${mMeta.name} is already in an arena match.`);
         return;
       }
-      if (ctx.duels.has(mPid)) {
+      if (duelFor(ctx, mPid) !== null) {
         ctx.error(id, `${mMeta.name} cannot queue while dueling.`);
         return;
       }
@@ -285,7 +286,7 @@ export function arenaQueueJoin(
       ctx.error(id, `${mMeta.name} is already in an arena match.`);
       return;
     }
-    if (ctx.duels.has(mPid)) {
+    if (duelFor(ctx, mPid) !== null) {
       ctx.error(id, `${mMeta.name} cannot queue while dueling.`);
       return;
     }

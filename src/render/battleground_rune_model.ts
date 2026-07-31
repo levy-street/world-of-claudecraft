@@ -26,7 +26,7 @@
 import * as THREE from 'three';
 import { type BgRuneType, RUNE_VISUALS } from '../sim/social/battleground';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 export interface RuneModelDef {
@@ -167,13 +167,16 @@ export function prepareRuneModel(
   return group;
 }
 
+// The DEFERRED lane, not the eager one: these models are only ever needed by a
+// player who enters the band, so nothing here should be in flight while the
+// launcher is still up.
 if (typeof window !== 'undefined') {
   for (const [kind, def] of Object.entries(RUNE_MODEL_DEFS) as [
     BgRuneType,
     RuneModelDef | null,
   ][]) {
     if (!def) continue;
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(def.url).then((gltf) => {
         // The rune color is fixed per type (RUNE_VISUALS), so one prepared
         // template per type covers every pad of that type on the field.

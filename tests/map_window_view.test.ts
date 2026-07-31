@@ -119,6 +119,25 @@ function makeOverworldWorld(
   } as unknown as IWorld;
 }
 
+/** makeOverworldWorld plus a party roster (issue 2652): self (pid 1, must draw
+ *  no marker), one alive member inside the zone/view, one dead member inside
+ *  the zone/view, and one member well outside the committed zone. */
+function makeOverworldWorldWithParty(shape: 'sim' | 'client'): IWorld {
+  const world = makeOverworldWorld(shape) as unknown as { partyInfo: unknown };
+  world.partyInfo = {
+    leader: 1,
+    raid: false,
+    master: { enabled: false, looter: 0, threshold: 'uncommon' },
+    members: [
+      { pid: 1, name: 'Me', cls: 'warrior', dead: 0, x: 0, z: ZONE_CZ },
+      { pid: 5, name: 'Ally', cls: 'mage', dead: 0, x: 15, z: ZONE_CZ },
+      { pid: 6, name: 'Fallen', cls: 'priest', dead: 1, x: -15, z: ZONE_CZ },
+      { pid: 7, name: 'FarAway', cls: 'rogue', dead: 0, x: ZONE_MAX_X + 50, z: ZONE_CZ },
+    ],
+  };
+  return world as unknown as IWorld;
+}
+
 function makeDelveWorld(shape: 'sim' | 'client'): IWorld {
   const simJunk = shape === 'sim' ? { hp: 100 } : {};
   return {
@@ -456,6 +475,67 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), LABELS_ZOOM));
     expect(model.allies.map((a) => a.kind)).toEqual(['friend', 'guild']);
     expect(model.allies.map((a) => a.name)).toEqual(['FriendA', 'GuildB']);
+  });
+
+  it('is empty solo / with no party formed', () => {
+    const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), LABELS_ZOOM));
+    expect(model.party).toEqual([]);
+  });
+
+  describe('party markers (issue 2652)', () => {
+    it('projects one marker per member, excluding self and a member outside the committed zone', () => {
+      const model = buildOverworldMapModel(input(makeOverworldWorldWithParty('sim'), LABELS_ZOOM));
+      expect(model.party.map((m) => m.name)).toEqual(['Ally', 'Fallen']);
+    });
+
+    it('carries only cls/dead/name identity, no resolved color, at the same projection every other marker uses', () => {
+      const model = buildOverworldMapModel(input(makeOverworldWorldWithParty('sim'), LABELS_ZOOM));
+      const ally = model.party.find((m) => m.name === 'Ally');
+      expect(ally).toBeDefined();
+      if (!ally) return;
+      expect(Object.keys(ally).sort()).toEqual(['cls', 'dead', 'mx', 'my', 'name'].sort());
+      expect(ally.cls).toBe('mage');
+      expect(ally.dead).toBe(false);
+      const r = model.region;
+      expect(ally.mx).toBeCloseTo(((r.maxX - 15) / (r.maxX - r.minX)) * CANVAS, 6);
+      expect(ally.my).toBeCloseTo(((r.maxZ - ZONE_CZ) / (r.maxZ - r.minZ)) * CANVAS, 6);
+    });
+
+    it('marks a dead member dead, distinctly from an alive one', () => {
+      const model = buildOverworldMapModel(input(makeOverworldWorldWithParty('sim'), LABELS_ZOOM));
+      const fallen = model.party.find((m) => m.name === 'Fallen');
+      expect(fallen?.dead).toBe(true);
+      expect(fallen?.cls).toBe('priest');
+    });
+
+    it('drops a member outside the committed zone, like every other marker kind', () => {
+      const model = buildOverworldMapModel(input(makeOverworldWorldWithParty('sim'), LABELS_ZOOM));
+      expect(model.party.some((m) => m.name === 'FarAway')).toBe(false);
+    });
+
+    it('Sim-shaped and ClientWorld-mirror-shaped stubs render an identical party array', () => {
+      const fromSim = buildOverworldMapModel(
+        input(makeOverworldWorldWithParty('sim'), LABELS_ZOOM),
+      );
+      const fromClient = buildOverworldMapModel(
+        input(makeOverworldWorldWithParty('client'), LABELS_ZOOM),
+      );
+      expect(fromSim.party).toEqual(fromClient.party);
+    });
+
+    it('draws a party member who is also an online friend once, as the party marker, not twice', () => {
+      const world = makeOverworldWorldWithParty('sim') as unknown as {
+        socialInfo: {
+          friends: { id: number; name: string; online: boolean; x: number; z: number }[];
+        };
+      };
+      // 'Ally' is party pid 5 at x=15; also list them as an online friend at the
+      // same spot, the common case of partying with someone on your friends list.
+      world.socialInfo.friends.push({ id: 99, name: 'Ally', online: true, x: 15, z: ZONE_CZ });
+      const model = buildOverworldMapModel(input(world as unknown as IWorld, LABELS_ZOOM));
+      expect(model.party.filter((m) => m.name === 'Ally')).toHaveLength(1);
+      expect(model.allies.filter((a) => a.name === 'Ally')).toHaveLength(0);
+    });
   });
 
   it('drops player, NPC, and ally markers outside the committed zone', () => {

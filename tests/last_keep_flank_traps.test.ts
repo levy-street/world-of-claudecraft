@@ -348,4 +348,25 @@ describe('the Last Keep flanks hold no wedge pockets', () => {
       expect(p.pos.y, 'stays on the terrace').toBeGreaterThan(CASTLE.ward.h - 0.4);
     }
   });
+
+  it('never freezes a walker pressed into the ward terrace retaining edge', () => {
+    // The ward terrace's faces are sheer 2.6yd risers. The steepness gate reads
+    // a 1-yard-cell memo, so the flat bailey ground one step out from the west
+    // face inherits the cell's slope and reads as steep. That alone used to strip
+    // movement control while the exact-position downhill was flat (nothing to
+    // slide off), trapping the body at the base with input disabled: players were
+    // stuck all along the west edge and had to /unstuck. A walker pressed into
+    // the edge must be REFUSED the climb yet still free to walk back off it.
+    for (const z of [2000, 2005, 2010, 2015]) {
+      const { sim, p, meta } = makeWalker({ x: 395, z });
+      pushToward(sim, p, meta, { x: 404, z }, 20 * 3); // press east into the face
+      const pinnedX = p.pos.x;
+      expect(pinnedX, `refused the sheer west face at z=${z}`).toBeLessThan(CASTLE.ward.x0);
+      pushToward(sim, p, meta, { x: 384, z }, 20 * 3); // now try to walk back west
+      expect(
+        pinnedX - p.pos.x,
+        `walks back off the west edge instead of freezing at z=${z}`,
+      ).toBeGreaterThan(3);
+    }
+  });
 });

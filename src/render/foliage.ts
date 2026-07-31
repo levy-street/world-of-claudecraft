@@ -26,7 +26,7 @@ import {
   zoneBiomeAt,
 } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   applyInstanceCollapse,
   type CollapseRole,
@@ -169,9 +169,13 @@ const loadedModels = new Map<string, GLTF>();
 const extractedParts = new Map<string, ModelPart[]>();
 for (const urls of Object.values(MODEL_URLS)) {
   for (const url of urls) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url).then((g) => {
         loadedModels.set(url, g);
+        // Packaged iOS: extract now and release the parse rather than holding it
+        // until buildFoliage (same rationale and same tier-safety argument as the
+        // props preload; see the comment there and the 17 Pro 1.54 GB kill).
+        if (GFX.nativeIosMemoryProfile) extractParts(url);
       }),
     );
   }
@@ -616,6 +620,17 @@ function bakeGeometry(mesh: THREE.Mesh): THREE.BufferGeometry {
   if (src.index) out.setIndex(src.index.clone());
   out.applyMatrix4(mesh.matrixWorld);
   return out;
+}
+
+/** Dev-channel residency accounting sources (see assets/residency_budget.ts). */
+export function foliageResidencySources(): {
+  extractedGeometries: THREE.BufferGeometry[];
+  parsedScenes: THREE.Object3D[];
+} {
+  return {
+    extractedGeometries: [...extractedParts.values()].flatMap((ps) => ps.map((p) => p.geometry)),
+    parsedScenes: [...loadedModels.values()].map((g) => g.scene),
+  };
 }
 
 function extractParts(url: string): ModelPart[] {

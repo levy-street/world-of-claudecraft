@@ -15,7 +15,12 @@
 
 import { audio } from '../game/audio';
 import type { ItemInstancePayload, ItemSlot } from '../sim/types';
-import type { IWorld } from '../world_api';
+import {
+  type IWorld,
+  type MarketInfo,
+  queryDiffersFromEcho,
+  searchDiffersFromEcho,
+} from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
 import { computeDropdownPlacement } from './dropdown_position';
@@ -98,6 +103,16 @@ export class MarketWindow {
   private searchQuery = '';
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
+  // Armed by onReconnected() and cleared by the next refreshIfChanged() that
+  // actually observes a post-reconnect MarketInfo. onReconnected() fires
+  // synchronously inside the client's `hello` handler, before the resent
+  // world's first snapshot has decoded, so at that instant marketInfo (if
+  // any) is still the PRE-drop echo, which by construction matches
+  // currentQuery() (the client pushed it and the server echoed it back
+  // before the socket died): queryDiffersFromEcho would always read false
+  // there and the resync would never fire. Deferring the comparison to the
+  // next snapshot lets it see the real post-reconnect echo instead.
+  private pendingReconnectResync = false;
 
   constructor(private readonly deps: MarketWindowDeps) {}
 
@@ -181,11 +196,45 @@ export class MarketWindow {
     this.deps.world().marketSearch(this.currentQuery());
   }
 
+  // Reconnect resync (issue 2416). A fresh join (the server's linkdead grace
+  // expired before the socket came back) hands the reconnecting character a
+  // brand-new session, whose browse query starts back at default; this window's
+  // own filter controls live in the client and survive the socket drop untouched,
+  // so without this the buttons keep showing a query the server silently stopped
+  // running. An ordinary resume keeps the same session (the echoed query still
+  // matches), so this is a no-op then: only a real drift re-pushes.
+  onReconnected(): void {
+    if (!this.opened) return;
+    // The socket just re-hello'd; the resent world's first snapshot has not
+    // decoded yet, so `marketInfo` here (if present at all) is still the
+    // pre-drop echo. Comparing against it now would always read "no drift"
+    // (it was pushed and echoed back before the socket died). Arm the flag
+    // instead and let refreshIfChanged() run the real comparison once a
+    // post-reconnect MarketInfo actually arrives.
+    this.pendingReconnectResync = true;
+  }
+
+  // Runs the deferred reconnect-drift check armed by onReconnected() above,
+  // once a MarketInfo has actually streamed in since. Checks both the five
+  // dropdown filter axes (queryDiffersFromEcho) and a settled search box
+  // (searchDiffersFromEcho): a fresh join resets `search` to '' same as the
+  // other axes, and by the time this runs no keystroke can be in flight.
+  private resolvePendingReconnectResync(info: MarketInfo | null): void {
+    if (!this.pendingReconnectResync || !info) return;
+    this.pendingReconnectResync = false;
+    const query = this.currentQuery();
+    if (queryDiffersFromEcho(query, info) || searchDiffersFromEcho(query, info)) {
+      this.pushQuery();
+    }
+  }
+
   // Per-frame (slow divider): refresh the live lists (Browse/Collect) when they
   // change. The Sell tab holds typed inputs, so it is only rebuilt on actions.
   refreshIfChanged(): void {
-    if (!this.opened || this.tab === 'sell') return;
+    if (!this.opened) return;
     const info = this.deps.world().marketInfo;
+    this.resolvePendingReconnectResync(info);
+    if (this.tab === 'sell') return;
     const sig = JSON.stringify([
       this.tab,
       this.itemTypeFilter,
@@ -595,6 +644,11 @@ export class MarketWindow {
           this.browsePage = Math.max(0, this.browsePage + (dir === 'next' ? 1 : -1));
           this.pushQuery(); // the server returns the requested page of listings
           this.lastSig = '';
+          // The page change is about to tear down and rebuild every `.mkt-row` node the
+          // same way refreshIfChanged()'s signature-driven refresh does; hide any tooltip
+          // still claimed by the pre-change rows before renderContent() below discards them
+          // (issue 2456, the pager's own row-teardown path).
+          this.deps.hideTooltip();
           audio.click();
           this.renderContent();
           // #market-body scrolls on desktop; on mobile the sheet base makes

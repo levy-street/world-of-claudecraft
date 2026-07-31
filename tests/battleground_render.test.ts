@@ -164,11 +164,11 @@ describe('Thornhollow art manifest: every group loads a model that exists', () =
       'models/city/wall_tower.glb':
         'f492b537c35f217e38f409f7e53fa76dee62db29b651f7f5c6a94b078a83517f',
       'models/medieval_village_v2/buildings/CastleBase_03.glb':
-        '18552bdfc917d62fb990010690e322bfbf07e26589fb2f6fefe218a354b0d24c',
+        '39d2d944a0a18010b488a2df22fded156a567b81299a4e7f0f1496a9cda32b2b',
       'models/medieval_village_v2/buildings/CastleStairs_03.glb':
-        'e99bbf698849f8058d55392086b5b1c7bc9ccfa5d9e10ac605e8e8e63dbbc3c1',
+        '1dd5b842c0df60f12a04c4723fcf614355a983ff47e6214d20702f46f2ddc405',
       'models/medieval_village_v2/buildings/Stairs_01.glb':
-        '29884dce6ba49138c71cae9d4deaf2424e43a0172ea657eaf6344bf38c56bbfc',
+        'df7c179971609353af4508e62b01be56af63234358eecba25296e54be17f4b3d',
     } as const;
     for (const [asset, expectedHash] of Object.entries(assets)) {
       const bytes = readFileSync(publicFile(asset));

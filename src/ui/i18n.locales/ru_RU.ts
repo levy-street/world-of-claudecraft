@@ -2390,6 +2390,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'Выдавший это задание не рядом.',
   'questUi.errors.turnInMissing': 'Место сдачи этого задания не рядом.',
   'questUi.errors.tooFar': 'Слишком далеко.',
+  'questUi.errors.escortAway': 'Тот, кого вы должны сопроводить, сейчас не на месте. Он скоро туда вернётся.',
   'itemUi.money.goldShort': 'з',
   'itemUi.money.silverShort': 'с',
   'itemUi.money.copperShort': 'м',
@@ -4478,6 +4479,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': 'Героический знак',
   'hudChrome.raidLockout.heroicName': 'Героический режим: {name}',
   'hudChrome.raidLockout.heroicLocked': 'Вы закреплены за героическим подземельем: {name}.',
+  'hudChrome.riftTracker.title': 'Разлом',
+  'hudChrome.riftTracker.floor': 'Этаж {current} из {total}',
+  'hudChrome.riftTracker.closesIn': 'Разлом закроется через {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
   'entities.items.morthens_cryptforged_hauberk.name': 'Кольчуга Мортена из гробничной стали',
   'entities.items.shadowpulse_handwraps.name': 'Обмотки теневого пульса',
   'entities.items.bonechill_striders.name': 'Сапоги костяного холода',
@@ -4765,7 +4771,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_moss_and_mending.objectives.1.label': 'Солёный мох Дальнего Берега',
   'entities.quests.q_fs_bram_come_home.title': 'Вернись домой, Брам',
   'entities.quests.q_fs_bram_come_home.text':
-    'Мой Брам вывел лодку в то самое утро, когда раскрылся прорыв у сетей, и море выбросило его где-то за мысом у Пристани. Три ночи назад я слышала его, {playerName}, — он звал через воду, а я побоялась пойти. Я и сейчас боюсь. Прошу тебя. Его лодка лежит разбитой на северном берегу. Доведи его до дома, ко мне.',
+    'Мой Брам вывел лодку в то самое утро, когда раскрылся прорыв у сетей, и море выбросило его где-то за мысом у Пристани. Три ночи назад я слышала его, {playerName}, — он звал через воду, а я побоялась пойти. Я и сейчас боюсь. Прошу тебя. Его лодка лежит разбитой на южном берегу. Доведи его до дома, ко мне.',
   'entities.quests.q_fs_bram_come_home.completion':
     'Брам! Ты вернул мне его целым, {playerName}. Мы оба плакали, и никому из нас не стыдно. Что бы прорывы ни забрали у этого острова дальше, моей семьи им не видать. Больше никогда.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
@@ -4839,7 +4845,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_sprung_traps.objectives.1.label': 'Капкан возвращён',
   'entities.quests.q_fv_seeing_wren_home.title': 'Проводить Рен домой',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Моя ученица Рен два дня назад ушла обходить линию у Золотой Проталины и не вернулась. Я нашёл её следы: она забилась под дорожные вехи к юго-западу от Ступеней Сияния и от страха перед волками не может сдвинуться с места. Мне нельзя оставить топь, {playerName}. Доведи её до лагеря Вейлы на Ступенях. Под огнями она будет в безопасности.',
+    'Моя ученица Рен два дня назад ушла обходить линию у Золотой Проталины и не вернулась. Я нашёл её следы: она забилась под дорожные вехи к северо-востоку от Ступеней Сияния и от страха перед волками не может сдвинуться с места. Мне нельзя оставить топь, {playerName}. Доведи её до лагеря Вейлы на Ступенях. Под огнями она будет в безопасности.',
   'entities.quests.q_fv_seeing_wren_home.completion':
     'Девочка внутри, закутана в половину моих одеял и болтает так, что звёзды с неба сыплются. Ты сделал сегодня доброе дело, {playerName}. Предел таких видит немного.',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
@@ -8270,6 +8276,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': 'Запрос слишком большой. Повторите попытку с меньшим объёмом данных.',
   'apiError.body.unsupported_media_type': 'Неподдерживаемый формат запроса.',
   'apiError.deeds.invalid_input': 'Недопустимые данные.',
+  'apiError.ota_updates.invalid_input': 'Недопустимые данные.',
   'apiError.steam.disabled': 'Привязка Steam сейчас недоступна.',
   'apiError.wallet.handoff_invalid':
     'Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку.',
@@ -9380,11 +9387,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Несколько повседневных команд стоит запомнить: /w Имя отправляет шёпот, а /r отвечает на последний полученный, /invite приглашает кого-то в вашу группу, /follow пристраивает вас следом за другом, /roll бросает кости на виду у группы, /who показывает, кто в сети, а /afk отмечает вас отошедшим. Введите /help в игре, чтобы увидеть полный список.',
   'guide.social.slashHeading': 'Удобные команды с косой чертой',
   // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.helpUnstuckSickness': 'Спасение: /unstuck запускает неподвижный отсчёт, после которого вас перенесёт на ближайшее кладбище и воскресит, если вы пали. Болезнь спасения останется на вас до 5 минут.',
   'hudChrome.unstuck.menuButton': 'Выбраться',
   'hudChrome.unstuck.help':
     'Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Спасение: /unstuck запускает неподвижный отсчёт, после которого ваш дух отправится на ближайшее кладбище. Чтобы вернуться к жизни, примите Подать Хранителя у Целителя душ.',
+  'hudChrome.unstuck.movedToGraveyard': 'Вас перенесли на ближайшее кладбище. Болезнь спасения тяготит вас.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck': 'Вас перенесли на ближайшее кладбище и воскресили. Болезнь спасения тяготит вас.',
   'hudChrome.unstuck.started':
     'Перемещение из ловушки через {seconds} сек. Движение, бой, получение урона или другое действие отменят его.',
   'hudChrome.unstuck.countdown': 'Выбраться: {seconds}',

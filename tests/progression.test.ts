@@ -140,6 +140,29 @@ describe('content referential integrity', () => {
     expect(new Set(QUEST_ORDER).size).toBe(QUEST_ORDER.length);
   });
 
+  it('every camp-spawned mob has an unconditional loot entry (copper at minimum)', () => {
+    // The v0.32.0 realms shipped 34 camp-spawned mobs with empty loot arrays
+    // and another 20 whose only entries were quest-gated: rollLoot
+    // (src/sim/loot/loot_roll.ts) drives entirely off template.loot, so both
+    // shapes drop nothing outside their quest, not even copper. Require at
+    // least one entry with no questId gate. The sanctioned lootless camp
+    // spawns are the practice target and the ambient stable horse (both
+    // non-combat fixtures by design), plus the Gilded Stag: the farm-yield
+    // economy model (tests/economy_yield.test.ts) uses it as the quest-only,
+    // zero-coin exemplar on purpose.
+    const LOOTLESS_FIXTURES = new Set(['training_dummy', 'stable_horse', 'gilded_stag']);
+    const problems: string[] = [];
+    const seen = new Set<string>();
+    for (const c of CAMPS) {
+      if (seen.has(c.mobId) || LOOTLESS_FIXTURES.has(c.mobId)) continue;
+      seen.add(c.mobId);
+      const t = MOBS[c.mobId];
+      if (t && !t.loot.some((l) => !l.questId))
+        problems.push(`${c.mobId} spawns from a camp with no unconditional loot`);
+    }
+    expect(problems).toEqual([]);
+  });
+
   it('all loot tables, vendor stock, camps and dungeon spawns resolve', () => {
     const problems: string[] = [];
     for (const m of Object.values(MOBS)) {

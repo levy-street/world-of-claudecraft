@@ -155,7 +155,6 @@ import {
   abilitiesKnownAt,
   arenaOrigin,
   CLASSES,
-  COMMUNITY_RIFT_SLOT_COUNT,
   DELVE_COMPANIONS,
   DELVE_LIST,
   DELVE_SLOT_COUNT,
@@ -408,12 +407,14 @@ import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
 import {
   applyResurrectionSickness,
+  applyUnstuckSickness,
   RESURRECTION_SICKNESS_ID,
   releasePlayerSpirit,
   resurrectAtCorpse,
   resurrectAtSpiritHealer,
   revivePlayerAt,
   spawnOverworldSpiritHealers,
+  UNSTUCK_SICKNESS_ID,
 } from './spirit';
 import { repairTalentLoadouts } from './talent_loadouts';
 import {
@@ -436,6 +437,7 @@ export type { MailSave } from './mail/post_office';
 export type { MarketSave } from './market';
 
 import { updateSwimFatigue } from './fatigue';
+import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
 import {
   applyDungeonMobTuning,
   mobLevelForDungeonDifficulty,
@@ -467,11 +469,7 @@ import {
   onNodeGatheredForQuests,
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
-import {
-  type NaturalRiftPortal,
-  RIFT_PORTAL_FIRST_AT,
-  updateRiftPortals as updateRiftPortalsImpl,
-} from './rift/portals';
+import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
 import {
   enchantRiftItem as enchantRiftItemImpl,
   type RiftForgeResult,
@@ -837,6 +835,12 @@ export interface DuelState {
   b: number;
   state: 'countdown' | 'active';
   timer: number; // countdown remaining / elapsed
+  // Tick number endDuel() set this on, or undefined while the duel is live.
+  // The entry is kept in `ctx.duels` (instead of being deleted synchronously)
+  // until updateDuels() purges it at tick-tail, so a reciprocal lethal hit
+  // resolving later in the SAME tick still finds it and gets clamped too:
+  // duels never produce a real death, even on a simultaneous double-kill.
+  endedTick?: number;
 }
 
 // GroundAoE type moved to entity_roster.ts (the ground-AoE drain's home); imported above.
@@ -1490,6 +1494,9 @@ export interface CharacterState {
   // The Keeper's Toll (Resurrection Sickness) remaining seconds (JSONB; optional/null when
   // none). Persisted so the penalty cannot be shed by logging out and back in.
   resSickness?: number | null;
+  // Unstuck Sickness remaining seconds, same contract as resSickness above (JSONB;
+  // optional/null when none, so pre-feature saves stay byte-equal and load clean).
+  unstuckSickness?: number | null;
   jail?: JailState;
   // Z-key sheathed-weapon toggle (JSONB; written only while sheathed, so pre-feature
   // saves and unsheathed characters stay byte-equal and load with the weapon drawn).
@@ -1766,7 +1773,9 @@ export class Sim {
   // scheduler; both live SimContext views).
   naturalRiftPortals: NaturalRiftPortal[] = [];
   riftPortalSpawnCount = 0;
-  riftPortalNextAt = RIFT_PORTAL_FIRST_AT;
+  // Placement-failure backoff gate only; per-zone cadence lives in the event
+  // history (rift/portals.ts riftZoneNextOpenAt).
+  riftPortalNextAt = 0;
   // Escort quest runs (src/sim/escort.ts), keyed by EscortDef id. Live
   // SimContext view; the module owns every mutation.
   escortRuns = new Map<string, EscortRunState>();
@@ -1858,6 +1867,10 @@ export class Sim {
   // the sim runs at 20 Hz wall speed, so the interval is real hours.
   private worldBossNextAt: number[] = WORLD_BOSSES.map((b) => b.intervalSeconds);
   private worldBossEntityIds: (number | null)[] = WORLD_BOSSES.map(() => null);
+  // One-shot gate for takeActionBarLayoutRestore (IWorldActionBar): mirrors
+  // ClientWorld's null-out pattern so the offline arm honors the same
+  // consumed-once contract instead of returning the 'noop' value forever.
+  private actionBarLayoutRestoreServed = false;
 
   // Per-world key for the rift collision registry in colliders.ts. Allocated per
   // Sim INSTANCE (not per seed): two same-seed Sims in one process must never
@@ -1877,7 +1890,6 @@ export class Sim {
       devCommands: this.devCommands,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
-      communityRifts: cfg.communityRifts ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       valeCupShowcase: cfg.valeCupShowcase ?? false,
@@ -2163,10 +2175,8 @@ export class Sim {
       }
     }
 
-    // Procedural rift instance pool (empty until a portal is entered). Public
-    // test realms opt into a larger pool without changing the normal host cap.
-    const riftSlotCount = this.cfg.communityRifts ? COMMUNITY_RIFT_SLOT_COUNT : RIFT_SLOT_COUNT;
-    for (let i = 0; i < riftSlotCount; i++) {
+    // Procedural rift instance pool (empty until a portal is entered).
+    for (let i = 0; i < RIFT_SLOT_COUNT; i++) {
       this.riftInstances.push({
         slot: i,
         instanceId: 0,
@@ -2212,6 +2222,7 @@ export class Sim {
         tier: null,
         portalId: null,
         rewarded: false,
+        progressed: false,
         seqResetAt: -Infinity,
         bossDeathZones: [],
       });
@@ -2895,6 +2906,12 @@ export class Sim {
       applyResurrectionSickness(this.ctx, player, savedState.resSickness);
       player.hp = Math.min(player.hp, player.maxHp);
     }
+    // Unstuck Sickness restores the same way. The two are mutually exclusive (see
+    // applySickness in spirit.ts), so a save carrying both resolves to this one.
+    if (savedState?.unstuckSickness && savedState.unstuckSickness > 0) {
+      applyUnstuckSickness(this.ctx, player, savedState.unstuckSickness);
+      player.hp = Math.min(player.hp, player.maxHp);
+    }
     // Resume a ghost: a player who logged out as a released spirit comes back as a
     // ghost at the graveyard (corpse still marked), not freely resurrected. dead stays
     // unset for a non-ghost logout (the pre-existing revive-on-relog behavior).
@@ -3390,6 +3407,8 @@ export class Sim {
       corpsePos: e.corpsePos ? { x: e.corpsePos.x, z: e.corpsePos.z } : null,
       // The Keeper's Toll persists across logout (it cannot be shed by relogging).
       resSickness: e.auras.find((a) => a.id === RESURRECTION_SICKNESS_ID)?.remaining ?? null,
+      // Unstuck Sickness persists across logout for the same reason.
+      unstuckSickness: e.auras.find((a) => a.id === UNSTUCK_SICKNESS_ID)?.remaining ?? null,
       equipment: { ...meta.equipment },
       equipmentInstance: Object.fromEntries(
         Object.entries(meta.equipmentInstance).map(([slot, inst]) => [
@@ -3715,6 +3734,8 @@ export class Sim {
   }
 
   takeActionBarLayoutRestore(): ActionBarLayoutRestore | undefined {
+    if (this.actionBarLayoutRestoreServed) return undefined;
+    this.actionBarLayoutRestoreServed = true;
     return { source: 'noop' };
   }
 
@@ -6656,6 +6677,16 @@ export class Sim {
       mob.yelledEngage = true;
       emitMobYell(this.ctx, mob, engageYell, MOBS[mob.templateId]?.battleYells?.range);
     }
+    // Premature-boss-pull punish, for the dungeons that opt in: pulling the boss
+    // with trash still standing brings the whole instance. Gated on a
+    // player-driven pull, like the engage yell above.
+    //
+    // Deliberately BEFORE the social block: both skip a mob that is no longer
+    // idle, so whichever runs first owns the leash anchor, and only the chain
+    // pull's puller-anchored leash lets a mob from the far end of the field
+    // actually reach the fight. Reordering these two would quietly shorten the
+    // leash on every mob they both claim.
+    if (playerPull) chainPullInstanceOnBossAggro(this.ctx, mob, target);
     if (social) {
       const family = MOBS[mob.templateId]?.family;
       const pullRadius = (family && SOCIAL_PULL_RADIUS[family]) ?? DEFAULT_SOCIAL_PULL_RADIUS;
@@ -6868,9 +6899,14 @@ export class Sim {
         });
         this.enterCombat(pet, target);
       } else {
+        // rangedDamageMult is the instance-tuning factor for a HOSTILE petSpell
+        // caster (undefined, so 1, for every player pet and every untuned or
+        // heroic spawn). Applied after the rng draw like the mechanic
+        // multipliers, so the shared draw order is unchanged.
         const dmg = Math.round(
           this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1) *
-            this.petDamageMult(pet),
+            this.petDamageMult(pet) *
+            (pet.rangedDamageMult ?? 1),
         );
         this.dealDamage(pet, target, Math.max(1, dmg), false, spell.school, spell.name, 'hit');
       }
@@ -7405,6 +7441,9 @@ export class Sim {
       // ever swinging. Kited from here, the chase-case leash check walks it back to
       // this eruption point, not the boss's distant home.
       add.tappedById = boss.tappedById;
+      // Slain adds unravel with their corpse (mob/locomotion.ts) rather than
+      // respawning at the eruption point, which is wherever the fight dragged.
+      add.summonedAdd = true;
       this.addEntity(add);
       boss.summonedIds.push(add.id);
       inst?.mobIds.push(add.id);
@@ -8417,6 +8456,7 @@ export class Sim {
       const duel = this.duels.get(attackerPlayer.id);
       if (
         duel &&
+        duel.endedTick === undefined &&
         duel.state === 'active' &&
         ((duel.a === attackerPlayer.id && duel.b === target.id) ||
           (duel.b === attackerPlayer.id && duel.a === target.id))
@@ -10349,6 +10389,19 @@ export class Sim {
     const inst = riftInstanceAtPos(this.ctx, p.pos);
     if (!inst || inst.partyKey === null) return [];
     return inst.bossDeathZones;
+  }
+
+  // Milliseconds remaining before the current rift's backing world event stops
+  // admitting new parties (null outside a rift, or for a dev-spawned rift with no
+  // backing RiftEvent). Sim-clock arithmetic only (event.expiresAt and this.time are
+  // both sim-clock seconds), recomputed fresh on every call so a repeated read ticks
+  // down like raidLockouts() does, with no caching to go stale between ticks.
+  riftEventMsRemaining(): number | null {
+    const view = this.riftFloor;
+    if (!view || view.eventId === null) return null;
+    const event = this.riftEvents.find((candidate) => candidate.eventId === view.eventId);
+    if (!event) return null;
+    return Math.max(0, Math.round((event.expiresAt - this.time) * 1000));
   }
 
   get delveRun(): DelveRunInfo | null {

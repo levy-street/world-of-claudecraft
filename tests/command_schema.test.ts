@@ -33,8 +33,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // Maker's Bond unbind service), the Rift + mounts surface (rift and
 // forge commands, learn_riding, mount selection), and market_list_instance
 // (the instance-payload market pipe).
-const EXPECTED_SEND_COUNT = 177; // +3 battleground sends; mount_select left the wire (reins are items)
-const EXPECTED_DISPATCH_COUNT = 189; // +4 battleground dispatches (dev_bg_start is dispatch-only)
+const EXPECTED_SEND_COUNT = 177; // +3 battleground sends // mount_select left the wire (reins are items)
+const EXPECTED_DISPATCH_COUNT = 189; // +4 (dev_bg_start is dispatch-only) // mount_select left the wire (reins are items)
 const EXPECTED_DISPATCH_ONLY_COUNT = 12; // + dev_bg_start
 
 // The chat sub-channel routing switch (server/game.ts `switch

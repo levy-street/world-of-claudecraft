@@ -4680,6 +4680,34 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false
   },
   {
+    "id": "chr_marsh_rares_ii",
+    "name": "The Glutton, Reckoned",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_peaks_rares_ii",
+    "name": "More Names Cut into the Crag",
+    "category": "chronicle",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "chr_gleamstag",
+    "name": "The Legend That Would Not Strike First",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_hollow_rares",
+    "name": "The Herd Remembers",
+    "category": "chronicle",
+    "renown": 10,
+    "feat": false
+  },
+  {
     "id": "pvp_bg_first_capture",
     "name": "Banner in Hand",
     "category": "pvp",

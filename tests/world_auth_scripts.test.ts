@@ -4,9 +4,14 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   ONLINE_WORLD_AUTH_TYPE as SCRIPT_WORLD_AUTH_TYPE,
+  ONLINE_WORLD_INCOMPATIBLE_MESSAGE as SCRIPT_WORLD_INCOMPATIBLE_MESSAGE,
   worldAuthMessage,
 } from '../scripts/lib/world_auth.mjs';
-import { ONLINE_WORLD_AUTH_TYPE, ONLINE_WORLD_LAYOUT_VERSION } from '../src/world_api';
+import {
+  ONLINE_WORLD_AUTH_TYPE,
+  ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
+  ONLINE_WORLD_LAYOUT_VERSION,
+} from '../src/world_api';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SCRIPTS_ROOT = join(ROOT, 'scripts');
@@ -72,7 +77,14 @@ const AUTHENTICATED_NODE_CLIENTS = [
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(token, characterId)))',
   },
 ] as const;
-const NON_AUTHENTICATING_NODE_WS_SCRIPTS = ['scripts/ws_security_e2e.mjs'] as const;
+// Scripts that open a world socket WITHOUT authenticating, on purpose. The OTA
+// layout preflight sends an empty token deliberately: it only wants to learn
+// whether the server accepts this checkout's layout discriminator, and reaching
+// the token rejection is the proof that it did.
+const NON_AUTHENTICATING_NODE_WS_SCRIPTS = [
+  'scripts/ota/check_server_layout.mjs',
+  'scripts/ws_security_e2e.mjs',
+] as const;
 const LEGACY_AUTH_LITERAL = /\bt\s*:\s*['"]auth['"]/;
 
 function nodeWebSocketSources(dir = SCRIPTS_ROOT): Array<[string, string]> {
@@ -103,6 +115,14 @@ describe('standalone world WebSocket auth', () => {
     expect(SCRIPT_WORLD_AUTH_TYPE).toBe(ONLINE_WORLD_AUTH_TYPE);
     expect(readFileSync(join(ROOT, 'scripts/lib/world_auth.d.mts'), 'utf8')).toContain(
       `export const ONLINE_WORLD_AUTH_TYPE: '${ONLINE_WORLD_AUTH_TYPE}';`,
+    );
+    // The mismatch literal travels with the discriminator: the OTA layout
+    // preflight tells an epoch refusal apart from an ordinary auth refusal by
+    // comparing against it, so a reworded message on one side only would make
+    // every preflight read inconclusive and silently block publishing.
+    expect(SCRIPT_WORLD_INCOMPATIBLE_MESSAGE).toBe(ONLINE_WORLD_INCOMPATIBLE_MESSAGE);
+    expect(readFileSync(join(ROOT, 'scripts/lib/world_auth.d.mts'), 'utf8')).toContain(
+      `export const ONLINE_WORLD_INCOMPATIBLE_MESSAGE: '${ONLINE_WORLD_INCOMPATIBLE_MESSAGE}';`,
     );
     expect(worldAuthMessage('token-1', 42)).toEqual({
       t: ONLINE_WORLD_AUTH_TYPE,

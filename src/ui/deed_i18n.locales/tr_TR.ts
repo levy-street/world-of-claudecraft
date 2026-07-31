@@ -776,4 +776,20 @@ export const table: DeedLocaleTable = {
     name: 'Kahramanca: Yaban Yürek Çukuru',
     desc: "Yaban Yürek Çukuru'nda Zulgar, Çukurun Sesi'ni Kahramanca zorlukta alt et.",
   },
+  chr_marsh_rares_ii: {
+    name: 'Obur, Hesaba Katıldı',
+    desc: "Mirefen Bataklığı'nın ilk sayımda atlanan dördüncü namlı dehşeti Obur Grubjaw'ı öldür.",
+  },
+  chr_peaks_rares_ii: {
+    name: 'Kayaya Kazınan Yeni Adlar',
+    desc: "Dikenzirve Tepeleri'nin ilk sayımda atlanan iki namlı dehşetini daha öldür: Yaşlı Cragmaw ve Kıymıkbeyi Kazzix.",
+  },
+  chr_gleamstag: {
+    name: 'Önce Vurmayan Efsane',
+    desc: "Ancak köşeye sıkıştırılınca saldıran ender ve çekingen elit Parıltı Geyiği'ni öldür.",
+  },
+  chr_hollow_rares: {
+    name: 'Sürü Unutmaz',
+    desc: "Örtülü Vadi'nin iki gezgin ender patronunu öldür: Yaşlı Marrowshell ve Sürünün İlki Aurelhorn.",
+  },
 };

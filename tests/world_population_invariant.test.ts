@@ -10,7 +10,7 @@
 // Deliberately driven through the real Sim and the real content tables: the
 // point is to exercise every shipped escort, not a fixture.
 import { describe, expect, it } from 'vitest';
-import { CAMPS, ESCORTS, MOBS } from '../src/sim/data';
+import { CAMPS, DUNGEON_X_THRESHOLD, ESCORTS, MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
@@ -29,7 +29,7 @@ function liveCounts(sim: Sim): Map<string, number> {
   const out = new Map<string, number>();
   for (const e of sim.entities.values()) {
     if (e.kind !== 'mob' || e.dead) continue;
-    if (e.spawnPos.x > 90_000) continue; // instance plane
+    if (e.spawnPos.x > DUNGEON_X_THRESHOLD) continue; // instance plane
     out.set(e.templateId, (out.get(e.templateId) ?? 0) + 1);
   }
   return out;

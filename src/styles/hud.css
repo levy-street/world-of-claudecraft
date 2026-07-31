@@ -2717,6 +2717,32 @@
     cursor: help;
   }
 
+  /* ---------- rift floor tracker ---------- */
+  /* Floor progress + the "closes in" event countdown (issue #2655). Same shape
+     as the delve tracker above; actionable pacing info, so it stays visible on
+     every graphics tier (docs/design/graphics-settings-fairness.md). */
+  #rift-tracker {
+    width: 100%;
+    font-size: 12px;
+    color: var(--gold);
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+    display: none;
+  }
+  #rift-tracker .rt-header {
+    font-family: var(--title-font);
+    font-size: 14px;
+    border-bottom: 1px solid #ffd10044;
+    margin-bottom: 4px;
+    padding-bottom: 2px;
+  }
+  #rift-tracker .rt-obj {
+    color: #e8e0c8;
+    font-size: 11px;
+    margin-left: 8px;
+    margin-top: 4px;
+  }
+
   /* ---------- combat meters ---------- */
   /* The damage window and the two detachable meters (Healing, Threat) share one
      panel shape. Undisturbed they sit in the bottom-right HUD stack exactly as

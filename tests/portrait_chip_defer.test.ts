@@ -4,6 +4,7 @@ const portraitUrl = `data:image/png;base64,${'A'.repeat(20_000)}`;
 
 vi.mock('../src/render/characters/portrait', () => ({
   onPortraitsReady: () => undefined,
+  onPortraitUpdate: () => undefined,
   playerPortraitDataUrl: () => portraitUrl,
   portraitsReady: () => true,
 }));

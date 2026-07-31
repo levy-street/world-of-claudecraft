@@ -1704,6 +1704,11 @@ const MOB_KEYS: Record<string, string> = {
   wood_wraith: 'mob_ghost',
   gravenbark_shambler: 'mob_treant',
   pale_huntsman: 'skel_rogue',
+  // Mosley is an escortee (mob-kind so the escort driver can walk him), and
+  // every escortee needs an explicit body: the humanoid family default is the
+  // hooded outlaw, so the townsfolk you walk home would read as the bandits you
+  // are protecting them from. Tinted villager, exactly like Wren above.
+  gravedigger_mosley: 'npc_villager',
   // the Palmreach: coral crabs, jungle boars, and the carved-stone guardian
   // (the canopy weavers take the spider family default)
   tide_scuttler: 'mob_crab',
@@ -1713,8 +1718,13 @@ const MOB_KEYS: Record<string, string> = {
   the_topiary_bull: 'mob_bull',
   moor_ram: 'mob_alpaca',
   shoal_scuttler: 'mob_crab',
+  // Navigator Suli, the Palmreach escortee (see gravedigger_mosley above).
+  castaway_navigator: 'npc_villager',
   // The Wreck Warden walks as Mogger's hulking bruiser body, not a skeleton.
   the_wreck_warden: 'mob_bruiser',
+  // the Farshore: Bram is the isle's escortee (see gravedigger_mosley above);
+  // its wretches, stalkers and horrors keep their family fallbacks.
+  fisher_bram: 'npc_villager',
   // The Infernal Citadel: the pact cult reads as robed casters, not the `undead`
   // family's default skeleton minion. Its demons keep the family fallback
   // (mob_demonalt), re-tinted deep red by the templates.

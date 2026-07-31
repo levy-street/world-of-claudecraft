@@ -504,9 +504,10 @@ the lever is material quantities per craft.
 - Closest-call name keeps flagged for review: Quartermaster Bree (recorded
   voice assets raise the rename cost), Highwatch (TERA's endgame hub city
   shares the exact coin; the town predates professions scope).
-- Buyback payload option b: whether vendor buyback should record and
-  re-grant the exact instance payload instead of a plain copy
+- Buyback payload option b (RESOLVED, shipped): vendor buyback records and
+  re-grants the exact instance payload instead of a plain copy
   (self-inflicted-loss class, not a wash; the bound arm is closed).
+  `items.ts` `recordVendorBuyback`/`buyBackItem` (#2412).
 
 ### Post-launch watches
 - Shard prices and heroic clear speed (tune enchanting via reagent costs).

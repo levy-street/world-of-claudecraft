@@ -19,7 +19,7 @@
 import * as THREE from 'three';
 import { TH_PLACEMENTS } from '../sim/thornhollow_field.generated';
 import { loadGltf, loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   BG_FLOOR_Y,
   BG_TEXTURE_DIR,
@@ -81,7 +81,9 @@ export function ensureBattlegroundAssets(): Promise<void> {
   return battlegroundAssetsPromise;
 }
 
-if (typeof window !== 'undefined') registerPreload(ensureBattlegroundAssets());
+// The DEFERRED lane: the field's art is only ever needed by a player who enters
+// the band, so it must not compete with the launcher's own fetches.
+if (typeof window !== 'undefined') registerDeferredPreload(() => ensureBattlegroundAssets());
 
 /** The renderer-owned hooks the field plugs into (the yumi signature shape). */
 export interface BattlegroundLightHooks {

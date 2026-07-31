@@ -121,7 +121,11 @@ export const WRAITHWOOD_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 8.5,
     aggroRadius: 12,
-    loot: [{ itemId: 'widowsilk_skein', chance: 0.6, questId: 'q_ww_widows_skeins' }],
+    loot: [
+      { copper: 105, chance: 1 },
+      { itemId: 'spider_leg', chance: 0.4 },
+      { itemId: 'widowsilk_skein', chance: 0.6, questId: 'q_ww_widows_skeins' },
+    ],
     scale: 1.3,
     color: 0x3a3440,
     componentTags: ['silk', 'venomSac'],
@@ -158,7 +162,10 @@ export const WRAITHWOOD_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 15,
     moveSpeed: 6.5, // a tree that decided to walk does not hurry
     aggroRadius: 8,
-    loot: [{ copper: 100, chance: 1 }],
+    loot: [
+      { copper: 100, chance: 1 },
+      { itemId: 'tangled_weed', chance: 0.4 },
+    ],
     scale: 1.35,
     color: 0x4e4a3a,
   },
@@ -177,7 +184,10 @@ export const WRAITHWOOD_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8.5,
     aggroRadius: 16, // the clearing is his, and he knows when you enter it
     elite: true,
-    loot: [{ copper: 100, chance: 1 }],
+    loot: [
+      { copper: 100, chance: 1 },
+      { itemId: 'bone_fragments', chance: 1 },
+    ],
     scale: 1.4,
     color: 0xc8d8c0,
   },

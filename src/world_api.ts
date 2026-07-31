@@ -198,6 +198,7 @@ export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
 export type { WorldInteractionOutcome } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
+export { queryDiffersFromEcho, searchDiffersFromEcho } from './world_api/market';
 export type { MountRaceView } from './world_api/mounts';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
 export type {

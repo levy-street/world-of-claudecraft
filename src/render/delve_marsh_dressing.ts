@@ -13,7 +13,7 @@ import type { DungeonLayout } from '../sim/dungeon_layout';
 import { polygonXAtZ } from '../sim/geometry2d';
 import { hash2 } from '../sim/rng';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 
 // Stable seed for all hash2 calls in this module (render-only dressing, no sim state).
@@ -80,7 +80,7 @@ const loadedMarshGltf = new Map<MarshGlbAnchorKind, THREE.Group>();
 
 if (typeof window !== 'undefined') {
   for (const [kind, url] of Object.entries(MARSH_ASSET_URL) as [MarshGlbAnchorKind, string][]) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url).then((gltf) => {
         loadedMarshGltf.set(kind, gltf.scene);
       }),

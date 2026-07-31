@@ -2524,6 +2524,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.noMailQuestItems':
     "Vous ne pouvez pas envoyer d'objets de quête par courrier.",
   'hudChrome.mailbox.result.noRecipient': 'Personne de ce nom ne possède de boîte aux lettres ici.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Cet objet est lié et ne peut pas être envoyé par courrier.',
   'hudChrome.mailbox.result.notEnoughItems': "Vous n'en avez pas autant à envoyer.",
   'hudChrome.mailbox.result.recipientBoxFull': 'Sa boîte aux lettres est pleine.',
   'hudChrome.mailbox.result.sent':
@@ -3787,6 +3789,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughHealth': 'Pas assez de points de vie.',
   'hud.errors.targetMustDodge': "Votre cible doit d'abord esquiver.",
   'hud.errors.tradeBound': 'Cet objet est lié et ne peut pas être échangé.',
+  'hud.errors.marketListBound': 'Cet objet est lié et ne peut pas être mis en vente.',
   'hud.errors.requiresCombo': 'Cette technique requiert des points de combo.',
   'hud.errors.requiresForm': 'Vous devez être en forme de {form}.',
   'hud.errors.bear': 'Bruin',
@@ -3839,6 +3842,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': 'Terminez votre échange avant de rejoindre la file.',
   'hud.errors.arenaQueueInstance': 'Vous ne pouvez pas rejoindre la file depuis une instance.',
   'hud.errors.tradeInProgress': 'Un échange est déjà en cours.',
+  'hud.errors.tradeAlreadyTrading': 'Ce joueur est déjà en train d’échanger.',
   'hud.errors.tradeTooFar': 'La cible est trop éloignée pour échanger.',
   'hud.errors.tradeExpired': "La demande d'échange a expiré.",
   'hud.errors.tradeFailed': 'Échange échoué : objets ou argent indisponibles.',
@@ -4124,6 +4128,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': "Le donneur de cette quête n'est pas à proximité.",
   'questUi.errors.turnInMissing': "Le rendu de cette quête n'est pas à proximité.",
   'questUi.errors.tooFar': 'Vous êtes trop loin.',
+  'questUi.errors.escortAway':
+    "Votre escorte n'est pas à son poste pour le moment. Elle y reviendra sous peu.",
   'itemUi.money.goldShort': 'po',
   'itemUi.money.silverShort': 'pa',
   'itemUi.money.copperShort': 'pc',
@@ -8759,6 +8765,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Ce lien de réinitialisation est invalide ou a expiré. Demandez-en un nouveau.',
   'apiError.deeds.invalid_input': 'Saisie invalide.',
+  'apiError.ota_updates.invalid_input': 'Saisie invalide.',
   'apiError.steam.account_taken': 'Ce compte Steam est déjà lié à un autre compte.',
   'apiError.steam.already_linked': 'Votre compte est déjà lié à un compte Steam.',
   'apiError.steam.banned': 'Ce compte Steam ne peut pas être lié.',
@@ -9081,7 +9088,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Pêcheur Bram ramené sain et sauf à Gullhaven',
   'entities.quests.q_fs_bram_come_home.text':
-    "Mon Bram a pris le bateau le matin où la brèche-des-filets s'est ouverte, et la mer l'a rejeté quelque part au-delà de la pointe du Débarcadère. Je l'ai entendu il y a trois nuits, {playerName}, appeler par-dessus l'eau, et j'étais trop effrayée pour y aller. Je le suis encore. Je vous en prie. Son bateau gît naufragé sur la rive nord. Ramenez-le-moi.",
+    "Mon Bram a pris le bateau le matin où la brèche-des-filets s'est ouverte, et la mer l'a rejeté quelque part au-delà de la pointe du Débarcadère. Je l'ai entendu il y a trois nuits, {playerName}, appeler par-dessus l'eau, et j'étais trop effrayée pour y aller. Je le suis encore. Je vous en prie. Son bateau gît naufragé sur la rive sud. Ramenez-le-moi.",
   'entities.quests.q_fs_bram_come_home.title': 'Que Bram revienne',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Dix de moins, et les ouvriers agricoles se disputent déjà pour savoir qui sort en premier. Cela ne durera pas, les brèches ne se reposent jamais longtemps, mais une ville qui mange est une ville qui tient.',
@@ -9168,7 +9175,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     "Apprentie Wren ramenée saine et sauve aux Marches de l'Aurore",
   'entities.quests.q_fv_seeing_wren_home.text':
-    "Mon apprentie Wren est partie parcourir la ligne du Goldmelt il y a deux jours et n'est jamais revenue. J'ai trouvé ses traces, elle s'est terrée sous les bornes routières au sud-ouest des Marches de l'Aurore, trop effrayée par les loups pour bouger. Je ne peux quitter la tourbière, {playerName}. Ramenez-la au camp de Veyla sur les Marches. Elle sera en sécurité sous les lumières.",
+    "Mon apprentie Wren est partie parcourir la ligne du Goldmelt il y a deux jours et n'est jamais revenue. J'ai trouvé ses traces, elle s'est terrée sous les bornes routières au nord-est des Marches de l'Aurore, trop effrayée par les loups pour bouger. Je ne peux quitter la tourbière, {playerName}. Ramenez-la au camp de Veyla sur les Marches. Elle sera en sécurité sous les lumières.",
   'entities.quests.q_fv_seeing_wren_home.title': 'Ramener Wren à bon port',
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve vous envoie ? Ha. Onze ans, et cette femme croit encore que la tourbière va me dévorer. Enfin... cette année, elle pourrait bien avoir raison. Regardez ce que ça a fait à mes lignes.',
@@ -10892,11 +10899,17 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Récupération : /unstuck démarre un compte à rebours immobile qui vous déplace vers un endroit sûr et accessible à proximité.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Récupération : /unstuck démarre un compte à rebours immobile, puis envoie votre esprit au cimetière le plus proche. Revenir par le Veilleur pâle exige le Glas du Veilleur.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Récupération : /unstuck démarre un compte à rebours immobile, puis vous déplace au cimetière le plus proche en vous ranimant si vous étiez tombé. Le Mal de déblocage vous accable pendant 5 minutes au maximum.',
   'hudChrome.unstuck.menuButton': 'Déblocage',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Vous avez été déplacé au cimetière le plus proche. Le Mal de déblocage pèse sur vous.',
   'hudChrome.unstuck.noSafePosition':
     "Aucun endroit sûr accessible n'a été trouvé à proximité. Vous n'avez pas été déplacé.",
   'hudChrome.unstuck.revivedAtGraveyard':
     'Vous avez été ramené au cimetière le plus proche et ranimé. Le Glas du Veilleur pèse sur vous.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Vous avez été déplacé au cimetière le plus proche et ranimé. Le Mal de déblocage pèse sur vous.',
   'hudChrome.unstuck.standStill':
     "Restez immobile sur un sol stable avant d'utiliser le Déblocage.",
   'hudChrome.unstuck.standStillAnywhere': "Restez immobile avant d'utiliser le Déblocage.",
@@ -11006,4 +11019,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marque du fabricant',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': "Bonus d'ouvrage de maître",
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Lien de commande',
+  'hudChrome.riftTracker.title': 'Faille',
+  'hudChrome.riftTracker.floor': 'Étage {current} sur {total}',
+  'hudChrome.riftTracker.closesIn': 'Se ferme dans {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

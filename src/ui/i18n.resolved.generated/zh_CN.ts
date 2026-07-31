@@ -340,11 +340,14 @@ export const zh_CN: EnTranslations = {
       "menuButton": "脱困",
       "help": "脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。",
       "helpAtGraveyard": "脱困：/unstuck 会启动原地倒计时，结束后将你的灵魂送往最近的墓地。你必须向灵魂医者接受守护者的代价才能复活。",
+      "helpUnstuckSickness": "脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。你将带着脱困后遗症，最多持续 5 分钟。",
       "started": "将在 {seconds} 秒后脱困。移动、战斗、受到伤害或开始其他动作都会取消。",
       "countdown": "脱困：{seconds}",
       "completed": "已移动到最近且可到达的安全位置。",
       "completedAtGraveyard": "你的灵魂已返回最近的墓地。与灵魂医者交谈并接受守护者的代价。",
       "revivedAtGraveyard": "你已被送回最近的墓地并复活。守护者的代价正压在你身上。",
+      "movedToGraveyard": "你已被移动到最近的墓地。脱困后遗症正压在你身上。",
+      "revivedAtGraveyardUnstuck": "你已被移动到最近的墓地并复活。脱困后遗症正压在你身上。",
       "cancelledMoved": "你进行了移动，脱困已取消。",
       "cancelledDamaged": "你受到了伤害，脱困已取消。",
       "cancelledCombat": "你进入了战斗，脱困已取消。",
@@ -884,6 +887,13 @@ export const zh_CN: EnTranslations = {
       "lockedToast": "你已锁定到{raid}。{time}后解锁。",
       "heroicName": "英雄难度：{name}",
       "heroicLocked": "你已被锁定至英雄难度的{name}。"
+    },
+    "riftTracker": {
+      "title": "裂隙",
+      "floor": "第 {current} 层，共 {total} 层",
+      "closesIn": "裂隙将在 {time} 后关闭",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "compass": {
       "N": "北",
@@ -2991,6 +3001,9 @@ export const zh_CN: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "钱包授权已过期或无法验证。请重试。"
+    },
+    "ota_updates": {
+      "invalid_input": "输入无效。"
     }
   },
   "guide": {
@@ -6890,7 +6903,8 @@ export const zh_CN: EnTranslations = {
       "incomplete": "该任务尚未完成。",
       "giverMissing": "该任务发布者不在附近。",
       "turnInMissing": "该任务交付点不在附近。",
-      "tooFar": "距离太远。"
+      "tooFar": "距离太远。",
+      "escortAway": "你要护送的人现在不在原处，稍后就会回来。"
     }
   },
   "itemUi": {
@@ -12893,7 +12907,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "送雯恩回家",
-        "text": "我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶西南边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。",
+        "text": "我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶东北边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。",
         "completion": "姑娘已经在帐里了，裹着我一半的毯子，叽叽喳喳快把星星都聊下来了。你今天做了件善事，{playerName}。这样的事，霜幕之境可不多见。",
         "objectives": {
           "0": {
@@ -13577,7 +13591,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "布拉姆回家",
-        "text": "晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在北岸。把他领回家，交到我手上。",
+        "text": "晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在南岸。把他领回家，交到我手上。",
         "completion": "布拉姆！你把他完完整整地带回来了，{playerName}。我们俩都哭了，谁也不觉得丢人。往后裂隙不管再从这座岛夺走什么，都别想夺走我的家人。再也不会了。",
         "objectives": {
           "0": {

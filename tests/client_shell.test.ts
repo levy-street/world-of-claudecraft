@@ -2066,6 +2066,12 @@ describe('client HTML shell', () => {
     // corpse-claim mirror online); the call now closes right after the
     // nothing-to-interact string.
     expect(mainTs).toContain("t('errors.nothingInteract'),\n      ),");
+    // The escort away line sits immediately before it (escort_interact.ts): an
+    // escort run has no other client entry point, so an unwired argument here
+    // would silently make those quests uncompletable again.
+    expect(mainTs).toContain(
+      "t('questUi.errors.escortAway'),\n        t('errors.nothingInteract'),",
+    );
     expect(mainTs).not.toContain('online === null');
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
     expect(mainTs).toContain(

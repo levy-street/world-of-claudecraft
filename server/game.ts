@@ -53,7 +53,6 @@ import {
   partyFrameRole,
 } from '../src/sim/party_frame_info';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
-import { populateCommunityRiftPortals } from '../src/sim/rift/portals';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { RAID_MAX } from '../src/sim/social/party';
@@ -1375,10 +1374,6 @@ export interface PerfCaptureStatus {
   last: PerfCaptureResult | null;
 }
 
-export interface GameServerOptions {
-  readonly communityTestRifts?: boolean;
-}
-
 export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
@@ -1552,10 +1547,8 @@ export class GameServer {
   private readonly ipSessionCounts = new Map<string, number>();
   private readonly riftUpgrader: RiftUpgradeCoordinator;
   private readonly riftAssets: RiftAssetCoordinator;
-  private readonly communityTestRifts: boolean;
 
-  constructor(options: GameServerOptions = {}) {
-    this.communityTestRifts = options.communityTestRifts ?? false;
+  constructor() {
     this.sim = new Sim({
       seed: WORLD_SEED,
       playerClass: 'warrior',
@@ -1566,7 +1559,6 @@ export class GameServer {
       worldBossAtBoot: true,
       // Ranked rift portals spawn on the live realm (dev/test worlds opt in).
       riftPortals: true,
-      communityRifts: this.communityTestRifts,
       lockoutNowMs: () => Date.now(),
       // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
       // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
@@ -3134,6 +3126,11 @@ export class GameServer {
     session.chatStrikes = meta.chatStrikes ?? session.chatStrikes;
     session.isAdmin = meta.isAdmin ?? false;
     session.adminPermissions = new Set(meta.adminPermissions ?? []);
+    // Re-validate the freshly-read layout (untrusted at rest), same as a fresh
+    // join. Without this, a mid-session save that already landed durably would
+    // be clobbered by the stale join-time snapshot once lastSent resets below
+    // forces a resend.
+    session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
     session.lastSent = {};
@@ -3529,22 +3526,9 @@ export class GameServer {
 
   async loadRifts(): Promise<void> {
     try {
-      loadRiftWorldState(this.sim.ctx, await loadRiftState(), Date.now(), {
-        strict: this.communityTestRifts,
-      });
+      loadRiftWorldState(this.sim.ctx, await loadRiftState(), Date.now());
     } catch (err) {
       console.error('failed to load shared Rift state:', err);
-      if (this.communityTestRifts) throw err;
-      return;
-    }
-    if (!this.communityTestRifts) return;
-
-    populateCommunityRiftPortals(this.sim.ctx);
-    try {
-      await this.persistRifts();
-    } catch (err) {
-      console.error('failed to save shared Rift state:', err);
-      throw err;
     }
   }
 

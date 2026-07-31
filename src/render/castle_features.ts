@@ -21,7 +21,7 @@ import {
   WARD_STEPS,
 } from '../sim/castle_layout';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { surfaceMat } from './gfx';
 import { PROP_ASSET_DEFS } from './props';
 
@@ -57,7 +57,7 @@ type CastleKey = (typeof CASTLE_KEYS)[number];
 
 const castleScenes: Partial<Record<CastleKey, THREE.Group>> = {};
 for (const key of CASTLE_KEYS) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(PROP_ASSET_DEFS[key].url).then((gltf) => {
       castleScenes[key] = gltf.scene;
     }),
@@ -70,6 +70,11 @@ export const castleFeaturesPreloadInternalsForTest = {
 
 /** world scale for the wall modules: the KayKit wall is 4 units long */
 const S = CASTLE.module / 4; // 1.75
+
+// How far south (+z, toward the bailey) the ward stair-cut mesh sits off the
+// terrace edge so its high back does not clip into the terrace face. Cosmetic
+// only: the walkable ramp wedge is unchanged.
+const WARD_STEP_MESH_PUSH = 0.5;
 
 interface Placement {
   x: number;
@@ -401,11 +406,19 @@ export function buildCastleFeatures(): CastleFeaturesView {
     // leaves the cuts out with the rest of the ward, so this carries them)
     for (const cut of WARD_STEPS) {
       const cx = (cut.x0 + cut.x1) / 2;
+      // kcasStairsWide climbs toward -z at rot 0 (the wall-flight foot treads
+      // below set the convention: rot PI climbs +z, -PI/2 climbs +x). This cut
+      // rises from the bailey at z1+run UP to the terrace at z1, i.e. toward -z,
+      // so the tread faces must point -z; the authored PI had the whole flight
+      // reversed (players read the steps as leading the wrong way off the
+      // terrace). The wedge below is symmetric, so only the mesh yaw was wrong.
+      // Nudged a touch south (+z, toward the bailey) off the terrace edge so the
+      // flight's high back no longer buries itself in the terrace face.
       put('kcasStairsWide', {
         x: cx,
         y: padY,
-        z: w.z1 + WARD_STEP_RUN / 2,
-        rot: Math.PI,
+        z: w.z1 + WARD_STEP_RUN / 2 + WARD_STEP_MESH_PUSH,
+        rot: 0,
         s: 0.62,
       });
       const z0 = w.z1;

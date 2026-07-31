@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   loadTexture: vi.fn(),
   registerPreload: vi.fn(),
+  registerDeferredPreload: vi.fn((start: () => unknown) => start()),
 }));
 
 vi.mock('../src/render/assets/loader', () => ({
@@ -12,6 +13,7 @@ vi.mock('../src/render/assets/loader', () => ({
 
 vi.mock('../src/render/assets/preload', () => ({
   registerPreload: mocks.registerPreload,
+  registerDeferredPreload: mocks.registerDeferredPreload,
 }));
 
 afterEach(() => {
@@ -33,8 +35,8 @@ describe('Eastbrook surface atlas preload', () => {
     const module = await import('../src/render/eastbrook_surface_atlas');
     expect(mocks.loadTexture).toHaveBeenCalledTimes(1);
     expect(mocks.loadTexture).toHaveBeenCalledWith(module.EASTBROOK_SURFACE_ATLAS_URL);
-    expect(mocks.registerPreload).toHaveBeenCalledTimes(1);
-    await mocks.registerPreload.mock.calls[0][0];
+    expect(mocks.registerDeferredPreload).toHaveBeenCalledTimes(1);
+    await mocks.registerDeferredPreload.mock.results[0].value;
     expect(module.eastbrookSurfaceAtlasTexture()).toBe(atlas);
     expect(atlas.colorSpace).toBe(THREE.NoColorSpace);
     expect(atlas.name).toBe('');

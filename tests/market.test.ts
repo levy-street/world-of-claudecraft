@@ -137,6 +137,66 @@ describe('the World Market — the Merchant', () => {
     expect(sim.marketInfoFor(seller)?.totalCount).toBe(all.totalCount);
   });
 
+  // Issue #2416: the browse query echo. Before this fix, MarketInfo only echoed the
+  // search text (`filter`); the client had no wire signal telling it whether the
+  // type/subtype/armor-class/primary-stat/rarity filters it was showing still
+  // matched what the server actually applied, so a fresh join silently desynced
+  // them (see the reconnect test below).
+  it('echoes every active filter axis on marketInfoFor, not just the search text', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+
+    sim.marketSearch(
+      q('robe', {
+        itemType: 'armor',
+        subtype: 'chest',
+        armorClass: 'cloth',
+        primaryStat: 'int',
+        rarity: 'rare',
+      }),
+      viewer,
+    );
+
+    const info = marketInfo(sim, viewer);
+    expect(info.filter).toBe('robe');
+    expect(info.itemType).toBe('armor');
+    expect(info.subtype).toBe('chest');
+    expect(info.armorClass).toBe('cloth');
+    expect(info.primaryStat).toBe('int');
+    expect(info.rarity).toBe('rare');
+  });
+
+  // Issue #2416: a fresh join (the server's linkdead grace expired before the socket
+  // came back) never resumes the old session; it hands the reconnecting character a
+  // brand-new PlayerMeta, whose marketQuery starts at defaultMarketQuery() same as any
+  // new session. The echoed query on the next marketInfoFor is the ONLY signal a
+  // reconnecting client has to notice its filter buttons no longer describe what the
+  // server is actually browsing by.
+  it('echoes the reset-to-default query after a fresh join, same as any new session', () => {
+    const sim = makeWorld();
+    const staleSession = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, staleSession);
+    sim.marketSearch(
+      q('', { itemType: 'weapon', subtype: 'axe', primaryStat: 'str' }),
+      staleSession,
+    );
+    expect(marketInfo(sim, staleSession).itemType).toBe('weapon');
+
+    // The old session tears down (grace expired) and the reconnect lands as a fresh
+    // join: a brand-new pid/meta for the same character, not a resume of the old one.
+    sim.removePlayer(staleSession);
+    const freshSession = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, freshSession);
+
+    const info = marketInfo(sim, freshSession);
+    expect(info.itemType).toBe('all');
+    expect(info.subtype).toBe('all');
+    expect(info.armorClass).toBe('all');
+    expect(info.primaryStat).toBe('all');
+    expect(info.rarity).toBe('all');
+  });
+
   it('applies armor class and dominant primary stat to the authoritative browse result', () => {
     const sim = makeWorld();
     const viewer = sim.addPlayer('warrior', 'Viewer');

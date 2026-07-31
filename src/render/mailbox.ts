@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   eastbrookSurfaceAtlasMetadata,
   eastbrookSurfaceAtlasTexture,
@@ -27,7 +27,7 @@ let sharedGlowGeometry: THREE.SphereGeometry | null = null;
 let sharedGlowMaterial: THREE.Material | null = null;
 
 if (typeof window !== 'undefined') {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(MAILBOX_ASSET_URL).then((gltf) => {
       loadedMailboxGltf = gltf;
     }),

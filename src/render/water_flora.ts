@@ -9,7 +9,7 @@
 import * as THREE from 'three';
 import { hollowWillowSpots } from '../sim/fen_willows';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { type WaterFloraPlacement, waterFloraRegions } from './water_flora_core';
 
 export interface WaterFloraView {
@@ -27,7 +27,7 @@ const FLORA_URLS = {
 type FloraKey = keyof typeof FLORA_URLS;
 const floraScenes: Partial<Record<FloraKey, THREE.Group>> = {};
 for (const key of Object.keys(FLORA_URLS) as FloraKey[]) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(FLORA_URLS[key]).then((gltf) => {
       floraScenes[key] = gltf.scene;
     }),

@@ -340,11 +340,14 @@ export const zh_TW: EnTranslations = {
       "menuButton": "脫困",
       "help": "脫困：/unstuck 會啟動原地倒數，之後將你移動到附近可到達的安全位置。",
       "helpAtGraveyard": "脫困：/unstuck 會啟動原地倒數，結束後將你的靈魂送往最近的墓地。你必須向靈魂醫者接受守護者的代價才能復活。",
+      "helpUnstuckSickness": "脫困：/unstuck 會啟動原地倒數，結束後將你移動到最近的墓地，若你已倒下則會復活你。你將帶著脫困虛弱，最多持續 5 分鐘。",
       "started": "將在 {seconds} 秒後脫困。移動、戰鬥、受到傷害或開始其他動作都會取消。",
       "countdown": "脫困：{seconds}",
       "completed": "已移動到最近且可到達的安全位置。",
       "completedAtGraveyard": "你的靈魂已返回最近的墓地。與靈魂醫者交談並接受守護者的代價。",
       "revivedAtGraveyard": "你已被送回最近的墓地並復活。守護者的代價正壓在你身上。",
+      "movedToGraveyard": "你已被移動到最近的墓地。脫困虛弱正壓在你身上。",
+      "revivedAtGraveyardUnstuck": "你已被移動到最近的墓地並復活。脫困虛弱正壓在你身上。",
       "cancelledMoved": "你進行了移動，脫困已取消。",
       "cancelledDamaged": "你受到了傷害，脫困已取消。",
       "cancelledCombat": "你進入了戰鬥，脫困已取消。",
@@ -884,6 +887,13 @@ export const zh_TW: EnTranslations = {
       "lockedToast": "你已鎖定到{raid}。{time}後解鎖。",
       "heroicName": "英雄難度:{name}",
       "heroicLocked": "你已被鎖定至英雄難度的{name}。"
+    },
+    "riftTracker": {
+      "title": "裂隙",
+      "floor": "第 {current} 層，共 {total} 層",
+      "closesIn": "裂隙將在 {time} 後關閉",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "compass": {
       "N": "北",
@@ -2991,6 +3001,9 @@ export const zh_TW: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "錢包授權已過期或無法驗證。請再試一次。"
+    },
+    "ota_updates": {
+      "invalid_input": "輸入無效。"
     }
   },
   "guide": {
@@ -6890,7 +6903,8 @@ export const zh_TW: EnTranslations = {
       "incomplete": "該任務尚未完成。",
       "giverMissing": "該任務發布者不在附近。",
       "turnInMissing": "該任務交付點不在附近。",
-      "tooFar": "距離太遠。"
+      "tooFar": "距離太遠。",
+      "escortAway": "你要護送的人現在不在原處，稍後就會回來。"
     }
   },
   "itemUi": {
@@ -12893,7 +12907,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "送雯恩回家",
-        "text": "我的學徒雯恩兩天前出門去巡融金隘口的路線，就再沒回來。我找到了她的足跡，她躲在極光台階西南邊的路標底下，怕狼怕得不敢動彈。我離不開這片沼澤，{playerName}。陪她走到台階上薇拉的營地吧。在極光底下她會安全的。",
+        "text": "我的學徒雯恩兩天前出門去巡融金隘口的路線，就再沒回來。我找到了她的足跡，她躲在極光台階東北邊的路標底下，怕狼怕得不敢動彈。我離不開這片沼澤，{playerName}。陪她走到台階上薇拉的營地吧。在極光底下她會安全的。",
         "completion": "姑娘進帳了，裹著我一半的毯子，正把天上的星星一顆顆說下來。你今天做了件善事，{playerName}。霜幕之境可不常見到善事。",
         "objectives": {
           "0": {
@@ -13577,7 +13591,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "布蘭姆回家",
-        "text": "網裂開的那個早晨，我的布蘭姆把船撐了出去，海把他拋回了登岸碼頭岬角外的什麼地方。三天前的夜裡，{playerName}，我聽見他隔著水喊，而我怕得不敢去。現在我還是不敢。求求你。他的船擱淺在北岸。陪他走回家，回到我身邊。",
+        "text": "網裂開的那個早晨，我的布蘭姆把船撐了出去，海把他拋回了登岸碼頭岬角外的什麼地方。三天前的夜裡，{playerName}，我聽見他隔著水喊，而我怕得不敢去。現在我還是不敢。求求你。他的船擱淺在南岸。陪他走回家，回到我身邊。",
         "completion": "布蘭姆！你把他完完整整地帶回了我身邊，{playerName}。我們倆都哭了，誰也不覺得羞。無論裂口接下來要從這座島奪走什麼，它們奪不走我的家人。再也不能了。",
         "objectives": {
           "0": {

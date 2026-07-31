@@ -25,7 +25,7 @@ import { hash2 } from '../sim/rng';
 import type { BuildingDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { buildEastbrookGrandArmouryView } from './eastbrook_grand_armoury';
 import {
   isEastbrookRebuildBuilding,
@@ -427,12 +427,37 @@ if (typeof window !== 'undefined') {
   const preloadKeys = preloadPropKeys(GFX.standardMaterials);
   for (const [key, def] of Object.entries(PROP_ASSET_DEFS)) {
     if (!preloadKeys.has(key as PropKey)) continue;
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(def.url).then((gltf) => {
         loadedProps.set(key, gltf);
+        // Packaged iOS: extract IMMEDIATELY and release the parse, instead of
+        // holding all 194 parsed scenes until buildProps runs in the Renderer
+        // ctor. Measured on an iPhone 17 Pro, WebContent died at 1.54 GB mid
+        // preload with the renderer never reached, so build-time extraction
+        // never got the chance to release anything; extracting per-prop as it
+        // lands keeps only the float geometry + converted materials resident
+        // (exactly what build-time extraction retains) and frees the parse's
+        // duplicate buffers progressively. Tier-safe HERE ONLY because
+        // nativeIosMemoryProfile derives from hints alone and pins
+        // standardMaterials=false at import AND live resolve, so the converted
+        // material class cannot drift the way an import-time TIER read would
+        // (the farmCrate P0). Also moves the extraction CPU out of the
+        // synchronous scene build, which shortens the entry stall.
+        if (GFX.nativeIosMemoryProfile) propAsset(key as PropKey);
       }),
     );
   }
+}
+
+/** Dev-channel residency accounting sources (see assets/residency_budget.ts). */
+export function propResidencySources(): {
+  extractedGeometries: THREE.BufferGeometry[];
+  parsedScenes: THREE.Object3D[];
+} {
+  return {
+    extractedGeometries: [...extractCache.values()].flatMap((a) => a.parts.map((p) => p.geo)),
+    parsedScenes: [...loadedProps.values()].map((g) => g.scene),
+  };
 }
 
 /** Test-only window into the preload/prewarm key sets (see tests/render_asset_preload). */

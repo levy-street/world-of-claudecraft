@@ -1250,6 +1250,7 @@ function blankEntity(id: number): Entity {
     detonateTimer: Infinity,
     firedSummons: 0,
     summonedIds: [],
+    summonedAdd: false,
     enraged: false,
     healedThisPull: false,
     threat: new Map(),
@@ -1434,6 +1435,13 @@ export class ClientWorld implements IWorld {
   // Active procedural Rift floor, rebuilt from the riftState event (no snapshot
   // field). The renderer regenerates geometry/style from this descriptor.
   riftFloor: RiftFloorView | null = null;
+  // The riftState event's expiresAtMs mirrored verbatim: an epoch-ms deadline the
+  // server computed via ctx.lockoutNowMs() (real Date.now() on the live server, the
+  // same clock raidLockouts() already relies on). Null while riftFloor is null or
+  // the run has no backing event (a dev-spawned rift). riftEventMsRemaining()
+  // subtracts Date.now() fresh on every call, so the HUD's "closes in" countdown
+  // ticks locally without a snapshot round trip.
+  private riftEventExpiresAtMs: number | null = null;
   // Active lethal boss death zones, mirrored from riftDeathZoneSpawn events.
   // Each entry stores the zone geometry and the wall-clock expiry (ms, performance.now
   // scale). riftBossDeathZones() converts these to RiftBossDeathZoneView on demand.
@@ -2068,6 +2076,15 @@ export class ClientWorld implements IWorld {
         this.cfg.playerClass = this.ownPlayerClass;
         this.spectateFacingPending = false;
         this.pendingSpectateFacing = null;
+        // marketInfo is delta-omitted (s.market only streams when it changes),
+        // so the mirror otherwise still holds the pre-drop echo at the instant
+        // onReconnected() below fires: that echo was pushed and echoed back
+        // before the socket died, so it trivially matches the window's own
+        // query and the reconnect resync (issue #2416) would never detect the
+        // fresh-join reset. Nulling it here forces MarketWindow to treat the
+        // resync as pending until a genuinely post-reconnect market snapshot
+        // decodes.
+        this.marketInfo = null;
         this.onReconnected?.();
       }
       this.connected = true;
@@ -4341,6 +4358,13 @@ export class ClientWorld implements IWorld {
     }
     return out;
   }
+  // Milliseconds remaining before the current rift's backing world event stops
+  // admitting new parties (null outside a rift, or for a dev-spawned rift). See the
+  // riftEventExpiresAtMs field above for the mirrored deadline this subtracts from.
+  riftEventMsRemaining(): number | null {
+    if (this.riftEventExpiresAtMs === null) return null;
+    return Math.max(0, this.riftEventExpiresAtMs - Date.now());
+  }
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.
   private selfLockouts: Record<string, number> = {};
@@ -4416,6 +4440,7 @@ export class ClientWorld implements IWorld {
           tier: ev.tier,
         }
       : null;
+    this.riftEventExpiresAtMs = ev.active ? ev.expiresAtMs : null;
     // Clear death zones on rift exit / floor change so stale rings from a
     // previous run never bleed into a new floor.
     if (!ev.active) this.activeBossDeathZones = [];

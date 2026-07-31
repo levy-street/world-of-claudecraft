@@ -2262,6 +2262,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': '该任务发布者不在附近。',
   'questUi.errors.turnInMissing': '该任务交付点不在附近。',
   'questUi.errors.tooFar': '距离太远。',
+  'questUi.errors.escortAway': '你要护送的人现在不在原处，稍后就会回来。',
   'itemUi.money.goldShort': '金',
   'itemUi.money.silverShort': '银',
   'itemUi.money.copperShort': '铜',
@@ -4273,6 +4274,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '英雄徽记',
   'hudChrome.raidLockout.heroicName': '英雄难度：{name}',
   'hudChrome.raidLockout.heroicLocked': '你已被锁定至英雄难度的{name}。',
+  'hudChrome.riftTracker.title': '裂隙',
+  'hudChrome.riftTracker.floor': '第 {current} 层，共 {total} 层',
+  'hudChrome.riftTracker.closesIn': '裂隙将在 {time} 后关闭',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
   'entities.items.morthens_cryptforged_hauberk.name': '莫尔森的墓铸锁甲',
   'entities.items.shadowpulse_handwraps.name': '暗影脉冲裹手',
   'entities.items.bonechill_striders.name': '骨寒行者之靴',
@@ -4520,7 +4526,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '布拉姆！你把他完完整整地带回来了，{playerName}。我们俩都哭了，谁也不觉得丢人。往后裂隙不管再从这座岛夺走什么，都别想夺走我的家人。再也不会了。',
   'entities.quests.q_fs_bram_come_home.objectives.0.label': '已护送渔民布拉姆平安回到鸥港',
   'entities.quests.q_fs_bram_come_home.text':
-    '晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在北岸。把他领回家，交到我手上。',
+    '晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在南岸。把他领回家，交到我手上。',
   'entities.quests.q_fs_bram_come_home.title': '布拉姆回家',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     '少了十个，雇工们已经在争谁第一个下田了。这撑不了多久，裂隙从不会安分太久，但吃得上饭的镇子，就是守得住的镇子。',
@@ -4605,7 +4611,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '姑娘已经在帐里了，裹着我一半的毯子，叽叽喳喳快把星星都聊下来了。你今天做了件善事，{playerName}。这样的事，霜幕之境可不多见。',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label': '已护送学徒雯恩平安抵达极光台阶',
   'entities.quests.q_fv_seeing_wren_home.text':
-    '我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶西南边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。',
+    '我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶东北边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。',
   'entities.quests.q_fv_seeing_wren_home.title': '送雯恩回家',
   'entities.quests.q_fv_silent_trapline.completion':
     '梅芙派你来的？哈。十一年了，那女人还当沼泽会吃了我。唔……今年她也许还真说对了。看看它把我的陷阱线糟蹋成什么样了。',
@@ -7777,6 +7783,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': '该请求过大。请减少数据后重试。',
   'apiError.body.unsupported_media_type': '不支持的请求格式。',
   'apiError.deeds.invalid_input': '输入无效。',
+  'apiError.ota_updates.invalid_input': '输入无效。',
   'apiError.steam.disabled': 'Steam 关联当前不可用。',
   'apiError.wallet.handoff_invalid': '钱包授权已过期或无法验证。请重试。',
   'apiError.steam.invalid_ticket': 'Steam 无法验证此关联请求。请在桌面客户端中重试。',
@@ -8808,10 +8815,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '有几条日常命令值得记住：/w 名字 发送密语，/r 回复你最近收到的一条，/invite 邀请某人加入你的小队，/follow 跟随一位好友的脚步，/roll 为全队掷骰，/who 显示谁在线，/afk 将你标记为离开。在游戏中输入 /help 可查看完整列表。',
   'guide.social.slashHeading': '实用的斜杠命令',
   // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.helpUnstuckSickness':
+    '脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。你将带着脱困后遗症，最多持续 5 分钟。',
   'hudChrome.unstuck.menuButton': '脱困',
   'hudChrome.unstuck.help': '脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。',
   'hudChrome.unstuck.helpAtGraveyard':
     '脱困：/unstuck 会启动原地倒计时，结束后将你的灵魂送往最近的墓地。你必须向灵魂医者接受守护者的代价才能复活。',
+  'hudChrome.unstuck.movedToGraveyard': '你已被移动到最近的墓地。脱困后遗症正压在你身上。',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    '你已被移动到最近的墓地并复活。脱困后遗症正压在你身上。',
   'hudChrome.unstuck.started':
     '将在 {seconds} 秒后脱困。移动、战斗、受到伤害或开始其他动作都会取消。',
   'hudChrome.unstuck.countdown': '脱困：{seconds}',

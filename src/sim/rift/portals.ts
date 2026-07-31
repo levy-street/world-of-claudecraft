@@ -4,9 +4,18 @@
 // group entering it receives an independent RiftInstance, while every instance
 // points back to the same event and races for its single first-clear claim.
 //
-// Determinism: scheduling and portal placement use streams derived only from the
-// realm seed and spawn ordinal. They never consume ctx.rng, so enabling Rifts
-// cannot perturb combat, loot, or any other pre-existing simulation stream.
+// Population policy: every eligible zone runs its own hourly respawn boundary
+// (RIFT_PORTAL_ZONE_CYCLE), anchored on that zone's previous opening. At a
+// boundary the zone opens a new rift UNLESS its current one is still open, in
+// which case the boundary is skipped and the zone is re-judged at the next
+// one. A first-cleared (sealed) zone stays empty until the first boundary at
+// or after the seal and is never instantly refarmed, while an uncleared portal
+// collapses at RIFT_PORTAL_LIFETIME (an exact multiple of the cycle), which
+// lands on a boundary, so its replacement is due immediately.
+//
+// Determinism: portal placement uses streams derived only from the realm seed
+// and spawn ordinal. They never consume ctx.rng, so enabling Rifts cannot
+// perturb combat, loot, or any other pre-existing simulation stream.
 
 import { isBlocked } from '../colliders';
 import { STRIP_MAX_X, STRIP_MIN_X, WORLD_MAX_X, WORLD_MIN_X, ZONES, zoneAt } from '../data';
@@ -27,16 +36,19 @@ import {
 export const RIFT_MIN_LEVEL = 20;
 
 export const RIFT_PORTAL_FIRST_AT = 120;
-export const RIFT_PORTAL_INTERVAL_MIN = 2 * 60 * 60;
-export const RIFT_PORTAL_INTERVAL_MAX = 4 * 60 * 60;
-/** Compatibility/telemetry value: the mean of the deterministic random window. */
-export const RIFT_PORTAL_INTERVAL = (RIFT_PORTAL_INTERVAL_MIN + RIFT_PORTAL_INTERVAL_MAX) / 2;
-export const RIFT_PORTAL_LIFETIME = 60 * 60;
-export const RIFT_PORTAL_MAX_OPEN = 3;
-export const COMMUNITY_RIFT_PORTAL_TARGET = 8;
-export const COMMUNITY_RIFT_PORTAL_LIFETIME = 6 * 60 * 60;
-export const COMMUNITY_RIFT_PORTAL_REFILL_DELAY = 60;
-const RIFT_EVENT_HISTORY_LIMIT = 64;
+export const RIFT_PORTAL_LIFETIME = 2 * 60 * 60;
+/** Each eligible zone gets its own hourly respawn boundary, anchored on the
+ * zone's own last opening (NOT tied to RIFT_PORTAL_LIFETIME: a portal can
+ * outlive one boundary and still be judged against the next). The lifetime
+ * must stay an exact multiple of this cycle so an uncleared portal's collapse
+ * lands exactly on a boundary and its replacement is due immediately. */
+export const RIFT_PORTAL_ZONE_CYCLE = 60 * 60;
+/** Backoff after a deterministic placement failure before rescanning zones. */
+export const RIFT_PORTAL_RETRY_DELAY = 60;
+/** Completed events retained for history AND per-zone cadence derivation
+ * (riftZoneNextOpenAt). Must stay comfortably above the eligible-zone count or
+ * a sealed zone's newest event could be trimmed and instantly refarm. */
+export const RIFT_EVENT_HISTORY_LIMIT = 64;
 
 /** Rank tuning. Rifts pay NO Heroic Marks at any rank (maintainer decision:
  * marks stay a heroic dungeon/raid currency; the rift prize is the clear-time
@@ -84,7 +96,8 @@ export interface NaturalRiftPortal {
 }
 
 interface RiftPortalSpawnOptions {
-  readonly excludedZoneIds?: ReadonlySet<string>;
+  /** Force the target zone (the per-zone scheduler); omitted picks by rng. */
+  readonly zoneId?: string;
   readonly lifetime?: number;
 }
 
@@ -92,16 +105,58 @@ function announce(ctx: SimContext, text: string, color: string): void {
   ctx.emit({ type: 'log', text, color });
 }
 
-function scheduleRng(ctx: SimContext, ordinal: number): Rng {
-  return new Rng((ctx.cfg.seed ^ Math.imul(ordinal + 1, 0x85ebca6b) ^ 0x51f15e5d) >>> 0);
-}
-
 function portalRng(ctx: SimContext, ordinal: number): Rng {
   return new Rng((ctx.cfg.seed ^ Math.imul(ordinal + 1, 0x9e3779b9) ^ 0xa341316c) >>> 0);
 }
 
-export function riftPortalDelay(ctx: SimContext, ordinal: number): number {
-  return scheduleRng(ctx, ordinal).range(RIFT_PORTAL_INTERVAL_MIN, RIFT_PORTAL_INTERVAL_MAX);
+export function eligibleRiftZones(): ZoneDef[] {
+  return ZONES.filter((zone) => zone.riftPortalEligible && zone.riftTierWeights !== undefined);
+}
+
+/** First hourly boundary at or after a rift's close, counted from that rift's
+ * own opening. Pure and rng-free: a zone's schedule is a deterministic
+ * function of its own event history, never a random draw. `closedAt` equal to
+ * a boundary (a rift that runs its full lifetime to collapse) yields that same
+ * boundary, i.e. the replacement is due immediately, not one cycle later. */
+export function riftZoneBoundaryAfterClose(
+  openedAt: number,
+  closedAt: number,
+  cycle: number = RIFT_PORTAL_ZONE_CYCLE,
+): number {
+  const elapsed = Math.max(0, closedAt - openedAt);
+  // Minus epsilon: sim time accumulates in DT-sized double additions, so an
+  // expiry stored as openedAt + LIFETIME can read back a hair PAST the exact
+  // boundary (elapsed / cycle = 2.0000000000000004). Without the guard that
+  // rounds a collapse up a whole extra cycle and the zone sits empty an
+  // extra hour instead of replacing immediately.
+  return openedAt + Math.ceil(elapsed / cycle - 1e-9) * cycle;
+}
+
+/** The sim-time a zone's rift actually closed, or null while it is still open
+ * (portal standing, or a party still racing inside it past its collapse). A
+ * sealed rift closes at its first-clear claim; a collapsed one at its expiry. */
+function riftEventClosedAt(event: RiftEvent): number | null {
+  if (event.status === 'cleared') return event.firstClear?.clearedAt ?? event.expiresAt;
+  if (event.status === 'collapsed') return event.expiresAt;
+  return null;
+}
+
+/** When `zoneId` may open its next portal: the first hourly boundary at or
+ * after its previous rift CLOSED (riftZoneBoundaryAfterClose). Derived from
+ * the event history alone, so a server restart preserves the cadence without
+ * any new persisted state; a zone with no recorded event is due at the world's
+ * first-spawn warmup, and a zone whose rift is still open is not due at all
+ * (that boundary is skipped and the zone re-judged at the next one). */
+export function riftZoneNextOpenAt(ctx: SimContext, zoneId: string): number {
+  let last: RiftEvent | null = null;
+  for (const event of ctx.riftEvents) {
+    if (event.zoneId !== zoneId) continue;
+    if (last === null || event.openedAt > last.openedAt) last = event;
+  }
+  if (last === null) return RIFT_PORTAL_FIRST_AT;
+  const closedAt = riftEventClosedAt(last);
+  if (closedAt === null) return Number.POSITIVE_INFINITY;
+  return riftZoneBoundaryAfterClose(last.openedAt, closedAt);
 }
 
 function contentHash(text: string): string {
@@ -170,16 +225,15 @@ export function spawnNaturalRiftPortal(
   ordinal: number,
   options?: RiftPortalSpawnOptions,
 ): boolean {
-  const eligible = ZONES.filter(
-    (zone) =>
-      zone.riftPortalEligible &&
-      zone.riftTierWeights !== undefined &&
-      !options?.excludedZoneIds?.has(zone.id),
-  );
+  const eligible = eligibleRiftZones();
   if (eligible.length === 0) return false;
 
   const rng = portalRng(ctx, ordinal);
-  const zone = eligible[rng.int(0, eligible.length - 1)];
+  const zone =
+    options?.zoneId !== undefined
+      ? (eligible.find((candidate) => candidate.id === options.zoneId) ?? null)
+      : eligible[rng.int(0, eligible.length - 1)];
+  if (zone === null) return false;
   const tier = riftTierForZone(zone, rng.next());
   const info = RIFT_TIER_INFO[tier];
   const xMin = Math.max(WORLD_MIN_X, zone.xMin ?? STRIP_MIN_X) + 25;
@@ -272,16 +326,8 @@ export function closeNaturalRiftPortal(
 ): void {
   const index = ctx.naturalRiftPortals.findIndex((portal) => portal.id === portalId);
   if (index < 0) return;
-  const coveredCommunityZonesBefore = ctx.cfg.communityRifts ? activeRiftZoneIds(ctx).size : 0;
   const portal = ctx.naturalRiftPortals[index];
   ctx.naturalRiftPortals.splice(index, 1);
-  if (
-    ctx.cfg.communityRifts &&
-    coveredCommunityZonesBefore >= COMMUNITY_RIFT_PORTAL_TARGET &&
-    activeRiftZoneIds(ctx).size < COMMUNITY_RIFT_PORTAL_TARGET
-  ) {
-    ctx.riftPortalNextAt = ctx.time + COMMUNITY_RIFT_PORTAL_REFILL_DELAY;
-  }
   if (ctx.entities.has(portal.id)) ctx.dropEntity(portal.id);
 
   const event = eventForPortal(ctx, portal);
@@ -305,54 +351,18 @@ function activeRiftZoneIds(ctx: SimContext): Set<string> {
   return new Set(ctx.naturalRiftPortals.map((portal) => portal.zoneId));
 }
 
-function spawnCommunityRiftPortal(ctx: SimContext): boolean {
-  const activeZoneIds = activeRiftZoneIds(ctx);
-  const ordinal = ctx.riftPortalSpawnCount;
-  if (
-    !spawnNaturalRiftPortal(ctx, ordinal, {
-      excludedZoneIds: activeZoneIds,
-      lifetime: COMMUNITY_RIFT_PORTAL_LIFETIME,
-    })
-  ) {
-    return false;
-  }
-  ctx.riftPortalSpawnCount += 1;
-  return true;
-}
-
-/** Reconcile the public-test population immediately after persisted state loads.
- * Existing open portals are preserved and every new portal selects a region not
- * already active. Placement failure leaves the ordinal pending for the scheduler. */
-export function populateCommunityRiftPortals(ctx: SimContext): number {
-  let spawned = 0;
-  while (activeRiftZoneIds(ctx).size < COMMUNITY_RIFT_PORTAL_TARGET) {
-    if (!spawnCommunityRiftPortal(ctx)) break;
-    spawned += 1;
-  }
-  ctx.riftPortalNextAt = ctx.time + COMMUNITY_RIFT_PORTAL_REFILL_DELAY;
-  return spawned;
-}
-
-function updateCommunityRiftPortals(ctx: SimContext): void {
-  for (let i = ctx.naturalRiftPortals.length - 1; i >= 0; i--) {
-    const portal = ctx.naturalRiftPortals[i];
-    if (ctx.time >= portal.expiresAt) closeNaturalRiftPortal(ctx, portal.id, 'collapsed');
-  }
-
-  if (activeRiftZoneIds(ctx).size >= COMMUNITY_RIFT_PORTAL_TARGET) return;
-  if (ctx.time < ctx.riftPortalNextAt) return;
-  spawnCommunityRiftPortal(ctx);
-  ctx.riftPortalNextAt = ctx.time + COMMUNITY_RIFT_PORTAL_REFILL_DELAY;
-}
-
-/** Once-per-second scheduler. A full world cap postpones the due event instead of
- * consuming it, and every successful spawn samples the next 2-4 hour deadline. */
+/** Once-per-second scheduler: each eligible zone is judged against its OWN
+ * hourly boundary, gated on its previous rift having CLOSED
+ * (riftZoneNextOpenAt). `riftPortalNextAt` survives only as the placement-failure
+ * backoff gate (a failed ordinal re-rolls identical positions, so hammering it
+ * every second is pointless; another zone's success advances the ordinal and
+ * unwedges it). At most ONE portal spawns per pass: a spawn generates a full
+ * rift plan plus its upgrade draft (~20 ms), so when many zones fall due in the
+ * same second (fresh world, the shared hourly boundary, post-downtime restore)
+ * the fill spreads over consecutive seconds instead of blowing the 50 ms tick
+ * budget in one go. A failed zone does NOT consume the pass. */
 export function updateRiftPortals(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 10) return;
-  if (ctx.cfg.communityRifts) {
-    updateCommunityRiftPortals(ctx);
-    return;
-  }
 
   for (let i = ctx.naturalRiftPortals.length - 1; i >= 0; i--) {
     const portal = ctx.naturalRiftPortals[i];
@@ -360,12 +370,15 @@ export function updateRiftPortals(ctx: SimContext): void {
   }
 
   if (ctx.time < ctx.riftPortalNextAt) return;
-  if (ctx.naturalRiftPortals.length >= RIFT_PORTAL_MAX_OPEN) return;
-  const ordinal = ctx.riftPortalSpawnCount;
-  if (!spawnNaturalRiftPortal(ctx, ordinal)) {
-    ctx.riftPortalNextAt = ctx.time + 60;
+  const openZoneIds = activeRiftZoneIds(ctx);
+  for (const zone of eligibleRiftZones()) {
+    if (openZoneIds.has(zone.id)) continue;
+    if (ctx.time < riftZoneNextOpenAt(ctx, zone.id)) continue;
+    if (!spawnNaturalRiftPortal(ctx, ctx.riftPortalSpawnCount, { zoneId: zone.id })) {
+      ctx.riftPortalNextAt = ctx.time + RIFT_PORTAL_RETRY_DELAY;
+      continue;
+    }
+    ctx.riftPortalSpawnCount += 1;
     return;
   }
-  ctx.riftPortalSpawnCount += 1;
-  ctx.riftPortalNextAt = ctx.time + riftPortalDelay(ctx, ordinal);
 }

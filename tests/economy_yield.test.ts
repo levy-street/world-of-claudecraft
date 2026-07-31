@@ -176,15 +176,13 @@ describe('harvest-family trash carries usable components instead of coin', () =>
     const byFamily = new Map<string, number>();
     for (const { template } of governed())
       byFamily.set(template.family, (byFamily.get(template.family) ?? 0) + 1);
-    // 17 beasts and 4 spiders ship as camp trash today; floors sit at the real
+    // 16 beasts and 4 spiders ship as camp trash today; floors sit at the real
     // counts so thinning the population fails here instead of going unnoticed.
-    expect(byFamily.get('beast') ?? 0).toBeGreaterThanOrEqual(17);
+    // Gloam Strider moved from beast to reptile (#2672), so reptile now has a
+    // camp-spawned member too.
+    expect(byFamily.get('beast') ?? 0).toBeGreaterThanOrEqual(16);
     expect(byFamily.get('spider') ?? 0).toBeGreaterThanOrEqual(4);
-    // No reptile is camp-spawned yet (the one reptile template is a delve mob),
-    // so that arm of the rule is currently unexercised. Stated rather than
-    // hidden: the day a reptile camp ships, this line documents that the guard
-    // above starts governing it automatically.
-    expect(byFamily.get('reptile') ?? 0).toBe(0);
+    expect(byFamily.get('reptile') ?? 0).toBeGreaterThanOrEqual(1);
     expect(governed().length).toBeGreaterThanOrEqual(21);
   });
 

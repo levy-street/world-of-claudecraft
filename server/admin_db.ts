@@ -39,22 +39,36 @@ export interface OverviewCounts {
   siteUsersNow: number;
 }
 
-export async function overviewCounts(): Promise<OverviewCounts> {
-  // A big multi-subquery aggregate over accounts / characters / play_sessions,
-  // request-driven through the admin overview cache (server/admin_overview_cache.ts),
-  // which bounds how often the admin Overview poll can re-run it: run it on the
-  // raised allowance so a growing play_sessions table cannot trip the default
-  // statement timeout. peak_online_all_time is GREATEST of the retained sample
-  // window's live max and the folded world_state peak (foldOnlinePeak below), so
-  // a peak inside the retained window stays honest before the next fold and a
-  // pruned-away peak is never lost. Only foldOnlinePeak writes the peak key, but
-  // a tampered or corrupted stored value must degrade to 0 under the guarded
-  // cast, never take down the whole overview read; the digit-count bound in the
-  // regex is part of that guard (a digits-only value wider than int4 would pass
-  // a bare digit match and the ::int cast would then error out the whole read).
-  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-    query(
-      `
+// world_state key prefix for the folded per-realm all-time online peak.
+// Single-sourced across foldOnlinePeak and the overviewCounts reader SQL (a
+// drifting copy on either side would silently orphan the stored peak); it is a
+// compile-time constant interpolated into SQL text, never user input. Declared
+// ahead of OVERVIEW_COUNTS_SQL below so that template literal can reference it
+// at module-load time.
+export const ONLINE_PEAK_WORLD_STATE_PREFIX = 'admin_online_peak:';
+
+// A big multi-subquery aggregate over accounts / characters / play_sessions,
+// request-driven through the admin overview cache (server/admin_overview_cache.ts),
+// which bounds how often the admin Overview poll can re-run it: run it on the
+// raised allowance so a growing play_sessions table cannot trip the default
+// statement timeout. peak_online_all_time is GREATEST of the retained sample
+// window's live max and the folded world_state peak (foldOnlinePeak below), so
+// a peak inside the retained window stays honest before the next fold and a
+// pruned-away peak is never lost. Only foldOnlinePeak writes the peak key, but
+// a tampered or corrupted stored value must degrade to 0 under the guarded
+// cast, never take down the whole overview read; the digit-count bound in the
+// regex is part of that guard (a digits-only value wider than int4 would pass
+// a bare digit match and the ::int cast would then error out the whole read).
+//
+// The active/returning-account subqueries use the sargable
+// `(ended_at IS NULL OR ended_at > cutoff)` form, never
+// `COALESCE(ended_at, now()) > cutoff`: a volatile function (now()) inside
+// the COALESCE makes the whole expression un-indexable, forcing a sequential
+// scan of play_sessions on every admin Overview refresh. The OR form lets the
+// planner serve both arms (still-open sessions, sessions that ended after the
+// cutoff) from play_sessions_ended_account (ended_at, account_id), the
+// concurrent index built in server/admin_db_indexes.ts.
+export const OVERVIEW_COUNTS_SQL = `
     SELECT
       (SELECT count(*) FROM accounts)::int                                               AS accounts,
       (SELECT count(*) FROM characters)::int                                             AS characters,
@@ -63,16 +77,16 @@ export async function overviewCounts(): Promise<OverviewCounts> {
       (SELECT count(*) FROM accounts WHERE created_at > now() - interval '30 days')::int AS accounts_month,
       (SELECT count(*) FROM play_sessions WHERE started_at > now() - interval '1 day')::int AS sessions_today,
       (SELECT count(DISTINCT account_id) FROM play_sessions
-        WHERE started_at <= now() AND COALESCE(ended_at, now()) > now() - interval '1 day')::int AS active_accounts_today,
+        WHERE started_at <= now() AND (ended_at IS NULL OR ended_at > now() - interval '1 day'))::int AS active_accounts_today,
       (SELECT count(DISTINCT account_id) FROM play_sessions
-        WHERE started_at <= now() AND COALESCE(ended_at, now()) > now() - interval '7 days')::int AS active_accounts_week,
+        WHERE started_at <= now() AND (ended_at IS NULL OR ended_at > now() - interval '7 days'))::int AS active_accounts_week,
       (SELECT count(DISTINCT account_id) FROM play_sessions
-        WHERE started_at <= now() AND COALESCE(ended_at, now()) > now() - interval '30 days')::int AS active_accounts_month,
+        WHERE started_at <= now() AND (ended_at IS NULL OR ended_at > now() - interval '30 days'))::int AS active_accounts_month,
       (SELECT count(DISTINCT ps.account_id) FROM play_sessions ps
         JOIN accounts a ON a.id = ps.account_id
         WHERE a.created_at <= now() - interval '1 day'
           AND ps.started_at <= now()
-          AND COALESCE(ps.ended_at, now()) > now() - interval '1 day')::int AS returning_accounts_today,
+          AND (ps.ended_at IS NULL OR ps.ended_at > now() - interval '1 day'))::int AS returning_accounts_today,
       -- The rollup term keeps the average stable as old sessions fold forward.
       COALESCE(
         ((SELECT COALESCE(sum(EXTRACT(EPOCH FROM (COALESCE(ended_at, now()) - started_at))), 0) FROM play_sessions)
@@ -90,9 +104,11 @@ export async function overviewCounts(): Promise<OverviewCounts> {
       )::int AS peak_online_all_time,
       (SELECT count(*) FROM site_presence_sessions
         WHERE last_seen_at > now() - interval '2 minutes')::int AS site_users_now
-  `,
-      [REALM],
-    ),
+  `;
+
+export async function overviewCounts(): Promise<OverviewCounts> {
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(OVERVIEW_COUNTS_SQL, [REALM]),
   );
   const r = res.rows[0];
   return {
@@ -315,12 +331,7 @@ export async function onlineHistory(rangeInput: string): Promise<OnlineHistory> 
 // sweep for the whole database: it folds each realm's all-time online peak into
 // world_state first, then deletes expired rows in bounded batches. The fold is
 // what makes pruning lossless for the admin Overview's all-time peak.
-
-// world_state key prefix for the folded per-realm all-time online peak.
-// Single-sourced across foldOnlinePeak and the overviewCounts reader SQL (a
-// drifting copy on either side would silently orphan the stored peak); it is a
-// compile-time constant interpolated into SQL text, never user input.
-export const ONLINE_PEAK_WORLD_STATE_PREFIX = 'admin_online_peak:';
+// ONLINE_PEAK_WORLD_STATE_PREFIX is declared above, ahead of OVERVIEW_COUNTS_SQL.
 
 // Every realm with samples in this database, not just this process's REALM: the
 // retention sweep runs in one advisory-locked process on behalf of the whole

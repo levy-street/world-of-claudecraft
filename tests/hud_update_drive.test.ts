@@ -398,16 +398,16 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.buffBarPainter.paint',
     band: 'frame',
-    gate: 'cadenceDue(this.lastBuffBarPaintAt, now, auraRefreshIntervalMs(fxTier))',
+    gate: '',
     surface: 'chrome',
-    why: 'the buff row, tier-coarsened (full tiers every frame, low ~4 Hz)',
+    why: 'the SELF buff row: never tier-gated, every frame on every graphics preset (the debuff row below shares this rule; only the TARGET debuffs strip is tier-coarsened)',
   },
   {
     call: 'this.debuffBarPainter.paint',
     band: 'frame',
-    gate: 'cadenceDue(this.lastBuffBarPaintAt, now, auraRefreshIntervalMs(fxTier))',
+    gate: '',
     surface: 'chrome',
-    why: 'the debuff row, on the same latch as the buff row',
+    why: 'the SELF debuff row: never tier-gated (your own debuffs are the ACTIONABLE read, docs/design/graphics-settings-fairness.md), so it paints every frame on every graphics preset, unlike the target debuffs strip',
   },
   {
     call: 'this.targetReannounce.mark',
@@ -769,6 +769,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     surface: 'chrome',
     why: 'the delve tracker',
+  },
+  {
+    call: 'this.updateRiftTracker',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'the rift floor + closing-timer tracker (#2655), signature-gated on floor/timer numbers',
   },
   {
     call: 'this.updatePartyFrames',
@@ -1355,7 +1362,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 40, chrome: 71, none: 14 });
+    ).toEqual({ window: 40, chrome: 72, none: 14 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

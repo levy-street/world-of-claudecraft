@@ -676,6 +676,16 @@ export class Market {
       // SELL/notes read true counts; `pageCount` below paginates the others.
       totalCount: matched.length,
       filter: query.search,
+      // Echo every filter axis, not just the search text: a fresh join (post-
+      // linkdead-grace reconnect) resets this session-only query to default, and
+      // this is the wire signal the client compares its own filter controls
+      // against to detect that drift (world_api/market.ts queryDiffersFromEcho,
+      // issue #2416).
+      itemType: query.itemType,
+      subtype: query.subtype,
+      armorClass: query.armorClass,
+      primaryStat: query.primaryStat,
+      rarity: query.rarity,
       page,
       pageCount,
       collectionCopper: col?.copper ?? 0,

@@ -2000,6 +2000,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Det brevet finns inte längre i din låda.',
   'hudChrome.mailbox.result.needRecipient': 'Ange en mottagare för ditt brev.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Du kan inte skicka uppdragsföremål med post.',
+  'hudChrome.mailbox.result.noMailBound': 'Det föremålet är bundet och kan inte skickas med post.',
   'hudChrome.mailbox.result.noRecipient': 'Ingen med det namnet har en brevlåda här.',
   'hudChrome.mailbox.result.notEnoughItems': 'Du har inte så många att skicka.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Mottagarens brevlåda är full.',
@@ -5760,7 +5761,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.tradeFailed':
     'Handeln misslyckades: föremål eller pengar är inte längre tillgängliga.',
   'hud.errors.tradeInProgress': 'En handel pågår redan.',
+  'hud.errors.tradeAlreadyTrading': 'Den spelaren handlar redan.',
   'hud.errors.tradeBound': 'Det föremålet är bundet och kan inte handlas.',
+  'hud.errors.marketListBound': 'Det föremålet är bundet och kan inte säljas.',
   'hud.errors.tradeTooFar': 'Målet är för långt bort för att handla.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Okänt kommando: {command}. Prova /s /y /w /p /g.',
@@ -6923,6 +6926,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Det uppdraget är inte slutfört.',
   'questUi.errors.notInLog': 'Det uppdraget finns inte i din logg.',
   'questUi.errors.tooFar': 'För långt bort.',
+  'questUi.errors.escortAway':
+    'Den du ska eskortera är inte på plats just nu och återvänder snart.',
   'questUi.errors.turnInMissing': 'Den uppdragsmottagaren är inte i närheten.',
   'questUi.errors.unavailable': 'Det uppdraget är inte tillgängligt.',
   'questUi.log.abandon': 'Överge uppdrag',
@@ -7923,6 +7928,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Den här återställningslänken är ogiltig eller har gått ut. Begär en ny.',
   'apiError.deeds.invalid_input': 'Ogiltig indata.',
+  'apiError.ota_updates.invalid_input': 'Ogiltig indata.',
   'apiError.steam.account_taken': 'Det Steam-kontot är redan länkat till ett annat konto.',
   'apiError.steam.already_linked': 'Ditt konto har redan ett länkat Steam-konto.',
   'apiError.steam.banned': 'Det Steam-kontot kan inte länkas.',
@@ -8260,7 +8266,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Fiskaren Bram säkert hemförd till Måshamn',
   'entities.quests.q_fs_bram_come_home.text':
-    'Min Bram tog ut båten morgonen nätbräschen öppnades, och havet kastade tillbaka honom någonstans bortom Landningsudden. Jag hörde honom för tre nätter sedan, {playerName}, ropande över vattnet, och jag var för rädd för att gå. Jag är fortfarande för rädd. Snälla. Hans båt ligger vrakad på norra stranden. För honom hem till mig.',
+    'Min Bram tog ut båten morgonen nätbräschen öppnades, och havet kastade tillbaka honom någonstans bortom Landningsudden. Jag hörde honom för tre nätter sedan, {playerName}, ropande över vattnet, och jag var för rädd för att gå. Jag är fortfarande för rädd. Snälla. Hans båt ligger vrakad på södra stranden. För honom hem till mig.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram kommer hem',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Tio färre, och fältarbetarna bråkar redan om vem som går ut först. Det kommer inte vara för alltid, bräscherna vilar aldrig länge, men en stad som äter är en stad som håller.',
@@ -8346,7 +8352,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Lärling Wren säkert förd till Norrskenstrapporna',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Min lärling Wren gick ut för att vandra Guldsmältans linje för två dagar sedan och kom aldrig tillbaka. Jag fann hennes spår, hon gömmer sig under vägmärkena sydväst om Norrskenstrapporna, för rädd för vargarna för att röra sig. Jag kan inte lämna kärret, {playerName}. För henne till Veylas läger på trapporna. Hon kommer vara säker under skenen.',
+    'Min lärling Wren gick ut för att vandra Guldsmältans linje för två dagar sedan och kom aldrig tillbaka. Jag fann hennes spår, hon gömmer sig under vägmärkena nordost om Norrskenstrapporna, för rädd för vargarna för att röra sig. Jag kan inte lämna kärret, {playerName}. För henne till Veylas läger på trapporna. Hon kommer vara säker under skenen.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Föra Wren hem',
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve skickade dig? Ha. Elva år och kvinnan tror fortfarande att kärret ska äta upp mig. Nåväl... i år kanske hon har rätt. Titta vad det har gjort med mina linor.',
@@ -10734,14 +10740,25 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Räddning: /unstuck startar en stillastående nedräkning som flyttar dig till en närliggande nåbar säker plats.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Räddning: /unstuck startar en stillastående nedräkning och skickar sedan din ande till närmaste kyrkogård. Att återvända via Den bleka väktaren kräver Väktarens tribut.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Räddning: /unstuck startar en stillastående nedräkning och flyttar dig sedan till närmaste kyrkogård, och återupplivar dig om du hade fallit. Räddningssjuka stannar på dig i upp till 5 minuter.',
   'hudChrome.unstuck.menuButton': 'Fastna-hjälp',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Du har flyttats till närmaste kyrkogård. Räddningssjuka vilar tungt på dig.',
   'hudChrome.unstuck.noSafePosition':
     'Ingen nåbar säker plats hittades i närheten. Du flyttades inte.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Du har återförts till närmaste kyrkogård och återupplivats. Väktarens tribut vilar tungt på dig.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Du har flyttats till närmaste kyrkogård och återupplivats. Räddningssjuka vilar tungt på dig.',
   'hudChrome.unstuck.standStill': 'Stå still på fast mark innan du använder Fastna-hjälp.',
   'hudChrome.unstuck.standStillAnywhere': 'Stå still innan du använder Fastna-hjälp.',
   'hudChrome.unstuck.started':
     'Fastna-hjälp om {seconds} sekunder. Att röra sig, strida, ta skada eller påbörja en annan handling avbryter den.',
   'hudChrome.unstuck.unavailable': 'Fastna-hjälp är inte tillgänglig i ditt nuvarande tillstånd.',
+  'hudChrome.riftTracker.title': 'Reva',
+  'hudChrome.riftTracker.floor': 'Våning {current} av {total}',
+  'hudChrome.riftTracker.closesIn': 'Stänger om {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

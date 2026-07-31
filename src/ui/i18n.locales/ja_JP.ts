@@ -2363,6 +2363,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'そのクエストの依頼主が近くにいません。',
   'questUi.errors.turnInMissing': 'そのクエストの報告先が近くにいません。',
   'questUi.errors.tooFar': '遠すぎます。',
+  'questUi.errors.escortAway': '護衛する相手は今その場所にいません。しばらくすれば戻ってきます。',
   'itemUi.money.goldShort': '金',
   'itemUi.money.silverShort': '銀',
   'itemUi.money.copperShort': '銅',
@@ -4449,6 +4450,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '英雄の証',
   'hudChrome.raidLockout.heroicName': 'ヒロイック:{name}',
   'hudChrome.raidLockout.heroicLocked': 'ヒロイックの{name}にロックされています。',
+  'hudChrome.riftTracker.title': 'リフト',
+  'hudChrome.riftTracker.floor': 'フロア {current}/{total}',
+  'hudChrome.riftTracker.closesIn': 'リフトは{time}後に閉じます',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
   'entities.items.morthens_cryptforged_hauberk.name': 'モルセンの墓鋳ホーバーク',
   'entities.items.shadowpulse_handwraps.name': 'シャドウパルスの手巻き',
   'entities.items.bonechill_striders.name': 'ボーンチルのストライダー',
@@ -4696,7 +4702,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': '守将コールファストに報告した',
   'entities.quests.q_fs_bram_come_home.title': 'ブラムを家へ',
   'entities.quests.q_fs_bram_come_home.text':
-    'うちのブラムは、網場の裂け目が開いたあの朝に船を出して、海は船着き場の岬の先のどこかに彼を打ち返した。三晩前に聞いたんだ、{playerName}、水の向こうから呼ぶ声を。なのに怖くて行けなかった。今でも怖い。お願いだ。彼の船は北の岸で難破している。彼を家まで連れて帰っておくれ。',
+    'うちのブラムは、網場の裂け目が開いたあの朝に船を出して、海は船着き場の岬の先のどこかに彼を打ち返した。三晩前に聞いたんだ、{playerName}、水の向こうから呼ぶ声を。なのに怖くて行けなかった。今でも怖い。お願いだ。彼の船は南の岸で難破している。彼を家まで連れて帰っておくれ。',
   'entities.quests.q_fs_bram_come_home.completion':
     'ブラム！五体満足で連れ帰ってくれたんだね、{playerName}。ふたりして泣いたけど、どちらも恥じてなんかいないよ。裂け目どもが次にこの島から何を奪おうと、うちの家族だけは渡さない。もう二度と。',
   'entities.quests.q_fs_bram_come_home.objectives.0.label': '漁師ブラムをカモメ港まで送り届けた',
@@ -4781,7 +4787,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_rime_unbound.objectives.0.label': '霧氷の精霊を倒した',
   'entities.quests.q_fv_seeing_wren_home.title': 'レンを送り届けて',
   'entities.quests.q_fv_seeing_wren_home.text':
-    '弟子のレンが二日前にゴールドメルトの罠のラインを見回りに出て、戻ってこない。足跡は見つけた。オーロラの階段の南西の道標の下に隠れて、狼が怖くて動けずにいるんだ。わたしは沼を離れられない、{playerName}。あの子を階段のヴェイラの野営まで歩かせてやってくれ。光の下なら安全だ。',
+    '弟子のレンが二日前にゴールドメルトの罠のラインを見回りに出て、戻ってこない。足跡は見つけた。オーロラの階段の北東の道標の下に隠れて、狼が怖くて動けずにいるんだ。わたしは沼を離れられない、{playerName}。あの子を階段のヴェイラの野営まで歩かせてやってくれ。光の下なら安全だ。',
   'entities.quests.q_fv_seeing_wren_home.completion':
     'あの子は中にいるよ。わたしの毛布を半分体に巻きつけて、空から星を語り落とす勢いでしゃべっている。今日、お前は優しいことをしたね、{playerName}。この果ての地では、めったに見られないものだよ。',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
@@ -8140,6 +8146,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': 'リクエストが大きすぎます。データを減らしてもう一度お試しください。',
   'apiError.body.unsupported_media_type': 'サポートされていないリクエスト形式です。',
   'apiError.deeds.invalid_input': '入力が無効です。',
+  'apiError.ota_updates.invalid_input': '入力が無効です。',
   'apiError.steam.disabled': 'Steam連携は現在利用できません。',
   'apiError.wallet.handoff_invalid':
     'ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。',
@@ -9223,11 +9230,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '日々使う便利なコマンドをいくつか覚えておくとよいでしょう。/w 名前 でウィスパーを送り、/r で最後に受け取ったウィスパーに返信します。/invite で誰かをパーティに誘い、/follow で仲間の後ろについて歩き、/roll でグループの全員に見えるサイコロを振り、/who でオンラインの相手を確認し、/afk で離席中を示します。全一覧はゲーム内で /help と打てば見られます。',
   'guide.social.slashHeading': '便利なスラッシュコマンド',
   // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.helpUnstuckSickness':
+    '復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。スタック解除の後遺症が最大5分間残ります。',
   'hudChrome.unstuck.menuButton': 'スタック解除',
   'hudChrome.unstuck.help':
     '復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。',
   'hudChrome.unstuck.helpAtGraveyard':
     '復帰：/unstuck はその場でカウントダウンを開始し、完了すると魂を最寄りの墓地へ送ります。生き返るには霊魂の癒し手から番人の代償を受ける必要があります。',
+  'hudChrome.unstuck.movedToGraveyard':
+    '最寄りの墓地へ移動しました。スタック解除の後遺症があなたにのしかかっています。',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    '最寄りの墓地へ移動し、蘇生しました。スタック解除の後遺症があなたにのしかかっています。',
   'hudChrome.unstuck.started':
     '{seconds}秒後にスタックを解除します。移動、戦闘、被ダメージ、別の行動を始めるとキャンセルされます。',
   'hudChrome.unstuck.countdown': 'スタック解除：{seconds}',
