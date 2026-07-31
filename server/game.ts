@@ -63,15 +63,14 @@ import {
 } from '../src/sim/talent_allocation_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
-  ALL_EQUIP_SLOTS,
   type Aura,
   DT,
   dist2d,
   type Entity,
-  type EquipSlot,
   emptyMoveInput,
   type ItemInstancePayload,
   isDungeonDifficulty,
+  isEquipSlot,
   MAX_LEVEL,
   type MobFamily,
   RUN_SPEED,
@@ -4387,10 +4386,7 @@ export class GameServer {
           // sim's own resolver rather than trusting the client. The sim then
           // re-validates the slot against the item itself.
           const aimed =
-            typeof msg.slot === 'string' &&
-            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
-              ? (msg.slot as EquipSlot)
-              : undefined;
+            typeof msg.slot === 'string' && isEquipSlot(msg.slot) ? msg.slot : undefined;
           if (aimed) sim.equipItemToSlot(msg.item, aimed, pid);
           else sim.equipItem(msg.item, pid);
         }
@@ -4403,13 +4399,8 @@ export class GameServer {
         }
         break;
       case 'unequip_item':
-        // ALL_EQUIP_SLOTS, not the frozen EQUIP_SLOTS: the latter omits the
-        // additive 'offhand' slot, so any offhand unequip was silently dropped here.
-        if (
-          typeof msg.slot === 'string' &&
-          (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
-        ) {
-          sim.unequipItem(msg.slot as EquipSlot, pid);
+        if (typeof msg.slot === 'string' && isEquipSlot(msg.slot)) {
+          sim.unequipItem(msg.slot, pid);
         }
         break;
       case 'use':
@@ -4480,11 +4471,7 @@ export class GameServer {
           // to undefined, which is the bagged arm. The sim then re-validates that
           // the named slot is actually wearing this item id and, without the
           // confirm flag below, that the worn copy is not already enchanted.
-          const worn =
-            typeof msg.slot === 'string' &&
-            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
-              ? (msg.slot as EquipSlot)
-              : undefined;
+          const worn = typeof msg.slot === 'string' && isEquipSlot(msg.slot) ? msg.slot : undefined;
           // `confirm` (#2415): the explicit consent to replace an existing
           // enchant. A strict boolean-true check (the dispatch type-guard
           // rule, the craft_item `commission` precedent); anything else reads

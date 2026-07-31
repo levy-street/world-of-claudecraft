@@ -13,7 +13,7 @@ import { ITEMS } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../src/sim/item_level_req';
 import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, EQUIP_SLOTS, MAX_LEVEL, xpToReachLevel } from '../src/sim/types';
+import { ALL_CLASSES, MAX_LEVEL, xpToReachLevel } from '../src/sim/types';
 
 describe('community test account configuration', () => {
   it('is disabled until boot explicitly enables it', () => {

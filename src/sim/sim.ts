@@ -587,7 +587,6 @@ import {
   type DungeonDifficulty,
   dist2d,
   type Entity,
-  EQUIP_SLOTS,
   type EquipSlot,
   type ErrorReason,
   type EscortRunState,
@@ -599,6 +598,7 @@ import {
   type ItemInstancePayload,
   isConsuming,
   isDungeonDifficulty,
+  isEquipSlot,
   isPetClass,
   isQuestTurnInNpc,
   LEASH_DISTANCE,
@@ -2646,15 +2646,15 @@ export class Sim {
       for (const [slot, instance] of Object.entries(
         s.equipmentInstance ?? s.equipmentInstances ?? {},
       )) {
-        if (!(EQUIP_SLOTS as readonly string[]).includes(slot) || !instance) continue;
-        const itemId = meta.equipment[slot as EquipSlot];
+        if (!isEquipSlot(slot) || !instance) continue;
+        const itemId = meta.equipment[slot];
         if (!itemId) continue;
         // A rift payload is validated against the worn item (anti-tamper); any
         // other instance (an enchant) deep-clones through the shared rules.
         const clean = instance.rift
           ? sanitizeRiftGearInstance(itemId, instance, player.id)
           : cloneItemInstancePayload(instance);
-        if (clean) meta.equipmentInstance[slot as EquipSlot] = clean;
+        if (clean) meta.equipmentInstance[slot] = clean;
       }
       // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
       // bank arm below): a counted instanced slot loads capped at what

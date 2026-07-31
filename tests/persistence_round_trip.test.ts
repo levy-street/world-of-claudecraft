@@ -8,6 +8,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
+import { ALL_EQUIP_SLOTS, type EquipSlot } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
@@ -156,5 +157,42 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     const s = sim.serializeCharacter(pid)!;
     expect(s.level).toBe(8);
     expect(s.xp).toBe(1234);
+  });
+});
+
+// equipmentInstance is the per-slot instanced-copy payload map: an enchant, a
+// masterwork copy's baked stats, a Rift-forged upgrade, crafted provenance, a
+// signer. Losing one silently reverts worn gear to plain on the next login, so
+// every LIVE slot has to survive the save/load boundary.
+//
+// Driven by ALL_EQUIP_SLOTS rather than a hand-listed set, deliberately: the
+// offhand payload was dropped for exactly as long as it took one load-path
+// validator to reach for the frozen launch-era slot list instead of the live
+// one, and a hand-listed test would have been written from that same stale
+// list. Parameterizing over the live list is what makes a future twelfth slot
+// inherit this coverage instead of needing someone to remember.
+describe('equipmentInstance survives the save/load boundary for every live slot', () => {
+  it.each([...ALL_EQUIP_SLOTS])('keeps the %s instance payload', (slot: EquipSlot) => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Enchanted');
+    const meta = sim.meta(pid)!;
+    // The item id is irrelevant to the payload plumbing under test (the load
+    // path keys on the slot being worn, not on the def), so one real id in
+    // every slot keeps the fixture honest without 12 slot-legal picks.
+    meta.equipment[slot] = 'worn_sword';
+    meta.equipmentInstance[slot] = { enchant: 'test_enchant', rolled: { stats: { str: 3 } } };
+
+    const saved = sim.serializeCharacter(pid)!;
+    expect(saved.equipmentInstance?.[slot]).toEqual({
+      enchant: 'test_enchant',
+      rolled: { stats: { str: 3 } },
+    });
+
+    const sim2 = makeWorld();
+    const pid2 = sim2.addPlayer('warrior', 'Enchanted', { state: saved });
+    expect(sim2.meta(pid2)!.equipmentInstance[slot]).toEqual({
+      enchant: 'test_enchant',
+      rolled: { stats: { str: 3 } },
+    });
   });
 });

@@ -124,7 +124,10 @@ a row here or a Key files entry (`sim.ts`, `sim_context.ts`, `entity_roster.ts`)
 these before inlining pure logic in a system module: `spell_scaling.ts` (spell/attack
 power coefficients), `stun_dr.ts` (CC diminishing-return categories), `item_level.ts`/
 `item_budget.ts`/`item_level_req.ts` (drop power math), `equipment_rules.ts` (equip
-legality), `cooldown_persist.ts` (cooldown save/load), `unstuck_cooldown.ts` (the hidden
+legality), `launch_paperdoll_slots.ts` (the FROZEN launch-era eleven-slot list, for
+launch-era completeness records ONLY: never validate a slot against it, use
+`isEquipSlot` from `types.ts`, which is derived from the live `ALL_EQUIP_SLOTS`),
+`cooldown_persist.ts` (cooldown save/load), `unstuck_cooldown.ts` (the hidden
 recovery timer across competitive resets), `tab_target.ts`/`assist.ts`/
 `dead_target.ts` (target cycling, /assist, dead-target selectability), `flee_speed.ts`,
 `mob/scan_counters.ts` (the per-tick mob scan-visit tally the server reads post-tick),
