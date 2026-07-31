@@ -136,7 +136,11 @@ describe('generated chunk geometry is stable', () => {
     expect(digestOf(inRect)).toBe('6e57b2b3457fd7612e6ace78247a2f22');
     // The gap super-chunks' own pin. Re-mint ONLY for a deliberate, reviewed
     // visual change.
-    expect(digestOf(gapFill)).toBe('7603031ddf0cba86d8172e0f4d8df80b');
+    // Re-minted for the ferry fidelity program's harbor terrain edits: the
+    // mainland shore pad and re-authored berth basins (HARBOR_TERRAIN_EDITS,
+    // F2.1/F2.2) deliberately regrade gap chunks around both harbors. The
+    // in-rect Eastbrook pin above is untouched: not one Vale byte moved.
+    expect(digestOf(gapFill)).toBe('d964238382e709c9ac24c4afbc0d15fc');
 
     terrain.cancelStreaming();
   });
