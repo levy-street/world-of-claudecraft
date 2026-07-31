@@ -541,7 +541,7 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
     if (pad.z > 0.5) continue;
     // A pad ON the centre line is its own twin's mirror, so the pair (-38, 0)
     // and (38, 0) both survive the z filter and `both()` then authors each of
-    // them AND the other — every midfield pad came out with two coincident
+    // them AND the other, every midfield pad came out with two coincident
     // rings of four lanterns stacked in the same holes. Take one side only and
     // let the mirror supply the other.
     if (Math.abs(pad.z) <= 0.5 && pad.x > 0) continue;
@@ -557,7 +557,7 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
         z: r4(pad.z + Math.sin(a) * 3.7),
         // Face the arm INWARD, so all four hang their lamp over the pad. The
         // post's arm runs down its own +Z, and rotY maps local +Z to world
-        // (sin, cos), so aiming it at the centre — world (-cos a, -sin a) —
+        // (sin, cos), so aiming it at the centre, world (-cos a, -sin a) ,
         // solves to -a - PI/2. Passing `a` (what this used to do) pointed each
         // post a different way round and only one of the four happened to look
         // right. See LANTERN_ARM_LOCAL in battleground_lantern_fx_core.ts,

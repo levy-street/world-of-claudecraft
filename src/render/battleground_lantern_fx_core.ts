@@ -94,7 +94,7 @@ export const LANTERN_FLAME = {
 export const LANTERN_SEED_STRIDE = 4;
 
 /**
- * Deterministic 0..1 hash. Same shape as the rune kits' — every client builds
+ * Deterministic 0..1 hash. Same shape as the rune kits', every client builds
  * the identical flame, so two players never see one lantern burning
  * differently.
  */

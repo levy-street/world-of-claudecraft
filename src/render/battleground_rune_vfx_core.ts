@@ -3,14 +3,14 @@
 // numbers a designer actually turns are unit-testable without a browser.
 //
 // One kit per rune type, and they are deliberately NOT the same effect
-// recolored — a player reading the field at distance should know which pad is
+// recolored, a player reading the field at distance should know which pad is
 // up from its MOTION, before the color or the model resolves:
 //
-//   sprint  (orange) "Slipstream" — motes fly a tight rising helix, fast.
+//   sprint  (orange) "Slipstream", motes fly a tight rising helix, fast.
 //                    Reads as speed.
-//   damage  (red)    "Forge"      — embers drift up slowly and FLICKER, over a
+//   damage  (red)    "Forge"     , embers drift up slowly and FLICKER, over a
 //                    lazy heat column. Reads as heat.
-//   defense (cyan)   "Aegis"      — sparks ORBIT the pad instead of rising,
+//   defense (cyan)   "Aegis"     , sparks ORBIT the pad instead of rising,
 //                    under slow shard plates. Reads as shelter.
 //
 // All three share ONE ground element: the scrolling streak ring, recolored per
@@ -90,7 +90,7 @@ export const AEGIS_SHARD_COUNT = 3;
 /**
  * Outer/inner radius (yd) of the scrolling ground ring EVERY pad wears. It
  * started as the Slipstream signature, but a common footing turns out to be
- * what makes the three read as one family of objects — the kits already differ
+ * what makes the three read as one family of objects, the kits already differ
  * where it counts, up in the motion above the pad.
  */
 export const RUNE_RING_OUTER = 1.55;
@@ -98,7 +98,7 @@ export const RUNE_RING_INNER = 0.95;
 
 /**
  * The Forge heat plume: two crossed quads the embers rise through, NOT a
- * cylinder shell. A shell was the first cut and it drew its own silhouette —
+ * cylinder shell. A shell was the first cut and it drew its own silhouette ,
  * a translucent cup hanging over the pad, obvious the moment a player stood
  * next to it. Crossed quads with a radial falloff have no rim to show.
  */

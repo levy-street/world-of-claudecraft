@@ -8,7 +8,7 @@
 //   3. `node scripts/build_media_manifest.mjs generate` (automatic in
 //      `npm run build`) so the asset is content-hashed into the manifest.
 //   4. `tests/render_glb_replacement_assets.test.ts` then enforces that the file
-//      exists on disk AND is manifested — no extra test wiring needed.
+//      exists on disk AND is manifested, no extra test wiring needed.
 // Nothing else changes: the pad's spin/bob, its glow disc, and its bespoke
 // effect kit (battleground_rune_vfx.ts) all sit outside the body and keep
 // working against whatever shape is in the socket.
@@ -17,7 +17,7 @@
 // builds (bolt / crossed swords / shield plate). That is the state today, so
 // the fallback is the LIVE path, not dead code: it must stay correct.
 //
-// Loading follows the mailbox.ts precedent — the fetch registers with the boot
+// Loading follows the mailbox.ts precedent, the fetch registers with the boot
 // preload gate at import time, so `startGame`'s `assetsReady()` await means
 // `runeModelBody()` can answer synchronously from the pad's build path. The
 // prepared template's geometries and materials are marked shared, so per-view
@@ -40,7 +40,7 @@ export interface RuneModelDef {
   readonly roll?: number;
   /**
    * Where the model's own bounds sit on the spinner origin: 0 seats its base
-   * there, 0.5 centers it (the default — the spinner hovers, so a centered
+   * there, 0.5 centers it (the default, the spinner hovers, so a centered
    * body reads better than one hanging from its feet).
    */
   readonly anchor?: number;
@@ -52,7 +52,7 @@ export interface RuneModelDef {
   readonly emissive?: number;
   /**
    * Body opacity. Under 1 the pad reads as a conjured, lit-from-within token
-   * rather than a physical object dropped on the field — which is what a rune
+   * rather than a physical object dropped on the field, which is what a rune
    * pickup IS. 1 keeps the export solid.
    */
   readonly opacity?: number;
@@ -135,7 +135,7 @@ export function prepareRuneModel(
       // transparent material, but these bodies self-overlap heavily (a boot
       // inside its own wings, crossed blades) and without depth they render as
       // a jumble of their own interior faces. Keeping it means the body blends
-      // against the world but stays solid against ITSELF — tinted glass, which
+      // against the world but stays solid against ITSELF, tinted glass, which
       // is the read we want, not an x-ray.
       mat.depthWrite = true;
     }
@@ -154,7 +154,7 @@ export function prepareRuneModel(
   instance.position.y -= scaled.min.y + (scaled.max.y - scaled.min.y) * anchor;
   // Center the body on the spin axis. The pad's spinner yaws this group about
   // its own origin, so a body whose export is off-center horizontally would
-  // ORBIT that origin instead of turning in place — and authored exports
+  // ORBIT that origin instead of turning in place, and authored exports
   // routinely are off-center (the Slipstream model's x bounds run -0.18..0.52).
   instance.position.x -= (scaled.min.x + scaled.max.x) / 2;
   instance.position.z -= (scaled.min.z + scaled.max.z) / 2;

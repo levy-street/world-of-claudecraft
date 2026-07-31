@@ -15,7 +15,7 @@
 // (shared_resource.ts), matching battleground_props.ts: pad views are stateful
 // and unpooled, so per-view disposal must never free resources the next pad
 // build will reuse. Sharing a material across two pads of the same type is
-// deliberate and correct — same-type pads animate in lockstep off one clock.
+// deliberate and correct, same-type pads animate in lockstep off one clock.
 //
 // The kit sits UNDER the pad's own glow disc and spinner, and never touches
 // them: the body (procedural shape today, a custom GLB once one is registered
@@ -41,7 +41,7 @@ import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 // The pad's light has to compete with FULL DAYLIGHT (renderer.ts runs the field
 // at sun 2.8 + hemi 0.45), so the old 1.6/8 spent itself entirely on the body
-// and put nothing on the ground — the pad glowed but lit nothing. These values
+// and put nothing on the ground, the pad glowed but lit nothing. These values
 // lay a clear pool of rune color on the cobble around the pad without reading
 // as a spotlight. Light COUNT is unchanged: one per pad, high tier only, on top
 // of the map's own budgeted lights (BG_LIGHT_BUDGET_BY_TIER).
@@ -59,7 +59,7 @@ export interface RuneVfxKit {
 // Shared shader chunks
 // ---------------------------------------------------------------------------
 
-// A soft round sprite computed from gl_PointCoord — no texture, no canvas, so
+// A soft round sprite computed from gl_PointCoord, no texture, no canvas, so
 // this module stays DOM-free and the cloud costs one program and zero uploads.
 const MOTE_FRAGMENT = /* glsl */ `
   uniform vec3 uColor;
@@ -85,7 +85,7 @@ const MOTE_SIZE_EXPR = 'uSize / max(-mv.z, 1.0)';
 const TAU = 'const float TAU = 6.28318530718;';
 
 // Slipstream: a tight rising helix that CONTRACTS as it climbs and whips
-// several turns per cycle — the silhouette of something being pulled upward.
+// several turns per cycle, the silhouette of something being pulled upward.
 const SLIPSTREAM_VERTEX = /* glsl */ `
   ${TAU}
   attribute vec4 aSeed;
@@ -302,7 +302,7 @@ function runeGroundRing(color: number): THREE.Mesh {
 // ---------------------------------------------------------------------------
 
 // Everything falls off to zero before it reaches a quad edge, so the plume has
-// no outline of its own from any angle — the fix for the cylinder shell this
+// no outline of its own from any angle, the fix for the cylinder shell this
 // replaced (see FORGE_PLUME_WIDTH in the core for what that looked like).
 const FORGE_PLUME_FRAGMENT = /* glsl */ `
   uniform float uTime;
@@ -320,7 +320,7 @@ const FORGE_PLUME_FRAGMENT = /* glsl */ `
     float a = lateral * rise * bands * 0.55;
     if (a < 0.01) discard;
     // A hot core where the plume is densest, cooling to the rune color out at
-    // the edges — a flat red wash reads as gel, not heat.
+    // the edges, a flat red wash reads as gel, not heat.
     gl_FragColor = vec4(mix(uColor, vec3(1.0), lateral * rise * 0.4), a);
   }
 `;
@@ -357,7 +357,7 @@ function forgePlume(color: number): THREE.Group {
 // There was a translucent hex dome here. It is GONE, and deliberately so: a
 // shell between the camera and the pad spends its alpha hiding the body the
 // pad exists to advertise. Softening it and flattening it both helped and
-// neither fixed it — the ward now reads from the shards and the orbiting
+// neither fixed it, the ward now reads from the shards and the orbiting
 // sparks, which sit BESIDE the body instead of in front of it.
 
 /** The orbiting plate: a small tapered shield chip, flat side facing outward. */

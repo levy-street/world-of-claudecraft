@@ -62,8 +62,8 @@ describe('pose math', () => {
 // and Renderer.createView puts that body inside a wrapper group of its own and
 // registers the WRAPPER as view.group. So the renderer has to hoist the refs
 // across that one level, and when it did not, every rune and flag silently
-// skipped its whole animation — no spin, no bob, no light pulse, no shard
-// orbit, no carrier ring — while looking perfectly correct on screen because
+// skipped its whole animation, no spin, no bob, no light pulse, no shard
+// orbit, no carrier ring, while looking perfectly correct on screen because
 // the pads' other effects are GPU-driven off the shared clock and kept moving.
 //
 // The seam lives inside Renderer, which a unit test cannot construct, so this

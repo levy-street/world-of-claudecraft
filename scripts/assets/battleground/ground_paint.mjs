@@ -40,7 +40,7 @@ export const PAINT_CELL = 0.25;
 export const BARE = 255;
 
 /**
- * The swatch table: NINE materials, three of each family — grass, cobble,
+ * The swatch table: NINE materials, three of each family, grass, cobble,
  * dirt. It was eighteen, and the field paid for it twice. Once in coherence (a
  * ground made of eighteen photographs reads as noise however carefully each
  * region is drawn) and once at load, since every entry is a layer of the
@@ -89,16 +89,16 @@ export const SWATCHES = [
 const MEADOW = 200; // grass: the hollow floor
 const SWARD = 216; // grass: lusher, open chambers
 const RIDGE_GRASS = 201; // grass: thinner, along the ramparts
-const FLAGSTONE = 206; // cobble: laid grey stone — floors and footings
-const COBBLED = 217; // cobble: rounded grey stone — rune pads, thresholds
+const FLAGSTONE = 206; // cobble: laid grey stone, floors and footings
+const COBBLED = 217; // cobble: rounded grey stone, rune pads, thresholds
 const WORN_EARTH = 212; // dirt: worn routes and scuff
 const SCREE = 211; // dirt: pebbled broken ground around rubble
 
 // Two textures were CUT here rather than merely left unpainted, because both
 // were actively wrong against a green field:
-//   Ground100 'Trodden Path' — very nearly black. As a route through grass it
+//   Ground100 'Trodden Path', very nearly black. As a route through grass it
 //     read as a burn scar, not a path.
-//   Rock054 'Keep Stone' — warm pink cobble flecked with purple crystal. It
+//   Rock054 'Keep Stone', warm pink cobble flecked with purple crystal. It
 //     belongs in a cave, and as a wall footing it ringed the whole field in
 //     pink. Footings are Cobblestone002 now, which is the grey the walls
 //     themselves are built from.
@@ -352,7 +352,7 @@ export function buildPaint() {
   }
   // The keep: garrison flagstone through the court, out through the mouth, and
   // in the pocket behind where the great hall stands. The terrace AROUND it
-  // stays grass — the keep is a building, not a compound.
+  // stays grass, the keep is a building, not a compound.
   g.rect(FLAGSTONE, 0, -(FLAG_Z + 1), KEEP_HALF_X + 2.5, 14, 1.1);
   g.rect(FLAGSTONE, 0, keepFront + 2, KEEP_HALF_X - 3, 6, 1.2);
   g.rect(FLAGSTONE, 0, -HALF_Z + 6, 15, 7, 1.1);

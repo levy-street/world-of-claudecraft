@@ -8,7 +8,7 @@
 //   - seeds are deterministic, so two clients standing on one pad see one
 //     effect and a pad rebuilt after interest churn does not re-scatter;
 //   - every geometry/material a kit hands a view is marked shared, because pad
-//     views are stateful and UNPOOLED — per-view disposal would otherwise free
+//     views are stateful and UNPOOLED, per-view disposal would otherwise free
 //     resources the next pad build reuses (the battleground_props.ts contract);
 //   - lowGfx drops the richness (light + shells) but keeps the identity cloud;
 //   - a rune with no registered GLB still builds its procedural fallback body,
@@ -260,7 +260,7 @@ describe('the pad body: custom GLB or procedural fallback', () => {
     const bounds = new THREE.Box3().setFromObject(prepared);
     expect((bounds.min.x + bounds.max.x) / 2).toBeCloseTo(0, 5);
     expect((bounds.min.z + bounds.max.z) / 2).toBeCloseTo(0, 5);
-    // Centering is horizontal only — the anchor still owns the vertical seat.
+    // Centering is horizontal only, the anchor still owns the vertical seat.
     expect(bounds.max.y).toBeCloseTo(1, 5);
   });
 

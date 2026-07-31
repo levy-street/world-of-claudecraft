@@ -151,7 +151,7 @@ float bgValueNoise(vec2 p) {
 const FRAG_BODY = /* glsl */ `
 // Break the lattice BEFORE looking up. The paint grid is a quarter-yard
 // lattice, so a border between two swatches is an axis-aligned staircase, and
-// a one-cell bilinear feather is far too narrow to hide it at head height —
+// a one-cell bilinear feather is far too narrow to hide it at head height ,
 // which is exactly where players read the ground. Two octaves of value noise
 // displace the LOOKUP by up to ~a yard, so the border wanders like a real
 // material boundary and the bilinear below then feathers what is left.

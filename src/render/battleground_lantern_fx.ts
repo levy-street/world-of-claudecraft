@@ -3,7 +3,7 @@
 // ONE draw for the whole field. Each mote carries its own lamp's world
 // position in `position` and its motion is derived in the vertex shader from a
 // baked seed and the renderer's shared `uTime`, so the field's two dozen
-// lanterns cost a single Points object and ZERO per-frame CPU — there is no
+// lanterns cost a single Points object and ZERO per-frame CPU, there is no
 // update() here on purpose, and nothing to tick.
 //
 // The lamp positions come from battleground_lantern_fx_core.ts, which resolves
@@ -123,7 +123,7 @@ export function buildLanternFlames(
       depthWrite: false,
       // depthTest OFF, and this is the whole trick. The flame sits at the
       // centre of the lamp's glass, and that glass is an OPAQUE panel in the
-      // model — depth-tested, the effect is perfectly positioned and perfectly
+      // model, depth-tested, the effect is perfectly positioned and perfectly
       // invisible, sealed inside its own lantern. Drawn over the shell it reads
       // as the light INSIDE the lamp, which is what it is. The cost is that a
       // lantern's flame is not occluded by geometry in front of it; at this
