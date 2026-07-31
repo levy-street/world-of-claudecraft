@@ -832,11 +832,15 @@ export function updateInstances(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.instances) {
     if (inst.partyKey === null) continue;
-    const origin = instanceOriginOf(inst);
     let occupied = false;
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);
-      if (e && instanceContains(origin, e.pos)) {
+      // instanceClaimContains, not the plain instanceContains box: the
+      // Nythraxis boss arena's authored room is wider than the generic
+      // footprint (see its carve-out above), so the narrower box let this
+      // reaper free a claim while raiders were still legitimately standing
+      // in the wide outer floor.
+      if (e && instanceClaimContains(inst, e.pos)) {
         occupied = true;
         break;
       }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { TranslationKey } from '../src/ui/i18n.catalog';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
+import { itemNames } from '../src/ui/i18n.catalog/items';
 import { cs_CZ } from '../src/ui/i18n.locales/cs_CZ';
 import { da_DK } from '../src/ui/i18n.locales/da_DK';
 import { de_DE } from '../src/ui/i18n.locales/de_DE';
@@ -111,6 +112,25 @@ describe('reviewed localization semantics', () => {
       expect(value).not.toContain('Eastbrook');
     });
   }
+
+  it('compact legacy item arrays do not shift v0.28 materials after inserted Rift names', () => {
+    const items = itemNames.es.entities.items;
+    expect({
+      rift: items.rift_essence.name,
+      copper: items.copper_ore.name,
+      iron: items.iron_ore.name,
+      log: items.ironbark_log.name,
+      herb: items.silverleaf_herb.name,
+    }).toEqual({
+      rift: 'Rift Essence',
+      copper: 'Copper Ore',
+      iron: 'Iron Ore',
+      log: 'Ironbark Log',
+      // The release renamed the herb's display name (Sheenleaf); the id and
+      // its slot are unchanged, which is what this shift guard pins.
+      herb: 'Sheenleaf Herb',
+    });
+  });
 
   // The q_prof_intro rewrite (PR 2039) removed the stale Latin-script fills
   // for the reworded completion (they sit pending until the release-time

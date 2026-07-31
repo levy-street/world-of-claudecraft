@@ -50,6 +50,7 @@ import {
   supportHeightAt,
 } from '../src/sim/colliders';
 import {
+  ARENA_X,
   BG_BAND_X_MAX,
   BG_BAND_X_MIN,
   BG_SLOT_COUNT,
@@ -57,9 +58,12 @@ import {
   battlegroundOrigin,
   bgOriginAt,
   DELVE_BAND_X_MIN,
+  DUNGEON_OVERFLOW_X_BASE,
+  INSTANCE_X_BASE,
   isArenaPos,
   isBgPos,
   isDelvePos,
+  isRiftPos,
   isYumiMazePos,
   YUMI_BAND_X_MAX,
 } from '../src/sim/data';
@@ -91,20 +95,34 @@ const locationCentre = (name: string) => {
 };
 
 describe('Thornhollow Fields band: non-overlap with every other instance band', () => {
-  it('claims a band past the Yumi cap and stays west of the Vale Cup pitches', () => {
+  it('sits on the instance plane, past every other band and the overflow zone', () => {
+    // The band is an OFFSET FROM INSTANCE_X_BASE, never a raw world x: the
+    // instance plane moved east wholesale, so a raw offset would put live
+    // matches in the overworld.
+    expect(BG_BAND_X_MIN).toBeGreaterThan(INSTANCE_X_BASE);
     expect(BG_BAND_X_MIN).toBeGreaterThanOrEqual(YUMI_BAND_X_MAX);
-    // Vale Cup practice pitches sit at x = 30000 (vale_cup_layout.ts
-    // vcPracticeOrigin); the two-sided cap keeps them unclassified as bg.
-    expect(BG_BAND_X_MAX).toBeLessThanOrEqual(30000);
-    expect(isBgPos(30000)).toBe(false);
+    expect(isBgPos(YUMI_BAND_X_MAX)).toBe(false);
+    // Overflow dungeons grow east from DUNGEON_OVERFLOW_X_BASE at 600/dungeon.
+    // The band starts far enough past it that adding dungeons cannot reach it.
+    expect(BG_BAND_X_MIN - DUNGEON_OVERFLOW_X_BASE).toBeGreaterThan(600 * 20);
+    // Two-sided cap: the band never claims everything east of itself.
+    expect(BG_BAND_X_MAX).toBeGreaterThan(BG_BAND_X_MIN);
+    expect(isBgPos(BG_BAND_X_MAX + 1)).toBe(false);
+    // No overworld x is ever a battleground x.
+    expect(isBgPos(0)).toBe(false);
+    expect(isBgPos(16400)).toBe(false);
   });
 
   it('classifies exclusively: no x is ever in two bands', () => {
     // sweep the whole instanced range at 50yd steps
-    for (let x = 500; x <= 31000; x += 50) {
-      const claims = [isArenaPos(x), isDelvePos(x), isYumiMazePos(x), isBgPos(x)].filter(
-        Boolean,
-      ).length;
+    for (let x = 500; x <= BG_BAND_X_MAX + 1000; x += 50) {
+      const claims = [
+        isArenaPos(x),
+        isDelvePos(x),
+        isYumiMazePos(x),
+        isRiftPos(x),
+        isBgPos(x),
+      ].filter(Boolean).length;
       expect(claims, `x=${x} claimed by ${claims} bands`).toBeLessThanOrEqual(1);
     }
     // the band's own edges
@@ -115,7 +133,7 @@ describe('Thornhollow Fields band: non-overlap with every other instance band', 
     expect(isArenaPos(BG_X)).toBe(false);
     expect(isYumiMazePos(BG_X)).toBe(false);
     // the arena/delve bands are untouched by the addition
-    expect(isArenaPos(4200)).toBe(true);
+    expect(isArenaPos(ARENA_X)).toBe(true);
     expect(isDelvePos(DELVE_BAND_X_MIN)).toBe(true);
   });
 
@@ -647,6 +665,51 @@ describe('Thornhollow Fields layout: the combat shape the dressing is laid over'
       { ...to, y: groundHeight(to.x, to.z, SEED) },
     );
   };
+
+  it('the caller-supplied eye height is scoped to the band, never the open world', () => {
+    // The band takes a fighter's REAL feet height for sight (its field is the
+    // one instanced region with sculpted terrain and standable decks, and its
+    // cover was authored against that). The open world must keep its historical
+    // terrain-derived eye, because both live callers pass an Entity.pos that
+    // always carries a y: applying it everywhere would silently retune spell
+    // line of sight for every player in the game. This pins the scoping itself,
+    // which is the only thing standing between the two behaviors.
+    const OPEN_A = { x: 40, z: 40 };
+    const OPEN_B = { x: 60, z: 40 };
+    expect(isBgPos(OPEN_A.x), 'the open-world probe must not be in the band').toBe(false);
+    const openGround = lineOfSightClear(
+      SEED,
+      { ...OPEN_A, y: groundHeight(OPEN_A.x, OPEN_A.z, SEED) },
+      { ...OPEN_B, y: groundHeight(OPEN_B.x, OPEN_B.z, SEED) },
+    );
+    // Lift BOTH endpoints a body's height off the ground: in the open world the
+    // answer must not move, because y is ignored there.
+    const openLifted = lineOfSightClear(
+      SEED,
+      { ...OPEN_A, y: groundHeight(OPEN_A.x, OPEN_A.z, SEED) + 3 },
+      { ...OPEN_B, y: groundHeight(OPEN_B.x, OPEN_B.z, SEED) + 3 },
+    );
+    expect(openLifted, 'open-world sight moved with the caller y').toBe(openGround);
+    // ...and omitting y entirely is the same answer again, which is what makes
+    // the probe callers and the entity callers agree out there.
+    expect(lineOfSightClear(SEED, OPEN_A, OPEN_B)).toBe(openGround);
+    // Inside the band the y IS honoured: standing on the mouth barricade's own
+    // top clears the sight line the same span refuses from the ground.
+    const a = local(-3, -108);
+    const b = local(-3, -104);
+    const groundLine = lineOfSightClear(
+      SEED,
+      { ...a, y: groundHeight(a.x, a.z, SEED) },
+      { ...b, y: groundHeight(b.x, b.z, SEED) },
+    );
+    const overTheTop = lineOfSightClear(
+      SEED,
+      { ...a, y: groundHeight(a.x, a.z, SEED) + 4 },
+      { ...b, y: groundHeight(b.x, b.z, SEED) + 4 },
+    );
+    expect(groundLine, 'the barricade should block at ground eye height').toBe(false);
+    expect(overTheTop, 'the band must honour the caller eye height').toBe(true);
+  });
 
   it('the heart ruin seals the main-gate-to-main-gate lane', () => {
     // The single most load-bearing sight property of the layout: the two main

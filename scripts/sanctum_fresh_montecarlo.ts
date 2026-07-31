@@ -150,7 +150,7 @@ const FRESH_HEALER = must(
 // 'fresh': what a freshly-capped 20 can wear out of questing and normal
 // leveling drops: no epics, no legendaries, no heroic-minted variants.
 // 'bis': everything, the healing MC best-in-slot tier (solo ceiling bench).
-type KitTier = 'fresh' | 'bis';
+export type KitTier = 'fresh' | 'bis';
 
 function tierAllows(tier: KitTier, item: ItemDef): boolean {
   if (tier === 'bis') return true;
@@ -239,7 +239,7 @@ function ensureTalents(sim: Sim, pid: number, spec: Spec) {
   }
 }
 
-function addTierPlayer(sim: Sim, spec: Spec, name: string, tier: KitTier): number {
+export function addTierPlayer(sim: Sim, spec: Spec, name: string, tier: KitTier): number {
   const pid = sim.addPlayer(spec.cls, name);
   sim.setPlayerLevel(MAX_LEVEL, pid);
   ensureTalents(sim, pid, spec);

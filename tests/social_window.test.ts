@@ -11,6 +11,10 @@ const componentsCss = readFileSync(
   new URL('../src/styles/components.css', import.meta.url),
   'utf8',
 );
+const hudChromeCatalog = readFileSync(
+  new URL('../src/ui/i18n.catalog/hud_chrome.ts', import.meta.url),
+  'utf8',
+);
 const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
 
 describe('social_window: .soc-body layout never uses CSS multicol', () => {
@@ -249,5 +253,35 @@ describe('social_window: guild billboard', () => {
     // inputs; the billboard edit input lives in the body and must be listed
     // there too or it renders ~28px tall under coarse pointers.
     expect(mobileCss).toContain('body.mobile-touch .soc-billboard-edit input');
+  });
+
+  it('keeps the read-only billboard message selectable and non-actionable', () => {
+    const messageRuleStart = componentsCss.indexOf('.soc-billboard-msg {');
+    expect(messageRuleStart).toBeGreaterThan(-1);
+    const messageRule = componentsCss.slice(
+      messageRuleStart,
+      componentsCss.indexOf('}', messageRuleStart),
+    );
+    expect(messageRule).toContain('user-select: text');
+    expect(messageRule).toContain('-webkit-user-select: text');
+
+    const section = painter.slice(
+      painter.indexOf('private billboardHtml'),
+      painter.indexOf('private guildMemberRowHtml'),
+    );
+    expect(section).toContain('<div class="soc-billboard-msg">$' + '{esc(g.motd)}</div>');
+    expect(section).not.toContain('class="soc-billboard-msg" data-');
+  });
+});
+
+describe('social_window: guild header copy', () => {
+  it('renders the guild name without decorative angle brackets', () => {
+    expect(painter).toContain('<div class="soc-guild-head">$' + '{esc(g.name)} <span class="gm">');
+    expect(painter).not.toContain('&lt;$' + '{esc(g.name)}&gt;');
+  });
+
+  it('uses localized membership copy that avoids the broken rank article sentence', () => {
+    expect(hudChromeCatalog).toContain("one: 'your guild rank is {rank}; {count} member'");
+    expect(hudChromeCatalog).toContain("other: 'your guild rank is {rank}; {count} members'");
   });
 });

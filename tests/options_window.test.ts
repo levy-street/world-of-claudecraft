@@ -243,12 +243,29 @@ describe('options_window: bug-report dispatch + async states (cluster 2)', () =>
     expect(bug).toContain("error.textContent = t('hudChrome.bugReport.describeFirst')");
     // in-flight: the button is disabled while the submit promise is pending
     expect(bug).toContain('submit.disabled = true');
+    // Capture/encode is deferred off the opening interaction and a fast submit
+    // waits for it instead of silently dropping the screenshot.
+    expect(bug).toContain('idleWindow.requestIdleCallback(capture, { timeout: 500 })');
+    expect(bug).toContain('void capturePromise.then((shot) =>');
     // the submit action and its honest dropped-screenshot reporting are intact
-    expect(bug).toContain('hooks\n        .submit({ description');
+    expect(bug).toContain('.submit({ description, screenshot: includeShot ? shot : null');
     expect(bug).toContain('hudChrome.bugReport.submittedNoShot');
     // failure: re-enable + localized error
     expect(bug).toContain('submit.disabled = false');
     expect(bug).toContain('this.localizeBugReportError(err)');
+  });
+
+  it('paints the form before the deferred screenshot capture and gates submit on it', () => {
+    const bug = painter.slice(
+      painter.indexOf('private renderBugReport'),
+      painter.indexOf('private localizeBugReportError'),
+    );
+    expect(bug).toContain('const capturePromise = new Promise<string | null>');
+    expect(bug).toContain('requestIdleCallback(capture, { timeout: 500 })');
+    expect(bug).toContain('void capturePromise.then((shot)');
+    expect(bug.indexOf('body.append(descLabel, desc)')).toBeLessThan(
+      bug.indexOf('const capturePromise'),
+    );
   });
 });
 
@@ -262,16 +279,27 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
 });
 
 describe('options_window: viewport resync on open (PR #1118)', () => {
-  it('calls syncAppViewport() before the panel flips to display: block', () => {
+  it('calls syncAppViewport() before render() flips the panel visible', () => {
+    // render() is the one place that flips `display` (issue 2569: Performance
+    // needs `flex` for its scroll wrapper, every other sub-view stays `block`),
+    // so the ordering guarantee is now "syncAppViewport() runs before toggle()
+    // hands off to render()", not a literal display-assignment string in toggle().
     expect(painter).toContain("import { syncAppViewport } from '../game/app_viewport'");
     const toggle = painter.slice(painter.indexOf('toggle(): void {'));
     const toggleEnd = toggle.indexOf('\n  }\n');
     const body = toggle.slice(0, toggleEnd);
     const syncIdx = body.indexOf('syncAppViewport()');
-    const displayIdx = body.indexOf("root().style.display = 'block'");
+    const renderIdx = body.indexOf('this.render()');
     expect(syncIdx).toBeGreaterThan(-1);
-    expect(displayIdx).toBeGreaterThan(-1);
-    expect(syncIdx).toBeLessThan(displayIdx);
+    expect(renderIdx).toBeGreaterThan(-1);
+    expect(syncIdx).toBeLessThan(renderIdx);
+
+    const render = painter.slice(painter.indexOf('private render(): void {'));
+    const renderEnd = render.indexOf('\n  }\n');
+    const renderBody = render.slice(0, renderEnd);
+    expect(renderBody).toContain(
+      "el.style.display = this.view === 'performance' ? 'flex' : 'block'",
+    );
   });
 });
 

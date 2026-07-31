@@ -63,6 +63,7 @@ network access, provider, or credentials.
 - `$woc-feature-plan` creates model-neutral vertical slices for large work.
 - `$woc-review-pr` reviews and drafts by default; posting needs explicit authorization.
 - `$woc-file-issue` creates an issue only after an explicit request to file it.
+- `$woc-image-to-glb` builds a shipping GLB asset from a reference image through the repo export, optimize, and fingerprint pipeline.
 - `$woc-release-merge-audit` finds semantic damage after release integration.
 - `$woc-release-malware-audit` combines the deterministic scanner with contextual triage.
 - `$woc-codex-audit` checks this architecture against current official guidance.

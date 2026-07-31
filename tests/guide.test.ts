@@ -436,12 +436,10 @@ describe('Guide bestiary spoiler safety', () => {
   });
 });
 
-// The bestiary walks a hand-listed union of mob tables, and CAMPS is itself a growing
-// merge: a future zone or overworld mob file whose camps join CAMPS could be silently
-// dropped from the wiki while the freshness gate stays green (the generated file would
-// be "fresh" and just missing the creatures). These gates tie the published bestiary to
-// the camp registry, so a camped creature a player can walk into is never unlisted.
-// NOTE: the exclusion filters below (elite/boss, warlock_, vision, fixture) mirror the
+// The bestiary walks the canonical MOBS registry, and CAMPS is itself a growing merge.
+// These gates tie the published bestiary to the camp registry, so a camped creature a
+// player can walk into is never unlisted even as new world columns and mob modules land.
+// NOTE: the exclusion filters below (elite/boss, ambient, warlock_, vision, fixture) mirror the
 // generator's own filters in scripts/wiki/build_content.mjs; the two lists must move
 // together, or this completeness gate and the published set silently diverge.
 describe('Guide bestiary completeness', () => {
@@ -467,6 +465,7 @@ describe('Guide bestiary completeness', () => {
     for (const camp of CAMPS) {
       const m = MOBS[camp.mobId];
       if (!m || m.elite || m.boss) continue;
+      if (m.ambient) continue; // ambient decoration (stable horses), not a wild creature
       if (camp.mobId.startsWith('warlock_')) continue;
       if (/vision/i.test(camp.mobId) || /^Vision\b/.test(m.name)) continue;
       if (isFixture(m)) continue; // inert practice fixtures (the training dummy)

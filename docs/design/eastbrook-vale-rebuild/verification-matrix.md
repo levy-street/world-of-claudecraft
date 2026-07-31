@@ -1,8 +1,8 @@
 # Eastbrook Vale rebuild: verification matrix
 
-This is the evidence ledger for the current polish-v2 worktree. Exact narrative and shipping
-tables are in `final-report.md`. Rebuild-v1 captures and measurements are historical references;
-they do not satisfy a current polish-v2 row.
+This is the evidence ledger for the settled polish-v2 implementation and current bank rebuild.
+Exact narrative and shipping tables are in `final-report.md`. Rebuild-v1 and pre-bank polish-v2
+captures and measurements are historical references; they do not satisfy a current bank row.
 
 Status vocabulary:
 
@@ -12,7 +12,7 @@ Status vocabulary:
 - `FAIL`: measured evidence violates the contract.
 - `BLOCKED`: the check could not run because of a named external blocker.
 
-No blank status is accepted. SwiftShader screenshots are visual evidence, never native-GPU
+No blank status is accepted. Software-renderer screenshots are visual evidence, never native-GPU
 performance evidence. Bare `polish/` evidence paths below are relative to
 `docs/screenshots/eastbrook-vale-rebuild/`.
 
@@ -24,8 +24,8 @@ performance evidence. Bare `polish/` evidence paths below are relative to
 | REF-02 | Polish concept is an original World of ClaudeCraft composition | `polish/concepts/master-concept.png`, prompts, provenance, `CREDITS.md`                    | No proprietary image input; prompt and rights lineage recorded                                                                                                  | PASS   |
 | REF-03 | Mailbox and noticeboard have reconstruction-grade turnarounds  | `polish/turnarounds/ravenpost-mailbox.png`, `polish/turnarounds/noticeboard.png`           | Matched isolated views are retained                                                                                                                             | PASS   |
 | REF-04 | Complete img2threejs intake exists for both new assets         | `docs/design/eastbrook-vale-rebuild/polish-img2threejs/`                                   | Admission, assessment, detail inventory, sculpt spec, stages, comparisons, and validation retained                                                              | PASS   |
-| SRC-01 | Rebuild-v1 town source remains deterministic                   | `tests/eastbrook_town_assets.test.ts`                                                      | Historical town source fingerprint remains `76e5620c78069b209a58d99ab7670c26a0edcc4f240f571f3dd130a859d97c6a`                                                   | PASS   |
-| SRC-02 | Shared atlas remains deterministic                             | `build_surface_atlas.mjs --check` contract                                                 | Fingerprint `ae247c4f22d166408f465a64a862db259e166e97dd266baf8fd072a6c9b87e56`; shipping SHA `d66f2fab603aa83e6c73c6fc4bdde2d545a6d8c1a0d4a58d42a3fb227e5a3f9b` | PASS   |
+| SRC-01 | Current town source remains deterministic                      | `tests/eastbrook_town_assets.test.ts`                                                      | Source fingerprint `4430923952c20d7a5883b54aea8b09fe305b392090aec5968b73bd8cf5b7a02a`                                                                      | PASS   |
+| SRC-02 | Shared atlas remains deterministic                             | `build_surface_atlas.mjs --check` contract                                                 | Fingerprint `6427821b76f9f45878dd6c1616be49264d5cd66a7c4ed61606c23b31df21d224`; shipping SHA `d66f2fab603aa83e6c73c6fc4bdde2d545a6d8c1a0d4a58d42a3fb227e5a3f9b` | PASS   |
 | SRC-03 | New mailbox source is fingerprinted                            | `tests/eastbrook_mailbox_asset.test.ts`                                                    | `488d484fbdbb15a4953754fbf08dc59880496ff97acec2e63036cde93ae883db`                                                                                              | PASS   |
 | SRC-04 | New noticeboard source is fingerprinted                        | `tests/eastbrook_noticeboard_asset.test.ts`                                                | `2a591ad70045e7988f38f9890383ffd35d9fefe6dd598436d92ea2b568d3fb17`                                                                                              | PASS   |
 | SRC-05 | Final re-export and generated-file freshness are clean         | Deterministic exporters, optimizer specs, media-manifest regeneration, zero generated diff | Settled mailbox/noticeboard exports, optimizer outputs, and generated manifest match the staged shipping files with no residual binary or manifest diff          | PASS   |
@@ -105,7 +105,10 @@ Primary evidence is `tests/eastbrook_layout.test.ts`, with literal polish anchor
 Every listed GLB is centered on X/Z, floor-seated at `Y=0`, uses `COLOR_0`, meshopt compression and
 quantization, and has zero embedded textures, animations, skins, cameras, and lights.
 
-### Retained rebuild-v1 bundle: historical origin, unchanged in polish v2
+### Historical rebuild-v1 bundle
+
+These values remain the accepted rebuild-v1 snapshot. They are not relabeled with the current
+bank rebuild's measurements or hashes.
 
 | Asset                  | Bounds `W x H x D` |     Bytes | Triangles | Primitives/materials | Status |
 | ---------------------- | -----------------: | --------: | --------: | -------------------: | ------ |
@@ -129,10 +132,11 @@ quantization, and has zero embedded textures, animations, skins, cameras, and li
 | GLB-03 | Noticeboard bytes and hash                         | `24,684`; SHA `2743458c5d551093c0ccc0d3104bdece26f06c210a7f3f74eaa2fe1510b9c8d7`                                               | PASS                           |
 | GLB-04 | Noticeboard topology                               | `2.4 x 2.6 x 0.6`; `1,184` triangles (`604` surface, `580` hardware); `2/2`; two sockets                                       | PASS                           |
 | GLB-05 | Polish service subtotal                            | `57,568` bytes, `2,824` triangles, `4/4`, zero embedded textures                                                               | PASS                           |
-| GLB-06 | Current town/service static total                  | Eleven GLBs: `400,772` bytes, `22,742` triangles, `22/22`; plus atlas = `542,438` bytes across 12 files                        | PASS                           |
+| GLB-06 | Current town/service static total                  | Eleven GLBs: `413,276` bytes, `23,522` triangles, `22/22`; plus atlas = `554,942` bytes across 12 files                        | PASS                           |
 | GLB-07 | Replaced-mailbox comparison                        | New mailbox + board versus old mailbox: `-57,520` bytes, `-6,470` triangles, `+3` primitives/materials, `-3` embedded textures | PASS                           |
 | GLB-08 | Final deterministic rebuild and manifest freshness | Re-export both assets, regenerate manifest, require no diff                                                                    | Optimized SHA and manifest diff are empty after settled rebuild | PASS |
 | GLB-09 | Raw and optimized validation                       | `gltf-transform inspect` and `validate` for both assets                                                                        | Raw and shipping mailbox/noticeboard assets inspect and validate | PASS |
+| GLB-10 | Current bank rebuild                               | `52,508` bytes; `3,104` triangles (`2,928` opaque, `176` emissive); SHA `59ee6025292eaeb616708be569d55d50d4f2de2077d0ab9418b6265054102c34`; exact `7 x 7.8 x 5.5` bounds | PASS |
 
 ## Civic motion, rendering, and tier fairness
 
@@ -141,20 +145,20 @@ quantization, and has zero embedded textures, animations, skins, cameras, and li
 | REN-01 | Civic motion selects only crystal geometry                            | `tests/eastbrook_civic_beacon.test.ts`    | Shipping GLB test selects exactly 24 `TownEmissive` crystal vertices and leaves every other mask byte zero | PASS   |
 | REN-02 | Motion is subtle and deterministic                                    | Shader literals                           | `0.28` rad/s rotation, `0.04` yard bob, emissive range `0.92..1.08`, shared `uTime`            | PASS   |
 | REN-03 | Reduced motion removes spatial and pulse animation                    | Standard/Lambert shader tests             | Rotation and bob stop; pulse resolves to `1.0`; steady emissive remains                        | PASS   |
-| REN-04 | Motion adds no rendering inventory                                    | Town renderer tests                       | No mesh/draw/shadow/triangle/texture/light/mixer; town root is `18` color / `9` shadow draws and `28,330` / `26,754` triangles | PASS   |
+| REN-04 | Motion adds no rendering inventory                                    | Town renderer tests                       | No mesh/draw/shadow/texture/light/mixer; town root is `18` color / `9` shadow draws and `29,110` / `27,554` triangles | PASS   |
 | REN-05 | Frame update allocates nothing                                        | Source test                               | Existing scalar uniform changes only; no per-frame object construction                         | PASS   |
 | REN-06 | Low uses the same identity geometry                                   | Lambert asset/material tests              | Mailbox, noticeboard, surface detail, and civic motion retain their gameplay cues              | PASS   |
 | REN-07 | Preload and actionable-landmark readiness are tier-independent         | Mailbox/noticeboard/town preload and prewarm-policy tests | Required models load on every preset; Mobile Low enters with visible, compiled mailbox and the ordinary two-view cap intact | PASS   |
 | REN-08 | Custom worlds instantiate no canonical town motion/board              | Renderer and content tests                | No canonical Eastbrook geometry or board without built-in content                              | PASS   |
 | REN-09 | Grass, minimap, collision, and camera treatments follow polish layout | Focused foliage/map/collider/render tests | Board and moved buildings have authoritative exclusions/OBBs/roof treatment; gates remain open | PASS   |
-| REN-10 | Combined static render inventory is exact                             | Capture-contract structural inventory     | Current color `22/31,154`, shadow `11/28,694`, shadows-on `33/59,848`; baseline `19/38,938`, `10/37,342`, `29/76,280`; deltas `+3/-7,784`, `+1/-8,648`, `+4/-16,432` | PASS   |
-| REN-11 | Current whole-scene render totals are measured                        | Four matched performance JSON files       | Four views x two repeats, shadows on/off, visible/hidden; native ANGLE Metal on Apple M4 Max     | PASS   |
+| REN-10 | Combined static render inventory is exact                             | Capture-contract structural inventory     | Current color `22/31,934`, shadow `11/29,494`, shadows-on `33/61,428`; baseline `19/38,938`, `10/37,342`, `29/76,280`; deltas `+3/-7,004`, `+1/-7,848`, `+4/-14,852` | PASS   |
 
 ## Visual capture contract
 
-The polish-v2 contract has 23 matched views: the historical 15 views plus eight finishing-pass views.
-Motion evidence adds four paired frames at a `1,600 ms` interval across motion-on and reduced-motion
-modes.
+The retained polish-v2 capture set has 23 matched views from before the bank rebuild: the historical
+15 views plus eight finishing-pass views. Motion evidence adds four paired frames at a `1,600 ms`
+interval across motion-on and reduced-motion modes. Current bank-specific procedural, raw,
+optimized, neutral, dusk, player-scale, and collider evidence is recorded separately.
 
 | ID     | Requirement                                                                         | Current result                                                                    | Status |
 | ------ | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------ |
@@ -164,12 +168,14 @@ modes.
 | VIS-04 | Complete Mobile Low after set is captured and visually accepted                     | All 23 matched `844 x 390`, touch, DPR-3 views and final contact visually accepted | PASS   |
 | VIS-05 | Mailbox/noticeboard procedural, raw, optimized, and comparison contacts are present | `polish/assets/ravenpost-mailbox/` and `polish/assets/noticeboard/`               | PASS   |
 | VIS-06 | Civic motion and reduced-motion pairs are captured and inspected                    | Four paired frames at the contract's 1,600 ms interval                            | PASS   |
-| VIS-07 | All 23 after records pass schema/hash/error/asset validation                        | Current fingerprint; zero page/console/asset failures in both profiles             | PASS   |
+| VIS-07 | All 23 retained after records pass schema/hash/error/asset validation               | Accepted historical fingerprint; zero page/console/asset failures in both profiles | PASS   |
+| VIS-08 | Current bank asset evidence is complete                                             | Five regenerated contact sheets cover procedural, raw, optimized, comparison, lighting, player scale, and bounds | PASS |
 
 ## Performance and asset budget
 
-Historical rebuild-v1 performance tables in `final-report.md` are explicitly non-current. The
-following rows use the final polish-v2 matched runs.
+Rows PERF-01 through PERF-07 retain the accepted polish-v2 matched runs from before the bank
+rebuild. They remain historical performance evidence and are not relabeled as measurements of the
+rebuilt bank. Current structural costs are recorded under REN-10.
 
 | ID      | Requirement                                                                    | Current result                                                                               | Status |
 | ------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- | ------ |
@@ -177,19 +183,28 @@ following rows use the final polish-v2 matched runs.
 | PERF-02 | Desktop Ultra shadows-off matched runs                                         | `431 -> 432.5` calls; `2,607,836 -> 2,604,586.5` triangles; p95 `9.10 -> 9.10 ms`            | PASS   |
 | PERF-03 | Mobile Low shadows-on matched runs                                             | `457.5 -> 465.5` calls; `1,270,003 -> 1,260,635` triangles; p95 `9.25 -> 8.95 ms`            | PASS   |
 | PERF-04 | Mobile Low shadows-off matched runs                                            | `362.5 -> 369` calls; `1,058,539 -> 1,051,152` triangles; p95 `9.25 -> 8.90 ms`              | PASS   |
-| PERF-05 | Town-visible/town-hidden attribution                                           | Direct deltas exactly `22/31,154` color and `11/28,694` shadow                               | PASS   |
+| PERF-05 | Historical town-visible/town-hidden attribution                                | Direct deltas exactly `22/31,154` color and `11/28,694` shadow                               | PASS   |
 | PERF-06 | Preload, heap, programs, textures, long tasks, input latency, and context loss | All recorded; no long tasks, >50 ms frames, context loss, or asset failure; Mobile Low prewarm is `522.0 ms`, two views, with `4,477.9 ms` budget remaining | PASS   |
 | PERF-07 | Timing labels remain honest                                                    | CPU/rAF only; no GPU-duration or driver texture-memory claim                                 | PASS   |
-| BUD-01  | Static public-asset delta is exact                                             | PR base `142,624,095/1,092`; current `143,051,704/1,103`; delta `+427,609/+11`               | PASS   |
-| BUD-02  | Polish improves rebuild-v1 media contribution                                  | `143,108,965 -> 143,051,445`, exactly `-57,520` bytes                                        | PASS   |
+| BUD-01  | Static public-asset delta is exact                                             | PR base `142,624,095/1,092`; current `143,085,136/1,104`; delta `+461,041/+12`               | PASS   |
+| BUD-02  | Current tree remains below rebuild-v1 media contribution                       | `143,108,965 -> 143,085,136`, exactly `-23,829` bytes                                        | PASS   |
 | BUD-03  | Pre-existing aggregate failures are separated                                  | Current aggregate remains above global and props limits; this pass improves both             | PASS   |
-| BUD-04  | Final settled asset-budget command is recorded                                 | `143,051,704` bytes / `1,103` files; only documented pre-existing aggregate overages         | PASS   |
+| BUD-04  | Final settled asset-budget command is recorded                                 | `143,085,136` bytes / `1,104` files; only documented pre-existing aggregate overages         | PASS   |
 
-## Build, native, security, gate, and reviews
+## Current bank-rebuild QA
 
-No rebuild-v1 PASS count is carried forward as a polish-v2 outcome.
+| ID     | Requirement                                    | Exact command or evidence                              | Current status |
+| ------ | ---------------------------------------------- | ------------------------------------------------------ | -------------- |
+| CUR-01 | Focused changed-contract coverage              | 5 files / 61 tests                                     | PASS |
+| CUR-02 | Current asset-budget delta                     | Release base `143,072,632`; rebuild `143,085,136`; exact `+12,504`; no new failure category | PASS |
+| CUR-03 | Canonical gate                                 | `npm run gate`; all 11 steps, 1,604 test files / 20,471 tests plus 8 browser files / 68 browser tests | PASS |
 
-| ID     | Requirement                                            | Exact command or evidence                   | Current status |
+## Historical polish-v2 build, native, security, gate, and reviews
+
+No rebuild-v1 PASS count was carried forward as a polish-v2 outcome. The rows below record the
+accepted polish-v2 pass before the bank rebuild and are not reused as current bank-rebuild QA.
+
+| ID     | Requirement                                            | Exact command or evidence                   | Recorded status |
 | ------ | ------------------------------------------------------ | ------------------------------------------- | -------------- |
 | QA-01  | Focused contribution suites                            | Final integrity/capture/observation invocation: 3 files / 36 tests; reviewer suites: 6 files / 84 tests | PASS |
 | QA-02  | Existing Armoury and banker contracts                  | Preserved-anchor suites included in the final 18,919-test gate | PASS |
@@ -208,9 +223,9 @@ No rebuild-v1 PASS count is carried forward as a polish-v2 outcome.
 | REV-05 | Release-malware specialist review                      | PASS; all 224 scanner findings reconciled, no malicious behavior | PASS |
 | REL-01 | One scoped local commit                                | Single scoped amend containing this report; final immutable hash supplied in handoff | PASS |
 
-## Completion rule
+## Historical completion rule
 
 The factual polish-v2 layout and source contracts, accepted captures, matched performance,
 deterministic settled rebuild, typecheck/build/native/gate results, specialist reviews, and scoped
-commit are complete. Physical iOS and authenticated native in-game rows remain explicit `VERIFY`
-items unless new device evidence is produced.
+commit were complete for that accepted snapshot. Physical iOS and authenticated native in-game rows
+remain explicit `VERIFY` items unless new device evidence is produced.

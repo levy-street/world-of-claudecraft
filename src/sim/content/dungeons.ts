@@ -865,6 +865,37 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     enterText: 'You cross the threshold of the Abandoned Crypt.',
     leaveText: 'You return to the cold air of Thornpeak.',
   },
+  the_last_keep: {
+    id: 'the_last_keep',
+    name: 'The Last Keep',
+    // Overflow band: indexes 0..7 are taken (temple 3, orkadia 6, wildheart 7),
+    // so the keep claims 8 (instanceOrigin: DUNGEON_OVERFLOW_X_BASE + 600).
+    index: 8,
+    // On the ward terrace at the keep's west front: clear of the keep's
+    // decor collider (r 8.5 at 421,2003), of both ward step tops, and of
+    // the terrace mid-walk, so neither the leave-drop (z - 4) nor casual
+    // foot traffic clips a collider or the 2yd door trigger (castle_layout)
+    doorPos: { x: 413.5, z: 2016.5 },
+    // Arrival just inside the entrance hall's south end, 4yd north of the exit
+    // portal so zoning in never lands inside the exit's 2yd door trigger.
+    entry: { x: 0, z: -5 },
+    exitOffset: { x: 0, z: -9 },
+    // Zero combat, zero loot by design: the keep is a place to walk, not a
+    // fight (the zero-spawn Nythraxis attunement crypt is the precedent). It is
+    // deliberately absent from FINDER_ACTIVITIES, so the Dungeon Finder never
+    // queues a group into an empty instance (orkadia/wildheart precedent: the
+    // finder catalogue is explicit, not derived from DUNGEONS).
+    spawns: [],
+    objects: [
+      // the hall's keepsake: a signet dropped by the garrison that never
+      // came home, on the entrance hall floor east of the door
+      { itemId: 'last_keep_signet', name: 'Signet of the Last Keep', x: 4, z: 0 },
+    ],
+    interior: 'lastkeep',
+    suggestedPlayers: 1,
+    enterText: 'You step into the cold, silent halls of the Last Keep.',
+    leaveText: 'You pull the keep door shut and step back into the Drakelands wind.',
+  },
   nythraxis_boss_arena: {
     id: 'nythraxis_boss_arena',
     name: 'Nythraxis Raid Arena',

@@ -45,7 +45,20 @@ import {
 import { passesTurnstile } from '../server/turnstile';
 import { isWebClientRequest } from '../server/web_login_guard';
 import { buildWebSocketAuthMessage, buildWebSocketUrl } from '../src/net/online';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
+import type { WorldContent } from '../src/sim/types';
+
+// The one Sim-backed test here only round-trips a serialized character; no
+// assertion reads ambient world content, so strip camps/npcs/ground objects
+// to keep construction cheap (the dot_final_tick subsystem-world pattern).
+const GM_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 import { ONLINE_WORLD_AUTH_TYPE, ONLINE_WORLD_LAYOUT_VERSION } from '../src/world_api';
 
 function fakeReq(headers: Record<string, string>, remoteAddress: string) {
@@ -551,12 +564,17 @@ describe('gm privilege boundaries', () => {
   });
 
   it('does not restore gm privilege from client-controlled saved character state', () => {
-    const source = new Sim({ seed: 42, playerClass: 'warrior' });
+    const source = new Sim({ seed: 42, playerClass: 'warrior', world: GM_TEST_WORLD });
     const state = source.serializeCharacter(source.playerId) as any;
     state.gm = true;
     state.is_gm = true;
 
-    const target = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const target = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: GM_TEST_WORLD,
+    });
     const pid = target.addPlayer('warrior', 'Tester', { state });
 
     expect(target.entities.get(pid)?.gm).not.toBe(true);

@@ -85,7 +85,7 @@ describe('leaderboard_window: async + page wiring contracts (the painter half)',
     // close() hides the window without clearing innerHTML, and a newer render
     // (tab switch, page change) owns the shared body; a late-resolving fetch
     // must bail on either rather than repaint stale rows.
-    expect(code).toContain("if (seq !== this.renderSeq || el.style.display !== 'block') return;");
+    expect(code).toContain("if (seq !== this.renderSeq || el.style.display !== 'flex') return;");
   });
 
   it('stamps a render epoch and bails every stale board response against it', () => {
@@ -148,6 +148,22 @@ describe('leaderboard_window: guild board tab (Players / Guilds)', () => {
     expect(code).toContain('aria-label="${esc(t(\'hudChrome.leaderboard.tabsLabel\'))}"');
   });
 
+  it('opens as a flex column and re-emits window-fill on the board body every render', () => {
+    // The board must follow the window box once the user drags the window to a
+    // size, instead of staying pinned to .lb-body's authored 56vh cap (which left
+    // a dead band under a truncated board). That needs two halves, both here:
+    //
+    // 1. the window is the flex COLUMN container. A stylesheet display can never
+    //    beat the inline one the painter writes, so the open value itself carries
+    //    it (the #mailbox-window family); 'block' would silently kill the fill.
+    expect(code).toContain("this.deps.root().style.display = 'flex';");
+    expect(code).toContain("return this.deps.root().style.display === 'flex';");
+    // 2. .lb-body is the marked fill child. render() rebuilds the window's whole
+    //    innerHTML on every open, tab switch and page change, so the class has to
+    //    come from the emitted HTML, not a one-time stamp at open.
+    expect(code).toContain('<div class="lb-body window-fill" id="lb-body-panel" role="tabpanel">');
+  });
+
   it('drives keyboard tab nav through the shared roving core and refocuses the active tab', () => {
     // Arrow/Home/End routed through the tested rovingTarget core (not bespoke math).
     expect(code).toContain("rovingTarget(ke.key, i, tabs.length, 'horizontal')");
@@ -200,7 +216,7 @@ describe('leaderboard_window: developers board tab', () => {
 
   it('guards against painting the dev board into a window closed or superseded mid-fetch', () => {
     expect(code).toMatch(
-      /renderDevBoard[\s\S]{0,400}if \(seq !== this\.renderSeq \|\| el\.style\.display !== 'block'\) return;/,
+      /renderDevBoard[\s\S]{0,400}if \(seq !== this\.renderSeq \|\| el\.style\.display !== 'flex'\) return;/,
     );
   });
 
@@ -285,7 +301,7 @@ describe('leaderboard_window: Renown (deeds) board tab', () => {
 
   it('guards against painting the Renown board into a window closed or superseded mid-fetch', () => {
     expect(code).toMatch(
-      /renderDeedsBoard\([\s\S]{0,500}if \(seq !== this\.renderSeq \|\| el\.style\.display !== 'block'\) return;/,
+      /renderDeedsBoard\([\s\S]{0,500}if \(seq !== this\.renderSeq \|\| el\.style\.display !== 'flex'\) return;/,
     );
   });
 });

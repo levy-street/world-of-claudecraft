@@ -51,6 +51,7 @@ import {
   type PetMode,
 } from '../types';
 import { startWaterJet } from './pet_ai';
+import { petCanForceTaunt } from './pet_taunt_gate';
 
 // Slice-only tuning consts, moved verbatim from sim.ts with the slice.
 const PET_TAUNT_RANGE = 5;
@@ -575,7 +576,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
     return;
   }
-  if (MOBS[pet.templateId]?.petCanTaunt === false) return;
+  if (!petCanForceTaunt(pet.templateId)) return;
   if (pet.petTauntTimer > 0) {
     ctx.error(r.e.id, 'Pet taunt is not ready.');
     return;
@@ -755,7 +756,7 @@ export function setPetAutoTaunt(ctx: SimContext, enabled: boolean, pid?: number)
     ctx.error(r.e.id, noPetError(r.e));
     return;
   }
-  if (MOBS[pet.templateId]?.petCanTaunt === false) {
+  if (!petCanForceTaunt(pet.templateId)) {
     pet.petAutoTaunt = false;
     return;
   }
@@ -797,7 +798,7 @@ export function setPetAutoWaterJet(ctx: SimContext, enabled: boolean, pid?: numb
 export function petTauntReadout(ctx: SimContext, owner: Entity): string {
   const pet = petOf(ctx, owner.id);
   if (!pet) return 'You do not have a pet.';
-  if (MOBS[pet.templateId]?.petCanTaunt === false) return 'This pet cannot taunt.';
+  if (!petCanForceTaunt(pet.templateId)) return 'This pet cannot taunt.';
   if (pet.petTauntTimer <= 0) {
     return pet.petAutoTaunt
       ? `Your pet's Growl is ready. Auto-taunt is on.`

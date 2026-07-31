@@ -478,6 +478,30 @@ export const TEMPLE_QUEST_ORDER = [
 // World layout — the Glimmermere shore (south of the tarn at -70,760)
 // ---------------------------------------------------------------------------
 
+// Camp ORDER is world-gen rng draw order: never reorder or insert here, only
+// retune a center in place.
+//
+// THESE CAMPS DELIBERATELY STAY ON THE WATERLINE. They sit in the gap between
+// Thornpeak's ogre camps (x -60..-132, z 700..768) and its revenant camps
+// (x -34..-40, z 830..842), so all three groups fall into one contiguous farm
+// cluster. That was investigated as a placement defect and it is not one: the
+// Glimmermere itself lies inside that corridor, and the binding neighbours are
+// the WESTERN packs, not the revenants. Brutok (-45, 768) is 34yd from the
+// first wader camp and the ogre camp at (-60, 730) is 51yd from it, so no
+// arrangement that keeps these mobs at the water clears the 60yd cluster link:
+// measured, the best separation reachable within 20yd of the shore is 54yd.
+//
+// Moving them out to where the packs separate means marching them 50 to 70yd
+// uphill, which contradicts their own quest text: waders "climb out of the mere"
+// (q_tarn_waders) and Sethrael "glides the deep shelf where the stair begins...
+// go down to the shelf" (q_palecoil). It also un-flattens the lakeshore, since
+// camps stamp terrain (src/sim/world.ts reads CAMPS), which reshapes the tarn's
+// water dressing.
+//
+// The farm problem these camps were suspected of is fixed at the source instead:
+// the zone respawn tier (src/sim/respawn_policy.ts) takes this corridor from
+// about 189 gold and 1.29M XP per hour down to about 25 gold and 179k XP,
+// bounded by tests/economy_yield.test.ts. Do not "fix" the spacing here.
 export const TEMPLE_CAMPS: CampDef[] = [
   { mobId: 'glimmermere_wader', center: { x: -78, z: 778 }, radius: 16, count: 7 },
   { mobId: 'glimmermere_wader', center: { x: -56, z: 800 }, radius: 14, count: 5 },
@@ -671,6 +695,18 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 200, sta: 7, str: 4 },
     sellValue: 2400,
     requiredClass: WAR,
+  },
+  // Collectible mount (Ysolei, Avatar of the Drowned Moon). Soulbound; owning
+  // the ignition key item is owning the mount (src/sim/mounts.ts mountOwned).
+  reins_aether_hover_cycle: {
+    id: 'reins_aether_hover_cycle',
+    name: 'Ignition Key: Aether-Jouster Hover-Cycle',
+    kind: 'mount',
+    mount: 'aether_hover_cycle',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
   },
   moonshroud_robe: {
     id: 'moonshroud_robe',

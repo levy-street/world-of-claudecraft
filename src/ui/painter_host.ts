@@ -124,25 +124,24 @@ export function makeWriterFacet(
   onWrite: () => void,
   onSkip: () => void,
 ): PainterHostWriters {
-  const write = (el: HTMLElement, key: string, apply: () => void): void => {
+  const shouldWrite = (el: HTMLElement, key: string): boolean => {
     if (cache.get(el) === key) {
       onSkip();
-      return;
+      return false;
     }
     cache.set(el, key);
     onWrite();
-    apply();
+    return true;
   };
   // Multi-slot variant: resolves (or lazily creates) the per-element inner map and
   // elides per (element, slot). Used by setStyleProp/toggleClass so one element can
   // hold many independent props/classes without them clobbering each other's cache.
-  const writeSlot = (
+  const shouldWriteSlot = (
     store: Map<HTMLElement, Map<string, string>>,
     el: HTMLElement,
     slot: string,
     value: string,
-    apply: () => void,
-  ): void => {
+  ): boolean => {
     let slots = store.get(el);
     if (slots === undefined) {
       slots = new Map();
@@ -150,40 +149,33 @@ export function makeWriterFacet(
     }
     if (slots.get(slot) === value) {
       onSkip();
-      return;
+      return false;
     }
     slots.set(slot, value);
     onWrite();
-    apply();
+    return true;
   };
   return {
-    setText: (el, text) =>
-      write(el, text, () => {
-        el.textContent = text;
-      }),
-    setDisplay: (el, display) =>
-      write(el, `display:${display}`, () => {
-        el.style.display = display;
-      }),
-    setTransform: (el, transform) =>
-      write(el, `transform:${transform}`, () => {
-        el.style.transform = transform;
-      }),
-    setWidth: (el, width) =>
-      write(el, `width:${width}`, () => {
-        el.style.width = width;
-      }),
-    setStyleProp: (el, prop, value) =>
-      writeSlot(stylePropCache, el, prop, value, () => {
-        el.style.setProperty(prop, value);
-      }),
-    toggleClass: (el, cls, on) =>
-      writeSlot(classCache, el, cls, on ? 'on' : 'off', () => {
-        el.classList.toggle(cls, on);
-      }),
-    setAttr: (el, name, value) =>
-      writeSlot(attrCache, el, name, value, () => {
-        el.setAttribute(name, value);
-      }),
+    setText: (el, text) => {
+      if (shouldWrite(el, text)) el.textContent = text;
+    },
+    setDisplay: (el, display) => {
+      if (shouldWrite(el, `display:${display}`)) el.style.display = display;
+    },
+    setTransform: (el, transform) => {
+      if (shouldWrite(el, `transform:${transform}`)) el.style.transform = transform;
+    },
+    setWidth: (el, width) => {
+      if (shouldWrite(el, `width:${width}`)) el.style.width = width;
+    },
+    setStyleProp: (el, prop, value) => {
+      if (shouldWriteSlot(stylePropCache, el, prop, value)) el.style.setProperty(prop, value);
+    },
+    toggleClass: (el, cls, on) => {
+      if (shouldWriteSlot(classCache, el, cls, on ? 'on' : 'off')) el.classList.toggle(cls, on);
+    },
+    setAttr: (el, name, value) => {
+      if (shouldWriteSlot(attrCache, el, name, value)) el.setAttribute(name, value);
+    },
   };
 }

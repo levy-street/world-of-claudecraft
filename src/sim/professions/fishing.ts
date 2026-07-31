@@ -237,7 +237,7 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   if (canGatherTier(rodTier, 3)) allowedBand = 2;
   const profBand = fishingBandFor(meta.gatheringProficiency.fishing ?? 0);
   const bandTables = FISHING_TABLES_BY_BAND[Math.min(profBand, allowedBand) as 0 | 1 | 2];
-  const table = bandTables[zoneAt(p.pos.z).id] ?? bandTables.eastbrook_vale;
+  const table = bandTables[zoneAt(p.pos.x, p.pos.z).id] ?? bandTables.eastbrook_vale;
   const total = table.reduce((sum, e) => sum + e.weight, 0);
   let roll = ctx.rng.next() * total;
   let caught: string | null = null;
@@ -289,7 +289,7 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   });
   // Book of Deeds: a real fish (never weeds or boots) from this zone's
   // waters feeds the per-zone first-cast mark.
-  onFishCaughtForDeeds(ctx, meta, zoneAt(p.pos.z).id, caught);
+  onFishCaughtForDeeds(ctx, meta, zoneAt(p.pos.x, p.pos.z).id, caught);
   // Fishing proficiency: a landed catch accrues the fractional
   // schedule amount (fishingCatchGain above, junk cut off past band 0) through
   // the shared gathering-grant queue, draining on the tick path exactly like a

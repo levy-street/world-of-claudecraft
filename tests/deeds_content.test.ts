@@ -17,6 +17,7 @@ import {
   GATHERING_PROFESSION_IDS,
   GATHERING_PROFESSIONS,
 } from '../src/sim/content/professions';
+import { RIFT_MOBS } from '../src/sim/content/rift/mobs';
 import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
 import { YUMI_TEMPLATE_ID } from '../src/sim/content/yumi';
 import {
@@ -35,6 +36,7 @@ import {
   MILESTONE_DEED_TO_LEGACY,
   VISITED_MARK_NAMESPACES,
 } from '../src/sim/deeds';
+import { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from '../src/sim/rift/rift_gen';
 import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
 
 const ALL = DEED_ORDER.map((id) => DEEDS[id]);
@@ -54,9 +56,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 219 deeds worth 2710 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(223);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2795);
+  it('ships exactly 225 deeds worth 2815 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(225);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2815);
   });
 
   it('ships the audited per-category counts', () => {
@@ -65,7 +67,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(byCategory).toEqual({
       progression: 50,
       combat: 10,
-      dungeon: 27,
+      dungeon: 29,
       delve: 13,
       chronicle: 24,
       collection: 28,
@@ -116,12 +118,23 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_perfect_specimen',
       'soc_first_salvage',
       'soc_salvage_50',
+      // The Wildheart Basin dungeon deeds append after the
+      // Professions 2.0 tail (the release base merge put that tail first).
+      'dgn_wildheart_basin',
+      'dgn_wildheart_basin_heroic',
       // Thornhollow Fields battleground tail (order-pinned like the blocks above).
       'pvp_bg_first_capture',
       'pvp_bg_first_win',
       'pvp_bg_wins_25',
       'pvp_bg_captures_100',
     ]);
+    expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
+    expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
+    expect(DEEDS.dgn_wildheart_basin.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'wildheart_basin',
+      count: 1,
+    });
     expect(DEEDS.prog_crown_below.renown).toBe(25);
     expect(DEEDS.prog_mere_at_rest.renown).toBe(25);
     expect(DEEDS.prog_callused_hands.renown).toBe(5);
@@ -275,7 +288,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.prog_ringwright).toBeUndefined();
   });
 
-  it('ships exactly 30 titles and 3 borders', () => {
+  it('ships exactly 31 titles and 3 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
     expect(titles.length).toBe(31);
@@ -318,7 +331,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // milestones, the rare-find quartet, and the salvage pair). No shipped
   // trigger or renown changed; prog_master_gatherer had only its English desc
   // reworded, which this digest deliberately does not cover.
-  const FROZEN_CATALOG_SHA256 = '40acc1e99dc16482b20c4b1df61d7f31fdd993de2257177502930f62dca4914e';
+  // Re-baselined at the release/v0.30.0 base merge: the catalog appends the
+  // Wildheart Basin dungeon deed pair (2 new deeds); no shipped
+  // trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '47d167bf142e38ef1f071023f46088191359d61cf0cf2675540b45280ddb9a98';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -412,23 +428,30 @@ describe('retro fallback proof sets stay anchored to the real tables', () => {
     expect(retroArm).toContain("'prog_guildsworn'");
   });
 
-  it('the creditable mob-level ceiling is the heroic pin', () => {
+  it('the creditable mob-level ceiling is the S-rank rift pin', () => {
     // Giantslayer's stranded heal keys on the highest level a creditable mob
-    // can ever spawn at. Heroic instances pin every mob to one shared level;
-    // outside heroic no spawnable template exceeds the player cap. The only
-    // templates authored above the ceiling can never be credited: warlock
-    // and mage pets sync to their owner's level and die outside kill credit
-    // (combat/damage.ts owned-pet early return), and the Yumi cat's damage
-    // is intercepted before the death path (social/yumi.ts).
+    // can ever spawn at. S-rank rift floors run mobs up to RIFT_MAX_MOB_LEVEL
+    // (the game-wide ceiling; at 23 the +5-level kill is out of reach at the
+    // level-20 cap, so capped players take the stranded retro-grant instead);
+    // heroic instances pin every mob to one shared level below it; outside
+    // those no spawnable template exceeds the player cap. The only templates
+    // authored above the ceiling can never be credited: warlock and mage pets
+    // sync to their owner's level and die outside kill credit (combat/damage.ts
+    // owned-pet early return), and the Yumi cat's damage is intercepted before
+    // the death path (social/yumi.ts).
     const heroicLevels = Object.values(HEROIC_DUNGEON_TUNING).map((t) => t.level);
-    expect(Math.max(...heroicLevels)).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    expect(RIFT_MAX_MOB_LEVEL).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    expect(Math.max(...heroicLevels)).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
+    expect(RIFT_LEVEL_CAP).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
     const neverCreditable = new Set([
       ...Object.keys(WARLOCK_PET_MOBS),
       ...Object.keys(MAGE_PET_MOBS),
       YUMI_TEMPLATE_ID,
     ]);
+    const dynamicallyLevelCapped = new Set(Object.keys(RIFT_MOBS));
     for (const [id, m] of Object.entries(MOBS)) {
-      if (m.dummy || m.worldBoss || neverCreditable.has(id)) continue;
+      if (m.dummy || m.worldBoss || neverCreditable.has(id) || dynamicallyLevelCapped.has(id))
+        continue;
       expect(m.maxLevel, id).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
     }
     // Delve spawns bypass maxLevel: the live level is minLevel plus the
@@ -448,7 +471,7 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and pvp_bg_captures_100
+    // literals: prog_first_steps opens the catalog and soc_salvage_50
     // closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.

@@ -2218,6 +2218,29 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'stat', stat: 'salvagesPerformed', count: 50 },
   },
 
+  // Wildheart Basin (Palmreach). New records stay at the append-only tail.
+  dgn_wildheart_basin: {
+    id: 'dgn_wildheart_basin',
+    name: 'The Basin Bites Back',
+    desc: 'Defeat Zulgar, Voice of the Basin in the Wildheart Basin.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'dungeonClears', dungeonId: 'wildheart_basin', count: 1 },
+  },
+  dgn_wildheart_basin_heroic: {
+    id: 'dgn_wildheart_basin_heroic',
+    name: 'Heroic: The Wildheart Basin',
+    desc: 'Defeat Zulgar, Voice of the Basin in the Wildheart Basin on Heroic difficulty.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: {
+      kind: 'dungeonClears',
+      dungeonId: 'wildheart_basin',
+      difficulty: 'heroic',
+      count: 1,
+    },
+  },
+
   // --- Thornhollow Fields, the 5v5 capture-the-flag battleground (src/sim/social/
   // battleground.ts). Meters read the persisted PlayerMeta standing (bgWins /
   // bgCaptures), so they count OUTCOMES, never attendance (rule 6), and
@@ -2232,7 +2255,7 @@ export const DEEDS: Record<string, DeedDef> = {
   },
   pvp_bg_first_win: {
     id: 'pvp_bg_first_win',
-    name: 'The Rift Holds',
+    name: 'The Hollow Holds',
     desc: 'Win a Thornhollow Fields battleground.',
     category: 'pvp',
     renown: 5,
@@ -2240,7 +2263,7 @@ export const DEEDS: Record<string, DeedDef> = {
   },
   pvp_bg_wins_25: {
     id: 'pvp_bg_wins_25',
-    name: 'Warden of the Rift',
+    name: 'Warden of the Hollow',
     desc: 'Win 25 Thornhollow Fields battlegrounds.',
     category: 'pvp',
     renown: 25,
@@ -2255,6 +2278,7 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 50,
     trigger: { kind: 'meter', meter: 'bgCaptures', amount: 100 },
   },
+
 };
 
 for (const def of Object.values(DEEDS)) {

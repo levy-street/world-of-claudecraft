@@ -10,8 +10,9 @@ function rig(
   level: number,
   rows: Record<number, string>,
   spec: string | null = null,
+  seed = 1,
 ) {
-  const sim = new Sim({ seed: 17, playerClass: cls, autoEquip: true });
+  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
   sim.setPlayerLevel(level);
   expect(sim.applyTalents({ spec, rows })).toBe(true);
   const p = sim.player;
@@ -290,7 +291,9 @@ describe('warlock wave 2 choice rows', () => {
 
   it('Deepened Hex and defensive pact hooks change live combat outcomes', () => {
     const hit = (withDot: boolean) => {
-      const { sim } = rig('warlock', 20, { 14: 'wlk_r14_amplify_curse' });
+      // Seed hunted (post-merge camp order) so the level-20 bolt LANDS in both
+      // arms (a resist zeroes the delta and voids the ratio). Spares: 3, 4.
+      const { sim } = rig('warlock', 20, { 14: 'wlk_r14_amplify_curse' }, null, 2);
       const mob = addTargetMob(sim);
       if (withDot) {
         mob.auras.push({

@@ -50,6 +50,7 @@ import {
   questObjectiveRequired,
   xpForLevel,
 } from '../types';
+import { UNSTUCK_COOLDOWN_ID } from '../unstuck_cooldown';
 import { groundHeight } from '../world';
 
 const NEARBY_RANGE = 40; // /nearby scan radius — wider than say, tighter than yell
@@ -106,13 +107,16 @@ export function partyReadout(ctx: SimContext, pid: number): string {
 }
 // Self-only readout for "/zones": lists every overworld zone in travel order
 // (south -> north) with its level range, tagging the zone the player is in.
-// `currentZ` is the player's world Z (use zoneAt(currentZ) to find their zone).
+// `currentX`/`currentZ` are the player's world position (zoneAt picks their zone).
 // ZONES is the ordered ZoneDef[] from ./data; each has .name and
 // .levelRange = [min, max].
-export function zonesReadout(currentZ: number): string {
+export function zonesReadout(currentX: number, currentZ: number): string {
   if (ZONES.length === 0) return 'No zones are defined.';
-  const here = zoneAt(currentZ);
-  const parts = ZONES.map((z) => {
+  const here = zoneAt(currentX, currentZ);
+  // travel order, not append order: south to north, then west to east
+  // within a row (a column zone appends LAST for rng-stream stability)
+  const ordered = [...ZONES].sort((a, b) => a.zMin - b.zMin || (a.xMin ?? -180) - (b.xMin ?? -180));
+  const parts = ordered.map((z) => {
     const line = `${z.name} (Lvl ${z.levelRange[0]}-${z.levelRange[1]})`;
     return z.id === here.id ? `${line} [you are here]` : line;
   });
@@ -167,7 +171,7 @@ export function combatReadout(e: Entity): string {
 // door zone via zoneAt — no new fields.
 export function dungeonsReadout(): string {
   const parts = DUNGEON_LIST.map(
-    (d) => `${d.name} (${zoneAt(d.doorPos.z).name}, ${d.suggestedPlayers} players)`,
+    (d) => `${d.name} (${zoneAt(d.doorPos.x, d.doorPos.z).name}, ${d.suggestedPlayers} players)`,
   );
   return `Dungeons (${parts.length}): ${parts.join(', ')}.`;
 }
@@ -195,7 +199,7 @@ export function considerReadout(ctx: SimContext, self: Entity): string {
 // (the same labels the HUD pins on the map) and your live position — no new
 // fields.
 export function poisReadout(self: Entity): string {
-  const zone = zoneAt(self.pos.z);
+  const zone = zoneAt(self.pos.x, self.pos.z);
   if (zone.pois.length === 0) return `${zone.name} has no notable landmarks.`;
   const parts = zone.pois
     .map((p) => ({ label: p.label, d: dist2d(self.pos, { x: p.x, y: 0, z: p.z }) }))
@@ -409,10 +413,11 @@ function auraLabel(a: Aura): string {
 // remainder showing as "(1s)", matching how /buffs renders aura timers.
 //
 export function cooldownsReadout(e: Entity): string {
-  if (e.cooldowns.size === 0) return 'No abilities are on cooldown.';
   const parts = [...e.cooldowns]
+    .filter(([id]) => id !== UNSTUCK_COOLDOWN_ID)
     .sort((a, b) => a[1] - b[1])
     .map(([id, remaining]) => `${ABILITIES[id]?.name ?? id} (${Math.ceil(remaining)}s)`);
+  if (parts.length === 0) return 'No abilities are on cooldown.';
   return `Abilities on cooldown (${parts.length}): ${parts.join(', ')}.`;
 }
 // Self-only readout of the active quest log: one entry per tracked quest with

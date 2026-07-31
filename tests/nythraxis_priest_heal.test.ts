@@ -42,7 +42,16 @@ function tickOneChannel(sim: Sim, malric: Entity, boss: Entity, maxTicks = 90): 
   const before = boss.hp;
   for (let i = 0; i < maxTicks; i++) {
     inner(sim).updateBossMechanics(malric);
-    if (boss.hp > before) return boss.hp - before;
+    const events = sim.drainEvents();
+    if (boss.hp > before) {
+      const gained = boss.hp - before;
+      // applyHeal rolls the shared 5%-floor spell-crit die, so any single
+      // channel tick can crit (x1.5) depending on the world's rng stream;
+      // normalize it away so the pins assert the authored base/ramp values,
+      // not the roll (the heal event carries the crit flag).
+      const crit = events.some((e) => e.type === 'heal2' && e.crit === true);
+      return crit ? Math.round(gained / 1.5) : gained;
+    }
   }
   return boss.hp - before;
 }

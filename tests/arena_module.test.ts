@@ -5,16 +5,33 @@
 // bout (to a defeat and to a timeout draw) behind the seam without Sim's delegates.
 
 import { describe, expect, it } from 'vitest';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import * as arena from '../src/sim/social/arena';
 import { ARENA_BASE_RATING, eloDelta } from '../src/sim/social/arena';
+import type { WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 type AnySim = Sim & Record<string, any>;
 
+// Arena bouts are resolved entirely between the two queued players; no assertion
+// reads ambient world content, so strip camps/npcs/ground objects to keep each
+// matchmaking tick cheap (the fiesta/yumi subsystem-world pattern).
+const ARENA_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld(): AnySim {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true }) as AnySim;
+  return new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: ARENA_TEST_WORLD,
+  }) as AnySim;
 }
 
 function teleport(sim: AnySim, pid: number, x: number, z: number): void {

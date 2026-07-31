@@ -9,8 +9,17 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). The market draws NO rng.
 
+import { bagCapacity, canGrantCopies, instancedCountCap } from './bags';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
+import {
+  countMatchingUnlocked,
+  grantCopies,
+  holdsMatchingLocked,
+  publicInstanceView,
+  removeMatchingInstance,
+  sanitizeEscrowSlot,
+} from './item_instance_transfer';
 import { planListingIds, playerListingIdFloor } from './market_listing_ids';
 import {
   MARKET_PAGE_SIZE,
@@ -20,12 +29,62 @@ import {
 } from './market_query';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
+import {
+  cloneInvSlot,
+  cloneItemInstancePayload,
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  type ItemInstancePayload,
+} from './types';
 
 const MARKET_RANGE = INTERACT_RANGE + 2; // you must stand at the Merchant to deal
 // the /listings readout (still on Sim) reports the seller's count against this cap,
 // so it is the one const exported back to sim.ts; the rest are market-internal.
 export const MARKET_MAX_LISTINGS = 12; // active player listings per seller
+export const MARKET_HOUSE_STOCK = [
+  { itemId: 'roasted_boar', count: 5, price: 700 },
+  { itemId: 'spring_water', count: 5, price: 160 },
+  { itemId: 'oiled_boots', count: 1, price: 1900 },
+  { itemId: 'quilted_trousers', count: 1, price: 2400 },
+  { itemId: 'greyjaw_pelt_cloak', count: 1, price: 2900 },
+  // Quartermaster's Consignment - a standing line of practical travel gear.
+  { itemId: 'roadwardens_helm', count: 1, price: 2200 },
+  { itemId: 'wayfarers_hood', count: 1, price: 2000 },
+  { itemId: 'acolytes_circlet', count: 1, price: 2000 },
+  { itemId: 'reinforced_pauldrons', count: 1, price: 2400 },
+  { itemId: 'embroidered_mantle', count: 1, price: 1900 },
+  { itemId: 'sturdy_belt', count: 1, price: 1700 },
+  { itemId: 'silk_sash', count: 1, price: 1700 },
+  { itemId: 'roughspun_gloves', count: 1, price: 1500 },
+  // Crossroads Outfitters - eight pieces kept in standing stock.
+  { itemId: 'tradesman_hatchet', count: 1, price: 2300 },
+  { itemId: 'drovers_staff', count: 1, price: 2500 },
+  { itemId: 'caravan_warden_dirk', count: 1, price: 2400 },
+  { itemId: 'outrider_brigandine', count: 1, price: 2600 },
+  { itemId: 'caravan_quilted_vest', count: 1, price: 1800 },
+  { itemId: 'outrider_legguards', count: 1, price: 2100 },
+  { itemId: 'pilgrims_leggings', count: 1, price: 1700 },
+  { itemId: 'outrider_sabatons', count: 1, price: 1900 },
+  // The two vendor-sold bags, at their vendor price, so the Bags filter is never
+  // empty on a fresh world. The four drop-only bags stay player-listed goods:
+  // house rows never deplete, so seeding those would be an endless bag faucet.
+  //
+  // APPENDED, never inserted mid-array: ids come off one counter in array order
+  // (below), house rows are reseeded every boot and are NOT persisted, and
+  // `market_buy` carries only the listing id with no item cross-check. Inserting
+  // here would renumber every row after it, so a client holding a browse list
+  // across a server restart could click Buy on a row that now means a different
+  // item. Appending leaves every existing id pointing at the same goods.
+  // (Growing this table is otherwise content-safe now: the counter is floored
+  // to the reserved player base below, so no id this build issues a player
+  // listing can ever be reached by stock, and an id a pre-#2463 build issued
+  // below that base is reissued by the load path in the same boot the table
+  // grows over it. See market_listing_ids.ts, #2463.)
+  { itemId: 'linen_pouch', count: 1, price: 250 },
+  { itemId: 'travelers_knapsack', count: 1, price: 2000 },
+] as const;
 const MARKET_MIN_PRICE = 1; // copper
 const MARKET_MAX_PRICE = 5_000_000; // 500g ceiling, guards against overflow / fat-finger
 // Exported for the wiki generator (scripts/wiki/build_content.mjs) and its
@@ -47,6 +106,11 @@ export interface MarketListing {
   price: number; // total copper buyout for the whole stack
   expiresAt: number; // sim.time seconds; Infinity for the Merchant's own stock
   house: boolean; // the Merchant's standing stock: never expires, never depletes, pays no one
+  /** The escrowed copy's full payload for an instanced listing (#1165
+   *  completion: single-copy, count 1, listed via marketListInstance). Absent
+   *  for the plain fungible listings, whose rows stay byte-identical. Wire
+   *  browse rows carry only its publicInstanceView projection. */
+  instance?: ItemInstancePayload;
 }
 
 // Gold + items awaiting pickup at the Merchant (sale proceeds, expired
@@ -68,6 +132,9 @@ export interface MarketSave {
     count: number;
     price: number;
     secondsLeft: number;
+    /** Additive (#1165): the escrowed payload of an instanced listing. Absent
+     *  on plain rows and on every pre-payload save, which load unchanged. */
+    instance?: ItemInstancePayload;
   }[];
   collections: { key: string; copper: number; items: InvSlot[] }[];
   nextListingId: number;
@@ -141,7 +208,9 @@ export class Market {
     if (!from) return false;
     const to = this.collectionFor(toKey);
     to.copper += from.copper;
-    to.items.push(...from.items.map((s) => ({ ...s })));
+    // cloneInvSlot: an instanced return's payload must never alias between the
+    // merged-away bucket and the surviving one.
+    to.items.push(...from.items.map(cloneInvSlot));
     this.marketCollections.delete(fromKey);
     return true;
   }
@@ -175,49 +244,7 @@ export class Market {
   // The Merchant always keeps a little stock so the market is never empty —
   // standing consignments that never expire, never deplete, and pay no one.
   private seedHouseListings(): void {
-    const stock: { itemId: string; count: number; price: number }[] = [
-      { itemId: 'roasted_boar', count: 5, price: 700 },
-      { itemId: 'spring_water', count: 5, price: 160 },
-      { itemId: 'oiled_boots', count: 1, price: 1900 },
-      { itemId: 'quilted_trousers', count: 1, price: 2400 },
-      { itemId: 'greyjaw_pelt_cloak', count: 1, price: 2900 },
-      // Quartermaster's Consignment — a standing line of practical travel gear.
-      { itemId: 'roadwardens_helm', count: 1, price: 2200 },
-      { itemId: 'wayfarers_hood', count: 1, price: 2000 },
-      { itemId: 'acolytes_circlet', count: 1, price: 2000 },
-      { itemId: 'reinforced_pauldrons', count: 1, price: 2400 },
-      { itemId: 'embroidered_mantle', count: 1, price: 1900 },
-      { itemId: 'sturdy_belt', count: 1, price: 1700 },
-      { itemId: 'silk_sash', count: 1, price: 1700 },
-      { itemId: 'roughspun_gloves', count: 1, price: 1500 },
-      // Crossroads Outfitters — eight pieces kept in standing stock
-      { itemId: 'tradesman_hatchet', count: 1, price: 2300 },
-      { itemId: 'drovers_staff', count: 1, price: 2500 },
-      { itemId: 'caravan_warden_dirk', count: 1, price: 2400 },
-      { itemId: 'outrider_brigandine', count: 1, price: 2600 },
-      { itemId: 'caravan_quilted_vest', count: 1, price: 1800 },
-      { itemId: 'outrider_legguards', count: 1, price: 2100 },
-      { itemId: 'pilgrims_leggings', count: 1, price: 1700 },
-      { itemId: 'outrider_sabatons', count: 1, price: 1900 },
-      // The two vendor-sold bags, at their vendor price, so the Bags filter is never
-      // empty on a fresh world. The four drop-only bags stay player-listed goods:
-      // house rows never deplete, so seeding those would be an endless bag faucet.
-      //
-      // APPENDED, never inserted mid-array: ids come off one counter in array order
-      // (below), house rows are reseeded every boot and are NOT persisted, and
-      // `market_buy` carries only the listing id with no item cross-check. Inserting
-      // here would renumber every row after it, so a client holding a browse list
-      // across a server restart could click Buy on a row that now means a different
-      // item. Appending leaves every existing id pointing at the same goods.
-      // (Growing this table is otherwise content-safe now: the counter is floored
-      // to the reserved player base below, so no id this build issues a player
-      // listing can ever be reached by stock, and an id a pre-#2463 build issued
-      // below that base is reissued by the load path in the same boot the table
-      // grows over it. See market_listing_ids.ts, #2463.)
-      { itemId: 'linen_pouch', count: 1, price: 250 },
-      { itemId: 'travelers_knapsack', count: 1, price: 2000 },
-    ];
-    for (const s of stock) {
+    for (const s of MARKET_HOUSE_STOCK) {
       if (!ITEMS[s.itemId]) continue;
       this.marketListings.push({
         id: this.nextListingId++,
@@ -272,9 +299,9 @@ export class Market {
       return;
     }
     const want = Math.max(1, Math.floor(count));
-    // Per-instance copies (#1165: signer/charges/rolled/boundTo) are inert on the
-    // World Market for now: count and escrow only the fungible stock, so a signed
-    // or bound item is never swept into a listing. (#1146 wires real handling later.)
+    // The PLAIN fungible path: counts and escrows only the fungible stock, so
+    // an instanced copy is never swept into a bulk listing. Instanced copies
+    // list through marketListInstance below (single-copy, payload-selected).
     if (this.ctx.countFungibleItem(itemId, meta.entityId) < want) {
       this.ctx.error(meta.entityId, 'You do not have that many to sell.');
       return;
@@ -319,6 +346,89 @@ export class Market {
     });
   }
 
+  // List ONE instanced copy (#1165 completion): a signed, enchanted, masterwork,
+  // or otherwise payload-carrying copy that is NOT transfer-locked (armed
+  // bindOnTrade or bound boundTo copies never ride an anonymous pipe; the
+  // def-level quest/soulbound/noMarketList rules are unchanged). The copy is
+  // named by its payload, never a bag index, so a reshuffle between staging and
+  // submit cannot redirect the escrow; what enters the book is the payload of
+  // the actual copy removed from the bags (removeMatchingInstance's contract),
+  // never the wire needle. Single-copy by design: count 1, one listing per
+  // copy. The plain fungible path (marketList above) stays byte-identical.
+  marketListInstance(
+    itemId: string,
+    price: number,
+    instance: ItemInstancePayload,
+    pid?: number,
+  ): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    if (p.dead) return;
+    if (instance === null || typeof instance !== 'object') return;
+    if (!this.nearMerchant(p)) {
+      this.ctx.error(meta.entityId, 'You must bring your goods to the Merchant.');
+      return;
+    }
+    const def = ITEMS[itemId];
+    if (!def) return;
+    if (def.kind === 'quest') {
+      this.ctx.error(meta.entityId, 'The Merchant will not broker quest items.');
+      return;
+    }
+    if (def.noMarketList || def.soulbound) {
+      this.ctx.error(meta.entityId, 'That item cannot be listed on the World Market.');
+      return;
+    }
+    if (countMatchingUnlocked(meta, itemId, instance) < 1) {
+      if (holdsMatchingLocked(meta, itemId, instance)) {
+        this.ctx.error(meta.entityId, 'That item is bound and cannot be listed.');
+      } else {
+        this.ctx.error(meta.entityId, 'You do not have that many to sell.');
+      }
+      return;
+    }
+    const ask = Math.floor(price);
+    if (!Number.isFinite(ask) || ask < MARKET_MIN_PRICE) {
+      this.ctx.error(meta.entityId, 'Name a price of at least 1 copper.');
+      return;
+    }
+    if (ask > MARKET_MAX_PRICE) {
+      this.ctx.error(meta.entityId, 'That price is beyond what the Merchant will broker.');
+      return;
+    }
+    const sellerKey = this.marketSellerKey(meta);
+    const mine = this.marketListings.reduce(
+      (n, l) => n + (this.marketListingBelongsTo(l, meta) ? 1 : 0),
+      0,
+    );
+    if (mine >= MARKET_MAX_LISTINGS) {
+      this.ctx.error(
+        meta.entityId,
+        `You may keep at most ${MARKET_MAX_LISTINGS} goods on the market at once.`,
+      );
+      return;
+    }
+    const escrowed = removeMatchingInstance(this.ctx, itemId, instance, meta.entityId);
+    if (!escrowed) return; // revalidation raced away; nothing was removed
+    this.marketListings.push({
+      id: this.nextListingId++,
+      sellerKey,
+      sellerName: meta.name,
+      itemId,
+      count: 1,
+      price: ask,
+      expiresAt: this.ctx.time + MARKET_LISTING_DURATION,
+      house: false,
+      instance: escrowed,
+    });
+    this.ctx.emit({
+      type: 'loot',
+      text: `Listed ${def.name} on the World Market for ${formatMoney(ask)}.`,
+      pid: meta.entityId,
+    });
+  }
+
   // Buy a listing outright. Coin leaves the buyer, goods enter their bags, and
   // the seller's proceeds (less the Merchant's cut) wait in their collection.
   marketBuy(listingId: number, pid?: number): void {
@@ -352,12 +462,20 @@ export class Market {
       this.ctx.error(meta.entityId, 'You cannot afford that.');
       return;
     }
-    if (!this.ctx.canAddItem(listing.itemId, listing.count, meta.entityId)) {
+    if (
+      !canGrantCopies(
+        meta.inventory,
+        bagCapacity(meta.bags),
+        listing.itemId,
+        listing.count,
+        listing.instance,
+      )
+    ) {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
     meta.copper -= listing.price;
-    this.ctx.addItem(listing.itemId, listing.count, meta.entityId);
+    grantCopies(this.ctx, meta.entityId, listing.itemId, listing.count, listing.instance);
     if (!listing.house) {
       const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
       this.collectionFor(listing.sellerKey).copper += proceeds;
@@ -395,12 +513,20 @@ export class Market {
       this.ctx.error(meta.entityId, 'That is not your listing.');
       return;
     }
-    if (!this.ctx.canAddItem(listing.itemId, listing.count, meta.entityId)) {
+    if (
+      !canGrantCopies(
+        meta.inventory,
+        bagCapacity(meta.bags),
+        listing.itemId,
+        listing.count,
+        listing.instance,
+      )
+    ) {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
     this.marketListings.splice(idx, 1);
-    this.ctx.addItem(listing.itemId, listing.count, meta.entityId);
+    grantCopies(this.ctx, meta.entityId, listing.itemId, listing.count, listing.instance);
     const def = ITEMS[listing.itemId];
     this.ctx.emit({
       type: 'loot',
@@ -437,11 +563,12 @@ export class Market {
       col.copper = 0;
     }
     // Capacity gate: items that don't fit stay in the collection box (never
-    // destroyed); the gold above is always collected.
+    // destroyed); the gold above is always collected. Instance-aware on both
+    // arms so a returned instanced listing keeps its payload here too.
     const kept: typeof col.items = [];
     for (const s of col.items) {
-      if (this.ctx.canAddItem(s.itemId, s.count, meta.entityId)) {
-        this.ctx.addItem(s.itemId, s.count, meta.entityId);
+      if (canGrantCopies(meta.inventory, bagCapacity(meta.bags), s.itemId, s.count, s.instance)) {
+        grantCopies(this.ctx, meta.entityId, s.itemId, s.count, s.instance);
       } else {
         kept.push(s);
       }
@@ -461,7 +588,13 @@ export class Market {
       const l = this.marketListings[i];
       if (l.house || this.ctx.time < l.expiresAt) continue;
       this.marketListings.splice(i, 1);
-      this.collectionFor(l.sellerKey).items.push({ itemId: l.itemId, count: l.count });
+      // Conditional spread: a plain row must not grow an `instance: undefined`
+      // key (rows are persisted and diffed byte-for-byte).
+      this.collectionFor(l.sellerKey).items.push({
+        itemId: l.itemId,
+        count: l.count,
+        ...(l.instance ? { instance: l.instance } : {}),
+      });
       const sellerMeta = this.metaByMarketSellerKey(l.sellerKey);
       if (sellerMeta) {
         const def = ITEMS[l.itemId];
@@ -526,6 +659,11 @@ export class Market {
       price: l.price,
       mine: isMine(l),
       house: l.house,
+      // Display projection only (publicInstanceView: signer/enchant/rolled,
+      // never boundTo/bindOnTrade/charges): browse rows are other players'
+      // goods, so the full payload never crosses the wire. Conditional spread:
+      // plain rows stay byte-identical (no `instance: undefined` key).
+      ...(l.instance ? { instance: publicInstanceView(l.instance) } : {}),
     }));
     const col = this.collectionForSeller(meta);
     const myListingCount = this.marketListings.reduce(
@@ -541,7 +679,11 @@ export class Market {
       page,
       pageCount,
       collectionCopper: col?.copper ?? 0,
-      collectionItems: col ? col.items.map((s) => ({ ...s })) : [],
+      // cloneInvSlot, not a shallow spread: the offline host hands this array
+      // straight to the UI, and an aliased live payload (mutable rolled/charges
+      // maps) must never leak out of the escrow book. Own goods, so the full
+      // payload (not the public trim) is correct here, the self inv precedent.
+      collectionItems: col ? col.items.map(cloneInvSlot) : [],
       cutPct: Math.round(MARKET_CUT * 100),
       maxListings: MARKET_MAX_LISTINGS,
       myListingCount,
@@ -564,11 +706,16 @@ export class Market {
           secondsLeft: Number.isFinite(l.expiresAt)
             ? Math.max(0, Math.round(l.expiresAt - this.ctx.time))
             : MARKET_LISTING_DURATION,
+          // Deep-cloned (never spread): the save must not alias the live book's
+          // mutable rolled/charges maps. Conditional so plain rows are unchanged.
+          ...(l.instance ? { instance: cloneItemInstancePayload(l.instance) } : {}),
         })),
       collections: [...this.marketCollections.entries()].map(([key, c]) => ({
         key,
         copper: c.copper,
-        items: c.items.map((s) => ({ ...s })),
+        // cloneInvSlot, not a shallow spread: an instanced return's payload
+        // must not alias between the live collection and the serialized blob.
+        items: c.items.map(cloneInvSlot),
       })),
       nextListingId: this.nextListingId,
     };
@@ -606,12 +753,19 @@ export class Market {
       // corrected id rehydrates it. Display/buy paths already guard on ITEMS[id].
       if (!ITEMS[l.itemId])
         console.warn(`market: keeping listing with unknown item id ${l.itemId}`);
+      // A persisted instanced row rehydrates its payload (deep-cloned off the
+      // raw blob) and clamps to the single-copy contract: no hand-edited save
+      // can mint a counted stack of one escrowed special copy.
+      const instance =
+        l.instance && typeof l.instance === 'object'
+          ? cloneItemInstancePayload(l.instance)
+          : undefined;
       this.marketListings.push({
         id: plan.ids[i],
         sellerKey: String(l.sellerKey ?? ''),
         sellerName: String(l.sellerName ?? l.sellerKey ?? '?'),
         itemId: l.itemId,
-        count: Math.max(1, l.count | 0),
+        count: instance ? 1 : Math.max(1, l.count | 0),
         price: Math.max(
           MARKET_MIN_PRICE,
           Math.min(MARKET_MAX_PRICE, Math.floor(l.price) || MARKET_MIN_PRICE),
@@ -620,6 +774,7 @@ export class Market {
           this.ctx.time +
           (Number.isFinite(l.secondsLeft) ? Math.max(0, l.secondsLeft) : MARKET_LISTING_DURATION),
         house: false,
+        ...(instance ? { instance } : {}),
       });
     }
     for (const c of save.collections ?? []) {
@@ -629,9 +784,11 @@ export class Market {
         // Keep returned/expired-listing items even when their id is unknown, for
         // the same reason as listings above: a content edit must not silently
         // empty a player's pending pickups. The id stays dormant until corrected.
+        // sanitizeEscrowSlot preserves an instanced return's payload and clamps
+        // its count to the identical-payload merge cap (the character-load rule).
         items: (c.items ?? [])
           .filter((s) => s && typeof s.itemId === 'string')
-          .map((s) => ({ itemId: s.itemId, count: Math.max(1, s.count | 0) })),
+          .map((s) => sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance))),
       });
     }
     this.nextListingId = plan.nextListingId;
@@ -660,7 +817,11 @@ export class Market {
       const l = this.marketListings[i];
       if (l.house || !ITEMS[l.itemId]?.soulbound) continue;
       this.marketListings.splice(i, 1);
-      this.collectionFor(l.sellerKey).items.push({ itemId: l.itemId, count: l.count });
+      this.collectionFor(l.sellerKey).items.push({
+        itemId: l.itemId,
+        count: l.count,
+        ...(l.instance ? { instance: l.instance } : {}),
+      });
     }
   }
 }

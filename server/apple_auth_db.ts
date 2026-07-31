@@ -91,17 +91,6 @@ export async function accountForApple(pool: Pool, subject: string): Promise<numb
   return result.rows[0]?.account_id ?? null;
 }
 
-export async function deleteUnusedAppleProvision(pool: Pool, accountId: number): Promise<void> {
-  await pool.query(
-    `DELETE FROM accounts a
-      WHERE a.id = $1 AND a.password_set = FALSE
-        AND NOT EXISTS (SELECT 1 FROM auth_tokens t WHERE t.account_id = a.id)
-        AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.account_id = a.id)
-        AND NOT EXISTS (SELECT 1 FROM apple_auth_links l WHERE l.account_id = a.id)`,
-    [accountId],
-  );
-}
-
 export async function linkAppleAccount(
   pool: Pool,
   accountId: number,

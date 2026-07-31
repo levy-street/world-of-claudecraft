@@ -24,12 +24,8 @@ const entrySource = `
   export { CLASSES, ABILITIES } from './src/sim/content/classes.ts';
   export { TALENTS } from './src/sim/content/talents.ts';
   export { ALL_CLASSES, FISHING_SESSION_CAP_SEC } from './src/sim/types.ts';
-  export { ZONES, DUNGEONS, MOBS, CAMPS, DELVE_LIST, NPCS, ITEMS, QUESTS } from './src/sim/data.ts';
+  export { ZONES, DUNGEONS, MOBS, CAMPS, DELVE_LIST, NPCS, ITEMS, QUESTS, zoneAt } from './src/sim/data.ts';
   export { WARLOCK_PET_MOBS } from './src/sim/content/warlock_pets.ts';
-  export { ZONE1_MOBS } from './src/sim/content/zone1.ts';
-  export { ZONE2_MOBS } from './src/sim/content/zone2.ts';
-  export { ZONE3_MOBS } from './src/sim/content/zone3.ts';
-  export { TEMPLE_MOBS } from './src/sim/content/temple.ts';
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
   export { DEEDS, DEED_ORDER } from './src/sim/content/deeds.ts';
   export { DEED_IMAGE_IDS } from './src/ui/deed_image_ids.ts';
@@ -92,6 +88,7 @@ const built = await esbuild.build({
 });
 const dataUrl = `data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`;
 const {
+  zoneAt,
   CLASSES,
   ABILITIES,
   TALENTS,
@@ -101,10 +98,6 @@ const {
   MOBS,
   CAMPS,
   WARLOCK_PET_MOBS,
-  ZONE1_MOBS,
-  ZONE2_MOBS,
-  ZONE3_MOBS,
-  TEMPLE_MOBS,
   DELVE_LIST,
   NPCS,
   DELVE_COMPANIONS,
@@ -347,6 +340,7 @@ const FAMILY_ORDER = [
   'undead',
   'elemental',
   'dragonkin',
+  'demon',
   'reptile',
 ];
 // A creature only belongs in the public bestiary if it actually spawns in the open world,
@@ -356,13 +350,13 @@ const FAMILY_ORDER = [
 const campedMobIds = new Set(CAMPS.map((c) => c.mobId));
 const publishedMobIds = new Set();
 const famMap = {};
-for (const [id, m] of Object.entries({
-  ...ZONE1_MOBS,
-  ...ZONE2_MOBS,
-  ...ZONE3_MOBS,
-  ...TEMPLE_MOBS,
-})) {
+// Enumerate the MERGED mob table (every zone module, old world and new-world realms
+// alike), not a hand-kept list of zone tables: the camp filter below already scopes
+// the bestiary to open-world wild creatures, and a new zone module then publishes
+// its residents without touching this generator.
+for (const [id, m] of Object.entries(MOBS)) {
   if (m.elite || m.boss) continue;
+  if (m.ambient) continue; // ambient decoration (stable horses), not a wild creature to fight
   if (id.startsWith('warlock_')) continue; // summoned pets, not wild creatures
   if (!campedMobIds.has(id)) continue; // summon-only encounter adds, never met in the open
   if (/vision/i.test(id) || /^Vision\b/.test(m.name)) continue; // cinematic apparitions, not creatures
@@ -396,12 +390,15 @@ const families = FAMILY_ORDER.filter((f) => famMap[f]).map((f) => ({
 // center z falls inside exactly one zone's z-band), never from level-band overlap: a
 // creature whose levels straddle a zone border is not a resident of a zone it has no
 // camp in. Drives the world page's "who you will meet" cross-links.
-const zoneIdForZ = (zv) => ZONES.find((z) => zv >= z.zMin && zv <= z.zMax)?.id ?? null;
+// Zones live on a 2D atlas grid (east columns share z-bands with west realms), so a
+// camp resolves through the sim's own authoritative zoneAt (exclusive max edges,
+// column ordering), never a re-derived rectangle scan.
+const zoneIdForXZ = (xv, zv) => zoneAt(xv, zv)?.id ?? null;
 const familiesByZone = {};
 for (const c of CAMPS) {
   const m = MOBS[c.mobId];
   if (!m || !publishedMobIds.has(c.mobId)) continue; // only bestiary-published creatures
-  const zid = zoneIdForZ(c.center.z);
+  const zid = zoneIdForXZ(c.center.x, c.center.z);
   if (!zid) continue;
   familiesByZone[zid] ??= new Set();
   familiesByZone[zid].add(m.family);

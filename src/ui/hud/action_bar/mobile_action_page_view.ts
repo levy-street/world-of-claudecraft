@@ -9,7 +9,11 @@
 // desktop rows. Seven pages of five expose slots 1 to 33; the last page has two
 // empty tail positions because the ring keeps a stable five-button geometry.
 
-import { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
+import {
+  ACTION_BAR_ABILITY_SLOTS,
+  ACTION_BAR_ABILITY_SLOTS_PER_ROW,
+} from './action_bar_layout_core';
+import type { ActionBarVisibility } from './action_bar_visibility_core';
 
 /** Ring buttons per page (the 5 visible action slots; attack is separate, fixed,
  *  and outside the paging system entirely). */
@@ -23,6 +27,14 @@ export const MOBILE_ACTION_SOURCE_SLOT_COUNT = ACTION_BAR_ABILITY_SLOTS;
 export const MOBILE_ACTION_PAGE_COUNT = Math.ceil(
   MOBILE_ACTION_SOURCE_SLOT_COUNT / MOBILE_ACTIONS_PER_PAGE,
 );
+
+/** The number of hotbar source slots reachable through mobile paging for the
+ *  currently visible action-bar rows. Hidden optional desktop rows stay hidden
+ *  from the mobile page cycle too. */
+export function mobileActionSourceSlotCount(visibility: ActionBarVisibility): number {
+  if (!visibility.secondary) return ACTION_BAR_ABILITY_SLOTS_PER_ROW;
+  return visibility.third ? ACTION_BAR_ABILITY_SLOTS : ACTION_BAR_ABILITY_SLOTS_PER_ROW * 2;
+}
 
 /** Number of pages needed to cover `totalSlots` source slots at
  *  MOBILE_ACTIONS_PER_PAGE per page, rounded up. Parameterized so callers can

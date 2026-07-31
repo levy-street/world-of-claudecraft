@@ -8,8 +8,12 @@ import {
 
 function installStorage(): void {
   const map = new Map<string, string>();
-  (globalThis as any).localStorage = {
-    getItem: (k: string) => (map.has(k) ? map.get(k)! : null),
+  const storage: Storage = {
+    get length() {
+      return map.size;
+    },
+    key: (index: number) => Array.from(map.keys())[index] ?? null,
+    getItem: (k: string) => map.get(k) ?? null,
     setItem: (k: string, v: string) => {
       map.set(k, v);
     },
@@ -18,9 +22,40 @@ function installStorage(): void {
     },
     clear: () => map.clear(),
   };
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: storage,
+  });
 }
 
-beforeEach(() => installStorage());
+function installTouchDefault(matches: boolean): void {
+  if (typeof window === 'undefined') {
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: {},
+    });
+  }
+  if (typeof document !== 'undefined') document.body.classList.remove('native-app');
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    value: (query: string) =>
+      ({
+        matches,
+        media: query,
+        onchange: null,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+        addListener: () => undefined,
+        removeListener: () => undefined,
+        dispatchEvent: () => false,
+      }) as MediaQueryList,
+  });
+}
+
+beforeEach(() => {
+  installStorage();
+  installTouchDefault(false);
+});
 
 describe('Settings', () => {
   it('defaults fresh sessions and initial logins to the medium graphics preset', () => {
@@ -185,6 +220,33 @@ describe('Settings', () => {
 
     fresh.set('showOwnNameplate', false);
     expect(new Settings().get('showOwnNameplate')).toBe(false);
+  });
+
+  it('defaults other-player nameplates off for fresh mobile sessions', () => {
+    installTouchDefault(true);
+
+    const fresh = new Settings();
+
+    expect(localStorage.getItem('woc_settings')).toBeNull();
+    expect(fresh.get('showPlayerNameplates')).toBe(false);
+  });
+
+  it('keeps other-player nameplates on by default for fresh desktop sessions', () => {
+    const fresh = new Settings();
+
+    expect(localStorage.getItem('woc_settings')).toBeNull();
+    expect(fresh.get('showPlayerNameplates')).toBe(true);
+  });
+
+  it('lets saved other-player nameplate preferences override the device default', () => {
+    installTouchDefault(true);
+    localStorage.setItem('woc_settings', JSON.stringify({ showPlayerNameplates: true }));
+    expect(new Settings().get('showPlayerNameplates')).toBe(true);
+
+    installStorage();
+    installTouchDefault(false);
+    localStorage.setItem('woc_settings', JSON.stringify({ showPlayerNameplates: false }));
+    expect(new Settings().get('showPlayerNameplates')).toBe(false);
   });
 
   it('defaults footstep sounds off and persists re-enabling across instances', () => {

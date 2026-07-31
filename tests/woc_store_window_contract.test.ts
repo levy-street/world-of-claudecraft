@@ -98,6 +98,12 @@ describe('WOC Store window contract', () => {
     );
   });
 
+  it('hydrates repeated class portraits without embedding their data URLs in store markup', () => {
+    expect(storeWindow).toContain('deferSource: true');
+    expect(storeWindow).toContain('hydratePortraits(body)');
+    expect(storeWindow).toContain('decoding="async"');
+  });
+
   it('keeps the Claudium window focused on currency purchases', () => {
     expect(claudiumWindow).not.toContain('private storeHtml(');
     expect(claudiumWindow).not.toContain('data-item=');

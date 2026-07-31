@@ -310,10 +310,6 @@ describe('handleMetrics', () => {
 // /metrics all answer before touching it.
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase23_health';
 
-// routeHttpRequest is synchronous fire-and-forget (void handleMetrics(...)), so a
-// dispatch must poll res.writableEnded before the captured body is readable.
-const MAX_POLL_TICKS = 5000;
-
 type MainModule = typeof import('../../../server/main');
 let main: MainModule;
 let savedNodeEnv: string | undefined;
@@ -329,7 +325,7 @@ afterAll(() => {
   else process.env.NODE_ENV = savedNodeEnv;
 });
 
-/** Drive the real routeHttpRequest under `mode` and poll until the response ends. */
+/** Drive the real routeHttpRequest under `mode` and await its end signal. */
 async function driveRoute(
   mode: 'legacy' | 'new',
   opts: { method?: string; url: string },
@@ -338,11 +334,7 @@ async function driveRoute(
   const req = makeReq(opts);
   const res = new FakeRes();
   main.routeHttpRequest(req, res as unknown as http.ServerResponse);
-  let ticks = 0;
-  while (!res.writableEnded) {
-    if (ticks++ > MAX_POLL_TICKS) throw new Error('response never ended');
-    await new Promise((r) => setImmediate(r));
-  }
+  await res.waitForEnd();
   return res;
 }
 

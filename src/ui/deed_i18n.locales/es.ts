@@ -817,6 +817,14 @@ export const table: DeedLocaleTable = {
     name: 'El taller del desmontador',
     desc: 'Desguaza 50 piezas de equipo para recuperar sus materiales en bruto.',
   },
+  dgn_wildheart_basin: {
+    name: 'La cuenca contraataca',
+    desc: 'Derrota a Zulgar, Voz de la Cuenca, en la Cuenca del Corazón Salvaje.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroico: La Cuenca del Corazón Salvaje',
+    desc: 'Derrota a Zulgar, Voz de la Cuenca, en la Cuenca del Corazón Salvaje en dificultad heroica.',
+  },
 };
 
 // es_ES rides this base table plus the delve-vocabulary override layer

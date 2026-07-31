@@ -10,7 +10,8 @@
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { type BagCells, layoutBagCells } from '../sim/inventory_order';
-import type { InvSlot } from '../sim/types';
+import { isTransferLockedInstance } from '../sim/item_instance_transfer';
+import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import {
   applyBagFilter,
   type BagFilterState,
@@ -31,6 +32,8 @@ export interface BagItemInfo {
   noDiscard?: boolean;
   /** Bound to its owner: cannot be traded, mailed, listed, or sold. */
   soulbound?: boolean;
+  /** The catalog mount a kind:'mount' reins item owns (see MountItemDef). */
+  mount?: string;
 }
 
 /** The open-window modes that change what a bag click does. At most one is the
@@ -56,9 +59,11 @@ export type BagAction =
   | 'trade'
   | 'mailAttach'
   | 'mailAttachBlocked'
+  | 'mailAttachBlockedBound'
   | 'marketSell'
   | 'marketSellBlockedQuest'
   | 'marketSellBlockedNoMarket'
+  | 'marketSellBlockedBound'
   | 'vendorSell'
   | 'bankDeposit'
   | 'bankDepositBlockedQuest'
@@ -79,6 +84,7 @@ export type BagTooltipHintKey =
   | 'hudChrome.bank.depositHint'
   | 'hudChrome.bank.cannotDeposit'
   | 'itemUi.tooltip.clickDestroy'
+  | 'hudChrome.mounts.clickManage'
   | 'itemUi.tooltip.clickEquip'
   | 'itemUi.tooltip.clickConsume'
   | 'itemUi.tooltip.clickUseInstant'
@@ -89,19 +95,28 @@ export type BagTooltipHintKey =
 
 /** Decide what a click on a bag item does. Mirrors the original click handler's
  *  priority order exactly: trade > mail-attach > market-sell > vendor > bank-deposit
- *  > pet-feed > quest > use. */
-export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
+ *  > pet-feed > quest > use. `instance` is the clicked SLOT's payload (issue 1165):
+ *  a transfer-locked copy (bindOnTrade-armed or boundTo-bound,
+ *  isTransferLockedInstance, the sim's pipe rule) blocks mail-attach and
+ *  market-sell in place; an unlocked instanced copy stages as itself. */
+export function bagItemAction(
+  item: BagItemInfo,
+  mode: BagMode,
+  instance?: ItemInstancePayload,
+): BagAction {
   if (item.soulbound && (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen))
     return 'transferBlockedSoulbound';
   if (mode.tradeOpen) return 'trade';
   if (mode.mailAttach) {
     // Mirrors the sim's mail escrow rule: quest and unmailable items refuse.
     if (item.kind === 'quest' || item.noMarketList) return 'mailAttachBlocked';
+    if (isTransferLockedInstance(instance)) return 'mailAttachBlockedBound';
     return 'mailAttach';
   }
   if (mode.marketSell) {
     if (item.kind === 'quest') return 'marketSellBlockedQuest';
     if (item.noMarketList) return 'marketSellBlockedNoMarket';
+    if (isTransferLockedInstance(instance)) return 'marketSellBlockedBound';
     return 'marketSell';
   }
   if (mode.vendorOpen) return 'vendorSell';
@@ -111,6 +126,9 @@ export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
   if (mode.petFeed) return item.kind === 'food' ? 'petFeed' : 'petFeedBlocked';
   if (item.kind === 'quest') return 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
+  // A collected reins item falls through to 'use' like any other usable item:
+  // clicking it summons that mount (sim useItem -> summonMountItem). There is no
+  // picker to open any more.
   return 'use';
 }
 
@@ -211,18 +229,24 @@ export function bagDestroyAction(item: BagItemInfo, mode: BagMode): BagDestroyAc
 }
 
 /** The tooltip hint sub-line for a bag item, matching the original tooltip's
- *  mode-then-kind branch. Returns '' when no hint applies (e.g. a material). */
-export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipHintKey {
+ *  mode-then-kind branch. Returns '' when no hint applies (e.g. a material).
+ *  `instance` mirrors bagItemAction's third parameter: a transfer-locked copy
+ *  reads the same cannot-mail / cannot-market hint its click deny shows. */
+export function bagTooltipHintKey(
+  item: BagItemInfo,
+  mode: BagMode,
+  instance?: ItemInstancePayload,
+): BagTooltipHintKey {
   if (item.soulbound && (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen))
     return 'hudChrome.itemSoulbound';
   if (mode.tradeOpen) return 'itemUi.tooltip.clickTradeOffer';
   if (mode.mailAttach) {
-    return item.kind === 'quest' || item.noMarketList
+    return item.kind === 'quest' || item.noMarketList || isTransferLockedInstance(instance)
       ? 'hudChrome.mailbox.cannotMail'
       : 'hudChrome.mailbox.clickAttach';
   }
   if (mode.marketSell) {
-    return item.kind === 'quest' || item.noMarketList
+    return item.kind === 'quest' || item.noMarketList || isTransferLockedInstance(instance)
       ? 'itemUi.tooltip.cannotMarket'
       : 'itemUi.tooltip.clickMarketList';
   }
@@ -231,6 +255,7 @@ export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipH
   if (mode.bankDeposit)
     return item.kind === 'quest' ? 'hudChrome.bank.cannotDeposit' : 'hudChrome.bank.depositHint';
   if (item.kind === 'quest') return 'itemUi.tooltip.clickDestroy';
+  if (item.kind === 'mount') return 'hudChrome.mounts.clickManage';
   if (
     item.kind === 'weapon' ||
     item.kind === 'armor' ||

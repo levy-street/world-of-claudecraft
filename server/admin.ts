@@ -15,6 +15,7 @@ import {
   registrationsByDay,
   sessionsByDay,
 } from './admin_db';
+import { cleanIpAssociationLookup } from './admin_ip_association';
 import { readOverviewCounts } from './admin_overview_cache';
 import {
   type AdminPermission,
@@ -44,10 +45,10 @@ import {
   getFilterConfig,
   listFilterWords,
   removeFilterWord,
-  resetChatStrikes,
   updateFilterConfig,
   type WordTier,
 } from './chat_filter_db';
+import { cleanContentModerationReason } from './content_moderation_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
   accountAndScopeForToken,
@@ -59,7 +60,6 @@ import {
   pool,
   revokeTokensExcept,
   saveToken,
-  setAccountDeactivated,
   touchLogin,
   updatePasswordHash,
 } from './db';
@@ -90,20 +90,33 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  reactivateAccountAudited,
   recordPasswordReset,
+  resetChatStrikesAudited,
   setAccountAiFlag,
   setAccountStreamerFlair,
   setDailyRewardsBan,
   setDailyRewardsIpBan,
 } from './moderation_db';
 import { providerUsageSnapshot } from './provider_usage';
-import { rateLimited } from './ratelimit';
+import { authThrottled, clearAuthFailures, rateLimited, recordAuthFailure } from './ratelimit';
+import { REALM } from './realm';
 import {
   adminRolesForAccount,
   listStaff,
   roleChangeHistory,
   setAccountAdminRoles,
 } from './staff_db';
+import {
+  type UnstuckHotspotRow as DbUnstuckHotspotRow,
+  type UnstuckReportPage as DbUnstuckReportPage,
+  type UnstuckReportRow as DbUnstuckReportRow,
+  listUnstuckHotspots as listUnstuckHotspotsDb,
+  listUnstuckReports as listUnstuckReportsDb,
+  UNSTUCK_HOTSPOT_MAX_LIMIT,
+  UNSTUCK_REPORT_MAX_DAYS,
+  UNSTUCK_REPORT_MAX_LIMIT,
+} from './unstuck_db';
 import { PgUserAssetsDb } from './user_assets_db';
 
 // Admin API: everything under /admin/api/*. Auth is an exact full-scope bearer
@@ -115,10 +128,20 @@ import { PgUserAssetsDb } from './user_assets_db';
 // runs, so a route absent from that table can never execute.
 
 const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
+// Per-account brute-force throttle, mirroring server/auth_routes.ts loginHandler
+// (#93): the per-IP ceiling above cannot stop a distributed attacker who spreads
+// guesses for one admin username across many source IPs, so admin login also gates
+// on authThrottled/recordAuthFailure/clearAuthFailures (server/ratelimit.ts), keyed
+// by username exactly like the player /api/login guard. The message matches a
+// bad-password response so it never reveals whether the account exists.
+const ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS =
+  'too many failed attempts, wait a few minutes and try again';
 const MAX_PAGE_LIMIT = 200;
 const DEFAULT_PAGE_LIMIT = 25;
 const ACTIVITY_WINDOW_DAYS = 30;
 const ANTIBOT_CONFIG_NOTE_MAX = 500;
+const UNSTUCK_DEFAULT_DAYS = 30;
+const UNSTUCK_DEFAULT_LIMIT = 50;
 
 const IP_BLOCK_KICK_MESSAGE = 'Connection to the server was lost.';
 
@@ -140,6 +163,103 @@ async function dailyRewardEventDay(value: string | null): Promise<string | null>
   return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
     ? value
     : null;
+}
+
+function boundedPositiveParam(raw: string | null, fallback: number, max: number): number {
+  const value = Number(raw ?? fallback);
+  return Number.isFinite(value) ? Math.min(max, Math.max(1, Math.floor(value))) : fallback;
+}
+
+function unstuckQuery(params: URLSearchParams): {
+  days: number;
+  limit: number;
+  beforeId?: number;
+} {
+  const days = boundedPositiveParam(
+    params.get('days'),
+    UNSTUCK_DEFAULT_DAYS,
+    UNSTUCK_REPORT_MAX_DAYS,
+  );
+  const limit = boundedPositiveParam(
+    params.get('limit'),
+    UNSTUCK_DEFAULT_LIMIT,
+    UNSTUCK_REPORT_MAX_LIMIT,
+  );
+  const rawBeforeId = Number(params.get('beforeId'));
+  return {
+    days,
+    limit,
+    ...(Number.isSafeInteger(rawBeforeId) && rawBeforeId > 0 ? { beforeId: rawBeforeId } : {}),
+  };
+}
+
+function adminUnstuckReport(row: DbUnstuckReportRow): unknown {
+  const destination =
+    row.destinationRawX === null ||
+    row.destinationRawY === null ||
+    row.destinationRawZ === null ||
+    row.destinationLocalX === null ||
+    row.destinationLocalZ === null
+      ? null
+      : {
+          x: row.destinationRawX,
+          y: row.destinationRawY,
+          z: row.destinationRawZ,
+          localX: row.destinationLocalX,
+          localY: row.destinationLocalY,
+          localZ: row.destinationLocalZ,
+        };
+  return {
+    id: row.id,
+    characterId: row.characterId,
+    characterName: row.characterName,
+    area: {
+      kind: row.areaKind,
+      id: row.areaId,
+      instanceId: row.instanceId,
+      slot: row.instanceSlot,
+    },
+    origin: {
+      x: row.originRawX,
+      y: row.originRawY,
+      z: row.originRawZ,
+      localX: row.originLocalX,
+      localY: row.originLocalY,
+      localZ: row.originLocalZ,
+    },
+    destination,
+    outcome: row.outcome,
+    reason: row.reason,
+    invokedAt: row.invokedAt,
+    resolvedAt: row.resolvedAt,
+  };
+}
+
+function adminUnstuckHotspot(row: DbUnstuckHotspotRow): unknown {
+  return {
+    area: { kind: row.areaKind, id: row.areaId, instanceId: null, slot: null },
+    bucket: { x: row.bucketLocalX, y: row.bucketLocalY, z: row.bucketLocalZ },
+    count: row.reportCount,
+    completed: row.completedCount,
+    cancelled: row.cancelledCount,
+    failed: row.failedCount,
+    lastUsedAt: row.lastResolvedAt,
+  };
+}
+
+function adminUnstuckPayload(
+  page: DbUnstuckReportPage,
+  hotspots: DbUnstuckHotspotRow[],
+  query: { days: number; limit: number },
+): unknown {
+  return {
+    reports: page.rows.map(adminUnstuckReport),
+    hotspots: hotspots.map(adminUnstuckHotspot),
+    days: query.days,
+    limit: query.limit,
+    hasMore: page.hasMore,
+    nextBeforeId: page.nextBeforeId,
+  };
 }
 
 /**
@@ -294,14 +414,20 @@ async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse):
     return fail(res, 429, 'too many attempts, wait a minute and try again');
   }
   const body = await readBody(req);
-  const account = typeof body.username === 'string' ? await findAccount(body.username) : null;
+  const username = typeof body.username === 'string' ? body.username : '';
+  if (username && !authThrottled(username).allowed) {
+    return fail(res, 429, ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS);
+  }
+  const account = username ? await findAccount(username) : null;
   if (!account || !(await verifyPassword(String(body.password ?? ''), account.password_hash))) {
+    if (username) recordAuthFailure(username);
     return fail(res, 401, 'invalid username or password');
   }
   const staff = await adminRolesForAccount(account.id);
   if (staff === null) {
     return fail(res, 403, 'this account does not have admin access');
   }
+  clearAuthFailures(username);
   await touchLogin(account.id);
   const token = newToken();
   await saveToken(token, account.id);
@@ -476,6 +602,12 @@ export async function handleAdminApi(
         if (action === 'suspend' || action === 'ban') {
           const statusText =
             action === 'ban' ? 'This account has been banned.' : 'This account is suspended.';
+          // Every device is signed out here too, mirroring the reset-password arm
+          // above: revoke all tokens then disconnect the live socket (revocation
+          // alone leaves an already-open connection intact). Otherwise a token
+          // issued before the sanction stays valid in auth_tokens and regains
+          // access with no re-authentication once the sanction is lifted or expires.
+          await revokeTokensExcept(targetAccountId, null);
           game.disconnectAccount(targetAccountId, statusText);
           // Notify the affected account of the moderation action. Best-effort and
           // fully isolated: a mail-target lookup or send failure must never turn a
@@ -506,8 +638,13 @@ export async function handleAdminApi(
     const reactivateMatch = /^\/admin\/api\/moderation\/accounts\/(\d+)\/reactivate$/.exec(path);
     if (req.method === 'POST' && reactivateMatch) {
       const targetAccountId = Number(reactivateMatch[1]);
+      const body = await readBody(req);
       try {
-        await setAccountDeactivated(targetAccountId, false);
+        await reactivateAccountAudited({
+          accountId: targetAccountId,
+          adminAccountId: accountId,
+          reason: body.reason,
+        });
         return ok(res, { ok: true });
       } catch (err) {
         return fail(res, 400, err instanceof Error ? err.message : 'reactivation failed');
@@ -641,9 +778,18 @@ export async function handleAdminApi(
     );
     if (req.method === 'POST' && resetStrikesMatch) {
       const id = Number(resetStrikesMatch[1]);
-      const reset = await resetChatStrikes(id);
-      if (reset) game.resetChatStrikesLive(id);
-      return reset ? ok(res, { ok: true }) : fail(res, 404, 'account not found');
+      const body = await readBody(req);
+      try {
+        const reset = await resetChatStrikesAudited({
+          accountId: id,
+          adminAccountId: accountId,
+          reason: body.reason,
+        });
+        if (reset) game.resetChatStrikesLive(id);
+        return reset ? ok(res, { ok: true }) : fail(res, 404, 'account not found');
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'chat strikes reset failed');
+      }
     }
 
     // Set a new password on any account (admin-initiated credential reset). The
@@ -757,9 +903,11 @@ export async function handleAdminApi(
 
     if (req.method === 'POST' && path === '/admin/api/blocked-ips') {
       const body = await readBody(req);
+      const cleanedIp = cleanIp(body.ip);
+      if (!cleanedIp) return fail(res, 400, 'a valid IP address is required');
       try {
         const ip = await addBlockedIp({
-          ip: body.ip,
+          ip: cleanedIp,
           reason: body.reason,
           createdByAccountId: accountId,
           expiresAt: body.expiresAt,
@@ -782,16 +930,25 @@ export async function handleAdminApi(
 
     // Map editor moderation: force a published map back to private, and
     // block/unblock an uploaded GLB asset (blocked assets 404 on the public
-    // byte GET and reject re-uploads of the same hash).
+    // byte GET and reject re-uploads of the same hash). Both write a
+    // content_moderation_actions audit row (content_moderation_db.ts).
     const mapUnpublishMatch = /^\/admin\/api\/maps\/(\d+)\/unpublish$/.exec(path);
     if (req.method === 'POST' && mapUnpublishMatch) {
-      const done = await adminMapsDb().setStatus(Number(mapUnpublishMatch[1]), null, 'private');
+      const body = await readBody(req);
+      const done = await adminMapsDb().adminUnpublish(Number(mapUnpublishMatch[1]), {
+        adminAccountId: accountId,
+        reason: cleanContentModerationReason(body.reason),
+      });
       return done ? ok(res, { ok: true }) : fail(res, 404, 'map_not_found');
     }
     const assetBlockMatch = /^\/admin\/api\/user-assets\/(\d+)\/(block|unblock)$/.exec(path);
     if (req.method === 'POST' && assetBlockMatch) {
       const status = assetBlockMatch[2] === 'block' ? 'blocked' : 'active';
-      const done = await adminUserAssetsDb().setStatus(Number(assetBlockMatch[1]), status);
+      const body = await readBody(req);
+      const done = await adminUserAssetsDb().adminSetStatus(Number(assetBlockMatch[1]), status, {
+        adminAccountId: accountId,
+        reason: cleanContentModerationReason(body.reason),
+      });
       return done ? ok(res, { ok: true }) : fail(res, 404, 'asset_not_found');
     }
 
@@ -932,18 +1089,20 @@ export async function handleAdminApi(
       });
     }
     if (path === '/admin/api/ip-associations') {
-      const ip = cleanIp(url.searchParams.get('ip'));
+      const ip = cleanIpAssociationLookup(url.searchParams.get('ip'));
       if (!ip) return fail(res, 400, 'a valid IP address is required');
       const { page, limit } = parsePageParams(url.searchParams);
       const associations = await associationsForIp(ip, page, limit);
       const onlineAccountIds = game.liveAccountIds();
+      const blockableIp = cleanIp(ip);
       return ok(res, {
         ...associations,
         accounts: associations.accounts.map((account) => ({
           ...account,
           online: onlineAccountIds.has(account.accountId),
         })),
-        blocked: game.isIpBlocked(ip),
+        blocked: blockableIp ? game.isIpBlocked(blockableIp) : false,
+        blockable: Boolean(blockableIp),
       });
     }
     if (path === '/admin/api/moderation/queue') {
@@ -960,6 +1119,20 @@ export async function handleAdminApi(
       const { page, limit } = parsePageParams(url.searchParams);
       const { rows, total } = await listBugReports(limit, (page - 1) * limit);
       return ok(res, { rows, total, page, limit });
+    }
+    if (path === '/admin/api/unstuck-reports') {
+      const query = unstuckQuery(url.searchParams);
+      const [page, hotspots] = await Promise.all([
+        listUnstuckReportsDb(pool, { realm: REALM, ...query }),
+        query.beforeId === undefined
+          ? listUnstuckHotspotsDb(pool, {
+              realm: REALM,
+              days: query.days,
+              limit: UNSTUCK_HOTSPOT_MAX_LIMIT,
+            })
+          : Promise.resolve<DbUnstuckHotspotRow[]>([]),
+      ]);
+      return ok(res, adminUnstuckPayload(page, hotspots, query));
     }
     const bugScreenshotMatch = /^\/admin\/api\/bug-reports\/(\d+)\/screenshot$/.exec(path);
     if (bugScreenshotMatch) {
@@ -1069,7 +1242,11 @@ export async function handleAdminApi(
 //    ADMIN_LOGIN_MAX_PER_MINUTE), NOT the new coded POLICIES table (rate_limit.ts):
 //    its own per-minute ceiling, isolated from the account/IP policy set, keeping the
 //    429 body byte-identical. Its own isolated limiter STORE is the two-tier limiter
-//    end-state; parity-first keeps the legacy shared-store call in-handler.
+//    end-state; parity-first keeps the legacy shared-store call in-handler. Both login
+//    arms ALSO gate on the shared per-account authThrottled/recordAuthFailure/
+//    clearAuthFailures throttle (server/ratelimit.ts), the same username-keyed guard
+//    server/auth_routes.ts uses for the player login: the per-IP ceiling alone cannot
+//    stop a distributed attacker who never repeats a source IP against one account.
 //
 //  - The enum-segment route restructures. The legacy regex route
 //    /moderation/accounts/:id/(suspend|unsuspend|ban|unban) violates the table
@@ -1206,6 +1383,10 @@ function makeRealAdminDb() {
     sessionsByDay,
     listBugReports,
     getBugReportScreenshot,
+    listUnstuckReports: (options: Parameters<typeof listUnstuckReportsDb>[1]) =>
+      listUnstuckReportsDb(pool, options),
+    listUnstuckHotspots: (options: Parameters<typeof listUnstuckHotspotsDb>[1]) =>
+      listUnstuckHotspotsDb(pool, options),
     listFilterWords,
     addFilterWord,
     removeFilterWord,
@@ -1213,7 +1394,7 @@ function makeRealAdminDb() {
     updateFilterConfig,
     chatModerationForAccount,
     chatModeratedAccounts,
-    resetChatStrikes,
+    resetChatStrikesAudited,
     cleanIp,
     listBlockedIps,
     addBlockedIp,
@@ -1233,7 +1414,7 @@ function makeRealAdminDb() {
     // chat muted" guards); the CALLER gate resolves roles via adminRolesForAccount.
     isAdminAccount,
     saveToken,
-    setAccountDeactivated,
+    reactivateAccountAudited,
     touchLogin,
     newToken,
     verifyPassword,
@@ -1254,6 +1435,10 @@ function makeRealAdminDb() {
     emailSecurityIncident,
     providerUsageSnapshot,
     rateLimited,
+    // Per-account failed-login throttle (mirrors server/auth_routes.ts loginHandler).
+    authThrottled,
+    recordAuthFailure,
+    clearAuthFailures,
     // Staff-role reads/writes (accounts.admin_roles + the audit trail).
     adminRolesForAccount,
     listStaff,
@@ -1309,24 +1494,34 @@ const MODERATION_ACTION_SCHEMA = enum_(['suspend', 'unsuspend', 'ban', 'unban'] 
 // ported body is byte-identical.
 // ---------------------------------------------------------------------------
 
-/** POST /admin/api/login: anonymous, its own in-handler rateLimited limiter. */
+/**
+ * POST /admin/api/login: anonymous, its own in-handler rateLimited limiter PLUS the
+ * per-account failed-login throttle (mirrors server/auth_routes.ts loginHandler),
+ * so a distributed attack spread across many source IPs cannot bypass a lockout by
+ * never repeating an IP.
+ */
 async function loginHandler(ctx: Ctx): Promise<void> {
   if (!adminDb().rateLimited(ctx.req, ADMIN_LOGIN_MAX_PER_MINUTE).allowed) {
     return fail(ctx.res, 429, 'too many attempts, wait a minute and try again');
   }
   const body = await readBody(ctx.req);
-  const account =
-    typeof body.username === 'string' ? await adminDb().findAccount(body.username) : null;
+  const username = typeof body.username === 'string' ? body.username : '';
+  if (username && !adminDb().authThrottled(username).allowed) {
+    return fail(ctx.res, 429, ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS);
+  }
+  const account = username ? await adminDb().findAccount(username) : null;
   if (
     !account ||
     !(await adminDb().verifyPassword(String(body.password ?? ''), account.password_hash))
   ) {
+    if (username) adminDb().recordAuthFailure(username);
     return fail(ctx.res, 401, 'invalid username or password');
   }
   const staff = await adminDb().adminRolesForAccount(account.id);
   if (staff === null) {
     return fail(ctx.res, 403, 'this account does not have admin access');
   }
+  adminDb().clearAuthFailures(username);
   await adminDb().touchLogin(account.id);
   const token = adminDb().newToken();
   await adminDb().saveToken(token, account.id);
@@ -1576,21 +1771,23 @@ async function sharedIpsHandler(ctx: Ctx): Promise<void> {
   });
 }
 
-/** GET /admin/api/ip-associations: accounts tied to one IP, with live online flags. */
+/** GET /admin/api/ip-associations: accounts tied to one stored IP marker, with live flags. */
 async function ipAssociationsHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
-  const ip = adminDb().cleanIp(ctx.url.searchParams.get('ip'));
+  const ip = cleanIpAssociationLookup(ctx.url.searchParams.get('ip'));
   if (!ip) return fail(ctx.res, 400, 'a valid IP address is required');
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const associations = await adminDb().associationsForIp(ip, page, limit);
   const onlineAccountIds = rt.liveAccountIds();
+  const blockableIp = adminDb().cleanIp(ip);
   ok(ctx.res, {
     ...associations,
     accounts: associations.accounts.map((account) => ({
       ...account,
       online: onlineAccountIds.has(account.accountId),
     })),
-    blocked: rt.isIpBlocked(ip),
+    blocked: blockableIp ? rt.isIpBlocked(blockableIp) : false,
+    blockable: Boolean(blockableIp),
   });
 }
 
@@ -1603,9 +1800,11 @@ async function blockedIpsGetHandler(ctx: Ctx): Promise<void> {
 async function blockedIpsPostHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
   const body = await readBody(ctx.req);
+  const cleanedIp = adminDb().cleanIp(body.ip);
+  if (!cleanedIp) return fail(ctx.res, 400, 'a valid IP address is required');
   try {
     const ip = await adminDb().addBlockedIp({
-      ip: body.ip,
+      ip: cleanedIp,
       reason: body.reason,
       createdByAccountId: ctxAccountId(ctx),
       expiresAt: body.expiresAt,
@@ -1657,6 +1856,12 @@ async function moderateActionHandler(ctx: Ctx): Promise<void> {
     if (action === 'suspend' || action === 'ban') {
       const statusText =
         action === 'ban' ? 'This account has been banned.' : 'This account is suspended.';
+      // Every device is signed out here too, mirroring resetPasswordHandler: revoke
+      // all tokens then disconnect the live socket (revocation alone leaves an
+      // already-open connection intact). Otherwise a token issued before the
+      // sanction stays valid in auth_tokens and regains access with no
+      // re-authentication the moment the sanction is lifted or expires.
+      await adminDb().revokeTokensExcept(targetAccountId, null);
       rt.disconnectAccount(targetAccountId, statusText);
       // Notify the affected account of the moderation action. Best-effort and fully
       // isolated: a mail-target lookup or send failure must never turn a successful
@@ -1687,8 +1892,14 @@ async function moderateActionHandler(ctx: Ctx): Promise<void> {
 
 /** POST /admin/api/moderation/accounts/:id/reactivate: reverse a self-deactivation. */
 async function reactivateHandler(ctx: Ctx): Promise<void> {
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
   try {
-    await adminDb().setAccountDeactivated(adminTargetId(ctx), false);
+    await adminDb().reactivateAccountAudited({
+      accountId: id,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+    });
     return ok(ctx.res, { ok: true });
   } catch (err) {
     return fail(ctx.res, 400, err instanceof Error ? err.message : 'reactivation failed');
@@ -1825,9 +2036,18 @@ async function noteHandler(ctx: Ctx): Promise<void> {
 async function resetStrikesHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
   const id = adminTargetId(ctx);
-  const reset = await adminDb().resetChatStrikes(id);
-  if (reset) rt.resetChatStrikesLive(id);
-  return reset ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'account not found');
+  const body = await readBody(ctx.req);
+  try {
+    const reset = await adminDb().resetChatStrikesAudited({
+      accountId: id,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+    });
+    if (reset) rt.resetChatStrikesLive(id);
+    return reset ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'account not found');
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'chat strikes reset failed');
+  }
 }
 
 /** GET /admin/api/moderation/queue: accounts with open reports. */
@@ -2028,6 +2248,22 @@ async function bugReportsHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { rows, total, page, limit });
 }
 
+/** GET /admin/api/unstuck-reports: bounded reports plus content-local hotspots. */
+async function unstuckReportsHandler(ctx: Ctx): Promise<void> {
+  const query = unstuckQuery(ctx.url.searchParams);
+  const [page, hotspots] = await Promise.all([
+    adminDb().listUnstuckReports({ realm: REALM, ...query }),
+    query.beforeId === undefined
+      ? adminDb().listUnstuckHotspots({
+          realm: REALM,
+          days: query.days,
+          limit: UNSTUCK_HOTSPOT_MAX_LIMIT,
+        })
+      : Promise.resolve<DbUnstuckHotspotRow[]>([]),
+  ]);
+  ok(ctx.res, adminUnstuckPayload(page, hotspots, query));
+}
+
 /** GET /admin/api/bug-reports/:id/screenshot: one report's screenshot on demand. */
 async function bugScreenshotHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { screenshot: await adminDb().getBugReportScreenshot(adminTargetId(ctx)) });
@@ -2060,16 +2296,24 @@ async function adminUserAssetsListHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { rows, total, page, limit });
 }
 
-/** POST /admin/api/maps/:id/unpublish: force a published map back to private. */
+/** POST /admin/api/maps/:id/unpublish: force a published map back to private, audited. */
 async function adminMapUnpublishHandler(ctx: Ctx): Promise<void> {
-  const done = await adminMapsDb().setStatus(adminTargetId(ctx), null, 'private');
+  const body = await readBody(ctx.req);
+  const done = await adminMapsDb().adminUnpublish(adminTargetId(ctx), {
+    adminAccountId: adminIdentityOf(ctx).accountId,
+    reason: cleanContentModerationReason(body.reason),
+  });
   return done ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'map_not_found');
 }
 
-/** POST /admin/api/user-assets/:id/(block|unblock): flip an upload's moderation flag. */
+/** POST /admin/api/user-assets/:id/(block|unblock): flip an upload's moderation flag, audited. */
 function adminAssetStatusHandler(status: 'blocked' | 'active') {
   return async (ctx: Ctx): Promise<void> => {
-    const done = await adminUserAssetsDb().setStatus(adminTargetId(ctx), status);
+    const body = await readBody(ctx.req);
+    const done = await adminUserAssetsDb().adminSetStatus(adminTargetId(ctx), status, {
+      adminAccountId: adminIdentityOf(ctx).accountId,
+      reason: cleanContentModerationReason(body.reason),
+    });
     return done ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'asset_not_found');
   };
 }
@@ -2501,6 +2745,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: bugReportsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/unstuck-reports',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: unstuckReportsHandler,
   },
   {
     method: 'GET',

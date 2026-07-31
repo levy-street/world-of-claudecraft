@@ -10,20 +10,26 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 
+const SERVER_MAIN_IMPORT_TIMEOUT_MS = 15_000;
+
 // Replace the real GameServer with a constructor spy. main.ts is the only module
 // that imports it as a value (everything else is `import type`), so this observes
 // exactly the construction liveGame() would perform.
 vi.mock('../../server/game', () => ({ GameServer: vi.fn() }));
 
 describe('deferred GameServer construction (liveGame)', () => {
-  it('a bare import of server/main constructs no GameServer', async () => {
-    // db.ts evaluates a module-scope DATABASE_URL (throws if unset); dummy URL as
-    // in importable_spine.test.ts, no connection is made on Pool construction.
-    process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase1_test';
-    const { GameServer } = await import('../../server/game');
-    await import('../../server/main');
-    expect(GameServer).not.toHaveBeenCalled();
-  });
+  it(
+    'a bare import of server/main constructs no GameServer',
+    async () => {
+      // db.ts evaluates a module-scope DATABASE_URL (throws if unset); dummy URL as
+      // in importable_spine.test.ts, no connection is made on Pool construction.
+      process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase1_test';
+      const { GameServer } = await import('../../server/game');
+      await import('../../server/main');
+      expect(GameServer).not.toHaveBeenCalled();
+    },
+    SERVER_MAIN_IMPORT_TIMEOUT_MS,
+  );
 });
 
 // startServer() binds a port, opens a WS server, and needs Postgres, so it cannot run

@@ -10,13 +10,13 @@
     "jammed chest (attemptAvailable=false) + surface exit opens"
   ],
   "draws": 3,
-  "drawDigest": "ad960248",
+  "drawDigest": "b660d801",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 416,
-      "state": "b33b9ff6",
+      "nextId": 821,
+      "state": "f0732736",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,7 +54,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 816,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -91,7 +91,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 415,
+          "id": 816,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -143,78 +143,78 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 427,
-      "state": "6206e48e",
-      "events": "1474b593",
+      "nextId": 831,
+      "state": "b58e3084",
+      "events": "c637ecb7",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "b660d801"
       }
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 427,
-      "state": "9cc4190c",
-      "events": "fcb0555f",
+      "nextId": 831,
+      "state": "46ced4f2",
+      "events": "7bcb507a",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "b660d801"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 427,
-      "state": "9280be06",
+      "nextId": 831,
+      "state": "550be31c",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "b660d801"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 427,
-      "state": "79183578",
+      "nextId": 831,
+      "state": "3f6f77fe",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "b660d801"
       }
     },
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 427,
-      "state": "e822ccee",
+      "nextId": 831,
+      "state": "d0c29d64",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "b660d801"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 427,
-      "state": "de3e8a9c",
+      "nextId": 831,
+      "state": "a920a342",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "b660d801"
       }
     },
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 428,
-      "state": "50551680",
-      "events": "e8a08ba7",
+      "nextId": 832,
+      "state": "416738c6",
+      "events": "c655b05d",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "b660d801"
       },
       "label": "lockpick-jammed",
       "players": [
@@ -273,7 +273,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 816,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -312,7 +312,7 @@
           "dualWielding": true,
           "fiveSecondRule": 102.45,
           "hp": 50000,
-          "id": 415,
+          "id": 816,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -331,7 +331,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "potionCooldownUntil": -1,
@@ -369,7 +369,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 426,
+          "id": 830,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -380,13 +380,13 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "stats": {},
@@ -402,23 +402,23 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 428,
-      "state": "3edac142",
+      "nextId": 832,
+      "state": "4f2a3e18",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "b660d801"
       }
     },
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 428,
-      "state": "851611a8",
+      "nextId": 832,
+      "state": "9e3691ae",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "b660d801"
       },
       "label": "final",
       "players": [
@@ -477,7 +477,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 816,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -516,7 +516,7 @@
           "dualWielding": true,
           "fiveSecondRule": 102.55,
           "hp": 50000,
-          "id": 415,
+          "id": 816,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -535,7 +535,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "potionCooldownUntil": -1,
@@ -573,7 +573,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 426,
+          "id": 830,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -584,13 +584,13 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "stats": {},

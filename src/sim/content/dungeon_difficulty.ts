@@ -207,6 +207,23 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     finalBossId: 'korzul_the_gravewyrm',
     marksPerParticipant: 1,
   },
+  // Palmreach's open-field five-man. The broad route and two rare elites use
+  // the same level-22 Heroic pin as the other endgame leveling dungeons.
+  wildheart_basin: {
+    id: 'wildheart_basin',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 4.0,
+    // Solved at the basin's weakest spawn-list mob (wildheart_hexcaller,
+    // 455 post-mitigation at 15.5x): the open-field roster sits between
+    // Orkadia's casters and the Sanctum band.
+    damageMultiplier: 17.25,
+    // No Wildheart boss summons adds; kept at the half convention, inert.
+    addDamageMultiplier: 8.625,
+    armorMultiplier: 1.2,
+    finalBossId: 'wildheart_high_priest',
+    marksPerParticipant: 1,
+  },
   // The 10-player raid arena. The boss floors at 1200 post-mitigation on the
   // reference warrior (roughly 43% of his hp per 2.6s swing; a raid brings
   // two or three healers) via the dungeon-wide multiplier; the encounter-

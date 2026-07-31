@@ -86,8 +86,21 @@ export function animatesEveryFrame(
   localPlayerId: number,
   targetId: number | null,
   castingAbility: string | null,
+  inCombat = false,
+  ownerId: number | null = null,
+  combatTargetId: number | null = null,
+  combatTargetOwnerId: number | null = null,
 ): boolean {
-  return entityId === localPlayerId || entityId === targetId || castingAbility !== null;
+  return (
+    entityId === localPlayerId ||
+    entityId === targetId ||
+    castingAbility !== null ||
+    (inCombat &&
+      (ownerId === localPlayerId ||
+        combatTargetId === localPlayerId ||
+        combatTargetId === targetId ||
+        combatTargetOwnerId === localPlayerId))
+  );
 }
 
 /**

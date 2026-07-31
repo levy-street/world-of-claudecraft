@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BG_GRAVEYARDS, BG_POWER_RUNES, BG_SPEED_RUNES } from '../src/sim/battleground_layout';
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
-import { battlegroundOrigin, isBgPos } from '../src/sim/data';
+import { battlegroundOrigin, instanceOrigin, isBgPos } from '../src/sim/data';
 import { BATTLEGROUND_LOSS_HONOR, BATTLEGROUND_WIN_HONOR } from '../src/sim/pvp';
 import { eloDelta, Sim } from '../src/sim/sim';
 import type { BgMatch } from '../src/sim/social/battleground';
@@ -144,7 +144,8 @@ describe('Thornhollow Fields: queue + matchmaking', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'A');
     sim.entities.get(a)!.level = BG_MIN_LEVEL;
-    tp(sim, a, 900, -1250); // a dungeon instance band
+    const dungeonInstance = instanceOrigin(0, 0);
+    tp(sim, a, dungeonInstance.x, dungeonInstance.z); // a dungeon instance band
     sim.bgQueueJoin(a);
     expect(sim.bgInfoFor(a)!.queued).toBe(false);
 
@@ -1270,7 +1271,8 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     sim.bgQueueJoin(a);
     sim.tick();
     expect(sim.bgInfoFor(a)!.queued).toBe(true);
-    tp(sim, a, 900, -1250); // a dungeon instance band
+    const dungeonInstance = instanceOrigin(0, 0);
+    tp(sim, a, dungeonInstance.x, dungeonInstance.z); // a dungeon instance band
     const evs = sim.tick();
     expect(sim.bgInfoFor(a)!.queued).toBe(false);
     expect(evs.some((e) => e.type === 'bgUnqueued' && e.pid === a)).toBe(true);

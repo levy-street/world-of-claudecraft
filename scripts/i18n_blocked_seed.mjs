@@ -266,6 +266,15 @@ export const COPIED_ALLOW_IDS = [
   'admin::pt_BR::detail.streamerLabel',
   'admin::sv_SE::detail.streamerLabel',
   'admin::vi_VN::detail.streamerLabel',
+  // Unstuck-reports dashboard (v0.32.0). Three genuine cognates rather than
+  // re-coined words: French "Destination" and German "Hotspots" are the normal
+  // terms in those languages, and Indonesian "area" is a standard loanword.
+  // fr_CA carries no own row for colDestination, so it inherits fr_FR's value
+  // and needs its own shadow entry (the same pairing as who.statusCombat above).
+  'admin::fr_FR::unstuckReports.colDestination',
+  'admin::fr_CA::unstuckReports.colDestination',
+  'admin::de_DE::unstuckReports.hotspotsTitle',
+  'admin::id_ID::unstuckReports.areaId',
 ];
 
 export const V07_SLASH = [
@@ -313,7 +322,6 @@ export const V07_SLASH = [
   'Quest log (5): Aki.',
   'Spellbook (5): Aki.',
   'Target: Aki (level 5 Aki) — Aki.',
-  'That player is already trading.',
   'Threat is only tracked on enemies; Aki is not one.',
   'Threat on Aki (5): Aki.',
   'Time played this session: Aki.',
@@ -363,7 +371,13 @@ export const V07_SLASH = [
   'Your vendor buyback list is empty.',
   'Zones (5): Aki.',
   '[dev] Added Akig to your purse.',
+  '[dev] Found no seed of that kind. Try again.',
+  '[dev] God mode ON (invulnerable).',
   '[dev] Level set to 5.',
+  '[dev] Opened a Aki-rank portal to Aki (5 floors, L5). Walk through it.',
+  '[dev] Seed Aki is not infernal; using Aki.',
+  '[dev] Smite mode OFF.',
+  '[dev] Smite mode ON (one-shot everything).',
   '[dev] Teleported to Aki, Aki.',
   "[dev] Unknown item 'Aki'.",
   '[dev] Spawned the Test Quartermaster (free epic gear) next to you.',

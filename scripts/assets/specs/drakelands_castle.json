@@ -1,0 +1,292 @@
+{
+  "comment": "The Drakelands' huge castle. Walkable-scale structure pieces (walls, stairs, barriers, floors, banners, torches, rubble, keep furnishings) from KayKit Dungeon Remastered (CC0), plus red-roofed bailey buildings from KayKit Medieval Hexagon Pack (CC0, red colorway, hex-tile scale so decor entries carry scale). Sourced from the user's local KayKit collection.",
+  "items": [
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/wall.gltf",
+      "out": "models/biome/kcas_wall.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/wall_half.gltf",
+      "out": "models/biome/kcas_wall_half.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/wall_corner.gltf",
+      "out": "models/biome/kcas_wall_corner.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/wall_gated.gltf",
+      "out": "models/biome/kcas_wall_gated.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/wall_doorway.gltf",
+      "out": "models/biome/kcas_wall_doorway.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/wall_broken.gltf",
+      "out": "models/biome/kcas_wall_broken.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/wall_cracked.gltf",
+      "out": "models/biome/kcas_wall_cracked.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/wall_window_open.gltf",
+      "out": "models/biome/kcas_wall_window.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/wall_pillar.gltf",
+      "out": "models/biome/kcas_wall_pillar.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/stairs_wide.gltf",
+      "out": "models/biome/kcas_stairs_wide.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/stairs_walled.gltf",
+      "out": "models/biome/kcas_stairs_walled.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/barrier.gltf",
+      "out": "models/biome/kcas_barrier.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/barrier_half.gltf",
+      "out": "models/biome/kcas_barrier_half.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/barrier_corner.gltf",
+      "out": "models/biome/kcas_barrier_corner.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/column.gltf",
+      "out": "models/biome/kcas_column.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/pillar_decorated.gltf",
+      "out": "models/biome/kcas_pillar.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/floor_tile_large.gltf",
+      "out": "models/biome/kcas_floor_large.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/floor_tile_small_weeds_A.gltf",
+      "out": "models/biome/kcas_floor_weeds.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/floor_foundation_allsides.gltf",
+      "out": "models/biome/kcas_foundation.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/banner_patternA_red.gltf",
+      "out": "models/biome/kcas_banner_red_a.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/banner_shield_red.gltf",
+      "out": "models/biome/kcas_banner_red_shield.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/banner_triple_red.gltf",
+      "out": "models/biome/kcas_banner_red_triple.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/torch_lit.gltf",
+      "out": "models/biome/kcas_torch.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/torch_mounted.gltf",
+      "out": "models/biome/kcas_torch_mounted.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/rubble_large.gltf",
+      "out": "models/biome/kcas_rubble_large.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/rubble_half.gltf",
+      "out": "models/biome/kcas_rubble_half.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/rocks.gltf",
+      "out": "models/biome/kcas_rocks.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/chest_large_gold.gltf",
+      "out": "models/biome/kcas_chest_gold.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/table_long_tablecloth_decorated_A.gltf",
+      "out": "models/biome/kcas_table_long.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/bench.gltf",
+      "out": "models/biome/kcas_bench.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/bookcase_double_decoratedA.gltf",
+      "out": "models/biome/kcas_bookcase.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/keg.gltf",
+      "out": "models/biome/kcas_keg.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Dungeon Remastered 1.1/Assets/gltf/barrel_large.gltf",
+      "out": "models/biome/kcas_barrel.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_castle_red.gltf",
+      "out": "models/biome/hexr_castle.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_townhall_red.gltf",
+      "out": "models/biome/hexr_townhall.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_barracks_red.gltf",
+      "out": "models/biome/hexr_barracks.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_church_red.gltf",
+      "out": "models/biome/hexr_church.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_tavern_red.gltf",
+      "out": "models/biome/hexr_tavern.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_stables_red.gltf",
+      "out": "models/biome/hexr_stables.glb",
+      "type": "static",
+      "maxTex": 512,
+      "dropIslands": {
+        "minTris": 150,
+        "maxDim": 1
+      },
+      "comment": "dropIslands strips the yard horses baked into the merged mesh (same fix as the blue stables in gale_harbor.json)"
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_home_A_red.gltf",
+      "out": "models/biome/hexr_home_a.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_home_B_red.gltf",
+      "out": "models/biome/hexr_home_b.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_market_red.gltf",
+      "out": "models/biome/hexr_market.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_blacksmith_red.gltf",
+      "out": "models/biome/hexr_blacksmith.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_windmill_red.gltf",
+      "out": "models/biome/hexr_windmill.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_archeryrange_red.gltf",
+      "out": "models/biome/hexr_archeryrange.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_tower_catapult_red.gltf",
+      "out": "models/biome/hexr_tower_catapult.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_tower_base_red.gltf",
+      "out": "models/biome/hexr_tower_base.glb",
+      "type": "static",
+      "maxTex": 512
+    }
+  ]
+}

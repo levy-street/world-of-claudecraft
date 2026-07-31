@@ -2,7 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type GamepadCallbacks, GamepadManager } from '../src/game/gamepad';
 import { GamepadBindings } from '../src/game/gamepad_bindings';
 import { GP, STANDARD_BUTTON_COUNT } from '../src/game/gamepad_map';
-import type { Input } from '../src/game/input';
+import { Input, type InputCallbacks } from '../src/game/input';
+import { Keybinds } from '../src/game/keybinds';
 
 const originalNavigator = globalThis.navigator;
 
@@ -42,6 +43,7 @@ describe('GamepadManager', () => {
     const onInputEdge = vi.fn();
     const input = {
       applyGamepadLook: vi.fn(),
+      setGamepadLookActive: vi.fn(),
       setGamepadMove: vi.fn(),
       triggerGamepadJump: vi.fn(),
     } as unknown as Input;
@@ -81,6 +83,7 @@ describe('GamepadManager window focus', () => {
     const clearGamepadMove = vi.fn();
     const input = {
       applyGamepadLook: vi.fn(),
+      setGamepadLookActive: vi.fn(),
       setGamepadMove,
       clearGamepadMove,
       triggerGamepadJump: vi.fn(),
@@ -158,6 +161,7 @@ function padWithId(id: string): Gamepad {
 function stubInput(): Input {
   return {
     applyGamepadLook: vi.fn(),
+    setGamepadLookActive: vi.fn(),
     setGamepadMove: vi.fn(),
     triggerGamepadJump: vi.fn(),
     clearGamepadMove: vi.fn(),
@@ -301,5 +305,134 @@ describe('GamepadManager brand detection', () => {
     expect(manager.getKind()).toBe('generic');
 
     Object.defineProperty(globalThis, 'window', { configurable: true, value: originalWindow });
+  });
+});
+
+// Regression coverage for the bug where right-stick look only ever orbited the
+// free camera: it never set any "look active" signal, so Input.isMouselookActive()
+// stayed false for gamepad input and gameplay facing (main.ts's
+// `mouselook ? input.camYaw : null`) was never derived from the stick, freezing
+// the character's heading for a controller-only player. These tests use a real
+// Input (not a mock), since the bug is in the real isMouselookActive() contract,
+// not just in whether GamepadManager calls a method.
+describe('GamepadManager right-stick turning', () => {
+  function inputCallbacks(): InputCallbacks {
+    return {
+      onTab: vi.fn(),
+      onTargetFriendly: vi.fn(),
+      onCycleFriendly: vi.fn(),
+      onPet: vi.fn(),
+      onAbility: vi.fn(),
+      onAbilityDown: vi.fn(),
+      onAbilityUp: vi.fn(),
+      onUiKey: vi.fn(),
+      onEmoteWheel: vi.fn(),
+      onClickPick: vi.fn(),
+      onAttackMove: vi.fn(),
+    } as unknown as InputCallbacks;
+  }
+
+  // Builds a real Input + GamepadManager pair behind the minimal DOM stubs the
+  // Input constructor touches (window/document/canvas), mirroring the pattern
+  // already used above for brand detection, and restores the globals after.
+  function withRealInput(
+    run: (input: Input, manager: GamepadManager, setPad: (p: Gamepad) => void) => void,
+  ): void {
+    const originalWindow = (globalThis as { window?: unknown }).window;
+    const originalDocument = (globalThis as { document?: unknown }).document;
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: {
+        innerWidth: 1920,
+        innerHeight: 1080,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      },
+    });
+    Object.defineProperty(globalThis, 'document', {
+      configurable: true,
+      value: {
+        activeElement: null,
+        body: { classList: { contains: () => false } },
+        pointerLockElement: null,
+        hidden: false,
+        hasFocus: () => true,
+        addEventListener: vi.fn(),
+        exitPointerLock: vi.fn(),
+      },
+    });
+    let pad = gamepadWithPressed();
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { getGamepads: () => [pad] },
+    });
+    const canvas = {
+      style: { cursor: '' },
+      addEventListener: vi.fn(),
+      requestPointerLock: vi.fn(),
+    } as unknown as HTMLCanvasElement;
+    const input = new Input(canvas, inputCallbacks(), new Keybinds());
+    const manager = new GamepadManager(input, new GamepadBindings(), {
+      onAction: vi.fn(),
+      onInputEdge: vi.fn(),
+      isPointerMode: () => false,
+    });
+    (manager as unknown as { index: number | null }).index = 0;
+    try {
+      run(input, manager, (p) => {
+        pad = p;
+      });
+    } finally {
+      Object.defineProperty(globalThis, 'window', { configurable: true, value: originalWindow });
+      Object.defineProperty(globalThis, 'document', {
+        configurable: true,
+        value: originalDocument,
+      });
+    }
+  }
+
+  function padWithRightStick(x: number, y = 0): Gamepad {
+    return { ...gamepadWithPressed(), axes: [0, 0, x, y] } as unknown as Gamepad;
+  }
+
+  it('is not mouselook-active while the right stick sits centered', () => {
+    withRealInput((input, manager) => {
+      manager.poll(1 / 60);
+      expect(input.isMouselookActive()).toBe(false);
+    });
+  });
+
+  it('drives player facing when the right stick is pushed sideways', () => {
+    withRealInput((input, manager, setPad) => {
+      const before = input.camYaw;
+      setPad(padWithRightStick(0.8, 0));
+      manager.poll(1 / 60);
+
+      // Before the fix: isMouselookActive() stayed false for gamepad input, so
+      // main.ts never adopted camYaw as the player's facing no matter how far
+      // the stick was pushed. camYaw itself already moved (the pre-existing
+      // free-camera orbit), which is exactly why this bug was easy to miss:
+      // the camera visibly turns, but the character never does.
+      expect(input.camYaw).not.toBe(before);
+      expect(input.isMouselookActive()).toBe(true);
+
+      // What main.ts's resolveMove()/renderFacingOverride() do with this state:
+      // while mouselook is active, gameplay facing tracks camYaw exactly.
+      const mouselook = input.isMouselookActive();
+      const facing: number | null = mouselook ? input.camYaw : null;
+      expect(facing).toBe(input.camYaw);
+    });
+  });
+
+  it('releases mouselook once the stick returns to center (no stuck turn)', () => {
+    withRealInput((input, manager, setPad) => {
+      setPad(padWithRightStick(0.8, 0));
+      manager.poll(1 / 60);
+      expect(input.isMouselookActive()).toBe(true);
+
+      setPad(gamepadWithPressed());
+      manager.poll(1 / 60);
+      expect(input.isMouselookActive()).toBe(false);
+    });
   });
 });

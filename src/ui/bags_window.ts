@@ -20,7 +20,7 @@
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS } from '../sim/data';
-import type { EquipSlot, InvSlot, ItemDef } from '../sim/types';
+import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   BAG_CATEGORIES,
@@ -64,6 +64,7 @@ import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
 import { svgIcon, type UiIconName } from './ui_icons';
+import { totalHeldCount } from './vendor_sell_quantity';
 import { dropOnWorld } from './world_drop_target';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
@@ -119,6 +120,7 @@ const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   consumable: 'hudChrome.bags.filterConsumable',
   material: 'hudChrome.bags.filterMaterial',
   quest: 'hudChrome.bags.filterQuest',
+  mount: 'hudChrome.bags.filterMount',
 };
 const BAG_SORT_LABEL_KEYS: Record<BagSort, TranslationKey> = {
   recent: 'hudChrome.bags.sortRecent',
@@ -180,12 +182,17 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  full-screen rule take over instead of leaving a half-width orphan). */
   onClosed(): void;
   addItemToTrade(itemId: string): void;
-  /** Stage a bag item for a Market listing (selects it + repaints the market). */
-  stageMarketSell(itemId: string): void;
-  /** Stage a bag stack as a mail parcel (repaints the mailbox Send tab). */
-  stageMailParcel(itemId: string): void;
+  /** Stage a bag item for a Market listing (selects it + repaints the market).
+   *  `instance` is the clicked slot's payload (issue 1165): an instanced copy stages
+   *  as ITSELF (single-copy listing), a plain stack stages fungibly. */
+  stageMarketSell(itemId: string, instance?: ItemInstancePayload): void;
+  /** Stage a bag stack as a mail parcel (repaints the mailbox Send tab).
+   *  `instance` mirrors stageMarketSell: an instanced copy stages as itself. */
+  stageMailParcel(itemId: string, instance?: ItemInstancePayload): void;
   /** Shift-click: insert a readable item link into the chat input. */
   insertItemChatLink(itemId: string): void;
+  /** Open the character sheet's mount picker highlighting this mount (a click
+   *  on a collected kind:'mount' reins item). */
   showError(text: string): void;
   setPendingPetFeed(active: boolean): void;
   resetPetBarSig(): void;
@@ -216,6 +223,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   openItemActionMenu(
     def: ItemDef,
     itemId: string,
+    slotIndex: number,
     x: number,
     y: number,
     runDefault: () => void,
@@ -874,7 +882,7 @@ export class BagsWindow {
   // pure bagItemAction decided. Both buttons run it (right-click is the classic
   // use/equip binding), so the two can never drift apart.
   private runBagAction(item: (typeof ITEMS)[string], s: InvSlot, ev: MouseEvent): void {
-    const action = bagItemAction(item, this.bagMode());
+    const action = bagItemAction(item, this.bagMode(), s.instance);
     switch (action) {
       case 'transferBlockedSoulbound':
         this.deps.showError(t('hudChrome.itemSoulbound'));
@@ -885,8 +893,11 @@ export class BagsWindow {
       case 'mailAttachBlocked':
         this.deps.showError(t('hudChrome.mailbox.cannotMail'));
         return;
+      case 'mailAttachBlockedBound':
+        this.deps.showError(t('hudChrome.mailbox.cannotMail'));
+        return;
       case 'mailAttach':
-        this.deps.stageMailParcel(s.itemId);
+        this.deps.stageMailParcel(s.itemId, s.instance);
         break;
       case 'marketSellBlockedQuest':
         this.deps.showError(t('itemUi.errors.noQuestItems'));
@@ -894,8 +905,11 @@ export class BagsWindow {
       case 'marketSellBlockedNoMarket':
         this.deps.showError(t('itemUi.tooltip.cannotMarket'));
         return;
+      case 'marketSellBlockedBound':
+        this.deps.showError(t('hud.errors.marketListBound'));
+        return;
       case 'marketSell':
-        this.deps.stageMarketSell(s.itemId);
+        this.deps.stageMarketSell(s.itemId, s.instance);
         break;
       case 'vendorSell':
         this.sellBagItem(s, ev);
@@ -946,7 +960,6 @@ export class BagsWindow {
         // Gathering tools (#2343) route through the interact-style handler
         // (nearest matching node + autorun stop) when main.ts has wired it;
         // everything else, and any unwired host, keeps the plain useItem.
-        const item = ITEMS[s.itemId];
         if (!item || !this.deps.useGatherTool(item)) this.deps.world().useItem(s.itemId);
         this.render();
         this.deps.renderCharIfOpen();
@@ -960,7 +973,7 @@ export class BagsWindow {
   private attachRowTooltip(row: HTMLElement, item: (typeof ITEMS)[string], s: InvSlot): void {
     this.deps.attachTooltip(row, () => {
       const mode = this.bagMode();
-      const key = bagTooltipHintKey(item, mode);
+      const key = bagTooltipHintKey(item, mode, s.instance);
       const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
       // Advertise the shift-click partial deposit on a splittable stack, the bank
       // window's withdrawPartialHint twin (tied to the deposit hint arm so a
@@ -1035,7 +1048,8 @@ export class BagsWindow {
     const rect = (ev.currentTarget as HTMLElement | null)?.getBoundingClientRect();
     const x = ev.clientX || rect?.left || 0;
     const y = ev.clientY || rect?.top || 0;
-    this.deps.openItemActionMenu(item, s.itemId, x, y, () => this.runBagAction(item, s, ev));
+    const index = bagStackIndex(this.deps.world().inventory, s);
+    this.deps.openItemActionMenu(item, s.itemId, index, x, y, () => this.runBagAction(item, s, ev));
   }
 
   private sellBagItem(slot: InvSlot, ev: MouseEvent): void {
@@ -1043,7 +1057,11 @@ export class BagsWindow {
     if (ev.ctrlKey || ev.metaKey) {
       this.deps.world().sellItem(slot.itemId, count);
     } else if (ev.shiftKey && count > 1) {
-      this.showSellQuantityPrompt(slot.itemId, count);
+      // The prompt's cap is every copy of this item across the whole bag, not just
+      // the ONE slot that was clicked: a stackable item's per-slot count tops out at
+      // its stackSize (commonly 20), so a player holding more sits in other slots.
+      const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
+      this.showSellQuantityPrompt(slot.itemId, heldTotal);
     } else {
       this.deps.world().sellItem(slot.itemId);
     }

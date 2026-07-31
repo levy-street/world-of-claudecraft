@@ -94,35 +94,49 @@ export const stationsPreloadInternalsForTest = {
   targetHeight: STATION_TARGET_HEIGHT,
 };
 
-function buildFallbackMesh(kind: StationPropKind): THREE.Object3D {
-  const h = STATION_TARGET_HEIGHT[kind];
-  const geo = new THREE.BoxGeometry(h * 0.7, h, h * 0.7);
-  const mesh = new THREE.Mesh(geo, surfaceMat({ color: 0x8a6a4a }));
-  mesh.position.y = h / 2;
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  return mesh;
+// One template part per mesh primitive of a station model, with the per-kind
+// height normalization baked in: normalize = T(0, -scaledMinY, 0) * S(scale),
+// exactly the transform the old per-placement clones applied, so instanced
+// placement is pixel-identical. That identity assumes the GLB scene ROOT has
+// no x/z offset (GLTFLoader always creates a fresh identity root): the old
+// clone path applied the scale around the reseated root, which cancels a
+// root y offset exactly but would drift x/z by offset*(1-scale).
+interface StationTemplatePart {
+  geo: THREE.BufferGeometry;
+  mat: THREE.Material;
+  local: THREE.Matrix4;
 }
 
-function buildStationMesh(kind: StationPropKind): THREE.Object3D {
+function stationTemplateParts(kind: StationPropKind): StationTemplatePart[] {
   const loaded = loadedStationGltf.get(kind);
-  if (!loaded) return buildFallbackMesh(kind);
-  const inst = loaded.clone(true);
-  // Normalize to the target height and re-seat the base at y=0 (the GLB's
-  // authored origin is not guaranteed to sit on the ground plane).
-  const box = new THREE.Box3().setFromObject(inst);
+  if (!loaded) {
+    const h = STATION_TARGET_HEIGHT[kind];
+    return [
+      {
+        geo: new THREE.BoxGeometry(h * 0.7, h, h * 0.7),
+        mat: surfaceMat({ color: 0x8a6a4a }),
+        local: new THREE.Matrix4().makeTranslation(0, h / 2, 0),
+      },
+    ];
+  }
+  loaded.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(loaded);
   const rawHeight = box.max.y - box.min.y;
   const scale = rawHeight > 1e-4 ? STATION_TARGET_HEIGHT[kind] / rawHeight : 1;
-  inst.scale.setScalar(scale);
-  const scaledBox = new THREE.Box3().setFromObject(inst);
-  inst.position.y -= scaledBox.min.y;
-  inst.traverse((child) => {
+  const normalize = new THREE.Matrix4()
+    .makeTranslation(0, -box.min.y * scale, 0)
+    .multiply(new THREE.Matrix4().makeScale(scale, scale, scale));
+  const parts: StationTemplatePart[] = [];
+  loaded.traverse((child) => {
     if (child instanceof THREE.Mesh) {
-      child.castShadow = true;
-      child.receiveShadow = true;
+      parts.push({
+        geo: child.geometry,
+        mat: child.material as THREE.Material,
+        local: new THREE.Matrix4().multiplyMatrices(normalize, child.matrixWorld),
+      });
     }
   });
-  return inst;
+  return parts;
 }
 
 export interface StationPropsView {
@@ -161,18 +175,32 @@ export function buildStationProps(seed: number, stations: readonly StationDef[])
   );
   const usePbr = GFX.standardMaterials;
 
+  // Group placements per (kind x region cell) and instance one mesh per
+  // model part: 18 per-placement GLB clones (a draw per primitive each)
+  // become one draw per (kind x part x hub cluster), and the per-cluster
+  // bounds keep off-screen hubs frustum-cullable (a single world-spanning
+  // batch would draw everywhere, forever).
+  const byKind = new Map<string, { kind: StationPropKind; mats: THREE.Matrix4[] }>();
+  const holderMatrix = new THREE.Matrix4();
+  const one = new THREE.Vector3(1, 1, 1);
+  const pos = new THREE.Vector3();
   for (const p of stationPropPlacements(stations)) {
-    const obj = buildStationMesh(p.kind);
-    const holder = new THREE.Group();
-    holder.add(obj);
-    holder.position.set(p.x, terrainHeight(p.x, p.z, seed), p.z);
+    pos.set(p.x, terrainHeight(p.x, p.z, seed), p.z);
     const yawQuat = new THREE.Quaternion().setFromAxisAngle(WORLD_UP, p.rot);
     const tiltQuat = new THREE.Quaternion().setFromUnitVectors(
       WORLD_UP,
       groundNormal(p.x, p.z, seed),
     );
-    holder.quaternion.copy(tiltQuat.multiply(yawQuat));
+    const quat = tiltQuat.multiply(yawQuat);
+    holderMatrix.compose(pos, quat, one);
+    const clusterKey = `${p.kind}:${Math.floor(p.x / 180)}:${Math.floor(p.z / 180)}`;
+    const bucket = byKind.get(clusterKey);
+    if (bucket) bucket.mats.push(holderMatrix.clone());
+    else byKind.set(clusterKey, { kind: p.kind, mats: [holderMatrix.clone()] });
     if (p.kind === 'campfire') {
+      const holder = new THREE.Group();
+      holder.position.copy(pos);
+      holder.quaternion.copy(quat);
       const flame = new THREE.Mesh(
         flameGeo,
         new THREE.MeshLambertMaterial({
@@ -196,8 +224,25 @@ export function buildStationProps(seed: number, stations: readonly StationDef[])
       light.position.y = FIRE_LIGHT_Y;
       holder.add(light);
       fireLights.push(light);
+      group.add(holder);
     }
-    group.add(holder);
+  }
+  const matrix = new THREE.Matrix4();
+  for (const { kind, mats: matrices } of byKind.values()) {
+    for (const part of stationTemplateParts(kind)) {
+      const im = new THREE.InstancedMesh(part.geo, part.mat, matrices.length);
+      im.name = `stationProps:${kind}`;
+      matrices.forEach((m, i) => {
+        matrix.multiplyMatrices(m, part.local);
+        im.setMatrixAt(i, matrix);
+      });
+      im.instanceMatrix.needsUpdate = true;
+      im.castShadow = true;
+      im.receiveShadow = true;
+      im.computeBoundingBox();
+      im.computeBoundingSphere();
+      group.add(im);
+    }
   }
   return { group, flames, fireLights };
 }

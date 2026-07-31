@@ -1,6 +1,8 @@
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { sfx } from '../src/game/sfx';
+import { FORGE_MAX_DISTANCE, MAX_DISTANCE, REF_DISTANCE, sfx } from '../src/game/sfx';
 import { SFX_CLIPS, type SfxEntry } from '../src/game/sfx_manifest.generated';
+import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
 // The footstep "jingling" bug: foot clips are ~0.48s but steps fire every ~0.22s
 // at a run, so flat retriggers overlap two pitch-jittered copies of one sample and
@@ -109,6 +111,9 @@ beforeEach(() => {
   // Inject decoded buffers directly (skip async fetch/decode in preload).
   const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
   buffers.set('foot_grass', { duration: 0.48 });
+  for (const [index, mountKey] of MOUNT_KEYS.entries()) {
+    buffers.set(`mount_run_${mountKey}`, { duration: 0.5 + index / 100 });
+  }
   buffers.set('foot_wood', WOOD_BUFFER);
 });
 
@@ -231,6 +236,160 @@ describe('isBuffered/preload', () => {
     const loading = (sfx as unknown as { loading: Map<string, unknown> }).loading;
     expect(loading.has(key)).toBe(false);
     expect(loading.has(`${key}:1`)).toBe(false);
+  });
+});
+
+describe('mount running audio', () => {
+  it('ships one generated manifest entry for every catalog mount', () => {
+    for (const mountKey of MOUNT_KEYS) {
+      const entry = SFX_CLIPS[`mount_run_${mountKey}`];
+      expect(entry).toMatchObject({
+        loop: false,
+        spatial: true,
+      });
+      expect(entry.url).toMatch(
+        new RegExp(`^/audio/sfx/mount_run_${mountKey}\\.mp3\\?v=[0-9a-f]{12}$`),
+      );
+    }
+  });
+
+  it('ships one non-empty MP3 asset for every catalog mount and no orphan mount clips', () => {
+    const directory = new URL('../public/audio/sfx/', import.meta.url);
+    const expected = MOUNT_KEYS.map((mountKey) => `mount_run_${mountKey}.mp3`).sort();
+    const actual = readdirSync(directory)
+      .filter((file) => file.startsWith('mount_run_') && file.endsWith('.mp3'))
+      .sort();
+
+    expect(actual).toEqual(expected);
+    for (const file of expected) {
+      const url = new URL(file, directory);
+      expect(statSync(url).size).toBeGreaterThan(5_000);
+      const header = readFileSync(url).subarray(0, 3).toString('ascii');
+      expect(header).toBe('ID3');
+    }
+  });
+
+  it('plays a distinct custom clip for every catalog mount', () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    const played = new Set<unknown>();
+
+    for (const mountKey of MOUNT_KEYS) {
+      nowT += 0.5;
+      sfx.mountRun(0, 0, 0, mountKey, true);
+      const src = sources.at(-1)!;
+      expect(src.buffer).toBe(buffers.get(`mount_run_${mountKey}`));
+      played.add(src.buffer);
+    }
+
+    expect(played.size).toBe(MOUNT_KEYS.length);
+  });
+
+  it('plays independently of the optional on-foot footstep toggle', () => {
+    sfx.setFootstepsEnabled(false);
+    sfx.mountRun(0, 0, 0, 'valorsteed', true);
+    expect(sources.at(-1)!.started).toBe(true);
+  });
+
+  it('truncates each stride before the next mounted running beat', () => {
+    sfx.mountRun(0, 0, 0, 'valorsteed', true);
+    const src = sources.at(-1)!;
+    expect(src.stopAt).not.toBeNull();
+    expect(src.stopAt! - nowT).toBeLessThan(0.5);
+  });
+
+  it('ignores unknown mount keys', () => {
+    const before = sources.length;
+    sfx.mountRun(0, 0, 0, 'unknown_mount', true);
+    expect(sources.length).toBe(before);
+  });
+});
+
+describe('amb_forge: its own narrower audible distance', () => {
+  beforeEach(() => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set('amb_forge', { duration: 3 });
+    buffers.set('amb_campfire', { duration: 3 });
+    sfx.setListener(0, 0, 0, 0, 0, 1);
+  });
+
+  function forgeSlot() {
+    const loops = (sfx as unknown as { loops: Map<string, { panner: unknown }> }).loops;
+    return loops.get('forge-1');
+  }
+
+  it('uses FORGE_MAX_DISTANCE on its panner, not the shared MAX_DISTANCE every other sound uses', () => {
+    const withinRange = FORGE_MAX_DISTANCE - 1;
+    sfx.ambience('vale', false, null, false, 0, [
+      { id: 'forge-1', kind: 'forge', x: withinRange, y: 0, z: 0 },
+    ]);
+    const slot = forgeSlot();
+    expect(slot).toBeDefined();
+    const panner = slot?.panner as { refDistance: number; maxDistance: number };
+    expect(panner.maxDistance).toBe(FORGE_MAX_DISTANCE); // not the shared MAX_DISTANCE
+    expect(panner.refDistance).toBe(REF_DISTANCE); // unchanged
+  });
+
+  it('stops playing beyond its own cutoff, well inside the shared MAX_DISTANCE (46)', () => {
+    // Halfway between the forge's own cutoff and the shared MAX_DISTANCE:
+    // guaranteed past the forge's cutoff and comfortably under the shared
+    // ceiling every other positional sound still uses, at any tuned value.
+    // If this were using the shared default, it would still be audible here.
+    const beyondForgeRange = (FORGE_MAX_DISTANCE + MAX_DISTANCE) / 2;
+    sfx.ambience('vale', false, null, false, 0, [
+      { id: 'forge-1', kind: 'forge', x: beyondForgeRange, y: 0, z: 0 },
+    ]);
+    expect(forgeSlot()).toBeUndefined();
+  });
+
+  it('a campfire at the same distance is unaffected, still using the shared MAX_DISTANCE', () => {
+    const beyondForgeRange = (FORGE_MAX_DISTANCE + MAX_DISTANCE) / 2;
+    sfx.ambience('vale', false, null, false, 0, [
+      { id: 'campfire-1', kind: 'campfire', x: beyondForgeRange, y: 0, z: 0 },
+    ]);
+    const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
+    expect(loops.get('campfire-1')).toBeDefined();
+  });
+
+  it('re-syncs an already-live loop panner to its override every frame, not only on creation', () => {
+    const withinRange = FORGE_MAX_DISTANCE - 1;
+    sfx.ambience('vale', false, null, false, 0, [
+      { id: 'forge-1', kind: 'forge', x: withinRange, y: 0, z: 0 },
+    ]);
+    const panner = forgeSlot()?.panner as { refDistance: number; maxDistance: number };
+    // Simulate drift: something else on the panner left maxDistance stale.
+    panner.maxDistance = MAX_DISTANCE;
+    expect(panner.maxDistance).not.toBe(FORGE_MAX_DISTANCE);
+
+    // ambience() calls loop() again next frame for the same live source.
+    sfx.ambience('vale', false, null, false, 0, [
+      { id: 'forge-1', kind: 'forge', x: withinRange, y: 0, z: 0 },
+    ]);
+    expect(panner.maxDistance).toBe(FORGE_MAX_DISTANCE);
+  });
+
+  it('carries the maxDistance override through the pending-load round trip', () => {
+    // A distinct id: the singleton sfx's loops/pendingLoops maps persist
+    // across tests, so reusing 'forge-1' here would hit the still-live slot
+    // from a sibling test's resync path instead of the pending-load branch.
+    const id = 'forge-pending';
+    // The outer beforeEach preloads amb_forge; remove it so this call takes
+    // the pending-load branch instead of creating the panner immediately.
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.delete('amb_forge');
+    sfx.loop(id, 'amb_forge', 1, 5, 0, 5, FORGE_MAX_DISTANCE);
+    const pendingLoops = (sfx as unknown as { pendingLoops: Map<string, { maxDistance?: number }> })
+      .pendingLoops;
+    const pending = pendingLoops.get(id);
+    expect(pending?.maxDistance).toBe(FORGE_MAX_DISTANCE);
+
+    // The buffer finishes loading; replay loop() with exactly what the
+    // pending record carried, the same value the real load callback reads.
+    buffers.set('amb_forge', { duration: 3 });
+    sfx.loop(id, 'amb_forge', 1, 5, 0, 5, pending?.maxDistance);
+    const loops = (sfx as unknown as { loops: Map<string, { panner: unknown }> }).loops;
+    const panner = loops.get(id)?.panner as { refDistance: number; maxDistance: number };
+    expect(panner.maxDistance).toBe(FORGE_MAX_DISTANCE);
+    expect(panner.refDistance).toBe(REF_DISTANCE);
   });
 });
 

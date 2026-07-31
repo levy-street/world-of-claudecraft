@@ -27,9 +27,10 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { ITEMS, isArenaPos, MOBS } from '../data';
+import { CLASSES, ITEMS, isArenaPos, MOBS } from '../data';
 import { weaponHand } from '../equipment_rules';
 import { TWOHAND_DPS_MULT } from '../item_budget';
+import { forceDismount } from '../mounts';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -110,6 +111,8 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
     ctx.error(p.id, 'Invalid attack target.');
     return;
   }
+  // Auto-dismount when the player is mounted and starts auto-attack.
+  if (p.mountKey !== '') forceDismount(ctx, p);
   if (p.sitting) ctx.standUp(p);
   if (p.weaponStowed) drawWeapon(p);
   p.autoAttack = true;
@@ -171,6 +174,10 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   // casters (wand-style, no dead zone so they don't run into melee, #94).
   // Form-aware: a druid keeps the class wand only in caster or Moonwing Form;
   // bear/cat/travel resolve to undefined here and fall through to melee.
+  // A pre-armed auto-attack that fires while mounted (e.g. mounted player who
+  // somehow retained autoAttack=true) force-dismounts before the swing lands,
+  // mirroring the ghost_wolf break pattern below and the startAutoAttack guard.
+  if (p.mountKey !== '') forceDismount(ctx, p);
   const ranged = rangedAutoProfile(p, meta.cls);
   if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
     if (!ctx.hasLineOfSight(p, t)) return;
@@ -497,15 +504,26 @@ export function meleeSwing(
     opts.forceCrit === true;
   if (crit) dmg *= 2 + attacker.critDmgPhysBonus;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
-  if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
+  const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
+  if (blocked) {
     dmg = Math.max(1, dmg - target.blockValue);
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
-  ctx.dealDamage(attacker, target, dealtAmount, crit, 'physical', abilityName, 'hit', false, {
-    flat: opts.threatFlat ?? 0,
-    mult: opts.threatMult ?? 1,
-  });
-  opts.onDealt?.(dealtAmount);
+  const resolvedAmount = ctx.dealDamage(
+    attacker,
+    target,
+    dealtAmount,
+    crit,
+    'physical',
+    abilityName,
+    blocked ? 'block' : 'hit',
+    false,
+    {
+      flat: opts.threatFlat ?? 0,
+      mult: opts.threatMult ?? 1,
+    },
+  );
+  opts.onDealt?.(resolvedAmount);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
   // the weaponStrike ability path, which resolves through this shell). Gated on
   // setProcs inside applySetProcs, so proc-less players draw no rng.

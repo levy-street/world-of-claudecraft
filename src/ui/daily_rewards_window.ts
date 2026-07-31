@@ -1,3 +1,4 @@
+import { WEAPON_SKIN_LIST } from '../sim/content/weapon_skins';
 import type { PlayerClass, WeaponSkinType } from '../sim/types';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
 import { ArmoryInspect } from './armory_inspect';
@@ -17,7 +18,7 @@ import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatDateTime, formatNumber, t } from './i18n';
-import { portraitChipHtml } from './portrait_chip';
+import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { rovingTarget } from './roving_index';
 import { svgIcon } from './ui_icons';
 import {
@@ -156,6 +157,12 @@ export class DailyRewardsWindow {
       return;
     }
     void this.renderCurrent('open');
+  }
+
+  /** Prebuild the store's persistent Armory context while loading hides it. */
+  async prewarmArmoryPreview(): Promise<void> {
+    if (!this.storeEnabled()) return;
+    await this.ensureArmoryInspect().prewarm(WEAPON_SKIN_LIST.map((skin) => skin.id));
   }
 
   toggle(): void {
@@ -397,6 +404,10 @@ export class DailyRewardsWindow {
       notice +
       armory;
     if (!this.replaceStoreBody(body, markup)) return;
+    // Dense armory compatibility chips defer their repeated portrait data URLs
+    // so this markup stays kilobytes rather than megabytes. Hydration assigns
+    // the already-cached nine class portraits by DOM property after mounting.
+    hydratePortraits(body);
     body.querySelector<HTMLButtonElement>('[data-buy-claudium]')?.addEventListener('click', () => {
       this.openClaudiumFromStore();
     });
@@ -452,7 +463,7 @@ export class DailyRewardsWindow {
     return (
       `<article class="armory-card rarity-${esc(row.skin.rarity)}${row.owned ? ' owned' : ''}${row.applied ? ' applied' : ''}">` +
       `<button type="button" data-armory-skin="${esc(row.skin.id)}" aria-label="${esc(t('hudChrome.wocStore.inspectAria', { item: copy.name }))}">` +
-      `<span class="armory-card-art"><img src="${esc(row.art)}" alt="" loading="lazy">${badge}${this.armoryClassChipsHtml(row)}</span>` +
+      `<span class="armory-card-art"><img src="${esc(row.art)}" alt="" loading="lazy" decoding="async">${badge}${this.armoryClassChipsHtml(row)}</span>` +
       `<span class="armory-card-copy"><span class="armory-card-type">${esc(weaponTypeLabel(row.skin.weaponType))}</span>` +
       `<h4>${esc(copy.name)}</h4>${state}</span>` +
       `</button></article>`
@@ -467,13 +478,17 @@ export class DailyRewardsWindow {
     const chips = row.eligibleClasses
       .map((cls) => {
         const name = tEntity({ kind: 'class', id: cls, field: 'name' });
-        return `<span class="armory-class-chip" title="${esc(name)}">${portraitChipHtml({ cls, name, badge: false })}</span>`;
+        return `<span class="armory-class-chip" title="${esc(name)}">${portraitChipHtml({ cls, name, badge: false, deferSource: true })}</span>`;
       })
       .join('');
     return chips ? `<span class="armory-classes">${chips}</span>` : '';
   }
 
   private openArmoryInspect(row: ArmorySkinRow): void {
+    this.ensureArmoryInspect().open(row);
+  }
+
+  private ensureArmoryInspect(): ArmoryInspect {
     if (!this.armoryInspect) {
       this.armoryInspect = new ArmoryInspect({
         appearance: () => {
@@ -497,7 +512,7 @@ export class DailyRewardsWindow {
         },
       });
     }
-    this.armoryInspect.open(row);
+    return this.armoryInspect;
   }
 
   /** Re-project + repaint after an optimistic apply/detach or a grant, keeping

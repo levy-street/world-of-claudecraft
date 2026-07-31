@@ -595,6 +595,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.1,
     color: 0x6b8e23,
+    componentTags: ['hide', 'meat'],
   },
 };
 
@@ -1643,6 +1644,18 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 130, sta: 4 },
     sellValue: 350,
     requiredClass: WAR,
+  },
+  // Collectible mount (Vael the Fogbinder, The Sunken Bastion). Soulbound;
+  // owning the reins item is owning the mount (src/sim/mounts.ts mountOwned).
+  reins_stalkglider_snail: {
+    id: 'reins_stalkglider_snail',
+    name: 'Reins of the Moss-Shell Stalk-Glider',
+    kind: 'mount',
+    mount: 'stalkglider_snail',
+    quality: 'rare',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
   },
   fenmist_robe: {
     id: 'fenmist_robe',

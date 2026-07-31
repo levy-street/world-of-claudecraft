@@ -38,6 +38,40 @@ export const hudChromeStrings = {
     healerConfirmAccept: 'Revive Me',
     healerConfirmCancel: 'Cancel',
   },
+  // Countdown-to-graveyard recovery. Stable event phases/reasons come from the
+  // authoritative sim; new semantics use new keys so stale safe-spot translations
+  // cannot be shown while locale fills catch up.
+  unstuck: {
+    menuButton: 'Unstuck',
+    help: 'Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.',
+    helpAtGraveyard:
+      "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
+    started:
+      'Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.',
+    countdown: 'Unstuck: {seconds}',
+    completed: 'Moved to the nearest reachable safe spot.',
+    completedAtGraveyard:
+      "Your spirit has returned to the nearest graveyard. Speak to the Pale Keeper to accept The Keeper's Toll.",
+    revivedAtGraveyard:
+      "You have been returned to the nearest graveyard and revived. The Keeper's Toll weighs on you.",
+    cancelledMoved: 'Unstuck cancelled because you moved.',
+    cancelledDamaged: 'Unstuck cancelled because you took damage.',
+    cancelledCombat: 'Unstuck cancelled because you entered combat.',
+    cancelledBusy: 'Unstuck cancelled because you started another action.',
+    cancelledState: 'Unstuck cancelled because your state changed.',
+    cancelledDisconnected: 'Unstuck cancelled because you disconnected.',
+    noSafePosition: 'No reachable safe spot was found nearby. You were not moved.',
+    alreadyActive: 'Unstuck is already counting down.',
+    alreadySafe: 'You are already in a safe, reachable position.',
+    cooldown: 'Unstuck will be ready in {seconds} seconds.',
+    dead: 'You cannot use Unstuck while dead or in spirit form.',
+    combat: 'You cannot use Unstuck during combat.',
+    controlled: 'You cannot use Unstuck while movement is impaired.',
+    standStill: 'Stand still on solid ground before using Unstuck.',
+    standStillAnywhere: 'Stand still before using Unstuck.',
+    busy: 'Finish your current action before using Unstuck.',
+    unavailable: 'Unstuck is unavailable in your current state.',
+  },
   // Floating combat text self-notes (proc consume labels, absorb readout).
   fct: {
     absorbed: 'Absorbed {amount}',
@@ -413,6 +447,7 @@ export const hudChromeStrings = {
     leaderboard: 'Ranks',
     dailyRewards: 'Store',
     deeds: 'Deeds',
+    mounts: 'Mounts',
     professions: 'Professions',
     nameplates: 'Names',
     haptics: 'Haptics',
@@ -609,6 +644,25 @@ export const hudChromeStrings = {
     // segment closes itself a few seconds after the fight ends.
     autoShowHint:
       'Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends.',
+    // Hover breakdown for one bar: a header line, then one row per ability (or,
+    // on the threat tab, per contributor). A pet is not its own bar, so its
+    // abilities carry the pet's name.
+    breakdownSummary: '{tab}: {value}',
+    breakdownRow: '{value} ({percent})',
+    breakdownOther: 'Other ({count})',
+    percent: '{value}%',
+    petAbility: '{pet}: {ability}',
+    melee: 'Melee',
+    // Each meter panel is movable (drag its title bar) and resizable (drag the
+    // corner grip), and the Healing / Threat meters can leave the tabbed window
+    // for one of their own.
+    move: 'Drag to move this meter',
+    resize: 'Drag to resize this meter',
+    dock: 'Dock this meter back into the meters window',
+    // Right-click menu on a meter tab's name. {meter} is the meter's own label
+    // ("Healing", "Threat"), so the row reads as the action on that meter.
+    separate: 'Separate {meter}',
+    regroup: 'Regroup {meter}',
   },
   // Pet action bar disabled-state tooltips: the feed/heal-pet button stays
   // visible (never hidden) while it cannot currently be used, so a hunter
@@ -636,6 +690,89 @@ export const hudChromeStrings = {
     petTaunt: 'Pet: Taunt',
     petDefensive: 'Pet: Defensive',
     petAggressive: 'Pet: Aggressive',
+    // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
+    mount: 'Mount / Dismount',
+  },
+  // The character sheet's mount picker (mount_picker.ts; the old Mounts window
+  // is retired, its keys stay per the retired-but-translated chrome precedent).
+  // Names and descriptions come from the reference cards
+  // (src/sim/content/mounts.ts carries the canonical English names for the sim
+  // side); clickManage is the bag tooltip hint on a collected reins item.
+  mounts: {
+    title: 'Mounts',
+    close: 'Close',
+    select: 'Select',
+    selected: 'Selected',
+    riding: 'Riding',
+    mount: 'Mount',
+    dismount: 'Dismount',
+    // Reins are usable items: the bag tooltip tells the player to use them. There
+    // is no per-mount level gate and no picker, so the old requiresLevel /
+    // pickFirst / keybindHint lines went with them.
+    useToRide: 'Use to summon this mount.',
+    // The empty state, shown when the player owns no mount yet: a heading plus
+    // how to earn a first one (the stablemaster's riding lessons) and the rarer
+    // boss-drop mounts.
+    emptyTitle: 'No mounts collected',
+    emptyStableHint:
+      'Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.',
+    emptyDropHint: 'Rarer mounts drop from heroic dungeon bosses and Rift completions.',
+    clickManage: 'Click to choose your mount',
+    rarity_common: 'Common',
+    rarity_rare: 'Rare',
+    rarity_epic: 'Epic',
+    spec_speed: '+{pct}% extra mobility',
+    name_valorsteed: 'Valorsteed',
+    name_grag_bear: 'Goliath Grag-Bear',
+    name_stalkglider_snail: 'Moss-Shell Stalk-Glider',
+    name_aether_hover_cycle: 'Aether-Jouster Hover-Cycle',
+    name_shadowjump_toad: 'Kama-Kage the Shadow-Jump Toad',
+    name_stormfeather_griffin: 'Sky-Reach Stormfeather',
+    name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
+    desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
+    desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
+    desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
+    desc_aether_hover_cycle:
+      'A powerful magitech bike designed for swift, low-hovering combat traversal.',
+    desc_shadowjump_toad:
+      'A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.',
+    desc_stormfeather_griffin:
+      'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
+    desc_thunderstrut_gobbler:
+      'A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.',
+  },
+  // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
+  // Marla lends the player a training Valorsteed for the paddock race. Finishing
+  // the course succeeds the lesson. Sim-side gameplay lives in
+  // src/sim/mounts_training.ts. mountPrompt is retained for the legacy command;
+  // the current flow starts on the glowing race platform.
+  mountTraining: {
+    mountPrompt: 'Press {key} to mount the training Valorsteed.',
+    // Shown once the riding lesson is turned in and the reward reins land in the
+    // bags. It must teach the ITEM, not a keybind: summoning your own mount is a
+    // bag / action-bar click now.
+    ownedMountPrompt: 'Your reins are in your bags. Use them to ride.',
+    ridePrompt: 'Follow the glowing marker to the start line, then press Start Race.',
+    begin: 'Begin Lesson',
+    success: 'You have tamed the Valorsteed.',
+    returnToMarla: 'Return to Marla at the stables to buy your Valorsteed reins for 10g.',
+  },
+  // The show-jumping race in the stables paddock (src/sim/mount_race.ts): ride to
+  // the glowing platform and press Start Race, watch the countdown, then clear
+  // every jump (in any order) and ride back through the arch in time. countdown/
+  // go are the center-screen count; startButton is the button; start/finished/
+  // timeout are the banners; timeLeft is the bottom strip's only text.
+  // {seconds} is a formatNumber-rendered count.
+  mountRace: {
+    startButton: 'Start Race',
+    cancelButton: 'Cancel Race',
+    go: 'GO!',
+    start: 'Go! Clear every jump, then ride back through the arch.',
+    toFinish: 'Ride back through the arch!',
+    finished: 'Finished in {seconds}s!',
+    timeout: 'Race Failed',
+    progress: 'Gates {n} of {total}',
+    timeLeft: '{seconds}s',
   },
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md): the queue window,
   // the persistent indicator button, the in-match score strip, and the event
@@ -1285,10 +1422,10 @@ export const hudChromeStrings = {
   // count is auto-supplied as {count}. Keep all four categories present per base.
   plurals: {
     guildMembers: {
-      one: 'you are {rank}, {count} member',
-      few: 'you are {rank}, {count} members',
-      many: 'you are {rank}, {count} members',
-      other: 'you are {rank}, {count} members',
+      one: 'your guild rank is {rank}; {count} member',
+      few: 'your guild rank is {rank}; {count} members',
+      many: 'your guild rank is {rank}; {count} members',
+      other: 'your guild rank is {rank}; {count} members',
     },
     finderPartySize: {
       one: '{count} player',
@@ -1427,6 +1564,13 @@ export const hudChromeStrings = {
     twoFactorRecoveryHint:
       'Each code works once. Store them somewhere safe: they are the only way back in if you lose your authenticator app.',
     twoFactorDownloadCodes: 'Download Codes',
+    // Recovery-codes download file (plain text): formatRecoveryCodesFile in
+    // src/ui/two_factor_setup.ts builds the downloadable file from these.
+    recoveryCodesFileHeader: '{brand} recovery codes',
+    recoveryCodesFileAccount: 'Account: {username}',
+    recoveryCodesFileHint:
+      'Each code can be used once if you lose access to your authenticator app.',
+    recoveryCodesFileWarn: 'Keep this file somewhere safe and private.',
     twoFactorDone: 'Done',
     twoFactorDisableHint:
       'Enter your password to turn two-factor off. Your recovery codes will be discarded.',
@@ -1483,7 +1627,15 @@ export const hudChromeStrings = {
     // one carried reviewed fills in every locale (in-place rewords go stale).
     harvestTooltip:
       'Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.',
-    concentrateHint: 'Fewer chosen components yield a higher tier each.',
+    // #2514 reword. The retired concentrateHint said "Fewer CHOSEN components
+    // yield a higher tier each", which the new rule makes false in both
+    // directions: checking one more unmapped row lowers nothing, and checking
+    // one fewer of them raises nothing. The tier tracks what the harvest TAKES,
+    // which is the rows that can pay, so the sentence says that instead. A new
+    // key rather than an in-place edit, the harvestTooltip precedent above:
+    // rewording a key in place leaves every locale's reviewed fill silently
+    // answering the old sentence.
+    yieldTierHint: 'The fewer components a harvest takes, the higher the tier of each.',
     // #2509: claw, tusk, gills and horn are tagged on corpses but no harvest
     // item is wired to them yet, so a selection of nothing but those would
     // spend the single-use corpse for nothing. The command refuses it and the
@@ -1491,6 +1643,18 @@ export const hudChromeStrings = {
     nothingSelectedYields: 'Nothing you selected can be harvested from this corpse.',
     alreadyHarvested: 'This corpse has already been harvested.',
     componentAria: 'Harvest {component}',
+    // #2514: the same four families, on a corpse that ALSO carries one that
+    // pays. The row stays offered (the corpse does carry it) and checking it is
+    // now free, so this marks it rather than explaining a refusal.
+    //
+    // Two keys, and the aria one takes the visible mark as a SECOND
+    // placeholder rather than restating it. Never concatenated, and it also
+    // makes WCAG 2.2 SC 2.5.3 (Label in Name) structural: the accessible name
+    // contains the text the row shows, in every locale, instead of depending on
+    // each translator happening to reuse their own phrasing across two
+    // independent strings. Keep {note} as a placeholder if this is reworded.
+    componentNoYield: 'nothing yet',
+    componentAriaNoYield: 'Harvest {component}: {note}',
     components: {
       hide: 'Hide',
       fang: 'Fang',
@@ -1637,6 +1801,7 @@ export const hudChromeStrings = {
     filterConsumable: 'Consumables',
     filterMaterial: 'Materials',
     filterQuest: 'Quest',
+    filterMount: 'Mounts',
     sortAria: 'Sort bag items',
     sortRecent: 'Recent',
     sortQuality: 'Quality',
@@ -1932,6 +2097,9 @@ export const hudChromeStrings = {
   // through formatNumber.
   itemTooltip: {
     requiresLevel: 'Requires Level {level}',
+    riftTier: '{tier}-rank Rift item',
+    riftUpgrade: 'Rift upgrade {level}/{max}',
+    riftSockets: 'Rift gems {used}/{total}',
     // The enchant-attributed sibling of itemUi.tooltip.stat, rendered on the
     // share of a per-copy bonus stat that an applied enchant granted
     // (item_instance_tooltip.ts instanceBonusStatLines). It replaced the old
@@ -2218,6 +2386,8 @@ export const hudChromeStrings = {
       noRecipient: 'No one by that name holds a mailbox here.',
       tooManyParcels: 'A letter carries at most {count} parcels.',
       noMailQuestItems: 'You cannot mail quest items.',
+      // Wordy, M16: the five non-Latin fills land in this same change.
+      noMailBound: 'That item is bound and cannot be mailed.',
       notEnoughItems: 'You do not have that many to send.',
       cantAffordPostage: 'You cannot afford the postage.',
       recipientBoxFull: 'Their mailbox is full.',
@@ -2229,8 +2399,8 @@ export const hudChromeStrings = {
   // visible while sale proceeds or returned items wait at the Merchant.
   // (Wordy, M16: the five non-Latin fills land in this same change.)
   marketIndicator: {
-    aria: 'World Market collection waiting',
-    tip: 'Gold or items are waiting for you at the Merchant.',
+    aria: 'World Market proceeds or items waiting',
+    tip: 'Sale proceeds or returned items are waiting for you at the Merchant.',
   },
   noticeboard: {
     empty: 'Nothing seems posted.',
@@ -2904,9 +3074,16 @@ export const hudChromeStrings = {
     // enchanted in place, so it lists alongside the bagged copies and needs to
     // say which equipment slot it is on ({slot} resolves through the shared
     // itemUi.slots labels, so Main Hand and Off Hand separate a dual-wielded
-    // pair). Both rings share the one "Finger" label there, which is fine: two
-    // eligible identical rings take the same enchant either way.
+    // pair).
     wornTag: 'Worn ({slot})',
+    // The same tag for an equipment key whose slot label is SHARED with another
+    // key: both fingers read "Finger", so two rings listed at once produced two
+    // identical rows and the player could not tell which finger a tap would
+    // change (#2466). {index} is the 1-based position inside the shared-label
+    // group (enchant_apply_view.ts slotIndex), so this reads "Worn (Finger 1)"
+    // and "Worn (Finger 2)". One key, never the plain tag with a number glued
+    // on: the order of a slot name and its ordinal is the translator's call.
+    wornTagIndexed: 'Worn ({slot} {index})',
     // The Apply Enchant picker's three section headers, in ladder order. The
     // tier is derived from the reagents alone (enchant_apply_view.ts
     // enchantTier), so these headers name the same ladder content/enchants.ts
@@ -3232,5 +3409,19 @@ export const hudChromeStrings = {
     // placement around the name live HERE so a locale owns both. Non-wordy
     // after placeholder strip, so no forced non-Latin fills.
     titledName: '{name} [{title}]',
+  },
+  // World map continent overview (right-click the map, or the level-toggle
+  // button, to zoom out to the whole world; click a region to open its zone map).
+  continentMap: {
+    title: 'World Map',
+    // aria-live summary announced when the overview opens.
+    summary: 'World map. Choose a zone to open its map.',
+    // Level-toggle button visible text per level (the accessible name too). The
+    // static aria/title is generic so it never needs a per-level setAttribute.
+    toWorld: 'World map',
+    toZone: 'Zone map',
+    toggleAria: 'Switch between the world map and the zone map',
+    // Hover tooltip over a zone region: its name plus the suggested level band.
+    levels: 'Levels {min} to {max}',
   },
 };

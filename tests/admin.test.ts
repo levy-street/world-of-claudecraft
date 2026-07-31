@@ -50,7 +50,9 @@ vi.mock('../server/moderation_db', () => ({
   liftAccountChatMute: vi.fn(),
   moderateAccount: vi.fn(),
   muteAccountChat: vi.fn(),
+  reactivateAccountAudited: vi.fn(),
   recordPasswordReset: vi.fn(),
+  resetChatStrikesAudited: vi.fn(),
 }));
 vi.mock('../server/chat_filter_db', () => ({
   addFilterWord: vi.fn(),
@@ -59,7 +61,6 @@ vi.mock('../server/chat_filter_db', () => ({
   getFilterConfig: vi.fn(),
   listFilterWords: vi.fn(),
   removeFilterWord: vi.fn(),
-  resetChatStrikes: vi.fn(),
   updateFilterConfig: vi.fn(),
 }));
 vi.mock('../server/ip_block_db', () => ({
@@ -112,7 +113,6 @@ import {
   getFilterConfig,
   listFilterWords,
   removeFilterWord,
-  resetChatStrikes,
   updateFilterConfig,
 } from '../server/chat_filter_db';
 import {
@@ -121,6 +121,7 @@ import {
   accountMailTarget,
   findAccount,
   isAdminAccount,
+  pool,
   revokeTokensExcept,
   updatePasswordHash,
 } from '../server/db';
@@ -134,8 +135,11 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  reactivateAccountAudited,
   recordPasswordReset,
+  resetChatStrikesAudited,
 } from '../server/moderation_db';
+import { resetAuthFailures } from '../server/ratelimit';
 import {
   adminRolesForAccount,
   listStaff,
@@ -146,7 +150,9 @@ import {
 const VALID_TOKEN = 'a'.repeat(64);
 const fullToken = (accountId: number) => ({ accountId, scope: 'full' as const });
 
-function fakeReq(opts: { method?: string; url?: string; token?: string; body?: unknown } = {}) {
+function fakeReq(
+  opts: { method?: string; url?: string; token?: string; body?: unknown; ip?: string } = {},
+) {
   const req = new EventEmitter() as EventEmitter & {
     method: string;
     url: string;
@@ -156,7 +162,9 @@ function fakeReq(opts: { method?: string; url?: string; token?: string; body?: u
   req.method = opts.method ?? 'GET';
   req.url = opts.url ?? '/admin/api/overview';
   req.headers = opts.token ? { authorization: `Bearer ${opts.token}` } : {};
-  req.socket = { remoteAddress: `10.0.0.${Math.floor(Math.random() * 250) + 1}` };
+  // A per-call source IP: random by default, or pinned via opts.ip so a test can
+  // simulate a distributed attacker who never repeats a source address.
+  req.socket = { remoteAddress: opts.ip ?? `10.0.0.${Math.floor(Math.random() * 250) + 1}` };
   if (opts.method === 'POST') {
     setImmediate(() => {
       if (opts.body !== undefined) req.emit('data', JSON.stringify(opts.body));
@@ -232,6 +240,9 @@ beforeEach(() => {
   // test's cached value never leaks into the next.
   resetOverviewCacheForTests();
   resetAdminPlayersCapForTests();
+  // The per-account failed-login throttle (server/ratelimit.ts) is real, module-level
+  // state; reset it so one test's failures never leak into the next.
+  resetAuthFailures();
   fakeGame.isIpBlocked.mockReturnValue(false);
   fakeGame.liveSharedIps.mockReturnValue([]);
   fakeGame.suspiciousPlayers.mockReturnValue([]);
@@ -597,6 +608,123 @@ describe('admin api auth', () => {
     expect(res.statusCode).toBe(200);
   });
 
+  it('serves unstuck reports through the production admin dispatcher', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(pool.query)
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: '9',
+            realm: 'main',
+            account_id: 4,
+            character_id: 5,
+            character_name: 'Aleph',
+            area_kind: 'dungeon',
+            area_id: 'hollow_crypt',
+            instance_id: null,
+            instance_slot: 2,
+            origin_raw_x: 100,
+            origin_raw_y: 3,
+            origin_raw_z: 200,
+            origin_local_x: 4,
+            origin_local_y: 3,
+            origin_local_z: 8,
+            destination_raw_x: null,
+            destination_raw_y: null,
+            destination_raw_z: null,
+            destination_local_x: null,
+            destination_local_y: null,
+            destination_local_z: null,
+            outcome: 'cancelled',
+            reason: 'moved',
+            invoked_at: '2026-07-14T00:00:00.000Z',
+            resolved_at: '2026-07-14T00:00:03.000Z',
+            created_at: '2026-07-14T00:00:03.000Z',
+          },
+        ],
+      } as never)
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            area_kind: 'dungeon',
+            area_id: 'hollow_crypt',
+            bucket_local_x: 0,
+            bucket_local_y: 0,
+            bucket_local_z: 5,
+            report_count: 3,
+            completed_count: 1,
+            cancelled_count: 2,
+            failed_count: 0,
+            first_invoked_at: '2026-07-13T00:00:00.000Z',
+            last_resolved_at: '2026-07-14T00:00:03.000Z',
+          },
+        ],
+      } as never);
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        token: VALID_TOKEN,
+        url: '/admin/api/unstuck-reports?days=14&limit=25',
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toMatchObject({
+      days: 14,
+      limit: 25,
+      reports: [
+        {
+          id: 9,
+          characterName: 'Aleph',
+          origin: { x: 100, y: 3, z: 200, localX: 4, localY: 3, localZ: 8 },
+          destination: null,
+          outcome: 'cancelled',
+          reason: 'moved',
+        },
+      ],
+      hotspots: [
+        {
+          bucket: { x: 0, y: 0, z: 5 },
+          count: 3,
+          completed: 1,
+          cancelled: 2,
+          failed: 0,
+        },
+      ],
+    });
+  });
+
+  it('skips the unstuck hotspot aggregate on legacy cursor pages', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(pool.query).mockResolvedValueOnce({ rows: [], rowCount: 0 } as never);
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        token: VALID_TOKEN,
+        url: '/admin/api/unstuck-reports?days=14&limit=25&beforeId=9',
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(pool.query).toHaveBeenCalledTimes(1);
+    expect(String(vi.mocked(pool.query).mock.calls[0][0])).toContain('FROM unstuck_reports r');
+    expect(String(vi.mocked(pool.query).mock.calls[0][0])).not.toContain('WITH bucketed AS');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toMatchObject({
+      reports: [],
+      hotspots: [],
+      hasMore: false,
+      nextBeforeId: null,
+    });
+  });
+
   it('serves shared IPs with their current block state', async () => {
     vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
@@ -713,7 +841,40 @@ describe('admin api auth', () => {
     expect(associationsForIp).toHaveBeenCalledWith('203.0.113.7', 2, 50);
     expect(res.statusCode).toBe(200);
     expect(res.body.data.blocked).toBe(true);
+    expect(res.body.data.blockable).toBe(true);
     expect(res.body.data.accounts[0].online).toBe(true);
+  });
+
+  it('serves associations for the stored unknown marker without checking the block list', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(associationsForIp).mockResolvedValue({
+      ip: 'unknown',
+      accounts: [],
+      total: 0,
+      page: 1,
+      limit: 25,
+    });
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/ip-associations?ip=unknown' }),
+      res,
+      fakeGame,
+    );
+
+    expect(associationsForIp).toHaveBeenCalledWith('unknown', 1, 25);
+    expect(fakeGame.isIpBlocked).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toEqual({
+      ip: 'unknown',
+      accounts: [],
+      total: 0,
+      page: 1,
+      limit: 25,
+      blocked: false,
+      blockable: false,
+    });
   });
 
   it('rejects an invalid IP association lookup', async () => {
@@ -940,6 +1101,7 @@ describe('admin api auth', () => {
       expiresAt,
     });
     expect(fakeGame.disconnectAccount).toHaveBeenCalledWith(9, 'This account is suspended.');
+    expect(revokeTokensExcept).toHaveBeenCalledWith(9, null);
   });
 
   it('bans and disconnects an account', async () => {
@@ -968,6 +1130,7 @@ describe('admin api auth', () => {
       expiresAt: undefined,
     });
     expect(fakeGame.disconnectAccount).toHaveBeenCalledWith(9, 'This account has been banned.');
+    expect(revokeTokensExcept).toHaveBeenCalledWith(9, null);
   });
 
   it('mutes account chat and sends a live warning without disconnecting', async () => {
@@ -1025,6 +1188,7 @@ describe('admin api auth', () => {
       expiresAt: undefined,
     });
     expect(fakeGame.disconnectAccount).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
   });
 
   it('unsuspends without disconnecting the account', async () => {
@@ -1054,6 +1218,7 @@ describe('admin api auth', () => {
     });
     expect(fakeGame.disconnectAccount).not.toHaveBeenCalled();
     expect(accountMailTarget).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
   });
 
   it('rejects suspending or banning admin accounts', async () => {
@@ -1262,7 +1427,8 @@ describe('admin api chat filter', () => {
   });
 
   it('resets strikes and syncs the live session', async () => {
-    vi.mocked(resetChatStrikes).mockResolvedValue(true);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(resetChatStrikesAudited).mockResolvedValue(true);
     const res = fakeRes();
 
     await handleAdminApi(
@@ -1270,14 +1436,96 @@ describe('admin api chat filter', () => {
         method: 'POST',
         token: VALID_TOKEN,
         url: '/admin/api/moderation/accounts/9/reset-strikes',
+        body: { reason: 'appeal accepted' },
       }),
       res,
       fakeGame,
     );
 
     expect(res.statusCode).toBe(200);
-    expect(resetChatStrikes).toHaveBeenCalledWith(9);
+    expect(resetChatStrikesAudited).toHaveBeenCalledWith({
+      accountId: 9,
+      adminAccountId: 7,
+      reason: 'appeal accepted',
+    });
     expect(fakeGame.resetChatStrikesLive).toHaveBeenCalledWith(9);
+  });
+
+  it('rejects a reset-strikes without a reason before touching the account', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(resetChatStrikesAudited).mockRejectedValue(
+      new Error('moderation reason is required'),
+    );
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/accounts/9/reset-strikes',
+        body: {},
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toEqual({
+      success: false,
+      data: null,
+      error: 'moderation reason is required',
+    });
+    expect(fakeGame.resetChatStrikesLive).not.toHaveBeenCalled();
+  });
+
+  it('reactivates an account and records the reason', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(reactivateAccountAudited).mockResolvedValue();
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/accounts/9/reactivate',
+        body: { reason: 'appeal accepted' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(reactivateAccountAudited).toHaveBeenCalledWith({
+      accountId: 9,
+      adminAccountId: 7,
+      reason: 'appeal accepted',
+    });
+  });
+
+  it('rejects a reactivate without a reason before touching the account', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(reactivateAccountAudited).mockRejectedValue(
+      new Error('moderation reason is required'),
+    );
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/accounts/9/reactivate',
+        body: {},
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toEqual({
+      success: false,
+      data: null,
+      error: 'moderation reason is required',
+    });
   });
 
   it('includes chat moderation state in the moderation account detail', async () => {
@@ -1398,6 +1646,26 @@ describe('blocked-ips admin route', () => {
       fakeGame,
     );
     expect(res.statusCode).toBe(400);
+    expect(fakeGame.disconnectByIp).not.toHaveBeenCalled();
+  });
+
+  it('refuses to block unknown before the write boundary', async () => {
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/blocked-ips',
+        body: { ip: 'unknown' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(400);
+    expect(addBlockedIp).not.toHaveBeenCalled();
+    expect(fakeGame.reloadBlockedIps).not.toHaveBeenCalled();
     expect(fakeGame.disconnectByIp).not.toHaveBeenCalled();
   });
 
@@ -1852,6 +2120,141 @@ describe('admin login payload', () => {
 
     expect(res.statusCode).toBe(403);
     expect(res.body.error).toMatch(/does not have admin access/);
+  });
+});
+
+// Regression coverage for the missing per-account brute-force lockout on the legacy
+// handleLogin arm: unlike POST /api/login (server/auth_routes.ts), admin login had
+// no authThrottled / recordAuthFailure / clearAuthFailures gate, so a distributed
+// attacker who never repeats a source IP could guess a known admin username's
+// password forever, capped only by ADMIN_LOGIN_MAX_PER_MINUTE per IP (never per
+// account).
+describe('admin login: per-account failed-login throttle (distributed brute force)', () => {
+  const MAX_AUTH_FAILURES = 10; // server/ratelimit.ts, not exported
+
+  it('429s the (MAX_AUTH_FAILURES + 1)th bad-password attempt against ONE account even though every attempt uses a DIFFERENT source IP', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'victim',
+      password_hash: 'hash',
+    } as never);
+
+    let res: FakeResponse & ServerResponse = fakeRes();
+    for (let i = 0; i < MAX_AUTH_FAILURES + 1; i++) {
+      res = fakeRes();
+      // A fresh, never-repeated source IP per attempt: the per-IP limiter
+      // (ADMIN_LOGIN_MAX_PER_MINUTE, 10/min) never sees more than one request from
+      // any of these, so if it were the only guard this loop would never lock out.
+      await handleAdminApi(
+        fakeReq({
+          method: 'POST',
+          url: '/admin/api/login',
+          body: { username: 'victim', password: 'wrong' },
+          ip: `203.0.113.${i + 1}`,
+        }),
+        res,
+        fakeGame,
+      );
+    }
+    expect(res.statusCode).toBe(429);
+    expect(res.body.error).toBe('too many failed attempts, wait a few minutes and try again');
+    // Locked out BEFORE any credential check on the final attempt: verifyPassword
+    // was reached exactly MAX_AUTH_FAILURES times (once per prior failure), never
+    // on the attempt that trips the lockout.
+    expect(vi.mocked(verifyPassword)).toHaveBeenCalledTimes(MAX_AUTH_FAILURES);
+  });
+
+  it('never locks out a DIFFERENT account sharing no username with the attacked one', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'victim',
+      password_hash: 'hash',
+    } as never);
+    for (let i = 0; i < MAX_AUTH_FAILURES; i++) {
+      await handleAdminApi(
+        fakeReq({
+          method: 'POST',
+          url: '/admin/api/login',
+          body: { username: 'victim', password: 'wrong' },
+          ip: `203.0.113.${i + 1}`,
+        }),
+        fakeRes(),
+        fakeGame,
+      );
+    }
+    // 'bystander' has never failed a login, so it is unaffected by victim's lockout.
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 4,
+      username: 'bystander',
+      password_hash: 'hash2',
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'bystander', roles: ['viewer'] });
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'bystander', password: 'right' },
+        ip: '198.51.100.1',
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('a successful login clears the account throttle so a later run needs a fresh MAX_AUTH_FAILURES failures', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'bob',
+      password_hash: 'hash',
+    } as never);
+    for (let i = 0; i < MAX_AUTH_FAILURES - 1; i++) {
+      await handleAdminApi(
+        fakeReq({
+          method: 'POST',
+          url: '/admin/api/login',
+          body: { username: 'bob', password: 'wrong' },
+          ip: `203.0.113.${i + 1}`,
+        }),
+        fakeRes(),
+        fakeGame,
+      );
+    }
+    // One under the ceiling; a correct password now succeeds and forgives the typos.
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'bob', roles: ['viewer'] });
+    const okRes = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'bob', password: 'correct' },
+        ip: '198.51.100.9',
+      }),
+      okRes,
+      fakeGame,
+    );
+    expect(okRes.statusCode).toBe(200);
+
+    // Failures started fresh: MAX_AUTH_FAILURES - 1 more bad attempts still don't
+    // lock the account out.
+    let lastRes: FakeResponse & ServerResponse = fakeRes();
+    for (let i = 0; i < MAX_AUTH_FAILURES - 1; i++) {
+      lastRes = fakeRes();
+      await handleAdminApi(
+        fakeReq({
+          method: 'POST',
+          url: '/admin/api/login',
+          body: { username: 'bob', password: 'wrong-again' },
+          ip: `192.0.2.${i + 1}`,
+        }),
+        lastRes,
+        fakeGame,
+      );
+    }
+    expect(lastRes.statusCode).toBe(401);
   });
 });
 

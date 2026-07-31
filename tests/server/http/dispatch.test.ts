@@ -42,22 +42,13 @@ function fakeRoute(handler: RouteHandler, meta?: RouteMeta): RouteDef {
 }
 
 /**
- * Drive the fire-and-forget dispatcher (void runOnion) to completion by polling
- * the response, bounded so a stuck onion fails loudly instead of hanging.
+ * Drive the fire-and-forget dispatcher (void runOnion) to completion. FakeRes
+ * owns the elapsed-time deadline; the extra macrotask lets the onion unwind
+ * through its metric-recording finally block after end().
  */
-function flush(res: FakeRes): Promise<void> {
-  return new Promise((resolve, reject) => {
-    let ticks = 0;
-    const tick = () => {
-      // A synchronous handler ends the response before the onion unwinds (where
-      // withMetrics records), so poll via setImmediate: the check runs only after
-      // the microtask queue (the full unwind, including the metric record) drains.
-      if (res.writableEnded) return resolve();
-      if (++ticks > 1000) return reject(new Error('response never ended'));
-      setImmediate(tick);
-    };
-    setImmediate(tick);
-  });
+async function flush(res: FakeRes): Promise<void> {
+  await res.waitForEnd();
+  await new Promise<void>((resolve) => setImmediate(resolve));
 }
 
 describe('createApiDispatcher', () => {

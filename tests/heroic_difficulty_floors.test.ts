@@ -45,7 +45,13 @@ const HEROIC_NYTHRAXIS_BOSS_FLOOR = 1000;
 const NORMAL_NYTHRAXIS_BOSS_FLOOR = 600;
 const NORMAL_NYTHRAXIS_ADD_FLOOR = 300;
 
-const FIVE_MANS = ['hollow_crypt', 'sunken_bastion', 'drowned_temple', 'gravewyrm_sanctum'];
+const FIVE_MANS = [
+  'hollow_crypt',
+  'sunken_bastion',
+  'drowned_temple',
+  'gravewyrm_sanctum',
+  'wildheart_basin',
+];
 const RAID = 'nythraxis_boss_arena';
 const RAID_BOSS = 'nythraxis_scourge_of_thornpeak';
 // Encounter-script waves (spawnNythraxisAdds / spawnNythraxisHeroicAdds spawn
@@ -199,6 +205,7 @@ describe('heroic tuning data contract', () => {
       sunken_bastion: [4.0, 18, 9.75],
       drowned_temple: [5.2, 16.5, 9.15],
       gravewyrm_sanctum: [4.0, 15.5, 8.55],
+      wildheart_basin: [4.0, 17.25, 8.625],
       nythraxis_boss_arena: [3.2, 7.25, 7.25],
     });
   });

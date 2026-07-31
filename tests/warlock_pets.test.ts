@@ -1,11 +1,23 @@
 import { describe, expect, it } from 'vitest';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, WorldContent } from '../src/sim/types';
 import { dist2d } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
+// The imp's target is whatever wild mob is nearest (teleported next to the
+// player as a dummy), so keep the real forest_wolf camps as that mob supply
+// and strip the rest of the ambient world (subsystem-world pattern, see
+// tests/dot_final_tick.test.ts).
+const WARLOCK_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((c) => c.mobId === 'forest_wolf'),
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeSim(seed = 42) {
-  return new Sim({ seed, playerClass: 'warlock', autoEquip: true });
+  return new Sim({ seed, playerClass: 'warlock', autoEquip: true, world: WARLOCK_TEST_WORLD });
 }
 
 function nearestMob(sim: Sim): Entity {

@@ -91,7 +91,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
 
   it('appends buyback rows as children of their own .vendor-goods-grid', () => {
     const buyback: VendorBuybackRow[] = [
-      { itemId: 'sword', item: item('sword'), count: 1, price: 100 },
+      { itemId: 'sword', item: item('sword'), count: 1, price: 100, index: 0 },
     ];
     const view: VendorView = { goods: [], buyback, honorBalance: 0, hasHonorGoods: false };
     const el = document.createElement('div');

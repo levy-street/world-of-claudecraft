@@ -92,12 +92,12 @@ function routeOf(server: GameServer): (evs: SimEvent[]) => void {
  *  cannot silently turn a far player into an in-zone recipient. */
 function moveToOtherZone(e: Entity, zoneId: string): void {
   let z = e.pos.z;
-  for (let i = 0; i < 400 && zoneAt(z).id === zoneId; i++) z += 50;
-  if (zoneAt(z).id === zoneId) {
+  for (let i = 0; i < 400 && zoneAt(e.pos.x, z).id === zoneId; i++) z += 50;
+  if (zoneAt(e.pos.x, z).id === zoneId) {
     z = e.pos.z;
-    for (let i = 0; i < 400 && zoneAt(z).id === zoneId; i++) z -= 50;
+    for (let i = 0; i < 400 && zoneAt(e.pos.x, z).id === zoneId; i++) z -= 50;
   }
-  expect(zoneAt(z).id).not.toBe(zoneId);
+  expect(zoneAt(e.pos.x, z).id).not.toBe(zoneId);
   e.pos.z = z;
   e.prevPos = { ...e.prevPos, z };
 }
@@ -122,7 +122,7 @@ describe('attunement celebration over the live GameServer wire (session routing)
     const ownerName = playersOf(server).get(so.pid)!.name;
 
     const entities = entitiesOf(server);
-    const zoneId = zoneAt(entities.get(so.pid)!.pos.z).id;
+    const zoneId = zoneAt(entities.get(so.pid)!.pos.x, entities.get(so.pid)!.pos.z).id;
     // Nearby spawns with the owner (same hub, same zone); park Farhand elsewhere.
     moveToOtherZone(entities.get(sf.pid)!, zoneId);
 

@@ -104,6 +104,15 @@ import {
 // costs anything) lives on in recipes.ts/types.ts.
 const CRAFT_SKILL_GAIN = 1;
 
+function isCraftedDisenchantTrackedOutput(def: ItemDef | undefined): boolean {
+  return (
+    !!def &&
+    (def.kind === 'weapon' || def.kind === 'armor') &&
+    !!def.quality &&
+    def.quality !== 'poor'
+  );
+}
+
 export interface CraftResult {
   ok: boolean;
   recipeId: string;
@@ -403,6 +412,7 @@ export function resolveCraftForRecipe(
   // the success path after consumption.
   const def: ItemDef | undefined = ITEMS[recipe.resultItemId];
   const outputQuality = defOutputQuality(def);
+  const craftedRecipeId = isCraftedDisenchantTrackedOutput(def) ? recipe.id : undefined;
   // #1129/#1148: the archetype empowerment ceiling. With deterministic
   // outputs, the only remaining quality-EXCEEDING mechanism is the masterwork
   // bump, so the ceiling now gates the masterwork effect (the proc arm
@@ -454,10 +464,10 @@ export function resolveCraftForRecipe(
     // The grant shapes, mirroring the grant arms below field for field so the
     // modeled payloads merge exactly like the minted ones.
     const shapes: InvSlot[][] = [];
-    if (recipe.resultCount === 1 && isSignableMaterialRarity(outputQuality)) {
+    if (isSignableMaterialRarity(outputQuality)) {
       const payload: ItemInstancePayload = { signer: meta.name };
       if (commissioned) payload.bindOnTrade = true;
-      shapes.push([{ itemId: recipe.resultItemId, count: 1, instance: payload }]);
+      shapes.push([{ itemId: recipe.resultItemId, count: recipe.resultCount, instance: payload }]);
     } else if (commissioned) {
       shapes.push([
         { itemId: recipe.resultItemId, count: recipe.resultCount, instance: { bindOnTrade: true } },
@@ -544,17 +554,21 @@ export function resolveCraftForRecipe(
     bumped !== null &&
     bumped.tier <= ceilingTier;
   // Deterministic grant: every successful craft yields recipe.resultItemId.
-  // #1149 signing rule preserved on the DEF quality: a single-copy output
-  // whose def is rare-or-better is a signed instance so it carries an
-  // attribution target for Battlefield Experience; anything below stays
-  // fungible, and a resultCount > 1 output is never itself signable
-  // (matching every recipe in content/recipes.ts today). A masterwork proc
-  // is always minted as ONE signed instance carrying the baked bonus stats;
-  // a resultCount > 1 recipe grants the remainder plain, exactly as the
-  // plain arm would. NEW crafts never write rolled.quality (retired for new
-  // writes; legacy payloads keep loading). A commissioned craft arms every
-  // copy (the player opted the CRAFT in, so a multi-copy output mints each
-  // remainder copy as its own armed instance; they stack byte-equal), and a
+  // #1149 signing rule preserved on the DEF quality: an output whose def is
+  // rare-or-better is a signed instance so it carries an attribution target
+  // for Battlefield Experience, EVERY granted copy included (a resultCount >
+  // 1 recipe_anglers_feast_platter/recipe_elixir_of_the_serpent-shaped output
+  // is just as signable as a resultCount 1 one; the same {signer} payload on
+  // every copy stacks byte-equal, so this is one addItemInstance call with
+  // count set to the full resultCount, not a loop); anything below stays
+  // fungible. A masterwork proc is always minted as ONE signed instance
+  // carrying the baked bonus stats; a resultCount > 1 recipe grants the
+  // remainder plain, exactly as the plain arm would (the proc bonus is
+  // specific to the one procced unit, unlike the DEF-quality signing rule
+  // above). NEW crafts never write rolled.quality (retired for new writes;
+  // legacy payloads keep loading). A commissioned craft arms every copy (the
+  // player opted the CRAFT in, so a multi-copy output mints each remainder
+  // copy as its own armed instance; they stack byte-equal), and a
   // commissioned sub-rare output forces the instance path a plain grant
   // would skip. Commission never adds signer: the #1149 signing rule is
   // untouched (the bond composes with the maker's mark, it does not extend
@@ -565,42 +579,70 @@ export function resolveCraftForRecipe(
   // top of it, and it logs the quality-colored, item-linked crafted line
   // carrying the output count, so the hub's "You receive:" line would be a
   // second (and for a resultCount > 1 recipe a third) line for the one craft
-  // (#2430).
+  // (#2430). Applying the DEF-quality rule to recipe_anglers_feast_platter and
+  // recipe_elixir_of_the_serpent is a deliberate, accepted cost: both are
+  // food/elixir, so useItem's battlefieldExperienceTrickle arm (gated on
+  // def.kind === 'potion') never reaches them, meaning this signs every copy
+  // for zero Battlefield Experience payoff. It still applies, for consistency
+  // with the four existing rare single-copy consumables (silvered_carp_supper,
+  // marlows_grand_roast, the two sunpetal draughts): the signed instance is
+  // non-fungible, so countFungibleItem/removeFungibleItem (src/sim/market.ts)
+  // and post_office.ts see zero fungible copies of either output. Since the
+  // instanced exchange pipes landed (#1165,
+  // src/sim/item_instance_transfer.ts), an unlocked signed copy lists and
+  // mails as its own single-copy entry, so signing no longer takes these
+  // outputs out of commerce; it only moves them off the fungible paths.
+  // Player-to-player trade of the signed instance is unchanged.
   if (meta && masterwork && bonusStats) {
     const payload: ItemInstancePayload = {
       signer: meta.name,
       rolled: { masterwork: true, stats: bonusStats },
     };
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, { silent: true, callerLogs: true });
+    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, {
+      silent: true,
+      callerLogs: true,
+      craftedRecipeId,
+    });
     if (recipe.resultCount > 1) {
       if (commissioned) {
         for (let i = 1; i < recipe.resultCount; i++) {
           ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, {
             silent: true,
             callerLogs: true,
+            craftedRecipeId,
           });
         }
       } else {
         ctx.addItem(recipe.resultItemId, recipe.resultCount - 1, pid, {
           silent: true,
           callerLogs: true,
+          craftedRecipeId,
         });
       }
     }
-  } else if (meta && recipe.resultCount === 1 && isSignableMaterialRarity(outputQuality)) {
+  } else if (meta && isSignableMaterialRarity(outputQuality)) {
     const payload: ItemInstancePayload = { signer: meta.name };
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, { silent: true, callerLogs: true });
+    ctx.addItemInstance(recipe.resultItemId, payload, pid, recipe.resultCount, {
+      silent: true,
+      callerLogs: true,
+      craftedRecipeId,
+    });
   } else if (commissioned) {
     for (let i = 0; i < recipe.resultCount; i++) {
       ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, {
         silent: true,
         callerLogs: true,
+        craftedRecipeId,
       });
     }
   } else {
-    ctx.addItem(recipe.resultItemId, recipe.resultCount, pid, { silent: true, callerLogs: true });
+    ctx.addItem(recipe.resultItemId, recipe.resultCount, pid, {
+      silent: true,
+      callerLogs: true,
+      craftedRecipeId,
+    });
   }
   if (meta) {
     // The #1129/#1148 gain doctrine (archetype ceiling alone zeroes, ordinary

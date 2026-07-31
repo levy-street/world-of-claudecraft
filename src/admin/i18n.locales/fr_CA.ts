@@ -465,4 +465,7 @@ export const fr_CA: Record<string, string> = {
   'moderationHistoryPage.colTarget': 'Cible',
   'moderationHistoryPage.colModerator': 'Modérateur',
   'moderationHistoryPage.colReason': 'Motif',
+  'dialog.actionResetChatStrikes': 'Remettre à zéro les infractions de clavardage de ce compte',
+  'dialog.confirmResetChatStrikes': 'Confirmer la remise à zéro des infractions de clavardage',
+  'moderationHistory.actionResetChatStrikes': 'Infractions de clavardage réinitialisées',
 };

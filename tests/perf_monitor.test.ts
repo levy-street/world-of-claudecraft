@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { PerfMonitor } from '../src/game/perf';
 import type { NetPipelineSummary } from '../src/net/net_pipeline_stats';
+import type { Renderer } from '../src/render/renderer';
+import type { SceneCensusReport } from '../src/render/scene_census_core';
 
 const MB = 1024 * 1024;
 
@@ -24,6 +26,7 @@ function installBrowserGlobals(search = ''): void {
     createElement: () => ({
       style: {},
       addEventListener: () => {},
+      appendChild: () => {},
     }),
   };
   Object.defineProperty(globalThis, 'navigator', {
@@ -143,5 +146,116 @@ describe('perf monitor external dev-trace spans', () => {
     const perf = new PerfMonitor(null);
     perf.recordExternalSpan('net.parse', 0, 20);
     expect(perf.snapshot(1000).devTrace).toBeUndefined();
+  });
+});
+
+// Scene census + hitch wiring (src/render/scene_census_core.ts consumers). The
+// fake renderer is a narrow structural mirror of the two members PerfMonitor
+// touches plus perfStats (which snapshot() always reads).
+describe('perf monitor scene census wiring', () => {
+  function censusReport(): SceneCensusReport {
+    return {
+      atMs: 123,
+      tier: 'ultra',
+      playerPosition: { x: 1, y: 2, z: 3 },
+      cameraPosition: { x: 1, y: 8, z: -3 },
+      baseline: { calls: 51, triangles: 6404, points: 0, lines: 0 },
+      shadow: { measured: true, calls: 12, triangles: 700, callsShare: 0.235 },
+      rows: [
+        {
+          category: 'props',
+          roots: 3,
+          visibleRoots: 3,
+          calls: 28,
+          triangles: 5000,
+          points: 0,
+          callsShare: 0.549,
+          trianglesShare: 0.781,
+        },
+      ],
+      residual: { calls: 4, triangles: 4 },
+      programs: 42,
+      textures: 7,
+      geometries: 9,
+      renders: 5,
+    };
+  }
+
+  function fakeRenderer() {
+    return {
+      hitchEnabled: [] as boolean[],
+      setHitchLogEnabled(enabled: boolean) {
+        this.hitchEnabled.push(enabled);
+      },
+      hitchStats: () => ({
+        frames: 100,
+        hitches: 2,
+        byCause: { 'shader-compile': 1, 'texture-upload': 0, 'view-create': 0, other: 1 },
+        programGrowthFrames: 1,
+        programsAdded: 3,
+        recent: [],
+      }),
+      captureSceneCensus: censusReport,
+      perfStats: () => null,
+    };
+  }
+
+  it('gates the renderer hitch log on the overlay enable state', () => {
+    const offRenderer = fakeRenderer();
+    const off = new PerfMonitor(offRenderer as unknown as Renderer);
+    expect(off.enabled).toBe(false);
+    expect(offRenderer.hitchEnabled).toEqual([false]);
+
+    installBrowserGlobals('?perf');
+    const onRenderer = fakeRenderer();
+    const on = new PerfMonitor(null);
+    on.setRenderer(onRenderer as unknown as Renderer);
+    expect(on.enabled).toBe(true);
+    expect(onRenderer.hitchEnabled).toEqual([true]);
+  });
+
+  it('runs the census through the renderer and serves census + hitches in the snapshot', () => {
+    installBrowserGlobals('?perf');
+    const perf = new PerfMonitor(fakeRenderer() as unknown as Renderer);
+    expect(perf.snapshot(1000).census).toBeUndefined();
+
+    const report = perf.runSceneCensus();
+    expect(report?.baseline.calls).toBe(51);
+
+    const snap = perf.snapshot(2000);
+    expect(snap.census?.baseline.calls).toBe(51);
+    expect(snap.census?.rows[0]?.category).toBe('props');
+    expect(snap.hitches?.hitches).toBe(2);
+    expect(snap.hitches?.byCause['shader-compile']).toBe(1);
+  });
+
+  it('drops the one self-inflicted frame sample after a census run', () => {
+    installBrowserGlobals('?perf');
+    const perf = new PerfMonitor(fakeRenderer() as unknown as Renderer);
+    perf.frame(0.016, 1000);
+    perf.runSceneCensus();
+    // The burst inflates the next rAF gap; that sample must not be recorded.
+    perf.frame(0.2, 1300);
+    perf.frame(0.016, 1316);
+    const snap = perf.snapshot(2000);
+    expect(snap.frames).toBe(2);
+    expect(snap.frameMs.max).toBeLessThan(50);
+  });
+
+  it('clears the stored census on reset', () => {
+    installBrowserGlobals('?perf');
+    const perf = new PerfMonitor(fakeRenderer() as unknown as Renderer);
+    perf.runSceneCensus();
+    expect(perf.snapshot(1000).census).toBeDefined();
+    perf.reset();
+    expect(perf.snapshot(2000).census).toBeUndefined();
+  });
+
+  it('returns null before a renderer exists and omits the optional fields', () => {
+    const perf = new PerfMonitor(null);
+    expect(perf.runSceneCensus()).toBeNull();
+    const snap = perf.snapshot(1000);
+    expect(snap.census).toBeUndefined();
+    expect(snap.hitches).toBeUndefined();
   });
 });

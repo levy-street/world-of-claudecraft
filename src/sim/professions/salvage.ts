@@ -15,9 +15,11 @@
 // in the headless RL env unchanged.
 
 import { bagCapacity, canAddItem, consumeOneScratch } from '../bags';
+import { RIFT_ESSENCE_ITEM_ID } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { requiredLevelFor } from '../item_level_req';
 import { removePreferFungible } from '../items';
+import { riftSalvageYield } from '../rift/progression';
 import type { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import type { ItemDef } from '../types';
@@ -116,18 +118,44 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   const materialItemId = SALVAGE_MATERIAL_BY_QUALITY[def.quality ?? 'common'] ?? 'bone_fragments';
   // #2350 capacity gate: the materials must fit AFTER the salvaged copy
   // leaves, so consume it on a scratch copy (consumeOneScratch mirrors
-  // removePreferFungible's victim order) and pre-fit the WORST-CASE yield
-  // (the +1 rng bonus arm): the denial draws nothing, and a granted roll can
-  // never exceed what was checked. Denies with no side effect, like every
-  // other arm above.
+  // removePreferFungible's victim order, and its returned payload predicts
+  // the actual victim) and pre-fit the payout that victim yields: a
+  // rift-upgraded copy pays rift essence at its deterministic count, any
+  // other copy the quality material at the WORST-CASE yield (the +1 rng
+  // bonus arm): the denial draws nothing, and a granted roll can never
+  // exceed what was checked. Denies with no side effect, like every other
+  // arm above.
   if (meta) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
-    consumeOneScratch(scratch, itemId);
-    if (!canAddItem(scratch, bagCapacity(meta.bags), materialItemId, maxSalvageYield(def))) {
+    const victim = consumeOneScratch(scratch, itemId);
+    const fitItemId = victim?.rift ? RIFT_ESSENCE_ITEM_ID : materialItemId;
+    const fitCount = victim?.rift ? riftSalvageYield(victim) : maxSalvageYield(def);
+    if (!canAddItem(scratch, bagCapacity(meta.bags), fitItemId, fitCount)) {
       return { ok: false, itemId, reason: 'no_bag_space' };
     }
   }
-  removePreferFungible(ctx, itemId, 1, pid);
+  // Prefer consuming a plain (fungible) copy so an enchanted or rift-upgraded
+  // instance is never salvaged while an interchangeable shell exists. When only
+  // instanced copies remain, removePreferFungible consumes one and returns the
+  // payload it ACTUALLY consumed: a rift-upgraded copy pays out rift essence.
+  const [consumedInstance] = removePreferFungible(ctx, itemId, 1, pid);
+  const riftInstance = consumedInstance?.rift ? consumedInstance : null;
+  if (riftInstance) {
+    const count = riftSalvageYield(riftInstance);
+    // silent + callerLogs, exactly like the material branch below: this arm
+    // returns a salvageResult too, so the salvage cue and the yield-naming
+    // salvage line already own both halves of the feedback (#2430). Without
+    // the flags a rift salvage stacked the generic loot ding and the hub's
+    // "You receive:" line on top of its own.
+    ctx.addItem(RIFT_ESSENCE_ITEM_ID, count, pid, { silent: true, callerLogs: true });
+    // A rift salvage is still a salvage: it spends the same throttle budget
+    // and feeds the lifetime counter, drawing zero rng on this branch.
+    if (meta) {
+      recordAction(meta);
+      ctx.bumpDeedStat(meta, 'salvagesPerformed', 1);
+    }
+    return { ok: true, itemId, materialItemId: RIFT_ESSENCE_ITEM_ID, count };
+  }
   const count = salvageYield(def, ctx.rng);
   // silent + callerLogs: the salvageResult event owns BOTH halves of the
   // player feedback. It fires its own dedicated cue (audio.salvage in

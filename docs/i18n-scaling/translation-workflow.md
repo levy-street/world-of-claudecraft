@@ -48,8 +48,9 @@ one.
    `...BASE_NEW`/`...PET_NEW` from the generated `sim_i18n.newlocales.ts` (regenerated
    by the new-locale fill pipeline), so a new key must be English-filled in those
    blocks too or `tsc` red-fails on the missing locale. Broad `(.+)` RULES go
-   LAST (after every more-specific form); the catch-all `unleashes` rule is the last
-   entry by design.
+   AFTER every more-specific form that could also match them; the catch-all
+   `unleashes` rule is the reference example, and anything a broad rule could
+   swallow must be registered above it.
 3. **`server/` emit.** Same idea in `src/ui/server_i18n.ts`: add the English to the
    inline `DICT` (all 22 locales, same dialect rule) + an `EXACT`/`RULES` matcher so
    `localizeServerText` re-renders it. Numbers/durations spliced into a server

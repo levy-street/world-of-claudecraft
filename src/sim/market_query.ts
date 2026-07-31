@@ -47,19 +47,23 @@ export type MarketBagSizeFilter = 'all' | `${number}`;
 // capacity no other bag has adds its browse option automatically, in ascending order,
 // with no code and no locale change: the option label reuses the already-translated
 // `itemUi.tooltip.bagSlots` template, which takes the number as a value.
-export const MARKET_BAG_SIZE_FILTERS: readonly MarketBagSizeFilter[] = [
-  'all',
-  ...[
-    ...new Set(
-      Object.values(ITEMS)
-        .filter((item) => item.kind === 'bag')
-        .map((item) => item.bagSlots ?? 0)
-        .filter((slots) => slots > 0),
-    ),
-  ]
-    .sort((a, b) => a - b)
-    .map((slots) => `${slots}` as const),
-];
+//
+// A bag with bagSlots 0, or with bagSlots omitted entirely (defaulted to 0 below), is a
+// legitimate distinct capacity, not noise to drop: excluding it here would still let the
+// bag match under itemType 'bag' + subtype 'all' (itemMatchesSubtype short-circuits on
+// 'all'), but no specific-capacity button could ever reach it. So every distinct value,
+// including 0, gets its own option.
+export function deriveBagSizeFilters(items: readonly ItemDef[]): readonly MarketBagSizeFilter[] {
+  return [
+    'all',
+    ...[...new Set(items.filter((item) => item.kind === 'bag').map((item) => item.bagSlots ?? 0))]
+      .sort((a, b) => a - b)
+      .map((slots) => `${slots}` as const),
+  ];
+}
+export const MARKET_BAG_SIZE_FILTERS: readonly MarketBagSizeFilter[] = deriveBagSizeFilters(
+  Object.values(ITEMS),
+);
 // Bound to the content union both ways on purpose: `satisfies` rejects an option that is not
 // a real ArmorType, and the Exclude assertion below reddens tsc if ArmorType ever gains a class
 // with no option here (which would silently make that whole armor class unbrowsable).
@@ -183,7 +187,11 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
   if (filter === 'material')
     return !isCosmeticItem(item) && (item.kind === 'junk' || item.kind === 'tool');
   if (filter === 'cosmetic') return isCosmeticItem(item);
-  if (filter === 'other') return item.kind === 'quest';
+  // The catch-all for catalog kinds with no browse category of their own. Mount
+  // reins join quest items here: both are soulbound oddments a player can hold
+  // but never list, so neither earns a filter chip, and neither may be left
+  // reachable through 'All' alone (tests/market_filters.test.ts).
+  if (filter === 'other') return item.kind === 'quest' || item.kind === 'mount';
   // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above
   // reddens tsc here instead of silently inheriting the 'other' predicate, which is
   // how `bag` browsed as nothing at all for its whole life before this arm existed.

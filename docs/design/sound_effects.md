@@ -85,6 +85,12 @@ not change the exit code), so the shipped world clips, which predate the mono
 policy, do not break the gate before the one-time re-process. Pass
 `npm run sfx:check -- --strict` to promote them to failures, and
 `npm run sfx:conform` (`--fix`) to conform loudness and downmix in a single pass.
+The 8 `player_hurt_female_1..5` / `player_death_female_1..3` clips under
+`public/audio/sfx/` are an intentional, temporary exception to the naming rule:
+they are staged ahead of the player-gender model swap (no `PlayerMeta` gender
+field exists yet to key playback on), so `--strict` currently flags all 8 as
+"not a catalog key, numbered variant, or mob subfamily file". That is expected
+noise, not a regression, until the swap lands and wires them under a real key.
 
 A third advisory category flags a `custom: true` key whose measured LUFS lands
 suspiciously close to the generated-content target (`TARGET_LUFS`, -14): the
@@ -129,6 +135,10 @@ which already computes interpolated position, `loco.speed/moving`, `swimming`,
   `zoneBiomeAt(z)` (vale→grass, marsh→dirt, peaks→stone) → water if wading →
   dock decks→wood → dungeon→stone → snow if weather is snowing. Suppressed while airborne /
   swimming / dead and gated by `d2 < SFX_RANGE_SQ`.
+- **Mount running:** the same distance accumulator fires a mount-specific
+  `sink.mountRun(x,y,z, mountKey, self)` gait beat while a grounded mount runs.
+  Mount walking stays quiet. These cues use the normal SFX mix and remain audible
+  when the optional on-foot footstep setting is disabled.
 - **Jump / land / splash / swim:** per-view edge detection on `airborne` and
   `swimming` transitions fires `sink.movement('jump'|'land'|'splash'|'swim', …)`.
 - **Listener:** after the camera is positioned (~L1583), `sink.setListener(camPos,
@@ -186,6 +196,13 @@ until that loop stops.
 | `foot_wood` | 0.5 | single boot step on hollow wooden planks, dull creak, close |
 | `foot_snow` | 0.5 | single boot step crunching fresh snow, soft compression |
 | `foot_water` | 0.6 | single footstep wading in shallow water, splashy, close |
+| `mount_run_valorsteed` | 0.39 | armored warhorse gallop |
+| `mount_run_grag_bear` | 0.70 | pitched-down paired heavy footfalls |
+| `mount_run_stalkglider_snail` | 0.55 | rapid slime surge |
+| `mount_run_aether_hover_cycle` | 0.65 | hovercraft acceleration pulse |
+| `mount_run_shadowjump_toad` | 0.52 | slime spring and damp footfall |
+| `mount_run_stormfeather_griffin` | 0.51 | large wing rush and hard talon contact |
+| `mount_run_thunderstrut_gobbler` | 0.40 | higher feather rush and quick claw contact |
 | `move_jump` | 0.5 | quick light gear/leather exertion and fabric rustle, a person leaping up |
 | `move_land` | 0.6 | a person landing from a jump, boots thud with armor and gear settle |
 | `move_splash` | 0.8 | a body plunging into water, big splash |
@@ -314,6 +331,16 @@ as footstep variant choice, not gameplay-affecting).
 | `amb_dungeon` | ✓ | global | a dark stone dungeon interior, dripping water echoes and a low ominous drone |
 | `amb_rain` | ✓ | global | steady rainfall pattering with occasional distant thunder |
 | `amb_snow` | ✓ | global | a soft muffled snowy wind, quiet and cold |
+
+Point ambience (`amb_campfire`/`amb_forge`) shares the same falloff every
+other positional sound uses by default, but `amb_forge` gets its own,
+narrower audible-distance override (`FORGE_MAX_DISTANCE`, `src/game/sfx.ts`;
+`makePanner`/`loop`/`tooFar` all take an optional refDistance/maxDistance
+override, defaulting to the shared constants so nothing else's range shifts).
+This sets the stage for future station ambiences (Professions 2.0's other
+station types: kitchens, apothecary, tannery, loom, toolworks, see issue
+#2208) to get their own audible radius the same way: a new `AmbientPointSource`
+`kind` plus a named constant, no changes to the override mechanism itself.
 
 ### Interface and personal event cues
 
@@ -457,12 +484,19 @@ decode is a no-op for them; that fold still protects any stereo asset (a
 not-yet-re-processed clip, or a bespoke upload) from wasting positional buffer
 memory.
 
+The `mount_*.mp3` entries are custom, optimized edits of CC0 or public-domain
+sources and are never sent to ElevenLabs. Their exact provenance is recorded in
+`CREDITS.md`. Running the generator without an API key is sufficient to rebuild
+the manifest when every generated clip already exists.
+
 ## Efficiency budget
 - One decoded `AudioBuffer` per loaded clip, shared across all sources. Only the
   startup set is eager; contextual assets are loaded once on demand.
 - `MAX_VOICES` concurrent one-shots; over-cap plays are dropped (oldest-wins).
 - Footsteps gated by `d2 < SFX_RANGE_SQ` (reuses the renderer's per-entity squared
   distance) and a per-entity stride accumulator — no timers, no per-frame alloc.
+- Mount gait beats reuse that distance gate and accumulator with a longer stride
+  distance so each custom clip decays before the next one begins.
 - Ambience/cast loops are a small pool of persistent sources, cross-faded by gain.
 - Listener updated once per frame; panners use cheap `equalpower` + linear rolloff
   with a hard `maxDistance` so far sounds cost nothing.

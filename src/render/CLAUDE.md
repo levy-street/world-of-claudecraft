@@ -23,6 +23,10 @@ Everything else is a sibling module in one of these families:
   the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`, `battleground*.ts`
   (Thornhollow Fields: kit-module field from the pure `battleground_core.ts` manifest,
   entity props in `battleground_props.ts`).
+  the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`. Rift
+  portals: `door_portal.ts` also builds the bespoke world-rift gate GLB with
+  its rank-tinted energy membrane (`buildRiftGateBody`), and `rift_rank.ts` is
+  the floating C/B/A/S rank badge above a world rift portal.
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
   particles), `weather.ts`, `character_effects.ts`.
 - **The nameplate suite** (below) owns all overhead text and badges.
@@ -128,6 +132,9 @@ rules, all CI-enforced:
   so it covers your module.
 
 ## i18n: overhead labels are the only string surface here
+One deliberate exception: `scene_census_core.ts`'s table/format helpers feed the
+`?perf` overlay, a dev diagnostic that stays English by the `src/game/CLAUDE.md`
+perf-overlay carve-out; never reuse them in player-facing chrome.
 The renderer is geometry/shaders; the overhead-text surface is
 `nameplate_painter.ts` (owns `t`/`tEntity`/`formatNumber`) plus
 `entity_labels.ts` (localized display-name helpers, lifted out of `renderer.ts`

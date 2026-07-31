@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_MARK_LETTER, QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/content/letters';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import {
   MAIL_ATTACHMENT_EXPIRY_SECONDS,
   MAIL_DELIVERY_SECONDS,
@@ -14,9 +15,20 @@ import {
   MAIL_POSTAGE,
 } from '../src/sim/mail/post_office';
 import { Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
+import type { SimEvent, WorldContent } from '../src/sim/types';
 
-const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+// Mailboxes are system-owned and still spawn with this fixture. Ambient camps,
+// NPCs and quest objects are irrelevant to delivery/index invariants and would
+// turn every simulated minute into a continent-wide AI benchmark.
+const MAIL_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
+const makeWorld = () =>
+  new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: MAIL_TEST_WORLD });
 
 function moveToMailbox(sim: Sim, pid: number): void {
   const box = sim.entities.get(sim.postOffice.mailboxIds[0]);
@@ -122,6 +134,29 @@ describe('sending a letter', () => {
     expect(
       events.some((e) => e.type === 'mailArrived' && e.pid === bob && e.senderName === 'Alice'),
     ).toBe(true);
+  });
+
+  it('streams older delivered mail beyond the first fifty rows so it can be opened', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 100_000;
+    moveToMailbox(sim, alice);
+
+    for (let i = 0; i < 60; i++) {
+      sim.mailSend('Bob', `Letter ${i}`, `Body ${i}`, 0, [], alice);
+    }
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    moveToMailbox(sim, bob);
+
+    const info = sim.mailInfoFor(bob);
+    expect(info).not.toBeNull();
+    expect(info?.totalCount).toBe(61);
+    expect(info?.messages).toHaveLength(61);
+    expect(info?.messages.some((m) => m.subject === 'Letter 0')).toBe(true);
+    expect(info?.messages.some((m) => m.subject === 'Letter 59')).toBe(true);
   });
 
   it('refuses what the post refuses', () => {
@@ -474,7 +509,14 @@ describe('unread index equivalence (finding 4)', () => {
 
 describe('quest thank-you letters', () => {
   it('the giver writes after an authored quest turn-in', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+    // QUESTS is a static data table (src/sim/data), not world content, so the
+    // dev turn-in and its thank-you letter work in the mailbox-only world too.
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: true,
+      world: MAIL_TEST_WORLD,
+    });
     const pid = sim.primaryId;
     expect(QUEST_LETTERS.q_wolves).toBeDefined();
     expect(sim.completeQuestForDev('q_wolves', pid)).toBe(true);

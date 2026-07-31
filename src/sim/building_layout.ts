@@ -34,10 +34,17 @@ export const EASTBROOK_GRAND_ARMOURY = {
  *  one startup-time landmark measurement into per-frame work. */
 export const BUILDING_TERRAIN_SAMPLE_STEP = 0.5;
 
+// Total by construction: a new BuildingDef kind must declare its height here
+// rather than silently inheriting a default. hollow* is the Veiled Hollow set.
 const BUILDING_CAMERA_HEIGHT: Readonly<Record<BuildingDef['kind'], number>> = {
   house: 8,
   inn: 7.8,
   chapel: 10.8,
+  hollowHouse: 8,
+  hollowInn: 8.5,
+  hollowChapel: 10.5,
+  hollowSmith: 6.2,
+  hollowMarket: 5.2,
 };
 
 /** Narrow the landmark-tagged inn record without changing its rested-XP kind. */

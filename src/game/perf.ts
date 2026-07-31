@@ -1,7 +1,13 @@
 import type { NetPipelineSummary } from '../net/net_pipeline_stats';
 import { type AssetTimingSnapshot, assetTimingSnapshot } from '../render/assets/stats';
 import type { Renderer } from '../render/renderer';
+import {
+  censusTableLines,
+  type HitchSummary,
+  type SceneCensusReport,
+} from '../render/scene_census_core';
 import { createHeapSawtooth, type HeapSawtoothSummary } from './heap_sawtooth';
+import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
 import { createWorstWindow, type WorstWindowSummary } from './worst_window';
 
 export interface PerfSnapshot {
@@ -66,6 +72,10 @@ export interface PerfSnapshot {
     maxTouchPoints: number;
   };
   devTrace?: DevPerfTrace;
+  /** Last on-demand scene census (the overlay's census button); absent until run. */
+  census?: SceneCensusReport;
+  /** Overlay-gated hitch correlation from the renderer; absent when the overlay is off. */
+  hitches?: HitchSummary;
 }
 
 export type PerfInputDebugState = Record<string, unknown>;
@@ -207,11 +217,6 @@ export interface DevPerfTrace {
   longTasks: DevLongTaskRecord[];
 }
 
-interface FrameSample {
-  at: number;
-  ms: number;
-}
-
 function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return 0;
   const idx = Math.min(sorted.length - 1, Math.max(0, Math.ceil(sorted.length * p) - 1));
@@ -245,11 +250,6 @@ function summarizeFrames(values: number[]): PerfSnapshot['frameMs'] {
     max: round(sorted[sorted.length - 1] ?? 0),
     long50: values.filter((v) => v >= 50).length,
   };
-}
-
-function pushSample(values: number[], sample: number): void {
-  values.push(sample);
-  if (values.length > MAX_SAMPLES) values.splice(0, values.length - MAX_SAMPLES);
 }
 
 function renderStallCategories(
@@ -358,13 +358,25 @@ export function localDevPerfTraceEnabled(): boolean {
 export class PerfMonitor {
   readonly enabled: boolean;
   private overlay: HTMLDivElement | null = null;
+  private overlayText: HTMLDivElement | null = null;
+  private lastCensus: SceneCensusReport | null = null;
+  // Rendered once per census run, not on every 1 Hz overlay repaint.
+  private lastCensusLines: string[] = [];
+  // The census burst runs inside one task, so the following rAF gap is a
+  // self-inflicted long frame; drop that one sample from the statistics.
+  private skipNextFrameSample = false;
   private startedAt = performance.now();
   private lastOverlayAt = 0;
   private frames = 0;
-  private frameMs: number[] = [];
+  private frameMs = new NumberSampleRing(MAX_SAMPLES);
   private lastFrameMs = 0;
-  private frameWindow: FrameSample[] = [];
-  private buckets: Record<TimedBucket, number[]> = { renderer: [], hud: [], events: [], sim: [] };
+  private frameWindow = new TimedNumberSampleRing(MAX_SAMPLES);
+  private buckets: Record<TimedBucket, NumberSampleRing> = {
+    renderer: new NumberSampleRing(MAX_SAMPLES),
+    hud: new NumberSampleRing(MAX_SAMPLES),
+    events: new NumberSampleRing(MAX_SAMPLES),
+    sim: new NumberSampleRing(MAX_SAMPLES),
+  };
   private lastBucketMs: Record<TimedBucket, number> = { renderer: 0, hud: 0, events: 0, sim: 0 };
   private lastSnapshot: PerfSnapshot | null = null;
   private network: PerfSnapshot['network'] = null;
@@ -379,11 +391,11 @@ export class PerfMonitor {
   private pendingFrameAt = 0;
   private pendingSendAt = 0;
   private pendingVisibleAt = 0;
-  private inputToFrameMs: number[] = [];
-  private inputToSendMs: number[] = [];
-  private inputToEchoMs: number[] = [];
-  private inputToVisibleMs: number[] = [];
-  private longTaskMs: number[] = [];
+  private inputToFrameMs = new NumberSampleRing(MAX_SAMPLES);
+  private inputToSendMs = new NumberSampleRing(MAX_SAMPLES);
+  private inputToEchoMs = new NumberSampleRing(MAX_SAMPLES);
+  private inputToVisibleMs = new NumberSampleRing(MAX_SAMPLES);
+  private longTaskMs = new NumberSampleRing(MAX_SAMPLES);
   private longTaskTotalMs = 0;
   private lastLongTaskAt = 0;
   private longTaskObserver: PerformanceObserver | null = null;
@@ -404,11 +416,13 @@ export class PerfMonitor {
     if (this.enabled) {
       this.mountOverlay();
     }
+    this.renderer?.setHitchLogEnabled(this.enabled);
     this.observeLongTasks();
   }
 
   setRenderer(renderer: Renderer): void {
     this.renderer = renderer;
+    renderer.setHitchLogEnabled(this.enabled);
   }
 
   setHud(hud: { perfStats(): PerfSnapshot['hud'] }): void {
@@ -420,13 +434,16 @@ export class PerfMonitor {
   }
 
   frame(dt: number, now = performance.now()): void {
+    if (this.skipNextFrameSample) {
+      this.skipNextFrameSample = false;
+      return;
+    }
     this.frames++;
     const ms = Math.min(250, Math.max(0, dt * 1000));
     this.lastFrameMs = ms;
-    pushSample(this.frameMs, ms);
-    this.frameWindow.push({ at: now, ms });
-    while (this.frameWindow.length && now - this.frameWindow[0].at > MAX_WINDOW_MS)
-      this.frameWindow.shift();
+    this.frameMs.push(ms);
+    this.frameWindow.push(now, ms);
+    this.frameWindow.pruneBefore(now - MAX_WINDOW_MS);
   }
 
   markInputIntent(kind: 'move' | 'look' | 'zoom', now = performance.now()): void {
@@ -441,24 +458,24 @@ export class PerfMonitor {
 
   markInputFrame(now = performance.now()): void {
     if (!this.enabled || this.pendingFrameAt <= 0) return;
-    pushSample(this.inputToFrameMs, now - this.pendingFrameAt);
+    this.inputToFrameMs.push(now - this.pendingFrameAt);
     this.pendingFrameAt = 0;
   }
 
   markInputSent(now = performance.now()): void {
     if (!this.enabled || this.pendingSendAt <= 0) return;
-    pushSample(this.inputToSendMs, now - this.pendingSendAt);
+    this.inputToSendMs.push(now - this.pendingSendAt);
     this.pendingSendAt = 0;
   }
 
   markInputEcho(ms: number): void {
     if (!this.enabled || !Number.isFinite(ms) || ms < 0) return;
-    pushSample(this.inputToEchoMs, ms);
+    this.inputToEchoMs.push(ms);
   }
 
   markInputVisible(now = performance.now()): void {
     if (!this.enabled || this.pendingVisibleAt <= 0) return;
-    pushSample(this.inputToVisibleMs, now - this.pendingVisibleAt);
+    this.inputToVisibleMs.push(now - this.pendingVisibleAt);
     this.pendingVisibleAt = 0;
   }
 
@@ -473,7 +490,7 @@ export class PerfMonitor {
     } finally {
       const ms = performance.now() - start;
       this.lastBucketMs[bucket] = round(ms);
-      pushSample(this.buckets[bucket], ms);
+      this.buckets[bucket].push(ms);
       this.recordDevTraceSpan(bucket, start, ms, 'bucket');
     }
   }
@@ -562,7 +579,7 @@ export class PerfMonitor {
       this.longTaskObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           const duration = Math.max(0, entry.duration || 0);
-          pushSample(this.longTaskMs, duration);
+          this.longTaskMs.push(duration);
           this.longTaskTotalMs += duration;
           this.lastLongTaskAt = entry.startTime + duration;
           if (this.traceEnabled) this.recordDevLongTask(entry);
@@ -753,9 +770,17 @@ export class PerfMonitor {
     this.heapSawtooth.sample(now);
     // 1 Hz worst-10s evaluation, also ungated (ruling R5): snapshot() stays a
     // pure read of the retained window; only the reporter drains it.
-    this.worstWindow.observe(this.frameWindow, now);
-    this.lastSnapshot = this.snapshot(now);
+    this.worstWindow.observe(
+      this.frameWindow.entries().map((entry) => ({ at: entry.at, ms: entry.value })),
+      now,
+    );
+    // Production telemetry reports on its own 75 s / 5 min cadence. Without a
+    // visible diagnostic overlay there is nothing to ASSEMBLE every second:
+    // doing so sorted every history and copied renderer stats for no consumer.
+    // The two trackers above stay ungated: the fleet report reads them whether
+    // or not the overlay is up.
     if (!this.enabled) return;
+    this.lastSnapshot = this.snapshot(now);
     this.renderOverlay(this.lastSnapshot);
   }
 
@@ -764,20 +789,20 @@ export class PerfMonitor {
     const mainMs = Object.fromEntries(
       (Object.keys(this.buckets) as TimedBucket[]).map((key) => [
         key,
-        summarize(this.buckets[key]),
+        summarize(this.buckets[key].toArray()),
       ]),
     );
     const windowSummary = (windowMs: number): PerfSnapshot['windows']['last10s'] => {
-      const samples = this.frameWindow.filter((s) => now - s.at <= windowMs);
+      const samples = this.frameWindow.snapshotSince(now - windowMs);
       const span =
-        samples.length > 1
-          ? Math.max(0.001, (samples[samples.length - 1].at - samples[0].at) / 1000)
+        samples.values.length > 1 && samples.firstAt !== null && samples.lastAt !== null
+          ? Math.max(0.001, (samples.lastAt - samples.firstAt) / 1000)
           : Math.min(seconds, windowMs / 1000);
       return {
         seconds: round(Math.min(seconds, windowMs / 1000)),
-        frames: samples.length,
-        fps: round(samples.length / Math.max(0.001, span)),
-        frameMs: summarizeFrames(samples.map((s) => s.ms)),
+        frames: samples.values.length,
+        fps: round(samples.values.length / Math.max(0.001, span)),
+        frameMs: summarizeFrames(samples.values),
       };
     };
     const inputDebug = this.readInputDebug();
@@ -785,7 +810,7 @@ export class PerfMonitor {
       seconds: round(seconds),
       frames: this.frames,
       fps: round(this.frames / seconds),
-      frameMs: summarizeFrames(this.frameMs),
+      frameMs: summarizeFrames(this.frameMs.toArray()),
       windows: {
         last10s: windowSummary(10_000),
         last30s: windowSummary(30_000),
@@ -802,15 +827,15 @@ export class PerfMonitor {
         intents: this.inputIntents,
         lastKind: this.lastInputKind,
         lastIntentAge: this.lastInputAt > 0 ? round(now - this.lastInputAt) : -1,
-        intentToFrame: summarize(this.inputToFrameMs),
-        intentToSend: summarize(this.inputToSendMs),
-        sendToEcho: summarize(this.inputToEchoMs),
-        intentToVisible: summarize(this.inputToVisibleMs),
+        intentToFrame: summarize(this.inputToFrameMs.toArray()),
+        intentToSend: summarize(this.inputToSendMs.toArray()),
+        sendToEcho: summarize(this.inputToEchoMs.toArray()),
+        intentToVisible: summarize(this.inputToVisibleMs.toArray()),
         ...(inputDebug ? { debug: inputDebug } : {}),
       },
       browser: {
         longTasks: {
-          ...summarize(this.longTaskMs),
+          ...summarize(this.longTaskMs.toArray()),
           totalMs: round(this.longTaskTotalMs),
           lastAge: this.lastLongTaskAt > 0 ? round(now - this.lastLongTaskAt) : -1,
         },
@@ -837,7 +862,27 @@ export class PerfMonitor {
         longTasks: this.devTraceLongTasks(),
       };
     }
+    if (this.lastCensus) snapshot.census = this.lastCensus;
+    const hitches = this.renderer?.hitchStats() ?? null;
+    if (hitches) snapshot.hitches = hitches;
     return snapshot;
+  }
+
+  /**
+   * Run the one-shot scene census through the renderer, remember it for the
+   * overlay table and the JSON report, and log it as copyable JSON. On demand
+   * only (the overlay's census button and the capture harness); returns null
+   * before the renderer exists.
+   */
+  runSceneCensus(): SceneCensusReport | null {
+    if (!this.renderer) return null;
+    const report = this.renderer.captureSceneCensus();
+    this.lastCensus = report;
+    this.lastCensusLines = censusTableLines(report);
+    this.skipNextFrameSample = true;
+    console.info('World of Claudecraft scene census:', JSON.stringify(report, null, 2));
+    if (this.enabled) this.renderOverlay(this.lastSnapshot ?? this.snapshot());
+    return report;
   }
 
   private readInputDebug(): PerfInputDebugState | null {
@@ -864,9 +909,12 @@ export class PerfMonitor {
   reset(): void {
     this.startedAt = performance.now();
     this.frames = 0;
-    this.frameMs = [];
-    this.frameWindow = [];
-    this.buckets = { renderer: [], hud: [], events: [], sim: [] };
+    this.frameMs.clear();
+    this.frameWindow.clear();
+    this.lastCensus = null;
+    this.lastCensusLines = [];
+    this.skipNextFrameSample = false;
+    for (const samples of Object.values(this.buckets)) samples.clear();
     this.lastSnapshot = null;
     this.netPipelineSource = null;
     this.heapSawtooth.reset();
@@ -877,11 +925,11 @@ export class PerfMonitor {
     this.pendingFrameAt = 0;
     this.pendingSendAt = 0;
     this.pendingVisibleAt = 0;
-    this.inputToFrameMs = [];
-    this.inputToSendMs = [];
-    this.inputToEchoMs = [];
-    this.inputToVisibleMs = [];
-    this.longTaskMs = [];
+    this.inputToFrameMs.clear();
+    this.inputToSendMs.clear();
+    this.inputToEchoMs.clear();
+    this.inputToVisibleMs.clear();
+    this.longTaskMs.clear();
     this.longTaskTotalMs = 0;
     this.lastLongTaskAt = 0;
     this.lastFrameMs = 0;
@@ -910,13 +958,26 @@ export class PerfMonitor {
       'box-shadow:0 8px 28px rgba(0,0,0,0.35)',
     ].join(';');
     this.overlay.title = 'Click to copy a JSON perf report';
-    this.overlay.textContent = 'perf: collecting...';
     this.overlay.addEventListener('click', () => this.copyReport());
+    this.overlayText = document.createElement('div');
+    this.overlayText.textContent = 'perf: collecting...';
+    this.overlay.appendChild(this.overlayText);
+    const censusBtn = document.createElement('div');
+    censusBtn.textContent = '[run scene census]';
+    censusBtn.title =
+      'One-shot per-system draw breakdown (a short burst of extra renders, results in the overlay + console JSON)';
+    censusBtn.style.cssText =
+      'margin-top:6px;cursor:pointer;color:#93c5fd;text-decoration:underline';
+    censusBtn.addEventListener('click', (e: Event) => {
+      e.stopPropagation();
+      this.runSceneCensus();
+    });
+    this.overlay.appendChild(censusBtn);
     document.body.appendChild(this.overlay);
   }
 
   private renderOverlay(s: PerfSnapshot): void {
-    if (!this.overlay) return;
+    if (!this.overlay || !this.overlayText) return;
     const r = s.renderer;
     const hud = s.hud;
     const net = s.network;
@@ -926,7 +987,12 @@ export class PerfMonitor {
     const rp = r?.phaseMs;
     const lt = s.browser.longTasks;
     const mem = s.browser.memory;
-    this.overlay.textContent = [
+    const h = s.hitches;
+    const hitchLine = h
+      ? `hitch ${h.hitches} (compile ${h.byCause['shader-compile']} tex ${h.byCause['texture-upload']} view ${h.byCause['view-create']} other ${h.byCause.other})  prog +${h.programsAdded}`
+      : null;
+    const censusLines = this.lastCensusLines;
+    this.overlayText.textContent = [
       `fps ${s.fps}  p95 ${s.frameMs.p95}ms  >50 ${s.frameMs.long50}`,
       `10s fps ${s.windows.last10s.fps}  p95 ${s.windows.last10s.frameMs.p95}ms  >50 ${s.windows.last10s.frameMs.long50}`,
       `longtask ${lt.count}  p95 ${lt.p95}ms  max ${lt.max}ms  heap ${mem ? `${mem.usedMB}/${mem.limitMB}MB` : '-'}`,
@@ -941,6 +1007,8 @@ export class PerfMonitor {
       net
         ? `net ${net.connected ? 'up' : 'down'} snap ${net.snapInterval}ms age ${net.lastSnapAge}ms a ${net.alpha}`
         : 'net offline',
+      ...(hitchLine ? [hitchLine] : []),
+      ...censusLines,
       'click: copy json',
     ].join('\n');
   }

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import {
   petFollow,
   petPickTarget,
@@ -7,18 +8,34 @@ import {
   updatePet,
 } from '../src/sim/pet/pet_ai';
 import { Sim } from '../src/sim/sim';
-import { dist2d, type Entity } from '../src/sim/types';
+import { dist2d, type Entity, type WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 // Direct unit tests for the extracted pet-AI module (P1a). They drive the moved
 // functions through the real Sim.ctx seam (so the still-on-Sim helpers they reach
 // back for resolve), pinning the slice's behavior independent of the parity golden.
 
+// The pets and hostiles under test are adopted/flagged wild mobs (any mob will
+// do; the tests place and level them explicitly), so keep the real forest_wolf
+// camps as that mob supply and strip the rest of the ambient world
+// (subsystem-world pattern, see tests/dot_final_tick.test.ts).
+const PET_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((c) => c.mobId === 'forest_wolf'),
+  npcs: {},
+  groundObjects: [],
+};
+
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 
 function world(): { sim: AnySim; pid: number; owner: AnyEntity } {
-  const sim = new Sim({ seed: 7, playerClass: 'hunter', noPlayer: true }) as AnySim;
+  const sim = new Sim({
+    seed: 7,
+    playerClass: 'hunter',
+    noPlayer: true,
+    world: PET_TEST_WORLD,
+  }) as AnySim;
   const pid = sim.addPlayer('hunter', 'Owner');
   const owner = sim.entities.get(pid) as AnyEntity;
   return { sim, pid, owner };
@@ -81,7 +98,12 @@ function wildHostile2(sim: AnySim, exclude: number[]): [AnyEntity, AnyEntity] {
 // PLAYER is a valid petPickTarget candidate (the grid holds every kind, and the admit
 // predicates carry no kind === 'mob' restriction on ownerOffense).
 function startedDuelHunter(): { sim: AnySim; a: number; b: number } {
-  const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true }) as AnySim;
+  const sim = new Sim({
+    seed: 7,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: PET_TEST_WORLD,
+  }) as AnySim;
   const a = sim.addPlayer('hunter', 'Aleph', { autoEquip: true });
   const b = sim.addPlayer('mage', 'Bet', { autoEquip: true });
   const move = (pid: number, x: number, z: number): void => {

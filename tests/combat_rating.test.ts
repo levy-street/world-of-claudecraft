@@ -195,6 +195,14 @@ describe('combat-rating tier ladder', () => {
     expect(ilvl29).toHaveLength(13);
     for (const item of ilvl29) expect(ratingValues(item), item.id).toEqual([20]);
 
+    // ilvl-31: heroic five-man boss pieces (40 rating) + rift clear-time epics
+    // (armor pieces 40, ring 25). Every ilvl-31 gear piece carries exactly one rating.
+    const ilvl31 = allGear.filter((item) => itemLevel(item) === 31);
+    expect(ilvl31.length).toBeGreaterThan(0);
+    for (const item of ilvl31) {
+      expect(ratingCount(item), `${item.id} (ilvl 31) carries one rating`).toBe(1);
+    }
+
     const directHeroicRaidWeapons = new Set([
       'scepter_of_the_deathless_court',
       'deathless_greatblade',
@@ -219,6 +227,17 @@ describe('combat-rating tier ladder', () => {
         ratingValues(item).sort((a, b) => b - a),
         item.id,
       ).toEqual([expectedPrimary, expectedSecondary]);
+    }
+  });
+
+  it('heart_of_the_rift (ilvl-35 legendary) carries zero ratings by design', () => {
+    // The rift legendary neck is class-neutral and carries no combat ratings:
+    // its differentiation is a large multi-stat primary-stat block, not ratings.
+    // This is intentional (pinned here so a future tuner does not silently add one).
+    const legendary = ITEMS['heart_of_the_rift'];
+    expect(legendary, 'heart_of_the_rift must exist').toBeTruthy();
+    if (legendary) {
+      expect(ratingCount(legendary), 'rift legendary carries no ratings').toBe(0);
     }
   });
 

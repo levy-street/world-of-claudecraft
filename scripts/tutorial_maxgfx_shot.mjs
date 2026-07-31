@@ -25,9 +25,9 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage();
 await page.setViewport({ width: 1600, height: 960 });
 const errors = [];
-page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+page.on('pageerror', (e) => errors.push(`PAGEERROR: ${e.message}`));
 page.on('console', (m) => {
-  if (m.type() === 'error') errors.push('CONSOLE: ' + m.text());
+  if (m.type() === 'error') errors.push(`CONSOLE: ${m.text()}`);
 });
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const tap = (sel) => page.evaluate((s) => document.querySelector(s)?.click(), sel);
@@ -133,6 +133,6 @@ await page.evaluate(() => {
 });
 await shot('6_done');
 
-if (errors.length) console.log('PAGE ERRORS:\n' + errors.join('\n'));
+if (errors.length) console.log(`PAGE ERRORS:\n${errors.join('\n')}`);
 await browser.close();
 console.log('done');

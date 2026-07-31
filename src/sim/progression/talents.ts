@@ -129,7 +129,17 @@ function normalizeAbilityCharges(
   if (!player.abilityCharges) return;
   for (const [abilityId, state] of Object.entries(player.abilityCharges)) {
     const ability = meta.known.find((known) => known.def.id === abilityId);
-    if (!ability || ability.cooldown <= 0) {
+    if (!ability) {
+      // Temporarily unlearned talent abilities can come back through another
+      // spec or loadout switch. Keep their recharge state aging instead of
+      // turning a switch away and back into a free reset.
+      const def = ABILITIES[abilityId];
+      if (def?.cooldown && def.cooldown > 0) continue;
+      delete player.abilityCharges[abilityId];
+      player.cooldowns.delete(abilityId);
+      continue;
+    }
+    if (ability.cooldown <= 0) {
       delete player.abilityCharges[abilityId];
       player.cooldowns.delete(abilityId);
       continue;

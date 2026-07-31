@@ -99,11 +99,99 @@ function expandItems(items) {
   return out;
 }
 
+function dropMeshIslands(root, opts, outName) {
+  const minTris = opts.minTris ?? 150;
+  const maxDim = opts.maxDim ?? 1;
+  let dropped = 0;
+  for (const mesh of root.listMeshes()) {
+    for (const prim of mesh.listPrimitives()) {
+      const posAttr = prim.getAttribute('POSITION');
+      const indices = prim.getIndices();
+      if (!posAttr || !indices) continue;
+      const pos = posAttr.getArray();
+      const idx = indices.getArray();
+      const nVerts = pos.length / 3;
+      // canonicalize verts by quantized position so seam-split verts join
+      const canon = new Map();
+      const vertKey = new Int32Array(nVerts);
+      for (let v = 0; v < nVerts; v++) {
+        const k = `${Math.round(pos[v * 3] * 1e4)},${Math.round(pos[v * 3 + 1] * 1e4)},${Math.round(pos[v * 3 + 2] * 1e4)}`;
+        let id = canon.get(k);
+        if (id === undefined) {
+          id = canon.size;
+          canon.set(k, id);
+        }
+        vertKey[v] = id;
+      }
+      const parent = new Int32Array(canon.size);
+      for (let i = 0; i < parent.length; i++) parent[i] = i;
+      const find = (a) => {
+        let r = a;
+        while (parent[r] !== r) r = parent[r];
+        while (parent[a] !== r) {
+          const next = parent[a];
+          parent[a] = r;
+          a = next;
+        }
+        return r;
+      };
+      for (let t = 0; t < idx.length; t += 3) {
+        const a = find(vertKey[idx[t]]);
+        const b = find(vertKey[idx[t + 1]]);
+        const c = find(vertKey[idx[t + 2]]);
+        parent[a] = c;
+        parent[b] = c;
+      }
+      const comps = new Map();
+      for (let t = 0; t < idx.length; t += 3) {
+        const rootId = find(vertKey[idx[t]]);
+        let comp = comps.get(rootId);
+        if (!comp) {
+          comp = { tris: 0, min: [1e9, 1e9, 1e9], max: [-1e9, -1e9, -1e9] };
+          comps.set(rootId, comp);
+        }
+        comp.tris++;
+        for (const vi of [idx[t], idx[t + 1], idx[t + 2]]) {
+          for (let ax = 0; ax < 3; ax++) {
+            const v = pos[vi * 3 + ax];
+            if (v < comp.min[ax]) comp.min[ax] = v;
+            if (v > comp.max[ax]) comp.max[ax] = v;
+          }
+        }
+      }
+      const doomed = new Set();
+      for (const [rootId, comp] of comps) {
+        const dims = comp.max.map((m, i) => m - comp.min[i]);
+        if (comp.tris >= minTris && Math.max(...dims) <= maxDim) {
+          doomed.add(rootId);
+          dropped++;
+        }
+      }
+      if (!doomed.size) continue;
+      const kept = [];
+      for (let t = 0; t < idx.length; t += 3) {
+        if (doomed.has(find(vertKey[idx[t]]))) continue;
+        kept.push(idx[t], idx[t + 1], idx[t + 2]);
+      }
+      indices.setArray(nVerts > 65535 ? new Uint32Array(kept) : new Uint16Array(kept));
+    }
+  }
+  console.log(`  dropIslands: removed ${dropped} island(s) from ${outName}`);
+}
+
 async function processModel(io, item, outputRoot) {
   const srcPath = resolveSrc(item.src);
   const outPath = resolveOutput(outputRoot, item.out);
   const doc = await io.read(srcPath);
   const root = doc.getRoot();
+
+  // Drop baked-in decoration islands from a merged mesh (e.g. the KayKit
+  // stables building ships with yard horses welded into its one primitive).
+  // An "island" is a connected triangle component (shared vertex positions);
+  // { "minTris": N, "maxDim": D } drops every island with at least N
+  // triangles whose bounding box fits inside a D-sized cube: big-but-small
+  // organic clutter, never the building shell (many small welded islands).
+  if (item.dropIslands) dropMeshIslands(root, item.dropIslands, item.out);
 
   // Merge animation clips from separate library glbs. KayKit's v2 packs ship
   // animations in standalone Rig_Medium_*.glb files, each carrying a mannequin
