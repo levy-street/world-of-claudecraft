@@ -119,6 +119,26 @@ describe('startGame wiring', () => {
   });
 });
 
+describe('editor viewport wiring', () => {
+  // The editor is its own build entry composing the real Sim + Renderer; it
+  // never runs startGame, so it must open the deferred lane itself or every
+  // world-content thunk stays parked and the Renderer ctor throws "asset not
+  // preloaded". Any future host that awaits assetsReady() then builds a
+  // Renderer needs the same call; this pin is the template.
+  it('opens the lane BEFORE the assetsReady that gates its Renderer', () => {
+    const viewportSource = readFileSync(
+      new URL('../src/editor/3d/viewport.ts', import.meta.url),
+      'utf8',
+    );
+    const beginAt = viewportSource.indexOf('beginDeferredPreloads()');
+    const awaitAt = viewportSource.indexOf('await assetsReady()');
+    const rendererAt = viewportSource.indexOf('new Renderer(');
+    expect(beginAt).toBeGreaterThan(-1);
+    expect(awaitAt).toBeGreaterThan(beginAt);
+    expect(rendererAt).toBeGreaterThan(awaitAt);
+  });
+});
+
 describe('no world module fetches at import', () => {
   // The launcher only draws the character-creation preview, so characters/assets.ts
   // is the one sanctioned eager registrant. Anything else registering eagerly is

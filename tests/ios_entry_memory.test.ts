@@ -226,6 +226,14 @@ describe('post-entry mob-body streaming (packaged iOS)', () => {
     expect(mainSource).toContain('ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));');
   });
 
+  it('re-arms a failed streamed body fetch from the visual-build miss path', () => {
+    // A streamed body whose one-shot stream fetch failed must not stay
+    // invisible for the session: resolvedGltf kicks the fetch again before its
+    // fail-soft throw, and the view-create retry gate re-attempts the build.
+    // Gated to streamed urls so a non-streamed miss stays a loud preload bug.
+    expect(assetsSource).toContain('if (streamedUrlSet.has(url)) ensureCharacterUrl(url);');
+  });
+
   it('starts the stream after prewarm, not inside the entry gate', () => {
     const prewarmAt = mainSource.indexOf("checkpoint('prewarm-complete'");
     const streamAt = mainSource.indexOf('startStreamedCharacterPreloads()');

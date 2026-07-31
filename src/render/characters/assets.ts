@@ -530,8 +530,10 @@ let streamedStarted = false;
  * Start the post-entry mob-body stream (idempotent; returns how many fetches
  * this call started). main.ts calls it once the entry is past its allocation
  * spike (prewarm complete). Empty everywhere but the packaged iOS shell, where
- * the boot gate above deliberately excluded these urls. Failures retry through
- * loadGltf's own eviction on next sight, exactly like the mount lazy loads.
+ * the boot gate above deliberately excluded these urls. A failed fetch re-arms
+ * when a visual build next needs the body: resolvedGltf kicks
+ * ensureCharacterUrl for a non-resident streamed url before its fail-soft
+ * throw, and the view-create retry gate re-attempts the build.
  */
 export function startStreamedCharacterPreloads(): number {
   if (streamedStarted) return 0;
@@ -750,7 +752,15 @@ export function characterResidencySources(): { parsedScenes: THREE.Object3D[] } 
 function resolvedGltf(url: string): GLTF {
   const resolvedUrl = assetUrl(url);
   const g = gltfByUrl.get(resolvedUrl);
-  if (!g) throw new Error(`character asset not preloaded: ${resolvedUrl}`);
+  if (!g) {
+    // A streamed body whose stream fetch failed re-arms here: the fail-soft
+    // visual build catches the throw, the retry gate re-attempts, and each
+    // attempt re-kicks the fetch (the mount lazy-load pattern; loadGltf
+    // evicts rejected promises so the re-call really re-fetches). A
+    // non-streamed miss stays a loud preload-set bug: no masking fetch.
+    if (streamedUrlSet.has(url)) ensureCharacterUrl(url);
+    throw new Error(`character asset not preloaded: ${resolvedUrl}`);
+  }
   return g;
 }
 
