@@ -328,6 +328,56 @@ describe('escort run guards', () => {
     }
     expect(state.run?.waypointIndex ?? before + 1).toBeGreaterThan(before);
   });
+
+  it('re-engages an evaded ambush wave onto the escortee instead of wedging the run', () => {
+    const sim = makeSim();
+    const def = ESCORTS[ESCORT_ID];
+    teleportTo(sim, def.start.x, def.start.z);
+    activateQuest(sim);
+    sim.interact();
+    const wren = findEscortee(sim);
+    const state = sim.escortRuns.get(ESCORT_ID);
+    expect(wren && state?.run).toBeTruthy();
+    if (!wren || !state?.run) return;
+
+    // Walk to the first ambush.
+    for (let i = 0; i < 60 * 20 && liveAmbushers(sim).length === 0; i++) sim.tick();
+    const wave = liveAmbushers(sim);
+    expect(wave.length).toBe(3);
+
+    // The live-server kite: drag the whole wave far past its leash. The chase
+    // exceeds LEASH_DISTANCE, the mobs evade home, and the evade reset clears
+    // their hate tables, the escortee seed included. Without the driver
+    // re-commit they would idle beside the waiting escortee until the run
+    // timeout (the reported "escortee just stops walking" wedge).
+    for (const mob of wave) {
+      const far = sim.groundPos(mob.pos.x + 80, mob.pos.z);
+      mob.pos = { ...far };
+      mob.prevPos = { ...far };
+    }
+    let reengaged = false;
+    for (let i = 0; i < 120 * 20 && !reengaged; i++) {
+      sim.tick();
+      const live = liveAmbushers(sim);
+      reengaged =
+        live.length === 3 &&
+        live.every((m) => m.aggroTargetId === wren.id && (m.threat.get(wren.id) ?? 0) > 0);
+    }
+    expect(reengaged).toBe(true);
+
+    // With the wave re-committed, cutting it down releases the walk: the run
+    // advances past the held waypoint instead of stalling to the timeout.
+    const before = state.run?.waypointIndex ?? -1;
+    for (const mob of liveAmbushers(sim)) {
+      mob.hp = 0;
+      mob.dead = true;
+      mob.respawnTimer = 99999;
+    }
+    for (let i = 0; i < 30 * 20 && state.run !== null && state.run.waypointIndex <= before; i++) {
+      sim.tick();
+    }
+    expect(state.run === null || state.run.waypointIndex > before).toBe(true);
+  });
 });
 
 // Every authored escort route must be WALKABLE in the real world: the escortee
