@@ -421,7 +421,7 @@ export function mobZonePhase(mob: Entity): string {
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
 // Thornhollow Fields `bg` self key: 1 Hz covers the in-match clocks (wave respawn,
-// match cap, spawn protection) that tick by whole seconds; queue and match
+// match cap, carrier vulnerability) that tick by whole seconds; queue and match
 // transitions force a fresh readout via lastBgWireTick resets (the arena
 // staleness fix), and the flag/score events ride the event queue instantly.
 const BG_WIRE_HZ = 1;

@@ -729,29 +729,38 @@ function tickRunes(ctx: SimContext, match: BgMatch): void {
 }
 
 function tickFlags(ctx: SimContext, match: BgMatch): void {
+  // TWO PASSES, and the split is the point. A capture needs the runner's own
+  // flag to be home, so if returns and capture checks shared one pass in flag
+  // index order, whether a waiting runner scored on this tick or the next one
+  // would depend on which team they were: team 0's flag is returned in
+  // iteration 0 (before team 1's carried flag is checked), while team 1's is
+  // returned in iteration 1 (after team 0's carried flag was already checked).
+  // One tick is 50ms and changes no outcome, but a rated field must not be
+  // asymmetric between the two sides at all, so every return lands first and
+  // both teams' capture checks then read the same world.
+  for (const flag of match.flags) {
+    if (flag.state !== 'dropped') continue;
+    for (const pid of match.teams[flag.team]) {
+      const e = ctx.entities.get(pid);
+      if (!e || e.dead) continue;
+      if (dist2d(e.pos, flag.pos) <= BG_PICKUP_RADIUS) {
+        returnFlag(ctx, match, flag, ctx.players.get(pid)?.name ?? '');
+        break;
+      }
+    }
+  }
   for (const flag of match.flags) {
     if (flag.state === 'carried') {
       tickCarriedFlag(ctx, match, flag);
       continue;
     }
-    // 1) The flag's OWN team returns a dropped flag by proximity: automatic
-    //    and instant. This runs BEFORE pickup presses, so an automatic return
-    //    beats a same-tick pickup press (the pinned race rule).
-    if (flag.state === 'dropped') {
-      let returned = false;
-      for (const pid of match.teams[flag.team]) {
-        const e = ctx.entities.get(pid);
-        if (!e || e.dead) continue;
-        if (dist2d(e.pos, flag.pos) <= BG_PICKUP_RADIUS) {
-          returnFlag(ctx, match, flag, ctx.players.get(pid)?.name ?? '');
-          returned = true;
-          break;
-        }
-      }
-      if (returned) continue;
-    }
-    // 2) The ENEMY team picks it up (from stand or ground) only via the
-    //    deliberate battleground action press; never by walk-over.
+    // The flag's own team already had its chance to return this flag in the
+    // pass above, which is what keeps an automatic return beating a same-tick
+    // pickup press (the pinned race rule): a returned flag is no longer
+    // 'dropped' by the time the press below is read.
+    //
+    // The ENEMY team picks it up (from stand or ground) only via the
+    // deliberate battleground action press; never by walk-over.
     let taken = false;
     for (const pid of bgAllPids(match)) {
       if (!match.pendingFlagPress.has(pid)) continue;
@@ -1048,7 +1057,12 @@ export function bgResolveDesertion(ctx: SimContext, pid: number): void {
   // A deserter auto-added to the team party leaves it too; a premade member
   // keeps their own group (they deserted the match, not their friends).
   unwindBgAutoPartyFor(ctx, match.autoPartyPids, pid);
-  if (match.teams[0].length === 0 || match.teams[1].length === 0) {
+  // A fully vacated side forfeits, but ONLY while the match is still being
+  // played. During the 'ended' hold the result is already recorded and the
+  // frozen scoreboard belongs to everyone still reading it: forfeiting there
+  // would end that hold early and yank the screen away from them (the result
+  // itself is safe either way, resolveBgResult no-ops on resultRecorded).
+  if (match.state !== 'ended' && (match.teams[0].length === 0 || match.teams[1].length === 0)) {
     const winner: BgTeam | null =
       match.teams[0].length === 0 && match.teams[1].length === 0
         ? null

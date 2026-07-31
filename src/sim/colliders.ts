@@ -1416,8 +1416,11 @@ function gridFor(seed: number): ColliderGrid {
   if (grid) return grid;
   const built = staticWorldColliders(seed);
   // The battleground band rides the same grid: its cells are far past the
-  // overworld rect, so the hash map simply grows by the field's cells.
-  built.push(...bandSlotColliders());
+  // overworld rect, so the hash map simply grows by the field's cells. Pushed
+  // in a loop, never spread as arguments: the field times BG_SLOT_COUNT is
+  // already five figures of colliders, and an argument-count limit that scales
+  // with both the field and the slot count is not a limit worth having.
+  for (const c of bandSlotColliders()) built.push(c);
   // Index every collider once so queries can dedupe against a flat stamp
   // buffer (a collider spanning cells appears in each of them).
   for (let i = 0; i < built.length; i++) built[i].gridIndex = i;

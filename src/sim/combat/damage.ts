@@ -1100,8 +1100,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     if (e.leap !== undefined) e.leap = null;
     e.followTargetId = null;
     ctx.emit({ type: 'playerDeath', pid: e.id });
-    // Thornhollow Fields: carrier death drops the flag in place; the team wave clock
-    // revives the fallen (no release, corpse, or ghost run).
+    // Thornhollow Fields: carrier death drops the flag in place. The corpse
+    // lies where it fell and the player's own Release press sends the spirit to
+    // the warded keep graveyard, where the team wave clock raises it.
     ctx.bgOnPlayerDeath(e, killer);
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {

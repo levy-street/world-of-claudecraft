@@ -851,7 +851,7 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
   });
 });
 
-describe('Thornhollow Fields: death, wave respawn, spawn protection', () => {
+describe('Thornhollow Fields: death, release, and the team wave respawn', () => {
   it('carrier death drops the flag in place and releasing does nothing', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
