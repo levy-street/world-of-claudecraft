@@ -1,11 +1,11 @@
 # PRD: The Far Shore Voyage, a Gullhaven sailing raid (Glasswake Covenant)
 
-Status: INCUBATION, draft pass 2 (2026-07-26) for discussion with Levy. Not scheduled
+Status: READY FOR THE LEVY CONVERSATION, draft pass 2 (2026-07-26). Not scheduled
 and not eligible for Stage 5. The reduced raid core still needs an explicit Stage 3
-scope decision before its existing handoff can be dispatched.
-Depends on the Farshore zone on the `feature/procedural-dungeons` branch
-(umbrella PR #1584) landing first. Supersedes the earlier Wickharbor-anchored
-draft. Pass-2 scope cut
+scope decision, pipeline proof, and a committed PBE round before its existing handoff
+can be dispatched. The Farshore zone content in `src/sim/content/farshore.ts` landed in
+`release/v0.33.0`, is merged through `src/sim/data.ts`, and is placed in the `ZONES`
+table. Supersedes the earlier Wickharbor-anchored draft. Pass-2 scope cut
 (maintainer direction): entry is the standard click-the-moored-ship raid
 gate, and every cross-instance or single-crew system is removed (bell
 relay, Gullhaven Answers, previous-crew ghost ship, town-side live state);
@@ -30,8 +30,8 @@ without creating persistent per-crew world state.
 
 ## Portfolio alignment
 
-- Proposed lane: incubation until the first dungeon and raid pipelines are proven, not yet
-  Levy-approved.
+- Proposed lane: ready for the Levy conversation, with the first dungeon and raid pipelines
+  still to be proven and no Levy approval yet.
 - Protected identity: one crew, one visible ship, the Name-Taker election, and Sereva's
   return-leg finale.
 - Scope rail: the pass-4 three-boss cut is the maximum initial raid. Cross-instance state,
@@ -39,9 +39,12 @@ without creating persistent per-crew world state.
   moves remain cut.
 - First schedule cut: the weekly low-tide assault becomes a separately approved post-raid
   extension. It cannot delay or share the initial raid dispatch.
-- Next-stage gate: Hullworks and one raid prove the pipeline, Levy approves the reduced
-  raid core, and the `feature/procedural-dungeons` branch (umbrella PR #1584) lands. The
-  low-tide extension receives its own later scope decision.
+- Satisfied zone gate: the Farshore content in `src/sim/content/farshore.ts` landed in
+  `release/v0.33.0`, is merged through `src/sim/data.ts`, and is placed in the `ZONES`
+  table.
+- Remaining next-stage gate: Hullworks and one raid prove the pipeline, Levy approves the
+  reduced raid core, and a PBE round is committed. The low-tide extension receives its own
+  later scope decision.
 
 ## Why this patch
 
@@ -78,8 +81,9 @@ Stage is the existing Farshore content (nothing invented here):
 - The Three Bells (existing quest motif): flavor only; the raid adds no
   live town-side state (pass-2 rule: no single-crew systems).
 
-Dependency: the Farshore ships on the `feature/procedural-dungeons` branch
-(umbrella PR #1584). This PRD stacks on it or follows it; it does not fork it.
+Dependency satisfied: the Farshore content in `src/sim/content/farshore.ts` landed in
+`release/v0.33.0`, is merged through `src/sim/data.ts`, and is placed in the `ZONES`
+table. This PRD builds on the released zone and does not edit it.
 
 ## The enemy: the Glasswake Covenant
 
@@ -338,11 +342,12 @@ convention.
 
 ## Rollout
 
-Per the contribution process: this is a large content feature, so the gate
-order is (1) a conversation with Levy on the reduced raid core, (2)
-implementation behind the Farshore dependency, (3) a PBE round for community
-testing, (4) raid release, and only then (5) a separate decision on the
-low-tide extension. i18n scope is large (faction, three bosses, ability names, bell
+The Farshore dependency is already satisfied in `release/v0.33.0` through
+`src/sim/content/farshore.ts`, its merge in `src/sim/data.ts`, and its placement in the
+`ZONES` table. Per the contribution process, this is a large content feature, so the
+remaining gate order is (1) a conversation with Levy on the reduced raid core, (2) a
+committed PBE round for community testing, (3) raid release, and only then (4) a separate
+decision on the low-tide extension. i18n scope is large (faction, three bosses, ability names, bell
 quest prose) and follows the standard catalog plus overlay
 workflow, budgeted as its own task.
 

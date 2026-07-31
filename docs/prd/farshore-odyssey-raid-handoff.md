@@ -2,12 +2,12 @@
 
 | | |
 |---|---|
-| **Status** | INCUBATION, DRAFT STAGE 4 PACKET, excluded from the active implementation-handoff queue. Do not start slices until Levy explicitly approves the reduced three-boss raid core, the first dungeon and raid pipelines are proven, and the `feature/procedural-dungeons` branch (umbrella PR #1584) lands. Large content requires PBE. |
-| **Portfolio lane** | Incubation. The packet is detailed enough to execute later, but detail is not approval or dispatch priority. |
-| **Dispatch gate** | Levy approves the reduced raid core after the pipeline proof, and the `feature/procedural-dungeons` branch (umbrella PR #1584) lands. The low-tide assault is a separately approved post-raid extension and cannot delay or share the initial raid dispatch. |
+| **Status** | READY FOR THE LEVY CONVERSATION, DRAFT STAGE 4 PACKET, excluded from the active implementation-handoff queue. The Farshore content in `src/sim/content/farshore.ts` landed in `release/v0.33.0`, is merged through `src/sim/data.ts`, and is placed in the `ZONES` table. Do not start slices until Levy explicitly approves the reduced three-boss raid core, the first dungeon and raid pipelines are proven, and a PBE round is committed. |
+| **Portfolio lane** | Pre-dispatch. The packet is ready for the Levy conversation, but detail is not approval or dispatch priority. |
+| **Dispatch gate** | The Farshore zone gate is satisfied in `release/v0.33.0` through `src/sim/content/farshore.ts`, its merge in `src/sim/data.ts`, and its placement in the `ZONES` table. Levy approval after the pipeline proof and a committed PBE round still gate dispatch. The low-tide assault is a separately approved post-raid extension and cannot delay or share the initial raid dispatch. |
 | **Source PRD** | `docs/prd/farshore-odyssey-raid.md` (whole document; its File plan section is the file inventory this handoff schedules) |
 | **Scope** | Initial raid core only: standard click-the-moored-ship entry, THREE bosses (Vessarine, the Name-Taker, Sereva) plus the non-boss Tenfold Sail launch and the open-sail prison-hulk rescue beat, ONE raid lockout id, the Beckoning lured-state primitive, in-instance ship/sail state, the vote with an aura-only Captain mantle, heroic mode on the existing difficulty and variant machinery, loot/deeds/i18n, music/fx, and bot tuning. The weekly low-tide assault is extension X1 outside this core. NOT in scope: the pass-2 to pass-4 cuts, town-side or cross-instance state, additional wings/routes, bespoke Captain buttons, trophy moves, Farshore leveling-content changes, and any $WOC or economy hook. |
-| **Verified against** | `origin/release/v0.30.0` and `origin/feature/procedural-dungeons`, 2026-07-25 (heroic anchors re-verified 2026-07-26). Revalidate every anchor against the active branch before implementation; trust symbols, not line numbers. |
+| **Verified against** | `origin/release/v0.30.0` for existing machinery and `origin/release/v0.33.0` for the Farshore stage, re-verified 2026-07-31 (heroic anchors re-verified 2026-07-26). Revalidate every anchor against the active branch before implementation; trust symbols, not line numbers. |
 | **Executor routing** | Claude uses `extract-and-test` and `qa-checklist`; Codex uses the matching `$woc-*` skills. The GLB lane uses the `image-to-glb` skill (`.claude/skills/image-to-glb/SKILL.md`) plus `docs/image-to-glb-asset-workflow.md`. Icon and kit lanes are plain authoring work with no named skill. Sim, frontend, and cross-platform reviewers follow the changed surface. No slice depends on a named model. |
 
 ## 0. Ground rules
@@ -16,19 +16,19 @@ Rules 1 to 6 of `docs/prd/FRONTIER_PHASE1_HANDOFF.md` section 0 apply verbatim (
 Rng-only randomness, i18n, strict TS, Conventional Commits, command-anchored acceptance).
 Deltas for this program:
 
-1. Base branch: until the `feature/procedural-dungeons` branch (umbrella PR #1584) merges,
-   every slice stacks on `origin/feature/procedural-dungeons` (the Farshore stage lives
-   there); after it merges, on the active release branch. Never fork or edit files owned
-   by the dependency branch.
-2. Commit scope is `feat(voyage): ...`; branches `feature/voyage-s<N>`.
-3. Every NEW per-tick sim module gets its `SIM_LAP_PHASES` pin in `server/game.ts` in the
+The Farshore stage in `src/sim/content/farshore.ts` landed in `release/v0.33.0`, is merged
+through `src/sim/data.ts`, and is placed in the `ZONES` table. Base every slice on the
+active release branch, and never edit the released Farshore stage.
+
+1. Commit scope is `feat(voyage): ...`; branches `feature/voyage-s<N>`.
+2. Every NEW per-tick sim module gets its `SIM_LAP_PHASES` pin in `server/game.ts` in the
    SAME slice as its tick call (gotcha G1); every NEW read surface ships as a
    `src/world_api/` facet in BOTH worlds with its `tests/world_api_parity.test.ts` pin in
    the SAME slice (G2).
-4. Agent-completable policy is a hard invariant: no mechanic may demand a reaction faster
+3. Agent-completable policy is a hard invariant: no mechanic may demand a reaction faster
    than its telegraphed timer, and every mechanic's state (watch assignment, Beckoned walk
    target, vote options, deck orders) must be readable through IWorld, never visuals.
-5. All tuning numbers in section 1 come from the PRD and are locked for PBE; do not retune
+4. All tuning numbers in section 1 come from the PRD and are locked for PBE; do not retune
    them mid-slice.
 
 ## 1. Shared design constants (defined once in S1, imported everywhere)
@@ -86,7 +86,7 @@ The boarding-net soaked debuff is a movement tax only, never damage.
 
 | Concern | Branch | Anchor (re-find before editing) |
 |---|---|---|
-| Farshore stage | procedural-dungeons | `src/sim/content/farshore.ts`: Warden Coalfast NPC, `welcomeQuestId: 'q_fs_bell_at_the_landing'`, Gullhaven prose. Read-only stage; the raid plugs in, never edits |
+| Farshore stage | release/v0.33.0 | `src/sim/content/farshore.ts`: Warden Coalfast NPC, `welcomeQuestId: 'q_fs_bell_at_the_landing'`, Gullhaven prose; merged through `src/sim/data.ts` as `FARSHORE_ZONE` in the `ZONES` table. Read-only stage; the raid plugs in, never edits |
 | Raid lockout | release/v0.30.0 | `raidLockouts: Map<string, number>` on PlayerMeta in `src/sim/sim.ts`; checked/cleared in `src/sim/instances/dungeons.ts`; `meta.raidLockouts.set(lockId, until)` precedent in `src/sim/encounters/nythraxis.ts` (pass 3: the raid uses the ONE `voyage` id, never per-wing ids) |
 | Instance entry | release/v0.30.0 | `export function enterDungeon(` in `src/sim/instances/dungeons.ts`; coverage pin `tests/dungeon_entry_clearance.test.ts` |
 | Content shape | release/v0.30.0 | `interface DungeonDef` and `interface MobTemplate` in `src/sim/types.ts`; precedent module `src/sim/content/temple.ts`; merged via `export const MOBS: Record<string, MobTemplate>` in `src/sim/data.ts` |
@@ -242,14 +242,16 @@ sim matcher rows, wiki regen, credits/provenance for that PR's assets, and this 
   without rng (the lowest-slot tie-break) or two hosts diverge; where an encounter does
   draw (loot), draw in one fixed module order per tick.
 - **G6, the stage is read-only.** `src/sim/content/farshore.ts` and the rift siege quests
-  belong to the `feature/procedural-dungeons` branch (umbrella PR #1584); the raid adds
-  siblings, never edits.
+  landed in `release/v0.33.0`, are merged through `src/sim/data.ts`, and are represented by
+  `FARSHORE_ZONE` in the `ZONES` table; the raid adds siblings, never edits.
 - **G7, worktree discipline.** The shared checkout carries uncommitted WIP; build each slice
   in a fresh worktree off the base branch (`feature/voyage-s<N>`) and re-merge it as it moves.
 
 ## 5. Dispatch note
 
-Do not dispatch any slice while the Status row says INCUBATION. When unblocked, hand each owner
-the slice block, section 0 rules, section 1 constants, its hook-map rows, the gotchas, and
-the acceptance commands. Require fails-before/passes-after evidence for every test written
-first, exact command output, and a `qa-checklist` pass. S1, S5, S7, S8, and S11 end with `npm run gate`.
+The Status row records readiness for the Levy conversation, not build authorization. Do not
+dispatch until the pipeline proof, explicit Levy approval, and committed PBE round are recorded.
+Once those gates are met, hand each owner the slice block, section 0 rules, section 1 constants,
+its hook-map rows, the gotchas, and the acceptance commands. Require fails-before/passes-after
+evidence for every test written first, exact command output, and a `qa-checklist` pass. S1, S5,
+S7, S8, and S11 end with `npm run gate`.
