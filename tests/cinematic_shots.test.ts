@@ -6,7 +6,6 @@ import { describe, expect, it } from 'vitest';
 import {
   measureArrivalApproach,
   measureSegment,
-  worldToLocal,
 } from '../scripts/lib/cinematic_trajectory_geometry.mjs';
 import {
   applySceneOp,
@@ -38,12 +37,9 @@ import {
 } from '../src/sim/content/last_bell_cinematics';
 import { PROPS } from '../src/sim/data';
 import {
-  GULLHAVEN_HARBOR,
   HARBORS,
   type HarborDef,
   harborRampHeight,
-  harborShipLocalBounds,
-  harborShipLocalPointInside,
   MAINLAND_HARBOR,
 } from '../src/sim/harbor_layout';
 import {
@@ -59,9 +55,10 @@ import {
   evaluateEntitySupport,
   evaluateFraming,
   FULL_BLACK_OPACITY,
-  HARBOR_HULL_FOOTPRINTS,
   HORIZONTAL_HALF_FOV_RAD,
+  HULL_GANGWAY_MATING_EPSILON_YARDS,
   HULL_INTERSECTION_EPSILON_YARDS,
+  HULL_TERRAIN_SAMPLE_STEP_YARDS,
   hullWorldCollision,
   length,
   MAX_ARRIVAL_BERTH_DISTANCE_YARDS,
@@ -115,6 +112,9 @@ import {
   screenPoint,
   settledPlayerStartForScene,
   shipDeckLocalBounds,
+  shipHullBlockers,
+  shipHullPointClearance,
+  shipHullVolumes,
   shipTarget,
   subtract,
   supportSurfacesAt,
@@ -692,8 +692,8 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
         kind: 'camera',
         shot: {
           kind: 'dolly',
-          points: [{ x: 232, z: -44, height: 4 }],
-          lookAt: { kind: 'point', point: { x: 250, z: -44, height: 4 } },
+          points: [{ x: 230.65, z: -56, height: 10 }],
+          lookAt: { kind: 'point', point: { x: 250.65, z: -56, height: 10 } },
           dur: 1.6,
         },
       },
@@ -917,12 +917,13 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
           kind: 'attach',
           target: 'harbor_ship_mainland',
           fallbackFrame: { point: { x: 240.5, z: -44, height: 8 }, yaw: Math.PI / 2 },
-          offset: { x: 6.6, y: 20, z: 0 },
-          lookAt: { x: 16.6, y: 20, z: 0 },
+          offset: { x: 10, y: 7, z: 0 },
+          lookAt: { x: 20, y: 7, z: 0 },
         },
       },
     ]),
     expectedCheck: 'clearance.volume',
+    expectedMeasured: 'mainland live ship model',
   },
   {
     def: syntheticCameraScene('scn_test_lint_fixed_deck_height_bad', 1.7, [
@@ -2393,11 +2394,14 @@ function cameraVolumeIntrusion(
       const clearance = camera.y - Math.max(ramp.highY, ramp.lowY) - PIER_KEEP_OUT_HEIGHT_YARDS;
       if (clearance < 0) return { label: `${harbor.id} ramp`, clearance };
     }
-    const localCamera = worldToLocal(shipFrameAt(harbor, time, activeProps), camera);
-    const bounds = harborShipLocalBounds(harbor.berth);
-    if (harborShipLocalPointInside(bounds, localCamera, PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS)) {
-      return { label: `${harbor.id} live ship model`, clearance: localCamera.y - bounds.topY };
-    }
+    const clearance = shipHullPointClearance(
+      harbor,
+      shipFrameAt(harbor, time, activeProps),
+      camera,
+      runtimeWaterLevel,
+      PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS,
+    );
+    if (clearance < 0) return { label: `${harbor.id} live ship model`, clearance };
   }
   return null;
 }
@@ -2443,18 +2447,18 @@ function sightLineOcclusion(
         const clearance = point.y - rampY - SIGHT_LINE_TERRAIN_MARGIN_YARDS;
         consider(`${harbor.id} ramp`, clearance, point, traveled);
       }
-      const local = worldToLocal(shipFrameAt(harbor, time, activeProps), point);
-      const footprint = HARBOR_HULL_FOOTPRINTS[harbor.id];
       const hullTopY = Math.max(
         ...harbor.shipDecks.map(
           (deck) => shipDeckLocalBounds(harbor, deck, runtimeWaterLevel).centerY,
         ),
       );
-      const clearance = Math.max(
-        Math.abs(local.x - footprint.x) - footprint.hw,
-        Math.abs(local.z - footprint.z) - footprint.hd,
-        footprint.bottomY - local.y,
-        local.y - hullTopY,
+      const clearance = shipHullPointClearance(
+        harbor,
+        shipFrameAt(harbor, time, activeProps),
+        point,
+        runtimeWaterLevel,
+        0,
+        hullTopY,
       );
       consider(`${harbor.id} ship hull`, clearance, point, traveled);
     }
@@ -4060,6 +4064,122 @@ describe('cinematic shot mechanical gate', () => {
     ).toEqual([]);
   });
 
+  it('pins generated hull fill, rider negatives, and the gangway mating boundary', async () => {
+    await loadLinterRuntime();
+    expect(HULL_GANGWAY_MATING_EPSILON_YARDS).toBe(0.15);
+    for (const harbor of HARBORS) {
+      const parkedFrame = shipFrameForPose(harbor, { x: 0, y: 0, z: 0, yaw: 0 });
+      expect(
+        hullWorldCollision(harbor, parkedFrame, WORLD_SEED, {
+          terrainHeight: sampleTerrainHeight,
+          waterLevel: runtimeWaterLevel,
+        }),
+        `${harbor.id} parked hull clears the world at the gangway tolerance`,
+      ).toBeNull();
+
+      const body = shipHullVolumes(harbor, runtimeWaterLevel).find(
+        (volume) => volume.id === 'lower-hull-body',
+      );
+      expect(body, `${harbor.id} generated lower hull fill`).toBeDefined();
+      if (!body) continue;
+      const bellyLocal = {
+        x: body.x,
+        y: (body.bottomY + body.topY) / 2,
+        z: body.z,
+      };
+      const bellyWorld = sceneRigLocalToWorld(parkedFrame, bellyLocal, { x: 0, y: 0, z: 0 });
+      expect(
+        shipHullPointClearance(harbor, parkedFrame, bellyWorld, runtimeWaterLevel),
+        `${harbor.id} center belly is solid`,
+      ).toBeLessThan(0);
+      const bodySampleCoordinate = (halfExtent: number): number => {
+        const steps = Math.max(1, Math.ceil((halfExtent * 2) / HULL_TERRAIN_SAMPLE_STEP_YARDS));
+        const index = Math.round(steps / 2);
+        return -halfExtent + (halfExtent * 2 * index) / steps;
+      };
+      const bellySampleWorld = sceneRigLocalToWorld(
+        parkedFrame,
+        {
+          x: body.x + bodySampleCoordinate(body.hw),
+          y: bellyLocal.y,
+          z: body.z + bodySampleCoordinate(body.hd),
+        },
+        { x: 0, y: 0, z: 0 },
+      );
+      const raisedFloorY = parkedFrame.position.y + body.bottomY + 0.5;
+      expect(
+        hullWorldCollision(harbor, parkedFrame, WORLD_SEED, {
+          terrainHeight: (x, z) =>
+            Math.hypot(x - bellySampleWorld.x, z - bellySampleWorld.z) <= 1e-6
+              ? raisedFloorY
+              : runtimeWaterLevel - 100,
+          waterLevel: runtimeWaterLevel,
+        }),
+        `${harbor.id} center belly samples the water floor`,
+      ).toMatchObject({
+        label: 'water floor',
+        volumeId: 'lower-hull-body',
+      });
+
+      const gangwayIndex = harbor.ramps.length - 1;
+      const gangway = harbor.ramps[gangwayIndex];
+      const towardGangway = {
+        x: gangway.x - parkedFrame.position.x,
+        z: gangway.z - parkedFrame.position.z,
+      };
+      const gangwayDistance = Math.hypot(towardGangway.x, towardGangway.z);
+      const boundaryFrame = {
+        position: {
+          ...parkedFrame.position,
+          x:
+            parkedFrame.position.x +
+            (towardGangway.x / gangwayDistance) * (HULL_GANGWAY_MATING_EPSILON_YARDS + 0.2),
+          z:
+            parkedFrame.position.z +
+            (towardGangway.z / gangwayDistance) * (HULL_GANGWAY_MATING_EPSILON_YARDS + 0.2),
+        },
+        yaw: parkedFrame.yaw,
+      };
+      expect(
+        hullWorldCollision(harbor, boundaryFrame, WORLD_SEED, {
+          terrainHeight: sampleTerrainHeight,
+          waterLevel: runtimeWaterLevel,
+        }),
+        `${harbor.id} beyond the gangway mating tolerance`,
+      ).toMatchObject({
+        label: `${harbor.id} ramp ${gangwayIndex}`,
+      });
+
+      const mainDeckBounds = shipDeckLocalBounds(harbor, harbor.shipDecks[0], runtimeWaterLevel);
+      const oldAggregateLocal = {
+        x: -25,
+        y: mainDeckBounds.centerY,
+        z: 0,
+      };
+      expect(Math.abs(oldAggregateLocal.x)).toBeLessThan(harbor.berth.length / 2);
+      const oldAggregateWorld = sceneRigLocalToWorld(parkedFrame, oldAggregateLocal, {
+        x: 0,
+        y: 0,
+        z: 0,
+      });
+      expect(
+        riderDeckViolation(
+          'old aggregate probe',
+          harbor,
+          parkedFrame,
+          oldAggregateWorld,
+          runtimeWaterLevel,
+        ),
+      ).toContain(`left ${harbor.id} deck bounds`);
+
+      const airborne = deckStandInPoint(harbor, parkedFrame, runtimeWaterLevel);
+      airborne.y += ENTITY_SUPPORT_EPSILON_YARDS + 0.2;
+      expect(
+        riderDeckViolation('airborne rider', harbor, parkedFrame, airborne, runtimeWaterLevel),
+      ).toContain(`deck air gap in ${harbor.id}`);
+    }
+  });
+
   it('samples every registered scene at 20 Hz against the mechanical rubric', async () => {
     await loadLinterRuntime();
     expect(MIN_PERCEPTUAL_FADE_SECONDS).toBeGreaterThanOrEqual(0.3);
@@ -4076,67 +4196,39 @@ describe('cinematic shot mechanical gate', () => {
     );
     // A renderer lens change must update the linter's framing calculations.
     expect(RENDERER_SOURCE).toContain('CAMERA_BASE_FOV = 60');
-    const modelBounds = harborShipLocalBounds(GULLHAVEN_HARBOR.berth);
-    expect(modelBounds).toEqual({
-      x: 0,
-      z: 0,
-      hw: 30,
-      hd: 8.863490707113863,
-      bottomY: -0.0004148165653705534,
-      topY: 39.56988457001259,
-    });
-    expect(HARBOR_HULL_FOOTPRINTS, 'each shipping ferry needs an authored hull box').toEqual({
-      mainland: harborShipLocalBounds(MAINLAND_HARBOR.berth),
-      gullhaven: modelBounds,
-    });
-    const modelCenter = { x: 0, y: 20, z: 0 };
-    expect(harborShipLocalPointInside(modelBounds, modelCenter)).toBe(true);
-    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: -30 })).toBe(true);
-    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: 30 })).toBe(true);
-    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: -30.01 })).toBe(false);
-    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: 30.01 })).toBe(false);
-    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, z: -modelBounds.hd })).toBe(
-      true,
-    );
-    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, z: modelBounds.hd })).toBe(
-      true,
-    );
-    expect(
-      harborShipLocalPointInside(modelBounds, { ...modelCenter, z: -modelBounds.hd - 0.01 }),
-    ).toBe(false);
-    expect(
-      harborShipLocalPointInside(modelBounds, { ...modelCenter, z: modelBounds.hd + 0.01 }),
-    ).toBe(false);
-    expect(
-      harborShipLocalPointInside(modelBounds, { ...modelCenter, y: modelBounds.bottomY }),
-    ).toBe(true);
-    expect(
-      harborShipLocalPointInside(modelBounds, { ...modelCenter, y: modelBounds.bottomY - 0.01 }),
-    ).toBe(false);
-    expect(
-      harborShipLocalPointInside(modelBounds, { ...modelCenter, y: modelBounds.topY - 0.01 }),
-    ).toBe(true);
-    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, y: modelBounds.topY })).toBe(
-      false,
-    );
-    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: 30.74 }, 0.75)).toBe(true);
-    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: 30.76 }, 0.75)).toBe(false);
-    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: -30.74 }, 0.75)).toBe(true);
-    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: -30.76 }, 0.75)).toBe(
-      false,
-    );
-    expect(
-      harborShipLocalPointInside(modelBounds, { ...modelCenter, z: modelBounds.hd + 0.74 }, 0.75),
-    ).toBe(true);
-    expect(
-      harborShipLocalPointInside(modelBounds, { ...modelCenter, z: modelBounds.hd + 0.76 }, 0.75),
-    ).toBe(false);
-    expect(
-      harborShipLocalPointInside(modelBounds, { ...modelCenter, z: -modelBounds.hd - 0.74 }, 0.75),
-    ).toBe(true);
-    expect(
-      harborShipLocalPointInside(modelBounds, { ...modelCenter, z: -modelBounds.hd - 0.76 }, 0.75),
-    ).toBe(false);
+    for (const harbor of HARBORS) {
+      const blockers = shipHullBlockers(harbor, runtimeWaterLevel);
+      expect(
+        blockers.map(({ id, kind }) => ({ id, kind })),
+        `${harbor.id} linter hull inventory`,
+      ).toEqual(harbor.shipBlockers.map(({ id, kind }) => ({ id, kind })));
+      expect(blockers).toHaveLength(harbor.shipBlockers.length);
+      const parkedFrame = shipFrameForPose(harbor, { x: 0, y: 0, z: 0, yaw: 0 });
+      for (const [index, blocker] of blockers.entries()) {
+        const worldCenter = sceneRigLocalToWorld(
+          parkedFrame,
+          { x: blocker.x, y: blocker.topY, z: blocker.z },
+          { x: 0, y: 0, z: 0 },
+        );
+        expect(worldCenter.x, `${harbor.id} blocker ${blocker.id} x`).toBeCloseTo(
+          harbor.shipBlockers[index].x,
+          10,
+        );
+        expect(worldCenter.y, `${harbor.id} blocker ${blocker.id} top`).toBeCloseTo(
+          harbor.shipBlockers[index].cameraTopY,
+          10,
+        );
+        expect(worldCenter.z, `${harbor.id} blocker ${blocker.id} z`).toBeCloseTo(
+          harbor.shipBlockers[index].z,
+          10,
+        );
+      }
+      const standIn = deckStandInPoint(harbor, parkedFrame, runtimeWaterLevel);
+      expect(
+        riderDeckViolation('deck stand-in', harbor, parkedFrame, standIn, runtimeWaterLevel),
+        `${harbor.id} rider containment uses the generated decks`,
+      ).toBeNull();
+    }
     const testGeometry: CameraGeometry = {
       camera: { x: 0, y: 0, z: 0 },
       lookAt: { x: 0, y: 0, z: 1 },

@@ -18,7 +18,6 @@ import {
   ENTITY_SUPPORT_EPSILON_YARDS,
   evaluateEntitySupport,
   evaluateFraming,
-  HARBOR_HULL_FOOTPRINTS,
   HORIZONTAL_HALF_FOV_RAD,
   HULL_INTERSECTION_EPSILON_YARDS,
   hullWorldCollision,
@@ -28,6 +27,7 @@ import {
   RIDER_DECK_EDGE_EPSILON_YARDS,
   riderDeckViolation,
   scale,
+  shipHullVolumes,
   shipTarget,
   subtract,
   supportSurfacesAt,
@@ -46,6 +46,7 @@ export type CinematicGizmoState = 'neutral' | 'violation';
 
 export interface CinematicHullGizmo {
   readonly kind: 'hull';
+  readonly label: string;
   readonly state: CinematicGizmoState;
   readonly center: SceneRigPoint;
   readonly size: SceneRigPoint;
@@ -143,7 +144,9 @@ export function evaluateCinematicGizmoFrame(
       terrainHeight: world.terrainHeight,
       waterLevel: world.waterLevel,
     });
-    gizmos.push(hullGizmo(ship.harbor, ship.frame, gizmoState(collision !== null)));
+    gizmos.push(
+      ...hullGizmos(ship.harbor, ship.frame, world.waterLevel, collision?.volumeId ?? null),
+    );
     if (collision) {
       violations.push({
         sceneId: scene.id,
@@ -283,27 +286,28 @@ export function evaluateCinematicGizmoFrame(
   return { gizmos, violations };
 }
 
-export function hullGizmo(
+export function hullGizmos(
   harbor: HarborDef,
   frame: SceneAttachFrame,
-  state: CinematicGizmoState,
-): CinematicHullGizmo {
-  const footprint = HARBOR_HULL_FOOTPRINTS[harbor.id];
-  return {
+  waterLevel: number,
+  violatingVolumeId: string | null,
+): readonly CinematicHullGizmo[] {
+  return shipHullVolumes(harbor, waterLevel).map((volume) => ({
     kind: 'hull',
-    state,
+    label: volume.id,
+    state: gizmoState(volume.id === violatingVolumeId),
     center: attachmentLocalToWorld(frame, {
-      x: footprint.x,
-      y: (footprint.bottomY + footprint.topY) / 2,
-      z: footprint.z,
+      x: volume.x,
+      y: (volume.bottomY + volume.topY) / 2,
+      z: volume.z,
     }),
     size: {
-      x: footprint.hw * 2,
-      y: footprint.topY - footprint.bottomY,
-      z: footprint.hd * 2,
+      x: volume.hw * 2,
+      y: volume.topY - volume.bottomY,
+      z: volume.hd * 2,
     },
-    yaw: frame.yaw,
-  };
+    yaw: frame.yaw + volume.rot,
+  }));
 }
 
 export function framingGizmo(

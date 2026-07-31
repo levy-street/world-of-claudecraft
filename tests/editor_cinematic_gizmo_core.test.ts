@@ -3,10 +3,14 @@ import {
   evaluateCinematicGizmoFrame,
   framingGizmo,
   gizmoState,
-  hullGizmo,
+  hullGizmos,
 } from '../src/editor/cinematic_gizmo_core';
-import { MAINLAND_HARBOR } from '../src/sim/harbor_layout';
-import { cameraGeometry, HARBOR_HULL_FOOTPRINTS } from '../src/sim/scenes/lint_core';
+import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
+import {
+  attachmentLocalToWorld,
+  cameraGeometry,
+  shipHullVolumes,
+} from '../src/sim/scenes/lint_core';
 import type { SceneDef } from '../src/sim/scenes/registry';
 import { WATER_LEVEL } from '../src/sim/world';
 
@@ -157,24 +161,30 @@ describe('editor cinematic gizmo core', () => {
       position: { x: 10, y: 3, z: -4 },
       yaw: Math.PI / 2,
     };
-    const hull = hullGizmo(MAINLAND_HARBOR, attachFrame, gizmoState(true));
-    const footprint = HARBOR_HULL_FOOTPRINTS.mainland;
+    const volumes = shipHullVolumes(MAINLAND_HARBOR, WATER_LEVEL);
+    const hulls = hullGizmos(MAINLAND_HARBOR, attachFrame, WATER_LEVEL, 'lower-hull-body');
 
-    expect(hull).toEqual({
-      kind: 'hull',
-      state: 'violation',
-      center: {
-        x: 10,
-        y: 3 + (footprint.bottomY + footprint.topY) / 2,
-        z: -4,
-      },
-      size: {
-        x: footprint.hw * 2,
-        y: footprint.topY - footprint.bottomY,
-        z: footprint.hd * 2,
-      },
-      yaw: Math.PI / 2,
-    });
+    expect(hulls.map((hull) => hull.label)).toEqual(volumes.map((volume) => volume.id));
+    expect(hulls).toHaveLength(MAINLAND_HARBOR.shipBlockers.length + 1);
+    for (const [index, hull] of hulls.entries()) {
+      const volume = volumes[index];
+      expect(hull).toEqual({
+        kind: 'hull',
+        label: volume.id,
+        state: volume.id === 'lower-hull-body' ? 'violation' : 'neutral',
+        center: attachmentLocalToWorld(attachFrame, {
+          x: volume.x,
+          y: (volume.bottomY + volume.topY) / 2,
+          z: volume.z,
+        }),
+        size: {
+          x: volume.hw * 2,
+          y: volume.topY - volume.bottomY,
+          z: volume.hd * 2,
+        },
+        yaw: attachFrame.yaw + volume.rot,
+      });
+    }
 
     const framing = framingGizmo(
       cameraGeometry({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 10 }),
