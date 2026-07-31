@@ -3080,8 +3080,14 @@ export class GameServer {
     // Re-validate the freshly-read layout (untrusted at rest), same as a fresh
     // join. Without this, a mid-session save that already landed durably would
     // be clobbered by the stale join-time snapshot once lastSent resets below
-    // forces a resend.
-    session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
+    // forces a resend. Only refresh when the caller actually supplies a layout:
+    // ws_auth.ts always does on the real reconnect path, but an in-process/test
+    // caller that omits it (meta = {}) must keep the session's saved value
+    // rather than being reset to null, matching the sibling bankBonus
+    // "absent means keep" pattern above.
+    if (meta.hotbarLayout !== undefined) {
+      session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
+    }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
     session.lastSent = {};
