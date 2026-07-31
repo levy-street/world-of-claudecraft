@@ -58,6 +58,16 @@ const THUNZHARR_REACH_SCALE = 5;
 export function combatProfileForMob(templateId: string, scale: number): MobCombatProfile {
   if (templateId === 'nythraxis_scourge_of_thornpeak') return NYTHRAXIS_BOSS_COMBAT_PROFILE;
   if (templateId === 'nythraxis_skeleton_warrior') return NYTHRAXIS_ADD_COMBAT_PROFILE;
+  if (templateId === 'wildheart_ravager')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      // The scale-2 default settles at desiredRange 6.4 and swings out to 9,
+      // so real landed hits read as whiffs into the ether. Keep the scaled
+      // reach but close to visual contact before trading, the Nythraxis
+      // meleeRange 8 / desiredRange 5 pattern.
+      meleeRange: scaledDefaultMobMeleeRange(2),
+      desiredRange: 5,
+    };
   if (templateId === 'thunzharr_waking_peak')
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,

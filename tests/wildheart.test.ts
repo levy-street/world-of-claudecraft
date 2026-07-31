@@ -27,9 +27,13 @@ import {
   YUMI_BAND_X_MAX,
   zoneAt,
 } from '../src/sim/data';
+import { onDungeonFinalBossKilledForDeeds } from '../src/sim/deeds';
 import { enterDungeon } from '../src/sim/instances/dungeons';
+import { combatProfileForMob, scaledDefaultMobMeleeRange } from '../src/sim/mob_combat';
+import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
+import { RUN_SPEED } from '../src/sim/types';
 import {
   WILDHEART_FIELD_BOUNDS,
   WILDHEART_FIELD_COLLIDER_SPECS,
@@ -221,5 +225,52 @@ describe('Wildheart Basin dungeon content', () => {
       difficulty: 'heroic',
       count: 1,
     });
+  });
+
+  it('credits the clear record and deed pair when Zulgar falls', () => {
+    // The shipped regression: wildheart_high_priest was absent from
+    // FINAL_BOSS_DUNGEONS, so both deeds above sat permanently at 0/1.
+    const sim = makeSim();
+    const playerId = sim.addPlayer('warrior', 'Clearer');
+    const meta = sim.players.get(playerId);
+    if (!meta) throw new Error('player meta missing');
+    const boss = { templateId: 'wildheart_high_priest' } as Entity;
+
+    onDungeonFinalBossKilledForDeeds(sim.ctx, boss, undefined, [meta]);
+    expect(meta.deedStats.dungeonClears.wildheart_basin).toBe(1);
+    expect(meta.deedStats.counters.dungeonFinalBossKills).toBe(1);
+    sim.tick();
+    expect(meta.deedsEarned.has('dgn_wildheart_basin')).toBe(true);
+    expect(meta.deedsEarned.has('dgn_wildheart_basin_heroic')).toBe(false);
+
+    onDungeonFinalBossKilledForDeeds(
+      sim.ctx,
+      boss,
+      { difficulty: 'heroic' } as InstanceSlot,
+      [meta],
+    );
+    expect(meta.deedStats.dungeonClears['wildheart_basin:heroic']).toBe(1);
+    sim.tick();
+    expect(meta.deedsEarned.has('dgn_wildheart_basin_heroic')).toBe(true);
+  });
+
+  it('pins the live-playtest combat fixes on the basin roster', () => {
+    // The Razorvine Spear must stay a non-physical school: a physical-school
+    // petSpell replays the melee Attack clip on every impact, which read as
+    // the stalker whiffing melee swings from 24yd.
+    expect(MOBS.wildheart_stalker.petSpell?.school).toBe('nature');
+    // "Fast melee pressure" must actually outrun a moving player (RUN_SPEED 7).
+    expect(MOBS.wildheart_ravager.moveSpeed).toBeGreaterThan(RUN_SPEED);
+    // The ravager keeps its scale-derived reach but closes to visual contact
+    // before trading, so landed hits no longer read as whiffs.
+    const profile = combatProfileForMob('wildheart_ravager', 2);
+    expect(profile.meleeRange).toBe(scaledDefaultMobMeleeRange(2));
+    expect(profile.desiredRange).toBe(5);
+  });
+
+  it('lets the Idol Guardian phase through the ruin-ring relic debris', () => {
+    // Without the flag the gatekeeper wedges on the toppled-relic colliders
+    // at the Sunken Idol's heart, ~0.4yd past its own reach, and never swings.
+    expect(MOBS.idol_guardian?.phasesThroughObstacles).toBe(true);
   });
 });

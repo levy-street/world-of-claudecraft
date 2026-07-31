@@ -60,8 +60,14 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7.4,
     aggroRadius: 16,
     petSpell: {
+      // 'nature', not 'physical': a physical-school petSpell replays the
+      // attacker's melee Attack clip on every impact (renderer damage-event
+      // heuristic), so the thrower looked like it was whiffing melee swings
+      // from 24yd. Nature keeps identical damage/resist math (hostile
+      // petSpells take no armor step and resist is school-independent) and
+      // renders the venom-vine spear as a visible projectile.
       name: 'Razorvine Spear',
-      school: 'physical',
+      school: 'nature',
       min: 26,
       max: 36,
       range: 24,
@@ -87,7 +93,11 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     dmgPerLevel: 2.9,
     attackSpeed: 2.25,
     armorPerLevel: 26,
-    moveSpeed: 7.1,
+    // 7.5, not 7.1: player RUN_SPEED is 7, so at 7.1 the "fast melee
+    // pressure" closed on a moving target at 0.1 yd/s and effectively never
+    // caught anyone on normal (heroic already floors mob speed at 8).
+    // drowned_thrall sets the precedent at 7.5.
+    moveSpeed: 7.5,
     aggroRadius: 14,
     bleed: {
       chance: 0.3,
