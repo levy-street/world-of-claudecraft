@@ -857,6 +857,14 @@ export function dealDamage(
   // below, plus encounter participant tracking for the roster tasks.
   if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
 
+  // Thornhollow Fields assists: remember who softened a player before the blow
+  // that finishes them. Only real damage on a live player counts, and the
+  // battleground module owns every other rule (same match, opposing teams, the
+  // assist window); this hub only reports the hit.
+  if (source && amount > 0 && target.kind === 'player' && !target.dead) {
+    ctx.bgOnPlayerDamaged(target, source);
+  }
+
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;

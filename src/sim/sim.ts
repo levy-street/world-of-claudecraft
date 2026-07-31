@@ -4856,6 +4856,8 @@ export class Sim {
         valeCupMod.vcupSportShove(sim.ctx, caster, target, distance),
       // Thornhollow Fields battleground hooks (social/battleground.ts).
       bgOnPlayerDeath: (e, killer) => bgMod.bgOnPlayerDeath(sim.ctx, e, killer),
+      bgOnPlayerDamaged: (victim, source) => bgMod.bgOnPlayerDamaged(sim.ctx, victim, source),
+      bgOnPlayerHealed: (target, source) => bgMod.bgOnPlayerHealed(sim.ctx, target, source),
     };
     return createSimContext(host);
   }

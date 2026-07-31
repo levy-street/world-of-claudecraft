@@ -865,6 +865,7 @@ export const hudChromeStrings = {
     levelRequirement: 'You must reach level {level} to unlock queueing for this battleground.',
     board: {
       kills: 'Kills',
+      assists: 'Assists',
       deaths: 'Deaths',
       captures: 'Captures',
     },
@@ -1296,6 +1297,8 @@ export const hudChromeStrings = {
       fiestaWin: 'Fiesta victory',
       battlegroundWin: 'Thornhollow Fields victory',
       battlegroundComplete: 'Thornhollow Fields battle fought',
+      battlegroundKill: 'honorable kill',
+      battlegroundAssist: 'killing blow assisted',
     },
   },
   // Character sheet showcase layout: the two titled stat-panel headings under the

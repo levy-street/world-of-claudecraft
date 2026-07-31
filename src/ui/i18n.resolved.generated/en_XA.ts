@@ -1044,6 +1044,7 @@ export const en_XA: EnTranslations = {
       "levelRequirement": "[Ýóú ɱúšţ ŕéáçĥ ļéʋéļ {level} ţó úñļóçķ ɋúéúéíñĝ ƒóŕ ţĥíš ƀáţţļéĝŕóúñð.]",
       "board": {
         "kills": "[Ķíļļš]",
+        "assists": "[Áššíšţš]",
         "deaths": "[Ðéáţĥš]",
         "captures": "[Çáþţúŕéš]"
       },
@@ -1363,7 +1364,9 @@ export const en_XA: EnTranslations = {
         "fiestaComplete": "[Ƒíéšţá çóɱþļéţéð]",
         "fiestaWin": "[Ƒíéšţá ʋíçţóŕý]",
         "battlegroundWin": "[Ţĥóŕñĥóļļóŵ Ƒíéļðš ʋíçţóŕý]",
-        "battlegroundComplete": "[Ţĥóŕñĥóļļóŵ Ƒíéļðš ƀáţţļé ƒóúĝĥţ]"
+        "battlegroundComplete": "[Ţĥóŕñĥóļļóŵ Ƒíéļðš ƀáţţļé ƒóúĝĥţ]",
+        "battlegroundKill": "[ĥóñóŕáƀļé ķíļļ]",
+        "battlegroundAssist": "[ķíļļíñĝ ƀļóŵ áššíšţéð]"
       }
     },
     "charSheet": {

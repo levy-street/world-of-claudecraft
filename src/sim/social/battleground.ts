@@ -28,7 +28,12 @@ import {
 } from '../battleground_layout';
 import { BG_SLOT_COUNT, battlegroundOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import { createGroundObject } from '../entity';
-import { awardBattlegroundHonor, honorTeamIdentity } from '../pvp';
+import {
+  awardBattlegroundAssistHonor,
+  awardBattlegroundHonor,
+  awardBattlegroundKillHonor,
+  honorTeamIdentity,
+} from '../pvp';
 import type { ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
 import { releasePlayerSpirit } from '../spirit';
@@ -80,6 +85,32 @@ const BG_RUNE_DURATION = 10; // seconds of haste per rune
 export const BG_POWER_RUNE_VALUE = 0.15; // +15% dealt / -15% taken
 const BG_POWER_RUNE_DURATION = 10;
 
+// How long a hit keeps you on the victim's assist roster. Long enough that a
+// opener into a teammate's finish still counts, short enough that a hit landed
+// a fight ago does not. Tick math, never a clock.
+const BG_ASSIST_WINDOW = 10;
+
+// --- matchmaking fairness ---------------------------------------------------
+// The queue is RATED but only lightly MATCHED, and that is deliberate at this
+// population: a strict band on a thin queue means an empty battleground. So the
+// rules below only ever REORDER a ten that is already assembled, or hold it
+// briefly, and they always give way to waiting time.
+/** Team-average rating gap tolerated straight away. */
+export const BG_RATING_BAND = 150;
+/** The band widens by this much for every second the oldest group has waited. */
+export const BG_BAND_WIDEN_PER_SEC = 5;
+/** Past this wait, ANY assembled ten starts: the queue must never starve. */
+export const BG_FAIRNESS_MAX_WAIT = 60;
+/**
+ * How long a premade-versus-pugs ten is held back while a counterweight group
+ * is hoped for. Deliberately SHORT: a party of friends queueing together is the
+ * most ordinary thing at this population, and making them sit a full minute
+ * every time would cost more than the mismatch does.
+ */
+export const BG_PREMADE_HOLD = 20;
+/** A queued group this size or larger counts as a premade for the pug rule. */
+export const BG_PREMADE_SIZE = 4;
+
 const CARRIER_VULN_AURA_ID = 'bg_carrier_vulnerability';
 export const SPRINT_RUNE_AURA_ID = 'bg_sprint_rune';
 export const BATTLE_RUNE_AURA_ID = 'bg_battle_rune';
@@ -129,13 +160,38 @@ export interface BgMatch {
   rated: boolean;
   // Per-player match tallies for the scoreboard (seeded to zeros at start;
   // a deserter's row drops with their team entry).
-  stats: Map<number, { kills: number; deaths: number; captures: number }>;
+  stats: Map<
+    number,
+    {
+      kills: number;
+      deaths: number;
+      captures: number;
+      /** Killing blows this player helped land without finishing. */
+      assists: number;
+      /** Blows that actually PAID honor (the DR curve can zero a repeat). */
+      honorKills: number;
+    }
+  >;
   ratingAvg: [number, number]; // team average rating at start, for Elo
   // Per team: pids auto-added to the team party at start (never the surviving
   // base premade), unwound at match end or on desertion (battleground_party.ts).
   autoPartyPids: [number[], number[]];
   resultRecorded: boolean;
   fightersReleased: boolean; // releaseBgFighters ran (teardown is once-only)
+  // Assist bookkeeping. `recentDamage` maps a VICTIM pid to everyone who has
+  // hit them lately and the match-elapsed second of that hit; the death hook
+  // reads it, pays everyone but the killer, and drops the row. Pruned on write
+  // and on death, so it can never grow past the ten fighters in the match.
+  recentDamage: Map<number, Map<number, number>>;
+  // The healer's half of the same idea: who HEALED an ally lately, mapped
+  // ally -> healer -> match-elapsed second. A kill pays the healers who kept
+  // its fighters standing, so a priest who never lands a blow still earns.
+  recentSupport: Map<number, Map<number, number>>;
+  // Per-match repeat counters for the kill and assist honor drip, keyed
+  // `attacker:victim`. On the MATCH, not the daily window: they exist to stop
+  // graveyard farming inside one battleground, not to taper a whole session.
+  killHonorPairs: Map<string, number>;
+  assistHonorPairs: Map<string, number>;
   // per-tick memo of the viewer-identical match view (server hot-path rule:
   // build shared things once per tick, never per viewer)
   viewTick: number;
@@ -145,6 +201,9 @@ export interface BgMatch {
 // A queued group: a whole party (or a solo) that matchmaking keeps together.
 export interface BgQueueGroup {
   pids: number[];
+  /** Seconds this group has waited, ticked by the matchmaker. Fairness is
+   *  traded away against it: see BG_FAIRNESS_MAX_WAIT. */
+  waited: number;
 }
 
 export function bgGroupContaining(ctx: SimContext, pid: number): BgQueueGroup | null {
@@ -223,7 +282,7 @@ export function bgQueueJoin(ctx: SimContext, pid?: number, opts?: { bypassLevel?
       return;
     }
   }
-  ctx.bgQueue.push({ pids: [...members] });
+  ctx.bgQueue.push({ pids: [...members], waited: 0 });
   const position = ctx.bgQueue.length;
   for (const m of members) {
     ctx.emit({ type: 'bgQueued', position, pid: m });
@@ -404,33 +463,115 @@ function matchmakeBg(ctx: SimContext): void {
       });
     }
     ctx.bgQueue = ctx.bgQueue.filter((g) => g.pids.length > 0);
+    for (const g of ctx.bgQueue) g.waited += DT;
     if (bgQueueSize(ctx) < BG_TEAM_SIZE * 2 || freeBgSlot(ctx) === null) return;
-    // Greedily pack whole groups into two teams of five, balancing headcount.
-    // Queue order is the only input: no rng, no rating banding (rated, not
-    // matched; strict matchmaking is deferred).
-    // Size-desc with a queue-order tiebreak: an explicit total order (the
-    // repo rule), not a lean on engine sort stability.
-    const groups = ctx.bgQueue
-      .map((g, seq) => ({ g, seq }))
-      .sort((a, b) => b.g.pids.length - a.g.pids.length || a.seq - b.seq)
-      .map((x) => x.g);
-    const teams: [number[], number[]] = [[], []];
-    const used: BgQueueGroup[] = [];
-    for (const g of groups) {
-      const canA = teams[0].length + g.pids.length <= BG_TEAM_SIZE;
-      const canB = teams[1].length + g.pids.length <= BG_TEAM_SIZE;
-      let t = -1;
-      if (canA && canB) t = teams[0].length <= teams[1].length ? 0 : 1;
-      else if (canA) t = 0;
-      else if (canB) t = 1;
-      if (t < 0) continue;
-      teams[t].push(...g.pids);
-      used.push(g);
-    }
-    if (teams[0].length !== BG_TEAM_SIZE || teams[1].length !== BG_TEAM_SIZE) return;
-    ctx.bgQueue = ctx.bgQueue.filter((g) => !used.includes(g));
-    startBgMatch(ctx, teams[0], teams[1]);
+    const picked = pickBgTeams(ctx);
+    if (!picked) return;
+    ctx.bgQueue = ctx.bgQueue.filter((g) => !picked.used.includes(g));
+    startBgMatch(ctx, picked.teams[0], picked.teams[1]);
   }
+}
+
+/** One candidate pairing, plus the numbers the fairness rules read off it. */
+interface BgPacking {
+  teams: [number[], number[]];
+  used: BgQueueGroup[];
+  /** Team-average rating gap. */
+  gap: number;
+  /** A premade on one side facing nothing but solos on the other. */
+  premadeVsPugs: boolean;
+}
+
+/**
+ * Pack whole groups into two teams of five. `preferRating` decides the tiebreak
+ * when a group fits on either side: by headcount (the plain balance) or toward
+ * the team whose running rating total is lower (which is what actually closes
+ * a rating gap). Both walk the SAME group order, so both are deterministic and
+ * neither draws rng.
+ */
+function packBgTeams(ctx: SimContext, preferRating: boolean): BgPacking | null {
+  // Size-desc with a queue-order tiebreak: an explicit total order (the repo
+  // rule), not a lean on engine sort stability.
+  const groups = ctx.bgQueue
+    .map((g, seq) => ({ g, seq }))
+    .sort((a, b) => b.g.pids.length - a.g.pids.length || a.seq - b.seq)
+    .map((x) => x.g);
+  const teams: [number[], number[]] = [[], []];
+  const totals: [number, number] = [0, 0];
+  const used: BgQueueGroup[] = [];
+  for (const g of groups) {
+    const canA = teams[0].length + g.pids.length <= BG_TEAM_SIZE;
+    const canB = teams[1].length + g.pids.length <= BG_TEAM_SIZE;
+    let t = -1;
+    if (canA && canB) {
+      t = preferRating
+        ? // Lower running total first; headcount breaks a rating tie, and side
+          // 0 breaks that, so the choice is always total.
+          totals[0] !== totals[1]
+          ? totals[0] < totals[1]
+            ? 0
+            : 1
+          : teams[0].length <= teams[1].length
+            ? 0
+            : 1
+        : teams[0].length <= teams[1].length
+          ? 0
+          : 1;
+    } else if (canA) t = 0;
+    else if (canB) t = 1;
+    if (t < 0) continue;
+    teams[t].push(...g.pids);
+    totals[t] += g.pids.reduce(
+      (sum, p) => sum + (ctx.players.get(p)?.bgRating ?? BG_BASE_RATING),
+      0,
+    );
+    used.push(g);
+  }
+  if (teams[0].length !== BG_TEAM_SIZE || teams[1].length !== BG_TEAM_SIZE) return null;
+  const biggest = (team: number[]): number => {
+    let best = 0;
+    for (const g of used) {
+      if (g.pids.every((p) => team.includes(p))) best = Math.max(best, g.pids.length);
+    }
+    return best;
+  };
+  const bigA = biggest(teams[0]);
+  const bigB = biggest(teams[1]);
+  return {
+    teams,
+    used,
+    gap: Math.abs(bgTeamAvg(ctx, teams[0]) - bgTeamAvg(ctx, teams[1])),
+    // The mismatch players actually feel: a coordinated block on one side with
+    // nothing but solo queuers opposite it.
+    premadeVsPugs: (bigA >= BG_PREMADE_SIZE && bigB <= 1) || (bigB >= BG_PREMADE_SIZE && bigA <= 1),
+  };
+}
+
+/**
+ * Choose the pairing to start, or null to keep waiting. Two candidate packings
+ * are scored and the better one taken; if even that one is unfair, the match is
+ * held back until the queue's oldest group has waited long enough that a match
+ * beats a fair match. It ALWAYS releases eventually: on a thin queue an empty
+ * battleground is the worse outcome, and the queue contents may never improve.
+ */
+function pickBgTeams(ctx: SimContext): BgPacking | null {
+  const candidates = [packBgTeams(ctx, false), packBgTeams(ctx, true)].filter(
+    (c): c is BgPacking => c !== null,
+  );
+  if (candidates.length === 0) return null;
+  // A premade facing pugs outweighs any rating gap: it is the mismatch a player
+  // can see from the first fight.
+  const score = (c: BgPacking): number => (c.premadeVsPugs ? 100_000 : 0) + c.gap;
+  let best = candidates[0];
+  for (const c of candidates) if (score(c) < score(best)) best = c;
+  const waited = Math.max(...ctx.bgQueue.map((g) => g.waited));
+  if (waited >= BG_FAIRNESS_MAX_WAIT) return best; // the queue never starves
+  // Hold a premade-versus-pugs ten only briefly: long enough for a second
+  // group to show up, short enough that a party never feels punished for
+  // queueing together.
+  if (best.premadeVsPugs && waited < BG_PREMADE_HOLD) return null;
+  const band = BG_RATING_BAND + waited * BG_BAND_WIDEN_PER_SEC;
+  return best.gap <= band ? best : null;
 }
 
 function bgTeamAvg(ctx: SimContext, pids: number[]): number {
@@ -450,8 +591,8 @@ export function startBgMatch(
   if (slot === null) {
     // Hand the seats back as two TEAM-SIZED groups: a single welded ten-group
     // could never be packed into 5v5 teams again by the matchmaker.
-    ctx.bgQueue.unshift({ pids: [...teamB] });
-    ctx.bgQueue.unshift({ pids: [...teamA] });
+    ctx.bgQueue.unshift({ pids: [...teamB], waited: 0 });
+    ctx.bgQueue.unshift({ pids: [...teamA], waited: 0 });
     return;
   }
   ctx.bgBusySlots.add(slot);
@@ -503,7 +644,12 @@ export function startBgMatch(
     id: ctx.nextBgMatchId++,
     slot,
     teams: [teamA, teamB],
-    stats: new Map([...teamA, ...teamB].map((p) => [p, { kills: 0, deaths: 0, captures: 0 }])),
+    stats: new Map(
+      [...teamA, ...teamB].map((p) => [
+        p,
+        { kills: 0, deaths: 0, captures: 0, assists: 0, honorKills: 0 },
+      ]),
+    ),
     scores: [0, 0],
     flags,
     runes,
@@ -520,6 +666,10 @@ export function startBgMatch(
     autoPartyPids: [[], []],
     resultRecorded: false,
     fightersReleased: false,
+    recentDamage: new Map(),
+    recentSupport: new Map(),
+    killHonorPairs: new Map(),
+    assistHonorPairs: new Map(),
     viewTick: -1,
     viewShared: null,
   };
@@ -976,6 +1126,59 @@ function dropFlag(ctx: SimContext, match: BgMatch, flag: BgFlagState, at: Entity
   );
 }
 
+/**
+ * Damage hook (combat/damage.ts): remember that `sourcePid` hit `victimPid`, so
+ * the death that follows can pay the players who worked for it and not only the
+ * one who landed the blow. Enemy player damage only; heals, self damage and
+ * friendly fire never reach here.
+ */
+export function bgOnPlayerDamaged(ctx: SimContext, victim: Entity, source: Entity): void {
+  const match = ctx.bgMatches.get(victim.id);
+  if (!match || match.state !== 'active') return;
+  // A pet's work is its owner's, the same credit rule the killing blow uses.
+  const attackerId = source.kind === 'player' ? source.id : (source.ownerId ?? -1);
+  if (attackerId < 0 || attackerId === victim.id) return;
+  if (ctx.bgMatches.get(attackerId) !== match) return;
+  if (bgTeamOf(match, attackerId) === bgTeamOf(match, victim.id)) return;
+  let roster = match.recentDamage.get(victim.id);
+  if (!roster) {
+    roster = new Map();
+    match.recentDamage.set(victim.id, roster);
+  }
+  // The match's own elapsed clock, which is tick math (timer += DT), never a
+  // wall clock: two hosts replaying the same match assist identically.
+  roster.set(attackerId, match.timer);
+  // Prune on write: anyone whose last hit fell out of the window stops being an
+  // assist candidate, and the row can never outgrow the ten live fighters.
+  for (const [pid, at] of roster) {
+    if (match.timer - at > BG_ASSIST_WINDOW) roster.delete(pid);
+  }
+}
+
+/**
+ * Heal hook (combat/heal.ts): remember that `source` healed `target`, so a kill
+ * their teammate lands can pay the healer who kept them up. Without this a
+ * dedicated healer could carry a fight and earn nothing from it, which is
+ * exactly the class the honor drip should not punish.
+ */
+export function bgOnPlayerHealed(ctx: SimContext, target: Entity, source: Entity): void {
+  const match = ctx.bgMatches.get(target.id);
+  if (!match || match.state !== 'active') return;
+  const healerId = source.kind === 'player' ? source.id : (source.ownerId ?? -1);
+  if (healerId < 0 || healerId === target.id) return; // self-healing is not support
+  if (ctx.bgMatches.get(healerId) !== match) return;
+  if (bgTeamOf(match, healerId) !== bgTeamOf(match, target.id)) return; // allies only
+  let roster = match.recentSupport.get(target.id);
+  if (!roster) {
+    roster = new Map();
+    match.recentSupport.set(target.id, roster);
+  }
+  roster.set(healerId, match.timer);
+  for (const [pid, at] of roster) {
+    if (match.timer - at > BG_ASSIST_WINDOW) roster.delete(pid);
+  }
+}
+
 /** Death hook (combat/damage.ts): carrier death drops the flag in place, the
  *  tallies move, and every match member gets the kill-feed event. The corpse
  *  then waits for the player's own release (spirit.ts owns the rite). */
@@ -1004,6 +1207,51 @@ export function bgOnPlayerDeath(ctx: SimContext, e: Entity, killer: Entity | nul
   if (credited) {
     const killerStats = match.stats.get(credited.id);
     if (killerStats) killerStats.kills++;
+  }
+  // The honor drip: the blow pays, and so does everyone who softened the target
+  // inside the assist window. Rated matches only (a dev-forced match must never
+  // move real currency), and the killer is never paid twice. Read and cleared
+  // together, so one death can only ever pay one round.
+  const helpers = match.recentDamage.get(e.id);
+  match.recentDamage.delete(e.id);
+  match.recentSupport.delete(e.id);
+  if (match.rated) {
+    if (credited) {
+      const killerMeta = ctx.players.get(credited.id);
+      if (killerMeta) {
+        awardBattlegroundKillHonor(ctx, killerMeta, e.id, match.killHonorPairs);
+        const stats = match.stats.get(credited.id);
+        if (stats) stats.honorKills++;
+      }
+    }
+    // Everyone who counts as having helped: the fighters who damaged the
+    // victim, plus the healers who kept THOSE fighters standing while they did
+    // it. Collected into one set first, so a player who both healed and hit is
+    // still paid exactly once.
+    const assisted = new Set<number>();
+    const fresh = (at: number) => match.timer - at <= BG_ASSIST_WINDOW;
+    if (helpers) {
+      for (const [pid, at] of helpers) {
+        if (!fresh(at)) continue;
+        assisted.add(pid);
+        // The healers who supported this damager inside the window.
+        const support = match.recentSupport.get(pid);
+        if (!support) continue;
+        for (const [healerPid, healedAt] of support) {
+          if (fresh(healedAt)) assisted.add(healerPid);
+        }
+      }
+    }
+    for (const pid of assisted) {
+      if (pid === credited?.id) continue; // the blow already paid
+      if (pid === e.id) continue; // never the victim
+      if (ctx.bgMatches.get(pid) !== match) continue; // deserted mid-fight
+      const helperMeta = ctx.players.get(pid);
+      if (!helperMeta) continue;
+      awardBattlegroundAssistHonor(ctx, helperMeta, e.id, match.assistHonorPairs);
+      const stats = match.stats.get(pid);
+      if (stats) stats.assists++;
+    }
   }
   // Kill feed: names + teams only (the client owns the localized line); an
   // uncredited death still feeds, with a null killer.
@@ -1304,6 +1552,7 @@ function sharedMatchView(ctx: SimContext, match: BgMatch): import('../../world_a
         kills: stat?.kills ?? 0,
         deaths: stat?.deaths ?? 0,
         captures: stat?.captures ?? 0,
+        assists: stat?.assists ?? 0,
       });
     }
   }

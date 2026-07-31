@@ -1044,6 +1044,7 @@ export const ja_JP: EnTranslations = {
       "levelRequirement": "この戦場のキュー参加はレベル{level}で解放されます。",
       "board": {
         "kills": "キル",
+        "assists": "アシスト",
         "deaths": "デス",
         "captures": "奪取"
       },
@@ -1363,7 +1364,9 @@ export const ja_JP: EnTranslations = {
         "fiestaComplete": "フィエスタ完遂",
         "fiestaWin": "フィエスタ勝利",
         "battlegroundWin": "レイヴンリフト勝利",
-        "battlegroundComplete": "レイヴンリフト参戦"
+        "battlegroundComplete": "レイヴンリフト参戦",
+        "battlegroundKill": "名誉ある撃破",
+        "battlegroundAssist": "撃破アシスト"
       }
     },
     "charSheet": {

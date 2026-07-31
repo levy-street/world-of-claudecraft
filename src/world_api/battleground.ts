@@ -29,6 +29,8 @@ export interface BgPlayerInfo {
   kills: number;
   deaths: number;
   captures: number;
+  /** Killing blows helped land without finishing (the classic assist column). */
+  assists: number;
   // Deliberately NO hp/mhp: the scoreboard reads dead/carrying and the
   // tallies only, and the bg self key is match-wide (never interest-scoped),
   // so shipping enemy health here would leak actionable state past the

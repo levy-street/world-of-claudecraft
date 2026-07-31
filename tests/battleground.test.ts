@@ -3,16 +3,24 @@ import { BG_GRAVEYARDS, BG_POWER_RUNES, BG_SPEED_RUNES } from '../src/sim/battle
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
 import { battlegroundOrigin, instanceOrigin, isBgPos } from '../src/sim/data';
 import { summonMountItem, toggleMount } from '../src/sim/mounts';
-import { BATTLEGROUND_LOSS_HONOR, BATTLEGROUND_WIN_HONOR } from '../src/sim/pvp';
+import {
+  BATTLEGROUND_ASSIST_HONOR,
+  BATTLEGROUND_KILL_HONOR,
+  BATTLEGROUND_LOSS_HONOR,
+  BATTLEGROUND_WIN_HONOR,
+} from '../src/sim/pvp';
 import { eloDelta, Sim } from '../src/sim/sim';
 import {
   BG_CARRIER_VULN_DELAY,
   BG_CARRIER_VULN_INTERVAL,
   BG_END_HOLD,
+  BG_FAIRNESS_MAX_WAIT,
   BG_MAX_DURATION,
   BG_MIN_LEVEL,
   BG_MIN_RATING,
   BG_POWER_RUNE_VALUE,
+  BG_PREMADE_HOLD,
+  BG_RATING_BAND,
   BG_WAVE_OFFSET,
   BG_WAVE_PERIOD,
   type BgMatch,
@@ -21,6 +29,7 @@ import {
   devEndBg,
   devStartBg,
   endBgMatch,
+  startBgMatch,
   updateBattleground,
 } from '../src/sim/social/battleground';
 import type { SimEvent } from '../src/sim/types';
@@ -201,7 +210,12 @@ describe('Thornhollow Fields: queue + matchmaking', () => {
       sim.bgQueueJoin(s);
     }
     sim.bgQueueJoin(leader); // queues the whole party as one group
+    // A four-stack against nothing but solos is held briefly for a
+    // counterweight (BG_PREMADE_HOLD), so this ten does NOT seat on the tick.
     sim.tick();
+    expect(sim.bgMatchFor(leader), 'a premade vs pugs must not seat instantly').toBeNull();
+    // ...and then it seats anyway rather than stranding the queue.
+    for (let i = 0; i < 20 * (BG_PREMADE_HOLD + 1) && !sim.bgMatchFor(leader); i++) sim.tick();
     const match = sim.bgMatchFor(leader)!;
     expect(match).toBeTruthy();
     const teamOfLeader = match.teams[0].includes(leader) ? 0 : 1;
@@ -1397,6 +1411,162 @@ describe('Thornhollow Fields: review-hardening pins', () => {
   });
 });
 
+describe('Thornhollow Fields: matchmaking fairness', () => {
+  const tenAtRatings = (ratings: number[]) => {
+    const sim = makeWorld();
+    const pids: number[] = [];
+    for (let i = 0; i < ratings.length; i++) {
+      const pid = sim.addPlayer('warrior', `R${i}`);
+      tp(sim, pid, 0, -40);
+      sim.entities.get(pid)!.level = BG_MIN_LEVEL;
+      sim.meta(pid)!.bgRating = ratings[i];
+      pids.push(pid);
+    }
+    return { sim, pids };
+  };
+
+  it('holds a lopsided ten, then seats it anyway rather than starving the queue', () => {
+    // Five high and five low, all solo: no packing can close a gap this wide,
+    // so the band refuses it at first.
+    const { sim, pids } = tenAtRatings([2400, 2400, 2400, 2400, 2400, 900, 900, 900, 900, 900]);
+    for (const pid of pids) sim.bgQueueJoin(pid);
+    sim.tick();
+    expect(sim.bgMatchFor(pids[0]), 'a gap far past the band must not seat at once').toBeNull();
+    // The band widens with the wait and the hard release backs it up, so the
+    // queue always drains: an empty battleground is the worse outcome.
+    for (let i = 0; i < 20 * (BG_FAIRNESS_MAX_WAIT + 1) && !sim.bgMatchFor(pids[0]); i++) {
+      sim.tick();
+    }
+    expect(sim.bgMatchFor(pids[0]), 'the queue must never starve').toBeTruthy();
+  });
+
+  it('seats an even ten immediately, and splits the two ratings across the teams', () => {
+    // FOUR high and six low, which is the packable case: two high and three low
+    // on each side closes the gap exactly, so there is no reason to wait. (Five
+    // and five is NOT packable: one side must take three highs, so the best
+    // possible gap is 300 and the test above is right to see it held.)
+    const { sim, pids } = tenAtRatings([2400, 2400, 2400, 2400, 900, 900, 900, 900, 900, 900]);
+    for (const pid of pids) sim.bgQueueJoin(pid);
+    sim.tick();
+    const match = sim.bgMatchFor(pids[0]);
+    expect(match, 'a packable ten seats on the tick').toBeTruthy();
+    const avg = (team: number[]) =>
+      team.reduce((sum, p) => sum + sim.meta(p)!.bgRating, 0) / team.length;
+    expect(Math.abs(avg(match!.teams[0]) - avg(match!.teams[1]))).toBeLessThanOrEqual(
+      BG_RATING_BAND,
+    );
+  });
+});
+
+describe('Thornhollow Fields: the kill and assist honor drip', () => {
+  it('pays the blow, pays the helpers less, and pays the helper only once', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const killer = match.teams[0][0];
+    const helper = match.teams[0][1];
+    const bystander = match.teams[0][2];
+    const victim = match.teams[1][0];
+    const honorOf = (pid: number) => sim.meta(pid)!.honor;
+    const before = [honorOf(killer), honorOf(helper), honorOf(bystander)];
+    // The helper softens the target, someone else lands the blow.
+    sim.ctx.dealDamage(
+      sim.entities.get(helper)!,
+      sim.entities.get(victim)!,
+      5,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+    kill(sim, victim, killer);
+    sim.tick();
+    expect(honorOf(killer) - before[0], 'the blow pays').toBe(BATTLEGROUND_KILL_HONOR);
+    expect(honorOf(helper) - before[1], 'the assist pays less').toBe(BATTLEGROUND_ASSIST_HONOR);
+    expect(honorOf(bystander) - before[2], 'a bystander is paid nothing').toBe(0);
+    // The scoreboard shows the same story.
+    expect(match.stats.get(killer)!.kills).toBe(1);
+    expect(match.stats.get(helper)!.assists).toBe(1);
+    expect(match.stats.get(helper)!.kills).toBe(0);
+    expect(match.stats.get(bystander)!.assists).toBe(0);
+  });
+
+  it('decays a repeated victim, so a graveyard camp stops paying', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const killer = match.teams[0][0];
+    const victim = match.teams[1][0];
+    const gains: number[] = [];
+    // Four kills on the SAME victim: the DR curve is 1, 0.5, 0.25, 0.
+    for (let i = 0; i < 4; i++) {
+      const before = sim.meta(killer)!.honor;
+      const e = sim.entities.get(victim)!;
+      e.dead = false;
+      e.ghost = false;
+      e.hp = e.maxHp;
+      kill(sim, victim, killer);
+      sim.tick();
+      gains.push(sim.meta(killer)!.honor - before);
+    }
+    expect(gains[0]).toBe(BATTLEGROUND_KILL_HONOR);
+    expect(gains[1]).toBe(Math.floor(BATTLEGROUND_KILL_HONOR * 0.5));
+    expect(gains[2]).toBe(Math.floor(BATTLEGROUND_KILL_HONOR * 0.25));
+    expect(gains[3], 'the fourth repeat pays nothing').toBe(0);
+    // A DIFFERENT victim is its own counter, so honest fighting still pays.
+    const other = match.teams[1][1];
+    const before = sim.meta(killer)!.honor;
+    kill(sim, other, killer);
+    sim.tick();
+    expect(sim.meta(killer)!.honor - before).toBe(BATTLEGROUND_KILL_HONOR);
+  });
+
+  it('pays the healer who kept the killer standing, and never the enemy healer', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const killer = match.teams[0][0];
+    const healer = match.teams[0][1];
+    const victim = match.teams[1][0];
+    const enemyHealer = match.teams[1][1];
+    // The enemy healer heals their OWN teammate: allied support, but for the
+    // losing side, so it must never pay when that side takes the death.
+    const victimEntity = sim.entities.get(victim)!;
+    victimEntity.hp = Math.max(1, victimEntity.maxHp - 50);
+    sim.ctx.applyHeal(sim.entities.get(enemyHealer)!, victimEntity, 10, 'test', null, false);
+    // Our healer tops up the fighter who then lands the blow: that IS support.
+    const killerEntity = sim.entities.get(killer)!;
+    killerEntity.hp = Math.max(1, killerEntity.maxHp - 50);
+    sim.ctx.applyHeal(sim.entities.get(healer)!, killerEntity, 10, 'test', null, false);
+    const healerBefore = sim.meta(healer)!.honor;
+    const enemyHealerBefore = sim.meta(enemyHealer)!.honor;
+    kill(sim, victim, killer);
+    sim.tick();
+    expect(
+      sim.meta(healer)!.honor - healerBefore,
+      'a healer who never swung still earns from the kill they enabled',
+    ).toBe(BATTLEGROUND_ASSIST_HONOR);
+    expect(match.stats.get(healer)!.assists).toBe(1);
+    expect(
+      sim.meta(enemyHealer)!.honor - enemyHealerBefore,
+      'the dead side is never paid for the death',
+    ).toBe(0);
+  });
+
+  it('never pays a teammate, and never pays an unrated dev match', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const a = match.teams[0][0];
+    const teammate = match.teams[0][1];
+    const before = sim.meta(a)!.honor;
+    kill(sim, teammate, a); // friendly fire earns nothing
+    sim.tick();
+    expect(sim.meta(a)!.honor).toBe(before);
+    expect(match.stats.get(a)!.kills).toBe(0);
+  });
+});
+
 describe('Thornhollow Fields: honor + persistence', () => {
   it('a played-out win pays BATTLEGROUND_WIN_HONOR, the losers BATTLEGROUND_LOSS_HONOR, repeat-decayed', () => {
     const { sim, pids } = tenInQueue();
@@ -1410,19 +1580,24 @@ describe('Thornhollow Fields: honor + persistence', () => {
     expect(sim.meta(loser)!.honor).toBe(BATTLEGROUND_LOSS_HONOR);
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick(); // run out the result screen
 
-    // the same ten rematch: the repeat vs the SAME opposing team pays half
-    for (const pid of pids) sim.bgQueueJoin(pid);
-    sim.tick();
+    // The SAME two teams meet again: the repeat pays half. Seated directly
+    // rather than through the queue on purpose. The matchmaker now rebalances
+    // by rating, and after one decided match the winners and losers have moved
+    // apart, so re-queueing the same ten deliberately produces DIFFERENT teams
+    // (a new opposing identity, which correctly pays full). What is under test
+    // here is the repeat decay itself, so the rematch keeps the first rosters.
+    const teamA = [...match.teams[0]];
+    const teamB = [...match.teams[1]];
+    startBgMatch(sim.ctx, teamA, teamB);
     const rematch = sim.bgMatchFor(winner)!;
     expect(rematch).toBeTruthy();
+    expect(rematch.teams[0]).toEqual(teamA);
+    expect(rematch.teams[1]).toEqual(teamB);
     toActive(sim, rematch);
     const winner2 = rematch.teams[0][0];
     for (let cap = 0; cap < 5; cap++) captureOnce(sim, rematch, winner2);
     const w2meta = sim.meta(winner2)!;
-    const firstAward = rematch.teams[0].includes(winner)
-      ? BATTLEGROUND_WIN_HONOR
-      : BATTLEGROUND_LOSS_HONOR;
-    expect(w2meta.honor).toBe(firstAward + Math.floor(BATTLEGROUND_WIN_HONOR * 0.5));
+    expect(w2meta.honor).toBe(BATTLEGROUND_WIN_HONOR + Math.floor(BATTLEGROUND_WIN_HONOR * 0.5));
   });
 
   it('battleground standing round-trips through CharacterState and stays absent until first result', () => {

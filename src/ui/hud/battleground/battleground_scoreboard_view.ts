@@ -27,6 +27,7 @@ export interface BgBoardRow {
   kills: number;
   deaths: number;
   captures: number;
+  assists: number;
 }
 
 export interface BgScoreboardView {
@@ -112,6 +113,7 @@ export function buildBgScoreboardView(info: BgInfo | null, myPid: number): BgSco
       kills: p.kills,
       deaths: p.deaths,
       captures: p.captures,
+      assists: p.assists,
     })),
     respawnIn: m.respawnIn,
     sig: `${m.myTeam}|${crimson.map((p) => p.pid).join(',')}|${azure.map((p) => p.pid).join(',')}`,

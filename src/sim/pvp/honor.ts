@@ -24,6 +24,14 @@ export const FIESTA_WIN_BONUS_HONOR = 40;
 // value without dwarfing it. Revisit against live match data.
 export const BATTLEGROUND_WIN_HONOR = 60;
 export const BATTLEGROUND_LOSS_HONOR = 20;
+// Per-kill honor, the classic battleground drip: a small, immediate "+N honor"
+// on every killing blow, so fighting away from the flag is still worth doing.
+// Deliberately small next to the result award (a 15-kill match pays about a
+// win) and decayed per REPEATED VICTIM on the same curve as everything else,
+// so farming one player in a graveyard pays out four times and then nothing.
+// An assist pays less than the blow, on its own separate victim counter.
+export const BATTLEGROUND_KILL_HONOR = 5;
+export const BATTLEGROUND_ASSIST_HONOR = 2;
 
 // Arena is especially easy to coordinate in 1v1, so only the first win against
 // the same opponent/team pays each UTC day. Fiesta uses softer decay because its
@@ -178,6 +186,46 @@ export function awardBattlegroundHonor(
   const base = outcome === 'win' ? BATTLEGROUND_WIN_HONOR : BATTLEGROUND_LOSS_HONOR;
   const reason: HonorReason = outcome === 'win' ? 'battleground_win' : 'battleground_complete';
   return grantHonor(ctx, meta, Math.floor(base * repeatHonorMultiplier(repeats)), reason);
+}
+
+/**
+ * A killing blow in the battleground. Decayed per repeated victim within the
+ * match (the counter lives on the match, not the daily window: a per-match
+ * counter is what stops graveyard farming without punishing a long session).
+ */
+export function awardBattlegroundKillHonor(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  victimPid: number,
+  killsByPair: Map<string, number>,
+): number {
+  const key = `${meta.entityId}:${victimPid}`;
+  const repeats = killsByPair.get(key) ?? 0;
+  killsByPair.set(key, repeats + 1);
+  return grantHonor(
+    ctx,
+    meta,
+    BATTLEGROUND_KILL_HONOR * repeatHonorMultiplier(repeats),
+    'battleground_kill',
+  );
+}
+
+/** An assist on someone else's killing blow: the same shape, its own counter. */
+export function awardBattlegroundAssistHonor(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  victimPid: number,
+  assistsByPair: Map<string, number>,
+): number {
+  const key = `${meta.entityId}:${victimPid}`;
+  const repeats = assistsByPair.get(key) ?? 0;
+  assistsByPair.set(key, repeats + 1);
+  return grantHonor(
+    ctx,
+    meta,
+    BATTLEGROUND_ASSIST_HONOR * repeatHonorMultiplier(repeats),
+    'battleground_assist',
+  );
 }
 
 export function awardFiestaKillHonor(

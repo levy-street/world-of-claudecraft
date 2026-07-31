@@ -131,6 +131,11 @@ export function applyHeal(
     ...(absorbed > 0 ? { absorbed } : {}),
   });
   healingThreat(ctx, source, target, healed);
+  // Thornhollow Fields: real healing on an ally is support, and a kill that
+  // ally helps land pays the healer an assist. Only healing that actually
+  // landed counts (a fully overhealed or absorbed cast is not support), and the
+  // battleground module owns every other rule.
+  if (healed > 0 && target.kind === 'player') ctx.bgOnPlayerHealed(target, source);
   // Talent procs listening for critical heals (deterministic, no rng draw).
   if (crit && source.kind === 'player') onSpellCrit(ctx, source, abilityId, target);
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op

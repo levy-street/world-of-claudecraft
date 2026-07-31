@@ -1044,6 +1044,7 @@ export const ru_RU: EnTranslations = {
       "levelRequirement": "Очередь на это поле боя открывается на уровне {level}.",
       "board": {
         "kills": "Убийства",
+        "assists": "Помощь",
         "deaths": "Смерти",
         "captures": "Захваты"
       },
@@ -1363,7 +1364,9 @@ export const ru_RU: EnTranslations = {
         "fiestaComplete": "Завершение Фиесты",
         "fiestaWin": "Победа на Фиесте",
         "battlegroundWin": "Победа в Вороньем Разломе",
-        "battlegroundComplete": "Битва в Вороньем Разломе"
+        "battlegroundComplete": "Битва в Вороньем Разломе",
+        "battlegroundKill": "Почётное убийство",
+        "battlegroundAssist": "Помощь в убийстве"
       }
     },
     "charSheet": {

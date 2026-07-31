@@ -28,6 +28,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -82,7 +83,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "es_ES": [
@@ -104,6 +107,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -158,7 +162,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "fr_FR": [
@@ -180,6 +186,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -234,7 +241,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "fr_CA": [
@@ -256,6 +265,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -310,7 +320,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "en_CA": [],
@@ -333,6 +345,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -387,7 +400,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "de_DE": [
@@ -409,6 +424,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -463,7 +479,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "zh_CN": [
@@ -505,6 +523,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -559,7 +578,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "ru_RU": [
@@ -586,6 +607,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -640,7 +662,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "nl_NL": [
@@ -662,6 +686,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -716,7 +741,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "pl_PL": [
@@ -738,6 +765,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -792,7 +820,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "id_ID": [
@@ -814,6 +844,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -868,7 +899,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "tr_TR": [
@@ -890,6 +923,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -944,7 +978,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "sv_SE": [
@@ -966,6 +1002,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -1020,7 +1057,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "vi_VN": [
@@ -1042,6 +1081,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -1096,7 +1136,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "da_DK": [
@@ -1118,6 +1160,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
     "hudChrome.bg.azure",
+    "hudChrome.bg.board.assists",
     "hudChrome.bg.board.captures",
     "hudChrome.bg.board.deaths",
     "hudChrome.bg.board.kills",
@@ -1172,7 +1215,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.bracket2v2",
     "hudChrome.pvp.launcherTitle",
     "hudChrome.pvp.mobileLabel",
+    "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
+    "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin"
   ]
 };

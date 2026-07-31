@@ -1044,6 +1044,7 @@ export const ko_KR: EnTranslations = {
       "levelRequirement": "이 전장의 대기열은 레벨 {level}에 도달하면 잠금 해제됩니다.",
       "board": {
         "kills": "처치",
+        "assists": "도움",
         "deaths": "죽음",
         "captures": "탈취"
       },
@@ -1363,7 +1364,9 @@ export const ko_KR: EnTranslations = {
         "fiestaComplete": "피에스타 완료",
         "fiestaWin": "피에스타 승리",
         "battlegroundWin": "레이븐리프트 승리",
-        "battlegroundComplete": "레이븐리프트 참전"
+        "battlegroundComplete": "레이븐리프트 참전",
+        "battlegroundKill": "명예로운 처치",
+        "battlegroundAssist": "처치 도움"
       }
     },
     "charSheet": {

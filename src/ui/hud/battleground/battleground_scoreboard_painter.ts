@@ -45,7 +45,13 @@ export class BattlegroundScoreboard {
   private resultEl: HTMLElement | null = null;
   private fstateEls: [HTMLElement | null, HTMLElement | null] = [null, null];
   // Expanded-board row cells, aligned with view.board order (structural sig).
-  private boardRows: { row: HTMLElement; k: HTMLElement; d: HTMLElement; c: HTMLElement }[] = [];
+  private boardRows: {
+    row: HTMLElement;
+    k: HTMLElement;
+    a: HTMLElement;
+    d: HTMLElement;
+    c: HTMLElement;
+  }[] = [];
 
   constructor(private readonly deps: BattlegroundScoreboardDeps) {}
 
@@ -77,6 +83,7 @@ export class BattlegroundScoreboard {
         (row) => ({
           row,
           k: row.querySelector('.bb-k') as HTMLElement,
+          a: row.querySelector('.bb-a') as HTMLElement,
           d: row.querySelector('.bb-d') as HTMLElement,
           c: row.querySelector('.bb-c') as HTMLElement,
         }),
@@ -145,6 +152,7 @@ export class BattlegroundScoreboard {
       const cells = this.boardRows[i];
       const r = view.board[i];
       w.setText(cells.k, num(r.kills));
+      w.setText(cells.a, num(r.assists));
       w.setText(cells.d, num(r.deaths));
       w.setText(cells.c, num(r.captures));
       w.toggleClass(cells.row, 'dead', r.dead);
@@ -183,7 +191,7 @@ export class BattlegroundScoreboard {
     // Hover reveals the expanded board (CSS); a tap/click pins it open (the
     // touch path), and the strip is FOCUSABLE so keyboard users get the same
     // board: focus reveals via :focus-within, Enter/Space pins it exactly like
-    // a click (a keyboard user must never be locked out of kills/deaths/caps).
+    // a click (a keyboard user must never be locked out of the tallies).
     el.tabIndex = 0;
     el.setAttribute('aria-label', t('hudChrome.bg.boardToggleLabel'));
     el.setAttribute('aria-expanded', 'false');
@@ -269,6 +277,7 @@ export class BattlegroundScoreboard {
       `<div class="bg-brow bg-bhead">` +
       `<span class="bb-name"></span>` +
       `<span class="bb-k">${esc(t('hudChrome.bg.board.kills'))}</span>` +
+      `<span class="bb-a">${esc(t('hudChrome.bg.board.assists'))}</span>` +
       `<span class="bb-d">${esc(t('hudChrome.bg.board.deaths'))}</span>` +
       `<span class="bb-c">${esc(t('hudChrome.bg.board.captures'))}</span></div>`;
     const rowHtml = (r: BgScoreboardView['board'][number]): string => {
@@ -276,7 +285,8 @@ export class BattlegroundScoreboard {
       return (
         `<div class="bg-brow bg-bplayer ${teamCls(r.team)}${r.me ? ' me' : ''}">` +
         `<span class="bb-name" title="${esc(clsName)}">${esc(r.name)}</span>` +
-        `<span class="bb-k">0</span><span class="bb-d">0</span><span class="bb-c">0</span></div>`
+        `<span class="bb-k">0</span><span class="bb-a">0</span>` +
+        `<span class="bb-d">0</span><span class="bb-c">0</span></div>`
       );
     };
     const section = (team: number): string =>

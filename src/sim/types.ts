@@ -76,7 +76,9 @@ export type HonorReason =
   | 'fiesta_complete'
   | 'fiesta_win'
   | 'battleground_win'
-  | 'battleground_complete';
+  | 'battleground_complete'
+  | 'battleground_kill'
+  | 'battleground_assist';
 
 // Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
 // by bracket plus the stable, sorted opposing-team identity; `totalWins` drives

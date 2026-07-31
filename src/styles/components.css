@@ -8785,7 +8785,10 @@
   }
   .bg-brow {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 52px 56px 68px;
+    /* name + the four tallies. A track per cell: the row is a grid, so a cell
+       without a track of its own wraps to a second line (which is exactly what
+       adding the assists column did before this track existed). */
+    grid-template-columns: minmax(0, 1fr) 52px 60px 56px 68px;
     gap: 4px;
     align-items: center;
     font-size: 12px;
@@ -8852,6 +8855,7 @@
     margin-left: 5px;
   }
   .bg-brow .bb-k,
+  .bg-brow .bb-a,
   .bg-brow .bb-d,
   .bg-brow .bb-c {
     text-align: right;
@@ -8863,6 +8867,7 @@
     color: #ded8c4;
   }
   .bg-brow.bg-bhead .bb-k,
+  .bg-brow.bg-bhead .bb-a,
   .bg-brow.bg-bhead .bb-d,
   .bg-brow.bg-bhead .bb-c {
     font-size: 10px;

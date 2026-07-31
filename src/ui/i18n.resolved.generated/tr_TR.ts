@@ -1044,6 +1044,7 @@ export const tr_TR: EnTranslations = {
       "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
       "board": {
         "kills": "Kills",
+        "assists": "Assists",
         "deaths": "Deaths",
         "captures": "Captures"
       },
@@ -1363,7 +1364,9 @@ export const tr_TR: EnTranslations = {
         "fiestaComplete": "Fiesta tamamlandı",
         "fiestaWin": "Fiesta zaferi",
         "battlegroundWin": "Thornhollow Fields victory",
-        "battlegroundComplete": "Thornhollow Fields battle fought"
+        "battlegroundComplete": "Thornhollow Fields battle fought",
+        "battlegroundKill": "honorable kill",
+        "battlegroundAssist": "killing blow assisted"
       }
     },
     "charSheet": {

@@ -195,6 +195,7 @@ describe('BattlegroundFx.update', () => {
       kills: 0,
       deaths: 0,
       captures: 0,
+      assists: 0,
     });
     match.players.push(row(70, 0), row(71, 1, true));
     const g70 = new THREE.Group();
@@ -240,6 +241,7 @@ describe('BattlegroundFx.update', () => {
       kills: 0,
       deaths: 0,
       captures: 0,
+      assists: 0,
     });
     h.entities.set(77, { auras: [{ id: 'bg_battle_rune' }] });
     h.fx.update(0.1);

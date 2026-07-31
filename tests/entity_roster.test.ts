@@ -391,6 +391,8 @@ function makeCtx() {
     vcupSportShove: vi.fn(),
     // Thornhollow Fields battleground hooks.
     bgOnPlayerDeath: vi.fn(),
+    bgOnPlayerDamaged: vi.fn(),
+    bgOnPlayerHealed: vi.fn(),
   };
   const ctx = createSimContext(host);
   return {

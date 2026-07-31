@@ -962,6 +962,10 @@ export interface SimContextCallbacks {
   // death drops the flag in place; releasing sends the spirit to the warded
   // graveyard and the team wave raises it).
   bgOnPlayerDeath(e: Entity, killer: Entity | null): void;
+  /** Damage hook: remember an enemy hit so the kill it leads to can pay assists. */
+  bgOnPlayerDamaged(victim: Entity, source: Entity): void;
+  /** Heal hook: remember allied support so a kill can pay the healers too. */
+  bgOnPlayerHealed(target: Entity, source: Entity): void;
 }
 
 // The seam consumed by extracted modules.
@@ -1475,5 +1479,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     vcupSportShove: host.vcupSportShove,
     // Thornhollow Fields battleground hooks (points at social/battleground.ts via Sim).
     bgOnPlayerDeath: host.bgOnPlayerDeath,
+    bgOnPlayerDamaged: host.bgOnPlayerDamaged,
+    bgOnPlayerHealed: host.bgOnPlayerHealed,
   };
 }

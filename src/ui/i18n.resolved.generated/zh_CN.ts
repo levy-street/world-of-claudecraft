@@ -1044,6 +1044,7 @@ export const zh_CN: EnTranslations = {
       "levelRequirement": "你需要达到{level}级才能解锁此战场的排队。",
       "board": {
         "kills": "击杀",
+        "assists": "助攻",
         "deaths": "死亡",
         "captures": "夺旗"
       },
@@ -1363,7 +1364,9 @@ export const zh_CN: EnTranslations = {
         "fiestaComplete": "完成嘉年华",
         "fiestaWin": "嘉年华胜利",
         "battlegroundWin": "鸦裂谷胜利",
-        "battlegroundComplete": "鸦裂谷参战"
+        "battlegroundComplete": "鸦裂谷参战",
+        "battlegroundKill": "荣誉击杀",
+        "battlegroundAssist": "助攻击杀"
       }
     },
     "charSheet": {

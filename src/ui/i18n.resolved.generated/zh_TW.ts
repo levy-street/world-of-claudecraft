@@ -1044,6 +1044,7 @@ export const zh_TW: EnTranslations = {
       "levelRequirement": "你需要達到{level}級才能解鎖此戰場的排隊。",
       "board": {
         "kills": "擊殺",
+        "assists": "助攻",
         "deaths": "死亡",
         "captures": "奪旗"
       },
@@ -1363,7 +1364,9 @@ export const zh_TW: EnTranslations = {
         "fiestaComplete": "完成嘉年華",
         "fiestaWin": "嘉年華勝利",
         "battlegroundWin": "鴉裂谷勝利",
-        "battlegroundComplete": "鴉裂谷參戰"
+        "battlegroundComplete": "鴉裂谷參戰",
+        "battlegroundKill": "榮譽擊殺",
+        "battlegroundAssist": "助攻擊殺"
       }
     },
     "charSheet": {

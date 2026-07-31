@@ -54,6 +54,7 @@ const baseMatch = (over: Partial<BgMatchInfo> = {}): BgMatchInfo => ({
       kills: 3,
       deaths: 1,
       captures: 2,
+      assists: 4,
     },
     {
       pid: 8,
@@ -65,6 +66,7 @@ const baseMatch = (over: Partial<BgMatchInfo> = {}): BgMatchInfo => ({
       kills: 0,
       deaths: 4,
       captures: 0,
+      assists: 1,
     },
     {
       pid: 9,
@@ -76,6 +78,7 @@ const baseMatch = (over: Partial<BgMatchInfo> = {}): BgMatchInfo => ({
       kills: 5,
       deaths: 0,
       captures: 1,
+      assists: 0,
     },
   ],
   countdown: 0,
@@ -170,10 +173,10 @@ describe('battleground window view (pure core)', () => {
         '"capsToWin":5,"scores":[1,2],"flags":[{"state":"home","carrierPid":null,' +
         '"carrierName":null,"carrierTeam":null},{"state":"carried","carrierPid":7,' +
         '"carrierName":"Ravven","carrierTeam":0}],"players":[{"pid":7,"name":"Ravven",' +
-        '"cls":"warrior","team":0,"carrying":true,"dead":false,"kills":3,"deaths":1,"captures":2},' +
-        '{"pid":8,"name":"Bryn","cls":"mage","team":0,"carrying":false,"dead":true,"kills":0,"deaths":4,"captures":0},' +
+        '"cls":"warrior","team":0,"carrying":true,"dead":false,"kills":3,"deaths":1,"captures":2,"assists":4},' +
+        '{"pid":8,"name":"Bryn","cls":"mage","team":0,"carrying":false,"dead":true,"kills":0,"deaths":4,"captures":0,"assists":1},' +
         '{"pid":9,"name":"Cael","cls":"priest","team":1,' +
-        '"carrying":false,"dead":false,"kills":5,"deaths":0,"captures":1}],"countdown":0,' +
+        '"carrying":false,"dead":false,"kills":5,"deaths":0,"captures":1,"assists":0}],"countdown":0,' +
         '"timeLeft":605,"waveIn":[10,5],"respawnIn":0,"winner":null}}',
     ) as BgInfo;
     const inputRest = { playerName: 'X', playerLevel: 20, party: null, allTime: null };
@@ -210,8 +213,16 @@ describe('battleground scoreboard view (pure core)', () => {
       kills: 3,
       deaths: 1,
       captures: 2,
+      assists: 4,
     });
-    expect(v.board[2]).toMatchObject({ pid: 9, team: 1, kills: 5, captures: 1, me: false });
+    expect(v.board[2]).toMatchObject({
+      pid: 9,
+      team: 1,
+      kills: 5,
+      captures: 1,
+      assists: 0,
+      me: false,
+    });
   });
 
   it('keeps the structural sig stable across score/clock/state changes and moves it on roster changes', () => {

@@ -564,6 +564,8 @@ function makeFakeHost() {
     vcupSportShove: vi.fn(),
     // Thornhollow Fields battleground hooks.
     bgOnPlayerDeath: vi.fn(),
+    bgOnPlayerDamaged: vi.fn(),
+    bgOnPlayerHealed: vi.fn(),
   };
   return { host, rng, entities, clock };
 }

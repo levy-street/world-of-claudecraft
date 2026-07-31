@@ -840,6 +840,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.fiestaWin': 'Победа на Фиесте',
   'hudChrome.warfare.reasons.battlegroundWin': 'Победа в Вороньем Разломе',
   'hudChrome.warfare.reasons.battlegroundComplete': 'Битва в Вороньем Разломе',
+  'hudChrome.warfare.reasons.battlegroundKill': 'Почётное убийство',
+  'hudChrome.warfare.reasons.battlegroundAssist': 'Помощь в убийстве',
   'hudChrome.keybinds.bgFlag': 'Действие с флагом',
   'hudChrome.pvp.launcherTitle': 'PvP: Вороний Разлом и арены',
   'hudChrome.pvp.mobileLabel': 'PvP',
@@ -884,6 +886,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.boardToggleLabel': 'Табло матча. Нажмите Enter, чтобы закрепить полную таблицу.',
   'hudChrome.bg.levelRequirement': 'Очередь на это поле боя открывается на уровне {level}.',
   'hudChrome.bg.board.kills': 'Убийства',
+  'hudChrome.bg.board.assists': 'Помощь',
   'hudChrome.bg.board.deaths': 'Смерти',
   'hudChrome.bg.board.captures': 'Захваты',
   'hudChrome.bg.capturedTeamBanner':
