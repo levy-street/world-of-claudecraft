@@ -71,7 +71,7 @@ const armouryFinalPipelineEnabled =
     item.src?.endsWith('eastbrook_grand_armoury-final.glb'),
   ) ?? false;
 const ARMOURY_SHIPPING_BYTE_CEILING = 160 * 1024;
-const ARMOURY_SHIPPING_SHA256 = '96618c2cb18ada633f65e57e48d376c58fff353506c213e52c26b879d16c6cff';
+const ARMOURY_SHIPPING_SHA256 = '016c9f2377333f1c980f637bce24ac7ad85fcc3ec44f5cc5465d1b54ea9fe163';
 const MANIFEST_HASH_LENGTH = 12;
 
 function expectAssetExistsAndManifested(url: string): void {
@@ -692,7 +692,11 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
       const file = path.join(publicDir, url.replace(/^\//, ''));
       const size = statSync(file).size;
       expect(size, `${url} should meet the static-prop size floor`).toBeGreaterThanOrEqual(40_000);
-      expect(size, `${url} should meet the static-prop size ceiling`).toBeLessThanOrEqual(100_000);
+      // KTX2 textures (tests/glb_texture_compression.test.ts) are larger on
+      // disk than the webp they replaced because they stay GPU-compressed in
+      // memory; the ceiling still catches an unoptimized re-export, which
+      // lands megabytes above this.
+      expect(size, `${url} should meet the static-prop size ceiling`).toBeLessThanOrEqual(256_000);
       expect(
         readGlbJson(path.join(publicDir, url.replace(/^\//, ''))).extensionsUsed,
         `${url} should use Meshopt`,

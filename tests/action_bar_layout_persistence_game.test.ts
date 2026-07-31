@@ -77,6 +77,16 @@ const LAYOUT: ActionBarLayout = {
   },
 };
 
+const LAYOUT_AFTER_MIDSESSION_EDIT: ActionBarLayout = {
+  v: 1,
+  forms: {
+    normal: {
+      bar: [{ type: 'ability', id: 'shield_slam' }, null],
+      attack: { type: 'item', id: 'linen_bandage' },
+    },
+  },
+};
+
 describe('action-bar layout persistence (wire round trip)', () => {
   beforeEach(() => {
     vi.mocked(setCharacterHotbarLayout).mockClear();
@@ -171,6 +181,31 @@ describe('action-bar layout persistence (wire round trip)', () => {
     const [characterId, saved] = vi.mocked(setCharacterHotbarLayout).mock.calls[0];
     expect(characterId).toBe(7);
     expect(saved).toEqual(LAYOUT);
+  });
+
+  it('resumes with the freshly-read layout, not the stale join-time snapshot', () => {
+    const server = new GameServer();
+    const firstFc = fakeWs();
+    const session = join(server, firstFc, 11, 'Resumer', { hotbarLayout: LAYOUT });
+    broadcast(server);
+    expect(lastSnap(firstFc.sent).self.hbl).toEqual(LAYOUT);
+
+    // The player edits and durably saves a new layout mid-session (the
+    // write already landed in the DB by the time the reconnect happens),
+    // then the socket drops into the linkdead grace window.
+    session.linkdead = true;
+
+    // The reconnect's WS auth handshake re-reads the character row fresh
+    // (server/ws_auth.ts), so the resume's `meta.hotbarLayout` carries the
+    // durably saved edit, never the stale join-time value.
+    const secondFc = fakeWs();
+    const resumed = join(server, secondFc, 11, 'Resumer', {
+      hotbarLayout: LAYOUT_AFTER_MIDSESSION_EDIT,
+    });
+    expect(resumed).toBe(session);
+    broadcast(server);
+    const resumedSnap = lastSnap(secondFc.sent);
+    expect(resumedSnap.self.hbl).toEqual(LAYOUT_AFTER_MIDSESSION_EDIT);
   });
 
   it('drops a garbage / oversized payload server-side without crashing or persisting', async () => {

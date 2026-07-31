@@ -43,6 +43,9 @@ describe('loadConfig', () => {
     expect(cfg.playSessionRetentionDays).toBe(180);
     expect(cfg.accountIpAssociationRetentionDays).toBe(730);
     expect(cfg.playerActivityRetentionDays).toBe(400);
+    expect(cfg.passwordResetRequestRetentionDays).toBe(30);
+    expect(cfg.emailChangeRequestRetentionDays).toBe(30);
+    expect(cfg.emailLogRetentionDays).toBe(90);
     expect(cfg.retentionSweepUtcHour).toBe(5);
     expect(cfg.retentionSweepMaxRowsPerRun).toBe(50000);
     expect(cfg.requireWebLogin).toBe(false);
@@ -203,17 +206,11 @@ describe('loadConfig', () => {
     );
   });
 
-  it('parses COMMUNITY_TEST_RIFTS strictly and defaults it off', () => {
-    expect(loadConfig({ ...MIN_ENV }).communityTestRifts).toBe(false);
-    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: '1' }).communityTestRifts).toBe(true);
-    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'true' }).communityTestRifts).toBe(true);
-    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: '0' }).communityTestRifts).toBe(false);
-    expect(loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'FALSE' }).communityTestRifts).toBe(
-      false,
-    );
-    expect(() => loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'yes' })).toThrow(
-      /COMMUNITY_TEST_RIFTS/,
-    );
+  it('ignores the retired COMMUNITY_TEST_RIFTS flag entirely', () => {
+    // The dense rift population is the one policy on every host now; a stale
+    // host .env value must neither throw nor surface on the config object.
+    const config = loadConfig({ ...MIN_ENV, COMMUNITY_TEST_RIFTS: 'yes' });
+    expect('communityTestRifts' in config).toBe(false);
   });
 
   it('reads the numeric and string overrides', () => {
@@ -273,7 +270,7 @@ describe('loadConfig', () => {
     expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: ' 0 ' }).maxPlayersPerRealm).toBe(0);
   });
 
-  it('reads the six retention day keys on the chat-log contract: empty is the default, whitespace is keep-forever', () => {
+  it('reads the nine retention day keys on the chat-log contract: empty is the default, whitespace is keep-forever', () => {
     const cases = [
       {
         key: 'DAILY_REWARD_EVENTS_RETENTION_DAYS',
@@ -289,6 +286,17 @@ describe('loadConfig', () => {
         dflt: 730,
       },
       { key: 'PLAYER_ACTIVITY_RETENTION_DAYS', field: 'playerActivityRetentionDays', dflt: 400 },
+      {
+        key: 'PASSWORD_RESET_REQUEST_RETENTION_DAYS',
+        field: 'passwordResetRequestRetentionDays',
+        dflt: 30,
+      },
+      {
+        key: 'EMAIL_CHANGE_REQUEST_RETENTION_DAYS',
+        field: 'emailChangeRequestRetentionDays',
+        dflt: 30,
+      },
+      { key: 'EMAIL_LOG_RETENTION_DAYS', field: 'emailLogRetentionDays', dflt: 90 },
     ] as const;
     for (const { key, field, dflt } of cases) {
       // A set value overrides the default.

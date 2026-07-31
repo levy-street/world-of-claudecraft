@@ -2235,6 +2235,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Die brief zit niet meer in je brievenbus.',
   'hudChrome.mailbox.result.needRecipient': 'Noem een ontvanger voor je brief.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Je kunt geen opdrachtvoorwerpen versturen.',
+  'hudChrome.mailbox.result.noMailBound': 'Dat voorwerp is gebonden en kan niet worden verstuurd.',
   'hudChrome.mailbox.result.noRecipient': 'Niemand met die naam heeft hier een brievenbus.',
   'hudChrome.mailbox.result.notEnoughItems': 'Zoveel heb je er niet om te versturen.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Hun brievenbus is vol.',
@@ -5061,12 +5062,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Indringers van voorbij de rifts, louter vuur en venijn. Waar er een staat, is een breuk nooit ver weg.',
   'guide.family.demon.name': 'Demonen',
-  'guide.family.kobold.desc':
-    'Scharrelende plunderaars en geesten van open plek en heg, meer overlast dan gevaar tot ze zich in aantal verzamelen.',
-  'guide.family.kobold.name': 'Kwelgeesten',
-  'guide.family.murloc.desc':
-    'Krassende vismensen van oever en getijdenpoel, snel om te zwermen op alles wat te dicht bij het water waadt.',
-  'guide.family.murloc.name': 'Kwaakvinnen',
   'guide.faqPage.a1':
     'Ja. Het hele spel is gratis te spelen tot aan de niveaulimiet, en de broncode is openbaar op GitHub.',
   'guide.faqPage.a10':
@@ -5985,9 +5980,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetTooFar': 'Het doelwit is te ver weg.',
   'hud.errors.tooClose': 'Te dichtbij!',
   'hud.errors.tradeBound': 'Dat voorwerp is gebonden en kan niet worden verhandeld.',
+  'hud.errors.marketListBound': 'Dat voorwerp is gebonden en kan niet te koop worden aangeboden.',
   'hud.errors.tradeExpired': 'Het ruilverzoek is verlopen.',
   'hud.errors.tradeFailed': 'Ruil mislukt: voorwerpen of geld niet langer beschikbaar.',
   'hud.errors.tradeInProgress': 'Er is al een ruil aan de gang.',
+  'hud.errors.tradeAlreadyTrading': 'Die speler is al aan het ruilen.',
   'hud.errors.tradeTooFar': 'Het doelwit is te ver weg om mee te ruilen.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Onbekende opdracht: {command}. Probeer /s /y /w /p /g.',
@@ -7164,6 +7161,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Die quest is niet voltooid.',
   'questUi.errors.notInLog': 'Die quest staat niet in je logboek.',
   'questUi.errors.tooFar': 'Te ver weg.',
+  'questUi.errors.escortAway':
+    'Degene die je moet begeleiden is er nu niet. Die komt binnenkort terug.',
   'questUi.errors.turnInMissing': 'Die questinlevering is niet in de buurt.',
   'questUi.errors.unavailable': 'Die quest is niet beschikbaar.',
   'questUi.log.abandon': 'Quest opgeven',
@@ -8124,6 +8123,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Deze herstellink is ongeldig of verlopen. Vraag een nieuwe aan.',
   'apiError.deeds.invalid_input': 'Ongeldige invoer.',
+  'apiError.ota_updates.invalid_input': 'Ongeldige invoer.',
   'apiError.steam.account_taken': 'Dat Steam-account is al aan een ander account gekoppeld.',
   'apiError.steam.already_linked': 'Je account heeft al een gekoppeld Steam-account.',
   'apiError.steam.banned': 'Dat Steam-account kan niet worden gekoppeld.',
@@ -8670,7 +8670,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'De nacht voelt al ijler aan. Wat hen ook wekt, is nog niet klaar, maar je hebt de Trappen wat rust gekocht.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Wren Veilig Thuisbrengen',
   'entities.quests.q_fv_seeing_wren_home.text':
-    "Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten zuidwesten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla's kamp op de Trappen. Daar is ze veilig onder de lichten.",
+    "Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten noordoosten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla's kamp op de Trappen. Daar is ze veilig onder de lichten.",
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Leerling Wren veilig naar de Aurora-Trappen gebracht',
   'entities.quests.q_fv_seeing_wren_home.completion':
@@ -8764,7 +8764,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'De dam houdt stand, en Tam heeft nog genoeg adem om te grappen over de drieslag. Goed. Wij zijn een eiland onder belegering, {playerName}, en elk paar handen dat die zandbank oversteekt, is een paar dat de breuken moeten passeren voordat ze mijn mensen bereiken. Welkom in Meeuwenhaven.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Komt Thuis',
   'entities.quests.q_fs_bram_come_home.text':
-    'Mijn Bram nam de boot mee de ochtend dat de nettenbreuk opende, en de zee wierp hem ergens voorbij de Aanlegpunt terug. Ik hoorde hem drie nachten geleden, {playerName}, roepend over het water, en ik was te bang om te gaan. Ik ben nog steeds te bang. Alsjeblieft. Zijn boot ligt vergaan op de noordoever. Breng hem lopend naar mij terug.',
+    'Mijn Bram nam de boot mee de ochtend dat de nettenbreuk opende, en de zee wierp hem ergens voorbij de Aanlegpunt terug. Ik hoorde hem drie nachten geleden, {playerName}, roepend over het water, en ik was te bang om te gaan. Ik ben nog steeds te bang. Alsjeblieft. Zijn boot ligt vergaan op de zuidoever. Breng hem lopend naar mij terug.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Visser Bram veilig naar Meeuwenhaven gebracht',
   'entities.quests.q_fs_bram_come_home.completion':
@@ -10887,14 +10887,25 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Herstel: /unstuck start een stilstaande aftelling die je verplaatst naar een nabije bereikbare veilige plek.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Herstel: /unstuck start een stilstaande aftelling en stuurt je geest daarna naar het dichtstbijzijnde kerkhof. Terugkeren via De Bleke Hoeder vereist de Tol van de Hoeder.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Herstel: /unstuck start een stilstaande aftelling en verplaatst je daarna naar het dichtstbijzijnde kerkhof, waarbij je herrijst als je was gevallen. De Loskomingsziekte blijft tot 5 minuten op je.',
   'hudChrome.unstuck.menuButton': 'Loskomen',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Je bent naar het dichtstbijzijnde kerkhof verplaatst. De Loskomingsziekte weegt op je.',
   'hudChrome.unstuck.noSafePosition':
     'Er is geen bereikbare veilige plek in de buurt gevonden. Je bent niet verplaatst.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Je bent teruggebracht naar het dichtstbijzijnde kerkhof en herrezen. De Tol van de Hoeder weegt op je.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Je bent naar het dichtstbijzijnde kerkhof verplaatst en herrezen. De Loskomingsziekte weegt op je.',
   'hudChrome.unstuck.standStill': 'Sta stil op vaste grond voordat je Loskomen gebruikt.',
   'hudChrome.unstuck.standStillAnywhere': 'Sta stil voordat je Loskomen gebruikt.',
   'hudChrome.unstuck.started':
     'Loskomen over {seconds} seconden. Bewegen, vechten, schade oplopen, of een andere actie beginnen annuleert dit.',
   'hudChrome.unstuck.unavailable': 'Loskomen is niet beschikbaar in je huidige toestand.',
+  'hudChrome.riftTracker.title': 'Rift',
+  'hudChrome.riftTracker.floor': 'Verdieping {current} van {total}',
+  'hudChrome.riftTracker.closesIn': 'Sluit over {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

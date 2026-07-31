@@ -10,6 +10,7 @@ import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import type { HoverCursorKind } from './cursors';
+import { decideEscortPress, handleEscortPress, isEscorteeEntity } from './escort_interact';
 import type { InteractionOutcome } from './interaction_autorun';
 
 export interface PickInteractionWorld {
@@ -21,7 +22,11 @@ export interface PickInteractionWorld {
   // Local party roster for the corpse rights check; optional so party-less
   // fixtures stay valid.
   partyInfo?: IWorld['partyInfo'];
+  // Required for the escort arm below (see escort_interact.ts): a right-click is
+  // the other half of an escort run's only client entry point.
+  questLog: IWorld['questLog'];
   targetEntity(id: number | null): void;
+  interact(): void;
   enterDungeon(dungeonId: string): InteractionOutcome;
   leaveDungeon(): InteractionOutcome;
   pickUpObject(id: number): InteractionOutcome;
@@ -110,6 +115,9 @@ export function hoverCursorKind(
   if (!e) return 'default';
   if (isAttackableEntity(e, playerId, activePvpOpponentSet)) return 'attack';
   if (e.kind === 'npc') return 'friendly';
+  // An escortee is a quest NPC that happens to be mob-kind; hovering it must
+  // read as interactive, or the only cue that it can be talked to is gone.
+  if (isEscorteeEntity(e)) return 'friendly';
   if (e.kind === 'player' && e.id !== playerId) return 'friendly';
   void partyMemberIds;
   return 'default';
@@ -248,6 +256,21 @@ export function handlePickedEntity(
       }
       hud.showError(t('questUi.errors.tooFar'));
       return false;
+    } else if (isEscorteeEntity(e)) {
+      // Escortees are mob-kind (the escort driver walks them), so they fall
+      // past the npc arm above and would otherwise land in the attackable
+      // branch below, which refuses them for being non-hostile: a right-click
+      // that only ever targeted. The verdict core decides start vs away.
+      // Range first, like the npc branch above: the player clicked HER, so an
+      // out-of-range click earns the too-far line (and the caller's
+      // shouldApproachPickedEntity then walks them over).
+      if (d > INTERACT_RANGE + 2) {
+        hud.showError(t('questUi.errors.tooFar'));
+        return false;
+      }
+      const verdict = decideEscortPress(world.player.pos, world.entities, world.questLog);
+      if (verdict.kind === 'none') return false;
+      return handleEscortPress(world, hud, verdict, t('questUi.errors.escortAway'));
     } else if (
       isAttackableEntity(e, world.playerId ?? world.player.id, activePvpOpponentIds(world))
     ) {

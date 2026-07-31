@@ -31,10 +31,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // place_mobile_station, train_recipe, the three enchanting actions
 // (disenchant_item, apply_enchant, salvage_item), unbind_item (the
 // Maker's Bond unbind service), the Rift + mounts surface (rift and
-// forge commands, learn_riding, mount selection), and assemble_item (the
-// right-click Assemble action on a kind:'assembled' item).
-const EXPECTED_SEND_COUNT = 174; // assemble_item joined the wire (charm assembly)
-const EXPECTED_DISPATCH_COUNT = 185; // assemble_item joined the wire (charm assembly)
+// forge commands, learn_riding, mount selection), market_list_instance (the
+// instance-payload market pipe), and assemble_item (the right-click Assemble
+// action on an item carrying an assembly recipe).
+const EXPECTED_SEND_COUNT = 175; // + market_list_instance, + assemble_item
+const EXPECTED_DISPATCH_COUNT = 186; // + market_list_instance, + assemble_item
 const EXPECTED_DISPATCH_ONLY_COUNT = 11;
 
 // The chat sub-channel routing switch (server/game.ts `switch

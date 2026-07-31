@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   loadTexture: vi.fn(),
   releaseGltf: vi.fn(),
   registerPreload: vi.fn(),
+  registerDeferredPreload: vi.fn((start: () => unknown) => start()),
 }));
 
 vi.mock('../src/render/assets/loader', () => ({
@@ -16,6 +17,7 @@ vi.mock('../src/render/assets/loader', () => ({
 
 vi.mock('../src/render/assets/preload', () => ({
   registerPreload: mocks.registerPreload,
+  registerDeferredPreload: mocks.registerDeferredPreload,
 }));
 
 afterEach(() => {
@@ -49,8 +51,8 @@ describe('Eastbrook town preload', () => {
       expect(allUrls).toHaveLength(11);
       expect(mocks.loadGltf.mock.calls.map(([url]) => url)).toEqual(allUrls);
       expect(mocks.loadTexture).toHaveBeenCalledWith('/textures/eastbrook_surface_atlas.webp');
-      expect(mocks.registerPreload).toHaveBeenCalledTimes(allUrls.length + 1);
-      await Promise.all(mocks.registerPreload.mock.calls.map(([registered]) => registered));
+      expect(mocks.registerDeferredPreload).toHaveBeenCalledTimes(allUrls.length + 1);
+      await Promise.all(mocks.registerDeferredPreload.mock.results.map((r) => r.value));
 
       const data = await import('../src/sim/data');
       data.setActiveWorldContent({ ...data.BUILTIN_WORLD, zones: [] });

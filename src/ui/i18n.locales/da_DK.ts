@@ -2004,6 +2004,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Det brev er ikke længere i din postkasse.',
   'hudChrome.mailbox.result.needRecipient': 'Angiv en modtager til dit brev.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Du kan ikke sende opgavegenstande med posten.',
+  'hudChrome.mailbox.result.noMailBound': 'Den genstand er bundet og kan ikke sendes med posten.',
   'hudChrome.mailbox.result.noRecipient': 'Ingen med det navn har en postkasse her.',
   'hudChrome.mailbox.result.notEnoughItems': 'Du har ikke så mange at sende.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Modtagerens postkasse er fuld.',
@@ -4826,12 +4827,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Angribere fra hinsides rifterne, lutter ild og ondskab. Hvor en står, er et brud aldrig langt væk.',
   'guide.family.demon.name': 'Dæmoner',
-  'guide.family.kobold.desc':
-    'Flakkende ådselsædere og ånder fra lysning og hæk, mere til gene end fare, indtil de samles i flok.',
-  'guide.family.kobold.name': 'Skælme',
-  'guide.family.murloc.desc':
-    'Kvækkende fiskefolk fra søbred og tidevandspøl, hurtige til at sværme om alt, der vader for tæt på.',
-  'guide.family.murloc.name': 'Kvækfinner',
   'guide.faqPage.a1':
     'Ja. Hele spillet er gratis at spille til niveaugrænsen, og kildekoden er åben på GitHub.',
   'guide.faqPage.a10':
@@ -5744,10 +5739,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetTooFar': 'Målet er for langt væk.',
   'hud.errors.tooClose': 'For tæt på!',
   'hud.errors.tradeBound': 'Den genstand er bundet og kan ikke handles.',
+  'hud.errors.marketListBound': 'Den genstand er bundet og kan ikke sættes til salg.',
   'hud.errors.tradeExpired': 'Handelsanmodningen er udløbet.',
   'hud.errors.tradeFailed':
     'Handel mislykkedes: genstande eller penge er ikke længere tilgængelige.',
   'hud.errors.tradeInProgress': 'En handel er allerede i gang.',
+  'hud.errors.tradeAlreadyTrading': 'Den spiller handler allerede.',
   'hud.errors.tradeTooFar': 'Målet er for langt væk til at handle.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Ukendt kommando: {command}. Prøv /s /y /w /p /g.',
@@ -7012,6 +7009,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Den quest er ikke fuldført.',
   'questUi.errors.notInLog': 'Den quest er ikke i din log.',
   'questUi.errors.tooFar': 'For langt væk.',
+  'questUi.errors.escortAway': 'Din eskorte er ikke på sin post lige nu og vender snart tilbage.',
   'questUi.errors.turnInMissing': 'Den quest-aflevering er ikke i nærheden.',
   'questUi.errors.unavailable': 'Den quest er ikke tilgængelig.',
   'questUi.log.abandon': 'Opgiv quest',
@@ -8026,6 +8024,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Dette nulstillingslink er ugyldigt eller udløbet. Anmod om et nyt.',
   'apiError.deeds.invalid_input': 'Ugyldig indtastning.',
+  'apiError.ota_updates.invalid_input': 'Ugyldig indtastning.',
   'apiError.steam.account_taken': 'Den Steam-konto er allerede knyttet til en anden konto.',
   'apiError.steam.already_linked': 'Din konto har allerede en tilknyttet Steam-konto.',
   'apiError.steam.banned': 'Den Steam-konto kan ikke tilknyttes.',
@@ -8569,7 +8568,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Natten føles allerede tyndere. Hvad end der vækker dem, er ikke færdigt, men du har købt Trapperne lidt ro.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Wren Bragt Hjem',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Min lærling Wren gik ud for at gå Guldsmeltets linje for to dage siden og kom aldrig tilbage. Jeg fandt hendes spor, hun sidder under vejmarkeringerne sydvest for Nordlys-Trapperne, for bange for ulvene til at bevæge sig. Jeg kan ikke forlade kæret, {playerName}. Følg hende til Veylas lejr på Trapperne. Hun vil være sikker under lysene.',
+    'Min lærling Wren gik ud for at gå Guldsmeltets linje for to dage siden og kom aldrig tilbage. Jeg fandt hendes spor, hun sidder under vejmarkeringerne nordøst for Nordlys-Trapperne, for bange for ulvene til at bevæge sig. Jeg kan ikke forlade kæret, {playerName}. Følg hende til Veylas lejr på Trapperne. Hun vil være sikker under lysene.',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Lærling Wren bragt sikkert til Nordlys-Trapperne',
   'entities.quests.q_fv_seeing_wren_home.completion':
@@ -8663,7 +8662,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Dæmningen holder, og Tam har stadig ånde nok til at spøge om treslaget. Godt. Vi er en ø under belejring, {playerName}, og hvert par hænder, der krydser den sandbanke, er et par, bruddene skal igennem, før de når mit folk. Velkommen til Mågehavn.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Kommer Hjem',
   'entities.quests.q_fs_bram_come_home.text':
-    'Min Bram tog båden ud den morgen, net-bruddet åbnede sig, og havet kastede ham tilbage et sted forbi Landgangspynten. Jeg hørte ham tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Vær sød. Hans båd ligger vraget på nordkysten. Følg ham hjem til mig.',
+    'Min Bram tog båden ud den morgen, net-bruddet åbnede sig, og havet kastede ham tilbage et sted forbi Landgangspynten. Jeg hørte ham tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Vær sød. Hans båd ligger vraget på sydkysten. Følg ham hjem til mig.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Fisker Bram bragt sikkert hjem til Mågehavn',
   'entities.quests.q_fs_bram_come_home.completion':
@@ -10752,14 +10751,25 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Redning: /unstuck starter en stillestående nedtælling, der flytter dig til et nærliggende tilgængeligt sikkert sted.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Redning: /unstuck starter en stillestående nedtælling og sender derefter din ånd til den nærmeste kirkegård. At vende tilbage via Den Blege Vogter kræver Vogterens Klokke.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Redning: /unstuck starter en stillestående nedtælling og flytter dig derefter til den nærmeste kirkegård, hvor du genoplives, hvis du var faldet. Frigørelsessyge bliver på dig i op til 5 minutter.',
   'hudChrome.unstuck.menuButton': 'Frigørelse',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Du er blevet flyttet til den nærmeste kirkegård. Frigørelsessyge tynger dig.',
   'hudChrome.unstuck.noSafePosition':
     'Intet tilgængeligt sikkert sted blev fundet i nærheden. Du blev ikke flyttet.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Du er blevet returneret til den nærmeste kirkegård og genoplivet. Vogterens Klokke tynger dig.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Du er blevet flyttet til den nærmeste kirkegård og genoplivet. Frigørelsessyge tynger dig.',
   'hudChrome.unstuck.standStill': 'Stå stille på fast grund, før du bruger Frigørelse.',
   'hudChrome.unstuck.standStillAnywhere': 'Stå stille, før du bruger Frigørelse.',
   'hudChrome.unstuck.started':
     'Frigørelse om {seconds} sekunder. At bevæge dig, kæmpe, tage skade eller begynde en anden handling annullerer den.',
   'hudChrome.unstuck.unavailable': 'Frigørelse er ikke tilgængelig i din nuværende tilstand.',
+  'hudChrome.riftTracker.title': 'Rift',
+  'hudChrome.riftTracker.floor': 'Etage {current} af {total}',
+  'hudChrome.riftTracker.closesIn': 'Lukker om {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

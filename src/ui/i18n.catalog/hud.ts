@@ -380,10 +380,13 @@ const hudStringsEn = {
       arenaQueueTrading: 'Finish your trade before queueing.',
       arenaQueueInstance: 'You cannot queue from inside an instance.',
       tradeInProgress: 'A trade is already in progress.',
+      tradeAlreadyTrading: 'That player is already trading.',
       tradeTooFar: 'Target is too far away to trade.',
       tradeExpired: 'The trade request has expired.',
       tradeFailed: 'Trade failed: items or money no longer available.',
       tradeBound: 'That item is bound and cannot be traded.',
+      // Wordy, M16: the five non-Latin fills land in this same change.
+      marketListBound: 'That item is bound and cannot be listed.',
     },
     logs: {
       standUp: 'You stand up.',

@@ -493,4 +493,20 @@ export const table: DeedLocaleTable = {
     name: '英雄：荒野之心盆地',
     desc: '在英雄难度的荒野之心盆地中击败盆地之声祖尔加。',
   },
+  chr_marsh_rares_ii: {
+    name: '暴食者，终得清算',
+    desc: '斩杀暴食者蛆颚，泥沼湿地第四位恶名之敌，首次清算时被漏记在册。',
+  },
+  chr_peaks_rares_ii: {
+    name: '峭壁上新刻的名字',
+    desc: '斩杀老岩颚与碎片领主卡兹克斯，荆峰高地又两位恶名之敌，首次清算时被漏记在册。',
+  },
+  chr_gleamstag: {
+    name: '从不先出手的传说',
+    desc: '斩杀微光雄鹿，一头稀有而避世的精英，只有被逼入绝境才会出手。',
+  },
+  chr_hollow_rares: {
+    name: '鹿群不忘',
+    desc: '斩杀老髓壳与鹿群之首金辉角，帷幕幽谷的两位游荡稀有首领。',
+  },
 };

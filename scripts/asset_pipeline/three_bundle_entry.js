@@ -6,6 +6,7 @@ export { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 export { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 export { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 export { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+export { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
 // Postprocessing chain for the weapon-inspector VFX layer (emissive bloom).
 export { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 export { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';

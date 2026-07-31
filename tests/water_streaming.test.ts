@@ -7,6 +7,7 @@ function mockWaterShaderAssets(): void {
   }));
   vi.doMock('../src/render/assets/preload', () => ({
     registerPreload: vi.fn(),
+    registerDeferredPreload: vi.fn((start: () => unknown) => start()),
   }));
   vi.doMock('../src/render/gfx', () => ({
     GFX: { standardMaterials: true },

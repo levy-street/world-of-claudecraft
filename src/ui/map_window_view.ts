@@ -4,7 +4,7 @@
 // Conventions; reference delve_map.ts / delve_map_painter.ts). It maps IWorld
 // state plus the committed zone to a flat geometry model in canvas-pixel space:
 // the background blit rect, the zoomed-detail overlay, and every label / portal /
-// npc glyph / player arrow / ally dot already projected to (mx, my). No DOM, no
+// npc glyph / player arrow / ally dot / party dot already projected to (mx, my). No DOM, no
 // Three, no 2D context, no i18n, no color: the painter owns the context and
 // resolves the --color-map-* tokens + the localized label text. The delve branch
 // of the map is owned by delve_map_painter.ts; this core models only the
@@ -192,6 +192,18 @@ export interface MapAllyMarker {
   kind: 'friend' | 'guild';
 }
 
+/** A party member dot (issue 2652): identity only, the class color and the
+ *  dead-state token are resolved by the painter, matching this file's stated
+ *  convention for every other marker. Works offline and online (both worlds
+ *  populate `partyInfo.members[].x/z/cls/dead` identically). */
+export interface MapPartyMarker {
+  mx: number;
+  my: number;
+  name: string;
+  cls: string;
+  dead: boolean;
+}
+
 /** A vegetation dot in the detail overlay (rock vs pine/oak foliage). */
 export interface MapDecorationMarker {
   mx: number;
@@ -270,6 +282,9 @@ export interface OverworldMapModel {
   questAreas: MapQuestAreaMarker[];
   player: MapPlayerMarker | null;
   allies: MapAllyMarker[];
+  /** Party members other than self, live world position (issue 2652). Empty
+   *  solo or with no party formed. */
+  party: MapPartyMarker[];
   /** The zoomed-detail overlay, or null below MAP_DETAIL_ZOOM. */
   detail: MapDetail | null;
   /** Canvas-space "Show on Map" highlight, or null when absent / out of view. */
@@ -450,9 +465,31 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     player = { mx, my, angle: -p.facing };
   }
 
+  // Party members (issue 2652): the minimap's already-consumed
+  // partyInfo.members, projected the same way as every other in-zone marker.
+  // Self is excluded (the player already has its own arrow); gated on `labels`
+  // like the ally dots above, since a party marker also carries a name label.
+  // Built before the ally loop so `partyNames` can gate it (see below).
+  const party: MapPartyMarker[] = [];
+  const partyNames = new Set<string>();
+  const partyInfo = world.partyInfo;
+  if (labels && partyInfo) {
+    for (const m of partyInfo.members) {
+      if (m.pid === p.id) continue;
+      partyNames.add(m.name);
+      if (!inZone(m.x, m.z) || !inView(m.x, m.z)) continue;
+      const { mx, my } = toMap(m.x, m.z);
+      party.push({ mx, my, name: m.name, cls: m.cls, dead: m.dead !== 0 });
+    }
+  }
+
   // Friends (green) and guild members (blue), plotted from the live positions the
   // server streams for online allies. socialInfo is null offline, so this is
-  // online-only; friends are plotted first and win ties (dedup by id).
+  // online-only; friends are plotted first and win ties (dedup by id). A friend
+  // or guildmate who is also a party member is skipped here: the party loop
+  // above already draws them with their class color, matching how
+  // minimap_markers.ts excludes partyPids from its entity loop to avoid the
+  // same double dot.
   const allies: MapAllyMarker[] = [];
   const social = world.socialInfo;
   if (labels && social) {
@@ -464,7 +501,8 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
         m.x === undefined ||
         m.z === undefined ||
         m.name === selfName ||
-        drawn.has(m.id)
+        drawn.has(m.id) ||
+        partyNames.has(m.name)
       )
         return;
       if (!inZone(m.x, m.z) || !inView(m.x, m.z)) return;
@@ -487,6 +525,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     questAreas,
     player,
     allies,
+    party,
     detail,
     ping,
   };

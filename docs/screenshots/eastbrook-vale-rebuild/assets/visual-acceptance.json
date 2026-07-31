@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "method": "img2threejs visual gate adapted to a coordinated multi-asset town kit",
-  "reviewedAt": "2026-07-23",
+  "reviewedAt": "2026-07-25",
   "policy": {
     "authority": "agent-vision-review",
     "globalThreshold": 0.7,
@@ -30,7 +30,7 @@
     "shippingDimensions": [512, 512],
     "shippingSha256": "d66f2fab603aa83e6c73c6fc4bdde2d545a6d8c1a0d4a58d42a3fb227e5a3f9b",
     "shippingBytes": 141666,
-    "atlasFingerprint": "6427821b76f9f45878dd6c1616be49264d5cd66a7c4ed61606c23b31df21d224",
+    "atlasFingerprint": "62f614037b5e1d52c41ef050d15f2906b49c0d3fa4cb2ae7c798711154e7fe19",
     "grid": {
       "columns": 4,
       "rows": 4,
@@ -91,39 +91,43 @@
     {
       "id": "bank",
       "decision": "accept",
-      "globalScore": 0.79,
+      "globalScore": 0.93,
       "comparisonImage": "bank-comparison.png",
       "auditImage": "bank-optimized-audit-contact.png",
       "layerScores": {
-        "silhouette-proportion": 0.82,
-        "geometry-depth": 0.78,
-        "color-material": 0.83,
-        "service-readability": 0.76
+        "silhouette-proportion": 0.91,
+        "geometry-depth": 0.94,
+        "color-material": 0.92,
+        "service-readability": 0.93
       },
       "criticalFeatures": [
         {
           "id": "cobalt-gable-and-entry-canopy",
-          "score": 0.82,
+          "score": 0.92,
           "threshold": 0.7,
           "visible": true,
-          "notes": "The steep cobalt roof, sheltered arch, and heavy gable frame read in front and three-quarter views."
+          "notes": "The steep cobalt roof, open roof courses, sheltered arch, and timber gables read cleanly without side-view spikes."
         },
         {
-          "id": "arched-teller-window",
-          "score": 0.8,
+          "id": "aligned-entry-and-teller-window",
+          "score": 0.95,
           "threshold": 0.7,
           "visible": true,
-          "notes": "The recessed triple-arched illuminated counter is the dominant front service cue."
+          "notes": "The arched entrance remains unobstructed and the recessed illuminated teller counter is centered on its awning, posts, and socket."
         },
         {
-          "id": "vault-and-banner-service-cues",
-          "score": 0.74,
+          "id": "empty-vault-alcove-and-banner-service-cues",
+          "score": 0.93,
           "threshold": 0.7,
           "visible": true,
-          "notes": "The side vault shelter and blue banner are clear across the side and rear-three-quarter evidence."
+          "notes": "The empty secure alcove, gold lock cue, and blue banner are clear. The decorative runtime banker chest remains a separate sibling and is not duplicated in the GLB."
         }
       ],
-      "intentionalOmissions": ["fine masonry seams", "individual metal fasteners"]
+      "intentionalOmissions": [
+        "fine masonry seams",
+        "individual metal fasteners",
+        "baked vault chest because the runtime banker chest remains separate"
+      ]
     },
     {
       "id": "smithy",

@@ -88,6 +88,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.refreshKeybindLabels|',
   'this.updateQuestTracker|',
   'this.delveTracker.relocalize|',
+  'this.riftTracker.relocalize|',
   'this.partyFramesPainter.relocalize|',
   'this.mapPainter.relocalize|',
   'this.targetFrameMover.relocalize|',
@@ -259,6 +260,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastIntroHintVisible'],
     answer: 'this.questDialog.relocalize',
     why: 'the profession intro hint visibility latch',
+  },
+  {
+    file: 'hud/rift/rift_floor_tracker_controller.ts',
+    memos: ['lastSignature'],
+    answer: 'this.riftTracker.relocalize',
+    why: 'the floor index, floor count and whole-second countdown, all numbers, so the Floor and Closes in lines never move with the locale (#2655)',
   },
   {
     file: 'mailbox_window.ts',

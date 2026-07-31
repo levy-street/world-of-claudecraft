@@ -279,16 +279,27 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
 });
 
 describe('options_window: viewport resync on open (PR #1118)', () => {
-  it('calls syncAppViewport() before the panel flips to display: block', () => {
+  it('calls syncAppViewport() before render() flips the panel visible', () => {
+    // render() is the one place that flips `display` (issue 2569: Performance
+    // needs `flex` for its scroll wrapper, every other sub-view stays `block`),
+    // so the ordering guarantee is now "syncAppViewport() runs before toggle()
+    // hands off to render()", not a literal display-assignment string in toggle().
     expect(painter).toContain("import { syncAppViewport } from '../game/app_viewport'");
     const toggle = painter.slice(painter.indexOf('toggle(): void {'));
     const toggleEnd = toggle.indexOf('\n  }\n');
     const body = toggle.slice(0, toggleEnd);
     const syncIdx = body.indexOf('syncAppViewport()');
-    const displayIdx = body.indexOf("root().style.display = 'block'");
+    const renderIdx = body.indexOf('this.render()');
     expect(syncIdx).toBeGreaterThan(-1);
-    expect(displayIdx).toBeGreaterThan(-1);
-    expect(syncIdx).toBeLessThan(displayIdx);
+    expect(renderIdx).toBeGreaterThan(-1);
+    expect(syncIdx).toBeLessThan(renderIdx);
+
+    const render = painter.slice(painter.indexOf('private render(): void {'));
+    const renderEnd = render.indexOf('\n  }\n');
+    const renderBody = render.slice(0, renderEnd);
+    expect(renderBody).toContain(
+      "el.style.display = this.view === 'performance' ? 'flex' : 'block'",
+    );
   });
 });
 

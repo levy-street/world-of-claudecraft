@@ -2166,7 +2166,13 @@ function deriveEmissive(mat: THREE.MeshStandardMaterial, e: WeaponVfxEmissiveSpe
   mat.metalnessMap = null;
   mat.roughnessMap = null;
   const img = mat.map?.image as HTMLImageElement | HTMLCanvasElement | ImageBitmap | undefined;
-  if (!img?.width) {
+  // A compressed (KTX2) map has a truthy image {width,height} but is not
+  // drawable into a canvas, so it must take the flat-tint fallback. Skin
+  // models with a WEAPON_VFX rig deliberately ship webp for this derivation
+  // (scripts/assets/compress_glb_textures.mjs excludes them); this guard keeps
+  // a future mistakenly-compressed skin subtle instead of throwing mid-frame.
+  const drawable = !(mat.map as { isCompressedTexture?: boolean } | null)?.isCompressedTexture;
+  if (!img?.width || !drawable) {
     mat.emissive = new THREE.Color(e.tint);
     mat.emissiveIntensity = 0.3;
     return { prev, tex: null, albedoTex: null };

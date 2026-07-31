@@ -231,14 +231,21 @@ exempt from the procedural rank-mechanic budget so the citadel identity is never
 A scheduler opens ranked portals automatically. Tuning is `RIFT_TIER_INFO` plus the
 `RIFT_PORTAL_*` constants at the top of the module.
 
-- **Cadence.** First portal ~2 min after boot (so a fresh realm is not empty),
-  then one roughly every `RIFT_PORTAL_INTERVAL` (~3 hours of sim time, which is
-  real time on the 20 Hz live server); at most `RIFT_PORTAL_MAX_OPEN` (3) open
-  world-wide. Enabled by `SimConfig.riftPortals` (on for the live server and the
-  offline client; OFF by default so tests / parity / the RL env stay portal-free).
-- **Determinism.** Each spawn rolls zone, rank, position and rift seed from a
+- **Cadence.** The first population fills ~2 min after boot
+  (`RIFT_PORTAL_FIRST_AT`). Past that, each ELIGIBLE ZONE keeps its own hourly
+  respawn boundary (`RIFT_PORTAL_ZONE_CYCLE`, 1 h), anchored on that zone's own
+  last opening: at a boundary the zone gets a new rift UNLESS its current one is
+  still open, in which case that boundary is skipped and the zone is re-judged
+  at the next one (`riftZoneNextOpenAt`, derived purely from the zone's own
+  event history: no per-zone persisted field, no schema change). The scheduler
+  still spawns at most one portal per pass even when several zones are due at
+  once. Enabled by `SimConfig.riftPortals` (on for the live server and the
+  offline client; OFF by default so tests / parity / the RL env stay
+  portal-free).
+- **Determinism.** Each spawn rolls rank, position and rift seed from a
   DEDICATED `Rng` derived from `(worldSeed, spawnOrdinal)`, never the shared
-  stream, so adding the scheduler shifts no existing draw order.
+  stream, so adding the scheduler shifts no existing draw order. Which zones are
+  due is itself rng-free: pure arithmetic over each zone's own event history.
 - **Zone to rank pool** (`riftTierForZone`): eligible regions are The Amberfall,
   The Drakelands, The Evergarden, The Farshore, The Frostveil Reach, The
   Galecrest, The Nightbloom, The Palmreach, The Veiled Hollow, The Willowfen,
@@ -246,23 +253,29 @@ A scheduler opens ranked portals automatically. Tuning is `RIFT_TIER_INFO` plus 
   generated dungeon's `baseLevel` (C=20 up to S=28, so B+ runs above the level
   cap) and the reward.
 - **Lifecycle:** a portal ANNOUNCES world-visibly on open, stays until its rift's
-  final boss dies (SEALED) or `RIFT_PORTAL_LIFETIME` (1 h) passes uncleared
-  (COLLAPSED), each with its own world announcement.
+  final boss dies (SEALED) or `RIFT_PORTAL_LIFETIME` (2 h) passes uncleared
+  (COLLAPSED), each with its own world announcement. The close time feeding the
+  zone's hourly schedule is read straight off the event record: the first-clear
+  timestamp for a sealed rift, `expiresAt` itself for a collapsed one.
 - **Rewards.** Rifts pay NO Heroic Marks at any rank (maintainer decision: marks
   stay a heroic dungeon/raid currency). The clear prize is the rank-gated gear
   ladder on the boss corpse (C a guaranteed themed rare + coin; B/A/S the epic
   ladder up to the S legendary), the natural-first-clear personal rings, essence
   and gems, the mount rolls, and the rank coin bonus. Dev-portal runs (tier
-  null) still pay the gear ladder but no first-clear extras.
-- **Public test profile.** `COMMUNITY_TEST_RIFTS=1` is a validated, default-off
-  server flag. After persisted state loads, the server preserves open events, fills
-  to eight distinct active eligible regions, and saves the result before accepting
-  players. A transitional population can exceed eight portals when restored events
-  overlap in one region; those valid events drain normally.
-  A missing portal is replaced after 60 seconds, community portals last six hours,
-  and the instance pool grows from eight to 24 concurrent groups. Persistence load
-  or initial save failure aborts boot in this mode so an unknown saved state is
-  never overwritten. Normal scheduling and capacity remain unchanged when off.
+  null) still pay the gear ladder but no first-clear extras. A race LOSER pays
+  nothing at completion (egress only, no gear ladder, no sealed cache): losers
+  keep only what dropped off the mobs during the run.
+- **Population policy (all realms).** A zone only receives a new rift at an
+  hourly boundary once its current one has CLOSED. A rift that closes at 1:30
+  (measured from its own opening) respawns at the 2:00 mark; one that closes at
+  0:45 respawns at 1:00; one that is never cleared collapses at
+  `RIFT_PORTAL_LIFETIME` (2 h), which, being an exact multiple of the cycle, is
+  itself a boundary, so the replacement spawns immediately. A first-cleared
+  (sealed) zone can never be immediately refarmed. The cadence derives from the
+  persisted event history (latest event per zone: its opening plus its close),
+  so restarts preserve it without extra saved state. The former
+  `COMMUNITY_TEST_RIFTS` public-test flag is gone: this is the one policy on
+  every host.
 
 ## Client sync + render
 
@@ -338,3 +351,9 @@ LETTER is a game glyph (like item-quality colour), not translated.
   you can climb a staircase to a raised tier, but not walk UNDER it. This is the only
   form the shared `groundHeight`/2D-collision model allows; true stacked geometry
   would need a second collision layer across all three hosts and is out of scope.
+- `trimEventHistory` keeps the most recent `RIFT_EVENT_HISTORY_LIMIT` (64)
+  completed events across ALL zones combined, not per zone. A quiet zone's
+  latest event can in principle be trimmed away by busier zones elsewhere,
+  after which that zone's schedule reads as "no history" and it becomes due
+  immediately rather than waiting out its real boundary. Harmless at today's
+  cadence and zone count, but the schedule is silently coupled to this limit.

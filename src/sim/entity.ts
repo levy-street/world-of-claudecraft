@@ -161,6 +161,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     warcryTimer: 0,
     firedSummons: 0,
     summonedIds: [],
+    summonedAdd: false,
     enraged: false,
     healedThisPull: false,
     threat: new Map(),

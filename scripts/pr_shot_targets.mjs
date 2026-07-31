@@ -3175,7 +3175,7 @@ export const TARGETS = [
   {
     key: 'perf-overlay-ornament',
     label: 'Performance Overlay window: gilded ornament pilot',
-    when: ['ui/perf_ornament_svg'],
+    when: ['ui/perf_ornament_svg', 'ui/perf_overlay_settings'],
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
       // The first-spawn "Choose Your Camera" prompt can still be up (or
@@ -3204,7 +3204,20 @@ export const TARGETS = [
         perfBtn?.click();
       });
       const wide = await pollForSize(page, '#options-menu.perf-wide');
-      return wide ? { clip: '#options-menu' } : {};
+      if (!wide) return {};
+      // Scroll the panel body all the way down: issue #2569 (the ornament
+      // scrolling with the content) only shows up once the panel has
+      // actually scrolled. Try the post-fix `.perf-scroll` wrapper first and
+      // fall back to the pre-fix scrolling host itself, so this one capture
+      // works for both a before and an after shot.
+      await page.evaluate(() => {
+        const scrollHost =
+          document.querySelector('#options-menu.perf-wide .perf-scroll') ??
+          document.querySelector('#options-menu.perf-wide');
+        if (scrollHost) scrollHost.scrollTop = scrollHost.scrollHeight;
+      });
+      await wait(150);
+      return { clip: '#options-menu' };
     },
   },
   {

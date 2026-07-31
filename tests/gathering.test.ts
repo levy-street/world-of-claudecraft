@@ -261,12 +261,15 @@ describe('isHarvestableCorpse', () => {
     // The complement is asserted too, so an always-false predicate could not
     // pass the row above by making the sweep vacuous.
     const included = Object.entries(MOBS).filter(([, m]) => isHarvestableCorpse(m.componentTags));
-    expect(included).toHaveLength(21);
-    // ...and the untagged templates are counted rather than assumed: 199 of them
+    // 36 since the farm-economy pass: beast, spider and reptile trash pays in
+    // harvestable components instead of coin, so 15 previously untagged
+    // templates gained mapped tags (tests/economy_yield.test.ts enforces it).
+    expect(included).toHaveLength(36);
+    // ...and the untagged templates are counted rather than assumed: 184 of them
     // ship, all excluded before this change and all excluded after it, which is
     // the path fen_troll now joins instead of getting one of its own.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(199);
+    expect(untagged).toHaveLength(184);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

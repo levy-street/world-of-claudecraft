@@ -403,11 +403,20 @@ export class CharacterVisual {
       this.casters.push(mesh);
     });
 
-    // far LOD + shadow proxy share the baked idle-pose geometry per key
+    // far LOD + shadow proxy share the baked idle-pose geometry per key. Skin
+    // aware from the start (see applySkinMaterials): a character that spawns
+    // already wearing a non-default skin must not LOD out to the embedded one.
     if (prep.idleGeo) {
       this.farMesh = new THREE.Mesh(
         prep.idleGeo,
-        tintedFarMaterials(prep.def, entityColor, prep.idleSrcMats),
+        tintedFarMaterials(
+          prep.def,
+          entityColor,
+          prep.idleSrcMats,
+          prep.idleSrcIsBody,
+          skinTexture(key, skinIndex),
+          skinEmissiveTexture(key, skinIndex),
+        ),
       );
       this.farMaterials = this.farMesh.material;
       this.farMesh.visible = false;
@@ -440,6 +449,21 @@ export class CharacterVisual {
     if (idle) {
       idle.play();
       this.current = idle;
+    }
+
+    // The atlas for a non-default skin may not be resident at construction: the
+    // packaged iOS shell defers the boot atlas sweep (assets.ts), so a visual
+    // born with a cosmetic skin applies the embedded default above and heals
+    // here once the atlas arrives - the same ensure + re-apply round-trip
+    // setSkin() already runs for live swaps. No-op when the atlas is resident
+    // (ensureSkinTexture returns null), so eager platforms are unchanged.
+    const pendingAtlas = ensureSkinTexture(this.key, skinIndex);
+    if (pendingAtlas) {
+      void pendingAtlas
+        .then(() => {
+          if (!this.disposed && this.skinIndex === skinIndex) this.applySkinMaterials(skinIndex);
+        })
+        .catch((err) => console.error('failed to load skin atlas:', err));
     }
   }
 
@@ -1024,6 +1048,20 @@ export class CharacterVisual {
         mesh.name === 'class_halo' ? (this.haloBaseMaterial ?? mesh.material) : mesh.material;
       this.originalMaterials.set(mesh, original);
     });
+    // The far LOD mesh is a separate baked geometry (see the constructor):
+    // it needs its own skin-aware material rebuild or a distant player LOD
+    // pop reverts to the model's embedded default skin.
+    if (this.farMesh) {
+      const prep = prepareVisual(this.key);
+      this.farMaterials = tintedFarMaterials(
+        this.def,
+        this.entityColor,
+        prep.idleSrcMats,
+        prep.idleSrcIsBody,
+        skinTexture(this.key, skinIndex),
+        skinEmissiveTexture(this.key, skinIndex),
+      );
+    }
     this.applyVisualMaterials();
   }
 

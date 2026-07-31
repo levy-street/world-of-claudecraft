@@ -107,6 +107,7 @@ const MAP_COLOR_TOKENS = {
   player: '--color-map-player',
   allyFriend: '--color-map-ally-friend',
   allyGuild: '--color-map-ally-guild',
+  partyDead: '--color-map-party-dead',
   rock: '--color-map-rock',
   tree: '--color-map-tree',
   oak: '--color-map-oak',
@@ -167,6 +168,11 @@ export class MapWindowPainter {
   // it) so the sprites survive across redraws; it trims itself back to its
   // budget at each redraw boundary.
   private readonly labels = new TextSpriteCache();
+
+  /** classColor resolves a party member's class to its display color (issue
+   *  2652), the same resolver Hud already threads into MinimapPainter /
+   *  DelveMapPainter. */
+  constructor(private readonly classColor: (cls: string) => string) {}
 
   /** Drop the cached label sprites on a language switch: every label re-resolves
    *  to a new string, so the old rasters can never be reused and would only sit
@@ -414,6 +420,29 @@ export class MapWindowPainter {
           ally.my - ALLY_NAME_OFFSET_Y,
           friend ? friendName : guildName,
         );
+      }
+    }
+
+    // Party members (issue 2652): the same dot + name-label family as the
+    // online allies above, class-colored (or the dead token for a fallen
+    // member) instead of friend/guild, so they read as visually distinct from
+    // both the ally dots and the white player arrow.
+    if (model.party.length > 0) {
+      ctx.lineWidth = LABEL_LINE_WIDTH;
+      ctx.strokeStyle = colors.outline;
+      for (const member of model.party) {
+        const color = member.dead ? colors.partyDead : this.classColor(member.cls);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(member.mx, member.my, ALLY_DOT_RADIUS, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        this.labels.draw(ctx, member.name, member.mx, member.my - ALLY_NAME_OFFSET_Y, {
+          font: ALLY_FONT,
+          fill: color,
+          stroke: colors.outline,
+          lineWidth: LABEL_LINE_WIDTH,
+        });
       }
     }
   }

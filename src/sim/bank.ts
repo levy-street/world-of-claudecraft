@@ -80,10 +80,13 @@ export interface MoveResult {
  *    mergeable dest stack with room and otherwise land in a fresh deep-cloned
  *    dest slot (countFit/addStacked carry the payload), refusing 'no_fit' only
  *    when the whole count cannot land.
- *  - A fungible slot reuses the bags.ts stacking rules (countFit/addStacked): the
- *    move fits only when every requested copy fits, then tops up dest stacks and
- *    appends fresh ones. A partial count decrements the source; a whole-stack move
- *    splices the source entry out. */
+ *  - A fungible slot reuses the bags.ts stacking rules (countFit/addStacked),
+ *    threading slot.craftedRecipeId through both calls so a plain crafted stack
+ *    (InvSlot.craftedRecipeId, no `instance`) keeps its provenance marker and
+ *    only merges with a same-recipe dest stack: the move fits only when every
+ *    requested copy fits, then tops up dest stacks and appends fresh ones. A
+ *    partial count decrements the source; a whole-stack move splices the
+ *    source entry out. */
 export function moveBetweenContainers(
   source: InvSlot[],
   sourceIndex: number,
@@ -110,10 +113,10 @@ export function moveBetweenContainers(
 
   const want = count === undefined ? slot.count : Math.floor(count);
   if (!(want > 0) || want > slot.count) return { moved: 0, refusal: 'invalid' };
-  if (countFit(dest, destCapacity, slot.itemId, want) < want) {
+  if (countFit(dest, destCapacity, slot.itemId, want, undefined, slot.craftedRecipeId) < want) {
     return { moved: 0, refusal: 'no_fit' };
   }
-  addStacked(dest, slot.itemId, want);
+  addStacked(dest, slot.itemId, want, undefined, slot.craftedRecipeId);
   if (want >= slot.count) source.splice(sourceIndex, 1);
   else slot.count -= want;
   return { moved: want };
@@ -299,9 +302,18 @@ export function sanitizeBankState(raw: unknown): BankState {
   if (Array.isArray(r.inventory)) {
     for (const entry of r.inventory) {
       if (!entry || typeof entry !== 'object') continue;
-      const e = entry as { itemId?: unknown; count?: unknown; instance?: unknown };
+      const e = entry as {
+        itemId?: unknown;
+        count?: unknown;
+        instance?: unknown;
+        craftedRecipeId?: unknown;
+      };
       if (typeof e.itemId !== 'string' || e.itemId === '') continue;
       const hasInstance = !!e.instance && typeof e.instance === 'object';
+      const craftedRecipeId =
+        typeof e.craftedRecipeId === 'string' && e.craftedRecipeId !== ''
+          ? e.craftedRecipeId
+          : undefined;
       // The shared tamper ceiling (bags.ts instancedCountCap, also applied to
       // the carried-inventory hydration in Sim.addPlayer): merge-legal stack
       // cap for a counted instanced slot, 1 for a charge-bearing payload, and
@@ -314,6 +326,7 @@ export function sanitizeBankState(raw: unknown): BankState {
       const slot: InvSlot = hasInstance
         ? { itemId: e.itemId, count, instance: e.instance as InvSlot['instance'] }
         : { itemId: e.itemId, count };
+      if (craftedRecipeId !== undefined) slot.craftedRecipeId = craftedRecipeId;
       inventory.push(cloneInvSlot(slot));
     }
   }

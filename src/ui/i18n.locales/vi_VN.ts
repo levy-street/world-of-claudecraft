@@ -2209,6 +2209,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Lá thư đó không còn trong hòm thư của bạn.',
   'hudChrome.mailbox.result.needRecipient': 'Hãy ghi tên người nhận cho lá thư của bạn.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Bạn không thể gửi vật phẩm nhiệm vụ qua thư.',
+  'hudChrome.mailbox.result.noMailBound': 'Vật phẩm đó đã bị ràng buộc và không thể gửi qua thư.',
   'hudChrome.mailbox.result.noRecipient': 'Không ai mang tên đó có hòm thư ở đây.',
   'hudChrome.mailbox.result.notEnoughItems': 'Bạn không có đủ số lượng đó để gửi.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Hòm thư của người nhận đã đầy.',
@@ -4529,7 +4530,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Ngư Dân Bram được đưa về Gullhaven an toàn',
   'entities.quests.q_fs_bram_come_home.text':
-    'Bram của tôi đã đưa thuyền ra khơi vào sáng hôm vết rạn ở khu lưới mở ra, và biển đã ném anh ấy trở lại đâu đó qua khỏi mũi Bến Tàu. Tôi nghe thấy anh ấy ba đêm trước, {playerName}, gọi vọng qua mặt nước, và tôi đã quá sợ hãi để đi. Tôi vẫn còn quá sợ hãi. Làm ơn. Thuyền của anh ấy đang đắm trên bờ bắc. Hãy dẫn anh ấy về nhà cho tôi.',
+    'Bram của tôi đã đưa thuyền ra khơi vào sáng hôm vết rạn ở khu lưới mở ra, và biển đã ném anh ấy trở lại đâu đó qua khỏi mũi Bến Tàu. Tôi nghe thấy anh ấy ba đêm trước, {playerName}, gọi vọng qua mặt nước, và tôi đã quá sợ hãi để đi. Tôi vẫn còn quá sợ hãi. Làm ơn. Thuyền của anh ấy đang đắm trên bờ nam. Hãy dẫn anh ấy về nhà cho tôi.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Trở Về Nhà',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Bớt đi mười kẻ, và những người làm ruộng đã bắt đầu tranh cãi xem ai sẽ ra ngoài trước. Việc này sẽ không kéo dài, những vết rạn chẳng bao giờ nghỉ ngơi lâu, nhưng một thị trấn có cái ăn là một thị trấn trụ vững.',
@@ -4617,7 +4618,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Học Việc Wren được đưa an toàn đến Bậc Thang Cực Quang',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Học việc Wren của ta đã ra đi dọc theo tuyến Goldmelt hai ngày trước và không bao giờ trở lại. Ta đã tìm thấy dấu chân cô bé, cô bé đang trốn dưới những cột mốc đường tây nam Bậc Thang Cực Quang, quá sợ đàn sói để di chuyển. Ta không thể rời khỏi đầm lầy này, {playerName}. Hãy dẫn cô bé đến trại của Veyla trên Bậc Thang. Cô bé sẽ an toàn dưới ánh sáng.',
+    'Học việc Wren của ta đã ra đi dọc theo tuyến Goldmelt hai ngày trước và không bao giờ trở lại. Ta đã tìm thấy dấu chân cô bé, cô bé đang trốn dưới những cột mốc đường đông bắc Bậc Thang Cực Quang, quá sợ đàn sói để di chuyển. Ta không thể rời khỏi đầm lầy này, {playerName}. Hãy dẫn cô bé đến trại của Veyla trên Bậc Thang. Cô bé sẽ an toàn dưới ánh sáng.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Đưa Wren Về Nhà',
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve cử bạn đến sao? Ha. Mười một năm rồi mà bà ấy vẫn nghĩ đầm lầy sẽ nuốt chửng ta. Chà... năm nay có lẽ bà ấy đúng. Nhìn xem nó đã làm gì với các tuyến bẫy của ta.',
@@ -5792,12 +5793,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Những kẻ xâm lược đến từ bên kia các vết rạn, toàn thân là lửa và ác ý. Nơi nào có một kẻ trong chúng đứng, nơi đó không bao giờ cách xa một vết rạn.',
   'guide.family.demon.name': 'Ác Ma',
-  'guide.family.kobold.desc':
-    'Những kẻ nhặt nhạnh lăng xăng và tinh linh của bãi cỏ, bờ giậu, phiền toái nhiều hơn là nguy hiểm, cho đến khi chúng tụ tập đông đảo.',
-  'guide.family.kobold.name': 'Tiểu Yêu',
-  'guide.family.murloc.desc':
-    'Giống người cá biết kêu ộp oạp sống ở bờ hồ và vũng nước triều, nhanh chóng vây lấy bất cứ thứ gì lội đến quá gần.',
-  'guide.family.murloc.name': 'Vây Ộp Oạp',
   'guide.faqPage.a1':
     'Đúng vậy. Cả trò chơi đều miễn phí chơi đến cấp tối đa, và mã nguồn được mở trên GitHub.',
   'guide.faqPage.a10':
@@ -6650,9 +6645,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetTooFar': 'Mục tiêu ở quá xa.',
   'hud.errors.tooClose': 'Quá gần!',
   'hud.errors.tradeBound': 'Vật phẩm đó đã bị ràng buộc và không thể giao dịch.',
+  'hud.errors.marketListBound': 'Vật phẩm đó đã bị ràng buộc và không thể rao bán.',
   'hud.errors.tradeExpired': 'Yêu cầu giao dịch đã hết hạn.',
   'hud.errors.tradeFailed': 'Giao dịch thất bại: vật phẩm hoặc tiền không còn khả dụng.',
   'hud.errors.tradeInProgress': 'Một giao dịch đang diễn ra.',
+  'hud.errors.tradeAlreadyTrading': 'Người chơi đó đang giao dịch.',
   'hud.errors.tradeTooFar': 'Mục tiêu ở quá xa để giao dịch.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Lệnh không xác định: {command}. Hãy thử /s /y /w /p /g.',
@@ -7817,6 +7814,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Nhiệm vụ đó chưa hoàn thành.',
   'questUi.errors.notInLog': 'Nhiệm vụ đó không có trong nhật ký của bạn.',
   'questUi.errors.tooFar': 'Quá xa.',
+  'questUi.errors.escortAway': 'Người bạn cần hộ tống hiện không có ở đó. Họ sẽ trở lại sớm.',
   'questUi.errors.turnInMissing': 'Nơi nộp nhiệm vụ không ở gần đây.',
   'questUi.errors.unavailable': 'Nhiệm vụ đó không khả dụng.',
   'questUi.log.abandon': 'Từ Bỏ Nhiệm Vụ',
@@ -8745,6 +8743,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Liên kết đặt lại này không hợp lệ hoặc đã hết hạn. Hãy yêu cầu liên kết mới.',
   'apiError.deeds.invalid_input': 'Dữ liệu nhập không hợp lệ.',
+  'apiError.ota_updates.invalid_input': 'Dữ liệu nhập không hợp lệ.',
   'apiError.steam.account_taken': 'Tài khoản Steam đó đã được liên kết với một tài khoản khác.',
   'apiError.steam.already_linked': 'Tài khoản của bạn đã liên kết với một tài khoản Steam.',
   'apiError.steam.banned': 'Không thể liên kết tài khoản Steam đó.',
@@ -10760,11 +10759,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên để đưa bạn đến một vị trí an toàn gần đó có thể tiếp cận được.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên, sau đó đưa linh hồn của bạn đến nghĩa trang gần nhất. Quay lại qua Người Giữ Nhợt Nhạt yêu cầu Phí Tổn Của Người Giữ.',
+  'hudChrome.unstuck.helpUnstuckSickness': 'Cứu hộ: /unstuck bắt đầu đếm ngược khi đứng yên, sau đó đưa bạn đến nghĩa trang gần nhất và hồi sinh bạn nếu bạn đã ngã xuống. Hội Chứng Thoát Kẹt sẽ đè nặng lên bạn tối đa 5 phút.',
   'hudChrome.unstuck.menuButton': 'Thoát Kẹt',
+  'hudChrome.unstuck.movedToGraveyard': 'Bạn đã được đưa đến nghĩa trang gần nhất. Hội Chứng Thoát Kẹt đang đè nặng lên bạn.',
   'hudChrome.unstuck.noSafePosition':
     'Không tìm thấy vị trí an toàn nào có thể tiếp cận gần đó. Bạn đã không được di chuyển.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Bạn đã được đưa về nghĩa trang gần nhất và hồi sinh. Phí Tổn Của Người Giữ đang đè nặng lên bạn.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck': 'Bạn đã được đưa đến nghĩa trang gần nhất và hồi sinh. Hội Chứng Thoát Kẹt đang đè nặng lên bạn.',
   'hudChrome.unstuck.standStill': 'Đứng yên trên mặt đất vững chắc trước khi sử dụng Thoát Kẹt.',
   'hudChrome.unstuck.standStillAnywhere': 'Đứng yên trước khi sử dụng Thoát Kẹt.',
   'hudChrome.unstuck.started':
@@ -10824,4 +10826,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'sim.rift.socketsShut': 'Các hốc khóa kèn kẹt đóng lại. Con đường lay động.',
   'sim.rift.stepBack': 'Bạn bước lùi qua Rạn Nứt.',
   'sim.rift.wayDownOpens': 'Lối đi xuống xé toạc mở ra.',
+  'hudChrome.riftTracker.title': 'Rạn Nứt',
+  'hudChrome.riftTracker.floor': 'Tầng {current}/{total}',
+  'hudChrome.riftTracker.closesIn': 'Đóng sau {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

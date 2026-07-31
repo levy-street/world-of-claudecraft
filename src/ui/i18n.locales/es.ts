@@ -1980,6 +1980,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Esa carta ya no está en tu buzón.',
   'hudChrome.mailbox.result.needRecipient': 'Indica un destinatario para tu carta.',
   'hudChrome.mailbox.result.noMailQuestItems': 'No puedes enviar objetos de misión por correo.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Ese objeto está vinculado y no puede enviarse por correo.',
   'hudChrome.mailbox.result.noRecipient': 'Nadie con ese nombre tiene buzón aquí.',
   'hudChrome.mailbox.result.notEnoughItems': 'No tienes tantos para enviar.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Su buzón está lleno.',
@@ -3261,9 +3263,11 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': 'Termina tu comercio antes de entrar en cola.',
   'hud.errors.arenaQueueInstance': 'No puedes entrar en cola desde una instancia.',
   'hud.errors.tradeInProgress': 'Ya hay un comercio en curso.',
+  'hud.errors.tradeAlreadyTrading': 'Ese jugador ya está comerciando.',
   'hud.errors.tradeTooFar': 'El objetivo está demasiado lejos para comerciar.',
   'hud.errors.tradeExpired': 'La solicitud de comercio ha expirado.',
   'hud.errors.tradeBound': 'Ese objeto está vinculado y no puede comerciarse.',
+  'hud.errors.marketListBound': 'Ese objeto está vinculado y no puede ponerse a la venta.',
   'hud.errors.tradeFailed': 'Comercio fallido: los objetos o el dinero ya no están disponibles.',
   'hud.logs.standUp': 'Te pones de pie.',
   'hud.logs.partyInviteSent': 'Has invitado a {name} a tu grupo.',
@@ -3546,6 +3550,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'El dador de esa misión no está cerca.',
   'questUi.errors.turnInMissing': 'La entrega de esa misión no está cerca.',
   'questUi.errors.tooFar': 'Está demasiado lejos.',
+  'questUi.errors.escortAway':
+    'Tu escolta no está en su puesto ahora mismo. Volverá allí en breve.',
   'itemUi.money.goldShort': 'o',
   'itemUi.money.silverShort': 'p',
   'itemUi.money.copperShort': 'c',
@@ -6063,12 +6069,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.name': 'Demonios',
   'guide.family.demon.desc':
     'Invasores de más allá de las brechas, todo fuego y rencor. Donde uno se planta, una brecha nunca está lejos.',
-  'guide.family.kobold.name': 'Bribones',
-  'guide.family.kobold.desc':
-    'Carroñeros correteantes y duendes de claros y setos, más molestia que amenaza hasta que se juntan en número.',
-  'guide.family.murloc.name': 'Aletacroantes',
-  'guide.family.murloc.desc':
-    'Gente-pez croante de orillas de lago y charcas de marea, rápidos para enjambrarse sobre cualquiera que vadee demasiado cerca.',
   'guide.faqPage.a1':
     'Sí. El juego completo es gratuito hasta el nivel máximo, y el código fuente es abierto en GitHub.',
   'guide.faqPage.a2':
@@ -8206,6 +8206,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Este enlace de restablecimiento no es válido o ha caducado. Solicita uno nuevo.',
   'apiError.deeds.invalid_input': 'Entrada no válida.',
+  'apiError.ota_updates.invalid_input': 'Entrada no válida.',
   'apiError.steam.account_taken': 'Esa cuenta de Steam ya está vinculada a otra cuenta.',
   'apiError.steam.already_linked': 'Tu cuenta ya tiene una cuenta de Steam vinculada.',
   'apiError.steam.banned': 'Esa cuenta de Steam no se puede vincular.',
@@ -8528,7 +8529,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': 'Informa al Guardián Coalfast',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Vuelve a Casa',
   'entities.quests.q_fs_bram_come_home.text':
-    'Mi Bram sacó el bote la mañana en que se abrió la brecha de las redes, y el mar lo devolvió en algún lugar pasado el Embarcadero. Lo oí hace tres noches, {playerName}, llamando sobre el agua, y tuve demasiado miedo para ir. Todavía tengo demasiado miedo. Por favor. Su bote yace naufragado en la orilla norte. Tráelo caminando de vuelta a mí.',
+    'Mi Bram sacó el bote la mañana en que se abrió la brecha de las redes, y el mar lo devolvió en algún lugar pasado el Embarcadero. Lo oí hace tres noches, {playerName}, llamando sobre el agua, y tuve demasiado miedo para ir. Todavía tengo demasiado miedo. Por favor. Su bote yace naufragado en la orilla sur. Tráelo caminando de vuelta a mí.',
   'entities.quests.q_fs_bram_come_home.completion':
     '¡Bram! Me lo trajiste de vuelta entero, {playerName}. Los dos lloramos y ninguno se avergüenza de ello. Lo que sea que las brechas le quiten a esta isla la próxima vez, no se llevarán a mi familia. Ya no.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
@@ -8615,7 +8616,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_rime_unbound.objectives.0.label': 'Elemental de Escarcha abatido',
   'entities.quests.q_fv_seeing_wren_home.title': 'Llevando a Wren a Casa',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Mi aprendiz Wren salió a recorrer la línea del Goldmelt hace dos días y nunca volvió. Encontré sus huellas, está refugiada bajo los mojones al suroeste de los Escalones de la Aurora, demasiado asustada de los lobos para moverse. No puedo dejar la ciénaga, {playerName}. Llévala al campamento de Veyla en los Escalones. Estará a salvo bajo las luces.',
+    'Mi aprendiz Wren salió a recorrer la línea del Goldmelt hace dos días y nunca volvió. Encontré sus huellas, está refugiada bajo los mojones al noreste de los Escalones de la Aurora, demasiado asustada de los lobos para moverse. No puedo dejar la ciénaga, {playerName}. Llévala al campamento de Veyla en los Escalones. Estará a salvo bajo las luces.',
   'entities.quests.q_fv_seeing_wren_home.completion':
     'La chica está dentro, envuelta en la mitad de mis mantas y hablándole a las estrellas hasta bajarlas del cielo. Hiciste algo bondadoso hoy, {playerName}. El Reach no ve muchos gestos así.',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
@@ -10577,11 +10578,17 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Recuperación: /unstuck inicia una cuenta regresiva estacionaria para llevarte a un punto seguro accesible cercano.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Recuperación: /unstuck inicia una cuenta regresiva estacionaria y luego envía tu espíritu al cementerio más cercano. Volver a través del Guardián Pálido requiere el Tañido del Guardián.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Recuperación: /unstuck inicia una cuenta regresiva estacionaria y luego te traslada al cementerio más cercano, reviviéndote si habías caído. Te deja con el Mal de desatasco durante un máximo de 5 minutos.',
   'hudChrome.unstuck.menuButton': 'Desatascar',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Has sido trasladado al cementerio más cercano. El Mal de desatasco pesa sobre ti.',
   'hudChrome.unstuck.noSafePosition':
     'No se encontró ningún punto seguro accesible cerca. No fuiste trasladado.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Has sido devuelto al cementerio más cercano y revivido. El Tañido del Guardián pesa sobre ti.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Has sido trasladado al cementerio más cercano y revivido. El Mal de desatasco pesa sobre ti.',
   'hudChrome.unstuck.standStill': 'Quédate quieto sobre suelo firme antes de usar Desatascar.',
   'hudChrome.unstuck.standStillAnywhere': 'Quédate quieto antes de usar Desatascar.',
   'hudChrome.unstuck.started':
@@ -10968,4 +10975,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marca del artesano',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonificación de obra maestra',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vínculo de encargo',
+  'hudChrome.riftTracker.title': 'Brecha',
+  'hudChrome.riftTracker.floor': 'Piso {current} de {total}',
+  'hudChrome.riftTracker.closesIn': 'Se cierra en {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

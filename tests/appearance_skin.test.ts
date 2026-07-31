@@ -14,6 +14,7 @@ vi.mock('../src/render/assets/loader', () => ({
 
 vi.mock('../src/render/assets/preload', () => ({
   registerPreload: vi.fn(),
+  registerDeferredPreload: vi.fn((start: () => unknown) => start()),
 }));
 
 const characterAssetsSource = readFileSync(

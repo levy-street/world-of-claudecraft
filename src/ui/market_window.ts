@@ -14,8 +14,13 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
-import type { ItemSlot } from '../sim/types';
-import type { IWorld } from '../world_api';
+import type { ItemInstancePayload, ItemSlot } from '../sim/types';
+import {
+  type IWorld,
+  type MarketInfo,
+  queryDiffersFromEcho,
+  searchDiffersFromEcho,
+} from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
 import { computeDropdownPlacement } from './dropdown_position';
@@ -94,9 +99,20 @@ export class MarketWindow {
   private rarityFilter: MarketRarityFilter = 'all';
   private browsePage = 0;
   private sellItemId: string | null = null;
+  private sellInstance: ItemInstancePayload | null = null;
   private searchQuery = '';
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
+  // Armed by onReconnected() and cleared by the next refreshIfChanged() that
+  // actually observes a post-reconnect MarketInfo. onReconnected() fires
+  // synchronously inside the client's `hello` handler, before the resent
+  // world's first snapshot has decoded, so at that instant marketInfo (if
+  // any) is still the PRE-drop echo, which by construction matches
+  // currentQuery() (the client pushed it and the server echoed it back
+  // before the socket died): queryDiffersFromEcho would always read false
+  // there and the resync would never fire. Deferring the comparison to the
+  // next snapshot lets it see the real post-reconnect echo instead.
+  private pendingReconnectResync = false;
 
   constructor(private readonly deps: MarketWindowDeps) {}
 
@@ -121,6 +137,7 @@ export class MarketWindow {
     this.rarityFilter = 'all';
     this.browsePage = 0;
     this.sellItemId = null;
+    this.sellInstance = null;
     this.searchQuery = '';
     this.pushQuery();
     this.lastSig = '';
@@ -140,6 +157,7 @@ export class MarketWindow {
     if (!this.opened) return;
     this.opened = false;
     this.sellItemId = null;
+    this.sellInstance = null;
     this.deps.root().style.display = 'none';
     this.deps.hideTooltip();
     document.body.classList.remove('market-open');
@@ -148,9 +166,12 @@ export class MarketWindow {
     this.openerFocus = null;
   }
 
-  /** Stage a bag item onto the Sell tab (called by the bags window on click). */
-  stageSell(itemId: string): void {
+  /** Stage a bag item onto the Sell tab (called by the bags window on click).
+   *  `instance` is the clicked slot's payload (issue 1165): an instanced copy stages
+   *  as ITSELF and lists single-copy through marketListInstance. */
+  stageSell(itemId: string, instance?: ItemInstancePayload): void {
     this.sellItemId = itemId;
+    this.sellInstance = instance ?? null;
     this.render();
   }
 
@@ -175,11 +196,45 @@ export class MarketWindow {
     this.deps.world().marketSearch(this.currentQuery());
   }
 
+  // Reconnect resync (issue 2416). A fresh join (the server's linkdead grace
+  // expired before the socket came back) hands the reconnecting character a
+  // brand-new session, whose browse query starts back at default; this window's
+  // own filter controls live in the client and survive the socket drop untouched,
+  // so without this the buttons keep showing a query the server silently stopped
+  // running. An ordinary resume keeps the same session (the echoed query still
+  // matches), so this is a no-op then: only a real drift re-pushes.
+  onReconnected(): void {
+    if (!this.opened) return;
+    // The socket just re-hello'd; the resent world's first snapshot has not
+    // decoded yet, so `marketInfo` here (if present at all) is still the
+    // pre-drop echo. Comparing against it now would always read "no drift"
+    // (it was pushed and echoed back before the socket died). Arm the flag
+    // instead and let refreshIfChanged() run the real comparison once a
+    // post-reconnect MarketInfo actually arrives.
+    this.pendingReconnectResync = true;
+  }
+
+  // Runs the deferred reconnect-drift check armed by onReconnected() above,
+  // once a MarketInfo has actually streamed in since. Checks both the five
+  // dropdown filter axes (queryDiffersFromEcho) and a settled search box
+  // (searchDiffersFromEcho): a fresh join resets `search` to '' same as the
+  // other axes, and by the time this runs no keystroke can be in flight.
+  private resolvePendingReconnectResync(info: MarketInfo | null): void {
+    if (!this.pendingReconnectResync || !info) return;
+    this.pendingReconnectResync = false;
+    const query = this.currentQuery();
+    if (queryDiffersFromEcho(query, info) || searchDiffersFromEcho(query, info)) {
+      this.pushQuery();
+    }
+  }
+
   // Per-frame (slow divider): refresh the live lists (Browse/Collect) when they
   // change. The Sell tab holds typed inputs, so it is only rebuilt on actions.
   refreshIfChanged(): void {
-    if (!this.opened || this.tab === 'sell') return;
+    if (!this.opened) return;
     const info = this.deps.world().marketInfo;
+    this.resolvePendingReconnectResync(info);
+    if (this.tab === 'sell') return;
     const sig = JSON.stringify([
       this.tab,
       this.itemTypeFilter,
@@ -449,7 +504,12 @@ export class MarketWindow {
         rarity: this.rarityFilter,
       },
       sellItemId: this.sellItemId,
-      sellHave: this.sellItemId ? this.bagCount(this.sellItemId) : 0,
+      sellHave: this.sellItemId
+        ? this.sellInstance
+          ? 1
+          : this.fungibleBagCount(this.sellItemId)
+        : 0,
+      sellInstance: this.sellInstance,
     });
     if (view.kind === 'no-data') {
       body.innerHTML = `<div class="mkt-empty">${esc(t('itemUi.market.noMerchant'))}</div>`;
@@ -565,7 +625,7 @@ export class MarketWindow {
         audio.click();
       });
       row.appendChild(btn);
-      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
+      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, l.instance));
       list.appendChild(row);
     }
     if (page.pageCount > 1) {
@@ -584,6 +644,11 @@ export class MarketWindow {
           this.browsePage = Math.max(0, this.browsePage + (dir === 'next' ? 1 : -1));
           this.pushQuery(); // the server returns the requested page of listings
           this.lastSig = '';
+          // The page change is about to tear down and rebuild every `.mkt-row` node the
+          // same way refreshIfChanged()'s signature-driven refresh does; hide any tooltip
+          // still claimed by the pre-change rows before renderContent() below discards them
+          // (issue 2456, the pager's own row-teardown path).
+          this.deps.hideTooltip();
           audio.click();
           this.renderContent();
           // #market-body scrolls on desktop; on mobile the sheet base makes
@@ -621,6 +686,7 @@ export class MarketWindow {
     }
     if (view.state === 'cannot-market') {
       this.sellItemId = null;
+      this.sellInstance = null;
       const pick = document.createElement('div');
       pick.className = 'mkt-sell-pick empty';
       pick.textContent = t('itemUi.tooltip.cannotMarket');
@@ -632,6 +698,9 @@ export class MarketWindow {
     const pick = document.createElement('div');
     pick.className = 'mkt-sell-pick';
     pick.innerHTML = `${this.deps.itemIcon(item)}<span class="ps-name" style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
+    // The staged copy's tooltip carries its payload, so a player holding plain
+    // AND special copies can see WHICH one is staged (the mail chip precedent).
+    this.deps.attachTooltip(pick, () => this.deps.itemTooltip(item, view.form.instance));
     body.appendChild(pick);
 
     const form = document.createElement('div');
@@ -681,8 +750,11 @@ export class MarketWindow {
         this.deps.showError(t('itemUi.market.minPriceError'));
         return;
       }
-      this.deps.world().marketList(view.form.itemId, qty, each * qty);
+      const staged = view.form.instance;
+      if (staged) this.deps.world().marketListInstance(view.form.itemId, each, staged);
+      else this.deps.world().marketList(view.form.itemId, qty, each * qty);
       this.sellItemId = null;
+      this.sellInstance = null;
       audio.coin();
       this.render(); // the next snapshot echoes the new bags + listings
     });
@@ -701,7 +773,7 @@ export class MarketWindow {
       row.innerHTML = `<span>${esc(t('itemUi.market.saleProceeds'))}</span><span class="mkt-price">${this.deps.moneyHtml(view.proceeds)}</span>`;
       body.appendChild(row);
     }
-    for (const { item, count } of view.rows) {
+    for (const { item, count, instance } of view.rows) {
       const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
       const row = document.createElement('div');
       row.className = 'mkt-collect';
@@ -710,7 +782,7 @@ export class MarketWindow {
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
           : '';
       row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
-      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
+      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
       body.appendChild(row);
     }
     const btn = document.createElement('button');
@@ -723,10 +795,14 @@ export class MarketWindow {
     body.appendChild(btn);
   }
 
-  private bagCount(itemId: string): number {
+  // Fungible stock only: the plain listing form's quantity cap must match what
+  // marketList can actually escrow (an instanced copy is never swept into a
+  // bulk listing), or a qty above the fungible stock just bounces off the
+  // sim's denial. An instanced staging is single-copy and never reads this.
+  private fungibleBagCount(itemId: string): number {
     return this.deps
       .world()
-      .inventory.filter((s) => s.itemId === itemId)
+      .inventory.filter((s) => s.itemId === itemId && !s.instance)
       .reduce((n, s) => n + s.count, 0);
   }
 

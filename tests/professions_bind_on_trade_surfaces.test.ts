@@ -298,6 +298,28 @@ describe('vendor: plain and armed copies sell, stamped copies are refused (wash 
     expect(slotsOf(sim, pid, R)).toHaveLength(0);
   });
 
+  it('buying back an ARMED copy keeps its bindOnTrade flag (#2412): the plain re-grant never strips it', () => {
+    // The instance-preservation mechanism in buyBackItem is not special-cased
+    // per payload field, but bindOnTrade is the one flag the issue calls out
+    // by name since a stripped arm would let the piece trade or vendor-sell
+    // again as if it had never been primed. Round trip it explicitly.
+    const { sim, pid } = vendorSetup();
+    setCopper(sim, pid, 40);
+    sim.addItemInstance(R, { ...ARMED }, pid);
+    sim.sellItem(R, 1, pid);
+    sim.drainEvents();
+    expect(slotsOf(sim, pid, R)).toHaveLength(0);
+    // Exercise the load-bearing discriminator path (index + expected payload),
+    // not just the legacy itemId-only fallback: this is the resolution order
+    // buyBackItem actually uses when a vendor's buyback row holds more than
+    // one line for the same itemId.
+    sim.buyBackItem(R, 0, { ...ARMED }, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    const back = slotsOf(sim, pid, R);
+    expect(back).toHaveLength(1);
+    expect(back[0].instance).toEqual({ bindOnTrade: true });
+  });
+
   it('selling one while holding 1 plain + 1 stamped consumes the PLAIN copy first', () => {
     const { sim, pid } = vendorSetup();
     setCopper(sim, pid, 0);

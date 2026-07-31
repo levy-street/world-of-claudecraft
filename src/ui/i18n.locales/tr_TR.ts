@@ -2115,6 +2115,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'O mektup artık kutunda değil.',
   'hudChrome.mailbox.result.needRecipient': 'Mektubun için bir alıcı belirt.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Görev eşyalarını postayla gönderemezsin.',
+  'hudChrome.mailbox.result.noMailBound': 'O eşya bağlı ve postayla gönderilemez.',
   'hudChrome.mailbox.result.noRecipient': 'Burada bu isimde posta kutusu olan kimse yok.',
   'hudChrome.mailbox.result.notEnoughItems': 'Gönderecek o kadar tane yok.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Alıcının posta kutusu dolu.',
@@ -4418,7 +4419,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     "Balıkçı Bram Gullhaven'a Güvenle Ulaştırıldı",
   'entities.quests.q_fs_bram_come_home.text':
-    "Bram'ım, ağ gediği açıldığı sabah tekneyi çıkardı, ve deniz onu İskele noktasının ötesinde bir yere geri fırlattı. Onu üç gece önce duydum, {playerName}, suyun üzerinden sesleniyordu, ve gitmeye çok korktum. Hala çok korkuyorum. Lütfen. Teknesi kuzey kıyısında parçalanmış yatıyor. Onu bana eve getir.",
+    "Bram'ım, ağ gediği açıldığı sabah tekneyi çıkardı, ve deniz onu İskele noktasının ötesinde bir yere geri fırlattı. Onu üç gece önce duydum, {playerName}, suyun üzerinden sesleniyordu, ve gitmeye çok korktum. Hala çok korkuyorum. Lütfen. Teknesi güney kıyısında parçalanmış yatıyor. Onu bana eve getir.",
   'entities.quests.q_fs_bram_come_home.title': 'Bram Eve Dönüyor',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'On tane eksik, ve tarla işçileri şimdiden kimin önce çıkacağı konusunda tartışıyor. Bu uzun sürmeyecek, gedikler asla uzun süre dinlenmez, ama yemek yiyen bir kasaba, direnen bir kasabadır.',
@@ -4504,7 +4505,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Çırak Wren Kutup Işığı Basamaklarına Güvenle Ulaştırıldı',
   'entities.quests.q_fv_seeing_wren_home.text':
-    "Çırağım Wren iki gün önce Altın Eriyiş hattını yürümeye çıktı ve bir daha geri dönmedi. İzlerini buldum, Kutup Işığı Basamakları'nın güneybatısındaki yol işaretlerinin altında saklanıyor, kurtlardan çok korktuğu için kımıldayamıyor. Bataklığı terk edemem, {playerName}. Onu Basamaklardaki Veyla'nın kampına götür. Işıkların altında güvende olacak.",
+    "Çırağım Wren iki gün önce Altın Eriyiş hattını yürümeye çıktı ve bir daha geri dönmedi. İzlerini buldum, Kutup Işığı Basamakları'nın kuzeydoğusundaki yol işaretlerinin altında saklanıyor, kurtlardan çok korktuğu için kımıldayamıyor. Bataklığı terk edemem, {playerName}. Onu Basamaklardaki Veyla'nın kampına götür. Işıkların altında güvende olacak.",
   'entities.quests.q_fv_seeing_wren_home.title': "Wren'i Eve Ulaştırmak",
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve mi gönderdi seni? Ha. On bir yıl oldu ve kadın hala bataklığın beni yiyeceğini düşünüyor. Şey... bu yıl haklı olabilir. Hatlarıma ne yaptığına bak.',
@@ -5664,12 +5665,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Yarıkların ötesinden gelen istilacılar, tepeden tırnağa ateş ve kin doludurlar. Biri nerede durursa, bir gedik asla uzak değildir.',
   'guide.family.demon.name': 'İblisler',
-  'guide.family.kobold.desc':
-    'Çayırların ve çitlerin telaşlı leş yiyicileri ve cinleri, sayıca çoğalana kadar tehlikeden çok baş belasıdırlar.',
-  'guide.family.kobold.name': 'Yaramazlar',
-  'guide.family.murloc.desc':
-    'Göl kıyısının ve gelgit havuzlarının vraklayan balık halkı, fazla yaklaşan her şeyin üzerine çabucak üşüşür.',
-  'guide.family.murloc.name': 'Vırakyüzgeçler',
   'guide.faqPage.a1':
     "Evet. Oyunun tamamı seviye sınırına kadar ücretsiz oynanabilir ve kaynak kodu GitHub'da açıktır.",
   'guide.faqPage.a10':
@@ -6522,7 +6517,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.tradeExpired': 'Takas isteğinin süresi doldu.',
   'hud.errors.tradeFailed': 'Takas başarısız: eşyalar ya da para artık mevcut değil.',
   'hud.errors.tradeBound': 'O eşya bağlı ve takas edilemez.',
+  'hud.errors.marketListBound': 'O eşya bağlı ve satışa çıkarılamaz.',
   'hud.errors.tradeInProgress': 'Zaten devam eden bir takas var.',
+  'hud.errors.tradeAlreadyTrading': 'Bu oyuncu zaten takas yapıyor.',
   'hud.errors.tradeTooFar': 'Hedef takas için çok uzakta.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Bilinmeyen komut: {command}. /s /y /w /p /g deneyin.',
@@ -7687,6 +7684,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'O görev tamamlanmadı.',
   'questUi.errors.notInLog': 'O görev kaydında yok.',
   'questUi.errors.tooFar': 'Çok uzakta.',
+  'questUi.errors.escortAway':
+    'Eşlik edeceğin kişi şu anda yerinde değil. Kısa süre içinde dönecek.',
   'questUi.errors.turnInMissing': 'O görevin teslim yeri yakında değil.',
   'questUi.errors.unavailable': 'O görev mevcut değil.',
   'questUi.log.abandon': 'Görevi Bırak',
@@ -8676,6 +8675,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Bu sıfırlama bağlantısı geçersiz veya süresi dolmuş. Yeni bir tane iste.',
   'apiError.deeds.invalid_input': 'Geçersiz girdi.',
+  'apiError.ota_updates.invalid_input': 'Geçersiz girdi.',
   'apiError.steam.account_taken': 'Bu Steam hesabı zaten başka bir hesaba bağlı.',
   'apiError.steam.already_linked': 'Hesabına zaten bağlı bir Steam hesabı var.',
   'apiError.steam.banned': 'Bu Steam hesabı bağlanamaz.',
@@ -10783,14 +10783,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kurtarma: /unstuck, seni yakındaki ulaşılabilir güvenli bir noktaya taşıyacak hareketsiz bir geri sayım başlatır.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Kurtarma: /unstuck hareketsiz bir geri sayım başlatır, ardından ruhunu en yakın mezarlığa gönderir. Solgun Gözcü aracılığıyla dönmek Gözcünün Bedelini gerektirir.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Kurtarma: /unstuck hareketsiz bir geri sayım başlatır, ardından seni en yakın mezarlığa taşır ve düşmüşsen diriltir. En fazla 5 dakika boyunca üzerinde Kurtulma Hastalığı kalır.',
   'hudChrome.unstuck.menuButton': 'Kurtulma',
+  'hudChrome.unstuck.movedToGraveyard':
+    'En yakın mezarlığa taşındın. Kurtulma Hastalığı üzerinde ağırlık yapıyor.',
   'hudChrome.unstuck.noSafePosition':
     'Yakınlarda ulaşılabilir güvenli bir nokta bulunamadı. Taşınmadın.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'En yakın mezarlığa döndürüldün ve diriltildin. Gözcünün Bedeli üzerinde ağırlık yapıyor.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'En yakın mezarlığa taşındın ve diriltildin. Kurtulma Hastalığı üzerinde ağırlık yapıyor.',
   'hudChrome.unstuck.standStill': 'Kurtulmayı kullanmadan önce sağlam zeminde hareketsiz dur.',
   'hudChrome.unstuck.standStillAnywhere': 'Kurtulmayı kullanmadan önce hareketsiz dur.',
   'hudChrome.unstuck.started':
     'Kurtulma {seconds} saniye içinde. Hareket etmek, savaşmak, hasar almak veya başka bir eylem başlatmak bunu iptal eder.',
   'hudChrome.unstuck.unavailable': 'Kurtulma mevcut durumunda kullanılamaz.',
+  'hudChrome.riftTracker.title': 'Yarık',
+  'hudChrome.riftTracker.floor': 'Kat {current}/{total}',
+  'hudChrome.riftTracker.closesIn': '{time} içinde kapanır',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

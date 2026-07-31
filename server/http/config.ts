@@ -89,9 +89,6 @@ export interface Config {
   // Off-by-default community-realm account provisioning. When enabled, the
   // central account insert atomically creates the full level-20 test roster.
   readonly provisionTestAccounts: boolean;
-  // Public-test Rift profile. Strictly validated, read once at boot, and off by
-  // default so a typo cannot silently enable or disable the denser realm policy.
-  readonly communityTestRifts: boolean;
   readonly turnstileSecret: string;
   readonly maxWsPerIpHard: number;
   // The realm player admission cap: the WS handshake (server/ws_auth.ts) refuses a
@@ -125,6 +122,15 @@ export interface Config {
   // the business-metrics fact table) to keep. The snapshot reads touch only
   // today and yesterday, so any positive window is read-invisible to them.
   readonly playerActivityRetentionDays: number;
+  // How many days of password_reset_requests / email_change_requests rows to
+  // keep after creation. The per-account supersede DELETE at each create call
+  // only removes a duplicate still-PENDING row (createPasswordResetRequest /
+  // createEmailChangeRequest, server/db.ts); a consumed or abandoned-and-expired
+  // row is untouched there, so these are the only knobs that bound either table.
+  readonly passwordResetRequestRetentionDays: number;
+  readonly emailChangeRequestRetentionDays: number;
+  // How many days of email_log rows (the outbound-email audit trail) to keep.
+  readonly emailLogRetentionDays: number;
   // The two sweep knobs follow the maxPlayersPerRealm trimmed-read contract
   // instead, because for them a whitespace-derived 0 is fail-DANGEROUS: hour 0
   // moves the sweep to 00:00 UTC, next to the nightly 03:15 UTC pg_dump window
@@ -178,6 +184,9 @@ const DEFAULT_SITE_PRESENCE_RETENTION_DAYS = 90;
 const DEFAULT_PLAY_SESSION_RETENTION_DAYS = 180;
 const DEFAULT_ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS = 730;
 const DEFAULT_PLAYER_ACTIVITY_RETENTION_DAYS = 400;
+const DEFAULT_PASSWORD_RESET_REQUEST_RETENTION_DAYS = 30;
+const DEFAULT_EMAIL_CHANGE_REQUEST_RETENTION_DAYS = 30;
+const DEFAULT_EMAIL_LOG_RETENTION_DAYS = 90;
 // PROVISIONAL: two hours after the nightly 03:15 UTC pg_dump window, pending real
 // traffic-curve evidence of the quietest hour; revisit when that evidence lands.
 const DEFAULT_RETENTION_SWEEP_UTC_HOUR = 5;
@@ -193,7 +202,6 @@ const REQUIRE_WEB_LOGIN_ENV = 'REQUIRE_WEB_LOGIN';
 const CONTENT_TYPE_ENFORCE_ENV = 'API_CONTENT_TYPE_ENFORCE';
 const ORIGIN_CHECK_ENFORCE_ENV = 'API_ORIGIN_CHECK_ENFORCE';
 const PROVISION_TEST_ACCOUNTS_ENV = 'PROVISION_TEST_ACCOUNTS';
-const COMMUNITY_TEST_RIFTS_ENV = 'COMMUNITY_TEST_RIFTS';
 
 // The recognized boolean-flag vocabulary shared by REQUIRE_WEB_LOGIN and the two
 // API enforce flags (matches web_login_guard.ts / content_type.ts / origin_check.ts:
@@ -314,7 +322,6 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
   validateBooleanFlag(env, CONTENT_TYPE_ENFORCE_ENV);
   validateBooleanFlag(env, ORIGIN_CHECK_ENFORCE_ENV);
   validateBooleanFlag(env, PROVISION_TEST_ACCOUNTS_ENV);
-  validateBooleanFlag(env, COMMUNITY_TEST_RIFTS_ENV);
   validatePublicOrigin(env);
   validateRealms(env);
 
@@ -331,7 +338,6 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     port: numberOr(env.PORT, DEFAULT_PORT),
     allowDevCommands: env.ALLOW_DEV_COMMANDS === ALLOW_DEV_COMMANDS_ON,
     provisionTestAccounts: resolveBooleanFlag(env, PROVISION_TEST_ACCOUNTS_ENV),
-    communityTestRifts: resolveBooleanFlag(env, COMMUNITY_TEST_RIFTS_ENV),
     turnstileSecret: env.TURNSTILE_SECRET ?? DEFAULT_TURNSTILE_SECRET,
     maxWsPerIpHard: numberOr(env.MAX_WS_PER_IP_HARD, DEFAULT_MAX_WS_PER_IP_HARD),
     // Trimmed so a whitespace-only value reads as unset -> the default, never as
@@ -371,6 +377,15 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
       env.PLAYER_ACTIVITY_RETENTION_DAYS,
       DEFAULT_PLAYER_ACTIVITY_RETENTION_DAYS,
     ),
+    passwordResetRequestRetentionDays: numberOr(
+      env.PASSWORD_RESET_REQUEST_RETENTION_DAYS,
+      DEFAULT_PASSWORD_RESET_REQUEST_RETENTION_DAYS,
+    ),
+    emailChangeRequestRetentionDays: numberOr(
+      env.EMAIL_CHANGE_REQUEST_RETENTION_DAYS,
+      DEFAULT_EMAIL_CHANGE_REQUEST_RETENTION_DAYS,
+    ),
+    emailLogRetentionDays: numberOr(env.EMAIL_LOG_RETENTION_DAYS, DEFAULT_EMAIL_LOG_RETENTION_DAYS),
     // An hour outside 0..23 is garbage, not a preference; fall back like numberOr does.
     retentionSweepUtcHour:
       Number.isInteger(sweepHourRaw) && sweepHourRaw >= 0 && sweepHourRaw <= 23

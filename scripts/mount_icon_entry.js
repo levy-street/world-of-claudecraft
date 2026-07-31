@@ -14,6 +14,7 @@
 import * as THREE from 'three';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { attachKtx2 } from './lib/ktx2_entry.js';
 
 const SIZE = 512; // supersample; the driver downscales and encodes the shipped 128px WebP
 
@@ -29,7 +30,7 @@ renderer.setClearAlpha(0); // transparent background, like portraits and the gui
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
-const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+const loader = attachKtx2(new GLTFLoader().setMeshoptDecoder(MeshoptDecoder), renderer);
 
 // Soft key/fill/rim so the face reads clearly at thumbnail size (mirrors portrait.ts).
 function makeLights() {

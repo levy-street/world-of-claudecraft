@@ -342,6 +342,10 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 24,
     moveSpeed: 7,
     aggroRadius: 13,
+    // Hard tether: the Tunnelking fights on his own ground. Kiting him past 50
+    // yards of his spawn (the town square is 100+) sends him home to a full
+    // reset, adds swept with him.
+    hardLeashRadius: 50,
     aoePulse: { min: 12, max: 18, radius: 8, every: 9, name: 'Cave-In', school: 'physical' },
     summonAdds: { mobId: 'tunnel_rat', count: 2, atHpPct: [0.55, 0.3] },
     enrage: { belowHpPct: 0.3, dmgMult: 1.4, hasteMult: 1.3 },

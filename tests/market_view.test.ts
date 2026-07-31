@@ -39,6 +39,11 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     listings: [],
     totalCount: 0,
     filter: '',
+    itemType: 'all',
+    subtype: 'all',
+    armorClass: 'all',
+    primaryStat: 'all',
+    rarity: 'all',
     page: 0,
     pageCount: 1,
     collectionCopper: 0,
@@ -272,6 +277,46 @@ describe('market_view: sell states', () => {
       body.form.suggested.silver * COPPER_PER_SILVER +
       body.form.suggested.copper;
     expect(reconstructed).toBe(36000);
+  });
+});
+
+describe('market_view: instanced staging (issue 1165)', () => {
+  it('an instanced staging forces a single-copy form and carries the payload', () => {
+    const body = buildMarketSell('worn_sword', 3, { signer: 'Ayla' });
+    expect(body.state).toBe('form');
+    if (body.state !== 'form') return;
+    expect(body.form.have).toBe(1);
+    expect(body.form.instance).toEqual({ signer: 'Ayla' });
+  });
+
+  it('a plain staging carries no instance key and keeps the quantity cap', () => {
+    const body = buildMarketSell('worn_sword', 3);
+    expect(body.state).toBe('form');
+    if (body.state !== 'form') return;
+    expect(body.form.have).toBe(3);
+    expect('instance' in body.form).toBe(false);
+  });
+
+  it('a transfer-locked staging cannot market (defence in depth behind the bags block)', () => {
+    expect(buildMarketSell('worn_sword', 1, { bindOnTrade: true })).toEqual({
+      state: 'cannot-market',
+    });
+    expect(buildMarketSell('worn_sword', 1, { boundTo: 7 })).toEqual({ state: 'cannot-market' });
+  });
+
+  it('collect rows surface a returned copy payload for the tooltip', () => {
+    const body = buildMarketCollect(
+      info({
+        collectionItems: [
+          { itemId: 'worn_sword', count: 1, instance: { enchant: 'ench_stat_str' } },
+          { itemId: 'worn_sword', count: 2 },
+        ],
+      }),
+    );
+    expect(body.state).toBe('items');
+    if (body.state !== 'items') return;
+    expect(body.rows[0].instance).toEqual({ enchant: 'ench_stat_str' });
+    expect('instance' in body.rows[1]).toBe(false);
   });
 });
 

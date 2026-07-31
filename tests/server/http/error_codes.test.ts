@@ -72,6 +72,7 @@ const EXPECTED_CODES = [
   'steam.already_linked',
   'steam.account_taken',
   'steam.upstream',
+  'ota_updates.invalid_input',
 ];
 
 describe('ERROR_CODES catalog', () => {

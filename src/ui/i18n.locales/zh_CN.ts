@@ -1905,6 +1905,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': '请先完成交易再加入队列。',
   'hud.errors.arenaQueueInstance': '你不能在副本内加入队列。',
   'hud.errors.tradeInProgress': '已有交易正在进行。',
+  'hud.errors.tradeAlreadyTrading': '该玩家已在交易中。',
   'hud.errors.tradeTooFar': '目标太远，无法交易。',
   'hud.errors.tradeExpired': '交易请求已过期。',
   'hud.errors.tradeFailed': '交易失败：物品或金钱已不可用。',
@@ -2183,6 +2184,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': '该任务发布者不在附近。',
   'questUi.errors.turnInMissing': '该任务交付点不在附近。',
   'questUi.errors.tooFar': '距离太远。',
+  'questUi.errors.escortAway': '你要护送的人现在不在原处，稍后就会回来。',
   'itemUi.money.goldShort': '金',
   'itemUi.money.silverShort': '银',
   'itemUi.money.copperShort': '铜',
@@ -4196,6 +4198,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '英雄徽记',
   'hudChrome.raidLockout.heroicName': '英雄难度：{name}',
   'hudChrome.raidLockout.heroicLocked': '你已被锁定至英雄难度的{name}。',
+  'hudChrome.riftTracker.title': '裂隙',
+  'hudChrome.riftTracker.floor': '第 {current} 层，共 {total} 层',
+  'hudChrome.riftTracker.closesIn': '裂隙将在 {time} 后关闭',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
   'entities.items.morthens_cryptforged_hauberk.name': '莫尔森的墓铸锁甲',
   'entities.items.shadowpulse_handwraps.name': '暗影脉冲裹手',
   'entities.items.bonechill_striders.name': '骨寒行者之靴',
@@ -4443,7 +4450,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '布拉姆！你把他完完整整地带回来了，{playerName}。我们俩都哭了，谁也不觉得丢人。往后裂隙不管再从这座岛夺走什么，都别想夺走我的家人。再也不会了。',
   'entities.quests.q_fs_bram_come_home.objectives.0.label': '已护送渔民布拉姆平安回到鸥港',
   'entities.quests.q_fs_bram_come_home.text':
-    '晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在北岸。把他领回家，交到我手上。',
+    '晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在南岸。把他领回家，交到我手上。',
   'entities.quests.q_fs_bram_come_home.title': '布拉姆回家',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     '少了十个，雇工们已经在争谁第一个下田了。这撑不了多久，裂隙从不会安分太久，但吃得上饭的镇子，就是守得住的镇子。',
@@ -4528,7 +4535,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '姑娘已经在帐里了，裹着我一半的毯子，叽叽喳喳快把星星都聊下来了。你今天做了件善事，{playerName}。这样的事，霜幕之境可不多见。',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label': '已护送学徒雯恩平安抵达极光台阶',
   'entities.quests.q_fv_seeing_wren_home.text':
-    '我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶西南边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。',
+    '我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶东北边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。',
   'entities.quests.q_fv_seeing_wren_home.title': '送雯恩回家',
   'entities.quests.q_fv_silent_trapline.completion':
     '梅芙派你来的？哈。十一年了，那女人还当沼泽会吃了我。唔……今年她也许还真说对了。看看它把我的陷阱线糟蹋成什么样了。',
@@ -6173,7 +6180,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.economy.mailBody':
     '每座主城都立着一根雕成渡鸦的石柱：那是渡鸦邮驿的邮箱，这个王国的信件服务。站在柱旁，便可按名字写信给任何角色，无论对方在线还是久未登录，并支付少许邮资，在信中附上钱币或货物。渡鸦要飞上一小段时间；当它降落时，一个信封指示标会提醒收件人有东西在等着。',
   'guide.economy.mailHow':
-    '领取则是同样的流程反过来：站在任意石柱旁阅读你的信件，把信中所附收入钱袋与背包。信件不会永远等候，所以要赶在渡鸦对你失去耐心之前领取。有两样东西邮驿一概拒收：灵魂绑定的物品与任务物品，它们只随你本人同行。另外，漂亮地交还一个任务之后，记得留意石柱；有些任务发布者是会写信的。',
+    '领取则是同样的流程反过来：站在任意石柱旁阅读你的信件，把信中所附收入钱袋与背包。信件不会永远等候，所以要赶在渡鸦对你失去耐心之前领取。有几样东西邮驿一概拒收：灵魂绑定的物品、任务物品，以及已绑定或将随交易绑定的物品，它们只随你本人同行。另外，漂亮地交还一个任务之后，记得留意石柱；有些任务发布者是会写信的。',
   'guide.economy.mailTitle': '渡鸦邮驿',
   'guide.economy.marketBody':
     '商人经营着世界市场，这是一个由玩家驱动的交易所，你可以在此与素未谋面的人买卖。与东溪镇的商人交谈，或与高守哨站上的拍卖师沃斯交谈，即可将它打开：两位管理者服务于同一个共享市场。商人还会在那里长期挂售自己的一批货物，因此即便没有其他玩家上架，也总有东西可买。',
@@ -6478,11 +6485,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.duskGreeter': '守护者塞尔文，古辉镇',
   'guide.worldPage.duskPlaceNotes':
     '古辉镇聚居在巨树之下。暮落洞穴与其瞭望台是入口，也是初见山谷的地方；古木林地与星落盆地守着宁静的南方；沉没王庭在东面藏着草木蔓生的废墟；辉光深处与水晶浅滩则在北方闪着微光。',
-  'guide.family.murloc.name': '蛙鳍族',
-  'guide.family.murloc.desc': '湖岸与潮池间呱呱叫的鱼人族群，谁涉水靠得太近，它们便会一拥而上。',
-  'guide.family.kobold.name': '林间小妖',
-  'guide.family.kobold.desc':
-    '在林间空地与树篱下窜来窜去的拾荒者和小妖精，单个不过讨人嫌，聚成一群才成祸患。',
   'guide.family.demon.name': '恶魔',
   'guide.family.demon.desc':
     '来自裂隙彼端的入侵者，浑身是火焰与怨毒。只要有一只现身，裂口就绝不会远。',
@@ -7727,6 +7729,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': '该请求过大。请减少数据后重试。',
   'apiError.body.unsupported_media_type': '不支持的请求格式。',
   'apiError.deeds.invalid_input': '输入无效。',
+  'apiError.ota_updates.invalid_input': '输入无效。',
   'apiError.steam.disabled': 'Steam 关联当前不可用。',
   'apiError.wallet.handoff_invalid': '钱包授权已过期或无法验证。请重试。',
   'apiError.steam.invalid_ticket': 'Steam 无法验证此关联请求。请在桌面客户端中重试。',
@@ -7831,6 +7834,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.noRecipient': '这里没有叫这个名字的邮箱主人。',
   'hudChrome.mailbox.result.tooManyParcels': '一封信最多可携带 {count} 个包裹。',
   'hudChrome.mailbox.result.noMailQuestItems': '你不能邮寄任务物品。',
+  'hudChrome.mailbox.result.noMailBound': '该物品已绑定，无法邮寄。',
   'hudChrome.mailbox.result.notEnoughItems': '你没有那么多可寄送的物品。',
   'hudChrome.mailbox.result.cantAffordPostage': '你付不起邮资。',
   'hudChrome.mailbox.result.recipientBoxFull': '对方的邮箱已满。',
@@ -8761,10 +8765,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '有几条日常命令值得记住：/w 名字 发送密语，/r 回复你最近收到的一条，/invite 邀请某人加入你的小队，/follow 跟随一位好友的脚步，/roll 为全队掷骰，/who 显示谁在线，/afk 将你标记为离开。在游戏中输入 /help 可查看完整列表。',
   'guide.social.slashHeading': '实用的斜杠命令',
   // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.helpUnstuckSickness':
+    '脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。你将带着脱困后遗症，最多持续 5 分钟。',
   'hudChrome.unstuck.menuButton': '脱困',
   'hudChrome.unstuck.help': '脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。',
   'hudChrome.unstuck.helpAtGraveyard':
     '脱困：/unstuck 会启动原地倒计时，结束后将你的灵魂送往最近的墓地。你必须向灵魂医者接受守护者的代价才能复活。',
+  'hudChrome.unstuck.movedToGraveyard': '你已被移动到最近的墓地。脱困后遗症正压在你身上。',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    '你已被移动到最近的墓地并复活。脱困后遗症正压在你身上。',
   'hudChrome.unstuck.started':
     '将在 {seconds} 秒后脱困。移动、战斗、受到伤害或开始其他动作都会取消。',
   'hudChrome.unstuck.countdown': '脱困：{seconds}',
@@ -9505,6 +9514,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.resonant_steel.name': '共鸣钢材',
   'entities.items.resonant_timber.name': '共鸣木材',
   'hud.errors.tradeBound': '该物品已绑定，无法交易。',
+  'hud.errors.marketListBound': '该物品已绑定，无法上架。',
   'hudChrome.enchantName.enchant_weapon_might': '武器附魔 - 威力',
   'hudChrome.enchantName.enchant_weapon_intellect': '武器附魔 - 法术强度',
   'hudChrome.enchantName.enchant_helmet_fortitude': '头盔附魔 - 坚韧',
@@ -10029,7 +10039,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '最稳的生意是消耗品，因为用掉就要再买：药水、熟食与附魔都随使用而消失。杰作是高端市场：无法定制，想要的人只能出高价，而上面的署名就是行走的招牌。原料是第三支柱：分解所得的奥术材料、直接从拆解者流向附魔师的各类Resonant次级材料，以及追逐杰作触发的工匠愿意溢价收购的署名采集品。',
   'guide.profPages.econ.marketHeading': '世界市场与抽成',
   'guide.profPages.econ.marketBody':
-    '世界市场是全服交易所，由Eastbrook的Merchant与Highwatch的Auctioneer Voss主持。挂单免费，没有押金，流拍原样退回；只在成交时抽取5%。重要限制：市场只经手无标记的普通货，署名、杰作、附魔或已绑定的副本一律不收，这些特殊物品只能面对面通过交易窗口转手。',
+    '世界市场是全服交易所，由Eastbrook的Merchant与Highwatch的Auctioneer Voss主持。挂单免费，没有押金，流拍原样退回；只在成交时抽取5%。特殊物品同样欢迎：署名、杰作或附魔的副本会以单件挂单上架，提示中带着完整的身份与署名，且绝不与普通堆叠混同。唯一拒收的是已绑定的副本：被制作者之约锁定（或仍待绑定）的物品既不能上市也不能邮寄，绑定无法被洗白。特殊物品请自行定价；普通挂单只能告诉你普通版的行情。',
   'guide.profPages.econ.collectorsHeading': '收藏家、战利品与故事的价格',
   'guide.profPages.econ.collectorsBody':
     '商人看不见出处：署名物品卖给NPC只值普通价，签名的溢价只存在于玩家之间。名家署名的横财矿石、一块Prime Cut、一柄署着已退隐工匠之名的杰作之刃，价格全凭记忆开价。功业之书里的Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen与Glimmer of Hope都是零声望的收藏印记，只为证明那一刻发生在你身上。出处不买属性也不赢战斗，它是这游戏里美好日子的存根。',
@@ -10125,7 +10135,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '两种行动推动技能：分解与施加附魔，每次成功最多一点，按工作的分量折算：普通分解与纯粉尘附魔算普通活；优秀分解与精华附魔算优秀活；精良分解与所有Runed或Greater附魔算精良活；史诗与传说分解更高。熟悉的精通衰减按25点层级作用：普通活在技能75变灰，优秀活在100，精良活恰在125上限。附魔另有一份仁慈：高于命途上限的输入向下取整而非归零，宣誓前史诗分解按精良计而非一无所获；若附魔沦为休眠，一切按普通活计，爬升停在75；作为爱好则精良活仍有收益，只是75之后变慢。',
   'guide.profPages.craftProse.enchanting.marketHeading': '附魔副本、出处与市场',
   'guide.profPages.craftProse.enchanting.marketBody':
-    '施加附魔消耗材料并标记特定的一件副本。用在背包中的副本上，交还一件独立的附魔副本；用在已穿戴的装备上，则就地附魔，无需脱下再穿上。无论哪种，加成都永远跟随。一件一附魔：对附魔副本施加另一个附魔会先要求确认，然后直接替换旧附魔，旧附魔被摧毁且不退还材料；出售、丢弃与分解都优先取用普通副本，成品不会被误吞；完全相同的附魔副本还能叠放。杰作与附魔是朋友：杰作完全可附魔，附魔叠加在杰作加成与署名之上互不干扰；署名杰作配Greater附魔是工艺品的极致，仍按设计低于团本战利品。世界市场只经手无标记的普通货，附魔与署名件都面对面交易；材料才是可上市的一半：粉尘、精华与碎片自由挂单，挂单免费，成交才抽5%。',
+    '施加附魔消耗材料并标记特定的一件副本。用在背包中的副本上，交还一件独立的附魔副本；用在已穿戴的装备上，则就地附魔，无需脱下再穿上。无论哪种，加成都永远跟随。一件一附魔：对附魔副本施加另一个附魔会先要求确认，然后直接替换旧附魔，旧附魔被摧毁且不退还材料；出售、丢弃与分解都优先取用普通副本，成品不会被误吞；完全相同的附魔副本还能叠放。杰作与附魔是朋友：杰作完全可附魔，附魔叠加在杰作加成与署名之上互不干扰；署名杰作配Greater附魔是工艺品的极致，仍按设计低于团本战利品。附魔与署名件如今也能上架：每件以单件挂单出售，物品提示会显示附魔与制作者印记，渡鸦邮驿同样可以寄送；材料依旧是稳定的一半：粉尘、精华与碎片自由挂单，挂单免费，成交才抽5%。',
   'hudChrome.corpseHarvest.components.meat': '兽肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（附魔）',
   'hudChrome.materialHint.arcaneDust': '附魔材料。分解普通和优秀品质的装备可得。',

@@ -165,6 +165,7 @@ export class Weather {
     this.points.frustumCulled = false;
     this.points.renderOrder = 3; // after the world, before nameplates
     this.points.visible = false;
+    this.points.userData.renderCategory = 'weather';
     scene.add(this.points);
   }
 

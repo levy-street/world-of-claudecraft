@@ -3,7 +3,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
 import { terrainHeight, waterLevel, waterLevelAt } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
 
 // Ambient leaping fish — a RENDER-ONLY decoration, no sim/IWorld/server state.
@@ -27,7 +27,7 @@ const FISH_ASSET_URL = '/models/creatures/leaping_fish.glb';
 let loadedFishGltf: THREE.Group | null = null;
 
 if (typeof window !== 'undefined') {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(FISH_ASSET_URL).then((gltf) => {
       loadedFishGltf = gltf.scene;
     }),

@@ -2136,6 +2136,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Dieser Brief ist nicht mehr in deinem Kasten.',
   'hudChrome.mailbox.result.needRecipient': 'Gib einen Empfänger für deinen Brief an.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Questgegenstände können nicht verschickt werden.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Dieser Gegenstand ist gebunden und kann nicht verschickt werden.',
   'hudChrome.mailbox.result.noRecipient':
     'Niemand mit diesem Namen unterhält hier einen Briefkasten.',
   'hudChrome.mailbox.result.notEnoughItems': 'So viele davon hast du nicht zum Versenden.',
@@ -3421,7 +3423,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': 'Beendet Euren Handel, bevor Ihr Euch anmeldet.',
   'hud.errors.arenaQueueInstance': 'Aus einer Instanz heraus könnt Ihr Euch nicht anmelden.',
   'hud.errors.tradeInProgress': 'Es läuft bereits ein Handel.',
+  'hud.errors.tradeAlreadyTrading': 'Dieser Spieler handelt bereits.',
   'hud.errors.tradeBound': 'Dieser Gegenstand ist gebunden und kann nicht gehandelt werden.',
+  'hud.errors.marketListBound':
+    'Dieser Gegenstand ist gebunden und kann nicht zum Verkauf angeboten werden.',
   'hud.errors.tradeTooFar': 'Das Ziel ist zu weit entfernt zum Handeln.',
   'hud.errors.tradeExpired': 'Die Handelsanfrage ist abgelaufen.',
   'hud.errors.tradeFailed':
@@ -3685,6 +3690,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'Der Questgeber ist nicht in der Nähe.',
   'questUi.errors.turnInMissing': 'Die Abgabe dieser Quest ist nicht in der Nähe.',
   'questUi.errors.tooFar': 'Ihr seid zu weit entfernt.',
+  'questUi.errors.escortAway':
+    'Eure Eskorte ist gerade nicht an ihrem Platz. Sie kehrt in Kürze dorthin zurück.',
   'itemUi.money.goldShort': 'G',
   'itemUi.money.silverShort': 'S',
   'itemUi.money.copperShort': 'K',
@@ -7970,6 +7977,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Dieser Link zum Zurücksetzen ist ungültig oder abgelaufen. Fordere einen neuen an.',
   'apiError.deeds.invalid_input': 'Ungültige Eingabe.',
+  'apiError.ota_updates.invalid_input': 'Ungültige Eingabe.',
   'apiError.steam.account_taken':
     'Dieses Steam-Konto ist bereits mit einem anderen Konto verknüpft.',
   'apiError.steam.already_linked': 'Dein Konto ist bereits mit einem Steam-Konto verknüpft.',
@@ -10171,7 +10179,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Fischer Bram sicher nach Gullhaven heimgebracht',
   'entities.quests.q_fs_bram_come_home.text':
-    'Mein Bram nahm das Boot hinaus an dem Morgen, als sich der Netzriss öffnete, und das Meer warf ihn irgendwo hinter der Landspitze zurück. Ich hörte ihn vor drei Nächten, {playerName}, rufend über das Wasser, und ich hatte zu viel Angst zu gehen. Ich habe immer noch zu viel Angst. Bitte. Sein Boot liegt zerschellt am Nordufer. Bring ihn heim zu mir.',
+    'Mein Bram nahm das Boot hinaus an dem Morgen, als sich der Netzriss öffnete, und das Meer warf ihn irgendwo hinter der Landspitze zurück. Ich hörte ihn vor drei Nächten, {playerName}, rufend über das Wasser, und ich hatte zu viel Angst zu gehen. Ich habe immer noch zu viel Angst. Bitte. Sein Boot liegt zerschellt am Südufer. Bring ihn heim zu mir.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram, komm heim',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     'Zehn weniger, und die Feldarbeiter streiten schon darüber, wer zuerst hinausgeht. Es wird nicht von Dauer sein, die Risse ruhen nie lange, aber eine Stadt, die isst, ist eine Stadt, die hält.',
@@ -10257,7 +10265,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Lehrling Wren sicher zu den Aurorastufen gebracht',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Meine Lehrling Wren ging vor zwei Tagen los, um die Goldmelt-Linie abzugehen, und kam nie zurück. Ich fand ihre Spuren, sie hat sich unter den Wegmarkierungen südwestlich der Aurorastufen verkrochen, zu verängstigt vor den Wölfen, um sich zu bewegen. Ich kann das Moor nicht verlassen, {playerName}. Bring sie zu Veylas Lager auf den Stufen. Dort wird sie unter den Lichtern sicher sein.',
+    'Meine Lehrling Wren ging vor zwei Tagen los, um die Goldmelt-Linie abzugehen, und kam nie zurück. Ich fand ihre Spuren, sie hat sich unter den Wegmarkierungen nordöstlich der Aurorastufen verkrochen, zu verängstigt vor den Wölfen, um sich zu bewegen. Ich kann das Moor nicht verlassen, {playerName}. Bring sie zu Veylas Lager auf den Stufen. Dort wird sie unter den Lichtern sicher sein.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Wren sicher heimbringen',
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve hat dich geschickt? Ha. Elf Jahre, und die Frau denkt immer noch, das Moor wird mich fressen. Nun... dieses Jahr könnte sie recht haben. Sieh dir an, was es meinen Linien angetan hat.',
@@ -10776,12 +10784,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Eindringlinge von jenseits der Risse, ganz Feuer und Bosheit. Wo einer steht, ist ein Durchbruch nie fern.',
   'guide.family.demon.name': 'Dämonen',
-  'guide.family.kobold.desc':
-    'Huschende Aasfresser und Wichte aus Lichtung und Hecke, eher lästig als bedrohlich, bis sie sich in großer Zahl versammeln.',
-  'guide.family.kobold.name': 'Schelme',
-  'guide.family.murloc.desc':
-    'Quakendes Fischvolk aus Seeufern und Gezeitentümpeln, schnell dabei, alles zu überfallen, das zu nah heranwatet.',
-  'guide.family.murloc.name': 'Quakflossen',
   'guide.home.world.amberBlurb':
     'Hinter den westlichen Klippen ein Herbst, der niemals endet, und Laternen auf einem goldenen See.',
   'guide.home.world.amberName': 'Der Bernsteinfall',
@@ -10929,11 +10931,17 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Rettung: /unstuck startet einen Countdown im Stehen, der dich zu einer nahen, erreichbaren sicheren Stelle bewegt.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Rettung: /unstuck startet einen Countdown im Stehen und schickt deinen Geist dann zum nächsten Friedhof. Die Rückkehr über den Bleichen Hüter erfordert den Hüterzoll.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Rettung: /unstuck startet einen Countdown im Stehen und bringt dich dann zum nächsten Friedhof, wobei du wiederbelebt wirst, falls du gefallen warst. Die Befreiungskrankheit bleibt bis zu 5 Minuten auf dir.',
   'hudChrome.unstuck.menuButton': 'Befreien',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Du wurdest zum nächsten Friedhof gebracht. Die Befreiungskrankheit lastet auf dir.',
   'hudChrome.unstuck.noSafePosition':
     'In der Nähe wurde keine erreichbare sichere Stelle gefunden. Du wurdest nicht bewegt.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Du wurdest zum nächsten Friedhof zurückgebracht und wiederbelebt. Der Hüterzoll lastet auf dir.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Du wurdest zum nächsten Friedhof gebracht und wiederbelebt. Die Befreiungskrankheit lastet auf dir.',
   'hudChrome.unstuck.standStill': 'Steh still auf festem Boden, bevor du Befreien benutzt.',
   'hudChrome.unstuck.standStillAnywhere': 'Steh still, bevor du Befreien benutzt.',
   'hudChrome.unstuck.started':
@@ -10990,4 +10998,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'sim.rift.socketsShut': 'Die Fassungen schließen sich knirschend. Der Weg regt sich.',
   'sim.rift.stepBack': 'Du trittst zurück durch den Riss.',
   'sim.rift.wayDownOpens': 'Der Weg hinab reißt auf.',
+  'hudChrome.riftTracker.title': 'Riss',
+  'hudChrome.riftTracker.floor': 'Ebene {current} von {total}',
+  'hudChrome.riftTracker.closesIn': 'Schließt in {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 
 export const EASTBROOK_SURFACE_ATLAS_URL = '/textures/eastbrook_surface_atlas.webp';
@@ -37,7 +37,7 @@ const CELL_PADDING_UV = CELL_PADDING_PIXELS / EASTBROOK_SURFACE_ATLAS_SIZE;
 let loadedAtlas: THREE.Texture | null = null;
 
 if (typeof window !== 'undefined') {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture(EASTBROOK_SURFACE_ATLAS_URL).then((texture) => {
       // Loader-cache results are immutable shared resources. Eastbrook identity
       // metadata stays module/root-side; consumers bind this exact texture.

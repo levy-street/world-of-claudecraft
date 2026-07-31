@@ -2103,6 +2103,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Quella lettera non è più nella tua cassetta.',
   'hudChrome.mailbox.result.needRecipient': 'Indica un destinatario per la tua lettera.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Non puoi spedire oggetti delle missioni.',
+  'hudChrome.mailbox.result.noMailBound': "Quell'oggetto è legato e non può essere spedito.",
   'hudChrome.mailbox.result.noRecipient': 'Nessuno con quel nome ha una cassetta postale qui.',
   'hudChrome.mailbox.result.notEnoughItems': 'Non ne hai così tanti da spedire.',
   'hudChrome.mailbox.result.recipientBoxFull': 'La sua cassetta postale è piena.',
@@ -3394,9 +3395,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': 'Termina lo scambio prima di metterti in coda.',
   'hud.errors.arenaQueueInstance': "Non puoi metterti in coda da dentro un'istanza.",
   'hud.errors.tradeInProgress': 'Uno scambio è già in corso.',
+  'hud.errors.tradeAlreadyTrading': 'Quel giocatore sta già scambiando.',
   'hud.errors.tradeTooFar': 'Il bersaglio è troppo lontano per commerciare.',
   'hud.errors.tradeExpired': 'La richiesta di scambio è scaduta.',
   'hud.errors.tradeBound': "Quell'oggetto è legato e non può essere scambiato.",
+  'hud.errors.marketListBound': "Quell'oggetto è legato e non può essere messo in vendita.",
   'hud.errors.tradeFailed': 'Scambio fallito: oggetti o denaro non più disponibili.',
   'hud.logs.standUp': 'Ti alzi.',
   'hud.logs.partyInviteSent': 'Hai invitato {name} nel tuo gruppo.',
@@ -3671,6 +3674,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'Chi assegna quella missione non è vicino.',
   'questUi.errors.turnInMissing': 'Il punto di consegna di quella missione non è vicino.',
   'questUi.errors.tooFar': 'Sei troppo lontano.',
+  'questUi.errors.escortAway':
+    'La tua scorta non è al suo posto in questo momento. Vi tornerà a breve.',
   'itemUi.money.goldShort': 'o',
   'itemUi.money.silverShort': 'a',
   'itemUi.money.copperShort': 'r',
@@ -6187,12 +6192,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.name': 'Demoni',
   'guide.family.demon.desc':
     'Invasori da oltre gli squarci, tutto fuoco e rancore. Dove uno si trova, una breccia non è mai lontana.',
-  'guide.family.kobold.name': 'Birbanti',
-  'guide.family.kobold.desc':
-    'Spazzini guizzanti e folletti di radure e siepi, più fastidiosi che pericolosi finché non si radunano in gran numero.',
-  'guide.family.murloc.name': 'Gracidopinne',
-  'guide.family.murloc.desc':
-    'Gracidanti genti-pesce di rive lacustri e pozze di marea, pronti a sciamare su chiunque si avvicini troppo.',
   'guide.faqPage.a1':
     "Sì. L'intero gioco è gratuito fino al livello massimo, e il codice sorgente è aperto su GitHub.",
   'guide.faqPage.a2':
@@ -8342,6 +8341,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Questo link di reimpostazione non è valido o è scaduto. Richiedine uno nuovo.',
   'apiError.deeds.invalid_input': 'Dati non validi.',
+  'apiError.ota_updates.invalid_input': 'Dati non validi.',
   'apiError.steam.account_taken': "Quell'account Steam è già collegato a un altro account.",
   'apiError.steam.already_linked': 'Il tuo account ha già un account Steam collegato.',
   'apiError.steam.banned': "Quell'account Steam non può essere collegato.",
@@ -8662,7 +8662,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'La strada rialzata regge, e Tam ha ancora fiato a sufficienza per scherzare sui tre rintocchi. Bene. Siamo un’isola sotto assedio, {playerName}, e ogni paio di mani che attraversa quella barra di sabbia è un paio che le fratture devono superare prima di raggiungere la mia gente. Benvenuto a Gullhaven.',
   'entities.quests.q_fs_bram_come_home.title': 'Bram Torna a Casa',
   'entities.quests.q_fs_bram_come_home.text':
-    'Il mio Bram ha preso la barca la mattina in cui si è aperta la frattura delle reti, e il mare lo ha rigettato da qualche parte oltre la punta dell’Approdo. L’ho sentito tre notti fa, {playerName}, chiamare sull’acqua, ed ero troppo spaventata per andare. Sono ancora troppo spaventata. Ti prego. La sua barca giace naufragata sulla costa nord. Riportamelo a casa.',
+    'Il mio Bram ha preso la barca la mattina in cui si è aperta la frattura delle reti, e il mare lo ha rigettato da qualche parte oltre la punta dell’Approdo. L’ho sentito tre notti fa, {playerName}, chiamare sull’acqua, ed ero troppo spaventata per andare. Sono ancora troppo spaventata. Ti prego. La sua barca giace naufragata sulla costa sud. Riportamelo a casa.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
     'Pescatore Bram riportato sano e salvo a Gullhaven',
   'entities.quests.q_fs_bram_come_home.completion':
@@ -8749,7 +8749,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "La notte sembra già più rarefatta. Qualunque cosa li risvegli non ha finito, ma hai comprato un po' di quiete per la Scalinata.",
   'entities.quests.q_fv_seeing_wren_home.title': 'Riportare Wren a Casa',
   'entities.quests.q_fv_seeing_wren_home.text':
-    "La mia apprendista Wren è uscita per percorrere la linea del Goldmelt due giorni fa e non è mai tornata. Ho trovato le sue tracce, si è rintanata sotto i segnavia a sudovest della Scalinata dell'Aurora, troppo spaventata dai lupi per muoversi. Non posso lasciare la palude, {playerName}. Accompagnala all'accampamento di Veyla sulla Scalinata. Sarà al sicuro sotto le luci.",
+    "La mia apprendista Wren è uscita per percorrere la linea del Goldmelt due giorni fa e non è mai tornata. Ho trovato le sue tracce, si è rintanata sotto i segnavia a nordest della Scalinata dell'Aurora, troppo spaventata dai lupi per muoversi. Non posso lasciare la palude, {playerName}. Accompagnala all'accampamento di Veyla sulla Scalinata. Sarà al sicuro sotto le luci.",
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     "Apprendista Wren accompagnata sana e salva alla Scalinata dell'Aurora",
   'entities.quests.q_fv_seeing_wren_home.completion':
@@ -10949,14 +10949,25 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Recupero: /unstuck avvia un conto alla rovescia da fermo per spostarti in un punto sicuro raggiungibile nelle vicinanze.',
   'hudChrome.unstuck.helpAtGraveyard':
     'Recupero: /unstuck avvia un conto alla rovescia da fermo, poi invia il tuo spirito al cimitero più vicino. Tornare tramite il Custode Pallido richiede il Mal di resurrezione.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Recupero: /unstuck avvia un conto alla rovescia da fermo, poi ti sposta al cimitero più vicino, rianimandoti se eri caduto. Ti lascia il Mal di sblocco per un massimo di 5 minuti.',
   'hudChrome.unstuck.menuButton': 'Sblocco',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Sei stato spostato al cimitero più vicino. Il Mal di sblocco grava su di te.',
   'hudChrome.unstuck.noSafePosition':
     'Non è stato trovato alcun punto sicuro raggiungibile nelle vicinanze. Non sei stato spostato.',
   'hudChrome.unstuck.revivedAtGraveyard':
     'Sei stato riportato al cimitero più vicino e rianimato. Il Mal di resurrezione grava su di te.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Sei stato spostato al cimitero più vicino e rianimato. Il Mal di sblocco grava su di te.',
   'hudChrome.unstuck.standStill': 'Resta fermo su terreno solido prima di usare Sblocco.',
   'hudChrome.unstuck.standStillAnywhere': 'Resta fermo prima di usare Sblocco.',
   'hudChrome.unstuck.started':
     "Sblocco tra {seconds} secondi. Muoverti, combattere, subire danni o avviare un'altra azione lo annulla.",
   'hudChrome.unstuck.unavailable': 'Sblocco non è disponibile nel tuo stato attuale.',
+  'hudChrome.riftTracker.title': 'Squarcio',
+  'hudChrome.riftTracker.floor': 'Piano {current} di {total}',
+  'hudChrome.riftTracker.closesIn': 'Si chiude tra {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

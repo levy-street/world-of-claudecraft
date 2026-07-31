@@ -243,11 +243,16 @@ export class ActionBarController {
     // Gathering implements (#2343): the simple pole (use.type 'fishing') and
     // every gatherTool (picks, axes, sickles, tiered rods) are placeable, so
     // a keybound press works the tool exactly like the bags click.
+    // Reins: the mounts-as-items pivot routes kind 'mount' through the same
+    // useItem dispatch a potion rides (src/sim/items.ts -> summonMountItem), so
+    // reins are placeable for the same reason a potion is. Without this arm the
+    // bag drag never writes a hotbar payload and the bar cannot accept them.
     const item = ITEMS[itemId];
     return (
       item?.kind === 'food' ||
       item?.kind === 'drink' ||
       item?.kind === 'potion' ||
+      item?.kind === 'mount' ||
       item?.use?.type === 'fishing' ||
       item?.use?.type === 'gatherTool'
     );

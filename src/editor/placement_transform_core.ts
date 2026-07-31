@@ -2,6 +2,8 @@
 // (drag-move, Shift/Alt+wheel rotate/scale, arrow-key nudges). No DOM, no
 // Three: the app and the 3D viewport consume it; a Vitest drives it directly.
 
+import { cameraAxes } from './camera_axes';
+
 /** Placement scale bounds shared by the inspector sliders and the wheel path. */
 export const PLACEMENT_SCALE_MIN = 0.2;
 export const PLACEMENT_SCALE_MAX = 5;
@@ -40,10 +42,7 @@ export function nudgeDelta(
   camYaw: number,
   step: number,
 ): { dx: number; dz: number } {
-  const fx = Math.sin(camYaw);
-  const fz = Math.cos(camYaw);
-  const rx = -Math.cos(camYaw);
-  const rz = Math.sin(camYaw);
+  const { fx, fz, rx, rz } = cameraAxes(camYaw);
   switch (key) {
     case 'ArrowUp':
       return { dx: fx * step, dz: fz * step };

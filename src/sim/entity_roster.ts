@@ -293,7 +293,11 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   // puddles must not outlive the death, or the respawned player can be hit
   // (or insta-killed) by an effect that was already active before they died.
   clearDrownedLitanyBellsAndMarks(ctx, run);
+  // prevFacing pairs with the forced facing reset (same convention as the graveyard
+  // release/revive flow in spirit.ts), or the render-interpolated facing sweeps from
+  // the pre-death heading instead of landing on 0 immediately.
   p.facing = 0;
+  p.prevFacing = 0;
   // A held movement key at the moment of death must not carry over into the respawned
   // body, or it walks off on its own with no input held (same fix as the graveyard
   // release/revive flow in spirit.ts).
