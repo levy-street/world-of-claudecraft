@@ -147,8 +147,8 @@ describe('BattlegroundFx.update', () => {
     expect(crimson.lean.rotation.x).toBeLessThan(0);
     expect(crimson.lean.rotation.y).toBeCloseTo(1.2, 5);
     // the pole mounts BEHIND the carrier along their facing, slightly raised
-    expect(crimson.lean.position.x).toBeCloseTo(-Math.sin(1.2) * 0.35, 5);
-    expect(crimson.lean.position.z).toBeCloseTo(-Math.cos(1.2) * 0.35, 5);
+    expect(crimson.lean.position.x).toBeCloseTo(-Math.sin(1.2) * 0.42, 5);
+    expect(crimson.lean.position.z).toBeCloseTo(-Math.cos(1.2) * 0.42, 5);
     expect(crimson.lean.position.y).toBeGreaterThan(0);
     // carrier view vanishes for a frame: the yaw holds instead of snapping
     h.views.delete(55);
@@ -177,8 +177,8 @@ describe('BattlegroundFx.update', () => {
     const lean = h.refs(h.crimsonFlag.group).lean;
     // the mount closes the whole gap (plus the usual back offset at yaw 0)
     expect(lean.position.x).toBeCloseTo(4 - 2, 5);
-    expect(lean.position.z).toBeCloseTo(-2 - -4 - 0.35, 5);
-    expect(lean.position.y).toBeCloseTo(0.5 + 0.1, 5);
+    expect(lean.position.z).toBeCloseTo(-2 - -4 - 0.42, 5);
+    expect(lean.position.y).toBeCloseTo(0.5 + 0.5, 5);
   });
 
   it('rides an identity ring on every visible match player: green ally, red enemy, hidden on corpses, torn down with the match', () => {

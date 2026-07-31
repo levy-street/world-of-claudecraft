@@ -820,7 +820,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': '鴉裂谷',
   'hudChrome.bg.blurb':
-    '兩座廢棄的要塞隔著棘峰下的圍牆山谷遙遙相望：緋紅在南，蔚藍在北，而兩者之間的古老廢墟庭院，誰都不曾真正佔據。每方五人，各持一面戰旗，先將對方戰旗奪回己方五次者贏得戰場。',
+    '兩座廢棄的要塞隔著棘峰陰影下的圍牆山谷遙遙相望：緋紅在南，蔚藍在北，而兩者之間的古老廢墟庭院，誰都不曾真正佔據。每方五人，各持一面戰旗，先將對方戰旗奪回己方五次者贏得戰場。',
   'hudChrome.bg.modeTag': '5v5奪旗戰',
   'hudChrome.bg.offlineNote': '鴉裂谷正在同步。待王國回應後即可排隊。',
   'hudChrome.bg.ratingSummary': '評分。{wins}勝 / {losses}敗',
@@ -874,7 +874,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.nav.ravenrift': '鴉裂谷',
   'guide.ravenriftPage.heading': '鴉裂谷',
   'guide.ravenriftPage.intro':
-    '排位5v5奪旗戰場:兩支五人隊伍,兩座要塞,一個目標。奪走敵方軍旗並送回己方,趕在他們得手之前。',
+    '一場排位 5v5 奪旗戰場，戰場位於棘峰之下老林中的圍牆山谷：兩座廢棄要塞沿著峽谷兩端遙遙相對，中間是一座更古老的庭院，誰都不曾真正佔據。每方五人，兩座要塞，一個目標：奪走敵方戰旗並趕在對方之前帶回家。',
   'guide.ravenriftPage.queueHeading': '排隊參戰',
   'guide.ravenriftPage.queueBody':
     '打開鴉裂谷面板即可單人排隊,也可以組一支最多五人的隊伍一同排隊:隊伍總在同一邊,空位由單人勇士補齊。十人就位後,比賽會把雙方安置在各自要塞,短暫列隊後旗幟生效。',

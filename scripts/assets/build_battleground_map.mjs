@@ -276,7 +276,7 @@ const map = {
     id: 'thornhollow_v3',
     name: 'Thornhollow Fields',
     description:
-      'Thornhollow Fields: a walled hollow in the old growth under Thornpeak. ' +
+      'Thornhollow Fields: a walled hollow in the old growth below Thornpeak. ' +
       'Crimson and Azure hold a keep at either end of the ravine floor, two curtain ' +
       'walls carve the field into three chambers, and the Ruin Courtyard between them ' +
       'settles what the flags cannot.',

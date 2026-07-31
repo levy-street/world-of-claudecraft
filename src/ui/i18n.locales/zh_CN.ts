@@ -819,7 +819,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': '鸦裂谷',
   'hudChrome.bg.blurb':
-    '两座废弃的要塞隔着索恩峰下的围墙山谷遥遥相望：绯红在南，蔚蓝在北，而两者之间的古老废墟庭院，谁都不曾真正占据。每方五人，各持一面战旗，先将对方战旗夺回本方五次者赢得战场。',
+    '两座废弃的要塞隔着棘峰阴影下的围墙山谷遥遥相望：绯红在南，蔚蓝在北，而两者之间的古老废墟庭院，谁都不曾真正占据。每方五人，各持一面战旗，先将对方战旗夺回本方五次者赢得战场。',
   'hudChrome.bg.modeTag': '5v5夺旗战',
   'hudChrome.bg.offlineNote': '鸦裂谷正在同步。待王国响应后即可排队。',
   'hudChrome.bg.ratingSummary': '评分。{wins}胜 / {losses}负',
@@ -873,7 +873,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.nav.ravenrift': '鸦裂谷',
   'guide.ravenriftPage.heading': '鸦裂谷',
   'guide.ravenriftPage.intro':
-    '排位5v5夺旗战场:两支五人队伍,两座要塞,一个目标。夺走敌方军旗并送回己方,赶在他们得手之前。',
+    '一场排位 5v5 夺旗战场，战场位于棘峰之下老林中的围墙山谷：两座废弃要塞沿着峡谷两端遥遥相对，中间是一座更古老的庭院，谁都不曾真正占据。每方五人，两座要塞，一个目标：夺走敌方战旗并抢在对方之前带回家。',
   'guide.ravenriftPage.queueHeading': '排队参战',
   'guide.ravenriftPage.queueBody':
     '打开鸦裂谷面板即可单人排队,也可以组一支最多五人的小队一同排队:小队总在同一边,空位由单人勇士补齐。十人就位后,比赛会把双方安置在各自要塞,短暂列队后旗帜生效。',

@@ -845,7 +845,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': '레이븐리프트',
   'hudChrome.bg.blurb':
-    '가시봉 아래 성벽으로 둘러싸인 분지를 사이에 두고 두 폐허가 된 요새가 마주 본다. 남쪽은 크림슨, 북쪽은 애저, 그 사이의 오래된 폐허 안뜰은 아직 누구도 차지하지 못했다. 5대 5, 깃발은 하나씩. 상대의 깃발을 먼저 다섯 번 가져오는 쪽이 전장을 차지한다.',
+    '가시봉 그늘에 성벽으로 둘러싸인 분지를 사이에 두고 두 폐허가 된 요새가 마주 본다. 남쪽은 크림슨, 북쪽은 애저, 그 사이의 오래된 폐허 안뜰은 아직 누구도 차지하지 못했다. 5대 5, 깃발은 하나씩. 상대의 깃발을 먼저 다섯 번 가져오는 쪽이 전장을 차지한다.',
   'hudChrome.bg.modeTag': '5v5 깃발 뺏기',
   'hudChrome.bg.offlineNote': '레이븐리프트 동기화 중입니다. 서버 응답 후 대기열이 열립니다.',
   'hudChrome.bg.ratingSummary': '레이팅. {wins}승 / {losses}패',
@@ -899,7 +899,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.nav.ravenrift': '레이븐리프트',
   'guide.ravenriftPage.heading': '레이븐리프트',
   'guide.ravenriftPage.intro':
-    '등급전 5v5 깃발 뺏기 전장. 5인 2개 팀, 2개의 요새, 목표는 하나. 적의 군기를 빼앗아 빼앗기기 전에 가져오세요.',
+    '가시봉 아래 오래된 숲의 성벽으로 둘러싸인 분지에서 벌어지는 랭크 5대 5 깃발 뺏기 전장. 협곡 양 끝에서 두 폐허 요새가 마주 보고, 그 사이에는 누구도 차지한 적 없는 더 오래된 안뜰이 있다. 다섯 명씩, 요새 둘, 목표 하나. 적의 깃발을 빼앗아 우리 깃발을 빼앗기기 전에 가져와라.',
   'guide.ravenriftPage.queueHeading': '대기열 참가',
   'guide.ravenriftPage.queueBody':
     '레이븐리프트 창을 열어 혼자 대기열에 서거나, 최대 5인 파티로 함께 참가하세요. 파티는 항상 같은 팀에 배치되고 남는 자리는 솔로 용사들로 채워집니다. 열 명이 모이면 양 팀이 각자의 요새에 배치되고, 짧은 집결 후 깃발이 활성화됩니다.',

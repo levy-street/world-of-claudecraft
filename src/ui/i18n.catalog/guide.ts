@@ -1157,7 +1157,7 @@ export const guideStrings = {
   ravenriftPage: {
     heading: 'Thornhollow Fields',
     intro:
-      'A ranked 5v5 capture-the-flag battleground: two teams of five, two keeps, one goal. Steal the enemy banner and run it home before they run yours.',
+      'A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.',
     queueHeading: 'Queueing up',
     queueBody:
       'Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.',

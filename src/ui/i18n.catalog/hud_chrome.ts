@@ -820,7 +820,7 @@ export const hudChromeStrings = {
     // The one-paragraph pitch above the queue button: what the place is, then
     // what the match is. Kept to two sentences so the panel never scrolls.
     blurb:
-      'Two ruined keeps face each other across a walled hollow under Thornpeak: Crimson to the south, Azure to the north, and the old Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry five of theirs home takes the field.',
+      'Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry five of theirs home takes the field.',
     modeTag: '5v5 Capture the Flag',
     offlineNote: 'Thornhollow Fields is syncing. The queue opens once the realm answers.',
     ratingSummary: 'Rating. {wins} wins / {losses} losses',
