@@ -203,8 +203,17 @@ export class MeterData {
             t.dmgByMob.set(ev.targetId, (t.dmgByMob.get(ev.targetId) ?? 0) + ev.amount);
           }
         }
-        // encounter label/threat subject: the beefiest mob the party fought
-        if (target.maxHp > this.current.biggestMobHp) {
+        // Encounter label / threat subject: the beefiest mob the party fought,
+        // EXCEPT that a segment routinely outlives its subject. Kill the pull
+        // and grab the next one (or lose the old one out of the interest-scoped
+        // entity map) and a size-only rule leaves the subject pinned to a
+        // corpse: the Threat tab then has no live hate table, silently falls
+        // back to the damage dealt to that corpse, and reads FROZEN for the
+        // rest of the segment while the party fights something else. Once the
+        // subject is dead or gone, the next mob damaged takes over regardless
+        // of size; while it is alive the beefiest-mob rule is untouched, so a
+        // boss still outranks its adds.
+        if (this.subjectLost(world) || target.maxHp > this.current.biggestMobHp) {
           this.current.biggestMobHp = target.maxHp;
           this.current.label = target.name;
           this.current.mainMobName = target.name;
@@ -220,6 +229,18 @@ export class MeterData {
         addBreakdown(t.healByAbility, who.petName, ev.ability, ev.amount);
       }
     }
+  }
+
+  /**
+   * True when the live segment's threat subject can no longer carry the Threat
+   * tab: it died, or it is no longer in the world view at all (the entity map
+   * is interest-scoped online, and a despawn drops it offline).
+   */
+  private subjectLost(world: IWorld): boolean {
+    const id = this.current?.mainMobId ?? null;
+    if (id === null) return true;
+    const mob = world.entities.get(id);
+    return !mob || mob.dead;
   }
 
   /** advance clocks + close the encounter once combat has clearly ended */
