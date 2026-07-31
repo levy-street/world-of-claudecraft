@@ -216,6 +216,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.0,
     color: 0xb9a3cf,
+    componentTags: ['hide', 'meat'],
   },
   veiled_doe: {
     id: 'veiled_doe',
@@ -234,6 +235,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 40, chance: 1 }],
     scale: 0.9,
     color: 0xcdbfdc,
+    componentTags: ['hide', 'meat'],
   },
   gleamstag: {
     id: 'gleamstag',

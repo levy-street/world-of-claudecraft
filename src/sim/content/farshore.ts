@@ -157,6 +157,7 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 26, chance: 1 }],
     scale: 1.15,
     color: 0x2f2a44,
+    componentTags: ['hide', 'fang'],
   },
   sundered_horror: {
     id: 'sundered_horror',

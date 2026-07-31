@@ -117,15 +117,50 @@ describe('coin-family trash sits on the coin curve', () => {
   const MIN_COPPER_PER_LEVEL = 3.5;
   const MAX_COPPER_PER_LEVEL = 7.0;
 
+  // ELITES are a separate tier and are excluded here. A zone's elite capstone
+  // is a deliberate step up (10 to 22.5 c/level in the shipped content), not an
+  // off-curve trash mob, and it is pinned by its own band below.
   const governed = () =>
     campTemplates().filter(
       ({ template, zoneLevelCap }) =>
-        isTrash(template) && COIN_FAMILIES.has(template.family) && zoneLevelCap >= 8,
+        isTrash(template) &&
+        !template.elite &&
+        COIN_FAMILIES.has(template.family) &&
+        zoneLevelCap >= 8,
+    );
+
+  const governedElites = () =>
+    campTemplates().filter(
+      ({ template, zoneLevelCap }) =>
+        isTrash(template) &&
+        template.elite === true &&
+        COIN_FAMILIES.has(template.family) &&
+        zoneLevelCap >= 8,
     );
 
   it('checks a real population, not an empty set', () => {
-    // 52 ship today; the floor sits at the real count, not comfortably under it.
-    expect(governed().length).toBeGreaterThanOrEqual(52);
+    expect(governed().length).toBeGreaterThanOrEqual(35);
+    expect(governedElites().length).toBeGreaterThanOrEqual(8);
+  });
+
+  it('pays elite capstones on their own higher band, not the trash curve', () => {
+    // Their step up is intentional; this pins it so it stays a step and does not
+    // drift into a farm. 8 to 25 c/level brackets the shipped spread.
+    const off = governedElites()
+      .map(({ template, zoneId }) => {
+        const level = (template.minLevel + template.maxLevel) / 2;
+        return { id: template.id, zoneId, perLevel: coinEvPerKill(template) / level };
+      })
+      .filter((r) => r.perLevel < 8 || r.perLevel > 25)
+      .map((r) => `${r.id} (${r.zoneId}): ${r.perLevel.toFixed(2)} c/level`);
+    expect(off).toEqual([]);
+    // ...and the two bands really are disjoint, so "elite" is doing work here.
+    const trashMax = Math.max(
+      ...governed().map(
+        ({ template }) => coinEvPerKill(template) / ((template.minLevel + template.maxLevel) / 2),
+      ),
+    );
+    expect(trashMax).toBeLessThan(8);
   });
 
   it('pays every coin-family trash mob within the curve band', () => {
@@ -149,17 +184,19 @@ describe('coin-family trash sits on the coin curve', () => {
   });
 
   it('rejects an over-curve AND an under-curve template, so both edges bite', () => {
-    // Per-dimension negative controls. Without the second one, setting
-    // MIN_COPPER_PER_LEVEL to 0 would leave every assertion above green, so the
-    // "a coin fill an order of magnitude off" regression is caught one way only.
-    const crusher = MOBS.ogre_crusher;
-    const level = (crusher.minLevel + crusher.maxLevel) / 2;
-    expect(coinEvPerKill(crusher) / level).toBeGreaterThanOrEqual(MIN_COPPER_PER_LEVEL);
-    expect(coinEvPerKill(crusher) / level).toBeLessThanOrEqual(MAX_COPPER_PER_LEVEL);
-    // The pre-trim value was over the top of the band...
-    expect(200 / level).toBeGreaterThan(MAX_COPPER_PER_LEVEL);
-    // ...and a tenth of the shipped fill would be under the bottom of it.
-    expect(coinEvPerKill(crusher) / 10 / level).toBeLessThan(MIN_COPPER_PER_LEVEL);
+    // Per-dimension negative controls against a real trash template. Without the
+    // second one, setting MIN_COPPER_PER_LEVEL to 0 would leave every assertion
+    // above green, so the "coin fill an order of magnitude off" regression is
+    // caught one way only.
+    const wader = MOBS.glimmermere_wader;
+    const level = (wader.minLevel + wader.maxLevel) / 2;
+    const onCurve = coinEvPerKill(wader) / level;
+    expect(onCurve).toBeGreaterThanOrEqual(MIN_COPPER_PER_LEVEL);
+    expect(onCurve).toBeLessThanOrEqual(MAX_COPPER_PER_LEVEL);
+    // Ten times the shipped fill clears the top of the band...
+    expect(onCurve * 10).toBeGreaterThan(MAX_COPPER_PER_LEVEL);
+    // ...and a tenth of it falls under the bottom.
+    expect(onCurve / 10).toBeLessThan(MIN_COPPER_PER_LEVEL);
   });
 });
 
@@ -236,9 +273,13 @@ describe('the yield model matches the sim it is modelling', () => {
   it('counts guaranteed and chance coin, and ignores quest-only drops', () => {
     const wader = MOBS.glimmermere_wader;
     expect(coinEvPerKill(wader)).toBe(70);
-    // Quest entries never contribute to sustainable income.
-    const questOnly = MOBS.gilded_stag;
-    expect(questOnly.loot.every((l) => !l.copper)).toBe(true);
+    // Quest entries never contribute to sustainable income. Asserted against a
+    // synthetic template rather than a content mob, whose loot may legitimately
+    // gain coin in a later pass and would silently retire the case.
+    const questOnly = {
+      ...MOBS.gilded_stag,
+      loot: [{ itemId: 'gilded_sap_clot', chance: 1, questId: 'q_af_amber_from_the_herd' }],
+    };
     expect(coinEvPerKill(questOnly)).toBe(0);
     expect(itemEvPerKill(questOnly)).toBe(0);
   });

@@ -127,6 +127,7 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.1,
     color: 0xe6e9f4,
+    componentTags: ['hide', 'meat'],
   },
   gloam_strider: {
     id: 'gloam_strider',
@@ -145,6 +146,7 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 105, chance: 1 }],
     scale: 1.1,
     color: 0x4c4a72,
+    componentTags: ['hide', 'fang'],
   },
   nightkin_stargazer: {
     id: 'nightkin_stargazer',

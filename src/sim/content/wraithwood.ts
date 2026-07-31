@@ -128,6 +128,7 @@ export const WRAITHWOOD_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.3,
     color: 0x3a3440,
+    componentTags: ['silk', 'venomSac'],
   },
   wood_wraith: {
     id: 'wood_wraith',

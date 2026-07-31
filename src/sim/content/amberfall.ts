@@ -119,6 +119,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.15,
     color: 0xd8a848,
+    componentTags: ['hide', 'meat'],
   },
   gloam_fox: {
     id: 'gloam_fox',
@@ -137,6 +138,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 90, chance: 1 }],
     scale: 1,
     color: 0xd87838,
+    componentTags: ['hide', 'fang'],
   },
   orchard_treant: {
     id: 'orchard_treant',

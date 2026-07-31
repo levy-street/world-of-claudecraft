@@ -123,6 +123,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.1,
     color: 0xeef4f8,
+    componentTags: ['hide', 'fang', 'meat'],
   },
   ice_wisp: {
     id: 'ice_wisp',
@@ -201,6 +202,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 105, chance: 1 }],
     scale: 1.3,
     color: 0x9db4c8,
+    componentTags: ['hide', 'fang', 'meat'],
   },
   // Trapper Brosk's lost apprentice (q_fv_seeing_wren_home). Escort-run
   // escortee: non-hostile, never wanders (moveSpeed 0; src/sim/escort.ts

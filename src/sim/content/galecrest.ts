@@ -138,6 +138,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.1,
     color: 0xd8d0c0,
+    componentTags: ['hide', 'meat'],
   },
   gale_wisp: {
     id: 'gale_wisp',

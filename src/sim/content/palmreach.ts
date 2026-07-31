@@ -125,6 +125,7 @@ export const PALMREACH_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 105, chance: 1 }],
     scale: 1.15,
     color: 0xe86848,
+    componentTags: ['meat'],
   },
   thicket_boar: {
     id: 'thicket_boar',
@@ -143,6 +144,7 @@ export const PALMREACH_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 105, chance: 1 }],
     scale: 1.2,
     color: 0x6a4e38,
+    componentTags: ['hide', 'meat'],
   },
   canopy_weaver: {
     id: 'canopy_weaver',
@@ -165,6 +167,7 @@ export const PALMREACH_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.25,
     color: 0x4e8a3c,
+    componentTags: ['silk', 'venomSac'],
   },
   idol_guardian: {
     id: 'idol_guardian',
