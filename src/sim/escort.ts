@@ -169,6 +169,15 @@ function fireAmbushes(ctx: SimContext, def: EscortDef, state: EscortRunState, np
       );
       const mob = createMob(ctx.nextId++, template, template.minLevel, pos);
       ctx.addEntity(mob);
+      // A wave mob belongs to the RUN, not to the world: it was never placed by
+      // a CAMP, so it must never respawn in place. Without this a killed
+      // ambusher came back as a permanent orphan spawn (handleDeath gives every
+      // mob a respawnTimer and updateMob revives it), so each run silently added
+      // its whole wave to the zone forever. That is the mob-pile players
+      // reported along the escort routes in the July zones.
+      // It also keeps the walk honest: a wave that revived mid-run would make
+      // liveAmbushCount non-zero again and pause the escortee indefinitely.
+      mob.runScoped = true;
       // Commit the wave to the escortee, social_aggro-style; player damage
       // out-threats the seed immediately via the normal pull-over rules.
       mob.aiState = 'chase';
@@ -198,11 +207,12 @@ function endRun(
   outcome: 'success' | 'fail',
 ): void {
   if (npc) emitMobYell(ctx, npc, outcome === 'success' ? def.successText : def.failText);
-  // Surviving ambush mobs leave with the run (a failed wave never lingers to
-  // camp the respawned escortee).
+  // Ambush mobs leave with the run, DEAD ONES INCLUDED (a failed wave never
+  // lingers to camp the respawned escortee, and a slain one must not be left as
+  // a permanent corpse now that it can no longer respawn away). Dropping by id
+  // covers both states, so nothing from the wave outlives its run.
   for (const id of state.run?.ambushIds ?? []) {
-    const mob = ctx.entities.get(id);
-    if (mob && !mob.dead) ctx.dropEntity(id);
+    if (ctx.entities.has(id)) ctx.dropEntity(id);
   }
   if (state.npcId !== null) ctx.dropEntity(state.npcId);
   state.npcId = null;

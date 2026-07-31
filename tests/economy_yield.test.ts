@@ -1,12 +1,12 @@
 // Guards the open-world farm ECONOMY: the per-cluster gold and XP ceilings, the
 // coin-per-level curve, and the harvest-tag standard for coinless families.
-// Model: src/sim/farm_yield.ts.
+// Model: tests/helpers/farm_yield.ts.
 import { describe, expect, it } from 'vitest';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
 import { CAMPS, MOBS, zoneContaining } from '../src/sim/data';
-import { coinEvPerKill, itemEvPerKill, worldFarmClusters, xpPerKill } from '../src/sim/farm_yield';
 import type { MobTemplate } from '../src/sim/types';
 import { mobXpValue } from '../src/sim/types';
+import { coinEvPerKill, itemEvPerKill, worldFarmClusters, xpPerKill } from './helpers/farm_yield';
 
 // Budgets are pinned ~25% above the shipped maxima, so ordinary content tuning
 // has room while a structural regression (a respawn tier cut, a coin fill an

@@ -16,7 +16,21 @@
 import { zoneContaining } from './data';
 import type { ZoneDef } from './types';
 
-/** Starter bands (zones capped at level 7): quest-paced, still fast. */
+/**
+ * Starter bands (zones capped at level 7): quest-paced, still fast.
+ *
+ * 60 rather than the band formula's own logic, and deliberately: this tier lands
+ * on a player's first hour, who has no second camp to rotate to and no mount, so
+ * it was checked against supply rather than assumed. A starter camp of 5 to 8
+ * mobs now returns 5 to 8 kills a minute (down from 12 to 19), while a new
+ * character needs 10 to 20 seconds per kill including the walk, so 3 to 6 a
+ * minute. Supply still exceeds demand at every authored starter camp, and the
+ * paired camps (two forest_wolf, two wild_boar, two vale_bandit) double it
+ * again, so a "kill 10" objective never waits on a spawn.
+ *
+ * If starter-zone feel ever regresses anyway, prefer ZoneDef.trashRespawnSeconds
+ * on the one zone over moving this constant, which governs Farshore Isle too.
+ */
 export const TRASH_RESPAWN_SECONDS_LOW = 60;
 /** Mid bands (zones capped at level 14). */
 export const TRASH_RESPAWN_SECONDS_MID = 120;

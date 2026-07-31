@@ -2,7 +2,14 @@
 // tiers, the precedence chain around them, and the death site that consumes it.
 import { describe, expect, it } from 'vitest';
 import { CORPSE_DURATION } from '../src/sim/combat/damage';
-import { instanceOrigin, MOBS, ZONES, zoneAt, zoneContaining } from '../src/sim/data';
+import {
+  DUNGEON_X_THRESHOLD,
+  instanceOrigin,
+  MOBS,
+  ZONES,
+  zoneAt,
+  zoneContaining,
+} from '../src/sim/data';
 import {
   baseRespawnSecondsAt,
   DEFAULT_RESPAWN_SECONDS,
@@ -282,6 +289,31 @@ describe('the death site consumes the policy', () => {
     if (!mob) throw new Error('no forest_wolf spawned');
     sim.dealDamage(null, mob, 99_999, false, 'physical', null, 'hit');
     expect(mob.respawnTimer).toBe(2);
+  });
+
+  it('gives every live open-world spawn a real zone, never the off-map fallback', () => {
+    // The static camp-rect check in tests/camp_density.test.ts covers authored
+    // centres; this covers where mobs ACTUALLY stand, since campSpawnOffset plus
+    // findSafePos can displace a spawn off its centre. Any open-world mob that
+    // landed outside every rect would take DEFAULT_RESPAWN_SECONDS and become a
+    // 25s farm pocket, which is the regression this pins.
+    const sim = new Sim({ seed: 20061, playerClass: 'warrior', noPlayer: true });
+    const openWorld = [...sim.entities.values()].filter(
+      (e) => e.kind === 'mob' && e.spawnPos.x < DUNGEON_X_THRESHOLD,
+    );
+    expect(openWorld.length).toBeGreaterThan(500);
+    const orphans = openWorld
+      .filter((e) => zoneContaining(e.spawnPos.x, e.spawnPos.z) === null)
+      .map((e) => `${e.templateId} at (${e.spawnPos.x.toFixed(1)}, ${e.spawnPos.z.toFixed(1)})`);
+    expect(orphans).toEqual([]);
+    // ...and none of them resolved to the fallback by another route either.
+    for (const e of openWorld) {
+      const template = MOBS[e.templateId];
+      if (template?.respawnSeconds !== undefined || isSelfScheduled(template)) continue;
+      expect(resolveRespawnSeconds(template, e.spawnPos, undefined), e.templateId).not.toBe(
+        DEFAULT_RESPAWN_SECONDS,
+      );
+    }
   });
 
   it('is not pushed out by the corpse window, which the yield model assumes', () => {
