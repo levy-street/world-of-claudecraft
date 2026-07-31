@@ -35,7 +35,7 @@ export const FERRY_FARE_COPPER = 10;
 export const FARE_CHOICE_OUT = 'ch_lb_ferry_fare_out';
 export const FARE_CHOICE_BACK = 'ch_lb_ferry_fare_back';
 
-// The keepers' gossip fare option (owner spec: talk to the ferryman, press
+// Ewald's gossip fare option at either post (owner spec: talk to the ferryman, press
 // the buy button, sail). One source of truth for BOTH the client button
 // (quest_dialog_controller renders promptKey with the price and answers the
 // choice) and the sim talk arm below.
@@ -45,7 +45,7 @@ export function ferryFareOfferFor(
   if (templateId === 'ferryman_ewald') {
     return { choiceId: FARE_CHOICE_OUT, promptKey: 'lb.fare.promptOut' };
   }
-  if (templateId === 'ferrykeeper_odda') {
+  if (templateId === 'ferryman_ewald_gullhaven') {
     return { choiceId: FARE_CHOICE_BACK, promptKey: 'lb.fare.promptBack' };
   }
   return null;
@@ -180,7 +180,7 @@ function payFare(ctx: SimContext, fromMainland: boolean, pid: number): void {
   crossFerry(ctx, fromMainland, pid);
 }
 
-// The fare dialog opens only by talking to a gangplank keeper. The mooring
+// The fare dialog opens only by talking to Ewald at a gangplank. The mooring
 // fixtures stay inert scenery. Personal prompt: in a party each rider pays
 // their own fare (leader-answers stays a story-claim rule).
 function offerFare(ctx: SimContext, fromMainland: boolean, pid: number): void {
@@ -207,7 +207,7 @@ export function tryLastBellInteract(ctx: SimContext, target: Entity, pid: number
   return false;
 }
 
-// NPC-talk arm (interaction.ts): an interact on a gangplank keeper opens the
+// NPC-talk arm (interaction.ts): an interact on either Ewald post opens the
 // personal fare choice. The client's gossip fare button drives this
 // (targetEntity + interact + answer 'pay'), so the flow is identical on
 // every host and the server keeps full authority over the charge.

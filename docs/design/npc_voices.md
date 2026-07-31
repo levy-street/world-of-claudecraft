@@ -797,22 +797,13 @@ lower, slower and more tired.
 ## The Farshore (Gullhaven)
 
 ### Ferryman Ewald: *The Farshore Crossing*
-**Visual:** villager, harbor blue (#4a5a7a), mainland gangplank.
+**Visual:** villager, harbor blue (#4a5a7a), both gangplanks.
 
 Low, weather-worn and deliberate, with the practical superstition of someone who
 has crossed dangerous water too often to mock its warnings. Ewald deliberately
-reuses Ferrymaster Caddow's established voice.
+reuses Ferrymaster Caddow's established voice at both posts.
 
 **Voice test:** *"Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."*
-
-### Ferrykeeper Odda: *The Farshore Crossing*
-**Visual:** villager, harbor blue (#4a5a7a), Gullhaven gangplank.
-
-Brisk, salt-worn contralto, decisive and tide-conscious, treating a three-toll
-warning as seamanship rather than folklore. Odda deliberately reuses
-Harbormaster Odile's established voice.
-
-**Voice test:** *"If you hear the bell start counting while we cast off, do not ask me to turn her around."*
 
 ### Sergeant Marsh: *Town Militia*
 **Visual:** villager, field brown (#6a5a3a), Watch Meadow line.

@@ -32,6 +32,10 @@ function findByName(sim: Sim, name: string): Entity | undefined {
   return [...sim.entities.values()].find((e) => e.name === name && !e.dead);
 }
 
+function findByTemplate(sim: Sim, templateId: string): Entity | undefined {
+  return [...sim.entities.values()].find((e) => e.templateId === templateId && !e.dead);
+}
+
 function collect(sim: Sim, ticks: number): SimEvent[] {
   const out: SimEvent[] = [];
   for (let i = 0; i < ticks; i++) out.push(...sim.tick());
@@ -57,7 +61,7 @@ describe('Q0 Ashore end to end', () => {
     const meta = sim.ctx.players.get(sim.playerId);
     if (meta) meta.copper = 50;
     teleport(sim, 238, -47.5);
-    const ewald = findByName(sim, 'Ferryman Ewald');
+    const ewald = findByTemplate(sim, 'ferryman_ewald');
     expect(ewald).toBeTruthy();
     sim.player.targetId = ewald?.id ?? null;
     sim.interact();
@@ -173,7 +177,7 @@ describe('Q0 Ashore end to end', () => {
     const meta = sim.ctx.players.get(sim.playerId);
     if (meta) meta.copper = 30;
     teleport(sim, 238, -47.5);
-    const ewald = findByName(sim, 'Ferryman Ewald');
+    const ewald = findByTemplate(sim, 'ferryman_ewald');
     sim.player.targetId = ewald?.id ?? null;
     sim.interact();
     expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_out', 'pay')).toBe(true);
@@ -187,10 +191,10 @@ describe('Q0 Ashore end to end', () => {
     expect(sceneEvents.length).toBeGreaterThan(0);
     expect(sceneEvents.every((e) => e.sceneId === 'scn_lb_ferry_depart_out')).toBe(true);
     expect(sceneEvents.some((e) => e.op.kind === 'line')).toBe(false);
-    // And talking to Odda on the Gullhaven ship's deck ferries back.
+    // And talking to Ewald at his Gullhaven post ferries back.
     teleport(sim, GULLHAVEN_HARBOR.boarding.x, GULLHAVEN_HARBOR.boarding.z);
-    const odda = findByName(sim, 'Ferrykeeper Odda');
-    sim.player.targetId = odda?.id ?? null;
+    const islandEwald = findByTemplate(sim, 'ferryman_ewald_gullhaven');
+    sim.player.targetId = islandEwald?.id ?? null;
     sim.interact();
     expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_back', 'pay')).toBe(true);
     expect(sim.player.pos).toEqual(

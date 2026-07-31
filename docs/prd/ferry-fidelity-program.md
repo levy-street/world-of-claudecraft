@@ -27,8 +27,7 @@ instead of cutting.
    is no opening in the rail where you board (you walk through the handrail), the
    stern and hull are walk-through, collisions do not match the drawn boat (F1).
 7. Ferryman Ewald faces away from the boarding entry (F4).
-8. Consider one ferryman shared by both ends rather than two keepers (F4, owner
-   decision pending).
+8. Use one ferryman shared by both ends (F4, owner decision 2026-07-31).
 
 ## Resolved decisions
 
@@ -61,14 +60,15 @@ instead of cutting.
    already support everything this program needs. The sim ferry remains static in
    the world model (voyage motion stays render-only presentation), so no moving
    platform physics is in scope.
+7. **One ferryman stands at both ends.** Ferryman Ewald is the same visible
+   character at the mainland and Gullhaven posts. He keeps his canonical Q0 giver
+   link on the mainland template. No deck-rider work is in scope.
 
-## Open decision (owner)
+## Owner decision (2026-07-31)
 
-- **One ferryman (finding 8).** Either the keeper rides the ship (the deck-rider
-  system from the cinematics program supports this) or the same character stands
-  at both ends. Touches campaign cast canon (docs/design/last-bell-campaign.html
-  is the story source of truth), so no worker decides this: F4.2 stays blocked
-  until the owner picks.
+- **One ferryman (finding 8).** The same Ferryman Ewald stands at both ends,
+  following the classic MMO convention that he crosses with his boat. This is not
+  the riding-keeper option, so no deck-rider work is required.
 
 ## Phases
 
@@ -130,11 +130,11 @@ instead of cutting.
 
 ### F4. Staging
 
-- **F4.1 Keeper facing.** Ferryman Ewald (and Ferrykeeper Odda) face the boarding
-  entry at their posts; pinned by the fixture tests.
-- **F4.2 One ferryman.** BLOCKED on the open owner decision above. When decided:
-  either implement the riding keeper on the deck-rider seam or unify the keeper
-  template, updating campaign cast canon in the same change.
+- **F4.1 Keeper facing.** Ferryman Ewald faces the boarding entry at both posts;
+  pinned by the fixture tests.
+- **F4.2 One ferryman.** Use the same Ewald identity at both posts while keeping
+  the canonical Q0 giver link on `ferryman_ewald`. Retire the second keeper and
+  reuse Ewald's visible identity, localization, and voice.
 
 ## Sequencing, parallelism, delivery
 
@@ -145,7 +145,7 @@ instead of cutting.
   merge.
 - Only ONE task at a time may edit tests/cinematic_shots.test.ts (F2.3, F3.1;
   the lesson of the last program). F3.2 follows F3.1 and F2.1.
-- F4.1 is independent and small. F4.2 waits for the owner.
+- F4.1 is independent and small. F4.2 follows the owner decision above.
 - Delivery matches the cinematics program: each task in its own scratch worktree
   off feature/last-bell-campaign, committed with Conventional Commits, reviewed
   against this PRD, merged locally (no push, no PR), targeted suites plus tsc at

@@ -12556,10 +12556,10 @@ export const en_CA: EnTranslations = {
         "title": "The Farshore Crossing",
         "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
       },
-      "ferrykeeper_odda": {
-        "name": "Ferrykeeper Odda",
+      "ferryman_ewald_gullhaven": {
+        "name": "Ferryman Ewald",
         "title": "The Farshore Crossing",
-        "greeting": "Mainland-bound? The ship goes when you are aboard, not before. And if you hear the bell start counting while we cast off, do not ask me to turn her around: nobody rows toward a three-toll."
+        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
       },
       "sergeant_marsh": {
         "name": "Sergeant Marsh",
