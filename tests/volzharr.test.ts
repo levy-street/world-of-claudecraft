@@ -153,6 +153,24 @@ describe('Volzharr, the Buried Furnace (wing 3)', () => {
     expect(meta.deedsEarned.has('dgn_undermount_volzharr_heroic')).toBe(true);
   });
 
+  it('clears vents, shamblers and encounter state when the boss dies', () => {
+    // The dead branch of updateMob returns before the encounter dispatch, so
+    // without an explicit death-path reset the vents outlive the kill and the
+    // raid loots on a floor still rendered full of fire (#2671 review round 2).
+    const sim = makeSim();
+    const { boss, pids } = pullVolzharr(sim, 1);
+    ticks(sim, 2);
+    const st = (boss as any).volzharr;
+    st.ventTimer = 0.01;
+    ticks(sim, 2);
+    expect(ventsOf(sim, boss).length).toBeGreaterThan(0);
+    const player = sim.entities.get(pids[0]) as AnyEntity;
+    sim.dealDamage(player, boss, boss.hp + 1, false, 'physical', null, 'hit', true);
+    ticks(sim, 5);
+    expect(ventsOf(sim, boss), 'vents die with the boss').toHaveLength(0);
+    expect((boss as any).volzharr, 'encounter state cleared').toBeUndefined();
+  });
+
   it('spawns dormant Cinderlings with the boss and gives him the walk speed', () => {
     const sim = makeSim();
     const { boss, inst } = pullVolzharr(sim, 1);

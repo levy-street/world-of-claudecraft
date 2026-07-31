@@ -20,8 +20,13 @@ import type { SimContext } from '../sim_context';
 import { type Aura, dist2d, type Entity, type SimEvent, YELL_RANGE } from '../types';
 
 // Players within this many yards of the dead boss's spawn get the wing cleared.
-// Matches NYTHRAXIS_ROOM_RADIUS: large enough to cover the interior, small enough
-// not to bleed into an adjacent instance's origin.
+// Matches NYTHRAXIS_ROOM_RADIUS (the grantNythraxisLockout precedent). Honest
+// bound: same-dungeon instance slots sit 500 apart in z with the boss at z+40,
+// so a player at the far south edge of an adjacent slot band would be ~210 yd
+// from this boss, inside the radius; the interiors keep players around z in
+// [-10, 120], which is what actually prevents cross-instance marks or credit.
+// Filtering through the instance claim instead would retire that whole class
+// for both raids together; do it there, not by shrinking this number.
 export const UNDERMOUNT_ROOM_RADIUS = 260;
 
 // Wing 2, Odrenn the Temperer: the section-1 design constants from the
@@ -316,6 +321,13 @@ function startUndermountMaerinBeat(ctx: SimContext, boss: Entity, wing: Undermou
 export function onUndermountBossDeath(ctx: SimContext, boss: Entity): void {
   const wing = WING_BY_BOSS.get(boss.templateId);
   if (!wing) return;
+  // The dead branch of updateMob returns before the encounter dispatch, so
+  // this is the only place the finale's state can die WITH the boss: without
+  // it the permanent vents, half-walked shamblers and Emberfeed survive the
+  // kill for the instance lifetime (the reset is pure cleanup, corpse-safe).
+  if (boss.templateId === 'volzharr_buried_furnace' && boss.volzharr) {
+    ctx.resetVolzharrEncounter(boss);
+  }
   frenzyUndermountPartners(ctx, wing, boss);
   if (!undermountBossCompletesWing(ctx, boss)) return;
   const instance = ctx.instances.find((claim) => claim.mobIds.includes(boss.id));
