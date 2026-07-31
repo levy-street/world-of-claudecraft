@@ -358,7 +358,11 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     // boardwalk out to the carved-deep basin where the tall ship lies
     // (same height as the head, so the run is seamless)
     { x: 212.5, z: -48, hw: 7, hd: 2.8, y: -0.2 },
-    { x: 225, z: -48, hw: 6, hd: 6.5, y: -0.2 },
+    // berth head split around the gangplank corridor so the turning hull
+    // clears the two outer deck corners while the boarding route stays flush
+    { x: 225, z: -48, hw: 5.9, hd: 1.4, y: -0.2 },
+    { x: 223.8, z: -51.95, hw: 4.7, hd: 2.55, y: -0.2 },
+    { x: 225, z: -44.05, hw: 5.9, hd: 2.55, y: -0.2 },
   ],
   rails: [
     // apron south edge; gap x 169..175 is the headland entry ramp
@@ -476,7 +480,11 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     // the grand extension: the boardwalk runs on west over the deep bay to
     // the berth head where the tall ship lies (same height, seamless)
     { x: 741, z: 116, hw: 9, hd: 2.8, y: 0.2 },
-    { x: 727.5, z: 116.5, hw: 5, hd: 6.5, y: 0.2 },
+    // berth head split around the gangplank corridor so the turning hull
+    // clears the two outer deck corners while the boarding route stays flush
+    { x: 727.5, z: 116.5, hw: 4.9, hd: 1.4, y: 0.2 },
+    { x: 728.7, z: 112.55, hw: 3.7, hd: 2.55, y: 0.2 },
+    { x: 727.5, z: 120.45, hw: 4.9, hd: 2.55, y: 0.2 },
   ],
   rails: [
     // apron west edge outside the pier seam (walkway z 112.8..119.2 open)
@@ -592,11 +600,19 @@ export const HARBOR_TERRAIN_EDITS = [
   // each hull is pulled toward -12 (the mainland dive plateau sits at
   // -5.7 to -6.6 and could never float her; deepening is invisible to the
   // farshore crossing-line pins, which only need wet, open-sea points).
-  { x: 240, z: -30, radius: 22, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 265, z: -8, radius: 30, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 240, z: -14, radius: 18, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 240, z: -30, radius: 32, delta: -12, falloff: 'smooth', mode: 'level' },
   { x: 240, z: -56, radius: 22, delta: -12, falloff: 'smooth', mode: 'level' },
   { x: 240, z: -76, radius: 18, delta: -12, falloff: 'smooth', mode: 'level' },
-  { x: 715, z: 132, radius: 24, delta: -12, falloff: 'smooth', mode: 'level' },
-  { x: 745, z: 132, radius: 24, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 246, z: -88, radius: 20, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 280, z: -57, radius: 55, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 305, z: -44, radius: 22, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 673, z: 108, radius: 55, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 708, z: 76, radius: 20, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 713, z: 96, radius: 26, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 713, z: 121, radius: 24, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 713, z: 146, radius: 22, delta: -12, falloff: 'smooth', mode: 'level' },
 ] as const;
 
 // The deck rect containing (x, z), or null. Later rects win ties so a seam

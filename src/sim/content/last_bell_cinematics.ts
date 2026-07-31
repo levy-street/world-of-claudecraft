@@ -25,8 +25,8 @@ export const LAST_BELL_VOYAGE_SEGMENT_IDS = {
 
 export const LAST_BELL_PROP_PATH_SEGMENTS = {
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff]: {
-    start: { x: 0, y: 0.5, z: 4, yaw: 0 },
-    end: { x: 22, y: 0.5, z: 7, yaw: 0 },
+    start: { x: 0, y: 0, z: 0, yaw: 0 },
+    end: { x: 22, y: 0, z: 7, yaw: 0 },
     duration: 4,
     ease: 'linear',
   },
@@ -37,27 +37,27 @@ export const LAST_BELL_PROP_PATH_SEGMENTS = {
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.arrival]: {
-    start: { x: -48, y: 0.75, z: 0, yaw: -2.822845 },
-    end: { x: 0, y: 0.75, z: 0, yaw: -2.822845 },
-    duration: 15,
+    start: { x: -40, y: 0, z: -13, yaw: -Math.PI / 2 },
+    end: { x: 0, y: 0, z: 0, yaw: 0 },
+    duration: 7,
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.castOff]: {
-    start: { x: 0, y: 0.5, z: -4, yaw: 0 },
-    end: { x: 22, y: 0.5, z: -7, yaw: 0 },
+    start: { x: 0, y: 0, z: 0, yaw: 0 },
+    end: { x: 22, y: 0, z: -7, yaw: 0 },
     duration: 4,
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.openWater]: {
-    start: { x: 170.151155, y: 0, z: -126.154286, yaw: -0.371593 },
-    end: { x: 218.151155, y: 0, z: -126.154286, yaw: -0.371593 },
+    start: { x: 148.090701, y: 0, z: -130.436384, yaw: 1.199203 },
+    end: { x: 196.090701, y: 0, z: -130.436384, yaw: 1.199203 },
     duration: 4.3,
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.arrival]: {
-    start: { x: -140, y: 0.5, z: 0, yaw: 1.511606 },
-    end: { x: 0, y: 0.5, z: 0, yaw: 1.511606 },
-    duration: 16,
+    start: { x: -40, y: 0, z: 13, yaw: Math.PI / 2 },
+    end: { x: 0, y: 0, z: 0, yaw: 0 },
+    duration: 7,
     ease: 'linear',
   },
 } as const;

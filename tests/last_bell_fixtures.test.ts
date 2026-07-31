@@ -48,7 +48,7 @@ describe('Last Bell campaign fixtures', () => {
     expect(ferries.map((f) => ({ x: f.pos.x, z: f.pos.z }))).toEqual(
       expect.arrayContaining([
         { x: 239, z: -48 },
-        { x: 727.5, z: 130 },
+        { x: 714.5, z: 116.5 },
       ]),
     );
     expect(ferries).toHaveLength(2);
@@ -166,7 +166,7 @@ describe('Last Bell campaign fixtures', () => {
 
     // The cinematic begins on the destination ship and walks the rider down
     // the gangplank. Step back aboard to take the return fare immediately.
-    teleport(sim, 727, 131);
+    teleport(sim, GULLHAVEN_HARBOR.boarding.x, GULLHAVEN_HARBOR.boarding.z);
     const odda = [...sim.entities.values()].find((e) => e.templateId === 'ferrykeeper_odda');
     expect(odda).toBeTruthy();
     if (!odda) return;
