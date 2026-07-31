@@ -4,7 +4,7 @@
   "shotPrefix": "after",
   "profile": "desktop-ultra",
   "sourceRevision": "working-tree",
-  "sourceFingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765",
+  "sourceFingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc",
   "records": [
     {
       "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-elevated-overview-desktop-ultra.png",
@@ -13,7 +13,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -961,7 +961,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -1909,7 +1909,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -2857,7 +2857,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -3805,7 +3805,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -4753,7 +4753,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -5703,7 +5703,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -6653,7 +6653,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -7603,7 +7603,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -8553,7 +8553,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -9504,7 +9504,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -10455,7 +10455,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -11408,7 +11408,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -12361,7 +12361,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,
@@ -14074,7 +14074,7 @@
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "2c8dbca4e099bfdefd9915ebf9b21b2d9d652b25571185f6b23672c201aec765"
+        "fingerprint": "a2600872768ad49e3c5336519d87ad5c90067f548625007f0f8ab99dcca794dc"
       },
       "expected": {
         "armoury": true,

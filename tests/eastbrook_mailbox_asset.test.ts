@@ -22,8 +22,8 @@ import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resourc
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/mailbox_pillar.glb');
 const ASSET_BYTES = 32_884;
-const ASSET_SHA256 = 'a5ffc5e8218d129b4aaab0e8e26b4437a5b0019f028465ed0b981f53f510282e';
-const SOURCE_FINGERPRINT = 'c4b25504ea79374e3c7adbb8a55f189e1c7cf38fcfd408b90b6f242001697314';
+const ASSET_SHA256 = '4cd77249f77b01393d1ede01e50bd04864e79bc215708bc834aa808fb5b54068';
+const SOURCE_FINGERPRINT = 'f11b96995d18fb41ff5ce032c77d87a5f809695370f26e911c87fc4fd8f5a486';
 const ORIGINAL_STANDARD_MATERIALS = GFX.standardMaterials;
 
 function sourceModel(material: THREE.MeshStandardMaterial): THREE.Group {
