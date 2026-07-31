@@ -1050,7 +1050,7 @@ export const VOICE_ALIAS = {
   scout_maren_highwatch: 'scout_maren',
   brother_halven_marsh: 'brother_halven',
   ferryman_ewald: 'ferrymaster_caddow',
-  ferrykeeper_odda: 'harbormaster_odile',
+  ferryman_ewald_gullhaven: 'ferrymaster_caddow',
   sergeant_marsh: 'marshal_redbrook',
 };
 

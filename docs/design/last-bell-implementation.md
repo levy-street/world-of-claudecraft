@@ -274,8 +274,8 @@ deck), moored at both berths at hull length 22; its measured deck plane
 (1.9 of 11 normalized, so -2.68 world at draft 1.0) is authored as
 shipDecks walkable rects with shipRails hull colliders, and the boarding
 fixture spawns ON the deck: walk the pier, cross the gangplank ramp, and
-board like the FFX Besaid ferry. (4) Ferrykeeper Odda keeps the Gullhaven
-gangplank (both sides have a keeper). (5) The deck look is procedural
+board like the FFX Besaid ferry. (4) Ferryman Ewald keeps both gangplanks.
+(5) The deck look is procedural
 long planks in muted driftwood tones merged per tone (a few draw calls
 per harbor), chunky post-and-cap rails, skirt beams, pilings.
 tests/last_bell_harbor.test.ts gained ramp-slope/flush pins, entry-step
@@ -317,8 +317,8 @@ at +0.72, ABOVE pier height, so both gangplanks now run UP onto the deck
 (dir flipped, highY on the ship side). Mainland: outer pier x 205..231,
 berth head, ship berthed at (240.5,-44) lying north-south. Gullhaven: the
 boardwalk runs west over the deep bay (outer run x 732..750), berth head,
-ship at (732,132.5) bow west (rot PI flips the model's +x bow). Ewald and
-Odda move to ON-DECK posts at the top of their gangplanks. Fatigue-free
+ship at (732,132.5) bow west (rot PI flips the model's +x bow). Ewald's
+two posts move to ON-DECK positions at the top of their gangplanks. Fatigue-free
 rects widened around both new basins (mainland kept south of z -33; the
 farshore.test.ts crossing line at z -30 stays open sea). Deck plane
 measured from the new model: 4.68 of its 24-unit normalized height,
@@ -327,7 +327,7 @@ scale 1.649. harbor/fixtures/q0 suites re-pinned; parity goldens hold
 
 ### H2: the fare, a personal dock dialog (2026-07-28)
 
-Boarding the ferry, or talking to Ewald or the NEW routing for Odda, opens
+Boarding the ferry, or talking to Ewald at either post, opens
 the dialogue-choice window with the fare: 10 copper (the owner priced it
 down from the PRD's 50), "Pay the fare." / "Not today.", each party rider
 answering their own prompt. The engine change is the choice system's

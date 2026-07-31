@@ -99,7 +99,7 @@ describe('NPC voice prompt catalog', () => {
     }
     expect(VOICE_ALIAS).toMatchObject({
       ferryman_ewald: 'ferrymaster_caddow',
-      ferrykeeper_odda: 'harbormaster_odile',
+      ferryman_ewald_gullhaven: 'ferrymaster_caddow',
       sergeant_marsh: 'marshal_redbrook',
     });
   });

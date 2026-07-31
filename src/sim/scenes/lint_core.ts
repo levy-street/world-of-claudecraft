@@ -420,7 +420,7 @@ export interface BerthPoseContinuityEvaluation {
 
 export const RIDER_HARBOR_BY_TEMPLATE: ReadonlyMap<string, HarborDef['id']> = new Map([
   ['ferryman_ewald', 'mainland'],
-  ['ferrykeeper_odda', 'gullhaven'],
+  ['ferryman_ewald_gullhaven', 'gullhaven'],
 ]);
 
 export function settledPlayerHarborForScene(sceneId: string): HarborDef | null {

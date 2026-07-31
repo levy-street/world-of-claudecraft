@@ -509,7 +509,7 @@ describe('the voyage cinematic', () => {
     sim.player.pos = { ...pos };
     sim.player.prevPos = { ...pos };
     sim.rebucket(sim.player);
-    const keeperId = x < 400 ? 'ferryman_ewald' : 'ferrykeeper_odda';
+    const keeperId = x < 400 ? 'ferryman_ewald' : 'ferryman_ewald_gullhaven';
     const gatekeeper = [...sim.entities.values()].find((e) => e.templateId === keeperId);
     expect(gatekeeper).toBeTruthy();
     sim.player.targetId = gatekeeper?.id ?? null;

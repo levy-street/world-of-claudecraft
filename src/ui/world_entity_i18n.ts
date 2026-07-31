@@ -336,7 +336,7 @@ const NPC_IDS = [
   'fisher_nell',
   // Last Bell campaign front-door and Watch Meadow cast.
   'ferryman_ewald',
-  'ferrykeeper_odda',
+  'ferryman_ewald_gullhaven',
   'sergeant_marsh',
   'forgemistress_darva', // crafting-station master: forge (Eastbrook, zone 1)
   'cook_marlow', // crafting-station master: kitchens (Eastbrook, zone 1)

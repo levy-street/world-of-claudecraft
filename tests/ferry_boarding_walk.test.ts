@@ -422,7 +422,7 @@ describe('grand ferry boarding walk', () => {
     const sim = makeSim(4242);
     for (const [templateId, harbor] of [
       ['ferryman_ewald', HARBORS[0]],
-      ['ferrykeeper_odda', HARBORS[1]],
+      ['ferryman_ewald_gullhaven', HARBORS[1]],
     ] as const) {
       const keeper = [...sim.entities.values()].find((entity) => entity.templateId === templateId);
       expect(keeper, templateId).toBeDefined();

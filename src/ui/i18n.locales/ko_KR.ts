@@ -11225,7 +11225,66 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toWorld': '세계 지도',
   'hudChrome.continentMap.toggleAria': '세계 지도와 지역 지도 전환',
   'hudChrome.continentMap.levels': '레벨 {min}부터 {max}까지',
-  'hudChrome.continentMap.toZone': '지역 지도',
+  'entities.mobs.lb_actor_coalfast.name': '숯불 워든',
+  'entities.mobs.lb_actor_ollun.name': '균열감시자 올룬',
+  'entities.mobs.lb_actor_edda.name': '병참관 에다',
+  'entities.mobs.lb_actor_saul.name': '치료사 사울',
+  'entities.mobs.lb_actor_tam.name': '종지기 탐',
+  'entities.mobs.tidemill_stalker.name': '밀물방앗간 추적자',
+  'entities.npcs.ferryman_ewald.name': '뱃사공 에발트',
+  'entities.npcs.ferryman_ewald.title': '건너편 해안 나루',
+  'entities.npcs.ferryman_ewald.greeting':
+    '건너편 해안으로 가나? 이제 고기잡이 때문에 건너는 사람은 아무도 없어, 친구. 준비되면 배에 타게. 도착하면 종소리를 잘 들어. 그 마을 사람들은 자네가 날씨를 살피듯 종소리를 듣거든.',
+  'entities.npcs.ferryman_ewald_gullhaven.name': '뱃사공 에발트',
+  'entities.npcs.ferryman_ewald_gullhaven.title': '건너편 해안 나루',
+  'entities.npcs.ferryman_ewald_gullhaven.greeting':
+    '건너편 해안으로 가나? 이제 고기잡이 때문에 건너는 사람은 아무도 없어, 친구. 준비되면 배에 타게. 도착하면 종소리를 잘 들어. 그 마을 사람들은 자네가 날씨를 살피듯 종소리를 듣거든.',
+  'entities.npcs.sergeant_marsh.name': '마시 중사',
+  'entities.npcs.sergeant_marsh.title': '마을 민병대',
+  'entities.npcs.sergeant_marsh.greeting':
+    '훈련은 받았나? 그럼 오늘 밤의 방식을 알려 주지. 내 전열이 길을 지킨다. 균열이 우리가 쓰러뜨리지 못할 것을 토해 내면 내가 자네를 가리킬 거다. 방앗간은 자네 몫이다. 아무것도 따라 들어가게 하지 말고, 아무것도 우리를 지나 마을로 가게 하지 마라. 가.',
+  'entities.quests.q_lb_q0_ashore.title': '상륙',
+  'entities.quests.q_lb_q0_ashore.text':
+    '갈매기항은 밤낮으로 균열의 공격을 받고도 버티고 있다. 그들과 함께 설 생각이라면 마을이 피 흘리는 곳에서 시작하라. 항구 계단과 오래된 조각상을 지나 동쪽으로 가서 감시 초원의 민병대 전열로 향하라.',
+  'entities.quests.q_lb_q0_ashore.completion':
+    '방앗간의 괴물은 자네 혼자 쓰러뜨렸고, 들것에 관한 탐의 말도 과장이 아니더군. 정찰병은 부족하고 지켜야 할 들판은 넘친다. 오늘 밤 자네는 원래 자네 것이 아닌 땅을 지켰다. 그게 이 일의 전부다. 감시대에 온 걸 환영한다.',
+  'entities.quests.q_lb_q0_ashore.objectives.0.label': '감시 초원의 마시 중사에게 보고',
+  'entities.quests.q_lb_q0_ashore.objectives.1.label': '균열의 소생물 처치',
+  'entities.quests.q_lb_q0_ashore.objectives.2.label': '밀물방앗간 안의 무언가를 처치',
+  'entities.dungeons.lb_tidemill.name': '밀물방앗간',
+  'entities.dungeons.lb_tidemill.enterText':
+    '방앗간 문이 열린다. 안에서는 어둠이 귀를 기울이고 있다.',
+  'entities.dungeons.lb_tidemill.leaveText': '밀물방앗간을 나와 저녁 공기 속으로 들어선다.',
+  'entities.dungeons.lb_riftline.name': '해질녘 균열 방어선',
+  'entities.dungeons.lb_riftline.enterText':
+    '순찰대 뒤로 초원의 문이 닫힌다. 오늘 밤은 이 방어선의 것이다.',
+  'entities.dungeons.lb_riftline.leaveText': '균열 방어선을 새벽 경비대에 맡기고 떠난다.',
+  'entities.dungeons.lb_vault.name': '가라앉은 첫 번째 보루',
+  'entities.dungeons.lb_vault.enterText':
+    '밧줄이 어둠 속으로 풀려 내려간다. 아래에는 오래된 보루가 추락한 자리에 누워 있다.',
+  'entities.dungeons.lb_vault.leaveText': '절벽 밧줄을 타고 햇빛 속으로 올라온다.',
+  'entities.dungeons.lb_council.name': '보루 평의회',
+  'entities.dungeons.lb_council.enterText': '평의회실에는 의자가 여섯 개 있다. 하나는 비어 있다.',
+  'entities.dungeons.lb_council.leaveText': '보루 밖으로 나온다.',
+  'entities.dungeons.lb_landing.name': '밤의 상륙지',
+  'entities.dungeons.lb_landing.enterText':
+    '유도 불길이 해변을 따라 타오른다. 함대는 여울 너머에서 기다린다.',
+  'entities.dungeons.lb_landing.leaveText': '상륙 해변을 뒤로하고 떠난다.',
+  'entities.dungeons.lb_riftfields.name': '균열 들판 진입로',
+  'entities.dungeons.lb_riftfields.enterText':
+    '네 곳의 수호 지점이 균열을 둘러싼다. 의식은 이곳을 열두 세기 동안 봉인했다.',
+  'entities.dungeons.lb_riftfields.leaveText': '균열 들판에서 아래로 걸어 내려온다.',
+  'entities.dungeons.lb_breach.name': '균열 안쪽',
+  'entities.dungeons.lb_breach.enterText':
+    '빛이 잘못되어 있고 하늘은 더 나쁘다. 핵은 앞쪽의 탁 트인 땅에 있다.',
+  'entities.dungeons.lb_breach.leaveText': '경계를 넘어 평범한 밤공기 속으로 돌아온다.',
+  'entities.dungeons.lb_lastwatch.name': '마지막 경계',
+  'entities.dungeons.lb_lastwatch.enterText':
+    '보루는 깨끗하고 비어 있다. 누군가는 이 경계를 끝내야 한다.',
+  'entities.dungeons.lb_lastwatch.leaveText': '뒤에서 보루의 문을 닫는다.',
+  'entities.dungeons.lb_willowfen.name': '우는버들 늪',
+  'entities.dungeons.lb_willowfen.enterText': '버드나무는 움직이지 않는다. 물도 마찬가지다.',
+  'entities.dungeons.lb_willowfen.leaveText': '버드나무를 고요 속에 남겨 두고 떠난다.',
   'hudChrome.enchanting.wornTagIndexed': '착용 중 ({slot} {index})',
   'editor.cinematic.title': '시네마틱',
   'editor.cinematic.show': '패널 표시',

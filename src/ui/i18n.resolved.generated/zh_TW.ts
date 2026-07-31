@@ -12556,10 +12556,10 @@ export const zh_TW: EnTranslations = {
         "title": "遠岸航線",
         "greeting": "要去遠岸，是嗎？如今已經沒人為了捕魚渡海了，朋友。準備好就上船；抵岸後留心鐘聲，鎮上的人聽鐘，就像你聽風辨天氣一樣。"
       },
-      "ferrykeeper_odda": {
-        "name": "渡船守 歐妲",
+      "ferryman_ewald_gullhaven": {
+        "name": "渡船夫 艾瓦德",
         "title": "遠岸航線",
-        "greeting": "要回大陸？你上船，我們才啟航，絕不會提前。如果解纜時鐘聲開始計數，別求我掉頭：沒人會朝三響鐘划去。"
+        "greeting": "要去遠岸，是嗎？如今已經沒人為了捕魚渡海了，朋友。準備好就上船；抵岸後留心鐘聲，鎮上的人聽鐘，就像你聽風辨天氣一樣。"
       },
       "sergeant_marsh": {
         "name": "馬許中士",
