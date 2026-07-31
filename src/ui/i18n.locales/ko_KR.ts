@@ -2305,6 +2305,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.potion': '물약',
   'itemUi.kind.elixir': '비약',
   'itemUi.kind.mount': '탈것',
+  'itemUi.kind.charm': '부적',
+  'itemUi.kind.artifact': '유물',
   'itemUi.stats.armor': '방어도',
   'itemUi.stats.str': '힘',
   'itemUi.stats.agi': '민첩성',
@@ -7245,6 +7247,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus4':
     '무기 치명타 적중 시 50% 확률로 "송곳니 질주"가 발동하여 공격 속도가 25% 증가합니다. 8초 동안 지속됩니다.',
   'hudChrome.itemSoulbound': '귀속',
+  'hudChrome.itemCharmHint': '가방에 지니고 있으면 효과를 얻습니다',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '적중 시 확률 ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': '피해 주문 시 확률 ({chance}%): {effect}',
@@ -9837,6 +9840,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '마지막 요새',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
+  'entities.items.st_albus_index_finger.name': '성 알부스의 검지',
+  'entities.items.st_albus_middle_finger.name': '성 알부스의 중지',
+  'entities.items.st_albus_ring_finger.name': '성 알부스의 약지',
+  'entities.items.st_albus_pinkie_finger.name': '성 알부스의 새끼손가락',
+  'entities.items.st_albus_thumb.name': '성 알부스의 엄지',
+  'entities.items.hand_of_st_albus.name': '성 알부스의 손',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',
@@ -9991,6 +10000,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.disenchant': '마력 추출',
   'hudChrome.itemMenu.salvage': '분해',
   'hudChrome.itemMenu.applyEnchant': '마법부여 적용',
+  'hudChrome.itemMenu.assemble': '조합',
   'hudChrome.enchanting.disenchantedLine': '{item}의 마력을 추출했습니다.',
   'hudChrome.enchanting.disenchantedYield':
     '{item}의 마력을 추출하여 {material}(으)로 만들었습니다.',

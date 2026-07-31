@@ -1361,6 +1361,7 @@ export const en_XA: EnTranslations = {
     },
     "itemHeroicTag": "[[ĤÉŔÓÍÇ]]",
     "itemSoulbound": "[Šóúļƀóúñð]",
+    "itemCharmHint": "[Ķééþ íñ ƀáĝ ţó ĝáíñ ƀóñúš]",
     "itemSet": {
       "header": "[{name} ({have}/{total})]",
       "bonusLine": "[({pieces}) {bonus}]"
@@ -2543,7 +2544,8 @@ export const en_XA: EnTranslations = {
       "equip": "[Éɋúíþ]",
       "disenchant": "[Ðíšéñçĥáñţ]",
       "salvage": "[Šáļʋáĝé]",
-      "applyEnchant": "[Áþþļý Éñçĥáñţ]"
+      "applyEnchant": "[Áþþļý Éñçĥáñţ]",
+      "assemble": "[Áššéɱƀļé]"
     },
     "enchanting": {
       "disenchantedLine": "[Ýóú ðíšéñçĥáñţ {item}.]",
@@ -6877,7 +6879,9 @@ export const en_XA: EnTranslations = {
       "potion": "[Þóţíóñ]",
       "elixir": "[Éļíẋíŕ]",
       "bag": "[Ɓáĝ]",
-      "mount": "[Ɱóúñţ]"
+      "mount": "[Ɱóúñţ]",
+      "charm": "[Çĥáŕɱ]",
+      "artifact": "[Áŕţíƒáçţ]"
     },
     "stats": {
       "armor": "[Áŕɱóŕ]",
@@ -9726,6 +9730,24 @@ export const en_XA: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "[Šíĝñéţ óƒ ţĥé Ļášţ Ķééþ]"
+      },
+      "st_albus_index_finger": {
+        "name": "[Ţĥé Íñðéẋ Ƒíñĝéŕ óƒ Šţ. Áļƀúš]"
+      },
+      "st_albus_middle_finger": {
+        "name": "[Ţĥé Ɱíððļé Ƒíñĝéŕ óƒ Šţ. Áļƀúš]"
+      },
+      "st_albus_ring_finger": {
+        "name": "[Ţĥé Ŕíñĝ Ƒíñĝéŕ óƒ Šţ. Áļƀúš]"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "[Ţĥé Þíñķíé Ƒíñĝéŕ óƒ Šţ. Áļƀúš]"
+      },
+      "st_albus_thumb": {
+        "name": "[Ţĥé Ţĥúɱƀ óƒ Šţ. Áļƀúš]"
+      },
+      "hand_of_st_albus": {
+        "name": "[Ţĥé Ĥáñð óƒ Šţ. Áļƀúš]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

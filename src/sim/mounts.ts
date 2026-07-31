@@ -85,7 +85,14 @@ export function ownedMounts(meta: PlayerMeta): MountKey[] {
 // Recompute the player's derived stats after a mount state change (aura strips,
 // mount/dismount): this is the same path an equip change takes.
 function recalcFor(ctx: SimContext, e: Entity, meta: PlayerMeta): void {
-  recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  recalcPlayerStats(
+    e,
+    meta.cls,
+    meta.equipment,
+    ctx.playerMods(meta),
+    meta.equipmentInstance,
+    meta.inventory,
+  );
 }
 
 /** The riding lesson lets the player ride the training Valorsteed before they own

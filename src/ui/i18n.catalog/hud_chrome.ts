@@ -1304,6 +1304,9 @@ export const hudChromeStrings = {
   // Tooltip marker for a soulbound item (bound to its owner: cannot be traded, mailed,
   // listed, sold, or destroyed). Currency-like reward tokens (Heroic Marks) carry this.
   itemSoulbound: 'Soulbound',
+  // Tooltip hint under a charm's stats: charms work from the bags, so a player who
+  // banks one (or hunts for a slot to equip it in) is told where it has to sit.
+  itemCharmHint: 'Keep in bag to gain bonus',
   itemSet: {
     header: '{name} ({have}/{total})',
     bonusLine: '({pieces}) {bonus}',
@@ -2933,6 +2936,7 @@ export const hudChromeStrings = {
     disenchant: 'Disenchant',
     salvage: 'Salvage',
     applyEnchant: 'Apply Enchant',
+    assemble: 'Assemble',
   },
   // Enchanting actions (Professions 2.0): the result toasts for the
   // disenchant / apply-enchant / salvage commands (enchanting_view.ts maps each

@@ -16,6 +16,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
+import { checkAssembly } from './assembly';
 import { addStacked, bagCapacity, bagsFullError, countFit, equipBag as equipBagCmd } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
@@ -280,6 +281,75 @@ export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: nu
   });
 }
 
+// Assemble (kind:'assembled'): consume the recipe's reagents and grant its output.
+// The refusal is the recipe's own authored failText, delivered as a personal chat
+// line rather than a toast, so a player poking at a collection piece gets flavor
+// instead of an error. Authoritative like every other inventory command: the held
+// counts are re-checked here, never trusted from the client.
+//
+// Capacity is checked against the bags as they will be AFTER the reagents leave,
+// since the removal is what frees the room the output needs; checking the current
+// bags would refuse the ordinary case where the last piece completes a set in full
+// bags. The reagents are removed only once the output is known to fit, so a refusal
+// can never destroy them.
+export function assembleItem(ctx: SimContext, itemId: string, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta } = r;
+  const def = ITEMS[itemId];
+  const recipe = def?.assembly;
+  if (!recipe) return;
+  if (ctx.countItem(itemId, meta.entityId) <= 0) {
+    ctx.error(meta.entityId, "You don't have that item.");
+    return;
+  }
+  const check = checkAssembly(meta.inventory, recipe);
+  if (!check.ok) {
+    ctx.notice(meta.entityId, recipe.failText);
+    return;
+  }
+  // Mirrors removePreferFungible below: plain copies first, then instanced ones,
+  // each highest-index-first, so the predicted free slots match the real removal.
+  const scratch = meta.inventory.map((s) => ({ ...s }));
+  for (const reagent of recipe.reagents) {
+    let left = reagent.count;
+    for (const instanced of [false, true]) {
+      for (let i = scratch.length - 1; i >= 0 && left > 0; i--) {
+        const s = scratch[i];
+        if (s.itemId !== reagent.itemId || !!s.instance !== instanced) continue;
+        const take = Math.min(s.count, left);
+        s.count -= take;
+        left -= take;
+        if (s.count <= 0) scratch.splice(i, 1);
+      }
+    }
+  }
+  if (!ITEMS[recipe.output.itemId]) return;
+  if (
+    countFit(scratch, bagCapacity(meta.bags), recipe.output.itemId, recipe.output.count) <
+    recipe.output.count
+  ) {
+    bagsFullError(ctx, meta.entityId);
+    return;
+  }
+  for (const reagent of recipe.reagents) {
+    removePreferFungible(ctx, reagent.itemId, reagent.count, meta.entityId);
+  }
+  // No bespoke success line: the grant's own "You receive:" line already names the
+  // output and is already localized, so assembling reads like any other item gain.
+  ctx.addItem(recipe.output.itemId, recipe.output.count, meta.entityId);
+  // Either side of the trade can be a charm, whose affixes come from the bags, so
+  // the stat block is rebuilt now rather than waiting for the next incidental recalc.
+  recalcPlayerStats(
+    r.e,
+    meta.cls,
+    meta.equipment,
+    ctx.playerMods(meta),
+    meta.equipmentInstance,
+    meta.inventory,
+  );
+}
+
 // Manual bag arrangement: the player dragged the stack at inventory index `from` onto
 // bag CELL `to`. An empty cell parks the stack there (leaving a hole behind it, which is
 // the point of fixed cells); an occupied one trades cells with its stack. The arrangement
@@ -394,7 +464,14 @@ export function equipItem(
   }
   // The all-slots deed reads equipment, so re-check this player's triggers.
   ctx.markDeedsDirty(meta.entityId);
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  recalcPlayerStats(
+    p,
+    meta.cls,
+    meta.equipment,
+    ctx.playerMods(meta),
+    meta.equipmentInstance,
+    meta.inventory,
+  );
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
 }
 
@@ -416,7 +493,14 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
   if (meta.equipmentInstance) delete meta.equipmentInstance.offhand;
   returnEquippedItemToBags(meta, offhandId, instance);
   ctx.markDeedsDirty(meta.entityId);
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  recalcPlayerStats(
+    p,
+    meta.cls,
+    meta.equipment,
+    ctx.playerMods(meta),
+    meta.equipmentInstance,
+    meta.inventory,
+  );
   ctx.emit({
     type: 'log',
     text: `Unequipped ${def.name}.`,
@@ -449,7 +533,14 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   // today keys on an unequip, so there is nothing to award here regardless. An
   // enchanted piece gets its own instanced slot instead, so its enchant survives.
   returnEquippedItemToBags(meta, itemId, instance);
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  recalcPlayerStats(
+    p,
+    meta.cls,
+    meta.equipment,
+    ctx.playerMods(meta),
+    meta.equipmentInstance,
+    meta.inventory,
+  );
   const def = ITEMS[itemId];
   ctx.emit({
     type: 'log',

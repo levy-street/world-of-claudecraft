@@ -1361,6 +1361,7 @@ export const zh_CN: EnTranslations = {
     },
     "itemHeroicTag": "[英雄]",
     "itemSoulbound": "灵魂绑定",
+    "itemCharmHint": "放在背包中即可获得加成",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const zh_CN: EnTranslations = {
       "equip": "装备",
       "disenchant": "分解",
       "salvage": "拆解",
-      "applyEnchant": "施加附魔"
+      "applyEnchant": "施加附魔",
+      "assemble": "组合"
     },
     "enchanting": {
       "disenchantedLine": "你分解了{item}。",
@@ -6877,7 +6879,9 @@ export const zh_CN: EnTranslations = {
       "potion": "药水",
       "elixir": "药剂",
       "bag": "背包",
-      "mount": "坐骑"
+      "mount": "坐骑",
+      "charm": "护符",
+      "artifact": "神器"
     },
     "stats": {
       "armor": "护甲",
@@ -9726,6 +9730,24 @@ export const zh_CN: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "最后的堡垒印戒"
+      },
+      "st_albus_index_finger": {
+        "name": "圣阿尔布斯的食指"
+      },
+      "st_albus_middle_finger": {
+        "name": "圣阿尔布斯的中指"
+      },
+      "st_albus_ring_finger": {
+        "name": "圣阿尔布斯的无名指"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "圣阿尔布斯的小指"
+      },
+      "st_albus_thumb": {
+        "name": "圣阿尔布斯的拇指"
+      },
+      "hand_of_st_albus": {
+        "name": "圣阿尔布斯之手"
       },
       "conjured_water4": {
         "name": "魔法泉水"

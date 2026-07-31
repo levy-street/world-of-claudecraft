@@ -6,6 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { ITEMS } from '../src/sim/data';
 import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
 import {
   type BagCopy,
@@ -16,6 +17,7 @@ import {
   isEnchantReagentItem,
   isSpecialCopy,
 } from '../src/ui/bag_item_context_menu';
+import type { TranslationKey } from '../src/ui/i18n.catalog';
 
 function def(kind: string, quality?: string): ItemDef {
   return { kind, quality } as unknown as ItemDef;
@@ -57,14 +59,69 @@ describe('bag_item_context_menu: action eligibility', () => {
 });
 
 describe('bag_item_context_menu: menu row ordering', () => {
-  it('always leads with the classic default action', () => {
+  it('leads with the classic default action when a plain click does something', () => {
     const gear = bagItemContextActions(def('weapon', 'common'), 'sword');
     expect(gear[0]).toEqual({ id: 'default', labelKey: 'hudChrome.itemMenu.equip' });
     expect(gear.map((r) => r.id)).toEqual(['default', 'disenchant', 'salvage']);
 
-    const reagent = bagItemContextActions(def('material'), 'arcane_dust');
-    expect(reagent[0]).toEqual({ id: 'default', labelKey: 'hudChrome.itemMenu.use' });
-    expect(reagent.map((r) => r.id)).toEqual(['default', 'applyEnchant']);
+    const potion = bagItemContextActions(def('potion'), 'minor_healing_potion');
+    expect(potion[0]).toEqual({ id: 'default', labelKey: 'hudChrome.itemMenu.use' });
+  });
+
+  // Every ItemKind, classified. A wrong member in either kind set silently costs a
+  // real item its Equip or Use row (or restores an inert one), which no
+  // single-kind spot check would catch. The expectations mirror the arms of
+  // useItem in src/sim/items.ts: it acts on the equippable kinds, the consumables,
+  // mounts, and anything carrying a `use` payload, and does nothing for the rest.
+  const KIND_EXPECTATIONS: [ItemDef['kind'], TranslationKey | null][] = [
+    ['weapon', 'hudChrome.itemMenu.equip'],
+    ['armor', 'hudChrome.itemMenu.equip'],
+    ['held_offhand', 'hudChrome.itemMenu.equip'],
+    ['bag', 'hudChrome.itemMenu.equip'],
+    ['food', 'hudChrome.itemMenu.use'],
+    ['drink', 'hudChrome.itemMenu.use'],
+    ['potion', 'hudChrome.itemMenu.use'],
+    ['elixir', 'hudChrome.itemMenu.use'],
+    ['mount', 'hudChrome.itemMenu.use'],
+    ['quest', null],
+    ['junk', null],
+    ['tool', null],
+    ['charm', null],
+    ['artifact', null],
+  ];
+
+  it.each(KIND_EXPECTATIONS)('kind %s gets the right default row', (kind, labelKey) => {
+    const rows = bagItemContextActions(def(kind), `probe_${kind}`);
+    const defaultRow = rows.find((r) => r.id === 'default');
+    if (labelKey === null) expect(defaultRow, `${kind} must have no default row`).toBeUndefined();
+    else expect(defaultRow, `${kind} default row`).toEqual({ id: 'default', labelKey });
+  });
+
+  it('covers every ItemKind, so a new kind cannot slip past the table above', () => {
+    // The table is hand-written; this pins its completeness against the real union
+    // by way of a sample item per kind in the shipped catalog.
+    const catalogKinds = new Set(Object.values(ITEMS).map((item) => item.kind));
+    const tabled = new Set(KIND_EXPECTATIONS.map(([kind]) => kind));
+    const untabled = [...catalogKinds].filter((kind) => !tabled.has(kind)).sort();
+    expect(untabled, `these shipped item kinds are not classified above`).toEqual([]);
+  });
+
+  it('a use payload overrides a kind that would otherwise have no default row', () => {
+    // The kind alone does not decide it: the simple fishing pole is junk-kind but
+    // carries use.type 'fishing', so a plain click casts and the row must stay.
+    const usable = bagItemContextActions(
+      { kind: 'junk', use: { type: 'fishing' } } as unknown as ItemDef,
+      'fishing_pole',
+    );
+    expect(usable[0]).toEqual({ id: 'default', labelKey: 'hudChrome.itemMenu.use' });
+  });
+
+  it('leaves an assembly piece with Assemble as its only row', () => {
+    const piece = bagItemContextActions(
+      { kind: 'artifact', quality: 'epic', assembly: {} } as unknown as ItemDef,
+      'st_albus_thumb',
+    );
+    expect(piece.map((r) => r.id)).toEqual(['assemble']);
   });
 });
 

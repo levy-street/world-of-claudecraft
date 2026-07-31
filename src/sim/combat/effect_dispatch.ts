@@ -266,7 +266,14 @@ export function runEffects(
       const lost = p.auras[sf];
       p.auras.splice(sf, 1);
       ctx.emit({ type: 'aura', targetId: p.id, name: lost.name, gained: false });
-      recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+      recalcPlayerStats(
+        p,
+        meta.cls,
+        meta.equipment,
+        ctx.playerMods(meta),
+        meta.equipmentInstance,
+        meta.inventory,
+      );
     }
   }
   const threatOpts = { flat: res.threatFlat, mult: res.threatMult };
@@ -978,6 +985,7 @@ export function runEffects(
               targetMeta.equipment,
               ctx.playerMods(targetMeta),
               targetMeta.equipmentInstance,
+              targetMeta.inventory,
             );
           }
         }
@@ -1888,6 +1896,7 @@ export function runEffects(
                 targetMeta.equipment,
                 ctx.playerMods(targetMeta),
                 targetMeta.equipmentInstance,
+                targetMeta.inventory,
               );
           }
         }
@@ -2291,6 +2300,7 @@ export function runEffects(
               meta.equipment,
               ctx.playerMods(meta),
               meta.equipmentInstance,
+              meta.inventory,
             );
             break;
           }
@@ -2363,6 +2373,7 @@ export function runEffects(
           meta.equipment,
           ctx.playerMods(meta),
           meta.equipmentInstance,
+          meta.inventory,
         );
         break;
       }
@@ -2450,6 +2461,7 @@ export function runEffects(
                 memberMeta.equipment,
                 ctx.playerMods(memberMeta),
                 memberMeta.equipmentInstance,
+                memberMeta.inventory,
               );
           }
         }

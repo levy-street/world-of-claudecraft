@@ -2279,6 +2279,12 @@ const ITEM_ENTITY_IDS = [
   'saltforged_grips',
   'mantle_of_the_unbroken_shore',
   'last_keep_signet',
+  'st_albus_index_finger',
+  'st_albus_middle_finger',
+  'st_albus_ring_finger',
+  'st_albus_pinkie_finger',
+  'st_albus_thumb',
+  'hand_of_st_albus',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2370,6 +2376,12 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   saltforged_grips: 'Saltforged Grips',
   mantle_of_the_unbroken_shore: 'Mantle of the Unbroken Shore',
   last_keep_signet: 'Signet of the Last Keep',
+  st_albus_index_finger: 'The Index Finger of St. Albus',
+  st_albus_middle_finger: 'The Middle Finger of St. Albus',
+  st_albus_ring_finger: 'The Ring Finger of St. Albus',
+  st_albus_pinkie_finger: 'The Pinkie Finger of St. Albus',
+  st_albus_thumb: 'The Thumb of St. Albus',
+  hand_of_st_albus: 'The Hand of St. Albus',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

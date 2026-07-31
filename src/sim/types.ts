@@ -659,7 +659,22 @@ type ItemKind =
   | 'potion'
   | 'elixir'
   | 'bag'
-  | 'mount';
+  | 'mount'
+  | 'charm'
+  | 'artifact';
+
+// Right-click "Assemble" recipe. Carrying this is what puts Assemble on the bag
+// menu, independent of the item's kind, so an assembled item keeps whatever kind
+// already describes it. `reagents` lists every stack consumed on success, authored
+// to include the carrier itself so any one piece of a set can drive the assembly;
+// `failText` is the item's own English refusal when the player is not holding all
+// of them, emitted as a personal chat line and re-localized at the client boundary
+// like every other sim emit.
+export interface AssemblyRecipe {
+  reagents: { itemId: string; count: number }[];
+  output: { itemId: string; count: number };
+  failText: string;
+}
 
 interface BaseItemDef {
   id: string;
@@ -671,6 +686,10 @@ interface BaseItemDef {
   // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
   // not one of the six primary attributes.
   spellPower?: number;
+  // Flat Attack Power affix, the melee/ranged counterpart of spellPower and off
+  // the primary stat budget for the same reason. Summed in recalcPlayerStats
+  // alongside the set-bonus and aura attack power.
+  attackPower?: number;
   // Combat ratings, converted to crit%/haste%/hit% in recalcPlayerStats.
   critRating?: number;
   hasteRating?: number;
@@ -721,6 +740,9 @@ interface BaseItemDef {
   // bags (kind:'bag'): extra inventory slots granted while equipped in one of
   // the 4 bag sockets (see src/sim/bags.ts; the 16-slot backpack is implicit).
   bagSlots?: number;
+  // The reagents, output, and refusal text for the right-click Assemble action
+  // (see src/sim/assembly.ts).
+  assembly?: AssemblyRecipe;
   // Max copies per inventory slot. When omitted the default is derived from
   // `kind` (weapon/armor/bag/tool: 1, everything else: 20); see stackSizeOf.
   stackSize?: number;

@@ -30,10 +30,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (card_queue_join/leave, play_card, card_forfeit), Professions 2.0's
 // place_mobile_station, train_recipe, the three enchanting actions
 // (disenchant_item, apply_enchant, salvage_item), unbind_item (the
-// Maker's Bond unbind service), and the Rift + mounts surface (rift and
-// forge commands, learn_riding, mount selection).
-const EXPECTED_SEND_COUNT = 173; // mount_select left the wire (reins are items)
-const EXPECTED_DISPATCH_COUNT = 184; // mount_select left the wire (reins are items)
+// Maker's Bond unbind service), the Rift + mounts surface (rift and
+// forge commands, learn_riding, mount selection), and assemble_item (the
+// right-click Assemble action on a kind:'assembled' item).
+const EXPECTED_SEND_COUNT = 174; // assemble_item joined the wire (charm assembly)
+const EXPECTED_DISPATCH_COUNT = 185; // assemble_item joined the wire (charm assembly)
 const EXPECTED_DISPATCH_ONLY_COUNT = 11;
 
 // The chat sub-channel routing switch (server/game.ts `switch

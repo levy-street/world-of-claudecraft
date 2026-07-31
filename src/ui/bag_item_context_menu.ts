@@ -34,7 +34,7 @@ export function isEnchantReagentItem(itemId: string): boolean {
   return ENCHANT_REAGENT_IDS.has(itemId);
 }
 
-export type BagItemNewActionId = 'disenchant' | 'salvage' | 'applyEnchant';
+export type BagItemNewActionId = 'disenchant' | 'salvage' | 'applyEnchant' | 'assemble';
 export type BagItemContextActionId = 'default' | BagItemNewActionId;
 
 export interface BagItemContextAction {
@@ -46,28 +46,53 @@ const NEW_ACTION_LABEL_KEY: Record<BagItemNewActionId, TranslationKey> = {
   disenchant: 'hudChrome.itemMenu.disenchant',
   salvage: 'hudChrome.itemMenu.salvage',
   applyEnchant: 'hudChrome.itemMenu.applyEnchant',
+  assemble: 'hudChrome.itemMenu.assemble',
 };
+
+/** The kinds a plain click equips. */
+const EQUIPPABLE_KINDS: ReadonlySet<ItemDef['kind']> = new Set<ItemDef['kind']>([
+  'weapon',
+  'armor',
+  'held_offhand',
+  'bag',
+]);
+
+/** The kinds a plain click consumes or summons; everything else needs a `use`
+ *  payload to do anything at all (see useItem in src/sim/items.ts, whose arms
+ *  these mirror). */
+const USABLE_KINDS: ReadonlySet<ItemDef['kind']> = new Set<ItemDef['kind']>([
+  'food',
+  'drink',
+  'potion',
+  'elixir',
+  'mount',
+]);
+
+/** Whether a plain click on this item does anything. An item that neither equips
+ *  nor uses (a collection piece whose only action is its own menu row) gets no
+ *  default row, so the menu never offers a verb that silently does nothing. */
+export function hasDefaultAction(def: ItemDef): boolean {
+  return EQUIPPABLE_KINDS.has(def.kind) || USABLE_KINDS.has(def.kind) || def.use !== undefined;
+}
 
 /** The classic left-click verb for the default (first) menu row, so the menu's
  *  top row always does exactly what a plain click does (the classic binding).
  *  Gear equips; everything else uses. */
 function defaultActionLabelKey(def: ItemDef): TranslationKey {
-  return def.kind === 'weapon' ||
-    def.kind === 'armor' ||
-    def.kind === 'held_offhand' ||
-    def.kind === 'bag'
-    ? 'hudChrome.itemMenu.equip'
-    : 'hudChrome.itemMenu.use';
+  return EQUIPPABLE_KINDS.has(def.kind) ? 'hudChrome.itemMenu.equip' : 'hudChrome.itemMenu.use';
 }
 
 /** The eligible new actions for this item, in fixed order (disenchant,
- *  salvage, apply-enchant). Empty when none apply, which is what keeps a plain
- *  item's right-click byte-identical to today. */
+ *  salvage, apply-enchant, assemble). Empty when none apply, which is what keeps
+ *  a plain item's right-click byte-identical to today. */
 export function bagItemNewActions(def: ItemDef, itemId: string): BagItemNewActionId[] {
   const out: BagItemNewActionId[] = [];
   if (isDisenchantable(def)) out.push('disenchant');
   if (isSalvageable(def)) out.push('salvage');
   if (isEnchantReagentItem(itemId)) out.push('applyEnchant');
+  // Def-based like the rest: carrying an assembly recipe is what offers the row,
+  // so it appears before the sim has been asked whether the reagents are held.
+  if (def.assembly) out.push('assemble');
   return out;
 }
 
@@ -78,9 +103,15 @@ export function bagItemHasContextActions(def: ItemDef, itemId: string): boolean 
 }
 
 /** The full ordered menu: the classic default row first (so left-click's binding
- *  survives as row one), then each eligible new action. */
+ *  survives as row one), then each eligible new action. The default row is omitted
+ *  for an item a plain click does nothing to, which is what keeps the menu free of
+ *  an inert verb. The menu only opens in default mode (no vendor / bank / trade /
+ *  mail / market / pet-feed active), so that row is always the equip-or-use action
+ *  and never a mode-specific one. */
 export function bagItemContextActions(def: ItemDef, itemId: string): BagItemContextAction[] {
-  const rows: BagItemContextAction[] = [{ id: 'default', labelKey: defaultActionLabelKey(def) }];
+  const rows: BagItemContextAction[] = hasDefaultAction(def)
+    ? [{ id: 'default', labelKey: defaultActionLabelKey(def) }]
+    : [];
   for (const id of bagItemNewActions(def, itemId)) {
     rows.push({ id, labelKey: NEW_ACTION_LABEL_KEY[id] });
   }

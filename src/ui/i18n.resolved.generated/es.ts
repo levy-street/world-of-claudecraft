@@ -1361,6 +1361,7 @@ export const es: EnTranslations = {
     },
     "itemHeroicTag": "[HEROICO]",
     "itemSoulbound": "Ligado al alma",
+    "itemCharmHint": "Keep in bag to gain bonus",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const es: EnTranslations = {
       "equip": "Equipar",
       "disenchant": "Desencatar",
       "salvage": "Desguazar",
-      "applyEnchant": "Aplicar encantamiento"
+      "applyEnchant": "Aplicar encantamiento",
+      "assemble": "Assemble"
     },
     "enchanting": {
       "disenchantedLine": "Desencatas {item}.",
@@ -6877,7 +6879,9 @@ export const es: EnTranslations = {
       "potion": "Poción",
       "elixir": "Elixir",
       "bag": "Bolsa",
-      "mount": "Montura"
+      "mount": "Montura",
+      "charm": "Charm",
+      "artifact": "Artifact"
     },
     "stats": {
       "armor": "Armadura",
@@ -9726,6 +9730,24 @@ export const es: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Sello del Last Keep"
+      },
+      "st_albus_index_finger": {
+        "name": "The Index Finger of St. Albus"
+      },
+      "st_albus_middle_finger": {
+        "name": "The Middle Finger of St. Albus"
+      },
+      "st_albus_ring_finger": {
+        "name": "The Ring Finger of St. Albus"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "The Pinkie Finger of St. Albus"
+      },
+      "st_albus_thumb": {
+        "name": "The Thumb of St. Albus"
+      },
+      "hand_of_st_albus": {
+        "name": "The Hand of St. Albus"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"

@@ -1361,6 +1361,7 @@ export const pl_PL: EnTranslations = {
     },
     "itemHeroicTag": "[HEROICZNY]",
     "itemSoulbound": "Związany z duszą",
+    "itemCharmHint": "Keep in bag to gain bonus",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const pl_PL: EnTranslations = {
       "equip": "Załóż",
       "disenchant": "Rozbroić",
       "salvage": "Odzyskaj",
-      "applyEnchant": "Zastosuj zaklinanie"
+      "applyEnchant": "Zastosuj zaklinanie",
+      "assemble": "Assemble"
     },
     "enchanting": {
       "disenchantedLine": "Rozbrajasz {item}.",
@@ -6877,7 +6879,9 @@ export const pl_PL: EnTranslations = {
       "potion": "Mikstura",
       "elixir": "Eliksir",
       "bag": "Torba",
-      "mount": "Wierzchowiec"
+      "mount": "Wierzchowiec",
+      "charm": "Charm",
+      "artifact": "Artifact"
     },
     "stats": {
       "armor": "Pancerz",
@@ -9726,6 +9730,24 @@ export const pl_PL: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Sygnet Ostatniej Twierdzy"
+      },
+      "st_albus_index_finger": {
+        "name": "The Index Finger of St. Albus"
+      },
+      "st_albus_middle_finger": {
+        "name": "The Middle Finger of St. Albus"
+      },
+      "st_albus_ring_finger": {
+        "name": "The Ring Finger of St. Albus"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "The Pinkie Finger of St. Albus"
+      },
+      "st_albus_thumb": {
+        "name": "The Thumb of St. Albus"
+      },
+      "hand_of_st_albus": {
+        "name": "The Hand of St. Albus"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

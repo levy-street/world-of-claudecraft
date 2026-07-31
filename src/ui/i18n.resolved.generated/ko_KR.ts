@@ -1361,6 +1361,7 @@ export const ko_KR: EnTranslations = {
     },
     "itemHeroicTag": "[영웅]",
     "itemSoulbound": "귀속",
+    "itemCharmHint": "가방에 지니고 있으면 효과를 얻습니다",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const ko_KR: EnTranslations = {
       "equip": "장착",
       "disenchant": "마력 추출",
       "salvage": "분해",
-      "applyEnchant": "마법부여 적용"
+      "applyEnchant": "마법부여 적용",
+      "assemble": "조합"
     },
     "enchanting": {
       "disenchantedLine": "{item}의 마력을 추출했습니다.",
@@ -6877,7 +6879,9 @@ export const ko_KR: EnTranslations = {
       "potion": "물약",
       "elixir": "비약",
       "bag": "가방",
-      "mount": "탈것"
+      "mount": "탈것",
+      "charm": "부적",
+      "artifact": "유물"
     },
     "stats": {
       "armor": "방어도",
@@ -9726,6 +9730,24 @@ export const ko_KR: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "마지막 요새의 인장"
+      },
+      "st_albus_index_finger": {
+        "name": "성 알부스의 검지"
+      },
+      "st_albus_middle_finger": {
+        "name": "성 알부스의 중지"
+      },
+      "st_albus_ring_finger": {
+        "name": "성 알부스의 약지"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "성 알부스의 새끼손가락"
+      },
+      "st_albus_thumb": {
+        "name": "성 알부스의 엄지"
+      },
+      "hand_of_st_albus": {
+        "name": "성 알부스의 손"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

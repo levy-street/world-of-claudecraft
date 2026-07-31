@@ -1285,6 +1285,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
             meta.equipment,
             ctx.playerMods(meta),
             meta.equipmentInstance,
+            meta.inventory,
           );
         }
       }
@@ -1388,7 +1389,14 @@ export function grantXp(
     // magnitudes scale with level (min(1, level/20) in accumulate), so a ding must
     // strengthen the mastery without waiting for a respec/spec-pick/relog re-bake.
     meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, p.level);
-    recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+    recalcPlayerStats(
+      p,
+      meta.cls,
+      meta.equipment,
+      ctx.playerMods(meta),
+      meta.equipmentInstance,
+      meta.inventory,
+    );
     p.hp = p.maxHp;
     if (p.resourceType === 'mana') p.resource = p.maxResource;
     ctx.emit({ type: 'levelup', level: p.level, pid: p.id });

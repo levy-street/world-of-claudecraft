@@ -3053,6 +3053,17 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   sanctum_key_shard: r('arcane', 'sky', ['gem'], ['sparkle', 'glow']),
   blessed_wax: r('holy', 'holyGold', [{ p: 'droplet', pal: 'holyGold' }], ['sparkle']),
   ghostly_essence: r('shadow', 'silverWhite', [{ p: 'flame', pal: 'silverWhite' }], ['sparkle']),
+  // The Hand of St. Albus collection. Without a recipe every piece falls through
+  // itemFallback to the generic leather scroll, so the set draws from the existing
+  // bone primitive and palette instead. The five fingers share one recipe so they
+  // read as a set; the assembled hand takes the hand primitive on a holy ground to
+  // separate the reward from its parts.
+  st_albus_index_finger: r('shadow', 'bone', [{ p: 'bone', pal: 'bone' }], ['glow']),
+  st_albus_middle_finger: r('shadow', 'bone', [{ p: 'bone', pal: 'bone' }], ['glow']),
+  st_albus_ring_finger: r('shadow', 'bone', [{ p: 'bone', pal: 'bone' }], ['glow']),
+  st_albus_pinkie_finger: r('shadow', 'bone', [{ p: 'bone', pal: 'bone' }], ['glow']),
+  st_albus_thumb: r('shadow', 'bone', [{ p: 'bone', pal: 'bone' }], ['glow']),
+  hand_of_st_albus: r('holy', 'bone', [{ p: 'hand', pal: 'bone' }], ['sparkle', 'glow']),
   webwood_silk: r('shadow', 'silverWhite', ['web']),
   supply_crate: r('wood', 'earthBrown', ['crate']),
   greyjaw_fang: r('earth', 'bone', [{ p: 'fang', pal: 'bone' }]),

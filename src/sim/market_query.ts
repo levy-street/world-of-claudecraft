@@ -190,8 +190,17 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
   // The catch-all for catalog kinds with no browse category of their own. Mount
   // reins join quest items here: both are soulbound oddments a player can hold
   // but never list, so neither earns a filter chip, and neither may be left
-  // reachable through 'All' alone (tests/market_filters.test.ts).
-  if (filter === 'other') return item.kind === 'quest' || item.kind === 'mount';
+  // reachable through 'All' alone (tests/market_filters.test.ts). Charms and the
+  // artifacts that assemble into them browse here too; unlike the other two, an
+  // artifact really is listable, so this is the chip a collector actually shops.
+  if (filter === 'other') {
+    return (
+      item.kind === 'quest' ||
+      item.kind === 'mount' ||
+      item.kind === 'charm' ||
+      item.kind === 'artifact'
+    );
+  }
   // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above
   // reddens tsc here instead of silently inheriting the 'other' predicate, which is
   // how `bag` browsed as nothing at all for its whole life before this arm existed.

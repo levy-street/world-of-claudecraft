@@ -919,8 +919,12 @@ export class BagsWindow {
           this.deps.hideTooltip();
           // Bank ops emit no client repaint event and the bags grid has no per-frame
           // refresh (only the bank grid does), so repaint here like the use / equip
-          // local-action cases, not a bespoke path.
+          // local-action cases, not a bespoke path. The character sheet repaints
+          // too: what leaves the bags can carry stats (a charm), and the sheet is
+          // only redrawn on an explicit trigger. The withdraw direction gets this
+          // from the bank window's own onInventoryChanged.
           this.render();
+          this.deps.renderCharIfOpen();
         }
         break;
       }
@@ -1320,6 +1324,7 @@ export class BagsWindow {
       // always-present close button rather than dropping it to <body>. dismiss()
       // cleared inert first, so this focus is not lost into a still-inert subtree.
       this.render();
+      this.deps.renderCharIfOpen();
       (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
     };
     confirm.addEventListener('click', submit);

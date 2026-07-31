@@ -234,11 +234,13 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
     // 10-player raid boss (Heroic Nythraxis) is one tier above at source level 27:
     // its explicit table lists the three heroic-only weapons (item level 33) plus
     // the two blue mount reins secondary paths (excluded from budget sweep below).
-    // Mount reins (kind 'mount') have no item level; only armor/weapon entries are
-    // budget-enforced.
+    // Only armor/weapon entries are budget-enforced. Stated as an inclusion, not as
+    // "everything except mount reins": a heroic table may carry any non-gear kind
+    // (reins, collection artifacts), and none of those has an item level or a stat
+    // budget to check.
     const isGearEntry = (itemId: string): boolean => {
       const item = ITEMS[itemId];
-      return !!item && item.kind !== 'mount';
+      return !!item && (item.kind === 'armor' || item.kind === 'weapon');
     };
     const raidIds = new Set(
       (HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak ?? []).flatMap((e) =>

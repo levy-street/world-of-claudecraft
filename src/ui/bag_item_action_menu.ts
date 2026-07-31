@@ -136,6 +136,12 @@ export class BagItemActionMenu {
       else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, slotIndex);
       else if (id === 'salvage') this.confirmDestroy('salvage', itemId);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);
+      // No confirm: assembling is the point of holding the pieces, and the sim
+      // answers a shortfall with the recipe's own line rather than consuming.
+      else if (id === 'assemble') {
+        this.deps.world().assembleItem(itemId);
+        this.deps.afterAction();
+      }
     });
   }
 

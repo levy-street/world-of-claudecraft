@@ -223,6 +223,7 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'fiestaMods', // derived from talentMods + augments
   'fiestaSpecial', // derived from augments
   'wireRev', // runtime-only wire-dirty counter; never serialized/persisted
+  'charmSig', // runtime-only cache key; derived from the sampled inventory
 ]);
 
 function sampleExcluding(source: Record<string, unknown>, exclude: ReadonlySet<string>): unknown {

@@ -1361,6 +1361,7 @@ export const da_DK: EnTranslations = {
     },
     "itemHeroicTag": "[HEROISK]",
     "itemSoulbound": "Sjælebundet",
+    "itemCharmHint": "Keep in bag to gain bonus",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const da_DK: EnTranslations = {
       "equip": "Udrust",
       "disenchant": "Affortrylle",
       "salvage": "Bjærg",
-      "applyEnchant": "Anvend fortryllelse"
+      "applyEnchant": "Anvend fortryllelse",
+      "assemble": "Assemble"
     },
     "enchanting": {
       "disenchantedLine": "Du affortrylles {item}.",
@@ -6877,7 +6879,9 @@ export const da_DK: EnTranslations = {
       "potion": "Eliksir",
       "elixir": "Eliksir",
       "bag": "Taske",
-      "mount": "Ridedyr"
+      "mount": "Ridedyr",
+      "charm": "Charm",
+      "artifact": "Artifact"
     },
     "stats": {
       "armor": "Rustning",
@@ -9726,6 +9730,24 @@ export const da_DK: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Segl fra Den Sidste Borg"
+      },
+      "st_albus_index_finger": {
+        "name": "The Index Finger of St. Albus"
+      },
+      "st_albus_middle_finger": {
+        "name": "The Middle Finger of St. Albus"
+      },
+      "st_albus_ring_finger": {
+        "name": "The Ring Finger of St. Albus"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "The Pinkie Finger of St. Albus"
+      },
+      "st_albus_thumb": {
+        "name": "The Thumb of St. Albus"
+      },
+      "hand_of_st_albus": {
+        "name": "The Hand of St. Albus"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

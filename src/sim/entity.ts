@@ -1,3 +1,4 @@
+import { aggregateCharmBonus } from './charms';
 import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
 import type { TalentModifiers } from './content/talents';
 import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
@@ -8,6 +9,7 @@ import { pvpFractionsFromRatings } from './pvp';
 import type {
   Entity,
   EquipSlot,
+  InvSlot,
   ItemInstancePayload,
   MobTemplate,
   PlayerClass,
@@ -262,6 +264,7 @@ export function recalcPlayerStats(
   equipment: PlayerEquipment,
   mods: TalentModifiers | undefined,
   equipmentInstance: PlayerEquipmentInstances,
+  inventory: readonly InvSlot[] = [],
 ): void {
   const def = CLASSES[cls];
   const lvl = e.level;
@@ -277,6 +280,7 @@ export function recalcPlayerStats(
   };
   const setCounts = new Map<string, number>();
   let bonusSp = 0; // flat Spell Power from gear affixes + buff_spellpower auras
+  let bonusAp = 0; // flat Attack Power from gear affixes + set bonuses + buff_ap auras
   let bonusCritRating = 0;
   let bonusHasteRating = 0;
   let bonusHitRating = 0;
@@ -295,6 +299,7 @@ export function recalcPlayerStats(
     if (!meetsLevelRequirement(lvl, item)) continue;
     if (item.set) setCounts.set(item.set, (setCounts.get(item.set) ?? 0) + 1);
     bonusSp += item.spellPower ?? 0;
+    bonusAp += item.attackPower ?? 0;
     bonusCritRating += item.critRating ?? 0;
     bonusHasteRating += item.hasteRating ?? 0;
     bonusHitRating += item.hitRating ?? 0;
@@ -327,6 +332,23 @@ export function recalcPlayerStats(
       bonusHasteRating += Number.isFinite(rolled.hasteRating) ? rolled.hasteRating : 0;
     }
   }
+  // Carried charms, which grant their affixes from the bags rather than a slot
+  // (src/sim/charms.ts). They join the gear totals for the same reason the set
+  // bonuses below do: every derivation downstream should see them.
+  const charm = aggregateCharmBonus(inventory, ITEMS);
+  s.str += charm.str;
+  s.agi += charm.agi;
+  s.sta += charm.sta;
+  s.int += charm.int;
+  s.spi += charm.spi;
+  s.armor += charm.armor;
+  bonusSp += charm.spellPower;
+  bonusAp += charm.attackPower;
+  bonusCritRating += charm.critRating;
+  bonusHasteRating += charm.hasteRating;
+  bonusHitRating += charm.hitRating;
+  bonusPvpOffenseRating += charm.pvpOffenseRating;
+  bonusPvpDefenseRating += charm.pvpDefenseRating;
   // Item-set bonuses from equipped pieces. Flat primary stats join the gear
   // totals so they feed every derivation below; AP/crit/pushback fold in at
   // their own steps (bonusAp, critChance, castPushbackReduction, knockbackResistance).
@@ -337,8 +359,8 @@ export function recalcPlayerStats(
   s.int += setEff.int;
   s.spi += setEff.spi;
   bonusSp += setEff.sp; // caster set 2-piece spell power (mirrors setEff.ap for melee)
+  bonusAp += setEff.ap;
   // Buff auras
-  let bonusAp = setEff.ap;
   let bonusDodge = 0;
   let bonusCrit = 0;
   let bonusHaste = 0;
@@ -676,10 +698,11 @@ export function characterDerivedStats(
   equipment: PlayerEquipment,
   mods?: TalentModifiers,
   equipmentInstance?: Partial<Record<EquipSlot, ItemInstancePayload>>,
+  inventory?: readonly InvSlot[],
 ): DerivedCharacterStats {
   const e = createPlayer(0, cls, { x: 0, y: 0, z: 0 }, '');
   e.level = Math.max(1, Math.floor(level));
-  recalcPlayerStats(e, cls, equipment, mods, equipmentInstance ?? {});
+  recalcPlayerStats(e, cls, equipment, mods, equipmentInstance ?? {}, inventory ?? []);
   return {
     stats: e.stats,
     maxHp: e.maxHp,

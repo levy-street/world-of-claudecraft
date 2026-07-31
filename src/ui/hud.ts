@@ -901,6 +901,8 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   elixir: 'itemUi.kind.elixir',
   bag: 'itemUi.kind.bag',
   mount: 'itemUi.kind.mount',
+  charm: 'itemUi.kind.charm',
+  artifact: 'itemUi.kind.artifact',
 };
 // Classic class colors (CLASSES[cls].color is a 0xRRGGBB number) as a CSS
 // string, used to color-code party members on the minimap and in the frames.
@@ -5003,6 +5005,19 @@ export class Hud {
         }),
       )}</div>`;
     }
+    // Flat power affixes (attack / spell power), above the ratings the way classic
+    // tooltips order them. Off the primary stat budget, so they never appear in
+    // item.stats and need their own lines.
+    for (const powerStat of ['attackPower', 'spellPower'] as const) {
+      const value = item[powerStat] ?? 0;
+      if (value <= 0) continue;
+      html += `<div class="tt-green">${esc(
+        t('itemUi.tooltip.stat', {
+          value: itemNumber(value),
+          stat: t(statNameKey(powerStat) as TranslationKey),
+        }),
+      )}</div>`;
+    }
     // Combat ratings (hit / crit / haste): shown as classic "+N Rating" affix lines,
     // sharing the character-sheet HUD-chrome labels. Hit answers the higher-level
     // miss/resist penalty; crit and haste add throughput.
@@ -5020,6 +5035,11 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useDrink', { amount: itemNumber(item.drinkMana), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
+    // A charm's stats above come from carrying it, not from a slot, so the
+    // tooltip says where it has to sit for them to count.
+    if (item.kind === 'charm') {
+      html += `<div class="tt-desc">${esc(t('hudChrome.itemCharmHint'))}</div>`;
+    }
     // Gathering implements (#2343): picks/axes/sickles/rods and the simple
     // pole render their kind, requirement, use, and bonus lines from the
     // pure sibling module (the item_instance_tooltip.ts pattern).

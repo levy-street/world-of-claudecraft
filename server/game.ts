@@ -4554,6 +4554,11 @@ export class GameServer {
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
         break;
+      case 'assemble_item':
+        // The sim owns every gate (held reagents, bag room) and answers a
+        // shortfall with the recipe's own refusal as a personal log line.
+        if (typeof msg.item === 'string') sim.assembleItem(msg.item, pid);
+        break;
       case 'equip_bag':
         if (typeof msg.item === 'string') {
           const socket =

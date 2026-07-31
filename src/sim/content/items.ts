@@ -1,4 +1,4 @@
-import type { ItemDef, PlayerClass } from '../types';
+import type { AssemblyRecipe, ItemDef, PlayerClass } from '../types';
 
 // Archetype groups for class-locked rewards (REWARD_ARCHETYPE hands warrior
 // rewards to paladins/shamans etc., so the lock must admit the whole group).
@@ -28,6 +28,21 @@ const CASTER_WEAPON_CLASSES: PlayerClass[] = [
   'paladin',
   'druid',
 ];
+
+// The one recipe every St. Albus finger carries, so right-clicking any piece of
+// the set offers the same Assemble and the same refusal (see the collection at
+// the end of BASE_ITEMS).
+const ST_ALBUS_ASSEMBLY: AssemblyRecipe = {
+  reagents: [
+    { itemId: 'st_albus_index_finger', count: 1 },
+    { itemId: 'st_albus_middle_finger', count: 1 },
+    { itemId: 'st_albus_ring_finger', count: 1 },
+    { itemId: 'st_albus_pinkie_finger', count: 1 },
+    { itemId: 'st_albus_thumb', count: 1 },
+  ],
+  output: { itemId: 'hand_of_st_albus', count: 1 },
+  failText: 'The finger cries out for its brethren!',
+};
 
 // ---------------------------------------------------------------------------
 // Items
@@ -2045,6 +2060,67 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 30, agi: 1, sta: 1 },
     sellValue: 110,
+  },
+
+  // --- The Hand of St. Albus -------------------------------------------------
+  // A five-piece collection, one finger per final boss in clear order (1% each,
+  // Hollow Crypt through the Nythraxis raid), that assembles into a carried charm.
+  // The drops are HEROIC-ONLY and live in content/heroic_loot.ts beside the mounts;
+  // no normal table carries them. Every finger shares the same recipe and refusal,
+  // so a player can right-click whichever piece they happen to be looking at. The
+  // pieces are epic to keep them off the vendor junk sweep (that only takes quality
+  // 'poor') and out of the disenchant/salvage paths (those only take weapons and armor).
+  st_albus_index_finger: {
+    id: 'st_albus_index_finger',
+    name: 'The Index Finger of St. Albus',
+    kind: 'artifact',
+    quality: 'epic',
+    sellValue: 10000,
+    assembly: ST_ALBUS_ASSEMBLY,
+  },
+  st_albus_middle_finger: {
+    id: 'st_albus_middle_finger',
+    name: 'The Middle Finger of St. Albus',
+    kind: 'artifact',
+    quality: 'epic',
+    sellValue: 10000,
+    assembly: ST_ALBUS_ASSEMBLY,
+  },
+  st_albus_ring_finger: {
+    id: 'st_albus_ring_finger',
+    name: 'The Ring Finger of St. Albus',
+    kind: 'artifact',
+    quality: 'epic',
+    sellValue: 10000,
+    assembly: ST_ALBUS_ASSEMBLY,
+  },
+  st_albus_pinkie_finger: {
+    id: 'st_albus_pinkie_finger',
+    name: 'The Pinkie Finger of St. Albus',
+    kind: 'artifact',
+    quality: 'epic',
+    sellValue: 10000,
+    assembly: ST_ALBUS_ASSEMBLY,
+  },
+  st_albus_thumb: {
+    id: 'st_albus_thumb',
+    name: 'The Thumb of St. Albus',
+    kind: 'artifact',
+    quality: 'epic',
+    sellValue: 10000,
+    assembly: ST_ALBUS_ASSEMBLY,
+  },
+  // Soulbound, unlike the fingers: the pieces trade freely so a collector can buy
+  // the one boss that will not drop for them, but the assembled charm stays with
+  // the character that earned it.
+  hand_of_st_albus: {
+    id: 'hand_of_st_albus',
+    name: 'The Hand of St. Albus',
+    kind: 'charm',
+    quality: 'legendary',
+    stats: { str: 2, agi: 2, sta: 2, int: 2, spi: 2 },
+    sellValue: 10000,
+    soulbound: true,
   },
 };
 

@@ -1361,6 +1361,7 @@ export const nl_NL: EnTranslations = {
     },
     "itemHeroicTag": "[HELDHAFTIG]",
     "itemSoulbound": "Zielsgebonden",
+    "itemCharmHint": "Keep in bag to gain bonus",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const nl_NL: EnTranslations = {
       "equip": "Uitrusten",
       "disenchant": "Onbetoveren",
       "salvage": "Salvagen",
-      "applyEnchant": "Betovering aanbrengen"
+      "applyEnchant": "Betovering aanbrengen",
+      "assemble": "Assemble"
     },
     "enchanting": {
       "disenchantedLine": "Je onbetoverd {item}.",
@@ -6877,7 +6879,9 @@ export const nl_NL: EnTranslations = {
       "potion": "Toverdrank",
       "elixir": "Elixer",
       "bag": "Tas",
-      "mount": "Rijdier"
+      "mount": "Rijdier",
+      "charm": "Charm",
+      "artifact": "Artifact"
     },
     "stats": {
       "armor": "Pantser",
@@ -9726,6 +9730,24 @@ export const nl_NL: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Zegel van de Laatste Burcht"
+      },
+      "st_albus_index_finger": {
+        "name": "The Index Finger of St. Albus"
+      },
+      "st_albus_middle_finger": {
+        "name": "The Middle Finger of St. Albus"
+      },
+      "st_albus_ring_finger": {
+        "name": "The Ring Finger of St. Albus"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "The Pinkie Finger of St. Albus"
+      },
+      "st_albus_thumb": {
+        "name": "The Thumb of St. Albus"
+      },
+      "hand_of_st_albus": {
+        "name": "The Hand of St. Albus"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

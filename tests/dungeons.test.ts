@@ -1313,7 +1313,11 @@ describe('dungeons: heroic boss drops', () => {
     // sub-1% draws (the mount drop matrix); the weapon contract applies to the
     // roll-grouped entries only.
     const weaponEntries = heroicTable.filter((e) => e.rollGroup !== undefined);
-    const mountEntries = heroicTable.filter((e) => e.rollGroup === undefined);
+    // Selected by KIND rather than by "has no rollGroup": the table carries other
+    // ungrouped independent draws too, so absence of a group does not mean mount.
+    const mountEntries = heroicTable.filter(
+      (e) => e.itemId !== undefined && ITEMS[e.itemId]?.kind === 'mount',
+    );
     const weaponIds = weaponEntries.flatMap((e) => (e.itemId ? [e.itemId] : []));
     const groups = new Set(weaponEntries.map((e) => e.rollGroup));
     expect(groups.size).toBe(1);

@@ -1361,6 +1361,7 @@ export const zh_TW: EnTranslations = {
     },
     "itemHeroicTag": "[英雄]",
     "itemSoulbound": "靈魂綁定",
+    "itemCharmHint": "放在背包中即可獲得加成",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const zh_TW: EnTranslations = {
       "equip": "裝備",
       "disenchant": "分解",
       "salvage": "拆解",
-      "applyEnchant": "施加附魔"
+      "applyEnchant": "施加附魔",
+      "assemble": "組合"
     },
     "enchanting": {
       "disenchantedLine": "你分解了 {item}。",
@@ -6877,7 +6879,9 @@ export const zh_TW: EnTranslations = {
       "potion": "藥水",
       "elixir": "藥劑",
       "bag": "背包",
-      "mount": "坐騎"
+      "mount": "坐騎",
+      "charm": "護符",
+      "artifact": "神器"
     },
     "stats": {
       "armor": "護甲",
@@ -9726,6 +9730,24 @@ export const zh_TW: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "最後的堡壘印戒"
+      },
+      "st_albus_index_finger": {
+        "name": "聖阿爾布斯的食指"
+      },
+      "st_albus_middle_finger": {
+        "name": "聖阿爾布斯的中指"
+      },
+      "st_albus_ring_finger": {
+        "name": "聖阿爾布斯的無名指"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "聖阿爾布斯的小指"
+      },
+      "st_albus_thumb": {
+        "name": "聖阿爾布斯的拇指"
+      },
+      "hand_of_st_albus": {
+        "name": "聖阿爾布斯之手"
       },
       "conjured_water4": {
         "name": "魔法泉水"

@@ -1361,6 +1361,7 @@ export const en_CA: EnTranslations = {
     },
     "itemHeroicTag": "[HEROIC]",
     "itemSoulbound": "Soulbound",
+    "itemCharmHint": "Keep in bag to gain bonus",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const en_CA: EnTranslations = {
       "equip": "Equip",
       "disenchant": "Disenchant",
       "salvage": "Salvage",
-      "applyEnchant": "Apply Enchant"
+      "applyEnchant": "Apply Enchant",
+      "assemble": "Assemble"
     },
     "enchanting": {
       "disenchantedLine": "You disenchant {item}.",
@@ -6877,7 +6879,9 @@ export const en_CA: EnTranslations = {
       "potion": "Potion",
       "elixir": "Elixir",
       "bag": "Bag",
-      "mount": "Mount"
+      "mount": "Mount",
+      "charm": "Charm",
+      "artifact": "Artifact"
     },
     "stats": {
       "armor": "Armour",
@@ -9726,6 +9730,24 @@ export const en_CA: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Signet of the Last Keep"
+      },
+      "st_albus_index_finger": {
+        "name": "The Index Finger of St. Albus"
+      },
+      "st_albus_middle_finger": {
+        "name": "The Middle Finger of St. Albus"
+      },
+      "st_albus_ring_finger": {
+        "name": "The Ring Finger of St. Albus"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "The Pinkie Finger of St. Albus"
+      },
+      "st_albus_thumb": {
+        "name": "The Thumb of St. Albus"
+      },
+      "hand_of_st_albus": {
+        "name": "The Hand of St. Albus"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"

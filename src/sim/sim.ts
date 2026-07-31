@@ -28,6 +28,7 @@ import {
 } from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
+import { carriedCharmSignature } from './charms';
 import { campSpawnOffset } from './camp_scatter';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
@@ -1085,6 +1086,12 @@ export interface PlayerMeta {
   // host can cheaply tell whether that state needs re-sending without diffing
   // it every frame. Runtime-only signal, never serialized/persisted.
   wireRev: number;
+  // The carried-charm set as of the last stat rebuild (src/sim/charms.ts
+  // carriedCharmSignature). Charms grant their affixes from the bags, so moving one
+  // in or out has to rebuild the stat block the way an equip does; comparing this
+  // across an inventory mutation is what tells the two apart from ordinary looting.
+  // Runtime-only signal, never serialized/persisted.
+  charmSig: string;
   inventory: InvSlot[];
   // The 4 equippable bag sockets (itemId of a kind:'bag' item, or null). The
   // 16-slot backpack is implicit; capacity math lives in bags.ts. Persisted.
@@ -2436,6 +2443,10 @@ export class Sim {
       pendingSkinItemId: savedState?.pendingSkinItemId ?? null,
       moveInput: emptyMoveInput(),
       wireRev: 0,
+      // Empty, not the loaded bags' real signature: a fresh meta has not had its
+      // stats derived yet, so the first inventory change must be seen as a change
+      // and rebuild them. addPlayer recalcs on the way in regardless.
+      charmSig: '',
       inventory: [],
       bags: Array<string | null>(BAG_SOCKETS).fill(null),
       bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
@@ -2785,7 +2796,14 @@ export class Sim {
     // resolver below consume it (they only ever read these flat numbers).
     meta.talentMods = computeTalentModifiers(cls, meta.talents, player.level);
     this.refreshKnownAbilities(meta, false);
-    recalcPlayerStats(player, cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
+    recalcPlayerStats(
+      player,
+      cls,
+      meta.equipment,
+      meta.talentMods,
+      meta.equipmentInstance,
+      meta.inventory,
+    );
     if (savedState) {
       player.hp = Math.max(1, Math.min(player.maxHp, savedState.hp));
       player.resource =
@@ -4463,7 +4481,15 @@ export class Sim {
         onRecipeCraftedForQuests(sim.ctx, recipeId, meta),
       onNodeGatheredForQuests: (node, itemId, meta) =>
         onNodeGatheredForQuests(sim.ctx, node, itemId, meta),
-      onInventoryChangedForQuests: (meta) => onInventoryChangedForQuests(sim.ctx, meta),
+      // Every inventory mutation routes through here (the hub's add/remove, the
+      // vendor and bank moves, bags, enchanting), which makes it the one place a
+      // carried charm entering or leaving the bags can be noticed. The charm
+      // refresh rides alongside the quest credit rather than being threaded to
+      // each call site, because the call sites are exactly this hook's.
+      onInventoryChangedForQuests: (meta) => {
+        onInventoryChangedForQuests(sim.ctx, meta);
+        sim.refreshCarriedCharms(meta);
+      },
       checkQuestReady: (qp, meta) => checkQuestReady(sim.ctx, qp, meta),
       countItem: sim.countItem.bind(sim),
       countFungibleItem: sim.countFungibleItem.bind(sim),
@@ -4801,6 +4827,7 @@ export class Sim {
       r.meta.equipment,
       this.playerMods(r.meta),
       r.meta.equipmentInstance,
+      r.meta.inventory,
     );
     r.e.hp = r.e.maxHp;
     if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
@@ -5787,7 +5814,14 @@ export class Sim {
     if (!removed) return;
     this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
     if (auraAffectsStats(removed)) {
-      recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta), meta.equipmentInstance);
+      recalcPlayerStats(
+        e,
+        meta.cls,
+        meta.equipment,
+        this.playerMods(meta),
+        meta.equipmentInstance,
+        meta.inventory,
+      );
     }
   }
 
@@ -5950,6 +5984,7 @@ export class Sim {
           meta.equipment,
           this.playerMods(meta),
           meta.equipmentInstance,
+          meta.inventory,
         );
     }
   }
@@ -6709,7 +6744,14 @@ export class Sim {
   private recalcPlayer(target: Entity): void {
     const meta = this.players.get(target.id);
     if (meta)
-      recalcPlayerStats(target, meta.cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
+      recalcPlayerStats(
+        target,
+        meta.cls,
+        meta.equipment,
+        meta.talentMods,
+        meta.equipmentInstance,
+        meta.inventory,
+      );
   }
 
   private updateRangedPetAttack(
@@ -7400,6 +7442,27 @@ export class Sim {
   // add new grant sites here (Phase 4 rare-event jackpot yields, Phase 13's
   // disenchant UI wiring): pass the same opts from those too, or the new
   // grants will double-ding and double-log the way the original ones did.
+  // Rebuild the stat block when the carried-charm set changes. A charm grants its
+  // affixes from the BAGS, so a deposit, a mail send, a trade or a sale has to
+  // re-derive stats the way unequipping a ring does. Nothing else notices: an
+  // inventory mutation that leaves the charm set alone (the overwhelming majority)
+  // compares two signatures and returns.
+  refreshCarriedCharms(meta: PlayerMeta): void {
+    const sig = carriedCharmSignature(meta.inventory, ITEMS);
+    if (sig === meta.charmSig) return;
+    meta.charmSig = sig;
+    const e = this.entities.get(meta.entityId);
+    if (!e) return;
+    recalcPlayerStats(
+      e,
+      meta.cls,
+      meta.equipment,
+      this.playerMods(meta),
+      meta.equipmentInstance,
+      meta.inventory,
+    );
+  }
+
   addItem(
     itemId: string,
     count: number,
@@ -7671,6 +7734,10 @@ export class Sim {
 
   sellAllJunk(pid?: number): void {
     items.sellAllJunk(this.ctx, pid);
+  }
+
+  assembleItem(itemId: string, pid?: number): void {
+    items.assembleItem(this.ctx, itemId, pid);
   }
 
   buyBackItem(
@@ -8697,6 +8764,7 @@ export class Sim {
           meta.equipment,
           this.playerMods(meta),
           meta.equipmentInstance,
+          meta.inventory,
         );
     }
   }

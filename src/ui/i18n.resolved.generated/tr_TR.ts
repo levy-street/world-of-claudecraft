@@ -1361,6 +1361,7 @@ export const tr_TR: EnTranslations = {
     },
     "itemHeroicTag": "[KAHRAMANCA]",
     "itemSoulbound": "Ruha Bağlı",
+    "itemCharmHint": "Keep in bag to gain bonus",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const tr_TR: EnTranslations = {
       "equip": "Kuşan",
       "disenchant": "Büyüyü Boz",
       "salvage": "Kurtar",
-      "applyEnchant": "Büyü Uygula"
+      "applyEnchant": "Büyü Uygula",
+      "assemble": "Assemble"
     },
     "enchanting": {
       "disenchantedLine": "{item} büyüsünü bozdunuz.",
@@ -6877,7 +6879,9 @@ export const tr_TR: EnTranslations = {
       "potion": "Şifa İksiri",
       "elixir": "İksir",
       "bag": "Çanta",
-      "mount": "Binek"
+      "mount": "Binek",
+      "charm": "Charm",
+      "artifact": "Artifact"
     },
     "stats": {
       "armor": "Zırh",
@@ -9726,6 +9730,24 @@ export const tr_TR: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Son Kale Mührü"
+      },
+      "st_albus_index_finger": {
+        "name": "The Index Finger of St. Albus"
+      },
+      "st_albus_middle_finger": {
+        "name": "The Middle Finger of St. Albus"
+      },
+      "st_albus_ring_finger": {
+        "name": "The Ring Finger of St. Albus"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "The Pinkie Finger of St. Albus"
+      },
+      "st_albus_thumb": {
+        "name": "The Thumb of St. Albus"
+      },
+      "hand_of_st_albus": {
+        "name": "The Hand of St. Albus"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

@@ -1361,6 +1361,7 @@ export const sv_SE: EnTranslations = {
     },
     "itemHeroicTag": "[HEROISK]",
     "itemSoulbound": "Själabunden",
+    "itemCharmHint": "Keep in bag to gain bonus",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const sv_SE: EnTranslations = {
       "equip": "Utrusta",
       "disenchant": "Avförtrylla",
       "salvage": "Bärga",
-      "applyEnchant": "Applicera förtrollning"
+      "applyEnchant": "Applicera förtrollning",
+      "assemble": "Assemble"
     },
     "enchanting": {
       "disenchantedLine": "Du avförtrollar {item}.",
@@ -6877,7 +6879,9 @@ export const sv_SE: EnTranslations = {
       "potion": "Trolldryck",
       "elixir": "Elixir",
       "bag": "Väska",
-      "mount": "Riddjur"
+      "mount": "Riddjur",
+      "charm": "Charm",
+      "artifact": "Artifact"
     },
     "stats": {
       "armor": "Rustning",
@@ -9726,6 +9730,24 @@ export const sv_SE: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Sista fästets signetring"
+      },
+      "st_albus_index_finger": {
+        "name": "The Index Finger of St. Albus"
+      },
+      "st_albus_middle_finger": {
+        "name": "The Middle Finger of St. Albus"
+      },
+      "st_albus_ring_finger": {
+        "name": "The Ring Finger of St. Albus"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "The Pinkie Finger of St. Albus"
+      },
+      "st_albus_thumb": {
+        "name": "The Thumb of St. Albus"
+      },
+      "hand_of_st_albus": {
+        "name": "The Hand of St. Albus"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

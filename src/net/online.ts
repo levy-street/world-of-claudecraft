@@ -3580,6 +3580,9 @@ export class ClientWorld implements IWorld {
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
   }
+  assembleItem(itemId: string): void {
+    this.cmd({ cmd: 'assemble_item', item: itemId });
+  }
   buyBackItem(
     itemId: string,
     index?: number,

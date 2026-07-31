@@ -815,6 +815,13 @@
       "confidence": "high"
     },
     {
+      "itemId": "hand_of_st_albus",
+      "name": "Skeletal Hand",
+      "sourcePack": "st_albus_collection",
+      "sourceFile": "skeletalhand.webp",
+      "license": "Contributed by the PR author UncleSporky for use in World of ClaudeCraft; see CREDITS.md"
+    },
+    {
       "itemId": "handaxe",
       "name": "Handaxe",
       "sourcePack": "farming",
@@ -976,14 +983,6 @@
       "name": "Linen Pouch",
       "sourcePack": "woc_bags",
       "sourceFile": "WoC_Bag_03.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "silkspun_satchel",
-      "name": "Silkspun Satchel",
-      "sourcePack": "woc_bags",
-      "sourceFile": "WoC_Bag_03.png (hue-shifted silk recolor of the linen_pouch conversion; dedicated art welcome)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
@@ -1692,6 +1691,14 @@
       "confidence": "medium"
     },
     {
+      "itemId": "silkspun_satchel",
+      "name": "Silkspun Satchel",
+      "sourcePack": "woc_bags",
+      "sourceFile": "WoC_Bag_03.png (hue-shifted silk recolor of the linen_pouch conversion; dedicated art welcome)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "silverleaf_herb",
       "name": "Sheenleaf Herb",
       "sourcePack": "woc_professions_art",
@@ -1807,6 +1814,41 @@
       "sourcePack": "generic100b",
       "sourceFile": "61.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "st_albus_index_finger",
+      "name": "Pointer Finger Bone",
+      "sourcePack": "st_albus_collection",
+      "sourceFile": "pointerbone.webp",
+      "license": "Contributed by the PR author UncleSporky for use in World of ClaudeCraft; see CREDITS.md"
+    },
+    {
+      "itemId": "st_albus_middle_finger",
+      "name": "Middle Finger Bone",
+      "sourcePack": "st_albus_collection",
+      "sourceFile": "middlebone.webp",
+      "license": "Contributed by the PR author UncleSporky for use in World of ClaudeCraft; see CREDITS.md"
+    },
+    {
+      "itemId": "st_albus_pinkie_finger",
+      "name": "Pinkie Finger Bone",
+      "sourcePack": "st_albus_collection",
+      "sourceFile": "pinkiebone.webp",
+      "license": "Contributed by the PR author UncleSporky for use in World of ClaudeCraft; see CREDITS.md"
+    },
+    {
+      "itemId": "st_albus_ring_finger",
+      "name": "Ring Finger Bone",
+      "sourcePack": "st_albus_collection",
+      "sourceFile": "ringbone.webp",
+      "license": "Contributed by the PR author UncleSporky for use in World of ClaudeCraft; see CREDITS.md"
+    },
+    {
+      "itemId": "st_albus_thumb",
+      "name": "Thumb Bone",
+      "sourcePack": "st_albus_collection",
+      "sourceFile": "thumbbone.webp",
+      "license": "Contributed by the PR author UncleSporky for use in World of ClaudeCraft; see CREDITS.md"
     },
     {
       "itemId": "stag_antler",

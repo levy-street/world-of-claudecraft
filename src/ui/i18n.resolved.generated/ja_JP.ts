@@ -1361,6 +1361,7 @@ export const ja_JP: EnTranslations = {
     },
     "itemHeroicTag": "[ヒロイック]",
     "itemSoulbound": "魂縛",
+    "itemCharmHint": "バッグに入れておくと効果を得られます",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const ja_JP: EnTranslations = {
       "equip": "装備する",
       "disenchant": "魔力分解",
       "salvage": "解体",
-      "applyEnchant": "エンチャントを付与"
+      "applyEnchant": "エンチャントを付与",
+      "assemble": "組み立てる"
     },
     "enchanting": {
       "disenchantedLine": "{item}を魔力分解した。",
@@ -6877,7 +6879,9 @@ export const ja_JP: EnTranslations = {
       "potion": "ポーション",
       "elixir": "エリクサー",
       "bag": "バッグ",
-      "mount": "マウント"
+      "mount": "マウント",
+      "charm": "護符",
+      "artifact": "アーティファクト"
     },
     "stats": {
       "armor": "防御力",
@@ -9726,6 +9730,24 @@ export const ja_JP: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "最後の砦の印章"
+      },
+      "st_albus_index_finger": {
+        "name": "聖アルバスの人差し指"
+      },
+      "st_albus_middle_finger": {
+        "name": "聖アルバスの中指"
+      },
+      "st_albus_ring_finger": {
+        "name": "聖アルバスの薬指"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "聖アルバスの小指"
+      },
+      "st_albus_thumb": {
+        "name": "聖アルバスの親指"
+      },
+      "hand_of_st_albus": {
+        "name": "聖アルバスの手"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

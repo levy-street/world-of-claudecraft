@@ -1361,6 +1361,7 @@ export const vi_VN: EnTranslations = {
     },
     "itemHeroicTag": "[ANH HÙNG]",
     "itemSoulbound": "Ràng Buộc Linh Hồn",
+    "itemCharmHint": "Keep in bag to gain bonus",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const vi_VN: EnTranslations = {
       "equip": "Trang Bị",
       "disenchant": "Hủy Pháp Khắc",
       "salvage": "Tháo Dỡ",
-      "applyEnchant": "Áp Dụng Pháp Khắc"
+      "applyEnchant": "Áp Dụng Pháp Khắc",
+      "assemble": "Assemble"
     },
     "enchanting": {
       "disenchantedLine": "Bạn hủy pháp khắc {item}.",
@@ -6877,7 +6879,9 @@ export const vi_VN: EnTranslations = {
       "potion": "Thuốc",
       "elixir": "Tiên Dược",
       "bag": "Túi",
-      "mount": "Thú Cưỡi"
+      "mount": "Thú Cưỡi",
+      "charm": "Charm",
+      "artifact": "Artifact"
     },
     "stats": {
       "armor": "Giáp",
@@ -9726,6 +9730,24 @@ export const vi_VN: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Nhẫn Ấn Của The Last Keep"
+      },
+      "st_albus_index_finger": {
+        "name": "The Index Finger of St. Albus"
+      },
+      "st_albus_middle_finger": {
+        "name": "The Middle Finger of St. Albus"
+      },
+      "st_albus_ring_finger": {
+        "name": "The Ring Finger of St. Albus"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "The Pinkie Finger of St. Albus"
+      },
+      "st_albus_thumb": {
+        "name": "The Thumb of St. Albus"
+      },
+      "hand_of_st_albus": {
+        "name": "The Hand of St. Albus"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

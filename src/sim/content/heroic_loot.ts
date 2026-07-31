@@ -562,6 +562,12 @@ const HEROIC_GREEN_MOUNT_CHANCE = 0.005;
 const HEROIC_BLUE_MOUNT_CHANCE = 0.001;
 const HEROIC_RAID_BLUE_MOUNT_CHANCE = 0.001;
 
+// The Hand of St. Albus collection (content/items.ts ST_ALBUS_ASSEMBLY): one
+// finger per final boss, in clear order, heroic-gated only like the mounts above.
+// An independent 1% draw rather than a slot in a *_heroic group, so the two
+// guaranteed epic drops per kill are untouched.
+const ST_ALBUS_FINGER_CHANCE = 0.01;
+
 export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   morthen: [
     { itemId: 'morthens_cryptforged_hauberk', chance: 0.25, rollGroup: 'morthen_heroic' },
@@ -573,6 +579,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'bonechill_cord', chance: 0.33, rollGroup: 'morthen_heroic2' },
     // Uncommon mount (0.5%): heroic-gated only, never on a normal table.
     { itemId: 'reins_stormfeather_griffin', chance: HEROIC_GREEN_MOUNT_CHANCE },
+    { itemId: 'st_albus_index_finger', chance: ST_ALBUS_FINGER_CHANCE },
   ],
   vael_the_mistcaller: [
     { itemId: 'mistcallers_fang', chance: 0.34, rollGroup: 'vael_heroic' },
@@ -584,6 +591,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'dreamroot_boots', chance: 0.25, rollGroup: 'vael_heroic2' },
     // Uncommon mount (0.5%): heroic-gated only, never on a normal table.
     { itemId: 'reins_shadowjump_toad', chance: HEROIC_GREEN_MOUNT_CHANCE },
+    { itemId: 'st_albus_middle_finger', chance: ST_ALBUS_FINGER_CHANCE },
   ],
   ysolei: [
     { itemId: 'lunar_tide_greatstaff', chance: 0.25, rollGroup: 'ysolei_heroic' },
@@ -595,6 +603,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'tideworn_warboots', chance: 0.33, rollGroup: 'ysolei_heroic2' },
     // Rare mount (0.1%): heroic-gated only, never on a normal table.
     { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
+    { itemId: 'st_albus_ring_finger', chance: ST_ALBUS_FINGER_CHANCE },
   ],
   korzul_the_gravewyrm: [
     { itemId: 'gravewyrm_cleaver', chance: 0.34, rollGroup: 'korzul_heroic' },
@@ -606,6 +615,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'wildsoul_maul', chance: 0.25, rollGroup: 'korzul_heroic2' },
     // Rare mount (0.1%): heroic-gated only, never on a normal table.
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
+    { itemId: 'st_albus_pinkie_finger', chance: ST_ALBUS_FINGER_CHANCE },
   ],
   nythraxis_scourge_of_thornpeak: [
     // The heroic set pieces and legendaries come free from the heroic loot swap:
@@ -632,5 +642,6 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     // five-man uncommon paths; every heroic raider has a path to each.
     { itemId: 'reins_stormfeather_griffin', chance: HEROIC_GREEN_MOUNT_CHANCE },
     { itemId: 'reins_shadowjump_toad', chance: HEROIC_GREEN_MOUNT_CHANCE },
+    { itemId: 'st_albus_thumb', chance: ST_ALBUS_FINGER_CHANCE },
   ],
 };

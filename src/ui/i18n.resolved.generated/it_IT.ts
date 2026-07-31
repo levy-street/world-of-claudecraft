@@ -1361,6 +1361,7 @@ export const it_IT: EnTranslations = {
     },
     "itemHeroicTag": "[EROICO]",
     "itemSoulbound": "Vincolato all’anima",
+    "itemCharmHint": "Keep in bag to gain bonus",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const it_IT: EnTranslations = {
       "equip": "Equipaggia",
       "disenchant": "Disincanta",
       "salvage": "Smantella",
-      "applyEnchant": "Applica Incantesimo"
+      "applyEnchant": "Applica Incantesimo",
+      "assemble": "Assemble"
     },
     "enchanting": {
       "disenchantedLine": "Disincanti {item}.",
@@ -6877,7 +6879,9 @@ export const it_IT: EnTranslations = {
       "potion": "Pozione",
       "elixir": "Elisir",
       "bag": "Borsa",
-      "mount": "Cavalcatura"
+      "mount": "Cavalcatura",
+      "charm": "Charm",
+      "artifact": "Artifact"
     },
     "stats": {
       "armor": "Armatura",
@@ -9726,6 +9730,24 @@ export const it_IT: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Sigillo dell’Ultima Rocca"
+      },
+      "st_albus_index_finger": {
+        "name": "The Index Finger of St. Albus"
+      },
+      "st_albus_middle_finger": {
+        "name": "The Middle Finger of St. Albus"
+      },
+      "st_albus_ring_finger": {
+        "name": "The Ring Finger of St. Albus"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "The Pinkie Finger of St. Albus"
+      },
+      "st_albus_thumb": {
+        "name": "The Thumb of St. Albus"
+      },
+      "hand_of_st_albus": {
+        "name": "The Hand of St. Albus"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"

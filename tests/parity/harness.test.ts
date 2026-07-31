@@ -167,6 +167,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'away',
       'bankBonusSources',
       'characterId',
+      'charmSig',
       'fiestaMods',
       'fiestaSpecial',
       'joinedAt',

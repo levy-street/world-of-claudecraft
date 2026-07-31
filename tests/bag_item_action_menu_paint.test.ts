@@ -171,9 +171,10 @@ describe('BagItemActionMenu.paint placement reserves', () => {
     h.openPlain();
     expect(h.placed).toHaveLength(1);
     expect(h.placed[0].reserveRight).toBe(190);
-    // Dust rows: the classic default action plus Apply Enchant, nothing else.
+    // Dust rows: Apply Enchant alone. Dust is a junk-kind reagent that a plain
+    // click does nothing to, so it carries no default row.
     const rows = h.el.querySelectorAll('.ctx-item').length;
-    expect(rows).toBe(2);
+    expect(rows).toBe(1);
     expect(h.placed[0].reserveBottom).toBe(80 + rows * 32);
     expect(h.el.classList.contains(CTX_MENU_PICKER_CLASS)).toBe(false);
   });

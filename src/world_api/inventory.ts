@@ -28,6 +28,10 @@ export interface IWorldInventory {
   /** Return the bag in `socket` to the inventory (refused when items would not fit). */
   unequipBag(socket: number): void;
   useItem(itemId: string): void;
+  /** Consume a kind:'assembled' item's reagents and grant its output. The sim
+   *  re-checks the held counts and answers a shortfall with the recipe's own
+   *  authored refusal as a personal chat line. */
+  assembleItem(itemId: string): void;
   discardItem(itemId: string, count?: number): void;
   buyItem(npcId: number, itemId: string): void;
   sellItem(itemId: string, count?: number): void;

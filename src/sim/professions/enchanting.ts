@@ -704,7 +704,14 @@ function resolveApplyEnchantWorn(
   // the render mirror e.equippedInstances, which is what the server's `eqi`
   // identity-diff (server/game.ts identityFields + the cache.idJson compare)
   // picks up on the next snapshot: no extra dirty-marking is needed.
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  recalcPlayerStats(
+    p,
+    meta.cls,
+    meta.equipment,
+    ctx.playerMods(meta),
+    meta.equipmentInstance,
+    meta.inventory,
+  );
   // Same skill gain as the bagged arm: the applied enchant's reagent-derived tier.
   grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
   return { ok: true, itemId, enchantId };

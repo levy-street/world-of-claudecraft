@@ -1361,6 +1361,7 @@ export const ru_RU: EnTranslations = {
     },
     "itemHeroicTag": "[ГЕРОИЧЕСКИЙ]",
     "itemSoulbound": "Персональный",
+    "itemCharmHint": "Держите в сумке, чтобы получать бонус",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2543,7 +2544,8 @@ export const ru_RU: EnTranslations = {
       "equip": "Надеть",
       "disenchant": "Распылить",
       "salvage": "Разобрать",
-      "applyEnchant": "Наложить чары"
+      "applyEnchant": "Наложить чары",
+      "assemble": "Собрать"
     },
     "enchanting": {
       "disenchantedLine": "Вы распыляете {item}.",
@@ -6877,7 +6879,9 @@ export const ru_RU: EnTranslations = {
       "potion": "Зелье",
       "elixir": "Эликсир",
       "bag": "Сумка",
-      "mount": "Транспорт"
+      "mount": "Транспорт",
+      "charm": "Талисман",
+      "artifact": "Артефакт"
     },
     "stats": {
       "armor": "Броня",
@@ -9726,6 +9730,24 @@ export const ru_RU: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Печатка Последнего оплота"
+      },
+      "st_albus_index_finger": {
+        "name": "Указательный палец святого Альбуса"
+      },
+      "st_albus_middle_finger": {
+        "name": "Средний палец святого Альбуса"
+      },
+      "st_albus_ring_finger": {
+        "name": "Безымянный палец святого Альбуса"
+      },
+      "st_albus_pinkie_finger": {
+        "name": "Мизинец святого Альбуса"
+      },
+      "st_albus_thumb": {
+        "name": "Большой палец святого Альбуса"
+      },
+      "hand_of_st_albus": {
+        "name": "Длань святого Альбуса"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
