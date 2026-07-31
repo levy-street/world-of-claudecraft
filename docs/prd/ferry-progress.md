@@ -15,7 +15,7 @@ iteration; committed at program milestones.
 | F3.1 Perceptual fade floor | merged | | audit PASS; merged (0.4s MIN_PERCEPTUAL_FADE_SECONDS, per-arm controls); linter-file mutex now free |
 | F3.2 Voyage dissolve pacing | merged | | side cut removed, landing dolly added, fade-ins reveal live glides; contact sheet still owed post-program |
 | F4.1 Keeper facing | merged | | merge 78a8ca983; yaw derived from gangplank geometry, fixture-pinned |
-| F4.2 One ferryman | blocked | | owner decision pending (PRD open decision) |
+| F4.2 One ferryman | running | woc-ferry-f42 (feature/ferry-f42) | owner decided 2026-07-31: same character both ends; Ewald serves both posts, Odda retires; codex run 10 |
 
 ## Final verification (2026-07-31)
 - Full npm run gate on the merged branch, single-process machine: 23,062 tests
