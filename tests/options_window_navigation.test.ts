@@ -6,6 +6,10 @@ vi.mock('../src/game/audio', () => ({ audio: { click: vi.fn() } }));
 vi.mock('../src/game/music', () => ({
   music: { pauseForMenu: vi.fn(), resumeFromMenu: vi.fn() },
 }));
+vi.mock('../src/game/mobile_controls', () => ({
+  isNativeAppShell: () => false,
+  useTouchInterface: () => false,
+}));
 vi.mock('../src/ui/app_version', () => ({
   appVersionInfo: () => ({ version: 'test', build: 'test' }),
 }));
@@ -13,12 +17,15 @@ vi.mock('../src/ui/app_version', () => ({
 import { OptionsWindow, type OptionsWindowDeps } from '../src/ui/options_window';
 
 interface OptionsWindowTestAccess {
-  view: 'interface' | 'controller';
+  view: 'interface' | 'controller' | 'graphics';
   opened: boolean;
   render(): void;
 }
 
-function mountView(view: OptionsWindowTestAccess['view']): {
+function mountView(
+  view: OptionsWindowTestAccess['view'],
+  optionsHooks: object | null = null,
+): {
   root: HTMLElement;
   window: OptionsWindow;
   focusFirstInteractive: ReturnType<typeof vi.fn>;
@@ -30,7 +37,7 @@ function mountView(view: OptionsWindowTestAccess['view']): {
   const deps = {
     root: () => root,
     world: () => ({}),
-    options: () => null,
+    options: () => optionsHooks,
     bugReport: () => null,
     keybinds: () => ({}),
     slotActionName: () => null,
@@ -116,5 +123,31 @@ describe('options window interface navigation', () => {
     window.refreshControllerLabels();
 
     expect(root.querySelector('[data-back]')).toBe(initialBack);
+  });
+
+  it('keeps the title-bar Back button wired after selecting a graphics preset', () => {
+    const onSettingChange = vi.fn();
+    const optionsHooks = {
+      perfOverlay: { setPlacement: vi.fn() },
+      settings: {
+        get: vi.fn((key: string) => (key === 'graphicsPreset' ? 3 : 0)),
+      },
+      onSettingChange,
+    };
+    const { root, focusFirstInteractive } = mountView('graphics', optionsHooks);
+
+    const initialBack = root.querySelector<HTMLButtonElement>('[data-back]');
+    const low = root.querySelector<HTMLButtonElement>('.set-choice button[data-value="1"]');
+    if (!initialBack || !low) throw new Error('Graphics navigation controls were not rendered');
+    low.click();
+    const rebuiltBack = root.querySelector<HTMLButtonElement>('[data-back]');
+    if (!rebuiltBack) throw new Error('Graphics Back control was not rebuilt');
+    expect(onSettingChange).toHaveBeenCalledWith('graphicsPreset', 1);
+    expect(rebuiltBack).not.toBe(initialBack);
+
+    rebuiltBack.click();
+
+    expect(root.querySelector('.opt-list')).not.toBeNull();
+    expect(focusFirstInteractive).toHaveBeenCalledWith(root);
   });
 });

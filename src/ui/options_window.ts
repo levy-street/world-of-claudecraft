@@ -830,7 +830,7 @@ export class OptionsWindow {
           nativeShell: isNativeAppShell(),
         })
       : [];
-    if (hooks) this.applyControls(body, controls, hooks, () => this.renderGraphics());
+    if (hooks) this.applyControls(body, controls, hooks, () => this.render());
     const el = this.deps.root();
     const note = document.createElement('div');
     note.className = 'set-note';
@@ -859,7 +859,7 @@ export class OptionsWindow {
     const hooks = this.deps.options();
     const body = this.settingsViewShell(t('hud.options.audio'));
     const controls = hooks ? buildAudioControls(this.settingsSource(hooks)) : [];
-    if (hooks) this.applyControls(body, controls, hooks, () => this.renderAudio());
+    if (hooks) this.applyControls(body, controls, hooks, () => this.render());
     this.settingsViewFooter(controls);
   }
 
@@ -1522,7 +1522,7 @@ export class OptionsWindow {
       else hooks.onSettingChange(key, hooks.settings.set(key, next));
       sync();
       // Attack Move reveals/hides its rebindable key row, so redraw the panel.
-      if (key === 'attackMove') this.renderKeybinds();
+      if (key === 'attackMove') this.render();
     });
     row.append(name, toggle);
     parent.appendChild(row);
@@ -1657,7 +1657,7 @@ export class OptionsWindow {
       this.capturingKey = null;
       this.keybindNote = t('hud.options.keybindReset');
       this.deps.refreshKeybindLabels();
-      this.renderKeybinds();
+      this.render();
     });
     const back = document.createElement('button');
     back.className = 'btn';
@@ -1673,7 +1673,7 @@ export class OptionsWindow {
     const name = this.actionDisplayName(actionId, fallbackLabel);
     this.capturingKey = { action: actionId, index };
     this.keybindNote = t('hud.options.keybindCapture', { action: name });
-    this.renderKeybinds();
+    this.render();
     hooks.captureKey((code) => {
       this.capturingKey = null;
       if (code === null) {
@@ -1691,7 +1691,7 @@ export class OptionsWindow {
         this.keybindNote = t('hud.options.keybindReserved', { key: keyLabel(code) });
       }
       // re-render only if the menu is still open (player may have closed it)
-      if (this.isOpen) this.renderKeybinds();
+      if (this.isOpen) this.render();
     });
   }
 }

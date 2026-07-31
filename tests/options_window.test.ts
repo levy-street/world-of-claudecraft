@@ -182,6 +182,27 @@ describe('options_window: controller rebuild routing', () => {
     expect(painter.match(/this\.renderController\(\)/g) ?? []).toHaveLength(1);
     expect(painter).toContain("if (this.isOpen && this.view === 'controller') this.render();");
   });
+
+  it('keeps every settings sub-view rebuild behind render()', () => {
+    const renderDispatcher = painter.slice(
+      painter.indexOf('private render(): void {'),
+      painter.indexOf('private renderMain(): void {'),
+    );
+    for (const [view, renderer] of [
+      ['graphics', 'renderGraphics'],
+      ['audio', 'renderAudio'],
+      ['keybinds', 'renderKeybinds'],
+    ]) {
+      expect(painter.match(new RegExp(`this\\.${renderer}\\(\\)`, 'g')) ?? []).toHaveLength(1);
+      expect(renderDispatcher).toMatch(new RegExp(`case '${view}':\\s*this\\.${renderer}\\(\\);`));
+    }
+    expect(painter).toContain("if (key === 'attackMove') this.render();");
+    expect(painter).toMatch(/this\.deps\.keybinds\(\)\.reset\(\);[\s\S]{0,300}?this\.render\(\);/);
+    expect(painter).toMatch(
+      /this\.keybindNote = t\('hud\.options\.keybindCapture',[\s\S]{0,200}?this\.render\(\);\s*hooks\.captureKey/,
+    );
+    expect(painter).toContain('if (this.isOpen) this.render();');
+  });
 });
 
 // The exact control-dispatch wiring. The pure value coercion is unit-tested in
