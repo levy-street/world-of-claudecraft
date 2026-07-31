@@ -127,13 +127,14 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.1,
     color: 0xe6e9f4,
+    componentTags: ['hide', 'meat'],
   },
   gloam_strider: {
     id: 'gloam_strider',
     name: 'Gloam Strider',
     minLevel: 20,
     maxLevel: 20,
-    family: 'beast',
+    family: 'reptile',
     hpBase: 58,
     hpPerLevel: 20,
     dmgBase: 12,
@@ -145,6 +146,7 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 105, chance: 1 }],
     scale: 1.1,
     color: 0x4c4a72,
+    componentTags: ['hide', 'fang'],
   },
   nightkin_stargazer: {
     id: 'nightkin_stargazer',
@@ -160,7 +162,7 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 11,
     moveSpeed: 7.5,
     aggroRadius: 0, // masked watchers adrift around their stones
-    loot: [{ copper: 110, chance: 1 }],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.0,
     color: 0x8fa8e0,
   },
@@ -180,7 +182,7 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 14,
     elite: true,
     loot: [
-      { copper: 450, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'bone_fragments', chance: 1 },
     ],
     scale: 1.5,
@@ -204,7 +206,7 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 12,
     loot: [
-      { copper: 110, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.5 },
     ],
     scale: 1.15,

@@ -13,7 +13,7 @@ import {
   WATER_LEVEL,
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { bakedPalmVariant } from './jungle_features';
 
 export interface FarshoreFeaturesView {
@@ -23,7 +23,7 @@ export interface FarshoreFeaturesView {
 
 const COCONUT_URL = '/models/props/fallen_coconuts.glb';
 let coconutScene: THREE.Group | null = null;
-registerPreload(
+registerDeferredPreload(() =>
   loadGltf(COCONUT_URL).then((gltf) => {
     coconutScene = gltf.scene;
   }),

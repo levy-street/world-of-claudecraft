@@ -3140,9 +3140,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetTooFar': 'Cíl je příliš daleko.',
   'hud.errors.tooClose': 'Příliš blízko!',
   'hud.errors.tradeBound': 'Tento předmět je vázaný a nelze ho vyměnit.',
+  'hud.errors.marketListBound': 'Tento předmět je vázaný a nelze ho nabídnout k prodeji.',
   'hud.errors.tradeExpired': 'Žádost o obchod vypršela.',
   'hud.errors.tradeFailed': 'Obchod selhal: předměty nebo peníze už nejsou dostupné.',
   'hud.errors.tradeInProgress': 'Obchod už probíhá.',
+  'hud.errors.tradeAlreadyTrading': 'Tento hráč už obchoduje.',
   'hud.errors.tradeTooFar': 'Cíl je příliš daleko pro obchod.',
   'hud.errors.travel': 'Rychlost',
   'hud.errors.unknownCommand': 'Neznámý příkaz: {command}. Zkus /s /y /w /p /g.',
@@ -3926,6 +3928,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Tento dopis už ve schránce není.',
   'hudChrome.mailbox.result.needRecipient': 'Zadej příjemce dopisu.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Úkolové předměty nelze posílat poštou.',
+  'hudChrome.mailbox.result.noMailBound': 'Tento předmět je vázaný a nelze ho poslat poštou.',
   'hudChrome.mailbox.result.noRecipient': 'Nikdo s tímto jménem zde poštovní schránku nemá.',
   'hudChrome.mailbox.result.notEnoughItems': 'Nemáš tolik kusů k odeslání.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Jejich poštovní schránka je plná.',
@@ -7313,12 +7316,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Vetřelci zpoza trhlin, samý oheň a zloba. Kde jeden stojí, průlom není nikdy daleko.',
   'guide.family.demon.name': 'Démoni',
-  'guide.family.kobold.desc':
-    'Pobíhající mrchožrouti a víly mýtin a živých plotů, spíš otrava než hrozba, dokud se nesejdou ve velkém počtu.',
-  'guide.family.kobold.name': 'Skrčci',
-  'guide.family.murloc.desc':
-    'Kvákající rybí lid jezerních břehů a přílivových tůní, rychle se hrnoucí na cokoliv, co se přiblíží příliš blízko.',
-  'guide.family.murloc.name': 'Kvákoploutví',
   'guide.worldPage.heading': 'Svět',
   'guide.worldPage.intro':
     'World of ClaudeCraft je jedna souvislá země, kterou přecházíš pěšky, tři zóny položené od jihu k severu. Není tu rychlé cestování, takže cesta je součástí dobrodružství.',
@@ -10723,4 +10720,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     'Vyproštění za {seconds} sekund. Pohyb, boj, utrpění zranění nebo zahájení jiné akce ho zruší.',
   'hudChrome.unstuck.unavailable': 'Vyproštění není ve tvém současném stavu dostupné.',
+  'hudChrome.riftTracker.title': 'Trhlina',
+  'hudChrome.riftTracker.floor': 'Patro {current} z {total}',
+  'hudChrome.riftTracker.closesIn': 'Zavře se za {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

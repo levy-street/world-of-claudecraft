@@ -32,7 +32,7 @@ import {
   WATER_LEVEL,
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 import { MIST_DRIFT_AMPLITUDE, SEA_LIGHT_RAYS, SEA_MIST_BANKS } from './sea_mist_core';
 
@@ -51,7 +51,7 @@ const SEA_ROCK_URLS = [
 // loader cache is immutable, so the scene is cloned before use).
 const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
 let greatTreeScene: THREE.Group | null = null;
-registerPreload(
+registerDeferredPreload(() =>
   loadGltf(GREAT_TREE_URL).then((gltf) => {
     greatTreeScene = gltf.scene;
   }),
@@ -66,7 +66,7 @@ interface ModelPart {
 }
 const loadedParts = new Map<string, ModelPart[]>();
 for (const url of new Set([...MUSHROOM_URLS, BOULDER_URL, ...SEA_ROCK_URLS])) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(url).then((gltf) => {
       gltf.scene.updateMatrixWorld(true);
       const parts: ModelPart[] = [];

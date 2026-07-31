@@ -13,7 +13,8 @@
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
-import type { InvSlot } from '../sim/types';
+import { itemInstancePayloadsEqual } from '../sim/item_instance_merge';
+import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName, tEntity } from './entity_i18n';
@@ -120,8 +121,11 @@ export class MailboxWindow {
     this.openerFocus = null;
   }
 
-  /** Stage a bag stack as a parcel (called by the bags window on click). */
-  stageParcel(itemId: string): void {
+  /** Stage a bag stack as a parcel (called by the bags window on click).
+   *  `instance` is the clicked slot's payload (issue 1165): an instanced copy
+   *  stages as ITSELF, a fixed single-copy parcel (the qty stepper stays
+   *  fungible-only); a plain stack stages fungibly exactly as before. */
+  stageParcel(itemId: string, instance?: ItemInstancePayload): void {
     if (!this.isSendTab) return;
     const info = this.deps.world().mailInfo;
     const max = info?.maxAttachments ?? 3;
@@ -133,7 +137,22 @@ export class MailboxWindow {
       );
       return;
     }
-    if (this.attachments.some((s) => s.itemId === itemId)) return;
+    if (instance) {
+      // One chip per distinct copy: a byte-equal duplicate stages once (the
+      // plain dedup rule, payload-aware); differently-instanced copies of one
+      // item id each get their own chip.
+      if (
+        this.attachments.some(
+          (s) => s.itemId === itemId && itemInstancePayloadsEqual(s.instance, instance),
+        )
+      )
+        return;
+      this.attachments.push({ itemId, count: 1, instance });
+      audio.click();
+      this.renderParcels();
+      return;
+    }
+    if (this.attachments.some((s) => s.itemId === itemId && !s.instance)) return;
     const count = this.ownedCountFor(itemId);
     if (count < 1) return;
     this.attachments.push({ itemId, count });
@@ -161,7 +180,7 @@ export class MailboxWindow {
 
   /** Nudge a staged parcel's quantity from the +/- stepper (#1444). */
   private adjustParcelQty(itemId: string, delta: number): void {
-    const slot = this.attachments.find((s) => s.itemId === itemId);
+    const slot = this.attachments.find((s) => s.itemId === itemId && !s.instance);
     if (!slot) return;
     const next = clampParcelQty(slot.count, delta, this.ownedCountFor(itemId));
     if (next === slot.count) return;
@@ -174,7 +193,7 @@ export class MailboxWindow {
    *  repaints, even when the count is unchanged, so a normalized-away entry
    *  ("007", "", "999" over stock) snaps the field back to the real value. */
   private setParcelQty(itemId: string, raw: string): void {
-    const slot = this.attachments.find((s) => s.itemId === itemId);
+    const slot = this.attachments.find((s) => s.itemId === itemId && !s.instance);
     if (!slot) return;
     const next = parseParcelQty(raw, this.ownedCountFor(itemId), slot.count);
     if (next !== slot.count) {
@@ -423,7 +442,7 @@ export class MailboxWindow {
           const stack =
             slot.count > 1 ? ` x${formatNumber(slot.count, { maximumFractionDigits: 0 })}` : '';
           chip.innerHTML = `${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span>`;
-          this.deps.attachTooltip(chip, () => this.deps.itemTooltip(item));
+          this.deps.attachTooltip(chip, () => this.deps.itemTooltip(item, slot.instance));
         } else {
           chip.textContent = slot.itemId;
         }
@@ -699,9 +718,16 @@ export class MailboxWindow {
         remove?: HTMLButtonElement;
       }
     >();
-    for (const slot of this.attachments) {
+    for (const [chipIdx, slot] of this.attachments.entries()) {
       const item = ITEMS[slot.itemId];
       if (!item) continue;
+      // Per-chip focus/controls key: a plain stack and an instanced copy of the
+      // same item id are distinct chips and must not collide in the focus map.
+      // The staged-array index keeps two DIFFERENTLY-instanced copies of one
+      // item id distinct too (stageParcel dedups byte-equal payloads only);
+      // the array order is stable across repaints, so the focus restore lands
+      // on the same chip.
+      const chipKey = slot.instance ? `${slot.itemId}#i${chipIdx}` : slot.itemId;
       const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
       const chip = document.createElement('span');
       chip.className = 'mail-parcel-chip';
@@ -711,7 +737,7 @@ export class MailboxWindow {
       // is a focusin listener on this exact element.
       name.tabIndex = 0;
       name.innerHTML = `${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
-      this.deps.attachTooltip(name, () => this.deps.itemTooltip(item));
+      this.deps.attachTooltip(name, () => this.deps.itemTooltip(item, slot.instance));
       chip.appendChild(name);
       const owned = this.ownedCountFor(slot.itemId);
       const controls: {
@@ -720,7 +746,7 @@ export class MailboxWindow {
         qty?: HTMLInputElement;
         remove?: HTMLButtonElement;
       } = {};
-      if (owned > 1) {
+      if (!slot.instance && owned > 1) {
         const step = document.createElement('span');
         step.className = 'mail-parcel-qty';
         const minus = document.createElement('button');
@@ -789,19 +815,21 @@ export class MailboxWindow {
       remove.type = 'button';
       remove.className = 'mail-parcel-remove-btn';
       remove.innerHTML = svgIcon('close', { cls: 'mail-parcel-remove' });
-      remove.dataset.focusKey = `${slot.itemId}:remove`;
+      remove.dataset.focusKey = `${chipKey}:remove`;
       remove.setAttribute(
         'aria-label',
         t('hudChrome.mailbox.removeParcelAria', { item: itemDisplayName(item) }),
       );
       remove.addEventListener('click', () => {
-        this.attachments = this.attachments.filter((s) => s.itemId !== slot.itemId);
+        // Reference identity, not item id: with a plain stack AND an instanced
+        // copy of one item staged, removing one chip must not sweep the other.
+        this.attachments = this.attachments.filter((s) => s !== slot);
         audio.click();
         this.renderParcels();
       });
       chip.appendChild(remove);
       controls.remove = remove;
-      itemControls.set(slot.itemId, controls);
+      itemControls.set(chipKey, controls);
       parcels.appendChild(chip);
     }
     if (focusKey) {

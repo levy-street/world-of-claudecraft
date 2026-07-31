@@ -10,7 +10,7 @@ import { WRAITHWOOD_PROPS } from '../sim/content/wraithwood';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 
 export interface HauntFeaturesView {
   group: THREE.Group;
@@ -26,7 +26,7 @@ const WOOD_ZMAX = 1820;
 // cloned per greatTrees record and darkened into haunted silhouettes.
 const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
 let greatTreeScene: THREE.Group | null = null;
-registerPreload(
+registerDeferredPreload(() =>
   loadGltf(GREAT_TREE_URL).then((gltf) => {
     greatTreeScene = gltf.scene;
   }),

@@ -169,4 +169,57 @@ describe('Glacial Spike gating + payoff', () => {
     // follow-up spells Shatter.
     expect(target.auras.some((a) => a.kind === 'root')).toBe(true);
   });
+
+  // Issue #2632: Glacial Spike's cast bar completes (mana spent, cooldown armed)
+  // several ticks before its frost bolt actually reaches the target (the
+  // projectile travels at PROJECTILE_SPEED). A rapid second press landing in
+  // that window used to re-check the Icicles gate, find it still at full stacks
+  // (the aura was only removed once the bolt LANDED, inside runEffects), and get
+  // wrongly accepted as a second legitimate cast off the same stack.
+  it('rejects a second press made while the first bolt is still in flight (issue #2632)', () => {
+    const { sim, p } = makeSim();
+    spawnTarget(sim, p);
+    pushAura(p, { id: 'icicles', name: 'Icicles', kind: 'icicles', stacks: ICICLE_MAX });
+    p.gcdRemaining = 0;
+    p.resource = p.maxResource;
+    sim.castAbility('glacial_spike');
+    const events: SimEvent[] = [...sim.drainEvents()];
+    expect(
+      events.some(
+        (e) => e.type === 'castStart' && e.entityId === p.id && e.ability === 'glacial_spike',
+      ),
+    ).toBe(true);
+
+    // Tick only far enough for the 2.7s cast bar to complete: the cast stops
+    // successfully, but the bolt (roughly 6 ticks over the spawnTarget distance)
+    // has not landed yet, so the Icicles gate is the only thing being tested.
+    let castCompleted = false;
+    for (let i = 0; i < 60 && !castCompleted; i++) {
+      events.push(...sim.tick());
+      castCompleted = events.some((e) => e.type === 'castStop' && e.entityId === p.id && e.success);
+    }
+    expect(castCompleted).toBe(true);
+    expect(damageEvents(events, 'Glacial Spike')).toHaveLength(0);
+
+    // A rapid second press in that window: must be rejected outright, not
+    // accepted as a fresh cast against the same (already-spent) Icicles stack.
+    const beforeSecondPress = events.length;
+    p.gcdRemaining = 0;
+    p.resource = p.maxResource;
+    sim.castAbility('glacial_spike');
+    events.push(...sim.drainEvents());
+    const secondPressEvents = events.slice(beforeSecondPress);
+    expect(
+      secondPressEvents.some(
+        (e) => e.type === 'castStart' && e.entityId === p.id && e.ability === 'glacial_spike',
+      ),
+    ).toBe(false);
+    expect(secondPressEvents.some((e) => e.type === 'error')).toBe(true);
+
+    // Let the first (and only accepted) bolt land, then confirm exactly one
+    // Glacial Spike hit landed and the whole Icicle stack was spent once.
+    for (let i = 0; i < 20; i++) events.push(...sim.tick());
+    expect(damageEvents(events, 'Glacial Spike')).toHaveLength(1);
+    expect(frostIcicleCharges(p.auras)).toBe(0);
+  });
 });

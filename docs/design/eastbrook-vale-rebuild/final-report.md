@@ -1,10 +1,12 @@
 # Eastbrook Vale rebuild: final implementation report
 
-Status: the polish-v2 layout, assets, interaction, parity, rendering, matched visual captures, and
-performance evidence in this report match the settled implementation. Focused tests, web/native
-builds, deterministic rebuilds, and specialist review results are recorded below. Authenticated
-physical-device play remains an explicit `VERIFY` item; browser and simulator evidence is not
-misrepresented as a physical-device pass.
+Status: the settled polish-v2 layout and current bank assets, interaction, parity, and rendering
+match the implementation. The matched visual captures and CPU/requestAnimationFrame measurements
+below are historical polish-v2 evidence from before the bank rebuild, not current bank
+performance evidence. Current deterministic geometry budgets, focused tests, web/native builds,
+deterministic rebuilds, and specialist review results are recorded below. Authenticated
+physical-device play and representative native-GPU performance remain explicit `VERIFY` items;
+browser and simulator evidence is not misrepresented as a physical-device pass.
 
 This report sits on top of the PR 2356 banker-chest and Grand Armoury stages, which both
 remain preserved in the shipped tree.
@@ -210,8 +212,9 @@ The new noticeboard is a real, future-extensible world service:
   graveyard, and Armoury approach. The noticeboard route is
   `(2.85,-1.8) -> (6,-6) -> (9.010050506338834,-7.010050506338834)`.
 - Current polish overlay inventory is exactly `43` OBBs, `1` circle, `32` points, and `6` gates.
-- The polish-v2 capture contract's `23` matched views are complete and visually accepted on both
-  Desktop Ultra and Mobile Low.
+- The pre-bank polish-v2 capture contract's `23` matched views remain complete and visually
+  accepted as historical evidence on Desktop Ultra and Mobile Low. Current bank-specific visual
+  evidence is recorded separately.
 - Fixed-seed camps, object/mob ordering, mailbox IDs, persisted-position escape, graveyard flows,
   and the established entity-54 arrival-timer RNG seam remain protected by decisive tests.
 - Browser/native proximity and click helpers, authoritative simulation interaction, and the
@@ -237,10 +240,10 @@ intentionally changed.
 
 ## Shipping assets
 
-### Retained rebuild-v1 town bundle (historical origin, current unchanged assets)
+### Historical rebuild-v1 town bundle
 
-This table originated with rebuild v1. The assets remain current and unchanged in polish v2; the
-label prevents their v1 aggregate from being mistaken for the complete polish-v2 media total.
+This table records the rebuild-v1 snapshot. It remains historical evidence and is not relabeled
+with the current bank rebuild's hashes or measurements.
 
 | Shipping GLB                      |     Bytes | Triangles | Primitives/materials | Textures/animations/skins | SHA-256                                                            |
 | --------------------------------- | --------: | --------: | -------------------: | ------------------------: | ------------------------------------------------------------------ |
@@ -254,6 +257,21 @@ label prevents their v1 aggregate from being mistaken for the complete polish-v2
 | `eastbrook_market_stall.glb`      |  `27,072` |   `1,314` |              `2 / 2` |               `0 / 0 / 0` | `c6a3fbca05b6dcd27669be04ae163e7727d9914a9c8f9ce3d3fb9f1c776915ff` |
 | `eastbrook_wall_wing.glb`         |   `8,352` |     `206` |              `2 / 2` |               `0 / 0 / 0` | `63c6f1a7009d8981355c6f63449e0baf9afa23be137231b4446ce59618b4a3b5` |
 | Historical v1 subtotal            | `343,204` |  `19,918` |            `18 / 18` |               `0 / 0 / 0` | n/a                                                                |
+
+### Current bank rebuild and town bundle
+
+The bank was rebuilt from its Eastbrook turnaround while retaining its exact
+`7 x 7.8 x 5.5` runtime envelope, two materials, two primitives, and two named sockets. The
+shipping bank is `52,508` bytes and `3,104` triangles (`2,928` opaque and `176` emissive), with
+SHA-256 `59ee6025292eaeb616708be569d55d50d4f2de2077d0ab9418b6265054102c34`.
+Its source fingerprint is
+`4430923952c20d7a5883b54aea8b09fe305b392090aec5968b73bd8cf5b7a02a`.
+
+The rebuilt facade keeps the arched entrance visible, aligns the teller counter with its awning,
+posts, and socket, and leaves the secure alcove empty so the separate runtime banker chest is not
+duplicated. The full nine-GLB town bundle is now `355,708` bytes and `20,698` unique triangles.
+Repeated town placement plus the six optional foundation skirts is `29,110` triangles, leaving
+`890` triangles below the `30,000` target.
 
 The retained shared `512 x 512` lossless WebP atlas is `141,666` bytes, SHA-256
 `d66f2fab603aa83e6c73c6fc4bdde2d545a6d8c1a0d4a58d42a3fb227e5a3f9b`.
@@ -276,11 +294,11 @@ embedded textures. Mailbox replacement plus noticeboard therefore changes the st
 inventory by `-57,520` bytes, `-6,470` triangles, `+3` primitives/materials, and `-3` embedded
 textures.
 
-The current 11-GLB town/service set totals `400,772` GLB bytes, `22,742` unique triangles, and
-`22` primitives/materials. Including the shared atlas, it is `542,438` bytes across 12 files.
+The current 11-GLB town/service set totals `413,276` GLB bytes, `23,522` unique triangles, and
+`22` primitives/materials. Including the shared atlas, it is `554,942` bytes across 12 files.
 Including the preserved Grand Armoury (`137,012` bytes, `8,226` triangles, `6/6`) and banker chest
-(`43,956` bytes, `2,048` triangles, `4/4`), the complete listed media is `723,406` bytes and
-`33,016` unique GLB triangles.
+(`43,956` bytes, `2,048` triangles, `4/4`), the complete listed media is `735,910` bytes and
+`33,796` unique GLB triangles.
 
 ## Civic animation and runtime rendering
 
@@ -296,19 +314,18 @@ animation or mixer:
   crystal.
 - No mesh, draw, shadow draw, triangle, texture, light, mixer, or per-frame object allocation is
   added. The town-root structural contract remains `18` color draws and `9` shadow draws, with
-  `28,330` color triangles and `26,754` shadow triangles.
+  `29,110` color triangles and `27,554` shadow triangles.
 
 The deterministic static render inventories are:
 
 | Inventory | Color draws / triangles | Shadow draws / triangles | Shadows-on draws / triangles |
 | --------- | -----------------------: | ------------------------: | ---------------------------: |
 | Baseline combined town set | `19 / 38,938` | `10 / 37,342` | `29 / 76,280` |
-| Current town + Ravenpost mailbox + noticeboard | `22 / 31,154` | `11 / 28,694` | `33 / 59,848` |
-| Current minus baseline | `+3 / -7,784` | `+1 / -8,648` | `+4 / -16,432` |
+| Current town + Ravenpost mailbox + noticeboard | `22 / 31,934` | `11 / 29,494` | `33 / 61,428` |
+| Current minus baseline | `+3 / -7,004` | `+1 / -7,848` | `+4 / -14,852` |
 
-These literal renderer-structure counts also match the direct town-visible/town-hidden attribution
-in every final performance scenario. Whole-scene frame, resource, preload, heap, and latency
-measurements are reported separately below.
+These current literal renderer-structure counts come from the shipping meshes and direct draw
+inventory. Earlier native measurements remain clearly separated as historical evidence.
 
 ## Performance
 
@@ -326,9 +343,11 @@ Metal. Those results are retained only as historical context:
 
 These values predate the distributed layout, replacement mailbox, noticeboard, and civic shader.
 
-### Current polish-v2 matched measurements
+### Historical polish-v2 matched measurements before the bank rebuild
 
-The final harness ran four identical views (main gate, elevated, central, and Armoury-facing) with
+These committed measurements retain the accepted pre-bank-rebuild town fingerprint. They are not
+relabeled as evidence for the rebuilt bank. The final harness ran four identical views (main gate,
+elevated, central, and Armoury-facing) with
 two warmed repeats per shadow state. Values below are medians of the eight town-visible samples;
 `max` and the second input-latency value are the worst corresponding samples. The baseline is the
 exact `3ab740db453bd8b5858a52c304edc811c9d520ca` rebuild-v1 tree. Both profiles used native ANGLE
@@ -374,14 +393,15 @@ The final static public-asset accounting is:
 | --------------------- | ------------: | -----------: | -----------------: |
 | PR 2356 base          | `142,624,095` |      `1,092` |                n/a |
 | Historical rebuild v1 | `143,108,965` |      `1,102` |   `+484,870 / +10` |
-| Current polish v2     | `143,051,704` |      `1,103` |   `+427,609 / +11` |
+| Current bank rebuild  | `143,085,136` |      `1,104` |   `+461,041 / +12` |
 
 The shipping service binaries are exactly `57,520` bytes smaller than rebuild v1 while adding the
-noticeboard. The full public-tree delta is `-57,261` bytes because the local props documentation grew
-by `259` bytes. `node scripts/asset_budget.mjs --json` settled at `143,051,704` bytes / `1,103`
-files and reports the repository's pre-existing aggregate failures (`136.425 MiB` total and the
+noticeboard. Against the current release branch, the bank rebuild adds exactly `12,504` bytes.
+The current tree remains `23,829` bytes below rebuild v1. `node scripts/asset_budget.mjs --json`
+settled at `143,085,136` bytes / `1,104` files and reports the repository's pre-existing aggregate
+failures (`136.457 MiB` total and the
 existing character, creature, props, dungeon, and weapon group overages). This finishing pass
-reduces, rather than causes, the total and props contribution.
+does not cause those inherited failures.
 
 ## Native iOS
 
@@ -403,12 +423,23 @@ resumed the same PID. This proves current shell packaging, orientation, safe-are
 behavior. Browser Mobile Low evidence and simulator-shell evidence do not substitute for an
 authenticated in-game physical-device pass or physical GPU/context-recovery evidence.
 
-## Final QA and review state
+## Current bank rebuild QA and review state
 
-Historical v1 pass counts do not satisfy polish-v2 acceptance. These are the exact final polish-v2
-commands and outcomes:
+The bank rebuild is checked in its isolated release-v0.31.0 worktree:
 
-| Check                                                                                                    | Current outcome |
+| Check | Current outcome |
+| ----- | --------------- |
+| Deterministic town export, GLB validation, manifest regeneration, and literal asset contracts | PASS |
+| Focused changed-asset, renderer, capture-contract, and historical-evidence suites | PASS: 5 files / 61 tests |
+| Asset budget versus exact release base | PASS for scoped delta: `+12,504` bytes, entirely in props; the same six aggregate failure categories exist on the clean base |
+| `npm run gate` | PASS: all 11 steps; 1,604 test files / 20,471 tests plus 8 browser files / 68 browser tests |
+
+## Historical polish-v2 QA and review state
+
+Historical v1 pass counts did not satisfy polish-v2 acceptance. These are the recorded polish-v2
+commands and outcomes from before the bank rebuild, not current bank-rebuild QA:
+
+| Check                                                                                                    | Recorded outcome |
 | -------------------------------------------------------------------------------------------------------- | --------------- |
 | Focused asset, layout, interaction, renderer, parity, auth, capture-contract, and preserved-anchor tests | PASS: final integrity/capture/observation command: 3 files / 36 tests; reviewer suites: 6 files / 84 tests |
 | Deterministic re-export, optimizer freshness, manifest freshness, GLB inspect/validate                   | PASS: settled outputs validated; no residual shipping-binary or manifest diff |
@@ -442,22 +473,29 @@ helpers. The evidence integrity tests pin the retained inventories exactly.
   reviews: `docs/design/eastbrook-vale-rebuild/polish-img2threejs/`.
 - Mailbox and noticeboard procedural/raw/optimized/lookdev/comparison contacts:
   `docs/screenshots/eastbrook-vale-rebuild/polish/assets/`.
+- Current bank procedural, raw, optimized, comparison, lighting, player-scale, and bounds contacts:
+  `docs/screenshots/eastbrook-vale-rebuild/assets/bank-*.png`.
+- Current bank matched in-game before and after views for Desktop Ultra and Mobile Low:
+  `docs/screenshots/eastbrook-vale-rebuild/bank-rebuild/before/` and
+  `docs/screenshots/eastbrook-vale-rebuild/bank-rebuild/after/`.
 - Prompts, provenance, and rights: `imagegen-prompts.md`, `imagegen-provenance.md`, and
   `CREDITS.md`.
 - Historical rebuild-v1 desktop/mobile evidence: `docs/screenshots/eastbrook-vale-rebuild/before/`,
   `after/`, `metadata/`, and `performance/`.
 - Polish-v2 matched baseline: `docs/screenshots/eastbrook-vale-rebuild/polish/before/` and
   `polish/metadata/before-*.json`.
-- Polish-v2 current after captures: `docs/screenshots/eastbrook-vale-rebuild/polish/after/`
+- Polish-v2 accepted after captures before the bank rebuild:
+  `docs/screenshots/eastbrook-vale-rebuild/polish/after/`
   retains the matched hero views (ten Desktop Ultra views plus the four desktop civic
   motion/reduced-motion frames, and the two Mobile Low heroes). The accepted runs recorded
-  all 23 matched views per profile with current-fingerprint metadata and zero page,
+  all 23 matched views per profile with their accepted historical fingerprint and zero page,
   console, or asset-load failures; that complete per-view record survives in
   `polish/metadata/` and the after contact sheets.
 - Visually accepted after contacts:
   `polish/contacts/after-desktop-ultra-contact.webp` and
   `polish/contacts/after-mobile-low-contact.webp`.
-- Matched final performance JSON: `docs/screenshots/eastbrook-vale-rebuild/polish/performance/`.
+- Historical matched performance JSON:
+  `docs/screenshots/eastbrook-vale-rebuild/polish/performance/`.
 
 ## Remaining risks and compromises
 
@@ -472,6 +510,5 @@ helpers. The evidence integrity tests pin the retained inventories exactly.
 - Real screen-reader/forced-colors announcement behavior and a contrived overlapping-landmark
   pre-input-unlock browser position remain explicit `VERIFY` items. The canonical Mobile Low spawn
   probe, interaction-radius tests, reduced-motion behavior, and ordinary prewarm cap all pass.
-- The full repository asset budget remains over pre-existing aggregate limits, although polish v2
-  reduces shipping service media by `57,520` bytes and the full public tree by `57,261` bytes versus
-  rebuild v1.
+- The full repository asset budget remains over pre-existing aggregate limits. The current tree
+  remains `23,829` bytes below rebuild v1 after the bank adjustment.

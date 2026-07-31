@@ -20,6 +20,8 @@ const CharacterVisual = vi.hoisted(() => vi.fn());
 
 vi.mock('../src/render/assets/preload', () => ({
   assetsReady: () => Promise.resolve(),
+  registerPreload: vi.fn(),
+  registerDeferredPreload: vi.fn((start: () => unknown) => start()),
 }));
 vi.mock('../src/render/characters/assets', () => ({
   ensureSkinTexture,

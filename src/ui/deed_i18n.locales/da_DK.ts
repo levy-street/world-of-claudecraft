@@ -752,4 +752,20 @@ export const table: DeedLocaleTable = {
     name: 'Heroisk: Vildhjertebassinet',
     desc: 'Besejr Zulgar, Bassinets Stemme, i Vildhjertebassinet på heroisk sværhedsgrad.',
   },
+  chr_marsh_rares_ii: {
+    name: 'Den Grådige, Gjort Op',
+    desc: 'Dræb Gravekæft den Grådige, en fjerde navngiven rædsel i Mosekær Sump, som blev glemt i den første optælling.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Flere Navne Hugget i Klippen',
+    desc: 'Dræb Gamle Klippekæft og Skårherre Kazzix, to navngivne rædsler mere i Tornetop Højder, som blev glemt i den første optælling.',
+  },
+  chr_gleamstag: {
+    name: 'Legenden Der Aldrig Slog Først',
+    desc: 'Dræb Glimmerhjorten, en sjælden og sky elite, der kun angriber, når den trænges op i en krog.',
+  },
+  chr_hollow_rares: {
+    name: 'Flokken Husker',
+    desc: 'Dræb Gamle Marvskal og Aurelhorn, Første af Flokken, de to omstrejfende sjældne bosser i Den Tilslørede Hule.',
+  },
 };

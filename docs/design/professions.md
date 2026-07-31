@@ -233,11 +233,13 @@ so a piece re-binds on its next trade. The master unbind service
 above): no quality unbinds free, ever (the fee is the wash guard and the
 sink), monotonic in quality. Vendor sell denies bound copies (the
 sell-then-buyback wash is closed; mixed stacks sell the unbound copies and
-report "Kept N bound copies."). Mail, market, vendor, and bank refusal of
-bound copies is today EMERGENT from fungible-only escrow;
-`tests/professions_bind_on_trade_surfaces.test.ts` is the wall, and any
-future instanced market/mail carriage MUST re-enforce the `boundTo` lock
-explicitly. The commission ORDER workflow stays wave 2 (#1298).
+report "Kept N bound copies."). Mail and market carry instanced copies
+(#1165) and re-enforce the lock EXPLICITLY: the shared
+`isTransferLockedInstance` (`src/sim/item_instance_transfer.ts`) refuses
+`boundTo`-bound and armed (`bindOnTrade`) copies on both pipes. Vendor and
+bank refusal of bound copies stays emergent from fungible-only escrow;
+`tests/professions_bind_on_trade_surfaces.test.ts` remains the wall. The
+commission ORDER workflow stays wave 2 (#1298).
 
 ### Stations, masters, training
 Stations are master NPCs. Six station types (forge, kitchens, loom,

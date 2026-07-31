@@ -14,7 +14,7 @@ import { GALE_HARBOR_DECKS, galeDeckSurfaceAt } from '../sim/gale_harbor';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { beamBetween, buildDeckWood } from './deck_render';
 import { GFX } from './gfx';
 
@@ -31,7 +31,7 @@ const TOWER_STACK = [
 ] as const;
 const towerScenes: (THREE.Group | null)[] = TOWER_STACK.map(() => null);
 for (let i = 0; i < TOWER_STACK.length; i++) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(TOWER_STACK[i].url).then((gltf) => {
       towerScenes[i] = gltf.scene;
     }),

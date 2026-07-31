@@ -2103,6 +2103,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Quella lettera non è più nella tua cassetta.',
   'hudChrome.mailbox.result.needRecipient': 'Indica un destinatario per la tua lettera.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Non puoi spedire oggetti delle missioni.',
+  'hudChrome.mailbox.result.noMailBound': "Quell'oggetto è legato e non può essere spedito.",
   'hudChrome.mailbox.result.noRecipient': 'Nessuno con quel nome ha una cassetta postale qui.',
   'hudChrome.mailbox.result.notEnoughItems': 'Non ne hai così tanti da spedire.',
   'hudChrome.mailbox.result.recipientBoxFull': 'La sua cassetta postale è piena.',
@@ -3394,9 +3395,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': 'Termina lo scambio prima di metterti in coda.',
   'hud.errors.arenaQueueInstance': "Non puoi metterti in coda da dentro un'istanza.",
   'hud.errors.tradeInProgress': 'Uno scambio è già in corso.',
+  'hud.errors.tradeAlreadyTrading': 'Quel giocatore sta già scambiando.',
   'hud.errors.tradeTooFar': 'Il bersaglio è troppo lontano per commerciare.',
   'hud.errors.tradeExpired': 'La richiesta di scambio è scaduta.',
   'hud.errors.tradeBound': "Quell'oggetto è legato e non può essere scambiato.",
+  'hud.errors.marketListBound': "Quell'oggetto è legato e non può essere messo in vendita.",
   'hud.errors.tradeFailed': 'Scambio fallito: oggetti o denaro non più disponibili.',
   'hud.logs.standUp': 'Ti alzi.',
   'hud.logs.partyInviteSent': 'Hai invitato {name} nel tuo gruppo.',
@@ -6189,12 +6192,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.name': 'Demoni',
   'guide.family.demon.desc':
     'Invasori da oltre gli squarci, tutto fuoco e rancore. Dove uno si trova, una breccia non è mai lontana.',
-  'guide.family.kobold.name': 'Birbanti',
-  'guide.family.kobold.desc':
-    'Spazzini guizzanti e folletti di radure e siepi, più fastidiosi che pericolosi finché non si radunano in gran numero.',
-  'guide.family.murloc.name': 'Gracidopinne',
-  'guide.family.murloc.desc':
-    'Gracidanti genti-pesce di rive lacustri e pozze di marea, pronti a sciamare su chiunque si avvicini troppo.',
   'guide.faqPage.a1':
     "Sì. L'intero gioco è gratuito fino al livello massimo, e il codice sorgente è aperto su GitHub.",
   'guide.faqPage.a2':
@@ -10968,4 +10965,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     "Sblocco tra {seconds} secondi. Muoverti, combattere, subire danni o avviare un'altra azione lo annulla.",
   'hudChrome.unstuck.unavailable': 'Sblocco non è disponibile nel tuo stato attuale.',
+  'hudChrome.riftTracker.title': 'Squarcio',
+  'hudChrome.riftTracker.floor': 'Piano {current} di {total}',
+  'hudChrome.riftTracker.closesIn': 'Si chiude tra {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

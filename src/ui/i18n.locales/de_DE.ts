@@ -2136,6 +2136,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Dieser Brief ist nicht mehr in deinem Kasten.',
   'hudChrome.mailbox.result.needRecipient': 'Gib einen Empfänger für deinen Brief an.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Questgegenstände können nicht verschickt werden.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Dieser Gegenstand ist gebunden und kann nicht verschickt werden.',
   'hudChrome.mailbox.result.noRecipient':
     'Niemand mit diesem Namen unterhält hier einen Briefkasten.',
   'hudChrome.mailbox.result.notEnoughItems': 'So viele davon hast du nicht zum Versenden.',
@@ -3421,7 +3423,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': 'Beendet Euren Handel, bevor Ihr Euch anmeldet.',
   'hud.errors.arenaQueueInstance': 'Aus einer Instanz heraus könnt Ihr Euch nicht anmelden.',
   'hud.errors.tradeInProgress': 'Es läuft bereits ein Handel.',
+  'hud.errors.tradeAlreadyTrading': 'Dieser Spieler handelt bereits.',
   'hud.errors.tradeBound': 'Dieser Gegenstand ist gebunden und kann nicht gehandelt werden.',
+  'hud.errors.marketListBound':
+    'Dieser Gegenstand ist gebunden und kann nicht zum Verkauf angeboten werden.',
   'hud.errors.tradeTooFar': 'Das Ziel ist zu weit entfernt zum Handeln.',
   'hud.errors.tradeExpired': 'Die Handelsanfrage ist abgelaufen.',
   'hud.errors.tradeFailed':
@@ -10779,12 +10784,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Eindringlinge von jenseits der Risse, ganz Feuer und Bosheit. Wo einer steht, ist ein Durchbruch nie fern.',
   'guide.family.demon.name': 'Dämonen',
-  'guide.family.kobold.desc':
-    'Huschende Aasfresser und Wichte aus Lichtung und Hecke, eher lästig als bedrohlich, bis sie sich in großer Zahl versammeln.',
-  'guide.family.kobold.name': 'Schelme',
-  'guide.family.murloc.desc':
-    'Quakendes Fischvolk aus Seeufern und Gezeitentümpeln, schnell dabei, alles zu überfallen, das zu nah heranwatet.',
-  'guide.family.murloc.name': 'Quakflossen',
   'guide.home.world.amberBlurb':
     'Hinter den westlichen Klippen ein Herbst, der niemals endet, und Laternen auf einem goldenen See.',
   'guide.home.world.amberName': 'Der Bernsteinfall',
@@ -10999,4 +10998,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'sim.rift.socketsShut': 'Die Fassungen schließen sich knirschend. Der Weg regt sich.',
   'sim.rift.stepBack': 'Du trittst zurück durch den Riss.',
   'sim.rift.wayDownOpens': 'Der Weg hinab reißt auf.',
+  'hudChrome.riftTracker.title': 'Riss',
+  'hudChrome.riftTracker.floor': 'Ebene {current} von {total}',
+  'hudChrome.riftTracker.closesIn': 'Schließt in {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

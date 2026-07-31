@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   type EastbrookSurfaceSemantic,
   eastbrookSurfaceAtlasMetadata,
@@ -28,7 +28,7 @@ let preparedNoticeboardTemplate: THREE.Group | null = null;
 let fallbackNoticeboardTemplate: THREE.Group | null = null;
 
 if (typeof window !== 'undefined') {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(NOTICEBOARD_ASSET_URL).then((gltf) => {
       loadedNoticeboardGltf = gltf;
     }),

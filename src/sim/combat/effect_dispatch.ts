@@ -71,7 +71,7 @@ import {
   selectCascadeTargets,
 } from './chronomancy';
 import { extendOwnedDot } from './dot_mutation';
-import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
+import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { fireGuaranteedCrit, personalBarrierIdForSpec } from './fire_mage';
@@ -315,7 +315,12 @@ export function runEffects(
     }
   }
 
-  if (ability.requiresAuraKind) consumeAuraKind(ctx, p, ability.requiresAuraKind);
+  // requiresAuraKind (Glacial Spike's Icicles, Victory Rush's kill window) is now
+  // consumed atomically at cast commit in casting_lifecycle.ts's applyAbility,
+  // alongside spendAbilityCost/armAbilityCooldown, not here: a ranged ability's
+  // runEffects can run ticks after the cast committed (once its projectile
+  // lands), which used to leave the gating aura alive for a same-tick second
+  // cast attempt (issue #2632).
 
   for (const eff of res.effects) {
     switch (eff.type) {

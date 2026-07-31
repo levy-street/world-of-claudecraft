@@ -1767,7 +1767,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam.",
     "families": [
       "beast",
-      "kobold",
+      "burrower",
       "elemental"
     ]
   },
@@ -1811,7 +1811,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Snow swallows every sound. Under the dancing lights, the cold itself feels awake.",
     "families": [
       "beast",
-      "kobold",
+      "burrower",
       "elemental"
     ]
   },
@@ -1834,8 +1834,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you.",
     "families": [
       "beast",
-      "murloc",
-      "kobold"
+      "mudfin",
+      "burrower"
     ]
   },
   {
@@ -1855,8 +1855,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     ],
     "welcome": "The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile.",
     "families": [
-      "murloc",
-      "kobold",
+      "mudfin",
+      "burrower",
       "elemental"
     ]
   },
@@ -1879,7 +1879,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "families": [
       "beast",
       "undead",
-      "elemental"
+      "elemental",
+      "reptile"
     ]
   },
   {
@@ -1948,7 +1949,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
     "families": [
       "beast",
-      "kobold",
+      "burrower",
       "humanoid"
     ]
   },
@@ -1972,7 +1973,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.",
     "families": [
       "beast",
-      "kobold",
+      "burrower",
       "undead"
     ]
   },
@@ -1993,7 +1994,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
     "families": [
       "beast",
-      "kobold",
+      "burrower",
       "demon"
     ]
   }
@@ -2253,16 +2254,6 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_wolf__9db4c8.webp"
       },
       {
-        "name": "Gloam Strider",
-        "min": 20,
-        "max": 20,
-        "rare": false,
-        "templateId": "gloam_strider",
-        "model": "mob_raptor",
-        "tint": "#4c4a72",
-        "still": "/guide-stills/mob_raptor__4c4a72.webp"
-      },
-      {
         "name": "Moonfleece Grazer",
         "min": 20,
         "max": 20,
@@ -2401,21 +2392,16 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_murloc",
         "tint": "#8fb6c4",
         "still": "/guide-stills/mob_murloc__8fb6c4.webp"
-      }
-    ]
-  },
-  {
-    "family": "murloc",
-    "creatures": [
+      },
       {
         "name": "Bogtoad",
         "min": 19,
         "max": 20,
         "rare": false,
         "templateId": "bogtoad",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_murloc",
+        "tint": "#7aa848",
+        "still": "/guide-stills/mob_murloc__7aa848.webp"
       },
       {
         "name": "Mere Lurker",
@@ -2423,15 +2409,25 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "mere_lurker",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_murloc",
+        "tint": "#a8b048",
+        "still": "/guide-stills/mob_murloc__a8b048.webp"
       }
     ]
   },
   {
     "family": "burrower",
     "creatures": [
+      {
+        "name": "Breach Wretch",
+        "min": 3,
+        "max": 5,
+        "rare": false,
+        "templateId": "breach_wretch",
+        "model": "mob_kobold",
+        "tint": "#5a4a78",
+        "still": "/guide-stills/mob_kobold__5a4a78.webp"
+      },
       {
         "name": "Deeprock Digger",
         "min": 4,
@@ -2451,21 +2447,6 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_kobold",
         "tint": "#9c7a3c",
         "still": "/guide-stills/mob_kobold__9c7a3c.webp"
-      }
-    ]
-  },
-  {
-    "family": "kobold",
-    "creatures": [
-      {
-        "name": "Breach Wretch",
-        "min": 3,
-        "max": 5,
-        "rare": false,
-        "templateId": "breach_wretch",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
       },
       {
         "name": "Gleamfolk Pixie",
@@ -2503,9 +2484,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 18,
         "rare": false,
         "templateId": "fen_sprite",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_kobold",
+        "tint": "#cfe0ea",
+        "still": "/guide-stills/mob_kobold__cfe0ea.webp"
       },
       {
         "name": "Harvest Sprite",
@@ -2513,9 +2494,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 19,
         "rare": false,
         "templateId": "harvest_sprite",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_kobold",
+        "tint": "#e8c878",
+        "still": "/guide-stills/mob_kobold__e8c878.webp"
       },
       {
         "name": "Willow Sprite",
@@ -2523,9 +2504,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "willow_sprite",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_kobold",
+        "tint": "#c8e0b8",
+        "still": "/guide-stills/mob_kobold__c8e0b8.webp"
       },
       {
         "name": "Downs Bandit",
@@ -2533,9 +2514,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "downs_bandit",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_kobold",
+        "tint": "#5a8a46",
+        "still": "/guide-stills/mob_kobold__5a8a46.webp"
       },
       {
         "name": "Hedge Gnome",
@@ -2543,9 +2524,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "hedge_gnome",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_kobold",
+        "tint": "#5a8a46",
+        "still": "/guide-stills/mob_kobold__5a8a46.webp"
       },
       {
         "name": "Wreckfield Thief",
@@ -2553,9 +2534,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "wreck_thief",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_kobold",
+        "tint": "#5a8a46",
+        "still": "/guide-stills/mob_kobold__5a8a46.webp"
       }
     ]
   },
@@ -2898,6 +2879,21 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_demonalt",
         "tint": "#7a3fb0",
         "still": "/guide-stills/mob_demonalt__7a3fb0.webp"
+      }
+    ]
+  },
+  {
+    "family": "reptile",
+    "creatures": [
+      {
+        "name": "Gloam Strider",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "gloam_strider",
+        "model": "mob_raptor",
+        "tint": "#4c4a72",
+        "still": "/guide-stills/mob_raptor__4c4a72.webp"
       }
     ]
   }

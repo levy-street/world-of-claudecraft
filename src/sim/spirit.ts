@@ -237,7 +237,12 @@ function releaseAtNearestGraveyard(
   p.pos = ctx.groundPos(gy.x, gy.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
+  // prevFacing pairs with facing on every forced-facing site in the sim (see
+  // mob/lifecycle.ts, sim.ts, social/arena.ts): leaving it stale here made the
+  // render-interpolated facing sweep from the pre-death heading to 0 over the
+  // next tick window instead of landing on 0 immediately.
   p.facing = 0;
+  p.prevFacing = 0;
   // Whatever movement keys were held at the moment of death must not carry over: the
   // ghost is teleported to the graveyard and should sit still until the player actually
   // presses a key again, not keep walking in the last held direction.
@@ -345,7 +350,9 @@ function reviveAt(
   p.pos = ctx.groundPos(pos.x, pos.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
+  // See releasePlayerSpirit above: pair prevFacing with the forced facing reset.
   p.facing = 0;
+  p.prevFacing = 0;
   // As with the release above: a held movement key at the moment the revive lands must
   // not carry over, or the freshly-revived body immediately walks off in whatever
   // direction was last held (this is what made revived players drift with no input).

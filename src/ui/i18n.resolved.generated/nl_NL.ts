@@ -888,6 +888,13 @@ export const nl_NL: EnTranslations = {
       "heroicName": "Heroïsch {name}",
       "heroicLocked": "Je bent vergrendeld voor Heroïsch {name}."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Verdieping {current} van {total}",
+      "closesIn": "Sluit over {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NO",
@@ -2120,6 +2127,7 @@ export const nl_NL: EnTranslations = {
         "noRecipient": "Niemand met die naam heeft hier een brievenbus.",
         "tooManyParcels": "Een brief draagt hoogstens {count} pakketten.",
         "noMailQuestItems": "Je kunt geen opdrachtvoorwerpen versturen.",
+        "noMailBound": "Dat voorwerp is gebonden en kan niet worden verstuurd.",
         "notEnoughItems": "Zoveel heb je er niet om te versturen.",
         "cantAffordPostage": "Je kunt de porto niet betalen.",
         "recipientBoxFull": "Hun brievenbus is vol.",
@@ -3530,14 +3538,6 @@ export const nl_NL: EnTranslations = {
       "reptile": {
         "name": "Reptielen",
         "desc": "Koudbloedige jagers met een eigen sis en snap, onderscheiden van de warmbloedige dieren."
-      },
-      "murloc": {
-        "name": "Kwaakvinnen",
-        "desc": "Krassende vismensen van oever en getijdenpoel, snel om te zwermen op alles wat te dicht bij het water waadt."
-      },
-      "kobold": {
-        "name": "Kwelgeesten",
-        "desc": "Scharrelende plunderaars en geesten van open plek en heg, meer overlast dan gevaar tot ze zich in aantal verzamelen."
       },
       "demon": {
         "name": "Demonen",
@@ -6479,11 +6479,12 @@ export const nl_NL: EnTranslations = {
       "arenaQueueTrading": "Rond je ruil af voordat je in de wachtrij gaat.",
       "arenaQueueInstance": "Je kunt niet in de wachtrij gaan vanuit een instantie.",
       "tradeInProgress": "Er is al een ruil aan de gang.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Die speler is al aan het ruilen.",
       "tradeTooFar": "Het doelwit is te ver weg om mee te ruilen.",
       "tradeExpired": "Het ruilverzoek is verlopen.",
       "tradeFailed": "Ruil mislukt: voorwerpen of geld niet langer beschikbaar.",
-      "tradeBound": "Dat voorwerp is gebonden en kan niet worden verhandeld."
+      "tradeBound": "Dat voorwerp is gebonden en kan niet worden verhandeld.",
+      "marketListBound": "Dat voorwerp is gebonden en kan niet te koop worden aangeboden."
     },
     "logs": {
       "standUp": "Je staat op.",

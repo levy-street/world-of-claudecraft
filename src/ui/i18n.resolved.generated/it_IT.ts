@@ -888,6 +888,13 @@ export const it_IT: EnTranslations = {
       "heroicName": "{name} Eroico",
       "heroicLocked": "Sei bloccato sulla versione Eroica di {name}."
     },
+    "riftTracker": {
+      "title": "Squarcio",
+      "floor": "Piano {current} di {total}",
+      "closesIn": "Si chiude tra {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -2120,6 +2127,7 @@ export const it_IT: EnTranslations = {
         "noRecipient": "Nessuno con quel nome ha una cassetta postale qui.",
         "tooManyParcels": "Una lettera trasporta al massimo {count} pacchi.",
         "noMailQuestItems": "Non puoi spedire oggetti delle missioni.",
+        "noMailBound": "Quell'oggetto è legato e non può essere spedito.",
         "notEnoughItems": "Non ne hai così tanti da spedire.",
         "cantAffordPostage": "Non puoi permetterti l'affrancatura.",
         "recipientBoxFull": "La sua cassetta postale è piena.",
@@ -3530,14 +3538,6 @@ export const it_IT: EnTranslations = {
       "reptile": {
         "name": "Rettili",
         "desc": "Cacciatori a sangue freddo con un sibilo e uno scatto tutti loro, ben distinti dalle bestie a sangue caldo."
-      },
-      "murloc": {
-        "name": "Gracidopinne",
-        "desc": "Gracidanti genti-pesce di rive lacustri e pozze di marea, pronti a sciamare su chiunque si avvicini troppo."
-      },
-      "kobold": {
-        "name": "Birbanti",
-        "desc": "Spazzini guizzanti e folletti di radure e siepi, più fastidiosi che pericolosi finché non si radunano in gran numero."
       },
       "demon": {
         "name": "Demoni",
@@ -6479,11 +6479,12 @@ export const it_IT: EnTranslations = {
       "arenaQueueTrading": "Termina lo scambio prima di metterti in coda.",
       "arenaQueueInstance": "Non puoi metterti in coda da dentro un'istanza.",
       "tradeInProgress": "Uno scambio è già in corso.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Quel giocatore sta già scambiando.",
       "tradeTooFar": "Il bersaglio è troppo lontano per commerciare.",
       "tradeExpired": "La richiesta di scambio è scaduta.",
       "tradeFailed": "Scambio fallito: oggetti o denaro non più disponibili.",
-      "tradeBound": "Quell'oggetto è legato e non può essere scambiato."
+      "tradeBound": "Quell'oggetto è legato e non può essere scambiato.",
+      "marketListBound": "Quell'oggetto è legato e non può essere messo in vendita."
     },
     "logs": {
       "standUp": "Ti alzi.",

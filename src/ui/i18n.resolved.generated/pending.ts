@@ -9,55 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
-  "es_ES": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
-  "fr_FR": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
-  "fr_CA": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
-  "de_DE": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
-  "nl_NL": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
-  "pl_PL": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
-  "id_ID": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
-  "tr_TR": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
-  "sv_SE": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
-  "vi_VN": [
-    "hud.errors.tradeAlreadyTrading"
-  ],
-  "da_DK": [
-    "hud.errors.tradeAlreadyTrading"
-  ]
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

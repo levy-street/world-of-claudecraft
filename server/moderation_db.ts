@@ -499,7 +499,7 @@ export async function moderateAccount(input: {
       reason,
       expiresAt: expiresAt ? expiresAt.toISOString() : null,
     });
-    if (input.action !== 'unsuspend') {
+    if (input.action === 'ban' || input.action === 'suspend') {
       await client.query(
         `UPDATE player_reports
          SET status = 'actioned', reviewed_at = now(), reviewed_by_account_id = $2, review_note = $3

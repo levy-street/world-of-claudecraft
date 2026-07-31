@@ -24,18 +24,18 @@ export const EASTBROOK_TOWN_CONTRACTS = Object.freeze({
     dimensions: Object.freeze({ width: 7, height: 7.8, depth: 5.5 }),
     triangleCeiling: 6000,
     byteCeiling: 350 * 1024,
-    serviceCues: Object.freeze(['arched-entry', 'teller-window', 'vault-chest', 'bank-banner']),
+    serviceCues: Object.freeze(['arched-entry', 'teller-window', 'vault-alcove', 'bank-banner']),
     sockets: Object.freeze([
       Object.freeze({
         id: 'front-entry',
         name: 'Socket_FrontEntry',
-        position: [-1.62, 0, 3.85],
+        position: [-1.48, 0, 2.62],
         purpose: 'front entrance alignment',
       }),
       Object.freeze({
         id: 'teller',
         name: 'Socket_TellerWindow',
-        position: [1.05, 1.35, 3.45],
+        position: [0.72, 1.42, 2.45],
         purpose: 'bank service cue',
       }),
     ]),

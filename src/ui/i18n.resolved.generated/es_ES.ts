@@ -888,6 +888,13 @@ export const es_ES: EnTranslations = {
       "heroicName": "{name} Heroico",
       "heroicLocked": "Estás bloqueado en {name} Heroico."
     },
+    "riftTracker": {
+      "title": "Brecha",
+      "floor": "Piso {current} de {total}",
+      "closesIn": "Se cierra en {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -2120,6 +2127,7 @@ export const es_ES: EnTranslations = {
         "noRecipient": "Nadie con ese nombre tiene buzón aquí.",
         "tooManyParcels": "Una carta lleva como máximo {count} paquetes.",
         "noMailQuestItems": "No puedes enviar objetos de misión por correo.",
+        "noMailBound": "Ese objeto está vinculado y no puede enviarse por correo.",
         "notEnoughItems": "No tienes tantos para enviar.",
         "cantAffordPostage": "No puedes costear el franqueo.",
         "recipientBoxFull": "Su buzón está lleno.",
@@ -3530,14 +3538,6 @@ export const es_ES: EnTranslations = {
       "reptile": {
         "name": "Reptilidos",
         "desc": "Cazadores de sangre fria con su propio silbido y mordisco, bien distintos de las bestias de sangre caliente."
-      },
-      "murloc": {
-        "name": "Aletacroantes",
-        "desc": "Gente-pez croante de orillas de lago y charcas de marea, rápidos para enjambrarse sobre cualquiera que vadee demasiado cerca."
-      },
-      "kobold": {
-        "name": "Bribones",
-        "desc": "Carroñeros correteantes y duendes de claros y setos, más molestia que amenaza hasta que se juntan en número."
       },
       "demon": {
         "name": "Demonios",
@@ -6479,11 +6479,12 @@ export const es_ES: EnTranslations = {
       "arenaQueueTrading": "Termina tu comercio antes de entrar en cola.",
       "arenaQueueInstance": "No puedes entrar en cola desde una instancia.",
       "tradeInProgress": "Ya hay un comercio en curso.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Ese jugador ya está comerciando.",
       "tradeTooFar": "El objetivo está demasiado lejos para comerciar.",
       "tradeExpired": "La solicitud de comercio ha expirado.",
       "tradeFailed": "Comercio fallido: los objetos o el dinero ya no están disponibles.",
-      "tradeBound": "Ese objeto está vinculado y no puede comerciarse."
+      "tradeBound": "Ese objeto está vinculado y no puede comerciarse.",
+      "marketListBound": "Ese objeto está vinculado y no puede ponerse a la venta."
     },
     "logs": {
       "standUp": "Te pones de pie.",

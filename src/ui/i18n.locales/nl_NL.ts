@@ -2235,6 +2235,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Die brief zit niet meer in je brievenbus.',
   'hudChrome.mailbox.result.needRecipient': 'Noem een ontvanger voor je brief.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Je kunt geen opdrachtvoorwerpen versturen.',
+  'hudChrome.mailbox.result.noMailBound': 'Dat voorwerp is gebonden en kan niet worden verstuurd.',
   'hudChrome.mailbox.result.noRecipient': 'Niemand met die naam heeft hier een brievenbus.',
   'hudChrome.mailbox.result.notEnoughItems': 'Zoveel heb je er niet om te versturen.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Hun brievenbus is vol.',
@@ -5061,12 +5062,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Indringers van voorbij de rifts, louter vuur en venijn. Waar er een staat, is een breuk nooit ver weg.',
   'guide.family.demon.name': 'Demonen',
-  'guide.family.kobold.desc':
-    'Scharrelende plunderaars en geesten van open plek en heg, meer overlast dan gevaar tot ze zich in aantal verzamelen.',
-  'guide.family.kobold.name': 'Kwelgeesten',
-  'guide.family.murloc.desc':
-    'Krassende vismensen van oever en getijdenpoel, snel om te zwermen op alles wat te dicht bij het water waadt.',
-  'guide.family.murloc.name': 'Kwaakvinnen',
   'guide.faqPage.a1':
     'Ja. Het hele spel is gratis te spelen tot aan de niveaulimiet, en de broncode is openbaar op GitHub.',
   'guide.faqPage.a10':
@@ -5985,9 +5980,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetTooFar': 'Het doelwit is te ver weg.',
   'hud.errors.tooClose': 'Te dichtbij!',
   'hud.errors.tradeBound': 'Dat voorwerp is gebonden en kan niet worden verhandeld.',
+  'hud.errors.marketListBound': 'Dat voorwerp is gebonden en kan niet te koop worden aangeboden.',
   'hud.errors.tradeExpired': 'Het ruilverzoek is verlopen.',
   'hud.errors.tradeFailed': 'Ruil mislukt: voorwerpen of geld niet langer beschikbaar.',
   'hud.errors.tradeInProgress': 'Er is al een ruil aan de gang.',
+  'hud.errors.tradeAlreadyTrading': 'Die speler is al aan het ruilen.',
   'hud.errors.tradeTooFar': 'Het doelwit is te ver weg om mee te ruilen.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Onbekende opdracht: {command}. Probeer /s /y /w /p /g.',
@@ -10906,4 +10903,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     'Loskomen over {seconds} seconden. Bewegen, vechten, schade oplopen, of een andere actie beginnen annuleert dit.',
   'hudChrome.unstuck.unavailable': 'Loskomen is niet beschikbaar in je huidige toestand.',
+  'hudChrome.riftTracker.title': 'Rift',
+  'hudChrome.riftTracker.floor': 'Verdieping {current} van {total}',
+  'hudChrome.riftTracker.closesIn': 'Sluit over {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

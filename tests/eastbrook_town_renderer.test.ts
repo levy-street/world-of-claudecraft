@@ -539,12 +539,12 @@ describe('Eastbrook repeated placement triangle budget', () => {
       budget.assets.find((asset) => asset.assetUrl.endsWith('eastbrook_wall_wing.glb')),
     ).toMatchObject({ instances: EASTBROOK_LAYOUT.wall.segments.length });
     expect(budget.maximumFoundationTriangles).toBe(EASTBROOK_LAYOUT.buildings.length * 12);
-    expect(budget.assetTriangles).toBe(28_258);
+    expect(budget.assetTriangles).toBe(29_038);
     expect(budget.maximumFoundationTriangles).toBe(72);
     expect(budget.maximumRuntimeTriangles).toBe(
       budget.assetTriangles + budget.maximumFoundationTriangles,
     );
-    expect(budget.maximumRuntimeTriangles).toBe(28_330);
+    expect(budget.maximumRuntimeTriangles).toBe(29_110);
     expect(
       budget.maximumRuntimeTriangles,
       JSON.stringify({

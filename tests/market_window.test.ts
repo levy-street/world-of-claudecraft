@@ -366,6 +366,25 @@ describe('market_window: stale tooltip on re-filter (#2456)', () => {
       render.indexOf('this.renderContent();'),
     );
   });
+
+  it('also guards the Browse-tab pager click, a third `.mkt-row` teardown path', () => {
+    // The pager's Prev/Next button is built inside renderBrowse() and calls pushQuery()
+    // then renderContent() directly: neither the full render() rebuild (which hides the
+    // tooltip unconditionally at its top) nor the guarded refreshIfChanged() path covers
+    // it, so it needs its own hideTooltip() before the rebuild.
+    const pagerStart = painter.indexOf(
+      "pager.querySelectorAll<HTMLButtonElement>('[data-market-page]').forEach((button) => {",
+    );
+    expect(pagerStart, 'pager click wiring must exist').toBeGreaterThan(-1);
+    const pagerHandler = painter.slice(pagerStart, painter.indexOf('list.appendChild(pager);'));
+    const hideIdx = pagerHandler.indexOf('this.deps.hideTooltip();');
+    const renderIdx = pagerHandler.indexOf('this.renderContent();');
+    expect(hideIdx, 'hideTooltip() must run in the pager click handler').toBeGreaterThan(-1);
+    expect(
+      hideIdx,
+      'hideTooltip() must run before renderContent() tears down the row nodes',
+    ).toBeLessThan(renderIdx);
+  });
 });
 
 describe('market_window: reconnect resync (#2416)', () => {

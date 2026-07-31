@@ -2115,6 +2115,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'O mektup artık kutunda değil.',
   'hudChrome.mailbox.result.needRecipient': 'Mektubun için bir alıcı belirt.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Görev eşyalarını postayla gönderemezsin.',
+  'hudChrome.mailbox.result.noMailBound': 'O eşya bağlı ve postayla gönderilemez.',
   'hudChrome.mailbox.result.noRecipient': 'Burada bu isimde posta kutusu olan kimse yok.',
   'hudChrome.mailbox.result.notEnoughItems': 'Gönderecek o kadar tane yok.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Alıcının posta kutusu dolu.',
@@ -5664,12 +5665,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Yarıkların ötesinden gelen istilacılar, tepeden tırnağa ateş ve kin doludurlar. Biri nerede durursa, bir gedik asla uzak değildir.',
   'guide.family.demon.name': 'İblisler',
-  'guide.family.kobold.desc':
-    'Çayırların ve çitlerin telaşlı leş yiyicileri ve cinleri, sayıca çoğalana kadar tehlikeden çok baş belasıdırlar.',
-  'guide.family.kobold.name': 'Yaramazlar',
-  'guide.family.murloc.desc':
-    'Göl kıyısının ve gelgit havuzlarının vraklayan balık halkı, fazla yaklaşan her şeyin üzerine çabucak üşüşür.',
-  'guide.family.murloc.name': 'Vırakyüzgeçler',
   'guide.faqPage.a1':
     "Evet. Oyunun tamamı seviye sınırına kadar ücretsiz oynanabilir ve kaynak kodu GitHub'da açıktır.",
   'guide.faqPage.a10':
@@ -6522,7 +6517,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.tradeExpired': 'Takas isteğinin süresi doldu.',
   'hud.errors.tradeFailed': 'Takas başarısız: eşyalar ya da para artık mevcut değil.',
   'hud.errors.tradeBound': 'O eşya bağlı ve takas edilemez.',
+  'hud.errors.marketListBound': 'O eşya bağlı ve satışa çıkarılamaz.',
   'hud.errors.tradeInProgress': 'Zaten devam eden bir takas var.',
+  'hud.errors.tradeAlreadyTrading': 'Bu oyuncu zaten takas yapıyor.',
   'hud.errors.tradeTooFar': 'Hedef takas için çok uzakta.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Bilinmeyen komut: {command}. /s /y /w /p /g deneyin.',
@@ -10802,4 +10799,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     'Kurtulma {seconds} saniye içinde. Hareket etmek, savaşmak, hasar almak veya başka bir eylem başlatmak bunu iptal eder.',
   'hudChrome.unstuck.unavailable': 'Kurtulma mevcut durumunda kullanılamaz.',
+  'hudChrome.riftTracker.title': 'Yarık',
+  'hudChrome.riftTracker.floor': 'Kat {current}/{total}',
+  'hudChrome.riftTracker.closesIn': '{time} içinde kapanır',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

@@ -365,6 +365,7 @@ export function enterDungeon(
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.facing = 0;
+  p.prevFacing = 0;
   p.targetId = null;
   p.autoAttack = false;
   inst.emptyFor = 0;

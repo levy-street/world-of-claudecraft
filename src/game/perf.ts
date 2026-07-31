@@ -1,6 +1,11 @@
 import type { NetPipelineSummary } from '../net/net_pipeline_stats';
 import { type AssetTimingSnapshot, assetTimingSnapshot } from '../render/assets/stats';
 import type { Renderer } from '../render/renderer';
+import {
+  censusTableLines,
+  type HitchSummary,
+  type SceneCensusReport,
+} from '../render/scene_census_core';
 import { createHeapSawtooth, type HeapSawtoothSummary } from './heap_sawtooth';
 import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
 import { createWorstWindow, type WorstWindowSummary } from './worst_window';
@@ -67,6 +72,10 @@ export interface PerfSnapshot {
     maxTouchPoints: number;
   };
   devTrace?: DevPerfTrace;
+  /** Last on-demand scene census (the overlay's census button); absent until run. */
+  census?: SceneCensusReport;
+  /** Overlay-gated hitch correlation from the renderer; absent when the overlay is off. */
+  hitches?: HitchSummary;
 }
 
 export type PerfInputDebugState = Record<string, unknown>;
@@ -349,6 +358,13 @@ export function localDevPerfTraceEnabled(): boolean {
 export class PerfMonitor {
   readonly enabled: boolean;
   private overlay: HTMLDivElement | null = null;
+  private overlayText: HTMLDivElement | null = null;
+  private lastCensus: SceneCensusReport | null = null;
+  // Rendered once per census run, not on every 1 Hz overlay repaint.
+  private lastCensusLines: string[] = [];
+  // The census burst runs inside one task, so the following rAF gap is a
+  // self-inflicted long frame; drop that one sample from the statistics.
+  private skipNextFrameSample = false;
   private startedAt = performance.now();
   private lastOverlayAt = 0;
   private frames = 0;
@@ -400,11 +416,13 @@ export class PerfMonitor {
     if (this.enabled) {
       this.mountOverlay();
     }
+    this.renderer?.setHitchLogEnabled(this.enabled);
     this.observeLongTasks();
   }
 
   setRenderer(renderer: Renderer): void {
     this.renderer = renderer;
+    renderer.setHitchLogEnabled(this.enabled);
   }
 
   setHud(hud: { perfStats(): PerfSnapshot['hud'] }): void {
@@ -416,6 +434,10 @@ export class PerfMonitor {
   }
 
   frame(dt: number, now = performance.now()): void {
+    if (this.skipNextFrameSample) {
+      this.skipNextFrameSample = false;
+      return;
+    }
     this.frames++;
     const ms = Math.min(250, Math.max(0, dt * 1000));
     this.lastFrameMs = ms;
@@ -840,7 +862,27 @@ export class PerfMonitor {
         longTasks: this.devTraceLongTasks(),
       };
     }
+    if (this.lastCensus) snapshot.census = this.lastCensus;
+    const hitches = this.renderer?.hitchStats() ?? null;
+    if (hitches) snapshot.hitches = hitches;
     return snapshot;
+  }
+
+  /**
+   * Run the one-shot scene census through the renderer, remember it for the
+   * overlay table and the JSON report, and log it as copyable JSON. On demand
+   * only (the overlay's census button and the capture harness); returns null
+   * before the renderer exists.
+   */
+  runSceneCensus(): SceneCensusReport | null {
+    if (!this.renderer) return null;
+    const report = this.renderer.captureSceneCensus();
+    this.lastCensus = report;
+    this.lastCensusLines = censusTableLines(report);
+    this.skipNextFrameSample = true;
+    console.info('World of Claudecraft scene census:', JSON.stringify(report, null, 2));
+    if (this.enabled) this.renderOverlay(this.lastSnapshot ?? this.snapshot());
+    return report;
   }
 
   private readInputDebug(): PerfInputDebugState | null {
@@ -869,6 +911,9 @@ export class PerfMonitor {
     this.frames = 0;
     this.frameMs.clear();
     this.frameWindow.clear();
+    this.lastCensus = null;
+    this.lastCensusLines = [];
+    this.skipNextFrameSample = false;
     for (const samples of Object.values(this.buckets)) samples.clear();
     this.lastSnapshot = null;
     this.netPipelineSource = null;
@@ -913,13 +958,26 @@ export class PerfMonitor {
       'box-shadow:0 8px 28px rgba(0,0,0,0.35)',
     ].join(';');
     this.overlay.title = 'Click to copy a JSON perf report';
-    this.overlay.textContent = 'perf: collecting...';
     this.overlay.addEventListener('click', () => this.copyReport());
+    this.overlayText = document.createElement('div');
+    this.overlayText.textContent = 'perf: collecting...';
+    this.overlay.appendChild(this.overlayText);
+    const censusBtn = document.createElement('div');
+    censusBtn.textContent = '[run scene census]';
+    censusBtn.title =
+      'One-shot per-system draw breakdown (a short burst of extra renders, results in the overlay + console JSON)';
+    censusBtn.style.cssText =
+      'margin-top:6px;cursor:pointer;color:#93c5fd;text-decoration:underline';
+    censusBtn.addEventListener('click', (e: Event) => {
+      e.stopPropagation();
+      this.runSceneCensus();
+    });
+    this.overlay.appendChild(censusBtn);
     document.body.appendChild(this.overlay);
   }
 
   private renderOverlay(s: PerfSnapshot): void {
-    if (!this.overlay) return;
+    if (!this.overlay || !this.overlayText) return;
     const r = s.renderer;
     const hud = s.hud;
     const net = s.network;
@@ -929,7 +987,12 @@ export class PerfMonitor {
     const rp = r?.phaseMs;
     const lt = s.browser.longTasks;
     const mem = s.browser.memory;
-    this.overlay.textContent = [
+    const h = s.hitches;
+    const hitchLine = h
+      ? `hitch ${h.hitches} (compile ${h.byCause['shader-compile']} tex ${h.byCause['texture-upload']} view ${h.byCause['view-create']} other ${h.byCause.other})  prog +${h.programsAdded}`
+      : null;
+    const censusLines = this.lastCensusLines;
+    this.overlayText.textContent = [
       `fps ${s.fps}  p95 ${s.frameMs.p95}ms  >50 ${s.frameMs.long50}`,
       `10s fps ${s.windows.last10s.fps}  p95 ${s.windows.last10s.frameMs.p95}ms  >50 ${s.windows.last10s.frameMs.long50}`,
       `longtask ${lt.count}  p95 ${lt.p95}ms  max ${lt.max}ms  heap ${mem ? `${mem.usedMB}/${mem.limitMB}MB` : '-'}`,
@@ -944,6 +1007,8 @@ export class PerfMonitor {
       net
         ? `net ${net.connected ? 'up' : 'down'} snap ${net.snapInterval}ms age ${net.lastSnapAge}ms a ${net.alpha}`
         : 'net offline',
+      ...(hitchLine ? [hitchLine] : []),
+      ...censusLines,
       'click: copy json',
     ].join('\n');
   }

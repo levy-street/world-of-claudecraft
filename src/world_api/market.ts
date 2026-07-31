@@ -6,7 +6,7 @@ import type {
   MarketRarityFilter,
   MarketSubtypeFilter,
 } from '../sim/market_query';
-import type { InvSlot } from '../sim/types';
+import type { InvSlot, ItemInstancePayload } from '../sim/types';
 
 // ---------------------------------------------------------------------------
 // The World Market (the Merchant's auction house). Listings are global and
@@ -22,6 +22,10 @@ export interface MarketListingView {
   price: number; // total copper buyout for the whole stack
   mine: boolean; // the viewer is the seller (offer them Cancel, not Buy)
   house: boolean; // the Merchant's own standing stock
+  /** DISPLAY payload of an instanced listing (#1165), trimmed to the public
+   *  allowlist (signer/enchant/rolled; never boundTo/bindOnTrade/charges): the
+   *  tooltip's enchant line and maker's mark. Absent on plain listings. */
+  instance?: ItemInstancePayload;
 }
 
 export interface MarketInfo {
@@ -62,6 +66,10 @@ export interface IWorldMarket {
   // sent to the server, which filters and paginates; marketInfo mirrors the result.
   marketSearch(query: MarketQuery): void;
   marketList(itemId: string, count: number, price: number): void;
+  /** List ONE instanced copy (count 1), named by its payload: the sim escrows
+   *  the actual held copy whose payload matches, refusing transfer-locked
+   *  (bindOnTrade-armed or boundTo-bound) copies. Plain stacks use marketList. */
+  marketListInstance(itemId: string, price: number, instance: ItemInstancePayload): void;
   marketBuy(listingId: number): void;
   marketCancel(listingId: number): void;
   marketCollect(): void;

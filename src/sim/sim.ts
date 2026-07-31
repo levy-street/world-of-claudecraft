@@ -225,7 +225,7 @@ import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } fr
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
-import { canStackInstancePayloads } from './item_instance_merge';
+import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
 import type { JailState } from './jail';
@@ -1630,8 +1630,8 @@ function freshCounters(): RewardCounters {
 export class Sim {
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
-  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
-    Pick<SimConfig, 'world' | 'perfLap'>;
+  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
+    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
   /**
    * The authored world this simulation owns. The active registry is a host/render
    * seam and may be swapped by an editor after construction; gameplay services,
@@ -1857,7 +1857,9 @@ export class Sim {
     this.cfg = {
       seed: cfg.seed,
       playerClass: cfg.playerClass,
-      respawnSeconds: cfg.respawnSeconds ?? 25,
+      // Deliberately NOT defaulted: the respawn policy (respawn_policy.ts) has to
+      // tell "the host pinned a global base" apart from "use the zone tier".
+      respawnSeconds: cfg.respawnSeconds,
       autoEquip: cfg.autoEquip ?? false,
       playerName: cfg.playerName ?? 'Adventurer',
       devCommands: this.devCommands,
@@ -2634,7 +2636,18 @@ export class Sim {
           meta.bags[i] = id && ITEMS[id]?.kind === 'bag' ? id : null;
         }
       }
-      meta.vendorBuyback = (s.vendorBuyback ?? []).map(cloneInvSlot);
+      // Buyback rows deliberately skip the full instancedCountCap: byte-equal
+      // merges past the stack cap are legitimate here (recordVendorBuyback
+      // merges an entire multi-unit sale into one row, and buyBackItem
+      // re-splits on the way out). The one arm that must clamp is charges: a
+      // charge-bearing payload can never merge, so a legitimate charge row is
+      // always count 1, and a hand-edited count would mint independent
+      // charge-bearing copies through the grant's fresh-slot clone.
+      meta.vendorBuyback = (s.vendorBuyback ?? []).map((raw) => {
+        const slot = cloneInvSlot(raw);
+        if (slot.instance && !isMergeableInstancePayload(slot.instance)) slot.count = 1;
+        return slot;
+      });
       // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
       // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
       meta.bank = sanitizeBankState(s.bank);
@@ -9339,6 +9352,15 @@ export class Sim {
     this.market.marketList(itemId, count, price, pid);
   }
 
+  marketListInstance(
+    itemId: string,
+    price: number,
+    instance: ItemInstancePayload,
+    pid?: number,
+  ): void {
+    this.market.marketListInstance(itemId, price, instance, pid);
+  }
+
   marketBuy(listingId: number, pid?: number): void {
     this.market.marketBuy(listingId, pid);
   }
@@ -10225,6 +10247,19 @@ export class Sim {
     const inst = riftInstanceAtPos(this.ctx, p.pos);
     if (!inst || inst.partyKey === null) return [];
     return inst.bossDeathZones;
+  }
+
+  // Milliseconds remaining before the current rift's backing world event stops
+  // admitting new parties (null outside a rift, or for a dev-spawned rift with no
+  // backing RiftEvent). Sim-clock arithmetic only (event.expiresAt and this.time are
+  // both sim-clock seconds), recomputed fresh on every call so a repeated read ticks
+  // down like raidLockouts() does, with no caching to go stale between ticks.
+  riftEventMsRemaining(): number | null {
+    const view = this.riftFloor;
+    if (!view || view.eventId === null) return null;
+    const event = this.riftEvents.find((candidate) => candidate.eventId === view.eventId);
+    if (!event) return null;
+    return Math.max(0, Math.round((event.expiresAt - this.time) * 1000));
   }
 
   get delveRun(): DelveRunInfo | null {

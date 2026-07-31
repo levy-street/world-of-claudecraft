@@ -753,4 +753,20 @@ export const table: DeedLocaleTable = {
     name: 'Heroisk: Vildhjärtats bassäng',
     desc: 'Besegra Zulgar, Bassängens röst, i Vildhjärtats bassäng på heroisk svårighetsgrad.',
   },
+  chr_marsh_rares_ii: {
+    name: 'Frossaren, uppräknad',
+    desc: 'Dräp Grävkäft Frossaren, en fjärde namnkunnig fasa i Dykärrsträsket som lämnades utanför den första räkningen.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Fler namn ristade i klippan',
+    desc: 'Dräp Gamle Klippkäft och Skärvherre Kazzix, två namnkunniga fasor till i Törntoppshöjderna som lämnades utanför den första räkningen.',
+  },
+  chr_gleamstag: {
+    name: 'Legenden som aldrig slog först',
+    desc: 'Dräp Skimmerhjorten, en sällsynt och skygg elit som bara anfaller när den trängs in i ett hörn.',
+  },
+  chr_hollow_rares: {
+    name: 'Hjorden minns',
+    desc: 'Dräp Gamla Märgskal och Aurelhorn, Först i hjorden, Slöjhålans två vandrande sällsynta bossar.',
+  },
 };

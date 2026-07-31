@@ -3247,8 +3247,6 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
   family_elemental: r('storm', 'sky', ['lightning'], ['glow']),
   family_dragonkin: r('fire', 'ember', ['claw_slash'], ['glow']),
   family_reptile: r('earth', 'leafGreen', ['fang']),
-  family_kobold: r('junk', 'gold', ['candle']),
-  family_murloc: r('drink', 'sky', ['droplet'], ['motion']),
   family_sheep: r('nature', 'silverWhite', ['sheep_head']),
   // status / interaction markers
   status_npc: r('parchment', 'gold', ['sigil_rune']),

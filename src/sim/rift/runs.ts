@@ -215,6 +215,14 @@ function emitRiftState(ctx: SimContext, pid: number, inst: RiftInstance, active:
       ? null
       : (ctx.riftEvents.find((candidate) => candidate.eventId === inst.eventId) ?? null);
   const contentId = event?.contentId ?? `procedural-v1:${inst.seed}:${inst.baseLevel}`;
+  // event.expiresAt is sim-clock seconds; convert to an epoch-comparable
+  // deadline through the shared lockoutNowMs seam (the same conversion
+  // rift/persistence.ts performs for save/load), so a client that never runs
+  // the sim tick loop can still tick a "closes in" countdown locally. Null for
+  // a dev-spawned rift, which has no backing RiftEvent (race.ts: dev portals
+  // are "deliberately outside the global race").
+  const expiresAtMs =
+    event === null ? null : Math.round(ctx.lockoutNowMs() + (event.expiresAt - ctx.time) * 1000);
   ctx.emit({
     type: 'riftState',
     pid,
@@ -232,6 +240,7 @@ function emitRiftState(ctx: SimContext, pid: number, inst: RiftInstance, active:
     name: floor.name,
     themeName: floor.themeName,
     tier: inst.tier,
+    expiresAtMs,
   });
 }
 

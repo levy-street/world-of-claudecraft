@@ -14,7 +14,7 @@ import { fbm2 } from '../sim/rng';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
 import { GFX } from './gfx';
 import { idleSlot } from './idle_queue';
@@ -73,7 +73,7 @@ const ALBEDO_ANISOTROPY = 8;
 const NORMAL_ANISOTROPY = 4;
 
 function kickTerrainTex(key: string, file: string, srgb: boolean): void {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true }).then((tex) => {
       tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
       TERRAIN_TEX[key] = tex;

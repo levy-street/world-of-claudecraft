@@ -888,6 +888,13 @@ export const pt_BR: EnTranslations = {
       "heroicName": "{name} Heroico",
       "heroicLocked": "Você está vinculado a {name} Heroico."
     },
+    "riftTracker": {
+      "title": "Fenda",
+      "floor": "Andar {current} de {total}",
+      "closesIn": "Fecha em {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -2120,6 +2127,7 @@ export const pt_BR: EnTranslations = {
         "noRecipient": "Ninguém com esse nome possui caixa de correio aqui.",
         "tooManyParcels": "Uma carta carrega no máximo {count} encomendas.",
         "noMailQuestItems": "Você não pode enviar itens de missão pelo correio.",
+        "noMailBound": "Esse item está vinculado e não pode ser enviado pelo correio.",
         "notEnoughItems": "Você não tem tantos assim para enviar.",
         "cantAffordPostage": "Você não pode pagar a postagem.",
         "recipientBoxFull": "A caixa de correio do destinatário está cheia.",
@@ -3530,14 +3538,6 @@ export const pt_BR: EnTranslations = {
       "reptile": {
         "name": "Répteis",
         "desc": "Caçadores de sangue frio com seu próprio silvo e bote, distintos das criaturas de sangue quente."
-      },
-      "murloc": {
-        "name": "Coaxa-barbatanas",
-        "desc": "Gente-peixe coaxante de margens de lagos e poças de maré, rápida em enxamear qualquer um que se aproxime demais."
-      },
-      "kobold": {
-        "name": "Traquinas",
-        "desc": "Batedores ágeis e duendes de clareiras e cercas vivas, mais incômodos que perigosos até se juntarem em grande número."
       },
       "demon": {
         "name": "Demônios",
@@ -6479,11 +6479,12 @@ export const pt_BR: EnTranslations = {
       "arenaQueueTrading": "Termine sua troca antes de entrar na fila.",
       "arenaQueueInstance": "Você não pode entrar na fila dentro de uma instância.",
       "tradeInProgress": "Já há uma troca em andamento.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Esse jogador já está em uma troca.",
       "tradeTooFar": "O alvo está longe demais para trocar.",
       "tradeExpired": "A solicitação de troca expirou.",
       "tradeFailed": "Troca falhou: itens ou dinheiro não estão mais disponíveis.",
-      "tradeBound": "Esse item está vinculado e não pode ser negociado."
+      "tradeBound": "Esse item está vinculado e não pode ser negociado.",
+      "marketListBound": "Esse item está vinculado e não pode ser colocado à venda."
     },
     "logs": {
       "standUp": "Você se levanta.",

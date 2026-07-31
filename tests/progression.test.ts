@@ -145,10 +145,12 @@ describe('content referential integrity', () => {
     // and another 20 whose only entries were quest-gated: rollLoot
     // (src/sim/loot/loot_roll.ts) drives entirely off template.loot, so both
     // shapes drop nothing outside their quest, not even copper. Require at
-    // least one entry with no questId gate. The only sanctioned lootless camp
-    // spawns are the practice target and the ambient stable horse, both
-    // non-combat fixtures by design.
-    const LOOTLESS_FIXTURES = new Set(['training_dummy', 'stable_horse']);
+    // least one entry with no questId gate. The sanctioned lootless camp
+    // spawns are the practice target and the ambient stable horse (both
+    // non-combat fixtures by design), plus the Gilded Stag: the farm-yield
+    // economy model (tests/economy_yield.test.ts) uses it as the quest-only,
+    // zero-coin exemplar on purpose.
+    const LOOTLESS_FIXTURES = new Set(['training_dummy', 'stable_horse', 'gilded_stag']);
     const problems: string[] = [];
     const seen = new Set<string>();
     for (const c of CAMPS) {

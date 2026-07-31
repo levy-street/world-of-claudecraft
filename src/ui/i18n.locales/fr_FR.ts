@@ -2524,6 +2524,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.noMailQuestItems':
     "Vous ne pouvez pas envoyer d'objets de quête par courrier.",
   'hudChrome.mailbox.result.noRecipient': 'Personne de ce nom ne possède de boîte aux lettres ici.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Cet objet est lié et ne peut pas être envoyé par courrier.',
   'hudChrome.mailbox.result.notEnoughItems': "Vous n'en avez pas autant à envoyer.",
   'hudChrome.mailbox.result.recipientBoxFull': 'Sa boîte aux lettres est pleine.',
   'hudChrome.mailbox.result.sent':
@@ -3789,6 +3791,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughHealth': 'Pas assez de points de vie.',
   'hud.errors.targetMustDodge': "Votre cible doit d'abord esquiver.",
   'hud.errors.tradeBound': 'Cet objet est lié et ne peut pas être échangé.',
+  'hud.errors.marketListBound': 'Cet objet est lié et ne peut pas être mis en vente.',
   'hud.errors.requiresCombo': 'Cette technique requiert des points de combo.',
   'hud.errors.requiresForm': 'Vous devez être en forme de {form}.',
   'hud.errors.bear': 'Bruin',
@@ -3841,6 +3844,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': 'Terminez votre échange avant de rejoindre la file.',
   'hud.errors.arenaQueueInstance': 'Vous ne pouvez pas rejoindre la file depuis une instance.',
   'hud.errors.tradeInProgress': 'Un échange est déjà en cours.',
+  'hud.errors.tradeAlreadyTrading': 'Ce joueur est déjà en train d’échanger.',
   'hud.errors.tradeTooFar': 'La cible est trop éloignée pour échanger.',
   'hud.errors.tradeExpired': "La demande d'échange a expiré.",
   'hud.errors.tradeFailed': 'Échange échoué : objets ou argent indisponibles.',
@@ -6768,12 +6772,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.name': 'Démons',
   'guide.family.demon.desc':
     "Des envahisseurs venus d'au-delà des failles, tout de feu et de rancune. Là où l'un se dresse, une brèche n'est jamais loin.",
-  'guide.family.kobold.name': 'Chenapans',
-  'guide.family.kobold.desc':
-    "Charognards agiles et lutins des clairières et des haies, plus nuisance que menace, jusqu'à ce qu'ils se regroupent en nombre.",
-  'guide.family.murloc.name': 'Coasse-Palmes',
-  'guide.family.murloc.desc':
-    "Peuple-poisson coassant des rives et des bassins de marée, prompt à submerger quiconque s'aventure trop près.",
   'guide.faqPage.a1':
     "Oui. Tout le jeu est gratuit jusqu'au niveau maximum, et le code source est ouvert sur GitHub.",
   'guide.faqPage.a2':
@@ -11051,4 +11049,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marque du fabricant',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': "Bonus d'ouvrage de maître",
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Lien de commande',
+  'hudChrome.riftTracker.title': 'Faille',
+  'hudChrome.riftTracker.floor': 'Étage {current} sur {total}',
+  'hudChrome.riftTracker.closesIn': 'Se ferme dans {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

@@ -296,6 +296,7 @@ import {
   abilityStartsAutoAttack,
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
+  isPvpHostileTarget,
 } from './hud/action_bar/attack_on_ability';
 import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './hud/action_bar/consumable_bar_view';
 import {
@@ -365,6 +366,7 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
+import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
 import { TrainLearnTracker } from './hud/vendor/train_learn_core';
@@ -830,6 +832,7 @@ const MAIL_RESULT_ERROR_KEYS: Record<MailResultCode, TranslationKey> = {
   noRecipient: 'hudChrome.mailbox.result.noRecipient',
   tooManyParcels: 'hudChrome.mailbox.result.tooManyParcels',
   noMailQuestItems: 'hudChrome.mailbox.result.noMailQuestItems',
+  noMailBound: 'hudChrome.mailbox.result.noMailBound',
   noMailSoulbound: 'hudChrome.itemSoulbound',
   notEnoughItems: 'hudChrome.mailbox.result.notEnoughItems',
   cantAffordPostage: 'hudChrome.mailbox.result.cantAffordPostage',
@@ -1428,6 +1431,7 @@ export class Hud {
   private selectedCraftTab: string | null = null;
   private readonly delveBoard: DelveBoardController;
   private readonly delveTracker: DelveTrackerController;
+  private readonly riftTracker: RiftFloorTrackerController;
   private readonly lockpickController: LockpickController;
   private readonly riteController: RiteController;
   private readonly questTracker: QuestTrackerController;
@@ -1633,6 +1637,10 @@ export class Hud {
       mobName: mobDisplayName,
       attachTooltip: (element, html) => this.attachTooltip(element, html),
       closeRitePanel: (restoreFocus) => this.closeRitePanel(restoreFocus),
+    });
+    this.riftTracker = new RiftFloorTrackerController({
+      element: $('#rift-tracker'),
+      world: () => this.sim,
     });
     this.delveBoard = new DelveBoardController({
       element: $('#delve-board'),
@@ -3924,8 +3932,8 @@ export class Hud {
     closeBank: () => this.closeBank(),
     onClosed: () => this.onBagsClosed(),
     addItemToTrade: (itemId) => this.addItemToTrade(itemId),
-    stageMarketSell: (itemId) => this.marketWindow.stageSell(itemId),
-    stageMailParcel: (itemId) => this.mailboxWindow.stageParcel(itemId),
+    stageMarketSell: (itemId, instance) => this.marketWindow.stageSell(itemId, instance),
+    stageMailParcel: (itemId, instance) => this.mailboxWindow.stageParcel(itemId, instance),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
     showError: (text) => this.showError(text),
     setPendingPetFeed: (active) => {
@@ -5320,6 +5328,9 @@ export class Hud {
     // a plain update() early-returns here and re-emits nothing. relocalize()
     // clears it for exactly one rebuild (#2529).
     this.delveTracker.relocalize();
+    // Same reason as delveTracker above: the rift floor tracker's signature is
+    // floor/timer numbers, none of which move with the locale.
+    this.riftTracker.relocalize();
     // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
     // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
@@ -5896,13 +5907,18 @@ export class Hud {
           // AOEs (Arcane Explosion, Frost Nova, Thunder Clap, ...) cast with no hostile
           // target, where startAutoAttack does NOT no-op but errors "Invalid attack
           // target." (sim/combat/auto_attack.ts). The explicit Attack button keeps that
-          // error feedback; this convenience path must not trip it.
+          // error feedback; this convenience path must not trip it. hasAutoAttackTarget
+          // also recognizes a live duel/arena opponent (#2451): a player target never
+          // carries the mob-only `hostile` flag, so it errored on every PvP cast.
           const tid = this.sim.player.targetId;
           const target = tid !== null ? (this.sim.entities.get(tid) ?? null) : null;
           if (
             this.optionsHooks?.settings.get('startAttackOnAbilityUse') &&
             abilityStartsAutoAttack(resolved.effects) &&
-            hasAutoAttackTarget(target)
+            hasAutoAttackTarget(
+              target,
+              isPvpHostileTarget(tid, this.sim.duelInfo, this.sim.arenaInfo),
+            )
           ) {
             // A TIMED cast must not engage yet: startAutoAttack aggros the target
             // immediately, so engaging at cast start pulled the mob before any
@@ -7994,6 +8010,7 @@ export class Hud {
 
       this.updateQuestTracker();
       this.updateDelveTracker();
+      this.updateRiftTracker();
       // Party frames run on the ~4Hz mediumHud band (the enclosing block) for EVERY tier.
       // The tier knobs deliberately do NOT tier them down on low: party-member HP is a healer's
       // only actionable signal (no self-dispel), so a graphics preset must not slow it
@@ -8432,6 +8449,10 @@ export class Hud {
 
   private updateDelveTracker(): void {
     this.delveTracker.update();
+  }
+
+  private updateRiftTracker(): void {
+    this.riftTracker.update();
   }
 
   // -------------------------------------------------------------------------
@@ -9377,6 +9398,9 @@ export class Hud {
         if (ev.crit && shouldPlayCritSfxForTarget(tgt))
           this.combat('combat_crit', tp.x, tp.y, tp.z, 1.0);
         // pain vocalization only on a crit — never on ordinary hits.
+        // player_hurt_female_1..5 exist under public/audio/sfx but are unwired: no
+        // gender field exists on PlayerMeta yet. Once the model swap defines one,
+        // resolve here via the mobVoiceCue hasCue-fallback pattern (src/ui/combat_sfx.ts).
         if (ev.crit && ev.targetId === sim.playerId) {
           this.combat('player_hurt', tp.x, tp.y, tp.z, 1.0, { cooldown: 0.3 });
         } else {
@@ -9497,6 +9521,10 @@ export class Hud {
           const voice = availableMobVoiceCue(ent.templateId, 'death');
           if (voice && shouldPlayMobVoiceSfxForEntity(ent)) this.combat(voice, p.x, p.y, p.z, 1.0);
         } else if (ent.kind === 'player' && ev.entityId !== sim.playerId) {
+          // player_death_female_1..3 exist under public/audio/sfx but are unwired,
+          // see the player_hurt note above. This branch is OTHER players dying;
+          // your OWN character's death sound is a separate trigger site,
+          // audio.playerDeath() in src/game/audio.ts.
           this.combat('player_death', p.x, p.y, p.z, 1.0);
         }
         return;
@@ -11357,7 +11385,8 @@ export class Hud {
             if (ev.success) {
               const castTid = sim.player.targetId;
               const castTarget = castTid !== null ? (sim.entities.get(castTid) ?? null) : null;
-              if (hasAutoAttackTarget(castTarget)) this.sim.startAutoAttack();
+              const castPvpHostile = isPvpHostileTarget(castTid, sim.duelInfo, sim.arenaInfo);
+              if (hasAutoAttackTarget(castTarget, castPvpHostile)) this.sim.startAutoAttack();
             }
           }
           break;
@@ -11872,6 +11901,7 @@ export class Hud {
       'The trade request has expired.': 'hud.errors.tradeExpired',
       'Trade failed: items or money no longer available.': 'hud.errors.tradeFailed',
       'That item is bound and cannot be traded.': 'hud.errors.tradeBound',
+      'That item is bound and cannot be listed.': 'hud.errors.marketListBound',
       'That quest is not available.': 'questUi.errors.unavailable',
       'That quest is not in your log.': 'questUi.errors.notInLog',
       'That quest is not complete.': 'questUi.errors.incomplete',

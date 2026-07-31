@@ -630,6 +630,21 @@ export const hudChromeStrings = {
     // mirrored yet ({name} = dungeon name).
     heroicLocked: 'You are locked to Heroic {name}.',
   },
+  // In-rift HUD tracker (issue #2655): floor position + a live "closes in"
+  // countdown on the rift's backing world event. Digits run through
+  // formatNumber; the clock templates are pre-built mm:ss / h:mm:ss so the
+  // separator stays a plain colon, like every other HUD clock (vcup, finder).
+  riftTracker: {
+    title: 'Rift',
+    // {current}/{total} are 1-based floor numbers (e.g. "Floor 2 of 5").
+    floor: 'Floor {current} of {total}',
+    // {time} is a pre-built clock string (see clockMs/clockHms below). This is
+    // about the overworld ENTRANCE closing to new parties, not the run ending:
+    // an in-progress group keeps playing out past this deadline.
+    closesIn: 'Closes in {time}',
+    clockMs: '{minutes}:{seconds}',
+    clockHms: '{hours}:{minutes}:{seconds}',
+  },
   // Eight-point compass abbreviations as drawn on the heading strip. Each locale
   // overrides with its own established compass abbreviations (e.g. West = "O" in
   // Spanish, "O" in French/Italian/Portuguese, "З" in Russian).
@@ -2322,6 +2337,8 @@ export const hudChromeStrings = {
       noRecipient: 'No one by that name holds a mailbox here.',
       tooManyParcels: 'A letter carries at most {count} parcels.',
       noMailQuestItems: 'You cannot mail quest items.',
+      // Wordy, M16: the five non-Latin fills land in this same change.
+      noMailBound: 'That item is bound and cannot be mailed.',
       notEnoughItems: 'You do not have that many to send.',
       cantAffordPostage: 'You cannot afford the postage.',
       recipientBoxFull: 'Their mailbox is full.',

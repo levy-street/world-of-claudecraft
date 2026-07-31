@@ -4369,6 +4369,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '英雄の証',
   'hudChrome.raidLockout.heroicName': 'ヒロイック:{name}',
   'hudChrome.raidLockout.heroicLocked': 'ヒロイックの{name}にロックされています。',
+  'hudChrome.riftTracker.title': 'リフト',
+  'hudChrome.riftTracker.floor': 'フロア {current}/{total}',
+  'hudChrome.riftTracker.closesIn': 'リフトは{time}後に閉じます',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
   'entities.items.morthens_cryptforged_hauberk.name': 'モルセンの墓鋳ホーバーク',
   'entities.items.shadowpulse_handwraps.name': 'シャドウパルスの手巻き',
   'entities.items.bonechill_striders.name': 'ボーンチルのストライダー',
@@ -6447,7 +6452,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.economy.mailBody':
     'どの拠点の町にも、ワタリガラスを彫った柱が立っています。レルムの手紙配達、レイヴンポストのメールボックスです。その前に立てば、オンラインの友人にも長くオフラインの相手にも、名前を指定してどのキャラクターへも手紙を書け、わずかな郵送料でコインや品物を手紙に添えられます。ワタリガラスが飛ぶには少し時間がかかります。届くと、封筒の印が受取人に何かが待っていると知らせてくれます。',
   'guide.economy.mailHow':
-    '受け取りも同じで、向きが逆になるだけです。どの柱の前でも手紙を読み、添えられたものを財布とバッグに納められます。手紙は永遠には待ってくれないので、ワタリガラスに見放される前に受け取りましょう。ポストがきっぱり断るものが二つあります。魂縛のアイテムとクエスト品は、あなた自身が運ぶか、まったく運ばれないかのどちらかです。そして、良い報告を終えたあとは柱に目を配りましょう。手紙をよこす発注者もいるのです。',
+    '受け取りも同じで、向きが逆になるだけです。どの柱の前でも手紙を読み、添えられたものを財布とバッグに納められます。手紙は永遠には待ってくれないので、ワタリガラスに見放される前に受け取りましょう。ポストがきっぱり断るものがいくつかあります。魂縛のアイテム、クエスト品、そしてバインド済みの品や取引で縛られる品は、あなた自身が運ぶか、まったく運ばれないかのどちらかです。そして、良い報告を終えたあとは柱に目を配りましょう。手紙をよこす発注者もいるのです。',
   'guide.economy.mailTitle': 'レイヴンポスト',
   'guide.economy.marketBody':
     '商人はワールドマーケットを運営しています。これは会うことのないかもしれない相手とも売買できる、プレイヤー主導の取引所です。イーストブルックの商人、あるいはハイウォッチの競売人ヴォスに話しかけると開けます。どちらの管理人も同じ一つの共有マーケットを扱っています。商人は自らの品も常に在庫として出品しているので、他のプレイヤーが何も出していないときでも、いつでも買えるものがあります。',
@@ -6764,12 +6769,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.duskGreeter': '守り手セルウィン、エルダーグリーム',
   'guide.worldPage.duskPlaceNotes':
     'エルダーグリームは大樹の下に集う。ダスクフォール洞窟とその見晴らし台が入り口であり、谷を初めて望む場所でもある。長老樹の森と星降りの盆地は静かな南を守り、沈んだ宮廷は東で草に覆われた遺跡を抱え、輝きの深みと水晶の浅瀬は北で淡く光る。',
-  'guide.family.murloc.name': 'クロークフィン',
-  'guide.family.murloc.desc':
-    '湖岸や潮だまりに棲む、しわがれ声の魚人たち。近づきすぎた者には、すぐさま群れをなして襲いかかります。',
-  'guide.family.kobold.name': 'いたずら小妖',
-  'guide.family.kobold.desc':
-    '林間や生け垣をちょろちょろと駆け回る、漁り屋の小妖たち。数が揃うまでは、脅威というより厄介者です。',
   'guide.family.demon.name': 'デーモン',
   'guide.family.demon.desc':
     '裂け目の彼方から来た侵略者たち。その身は炎と悪意のかたまりです。一体がいるところ、次元の裂け目は決して遠くありません。',
@@ -8206,6 +8205,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.noRecipient': 'その名前のメールボックスの持ち主はいません。',
   'hudChrome.mailbox.result.tooManyParcels': '1通の手紙に添付できる小包は最大{count}個です。',
   'hudChrome.mailbox.result.noMailQuestItems': 'クエストアイテムは郵送できません。',
+  'hudChrome.mailbox.result.noMailBound': 'そのアイテムはバインドされているため郵送できません。',
   'hudChrome.mailbox.result.notEnoughItems': '送るのに十分な数を持っていません。',
   'hudChrome.mailbox.result.cantAffordPostage': '郵送料を支払えません。',
   'hudChrome.mailbox.result.recipientBoxFull': '相手のメールボックスは満杯です。',
@@ -9964,6 +9964,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.resonant_steel.name': '共鳴の鋼',
   'entities.items.resonant_timber.name': '共鳴の木材',
   'hud.errors.tradeBound': 'そのアイテムはバインドされているため取引できません。',
+  'hud.errors.marketListBound': 'そのアイテムはバインドされているため出品できません。',
   'hudChrome.enchantName.enchant_weapon_might': '武器エンチャント - 剛力',
   'hudChrome.enchantName.enchant_weapon_intellect': '武器エンチャント - 呪文威力',
   'hudChrome.enchantName.enchant_helmet_fortitude': '頭エンチャント - 堅牢',
@@ -10501,7 +10502,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '最も堅実な商売は消耗品です。使えばなくなり、また買われるからです。薬、料理、エンチャントはすべて消えもの。剣を一度買った戦士も回復薬は永遠に買い続けます。傑作は高級品市場です。注文生産はできないため、望まれた一品には本物の上乗せがつき、刻まれた署名は歩く看板になります。素材が第三の柱です。分解で得る秘術素材、砕き手からエンチャンターへ直接流れるResonant副産物、そして傑作を狙う職人が割高でも買う署名入り採集素材です。',
   'guide.profPages.econ.marketHeading': '世界市場と手数料',
   'guide.profPages.econ.marketBody':
-    '世界市場はレルム全体の取引所で、EastbrookのMerchantとHighwatchのAuctioneer Vossが取り仕切ります。出品は無料。保証金はなく、売れ残りはそのまま戻ります。手数料は成立時のみ、売値の5%です。重要な制限として、市場が扱うのは無印の品だけです。署名入り、傑作、エンチャント済み、バインド済みの品は出品されないため、特別な品は取引ウィンドウで直接手渡しされます。値付けは自分で。市場が教えてくれるのは無印の相場だけです。',
+    '世界市場はレルム全体の取引所で、EastbrookのMerchantとHighwatchのAuctioneer Vossが取り仕切ります。出品は無料。保証金はなく、売れ残りはそのまま戻ります。手数料は成立時のみ、売値の5%です。特別な品も歓迎です。署名入り、傑作、エンチャント済みの品は一品ずつの単品出品となり、ツールチップに署名まで含めた素性がそのまま表示され、無印の山と混ざることはありません。唯一の拒否はバインドされた品です。作り手の絆で縛られた、またはこれから縛られる品は市場にも郵便にも出せず、絆を洗い流すことはできません。特別な品の値付けは自分で。無印の出品が教えてくれるのは無印の相場だけです。',
   'guide.profPages.econ.collectorsHeading': '収集家と戦利品、物語の値段',
   'guide.profPages.econ.collectorsBody':
     '商人は来歴を見ません。署名入りでもNPCへの売値は無印と同額です。署名の上乗せはプレイヤーの間にだけ存在し、だからこそ面白いのです。名の知れた採集者が署名した幸運の鉱石、Prime Cutの一切れ、引退した職人の名を刻む傑作の剣。値段は誰かの記憶が決めます。功績の書も同じ心を汲みます。Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen、Glimmer of Hopeはいずれも名声ゼロの収集印で、その瞬間があなたに起きた証のためだけにあります。これらは力ではありません。来歴は能力値を買わず、戦いにも勝ちません。良き日々の控えです。',
@@ -10597,7 +10598,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'スキルを動かす行動は二つ、分解とエンチャント付与です。成功ごとに最大1ポイント、仕事の重さで換算されます。コモンの分解と粉だけのエンチャントはコモンの仕事、良質の分解とエッセンスのエンチャントは良質、レアの分解とRunedやGreaterのエンチャントはレア、エピックと伝説の分解はさらに上です。お馴染みの熟達の薄れが25ポイント刻みで効き、コモンの仕事はスキル75で、良質は100で、レアの仕事はちょうど上限の125で灰色になります。エンチャントだけの情けもひとつ。天井を超える入力はゼロではなく天井へ丸められるため、誓う前でもエピックの分解はレアとして数えられ、無駄になりません。エンチャントが休眠に落ちればすべてコモン扱いで登りは75で止まり、趣味に据えればレアの仕事はまだ実り、75以降が遅くなるだけです。',
   'guide.profPages.craftProse.enchanting.marketHeading': '付与済みの品と来歴と市場',
   'guide.profPages.craftProse.enchanting.marketBody':
-    '付与は素材を消費し、特定の一品に印を付けます。鞄の中の品に使えば別個の付与済みの品が返り、装備中の品に使えばその場で付与され、外して着け直す必要はありません。どちらでも効果は永遠にその品に付き従います。一品にひとつ。付与済みの品に別の付与を使うと確認のうえ古い付与をそのまま置き換え、古い付与は素材の返却なしに破棄されます。売却、破棄、分解はどれも無印の品を先に選ぶので、完成品がうっかり食われることはありません。同一の付与品同士は重ねられます。傑作とエンチャントは友人です。傑作は問題なく付与でき、効果は傑作ボーナスにも署名にも触れず上乗せされます。全部を積んだ署名入り傑作のGreater付与が工芸品の頂点で、それでも設計上レイド戦利品の下に座ります。世界市場は無印の品しか扱わないため、付与済みや署名入りは取引ウィンドウで直接手渡し。市場に出せる半分は素材の方です。粉、エッセンス、シャードは自由に出品でき、出品無料、手数料は成立時の5%だけです。',
+    '付与は素材を消費し、特定の一品に印を付けます。鞄の中の品に使えば別個の付与済みの品が返り、装備中の品に使えばその場で付与され、外して着け直す必要はありません。どちらでも効果は永遠にその品に付き従います。一品にひとつ。付与済みの品に別の付与を使うと確認のうえ古い付与をそのまま置き換え、古い付与は素材の返却なしに破棄されます。売却、破棄、分解はどれも無印の品を先に選ぶので、完成品がうっかり食われることはありません。同一の付与品同士は重ねられます。傑作とエンチャントは友人です。傑作は問題なく付与でき、効果は傑作ボーナスにも署名にも触れず上乗せされます。全部を積んだ署名入り傑作のGreater付与が工芸品の頂点で、それでも設計上レイド戦利品の下に座ります。付与済みや署名入りの品も世界市場に出せます。一品ずつの単品出品となり、ツールチップには付与と作り手の銘が表示され、ワタリガラス便でも同じように送れます。素材は今も商いの堅実な半分です。粉、エッセンス、シャードは自由に出品でき、出品無料、手数料は成立時の5%だけです。',
   'hudChrome.corpseHarvest.components.meat': '肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（エンチャント）',
   'hudChrome.materialHint.arcaneDust':
