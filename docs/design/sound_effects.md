@@ -85,6 +85,12 @@ not change the exit code), so the shipped world clips, which predate the mono
 policy, do not break the gate before the one-time re-process. Pass
 `npm run sfx:check -- --strict` to promote them to failures, and
 `npm run sfx:conform` (`--fix`) to conform loudness and downmix in a single pass.
+The 8 `player_hurt_female_1..5` / `player_death_female_1..3` clips under
+`public/audio/sfx/` are an intentional, temporary exception to the naming rule:
+they are staged ahead of the player-gender model swap (no `PlayerMeta` gender
+field exists yet to key playback on), so `--strict` currently flags all 8 as
+"not a catalog key, numbered variant, or mob subfamily file". That is expected
+noise, not a regression, until the swap lands and wires them under a real key.
 
 A third advisory category flags a `custom: true` key whose measured LUFS lands
 suspiciously close to the generated-content target (`TARGET_LUFS`, -14): the

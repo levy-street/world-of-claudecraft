@@ -9349,7 +9349,7 @@ export class Hud {
         // pain vocalization only on a crit — never on ordinary hits.
         // player_hurt_female_1..5 exist under public/audio/sfx but are unwired: no
         // gender field exists on PlayerMeta yet. Once the model swap defines one,
-        // resolve here via the mobVoiceCue hasCue-fallback pattern (combat_sfx.ts).
+        // resolve here via the mobVoiceCue hasCue-fallback pattern (src/ui/combat_sfx.ts).
         if (ev.crit && ev.targetId === sim.playerId) {
           this.combat('player_hurt', tp.x, tp.y, tp.z, 1.0, { cooldown: 0.3 });
         } else {
@@ -9471,7 +9471,9 @@ export class Hud {
           if (voice && shouldPlayMobVoiceSfxForEntity(ent)) this.combat(voice, p.x, p.y, p.z, 1.0);
         } else if (ent.kind === 'player' && ev.entityId !== sim.playerId) {
           // player_death_female_1..3 exist under public/audio/sfx but are unwired,
-          // see the player_hurt note above.
+          // see the player_hurt note above. This branch is OTHER players dying;
+          // your OWN character's death sound is a separate trigger site,
+          // audio.playerDeath() in src/game/audio.ts.
           this.combat('player_death', p.x, p.y, p.z, 1.0);
         }
         return;
