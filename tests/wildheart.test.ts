@@ -259,13 +259,19 @@ describe('Wildheart Basin dungeon content', () => {
     // petSpell replays the melee Attack clip on every impact, which read as
     // the stalker whiffing melee swings from 24yd.
     expect(MOBS.wildheart_stalker.petSpell?.school).toBe('nature');
-    // "Fast melee pressure" must actually outrun a moving player (RUN_SPEED 7).
-    expect(MOBS.wildheart_ravager.moveSpeed).toBeGreaterThan(RUN_SPEED);
-    // The ravager keeps its scale-derived reach but closes to visual contact
+    // "Fast melee pressure" must actually outrun a moving player: the shipped
+    // 7.1 vs RUN_SPEED 7 closed at 0.1 yd/s and never caught anyone, and a
+    // bare toBeGreaterThan(RUN_SPEED) would have accepted that regression, so
+    // pin the margin.
+    expect(MOBS.wildheart_ravager.moveSpeed).toBeGreaterThanOrEqual(RUN_SPEED + 0.5);
+    // The bruisers keep their scale-derived reach but close to visual contact
     // before trading, so landed hits no longer read as whiffs.
-    const profile = combatProfileForMob('wildheart_ravager', 2);
-    expect(profile.meleeRange).toBe(scaledDefaultMobMeleeRange(2));
-    expect(profile.desiredRange).toBe(5);
+    const ravager = combatProfileForMob('wildheart_ravager', 2);
+    expect(ravager.meleeRange).toBe(scaledDefaultMobMeleeRange(2));
+    expect(ravager.desiredRange).toBe(5);
+    const beastmaster = combatProfileForMob('wildheart_beastmaster', 2.35);
+    expect(beastmaster.meleeRange).toBe(scaledDefaultMobMeleeRange(2.35));
+    expect(beastmaster.desiredRange).toBe(5.5);
   });
 
   it('lets the Idol Guardian phase through the ruin-ring relic debris', () => {

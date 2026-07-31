@@ -19,10 +19,13 @@
 //   node scripts/_add_wildheart_death_anim.mjs [in.glb] [out.glb]
 //
 // With no args it edits all five creature GLBs in place; with args it processes
-// the one file. Idempotent: 'Death' is dropped before re-authoring, and the
-// trims skip clips already at game length. Meshopt encoder/decoder are
-// registered like the cantor script (these particular GLBs ship uncompressed
-// with WebP textures, which the write preserves).
+// the one file. Byte-stable from the FIRST pass: 'Death' is dropped and
+// re-authored AFTER the trims (matching the accessor order a guard-skipping
+// re-run reproduces, so f(raw) == f(f(raw)) and re-runs never invalidate the
+// minted media-manifest hashes), and the trims skip clips already at game
+// length. Meshopt encoder/decoder are registered like the cantor script (these
+// particular GLBs ship uncompressed with WebP textures, which the write
+// preserves).
 //
 // AXIS NOTE: this is the 41-joint Tripo biped (Root/Hip/Pelvis/Waist/...),
 // authored facing local +X — every wildheart VisualDef corrects with
@@ -302,6 +305,34 @@ async function processFile(inPath, outPath) {
     return node;
   };
 
+  // --- Attack / Hit trims ----------------------------------------------------
+  // Trimmed BEFORE the Death re-author on purpose: a re-run drops and
+  // re-appends Death after these guard-skipped trims, so authoring Death last
+  // on the first pass too means pass one already produces the byte-stable
+  // accessor order a re-run reproduces (f(raw) == f(f(raw))). With Death
+  // authored first, the first pass permutes accessors relative to every later
+  // pass and silently invalidates freshly minted media-manifest hashes.
+  for (const [clipName, window, guard, tag] of [
+    ['Attack', ATTACK_WINDOW, ATTACK_TRIMMED_BELOW, 'whAttackTrim'],
+    ['Hit', HIT_WINDOW, HIT_TRIMMED_BELOW, 'whHitTrim'],
+  ]) {
+    const anim = root.listAnimations().find((a) => a.getName() === clipName);
+    if (!anim) {
+      console.error(`${inPath}: missing clip ${clipName}`);
+      process.exit(1);
+    }
+    if (clipDuration(anim) < guard) continue; // already trimmed
+    const old = trimAnimation(doc, buffer, anim, window[0], window[1], tag);
+    const keep = new Set();
+    for (const other of root.listAnimations()) {
+      for (const s of other.listSamplers()) {
+        keep.add(s.getInput());
+        keep.add(s.getOutput());
+      }
+    }
+    for (const acc of old) if (!keep.has(acc)) acc.dispose();
+  }
+
   // --- Death: drop the loop-closed take, author the topple -------------------
   const priorDeath = root.listAnimations().filter((a) => a.getName() === 'Death');
   disposeOwnedAccessors(root, priorDeath);
@@ -374,28 +405,6 @@ async function processFile(inPath, outPath) {
       D_LIMP.flatMap((f) => qMul(slumpRot(sign * peak * f), rest)),
       `whDeathSlump_${name}`,
     );
-  }
-
-  // --- Attack / Hit trims ----------------------------------------------------
-  for (const [clipName, window, guard, tag] of [
-    ['Attack', ATTACK_WINDOW, ATTACK_TRIMMED_BELOW, 'whAttackTrim'],
-    ['Hit', HIT_WINDOW, HIT_TRIMMED_BELOW, 'whHitTrim'],
-  ]) {
-    const anim = root.listAnimations().find((a) => a.getName() === clipName);
-    if (!anim) {
-      console.error(`${inPath}: missing clip ${clipName}`);
-      process.exit(1);
-    }
-    if (clipDuration(anim) < guard) continue; // already trimmed
-    const old = trimAnimation(doc, buffer, anim, window[0], window[1], tag);
-    const keep = new Set();
-    for (const other of root.listAnimations()) {
-      for (const s of other.listSamplers()) {
-        keep.add(s.getInput());
-        keep.add(s.getOutput());
-      }
-    }
-    for (const acc of old) if (!keep.has(acc)) acc.dispose();
   }
 
   await io.write(outPath, doc);

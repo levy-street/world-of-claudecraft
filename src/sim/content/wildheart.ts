@@ -63,9 +63,13 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       // 'nature', not 'physical': a physical-school petSpell replays the
       // attacker's melee Attack clip on every impact (renderer damage-event
       // heuristic), so the thrower looked like it was whiffing melee swings
-      // from 24yd. Nature keeps identical damage/resist math (hostile
-      // petSpells take no armor step and resist is school-independent) and
-      // renders the venom-vine spear as a visible projectile.
+      // from 24yd. The roll path is unchanged (hostile petSpells take no
+      // armor step; resist is school-independent), and every other petSpell
+      // in the game is a magic school — but dealDamage's school-scoped folds
+      // DO shift: physical-only DR (a prot warrior's Raised Guard) and the
+      // physical-amp debuff stop applying to the spear, and magic-amp
+      // debuffs start. Revisit the stalker's rangedDamageMultiplierByMob
+      // tuning if tank intake reads hot.
       name: 'Razorvine Spear',
       school: 'nature',
       min: 26,

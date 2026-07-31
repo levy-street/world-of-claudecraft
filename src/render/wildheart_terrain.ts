@@ -742,12 +742,27 @@ function buildCalderaRimRibs(): THREE.Mesh {
         const r = 3 + hash(i, side * 9) * 3.5;
         stack(x, z, h, r, i * 17 + side, i % 4 === 0 ? LIMESTONE_RIB_LIGHT : LIMESTONE_RIB_DARK);
       }
+      // Staggered infill offset half a step: an elevated camera (eye ~23yd at
+      // full zoom-out + pitch) sees -8..-10deg below-horizon slivers BETWEEN
+      // the primary stacks; a second offset row closes the gaps without
+      // thickening the silhouette at ground level.
+      for (let i = 0; i < 20; i++) {
+        const z = -21 + i * 14;
+        const x = side * (87.5 + hash(i, side * 21) * 3.5);
+        const h = 10 + hash(i, side * 23) * 14;
+        const r = 2.6 + hash(i, side * 27) * 3;
+        stack(x, z, h, r, i * 19 + side + 700, i % 3 === 0 ? LIMESTONE_RIB_LIGHT : LIMESTONE_RIB_DARK);
+      }
     }
     for (let i = 0; i < 13; i++) {
       // North end row in the wall-to-cut margin (wall z=242, mesh edge z=249).
-      // The shoulder heightfield already stands tall here, so short stacks do.
+      // The shoulder heightfield stands tall mid-row, but it keys on |x| only
+      // and the temple flat holds the terrace at 10.5, so an elevated camera
+      // (zoom 22, pitch 1.35 puts the eye ~23yd up) sees over short corner
+      // stacks: ramp the heights up toward the corners, where the raycast
+      // probe measured 20-33 deg below-horizon escape bands.
       const nx = -84 + i * 14 + (hash(i, 51) - 0.5) * 4;
-      const nh = 9 + hash(i, 53) * 9;
+      const nh = 9 + hash(i, 53) * 9 + Math.max(0, (Math.abs(nx) - 52) / 32) * 15;
       const nr = 2.6 + hash(i, 55) * 1.6;
       stack(
         nx,
@@ -771,6 +786,16 @@ function buildCalderaRimRibs(): THREE.Mesh {
         i + 500,
         i % 3 === 0 ? LIMESTONE_RIB_LIGHT : LIMESTONE_RIB_DARK,
       );
+    }
+    // The four mesh corners (±92, 249) and (±92, -31) sit past both the side
+    // screens (end z 238) and the end rows (span |x| 84): without their own
+    // tall clusters they are exactly the NE/NW/SE/SW diagonal windows the
+    // elevated-camera probe found open.
+    for (let side = -1; side <= 1; side += 2) {
+      stack(side * 88, 242, 24 + hash(side, 71) * 6, 4.4, side * 3 + 600, LIMESTONE_RIB_LIGHT);
+      stack(side * 90, 247.5, 20 + hash(side, 73) * 6, 3.6, side * 5 + 610, LIMESTONE_RIB_DARK);
+      stack(side * 88, -26, 22 + hash(side, 75) * 6, 4.2, side * 7 + 620, LIMESTONE_RIB_DARK);
+      stack(side * 90, -30, 19 + hash(side, 77) * 5, 3.4, side * 9 + 630, LIMESTONE_RIB_LIGHT);
     }
     const merged = mergeGeometries(stacks, false);
     if (!merged) throw new Error('Wildheart rim rib geometry merge failed');
@@ -796,8 +821,12 @@ function buildDistantCanopyRidge(): THREE.Mesh {
     // ritual pyramid. Seated lower than the Orkadia template (base ~y 4, not
     // ~14): the temple-axis crest here is only ~10.5, so a higher base opens a
     // sky sliver beneath the canopy line.
-    for (let i = 0; i < 9; i++) {
-      const x = -46 + i * 11.5;
+    // 15 peaks spanning x -84..84, not the template's 9 across -46..46: the
+    // mesh corners are at |x|=92, and a ridge that stops at |x|~64 (cone base
+    // included) leaves the NE/NW diagonals from the boss terrace as open
+    // below-horizon windows at elevated camera pitch.
+    for (let i = 0; i < 15; i++) {
+      const x = -84 + i * 12;
       const h = 34 + hash(i, 81) * 36;
       const r = 10 + hash(i, 82) * 8;
       const peak = new THREE.ConeGeometry(r, h, 5);
@@ -809,8 +838,8 @@ function buildDistantCanopyRidge(): THREE.Mesh {
     // war-gate wall, the jaguar gate is an open arch, so the horizon behind
     // the arrival flat needs its own canopy line; bases sink below the flat's
     // y=0 so the perimeter skirt hides them.
-    for (let i = 0; i < 6; i++) {
-      const x = -50 + i * 20 + (hash(i, 91) - 0.5) * 6;
+    for (let i = 0; i < 9; i++) {
+      const x = -84 + i * 21 + (hash(i, 91) - 0.5) * 6;
       const h = 30 + hash(i, 92) * 30;
       const r = 12 + hash(i, 93) * 8;
       const peak = new THREE.ConeGeometry(r, h, 5);

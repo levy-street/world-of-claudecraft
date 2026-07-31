@@ -1708,14 +1708,26 @@ export const JUNGLE_GRASS_TINT: number = GRASS_TINT.jungle;
 export function createGrassTuftMaterial(): THREE.Material {
   const mat = configureMaskedDoubleSidedVegetationMaterial(
     new THREE.MeshStandardMaterial({
+      // grassTuftTexture draws from textures.ts's shared sequential LCG, and
+      // this material is built lazily on first interior entry, so the card's
+      // blade layout (and the stream position of any texture generated after
+      // it) depends on when in the session the basin first builds. Cosmetic
+      // only, and the Yumi maze's lazy stoneTexture already ships the same
+      // order-dependence; a per-module stateless hash would fix it at the
+      // cost of duplicating the tuft painter.
       map: grassTuftTexture(30),
       alphaTest: 0.3,
       roughness: 0.9,
     }),
   );
   applyGrassShader(mat, {
+    // uFadeFar must comfortably exceed the parked distance: the fade term is
+    // 1 - smoothstep(uFadeFar*0.7, uFadeFar, distance(vTuftWorld, uPlayerPos)),
+    // so with the player parked at (1e6,1e6) a uFadeFar of 1e6 SATURATES the
+    // smoothstep (every tuft sits ~1.414e6 away) and alphaTest discards every
+    // fragment — an invisible scatter. 1e8 keeps the factor at exactly 1.
     uPlayerPos: { value: new THREE.Vector2(1e6, 1e6) },
-    uFadeFar: { value: 1e6 },
+    uFadeFar: { value: 1e8 },
   });
   return mat;
 }

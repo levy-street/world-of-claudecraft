@@ -68,6 +68,16 @@ export function combatProfileForMob(templateId: string, scale: number): MobComba
       meleeRange: scaledDefaultMobMeleeRange(2),
       desiredRange: 5,
     };
+  if (templateId === 'wildheart_beastmaster')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      // Same whiff geometry as the ravager, one size up (scale 2.35 settles
+      // at 7.24): the pack-leader bruiser also closes to contact. Zulgar is
+      // deliberately left on the scale default — the boss fight is built on
+      // knockback/pulse spacing and his reach reads as boss presence.
+      meleeRange: scaledDefaultMobMeleeRange(2.35),
+      desiredRange: 5.5,
+    };
   if (templateId === 'thunzharr_waking_peak')
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,
