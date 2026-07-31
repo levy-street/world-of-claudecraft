@@ -1,11 +1,14 @@
 // Sustainable farm yield: what a stretch of open world can pay per hour if a
 // player kills everything in it as fast as it comes back.
 //
-// A pure leaf (no SimContext, no state): a Vitest imports it directly. Nothing
-// in the live sim calls it. It exists so the balance question "how much gold and
-// XP per hour does this patch of world support?" is answered by one shared model
-// that guard tests pin (tests/camp_density.test.ts, tests/economy_yield.test.ts),
-// instead of by hand arithmetic in a review comment.
+// A TEST HELPER, not sim code: nothing in the live sim calls it, so it lives
+// beside the suites that do rather than shipping unreferenced inside the
+// deterministic core. It reads the real content tables and the real respawn
+// policy, so it stays honest about the world it prices. It exists so the balance
+// question "how much gold and XP per hour does this patch of world support?" is
+// answered by one shared model that guard tests pin
+// (tests/camp_density.test.ts, tests/economy_yield.test.ts), instead of by hand
+// arithmetic in a review comment.
 //
 // The model is a CEILING, deliberately generous to the farmer: it assumes zero
 // travel and kill time, every mob dead the instant it respawns, every non-quest
@@ -22,10 +25,10 @@
 // which for most of them is zero. Read a beast camp's copperPerHour as "coin and
 // vendorable drops", not "everything a skinner can make from it".
 
-import { CAMPS, ITEMS, MOBS, zoneContaining } from './data';
-import { resolveRespawnSeconds } from './respawn_policy';
-import type { CampDef, MobTemplate } from './types';
-import { mobXpValue } from './types';
+import { CAMPS, ITEMS, MOBS, zoneContaining } from '../../src/sim/data';
+import { resolveRespawnSeconds } from '../../src/sim/respawn_policy';
+import type { CampDef, MobTemplate } from '../../src/sim/types';
+import { mobXpValue } from '../../src/sim/types';
 
 /**
  * Two camps join the same farm cluster when their centers are within this many
@@ -34,7 +37,16 @@ import { mobXpValue } from './types';
  */
 export const CLUSTER_LINK_DISTANCE = 60;
 
-/** Guaranteed-plus-chance coin per kill, in copper. */
+/**
+ * Guaranteed-plus-chance coin per kill, in copper, at the NOMINAL authored
+ * value. The live roll spreads it (loot/loot_roll.ts rolls
+ * `rng.int(ceil(c * 0.6), ceil(c * 1.4))`, inclusive), whose mean is exactly the
+ * nominal value whenever c is a multiple of 5, which every curve fill is. Off
+ * the fives the two ceils round the mean up a little, reaching about +17% on a
+ * 3-copper drop, so this arm is very slightly CONSERVATIVE there rather than
+ * generous. Called out because the rest of the model is deliberately generous to
+ * the farmer, and that asymmetry should be visible instead of assumed away.
+ */
 export function coinEvPerKill(template: MobTemplate): number {
   let copper = 0;
   for (const entry of template.loot) {

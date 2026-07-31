@@ -1,16 +1,16 @@
 // Guards camp DENSITY: how many mobs one farm route can hold at once, and the
 // specific Thornpeak corridor de-stack that motivated the model
-// (src/sim/farm_yield.ts).
+// (tests/helpers/farm_yield.ts).
 import { describe, expect, it } from 'vitest';
 import { CAMPS, MOBS, zoneContaining } from '../src/sim/data';
+import type { MobTemplate } from '../src/sim/types';
 import {
   type CampYield,
   CLUSTER_LINK_DISTANCE,
   campYield,
   clusterCamps,
   worldFarmClusters,
-} from '../src/sim/farm_yield';
-import type { MobTemplate } from '../src/sim/types';
+} from './helpers/farm_yield';
 
 /**
  * The most mobs a single fast-respawning trash cluster may hold. Eastbrook
@@ -123,14 +123,42 @@ describe('no farm cluster is overdense', () => {
     expect(largest).toBeGreaterThan(MAX_MOBS_PER_CLUSTER * 0.8);
   });
 
+  it('keeps every camp INSIDE an authored zone rect, even at its radius corners', () => {
+    // THE hole this guard exists to close. A camp that overhangs a zone edge has
+    // spawn points where zoneContaining is null, and the respawn policy hands
+    // those the 25s off-map fallback: a fast-farm pocket strictly worse than the
+    // pre-tier world, landing silently. Checked at the corners, not just the
+    // centre, because mobs scatter across the whole radius.
+    const outside: string[] = [];
+    for (const camp of CAMPS) {
+      const corners: [number, number][] = [
+        [0, 0],
+        [camp.radius, 0],
+        [-camp.radius, 0],
+        [0, camp.radius],
+        [0, -camp.radius],
+      ];
+      for (const [dx, dz] of corners) {
+        if (zoneContaining(camp.center.x + dx, camp.center.z + dz) === null) {
+          outside.push(`${camp.mobId} at (${camp.center.x},${camp.center.z}) r=${camp.radius}`);
+          break;
+        }
+      }
+    }
+    expect(outside).toEqual([]);
+    // ...and the sweep really looked at every camp, so an empty CAMPS or a
+    // short-circuited loop could not pass the row above.
+    expect(CAMPS.length).toBeGreaterThanOrEqual(175);
+  });
+
   it('never lets a camp straddle a zone seam, which the yield model assumes', () => {
     // farm_yield prices a camp from its CENTER's zone, while the live sim
     // resolves respawn per mob from its own spawn point. Those agree only while
-    // no camp's scatter radius crosses a band boundary.
+    // no camp's scatter radius crosses a band boundary, which would otherwise
+    // price a camp at one tier while its mobs respawned on another.
     const straddling: string[] = [];
     for (const camp of CAMPS) {
       const home = zoneContaining(camp.center.x, camp.center.z);
-      if (!home) continue;
       for (const [dx, dz] of [
         [camp.radius, 0],
         [-camp.radius, 0],
@@ -138,7 +166,7 @@ describe('no farm cluster is overdense', () => {
         [0, -camp.radius],
       ]) {
         const edge = zoneContaining(camp.center.x + dx, camp.center.z + dz);
-        if (edge?.id !== home.id) {
+        if (edge?.id !== home?.id) {
           straddling.push(`${camp.mobId} at (${camp.center.x},${camp.center.z}) r=${camp.radius}`);
           break;
         }
