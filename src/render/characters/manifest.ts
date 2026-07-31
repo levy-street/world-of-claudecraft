@@ -46,6 +46,13 @@ export interface ClipMap {
   stow?: string;
   /** player-facing overhead emote one-shots; clips are sourced from the GLB. */
   emote?: Partial<Record<OverheadEmoteId, EmoteClipSpec>>;
+  /** Bow-native ranged cycle (the v04 hunter): the draw one-shot, the drawn
+   *  aim-hold loop, and the release one-shot whose pre-snap segment is scrubbed
+   *  against the shot countdown so the string-snap frame lands exactly on the
+   *  projectile launch (`releaseArmAt`, seconds into the release clip). A rig
+   *  missing any of the three clips keeps the plain attack one-shot at launch
+   *  (visual.ts gates at action-bind time; see bow_cycle.ts). */
+  rangedBow?: { draw: string; hold: string; release: string; releaseArmAt: number };
 }
 
 export interface AttachDef {
@@ -174,6 +181,12 @@ const KAYKIT_EMOTES: Partial<Record<OverheadEmoteId, EmoteClipSpec>> = {
   roar: { clips: ['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop', 'Cheer'], timeScale: 0.9 },
   kneel: { clips: ['Sit_Floor_Down'], timeScale: 0.85 },
 };
+
+/** Seconds into Bow_Release where the string snaps (the launch-alignment frame,
+ *  measured off the authored clip: the string hand's angular-velocity spike sits
+ *  between the 0.133s and 0.167s keys, so the scrub parks at full draw and the
+ *  free-run from here snaps within a frame of the projectile spawn). */
+export const BOW_RELEASE_ARM_AT = 0.133;
 
 const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
   idle,
@@ -758,19 +771,32 @@ export const VISUALS: Record<string, VisualDef> = {
     // ranger.glb (+ its ranger skins).
     url: `${PLAYERS}/hunter_male_v02.glb`,
     height: PLAYER_H,
-    // 2H_Ranged_Shoot is the bow auto-shot. No attackByAbility: aimed_shot's 3s
-    // cast draws via the base cast state (Spellcasting = the bow draw); every
-    // instant shot/trap/sting plays no cast anim (the shots fire via the weapon
-    // path). The crossbow is fixed to the hand (no weaponSlots swap).
-    clips: kaykit(['2H_Ranged_Shoot']),
-    // Bow-draw clips for the Season 1 bow skins (scripts/build_bow_anims.mjs):
-    // with a bow displayed the shot plays a draw instead of the crossbow
-    // shoulder-aim (visual.ts weaponSkinAttackClips).
+    // The v04 rig authors the ranged kit as a real archer cycle (rangedBow
+    // below): Spellcasting is the bow DRAW, 2H_Ranged_Shoot the drawn aim-hold
+    // loop, Bow_Release the string-snap + follow-through whose snap frame the
+    // bow_cycle module lands exactly on the projectile launch. aimed_shot's 3s
+    // cast rides the same cycle (the cast state plays the draw; the release
+    // scrubs against the replicated cast countdown). The plain attack list is
+    // the point-blank fallback: a melee swing (Raptor Strike inside the dead
+    // zone) chops with the offhand hatchet arm rather than re-aiming the bow.
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop']),
+      rangedBow: {
+        draw: 'Spellcasting',
+        hold: '2H_Ranged_Shoot',
+        release: 'Bow_Release',
+        releaseArmAt: BOW_RELEASE_ARM_AT,
+      },
+    },
+    // Bow_Draw_Shot (scripts/build_bow_anims.mjs) rides along for the KayKit
+    // rigs that inherit these animUrls (the mech suit): its tracks target the
+    // old Rig_Medium bone names, so on this mixamorig body it binds nothing.
     animUrls: [`${PLAYERS}/bow_anims.glb`],
     // LEFT hand: the ranged clip set extends the left arm toward the target and
-    // keeps the right back, so the weapon reads correctly in the front hand. The
-    // mirrored left seat for this model lives in KAYKIT_HAND_GRIPS['1H_Crossbow'].
-    attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.l' }],
+    // keeps the right back as the string hand, so the bow reads correctly in
+    // the front hand. A displayed bow/crossbow skin substitutes this fixed
+    // attach (assets.ts RANGED_SWAP_BASENAMES); equipped melee items never do.
+    attach: [{ url: `${WEAPONS}/fletcher_s_guild_bow.glb`, bone: 'handslot.l' }],
     skinMeshNames: ['Torso', 'Arms', 'Pants'],
     cosmetics: V02_HEAD_COSMETICS,
   },
@@ -1569,8 +1595,23 @@ const MECH_SUIT_CLASSES: readonly PlayerClass[] = [
 for (const cls of MECH_SUIT_CLASSES) {
   const base = VISUALS[`player_${cls}`];
   if (base) {
+    const variant = armoredVariant(base, `player_${cls}`, `${PLAYERS}/${cls}_mech.glb`, false);
     VISUALS[`player_${cls}_mech`] = {
-      ...armoredVariant(base, `player_${cls}`, `${PLAYERS}/${cls}_mech.glb`, false),
+      ...variant,
+      // The suit is the old KayKit Rig_Medium, not the class body's mixamorig
+      // skeleton: the hunter's bow cycle clips (Bow_Release) bind nothing there,
+      // so the suit keeps the authored arm-cannon shoulder-aim one-shot instead
+      // of inheriting the cycle (rangedBow off, 2H_Ranged_Shoot restored), and
+      // keeps its crossbow: the base body's default bow would read backwards
+      // against the shoulder-aim clip.
+      clips:
+        cls === 'hunter'
+          ? { ...variant.clips, attack: ['2H_Ranged_Shoot'], rangedBow: undefined }
+          : variant.clips,
+      attach:
+        cls === 'hunter'
+          ? [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.l' }]
+          : variant.attach,
       // Mech-family loading: kept out of the boot sweep like player_mech, warmed
       // by preloadMechAssets() alongside it (see mechVisualKeys).
       lazyPreload: true,

@@ -21,6 +21,13 @@ export interface AnimState {
   spinning?: boolean;
   swimming: boolean;
   sitting: boolean;
+  /** Bow-cycle facts (bow_cycle.ts writeBowShotInputs): the rig wants the bow
+   *  raised, whether that intent is authoritative (the local player) or
+   *  launch-event-latched (remote rigs), and the seconds until the predicted
+   *  launch (null = unknown). */
+  bowEngaged?: boolean;
+  bowLocalIntent?: boolean;
+  bowTimeToShot?: number | null;
 }
 
 /** Copy authoritative cast facts into the renderer's reusable animation state. */

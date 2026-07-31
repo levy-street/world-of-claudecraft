@@ -167,7 +167,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/chars/players/druid_male_v02.glb": "/media/models/chars/players/druid_male_v02.40b6a72c89b9.glb",
   "models/chars/players/druid_mech.glb": "/media/models/chars/players/druid_mech.5eb3162ade22.glb",
   "models/chars/players/hunter_lvl20.glb": "/media/models/chars/players/hunter_lvl20.5e74ff74a093.glb",
-  "models/chars/players/hunter_male_v02.glb": "/media/models/chars/players/hunter_male_v02.027ca23d9db1.glb",
+  "models/chars/players/hunter_male_v02.glb": "/media/models/chars/players/hunter_male_v02.6224716452ba.glb",
   "models/chars/players/hunter_mech.glb": "/media/models/chars/players/hunter_mech.1ca5004c0a70.glb",
   "models/chars/players/knight.glb": "/media/models/chars/players/knight.ce0d0a5ec1d6.glb",
   "models/chars/players/mage.glb": "/media/models/chars/players/mage.473bcf6ad4d1.glb",
