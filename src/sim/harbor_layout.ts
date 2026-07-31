@@ -391,7 +391,9 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     { x: 212.5, z: -45.2, hw: 7, rot: 0 },
     // berth head; the east edge gap is derived from the generated ship
     // mating edge, so the gangplank never overlaps either rail segment
-    { x: 225, z: -54.5, hw: 6, rot: 0 },
+    // The south run stops at the split deck corner, leaving the turning
+    // hull's arrival sweep open. buildRail seats a post at this endpoint.
+    { x: 223.8, z: -54.5, hw: 4.7, rot: 0 },
     { x: 225, z: -41.5, hw: 6, rot: 0 },
     { x: 219, z: -52.65, hw: 1.85, rot: Math.PI / 2 },
     { x: 219, z: -43.35, hw: 1.85, rot: Math.PI / 2 },
@@ -513,7 +515,10 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     { x: 741, z: 118.8, hw: 9, rot: 0 },
     // berth head; the north edge gap is derived from the mirrored generated
     // ship mating edge, so the gangplank never overlaps either rail segment
-    { x: 727.5, z: 110, hw: 5, rot: 0 },
+    // The south run starts at the split deck corner, leaving the turning
+    // hull's arrival sweep open. buildRail seats a post at this endpoint.
+    { x: 728.7, z: 110, hw: 3.7, rot: 0 },
+    { x: 727.5, z: 123, hw: 5, rot: 0 },
     {
       x: (722.5 + GULLHAVEN_PIER_GANGWAY_GAP.min) / 2,
       z: 123,
