@@ -1153,7 +1153,7 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
       },
     ]),
     expectedCheck: 'prop.arrivalDirection',
-    expectedMeasured: 'travel dot 0.514',
+    expectedMeasured: 'travel dot 0.800',
   },
   {
     def: syntheticCameraScene('scn_test_lint_arrival_berth_bad', 1.7, [
@@ -1575,8 +1575,8 @@ const PROP_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> = {
     ease: 'easeInOutSine',
   },
   [SYNTHETIC_CROSSWIND_ARRIVAL_CUE]: {
-    start: { x: -23.323808, y: 0, z: 0, yaw: 2.429963 },
-    end: { x: 0, y: 0, z: 0, yaw: 2.429963 },
+    start: { x: -20, y: 0, z: 0, yaw: -2.2794 },
+    end: { x: 0, y: 0, z: 0, yaw: -2.2794 },
     duration: 4.3,
     ease: 'easeInOutSine',
   },

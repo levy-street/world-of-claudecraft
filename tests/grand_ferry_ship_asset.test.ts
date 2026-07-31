@@ -17,8 +17,8 @@ import { HARBORS, type HarborRail, type HarborRamp } from '../src/sim/harbor_lay
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/grand_ferry_ship.glb');
 const ASSET_BYTES = 33_592;
-const ASSET_SHA256 = 'ae6a2adcaf5c95bae4a0c75ba838031e68f5ca318935aa351885d75158085a45';
-const SOURCE_FINGERPRINT = 'a12acdf6352a17b4e0963424588a3ab6a5b70ff877272f39fe2e72a41a8eb6b4';
+const ASSET_SHA256 = '6cab3ddd29813b733639d81a06b6c2b0d88b8c5dc11ad4a239688e0f7b679d85';
+const SOURCE_FINGERPRINT = '4f8a3ff04c36deb360324713a7ac6ec0324a196b1489ccdaff5aebb92cb6cadb';
 const PLAN_MESH_EPSILON = GRAND_FERRY_SHIP_PLAN.measurementEpsilons.optimized;
 const RAMP_MATING_EPSILON = 1e-9;
 const RAIL_GAP_INTERIOR_EPSILON = 0.02;
@@ -299,7 +299,7 @@ describe('grand ferry procedural asset contract', () => {
       'min: MAINLAND_SHIP.rampMatingEdge.z - MAINLAND_SHIP.rampMatingEdge.halfWidth,',
     );
     expect(layoutSource).toContain(
-      'min: GULLHAVEN_SHIP.rampMatingEdge.x - GULLHAVEN_SHIP.rampMatingEdge.halfWidth,',
+      'min: GULLHAVEN_SHIP.rampMatingEdge.z - GULLHAVEN_SHIP.rampMatingEdge.halfWidth,',
     );
     const collidersSource = readFileSync(path.join(REPO_ROOT, 'src/sim/colliders.ts'), 'utf8');
     expect(collidersSource).toContain('for (const blocker of h.shipBlockers)');
@@ -547,7 +547,8 @@ describe('grand ferry procedural asset contract', () => {
     const matingBounds = getBounds(requiredNode(nodes, 'GrandFerryGangwayMating'));
     expect(matingBounds.min[0]).toBeCloseTo(edge.x - edge.halfWidth, 2);
     expect(matingBounds.max[0]).toBeCloseTo(edge.x + edge.halfWidth, 2);
-    expect(matingBounds.min[2]).toBeCloseTo(edge.z, 2);
+    expect(matingBounds.min[2]).toBeCloseTo(-GRAND_FERRY_SHIP_PLAN.model.beam / 2, 2);
+    expect(matingBounds.max[2]).toBeCloseTo(edge.z, 2);
     expect(matingBounds.max[1]).toBeCloseTo(edge.y, 2);
     const socket = requiredNode(nodes, 'Socket_GangwayMatingEdge');
     expect(socket.getTranslation()[0]).toBeCloseTo(edge.x, 12);
@@ -617,7 +618,7 @@ describe('grand ferry procedural asset contract', () => {
 
   it('transforms the generated plan into both berths with flush ramps and open rail gaps', () => {
     for (const harbor of HARBORS) {
-      expect(harbor.shipDecks).toHaveLength(1);
+      expect(harbor.shipDecks).toHaveLength(2);
       expect(harbor.shipRails).toHaveLength(GRAND_FERRY_SHIP_PLAN.rails.length);
       expect(harbor.shipBlockers).toHaveLength(GRAND_FERRY_SHIP_PLAN.blockingVolumes.length);
       const scale = harbor.berth.length / GRAND_FERRY_SHIP_PLAN.model.length;
@@ -652,7 +653,9 @@ describe('grand ferry procedural asset contract', () => {
         expect(harbor.shipBlockers.some((blocker) => blocker.kind === kind)).toBe(true);
       }
       const deck = harbor.shipDecks[0];
-      expect(deck.y).toBe(GRAND_FERRY_SHIP_PLAN.standardBerth.deckWorldY);
+      for (const shipDeck of harbor.shipDecks) {
+        expect(shipDeck.y).toBe(GRAND_FERRY_SHIP_PLAN.standardBerth.deckWorldY);
+      }
       const ramp = harbor.ramps[harbor.ramps.length - 1];
       const edge = highEdge(ramp);
       const pierEdge = lowEdge(ramp);
@@ -665,10 +668,12 @@ describe('grand ferry procedural asset contract', () => {
         12,
       );
       const edgeDistance = Math.min(
-        Math.abs(edge.x - (deck.x - deck.hw)),
-        Math.abs(edge.x - (deck.x + deck.hw)),
-        Math.abs(edge.z - (deck.z - deck.hd)),
-        Math.abs(edge.z - (deck.z + deck.hd)),
+        ...harbor.shipDecks.flatMap((shipDeck) => [
+          Math.abs(edge.x - (shipDeck.x - shipDeck.hw)),
+          Math.abs(edge.x - (shipDeck.x + shipDeck.hw)),
+          Math.abs(edge.z - (shipDeck.z - shipDeck.hd)),
+          Math.abs(edge.z - (shipDeck.z + shipDeck.hd)),
+        ]),
       );
       expect(edgeDistance).toBeLessThanOrEqual(RAMP_MATING_EPSILON);
       expect(harbor.shipRails.some((rail) => railContains(rail, edge))).toBe(false);
@@ -714,6 +719,6 @@ describe('grand ferry procedural asset contract', () => {
     expect(HARBORS[0].berth.mirrorZ).toBeUndefined();
     expect(HARBORS[1].berth.mirrorZ).toBe(true);
     expect(HARBORS[0].ramps.at(-1)?.z).toBe(-48.25);
-    expect(HARBORS[1].ramps.at(-1)?.x).toBe(727.75);
+    expect(HARBORS[1].ramps.at(-1)?.x).toBeCloseTo(722.281745353557, 12);
   });
 });

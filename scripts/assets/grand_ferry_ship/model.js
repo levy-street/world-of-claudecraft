@@ -27,6 +27,7 @@ const RAIL_HALF_THICKNESS = 0.14 / STANDARD_SCALE;
 const RAIL_HEIGHT = 1.05 / STANDARD_SCALE;
 const HULL_HALF_LENGTH = GRAND_FERRY_SHIP_NATIVE_BOUNDS.length / 2;
 const HULL_HALF_BEAM = GRAND_FERRY_SHIP_NATIVE_BOUNDS.beam / 2;
+const GANGWAY_LANDING_DEPTH = HULL_HALF_BEAM - DECK_HALF_BEAM;
 const HULL_EDGE_BLOCKER_HALF_THICKNESS = 0.08;
 const HULL_NOTCH_BEVEL = 0.02;
 const HULL_SECTIONS = Object.freeze([
@@ -440,8 +441,8 @@ function buildMainDeck(root, woodMaterial) {
   const mating = [];
   addBox(
     mating,
-    [GANGWAY_HALF_WIDTH * 2, 0.08, 0.46],
-    [GANGWAY_CENTER_X, DECK_SURFACE_Y - 0.04, -DECK_HALF_BEAM + 0.23],
+    [GANGWAY_HALF_WIDTH * 2, 0.08, GANGWAY_LANDING_DEPTH],
+    [GANGWAY_CENTER_X, DECK_SURFACE_Y - 0.04, -(HULL_HALF_BEAM + DECK_HALF_BEAM) / 2],
     PALETTE.deckLight,
   );
   root.add(meshFromBucket('GrandFerryGangwayMating', mating, woodMaterial));
