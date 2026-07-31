@@ -1,5 +1,7 @@
 // Guards the open-world farm ECONOMY: the per-cluster gold and XP ceilings, the
-// coin-per-level curve, and the harvest-tag standard for coinless families.
+// coin-per-level curve, and the harvest-tag standard for the beast, spider and
+// reptile families. NOTE: those families carry coin on this branch AND their
+// harvest tags; the tags are an additional profession yield, not a swap.
 // Model: tests/helpers/farm_yield.ts.
 import { describe, expect, it } from 'vitest';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
@@ -200,7 +202,7 @@ describe('coin-family trash sits on the coin curve', () => {
   });
 });
 
-describe('harvest-family trash carries usable components instead of coin', () => {
+describe('harvest-family trash carries usable components as well as coin', () => {
   const governed = () =>
     campTemplates().filter(
       ({ template }) =>

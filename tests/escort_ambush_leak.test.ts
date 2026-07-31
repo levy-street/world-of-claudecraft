@@ -135,6 +135,11 @@ describe('escort ambush mobs never outlive their run', () => {
 
     // Three runs, three killed waves: without the fix this is baseline + 9.
     expect(liveOf(sim, ambushTemplate).length).toBe(baseline);
+    // Drain past the corpse window first: a slain wave mob is DELIBERATELY left
+    // as a lootable corpse until it lapses (summonedAdd unravels it in
+    // mob/locomotion.ts), so asserting sooner would be asserting against the
+    // loot window rather than against a leak.
+    for (let i = 0; i < 90 * 20; i++) sim.tick();
     // And no corpse residue either: the roster holds no more mobs of this
     // template than the zone's own camps authored.
     const anyState = [...sim.entities.values()].filter(

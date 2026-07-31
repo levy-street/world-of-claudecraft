@@ -261,9 +261,10 @@ describe('isHarvestableCorpse', () => {
     // The complement is asserted too, so an always-false predicate could not
     // pass the row above by making the sweep vacuous.
     const included = Object.entries(MOBS).filter(([, m]) => isHarvestableCorpse(m.componentTags));
-    // 36 since the farm-economy pass: beast, spider and reptile trash pays in
-    // harvestable components instead of coin, so 15 previously untagged
-    // templates gained mapped tags (tests/economy_yield.test.ts enforces it).
+    // 36 since the farm-economy pass gave 15 previously untagged beast, spider
+    // and reptile templates their mapped tags. They keep their coin: the tags
+    // are an ADDITIONAL, opt-in profession yield on top, not a replacement
+    // (tests/economy_yield.test.ts enforces the tags, not the exchange).
     expect(included).toHaveLength(36);
     // ...and the untagged templates are counted rather than assumed: 184 of them
     // ship, all excluded before this change and all excluded after it, which is
