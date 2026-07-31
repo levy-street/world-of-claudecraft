@@ -365,7 +365,7 @@ describe('Eastbrook polish capture contract', () => {
       // pinned townAsset source-fingerprint input, so this composite mints
       // fresh even though the fix only changes the bank's own geometry by a
       // few millimeters and adds a runtime assertion. No recapture.
-      fingerprint: 'abbc67001854b668e89116cea18b28ae0a7fd3856fe2709535c36768614f3682',
+      fingerprint: 'c7aa043a561c48b8c96950619825f10bf2619a1c83d90e0d109668b96f726855',
       components: {
         captureContract: {
           id: 'polish-v2',
