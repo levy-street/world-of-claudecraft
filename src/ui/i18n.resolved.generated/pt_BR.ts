@@ -6479,6 +6479,7 @@ export const pt_BR: EnTranslations = {
       "arenaQueueTrading": "Termine sua troca antes de entrar na fila.",
       "arenaQueueInstance": "Você não pode entrar na fila dentro de uma instância.",
       "tradeInProgress": "Já há uma troca em andamento.",
+      "tradeAlreadyTrading": "That player is already trading.",
       "tradeTooFar": "O alvo está longe demais para trocar.",
       "tradeExpired": "A solicitação de troca expirou.",
       "tradeFailed": "Troca falhou: itens ou dinheiro não estão mais disponíveis.",

@@ -6479,6 +6479,7 @@ export const ru_RU: EnTranslations = {
       "arenaQueueTrading": "Завершите обмен перед постановкой в очередь.",
       "arenaQueueInstance": "Нельзя вставать в очередь из подземелья.",
       "tradeInProgress": "Обмен уже идет.",
+      "tradeAlreadyTrading": "Этот игрок уже торгует.",
       "tradeTooFar": "Цель слишком далеко для обмена.",
       "tradeExpired": "Запрос обмена истек.",
       "tradeFailed": "Обмен не удался: предметы или деньги больше недоступны.",

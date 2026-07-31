@@ -6479,6 +6479,7 @@ export const zh_TW: EnTranslations = {
       "arenaQueueTrading": "請先完成交易再加入佇列。",
       "arenaQueueInstance": "你不能在副本內加入佇列。",
       "tradeInProgress": "已有交易正在進行。",
+      "tradeAlreadyTrading": "該玩家已在交易中。",
       "tradeTooFar": "目標太遠，無法交易。",
       "tradeExpired": "交易請求已過期。",
       "tradeFailed": "交易失敗：物品或金錢已不可用。",

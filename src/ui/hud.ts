@@ -11867,6 +11867,7 @@ export class Hud {
       'Finish your trade before queueing.': 'hud.errors.arenaQueueTrading',
       'You cannot queue from inside an instance.': 'hud.errors.arenaQueueInstance',
       'A trade is already in progress.': 'hud.errors.tradeInProgress',
+      'That player is already trading.': 'hud.errors.tradeAlreadyTrading',
       'Target is too far away to trade.': 'hud.errors.tradeTooFar',
       'The trade request has expired.': 'hud.errors.tradeExpired',
       'Trade failed: items or money no longer available.': 'hud.errors.tradeFailed',

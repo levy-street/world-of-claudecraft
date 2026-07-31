@@ -1905,6 +1905,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': '请先完成交易再加入队列。',
   'hud.errors.arenaQueueInstance': '你不能在副本内加入队列。',
   'hud.errors.tradeInProgress': '已有交易正在进行。',
+  'hud.errors.tradeAlreadyTrading': '该玩家已在交易中。',
   'hud.errors.tradeTooFar': '目标太远，无法交易。',
   'hud.errors.tradeExpired': '交易请求已过期。',
   'hud.errors.tradeFailed': '交易失败：物品或金钱已不可用。',

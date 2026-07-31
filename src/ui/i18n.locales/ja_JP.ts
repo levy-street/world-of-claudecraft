@@ -1998,6 +1998,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': '取引を終えてからキューに入ってください。',
   'hud.errors.arenaQueueInstance': 'インスタンス内からキューには入れません。',
   'hud.errors.tradeInProgress': 'すでに取引が進行中です。',
+  'hud.errors.tradeAlreadyTrading': 'そのプレイヤーはすでに取引中です。',
   'hud.errors.tradeTooFar': '対象が遠すぎて取引できません。',
   'hud.errors.tradeExpired': '取引リクエストは期限切れです。',
   'hud.errors.tradeFailed': '取引失敗: アイテムまたは所持金が利用できません。',

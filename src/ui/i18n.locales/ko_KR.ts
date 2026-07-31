@@ -1983,6 +1983,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': '거래를 끝낸 뒤 대기열에 들어가세요.',
   'hud.errors.arenaQueueInstance': '인스턴스 안에서는 대기열에 들어갈 수 없습니다.',
   'hud.errors.tradeInProgress': '이미 거래가 진행 중입니다.',
+  'hud.errors.tradeAlreadyTrading': '그 플레이어는 이미 거래 중입니다.',
   'hud.errors.tradeTooFar': '대상이 너무 멀어 거래할 수 없습니다.',
   'hud.errors.tradeExpired': '거래 요청이 만료되었습니다.',
   'hud.errors.tradeFailed': '거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다.',

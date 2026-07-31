@@ -6479,6 +6479,7 @@ export const en: EnTranslations = {
       "arenaQueueTrading": "Finish your trade before queueing.",
       "arenaQueueInstance": "You cannot queue from inside an instance.",
       "tradeInProgress": "A trade is already in progress.",
+      "tradeAlreadyTrading": "That player is already trading.",
       "tradeTooFar": "Target is too far away to trade.",
       "tradeExpired": "The trade request has expired.",
       "tradeFailed": "Trade failed: items or money no longer available.",
