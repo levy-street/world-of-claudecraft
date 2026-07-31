@@ -56,6 +56,7 @@ import {
   stopActiveEntryDiagnostics,
   suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
+import { FramePerfAccounting } from './game/frame_perf_accounting';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
@@ -3531,12 +3532,7 @@ async function startGame(
     return !movementFrozen() ? diagonalMovementVisualFacing(mi, baseFacing) : null;
   }
 
-  const perfNetworkStats = {
-    connected: false,
-    snapInterval: 0,
-    lastSnapAge: -1,
-    alpha: 0,
-  };
+  const framePerf = new FramePerfAccounting(perf);
   const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
 
   function frame(now: number): void {
@@ -3574,24 +3570,24 @@ async function startGame(
     }
     playerWasDead = playerDead;
     const frameDtMs = frameDt * 1000;
-    let traceStart = perf.startTrace();
+    framePerf.beginTrace();
     try {
       input.updateTouchLook(frameDt);
     } finally {
-      perf.finishTrace('input.updateTouchLook', traceStart, 'frameDtMs', frameDtMs);
+      framePerf.finishTouchLook(frameDtMs);
     }
-    traceStart = perf.startTrace();
+    framePerf.beginTrace();
     try {
       gamepad.poll(frameDt);
     } finally {
-      perf.finishTrace('input.gamepad', traceStart, 'frameDtMs', frameDtMs);
+      framePerf.finishGamepad(frameDtMs);
     }
     const hoverActive = input.hoverActive;
-    traceStart = perf.startTrace();
+    framePerf.beginTrace();
     try {
       updateHoverCursor();
     } finally {
-      perf.finishTrace('input.hoverCursor', traceStart, 'active', hoverActive);
+      framePerf.finishHover(hoverActive);
     }
     perf.markInputFrame(performance.now());
 
@@ -3642,30 +3638,19 @@ async function startGame(
         if (stepFacing !== null) offlineSim.player.facing = stepFacing;
         offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
         perf.markInputSent(performance.now());
-        const simStart = perf.startTime();
         let events: ReturnType<typeof offlineSim.tick>;
-        traceStart = perf.startTrace();
+        framePerf.beginTimedTrace();
         try {
           events = offlineSim.tick();
         } finally {
-          perf.finishTrace('sim.tick', traceStart, 'mode', 'offline');
-          perf.finishTime('sim', simStart);
+          framePerf.finishSimTick();
         }
         const eventsLength = events.length;
-        const eventsStart = perf.startTime();
-        traceStart = perf.startTrace();
+        framePerf.beginTimedTrace();
         try {
           hud.handleEvents(events);
         } finally {
-          perf.finishTrace(
-            'hud.handleEvents',
-            traceStart,
-            'mode',
-            'offline',
-            'events',
-            eventsLength,
-          );
-          perf.finishTime('events', eventsStart);
+          framePerf.finishEvents('offline', eventsLength);
         }
         // A tick consumed the latched release facing (movementFacing fed
         // stepFacing above); drop it so it is not re-applied next frame.
@@ -3673,55 +3658,42 @@ async function startGame(
         acc -= DT;
       }
       const pp = offlineSim.player;
-      traceStart = perf.startTrace();
+      framePerf.beginTrace();
       try {
         updateCamera(frameDt, pp.prevFacing + wrapAngle(pp.facing - pp.prevFacing) * (acc / DT));
       } finally {
-        perf.finishTrace('camera.follow', traceStart, 'mode', 'offline', 'frameDtMs', frameDtMs);
+        framePerf.finishCamera('offline', frameDtMs, 0, -1);
       }
       introCameraTick(now);
       renderer.camYaw = input.camYaw;
       renderer.camPitch = input.camPitch;
       renderer.camDist = input.camDist;
       syncGroundAimReticle();
-      perf.setNetwork(null);
+      framePerf.publishOfflineNetwork();
       const offlineRenderFacing =
         visualFacingFor(input.readMoveInput(), movementFacing ?? offlineSim.player.facing) ??
         movementFacing;
       const offlineAlpha = acc / DT;
       const offlineViews = renderer.views.size;
-      const rendererStart = perf.startTime();
-      traceStart = perf.startTrace();
+      framePerf.beginTimedTrace();
       try {
         renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null);
       } finally {
-        perf.finishTrace(
-          'renderer.sync',
-          traceStart,
-          'mode',
-          'offline',
-          'views',
-          offlineViews,
-          'alpha',
-          offlineAlpha,
-        );
-        perf.finishTime('renderer', rendererStart);
+        framePerf.finishRenderer('offline', offlineViews, offlineAlpha, frameDtMs);
       }
-      traceStart = perf.startTrace();
+      framePerf.beginTrace();
       try {
         updateClickMoveMarker();
       } finally {
-        perf.finishTrace('ui.clickMoveMarker', traceStart);
+        framePerf.finishClickMoveMarker();
       }
       perf.markInputVisible(performance.now());
       if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-      const hudStart = perf.startTime();
-      traceStart = perf.startTrace();
+      framePerf.beginTimedTrace();
       try {
         hud.update();
       } finally {
-        perf.finishTrace('hud.update', traceStart, 'mode', 'offline');
-        perf.finishTime('hud', hudStart);
+        framePerf.finishHud('offline');
       }
       perf.tick(now);
       entryDiagnostics.renderedFrame(now);
@@ -3800,52 +3772,44 @@ async function startGame(
       net.playerId,
     );
     const drainedEventsLength = drainedEvents.length;
-    const eventsStart = perf.startTime();
-    traceStart = perf.startTrace();
+    framePerf.beginTimedTrace();
     try {
       hud.handleEvents(drainedEvents);
     } finally {
-      perf.finishTrace(
-        'hud.handleEvents',
-        traceStart,
-        'mode',
-        'online',
-        'events',
-        drainedEventsLength,
-      );
-      perf.finishTime('events', eventsStart);
+      framePerf.finishEvents('online', drainedEventsLength);
     }
     if (net.consumeProfanityChanged()) {
       const profanityWordsLength = net.profanityWords.length;
-      traceStart = perf.startTrace();
+      framePerf.beginTrace();
       try {
         hud.setProfanityWords(net.profanityWords);
       } finally {
-        perf.finishTrace('hud.setProfanityWords', traceStart, 'words', profanityWordsLength);
+        framePerf.finishProfanityWords(profanityWordsLength);
       }
     }
     if (net.consumeInventoryChanged()) {
-      traceStart = perf.startTrace();
+      framePerf.beginTrace();
       try {
         hud.onInventoryChanged();
       } finally {
-        perf.finishTrace('hud.onInventoryChanged', traceStart);
+        framePerf.finishInventoryChanged();
       }
     }
     if (net.consumeCosmeticsChanged()) {
-      traceStart = perf.startTrace();
+      framePerf.beginTrace();
       try {
         hud.onCosmeticsChanged();
       } finally {
-        perf.finishTrace('hud.onCosmeticsChanged', traceStart);
+        framePerf.finishCosmeticsChanged();
       }
     }
-    perfNetworkStats.connected = net.connected;
-    perfNetworkStats.snapInterval = Math.round(net.snapInterval);
-    perfNetworkStats.lastSnapAge =
-      net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1;
-    perfNetworkStats.alpha = Math.round(alpha * 100) / 100;
-    perf.setNetwork(perfNetworkStats);
+    framePerf.publishOnlineNetwork(
+      net.connected,
+      net.snapInterval,
+      net.lastSnapAt,
+      performance.now(),
+      alpha,
+    );
     // Always-on net-pipeline counters (net_pipeline_stats.ts): fold the
     // snapshots-applied-since-last-frame count, then publish the stats source
     // UNGATED (ruling R9), unlike the overlay-gated setNetwork above; the
@@ -3883,22 +3847,11 @@ async function startGame(
           frameDt,
         );
     const cameraLastSnapAge = net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1;
-    traceStart = perf.startTrace();
+    framePerf.beginTrace();
     try {
       updateCamera(frameDt, kbFacing ?? interpServerFacing);
     } finally {
-      perf.finishTrace(
-        'camera.follow',
-        traceStart,
-        'mode',
-        'online',
-        'alpha',
-        alpha,
-        'frameDtMs',
-        frameDtMs,
-        'lastSnapAge',
-        cameraLastSnapAge,
-      );
+      framePerf.finishCamera('online', frameDtMs, alpha, cameraLastSnapAge);
     }
     introCameraTick(now);
     renderer.camYaw = input.camYaw;
@@ -3906,8 +3859,7 @@ async function startGame(
     renderer.camDist = input.camDist;
     syncGroundAimReticle();
     const onlineViews = renderer.views.size;
-    const rendererStart = perf.startTime();
-    traceStart = perf.startTrace();
+    framePerf.beginTimedTrace();
     try {
       renderer.sync(
         alpha,
@@ -3922,36 +3874,22 @@ async function startGame(
         selfAuthoritativeDiscontinuity,
       );
     } finally {
-      perf.finishTrace(
-        'renderer.sync',
-        traceStart,
-        'mode',
-        'online',
-        'views',
-        onlineViews,
-        'alpha',
-        alpha,
-        'frameDtMs',
-        frameDtMs,
-      );
-      perf.finishTime('renderer', rendererStart);
+      framePerf.finishRenderer('online', onlineViews, alpha, frameDtMs);
     }
-    traceStart = perf.startTrace();
+    framePerf.beginTrace();
     try {
       updateClickMoveMarker();
     } finally {
-      perf.finishTrace('ui.clickMoveMarker', traceStart);
+      framePerf.finishClickMoveMarker();
     }
     maybeShowImmobileNote(now);
     perf.markInputVisible(performance.now());
     if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-    const hudStart = perf.startTime();
-    traceStart = perf.startTrace();
+    framePerf.beginTimedTrace();
     try {
       hud.update();
     } finally {
-      perf.finishTrace('hud.update', traceStart, 'mode', 'online');
-      perf.finishTime('hud', hudStart);
+      framePerf.finishHud('online');
     }
     perf.tick(now);
     entryDiagnostics.renderedFrame(now);

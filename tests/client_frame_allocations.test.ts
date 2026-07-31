@@ -30,32 +30,17 @@ function findFrameFunction(): ts.FunctionDeclaration {
 }
 
 describe('client frame allocation guards', () => {
-  it('passes no eager allocation to any frame trace scope', () => {
+  it('delegates every frame trace scope to the reusable accounting helper', () => {
     const frame = findFrameFunction();
-    const eagerAllocations: string[] = [];
-    const finishedTraces: Array<{
-      name: string;
-      detailKeys: string[];
-      detailValues: string[];
-      finishesInFinally: boolean;
-    }> = [];
+    const finishers: Array<{ name: string; finishesInFinally: boolean }> = [];
 
     const visit = (node: ts.Node): void => {
       if (
         ts.isCallExpression(node) &&
         ts.isPropertyAccessExpression(node.expression) &&
-        node.expression.expression.getText(sourceFile) === 'perf' &&
-        node.expression.name.text === 'finishTrace'
+        node.expression.expression.getText(sourceFile) === 'framePerf' &&
+        node.expression.name.text.startsWith('finish')
       ) {
-        const name = node.arguments[0];
-        const detailKeys = node.arguments
-          .slice(2)
-          .filter((_, index) => index % 2 === 0)
-          .map((argument) => argument.getText(sourceFile).replaceAll("'", ''));
-        const detailValues = node.arguments
-          .slice(2)
-          .filter((_, index) => index % 2 === 1)
-          .map((argument) => argument.getText(sourceFile).replaceAll("'", ''));
         let ancestor: ts.Node | undefined = node.parent;
         let finishesInFinally = false;
         while (ancestor && ancestor !== frame) {
@@ -69,135 +54,35 @@ describe('client frame allocation guards', () => {
           }
           ancestor = ancestor.parent;
         }
-        finishedTraces.push({
-          name: name.getText(sourceFile).replaceAll("'", ''),
-          detailKeys,
-          detailValues,
-          finishesInFinally,
-        });
-        for (const argument of node.arguments.slice(2)) {
-          if (
-            ts.isObjectLiteralExpression(argument) ||
-            ts.isArrayLiteralExpression(argument) ||
-            ts.isArrowFunction(argument) ||
-            ts.isFunctionExpression(argument) ||
-            ts.isTemplateExpression(argument)
-          ) {
-            eagerAllocations.push(argument.getText(sourceFile));
-          }
-        }
+        finishers.push({ name: node.expression.name.text, finishesInFinally });
       }
       ts.forEachChild(node, visit);
     };
 
     visit(frame);
-    expect(finishedTraces).toEqual([
-      {
-        name: 'input.updateTouchLook',
-        detailKeys: ['frameDtMs'],
-        detailValues: ['frameDtMs'],
-        finishesInFinally: true,
-      },
-      {
-        name: 'input.gamepad',
-        detailKeys: ['frameDtMs'],
-        detailValues: ['frameDtMs'],
-        finishesInFinally: true,
-      },
-      {
-        name: 'input.hoverCursor',
-        detailKeys: ['active'],
-        detailValues: ['hoverActive'],
-        finishesInFinally: true,
-      },
-      {
-        name: 'sim.tick',
-        detailKeys: ['mode'],
-        detailValues: ['offline'],
-        finishesInFinally: true,
-      },
-      {
-        name: 'hud.handleEvents',
-        detailKeys: ['mode', 'events'],
-        detailValues: ['offline', 'eventsLength'],
-        finishesInFinally: true,
-      },
-      {
-        name: 'camera.follow',
-        detailKeys: ['mode', 'frameDtMs'],
-        detailValues: ['offline', 'frameDtMs'],
-        finishesInFinally: true,
-      },
-      {
-        name: 'renderer.sync',
-        detailKeys: ['mode', 'views', 'alpha'],
-        detailValues: ['offline', 'offlineViews', 'offlineAlpha'],
-        finishesInFinally: true,
-      },
-      {
-        name: 'ui.clickMoveMarker',
-        detailKeys: [],
-        detailValues: [],
-        finishesInFinally: true,
-      },
-      {
-        name: 'hud.update',
-        detailKeys: ['mode'],
-        detailValues: ['offline'],
-        finishesInFinally: true,
-      },
-      {
-        name: 'hud.handleEvents',
-        detailKeys: ['mode', 'events'],
-        detailValues: ['online', 'drainedEventsLength'],
-        finishesInFinally: true,
-      },
-      {
-        name: 'hud.setProfanityWords',
-        detailKeys: ['words'],
-        detailValues: ['profanityWordsLength'],
-        finishesInFinally: true,
-      },
-      {
-        name: 'hud.onInventoryChanged',
-        detailKeys: [],
-        detailValues: [],
-        finishesInFinally: true,
-      },
-      {
-        name: 'hud.onCosmeticsChanged',
-        detailKeys: [],
-        detailValues: [],
-        finishesInFinally: true,
-      },
-      {
-        name: 'camera.follow',
-        detailKeys: ['mode', 'alpha', 'frameDtMs', 'lastSnapAge'],
-        detailValues: ['online', 'alpha', 'frameDtMs', 'cameraLastSnapAge'],
-        finishesInFinally: true,
-      },
-      {
-        name: 'renderer.sync',
-        detailKeys: ['mode', 'views', 'alpha', 'frameDtMs'],
-        detailValues: ['online', 'onlineViews', 'alpha', 'frameDtMs'],
-        finishesInFinally: true,
-      },
-      {
-        name: 'ui.clickMoveMarker',
-        detailKeys: [],
-        detailValues: [],
-        finishesInFinally: true,
-      },
-      {
-        name: 'hud.update',
-        detailKeys: ['mode'],
-        detailValues: ['online'],
-        finishesInFinally: true,
-      },
+    expect(finishers).toEqual([
+      { name: 'finishTouchLook', finishesInFinally: true },
+      { name: 'finishGamepad', finishesInFinally: true },
+      { name: 'finishHover', finishesInFinally: true },
+      { name: 'finishSimTick', finishesInFinally: true },
+      { name: 'finishEvents', finishesInFinally: true },
+      { name: 'finishCamera', finishesInFinally: true },
+      { name: 'finishRenderer', finishesInFinally: true },
+      { name: 'finishClickMoveMarker', finishesInFinally: true },
+      { name: 'finishHud', finishesInFinally: true },
+      { name: 'finishEvents', finishesInFinally: true },
+      { name: 'finishProfanityWords', finishesInFinally: true },
+      { name: 'finishInventoryChanged', finishesInFinally: true },
+      { name: 'finishCosmeticsChanged', finishesInFinally: true },
+      { name: 'finishCamera', finishesInFinally: true },
+      { name: 'finishRenderer', finishesInFinally: true },
+      { name: 'finishClickMoveMarker', finishesInFinally: true },
+      { name: 'finishHud', finishesInFinally: true },
     ]);
-    expect(eagerAllocations).toEqual([]);
     expect(frame.getText(sourceFile)).not.toContain('perf.trace(');
     expect(frame.getText(sourceFile)).not.toContain('perf.time(');
+    expect(frame.getText(sourceFile)).not.toContain('perf.finishTrace(');
+    expect(frame.getText(sourceFile)).not.toContain('perf.finishTime(');
 
     const initializers = new Map<string, string>();
     const findInitializers = (node: ts.Node): void => {

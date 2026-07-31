@@ -119,7 +119,7 @@ describe('renderer CPU hot path', () => {
     expect(renderer).toContain('freezeStaticSubtreeMatrices(this.terrainView.group)');
     expect(renderer).toContain('freezeStaticSubtreeMatrices(this.waterView.group)');
     expect(renderer).toContain('freezeStaticSubtreeMatrices(this.eastbrookTownView.group)');
-    expect(renderer).toContain('freezeStaticSubtreeMatrices(this.gatherNodes.group)');
+    expect(renderer).toContain('freezeStaticSubtreeMatrices(gatherNodes.group)');
   });
 
   it('compares nameplate primitives before formatting unchanged DOM strings', () => {
