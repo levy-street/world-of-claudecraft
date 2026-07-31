@@ -183,6 +183,27 @@ describe('the shipped St. Albus collection', () => {
     expect(ITEMS.hand_of_st_albus.assembly).toBeUndefined();
   });
 
+  it('every shipped recipe carries a real refusal and a resolvable output', () => {
+    // failText is a required field, so it cannot be forgotten, but it CAN be
+    // satisfied with an empty string, which would refuse an assembly with a blank
+    // chat line and no explanation. Checked across the whole catalog rather than
+    // this collection, so a future recipe inherits the guarantee.
+    const recipes = Object.values(ITEMS).flatMap((item) =>
+      item.assembly ? [[item.id, item.assembly] as const] : [],
+    );
+    expect(recipes.length).toBeGreaterThan(0);
+    for (const [id, recipe] of recipes) {
+      expect(recipe.failText.trim(), `${id} must explain why it will not assemble`).not.toBe('');
+      expect(recipe.reagents.length, `${id} must consume something`).toBeGreaterThan(0);
+      for (const reagent of recipe.reagents) {
+        expect(ITEMS[reagent.itemId], `${id} reagent ${reagent.itemId} must exist`).toBeTruthy();
+        expect(reagent.count, `${id} reagent ${reagent.itemId} count`).toBeGreaterThan(0);
+      }
+      expect(ITEMS[recipe.output.itemId], `${id} output must exist`).toBeTruthy();
+      expect(recipe.output.count, `${id} output count`).toBeGreaterThan(0);
+    }
+  });
+
   it('binds the assembled hand but leaves the pieces tradeable', () => {
     // The pieces trade so a collector can buy the boss that will not drop for
     // them; the charm they assemble into stays with the character that earned it.
