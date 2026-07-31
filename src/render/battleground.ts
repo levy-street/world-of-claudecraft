@@ -30,6 +30,7 @@ import {
   bgPaintTextureFiles,
 } from './battleground_core';
 import { buildLanternFlames } from './battleground_lantern_fx';
+import { TORCH_FLAME, TORCH_HEAD_LOCAL } from './battleground_lantern_fx_core';
 import { type BgPlacementsView, buildBattlegroundPlacements } from './battleground_placements';
 import { type BgTerrainView, buildBattlegroundTerrain } from './battleground_terrain';
 import { ensureDungeonAssets } from './dungeon';
@@ -257,12 +258,26 @@ export function buildBattleground(
         group.add(mesh);
       }
 
-      // Lantern flames: one Points draw for every lamp on the field, animated
-      // entirely in its vertex shader off the shared clock (no tick here).
-      const flames = buildLanternFlames(TH_PLACEMENTS, { lowGfx: opts.lowGfx });
-      if (flames) {
-        owned.push(flames.geometry, flames.material as THREE.Material);
-        group.add(flames);
+      // Fire: one Points draw per fixture family for the WHOLE field, animated
+      // entirely in its vertex shader off the shared clock (no tick here). The
+      // rune-pad lamps burn behind glass; the wall torches down every keep,
+      // curtain and gatehouse face burn in the open, which is why they carry
+      // their own seat offset and tuning. Unlit iron cages on otherwise dressed
+      // stone was the thing that read as unfinished.
+      for (const fixture of [
+        { assetId: 'dungeon/post_lantern', local: undefined, flame: undefined },
+        { assetId: 'dungeon/torch_mounted', local: TORCH_HEAD_LOCAL, flame: TORCH_FLAME },
+      ]) {
+        const flames = buildLanternFlames(TH_PLACEMENTS, {
+          lowGfx: opts.lowGfx,
+          assetId: fixture.assetId,
+          local: fixture.local,
+          flame: fixture.flame,
+        });
+        if (flames) {
+          owned.push(flames.geometry, flames.material as THREE.Material);
+          group.add(flames);
+        }
       }
 
       const budget = BG_LIGHT_BUDGET_BY_TIER[GFX.tier] ?? 6;

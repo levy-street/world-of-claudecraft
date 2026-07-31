@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { BG_GRAVEYARDS, BG_POWER_RUNES, BG_SPEED_RUNES } from '../src/sim/battleground_layout';
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
 import { battlegroundOrigin, instanceOrigin, isBgPos } from '../src/sim/data';
+import { summonMountItem, toggleMount } from '../src/sim/mounts';
 import { BATTLEGROUND_LOSS_HONOR, BATTLEGROUND_WIN_HONOR } from '../src/sim/pvp';
 import { eloDelta, Sim } from '../src/sim/sim';
-import type { BgMatch } from '../src/sim/social/battleground';
 import {
   BG_CARRIER_VULN_DELAY,
   BG_CARRIER_VULN_INTERVAL,
@@ -15,12 +15,15 @@ import {
   BG_POWER_RUNE_VALUE,
   BG_WAVE_OFFSET,
   BG_WAVE_PERIOD,
+  type BgMatch,
+  bgCarryingFlag,
   bgResolveDesertion,
   devEndBg,
   devStartBg,
   endBgMatch,
   updateBattleground,
 } from '../src/sim/social/battleground';
+import type { SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 function makeWorld() {
@@ -64,6 +67,12 @@ function inGraveyard(sim: Sim, match: BgMatch, pid: number, team: 0 | 1): boolea
   );
 }
 
+function errorTexts(events: SimEvent[]): string[] {
+  return events
+    .filter((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error')
+    .map((e) => e.text);
+}
+
 function kill(sim: Sim, pid: number, killerPid: number | null = null) {
   const e = sim.entities.get(pid)!;
   const killer = killerPid !== null ? sim.entities.get(killerPid)! : null;
@@ -80,6 +89,65 @@ function captureOnce(sim: Sim, match: BgMatch, carrier: number) {
   tp(sim, carrier, crimsonHome.x, crimsonHome.z);
   sim.tick();
 }
+
+describe('Thornhollow Fields: the flag is carried on foot', () => {
+  it('throws a mounted runner out of the saddle when they take the flag', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const crimson = match.teams[0][0];
+    const e = sim.entities.get(crimson)!;
+    // In the saddle, and mid-summon of another mount at the same time: both
+    // have to be gone the moment the flag is in hand, or the grab lands the
+    // runner back on a mount a second and a half later.
+    e.mountKey = 'valorsteed';
+    e.mountCastRemaining = 1.5;
+    e.mountCastKey = 'valorsteed';
+    const azure = match.flags[1];
+    tp(sim, crimson, azure.pos.x, azure.pos.z);
+    sim.bgFlagAction(crimson);
+    sim.tick();
+    expect(azure.carrier, 'the grab itself must land').toBe(crimson);
+    expect(e.mountKey, 'still mounted while carrying the flag').toBe('');
+    expect(e.mountCastRemaining, 'a summon survived the grab').toBe(0);
+    expect(e.mountCastKey).toBe('');
+  });
+
+  it('refuses the saddle while carrying, and gives it back once the flag is gone', () => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.bgMatchFor(pids[0])!;
+    toActive(sim, match);
+    const crimson = match.teams[0][0];
+    const e = sim.entities.get(crimson)!;
+    sim.addItem('reins_valorsteed', 1, crimson);
+    // Riding is a permanent capability gate and answers before this one, so
+    // train the rider: what is under test is the transient flag rule.
+    sim.players.get(crimson)!.ridingTrained = true;
+    const azure = match.flags[1];
+    tp(sim, crimson, azure.pos.x, azure.pos.z);
+    sim.bgFlagAction(crimson);
+    sim.tick();
+    expect(azure.carrier).toBe(crimson);
+    // Both mount entry points refuse: the item summon and the Mount toggle.
+    expect(summonMountItem(sim.ctx, crimson, 'valorsteed')).toBe(false);
+    expect(errorTexts(sim.tick())).toContain("You can't ride while carrying the flag.");
+    expect(e.mountKey).toBe('');
+    expect(toggleMount(sim.ctx, crimson)).toBe(false);
+    expect(e.mountKey).toBe('');
+    // Drop it, and riding is allowed again: the rule is about the flag, not
+    // about being in a battleground. (Killing the carrier is how a flag comes
+    // loose; revive the body so the dead/ghost refusal is not what answers.)
+    kill(sim, crimson);
+    sim.tick();
+    expect(azure.carrier).toBeNull();
+    expect(bgCarryingFlag(sim.ctx, crimson)).toBe(false);
+    const revived = sim.entities.get(crimson)!;
+    revived.dead = false;
+    revived.ghost = false;
+    revived.inCombat = false;
+    expect(summonMountItem(sim.ctx, crimson, 'valorsteed')).toBe(true);
+  });
+});
 
 describe('Thornhollow Fields: queue + matchmaking', () => {
   it('needs ten players; then forms two teams of five and seats them in the battleground band', () => {

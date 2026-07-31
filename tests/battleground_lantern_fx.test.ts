@@ -11,6 +11,8 @@ import {
   lanternLampWorld,
   lanternMoteSeeds,
   lanternSeed,
+  TORCH_FLAME,
+  TORCH_HEAD_LOCAL,
 } from '../src/render/battleground_lantern_fx_core';
 import { TH_PLACEMENTS } from '../src/sim/thornhollow_field.generated';
 
@@ -92,6 +94,51 @@ describe('flame tuning stays inside its lamp', () => {
     expect(LANTERN_FLAME.rise).toBeLessThanOrEqual(glassHalfHeight + 1e-9);
     // And its spawn ring has to fit the glass's waist.
     expect(LANTERN_FLAME.radius).toBeLessThan(0.16 * 1.5);
+  });
+});
+
+describe('wall torches burn in their own cage', () => {
+  it('seats the fire out on the arm, never inside the wall the torch hangs on', () => {
+    // The torch's shaft hugs the wall at -z and the cage hangs out at +z, so a
+    // flame left on the placement origin burns inside the masonry. The offset
+    // was measured off the real mesh through the renderer's own loader (top 10%
+    // of vertices, normalized exactly as the placement builder normalizes).
+    expect(TORCH_HEAD_LOCAL.z).toBeGreaterThan(0.5);
+    expect(TORCH_HEAD_LOCAL.x).toBe(0);
+    // ...and under the cage rim (2.097), so the fire sits IN the cage.
+    expect(TORCH_HEAD_LOCAL.y).toBeLessThan(2.097);
+    expect(TORCH_HEAD_LOCAL.y).toBeGreaterThan(1.8);
+
+    // A torch on the south keep wall faces inward (rotY 0 keeps local +z as
+    // world +z): the flame must land field-side of the wall, not behind it.
+    const facingNorth = lanternLampWorld(
+      { x: 10, z: -128, rotY: 0, scale: 1.1, seatY: 2 },
+      TORCH_HEAD_LOCAL,
+    );
+    expect(facingNorth.z).toBeGreaterThan(-128);
+    expect(facingNorth.x).toBeCloseTo(10, 6);
+    // Turned to face west, the same offset swings onto the x axis.
+    const facingWest = lanternLampWorld(
+      { x: 10, z: -128, rotY: Math.PI / 2, scale: 1.1, seatY: 2 },
+      TORCH_HEAD_LOCAL,
+    );
+    expect(facingWest.x).toBeGreaterThan(10);
+    expect(facingWest.z).toBeCloseTo(-128, 6);
+    // Height rides the placement scale off the seat, like the lamp's.
+    expect(facingNorth.y).toBeCloseTo(2 + TORCH_HEAD_LOCAL.y * 1.1, 6);
+  });
+
+  it('burns bigger and lazier than a lamp, and never leaves its cage', () => {
+    // Open fire in iron, not a flame behind glass.
+    expect(TORCH_FLAME.rise).toBeGreaterThan(LANTERN_FLAME.rise);
+    expect(TORCH_FLAME.radius).toBeGreaterThan(LANTERN_FLAME.radius);
+    expect(TORCH_FLAME.cycleSec).toBeGreaterThan(LANTERN_FLAME.cycleSec);
+    // But the climb still has to stay under the torch's own head: the cage rim
+    // sits 2.097 above the seat and the fire starts at TORCH_HEAD_LOCAL.y, so
+    // a taller climb would send motes up through the ironwork.
+    expect(TORCH_HEAD_LOCAL.y + TORCH_FLAME.rise).toBeLessThan(2.5);
+    // Same fire palette as the lamps: two sizes of one flame, not two flames.
+    expect(TORCH_FLAME.colorCore).toBe(LANTERN_FLAME.colorCore);
   });
 });
 

@@ -87,9 +87,13 @@ export class BattlegroundKillFeed {
     if (buf) segs.push(`<span class="bgkf-verb">${esc(buf)}</span>`);
     const parts = segs.join('');
     // A crossed-swords mark leads the entry (inline SVG: no fonts, no images).
+    // Both blades run the FULL diagonal and the two crossguards sit square
+    // across their hilts, so the mark is mirror-symmetric about the box centre.
+    // The first cut drew one blade corner to corner and bent the other's hilt
+    // to stay inside the viewBox, which read as a clipped, broken glyph.
     const mark =
       '<svg class="bgkf-mark" viewBox="0 0 24 24" aria-hidden="true">' +
-      '<path d="M3 3 L14 14 M14 3 L3 14 M14 14 L20 20 M3 14 L9 20" ' +
+      '<path d="M4 4 L20 20 M20 4 L4 20 M16 20 L20 16 M4 16 L8 20" ' +
       'stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>';
     return `<div class="bgkf-line ${teamCls(l.killerTeam)}">${mark}${parts}</div>`;
   }

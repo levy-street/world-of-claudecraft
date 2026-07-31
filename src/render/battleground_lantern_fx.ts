@@ -73,14 +73,31 @@ const FLAME_FRAGMENT = /* glsl */ `
  */
 export function buildLanternFlames(
   placements: readonly (LanternPlacement & { assetId: string })[],
-  opts: { lowGfx: boolean; assetId?: string },
+  opts: {
+    lowGfx: boolean;
+    assetId?: string;
+    /** Where the fire sits in the fixture's own frame (lamp glass, torch cage). */
+    local?: { readonly x: number; readonly y: number; readonly z: number };
+    /** Flame tuning: a caged torch burns bigger and slower than a lamp. */
+    flame?: {
+      readonly perLantern: number;
+      readonly rise: number;
+      readonly radius: number;
+      readonly size: number;
+      readonly cycleSec: number;
+      readonly colorCore: number;
+      readonly colorEdge: number;
+    };
+  },
 ): THREE.Points | null {
   if (opts.lowGfx) return null;
   const assetId = opts.assetId ?? 'dungeon/post_lantern';
+  const local = opts.local;
+  const tuning = opts.flame ?? LANTERN_FLAME;
   const posts = placements.filter((p) => p.assetId === assetId);
   if (posts.length === 0) return null;
 
-  const per = LANTERN_FLAME.perLantern;
+  const per = tuning.perLantern;
   const count = posts.length * per;
   const pos = new Float32Array(count * 3);
   // Seeded across the WHOLE field, not per lantern: a shared block would give
@@ -88,7 +105,7 @@ export function buildLanternFlames(
   // burn.
   const seeds = lanternMoteSeeds(count);
   for (let i = 0; i < posts.length; i++) {
-    const lamp = lanternLampWorld(posts[i]);
+    const lamp = lanternLampWorld(posts[i], local);
     for (let m = 0; m < per; m++) {
       const o = (i * per + m) * 3;
       pos[o] = lamp.x;
@@ -103,7 +120,7 @@ export function buildLanternFlames(
   // The shader lifts motes above their lamp, so widen the sphere the renderer
   // culls against rather than leaving it fitted to the bare lamp points.
   geo.computeBoundingSphere();
-  if (geo.boundingSphere) geo.boundingSphere.radius += LANTERN_FLAME.rise + LANTERN_FLAME.radius;
+  if (geo.boundingSphere) geo.boundingSphere.radius += tuning.rise + tuning.radius;
   markSharedGeometry(geo);
 
   const mat = markSharedMaterial(
@@ -112,12 +129,12 @@ export function buildLanternFlames(
       fragmentShader: FLAME_FRAGMENT,
       uniforms: {
         uTime: sharedUniforms.uTime,
-        uRise: { value: LANTERN_FLAME.rise },
-        uRadius: { value: LANTERN_FLAME.radius },
-        uSize: { value: LANTERN_FLAME.size },
-        uCycle: { value: LANTERN_FLAME.cycleSec },
-        uCore: { value: new THREE.Color(LANTERN_FLAME.colorCore) },
-        uEdge: { value: new THREE.Color(LANTERN_FLAME.colorEdge) },
+        uRise: { value: tuning.rise },
+        uRadius: { value: tuning.radius },
+        uSize: { value: tuning.size },
+        uCycle: { value: tuning.cycleSec },
+        uCore: { value: new THREE.Color(tuning.colorCore) },
+        uEdge: { value: new THREE.Color(tuning.colorEdge) },
       },
       transparent: true,
       depthWrite: false,
@@ -134,7 +151,7 @@ export function buildLanternFlames(
   );
 
   const points = new THREE.Points(geo, mat);
-  points.name = 'battleground-lantern-flames';
+  points.name = `battleground-flames-${assetId.replace('/', '-')}`;
   points.renderOrder = 4;
   return points;
 }

@@ -58,6 +58,10 @@ const baseEnTable = {
   // mount or select a mount without having purchased the riding skill from Marla.
   // Placeholder-free, so it registers in the EXACT matcher automatically.
   'error.ridingUntrained': 'You must learn to ride first. Find a riding trainer.',
+  // The battleground flag is carried on foot (src/sim/mounts.ts refuses the
+  // saddle; the grab itself dismounts). Placeholder-free, so it registers in
+  // the EXACT matcher automatically.
+  'error.mountCarryingFlag': "You can't ride while carrying the flag.",
   // Riding skill purchase (learnRiding in src/sim/mounts_training.ts).
   'error.ridingAlreadyLearned': 'You have already learned Riding.',
   'error.ridingTrainLevel': 'You must be level 20 to learn Riding.',

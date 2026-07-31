@@ -25,6 +25,20 @@
  */
 export const LANTERN_LAMP_LOCAL = { x: 0, y: 2.02, z: 1.0 } as const;
 
+/**
+ * The flame cup of a wall-mounted torch (`dungeon/torch_mounted`), in the same
+ * seat-relative, normalized frame as the lantern's lamp above.
+ *
+ * Measured the same way rather than eyeballed: the model was loaded through the
+ * renderer's own loader, normalized by `targetHeightFor / maxDimension` exactly
+ * as the placement builder does, seated with its lowest point at 0, and its top
+ * 10% of vertices averaged. That band is the iron cage's rim (42 verts) at
+ * (0, 2.097, 0.648): the shaft hugs the wall at -z and the cage hangs out at
+ * +z, so a flame placed on the placement origin would burn inside the masonry.
+ * The seat drops just under the rim so the fire sits IN the cage, not on it.
+ */
+export const TORCH_HEAD_LOCAL = { x: 0, y: 2.0, z: 0.64 } as const;
+
 /** Which way the arm points in model space, for callers aiming a post. */
 export const LANTERN_ARM_LOCAL = { x: 0, z: 1 } as const;
 
@@ -51,14 +65,17 @@ export interface LanternLamp {
  * (cos, -sin). Getting this wrong is invisible in code review and glaring in
  * game: the flame floats off to one side of its lantern.
  */
-export function lanternLampWorld(p: LanternPlacement): LanternLamp {
+export function lanternLampWorld(
+  p: LanternPlacement,
+  local: { readonly x: number; readonly y: number; readonly z: number } = LANTERN_LAMP_LOCAL,
+): LanternLamp {
   const s = Math.sin(p.rotY);
   const c = Math.cos(p.rotY);
-  const lx = LANTERN_LAMP_LOCAL.x * p.scale;
-  const lz = LANTERN_LAMP_LOCAL.z * p.scale;
+  const lx = local.x * p.scale;
+  const lz = local.z * p.scale;
   return {
     x: p.x + (lx * c + lz * s),
-    y: p.seatY + LANTERN_LAMP_LOCAL.y * p.scale,
+    y: p.seatY + local.y * p.scale,
     z: p.z + (-lx * s + lz * c),
   };
 }
@@ -88,6 +105,22 @@ export const LANTERN_FLAME = {
   /** Flame core and edge colours. */
   colorCore: 0xfff3c4,
   colorEdge: 0xff9d2e,
+} as const;
+
+/**
+ * Torch tuning. Open fire in an iron cage rather than a flame behind glass, so
+ * it is bigger and lazier than the lamp: a wider spawn disc, more climb, and a
+ * longer cycle. The colours stay the field's fire palette so both fixtures read
+ * as the same flame at different sizes.
+ */
+export const TORCH_FLAME = {
+  perLantern: 11,
+  rise: 0.38,
+  radius: 0.14,
+  size: 84,
+  cycleSec: 1.6,
+  colorCore: 0xfff3c4,
+  colorEdge: 0xff8a1e,
 } as const;
 
 /** Seeds per mote packed into the `aSeed` vec4. */

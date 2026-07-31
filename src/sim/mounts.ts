@@ -28,6 +28,7 @@ import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { bgCarryingFlag } from './social/battleground';
 import { DT, type Entity, FORM_AURA_KINDS } from './types';
 
 // Summon channel duration (seconds). Mounting is a short cast the player can
@@ -122,6 +123,7 @@ export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
   return true;
 }
 
+const CARRYING_FLAG_MSG = "You can't ride while carrying the flag.";
 const RIDING_UNTRAINED_MSG = 'You must learn to ride first. Find a riding trainer.';
 
 /** Strip all active form auras (FORM_AURA_KINDS) and ghost_wolf from the entity,
@@ -184,6 +186,14 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
     ctx.error(pid, "You can't do that while in combat.");
     return false;
   }
+  // The battleground flag is carried on foot: no saddle while you hold it. The
+  // grab itself already dismounts (social/battleground.ts), so this is the
+  // other half of the same rule, and it also covers the mount-to-mount swap
+  // below, which is not a summon and would otherwise slip past every gate.
+  if (bgCarryingFlag(ctx, pid)) {
+    ctx.error(pid, CARRYING_FLAG_MSG);
+    return false;
+  }
   // Swapping between mounts is instant: the player is already mounted, so there
   // is nothing to summon, only a model to change.
   if (e.mountKey) {
@@ -236,6 +246,10 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     if (e.dead || e.ghost) return false;
     if (e.inCombat) {
       ctx.error(pid, "You can't do that while in combat.");
+      return false;
+    }
+    if (bgCarryingFlag(ctx, pid)) {
+      ctx.error(pid, CARRYING_FLAG_MSG);
       return false;
     }
     cancelFormsAndGhostWolf(ctx, e);

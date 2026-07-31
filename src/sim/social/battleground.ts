@@ -774,6 +774,13 @@ function tickFlags(ctx: SimContext, match: BgMatch): void {
       flag.carrier = pid;
       flag.carrySeconds = 0;
       bgBreakStealth(ctx, e); // and a revealing one: stealth never survives it
+      // The flag is carried ON FOOT. A mounted runner is thrown out of the
+      // saddle the moment they take it, and an in-flight summon is cancelled
+      // with it (the casting-lifecycle pattern), so grabbing mid-summon cannot
+      // land a player on a mount a second and a half later.
+      ctx.forceDismount(e);
+      e.mountCastRemaining = 0;
+      e.mountCastKey = '';
       const byName = ctx.players.get(pid)?.name ?? '?';
       bgEmitAll(ctx, match, (mp) =>
         ctx.emit({
@@ -1007,6 +1014,16 @@ export function bgOnPlayerDeath(ctx: SimContext, e: Entity, killer: Entity | nul
   for (const pid of bgAllPids(match)) {
     ctx.emit({ type: 'bgKill', pid, killerName, victimName, killerTeam, victimTeam });
   }
+}
+
+/**
+ * Is this player carrying an enemy flag right now? The one place the question
+ * is answered, because more than the battleground asks it: the mount gate
+ * refuses a saddle to a carrier, and a runner may only hold one flag.
+ */
+export function bgCarryingFlag(ctx: SimContext, pid: number): boolean {
+  const match = ctx.bgMatches.get(pid);
+  return match ? match.flags.some((f) => f.carrier === pid) : false;
 }
 
 /** Disconnect/leave/jail mid-match: the deserter takes the rating loss and a
