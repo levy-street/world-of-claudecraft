@@ -2,12 +2,12 @@
 
 | | |
 |---|---|
-| **Status** | BLOCKED. Do not start slices until: (1) the Levy conversation on the PRD has happened (contribution process: features need a conversation first, then a PBE round); (2) the `feature/procedural-dungeons` branch (umbrella PR #1584) has landed in a release, since this dungeon stacks on its zone file; (3) the open question is resolved: level band 13 to 15 inside a level 20 zone (sheltered entrance pocket) OR re-band to 20. All numbers below assume 13 to 15; a re-band changes boss levels, loot ilvls, and the entrance pocket rule but no file structure. Pass 2 applied 2026-07-27 (maintainer direction: do not copy Deadmines, too long): cut from five bosses plus an optional wing to THREE (Charwick, the Hulljack, Redwake); Overseer Brack and Quartermaster Sallow cut outright along with the optional Sawpits wing; the Deadmines-style cannon-door breach replaced by the Sluiceworks flood beat, which the wrecker fiction actually earns (they drowned a hundred ships to build this one, and you drown it back); `cart_lanes.ts` and `wreck_train.ts` cut with their systems. |
+| **Status** | READY FOR THE LEVY CONVERSATION. The zone dependency is satisfied: `src/sim/content/galecrest.ts` landed in `release/v0.33.0`, is merged through `src/sim/data.ts`, and is placed in `ZONES`. Do not start slices until: (1) the Levy conversation on the PRD has happened and Levy has selected the band and portfolio slot; (2) the PBE round commitment is recorded; (3) the open question is resolved: level band 13 to 15 inside a level 20 zone (sheltered entrance pocket) OR re-band to 20. All numbers below assume 13 to 15; a re-band changes boss levels, loot ilvls, and the entrance pocket rule but no file structure. Pass 2 applied 2026-07-27 (maintainer direction: do not copy Deadmines, too long): cut from five bosses plus an optional wing to THREE (Charwick, the Hulljack, Redwake); Overseer Brack and Quartermaster Sallow cut outright along with the optional Sawpits wing; the Deadmines-style cannon-door breach replaced by the Sluiceworks flood beat, which the wrecker fiction actually earns (they drowned a hundred ships to build this one, and you drown it back); `cart_lanes.ts` and `wreck_train.ts` cut with their systems. |
 | **Portfolio lane** | Proposed first approval candidate and first dungeon build. This is not Levy approval. |
-| **Dispatch gate** | Levy selects the band and this portfolio slot, the `feature/procedural-dungeons` branch (umbrella PR #1584) lands in a release, and the PBE commitment is recorded. The pass-2 schedule cut is already applied; the protected spine is the worksite, the Charwick and Hulljack lineage, the Sluiceworks flood, and the Redwake deck finale. |
+| **Dispatch gate** | The zone dependency is satisfied: `src/sim/content/galecrest.ts` landed in `release/v0.33.0`, is merged through `src/sim/data.ts`, and is placed in `ZONES`. Dispatch remains gated on Levy selecting the band and this portfolio slot, resolving the open level-band question, and recording the PBE round commitment. The pass-2 schedule cut is already applied; the protected spine is the worksite, the Charwick and Hulljack lineage, the Sluiceworks flood, and the Redwake deck finale. |
 | **Source PRD** | `docs/prd/hullworks-dungeon.md` (honor its File plan; this doc slices it) |
 | **Scope** | The full dungeon: instance shell, three bosses, the Sluiceworks flood beat, loot, heroic at launch on the existing machinery, deeds, quests, music, i18n, bot clear. Run length 20 to 30 minutes at level (tuning). PRD PR A = S1 to S4 (shell + bosses 1 to 2 lineage), PR B = S5 to S7 (flood + Redwake + heroic + loot). |
-| **Verified against** | 2026-07-25: `origin/release/v0.30.0` (all engine anchors) and `origin/feature/procedural-dungeons` (galecrest anchors); pass-2 re-slice 2026-07-27 against the pass-2 PRD (engine anchors unchanged). Re-find every symbol before editing; trust symbols, not line numbers. |
+| **Verified against** | 2026-07-31: `release/v0.33.0` for `src/sim/content/galecrest.ts`, its merge through `src/sim/data.ts`, and its placement in `ZONES`; engine anchors remain from the 2026-07-25 review of `origin/release/v0.30.0`, with the pass-2 re-slice checked against the PRD on 2026-07-27. Re-find every symbol before editing; trust symbols, not line numbers. |
 | **Executor routing** | Claude uses `extract-and-test`, `build-dungeon-kit`, and `qa-checklist`; Codex uses `$woc-extract-and-test`, `$woc-build-dungeon-kit`, and `$woc-qa`. Sim diffs also get architecture review. |
 
 ---
@@ -29,9 +29,9 @@
 5. Deeds are append-only: `DEED_ORDER` derives from `Object.keys(DEEDS)` in
    `src/sim/content/deeds.ts`, so new deeds go at the END of the record and ids
    never change once shipped (`docs/design/deeds.md` authoring contract).
-6. The galecrest.ts edit stays additive and minimal: one POI, one NPC quest hook, one
-   camp-exclusion comment. It comes from the `feature/procedural-dungeons` branch
-   (umbrella PR #1584), which must land in a release before dispatch; coordinate the base.
+6. The `src/sim/content/galecrest.ts` edit stays additive and minimal: one POI, one
+   NPC quest hook, one camp-exclusion comment. The file landed in `release/v0.33.0`,
+   is merged through `src/sim/data.ts`, and is placed in `ZONES`; coordinate the base.
 
 ## 1. Shared design constants (defined once in S1, imported everywhere)
 
@@ -69,7 +69,7 @@ Redwake phases 100/70/30, Broadside cone 90 deg. Instance x-bands derive from
 | Boss-kit fields | `MobTemplate` in `src/sim/types.ts` defines fields such as `aoePulse`; `DUNGEON_MOBS` in `src/sim/content/dungeons.ts` provides examples for `aoePulse`, `mortalStrike`, `summonAdds`, charge, and stun. NEW mechanics do NOT extend the kit; they live in the S3 to S6 modules keyed off template ids |
 | Entry clearance | every def comments `entry` clear of first-pack aggro; pinned by `tests/dungeon_entry_clearance.test.ts` |
 | Module tick pins | `Sim` in `src/sim/sim.ts` emits each lap phase; `SIM_LAP_PHASES` in `server/game.ts` pins the exact emission list. Append new names AFTER existing names so old names stay byte-identical |
-| Zone file from the `feature/procedural-dungeons` branch (umbrella PR #1584) | `src/sim/content/galecrest.ts` exports `GALECREST_ZONE`, `GALECREST_NPCS`, `GALECREST_QUESTS`, `GALECREST_QUEST_ORDER`, `GALECREST_OBJECTS`, and `GALECREST_CAMPS`; the branch merges them through the exported content registries in `src/sim/data.ts`. `GALECREST_ZONE` has `levelRange: [20, 20]` |
+| Zone content landed in `release/v0.33.0` | `src/sim/content/galecrest.ts` exports `GALECREST_ZONE`, `GALECREST_NPCS`, `GALECREST_QUESTS`, `GALECREST_QUEST_ORDER`, `GALECREST_OBJECTS`, and `GALECREST_CAMPS`; `src/sim/data.ts` merges them through the exported content registries and places `GALECREST_ZONE` in `ZONES`. `GALECREST_ZONE` has `levelRange: [20, 20]` |
 | Deeds | `DEEDS` and `DEED_ORDER` in `src/sim/content/deeds.ts`; per-boss first-kill rows follow existing dungeon rows. Stat triggers use exported helpers such as `bumpDeedStat` in `src/sim/deeds.ts` |
 | Dungeon Finder | `FINDER_ACTIVITIES` and `FinderEncounter` in `src/sim/content/dungeon_finder.ts`; heroic boss drops use `HEROIC_BOSS_LOOT` in `src/sim/content/heroic_loot.ts`; `tests/dungeon_finder.test.ts` pins activity ids and level ranges |
 | Music | `ZONE_STREAM_URLS` in `src/game/music_tracks.ts`; `instanceMusicDecision` and `InstanceMusicController` in `src/game/instance_music.ts` |
@@ -251,11 +251,10 @@ credits/provenance, and
   `SIM_LAP_PHASES` in `server/game.ts`, AFTER the
   existing names (the base list stays byte-identical). Two pins land here: `fuseLines`
   (S3) and `rigPilot` (S4). The Sluiceworks beat has no module and no pin.
-- **G2, the zone file is not yours.** `src/sim/content/galecrest.ts` comes from the
-  `feature/procedural-dungeons` branch (umbrella PR #1584), and its
-  author may still be moving it. Every edit is additive (new poi row, new quest rows,
-  comments); never re-shape existing exports. If that branch has not landed in a
-  release when S1 starts, stop and re-check the base with the operator.
+- **G2, the zone file is not yours.** `src/sim/content/galecrest.ts` landed in
+  `release/v0.33.0`, is merged through `src/sim/data.ts`, and is placed in `ZONES`.
+  Every edit is additive (new poi row, new quest rows, comments); never re-shape
+  existing exports. Re-check the release base with the operator before S1 starts.
 - **G3, parity.** New `ctx.rng` draws must live strictly inside Hullworks code paths
   (encounter state, instance band). One new golden (`hullworks_redwake`, S6) is added;
   if any EXISTING golden reds, the fix is the code, never `UPDATE_PARITY=1` on it.

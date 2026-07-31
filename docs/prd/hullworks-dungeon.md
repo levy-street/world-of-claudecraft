@@ -1,8 +1,12 @@
 # PRD: The Hullworks, a five-player smuggler-shipyard dungeon
 
-Status: DRAFT pass 1 (2026-07-25), for discussion with Levy. Numbers marked
-(tuning) are proposals; engine-derived numbers follow the formulas named
-inline. Archetype: the classic "criminal syndicate digs under the coast and
+Status: READY FOR THE LEVY CONVERSATION (2026-07-31). The zone dependency
+is satisfied: `src/sim/content/galecrest.ts` landed in `release/v0.33.0`,
+is merged through `src/sim/data.ts`, and is placed in `ZONES`. The Levy
+conversation, including the band and portfolio decision, plus the PBE round
+commitment still gate dispatch. Numbers marked (tuning) are proposals;
+engine-derived numbers follow the formulas named inline. Archetype: the
+classic "criminal syndicate digs under the coast and
 builds a warship in a cave" first-story-dungeon, rebuilt with original
 fiction and this engine's primitives. Not a copy of any existing MMO
 instance: the shape (descend a worksite, reach the hidden ship) is genre
@@ -30,9 +34,11 @@ ships to build this one, and you drown it back.)
   arena); the dungeon adds no ship-physics or water-simulation system.
 - Schedule cut applied at pass 2: three bosses (Charwick, the Hulljack, Redwake), no
   optional wing, no cannon beat; Overseer Brack and Quartermaster Sallow cut outright.
-- Next-stage gate: Levy chooses the 13 to 15 or level-20 band, the
-  `feature/procedural-dungeons` branch (umbrella PR #1584) lands in a release, and the PBE
-  commitment is recorded. The proposed portfolio position is not approval.
+- Satisfied dependency: `src/sim/content/galecrest.ts` landed in
+  `release/v0.33.0`, is merged through `src/sim/data.ts`, and is placed in `ZONES`.
+- Next-stage gate: the Levy conversation resolves the 13 to 15 or level-20 band and
+  portfolio slot, and the PBE commitment is recorded. The proposed portfolio position
+  is not approval.
 
 ## Where it sits
 
@@ -47,8 +53,9 @@ ships to build this one, and you drown it back.)
   proposed door area is x 400 to 430, z 370 to 400, near the cove. S1 must
   verify final placement against the real terrain before committing the
   `doorPos`.
-- Hard dependency: the `feature/procedural-dungeons` branch (umbrella PR #1584)
-  must land in a release first. This PRD stacks on it.
+- Satisfied dependency: the Galecrest content in
+  `src/sim/content/galecrest.ts` landed in `release/v0.33.0`, is merged through
+  `src/sim/data.ts`, and is placed in `ZONES`.
 - Finder band: `HULLWORKS_MIN_LEVEL` is 13, and the normal Dungeon Finder
   activity has `minLevel: 13` and `maxLevel: 15`. Those finder rows are the
   only level enforcement surface. Physical door entry remains ungated by
@@ -261,8 +268,8 @@ Files ADDED:
 Files MODIFIED:
 - `src/sim/data.ts` (merge), `src/sim/content/deeds.ts` (append),
   `src/sim/sim.ts` (module ticks) + `server/game.ts` SIM_LAP_PHASES pins.
-- `src/sim/content/galecrest.ts`, from the `feature/procedural-dungeons`
-  branch (umbrella PR #1584): the entrance
+- `src/sim/content/galecrest.ts`, landed in `release/v0.33.0`, merged through
+  `src/sim/data.ts`, and placed in `ZONES`: the entrance
   work-lift POI, the entrance pocket kept clear of level-20 camps, and
   Odile's noticeboard quest hook; the ONLY zone-file edit, kept minimal.
 - `src/sim/content/dungeon_finder.ts` (`FINDER_ACTIVITIES` normal and heroic
