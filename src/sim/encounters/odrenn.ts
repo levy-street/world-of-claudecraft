@@ -175,7 +175,9 @@ export function updateOdrennEncounter(ctx: SimContext, boss: Entity): void {
         for (const p of raiders) {
           if (hit.has(p.id)) continue;
           const d = dist2d(current.pos, p.pos);
-          if (d <= best) {
+          // Strict: an exact tie keeps the earlier candidate instead of
+          // depending on ctx.players iteration order.
+          if (d < best) {
             best = d;
             next = p;
           }
