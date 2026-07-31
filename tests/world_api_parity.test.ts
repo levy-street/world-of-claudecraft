@@ -180,7 +180,7 @@ export const IWORLD_MEMBERS = [
   { name: 'arenaInfo', kind: 'data' },
   { name: 'honor', kind: 'data' },
   { name: 'lifetimeHonor', kind: 'data' },
-  // --- Ravenrift battleground (IWorldBattleground) ---
+  // --- Thornhollow Fields battleground (IWorldBattleground) ---
   { name: 'bgInfo', kind: 'data' },
   { name: 'cardMinigameInfo', kind: 'data' },
   { name: 'joinCardDuelQueue', kind: 'method' },
@@ -245,7 +245,7 @@ export const IWORLD_MEMBERS = [
   { name: 'arenaQueueJoin', kind: 'method' },
   { name: 'arenaQueueLeave', kind: 'method' },
   { name: 'arenaAugmentPick', kind: 'method' },
-  // --- Ravenrift battleground (IWorldBattleground) ---
+  // --- Thornhollow Fields battleground (IWorldBattleground) ---
   { name: 'bgQueueJoin', kind: 'method' },
   { name: 'bgQueueLeave', kind: 'method' },
   { name: 'bgFlagAction', kind: 'method' },

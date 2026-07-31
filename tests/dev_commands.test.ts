@@ -167,7 +167,7 @@ describe('dev commands', () => {
   });
 });
 
-describe('/dev bg (Ravenrift force-start)', () => {
+describe('/dev bg (Thornhollow Fields force-start)', () => {
   it('force-starts a short-handed match from whoever is queued, no bots', () => {
     const sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true, devCommands: true });
     const a = sim.addPlayer('warrior', 'Alpha');

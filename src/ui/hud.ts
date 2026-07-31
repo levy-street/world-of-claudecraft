@@ -1405,7 +1405,7 @@ export class Hud {
   private wasLeaderOfParty = false;
   private lastArenaStatusSig = '';
   private arenaMatchSeen = false; // closes the queue panel once a bout starts
-  private bgMatchSeen = false; // closes the Ravenrift queue window once a match seats
+  private bgMatchSeen = false; // closes the Thornhollow Fields queue window once a match seats
   private readonly fiesta: FiestaController;
   private lastCombatEventAt = 0;
   // mob ids that have already vocalized their aggro alert (so the first strike
@@ -1844,7 +1844,7 @@ export class Hud {
     // every other touch-facing HUD button; desktop mouse/keyboard is preserved.
     bindTouchTap(this.releaseSpiritBtnEl, () => {
       if (this.sim.arenaInfo?.match) return;
-      // Ravenrift releases like the open world: the spirit rises in the keep
+      // Thornhollow Fields releases like the open world: the spirit rises in the keep
       // graveyard and waits for the wave (the sim routes the destination).
       this.sim.releaseSpirit();
     });
@@ -3928,7 +3928,7 @@ export class Hud {
     writers: this.writerFacet,
   });
 
-  // Ravenrift in-match scoreboard strip + wave-respawn overlay (self-mounting,
+  // Thornhollow Fields in-match scoreboard strip + wave-respawn overlay (self-mounting,
   // elided writers; hud/battleground/).
   private readonly bgMapPainter = new BattlegroundMapPainter();
   private readonly bgScoreboard = new BattlegroundScoreboard({
@@ -7786,7 +7786,7 @@ export class Hud {
       this.valeCupWindow.close();
     }
     this.vcupMatchSeen = inVcupMatch;
-    // Same for Ravenrift: when the match seats, the PvP window steps aside.
+    // Same for Thornhollow Fields: when the match seats, the PvP window steps aside.
     const inBgMatch = !!this.sim.bgInfo?.match;
     if (inBgMatch && !this.bgMatchSeen && $('#arena-window').style.display === 'block') {
       this.arenaWindow.close();
@@ -8381,7 +8381,7 @@ export class Hud {
   }
 
   toggleBattleground(): void {
-    // The Ravenrift deep entry into the merged PvP window (its primary tab).
+    // The Thornhollow Fields deep entry into the merged PvP window (its primary tab).
     this.arenaWindow.openTab('ravenrift');
   }
 
@@ -8510,7 +8510,7 @@ export class Hud {
     const summaryEl = $('#map-summary');
 
     if (mapWindowMode(this.sim) === 'battleground') {
-      // The Ravenrift surface: the field schematic + the honest marker set
+      // The Thornhollow Fields surface: the field schematic + the honest marker set
       // (self + teammates; the fog's no-scouting rule owns everything else).
       this.mapQuestAreas = [];
       this.mapNpcMarkers = [];

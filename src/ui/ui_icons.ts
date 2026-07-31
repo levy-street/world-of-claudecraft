@@ -83,7 +83,7 @@ export type UiIconName =
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
 // glyphs set fill-rule="evenodd" locally.
 const ICONS: Record<UiIconName, string> = {
-  // hand-authored capture-the-flag banner on a pole (Ravenrift battleground)
+  // hand-authored capture-the-flag banner on a pole (Thornhollow Fields battleground)
   battleground: '<path d="M150 56h26v400h-26z"/><path d="M176 78h236l-52 66 52 66H176z"/>',
   // ── game-icons.net (CC BY 3.0) ───────────────────────────────────────────
   arena:

@@ -1,4 +1,4 @@
-// Thin DOM painter for the Ravenrift kill feed: a short top-right stack of
+// Thin DOM painter for the Thornhollow Fields kill feed: a short top-right stack of
 // death calls, event-pushed and expiry-pruned through the pure core
 // (battleground_kill_feed_view.ts). The per-frame update is a no-op unless a
 // line actually expired (the core returns the same array otherwise), so the

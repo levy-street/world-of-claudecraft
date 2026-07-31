@@ -1,4 +1,4 @@
-# scripts/assets/battleground/ - the Ravenrift field builder
+# scripts/assets/battleground/ - the Thornhollow Fields builder
 
 The pure halves of the battleground map builder. The orchestrator is
 `scripts/assets/build_battleground_map.mjs`; everything with logic worth a test
@@ -7,7 +7,7 @@ lives here, with a hand-written `.d.mts` beside it so the type-checked Vitest
 
 ## The one idea: the PLAN owns the footprint, the DRESSING owns the look
 
-`field_plan.mjs` is the combat-tuned Ravenrift layout as plain data: the 100x280
+`field_plan.mjs` is the combat-tuned Thornhollow Fields layout as plain data: the 100x280
 footprint, the keeps, the two curtains and their crossings, the cover, the rune
 pads, the graveyards. It is the gameplay contract. **Anything that changes where
 a fighter can stand belongs there, and only there.**

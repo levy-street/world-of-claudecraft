@@ -52,7 +52,7 @@ const CAMPFIRE_MIN_RADIUS = 1.4;
 const CAMPFIRE_RADIUS_PPU = 0.5;
 
 /** Which world-map surface a given world renders: the delve schematic (owned by
- *  delve_map_painter), the Ravenrift battleground band (routed to the plain
+ *  delve_map_painter), the Thornhollow Fields battleground band (routed to the plain
  *  overworld surface: the band sits past WORLD_MAX_X, so the player/ally
  *  markers self-suppress; the minimap owns the in-band field raster), or the
  *  overworld map (this core). */

@@ -274,7 +274,8 @@ export function handleDevChat(
   if (/^\/(?:dev\s+bg|devbg)\s+end\s*$/i.test(raw)) {
     // End the caller's live match early, resolving on the current score (ties
     // draw) through the normal result screen + release flow.
-    if (devEndBg(ctx, pid)) emitDevLog(ctx, pid, '[dev] Ravenrift resolved early on score.');
+    if (devEndBg(ctx, pid))
+      emitDevLog(ctx, pid, '[dev] Thornhollow Fields resolved early on score.');
     else ctx.error(pid, '[dev] You are not in an unresolved battleground.');
     return null;
   }
@@ -312,11 +313,11 @@ export function handleDevChat(
     const match = ctx.bgMatches.get(pid);
     if (match) {
       const count = match.teams[0].length + match.teams[1].length;
-      emitDevLog(ctx, pid, `[dev] Ravenrift force-started with ${count} champions.`);
+      emitDevLog(ctx, pid, `[dev] Thornhollow Fields force-started with ${count} champions.`);
     } else {
       ctx.error(
         pid,
-        '[dev] Could not force-start Ravenrift (needs 2 queued players and a free slot).',
+        '[dev] Could not force-start Thornhollow Fields (needs 2 queued players and a free slot).',
       );
     }
     return null;

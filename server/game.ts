@@ -238,7 +238,7 @@ const NPC_DROP_RADIUS = 130;
 // the widest OPEN-WORLD radius any entity kind can be relevant at (the
 // battleground band widens past this: BG_MATCH_DROP_RADIUS below)
 const INTEREST_QUERY_RADIUS = NPC_DROP_RADIUS;
-// Ravenrift at Thornhollow: the 100x280 field (diagonal ~297yd) stays fully
+// Thornhollow Fields: the 100x280 field (diagonal ~297yd) stays fully
 // tracked for its own match, so the whole battle exists in every participant's
 // sim mirror (the CLIENT hides past ~120yd behind the band's distance fog, like
 // the open world's view distance). Applies to SAME-SLOT pairs only: slot
@@ -409,7 +409,7 @@ export function mobZonePhase(mob: Entity): string {
 
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
-// Ravenrift `bg` self key: 1 Hz covers the in-match clocks (wave respawn,
+// Thornhollow Fields `bg` self key: 1 Hz covers the in-match clocks (wave respawn,
 // match cap, spawn protection) that tick by whole seconds; queue and match
 // transitions force a fresh readout via lastBgWireTick resets (the arena
 // staleness fix), and the flag/score events ride the event queue instantly.
@@ -750,7 +750,7 @@ export interface ClientSession {
   timerWireCache: StableSelfTimerWireCache;
   // arena readout is reconciled at UI cadence instead of snapshot cadence
   lastArenaWireTick: number;
-  // Ravenrift battleground readout, same idea at its own cadence (BG_WIRE_HZ)
+  // Thornhollow Fields battleground readout, same idea at its own cadence (BG_WIRE_HZ)
   lastBgWireTick: number;
   // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
   lastDfWireTick: number;
@@ -1744,7 +1744,7 @@ export class GameServer {
     this.sim.vcupQueueLeave(target.pid);
     this.sim.vcupResolveDesertion(target.pid);
     this.sim.leaveCardMinigameEntirely(target.pid);
-    // Ravenrift: leave the queue and desert any live match (the deserter takes
+    // Thornhollow Fields: leave the queue and desert any live match (the deserter takes
     // the rating loss; the team fights on) so the jail sweep never fights the
     // battleground for control of the prisoner's entity.
     this.sim.bgQueueLeave(target.pid);
@@ -3185,7 +3185,7 @@ export class GameServer {
     // Card Duel: drop the queue slot and forfeit any live match on disconnect,
     // same idempotent-before-persistence shape as the two lines above.
     this.sim.leaveCardMinigameEntirely(session.pid);
-    // Ravenrift desertion also resolves before the leave save so the leaver's
+    // Thornhollow Fields desertion also resolves before the leave save so the leaver's
     // recorded loss and rating delta are in the persisted state (idempotent;
     // removePlayer repeats it harmlessly).
     this.sim.bgResolveDesertion(session.pid);
@@ -4874,7 +4874,7 @@ export class GameServer {
         break;
       }
 
-      // Ravenrift (5v5 capture-the-flag). The sim owns every rule; the resets
+      // Thornhollow Fields (5v5 capture-the-flag). The sim owns every rule; the resets
       // surface the changed queue/match state on the next snapshot instead of
       // the throttled BG_WIRE_HZ tick (the arena staleness fix).
       case 'bg_queue':
@@ -5967,7 +5967,7 @@ export class GameServer {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));
     }
-    // Ravenrift readout at its own UI cadence (BG_WIRE_HZ). The viewer-identical
+    // Thornhollow Fields readout at its own UI cadence (BG_WIRE_HZ). The viewer-identical
     // match core is memoized per tick inside the sim (sharedMatchView), so ten
     // in-match viewers share one build; only the per-viewer scalars differ.
     if (this.sim.tickCount - session.lastBgWireTick >= BG_WIRE_INTERVAL_TICKS) {
@@ -6651,7 +6651,7 @@ export class GameServer {
               // force it fresh next snapshot instead of leaving the Arena
               // window showing the pre-match rating for up to 10s.
               if (ev.type === 'arenaEnd') session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
-              // Same staleness fix for the Ravenrift readout: queue churn,
+              // Same staleness fix for the Thornhollow Fields readout: queue churn,
               // match lifecycle, and flag plays refresh `bg` next snapshot.
               if (BG_WIRE_RESET_EVENTS.has(ev.type))
                 session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;

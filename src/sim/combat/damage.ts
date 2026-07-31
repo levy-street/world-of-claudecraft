@@ -134,7 +134,7 @@ export function dealDamage(
   // damage (owner 2026-07-13), so nothing gets through until it is cancelled or
   // expires. Every damage path funnels here, so this covers melee, spells, and DoTs.
   if (target.auras.some((a) => a.kind === 'stasis')) return;
-  // Ravenrift spawn protection: full damage immunity for a few seconds after
+  // Thornhollow Fields spawn protection: full damage immunity for a few seconds after
   // every battleground spawn (social/battleground.ts owns the aura). Every
   // damage path funnels here, so this covers melee, spells, and DoT ticks.
   // A wild mob that broke leash is in 'evade': it has dropped its hate table
@@ -1083,7 +1083,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     if (e.leap !== undefined) e.leap = null;
     e.followTargetId = null;
     ctx.emit({ type: 'playerDeath', pid: e.id });
-    // Ravenrift: carrier death drops the flag in place; the team wave clock
+    // Thornhollow Fields: carrier death drops the flag in place; the team wave clock
     // revives the fallen (no release, corpse, or ghost run).
     ctx.bgOnPlayerDeath(e, killer);
     for (const m of ctx.entities.values()) {

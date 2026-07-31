@@ -1,4 +1,4 @@
-// Ravenrift battleground field (Thornhollow): the Three half of the render
+// Thornhollow Fields battleground field (Thornhollow): the Three half of the render
 // layer. One view per match slot, built lazily by the renderer when the player
 // is near (the yumi_maze pattern).
 //

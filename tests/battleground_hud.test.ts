@@ -340,7 +340,7 @@ describe('battleground map view (pure core)', () => {
 
   it('spans the authored field rect, and every mapped anchor falls inside it', () => {
     const model = buildBgMapModel(worldSlice(0, []));
-    // Ravenrift's own 100x280yd footprint: the map a player learns the field
+    // Thornhollow Fields' own 100x280yd footprint: the map a player learns the field
     // by is the same shape the field has always been.
     expect([model.halfX, model.halfZ]).toEqual([BG_HALF_X, BG_HALF_Z]);
     expect(model.halfX * 2).toBe(100);

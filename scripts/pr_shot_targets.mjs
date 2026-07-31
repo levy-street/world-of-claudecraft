@@ -52,7 +52,8 @@ async function openMarketBrowse(page) {
 export const TARGETS = [
   {
     key: 'ravenrift',
-    label: 'Ravenrift 5v5 battleground: field, gatehouse, carry, queue window, mobile scoreboard',
+    label:
+      'Thornhollow Fields 5v5 battleground: field, gatehouse, carry, queue window, mobile scoreboard',
     // Match the SOURCE files (the `.ts` suffixes keep the sim/render tests from
     // classifying as visual).
     when: [
@@ -194,7 +195,7 @@ export const TARGETS = [
         return { clip: '#bg-scoreboard' };
       }
       if (scene === 'map') {
-        // the M-key world map's Ravenrift surface (schematic + honest markers)
+        // the M-key world map's Thornhollow Fields surface (schematic + honest markers)
         const mapOk = await page.evaluate(() => {
           const game = window.__game;
           if (!game.sim.bgMatchFor(game.sim.player.id)) return false; // staging lost

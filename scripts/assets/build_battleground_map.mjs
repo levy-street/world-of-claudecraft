@@ -1,8 +1,8 @@
-// Build the Ravenrift battleground map document
+// Build the Thornhollow Fields battleground map document
 // (data/battleground/thornhollow.map.json) from the combat plan plus the
 // Thornhollow art kit.
 //
-// The field is Ravenrift's original, combat-tuned layout, dressed at
+// The field is Thornhollow Fields' original, combat-tuned layout, dressed at
 // Thornhollow: same 100x280 footprint, same three chambers, same two crossings
 // per curtain, same keeps, cover, rune pads and graveyards, now built out of the
 // authored map's catalogue architecture, photographed ground textures, sculpted
@@ -274,9 +274,9 @@ const map = {
   version: 2,
   meta: {
     id: 'thornhollow_v3',
-    name: 'Thornhollow',
+    name: 'Thornhollow Fields',
     description:
-      'Ravenrift at Thornhollow: a walled hollow in the old growth under Thornpeak. ' +
+      'Thornhollow Fields: a walled hollow in the old growth under Thornpeak. ' +
       'Crimson and Azure hold a keep at either end of the ravine floor, two curtain ' +
       'walls carve the field into three chambers, and the Ruin Courtyard between them ' +
       'settles what the flags cannot.',

@@ -1,4 +1,4 @@
-// Thin DOM painter for the in-match Ravenrift scoreboard strip and the
+// Thin DOM painter for the in-match Thornhollow Fields scoreboard strip and the
 // wave-respawn overlay (the ValeCupHud composition template: snapshot-driven
 // per mediumHud tick from the pure BgScoreboardView, self-mounting roots,
 // sig-diffed skeleton). The skeleton (team labels + pip slots) rebuilds only

@@ -1,7 +1,7 @@
-// The RAVENRIFT FIELD PLAN: the gameplay-authoritative geometry of the 5v5
+// The THORNHOLLOW FIELDS PLAN: the gameplay-authoritative geometry of the 5v5
 // capture-the-flag battleground, restated as plain data.
 //
-// Every number here is the ORIGINAL Ravenrift layout (the combat-tuned field:
+// Every number here is the ORIGINAL Thornhollow Fields layout (the combat-tuned field:
 // three chambers, two curtains pierced by a main gate and a gatehouse each, a
 // keep whose mouth is the only way in, the hollow heart ruin, and the cover
 // that breaks each straight charge). The map builder dresses this plan with the
@@ -316,7 +316,7 @@ export const LOCATIONS = [
   { name: 'The Ruin Courtyard', minX: -HALF_X, minZ: -CURTAIN_Z, maxX: HALF_X, maxZ: CURTAIN_Z },
   { name: 'Crimson Field', minX: -HALF_X, minZ: -108, maxX: HALF_X, maxZ: -CURTAIN_Z },
   { name: 'Azure Field', minX: -HALF_X, minZ: CURTAIN_Z, maxX: HALF_X, maxZ: 108 },
-  { name: 'Ravenrift', minX: -HALF_X, minZ: -HALF_Z, maxX: HALF_X, maxZ: HALF_Z },
+  { name: 'Thornhollow Fields', minX: -HALF_X, minZ: -HALF_Z, maxX: HALF_X, maxZ: HALF_Z },
 ];
 
 // ---------------------------------------------------------------------------

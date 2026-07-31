@@ -45,7 +45,7 @@ export const guideStrings = {
     talents: 'Talents',
     arena: 'Arena & PvP',
     valeCup: 'Vale Cup',
-    ravenrift: 'Ravenrift',
+    ravenrift: 'Thornhollow Fields',
     deeds: 'Book of Deeds',
     glossary: 'Glossary',
     wishIKnew: 'Things I Wish I Knew',
@@ -1070,12 +1070,12 @@ export const guideStrings = {
   // lore, how to play, nations, roles; no kick powers, timers, or matchmaker
   // internals. Nation/role NAMES render from the shared hudChrome.vcup.* keys.
   ravenriftPage: {
-    heading: 'Ravenrift',
+    heading: 'Thornhollow Fields',
     intro:
       'A ranked 5v5 capture-the-flag battleground: two teams of five, two keeps, one goal. Steal the enemy banner and run it home before they run yours.',
     queueHeading: 'Queueing up',
     queueBody:
-      'Open the Ravenrift panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.',
+      'Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.',
     fieldHeading: 'The field',
     fieldBody:
       "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",

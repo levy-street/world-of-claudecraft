@@ -642,20 +642,20 @@ export const hudChromeStrings = {
   // banners / log lines. Nation names are SHORT proper names; sport ability
   // names/descriptions localize through the entity catalog
   // (i18n.catalog/abilities.ts), not here.
-  // Ravenrift, the 5v5 capture-the-flag battleground: the queue window, the
+  // Thornhollow Fields, the 5v5 capture-the-flag battleground: the queue window, the
   // in-match scoreboard strip, and the event banners/log lines.
-  // The merged PvP window's chrome: the launcher (one button for Ravenrift and
+  // The merged PvP window's chrome: the launcher (one button for Thornhollow Fields and
   // the arenas) and the tab-strip bracket labels.
   pvp: {
-    launcherTitle: 'PvP: Ravenrift and the Arenas',
+    launcherTitle: 'PvP: Thornhollow Fields and the Arenas',
     mobileLabel: 'PvP',
     bracket1v1: '1v1',
     bracket2v2: '2v2',
   },
   bg: {
-    title: 'Ravenrift',
+    title: 'Thornhollow Fields',
     modeTag: '5v5 Capture the Flag',
-    offlineNote: 'Ravenrift is syncing. The queue opens once the realm answers.',
+    offlineNote: 'Thornhollow Fields is syncing. The queue opens once the realm answers.',
     ratingSummary: 'Rating. {wins} wins / {losses} losses',
     careerCaptures: 'Career captures: {count}',
     enterQueue: 'Enter the Queue',
@@ -692,7 +692,7 @@ export const hudChromeStrings = {
     killFeedFallen: '{victim} has fallen',
     // event banners + combat-log lines (hud.handleEvents)
     foundBanner: 'Battle found. You fight for the {team}!',
-    countdownBanner: 'Ravenrift begins in {seconds}',
+    countdownBanner: 'Thornhollow Fields begins in {seconds}',
     startBanner: 'Capture the flag!',
     flagTakenLog: '{name} has taken the {team} flag!',
     flagDroppedLog: 'The {team} flag was dropped.',
@@ -709,10 +709,10 @@ export const hudChromeStrings = {
     flagReturnedBanner: 'The {team} flag was returned!',
     capturedTeamBanner: 'The {takers} have captured the {team} flag! {crimson}:{azure}',
     capturedLog: '{name} captured the {team} flag. Score {crimson}:{azure}.',
-    victoryBanner: 'Victory! Ravenrift {crimson}:{azure}. Rating {rating} ({delta})',
-    defeatBanner: 'Defeat. Ravenrift {crimson}:{azure}. Rating {rating} ({delta})',
-    drawBanner: 'Ravenrift draw {crimson}:{azure}. Rating {rating} ({delta})',
-    endLog: 'Ravenrift ended {crimson}:{azure}. Rating {rating} ({delta}).',
+    victoryBanner: 'Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})',
+    defeatBanner: 'Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})',
+    drawBanner: 'Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})',
+    endLog: 'Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).',
   },
   vcup: {
     title: 'The Vale Cup',
@@ -1131,8 +1131,8 @@ export const hudChromeStrings = {
       fiestaKill: 'Fiesta takedown',
       fiestaComplete: 'Fiesta completed',
       fiestaWin: 'Fiesta victory',
-      battlegroundWin: 'Ravenrift victory',
-      battlegroundComplete: 'Ravenrift battle fought',
+      battlegroundWin: 'Thornhollow Fields victory',
+      battlegroundComplete: 'Thornhollow Fields battle fought',
     },
   },
   // Character sheet showcase layout: the two titled stat-panel headings under the

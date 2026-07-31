@@ -1,4 +1,4 @@
-// Ravenrift at THORNHOLLOW: the sim-side pins for the authored field.
+// Thornhollow Fields at THORNHOLLOW: the sim-side pins for the authored field.
 //
 // The field is no longer code-defined geometry: the combat plan is built into
 // data/battleground/thornhollow.map.json and compiled into
@@ -90,7 +90,7 @@ const locationCentre = (name: string) => {
   return { x: (r.minX + r.maxX) / 2, z: (r.minZ + r.maxZ) / 2 };
 };
 
-describe('Ravenrift band: non-overlap with every other instance band', () => {
+describe('Thornhollow Fields band: non-overlap with every other instance band', () => {
   it('claims a band past the Yumi cap and stays west of the Vale Cup pitches', () => {
     expect(BG_BAND_X_MIN).toBeGreaterThanOrEqual(YUMI_BAND_X_MAX);
     // Vale Cup practice pitches sit at x = 30000 (vale_cup_layout.ts
@@ -288,7 +288,7 @@ describe('Thornhollow generated artifacts: fresh against the plan', () => {
   }, 240000);
 });
 
-describe('Ravenrift anchors: the game-mode record, authored symmetric', () => {
+describe('Thornhollow Fields anchors: the game-mode record, authored symmetric', () => {
   const mirrorDist = (a: { x: number; z: number }, b: { x: number; z: number }) =>
     Math.hypot(a.x + b.x, a.z + b.z);
   // Worst "nearest point mirror" over a whole set: the anchors mirror as SETS
@@ -527,7 +527,7 @@ function floodPlayRect(): Flood {
   return { cols, rows, nearest, visitedAt, reached };
 }
 
-describe('Ravenrift walkability: one connected field, both keeps included', () => {
+describe('Thornhollow Fields walkability: one connected field, both keeps included', () => {
   const flood = floodPlayRect();
   // "Standable" = the flood reached a cell inside one flood cell of the point.
   const reaches = (x: number, z: number) => flood.nearest(x, z) <= FLOOD_CELL + 1e-9;
@@ -636,7 +636,7 @@ describe('Ravenrift walkability: one connected field, both keeps included', () =
   });
 });
 
-describe('Ravenrift layout: the combat shape the dressing is laid over', () => {
+describe('Thornhollow Fields layout: the combat shape the dressing is laid over', () => {
   const local = (x: number, z: number) => ({ x: ORIGIN.x + x, z: ORIGIN.z + z });
   const sight = (a: [number, number], b: [number, number]) => {
     const from = local(a[0], a[1]);
@@ -1033,7 +1033,7 @@ describe('Thornhollow collision honesty: what blocks, blocks; what opens, opens'
   });
 });
 
-describe('Ravenrift slots: isolated from each other, whole inside one match', () => {
+describe('Thornhollow Fields slots: isolated from each other, whole inside one match', () => {
   it('a same-slot match fits inside the raised interest radius', () => {
     // Whole-match interest is the design: every fighter is in every other
     // fighter's mirror. The two longest same-slot spans have to fit.

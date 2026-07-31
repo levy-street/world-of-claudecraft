@@ -1,7 +1,7 @@
-// Ravenrift, the ranked 5v5 capture-the-flag battleground, fought at
+// Thornhollow Fields, the ranked 5v5 capture-the-flag battleground, fought at
 // THORNHOLLOW: a walled hollow in the old growth under Thornpeak.
 //
-// The LAYOUT is Ravenrift's original, combat-tuned field: a 100x280 walled
+// The LAYOUT is Thornhollow Fields' original, combat-tuned field: a 100x280 walled
 // rectangle, a keep at each end whose mouth is the only way in or out, two
 // full-width curtain walls carving the space into three chambers, exactly TWO
 // contested crossings per curtain (the main gate and the gatehouse room), a low

@@ -1,5 +1,5 @@
 // Pins for the merged PvP window's tab-strip model (src/ui/pvp_tabs_view.ts):
-// display order with Ravenrift primary, busy-state derivation from BOTH world
+// display order with Thornhollow Fields primary, busy-state derivation from BOTH world
 // shapes (offline Sim and ClientWorld mirror), pinning and locking, and the
 // dev-only edge where a retired bracket is live.
 import { describe, expect, it } from 'vitest';
@@ -12,7 +12,7 @@ const idle = (selected: PvpTabsInput['selected'] = 'ravenrift'): PvpTabsInput =>
 });
 
 describe('pvp tabs: order, pinning, locking', () => {
-  it('offers exactly Ravenrift, 1v1, 2v2, in that order, Ravenrift primary', () => {
+  it('offers exactly Thornhollow Fields, 1v1, 2v2, in that order, Thornhollow Fields primary', () => {
     expect(PVP_TABS).toEqual(['ravenrift', '1v1', '2v2']);
     const m = buildPvpTabs(idle());
     expect(m.tabs.map((tab) => tab.id)).toEqual(['ravenrift', '1v1', '2v2']);
@@ -33,14 +33,14 @@ describe('pvp tabs: order, pinning, locking', () => {
     expect(m.tabs.every((tab) => !tab.locked)).toBe(true);
   });
 
-  it('a queued battleground pins Ravenrift and locks both arena tabs', () => {
+  it('a queued battleground pins Thornhollow Fields and locks both arena tabs', () => {
     const m = buildPvpTabs({ ...idle('1v1'), bg: { queued: true, match: null } });
     expect(m.active).toBe('ravenrift');
     expect(m.commit).toBe(true);
     expect(m.tabs.filter((tab) => tab.locked).map((tab) => tab.id)).toEqual(['1v1', '2v2']);
   });
 
-  it('a live battleground match pins Ravenrift too (the match field alone)', () => {
+  it('a live battleground match pins Thornhollow Fields too (the match field alone)', () => {
     const m = buildPvpTabs({
       ...idle('2v2'),
       bg: { queued: false, match: {} as never },
@@ -49,7 +49,7 @@ describe('pvp tabs: order, pinning, locking', () => {
     expect(m.commit).toBe(true);
   });
 
-  it('a queued arena bracket pins its tab and locks the others, Ravenrift included', () => {
+  it('a queued arena bracket pins its tab and locks the others, Thornhollow Fields included', () => {
     const m = buildPvpTabs({
       ...idle('ravenrift'),
       arena: { queued: true, format: '2v2', match: null },

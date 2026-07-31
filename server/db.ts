@@ -2961,7 +2961,7 @@ export async function topArenaRatings(
 }
 
 // ---------------------------------------------------------------------------
-// Ravenrift rankings: the battleground's all-time 5v5 ladder. Ratings/records
+// Thornhollow Fields rankings: the battleground's all-time 5v5 ladder. Ratings/records
 // live inside each character's state JSONB (no schema migration needed); only
 // characters who have actually fought a match appear. Read through the
 // server-side cache in main.ts, never run per request under load.

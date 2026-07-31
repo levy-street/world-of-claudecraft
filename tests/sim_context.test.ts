@@ -234,7 +234,7 @@ const CALLBACK_KEYS = [
   'vcupShoot',
   'vcupSportDash',
   'vcupSportShove',
-  // Ravenrift battleground hooks (social/battleground.ts).
+  // Thornhollow Fields battleground hooks (social/battleground.ts).
   'bgOnPlayerDeath',
 ] as const;
 
@@ -536,7 +536,7 @@ function makeFakeHost() {
     vcupShoot: vi.fn(),
     vcupSportDash: vi.fn(),
     vcupSportShove: vi.fn(),
-    // Ravenrift battleground hooks.
+    // Thornhollow Fields battleground hooks.
     bgOnPlayerDeath: vi.fn(),
   };
   return { host, rng, entities, clock };

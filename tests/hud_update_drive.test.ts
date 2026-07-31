@@ -174,7 +174,7 @@ interface DriveRow {
 const SIG_RETURN = 'if (sig === this.lastSig) return;';
 const VIEW_SIG_RETURN = 'if (view.sig === this.lastSig) return;';
 // The merged PvP window guards its two tab arms with the same shape against the same
-// field, so the Ravenrift arm names its signature apart to stay pinnable.
+// field, so the Thornhollow Fields arm names its signature apart to stay pinnable.
 const RAVENRIFT_SIG_RETURN = 'if (ravenriftSig === this.lastSig) return;';
 const VIEW_SIG_BLOCK = 'if (view.sig !== this.lastSig) {';
 
@@ -766,14 +766,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     band: 'medium',
     gate: '',
     surface: 'chrome',
-    why: 'the Ravenrift in-match strip, the wave-respawn overlay and the spawn-protection line; the view core short-circuits an inactive match',
+    why: 'the Thornhollow Fields in-match strip, the wave-respawn overlay and the spawn-protection line; the view core short-circuits an inactive match',
   },
   {
     call: 'this.bgKillFeed.update',
     band: 'medium',
     gate: '',
     surface: 'chrome',
-    why: 'ages out the Ravenrift banner kill feed on its own clock, so an entry expires with no new event to drive it',
+    why: 'ages out the Thornhollow Fields banner kill feed on its own clock, so an entry expires with no new event to drive it',
   },
   {
     call: 'this.yumiPainter.update',
@@ -836,7 +836,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "$('#arena-window').style.display === 'block'",
     surface: 'window',
     guard: { kind: 'module', module: 'arena_window.ts', proof: RAVENRIFT_SIG_RETURN },
-    why: 'the merged PvP window (Ravenrift and arena tabs); each tab arm builds its\n      own signature and returns on an unchanged one',
+    why: 'the merged PvP window (Thornhollow Fields and arena tabs); each tab arm builds its\n      own signature and returns on an unchanged one',
   },
   {
     call: 'this.dungeonFinderWindow.render',
@@ -954,7 +954,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "inBgMatch && !this.bgMatchSeen && $('#arena-window').style.display === 'block'",
     surface: 'window',
     guard: { kind: 'callsite' },
-    why: "the same edge close when a Ravenrift match seats: the queue lives on that window's Ravenrift tab",
+    why: "the same edge close when a Thornhollow Fields match seats: the queue lives on that window's Thornhollow Fields tab",
   },
   {
     call: 'this.valeCupWindow.close',

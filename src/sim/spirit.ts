@@ -115,11 +115,11 @@ export function releasePlayerSpirit(
   if (!r) return;
   const { meta, e: p } = r;
   if (!p.dead || p.ghost) return; // not dead, or already a spirit
-  // Arena/fiesta run their own respawn, BUT a live Ravenrift membership wins:
+  // Arena/fiesta run their own respawn, BUT a live Thornhollow Fields membership wins:
   // a stale arenaMatches entry (jail/cross-queue leaks) once held this gate
   // shut for a whole bg match, so the guard must never outrank the bg arm.
   if (ctx.arenaMatches.has(p.id) && !ctx.bgMatches.has(p.id)) return;
-  // Ravenrift keeps the classic release: the spirit rises in the team's keep
+  // Thornhollow Fields keeps the classic release: the spirit rises in the team's keep
   // graveyard plot and waits there for the wave (never a graveyard-walk out).
   const bgMatch = ctx.bgMatches.get(p.id) ?? null;
   if (isDelvePos(p.pos.x)) {
@@ -180,7 +180,7 @@ export function resurrectAtCorpse(ctx: SimContext, pid?: number): void {
   if (!r) return;
   const { meta, e: p } = r;
   if (!p.dead || !p.ghost || !p.corpsePos) return;
-  if (ctx.bgMatches.has(p.id)) return; // Ravenrift revives on the wave only
+  if (ctx.bgMatches.has(p.id)) return; // Thornhollow Fields revives on the wave only
   // Server-authoritative range gate; the client only offers the button in range.
   if (dist2d(p.pos, p.corpsePos) > CORPSE_REZ_RANGE) return;
   // Revive where the ghost is standing (it ran back to within range of the body), not
@@ -195,7 +195,7 @@ export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean 
   if (!r) return false;
   const { meta, e: p } = r;
   if (!p.dead || !p.ghost) return false;
-  if (ctx.bgMatches.has(p.id)) return false; // Ravenrift revives on the wave only
+  if (ctx.bgMatches.has(p.id)) return false; // Thornhollow Fields revives on the wave only
   if (!spiritHealerInRange(ctx, p)) return false;
   // The Spirit Healer always inflicts Resurrection Sickness and returns you at only
   // RES_HEALER_HP_FRACTION of your pools (the corpse run is the penalty-free choice).

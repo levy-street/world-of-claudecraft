@@ -456,7 +456,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.innerHTML': 1, '.setAttribute': 3, '.removeAttribute': 3 },
     reflowAllow: {},
   },
-  // The Ravenrift scoreboard rebuilds its skeleton in ONE innerHTML write only
+  // The Thornhollow Fields scoreboard rebuilds its skeleton in ONE innerHTML write only
   // when the STRUCTURAL sig changes (new match / roster change); the seven
   // setAttribute calls are the mount-time a11y wiring plus the pin toggle
   // and the outside-click unpin, and the three classList uses are those same
@@ -504,7 +504,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // perf_graph is handed both its context and its color and reaches for neither.
 const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'hud/delve/delve_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
-  // the M-map Ravenrift field plan: canvas-only, redrawn on the map cadence;
+  // the M-map Thornhollow Fields plan: canvas-only, redrawn on the map cadence;
   // like minimap it caches its one --color-* group resolve for the session
   {
     file: 'hud/battleground/battleground_map_painter.ts',

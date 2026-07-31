@@ -1,11 +1,11 @@
-// Thin DOM painter for the merged PvP window: Ravenrift (the primary tab)
+// Thin DOM painter for the merged PvP window: Thornhollow Fields (the primary tab)
 // plus the two ranked arena brackets, one window on the classic G keybind.
 //
 // The consumer half of the pure-core + thin-painter split, driven by THREE
 // pure cores: pvp_tabs_view.ts decides the tab strip (which tab is pinned by a
 // live queue/match and which are locked), arena_window_view.ts models the
 // arena panel, and hud/battleground/battleground_window_view.ts models the
-// Ravenrift panel. This module renders whichever panel the active tab selects
+// Thornhollow Fields panel. This module renders whichever panel the active tab selects
 // and wires the tab / queue / leave / close dispatch back through IWorld +
 // injected callbacks. It owns the window's view-state (active tab, the
 // per-mode all-time-ladder caches + fetch throttles, the render-skip
@@ -78,7 +78,7 @@ export interface ArenaWindowDeps {
 }
 
 export class ArenaWindow {
-  /** The active tab; Ravenrift is the window's primary tab. */
+  /** The active tab; Thornhollow Fields is the window's primary tab. */
   private tab: PvpTabId = 'ravenrift';
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
@@ -119,7 +119,7 @@ export class ArenaWindow {
   }
 
   /** Open on (or switch to) a specific tab; a second call on that tab closes.
-   *  The Ravenrift deep entry (the shot harness, legacy callers) rides this. */
+   *  The Thornhollow Fields deep entry (the shot harness, legacy callers) rides this. */
   openTab(tab: PvpTabId): void {
     if (!this.isOpen) {
       this.tab = tab;
@@ -214,13 +214,13 @@ export class ArenaWindow {
     if (strip.commit) this.tab = strip.active;
 
     if (this.tab === 'ravenrift') {
-      this.renderRavenrift(el, world, strip);
+      this.renderThornhollowFields(el, world, strip);
       return;
     }
     this.renderArena(el, world, strip, this.tab);
   }
 
-  private renderRavenrift(el: HTMLElement, world: IWorld, strip: PvpTabsModel): void {
+  private renderThornhollowFields(el: HTMLElement, world: IWorld, strip: PvpTabsModel): void {
     const view = buildBgWindowView({
       info: world.bgInfo,
       playerName: world.player.name,

@@ -116,7 +116,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_perfect_specimen',
       'soc_first_salvage',
       'soc_salvage_50',
-      // Ravenrift battleground tail (order-pinned like the blocks above).
+      // Thornhollow Fields battleground tail (order-pinned like the blocks above).
       'pvp_bg_first_capture',
       'pvp_bg_first_win',
       'pvp_bg_wins_25',

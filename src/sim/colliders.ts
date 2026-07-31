@@ -1091,7 +1091,7 @@ export const colliderInternalsForTest = { staticWorldColliders };
 // its elevation is FLOOR, not obstacle (world.ts groundHeight lifts it).
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
 const DROWNED_COURT_COLLIDERS: Collider[] = layoutColliders(DROWNED_COURT_LAYOUT);
-// Ravenrift battleground (the Thornhollow field): compiled per-asset baked
+// Thornhollow Fields battleground (the Thornhollow field): compiled per-asset baked
 // collision, far too many colliders for the old linear per-slot scan. Every
 // slot's copy is registered into the open-world spatial GRID instead (see
 // gridFor), so movement, sight, camera and support all reach the field

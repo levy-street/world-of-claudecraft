@@ -196,7 +196,7 @@ describe('axe: talents window', () => {
 
 // ---------------------------------------------------------------------------
 // The merged PvP window (#arena-window) - offline hosts of BOTH tab families
-// (dialog role + named title + close). The window opens on the Ravenrift tab.
+// (dialog role + named title + close). The window opens on the Thornhollow Fields tab.
 // ---------------------------------------------------------------------------
 
 describe('axe: pvp window', () => {
@@ -216,7 +216,7 @@ describe('axe: pvp window', () => {
       }),
     );
 
-  it('offline Ravenrift tab (the default) is clean (dialog role, labelled title)', async () => {
+  it('offline Thornhollow Fields tab (the default) is clean (dialog role, labelled title)', async () => {
     const root = host('arena-window');
     root.style.display = 'none';
     const win = makeWin(root);

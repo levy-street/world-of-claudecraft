@@ -317,7 +317,7 @@ export class GameAudio {
     this.play(UI_CUES.fiestaRevive);
   }
 
-  // Ravenrift flag moments want WEIGHT. No dedicated recordings yet (the SFX
+  // Thornhollow Fields flag moments want WEIGHT. No dedicated recordings yet (the SFX
   // asset flow is a follow-up), so each layers two existing cues into one
   // bigger hit: a WAR-HORN stack for a take (the challenge horn doubled with
   // a deep detuned layer carrying the weight and the fight-starts hit on the

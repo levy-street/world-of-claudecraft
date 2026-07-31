@@ -29,7 +29,7 @@
 //   trade.ts            IWorldTrade          peer-to-peer trade window
 //   chat.ts             IWorldChat           chat router + emotes
 //   duel_arena.ts       IWorldDuelArena      duels + ranked arena + 2v2 fiesta
-//   battleground.ts     IWorldBattleground   Ravenrift 5v5 capture-the-flag queue + match view
+//   battleground.ts     IWorldBattleground   Thornhollow Fields 5v5 capture-the-flag queue + match view
 //   social_graph.ts     IWorldSocialGraph    friends/blocks/guild (online-only frames)
 //   market.ts           IWorldMarket         World Market browse/list/buy
 //   mail.ts             IWorldMail           Ravenpost mail send/take + unread badge
@@ -479,7 +479,7 @@ export const COMMAND_NAMES = [
   // Guild billboard: set (or clear, with '') the officer-editable message
   // pinned atop the social window's Guild tab (SocialService.guildSetMotd).
   'guild_set_motd',
-  // Ravenrift 5v5 capture-the-flag: queue join/leave and the deliberate
+  // Thornhollow Fields 5v5 capture-the-flag: queue join/leave and the deliberate
   // battleground action press (flag pickup; Sim.bgQueueJoin/bgQueueLeave/
   // bgFlagAction via src/sim/social/battleground.ts). dev_bg_start is the
   // env-gated force-start (dispatch-only, below).
@@ -649,7 +649,7 @@ export const COMMAND_FACETS = {
   arena_queue: 'IWorldDuelArena',
   arena_leave: 'IWorldDuelArena',
   arena_augment: 'IWorldDuelArena',
-  // IWorldBattleground: the Ravenrift queue + the deliberate flag action.
+  // IWorldBattleground: the Thornhollow Fields queue + the deliberate flag action.
   bg_queue: 'IWorldBattleground',
   bg_leave: 'IWorldBattleground',
   bg_flag: 'IWorldBattleground',

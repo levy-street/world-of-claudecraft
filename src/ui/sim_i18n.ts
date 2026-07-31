@@ -7035,7 +7035,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Tamed: 'aura.tamed',
   'Temporal Exhaustion': 'aura.temporalExhaustion',
   'Cauterize Fatigue': 'aura.cauterizeFatigue',
-  // Ravenrift battleground auras (src/sim/social/battleground.ts): spawn
+  // Thornhollow Fields battleground auras (src/sim/social/battleground.ts): spawn
   // protection, the carrier-fatigue vulnerability, and the sprint-rune haste.
   'Carrier Fatigue': 'aura.carrierFatigue',
   Sprint: 'aura.sprintRune',
@@ -7463,7 +7463,7 @@ function tArenaExtra(key: ArenaExtraKey, params?: InterpolationValues): string {
   return interpolate(table[key] ?? ARENA_EXTRA.en[key], params);
 }
 
-// Ravenrift 5v5 capture-the-flag emit strings (src/sim/social/battleground.ts).
+// Thornhollow Fields 5v5 capture-the-flag emit strings (src/sim/social/battleground.ts).
 // English is authoritative; the non-Latin surfaces ship real fills (the M16
 // spirit) and the remaining locales fall back to English here until the
 // release-tier locale fill (the PR-tier S3 guard requires recognition only).
@@ -7491,26 +7491,26 @@ type BgExtraKey =
   | 'heldAtGate';
 
 const BG_EXTRA_EN: Record<BgExtraKey, string> = {
-  joinQueue: 'You join the Ravenrift queue. Need {count} champions to start a match.',
-  partyJoinQueue: 'Your party of {count} joins the Ravenrift queue.',
-  leaveQueue: 'You leave the Ravenrift queue.',
-  battleBegins: 'The Ravenrift battle begins: take their flag!',
-  fightFor: 'Ravenrift: you fight for the {team}. First to {caps} captures wins.',
+  joinQueue: 'You join the Thornhollow Fields queue. Need {count} champions to start a match.',
+  partyJoinQueue: 'Your party of {count} joins the Thornhollow Fields queue.',
+  leaveQueue: 'You leave the Thornhollow Fields queue.',
+  battleBegins: 'The Thornhollow Fields battle begins: take their flag!',
+  fightFor: 'Thornhollow Fields: you fight for the {team}. First to {caps} captures wins.',
   seizeRune: 'You seize a Sprint Rune!',
   seizeBattleRune: 'You seize a Battle Rune!',
   seizeWardRune: 'You seize a Ward Rune!',
   teamCrimson: 'Crimson',
   teamAzure: 'Azure',
   errInBattleground: 'You are already in a battleground.',
-  errQueueDead: 'You cannot queue for Ravenrift while dead.',
-  errQueueInMatch: 'You cannot queue for Ravenrift while in another match.',
+  errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
+  errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
   errMemberQueued: 'A party member is already queued or in a match.',
   errNoFlag: 'There is no flag within reach.',
-  errPartyTooLarge: 'Your party is too large for Ravenrift. It queues parties of up to 5.',
+  errPartyTooLarge: 'Your party is too large for Thornhollow Fields. It queues parties of up to 5.',
   errDelveDuringBg: 'You cannot enter a delve during a battleground.',
   errTalentsDuringBg: 'You cannot change talents during a battleground.',
-  errLevelTooLow: 'Ravenrift requires level {level}.',
-  errMemberLevelTooLow: 'Every party member must be level {level} to queue for Ravenrift.',
+  errLevelTooLow: 'Thornhollow Fields requires level {level}.',
+  errMemberLevelTooLow: 'Every party member must be level {level} to queue for Thornhollow Fields.',
   heldAtGate: 'The gates open when the battle begins.',
 };
 
@@ -8837,19 +8837,22 @@ const RULES: Rule[] = [
     re: /^(.+) cannot queue from inside an instance\.$/,
     build: (m) => tArenaExtra('memberInstance', { name: m[1] }),
   },
-  // Ravenrift 5v5 capture-the-flag (src/sim/social/battleground.ts emits).
+  // Thornhollow Fields 5v5 capture-the-flag (src/sim/social/battleground.ts emits).
   {
-    re: /^You join the Ravenrift queue\. Need (.+?) champions to start a match\.$/,
+    re: /^You join the Thornhollow Fields queue\. Need (.+?) champions to start a match\.$/,
     build: (m) => tBg('joinQueue', { count: m[1] }),
   },
   {
-    re: /^Your party of (.+?) joins the Ravenrift queue\.$/,
+    re: /^Your party of (.+?) joins the Thornhollow Fields queue\.$/,
     build: (m) => tBg('partyJoinQueue', { count: m[1] }),
   },
-  { re: /^You leave the Ravenrift queue\.$/, build: () => tBg('leaveQueue') },
-  { re: /^The Ravenrift battle begins: take their flag!$/, build: () => tBg('battleBegins') },
+  { re: /^You leave the Thornhollow Fields queue\.$/, build: () => tBg('leaveQueue') },
   {
-    re: /^Ravenrift: you fight for the (.+?)\. First to (.+?) captures wins\.$/,
+    re: /^The Thornhollow Fields battle begins: take their flag!$/,
+    build: () => tBg('battleBegins'),
+  },
+  {
+    re: /^Thornhollow Fields: you fight for the (.+?)\. First to (.+?) captures wins\.$/,
     build: (m) =>
       tBg('fightFor', {
         team: m[1] === 'Crimson' ? tBg('teamCrimson') : m[1] === 'Azure' ? tBg('teamAzure') : m[1],
@@ -8860,9 +8863,12 @@ const RULES: Rule[] = [
   { re: /^You seize a Battle Rune!$/, build: () => tBg('seizeBattleRune') },
   { re: /^You seize a Ward Rune!$/, build: () => tBg('seizeWardRune') },
   { re: /^You are already in a battleground\.$/, build: () => tBg('errInBattleground') },
-  { re: /^You cannot queue for Ravenrift while dead\.$/, build: () => tBg('errQueueDead') },
   {
-    re: /^You cannot queue for Ravenrift while in another match\.$/,
+    re: /^You cannot queue for Thornhollow Fields while dead\.$/,
+    build: () => tBg('errQueueDead'),
+  },
+  {
+    re: /^You cannot queue for Thornhollow Fields while in another match\.$/,
     build: () => tBg('errQueueInMatch'),
   },
   {
@@ -8871,7 +8877,7 @@ const RULES: Rule[] = [
   },
   { re: /^There is no flag within reach\.$/, build: () => tBg('errNoFlag') },
   {
-    re: /^Your party is too large for Ravenrift\. It queues parties of up to (.+?)\.$/,
+    re: /^Your party is too large for Thornhollow Fields\. It queues parties of up to (.+?)\.$/,
     build: () => tBg('errPartyTooLarge'),
   },
   {
@@ -8883,11 +8889,11 @@ const RULES: Rule[] = [
     build: () => tBg('errTalentsDuringBg'),
   },
   {
-    re: /^Ravenrift requires level (\d+)\.$/,
+    re: /^Thornhollow Fields requires level (\d+)\.$/,
     build: (m) => tBg('errLevelTooLow', { level: m[1] }),
   },
   {
-    re: /^Every party member must be level (\d+) to queue for Ravenrift\.$/,
+    re: /^Every party member must be level (\d+) to queue for Thornhollow Fields\.$/,
     build: (m) => tBg('errMemberLevelTooLow', { level: m[1] }),
   },
   {

@@ -1,4 +1,4 @@
-// Unit coverage for the Ravenrift REST domain (server/battleground.ts) plus the
+// Unit coverage for the Thornhollow Fields REST domain (server/battleground.ts) plus the
 // SQL-convention pins for its db.ts read (topBgRatings), mirrored from the
 // public-read exemplar suites (tests/server/leaderboard.test.ts for the handler
 // rungs, tests/arena_db.test.ts for the ladder-SQL pins). The handler is driven

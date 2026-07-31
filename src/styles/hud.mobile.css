@@ -4224,7 +4224,7 @@
     min-height: 40px;
     box-sizing: border-box;
   }
-  /* Ravenrift scoreboard: compacted for the 844x390 landscape HUD so it clears
+  /* Thornhollow Fields scoreboard: compacted for the 844x390 landscape HUD so it clears
      the top button clusters; the respawn overlay rides the same midline. */
   body.mobile-touch #bg-scoreboard {
     top: 4px;

@@ -21,7 +21,7 @@ describe('arena_window: WCAG chrome (focusable controls + focus-return)', () => 
   });
 
   it('exposes the tab deep entry and tab-prefixes every live render-skip sig', () => {
-    // openTab is the Ravenrift deep entry (hud.toggleBattleground rides it).
+    // openTab is the Thornhollow Fields deep entry (hud.toggleBattleground rides it).
     expect(code).toContain('openTab(tab: PvpTabId)');
     // The two live signatures carry the tab and the strip's lock state, so a
     // tab switch or a lock change can never be skipped by a colliding sig. They
@@ -55,7 +55,7 @@ describe('arena_window: WCAG chrome (focusable controls + focus-return)', () => 
     expect(code).toContain("t('hudChrome.bg.offlineNote')");
   });
 
-  it('every panel state emits the dialog label id, the Ravenrift title included', () => {
+  it('every panel state emits the dialog label id, the Thornhollow Fields title included', () => {
     // markDialogRoot(labelledBy: 'arena-title') is set once on open; both
     // title builders must therefore carry the id in every rebuilt panel.
     expect(code).toContain('<span id="arena-title">${esc(t(\'hud.arena.title\'))}');
@@ -96,12 +96,12 @@ describe('arena_window: mediumHud redraw call site', () => {
     expect(hud).toContain(
       "if (inArenaMatch && !this.arenaMatchSeen && $('#arena-window').style.display === 'block') {",
     );
-    // The Ravenrift match-start auto-close routes through the same painter.
+    // The Thornhollow Fields match-start auto-close routes through the same painter.
     expect(hud).toContain(
       "if (inBgMatch && !this.bgMatchSeen && $('#arena-window').style.display === 'block') {",
     );
     expect(hud).not.toContain("'#arena-window').style.display = 'none'");
-    // hud.toggleBattleground deep-opens the merged window on the Ravenrift tab.
+    // hud.toggleBattleground deep-opens the merged window on the Thornhollow Fields tab.
     expect(hud).toContain("this.arenaWindow.openTab('ravenrift')");
   });
 });

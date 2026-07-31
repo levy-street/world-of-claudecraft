@@ -370,7 +370,7 @@ function makeCtx() {
     vcupShoot: vi.fn(),
     vcupSportDash: vi.fn(),
     vcupSportShove: vi.fn(),
-    // Ravenrift battleground hooks.
+    // Thornhollow Fields battleground hooks.
     bgOnPlayerDeath: vi.fn(),
   };
   const ctx = createSimContext(host);

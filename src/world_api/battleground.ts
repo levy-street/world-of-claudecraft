@@ -1,4 +1,4 @@
-// Ravenrift: the ranked 5v5 capture-the-flag battleground. The HUD reads
+// Thornhollow Fields: the ranked 5v5 capture-the-flag battleground. The HUD reads
 // `bgInfo` (queue state + the live match view) and sends the queue commands
 // plus the deliberate flag-action press. The persistent ladder is served over
 // REST (`GET /api/battleground/leaderboard`), not this facet.

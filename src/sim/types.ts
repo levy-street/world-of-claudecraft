@@ -84,7 +84,7 @@ export interface HonorArenaDailyState {
   date: string;
   winsByOpponent: Record<string, number>;
   fiestaCompletionsByOpponent: Record<string, number>;
-  // Ravenrift results per opposing-team identity (optional so pre-battleground
+  // Thornhollow Fields results per opposing-team identity (optional so pre-battleground
   // saves stay byte-equal; absent until the first battleground result).
   bgResultsByOpponent?: Record<string, number>;
   totalWins: number;
@@ -3544,7 +3544,7 @@ export type SimEvent = { pid?: number } & (
       allies: ArenaCombatant[];
       enemies: ArenaCombatant[];
     }
-  // Ravenrift 5v5 capture-the-flag: queue state, match lifecycle, flag plays,
+  // Thornhollow Fields 5v5 capture-the-flag: queue state, match lifecycle, flag plays,
   // and the rating result. All personal (each carries a pid).
   // position: the group's 1-based place in the queue line
   | { type: 'bgQueued'; position: number }

@@ -1,4 +1,4 @@
-// Ravenrift: the ranked 5v5 capture-the-flag battleground (re-cut of
+// Thornhollow Fields: the ranked 5v5 capture-the-flag battleground (re-cut of
 // Dubtribe11's PR #589 on the SimContext seam; the arena slice A2 is the
 // structural template, Protect Yumi the band/module precedent).
 //
@@ -36,7 +36,7 @@ import { type Aura, DT, type Entity, type Vec3 } from '../types';
 import { eloDelta, snapshotArenaReturnPools } from './arena';
 import { formBgTeamParty, unwindBgAutoPartyFor, unwindBgTeamParties } from './battleground_party';
 
-// --- Ravenrift tuning consts (rating reuses the arena's exported eloDelta) ---
+// --- Thornhollow Fields tuning consts (rating reuses the arena's exported eloDelta) ---
 export const BG_BASE_RATING = 1500; // every character starts here on the ladder
 export const BG_MIN_RATING = 100; // rating floor so a losing streak can't go absurd
 export const BG_TEAM_SIZE = 5; // players per team: a full match is 5v5
@@ -180,15 +180,15 @@ export function bgQueueJoin(ctx: SimContext, pid?: number, opts?: { bypassLevel?
     return;
   }
   if (r.e.dead) {
-    ctx.error(id, 'You cannot queue for Ravenrift while dead.');
+    ctx.error(id, 'You cannot queue for Thornhollow Fields while dead.');
     return;
   }
   if (ctx.arenaMatches.has(id)) {
-    ctx.error(id, 'You cannot queue for Ravenrift while in another match.');
+    ctx.error(id, 'You cannot queue for Thornhollow Fields while in another match.');
     return;
   }
   if (!opts?.bypassLevel && r.e.level < BG_MIN_LEVEL) {
-    ctx.error(id, `Ravenrift requires level ${BG_MIN_LEVEL}.`);
+    ctx.error(id, `Thornhollow Fields requires level ${BG_MIN_LEVEL}.`);
     return;
   }
   if (r.e.pos.x > DUNGEON_X_THRESHOLD) {
@@ -205,7 +205,7 @@ export function bgQueueJoin(ctx: SimContext, pid?: number, opts?: { bypassLevel?
   // over-size party is refused outright rather than silently truncated.
   const party = ctx.partyOf(id);
   if (party && party.members.length > BG_TEAM_SIZE) {
-    ctx.error(id, 'Your party is too large for Ravenrift. It queues parties of up to 5.');
+    ctx.error(id, 'Your party is too large for Thornhollow Fields. It queues parties of up to 5.');
     return;
   }
   const members = party ? [...party.members] : [id];
@@ -216,7 +216,10 @@ export function bgQueueJoin(ctx: SimContext, pid?: number, opts?: { bypassLevel?
     }
     const member = ctx.entities.get(m);
     if (!opts?.bypassLevel && member && member.level < BG_MIN_LEVEL) {
-      ctx.error(id, `Every party member must be level ${BG_MIN_LEVEL} to queue for Ravenrift.`);
+      ctx.error(
+        id,
+        `Every party member must be level ${BG_MIN_LEVEL} to queue for Thornhollow Fields.`,
+      );
       return;
     }
   }
@@ -228,8 +231,8 @@ export function bgQueueJoin(ctx: SimContext, pid?: number, opts?: { bypassLevel?
       type: 'log',
       text:
         party && members.length > 1
-          ? `Your party of ${members.length} joins the Ravenrift queue.`
-          : `You join the Ravenrift queue. Need ${BG_TEAM_SIZE * 2} champions to start a match.`,
+          ? `Your party of ${members.length} joins the Thornhollow Fields queue.`
+          : `You join the Thornhollow Fields queue. Need ${BG_TEAM_SIZE * 2} champions to start a match.`,
       color: '#7fd4ff',
       pid: m,
     });
@@ -244,7 +247,12 @@ export function bgQueueLeave(ctx: SimContext, pid?: number): void {
   ctx.bgQueue = ctx.bgQueue.filter((g) => g !== group);
   for (const m of group.pids) {
     ctx.emit({ type: 'bgUnqueued', pid: m });
-    ctx.emit({ type: 'log', text: 'You leave the Ravenrift queue.', color: '#7fd4ff', pid: m });
+    ctx.emit({
+      type: 'log',
+      text: 'You leave the Thornhollow Fields queue.',
+      color: '#7fd4ff',
+      pid: m,
+    });
   }
 }
 
@@ -364,7 +372,7 @@ function tickCountdown(ctx: SimContext, match: BgMatch): void {
       }
       ctx.emit({
         type: 'log',
-        text: 'The Ravenrift battle begins: take their flag!',
+        text: 'The Thornhollow Fields battle begins: take their flag!',
         color: '#ff5a3c',
         pid,
       });
@@ -387,7 +395,7 @@ function matchmakeBg(ctx: SimContext): void {
           ctx.emit({ type: 'bgUnqueued', pid: p });
           ctx.emit({
             type: 'log',
-            text: 'You leave the Ravenrift queue.',
+            text: 'You leave the Thornhollow Fields queue.',
             color: '#7fd4ff',
             pid: p,
           });
@@ -532,7 +540,7 @@ export function startBgMatch(
       ctx.emit({ type: 'bgCountdown', seconds: BG_COUNTDOWN, pid });
       ctx.emit({
         type: 'log',
-        text: `Ravenrift: you fight for the ${BG_TEAM_NAMES[team]}. First to ${BG_CAPS_TO_WIN} captures wins.`,
+        text: `Thornhollow Fields: you fight for the ${BG_TEAM_NAMES[team]}. First to ${BG_CAPS_TO_WIN} captures wins.`,
         color: '#7fd4ff',
         pid,
       });

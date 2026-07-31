@@ -56,7 +56,7 @@ describe('aura icons reuse image-based ability art', () => {
     }
   });
 
-  it('the Ravenrift rune buffs carry dedicated identity recipes (boots/sword/shield)', () => {
+  it('the Thornhollow Fields rune buffs carry dedicated identity recipes (boots/sword/shield)', () => {
     // The hud iconId resolver passes an aura id through ONLY when it has a
     // recipe (or is an ability); without these rows the rune buffs collapse to
     // the aura_<kind> generic and read as color-only, the playtest complaint.

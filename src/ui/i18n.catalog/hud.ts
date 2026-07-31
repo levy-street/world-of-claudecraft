@@ -167,7 +167,7 @@ const hudStringsEn = {
         nameplates: 'Toggle Nameplates',
         meters: 'Damage Meters',
         social: 'Friends & Guild',
-        arena: 'PvP (Ravenrift and Arenas)',
+        arena: 'PvP (Thornhollow Fields and Arenas)',
         chat: 'Open Chat',
         attack: 'Attack',
         actionBarSlot: 'Action Bar {slot}',

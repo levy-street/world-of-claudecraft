@@ -21,7 +21,7 @@ Everything else is a sibling module in one of these families:
   shore-depth and tier core in `water_core.ts`, sleeping GPU height field and
   facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`. Event/minigame scenes follow
   the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`, `battleground*.ts`
-  (Ravenrift: kit-module field from the pure `battleground_core.ts` manifest,
+  (Thornhollow Fields: kit-module field from the pure `battleground_core.ts` manifest,
   entity props in `battleground_props.ts`).
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
   particles), `weather.ts`, `character_effects.ts`.

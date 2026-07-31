@@ -1349,7 +1349,7 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
-  // --- IWorldBattleground: Ravenrift queue + live-match state, mirrored from
+  // --- IWorldBattleground: Thornhollow Fields queue + live-match state, mirrored from
   // the snapshot self (`s.bg`, delta-omitted); flag/score dynamics also ride
   // the events queue for banners and the combat log. ---
   bgInfo: import('../world_api').BgInfo | null = null;
@@ -3724,7 +3724,7 @@ export class ClientWorld implements IWorld {
   arenaAugmentPick(augmentId: string): void {
     this.cmd({ cmd: 'arena_augment', augment: augmentId });
   }
-  // --- IWorldBattleground: Ravenrift queue + flag-action sends (bgInfo is a
+  // --- IWorldBattleground: Thornhollow Fields queue + flag-action sends (bgInfo is a
   // snapshot read, decoded in applySnapshot). ---
   bgQueueJoin(): void {
     this.cmd({ cmd: 'bg_queue' });

@@ -1,4 +1,4 @@
-// The Ravenrift field's TERRAIN: the stamp chain that turns the plan's flat
+// The Thornhollow Fields TERRAIN: the stamp chain that turns the plan's flat
 // rectangle into ground worth looking at, without moving a single lane.
 //
 // The shape is deliberately gentle, because the plan below it is combat-tuned

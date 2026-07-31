@@ -584,7 +584,7 @@ export function yumiMazeOriginAt(z: number): { x: number; z: number; slot: numbe
 }
 
 // ---------------------------------------------------------------------------
-// Ravenrift, the 5v5 capture-the-flag battleground. Its match instances take
+// Thornhollow Fields, the 5v5 capture-the-flag battleground. Its match instances take
 // the next free far-east band past the Protect Yumi maze cap (YUMI_BAND_X_MAX
 // = 12000) and stay well west of the Vale Cup practice pitches (x = 30000,
 // src/sim/vale_cup_layout.ts vcPracticeOrigin). Like every far-east band:
@@ -592,7 +592,7 @@ export function yumiMazeOriginAt(z: number): { x: number; z: number; slot: numbe
 // (sim/battleground_layout.ts via sim/colliders.ts).
 // ---------------------------------------------------------------------------
 
-export const BG_BAND_X_MIN = 16000; // x at/after this = a Ravenrift instance
+export const BG_BAND_X_MIN = 16000; // x at/after this = a Thornhollow Fields instance
 // Two-sided cap, the Yumi-band move: the band never claims everything east,
 // so a later band (or the Vale Cup pitches at 30000) stays classifiable.
 export const BG_BAND_X_MAX = 20000;

@@ -1,4 +1,4 @@
-// The Ravenrift field's DRESSING: every wall block, tower, gate arch, brazier,
+// The Thornhollow Fields DRESSING: every wall block, tower, gate arch, brazier,
 // crate, boulder and tree that turns the combat plan into Thornhollow.
 //
 // The rule the whole file obeys: the PLAN owns the footprint, the dressing owns

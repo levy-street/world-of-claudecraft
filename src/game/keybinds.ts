@@ -156,7 +156,7 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyF'],
   },
   {
-    // The deliberate Ravenrift flag press (never a walk-over). The bare
+    // The deliberate Thornhollow Fields flag press (never a walk-over). The bare
     // interact key also routes here inside a live match (main.ts), so this
     // dedicated bind is the rebindable, always-explicit form on F's shifted
     // layer (the thematically nearest key: it IS an interaction).
@@ -210,7 +210,7 @@ export const BIND_ACTIONS: BindAction[] = [
   },
   {
     id: 'arena',
-    label: 'PvP (Ravenrift and Arenas)',
+    label: 'PvP (Thornhollow Fields and Arenas)',
     category: 'Interface',
     kind: 'edge',
     defaults: ['KeyG'],

@@ -48,7 +48,7 @@ const PARTY_DISC_RADIUS_RANGE = 3;
 
 /** Which minimap surface a world renders: the delve schematic (owned by
  *  delve_map_painter), the Protect Yumi maze (the overworld marker set over a
- *  cached maze-wall background, minimap_painter.paintYumiMaze), the Ravenrift
+ *  cached maze-wall background, minimap_painter.paintYumiMaze), the Thornhollow Fields
  *  battleground (the same marker set over a cached wall raster; Hud routes it
  *  through paintOverworld, which branches to paintBattleground), or the
  *  overworld minimap (this core). */

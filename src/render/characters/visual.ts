@@ -271,7 +271,7 @@ export class CharacterVisual {
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
   private moonkinMaterials = new Map<THREE.Material, THREE.Material>();
   private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
-  // Ravenrift rune buffs: a slight whole-body lean toward the rune's color
+  // Thornhollow Fields rune buffs: a slight whole-body lean toward the rune's color
   // (weakest treatment: every form/death tint above wins). Keyed per source
   // material AND color, since the wearer can chain different runes.
   private runeTintMaterials = new Map<string, THREE.Material>();
@@ -935,7 +935,7 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
-  /** Slight whole-body color lean while a Ravenrift rune buff rides (null = off). */
+  /** Slight whole-body color lean while a Thornhollow Fields rune buff rides (null = off). */
   setRuneTint(color: number | null): void {
     if (color === this.runeTint) return;
     this.runeTint = color;

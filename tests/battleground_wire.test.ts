@@ -1,4 +1,4 @@
-// Ravenrift wire gate: the bg_queue / bg_leave / bg_flag commands through
+// Thornhollow Fields wire gate: the bg_queue / bg_leave / bg_flag commands through
 // GameServer.handleMessage, the dev_bg_start ALLOW_DEV_COMMANDS env gate, and
 // the `bg` self key riding the snapshot into ClientWorld.bgInfo (server encode
 // -> ClientWorld decode). Harness modeled on tests/weapon_stow.test.ts +

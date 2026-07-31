@@ -230,9 +230,9 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 - **1v1 and 2v2 ranked ladders**, each with a persistent Elo-style rating (everyone starts at 1500) and an all-time leaderboard (`GET /api/arena/leaderboard`).
 - **2v2 Fiesta**, a livelier party mode: first team to fifteen takedowns wins inside a six-minute cap, players respawn on growing timers, augment pickups drop power across three waves, and a closing ring forces the fight together.
 
-### Ravenrift (5v5 capture the flag)
+### Thornhollow Fields (5v5 capture the flag)
 
-Press `G` to open the PvP window (Ravenrift is its primary tab, beside the 1v1 and 2v2 arena brackets) and Enter the Queue, solo or with a party of up to five (parties stay together; solos fill the rest). Two teams of five fight over a walled, open-air field with a keep at each end: steal the enemy banner with a deliberate press of the battleground action key and run it to your own stand. First to 5 captures wins inside a 12-minute cap.
+Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside the 1v1 and 2v2 arena brackets) and Enter the Queue, solo or with a party of up to five (parties stay together; solos fill the rest). Two teams of five fight over a walled, open-air field with a keep at each end: steal the enemy banner with a deliberate press of the battleground action key and run it to your own stand. First to 5 captures wins inside a 12-minute cap.
 
 - **Team wave respawns** (no graveyard run): each team's fallen rise together on a staggered wave clock at their keep, briefly spawn-protected until they act.
 - **Anti-turtle carrier fatigue**: hold the enemy flag too long and you take ever-increasing damage until it is captured, dropped, or returned. The flag also refuses to hide: grabbing it breaks stealth, and a carrier who turns invisible drops it on the spot.
@@ -343,7 +343,7 @@ node scripts/tour_temple.mjs    # screenshot tour of the Glimmermere and Drowned
 node scripts/mp_integration.mjs # API, WS, and persistence checks (server running)
 node scripts/social_e2e.mjs     # trade and duel over the wire (ALLOW_DEV_COMMANDS=1)
 node scripts/arena_visual.mjs   # two clients queue and fight a ranked 1v1
-node scripts/squad_visual.mjs   # several clients queue and play Ravenrift 5v5 CTF (ALLOW_DEV_COMMANDS=1)
+node scripts/squad_visual.mjs   # several clients queue and play Thornhollow Fields 5v5 CTF (ALLOW_DEV_COMMANDS=1)
 node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_COMMANDS=1)
 ```
 

@@ -22,7 +22,7 @@ describe('playerDeath audio wiring', () => {
   });
 
   it('leaves every minigame/PvP loss chime on the shared generic cue', () => {
-    // fiesta, Vale Cup, and Ravenrift losses are NOT a character death and
+    // fiesta, Vale Cup, and Thornhollow Fields losses are NOT a character death and
     // must keep using the shared stinger. Arena rating loss moved to its own
     // dedicated audio.arenaLoss() cue (ui_arena_loss), so it no longer counts.
     const matches = hud.match(/audio\.death\(\);/g) ?? [];

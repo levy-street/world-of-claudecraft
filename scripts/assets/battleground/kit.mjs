@@ -1,4 +1,4 @@
-// The Thornhollow ART KIT: the catalogue pieces the Ravenrift field is built
+// The Thornhollow ART KIT: the catalogue pieces Thornhollow Fields is built
 // out of, and the small amount of arithmetic that makes them fit.
 //
 // Every catalogue GLB is normalized to a target height before its placement

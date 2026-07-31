@@ -1,4 +1,4 @@
-// Pure, host-agnostic view model for the in-match Ravenrift scoreboard strip:
+// Pure, host-agnostic view model for the in-match Thornhollow Fields scoreboard strip:
 // both team scores, the two flag states (with carrier), the team roster pips,
 // the match clock, and the personal wave-respawn / spawn-protection readouts.
 // Snapshot-driven from bgInfo.match so it self-heals on reconnect; the one-shot

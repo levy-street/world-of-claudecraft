@@ -1,4 +1,4 @@
-// Pure view model for the merged PvP window's tab strip: Ravenrift first (the
+// Pure view model for the merged PvP window's tab strip: Thornhollow Fields first (the
 // primary tab), then the two ranked arena brackets. It derives busy-state from
 // the two IWorld snapshots itself (so the painter never re-implements the
 // resolution), decides which tab is pinned (a live queue or match commits its
@@ -8,7 +8,7 @@
 
 import type { ArenaFormat, ArenaInfo, BgInfo } from '../world_api';
 
-/** The merged window's tabs, in display order: Ravenrift is primary. */
+/** The merged window's tabs, in display order: Thornhollow Fields is primary. */
 export type PvpTabId = 'ravenrift' | '1v1' | '2v2';
 export const PVP_TABS: readonly PvpTabId[] = ['ravenrift', '1v1', '2v2'];
 

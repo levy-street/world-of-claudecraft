@@ -1,4 +1,4 @@
-// Drives several real browser clients through Ravenrift, the 5v5 capture-the-
+// Drives several real browser clients through Thornhollow Fields, the 5v5 capture-the-
 // flag battleground: queue, a dev force-start (so a screenshot run needs fewer
 // than ten browsers), then a rune grab, a deliberate flag pickup, and a capture.
 // Screenshots land in tmp/. Run the game server first (serves the built client
@@ -108,7 +108,7 @@ for (const pg of pages)
   await pg.evaluate(() => window.__game.online.cmd({ cmd: 'dev_level', level: 14 }));
 await sleep(800);
 
-// --- 1. the Ravenrift panel: standing, queue button, all-time board ---
+// --- 1. the Thornhollow Fields panel: standing, queue button, all-time board ---
 await hero.bringToFront();
 await hero.evaluate(() => window.__game.hud.toggleBattleground());
 await sleep(700);

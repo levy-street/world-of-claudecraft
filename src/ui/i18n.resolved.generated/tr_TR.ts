@@ -894,15 +894,15 @@ export const tr_TR: EnTranslations = {
       "petAggressive": "Yoldaş: Saldırgan"
     },
     "pvp": {
-      "launcherTitle": "PvP: Ravenrift and the Arenas",
+      "launcherTitle": "PvP: Thornhollow Fields and the Arenas",
       "mobileLabel": "PvP",
       "bracket1v1": "1v1",
       "bracket2v2": "2v2"
     },
     "bg": {
-      "title": "Ravenrift",
+      "title": "Thornhollow Fields",
       "modeTag": "5v5 Capture the Flag",
-      "offlineNote": "Ravenrift is syncing. The queue opens once the realm answers.",
+      "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
       "ratingSummary": "Rating. {wins} wins / {losses} losses",
       "careerCaptures": "Career captures: {count}",
       "enterQueue": "Enter the Queue",
@@ -934,7 +934,7 @@ export const tr_TR: EnTranslations = {
       "killFeed": "{killer} felled {victim}",
       "killFeedFallen": "{victim} has fallen",
       "foundBanner": "Battle found. You fight for the {team}!",
-      "countdownBanner": "Ravenrift begins in {seconds}",
+      "countdownBanner": "Thornhollow Fields begins in {seconds}",
       "startBanner": "Capture the flag!",
       "flagTakenLog": "{name} has taken the {team} flag!",
       "flagDroppedLog": "The {team} flag was dropped.",
@@ -950,10 +950,10 @@ export const tr_TR: EnTranslations = {
       "flagReturnedBanner": "The {team} flag was returned!",
       "capturedTeamBanner": "The {takers} have captured the {team} flag! {crimson}:{azure}",
       "capturedLog": "{name} captured the {team} flag. Score {crimson}:{azure}.",
-      "victoryBanner": "Victory! Ravenrift {crimson}:{azure}. Rating {rating} ({delta})",
-      "defeatBanner": "Defeat. Ravenrift {crimson}:{azure}. Rating {rating} ({delta})",
-      "drawBanner": "Ravenrift draw {crimson}:{azure}. Rating {rating} ({delta})",
-      "endLog": "Ravenrift ended {crimson}:{azure}. Rating {rating} ({delta})."
+      "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta})."
     },
     "vcup": {
       "title": "Vadi Kupası",
@@ -1261,8 +1261,8 @@ export const tr_TR: EnTranslations = {
         "fiestaKill": "Fiesta avlaması",
         "fiestaComplete": "Fiesta tamamlandı",
         "fiestaWin": "Fiesta zaferi",
-        "battlegroundWin": "Ravenrift victory",
-        "battlegroundComplete": "Ravenrift battle fought"
+        "battlegroundWin": "Thornhollow Fields victory",
+        "battlegroundComplete": "Thornhollow Fields battle fought"
       }
     },
     "charSheet": {
@@ -2913,7 +2913,7 @@ export const tr_TR: EnTranslations = {
       "talents": "Yetenekler",
       "arena": "Arena ve PvP",
       "valeCup": "Vadi Kupası",
-      "ravenrift": "Ravenrift",
+      "ravenrift": "Thornhollow Fields",
       "deeds": "Yiğitlikler Kitabı",
       "glossary": "Sözlük",
       "wishIKnew": "Keşke Bilseydim Dediklerim",
@@ -3633,10 +3633,10 @@ export const tr_TR: EnTranslations = {
       "ladderBody": "Dereceli oyun, konumunu zaman içinde takip eder. Nerede durduğunu ve diyarın zirvesini kimin tuttuğunu görmek için lider tablosuna bak."
     },
     "ravenriftPage": {
-      "heading": "Ravenrift",
+      "heading": "Thornhollow Fields",
       "intro": "A ranked 5v5 capture-the-flag battleground: two teams of five, two keeps, one goal. Steal the enemy banner and run it home before they run yours.",
       "queueHeading": "Queueing up",
-      "queueBody": "Open the Ravenrift panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.",
+      "queueBody": "Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.",
       "fieldHeading": "The field",
       "fieldBody": "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
       "flagsHeading": "Flags",
@@ -6099,7 +6099,7 @@ export const tr_TR: EnTranslations = {
         "nameplates": "İsim Levhalarını Aç/Kapat",
         "meters": "Hasar Ölçerleri",
         "social": "Arkadaşlar ve Lonca",
-        "arena": "PvP (Ravenrift and Arenas)",
+        "arena": "PvP (Thornhollow Fields and Arenas)",
         "chat": "Sohbeti Aç",
         "attack": "Saldır",
         "actionBarSlot": "Eylem Çubuğu {slot}"

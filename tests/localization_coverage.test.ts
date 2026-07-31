@@ -1312,7 +1312,7 @@ describe('i18n Localization Key Coverage', () => {
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
     // name + desc per deed, plus one title entry per title deed (31 as of
-    // Ravenrift; tests/deeds_content.test.ts pins the count).
+    // Thornhollow Fields; tests/deeds_content.test.ts pins the count).
     expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 31);
 
     for (const lang of supportedLanguages) {
@@ -1817,7 +1817,7 @@ describe('i18n Localization Key Coverage', () => {
     expect(html).toContain('data-i18n="hud.core.mobileChat"');
     expect(html).toContain('data-i18n="hud.core.mobileMore"');
     expect(html).toContain('data-i18n="hud.core.mobileSocial"');
-    // The merged PvP window's launcher label (Ravenrift + arenas on one
+    // The merged PvP window's launcher label (Thornhollow Fields + arenas on one
     // button); the old mobileArena key stays in the catalog like mobileTarget
     // but no longer appears in the markup.
     expect(html).toContain('data-i18n="hudChrome.pvp.mobileLabel"');

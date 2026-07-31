@@ -1,4 +1,4 @@
-// Headless pins for the Ravenrift battleground RENDER manifest
+// Headless pins for the Thornhollow Fields battleground RENDER manifest
 // (src/render/battleground_core.ts): the pure projection of the authored
 // Thornhollow map that the Three builder (src/render/battleground.ts, via
 // battleground_terrain.ts and battleground_placements.ts) instantiates

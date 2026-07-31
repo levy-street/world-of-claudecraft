@@ -307,7 +307,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/deeds/rarity' },
     { method: 'GET', path: '/api/deeds/broadcasts' },
     { method: 'POST', path: '/api/deeds/broadcasts' },
-    // The Ravenrift ladder (server/battleground.ts): registry-only like the
+    // The Thornhollow Fields ladder (server/battleground.ts): registry-only like the
     // deeds family, per the same new-route rule.
     { method: 'GET', path: '/api/battleground/leaderboard' },
     // The Steam link trio (server/steam/routes.ts): registry-only like the

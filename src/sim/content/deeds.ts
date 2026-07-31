@@ -2218,14 +2218,14 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'stat', stat: 'salvagesPerformed', count: 50 },
   },
 
-  // --- Ravenrift, the 5v5 capture-the-flag battleground (src/sim/social/
+  // --- Thornhollow Fields, the 5v5 capture-the-flag battleground (src/sim/social/
   // battleground.ts). Meters read the persisted PlayerMeta standing (bgWins /
   // bgCaptures), so they count OUTCOMES, never attendance (rule 6), and
   // retro-grant on load like every meter.
   pvp_bg_first_capture: {
     id: 'pvp_bg_first_capture',
     name: 'Banner in Hand',
-    desc: 'Capture a flag in Ravenrift.',
+    desc: 'Capture a flag in Thornhollow Fields.',
     category: 'pvp',
     renown: 5,
     trigger: { kind: 'meter', meter: 'bgCaptures', amount: 1 },
@@ -2233,7 +2233,7 @@ export const DEEDS: Record<string, DeedDef> = {
   pvp_bg_first_win: {
     id: 'pvp_bg_first_win',
     name: 'The Rift Holds',
-    desc: 'Win a Ravenrift battleground.',
+    desc: 'Win a Thornhollow Fields battleground.',
     category: 'pvp',
     renown: 5,
     trigger: { kind: 'meter', meter: 'bgWins', amount: 1 },
@@ -2241,7 +2241,7 @@ export const DEEDS: Record<string, DeedDef> = {
   pvp_bg_wins_25: {
     id: 'pvp_bg_wins_25',
     name: 'Warden of the Rift',
-    desc: 'Win 25 Ravenrift battlegrounds.',
+    desc: 'Win 25 Thornhollow Fields battlegrounds.',
     category: 'pvp',
     renown: 25,
     trigger: { kind: 'meter', meter: 'bgWins', amount: 25 },
@@ -2250,7 +2250,7 @@ export const DEEDS: Record<string, DeedDef> = {
   pvp_bg_captures_100: {
     id: 'pvp_bg_captures_100',
     name: 'A Hundred Banners',
-    desc: 'Capture 100 flags in Ravenrift across your career.',
+    desc: 'Capture 100 flags in Thornhollow Fields across your career.',
     category: 'pvp',
     renown: 50,
     trigger: { kind: 'meter', meter: 'bgCaptures', amount: 100 },

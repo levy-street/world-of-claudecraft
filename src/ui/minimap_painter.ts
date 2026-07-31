@@ -137,7 +137,7 @@ const MAZE_BG_PX_PER_YARD = 3;
 const MAZE_BG_MARGIN_YD = 24;
 const MAZE_BG_WALL_ALPHA = 0.75;
 
-// Ravenrift battleground background: the same cached-raster technique over
+// Thornhollow Fields battleground background: the same cached-raster technique over
 // bgFieldPlanWalls() (every REAL box collider of the authored Thornhollow
 // field, so the minimap shows exactly what blocks movement) laid over a shaded
 // relief underlay sampled from the field's own heightfield. The relief is what
@@ -225,7 +225,7 @@ export class MinimapPainter {
   // The Protect Yumi maze wall cache (built on first in-maze redraw; the fixed
   // competitive layout never changes, so one raster serves the session).
   private mazeBg: HTMLCanvasElement | null = null;
-  // The Ravenrift field cache, relief plus wall plan (same lifecycle as mazeBg:
+  // The Thornhollow Fields cache, relief plus wall plan (same lifecycle as mazeBg:
   // the authored field never changes, so one raster serves the session).
   private battlegroundBg: HTMLCanvasElement | null = null;
   // NPC glyph sprites (see the NPC_GLYPH_* header), keyed color -> glyph. Nested rather
@@ -273,7 +273,7 @@ export class MinimapPainter {
   ): void {
     // One token resolve serves both branches below (cached; static tokens).
     const colors = this.resolveColors();
-    // Ravenrift battleground band: Hud routes the 'battleground' minimap mode
+    // Thornhollow Fields battleground band: Hud routes the 'battleground' minimap mode
     // through this overworld entry (the mode falls through its delve/yumi
     // branches), so branch to the field raster here instead of blitting the
     // far-off overworld terrain cache the band sits outside of.
@@ -374,7 +374,7 @@ export class MinimapPainter {
   }
 
   /**
-   * Ravenrift battleground render: the ordinary overworld marker set (party
+   * Thornhollow Fields battleground render: the ordinary overworld marker set (party
    * discs, players, mob dots) over a cached raster of the Thornhollow field's
    * relief and wall plan (the paintYumiMaze technique). The '#zone-label' keeps
    * the localized committed zone (the arena-band precedent; the band has no

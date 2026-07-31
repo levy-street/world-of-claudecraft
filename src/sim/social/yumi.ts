@@ -99,7 +99,7 @@ export function pruneYumiQueue(ctx: SimContext, fmt: YumiFormat): void {
   const keep = (unit: ArenaQueueUnit) =>
     unit.pids.every((id) => {
       const e = ctx.entities.get(id);
-      // A Ravenrift member must never be seated into a yumi maze mid-match
+      // A Thornhollow Fields member must never be seated into a yumi maze mid-match
       // (the cross-queue hole behind the stale-arenaMatches release bug).
       return !!e && !e.dead && !ctx.arenaMatches.has(id) && !ctx.bgMatches.has(id);
     });

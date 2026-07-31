@@ -1,4 +1,4 @@
-// Per-entity visuals for the Ravenrift battleground ground objects (sim kind
+// Per-entity visuals for the Thornhollow Fields battleground ground objects (sim kind
 // 'object', templateId 'bg_flag' / 'bg_rune'). Built by renderer.createView's
 // bg_ arm with objectPoolKey = null (stateful, never pooled), so views come and
 // go with interest churn: every geometry and material here is a module-level

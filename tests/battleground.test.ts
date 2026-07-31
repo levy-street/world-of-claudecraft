@@ -81,7 +81,7 @@ function captureOnce(sim: Sim, match: BgMatch, carrier: number) {
   sim.tick();
 }
 
-describe('Ravenrift: queue + matchmaking', () => {
+describe('Thornhollow Fields: queue + matchmaking', () => {
   it('needs ten players; then forms two teams of five and seats them in the battleground band', () => {
     const sim = makeWorld();
     const pids: number[] = [];
@@ -165,7 +165,7 @@ describe('Ravenrift: queue + matchmaking', () => {
   });
 });
 
-describe('Ravenrift: team parties for the match', () => {
+describe('Thornhollow Fields: team parties for the match', () => {
   it('welds each all-solo team into one party at start and disbands both at the end', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -235,7 +235,7 @@ describe('Ravenrift: team parties for the match', () => {
   });
 });
 
-describe('Ravenrift: the post-match hold (frozen result screen)', () => {
+describe('Thornhollow Fields: the post-match hold (frozen result screen)', () => {
   function playToCaps() {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -295,7 +295,7 @@ describe('Ravenrift: the post-match hold (frozen result screen)', () => {
   });
 });
 
-describe('Ravenrift: release is never gated by a stale arena entry (playtest regression)', () => {
+describe('Thornhollow Fields: release is never gated by a stale arena entry (playtest regression)', () => {
   it('releases into the team graveyard even while arenaMatches still holds an entry', () => {
     // The playtest bug: a leaked arenaMatches entry (jail/cross-queue holes)
     // made releasePlayerSpirit silently no-op for one player all match. The
@@ -317,7 +317,7 @@ describe('Ravenrift: release is never gated by a stale arena entry (playtest reg
     sim.arenaMatches.delete(victim);
   });
 
-  it('refuses the Ravenrift queue while in an arena match (the front door)', () => {
+  it('refuses the Thornhollow Fields queue while in an arena match (the front door)', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'A');
     tp(sim, a, 0, -40);
@@ -347,7 +347,7 @@ describe('Ravenrift: release is never gated by a stale arena entry (playtest reg
   });
 });
 
-describe('Ravenrift: dev-forced matches are unrated (jgyy review)', () => {
+describe('Thornhollow Fields: dev-forced matches are unrated (jgyy review)', () => {
   it('a devStartBg match moves no rating, W/L, or honor on resolve', () => {
     const sim = makeWorld();
     const pids: number[] = [];
@@ -377,7 +377,7 @@ describe('Ravenrift: dev-forced matches are unrated (jgyy review)', () => {
   });
 });
 
-describe('Ravenrift: /dev bg end (early resolve)', () => {
+describe('Thornhollow Fields: /dev bg end (early resolve)', () => {
   it('resolves the match on the current score through the normal hold, once', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -393,7 +393,7 @@ describe('Ravenrift: /dev bg end (early resolve)', () => {
   });
 });
 
-describe('Ravenrift: the level 20 queue floor', () => {
+describe('Thornhollow Fields: the level 20 queue floor', () => {
   it('refuses an under-leveled solo queue and admits exactly BG_MIN_LEVEL', () => {
     expect(BG_MIN_LEVEL).toBe(20);
     const sim = makeWorld();
@@ -426,7 +426,7 @@ describe('Ravenrift: the level 20 queue floor', () => {
   });
 });
 
-describe('Ravenrift: match tallies (kills, deaths, captures)', () => {
+describe('Thornhollow Fields: match tallies (kills, deaths, captures)', () => {
   it('counts deaths, credits only enemy killers, and counts captures on the wire rows', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -479,7 +479,7 @@ describe('Ravenrift: match tallies (kills, deaths, captures)', () => {
   });
 });
 
-describe('Ravenrift: power runes (Battle / Ward)', () => {
+describe('Thornhollow Fields: power runes (Battle / Ward)', () => {
   it('opens both pads on the same seeded face, applies the right buff, and flips per claim', () => {
     // determinism: the same seed opens the same face
     const face = (seed: number) => {
@@ -526,7 +526,7 @@ describe('Ravenrift: power runes (Battle / Ward)', () => {
   });
 });
 
-describe('Ravenrift: the form-up hold', () => {
+describe('Thornhollow Fields: the form-up hold', () => {
   it('a runner slipping out during the countdown is set back and told why', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -550,7 +550,7 @@ describe('Ravenrift: the form-up hold', () => {
   });
 });
 
-describe('Ravenrift: the graveyard rite', () => {
+describe('Thornhollow Fields: the graveyard rite', () => {
   it('a corpse NEVER auto-releases (the press is the player own move); the ward binds the ghost', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -622,7 +622,7 @@ describe('Ravenrift: the graveyard rite', () => {
   });
 });
 
-describe('Ravenrift: ghost-state teardown (review pins)', () => {
+describe('Thornhollow Fields: ghost-state teardown (review pins)', () => {
   it('a match ending while a spirit waits clears ghost and corpse state on the way home', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -673,7 +673,7 @@ describe('Ravenrift: ghost-state teardown (review pins)', () => {
   });
 });
 
-describe('Ravenrift: deliberate pickup + automatic return', () => {
+describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
   it('walking over a flag never picks it up; the deliberate press does', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -850,7 +850,7 @@ describe('Ravenrift: deliberate pickup + automatic return', () => {
   });
 });
 
-describe('Ravenrift: death, wave respawn, spawn protection', () => {
+describe('Thornhollow Fields: death, wave respawn, spawn protection', () => {
   it('carrier death drops the flag in place and releasing does nothing', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -930,7 +930,7 @@ describe('Ravenrift: death, wave respawn, spawn protection', () => {
   });
 });
 
-describe('Ravenrift: the classic capture gate', () => {
+describe('Thornhollow Fields: the classic capture gate', () => {
   it('a capture only resolves while your OWN flag is home, and fires the moment it returns', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -964,7 +964,7 @@ describe('Ravenrift: the classic capture gate', () => {
   });
 });
 
-describe('Ravenrift: carrier vulnerability (Focused Assault lineage)', () => {
+describe('Thornhollow Fields: carrier vulnerability (Focused Assault lineage)', () => {
   it('stacks after the fatigue delay (75s), one more every 15s, and amplifies damage taken', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -1054,7 +1054,7 @@ describe('Ravenrift: carrier vulnerability (Focused Assault lineage)', () => {
   });
 });
 
-describe('Ravenrift: runes, hostility, and the match clock', () => {
+describe('Thornhollow Fields: runes, hostility, and the match clock', () => {
   it('pins the whole live tune as literals (re-pin deliberately when retuning)', () => {
     // The behavior suites use these constants symbolically, so THIS block is
     // what actually fails on a silent retune: every tuned number ships pinned.
@@ -1187,7 +1187,7 @@ describe('Ravenrift: runes, hostility, and the match clock', () => {
   });
 });
 
-describe('Ravenrift: review-hardening pins', () => {
+describe('Thornhollow Fields: review-hardening pins', () => {
   it('the ACTIVE battleground phase draws ZERO rng (the one draw is at match start)', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;
@@ -1327,7 +1327,7 @@ describe('Ravenrift: review-hardening pins', () => {
   });
 });
 
-describe('Ravenrift: honor + persistence', () => {
+describe('Thornhollow Fields: honor + persistence', () => {
   it('a played-out win pays BATTLEGROUND_WIN_HONOR, the losers BATTLEGROUND_LOSS_HONOR, repeat-decayed', () => {
     const { sim, pids } = tenInQueue();
     const match = sim.bgMatchFor(pids[0])!;

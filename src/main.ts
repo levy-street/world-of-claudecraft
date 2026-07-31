@@ -2481,7 +2481,7 @@ async function startGame(
       }
     }
   }
-  // The deliberate Ravenrift flag press. Inside a live match the bare interact
+  // The deliberate Thornhollow Fields flag press. Inside a live match the bare interact
   // key also routes here (the field has no other interactables), which gives
   // the mobile interact button flag parity for free; the world owns every rule
   // (radius, team, the return-beats-press race), so a stray press is a no-op.

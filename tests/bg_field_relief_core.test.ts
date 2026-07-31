@@ -1,4 +1,4 @@
-// The shared Ravenrift relief rasterizer (src/ui/bg_field_relief_core.ts): the
+// The shared Thornhollow Fields relief rasterizer (src/ui/bg_field_relief_core.ts): the
 // pure half of both battleground map backgrounds (the M-key field plan and the
 // cached minimap raster). Node-testable by construction, so these are behavior
 // assertions on the pixels, not source-text guesses.

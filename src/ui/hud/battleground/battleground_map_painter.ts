@@ -1,4 +1,4 @@
-// Canvas painter for the M-key world map's Ravenrift surface (the delve
+// Canvas painter for the M-key world map's Thornhollow Fields surface (the delve
 // schematic's routing sibling): an illustrated field plan of THORNHOLLOW drawn
 // from the same authored map data the colliders and the terrain are built from
 // (the real wall boxes, the field heightfield, the graveyard plots, the rune

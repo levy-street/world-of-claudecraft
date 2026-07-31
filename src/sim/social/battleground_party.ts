@@ -1,4 +1,4 @@
-// Ravenrift team parties: each team of five fights as ONE party for the match
+// Thornhollow Fields team parties: each team of five fights as ONE party for the match
 // (party chat plus the left-screen party frames), formed at match start
 // through the same dungeon-finder formation seam manual groups use, and
 // unwound again when the match ends or a member deserts.

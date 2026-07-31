@@ -111,7 +111,7 @@ describe('minimap_painter: cached background + ~10Hz cadence preserved', () => {
     expect(code).toContain('this.writers.setText(zoneLabelEl');
   });
 
-  it('keeps the cached Ravenrift field sheet bounded for the 240x452yd field', () => {
+  it('keeps the cached Thornhollow Fields sheet bounded for the 240x452yd field', () => {
     // The battleground raster is built ONCE per session and held for it, so its
     // size is a memory decision, not a per-frame one. Thornhollow is over three
     // times the old code-defined field, and the maze arm's shape (one square pad

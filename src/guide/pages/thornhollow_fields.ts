@@ -1,4 +1,4 @@
-// Ravenrift: a spoiler-safe overview of the 5v5 capture-the-flag battleground.
+// Thornhollow Fields: a spoiler-safe overview of the 5v5 capture-the-flag battleground.
 // Concepts only (the mode, the field, flags, wave respawns, runes, the ladder);
 // no honor amounts, rating math, or tuning constants (guide spoiler policy).
 
@@ -8,11 +8,11 @@ import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
 import { callout, pageHeader, related, section } from './ui';
 
-export const ravenrift: GuidePage = {
+export const thornhollowFields: GuidePage = {
   titleKey: 'guide.nav.ravenrift',
   render() {
     return `
-      <article class="guide-article guide-ravenrift">
+      <article class="guide-article guide-thornhollow-fields">
         ${pageHeader('guide.ravenriftPage.heading', 'guide.ravenriftPage.intro')}
         ${section('guide.ravenriftPage.queueHeading', `<p>${esc(t('guide.ravenriftPage.queueBody'))}</p>`)}
         ${section('guide.ravenriftPage.fieldHeading', `<p>${esc(t('guide.ravenriftPage.fieldBody'))}</p>`)}

@@ -1,4 +1,4 @@
-// Ravenrift blueprint: a top-down, annotated map diagram generated FROM the
+// Thornhollow Fields blueprint: a top-down, annotated map diagram generated FROM the
 // authoritative layout record (src/sim/battleground_layout.ts) plus the zone
 // bands (src/render/battleground_core.ts), so the diagram can never drift from
 // what players actually collide with. Emits SVG, then rasterizes to PNG via
@@ -142,7 +142,7 @@ for (const r of [...BG_SPEED_RUNES, ...BG_POWER_RUNES]) {
 }
 
 // ---- annotations (labels live in the side gutters, clear of the field) -----
-label(0, BG_HALF_Z + 11, 'RAVENRIFT: THE FIELD', 26, INK);
+label(0, BG_HALF_Z + 11, 'THORNHOLLOW FIELDS', 26, INK);
 label(
   0,
   BG_HALF_Z + 6,

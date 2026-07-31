@@ -1,4 +1,4 @@
-// The Ravenrift flag/rune per-frame visual core (src/render/battleground_fx_core.ts):
+// The Thornhollow Fields flag/rune per-frame visual core (src/render/battleground_fx_core.ts):
 // the transition classifier that picks celebration bursts, and the carried-lean /
 // rune-gem pose math the thin Three consumer (battleground_fx.ts) applies.
 import { describe, expect, it } from 'vitest';

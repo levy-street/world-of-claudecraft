@@ -1,9 +1,9 @@
-// Ravenrift battleground REST surface, born as a registry-only RouteDef module
+// Thornhollow Fields battleground REST surface, born as a registry-only RouteDef module
 // (the new-route rule in server/http/CLAUDE.md: a NEW endpoint never gets an
 // inline main.ts ladder arm).
 //
 // This module hosts the anonymous public GET /api/battleground/leaderboard, the
-// all-time Ravenrift 5v5 ladder. Structure mirrors server/leaderboard.ts (the
+// all-time Thornhollow Fields 5v5 ladder. Structure mirrors server/leaderboard.ts (the
 // public-read exemplar): the SQL read stays in db.ts (topBgRatings) behind the
 // main.ts TTL cache; this module carries only the host-agnostic inner read (the
 // cache's INNER read, so the ladder depth is owned here), a thin Ctx handler,
@@ -19,7 +19,7 @@ import type { Ctx, RouteDef } from './http/types';
 import { json } from './http_util';
 import { publicReadRateLimited } from './ratelimit';
 
-/** How many Ravenrift ranks the public ladder returns (the arena ladder's depth). */
+/** How many Thornhollow Fields ranks the public ladder returns (the arena ladder's depth). */
 export const BG_LEADERBOARD_LIMIT = 20;
 
 // ---------------------------------------------------------------------------
@@ -30,7 +30,7 @@ export const BG_LEADERBOARD_LIMIT = 20;
 /** The main.ts-owned runtime the handler depends on but cannot import without a
  *  cycle: the cache-fronted ladder read (the TTL + single-flight getter). */
 export interface BattlegroundRuntime {
-  /** Cache-fronted Ravenrift ladder read (main.ts getBgLeaderboard). */
+  /** Cache-fronted Thornhollow Fields ladder read (main.ts getBgLeaderboard). */
   getBgLeaderboard(): Promise<BgLeaderRow[]>;
 }
 
@@ -61,7 +61,7 @@ function useRuntime(): BattlegroundRuntime {
 // ladder depth is set.
 // ---------------------------------------------------------------------------
 
-/** DB read the Ravenrift ladder needs. */
+/** DB read the Thornhollow Fields ladder needs. */
 interface BgReadDb {
   topBgRatings(limit?: number): Promise<BgLeaderRow[]>;
 }
@@ -75,7 +75,7 @@ export async function readBgLeaderboard(db: BgReadDb): Promise<{ leaders: BgLead
 // Handler (a thin Ctx adapter, modeled on arenaLeaderboardHandler).
 // ---------------------------------------------------------------------------
 
-/** GET /api/battleground/leaderboard: the public all-time Ravenrift ladder,
+/** GET /api/battleground/leaderboard: the public all-time Thornhollow Fields ladder,
  *  served from the cache-fronted runtime so the ladder query runs at most once
  *  per TTL. Rate-limited in-handler with publicReadRateLimited (the same per-IP
  *  public-read budget the arena ladder and search routes use); the 429 keeps

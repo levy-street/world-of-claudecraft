@@ -1087,7 +1087,7 @@ export interface PlayerMeta {
   arena2v2Rating: number;
   arena2v2Wins: number;
   arena2v2Losses: number;
-  // Ravenrift 5v5 battleground standing (rated, not matched); bgCaptures is
+  // Thornhollow Fields 5v5 battleground standing (rated, not matched); bgCaptures is
   // the career flag-capture count feeding the Book of Deeds meters. All
   // persisted in CharacterState, absent until the first result.
   bgRating: number;
@@ -1335,8 +1335,8 @@ export interface CharacterState {
   arena2v2Rating?: number;
   arena2v2Wins?: number;
   arena2v2Losses?: number;
-  // Ravenrift battleground standing (JSONB; optional and written only once a
-  // result or capture exists, so pre-Ravenrift saves load cleanly and
+  // Thornhollow Fields battleground standing (JSONB; optional and written only once a
+  // result or capture exists, so pre-Thornhollow Fields saves load cleanly and
   // unchanged saves stay byte-equal).
   bgRating?: number;
   bgWins?: number;
@@ -1611,7 +1611,7 @@ export class Sim {
   private yumiBusySlots = new Set<number>();
   private yumiCatMatches = new Map<number, ArenaMatch>();
   private nextArenaMatchId = 1;
-  // Ravenrift battleground: queued party-groups, live matches keyed by every
+  // Thornhollow Fields battleground: queued party-groups, live matches keyed by every
   // member pid, and the band's own busy-slot pool (slot numbers collide across
   // pools, so it must never share the arena's). social/battleground.ts owns
   // the behavior; these are its ctx live views.
@@ -2181,7 +2181,7 @@ export class Sim {
     // position and eject the player to a dungeon door instead of the board door
     // (FR-1.6). The two bands are disjoint, so `else if` keeps dungeon handling intact.
     if (savedPos && isBgPos(savedPos.x)) {
-      // A save inside the Ravenrift band (a crash mid-match) has no match to
+      // A save inside the Thornhollow Fields band (a crash mid-match) has no match to
       // rejoin: resume at the world start (dungeonAt() knows nothing about
       // this band, so the dungeon-door fallback below must never see it).
       savedPos = null;
@@ -3053,7 +3053,7 @@ export class Sim {
               fiestaCompletionsByOpponent: {
                 ...meta.honorArenaDaily.fiestaCompletionsByOpponent,
               },
-              // Optional Ravenrift DR window: omitted when empty so pre-Ravenrift
+              // Optional Thornhollow Fields DR window: omitted when empty so pre-Thornhollow Fields
               // saves stay byte-equal (mirrors normalizeHonorDailyState).
               ...(meta.honorArenaDaily.bgResultsByOpponent &&
               Object.keys(meta.honorArenaDaily.bgResultsByOpponent).length > 0
@@ -3124,7 +3124,7 @@ export class Sim {
       arena2v2Rating: meta.arena2v2Rating,
       arena2v2Wins: meta.arena2v2Wins,
       arena2v2Losses: meta.arena2v2Losses,
-      // Absent until the first Ravenrift result or capture moves something
+      // Absent until the first Thornhollow Fields result or capture moves something
       // (back-compat + parity-stable saves).
       ...(meta.bgWins || meta.bgLosses || meta.bgCaptures || meta.bgRating !== bgMod.BG_BASE_RATING
         ? {
@@ -3891,7 +3891,7 @@ export class Sim {
       set nextArenaMatchId(v) {
         sim.nextArenaMatchId = v;
       },
-      // Ravenrift battleground live views (social/battleground.ts).
+      // Thornhollow Fields battleground live views (social/battleground.ts).
       get bgQueue() {
         return sim.bgQueue;
       },
@@ -4376,7 +4376,7 @@ export class Sim {
         valeCupMod.vcupSportDash(sim.ctx, caster, distance, catchBall),
       vcupSportShove: (caster, target, distance) =>
         valeCupMod.vcupSportShove(sim.ctx, caster, target, distance),
-      // Ravenrift battleground hooks (social/battleground.ts).
+      // Thornhollow Fields battleground hooks (social/battleground.ts).
       bgOnPlayerDeath: (e, killer) => bgMod.bgOnPlayerDeath(sim.ctx, e, killer),
     };
     return createSimContext(host);
@@ -4743,7 +4743,7 @@ export class Sim {
     // tick-staggered bots), so appending it here cannot fork the draw order.
     this.updateValeCup();
     lap?.('valecup');
-    // Ravenrift's ACTIVE phase draws ZERO rng (queue-order matchmaking,
+    // Thornhollow Fields' ACTIVE phase draws ZERO rng (queue-order matchmaking,
     // tick-math wave and rune clocks; the one seeded draw is the power-rune
     // face at match START), so its tick position cannot fork the draw order
     // mid-match.
@@ -7802,7 +7802,7 @@ export class Sim {
       ) {
         return true;
       }
-      // Ravenrift: hostile to the other team while the battle is live,
+      // Thornhollow Fields: hostile to the other team while the battle is live,
       // friendly to your own (isFriendlyTo derives from this arm, so
       // cross-team heals are refused too).
       const bg = this.bgMatches.get(attackerPlayer.id);
@@ -8351,7 +8351,7 @@ export class Sim {
   }
 
   // -------------------------------------------------------------------------
-  // Ravenrift, the 5v5 capture-the-flag battleground. Thin delegates onto
+  // Thornhollow Fields, the 5v5 capture-the-flag battleground. Thin delegates onto
   // social/battleground.ts (the arena-slice pattern): the wire command path,
   // tests, and the server resolve these on the facade.
   // -------------------------------------------------------------------------

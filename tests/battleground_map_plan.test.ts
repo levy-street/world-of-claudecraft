@@ -1,4 +1,4 @@
-// The Ravenrift MAP BUILDER's pure halves: the combat plan, the terrain stamp
+// The Thornhollow Fields MAP BUILDER's pure halves: the combat plan, the terrain stamp
 // chain, the ground paint and the kit arithmetic that fits catalogue pieces to
 // the plan (scripts/assets/battleground/).
 //
@@ -64,7 +64,7 @@ function hasMirrorRect(set: readonly PlanRect[], r: PlanRect, eps = 1e-9): boole
   );
 }
 
-describe('Ravenrift plan: point symmetry, the fairness invariant', () => {
+describe('Thornhollow Fields plan: point symmetry, the fairness invariant', () => {
   it('every wall rectangle on the field has a point-mirrored twin', () => {
     // The ONE property the whole layout rests on: (x, z) -> (-x, -z) maps the
     // field onto itself, so neither team fights a different shape. Checked over
@@ -133,7 +133,7 @@ describe('Ravenrift plan: point symmetry, the fairness invariant', () => {
   });
 });
 
-describe('Ravenrift plan: the combat shape itself', () => {
+describe('Thornhollow Fields plan: the combat shape itself', () => {
   it('keeps the 100x280 footprint and the 236yd flag run', () => {
     expect([HALF_X * 2, HALF_Z * 2]).toEqual([100, 280]);
     expect(FLAG_Z * 2).toBe(236);
@@ -285,7 +285,7 @@ describe('Ravenrift plan: the combat shape itself', () => {
   });
 });
 
-describe('Ravenrift terrain plan: shallow by design', () => {
+describe('Thornhollow Fields terrain plan: shallow by design', () => {
   const h = makeHeightAt(terrainStamps());
 
   it('keeps the whole play surface inside a few yards of relief', () => {
@@ -339,7 +339,7 @@ describe('Ravenrift terrain plan: shallow by design', () => {
   });
 });
 
-describe('Ravenrift ground paint: complete, legible, and every swatch earning its layer', () => {
+describe('Thornhollow Fields ground paint: complete, legible, and every swatch earning its layer', () => {
   const paint = buildPaint();
 
   it('covers the whole rect at the authoring resolution', () => {
@@ -378,7 +378,7 @@ describe('Ravenrift ground paint: complete, legible, and every swatch earning it
   });
 });
 
-describe('Ravenrift kit arithmetic: catalogue pieces fitted to the plan', () => {
+describe('Thornhollow Fields kit arithmetic: catalogue pieces fitted to the plan', () => {
   it('a course of modules spans its run exactly, whatever the run length', () => {
     // A course that overshoots pokes through the wall it joins; one that
     // undershoots leaves a hairline a body can be pushed into.

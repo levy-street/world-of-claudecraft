@@ -610,11 +610,11 @@ describe('server/main.ts wiring: both leaderboard read paths share one flight', 
     // pinned on the comment-stripped view: the board is character-faced, so its
     // plain flight let one post-bust read serve a just-banned account's character.
     expect(compactCode).toContain('singleFlight(refreshDeedsBoard,()=>boardEpoch');
-    // The Ravenrift ladder flight wraps a NAMED function too (single format, no
+    // The Thornhollow Fields ladder flight wraps a NAMED function too (single format, no
     // per-scope arrow), bust-wired like the arena ladder it mirrors.
     expect(compactCode).toContain('singleFlight(refreshBg,()=>boardEpoch');
     // Exactly eight epoch-keyed flights (player + guild, realm + global; arena
-    // 1v1 + 2v2; the deeds board; the Ravenrift ladder): the rarity and
+    // 1v1 + 2v2; the deeds board; the Thornhollow Fields ladder): the rarity and
     // project-stats caches (not bust-wired) must NOT gain the getter, and no
     // board flight may lose it. The count sits on the comment-stripped
     // compactCode view so a commented-out getter drops it.

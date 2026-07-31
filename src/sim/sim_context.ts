@@ -160,7 +160,7 @@ export interface SimContextPrimitives {
   arenaQueueYumi5: ArenaQueueUnit[];
   readonly yumiBusySlots: Set<number>;
   readonly yumiCatMatches: Map<number, ArenaMatch>;
-  // Ravenrift battleground state (social/battleground.ts). The queue array is
+  // Thornhollow Fields battleground state (social/battleground.ts). The queue array is
   // REASSIGNED by the matchmaker's prune filters (read-write, the arena-queue
   // precedent); the pid -> shared-match map, the busy slot pool (its own pool,
   // never the arena's: slot numbers collide across pools) and the match-id
@@ -873,7 +873,7 @@ export interface SimContextCallbacks {
   vcupShoot(caster: Entity, power: number, loft: number, range: number): void;
   vcupSportDash(caster: Entity, distance: number, catchBall: boolean): void;
   vcupSportShove(caster: Entity, target: Entity, distance: number): void;
-  // Ravenrift battleground (social/battleground.ts). bgOnPlayerDeath is the
+  // Thornhollow Fields battleground (social/battleground.ts). bgOnPlayerDeath is the
   // death hook the damage hub calls for a fallen battleground player (carrier
   // death drops the flag in place; releasing sends the spirit to the warded
   // graveyard and the team wave raises it).
@@ -1340,7 +1340,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     vcupShoot: host.vcupShoot,
     vcupSportDash: host.vcupSportDash,
     vcupSportShove: host.vcupSportShove,
-    // Ravenrift battleground hooks (points at social/battleground.ts via Sim).
+    // Thornhollow Fields battleground hooks (points at social/battleground.ts via Sim).
     bgOnPlayerDeath: host.bgOnPlayerDeath,
   };
 }

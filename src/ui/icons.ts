@@ -3207,7 +3207,7 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // Breachmaker's source-scoped vulnerability debuff (kind 'vuln_source'), shown
   // on the target's debuff frame: a cracked guard struck by a blade
   aura_vuln_source: r('blood', 'earthBrown', ['sword', { p: 'sunburst', ...BR }], ['crack']),
-  // Ravenrift rune buffs, keyed by AURA id (the hud iconId resolver passes
+  // Thornhollow Fields rune buffs, keyed by AURA id (the hud iconId resolver passes
   // ids with a recipe through): identity beyond hue, per the owner direction:
   // boots for Sprint, a sword for Battle, a shield for Ward.
   bg_sprint_rune: r('fire', 'ember', ['boot'], ['motion', 'glow']),

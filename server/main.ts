@@ -620,7 +620,7 @@ async function getArenaLeaderboard(format: '1v1' | '2v2'): Promise<ArenaLeaderRo
   }
 }
 
-// Ravenrift ladder cache. ONE entry (the battleground has a single format),
+// Thornhollow Fields ladder cache. ONE entry (the battleground has a single format),
 // same compute-once / serve-from-memory shape as the arena ladder above. Wired
 // into bustBoardCaches below because the ladder is character-faced and
 // moderation-visible: a ban delists immediately in-process while cross-process
@@ -2515,7 +2515,7 @@ configureLeaderboardRuntime({
   toSheetRank,
 });
 
-// Inject the main.ts runtime the Ravenrift ladder handler
+// Inject the main.ts runtime the Thornhollow Fields ladder handler
 // (server/battleground.ts) needs but cannot import without a cycle: the
 // cache-fronted ladder read. Done at module load, before any request,
 // mirroring configureLeaderboardRuntime above.

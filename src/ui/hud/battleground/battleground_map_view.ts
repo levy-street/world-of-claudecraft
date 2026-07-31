@@ -1,4 +1,4 @@
-// Pure, host-agnostic model for the M-key world map's Ravenrift surface: the
+// Pure, host-agnostic model for the M-key world map's Thornhollow Fields surface: the
 // field schematic plus the HONEST marker set. Deliberately shown: the walls,
 // both flag STANDS (static), the graveyard plots, the rune pads, yourself,
 // and your TEAMMATES. Deliberately absent: enemies and live flag positions,

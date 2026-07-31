@@ -1,4 +1,4 @@
-// Pure lifecycle core for the Ravenrift kill feed (DOM-free, Node-tested):
+// Pure lifecycle core for the Thornhollow Fields kill feed (DOM-free, Node-tested):
 // the short top-right stack of "who felled whom" lines a match shows for a
 // few seconds per death. The painter (battleground_kill_feed_painter.ts) owns
 // the DOM and the localized line text; this core owns the list rules, so the

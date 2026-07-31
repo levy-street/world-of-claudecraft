@@ -1,4 +1,4 @@
-// The Ravenrift field's GROUND PAINT: which of the map's eighteen photographed
+// The Thornhollow Fields GROUND PAINT: which of the map's eighteen photographed
 // ground textures every quarter-yard of the hollow is dressed in.
 //
 // The swatch table is Thornhollow's, unchanged, because the ground is half of

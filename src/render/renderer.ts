@@ -1189,7 +1189,7 @@ export class Renderer {
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
   vfx: Vfx;
-  // Ravenrift flag/rune per-frame dressing + transition bursts; runs off
+  // Thornhollow Fields flag/rune per-frame dressing + transition bursts; runs off
   // bgInfo and view userData only (battleground_fx.ts).
   private bgFx!: BattlegroundFx;
   private lightPulses: LightPulses;
@@ -2670,7 +2670,7 @@ export class Renderer {
       this.sun.target.position.set(pp.x, pp.y, pp.z);
     }
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
-    // Ravenrift is OPEN-AIR: the dome and sun render over the band exactly
+    // Thornhollow Fields is OPEN-AIR: the dome and sun render over the band exactly
     // like the overworld (hiding them left a black void above the ramparts).
     this.sky.visible = this.fogState === 'outdoor' || this.fogState === 'battleground';
     if (this.sky.visible) {
@@ -4771,7 +4771,7 @@ export class Renderer {
     if (target.kind !== 'player' || target.dead || target.id === this.sim.playerId) return false;
     if (this.sim.duelInfo?.state === 'active' && this.sim.duelInfo.otherPid === target.id)
       return true;
-    // Ravenrift: the opposing TEAM is hostile for the whole live match.
+    // Thornhollow Fields: the opposing TEAM is hostile for the whole live match.
     const bg = this.sim.bgInfo?.match;
     if (bg?.state === 'active') {
       const row = bg.players.find((p) => p.pid === target.id);
@@ -4796,7 +4796,7 @@ export class Renderer {
   // Protect Yumi maze interiors, one per match slot, built lazily like the
   // arena copies; their update() anchors the team beacons each frame.
   private yumiMazeViews = new Map<number, YumiMazeView>();
-  // Ravenrift battleground fields, one per match slot, built lazily like the
+  // Thornhollow Fields battleground fields, one per match slot, built lazily like the
   // yumi maze copies; the field is static, so there is no per-frame update.
   private bgViews = new Map<number, BattlegroundView>();
   // Blue/red team arrows above every yumi fighter (yumi_team_markers.ts).
@@ -4950,7 +4950,7 @@ export class Renderer {
         }
       }
     } else if (inside && isBgPos(px)) {
-      // build the Ravenrift field copy the player was matched into (the yumi
+      // build the Thornhollow Fields copy the player was matched into (the yumi
       // view-map pattern; the field is static, so no per-frame update hook)
       for (let i = 0; i < BG_SLOT_COUNT; i++) {
         if (this.bgViews.has(i)) continue;
@@ -5048,7 +5048,7 @@ export class Renderer {
         fog.near = 30;
         fog.far = 170;
       } else if (desired === 'battleground') {
-        // Ravenrift is OPEN-AIR at immersive scale (100x280): true
+        // Thornhollow Fields is OPEN-AIR at immersive scale (100x280): true
         // view-distance fog, the open world's own rule. The fight around you
         // (~a chamber) reads clearly; the far keep's detail still dissolves
         // before the 236yd flag-to-flag line, so the far chambers stay places

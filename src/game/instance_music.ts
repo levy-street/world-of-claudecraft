@@ -65,7 +65,7 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
 
   const dungeon = dungeonAt(input.playerPos.x);
   const inRaidArena = dungeon?.id === RAID_ARENA_ID;
-  // Ravenrift battleground: the whole match rides the existing battle track
+  // Thornhollow Fields battleground: the whole match rides the existing battle track
   // (the raid-arena musicCombat treatment; no dedicated audio asset).
   const inBattleground = isBgPos(input.playerPos.x);
   const inCombat = aggroed || input.now - input.lastCombatEventAt < RECENT_COMBAT_MS;

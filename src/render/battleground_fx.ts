@@ -1,4 +1,4 @@
-// Per-frame Ravenrift flag/rune animation + state-transition bursts. The
+// Per-frame Thornhollow Fields flag/rune animation + state-transition bursts. The
 // renderer constructs one and calls update(time) from the live sync() fx block
 // each frame; all math and the transition classifier live in
 // battleground_fx_core (pure, Node-tested). This module only touches child

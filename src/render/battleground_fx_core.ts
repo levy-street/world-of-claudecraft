@@ -1,4 +1,4 @@
-// Pure math + state classification for the Ravenrift flag/rune per-frame
+// Pure math + state classification for the Thornhollow Fields flag/rune per-frame
 // visuals (no Three, no DOM): the carried-flag lean and bob, the rune gem's
 // spin and hover, and the flag state-transition classifier that decides which
 // celebration burst plays. battleground_fx.ts is the thin Three consumer.

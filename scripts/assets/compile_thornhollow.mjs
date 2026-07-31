@@ -1,5 +1,5 @@
 // Compile the Thornhollow battleground map (data/battleground/thornhollow.map.json,
-// a standard WoC map-editor document, built from the Ravenrift combat plan by
+// a standard WoC map-editor document, built from the Thornhollow Fields combat plan by
 // scripts/assets/build_battleground_map.mjs) into the generated field module the
 // game consumes: src/sim/thornhollow_field.generated.ts.
 //

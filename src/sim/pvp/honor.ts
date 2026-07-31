@@ -13,7 +13,7 @@ export const RANKED_ARENA_WIN_HONOR = {
 export const FIESTA_KILL_HONOR = 20;
 export const FIESTA_COMPLETION_HONOR = 20;
 export const FIESTA_WIN_BONUS_HONOR = 40;
-// Ravenrift 5v5 capture-the-flag. A win pays more than a 2v2 win because a
+// Thornhollow Fields 5v5 capture-the-flag. A win pays more than a 2v2 win because a
 // full match is a 10-player, ~10-13 minute commitment; the loss award is a
 // completion consolation (a draw pays the loss amount to both sides). Both
 // decay per repeated opposing-team via HONOR_REPEAT_DR (the Fiesta rule for
@@ -61,7 +61,7 @@ export function normalizeHonorDailyState(value: unknown): HonorArenaDailyState |
     date: typeof record.date === 'string' ? record.date : '',
     winsByOpponent: normalizeCountRecord(record.winsByOpponent),
     fiestaCompletionsByOpponent: normalizeCountRecord(record.fiestaCompletionsByOpponent),
-    // Optional: absent (not empty) when there are no results, so pre-Ravenrift
+    // Optional: absent (not empty) when there are no results, so pre-Thornhollow Fields
     // saves round-trip byte-identical.
     ...(Object.keys(bgResults).length > 0 ? { bgResultsByOpponent: bgResults } : {}),
     totalWins: normalizeHonorCounter(record.totalWins),
@@ -158,7 +158,7 @@ export function awardRankedArenaWinHonor(
   return grantHonor(ctx, meta, amount, 'arena_win');
 }
 
-// Ravenrift result honor: one award per played-out match, decayed per repeated
+// Thornhollow Fields result honor: one award per played-out match, decayed per repeated
 // opposing-team identity in the same UTC day (HONOR_REPEAT_DR, the softer
 // Fiesta curve; a 5v5 match is long enough that the arena's first-win-only rule
 // would be needlessly punishing). Draws pay the loss amount to both sides.

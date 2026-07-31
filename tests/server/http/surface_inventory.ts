@@ -1116,7 +1116,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
-  // Ravenrift (server/battleground.ts): a registry-only RouteDef born after
+  // Thornhollow Fields (server/battleground.ts): a registry-only RouteDef born after
   // the migration, per the same new-route rule as the deeds family. Public
   // anonymous ladder read, rate-limited in-handler with publicReadRateLimited
   // (the deeds-rarity row shape).
