@@ -2305,6 +2305,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': '그 퀘스트를 주는 대상이 근처에 없습니다.',
   'questUi.errors.turnInMissing': '그 퀘스트를 보고할 대상이 근처에 없습니다.',
   'questUi.errors.tooFar': '너무 멉니다.',
+  'questUi.errors.escortAway': '호송할 대상이 지금 자리에 없습니다. 잠시 후 그곳으로 돌아옵니다.',
   'itemUi.money.goldShort': '금',
   'itemUi.money.silverShort': '은',
   'itemUi.money.copperShort': '동',
@@ -4392,6 +4393,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '영웅의 징표',
   'hudChrome.raidLockout.heroicName': '영웅: {name}',
   'hudChrome.raidLockout.heroicLocked': '영웅 난이도 {name}에 귀속되었습니다.',
+  'hudChrome.riftTracker.title': '균열',
+  'hudChrome.riftTracker.floor': '{total}층 중 {current}층',
+  'hudChrome.riftTracker.closesIn': '균열이 {time} 후 닫힙니다',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
   'entities.items.morthens_cryptforged_hauberk.name': '모르텐의 묘지주조 사슬갑옷',
   'entities.items.shadowpulse_handwraps.name': '어둠파동 손싸개',
   'entities.items.bonechill_striders.name': '뼈서리 장화',
@@ -4637,7 +4643,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': '숯불 워든에게 보고',
   'entities.quests.q_fs_bram_come_home.title': '브람아 돌아오렴',
   'entities.quests.q_fs_bram_come_home.text':
-    '그물 균열이 열리던 아침에 우리 브람이 배를 몰고 나갔는데, 바다가 그이를 선착장 곶 너머 어딘가로 내던졌어요. 사흘 전 밤에 그이가 물 너머로 부르는 소리를 들었어요, {playerName}. 그런데도 나는 무서워서 가지 못했어요. 지금도 무서워요. 부탁이에요. 그이의 배가 북쪽 물가에 부서져 있어요. 그이를 집까지 데려다주세요.',
+    '그물 균열이 열리던 아침에 우리 브람이 배를 몰고 나갔는데, 바다가 그이를 선착장 곶 너머 어딘가로 내던졌어요. 사흘 전 밤에 그이가 물 너머로 부르는 소리를 들었어요, {playerName}. 그런데도 나는 무서워서 가지 못했어요. 지금도 무서워요. 부탁이에요. 그이의 배가 남쪽 물가에 부서져 있어요. 그이를 집까지 데려다주세요.',
   'entities.quests.q_fs_bram_come_home.completion':
     '브람! 그이를 성한 몸으로 데려다주셨군요, {playerName}. 우리 둘 다 울었지만 부끄럽지 않아요. 균열이 이 섬에서 다음에 무엇을 앗아 가든, 내 가족만은 안 돼요. 이제 다시는요.',
   'entities.quests.q_fs_bram_come_home.objectives.0.label':
@@ -4723,7 +4729,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_rime_unbound.objectives.0.label': '서리 정령 처치',
   'entities.quests.q_fv_seeing_wren_home.title': '렌을 바래다주는 길',
   'entities.quests.q_fv_seeing_wren_home.text':
-    '내 견습생 렌이 이틀 전에 금빛눈녹이 길을 살피러 나갔다가 돌아오지 않았네. 발자국은 찾았어. 오로라 계단 남서쪽 길표지 아래 웅크리고 있는데, 늑대가 무서워 꼼짝을 못 하고 있지. 나는 늪을 비울 수가 없네, {playerName}. 그 아이를 계단 위 베일라의 야영지까지 데려다주게. 빛 아래라면 안전할 걸세.',
+    '내 견습생 렌이 이틀 전에 금빛눈녹이 길을 살피러 나갔다가 돌아오지 않았네. 발자국은 찾았어. 오로라 계단 북동쪽 길표지 아래 웅크리고 있는데, 늑대가 무서워 꼼짝을 못 하고 있지. 나는 늪을 비울 수가 없네, {playerName}. 그 아이를 계단 위 베일라의 야영지까지 데려다주게. 빛 아래라면 안전할 걸세.',
   'entities.quests.q_fv_seeing_wren_home.completion':
     '그 아이는 안에 있네. 내 담요를 절반이나 두르고서 하늘의 별을 다 헤아릴 기세로 떠들고 있지. 오늘 자네는 고운 일을 했어, {playerName}. 서리장막 봉우리에서는 좀처럼 보기 힘든 일이라네.',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
@@ -6479,7 +6485,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.economy.mailBody':
     '모든 거점 마을에는 조각한 까마귀 석주가 서 있습니다. 왕국의 편지 배달부, 레이븐포스트의 우편함입니다. 그 앞에 서면 접속 중인 친구든 오래 접속하지 않은 이든 어떤 캐릭터에게나 이름으로 편지를 쓸 수 있고, 약간의 우편 요금으로 동전이나 물건을 편지에 첨부할 수 있습니다. 까마귀가 날아가는 데는 잠시 시간이 걸리며, 도착하면 봉투 표시가 받는 이에게 무언가 기다리고 있음을 알려 줍니다.',
   'guide.economy.mailHow':
-    '받는 것도 똑같이 거꾸로 하면 됩니다. 어느 석주 앞에서든 편지를 읽고, 담긴 것을 지갑과 가방으로 옮기세요. 편지는 영원히 기다려 주지 않으니, 까마귀가 당신을 포기하기 전에 찾아가세요. 우편이 딱 잘라 거절하는 것이 둘 있습니다. 귀속 아이템과 퀘스트 물품은 당신과 함께 다니거나, 아예 다니지 않습니다. 그리고 보람찬 퀘스트 완료 뒤에는 석주를 눈여겨보세요. 편지를 쓰는 퀘스트 제공자들도 있으니까요.',
+    '받는 것도 똑같이 거꾸로 하면 됩니다. 어느 석주 앞에서든 편지를 읽고, 담긴 것을 지갑과 가방으로 옮기세요. 편지는 영원히 기다려 주지 않으니, 까마귀가 당신을 포기하기 전에 찾아가세요. 우편이 딱 잘라 거절하는 것이 몇 가지 있습니다. 귀속 아이템, 퀘스트 물품, 그리고 이미 귀속되었거나 거래로 귀속될 물건은 당신과 함께 다니거나, 아예 다니지 않습니다. 그리고 보람찬 퀘스트 완료 뒤에는 석주를 눈여겨보세요. 편지를 쓰는 퀘스트 제공자들도 있으니까요.',
   'guide.economy.mailTitle': '레이븐포스트',
   'guide.economy.marketBody':
     '상인이 세계 시장을 운영합니다. 만날 일 없을지도 모를 사람들과 사고팔 수 있는, 플레이어가 이끄는 거래소입니다. 이스트브룩의 상인에게 말을 걸거나 하이워치의 경매인 보스에게 말을 걸어 열 수 있으며, 두 관리인 모두 하나의 공용 시장을 담당합니다. 상인은 자신의 물품도 상시 목록에 올려 두므로, 다른 플레이어가 아무것도 올리지 않았을 때에도 언제나 살 것이 있습니다.',
@@ -6797,12 +6803,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.duskGreeter': '수호자 샐윈, 엘더글림',
   'guide.worldPage.duskPlaceNotes':
     '엘더글림은 큰 나무 아래 모여 있다. 황혼 동굴과 그 전망대는 들어가는 길이자 골짜기를 처음 내려다보는 곳이다. 고대나무 숲과 별내림 분지는 고요한 남쪽을 지키고, 가라앉은 궁정은 동쪽에 수풀 우거진 폐허를 품으며, 빛나는 심처와 수정 여울은 북쪽에서 은은히 빛난다.',
-  'guide.family.murloc.name': '개굴지느러미족',
-  'guide.family.murloc.desc':
-    '호숫가와 조수 웅덩이에 사는 개골거리는 물고기 인간들로, 물가에 너무 가까이 들어오는 것은 무엇이든 재빨리 떼 지어 덮칩니다.',
-  'guide.family.kobold.name': '장난꾸러기 정령',
-  'guide.family.kobold.desc':
-    '숲속 공터와 산울타리를 종종거리며 뒤지는 약탈꾼과 요정들로, 수가 모이기 전까지는 위협이라기보다 골칫거리에 가깝습니다.',
   'guide.family.demon.name': '악마',
   'guide.family.demon.desc':
     '균열 너머에서 온 침략자들로, 온통 불길과 악의뿐입니다. 악마 하나가 서 있는 곳이라면, 균열이 결코 멀지 않습니다.',
@@ -8111,6 +8111,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': '요청이 너무 큽니다. 데이터를 줄여 다시 시도하세요.',
   'apiError.body.unsupported_media_type': '지원되지 않는 요청 형식입니다.',
   'apiError.deeds.invalid_input': '입력이 올바르지 않습니다.',
+  'apiError.ota_updates.invalid_input': '입력이 올바르지 않습니다.',
   'apiError.steam.disabled': '현재 Steam 연동을 사용할 수 없습니다.',
   'apiError.wallet.handoff_invalid':
     '지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요.',
@@ -8222,6 +8223,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.tooManyParcels':
     '편지 하나에는 소포를 최대 {count}개까지 담을 수 있습니다.',
   'hudChrome.mailbox.result.noMailQuestItems': '퀘스트 아이템은 우편으로 보낼 수 없습니다.',
+  'hudChrome.mailbox.result.noMailBound': '그 아이템은 귀속되어 우편으로 보낼 수 없습니다.',
   'hudChrome.mailbox.result.notEnoughItems': '보낼 수 있는 수량이 부족합니다.',
   'hudChrome.mailbox.result.cantAffordPostage': '우편 요금을 낼 수 없습니다.',
   'hudChrome.mailbox.result.recipientBoxFull': '상대의 우편함이 가득 찼습니다.',
@@ -9090,6 +9092,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '그림자 도약 두꺼비 카마카게',
   'hudChrome.mounts.name_stormfeather_griffin': '하늘닿이 폭풍깃',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
+  'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 테러스파크',
   'hudChrome.mounts.desc_valorsteed': '여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.',
   'hudChrome.mounts.desc_grag_bear': '여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.',
   'hudChrome.mounts.desc_stalkglider_snail': '여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.',
@@ -9101,6 +9104,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     '깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.',
+  'hudChrome.mounts.desc_terrorspark_groundshaker':
+    '묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.',
   'hudChrome.mounts.emptyTitle': '보유한 탈것 없음',
   'hudChrome.mounts.emptyStableHint':
     '20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.',
@@ -9201,11 +9206,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '몇 가지 자주 쓰는 명령어는 외워 둘 만합니다. /w 이름은 귓속말을 보내고, /r은 마지막으로 받은 귓속말에 답하며, /invite는 상대를 파티로 초대하고, /follow는 친구 뒤를 따라 걷게 하며, /roll은 파티가 함께 볼 주사위를 굴리고, /who는 접속 중인 사람을 보여주며, /afk는 자리 비움으로 표시합니다. 전체 목록은 게임에서 /help를 입력해 확인하세요.',
   'guide.social.slashHeading': '유용한 슬래시 명령어',
   // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.helpUnstuckSickness':
+    '탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 가장 가까운 묘지로 이동시키며 쓰러져 있었다면 부활시킵니다. 최대 5분 동안 탈출의 후유증이 남습니다.',
   'hudChrome.unstuck.menuButton': '갇힘 탈출',
   'hudChrome.unstuck.help':
     '탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.',
   'hudChrome.unstuck.helpAtGraveyard':
     '탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 영혼을 가장 가까운 묘지로 보냅니다. 되살아나려면 영혼 치유사에게서 수호자의 대가를 받아야 합니다.',
+  'hudChrome.unstuck.movedToGraveyard':
+    '가장 가까운 묘지로 이동했습니다. 탈출의 후유증이 당신을 짓누릅니다.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    '가장 가까운 묘지로 이동해 부활했습니다. 탈출의 후유증이 당신을 짓누릅니다.',
   'hudChrome.unstuck.started':
     '{seconds}초 후 탈출합니다. 이동, 전투, 피해를 받거나 다른 행동을 시작하면 취소됩니다.',
   'hudChrome.unstuck.countdown': '갇힘 탈출: {seconds}',
@@ -9412,7 +9423,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '깜빡임 걸음, 서리장막 및 상급 투명화의 재사용 대기시간을 즉시 초기화합니다. (마법사 특성)',
   'entities.abilities.greater_invisibility.name': '상급 투명화',
   'entities.abilities.greater_invisibility.description':
-    '20초 동안 모습을 감춥니다. 지속 피해 효과 2개를 제거하고 투명 상태인 동안과 해제 직후 받는 피해가 90% 감소합니다. (마법사 특성)',
+    '20초 동안 사라지며 지속 피해 효과를 2개 제거합니다. 투명화가 끝나면 2초 동안 받는 피해가 90% 감소합니다. (마법사 특성)',
   'entities.abilities.hot_streak.name': '몰아치는 열기',
   'entities.abilities.hot_streak.description':
     '지속 효과: 화염 주문(화염구, 화염 작렬, 불태우기, 불덩이 작렬 또는 불기둥)으로 연속 두 번 치명타를 적중시키면 다음 불덩이 작렬 또는 불기둥이 즉시 시전되고 마나를 소모하지 않습니다. 소모 주문은 무료 시전을 포함해 다음 연속 발동 조건에 포함됩니다. 불기둥은 적중한 적의 수와 관계없이 한 번만 계산되며 최초 충격만 조건에 포함됩니다. (화염)',
@@ -9877,6 +9888,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '마지막 요새',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
+  'entities.items.reins_terrorspark_groundshaker.name': '테러스파크 시동 열쇠',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',
@@ -9985,6 +9997,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.resonant_steel.name': '공명의 강철',
   'entities.items.resonant_timber.name': '공명의 목재',
   'hud.errors.tradeBound': '그 아이템은 귀속되어 거래할 수 없습니다.',
+  'hud.errors.marketListBound': '그 아이템은 귀속되어 등록할 수 없습니다.',
   'hudChrome.enchantName.enchant_weapon_might': '무기 마법부여 - 위력',
   'hudChrome.enchantName.enchant_weapon_intellect': '무기 마법부여 - 주문력',
   'hudChrome.enchantName.enchant_helmet_fortitude': '투구 마법부여 - 강건함',
@@ -10525,7 +10538,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '가장 꾸준한 장사는 소모품이다. 쓰면 사라지고 다시 사기 때문이다. 물약, 요리, 마법부여는 모두 소모된다. 검을 한 번 산 전사도 치유 물약은 영원히 산다. 걸작은 프리미엄 시장이다. 주문 제작이 불가능하니 원하는 물건 하나에 진짜 웃돈이 붙고, 그 위의 서명은 걸어 다니는 광고다. 재료가 세 번째 기둥이다. 분해에서 나오는 비전 재료, 분해자에게서 마법부여사에게 곧장 흐르는 Resonant 부산물, 그리고 걸작 발동을 노리는 장인들이 웃돈을 주고 사는 서명된 채집 재료다.',
   'guide.profPages.econ.marketHeading': '세계 시장과 수수료',
   'guide.profPages.econ.marketBody':
-    '세계 시장은 Eastbrook의 Merchant와 Highwatch의 Auctioneer Voss가 지키는 서버 전체 거래소다. 등록은 무료다. 보증금이 없고 유찰된 물건은 그대로 돌아온다. 수수료는 성사될 때만 판매가의 5%를 뗀다. 중요한 한계 하나. 시장은 표식 없는 일반품만 다룬다. 서명, 걸작, 마법부여, 귀속된 사본은 등록되지 않으므로, 특별한 물건은 거래 창에서 얼굴을 맞대고 넘긴다. 값은 직접 매기자. 시장은 일반판 시세만 알려 줄 뿐이다.',
+    '세계 시장은 Eastbrook의 Merchant와 Highwatch의 Auctioneer Voss가 지키는 서버 전체 거래소다. 등록은 무료다. 보증금이 없고 유찰된 물건은 그대로 돌아온다. 수수료는 성사될 때만 판매가의 5%를 뗀다. 특별한 물건도 환영이다. 서명, 걸작, 마법부여된 사본은 한 점씩 단일 등록으로 올라가고, 툴팁에 서명까지 그 정체가 그대로 실리며, 일반 더미와 섞이지 않는다. 유일하게 거절되는 것은 귀속된 사본이다. 제작자의 서약에 묶였거나 묶일 예정인 물건은 시장에도 우편에도 오르지 못하니, 서약을 세탁할 길은 없다. 특별한 물건의 값은 직접 매기자. 일반 등록은 일반판 시세만 알려 줄 뿐이다.',
   'guide.profPages.econ.collectorsHeading': '수집가, 전리품, 이야기의 값',
   'guide.profPages.econ.collectorsBody':
     '상인은 출처를 보지 못한다. 서명된 물건도 NPC에게는 일반품 값에 팔린다. 서명의 웃돈은 플레이어 사이에만 존재하고, 바로 그래서 흥미롭다. 이름난 채집가가 서명한 횡재 광석, Prime Cut 한 점, 은퇴한 장인의 이름이 새겨진 걸작 검. 값은 누군가의 기억이 정한다. 업적의 서도 같은 본능을 좇는다. Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen, Glimmer of Hope는 모두 그 순간이 당신에게 일어났음을 증명하기 위해서만 존재하는 명성 0의 수집 표식이다. 이것은 힘이 아니다. 출처는 능력치를 사지도, 싸움을 이기지도 않는다. 좋은 날들의 영수증일 뿐이다.',
@@ -10621,7 +10634,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '기술을 움직이는 행동은 둘이다. 분해와 마법부여 시전. 성공마다 최대 1점이고, 일의 무게로 환산된다. 일반 분해와 가루만 드는 마법부여는 일반 일, 고급 분해와 정수 마법부여는 고급, 희귀 분해와 모든 Runed나 Greater 마법부여는 희귀, 영웅과 전설 분해는 그보다 높다. 익숙한 숙달 감쇠가 25점 단위로 걸려 일반 일은 기술 75에, 고급 일은 100에, 희귀 일은 정확히 상한 125에 회색이 된다. 마법부여만의 자비도 하나 있다. 천장을 넘는 입력은 0이 아니라 천장으로 내림되니, 맹세 전의 영웅 분해는 아무것도 못 배우는 대신 희귀로 계산된다. 마법부여가 다른 정체성 뒤에서 휴면하면 모든 것이 일반 일로 계산되어 오름세가 75에 멎고, 취미로 두면 희귀 일이 여전히 값을 하되 75 이후 느려질 뿐이다.',
   'guide.profPages.craftProse.enchanting.marketHeading': '부여된 사본, 출처, 시장',
   'guide.profPages.craftProse.enchanting.marketBody':
-    '마법부여는 재료를 소모하고 특정 사본 하나에 표시를 남긴다. 가방 속 사본에 쓰면 별개의 부여된 사본을 돌려받고, 이미 착용 중인 물건에 쓰면 벗었다 다시 입을 필요 없이 그 자리에서 부여된다. 어느 쪽이든 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본에 다른 마법부여를 쓰면 먼저 확인을 거친 뒤 옛 부여를 그대로 대체하며, 옛 부여는 재료 환불 없이 파괴된다. 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 세계 시장은 무표식 일반품만 다루므로 부여품과 서명품은 거래 창에서 직접 오간다. 시장에 올릴 수 있는 절반은 재료 쪽이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다.',
+    '마법부여는 재료를 소모하고 특정 사본 하나에 표시를 남긴다. 가방 속 사본에 쓰면 별개의 부여된 사본을 돌려받고, 이미 착용 중인 물건에 쓰면 벗었다 다시 입을 필요 없이 그 자리에서 부여된다. 어느 쪽이든 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본에 다른 마법부여를 쓰면 먼저 확인을 거친 뒤 옛 부여를 그대로 대체하며, 옛 부여는 재료 환불 없이 파괴된다. 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 이제 부여품과 서명품도 세계 시장에 올릴 수 있다. 한 점씩 단일 등록으로 팔리고, 툴팁에 부여와 제작자의 서명이 표시되며, 큰까마귀 우편으로도 똑같이 보낼 수 있다. 재료는 여전히 장사의 든든한 절반이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다.',
   'hudChrome.corpseHarvest.components.meat': '고기',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (마법부여)',
   'hudChrome.materialHint.arcaneDust': '마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.',

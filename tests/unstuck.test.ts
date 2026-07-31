@@ -3,13 +3,21 @@ import { BUILTIN_WORLD, DELVES, INSTANCE_X_BASE, setActiveWorldContent } from '.
 import { delveModuleEntry } from '../src/sim/delves/runs';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { swimSurfaceY } from '../src/sim/player_motion';
+import {
+  RES_SICKNESS_STAT_MULT,
+  RESURRECTION_SICKNESS_ID,
+  UNSTUCK_SICKNESS_DURATION,
+  UNSTUCK_SICKNESS_ID,
+  unstuckSicknessDuration,
+} from '../src/sim/resurrection';
 import { Sim } from '../src/sim/sim';
 import {
+  applyResurrectionSickness,
+  moveToGraveyardForUnstuck,
   nearestOverworldGraveyard,
   RES_HEALER_HP_FRACTION,
-  RESURRECTION_SICKNESS_ID,
 } from '../src/sim/spirit';
-import type { BlockerDef, SimEvent, WorldContent } from '../src/sim/types';
+import { type BlockerDef, MAX_LEVEL, type SimEvent, type WorldContent } from '../src/sim/types';
 import {
   UNSTUCK_COOLDOWN_ID,
   UNSTUCK_COUNTDOWN_SECONDS,
@@ -318,14 +326,14 @@ describe('unstuck countdown and cancellation', () => {
   });
 });
 
-describe('unstuck graveyard release', () => {
-  function runCompletion(): {
+describe('unstuck graveyard move while alive', () => {
+  function runCompletion(level = 10): {
     sim: Sim;
     player: Sim['player'];
     event: Extract<Event, { phase: 'completed' }>;
   } {
     const sim = makeWorld();
-    sim.setPlayerLevel(10);
+    sim.setPlayerLevel(level);
     const { player } = accepted(sim);
     const events = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20));
     const event = events.find(
@@ -337,30 +345,97 @@ describe('unstuck graveyard release', () => {
     return { sim, player, event: required(event, 'completed event') };
   }
 
-  it('works from an ordinary safe position, kills the player, and forces the Pale Keeper toll', () => {
+  it('moves a living player to the nearest graveyard without killing them', () => {
     const { sim, player, event } = runCompletion();
     const graveyard = nearestOverworldGraveyard(START.x, START.z);
 
-    expect(event.reason).toBe('nearest_graveyard');
+    expect(event.reason).toBe('moved_to_graveyard');
     expect(event.destination).toMatchObject(graveyard);
     expect(player.pos).toMatchObject(graveyard);
     expect(player.prevPos).toEqual(player.pos);
-    expect(player.dead).toBe(true);
-    expect(player.ghost).toBe(true);
-    expect(player.corpsePos).toBeNull();
-    expect(required(sim.meta(player.id), 'player metadata').counters.deaths).toBe(1);
-
-    sim.resurrectAtCorpse();
-    expect(player.dead).toBe(true);
-    expect(player.ghost).toBe(true);
-
-    sim.resurrectAtSpiritHealer();
     expect(player.dead).toBe(false);
     expect(player.ghost).toBe(false);
-    expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(true);
+    expect(player.corpsePos).toBeNull();
+    expect(player.hp).toBeGreaterThan(0);
+    // No death happened, so nothing may reach the death bookkeeping.
+    expect(required(sim.meta(player.id), 'player metadata').counters.deaths).toBe(0);
+    // Nor may the death loop offer itself: there is no corpse and no spirit to release.
+    sim.releaseSpirit();
+    expect(player.ghost).toBe(false);
   });
 
-  it('uses the same graveyard death flow for an idle swimmer', () => {
+  it('charges Unstuck Sickness rather than The Keeper’s Toll, and clears momentum', () => {
+    const { player } = runCompletion();
+
+    expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(false);
+    const sickness = required(
+      player.auras.find((aura) => aura.id === UNSTUCK_SICKNESS_ID),
+      'unstuck sickness aura',
+    );
+    expect(sickness.kind).toBe('buff_allstats_pct');
+    expect(sickness.value).toBe(RES_SICKNESS_STAT_MULT);
+    expect(sickness.remaining).toBe(unstuckSicknessDuration(player.level));
+    expect([player.vx, player.vy, player.vz]).toEqual([0, 0, 0]);
+    expect(player.targetId).toBeNull();
+    expect(player.autoAttack).toBe(false);
+  });
+
+  it('caps the sickness at five minutes and exempts characters below level 10', () => {
+    const { player: capped } = runCompletion(MAX_LEVEL);
+    expect(
+      required(
+        capped.auras.find((aura) => aura.id === UNSTUCK_SICKNESS_ID),
+        'max-level unstuck sickness',
+      ).duration,
+    ).toBe(UNSTUCK_SICKNESS_DURATION);
+    expect(UNSTUCK_SICKNESS_DURATION).toBe(5 * 60);
+
+    const { player: exempt } = runCompletion(9);
+    expect(exempt.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(false);
+    expect(exempt.dead).toBe(false);
+  });
+
+  it('never stacks a second whole-stat drain on top of The Keeper’s Toll', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(MAX_LEVEL);
+    const { player } = accepted(sim);
+    applyResurrectionSickness(sim.ctx, player);
+    const drained = player.stats.str;
+    expect(drained).toBeGreaterThan(0);
+
+    tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+
+    // The Toll is displaced rather than compounded: two -75% drains would leave
+    // strength at a sixteenth of the base block instead of a quarter.
+    expect(player.auras.filter((aura) => aura.kind === 'buff_allstats_pct')).toHaveLength(1);
+    expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(false);
+    expect(player.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+    expect(player.stats.str).toBe(drained);
+  });
+
+  it('logs the displaced Keeper’s Toll fading, which no snapshot would reveal', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(MAX_LEVEL);
+    const { player } = accepted(sim);
+    applyResurrectionSickness(sim.ctx, player);
+    sim.drainEvents();
+
+    const auraEvents = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20).filter(
+      (event): event is Extract<SimEvent, { type: 'aura' }> => event.type === 'aura',
+    );
+
+    expect(auraEvents).toContainEqual({
+      type: 'aura',
+      targetId: player.id,
+      name: 'Resurrection Sickness',
+      gained: false,
+    });
+    expect(auraEvents).toContainEqual(
+      expect.objectContaining({ name: 'Unstuck Sickness', gained: true }),
+    );
+  });
+
+  it('uses the same graveyard move for an idle swimmer', () => {
     const sim = makeWorld();
     sim.setPlayerLevel(10);
     placeInWaterTrap(sim);
@@ -374,14 +449,14 @@ describe('unstuck graveyard release', () => {
       (event): event is Extract<Event, { phase: 'completed' }> => event.phase === 'completed',
     );
 
-    expect(completed?.reason).toBe('nearest_graveyard');
+    expect(completed?.reason).toBe('moved_to_graveyard');
     expect(player.pos).toMatchObject(graveyard);
-    expect(player.dead).toBe(true);
-    expect(player.ghost).toBe(true);
+    expect(player.dead).toBe(false);
+    expect(player.ghost).toBe(false);
     expect(player.corpsePos).toBeNull();
   });
 
-  it('returns a delve player to the graveyard nearest the delve entrance', () => {
+  it('returns a delve player to the graveyard nearest the delve entrance, still alive', () => {
     const sim = makeWorld();
     const pid = sim.player.id;
     const delve = DELVES.collapsed_reliquary;
@@ -394,9 +469,81 @@ describe('unstuck graveyard release', () => {
     tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
 
     expect(sim.player.pos).toMatchObject(graveyard);
-    expect(sim.player.dead).toBe(true);
-    expect(sim.player.ghost).toBe(true);
+    expect(sim.player.dead).toBe(false);
+    expect(sim.player.ghost).toBe(false);
     expect(sim.player.corpsePos).toBeNull();
+  });
+
+  it('settles the landing like a portal teleport, so a stale jump arc cannot deal fall damage', () => {
+    const sim = makeWorld();
+    // Below the sickness floor, so the hp math stays untouched by the aura.
+    sim.setPlayerLevel(9);
+    const player = sim.player;
+    // Emulate the state the countdown gates currently forbid (a mid-air invoker with a
+    // high fall origin): the settle contract must hold on its own, not lean on the gates.
+    player.jumping = true;
+    player.onGround = false;
+    player.fallStartY = player.pos.y + 100;
+
+    moveToGraveyardForUnstuck(sim.ctx, player.id);
+
+    const graveyard = nearestOverworldGraveyard(START.x, START.z);
+    expect(player.pos).toMatchObject(graveyard);
+    expect(player.jumping).toBe(false);
+    expect(player.onGround).toBe(true);
+    expect(player.fallStartY).toBe(player.pos.y);
+
+    const hpBefore = player.hp;
+    tickMany(sim, 20);
+    expect(player.hp).toBe(hpBefore);
+    expect(player.onGround).toBe(true);
+  });
+
+  it("swaps Unstuck Sickness for The Keeper's Toll at a Spirit Healer, never stacking them", () => {
+    const { sim, player } = runCompletion(MAX_LEVEL);
+    const drained = player.stats.str;
+    expect(player.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+
+    sim.ctx.dealDamage(null, player, player.maxHp * 10, false, 'physical', null, 'hit');
+    expect(player.dead).toBe(true);
+    sim.releaseSpirit();
+    expect(player.ghost).toBe(true);
+    // Dying sheds nothing: the unstuck drain survives to the healer.
+    expect(player.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+
+    sim.resurrectAtSpiritHealer();
+    expect(player.dead).toBe(false);
+
+    // The healer's Toll displaces the Unstuck drain rather than compounding with it:
+    // strength stays at the quarter either drain produces alone, not a sixteenth.
+    expect(player.auras.filter((aura) => aura.kind === 'buff_allstats_pct')).toHaveLength(1);
+    expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(true);
+    expect(player.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(false);
+    expect(player.stats.str).toBe(drained);
+  });
+
+  it('resumes the sickness with its saved remaining after a relog', () => {
+    const { sim, player } = runCompletion(MAX_LEVEL);
+    tickMany(sim, 40); // burn two seconds off the debuff
+    const remaining = required(
+      player.auras.find((aura) => aura.id === UNSTUCK_SICKNESS_ID),
+      'unstuck sickness aura',
+    ).remaining;
+    expect(remaining).toBeLessThan(UNSTUCK_SICKNESS_DURATION);
+    const state = required(sim.serializeCharacter(player.id), 'serialized character');
+    expect(state.unstuckSickness).toBe(remaining);
+
+    const restored = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+    const restoredPid = restored.addPlayer('warrior', 'Wayfinder', { state });
+    const restoredPlayer = required(restored.entities.get(restoredPid), 'restored player');
+
+    expect(
+      required(
+        restoredPlayer.auras.find((aura) => aura.id === UNSTUCK_SICKNESS_ID),
+        'restored unstuck sickness',
+      ).remaining,
+    ).toBe(remaining);
+    expect(restoredPlayer.hp).toBeLessThanOrEqual(restoredPlayer.maxHp);
   });
 });
 
@@ -417,7 +564,7 @@ describe('unstuck while dead', () => {
     );
   }
 
-  it('revives an unreleased body at the nearest graveyard under the Keeper toll', () => {
+  it('revives an unreleased body at the nearest graveyard under Unstuck Sickness', () => {
     const sim = makeWorld();
     sim.setPlayerLevel(10);
     const player = killed(sim);
@@ -435,7 +582,8 @@ describe('unstuck while dead', () => {
     expect(player.dead).toBe(false);
     expect(player.ghost).toBe(false);
     expect(player.corpsePos).toBeNull();
-    expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(true);
+    expect(player.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+    expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(false);
     expect(player.hp).toBe(Math.max(1, Math.round(player.maxHp * RES_HEALER_HP_FRACTION)));
     expect(player.cooldowns.get(UNSTUCK_COOLDOWN_ID)).toBe(UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
   });
@@ -470,7 +618,7 @@ describe('unstuck while dead', () => {
     expect(player.dead).toBe(false);
     expect(player.ghost).toBe(false);
     expect(player.corpsePos).toBeNull();
-    expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(true);
+    expect(player.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
   });
 
   it('accepts a body frozen mid-fall, whose physics fields never tick again', () => {
@@ -489,6 +637,15 @@ describe('unstuck while dead', () => {
     expect(sim.unstuck(player.id)).toBe(true);
     sim.drainEvents();
     expect(completionOf(sim)?.reason).toBe('revived_at_graveyard');
+
+    // The whole point of rescuing this body is that it stops falling. The stale mid-fall
+    // velocity must not carry into the revive and drop the player through the graveyard.
+    const graveyard = nearestOverworldGraveyard(START.x, START.z);
+    const landed = { ...player.pos };
+    tickMany(sim, 20);
+    expect(player.pos).toMatchObject(graveyard);
+    expect(player.pos.y).toBeCloseTo(landed.y, 5);
+    expect(player.onGround).toBe(true);
   });
 
   it('still blocks a body that died in combat until the five seconds elapse', () => {

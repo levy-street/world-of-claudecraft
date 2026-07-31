@@ -91,7 +91,7 @@ describe('duel: non-lethal cleanup', () => {
     (sim as any).applyAura(eb, opponentDot(ea.id));
     (sim as any).dealDamage(ea, eb, eb.hp + 1000, false, 'physical', 'Finisher', 'hit');
 
-    expect((sim as any).duels.has(b)).toBe(false); // duel is over
+    expect(sim.duelFor(b)).toBeNull(); // duel is over
     expect(eb.dead).toBe(false);
     expect(eb.hp).toBe(1);
 
@@ -120,6 +120,44 @@ describe('duel: non-lethal cleanup', () => {
 
     for (let i = 0; i < 20 * 3; i++) sim.tick();
     expect(eb.dead).toBe(false);
+  });
+});
+
+describe('duel: same-tick reciprocal lethal hits', () => {
+  it('does not let a real death slip through when both duelists land a lethal hit in the same tick', () => {
+    const { sim, a, b } = startedDuel();
+    const ea = sim.entities.get(a)!;
+    const eb = sim.entities.get(b)!;
+    (sim as any).drainEvents();
+
+    // Aleph's blow lands first and ends the duel via the 1-HP guard. Before
+    // the duel entry is purged, Bet's own lethal blow against Aleph resolves
+    // in the SAME tick (the real projectile-resolution path can produce this
+    // when both attacks land in one tick). Neither hit may produce a real
+    // death: duels never kill.
+    (sim as any).dealDamage(ea, eb, eb.hp + 1000, false, 'physical', 'Finisher', 'hit');
+    (sim as any).dealDamage(eb, ea, ea.hp + 1000, false, 'physical', 'Finisher', 'hit');
+
+    expect(eb.dead).toBe(false);
+    expect(eb.hp).toBe(1);
+    expect(ea.dead).toBe(false);
+    expect(ea.hp).toBe(1);
+    expect(sim.duelFor(a)).toBeNull();
+    expect(sim.duelFor(b)).toBeNull();
+
+    // Only the first lethal hit should have resolved the duel: the deed
+    // ledgers and the duelEnd broadcast must not double-count the reciprocal
+    // hit that landed against an already-ended bout.
+    const aMeta = sim.players.get(a)!;
+    const bMeta = sim.players.get(b)!;
+    expect(aMeta.deedStats.counters.duelsWon ?? 0).toBe(1);
+    expect(bMeta.deedStats.counters.duelsLost ?? 0).toBe(1);
+    expect(bMeta.deedStats.counters.duelsWon ?? 0).toBe(0);
+    expect(aMeta.deedStats.counters.duelsLost ?? 0).toBe(0);
+    const duelEndEvents = ((sim as any).events as { type: string }[]).filter(
+      (e) => e.type === 'duelEnd',
+    );
+    expect(duelEndEvents.length).toBe(1);
   });
 });
 
@@ -154,7 +192,7 @@ describe('duel: PvP combat affordances', () => {
 
     (sim as any).dealDamage(pet, eb, eb.hp + 1000, false, 'physical', 'Pet Bite', 'hit');
 
-    expect((sim as any).duels.has(b)).toBe(false);
+    expect(sim.duelFor(b)).toBeNull();
     expect(eb.dead).toBe(false);
     expect(eb.hp).toBe(1);
   });

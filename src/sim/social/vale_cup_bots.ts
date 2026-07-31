@@ -35,6 +35,7 @@ import {
   vcPracticeOrigin,
 } from '../vale_cup_layout';
 import { isArenaQueued } from './arena';
+import { duelFor } from './duel';
 import * as valeCupMod from './vale_cup';
 import {
   VC_BACKFILL_WAIT,
@@ -214,7 +215,7 @@ export function startValeCupPractice(sim: Sim, bracket: VcBracket, pid?: number)
     ctx.error(id, 'You cannot queue for the arena while dead.');
     return;
   }
-  if (ctx.duels.has(id)) {
+  if (duelFor(ctx, id) !== null) {
     ctx.error(id, 'You cannot queue while dueling.');
     return;
   }

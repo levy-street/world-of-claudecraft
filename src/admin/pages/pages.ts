@@ -11,6 +11,7 @@ export type AdminPage =
   | 'tick-perf'
   | 'accounts'
   | 'characters'
+  | 'online-players'
   | 'moderation'
   | 'moderation-history'
   | 'suspicious-players'
@@ -58,6 +59,9 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     items: [
       { id: 'accounts', labelKey: 'nav.accounts', permission: 'accounts.read' },
       { id: 'characters', labelKey: 'nav.characters', permission: 'accounts.read' },
+      // The live roster moved off the Overview dashboard onto its own page, so it
+      // keeps the already-localized title that panel used.
+      { id: 'online-players', labelKey: 'online.title', permission: 'accounts.read' },
     ],
   },
   {

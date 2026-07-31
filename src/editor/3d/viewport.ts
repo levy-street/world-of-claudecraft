@@ -12,7 +12,7 @@
 // content and pushes render updates.
 
 import * as THREE from 'three';
-import { assetsReady } from '../../render/assets/preload';
+import { assetsReady, beginDeferredPreloads } from '../../render/assets/preload';
 import { type SeatRegion, unionRegion } from '../../render/placed_assets';
 import { Renderer } from '../../render/renderer';
 import { FENCE_HALF_DEPTH } from '../../sim/colliders';
@@ -169,6 +169,11 @@ export class Editor3DViewport {
     if (!this.canvas.isConnected) this.createSurfaces();
     this.seed = this.map.meta.seed;
     const world = customMapToWorldContent(this.map);
+    // The editor is its own host: world-content fetches sit parked in the
+    // deferred lane until someone opens it (startGame does this for the game
+    // client), and a Renderer built over an unopened lane throws "asset not
+    // preloaded". Idempotent, so repeated start() calls are fine.
+    beginDeferredPreloads();
     await assetsReady();
     if (this.disposed || gen !== this.generation) return;
     // The live PlacedAssetsView owns placements, so strip them from the Sim's

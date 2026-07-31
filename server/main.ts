@@ -427,9 +427,7 @@ const DAILY_PRUNE_INTERVAL_MS = 24 * 3600 * 1000;
 // lazily instead of at module load.
 let gameInstance: GameServer | null = null;
 function liveGame(): GameServer {
-  gameInstance ??= new GameServer({
-    communityTestRifts: activeConfig().communityTestRifts,
-  });
+  gameInstance ??= new GameServer();
   return gameInstance;
 }
 

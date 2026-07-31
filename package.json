@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.32.0",
+  "version": "0.32.4",
   "private": true,
   "license": "MIT",
   "author": {
@@ -20,8 +20,9 @@
     "wiki:content": "node scripts/wiki/build_content.mjs",
     "wiki:stills": "node scripts/wiki/render_model_stills.mjs",
     "sitemap:build": "node scripts/build_sitemap.mjs",
-    "build:native": "VITE_NATIVE_APP=1 VITE_API_ORIGIN=${VITE_API_ORIGIN:-https://worldofclaudecraft.com} npm run build",
+    "build:native": "VITE_NATIVE_APP=1 VITE_API_ORIGIN=${VITE_API_ORIGIN:-https://worldofclaudecraft.com} npm run build && node scripts/build_media_manifest.mjs prune",
     "native:sync": "npm run build:native && npx cap sync",
+    "ota:publish": "node scripts/ota/publish_bundle.mjs",
     "native:open:ios": "npm run native:sync && npx cap open ios",
     "native:open:android": "npm run native:sync && npx cap open android",
     "electron:dev": "node scripts/electron-dev.mjs",
@@ -99,6 +100,7 @@
     "@aws-sdk/client-sesv2": "^3.1084.0",
     "@capacitor/app": "^8.1.0",
     "@capacitor/browser": "^8.0.3",
+    "@capgo/capacitor-updater": "^8.51.2",
     "@noble/curves": "^1.9.7",
     "@reown/appkit": "1.8.22",
     "@reown/appkit-adapter-solana": "1.8.22",

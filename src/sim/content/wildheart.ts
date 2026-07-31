@@ -273,6 +273,11 @@ export const WILDHEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
     exitOffset: { x: 0, z: -10 },
     spawns: WILDHEART_SPAWN_LIST,
     interior: 'wildheart',
+    // The basin answers as one. Pulling Zulgar with any of the route still alive
+    // brings the whole cult down on you (instances/boss_chain_pull.ts): the two
+    // open routes make skipping trash to the shrine trivial otherwise, since
+    // nothing here is a corridor that has to be fought through.
+    bossChainPull: true,
     suggestedPlayers: 5,
     enterText: 'Warm rain hisses on old stone. The Wildheart Basin opens before you.',
     leaveText: 'You pass back beneath the stone fangs into the Palmreach sun.',

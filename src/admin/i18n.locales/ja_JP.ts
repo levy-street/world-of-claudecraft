@@ -165,7 +165,6 @@ export const ja_JP: Record<string, string> = {
   'stats.serverRss': 'サーバーRSS',
   'stats.playersCap': 'プレイヤー上限',
   'online.title': 'オンラインのプレイヤー',
-  'online.refreshHint': '5秒ごとに更新',
   'online.empty': '現在オンラインのプレイヤーはいません',
   'online.colCharacter': 'キャラクター',
   'online.colClass': 'クラス',

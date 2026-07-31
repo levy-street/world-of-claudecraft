@@ -168,7 +168,6 @@ export const id_ID: Record<string, string> = {
   'stats.playersCap': 'batas pemain',
   'stats.serverRss': 'rss server',
   'online.title': 'Pemain daring',
-  'online.refreshHint': 'menyegar setiap 5d',
   'online.empty': 'tidak ada yang daring saat ini',
   'online.colCharacter': 'Karakter',
   'online.colClass': 'Kelas',

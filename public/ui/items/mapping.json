@@ -1474,6 +1474,14 @@
       "license": "World of ClaudeCraft original art (project-owned render of a project-owned mount model)"
     },
     {
+      "itemId": "reins_terrorspark_groundshaker",
+      "name": "Ignition Key: Terrorspark Groundshaker",
+      "sourcePack": "woc_mount_models",
+      "sourceFile": "terrorspark_groundshaker.glb",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned render of a project-owned procedural mount model)"
+    },
+    {
       "itemId": "reins_thunderstrut_gobbler",
       "name": "Reins of Thunderstrut the Grand Gobbler",
       "sourcePack": "woc_mount_models",

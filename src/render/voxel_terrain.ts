@@ -5,7 +5,7 @@ import { voxelDensity } from '../sim/voxel';
 import { meshVoxelChunk } from '../sim/voxel_mesh';
 import { roadDistance, terrainHeight, waterLevelAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 
 // Real PBR albedo (ambientCG 1K, shipped under public/textures/terrain, this
 // repo's existing asset set: no new files). Unconditional load (not gated on
@@ -15,7 +15,7 @@ import { registerPreload } from './assets/preload';
 // which comfortably has far more than the handful of texture units this uses.
 const VOXEL_TEX: Record<string, THREE.Texture> = {};
 function kickVoxelTex(key: string, file: string): void {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture(`/textures/terrain/${file}`, { srgb: true, repeat: true }).then((tex) => {
       VOXEL_TEX[key] = tex;
       return tex;

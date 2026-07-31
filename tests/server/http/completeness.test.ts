@@ -112,6 +112,7 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/deeds/broadcasts',
   '/api/steam/link',
   '/api/steam/status',
+  '/api/ota/updates',
 ]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
@@ -311,6 +312,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'POST', path: '/api/steam/link' },
     { method: 'DELETE', path: '/api/steam/link' },
     { method: 'GET', path: '/api/steam/status' },
+    // The OTA update check (server/ota_updates.ts): registry-only like the
+    // deeds trio, env-gated dark until OTA_MANIFEST_URL is set.
+    { method: 'POST', path: '/api/ota/updates' },
     // v0.20.0: the paginated daily leaderboard read (the ops-side sibling is
     // asserted with the internal family below).
     { method: 'GET', path: '/api/daily-rewards/leaderboard' },

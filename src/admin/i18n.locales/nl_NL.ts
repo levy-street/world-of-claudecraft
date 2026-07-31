@@ -121,7 +121,6 @@ export const nl_NL: Record<string, string> = {
   'stats.avgTick': 'gem. tick',
   'stats.serverRss': 'server-rss',
   'online.title': 'Spelers online',
-  'online.refreshHint': 'vernieuwt elke 5s',
   'online.empty': 'niemand op dit moment online',
   'online.colCharacter': 'Personage',
   'online.colClass': 'Klasse',

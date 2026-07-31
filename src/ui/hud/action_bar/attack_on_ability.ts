@@ -5,6 +5,7 @@
 // sim import), so a Vitest drives them directly; the HUD gates on the player's setting.
 
 import type { AbilityEffect, Entity } from '../../../sim/types';
+import type { ArenaInfo, DuelInfo } from '../../../world_api/duel_arena';
 
 // Auto-attack classification of EVERY AbilityEffect type. Because this is a Record over
 // the discriminant union, adding a new effect to `AbilityEffect` (src/sim/types.ts) is a
@@ -142,20 +143,53 @@ export function abilityStartsAutoAttack(effects: AbilityEffect[]): boolean {
 }
 
 /**
- * Whether the player's current target is a live, hostile MOB, i.e. one a white swing
- * would actually engage. Gating the auto-attack convenience on this keeps a targetless
- * AOE (Arcane Explosion, Frost Nova, Thunder Clap, ...) from flashing a spurious
- * "Invalid attack target." toast on every cast. Only mobs carry `hostile:true`
- * (players/NPCs default false) and the server mirrors the flag onto the wire, so the
- * same read holds for the offline Sim and the online ClientWorld.
+ * Whether the player's current target is a live target a white swing would actually
+ * engage: either a hostile MOB (`hostile:true`; players/NPCs default false, and the
+ * server mirrors the flag onto the wire, so the same read holds for the offline Sim and
+ * the online ClientWorld), or a player who is PvP-hostile right now per
+ * `isPvpHostileTarget` (an active duel/arena opponent). Gating the auto-attack
+ * convenience on this keeps a targetless AOE (Arcane Explosion, Frost Nova, Thunder
+ * Clap, ...) from flashing a spurious "Invalid attack target." toast on every cast.
  *
- * Deliberately narrower than the sim's `isHostileTo`, which also treats an enemy player
- * in an active duel/arena as hostile (players are `hostile:false`): replicating that PvP
- * state on the client is not worth it, so the convenience is PvE-mob scope. That is safe,
- * no error, just no auto-engage in PvP, where the explicit Attack button still works.
+ * `pvpHostile` mirrors the sim's `isHostileTo`, which also treats an enemy player in an
+ * active duel/arena as hostile (players are otherwise always `hostile:false`, since this
+ * game has no open-world FFA PvP): the caller computes it via `isPvpHostileTarget` from
+ * the already-mirrored `IWorld.duelInfo`/`IWorld.arenaInfo`, so no new wire state is
+ * needed. Defaults to false so an omitted argument keeps the original PvE-only behavior.
  */
-export function hasAutoAttackTarget(target: Entity | null | undefined): boolean {
-  return !!target && !target.dead && target.hostile;
+export function hasAutoAttackTarget(
+  target: Entity | null | undefined,
+  pvpHostile = false,
+): boolean {
+  return !!target && !target.dead && (target.hostile || pvpHostile);
+}
+
+/**
+ * Whether a player target is PvP-hostile right now: an active duel opponent, or an
+ * active-arena opponent/enemy. Mirrors the private `isHostilePlayer` the renderer
+ * already computes for nameplate coloring (`src/render/renderer.ts`), so the "Auto-Attack
+ * on Ability Use" QoL setting recognizes the same PvP-hostile state instead of gating on
+ * the mob-only `hostile` flag, which a player target never carries.
+ *
+ * Deliberately narrower than the sim's `isHostileTo`: it does not cover the jail brawl,
+ * the warden arm, an enemy player's PET (resolved through `pvpController`), or the Vale
+ * Cup cross-team arm. That matches the renderer's own nameplate predicate (a parity
+ * choice, not a defect); if a third copy of this verdict shows up, extract one shared
+ * pure module both the renderer and this file consume.
+ */
+export function isPvpHostileTarget(
+  targetId: number | null | undefined,
+  duelInfo: DuelInfo | null | undefined,
+  arenaInfo: ArenaInfo | null | undefined,
+): boolean {
+  if (targetId === null || targetId === undefined) return false;
+  if (duelInfo?.state === 'active' && duelInfo.otherPid === targetId) return true;
+  const match = arenaInfo?.match;
+  return (
+    !!match &&
+    match.state === 'active' &&
+    (match.oppPid === targetId || match.enemies.some((e) => e.pid === targetId))
+  );
 }
 
 /**

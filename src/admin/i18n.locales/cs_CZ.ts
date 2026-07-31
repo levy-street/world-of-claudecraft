@@ -476,7 +476,6 @@ export const cs_CZ: Record<string, string> = {
   'online.colSession': 'Relace',
   'online.colZone': 'Oblast',
   'online.empty': 'teď není nikdo online',
-  'online.refreshHint': 'obnovuje se každých 5 s',
   'online.title': 'Hráči online',
   'poi.eastbrook_vale.0': 'Eastbrook',
   'poi.eastbrook_vale.1': 'Vlčí běh',

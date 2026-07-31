@@ -595,6 +595,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.1,
     color: 0x6b8e23,
+    componentTags: ['hide', 'meat'],
   },
 };
 

@@ -672,6 +672,11 @@ function marketInfo(shape: WorldShape): MarketInfo {
     listings: [listing],
     totalCount: 1,
     filter: 'all',
+    itemType: 'all',
+    subtype: 'all',
+    armorClass: 'all',
+    primaryStat: 'all',
+    rarity: 'all',
     page: 0,
     pageCount: 1,
     collectionCopper: 0,
@@ -717,6 +722,86 @@ describe('axe: market window (Sim + ClientWorld shapes)', () => {
       await expectClean(root);
     });
   }
+});
+
+// Issue #2416 (reconnect ordering): onReconnected() fires synchronously inside
+// the client's `hello` handler, before the resent world's first snapshot has
+// decoded. At that instant world().marketInfo (if any) is still the pre-drop
+// echo, which by construction matches the window's own query (it was pushed
+// and echoed back before the socket died). A drift check that ran right there
+// would always read "no drift" and the resync would never fire, which is
+// exactly why onReconnected() only arms a flag: the real comparison happens
+// later, in refreshIfChanged(), once a genuinely post-reconnect MarketInfo
+// arrives (online.ts nulls the mirror on the `hello` reset so "still pending"
+// is unambiguous).
+describe('market window: reconnect resync ordering (#2416)', () => {
+  it('does not resync against the stale pre-drop echo, but does once a post-reconnect echo arrives', async () => {
+    const root = host('market-window');
+    root.style.display = 'none';
+    const searches: unknown[] = [];
+    // The pre-drop echo: the player narrowed to Armor/Chest/Cloth/Intellect,
+    // pushed that query, and the server echoed it back before the socket
+    // died, so this matches the window's own (about-to-be-set) query exactly.
+    let info: MarketInfo | null = {
+      ...marketInfo('client'),
+      filter: '', // matches the window's default (empty) search box
+      itemType: 'armor',
+      subtype: 'chest',
+      armorClass: 'cloth',
+      primaryStat: 'int',
+    };
+    const win = new MarketWindow(
+      stubDeps({
+        root: () => root,
+        world: () =>
+          ({
+            get marketInfo() {
+              return info;
+            },
+            copper: 0,
+            marketSearch: (q: unknown) => searches.push(q),
+          }) as never,
+        hideTooltip: () => undefined,
+        captureFocus: () => null,
+      }),
+    );
+    win.open();
+    searches.length = 0; // drop the query push open() itself does
+
+    // Mirror the same narrowing onto the window's own client-side filter state
+    // (the controls survive the socket drop untouched).
+    Object.assign(win, {
+      itemTypeFilter: 'armor',
+      subtypeFilter: 'chest',
+      armorClassFilter: 'cloth',
+      primaryStatFilter: 'int',
+    });
+
+    // hello fires: online.ts nulls the mirror in its reset block (marketInfo is
+    // delta-omitted, so without this it would still read the stale pre-drop
+    // echo, which trivially matches the query) BEFORE calling onReconnected(),
+    // which just arms the flag rather than deciding off a possibly-stale value.
+    info = null;
+    (win as unknown as { onReconnected(): void }).onReconnected();
+    (win as unknown as { refreshIfChanged(): void }).refreshIfChanged();
+    expect(searches, 'must keep waiting while marketInfo is null (still pending)').toHaveLength(0);
+
+    // The resent world's first snapshot decodes: the fresh-join session reset
+    // the server-side query back to default, so the echo no longer matches.
+    info = marketInfo('client');
+    (win as unknown as { refreshIfChanged(): void }).refreshIfChanged();
+    expect(searches, 'must resync once the real post-reconnect echo arrives').toHaveLength(1);
+    expect(searches[0]).toMatchObject({
+      itemType: 'armor',
+      subtype: 'chest',
+      armorClass: 'cloth',
+      primaryStat: 'int',
+    });
+
+    // A second refresh with the same (now-matching) info must not re-push again.
+    (win as unknown as { refreshIfChanged(): void }).refreshIfChanged();
+    expect(searches, 'the flag must clear after resolving once').toHaveLength(1);
+  });
 });
 
 // ---------------------------------------------------------------------------

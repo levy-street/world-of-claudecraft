@@ -74,6 +74,10 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // ships its authored strut cycle as Walk/Run plus a baked breathing Idle;
   // the saddle sits over the hips, behind the neck (hence the rear shift)
   thunderstrut_gobbler: spec('mount_thunderstrut_gobbler', 2.05, true, undefined, -0.15),
+  // Compact tracked vehicle with an authored rider socket behind the turret.
+  // Its rigid-body clips animate the suspension and track wheels without a
+  // procedural bob, keeping the pilot locked to the saddle.
+  terrorspark_groundshaker: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
 };
 
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */

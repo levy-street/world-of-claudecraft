@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { NATIVE_APP } from '../client_origin';
+import { tightMemoryDeviceHint } from '../device_memory_hint';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
 import { isSoftwareRendererName } from './software_renderer';
@@ -62,6 +63,8 @@ export interface GfxRuntimeHints {
   gpuRenderer?: string;
   nativeApp?: boolean;
   platform?: 'ios' | 'android' | 'other';
+  /** 4 GB-class device or a fresh entry-crash marker (src/device_memory_hint.ts). */
+  tightMemory?: boolean;
   graphicsPreset?: number;
   terrainDetail?: number;
   foliageDensity?: number;
@@ -110,6 +113,16 @@ export interface GfxSettings {
   readonly constrainedMemory: boolean;
   /** Packaged iOS WKWebView profile that bounds retained GPU resources independently of FPS. */
   readonly nativeIosMemoryProfile: boolean;
+  /**
+   * The rung below nativeIosMemoryProfile for 4 GB-class devices (iPhone 13 and older
+   * non-Pro phones) and for any native-iOS device that just survived an entry-crash
+   * recovery: the WebContent jetsam ceiling there sits below the standard native
+   * profile's entry footprint, so this profile sheds RESIDENCY (DPR, pooled rigs,
+   * grass density, deferred cosmetic prewarms/preloads), never information a player
+   * acts on. Driven by src/device_memory_hint.ts; false wherever the hint is absent,
+   * which keeps every existing device on today's exact profile.
+   */
+  readonly tightMemory: boolean;
   /** Global cap for inactive skinned character rigs retained for reuse. */
   readonly maxPooledCharacterVisuals: number;
   /**
@@ -673,6 +686,10 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
   // tier (and its density/VFX progression) while routing the packaged iOS app through the
   // bounded-residency material/world path from scene construction onward.
   const nativeIosMemoryProfile = hints?.nativeApp === true && hints.platform === 'ios';
+  // The stricter 4 GB-class rung. The native shell can measure physicalMemory,
+  // while either native WKWebView or iOS Safari can stamp the same marker after
+  // a foreground entry kill. Both WebKit hosts share the WebContent ceiling.
+  const tightMemoryProfile = hints?.platform === 'ios' && hints?.tightMemory === true;
   // Phone-class browsers live under a hard per-process memory ceiling (iOS WebKit evicts the
   // WebContent process outright); shed the largest one-shot GPU allocations there. Shadow-map
   // texels, MSAA, and DPR are cosmetic sharpness only, so this never crosses the
@@ -697,15 +714,17 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // it ~1ms-class on real GPUs; ultra gets full-res Medium
     ao: !nativeIosMemoryProfile && (tier === 'high' || tier === 'ultra'),
     msaaSamples: (tier === 'high' || tier === 'ultra') && !constrainedMemory ? 4 : 0,
-    pixelRatioCap: nativeIosMemoryProfile
-      ? 1.25
-      : constrainedMemory
-        ? 1.48
-        : tier === 'low' || tier === 'medium'
+    pixelRatioCap: tightMemoryProfile
+      ? 1.0
+      : nativeIosMemoryProfile
+        ? 1.25
+        : constrainedMemory
           ? 1.48
-          : tier === 'high'
-            ? 1.75
-            : 2.5,
+          : tier === 'low' || tier === 'medium'
+            ? 1.48
+            : tier === 'high'
+              ? 1.75
+              : 2.5,
     // Shadows are cosmetic and duplicate the visible scene draw. Both constrained browsers and
     // the stricter native-iOS residency profile remove that duplicate pass.
     dynamicShadows: tier !== 'low' && !constrainedMemory,
@@ -727,31 +746,42 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // occlude world sightlines. Keep the constrained profile on the full placement
     // set and reduce only non-occluding grass below.
     leanFoliage: tier === 'low' || (tier === 'medium' && weakIntegratedGpu),
-    grassRadius: nativeIosMemoryProfile
-      ? 52
-      : tier === 'low'
-        ? 80
-        : tier === 'medium'
-          ? constrainedMemory
-            ? 62
-            : 76
-          : 82,
-    grassStep: nativeIosMemoryProfile
-      ? 2.75
-      : tier === 'low'
-        ? 2.05
-        : tier === 'medium'
-          ? constrainedMemory
-            ? 2.35
-            : 2.0
-          : 1.8,
+    // Tight memory reuses the Advanced sub-knob's lean grass values (34 / 3.8): the
+    // leanest grass the game already ships, so no new visual floor is introduced.
+    grassRadius: tightMemoryProfile
+      ? 34
+      : nativeIosMemoryProfile
+        ? 52
+        : tier === 'low'
+          ? 80
+          : tier === 'medium'
+            ? constrainedMemory
+              ? 62
+              : 76
+            : 82,
+    grassStep: tightMemoryProfile
+      ? 3.8
+      : nativeIosMemoryProfile
+        ? 2.75
+        : tier === 'low'
+          ? 2.05
+          : tier === 'medium'
+            ? constrainedMemory
+              ? 2.35
+              : 2.0
+            : 1.8,
     terrainSplat:
       !nativeIosMemoryProfile && (tier === 'medium' || tier === 'high' || tier === 'ultra'),
     windSway: true,
     maxPointLights: nativeIosMemoryProfile ? 2 : constrainedMemory ? 3 : 6,
     constrainedMemory,
     nativeIosMemoryProfile,
-    maxPooledCharacterVisuals: nativeIosMemoryProfile ? 6 : Number.POSITIVE_INFINITY,
+    tightMemory: tightMemoryProfile,
+    maxPooledCharacterVisuals: tightMemoryProfile
+      ? 4
+      : nativeIosMemoryProfile
+        ? 6
+        : Number.POSITIVE_INFINITY,
     // Extra articulated rigs are skinning + draw-call cost, so the phone-class
     // memory profiles and the low tier (which includes software GL) opt out and
     // keep the straight-to-frozen far LOD.
@@ -854,6 +884,7 @@ function runtimeHints(): GfxRuntimeHints {
     gpuRenderer: probeGpuRenderer(),
     nativeApp: NATIVE_APP,
     platform: mobilePlatformFromNavigator(nav),
+    tightMemory: tightMemoryDeviceHint(),
     graphicsPreset: storedNumericSetting('graphicsPreset'),
     terrainDetail: storedNumericSetting('terrainDetail'),
     foliageDensity: storedNumericSetting('foliageDensity'),
@@ -1118,6 +1149,7 @@ export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
 
 export const gfxInternalsForTest = {
   settingsFor,
+  runtimeHints,
   mobilePlatformFromNavigator,
   probeGpuRenderer,
   resetGpuRendererProbe: () => {

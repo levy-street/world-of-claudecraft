@@ -6,6 +6,7 @@ vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
 vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));
 vi.mock('../src/render/characters/portrait', () => ({
   onPortraitsReady: vi.fn(),
+  onPortraitUpdate: vi.fn(),
   playerPortraitDataUrl: vi.fn(),
   visualPortraitDataUrl: vi.fn(),
 }));

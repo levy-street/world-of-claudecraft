@@ -62,6 +62,18 @@ export function updateMobCombatProfile(
   if (ctx.maybeFlee(mob, target)) return 'done';
 
   if (profile.canLeash) {
+    // The hard tether measures from the SPAWN, never the refreshing anchor,
+    // and ignores the flee-recovery grace: past it the mob goes home, however
+    // the fight has been dragged. Checked before the soft leash so a tethered
+    // mob can never be walked out one anchor-refresh at a time.
+    const hardLeash = MOBS[mob.templateId]?.hardLeashRadius;
+    if (hardLeash !== undefined && dist2d(mob.pos, mob.spawnPos) > hardLeash) {
+      mob.aiState = 'evade';
+      mob.aggroTargetId = null;
+      clearThreat(mob);
+      mob.leashAnchor = null;
+      return 'done';
+    }
     const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
     const leashAnchor = mob.leashAnchor ?? mob.spawnPos;
     if (mob.fleeReturnTimer > 0) {

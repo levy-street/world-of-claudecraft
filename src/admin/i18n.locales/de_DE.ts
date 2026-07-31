@@ -121,7 +121,6 @@ export const de_DE: Record<string, string> = {
   'stats.serverRss': 'Server-RSS',
   'stats.playersCap': 'Spielerlimit',
   'online.title': 'Spieler online',
-  'online.refreshHint': 'aktualisiert alle 5s',
   'online.empty': 'gerade niemand online',
   'online.colCharacter': 'Charakter',
   'online.colClass': 'Klasse',

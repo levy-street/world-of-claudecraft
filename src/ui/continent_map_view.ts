@@ -4,7 +4,8 @@
 // (every ZoneDef rect + the world bounds) plus the player's position to a flat
 // geometry model in canvas-pixel space: the contain-fit rect where the painted
 // continent art blits, one clickable/hoverable rect per zone (already projected),
-// the "you are here" marker, and which zone the player currently stands in.
+// the "you are here" marker, a dot per party member, and which zone the player
+// currently stands in.
 //
 // The pure-core half of the pure-core + canvas-painter split (root CLAUDE.md
 // Conventions; reference map_window_view.ts / map_window_painter.ts). No DOM, no
@@ -54,6 +55,19 @@ export interface ContinentZoneRegion {
   levelMax: number;
 }
 
+/** A party member's dot on the continent overview (issue 2652). Identity is the
+ *  class plus the dead state only, both resolved to colors by the painter, and
+ *  deliberately carries no name: at this scale a zone cell is under 100px wide
+ *  and already holds its own zone label, so per-member names would collide with
+ *  it and with each other. The per-zone map (map_window_view.ts) is the surface
+ *  that names them. */
+export interface ContinentPartyMarker {
+  mx: number;
+  my: number;
+  cls: string;
+  dead: boolean;
+}
+
 /** Everything the painter draws for one continent-overview frame, all in
  *  canvas-pixel space and derived purely from the world layout + the player. */
 export interface ContinentMapModel {
@@ -63,6 +77,9 @@ export interface ContinentMapModel {
   regions: ContinentZoneRegion[];
   /** The player's projected position ("you are here"), or null if off the world. */
   player: { mx: number; my: number } | null;
+  /** Party members other than self, at their live world position (issue 2652).
+   *  Empty solo, with no party formed, or when every member is off the world. */
+  party: ContinentPartyMarker[];
   /** The zone id the player currently stands in (the on-canvas subtitle). */
   currentZoneId: string;
 }
@@ -144,17 +161,33 @@ export function buildContinentMapModel(input: ContinentMapInput): ContinentMapMo
     };
   });
 
-  const withinWorld =
-    p.pos.x >= WORLD_MIN_X &&
-    p.pos.x <= WORLD_MAX_X &&
-    p.pos.z >= WORLD_MIN_Z &&
-    p.pos.z <= WORLD_MAX_Z;
-  const player = withinWorld ? toMap(p.pos.x, p.pos.z) : null;
+  const inWorld = (x: number, z: number): boolean =>
+    x >= WORLD_MIN_X && x <= WORLD_MAX_X && z >= WORLD_MIN_Z && z <= WORLD_MAX_Z;
+  const player = inWorld(p.pos.x, p.pos.z) ? toMap(p.pos.x, p.pos.z) : null;
+
+  // Party members (issue 2652): the same partyInfo.members the minimap and the
+  // per-zone map already consume, projected through this level's toMap. Self is
+  // skipped (it has its own "you are here" marker) and anyone off the world rect
+  // is dropped, on the same bounds test as the player marker above. Not gated on
+  // the zone: telling you a member is two zones north is the whole point of this
+  // level, and it is what the per-zone map (which drops out-of-zone members)
+  // cannot answer.
+  const party: ContinentPartyMarker[] = [];
+  const partyInfo = world.partyInfo;
+  if (partyInfo) {
+    for (const m of partyInfo.members) {
+      if (m.pid === p.id) continue;
+      if (!inWorld(m.x, m.z)) continue;
+      const { mx, my } = toMap(m.x, m.z);
+      party.push({ mx, my, cls: m.cls, dead: m.dead !== 0 });
+    }
+  }
 
   return {
     image: { mx: imageX, my: imageY, w: imageW, h: imageH },
     regions,
     player,
+    party,
     currentZoneId,
   };
 }

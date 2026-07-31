@@ -5,6 +5,7 @@
 // writes.
 
 import * as THREE from 'three';
+import { cameraAxes } from '../camera_axes';
 
 function clamp(v: number, lo: number, hi: number): number {
   return v < lo ? lo : v > hi ? hi : v;
@@ -53,10 +54,7 @@ export class EditorCamera {
   // camera's horizontal look direction; right is perpendicular.
   pan(dxPx: number, dyPx: number): void {
     const speed = this.dist * 0.0016;
-    const fx = Math.sin(this.yaw);
-    const fz = Math.cos(this.yaw);
-    const rx = Math.cos(this.yaw);
-    const rz = -Math.sin(this.yaw);
+    const { fx, fz, rx, rz } = cameraAxes(this.yaw);
     this.target.x += (-dxPx * rx + dyPx * fx) * speed;
     this.target.z += (-dxPx * rz + dyPx * fz) * speed;
   }
@@ -66,10 +64,7 @@ export class EditorCamera {
   // owning the orbit distance.
   fly(forward: number, right: number, up: number, dt: number): void {
     const speed = this.dist * dt * 1.4;
-    const fx = Math.sin(this.yaw);
-    const fz = Math.cos(this.yaw);
-    const rx = Math.cos(this.yaw);
-    const rz = -Math.sin(this.yaw);
+    const { fx, fz, rx, rz } = cameraAxes(this.yaw);
     this.target.x += (forward * fx + right * rx) * speed;
     this.target.z += (forward * fz + right * rz) * speed;
     this.target.y += up * speed;

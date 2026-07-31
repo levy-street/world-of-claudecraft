@@ -3,9 +3,11 @@
 // waves that attack the escortee and pause the walk, failure + respawn, and
 // the success credit that readies the quest.
 import { describe, expect, it } from 'vitest';
-import { ESCORTS, MOBS, NPCS, QUESTS } from '../src/sim/data';
+import { visualKeyFor } from '../src/render/characters/manifest';
+import { ESCORTS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { Entity, SimEvent } from '../src/sim/types';
+import { dist2d, type Entity, LEASH_DISTANCE, type SimEvent } from '../src/sim/types';
+import { groundHeight, WATER_LEVEL } from '../src/sim/world';
 
 const ESCORT_ID = 'esc_fv_wren';
 const QUEST_ID = 'q_fv_seeing_wren_home';
@@ -69,6 +71,64 @@ describe('escort content integrity', () => {
         expect(ambush.atWaypoint).toBeGreaterThanOrEqual(0);
         expect(ambush.atWaypoint).toBeLessThan(def.waypoints.length);
       }
+    }
+  });
+
+  // The quest text is the ONLY navigation aid this game gives (there are no
+  // objective markers on the map or minimap), so a wrong bearing is a
+  // functional bug. Bearings must be computed under the convention the compass
+  // and the map actually render: +z north, +x WEST, so east is -x (see
+  // src/ui/compass.ts, and src/ui/map_terrain.ts drawing +x on the left).
+  // PR #1904 previously pinned a direction "fix" to the mirrored convention by
+  // reading it off content ids, so this asserts the axes explicitly.
+  it('sends the player the way the compass and map actually point', () => {
+    const frostveil = ZONES.find((zone) => zone.id === 'frostveil');
+    const steps = frostveil?.pois?.find((poi) => poi.id === 'the_aurora_steps');
+    expect(steps).toBeTruthy();
+    if (!steps) return;
+    const post = ESCORTS.esc_fv_wren.start;
+
+    // East is -x: a SMALLER x than the landmark is east of it. North is +z.
+    expect(post.x).toBeLessThan(steps.x);
+    expect(post.z).toBeGreaterThan(steps.z);
+
+    const text = QUESTS.q_fv_seeing_wren_home.text;
+    expect(text).toContain('northeast of the Aurora Steps');
+    expect(text).not.toContain('southwest');
+  });
+
+  // Bram is the other escort whose text carries a bearing. His post sits on the
+  // isle's SOUTH shore: open sea a few yards south of it and none within 60
+  // yards north. Sampled here rather than asserted from prose, and stable
+  // across seeds (the macro coastline is authored, the seed only adds noise).
+  it("puts Bram's wreck on the shore the terrain actually has", () => {
+    const post = ESCORTS.esc_fs_bram.start;
+    const seaDistance = (dz: number): number => {
+      for (let d = 0; d <= 200; d += 2) {
+        if (groundHeight(post.x, post.z + dz * d, 1337) < WATER_LEVEL) return d;
+      }
+      return Number.POSITIVE_INFINITY;
+    };
+
+    expect(seaDistance(-1)).toBeLessThan(20);
+    expect(seaDistance(1)).toBeGreaterThan(60);
+
+    const text = QUESTS.q_fs_bram_come_home.text;
+    expect(text).toContain('on the south shore');
+    expect(text).not.toContain('north shore');
+  });
+
+  // Every escortee needs an explicit body in the character manifest. The
+  // humanoid family default is the hooded outlaw (mob_bandit), so an
+  // unregistered escortee reads as the bandits the player is protecting them
+  // from: only Wren was registered, and Mosley, Suli and Bram were not.
+  it('gives every escortee an explicit character model, never the outlaw fallback', () => {
+    for (const def of Object.values(ESCORTS)) {
+      const key = visualKeyFor({ kind: 'mob', templateId: def.npcMobId } as Entity);
+      expect(key, `${def.id} escortee model`).not.toBe('mob_bandit');
+      expect(key.startsWith('npc_'), `${def.id} escortee model is ${key}`).toBe(true);
+      // The body is shared, so each escortee's own tint is what tells them apart.
+      expect(MOBS[def.npcMobId].color, `${def.id} tint`).toBeTypeOf('number');
     }
   });
 });
@@ -267,6 +327,132 @@ describe('escort run guards', () => {
       wren.pos.z = pin.z;
     }
     expect(state.run?.waypointIndex ?? before + 1).toBeGreaterThan(before);
+  });
+
+  it('re-engages an evaded ambush wave onto the escortee instead of wedging the run', () => {
+    const sim = makeSim();
+    const def = ESCORTS[ESCORT_ID];
+    teleportTo(sim, def.start.x, def.start.z);
+    activateQuest(sim);
+    sim.interact();
+    const wren = findEscortee(sim);
+    const state = sim.escortRuns.get(ESCORT_ID);
+    expect(wren && state?.run).toBeTruthy();
+    if (!wren || !state?.run) return;
+
+    // Walk to the first ambush.
+    for (let i = 0; i < 60 * 20 && liveAmbushers(sim).length === 0; i++) sim.tick();
+    const wave = liveAmbushers(sim);
+    expect(wave.length).toBe(3);
+
+    // Wound one mob through the real damage path so the full-health check
+    // below can prove the walk-home reset (which heals) actually ran.
+    (sim as any).dealDamage(sim.player, wave[0], 50, false, 'physical', null, 'hit');
+    expect(wave[0].hp).toBeLessThan(wave[0].maxHp);
+
+    // The live-server kite: drag the whole wave far past its leash. The chase
+    // exceeds LEASH_DISTANCE, the mobs evade home, and the evade reset clears
+    // their hate tables, the escortee seed included. Without the driver
+    // re-commit they would idle beside the waiting escortee until the run
+    // timeout (the reported "escortee just stops walking" wedge).
+    for (const mob of wave) {
+      const far = sim.groundPos(mob.pos.x + 80, mob.pos.z);
+      mob.pos = { ...far };
+      mob.prevPos = { ...far };
+      // Precondition pin: the drag genuinely exceeds the leash, so the pass
+      // below exercises a real evade, not the surviving spawn commitment.
+      expect(dist2d(mob.pos, wren.pos)).toBeGreaterThan(LEASH_DISTANCE);
+    }
+    let reengaged = false;
+    for (let i = 0; i < 120 * 20 && !reengaged; i++) {
+      sim.tick();
+      const live = liveAmbushers(sim);
+      reengaged =
+        live.length === 3 &&
+        live.every((m) => m.aggroTargetId === wren.id && (m.threat.get(wren.id) ?? 0) > 0);
+    }
+    expect(reengaged).toBe(true);
+    // Full health proves the re-commit happened AFTER the walk-home reset
+    // (resetEvadingMob heals), not on the leash-break tick: the escort driver
+    // must never bypass the leash contract.
+    for (const mob of liveAmbushers(sim)) expect(mob.hp).toBe(mob.maxHp);
+
+    // The wave resumes the ATTACK, not just the aggro fields: the escortee
+    // takes fresh hits after the re-commit.
+    const hpAtReengage = wren.hp;
+    for (let i = 0; i < 120 * 20 && wren.hp >= hpAtReengage; i++) sim.tick();
+    expect(wren.hp).toBeLessThan(hpAtReengage);
+
+    // With the wave re-committed, cutting it down releases the walk: the run
+    // survives and advances past the held waypoint instead of stalling to the
+    // timeout or failing.
+    const before = state.run?.waypointIndex ?? -1;
+    for (const mob of liveAmbushers(sim)) {
+      mob.hp = 0;
+      mob.dead = true;
+      mob.respawnTimer = 99999;
+    }
+    for (let i = 0; i < 30 * 20 && state.run !== null && state.run.waypointIndex <= before; i++) {
+      sim.tick();
+    }
+    expect(wren.dead).toBe(false);
+    expect(state.run).not.toBeNull();
+    expect(state.run?.waypointIndex ?? before).toBeGreaterThan(before);
+  });
+
+  it('never re-seeds a wave mob a player is actively fighting', () => {
+    const sim = makeSim();
+    const def = ESCORTS[ESCORT_ID];
+    teleportTo(sim, def.start.x, def.start.z);
+    activateQuest(sim);
+    sim.interact();
+    const wren = findEscortee(sim);
+    expect(wren).toBeTruthy();
+    if (!wren) return;
+    for (let i = 0; i < 60 * 20 && liveAmbushers(sim).length === 0; i++) sim.tick();
+    const mob = liveAmbushers(sim)[0];
+    expect(mob).toBeTruthy();
+
+    // The player pulls one wave mob through the real damage path: their
+    // threat towers over the escortee seed and the mob turns on them.
+    teleportTo(sim, mob.pos.x + 2, mob.pos.z);
+    (sim as any).dealDamage(sim.player, mob, 50, false, 'physical', null, 'hit');
+    for (let i = 0; i < 20; i++) sim.tick();
+    expect(mob.dead).toBe(false);
+    expect(mob.aggroTargetId).toBe(sim.player.id);
+    // The driver never re-seeded the fight: the escortee entry is still the
+    // untouched spawn seed of 1, below the player's damage threat.
+    expect(mob.threat.get(wren.id) ?? 0).toBeLessThanOrEqual(1);
+    expect(mob.threat.get(sim.player.id) ?? 0).toBeGreaterThan(1);
+  });
+
+  it('a slain wave unravels after its loot window instead of respawning into the run', () => {
+    const sim = makeSim();
+    const def = ESCORTS[ESCORT_ID];
+    teleportTo(sim, def.start.x, def.start.z);
+    activateQuest(sim);
+    sim.interact();
+    for (let i = 0; i < 60 * 20 && liveAmbushers(sim).length === 0; i++) sim.tick();
+    const waveIds = [...(sim.escortRuns.get(ESCORT_ID)?.run?.ambushIds ?? [])];
+    expect(waveIds.length).toBe(3);
+    // Cut the wave down through the real damage path so death runs the full
+    // handleDeath arm (corpse window, respawn timer assignment).
+    for (const mob of liveAmbushers(sim)) {
+      (sim as any).dealDamage(sim.player, mob, 999999, false, 'physical', null, 'hit');
+    }
+    // Pre-fix, the generic in-place camp respawn (cfg default 25s, deferred by
+    // the corpse window) revived the wave into ambushIds and wedged or
+    // re-attacked any run still walking. Now the summoned-add arm drops the
+    // corpse once its loot window (60s) lapses, and the mob NEVER comes back:
+    // watch well past corpse decay plus the old respawn delay.
+    for (let i = 0; i < 100 * 20; i++) {
+      sim.tick();
+      for (const id of waveIds) {
+        const mob = sim.entities.get(id);
+        expect(!mob || mob.dead).toBe(true);
+      }
+    }
+    for (const id of waveIds) expect(sim.entities.get(id)).toBeUndefined();
   });
 });
 

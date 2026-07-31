@@ -587,10 +587,12 @@ export function resolveCraftForRecipe(
   // with the four existing rare single-copy consumables (silvered_carp_supper,
   // marlows_grand_roast, the two sunpetal draughts): the signed instance is
   // non-fungible, so countFungibleItem/removeFungibleItem (src/sim/market.ts)
-  // and post_office.ts see zero fungible copies of either output, which takes
-  // both out of the World Market and mail entirely. Crafting is their only
-  // source, so this closes that acquisition path outright; player-to-player
-  // trade of the signed instance still works.
+  // and post_office.ts see zero fungible copies of either output. Since the
+  // instanced exchange pipes landed (#1165,
+  // src/sim/item_instance_transfer.ts), an unlocked signed copy lists and
+  // mails as its own single-copy entry, so signing no longer takes these
+  // outputs out of commerce; it only moves them off the fungible paths.
+  // Player-to-player trade of the signed instance is unchanged.
   if (meta && masterwork && bonusStats) {
     const payload: ItemInstancePayload = {
       signer: meta.name,

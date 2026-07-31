@@ -16,7 +16,7 @@ fs.mkdirSync('tmp', { recursive: true });
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
-  userDataDir: `C:/Users/Sud0S/AppData/Local/Temp/woc-lockpick-${Date.now()}`,
+  userDataDir: `C:woc-lockpick-${Date.now()}`,
   args: [
     '--window-size=1280,800',
     '--use-angle=swiftshader',

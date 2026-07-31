@@ -123,7 +123,6 @@ export const pt_BR: Record<string, string> = {
   'stats.avgTick': 'tick médio',
   'stats.serverRss': 'rss do servidor',
   'online.title': 'Jogadores online',
-  'online.refreshHint': 'atualiza a cada 5s',
   'online.empty': 'ninguém online no momento',
   'online.colCharacter': 'Personagem',
   'online.colClass': 'Classe',

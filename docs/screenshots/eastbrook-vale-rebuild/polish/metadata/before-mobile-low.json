@@ -5,7 +5,7 @@
   "profile": "mobile-low",
   "townContractId": "polish-baseline",
   "sourceRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-  "sourceFingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e",
+  "sourceFingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab",
   "polishProvenance": {
     "schemaVersion": 1,
     "mode": "baseline-revision",
@@ -13,14 +13,14 @@
   },
   "records": [
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-elevated-overview-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-elevated-overview-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -1138,14 +1138,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-planning-top-down-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-planning-top-down-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -2263,14 +2263,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-gate-approach-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-gate-approach-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -3388,14 +3388,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-central-square-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-central-square-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -4513,14 +4513,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-armoury-facade-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-armoury-facade-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -5638,14 +5638,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-armoury-relation-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-armoury-relation-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -6763,14 +6763,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-bank-and-chest-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-bank-and-chest-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -7888,14 +7888,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-smithy-and-forge-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-smithy-and-forge-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -9013,14 +9013,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-inn-and-kitchens-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-inn-and-kitchens-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -10140,14 +10140,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-market-and-fence-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-market-and-fence-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -11267,14 +11267,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-chapel-and-weaving-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-chapel-and-weaving-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -12394,14 +12394,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-toolworks-service-perimeter-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-toolworks-service-perimeter-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -13521,14 +13521,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-player-scale-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-player-scale-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -14648,14 +14648,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-interaction-collider-overlay-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-interaction-collider-overlay-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -16716,14 +16716,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-side-rear-proof-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-side-rear-proof-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -17843,14 +17843,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-stall-world-market-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-stall-world-market-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -18970,14 +18970,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-stall-provisions-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-stall-provisions-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -20097,14 +20097,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-apothecary-lin-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-apothecary-lin-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -21224,14 +21224,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-ravenpost-mailbox-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-ravenpost-mailbox-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -22351,14 +22351,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-noticeboard-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-noticeboard-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -23478,14 +23478,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-civic-motion-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-civic-motion-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -24605,14 +24605,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-ravenpost-chronicler-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-ravenpost-chronicler-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,
@@ -25732,14 +25732,14 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/polish/before/before-west-wall-quartermaster-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/polish/before/before-west-wall-quartermaster-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "captureMode": "screenshots",
       "source": {
         "comparison": "polish-baseline-worktree",
         "revision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab"
       },
       "polishProvenance": {
         "schemaVersion": 1,

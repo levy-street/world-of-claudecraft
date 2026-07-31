@@ -2,6 +2,7 @@
 // index.html and play.html both bootstrap through this module, so this one import
 // styles both game entries; admin/guide use their own entries and inline CSS.
 import './styles/index.css';
+import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
 import { syncAppViewport as syncAppViewportShared } from './game/app_viewport';
 import { audio } from './game/audio';
@@ -13,7 +14,12 @@ import {
   readBrowserEnv,
 } from './game/browser_env';
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
-import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
+import {
+  cameraFollowShouldSettle,
+  isRespawnFacingResyncEdge,
+  updateFollowCameraYaw,
+  wrapAngle,
+} from './game/camera_follow';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveBrokenByTeleport,
@@ -43,7 +49,9 @@ import {
 import {
   checkpointActiveEntryDiagnostics,
   createEntryDiagnosticsController,
+  resumeActiveEntryDiagnostics,
   stopActiveEntryDiagnostics,
+  suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
@@ -133,6 +141,7 @@ import {
   signInWithNativeApple,
 } from './net/native_apple_auth';
 import { createNativeAttestationProof } from './net/native_attestation';
+import { primeNativeDeviceMemoryHint } from './net/native_device_info';
 import {
   createNativeDiscordProof,
   installNativeDiscordUrlHandler,
@@ -140,6 +149,7 @@ import {
   openNativeDiscordOAuth,
   takeNativeDiscordVerifier,
 } from './net/native_discord';
+import { notifyOtaAppReady } from './net/native_ota';
 import {
   Api,
   ApiError,
@@ -164,11 +174,20 @@ import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
-import { assetsReady } from './render/assets/preload';
+import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
-import { charactersReady, preloadMechAssets } from './render/characters/assets';
-import { skinCount } from './render/characters/manifest';
-import { onPortraitsReady, playerPortraitDataUrl } from './render/characters/portrait';
+import {
+  charactersReady,
+  ensureCharacterUrl,
+  preloadMechAssets,
+  startStreamedCharacterPreloads,
+} from './render/characters/assets';
+import { skinCount, weaponSkinModelUrl } from './render/characters/manifest';
+import {
+  onPortraitsReady,
+  onPortraitUpdate,
+  playerPortraitDataUrl,
+} from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
 import { setDayNightPhaseOverride } from './render/day_night_clock';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
@@ -306,6 +325,7 @@ import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
 import { createSpectateBadge } from './ui/spectate_badge';
+import { refreshStartSkinPickerPortraits } from './ui/start_skin_picker_portraits';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
 import { shouldShowStorePromo } from './ui/store_promo_card';
 import { talentRowOptionIconRef } from './ui/talent_icons';
@@ -404,6 +424,12 @@ applyNativeDeviceLanguage({
   languages: navigator.languages,
   language: navigator.language,
 });
+
+// Cache the native shell's physical-memory measurement for the NEXT boot's
+// synchronous graphics-profile resolution (4 GB-class devices get the tight
+// residency profile; see src/device_memory_hint.ts). Fire-and-forget: this
+// boot's profile is already resolved, and a missing bridge no-ops.
+void primeNativeDeviceMemoryHint();
 
 const SITE_URL = 'https://worldofclaudecraft.com/';
 
@@ -619,6 +645,7 @@ setInterfaceMode(interfaceModeFromSetting(new Settings().get('interfaceMode')));
 syncAppViewport();
 syncBuildInfo();
 scheduleNativeUpdateCheck(__APP_VERSION__);
+void notifyOtaAppReady();
 preventMobileZoom();
 syncPhoneTouchClass();
 window.matchMedia(PHONE_TOUCH_QUERY).addEventListener?.('change', syncPhoneTouchClass);
@@ -997,39 +1024,15 @@ async function startGame(
   // Paint the loading screen before anything can block, assetsReady may resolve
   // immediately when assets are already cached, and the scene build is synchronous.
   await nextPaint();
-  // Lazy locale flip: fetch the active locale's chunk (plus the deed locale chunk the HUD's
-  // deed surfaces read) and make both resident before the HUD renders (mountGameUi ->
-  // translatePage fans out hundreds of t() calls). It sits behind the loading screen (already
-  // painted above), so a stored non-en visitor never sees an English flash. This is now a
-  // REAL per-locale network request, so guard it: startGame is void-invoked (see the call
-  // sites) with no .catch, and English is always resident, so a failed fetch must fall back
-  // to English and keep booting rather than reject unhandled.
-  try {
-    await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);
-  } catch {
-    // Soft fallback: English is statically resident; boot in English (the picker can retry).
-  }
-  try {
-    await assetsReady((done, total) => setLoadingProgressRange(done, total, 0, 35));
-  } catch (err) {
-    fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
-    return;
-  }
-  // Assets are the only network-bound phase the slow-connection hint can
-  // speak to; everything after this is synchronous CPU-bound scene build, so
-  // stop watching here rather than leaving it armed through hideLoadingScreen.
-  stopSlowConnectionWatch();
-  const spectateBadge = createSpectateBadge();
-  setLoadingStatus(t('loading.enteringWorld'));
-  // Let the final status + full progress bar paint before the synchronous
-  // Renderer/Hud build freezes the main thread for a beat.
-  await nextPaint();
-  mountGameUi();
-
-  const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
-  const nameplates = $('#nameplates') as HTMLDivElement;
-
-  const keybinds = new Keybinds(keybindScope);
+  // Graphics preset resolution + the entry crash probe run BEFORE the locale and
+  // asset awaits below. Those awaits are where the WebContent process actually
+  // holds its peak footprint on phone-class WebKit (the import-time preloads all
+  // resolve inside assetsReady), and a probe armed only after them missed every
+  // kill in that window: the next boot found no evidence, stepped nothing down,
+  // and the player re-crashed identically (the iPhone 13 entry-crash report).
+  // Settings and both preset writers are pure localStorage/navigator reads, so
+  // hoisting them ahead of mountGameUi is safe; everything DOM-bound (canvas
+  // lookups, the context-lost listeners) stays below, after the template mounts.
   const settings = new Settings();
   // First-run graphics default: until a device default has been applied (the dedicated
   // graphicsDefaultApplied marker, NOT the graphicsPreset key, which save() def-fills the moment
@@ -1063,38 +1066,9 @@ async function startGame(
   if (safePreset !== settings.get('graphicsPreset')) {
     settings.set('graphicsPreset', safePreset);
   }
-  // UI theming: apply the persisted theme's CSS variables to :root, then keep a
-  // hook so the Options panel can switch preset / override colours live.
-  const themeStore = new ThemeStore();
-  function applyTheme(): void {
-    const vars = themeStore.cssVars();
-    for (const name of Object.keys(vars))
-      document.documentElement.style.setProperty(name, vars[name]);
-  }
-  applyTheme();
-  // Graphics-tier HUD effects: publish the resolved effect profile (data-fx-level +
-  // the --fx-* tokens) on settings / OS reduced-motion changes only, never per
-  // frame. Driven by the STATIC graphics preset (the gfx.ts `ui` band stays
-  // governable:false): the FPS governor cannot measure compositor blur cost (the
-  // two-controller hazard). The pure resolver decides; this applier is the thin DOM
-  // consumer, mirroring applyTheme above. Motion has a single source of truth: the
-  // OS prefers-reduced-motion channel (owned by the applier) OR the in-game
-  // reduceMotion setting, both feeding the resolver's reduceMotion input; the
-  // body.reduce-motion class below stays only as the CSS hook it already is.
-  const uiEffectsApplier = new UiEffectsApplier({
-    resolve: (osReducedMotion) =>
-      resolveUiEffectsProfile({
-        presetLabel: graphicsPresetLabel(settings.get('graphicsPreset')),
-        effectsQuality: settings.get('effectsQuality'),
-        reduceMotion: osReducedMotion || settings.get('reduceMotion'),
-      }),
-  });
-  uiEffectsApplier.applyNow();
   let renderer!: Renderer;
   let rendererReady = false;
   let hud!: Hud;
-  const autoLoot = new AutoLoot();
-  const perf = createPerfMonitor(null);
   const baseEntryDiagnostics = (): EntryDiagnostics => {
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
     return {
@@ -1129,6 +1103,7 @@ async function startGame(
       tier: stats.tier,
       constrainedMemory: GFX.constrainedMemory,
       nativeIosMemoryProfile: GFX.nativeIosMemoryProfile,
+      tightMemory: GFX.tightMemory,
       dynamicShadows: GFX.dynamicShadows,
       shadowMap: GFX.shadowMap,
       msaaSamples: GFX.msaaSamples,
@@ -1174,6 +1149,97 @@ async function startGame(
     baseSnapshot: baseEntryDiagnostics,
     renderSnapshot: renderEntryDiagnostics,
   });
+  // World-entry crash guard: persist a probe BEFORE the locale/asset awaits AND the
+  // synchronous scene build. If phone WebKit kills the WebContent process anywhere in
+  // that window (no event, no error, just a reload), the next boot finds the probe
+  // still armed and steps the graphics preset down one tier (see the recovery block
+  // in wireStartScreens). Cleared once the entry demonstrably survives, on the
+  // handled failure paths below, and whenever the page is hidden (a backgrounded
+  // eviction is NOT an entry crash).
+  entryDiagnostics.start(settings.get('graphicsPreset'));
+  // Dev-channel diagnostic (English on purpose): grep "[entry-guard]" in the WebView
+  // inspector / device console to isolate crash-at-entry causes on real hardware.
+  console.info(
+    `[entry-guard] world entry: preset=${settings.get('graphicsPreset')} ` +
+      `(${graphicsPresetLabel(settings.get('graphicsPreset'))}) native=${isNativeRuntime()}`,
+  );
+  // Name the await window in the probe: a kill during the locale/asset resolution
+  // now reads as checkpoint=assets-await instead of masquerading as a scene-build
+  // death (start() stamps scene-build-start; the real one is re-stamped below).
+  entryDiagnostics.checkpoint('assets-await', baseEntryDiagnostics());
+  // Lazy locale flip: fetch the active locale's chunk (plus the deed locale chunk the HUD's
+  // deed surfaces read) and make both resident before the HUD renders (mountGameUi ->
+  // translatePage fans out hundreds of t() calls). It sits behind the loading screen (already
+  // painted above), so a stored non-en visitor never sees an English flash. This is now a
+  // REAL per-locale network request, so guard it: startGame is void-invoked (see the call
+  // sites) with no .catch, and English is always resident, so a failed fetch must fall back
+  // to English and keep booting rather than reject unhandled.
+  try {
+    await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);
+  } catch {
+    // Soft fallback: English is statically resident; boot in English (the picker can retry).
+  }
+  // Open the deferred preload lane: the world's assets do not fetch at module
+  // import any more, because decoding them merely to show the LAUNCHER crossed
+  // WKWebView's per-process ceiling (a 12 GB iPhone 17 Pro was killed 1.6 s in and
+  // reloaded forever). This must run BEFORE the await below, which snapshots the
+  // task list, so the Renderer still cannot outrun a load.
+  const deferredStarted = beginDeferredPreloads();
+  console.info(`[entry-guard] world assets: started ${deferredStarted} deferred preloads`);
+  try {
+    await assetsReady((done, total) => setLoadingProgressRange(done, total, 0, 35));
+  } catch (err) {
+    // A HANDLED failure is not a process kill, so the crash probe must not
+    // survive to cost the player a graphics tier next boot (same rule as the
+    // scene-build catch below).
+    entryDiagnostics.stop();
+    fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
+    return;
+  }
+  // Assets are the only network-bound phase the slow-connection hint can
+  // speak to; everything after this is synchronous CPU-bound scene build, so
+  // stop watching here rather than leaving it armed through hideLoadingScreen.
+  stopSlowConnectionWatch();
+  const spectateBadge = createSpectateBadge();
+  setLoadingStatus(t('loading.enteringWorld'));
+  // Let the final status + full progress bar paint before the synchronous
+  // Renderer/Hud build freezes the main thread for a beat.
+  await nextPaint();
+  mountGameUi();
+
+  const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
+  const nameplates = $('#nameplates') as HTMLDivElement;
+
+  const keybinds = new Keybinds(keybindScope);
+  // UI theming: apply the persisted theme's CSS variables to :root, then keep a
+  // hook so the Options panel can switch preset / override colours live.
+  const themeStore = new ThemeStore();
+  function applyTheme(): void {
+    const vars = themeStore.cssVars();
+    for (const name of Object.keys(vars))
+      document.documentElement.style.setProperty(name, vars[name]);
+  }
+  applyTheme();
+  // Graphics-tier HUD effects: publish the resolved effect profile (data-fx-level +
+  // the --fx-* tokens) on settings / OS reduced-motion changes only, never per
+  // frame. Driven by the STATIC graphics preset (the gfx.ts `ui` band stays
+  // governable:false): the FPS governor cannot measure compositor blur cost (the
+  // two-controller hazard). The pure resolver decides; this applier is the thin DOM
+  // consumer, mirroring applyTheme above. Motion has a single source of truth: the
+  // OS prefers-reduced-motion channel (owned by the applier) OR the in-game
+  // reduceMotion setting, both feeding the resolver's reduceMotion input; the
+  // body.reduce-motion class below stays only as the CSS hook it already is.
+  const uiEffectsApplier = new UiEffectsApplier({
+    resolve: (osReducedMotion) =>
+      resolveUiEffectsProfile({
+        presetLabel: graphicsPresetLabel(settings.get('graphicsPreset')),
+        effectsQuality: settings.get('effectsQuality'),
+        reduceMotion: osReducedMotion || settings.get('reduceMotion'),
+      }),
+  });
+  uiEffectsApplier.applyNow();
+  const autoLoot = new AutoLoot();
+  const perf = createPerfMonitor(null);
   canvas.addEventListener('webglcontextlost', () => {
     entryDiagnostics.checkpoint('webgl-context-lost', {
       ...renderEntryDiagnostics(),
@@ -1185,19 +1251,9 @@ async function startGame(
     entryDiagnostics.checkpoint('webgl-context-restored');
     console.info('[entry-diag] WebGL context restored during or after world entry');
   });
-  // World-entry crash guard: persist a probe RIGHT BEFORE the synchronous scene build.
-  // If phone WebKit kills the WebContent process during the build (no event, no error,
-  // just a reload), the next boot finds the probe still armed and steps the graphics
-  // preset down one tier (see the recovery block in wireStartScreens). Cleared once the
-  // entry demonstrably survives, on the handled failure path below, and whenever the
-  // page is hidden (a backgrounded eviction is NOT an entry crash).
-  entryDiagnostics.start(settings.get('graphicsPreset'));
-  // Dev-channel diagnostic (English on purpose): grep "[entry-guard]" in the WebView
-  // inspector / device console to isolate crash-at-entry causes on real hardware.
-  console.info(
-    `[entry-guard] world entry: preset=${settings.get('graphicsPreset')} ` +
-      `(${graphicsPresetLabel(settings.get('graphicsPreset'))}) native=${isNativeRuntime()}`,
-  );
+  // The probe was armed before the locale/asset awaits above; mark that the await
+  // window ended and the synchronous scene build is what runs next.
+  entryDiagnostics.checkpoint('scene-build-start', baseEntryDiagnostics());
   try {
     setLoadingPercent(37, t('loading.enteringWorld'));
     await ensureSkyAssetsAt(world.player.pos.x, world.player.pos.z);
@@ -2371,6 +2427,15 @@ async function startGame(
   // otherwise, so it is a live affordance offline too (not gated on `online`).
   hud.attachDiscordHook(() => openDiscordEntry());
   if (online) {
+    // Issue #2416: chain onto whatever onReconnected enterWorld already armed
+    // (the reconnect overlay teardown), rather than replacing it: hud does not
+    // exist yet when enterWorld sets that handler, so the market resync has to
+    // be wired here instead, once hud is actually available.
+    const priorOnReconnected = online.onReconnected;
+    online.onReconnected = () => {
+      priorOnReconnected?.();
+      hud.marketResyncAfterReconnect();
+    };
     // A hosted dev/PBE realm booted with ALLOW_DEV_COMMANDS=1 lights the /dev GUI
     // even in a production client build, where import.meta.env.DEV is false. That
     // build flag alone used to gate it, which is why a tester on a dev realm could
@@ -2651,6 +2716,7 @@ async function startGame(
         (node) => gatherNodeToolGateFor(world, node),
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
+        t('questUi.errors.escortAway'),
         t('errors.nothingInteract'),
       ),
       input,
@@ -3121,6 +3187,11 @@ async function startGame(
   // eases back to zero so the camera settles in behind the character.
   let lastInterpFacing: number | null = null;
   let wasClickMoving = false;
+  // Tracks the player's dead/ghost state across frames so a respawn/release-spirit
+  // edge (see isRespawnFacingResyncEdge) can resync lastInterpFacing below, the same
+  // way the click-to-move release edge does just underneath it.
+  let prevPlayerDead = world.player.dead;
+  let prevPlayerGhost = world.player.ghost;
   // Tracks camera-driven facing (classic right-mouse mouselook, or Mouse Camera
   // mode while a movement key is held) across frames so its falling edge can
   // commit the final camera yaw to the player facing (see mouselook_release.ts
@@ -3147,6 +3218,17 @@ async function startGame(
     // handoff stays smooth even in pure-follow (non-camera-driven) mode.
     if (wasClickMoving && !clickMoving) lastInterpFacing = interpFacing;
     wasClickMoving = clickMoving;
+    // A respawn/release-spirit forces the player's facing to 0 (see spirit.ts and
+    // entity_roster.ts); resync here too, or the rigid follow term below reads the
+    // gap against the stale pre-death lastInterpFacing as a turn and sticks the
+    // camera off-yaw (see isRespawnFacingResyncEdge for why).
+    const playerDead = world.player.dead;
+    const playerGhost = world.player.ghost;
+    if (isRespawnFacingResyncEdge(prevPlayerDead, prevPlayerGhost, playerDead, playerGhost)) {
+      lastInterpFacing = interpFacing;
+    }
+    prevPlayerDead = playerDead;
+    prevPlayerGhost = playerGhost;
     const next = updateFollowCameraYaw({
       camYaw: input.camYaw,
       interpFacing,
@@ -3920,19 +4002,35 @@ async function startGame(
     // has been materialized successfully.
     console.warn('Renderer prewarm failed', err);
   }
-  try {
-    await hud.prewarmCharacterPreview();
-  } catch (err) {
-    // The paperdoll preview is optional UI. If its secondary WebGL context
-    // cannot prewarm, opening the window can still take the normal lazy path.
-    console.warn('Character preview prewarm failed', err);
+  // The entry allocation spike is over: start streaming the mob bodies the
+  // packaged iOS boot gate deliberately excluded (empty everywhere else). A mob
+  // whose GLB is still arriving renders a beat late through the fail-soft
+  // view-create path, instead of its decode competing with the scene build for
+  // the WebContent memory ceiling.
+  const streamedCount = startStreamedCharacterPreloads();
+  if (streamedCount > 0) {
+    console.info(`[entry-guard] streaming ${streamedCount} deferred character assets`);
   }
-  try {
-    await hud.prewarmArmoryPreview();
-  } catch (err) {
-    // The store is optional and online-only. A secondary-context failure must
-    // never prevent entering the world; opening it can retain the lazy path.
-    console.warn('Armory preview prewarm failed', err);
+  // Each preview prewarm mints a SECONDARY WebGL context beside the world
+  // renderer: real WebKit GPU-process residency held for a window the player
+  // may never open. The 4 GB-class tight profile skips both and keeps their
+  // documented lazy first-open path instead (the catch arms below already
+  // promise exactly that fallback).
+  if (!GFX.tightMemory) {
+    try {
+      await hud.prewarmCharacterPreview();
+    } catch (err) {
+      // The paperdoll preview is optional UI. If its secondary WebGL context
+      // cannot prewarm, opening the window can still take the normal lazy path.
+      console.warn('Character preview prewarm failed', err);
+    }
+    try {
+      await hud.prewarmArmoryPreview();
+    } catch (err) {
+      // The store is optional and online-only. A secondary-context failure must
+      // never prevent entering the world; opening it can retain the lazy path.
+      console.warn('Armory preview prewarm failed', err);
+    }
   }
   setLoadingPercent(100, t('loading.enteringWorld'));
   await nextPaint();
@@ -4239,6 +4337,10 @@ function refreshOnlineSkins(cls: PlayerClass): void {
     characterPreview?.setSkin(i);
   });
 }
+
+onPortraitUpdate((visualKey, skin) => {
+  refreshStartSkinPickerPortraits(document, visualKey, skin, playerPortraitDataUrl);
+});
 
 function updatePreviewContainer(panelId: string): void {
   if (!characterPreview) return;
@@ -5628,6 +5730,13 @@ const activeClassDetailsTimeouts: Record<string, number | null> = {};
 
 // The char-select roster row's real, in-world appearance for the 3D preview.
 function charselectAppearance(c: CharacterSummary): PreviewAppearance {
+  // The packaged iOS shell streams the Armory weapon-skin GLBs after world
+  // entry instead of holding all of them at the launcher, so the preview of a
+  // character wearing one needs ITS skin fetched on demand (the mech lazy-load
+  // pattern). Memoized and a no-op when resident or on eager platforms; a
+  // preview built in the race window shows the base weapon and picks the skin
+  // up on the next selection change.
+  ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
   return {
     cls: c.class,
     skin: c.skin ?? 0,
@@ -9425,6 +9534,13 @@ function wireStartScreens(): void {
         recoverySettings.set('graphicsPreset', entryRecovery.to);
       }
       recoverySettings.set('graphicsDefaultApplied', true);
+      // A confirmed WebContent kill during entry is direct evidence this device
+      // runs at its memory ceiling, and the preset ladder has no rung below Low.
+      // Stamp the tight-memory marker: from the NEXT module load the gfx profile
+      // and the render preload sweeps shed residency (DPR, pooled rigs, deferred
+      // cosmetic atlases/prewarms) independently of the preset. Time-limited in
+      // device_memory_hint.ts so a one-off kill cannot degrade a device forever.
+      markEntryTightMode(entryRecoveryAt);
       clearPlayMarker();
       console.warn(
         `[entry-guard] previous world entry crashed ${Math.round(entryRecovery.ageMs / 1000)}s ` +
@@ -9532,8 +9648,12 @@ function wireStartScreens(): void {
       // A page that leaves the foreground mid-entry was not killed by a foreground
       // memory spike: a later eviction while backgrounded (or a deliberate reload,
       // which also fires pagehide) must not read as an entry crash next boot.
-      stopActiveEntryDiagnostics();
-      clearEntryProbe();
+      suspendActiveEntryDiagnostics();
+    } else {
+      // A hidden page can resume the same entry attempt. Re-arm the probe with
+      // its last durable checkpoint before the awaits or scene build continue,
+      // so a later foreground WebContent kill still advances the recovery ladder.
+      resumeActiveEntryDiagnostics();
     }
   };
   document.addEventListener('visibilitychange', restampResumeMarker);

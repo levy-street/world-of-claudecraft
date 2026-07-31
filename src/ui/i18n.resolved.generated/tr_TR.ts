@@ -340,11 +340,14 @@ export const tr_TR: EnTranslations = {
       "menuButton": "Kurtulma",
       "help": "Kurtarma: /unstuck, seni yakındaki ulaşılabilir güvenli bir noktaya taşıyacak hareketsiz bir geri sayım başlatır.",
       "helpAtGraveyard": "Kurtarma: /unstuck hareketsiz bir geri sayım başlatır, ardından ruhunu en yakın mezarlığa gönderir. Solgun Gözcü aracılığıyla dönmek Gözcünün Bedelini gerektirir.",
+      "helpUnstuckSickness": "Kurtarma: /unstuck hareketsiz bir geri sayım başlatır, ardından seni en yakın mezarlığa taşır ve düşmüşsen diriltir. En fazla 5 dakika boyunca üzerinde Kurtulma Hastalığı kalır.",
       "started": "Kurtulma {seconds} saniye içinde. Hareket etmek, savaşmak, hasar almak veya başka bir eylem başlatmak bunu iptal eder.",
       "countdown": "Kurtulma: {seconds}",
       "completed": "En yakın ulaşılabilir güvenli noktaya taşındın.",
       "completedAtGraveyard": "Ruhun en yakın mezarlığa döndü. Gözcünün Bedelini kabul etmek için Solgun Gözcü ile konuş.",
       "revivedAtGraveyard": "En yakın mezarlığa döndürüldün ve diriltildin. Gözcünün Bedeli üzerinde ağırlık yapıyor.",
+      "movedToGraveyard": "En yakın mezarlığa taşındın. Kurtulma Hastalığı üzerinde ağırlık yapıyor.",
+      "revivedAtGraveyardUnstuck": "En yakın mezarlığa taşındın ve diriltildin. Kurtulma Hastalığı üzerinde ağırlık yapıyor.",
       "cancelledMoved": "Hareket ettiğin için Kurtulma iptal edildi.",
       "cancelledDamaged": "Hasar aldığın için Kurtulma iptal edildi.",
       "cancelledCombat": "Savaşa girdiğin için Kurtulma iptal edildi.",
@@ -885,6 +888,13 @@ export const tr_TR: EnTranslations = {
       "heroicName": "Kahramanca {name}",
       "heroicLocked": "Kahramanca {name} akınına kilitlisin."
     },
+    "riftTracker": {
+      "title": "Yarık",
+      "floor": "Kat {current}/{total}",
+      "closesIn": "{time} içinde kapanır",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "K",
       "NE": "KD",
@@ -956,13 +966,15 @@ export const tr_TR: EnTranslations = {
       "name_shadowjump_toad": "Gölge Sıçrayan Kurbağa Kama-Kage",
       "name_stormfeather_griffin": "Gökyüzü Erişimli Fırtınatüy",
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
       "desc_stalkglider_snail": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.",
       "desc_aether_hover_cycle": "Savaşta hızlı, alçaktan süzülerek hareket etmek için tasarlanmış güçlü bir büyü-teknoloji motosikleti.",
       "desc_shadowjump_toad": "Her arazi türünü aşan, şimşek hızındaki gölgeli sıçramalarla eğitilmiş, dev ve sağlam adımlı bir kurbağa.",
       "desc_stormfeather_griffin": "Rün nallı pençeleriyle yerde süzülen, kanatları katlı, asil bir fırtına grifonu.",
-      "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi."
+      "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
@@ -2117,6 +2129,7 @@ export const tr_TR: EnTranslations = {
         "noRecipient": "Burada bu isimde posta kutusu olan kimse yok.",
         "tooManyParcels": "Bir mektup en fazla {count} paket taşır.",
         "noMailQuestItems": "Görev eşyalarını postayla gönderemezsin.",
+        "noMailBound": "O eşya bağlı ve postayla gönderilemez.",
         "notEnoughItems": "Gönderecek o kadar tane yok.",
         "cantAffordPostage": "Posta ücretini karşılayamazsın.",
         "recipientBoxFull": "Alıcının posta kutusu dolu.",
@@ -2925,6 +2938,9 @@ export const tr_TR: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene."
+    },
+    "ota_updates": {
+      "invalid_input": "Geçersiz girdi."
     }
   },
   "guide": {
@@ -3524,14 +3540,6 @@ export const tr_TR: EnTranslations = {
       "reptile": {
         "name": "Sürüngenler",
         "desc": "Kendi özgün tıslaması ve ısırışıyla soğukkanlı avcılar; sıcakkanlı yaratıklardan tamamen farklı bir türdür."
-      },
-      "murloc": {
-        "name": "Vırakyüzgeçler",
-        "desc": "Göl kıyısının ve gelgit havuzlarının vraklayan balık halkı, fazla yaklaşan her şeyin üzerine çabucak üşüşür."
-      },
-      "kobold": {
-        "name": "Yaramazlar",
-        "desc": "Çayırların ve çitlerin telaşlı leş yiyicileri ve cinleri, sayıca çoğalana kadar tehlikeden çok baş belasıdırlar."
       },
       "demon": {
         "name": "İblisler",
@@ -6473,11 +6481,12 @@ export const tr_TR: EnTranslations = {
       "arenaQueueTrading": "Sıraya girmeden önce takasını bitir.",
       "arenaQueueInstance": "Bir zindanın içinden sıraya giremezsin.",
       "tradeInProgress": "Zaten devam eden bir takas var.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Bu oyuncu zaten takas yapıyor.",
       "tradeTooFar": "Hedef takas için çok uzakta.",
       "tradeExpired": "Takas isteğinin süresi doldu.",
       "tradeFailed": "Takas başarısız: eşyalar ya da para artık mevcut değil.",
-      "tradeBound": "O eşya bağlı ve takas edilemez."
+      "tradeBound": "O eşya bağlı ve takas edilemez.",
+      "marketListBound": "O eşya bağlı ve satışa çıkarılamaz."
     },
     "logs": {
       "standUp": "Ayağa kalkıyorsun.",
@@ -6833,7 +6842,8 @@ export const tr_TR: EnTranslations = {
       "incomplete": "O görev tamamlanmadı.",
       "giverMissing": "O görev veren yakında değil.",
       "turnInMissing": "O görevin teslim yeri yakında değil.",
-      "tooFar": "Çok uzakta."
+      "tooFar": "Çok uzakta.",
+      "escortAway": "Eşlik edeceğin kişi şu anda yerinde değil. Kısa süre içinde dönecek."
     }
   },
   "itemUi": {
@@ -7221,7 +7231,7 @@ export const tr_TR: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Üstün Görünmezlik",
-        "description": "20 sn. boyunca kaybolursun: 2 zamanla hasar etkisini kaldırır ve görünmezken ve hemen sonrasında %90 daha az hasar alırsın. (büyücü yeteneği)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Sıcak Seri",
@@ -9727,6 +9737,9 @@ export const tr_TR: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Son Kale Mührü"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "slag_tempered_sabatons": {
         "name": "Cürufla Suverilmiş Savaş Çizmeleri"
@@ -13000,7 +13013,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Wren'i Eve Ulaştırmak",
-        "text": "Çırağım Wren iki gün önce Altın Eriyiş hattını yürümeye çıktı ve bir daha geri dönmedi. İzlerini buldum, Kutup Işığı Basamakları'nın güneybatısındaki yol işaretlerinin altında saklanıyor, kurtlardan çok korktuğu için kımıldayamıyor. Bataklığı terk edemem, {playerName}. Onu Basamaklardaki Veyla'nın kampına götür. Işıkların altında güvende olacak.",
+        "text": "Çırağım Wren iki gün önce Altın Eriyiş hattını yürümeye çıktı ve bir daha geri dönmedi. İzlerini buldum, Kutup Işığı Basamakları'nın kuzeydoğusundaki yol işaretlerinin altında saklanıyor, kurtlardan çok korktuğu için kımıldayamıyor. Bataklığı terk edemem, {playerName}. Onu Basamaklardaki Veyla'nın kampına götür. Işıkların altında güvende olacak.",
         "completion": "Kız içeride, battaniyelerimin yarısına sarılı ve yıldızları gökten indirecek kadar konuşuyor. Bugün nazik bir şey yaptın, {playerName}. Diyar bunlardan pek fazla görmüyor.",
         "objectives": {
           "0": {
@@ -13684,7 +13697,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Eve Dönüyor",
-        "text": "Bram'ım, ağ gediği açıldığı sabah tekneyi çıkardı, ve deniz onu İskele noktasının ötesinde bir yere geri fırlattı. Onu üç gece önce duydum, {playerName}, suyun üzerinden sesleniyordu, ve gitmeye çok korktum. Hala çok korkuyorum. Lütfen. Teknesi kuzey kıyısında parçalanmış yatıyor. Onu bana eve getir.",
+        "text": "Bram'ım, ağ gediği açıldığı sabah tekneyi çıkardı, ve deniz onu İskele noktasının ötesinde bir yere geri fırlattı. Onu üç gece önce duydum, {playerName}, suyun üzerinden sesleniyordu, ve gitmeye çok korktum. Hala çok korkuyorum. Lütfen. Teknesi güney kıyısında parçalanmış yatıyor. Onu bana eve getir.",
         "completion": "Bram! Onu bana sağ salim getirdin, {playerName}. İkimiz de ağladık ve hiçbirimiz utanmıyoruz. Gedikler bu adadan bundan sonra ne alırsa alsın, ailemi alamazlar. Artık olmaz.",
         "objectives": {
           "0": {

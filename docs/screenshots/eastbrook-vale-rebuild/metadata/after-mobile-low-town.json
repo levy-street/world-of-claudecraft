@@ -4,16 +4,16 @@
   "shotPrefix": "after",
   "profile": "mobile-low",
   "sourceRevision": "working-tree",
-  "sourceFingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e",
+  "sourceFingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048",
   "records": [
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-elevated-overview-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-elevated-overview-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -936,13 +936,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-planning-top-down-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-planning-top-down-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -1865,13 +1865,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-gate-approach-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-gate-approach-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -2794,13 +2794,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-central-square-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-central-square-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -3723,13 +3723,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-armoury-facade-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-armoury-facade-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -4652,13 +4652,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-armoury-relation-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-armoury-relation-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -5581,13 +5581,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-bank-and-chest-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-bank-and-chest-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -6510,13 +6510,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-smithy-and-forge-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-smithy-and-forge-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -7439,13 +7439,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-inn-and-kitchens-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-inn-and-kitchens-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -8368,13 +8368,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-market-and-fence-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-market-and-fence-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -9299,13 +9299,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-chapel-and-weaving-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-chapel-and-weaving-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -10230,13 +10230,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-toolworks-service-perimeter-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-toolworks-service-perimeter-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -11161,13 +11161,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-player-scale-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-player-scale-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -12092,13 +12092,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-interaction-collider-overlay-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-interaction-collider-overlay-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -13783,13 +13783,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-side-rear-proof-mobile-low.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-side-rear-proof-mobile-low.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,

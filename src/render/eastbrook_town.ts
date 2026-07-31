@@ -6,7 +6,7 @@ import { EASTBROOK_LAYOUT, localToWorld, wallSegmentMirrored } from '../sim/east
 import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   createEastbrookCivicBeaconState,
   decorateEastbrookCivicBeaconMaterial,
@@ -67,7 +67,7 @@ const preparedTemplates = new Map<string, TownAssetTemplate>();
 
 if (typeof window !== 'undefined') {
   for (const url of ALL_ASSET_URLS) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url).then((gltf) => {
         loadedSources.set(url, gltf.scene);
       }),

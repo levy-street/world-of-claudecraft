@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { PlayerClass } from '../../sim/types';
 import { assetsReady } from '../assets/preload';
 import { trackWebGLContext } from '../context_release';
+import { ensureSkinTexture } from './assets';
 import { VISUALS } from './manifest';
 import { type PortraitFraming, portraitFrameParams } from './portrait_framing';
 import { CharacterVisual } from './visual';
@@ -50,6 +51,8 @@ let mount: THREE.Group | null = null;
 
 const cache = new Map<string, string>();
 const readyListeners = new Set<() => void>();
+const updateListeners = new Set<(visualKey: string, skin: number) => void>();
+const pendingAtlases = new Map<string, Promise<void>>();
 let assetsAreReady = false;
 void assetsReady()
   .then(() => {
@@ -124,6 +127,28 @@ export function visualPortraitDataUrl(
   if (cached) return cached;
   if (!assetsAreReady) return null;
 
+  // Tight-memory iOS hosts defer the boot skin-atlas sweep (assets.ts), so a
+  // non-default skin's atlas may not be resident yet. Do not capture the
+  // embedded default as if it were the requested chroma. Return the normal
+  // fallback and notify mounted consumers once the real atlas arrives.
+  const atlasPending = ensureSkinTexture(visualKey, skin);
+  if (atlasPending) {
+    const atlasKey = `${visualKey}:${skin}`;
+    if (!pendingAtlases.has(atlasKey)) {
+      pendingAtlases.set(atlasKey, atlasPending);
+      void atlasPending.then(
+        () => {
+          pendingAtlases.delete(atlasKey);
+          for (const cb of updateListeners) cb(visualKey, skin);
+        },
+        () => {
+          pendingAtlases.delete(atlasKey);
+        },
+      );
+    }
+    return null;
+  }
+
   let visual: CharacterVisual | null = null;
   try {
     ensureRig();
@@ -189,6 +214,12 @@ export function visualPortraitDataUrl(
 export function onPortraitsReady(cb: () => void): void {
   if (assetsAreReady) cb();
   else readyListeners.add(cb);
+}
+
+/** Subscribe to newly available deferred atlases so mounted portrait consumers
+ * can replace their fallback without waiting for an unrelated repaint. */
+export function onPortraitUpdate(cb: (visualKey: string, skin: number) => void): void {
+  updateListeners.add(cb);
 }
 
 /** True once portraits can be generated synchronously. */

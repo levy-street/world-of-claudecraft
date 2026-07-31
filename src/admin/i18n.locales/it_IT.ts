@@ -122,7 +122,6 @@ export const it_IT: Record<string, string> = {
   'stats.avgTick': 'tick medio',
   'stats.serverRss': 'rss server',
   'online.title': 'Giocatori online',
-  'online.refreshHint': 'si aggiorna ogni 5s',
   'online.empty': 'nessuno online al momento',
   'online.colCharacter': 'Personaggio',
   'online.colClass': 'Classe',

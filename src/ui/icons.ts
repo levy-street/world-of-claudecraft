@@ -3247,8 +3247,6 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
   family_elemental: r('storm', 'sky', ['lightning'], ['glow']),
   family_dragonkin: r('fire', 'ember', ['claw_slash'], ['glow']),
   family_reptile: r('earth', 'leafGreen', ['fang']),
-  family_kobold: r('junk', 'gold', ['candle']),
-  family_murloc: r('drink', 'sky', ['droplet'], ['motion']),
   family_sheep: r('nature', 'silverWhite', ['sheep_head']),
   // status / interaction markers
   status_npc: r('parchment', 'gold', ['sigil_rune']),
@@ -3669,7 +3667,7 @@ const ITEM_ICON_IMAGES = ITEM_WEAPON_VARIANTS;
 
 /** Static URL of a weapon's rendered thumbnail, or null if it uses a recipe. */
 function weaponIconUrl(id: string): string | null {
-  const model = ITEM_ICON_IMAGES[id] ?? ITEM_ICON_IMAGES[ITEMS[id]?.heroicOf ?? ''];
+  const model = ITEM_ICON_IMAGES[id];
   return model ? `${WEAPON_ICON_DIR}/${model}.jpg` : null;
 }
 
@@ -4320,6 +4318,7 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_shadowjump_toad',
   'reins_stormfeather_griffin',
   'reins_thunderstrut_gobbler',
+  'reins_terrorspark_groundshaker',
   // Undermount wing 1 and 2 raid armor and jewelry. Weapons use rendered models.
   'slag_tempered_sabatons',
   'glasswalker_treads',
@@ -4351,7 +4350,7 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'heroic_ashwalk_sandals',
   'heroic_quenchsilk_cord',
   'heroic_slakeleather_belt',
-  // Undermount S7: Volzharr normal and heroic non-weapon rewards
+  // Undermount wing 3 normal and heroic non-weapon rewards.
   'band_of_the_ninth_quench',
   'crownforged_heartplate',
   'footwraps_of_the_waking_floor',

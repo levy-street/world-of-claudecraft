@@ -4,16 +4,16 @@
   "shotPrefix": "after",
   "profile": "desktop-ultra",
   "sourceRevision": "working-tree",
-  "sourceFingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e",
+  "sourceFingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048",
   "records": [
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-elevated-overview-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-elevated-overview-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -955,13 +955,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-planning-top-down-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-planning-top-down-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -1903,13 +1903,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-gate-approach-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-gate-approach-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -2851,13 +2851,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-central-square-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-central-square-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -3799,13 +3799,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-armoury-facade-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-armoury-facade-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -4747,13 +4747,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-armoury-relation-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-armoury-relation-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -5697,13 +5697,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-bank-and-chest-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-bank-and-chest-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -6647,13 +6647,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-smithy-and-forge-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-smithy-and-forge-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -7597,13 +7597,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-inn-and-kitchens-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-inn-and-kitchens-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -8547,13 +8547,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-market-and-fence-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-market-and-fence-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -9498,13 +9498,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-chapel-and-weaving-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-chapel-and-weaving-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -10449,13 +10449,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-toolworks-service-perimeter-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-toolworks-service-perimeter-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -11402,13 +11402,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-player-scale-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-player-scale-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -12355,13 +12355,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-interaction-collider-overlay-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-interaction-collider-overlay-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,
@@ -14068,13 +14068,13 @@
       }
     },
     {
-      "output": "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/after/after-side-rear-proof-desktop-ultra.png",
+      "output": "docs/screenshots/eastbrook-vale-rebuild/after/after-side-rear-proof-desktop-ultra.png",
       "schemaVersion": 2,
       "captureScope": "town",
       "source": {
         "comparison": "feature-worktree",
         "revision": "working-tree",
-        "fingerprint": "9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e"
+        "fingerprint": "c39af06913c75689d31f8f834001b91186320b2cdba672d5978203b3a6da9048"
       },
       "expected": {
         "armoury": true,

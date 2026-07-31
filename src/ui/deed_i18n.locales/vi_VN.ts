@@ -822,4 +822,20 @@ export const table: DeedLocaleTable = {
     name: 'Anh Hùng: Lòng Chảo Trái Tim Hoang Dã',
     desc: 'Đánh bại Zulgar, Tiếng Nói Của Vùng Trũng, trong Lòng Chảo Trái Tim Hoang Dã ở độ khó Anh Hùng.',
   },
+  chr_marsh_rares_ii: {
+    name: 'Kẻ Phàm Ăn, Được Ghi Sổ',
+    desc: 'Hạ Grubjaw Phàm Ăn, nỗi kinh hoàng hữu danh thứ tư của Đầm Lầy Bùn Sâu bị bỏ sót trong lần điểm danh đầu tiên.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Thêm Những Cái Tên Khắc Vào Vách Đá',
+    desc: 'Hạ Cragmaw Già và Lãnh Chúa Mảnh Vỡ Kazzix, thêm hai nỗi kinh hoàng hữu danh của Cao Nguyên Đỉnh Gai bị bỏ sót trong lần điểm danh đầu tiên.',
+  },
+  chr_gleamstag: {
+    name: 'Huyền Thoại Không Bao Giờ Ra Tay Trước',
+    desc: 'Hạ Hươu Lấp Lánh, một tinh anh hiếm gặp và nhút nhát, chỉ tấn công khi bị dồn vào đường cùng.',
+  },
+  chr_hollow_rares: {
+    name: 'Bầy Đàn Ghi Nhớ',
+    desc: 'Hạ Marrowshell Già và Aurelhorn, Kẻ Đầu Đàn, hai trùm hiếm lang thang của Thung Lũng Sương Phủ.',
+  },
 };

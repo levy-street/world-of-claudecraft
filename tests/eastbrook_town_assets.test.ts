@@ -21,7 +21,7 @@ const REPO_ROOT = path.join(__dirname, '..');
 const PROPS_ROOT = path.join(REPO_ROOT, 'public/models/props');
 const EVIDENCE_ROOT = path.join(REPO_ROOT, 'docs/screenshots/eastbrook-vale-rebuild/assets');
 const MATERIALS_ROOT = path.join(REPO_ROOT, 'docs/screenshots/eastbrook-vale-rebuild/materials');
-const SOURCE_FINGERPRINT = '9262e650d1f9b1ece4fad225477a327f047b2aa4ac00a0f94250986fb8b3015e';
+const SOURCE_FINGERPRINT = '10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab';
 const SURFACE_ATLAS_SOURCE_SHA256 =
   'abec3036f8887e9c94972dab52aea664f18a74696db6b6d24cc48a4cfbe22b7d';
 const SURFACE_ATLAS_SHIPPING_SHA256 =
@@ -29,7 +29,7 @@ const SURFACE_ATLAS_SHIPPING_SHA256 =
 const SURFACE_ATLAS_PREVIEW_SHA256 =
   'ea6ba64e200f305f079cc858a4daf5d28dc8c240acd83895729237c521d26576';
 const SURFACE_ATLAS_FINGERPRINT =
-  '6427821b76f9f45878dd6c1616be49264d5cd66a7c4ed61606c23b31df21d224';
+  '62f614037b5e1d52c41ef050d15f2906b49c0d3fa4cb2ae7c798711154e7fe19';
 const TURNAROUND_VIEWS = [
   'front',
   'right',
@@ -46,6 +46,7 @@ interface SocketContract {
   id: string;
   name: string;
   purpose: string;
+  position?: readonly [number, number, number];
 }
 
 interface AssetContract {
@@ -62,6 +63,7 @@ interface AssetContract {
   byteCeiling: number;
   serviceCues: readonly string[];
   sockets: readonly SocketContract[];
+  evidenceSha256?: Readonly<Record<string, string>>;
 }
 
 const ASSETS: readonly AssetContract[] = [
@@ -71,17 +73,35 @@ const ASSETS: readonly AssetContract[] = [
     file: 'eastbrook_bank.glb',
     rootName: 'EastbrookBank',
     dimensions: [7, 7.8, 5.5],
-    bytes: 40_000,
-    sha256: '2523aa26b93c27b246579030ee564e5fa4ea6d1fa036ad6f4fc033565e70aea7',
-    triangles: 2324,
-    primitiveTriangles: [2128, 196],
+    bytes: 52_508,
+    sha256: '0b8f5169af3aaebb206ad95386f15b7aab1bd31771013c10c50dbcfb390f1c9a',
+    triangles: 3104,
+    primitiveTriangles: [2928, 176],
     triangleCeiling: 6000,
     byteCeiling: 350 * 1024,
-    serviceCues: ['arched-entry', 'teller-window', 'vault-chest', 'bank-banner'],
+    serviceCues: ['arched-entry', 'teller-window', 'vault-alcove', 'bank-banner'],
     sockets: [
-      { id: 'front-entry', name: 'Socket_FrontEntry', purpose: 'front entrance alignment' },
-      { id: 'teller', name: 'Socket_TellerWindow', purpose: 'bank service cue' },
+      {
+        id: 'front-entry',
+        name: 'Socket_FrontEntry',
+        purpose: 'front entrance alignment',
+        position: [-1.48, 0, 2.6105782171580785],
+      },
+      {
+        id: 'teller',
+        name: 'Socket_TellerWindow',
+        purpose: 'bank service cue',
+        position: [0.72, 1.4199999682016868, 2.441280326460385],
+      },
     ],
+    evidenceSha256: {
+      'procedural-contact.png': '5e59fb1ae4d4e5e1249de34aaceb7835a8b2575850c7b8b466f7131d08fbd1fb',
+      'raw-contact.png': '473914c3a15dcc3ef157e583b063fe8655cafd8061cbb4a43c95481805665fca',
+      'optimized-contact.png': 'b44b6ad51a4cde1e44ed7b6b502348603dcc794c52c00fea4992dfeb3850cea2',
+      'optimized-audit-contact.png':
+        'af672d33ac1401e3caab5ade81486339feb665b67c5a11e7fbcaa31ce8c9bf9d',
+      'comparison.png': '4855a7af798326287af5f8969595a86ee048e56e8959ff85a04ae6e4ce2c3eaf',
+    },
   },
   {
     id: 'smithy',
@@ -90,15 +110,25 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookSmithy',
     dimensions: [7, 7.5, 5.5],
     bytes: 40_352,
-    sha256: '578250be84860f153145611e3f7df70d303b7ebfc9e2ee3e4c0aa4bb0c05a65e',
+    sha256: '4b0985000cca8cf7db733c19c8181c194fa02965df3d17bacc5b52efcee941ff',
     triangles: 2410,
     primitiveTriangles: [2282, 128],
     triangleCeiling: 6000,
     byteCeiling: 350 * 1024,
     serviceCues: ['open-forge', 'chimney', 'anvil', 'tool-rack', 'log-rack'],
     sockets: [
-      { id: 'front-entry', name: 'Socket_FrontEntry', purpose: 'front entrance alignment' },
-      { id: 'forge', name: 'Socket_Forge', purpose: 'smithing service cue' },
+      {
+        id: 'front-entry',
+        name: 'Socket_FrontEntry',
+        purpose: 'front entrance alignment',
+        position: [-1.4966835342192881, 0, 2.545512812538103],
+      },
+      {
+        id: 'forge',
+        name: 'Socket_Forge',
+        purpose: 'smithing service cue',
+        position: [1.7599897406239382, 1.4811489675639933, 1.3820512669639788],
+      },
     ],
   },
   {
@@ -108,15 +138,25 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookInn',
     dimensions: [7.5, 8.5, 6],
     bytes: 67_768,
-    sha256: '769b15a77972265a4b768b17faa4be011a72cdcf8e0efbd09ac7fa62abe68ddd',
+    sha256: '01fe3ce08266ca8872616f01f2291be4f91325f5e6f96692dab7d17f71583099',
     triangles: 4348,
     primitiveTriangles: [4004, 344],
     triangleCeiling: 6000,
     byteCeiling: 350 * 1024,
     serviceCues: ['deep-portico', 'upper-dormer', 'chimney-hood', 'provision-table'],
     sockets: [
-      { id: 'front-entry', name: 'Socket_FrontEntry', purpose: 'front entrance alignment' },
-      { id: 'provisions', name: 'Socket_Provisions', purpose: 'inn service cue' },
+      {
+        id: 'front-entry',
+        name: 'Socket_FrontEntry',
+        purpose: 'front entrance alignment',
+        position: [0, 0, 2.7155756379701654],
+      },
+      {
+        id: 'provisions',
+        name: 'Socket_Provisions',
+        purpose: 'inn service cue',
+        position: [-2.4143834985606705, 1.3687600560041784, 2.356659164823497],
+      },
     ],
   },
   {
@@ -126,15 +166,25 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookChapel',
     dimensions: [5.5, 7, 6],
     bytes: 66_132,
-    sha256: '7ac644f55f7dd8d3e22a330b7501643a8e2154edce569961772987d866b427f2',
+    sha256: 'a59097336db63f0cf73a6ddd986456bae1773cc715e7ee33b2ee48b7fd43ebe7',
     triangles: 4120,
     primitiveTriangles: [3800, 320],
     triangleCeiling: 6000,
     byteCeiling: 350 * 1024,
     serviceCues: ['pointed-entry', 'lancet-windows', 'flower-boxes', 'crystal-finial'],
     sockets: [
-      { id: 'front-entry', name: 'Socket_FrontEntry', purpose: 'front entrance alignment' },
-      { id: 'altar-axis', name: 'Socket_AltarAxis', purpose: 'chapel interior axis cue' },
+      {
+        id: 'front-entry',
+        name: 'Socket_FrontEntry',
+        purpose: 'front entrance alignment',
+        position: [0, 0, 2.7045454862908116],
+      },
+      {
+        id: 'altar-axis',
+        name: 'Socket_AltarAxis',
+        purpose: 'chapel interior axis cue',
+        position: [0, 1.2617448772945523, -2.1818181030021235],
+      },
     ],
   },
   {
@@ -144,15 +194,25 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookWeavingWorkshop',
     dimensions: [5.5, 5.8, 4.5],
     bytes: 40_392,
-    sha256: '4369633e650ac83bd2c3419ff53c8095b163a709c46f0b3e9514b03367cbc270',
+    sha256: '2a14e4dfdff030fb17e715e1aac47672a74e7f6e68a190e8874f0d8a665bf555',
     triangles: 2412,
     primitiveTriangles: [2272, 140],
     triangleCeiling: 6000,
     byteCeiling: 350 * 1024,
     serviceCues: ['open-loom-bay', 'threaded-loom', 'fabric-rolls', 'dye-barrel'],
     sockets: [
-      { id: 'front-entry', name: 'Socket_FrontEntry', purpose: 'front entrance alignment' },
-      { id: 'loom', name: 'Socket_Loom', purpose: 'weaving service cue' },
+      {
+        id: 'front-entry',
+        name: 'Socket_FrontEntry',
+        purpose: 'front entrance alignment',
+        position: [-1.3364486219539575, 0, 1.8883425508188183],
+      },
+      {
+        id: 'loom',
+        name: 'Socket_Loom',
+        purpose: 'weaving service cue',
+        position: [1.1822430117285008, 1.592677387820417, 1.5179573274764089],
+      },
     ],
   },
   {
@@ -162,15 +222,25 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookToolworks',
     dimensions: [5.5, 5.8, 4.5],
     bytes: 39_920,
-    sha256: 'a437cde7b39bfcbd111fce105f9357b073e65359b1dc0259b567817534346d2d',
+    sha256: '30506fe48948ac73c38c713a240be04d1edd5b208331d656b34896b9cc2837a5',
     triangles: 2320,
     primitiveTriangles: [2180, 140],
     triangleCeiling: 6000,
     byteCeiling: 350 * 1024,
     serviceCues: ['covered-tool-display', 'workbench', 'crate', 'barrel'],
     sockets: [
-      { id: 'front-entry', name: 'Socket_FrontEntry', purpose: 'front entrance alignment' },
-      { id: 'tool-display', name: 'Socket_ToolDisplay', purpose: 'tool service cue' },
+      {
+        id: 'front-entry',
+        name: 'Socket_FrontEntry',
+        purpose: 'front entrance alignment',
+        position: [0.7401869290821919, 0, 2.1133093138530685],
+      },
+      {
+        id: 'tool-display',
+        name: 'Socket_ToolDisplay',
+        purpose: 'tool service cue',
+        position: [-1.3570093699840184, 1.9244851767848596, 1.739208601273121],
+      },
     ],
   },
   {
@@ -180,15 +250,25 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookCivicWellBeacon',
     dimensions: [3.2, 3.1, 3.2],
     bytes: 13_216,
-    sha256: '32449160a9e1d0b89687e7d5a2a45feb3b8d293972e29e829cc4b329bd922add',
+    sha256: '6b489548c9e45e2aa1cb5370240dc06dd29d5b548c8b136b7191d2ac2dc86af0',
     triangles: 464,
     primitiveTriangles: [456, 8],
     triangleCeiling: 3000,
     byteCeiling: 180 * 1024,
     serviceCues: ['masonry-well', 'water-basin', 'crystal-beacon'],
     sockets: [
-      { id: 'center', name: 'Socket_CivicCenter', purpose: 'civic center alignment' },
-      { id: 'beacon', name: 'Socket_Beacon', purpose: 'beacon effect anchor' },
+      {
+        id: 'center',
+        name: 'Socket_CivicCenter',
+        purpose: 'civic center alignment',
+        position: [0, 0, 0],
+      },
+      {
+        id: 'beacon',
+        name: 'Socket_Beacon',
+        purpose: 'beacon effect anchor',
+        position: [0, 3.1271887952018855, 0],
+      },
     ],
   },
   {
@@ -198,15 +278,25 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookMarketStall',
     dimensions: [2.8, 2.7, 2.2],
     bytes: 27_072,
-    sha256: '29da7ea6a7613e171d82feb1e5be0d481b3da38d0908a67ae84c7d9725c44af1',
+    sha256: '749a284d004fe11c5786cc425ce092e46eacd100ec2288f871255af676383418',
     triangles: 1314,
     primitiveTriangles: [1294, 20],
     triangleCeiling: 3000,
     byteCeiling: 180 * 1024,
     serviceCues: ['striped-canopy', 'counter-goods', 'crate', 'barrel', 'lanterns'],
     sockets: [
-      { id: 'vendor', name: 'Socket_Vendor', purpose: 'vendor alignment' },
-      { id: 'counter', name: 'Socket_Counter', purpose: 'market service cue' },
+      {
+        id: 'vendor',
+        name: 'Socket_Vendor',
+        purpose: 'vendor alignment',
+        position: [-0.003220054370812568, 0, -0.36377953302247557],
+      },
+      {
+        id: 'counter',
+        name: 'Socket_Counter',
+        purpose: 'market service cue',
+        position: [-0.003220054370812568, 1.244197893566759, 0.5889763867982938],
+      },
     ],
   },
   {
@@ -216,15 +306,25 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookWallWing',
     dimensions: [6.5, 2.7, 0.65],
     bytes: 8352,
-    sha256: 'eb9266aac9075abe32b4b9537c38e035d69335cb254d5324141f7fafebdf10ea',
+    sha256: 'd91d5ee1a9e0890eb639dd7008a6b14f09717d8db555ef799abf9307b027bac4',
     triangles: 206,
     primitiveTriangles: [196, 10],
     triangleCeiling: 206,
     byteCeiling: 180 * 1024,
     serviceCues: ['masonry-courses', 'rail-caps', 'watch-lantern', 'banded-gate-leaf'],
     sockets: [
-      { id: 'left-join', name: 'Socket_LeftJoin', purpose: 'wall chaining anchor' },
-      { id: 'right-gate', name: 'Socket_RightGate', purpose: 'gate-side chaining anchor' },
+      {
+        id: 'left-join',
+        name: 'Socket_LeftJoin',
+        purpose: 'wall chaining anchor',
+        position: [-3.240136579839491, 0, 0],
+      },
+      {
+        id: 'right-gate',
+        name: 'Socket_RightGate',
+        purpose: 'gate-side chaining anchor',
+        position: [3.171092638715929, 0, 0],
+      },
     ],
   },
 ];
@@ -671,6 +771,10 @@ describe('Eastbrook town shipping GLBs', () => {
           interactive: false,
         });
         expectQuantizedArray(runtime.sockets[socket.id].position, node.getTranslation());
+        if (socket.position) {
+          expectQuantizedArray(node.getTranslation(), socket.position);
+          expectQuantizedArray(runtime.sockets[socket.id].position, socket.position);
+        }
       }
       expect(Object.keys(runtime?.sockets ?? {}).sort()).toEqual(
         asset.sockets.map((socket) => socket.id).sort(),
@@ -682,9 +786,9 @@ describe('Eastbrook town shipping GLBs', () => {
       totalTriangles += triangles;
     }
 
-    expect(totalBytes).toBe(343_204);
+    expect(totalBytes).toBe(355_712);
     expect(totalBytes).toBeLessThanOrEqual(Math.floor(1.25 * 1024 * 1024));
-    expect(totalTriangles).toBe(19_918);
+    expect(totalTriangles).toBe(20_698);
     expect(totalTriangles).toBeLessThanOrEqual(30_000);
   });
 
@@ -713,10 +817,10 @@ describe('Eastbrook town shipping GLBs', () => {
     const wholeTownTriangles =
       fixedNonWallTriangles + wallTriangles + optionalFoundationSkirtTriangles;
 
-    expect(buildingTriangles).toBe(17_934);
-    expect(fixedNonWallTriangles).toBe(22_902);
+    expect(buildingTriangles).toBe(18_714);
+    expect(fixedNonWallTriangles).toBe(23_682);
     expect(optionalFoundationSkirtTriangles).toBe(72);
-    expect(wholeTownTriangles).toBe(28_330);
+    expect(wholeTownTriangles).toBe(29_110);
     expect(wholeTownTriangles).toBeLessThanOrEqual(30_000);
   });
 
@@ -769,6 +873,7 @@ describe('Eastbrook town shipping GLBs', () => {
           threshold: number;
           visible: boolean;
         }>;
+        intentionalOmissions: string[];
       }>;
     };
     expect(acceptance.schemaVersion).toBe(1);
@@ -839,18 +944,51 @@ describe('Eastbrook town shipping GLBs', () => {
           feature.threshold,
         );
       }
+      // The inline type above declares intentionalOmissions non-optional, but a
+      // JSON.parse(...) as T cast is not runtime validation: without this, a
+      // review entry missing the field entirely would only be caught for the
+      // bank (the one asset with a full toEqual below). All nine carry it today.
+      expect(Array.isArray(review.intentionalOmissions), asset.id).toBe(true);
+      if (asset.id === 'bank') {
+        expect(review.criticalFeatures.map((feature) => feature.id)).toEqual([
+          'cobalt-gable-and-entry-canopy',
+          'aligned-entry-and-teller-window',
+          'empty-vault-alcove-and-banner-service-cues',
+        ]);
+        expect(review.intentionalOmissions).toEqual([
+          'fine masonry seams',
+          'individual metal fasteners',
+          'baked vault chest because the runtime banker chest remains separate',
+        ]);
+      }
       expect(review.comparisonImage).toBe(`${asset.id}-comparison.png`);
       expect(review.auditImage).toBe(`${asset.id}-optimized-audit-contact.png`);
-      for (const suffix of [
+      const evidenceSuffixes = [
         'procedural-contact.png',
         'raw-contact.png',
         'optimized-contact.png',
         'optimized-audit-contact.png',
         'comparison.png',
-      ]) {
+      ];
+      // A typo'd key in an asset's evidenceSha256 map would otherwise silently
+      // skip that hash check below instead of failing (asset.evidenceSha256?.[suffix]
+      // resolves to undefined and the `if` just no-ops), so pin the key set
+      // itself before relying on the per-suffix lookup.
+      if (asset.evidenceSha256) {
+        expect(Object.keys(asset.evidenceSha256).sort(), asset.id).toEqual(
+          [...evidenceSuffixes].sort(),
+        );
+      }
+      for (const suffix of evidenceSuffixes) {
         const evidencePath = path.join(EVIDENCE_ROOT, `${asset.id}-${suffix}`);
         expect(existsSync(evidencePath), `${asset.id}-${suffix} is missing`).toBe(true);
         expect(statSync(evidencePath).size).toBeGreaterThan(1024);
+        const expectedEvidenceSha = asset.evidenceSha256?.[suffix];
+        if (expectedEvidenceSha) {
+          expect(createHash('sha256').update(readFileSync(evidencePath)).digest('hex')).toBe(
+            expectedEvidenceSha,
+          );
+        }
       }
     }
   });

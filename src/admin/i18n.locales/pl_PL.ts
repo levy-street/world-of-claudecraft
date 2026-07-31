@@ -120,7 +120,6 @@ export const pl_PL: Record<string, string> = {
   'stats.avgTick': 'śr. takt',
   'stats.serverRss': 'rss serwera',
   'online.title': 'Gracze online',
-  'online.refreshHint': 'odświeża się co 5 s',
   'online.empty': 'obecnie nikogo nie ma online',
   'online.colCharacter': 'Postać',
   'online.colClass': 'Klasa',

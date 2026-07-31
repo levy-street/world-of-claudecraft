@@ -2590,7 +2590,7 @@ function mobLocomotion(): Scenario {
     coverage: [
       'attack arm aoePulse rng.range(pulse.min,pulse.max) + spellfx (mogger Ground Pound)',
       'attack arm War Stomp rng.range(stomp.min,stomp.max) + stomp_stun aura (korgath)',
-      'attack arm Banshee terrify rng.range(-PI,PI) fear facing + fear_incap aura (sister_nhalia)',
+      'attack arm Banshee terrify rng.range(-PI,PI) fear facing + fear_incap aura on the non-tank bystander; the aggro target is exempt (sister_nhalia)',
       'idle arm wander draws (range(0,2PI) heading + range(2,9) radius -> groundPos wanderTarget)',
       'evade arm arrival -> resetEvadingMob (rng.range(2,8), full-heal, clearThreat, telegraph re-arm)',
       'cowardly flee: maybeFlee at FLEE_HP_THRESHOLD -> flee arm (fleeMoveSpeed run-away)',
@@ -2603,6 +2603,15 @@ function mobLocomotion(): Scenario {
       const player = sim.entities.get(pid) as AnyEntity;
       rec.track(pid);
       rec.notes.pid = pid;
+      // Terrify spares the boss's current aggro target (the tank exemption), so
+      // a second, non-tank player stands on the tank: the fear heading draw and
+      // the fear_incap aura land on the bystander, and every radius mechanic
+      // (pulse/stomp) now pins its per-player draw loop over two players.
+      const bystanderId = sim.addPlayer('mage', 'Skitter');
+      const bystander = sim.entities.get(bystanderId) as AnyEntity;
+      bystander.pos = { ...player.pos };
+      rec.track(bystanderId);
+      rec.notes.bystanderId = bystanderId;
       // Keep the target alive through every mechanic. beef() on a player does not
       // stick: applyAura -> recalcPlayerStats resets maxHp to the real (level-1)
       // value, so each boss aura would otherwise shrink maxHp and the next mechanic
@@ -2610,6 +2619,7 @@ function mobLocomotion(): Scenario {
       // the draw), so a fresh top-up right before each call keeps every draw firing.
       const reviveTarget = () => {
         player.hp = 1_000_000;
+        bystander.hp = 1_000_000;
       };
 
       // Spawn a boss locked in melee on the player (spawnPos == player pos -> no leash),
@@ -2648,7 +2658,10 @@ function mobLocomotion(): Scenario {
         m.terrifyTimer = 0.001;
       });
       rec.notes.terrifierId = terrifier.id;
-      rec.notes.fearLanded = player.auras.some((a: any) => a.id === 'fear_incap');
+      rec.notes.fearLanded = bystander.auras.some((a: any) => a.id === 'fear_incap');
+      // The tank exemption: the boss's current target draws a heading too (the
+      // stream is identical either way) but is never feared.
+      rec.notes.tankFearLanded = player.auras.some((a: any) => a.id === 'fear_incap');
       rec.snapshot('terrify');
 
       // Idle wander: a mob far out of aggro range whose wanderTimer is due picks a new

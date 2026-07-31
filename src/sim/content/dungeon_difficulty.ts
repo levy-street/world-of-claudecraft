@@ -80,6 +80,17 @@ export interface NormalDungeonTuning {
   // factor. Keys must be a subset of damageMultiplierByMob (pinned by
   // tests/gravewyrm_normal_tuning.test.ts).
   mechanicDamageMultiplierByMob?: Record<string, number>;
+  // Optional per-mob multiplier for a mob's RANGED petSpell nuke. Needed
+  // because damageMultiplierByMob moves dmgBase/dmgPerLevel, which is MELEE
+  // only, while a petSpell caster stands at spell range and casts instead of
+  // swinging (mob/combat_profile.ts updateCasterCombat: "the chase-arm melee
+  // probes are dead in practice"). For such a mob the melee factor is inert and
+  // this is the factor that actually prices it. Rolled damage is unmitigated by
+  // armor, so its floor is measured on the raw hit, not the tank's intake.
+  // Keys must be a subset of damageMultiplierByMob, and every key must name a
+  // template that actually HAS a petSpell (pinned by
+  // tests/wildheart_normal_tuning.test.ts).
+  rangedDamageMultiplierByMob?: Record<string, number>;
 }
 
 // Fresh-group retune (v0.30), pressure pass (2026-07-26): the first v0.30
@@ -140,6 +151,54 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     damageMultiplierByMob: {
       nythraxis_scourge_of_thornpeak: 5,
       nythraxis_skeleton_warrior: 5,
+    },
+  },
+  // Wildheart Basin shipped with a heroic record but NO normal one, so its
+  // normal mode ran the raw base templates: trash swung 26-32 post-mitigation
+  // on the reference warrior and Zulgar 35, against the Sanctum's 103-112 and
+  // 200-301. That is 3.5x under on trash and 6-8x under on the boss, for a
+  // dungeon whose loot and level sit in the same endgame band. This record puts
+  // normal Wildheart on the SANCTUM NORMAL calibration: the same DOUBLED health
+  // and the same reference warrior (level-20 prot, 2861 armor, Defensive
+  // Stance), floored per band at trash 100 / boss 200.
+  //
+  // Two Wildheart-specific departures from the Sanctum table, both forced by
+  // the roster rather than chosen:
+  // 1. A third band at 150 for wildheart_beastmaster. It is a rare, ccImmune
+  //    pack-leader that spawns TWICE and carries warcry + wardAllies + stomp,
+  //    so it out-presses trash, but it is not the final boss and must not read
+  //    as a third Zulgar. Nythraxis set the same precedent (its own 600/300
+  //    bands rather than the five-man 500/250).
+  // 2. rangedDamageMultiplierByMob for the two petSpell casters. HALF the
+  //    20-spawn roster (stalker x6, hexcaller x4) is a ranged caster that never
+  //    melees, so its damageMultiplierByMob factor is inert and its real output
+  //    is a petSpell nuke no other knob reaches. Priced to the same 100 minimum
+  //    hit as trash melee: unmitigated by armor and landable on any group
+  //    member, which is what makes them the priority kill the content brief
+  //    calls for. Their melee factors are still solved to the 100 floor so a
+  //    caster cornered in melee range (the chase arm) is on-model too.
+  //
+  // Mechanics ride each mob's own melee factor with NO override, which is the
+  // Sanctum default: Zulgar's Wildheart Pulse lands 170-243 raw every 9s
+  // against Korgath's Shuddering Stomp at 190-285 every 12s, and the
+  // beastmaster's Beast Pit Quake 88-130. Support scales on mechanicHealMult
+  // (= healthMultiplier), so the hexcaller's Ancestral Sap heals 72-100 and
+  // Thickhide Ward absorbs 140, both keeping pace with the doubled pools.
+  // Pinned by tests/wildheart_normal_tuning.test.ts.
+  wildheart_basin: {
+    id: 'wildheart_basin',
+    difficulty: 'normal',
+    healthMultiplier: 2.0,
+    damageMultiplierByMob: {
+      wildheart_stalker: 3.7,
+      wildheart_ravager: 3.15,
+      wildheart_hexcaller: 3.9,
+      wildheart_beastmaster: 4.2,
+      wildheart_high_priest: 5.65,
+    },
+    rangedDamageMultiplierByMob: {
+      wildheart_stalker: 2.7,
+      wildheart_hexcaller: 2.5,
     },
   },
 };

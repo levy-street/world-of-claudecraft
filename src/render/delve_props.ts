@@ -8,7 +8,7 @@
 
 import * as THREE from 'three';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { delveInteractableVisible } from './delve_interactable_visibility_core';
 import { buildDungeonPropMesh } from './dungeon';
 import { GFX, surfaceMat } from './gfx';
@@ -33,7 +33,7 @@ const loadedStandaloneProp = new Map<StandalonePropKey, THREE.Group>();
 
 if (typeof window !== 'undefined') {
   for (const [key, url] of Object.entries(STANDALONE_PROP_URL) as [StandalonePropKey, string][]) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url).then((gltf) => {
         loadedStandaloneProp.set(key, gltf.scene);
       }),

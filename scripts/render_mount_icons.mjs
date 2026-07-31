@@ -1,4 +1,4 @@
-// Render 3D face/front icons for the six rideable mounts, for use as the 2D bag/tooltip
+// Render 3D face/front icons for the rideable mounts, for use as the 2D bag/tooltip
 // icons on their reins items (and the mount-picker cards). Mirrors the headless-Chrome +
 // swiftshader harness of scripts/render_weapon_icons.mjs and the transparent-WebP + blank
 // alpha check of scripts/wiki/render_model_stills.mjs, but frames a front three-quarter
@@ -16,6 +16,7 @@ import * as esbuild from 'esbuild';
 import puppeteer from 'puppeteer-core';
 import sharp from 'sharp';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { ktx2TranscoderScriptTag } from './lib/ktx2_assets.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mountsDir = path.join(root, 'public/models/mounts');
@@ -69,6 +70,13 @@ const JOBS = [
     id: 'reins_thunderstrut_gobbler',
     cfg: { headFwd: 0.7, headUp: 0.7, fill: 0.62, yaw: 0.45, pitch: 0.12 },
   },
+  {
+    // Show the cannon, prow, and near track together so the silhouette reads
+    // as a vehicle even at bag-icon size.
+    file: 'terrorspark_groundshaker.glb',
+    id: 'reins_terrorspark_groundshaker',
+    cfg: { headFwd: 0.1, headUp: 0, fill: 1.18, yaw: 0.68, pitch: 0.24 },
+  },
 ];
 
 const only = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;
@@ -83,7 +91,10 @@ const built = await esbuild.build({
   logLevel: 'silent',
 });
 const bundleJs = built.outputFiles[0].text;
-const html = `<!doctype html><html><head><meta charset="utf8"><style>html,body{margin:0;background:transparent}</style></head><body><script>${bundleJs}</script></body></html>`;
+const ktx2Tag = ktx2TranscoderScriptTag(
+  path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
+);
+const html = `<!doctype html><html><head><meta charset="utf8"><style>html,body{margin:0;background:transparent}</style></head><body>${ktx2Tag}<script>${bundleJs}</script></body></html>`;
 
 // 2) Drive headless Chrome over software WebGL.
 const browser = await puppeteer.launch({

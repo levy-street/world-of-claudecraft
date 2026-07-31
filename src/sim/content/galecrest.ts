@@ -132,9 +132,13 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13, // a fleece the wind gave up on
     moveSpeed: 8.5,
     aggroRadius: 0, // grazing the downs, braced side-on to the gale
-    loot: [{ itemId: 'galecrest_ram_wool', chance: 0.65, questId: 'q_gc_wool_off_the_downs' }],
+    loot: [
+      { copper: 105, chance: 1 },
+      { itemId: 'galecrest_ram_wool', chance: 0.65, questId: 'q_gc_wool_off_the_downs' },
+    ],
     scale: 1.1,
     color: 0xd8d0c0,
+    componentTags: ['hide', 'meat'],
   },
   gale_wisp: {
     id: 'gale_wisp',
@@ -150,7 +154,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 9,
     moveSpeed: 9,
     aggroRadius: 11, // a knot of living wind, and it resents shelter
-    loot: [],
+    loot: [{ copper: 105, chance: 1 }],
     scale: 1.25,
     color: 0xbfe0e8,
   },
@@ -168,7 +172,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 14, // storm-shell
     moveSpeed: 7,
     aggroRadius: 8,
-    loot: [],
+    loot: [{ copper: 105, chance: 1 }],
     scale: 1.2,
     color: 0x8898a8,
   },
@@ -177,7 +181,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     name: 'Downs Bandit',
     minLevel: 20,
     maxLevel: 20,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 52,
     hpPerLevel: 18,
     dmgBase: 11,
@@ -186,7 +190,11 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 8.5,
     aggroRadius: 10, // squatting the old raider tents, and keeping them
-    loot: [],
+    loot: [
+      { copper: 100, chance: 1 },
+      { itemId: 'bandit_bandana', chance: 0.5 },
+      { itemId: 'linen_scrap', chance: 0.3 },
+    ],
     scale: 0.95,
     color: 0x5a8a46,
   },
@@ -195,7 +203,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     name: 'Wreckfield Thief',
     minLevel: 20,
     maxLevel: 20,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 52,
     hpPerLevel: 18,
     dmgBase: 11,
@@ -204,7 +212,11 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 8.5,
     aggroRadius: 10, // every beached cargo on this coast is theirs by claim
-    loot: [],
+    loot: [
+      { copper: 100, chance: 1 },
+      { itemId: 'bandit_bandana', chance: 0.5 },
+      { itemId: 'linen_scrap', chance: 0.3 },
+    ],
     scale: 0.95,
     color: 0x5a8a46,
   },
@@ -223,7 +235,10 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 14, // every hull on that beach is a grave he keeps
     elite: true,
-    loot: [],
+    loot: [
+      { copper: 100, chance: 1 },
+      { itemId: 'bone_fragments', chance: 1 },
+    ],
     scale: 1.45,
     color: 0x7a8a86,
   },
@@ -245,7 +260,10 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13,
     moveSpeed: 7.5,
     aggroRadius: 12,
-    loot: [],
+    loot: [
+      { copper: 100, chance: 1 },
+      { itemId: 'bone_fragments', chance: 0.5 },
+    ],
     scale: 1.05,
     color: 0x86988e,
   },

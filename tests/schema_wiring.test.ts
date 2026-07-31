@@ -535,6 +535,7 @@ describe('ensureSchema wires every schema module at boot', () => {
       'daily_reward_events_account_day_created_id',
       'play_sessions_open_character',
       'client_perf_reports_worst10s_created',
+      'play_sessions_ended_account',
     ]);
   });
 

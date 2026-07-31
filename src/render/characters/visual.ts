@@ -450,6 +450,21 @@ export class CharacterVisual {
       idle.play();
       this.current = idle;
     }
+
+    // The atlas for a non-default skin may not be resident at construction: the
+    // packaged iOS shell defers the boot atlas sweep (assets.ts), so a visual
+    // born with a cosmetic skin applies the embedded default above and heals
+    // here once the atlas arrives - the same ensure + re-apply round-trip
+    // setSkin() already runs for live swaps. No-op when the atlas is resident
+    // (ensureSkinTexture returns null), so eager platforms are unchanged.
+    const pendingAtlas = ensureSkinTexture(this.key, skinIndex);
+    if (pendingAtlas) {
+      void pendingAtlas
+        .then(() => {
+          if (!this.disposed && this.skinIndex === skinIndex) this.applySkinMaterials(skinIndex);
+        })
+        .catch((err) => console.error('failed to load skin atlas:', err));
+    }
   }
 
   // -------------------------------------------------------------------------

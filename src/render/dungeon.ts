@@ -45,7 +45,7 @@ import {
 } from '../sim/rift/authored';
 import { ARENA_WATER_NAVE_HALF_X, arenaWaterBands } from './arena_water_band_core';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { fitAuthoredWallSegment } from './authored_walls_core';
 import { DAIS_PLATFORM_HEIGHT } from './dais_lift';
 import {
@@ -491,7 +491,7 @@ export function loadKitModules(names: readonly string[]): Promise<void> {
 // kit + Halloween-bits modules stream in (and their shaders compile) the moment
 // the camera nears a dungeon door, which is the on-approach freeze at the Fallen
 // Chapel. assetsReady() now genuinely covers everything buildInterior needs.
-if (typeof window !== 'undefined') registerPreload(ensureDungeonAssets());
+if (typeof window !== 'undefined') registerDeferredPreload(() => ensureDungeonAssets());
 
 // ---------------------------------------------------------------------------
 // Deterministic placement helpers
@@ -850,6 +850,7 @@ export class DungeonInteriors {
         fireLights: this.fireLights,
       });
       group.position.set(ox, 0, oz);
+      group.userData.renderCategory = 'dungeon';
       this.scene.add(group);
       return group;
     }
@@ -944,6 +945,7 @@ export class DungeonInteriors {
         floor: opts?.style?.floorTint ?? (variant === 'lastkeep' ? KEEP_FLOOR_TINT : undefined),
       });
       group.position.set(ox, 0, oz);
+      group.userData.renderCategory = 'dungeon';
       this.scene.add(group);
       return group;
     }
@@ -999,6 +1001,7 @@ export class DungeonInteriors {
       for (const wall of arenaWalls.all) this.emitArenaHideable(group, wall, variant);
     }
     group.position.set(ox, 0, oz);
+    group.userData.renderCategory = 'dungeon';
     this.scene.add(group);
     return group;
   }

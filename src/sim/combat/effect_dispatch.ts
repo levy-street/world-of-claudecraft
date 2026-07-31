@@ -71,7 +71,7 @@ import {
   selectCascadeTargets,
 } from './chronomancy';
 import { extendOwnedDot } from './dot_mutation';
-import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
+import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { fireGuaranteedCrit, personalBarrierIdForSpec } from './fire_mage';
@@ -84,6 +84,10 @@ import {
 } from './frost_mage';
 import { spawnFrozenOrb } from './frozen_orb';
 import { glacialFrontContains } from './glacial_front';
+import {
+  applyGreaterInvisibilityAftereffect,
+  GREATER_INVISIBILITY_DR_AURA_ID,
+} from './greater_invisibility';
 import { livingGroupRaidInRadius } from './group_targeting';
 import { applyGroupHaste } from './haste_burst';
 import { armHeroicLeap, relocateSwept } from './heroic_leap';
@@ -315,7 +319,12 @@ export function runEffects(
     }
   }
 
-  if (ability.requiresAuraKind) consumeAuraKind(ctx, p, ability.requiresAuraKind);
+  // requiresAuraKind (Glacial Spike's Icicles, Victory Rush's kill window) is now
+  // consumed atomically at cast commit in casting_lifecycle.ts's applyAbility,
+  // alongside spendAbilityCost/armAbilityCooldown, not here: a ranged ability's
+  // runEffects can run ticks after the cast committed (once its projectile
+  // lands), which used to leave the gating aura alive for a same-tick second
+  // cast attempt (issue #2632).
 
   for (const eff of res.effects) {
     switch (eff.type) {
@@ -964,6 +973,10 @@ export function runEffects(
           ctx.applyNonPlayerStatAura(target, aura, -1);
           target.auras.splice(index, 1);
           ctx.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: false });
+          if (aura.kind === 'stealth') {
+            target.stealthed = target.auras.some((entry) => entry.kind === 'stealth');
+          }
+          applyGreaterInvisibilityAftereffect(ctx, target, aura);
           if (eff.steal && offensive) {
             ctx.applyAura(p, { ...aura, sourceId: p.id });
           }
@@ -1965,11 +1978,17 @@ export function runEffects(
         break;
       }
       case 'greaterInvisibility': {
-        // One dispatch applies the whole package so the two self-auras carry
-        // distinct ids (the selfBuff case keys auras by the ability id alone):
-        // strip up to N DoTs (newest first), vanish via the stealth machinery
-        // (applyAura sets stealthed), and a buff_dr cut that outlives the
-        // vanish by `linger` so it survives an early break. Draws no rng.
+        // Strip up to N DoTs (newest first), then vanish through the shared
+        // stealth machinery. value2/value3 carry the configured defensive
+        // aftereffect so whichever normal path ends the vanish applies it once.
+        // A reset-assisted recast may have just ended the previous vanish, so
+        // clear that aftereffect before entering invisibility again.
+        const existingDr = p.auras.findIndex((a) => a.id === GREATER_INVISIBILITY_DR_AURA_ID);
+        if (existingDr >= 0) {
+          const gone = p.auras[existingDr];
+          p.auras.splice(existingDr, 1);
+          ctx.emit({ type: 'aura', targetId: p.id, name: gone.name, gained: false });
+        }
         let removed = 0;
         for (let i = p.auras.length - 1; i >= 0 && removed < eff.removeDotCount; i--) {
           if (p.auras[i].kind !== 'dot') continue;
@@ -1988,16 +2007,8 @@ export function runEffects(
           remaining: eff.duration,
           duration: eff.duration,
           value: 1,
-          sourceId: p.id,
-          school: ability.school,
-        });
-        ctx.applyAura(p, {
-          id: `${ability.id}_dr`,
-          name: ability.name,
-          kind: 'buff_dr',
-          remaining: eff.duration + eff.linger,
-          duration: eff.duration + eff.linger,
-          value: eff.drValue,
+          value2: eff.drValue,
+          value3: eff.afterDuration,
           sourceId: p.id,
           school: ability.school,
         });

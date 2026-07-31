@@ -340,11 +340,14 @@ export const fr_CA: EnTranslations = {
       "menuButton": "Déblocage",
       "help": "Récupération : /unstuck démarre un compte à rebours immobile qui vous déplace vers un endroit sûr et accessible à proximité.",
       "helpAtGraveyard": "Récupération : /unstuck démarre un compte à rebours immobile, puis envoie votre esprit au cimetière le plus proche. Revenir par le Veilleur pâle exige le Glas du Veilleur.",
+      "helpUnstuckSickness": "Récupération : /unstuck démarre un compte à rebours immobile, puis vous déplace au cimetière le plus proche en vous ranimant si vous étiez tombé. Le Mal de déblocage vous accable pendant 5 minutes au maximum.",
       "started": "Déblocage dans {seconds} secondes. Bouger, combattre, subir des dégâts ou commencer une autre action l'annule.",
       "countdown": "Déblocage: {seconds}",
       "completed": "Déplacé vers l'endroit sûr accessible le plus proche.",
       "completedAtGraveyard": "Votre esprit est retourné au cimetière le plus proche. Parlez au Veilleur pâle pour accepter le Glas du Veilleur.",
       "revivedAtGraveyard": "Vous avez été ramené au cimetière le plus proche et ranimé. Le Glas du Veilleur pèse sur vous.",
+      "movedToGraveyard": "Vous avez été déplacé au cimetière le plus proche. Le Mal de déblocage pèse sur vous.",
+      "revivedAtGraveyardUnstuck": "Vous avez été déplacé au cimetière le plus proche et ranimé. Le Mal de déblocage pèse sur vous.",
       "cancelledMoved": "Déblocage annulé : vous avez bougé.",
       "cancelledDamaged": "Déblocage annulé : vous avez subi des dégâts.",
       "cancelledCombat": "Déblocage annulé : vous êtes entré en combat.",
@@ -885,6 +888,13 @@ export const fr_CA: EnTranslations = {
       "heroicName": "{name} héroïque",
       "heroicLocked": "Vous êtes verrouillé sur {name} héroïque."
     },
+    "riftTracker": {
+      "title": "Faille",
+      "floor": "Étage {current} sur {total}",
+      "closesIn": "Se ferme dans {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -956,13 +966,15 @@ export const fr_CA: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, le Crapaud Saute-Ombre",
       "name_stormfeather_griffin": "Plume-d’Orage Toise-Ciel",
       "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
       "desc_aether_hover_cycle": "Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.",
       "desc_shadowjump_toad": "Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.",
       "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.",
-      "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage."
+      "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
@@ -2117,6 +2129,7 @@ export const fr_CA: EnTranslations = {
         "noRecipient": "Personne de ce nom ne possède de boîte aux lettres ici.",
         "tooManyParcels": "Une lettre transporte au plus {count} colis.",
         "noMailQuestItems": "Vous ne pouvez pas envoyer d'objets de quête par courrier.",
+        "noMailBound": "Cet objet est lié et ne peut pas être envoyé par courrier.",
         "notEnoughItems": "Vous n'en avez pas autant à envoyer.",
         "cantAffordPostage": "Vous n'avez pas de quoi payer l'affranchissement.",
         "recipientBoxFull": "Sa boîte aux lettres est pleine.",
@@ -2925,6 +2938,9 @@ export const fr_CA: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez."
+    },
+    "ota_updates": {
+      "invalid_input": "Saisie invalide."
     }
   },
   "guide": {
@@ -3524,14 +3540,6 @@ export const fr_CA: EnTranslations = {
       "reptile": {
         "name": "Reptiles",
         "desc": "Des chasseurs à sang froid dotés d'un sifflement et d'un claquement qui leur sont propres, distincts des créatures à sang chaud."
-      },
-      "murloc": {
-        "name": "Coasse-Palmes",
-        "desc": "Peuple-poisson coassant des rives et des bassins de marée, prompt à submerger quiconque s'aventure trop près."
-      },
-      "kobold": {
-        "name": "Chenapans",
-        "desc": "Charognards agiles et lutins des clairières et des haies, plus nuisance que menace, jusqu'à ce qu'ils se regroupent en nombre."
       },
       "demon": {
         "name": "Démons",
@@ -6473,11 +6481,12 @@ export const fr_CA: EnTranslations = {
       "arenaQueueTrading": "Terminez votre échange avant de rejoindre la file.",
       "arenaQueueInstance": "Vous ne pouvez pas rejoindre la file depuis une instance.",
       "tradeInProgress": "Un échange est déjà en cours.",
-      "tradeAlreadyTrading": "That player is already trading.",
+      "tradeAlreadyTrading": "Ce joueur est déjà en train d’échanger.",
       "tradeTooFar": "La cible est trop éloignée pour échanger.",
       "tradeExpired": "La demande d'échange a expiré.",
       "tradeFailed": "Échange échoué : objets ou argent indisponibles.",
-      "tradeBound": "Cet objet est lié et ne peut pas être échangé."
+      "tradeBound": "Cet objet est lié et ne peut pas être échangé.",
+      "marketListBound": "Cet objet est lié et ne peut pas être mis en vente."
     },
     "logs": {
       "standUp": "Vous vous levez.",
@@ -6833,7 +6842,8 @@ export const fr_CA: EnTranslations = {
       "incomplete": "Cette quête n'est pas terminée.",
       "giverMissing": "Le donneur de cette quête n'est pas à proximité.",
       "turnInMissing": "Le rendu de cette quête n'est pas à proximité.",
-      "tooFar": "Vous êtes trop loin."
+      "tooFar": "Vous êtes trop loin.",
+      "escortAway": "Votre escorte n'est pas à son poste pour le moment. Elle y reviendra sous peu."
     }
   },
   "itemUi": {
@@ -7221,7 +7231,7 @@ export const fr_CA: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilité accrue",
-        "description": "Disparais pendant 20 s : enlève 2 effets de dégâts périodiques et réduit de 90% les dégâts que tu subis tant que tu es invisible et pour un court moment après. (Talent de mage)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Suite flamboyante",
@@ -9727,6 +9737,9 @@ export const fr_CA: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Chevalière de The Last Keep"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "slag_tempered_sabatons": {
         "name": "Bottes de plaque trempées dans le laitier"
@@ -13000,7 +13013,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Ramener Wren à bon port",
-        "text": "Mon apprentie Wren est partie parcourir la ligne du Goldmelt il y a deux jours et n'est jamais revenue. J'ai trouvé ses traces, elle s'est terrée sous les bornes routières au sud-ouest des Marches de l'Aurore, trop effrayée par les loups pour bouger. Je ne peux quitter la tourbière, {playerName}. Ramenez-la au camp de Veyla sur les Marches. Elle sera en sécurité sous les lumières.",
+        "text": "Mon apprentie Wren est partie parcourir la ligne du Goldmelt il y a deux jours et n'est jamais revenue. J'ai trouvé ses traces, elle s'est terrée sous les bornes routières au nord-est des Marches de l'Aurore, trop effrayée par les loups pour bouger. Je ne peux quitter la tourbière, {playerName}. Ramenez-la au camp de Veyla sur les Marches. Elle sera en sécurité sous les lumières.",
         "completion": "La fille est à l'intérieur, enroulée dans la moitié de mes couvertures, à discourir sur les étoiles. Vous avez fait une bonne chose aujourd'hui, {playerName}. Le Reach n'en voit pas beaucoup.",
         "objectives": {
           "0": {
@@ -13684,7 +13697,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Que Bram revienne",
-        "text": "Mon Bram a pris le bateau le matin où la brèche-des-filets s'est ouverte, et la mer l'a rejeté quelque part au-delà de la pointe du Débarcadère. Je l'ai entendu il y a trois nuits, {playerName}, appeler par-dessus l'eau, et j'étais trop effrayée pour y aller. Je le suis encore. Je vous en prie. Son bateau gît naufragé sur la rive nord. Ramenez-le-moi.",
+        "text": "Mon Bram a pris le bateau le matin où la brèche-des-filets s'est ouverte, et la mer l'a rejeté quelque part au-delà de la pointe du Débarcadère. Je l'ai entendu il y a trois nuits, {playerName}, appeler par-dessus l'eau, et j'étais trop effrayée pour y aller. Je le suis encore. Je vous en prie. Son bateau gît naufragé sur la rive sud. Ramenez-le-moi.",
         "completion": "Bram ! Vous me l'avez ramené entier, {playerName}. Nous avons tous les deux pleuré, et aucun de nous n'en a honte. Quoi que les brèches prennent ensuite à cette île, elles n'auront pas ma famille. Plus jamais.",
         "objectives": {
           "0": {

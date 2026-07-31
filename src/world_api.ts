@@ -194,6 +194,7 @@ export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
 export type { WorldInteractionOutcome } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
+export { queryDiffersFromEcho, searchDiffersFromEcho } from './world_api/market';
 export type { MountRaceView } from './world_api/mounts';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
 export type {
@@ -392,6 +393,7 @@ export const COMMAND_NAMES = [
   'deleteLoadout',
   'market_search',
   'market_list',
+  'market_list_instance',
   'market_buy',
   'market_cancel',
   'market_collect',
@@ -702,6 +704,7 @@ export const COMMAND_FACETS = {
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
   market_list: 'IWorldMarket',
+  market_list_instance: 'IWorldMarket',
   market_buy: 'IWorldMarket',
   market_cancel: 'IWorldMarket',
   market_collect: 'IWorldMarket',

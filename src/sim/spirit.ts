@@ -15,6 +15,11 @@
 //      in place, at the cost of Resurrection Sickness (RES_SICKNESS_*). For corpses
 //      that are unreachable.
 //
+// Sitting beside that loop but NOT part of it: the two /unstuck outcomes
+// (moveToGraveyardForUnstuck / reviveAtGraveyardForUnstuck). Unstuck never kills and never
+// leaves a corpse; it moves the player to the nearest graveyard, raises them if they were
+// down, and charges Unstuck Sickness instead of routing them through the Pale Keeper.
+//
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now.
 
 import {
@@ -37,6 +42,10 @@ import {
   RES_SICKNESS_STAT_MULT,
   RESURRECTION_SICKNESS_ID,
   resSicknessDuration,
+  SICKNESS_AURA_IDS,
+  UNSTUCK_SICKNESS_ID,
+  UNSTUCK_SICKNESS_STAT_MULT,
+  unstuckSicknessDuration,
 } from './resurrection';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -57,10 +66,11 @@ export const RES_HP_FRACTION = 0.5;
 // hp/mana AND inflicts Resurrection Sickness, so the penalty-free corpse run is the
 // reward for running your spirit all the way back.
 export const RES_HEALER_HP_FRACTION = 0.2;
-// Resurrection Sickness (display "The Keeper's Toll"), its level-scaled duration, and the
-// "survives death" predicate live in ./resurrection (a leaf module shared by every
-// death/respawn site). Re-export the id so it stays importable from here.
-export { RESURRECTION_SICKNESS_ID };
+// Resurrection Sickness (display "The Keeper's Toll"), Unstuck Sickness, their
+// level-scaled durations, and the "survives death" predicate live in ./resurrection (a leaf
+// module shared by every death/respawn site). Re-export the ids so they stay importable
+// from here.
+export { RESURRECTION_SICKNESS_ID, UNSTUCK_SICKNESS_ID };
 
 // --- graveyard selection ----------------------------------------------------
 
@@ -145,27 +155,62 @@ export function releasePlayerSpirit(
     releaseSpiritInDelve(ctx, meta.entityId);
     return;
   }
-  releaseAtNearestGraveyard(ctx, meta, p, true, graveyards, fallback);
+  releaseAtNearestGraveyard(ctx, meta, p, graveyards, fallback);
 }
 
 /**
- * Finish Unstuck through the ordinary graveyard/Pale Keeper loop. Unlike a
- * normal death, the abandoned body cannot be used for a penalty-free corpse
- * resurrection: the player must accept The Keeper's Toll at the graveyard.
+ * Finish Unstuck for a LIVING player: move them to the nearest graveyard and leave them
+ * alive. No death and no corpse; the whole price is Unstuck Sickness. The graveyard (rather
+ * than a nearby safe spot) is the destination because it is the one point in every zone
+ * guaranteed to be reachable open ground.
+ *
+ * The countdown's own gates (blockedReason/cancelReason in ./unstuck) guarantee that a
+ * player who reaches this point is out of combat, standing still, and not casting, eating,
+ * sitting, charging, or following, so none of that state needs unwinding here.
  */
-export function releasePlayerSpiritForUnstuck(ctx: SimContext, pid?: number): void {
+export function moveToGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
-  if (!r?.e.dead || r.e.ghost) return;
-  releaseAtNearestGraveyard(ctx, r.meta, r.e, false);
+  if (!r || r.e.dead || r.e.ghost) return;
+  const { meta, e: p } = r;
+  // Resolve the graveyard before the move takes the player out of its instance band.
+  const gy = ghostGraveyard(ctx, p);
+  p.pos = ctx.groundPos(gy.x, gy.z);
+  p.prevPos = { ...p.pos };
+  ctx.rebucket(p);
+  p.facing = 0;
+  // Whatever keys were held when the countdown finished must not carry over, or the
+  // player walks off the graveyard in the last held direction the instant they land
+  // (the same reason the release and revive paths below clear this).
+  Object.assign(meta.moveInput, emptyMoveInput());
+  p.vx = 0;
+  p.vy = 0;
+  p.vz = 0;
+  // Land settled, the same recipe as the portal teleport (see portals.ts): no carried-over
+  // jump arc or fall origin from the old position, so a move off a high ledge can never
+  // deal fall damage on arrival.
+  p.jumping = false;
+  p.onGround = true;
+  p.fallStartY = p.pos.y;
+  // Everything that pointed at where they used to be is now out of range.
+  p.targetId = null;
+  p.autoAttack = false;
+  p.queuedOnSwing = null;
+  delete p.queuedOnSwingFree;
+  delete p.queuedOnSwingCostMultiplier;
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
+  // Applied last: the sickness drains stamina, so recalcPlayerStats (via applyAura) rebuilds
+  // the pools and carries the current hp/mana FRACTIONS into the reduced maxima. A player at
+  // full health arrives at full health of a smaller bar rather than over the top of it.
+  applyUnstuckSickness(ctx, p);
 }
 
 /**
- * Finish Unstuck for a player who was ALREADY dead when they invoked it. The
- * graveyard/Pale Keeper loop has nothing left to offer a body that cannot reach
- * its corpse or an angel, so pull them to the graveyard and resurrect them there
- * on exactly the Spirit Healer's terms: RES_HEALER_HP_FRACTION of their pools
- * plus The Keeper's Toll. Unstuck only saves them the walk, never the toll, so it
- * can never be the cheap way out of a death.
+ * Finish Unstuck for a player who was dead or a released ghost: pull them to the nearest
+ * graveyard and raise them there at RES_HEALER_HP_FRACTION of their pools. This is the
+ * escape hatch for a spirit that cannot reach its corpse or an angel. It charges Unstuck
+ * Sickness, not The Keeper's Toll, so it is a shorter penalty than walking to the Pale
+ * Keeper would have been but it is never free.
  */
 export function reviveAtGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -173,7 +218,7 @@ export function reviveAtGraveyardForUnstuck(ctx: SimContext, pid?: number): void
   const { meta, e: p } = r;
   // Resolve the graveyard before the revive moves the body out of its instance band.
   const gy = ghostGraveyard(ctx, p);
-  reviveAt(ctx, meta, p, { x: gy.x, y: p.pos.y, z: gy.z }, RES_HEALER_HP_FRACTION, true);
+  reviveAt(ctx, meta, p, { x: gy.x, y: p.pos.y, z: gy.z }, RES_HEALER_HP_FRACTION, 'unstuck');
   ctx.emit({ type: 'respawn', pid: meta.entityId });
 }
 
@@ -181,19 +226,23 @@ function releaseAtNearestGraveyard(
   ctx: SimContext,
   meta: PlayerMeta,
   p: Entity,
-  leaveCorpse: boolean,
   graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
   fallback: { x: number; z: number } = PLAYER_START,
 ): void {
   // Resolve the graveyard before moving the entity out of its instance band.
   const gy = ghostGraveyard(ctx, p, graveyards, fallback);
-  p.corpsePos = leaveCorpse ? { x: p.pos.x, y: p.pos.y, z: p.pos.z } : null;
-  p.corpseInstanceId = leaveCorpse ? ctx.instanceClaimIdAt(p.pos) : null;
+  p.corpsePos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
+  p.corpseInstanceId = ctx.instanceClaimIdAt(p.pos);
   p.ghost = true; // p.dead stays true
   p.pos = ctx.groundPos(gy.x, gy.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
+  // prevFacing pairs with facing on every forced-facing site in the sim (see
+  // mob/lifecycle.ts, sim.ts, social/arena.ts): leaving it stale here made the
+  // render-interpolated facing sweep from the pre-death heading to 0 over the
+  // next tick window instead of landing on 0 immediately.
   p.facing = 0;
+  p.prevFacing = 0;
   // Whatever movement keys were held at the moment of death must not carry over: the
   // ghost is teleported to the graveyard and should sit still until the player actually
   // presses a key again, not keep walking in the last held direction.
@@ -229,7 +278,7 @@ export function resurrectAtCorpse(ctx: SimContext, pid?: number): void {
   if (dist2d(p.pos, p.corpsePos) > CORPSE_REZ_RANGE) return;
   // Revive where the ghost is standing (it ran back to within range of the body), not
   // teleported onto the exact corpse point.
-  reviveAt(ctx, meta, p, p.pos, RES_HP_FRACTION, false);
+  reviveAt(ctx, meta, p, p.pos, RES_HP_FRACTION, 'none');
   ctx.emit({ type: 'respawn', pid: meta.entityId });
 }
 
@@ -242,7 +291,7 @@ export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean 
   if (!spiritHealerInRange(ctx, p)) return false;
   // The Spirit Healer always inflicts Resurrection Sickness and returns you at only
   // RES_HEALER_HP_FRACTION of your pools (the corpse run is the penalty-free choice).
-  reviveAt(ctx, meta, p, p.pos, RES_HEALER_HP_FRACTION, true);
+  reviveAt(ctx, meta, p, p.pos, RES_HEALER_HP_FRACTION, 'resurrection');
   ctx.emit({ type: 'respawn', pid: meta.entityId });
   return true;
 }
@@ -257,10 +306,10 @@ export function resurrectOnInstanceReentry(
   p: Entity,
   pos: Vec3,
 ): void {
-  // Unstuck deliberately abandons its corpse so the Pale Keeper toll cannot be
-  // bypassed by walking the ghost through an unrelated instance entrance.
+  // Only a spirit whose body actually lies inside an instance revives on re-entry, so
+  // walking a ghost through an unrelated door is not a free resurrection.
   if (!p.corpsePos || p.corpseInstanceId === null) return;
-  reviveAt(ctx, meta, p, pos, RES_HP_FRACTION, false);
+  reviveAt(ctx, meta, p, pos, RES_HP_FRACTION, 'none');
   ctx.emit({ type: 'respawn', pid: meta.entityId });
 }
 
@@ -268,7 +317,7 @@ export function revivePlayerAt(ctx: SimContext, pid: number, pos: Vec3, hpFrac =
   const r = ctx.resolve(pid);
   if (!r) return;
   const wasDead = r.e.dead || r.e.ghost;
-  reviveAt(ctx, r.meta, r.e, pos, hpFrac, false);
+  reviveAt(ctx, r.meta, r.e, pos, hpFrac, 'none');
   if (wasDead) ctx.emit({ type: 'respawn', pid: r.meta.entityId });
 }
 
@@ -281,15 +330,18 @@ function spiritHealerInRange(ctx: SimContext, p: Entity): boolean {
   return false;
 }
 
+/** Which sickness a revive charges: none, The Keeper's Toll, or the shorter Unstuck one. */
+type SicknessKind = 'none' | 'resurrection' | 'unstuck';
+
 // Shared resurrection: clear the ghost/corpse state, place the body, restore half
-// pools, and (when penalized) apply Resurrection Sickness.
+// pools, and (when penalized) apply the named sickness.
 function reviveAt(
   ctx: SimContext,
   meta: PlayerMeta,
   p: Entity,
   pos: Vec3,
   hpFrac: number,
-  sickness: boolean,
+  sickness: SicknessKind,
 ): void {
   p.dead = false;
   p.ghost = false;
@@ -298,13 +350,15 @@ function reviveAt(
   p.pos = ctx.groundPos(pos.x, pos.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
+  // See releasePlayerSpirit above: pair prevFacing with the forced facing reset.
   p.facing = 0;
+  p.prevFacing = 0;
   // As with the release above: a held movement key at the moment the revive lands must
   // not carry over, or the freshly-revived body immediately walks off in whatever
   // direction was last held (this is what made revived players drift with no input).
   Object.assign(meta.moveInput, emptyMoveInput());
-  // Keep The Keeper's Toll across the revive (it persists through death); a healer
-  // resurrection refreshes it to full duration via applyResurrectionSickness below.
+  // Keep both sicknesses across the revive (they persist through death); a healer
+  // resurrection refreshes The Keeper's Toll to full duration via the apply below.
   p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
@@ -319,25 +373,69 @@ function reviveAt(
   p.inCombat = false;
   // Apply sickness last: applyAura -> recalcPlayerStats preserves the hp/resource
   // fractions just set, so hp settles at RES_HP_FRACTION of the reduced max.
-  if (sickness) applyResurrectionSickness(ctx, p);
+  if (sickness === 'resurrection') applyResurrectionSickness(ctx, p);
+  else if (sickness === 'unstuck') applyUnstuckSickness(ctx, p);
+}
+
+// Apply one of the two sicknesses, dropping the other first. Both are `buff_allstats_pct`
+// and recalcPlayerStats multiplies every such aura in turn, so letting them coexist would
+// compound two -75% drains into -93.75%. A player only ever owes the most recent one.
+function applySickness(
+  ctx: SimContext,
+  p: Entity,
+  id: string,
+  name: string,
+  value: number,
+  dur: number,
+): void {
+  if (dur <= 0) return;
+  const other = p.auras.findIndex((a) => SICKNESS_AURA_IDS.has(a.id) && a.id !== id);
+  if (other >= 0) {
+    // Emit the fade the client cannot infer, exactly as applyAura does for its own
+    // same-id displacements: the buff bar rebuilds from the snapshot either way, but
+    // without this the combat log never shows the old sickness lifting.
+    const displaced = p.auras[other];
+    p.auras.splice(other, 1);
+    ctx.emit({ type: 'aura', targetId: p.id, name: displaced.name, gained: false });
+  }
+  ctx.applyAura(p, {
+    id,
+    name,
+    kind: 'buff_allstats_pct',
+    remaining: dur,
+    duration: dur,
+    value,
+    sourceId: p.id,
+    school: 'shadow',
+  });
 }
 
 // Apply Resurrection Sickness. Fresh application uses the level-scaled duration (nothing
 // below RES_SICKNESS_MIN_LEVEL); a relog restore passes the SAVED remaining so the penalty
 // resumes rather than resets.
 export function applyResurrectionSickness(ctx: SimContext, p: Entity, remaining?: number): void {
-  const dur = remaining ?? resSicknessDuration(p.level);
-  if (dur <= 0) return;
-  ctx.applyAura(p, {
-    id: RESURRECTION_SICKNESS_ID,
-    name: 'Resurrection Sickness',
-    kind: 'buff_allstats_pct',
-    remaining: dur,
-    duration: dur,
-    value: RES_SICKNESS_STAT_MULT,
-    sourceId: p.id,
-    school: 'shadow',
-  });
+  applySickness(
+    ctx,
+    p,
+    RESURRECTION_SICKNESS_ID,
+    'Resurrection Sickness',
+    RES_SICKNESS_STAT_MULT,
+    remaining ?? resSicknessDuration(p.level),
+  );
+}
+
+// Apply Unstuck Sickness, the price of a completed /unstuck. Same shape as The Keeper's
+// Toll (level-scaled, nothing below UNSTUCK_SICKNESS_MIN_LEVEL, saved remaining on a relog
+// restore) but capped at 5 minutes rather than 10.
+export function applyUnstuckSickness(ctx: SimContext, p: Entity, remaining?: number): void {
+  applySickness(
+    ctx,
+    p,
+    UNSTUCK_SICKNESS_ID,
+    'Unstuck Sickness',
+    UNSTUCK_SICKNESS_STAT_MULT,
+    remaining ?? unstuckSicknessDuration(p.level),
+  );
 }
 
 // --- spawning the angels ----------------------------------------------------

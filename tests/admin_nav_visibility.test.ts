@@ -18,13 +18,17 @@ describe('admin nav visibility', () => {
   });
 
   it('drops every section without a granted permission and keeps the rest whole', () => {
-    // accounts.read gates both players items (accounts + characters), so the
-    // whole players section stays and every other section (each needing a
-    // permission not granted here) drops out entirely.
+    // accounts.read gates every players item (accounts, characters and the live
+    // online roster), so the whole players section stays and every other section
+    // (each needing a permission not granted here) drops out entirely.
     const sections = visibleNavSections(can(['accounts.read']));
     expect(sections.map((section) => section.id)).toEqual(['players']);
     const players = sections[0];
-    expect(players.items.map((item) => item.id)).toEqual(['accounts', 'characters']);
+    expect(players.items.map((item) => item.id)).toEqual([
+      'accounts',
+      'characters',
+      'online-players',
+    ]);
     expect(players.defaultPage).toBe('accounts');
   });
 

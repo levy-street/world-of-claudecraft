@@ -1052,7 +1052,7 @@ export function helpLines(): string[] {
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
     'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /afk, /dnd, /who.',
-    "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
+    'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. It leaves you with Unstuck Sickness for up to 5 minutes.',
     'Hide a player: /ignore <name> hides their public chat only. /block <name> also stops their whispers, invites and mail. Also /unignore, /unblock, /ignorelist, /blocklist.',
     'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',

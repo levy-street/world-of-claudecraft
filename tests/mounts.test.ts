@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so importing server/game (for wireEntity) needs no Postgres,
@@ -16,7 +18,9 @@ vi.mock('../server/db', () => ({
 
 import { meleeSwing, updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
 import { castAbility } from '../src/sim/combat/casting_lifecycle';
+import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import {
   DEFAULT_MOUNT,
   MOUNT_KEYS,
@@ -25,9 +29,10 @@ import {
   normalizeMountKey,
   normalizeSelectedMount,
 } from '../src/sim/content/mounts';
-import { ITEMS, MOBS, QUESTS } from '../src/sim/data';
+import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { useItem } from '../src/sim/items';
+import { MARKET_HOUSE_STOCK } from '../src/sim/market';
 import {
   MOUNT_SUMMON_SECONDS,
   mountItemId,
@@ -88,10 +93,11 @@ function ride(sim: Sim, pid: number, key: string): void {
   finishTransition(sim, pid);
 }
 
-describe('mount catalog (the seven ground mounts from the cards)', () => {
-  it('has exactly the seven mounts with the horse first (the base mount)', () => {
-    expect(MOUNT_KEYS).toHaveLength(7);
+describe('mount catalog', () => {
+  it('has exactly eight mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(8);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
+    expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
   });
 
@@ -107,6 +113,7 @@ describe('mount catalog (the seven ground mounts from the cards)', () => {
     expect(spec('stalkglider_snail')).toEqual(['rare', 0.75]);
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
+    expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
     // requiredLevel and every source is level-20 content) and leaving it would
     // invite a second gate to grow back beside ridingTrained.
@@ -168,7 +175,19 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it('only the horse reins is purchasable, for 10 gold; the rest are loot-only', () => {
+  // scripts/mounts_shot.mjs grants the reins by a hardcoded list, and a mount
+  // added to the catalog without a matching row leaves the capture tool showing
+  // a stale collection while every gate stays green. Pin the list against the
+  // catalog so the desync is a red test instead of a silently short screenshot.
+  it('the mounts capture script grants exactly the catalog reins', () => {
+    const source = readFileSync(path.join(__dirname, '..', 'scripts/mounts_shot.mjs'), 'utf8');
+    const block = source.match(/for \(const id of \[([^\]]*)\]\)/);
+    expect(block, 'the reins grant loop moved or changed shape').not.toBeNull();
+    const granted = [...(block as RegExpMatchArray)[1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
+    expect(granted.sort()).toEqual(MOUNT_KEYS.map((key) => mountItemId(key)).sort());
+  });
+
+  it('only the horse reins is purchasable, for 10 gold', () => {
     const horse = reinsFor('valorsteed')[0];
     expect(horse.id).toBe('reins_valorsteed');
     expect(horse.buyValue).toBe(100_000); // 10 gold in copper (ridingTrained gated)
@@ -190,6 +209,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
 
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
+      if (key === 'terrorspark_groundshaker') continue; // developer-only, pinned separately below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
       // No mount is ever on a NORMAL mob table, at any rarity.
@@ -230,6 +250,67 @@ describe('mount reins items (the collection: owning the item is owning the mount
       expect(riftPool as readonly string[], `${itemId} in the matching rift tier`).toContain(
         itemId,
       );
+    }
+  });
+
+  it('keeps the tank developer-only and absent from every normal acquisition table', () => {
+    const itemId = 'reins_terrorspark_groundshaker';
+    const item = ITEMS[itemId] as MountItemDef;
+    expect(item).toMatchObject({
+      kind: 'mount',
+      mount: 'terrorspark_groundshaker',
+      quality: 'epic',
+      soulbound: true,
+      noDiscard: true,
+      sellValue: 0,
+    });
+    expect(item.buyValue).toBeUndefined();
+
+    for (const mob of Object.values(MOBS)) {
+      expect(
+        mob.loot.some((entry) => entry.itemId === itemId),
+        `${itemId} must not be on ${mob.id}`,
+      ).toBe(false);
+    }
+    for (const [bossId, loot] of Object.entries(HEROIC_BOSS_LOOT)) {
+      expect(
+        loot.some((entry) => entry.itemId === itemId),
+        `${itemId} must not be on heroic boss ${bossId}`,
+      ).toBe(false);
+    }
+    expect([
+      ...RIFT_GREEN_MOUNT_REINS,
+      ...RIFT_BLUE_MOUNT_REINS,
+      ...RIFT_EPIC_MOUNT_REINS,
+    ]).not.toContain(itemId);
+    for (const npc of Object.values(NPCS)) {
+      expect(npc.vendorItems ?? [], `${itemId} must not be sold by ${npc.id}`).not.toContain(
+        itemId,
+      );
+    }
+    expect(
+      HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
+      `${itemId} must not be sold by the Heroic Quartermaster`,
+    ).not.toContain(itemId);
+    for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
+      expect(
+        offers.map((offer) => offer.itemId),
+        `${itemId} must not be sold by delve shop ${delveId}`,
+      ).not.toContain(itemId);
+    }
+    expect(
+      MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
+      `${itemId} must not be seeded by the World Market`,
+    ).not.toContain(itemId);
+    for (const quest of Object.values(QUESTS)) {
+      expect(
+        Object.values(quest.itemRewards),
+        `${itemId} must not be rewarded by ${quest.id}`,
+      ).not.toContain(itemId);
+      expect(
+        quest.requiredItems ?? [],
+        `${itemId} must not be required by ${quest.id}`,
+      ).not.toContain(itemId);
     }
   });
 

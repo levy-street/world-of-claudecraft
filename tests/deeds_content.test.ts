@@ -21,6 +21,7 @@ import { RIFT_MOBS } from '../src/sim/content/rift/mobs';
 import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
 import { YUMI_TEMPLATE_ID } from '../src/sim/content/yumi';
 import {
+  CAMPS,
   DELVES,
   DUNGEONS,
   GROUND_OBJECTS,
@@ -34,6 +35,7 @@ import {
   GROUND_PICKUP_PROVING_QUESTS,
   MAX_CREDITABLE_MOB_LEVEL,
   MILESTONE_DEED_TO_LEGACY,
+  RARE_SLAIN_TEMPLATES,
   VISITED_MARK_NAMESPACES,
 } from '../src/sim/deeds';
 import { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from '../src/sim/rift/rift_gen';
@@ -56,9 +58,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 228 deeds worth 2845 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(228);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2845);
+  it('ships exactly 232 deeds worth 2875 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(232);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2875);
   });
 
   it('ships the audited per-category counts', () => {
@@ -69,7 +71,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       combat: 10,
       dungeon: 36,
       delve: 13,
-      chronicle: 24,
+      chronicle: 28,
       collection: 28,
       pvp: 28,
       social: 18,
@@ -122,6 +124,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // Professions 2.0 tail (the release base merge put that tail first).
       'dgn_wildheart_basin',
       'dgn_wildheart_basin_heroic',
+      // Camp rares missed by the first reckoning (bug fix; see the
+      // RARE_SLAIN_TEMPLATES coverage test below).
+      'chr_marsh_rares_ii',
+      'chr_peaks_rares_ii',
+      'chr_gleamstag',
+      'chr_hollow_rares',
+      // The Undermount raid deeds append after the current release tail.
       'dgn_undermount_kiln_keepers',
       'dgn_undermount_kiln_keepers_heroic',
       'dgn_undermount_odrenn',
@@ -230,6 +239,20 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.chr_marsh_first_cast.trigger).toEqual({
       kind: 'visit',
       markId: 'fish:mirefen_marsh',
+    });
+    expect(DEEDS.chr_marsh_rares_ii.renown).toBe(5);
+    expect(DEEDS.chr_marsh_rares_ii.trigger).toEqual({ kind: 'visit', markId: 'slain:grubjaw' });
+    expect(DEEDS.chr_peaks_rares_ii.renown).toBe(10);
+    expect(DEEDS.chr_peaks_rares_ii.trigger).toEqual({
+      kind: 'visits',
+      markIds: ['slain:old_cragmaw', 'slain:shardlord_kazzix'],
+    });
+    expect(DEEDS.chr_gleamstag.renown).toBe(5);
+    expect(DEEDS.chr_gleamstag.trigger).toEqual({ kind: 'visit', markId: 'slain:gleamstag' });
+    expect(DEEDS.chr_hollow_rares.renown).toBe(10);
+    expect(DEEDS.chr_hollow_rares.trigger).toEqual({
+      kind: 'visits',
+      markIds: ['slain:old_marrowshell', 'slain:aurelhorn'],
     });
   });
 
@@ -385,11 +408,15 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined at the release/v0.30.0 base merge: the catalog appends the
   // Wildheart Basin dungeon deed pair (2 new deeds); no shipped
   // trigger or renown changed.
-  // Re-baselined for four appended Undermount wing 1 and 2 first-kill deeds;
-  // no shipped trigger or renown changed.
-  // Re-baselined for the three appended Undermount wing 3 deeds; no shipped
-  // trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '6f06e46f9924fc3ea48316cb0029e9f5a86173cd88400010eeb82100146d992a';
+  // Re-baselined again for the RARE_SLAIN_TEMPLATES coverage fix: four more
+  // appended deeds, chr_marsh_rares_ii (Grubjaw), chr_peaks_rares_ii (Old
+  // Cragmaw, Shardlord Kazzix), chr_gleamstag, and chr_hollow_rares (Old
+  // Marrowshell, Aurelhorn), all uncredited camp rares found by the same
+  // coverage test after rebasing onto release/v0.33.0. No shipped trigger or
+  // renown changed.
+  // Re-baselined for seven appended Undermount raid deeds after that release
+  // tail. No shipped trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '6d5f2532b39205e8733d68f731cd62cd69e6859c8c7c6e11026890732f3dd605';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -524,12 +551,64 @@ describe('retro fallback proof sets stay anchored to the real tables', () => {
   });
 });
 
+describe('RARE_SLAIN_TEMPLATES covers every rare camp mob (bug fix regression)', () => {
+  // Grubjaw, Old Cragmaw, and Shardlord Kazzix shipped as ordinary CAMPS
+  // rares (rare: true, a persistent spawn point, a unique name) but were
+  // left off RARE_SLAIN_TEMPLATES, so killing them wrote no 'slain:<id>'
+  // mark and could never progress a chr_*_rares deed. Re-derive the live set
+  // of rare CAMPS mobs from the real content tables and hold
+  // RARE_SLAIN_TEMPLATES to full coverage of it, so a future rare camp mob
+  // shipped without deed coverage fails here instead of shipping silently.
+  const QUEST_CREDITED_RARE_EXCEPTIONS = new Set([
+    // Sethrael the Palecoil (the Drowned Temple side-wing) is not exempt by
+    // oversight: its kill is the guaranteed-drop objective of q_palecoil,
+    // which already feeds prog_mere_at_rest, so it is credited through the
+    // quest-chain system instead of the visited-mark rares system.
+    'sethrael_palecoil',
+  ]);
+
+  it('every live rare CAMPS mob is in RARE_SLAIN_TEMPLATES or a documented quest-credit exception', () => {
+    const campRareIds = new Set(
+      CAMPS.filter((c) => MOBS[c.mobId]?.rare === true).map((c) => c.mobId),
+    );
+    expect(campRareIds.size).toBeGreaterThan(0);
+    for (const id of campRareIds) {
+      const credited = RARE_SLAIN_TEMPLATES.has(id) || QUEST_CREDITED_RARE_EXCEPTIONS.has(id);
+      expect(credited, `${id} is a rare camp mob with no deed credit path`).toBe(true);
+    }
+  });
+
+  it('RARE_SLAIN_TEMPLATES holds no stale id (every entry is a live rare CAMPS mob)', () => {
+    const campRareIds = new Set(
+      CAMPS.filter((c) => MOBS[c.mobId]?.rare === true).map((c) => c.mobId),
+    );
+    for (const id of RARE_SLAIN_TEMPLATES) {
+      expect(
+        campRareIds.has(id),
+        `${id} in RARE_SLAIN_TEMPLATES is not a live rare CAMPS mob`,
+      ).toBe(true);
+    }
+  });
+
+  it('the quest-credit exception really is proven by a required-kill quest that feeds a deed', () => {
+    // Cross-check the documented rationale, not just the exclusion: Sethrael's
+    // heartscale drop is guaranteed (chance: 1) and gated to q_palecoil, and
+    // that quest is required by a live, non-hidden deed.
+    const palecoilLoot = MOBS.sethrael_palecoil.loot?.find((l) => l.questId === 'q_palecoil');
+    expect(palecoilLoot?.chance).toBe(1);
+    const feedsADeed = ALL.some(
+      (d) => d.trigger.kind === 'quests' && d.trigger.questIds.includes('q_palecoil'),
+    );
+    expect(feedsADeed).toBe(true);
+  });
+});
+
 describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and soc_salvage_50
-    // closes the tail, and either moving would signal a reorder
+    // literals: prog_first_steps opens the catalog and the final Undermount
+    // heroic deed closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');

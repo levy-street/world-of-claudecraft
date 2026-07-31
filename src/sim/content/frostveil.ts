@@ -117,9 +117,13 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 8.5,
     aggroRadius: 14,
-    loot: [{ itemId: 'thick_winter_pelt', chance: 0.6, questId: 'q_fv_winter_pelts' }],
+    loot: [
+      { copper: 80, chance: 1 },
+      { itemId: 'thick_winter_pelt', chance: 0.6, questId: 'q_fv_winter_pelts' },
+    ],
     scale: 1.1,
     color: 0xeef4f8,
+    componentTags: ['hide', 'fang', 'meat'],
   },
   ice_wisp: {
     id: 'ice_wisp',
@@ -135,7 +139,10 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 7.5,
     aggroRadius: 0, // drifting cold light, harmless unless harmed
-    loot: [{ itemId: 'aurora_mote', chance: 0.65, questId: 'q_fv_aurora_motes' }],
+    loot: [
+      { copper: 90, chance: 1 },
+      { itemId: 'aurora_mote', chance: 0.65, questId: 'q_fv_aurora_motes' },
+    ],
     scale: 0.7,
     color: 0xbfe4ff,
   },
@@ -153,7 +160,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 14,
     moveSpeed: 7,
     aggroRadius: 12,
-    loot: [],
+    loot: [{ copper: 95, chance: 1 }],
     scale: 1.15,
     color: 0x9fd0f0,
   },
@@ -162,7 +169,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     name: 'Fen Sprite',
     minLevel: 17,
     maxLevel: 18,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 48,
     hpPerLevel: 17,
     dmgBase: 9,
@@ -171,7 +178,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 11,
     moveSpeed: 8,
     aggroRadius: 10,
-    loot: [],
+    loot: [{ copper: 90, chance: 1 }],
     scale: 0.9,
     color: 0xcfe0ea,
   },
@@ -192,9 +199,10 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13,
     moveSpeed: 8.5,
     aggroRadius: 15,
-    loot: [],
+    loot: [{ copper: 105, chance: 1 }],
     scale: 1.3,
     color: 0x9db4c8,
+    componentTags: ['hide', 'fang', 'meat'],
   },
   // Trapper Brosk's lost apprentice (q_fv_seeing_wren_home). Escort-run
   // escortee: non-hostile, never wanders (moveSpeed 0; src/sim/escort.ts
@@ -233,7 +241,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 16,
     elite: true,
-    loot: [],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.5,
     color: 0xf2f6fa,
   },
@@ -469,7 +477,7 @@ export const FROSTVEIL_QUESTS: Record<string, QuestDef> = {
     name: 'Seeing Wren Home',
     giverNpcId: 'trapper_brosk',
     turnInNpcId: 'aurorist_veyla',
-    text: "My apprentice Wren went out to walk the Goldmelt line two days ago and never came back. I found her tracks, she is holed up under the road markers southwest of the Aurora Steps, too scared of the wolves to move. I cannot leave the fen, $N. Walk her to Veyla's camp on the Steps. She will be safe under the lights.",
+    text: "My apprentice Wren went out to walk the Goldmelt line two days ago and never came back. I found her tracks, she is holed up under the road markers northeast of the Aurora Steps, too scared of the wolves to move. I cannot leave the fen, $N. Walk her to Veyla's camp on the Steps. She will be safe under the lights.",
     completionText:
       "The girl is inside, wrapped in half my blankets and talking the stars out of the sky. You did a kind thing today, $N. The Reach doesn't see many of those.",
     objectives: [
@@ -641,9 +649,14 @@ export const FROSTVEIL_QUEST_CAMPS: CampDef[] = [
 ];
 
 // Seeing Wren Home (q_fv_seeing_wren_home): Wren shelters under the Goldmelt
-// road markers southwest of the Aurora Steps and walks the road northeast to
+// road markers northeast of the Aurora Steps and walks the road southwest to
 // Aurorist Veyla's camp, through the sprites and the wolves that kept her
 // pinned. Waypoints hug the authored road curve above.
+//
+// Bearings here follow the ENGINE convention the map and compass render (+z
+// north, +x WEST, so east is -x; see src/ui/compass.ts and map_terrain.ts,
+// which draws +x on the left). Wren's post at x -42 is 72 yards EAST of the
+// Steps at x 30, and 58 yards north of them.
 export const FROSTVEIL_ESCORTS: Record<string, EscortDef> = {
   esc_fv_wren: {
     id: 'esc_fv_wren',

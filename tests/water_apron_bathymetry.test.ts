@@ -17,7 +17,10 @@ function mockWaterShaderAssets(): void {
   vi.doMock('../src/render/assets/loader', () => ({
     loadTexture: vi.fn(async () => new THREE.Texture()),
   }));
-  vi.doMock('../src/render/assets/preload', () => ({ registerPreload: vi.fn() }));
+  vi.doMock('../src/render/assets/preload', () => ({
+    registerPreload: vi.fn(),
+    registerDeferredPreload: vi.fn((start: () => unknown) => start()),
+  }));
   vi.doMock('../src/render/gfx', () => ({
     GFX: { standardMaterials: true },
     SUN_DIR: new THREE.Vector3(1, 1, 1).normalize(),

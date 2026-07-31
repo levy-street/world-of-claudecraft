@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { loadTexture, releaseTexture } from './assets/loader';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
 
 // Spell & ambience particle system. One pooled THREE.Points cloud drawn with
@@ -101,7 +101,7 @@ const SPR = {
 
 const spriteImages: (TexImageSource | null)[] = SPRITE_FILES.map(() => null);
 for (let i = 0; i < SPRITE_FILES.length; i++) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture(`/vfx/${SPRITE_FILES[i]}.png`, { srgb: true }).then((tex) => {
       spriteImages[i] = tex.image as TexImageSource;
       return tex;
@@ -109,10 +109,18 @@ for (let i = 0; i < SPRITE_FILES.length; i++) {
   );
 }
 
+// The composed atlas canvas, kept module-level and reused. A SECOND Vfx in the
+// same page is real (the editor viewport's reload() builds a fresh Renderer, and
+// each Renderer owns a Vfx), and composeAtlasCanvas() releases its source
+// sprites, so recomposing would silently paint all 16 cells as fallback discs.
+// Retaining the one 1024x1024 canvas instead of 16 decoded sources is also the
+// cheaper half of that trade.
+let atlasCanvas: HTMLCanvasElement | null = null;
+
 // Compose the atlas once. Any cell whose PNG is unavailable (e.g. unit tests
 // that construct Vfx without the preload gate) falls back to a soft painted
 // disc so the system always renders something sane.
-function buildAtlasTexture(): THREE.CanvasTexture {
+function composeAtlasCanvas(): HTMLCanvasElement {
   const size = ATLAS_GRID * ATLAS_CELL;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
@@ -141,7 +149,28 @@ function buildAtlasTexture(): THREE.CanvasTexture {
       ctx.fillRect(x, y, ATLAS_CELL, ATLAS_CELL);
     }
   }
-  const tex = new THREE.CanvasTexture(canvas);
+  // The canvas now owns every cell's pixels, so the 16 source sprites (decoded
+  // RGBA, their loader cache entries, and the THREE wrappers that are never
+  // uploaded to the GPU) are dead weight from here on: ~16 MB retained for
+  // nothing, on a process whose memory ceiling is what kills world entry on
+  // 4 GB iPhones. Safe to drop because nothing recomposes this canvas (see
+  // atlasCanvas above) and no context-restore path re-reads the sources: a lost
+  // WebGL context is a dead session here, handled out of band by the entry crash
+  // guard, never re-uploaded from CPU-side copies.
+  for (let i = 0; i < SPRITE_FILES.length; i++) {
+    spriteImages[i] = null;
+    releaseTexture(`/vfx/${SPRITE_FILES[i]}.png`, { srgb: true });
+  }
+  return canvas;
+}
+
+/** A per-Vfx CanvasTexture over the one shared, already-composed atlas canvas.
+ *  A fresh texture object per instance keeps each renderer's GPU upload its own
+ *  (two live Vfx never share one texture), while the composed pixels are built
+ *  exactly once. */
+function buildAtlasTexture(): THREE.CanvasTexture {
+  atlasCanvas ??= composeAtlasCanvas();
+  const tex = new THREE.CanvasTexture(atlasCanvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.minFilter = THREE.LinearFilter;
   tex.magFilter = THREE.LinearFilter;

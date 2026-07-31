@@ -27,8 +27,9 @@ type-checked by `npm run check:admin` (svelte-check over `tsconfig.admin.json`).
 - `navigation.ts`: typed page/IP route parsing, URL serialization, History API interception, and optional navigation context for native links.
 - `components/`: shared UI; reuse a family before writing a bespoke one: dialogs are
   `ModalDialog`/`ConfirmDialog`, charts are `BarChart`/`LineChart` (native SVG, no `{@html}`),
-  moderation actions go through the existing `*Moderation*` components. Enumerate:
-  `ls src/admin/components`.
+  the live-polling switch is `AutoRefreshToggle` (paired with the stored opt-out in
+  `auto_refresh_preference.ts`), moderation actions go through the existing `*Moderation*`
+  components. Enumerate: `ls src/admin/components`.
 - `pages/`: one `.svelte` per route id (enumerate: `ls src/admin/pages`). `pages.ts` is the
   navigation tree: each item carries its `permission`; `visibleNavSections`/`firstVisiblePage`
   drive the sidebar filter and route-guard fallback. Server-authored data renders as data, not
@@ -44,9 +45,11 @@ Recent surfaces follow the same shape, permission-gated per page: `SuspiciousPla
 `calibration_export.ts`/`suspicious_sessions_export.ts`), `TickPerf` (`ops.perf`; on-demand
 `POST /perf/tick/capture`), `ModerationHistoryPage` (`moderation.read`), timed
 daily-rewards bans (optional duration in hours, blank means permanent) and account notes
-(`moderation.act`), reset-password (`accounts.password`), and the AccountModal Reward
+(`moderation.act`), reset-password (`accounts.password`), the AccountModal Reward
 Points event ledger (`accounts.read`; pure presentation in `daily_reward_event_log.ts`,
-pinned by `tests/admin/daily_reward_event_log.test.ts`).
+pinned by `tests/admin/daily_reward_event_log.test.ts`), and `OnlinePlayers`
+(`accounts.read`; the live roster that used to sit on the Overview dashboard, with
+search/sort/paging in the pure `online_players_view.ts` and a switchable 1-minute poll).
 
 ## i18n: operators are users, so all rendered text routes through `t()`
 Admin has its OWN sparse-overlay catalog, independent of the game. Author English in
