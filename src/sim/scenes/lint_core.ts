@@ -3,13 +3,12 @@
 // independent of the DOM, Three.js, and any concrete world implementation.
 
 import {
-  GULLHAVEN_HARBOR,
   HARBORS,
   type HarborDeck,
   type HarborDef,
+  type HarborShipBlocker,
   harborRampHeight,
   harborShipLocalBounds,
-  MAINLAND_HARBOR,
 } from '../harbor_layout';
 import type { SceneAttachFrame, SceneRigPoint } from '../types';
 
@@ -96,6 +95,9 @@ export const MAX_ARRIVAL_BERTH_DISTANCE_YARDS = 0.5;
 export const HULL_TERRAIN_SAMPLE_STEP_YARDS = 2;
 // Contact within this tolerance is accepted as a berth seam, not solid penetration.
 export const HULL_INTERSECTION_EPSILON_YARDS = 0.01;
+// The generated lower-hull blocker straddles the visual skin, so the fixed
+// gangplank may share this much of its mating edge while the ship is parked.
+export const HULL_GANGWAY_MATING_EPSILON_YARDS = 0.15;
 // Feet must remain this close to an authored presentation support surface.
 export const ENTITY_SUPPORT_EPSILON_YARDS = 0.1;
 // Rider centers may cross a deck edge only by this numerical transform tolerance.
@@ -342,16 +344,31 @@ export function evaluateFraming(
   };
 }
 
-export type HullFootprint = ReturnType<typeof harborShipLocalBounds>;
+export interface ShipHullBlocker {
+  readonly id: HarborShipBlocker['id'];
+  readonly kind: HarborShipBlocker['kind'];
+  readonly x: number;
+  readonly z: number;
+  readonly hw: number;
+  readonly hd: number;
+  readonly rot: number;
+  readonly bottomY: number;
+  readonly topY: number;
+}
 
-export const HARBOR_HULL_FOOTPRINTS: Readonly<Record<HarborDef['id'], HullFootprint>> = {
-  mainland: harborShipLocalBounds(MAINLAND_HARBOR.berth),
-  gullhaven: harborShipLocalBounds(GULLHAVEN_HARBOR.berth),
-};
+const shipHullBlockerCache = new WeakMap<
+  HarborDef,
+  { readonly waterLevel: number; readonly blockers: readonly ShipHullBlocker[] }
+>();
+const shipHullVolumeCache = new WeakMap<
+  HarborDef,
+  { readonly waterLevel: number; readonly volumes: readonly ShipHullBlocker[] }
+>();
 
 export interface HullCollision {
   readonly label: string;
   readonly penetration: number;
+  readonly volumeId: string;
 }
 
 export interface HullWorldQuery {
@@ -435,12 +452,8 @@ export function attachmentWorldToLocal(
   };
 }
 
-export function shipDeckLocalBounds(
-  harbor: HarborDef,
-  deck: HarborDeck,
-  waterLevel: number,
-): { x0: number; x1: number; z0: number; z1: number; centerY: number } {
-  const parked: SceneAttachFrame = {
+function parkedShipFrame(harbor: HarborDef, waterLevel: number): SceneAttachFrame {
+  return {
     position: {
       x: harbor.berth.x,
       y: waterLevel - harbor.berth.draft,
@@ -448,6 +461,114 @@ export function shipDeckLocalBounds(
     },
     yaw: harbor.berth.rot,
   };
+}
+
+export function shipHullBlockers(
+  harbor: HarborDef,
+  waterLevel: number,
+): readonly ShipHullBlocker[] {
+  const cached = shipHullBlockerCache.get(harbor);
+  if (cached?.waterLevel === waterLevel) return cached.blockers;
+  const parked = parkedShipFrame(harbor, waterLevel);
+  const bottomY = harborShipLocalBounds(harbor.berth).bottomY;
+  const blockers = harbor.shipBlockers.map((blocker) => {
+    const center = attachmentWorldToLocal(parked, {
+      x: blocker.x,
+      y: blocker.cameraTopY,
+      z: blocker.z,
+    });
+    return {
+      id: blocker.id,
+      kind: blocker.kind,
+      x: center.x,
+      z: center.z,
+      hw: blocker.hw,
+      hd: blocker.hd,
+      rot: blocker.rot - harbor.berth.rot,
+      bottomY,
+      topY: center.y,
+    };
+  });
+  shipHullBlockerCache.set(harbor, { waterLevel, blockers });
+  return blockers;
+}
+
+export function shipHullVolumes(harbor: HarborDef, waterLevel: number): readonly ShipHullBlocker[] {
+  const cached = shipHullVolumeCache.get(harbor);
+  if (cached?.waterLevel === waterLevel) return cached.volumes;
+  const blockers = shipHullBlockers(harbor, waterLevel);
+  const lowerHull = blockers.filter((blocker) => blocker.kind === 'lower-hull');
+  let x0 = Number.POSITIVE_INFINITY;
+  let x1 = Number.NEGATIVE_INFINITY;
+  let z0 = Number.POSITIVE_INFINITY;
+  let z1 = Number.NEGATIVE_INFINITY;
+  for (const blocker of lowerHull) {
+    const cos = Math.cos(blocker.rot);
+    const sin = Math.sin(blocker.rot);
+    for (const along of [-blocker.hw, blocker.hw]) {
+      for (const across of [-blocker.hd, blocker.hd]) {
+        const x = blocker.x + along * cos + across * sin;
+        const z = blocker.z - along * sin + across * cos;
+        x0 = Math.min(x0, x);
+        x1 = Math.max(x1, x);
+        z0 = Math.min(z0, z);
+        z1 = Math.max(z1, z);
+      }
+    }
+  }
+  if (lowerHull.length === 0) {
+    throw new Error(`${harbor.id} generated plan has no lower-hull outline`);
+  }
+  const body: ShipHullBlocker = {
+    id: 'lower-hull-body',
+    kind: 'lower-hull',
+    x: (x0 + x1) / 2,
+    z: (z0 + z1) / 2,
+    hw: (x1 - x0) / 2,
+    hd: (z1 - z0) / 2,
+    rot: 0,
+    bottomY: Math.min(...lowerHull.map((blocker) => blocker.bottomY)),
+    topY: Math.max(...lowerHull.map((blocker) => blocker.topY)),
+  };
+  const volumes = [...blockers, body];
+  shipHullVolumeCache.set(harbor, { waterLevel, volumes });
+  return volumes;
+}
+
+export function shipHullPointClearance(
+  harbor: HarborDef,
+  frame: SceneAttachFrame,
+  point: SceneRigPoint,
+  waterLevel: number,
+  horizontalMargin = 0,
+  maximumTopY = Number.POSITIVE_INFINITY,
+): number {
+  const local = attachmentWorldToLocal(frame, point);
+  let nearest = Number.POSITIVE_INFINITY;
+  for (const blocker of shipHullVolumes(harbor, waterLevel)) {
+    const dx = local.x - blocker.x;
+    const dz = local.z - blocker.z;
+    const cos = Math.cos(blocker.rot);
+    const sin = Math.sin(blocker.rot);
+    const along = dx * cos - dz * sin;
+    const across = dx * sin + dz * cos;
+    const clearance = Math.max(
+      Math.abs(along) - blocker.hw - horizontalMargin,
+      Math.abs(across) - blocker.hd - horizontalMargin,
+      blocker.bottomY - local.y,
+      local.y - Math.min(blocker.topY, maximumTopY),
+    );
+    nearest = Math.min(nearest, clearance);
+  }
+  return nearest;
+}
+
+export function shipDeckLocalBounds(
+  harbor: HarborDef,
+  deck: HarborDeck,
+  waterLevel: number,
+): { x0: number; x1: number; z0: number; z1: number; centerY: number } {
+  const parked = parkedShipFrame(harbor, waterLevel);
   let x0 = Number.POSITIVE_INFINITY;
   let x1 = Number.NEGATIVE_INFINITY;
   let z0 = Number.POSITIVE_INFINITY;
@@ -476,34 +597,59 @@ function sampledAxis(minimum: number, maximum: number): number[] {
   return Array.from({ length: steps + 1 }, (_, index) => minimum + (span * index) / steps);
 }
 
-function hullTerrainSamples(footprint: HullFootprint): readonly { x: number; z: number }[] {
-  const samples: { x: number; z: number }[] = [];
-  for (const x of sampledAxis(footprint.x - footprint.hw, footprint.x + footprint.hw)) {
-    for (const z of sampledAxis(footprint.z - footprint.hd, footprint.z + footprint.hd)) {
-      samples.push({ x, z });
+function hullTerrainSamples(
+  footprints: readonly ShipHullBlocker[],
+): readonly { x: number; z: number; volumeId: string }[] {
+  const samples: { x: number; z: number; volumeId: string }[] = [];
+  for (const footprint of footprints) {
+    const cos = Math.cos(footprint.rot);
+    const sin = Math.sin(footprint.rot);
+    for (const x of sampledAxis(-footprint.hw, footprint.hw)) {
+      for (const z of sampledAxis(-footprint.hd, footprint.hd)) {
+        samples.push({
+          x: footprint.x + x * cos + z * sin,
+          z: footprint.z - x * sin + z * cos,
+          volumeId: footprint.id,
+        });
+      }
     }
   }
   return samples;
 }
 
-const HULL_TERRAIN_SAMPLES: Readonly<Record<HarborDef['id'], readonly { x: number; z: number }[]>> =
+const hullTerrainSampleCache = new WeakMap<
+  HarborDef,
   {
-    mainland: hullTerrainSamples(HARBOR_HULL_FOOTPRINTS.mainland),
-    gullhaven: hullTerrainSamples(HARBOR_HULL_FOOTPRINTS.gullhaven),
-  };
+    readonly footprints: readonly ShipHullBlocker[];
+    readonly samples: readonly { x: number; z: number; volumeId: string }[];
+  }
+>();
+
+function cachedHullTerrainSamples(
+  harbor: HarborDef,
+  footprints: readonly ShipHullBlocker[],
+): readonly { x: number; z: number; volumeId: string }[] {
+  const cached = hullTerrainSampleCache.get(harbor);
+  if (cached?.footprints === footprints) return cached.samples;
+  const samples = hullTerrainSamples(footprints);
+  hullTerrainSampleCache.set(harbor, { footprints, samples });
+  return samples;
+}
 
 function hullRectPenetration(
   frame: SceneAttachFrame,
-  footprint: HullFootprint,
+  footprint: ShipHullBlocker,
   rect: { x: number; z: number; hw: number; hd: number },
+  tolerance = HULL_INTERSECTION_EPSILON_YARDS,
 ): number | null {
   const center = attachmentLocalToWorld(frame, {
     x: footprint.x,
     y: 0,
     z: footprint.z,
   });
-  const cosYaw = Math.cos(frame.yaw);
-  const sinYaw = Math.sin(frame.yaw);
+  const yaw = frame.yaw + footprint.rot;
+  const cosYaw = Math.cos(yaw);
+  const sinYaw = Math.sin(yaw);
   const localX = { x: cosYaw, z: -sinYaw };
   const localZ = { x: sinYaw, z: cosYaw };
   const delta = { x: rect.x - center.x, z: rect.z - center.z };
@@ -516,7 +662,7 @@ function hullRectPenetration(
       footprint.hd * Math.abs(localZ.x * axis.x + localZ.z * axis.z);
     const rectRadius = rect.hw * Math.abs(axis.x) + rect.hd * Math.abs(axis.z);
     const penetration = hullRadius + rectRadius - distance;
-    if (penetration <= HULL_INTERSECTION_EPSILON_YARDS) return null;
+    if (penetration <= tolerance) return null;
     minimumPenetration = Math.min(minimumPenetration, penetration);
   }
   return minimumPenetration;
@@ -528,24 +674,32 @@ export function hullWorldCollision(
   seed: number,
   world: HullWorldQuery,
 ): HullCollision | null {
-  const footprint = HARBOR_HULL_FOOTPRINTS[harbor.id];
+  const footprints = shipHullVolumes(harbor, world.waterLevel);
   for (const fixedHarbor of HARBORS) {
     for (const [index, deck] of fixedHarbor.decks.entries()) {
-      const penetration = hullRectPenetration(frame, footprint, deck);
-      if (penetration !== null) {
-        return { label: `${fixedHarbor.id} deck ${index}`, penetration };
+      for (const footprint of footprints) {
+        const penetration = hullRectPenetration(frame, footprint, deck);
+        if (penetration !== null) {
+          return { label: `${fixedHarbor.id} deck ${index}`, penetration, volumeId: footprint.id };
+        }
       }
     }
     for (const [index, ramp] of fixedHarbor.ramps.entries()) {
-      const penetration = hullRectPenetration(frame, footprint, ramp);
-      if (penetration !== null) {
-        return { label: `${fixedHarbor.id} ramp ${index}`, penetration };
+      const tolerance =
+        fixedHarbor.id === harbor.id && index === fixedHarbor.ramps.length - 1
+          ? HULL_GANGWAY_MATING_EPSILON_YARDS
+          : HULL_INTERSECTION_EPSILON_YARDS;
+      for (const footprint of footprints) {
+        const penetration = hullRectPenetration(frame, footprint, ramp, tolerance);
+        if (penetration !== null) {
+          return { label: `${fixedHarbor.id} ramp ${index}`, penetration, volumeId: footprint.id };
+        }
       }
     }
   }
 
-  const bottomY = frame.position.y + footprint.bottomY;
-  for (const sample of HULL_TERRAIN_SAMPLES[harbor.id]) {
+  const bottomY = frame.position.y + Math.min(...footprints.map((footprint) => footprint.bottomY));
+  for (const sample of cachedHullTerrainSamples(harbor, footprints)) {
     const point = attachmentLocalToWorld(frame, { x: sample.x, y: 0, z: sample.z });
     const terrainY = world.terrainHeight(point.x, point.z, seed);
     const penetration = terrainY - bottomY;
@@ -553,6 +707,7 @@ export function hullWorldCollision(
     return {
       label: terrainY < world.waterLevel ? 'water floor' : 'terrain',
       penetration,
+      volumeId: sample.volumeId,
     };
   }
   return null;

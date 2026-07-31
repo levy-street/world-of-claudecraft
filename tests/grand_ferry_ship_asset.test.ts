@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -16,10 +17,14 @@ import { HARBORS, type HarborRail, type HarborRamp } from '../src/sim/harbor_lay
 
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/grand_ferry_ship.glb');
+const EXPORTER_PATH = path.join(
+  REPO_ROOT,
+  'scripts/assets/grand_ferry_ship/export_grand_ferry_ship.mjs',
+);
 const ASSET_BYTES = 33_592;
-const ASSET_SHA256 = 'ae6a2adcaf5c95bae4a0c75ba838031e68f5ca318935aa351885d75158085a45';
-const SOURCE_FINGERPRINT = 'a12acdf6352a17b4e0963424588a3ab6a5b70ff877272f39fe2e72a41a8eb6b4';
-const PLAN_MESH_EPSILON = GRAND_FERRY_SHIP_PLAN.measurementEpsilons.optimized;
+const ASSET_SHA256 = '6cab3ddd29813b733639d81a06b6c2b0d88b8c5dc11ad4a239688e0f7b679d85';
+const SOURCE_FINGERPRINT = '4f8a3ff04c36deb360324713a7ac6ec0324a196b1489ccdaff5aebb92cb6cadb';
+const PLAN_MESH_EPSILON = 0.005;
 const RAMP_MATING_EPSILON = 1e-9;
 const RAIL_GAP_INTERIOR_EPSILON = 0.02;
 const RAIL_SIDE_VERTEX_EPSILON = 0.12;
@@ -246,7 +251,21 @@ function colliderMatchesBlocker(
 }
 
 describe('grand ferry procedural asset contract', () => {
+  it('rebuilds the staged asset and plan byte for byte from the current model', () => {
+    const result = spawnSync(process.execPath, [EXPORTER_PATH, '--verify-staged', '--no-preview'], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+      maxBuffer: 16 * 1024 * 1024,
+      timeout: 30_000,
+    });
+    expect(result.error, result.stderr).toBeUndefined();
+    expect(result.status, result.stderr).toBe(0);
+    expect(result.stdout).toContain(`staged artifact verified: ${ASSET_SHA256}`);
+    expect(result.stdout).toContain(`source fingerprint: ${SOURCE_FINGERPRINT}`);
+  }, 30_000);
+
   it('pins the deterministic source inventory, optimizer spec, and stable render binding', () => {
+    expect(GRAND_FERRY_SHIP_PLAN.measurementEpsilons.optimized).toBe(PLAN_MESH_EPSILON);
     expect(GRAND_FERRY_SHIP_SOURCE_FILES).toEqual([
       'scripts/assets/grand_ferry_ship/model.js',
       'scripts/assets/grand_ferry_ship/export_entry.js',

@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { characterPreloadUrls, manifestUrlsForGraphics } from '../src/render/characters/manifest';
-import { propPreloadInternalsForTest } from '../src/render/props';
+import { propMaterialInternalsForTest, propPreloadInternalsForTest } from '../src/render/props';
 
 // Guard against the v0.16.0 "Could not start the renderer" P0. Both props (props.ts)
 // and characters (characters/assets.ts) freeze their GLB PRELOAD set at module-import
@@ -38,6 +39,30 @@ describe('prop preload set covers placement at every graphics tier (v0.16.0 farm
     expect(lowRendered.has('farmCrate')).toBe(false);
     // ...yet the actual preload set still contains it, even when the import tier was low.
     expect(preloadPropKeys(false).has('farmCrate')).toBe(true);
+  });
+});
+
+describe('prop material conversion cache', () => {
+  it('does not alias same-named materials that differ only in side', () => {
+    const front = new THREE.MeshStandardMaterial({ color: 0x6b7c8d, side: THREE.FrontSide });
+    front.name = 'MaterialSideCacheRegression';
+    const double = new THREE.MeshStandardMaterial({ color: 0x6b7c8d, side: THREE.DoubleSide });
+    double.name = front.name;
+
+    const convertedFront = propMaterialInternalsForTest.convertMaterial(
+      front,
+      'material-side-cache-regression',
+      false,
+    );
+    const convertedDouble = propMaterialInternalsForTest.convertMaterial(
+      double,
+      'material-side-cache-regression',
+      false,
+    );
+
+    expect(convertedFront).not.toBe(convertedDouble);
+    expect(convertedFront.side).toBe(THREE.FrontSide);
+    expect(convertedDouble.side).toBe(THREE.DoubleSide);
   });
 });
 
