@@ -25,6 +25,7 @@ import {
   applyMaterials,
   assembleModel,
   ensureSkinTexture,
+  heldWeaponPayloads,
   prepareVisual,
   setHeldOffhand,
   setHeldWeapon,
@@ -34,8 +35,10 @@ import {
   tintedFarMaterials,
   wingsProp,
 } from './assets';
+import { bowArmScrubTime, bowDrawTimeScale, createBowCycle, tickBowCycle } from './bow_cycle';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import { attachNockedArrow } from './nocked_arrow';
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { weaponAttackStyle } from './weapon_attack_style_core';
@@ -86,6 +89,20 @@ const GUN_CARRY_QUAT = new THREE.Quaternion()
   .setFromEuler(new THREE.Euler(Math.PI / 2, 0, 0, 'XYZ'))
   .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 2));
 const BOW_PIN_BLEND_S = 0.12; // engage/disengage fade for the orientation pins
+// The default bow's hand-local AIM adjustment. The grip override seats the bow
+// for the reference CARRY (plumb vertical, belly forward, string to the body;
+// weapon_grip.ts rot [174, 0, 89]); the aiming fist needs a different seat
+// (limbs vertical at full draw, belly down the arrow line, solved rot
+// [129, -2, 160] against the ranged clips). Both were solved analytically from
+// the hand bone's world orientation per pose, with the bow's belly axis ground
+// -truthed off the GLB geometry (belly = authored -X, string = +X). This
+// quaternion is carry^-1 * aim (euler delta [25.7, 38.4, 30.3]; the carry
+// tilts 33 degrees top-back per the reference relaxed stance), blended in
+// while the bow cycle is engaged and back out when it lowers, so both poses
+// match the reference without a world-space pin.
+const BOW_AIM_ADJUST_QUAT = new THREE.Quaternion(0.2861, 0.25458, 0.31085, 0.86989);
+const BOW_AIM_ADJUST_BLEND_S = 0.18;
+const BOW_Q_ADJUST = new THREE.Quaternion(); // scratch, no per-frame allocation
 
 const FADE = 0.22;
 const ONESHOT_FADE = 0.1;
@@ -249,14 +266,17 @@ export class CharacterVisual {
   private offhandItemId: string | null;
   private weaponSkinId: string | null = null;
   private weaponVfx: WeaponVfxHandle[] = [];
-  // Skin payloads whose orientation blends to a root-relative pin (see
-  // applySkinOrientation): bows aim upright DURING the shot, bow-slot guns
-  // carry forward OUTSIDE it. qGrip is the authored grip-local orientation.
+  // Weapon payloads whose orientation blends to a root-relative pin (see
+  // applySkinOrientation): bow skins aim upright DURING the shot, bow-slot
+  // guns carry forward OUTSIDE it, and a bow-cycle rig's default bow carries
+  // upright outside the cycle. qGrip is the authored grip-local orientation;
+  // `target` the root-relative orientation the pin blends toward.
   private orientPins: {
     payload: THREE.Object3D;
     qGrip: THREE.Quaternion;
     blend: number;
     duringShot: boolean;
+    target: THREE.Quaternion;
   }[] = [];
   private weaponVfxSpriteScale = WORLD_FOV_SPRITE_SCALE;
   private stow = createStowTransition();
@@ -329,6 +349,22 @@ export class CharacterVisual {
   private climbClipsActive = false;
   private spinAngle = 0;
   private spinOnceTimer = 0;
+  // Bow-native ranged cycle (bow_cycle.ts owns the phase/timing decisions; the
+  // pulses below carry sim events and finished one-shots into its next tick).
+  private bow = createBowCycle();
+  private bowLaunchPending = false;
+  private bowDrawDone = false;
+  private bowLooseDone = false;
+  private bowTimeToShot: number | null = null;
+  /** The nocked-arrow prop on the string hand, built lazily on the first draw
+   *  (null = the rig has no string-hand slot). Visible during draw/hold/arm. */
+  private nockedArrow: THREE.Object3D | null | undefined;
+  /** The default bow payload whose hand-local seat blends between the carry
+   *  grip and the aim adjustment as the cycle engages (applyBowAimAdjust).
+   *  undefined = resolve lazily; null = no eligible payload (skin displayed,
+   *  sheathed, or not a bow-cycle rig). Reset whenever the prop graph rebuilds. */
+  private bowAimPayload: { payload: THREE.Object3D; qGrip: THREE.Quaternion } | null | undefined;
+  private bowAimBlend = 0;
 
   private shadowOn = true;
   private far = false;
@@ -383,6 +419,10 @@ export class CharacterVisual {
     // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
     // the held weapon model, so the visual is born holding the right weapon.
     this.model = assembleModel(this.def, weaponItemId, offhandItemId);
+    // Orientation pins must exist from the FIRST frame (the char-select
+    // preview never runs a gear/skin diff, so finishWeaponAttach would never
+    // fire and an unpinned default bow hangs flat off the idle fist).
+    this.rebuildOrientPins(heldWeaponPayloads(this.model));
     applyMaterials(
       this.model,
       this.def,
@@ -536,6 +576,12 @@ export class CharacterVisual {
     this.starvedFrames = scan.starvedFrames;
     if (scan.repair) this.repairPose();
 
+    // Bow cycle phase machine: runs AFTER the base-state block (and the
+    // watchdog) so it can re-assert the aim hold over an idle fade or a pose
+    // repair the same frame, and outside `animate` so throttled rigs still
+    // latch phase edges.
+    this.driveBowCycle(dt, s);
+
     if (s.spinning && !s.dead) {
       this.spinAngle = (this.spinAngle + dt * SPIN_RATE) % (Math.PI * 2);
       this.spinOnceTimer = 0;
@@ -589,6 +635,7 @@ export class CharacterVisual {
     if (animate) {
       // BEFORE the mixer integrates: scrub the climb's baked clips (weights
       // and frozen times are mixer INPUTS, unlike the additive lifts below).
+      this.driveBowScrub();
       this.driveClimbClips();
       this.mixer.update(this.pendingDt);
       this.pendingDt = 0;
@@ -908,6 +955,147 @@ export class CharacterVisual {
     const window = Math.max(0.2, durationSeconds);
     const timeScale = Math.min(2, Math.max(0.5, a.getClip().duration / window));
     this.playOneShot('Spellcast_Raise', timeScale);
+  }
+
+  // -------------------------------------------------------------------------
+  // Bow-native ranged cycle (bow_cycle.ts decides, this block executes)
+  // -------------------------------------------------------------------------
+
+  /** The cycle's three actions, or null when this rig cannot run it (no
+   *  rangedBow declaration, or any clip absent from the bound GLB set). */
+  private bowClipActions(): {
+    draw: THREE.AnimationAction;
+    hold: THREE.AnimationAction;
+    release: THREE.AnimationAction;
+    armAt: number;
+  } | null {
+    const rb = this.def.clips.rangedBow;
+    if (!rb) return null;
+    const draw = this.action(rb.draw);
+    const hold = this.action(rb.hold);
+    const release = this.action(rb.release);
+    return draw && hold && release ? { draw, hold, release, armAt: rb.releaseArmAt } : null;
+  }
+
+  /** This rig runs the bow-native cycle (rangedBow declared AND every clip
+   *  bound). The renderer keys the arrow-vs-comet projectile visual off this
+   *  too: a warrior's hurled Storm Bolt carries the same 'ranged-shot' marker
+   *  but must keep the comet. */
+  get hasBowCycle(): boolean {
+    return this.bowClipActions() !== null;
+  }
+
+  /** A ranged projectile launched from this rig (the sim event, the cycle's
+   *  ground truth). Returns false when this rig has no bow cycle so the caller
+   *  can fall back to the plain attack one-shot. */
+  notifyRangedLaunch(): boolean {
+    if (this.deadLock || !this.bowClipActions()) return false;
+    this.bowLaunchPending = true;
+    return true;
+  }
+
+  /** The bow orientation pins and the nocked arrow read this: the whole cycle
+   *  counts as "shooting" (the hold is a loop, not a one-shot). */
+  private get bowCycleEngaged(): boolean {
+    return this.bow.phase !== 'off';
+  }
+
+  private driveBowCycle(dt: number, s: AnimState): void {
+    const acts = this.bowClipActions();
+    if (!acts) return;
+    if (this.deadLock) {
+      // death owns the pose outright; just fold the cycle so revive starts clean
+      this.bow.phase = 'off';
+      this.bowLaunchPending = false;
+      this.setNockedArrowVisible(false);
+      return;
+    }
+    const poseOk = !s.dead && !s.moving && !s.airborne && !s.swimming && !s.sitting && !s.spinning;
+    this.bowTimeToShot = s.bowTimeToShot ?? null;
+    const input = {
+      dt,
+      poseOk,
+      engaged: s.bowEngaged === true,
+      localIntent: s.bowLocalIntent === true,
+      timeToShot: this.bowTimeToShot,
+      launch: this.bowLaunchPending,
+      drawDone: this.bowDrawDone,
+      looseDone: this.bowLooseDone,
+    };
+    this.bowLaunchPending = false;
+    this.bowDrawDone = false;
+    this.bowLooseDone = false;
+    const rb = this.def.clips.rangedBow!;
+    switch (tickBowCycle(this.bow, input, { armAt: acts.armAt })) {
+      case 'draw':
+        this.playOneShot(
+          rb.draw,
+          bowDrawTimeScale(acts.draw.getClip().duration, acts.armAt, input.timeToShot),
+        );
+        this.setNockedArrowVisible(true);
+        break;
+      case 'hold':
+        this.fadeToBowHold(acts);
+        this.setNockedArrowVisible(true);
+        break;
+      case 'arm':
+        // start the release parked at the countdown-matched pre-snap frame;
+        // driveBowScrub tracks it from here
+        this.playOneShot(rb.release, 1);
+        acts.release.paused = true;
+        acts.release.time = bowArmScrubTime(acts.armAt, input.timeToShot ?? acts.armAt);
+        this.setNockedArrowVisible(true);
+        break;
+      case 'loose': {
+        const r = acts.release;
+        if (this.current !== r || !r.isRunning()) this.playOneShot(rb.release, 1);
+        r.paused = false;
+        r.time = acts.armAt; // the snap plays NOW, aligned to the launch
+        this.setNockedArrowVisible(false); // the flying arrow takes over
+        break;
+      }
+      case 'lower':
+        this.setNockedArrowVisible(false);
+        this.currentIsOneShot = false;
+        this.currentOneShotIsEmote = false;
+        this.fadeTo(
+          this.baseAction(),
+          FADE,
+          false,
+          this.baseState === 'cast' && this.castShouldLoop,
+        );
+        break;
+      case 'none':
+        // self-heal: a hit react or emote hand-off displaced the aim hold
+        if (this.bow.phase === 'hold' && !this.currentIsOneShot && this.current !== acts.hold)
+          this.fadeToBowHold(acts);
+        break;
+    }
+  }
+
+  /** The aim hold must LOOP (isOnce() would clamp it while the cast base state
+   *  owns the rig, freezing the sway), hence the explicit forceLoop. */
+  private fadeToBowHold(acts: { hold: THREE.AnimationAction }): void {
+    this.currentIsOneShot = false;
+    this.currentOneShotIsEmote = false;
+    this.fadeTo(acts.hold, FADE, false, true);
+  }
+
+  /** Mixer-input scrub for an armed release: the pre-snap segment tracks the
+   *  authoritative countdown directly, so cast pushback or a stalled swing
+   *  simply parks the pose (driveClimbClips pattern; runs before mixer.update). */
+  private driveBowScrub(): void {
+    if (this.bow.phase !== 'arm') return;
+    const acts = this.bowClipActions();
+    if (!acts) return;
+    acts.release.time = bowArmScrubTime(acts.armAt, this.bowTimeToShot ?? acts.armAt);
+  }
+
+  private setNockedArrowVisible(visible: boolean): void {
+    if (visible && this.nockedArrow === undefined) {
+      this.nockedArrow = attachNockedArrow(this.model);
+    }
+    if (this.nockedArrow) this.nockedArrow.visible = visible;
   }
 
   // -------------------------------------------------------------------------
@@ -1326,25 +1514,31 @@ export class CharacterVisual {
   /** The shared tail of every re-attach (slot swap, skin change, sheathe swap):
    *  re-pin skin orientation, re-run the material pass, re-snapshot originals,
    *  and rebuild the skin VFX on the payloads that now exist. */
+  /** Ranged SKINS take a root-relative orientation pin (position always rides
+   *  the hand): a bow skin aims upright WHILE the shot plays (the string hand
+   *  rolls a glued bow sideways mid-draw); a bow-slot gun carries muzzle
+   *  forward OUTSIDE the shot (the hanging idle arm points it at the ground)
+   *  and keeps the hand-tuned grip during the shouldered aim
+   *  (applySkinOrientation each frame). The DEFAULT bow needs no pin: its grip
+   *  is seated against this rig's own handslot frame (weapon_grip.ts), so it
+   *  reads through idle, draw, hold, and release. A SHEATHED weapon takes no
+   *  pin: its pose is the on-back grip, which the pin would fight every frame. */
+  private rebuildOrientPins(payloads: THREE.Object3D[]): void {
+    const mode = this.stow.attached ? null : weaponSkinOrientPin(this.weaponSkinId);
+    this.orientPins = mode
+      ? payloads.map((payload) => ({
+          payload,
+          qGrip: payload.quaternion.clone(),
+          blend: 0,
+          duringShot: mode === 'aimDuringShot',
+          target: mode === 'aimDuringShot' ? BOW_AIM_QUAT : GUN_CARRY_QUAT,
+        }))
+      : [];
+  }
+
   private finishWeaponAttach(payloads: THREE.Object3D[]): void {
-    // Ranged skins take a root-relative orientation pin (position always rides
-    // the hand): a bow aims upright WHILE the shot one-shot plays (the string
-    // hand rolls a glued bow sideways mid-draw); a bow-slot gun carries muzzle
-    // forward OUTSIDE the shot (the hanging idle arm points it at the ground)
-    // and keeps the hand-tuned grip during the shouldered aim
-    // (applySkinOrientation each frame). A SHEATHED weapon takes no pin: its
-    // pose is the on-back grip, which the pin would fight every frame.
-    {
-      const mode = this.stow.attached ? null : weaponSkinOrientPin(this.weaponSkinId);
-      this.orientPins = mode
-        ? payloads.map((payload) => ({
-            payload,
-            qGrip: payload.quaternion.clone(),
-            blend: 0,
-            duringShot: mode === 'aimDuringShot',
-          }))
-        : [];
-    }
+    this.rebuildOrientPins(payloads);
+    this.bowAimPayload = undefined; // prop graph changed: re-resolve lazily
     applyMaterials(
       this.model,
       this.def,
@@ -1485,7 +1679,28 @@ export class CharacterVisual {
    *  Also re-pins bow payload orientation (see reattachHeldWeapon). */
   updateWeaponVfx(dt: number): void {
     this.applySkinOrientation(dt);
+    this.applyBowAimAdjust(dt);
     for (const handle of this.weaponVfx) handle.update(dt);
+  }
+
+  /** Blend the default bow between its authored CARRY grip and the solved AIM
+   *  seat as the bow cycle engages/lowers (see BOW_AIM_ADJUST_QUAT). The whole
+   *  transform stays hand-local, so the bow keeps riding the fist through
+   *  every pose; only skins take the root-relative pins instead. */
+  private applyBowAimAdjust(dt: number): void {
+    if (this.bowAimPayload === undefined) {
+      const eligible =
+        this.def.clips.rangedBow !== undefined && !this.weaponSkinId && !this.stow.attached;
+      const payload = eligible ? (heldWeaponPayloads(this.model)[0] ?? null) : null;
+      this.bowAimPayload = payload ? { payload, qGrip: payload.quaternion.clone() } : null;
+    }
+    const seat = this.bowAimPayload;
+    if (!seat) return;
+    const target = this.bowCycleEngaged && !this.deadLock ? 1 : 0;
+    const step = dt / BOW_AIM_ADJUST_BLEND_S;
+    this.bowAimBlend = Math.min(1, Math.max(0, this.bowAimBlend + (target > 0 ? step : -step)));
+    BOW_Q_ADJUST.identity().slerp(BOW_AIM_ADJUST_QUAT, this.bowAimBlend);
+    seat.payload.quaternion.copy(seat.qGrip).multiply(BOW_Q_ADJUST);
   }
 
   /** Blend pinned skin payloads between the authored grip glue and their
@@ -1495,7 +1710,9 @@ export class CharacterVisual {
    *  the hand. No-op without pinned payloads. */
   private applySkinOrientation(dt: number): void {
     if (this.orientPins.length === 0) return;
-    const shot = this.currentIsOneShot && !this.currentOneShotIsEmote;
+    // The whole bow cycle counts as "the shot": the aim hold is a LOOP, so the
+    // one-shot flag alone would drop the upright pin mid-aim every cycle.
+    const shot = (this.currentIsOneShot && !this.currentOneShotIsEmote) || this.bowCycleEngaged;
     const step = dt / BOW_PIN_BLEND_S;
     this.root.getWorldQuaternion(BOW_Q_ROOT);
     for (const entry of this.orientPins) {
@@ -1509,9 +1726,7 @@ export class CharacterVisual {
       }
       // pinned local = parentWorld^-1 * rootWorld * pin target
       parent.getWorldQuaternion(BOW_Q_B).invert();
-      BOW_Q_TARGET.copy(BOW_Q_B)
-        .multiply(BOW_Q_ROOT)
-        .multiply(entry.duringShot ? BOW_AIM_QUAT : GUN_CARRY_QUAT);
+      BOW_Q_TARGET.copy(BOW_Q_B).multiply(BOW_Q_ROOT).multiply(entry.target);
       entry.payload.quaternion.copy(entry.qGrip).slerp(BOW_Q_TARGET, entry.blend);
     }
   }
@@ -1923,6 +2138,20 @@ export class CharacterVisual {
 
   private onFinished(a: THREE.AnimationAction): void {
     if (this.deadLock) return; // death clip clamps on its last frame
+    // Bow cycle hand-offs: the finished draw flows straight into the aim-hold
+    // loop (never back to idle), and a finished release holds its clamped
+    // carry frame for the tick it takes the cycle to pick draw-again vs lower
+    // (the poses are authored identical, so nothing pops).
+    const bowActs = this.bowClipActions();
+    if (bowActs && a === bowActs.draw && this.bow.phase === 'draw') {
+      this.bowDrawDone = true;
+      this.fadeToBowHold(bowActs);
+      return;
+    }
+    if (bowActs && a === bowActs.release && this.bow.phase === 'loose') {
+      this.bowLooseDone = true;
+      return;
+    }
     if (this.baseState === 'sit' && a === this.action(this.def.clips.sitDown)) {
       this.fadeTo(this.action(this.def.clips.sitIdle) ?? a, 0.25, false);
       return;
@@ -2027,6 +2256,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.walkBack,
     c.flourish,
     c.stow,
+    ...(c.rangedBow ? [c.rangedBow.draw, c.rangedBow.hold, c.rangedBow.release] : []),
     ...Object.values(c.emote ?? {}).flatMap((spec) => spec.clips),
   ].filter((n): n is string => !!n);
 }
