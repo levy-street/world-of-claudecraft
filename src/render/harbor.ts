@@ -6,9 +6,8 @@
 // the exact walkable ramp surfaces (the same ramps the sim walks, including
 // the gangplank onto the ship), lamp/crate/barrel/bollard dressing, and the
 // generated ferry ship GLB moored at the berth with its keel sunk draft
-// yards below the sea surface. The walkable shipDecks in the layout are
-// measured from that model's deck plane, so what you see is what you stand
-// on, on the ship too.
+// yards below the sea surface. The procedural ship factory emits both the
+// GLB and the generated walkable plan, so what you see is what you stand on.
 //
 // House style follows last_bell_fixtures.ts / mailbox.ts: deterministic (the
 // authored layout drives everything, never Math.random), materials go through
@@ -19,6 +18,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { LAST_BELL_PROP_PATH_SEGMENTS } from '../sim/content/last_bell_cinematics';
 import { getActiveWorldContent } from '../sim/data';
+import { GRAND_FERRY_SHIP_PLAN } from '../sim/grand_ferry_ship_plan.generated';
 import {
   HARBOR_RAIL_HEIGHT,
   type HarborDeck,
@@ -403,13 +403,16 @@ export interface HarborSceneDeps {
   nowSec: () => number;
 }
 
-// Ship-local yards for the 60-yard grand ferry. The authored shipDecks center
-// the main deck 6.6 yards along the +x bow axis at world y 0.72. The keel
-// parent rests at WATER_LEVEL - draft = -7, so y 7.72 puts the feet on deck.
+const HARBOR_SHIP_STANDARD_SCALE =
+  GRAND_FERRY_SHIP_PLAN.standardBerth.length / GRAND_FERRY_SHIP_PLAN.model.length;
+
+// Ship-local yards for the standard 60-yard grand ferry. The generated deck
+// center and height keep the moving player stand-in on the same authored deck.
 const HARBOR_SHIP_DECK_STAND_IN_ATTACH = {
-  x: 6.6,
-  y: 7.72,
-  z: 0,
+  x: GRAND_FERRY_SHIP_PLAN.deck.x * HARBOR_SHIP_STANDARD_SCALE,
+  y:
+    (GRAND_FERRY_SHIP_PLAN.deck.y - GRAND_FERRY_SHIP_PLAN.model.keelY) * HARBOR_SHIP_STANDARD_SCALE,
+  z: GRAND_FERRY_SHIP_PLAN.deck.z * HARBOR_SHIP_STANDARD_SCALE,
   yaw: Math.PI / 2,
 } satisfies DeckStandInAttachPoint;
 const DECK_STAND_IN_IDLE_STATE: AnimState = {
@@ -663,13 +666,13 @@ export const updateHarborShips = createHarborShipUpdater<Entity, CharacterVisual
 function buildShip(parent: THREE.Group, harbor: HarborDef): void {
   const ship = propAsset('harborShip');
   const scale = harbor.berth.length / ship.size.x;
-  const g = addAsset(parent, ship, {
-    x: harbor.berth.x,
-    y: WATER_LEVEL - harbor.berth.draft,
-    z: harbor.berth.z,
-    scale,
-  });
+  const g = new THREE.Group();
+  g.position.set(harbor.berth.x, WATER_LEVEL - harbor.berth.draft, harbor.berth.z);
+  g.scale.setScalar(scale);
   g.rotation.y = harbor.berth.rot;
+  parent.add(g);
+  const shipVisual = addAsset(g, ship);
+  if (harbor.berth.mirrorZ) shipVisual.scale.z = -1;
   const target = `harbor_ship_${harbor.id}`;
   const handle: HarborShipHandle = {
     target,
@@ -715,9 +718,6 @@ export function buildHarbors(seed: number, deps: HarborSceneDeps): { group: THRE
     rampMeshes = [];
     for (const deck of harbor.decks) buildDeck(wood, deck, seed);
     for (const rail of harbor.rails) {
-      buildRail(wood, rail, harborSurfaceHeight(harbor, rail.x, rail.z));
-    }
-    for (const rail of harbor.shipRails) {
       buildRail(wood, rail, harborSurfaceHeight(harbor, rail.x, rail.z));
     }
     for (const ramp of harbor.ramps) buildRamp(wood, ramp);

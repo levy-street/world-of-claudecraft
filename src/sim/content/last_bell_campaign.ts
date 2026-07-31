@@ -17,8 +17,7 @@ import {
   buildScene,
   coveredCut,
   fadeInTail,
-  SCENE_CUT_FADE_SECONDS,
-  type SceneCameraShotDef,
+  MIN_PERCEPTUAL_FADE_SECONDS,
   type SceneTimelineEntry,
 } from '../scenes/authoring';
 import { registerChoice } from '../scenes/choices';
@@ -65,6 +64,16 @@ export const LAST_BELL_CAMPAIGN_MOBS: Record<string, MobTemplate> = {
 // posts in FARSHORE_NPCS)
 // ---------------------------------------------------------------------------
 
+const EWALD_POST = {
+  x: MAINLAND_HARBOR.boarding.x - 2,
+  z: MAINLAND_HARBOR.boarding.z - 0.9,
+} as const;
+
+const ODDA_POST = {
+  x: GULLHAVEN_HARBOR.boarding.x - 0.9,
+  z: GULLHAVEN_HARBOR.boarding.z + 1.5,
+} as const;
+
 export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
   // The mainland side of the crossing. He sells nothing and saves lives
   // anyway: the ferry is how a proven hand reaches a besieged island.
@@ -75,11 +84,11 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
     // His post is ON DECK at the top of the gangplank: he greets riders as
     // they step aboard, and stands close enough to the boarding point to
     // hand out Q0. The harbor layout is the single anchor source.
-    pos: {
-      x: MAINLAND_HARBOR.boarding.x - 2,
-      z: MAINLAND_HARBOR.boarding.z - 0.9,
-    },
-    facing: MAINLAND_HARBOR.gangplank.facing,
+    pos: EWALD_POST,
+    facing: Math.atan2(
+      MAINLAND_HARBOR.gangplank.x - EWALD_POST.x,
+      MAINLAND_HARBOR.gangplank.z - EWALD_POST.z,
+    ),
     color: 0x4a5a7a,
     // Q0 is accepted automatically on the first crossing, but the canonical
     // giver link still belongs on Ewald for quest integrity, save repair, and
@@ -94,11 +103,11 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
     id: 'ferrykeeper_odda',
     name: 'Ferrykeeper Odda',
     title: 'The Farshore Crossing',
-    pos: {
-      x: GULLHAVEN_HARBOR.boarding.x - 0.9,
-      z: GULLHAVEN_HARBOR.boarding.z + 1.5,
-    },
-    facing: Math.PI / 2,
+    pos: ODDA_POST,
+    facing: Math.atan2(
+      GULLHAVEN_HARBOR.gangplank.x - ODDA_POST.x,
+      GULLHAVEN_HARBOR.gangplank.z - ODDA_POST.z,
+    ),
     color: 0x4a5a7a,
     questIds: [],
     greeting:
@@ -206,6 +215,7 @@ const LAST_BELL_TOLL_LINE_SECONDS = 6.5;
 
 const VOYAGE_CORE_BEATS = {
   castOff: 0.2,
+  castOffCut: MIN_PERCEPTUAL_FADE_SECONDS + DT,
   openWater: 4.2,
   seaArrival: 8.5,
   pier: 15.5,
@@ -343,20 +353,13 @@ function attachShot(
   };
 }
 
-function blackTickCoveredCut<Beat extends string>(
-  at: Beat,
-  shot: SceneCameraShotDef,
-): SceneTimelineEntry<Beat>[] {
-  return [{ at: beat(at, -DT), kind: 'fade', to: 'black', dur: 0 }, coveredCut(at, shot)];
-}
-
 function arrivalPierTimeline(
   direction: VoyageDirection,
   includeHarborLine: boolean,
 ): SceneTimelineEntry<VoyageCoreBeat>[] {
   const timeline: SceneTimelineEntry<VoyageCoreBeat>[] = [
     { at: 'pier', kind: 'prop', target: direction.arrivalTarget, cue: LB_PROP_CUE_PARK },
-    ...blackTickCoveredCut('pier', direction.pierShot),
+    coveredCut('pier', direction.pierShot),
     {
       at: beat('pier', 0.4),
       kind: 'playerWalk',
@@ -384,15 +387,20 @@ function voyageTimeline(
     { at: 0, kind: 'letterbox', on: true },
     { at: 0, kind: 'inputLock', on: true },
     { at: 0, kind: 'music', directive: 'lb_harbor_ambience' },
-    { at: 0, kind: 'fade', to: 'black', dur: 0 },
+    {
+      at: 0,
+      kind: 'fade',
+      to: 'black',
+      dur: MIN_PERCEPTUAL_FADE_SECONDS,
+    },
     {
       at: 'castOff',
       kind: 'prop',
       target: direction.departureTarget,
       cue: direction.segmentIds.castOff,
     },
-    ...blackTickCoveredCut(
-      'castOff',
+    coveredCut(
+      'castOffCut',
       attachShot(direction.departureTarget, direction.departureHarbor, direction.sternOffset),
     ),
     { at: 1.2, kind: 'music', directive: 'lb_bell_toll_one' },
@@ -403,7 +411,7 @@ function voyageTimeline(
       target: direction.departureTarget,
       cue: direction.segmentIds.openWater,
     },
-    ...blackTickCoveredCut(
+    coveredCut(
       'openWater',
       attachShot(direction.departureTarget, direction.departureHarbor, direction.sideOffset),
     ),
@@ -413,7 +421,7 @@ function voyageTimeline(
       target: direction.arrivalTarget,
       cue: direction.segmentIds.arrival,
     },
-    ...blackTickCoveredCut(
+    coveredCut(
       'seaArrival',
       attachShot(
         direction.arrivalTarget,
@@ -463,7 +471,7 @@ const Q0_TOLL_SHOT: SceneDollyShotDef = {
 
 function q0StoryTimeline(): SceneTimelineEntry<Q0StoryBeat>[] {
   return [
-    ...blackTickCoveredCut('statue', Q0_STATUE_SHOT),
+    coveredCut('statue', Q0_STATUE_SHOT),
     {
       at: beat('statue', 0.2),
       kind: 'line',
@@ -472,7 +480,7 @@ function q0StoryTimeline(): SceneTimelineEntry<Q0StoryBeat>[] {
       dur: LAST_BELL_PLINTH_LINE_SECONDS,
     },
     { at: beat('toll', -0.1), kind: 'music', directive: 'lb_bell_toll_one' },
-    ...blackTickCoveredCut('toll', Q0_TOLL_SHOT),
+    coveredCut('toll', Q0_TOLL_SHOT),
     {
       at: beat('toll', 0.2),
       kind: 'line',
@@ -486,12 +494,11 @@ function q0StoryTimeline(): SceneTimelineEntry<Q0StoryBeat>[] {
 function releaseTimeline(): SceneTimelineEntry<ReleaseBeat>[] {
   return [
     {
-      at: beat('release', -(SCENE_CUT_FADE_SECONDS + DT)),
+      at: beat('release', -(MIN_PERCEPTUAL_FADE_SECONDS + DT)),
       kind: 'fade',
       to: 'black',
-      dur: SCENE_CUT_FADE_SECONDS,
+      dur: MIN_PERCEPTUAL_FADE_SECONDS,
     },
-    { at: beat('release', -DT), kind: 'fade', to: 'black', dur: 0 },
     { at: 'release', kind: 'fade', to: 'black', dur: 0 },
     { at: 'release', kind: 'camera', shot: { kind: 'release' } },
     fadeInTail(beat('release', DT)),
