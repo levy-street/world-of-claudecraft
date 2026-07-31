@@ -40,18 +40,23 @@ import {
   HARBORS,
   type HarborDef,
   harborRampHeight,
+  harborShipParkedPose,
   MAINLAND_HARBOR,
 } from '../src/sim/harbor_layout';
 import {
   add,
+  BERTH_POSE_POSITION_EPSILON_YARDS,
+  BERTH_POSE_YAW_EPSILON_RADIANS,
   CAMERA_TERRAIN_CLEARANCE_YARDS,
   CAMERA_WATER_CLEARANCE_YARDS,
   type CameraGeometry,
   cameraGeometry,
+  classifyBerthGlideCues,
   DEG_PER_RAD,
   deckStandInPoint,
   directionAngleDeg,
   ENTITY_SUPPORT_EPSILON_YARDS,
+  evaluateBerthPoseContinuity,
   evaluateEntitySupport,
   evaluateFraming,
   FULL_BLACK_OPACITY,
@@ -91,6 +96,7 @@ import {
   normalize,
   PIER_KEEP_OUT_HEIGHT_YARDS,
   PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS,
+  parkedShipFrame,
   playerCapsuleIntersectsFrame,
   pointInFrame,
   pointInsideDeck,
@@ -275,6 +281,10 @@ type TimedCameraOp = TimedSceneOp & {
   readonly op: Extract<SceneWireOp, { kind: 'camera' }>;
 };
 
+type TimedPropOp = TimedSceneOp & {
+  readonly op: Extract<SceneWireOp, { kind: 'prop' }>;
+};
+
 interface EntityPoint {
   readonly x: number;
   readonly y: number;
@@ -366,6 +376,9 @@ interface SyntheticControl {
 }
 
 const SYNTHETIC_FAST_PROP_CUE = 'scn_test_lint_prop_speed_bad';
+const SYNTHETIC_OFFSET_BERTH_ARRIVAL_CUE = 'scn_test_lint_berth_pose_bad';
+const SYNTHETIC_BERTH_DEPARTURE_YAW_CUE = 'scn_test_lint_berth_pose_departure_yaw_bad';
+const SYNTHETIC_PARKED_GLIDE_CUE = 'scn_test_lint_berth_pose_parked_pass';
 const SYNTHETIC_LANDWARD_ARRIVAL_CUE = 'scn_test_lint_arrival_direction_bad';
 const SYNTHETIC_REVERSED_BOW_ARRIVAL_CUE = 'scn_test_lint_arrival_bow_bad';
 const SYNTHETIC_MISSED_BERTH_ARRIVAL_CUE = 'scn_test_lint_arrival_berth_bad';
@@ -1033,6 +1046,46 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     expectedMeasured: 'missing cue scn_test_lint_prop_segment_missing_bad',
   },
   {
+    def: syntheticCameraScene('scn_test_lint_berth_pose_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_mainland',
+        cue: SYNTHETIC_OFFSET_BERTH_ARRIVAL_CUE,
+      },
+      {
+        at: SAMPLE_INTERVAL_SEC,
+        kind: 'prop',
+        target: 'harbor_ship_mainland',
+        cue: LB_PROP_CUE_PARK,
+      },
+      ...SYNTHETIC_GRAMMAR_CAMERA_OPS,
+    ]),
+    expectedCheck: 'continuity.berthPose',
+    expectedMeasured: 'arrival last sample is 0.020 yd',
+    onlyExpectedCheck: true,
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_berth_pose_departure_yaw_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_mainland',
+        cue: SYNTHETIC_BERTH_DEPARTURE_YAW_CUE,
+      },
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_gullhaven',
+        cue: SYNTHETIC_PARKED_GLIDE_CUE,
+      },
+      ...SYNTHETIC_GRAMMAR_CAMERA_OPS,
+    ]),
+    expectedCheck: 'continuity.berthPose',
+    expectedMeasured: 'departure first sample is 0.000 yd and 0.002 rad',
+    onlyExpectedCheck: true,
+  },
+  {
     def: syntheticCameraScene('scn_test_lint_ship_screen_direction_bad', 1.7, [
       {
         at: 0,
@@ -1660,6 +1713,24 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
 
 const PROP_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> = {
   ...LAST_BELL_PROP_PATH_SEGMENTS,
+  [SYNTHETIC_OFFSET_BERTH_ARRIVAL_CUE]: {
+    start: { x: BERTH_POSE_POSITION_EPSILON_YARDS * 3, y: 0, z: 0, yaw: 0 },
+    end: { x: BERTH_POSE_POSITION_EPSILON_YARDS * 2, y: 0, z: 0, yaw: 0 },
+    duration: SAMPLE_INTERVAL_SEC,
+    ease: 'linear',
+  },
+  [SYNTHETIC_BERTH_DEPARTURE_YAW_CUE]: {
+    start: { x: 0, y: 0, z: 0, yaw: BERTH_POSE_YAW_EPSILON_RADIANS * 2 },
+    end: { x: 0, y: 0, z: 0, yaw: BERTH_POSE_YAW_EPSILON_RADIANS * 2 },
+    duration: 1,
+    ease: 'linear',
+  },
+  [SYNTHETIC_PARKED_GLIDE_CUE]: {
+    start: { x: 0, y: 0, z: 0, yaw: 0 },
+    end: { x: 0, y: 0, z: 0, yaw: 0 },
+    duration: 1,
+    ease: 'linear',
+  },
   [SYNTHETIC_FAST_PROP_CUE]: {
     start: { x: 0, y: 0, z: 0, yaw: 0 },
     end: { x: 40, y: 0, z: 0, yaw: 0 },
@@ -1703,8 +1774,8 @@ const PROP_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> = {
     ease: 'linear',
   },
   [SYNTHETIC_ATTACH_PASS_CUE]: {
-    start: { x: 50, y: 10, z: 0, yaw: 0 },
-    end: { x: 58, y: 10, z: 0, yaw: 0 },
+    start: { x: 0, y: 0, z: 0, yaw: 0 },
+    end: { x: 8, y: 0, z: 0, yaw: 0 },
     duration: 4,
     ease: 'linear',
   },
@@ -2270,12 +2341,13 @@ function shipFrameForPose(
   harbor: HarborDef,
   pose: { x: number; y: number; z: number; yaw: number },
 ): SceneAttachFrame {
+  const parked = parkedShipFrame(harbor, runtimeWaterLevel);
   return composeHarborShipAttachFrame(
     {
-      baseX: harbor.berth.x,
-      baseY: runtimeWaterLevel - harbor.berth.draft,
-      baseZ: harbor.berth.z,
-      baseRot: harbor.berth.rot,
+      baseX: parked.position.x,
+      baseY: parked.position.y,
+      baseZ: parked.position.z,
+      baseRot: parked.yaw,
     },
     { ...pose, done: false },
     { position: { x: 0, y: 0, z: 0 }, yaw: 0 },
@@ -3397,6 +3469,21 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
   for (const timed of scene.ops) {
     if (timed.op.kind === 'prop') propTargets.add(timed.op.target);
   }
+  const harborShipTargets = new Set(HARBORS.map(shipTarget));
+  const berthPropOps = scene.ops.filter(
+    (timed): timed is TimedPropOp =>
+      timed.op.kind === 'prop' && harborShipTargets.has(timed.op.target),
+  );
+  const berthPropCues = berthPropOps.map((timed) => ({
+    target: timed.op.target,
+    parksTarget: timed.op.cue === LB_PROP_CUE_PARK,
+  }));
+  const berthGlideRoles = new Map<number, 'departure' | 'arrival'>();
+  for (const [cueIndex, classification] of classifyBerthGlideCues(berthPropCues).entries()) {
+    if (classification) {
+      berthGlideRoles.set(berthPropOps[cueIndex].index, classification);
+    }
+  }
   const cameraOps = scene.ops.filter((timed): timed is TimedCameraOp => timed.op.kind === 'camera');
   const shotOps = cameraOps.filter((timed) => timed.op.shot.kind !== 'release');
   const authoredCameraOps = scene.authoredOps.filter(
@@ -3561,6 +3648,34 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
             timedOp: timed,
           });
           if (harbor) {
+            const berthGlideRole = berthGlideRoles.get(timed.index);
+            if (berthGlideRole) {
+              const endpointLabel = berthGlideRole === 'departure' ? 'first sample' : 'last sample';
+              const endpointTime = berthGlideRole === 'departure' ? 0 : segment.duration;
+              const endpointFrame = shipFrameForPose(harbor, propPathPoseAt(segment, endpointTime));
+              const continuity = evaluateBerthPoseContinuity(
+                harbor,
+                endpointFrame,
+                runtimeWaterLevel,
+              );
+              if (!continuity.passing) {
+                report({
+                  sceneId: scene.id,
+                  check: 'continuity.berthPose',
+                  opIndex: timed.index,
+                  opKind: opKind(timed.op),
+                  time: timed.at,
+                  threshold: `${berthGlideRole} ${endpointLabel} within ${BERTH_POSE_POSITION_EPSILON_YARDS.toFixed(
+                    3,
+                  )} yd and ${BERTH_POSE_YAW_EPSILON_RADIANS.toFixed(
+                    3,
+                  )} rad of the ${harbor.id} rendered parked pose`,
+                  measured: `${berthGlideRole} ${endpointLabel} is ${continuity.positionDelta.toFixed(
+                    3,
+                  )} yd and ${continuity.yawDelta.toFixed(3)} rad from the parked pose`,
+                });
+              }
+            }
             const maximumSpeed = maximumPropSegmentSpeed(harbor, segment);
             if (maximumSpeed > LAST_BELL_CINEMATIC_SHIP_SPEED_CAP_YARDS_PER_SEC) {
               report({
@@ -4062,6 +4177,81 @@ describe('cinematic shot mechanical gate', () => {
       missingChecks,
       `MechanicalCheck members without a synthetic failing control: ${missingChecks.join(', ')}`,
     ).toEqual([]);
+  });
+
+  it('pins berth continuity tolerances, boundaries, and cross-ship reset classification', () => {
+    expect(BERTH_POSE_POSITION_EPSILON_YARDS).toBe(0.01);
+    expect(BERTH_POSE_YAW_EPSILON_RADIANS).toBe(0.001);
+
+    const waterLevel = 7;
+    expect(
+      harborShipParkedPose({ x: 3, z: 4, rot: 0.5, draft: 2, length: 10 }, waterLevel),
+    ).toEqual({ x: 3, y: 5, z: 4, yaw: 0.5 });
+    const parked = parkedShipFrame(MAINLAND_HARBOR, waterLevel);
+    expect(
+      evaluateBerthPoseContinuity(
+        MAINLAND_HARBOR,
+        {
+          position: {
+            ...parked.position,
+            x: parked.position.x + BERTH_POSE_POSITION_EPSILON_YARDS,
+          },
+          yaw: parked.yaw + BERTH_POSE_YAW_EPSILON_RADIANS,
+        },
+        waterLevel,
+      ).passing,
+    ).toBe(true);
+    expect(
+      evaluateBerthPoseContinuity(
+        MAINLAND_HARBOR,
+        {
+          position: {
+            ...parked.position,
+            y: parked.position.y + BERTH_POSE_POSITION_EPSILON_YARDS * 0.8,
+            z: parked.position.z + BERTH_POSE_POSITION_EPSILON_YARDS * 0.8,
+          },
+          yaw: parked.yaw,
+        },
+        waterLevel,
+      ).passing,
+    ).toBe(false);
+    expect(
+      evaluateBerthPoseContinuity(
+        MAINLAND_HARBOR,
+        {
+          position: parked.position,
+          yaw: parked.yaw + Math.PI * 2,
+        },
+        waterLevel,
+      ).passing,
+    ).toBe(true);
+    expect(
+      evaluateBerthPoseContinuity(
+        MAINLAND_HARBOR,
+        {
+          position: parked.position,
+          yaw: parked.yaw + Math.PI * 2 + BERTH_POSE_YAW_EPSILON_RADIANS + 0.000001,
+        },
+        waterLevel,
+      ).passing,
+    ).toBe(false);
+
+    expect(
+      classifyBerthGlideCues([
+        { target: 'mainland', parksTarget: false },
+        { target: 'gullhaven', parksTarget: false },
+        { target: 'mainland', parksTarget: false },
+        { target: 'gullhaven', parksTarget: false },
+        { target: 'gullhaven', parksTarget: true },
+      ]),
+    ).toEqual(['departure', 'departure', 'departure', 'arrival', null]);
+    expect(
+      classifyBerthGlideCues([
+        { target: 'mainland', parksTarget: false },
+        { target: 'mainland', parksTarget: false },
+        { target: 'mainland', parksTarget: true },
+      ]),
+    ).toEqual(['departure', 'arrival', null]);
   });
 
   it('pins generated hull fill, rider negatives, and the gangway mating boundary', async () => {

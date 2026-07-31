@@ -99,6 +99,22 @@ export interface HarborShipLocalBounds {
   topY: number;
 }
 
+export interface HarborShipParkedPose {
+  x: number;
+  y: number;
+  z: number;
+  yaw: number;
+}
+
+export function harborShipParkedPose(berth: HarborBerth, waterLevel: number): HarborShipParkedPose {
+  return {
+    x: berth.x,
+    y: waterLevel - berth.draft,
+    z: berth.z,
+    yaw: berth.rot,
+  };
+}
+
 export function harborShipLocalBounds(berth: HarborBerth): HarborShipLocalBounds {
   const scale = berth.length / GRAND_FERRY_SHIP_PLAN.model.length;
   return {
@@ -109,21 +125,6 @@ export function harborShipLocalBounds(berth: HarborBerth): HarborShipLocalBounds
     bottomY: GRAND_FERRY_SHIP_PLAN.model.keelY * scale,
     topY: GRAND_FERRY_SHIP_PLAN.model.height * scale,
   };
-}
-
-export function harborShipLocalPointInside(
-  bounds: HarborShipLocalBounds,
-  point: { x: number; y: number; z: number },
-  horizontalMargin = 0,
-): boolean {
-  return (
-    point.x >= bounds.x - bounds.hw - horizontalMargin &&
-    point.x <= bounds.x + bounds.hw + horizontalMargin &&
-    point.z >= bounds.z - bounds.hd - horizontalMargin &&
-    point.z <= bounds.z + bounds.hd + horizontalMargin &&
-    point.y >= bounds.bottomY &&
-    point.y < bounds.topY
-  );
 }
 
 export interface HarborDef {
