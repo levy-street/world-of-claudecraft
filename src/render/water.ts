@@ -139,7 +139,9 @@ export function hasWaterShaderAssets(): boolean {
 }
 
 const DEEP_COLOR = new THREE.Color(0x0d3a52);
-const SHALLOW_COLOR = new THREE.Color(0x2d8077);
+/** Canonical shallow-water tint, exported for surfaces that must match the
+ *  sea palette without the full shader (the Wildheart waterfall ribbons). */
+export const SHALLOW_COLOR = new THREE.Color(0x2d8077);
 const SKY_TINT = new THREE.Color(0x7fb2e0); // matches the sky horizon band
 const SUN_COLOR = new THREE.Color(0xfff0d4);
 
@@ -362,7 +364,9 @@ function disposeOwned(meshes: THREE.Mesh[]): void {
   for (const material of materials) material.dispose();
 }
 
-function zeroWaveUniforms(): WaterWaveUniforms {
+/** Inert wave uniforms for surfaces with no interactive height field (no
+ *  renderer to run the simulation, or an interior pool outside its window). */
+export function zeroWaveUniforms(): WaterWaveUniforms {
   return {
     uWaveState: { value: WATER_TEX.n1 },
     uWaveEnabled: { value: 0 },
@@ -371,15 +375,15 @@ function zeroWaveUniforms(): WaterWaveUniforms {
   };
 }
 
-function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterView {
-  // legacy procedural maps still get generated (unused) to preserve the
-  // shared-LCG call order in textures.ts for everything generated after
-  waterNormalMaps();
-  const simulation = renderer ? new WaterSimulation(renderer) : null;
-  const wave = simulation ? simulation.uniforms : zeroWaveUniforms();
-  // ONE material for every zone plane and the apron, so the field's uniform
-  // objects (shared by reference, like uTime) drive the whole surface.
-  const material = new THREE.ShaderMaterial({
+/**
+ * The one overworld water surface material (dual-scroll + swell normal maps,
+ * fresnel sky tint, HDR sun glints, shore foam, fog). Exported so interior
+ * builders (the Wildheart Basin) draw the exact same surface; geometry fed to
+ * it must carry aShoreDepth/aShoreSlope attributes. Callers gate on
+ * GFX.standardMaterials && hasWaterShaderAssets() exactly like buildWater.
+ */
+export function createWaterSurfaceMaterial(wave: WaterWaveUniforms): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
     uniforms: {
       ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
       uNorm1: { value: WATER_TEX.n1 },
@@ -402,6 +406,17 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     depthWrite: false,
     fog: true,
   });
+}
+
+function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterView {
+  // legacy procedural maps still get generated (unused) to preserve the
+  // shared-LCG call order in textures.ts for everything generated after
+  waterNormalMaps();
+  const simulation = renderer ? new WaterSimulation(renderer) : null;
+  const wave = simulation ? simulation.uniforms : zeroWaveUniforms();
+  // ONE material for every zone plane and the apron, so the field's uniform
+  // objects (shared by reference, like uTime) drive the whole surface.
+  const material = createWaterSurfaceMaterial(wave);
 
   const meshes: THREE.Mesh[] = [];
   const group = new THREE.Group();

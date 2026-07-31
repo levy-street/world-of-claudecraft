@@ -112,10 +112,18 @@ export function hasTerrainSplatAssets(): boolean {
   );
 }
 
+/** Narrow read of the loaded grass splat layers for interiors that reuse the
+ *  overworld ground look (the Wildheart Basin floor). Undefined until the
+ *  boot preload resolves; callers must fall back to their own material. */
+export function terrainSplatTexture(key: 'grassC' | 'grassN'): THREE.Texture | undefined {
+  return TERRAIN_TEX[key];
+}
+
 // Per-layer constant roughness, eyeballed from the packs' roughness-map means
 // (saves four samplers vs. real roughness maps; terrain is never glossy
 // enough for the difference to read at gameplay camera distance).
-const ROUGH_GRASS = 0.8;
+// ROUGH_GRASS is exported for interiors sharing the grass albedo.
+export const ROUGH_GRASS = 0.8;
 const ROUGH_DIRT = 0.9;
 const ROUGH_ROCK = 0.75;
 const ROUGH_SAND = 0.85;

@@ -1695,6 +1695,31 @@ function applyGrassShader(
   };
 }
 
+/** The overworld jungle grass tint (GRASS_TINT.jungle), for interiors that
+ *  reuse the grass-tuft look (the Wildheart Basin ground cover). */
+export const JUNGLE_GRASS_TINT: number = GRASS_TINT.jungle;
+
+/**
+ * The standard high-tier grass-tuft material (lush texture card, alphaTest
+ * cutout, wind sway on the shared uTime clock) for a STATIC interior scatter:
+ * the player-distance fade is neutralized (uPlayerPos parked at infinity,
+ * uFadeFar huge) so a one-shot InstancedMesh never thins with distance.
+ */
+export function createGrassTuftMaterial(): THREE.Material {
+  const mat = configureMaskedDoubleSidedVegetationMaterial(
+    new THREE.MeshStandardMaterial({
+      map: grassTuftTexture(30),
+      alphaTest: 0.3,
+      roughness: 0.9,
+    }),
+  );
+  applyGrassShader(mat, {
+    uPlayerPos: { value: new THREE.Vector2(1e6, 1e6) },
+    uFadeFar: { value: 1e6 },
+  });
+  return mat;
+}
+
 function loopbackHostname(hostname: string): boolean {
   return (
     hostname === 'localhost' ||
