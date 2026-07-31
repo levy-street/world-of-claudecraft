@@ -247,15 +247,15 @@ with the current bank rebuild's hashes or measurements.
 
 | Shipping GLB                      |     Bytes | Triangles | Primitives/materials | Textures/animations/skins | SHA-256                                                            |
 | --------------------------------- | --------: | --------: | -------------------: | ------------------------: | ------------------------------------------------------------------ |
-| `eastbrook_bank.glb`              |  `40,000` |   `2,324` |              `2 / 2` |               `0 / 0 / 0` | `d8de1129edf7bdf7789b1cf0a1088eb492c7617948c4c05d34c95b43876f97cf` |
-| `eastbrook_smithy.glb`            |  `40,352` |   `2,410` |              `2 / 2` |               `0 / 0 / 0` | `f07fb30a58733982216e51e99abcb29d9323df8035820a74ab6919d865824c21` |
-| `eastbrook_inn.glb`               |  `67,768` |   `4,348` |              `2 / 2` |               `0 / 0 / 0` | `16213ff1526914d7448d87ac12667fe4702ae76edee9acfc50f26478242af902` |
-| `eastbrook_chapel.glb`            |  `66,132` |   `4,120` |              `2 / 2` |               `0 / 0 / 0` | `efe504a2d46e3eadaba772e35c893647e867ee2ee9fde252890d971a98c75af0` |
-| `eastbrook_weaving_workshop.glb`  |  `40,392` |   `2,412` |              `2 / 2` |               `0 / 0 / 0` | `bd3e8486102bcab9a8e8385631b4bf09e2d9b9c4d41eec8e0d6a150def93514d` |
-| `eastbrook_toolworks.glb`         |  `39,920` |   `2,320` |              `2 / 2` |               `0 / 0 / 0` | `a87b4b647b07555209448c4a34642c230b457648d9aff4d99c50605c405626d1` |
-| `eastbrook_civic_well_beacon.glb` |  `13,216` |     `464` |              `2 / 2` |               `0 / 0 / 0` | `b999fde017b1c67cf54dd45bc1648b0f11c7208b6e8e8cf24c0cafb818b2e76e` |
-| `eastbrook_market_stall.glb`      |  `27,072` |   `1,314` |              `2 / 2` |               `0 / 0 / 0` | `c6a3fbca05b6dcd27669be04ae163e7727d9914a9c8f9ce3d3fb9f1c776915ff` |
-| `eastbrook_wall_wing.glb`         |   `8,352` |     `206` |              `2 / 2` |               `0 / 0 / 0` | `63c6f1a7009d8981355c6f63449e0baf9afa23be137231b4446ce59618b4a3b5` |
+| `eastbrook_bank.glb`              |  `40,000` |   `2,324` |              `2 / 2` |               `0 / 0 / 0` | `95618960da407e9a4816fd712633476968b158a7177fede489fac59b2ca5d20d` |
+| `eastbrook_smithy.glb`            |  `40,352` |   `2,410` |              `2 / 2` |               `0 / 0 / 0` | `79ea451377d63034259f347721d1ac2811616ce3b26f4e4f21e8f2c0af341ffa` |
+| `eastbrook_inn.glb`               |  `67,768` |   `4,348` |              `2 / 2` |               `0 / 0 / 0` | `c50e37abba211d71456b8a4292e97535f2c0c9c960833bb9d52a2c0c8e1865d9` |
+| `eastbrook_chapel.glb`            |  `66,132` |   `4,120` |              `2 / 2` |               `0 / 0 / 0` | `48a304e75c038ac6244926d589701e41679d4c5e28bb9d7a8993339a5de8babf` |
+| `eastbrook_weaving_workshop.glb`  |  `40,392` |   `2,412` |              `2 / 2` |               `0 / 0 / 0` | `17e889f021e7796f816950b694ca8ad54cc5284b2301bc446f27efe9bfa4c267` |
+| `eastbrook_toolworks.glb`         |  `39,920` |   `2,320` |              `2 / 2` |               `0 / 0 / 0` | `b742089e1cb07167512b46c8bd8781aa6a50f8dab40af901431f3c4d0fc552f4` |
+| `eastbrook_civic_well_beacon.glb` |  `13,216` |     `464` |              `2 / 2` |               `0 / 0 / 0` | `6d0463046440f344f52cc4f6a13a4823e5e6797d15208b6bbff66782c3573ac2` |
+| `eastbrook_market_stall.glb`      |  `27,072` |   `1,314` |              `2 / 2` |               `0 / 0 / 0` | `3577ddeef5594495d42ee4e711ba7240b6a0bba62311b5ce9241b702b96c6562` |
+| `eastbrook_wall_wing.glb`         |   `8,352` |     `206` |              `2 / 2` |               `0 / 0 / 0` | `568b5acdc1d778a7d62500c6c88ac312721f8393cc36a18d309fcbb5c56baa11` |
 | Historical v1 subtotal            | `343,204` |  `19,918` |            `18 / 18` |               `0 / 0 / 0` | n/a                                                                |
 
 ### Current bank rebuild and town bundle
@@ -265,7 +265,7 @@ The bank was rebuilt from its Eastbrook turnaround while retaining its exact
 shipping bank is `52,508` bytes and `3,104` triangles (`2,928` opaque and `176` emissive), with
 SHA-256 `59ee6025292eaeb616708be569d55d50d4f2de2077d0ab9418b6265054102c34`.
 Its source fingerprint is
-`4430923952c20d7a5883b54aea8b09fe305b392090aec5968b73bd8cf5b7a02a`.
+`4d3ec4b5413f6db4b30939ce883d093875f3a29a0ff6dcb32140cbaa783217bf`.
 
 The rebuilt facade keeps the arched entrance visible, aligns the teller counter with its awning,
 posts, and socket, and leaves the secure alcove empty so the separate runtime banker chest is not
@@ -280,8 +280,8 @@ The retained shared `512 x 512` lossless WebP atlas is `141,666` bytes, SHA-256
 
 | Shipping GLB                |  Bounds `W x H x D` |    Bytes | Triangles | Primitives/materials | Textures/animations/skins | SHA-256                                                            | Source fingerprint                                                 |
 | --------------------------- | ------------------: | -------: | --------: | -------------------: | ------------------------: | ------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| `mailbox_pillar.glb`        | `1.65 x 2.9 x 1.05` | `32,884` |   `1,640` |              `2 / 2` |               `0 / 0 / 0` | `24678a6bbc8e8b25926b3c17298b959f0cbd149c7641e1a3331a02a3c19c4207` | `3c6803552368b495ac05758cf7dbe8dd393f8c6cfd4625c587362898e6db687b` |
-| `eastbrook_noticeboard.glb` |   `2.4 x 2.6 x 0.6` | `24,684` |   `1,184` |              `2 / 2` |               `0 / 0 / 0` | `a53a3f9818ca57f593ccc448cb1b60862a28bf9cf0d1b17baf43eb6942a0516f` | `12435757b245583bb91a26450f5bfcf76c3532399b5d8f024af8dae30078265e` |
+| `mailbox_pillar.glb`        | `1.65 x 2.9 x 1.05` | `32,884` |   `1,640` |              `2 / 2` |               `0 / 0 / 0` | `a3caf1b97a0e8763658ef0ca9fc92052003bf5ea8453cd99a9f23f10ad16dce1` | `9acdbbd9a5dc809254cd96667946c08f6308bb38c9cc98f1d0eeea2fbfac94ef` |
+| `eastbrook_noticeboard.glb` |   `2.4 x 2.6 x 0.6` | `24,684` |   `1,184` |              `2 / 2` |               `0 / 0 / 0` | `bcfe3b2dbdcc1fd5a485cf50631249fe2f618472607a97e2cf9238a848c63af8` | `a87099637af4e7657c182c4859ecc1006092318a902f4fba0b6ea454bcadd425` |
 | Polish-v2 service subtotal  |                 n/a | `57,568` |   `2,824` |              `4 / 4` |               `0 / 0 / 0` | n/a                                                                | n/a                                                                |
 
 Both are centered on X/Z, floor-seated at `Y=0`, use `COLOR_0`, meshopt compression and
