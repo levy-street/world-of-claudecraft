@@ -2117,6 +2117,7 @@ export const pl_PL: EnTranslations = {
         "noRecipient": "Nikt o tym imieniu nie ma tu skrzynki pocztowej.",
         "tooManyParcels": "List mieści najwyżej {count} paczek.",
         "noMailQuestItems": "Nie możesz wysyłać pocztą przedmiotów zadań.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Nie masz aż tylu do wysłania.",
         "cantAffordPostage": "Nie stać cię na opłatę pocztową.",
         "recipientBoxFull": "Skrzynka odbiorcy jest pełna.",
@@ -6477,7 +6478,8 @@ export const pl_PL: EnTranslations = {
       "tradeTooFar": "Cel jest zbyt daleko, by handlować.",
       "tradeExpired": "Prośba o wymianę wygasła.",
       "tradeFailed": "Wymiana nieudana: przedmioty lub pieniądze są już niedostępne.",
-      "tradeBound": "Ten przedmiot jest przywiązany i nie można go wymienić."
+      "tradeBound": "Ten przedmiot jest przywiązany i nie można go wymienić.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Wstajesz.",

@@ -2117,6 +2117,7 @@ export const id_ID: EnTranslations = {
         "noRecipient": "Tidak ada orang dengan nama itu yang memiliki kotak surat di sini.",
         "tooManyParcels": "Satu surat memuat paling banyak {count} bingkisan.",
         "noMailQuestItems": "Kamu tidak bisa mengirim barang misi lewat surat.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Kamu tidak punya sebanyak itu untuk dikirim.",
         "cantAffordPostage": "Kamu tidak mampu membayar perangkonya.",
         "recipientBoxFull": "Kotak surat mereka penuh.",
@@ -6477,7 +6478,8 @@ export const id_ID: EnTranslations = {
       "tradeTooFar": "Sasaran terlalu jauh untuk berdagang.",
       "tradeExpired": "Permintaan perdagangan telah kedaluwarsa.",
       "tradeFailed": "Perdagangan gagal: barang atau uang sudah tidak tersedia.",
-      "tradeBound": "Barang itu terikat dan tidak dapat diperdagangkan."
+      "tradeBound": "Barang itu terikat dan tidak dapat diperdagangkan.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Kamu berdiri.",

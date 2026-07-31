@@ -10,54 +10,84 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "es_ES": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "fr_FR": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "fr_CA": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "en_CA": [],
   "it_IT": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "de_DE": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "nl_NL": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "pl_PL": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "id_ID": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "tr_TR": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "sv_SE": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "vi_VN": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ],
   "da_DK": [
-    "hud.errors.tradeAlreadyTrading"
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
   ]
 };

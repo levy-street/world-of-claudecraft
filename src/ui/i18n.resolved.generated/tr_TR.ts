@@ -2117,6 +2117,7 @@ export const tr_TR: EnTranslations = {
         "noRecipient": "Burada bu isimde posta kutusu olan kimse yok.",
         "tooManyParcels": "Bir mektup en fazla {count} paket taşır.",
         "noMailQuestItems": "Görev eşyalarını postayla gönderemezsin.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Gönderecek o kadar tane yok.",
         "cantAffordPostage": "Posta ücretini karşılayamazsın.",
         "recipientBoxFull": "Alıcının posta kutusu dolu.",
@@ -6477,7 +6478,8 @@ export const tr_TR: EnTranslations = {
       "tradeTooFar": "Hedef takas için çok uzakta.",
       "tradeExpired": "Takas isteğinin süresi doldu.",
       "tradeFailed": "Takas başarısız: eşyalar ya da para artık mevcut değil.",
-      "tradeBound": "O eşya bağlı ve takas edilemez."
+      "tradeBound": "O eşya bağlı ve takas edilemez.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Ayağa kalkıyorsun.",
