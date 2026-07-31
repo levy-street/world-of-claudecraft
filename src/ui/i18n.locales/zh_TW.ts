@@ -1209,9 +1209,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'wallet.extensionHelp':
     '若要在此處看到錢包，請保持 Solflare Wallet 等瀏覽器錢包擴充功能處於啟用狀態。',
   'wallet.mobileAppHelp':
-    '選擇 Phantom 或 Solflare。錢包應用程式會要求核准。請保持遊戲開啟，完成後返回遊戲。',
+    '選擇 WOC Wallet、WOC Wallet、Phantom 或 Solflare。錢包應用程式會要求核准。請保持遊戲開啟，完成後返回遊戲。',
   'wallet.standaloneAppHelp':
-    '主畫面應用程式目前尚不支援連接錢包。若要使用 Phantom 或 Solflare，請在 Safari 或 Chrome 中開啟 World of ClaudeCraft。',
+    '主畫面應用程式目前尚不支援連接錢包。若要使用 WOC Wallet、WOC Wallet、Phantom 或 Solflare，請在 Safari 或 Chrome 中開啟 World of ClaudeCraft。',
   'wallet.openAppTitle': '在 {wallet} 中繼續',
   'wallet.openAppHelp': '開啟 {wallet} 檢視此請求。錢包應用程式啟用時，請保持此遊戲分頁開啟。',
   'wallet.openAppButton': '開啟 {wallet}',

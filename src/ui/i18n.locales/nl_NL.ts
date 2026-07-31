@@ -252,7 +252,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.completeTitle': 'Portemonnee-autorisatie voltooid',
   'wallet.browser.continueWith': 'Doorgaan met {wallet}',
   'wallet.browser.extensionHelp':
-    'Geen compatibele portemonnee-extensie gevonden. Installeer of ontgrendel Phantom, Solflare of een andere Solana-browserportemonnee en probeer het opnieuw.',
+    'Geen compatibele portemonnee-extensie gevonden. Installeer of ontgrendel WOC Wallet, Phantom, Solflare of een andere Solana-browserportemonnee en probeer het opnieuw.',
   'wallet.browser.eyebrow': 'Desktop-portemonnee-autorisatie',
   'wallet.browser.failed':
     'Portemonnee-autorisatie mislukt of verlopen. Keer terug naar de desktop-app en probeer het opnieuw.',
@@ -271,14 +271,14 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'wallet.manualReturnStandaloneHelp':
     'Keer na goedkeuring terug naar World of ClaudeCraft via je beginscherm. Als iOS een browser opent, sluit die dan en open de beginscherm-app handmatig opnieuw.',
   'wallet.mobileAppHelp':
-    'Kies Phantom of Solflare. Je portemonnee-app vraagt om goedkeuring. Houd dit spel open en keer ernaar terug wanneer je klaar bent.',
+    'Kies WOC Wallet, Phantom of Solflare. Je portemonnee-app vraagt om goedkeuring. Houd dit spel open en keer ernaar terug wanneer je klaar bent.',
   'wallet.openAppButton': 'Open {wallet}',
   'wallet.openAppHelp':
     'Open {wallet} om dit verzoek te bekijken. Houd dit speltabblad open terwijl de portemonnee-app actief is.',
   'wallet.openAppTitle': 'Doorgaan in {wallet}',
   'wallet.preparingAppButton': '{wallet} voorbereiden...',
   'wallet.standaloneAppHelp':
-    'Portemonneeverbindingen zijn nog niet beschikbaar in de beginscherm-app. Open World of ClaudeCraft in Safari of Chrome om Phantom of Solflare te gebruiken.',
+    'Portemonneeverbindingen zijn nog niet beschikbaar in de beginscherm-app. Open World of ClaudeCraft in Safari of Chrome om WOC Wallet, Phantom of Solflare te gebruiken.',
   'wallet.walletAppUnavailable':
     '{wallet} kon niet worden voorbereid. Sluit dit venster en probeer het opnieuw.',
   'entities.abilities.primal_reflexes.description':

@@ -252,7 +252,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.completeTitle': 'Autoryzacja portfela zakończona',
   'wallet.browser.continueWith': 'Kontynuuj z {wallet}',
   'wallet.browser.extensionHelp':
-    'Nie znaleziono zgodnego rozszerzenia portfela. Zainstaluj lub odblokuj Phantom, Solflare lub inny portfel Solana w przeglądarce, a następnie spróbuj ponownie.',
+    'Nie znaleziono zgodnego rozszerzenia portfela. Zainstaluj lub odblokuj WOC Wallet, Phantom, Solflare lub inny portfel Solana w przeglądarce, a następnie spróbuj ponownie.',
   'wallet.browser.eyebrow': 'Autoryzacja portfela desktopowego',
   'wallet.browser.failed':
     'Autoryzacja portfela nie powiodła się lub wygasła. Wróć do aplikacji desktopowej i spróbuj ponownie.',
@@ -273,14 +273,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'wallet.manualReturnStandaloneHelp':
     'Po zatwierdzeniu wróć do World of ClaudeCraft z ekranu głównego. Jeśli iOS otworzy przeglądarkę, zamknij ją i ręcznie otwórz ponownie aplikację z ekranu głównego.',
   'wallet.mobileAppHelp':
-    'Wybierz Phantom lub Solflare. Aplikacja portfela poprosi o zatwierdzenie. Pozostaw tę grę otwartą i wróć do niej po zakończeniu.',
+    'Wybierz WOC Wallet, Phantom lub Solflare. Aplikacja portfela poprosi o zatwierdzenie. Pozostaw tę grę otwartą i wróć do niej po zakończeniu.',
   'wallet.openAppButton': 'Otwórz {wallet}',
   'wallet.openAppHelp':
     'Otwórz {wallet}, aby przejrzeć to żądanie. Pozostaw tę kartę gry otwartą, gdy aplikacja portfela jest aktywna.',
   'wallet.openAppTitle': 'Kontynuuj w {wallet}',
   'wallet.preparingAppButton': 'Przygotowywanie {wallet}...',
   'wallet.standaloneAppHelp':
-    'Połączenia z portfelami nie są jeszcze dostępne w aplikacji z ekranu głównego. Otwórz World of ClaudeCraft w Safari lub Chrome, aby używać Phantom lub Solflare.',
+    'Połączenia z portfelami nie są jeszcze dostępne w aplikacji z ekranu głównego. Otwórz World of ClaudeCraft w Safari lub Chrome, aby używać WOC Wallet, Phantom lub Solflare.',
   'wallet.walletAppUnavailable':
     'Nie udało się przygotować {wallet}. Zamknij to okno i spróbuj ponownie.',
   'entities.abilities.primal_reflexes.description':

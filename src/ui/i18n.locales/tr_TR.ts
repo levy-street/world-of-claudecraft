@@ -250,7 +250,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.completeTitle': 'Cüzdan yetkilendirmesi tamamlandı',
   'wallet.browser.continueWith': '{wallet} ile devam et',
   'wallet.browser.extensionHelp':
-    'Uyumlu cüzdan uzantısı bulunamadı. Phantom, Solflare veya başka bir Solana tarayıcı cüzdanını yükle ya da kilidini aç, ardından tekrar dene.',
+    'Uyumlu cüzdan uzantısı bulunamadı. WOC Wallet, Phantom, Solflare veya başka bir Solana tarayıcı cüzdanını yükle ya da kilidini aç, ardından tekrar dene.',
   'wallet.browser.eyebrow': 'Masaüstü cüzdan yetkilendirmesi',
   'wallet.browser.failed':
     'Cüzdan yetkilendirmesi başarısız oldu veya süresi doldu. Masaüstü uygulamasına dön ve tekrar dene.',
@@ -270,14 +270,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'wallet.manualReturnStandaloneHelp':
     "Onayladıktan sonra Ana Ekranından World of ClaudeCraft'a dön. iOS bir tarayıcı açarsa, kapat ve Ana Ekran uygulamasını manuel olarak yeniden aç.",
   'wallet.mobileAppHelp':
-    "Phantom veya Solflare'i seç. Cüzdan uygulan onay isteyecek. Bu oyunu açık bırak ve bittiğinde geri dön.",
+    "WOC Wallet, Phantom veya Solflare'i seç. Cüzdan uygulan onay isteyecek. Bu oyunu açık bırak ve bittiğinde geri dön.",
   'wallet.openAppButton': "{wallet}'u aç",
   'wallet.openAppHelp':
     "Bu isteği incelemek için {wallet}'u aç. Cüzdan uygulaması etkinken bu oyun sekmesini açık bırak.",
   'wallet.openAppTitle': "{wallet}'da devam et",
   'wallet.preparingAppButton': '{wallet} hazırlanıyor...',
   'wallet.standaloneAppHelp':
-    "Ana Ekran uygulamasında cüzdan bağlantıları henüz mevcut değil. Phantom veya Solflare kullanmak için World of ClaudeCraft'ı Safari veya Chrome'da aç.",
+    "Ana Ekran uygulamasında cüzdan bağlantıları henüz mevcut değil. WOC Wallet, Phantom veya Solflare kullanmak için World of ClaudeCraft'ı Safari veya Chrome'da aç.",
   'wallet.walletAppUnavailable': '{wallet} hazırlanamadı. Bu pencereyi kapat ve tekrar dene.',
   'entities.abilities.primal_reflexes.description':
     'İçgüdülerin keskinleşerek 6 sn boyunca savurma şansını %50 artırır.',

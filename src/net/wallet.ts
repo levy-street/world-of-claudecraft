@@ -80,14 +80,19 @@ export const WALLET_CONNECT_NAME = 'Wallet app or QR code';
 export const WALLET_CONNECT_ICON =
   'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%233b82f6"/%3E%3Cpath d="M18 27c8-8 20-8 28 0l3 3-5 5-3-3c-5-5-13-5-18 0l-3 3-5-5 3-3Zm5 10 5-5 4 4 4-4 5 5-9 9-9-9Z" fill="white"/%3E%3C/svg%3E' as WalletIcon;
 const MOBILE_WALLET_IDS: Record<MobileWalletProvider, string> = {
+  wocwallet: 'woc.mobile.wocwallet',
   phantom: 'woc.mobile.phantom',
   solflare: 'woc.mobile.solflare',
 };
 const MOBILE_WALLET_NAMES: Record<MobileWalletProvider, string> = {
+  wocwallet: 'WOC Wallet',
   phantom: 'Phantom',
   solflare: 'Solflare',
 };
 const MOBILE_WALLET_ICONS: Record<MobileWalletProvider, WalletIcon> = {
+  // Gold mark on deep navy  -  matches WOC brand palette used on the wallet surface.
+  wocwallet:
+    'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%230a0f1e"/%3E%3Cpath d="M18 42 32 14l14 28h-8.2L32 28.5 26.2 42H18Z" fill="%23d4a84b"/%3E%3Ccircle cx="32" cy="46" r="3.5" fill="%23d4a84b"/%3E%3C/svg%3E' as WalletIcon,
   phantom:
     'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%23551bf9"/%3E%3Cpath d="M15 35c0-12 7-21 18-21 10 0 17 8 17 18 0 11-6 18-13 18-4 0-6-2-7-5-2 3-4 5-8 5-5 0-7-4-7-9v-6Zm12-4a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm11 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="white"/%3E%3C/svg%3E' as WalletIcon,
   solflare:
@@ -245,6 +250,7 @@ export function setMobileWalletLauncher(launcher: MobileWalletLauncher | null): 
 }
 
 function mobileProviderForId(id: string): MobileWalletProvider | null {
+  if (id === MOBILE_WALLET_IDS.wocwallet) return 'wocwallet';
   if (id === MOBILE_WALLET_IDS.phantom) return 'phantom';
   if (id === MOBILE_WALLET_IDS.solflare) return 'solflare';
   return null;

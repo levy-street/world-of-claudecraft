@@ -1256,9 +1256,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'wallet.extensionHelp':
     '여기에 지갑이 표시되려면 Solflare Wallet 같은 브라우저 지갑 확장 프로그램이 활성화되어 있어야 합니다.',
   'wallet.mobileAppHelp':
-    'Phantom 또는 Solflare를 선택하세요. 지갑 앱에서 승인을 요청합니다. 게임을 열어 둔 채 완료 후 돌아오세요.',
+    'WOC Wallet, Phantom 또는 Solflare를 선택하세요. 지갑 앱에서 승인을 요청합니다. 게임을 열어 둔 채 완료 후 돌아오세요.',
   'wallet.standaloneAppHelp':
-    '홈 화면 앱에서는 아직 지갑 연결을 사용할 수 없습니다. Phantom 또는 Solflare를 사용하려면 Safari나 Chrome에서 World of ClaudeCraft를 여세요.',
+    '홈 화면 앱에서는 아직 지갑 연결을 사용할 수 없습니다. WOC Wallet, Phantom 또는 Solflare를 사용하려면 Safari나 Chrome에서 World of ClaudeCraft를 여세요.',
   'wallet.openAppTitle': '{wallet}에서 계속',
   'wallet.openAppHelp':
     '{wallet}을 열어 이 요청을 확인하세요. 지갑 앱을 사용하는 동안 이 게임 탭을 열어 두세요.',
@@ -1280,7 +1280,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 브라우저에서 지갑 확장 프로그램을 선택하세요. 인증 메시지에 서명한 뒤 데스크톱 앱으로 돌아갑니다.',
   'wallet.browser.paymentBody': '계정에 연결된 지갑을 선택하고 이 브라우저에서 거래를 승인하세요.',
   'wallet.browser.extensionHelp':
-    '호환되는 지갑 확장 프로그램을 찾지 못했습니다. Phantom, Solflare 또는 다른 Solana 브라우저 지갑을 설치하거나 잠금 해제한 뒤 다시 시도하세요.',
+    '호환되는 지갑 확장 프로그램을 찾지 못했습니다. WOC Wallet, Phantom, Solflare 또는 다른 Solana 브라우저 지갑을 설치하거나 잠금 해제한 뒤 다시 시도하세요.',
   'wallet.browser.safety': 'World of ClaudeCraft는 복구 문구나 개인 키를 요청하지 않습니다.',
   'wallet.browser.continueWith': '{wallet}(으)로 계속',
   'wallet.browser.reviewTitle': '지갑에서 검토',

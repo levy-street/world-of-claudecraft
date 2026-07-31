@@ -272,7 +272,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.completeTitle': 'Autorisation du portefeuille effectuée',
   'wallet.browser.continueWith': 'Continuer avec {wallet}',
   'wallet.browser.extensionHelp':
-    "Aucune extension de portefeuille compatible n'a été trouvée. Installez ou déverrouillez Phantom, Solflare ou un autre portefeuille Solana pour navigateur, puis réessayez.",
+    "Aucune extension de portefeuille compatible n'a été trouvée. Installez ou déverrouillez WOC Wallet, Phantom, Solflare ou un autre portefeuille Solana pour navigateur, puis réessayez.",
   'wallet.browser.eyebrow': 'Autorisation du portefeuille de bureau',
   'wallet.browser.failed':
     "L'autorisation du portefeuille a échoué ou a expiré. Retournez dans l'application de bureau et réessayez.",
@@ -293,14 +293,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'wallet.manualReturnStandaloneHelp':
     "Après approbation, revenez à World of ClaudeCraft depuis votre écran d'accueil. Si iOS ouvre un navigateur, fermez-le et rouvrez manuellement l'application de l'écran d'accueil.",
   'wallet.mobileAppHelp':
-    'Choisissez Phantom ou Solflare. Votre application de portefeuille demandera une approbation. Gardez ce jeu ouvert et revenez-y une fois terminé.',
+    'Choisissez WOC Wallet, Phantom ou Solflare. Votre application de portefeuille demandera une approbation. Gardez ce jeu ouvert et revenez-y une fois terminé.',
   'wallet.openAppButton': 'Ouvrir {wallet}',
   'wallet.openAppHelp':
     "Ouvrez {wallet} pour examiner cette demande. Gardez cet onglet de jeu ouvert pendant que l'application de portefeuille est active.",
   'wallet.openAppTitle': 'Continuer dans {wallet}',
   'wallet.preparingAppButton': 'Préparation de {wallet}...',
   'wallet.standaloneAppHelp':
-    "Les connexions de portefeuille ne sont pas encore disponibles dans l'application de l'écran d'accueil. Ouvrez World of ClaudeCraft dans Safari ou Chrome pour utiliser Phantom ou Solflare.",
+    "Les connexions de portefeuille ne sont pas encore disponibles dans l'application de l'écran d'accueil. Ouvrez World of ClaudeCraft dans Safari ou Chrome pour utiliser WOC Wallet, Phantom ou Solflare.",
   'wallet.walletAppUnavailable':
     "{wallet} n'a pas pu être préparé. Fermez cette fenêtre et réessayez.",
   'entities.abilities.primal_reflexes.description':

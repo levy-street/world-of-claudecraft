@@ -7,6 +7,7 @@ import {
   createMobileWalletClient,
   decryptConnectResponse,
   decryptEncryptedResponse,
+  encryptionPublicKeyParam,
 } from '../src/net/mobile_wallet_deeplink';
 
 afterEach(() => vi.unstubAllGlobals());
@@ -65,6 +66,13 @@ function encryptedResponse(payload: unknown, sharedSecret: Uint8Array) {
 describe('mobile Solana wallet deeplinks', () => {
   it('builds provider-specific connect requests with the app callback', () => {
     const dapp = nacl.box.keyPair();
+    const woc = buildConnectRequest({
+      provider: 'wocwallet',
+      appUrl: 'https://dev.worldofclaudecraft.com',
+      redirectUrl:
+        'https://dev.worldofclaudecraft.com/wallet-return.html?woc_wallet_request=request-0',
+      dappPublicKey: dapp.publicKey,
+    });
     const phantom = buildConnectRequest({
       provider: 'phantom',
       appUrl: 'https://dev.worldofclaudecraft.com',
@@ -80,6 +88,7 @@ describe('mobile Solana wallet deeplinks', () => {
       dappPublicKey: dapp.publicKey,
     });
 
+    expect(woc.origin + woc.pathname).toBe('https://wocwallet.app/ul/v1/connect');
     expect(phantom.origin + phantom.pathname).toBe('https://phantom.app/ul/v1/connect');
     expect(solflare.origin + solflare.pathname).toBe('https://solflare.com/ul/v1/connect');
     expect(phantom.searchParams.get('cluster')).toBe('mainnet-beta');
@@ -87,6 +96,12 @@ describe('mobile Solana wallet deeplinks', () => {
     expect(phantom.searchParams.get('dapp_encryption_public_key')).toBe(
       bs58.encode(dapp.publicKey),
     );
+  });
+
+  it('names the connect response encryption key after the provider id', () => {
+    expect(encryptionPublicKeyParam('wocwallet')).toBe('wocwallet_encryption_public_key');
+    expect(encryptionPublicKeyParam('phantom')).toBe('phantom_encryption_public_key');
+    expect(encryptionPublicKeyParam('solflare')).toBe('solflare_encryption_public_key');
   });
 
   it('decrypts a connect response and preserves the provider session', () => {
@@ -102,6 +117,24 @@ describe('mobile Solana wallet deeplinks', () => {
     expect(decryptConnectResponse('phantom', response, dapp.secretKey)).toEqual({
       address: 'WalletAddress',
       session: 'opaque-session',
+      walletPublicKey: wallet.publicKey,
+      sharedSecret: shared,
+    });
+  });
+
+  it('decrypts a WOC Wallet connect response using wocwallet_encryption_public_key', () => {
+    const dapp = nacl.box.keyPair();
+    const wallet = nacl.box.keyPair();
+    const shared = nacl.box.before(dapp.publicKey, wallet.secretKey);
+    const response = encryptedResponse(
+      { public_key: 'WocWalletAddress', session: 'woc-session' },
+      shared,
+    );
+    response.set('wocwallet_encryption_public_key', bs58.encode(wallet.publicKey));
+
+    expect(decryptConnectResponse('wocwallet', response, dapp.secretKey)).toEqual({
+      address: 'WocWalletAddress',
+      session: 'woc-session',
       walletPublicKey: wallet.publicKey,
       sharedSecret: shared,
     });

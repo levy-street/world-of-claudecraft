@@ -271,7 +271,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.completeTitle': 'Autorizzazione portafoglio completata',
   'wallet.browser.continueWith': 'Continua con {wallet}',
   'wallet.browser.extensionHelp':
-    'Nessuna estensione portafoglio compatibile trovata. Installa o sblocca Phantom, Solflare o un altro portafoglio Solana per browser, poi riprova.',
+    'Nessuna estensione portafoglio compatibile trovata. Installa o sblocca WOC Wallet, Phantom, Solflare o un altro portafoglio Solana per browser, poi riprova.',
   'wallet.browser.eyebrow': 'Autorizzazione portafoglio desktop',
   'wallet.browser.failed':
     "Autorizzazione portafoglio non riuscita o scaduta. Torna all'app desktop e riprova.",
@@ -292,14 +292,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'wallet.manualReturnStandaloneHelp':
     "Dopo l'approvazione, torna a World of ClaudeCraft dalla tua Schermata Home. Se iOS apre un browser, chiudilo e riapri manualmente l'app dalla Schermata Home.",
   'wallet.mobileAppHelp':
-    'Scegli Phantom o Solflare. La tua app portafoglio chiederà approvazione. Tieni aperto questo gioco e tornaci quando hai finito.',
+    'Scegli WOC Wallet, Phantom o Solflare. La tua app portafoglio chiederà approvazione. Tieni aperto questo gioco e tornaci quando hai finito.',
   'wallet.openAppButton': 'Apri {wallet}',
   'wallet.openAppHelp':
     "Apri {wallet} per esaminare questa richiesta. Tieni aperta questa scheda del gioco mentre l'app portafoglio è attiva.",
   'wallet.openAppTitle': 'Continua in {wallet}',
   'wallet.preparingAppButton': 'Preparazione di {wallet}...',
   'wallet.standaloneAppHelp':
-    "Le connessioni portafoglio non sono ancora disponibili nell'app dalla Schermata Home. Apri World of ClaudeCraft in Safari o Chrome per usare Phantom o Solflare.",
+    "Le connessioni portafoglio non sono ancora disponibili nell'app dalla Schermata Home. Apri World of ClaudeCraft in Safari o Chrome per usare WOC Wallet, Phantom o Solflare.",
   'wallet.walletAppUnavailable':
     '{wallet} non ha potuto essere preparato. Chiudi questa finestra e riprova.',
   'entities.abilities.primal_reflexes.description':

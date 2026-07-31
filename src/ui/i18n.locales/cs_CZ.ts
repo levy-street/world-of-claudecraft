@@ -254,7 +254,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.completeTitle': 'Autorizace peněženky dokončena',
   'wallet.browser.continueWith': 'Pokračovat s {wallet}',
   'wallet.browser.extensionHelp':
-    'Nebyla nalezena žádná kompatibilní rozšíření peněženky. Nainstaluj nebo odemkni Phantom, Solflare nebo jiný Solana prohlížečový wallet a zkus to znovu.',
+    'Nebyla nalezena žádná kompatibilní rozšíření peněženky. Nainstaluj nebo odemkni WOC Wallet, Phantom, Solflare nebo jiný Solana prohlížečový wallet a zkus to znovu.',
   'wallet.browser.eyebrow': 'Desktopová autorizace peněženky',
   'wallet.browser.failed':
     'Autorizace peněženky selhala nebo vypršela. Vrať se do desktopové aplikace a zkus to znovu.',
@@ -275,14 +275,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'wallet.manualReturnStandaloneHelp':
     'Po schválení se vrať do World of ClaudeCraft z domovské obrazovky. Pokud iOS otevře prohlížeč, zavři ho a ručně znovu otevři aplikaci z domovské obrazovky.',
   'wallet.mobileAppHelp':
-    'Zvol Phantom nebo Solflare. Tvoje aplikace peněženky požádá o schválení. Nechej tuto hru otevřenou a po dokončení se do ní vrať.',
+    'Zvol WOC Wallet, Phantom nebo Solflare. Tvoje aplikace peněženky požádá o schválení. Nechej tuto hru otevřenou a po dokončení se do ní vrať.',
   'wallet.openAppButton': 'Otevřít {wallet}',
   'wallet.openAppHelp':
     'Otevři {wallet} pro kontrolu tohoto požadavku. Nechej tuto záložku hry otevřenou, zatímco je aplikace peněženky aktivní.',
   'wallet.openAppTitle': 'Pokračovat v {wallet}',
   'wallet.preparingAppButton': 'Připravuji {wallet}...',
   'wallet.standaloneAppHelp':
-    'Připojení peněženky není zatím v aplikaci z domovské obrazovky dostupné. Otevři World of ClaudeCraft v Safari nebo Chrome pro použití Phantom nebo Solflare.',
+    'Připojení peněženky není zatím v aplikaci z domovské obrazovky dostupné. Otevři World of ClaudeCraft v Safari nebo Chrome pro použití WOC Wallet, Phantom nebo Solflare.',
   'wallet.walletAppUnavailable': '{wallet} nelze připravit. Zavři toto okno a zkus to znovu.',
   'entities.abilities.primal_reflexes.description':
     'Tvoje instinkty se zostří a tvá šance na vyhnutí se útoku vzroste o 50 % po dobu 6 sekund.',

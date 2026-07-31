@@ -253,7 +253,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.completeTitle': 'Ủy quyền ví hoàn tất',
   'wallet.browser.continueWith': 'Tiếp tục với {wallet}',
   'wallet.browser.extensionHelp':
-    'Không tìm thấy tiện ích mở rộng ví tương thích nào. Hãy cài đặt hoặc mở khóa Phantom, Solflare hoặc ví trình duyệt Solana khác, rồi thử lại.',
+    'Không tìm thấy tiện ích mở rộng ví tương thích nào. Hãy cài đặt hoặc mở khóa WOC Wallet, Phantom, Solflare hoặc ví trình duyệt Solana khác, rồi thử lại.',
   'wallet.browser.eyebrow': 'Ủy quyền ví trên máy tính',
   'wallet.browser.failed':
     'Ủy quyền ví thất bại hoặc đã hết hạn. Hãy quay lại ứng dụng máy tính và thử lại.',
@@ -273,14 +273,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'wallet.manualReturnStandaloneHelp':
     'Sau khi phê duyệt, hãy quay lại World of ClaudeCraft từ Màn hình chính của bạn. Nếu iOS mở một trình duyệt, hãy đóng nó và mở lại ứng dụng Màn hình chính thủ công.',
   'wallet.mobileAppHelp':
-    'Hãy chọn Phantom hoặc Solflare. Ứng dụng ví của bạn sẽ yêu cầu phê duyệt. Giữ trò chơi này mở và quay lại khi hoàn thành.',
+    'Hãy chọn WOC Wallet, Phantom hoặc Solflare. Ứng dụng ví của bạn sẽ yêu cầu phê duyệt. Giữ trò chơi này mở và quay lại khi hoàn thành.',
   'wallet.openAppButton': 'Mở {wallet}',
   'wallet.openAppHelp':
     'Hãy mở {wallet} để xem xét yêu cầu này. Giữ tab trò chơi này mở trong khi ứng dụng ví đang hoạt động.',
   'wallet.openAppTitle': 'Tiếp tục trong {wallet}',
   'wallet.preparingAppButton': 'Đang chuẩn bị {wallet}...',
   'wallet.standaloneAppHelp':
-    'Kết nối ví chưa có sẵn trong ứng dụng Màn hình chính. Hãy mở World of ClaudeCraft trong Safari hoặc Chrome để sử dụng Phantom hoặc Solflare.',
+    'Kết nối ví chưa có sẵn trong ứng dụng Màn hình chính. Hãy mở World of ClaudeCraft trong Safari hoặc Chrome để sử dụng WOC Wallet, Phantom hoặc Solflare.',
   'wallet.walletAppUnavailable': 'Không thể chuẩn bị {wallet}. Hãy đóng cửa sổ này và thử lại.',
   'entities.abilities.primal_reflexes.description':
     'Bản năng của bạn trở nên sắc bén, tăng 50% cơ hội né đòn trong 6 giây.',

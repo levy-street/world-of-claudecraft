@@ -57,9 +57,15 @@ interface StoredPendingRequest {
 }
 
 const PROVIDERS = {
+  wocwallet: { name: 'WOC Wallet', baseUrl: 'https://wocwallet.app/ul/v1' },
   phantom: { name: 'Phantom', baseUrl: 'https://phantom.app/ul/v1' },
   solflare: { name: 'Solflare', baseUrl: 'https://solflare.com/ul/v1' },
 } as const;
+
+/** Query param the wallet sets on connect redirects (provider-specific name). */
+export function encryptionPublicKeyParam(provider: MobileDeeplinkWalletProvider): string {
+  return `${provider}_encryption_public_key`;
+}
 const STORAGE_PREFIX = 'woc.wallet.mobile.v1';
 const RESPONSE_TIMEOUT_MS = 120_000;
 const SOLANA_MAINNET_CHAIN = 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp';
@@ -138,9 +144,7 @@ export function decryptConnectResponse(
   params: URLSearchParams,
   dappSecretKey: Uint8Array,
 ): DecryptedConnectResponse {
-  const walletKeyName =
-    provider === 'phantom' ? 'phantom_encryption_public_key' : 'solflare_encryption_public_key';
-  const walletPublicKey = bs58.decode(requireParam(params, walletKeyName));
+  const walletPublicKey = bs58.decode(requireParam(params, encryptionPublicKeyParam(provider)));
   const sharedSecret = nacl.box.before(walletPublicKey, dappSecretKey);
   const data = decryptEncryptedResponse(params, sharedSecret);
   return {

@@ -1,5 +1,6 @@
 export type WalletWebPlatform = 'desktop-web' | 'ios-web' | 'android-web';
-export type MobileDeeplinkWalletProvider = 'phantom' | 'solflare';
+/** Deep-link wallets the game opens on mobile web (not Wallet Standard). */
+export type MobileDeeplinkWalletProvider = 'wocwallet' | 'phantom' | 'solflare';
 export type MobileWalletProvider = MobileDeeplinkWalletProvider;
 
 export interface WalletStandaloneIdentity {
@@ -41,8 +42,20 @@ export function currentStandaloneWalletWebApp(): boolean {
   });
 }
 
-function hasInjectedWallet(names: readonly string[], provider: MobileWalletProvider): boolean {
-  return names.some((name) => name.toLowerCase().includes(provider));
+/**
+ * Match injected Wallet Standard names to a deep-link provider id.
+ * "WOC Wallet" must match `wocwallet` (alphanumerics only), not a naive
+ * substring of the id.
+ */
+export function hasInjectedWallet(
+  names: readonly string[],
+  provider: MobileWalletProvider,
+): boolean {
+  const needle = provider.replace(/[^a-z0-9]/gi, '').toLowerCase();
+  return names.some((name) => {
+    const normalized = name.replace(/[^a-z0-9]/gi, '').toLowerCase();
+    return normalized.includes(needle);
+  });
 }
 
 export function walletConnectionOptionsForPlatform(
@@ -51,9 +64,10 @@ export function walletConnectionOptionsForPlatform(
   standalone = false,
 ): { mobileProviders: MobileWalletProvider[]; reown: boolean } {
   if (platform === 'desktop-web') return { mobileProviders: [], reown: true };
+  // WOC Wallet first: first-party option for World of ClaudeCraft mobile.
   const supportedProviders: readonly MobileWalletProvider[] = standalone
     ? []
-    : ['phantom', 'solflare'];
+    : ['wocwallet', 'phantom', 'solflare'];
   const mobileProviders = supportedProviders.filter(
     (provider) => !hasInjectedWallet(injectedWalletNames, provider),
   );

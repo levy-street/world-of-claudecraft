@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   detectWalletPlatform,
+  hasInjectedWallet,
   isStandaloneWalletWebApp,
   walletConnectionOptionsForPlatform,
 } from '../src/net/wallet_platform';
@@ -40,11 +41,11 @@ describe('wallet platform options', () => {
 
   it('offers wallet-app handoffs on mobile and Reown QR on desktop', () => {
     expect(walletConnectionOptionsForPlatform('ios-web', [])).toEqual({
-      mobileProviders: ['phantom', 'solflare'],
+      mobileProviders: ['wocwallet', 'phantom', 'solflare'],
       reown: false,
     });
     expect(walletConnectionOptionsForPlatform('android-web', [])).toEqual({
-      mobileProviders: ['phantom', 'solflare'],
+      mobileProviders: ['wocwallet', 'phantom', 'solflare'],
       reown: false,
     });
     expect(walletConnectionOptionsForPlatform('desktop-web', [])).toEqual({
@@ -59,17 +60,27 @@ describe('wallet platform options', () => {
 
   it('does not duplicate a wallet already injected into a mobile wallet browser', () => {
     expect(walletConnectionOptionsForPlatform('ios-web', ['Phantom'])).toEqual({
-      mobileProviders: ['solflare'],
+      mobileProviders: ['wocwallet', 'solflare'],
       reown: false,
     });
     expect(walletConnectionOptionsForPlatform('android-web', ['Solflare Wallet'])).toEqual({
-      mobileProviders: ['phantom'],
+      mobileProviders: ['wocwallet', 'phantom'],
       reown: false,
     });
-    expect(walletConnectionOptionsForPlatform('ios-web', ['Backpack'])).toEqual({
+    expect(walletConnectionOptionsForPlatform('ios-web', ['WOC Wallet'])).toEqual({
       mobileProviders: ['phantom', 'solflare'],
       reown: false,
     });
+    expect(walletConnectionOptionsForPlatform('ios-web', ['Backpack'])).toEqual({
+      mobileProviders: ['wocwallet', 'phantom', 'solflare'],
+      reown: false,
+    });
+  });
+
+  it('matches injected WOC Wallet names to the wocwallet provider id', () => {
+    expect(hasInjectedWallet(['WOC Wallet'], 'wocwallet')).toBe(true);
+    expect(hasInjectedWallet(['wocwallet'], 'wocwallet')).toBe(true);
+    expect(hasInjectedWallet(['Phantom'], 'wocwallet')).toBe(false);
   });
 
   it('recognizes both standards-based and legacy iOS standalone mode', () => {

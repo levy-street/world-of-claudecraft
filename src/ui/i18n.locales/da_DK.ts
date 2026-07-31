@@ -254,7 +254,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.completeTitle': 'Pung-godkendelse fuldført',
   'wallet.browser.continueWith': 'Fortsæt med {wallet}',
   'wallet.browser.extensionHelp':
-    'Ingen kompatibel pung-udvidelse blev fundet. Installer eller lås Phantom, Solflare eller en anden Solana-browserpung op og prøv derefter igen.',
+    'Ingen kompatibel pung-udvidelse blev fundet. Installer eller lås WOC Wallet, Phantom, Solflare eller en anden Solana-browserpung op og prøv derefter igen.',
   'wallet.browser.eyebrow': 'Skrivebordsappens pung-godkendelse',
   'wallet.browser.failed':
     'Pung-godkendelse mislykkedes eller udløb. Vend tilbage til skrivebordsappen og prøv igen.',
@@ -274,14 +274,14 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'wallet.manualReturnStandaloneHelp':
     'Efter godkendelse kan du vende tilbage til World of ClaudeCraft fra din startskærm. Hvis iOS åbner en browser, skal du lukke den og manuelt genåbne startskærmsappen.',
   'wallet.mobileAppHelp':
-    'Vælg Phantom eller Solflare. Din pung-app beder om godkendelse. Hold dette spil åbent og vend tilbage, når du er færdig.',
+    'Vælg WOC Wallet, Phantom eller Solflare. Din pung-app beder om godkendelse. Hold dette spil åbent og vend tilbage, når du er færdig.',
   'wallet.openAppButton': 'Åbn {wallet}',
   'wallet.openAppHelp':
     'Åbn {wallet} for at gennemgå denne anmodning. Hold denne spil-fane åben, mens pung-appen er aktiv.',
   'wallet.openAppTitle': 'Fortsæt i {wallet}',
   'wallet.preparingAppButton': 'Forbereder {wallet}...',
   'wallet.standaloneAppHelp':
-    'Pungforbindelser er endnu ikke tilgængelige i startskærmsappen. Åbn World of ClaudeCraft i Safari eller Chrome for at bruge Phantom eller Solflare.',
+    'Pungforbindelser er endnu ikke tilgængelige i startskærmsappen. Åbn World of ClaudeCraft i Safari eller Chrome for at bruge WOC Wallet, Phantom eller Solflare.',
   'wallet.walletAppUnavailable': '{wallet} kunne ikke forberedes. Luk dette vindue og prøv igen.',
   'entities.abilities.primal_reflexes.description':
     'Dine instinkter skærpes og øger din chance for at undvige med 50% i 6 sek.',

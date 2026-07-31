@@ -268,7 +268,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.completeTitle': 'Autorização de carteira concluída',
   'wallet.browser.continueWith': 'Continuar com {wallet}',
   'wallet.browser.extensionHelp':
-    'Nenhuma extensão de carteira compatível foi encontrada. Instale ou desbloqueie Phantom, Solflare ou outra carteira Solana para navegador e tente novamente.',
+    'Nenhuma extensão de carteira compatível foi encontrada. Instale ou desbloqueie WOC Wallet, Phantom, Solflare ou outra carteira Solana para navegador e tente novamente.',
   'wallet.browser.eyebrow': 'Autorização de carteira para desktop',
   'wallet.browser.failed':
     'A autorização da carteira falhou ou expirou. Retorne ao aplicativo para desktop e tente novamente.',
@@ -289,14 +289,14 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'wallet.manualReturnStandaloneHelp':
     'Após a aprovação, retorne ao World of ClaudeCraft pela sua Tela Inicial. Se o iOS abrir um navegador, feche-o e reabra o aplicativo da Tela Inicial manualmente.',
   'wallet.mobileAppHelp':
-    'Escolha Phantom ou Solflare. Seu app de carteira pedirá aprovação. Mantenha o jogo aberto e retorne a ele quando terminar.',
+    'Escolha WOC Wallet, Phantom ou Solflare. Seu app de carteira pedirá aprovação. Mantenha o jogo aberto e retorne a ele quando terminar.',
   'wallet.openAppButton': 'Abrir {wallet}',
   'wallet.openAppHelp':
     'Abra {wallet} para revisar esta solicitação. Mantenha esta aba do jogo aberta enquanto o app da carteira estiver ativo.',
   'wallet.openAppTitle': 'Continuar em {wallet}',
   'wallet.preparingAppButton': 'Preparando {wallet}...',
   'wallet.standaloneAppHelp':
-    'As conexões de carteira ainda não estão disponíveis no aplicativo da Tela Inicial. Abra o World of ClaudeCraft no Safari ou Chrome para usar Phantom ou Solflare.',
+    'As conexões de carteira ainda não estão disponíveis no aplicativo da Tela Inicial. Abra o World of ClaudeCraft no Safari ou Chrome para usar WOC Wallet, Phantom ou Solflare.',
   'wallet.walletAppUnavailable':
     '{wallet} não pôde ser preparado. Feche esta janela e tente novamente.',
   'entities.abilities.primal_reflexes.description':

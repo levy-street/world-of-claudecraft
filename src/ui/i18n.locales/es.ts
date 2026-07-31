@@ -243,7 +243,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.completeTitle': 'Autorización de cartera completada',
   'wallet.browser.continueWith': 'Continuar con {wallet}',
   'wallet.browser.extensionHelp':
-    'No se encontró ninguna extensión de cartera compatible. Instala o desbloquea Phantom, Solflare u otra cartera de Solana para el navegador, luego vuelve a intentarlo.',
+    'No se encontró ninguna extensión de cartera compatible. Instala o desbloquea WOC Wallet, Phantom, Solflare u otra cartera de Solana para el navegador, luego vuelve a intentarlo.',
   'wallet.browser.eyebrow': 'Autorización de cartera de escritorio',
   'wallet.browser.failed':
     'La autorización de la cartera falló o caducó. Vuelve a la aplicación de escritorio e inténtalo de nuevo.',
@@ -264,14 +264,14 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'wallet.manualReturnStandaloneHelp':
     'Tras la aprobación, vuelve a World of ClaudeCraft desde tu pantalla de inicio. Si iOS abre un navegador, ciérralo y vuelve a abrir la aplicación de la pantalla de inicio manualmente.',
   'wallet.mobileAppHelp':
-    'Elige Phantom o Solflare. Tu aplicación de cartera pedirá aprobación. Mantén este juego abierto y vuelve a él cuando termines.',
+    'Elige WOC Wallet, Phantom o Solflare. Tu aplicación de cartera pedirá aprobación. Mantén este juego abierto y vuelve a él cuando termines.',
   'wallet.openAppButton': 'Abrir {wallet}',
   'wallet.openAppHelp':
     'Abre {wallet} para revisar esta solicitud. Mantén esta pestaña del juego abierta mientras la aplicación de cartera esté activa.',
   'wallet.openAppTitle': 'Continuar en {wallet}',
   'wallet.preparingAppButton': 'Preparando {wallet}...',
   'wallet.standaloneAppHelp':
-    'Las conexiones de cartera aún no están disponibles en la aplicación de la pantalla de inicio. Abre World of ClaudeCraft en Safari o Chrome para usar Phantom o Solflare.',
+    'Las conexiones de cartera aún no están disponibles en la aplicación de la pantalla de inicio. Abre World of ClaudeCraft en Safari o Chrome para usar WOC Wallet, Phantom o Solflare.',
   'wallet.walletAppUnavailable':
     'No se pudo preparar {wallet}. Cierra esta ventana e inténtalo de nuevo.',
   'entities.abilities.primal_reflexes.description':

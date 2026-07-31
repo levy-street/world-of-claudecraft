@@ -251,7 +251,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.completeTitle': 'Plånboksbehörighet slutförd',
   'wallet.browser.continueWith': 'Fortsätt med {wallet}',
   'wallet.browser.extensionHelp':
-    'Inget kompatibelt plånbokstillägg hittades. Installera eller lås upp Phantom, Solflare eller en annan Solana-webbläsarplånbok och försök sedan igen.',
+    'Inget kompatibelt plånbokstillägg hittades. Installera eller lås upp WOC Wallet, Phantom, Solflare eller en annan Solana-webbläsarplånbok och försök sedan igen.',
   'wallet.browser.eyebrow': 'Skrivbordsplånboksbehörighet',
   'wallet.browser.failed':
     'Plånboksbehörighet misslyckades eller gick ut. Återgå till skrivbordsappen och försök igen.',
@@ -271,14 +271,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'wallet.manualReturnStandaloneHelp':
     'Efter godkännande, återgå till World of ClaudeCraft från din hemskärm. Om iOS öppnar en webbläsare, stäng den och öppna hemskärmsappen manuellt igen.',
   'wallet.mobileAppHelp':
-    'Välj Phantom eller Solflare. Din plånboksapp ber om godkännande. Håll det här spelet öppet och återgå till det när du är klar.',
+    'Välj WOC Wallet, Phantom eller Solflare. Din plånboksapp ber om godkännande. Håll det här spelet öppet och återgå till det när du är klar.',
   'wallet.openAppButton': 'Öppna {wallet}',
   'wallet.openAppHelp':
     'Öppna {wallet} för att granska denna begäran. Håll denna spelflik öppen medan plånboksappen är aktiv.',
   'wallet.openAppTitle': 'Fortsätt i {wallet}',
   'wallet.preparingAppButton': 'Förbereder {wallet}...',
   'wallet.standaloneAppHelp':
-    'Plånboksanslutningar är ännu inte tillgängliga i hemskärmsappen. Öppna World of ClaudeCraft i Safari eller Chrome för att använda Phantom eller Solflare.',
+    'Plånboksanslutningar är ännu inte tillgängliga i hemskärmsappen. Öppna World of ClaudeCraft i Safari eller Chrome för att använda WOC Wallet, Phantom eller Solflare.',
   'wallet.walletAppUnavailable':
     '{wallet} kunde inte förberedas. Stäng det här fönstret och försök igen.',
   'entities.abilities.primal_reflexes.description':

@@ -1274,9 +1274,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'wallet.extensionHelp':
     'Чтобы кошелек появился здесь, держите активным браузерное расширение кошелька, например Solflare Wallet.',
   'wallet.mobileAppHelp':
-    'Выберите Phantom или Solflare. Приложение кошелька запросит подтверждение. Не закрывайте игру и вернитесь в нее после завершения.',
+    'Выберите WOC Wallet, Phantom или Solflare. Приложение кошелька запросит подтверждение. Не закрывайте игру и вернитесь в нее после завершения.',
   'wallet.standaloneAppHelp':
-    'Подключение кошелька пока недоступно в приложении с главного экрана. Для Phantom или Solflare откройте World of ClaudeCraft в Safari или Chrome.',
+    'Подключение кошелька пока недоступно в приложении с главного экрана. Для WOC Wallet, Phantom или Solflare откройте World of ClaudeCraft в Safari или Chrome.',
   'wallet.openAppTitle': 'Продолжить в {wallet}',
   'wallet.openAppHelp':
     'Откройте {wallet}, чтобы проверить этот запрос. Не закрывайте вкладку с игрой, пока открыто приложение кошелька.',
@@ -1301,7 +1301,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.paymentBody':
     'Выберите кошелек, привязанный к аккаунту, и подтвердите транзакцию в этом браузере.',
   'wallet.browser.extensionHelp':
-    'Совместимое расширение кошелька не найдено. Установите или разблокируйте Phantom, Solflare либо другой браузерный кошелек Solana и повторите попытку.',
+    'Совместимое расширение кошелька не найдено. Установите или разблокируйте WOC Wallet, Phantom, Solflare либо другой браузерный кошелек Solana и повторите попытку.',
   'wallet.browser.safety':
     'World of ClaudeCraft никогда не запрашивает фразу восстановления или закрытый ключ.',
   'wallet.browser.continueWith': 'Продолжить с {wallet}',

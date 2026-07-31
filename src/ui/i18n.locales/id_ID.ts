@@ -254,7 +254,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'wallet.browser.completeTitle': 'Otorisasi dompet selesai',
   'wallet.browser.continueWith': 'Lanjutkan dengan {wallet}',
   'wallet.browser.extensionHelp':
-    'Tidak ada ekstensi dompet yang kompatibel ditemukan. Instal atau buka Phantom, Solflare, atau dompet browser Solana lainnya, lalu coba lagi.',
+    'Tidak ada ekstensi dompet yang kompatibel ditemukan. Instal atau buka WOC Wallet, Phantom, Solflare, atau dompet browser Solana lainnya, lalu coba lagi.',
   'wallet.browser.eyebrow': 'Otorisasi dompet desktop',
   'wallet.browser.failed':
     'Otorisasi dompet gagal atau kedaluwarsa. Kembali ke aplikasi desktop dan coba lagi.',
@@ -275,14 +275,14 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'wallet.manualReturnStandaloneHelp':
     'Setelah persetujuan, kembali ke World of ClaudeCraft dari Layar Utamamu. Jika iOS membuka browser, tutup dan buka kembali aplikasi Layar Utama secara manual.',
   'wallet.mobileAppHelp':
-    'Pilih Phantom atau Solflare. Aplikasi dompetmu akan meminta persetujuan. Jaga permainan ini tetap terbuka dan kembali ke sana saat selesai.',
+    'Pilih WOC Wallet, Phantom, atau Solflare. Aplikasi dompetmu akan meminta persetujuan. Jaga permainan ini tetap terbuka dan kembali ke sana saat selesai.',
   'wallet.openAppButton': 'Buka {wallet}',
   'wallet.openAppHelp':
     'Buka {wallet} untuk meninjau permintaan ini. Jaga tab permainan ini tetap terbuka saat aplikasi dompet aktif.',
   'wallet.openAppTitle': 'Lanjutkan di {wallet}',
   'wallet.preparingAppButton': 'Mempersiapkan {wallet}...',
   'wallet.standaloneAppHelp':
-    'Koneksi dompet belum tersedia di aplikasi Layar Utama. Buka World of ClaudeCraft di Safari atau Chrome untuk menggunakan Phantom atau Solflare.',
+    'Koneksi dompet belum tersedia di aplikasi Layar Utama. Buka World of ClaudeCraft di Safari atau Chrome untuk menggunakan WOC Wallet, Phantom, atau Solflare.',
   'wallet.walletAppUnavailable':
     '{wallet} tidak dapat dipersiapkan. Tutup jendela ini dan coba lagi.',
   'entities.abilities.primal_reflexes.description':

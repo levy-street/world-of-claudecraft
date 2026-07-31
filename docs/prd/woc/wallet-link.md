@@ -19,17 +19,17 @@ Foundational rather than a flywheel itself: every other $WOC mechanic needs a ve
 ## Implemented behavior
 - Wallet Standard drives installed-extension selection. Reown AppKit's dedicated
   Solana adapter adds the desktop web WalletConnect QR fallback without custody.
-- On iOS and Android web, the picker shows direct Phantom and Solflare options
-  instead of the desktop QR. Each uses the wallet's encrypted provider-method
-  universal link, so approval happens in the native wallet app and returns to the
-  original browser tab. The web desktop QR is a WalletConnect pairing QR:
-  scan it with a compatible WalletConnect scanner, not a Solana Pay-only scanner.
-  A universal Camera-app QR would require a separate wallet-specific cross-device
-  handoff.
-- Installed Home Screen web apps do not offer wallet connection. Phantom and
-  Solflare return links reopen a browser instead of the isolated Home Screen app.
-  Players must open the game in Safari or Chrome until a server-mediated handoff
-  is implemented.
+- On iOS and Android web, the picker shows direct **WOC Wallet**, Phantom, and
+  Solflare options instead of the desktop QR. Each uses the wallet's encrypted
+  provider-method universal link, so approval happens in the native wallet app
+  (or hosted WOC Wallet page) and returns to the original browser tab. The web
+  desktop QR is a WalletConnect pairing QR: scan it with a compatible
+  WalletConnect scanner, not a Solana Pay-only scanner. A universal Camera-app
+  QR would require a separate wallet-specific cross-device handoff.
+- Installed Home Screen web apps do not offer wallet connection. Deep-link return
+  paths reopen a browser instead of the isolated Home Screen app. Players must
+  open the game in Safari or Chrome until a server-mediated handoff is
+  implemented.
 - The website Electron build opens a short-lived authorization page from its
   fixed API origin in the player's normal browser instead of showing a
   WalletConnect QR inside Electron. Create, claim, complete, and result requests
@@ -57,8 +57,8 @@ Foundational rather than a flywheel itself: every other $WOC mechanic needs a ve
 - **Non-custodial** - the chain owns assets; `src/sim/` stays pure and deterministic.
 
 ## Open questions
-- Should the featured external-wallet list change beyond Phantom, Solflare, and
-  Backpack?
+- Should the featured external-wallet list change beyond WOC Wallet, Phantom,
+  Solflare, and Backpack?
 - Should future account models support many wallets, or keep one verified wallet per account?
 - How much wallet rotation and unlink history should be visible to players and operators?
 

@@ -1259,9 +1259,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'wallet.extensionHelp':
     'ここにウォレットを表示するには、Solflare Wallet などのブラウザ用ウォレット拡張機能を有効にしておいてください。',
   'wallet.mobileAppHelp':
-    'Phantom または Solflare を選択してください。ウォレットアプリで承認を求められます。ゲームを開いたままにし、完了後に戻ってください。',
+    'WOC Wallet、Phantom または Solflare を選択してください。ウォレットアプリで承認を求められます。ゲームを開いたままにし、完了後に戻ってください。',
   'wallet.standaloneAppHelp':
-    'ホーム画面アプリでは、まだウォレットに接続できません。Phantom または Solflare を使用するには、Safari か Chrome で World of ClaudeCraft を開いてください。',
+    'ホーム画面アプリでは、まだウォレットに接続できません。WOC Wallet、Phantom または Solflare を使用するには、Safari か Chrome で World of ClaudeCraft を開いてください。',
   'wallet.openAppTitle': '{wallet} で続行',
   'wallet.openAppHelp':
     '{wallet} を開いてこのリクエストを確認してください。ウォレットアプリの使用中も、このゲームタブを開いたままにしてください。',
