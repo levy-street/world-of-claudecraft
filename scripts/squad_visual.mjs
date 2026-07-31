@@ -36,7 +36,7 @@ const browser = await puppeteer.launch({
 });
 
 async function login(page, charName, cls) {
-  page.on('pageerror', (e) => errors.push(`[${charName}] ` + e.message));
+  page.on('pageerror', (e) => errors.push(`[${charName}] ${e.message}`));
   await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await sleep(600);
   await page.evaluate(
