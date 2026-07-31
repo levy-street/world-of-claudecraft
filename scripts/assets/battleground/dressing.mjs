@@ -313,6 +313,29 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
       name: 'Main gate',
     });
     bothLights({ x: r4(gate.x), y: 6.5, z: r4(gate.z), color: FLAME, intensity: 26, range: 26 });
+    // The gate wears the half's colours: one banner on the curtain wall each
+    // side of the arch, on BOTH faces, so the heraldry reads whether a runner
+    // is charging the gate or falling back through it. Hung clear of the arch
+    // piers, thin cloth against a wall that already blocks.
+    for (const bx of [gate.x - 8.5, gate.x + 8.5]) {
+      for (const face of [-1, 1]) {
+        bothTeamArt(
+          {
+            assetId: 'dungeon/banner_triple_red',
+            x: r4(bx),
+            z: r4(gate.z + face * 1.45),
+            rotY: yaw(face < 0 ? Math.PI : 0),
+            scale: 2,
+            collide: false,
+            y: 1.5,
+            detached: true,
+            groundY: r4(floorUnder(bx, gate.z, 1.5, 1.5) - BURY),
+            name: 'Gate colours',
+          },
+          'dungeon/banner_triple_blue',
+        );
+      }
+    }
   }
 
   // Gatehouse timber posts and a lantern. They COLLIDE: a post you can see and
@@ -746,25 +769,29 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
     }
   }
 
-  // The keep court: banners on the back wall, arms racks and stores against the
-  // side walls, the team's standards flanking the flag stand. Everything hugs a
-  // wall or the stand itself, so the court stays the clean fight space the plan
-  // intends.
+  // The keep court: the team's shield banners on the back wall over the flag,
+  // arms racks and stores against the side walls. Everything hugs a wall, so
+  // the court stays the clean fight space the plan intends. A banner is a
+  // WALL-HUNG piece: it always hangs on stone, never stands free in the court
+  // (a floating cloth was the first thing playtesting called out).
   const courtSeat = floorUnder(0, -FLAG_Z, 14, 8);
   for (const sx of [-1, 1]) {
-    both({
-      assetId: 'dungeon/banner_patterna_white',
-      x: r4(sx * 7),
-      z: -126.6,
-      rotY: 0,
-      scale: 2.4,
-      collide: true,
-      collisionMode: 'baked',
-      y: 0.5,
-      detached: true,
-      groundY: r4(courtSeat),
-      name: 'Court banner',
-    });
+    bothTeamArt(
+      {
+        assetId: 'dungeon/banner_shield_red',
+        x: r4(sx * 7),
+        z: -126.6,
+        rotY: 0,
+        scale: 2.4,
+        collide: true,
+        collisionMode: 'baked',
+        y: 0.5,
+        detached: true,
+        groundY: r4(courtSeat),
+        name: 'Court banner',
+      },
+      'dungeon/banner_shield_blue',
+    );
     both({
       assetId: 'props/weapon_stand',
       x: r4(sx * 13.2),
@@ -788,18 +815,15 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
   }
 
   // The flag stand itself: a two-step stone dais under the flag, with the
-  // team's shield standards flanking it. No firepits here anymore: an open
+  // team's colours on the wall behind it. No firepits here anymore: an open
   // flame on the one spot every fight converges on read as a hazard, and the
   // stand carries the ceremony instead. Both dais steps finish far under the
   // physics step height, so the dais is ground a body strides over rather than
   // a ledge, and it rides camGhost like all low stone, so the chase camera in
   // the court never jams (the compiler's CAMERA_SOLID_MIN_HEIGHT guarantees
-  // both). The standards are CEREMONY ONLY, by design: the braziers they
-  // replace were steppable and sight-transparent, and a colliding post here
-  // would let a defender break line of sight four yards from the flag, in the
-  // one court the plan keeps as a clean fight space. tests/battleground_band
-  // pins the whole contract (dais step height, pickup clearance, no blocker
-  // by the stand).
+  // both). Nothing stands free around the stand: the court keeps the clean
+  // fight space the plan intends, and tests/battleground_band pins the whole
+  // contract (dais step height, pickup clearance, no blocker by the stand).
   both({
     assetId: 'dungeon/path_a',
     x: 0,
@@ -822,20 +846,6 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
     y: 0.42,
     name: 'Flag dais',
   });
-  for (const sx of [-1, 1]) {
-    bothTeamArt(
-      {
-        assetId: 'dungeon/banner_shield_red',
-        x: r4(sx * 4.2),
-        z: -120.4,
-        rotY: 0,
-        scale: 1.7,
-        collide: false,
-        name: 'Flag standard',
-      },
-      'dungeon/banner_shield_blue',
-    );
-  }
   // ONE team-coloured glow over each stand: the field's authored light set has
   // to fit the renderer's per-tier budget (14 on the top tiers), and a light
   // past the budget is authored cost that never reaches a frame.

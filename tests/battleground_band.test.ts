@@ -857,9 +857,8 @@ describe('Thornhollow collision honesty: what blocks, blocks; what opens, opens'
     // body walks straight onto (every standable top in the court rises under
     // the physics step height), and no blocking collider stands inside the
     // pickup radius, so contesting the flag is never a fight with furniture.
-    // The flanking standards are ceremony only by design (see the dressing
-    // pass): a colliding post four yards out would break line of sight in the
-    // court the plan keeps clean.
+    // The court's ceremony hangs on its walls (see the dressing pass): nothing
+    // stands free around the stand.
     const distToObb = (
       c: { x: number; z: number; hw: number; hd: number; rot: number },
       px: number,
@@ -981,15 +980,7 @@ describe('Thornhollow collision honesty: what blocks, blocks; what opens, opens'
       string,
       { boxes?: { x: number; y: number; z: number; hx: number; hy: number; hz: number }[] }
     >;
-    // banner_shield: the flag standards, ceremony only by design (a colliding
-    // post four yards from the flag would break line of sight in the court the
-    // plan keeps clean; the braziers they replaced never blocked either).
-    const NON_COLLIDING_BY_DESIGN = new Set([
-      'dungeon/torch_mounted',
-      'dungeon/fence_broken',
-      'dungeon/banner_shield_red',
-      'dungeon/banner_shield_blue',
-    ]);
+    const NON_COLLIDING_BY_DESIGN = new Set(['dungeon/torch_mounted', 'dungeon/fence_broken']);
     let checked = 0;
     for (const p of TH_PLACEMENTS) {
       // Out-of-play slope dressing is unreachable by construction.
