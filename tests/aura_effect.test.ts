@@ -4,6 +4,13 @@ import { type AuraEffectInput, auraEffectDescriptor } from '../src/ui/aura_effec
 const desc = (a: AuraEffectInput) => auraEffectDescriptor(a);
 
 describe('auraEffectDescriptor', () => {
+  it('renders no line for an inert zero-value vulnerability marker', () => {
+    // The Odrenn geography marks are kind vulnerability with value 0 so the
+    // damage math stays inert; a permanent "0% damage taken" tooltip on a
+    // mark the raid reads constantly is noise (#2671 review round 2).
+    expect(desc({ id: 'odrenn_scorched', kind: 'vulnerability', value: 0 })).toBeNull();
+  });
+
   it('describes the cancelable protective Hourglass aura', () => {
     expect(desc({ id: 'temporal_hourglass', kind: 'stasis', value: 1.5 })).toEqual({
       key: 'hudChrome.auraEffect.temporalHourglass',

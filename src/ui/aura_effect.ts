@@ -195,6 +195,9 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
     case 'mortal_wound':
       return { key: `${KEY}.mortalWound`, nums: { pct: pctFromFrac(a.value) } };
     case 'vulnerability':
+      // A zero-value vulnerability is an inert marker (the Odrenn geography
+      // marks): a permanent "0% damage taken" line is noise, not information.
+      if (!a.value) return null;
       return { key: `${KEY}.vulnerability`, nums: { pct: pctFromFrac(a.value) } };
     case 'spellvuln':
       return { key: `${KEY}.spellVuln`, nums: { pct: pctFromFrac(a.value) } };
