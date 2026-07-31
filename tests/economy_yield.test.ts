@@ -141,8 +141,11 @@ describe('coin-family trash sits on the coin curve', () => {
     );
 
   it('checks a real population, not an empty set', () => {
-    expect(governed().length).toBeGreaterThanOrEqual(35);
-    expect(governedElites().length).toBeGreaterThanOrEqual(8);
+    // Floors sit at the REAL shipped counts (39 trash, 13 elite), not under
+    // them: the point of this pin is that a template silently dropping out of
+    // governance fails here rather than shrinking the sweep unnoticed.
+    expect(governed().length).toBeGreaterThanOrEqual(39);
+    expect(governedElites().length).toBeGreaterThanOrEqual(13);
   });
 
   it('pays elite capstones on their own higher band, not the trash curve', () => {
