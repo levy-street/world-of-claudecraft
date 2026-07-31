@@ -115,6 +115,9 @@ describe('escort ambush mobs never outlive their run', () => {
     }
   });
 
+  // Three full escort runs through the real sim (50s of ticks each) outrun the
+  // default 20s timeout on a contended CI shard; the v0.32.3 arm of this test
+  // carried the same explicit budget.
   it('does not accumulate across repeated runs, which is the reported symptom', () => {
     const sim = makeSim();
     const ambushTemplate = ESCORTS[ESCORT_ID].ambushes[0].mobId;
@@ -141,5 +144,5 @@ describe('escort ambush mobs never outlive their run', () => {
       (e) => e.kind === 'mob' && e.templateId === ambushTemplate,
     );
     expect(anyState.length).toBe(baseline);
-  });
+  }, 120_000);
 });
