@@ -89,6 +89,14 @@ async function paintArrayTexture(files: string[], size: number): Promise<THREE.D
   return array;
 }
 
+/**
+ * How far (yards) the noise may displace a paint lookup. Sized against the
+ * paint grid, not the textures: at the 0.25yd cell this is ~3 cells of
+ * wander, enough to bury the staircase without smearing a painted region so
+ * far that it stops matching the map the author drew.
+ */
+const PAINT_WARP_YD = 0.85;
+
 const VERT_HEAD = /* glsl */ `
 varying vec2 vFieldXZ;
 `;
@@ -105,11 +113,32 @@ uniform vec2 uPaintSize;   // cols, rows
 uniform float uPaintCell;
 uniform vec2 uSwatch[32];  // per layer: (1 / tileSize, light)
 
+uniform float uPaintWarp;
+
 vec3 bgSwatchSample(uint layer, vec2 world) {
   if (layer > 250u) return vec3(-1.0);
   vec2 sw = uSwatch[layer];
   vec3 c = texture(uPaintTex, vec3(world * sw.x, float(layer))).rgb;
   return clamp(c * (1.0 + sw.y), 0.0, 1.0);
+}
+
+// Cheap hash-based value noise. Used ONLY to warp the paint lookup, so it costs
+// four hashes a fragment and no extra texture taps.
+float bgHash21(vec2 p) {
+  vec3 q = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973));
+  q += dot(q, q.yzx + 33.33);
+  return fract((q.x + q.y) * q.z);
+}
+
+float bgValueNoise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(bgHash21(i), bgHash21(i + vec2(1.0, 0.0)), f.x),
+    mix(bgHash21(i + vec2(0.0, 1.0)), bgHash21(i + vec2(1.0, 1.0)), f.x),
+    f.y
+  );
 }
 `;
 
@@ -120,7 +149,26 @@ vec3 bgSwatchSample(uint layer, vec2 world) {
 // editor composites the same swatches, so the ground reads exactly as authored
 // rather than as the base tint multiplied by a texture.
 const FRAG_BODY = /* glsl */ `
-vec2 pCoord = (vFieldXZ - uPaintOrigin) / uPaintCell - 0.5;
+// Break the lattice BEFORE looking up. The paint grid is a quarter-yard
+// lattice, so a border between two swatches is an axis-aligned staircase, and
+// a one-cell bilinear feather is far too narrow to hide it at head height —
+// which is exactly where players read the ground. Two octaves of value noise
+// displace the LOOKUP by up to ~a yard, so the border wanders like a real
+// material boundary and the bilinear below then feathers what is left.
+// The warp never touches the tiling coordinate handed to bgSwatchSample: warp
+// that and the material itself swims underfoot as the camera moves.
+// Fade the warp out with distance. The index map is sampled NEAREST, so a
+// warp that survives to where one pixel covers most of a cell makes
+// neighbouring pixels land in different cells and the far field SPARKLES as
+// the camera moves. fwidth gives yards-per-pixel directly, so the warp is full
+// strength exactly where the staircase is legible and gone by the time it
+// isn't. This is also why it costs nothing at distance.
+float pxSpan = max(fwidth(vFieldXZ.x), fwidth(vFieldXZ.y));
+float warpFade = 1.0 - smoothstep(0.06, 0.32, pxSpan);
+vec2 warp = vec2(bgValueNoise(vFieldXZ * 1.3), bgValueNoise(vFieldXZ * 1.3 + 41.7)) - 0.5;
+warp += (vec2(bgValueNoise(vFieldXZ * 3.7 + 11.3), bgValueNoise(vFieldXZ * 3.7 + 87.1)) - 0.5) * 0.5;
+vec2 pWorld = vFieldXZ + warp * (uPaintWarp * warpFade);
+vec2 pCoord = (pWorld - uPaintOrigin) / uPaintCell - 0.5;
 vec2 pBase = floor(pCoord);
 vec2 pFrac = pCoord - pBase;
 vec3 acc = vec3(0.0);
@@ -169,6 +217,7 @@ export async function buildBattlegroundTerrain(opts: { lowGfx: boolean }): Promi
     shader.uniforms.uPaintSize = { value: new THREE.Vector2(paint.cols, paint.rows) };
     shader.uniforms.uPaintCell = { value: paint.cell };
     shader.uniforms.uSwatch = { value: swatch };
+    shader.uniforms.uPaintWarp = { value: PAINT_WARP_YD };
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>\n${VERT_HEAD}`)
       .replace('#include <begin_vertex>', `#include <begin_vertex>\n${VERT_BODY}`);

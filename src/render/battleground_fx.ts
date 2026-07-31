@@ -119,6 +119,9 @@ export class BattlegroundFx {
         const pose = runeGemPose(time);
         bg.gem.rotation.y = pose.spin;
         bg.gem.position.y = bg.gemBaseY + pose.bob;
+        // The bespoke kit is GPU-driven off sharedUniforms.uTime; this call is
+        // only the light pulse and the Ward shard yaw (battleground_rune_vfx).
+        bg.vfx?.update(time);
         continue;
       }
       const flag = match.flags[bg.team];

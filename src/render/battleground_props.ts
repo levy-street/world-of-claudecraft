@@ -18,8 +18,10 @@
 // group's own position/rotation stay renderer-owned.
 import * as THREE from 'three';
 import { BG_TEAM_COLORS } from '../sim/battleground_layout';
-import { RUNE_VISUALS } from '../sim/social/battleground';
+import { type BgRuneType, RUNE_VISUALS } from '../sim/social/battleground';
 import { BG_RUNE_BOB_AMP } from './battleground_fx_core';
+import { runeModelBody } from './battleground_rune_model';
+import { buildRuneVfxKit, type RuneVfxKit } from './battleground_rune_vfx';
 import { surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
@@ -53,8 +55,11 @@ export type BgObjectRefs =
     }
   | {
       kind: 'rune';
-      gem: THREE.Group; // the spinner holding the tilted cube gem
+      gem: THREE.Group; // the spinner holding the body (custom GLB or fallback)
       gemBaseY: number;
+      // The pad's bespoke effect kit (Slipstream / Forge / Aegis), or null on
+      // an unrecognized rune color. The fx pass ticks it; nothing else may.
+      vfx: RuneVfxKit | null;
     };
 
 let flagPoleGeo: THREE.CylinderGeometry | null = null;
@@ -123,6 +128,10 @@ function runeTypeForColor(color: number): keyof typeof RUNE_VISUALS | null {
 // second pass: 2D glyph billboards read as stickers against the low-poly
 // world): Sprint spins a lightning bolt, Battle a pair of crossed swords,
 // Ward a shield plate, all extruded low-poly solids in the rune color.
+//
+// These are the FALLBACK bodies. A rune with a custom GLB registered in
+// battleground_rune_model.ts spins that instead; everything around the body
+// (glow disc, spin/bob, the bespoke effect kit) is identical either way.
 let bladeGeo: THREE.ExtrudeGeometry | null = null;
 let shieldGeo: THREE.ExtrudeGeometry | null = null;
 let boltGeo: THREE.ExtrudeGeometry | null = null;
@@ -184,6 +193,32 @@ function runeShieldGeometry(): THREE.ExtrudeGeometry {
 }
 
 /**
+ * The procedural spinner body for a rune pad: the shape that spins when no
+ * custom GLB is registered for that rune (and for an unrecognized rune color,
+ * which falls through to the corner-down gem cube).
+ */
+function proceduralRuneBody(runeType: BgRuneType | null, color: number): THREE.Object3D[] {
+  if (runeType === 'damage') {
+    // CROSSED swords: two blades in an X, the war-room trophy silhouette.
+    return [-0.5, 0.5].map((lean) => {
+      const blade = new THREE.Mesh(runeBladeGeometry(), gemMaterial(color));
+      blade.rotation.z = lean;
+      blade.position.y = 0.3; // grips clear the pad at the bob's low point
+      return blade;
+    });
+  }
+  if (runeType === 'defense') return [new THREE.Mesh(runeShieldGeometry(), gemMaterial(color))];
+  if (runeType === 'sprint') return [new THREE.Mesh(runeBoltGeometry(), gemMaterial(color))];
+  runeGemGeo ??= markSharedGeometry(
+    new THREE.BoxGeometry(RUNE_GEM_SIZE, RUNE_GEM_SIZE, RUNE_GEM_SIZE),
+  );
+  const gemMesh = new THREE.Mesh(runeGemGeo, gemMaterial(color));
+  gemMesh.rotation.z = RUNE_GEM_TILT_Z;
+  gemMesh.rotation.x = RUNE_GEM_TILT_X;
+  return [gemMesh];
+}
+
+/**
  * Build the view body for one battleground ground object. `color` is the sim
  * entity's color (team color for a flag, gold for a rune); `height` feeds the
  * renderer's nameplate anchor.
@@ -197,46 +232,33 @@ export function buildBattlegroundObject(
 
   if (templateId === 'bg_rune') {
     runeDiscGeo ??= markSharedGeometry(new THREE.CircleGeometry(RUNE_DISC_R, 24));
-    runeGemGeo ??= markSharedGeometry(
-      new THREE.BoxGeometry(RUNE_GEM_SIZE, RUNE_GEM_SIZE, RUNE_GEM_SIZE),
-    );
     const glow = glowMaterial(color);
     const disc = new THREE.Mesh(runeDiscGeo, glow);
     disc.rotation.x = -Math.PI / 2;
     disc.position.y = RUNE_DISC_Y;
     group.add(disc);
-    // The spinner: a per-type solid inside a group the fx pass yaws and bobs
-    // (battleground_fx_core runeGemPose). Sprint keeps the corner-down gem
-    // cube; Battle spins a sword shard, Ward a shield plate, so the pad's
-    // PURPOSE reads from the shape before the color.
+    // The spinner: the pad's body inside a group the fx pass yaws and bobs
+    // (battleground_fx_core runeGemPose). A registered custom GLB wins; without
+    // one the procedural per-type solid keeps the pad's PURPOSE readable from
+    // the shape before the color.
     const gem = new THREE.Group();
     gem.position.y = RUNE_GEM_Y;
     const runeType = runeTypeForColor(color);
-    if (runeType === 'damage') {
-      // CROSSED swords: two blades in an X, the war-room trophy silhouette.
-      for (const lean of [-0.5, 0.5]) {
-        const blade = new THREE.Mesh(runeBladeGeometry(), gemMaterial(color));
-        blade.rotation.z = lean;
-        blade.position.y = 0.3; // grips clear the pad at the bob's low point
-        gem.add(blade);
-      }
-    } else if (runeType === 'defense') {
-      gem.add(new THREE.Mesh(runeShieldGeometry(), gemMaterial(color)));
-    } else if (runeType === 'sprint') {
-      gem.add(new THREE.Mesh(runeBoltGeometry(), gemMaterial(color)));
-    } else {
-      const gemMesh = new THREE.Mesh(runeGemGeo, gemMaterial(color));
-      gemMesh.rotation.z = RUNE_GEM_TILT_Z;
-      gemMesh.rotation.x = RUNE_GEM_TILT_X;
-      gem.add(gemMesh);
-    }
+    const model = runeType ? runeModelBody(runeType) : null;
+    if (model) gem.add(model);
+    else for (const part of proceduralRuneBody(runeType, color)) gem.add(part);
     group.add(gem);
-    if (!lowGfx) {
+    // The bespoke effect kit owns the pad's pulsing point light, so an
+    // unrecognized rune color (no kit) still gets the plain light it always had.
+    const vfx = runeType ? buildRuneVfxKit(runeType, color, lowGfx) : null;
+    if (vfx) {
+      group.add(vfx.group);
+    } else if (!lowGfx) {
       const light = new THREE.PointLight(color, RUNE_LIGHT_INTENSITY, RUNE_LIGHT_DISTANCE, 2);
       light.position.y = RUNE_GEM_Y;
       group.add(light);
     }
-    group.userData.bg = { kind: 'rune', gem, gemBaseY: RUNE_GEM_Y } satisfies BgObjectRefs;
+    group.userData.bg = { kind: 'rune', gem, gemBaseY: RUNE_GEM_Y, vfx } satisfies BgObjectRefs;
     // Nameplate anchor clears the tallest spinner (the blade's raised point)
     // at the top of its hover (bob amplitude from battleground_fx_core).
     return { group, height: RUNE_GEM_Y + BG_RUNE_BOB_AMP + 1.1 + 0.25 };

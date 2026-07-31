@@ -4295,6 +4295,14 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body!;
+      // Hoist the per-frame handles onto the VIEW group. battleground_fx.ts
+      // reads `view.group.userData.bg`, and view.group is this method's own
+      // wrapper — the built body goes in as a CHILD of it further down, so the
+      // refs the props builder set are one level too deep to be found. Without
+      // this the fx pass hits `if (!bg) continue` for every rune and flag and
+      // silently animates nothing: no rune spin or bob, no pad light pulse, no
+      // Ward shard orbit, and no flag carrier ring or lean.
+      group.userData.bg = built.group.userData.bg;
     } else if (e.kind === 'object') {
       objectPoolKey = this.objectPoolKeyFor(e);
       const pooled = objectPoolKey ? this.takePooledObject(objectPoolKey) : null;
