@@ -3667,7 +3667,11 @@ const ITEM_ICON_IMAGES = ITEM_WEAPON_VARIANTS;
 
 /** Static URL of a weapon's rendered thumbnail, or null if it uses a recipe. */
 function weaponIconUrl(id: string): string | null {
-  const model = ITEM_ICON_IMAGES[id];
+  // A heroic clone carries no mapping of its own: it rides its base weapon's
+  // rendered thumbnail through heroicOf, so bag icon and in-hand model still
+  // match. Without the fallback a heroic weapon falls through to procedural
+  // composition (pinned by tests/item_icons.test.ts case K).
+  const model = ITEM_ICON_IMAGES[id] ?? ITEM_ICON_IMAGES[ITEMS[id]?.heroicOf ?? ''];
   return model ? `${WEAPON_ICON_DIR}/${model}.jpg` : null;
 }
 
