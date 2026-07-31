@@ -6,6 +6,7 @@ import { Sim } from '../src/sim/sim';
 import { type Entity, emptyMoveInput } from '../src/sim/types';
 import { groundHeight, waterLevelAt } from '../src/sim/world';
 
+// The ship plan is seed-invariant; these seeds exercise terrain and water context, not ship pose variation.
 const SEEDS = [20061, 4242, 7, 999983];
 const WAYPOINT_EPSILON = 0.4;
 const RAIL_STANDOFF_EPSILON = 0.06;
@@ -187,6 +188,46 @@ function walkBoardingCircuit(sim: Sim, harbor: HarborDef): void {
       300,
     );
   }
+
+  const blockedExitRail = harbor.shipRails[0];
+  if (!blockedExitRail) throw new Error(`${harbor.id} has no rail for the blocked exit attempt`);
+  const railNormal = {
+    x: Math.sin(blockedExitRail.rot),
+    z: Math.cos(blockedExitRail.rot),
+  };
+  const deckDelta = {
+    x: mainDeck.x - blockedExitRail.x,
+    z: mainDeck.z - blockedExitRail.z,
+  };
+  const insideSign = Math.sign(deckDelta.x * railNormal.x + deckDelta.z * railNormal.z);
+  if (insideSign === 0) throw new Error(`${harbor.id} blocked exit rail has no deck side`);
+  const railHalfThickness = blockedExitRail.halfThickness ?? 0.14;
+  const blockedExitStart = {
+    x:
+      blockedExitRail.x +
+      railNormal.x * insideSign * (railHalfThickness + PLAYER_BODY_RADIUS + 0.25),
+    z:
+      blockedExitRail.z +
+      railNormal.z * insideSign * (railHalfThickness + PLAYER_BODY_RADIUS + 0.25),
+  };
+  const blockedExitTarget = {
+    x: blockedExitRail.x - railNormal.x * insideSign * 2,
+    z: blockedExitRail.z - railNormal.z * insideSign * 2,
+  };
+  walkTo(sim, blockedExitStart, `${harbor.id} approaches the rail midpoint to exit`);
+  pushToward(sim, blockedExitTarget, 12);
+  const blockedExitDistance =
+    ((sim.player.pos.x - blockedExitRail.x) * railNormal.x +
+      (sim.player.pos.z - blockedExitRail.z) * railNormal.z) *
+    insideSign;
+  expect(
+    blockedExitDistance,
+    `${harbor.id} rail midpoint blocks the exit attempt`,
+  ).toBeGreaterThanOrEqual(railHalfThickness + PLAYER_BODY_RADIUS - RAIL_STANDOFF_EPSILON);
+  expect(insideDeck(mainDeck, sim.player.pos), `${harbor.id} blocked rail exit stays aboard`).toBe(
+    true,
+  );
+  walkTo(sim, aboard, `${harbor.id} returns to the gangway opening after the blocked exit`);
 
   let leftMainDeck = false;
   const exitHeights: number[] = [];

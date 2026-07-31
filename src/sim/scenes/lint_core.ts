@@ -9,6 +9,7 @@ import {
   type HarborShipBlocker,
   harborRampHeight,
   harborShipLocalBounds,
+  harborShipParkedPose,
 } from '../harbor_layout';
 import type { SceneAttachFrame, SceneRigPoint } from '../types';
 
@@ -91,6 +92,10 @@ export const MIN_ARRIVAL_SEAWARD_START_YARDS = 12;
 export const MIN_ARRIVAL_DIRECTION_DOT = 0.95;
 // The final arrival pose must land on the destination berth before the hidden park cue.
 export const MAX_ARRIVAL_BERTH_DISTANCE_YARDS = 0.5;
+// A berth-anchored glide endpoint must meet the rendered parked position within this tolerance.
+export const BERTH_POSE_POSITION_EPSILON_YARDS = 0.01;
+// Equivalent berth yaws may differ only by this wrapped angular tolerance.
+export const BERTH_POSE_YAW_EPSILON_RADIANS = 0.001;
 // Hull terrain probes are close enough to catch a narrow shoreline ridge without slowing watch mode.
 export const HULL_TERRAIN_SAMPLE_STEP_YARDS = 2;
 // Contact within this tolerance is accepted as a berth seam, not solid penetration.
@@ -132,6 +137,7 @@ export type MechanicalCheck =
   | 'fade.symmetry'
   | 'timing.opWithinDuration'
   | 'cut.teardown'
+  | 'continuity.berthPose'
   | 'continuity.shipScreenDirection'
   | 'continuity.standInHandoff'
   | 'prop.segment'
@@ -169,6 +175,7 @@ export const MECHANICAL_CHECKS = [
   'fade.symmetry',
   'timing.opWithinDuration',
   'cut.teardown',
+  'continuity.berthPose',
   'continuity.shipScreenDirection',
   'continuity.standInHandoff',
   'prop.segment',
@@ -398,6 +405,19 @@ export interface RiderContainmentEvaluation {
   readonly passing: boolean;
 }
 
+export interface BerthPropCue {
+  readonly target: string;
+  readonly parksTarget: boolean;
+}
+
+export type BerthGlideRole = 'departure' | 'arrival';
+
+export interface BerthPoseContinuityEvaluation {
+  readonly positionDelta: number;
+  readonly yawDelta: number;
+  readonly passing: boolean;
+}
+
 export const RIDER_HARBOR_BY_TEMPLATE: ReadonlyMap<string, HarborDef['id']> = new Map([
   ['ferryman_ewald', 'mainland'],
   ['ferrykeeper_odda', 'gullhaven'],
@@ -422,6 +442,40 @@ export function settledPlayerStartForScene(sceneId: string): { x: number; z: num
 
 export function shipTarget(harbor: HarborDef): string {
   return `harbor_ship_${harbor.id}`;
+}
+
+/** Classify chronological harbor cues using the renderer's single-active-ship
+ * registry state. An explicit reset makes the latest glide an arrival, while
+ * activating another target implicitly returns the prior ship to its berth. */
+export function classifyBerthGlideCues(
+  cues: readonly BerthPropCue[],
+): readonly (BerthGlideRole | null)[] {
+  const classifications: (BerthGlideRole | null)[] = cues.map(() => null);
+  const activeCueByTarget = new Map<string, number>();
+  let activeTarget: string | null = null;
+
+  for (const [cueIndex, cue] of cues.entries()) {
+    if (cue.parksTarget) {
+      const activeCueIndex = activeCueByTarget.get(cue.target);
+      if (activeCueIndex !== undefined) {
+        classifications[activeCueIndex] = 'arrival';
+        activeCueByTarget.delete(cue.target);
+      }
+      if (activeTarget === cue.target) activeTarget = null;
+      continue;
+    }
+
+    if (activeTarget !== null && activeTarget !== cue.target) {
+      activeCueByTarget.delete(activeTarget);
+    }
+    if (!activeCueByTarget.has(cue.target)) {
+      classifications[cueIndex] = 'departure';
+    }
+    activeCueByTarget.set(cue.target, cueIndex);
+    activeTarget = cue.target;
+  }
+
+  return classifications;
 }
 
 export function attachmentLocalToWorld(
@@ -452,14 +506,38 @@ export function attachmentWorldToLocal(
   };
 }
 
-function parkedShipFrame(harbor: HarborDef, waterLevel: number): SceneAttachFrame {
+export function parkedShipFrame(harbor: HarborDef, waterLevel: number): SceneAttachFrame {
+  const parked = harborShipParkedPose(harbor.berth, waterLevel);
   return {
     position: {
-      x: harbor.berth.x,
-      y: waterLevel - harbor.berth.draft,
-      z: harbor.berth.z,
+      x: parked.x,
+      y: parked.y,
+      z: parked.z,
     },
-    yaw: harbor.berth.rot,
+    yaw: parked.yaw,
+  };
+}
+
+export function evaluateBerthPoseContinuity(
+  harbor: HarborDef,
+  frame: SceneAttachFrame,
+  waterLevel: number,
+): BerthPoseContinuityEvaluation {
+  const parked = parkedShipFrame(harbor, waterLevel);
+  const positionDelta = Math.hypot(
+    frame.position.x - parked.position.x,
+    frame.position.y - parked.position.y,
+    frame.position.z - parked.position.z,
+  );
+  const yawDelta = Math.abs(
+    Math.atan2(Math.sin(frame.yaw - parked.yaw), Math.cos(frame.yaw - parked.yaw)),
+  );
+  return {
+    positionDelta,
+    yawDelta,
+    passing:
+      positionDelta <= BERTH_POSE_POSITION_EPSILON_YARDS &&
+      yawDelta <= BERTH_POSE_YAW_EPSILON_RADIANS,
   };
 }
 
