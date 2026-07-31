@@ -176,7 +176,11 @@ collision/movement.
   `package.json` is n8ao's peer dependency, not imported directly, so don't
   remove it as "unused." Don't bump Three or swap the chain casually: shaders
   here patch the pinned release's shader chunks via `onBeforeCompile`, so any
-  bump means re-verifying every patched chunk.
+  bump means re-verifying every patched chunk. A bump also touches KTX2:
+  `assets/ktx2_support.ts` hand-builds a `workerConfig` on its no-context
+  fallback arm (a shape KTX2Loader owns and can change between releases), and
+  the shipped `public/basis/` transcoder must be re-copied from the new three
+  (`tests/glb_texture_compression.test.ts` byte-pins it and goes red).
 - Reuse, don't allocate: instancing for repeats, merge one-offs per
   (material, z-band), share materials via `surfaceMat`, distance-cull/LOD in
   `sync` (see the `*_RANGE_SQ` constants). No per-frame `new THREE.*` in hot paths;

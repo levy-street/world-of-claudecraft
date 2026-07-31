@@ -19,6 +19,7 @@ import {
   registerDeferredPreload,
   registerPreload,
 } from '../src/render/assets/preload';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 const mainSource = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 
@@ -149,20 +150,49 @@ describe('no world module fetches at import', () => {
     'src/render/placed_assets.ts',
   ]);
 
-  it('leaves only the sanctioned eager registrants', async () => {
-    const { globSync } = await import('node:fs');
-    const files = globSync('src/render/**/*.ts');
+  it('leaves only the sanctioned eager registrants', () => {
+    const files = tsFilesUnder(new URL('../src/render', import.meta.url).pathname);
+    // Vacuity floor: an empty or misrooted walk must not pass as "no offenders".
+    expect(files.length).toBeGreaterThan(100);
     const offenders: string[] = [];
-    for (const file of files) {
-      if (file.endsWith('assets/preload.ts') || EAGER_ALLOWED.has(file)) continue;
+    for (const { file, full } of files) {
+      const repoRel = `src/render/${file}`;
+      if (repoRel.endsWith('assets/preload.ts') || EAGER_ALLOWED.has(repoRel)) continue;
       // Strip comments first: this guard polices CODE, not prose that happens to
       // name the eager function while explaining the lanes.
-      const code = readFileSync(file, 'utf8')
+      const code = readFileSync(full, 'utf8')
         .replace(/\/\*[\s\S]*?\*\//g, '')
         .replace(/^[ \t]*\/\/.*$/gm, '');
       // Match the call, not the identifier inside registerDeferredPreload.
-      if (/(?<!Deferred)\bregisterPreload\s*\(/.test(code)) offenders.push(file);
+      if (/(?<!Deferred)\bregisterPreload\s*\(/.test(code)) offenders.push(repoRel);
     }
     expect(offenders).toEqual([]);
+  });
+});
+
+describe('every assetsReady host opens the lane', () => {
+  // The general rule behind the two ordering pins above: ANY source that awaits
+  // assetsReady() and then constructs the Renderer is a host, and a host that
+  // does not open the deferred lane first builds over parked world-content
+  // thunks and throws "asset not preloaded" (the editor viewport did exactly
+  // this when the lane landed; the gate stayed green because nothing swept the
+  // call sites).
+  it('finds no Renderer host awaiting assetsReady without beginDeferredPreloads', () => {
+    const files = tsFilesUnder(new URL('../src', import.meta.url).pathname);
+    expect(files.length).toBeGreaterThan(400);
+    const offenders: string[] = [];
+    let hosts = 0;
+    for (const { file, full } of files) {
+      const code = readFileSync(full, 'utf8');
+      const awaitAt = code.indexOf('await assetsReady(');
+      if (awaitAt < 0 || !code.includes('new Renderer(')) continue;
+      hosts++;
+      const beginAt = code.indexOf('beginDeferredPreloads()');
+      if (beginAt < 0 || beginAt > awaitAt) offenders.push(`src/${file}`);
+    }
+    expect(offenders).toEqual([]);
+    // Both known hosts (startGame in main.ts, the editor viewport) must be
+    // seen, or the sweep has quietly stopped matching the pattern it polices.
+    expect(hosts).toBeGreaterThanOrEqual(2);
   });
 });

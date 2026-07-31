@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { GFX } from '../gfx';
 import { resampleHdrRgba } from '../hdr_resample';
 import { ktx2Loader } from './ktx2_support';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
@@ -92,18 +93,25 @@ function loader(): GLTFLoader {
 
 // Dev-channel load telemetry (English on purpose, console.* only): one line per
 // asset fetch start/settle so a device console shows exactly how far through the
-// preload set a WebContent kill lands and which asset preceded it. Release shells
-// suppress the JS console, so shipping builds stay silent; the ~700 lines only
-// surface in a Debug shell attached for diagnosis (the iPhone 17 Pro entry-kill
-// investigation: WebContent died at 1.54 GB resident mid-decode with no JS error,
-// so sequencing evidence has to come from the console, not from error handlers).
+// preload set a WebContent kill lands and which asset preceded it (the iPhone 17
+// Pro entry-kill investigation: WebContent died at 1.54 GB resident mid-decode
+// with no JS error, so sequencing evidence has to come from the console, not
+// from error handlers). Gated like the residency table: dev browsers plus the
+// native iOS profile under diagnosis. The production WEB population must not
+// pay ~700 console lines per entry; the native Release shell suppresses the JS
+// console anyway, and a Debug shell attached for diagnosis sees every line.
+function loadDiagEnabled(): boolean {
+  return import.meta.env.DEV || GFX.nativeIosMemoryProfile;
+}
 let loadDiagSeq = 0;
 function diagStart(kind: string, resolved: string): number {
+  if (!loadDiagEnabled()) return 0;
   const seq = ++loadDiagSeq;
   console.info(`[load-diag] ${seq} ${kind} start ${resolved}`);
   return seq;
 }
 function diagSettle(seq: number, kind: string, resolved: string, ok: boolean): void {
+  if (!loadDiagEnabled()) return;
   console.info(`[load-diag] ${seq} ${kind} ${ok ? 'done' : 'FAIL'} ${resolved}`);
 }
 

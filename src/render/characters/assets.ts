@@ -501,6 +501,11 @@ export function ensureCharacterUrl(url: string | null | undefined): void {
   if (!url || characterAssetResident(url)) return;
   void loadGltf(url)
     .then((g) => {
+      // Keyed on the RAW url like the eager boot loop; readers resolve through
+      // assetUrl(url). Consistent today because no streamed url is aliased
+      // (LOW_URL_ALIAS only rewrites the rogue body, never streamed); an alias
+      // added inside models/creatures/ or the skin set would make this asset
+      // look permanently non-resident, so key any such future entry resolved.
       gltfByUrl.set(url, g);
     })
     .catch(() => undefined);
@@ -541,6 +546,7 @@ export function startStreamedCharacterPreloads(): number {
   for (const url of streamedUrls) {
     void loadGltf(url)
       .then((g) => {
+        // Raw-url key on purpose: see the keying note in ensureCharacterUrl.
         gltfByUrl.set(url, g);
       })
       .catch(() => undefined);
