@@ -363,7 +363,7 @@ describe('Eastbrook polish capture contract', () => {
       // eastbrook_layout.ts are fingerprinted inputs and both changed (the
       // landing fall-speed reset; the graveyard walk threading the headstone
       // gap), and the after-evidence was recaptured against them.
-      fingerprint: 'f00e3ab9f70974fe435e97de86e52953829bbc0776e153ed1aa602a4f136251d',
+      fingerprint: 'ed18a2a2dd21819c4f1ecbe76927d94b47c6eeb5393e166fd44f447f7a46924d',
       components: {
         captureContract: {
           id: 'polish-v2',
