@@ -576,36 +576,127 @@ describe('the voyage cinematic', () => {
       out: out.duration,
       back: back.duration,
       q0: q0.duration,
-    }).toEqual({ out: 21.5, back: 21.5, q0: 36.7 });
+    }).toEqual({ out: 21.95, back: 21.95, q0: 31.3 });
     const cameraTimes = (scene: typeof out): number[] =>
       scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.at] : []));
-    expect(cameraTimes(out)).toEqual([0.45, 4.2, 8.5, 12.8, 17.8]);
-    expect(cameraTimes(back)).toEqual([0.45, 4.2, 8.5, 12.8, 17.8]);
-    expect(cameraTimes(q0)).toEqual([0.45, 4.2, 8.5, 12.8, 18.3, 26.1, 33]);
+    expect(cameraTimes(out)).toEqual([0.45, 4.2, 8.5, 15.5, 21.5]);
+    expect(cameraTimes(back)).toEqual([0.45, 4.2, 8.5, 15.5, 21.5]);
+    expect(cameraTimes(q0)).toEqual([0.45, 4.2, 8.5, 15.5, 23.4, 30.3]);
 
     for (const scene of [out, back, q0]) {
-      expect(
-        scene.ops.some(
-          (op) => op.at === 0 && op.kind === 'fade' && op.to === 'black' && op.dur === 0.4,
-        ),
-      ).toBe(true);
+      expect(scene.ops.filter((op) => op.at === 0 && op.kind === 'fade')).toEqual([
+        { at: 0, kind: 'fade', to: 'black', dur: 0.4 },
+      ]);
       const finalFade = scene.ops.filter((op) => op.kind === 'fade').at(-1);
       expect(finalFade).toMatchObject({ kind: 'fade', to: 'clear', dur: 0.4 });
-      expect(finalFade?.at).toBeCloseTo(scene === q0 ? 35.75 : 20.55, 8);
+      expect(finalFade?.at).toBeCloseTo(scene === q0 ? 30.35 : 21.55, 8);
     }
 
     const shotKinds = (scene: typeof out): string[] =>
       scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.shot.kind] : []));
     expect(shotKinds(out)).toEqual(['attach', 'attach', 'attach', 'dolly', 'release']);
     expect(shotKinds(back)).toEqual(['attach', 'attach', 'attach', 'dolly', 'release']);
-    expect(shotKinds(q0)).toEqual([
-      'attach',
-      'attach',
-      'attach',
-      'dolly',
-      'dolly',
-      'dolly',
-      'release',
+    expect(shotKinds(q0)).toEqual(['attach', 'attach', 'attach', 'dolly', 'dolly', 'release']);
+
+    const dollySpecs = (scene: typeof out) =>
+      scene.ops.flatMap((op) =>
+        op.kind === 'camera' && op.shot.kind === 'dolly' ? [{ at: op.at, shot: op.shot }] : [],
+      );
+    expect(dollySpecs(out)).toEqual([
+      {
+        at: 15.5,
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 693, z: 113.9, height: 23.659148 },
+            { x: 693, z: 96.5, height: 24.096469 },
+            { x: 701, z: 86.5, height: 25.597703 },
+            { x: 719, z: 86.5, height: 25.045709 },
+            { x: 725, z: 93.5, height: 22.685134 },
+            { x: 723.5, z: 105.109175, height: 15.369799 },
+          ],
+          lookAt: {
+            kind: 'spline',
+            points: [
+              { x: 713, z: 96.5, height: 13.597597 },
+              { x: 715, z: 100.5, height: 1 },
+              { x: 717, z: 104.5, height: 1.12 },
+              { x: 719, z: 108.5, height: 1.24 },
+              { x: 721.5, z: 112.5, height: 14.660648 },
+              { x: 723.5, z: 116.5, height: 2 },
+            ],
+          },
+          dur: 6,
+        },
+      },
+    ]);
+    expect(dollySpecs(back)).toEqual([
+      {
+        at: 15.5,
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 260.5, z: -50.6, height: 23.67159 },
+            { x: 260.5, z: -68, height: 24.393817 },
+            { x: 252.5, z: -78, height: 25.647641 },
+            { x: 234.5, z: -78, height: 25.962952 },
+            { x: 228.5, z: -71, height: 18.562805 },
+            { x: 230.4, z: -59.390825, height: 15.369799 },
+          ],
+          lookAt: {
+            kind: 'spline',
+            points: [
+              { x: 240.5, z: -68, height: 12.804822 },
+              { x: 238.5, z: -64, height: 0.92 },
+              { x: 236.5, z: -60, height: 0.96 },
+              { x: 234.5, z: -56, height: 1 },
+              { x: 232.5, z: -52, height: 12.471553 },
+              { x: 230.4, z: -48, height: 2 },
+            ],
+          },
+          dur: 6,
+        },
+      },
+    ]);
+    expect(dollySpecs(q0)).toEqual([
+      {
+        at: 15.5,
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 806, z: 112, height: 8 },
+            { x: 808, z: 113, height: 7.4 },
+          ],
+          lookAt: {
+            kind: 'point',
+            point: { x: 818, z: 120, height: 2 },
+          },
+          dur: 4.8,
+          subjectRef: 'statueBlock',
+        },
+      },
+      {
+        at: 23.4,
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 808, z: 113, height: 7.4 },
+            { x: 780, z: 115, height: 5.9 },
+            { x: 755, z: 116, height: 8 },
+            { x: 723.5, z: 105.109175, height: 15.369799 },
+          ],
+          lookAt: {
+            kind: 'spline',
+            points: [
+              { x: 818, z: 120, height: 2 },
+              { x: 785, z: 122, height: 2 },
+              { x: 755, z: 121.5, height: 2 },
+              { x: 723.5, z: 116.5, height: 2 },
+            ],
+          },
+          dur: 6.45,
+        },
+      },
     ]);
 
     const attachSpecs = (scene: typeof out) =>
@@ -628,7 +719,7 @@ describe('the voyage cinematic', () => {
       },
       {
         target: 'harbor_ship_mainland',
-        offset: { x: 6.6, y: 18, z: -28 },
+        offset: { x: -20, y: 16, z: 22 },
         lookAt: { x: 6.6, y: 8.6, z: 0 },
       },
       {
@@ -645,7 +736,7 @@ describe('the voyage cinematic', () => {
       },
       {
         target: 'harbor_ship_gullhaven',
-        offset: { x: 6.6, y: 18, z: 28 },
+        offset: { x: -20, y: 16, z: -22 },
         lookAt: { x: 6.6, y: 8.6, z: 0 },
       },
       {
@@ -660,13 +751,13 @@ describe('the voyage cinematic', () => {
         op.kind === 'playerWalk' ? [{ at: op.at, to: op.to, speed: op.speed }] : [],
       );
     expect(walks(out)).toHaveLength(1);
-    expect(walks(out)[0]?.at).toBeCloseTo(15.9, 8);
+    expect(walks(out)[0]?.at).toBeCloseTo(15.5, 8);
     expect(walks(out)[0]).toMatchObject({
       to: { x: GULLHAVEN_HARBOR.gangplank.x, z: GULLHAVEN_HARBOR.gangplank.z },
       speed: 2.75,
     });
     expect(walks(back)).toHaveLength(1);
-    expect(walks(back)[0]?.at).toBeCloseTo(15.9, 8);
+    expect(walks(back)[0]?.at).toBeCloseTo(15.5, 8);
     expect(walks(back)[0]).toMatchObject({
       to: { x: MAINLAND_HARBOR.gangplank.x, z: MAINLAND_HARBOR.gangplank.z },
       speed: 2.75,
@@ -675,22 +766,32 @@ describe('the voyage cinematic', () => {
     expect(back.ops.some((op) => op.kind === 'line')).toBe(false);
 
     for (const scene of [out, back]) {
-      const pierFade = scene.ops.flatMap((op) =>
+      const parkFade = scene.ops.flatMap((op) =>
         op.kind === 'fade' && op.to === 'black' && op.at > 8.5 && op.at < 15.5
           ? [{ at: op.at, dur: op.dur }]
           : [],
       );
-      expect(pierFade).toHaveLength(1);
-      expect(pierFade.map((op) => op.dur)).toEqual([0.4]);
-      expect(pierFade[0]?.at).toBeCloseTo(12.35, 8);
+      expect(parkFade).toHaveLength(1);
+      expect(parkFade.map((op) => op.dur)).toEqual([0.4]);
+      expect(parkFade[0]?.at).toBeCloseTo(15.05, 8);
     }
 
     const arrivalCutKinds = (scene: typeof out) =>
       scene.ops
         .filter((op) => Math.abs(op.at - 15.5) < 1e-8)
         .map((op) => (op.kind === 'prop' ? `${op.kind}/${op.cue}` : op.kind));
-    expect(arrivalCutKinds(out)).toEqual([`prop/${LB_PROP_CUE_PARK}`, 'fade', 'camera']);
-    expect(arrivalCutKinds(back)).toEqual([`prop/${LB_PROP_CUE_PARK}`, 'fade', 'camera']);
+    expect(arrivalCutKinds(out)).toEqual([
+      `prop/${LB_PROP_CUE_PARK}`,
+      'playerWalk',
+      'fade',
+      'camera',
+    ]);
+    expect(arrivalCutKinds(back)).toEqual([
+      `prop/${LB_PROP_CUE_PARK}`,
+      'playerWalk',
+      'fade',
+      'camera',
+    ]);
 
     const q0Lines = q0.ops.flatMap((op) =>
       op.kind === 'line' ? [{ at: op.at, key: op.key, dur: op.dur }] : [],
@@ -701,9 +802,9 @@ describe('the voyage cinematic', () => {
       { key: 'lb.q0.scene.toll', dur: 6.5 },
     ]);
     expect(q0Lines.map((line) => line.at)).toEqual([
-      expect.closeTo(16, 8),
-      expect.closeTo(21.2, 8),
-      expect.closeTo(29, 8),
+      expect.closeTo(10.2, 8),
+      expect.closeTo(15.7, 8),
+      expect.closeTo(23.6, 8),
     ]);
     expect(
       q0.ops.filter((op) => op.kind === 'music' && op.directive === 'lb_bell_toll_one'),
