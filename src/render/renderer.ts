@@ -6117,10 +6117,31 @@ export class Renderer {
   // main thread (KHR_parallel_shader_compile via compileAsync) against the live
   // scene's exact lights + environment, racing the shared fail-soft ceiling so a
   // driver that never reports completion can't strand a caller hidden forever.
-  // compileAsync's material traversal is scoped to `target` alone (confirmed
-  // against the pinned three.js source for #2571's commit 3: only its light
-  // gathering walks the whole `this.scene`, not the material/program pass), so
-  // this is cheap to call once per swapped node rather than needing to batch.
+  //
+  // Deliberately ONE call per gated target, not batched into one call per frame.
+  // #2571's third fix asked for exactly that batching, on the premise that "each
+  // gated view calls compileAsync with the whole scene individually", checked
+  // against the pinned three.js WebGLRenderer.compile()/compileAsync() source
+  // directly rather than assumed. `compile(scene, camera, targetScene)` gathers
+  // LIGHTS from `targetScene` (here `this.scene`, for a correct
+  // NUM_POINT_LIGHTS/... shader variant) but only calls getProgram/prepareMaterial
+  // by traversing `scene` (here `target`, the one gated node): "Only initialize
+  // materials in the new scene, not the targetScene" per its own source comment.
+  // So the expensive part (shader source generation, program acquisition) is
+  // already scoped to the single target, never the whole scene; only the light
+  // GATHERING walk re-scans `this.scene` on every call, and it is a plain
+  // isLight check over the scene graph, not a shader compile. At the runtime
+  // view-create budget (see VIEW_CREATE_BUDGET_HIGH; the boot prewarm's much
+  // larger manifest is a separate, one-time pass with its own budgets), a
+  // worst-case frame pays that redundant light-gather walk a handful of times,
+  // never a redundant scene-wide shader compile. Batching multiple targets into
+  // one compileAsync call is not achievable through the public API without either
+  // reparenting each already-placed target out of its real scene position
+  // (breaking its transform) or cloning every target into a scratch batch
+  // container purely to compile it (paying a real allocation/traversal cost to
+  // save a cheap boolean-flag walk). Given the traversal that actually matters is
+  // already correctly scoped, and a real batch would cost more than it saves,
+  // this stays one call per target.
   private compileGate(target: THREE.Object3D): Promise<void> {
     return raceCompileGate(
       () => this.webgl.compileAsync(target, this.camera, this.scene),
