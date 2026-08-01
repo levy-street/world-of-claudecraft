@@ -137,6 +137,48 @@ describe('perf report ingestion', () => {
     );
   });
 
+  it('preserves the insane preset and tier independently for fleet segmentation', async () => {
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'insane-preset',
+          graphicsPreset: 'insane',
+          gfxTier: 'low',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.79' },
+      ),
+      fakeRes(),
+    );
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'insane-tier',
+          graphicsPreset: 'auto',
+          gfxTier: 'insane',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.80' },
+      ),
+      fakeRes(),
+    );
+
+    expect(insertClientPerfReport).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        graphicsPreset: 'insane',
+        gfxTier: 'low',
+      }),
+    );
+    expect(insertClientPerfReport).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        graphicsPreset: 'auto',
+        gfxTier: 'insane',
+      }),
+    );
+  });
+
   it('keeps old schema-version-1 clients valid through the intIn clamp', async () => {
     const res = fakeRes();
     await handlePerfReport(

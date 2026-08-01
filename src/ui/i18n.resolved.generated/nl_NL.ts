@@ -2191,7 +2191,7 @@ export const nl_NL: EnTranslations = {
         "noRecipient": "Niemand met die naam heeft hier een brievenbus.",
         "tooManyParcels": "Een brief draagt hoogstens {count} pakketten.",
         "noMailQuestItems": "Je kunt geen opdrachtvoorwerpen versturen.",
-        "noMailBound": "Dat voorwerp is gebonden en kan niet worden verstuurd.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Zoveel heb je er niet om te versturen.",
         "cantAffordPostage": "Je kunt de porto niet betalen.",
         "recipientBoxFull": "Hun brievenbus is vol.",
@@ -6254,11 +6254,15 @@ export const nl_NL: EnTranslations = {
       "graphicsPresetMedium": "Gemiddeld",
       "graphicsPresetHigh": "Hoog",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Geavanceerd",
       "terrainDetail": "Terreindetail",
       "foliageDensity": "Bladerdichtheid",
       "effectsQuality": "Effecten en belichting",
       "shadowQuality": "Schaduwkwaliteit",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Laag",
       "terrainHigh": "Hoog",
       "touchOpacity": "Doorzichtigheid aanraakbediening",
@@ -6548,7 +6552,7 @@ export const nl_NL: EnTranslations = {
       "tradeExpired": "Het ruilverzoek is verlopen.",
       "tradeFailed": "Ruil mislukt: voorwerpen of geld niet langer beschikbaar.",
       "tradeBound": "Dat voorwerp is gebonden en kan niet worden verhandeld.",
-      "marketListBound": "Dat voorwerp is gebonden en kan niet te koop worden aangeboden."
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Je staat op.",

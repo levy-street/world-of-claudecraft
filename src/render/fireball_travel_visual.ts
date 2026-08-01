@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { surfaceMat } from './gfx';
+import { EMISSIVE_LIGHT, surfaceMat } from './gfx';
 
 const CORE_GEOMETRY = new THREE.IcosahedronGeometry(0.78, 2);
 const SHELL_GEOMETRY = new THREE.IcosahedronGeometry(0.92, 2);
@@ -20,7 +20,7 @@ function fireballMaterials(): FireballMaterials {
   const core = surfaceMat({
     color: 0xffc53d,
     emissive: 0xff4a08,
-    emissiveIntensity: 2.4,
+    emissiveIntensity: EMISSIVE_LIGHT,
     roughness: 0.38,
     flatShading: true,
   });

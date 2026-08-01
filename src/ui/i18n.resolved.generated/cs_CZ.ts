@@ -2191,7 +2191,7 @@ export const cs_CZ: EnTranslations = {
         "noRecipient": "Nikdo s tímto jménem zde poštovní schránku nemá.",
         "tooManyParcels": "Dopis unese nejvýše {count} balíků.",
         "noMailQuestItems": "Úkolové předměty nelze posílat poštou.",
-        "noMailBound": "Tento předmět je vázaný a nelze ho poslat poštou.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Nemáš tolik kusů k odeslání.",
         "cantAffordPostage": "Nemůžeš si dovolit poštovné.",
         "recipientBoxFull": "Jejich poštovní schránka je plná.",
@@ -6254,11 +6254,15 @@ export const cs_CZ: EnTranslations = {
       "graphicsPresetMedium": "Střední",
       "graphicsPresetHigh": "Vysoká",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Pokročilé",
       "terrainDetail": "Detail terénu",
       "foliageDensity": "Hustota vegetace",
       "effectsQuality": "Efekty a osvětlení",
       "shadowQuality": "Kvalita stínů",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Nízký",
       "terrainHigh": "Vysoký",
       "touchOpacity": "Krytí dotykového ovládání",
@@ -6548,7 +6552,7 @@ export const cs_CZ: EnTranslations = {
       "tradeExpired": "Žádost o obchod vypršela.",
       "tradeFailed": "Obchod selhal: předměty nebo peníze už nejsou dostupné.",
       "tradeBound": "Tento předmět je vázaný a nelze ho vyměnit.",
-      "marketListBound": "Tento předmět je vázaný a nelze ho nabídnout k prodeji."
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Vstáváš.",

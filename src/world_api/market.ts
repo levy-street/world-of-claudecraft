@@ -1,11 +1,4 @@
-import type {
-  MarketArmorClassFilter,
-  MarketItemTypeFilter,
-  MarketPrimaryStatFilter,
-  MarketQuery,
-  MarketRarityFilter,
-  MarketSubtypeFilter,
-} from '../sim/market_query';
+import type { MarketQuery } from '../sim/market_query';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 
 // ---------------------------------------------------------------------------

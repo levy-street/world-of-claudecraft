@@ -164,7 +164,6 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 13,
     loot: [
       { copper: 90, chance: 1 },
-      { itemId: 'bone_fragments', chance: 0.4 },
       { itemId: 'ashbone_war_brand', chance: 0.6, questId: 'q_dk_marrow_and_ash' },
     ],
     scale: 1,
@@ -186,7 +185,6 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 13,
     loot: [
       { copper: 95, chance: 1 },
-      { itemId: 'bone_fragments', chance: 0.4 },
       { itemId: 'ashbone_war_brand', chance: 0.6, questId: 'q_dk_marrow_and_ash' },
     ],
     scale: 1.1,
@@ -206,10 +204,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 14,
     moveSpeed: 8.5,
     aggroRadius: 14,
-    loot: [
-      { copper: 90, chance: 1 },
-      { itemId: 'chipped_tusk', chance: 0.4 },
-    ],
+    loot: [{ copper: 90, chance: 1 }],
     scale: 1.15,
     color: 0xb07040,
   },

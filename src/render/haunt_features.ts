@@ -10,7 +10,8 @@ import { WRAITHWOOD_PROPS } from '../sim/content/wraithwood';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
+import { registerPreload } from './assets/preload';
+import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface HauntFeaturesView {
   group: THREE.Group;
@@ -101,6 +102,9 @@ export function buildHauntFeatures(seed: number): HauntFeaturesView {
         m = source.clone();
         const c = (m as THREE.MeshStandardMaterial).color;
         if (c) c.multiply(new THREE.Color(0.42, 0.48, 0.42));
+        // giant haunted trunks take the coarse landmark bark grain
+        if (isBarkMaterialName(source.name))
+          applySurfaceDetail(m as THREE.MeshStandardMaterial, 'bark', GREAT_TREE_BARK_DETAIL);
         darkened.set(source.uuid, m);
       }
       return m;

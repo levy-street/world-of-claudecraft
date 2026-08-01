@@ -650,6 +650,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the touch consumables quick bar, only while the row is expanded',
   },
   {
+    call: 'this.xpBarViewCache.resolve',
+    band: 'frame',
+    gate: '',
+    surface: 'none',
+    why: 'derives the localized XP view only when its scalar inputs or i18n revision change',
+  },
+  {
     call: 'this.xpBarPainter.paint',
     band: 'frame',
     gate: '',
@@ -1308,7 +1315,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
   it('keeps the classic target strip complete and reuses that model for the detail window', () => {
     const source = readFileSync(HUD_PATH, 'utf8');
     expect(source).toMatch(
-      /targetAurasView = createAurasView\('all', this\.aurasViewDeps, \{\s*ownFirst: true,\s*effectHtmlCacheVersion: getLanguage,\s*\}\);/,
+      /targetAurasView = createAurasView\('all', this\.aurasViewDeps, \{\s*ownFirst: true,\s*effectHtmlCacheVersion: getI18nRevision,\s*\}\);/,
     );
     expect(source).toMatch(
       /const targetAuraState = this\.targetAurasView\.tick\(target\);\s*this\.targetDebuffsPainter\.paint\(targetAuraState\);\s*if \(this\.targetAurasWindow\.isVisible\) \{\s*this\.targetAurasWindow\.paint\([^,]+, targetAuraState,/,
@@ -1405,7 +1412,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 41, chrome: 71, none: 15 });
+    ).toEqual({ window: 41, chrome: 71, none: 16 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

@@ -22,6 +22,46 @@ export interface XpBarView {
   postCap: boolean; // true → distinct prestige/gold styling
 }
 
+/** Allocation-free steady-state cache for the HUD's localized XP bar view. */
+export class XpBarViewCache {
+  private level = Number.NaN;
+  private xp = Number.NaN;
+  private lifetimeXp = Number.NaN;
+  private restedXp = Number.NaN;
+  private showOverflow = false;
+  private i18nRevision = -1;
+  private view: XpBarView | null = null;
+
+  resolve(
+    level: number,
+    xp: number,
+    lifetimeXp: number,
+    restedXp: number,
+    showOverflow: boolean,
+    i18nRevision: number,
+  ): XpBarView {
+    if (
+      this.view &&
+      level === this.level &&
+      xp === this.xp &&
+      lifetimeXp === this.lifetimeXp &&
+      restedXp === this.restedXp &&
+      showOverflow === this.showOverflow &&
+      i18nRevision === this.i18nRevision
+    ) {
+      return this.view;
+    }
+    this.level = level;
+    this.xp = xp;
+    this.lifetimeXp = lifetimeXp;
+    this.restedXp = restedXp;
+    this.showOverflow = showOverflow;
+    this.i18nRevision = i18nRevision;
+    this.view = xpBarView({ level, xp, lifetimeXp, restedXp, showOverflow });
+    return this.view;
+  }
+}
+
 // Locale-grouped non-negative integer XP count (e.g. en "1,000"). Routes
 // through formatNumber so the digit grouping/numerals follow the active locale.
 export function formatXp(n: number): string {

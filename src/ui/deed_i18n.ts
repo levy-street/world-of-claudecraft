@@ -8,7 +8,7 @@
 // English (clean English is preferable to a broken guess).
 
 import { DEEDS } from '../sim/content/deeds';
-import { getLanguage, isPseudoActive, type SupportedLanguage, t } from './i18n';
+import { getI18nRevision, getLanguage, isPseudoActive, type SupportedLanguage, t } from './i18n';
 
 export type DeedTranslationField = 'name' | 'desc' | 'title';
 
@@ -99,6 +99,7 @@ const DEED_DIALECT_BASE: Partial<Record<SupportedLanguage, DeedBaseLocale>> = {
 // resident once its own chunk resolves. Absent until then: a non-en read falls
 // back to the authored English (the documented absent-table behavior).
 const residentDeedLocales: Partial<Record<SupportedLanguage, DeedLocaleTable>> = {};
+let deedLocaleRevision = 0;
 // One coalesced in-flight promise PER LANGUAGE, cleared on reject so a failed
 // fetch of one locale leaves a retry possible and never blocks another locale.
 const inflightDeedLocales = new Map<SupportedLanguage, Promise<void>>();
@@ -127,6 +128,7 @@ export async function ensureDeedLocalesLoaded(lang: SupportedLanguage): Promise<
       const m = (mod as { default?: DeedLocaleModule }).default ?? mod;
       const override = dialectBase ? m.dialects?.[lang] : undefined;
       residentDeedLocales[lang] = override ? { ...m.table, ...override } : m.table;
+      deedLocaleRevision++;
       inflightDeedLocales.delete(lang);
     })
     .catch((err) => {
@@ -135,6 +137,11 @@ export async function ensureDeedLocalesLoaded(lang: SupportedLanguage): Promise<
     });
   inflightDeedLocales.set(lang, task);
   return task;
+}
+
+/** Monotonic token for title caches backed by both main and deed locale chunks. */
+export function getDeedTitleI18nRevision(): number {
+  return getI18nRevision() + deedLocaleRevision;
 }
 
 // --- en_XA dev pseudo-locale port ---------------------------------------------

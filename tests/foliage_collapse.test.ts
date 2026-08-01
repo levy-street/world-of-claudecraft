@@ -12,6 +12,7 @@ import { instanceCullWindows } from '../src/render/foliage_lod';
 const BASE_VERTEX = [
   '#include <common>',
   'void main() {',
+  '#include <uv_vertex>',
   '#include <begin_vertex>',
   '#include <project_vertex>',
   '}',
@@ -30,7 +31,7 @@ function compile(mat: CollapsibleMaterial): FakeShader {
 }
 
 describe('foliage collapse: shader injection', () => {
-  it('collapses instances outside the window, right before projection', () => {
+  it('rejects instances outside the window before per-vertex material work', () => {
     const mat: CollapsibleMaterial = {};
     applyInstanceCollapse(mat, 'tree');
     const sh = compile(mat);
@@ -45,18 +46,34 @@ describe('foliage collapse: shader injection', () => {
     );
     // window arithmetic: alive on [min, max)
     expect(sh.vertexShader).toContain(
-      'transformed *= step(uCollapseMin, collapseDist) * (1.0 - step(uCollapseMax, collapseDist));',
+      'float collapseKeep = step(uCollapseMin, collapseDist) * (1.0 - step(uCollapseMax, collapseDist));',
     );
+    expect(sh.vertexShader).toContain('if (collapseKeep == 0.0) {');
+    expect(sh.vertexShader).toContain('gl_Position = vec4(2.0, 2.0, 2.0, 1.0);');
     // uniform declarations must land in the prelude, not inside main()
     const mainAt = sh.vertexShader.indexOf('void main()');
     expect(sh.vertexShader.indexOf('uniform float uCollapseMin;')).toBeLessThan(mainAt);
-    // the multiply must land before projection so it is the LAST transformed edit
-    const collapseAt = sh.vertexShader.indexOf('transformed *=');
+    // the no-fragment return lands before the first stock vertex-main include
+    const returnAt = sh.vertexShader.indexOf('return;');
+    const uvAt = sh.vertexShader.indexOf('#include <uv_vertex>');
+    const beginAt = sh.vertexShader.indexOf('#include <begin_vertex>');
     const projectAt = sh.vertexShader.indexOf('#include <project_vertex>');
-    expect(collapseAt).toBeGreaterThan(mainAt);
-    expect(projectAt).toBeGreaterThan(collapseAt);
-    // and stays harmless for a non-instanced draw of the same material
-    expect(sh.vertexShader).toContain('#ifdef USE_INSTANCING');
+    expect(returnAt).toBeGreaterThan(mainAt);
+    expect(uvAt).toBeGreaterThan(returnAt);
+    expect(beginAt).toBeGreaterThan(uvAt);
+    expect(projectAt).toBeGreaterThan(beginAt);
+    // The return stays inside the instancing guard, so a non-instanced draw
+    // reaches the unchanged UV and later stock chunks.
+    expect(sh.vertexShader).toContain(`#ifdef USE_INSTANCING
+  vec2 collapseOrigin = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);
+  float collapseDist = distance(collapseOrigin, cameraPosition.xz);
+  float collapseKeep = step(uCollapseMin, collapseDist) * (1.0 - step(uCollapseMax, collapseDist));
+  if (collapseKeep == 0.0) {
+    gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+    return;
+  }
+#endif
+#include <uv_vertex>`);
   });
 
   it('each role reads its own live window: tree ends where the impostor begins', () => {
@@ -85,10 +102,10 @@ describe('foliage collapse: shader injection', () => {
     expect(shImpostor.uniforms.uCollapseMax.value).toBe(418.15);
   });
 
-  it('composes with an existing hook and collapses AFTER its vertex edits', () => {
-    // The wind sway replaces begin_vertex with itself plus offsets. If the
-    // collapse multiplied transformed before those offsets, a collapsed tree
-    // would be nudged back off its origin and leave shimmering fragments.
+  it('composes with an existing hook and rejects before its vertex edits', () => {
+    // The wind sway replaces begin_vertex with itself plus offsets. Rejected
+    // instances return before that anchor, while live instances execute the
+    // byte-unchanged previous hook.
     const windUniform = { value: 0.06 };
     const mat: CollapsibleMaterial = {
       onBeforeCompile(shader) {
@@ -102,9 +119,9 @@ describe('foliage collapse: shader injection', () => {
     const sh = compile(mat);
     expect(sh.uniforms.uWindStrength).toBe(windUniform); // previous hook still ran
     const windAt = sh.vertexShader.indexOf('transformed.x += windAmt;');
-    const collapseAt = sh.vertexShader.indexOf('transformed *=');
+    const returnAt = sh.vertexShader.indexOf('return;');
     expect(windAt).toBeGreaterThan(-1);
-    expect(collapseAt).toBeGreaterThan(windAt);
+    expect(windAt).toBeGreaterThan(returnAt);
     // and the previous hook ran FIRST: both hooks insert right after
     // <common>, so wrapper-first ordering would leave the wind marker ahead
     // of the collapse uniforms instead of behind them

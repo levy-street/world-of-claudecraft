@@ -2191,7 +2191,7 @@ export const sv_SE: EnTranslations = {
         "noRecipient": "Ingen med det namnet har en brevlåda här.",
         "tooManyParcels": "Ett brev rymmer högst {count} paket.",
         "noMailQuestItems": "Du kan inte skicka uppdragsföremål med post.",
-        "noMailBound": "Det föremålet är bundet och kan inte skickas med post.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Du har inte så många att skicka.",
         "cantAffordPostage": "Du har inte råd med portot.",
         "recipientBoxFull": "Mottagarens brevlåda är full.",
@@ -6254,11 +6254,15 @@ export const sv_SE: EnTranslations = {
       "graphicsPresetMedium": "Medel",
       "graphicsPresetHigh": "Hög",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Avancerad",
       "terrainDetail": "Terrängdetalj",
       "foliageDensity": "Lövverkstäthet",
       "effectsQuality": "Effekter och ljus",
       "shadowQuality": "Skuggkvalitet",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Låg",
       "terrainHigh": "Hög",
       "touchOpacity": "Pekkontrollernas opacitet",
@@ -6548,7 +6552,7 @@ export const sv_SE: EnTranslations = {
       "tradeExpired": "Handelsförfrågan har gått ut.",
       "tradeFailed": "Handeln misslyckades: föremål eller pengar är inte längre tillgängliga.",
       "tradeBound": "Det föremålet är bundet och kan inte handlas.",
-      "marketListBound": "Det föremålet är bundet och kan inte säljas."
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Du reser dig upp.",

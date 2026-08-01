@@ -55,7 +55,7 @@ export interface PerfDoctorSnapshot {
 function hasForcedHighGraphics(search: string): boolean {
   const params = new URLSearchParams(search);
   const gfx = params.get('gfx');
-  return gfx === 'high' || gfx === 'ultra';
+  return gfx === 'high' || gfx === 'ultra' || gfx === 'insane';
 }
 
 function lowGraphicsHref(search: string): string {

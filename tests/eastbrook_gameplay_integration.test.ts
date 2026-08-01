@@ -497,7 +497,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     }
   });
 
-  it('uses exact authored collider shapes, heights, and camera-occlusion policy', () => {
+  it('uses exact authored collider shapes and visual heights', () => {
     const colliders = colliderInternalsForTest.staticWorldColliders(SEED);
     const stall = EASTBROOK_LAYOUT.market.stalls[0];
     const stallCollider = colliders.find(
@@ -511,7 +511,6 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
       hw: stall.width / 2,
       hd: stall.depth / 2,
       rot: stall.rotation,
-      camGhost: false,
     });
     expect(
       colliders.find(
@@ -533,7 +532,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
         collider.x === well.position.x &&
         collider.z === well.position.z,
     );
-    expect(wellCollider).toMatchObject({ type: 'circle', r: well.radius, camGhost: false });
+    expect(wellCollider).toMatchObject({ type: 'circle', r: well.radius });
     expect(wellCollider?.cameraTopY).toBeCloseTo(
       groundHeight(well.position.x, well.position.z, SEED) + well.height,
     );
@@ -550,7 +549,6 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
       hw: wall.footprint.halfWidth,
       hd: wall.footprint.halfDepth,
       rot: wall.footprint.rotation,
-      camGhost: false,
     });
 
     const fence = EASTBROOK_LAYOUT.fences[0];
@@ -566,7 +564,6 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
       type: 'obb',
       hd: fence.width / 2,
       isFence: true,
-      camGhost: true,
     });
     expect(fenceCollider?.cameraTopY).toBeCloseTo(
       groundHeight(fenceCenter.x, fenceCenter.z, SEED) + fence.height,
@@ -584,7 +581,6 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
       hw: board.nativeDimensions.width / 2,
       hd: board.nativeDimensions.depth / 2,
       rot: board.rotation,
-      camGhost: true,
     });
     expect(boardCollider?.cameraTopY).toBeCloseTo(
       groundHeight(board.position.x, board.position.z, SEED) + board.nativeDimensions.height,

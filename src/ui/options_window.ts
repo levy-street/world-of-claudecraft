@@ -734,8 +734,23 @@ export class OptionsWindow {
     const wrap = document.createElement('div');
     wrap.className = 'set-choice';
     const sync = () => {
-      const current = Math.round(hooks.settings.get(key));
-      for (const btn of [...wrap.querySelectorAll<HTMLButtonElement>('button[data-value]')]) {
+      // Nearest-option select (not Math.round): the round-10 level ladders
+      // persist half-step values (0.5 = Medium), which rounding would
+      // mis-highlight as the next button up. Exact stored values (every
+      // historical row) behave exactly as before.
+      const raw = hooks.settings.get(key);
+      const buttons = [...wrap.querySelectorAll<HTMLButtonElement>('button[data-value]')];
+      let current = Number.NaN;
+      let bestDistance = Number.POSITIVE_INFINITY;
+      for (const btn of buttons) {
+        const value = Number(btn.dataset.value);
+        const distance = Math.abs(value - raw);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          current = value;
+        }
+      }
+      for (const btn of buttons) {
         const selected = Number(btn.dataset.value) === current;
         btn.classList.toggle('sel', selected);
         btn.setAttribute('aria-pressed', String(selected));

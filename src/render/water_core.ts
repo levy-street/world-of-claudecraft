@@ -51,22 +51,35 @@ export interface WaterScheduleState {
   stepSeconds: number;
 }
 
+/** The tier union re-stated locally: this is a registered pure core and must
+ *  stay Three-free, so it cannot import gfx.ts (which imports three). Insane
+ *  deliberately matches ultra: the water field is already at its quality
+ *  ceiling there and a larger allocation would only spend memory. */
+type WaterTier = 'low' | 'medium' | 'high' | 'ultra' | 'insane';
+
 /** Fixed allocation size per tier, so re-anchoring never resizes an attachment. */
-export function waterSimulationTargetResolution(tier: 'low' | 'medium' | 'high' | 'ultra'): number {
-  if (tier === 'ultra') return 128;
+export function waterSimulationTargetResolution(tier: WaterTier): number {
+  if (tier === 'ultra' || tier === 'insane') return 128;
   if (tier === 'high') return 96;
   if (tier === 'medium') return 64;
   return 48;
 }
 
 /** Bounded height-field allocation and fixed rate for the camera-anchored field. */
-export function waterFieldPlan(tier: 'low' | 'medium' | 'high' | 'ultra'): WaterFieldPlan {
+export function waterFieldPlan(tier: WaterTier): WaterFieldPlan {
   const resolution = waterSimulationTargetResolution(tier);
   return {
     resolution,
     cellSize: WATER_FIELD_CELL_SIZE,
     size: resolution * WATER_FIELD_CELL_SIZE,
-    stepHz: tier === 'ultra' ? 30 : tier === 'high' ? 24 : tier === 'medium' ? 20 : 15,
+    stepHz:
+      tier === 'ultra' || tier === 'insane'
+        ? 30
+        : tier === 'high'
+          ? 24
+          : tier === 'medium'
+            ? 20
+            : 15,
   };
 }
 

@@ -190,11 +190,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 8.5,
     aggroRadius: 10, // squatting the old raider tents, and keeping them
-    loot: [
-      { copper: 100, chance: 1 },
-      { itemId: 'bandit_bandana', chance: 0.5 },
-      { itemId: 'linen_scrap', chance: 0.3 },
-    ],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 0.95,
     color: 0x5a8a46,
   },
@@ -212,11 +208,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 8.5,
     aggroRadius: 10, // every beached cargo on this coast is theirs by claim
-    loot: [
-      { copper: 100, chance: 1 },
-      { itemId: 'bandit_bandana', chance: 0.5 },
-      { itemId: 'linen_scrap', chance: 0.3 },
-    ],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 0.95,
     color: 0x5a8a46,
   },
@@ -235,10 +227,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 14, // every hull on that beach is a grave he keeps
     elite: true,
-    loot: [
-      { copper: 100, chance: 1 },
-      { itemId: 'bone_fragments', chance: 1 },
-    ],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.45,
     color: 0x7a8a86,
   },
@@ -260,10 +249,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13,
     moveSpeed: 7.5,
     aggroRadius: 12,
-    loot: [
-      { copper: 100, chance: 1 },
-      { itemId: 'bone_fragments', chance: 0.5 },
-    ],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.05,
     color: 0x86988e,
   },

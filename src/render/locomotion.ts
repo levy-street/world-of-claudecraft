@@ -51,6 +51,10 @@ export function newLocoTrack(): LocoTrack {
   };
 }
 
+export function newLocoState(): LocoState {
+  return { speed: 0, moving: false, backwards: false, running: false };
+}
+
 /**
  * Advance the locomotion hysteresis by one frame.
  * @param t      per-entity track (mutated in place)
@@ -59,6 +63,18 @@ export function newLocoTrack(): LocoTrack {
  * @param dt     frame delta in seconds
  */
 export function updateLocomotion(
+  t: LocoTrack,
+  vx: number,
+  vz: number,
+  facing: number,
+  dt: number,
+): LocoState {
+  return updateLocomotionInto(newLocoState(), t, vx, vz, facing, dt);
+}
+
+/** Fill a caller-owned state while advancing one entity's locomotion track. */
+export function updateLocomotionInto(
+  out: LocoState,
   t: LocoTrack,
   vx: number,
   vz: number,
@@ -116,10 +132,9 @@ export function updateLocomotion(
     }
   }
 
-  return {
-    speed: t.smoothSpeed,
-    moving,
-    backwards: moving && t.movingBackwards,
-    running: moving && t.runGait,
-  };
+  out.speed = t.smoothSpeed;
+  out.moving = moving;
+  out.backwards = moving && t.movingBackwards;
+  out.running = moving && t.runGait;
+  return out;
 }

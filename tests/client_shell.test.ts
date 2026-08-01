@@ -622,7 +622,9 @@ describe('client HTML shell', () => {
     // character-bound) through toggleClass. No raw classList/style write on either
     // frame survives (those silently collapse the hot-DOM skip rate).
     expect(hudTs).toContain('const targetRank = targetRankView(targetTemplate);');
-    expect(hudTs).toContain('levelText: String(target.level),');
+    // Written into the reused target descriptor rather than a per-frame object
+    // literal; the routing this test guards is unchanged.
+    expect(hudTs).toContain('targetFrame.levelText = String(target.level);');
     expect(hudTs).toContain(
       "this.toggleClass(this.targetFrameEl, 'elite', targetUsesEliteFrame(targetRank));",
     );

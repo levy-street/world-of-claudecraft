@@ -5,6 +5,7 @@ import {
   animatesEveryFrame,
   animCadenceFrames,
   characterLodBands,
+  characterLodBandsInto,
   crowdLodScaleSq,
   FAR_ANIM_RANGE_SCALE_MAX,
   farAnimCadence,
@@ -12,6 +13,20 @@ import {
   midAnimCadence,
   showsStaticFarMesh,
 } from '../src/render/crowd_lod';
+import { assertAllocationStable } from './util/alloc_probe';
+
+describe('character LOD allocation budget', () => {
+  it('fills one caller-owned band plan', () => {
+    const out = characterLodBands(0, 625, 3600, 1, 0);
+    expect(() =>
+      assertAllocationStable(
+        () => characterLodBandsInto(out, 20, 625, 3600, 1, 0),
+        64,
+        'character LOD plan',
+      ),
+    ).not.toThrow();
+  });
+});
 
 describe('crowdLodScaleSq', () => {
   it('leaves ordinary scenes at full range', () => {

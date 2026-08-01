@@ -9,9 +9,11 @@ import { JAIL_CAGE_HALF, JAIL_CENTER, JAIL_GATE, JAIL_OUTER_HALF } from '../sim/
 import { groundHeight } from '../sim/world';
 import { registerDeferredPreload } from './assets/preload';
 import { buildDungeonPropMesh, ensureDungeonAssets, loadKitModules } from './dungeon';
-import { GFX } from './gfx';
+import { EMISSIVE_LIGHT, GFX } from './gfx';
+import { residentSceneMayReachRenderVolumes, type ScenerySphere } from './resident_scenery_core';
 import { freezeStaticMatrices } from './static_matrix';
 import { radialGlowTexture } from './textures';
+import { applySurfaceDetail } from './worn_stone';
 
 // Kit modules the dungeon interiors do not load; fetched on demand alongside
 // ensureDungeonAssets() and served through the same registry.
@@ -349,7 +351,7 @@ function placeTorches(group: THREE.Group, p: JailPlacements): void {
   const flameMat = new THREE.MeshLambertMaterial({
     color: FLAME_COLOR,
     emissive: FLAME_EMISSIVE,
-    emissiveIntensity: 2.2,
+    emissiveIntensity: EMISSIVE_LIGHT,
     transparent: true,
     opacity: 0.92,
   });
@@ -412,6 +414,9 @@ function displayMaterial(src: THREE.Material): THREE.Material {
     std.vertexColors = false;
     std.metalness = 0;
     std.roughness = Math.max(0.85, std.roughness);
+    // Same triplanar stone layer the dungeon interiors give the shared pack
+    // materials, so the jail's kit stone matches the crypt next door.
+    applySurfaceDetail(std, 'stone');
     mat = std;
   }
   displayMats.set(src, mat);
@@ -436,7 +441,12 @@ function emit(group: THREE.Group, p: JailPlacements): void {
   }
 }
 
-export function buildJailScene(seed: number): THREE.Group {
+export interface JailSceneView {
+  group: THREE.Group;
+  updateVisibility(camera: THREE.PerspectiveCamera, sun: THREE.DirectionalLight): void;
+}
+
+export function buildJailScene(seed: number): JailSceneView {
   const group = new THREE.Group();
   group.name = 'jail_scene';
   group.position.set(
@@ -463,5 +473,35 @@ export function buildJailScene(seed: number): THREE.Group {
   group.traverse((o) => {
     if (o.userData.jailPortalSpin) o.matrixAutoUpdate = true;
   });
-  return group;
+  const sphere = new THREE.Box3().setFromObject(group).getBoundingSphere(new THREE.Sphere());
+  const bounds: ScenerySphere = {
+    x: sphere.center.x,
+    y: sphere.center.y,
+    z: sphere.center.z,
+    radius: sphere.radius,
+  };
+  return {
+    group,
+    updateVisibility(camera: THREE.PerspectiveCamera, sun: THREE.DirectionalLight): void {
+      const halfHeight = camera.far * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const colorRange = Math.hypot(camera.far, halfHeight, halfHeight * camera.aspect);
+      let shadowRange = 0;
+      if (sun.castShadow) {
+        const shadowCamera = sun.shadow.camera;
+        shadowRange = Math.hypot(
+          shadowCamera.far,
+          Math.max(Math.abs(shadowCamera.left), Math.abs(shadowCamera.right)),
+          Math.max(Math.abs(shadowCamera.top), Math.abs(shadowCamera.bottom)),
+        );
+      }
+      group.visible = residentSceneMayReachRenderVolumes(
+        bounds,
+        camera.position,
+        colorRange,
+        sun.castShadow,
+        sun.position,
+        shadowRange,
+      );
+    },
+  };
 }

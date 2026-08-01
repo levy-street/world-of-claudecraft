@@ -17,6 +17,7 @@ import {
   deedName,
   deedTitleText,
   ensureDeedLocalesLoaded,
+  getDeedTitleI18nRevision,
 } from '../src/ui/deed_i18n';
 import { type SupportedLanguage, setLanguage } from '../src/ui/i18n';
 
@@ -38,8 +39,10 @@ describe('lazy deed locales: per-locale chunks, synchronous lookups around ensur
     const failSpy = vi
       .spyOn(DEED_LOCALE_LOADERS, 'cs_CZ')
       .mockRejectedValueOnce(new Error('simulated 404'));
+    const revisionBeforeFailure = getDeedTitleI18nRevision();
     await expect(ensureDeedLocalesLoaded('cs_CZ')).rejects.toThrow(/simulated 404/);
     failSpy.mockRestore();
+    expect(getDeedTitleI18nRevision()).toBe(revisionBeforeFailure);
     expect(deedName('prog_first_steps')).toBe('First Steps');
 
     // Retry: two concurrent loads coalesce onto ONE import (spy-through, the real
@@ -52,6 +55,7 @@ describe('lazy deed locales: per-locale chunks, synchronous lookups around ensur
     } finally {
       loadSpy.mockRestore();
     }
+    expect(getDeedTitleI18nRevision()).toBeGreaterThan(revisionBeforeFailure);
     expect(deedName('prog_first_steps')).toBe('První kroky');
     expect(deedDesc('prog_first_steps')).toBe(
       'Dosáhni úrovně 2 a udělej první krok na dlouhé cestě.',

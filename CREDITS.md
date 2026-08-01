@@ -108,8 +108,12 @@ than free, so ask before you rely on it.
 | Medieval Hexagon Pack (hex buildings, hex tiles, walls, bridge) | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0 | CC0 1.0 | Yes |
 | Canyon Terrain Asset (cacti, desert tree, canyon rock formations, boulders, mesas) | loafbrr | https://loafbrr.itch.io/canyon-terrain-asset | CC0 1.0 | Yes |
 | Mines and Cave Modular Set (mine carts, rails, ladder, cave rocks, entrances, supports, platforms) | loafbrr | https://loafbrr.itch.io/mines-and-cave-set | CC0 1.0 | Yes |
-| Terrain PBR textures (Grass001, Ground048, Rock051, Ground071, Ground080, PavingStones046, Snow010A) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
+| Terrain PBR textures (Grass001, Ground023, Rock026, Rock051, Rock060, Ground071, Ground080, PavingStones046, Snow010A) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
 | Terrain PBR textures, biome set (Ground054, Ground095A, Ground093A, Rock029, Lava004, Gravel024, Rock035) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
+| Surface-detail PBR textures for the triplanar material families (Bark012, Bricks076A/B, Fabric030, Metal013 incl. Metalness, Plaster007; Color/NormalGL/AmbientOcclusion/Roughness/Displacement under `public/textures/structures/`) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
+| Canopy clump-detail textures (Moss002; NormalGL/AmbientOcclusion under `public/textures/foliage/`) | ambientCG | https://ambientcg.com | CC0 1.0 | Yes |
+| Worn-metal surface-detail PBR texture (RustCoarse01, from rust_coarse_01; NormalGL/AmbientOcclusion/Roughness/Displacement under `public/textures/structures/`) | Poly Haven | https://polyhaven.com/a/rust_coarse_01 | CC0 1.0 | Yes |
+| Medieval wood surface-detail PBR texture (MedievalWood, from medieval_wood; Color/NormalGL/AmbientOcclusion/Roughness/Displacement under `public/textures/structures/`) | Poly Haven | https://polyhaven.com/a/medieval_wood | CC0 1.0 | Yes |
 | HDRI environment maps (kloofendal_48d_partly_cloudy_puresky, belfast_open_field, kiara_1_dawn, dikhololo_night) | Poly Haven | https://polyhaven.com | CC0 1.0 | Yes |
 | Vale Cup practice-pitch skybox (env/space_galaxy.jpg, the 360 degree Milky Way panorama) | ESO / S. Brunier | https://www.eso.org/public/images/eso0932a/ | CC BY 4.0 | Yes, attribution required |
 | Water normal maps (waternormals.jpg, Water_1/2_M_Normal.jpg) | three.js authors | https://github.com/mrdoob/three.js (r165, examples/textures) | MIT | Yes, attribution required |

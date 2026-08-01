@@ -56,12 +56,21 @@ export interface SpeedStreak {
  * reduced-motion. Outside that band the target is 0 so the cue eases away.
  */
 export function targetIntensity(i: TravelSpeedFxInputs): number {
-  if (i.reducedMotion || !i.inTravelForm) return 0;
-  if (i.speed <= FX_SPEED_FLOOR) return 0;
+  return targetIntensityFromValues(i.inTravelForm, i.speed, i.reducedMotion);
+}
+
+/** Scalar hot-path form used by the renderer without a transient input object. */
+export function targetIntensityFromValues(
+  inTravelForm: boolean,
+  speed: number,
+  reducedMotion: boolean,
+): number {
+  if (reducedMotion || !inTravelForm) return 0;
+  if (speed <= FX_SPEED_FLOOR) return 0;
   // Reject teleport / displacement spikes rather than flashing the cue (see
   // FX_SPEED_MAX_PLAUSIBLE).
-  if (i.speed > FX_SPEED_MAX_PLAUSIBLE) return 0;
-  const t = (i.speed - FX_SPEED_FLOOR) / (FX_SPEED_FULL - FX_SPEED_FLOOR);
+  if (speed > FX_SPEED_MAX_PLAUSIBLE) return 0;
+  const t = (speed - FX_SPEED_FLOOR) / (FX_SPEED_FULL - FX_SPEED_FLOOR);
   const clamped = t < 0 ? 0 : t > 1 ? 1 : t;
   // ease-out so the cue swells quickly then plateaus near top speed.
   return clamped * (2 - clamped);
@@ -93,9 +102,15 @@ export function speedStreaks(intensity: number, phase: number, count = 28): Spee
  * inputs; the renderer drives this with a persistent buffer.
  */
 export function speedStreaksInto(
-  out: SpeedStreak[], intensity: number, phase: number, count = 28,
+  out: SpeedStreak[],
+  intensity: number,
+  phase: number,
+  count = 28,
 ): SpeedStreak[] {
-  if (intensity <= 0) { out.length = 0; return out; }
+  if (intensity <= 0) {
+    out.length = 0;
+    return out;
+  }
   const reach = 0.18 + 0.32 * intensity; // longer streaks the faster you go
   for (let n = 0; n < count; n++) {
     // even spread plus a tiny deterministic jitter so streaks don't look combed.
@@ -107,8 +122,12 @@ export function speedStreaksInto(
     const outer = Math.min(1, inner + reach * (0.7 + 0.3 * shimmer));
     const alpha = intensity * (0.45 + 0.55 * shimmer);
     const s = out[n];
-    if (s) { s.angle = angle; s.inner = inner; s.outer = outer; s.alpha = alpha; }
-    else out[n] = { angle, inner, outer, alpha };
+    if (s) {
+      s.angle = angle;
+      s.inner = inner;
+      s.outer = outer;
+      s.alpha = alpha;
+    } else out[n] = { angle, inner, outer, alpha };
   }
   out.length = count;
   return out;

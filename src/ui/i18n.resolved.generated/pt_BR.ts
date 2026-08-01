@@ -2191,7 +2191,7 @@ export const pt_BR: EnTranslations = {
         "noRecipient": "Ninguém com esse nome possui caixa de correio aqui.",
         "tooManyParcels": "Uma carta carrega no máximo {count} encomendas.",
         "noMailQuestItems": "Você não pode enviar itens de missão pelo correio.",
-        "noMailBound": "Esse item está vinculado e não pode ser enviado pelo correio.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Você não tem tantos assim para enviar.",
         "cantAffordPostage": "Você não pode pagar a postagem.",
         "recipientBoxFull": "A caixa de correio do destinatário está cheia.",
@@ -6254,11 +6254,15 @@ export const pt_BR: EnTranslations = {
       "graphicsPresetMedium": "Média",
       "graphicsPresetHigh": "Alta",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrema",
       "graphicsPresetAdvanced": "Avançada",
       "terrainDetail": "Detalhe do terreno",
       "foliageDensity": "Densidade da vegetação",
       "effectsQuality": "Efeitos e iluminação",
       "shadowQuality": "Qualidade das sombras",
+      "surfaceDetail": "Detalhe de superfícies",
+      "surfaceDetailBasic": "Básico",
+      "surfaceDetailFull": "Completo",
       "terrainLow": "Baixo",
       "terrainHigh": "Alto",
       "touchOpacity": "Opacidade dos controles de toque",
@@ -6548,7 +6552,7 @@ export const pt_BR: EnTranslations = {
       "tradeExpired": "A solicitação de troca expirou.",
       "tradeFailed": "Troca falhou: itens ou dinheiro não estão mais disponíveis.",
       "tradeBound": "Esse item está vinculado e não pode ser negociado.",
-      "marketListBound": "Esse item está vinculado e não pode ser colocado à venda."
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Você se levanta.",

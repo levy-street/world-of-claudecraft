@@ -2191,7 +2191,7 @@ export const id_ID: EnTranslations = {
         "noRecipient": "Tidak ada orang dengan nama itu yang memiliki kotak surat di sini.",
         "tooManyParcels": "Satu surat memuat paling banyak {count} bingkisan.",
         "noMailQuestItems": "Kamu tidak bisa mengirim barang misi lewat surat.",
-        "noMailBound": "Barang itu terikat dan tidak dapat dikirim lewat surat.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "Kamu tidak punya sebanyak itu untuk dikirim.",
         "cantAffordPostage": "Kamu tidak mampu membayar perangkonya.",
         "recipientBoxFull": "Kotak surat mereka penuh.",
@@ -6254,11 +6254,15 @@ export const id_ID: EnTranslations = {
       "graphicsPresetMedium": "Sedang",
       "graphicsPresetHigh": "Tinggi",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Lanjutan",
       "terrainDetail": "Detail Medan",
       "foliageDensity": "Kerapatan Dedaunan",
       "effectsQuality": "Efek & Pencahayaan",
       "shadowQuality": "Kualitas Bayangan",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Rendah",
       "terrainHigh": "Tinggi",
       "touchOpacity": "Keburaman Kontrol Sentuh",
@@ -6548,7 +6552,7 @@ export const id_ID: EnTranslations = {
       "tradeExpired": "Permintaan perdagangan telah kedaluwarsa.",
       "tradeFailed": "Perdagangan gagal: barang atau uang sudah tidak tersedia.",
       "tradeBound": "Barang itu terikat dan tidak dapat diperdagangkan.",
-      "marketListBound": "Barang itu terikat dan tidak dapat dijual di pasar."
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "Kamu berdiri.",

@@ -615,9 +615,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   'metadata/after-desktop-ultra.json',
 );
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '49b3aece9a2b42365e5b6d1e806c674a8818c4a7995c64e9db120c7ddc949bf5';
+  '3d3cc79893f165a22ccae80b99cb81efc79ae53fd2c64df12749b1c8b3c783c7';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'b3a49fd4fa887920af5de4b6fb93e2b9b3c6c0351e9a2ba00d6567e44083e88b';
+  '85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1474,14 +1474,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // The release/v0.33.0 resync of the draw-call diet branch moved the
-    // runtimeRender.renderer.sha256 leaf (census hooks and the diet's batching
-    // seams merged over the streaming and cull deltas), so the composite
-    // polish provenance followed, and this seal follows the composite. Every
-    // measured value (frame timings, draw stats, triangle and scenario
+    // The release/v0.33.0 merge changed fingerprinted renderer inputs, so the
+    // composite polish provenance moved and this seal follows the composite.
+    // Every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '99875450e29ab96bc623ae8640763199c50ec7241595039c4e7d405540964840',
+      'e12494ded731ba166d2b55b087bf1f201dc59833d571ddfbbc8f2dbf20bf2dcd',
     );
   });
 
