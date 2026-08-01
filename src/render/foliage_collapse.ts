@@ -10,7 +10,7 @@
 //
 // The windows arrive per frame via updateCollapseUniforms (the shared-uniform
 // pattern of gfx.ts sharedUniforms.uTime): every material references the same
-// value objects, so the per-frame cost is three number writes. The decision
+// value objects, so the per-frame cost is four number writes. The decision
 // arithmetic lives in foliage_lod.ts (instanceCullWindows); this module is only
 // the Three-side injection, kept import-free so tests can drive it with plain
 // fakes.

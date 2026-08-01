@@ -219,19 +219,20 @@ export interface BucketWindowInput {
  * are measured against the bucket's CENTER, as they always have been. They
  * are cost controls and a bucket is ~240u deep, so measuring them from the near
  * edge would keep every bucket alive for another half-bucket past its cap and
- * quietly multiply the triangles they exist to cut. Dressing is the exception:
+ * quietly multiply the triangles they exist to cut. Dressing is one exception:
  * its shader enforces the adaptive cap per instance, so its bucket test uses the
  * near edge only as a conservative coverage bound.
  *
- * The tree-detail swap is the exception: its two arms are COVERAGE tests, not a
- * partition. The real model draws while any part of the bucket is inside the
- * swap (near edge), the impostor while any part is outside it (far edge), so a
- * bucket straddling the boundary draws both meshes and the per-instance windows
- * (instanceCullWindows, enforced in the vertex shader) split the trees exactly.
- * Keyed on the center, a bucket you are standing at the edge of could already
- * have flipped to impostors, putting cones a few strides away; keyed near-edge
- * only, as this was before the shader owned the boundary, every tree in a
- * 540x240u slab drew at full detail until the whole slab left the swap.
+ * The tree-detail swap is a second, unrelated exception, for a different reason:
+ * its two arms are COVERAGE tests, not a partition. The real model draws while
+ * any part of the bucket is inside the swap (near edge), the impostor while any
+ * part is outside it (far edge), so a bucket straddling the boundary draws both
+ * meshes and the per-instance windows (instanceCullWindows, enforced in the
+ * vertex shader) split the trees exactly. Keyed on the center, a bucket you are
+ * standing at the edge of could already have flipped to impostors, putting
+ * cones a few strides away; keyed near-edge only, as this was before the shader
+ * owned the boundary, every tree in a 540x240u slab drew at full detail until
+ * the whole slab left the swap.
  */
 export function bucketVisible(w: BucketWindowInput): boolean {
   const nearEdge = w.centerDist - w.radius;

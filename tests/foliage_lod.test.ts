@@ -359,6 +359,21 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
     expect(bucketVisible({ ...dressing, centerDist: 321 })).toBe(false);
   });
 
+  it('scales the exact per-instance dressing cap by distanceScale too', () => {
+    // The regression above pins the maxAtInstance near-edge compare only at
+    // windowFor's default distanceScale (BEST_SCALE, which is 1): coverage for
+    // the budget actually shrinking that same cap, not just the plain-numeric one.
+    const scaledDressing = windowFor({
+      centerDist: 150,
+      radius: 60,
+      maxDist: LOD_HIGH.dressFar, // 200, scaled to 100 at half budget
+      maxAtInstance: true,
+      distanceScale: 0.5,
+    });
+    expect(bucketVisible(scaledDressing)).toBe(true); // nearEdge 90 < maxCap 100
+    expect(bucketVisible({ ...scaledDressing, centerDist: 160 })).toBe(false); // nearEdge 100 >= 100
+  });
+
   it('the budget still scales build-time bounds, just not the fog-derived one', () => {
     // A plain numeric bound (rocks, dressing, the near-fill cull) keeps shrinking
     // under load, which is the budget's whole point. rockFar 360 at half budget
