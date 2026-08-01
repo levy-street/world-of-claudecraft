@@ -3870,7 +3870,7 @@ export class Hud {
   // graphics tier keeps it (gameplay-neutral-graphics invariant).
   private readonly targetAurasView = createAurasView('all', this.aurasViewDeps, {
     ownFirst: true,
-    effectHtmlCacheVersion: getLanguage,
+    effectHtmlCacheVersion: getI18nRevision,
   });
   // The buff-bar painter alone gets attachCancel: right-clicking one of the local player's
   // own helpful buffs cancels it (classic convention). The debuff / target painters reuse
