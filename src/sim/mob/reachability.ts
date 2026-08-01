@@ -1,12 +1,18 @@
 // Unreachable-target detection for engaged mobs: the classic evade trigger.
 // Mobs chase in a straight line with a slide fan and no pathfinding, so a mob
-// whose target stands past a wall or across deep water pins in place forever,
-// still in combat, while the target chips it down risk-free (the rift ledge
-// exploit). This leaf watches for that shape: engaged, out of reach, committing
-// zero movement, with the straight step toward the target eaten by a collider.
-// After CHASE_STALL_TIMEOUT seconds of that, the caller (combat_profile.ts)
-// sends the mob home through the existing evade state (immune, heals to full
-// on arrival).
+// whose target stands past a wall or under an unclimbable ledge pins in place
+// forever, still in combat, while the target chips it down risk-free (the rift
+// ledge exploit). This module watches for that shape: engaged, out of reach,
+// committing zero movement, with the straight step toward the target refused
+// by the same block modes moveToward enforces. After CHASE_STALL_TIMEOUT
+// seconds of that, the caller (combat_profile.ts) sends the mob home through
+// the existing evade state (immune, heals to full on arrival).
+//
+// This applies to EVERY canLeash mob, bosses included: pinning a boss out of
+// reach force-resets the pull (full heal, loot rights dropped). That is the
+// intended classic behavior, the whole point being that an unreachable
+// attacker gets nothing; only canLeash false encounter scripts (Nythraxis)
+// opt out.
 //
 // Draws NO rng and writes nothing but mob.chaseStall, so the parity goldens
 // are unaffected: the accumulator stays 0 in every scenario where mobs fight
@@ -30,16 +36,22 @@ import {
 // sustained free damage from an unreachable perch.
 export const CHASE_STALL_TIMEOUT = 5;
 
-// Would a normal chase step toward `dest` be blocked, i.e. is a prop, deep
+// Would a chase step of `speed` toward `dest` be blocked, i.e. is a prop, deep
 // water, an unclimbable cliff face, or a maze hedge right in front of this
-// mob? Mirrors every block mode moveToward (sim.ts) enforces, at chase speed,
-// in the same order, so a mob that commits zero movement AND probes blocked is
-// genuinely pinned by geometry. Mobs with phasesThroughObstacles never reach
-// this probe: their moveToward always commits the straight step, so the
-// moved-this-tick gate in chaseStalledUnreachable resets the accumulator first.
-export function blockedTowardTarget(ctx: SimContext, e: Entity, dest: Vec3): boolean {
+// mob? Mirrors every block mode moveToward (sim.ts) enforces, in the same
+// order, so a mob that commits zero movement AND probes blocked is genuinely
+// pinned by geometry. `speed` is the caller's actual attempted chase speed so
+// the probed step matches the step moveToward just refused. (The deep-water
+// arm is kept for mirror fidelity with moveToward and blockedTowardSpawn even
+// though every template-backed mob currently swims.)
+export function blockedTowardTarget(
+  ctx: SimContext,
+  e: Entity,
+  dest: Vec3,
+  speed: number,
+): boolean {
   const d = dist2d(e.pos, dest);
-  const step = Math.min(e.moveSpeed * DT, d);
+  const step = Math.min(speed * DT, d);
   if (step < 1e-4) return false;
   const facing = angleTo(e.pos, dest);
   const nx = e.pos.x + Math.sin(facing) * step;
@@ -70,14 +82,22 @@ export function blockedTowardTarget(ctx: SimContext, e: Entity, dest: Vec3): boo
 
 // One evaluation per engaged tick, AFTER the combat arm has moved the mob (so
 // "did it move this tick" is mob.pos vs mob.prevPos, which the roster pass
-// refreshed at tick start). Returns true exactly once per full stall window;
-// the caller flips the mob to evade.
+// refreshed at tick start). `chaseSpeed` is the speed the arm just attempted.
+// Returns true exactly once per full stall window; the caller flips the mob to
+// evade. The clock accumulates only on qualifying ticks: states that bypass
+// the engaged runner (stun, fear, charge dashes, healer hold) freeze it, so
+// "5 seconds pinned" means 5 accumulated seconds of genuine pinning, however
+// much CC interleaves.
 export function chaseStalledUnreachable(
   ctx: SimContext,
   mob: Entity,
   target: Entity,
   reach: number,
+  chaseSpeed: number,
 ): boolean {
+  // A phasing mob walks through the geometry this probe models; its moveToward
+  // always commits the straight step, so it can never be terrain-pinned.
+  if (MOBS[mob.templateId]?.phasesThroughObstacles) return false;
   // In reach is fighting fine: melee in swing range, casters standing at spell
   // range on purpose. Also covers a mob close enough to hit through thin walls
   // (mob melee has no line-of-sight check), which is a fight, not a stall.
@@ -98,7 +118,7 @@ export function chaseStalledUnreachable(
   }
   // Stationary with open ground ahead is a transient AI hiccup, not an
   // unreachable target.
-  if (!blockedTowardTarget(ctx, mob, target.pos)) {
+  if (!blockedTowardTarget(ctx, mob, target.pos, chaseSpeed)) {
     mob.chaseStall = 0;
     return false;
   }

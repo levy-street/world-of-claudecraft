@@ -22,12 +22,21 @@ type EngagedTickHook = () => void;
 // Drop the pull and walk home: the shared evade entry used by the leash breaks
 // and the unreachable-target stall. The evade arm in locomotion.ts handles the
 // walk, the immunity lives in combat/damage.ts, and resetEvadingMob heals to
-// full on arrival.
+// full on arrival. Any in-flight cast dies with the pull: the bar would
+// otherwise freeze on an immune mob walking home, and a committed ranged
+// windup (rangedWindupReleaseTick is an ABSOLUTE tick) would fire instantly
+// on the next pull's first in-range tick.
 function startEvadeHome(mob: Entity): void {
   mob.aiState = 'evade';
   mob.aggroTargetId = null;
   clearThreat(mob);
   mob.leashAnchor = null;
+  mob.castingAbility = null;
+  mob.castTotal = 0;
+  mob.castRemaining = 0;
+  mob.castTargetId = null;
+  mob.channeling = false;
+  mob.rangedWindupReleaseTick = null;
 }
 
 export function mobCombatProfile(mob: Entity): MobCombatProfile {
@@ -111,9 +120,10 @@ export function updateMobCombatProfile(
   // tick upstream in updateMob, a holding healer returned above, and canLeash
   // opts an encounter out entirely (same gate as the leash prelude).
   const spell = MOBS[mob.templateId]?.petSpell;
+  const chaseSpeed = mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob);
   if (spell) {
     const result = updateCasterCombat(ctx, mob, target, profile, spell);
-    if (profile.canLeash && chaseStalledUnreachable(ctx, mob, target, spell.range)) {
+    if (profile.canLeash && chaseStalledUnreachable(ctx, mob, target, spell.range, chaseSpeed)) {
       startEvadeHome(mob);
       return 'done';
     }
@@ -121,7 +131,10 @@ export function updateMobCombatProfile(
   }
 
   updatePursuitProfileCombat(ctx, mob, target, profile);
-  if (profile.canLeash && chaseStalledUnreachable(ctx, mob, target, profile.meleeRange)) {
+  if (
+    profile.canLeash &&
+    chaseStalledUnreachable(ctx, mob, target, profile.meleeRange, chaseSpeed)
+  ) {
     startEvadeHome(mob);
     return 'done';
   }

@@ -259,6 +259,8 @@ describe('ordinary combat never trips the stall detector', () => {
     }
     expect(sawEvade).toBe(false);
     expect(caster.chaseStall).toBe(0);
-    expect(`${key} still engaged`).toBeTruthy();
+    expect(caster.aggroTargetId, `${key} should still be engaged on the player`).toBe(
+      sim.player.id,
+    );
   });
 });
