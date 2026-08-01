@@ -134,7 +134,9 @@ describe('editor cinematic gizmo core', () => {
             label: 'player',
             point: {
               x: GULLHAVEN_HARBOR.deckArrival.x,
-              y: 0.72,
+              // The measured Tripo deck height (the old 0.72 procedural
+              // deck went stale with the art-first re-measure).
+              y: 1.034142297254,
               z: GULLHAVEN_HARBOR.deckArrival.z,
             },
             riderHarborId: 'gullhaven',
