@@ -329,19 +329,31 @@ as footstep variant choice, not gameplay-affecting).
 | `amb_water` | yes | global | gentle lake water lapping at the shore, soft flowing ripples |
 | `amb_campfire` | ✓ | point | a crackling campfire, popping embers and flames |
 | `amb_forge` | ✓ | point | a blacksmith forge, roaring furnace with rhythmic hammer strikes on an anvil |
+| `amb_kitchens` | ✓ | point | a town kitchen at work: hearth crackle, stew bubbling, uneven knife chops, a pan sizzle, a pot tink, a ladle stir |
+| `amb_apothecary` | ✓ | point | a quiet apothecary laboratory: glassy bubbles, retort glugs, a clink, a careful pour, a cork squeak |
+| `amb_tannery` | ✓ | point | an open-air tannery: hide-scraping strokes, a vat slosh, a rack creak, a wring-out splash |
+| `amb_loom` | ✓ | point | a weaving room: shuttle swish, wooden clack pairs, beater thumps in an uneven human rhythm, a treadle creak |
+| `amb_toolworks` | ✓ | point | a tinker workshop: file strokes, light metallic tinks, an accelerating ratchet, a gear whir over a bench hum |
 | `amb_dungeon` | ✓ | global | a dark stone dungeon interior, dripping water echoes and a low ominous drone |
 | `amb_rain` | ✓ | global | steady rainfall pattering with occasional distant thunder |
 | `amb_snow` | ✓ | global | a soft muffled snowy wind, quiet and cold |
 
-Point ambience (`amb_campfire`/`amb_forge`) shares the same falloff every
-other positional sound uses by default, but `amb_forge` gets its own,
-narrower audible-distance override (`FORGE_MAX_DISTANCE`, `src/game/sfx.ts`;
-`makePanner`/`loop`/`tooFar` all take an optional refDistance/maxDistance
-override, defaulting to the shared constants so nothing else's range shifts).
-This sets the stage for future station ambiences (Professions 2.0's other
-station types: kitchens, apothecary, tannery, loom, toolworks, see issue
-#2208) to get their own audible radius the same way: a new `AmbientPointSource`
-`kind` plus a named constant, no changes to the override mechanism itself.
+Point ambience shares the same falloff every other positional sound uses by
+default, but `amb_forge` gets its own, narrower audible-distance override
+(`FORGE_MAX_DISTANCE`, `src/game/sfx.ts`; `makePanner`/`loop`/`tooFar` all
+take an optional refDistance/maxDistance override, defaulting to the shared
+constants so nothing else's range shifts). The five crafting-station beds
+(issue #2208) follow that exact pattern: one point source per non-forge
+station (`buildWorldAmbientSources`, `src/render/world_audio.ts`; the
+forge-type station shares the smithy's existing sources), the per-kind
+cue/gain table in `src/game/station_ambience.ts`, and the shared
+`STATION_MAX_DISTANCE` reusing the forge's live-tuned radius. The beds are
+authored deterministic synthesis, seeded and byte-reproducible
+(`scripts/gen_station_ambience.mjs`, `npm run sfx:stations`), conformed like
+every generated loop and registered `custom: true` so `sfx:gen` can never
+overwrite them; each bed keeps its head and tail bed-only and exactly
+periodic so the MP3 wrap stays inaudible without the forge recording's
+silence-pad trick (pinned by `tests/station_ambience.test.ts`).
 
 ### Interface and personal event cues
 
@@ -374,8 +386,7 @@ Fiesta) and every world/spatial sound ignore the toggle.
 | `ui_card_play`, `ui_card_reveal` | Card Duel minigame (`src/sim/social/card_duel.ts`): a card played, and every round's simultaneous reveal. High-frequency (once per round each), multi-take. |
 | `ui_card_round_push` | Card Duel: layers on top of the reveal cue when a round ties (nobody scores), never a replacement for it |
 | `ui_card_shuffle` | Card Duel: the initial deal at match start AND a mid-match reshuffle (discard pile shuffled back into the deck once it empties), same cue for both moments |
-| `ui_gather_cast` | the gather cast starting (Professions 2.0 Phase 12b), a soft tool wind-up; PLACEHOLDER (deterministic synth, issue #2208) ONLY as the flat fallback for when `gatherCast()` is called with no node type known. In practice `ui_gather_cast_<nodeType>` below always takes over: `harvestNode` is the sole gather `castStart` emit site and always sets the type |
-| `ui_gather_cast_ore`, `ui_gather_cast_wood`, `ui_gather_cast_herb` | the real, per-node-type "pulling the tool out" recordings that supersede `ui_gather_cast` above, via `audio.gatherCast(nodeType)` |
+| `ui_gather_cast_ore`, `ui_gather_cast_wood`, `ui_gather_cast_herb` | the real, per-node-type "pulling the tool out" recordings, via `audio.gatherCast(nodeType)`. The flat no-type fallback arm (in practice unreachable: `harvestNode` is the sole gather `castStart` emit site and always sets the type) reuses the ore take; the `ui_gather_cast` synth placeholder that used to cover it is retired (issue #2208) |
 | `ui_fish_cast` | the fishing line cast whoosh and plop |
 | `ui_fish_bite` | the bite signal opening the reel window; the one gameplay-timing cue of this family, so it ignores the Interface & Feedback Sounds toggle (rides `play()`, never `playFeedback()`) |
 | `ui_fish_reel` | the landed reel crank and splash |

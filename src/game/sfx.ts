@@ -21,6 +21,11 @@ import {
   type SfxEntry,
 } from './sfx_manifest.generated';
 import { loadRuntimeSfxPack } from './sfx_runtime_pack';
+import {
+  STATION_AMBIENCE,
+  STATION_MAX_DISTANCE,
+  type StationAmbienceKind,
+} from './station_ambience';
 import { type WaterElementalCue, waterElementalSamples } from './water_elemental_audio';
 
 const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies this
@@ -126,16 +131,18 @@ interface PendingLoop {
   maxDistance?: number;
 }
 
-// 'kind' is the closed set of point-ambience station sources today (campfire,
-// forge). makePanner/loop/tooFar all accept an optional refDistance/
-// maxDistance override (see FORGE_MAX_DISTANCE, pointAmbient's 'forge'
-// branch), so a future station ambience with its own audible-radius need
-// (e.g. a Professions 2.0 station bed: kitchens/apothecary/tannery/loom/
-// toolworks, see issue #2208) is a new 'kind' plus its own named constant,
-// same pattern, no changes needed to the override mechanism itself.
+// 'kind' is the closed set of point-ambience station sources: the original
+// campfire/forge pair plus the five Professions 2.0 station beds (issue
+// #2208), whose per-kind cue/gain config lives in ./station_ambience.ts.
+// makePanner/loop/tooFar all accept an optional refDistance/maxDistance
+// override (see FORGE_MAX_DISTANCE and STATION_MAX_DISTANCE), so a future
+// kind with its own audible-radius need stays a new union member plus a
+// named constant, no changes to the override mechanism itself. Mirrors the
+// seam union in src/render/audio_sink.ts (never imported across the
+// render/game boundary; tests/station_ambience.test.ts pins them in sync).
 interface AmbientPointSource {
   readonly id: string;
-  readonly kind: 'campfire' | 'forge';
+  readonly kind: 'campfire' | 'forge' | StationAmbienceKind;
   readonly x: number;
   readonly y: number;
   readonly z: number;
@@ -853,18 +860,33 @@ class Sfx {
   }
 
   private pointAmbient(source: AmbientPointSource): void {
-    // The forge's own, narrower cull distance so it stops (unloops) exactly
-    // where its own falloff (below) would already have gone silent, instead
-    // of lingering as a silent loop out to the shared MAX_DISTANCE.
-    const maxDistance = source.kind === 'forge' ? FORGE_MAX_DISTANCE : undefined;
+    // Forge and the station beds carry their own, narrower cull distance so
+    // each stops (unloops) exactly where its own falloff (below) would
+    // already have gone silent, instead of lingering as a silent loop out
+    // to the shared MAX_DISTANCE. Campfire keeps the shared default.
+    let key: string;
+    let gain: number;
+    let maxDistance: number | undefined;
+    if (source.kind === 'campfire') {
+      key = 'amb_campfire';
+      gain = POINT_AMBIENCE_GAIN;
+      maxDistance = undefined;
+    } else if (source.kind === 'forge') {
+      key = 'amb_forge';
+      gain = FORGE_AMBIENCE_GAIN;
+      maxDistance = FORGE_MAX_DISTANCE;
+    } else {
+      const station = STATION_AMBIENCE[source.kind];
+      key = station.key;
+      gain = station.gain;
+      maxDistance = STATION_MAX_DISTANCE;
+    }
     if (this.tooFar(source.x, source.z, maxDistance)) {
       if (this.loops.has(source.id) || this.pendingLoops.has(source.id)) {
         this.unloop(source.id, 0.7);
       }
       return;
     }
-    const key = source.kind === 'campfire' ? 'amb_campfire' : 'amb_forge';
-    const gain = source.kind === 'forge' ? FORGE_AMBIENCE_GAIN : POINT_AMBIENCE_GAIN;
     this.loop(source.id, key, gain, source.x, source.y, source.z, maxDistance);
   }
 

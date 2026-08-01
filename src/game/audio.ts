@@ -58,12 +58,15 @@ export const UI_CUES = {
   cardShuffle: 'ui_card_shuffle',
   // Gathering rhythm (Professions 2.0 Phase 12b, issue #2208): fishCast/
   // fishBite/fishReel are real, shipped fishing cues. gatherCast branches by
-  // node type (gatherCastByNodeType below); this flat cue is only the
-  // fallback for the rare case gatherCast() is called with no type known.
-  // fishBite is the one gameplay-timing cue of the family (the reel window
-  // opens with it), so it rides the ungated play() arm; the rest are
+  // node type (gatherCastByNodeType below); this flat entry is only the
+  // fallback for the rare case gatherCast() is called with no type known,
+  // and it reuses the real ore recording (the most tool-neutral take of the
+  // three) rather than keeping the retired ui_gather_cast synth placeholder
+  // alive for an in-practice-unreachable arm (harvestNode always sets the
+  // type). fishBite is the one gameplay-timing cue of the family (the reel
+  // window opens with it), so it rides the ungated play() arm; the rest are
   // feedback notifications.
-  gatherCast: 'ui_gather_cast',
+  gatherCast: 'ui_gather_cast_ore',
   fishCast: 'ui_fish_cast',
   fishBite: 'ui_fish_bite',
   fishReel: 'ui_fish_reel',

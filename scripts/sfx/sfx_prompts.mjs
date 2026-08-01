@@ -644,6 +644,56 @@ export const SFX = [
     prompt: 'A soft muffled snowy wind, quiet and cold. Seamless loop, no music.',
   },
 
+  // --- Station ambience beds (issue #2208) ----------------------------------
+  // Authored deterministic synthesis, not ElevenLabs: rendered by
+  // scripts/gen_station_ambience.mjs from scripts/sfx/station_ambience.mjs
+  // (seeded, byte-reproducible) and conformed like every generated loop.
+  // custom: true is load-bearing exactly as on amb_forge: gen_sfx.mjs must
+  // never overwrite an authored bed with an API render, even with --force.
+  // The prompt rows document the authored brief; nothing regenerates from
+  // them. Durations are deliberately co-prime-ish so neighboring stations
+  // in one town never phase-lock into a combined rhythm.
+  {
+    key: 'amb_kitchens',
+    duration: 12.8,
+    loop: true,
+    custom: true,
+    prompt:
+      'A town kitchen at work: hearth crackle, a stew bubbling, uneven knife chops, one pan sizzle, a pot tink, a ladle stir. Seamless loop, no music.',
+  },
+  {
+    key: 'amb_apothecary',
+    duration: 11.6,
+    loop: true,
+    custom: true,
+    prompt:
+      'A quiet apothecary laboratory: slow glassy bubbles, retort glugs, a glass clink, a long careful pour, a cork squeak. Seamless loop, no music.',
+  },
+  {
+    key: 'amb_tannery',
+    duration: 13.4,
+    loop: true,
+    custom: true,
+    prompt:
+      'An open-air tannery: long hide-scraping strokes, a vat slosh, a drying-rack creak, a wring-out splash on a breeze. Seamless loop, no music.',
+  },
+  {
+    key: 'amb_loom',
+    duration: 12.2,
+    loop: true,
+    custom: true,
+    prompt:
+      'A weaving room: shuttle swish, wooden clack pairs, beater thumps in an uneven human rhythm, a treadle creak, a thread whisper. Seamless loop, no music.',
+  },
+  {
+    key: 'amb_toolworks',
+    duration: 13.0,
+    loop: true,
+    custom: true,
+    prompt:
+      'A tinker workshop: file strokes back and forth, light metallic tinks, an accelerating ratchet run, a gear whir over a low bench hum. Seamless loop, no music.',
+  },
+
   // --- Custom recordings (not ElevenLabs) ----------------------------------
   { key: 'quest_accept', custom: true },
   { key: 'quest_ready', custom: true },
@@ -798,8 +848,10 @@ export const SFX = [
   // --- Gathering tool-out cue, per node type (custom recordings) -----------
   // Fires at gather CAST START (audio.gatherCast(nodeType)), a "pulling the
   // tool out" beat for the cast bar's anticipation window; distinct from the
-  // completion cue above. Falls back to the flat ui_gather_cast placeholder
-  // (scripts/sfx/ui_sfx.mjs) when no node type is known. Multi-take.
+  // completion cue above. When no node type is known the flat fallback in
+  // src/game/audio.ts reuses the ore take (the synth ui_gather_cast
+  // placeholder that used to cover that arm is retired, issue #2208).
+  // Multi-take.
   { key: 'ui_gather_cast_ore', custom: true },
   { key: 'ui_gather_cast_wood', custom: true },
   { key: 'ui_gather_cast_herb', custom: true },

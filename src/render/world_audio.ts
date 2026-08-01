@@ -76,5 +76,22 @@ export function buildWorldAmbientSources(seed: number): AmbientPointSource[] {
       z: stall.z,
     });
   }
+  // Crafting-station beds (issue #2208): one point source per non-forge
+  // station. The forge-type station shares Smith Haldren's smithy, whose
+  // building/stall sources above already hum there (a second co-located
+  // source would double the loop). services is optional by design: custom
+  // maps that omit it get no station beds, matching how they get no
+  // stations.
+  const stations = getActiveWorldContent().services?.stations ?? [];
+  for (const station of stations) {
+    if (station.type === 'forge') continue;
+    sources.push({
+      id: `world:station:${station.id}`,
+      kind: station.type,
+      x: station.pos.x,
+      y: groundHeight(station.pos.x, station.pos.z, seed) + 1,
+      z: station.pos.z,
+    });
+  }
   return sources;
 }

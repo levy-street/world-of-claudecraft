@@ -2,6 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FORGE_MAX_DISTANCE, MAX_DISTANCE, REF_DISTANCE, sfx } from '../src/game/sfx';
 import { SFX_CLIPS, type SfxEntry } from '../src/game/sfx_manifest.generated';
+import { STATION_MAX_DISTANCE } from '../src/game/station_ambience';
 import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
 // The footstep "jingling" bug: foot clips are ~0.48s but steps fire every ~0.22s
@@ -301,6 +302,72 @@ describe('mount running audio', () => {
     const before = sources.length;
     sfx.mountRun(0, 0, 0, 'unknown_mount', true);
     expect(sources.length).toBe(before);
+  });
+});
+
+describe('station ambience beds: routing through pointAmbient (issue #2208)', () => {
+  beforeEach(() => {
+    sfx.setListener(0, 0, 0, 0, 0, 1);
+  });
+
+  // The five station kinds pinned to LITERAL cue keys, mix gains, and the
+  // shared 38-unit cull radius: never derived from STATION_AMBIENCE, so a
+  // swapped key, a drifted gain, or a dropped maxDistance in either the
+  // config table or pointAmbient's station branch fails here.
+  const EXPECTED: readonly [string, string, number][] = [
+    ['kitchens', 'amb_kitchens', 0.2],
+    ['apothecary', 'amb_apothecary', 0.2],
+    ['tannery', 'amb_tannery', 0.24],
+    ['loom', 'amb_loom', 0.2],
+    ['toolworks', 'amb_toolworks', 0.2],
+  ];
+
+  it('routes every station kind to its literal bed key, gain, and cull radius', () => {
+    // No station buffer is preloaded, so each source lands in pendingLoops,
+    // which records exactly what pointAmbient passed to loop().
+    const pendingLoops = (
+      sfx as unknown as {
+        pendingLoops: Map<string, { key: string; target: number; maxDistance?: number }>;
+      }
+    ).pendingLoops;
+    for (const [kind, key, gain] of EXPECTED) {
+      const id = `station-${kind}`;
+      sfx.ambience('vale', false, null, false, 0, [{ id, kind: kind as never, x: 5, y: 0, z: 0 }]);
+      const pending = pendingLoops.get(id);
+      expect(pending, kind).toBeDefined();
+      expect(pending?.key, kind).toBe(key);
+      expect(pending?.target, kind).toBe(gain);
+      expect(pending?.maxDistance, kind).toBe(38);
+      pendingLoops.delete(id);
+    }
+    expect(STATION_MAX_DISTANCE).toBe(38); // the literal above IS the tuned constant
+  });
+
+  it('creates a live loop with the station cull radius on its panner once loaded', () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set('amb_kitchens', { duration: 3 });
+    sfx.ambience('vale', false, null, false, 0, [
+      { id: 'station-live', kind: 'kitchens', x: STATION_MAX_DISTANCE - 1, y: 0, z: 0 },
+    ]);
+    const loops = (sfx as unknown as { loops: Map<string, { panner: unknown }> }).loops;
+    const panner = loops.get('station-live')?.panner as {
+      refDistance: number;
+      maxDistance: number;
+    };
+    expect(panner).toBeDefined();
+    expect(panner.maxDistance).toBe(STATION_MAX_DISTANCE);
+    expect(panner.refDistance).toBe(REF_DISTANCE);
+  });
+
+  it('stops beyond the station cutoff, well inside the shared MAX_DISTANCE', () => {
+    const beyondStationRange = (STATION_MAX_DISTANCE + MAX_DISTANCE) / 2;
+    sfx.ambience('vale', false, null, false, 0, [
+      { id: 'station-far', kind: 'loom', x: beyondStationRange, y: 0, z: 0 },
+    ]);
+    const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
+    const pendingLoops = (sfx as unknown as { pendingLoops: Map<string, unknown> }).pendingLoops;
+    expect(loops.get('station-far')).toBeUndefined();
+    expect(pendingLoops.get('station-far')).toBeUndefined();
   });
 });
 

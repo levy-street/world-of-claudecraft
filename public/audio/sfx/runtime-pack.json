@@ -1,9 +1,21 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "242e90b0bcd7c91dd00676576b85a2302bd2e37ab401b227396a4207ed619325",
-  "catalogHash": "84cbcbe7eaed06729e9ca12e47d7e01d2ebdad196ec7222f788322a16e8fe0c5",
+  "bundleId": "a54ed5fcea5f789595c9b6d3767947b27909658450a8a5c9d1f2a74a797c8892",
+  "catalogHash": "1cb85bd107a49cffbc33e9951a56f01768952ab998d7041a3e1a62718a9aa8f3",
   "clips": {
+    "amb_apothecary": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/amb_apothecary.mp3?v=a0b1fe90b1ff",
+          "bytes": 280284,
+          "sha256": "a0b1fe90b1ff3e1b303a9496268d768f825561c789f4257cf04d04eb1fef913b"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "amb_birds": {
       "variants": [
         {
@@ -52,6 +64,30 @@
       "gain": 1.778279,
       "playbackRate": 1
     },
+    "amb_kitchens": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/amb_kitchens.mp3?v=07d960f624e0",
+          "bytes": 308496,
+          "sha256": "07d960f624e0d3b411b9b2ec9126b35e7a37659173112bb366f8c5a665e8348b"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "amb_loom": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/amb_loom.mp3?v=b6ddfe09106d",
+          "bytes": 294704,
+          "sha256": "b6ddfe09106d38ac209830190b1cb06f07f3a91d246e6c822b7ba7fbb033eff4"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "amb_rain": {
       "variants": [
         {
@@ -71,6 +107,30 @@
           "url": "/audio/sfx/amb_snow.mp3?v=c32c3180bd67",
           "bytes": 193767,
           "sha256": "c32c3180bd678e6949c2a681bc394860b76c628df964f14a9152f1404e904cb0"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "amb_tannery": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/amb_tannery.mp3?v=297445caacdf",
+          "bytes": 322916,
+          "sha256": "297445caacdf3a9024d2e6bdd8139d38f0a0558c508bb392b97f613b2b671e59"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "amb_toolworks": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/amb_toolworks.mp3?v=5d82dfa30c1e",
+          "bytes": 313512,
+          "sha256": "5d82dfa30c1ed7d6cabe7b6e5e6b26f51b2a7841133a39b40ba42bcb22e431f9"
         }
       ],
       "gain": 1,
@@ -3575,18 +3635,6 @@
           "url": "/audio/sfx/ui_fish_reel_3.mp3?v=996c2799519d",
           "bytes": 33270,
           "sha256": "996c2799519d42913e850da609471474495355c285235f9978241dd51ee98bfe"
-        }
-      ],
-      "gain": 1,
-      "playbackRate": 1
-    },
-    "ui_gather_cast": {
-      "variants": [
-        {
-          "id": "main",
-          "url": "/audio/sfx/ui_gather_cast.mp3?v=7c2be6a5c0fd",
-          "bytes": 13835,
-          "sha256": "7c2be6a5c0fd46fe577f79a5ac32f0686811258e02a54274f095267d1faf8803"
         }
       ],
       "gain": 1,

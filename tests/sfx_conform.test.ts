@@ -23,6 +23,7 @@ import {
   TARGET_STEREO_CHANNELS,
 } from '../scripts/sfx/sfx_conform_rules.mjs';
 import { SFX } from '../scripts/sfx/sfx_prompts.mjs';
+import { STATION_AMBIENCE } from '../src/game/station_ambience';
 
 const {
   buildSfxConformArgs,
@@ -661,22 +662,39 @@ describe('channel policy: pure rules', () => {
   });
 });
 
+// The point-ambience beds (campfire, forge, and the five station beds from
+// src/game/station_ambience.ts) play through positional panners, so they
+// stay mono; only the zone-wide beds are stereo.
+const POSITIONAL_BEDS = [
+  'amb_campfire',
+  'amb_forge',
+  ...Object.values(STATION_AMBIENCE).map((config) => config.key),
+];
+
 describe('channel policy: catalog data', () => {
   it('keeps stereo only for non-positional ambience beds', () => {
     const stereoKeys = SFX.filter((entry) => entry.stereo).map((entry) => entry.key);
     const ambienceBeds = SFX.filter(
-      (entry) =>
-        entry.loop &&
-        entry.key.startsWith('amb_') &&
-        entry.key !== 'amb_campfire' &&
-        entry.key !== 'amb_forge',
+      (entry) => entry.loop && entry.key.startsWith('amb_') && !POSITIONAL_BEDS.includes(entry.key),
     ).map((entry) => entry.key);
     expect(stereoKeys.sort()).toEqual(ambienceBeds.sort());
     expect(stereoKeys.length).toBeGreaterThan(0);
   });
 
-  it('keeps positional campfire and forge loops mono', () => {
-    for (const key of ['amb_campfire', 'amb_forge']) {
+  it('keeps the positional campfire, forge, and station loops mono', () => {
+    // Literal safety pin: the STATION_AMBIENCE-derived list above must
+    // resolve to exactly these seven beds, so a station key silently
+    // dropped from the config cannot shrink this test's coverage.
+    expect([...POSITIONAL_BEDS].sort()).toEqual([
+      'amb_apothecary',
+      'amb_campfire',
+      'amb_forge',
+      'amb_kitchens',
+      'amb_loom',
+      'amb_tannery',
+      'amb_toolworks',
+    ]);
+    for (const key of POSITIONAL_BEDS) {
       const entry = SFX.find((candidate) => candidate.key === key);
       expect(expectedChannelsForEntry(entry), key).toBe(TARGET_MONO_CHANNELS);
     }

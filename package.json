@@ -90,6 +90,7 @@
     "voices:lines": "node scripts/gen_npc_lines.mjs",
     "sfx:gen": "node scripts/gen_sfx.mjs",
     "sfx:ui": "node scripts/gen_ui_sfx.mjs",
+    "sfx:stations": "node scripts/gen_station_ambience.mjs",
     "sfx:manifest": "node scripts/build_sfx_manifest.mjs",
     "sfx:check": "node scripts/sfx_conform.mjs",
     "sfx:conform": "node scripts/sfx_conform.mjs --fix",

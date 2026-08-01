@@ -161,6 +161,18 @@ describe('sampled GameAudio facade', () => {
     expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_loot_item', { jitter: false });
   });
 
+  it('resolves the no-type gatherCast fallback to the real ore cast take', () => {
+    // The flat ui_gather_cast synth placeholder is retired (issue #2208):
+    // the in-practice-unreachable no-type arm reuses the ore recording.
+    const audio = new GameAudio();
+    audio.gatherCast();
+    audio.gatherCast('herb');
+    expect(sfxMock.playUi.mock.calls.map(([key]) => key)).toEqual([
+      'ui_gather_cast_ore',
+      'ui_gather_cast_herb',
+    ]);
+  });
+
   it('maps all Fiesta word and score variants to separately editable clips', () => {
     const audio = new GameAudio();
 
@@ -283,16 +295,16 @@ describe('sampled GameAudio facade', () => {
 });
 
 describe('deterministic UI SFX catalog', () => {
-  it('adds 15 unique UI cues to the authoritative studio inventory', () => {
-    // 14 pre-12b cues plus the one remaining Phase 12b gathering-rhythm
-    // placeholder (ui_gather_cast, the flat fallback), issue #2208.
-    // ui_gather_strike/rare and ui_fish_cast/bite/reel were retired here
-    // once real per-node-type/rarity-tier/fishing recordings replaced them
-    // (src/game/audio.ts).
+  it('adds 14 unique UI cues to the authoritative studio inventory', () => {
+    // The 14 pre-12b cues. Every Phase 12b gathering/fishing-rhythm
+    // placeholder is retired (issue #2208): ui_gather_strike/rare and
+    // ui_fish_cast/bite/reel once real recordings replaced them, and
+    // finally ui_gather_cast (the flat fallback) once that arm was
+    // retargeted at the real ore cast take (src/game/audio.ts).
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
 
-    expect(keys).toHaveLength(15);
+    expect(keys).toHaveLength(14);
     expect(new Set(keys).size).toBe(keys.length);
     expect(keys.every((key: string) => key.startsWith('ui_'))).toBe(true);
     expect(UI_SFX_CATALOG.every((cue: { generator: string }) => cue.generator === 'ffmpeg')).toBe(

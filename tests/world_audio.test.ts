@@ -6,7 +6,13 @@ import {
   isOnDockDeck,
 } from '../src/render/world_audio';
 import { clonePropsWithoutEastbrookLayout } from '../src/sim/custom_world_props';
-import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, PROPS, setActiveWorldContent } from '../src/sim/data';
+import {
+  BUILTIN_WORLD,
+  DUNGEON_X_THRESHOLD,
+  PROPS,
+  STATIONS,
+  setActiveWorldContent,
+} from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import { SOWFIELD_CENTER } from '../src/sim/vale_cup_layout';
 import { groundHeight } from '../src/sim/world';
@@ -118,5 +124,54 @@ describe('world audio routing', () => {
     expect(campfires.map(({ x, z }) => [x, z])).toEqual(props.campfires);
     expect(forges.map(({ x, z }) => [x, z])).toEqual([[-4.5, 673.5]]);
     expect(sources.some((source) => source.id === 'world:forge:4.5:18.5')).toBe(false);
+  });
+
+  it('builds one station bed source per non-forge crafting station', () => {
+    const sources = buildWorldAmbientSources(SEED);
+    const stations = STATIONS.filter((station) => station.type !== 'forge');
+    expect(stations).toHaveLength(5);
+    for (const station of stations) {
+      expect(sources).toContainEqual({
+        id: `world:station:${station.id}`,
+        kind: station.type,
+        x: station.pos.x,
+        y: groundHeight(station.pos.x, station.pos.z, SEED) + 1,
+        z: station.pos.z,
+      });
+    }
+    // The forge-type station shares the smithy: its beds are the two forge
+    // sources pinned above, never a third co-located station source.
+    expect(sources.filter((source) => source.id.startsWith('world:station:'))).toHaveLength(5);
+    expect(sources.some((source) => source.id === 'world:station:station_eastbrook_forge')).toBe(
+      false,
+    );
+  });
+
+  it('drops station beds for maps without services and follows relocated stations', () => {
+    const { services: _services, ...withoutServices } = BUILTIN_WORLD;
+    setActiveWorldContent({ ...withoutServices });
+    expect(
+      buildWorldAmbientSources(SEED).some((source) => source.id.startsWith('world:station:')),
+    ).toBe(false);
+
+    const loom = STATIONS.find((station) => station.type === 'loom');
+    expect(loom).toBeDefined();
+    if (!loom) return;
+    const moved = { ...loom, pos: { x: 200, z: 300 } };
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      services: { ...BUILTIN_WORLD.services, stations: [moved] },
+    });
+    const sources = buildWorldAmbientSources(SEED);
+    const stationSources = sources.filter((source) => source.id.startsWith('world:station:'));
+    expect(stationSources).toEqual([
+      {
+        id: `world:station:${moved.id}`,
+        kind: 'loom',
+        x: 200,
+        y: groundHeight(200, 300, SEED) + 1,
+        z: 300,
+      },
+    ]);
   });
 });

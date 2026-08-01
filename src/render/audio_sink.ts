@@ -9,7 +9,19 @@ export type Surface = 'grass' | 'dirt' | 'stone' | 'wood' | 'snow' | 'water';
 
 export interface AmbientPointSource {
   readonly id: string;
-  readonly kind: 'campfire' | 'forge';
+  /** Point-ambience station sources. Mirrored (not imported: this seam file
+   *  keeps src/render/ free of src/game/ imports) by the union in
+   *  src/game/sfx.ts and, for the five station kinds, by StationAmbienceKind
+   *  in src/game/station_ambience.ts; tests/station_ambience.test.ts pins
+   *  the three in sync. */
+  readonly kind:
+    | 'campfire'
+    | 'forge'
+    | 'kitchens'
+    | 'apothecary'
+    | 'tannery'
+    | 'loom'
+    | 'toolworks';
   readonly x: number;
   readonly y: number;
   readonly z: number;

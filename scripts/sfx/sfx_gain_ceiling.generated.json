@@ -1,5 +1,10 @@
 {
+  "amb_apothecary": 5.5,
   "amb_forge": 5,
+  "amb_kitchens": 4.8,
+  "amb_loom": 4.7,
+  "amb_tannery": 4.5,
+  "amb_toolworks": 5,
   "buff_apply": 7.9,
   "cast_chain_heal": 4.5,
   "cast_lightning_bolt": 5,

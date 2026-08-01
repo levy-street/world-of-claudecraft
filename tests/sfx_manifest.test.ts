@@ -162,11 +162,18 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 8 mount cues, and all 62 UI cues in one 218-key inventory', () => {
+  it('keeps the release catalog, all 8 mount cues, and all 61 UI cues in one 222-key inventory', () => {
+    // 222 = 218 shipped at v0.33.0 cut, plus the five station ambience beds
+    // (issue #2208), minus the retired ui_gather_cast synth placeholder.
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(218);
-    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
+    expect(keys.size).toBe(222);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(61);
     for (const key of [
+      'amb_kitchens',
+      'amb_apothecary',
+      'amb_tannery',
+      'amb_loom',
+      'amb_toolworks',
       'cast_lightning_bolt',
       'mob_mudfin_attack',
       'mob_burrower_attack',
@@ -196,7 +203,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(218);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(222);
   });
 });
 
