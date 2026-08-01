@@ -122,6 +122,9 @@ const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   ysolei: 'drowned_temple',
   korzul_the_gravewyrm: 'gravewyrm_sanctum',
   nythraxis_scourge_of_thornpeak: 'nythraxis_boss_arena',
+  // Without this entry Zulgar kills write no dungeonClears record, so the
+  // dgn_wildheart_basin deed pair ships permanently unearnable (0/1 forever).
+  wildheart_high_priest: 'wildheart_basin',
 };
 
 // Perfection tasks: zero player deaths inside the boss's heroic instance

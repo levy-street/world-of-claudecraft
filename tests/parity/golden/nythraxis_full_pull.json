@@ -13,8 +13,8 @@
     "Final Stand enrage at 5% + grantNythraxisLockout (raidLockouts) + onBossDeath death dialogue",
     "class:warrior"
   ],
-  "draws": 6018,
-  "drawDigest": "5da34be4",
+  "draws": 6004,
+  "drawDigest": "ad2d01a5",
   "frames": [
     {
       "tick": 0,
@@ -8062,8 +8062,8 @@
       "state": "8e13f07e",
       "events": "741638a5",
       "rng": {
-        "draws": 4805,
-        "digest": "1b6af8b9"
+        "draws": 4806,
+        "digest": "2c79852f"
       }
     },
     {
@@ -8073,8 +8073,8 @@
       "state": "6c8a2c57",
       "events": "741638a5",
       "rng": {
-        "draws": 4878,
-        "digest": "f052b525"
+        "draws": 4880,
+        "digest": "6fe551bf"
       }
     },
     {
@@ -8095,8 +8095,8 @@
       "state": "36e150b0",
       "events": "741638a5",
       "rng": {
-        "draws": 5055,
-        "digest": "d174297d"
+        "draws": 5058,
+        "digest": "04be4939"
       }
     },
     {
@@ -8106,52 +8106,52 @@
       "state": "5b7fdcab",
       "events": "0a143e37",
       "rng": {
-        "draws": 5145,
-        "digest": "d49b0190"
+        "draws": 5143,
+        "digest": "060f92f0"
       }
     },
     {
       "tick": 600,
       "time": 30,
       "nextId": 833,
-      "state": "58651e23",
-      "events": "0ae91127",
+      "state": "f9269e61",
+      "events": "f37a041f",
       "rng": {
-        "draws": 5238,
-        "digest": "88f6d088"
+        "draws": 5226,
+        "digest": "0dcca6e2"
       }
     },
     {
       "tick": 610,
       "time": 30.5,
       "nextId": 833,
-      "state": "1198b0d6",
+      "state": "8c8e4644",
       "events": "741638a5",
       "rng": {
-        "draws": 5351,
-        "digest": "4aa3f07d"
+        "draws": 5340,
+        "digest": "77d5d5d8"
       }
     },
     {
       "tick": 620,
       "time": 31,
       "nextId": 833,
-      "state": "179f2a8b",
+      "state": "a9013aa9",
       "events": "741638a5",
       "rng": {
-        "draws": 5433,
-        "digest": "b79d71f1"
+        "draws": 5424,
+        "digest": "754dc162"
       }
     },
     {
       "tick": 627,
       "time": 31.35,
       "nextId": 833,
-      "state": "470e7279",
+      "state": "d85b075f",
       "events": "ba829b90",
       "rng": {
-        "draws": 5514,
-        "digest": "2aed2240"
+        "draws": 5496,
+        "digest": "06dcab76"
       },
       "label": "finalstand",
       "players": [
@@ -8171,7 +8171,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 6276,
-            "damageTaken": 21425,
+            "damageTaken": 21416,
             "kills": 2,
             "xpGained": 166
           },
@@ -9309,11 +9309,11 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 833,
-      "state": "201b8654",
+      "state": "dd196a9f",
       "events": "0726e16a",
       "rng": {
-        "draws": 5528,
-        "digest": "243b8d72"
+        "draws": 5509,
+        "digest": "b111ede9"
       },
       "label": "death",
       "players": [
@@ -9333,7 +9333,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 11076,
-            "damageTaken": 21425,
+            "damageTaken": 21416,
             "kills": 3,
             "xpGained": 249
           },
@@ -10195,15 +10195,11 @@
           },
           "level": 20,
           "loot": {
-            "copper": 131606,
+            "copper": 113732,
             "items": [
               {
                 "count": 1,
-                "itemId": "bonewrought_greatsword"
-              },
-              {
-                "count": 1,
-                "itemId": "stormcallers_spaulders"
+                "itemId": "nighttalon_shoulderguards"
               },
               {
                 "count": 1,
@@ -10211,7 +10207,15 @@
               },
               {
                 "count": 1,
-                "itemId": "nighttalon_crown"
+                "itemId": "stormcallers_crown"
+              },
+              {
+                "count": 1,
+                "itemId": "stormcallers_spaulders"
+              },
+              {
+                "count": 1,
+                "itemId": "maul_of_the_scourged_wilds"
               }
             ]
           },
@@ -10593,77 +10597,77 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 833,
-      "state": "7b60e82a",
+      "state": "2df8b3f9",
       "events": "741638a5",
       "rng": {
-        "draws": 5549,
-        "digest": "62fba832"
+        "draws": 5523,
+        "digest": "d8ef2ec1"
       }
     },
     {
       "tick": 640,
       "time": 32,
       "nextId": 833,
-      "state": "9fc078be",
+      "state": "a98bffb9",
       "events": "741638a5",
       "rng": {
-        "draws": 5623,
-        "digest": "c49483a4"
+        "draws": 5592,
+        "digest": "3caa88e2"
       }
     },
     {
       "tick": 650,
       "time": 32.5,
       "nextId": 833,
-      "state": "47d066ee",
+      "state": "7f052991",
       "events": "741638a5",
       "rng": {
-        "draws": 5686,
-        "digest": "7749c4ce"
+        "draws": 5670,
+        "digest": "c916f032"
       }
     },
     {
       "tick": 660,
       "time": 33,
       "nextId": 833,
-      "state": "878c7332",
+      "state": "03421f59",
       "events": "741638a5",
       "rng": {
-        "draws": 5776,
-        "digest": "4a2e3d43"
+        "draws": 5759,
+        "digest": "8cbe8a7d"
       }
     },
     {
       "tick": 670,
       "time": 33.5,
       "nextId": 833,
-      "state": "e1c630de",
+      "state": "a868b3c5",
       "events": "741638a5",
       "rng": {
-        "draws": 5862,
-        "digest": "648c8f96"
+        "draws": 5837,
+        "digest": "e63976dd"
       }
     },
     {
       "tick": 680,
       "time": 34,
       "nextId": 833,
-      "state": "562acf0a",
+      "state": "551f652d",
       "events": "741638a5",
       "rng": {
-        "draws": 5932,
-        "digest": "36928617"
+        "draws": 5912,
+        "digest": "98777704"
       }
     },
     {
       "tick": 688,
       "time": 34.4,
       "nextId": 833,
-      "state": "9d5665de",
+      "state": "e4b70d79",
       "events": "2dda13ac",
       "rng": {
-        "draws": 6018,
-        "digest": "5da34be4"
+        "draws": 6004,
+        "digest": "ad2d01a5"
       },
       "label": "final",
       "players": [
@@ -10683,7 +10687,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 11076,
-            "damageTaken": 21425,
+            "damageTaken": 21416,
             "kills": 3,
             "xpGained": 249
           },
@@ -11545,15 +11549,11 @@
           },
           "level": 20,
           "loot": {
-            "copper": 131606,
+            "copper": 113732,
             "items": [
               {
                 "count": 1,
-                "itemId": "bonewrought_greatsword"
-              },
-              {
-                "count": 1,
-                "itemId": "stormcallers_spaulders"
+                "itemId": "nighttalon_shoulderguards"
               },
               {
                 "count": 1,
@@ -11561,7 +11561,15 @@
               },
               {
                 "count": 1,
-                "itemId": "nighttalon_crown"
+                "itemId": "stormcallers_crown"
+              },
+              {
+                "count": 1,
+                "itemId": "stormcallers_spaulders"
+              },
+              {
+                "count": 1,
+                "itemId": "maul_of_the_scourged_wilds"
               }
             ]
           },

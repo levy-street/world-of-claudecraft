@@ -206,6 +206,20 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // mount's rarity without moving its drop and this reds immediately.
     const nyth = HEROIC_BOSS_LOOT['nythraxis_scourge_of_thornpeak'] ?? [];
     const CHANCE_FOR_RARITY: Record<string, number> = { uncommon: 0.005, rare: 0.001 };
+    // The FIVE-MAN bosses carrying each drop-tier mount, pinned explicitly (the
+    // heroic raid carries all four on top of these). Listed rather than counted
+    // so a stray new path fails here instead of silently widening a mount's
+    // supply. The two blues each carry a SECOND five-man path: the Wildheart
+    // Basin is the fifth heroic five-man against a four-mount catalog, so it
+    // takes equal-rate secondary paths to both rather than a fifth signature
+    // mount (owner call, 2026-08-01). Rate parity below is what keeps that
+    // honest: every path still pays the one rarity rate.
+    const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
+      reins_stormfeather_griffin: ['morthen'],
+      reins_shadowjump_toad: ['vael_the_mistcaller'],
+      reins_grag_bear: ['wildheart_high_priest', 'ysolei'],
+      reins_stalkglider_snail: ['korzul_the_gravewyrm', 'wildheart_high_priest'],
+    };
 
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
@@ -233,10 +247,12 @@ describe('mount reins items (the collection: owning the item is owning the mount
 
       const chance = CHANCE_FOR_RARITY[rarity];
       expect(chance, `${rarity} is a known drop tier`).toBeDefined();
-      // Exactly two heroic paths: one five-man boss, plus the heroic raid.
-      expect(heroicEntries.length, `${itemId} heroic paths`).toBe(2);
+      // Its five-man sources are exactly the pinned set, plus the heroic raid.
       const fiveMan = heroicEntries.filter((e) => e.bossId !== 'nythraxis_scourge_of_thornpeak');
-      expect(fiveMan.length, `${itemId} has one five-man path`).toBe(1);
+      expect(fiveMan.map((e) => e.bossId).sort(), `${itemId} five-man paths`).toEqual(
+        FIVE_MAN_SOURCES[itemId],
+      );
+      expect(heroicEntries.length, `${itemId} heroic paths`).toBe(fiveMan.length + 1);
       expect(
         nyth.some((l) => l.itemId === itemId),
         `${itemId} on the heroic raid`,

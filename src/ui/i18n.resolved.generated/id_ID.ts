@@ -9650,6 +9650,18 @@ export const id_ID: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Pisau Taring Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Tombak Binatang Fanglord"
+      },
+      "bloodmane_warleggings": {
+        "name": "Pelindung Kaki Perang Bloodmane"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Celana Pengintai Vineclaw"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sarung Ritual Sunbone"
+      },
       "thick_winter_pelt": {
         "name": "Bulu Musim Dingin yang Tebal"
       },
@@ -10396,6 +10408,24 @@ export const id_ID: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Pembalut Tangan Paduan Suara Wyrm"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunik Pengintai Cekungan"
+      },
+      "verdant_heart_vestment": {
+        "name": "Busana Jantung Hijau"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Zirah Ritual Sunbone"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Taring Agung Cekungan"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Mahkota Peramal Sunbone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Zirah Kaki Perang Bloodmane"
       },
       "deathless_greatblade": {
         "name": "Bilah Agung Nirmaut"

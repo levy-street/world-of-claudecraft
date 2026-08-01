@@ -9650,6 +9650,18 @@ export const cs_CZ: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Tesákový nůž Zulgara"
       },
+      "fanglords_beastspear": {
+        "name": "Zvířecí kopí Tesákopána"
+      },
+      "bloodmane_warleggings": {
+        "name": "Krvavohřívé válečné nohavice"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Liánodrápé plíživé kalhoty"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Slunečněkostní rituální sarong"
+      },
       "thick_winter_pelt": {
         "name": "Silná zimní kožešina"
       },
@@ -10396,6 +10408,24 @@ export const cs_CZ: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Omotávky dračího chóru"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunika plíživce z Kotliny"
+      },
+      "verdant_heart_vestment": {
+        "name": "Roucho zeleného srdce"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Slunečněkostní rituální hauberk"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Velký tesák Kotliny"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Slunečněkostní koruna orákula"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Krvavohřívé válečné chrániče nohou"
       },
       "deathless_greatblade": {
         "name": "Nesmrtelná velká čepel"

@@ -2538,6 +2538,10 @@ export interface DungeonDef {
   overworldDoor?: boolean; // false for rooms only reached by internal instance doors
   entry: { x: number; z: number }; // player arrival point (instance-local)
   exitOffset: { x: number; z: number }; // exit portal (instance-local)
+  // Where a second exit portal opens when the final boss dies (instance-local).
+  // For open-field dungeons whose boss stands far from the entrance with no
+  // corridor back; absent = no boss portal (every corridor dungeon).
+  bossExitPortal?: { x: number; z: number };
   spawns: DungeonSpawn[];
   objects?: DungeonObjectSpawn[];
   interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis' | 'wildheart' | 'lastkeep'; // renderer + collider interior builder key

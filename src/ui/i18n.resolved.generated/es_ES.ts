@@ -9650,6 +9650,18 @@ export const es_ES: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Cuchillo Colmillo de Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Lanza de Bestias del Fanglord"
+      },
+      "bloodmane_warleggings": {
+        "name": "Perneras de Guerra Bloodmane"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Calzas de Acecho Vineclaw"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Pareo Ritual Sunbone"
+      },
       "thick_winter_pelt": {
         "name": "Piel Gruesa de Invierno"
       },
@@ -10396,6 +10408,24 @@ export const es_ES: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Vendas del Coro del Wyrm"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Túnica del Acechador de la Cuenca"
+      },
+      "verdant_heart_vestment": {
+        "name": "Vestimenta del Corazón Verdeante"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Loriga Ritual Sunbone"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Gran Colmillo de la Cuenca"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Corona del Oráculo Sunbone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Guardapiernas de Guerra Bloodmane"
       },
       "deathless_greatblade": {
         "name": "Mandoble Imperecedero"

@@ -288,6 +288,7 @@ describe('itemization coverage: heroic variants are only built from heroic-eligi
       'sunken_bastion',
       'drowned_temple',
       'gravewyrm_sanctum',
+      'wildheart_basin',
       'nythraxis_boss_arena',
     ]);
     const heroicEligibleMobs = new Set<string>();

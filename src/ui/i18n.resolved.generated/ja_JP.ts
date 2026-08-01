@@ -9650,6 +9650,18 @@ export const ja_JP: EnTranslations = {
       "wildheart_fangknife": {
         "name": "ズルガーの牙小刀"
       },
+      "fanglords_beastspear": {
+        "name": "牙王の獣槍"
+      },
+      "bloodmane_warleggings": {
+        "name": "血鬣の戦脚甲"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "蔦爪の潜行ズボン"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "陽骨の儀式腰布"
+      },
       "thick_winter_pelt": {
         "name": "厚い冬毛皮"
       },
@@ -10396,6 +10408,24 @@ export const ja_JP: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "ワームクワイアの手巻き"
+      },
+      "basin_stalkers_tunic": {
+        "name": "盆地追跡者のチュニック"
+      },
+      "verdant_heart_vestment": {
+        "name": "翠心の祭服"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "陽骨の儀式ホーバーク"
+      },
+      "greatfang_of_the_basin": {
+        "name": "盆地の大牙"
+      },
+      "sunbone_oracles_crown": {
+        "name": "陽骨の託宣者の冠"
+      },
+      "bloodmane_war_legguards": {
+        "name": "血鬣の戦レッグガード"
       },
       "deathless_greatblade": {
         "name": "不死の大剣"

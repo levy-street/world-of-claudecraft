@@ -99,6 +99,38 @@ export function lockNormalDungeonResetOnBossKill(ctx: SimContext, mob: Entity): 
   }
 }
 
+/**
+ * Open the far-end exit portal a `DungeonDef.bossExitPortal` dungeon earns by
+ * killing its final boss. The Wildheart Basin's shrine terrace sits ~220yd
+ * from the entrance exit with no corridor back, so the cleared run steps
+ * through here instead of retracing the whole route. Spawned only on the
+ * final boss's death (that IS the "portal opens" beat), on both difficulties;
+ * the object joins inst.objectIds so freeInstance tears it down with the
+ * claim. Draws no rng.
+ */
+export function spawnBossExitPortal(ctx: SimContext, mob: Entity): void {
+  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
+  if (!inst || inst.bossExitId !== null) return;
+  const dungeon = DUNGEONS[inst.dungeonId];
+  const portal = dungeon?.bossExitPortal;
+  if (!portal) return;
+  if (mob.templateId !== HEROIC_DUNGEON_TUNING[inst.dungeonId]?.finalBossId) return;
+  const origin = instanceOrigin(dungeon.index, inst.slot);
+  const exit = createGroundObject(
+    ctx.nextId++,
+    '',
+    `${dungeon.name} Exit`,
+    ctx.groundPos(origin.x + portal.x, origin.z + portal.z),
+  );
+  exit.templateId = 'dungeon_exit';
+  exit.dungeonId = dungeon.id;
+  exit.objectItemId = null;
+  exit.lootable = true;
+  ctx.addEntity(exit);
+  inst.objectIds.push(exit.id);
+  inst.bossExitId = exit.id;
+}
+
 // Joining a party during a reset cooldown inherits that party's active dungeon
 // locks. Otherwise fresh characters could take over the replacement claim, rotate
 // the ephemeral party id, and open another run before the five-minute boundary.
@@ -178,16 +210,24 @@ export function heroicLockoutId(dungeonId: string): string {
   return `${dungeonId}:heroic`;
 }
 
+// True when this exit-portal id is live and the player stands inside its door
+// trigger; a null id (no portal spawned) simply misses. Kept allocation-free:
+// updateDoorTriggers runs per player per tick over the whole instance pool.
+function touchesExitPortal(ctx: SimContext, p: Entity, exitId: number | null): boolean {
+  if (exitId === null) return false;
+  const exit = ctx.entities.get(exitId);
+  return exit !== undefined && dist2d(p.pos, exit.pos) < DOOR_TRIGGER_RADIUS;
+}
+
 // Walking into a dungeon door teleports you through it (no click needed).
 // Party members who walk in land in the same instance via instanceKeyFor.
 export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
   if (p.kind !== 'player') return;
   if (p.pos.x > DUNGEON_X_THRESHOLD) {
-    // inside: walking into the exit portal climbs back out
+    // inside: walking into the entrance exit, or the boss-death portal a
+    // bossExitPortal dungeon opens at the far end, climbs back out
     for (const inst of ctx.instances) {
-      if (inst.exitId === null) continue;
-      const exit = ctx.entities.get(inst.exitId);
-      if (exit && dist2d(p.pos, exit.pos) < DOOR_TRIGGER_RADIUS) {
+      if (touchesExitPortal(ctx, p, inst.exitId) || touchesExitPortal(ctx, p, inst.bossExitId)) {
         leaveDungeon(ctx, p.id);
         return;
       }
@@ -613,6 +653,7 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   inst.mobIds = [];
   inst.objectIds = [];
   inst.exitId = null;
+  inst.bossExitId = null; // the entity itself was dropped with objectIds
   inst.emptyFor = 0;
   inst.resetAvailableAt = 0;
   inst.claimedAt = undefined;

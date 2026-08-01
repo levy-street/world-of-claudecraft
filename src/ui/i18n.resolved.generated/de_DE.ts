@@ -9650,6 +9650,18 @@ export const de_DE: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Zulgars Fangmesser"
       },
+      "fanglords_beastspear": {
+        "name": "Bestienspeer des Fangfürsten"
+      },
+      "bloodmane_warleggings": {
+        "name": "Blutmähnen-Kriegsbeinschützer"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Rankenklauen-Pirschhose"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sonnenknochen-Ritualsarong"
+      },
       "thick_winter_pelt": {
         "name": "Dickes Winterfell"
       },
@@ -10396,6 +10408,24 @@ export const de_DE: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Wyrmchor-Handwickel"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunika des Beckenpirschers"
+      },
+      "verdant_heart_vestment": {
+        "name": "Grünherz-Gewand"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Sonnenknochen-Ritualkettenhemd"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Großfang des Beckens"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Sonnenknochen-Orakelkrone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Blutmähnen-Kriegsbeinschienen"
       },
       "deathless_greatblade": {
         "name": "Todlose Großklinge"

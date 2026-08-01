@@ -85,6 +85,7 @@ function encounterInstance(
     mobIds: [boss.id],
     objectIds: [],
     exitId: null,
+    bossExitId: null,
     emptyFor: 0,
     resetAvailableAt: 0,
     clearedBy: new Set(),

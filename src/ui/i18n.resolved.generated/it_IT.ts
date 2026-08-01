@@ -9650,6 +9650,18 @@ export const it_IT: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Pugnale Zanna di Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Spiedo da Bestie del Signore delle Zanne"
+      },
+      "bloodmane_warleggings": {
+        "name": "Cosciali da Guerra Criniera di Sangue"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Brache da Agguato Artiglio di Vite"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sarong Rituale Ossosole"
+      },
       "thick_winter_pelt": {
         "name": "Pelliccia Invernale Spessa"
       },
@@ -10396,6 +10408,24 @@ export const it_IT: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Bende del coro dei wyrm"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunica del Predatore del Bacino"
+      },
+      "verdant_heart_vestment": {
+        "name": "Veste del Cuore Verdeggiante"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Usbergo Rituale Ossosole"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Granzanna del Bacino"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Corona dell'Oracolo Ossosole"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Gambali da Guerra Criniera di Sangue"
       },
       "deathless_greatblade": {
         "name": "Spadone senza morte"

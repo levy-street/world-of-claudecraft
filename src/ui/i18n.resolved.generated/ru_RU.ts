@@ -9650,6 +9650,18 @@ export const ru_RU: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Клыковый нож Зулгара"
       },
+      "fanglords_beastspear": {
+        "name": "Звериное копье Повелителя клыков"
+      },
+      "bloodmane_warleggings": {
+        "name": "Боевые поножи Кровавой Гривы"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Штаны лазутчика Лозокогтя"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Ритуальный саронг Солнечной Кости"
+      },
       "thick_winter_pelt": {
         "name": "Плотная зимняя шкура"
       },
@@ -10396,6 +10408,24 @@ export const ru_RU: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Обмотки змеиного хора"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Туника лазутчика Котловины"
+      },
+      "verdant_heart_vestment": {
+        "name": "Облачение Зеленеющего Сердца"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Ритуальная кольчуга Солнечной Кости"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Великий клык Котловины"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Корона оракула Солнечной Кости"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Боевые набедренники Кровавой Гривы"
       },
       "deathless_greatblade": {
         "name": "Бессмертный великий клинок"

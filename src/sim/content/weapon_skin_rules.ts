@@ -43,6 +43,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   direfang_greatblade: 'sword',
   hoarfrost_edge: 'sword',
   wildheart_tuskblade: 'sword',
+  greatfang_of_the_basin: 'sword',
   // Daggers
   rusty_dagger: 'dagger',
   whetted_iron_dirk: 'dagger',
@@ -140,6 +141,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   tidereaver_gaff: 'polearm',
   ironbark_boar_spear: 'polearm',
   fen_reaver_glaive: 'polearm',
+  fanglords_beastspear: 'polearm',
 };
 
 /**

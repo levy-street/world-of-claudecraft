@@ -9650,6 +9650,18 @@ export const tr_TR: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Zulgar'ın Diş Bıçağı"
       },
+      "fanglords_beastspear": {
+        "name": "Diş Lordu'nun Canavar Mızrağı"
+      },
+      "bloodmane_warleggings": {
+        "name": "Kanyeleli Savaş Dizlikleri"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Sarmaşık Pençeli Av Pantolonu"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Güneşkemik Ritüel Sarongu"
+      },
       "thick_winter_pelt": {
         "name": "Kalın Kış Postu"
       },
@@ -10396,6 +10408,24 @@ export const tr_TR: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Ejderkorosu El Sargıları"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Çukur Avcısının Tüniği"
+      },
+      "verdant_heart_vestment": {
+        "name": "Yeşeren Kalbin Giysisi"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Güneşkemik Ritüel Zırh Gömleği"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Çukurun Büyük Dişi"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Güneşkemik Kâhin Tacı"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Kanyeleli Savaş Bacak Muhafızları"
       },
       "deathless_greatblade": {
         "name": "Ölümsüz Pala"

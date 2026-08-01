@@ -10,8 +10,8 @@
     "pulseGroundAoE over 2+ in-radius hostiles: rng.range per target, stable order",
     "class:paladin"
   ],
-  "draws": 1448,
-  "drawDigest": "6d47cfcb",
+  "draws": 1453,
+  "drawDigest": "ba7b1538",
   "frames": [
     {
       "tick": 0,
@@ -867,8 +867,8 @@
       "state": "0c1ad243",
       "events": "1f5c6d57",
       "rng": {
-        "draws": 992,
-        "digest": "b7b86199"
+        "draws": 993,
+        "digest": "9455c862"
       }
     },
     {
@@ -878,8 +878,8 @@
       "state": "ba5b7cc9",
       "events": "741638a5",
       "rng": {
-        "draws": 1049,
-        "digest": "2e1c2e59"
+        "draws": 1050,
+        "digest": "5b102576"
       }
     },
     {
@@ -889,8 +889,8 @@
       "state": "a39ee8de",
       "events": "741638a5",
       "rng": {
-        "draws": 1114,
-        "digest": "818935e0"
+        "draws": 1115,
+        "digest": "2be44937"
       }
     },
     {
@@ -911,8 +911,8 @@
       "state": "1cc5100e",
       "events": "741638a5",
       "rng": {
-        "draws": 1213,
-        "digest": "7599cc4d"
+        "draws": 1215,
+        "digest": "f235f9d2"
       }
     },
     {
@@ -922,8 +922,8 @@
       "state": "0652abe2",
       "events": "741638a5",
       "rng": {
-        "draws": 1281,
-        "digest": "c97c7ac2"
+        "draws": 1285,
+        "digest": "46583eef"
       }
     },
     {
@@ -933,8 +933,8 @@
       "state": "80f8fa53",
       "events": "741638a5",
       "rng": {
-        "draws": 1354,
-        "digest": "b6b832bc"
+        "draws": 1359,
+        "digest": "c1d16f06"
       }
     },
     {
@@ -944,19 +944,19 @@
       "state": "f9ffe70b",
       "events": "741638a5",
       "rng": {
-        "draws": 1423,
-        "digest": "2ed3a808"
+        "draws": 1431,
+        "digest": "72043e63"
       }
     },
     {
       "tick": 182,
       "time": 9.1,
       "nextId": 824,
-      "state": "62e04109",
-      "events": "b5c9e892",
+      "state": "5c1d0d44",
+      "events": "f73659df",
       "rng": {
-        "draws": 1448,
-        "digest": "6d47cfcb"
+        "draws": 1453,
+        "digest": "ba7b1538"
       },
       "label": "final",
       "players": [
@@ -976,14 +976,14 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 264,
+            "damageDealt": 263,
             "damageTaken": 34
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 264
+              "damageDealt": 263
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1173,7 +1173,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 39870,
+          "hp": 39873,
           "id": 822,
           "inCombat": true,
           "kind": "mob",
@@ -1206,7 +1206,7 @@
           "threat": [
             [
               816,
-              131
+              128
             ]
           ],
           "weapon": {
@@ -1227,7 +1227,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 39866,
+          "hp": 39864,
           "id": 823,
           "inCombat": true,
           "kind": "mob",
@@ -1260,7 +1260,7 @@
           "threat": [
             [
               816,
-              135
+              137
             ]
           ],
           "weapon": {
