@@ -337,6 +337,11 @@ import {
 import type { GuildRank, Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
+import { createPokerService } from './poker_service';
+// Imported from the mirror module DIRECTLY (not the ./steam barrel), the same
+// way deeds_records imports onDeedRecorded: the barrel drags routes.ts (and its
+// load-time requireAccount over the db module) into every test that
+// partial-mocks the db, the known overlay-mock breakage class.
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
@@ -726,6 +731,13 @@ type ClientMessage = Record<string, unknown> & {
   q?: string;
   quest?: string;
   r?: string;
+  tableId?: string;
+  handNumber?: number;
+  actionSequence?: number;
+  action?: unknown;
+  seatIndex?: number;
+  copper?: number;
+  watch?: boolean;
   rid?: number;
   role?: string;
   roles?: unknown;
@@ -1886,6 +1898,11 @@ export class GameServer {
   private readonly moderation: ModerationService<ClientSession>;
   private readonly generalChatQuota: GeneralChatQuotaCoordinator;
   private readonly generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
+  private readonly pokerService = createPokerService({
+    db: { query: (text, values) => pool.query(text, values) },
+    featureEnabled: () => process.env.POKER_FEATURE_ENABLED === '1',
+    nowMs: () => Date.now(),
+  });
   private wireCache = new Map<number, EntityWireCache>();
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
@@ -6613,6 +6630,22 @@ export class GameServer {
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
       return;
     }
+    if (msg.t === 'poker_action') {
+      void this.handlePokerAction(session, msg, receivedAtMs);
+      return;
+    }
+    if (msg.t === 'poker_join') {
+      void this.handlePokerJoin(session, msg);
+      return;
+    }
+    if (msg.t === 'poker_leave') {
+      void this.handlePokerLeave(session, msg);
+      return;
+    }
+    if (msg.t === 'poker_watch') {
+      void this.handlePokerWatch(session, msg);
+      return;
+    }
     if (msg.t !== 'cmd') {
       this.botDetector.observeProtocolAnomaly(
         session.botTrackingContext,
@@ -10854,6 +10887,70 @@ export class GameServer {
     delete session.lastSent.dcomp;
     delete session.lastSent.dclears;
     delete session.lastSent.delveDaily;
+  }
+
+  private async handlePokerJoin(session: ClientSession, msg: ClientMessage): Promise<void> {
+    if (!this.pokerEnabled()) {
+      this.send(session, { t: 'poker_error', error: 'Poker feature is disabled' });
+      return;
+    }
+    const tableId = typeof msg.tableId === 'string' ? msg.tableId : '';
+    const seatIndex = typeof msg.seatIndex === 'number' ? msg.seatIndex : 0;
+    await this.pokerService.buyIn({
+      tableId,
+      accountId: session.accountId,
+      characterId: session.characterId,
+      seatIndex,
+      copper: typeof msg.copper === 'number' ? msg.copper : 2_000,
+    }).catch((err) => {
+      this.send(session, { t: 'poker_error', error: String(err.message ?? err) });
+    });
+    this.send(session, { t: 'poker_snapshot', snapshot: this.pokerService.snapshot(tableId, session.characterId) });
+  }
+
+  private async handlePokerLeave(session: ClientSession, msg: ClientMessage): Promise<void> {
+    const tableId = typeof msg.tableId === 'string' ? msg.tableId : '';
+    await this.pokerService.leaveTable({ tableId, characterId: session.characterId });
+    this.send(session, { t: 'poker_snapshot', snapshot: this.pokerService.snapshot(tableId, session.characterId) });
+  }
+
+  private async handlePokerWatch(session: ClientSession, msg: ClientMessage): Promise<void> {
+    const tableId = typeof msg.tableId === 'string' ? msg.tableId : '';
+    this.send(session, { t: 'poker_snapshot', snapshot: this.pokerService.snapshot(tableId, null) });
+  }
+
+  private async handlePokerAction(session: ClientSession, msg: ClientMessage, receivedAtMs: number): Promise<void> {
+    if (!this.pokerEnabled()) {
+      this.send(session, { t: 'poker_error', error: 'Poker feature is disabled' });
+      return;
+    }
+    const tableId = typeof msg.tableId === 'string' ? msg.tableId : '';
+    const action = msg.action;
+    if (!tableId || !action || typeof action !== 'object') {
+      this.send(session, { t: 'poker_error', error: 'Invalid action' });
+      return;
+    }
+    const actionType = (action as Record<string, unknown>).type;
+    const mappedAction = actionType === 'fold' || actionType === 'check' || actionType === 'call'
+      ? { type: actionType }
+      : actionType === 'bet' || actionType === 'raise'
+        ? { type: actionType, to: Number((action as Record<string, unknown>).to ?? 0) }
+        : actionType === 'all-in'
+          ? { type: 'all-in' }
+          : null;
+    if (!mappedAction) {
+      this.send(session, { t: 'poker_error', error: 'Invalid action' });
+      return;
+    }
+    await this.pokerService.act(tableId, session.characterId, mappedAction).catch((err) => {
+      this.send(session, { t: 'poker_error', error: String(err.message ?? err) });
+    });
+    this.send(session, { t: 'poker_snapshot', snapshot: this.pokerService.snapshot(tableId, session.characterId) });
+    void receivedAtMs;
+  }
+
+  private pokerEnabled(): boolean {
+    return process.env.POKER_FEATURE_ENABLED === '1';
   }
 
   private send(session: ClientSession, obj: unknown): void {

@@ -284,6 +284,24 @@ export class PokerTable {
     this.assertChipConservation();
   }
 
+  addToStack(playerId: PokerPlayerId, amount: number): void {
+    validateInteger(amount, 'Stack addition', 1);
+    const found = this.seatForPlayer(playerId);
+    pokerInvariant(found, 'Player is not seated');
+    pokerInvariant(!this.handValue, 'Players may rebuy only between hands');
+    pokerInvariant(
+      Number.isSafeInteger(found.seat.stack + amount),
+      'Rebuy exceeds the safe chip range',
+    );
+    pokerInvariant(
+      found.seat.stack + amount <= this.configValue.maxBuyIn,
+      'Rebuy exceeds the table maximum',
+    );
+    found.seat.stack += amount;
+    this.chipTotalValue += amount;
+    this.assertChipConservation();
+  }
+
   standUp(playerId: PokerPlayerId): number {
     pokerInvariant(!this.handValue, 'Players may stand only between hands');
     const found = this.seatForPlayer(playerId);
