@@ -303,14 +303,25 @@ describe('mandatory interaction-landmark prewarm', () => {
   it('bounds parallel compile readiness and makes the no-parallel path immediate', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const gateStart = renderer.indexOf('private gateViewOnCompile(');
-    const gateEnd = renderer.indexOf('\n  /** The visual the player currently sees', gateStart);
+    // The view gate now has siblings (gateSwapOnCompile / gateSwapFlagOnCompile)
+    // between it and the old anchor, so end at the first sibling instead: the
+    // wider slice would pass on text belonging to a different gate.
+    const gateEnd = renderer.indexOf('\n  // Sibling to gateViewOnCompile', gateStart);
     const gate = renderer.slice(gateStart, gateEnd);
     expect(gateStart).toBeGreaterThan(-1);
     expect(gateEnd).toBeGreaterThan(gateStart);
     expect(gate).toContain('if (!this.asyncCompileSupported) return null;');
-    expect(gate).toContain('const guard = setTimeout(clear, VIEW_COMPILE_GATE_MAX_MS);');
     expect(gate).toContain('view.compilePending = false;');
-    expect(gate).toContain('resolve();');
+    // The bounded race itself moved out of this method into the shared
+    // compileGate helper (compile_gate.ts's raceCompileGate), so pin BOTH
+    // halves: the gate delegates, and the helper still applies the bound.
+    // Pinning only the delegation would let the timeout disappear silently.
+    expect(gate).toContain('this.compileGate(group)');
+    const helperStart = renderer.indexOf('private compileGate(');
+    const helper = renderer.slice(helperStart, renderer.indexOf('\n  }', helperStart));
+    expect(helperStart).toBeGreaterThan(-1);
+    expect(helper).toContain('raceCompileGate(');
+    expect(helper).toContain('VIEW_COMPILE_GATE_MAX_MS');
   });
 });
 
