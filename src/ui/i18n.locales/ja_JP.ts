@@ -9560,6 +9560,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.maxHpPct': '最大体力を{pct}%上昇させる',
   'hud.combat.floatingParry': '受け流し',
   'hud.combat.parried': '{target}は{ability}を受け流しました。',
+  'hud.combat.floatingEvade': '完全回避',
+  'hud.combat.evaded': '{target}は{ability}を完全回避しました。',
   'hudChrome.options.mouseoverCast': 'パーティフレームでマウスオーバーキャスト',
   'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
   'hudChrome.options.stickyTarget': '地面クリックでターゲットを維持',

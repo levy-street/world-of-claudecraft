@@ -9122,6 +9122,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.maxHpPct': '最大生命值提高 {pct}%',
   'hud.combat.floatingParry': '招架',
   'hud.combat.parried': '你的{ability}被{target}招架了。',
+  'hud.combat.floatingEvade': '迴避',
+  'hud.combat.evaded': '你的{ability}被{target}迴避了。',
   'hudChrome.options.mouseoverCast': '對隊伍框架滑鼠指向施法',
   'hudChrome.options.showTargetOfTarget': '顯示目標的目標',
   'hudChrome.options.stickyTarget': '點擊地面時保留目標',

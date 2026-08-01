@@ -9442,11 +9442,16 @@ export class Hud {
         }
         if ((ev.absorbed ?? 0) > 0 || ev.kind === 'block')
           this.combat('combat_block', tp.x, tp.y, tp.z, 0.55);
-        // The miss/dodge/resist/parry "avoid" cues are interface feedback (they report
-        // an outcome, not a world impact), so the Interface & Feedback Sounds toggle
-        // silences them. The early return stays either way, so a muted avoid never
-        // falls through to an impact sound.
-        if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
+        // The miss/dodge/resist/parry/evade "avoid" cues are interface feedback (they
+        // report an outcome, not a world impact), so the Interface & Feedback Sounds
+        // toggle silences them. The early return stays either way, so a muted avoid
+        // never falls through to an impact sound.
+        if (
+          ev.kind === 'miss' ||
+          ev.kind === 'dodge' ||
+          ev.kind === 'resist' ||
+          ev.kind === 'evade'
+        ) {
           if (audio.feedbackEnabled) this.combat('combat_dodge', tp.x, tp.y, tp.z, 0.5);
           return;
         }
@@ -9726,7 +9731,8 @@ export class Hud {
             ev.kind === 'miss' ||
             ev.kind === 'dodge' ||
             ev.kind === 'parry' ||
-            ev.kind === 'resist'
+            ev.kind === 'resist' ||
+            ev.kind === 'evade'
           ) {
             // self vs other (carried on the shape's isSelf) drives the avoidance colour
             // token (#bbb vs #fff); the localized word stays at the call site. A resisted
@@ -9751,7 +9757,9 @@ export class Hud {
                         ? t('hud.combat.floatingDodge')
                         : ev.kind === 'parry'
                           ? t('hud.combat.floatingParry')
-                          : t('hud.combat.floatingResist'),
+                          : ev.kind === 'evade'
+                            ? t('hud.combat.floatingEvade')
+                            : t('hud.combat.floatingResist'),
                   target: tgt,
                 },
                 now,
@@ -9769,7 +9777,9 @@ export class Hud {
                     ? 'hud.combat.dodged'
                     : ev.kind === 'parry'
                       ? 'hud.combat.parried'
-                      : 'hud.combat.resisted';
+                      : ev.kind === 'evade'
+                        ? 'hud.combat.evaded'
+                        : 'hud.combat.resisted';
               this.combatLog(
                 t(logKey, {
                   ability: combatAbilityName(ev.ability),
