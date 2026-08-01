@@ -137,8 +137,11 @@ describe('live post pipeline', () => {
     expect(bloom.compositeMaterial.fragmentShader).not.toContain('bloomTintColors');
     expect(
       bloom.compositeMaterial.fragmentShader.match(
-        /lerpBloomFactor\(bloomFactors\[\d]\) \* texture2D/g,
+        /lerpBloomFactor\s*\(\s*bloomFactors\s*\[\s*\d\s*\]\s*\)/g,
       ),
+    ).toHaveLength(5);
+    expect(
+      bloom.compositeMaterial.fragmentShader.match(/texture2D\s*\(\s*blurTexture[1-5]\s*,/g),
     ).toHaveLength(5);
   });
 
