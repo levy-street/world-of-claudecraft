@@ -21,3 +21,16 @@ export function freezeStaticMatrices(root: THREE.Object3D): void {
     o.matrixAutoUpdate = false;
   });
 }
+
+/**
+ * Freeze a subtree whose complete membership and transforms are final.
+ *
+ * matrixAutoUpdate=false avoids local recomposition, but Three still descends
+ * into that object on every scene update. Disabling matrixWorldAutoUpdate on
+ * the subtree root lets the parent scene skip the whole static branch. Callers
+ * must not add transform-bearing descendants after this stronger freeze.
+ */
+export function freezeStaticSubtreeMatrices(root: THREE.Object3D): void {
+  freezeStaticMatrices(root);
+  root.matrixWorldAutoUpdate = false;
+}

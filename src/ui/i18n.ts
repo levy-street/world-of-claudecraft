@@ -160,13 +160,22 @@ if (typeof window !== 'undefined' && window.location) {
   currentLanguage = getStoredLanguage() ?? currentLanguage;
 }
 
+let resolutionRevision = pseudoActive || currentLanguage !== 'en' ? 1 : 0;
+
 export function getLanguage(): SupportedLanguage {
   return currentLanguage;
 }
 
+/** Monotonic token for cached UI whose resolved catalog text can change. */
+export function getI18nRevision(): number {
+  return resolutionRevision;
+}
+
 export function setLanguage(lang: SupportedLanguage): void {
+  const resolutionChanged = pseudoActive || currentLanguage !== lang;
   pseudoActive = false; // selecting a real locale leaves the dev pseudo-locale
   currentLanguage = lang;
+  if (resolutionChanged) resolutionRevision++;
   setStoredLanguage(lang);
 }
 
@@ -218,6 +227,7 @@ export async function ensureLocaleLoaded(lang: SupportedLanguage): Promise<void>
       resident[lang] =
         (mod as { default?: EnTranslations }).default ??
         (mod as Record<string, EnTranslations>)[lang];
+      if (lang === currentLanguage) resolutionRevision++;
       inflight.delete(lang);
     })
     .catch((err) => {

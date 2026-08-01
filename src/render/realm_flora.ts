@@ -33,8 +33,16 @@ import {
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { cloneGeometryForBake } from './geometry_bake_clone';
 import { GFX, surfaceMat } from './gfx';
 import { MIST_DRIFT_AMPLITUDE, SEA_LIGHT_RAYS, SEA_MIST_BANKS } from './sea_mist_core';
+import {
+  applySurfaceDetail,
+  applyWornStone,
+  detailedSurfaceMat,
+  GREAT_TREE_BARK_DETAIL,
+  isBarkMaterialName,
+} from './worn_stone';
 
 const MUSHROOM_URLS = ['/models/props/mushroom_red.glb', '/models/props/mushroom_tan.glb'];
 const BOULDER_URL = '/models/props/rock_large_d.glb';
@@ -73,13 +81,7 @@ for (const url of new Set([...MUSHROOM_URLS, BOULDER_URL, ...SEA_ROCK_URLS])) {
       gltf.scene.traverse((obj) => {
         const mesh = obj as THREE.Mesh;
         if (!mesh.isMesh) return;
-        const src = mesh.geometry;
-        const geo = new THREE.BufferGeometry();
-        for (const name of ['position', 'normal', 'uv']) {
-          const attr = src.getAttribute(name);
-          if (attr) geo.setAttribute(name, attr.clone());
-        }
-        if (src.index) geo.setIndex(src.index.clone());
+        const geo = cloneGeometryForBake(mesh.geometry);
         geo.applyMatrix4(mesh.matrixWorld);
         parts.push({ geometry: geo, material: mesh.material as THREE.Material });
       });
@@ -826,9 +828,12 @@ export function buildRealmFlora(seed: number): RealmFloraView {
 
   // --- weeping willows on the lakeshores ---
   const willow = willowGeo();
-  instance(willow.trunk, surfaceMat({ color: WILLOW_BARK, roughness: 0.9 }), spots.willows, {
-    castShadow: true,
-  });
+  instance(
+    willow.trunk,
+    detailedSurfaceMat({ color: WILLOW_BARK, roughness: 0.9 }, 'bark'),
+    spots.willows,
+    { castShadow: true },
+  );
   instance(
     perFaceShade(willow.canopy, 0.12, seed + 621),
     floraMat({ color: WILLOW_LEAF, roughness: 0.85, flatShading: true, vertexColors: true }),
@@ -838,9 +843,12 @@ export function buildRealmFlora(seed: number): RealmFloraView {
 
   // --- blossom trees, two pinks ---
   const blossom = blossomGeo();
-  instance(blossom.trunk, surfaceMat({ color: BLOSSOM_BARK, roughness: 0.9 }), spots.blossoms, {
-    castShadow: true,
-  });
+  instance(
+    blossom.trunk,
+    detailedSurfaceMat({ color: BLOSSOM_BARK, roughness: 0.9 }, 'bark'),
+    spots.blossoms,
+    { castShadow: true },
+  );
   const blossomShaded = perFaceShade(blossom.canopy, 0.15, seed + 631, 0.12);
   for (const variant of [0, 1]) {
     instance(
@@ -867,6 +875,9 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         const nm = (part.material.name || '').toLowerCase();
         mat.color.set(nm.includes('grass') ? 0x6f7a76 : 0x8a8e93);
       }
+      // untextured kit rock: the worn triplanar layer can run a touch
+      // stronger here without fighting a palette map (the minerock strength)
+      applyWornStone(mat, { strength: 0.6 });
       instance(part.geometry, mat, spots.boulders, { sink: 0.12, castShadow: true });
     }
   }
@@ -884,6 +895,9 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         const mat = part.material.clone() as THREE.MeshStandardMaterial;
         if ('color' in mat) mat.color.multiply(new THREE.Color(SEA_STONE));
         if ('roughness' in mat) mat.roughness = 0.95;
+        // sea-worn stone: default subtle strength, mortar grime reads as salt
+        // staining at the waterline
+        applyWornStone(mat);
         instance(part.geometry, mat, rocks, {
           sink: 0.18,
           castShadow: true,
@@ -1075,11 +1089,27 @@ export function buildRealmFlora(seed: number): RealmFloraView {
     tree.position.set(tx, terrainHeight(tx, tz, seed) - 0.2, tz);
     tree.scale.setScalar(6.5);
     tree.rotation.y = 0.8;
+    // The loader cache is immutable: clone the trunk material before giving
+    // the giant its coarse landmark bark grain (leaves keep the clean sheet).
+    const barked = new Map<string, THREE.Material>();
+    const barkify = (source: THREE.Material): THREE.Material => {
+      if (!isBarkMaterialName(source.name)) return source;
+      let m = barked.get(source.uuid);
+      if (!m) {
+        m = source.clone();
+        applySurfaceDetail(m as THREE.MeshStandardMaterial, 'bark', GREAT_TREE_BARK_DETAIL);
+        barked.set(source.uuid, m);
+      }
+      return m;
+    };
     tree.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
       if (mesh.isMesh) {
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+        mesh.material = Array.isArray(mesh.material)
+          ? mesh.material.map(barkify)
+          : barkify(mesh.material);
       }
     });
     group.add(tree);

@@ -268,6 +268,12 @@ export class Profiler {
     this.targetFps = opts.targetFps ?? 60;
     this.browserPath = opts.browserPath ?? process.env.BROWSER_PATH ?? BROWSER_PATH;
     this.shotDir = opts.shotDir ?? process.env.PROF_SHOT ?? null; // screenshot each sample (overlay visible)
+    this.extraArgs = opts.extraArgs ?? []; // extra Chromium switches (e.g. occlusion opt-outs)
+    // Headless SwiftShader mode: correct pixels with no window at all, immune to
+    // window occlusion (an occluded headed window stops producing frames and
+    // wedges Page.captureScreenshot). Software raster: never use it for perf
+    // numbers, only for visual capture (same trade as scripts/perf_tour.mjs).
+    this.headless = opts.headless ?? false;
     this.uniq = (process.env.PROF_UNIQ ?? `${Date.now().toString(36)}${process.pid.toString(36)}`)
       .replace(/[^a-z0-9]/gi, '')
       .slice(-10);
@@ -283,20 +289,29 @@ export class Profiler {
   async launch() {
     this.browser = await puppeteer.launch({
       executablePath: this.browserPath,
-      headless: false,
+      headless: this.headless ? 'new' : false,
       protocolTimeout: 180000,
-      args: [
-        `--window-size=${this.width},${this.height + 120}`,
-        '--ignore-gpu-blocklist',
-        '--enable-gpu',
-        '--disable-gpu-vsync',
-        '--disable-frame-rate-limit',
-        '--autoplay-policy=no-user-gesture-required',
-        // Chrome-for-Testing's default Wayland ozone can hang window creation on
-        // nvidia desktops (e.g. after a suspend/resume); XWayland is reliable and
-        // renders on the same GPU. Only where XWayland actually exists.
-        ...(process.env.WAYLAND_DISPLAY && process.env.DISPLAY ? ['--ozone-platform=x11'] : []),
-      ],
+      args: this.headless
+        ? [
+            `--window-size=${this.width},${this.height + 120}`,
+            '--use-angle=swiftshader',
+            '--enable-unsafe-swiftshader',
+            '--autoplay-policy=no-user-gesture-required',
+            ...this.extraArgs,
+          ]
+        : [
+            `--window-size=${this.width},${this.height + 120}`,
+            '--ignore-gpu-blocklist',
+            '--enable-gpu',
+            '--disable-gpu-vsync',
+            '--disable-frame-rate-limit',
+            '--autoplay-policy=no-user-gesture-required',
+            // Chrome-for-Testing's default Wayland ozone can hang window creation on
+            // nvidia desktops (e.g. after a suspend/resume); XWayland is reliable and
+            // renders on the same GPU. Only where XWayland actually exists.
+            ...(process.env.WAYLAND_DISPLAY && process.env.DISPLAY ? ['--ozone-platform=x11'] : []),
+            ...this.extraArgs,
+          ],
     });
     this.page = await this.browser.newPage();
     await this.page.setViewport({
@@ -312,11 +327,18 @@ export class Profiler {
     return tier ? `&gfx=${tier}` : '';
   }
 
-  async enter({ mode = 'offline', cls = 'warrior', tier } = {}) {
+  async enter({
+    mode = 'offline',
+    cls = 'warrior',
+    tier,
+    selectorTimeoutMs,
+    gameBootTimeoutMs,
+    extraQuery = '',
+  } = {}) {
     this.mode = mode;
     const page = this.page;
     if (mode === 'offline') {
-      await page.goto(`${this.gameUrl}/?perf${this.gfxQs(tier)}`, {
+      await page.goto(`${this.gameUrl}/?perf${this.gfxQs(tier)}${extraQuery}`, {
         waitUntil: 'domcontentloaded',
         timeout: 60000,
       });
@@ -324,7 +346,13 @@ export class Profiler {
       // name -> class -> Enter World -> Welcome Screen Continue -> intro/tutorial
       // dismissal. The Welcome Screen (#ws-continue) has gated world entry since
       // the v0.27.0 merge; driving it by hand here would drift again.
-      await enterOfflineGame(page, { charClass: cls, charName: 'Probe', settleMs: 0 });
+      await enterOfflineGame(page, {
+        charClass: cls,
+        charName: 'Probe',
+        settleMs: 0,
+        selectorTimeoutMs,
+        gameBootTimeoutMs,
+      });
     } else {
       const u = `prof_cam_${this.uniq}`;
       await api(
@@ -334,7 +362,7 @@ export class Profiler {
         undefined,
         '172.31.0.1',
       );
-      await page.goto(`${this.gameUrl}/?perf${this.gfxQs(tier)}`, {
+      await page.goto(`${this.gameUrl}/?perf${this.gfxQs(tier)}${extraQuery}`, {
         waitUntil: 'domcontentloaded',
         timeout: 60000,
       });
@@ -410,7 +438,10 @@ export class Profiler {
       await page.waitForFunction(
         () => window.__game?.world?.player && window.__game?.perf?.report,
         {
-          timeout: 30000,
+          // The heavy tiers (ultra, insane) can spend well over 30s in boot
+          // prewarm/shader compile on a cold cache; keep 30s the default and let
+          // slow-boot callers widen it, matching perf_tour's PERF_BOOT_TIMEOUT_MS.
+          timeout: Number(process.env.PROF_BOOT_TIMEOUT_MS ?? 30000),
           polling: 300,
         },
       );

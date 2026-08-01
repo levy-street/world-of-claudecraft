@@ -11,6 +11,7 @@ import {
   governorDrawSignal,
 } from '../src/render/draw_stats_core';
 import { GFX_CONFIG_VERSION } from '../src/render/gfx';
+import { assertAllocationStable } from './util/alloc_probe';
 
 const counters = (
   calls: number,
@@ -20,6 +21,24 @@ const counters = (
 ): DrawStatsCounters => ({ calls, triangles, points, lines });
 
 describe('draw_stats_core', () => {
+  it('fills one caller-owned frame counter on the composer hot path', () => {
+    const acc = createDrawStatsAccumulator();
+    const read = counters(0, 0, 0, 0);
+    const out = counters(0, 0, 0, 0);
+    acc.beginFrame(read, out);
+    expect(() =>
+      assertAllocationStable(
+        () => {
+          read.calls++;
+          read.triangles += 10;
+          return acc.beginFrame(read, out);
+        },
+        64,
+        'draw stats frame',
+      ),
+    ).not.toThrow();
+  });
+
   it('accumulates across passes: consecutive monotonic reads become per-frame deltas', () => {
     const acc = createDrawStatsAccumulator();
     acc.beginFrame(counters(0, 0, 0, 0)); // baseline capture, return discarded
@@ -97,10 +116,10 @@ describe('draw_stats_core', () => {
     expect(first.calls).not.toBe(5300);
   });
 
-  it('pins the R2 config version that segments the new draw-count semantics', () => {
-    // Deliberate future bumps move this pin; it exists to catch an accidental
-    // revert of the packet 0 ruling R2 segmentation marker.
-    expect(GFX_CONFIG_VERSION).toBe(18);
+  it('pins the config version that segments perceptual scenery LOD telemetry', () => {
+    // Deliberate future bumps move this pin; v19 separates the first relaxed
+    // scenery contract from the pixel-exact v18 renderer.
+    expect(GFX_CONFIG_VERSION).toBe(19);
   });
 
   it('clamps a backward counter jump at zero, per field, and recovers', () => {

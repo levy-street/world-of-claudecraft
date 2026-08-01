@@ -43,6 +43,9 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
+- `skin_gpu_layout.ts`: compacts merged palettes to every matrix the shader
+  fetches, narrows exact joint indices, and crops unused RGBA32F bone-texture
+  rows without changing skin weights, matrix values, draws, or shader math.
 - `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/ghost
   plumbing, one-shot triggers, death/revive edge logic.
 - `preview.ts`: `CharacterPreview`, the character-creation turntable (own scene/

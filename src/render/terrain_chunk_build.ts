@@ -2,7 +2,7 @@
 // the row-wise fills that write plain typed arrays.
 //
 // Split out of terrain.ts because none of it touches WebGL. It writes
-// Float32Array / Uint32Array and nothing else, so it can run off the main
+// Float32Array / Uint16Array and nothing else, so it can run off the main
 // thread; terrain.ts keeps finishChunkGeometry, which is the only part that
 // needs Three's BufferGeometry, and every other WebGL-side concern.
 //
@@ -40,6 +40,10 @@ import { meshTerrainHeight } from './terrain_mesh_height';
 
 const SKIRT_DROP = 0.3;
 const SLOPE_EPS = 1.5; // matches the legacy color pass so tints don't shift
+// Three-quad tiles keep a compact working set across both diagonal choices.
+// The old full-row walk evicted one grid row before the next quad could reuse
+// it on the 25-52-quad chunk widths.
+const INDEX_TILE_QUADS = 3;
 const BIOME_PALETTE: Record<
   BiomeId,
   { grass: number; grassDark: number; grassYellow: number; dirt: number; sand: number }
@@ -309,6 +313,33 @@ function lerpSplat(w: [number, number, number, number], layer: 0 | 1 | 2 | 3, t:
 
 // One terrain sample: height, analytic normal, legacy tint color and splat
 // weights. Both tiers use the color; only the splat tier consumes weights.
+// The grass colour the terrain itself would paint at (x, z): the zone-blended
+// palette plus the same two fbm patch-noise layers the vertex tint uses.
+// Foliage keys tuft and dressing tints off this so ground cover reads as
+// growing out of the meadow instead of sitting on top of it (a flat biome
+// constant left grass arithmetically decoupled from the ground under it).
+export function groundGrassColorAt(
+  x: number,
+  z: number,
+  seed: number,
+  out: THREE.Color,
+): THREE.Color {
+  paletteAt(x, z);
+  const v = groundLushnessAt(x, z, seed);
+  out.copy(grassC).lerp(grassDarkC, v);
+  const v2 = fbm2(x * 0.16, z * 0.16, seed + 59, 2);
+  out.lerp(grassYellowC, v2 * 0.35);
+  return out;
+}
+
+// The dark-patch weight of the grass palette (0 = yellowed open ground,
+// 1 = deep lush green), exposed so grass PLACEMENT can follow the same
+// noise the ground colour does: dense tall stands on the lush patches,
+// thinning to bare ground between them.
+export function groundLushnessAt(x: number, z: number, seed: number): number {
+  return fbm2(x * 0.045, z * 0.045, seed + 53, 3);
+}
+
 function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): VertexSample {
   const h = meshTerrainHeight(x, z, seed);
   const hx = meshTerrainHeight(x + SLOPE_EPS, z, seed) - meshTerrainHeight(x - SLOPE_EPS, z, seed);
@@ -532,7 +563,7 @@ export interface ChunkGeometryArrays {
   uvs: Float32Array;
   splats: Float32Array | null;
   extras: Float32Array | null;
-  indices: Uint32Array;
+  indices: Uint16Array;
 }
 
 export interface ChunkGeometryBuildState extends ChunkGeometryArrays {
@@ -579,7 +610,13 @@ export function beginChunkGeometry(
   const extras = withSplat ? new Float32Array(count * 4) : null;
   const quadsX = gw - 1,
     quadsZ = gh - 1;
-  const indices = new Uint32Array(quadsX * quadsZ * 6);
+  // WebGL2 reserves 65535 as the fixed primitive-restart index. The largest
+  // current chunk has 2,809 vertices, but keep the exact safety condition
+  // beside the narrowing in case the chunk ladder changes later.
+  if (count > 0xffff) {
+    throw new Error(`Terrain chunk has ${count} vertices; Uint16 indices require at most 65535`);
+  }
+  const indices = new Uint16Array(quadsX * quadsZ * 6);
   return {
     nx,
     nz,
@@ -652,8 +689,18 @@ export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): 
 
 export function fillChunkIndexRow(state: ChunkGeometryBuildState, gj: number): void {
   const quadsX = state.gw - 1;
-  let k = gj * quadsX * 6;
+  const quadsZ = state.gh - 1;
+  const tileRowStart = Math.floor(gj / INDEX_TILE_QUADS) * INDEX_TILE_QUADS;
+  const tileHeight = Math.min(INDEX_TILE_QUADS, quadsZ - tileRowStart);
   for (let gi = 0; gi < quadsX; gi++) {
+    const tileColumnStart = Math.floor(gi / INDEX_TILE_QUADS) * INDEX_TILE_QUADS;
+    const tileWidth = Math.min(INDEX_TILE_QUADS, quadsX - tileColumnStart);
+    const cellOffset =
+      tileRowStart * quadsX +
+      tileColumnStart * tileHeight +
+      (gj - tileRowStart) * tileWidth +
+      (gi - tileColumnStart);
+    let k = cellOffset * 6;
     const a = gj * state.gw + gi;
     const b = a + 1;
     const c = a + state.gw;

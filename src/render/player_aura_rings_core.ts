@@ -20,7 +20,7 @@ export interface PlayerAuraOrnamentSpec {
   angularSpeed: number;
 }
 
-export type PlayerAuraRingQualityTier = 'low' | 'medium' | 'high' | 'ultra';
+export type PlayerAuraRingQualityTier = 'low' | 'medium' | 'high' | 'ultra' | 'insane';
 
 export interface PlayerAuraRingQualityProfile {
   radialSegments: number;

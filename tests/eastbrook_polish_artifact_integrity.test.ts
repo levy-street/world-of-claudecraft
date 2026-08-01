@@ -615,9 +615,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   'metadata/after-desktop-ultra.json',
 );
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'dec485ef88517fdf5800c9a611fc240e318f4ea5da4bc770f4f7d6c772f60f00';
+  '1276ca6bb0f63f19cd8f76ee1f4999d616b2bb006c69152713ab58752de0f623';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'b8e15eb684763ae45fe5fb4795eb4cbc4c8b651236bb9c2d1f826a391d44a9b2';
+  '9d38235f6a16ce60925c0faa28567775cbdb640f1749686c866ffeb9e5a10cb9';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1474,13 +1474,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // The 0.33.0 version sync bumped package-lock.json, a hashed input to every
-    // GLB source fingerprint, so the town/mailbox/noticeboard leaves moved, the
-    // composite polish provenance followed, and this seal follows the composite.
+    // The graphics overhaul changed the fingerprinted runtimeRender inputs, so
+    // the composite polish provenance moved and this seal follows the composite.
     // Every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '102cedcd2d5e3997b3aace8fc45332e7ae5f619aeb004c5cfba7d3c083af09a7',
+      '7c4dac9b0aca7cb191d8ab90feb0eb987eba9b1dcb70c4ff3cfee7e34aaeef26',
     );
   });
 

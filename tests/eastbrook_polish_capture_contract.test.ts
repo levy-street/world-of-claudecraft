@@ -361,14 +361,14 @@ describe('Eastbrook polish capture contract', () => {
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
       // Deliberately re-pinned: src/render/renderer.ts is the rendererIntegration
-      // leaf of this composite (capture_contract.mjs EASTBROOK_POLISH_PROVENANCE_INPUTS),
-      // and the compile-storm fix edits it, so the composite mints fresh. Only that
-      // one leaf moved: package-lock.json is byte-identical to the release tip, no
-      // GLB source fingerprint changed, no pipeline was re-run and no capture retaken
-      // (the five per-asset seal suites stay green untouched).
-      //
-      // The previous value came from #2729's version-sync re-mint.
-      fingerprint: '2d944d86b6b6d8f5b8cef860b83e22bf8eb4e477c8540adb42da8b9b8d42b094',
+      // leaf of this composite (capture_contract.mjs EASTBROOK_POLISH_PROVENANCE_INPUTS).
+      // Both sides of this merge edit it, the graphics overhaul on release and the
+      // compile-storm gates here, so the composite mints fresh once for the merged
+      // file rather than matching either parent's value. Only the runtimeRender
+      // leaves moved: the GLB source fingerprints and package-lock.json are
+      // unchanged from release/v0.33.0, no pipeline was re-run and no capture
+      // retaken (the five per-asset seal suites stay green untouched).
+      fingerprint: 'ac834467455e36a01485ba848674d454d84ea304078b7e4d7177045e5dcf373e',
       components: {
         captureContract: {
           id: 'polish-v2',
