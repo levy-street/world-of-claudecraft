@@ -1004,14 +1004,9 @@ export class CharacterVisual {
   }
 
   /** Swap the body skin (alternate texture atlas) at runtime; no-op if unchanged.
-   *  Reuses the shared skin-keyed material cache, so this is a cheap reassign.
-   *  Returns the root whose materials just changed (for the caller's compile
-   *  gate, see renderer.ts's gateSwapFlagOnCompile), or null on a no-op. The
-   *  deferred re-apply below (the atlas arriving late) is NOT covered: it is a
-   *  texture-only reassign onto an already-compiled shader shape, not a new
-   *  program. */
-  setSkin(skinIndex: number): THREE.Object3D | null {
-    if (skinIndex === this.skinIndex) return null;
+   *  Reuses the shared skin-keyed material cache, so this is a cheap reassign. */
+  setSkin(skinIndex: number): void {
+    if (skinIndex === this.skinIndex) return;
     this.skinIndex = skinIndex;
     this.applySkinMaterials(skinIndex);
     // If the alternate atlas for this skin has not finished loading yet,
@@ -1030,7 +1025,6 @@ export class CharacterVisual {
         })
         .catch((err) => console.error('failed to load skin atlas:', err));
     }
-    return this.root;
   }
 
   private applySkinMaterials(skinIndex: number): void {
