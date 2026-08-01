@@ -184,8 +184,8 @@ export const PALMREACH_MOBS: Record<string, MobTemplate> = {
     // Carved stone walking its own drowned ring: every movement step (chase
     // and wander alike) passes straight through the toppled relics at the
     // ring's heart (same knob as Thunzharr, zone3.ts). Without this it wedges
-    // on the relic colliders ~6.9yd from its target — 0.4yd past its
-    // stationary reach — and stands there forever without swinging.
+    // on the relic colliders ~6.9yd from its target, 0.4yd past its
+    // stationary reach, and stands there forever without swinging.
     phasesThroughObstacles: true,
     loot: [{ copper: 450, chance: 1 }],
     scale: 1.5,

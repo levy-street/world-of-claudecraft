@@ -7,13 +7,13 @@
 // froze standing; the ravager's 2.25s swing cadence reset the attack one-shot
 // before its peak, so no swing ever read. Fixes baked here, in the data:
 //
-//   Death  — replaced with a synthesized ~1.8s topple: the body tips about its
+//   Death  - replaced with a synthesized ~1.8s topple: the body tips about its
 //            left-right axis while the hips sink to the floor, with a small
 //            impact bounce, ending clamped flat. The last keyframe IS the
 //            corpse pose.
-//   Attack — trimmed to the measured strike window [1.0s, 3.0s] (ramp-up
+//   Attack - trimmed to the measured strike window [1.0s, 3.0s] (ramp-up
 //            67deg..132deg peak..follow-through on R_Upperarm), rebased to 2.0s.
-//   Hit    — trimmed to the first 0.7s of the flinch (house convention is a
+//   Hit    - trimmed to the first 0.7s of the flinch (house convention is a
 //            0.45-0.7s hit-react; the one-shot fade-out supplies the recovery).
 //
 //   node scripts/_add_wildheart_death_anim.mjs [in.glb] [out.glb]
@@ -28,7 +28,7 @@
 // preserves).
 //
 // AXIS NOTE: this is the 41-joint Tripo biped (Root/Hip/Pelvis/Waist/...),
-// authored facing local +X — every wildheart VisualDef corrects with
+// authored facing local +X, every wildheart VisualDef corrects with
 // yaw: -Math.PI/2 (manifest.ts). Nothing here hardcodes that frame: the topple
 // axis, per-bone slump directions, and the tip angle that lands the spine flat
 // are all derived from the rig's measured rest orientation, and the written

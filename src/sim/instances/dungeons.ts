@@ -215,8 +215,8 @@ export function heroicLockoutId(dungeonId: string): string {
 export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
   if (p.kind !== 'player') return;
   if (p.pos.x > DUNGEON_X_THRESHOLD) {
-    // inside: walking into the entrance exit — or the boss-death portal a
-    // bossExitPortal dungeon opens at the far end — climbs back out
+    // inside: walking into the entrance exit, or the boss-death portal a
+    // bossExitPortal dungeon opens at the far end, climbs back out
     for (const inst of ctx.instances) {
       for (const exitId of [inst.exitId, inst.bossExitId]) {
         if (exitId === null || exitId === undefined) continue;

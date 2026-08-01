@@ -1,4 +1,4 @@
-﻿// The Wildheart Basin: a level-20 open-field dungeon hidden behind the Sunken
+// The Wildheart Basin: a level-20 open-field dungeon hidden behind the Sunken
 // Idol in Palmreach. Unlike Orkadia's processional war-camp, this interior is a
 // flooded jungle caldera with two routes around a central beast island. Both
 // paths climb into one ritual terrace beneath a colossal jaguar shrine.
@@ -116,7 +116,7 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       // heuristic), so the thrower looked like it was whiffing melee swings
       // from 24yd. The roll path is unchanged (hostile petSpells take no
       // armor step; resist is school-independent), and every other petSpell
-      // in the game is a magic school — but dealDamage's school-scoped folds
+      // in the game is a magic school, but dealDamage's school-scoped folds
       // DO shift: physical-only DR (a prot warrior's Raised Guard) and the
       // physical-amp debuff stop applying to the spear, and magic-amp
       // debuffs start. Revisit the stalker's rangedDamageMultiplierByMob

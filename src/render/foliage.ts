@@ -1725,7 +1725,7 @@ export function createGrassTuftMaterial(): THREE.Material {
     // 1 - smoothstep(uFadeFar*0.7, uFadeFar, distance(vTuftWorld, uPlayerPos)),
     // so with the player parked at (1e6,1e6) a uFadeFar of 1e6 SATURATES the
     // smoothstep (every tuft sits ~1.414e6 away) and alphaTest discards every
-    // fragment — an invisible scatter. 1e8 keeps the factor at exactly 1.
+    // fragment, an invisible scatter. 1e8 keeps the factor at exactly 1.
     uPlayerPos: { value: new THREE.Vector2(1e6, 1e6) },
     uFadeFar: { value: 1e8 },
   });

@@ -518,7 +518,7 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     for (const post of gate) expect(post.r).toBeLessThanOrEqual(2.7);
     const origin = instanceOrigin(DUNGEONS.wildheart_basin.index, 0);
     // Beside the east pylon (just past the pillar's push zone: post r 2.64 +
-    // body 0.5 — the old fat circles blocked a player-sized body out past 19)
+    // body 0.5, the old fat circles blocked a player-sized body out past 19)
     // and the arch center: a 1.2yd step in every direction must resolve
     // without a collider push-back.
     for (const [sx, sz] of [

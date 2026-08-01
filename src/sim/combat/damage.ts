@@ -135,7 +135,7 @@ export function dealDamage(
     // event: the renderer keys attacker swing animations and FCT off damage
     // events, so a silent return made every melee mob look like it "follows
     // but never attacks" during god-mode playtests (the live-test report).
-    // Presentation only — no threat, procs, deed counters, or rng. Real GMs
+    // Presentation only, no threat, procs, deed counters, or rng. Real GMs
     // (production, no devCommands) stay fully silent as before.
     if (target.devGod && ctx.devCommands && source) {
       ctx.emit({

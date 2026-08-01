@@ -152,7 +152,7 @@ let groundGeometry: THREE.BufferGeometry | null = null;
 // Perimeter skirt drop: the outermost vertex ring hangs this far down, so a
 // camera ray clearing the rim ribs still lands on painted ground instead of
 // the below-horizon slice of the global sky dome (which this open-air
-// interior deliberately keeps — renderer.ts wildheartField).
+// interior deliberately keeps, renderer.ts wildheartField).
 const GROUND_SKIRT_DROP_Y = -40;
 const PAINT_WHITE = new THREE.Color(0xffffff);
 // How far the vertex paint recenters toward white on the splat tier: the real
@@ -266,7 +266,7 @@ function basinWaterMaterial(): THREE.Material {
   // permanently: a player who reaches the basin before the water normal maps
   // finish preloading builds this interior on the Lambert fallback, and a
   // one-shot cache pinned that cheap flat sheet for the whole session (the
-  // live-playtest "still looks like a path" report) — the next interior build
+  // live-playtest "still looks like a path" report), the next interior build
   // must be allowed to upgrade.
   if (waterMaterial) return waterMaterial;
   if (GFX.standardMaterials && hasWaterShaderAssets()) {
@@ -292,7 +292,7 @@ function basinWaterMaterial(): THREE.Material {
 
 // Mirrors water_core.ts (SHORE_SLOPE_SAMPLE_HALF_WIDTH / MIN_SHORE_SLOPE): the
 // water shader recovers shoreline distance as depth / slope, so the basin bake
-// must sample with the same contract the overworld planes do — just against
+// must sample with the same contract the overworld planes do, just against
 // wildheartFieldHeight instead of terrainHeight.
 const SHORE_SLOPE_SAMPLE_HALF_WIDTH = 1.5;
 const MIN_SHORE_SLOPE = 1e-3;
@@ -345,13 +345,13 @@ function buildWater(): THREE.Group {
     for (let i = 0; i <= segments; i++) {
       // From z 34, not 27: the sim's stream carve only ramps in over z 25-42,
       // and a surface floated over UNCARVED flat ground has no waterline for
-      // the contour fade to find — it reads as a pale painted sheet with
+      // the contour fade to find, it reads as a pale painted sheet with
       // geometry edges (the "footpath" report). Start where the bed exists
       // and let the emergence taper below do the rest.
       const z = 34 + (i / segments) * 143;
       const center = wildheartStreamCenter(z);
       // Wider than the carved bed on purpose: with the shader's contour
-      // edge-fade the GEOMETRY is only a canvas — the visible bank is wherever
+      // edge-fade the GEOMETRY is only a canvas, the visible bank is wherever
       // the bed meets the surface, so the strip must overshoot the wet line,
       // never clip it. Tapered at the emergence so the spring starts as a
       // trickle instead of a full-width sheet.
@@ -385,7 +385,7 @@ function buildWater(): THREE.Group {
     bakeShoreAttributes(streamGeometry, 0, 0);
     // Carve a VISUAL channel into the baked bathymetry: the stream surface
     // floats only 0.55yd over its bed, so every vertex sat inside the shader's
-    // 4.5yd foam band and 6yd shallow ramp — the whole strip rendered as pale
+    // 4.5yd foam band and 6yd shallow ramp, the whole strip rendered as pale
     // foam ("a footpath of water", per the live playtest). A parabolic
     // mid-channel boost pushes the center toward the deep color while the true
     // bank depth keeps the foam exactly on the banks. Presentation only: sim
@@ -740,7 +740,7 @@ function colorGeometry(geometry: THREE.BufferGeometry, color: number): THREE.Buf
 let rimMaterial: THREE.Material | null = null;
 
 // Opaque flat-shaded vertex-color material for the edge-closing geometry (the
-// module's vertexMaterial() is the translucent path overlay — not reusable).
+// module's vertexMaterial() is the translucent path overlay, not reusable).
 function rimVertexMaterial(): THREE.Material {
   if (rimMaterial) return rimMaterial;
   rimMaterial = GFX.standardMaterials
@@ -762,7 +762,7 @@ let ribsGeometry: THREE.BufferGeometry | null = null;
 
 // Continuous jagged limestone screens along every mesh edge (Orkadia's
 // buildBasaltRibs pattern): the straight terrain cut must never be an open
-// sightline. Merged flat-shaded opaque low-poly stacks — SwiftShader-safe —
+// sightline. Merged flat-shaded opaque low-poly stacks, SwiftShader-safe -
 // and NOT part of WILDHEART_FIELD_PLACEMENTS, so sim placement/collider
 // tables are untouched.
 function buildCalderaRimRibs(): THREE.Mesh {
@@ -775,7 +775,7 @@ function buildCalderaRimRibs(): THREE.Mesh {
       rib.translate(x, wildheartFieldHeight(x, z) + h * 0.45, z);
       stacks.push(colorGeometry(rib, tone));
     };
-    // Side screens: |x| 86-90 — OUTSIDE the ±82 collision walls and INSIDE the
+    // Side screens: |x| 86-90, OUTSIDE the ±82 collision walls and INSIDE the
     // ±92 mesh edge, so the stacks are pure scenery and need no colliders.
     for (let side = -1; side <= 1; side += 2) {
       for (let i = 0; i < 20; i++) {
