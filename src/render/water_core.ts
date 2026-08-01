@@ -144,11 +144,13 @@ export const WATER_FOAM_WIDTH_YARDS = 4.5;
 
 // Half-width of the central difference used for the seabed gradient, in yards.
 // The zone plane bakes at ~2 yard vertex spacing, so sampling wider than that
-// would smear a cove's slope into its neighbour's.
-const SHORE_SLOPE_SAMPLE_HALF_WIDTH = 1.5;
+// would smear a cove's slope into its neighbour's. Exported so interior shore
+// bakes (wildheart_terrain.ts) sample with the same contract the shader
+// expects instead of mirroring the value.
+export const SHORE_SLOPE_SAMPLE_HALF_WIDTH = 1.5;
 // Below this the seabed is flat enough that depth carries no direction, and
 // dividing by it would explode the derived shoreline distance.
-const MIN_SHORE_SLOPE = 1e-3;
+export const MIN_SHORE_SLOPE = 1e-3;
 
 /**
  * Magnitude of the seabed gradient at (x, z): yards of depth gained per yard

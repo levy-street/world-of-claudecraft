@@ -210,6 +210,15 @@ export function heroicLockoutId(dungeonId: string): string {
   return `${dungeonId}:heroic`;
 }
 
+// True when this exit-portal id is live and the player stands inside its door
+// trigger; a null id (no portal spawned) simply misses. Kept allocation-free:
+// updateDoorTriggers runs per player per tick over the whole instance pool.
+function touchesExitPortal(ctx: SimContext, p: Entity, exitId: number | null): boolean {
+  if (exitId === null) return false;
+  const exit = ctx.entities.get(exitId);
+  return exit !== undefined && dist2d(p.pos, exit.pos) < DOOR_TRIGGER_RADIUS;
+}
+
 // Walking into a dungeon door teleports you through it (no click needed).
 // Party members who walk in land in the same instance via instanceKeyFor.
 export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
@@ -218,13 +227,9 @@ export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
     // inside: walking into the entrance exit, or the boss-death portal a
     // bossExitPortal dungeon opens at the far end, climbs back out
     for (const inst of ctx.instances) {
-      for (const exitId of [inst.exitId, inst.bossExitId]) {
-        if (exitId === null || exitId === undefined) continue;
-        const exit = ctx.entities.get(exitId);
-        if (exit && dist2d(p.pos, exit.pos) < DOOR_TRIGGER_RADIUS) {
-          leaveDungeon(ctx, p.id);
-          return;
-        }
+      if (touchesExitPortal(ctx, p, inst.exitId) || touchesExitPortal(ctx, p, inst.bossExitId)) {
+        leaveDungeon(ctx, p.id);
+        return;
       }
     }
   }

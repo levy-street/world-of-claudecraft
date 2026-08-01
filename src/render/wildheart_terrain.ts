@@ -19,6 +19,11 @@ import {
   SHALLOW_COLOR,
   zeroWaveUniforms,
 } from './water';
+// The water shader recovers shoreline distance as depth / slope, so the basin
+// bake samples with the same contract the overworld planes do (against
+// wildheartFieldHeight instead of terrainHeight): import those constants rather
+// than mirroring them, so a water_core retune cannot silently desync the bake.
+import { MIN_SHORE_SLOPE, SHORE_SLOPE_SAMPLE_HALF_WIDTH } from './water_core';
 
 const GROUND_WIDTH = 184;
 const GROUND_DEPTH = 280;
@@ -289,13 +294,6 @@ function basinWaterMaterial(): THREE.Material {
   );
   return waterFallbackMaterial;
 }
-
-// Mirrors water_core.ts (SHORE_SLOPE_SAMPLE_HALF_WIDTH / MIN_SHORE_SLOPE): the
-// water shader recovers shoreline distance as depth / slope, so the basin bake
-// must sample with the same contract the overworld planes do, just against
-// wildheartFieldHeight instead of terrainHeight.
-const SHORE_SLOPE_SAMPLE_HALF_WIDTH = 1.5;
-const MIN_SHORE_SLOPE = 1e-3;
 
 /**
  * Bakes aShoreDepth/aShoreSlope for a basin water geometry. `offsetX/offsetZ`
