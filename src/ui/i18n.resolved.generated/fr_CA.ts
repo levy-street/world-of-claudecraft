@@ -2199,7 +2199,7 @@ export const fr_CA: EnTranslations = {
         "noRecipient": "Personne de ce nom ne possède de boîte aux lettres ici.",
         "tooManyParcels": "Une lettre transporte au plus {count} colis.",
         "noMailQuestItems": "Vous ne pouvez pas envoyer d'objets de quête par courrier.",
-        "noMailBound": "Cet objet est lié et ne peut pas être envoyé par courrier.",
+        "noMailBound": "Cet objet est lié et ne peut pas être envoyé par la poste.",
         "notEnoughItems": "Vous n'en avez pas autant à envoyer.",
         "cantAffordPostage": "Vous n'avez pas de quoi payer l'affranchissement.",
         "recipientBoxFull": "Sa boîte aux lettres est pleine.",
@@ -6565,12 +6565,12 @@ export const fr_CA: EnTranslations = {
       "arenaQueueTrading": "Terminez votre échange avant de rejoindre la file.",
       "arenaQueueInstance": "Vous ne pouvez pas rejoindre la file depuis une instance.",
       "tradeInProgress": "Un échange est déjà en cours.",
-      "tradeAlreadyTrading": "Ce joueur est déjà en train d’échanger.",
+      "tradeAlreadyTrading": "Ce joueur est déjà en train de faire un échange.",
       "tradeTooFar": "La cible est trop éloignée pour échanger.",
       "tradeExpired": "La demande d'échange a expiré.",
       "tradeFailed": "Échange échoué : objets ou argent indisponibles.",
       "tradeBound": "Cet objet est lié et ne peut pas être échangé.",
-      "marketListBound": "Cet objet est lié et ne peut pas être mis en vente."
+      "marketListBound": "Cet objet est lié et ne peut pas être inscrit au marché."
     },
     "logs": {
       "standUp": "Vous vous levez.",
