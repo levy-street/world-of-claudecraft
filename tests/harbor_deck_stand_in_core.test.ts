@@ -14,10 +14,18 @@ const HARBOR_SOURCE = readFileSync(new URL('../src/render/harbor.ts', import.met
 const RENDERER_SOURCE = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 const STANDARD_SHIP_SCALE =
   GRAND_FERRY_SHIP_PLAN.standardBerth.length / GRAND_FERRY_SHIP_PLAN.model.length;
+// The stand-in rides the deck SECTION the gangway meets, mirroring the render
+// module's own resolution, so a taper change moves both together or neither.
+const BOARDING_DECK =
+  GRAND_FERRY_SHIP_PLAN.decks.find(
+    (deck) =>
+      GRAND_FERRY_SHIP_PLAN.rampMatingEdge.x >= deck.x - deck.hw &&
+      GRAND_FERRY_SHIP_PLAN.rampMatingEdge.x <= deck.x + deck.hw,
+  ) ?? GRAND_FERRY_SHIP_PLAN.decks[0];
 const GENERATED_DECK_ATTACH = {
-  x: GRAND_FERRY_SHIP_PLAN.deck.x * STANDARD_SHIP_SCALE,
-  y: (GRAND_FERRY_SHIP_PLAN.deck.y - GRAND_FERRY_SHIP_PLAN.model.keelY) * STANDARD_SHIP_SCALE,
-  z: GRAND_FERRY_SHIP_PLAN.deck.z * STANDARD_SHIP_SCALE,
+  x: BOARDING_DECK.x * STANDARD_SHIP_SCALE,
+  y: (BOARDING_DECK.y - GRAND_FERRY_SHIP_PLAN.model.keelY) * STANDARD_SHIP_SCALE,
+  z: BOARDING_DECK.z * STANDARD_SHIP_SCALE,
 };
 
 describe('harbor deck stand-in core', () => {
@@ -92,10 +100,10 @@ describe('harbor deck stand-in render wiring', () => {
     );
     expect(HARBOR_SOURCE).toContain('const HARBOR_SHIP_STANDARD_SCALE =');
     expect(HARBOR_SOURCE).toContain(
-      'x: GRAND_FERRY_SHIP_PLAN.deck.x * HARBOR_SHIP_STANDARD_SCALE,',
+      'x: HARBOR_SHIP_BOARDING_DECK.x * HARBOR_SHIP_STANDARD_SCALE,',
     );
     expect(HARBOR_SOURCE).toContain(
-      '(GRAND_FERRY_SHIP_PLAN.deck.y - GRAND_FERRY_SHIP_PLAN.model.keelY) * HARBOR_SHIP_STANDARD_SCALE,',
+      '(HARBOR_SHIP_BOARDING_DECK.y - GRAND_FERRY_SHIP_PLAN.model.keelY) * HARBOR_SHIP_STANDARD_SCALE,',
     );
     expect(HARBOR_SOURCE).toContain("from './characters';");
     expect(HARBOR_SOURCE).toContain('const visual = createCharacterVisual(player);');

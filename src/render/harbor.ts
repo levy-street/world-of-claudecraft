@@ -409,11 +409,19 @@ const HARBOR_SHIP_STANDARD_SCALE =
 
 // Ship-local yards for the standard 60-yard grand ferry. The generated deck
 // center and height keep the moving player stand-in on the same authored deck.
+// The generated deck runs in sections following the hull; the stand-in rides
+// the one the gangway meets, which is the section a real rider boards onto.
+const HARBOR_SHIP_BOARDING_DECK =
+  GRAND_FERRY_SHIP_PLAN.decks.find(
+    (deck) =>
+      GRAND_FERRY_SHIP_PLAN.rampMatingEdge.x >= deck.x - deck.hw &&
+      GRAND_FERRY_SHIP_PLAN.rampMatingEdge.x <= deck.x + deck.hw,
+  ) ?? GRAND_FERRY_SHIP_PLAN.decks[0];
 const HARBOR_SHIP_DECK_STAND_IN_ATTACH = {
-  x: GRAND_FERRY_SHIP_PLAN.deck.x * HARBOR_SHIP_STANDARD_SCALE,
+  x: HARBOR_SHIP_BOARDING_DECK.x * HARBOR_SHIP_STANDARD_SCALE,
   y:
-    (GRAND_FERRY_SHIP_PLAN.deck.y - GRAND_FERRY_SHIP_PLAN.model.keelY) * HARBOR_SHIP_STANDARD_SCALE,
-  z: GRAND_FERRY_SHIP_PLAN.deck.z * HARBOR_SHIP_STANDARD_SCALE,
+    (HARBOR_SHIP_BOARDING_DECK.y - GRAND_FERRY_SHIP_PLAN.model.keelY) * HARBOR_SHIP_STANDARD_SCALE,
+  z: HARBOR_SHIP_BOARDING_DECK.z * HARBOR_SHIP_STANDARD_SCALE,
   yaw: Math.PI / 2,
 } satisfies DeckStandInAttachPoint;
 const DECK_STAND_IN_IDLE_STATE: AnimState = {

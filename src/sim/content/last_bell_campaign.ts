@@ -64,15 +64,12 @@ export const LAST_BELL_CAMPAIGN_MOBS: Record<string, MobTemplate> = {
 // posts in FARSHORE_NPCS)
 // ---------------------------------------------------------------------------
 
-const EWALD_POST = {
-  x: MAINLAND_HARBOR.boarding.x - 2,
-  z: MAINLAND_HARBOR.boarding.z - 0.9,
-} as const;
-
-const GULLHAVEN_EWALD_POST = {
-  x: GULLHAVEN_HARBOR.boarding.x - 0.9,
-  z: GULLHAVEN_HARBOR.boarding.z + 1.5,
-} as const;
+// Both posts come from the harbor layout's generated keeper anchor rather than
+// a world-axis nudge off the boarding point: the anchor is derived from the
+// ship's own mating edge, so it stays aboard and beside the route whatever the
+// measured deck turns out to be at either berth.
+const EWALD_POST = MAINLAND_HARBOR.keeperPost;
+const GULLHAVEN_EWALD_POST = GULLHAVEN_HARBOR.keeperPost;
 
 const EWALD_IDENTITY = {
   name: 'Ferryman Ewald',

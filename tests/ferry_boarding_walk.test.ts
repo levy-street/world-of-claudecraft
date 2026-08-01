@@ -1,3 +1,4 @@
+import { GRAND_FERRY_SHIP_PLAN } from '../src/sim/grand_ferry_ship_plan.generated';
 import { describe, expect, it } from 'vitest';
 import { HARBORS, type HarborDef, type HarborRamp, harborDeckAt } from '../src/sim/harbor_layout';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
@@ -103,6 +104,50 @@ function insideDeck(deck: HarborDef['shipDecks'][number], point: Point2): boolea
   return Math.abs(point.x - deck.x) <= deck.hw && Math.abs(point.z - deck.z) <= deck.hd;
 }
 
+// The generated deck follows the hull's taper as a RUN of sections, so being
+// "on deck" means being on any of them. shipDecks ends with the gangway
+// landing, which is part of the walkable route and counts too.
+function shipSections(harbor: HarborDef): readonly HarborDef['shipDecks'][number][] {
+  return harbor.shipDecks;
+}
+
+function onShipDeck(harbor: HarborDef, point: Point2): boolean {
+  return shipSections(harbor).some((deck) => insideDeck(deck, point));
+}
+
+/**
+ * A rectangle INSCRIBED in the deck run: the full length, but only as wide as
+ * the narrowest section. The deck tapers, so the union rectangle's corners
+ * hang over the water at the narrow end and a circuit walked around it stalls
+ * against the rail. Everything here that probes "somewhere on deck" wants a
+ * box that is on deck everywhere, which is this one. The gangway landing is
+ * excluded: it is a plank-width stub, not part of the deck's beam.
+ */
+function deckWalkBox(harbor: HarborDef): { x: number; z: number; hw: number; hd: number } {
+  const sections = shipSections(harbor).slice(0, -1);
+  const x0 = Math.min(...sections.map((deck) => deck.x - deck.hw));
+  const x1 = Math.max(...sections.map((deck) => deck.x + deck.hw));
+  const z0 = Math.min(...sections.map((deck) => deck.z - deck.hd));
+  const z1 = Math.max(...sections.map((deck) => deck.z + deck.hd));
+  // A berth's yaw decides which world axis the sections tile along, so the
+  // axis is detected rather than assumed: union along the run, narrowest
+  // across the beam.
+  const tilesAlongX = x1 - x0 >= z1 - z0;
+  return tilesAlongX
+    ? {
+        x: (x0 + x1) / 2,
+        z: (z0 + z1) / 2,
+        hw: (x1 - x0) / 2,
+        hd: Math.min(...sections.map((deck) => deck.hd)),
+      }
+    : {
+        x: (x0 + x1) / 2,
+        z: (z0 + z1) / 2,
+        hw: Math.min(...sections.map((deck) => deck.hw)),
+        hd: (z1 - z0) / 2,
+      };
+}
+
 function pointInsideBlocker(blocker: HarborDef['shipBlockers'][number], point: Point2): boolean {
   const dx = point.x - blocker.x;
   const dz = point.z - blocker.z;
@@ -130,8 +175,8 @@ function pointClearanceFromBlocker(
 }
 
 function walkBoardingCircuit(sim: Sim, harbor: HarborDef): void {
-  const mainDeck = harbor.shipDecks[0];
-  const landing = harbor.shipDecks[1];
+  const mainDeck = deckWalkBox(harbor);
+  const landing = harbor.shipDecks.at(-1);
   const ramp = harbor.ramps.at(-1);
   if (!mainDeck || !landing || !ramp) throw new Error(`${harbor.id} boarding plan is incomplete`);
   const high = rampHighEdge(ramp);
@@ -161,7 +206,7 @@ function walkBoardingCircuit(sim: Sim, harbor: HarborDef): void {
     },
     240,
   );
-  expect(insideDeck(mainDeck, sim.player.pos), `${harbor.id} reached the main deck`).toBe(true);
+  expect(onShipDeck(harbor, sim.player.pos), `${harbor.id} reached the main deck`).toBe(true);
   expect(Math.min(...boardingHeights), `${harbor.id} ramp-to-deck gap`).toBeGreaterThanOrEqual(
     Math.min(ramp.lowY, ramp.highY) - 0.01,
   );
@@ -180,7 +225,7 @@ function walkBoardingCircuit(sim: Sim, harbor: HarborDef): void {
       `${harbor.id} deck perimeter leg ${index}`,
       (player) => {
         expect(
-          insideDeck(mainDeck, player.pos),
+          onShipDeck(harbor, player.pos),
           `${harbor.id} perimeter leg ${index} left the deck`,
         ).toBe(true);
         expect(player.onGround, `${harbor.id} perimeter leg ${index} footing`).toBe(true);
@@ -224,7 +269,7 @@ function walkBoardingCircuit(sim: Sim, harbor: HarborDef): void {
     blockedExitDistance,
     `${harbor.id} rail midpoint blocks the exit attempt`,
   ).toBeGreaterThanOrEqual(railHalfThickness + PLAYER_BODY_RADIUS - RAIL_STANDOFF_EPSILON);
-  expect(insideDeck(mainDeck, sim.player.pos), `${harbor.id} blocked rail exit stays aboard`).toBe(
+  expect(onShipDeck(harbor, sim.player.pos), `${harbor.id} blocked rail exit stays aboard`).toBe(
     true,
   );
   walkTo(sim, aboard, `${harbor.id} returns to the gangway opening after the blocked exit`);
@@ -241,7 +286,7 @@ function walkBoardingCircuit(sim: Sim, harbor: HarborDef): void {
       expect(isSwimming(player, sim.cfg.seed), `${harbor.id} outbound gangplank water gap`).toBe(
         false,
       );
-      if (insideDeck(mainDeck, player.pos)) return;
+      if (onShipDeck(harbor, player.pos)) return;
       leftMainDeck = true;
       const onLanding = insideDeck(landing, player.pos);
       const onRamp =
@@ -277,8 +322,8 @@ function walkBoardingCircuit(sim: Sim, harbor: HarborDef): void {
 
 function challengeRailRun(sim: Sim, harbor: HarborDef, railIndex: number): void {
   const rail = harbor.shipRails[railIndex];
-  const mainDeck = harbor.shipDecks[0];
-  if (!rail || !mainDeck) throw new Error(`${harbor.id} rail ${railIndex} is missing`);
+  const mainDeck = deckWalkBox(harbor);
+  if (!rail) throw new Error(`${harbor.id} rail ${railIndex} is missing`);
   const axis = { x: Math.cos(rail.rot), z: -Math.sin(rail.rot) };
   const normal = { x: Math.sin(rail.rot), z: Math.cos(rail.rot) };
   const deckDelta = { x: mainDeck.x - rail.x, z: mainDeck.z - rail.z };
@@ -373,7 +418,9 @@ describe('grand ferry boarding walk', () => {
 
   it.each(SEEDS)('blocks every generated rail run from the deck side, seed %i', (seed) => {
     for (const harbor of HARBORS) {
-      expect(harbor.shipRails).toHaveLength(5);
+      // Derived, not a literal: the rail runs follow the deck sections, so a
+      // hull that measures out with a different taper changes the count.
+      expect(harbor.shipRails).toHaveLength(GRAND_FERRY_SHIP_PLAN.rails.length);
       const sim = makeSim(seed);
       for (let railIndex = 0; railIndex < harbor.shipRails.length; railIndex++) {
         challengeRailRun(sim, harbor, railIndex);
@@ -394,25 +441,30 @@ describe('grand ferry boarding walk', () => {
         x: Math.cos(harbor.berth.rot),
         z: -Math.sin(harbor.berth.rot),
       };
+      // Chosen by KIND, not by generated id. The ids follow the measured deck
+      // sections, so pinning them here would make a re-measure look like a
+      // regression; what this guards is that each FACE of the hull turns a
+      // walker back, and that survives the hull being measured differently.
+      const firstOfKind = (kind: HarborDef['shipBlockers'][number]['kind']) => {
+        const blocker = harbor.shipBlockers.find((candidate) => candidate.kind === kind);
+        if (!blocker) throw new Error(`${harbor.id} has no ${kind} blocker`);
+        return blocker.id;
+      };
+      const hullSides = harbor.shipBlockers.filter((candidate) => candidate.kind === 'lower-hull');
+      expect(hullSides.length, `${harbor.id} hull sides`).toBeGreaterThanOrEqual(2);
+      challengeHullBlocker(sim, harbor, hullSides[0].id, pierDirection, 'pier-side hull approach');
       challengeHullBlocker(
         sim,
         harbor,
-        'lower-hull-port-stern-1',
-        pierDirection,
-        'pier-side hull approach',
-      );
-      challengeHullBlocker(
-        sim,
-        harbor,
-        'lower-hull-starboard-2',
+        hullSides[1].id,
         waterDirection,
         'water-side hull approach',
       );
-      challengeHullBlocker(sim, harbor, 'bow-center-2', bowDirection, 'bow approach');
+      challengeHullBlocker(sim, harbor, firstOfKind('bow'), bowDirection, 'bow approach');
       challengeHullBlocker(
         sim,
         harbor,
-        'stern-center-1',
+        firstOfKind('stern'),
         { x: -bowDirection.x, z: -bowDirection.z },
         'stern approach',
       );
@@ -427,11 +479,11 @@ describe('grand ferry boarding walk', () => {
       const keeper = [...sim.entities.values()].find((entity) => entity.templateId === templateId);
       expect(keeper, templateId).toBeDefined();
       if (!keeper) continue;
-      const mainDeck = harbor.shipDecks[0];
+      const mainDeck = deckWalkBox(harbor);
       const ramp = harbor.ramps.at(-1);
       if (!mainDeck || !ramp) throw new Error(`${harbor.id} keeper plan is incomplete`);
       const high = rampHighEdge(ramp);
-      expect(insideDeck(mainDeck, keeper.pos), `${templateId} main deck post`).toBe(true);
+      expect(onShipDeck(harbor, keeper.pos), `${templateId} main deck post`).toBe(true);
       expect(
         Math.hypot(keeper.pos.x - harbor.boarding.x, keeper.pos.z - harbor.boarding.z),
         `${templateId} distance from boarding post`,

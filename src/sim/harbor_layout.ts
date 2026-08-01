@@ -26,6 +26,11 @@ import { GRAND_FERRY_SHIP_PLAN } from './grand_ferry_ship_plan.generated';
 export const HARBOR_RAIL_HALF_THICK = 0.14;
 export const HARBOR_RAIL_HEIGHT = 1.05;
 
+// How far aboard the boarding anchors sit from the gangway's mating edge, and
+// how far the keeper stands to one side of the route so he never blocks it.
+const SHIP_BOARDING_INBOARD = 2.4;
+const SHIP_KEEPER_ALONG = 2.6;
+
 // One walkable deck rect: center, half extents, and the authored deck height.
 export interface HarborDeck {
   x: number;
@@ -136,6 +141,9 @@ export interface HarborDef {
   berth: HarborBerth;
   // Generated ship collision data transformed into this berth. Same
   // height/collider semantics as decks/rails; the GLB owns the visuals.
+  // ORDER IS PART OF THE CONTRACT: the deck section the gangway meets comes
+  // FIRST (arrivals and the stand-in land there) and the gangway landing comes
+  // LAST; the sections between them are the rest of the deck's taper.
   shipDecks: readonly HarborDeck[];
   shipRails: readonly HarborRail[];
   shipBlockers: readonly HarborShipBlocker[];
@@ -146,6 +154,8 @@ export interface HarborDef {
   // Where boarding happens: ON the ship's main deck (walk the gangplank
   // aboard, then depart). The lb_ferry fixture spawns here.
   boarding: { x: number; z: number };
+  // Where the keeper stands: aboard, beside the opening, clear of the route.
+  keeperPost: { x: number; z: number };
   // Where an arriving rider first appears on the parked ship deck. Voyage
   // scenes walk the real player from here down the gangplank.
   deckArrival: { x: number; z: number };
@@ -230,17 +240,53 @@ function generatedShipPlacement(berth: HarborBerth): HarborShipPlacementPlan {
     const offset = rotateLocal(x * scale, z * mirror * scale, berth.rot);
     return { x: berth.x + offset.x, z: berth.z + offset.z };
   };
-  const deck = GRAND_FERRY_SHIP_PLAN.deck;
-  const deckCenter = worldPoint(deck.x, deck.z);
   const deckCos = Math.abs(snapAxis(Math.cos(berth.rot)));
   const deckSin = Math.abs(snapAxis(Math.sin(berth.rot)));
+  const localEdge = GRAND_FERRY_SHIP_PLAN.rampMatingEdge;
+  const edge = worldPoint(localEdge.x, localEdge.z);
+  const localOutward = generatedDirection(localEdge.outward);
+  const outward = rotateLocal(localOutward.x, localOutward.z * mirror, berth.rot);
+  const hullEdge = worldPoint(localEdge.x, localOutward.z * (GRAND_FERRY_SHIP_PLAN.model.beam / 2));
+  const landing: HarborDeck =
+    Math.abs(outward.x) > 0.5
+      ? {
+          x: (edge.x + hullEdge.x) / 2,
+          z: edge.z,
+          hw: Math.abs(edge.x - hullEdge.x) / 2,
+          hd: localEdge.halfWidth * scale,
+          y: snapGeneratedValue(baseY + localEdge.y * scale),
+        }
+      : {
+          x: edge.x,
+          z: (edge.z + hullEdge.z) / 2,
+          hw: localEdge.halfWidth * scale,
+          hd: Math.abs(edge.z - hullEdge.z) / 2,
+          y: snapGeneratedValue(baseY + localEdge.y * scale),
+        };
+  // The generated deck is a RUN of sections following the hull's taper, so
+  // every one of them transforms into the berth. The section carrying the
+  // gangway leads the list: a rider stepping aboard, and the arrival scene
+  // that walks them off, both want the deck the plank actually meets.
+  const boardingIndex = Math.max(
+    0,
+    GRAND_FERRY_SHIP_PLAN.decks.findIndex(
+      (candidate) =>
+        localEdge.x >= candidate.x - candidate.hw && localEdge.x <= candidate.x + candidate.hw,
+    ),
+  );
+  const shipDecks = GRAND_FERRY_SHIP_PLAN.decks.map((section) => {
+    const center = worldPoint(section.x, section.z);
+    return {
+      ...center,
+      hw: (section.hw * deckCos + section.hd * deckSin) * scale,
+      hd: (section.hw * deckSin + section.hd * deckCos) * scale,
+      y: snapGeneratedValue(baseY + section.y * scale),
+    };
+  });
   const decks: readonly HarborDeck[] = [
-    {
-      ...deckCenter,
-      hw: (deck.hw * deckCos + deck.hd * deckSin) * scale,
-      hd: (deck.hw * deckSin + deck.hd * deckCos) * scale,
-      y: snapGeneratedValue(baseY + deck.y * scale),
-    },
+    shipDecks[boardingIndex],
+    ...shipDecks.filter((_, index) => index !== boardingIndex),
+    landing,
   ];
   const rails = GRAND_FERRY_SHIP_PLAN.rails.map((rail) => {
     const center = worldPoint(rail.x, rail.z);
@@ -279,6 +325,29 @@ function generatedShipPlacement(berth: HarborBerth): HarborShipPlacementPlan {
       outwardX: outward.x,
       outwardZ: outward.z,
     },
+  };
+}
+
+/**
+ * A point on the ship's boarding deck, placed off the generated mating edge.
+ *
+ * `inboard` steps in from the edge along the gangway's own axis; `along` runs
+ * across it, down the deck. Both anchors that used to be typed as world
+ * coordinates (where a rider stands aboard, where the keeper keeps his post)
+ * come from here instead, so a hull whose deck measures out differently moves
+ * them with it rather than leaving them hanging over the water.
+ */
+function shipBoardingPoint(
+  ship: HarborShipPlacementPlan,
+  inboard: number,
+  along = 0,
+): { x: number; z: number } {
+  const edge = ship.rampMatingEdge;
+  const inX = -edge.outwardX;
+  const inZ = -edge.outwardZ;
+  return {
+    x: snapGeneratedValue(edge.x + inX * inboard - inZ * along),
+    z: snapGeneratedValue(edge.z + inZ * inboard + inX * along),
   };
 }
 
@@ -451,7 +520,8 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
   shipRails: MAINLAND_SHIP.rails,
   shipBlockers: MAINLAND_SHIP.blockers,
   gangplank: { x: 230.4, z: -48, facing: Math.PI / 2 },
-  boarding: { x: 239, z: -48 },
+  boarding: shipBoardingPoint(MAINLAND_SHIP, SHIP_BOARDING_INBOARD),
+  keeperPost: shipBoardingPoint(MAINLAND_SHIP, SHIP_BOARDING_INBOARD, SHIP_KEEPER_ALONG),
   deckArrival: {
     x: MAINLAND_SHIP.decks[0].x,
     z: MAINLAND_SHIP.decks[0].z,
@@ -573,8 +643,9 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
   shipDecks: GULLHAVEN_SHIP.decks,
   shipRails: GULLHAVEN_SHIP.rails,
   shipBlockers: GULLHAVEN_SHIP.blockers,
-  gangplank: { x: 727.5, z: 122, facing: 0 },
-  boarding: { x: 727.5, z: 130 },
+  gangplank: { x: 723.5, z: 116.5, facing: 0 },
+  boarding: shipBoardingPoint(GULLHAVEN_SHIP, SHIP_BOARDING_INBOARD),
+  keeperPost: shipBoardingPoint(GULLHAVEN_SHIP, SHIP_BOARDING_INBOARD, SHIP_KEEPER_ALONG),
   deckArrival: {
     x: GULLHAVEN_SHIP.decks[0].x,
     z: GULLHAVEN_SHIP.decks[0].z,
