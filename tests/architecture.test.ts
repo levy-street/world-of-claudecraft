@@ -169,6 +169,7 @@ const UI_PURE_CORES = [
   'src/ui/target_rank_view.ts',
   'src/ui/meters_breakdown_view.ts',
   'src/ui/meters_frame_core.ts',
+  'src/ui/meters_list_view.ts',
   'src/ui/meters_menu_view.ts',
   'src/ui/meters_rows_view.ts',
   'src/ui/mob_tooltip_view.ts',

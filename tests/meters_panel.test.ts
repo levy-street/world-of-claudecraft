@@ -94,12 +94,22 @@ function setup() {
     attachTooltip: (el, html) => tooltips.set(el, html),
   });
   const rowsEl = document.querySelector('.mt-rows') as HTMLElement;
-  const visibleRows = () =>
+  const lines = () =>
     [...rowsEl.querySelectorAll<HTMLElement>('.mt-row')].filter(
       (el) => el.style.display !== 'none',
     );
+  /** Member bars only: an open member's split rows carry .mt-arow. */
+  const visibleRows = () => lines().filter((el) => !el.classList.contains('mt-arow'));
+  /** [label, value] of every split row currently painted into the panel. */
+  const splitRows = (): [string, string][] =>
+    lines()
+      .filter((el) => el.classList.contains('mt-arow'))
+      .map((el) => [
+        el.querySelector('.mt-label')?.textContent ?? '',
+        el.querySelector('.mt-num')?.textContent ?? '',
+      ]);
   const tooltipFor = (el: HTMLElement) => (tooltips.get(el) as () => string)();
-  return { meters, world, rowsEl, visibleRows, tooltipFor };
+  return { meters, world, rowsEl, lines, visibleRows, splitRows, tooltipFor };
 }
 
 describe('meters panel', () => {
@@ -120,6 +130,77 @@ describe('meters panel', () => {
     expect(rows.map((el) => el.querySelector('.mt-label')?.textContent)).toEqual(['Hero', 'Pal']);
     // 300 own + 200 pet ranks the hunter above the priest's 100
     expect(rows[0].querySelector('.mt-num')?.textContent).toContain('500');
+  });
+
+  it('paints the pet casts into the panel as spell rows, with no hover needed', () => {
+    // The regression this exists for: a pet has no bar of its own, so with the
+    // split living only in the tooltip a solo pet class saw one bar with their
+    // own name on it and no sign of the pet at all.
+    const { meters, splitRows } = setup();
+    meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
+    meters.onEvent(dmg(3, 51, 200, 'Claw'));
+    meters.update();
+    meters.render(true);
+
+    expect(splitRows()).toEqual([
+      ['Aimed Shot', '300 (60%)'],
+      ['Wolf Pet: Claw', '200 (40%)'],
+    ]);
+  });
+
+  it('starts your own bar open and every other member closed, and toggles on click', () => {
+    const { meters, visibleRows, splitRows } = setup();
+    meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
+    meters.onEvent(dmg(3, 51, 200, 'Claw'));
+    meters.onEvent(dmg(2, 51, 400, 'Smite'));
+    meters.onEvent(dmg(2, 51, 100, 'Holy Fire'));
+    meters.update();
+    meters.render(true);
+
+    // Pal outranks the hunter (500 vs 500 ties, so pin by label instead)
+    const barFor = (name: string) =>
+      visibleRows().find(
+        (el) => el.querySelector('.mt-label')?.textContent === name,
+      ) as HTMLElement;
+    expect(barFor('Hero').getAttribute('aria-expanded')).toBe('true');
+    expect(barFor('Pal').getAttribute('aria-expanded')).toBe('false');
+    expect(splitRows().map(([label]) => label)).toEqual(['Aimed Shot', 'Wolf Pet: Claw']);
+
+    // open the priest: their split joins the list, under their own bar
+    barFor('Pal').click();
+    expect(barFor('Pal').getAttribute('aria-expanded')).toBe('true');
+    expect(splitRows().map(([label]) => label)).toEqual([
+      'Aimed Shot',
+      'Wolf Pet: Claw',
+      'Smite',
+      'Holy Fire',
+    ]);
+
+    // and close your own: an explicit choice outranks the default
+    barFor('Hero').click();
+    expect(barFor('Hero').getAttribute('aria-expanded')).toBe('false');
+    expect(splitRows().map(([label]) => label)).toEqual(['Smite', 'Holy Fire']);
+  });
+
+  it('toggles a bar from the keyboard, and never from a split row', () => {
+    const { meters, lines, visibleRows, splitRows } = setup();
+    meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
+    meters.onEvent(dmg(3, 51, 200, 'Claw'));
+    meters.update();
+    meters.render(true);
+    expect(splitRows()).toHaveLength(2);
+
+    // a split row is a readout, not a control: pressing it changes nothing
+    const splitLine = lines().find((el) => el.classList.contains('mt-arow')) as HTMLElement;
+    splitLine.click();
+    expect(splitRows()).toHaveLength(2);
+
+    const key = (el: HTMLElement, k: string) =>
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+    key(visibleRows()[0], 'Enter');
+    expect(splitRows()).toHaveLength(0);
+    key(visibleRows()[0], ' ');
+    expect(splitRows()).toHaveLength(2);
   });
 
   it('breaks the hovered bar down per ability and names the pet that acted', () => {
@@ -145,23 +226,33 @@ describe('meters panel', () => {
     meters.update();
     meters.render(true);
     const first = visibleRows()[0];
+    // one ability so far: the split would only restate the bar, so no line is
+    // added and the bar advertises no toggle at all, in class or in ARIA
+    expect(rowsEl.querySelectorAll('.mt-row')).toHaveLength(1);
+    expect(first.classList.contains('mt-expandable')).toBe(false);
+    expect(first.getAttribute('aria-expanded')).toBeNull();
+    expect(first.getAttribute('role')).toBeNull();
 
     meters.onEvent(dmg(1, 51, 100, 'Arcane Shot'));
     meters.update();
     meters.render(true);
     expect(visibleRows()[0]).toBe(first); // same node, so the tooltip stayed attached
-    expect(rowsEl.querySelectorAll('.mt-row')).toHaveLength(1);
     // and the tooltip closure reads live state, not what it captured at attach time
     expect(tooltipFor(first)).toContain('Arcane Shot');
   });
 
   it('adds a pet threat to its owner column and marks the owner when the pet holds aggro', () => {
-    const { meters, visibleRows, tooltipFor } = setup();
+    const { meters, visibleRows, splitRows, tooltipFor } = setup();
     meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
     meters.onEvent(dmg(2, 51, 100, 'Smite'));
     meters.update();
     (document.querySelector('.mt-tab[data-tab="threat"]') as HTMLElement).click();
 
+    // your own column is split in the panel, into the contributors it sums
+    expect(splitRows()).toEqual([
+      ['Hero', '100 (67%)'],
+      ['Wolf Pet', '50 (33%)'],
+    ]);
     const rows = visibleRows();
     expect(rows.map((el) => el.querySelector('.mt-label')?.textContent)).toEqual(['Hero', 'Pal']);
     // 100 own hate + the pet's 50, not the bare 100

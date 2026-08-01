@@ -154,6 +154,53 @@ describe('combat meters', () => {
     expect(m.history[0].duration).toBe(10); // 1000 dmg / 10s = 100 DPS, retained
   });
 
+  it('hands the threat subject to the next mob once the pinned one dies mid-segment', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(dmg(1, 51, 40), w, party, 1000);
+    expect(m.current!.mainMobId).toBe(51);
+    // Gorrak dies; the very next pull is the same size, so a "beefiest mob"
+    // rule alone leaves the Threat tab reading a corpse's hate table for the
+    // rest of the segment (an encounter survives a kill: 5s of quiet, or any
+    // mob still holding aggro, keeps it open).
+    (w.entities.get(51) as any).dead = true;
+    (w.entities as Map<number, any>).set(52, {
+      id: 52,
+      kind: 'mob',
+      name: 'Gorrak the Second',
+      maxHp: 400,
+      dead: false,
+      aggroTargetId: 1,
+    });
+    m.onEvent(dmg(1, 52, 30), w, party, 2000);
+    expect(m.current!.mainMobId).toBe(52);
+    expect(m.current!.mainMobName).toBe('Gorrak the Second');
+    expect(m.current!.label).toBe('Gorrak the Second');
+  });
+
+  it('re-points the threat subject when the pinned mob leaves the world entirely', () => {
+    // Online the entity map is interest-scoped, so a subject can vanish without
+    // ever being marked dead (it despawned, or the party walked away).
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(dmg(1, 51, 40), w, party, 1000);
+    (w.entities as Map<number, any>).delete(51);
+    m.onEvent(dmg(1, 50, 10), w, party, 2000);
+    expect(m.current!.mainMobId).toBe(50);
+  });
+
+  it('keeps the boss as the threat subject while it is alive, even when adds are hit', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(dmg(1, 51, 40), w, party, 1000); // Gorrak, 400 maxHp
+    m.onEvent(dmg(1, 50, 90), w, party, 1500); // Wolf add, 60 maxHp
+    expect(m.current!.mainMobId).toBe(51);
+    expect(m.current!.mainMobName).toBe('Gorrak');
+  });
+
   it('damage taken by a party member keeps the encounter alive but adds no damage row', () => {
     const w = fakeWorld();
     const party = new Set([1, 2]);
