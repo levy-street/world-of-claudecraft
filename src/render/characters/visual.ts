@@ -1004,9 +1004,14 @@ export class CharacterVisual {
   }
 
   /** Swap the body skin (alternate texture atlas) at runtime; no-op if unchanged.
-   *  Reuses the shared skin-keyed material cache, so this is a cheap reassign. */
-  setSkin(skinIndex: number): void {
-    if (skinIndex === this.skinIndex) return;
+   *  Reuses the shared skin-keyed material cache, so this is a cheap reassign.
+   *  Returns the root whose materials just changed (for the caller's compile
+   *  gate, see renderer.ts's gateSwapFlagOnCompile), or null on a no-op. The
+   *  deferred re-apply below (the atlas arriving late) is NOT covered: it is a
+   *  texture-only reassign onto an already-compiled shader shape, not a new
+   *  program. */
+  setSkin(skinIndex: number): THREE.Object3D | null {
+    if (skinIndex === this.skinIndex) return null;
     this.skinIndex = skinIndex;
     this.applySkinMaterials(skinIndex);
     // If the alternate atlas for this skin has not finished loading yet,
@@ -1025,6 +1030,7 @@ export class CharacterVisual {
         })
         .catch((err) => console.error('failed to load skin atlas:', err));
     }
+    return this.root;
   }
 
   private applySkinMaterials(skinIndex: number): void {
@@ -1070,12 +1076,13 @@ export class CharacterVisual {
    *  no VisualDef.weaponSlot). Mirrors setSkin: re-attach the prop, re-run the
    *  shared material pass, re-snapshot the original-material map, then re-apply any
    *  active ghost/soul-rend overlay. Cheap (one prop clone) and keeps the mixer/
-   *  animation state, unlike a full visual rebuild. */
-  setWeapon(weaponItemId: string | null): void {
-    if (weaponItemId === this.weaponItemId) return;
+   *  animation state, unlike a full visual rebuild. Returns the newly attached
+   *  payload(s) (for the caller's compile gate), or null on a no-op. */
+  setWeapon(weaponItemId: string | null): THREE.Object3D[] | null {
+    if (weaponItemId === this.weaponItemId) return null;
     this.weaponItemId = weaponItemId;
-    if (!this.def.weaponSlots?.length) return;
-    this.reattachHeldWeapon();
+    if (!this.def.weaponSlots?.length) return null;
+    return this.reattachHeldWeapon();
   }
 
   /** Swap the actual offhand. When neither the old nor the new offhand mirrors the
@@ -1083,19 +1090,19 @@ export class CharacterVisual {
    *  cosmetic pipeline (its rarity VFX keep running). When the offhand crosses into,
    *  out of, or between skin-mirrored states (a matching-type weapon), it
    *  routes through the full re-attach so the offhand gains or loses the skin model
-   *  and its rarity VFX in step with the mainhand. */
-  setOffhand(offhandItemId: string | null): void {
-    if (offhandItemId === this.offhandItemId) return;
+   *  and its rarity VFX in step with the mainhand. Returns the newly attached
+   *  payload(s) (for the caller's compile gate), or null on a no-op. */
+  setOffhand(offhandItemId: string | null): THREE.Object3D[] | null {
+    if (offhandItemId === this.offhandItemId) return null;
     if (this.def.offhandSlot === undefined) {
       this.offhandItemId = offhandItemId;
-      return;
+      return null;
     }
     const wasMirrored = offhandMirrorsWeaponSkin(this.weaponSkinId, this.offhandItemId);
     this.offhandItemId = offhandItemId;
     const nowMirrored = offhandMirrorsWeaponSkin(this.weaponSkinId, this.offhandItemId);
     if (wasMirrored || nowMirrored) {
-      this.reattachHeldWeapon();
-      return;
+      return this.reattachHeldWeapon();
     }
     const payloads = setHeldOffhand(
       this.model,
@@ -1116,16 +1123,18 @@ export class CharacterVisual {
     this.originalMaterials.clear();
     this.rebuildCasters();
     this.applyVisualMaterials();
+    return payloads;
   }
 
   /** Apply or clear a Season 1 Armory weapon-skin cosmetic: the skin's model
    *  replaces the held weapon (all swap slots, or the hunter's fixed ranged
    *  attach) and its rarity VFX ride the new payloads. Null restores the
-   *  equipped item's own model. */
-  setWeaponSkin(weaponSkinId: string | null): void {
-    if (weaponSkinId === this.weaponSkinId) return;
+   *  equipped item's own model. Returns the newly attached payload(s) (for the
+   *  caller's compile gate), or null on a no-op. */
+  setWeaponSkin(weaponSkinId: string | null): THREE.Object3D[] | null {
+    if (weaponSkinId === this.weaponSkinId) return null;
     this.weaponSkinId = weaponSkinId;
-    this.reattachHeldWeapon();
+    return this.reattachHeldWeapon();
   }
 
   /** Re-attach BOTH held hands (gear swap / skin change), honoring an active
@@ -1133,8 +1142,9 @@ export class CharacterVisual {
    *  offhand re-attaches with skin awareness: when the active skin mirrors onto a
    *  matching-type offhand weapon, that payload joins the skin VFX/material
    *  set; a shield, held offhand, or different-type weapon re-attaches with its own
-   *  model and stays out of that set (pixel-untouched). */
-  private reattachHeldWeapon(): void {
+   *  model and stays out of that set (pixel-untouched). Returns the newly attached
+   *  payload(s), for the caller's compile gate. */
+  private reattachHeldWeapon(): THREE.Object3D[] {
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();
     const payloads = setHeldWeapon(
@@ -1155,6 +1165,7 @@ export class CharacterVisual {
       payloads.push(...offPayloads);
     }
     this.finishWeaponAttach(payloads);
+    return payloads;
   }
 
   /** The shared tail of every re-attach (slot swap, skin change, sheathe swap):

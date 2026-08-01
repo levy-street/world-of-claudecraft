@@ -278,6 +278,7 @@ const UI_PURE_CORES = [
 const RENDER_PURE_CORES = [
   'src/render/arena_water_band_core.ts',
   'src/render/camera_boom_core.ts',
+  'src/render/compile_gate.ts',
   'src/render/camera_director_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
@@ -325,6 +326,7 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/render/foliage_lod.ts',
+  'src/render/compile_gate.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',

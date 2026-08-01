@@ -104,6 +104,7 @@ import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_poli
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
 import { fogFarForBuiltGround } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
+import { raceCompileGate } from './compile_gate';
 import { trackWebGLContext } from './context_release';
 import {
   animatesEveryFrame,
@@ -862,6 +863,12 @@ export interface EntityView {
   compilePending: boolean;
   // Resolves when compilePending clears, including the bounded fail-soft timeout.
   compileReady: Promise<void> | null;
+  // A live material-variant swap (gateSwapFlagOnCompile) is still linking off-thread
+  // for a target whose .visible the per-frame loop recomputes every tick (the mount
+  // root, the base visual root after a skin/visual-key swap) — those lines AND this
+  // in so a plain hide would not be overwritten later the same frame. See #2571.
+  mountCompilePending: boolean;
+  visualCompilePending: boolean;
   lastOverheadEmoteKey: string | null;
   recklessOn?: boolean;
   // render-space position last frame, for true u/s locomotion speed
@@ -6059,6 +6066,8 @@ export class Renderer {
       isFar: false,
       compilePending: false,
       compileReady: null,
+      mountCompilePending: false,
+      visualCompilePending: false,
       lastOverheadEmoteKey: null,
       lastX: e.pos.x,
       lastZ: e.pos.z,
@@ -6104,38 +6113,64 @@ export class Renderer {
     }
   }
 
+  // Shared core for every compile gate below: link `target`'s programs OFF the
+  // main thread (KHR_parallel_shader_compile via compileAsync) against the live
+  // scene's exact lights + environment, racing the shared fail-soft ceiling so a
+  // driver that never reports completion can't strand a caller hidden forever.
+  // compileAsync's material traversal is scoped to `target` alone (confirmed
+  // against the pinned three.js source for #2571's commit 3: only its light
+  // gathering walks the whole `this.scene`, not the material/program pass), so
+  // this is cheap to call once per swapped node rather than needing to batch.
+  private compileGate(target: THREE.Object3D): Promise<void> {
+    return raceCompileGate(
+      () => this.webgl.compileAsync(target, this.camera, this.scene),
+      VIEW_COMPILE_GATE_MAX_MS,
+    );
+  }
+
   // Generic anti-freeze layer. A freshly-streamed view links its shader programs
   // SYNCHRONOUSLY on first draw - a 50-1700ms frame stall (the open-world travel
-  // hitch). Instead link them OFF the main thread (KHR_parallel_shader_compile via
-  // compileAsync) against the live scene's exact lights + environment, and keep the
-  // view hidden until ready: it pops in a frame or two late rather than freezing.
-  // Unlike the boot prewarm this enumerates NOTHING, so new content and render-state
-  // variants the prewarm cannot anticipate (e.g. the env-map-lit material that links
-  // only when you walk into a biome) never hitch in-world. The prewarm stays a pure
+  // hitch). Instead link them OFF the main thread and keep the view hidden until
+  // ready: it pops in a frame or two late rather than freezing. Unlike the boot
+  // prewarm this enumerates NOTHING, so new content and render-state variants the
+  // prewarm cannot anticipate (e.g. the env-map-lit material that links only when
+  // you walk into a biome) never hitch in-world. The prewarm stays a pure
   // optimization: already-compiled spawn content resolves instantly, no pop-in.
   private gateViewOnCompile(view: EntityView, group: THREE.Group): Promise<void> | null {
     if (!this.asyncCompileSupported) return null;
     view.compilePending = true;
     group.visible = false;
-    return new Promise<void>((resolve) => {
-      let settled = false;
-      const clear = (): void => {
-        if (settled) return;
-        settled = true;
-        view.compilePending = false;
-        resolve();
-      };
-      const guard = setTimeout(clear, VIEW_COMPILE_GATE_MAX_MS);
-      try {
-        this.webgl
-          .compileAsync(group, this.camera, this.scene)
-          .then(clear, clear)
-          .finally(() => clearTimeout(guard));
-      } catch {
-        clearTimeout(guard);
-        clear();
-      }
+    return this.compileGate(group).then(() => {
+      view.compilePending = false;
     });
+  }
+
+  // Sibling to gateViewOnCompile for a live material-variant swap on an
+  // ALREADY-VISIBLE entity (a gear/weapon-skin prop just attached to a
+  // character already on screen, see #2571 commit 2). Hiding the WHOLE
+  // character like a brand-new view would be a worse regression than the
+  // freeze this prevents, so this hides only the swapped node: the rest of
+  // the character keeps animating and drawing normally, and the new prop
+  // pops in a frame or two late instead of stalling the frame. Safe only for
+  // a node nothing else drives the visibility of per frame (a weapon/offhand
+  // payload, once attached, is left alone); for one the per-frame loop
+  // recomputes every tick, use gateSwapFlagOnCompile instead.
+  private gateSwapOnCompile(target: THREE.Object3D): void {
+    if (!this.asyncCompileSupported || !target.visible) return;
+    target.visible = false;
+    void this.compileGate(target).then(() => {
+      target.visible = true;
+    });
+  }
+
+  // Sibling to gateSwapOnCompile for a swap whose .visible the per-frame loop
+  // ALREADY recomputes every tick (the mount root, the base visual root after
+  // a skin or visual-key swap): a direct hide would be overwritten later the
+  // same frame, so this compiles in the background and reports back through a
+  // caller-owned flag those per-frame lines AND against instead.
+  private gateSwapFlagOnCompile(target: THREE.Object3D, onSettled: () => void): void {
+    if (!this.asyncCompileSupported) return;
+    void this.compileGate(target).then(onSettled);
   }
 
   /** The visual the player currently sees (form swaps hide the base rig). */
@@ -6169,7 +6204,6 @@ export class Renderer {
     if (!next) return;
     next.setShadow(v.shadowOn);
     next.setFar(v.isFar);
-    next.root.visible = v.visual.root.visible;
     const oldClickTarget = v.clickTarget;
     const idx = this.clickTargets.indexOf(oldClickTarget);
     v.visual.dispose();
@@ -6187,6 +6221,13 @@ export class Renderer {
     v.weaponStowed = false; // next was built drawn (fresh stow transition); the diff re-sheathes
     v.group.add(next.root);
     this.reconcileViewLights(v);
+    // A live base-visual replace (race/mech toggle) is exactly a brand-new
+    // rig's materials linking for the first time; gate it the same as a
+    // gear swap rather than freezing the frame it lands on (#2571).
+    v.visualCompilePending = true;
+    this.gateSwapFlagOnCompile(next.root, () => {
+      v.visualCompilePending = false;
+    });
   }
 
   private reconcileViewLights(v: EntityView): void {
@@ -7514,23 +7555,37 @@ export class Renderer {
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
 
-      // live skin swap — appearance changed (in-game changer or a multiplayer peer)
+      // live skin swap — appearance changed (in-game changer or a multiplayer peer).
+      // Gated the same as a base-visual swap (v.visual.root's own materials just
+      // changed): a first-sight skin's shader can still link synchronously outside
+      // the boot prewarm's variant pool (mob/NPC skins, an uncached combo) (#2571).
       if (e.skin !== v.skin) {
         v.skin = e.skin;
-        v.visual.setSkin(e.skin);
+        const changedRoot = v.visual.setSkin(e.skin);
+        if (changedRoot) {
+          v.visualCompilePending = true;
+          this.gateSwapFlagOnCompile(changedRoot, () => {
+            v.visualCompilePending = false;
+          });
+        }
       }
 
       // live held-weapon swap — equipped mainhand changed (self equip or a peer's
-      // gear update); setWeapon no-ops on classes with a fixed weapon (hunter)
+      // gear update); setWeapon no-ops on classes with a fixed weapon (hunter).
+      // Gated per newly attached payload: nothing else in this loop drives its own
+      // .visible, so first-sight materials link off-thread instead of freezing the
+      // frame the gear lands on (#2571).
       if (e.mainhandItemId !== v.mainhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
-        v.visual.setWeapon(e.mainhandItemId);
+        const changed = v.visual.setWeapon(e.mainhandItemId);
+        if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
       }
 
       if (e.offhandItemId !== v.offhandItemId) {
         v.offhandItemId = e.offhandItemId;
-        v.visual.setOffhand(e.offhandItemId);
+        const changed = v.visual.setOffhand(e.offhandItemId);
+        if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
       }
 
@@ -7538,7 +7593,8 @@ export class Renderer {
       // or a peer, via the identity wire); replaces the held model + rarity VFX
       if (e.weaponSkinId !== v.weaponSkinId) {
         v.weaponSkinId = e.weaponSkinId;
-        v.visual.setWeaponSkin(e.weaponSkinId);
+        const changed = v.visual.setWeaponSkin(e.weaponSkinId);
+        if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
       }
       v.visual.setWeaponAura(characterSanguineAuraActive(e));
@@ -7610,6 +7666,13 @@ export class Renderer {
           v.mountVisual = createMountVisual(mountSpec.visualKey);
           v.group.add(v.mountVisual.root); // group.scale already carries e.scale
           v.mountVisualKey = mountSpec.visualKey;
+          // A newly summoned mount is exactly a brand-new rig's materials
+          // linking for the first time; gate it like a gear swap instead of
+          // freezing the frame the mount lands on (#2571).
+          v.mountCompilePending = true;
+          this.gateSwapFlagOnCompile(v.mountVisual.root, () => {
+            v.mountCompilePending = false;
+          });
         } else {
           void preloadMountAssets(mountSpec.visualKey).catch((err) =>
             console.error('Failed to preload mount model:', err),
@@ -7621,7 +7684,7 @@ export class Renderer {
         v.mountVisual = null;
         v.mountVisualKey = '';
       }
-      if (v.mountVisual) v.mountVisual.root.visible = mountShown;
+      if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
       v.mountLift = mountShown && v.mountVisual ? mountSpec.seat : 0;
       const active =
         polyed && v.sheepVisual
@@ -7647,7 +7710,7 @@ export class Renderer {
       active.setShadowform(hasShadowform);
       active.setMoonkin(hasMoonkin);
       active.setMetamorph(hasMetamorph);
-      v.visual.root.visible = active === v.visual && !fireballForm;
+      v.visual.root.visible = active === v.visual && !fireballForm && !v.visualCompilePending;
       // saddle lift: the rider (click proxy included, a root child) sits at
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
       // seatFwd slides the rider along facing onto saddles that sit off the
