@@ -895,6 +895,16 @@ export class Api {
     return this.get('/api/daily-rewards');
   }
 
+  // Companion Home and any non-world surface can claim the daily spin without a
+  // ClientWorld session (same bearer auth as dailyRewards()).
+  async spinDailyReward(): Promise<DailyRewardSpinResult> {
+    return this.post('/api/daily-rewards/spin', {});
+  }
+
+  async dailyRewardHistory(): Promise<DailyRewardHistory> {
+    return this.get('/api/daily-rewards/history');
+  }
+
   // Unlink Discord. A Discord-provisioned account (no real password yet) must send a
   // `password` so it stays reachable after unlinking; the server 400s with
   // 'password_required' otherwise. A normal account passes nothing.

@@ -104,6 +104,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/wiki/', '/guide.html'],
   ['/editor', '/editor.html'],
   ['/editor/', '/editor.html'],
+  ['/companion', '/companion.html'],
+  ['/companion/', '/companion.html'],
 ]);
 // The Guide is the site wiki: a client-routed SPA at /wiki. Deep paths like
 // /wiki/classes/warrior have no static file, so any extensionless /wiki* request falls
@@ -349,6 +351,7 @@ export default defineConfig({
         guide: fileURLToPath(new URL('guide.html', import.meta.url)),
         editor: fileURLToPath(new URL('editor.html', import.meta.url)),
         walletHandoff: fileURLToPath(new URL('wallet-handoff.html', import.meta.url)),
+        companion: fileURLToPath(new URL('companion.html', import.meta.url)),
       },
       output: {
         // three.js almost never changes between our releases and is the single
