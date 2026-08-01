@@ -24,16 +24,24 @@ export const LAST_BELL_VOYAGE_SEGMENT_IDS = {
 } as const;
 
 export const LAST_BELL_PROP_PATH_SEGMENTS = {
+  // Cast-off glides run until the cut to open water is fully black, so the
+  // vessel never stops on camera; the pace is a gentle getting-under-way.
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff]: {
     start: { x: 0, y: 0, z: 0, yaw: 0 },
     end: { x: 22, y: 0, z: 7, yaw: 0 },
-    duration: 4,
+    duration: 5,
     ease: 'linear',
   },
+  // The open-water legs ride the old crossing track (360,-8) to (470,34),
+  // deep water the whole way, so the Old Beacon lighthouse on the Galecrest
+  // headland stands on the horizon behind the beam shot. World spans:
+  // out (390.83, 3.77) to (439.41, 22.32); back the same water sailed the
+  // other way. Pose positions rotate by the COMBINED yaw (base plus pose)
+  // in composeHarborShipAttachFrame, so these locals bake that in.
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.openWater]: {
-    start: { x: -0.480547, y: 0, z: -164.456482, yaw: -1.910796 },
-    end: { x: 47.519453, y: 0, z: -164.456482, yaw: -1.910796 },
-    duration: 4.3,
+    start: { x: 157.48, y: 0, z: -8.994, yaw: -1.935526 },
+    end: { x: 209.481, y: 0, z: -8.995, yaw: -1.935526 },
+    duration: 5.5,
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.arrival]: {
@@ -45,13 +53,13 @@ export const LAST_BELL_PROP_PATH_SEGMENTS = {
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.castOff]: {
     start: { x: 0, y: 0, z: 0, yaw: 0 },
     end: { x: 22, y: 0, z: -7, yaw: 0 },
-    duration: 4,
+    duration: 5,
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.openWater]: {
-    start: { x: 148.090701, y: 0, z: -130.436384, yaw: 1.199203 },
-    end: { x: 196.090701, y: 0, z: -130.436384, yaw: 1.199203 },
-    duration: 4.3,
+    start: { x: 290.615, y: 0, z: -5.869, yaw: 1.206066 },
+    end: { x: 342.615, y: 0, z: -5.868, yaw: 1.206066 },
+    duration: 5.5,
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.arrival]: {

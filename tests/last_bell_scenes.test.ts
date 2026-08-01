@@ -527,16 +527,19 @@ describe('the voyage cinematic', () => {
       backOpenWater: LAST_BELL_PROP_PATH_SEGMENTS.lb_voyage_back_open_water,
       backArrival: LAST_BELL_PROP_PATH_SEGMENTS.lb_voyage_back_arrival,
     }).toEqual({
+      // Cast-off glides run until the open-water cut is fully black; the
+      // open-water legs ride the crossing track (360,-8) to (470,34) over
+      // the carved channel so the Old Beacon stands behind the beam shot.
       outCastOff: {
         start: { x: 0, y: 0, z: 0, yaw: 0 },
         end: { x: 22, y: 0, z: 7, yaw: 0 },
-        duration: 4,
+        duration: 5,
         ease: 'linear',
       },
       outOpenWater: {
-        start: { x: -0.480547, y: 0, z: -164.456482, yaw: -1.910796 },
-        end: { x: 47.519453, y: 0, z: -164.456482, yaw: -1.910796 },
-        duration: 4.3,
+        start: { x: 157.48, y: 0, z: -8.994, yaw: -1.935526 },
+        end: { x: 209.481, y: 0, z: -8.995, yaw: -1.935526 },
+        duration: 5.5,
         ease: 'linear',
       },
       outArrival: {
@@ -548,13 +551,13 @@ describe('the voyage cinematic', () => {
       backCastOff: {
         start: { x: 0, y: 0, z: 0, yaw: 0 },
         end: { x: 22, y: 0, z: -7, yaw: 0 },
-        duration: 4,
+        duration: 5,
         ease: 'linear',
       },
       backOpenWater: {
-        start: { x: 148.090701, y: 0, z: -130.436384, yaw: 1.199203 },
-        end: { x: 196.090701, y: 0, z: -130.436384, yaw: 1.199203 },
-        duration: 4.3,
+        start: { x: 290.615, y: 0, z: -5.869, yaw: 1.206066 },
+        end: { x: 342.615, y: 0, z: -5.868, yaw: 1.206066 },
+        duration: 5.5,
         ease: 'linear',
       },
       backArrival: {
@@ -572,39 +575,57 @@ describe('the voyage cinematic', () => {
     expect(back).toBeDefined();
     expect(q0).toBeDefined();
     if (!out || !back || !q0) return;
-    expect({
-      out: out.duration,
-      back: back.duration,
-      q0: q0.duration,
-    }).toEqual({ out: 21.95, back: 21.95, q0: 31.3 });
+    expect(out.duration).toBeCloseTo(27.15, 8);
+    expect(back.duration).toBeCloseTo(27.15, 8);
+    expect(q0.duration).toBeCloseTo(34.7, 8);
     const cameraTimes = (scene: typeof out): number[] =>
       scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.at] : []));
-    expect(cameraTimes(out)).toEqual([0.45, 4.2, 8.5, 15.5, 21.5]);
-    expect(cameraTimes(back)).toEqual([0.45, 4.2, 8.5, 15.5, 21.5]);
-    expect(cameraTimes(q0)).toEqual([0.45, 4.2, 8.5, 15.5, 23.4, 30.3]);
+    expect(cameraTimes(out)).toEqual([expect.closeTo(1.05, 8), 6.3, 12, 19.05, 26.3]);
+    expect(cameraTimes(back)).toEqual([expect.closeTo(1.05, 8), 6.3, 12, 19.05, 26.3]);
+    expect(cameraTimes(q0)).toEqual([expect.closeTo(1.05, 8), 6.3, 12, 19.05, 26.95, 33.85]);
 
     for (const scene of [out, back, q0]) {
       expect(scene.ops.filter((op) => op.at === 0 && op.kind === 'fade')).toEqual([
-        { at: 0, kind: 'fade', to: 'black', dur: 0.4 },
+        { at: 0, kind: 'fade', to: 'black', dur: 0.8 },
       ]);
       const finalFade = scene.ops.filter((op) => op.kind === 'fade').at(-1);
-      expect(finalFade).toMatchObject({ kind: 'fade', to: 'clear', dur: 0.4 });
-      expect(finalFade?.at).toBeCloseTo(scene === q0 ? 30.35 : 21.55, 8);
+      expect(finalFade).toMatchObject({ kind: 'fade', to: 'clear', dur: 0.8 });
+      expect(finalFade?.at).toBeCloseTo(scene === q0 ? 33.9 : 26.35, 8);
     }
 
     const shotKinds = (scene: typeof out): string[] =>
       scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.shot.kind] : []));
-    expect(shotKinds(out)).toEqual(['attach', 'attach', 'attach', 'dolly', 'release']);
-    expect(shotKinds(back)).toEqual(['attach', 'attach', 'attach', 'dolly', 'release']);
-    expect(shotKinds(q0)).toEqual(['attach', 'attach', 'attach', 'dolly', 'dolly', 'release']);
+    expect(shotKinds(out)).toEqual(['dolly', 'attach', 'attach', 'dolly', 'release']);
+    expect(shotKinds(back)).toEqual(['dolly', 'attach', 'attach', 'dolly', 'release']);
+    expect(shotKinds(q0)).toEqual(['dolly', 'attach', 'attach', 'dolly', 'dolly', 'release']);
 
     const dollySpecs = (scene: typeof out) =>
       scene.ops.flatMap((op) =>
         op.kind === 'camera' && op.shot.kind === 'dolly' ? [{ at: op.at, shot: op.shot }] : [],
       );
+    const outOpeningShot = {
+      kind: 'dolly',
+      points: [
+        { x: 230, z: -52, height: 15.92 },
+        { x: 230, z: -52, height: 18.62 },
+        { x: 230, z: -52, height: 21.42 },
+        { x: 230, z: -52, height: 24.12 },
+      ],
+      lookAt: {
+        kind: 'spline',
+        points: [
+          { x: 243.6, z: -41.8, height: 0.17 },
+          { x: 244.4, z: -44.35, height: 2.87 },
+          { x: 245.4, z: -47.6, height: 5.67 },
+          { x: 245.6, z: -47.7, height: 8.37 },
+        ],
+      },
+      dur: 5.2,
+    };
     expect(dollySpecs(out)).toEqual([
+      { at: expect.closeTo(1.05, 8), shot: outOpeningShot },
       {
-        at: 15.5,
+        at: 19.05,
         shot: {
           kind: 'dolly',
           points: [
@@ -615,17 +636,14 @@ describe('the voyage cinematic', () => {
             { x: 725, z: 93.5, height: 22.685134 },
             { x: 723.5, z: 105.109175, height: 15.369799 },
           ],
+          // The docking look-at rides the arrival walk: down the parked
+          // deck, through the gangway cut, across the boarding bridge.
           lookAt: {
             kind: 'spline',
             points: [
-              { x: 713, z: 96.5, height: 13.597597 },
-              { x: 715, z: 100.5, height: 1 },
-              { x: 717, z: 104.5, height: 1.12 },
-              { x: 719, z: 108.5, height: 1.24 },
-              { x: 721.5, z: 112.5, height: 14.660648 },
-              // The pier-side look-at rides the gangplank anchor, which is
-              // derived from the generated mating edge since the level
-              // crossing landed.
+              { x: 713, z: 111, height: 2.47 },
+              { x: 716, z: 114, height: 1.97 },
+              { x: 721.4, z: 116.25, height: 1.87 },
               { x: 723.5, z: GULLHAVEN_HARBOR.gangplank.z, height: 2 },
             ],
           },
@@ -635,7 +653,29 @@ describe('the voyage cinematic', () => {
     ]);
     expect(dollySpecs(back)).toEqual([
       {
-        at: 15.5,
+        at: expect.closeTo(1.05, 8),
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 723, z: 110, height: 18.73 },
+            { x: 723, z: 110, height: 21.43 },
+            { x: 723, z: 110, height: 24.23 },
+            { x: 723, z: 110, height: 26.93 },
+          ],
+          lookAt: {
+            kind: 'spline',
+            points: [
+              { x: 711.9, z: 121.5, height: 0.17 },
+              { x: 710.7, z: 120.3, height: 2.87 },
+              { x: 708.6, z: 117, height: 5.67 },
+              { x: 707.65, z: 112.16, height: 8.37 },
+            ],
+          },
+          dur: 5.2,
+        },
+      },
+      {
+        at: 19.05,
         shot: {
           kind: 'dolly',
           points: [
@@ -649,11 +689,9 @@ describe('the voyage cinematic', () => {
           lookAt: {
             kind: 'spline',
             points: [
-              { x: 240.5, z: -68, height: 12.804822 },
-              { x: 238.5, z: -64, height: 0.92 },
-              { x: 236.5, z: -60, height: 0.96 },
-              { x: 234.5, z: -56, height: 1 },
-              { x: 232.5, z: -52, height: 12.471553 },
+              { x: 240.5, z: -52, height: 2.47 },
+              { x: 238, z: -48.9, height: 1.97 },
+              { x: 232.1, z: -48.25, height: 1.87 },
               { x: 230.4, z: MAINLAND_HARBOR.gangplank.z, height: 2 },
             ],
           },
@@ -662,8 +700,9 @@ describe('the voyage cinematic', () => {
       },
     ]);
     expect(dollySpecs(q0)).toEqual([
+      { at: expect.closeTo(1.05, 8), shot: outOpeningShot },
       {
-        at: 15.5,
+        at: 19.05,
         shot: {
           kind: 'dolly',
           points: [
@@ -679,7 +718,7 @@ describe('the voyage cinematic', () => {
         },
       },
       {
-        at: 23.4,
+        at: 26.95,
         shot: {
           kind: 'dolly',
           points: [
@@ -714,16 +753,13 @@ describe('the voyage cinematic', () => {
             ]
           : [],
       );
+    // Two attaches per direction: the C5 beam shot abeam on the southern
+    // side (the Old Beacon composition), then the bow-quarter arrival.
     expect(attachSpecs(out)).toEqual([
       {
         target: 'harbor_ship_mainland',
-        offset: { x: -20, y: 16, z: 22 },
-        lookAt: { x: 6.6, y: 8.6, z: 0 },
-      },
-      {
-        target: 'harbor_ship_mainland',
-        offset: { x: -20, y: 16, z: 22 },
-        lookAt: { x: 6.6, y: 8.6, z: 0 },
+        offset: { x: 6.6, y: 9.2, z: -11 },
+        lookAt: { x: 10.2, y: 8.6, z: 0 },
       },
       {
         target: 'harbor_ship_gullhaven',
@@ -734,13 +770,8 @@ describe('the voyage cinematic', () => {
     expect(attachSpecs(back)).toEqual([
       {
         target: 'harbor_ship_gullhaven',
-        offset: { x: -20, y: 16, z: -22 },
-        lookAt: { x: 6.6, y: 8.6, z: 0 },
-      },
-      {
-        target: 'harbor_ship_gullhaven',
-        offset: { x: -20, y: 16, z: -22 },
-        lookAt: { x: 6.6, y: 8.6, z: 0 },
+        offset: { x: 6.6, y: 9.2, z: 11 },
+        lookAt: { x: 3.05, y: 8.6, z: 0 },
       },
       {
         target: 'harbor_ship_mainland',
@@ -754,13 +785,13 @@ describe('the voyage cinematic', () => {
         op.kind === 'playerWalk' ? [{ at: op.at, to: op.to, speed: op.speed }] : [],
       );
     expect(walks(out)).toHaveLength(1);
-    expect(walks(out)[0]?.at).toBeCloseTo(15.5, 8);
+    expect(walks(out)[0]?.at).toBeCloseTo(19.05, 8);
     expect(walks(out)[0]).toMatchObject({
       to: { x: GULLHAVEN_HARBOR.gangplank.x, z: GULLHAVEN_HARBOR.gangplank.z },
       speed: 2.75,
     });
     expect(walks(back)).toHaveLength(1);
-    expect(walks(back)[0]?.at).toBeCloseTo(15.5, 8);
+    expect(walks(back)[0]?.at).toBeCloseTo(19.05, 8);
     expect(walks(back)[0]).toMatchObject({
       to: { x: MAINLAND_HARBOR.gangplank.x, z: MAINLAND_HARBOR.gangplank.z },
       speed: 2.75,
@@ -770,18 +801,18 @@ describe('the voyage cinematic', () => {
 
     for (const scene of [out, back]) {
       const parkFade = scene.ops.flatMap((op) =>
-        op.kind === 'fade' && op.to === 'black' && op.at > 8.5 && op.at < 15.5
+        op.kind === 'fade' && op.to === 'black' && op.at > 12 && op.at < 19.05
           ? [{ at: op.at, dur: op.dur }]
           : [],
       );
       expect(parkFade).toHaveLength(1);
-      expect(parkFade.map((op) => op.dur)).toEqual([0.4]);
-      expect(parkFade[0]?.at).toBeCloseTo(15.05, 8);
+      expect(parkFade.map((op) => op.dur)).toEqual([0.8]);
+      expect(parkFade[0]?.at).toBeCloseTo(18, 8);
     }
 
     const arrivalCutKinds = (scene: typeof out) =>
       scene.ops
-        .filter((op) => Math.abs(op.at - 15.5) < 1e-8)
+        .filter((op) => Math.abs(op.at - 19.05) < 1e-8)
         .map((op) => (op.kind === 'prop' ? `${op.kind}/${op.cue}` : op.kind));
     expect(arrivalCutKinds(out)).toEqual([
       `prop/${LB_PROP_CUE_PARK}`,
@@ -805,9 +836,9 @@ describe('the voyage cinematic', () => {
       { key: 'lb.q0.scene.toll', dur: 6.5 },
     ]);
     expect(q0Lines.map((line) => line.at)).toEqual([
-      expect.closeTo(10.2, 8),
-      expect.closeTo(15.7, 8),
-      expect.closeTo(23.6, 8),
+      expect.closeTo(13.7, 8),
+      expect.closeTo(19.25, 8),
+      expect.closeTo(27.15, 8),
     ]);
     expect(
       q0.ops.filter((op) => op.kind === 'music' && op.directive === 'lb_bell_toll_one'),
@@ -817,7 +848,7 @@ describe('the voyage cinematic', () => {
   it('the first paid crossing plays the spliced voyage: ship cue, bell, then the arrival', () => {
     const sim = makeRider();
     board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');
-    const ops = sceneOps(collect(sim, 16 * 20));
+    const ops = sceneOps(collect(sim, 21 * 20));
     expect(ops.every((e) => e.sceneId === 'scn_lb_q0_voyage')).toBe(true);
     const props = ops
       .filter((e): e is typeof e & { op: { kind: 'prop'; target: string; cue: string } } => {
@@ -887,17 +918,12 @@ describe('the voyage cinematic', () => {
     sim.ctx.players.get(sim.playerId)?.questsDone.add(Q0);
     board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');
     // Let the outbound departure finish before riding back.
-    collect(sim, 22 * 20);
+    collect(sim, 29 * 20);
     expect(sim.player.pos).toEqual(
       sim.groundPos(GULLHAVEN_HARBOR.gangplank.x, GULLHAVEN_HARBOR.gangplank.z),
     );
-    board(
-      sim,
-      GULLHAVEN_HARBOR.boarding.x,
-      GULLHAVEN_HARBOR.boarding.z,
-      'ch_lb_ferry_fare_back',
-    );
-    const ops = sceneOps(collect(sim, 10 * 20));
+    board(sim, GULLHAVEN_HARBOR.boarding.x, GULLHAVEN_HARBOR.boarding.z, 'ch_lb_ferry_fare_back');
+    const ops = sceneOps(collect(sim, 13 * 20));
     expect(ops.length).toBeGreaterThan(0);
     expect(ops.every((e) => e.sceneId === 'scn_lb_ferry_depart_back')).toBe(true);
     const props = ops
@@ -920,7 +946,7 @@ describe('the voyage cinematic', () => {
       },
     ]);
     expect(ops.some((e) => e.op.kind === 'line')).toBe(false);
-    const arrivalOps = sceneOps(collect(sim, 7 * 20));
+    const arrivalOps = sceneOps(collect(sim, 9 * 20));
     const walk = arrivalOps.find((e) => e.op.kind === 'playerWalk');
     expect(walk?.op).toEqual({
       kind: 'playerWalk',
@@ -939,7 +965,7 @@ describe('the voyage cinematic', () => {
         MAINLAND_HARBOR.deckArrival.z - mainlandEnd.z,
       ),
     );
-    collect(sim, 5 * 20);
+    collect(sim, 7 * 20);
     expect(sim.ctx.scenePlaybacks.size).toBe(0);
     expect(sim.player.pos).toEqual(mainlandEnd);
   });

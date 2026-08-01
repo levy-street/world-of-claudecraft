@@ -792,6 +792,15 @@ export const HARBOR_TERRAIN_EDITS = [
   { x: 713, z: 96, radius: 26, delta: -12, falloff: 'smooth', mode: 'level' },
   { x: 713, z: 121, radius: 24, delta: -12, falloff: 'smooth', mode: 'level' },
   { x: 713, z: 146, radius: 22, delta: -12, falloff: 'smooth', mode: 'level' },
+  // The crossing channel: the voyage's filmed open-water leg rides the old
+  // crossing track (360,-8) to (470,34), but the natural strait shelf is
+  // only -5.7 to -6.9 there and the grand hull draws to -7.0 below the
+  // -4.5 sea. Three stamps carve honest depth under the whole swept leg,
+  // the same pattern as the carved berth basins above (deep mid-sea, no
+  // walkable or shoreline impact).
+  { x: 378.7, z: -0.9, radius: 40, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 415, z: 13, radius: 40, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 451.5, z: 27, radius: 40, delta: -12, falloff: 'smooth', mode: 'level' },
 ] as const;
 
 // The deck rect containing (x, z), or null. Later rects win ties so a seam

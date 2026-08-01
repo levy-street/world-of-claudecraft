@@ -21,10 +21,18 @@ type SceneOpAt<Op, Beat extends string> = Op extends { at: number }
 export type SceneTimelineOpDef<Beat extends string = string> = SceneOpAt<SceneOpDef, Beat>;
 export type SceneCameraShotDef = Extract<SceneOpDef, { kind: 'camera' }>['shot'];
 
+export interface CoveredCutOptions {
+  /** Fade-out and fade-in duration; must meet the perceptual floor. */
+  readonly fadeSeconds?: number;
+  /** Full-black hold, split evenly around the cut, for a real breath of black. */
+  readonly holdSeconds?: number;
+}
+
 export interface CoveredCutDef<Beat extends string = string> {
   readonly helper: 'coveredCut';
   readonly at: SceneBeatAt<Beat>;
   readonly shot: SceneCameraShotDef;
+  readonly options?: CoveredCutOptions;
 }
 
 export interface FadeInTailDef<Beat extends string = string> {
@@ -54,8 +62,9 @@ export function beat<const Beat extends string>(beatName: Beat, offset = 0): Sce
 export function coveredCut<const Beat extends string>(
   at: SceneBeatAt<Beat>,
   shot: SceneCameraShotDef,
+  options?: CoveredCutOptions,
 ): CoveredCutDef<Beat> {
-  return { helper: 'coveredCut', at, shot };
+  return { helper: 'coveredCut', at, shot, options };
 }
 
 export function fadeInTail<const Beat extends string>(
@@ -102,21 +111,33 @@ function expandCoveredCut<Beat extends string>(
   beats: SceneBeatMap,
 ): SceneOpDef[] {
   const cutAt = resolveAt(entry.at, beats);
-  const requiredLeadSeconds = MIN_PERCEPTUAL_FADE_SECONDS + DT;
+  const fadeSeconds = entry.options?.fadeSeconds ?? MIN_PERCEPTUAL_FADE_SECONDS;
+  if (!Number.isFinite(fadeSeconds) || fadeSeconds < MIN_PERCEPTUAL_FADE_SECONDS) {
+    throw new Error(`coveredCut fadeSeconds must be at least ${MIN_PERCEPTUAL_FADE_SECONDS}s`);
+  }
+  // The default hold preserves the original cut shape: black is reached one
+  // tick before the cut and released one tick after it. A longer hold splits
+  // evenly around the cut so the black gets a real breath.
+  const holdSeconds = entry.options?.holdSeconds ?? 2 * DT;
+  if (!Number.isFinite(holdSeconds) || holdSeconds < 2 * DT) {
+    throw new Error(`coveredCut holdSeconds must be at least ${2 * DT}s`);
+  }
+  const halfHold = holdSeconds / 2;
+  const requiredLeadSeconds = fadeSeconds + halfHold;
   if (cutAt < requiredLeadSeconds) {
     throw new Error(
       `coveredCut at ${cutAt}s requires at least ${requiredLeadSeconds}s for the fade floor`,
     );
   }
   const fadeLeadAt = cutAt - requiredLeadSeconds;
-  const fadeClearAt = cutAt + DT;
+  const fadeClearAt = cutAt + halfHold;
 
   return [
     {
       at: fadeLeadAt,
       kind: 'fade',
       to: 'black',
-      dur: MIN_PERCEPTUAL_FADE_SECONDS,
+      dur: fadeSeconds,
     },
     { at: cutAt, kind: 'fade', to: 'black', dur: 0 },
     { at: cutAt, kind: 'camera', shot: entry.shot },
@@ -124,7 +145,7 @@ function expandCoveredCut<Beat extends string>(
       at: fadeClearAt,
       kind: 'fade',
       to: 'clear',
-      dur: MIN_PERCEPTUAL_FADE_SECONDS,
+      dur: fadeSeconds,
     },
   ];
 }

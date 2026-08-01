@@ -104,12 +104,14 @@ describe('Last Bell outbound cast-off segment', () => {
     LAST_BELL_PROP_PATH_SEGMENTS[LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff];
 
   // These are authored berth-local values. Changing this pin changes the
-  // shipped voyage clearance or visible motion.
+  // shipped voyage clearance or visible motion. The 5s duration is the J2
+  // pacing: the glide runs until the cut to open water is fully black so
+  // the vessel never stops on camera.
   it('pins the shipped cast-off segment values', () => {
     expect(LAST_BELL_PROP_PATH_SEGMENTS[LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff]).toEqual({
       start: { x: 0, y: 0, z: 0, yaw: 0 },
       end: { x: 22, y: 0, z: 7, yaw: 0 },
-      duration: 4,
+      duration: 5,
       ease: 'linear',
     });
   });

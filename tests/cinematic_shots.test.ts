@@ -705,8 +705,11 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
         kind: 'camera',
         shot: {
           kind: 'dolly',
-          points: [{ x: 230.65, z: -56, height: 10 }],
-          lookAt: { kind: 'point', point: { x: 250.65, z: -56, height: 10 } },
+          // The ray crosses the measured MIDSHIP wall: the Tripo hull's
+          // lower-hull volumes end short of the bow taper, so a ray at the
+          // old z -56 station threads the gap and never occludes.
+          points: [{ x: 230.65, z: -52, height: 10 }],
+          lookAt: { kind: 'point', point: { x: 250.65, z: -52, height: 10 } },
           dur: 1.6,
         },
       },
