@@ -17,7 +17,6 @@ import {
   buildScene,
   coveredCut,
   fadeInTail,
-  MIN_PERCEPTUAL_FADE_SECONDS,
   type SceneTimelineEntry,
 } from '../scenes/authoring';
 import { registerChoice } from '../scenes/choices';
