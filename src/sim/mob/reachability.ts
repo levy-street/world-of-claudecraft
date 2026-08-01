@@ -12,10 +12,16 @@
 // are unaffected: the accumulator stays 0 in every scenario where mobs fight
 // in contact or make chase progress.
 import { MOBS } from '../data';
-import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
+import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
 import { angleTo, DT, dist2d, type Entity, type Vec3 } from '../types';
-import { groundHeight, waterLevelAt } from '../world';
+import {
+  crossesGardenHedge,
+  groundHeight,
+  nearSteepWalls,
+  terrainSteepnessAt,
+  waterLevelAt,
+} from '../world';
 
 // Longer than the evade arm's EVADE_STALL_TIMEOUT (3s, locomotion.ts): a false
 // positive there merely phases a mob home, while a false positive here full
@@ -24,9 +30,13 @@ import { groundHeight, waterLevelAt } from '../world';
 // sustained free damage from an unreachable perch.
 export const CHASE_STALL_TIMEOUT = 5;
 
-// Would a normal (collision- and water-aware) chase step toward `dest` be
-// blocked, i.e. is a prop or deep water right in front of this mob? Mirrors
-// the evade arm's blockedTowardSpawn probe (locomotion.ts) at chase speed.
+// Would a normal chase step toward `dest` be blocked, i.e. is a prop, deep
+// water, an unclimbable cliff face, or a maze hedge right in front of this
+// mob? Mirrors every block mode moveToward (sim.ts) enforces, at chase speed,
+// in the same order, so a mob that commits zero movement AND probes blocked is
+// genuinely pinned by geometry. Mobs with phasesThroughObstacles never reach
+// this probe: their moveToward always commits the straight step, so the
+// moved-this-tick gate in chaseStalledUnreachable resets the accumulator first.
 export function blockedTowardTarget(ctx: SimContext, e: Entity, dest: Vec3): boolean {
   const d = dist2d(e.pos, dest);
   const step = Math.min(e.moveSpeed * DT, d);
@@ -34,12 +44,26 @@ export function blockedTowardTarget(ctx: SimContext, e: Entity, dest: Vec3): boo
   const facing = angleTo(e.pos, dest);
   const nx = e.pos.x + Math.sin(facing) * step;
   const nz = e.pos.z + Math.cos(facing) * step;
-  if (
-    !ctx.mobCanSwim(MOBS[e.templateId]) &&
-    groundHeight(nx, nz, ctx.cfg.seed) < waterLevelAt(nx, nz) - PLAYER_SWIM_DEPTH
-  )
+  const canSwim = ctx.mobCanSwim(MOBS[e.templateId]);
+  const seed = ctx.cfg.seed;
+  if (!canSwim && groundHeight(nx, nz, seed) < waterLevelAt(nx, nz) - PLAYER_SWIM_DEPTH)
     return true;
+  // The uphill steep-wall gate: a cliff face refuses a chase step exactly as it
+  // does in moveToward, so a mob pinned under a ledge reads as blocked, not as
+  // "open ground ahead". Swimmers clamp submerged ground to the waterline (a
+  // sloped lake bed is not a wall), matching moveToward's ride().
+  if (nearSteepWalls(nx, nz) && terrainSteepnessAt(nx, nz, seed) > PLAYER_MAX_CLIMB_SLOPE) {
+    const ride = (x: number, z: number): number => {
+      const h = groundHeight(x, z, seed);
+      const wl = waterLevelAt(x, z);
+      return canSwim && h < wl ? wl : h;
+    };
+    if (ride(nx, nz) > ride(e.pos.x, e.pos.z)) return true;
+  }
   const resolved = ctx.resolveMovePoint(nx, nz, PLAYER_BODY_RADIUS, e);
+  // The Great Maze's hedge walls are hard for mobs too (moveToward refuses the
+  // crossing), so a hedge-pinned chase reads as blocked.
+  if (crossesGardenHedge(e.pos.x, e.pos.z, resolved.x, resolved.z)) return true;
   // a collider ate most of the intended movement -> blocked
   return Math.hypot(nx - resolved.x, nz - resolved.z) > step * 0.5;
 }

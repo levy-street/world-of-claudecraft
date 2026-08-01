@@ -11,7 +11,7 @@ import { createMob } from '../src/sim/entity';
 import { CHASE_STALL_TIMEOUT } from '../src/sim/mob/reachability';
 import { generateRiftFloor } from '../src/sim/rift/rift_gen';
 import { Sim } from '../src/sim/sim';
-import { dist2d, type Entity } from '../src/sim/types';
+import { dist2d, type Entity, NYTHRAXIS_ADD_ID } from '../src/sim/types';
 
 // A plain rectangular floor-0 room (no shell polygon) keeps the wall face at a
 // known |x| = wallX so the pin geometry is exact, and a modest wallX keeps the
@@ -153,6 +153,56 @@ describe('a mob that cannot reach its target evades', () => {
     expect(sawEvade).toBe(false);
     expect(mob.chaseStall).toBe(0);
     expect(mob.aiState === 'attack' || mob.aiState === 'chase').toBe(true);
+  });
+
+  it('never accumulates while stunned against the wall (CC holds the clock)', () => {
+    const { sim, mob } = pinnedSetup();
+    // stun it for well past the stall window before it can pin up
+    mob.auras.push({
+      id: 'test_stun',
+      name: 'Test Stun',
+      kind: 'stun',
+      remaining: CHASE_STALL_TIMEOUT + 3,
+      duration: CHASE_STALL_TIMEOUT + 3,
+      value: 0,
+      sourceId: sim.player.id,
+      school: 'physical',
+    });
+
+    let sawEvadeWhileStunned = false;
+    for (let i = 0; i < (CHASE_STALL_TIMEOUT + 3) * 20; i++) {
+      sim.tick();
+      if (mob.aiState === 'evade') sawEvadeWhileStunned = true;
+    }
+    expect(sawEvadeWhileStunned).toBe(false);
+    expect(mob.chaseStall).toBe(0);
+
+    // once the stun expires the pin is real again: it evades within the window
+    const evaded = tickUntil(
+      sim,
+      () => mob.aiState === 'evade',
+      Math.round((CHASE_STALL_TIMEOUT * 3) / (1 / 20)),
+    );
+    expect(evaded).toBe(true);
+  });
+
+  it('a canLeash:false profile mob never evades off the stall detector', () => {
+    const { sim, mob, player } = pinnedSetup();
+    // swap the pinned trash mob for a Nythraxis add (the canLeash:false profile)
+    const add = createMob(sim.nextId++, MOBS[NYTHRAXIS_ADD_ID], 25, { ...mob.pos });
+    add.hostile = true;
+    sim.addEntity(add);
+    mob.hp = 0;
+    mob.dead = true;
+    sim.ctx.dealDamage(player, add, 1, false, 'physical', null, 'hit');
+
+    let sawEvade = false;
+    for (let i = 0; i < Math.round((CHASE_STALL_TIMEOUT * 3) / (1 / 20)); i++) {
+      sim.tick();
+      if (add.aiState === 'evade') sawEvade = true;
+    }
+    expect(sawEvade).toBe(false);
+    expect(add.chaseStall).toBe(0);
   });
 });
 
