@@ -268,6 +268,7 @@ const WATER_FRAG = /* glsl */ `
   uniform float uWaveEnabled;
   uniform vec2 uWaveOrigin;
   uniform float uWaveSize;
+  uniform float uShoreEdgeFade;
   varying vec3 vWPos;
   varying float vShoreDepth;
   varying float vShoreSlope;
@@ -346,6 +347,13 @@ const WATER_FRAG = /* glsl */ `
       mix(${glsl(WATER_SHALLOW_ALPHA)}, ${glsl(WATER_DEEP_ALPHA)}, opacityDepth),
       surfaceAccent * 0.95
     );
+    // Contour waterline (uShoreEdgeFade, interior strips/pools only): the
+    // surface dissolves where the baked depth reaches zero, so the visible
+    // bank is the terrain's own wet line, never the mesh rectangle. The noise
+    // term wobbles the line so it reads as a shore, not a clip path. Off (0)
+    // collapses the mix to 1.0: the overworld shader is byte-identical.
+    float edgeWobble = 0.18 * sin(vWPos.x * 1.7 + vWPos.z * 2.3) + 0.12 * sin(vWPos.z * 4.1 - vWPos.x * 3.3);
+    alpha *= mix(1.0, smoothstep(0.12, 0.85, vShoreDepth + edgeWobble * uShoreEdgeFade), uShoreEdgeFade);
     gl_FragColor = vec4(col, alpha);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -381,8 +389,19 @@ export function zeroWaveUniforms(): WaterWaveUniforms {
  * builders (the Wildheart Basin) draw the exact same surface; geometry fed to
  * it must carry aShoreDepth/aShoreSlope attributes. Callers gate on
  * GFX.standardMaterials && hasWaterShaderAssets() exactly like buildWater.
+ *
+ * `shoreEdgeFade` fades the surface to nothing where the baked depth reaches
+ * zero, so the WATERLINE follows the terrain contour instead of the geometry
+ * boundary. The overworld planes leave it off (their rect edges hide under
+ * carved bathymetry and the apron); an interior strip or pool laid over its
+ * own heightfield turns it on so a rectangular mesh cannot read as a
+ * hard-edged sheet. Off is the exact pre-option shader (the mix collapses to
+ * 1.0), so overworld output is unchanged.
  */
-export function createWaterSurfaceMaterial(wave: WaterWaveUniforms): THREE.ShaderMaterial {
+export function createWaterSurfaceMaterial(
+  wave: WaterWaveUniforms,
+  opts?: { shoreEdgeFade?: boolean },
+): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     uniforms: {
       ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
@@ -399,6 +418,7 @@ export function createWaterSurfaceMaterial(wave: WaterWaveUniforms): THREE.Shade
       uWaveEnabled: wave.uWaveEnabled,
       uWaveOrigin: wave.uWaveOrigin,
       uWaveSize: wave.uWaveSize,
+      uShoreEdgeFade: { value: opts?.shoreEdgeFade ? 1 : 0 },
     },
     vertexShader: WATER_VERT,
     fragmentShader: WATER_FRAG,

@@ -255,27 +255,39 @@ function buildPath(side: -1 | 1): THREE.Mesh {
 }
 
 let waterMaterial: THREE.Material | null = null;
+let waterFallbackMaterial: THREE.Material | null = null;
 
 function basinWaterMaterial(): THREE.Material {
-  if (waterMaterial) return waterMaterial;
   // The basin renders with the overworld's one water surface shader (scrolling
   // normal maps, fresnel sky, sun glints, shore foam, fog) so its pools belong
   // to the same sea palette as the Palmreach outside. Wave uniforms stay
   // zeroed: the interactive height field is owned by the overworld WaterView.
-  // Gate exactly like water.ts buildWater; the Lambert fallback keeps the low
-  // tier (and a failed texture preload) on the legacy cheap surface.
-  waterMaterial =
-    GFX.standardMaterials && hasWaterShaderAssets()
-      ? createWaterSurfaceMaterial(zeroWaveUniforms())
-      : new THREE.MeshLambertMaterial({
-          color: 0x0a5551,
-          transparent: true,
-          opacity: 0.88,
-          side: THREE.DoubleSide,
-          depthWrite: false,
-        });
-  markSharedMaterial(waterMaterial);
-  return waterMaterial;
+  // Gate exactly like water.ts buildWater. ONLY the shader material is cached
+  // permanently: a player who reaches the basin before the water normal maps
+  // finish preloading builds this interior on the Lambert fallback, and a
+  // one-shot cache pinned that cheap flat sheet for the whole session (the
+  // live-playtest "still looks like a path" report) — the next interior build
+  // must be allowed to upgrade.
+  if (waterMaterial) return waterMaterial;
+  if (GFX.standardMaterials && hasWaterShaderAssets()) {
+    // shoreEdgeFade: the basin's strips and pool sit over their own
+    // heightfield with no carved apron, so the waterline must come from the
+    // terrain contour, never the mesh rectangle.
+    waterMaterial = markSharedMaterial(
+      createWaterSurfaceMaterial(zeroWaveUniforms(), { shoreEdgeFade: true }),
+    );
+    return waterMaterial;
+  }
+  waterFallbackMaterial ??= markSharedMaterial(
+    new THREE.MeshLambertMaterial({
+      color: 0x0a5551,
+      transparent: true,
+      opacity: 0.88,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    }),
+  );
+  return waterFallbackMaterial;
 }
 
 // Mirrors water_core.ts (SHORE_SLOPE_SAMPLE_HALF_WIDTH / MIN_SHORE_SLOPE): the
@@ -318,9 +330,9 @@ let streamGeometry: THREE.BufferGeometry | null = null;
 let cenoteGeometry: THREE.BufferGeometry | null = null;
 
 // Crosswise vertex columns across the stream strip, so the shader's per-vertex
-// foam band and shallow grading vary over the width instead of interpolating
-// straight bank to bank.
-const STREAM_COLUMNS = 5;
+// foam band, shallow grading, and contour edge-fade vary smoothly over the
+// width instead of interpolating straight bank to bank.
+const STREAM_COLUMNS = 9;
 const CENOTE_SURFACE_Y = -0.46;
 
 function buildWater(): THREE.Group {
@@ -331,10 +343,23 @@ function buildWater(): THREE.Group {
     const indices: number[] = [];
     const segments = 64;
     for (let i = 0; i <= segments; i++) {
-      const z = 27 + (i / segments) * 150;
+      // From z 34, not 27: the sim's stream carve only ramps in over z 25-42,
+      // and a surface floated over UNCARVED flat ground has no waterline for
+      // the contour fade to find — it reads as a pale painted sheet with
+      // geometry edges (the "footpath" report). Start where the bed exists
+      // and let the emergence taper below do the rest.
+      const z = 34 + (i / segments) * 143;
       const center = wildheartStreamCenter(z);
-      const width = 4.8 + 2.1 * Math.sin((i / segments) * Math.PI) ** 2;
-      const y = wildheartFieldHeight(center, z) + 0.55;
+      // Wider than the carved bed on purpose: with the shader's contour
+      // edge-fade the GEOMETRY is only a canvas — the visible bank is wherever
+      // the bed meets the surface, so the strip must overshoot the wet line,
+      // never clip it. Tapered at the emergence so the spring starts as a
+      // trickle instead of a full-width sheet.
+      const emergence = 0.35 + 0.65 * smoothstep(34, 58, z);
+      const width = (8 + 2.5 * Math.sin((i / segments) * Math.PI) ** 2) * emergence;
+      // +0.35, not +0.55: the closer the surface hugs the bed, the sooner the
+      // banks cross the fade threshold and the wet line follows the carve.
+      const y = wildheartFieldHeight(center, z) + 0.35;
       for (let column = 0; column < STREAM_COLUMNS; column++) {
         const x = center + ((column / (STREAM_COLUMNS - 1)) * 2 - 1) * width;
         positions.push(x, y, z);
@@ -369,7 +394,10 @@ function buildWater(): THREE.Group {
       const depthAttr = streamGeometry.getAttribute('aShoreDepth');
       for (let i = 0; i < depthAttr.count; i++) {
         const t = ((i % STREAM_COLUMNS) / (STREAM_COLUMNS - 1)) * 2 - 1;
-        depthAttr.setX(i, depthAttr.getX(i) + 4.5 * (1 - t * t));
+        // Cubed falloff, not a bare parabola: the strip overshoots the wet
+        // line for the contour fade, so the deep channel must die out before
+        // the banks or it eats the shoreline foam and shallow grade.
+        depthAttr.setX(i, depthAttr.getX(i) + 4.5 * (1 - t * t) ** 3);
       }
       depthAttr.needsUpdate = true;
     }
