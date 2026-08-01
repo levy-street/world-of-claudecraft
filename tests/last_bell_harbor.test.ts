@@ -84,6 +84,16 @@ describe('Last Bell harbors', () => {
         `${harbor.id} bridge rails registered`,
       ).toBe(true);
     }
+    // The bridge's pier-side edge must meet the berth-head corridor deck
+    // exactly: the corridor's seaward edge is the authored pier edge the
+    // bridge generator was handed, so a nudge to either silently opens a
+    // gap in the crossing without this pin.
+    expect(MAINLAND_HARBOR.bridge.x - MAINLAND_HARBOR.bridge.hw).toBeCloseTo(230.9, 8);
+    expect(GULLHAVEN_HARBOR.bridge.x + GULLHAVEN_HARBOR.bridge.hw).toBeCloseTo(722.6, 8);
+    const mainlandCorridor = MAINLAND_HARBOR.decks[4];
+    const gullhavenCorridor = GULLHAVEN_HARBOR.decks[5];
+    expect(mainlandCorridor.x + mainlandCorridor.hw).toBeCloseTo(230.9, 8);
+    expect(gullhavenCorridor.x - gullhavenCorridor.hw).toBeCloseTo(722.6, 8);
   });
 
   it('lands the seam ramps on walkable shoulders, never open water', () => {

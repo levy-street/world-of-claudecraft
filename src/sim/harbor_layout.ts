@@ -155,9 +155,10 @@ export interface HarborDef {
   // hull skin, so coarse hull-box sweeps special-case them by identity.
   bridge: HarborDeck;
   bridgeRails: readonly HarborRail[];
-  // The pier-side end of the boarding bridge: the ferryman keeps his post
-  // here. facing is the yaw an NPC at the gangplank should stand with
-  // (looking down the pier at arrivals).
+  // The boarding approach on the berth-head corridor, just short of the
+  // bridge's pier edge: arrival walks end here and the ferryman post yaw
+  // derives from it. facing is the yaw an NPC at the gangplank should
+  // stand with (looking down the pier at arrivals).
   gangplank: { x: number; z: number; facing: number };
   // Where boarding happens: ON the ship's main deck (walk the gangplank
   // aboard, then depart). The lb_ferry fixture spawns here.
@@ -628,8 +629,8 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     { x: 773.25, z: 116, hw: 5.25, hd: 3.2, y: 4.2 },
     // lower pier (x 760.5..769.5, z 112.8..119.2)
     { x: 765, z: 116, hw: 4.5, hd: 3.2, y: 2.6 },
-    // pier head (x 753..761, z 110.5..121.5), low over the bay so the
-    // gangplank onto the ship's deck stays a walkable slope
+    // pier head (x 753..761, z 110.5..121.5), low over the bay; the climb
+    // to the ship's deck height happens on the seam ramp past the outer run
     { x: 757, z: 116, hw: 4, hd: 5.5, y: 0.2 },
     // the grand extension: the boardwalk runs on west over the deep bay to
     // the berth head where the tall ship lies. The run continues UNDER the
