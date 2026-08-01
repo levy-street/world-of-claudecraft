@@ -360,12 +360,16 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned: the review's roof-course offset fix and the
-      // makeOpenPitchedRoof coupling guard touched buildings_commerce.js, a
-      // pinned townAsset source-fingerprint input, so this composite mints
-      // fresh even though the fix only changes the bank's own geometry by a
-      // few millimeters and adds a runtime assertion. No recapture.
-      fingerprint: 'b3a49fd4fa887920af5de4b6fb93e2b9b3c6c0351e9a2ba00d6567e44083e88b',
+      // Deliberately re-pinned again: issue #2571's compile-storm fix (world-
+      // entry prewarm resume, plus gating live gear/mount/skin swaps on
+      // already-visible entities) touched src/render/renderer.ts, a pinned
+      // rendererIntegration source-fingerprint input, so this composite mints
+      // fresh. The change is timing/gating only (when a program links, never
+      // what the compiled result looks like), Eastbrook's own runtime modules
+      // (eastbrook_town.ts, mailbox.ts, noticeboard.ts, eastbrook_civic_beacon.ts)
+      // are untouched, and prewarm_policy.ts's contribution stays a wildcard
+      // match below regardless. No recapture.
+      fingerprint: 'd4b584aeb232d2d4c1c6e735ecf7e4125479b1bfa9822472d84cb0f792c09d6c',
       components: {
         captureContract: {
           id: 'polish-v2',

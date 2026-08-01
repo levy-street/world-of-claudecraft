@@ -301,6 +301,12 @@ describe('mandatory interaction-landmark prewarm', () => {
   });
 
   it('bounds parallel compile readiness and makes the no-parallel path immediate', () => {
+    // #2571 commit 2 extracted the bounded timeout race that used to be inline
+    // here into a shared core (compileGate delegating to raceCompileGate, see
+    // src/render/compile_gate.ts) so gateSwapOnCompile/gateSwapFlagOnCompile
+    // could reuse it instead of duplicating it. gateViewOnCompile itself still
+    // owns the unsupported-browser short-circuit and the compilePending
+    // lifecycle; the timeout/resolve mechanics now live one hop over.
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const gateStart = renderer.indexOf('private gateViewOnCompile(');
     const gateEnd = renderer.indexOf('\n  /** The visual the player currently sees', gateStart);
@@ -308,9 +314,25 @@ describe('mandatory interaction-landmark prewarm', () => {
     expect(gateStart).toBeGreaterThan(-1);
     expect(gateEnd).toBeGreaterThan(gateStart);
     expect(gate).toContain('if (!this.asyncCompileSupported) return null;');
-    expect(gate).toContain('const guard = setTimeout(clear, VIEW_COMPILE_GATE_MAX_MS);');
+    expect(gate).toContain('this.compileGate(group)');
     expect(gate).toContain('view.compilePending = false;');
-    expect(gate).toContain('resolve();');
+
+    const compileGateStart = renderer.indexOf('private compileGate(');
+    const compileGateEnd = renderer.indexOf('private gateViewOnCompile(', compileGateStart);
+    const compileGate = renderer.slice(compileGateStart, compileGateEnd);
+    expect(compileGateStart).toBeGreaterThan(-1);
+    expect(compileGateEnd).toBeGreaterThan(compileGateStart);
+    expect(compileGate).toContain('raceCompileGate(');
+    expect(compileGate).toContain('VIEW_COMPILE_GATE_MAX_MS');
+
+    // The bounded timeout race itself, plus its own dedicated coverage, now
+    // live in the shared core: tests/compile_gate.test.ts drives its actual
+    // behavior (resolves on compile, on rejection, or on timeout); this pin
+    // only confirms the mechanics still exist in source, not duplicated back
+    // into gateViewOnCompile.
+    const core = readFileSync(new URL('../src/render/compile_gate.ts', import.meta.url), 'utf8');
+    expect(core).toContain('const guard = scheduler.setTimeout(clear, timeoutMs);');
+    expect(core).toContain('resolve();');
   });
 });
 
