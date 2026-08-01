@@ -66,6 +66,10 @@ export function firstHarborHullColliderOverlap(
   for (const harbor of harbors) {
     for (let i = 0; i < harbor.decks.length; i++) {
       const deck = harbor.decks[i];
+      // The ship's own boarding bridge deliberately meets the hull skin at
+      // the berth, so the coarse full-beam sweep skips it; the linter's
+      // measured-volume mating check owns that seam.
+      if (harbor.id === movingHarbor.id && deck === harbor.bridge) continue;
       if (
         verticalOverlap(frame, bounds, deck.y, deck.y) &&
         horizontalOverlap(frame, bounds, deck)

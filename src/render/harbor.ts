@@ -167,8 +167,10 @@ function addAsset(
 
 // One deck rect: long boards laid across the SHORT axis (so they run along
 // the deck's length), staggered joints, alternating tones; a darker skirt
-// beam around the rim and pilings down into the water.
-function buildDeck(wood: WoodBuckets, deck: HarborDeck, seed: number): void {
+// beam around the rim and pilings down into the water. The boarding bridge
+// passes withPilings false: it is a suspended brow onto the hull, so posts
+// dangling against the ship's side would read as a mistake.
+function buildDeck(wood: WoodBuckets, deck: HarborDeck, seed: number, withPilings = true): void {
   const alongX = deck.hw >= deck.hd; // boards run along the longer axis
   const runHalf = alongX ? deck.hw : deck.hd;
   const acrossHalf = alongX ? deck.hd : deck.hw;
@@ -203,6 +205,7 @@ function buildDeck(wood: WoodBuckets, deck: HarborDeck, seed: number): void {
   wood.box(TRIM_TONE, 0.24, 0.3, deck.hd * 2 + 0.2, deck.x - deck.hw, skirtY, deck.z);
   wood.box(TRIM_TONE, 0.24, 0.3, deck.hd * 2 + 0.2, deck.x + deck.hw, skirtY, deck.z);
   // pilings at the corners and every ~3.6 yd along the edges
+  if (!withPilings) return;
   const step = 3.6;
   const posts: { x: number; z: number }[] = [];
   for (let x = deck.x - deck.hw; x <= deck.x + deck.hw + 0.01; x += step) {
@@ -419,8 +422,7 @@ const HARBOR_SHIP_BOARDING_DECK =
   ) ?? GRAND_FERRY_SHIP_PLAN.decks[0];
 const HARBOR_SHIP_DECK_STAND_IN_ATTACH = {
   x: HARBOR_SHIP_BOARDING_DECK.x * HARBOR_SHIP_STANDARD_SCALE,
-  y:
-    (HARBOR_SHIP_BOARDING_DECK.y - GRAND_FERRY_SHIP_PLAN.model.keelY) * HARBOR_SHIP_STANDARD_SCALE,
+  y: (HARBOR_SHIP_BOARDING_DECK.y - GRAND_FERRY_SHIP_PLAN.model.keelY) * HARBOR_SHIP_STANDARD_SCALE,
   z: HARBOR_SHIP_BOARDING_DECK.z * HARBOR_SHIP_STANDARD_SCALE,
   yaw: Math.PI / 2,
 } satisfies DeckStandInAttachPoint;
@@ -726,7 +728,7 @@ export function buildHarbors(seed: number, deps: HarborSceneDeps): { group: THRE
     const g = new THREE.Group();
     const wood = new WoodBuckets();
     rampMeshes = [];
-    for (const deck of harbor.decks) buildDeck(wood, deck, seed);
+    for (const deck of harbor.decks) buildDeck(wood, deck, seed, deck !== harbor.bridge);
     for (const rail of harbor.rails) {
       buildRail(wood, rail, harborSurfaceHeight(harbor, rail.x, rail.z));
     }

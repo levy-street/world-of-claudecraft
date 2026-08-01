@@ -1,6 +1,6 @@
-import { GRAND_FERRY_SHIP_PLAN } from '../src/sim/grand_ferry_ship_plan.generated';
 import { describe, expect, it } from 'vitest';
-import { HARBORS, type HarborDef, type HarborRamp, harborDeckAt } from '../src/sim/harbor_layout';
+import { GRAND_FERRY_SHIP_PLAN } from '../src/sim/grand_ferry_ship_plan.generated';
+import { HARBORS, type HarborDef, harborDeckAt } from '../src/sim/harbor_layout';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { isSwimming } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
@@ -82,22 +82,27 @@ function pushToward(
   clearInput(sim);
 }
 
-function rampHighEdge(ramp: HarborRamp): Point2 {
-  switch (ramp.dir) {
-    case 'x+':
-      return { x: ramp.x - ramp.hw, z: ramp.z };
-    case 'x-':
-      return { x: ramp.x + ramp.hw, z: ramp.z };
-    case 'z+':
-      return { x: ramp.x, z: ramp.z - ramp.hd };
-    case 'z-':
-      return { x: ramp.x, z: ramp.z + ramp.hd };
+// The level boarding bridge replaced the sloped gangplank: its ship-side and
+// pier-side edges are derived from which world axis carries the crossing (the
+// berth center sits off the bridge along that axis).
+function bridgeEdges(harbor: HarborDef): { ship: Point2; pier: Point2; alongX: boolean } {
+  const bridge = harbor.bridge;
+  const dx = harbor.berth.x - bridge.x;
+  const dz = harbor.berth.z - bridge.z;
+  if (Math.abs(dx) >= Math.abs(dz)) {
+    const sign = Math.sign(dx);
+    return {
+      ship: { x: bridge.x + sign * bridge.hw, z: bridge.z },
+      pier: { x: bridge.x - sign * bridge.hw, z: bridge.z },
+      alongX: true,
+    };
   }
-}
-
-function rampLowEdge(ramp: HarborRamp): Point2 {
-  const high = rampHighEdge(ramp);
-  return { x: ramp.x * 2 - high.x, z: ramp.z * 2 - high.z };
+  const sign = Math.sign(dz);
+  return {
+    ship: { x: bridge.x, z: bridge.z + sign * bridge.hd },
+    pier: { x: bridge.x, z: bridge.z - sign * bridge.hd },
+    alongX: false,
+  };
 }
 
 function insideDeck(deck: HarborDef['shipDecks'][number], point: Point2): boolean {
@@ -177,10 +182,9 @@ function pointClearanceFromBlocker(
 function walkBoardingCircuit(sim: Sim, harbor: HarborDef): void {
   const mainDeck = deckWalkBox(harbor);
   const landing = harbor.shipDecks.at(-1);
-  const ramp = harbor.ramps.at(-1);
-  if (!mainDeck || !landing || !ramp) throw new Error(`${harbor.id} boarding plan is incomplete`);
-  const high = rampHighEdge(ramp);
-  const low = rampLowEdge(ramp);
+  const bridge = harbor.bridge;
+  if (!mainDeck || !landing) throw new Error(`${harbor.id} boarding plan is incomplete`);
+  const { ship: high, pier: low, alongX } = bridgeEdges(harbor);
   const outwardX = low.x - high.x;
   const outwardZ = low.z - high.z;
   const outwardLength = Math.hypot(outwardX, outwardZ);
@@ -201,14 +205,18 @@ function walkBoardingCircuit(sim: Sim, harbor: HarborDef): void {
     `${harbor.id} boards through the gangway`,
     (player) => {
       boardingHeights.push(player.pos.y);
-      expect(player.onGround, `${harbor.id} gangplank footing`).toBe(true);
-      expect(isSwimming(player, sim.cfg.seed), `${harbor.id} gangplank water gap`).toBe(false);
+      expect(player.onGround, `${harbor.id} boarding bridge footing`).toBe(true);
+      expect(isSwimming(player, sim.cfg.seed), `${harbor.id} boarding bridge water gap`).toBe(
+        false,
+      );
     },
     240,
   );
   expect(onShipDeck(harbor, sim.player.pos), `${harbor.id} reached the main deck`).toBe(true);
-  expect(Math.min(...boardingHeights), `${harbor.id} ramp-to-deck gap`).toBeGreaterThanOrEqual(
-    Math.min(ramp.lowY, ramp.highY) - 0.01,
+  // The crossing is LEVEL: from the berth head across the bridge onto the
+  // deck, nobody ever dips below the bridge's own surface.
+  expect(Math.min(...boardingHeights), `${harbor.id} bridge-to-deck gap`).toBeGreaterThanOrEqual(
+    bridge.y - 0.01,
   );
 
   const perimeter = [
@@ -289,31 +297,32 @@ function walkBoardingCircuit(sim: Sim, harbor: HarborDef): void {
       if (onShipDeck(harbor, player.pos)) return;
       leftMainDeck = true;
       const onLanding = insideDeck(landing, player.pos);
-      const onRamp =
-        Math.abs(player.pos.x - ramp.x) <= ramp.hw + PLAYER_BODY_RADIUS &&
-        Math.abs(player.pos.z - ramp.z) <= ramp.hd + PLAYER_BODY_RADIUS;
+      const onBridge =
+        Math.abs(player.pos.x - bridge.x) <= bridge.hw + PLAYER_BODY_RADIUS &&
+        Math.abs(player.pos.z - bridge.z) <= bridge.hd + PLAYER_BODY_RADIUS;
       expect(
-        onLanding || onRamp || harborDeckAt(harbor, player.pos.x, player.pos.z) !== null,
+        onLanding || onBridge || harborDeckAt(harbor, player.pos.x, player.pos.z) !== null,
         `${harbor.id} deck exit stays on the gangway route`,
       ).toBe(true);
-      if (ramp.dir === 'x+' || ramp.dir === 'x-') {
+      if (alongX) {
         expect(
-          Math.abs(player.pos.z - ramp.z),
+          Math.abs(player.pos.z - bridge.z),
           `${harbor.id} deck exit crossed the gangway opening`,
-        ).toBeLessThanOrEqual(ramp.hd + PLAYER_BODY_RADIUS);
+        ).toBeLessThanOrEqual(bridge.hd + PLAYER_BODY_RADIUS);
       } else {
         expect(
-          Math.abs(player.pos.x - ramp.x),
+          Math.abs(player.pos.x - bridge.x),
           `${harbor.id} deck exit crossed the gangway opening`,
-        ).toBeLessThanOrEqual(ramp.hw + PLAYER_BODY_RADIUS);
+        ).toBeLessThanOrEqual(bridge.hw + PLAYER_BODY_RADIUS);
       }
     },
     240,
   );
   expect(leftMainDeck, `${harbor.id} left the deck`).toBe(true);
-  expect(Math.min(...exitHeights), `${harbor.id} outbound ramp-to-deck gap`).toBeGreaterThanOrEqual(
-    Math.min(ramp.lowY, ramp.highY) - 0.01,
-  );
+  expect(
+    Math.min(...exitHeights),
+    `${harbor.id} outbound bridge-to-deck gap`,
+  ).toBeGreaterThanOrEqual(bridge.y - 0.01);
   expect(
     Math.hypot(sim.player.pos.x - approach.x, sim.player.pos.z - approach.z),
     `${harbor.id} returned to the pier`,
@@ -431,10 +440,7 @@ describe('grand ferry boarding walk', () => {
   it.each(SEEDS)('blocks pier, water, bow, and stern hull approaches, seed %i', (seed) => {
     for (const harbor of HARBORS) {
       const sim = makeSim(seed);
-      const ramp = harbor.ramps.at(-1);
-      if (!ramp) throw new Error(`${harbor.id} lost its gangplank`);
-      const high = rampHighEdge(ramp);
-      const low = rampLowEdge(ramp);
+      const { ship: high, pier: low } = bridgeEdges(harbor);
       const pierDirection = { x: low.x - high.x, z: low.z - high.z };
       const waterDirection = { x: -pierDirection.x, z: -pierDirection.z };
       const bowDirection = {
@@ -480,9 +486,8 @@ describe('grand ferry boarding walk', () => {
       expect(keeper, templateId).toBeDefined();
       if (!keeper) continue;
       const mainDeck = deckWalkBox(harbor);
-      const ramp = harbor.ramps.at(-1);
-      if (!mainDeck || !ramp) throw new Error(`${harbor.id} keeper plan is incomplete`);
-      const high = rampHighEdge(ramp);
+      if (!mainDeck) throw new Error(`${harbor.id} keeper plan is incomplete`);
+      const { ship: high } = bridgeEdges(harbor);
       expect(onShipDeck(harbor, keeper.pos), `${templateId} main deck post`).toBe(true);
       expect(
         Math.hypot(keeper.pos.x - harbor.boarding.x, keeper.pos.z - harbor.boarding.z),

@@ -6,9 +6,10 @@ import type { HarborDef } from '../src/sim/harbor_layout.js';
 const HARBOR_SOURCE = readFileSync(new URL('../src/render/harbor.ts', import.meta.url), 'utf8');
 
 function harbor(id: string, x: number, z: number): HarborDef {
+  const decks = [{ x: x + 20, z, y: 1, hw: 3, hd: 3 }];
   return {
     id: id as HarborDef['id'],
-    decks: [{ x: x + 20, z, y: 1, hw: 3, hd: 3 }],
+    decks,
     rails: [],
     ramps: [],
     dressing: [],
@@ -22,8 +23,10 @@ function harbor(id: string, x: number, z: number): HarborDef {
     shipDecks: [{ x, z, y: 2, hw: 4, hd: 8 }],
     shipRails: [],
     shipBlockers: [],
+    bridge: decks[0],
+    bridgeRails: [],
     keeperPost: { x: 0, z: 0 },
-  gangplank: { x, z, facing: 0 },
+    gangplank: { x, z, facing: 0 },
     boarding: { x, z },
     deckArrival: { x, z },
     arrival: { x, z },
@@ -61,6 +64,47 @@ describe('harbor ship tripwire core', () => {
         fixed,
       ]),
     ).toBeNull();
+  });
+
+  it("skips only the moving harbor's own boarding bridge", () => {
+    const overlappingDeck = { x: 4, z: 0, y: 1, hw: 2, hd: 2 };
+    const base = harbor('moving', 0, 0);
+    const ownBridge: HarborDef = {
+      ...base,
+      decks: [overlappingDeck],
+      bridge: overlappingDeck,
+    };
+    expect(
+      firstHarborHullColliderOverlap(ownBridge, { position: { x: 0, y: 0, z: 0 }, yaw: 0 }, [
+        ownBridge,
+      ]),
+    ).toBeNull();
+
+    // The same rect without bridge identity still trips: the skip is by
+    // identity, never by position.
+    const plainDeck: HarborDef = {
+      ...base,
+      decks: [overlappingDeck],
+      bridge: { ...overlappingDeck },
+    };
+    expect(
+      firstHarborHullColliderOverlap(plainDeck, { position: { x: 0, y: 0, z: 0 }, yaw: 0 }, [
+        plainDeck,
+      ]),
+    ).toMatchObject({ harborId: 'moving', colliderKind: 'deck', colliderIndex: 0 });
+
+    // Another harbor's bridge is a real obstacle for this hull.
+    const otherHarbor: HarborDef = {
+      ...harbor('fixed', 100, 100),
+      decks: [overlappingDeck],
+      bridge: overlappingDeck,
+    };
+    expect(
+      firstHarborHullColliderOverlap(base, { position: { x: 0, y: 0, z: 0 }, yaw: 0 }, [
+        base,
+        otherHarbor,
+      ]),
+    ).toMatchObject({ harborId: 'fixed', colliderKind: 'deck', colliderIndex: 0 });
   });
 
   it('checks ramps independently and rejects vertical separation', () => {

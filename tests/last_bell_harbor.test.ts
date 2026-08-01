@@ -27,13 +27,29 @@ function makeSim(): Sim {
 describe('Last Bell harbors', () => {
   it('ships both harbors', () => {
     expect(HARBORS.map((h) => h.id)).toEqual(['mainland', 'gullhaven']);
-    // Pin the anchors so the campaign cannot silently drift.
-    expect(MAINLAND_HARBOR.gangplank).toEqual({ x: 230.4, z: -48, facing: Math.PI / 2 });
-    expect(GULLHAVEN_HARBOR.gangplank).toEqual({ x: 723.5, z: 116.5, facing: 0 });
-    expect(MAINLAND_HARBOR.boarding).toEqual({ x: 239, z: -48 });
-    expect(GULLHAVEN_HARBOR.boarding).toEqual({ x: 714.5, z: 116.5 });
-    expect(MAINLAND_HARBOR.deckArrival).toEqual({ x: 240.5, z: -50.6 });
-    expect(GULLHAVEN_HARBOR.deckArrival).toEqual({ x: 713, z: 113.9 });
+    // Pin the anchors so the campaign cannot silently drift. The z values
+    // ride the generated mating edge and the x values the measured deck, so
+    // they are pinned to the expected world spots within a float hair.
+    expect(MAINLAND_HARBOR.gangplank).toEqual({
+      x: 230.4,
+      z: expect.closeTo(-48.25, 5),
+      facing: Math.PI / 2,
+    });
+    expect(GULLHAVEN_HARBOR.gangplank).toEqual({
+      x: 723.5,
+      z: expect.closeTo(116.25, 5),
+      facing: 0,
+    });
+    expect(MAINLAND_HARBOR.boarding).toEqual({
+      x: expect.closeTo(237.15, 5),
+      z: expect.closeTo(-48.25, 5),
+    });
+    expect(GULLHAVEN_HARBOR.boarding).toEqual({
+      x: expect.closeTo(716.35, 5),
+      z: expect.closeTo(116.25, 5),
+    });
+    expect(MAINLAND_HARBOR.deckArrival).toEqual({ x: 240.5, z: expect.closeTo(-50.775, 5) });
+    expect(GULLHAVEN_HARBOR.deckArrival).toEqual({ x: 713, z: expect.closeTo(113.725, 5) });
     expect(MAINLAND_HARBOR.arrival).toEqual({ x: 173, z: -42 });
     expect(GULLHAVEN_HARBOR.arrival).toEqual({ x: 782, z: 125 });
   });
@@ -97,8 +113,8 @@ describe('Last Bell harbors', () => {
         }
         prev = g;
       }
-      // and the walk ends on the ship's deck
-      expect(groundHeight(239, -48, seed)).toBe(0.72);
+      // and the walk ends on the ship's measured deck height
+      expect(groundHeight(239, -48, seed)).toBe(1.034142297254);
     }
   });
 
@@ -129,7 +145,10 @@ describe('Last Bell harbors', () => {
     // the previous, higher deck are that deck's business, so sample only
     // where the head rules.
     for (const harbor of HARBORS) {
-      const head = harbor.decks[harbor.decks.length - 1];
+      // The last deck is the boarding bridge by contract; the seaward deck
+      // this test wants is the berth head beside it.
+      const berthDecks = harbor.decks.filter((deck) => deck !== harbor.bridge);
+      const head = berthDecks[berthDecks.length - 1];
       for (const seed of SEEDS) {
         let sampled = 0;
         for (let x = head.x - head.hw + 0.2; x <= head.x + head.hw - 0.2; x += 1.1) {
@@ -267,9 +286,9 @@ describe('Last Bell harbors', () => {
     sim.player.facing = Math.PI / 2;
     sim.moveInput.forward = true;
     for (let i = 0; i < 420; i++) sim.tick();
-    // aboard, well past the gangplank landing
+    // aboard, well past the gangway landing, at the measured deck height
     expect(sim.player.pos.x).toBeGreaterThan(236);
-    expect(sim.player.pos.y).toBeCloseTo(0.72, 3);
+    expect(sim.player.pos.y).toBeCloseTo(1.034142, 3);
     // and back west down the plank to the berth head: control never strips
     sim.player.facing = -Math.PI / 2;
     for (let i = 0; i < 500; i++) sim.tick();

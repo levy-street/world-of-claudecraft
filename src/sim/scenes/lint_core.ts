@@ -101,7 +101,8 @@ export const HULL_TERRAIN_SAMPLE_STEP_YARDS = 2;
 // Contact within this tolerance is accepted as a berth seam, not solid penetration.
 export const HULL_INTERSECTION_EPSILON_YARDS = 0.01;
 // The generated lower-hull blocker straddles the visual skin, so the fixed
-// gangplank may share this much of its mating edge while the ship is parked.
+// boarding bridge (which deliberately lands ON the hull skin line) may share
+// this much of its mating edge while the ship is parked.
 export const HULL_GANGWAY_MATING_EPSILON_YARDS = 0.15;
 // Feet must remain this close to an authored presentation support surface.
 export const ENTITY_SUPPORT_EPSILON_YARDS = 0.1;
@@ -755,20 +756,23 @@ export function hullWorldCollision(
   const footprints = shipHullVolumes(harbor, world.waterLevel);
   for (const fixedHarbor of HARBORS) {
     for (const [index, deck] of fixedHarbor.decks.entries()) {
+      // The harbor's own boarding bridge deliberately mates with the hull
+      // skin, so it alone carries the gangway tolerance; every other deck
+      // (and any OTHER harbor's bridge) stays a tight seam.
+      const tolerance =
+        fixedHarbor.id === harbor.id && deck === fixedHarbor.bridge
+          ? HULL_GANGWAY_MATING_EPSILON_YARDS
+          : HULL_INTERSECTION_EPSILON_YARDS;
       for (const footprint of footprints) {
-        const penetration = hullRectPenetration(frame, footprint, deck);
+        const penetration = hullRectPenetration(frame, footprint, deck, tolerance);
         if (penetration !== null) {
           return { label: `${fixedHarbor.id} deck ${index}`, penetration, volumeId: footprint.id };
         }
       }
     }
     for (const [index, ramp] of fixedHarbor.ramps.entries()) {
-      const tolerance =
-        fixedHarbor.id === harbor.id && index === fixedHarbor.ramps.length - 1
-          ? HULL_GANGWAY_MATING_EPSILON_YARDS
-          : HULL_INTERSECTION_EPSILON_YARDS;
       for (const footprint of footprints) {
-        const penetration = hullRectPenetration(frame, footprint, ramp, tolerance);
+        const penetration = hullRectPenetration(frame, footprint, ramp);
         if (penetration !== null) {
           return { label: `${fixedHarbor.id} ramp ${index}`, penetration, volumeId: footprint.id };
         }

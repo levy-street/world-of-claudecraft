@@ -14,10 +14,17 @@ import {
   harborShipLocalBounds,
   MAINLAND_HARBOR,
 } from '../src/sim/harbor_layout';
+import { shipHullPointClearance } from '../src/sim/scenes/lint_core';
 import type { SceneAttachFrame } from '../src/sim/types';
+import { WATER_LEVEL } from '../src/sim/world';
 
 const BERTH_SWEEP_SAMPLE_STEP_SECONDS = 0.05;
 const FENCE_INTERSECTION_EPSILON_YARDS = 0.01;
+// The bridge rails deliberately run past the model's widest-beam line to the
+// hull skin at the gangway station, so the coarse full-beam box would always
+// flag them; they get the accurate measured-volume sweep below instead.
+const BRIDGE_RAIL_SAMPLE_STEP_YARDS = 0.25;
+const BRIDGE_RAIL_CLEARANCE_EPSILON_YARDS = 0.02;
 
 interface OrientedRect {
   readonly x: number;
@@ -122,7 +129,9 @@ function expectFenceClearance(
   collisions: Map<string, string>,
 ): void {
   const hull = hullRect(harbor, frame);
+  const bridgeRails = new Set<HarborRail>(harbor.bridgeRails);
   for (const [railIndex, rail] of harbor.rails.entries()) {
+    if (bridgeRails.has(rail)) continue;
     if (!orientedRectsIntersect(hull, railRect(rail))) continue;
     const key = `${harbor.id}:${collisionGroup}:${railIndex}`;
     if (!collisions.has(key)) {
@@ -131,17 +140,52 @@ function expectFenceClearance(
   }
 }
 
+// The accurate arm for the bridge rails: every sample point along each rail's
+// center line stays clear of the MEASURED hull volumes at this pose.
+function expectBridgeRailClearance(
+  harbor: HarborDef,
+  frame: SceneAttachFrame,
+  label: string,
+  collisions: Map<string, string>,
+): void {
+  for (const [railIndex, rail] of harbor.bridgeRails.entries()) {
+    const alongX = rail.rot === 0;
+    const halfThickness = rail.halfThickness ?? HARBOR_RAIL_HALF_THICK;
+    const samples = Math.max(2, Math.ceil((rail.hw * 2) / BRIDGE_RAIL_SAMPLE_STEP_YARDS) + 1);
+    for (let index = 0; index < samples; index++) {
+      const along = -rail.hw + (rail.hw * 2 * index) / (samples - 1);
+      const point = {
+        x: alongX ? rail.x + along : rail.x,
+        y: harbor.bridge.y + 0.5,
+        z: alongX ? rail.z : rail.z + along,
+      };
+      const clearance = shipHullPointClearance(harbor, frame, point, WATER_LEVEL);
+      if (clearance >= halfThickness + BRIDGE_RAIL_CLEARANCE_EPSILON_YARDS) continue;
+      const key = `${harbor.id}:bridge:${railIndex}`;
+      if (!collisions.has(key)) {
+        collisions.set(
+          key,
+          `${harbor.id} bridge rail ${railIndex} runs ${clearance.toFixed(3)} yd from the measured hull at ${label}`,
+        );
+      }
+    }
+  }
+}
+
 describe('ferry berth fence clearance', () => {
   it('keeps both parked hulls and all four berth glides clear of dock rail colliders', () => {
     const collisions = new Map<string, string>();
     for (const { harbor, segmentIds } of BERTH_GLIDES) {
-      expectFenceClearance(
-        harbor,
-        shipFrame(harbor, null),
-        'parked',
-        'the parked pose',
-        collisions,
-      );
+      const checkPose = (
+        pose: { x: number; y: number; z: number; yaw: number } | null,
+        group: string,
+        label: string,
+      ) => {
+        const frame = shipFrame(harbor, pose);
+        expectFenceClearance(harbor, frame, group, label, collisions);
+        expectBridgeRailClearance(harbor, frame, label, collisions);
+      };
+      checkPose(null, 'parked', 'the parked pose');
       for (const segmentId of segmentIds) {
         const segment = LAST_BELL_PROP_PATH_SEGMENTS[segmentId];
         for (
@@ -149,20 +193,16 @@ describe('ferry berth fence clearance', () => {
           elapsed < segment.duration;
           elapsed += BERTH_SWEEP_SAMPLE_STEP_SECONDS
         ) {
-          expectFenceClearance(
-            harbor,
-            shipFrame(harbor, propPathPoseAt(segment, elapsed)),
+          checkPose(
+            propPathPoseAt(segment, elapsed),
             segmentId,
             `${segmentId} at ${elapsed.toFixed(2)} seconds`,
-            collisions,
           );
         }
-        expectFenceClearance(
-          harbor,
-          shipFrame(harbor, propPathPoseAt(segment, segment.duration)),
+        checkPose(
+          propPathPoseAt(segment, segment.duration),
           segmentId,
           `${segmentId} at ${segment.duration.toFixed(2)} seconds`,
-          collisions,
         );
       }
     }

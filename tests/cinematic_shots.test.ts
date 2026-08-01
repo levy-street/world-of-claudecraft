@@ -4311,11 +4311,14 @@ describe('cinematic shot mechanical gate', () => {
         volumeId: 'lower-hull-body',
       });
 
-      const gangwayIndex = harbor.ramps.length - 1;
-      const gangway = harbor.ramps[gangwayIndex];
+      // The boarding bridge is the deck that deliberately mates with the hull
+      // skin: shoving the parked hull toward it past the mating tolerance must
+      // trip the deck arm on exactly that rect.
+      const bridgeIndex = harbor.decks.indexOf(harbor.bridge);
+      expect(bridgeIndex, `${harbor.id} bridge sits in decks`).toBeGreaterThanOrEqual(0);
       const towardGangway = {
-        x: gangway.x - parkedFrame.position.x,
-        z: gangway.z - parkedFrame.position.z,
+        x: harbor.bridge.x - parkedFrame.position.x,
+        z: harbor.bridge.z - parkedFrame.position.z,
       };
       const gangwayDistance = Math.hypot(towardGangway.x, towardGangway.z);
       const boundaryFrame = {
@@ -4337,7 +4340,7 @@ describe('cinematic shot mechanical gate', () => {
         }),
         `${harbor.id} beyond the gangway mating tolerance`,
       ).toMatchObject({
-        label: `${harbor.id} ramp ${gangwayIndex}`,
+        label: `${harbor.id} deck ${bridgeIndex}`,
       });
 
       const mainDeckBounds = shipDeckLocalBounds(harbor, harbor.shipDecks[0], runtimeWaterLevel);
