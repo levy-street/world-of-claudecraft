@@ -8,6 +8,7 @@ import {
   chatOpenTabLabelKey,
   composeChatLine,
   composeWhisperReply,
+  composeWhisperTo,
   isChatOpenTab,
   isChatTabChannel,
   parseChatTabs,
@@ -17,6 +18,7 @@ import {
   serializeChatTabs,
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
+  whisperTargetName,
 } from '../src/ui/hud/chat/chat_channels';
 
 describe('chat channel tabs — pure model', () => {
@@ -123,8 +125,43 @@ describe('chat channel tabs — pure model', () => {
         expect(composeWhisperReply('/p inc')).toBe('/p inc');
       });
 
-      it('drops empty input', () => {
+      it('leaves blank input empty', () => {
         expect(composeWhisperReply('   ')).toBe('');
+      });
+    });
+
+    describe('whisperTargetName (the sticky target of an explicit /w)', () => {
+      it('extracts the first-token name from every whisper alias', () => {
+        expect(whisperTargetName('/w strong hey')).toBe('strong');
+        expect(whisperTargetName('/whisper Bob meet me')).toBe('Bob');
+        expect(whisperTargetName('/t Alice hi')).toBe('Alice');
+        expect(whisperTargetName('/tell Carol yo')).toBe('Carol');
+        expect(whisperTargetName('  /w  Dana  padded  ')).toBe('Dana');
+      });
+
+      it('returns null for /r and every non-whisper line (no client-known target)', () => {
+        // /r replies to whoever last whispered YOU, a target only the server knows.
+        expect(whisperTargetName('/r on my way')).toBeNull();
+        expect(whisperTargetName('/reply ok')).toBeNull();
+        expect(whisperTargetName('/p inc')).toBeNull();
+        expect(whisperTargetName('hello')).toBeNull();
+        expect(whisperTargetName('')).toBeNull();
+      });
+    });
+
+    describe('composeWhisperTo (keep whispering a specific player)', () => {
+      it('prepends /w <name> to plain text', () => {
+        expect(composeWhisperTo('strong', 'you there?')).toBe('/w strong you there?');
+        expect(composeWhisperTo('Bob', '  hi  ')).toBe('/w Bob hi');
+      });
+
+      it('lets an explicit slash command win (a one-off to someone else)', () => {
+        expect(composeWhisperTo('strong', '/p inc')).toBe('/p inc');
+        expect(composeWhisperTo('strong', '/w Bob hi')).toBe('/w Bob hi');
+      });
+
+      it('leaves blank input empty', () => {
+        expect(composeWhisperTo('strong', '   ')).toBe('');
       });
     });
   });
