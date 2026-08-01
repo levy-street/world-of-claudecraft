@@ -242,9 +242,10 @@ describe('character visual manifest', () => {
         }
         return duration;
       };
-      expect(durationOf('Death'), `${key} Death should stay a game-length take`).toBeLessThanOrEqual(
-        2.5,
-      );
+      expect(
+        durationOf('Death'),
+        `${key} Death should stay a game-length take`,
+      ).toBeLessThanOrEqual(2.5);
       expect(
         durationOf('Attack'),
         `${key} Attack should stay cut to its strike window`,

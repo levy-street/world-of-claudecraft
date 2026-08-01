@@ -356,7 +356,8 @@ async function processFile(inPath, outPath) {
   const hipHeight = restWorldPosition(hip)[1];
   const sinkWorld = Math.max(0, hipHeight * (1 - HIP_REST_FRACTION));
   const downLocal = qRotate(qInv(hipParentRot), [0, -1, 0]);
-  const preRot = (angle) => qMul(qMul(qInv(hipParentRot), qAboutAxis(tipAxis, angle)), hipParentRot);
+  const preRot = (angle) =>
+    qMul(qMul(qInv(hipParentRot), qAboutAxis(tipAxis, angle)), hipParentRot);
 
   const death = doc.createAnimation('Death');
   addChannel(
@@ -393,8 +394,7 @@ async function processFile(inPath, outPath) {
     const tipDir = qRotate(restWorldRotation(node), [0, 1, 0]);
     const swing = dot(cross(tipAxis, tipDir), fallDir);
     const sign = Math.abs(swing) < 0.05 ? 1 : Math.sign(swing);
-    const slumpRot = (angle) =>
-      qMul(qMul(qInv(parentRot), qAboutAxis(tipAxis, angle)), parentRot);
+    const slumpRot = (angle) => qMul(qMul(qInv(parentRot), qAboutAxis(tipAxis, angle)), parentRot);
     addChannel(
       doc,
       buffer,

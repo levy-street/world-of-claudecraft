@@ -15,13 +15,6 @@ import {
   WILDHEART_MOBS,
 } from '../src/sim/content/wildheart';
 import {
-  primaryStatBudget,
-  TWOHAND_DPS_MULT,
-  TWOHAND_STAT_MULT,
-  weaponDpsBudget,
-} from '../src/sim/item_budget';
-import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
-import {
   BUILTIN_WORLD,
   DUNGEON_OVERFLOW_X_BASE,
   DUNGEONS,
@@ -38,6 +31,13 @@ import {
 } from '../src/sim/data';
 import { onDungeonFinalBossKilledForDeeds } from '../src/sim/deeds';
 import { enterDungeon } from '../src/sim/instances/dungeons';
+import {
+  primaryStatBudget,
+  TWOHAND_DPS_MULT,
+  TWOHAND_STAT_MULT,
+  weaponDpsBudget,
+} from '../src/sim/item_budget';
+import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { combatProfileForMob, scaledDefaultMobMeleeRange } from '../src/sim/mob_combat';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -530,10 +530,9 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
         const fx = origin.x + sx + Math.sin(angle) * 1.2;
         const fz = origin.z + sz + Math.cos(angle) * 1.2;
         const resolved = resolvePosition(1, fx, fz, 0.5);
-        expect(
-          Math.hypot(resolved.x - fx, resolved.z - fz),
-          `(${sx},${sz}) dir ${a}`,
-        ).toBeLessThan(0.3);
+        expect(Math.hypot(resolved.x - fx, resolved.z - fz), `(${sx},${sz}) dir ${a}`).toBeLessThan(
+          0.3,
+        );
       }
     }
   });

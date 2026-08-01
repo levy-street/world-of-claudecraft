@@ -676,7 +676,9 @@ function buildBasinGrass(): THREE.InstancedMesh {
     for (let j = 0; j <= rows; j++) {
       if (hash(i, j) > BASIN_GRASS_DENSITY) continue;
       const x =
-        -GROUND_WIDTH / 2 + i * BASIN_GRASS_STEP + (hash(i, j + 101) - 0.5) * BASIN_GRASS_STEP * 1.4;
+        -GROUND_WIDTH / 2 +
+        i * BASIN_GRASS_STEP +
+        (hash(i, j + 101) - 0.5) * BASIN_GRASS_STEP * 1.4;
       const z = minZ + j * BASIN_GRASS_STEP + (hash(i + 57, j) - 0.5) * BASIN_GRASS_STEP * 1.4;
       // Stay clear of the dropped skirt ring at the mesh boundary.
       if (Math.abs(x) > GROUND_WIDTH / 2 - 3 || z < minZ + 3 || z > minZ + GROUND_DEPTH - 3) {
@@ -704,11 +706,7 @@ function buildBasinGrass(): THREE.InstancedMesh {
     const spot = spots[n];
     const size = 0.55 + hash(spot.i + 13, spot.j) * 1.1;
     quaternion.setFromAxisAngle(up, hash(spot.i, spot.j + 7) * 12.4);
-    matrix.compose(
-      position.set(spot.x, spot.y, spot.z),
-      quaternion,
-      scale.set(size, size, size),
-    );
+    matrix.compose(position.set(spot.x, spot.y, spot.z), quaternion, scale.set(size, size, size));
     mesh.setMatrixAt(n, matrix);
     color.setHex(JUNGLE_GRASS_TINT);
     color.offsetHSL(
@@ -768,7 +766,14 @@ let ribsGeometry: THREE.BufferGeometry | null = null;
 function buildCalderaRimRibs(): THREE.Mesh {
   if (!ribsGeometry) {
     const stacks: THREE.BufferGeometry[] = [];
-    const stack = (x: number, z: number, h: number, r: number, spin: number, tone: number): void => {
+    const stack = (
+      x: number,
+      z: number,
+      h: number,
+      r: number,
+      spin: number,
+      tone: number,
+    ): void => {
       const rib = new THREE.CylinderGeometry(r * 0.28, r, h, 5);
       rib.rotateY(hash(spin, 11) * Math.PI);
       rib.rotateZ((hash(spin, 13) - 0.5) * 0.14);
@@ -794,7 +799,14 @@ function buildCalderaRimRibs(): THREE.Mesh {
         const x = side * (87.5 + hash(i, side * 21) * 3.5);
         const h = 10 + hash(i, side * 23) * 14;
         const r = 2.6 + hash(i, side * 27) * 3;
-        stack(x, z, h, r, i * 19 + side + 700, i % 3 === 0 ? LIMESTONE_RIB_LIGHT : LIMESTONE_RIB_DARK);
+        stack(
+          x,
+          z,
+          h,
+          r,
+          i * 19 + side + 700,
+          i % 3 === 0 ? LIMESTONE_RIB_LIGHT : LIMESTONE_RIB_DARK,
+        );
       }
     }
     for (let i = 0; i < 13; i++) {
