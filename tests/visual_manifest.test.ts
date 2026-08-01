@@ -242,14 +242,31 @@ describe('character visual manifest', () => {
         }
         return duration;
       };
+      // Two-sided bounds: the upper edge pins the re-cut (Attack must land
+      // inside the ravager's 2.25s swing cadence, the original defect), the
+      // lower edge rejects a destroyed or stub clip that would also "pass".
       expect(
         durationOf('Death'),
         `${key} Death should stay a game-length take`,
       ).toBeLessThanOrEqual(2.5);
       expect(
+        durationOf('Death'),
+        `${key} Death must remain a real topple, not a stub`,
+      ).toBeGreaterThanOrEqual(1.0);
+      expect(
         durationOf('Attack'),
-        `${key} Attack should stay cut to its strike window`,
-      ).toBeLessThanOrEqual(2.5);
+        `${key} Attack should stay cut inside the 2.25s swing cadence`,
+      ).toBeLessThanOrEqual(2.25);
+      expect(
+        durationOf('Attack'),
+        `${key} Attack must remain a real strike, not a stub`,
+      ).toBeGreaterThanOrEqual(0.5);
+      // The re-cut Hit is the 0.7s house flinch; a regressed 1.3s take or a
+      // near-zero stub both fail.
+      expect(durationOf('Hit'), `${key} Hit should stay the house flinch`).toBeLessThanOrEqual(
+        0.75,
+      );
+      expect(durationOf('Hit'), `${key} Hit must remain a real flinch`).toBeGreaterThanOrEqual(0.5);
 
       // A loop-closed death would make the clamped corpse pose the standing
       // start pose again: the final keyframe must differ from the first.

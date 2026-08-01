@@ -17,6 +17,7 @@ import {
 import {
   BUILTIN_WORLD,
   DUNGEON_OVERFLOW_X_BASE,
+  DUNGEON_X_THRESHOLD,
   DUNGEONS,
   dungeonAt,
   ITEMS,
@@ -30,7 +31,7 @@ import {
   zoneAt,
 } from '../src/sim/data';
 import { onDungeonFinalBossKilledForDeeds } from '../src/sim/deeds';
-import { enterDungeon } from '../src/sim/instances/dungeons';
+import { enterDungeon, updateDoorTriggers } from '../src/sim/instances/dungeons';
 import {
   primaryStatBudget,
   TWOHAND_DPS_MULT,
@@ -275,12 +276,17 @@ describe('Wildheart Basin dungeon content', () => {
     // pin the margin.
     expect(MOBS.wildheart_ravager.moveSpeed).toBeGreaterThanOrEqual(RUN_SPEED + 0.5);
     // The bruisers keep their scale-derived reach but close to visual contact
-    // before trading, so landed hits no longer read as whiffs.
-    const ravager = combatProfileForMob('wildheart_ravager', 2);
-    expect(ravager.meleeRange).toBe(scaledDefaultMobMeleeRange(2));
+    // before trading, so landed hits no longer read as whiffs. Reach is driven
+    // by the AUTHORED scale (mob_combat.ts hardcodes it per the Nythraxis
+    // pattern), so read it from the template: a scale retune that forgets the
+    // profile now fails here instead of drifting silently.
+    const ravagerScale = MOBS.wildheart_ravager.scale ?? 1;
+    const ravager = combatProfileForMob('wildheart_ravager', ravagerScale);
+    expect(ravager.meleeRange).toBe(scaledDefaultMobMeleeRange(ravagerScale));
     expect(ravager.desiredRange).toBe(5);
-    const beastmaster = combatProfileForMob('wildheart_beastmaster', 2.35);
-    expect(beastmaster.meleeRange).toBe(scaledDefaultMobMeleeRange(2.35));
+    const beastmasterScale = MOBS.wildheart_beastmaster.scale ?? 1;
+    const beastmaster = combatProfileForMob('wildheart_beastmaster', beastmasterScale);
+    expect(beastmaster.meleeRange).toBe(scaledDefaultMobMeleeRange(beastmasterScale));
     expect(beastmaster.desiredRange).toBe(5.5);
   });
 
@@ -288,6 +294,52 @@ describe('Wildheart Basin dungeon content', () => {
     // Without the flag the gatekeeper wedges on the toppled-relic colliders
     // at the Sunken Idol's heart, ~0.4yd past its own reach, and never swings.
     expect(MOBS.idol_guardian?.phasesThroughObstacles).toBe(true);
+  });
+
+  it('the spear school skips physical-only DR: Raised Guard halves melee, never the spear', () => {
+    // The school flip's real gameplay consequence beyond the render fix:
+    // dealDamage's physical-only fold (buff_dr_phys, prot's Raised Guard) no
+    // longer applies to the Razorvine Spear. Reading the school FROM the
+    // template makes a silent revert to 'physical' collapse the two deltas
+    // and fail here.
+    const spear = MOBS.wildheart_stalker.petSpell;
+    if (!spear) throw new Error('the stalker lost its spear');
+    const sim = makeSim(23);
+    const pid = sim.addPlayer('warrior', 'Tank');
+    expect(enterDungeon(sim.ctx, 'wildheart_basin', pid)).toBe(true);
+    const inst = (sim.instances as { dungeonId: string; mobIds: number[] }[]).find(
+      (i) => i.dungeonId === 'wildheart_basin',
+    );
+    const stalker = inst?.mobIds
+      .map((id) => sim.entities.get(id))
+      .find((e): e is Entity => e?.templateId === 'wildheart_stalker');
+    if (!stalker) throw new Error('no stalker spawned');
+    const p = sim.entities.get(pid) as Entity;
+    p.auras.push({
+      id: 'raised_guard',
+      name: 'Raised Guard',
+      kind: 'buff_dr_phys',
+      remaining: 6,
+      duration: 6,
+      value: 0.5,
+      sourceId: p.id,
+      school: 'physical',
+    });
+    const taken = (school: string): number => {
+      p.hp = p.maxHp;
+      (sim as unknown as { dealDamage: Function }).dealDamage(
+        stalker,
+        p,
+        20,
+        false,
+        school,
+        spear.name,
+        'hit',
+      );
+      return p.maxHp - p.hp;
+    };
+    expect(taken('physical'), 'the fold halves a physical hit').toBe(10);
+    expect(taken(spear.school), "the spear's school passes it whole").toBe(20);
   });
 });
 
@@ -358,7 +410,11 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     expect(groupSum('zulgar_guaranteed_uncommon')).toBeCloseTo(1.0, 9);
     // 0.06 per epic, the house PER-ITEM bonus rate (Korzul's epics sit at ~0.05
     // each across a 13-item group; a 3-item pool matches the per-item rate, not
-    // the group's total mass).
+    // the group's total mass). Pinned per item, not only as the group sum: a
+    // non-uniform re-tune (0.10/0.05/0.03) keeps the sum but breaks the rate.
+    expect(loot.filter((e) => e.rollGroup === 'wildheart_bonus').map((e) => e.chance)).toEqual([
+      0.06, 0.06, 0.06,
+    ]);
     expect(groupSum('wildheart_bonus')).toBeCloseTo(0.18, 9);
     expect(loot.some((e) => e.copper === 55000 && e.chance === 1)).toBe(true);
     expect(loot.some((e) => e.itemId === 'bone_fragments' && e.chance === 0.8)).toBe(true);
@@ -397,6 +453,9 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     // other heroic item in the game).
     const ids = entries.map((e) => e.itemId);
     expect(new Set(ids).size).toBe(ids.length);
+    // Per-item literals, not only group sums: 0.9/0.05/0.05 also sums to 1.0
+    // but pays one item far above the house 0.33-0.34 per-item band.
+    expect(entries.map((e) => e.chance)).toEqual([0.34, 0.33, 0.33, 0.34, 0.33, 0.33]);
     expect(
       entries.filter((e) => e.itemId === 'greatfang_of_the_basin').map((e) => e.rollGroup),
     ).toEqual(['wildheart_heroic2']);
@@ -417,9 +476,12 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     expect(ITEMS[heroicVariantId('bloodmane_warleggings')]).toBeUndefined();
   });
 
-  // Kills Zulgar with one direct overkill hit and returns the sim + corpse.
-  // Mirrors the killKorzul harness in tests/heroic_loot_flair.test.ts.
-  function killZulgar(seed: number, difficulty: 'normal' | 'heroic'): { sim: Sim; zulgar: Entity } {
+  // Kills Zulgar with one direct overkill hit and returns the sim, corpse, and
+  // killer. Mirrors the killKorzul harness in tests/heroic_loot_flair.test.ts.
+  function killZulgar(
+    seed: number,
+    difficulty: 'normal' | 'heroic',
+  ): { sim: Sim; zulgar: Entity; p: Entity } {
     const sim = makeSim(seed);
     const pid = sim.addPlayer('warrior', 'Looter');
     if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', pid);
@@ -446,7 +508,7 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
       'hit',
     );
     expect(zulgar.dead, `seed ${seed}`).toBe(true);
-    return { sim, zulgar };
+    return { sim, zulgar, p };
   }
 
   it('pays copper plus exactly one guaranteed uncommon when a party kills Zulgar', () => {
@@ -456,27 +518,37 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
       'sunbone_ritual_sarong',
     ]);
     // Several seeds so the pin holds across roll outcomes, not one lucky draw.
-    for (const seed of [3, 11, 42]) {
+    const seen = new Set<string>();
+    for (const seed of [3, 8, 11, 42]) {
       const { zulgar } = killZulgar(seed, 'normal');
       expect(zulgar.loot, `seed ${seed} has loot`).toBeTruthy();
       expect(zulgar.loot?.copper, `seed ${seed} copper`).toBeGreaterThan(0);
       const uncommons = (zulgar.loot?.items ?? []).filter((s) => trio.has(s.itemId));
       expect(uncommons, `seed ${seed}: exactly one guaranteed uncommon`).toHaveLength(1);
+      seen.add(uncommons[0].itemId);
     }
+    // Every trio piece is reachable, not just the count: the seed set must
+    // cover all three armor classes.
+    expect([...seen].sort()).toEqual([...trio].sort());
   });
 
   it('pays exactly two DISTINCT heroic epics per heroic Zulgar kill', () => {
     const heroicIds = new Set(
       HEROIC_BOSS_LOOT.wildheart_high_priest.flatMap((e) => (e.itemId ? [e.itemId] : [])),
     );
-    for (const seed of [3, 11, 42, 97, 123]) {
+    const seen = new Set<string>();
+    for (const seed of [3, 8, 11, 42, 97, 123]) {
       const { zulgar } = killZulgar(seed, 'heroic');
       const drops = (zulgar.loot?.items ?? [])
         .map((s) => s.itemId)
         .filter((id) => heroicIds.has(id));
       expect(drops, `seed ${seed}: two heroic epics`).toHaveLength(2);
       expect(new Set(drops).size, `seed ${seed}: the two epics are distinct`).toBe(2);
+      for (const id of drops) seen.add(id);
     }
+    // All six epics are reachable across the seed set, so no table entry can
+    // quietly become dead weight.
+    expect([...seen].sort()).toEqual([...heroicIds].sort());
   });
 
   it("opens the shrine-terrace exit portal on Zulgar's death, on both difficulties", () => {
@@ -504,6 +576,48 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
       (i) => i.dungeonId === 'wildheart_basin',
     );
     expect(inst?.bossExitId).toBeNull();
+  });
+
+  it('keeps the portal shut for trash kills and lets a walk into it leave the dungeon', () => {
+    // A non-final-boss death inside the claim must not open the exit: without
+    // the finalBossId guard a trash pull would let a group skip the run.
+    const sim = makeSim(17);
+    const pid = sim.addPlayer('warrior', 'Trasher');
+    expect(enterDungeon(sim.ctx, 'wildheart_basin', pid)).toBe(true);
+    const inst = (
+      sim.instances as { dungeonId: string; bossExitId: number | null; mobIds: number[] }[]
+    ).find((i) => i.dungeonId === 'wildheart_basin');
+    if (!inst) throw new Error('instance missing');
+    const trash = inst.mobIds
+      .map((id) => sim.entities.get(id))
+      .find((e): e is Entity => e?.templateId === 'wildheart_stalker');
+    if (!trash) throw new Error('no stalker spawned');
+    const p = sim.entities.get(pid) as Entity;
+    (sim as unknown as { dealDamage: Function }).dealDamage(
+      p,
+      trash,
+      trash.hp + 100,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+    expect(trash.dead).toBe(true);
+    expect(inst.bossExitId).toBeNull();
+
+    // And once earned, the portal is USABLE: walking into it rides the same
+    // door trigger as the entrance exit and drops the player back outside.
+    const cleared = killZulgar(31, 'normal');
+    const clearedInst = (
+      cleared.sim.instances as { dungeonId: string; bossExitId: number | null }[]
+    ).find((i) => i.dungeonId === 'wildheart_basin');
+    const portal = cleared.sim.entities.get(clearedInst?.bossExitId as number) as Entity;
+    const walker = cleared.p;
+    walker.pos = { ...portal.pos };
+    walker.prevPos = { ...walker.pos };
+    cleared.sim.rebucket(walker);
+    updateDoorTriggers(cleared.sim.ctx, walker);
+    expect(walker.pos.x, 'the walker left the instance band').toBeLessThan(DUNGEON_X_THRESHOLD);
   });
 
   it('keeps the jaguar-gate colliders inscribed: the arch and pylon flanks stay walkable', () => {
