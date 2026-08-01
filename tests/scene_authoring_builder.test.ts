@@ -139,6 +139,41 @@ describe('scene authoring builder', () => {
     expect(scene.duration).toBe(3.5);
   });
 
+  it('spreads a covered cut with authored fade and hold around the cut', () => {
+    const scene = buildScene({
+      id: 'scn_test_covered_cut_hold',
+      beats: { cut: 3 },
+      releaseMargin: 0,
+      timeline: [coveredCut('cut', FOCUS_SHOT, { fadeSeconds: 0.8, holdSeconds: 0.5 })],
+    });
+
+    expect(scene.ops).toEqual([
+      { at: 1.95, kind: 'fade', to: 'black', dur: 0.8 },
+      { at: 3, kind: 'fade', to: 'black', dur: 0 },
+      { at: 3, kind: 'camera', shot: FOCUS_SHOT },
+      { at: 3.25, kind: 'fade', to: 'clear', dur: 0.8 },
+    ]);
+  });
+
+  it('rejects covered cut fades below the perceptual floor and holds below two ticks', () => {
+    expect(() =>
+      buildScene({
+        id: 'scn_test_covered_cut_thin_fade',
+        beats: { cut: 3 },
+        releaseMargin: 0,
+        timeline: [coveredCut('cut', FOCUS_SHOT, { fadeSeconds: 0.2 })],
+      }),
+    ).toThrow('coveredCut fadeSeconds must be at least 0.4s');
+    expect(() =>
+      buildScene({
+        id: 'scn_test_covered_cut_thin_hold',
+        beats: { cut: 3 },
+        releaseMargin: 0,
+        timeline: [coveredCut('cut', FOCUS_SHOT, { holdSeconds: 0.01 })],
+      }),
+    ).toThrow('coveredCut holdSeconds must be at least 0.1s');
+  });
+
   it('rejects a covered cut without enough perceptual fade lead', () => {
     expect(() =>
       buildScene({

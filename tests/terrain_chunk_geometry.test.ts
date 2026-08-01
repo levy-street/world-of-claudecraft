@@ -140,7 +140,11 @@ describe('generated chunk geometry is stable', () => {
     // mainland shore pad and re-authored berth basins (HARBOR_TERRAIN_EDITS,
     // F2.1/F2.2) deliberately regrade gap chunks around both harbors. The
     // in-rect Eastbrook pin above is untouched: not one Vale byte moved.
-    expect(digestOf(gapFill)).toBe('d964238382e709c9ac24c4afbc0d15fc');
+    // Re-minted for the voyage crossing channel (J2): three deep-level
+    // HARBOR_TERRAIN_EDITS stamps carve honest depth under the filmed
+    // open-water leg on the crossing track. Mid-sea gap cells only; the
+    // in-rect Eastbrook pin above did not move.
+    expect(digestOf(gapFill)).toBe('98ddb2c80a4619d5555ccb4eb807c35d');
 
     terrain.cancelStreaming();
   });

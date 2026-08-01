@@ -211,26 +211,38 @@ const LAST_BELL_PLINTH_LINE_SECONDS = 7.5;
 const LAST_BELL_TOLL_LINE_SECONDS = 6.5;
 const LANDING_SHOT_SECONDS = 6;
 
+// J2 pacing: the voyage breathes. Every covered cut fades out and in slower
+// than the bare perceptual floor and holds a real beat of black around the
+// cut instead of a single tick.
+const VOYAGE_FADE_SECONDS = 0.8;
+const VOYAGE_HOLD_SECONDS = 0.5;
+const VOYAGE_CUT = {
+  fadeSeconds: VOYAGE_FADE_SECONDS,
+  holdSeconds: VOYAGE_HOLD_SECONDS,
+} as const;
+// The opening cut's fade lead starts exactly at scene start.
+const VOYAGE_OPEN_CUT_SECONDS = VOYAGE_FADE_SECONDS + VOYAGE_HOLD_SECONDS / 2;
+
 const VOYAGE_CORE_BEATS = {
-  castOff: 0.2,
-  castOffCut: MIN_PERCEPTUAL_FADE_SECONDS + DT,
-  openWater: 4.2,
-  seaArrival: 8.5,
-  park: 15.5,
+  open: VOYAGE_OPEN_CUT_SECONDS,
+  castOff: 1.2,
+  openWater: 6.3,
+  seaArrival: 12,
+  park: 19.05,
 } as const;
 
 const RERIDE_BEATS = {
   ...VOYAGE_CORE_BEATS,
-  release: 21.5,
-  end: 21.95,
+  release: 26.3,
+  end: 27.15,
 } as const;
 
 const Q0_VOYAGE_BEATS = {
   ...VOYAGE_CORE_BEATS,
-  statue: 15.5,
-  toll: 23.4,
-  release: 30.3,
-  end: 31.3,
+  statue: 19.05,
+  toll: 26.95,
+  release: 33.85,
+  end: 34.7,
 } as const;
 
 const Q0_DOORWAY_BEATS = {
@@ -254,7 +266,15 @@ interface VoyageDirection {
     readonly openWater: LastBellPropPathSegmentId;
     readonly arrival: LastBellPropPathSegmentId;
   };
-  readonly sternOffset: { x: number; y: number; z: number };
+  // One continuous crane move carries the whole cast-off: the camera rises
+  // from beside the boarding bridge and drifts seaward while the look-at
+  // tracks the rider's deck as she gets under way. No cuts inside it.
+  readonly openingShot: SceneDollyShotDef;
+  // The C5 beam shot on the open-water leg: camera abeam on the southern
+  // side, gaze panned toward the bow so the Old Beacon lighthouse stands
+  // clearly on the horizon behind her.
+  readonly beamOffset: { x: number; y: number; z: number };
+  readonly beamLookAt: { x: number; y: number; z: number };
   readonly bowOffset: { x: number; y: number; z: number };
   readonly arrivalLookAt: { x: number; y: number; z: number };
   readonly walkTo: { x: number; z: number };
@@ -268,7 +288,33 @@ const OUTBOUND: VoyageDirection = {
   departureTarget: 'harbor_ship_mainland',
   arrivalTarget: 'harbor_ship_gullhaven',
   segmentIds: LAST_BELL_VOYAGE_SEGMENT_IDS.out,
-  sternOffset: { x: -20, y: 16, z: 22 },
+  // A rising jib over the berth head: the camera position holds its spot
+  // and climbs (no along-course translation, so the ship's screen drift is
+  // purely her own motion), while the gaze pans at a fraction of her
+  // angular rate, always lagging, letting her slide across the frame.
+  openingShot: {
+    kind: 'dolly',
+    points: [
+      { x: 230, z: -52, height: 15.92 },
+      { x: 230, z: -52, height: 18.62 },
+      { x: 230, z: -52, height: 21.42 },
+      { x: 230, z: -52, height: 24.12 },
+    ],
+    // The gaze eases to a near-hold after mid-shot: she draws ahead of the
+    // frame on her own way just as the fade to open water covers her.
+    lookAt: {
+      kind: 'spline',
+      points: [
+        { x: 243.6, z: -41.8, height: 0.17 },
+        { x: 244.4, z: -44.35, height: 2.87 },
+        { x: 245.4, z: -47.6, height: 5.67 },
+        { x: 245.6, z: -47.7, height: 8.37 },
+      ],
+    },
+    dur: 5.2,
+  },
+  beamOffset: { x: 6.6, y: 9.2, z: -11 },
+  beamLookAt: { x: 10.2, y: 8.6, z: 0 },
   bowOffset: { x: 6.6, y: 20, z: -20 },
   arrivalLookAt: { x: 24, y: 8.6, z: 0 },
   walkTo: { x: GULLHAVEN_HARBOR.gangplank.x, z: GULLHAVEN_HARBOR.gangplank.z },
@@ -283,14 +329,14 @@ const OUTBOUND: VoyageDirection = {
       { x: 725, z: 93.5, height: 22.685134 },
       { x: 723.5, z: 105.109175, height: 15.369799 },
     ],
+    // The look-at rides the arrival walk: down the parked deck, through the
+    // gangway cut, across the boarding bridge, settling on the gangplank.
     lookAt: {
       kind: 'spline',
       points: [
-        { x: 713, z: 96.5, height: 13.597597 },
-        { x: 715, z: 100.5, height: 1 },
-        { x: 717, z: 104.5, height: 1.12 },
-        { x: 719, z: 108.5, height: 1.24 },
-        { x: 721.5, z: 112.5, height: 14.660648 },
+        { x: 713, z: 111, height: 2.47 },
+        { x: 716, z: 114, height: 1.97 },
+        { x: 721.4, z: 116.25, height: 1.87 },
         {
           x: GULLHAVEN_HARBOR.gangplank.x,
           z: GULLHAVEN_HARBOR.gangplank.z,
@@ -308,7 +354,28 @@ const RETURN: VoyageDirection = {
   departureTarget: 'harbor_ship_gullhaven',
   arrivalTarget: 'harbor_ship_mainland',
   segmentIds: LAST_BELL_VOYAGE_SEGMENT_IDS.back,
-  sternOffset: { x: -20, y: 16, z: -22 },
+  // The mirrored rising jib for the island departure.
+  openingShot: {
+    kind: 'dolly',
+    points: [
+      { x: 723, z: 110, height: 18.73 },
+      { x: 723, z: 110, height: 21.43 },
+      { x: 723, z: 110, height: 24.23 },
+      { x: 723, z: 110, height: 26.93 },
+    ],
+    lookAt: {
+      kind: 'spline',
+      points: [
+        { x: 711.9, z: 121.5, height: 0.17 },
+        { x: 710.7, z: 120.3, height: 2.87 },
+        { x: 708.6, z: 117, height: 5.67 },
+        { x: 707.65, z: 112.16, height: 8.37 },
+      ],
+    },
+    dur: 5.2,
+  },
+  beamOffset: { x: 6.6, y: 9.2, z: 11 },
+  beamLookAt: { x: 3.05, y: 8.6, z: 0 },
   bowOffset: { x: 6.6, y: 20, z: 20 },
   arrivalLookAt: { x: 24, y: 8.6, z: 0 },
   walkTo: { x: MAINLAND_HARBOR.gangplank.x, z: MAINLAND_HARBOR.gangplank.z },
@@ -326,11 +393,9 @@ const RETURN: VoyageDirection = {
     lookAt: {
       kind: 'spline',
       points: [
-        { x: 240.5, z: -68, height: 12.804822 },
-        { x: 238.5, z: -64, height: 0.92 },
-        { x: 236.5, z: -60, height: 0.96 },
-        { x: 234.5, z: -56, height: 1 },
-        { x: 232.5, z: -52, height: 12.471553 },
+        { x: 240.5, z: -52, height: 2.47 },
+        { x: 238, z: -48.9, height: 1.97 },
+        { x: 232.1, z: -48.25, height: 1.87 },
         {
           x: MAINLAND_HARBOR.gangplank.x,
           z: MAINLAND_HARBOR.gangplank.z,
@@ -382,7 +447,7 @@ function arrivalTimeline(
       dur: LAST_BELL_HARBOR_LINE_SECONDS,
     });
   } else {
-    timeline.push(coveredCut('park', direction.landingShot));
+    timeline.push(coveredCut('park', direction.landingShot, VOYAGE_CUT));
   }
   return timeline;
 }
@@ -395,18 +460,18 @@ function voyageTimeline(
     { at: 0, kind: 'letterbox', on: true },
     { at: 0, kind: 'inputLock', on: true },
     { at: 0, kind: 'music', directive: 'lb_harbor_ambience' },
+    // No cuts at the start: the scene opens under its own fade onto ONE
+    // continuous crane move that carries the whole cast-off. The cue lands
+    // during the black hold, so the fade-in reveals her under way.
+    coveredCut('open', direction.openingShot, VOYAGE_CUT),
     {
       at: 'castOff',
       kind: 'prop',
       target: direction.departureTarget,
       cue: direction.segmentIds.castOff,
     },
-    coveredCut(
-      'castOffCut',
-      attachShot(direction.departureTarget, direction.departureHarbor, direction.sternOffset),
-    ),
-    { at: 1.2, kind: 'music', directive: 'lb_bell_toll_one' },
-    { at: 1.8, kind: 'music', directive: 'lb_ship_castoff' },
+    { at: 1.6, kind: 'music', directive: 'lb_bell_toll_one' },
+    { at: 2.2, kind: 'music', directive: 'lb_ship_castoff' },
     {
       at: 'openWater',
       kind: 'prop',
@@ -415,7 +480,13 @@ function voyageTimeline(
     },
     coveredCut(
       'openWater',
-      attachShot(direction.departureTarget, direction.departureHarbor, direction.sternOffset),
+      attachShot(
+        direction.departureTarget,
+        direction.departureHarbor,
+        direction.beamOffset,
+        direction.beamLookAt,
+      ),
+      VOYAGE_CUT,
     ),
     {
       at: 'seaArrival',
@@ -431,6 +502,7 @@ function voyageTimeline(
         direction.bowOffset,
         direction.arrivalLookAt,
       ),
+      VOYAGE_CUT,
     ),
     ...arrivalTimeline(direction, includeHarborLine),
   ];
@@ -473,7 +545,7 @@ const Q0_TOLL_SHOT: SceneDollyShotDef = {
 
 function q0StoryTimeline(): SceneTimelineEntry<Q0StoryBeat>[] {
   return [
-    coveredCut('statue', Q0_STATUE_SHOT),
+    coveredCut('statue', Q0_STATUE_SHOT, VOYAGE_CUT),
     {
       at: beat('statue', 0.2),
       kind: 'line',
@@ -482,7 +554,7 @@ function q0StoryTimeline(): SceneTimelineEntry<Q0StoryBeat>[] {
       dur: LAST_BELL_PLINTH_LINE_SECONDS,
     },
     { at: beat('toll', -0.1), kind: 'music', directive: 'lb_bell_toll_one' },
-    coveredCut('toll', Q0_TOLL_SHOT),
+    coveredCut('toll', Q0_TOLL_SHOT, VOYAGE_CUT),
     {
       at: beat('toll', 0.2),
       kind: 'line',
@@ -496,14 +568,14 @@ function q0StoryTimeline(): SceneTimelineEntry<Q0StoryBeat>[] {
 function releaseTimeline(): SceneTimelineEntry<ReleaseBeat>[] {
   return [
     {
-      at: beat('release', -(MIN_PERCEPTUAL_FADE_SECONDS + DT)),
+      at: beat('release', -(VOYAGE_FADE_SECONDS + DT)),
       kind: 'fade',
       to: 'black',
-      dur: MIN_PERCEPTUAL_FADE_SECONDS,
+      dur: VOYAGE_FADE_SECONDS,
     },
     { at: 'release', kind: 'fade', to: 'black', dur: 0 },
     { at: 'release', kind: 'camera', shot: { kind: 'release' } },
-    fadeInTail(beat('release', DT)),
+    fadeInTail(beat('release', DT), VOYAGE_FADE_SECONDS),
     { at: 'end', kind: 'letterbox', on: false },
     { at: 'end', kind: 'inputLock', on: false },
   ];
