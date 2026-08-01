@@ -360,11 +360,15 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned: the 0.33.0 version sync bumped package-lock.json,
-      // a hashed input to every GLB source fingerprint, so the town, mailbox and
-      // noticeboard leaves all moved and this composite mints fresh. Not one
-      // pipeline input or geometry value changed, and no capture was retaken.
-      fingerprint: 'b8e15eb684763ae45fe5fb4795eb4cbc4c8b651236bb9c2d1f826a391d44a9b2',
+      // Deliberately re-pinned: src/render/renderer.ts is the rendererIntegration
+      // leaf of this composite (capture_contract.mjs EASTBROOK_POLISH_PROVENANCE_INPUTS),
+      // and the compile-storm fix edits it, so the composite mints fresh. Only that
+      // one leaf moved: package-lock.json is byte-identical to the release tip, no
+      // GLB source fingerprint changed, no pipeline was re-run and no capture retaken
+      // (the five per-asset seal suites stay green untouched).
+      //
+      // The previous value came from #2729's version-sync re-mint.
+      fingerprint: '2d944d86b6b6d8f5b8cef860b83e22bf8eb4e477c8540adb42da8b9b8d42b094',
       components: {
         captureContract: {
           id: 'polish-v2',
