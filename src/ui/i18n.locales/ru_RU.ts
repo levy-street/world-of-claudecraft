@@ -9701,6 +9701,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.maxHpPct': 'Повышает максимальное здоровье на {pct}%',
   'hud.combat.floatingParry': 'Парировано',
   'hud.combat.parried': '{target} парирует ваш {ability}.',
+  'hud.combat.floatingEvade': 'Ускользание',
+  'hud.combat.evaded': '{target} ускользает от вашего {ability}.',
   'hudChrome.options.mouseoverCast': 'Применение по наведению на рамки группы',
   'hudChrome.options.showTargetOfTarget': 'Показывать цель цели',
   'hudChrome.options.stickyTarget': 'Сохранять цель при клике по земле',

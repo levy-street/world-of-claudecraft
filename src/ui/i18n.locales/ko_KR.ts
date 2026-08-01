@@ -9520,6 +9520,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.maxHpPct': '최대 생명력이 {pct}% 증가합니다',
   'hud.combat.floatingParry': '무기 막기',
   'hud.combat.parried': '{target}이 당신의 {ability}을 무기로 막았습니다.',
+  'hud.combat.floatingEvade': '완전 회피',
+  'hud.combat.evaded': '{target}이 당신의 {ability}을 완전히 회피했습니다.',
   'hudChrome.options.mouseoverCast': '파티 창에서 마우스오버 시전',
   'hudChrome.options.showTargetOfTarget': '대상의 대상 표시',
   'hudChrome.options.stickyTarget': '지면 클릭 시 대상 유지',

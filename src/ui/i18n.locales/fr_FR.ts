@@ -400,6 +400,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "En partie. Les neuf recettes communes de terrain (les armes de départ, les armures, la nourriture et les élixirs de base) se fabriquent n'importe où, à n'importe quel moment. Tout ce qui les dépasse est lié à un type d'atelier : forge, cuisines, apothicairerie, tannerie, métier à tisser ou atelier, et vous devez être à moins de 20 mètres de l'atelier pour que la fabrication soit validée.\n\nÀ 75 de compétence dans un métier, vous vous spécialisez, et avec une réduction de 20 pour cent sur les matériaux vous obtenez un atelier mobile : placez-le sur le terrain et il tient 10 minutes, servant les recettes de ce métier comme si vous étiez au véritable atelier. L'atelier mobile est uniquement pour la fabrication : apprendre des recettes et délier des pièces de commande nécessite toujours le vrai atelier en ville.",
   'hud.combat.floatingParry': 'Parade',
   'hud.combat.parried': 'Votre {ability} est parée par {target}.',
+  'hud.combat.floatingEvade': 'Évasion',
+  'hud.combat.evaded': 'Votre {ability} est évitée par {target}.',
   'hud.logs.keptBoundOne': 'Conservé {count} exemplaire lié.',
   'hud.logs.keptBoundMany': 'Conservé {count} exemplaires liés.',
   'hud.pet.waterJet': "Jet d'eau",

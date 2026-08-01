@@ -399,6 +399,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Teilweise. Die neun gewöhnlichen Feldrezepte (die einfachen Waffen-, Rüstungs-, Nahrungs- und Trank-Grundlagen) können überall und jederzeit hergestellt werden. Alles darüber ist an einen Stationstyp gebunden: Schmiede, Küchen, Apotheke, Gerberei, Webstuhl oder Werkzeugmacherei, und du musst innerhalb von 20 Metern der Station sein, damit die Herstellung durchgeht.\n\nBei Fertigkeit 75 in einem Handwerk spezialisierst du dich, und neben einem Materialrabatt von 20 Prozent erhältst du eine mobile Station: Platziere sie im Gelände und sie steht 10 Minuten lang und bedient die Rezepte dieses Handwerks, als wärst du am echten Ort. Die mobile Station ist nur zum Herstellen: Rezepte erlernen und Auftragsarbeiten entbinden erfordern immer die echte Station in der Stadt.',
   'hud.combat.floatingParry': 'Pariert',
   'hud.combat.parried': 'Deine {ability} wird von {target} pariert.',
+  'hud.combat.floatingEvade': 'Entgangen',
+  'hud.combat.evaded': '{target} entgeht deiner {ability}.',
   'hud.logs.keptBoundOne': '{count} gebundene Kopie behalten.',
   'hud.logs.keptBoundMany': '{count} gebundene Kopien behalten.',
   'hud.pet.waterJet': 'Wasserstrahl',
