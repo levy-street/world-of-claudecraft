@@ -125,7 +125,7 @@ export function armHeroicLeap(
   entity: Entity,
   aim: Vec3,
   landingAoe: { min: number; max: number; radius: number },
-  ability: Pick<AbilityDef, 'name' | 'school'>,
+  ability: Pick<AbilityDef, 'id' | 'name' | 'school'>,
 ): void {
   if (hasUnbreakableMovementLock(entity)) return;
   const landing = sweptLanding(ctx, entity, aim);
@@ -139,6 +139,7 @@ export function armHeroicLeap(
     apex: FLIGHT_APEX,
     landingAoe: { ...landingAoe },
     abilityName: ability.name,
+    abilityId: ability.id,
     school: ability.school,
   };
 }
@@ -170,6 +171,7 @@ export function advanceHeroicLeap(ctx: SimContext, entity: Entity): boolean {
     school: flight.school,
     fx: 'nova',
     radius: flight.landingAoe.radius,
+    ability: flight.abilityId,
   });
   for (const target of ctx.hostilesInRadius(entity, entity.pos, flight.landingAoe.radius)) {
     if (!ctx.hasLineOfSight(entity, target)) continue;

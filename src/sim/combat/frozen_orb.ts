@@ -47,6 +47,7 @@ export interface FrozenOrbState {
   interval: number;
   pulseTimer: number;
   abilityName: string;
+  abilityId: string;
   // Latched: a living enemy the pulses can strike is in reach, so the orb
   // holds position until nothing strikeable lives. Transitions emit the
   // halt/resume visual events so the client flight animation tracks the path.
@@ -61,6 +62,7 @@ export function spawnFrozenOrb(
   p: Entity,
   eff: { min: number; max: number; radius: number; duration: number; interval: number },
   abilityName: string,
+  abilityId: string,
   spBonus: number,
 ): void {
   const dirX = Math.sin(p.facing);
@@ -74,6 +76,7 @@ export function spawnFrozenOrb(
     school: 'frost',
     fx: 'nova',
     radius: eff.radius,
+    ability: abilityId,
   });
   // The visible sphere: the flight is a straight line at fixed speed, so this
   // ONE event carries the whole path and the client animates the orb locally
@@ -88,6 +91,7 @@ export function spawnFrozenOrb(
     phase: 'release',
     sourceId: p.id,
     radius: eff.radius,
+    ability: abilityId,
     dirX,
     dirZ,
     speed: FROZEN_ORB_SPEED,
@@ -109,6 +113,7 @@ export function spawnFrozenOrb(
     // scheduled tick (the cast itself is the wind-up, not a free hit).
     pulseTimer: eff.interval,
     abilityName,
+    abilityId,
     halted: false,
   });
 }
@@ -140,6 +145,7 @@ export function tickFrozenOrbs(ctx: SimContext): void {
         fx: 'orb',
         phase: latched ? 'halt' : 'resume',
         sourceId: orb.sourceId,
+        ability: orb.abilityId,
       });
     }
     if (!orb.halted) {
@@ -179,6 +185,7 @@ function pulseOrb(ctx: SimContext, orb: FrozenOrbState, source: Entity): void {
     school: 'frost',
     fx: 'nova',
     radius: orb.radius,
+    ability: orb.abilityId,
   });
   let struck = 0;
   for (const target of ctx.hostilesInRadius(source, center, orb.radius)) {

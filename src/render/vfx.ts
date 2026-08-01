@@ -11,8 +11,8 @@ import {
 // Spell & ambience particle system. One pooled THREE.Points cloud drawn with
 // additive blending; projectiles are lightweight emitters that home on their
 // target and burst on arrival. Particles sample a 4x4 atlas of Kenney
-// particle-pack sprites (black-background, additive-ready, CC0) — flames,
-// sparks, magic wisps, smoke — built once at startup from the preloaded PNGs.
+// particle-pack sprites (black-background, additive-ready, CC0): flames,
+// sparks, magic wisps, smoke, built once at startup from the preloaded PNGs.
 //
 // On the composer tiers, colors are pushed past 1.0 (the HDR HalfFloat target
 // preserves them) so projectile cores, novas and heal pillars bloom; the low
@@ -43,7 +43,10 @@ const projectileColorCache = new Map<
   { base: THREE.Color; core: THREE.Color; trail: THREE.Color }
 >();
 let projectileColorComposer: boolean | null = null;
-function projectileSchoolColors(school: string): {
+function projectileSchoolColors(
+  school: string,
+  colorOverride?: number,
+): {
   base: THREE.Color;
   core: THREE.Color;
   trail: THREE.Color;
@@ -52,22 +55,23 @@ function projectileSchoolColors(school: string): {
     projectileColorCache.clear();
     projectileColorComposer = GFX.composer;
   }
-  let c = projectileColorCache.get(school);
+  const key = colorOverride === undefined ? school : `c:${colorOverride}`;
+  let c = projectileColorCache.get(key);
   if (!c) {
-    const base = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff);
+    const base = new THREE.Color(colorOverride ?? SCHOOL_COLORS[school] ?? 0xffffff);
     c = {
       base,
       core: base.clone().multiplyScalar(hdr(2.5)),
       trail: base.clone().multiplyScalar(hdr(1.4)),
     };
-    projectileColorCache.set(school, c);
+    projectileColorCache.set(key, c);
   }
   return c;
 }
 
 // ---------------------------------------------------------------------------
 // Sprite atlas: 16 cherry-picked Kenney sprites in a 4x4 grid. Order defines
-// the cell index used by the shader — append only.
+// the cell index used by the shader: append only.
 // ---------------------------------------------------------------------------
 
 const ATLAS_GRID = 4;
@@ -142,7 +146,8 @@ function composeAtlasCanvas(): HTMLCanvasElement {
   const size = ATLAS_GRID * ATLAS_CELL;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('2D canvas context unavailable');
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, size, size);
   for (let i = 0; i < SPRITE_FILES.length; i++) {
@@ -227,7 +232,7 @@ export const SCHOOL_COLORS: Record<string, number> = {
   shadow: 0x9a5df0,
   holy: 0xffe9a0,
   nature: 0x86e86a,
-  // warm steel-spark — near-white crossed the bloom threshold colorlessly and
+  // warm steel-spark: near-white crossed the bloom threshold colorlessly and
   // melee hits read as faint white noise
   physical: 0xffd28a,
 };
@@ -607,10 +612,10 @@ export class Vfx {
   // High-level effects
   // ---------------------------------------------------------------------
 
-  projectile(sourceId: number, targetId: number, school: string, scale = 1): void {
+  projectile(sourceId: number, targetId: number, school: string, scale = 1, color?: number): void {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
-    const colors = projectileSchoolColors(school);
+    const colors = projectileSchoolColors(school, color);
     const sprites = projectileSprites(school);
     this.projectiles.push({
       pos: from.clone(),
@@ -626,11 +631,13 @@ export class Vfx {
     });
   }
 
-  beam(sourceId: number, targetId: number, school: string): void {
+  beam(sourceId: number, targetId: number, school: string, colorOverride?: number): void {
     const from = this.anchor(sourceId, 0.62);
     const to = this.anchor(targetId, 0.55);
     if (!from || !to) return;
-    const color = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.9));
+    const color = new THREE.Color(
+      colorOverride ?? SCHOOL_COLORS[school] ?? 0xffffff,
+    ).multiplyScalar(hdr(1.9));
     const dir = to.clone().sub(from);
     const len = dir.length();
     if (len <= 0.001) return;
@@ -767,15 +774,21 @@ export class Vfx {
   // it arrives, no flash-then-wait), but its flying head renders as a short jagged
   // blue-white electric streak instead of a round glowing comet (the shape is
   // drawn in the projectile update loop). Original procedural effect (no assets).
-  lightningProjectile(sourceId: number, targetId: number): void {
+  lightningProjectile(sourceId: number, targetId: number, color?: number): void {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
+    // A color override tints the bolt per ability: the head stays pushed toward
+    // white so it still reads as a hot electric core.
+    const head =
+      color === undefined
+        ? new THREE.Color(0xeaf6ff)
+        : new THREE.Color(color).lerp(new THREE.Color(0xffffff), 0.6);
     this.projectiles.push({
       pos: from.clone(),
       targetId,
-      color: new THREE.Color(0x66b8ff).multiplyScalar(hdr(1.7)), // electric blue (impact tint)
-      coreColor: new THREE.Color(0xeaf6ff).multiplyScalar(hdr(3.0)), // hot white-blue head
-      trailColor: new THREE.Color(0x3f9bff).multiplyScalar(hdr(1.9)), // crackle
+      color: new THREE.Color(color ?? 0x66b8ff).multiplyScalar(hdr(1.7)), // electric blue (impact tint)
+      coreColor: head.multiplyScalar(hdr(3.0)), // hot white-blue head
+      trailColor: new THREE.Color(color ?? 0x3f9bff).multiplyScalar(hdr(1.9)), // crackle
       speed: 26,
       ttl: 3,
       coreSprite: SPR.glowCore,
@@ -938,8 +951,8 @@ export class Vfx {
     this.spawn(at.x, at.y + 0.4, at.z, 0, 0.8, 0, hot, 2.4, 0.42, 0, SPR.flash);
   }
 
-  burst(at: THREE.Vector3, school: string, count = 18, power = 1): void {
-    const c = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.6));
+  burst(at: THREE.Vector3, school: string, count = 18, power = 1, color?: number): void {
+    const c = new THREE.Color(color ?? SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.6));
     const isFire = school === 'fire';
     const scaledCount = this.scaledCount(count);
     for (let i = 0; i < scaledCount; i++) {
@@ -1073,15 +1086,15 @@ export class Vfx {
     );
   }
 
-  tick(targetId: number, school: string): void {
+  tick(targetId: number, school: string, color?: number): void {
     const at = this.anchor(targetId, 0.55);
-    if (at) this.burst(at, school, 7, 0.6);
+    if (at) this.burst(at, school, 7, 0.6, color);
   }
 
-  nova(centerId: number, school: string): void {
+  nova(centerId: number, school: string, color?: number): void {
     const at = this.anchor(centerId, 0.12);
     if (!at) return;
-    const c = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.6));
+    const c = new THREE.Color(color ?? SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.6));
     // one expanding rune ring at the centre sells the shockwave
     this.spawn(at.x, at.y + 0.3, at.z, 0, 0.3, 0, c, 1.5, 0.4, 0, SPR.ring, 0);
     const count = this.scaledCount(34);
@@ -1333,11 +1346,11 @@ export class Vfx {
   }
 
   // continuous emitters (called per frame)
-  castSparkle(entityId: number, school: string, dt: number): void {
+  castSparkle(entityId: number, school: string, dt: number, color?: number): void {
     if (!this.emitChance(30, dt)) return;
     const at = this.anchor(entityId, 0.66);
     if (!at) return;
-    const c = SCHOOL_COLORS[school] ?? 0xffffff;
+    const c = color ?? SCHOOL_COLORS[school] ?? 0xffffff;
     const a = Math.random() * Math.PI * 2;
     this.spawn(
       at.x + Math.sin(a) * 0.5,

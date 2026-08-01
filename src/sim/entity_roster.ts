@@ -50,6 +50,10 @@ export type GroundAoE = {
   tickTimer: number;
   school: string;
   ability: string;
+  // The casting ability's stable id (`ability` above is the display NAME, kept
+  // for aura/damage attribution); the zone pulse events carry this so the
+  // renderer can identify which ground cast is pulsing.
+  abilityId: string;
   // Spell Power added per tick, snapshotted at cast time (caster ground AoEs).
   spBonus?: number;
   // Rune of Power (mage choice row): a FRIENDLY zone. When set, each pulse

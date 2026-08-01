@@ -80,6 +80,9 @@ describe('live post pipeline', () => {
       'StaticOpaqueN8AOPass',
       'PreparedBloomPass',
       'OutputGradePass',
+      // The ability-VFX screen-fx pass (ripple / flash) sits between the grade
+      // and the tail SMAA, so SMAA keeps anti-aliasing the final image.
+      'ShaderPass',
       'SMAAPass',
     ]);
     expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
@@ -156,6 +159,7 @@ describe('live post pipeline', () => {
     expect(post.composer.passes.map((pass) => pass.constructor.name)).toEqual([
       'RenderPass',
       'OutputGradePass',
+      'ShaderPass',
       'SMAAPass',
     ]);
     expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
@@ -251,6 +255,7 @@ describe('live post pipeline', () => {
       'StaticOpaqueN8AOPass',
       'PreparedBloomPass',
       'OutputGradePass',
+      'ShaderPass',
     ]);
     expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
   });

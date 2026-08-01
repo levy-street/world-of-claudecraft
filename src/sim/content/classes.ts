@@ -88,6 +88,11 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'raging_gale',
       'raised_guard',
       'pummel',
+      // Seething Fury: authored as a plain L10 active (def below) but orphaned
+      // when the v2 talent integration deleted the v1 class-tree grant
+      // (war_berserker_rage) without re-homing it - abilitiesKnownAt could
+      // never return it (owner report: unfindable on a live L20 warrior).
+      'berserker_rage',
       'execute',
       'furious_mending',
       'iron_resolve',
