@@ -2682,7 +2682,7 @@ export interface BuildingDef {
   w: number;
   d: number;
   rot: number;
-  /** Authored height above grade for camera collision. */
+  /** Authored visual height above grade. */
   height?: number;
 }
 
@@ -2695,8 +2695,6 @@ export interface StaticObbPropDef {
   d: number;
   rot: number;
   height: number;
-  /** False when a merged mesh cannot hide this placement independently. */
-  camGhost?: boolean;
   /**
    * The asset renders x-mirrored (an asymmetric wing flipped end for end,
    * e.g. a town-wall wing whose tall lantern pillar swaps sides). Collision
@@ -2716,7 +2714,6 @@ export interface ZonePropsDef {
     z: number;
     r: number;
     height?: number;
-    camGhost?: boolean;
   }[];
   stalls: {
     id?: string;
@@ -2730,7 +2727,6 @@ export interface ZonePropsDef {
     height?: number;
     canopyVariant?: string;
     smithy?: true;
-    camGhost?: boolean;
   }[];
   // moundOffset/moundRadius override the collider's default backward offset
   // and radius (colliders.ts) for the rock mound behind the timber portal,

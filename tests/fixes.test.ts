@@ -2,20 +2,18 @@
 // fixtures live in tests/fixes_shared.ts; the loot/quest-npc/combat shard is
 // tests/fixes_loot_npcs.test.ts.
 import { describe, expect, it } from 'vitest';
-import { cameraOcclusion, isBlocked, resolvePosition } from '../src/sim/colliders';
+import { isBlocked, resolvePosition } from '../src/sim/colliders';
 import {
   CRYPT_DOOR_POS,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
   ITEMS,
-  instanceOrigin,
   LAKE,
   MOBS,
   PROPS,
   zoneAt,
   zoneWelcomeText,
 } from '../src/sim/data';
-import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { EASTBROOK_BUILDINGS_BY_ID, localToWorld } from '../src/sim/eastbrook_layout';
 import { createMob } from '../src/sim/entity';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
@@ -179,156 +177,16 @@ describe('collision & terrain', () => {
     expect(isBlocked(SEED, 2, 212, 0.5)).toBe(false);
   });
 
-  it('camera ghosts through village buildings (hidden instead of pulling in)', () => {
-    const bank = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank;
-    const front = localToWorld(
-      bank.position,
-      bank.rotation,
-      0,
-      bank.nativeDimensions.depth / 2 + 4,
-    );
-    const rear = localToWorld(
-      bank.position,
-      bank.rotation,
-      0,
-      -bank.nativeDimensions.depth / 2 - 4,
-    );
-    const groundY = groundHeight(front.x, front.z, SEED);
-    const eyeY = groundY + 2;
-
-    // The ray sweeps through the replacement bank: buildings are camGhost,
-    // so the chase cam no longer pulls in for them — the renderer hides them.
-    const through = cameraOcclusion(SEED, front.x, eyeY, front.z, rear.x, eyeY + 1.5, rear.z, 0.35);
-    expect(through).toBe(1);
-    // but movement still collides with that same bank (camGhost is camera-only)
-    const blocked = resolvePosition(SEED, bank.position.x, bank.position.z, 0.5);
-    expect(
-      Math.abs(blocked.x - bank.position.x) + Math.abs(blocked.z - bank.position.z),
-    ).toBeGreaterThan(0.5);
-
-    const clear = cameraOcclusion(SEED, 0, eyeY, -40, 0, eyeY + 1.5, -48, 0.35);
-    expect(clear).toBe(1);
-
-    const overhead = cameraOcclusion(SEED, front.x, eyeY, front.z, rear.x, eyeY + 24, rear.z, 0.35);
-    expect(overhead).toBe(1);
+  it('keeps campfire bases solid for movement', () => {
+    const [x, z] = PROPS.campfires[0];
+    const blocked = resolvePosition(SEED, x, z, 0.5);
+    expect(Math.abs(blocked.x - x) + Math.abs(blocked.z - z)).toBeGreaterThan(0.5);
   });
 
-  it('the chase cam clears low exterior clutter by HEIGHT, but still respects the town wall', () => {
-    // #2566 originally bypassed the whole exterior sweep to stop "exterior scenery
-    // driving zoom". That premise did not hold: sweepColliders already skips every
-    // camGhost prop, so hideable scenery never drove the exterior sweep at all. What
-    // an exterior-wide bypass actually removed was the pull-in for the only colliders
-    // authored camGhost:false out here, the Eastbrook civic benches and the town WALL
-    // (plus its lantern pylons), leaving the camera free to sit inside a solid, fully
-    // drawn wall segment. Both halves are pinned here so neither can regress again.
-    const bench = PROPS.benches?.[0];
-    expect(bench, 'expected an exterior bench fixture').toBeDefined();
-    if (!bench) throw new Error('expected an exterior bench fixture');
-    const benchGround = groundHeight(bench.x, bench.z, SEED);
-    const benchSweep = (dy: number) =>
-      cameraOcclusion(
-        SEED,
-        bench.x - 8,
-        benchGround + dy,
-        bench.z,
-        bench.x + 8,
-        benchGround + dy,
-        bench.z,
-        0.35,
-      );
-    // A bench is one unit tall, so cameraTopY clears it at any camera height a
-    // player actually sees: this is the height gate doing the job the bypass was
-    // added for, and it needs no exterior special case.
-    expect(benchSweep(1.2), 'bench does not pull the camera in at eye height').toBe(1);
-    expect(benchSweep(2.5), 'nor from above').toBe(1);
-    // Below its top it DOES occlude, which is what makes the line above a real
-    // height gate rather than the bench having quietly stopped colliding.
-    expect(benchSweep(0.5), 'but a ray under the bench top still hits it').toBeLessThan(1);
-
-    // The town wall is tall and camGhost:false, so it occludes at every height a
-    // camera can sit. This is the case an exterior-wide bypass silently broke.
-    const wall = PROPS.walls?.[0];
-    expect(wall, 'expected an Eastbrook wall segment').toBeDefined();
-    if (!wall) throw new Error('expected an Eastbrook wall segment');
-    const wallGround = groundHeight(wall.x, wall.z, SEED);
-    for (const dy of [0.5, 1.2, 2.5]) {
-      const f = cameraOcclusion(
-        SEED,
-        wall.x - 8,
-        wallGround + dy,
-        wall.z,
-        wall.x + 8,
-        wallGround + dy,
-        wall.z,
-        0.35,
-      );
-      expect(f, `town wall occludes the chase cam at ground+${dy}`).toBeLessThan(1);
-    }
-
-    // And the interior sweep is untouched.
-    const dungeon = DUNGEON_LIST[0];
-    const origin = instanceOrigin(dungeon.index, 0);
-    const interior = cameraOcclusion(
-      SEED,
-      origin.x,
-      2,
-      origin.z,
-      origin.x + DUNGEON_WALL_X + 4,
-      2,
-      origin.z,
-      0.1,
-    );
-    expect(interior).toBeLessThan(1);
-  });
-
-  it('camera ghosts through campfires while movement still collides', () => {
-    const [cx, cz] = PROPS.campfires[0];
-    const groundY = groundHeight(cx, cz, SEED);
-
-    const eyeHeightRay = cameraOcclusion(
-      SEED,
-      cx,
-      groundY + 2.0,
-      cz - 8,
-      cx,
-      groundY + 2.2,
-      cz + 8,
-      0.35,
-    );
-    expect(eyeHeightRay).toBe(1);
-
-    const lowRay = cameraOcclusion(
-      SEED,
-      cx,
-      groundY + 0.8,
-      cz - 8,
-      cx,
-      groundY + 0.9,
-      cz + 8,
-      0.35,
-    );
-    expect(lowRay).toBe(1);
-
-    const blocked = resolvePosition(SEED, cx, cz, 0.5);
-    expect(Math.abs(blocked.x - cx) + Math.abs(blocked.z - cz)).toBeGreaterThan(0.5);
-  });
-
-  it('camera ghosts through trees while movement still collides', () => {
-    const tree = decorations().find((d) => d.kind !== 'rock')!;
-    const groundY = groundHeight(tree.x, tree.z, SEED);
-
-    const through = cameraOcclusion(
-      SEED,
-      tree.x,
-      groundY + 1.0,
-      tree.z - 8,
-      tree.x,
-      groundY + 1.2,
-      tree.z + 8,
-      0.35,
-    );
-    expect(through).toBe(1);
-
+  it('keeps generated tree trunks solid for movement', () => {
+    const tree = decorations().find((decoration) => decoration.kind !== 'rock');
+    expect(tree).toBeDefined();
+    if (!tree) throw new Error('expected a generated tree');
     const blocked = resolvePosition(SEED, tree.x, tree.z, 0.5);
     expect(Math.abs(blocked.x - tree.x) + Math.abs(blocked.z - tree.z)).toBeGreaterThan(0.5);
   });

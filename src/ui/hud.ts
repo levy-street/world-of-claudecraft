@@ -147,7 +147,7 @@ import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
-import { CastBarPainter } from './cast_bar_painter';
+import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
 import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
@@ -286,6 +286,7 @@ import { ActionBarPainter, type ActionBarSlotElements } from './hud/action_bar/a
 import {
   ABILITY_ICON_PREFIX,
   type ActionBarView,
+  type ActionBarWorldInput,
   ATTACK_ICON_KEY,
   createActionBarView,
   EMPTY_ICON_KEY,
@@ -406,7 +407,7 @@ import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
 import { lowHealthVignette } from './low_health';
-import { lowResourceView } from './low_resource';
+import { type LowResourceView, lowResourceViewInto } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
@@ -548,7 +549,7 @@ import { tradeOfferCeiling } from './trade_view';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
-import { type UnitFrameDescriptor, unitFrameView } from './unit_frame';
+import { newUnitFrameBuffer, type UnitFrameDescriptor, unitFrameViewInto } from './unit_frame';
 import { UnitFramePainter } from './unit_frame_painter';
 import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
@@ -583,7 +584,7 @@ import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { stackedWindowsVisible } from './window_stack_state_core';
 import { installWorldDropTarget } from './world_drop_target';
-import { formatXp, xpBarView } from './xp_bar';
+import { formatXp, type XpBarView, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
 
@@ -1025,6 +1026,9 @@ export class Hud {
   // every desktop row and mobile variant reuse the same derivation.
   private actionBarView!: ActionBarView;
   private actionBarPainter!: ActionBarPainter;
+  private actionBarWorldInput: ActionBarWorldInput | null = null;
+  private playerCastBarInput: CastBarPaintInput | null = null;
+  private targetCastBarInput: CastBarPaintInput | null = null;
   // The mobile action ring: a SECOND createActionBarView instance over a 6-slot
   // descriptor (slot 0 attack, slots 1-5 resolve through
   // sourceSlotForMobileButton(mobileActionPage, i-1)). mobileActionPage is the
@@ -1441,7 +1445,27 @@ export class Hud {
   // up), so the bar tracks real swing speed including haste / ranged weapons.
   private swingPeriod = 0;
   private lastSwingTimer = 0;
-  private lastLowResourceSig = '';
+  private lastLowResourceInput = Number.NaN;
+  private lastLowResourceMax = Number.NaN;
+  private lastLowResourceType: ResourceType | null | undefined;
+  private lastLowResourceLanguage = '';
+  private readonly lowResourceState: LowResourceView = {
+    active: false,
+    opacity: 0,
+    pulseSeconds: 0,
+    label: '',
+  };
+  private lastLowResourceActive = false;
+  private lastLowResourceOpacity = 0;
+  private lastLowResourcePulseSeconds = 0;
+  private lastLowResourceLabel = '';
+  private lastXpLevel = Number.NaN;
+  private lastXp = Number.NaN;
+  private lastLifetimeXp = Number.NaN;
+  private lastRestedXp = Number.NaN;
+  private lastShowOverflow = false;
+  private lastXpLanguage = '';
+  private xpBarViewCache: XpBarView | null = null;
   // trading: locally staged offer, pushed to the server on change
   private stagedTrade: { items: InvSlot[]; copper: number } = { items: [], copper: 0 };
   private tradeWasOpen = false;
@@ -3580,6 +3604,35 @@ export class Hud {
   private readonly auraOverlayController: AuraOverlayController;
   // One-shot login preview gate for the phoenix (see update()).
   private procOverlayPreviewed = false;
+  private readonly playerFrameBuffer = newUnitFrameBuffer();
+  private readonly targetFrameBuffer = newUnitFrameBuffer();
+  private readonly totFrameBuffer = newUnitFrameBuffer();
+  private readonly playerFrameDescriptor: UnitFrameDescriptor = {
+    present: true,
+    hpFrac: 0,
+    hpText: '',
+    showAbsorbText: true,
+    resourceKind: null,
+    resFrac: 0,
+    resText: '',
+    levelText: null,
+    name: '',
+    portraitKey: PLAYER_PORTRAIT_KEY,
+    absorb: null,
+    dead: false,
+    outOfRange: false,
+  };
+  private lastPlayerFrameHp = Number.NaN;
+  private lastPlayerFrameMaxHp = Number.NaN;
+  private lastPlayerFrameResource = Number.NaN;
+  private lastPlayerFrameMaxResource = Number.NaN;
+  private lastPlayerFrameLevel = Number.NaN;
+  private readonly targetFrameDescriptor: UnitFrameDescriptor = {
+    ...ABSENT_TARGET_DESCRIPTOR,
+  };
+  private readonly totFrameDescriptor: UnitFrameDescriptor = {
+    ...ABSENT_TARGET_DESCRIPTOR,
+  };
   // The per-frame FCT painter: the pooled-div ring that replaced the per-event
   // createElement + setTimeout fct() below. handleEvents + showSelfNote feed spawn(), which
   // projects the head anchor ONCE (screen-anchored, byte-faithful to the old fct() and to
@@ -7580,23 +7633,30 @@ export class Hud {
     // className swap on the player hot path). updateLowHealthVignette +
     // updateLowResource are player-only side effects with their own cores and stay
     // here, OUT of the shared family (target/party must not inherit them).
-    this.playerFramePainter.paint(
-      unitFrameView({
-        present: true,
-        hpFrac: p.hp / Math.max(1, p.maxHp),
-        hpText: `${p.hp} / ${p.maxHp}`,
-        showAbsorbText: true,
-        resourceKind: p.resourceType,
-        resFrac: p.resource / Math.max(1, p.maxResource),
-        resText: `${Math.round(p.resource)} / ${p.maxResource}`,
-        levelText: String(p.level),
-        name: p.name,
-        portraitKey: PLAYER_PORTRAIT_KEY,
-        absorb: p,
-        dead: false,
-        outOfRange: false,
-      }),
-    );
+    const playerFrame = this.playerFrameDescriptor;
+    playerFrame.hpFrac = p.hp / Math.max(1, p.maxHp);
+    if (p.hp !== this.lastPlayerFrameHp || p.maxHp !== this.lastPlayerFrameMaxHp) {
+      this.lastPlayerFrameHp = p.hp;
+      this.lastPlayerFrameMaxHp = p.maxHp;
+      playerFrame.hpText = `${p.hp} / ${p.maxHp}`;
+    }
+    playerFrame.resourceKind = p.resourceType;
+    playerFrame.resFrac = p.resource / Math.max(1, p.maxResource);
+    if (
+      p.resource !== this.lastPlayerFrameResource ||
+      p.maxResource !== this.lastPlayerFrameMaxResource
+    ) {
+      this.lastPlayerFrameResource = p.resource;
+      this.lastPlayerFrameMaxResource = p.maxResource;
+      playerFrame.resText = `${Math.round(p.resource)} / ${p.maxResource}`;
+    }
+    if (p.level !== this.lastPlayerFrameLevel) {
+      this.lastPlayerFrameLevel = p.level;
+      playerFrame.levelText = String(p.level);
+    }
+    playerFrame.name = p.name;
+    playerFrame.absorb = p;
+    this.playerFramePainter.paint(unitFrameViewInto(this.playerFrameBuffer, playerFrame));
     this.updateLowHealthVignette(p.hp, p.maxHp);
     this.updateLowResource(p);
 
@@ -7686,39 +7746,38 @@ export class Hud {
           this.lastTargetTitleSig = titleSig;
           this.targetTitleDecoration = titledNameDecoration(target.title ?? null);
         }
-        this.targetFramePainter.paint(
-          unitFrameView({
-            present: true,
-            hpFrac: target.hp / Math.max(1, target.maxHp),
-            hpText: target.dead ? t('hud.core.dead') : `${target.hp} / ${target.maxHp}`,
-            showAbsorbText: !target.dead,
-            // The target's power bar (classic target frame): players and caster
-            // mobs show their mana/rage/energy; a resource-less target (a plain
-            // beast, rtype null) maps to 'none' EXPLICITLY (unitResourceClass
-            // buckets null with mana), so every type class turns off and the
-            // rail renders EMPTY (zero fill, no text) but stays visible, the
-            // classic look where the frame never changes height. Dead: same.
-            resourceKind: target.dead || !target.resourceType ? 'none' : target.resourceType,
-            resFrac:
-              target.dead || !target.resourceType
-                ? 0
-                : target.resource / Math.max(1, target.maxResource),
-            resText:
-              target.dead || !target.resourceType
-                ? ''
-                : `${Math.round(target.resource)} / ${target.maxResource}`,
-            levelText: String(target.level),
-            name: entityDisplayName(target),
-            titlePre: this.targetTitleDecoration.pre,
-            titlePost: this.targetTitleDecoration.post,
-            // id-keyed gate, byte-faithful to the old lastPortraitTarget !== target.id;
-            // the painter resets it on hide so an id reused by a new mob still redraws.
-            portraitKey: String(target.id),
-            absorb: target.dead ? null : target,
-            dead: false,
-            outOfRange: false,
-          }),
-        );
+        const targetFrame = this.targetFrameDescriptor;
+        targetFrame.present = true;
+        targetFrame.hpFrac = target.hp / Math.max(1, target.maxHp);
+        targetFrame.hpText = target.dead ? t('hud.core.dead') : `${target.hp} / ${target.maxHp}`;
+        targetFrame.showAbsorbText = !target.dead;
+        // The target's power bar (classic target frame): players and caster
+        // mobs show their mana/rage/energy; a resource-less target (a plain
+        // beast, rtype null) maps to 'none' EXPLICITLY (unitResourceClass
+        // buckets null with mana), so every type class turns off and the
+        // rail renders EMPTY (zero fill, no text) but stays visible, the
+        // classic look where the frame never changes height. Dead: same.
+        targetFrame.resourceKind =
+          target.dead || !target.resourceType ? 'none' : target.resourceType;
+        targetFrame.resFrac =
+          target.dead || !target.resourceType
+            ? 0
+            : target.resource / Math.max(1, target.maxResource);
+        targetFrame.resText =
+          target.dead || !target.resourceType
+            ? ''
+            : `${Math.round(target.resource)} / ${target.maxResource}`;
+        targetFrame.levelText = String(target.level);
+        targetFrame.name = entityDisplayName(target);
+        targetFrame.titlePre = this.targetTitleDecoration.pre;
+        targetFrame.titlePost = this.targetTitleDecoration.post;
+        // id-keyed gate, byte-faithful to the old lastPortraitTarget !== target.id;
+        // the painter resets it on hide so an id reused by a new mob still redraws.
+        targetFrame.portraitKey = String(target.id);
+        targetFrame.absorb = target.dead ? null : target;
+        targetFrame.dead = false;
+        targetFrame.outOfRange = false;
+        this.targetFramePainter.paint(unitFrameViewInto(this.targetFrameBuffer, targetFrame));
       }
       // Target-only sub-parts the family frame does not express, each routed through
       // the elided writers (the elite class + name color are the two writes the four
@@ -7758,10 +7817,19 @@ export class Hud {
       // target/boss cast bar (e.g. Nythraxis' Deathless Rage), shown under the name +
       // HP so the raid sees exactly when to channel the wardstones. The target
       // instance shows the raw cast id and never eats/drinks (no `consume`).
-      this.targetCastBarPainter.paint({
-        cast: castBarState(target),
-        castRemaining: target.castRemaining,
-      });
+      const targetCast = castBarState(target);
+      let targetCastInput = this.targetCastBarInput;
+      if (targetCastInput) {
+        targetCastInput.cast = targetCast;
+        targetCastInput.castRemaining = target.castRemaining;
+      } else {
+        targetCastInput = {
+          cast: targetCast,
+          castRemaining: target.castRemaining,
+        };
+        this.targetCastBarInput = targetCastInput;
+      }
+      this.targetCastBarPainter.paint(targetCastInput);
       // Target of Target (showTargetOfTarget): resolve who the target is targeting (a
       // mob/pet's aggro target, a player's selected target) and paint the mini-frame.
       // The id already rides the wire (aggro for mobs, tgt for players), but the ENTITY
@@ -7784,27 +7852,29 @@ export class Hud {
         ) {
           this.lastTotFramePaintAt = now;
           this.lastTotFrameId = tot.id;
-          this.totFramePainter.paint(
-            unitFrameView({
-              present: true,
-              hpFrac: tot.hp / Math.max(1, tot.maxHp),
-              hpText: tot.dead ? t('hud.core.dead') : `${tot.hp} / ${tot.maxHp}`,
-              showAbsorbText: false,
-              resourceKind: 'none',
-              resFrac: 0,
-              resText: '',
-              levelText: null,
-              name: entityDisplayName(tot),
-              portraitKey: String(tot.id),
-              absorb: null,
-              dead: false,
-              outOfRange: false,
-            }),
-          );
+          const totFrame = this.totFrameDescriptor;
+          totFrame.present = true;
+          totFrame.hpFrac = tot.hp / Math.max(1, tot.maxHp);
+          totFrame.hpText = tot.dead ? t('hud.core.dead') : `${tot.hp} / ${tot.maxHp}`;
+          totFrame.showAbsorbText = false;
+          totFrame.resourceKind = 'none';
+          totFrame.resFrac = 0;
+          totFrame.resText = '';
+          totFrame.levelText = null;
+          totFrame.name = entityDisplayName(tot);
+          totFrame.titlePre = '';
+          totFrame.titlePost = '';
+          totFrame.portraitKey = String(tot.id);
+          totFrame.absorb = null;
+          totFrame.dead = false;
+          totFrame.outOfRange = false;
+          this.totFramePainter.paint(unitFrameViewInto(this.totFrameBuffer, totFrame));
         }
       } else {
         this.lastTotFrameId = null;
-        this.totFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
+        this.totFramePainter.paint(
+          unitFrameViewInto(this.totFrameBuffer, ABSENT_TARGET_DESCRIPTOR),
+        );
       }
     } else {
       // No target (or a world object): hide the frame. The painter also resets its
@@ -7823,25 +7893,40 @@ export class Hud {
         this.targetReannounce.reset();
         this.lastAnnouncedTargetId = null;
       }
-      this.targetFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
+      this.targetFramePainter.paint(
+        unitFrameViewInto(this.targetFrameBuffer, ABSENT_TARGET_DESCRIPTOR),
+      );
       this.targetAurasWindow.clear();
       // Hide the target-of-target frame too. Its parent (#target-frame) is already
       // display:none, but paint hidden anyway to reset the painter's portrait gate +
       // cadence id so re-acquiring a target repaints the mini-frame immediately.
       this.lastTotFrameId = null;
-      this.totFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
+      this.totFramePainter.paint(unitFrameViewInto(this.totFrameBuffer, ABSENT_TARGET_DESCRIPTOR));
     }
 
     // cast bar: the player instance localizes the cast id (castDisplayName), layers
     // the mount summon channel (mountSummonBarState) and the player-only eat/drink
     // overlay (consumeBarState), and clears on hide. Priority: spell cast > mount
     // summon > eat/drink (you cannot cast while mounting, but the painter guards it).
-    this.playerCastBarPainter.paint({
-      cast: castBarState(p),
-      castRemaining: p.castRemaining,
-      mountSummon: mountSummonBarState(p.mountCastRemaining, p.mountCastKey),
-      consume: consumeBarState(p.eating, p.drinking),
-    });
+    const playerCast = castBarState(p);
+    const playerMountSummon = mountSummonBarState(p.mountCastRemaining, p.mountCastKey);
+    const playerConsume = consumeBarState(p.eating, p.drinking);
+    let playerCastInput = this.playerCastBarInput;
+    if (playerCastInput) {
+      playerCastInput.cast = playerCast;
+      playerCastInput.castRemaining = p.castRemaining;
+      playerCastInput.mountSummon = playerMountSummon;
+      playerCastInput.consume = playerConsume;
+    } else {
+      playerCastInput = {
+        cast: playerCast,
+        castRemaining: p.castRemaining,
+        mountSummon: playerMountSummon,
+        consume: playerConsume,
+      };
+      this.playerCastBarInput = playerCastInput;
+    }
+    this.playerCastBarPainter.paint(playerCastInput);
 
     // swing timer: fills between melee/ranged auto-attack swings. swingTimer
     // counts DOWN to 0 (ready); swing_timer.ts recovers the full interval from the
@@ -7895,18 +7980,27 @@ export class Hud {
     // client (see src/net/online.ts, server/game.ts). The auras ARE mirrored, so
     // this stays correct on both hosts. Shared by every action-bar-family view
     // below (desktop bar, mobile ring, consumables quick bar).
-    const abPlayer = { ...p, stealthed: playerStealthed(p.auras) };
+    const stealthed = playerStealthed(p.auras);
+    let actionBarWorld = this.actionBarWorldInput;
+    if (actionBarWorld) {
+      actionBarWorld.player = p;
+      actionBarWorld.target = target ?? null;
+      actionBarWorld.inventory = sim.inventory;
+      actionBarWorld.stealthed = stealthed;
+    } else {
+      actionBarWorld = {
+        player: p,
+        target: target ?? null,
+        inventory: sim.inventory,
+        stealthed,
+      };
+      this.actionBarWorldInput = actionBarWorld;
+    }
     this.renderPetBar();
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
-    this.actionBarPainter.paint(
-      this.actionBarView.tick({
-        player: abPlayer,
-        target: target ?? null,
-        inventory: sim.inventory,
-      }),
-    );
+    this.actionBarPainter.paint(this.actionBarView.tick(actionBarWorld));
 
     // mobile action ring: the paged touch combat cluster, gated on the touch-mode
     // signal so desktop skips the tick+paint entirely (both the view and painter
@@ -7916,11 +8010,7 @@ export class Hud {
       const mobileActionPage = this.currentMobileActionPage();
       const mobileActionSourceSlotCount = this.mobileActionSourceSlotCount();
       this.mobileActionRingPainter.paint(
-        this.mobileActionRingView.tick({
-          player: abPlayer,
-          target: target ?? null,
-          inventory: sim.inventory,
-        }),
+        this.mobileActionRingView.tick(actionBarWorld),
         mobileActionPage,
         mobilePageCount(mobileActionSourceSlotCount),
         mobileActionSourceSlotCount,
@@ -7941,13 +8031,7 @@ export class Hud {
       this.consumableBarView &&
       this.consumableBarPainter
     ) {
-      this.consumableBarPainter.paint(
-        this.consumableBarView.tick({
-          player: abPlayer,
-          target: target ?? null,
-          inventory: sim.inventory,
-        }),
-      );
+      this.consumableBarPainter.paint(this.consumableBarView.tick(actionBarWorld));
     }
 
     // xp bar: pre-cap shows the level bar; post-cap fills toward the next virtual
@@ -7955,13 +8039,32 @@ export class Hud {
     // painter caches the #xpbar / .rested / #player-frame refs once and routes the
     // --xp-fill / .rested / class writes through the elided helpers.
     const showOverflow = (this.optionsHooks?.settings.get('showOverflowXp') ?? 1) >= 0.5;
-    const bar = xpBarView({
-      level: p.level,
-      xp: sim.xp,
-      lifetimeXp: sim.lifetimeXp,
-      restedXp: sim.restedXp,
-      showOverflow,
-    });
+    const xpLanguage = getLanguage();
+    let bar = this.xpBarViewCache;
+    if (
+      !bar ||
+      p.level !== this.lastXpLevel ||
+      sim.xp !== this.lastXp ||
+      sim.lifetimeXp !== this.lastLifetimeXp ||
+      sim.restedXp !== this.lastRestedXp ||
+      showOverflow !== this.lastShowOverflow ||
+      xpLanguage !== this.lastXpLanguage
+    ) {
+      this.lastXpLevel = p.level;
+      this.lastXp = sim.xp;
+      this.lastLifetimeXp = sim.lifetimeXp;
+      this.lastRestedXp = sim.restedXp;
+      this.lastShowOverflow = showOverflow;
+      this.lastXpLanguage = xpLanguage;
+      bar = xpBarView({
+        level: p.level,
+        xp: sim.xp,
+        lifetimeXp: sim.lifetimeXp,
+        restedXp: sim.restedXp,
+        showOverflow,
+      });
+      this.xpBarViewCache = bar;
+    }
     this.xpBarPainter.paint(bar);
 
     // FCT painter: drive the pooled floating-combat-text ring on the every-frame
@@ -8269,20 +8372,36 @@ export class Hud {
   // runs low. Pure read of replicated state (resource/maxResource/type) so it
   // works offline and online alike. Touches the DOM only on state change.
   private updateLowResource(p: Entity): void {
-    const v = lowResourceView({
-      resource: p.resource,
-      maxResource: p.maxResource,
-      resourceType: p.resourceType,
-    });
+    const language = getLanguage();
+    if (
+      p.resource === this.lastLowResourceInput &&
+      p.maxResource === this.lastLowResourceMax &&
+      p.resourceType === this.lastLowResourceType &&
+      language === this.lastLowResourceLanguage
+    )
+      return;
+    this.lastLowResourceInput = p.resource;
+    this.lastLowResourceMax = p.maxResource;
+    this.lastLowResourceType = p.resourceType;
+    this.lastLowResourceLanguage = language;
+    const v = lowResourceViewInto(this.lowResourceState, p.resource, p.maxResource, p.resourceType);
     const bar = this.pfResourceEl; // the cached ref the family painter also writes
     // `.low` is this method's own class (the unit_frame painter toggles only the
     // mutually-exclusive power-type classes, never `low`), so toggling it each frame
     // is cheap and idempotent. Only the expensive style / label writes below are
-    // diffed against the cached signature.
+    // diffed against the cached scalar state.
     bar.classList.toggle('low', v.active);
-    const sig = v.active ? `${v.opacity.toFixed(2)}|${v.pulseSeconds.toFixed(2)}|${v.label}` : '';
-    if (sig === this.lastLowResourceSig) return;
-    this.lastLowResourceSig = sig;
+    if (
+      v.active === this.lastLowResourceActive &&
+      v.opacity === this.lastLowResourceOpacity &&
+      v.pulseSeconds === this.lastLowResourcePulseSeconds &&
+      v.label === this.lastLowResourceLabel
+    )
+      return;
+    this.lastLowResourceActive = v.active;
+    this.lastLowResourceOpacity = v.opacity;
+    this.lastLowResourcePulseSeconds = v.pulseSeconds;
+    this.lastLowResourceLabel = v.label;
     const label = $('#pf-low-resource') as HTMLElement;
     if (v.active) {
       bar.style.setProperty('--lr-opacity', String(v.opacity));

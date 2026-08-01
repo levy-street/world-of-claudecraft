@@ -35,7 +35,9 @@ import {
 } from './assets';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
+import { configureTightBoneTextures } from './skin_gpu_layout';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { weaponAttackStyle } from './weapon_attack_style_core';
 import {
@@ -263,6 +265,7 @@ export class CharacterVisual {
   private disposed = false;
   private ghosted = false;
   private mixer: THREE.AnimationMixer;
+  private skeletonUpdates: SkeletonUpdateCache;
   private actions = new Map<string, THREE.AnimationAction>();
   private model: THREE.Object3D;
   private modelWrap = new THREE.Group();
@@ -295,6 +298,10 @@ export class CharacterVisual {
   /** Per-frame scratch view of every action's mixer weight, refilled in place:
    *  a fresh array per rig per frame would be real GC churn at raid rig counts. */
   private readonly weightScan: AnimActionWeight[] = [];
+  private readonly currentWeight: AnimActionWeight = {
+    scheduled: false,
+    effectiveWeight: 0,
+  };
   private wasDead = false;
   private initialized = false;
   private attackIdx = 0;
@@ -360,6 +367,7 @@ export class CharacterVisual {
     // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
     // the held weapon model, so the visual is born holding the right weapon.
     this.model = assembleModel(this.def, weaponItemId, offhandItemId);
+    configureTightBoneTextures(this.model);
     applyMaterials(
       this.model,
       this.def,
@@ -439,6 +447,7 @@ export class CharacterVisual {
     this.root.add(this.clickProxy);
 
     this.mixer = new THREE.AnimationMixer(this.model);
+    this.skeletonUpdates = new SkeletonUpdateCache(this.model);
     for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES]) {
       const clip = prep.clips.get(name);
       if (clip) this.actions.set(name, this.mixer.clipAction(clip));
@@ -518,9 +527,13 @@ export class CharacterVisual {
     // (the T-pose) for as long as the state is held, and strafe/cast/walk are
     // all held states. Re-drive the base pose instead of waiting for the next
     // edge. Debounced, so a legitimate crossfade can never trip it.
-    const scan = scanAnimRepair(this.starvedFrames, this.readActionWeights(), this.deadLock);
-    this.starvedFrames = scan.starvedFrames;
-    if (scan.repair) this.repairPose();
+    if (this.current && drivesPose(readActionWeight(this.current, this.currentWeight))) {
+      this.starvedFrames = 0;
+    } else {
+      const scan = scanAnimRepair(this.starvedFrames, this.readActionWeights(), this.deadLock);
+      this.starvedFrames = scan.starvedFrames;
+      if (scan.repair) this.repairPose();
+    }
 
     if (s.spinning && !s.dead) {
       this.spinAngle = (this.spinAngle + dt * SPIN_RATE) % (Math.PI * 2);
@@ -569,7 +582,7 @@ export class CharacterVisual {
       // BEFORE the mixer integrates: scrub the climb's baked clips (weights
       // and frozen times are mixer INPUTS, unlike the additive lifts below).
       this.driveClimbClips();
-      this.mixer.update(this.pendingDt);
+      this.updateMixer(this.pendingDt);
       this.pendingDt = 0;
       // AFTER the mixer wrote the sampled pose: the sheathe gesture's additive
       // arm raise (never applied on skipped-mixer frames, so it cannot accumulate).
@@ -905,7 +918,7 @@ export class CharacterVisual {
     this.current = chosen;
     this.currentIsOneShot = true;
     this.currentOneShotIsEmote = false;
-    this.mixer.update(0);
+    this.updateMixer(0);
     return name;
   }
 
@@ -925,7 +938,7 @@ export class CharacterVisual {
     idle.setEffectiveWeight(1);
     idle.play();
     this.current = idle;
-    this.mixer.update(0);
+    this.updateMixer(0);
   }
 
   // -------------------------------------------------------------------------
@@ -951,7 +964,7 @@ export class CharacterVisual {
   }
 
   setProxyShadow(on: boolean): void {
-    if (this.shadowProxy) this.shadowProxy.visible = on;
+    if (this.shadowProxy && this.shadowProxy.visible !== on) this.shadowProxy.visible = on;
   }
 
   setFar(far: boolean): void {
@@ -966,6 +979,7 @@ export class CharacterVisual {
   }
 
   setGhost(on: boolean): void {
+    if (on === this.ghosted) return;
     this.ghosted = on;
     this.applyVisualMaterials();
   }
@@ -1105,6 +1119,7 @@ export class CharacterVisual {
       this.stow.attached,
     );
     for (const payload of payloads) {
+      configureTightBoneTextures(payload);
       applyMaterials(
         payload,
         this.def,
@@ -1161,6 +1176,7 @@ export class CharacterVisual {
    *  re-pin skin orientation, re-run the material pass, re-snapshot originals,
    *  and rebuild the skin VFX on the payloads that now exist. */
   private finishWeaponAttach(payloads: THREE.Object3D[]): void {
+    for (const payload of payloads) configureTightBoneTextures(payload);
     // Ranged skins take a root-relative orientation pin (position always rides
     // the hand): a bow aims upright WHILE the shot one-shot plays (the string
     // hand rolls a glued bow sideways mid-draw); a bow-slot gun carries muzzle
@@ -1457,6 +1473,7 @@ export class CharacterVisual {
     this.disposeEffectMaterials();
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
+    this.skeletonUpdates.dispose();
     this.root.removeFromParent();
     // SkeletonUtils.clone gives each instance exclusive Skeletons whose GPU
     // bone textures the renderer allocates lazily — release them here or
@@ -1493,6 +1510,16 @@ export class CharacterVisual {
       i++;
     }
     return scan;
+  }
+
+  /** Measured requests vs actual palette rebuilds for browser-side accounting. */
+  skeletonUpdateStats(): SkeletonUpdateStats {
+    return this.skeletonUpdates.stats();
+  }
+
+  private updateMixer(dt: number): void {
+    this.mixer.update(dt);
+    this.skeletonUpdates.markPoseChanged();
   }
 
   /** Nothing is driving the rig (see `needsAnimRepair`): drop the stale handle
@@ -1764,7 +1791,7 @@ export class CharacterVisual {
       death.play();
       death.time = Math.max(0, death.getClip().duration - 1e-3);
       this.current = death;
-      this.mixer.update(0);
+      this.updateMixer(0);
       return;
     }
     this.beginAction(death, prev, ONESHOT_FADE);

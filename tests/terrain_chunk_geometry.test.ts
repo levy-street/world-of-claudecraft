@@ -119,15 +119,13 @@ describe('generated chunk geometry is stable', () => {
     expect(inRect.length).toBe(36);
     expect(gapFill.length).toBe(12);
 
-    // Re-minted for the Eastbrook camp respacing (PR #2584, maintainer-ordered):
-    // camp radii drive the terrain flatten aprons, so the deliberate, reviewed
-    // spread of the starter camps regrades the Vale rect. The prior pin
-    // (6f7fb63da247a5eb272dd9d7a42a5fcd) dated from before that change; the
-    // gap-cell fill must still not perturb a single byte of in-rect geometry.
-    expect(digestOf(inRect)).toBe('987a8787d8d0101698ed259f73aa557b');
-    // The gap super-chunks' own pin. Re-mint ONLY for a deliberate, reviewed
-    // visual change.
-    expect(digestOf(gapFill)).toBe('1da89b363fda0dcac73d4d5a24c1760d');
+    // Re-minted for the exact Uint16 and tile-major index pipeline. The
+    // terrain_vertex_pipeline contract proves the ordered triangles and every
+    // vertex attribute are unchanged; only triangle submission order and
+    // index transport width moved.
+    expect(digestOf(inRect)).toBe('79c79fa3732d4c2e235db0a8bca13f67');
+    // The gap super-chunks take the same index-only migration.
+    expect(digestOf(gapFill)).toBe('b13f0ba61280f097b30d31904eb73415');
 
     terrain.cancelStreaming();
   });

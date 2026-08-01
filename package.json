@@ -60,6 +60,7 @@
     "perf:tour": "node scripts/perf_tour.mjs",
     "perf:crowd": "node scripts/crowd_fps_bench.mjs",
     "perf:prewarm": "node scripts/prewarm_travel_bench.mjs",
+    "perf:baseline": "node scripts/perf_baseline.mjs",
     "ops:cpu-monitor": "node scripts/prod_cpu_monitor.mjs",
     "feel:smoke": "node scripts/feel_smoke.mjs",
     "asset:budget": "node scripts/asset_budget.mjs",

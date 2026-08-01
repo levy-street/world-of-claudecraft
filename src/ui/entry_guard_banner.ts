@@ -12,6 +12,7 @@ const PRESET_LABEL_KEYS: Record<number, TranslationKey> = {
   3: 'hud.options.graphicsPresetHigh',
   4: 'hud.options.graphicsPresetUltra',
   5: 'hud.options.graphicsPresetAdvanced',
+  6: 'hud.options.graphicsPresetInsane',
 };
 
 /** Localized display name for a graphicsPreset settings value. */

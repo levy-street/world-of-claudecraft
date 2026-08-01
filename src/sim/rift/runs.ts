@@ -250,7 +250,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const floor = floorForInstance(inst);
 
-  // Publish the generated collision so movement/pathing/LoS/camera respect it.
+  // Publish the generated collision so movement, pathing, and LoS respect it.
   setRiftRegion(ctx.riftCollisionToken, origin.x, origin.z, layoutColliders(floor.layout));
 
   inst.mobIds = [];

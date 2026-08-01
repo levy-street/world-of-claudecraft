@@ -319,7 +319,6 @@ export const IWORLD_MEMBERS = [
   // Maker's Bond unbind service (Professions 2.0).
   { name: 'unbindItem', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
-  { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
   { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
@@ -498,9 +497,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // activeMasterLootRolls, leaving 274; the rift floor timer HUD adds
     // riftEventMsRemaining and the instance-payload pipes add
     // marketListInstance, leaving 276. Reactive aura timing adds
-    // reactiveAbilityWindowRemaining, leaving 277.
-    expect(IWORLD_MEMBERS.length).toBe(277);
-    expect(DATA_MEMBERS.length).toBe(72);
+    // reactiveAbilityWindowRemaining, leaving 277; this branch removes the
+    // renderer-only riftCollisionToken with third-person camera collision,
+    // leaving 276.
+    expect(IWORLD_MEMBERS.length).toBe(276);
+    expect(DATA_MEMBERS.length).toBe(71);
     expect(METHOD_MEMBERS.length).toBe(205);
   });
   it('has no duplicate member names', () => {
@@ -727,7 +728,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'revivePet',
       'ridingTrained',
       'riftBossDeathZones',
-      'riftCollisionToken',
       'riftEventMsRemaining',
       'riftFloor',
       'salvageItem',
@@ -854,7 +854,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'recipeList',
       'renown',
       'restedXp',
-      'riftCollisionToken',
       'riftFloor',
       'socialInfo',
       'stationPlacements',
@@ -1421,7 +1420,6 @@ const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
   'raidLockouts',
-  'riftCollisionToken',
   'riftFloor',
   'riftBossDeathZones',
   'riftEventMsRemaining',
@@ -1617,8 +1615,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(277);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(277);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(276);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(276);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

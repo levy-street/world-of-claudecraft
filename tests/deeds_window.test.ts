@@ -411,9 +411,16 @@ describe('renderer celebration + nameplate title', () => {
     expect(rendererSrc.match(/FESTIVAL_GOLD_COLORS/g)?.length).toBe(3);
   });
 
-  it('renders the title subtitle cheap-diffed per (language, title id)', () => {
+  it('renders the title subtitle cheap-diffed per (i18n revision, title id)', () => {
     expect(nameplateSrc).toContain('private setNameplateTitle(');
-    expect(nameplateSrc).toMatch(/`\$\{getLanguage\(\)\}\|\$\{titleId\}`/);
+    // Keyed on a monotonic i18n revision rather than getLanguage(): the dev
+    // pseudo-locale deliberately leaves getLanguage() at 'en' while changing
+    // what t() resolves to, so a language-keyed gate left pseudo text on screen
+    // after switching back.
+    expect(nameplateSrc).toMatch(/`\$\{i18nRevision\}\|\$\{titleId\}`/);
+    expect(nameplateSrc).toContain(
+      'if (id === v.nameplateTitleId && i18nRevision === v.nameplateTitleI18nRevision) return;',
+    );
     expect(nameplateSrc).toContain(
       'this.setNameplateTitle(v, suppressSelf ? undefined : e.title);',
     );

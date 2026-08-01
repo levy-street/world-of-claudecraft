@@ -1,5 +1,5 @@
 // Skinned-rig part merging: collapse the several body-part SkinnedMeshes a
-// KayKit character ships into ONE SkinnedMesh per (material, parent, transform).
+// KayKit character ships into ONE SkinnedMesh per (material, world transform).
 //
 // Why the naive merge does not work
 // ---------------------------------
@@ -31,8 +31,9 @@
 // IDENTICALLY against the canonical part's skeleton, and the parts can then be
 // merged into one geometry, one Skeleton, and one GPU bone texture.
 //
-// Payoff: a rig drops from ~9 skinned draws (each with its own skeleton update
-// and bone-texture upload, in the main pass AND the shadow pass) to 1.
+// Payoff: a rig drops from ~9 skinned draws (each with its own skeleton and
+// palette upload when its pose advances) to 1 in both color and shadow. Three
+// re-runs vertex skinning for each pass, but uploads a changed texture only once.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
@@ -155,11 +156,18 @@ export function rebakeGeometry(geo: THREE.BufferGeometry, m: THREE.Matrix4): THR
   return out;
 }
 
-/** Parts of one rig that ride the same bones, material, parent and local transform. */
+/**
+ * Parts of one rig that ride the same bones, material, and world transform.
+ *
+ * GLTFLoader represents a multi-primitive mesh as one identity Group containing
+ * one SkinnedMesh per primitive. Some rigs split body parts across several such
+ * sibling Groups. Their parent UUIDs differ even though their meshes occupy the
+ * exact same space, so world transform is the identity-relevant key.
+ */
 function bucketKey(sm: THREE.SkinnedMesh): string {
   const bones = sm.skeleton.bones.map((b) => b.uuid).join(',');
   const mat = sm.material as THREE.Material;
-  return `${bones}|${mat.uuid}|${sm.parent?.uuid}|${sm.matrix.elements.join(',')}`;
+  return `${bones}|${mat.uuid}|${sm.matrixWorld.elements.join(',')}`;
 }
 
 function sameAttributeSet(parts: THREE.SkinnedMesh[]): boolean {
@@ -179,23 +187,60 @@ function hasMorphTargets(sm: THREE.SkinnedMesh): boolean {
   return !!morphs && Object.keys(morphs).length > 0;
 }
 
+/** Scene nodes addressed by the supplied Three animation clips. */
+export function animatedNodeNames(clips: THREE.AnimationClip[]): Set<string> {
+  const names = new Set<string>();
+  for (const clip of clips) {
+    for (const track of clip.tracks) {
+      const nodeName = THREE.PropertyBinding.parseTrackName(track.name).nodeName;
+      if (nodeName) names.add(nodeName);
+    }
+  }
+  return names;
+}
+
+function parentBehaviorKey(
+  mesh: THREE.SkinnedMesh,
+  root: THREE.Object3D,
+  animatedNames: ReadonlySet<string> | undefined,
+): string {
+  const parentId = mesh.parent?.uuid ?? mesh.uuid;
+  // Without clip evidence, retain the original parent-local merge boundary.
+  if (!animatedNames) return `parent:${parentId}`;
+  if (mesh.name && animatedNames.has(mesh.name)) return `mesh:${mesh.uuid}`;
+  let current = mesh.parent;
+  let chainVisible = true;
+  while (current && current !== root) {
+    chainVisible &&= current.visible;
+    // Meshes under one animated parent still move together and may merge.
+    // Different parents must remain separate if either chain can diverge.
+    if (current.name && animatedNames.has(current.name)) return `parent:${parentId}`;
+    current = current.parent;
+  }
+  // Cross-parent merging is deliberately limited to sibling wrapper Groups.
+  // That is the GLTFLoader multi-primitive shape this optimization proves.
+  const grandparentId = mesh.parent?.parent?.uuid ?? root.uuid;
+  return `static:${grandparentId}|visible:${chainVisible}`;
+}
+
 /**
  * Merge every mergeable group of skinned body parts under `root` in place.
  *
  * A part joins the merge only when it shares the canonical part's bone array,
- * material, parent and local transform, has the same attribute set, an equal
- * bind matrix, and bind data satisfying the single-T law. Anything else is left
- * untouched as its own SkinnedMesh, so a rig we cannot prove safe still renders
- * correctly (just without the saving).
+ * material and world transform, has the same attribute set, an equal
+ * bind matrix, static-equivalent parent behavior, and bind data satisfying the
+ * single-T law. Anything else is left untouched as its own SkinnedMesh, so a
+ * rig we cannot prove safe still renders correctly (just without the saving).
  */
-export function mergeSkinnedParts(root: THREE.Object3D): void {
+export function mergeSkinnedParts(root: THREE.Object3D, animatedNames?: ReadonlySet<string>): void {
+  root.updateMatrixWorld(true);
   const groups = new Map<string, THREE.SkinnedMesh[]>();
   root.traverse((o) => {
     const sm = o as THREE.SkinnedMesh;
     if (!sm.isSkinnedMesh || !sm.visible) return;
     if (Array.isArray(sm.material)) return; // never happens via GLTFLoader
     if (hasMorphTargets(sm)) return; // would be silently dropped by the rebake
-    const key = bucketKey(sm);
+    const key = `${bucketKey(sm)}|${parentBehaviorKey(sm, root, animatedNames)}`;
     const bucket = groups.get(key);
     if (bucket) bucket.push(sm);
     else groups.set(key, [sm]);

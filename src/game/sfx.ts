@@ -11,6 +11,7 @@
 
 import { apiUrl } from '../client_origin';
 import type { BiomeId } from '../sim/types';
+import { resumeWhenAllowed } from './audio_unlock';
 import {
   SFX_CATALOG_HASH,
   SFX_CLIPS,
@@ -175,9 +176,7 @@ class Sfx {
       this.master = this.ctx.createGain();
       this.master.gain.value = SAMPLE_GAIN * this.vol;
       this.master.connect(this.ctx.destination);
-      void this.ctx.resume?.().catch(() => {
-        /* resumes on the next gesture */
-      });
+      resumeWhenAllowed(this.ctx);
       const l = this.ctx.listener;
       if (l.upX) {
         l.upX.value = 0;

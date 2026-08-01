@@ -341,7 +341,6 @@ describe('active-world noticeboard service', () => {
       hd: 0.3,
       rot: 0.25,
       cameraTopY: present.groundPos(118, -76).y + 2.6,
-      camGhost: true,
     });
   });
 

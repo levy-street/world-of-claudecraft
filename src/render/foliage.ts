@@ -27,6 +27,7 @@ import {
 } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { applyCanopyDetail } from './canopy_detail';
 import {
   applyInstanceCollapse,
   type CollapseRole,
@@ -50,6 +51,11 @@ import {
   treeDetailDistance,
 } from './foliage_lod';
 import {
+  patchConstantUpNormalVertexShader,
+  patchGrassFragmentShader,
+  reuseDiffuseMapSampleForEmissive,
+} from './foliage_shader_core';
+import {
   gardenLushGrassAt,
   gardenMeadowTintAt,
   inParterrePlot,
@@ -57,8 +63,24 @@ import {
   parterreFlowerTintAt,
 } from './garden_parterre_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
+import {
+  type GrassCapCollapseBand,
+  grassCapCollapseBand,
+  grassCapCollapseShaderPatch,
+} from './grass_cap_collapse_core';
+import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
+import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import {
+  advanceInstanceCountInto,
+  farFieldDensityFractionForValues,
+  projectedPixelSize,
+  reorderInstanceDataByStableRank,
+} from './perceptual_lod_core';
 import { attachShadowPassOnlyGate } from './shadow_pass_gate_core';
+import { freezeStaticMatrices } from './static_matrix';
+import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
+import { applySurfaceDetail, foliageWornFamilyFor } from './worn_stone';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
 //
@@ -101,7 +123,9 @@ const GRASS_DENSITY_HIGH = 0.5;
 // Per-biome grass density multipliers over the base above. The Reach is bare
 // snow (no blades, and with them no ground flowers); the Wraithwood's floor is
 // deep grass instead of flowers, so its forest reads lush, not decorated.
-const GRASS_BIOME_DENSITY: Partial<Record<BiomeId, number>> = {
+// Exported: the near-field blade carpet (blade_grass.ts) follows the same
+// per-biome bare/lush rules as the card tufts.
+export const GRASS_BIOME_DENSITY: Partial<Record<BiomeId, number>> = {
   frost: 0,
   ember: 0, // the Drakelands are scorched waste: no blades in the cinders
   haunt: 1.55,
@@ -119,8 +143,21 @@ const FLOWERLESS_BIOMES: ReadonlySet<BiomeId> = new Set(['frost', 'haunt']);
 const FIELD_BIOMES: ReadonlySet<BiomeId> = new Set(['dusk', 'amber', 'night', 'garden', 'fen']);
 const GRASS_CHUNK_CACHE_LIMIT_LOW = 96;
 const GRASS_CHUNK_CACHE_LIMIT_HIGH = 128;
-const TREE_WIND_STRENGTH = 0.06;
-const GRASS_WIND_STRENGTH = 0.08;
+const GRASS_RANK_SALT = 17;
+const FLOWER_RANK_SALT = 53;
+const GRASS_CARD_REFERENCE_HEIGHT_LOW = 0.72;
+const GRASS_CARD_REFERENCE_HEIGHT_HIGH = 0.9;
+const FLOWER_CARD_REFERENCE_HEIGHT = 0.82;
+const FLOWER_FAR_DENSITY_FLOOR = 0.75;
+const TREE_WIND_STRENGTH = 0.08;
+const GRASS_WIND_STRENGTH = 0.16;
+// how far leaf normals bend toward the canopy-sphere direction (see addWind);
+// 0 keeps the raw card normals and their crushed-black backlit sides. The old
+// straight-up bend at this strength pulled every leaf to the same near-peak
+// N·L under a high sun and flattened whole canopies into one value; the
+// sphere target keeps the shaded side lit through the sky term while giving
+// the canopy a real lit side and shade side.
+const LEAF_UP_NORMAL_BLEND = 0.7;
 // two x-halves x 240u z-bands: bucket count x variants-per-bucket is the
 // foliage draw budget — see the perBucket caps in the species specs
 const BUCKET_DEPTH = 240;
@@ -260,6 +297,11 @@ const TRUNK_TINT: Record<BiomeId, number> = {
   garden: 0xcfc4b0,
   gale: 0x9a8a74,
 };
+// Per-biome grass accents, normalized against the vale entry at build time:
+// the per-instance tuft tint starts from the ground colour under the tuft
+// (same palette zone blend and patch noise the terrain vertex colours use),
+// then multiplies in the biome accent so authored casts survive (night stays
+// orchid, jungle stays wet-bright) while the base still tracks the meadow.
 const GRASS_TINT: Record<BiomeId, number> = {
   vale: 0xdde4c0,
   marsh: 0xbfc492,
@@ -279,6 +321,32 @@ const GRASS_TINT: Record<BiomeId, number> = {
   garden: 0xd0eeb0, // mown lawn
   gale: 0xb8d09a, // wind-silvered grass
 };
+// The cards are lit with up normals (see applyGrassShader), so no N.L
+// compensation is needed; per-channel because the grass photo the ground
+// multiplies in is not neutral against the tuft map.
+const GRASS_TINT_GAIN: readonly [number, number, number] = [1.08, 1.0, 0.7];
+const tuftTintChannel = (ground: number, gain: number): number =>
+  Math.min(1, gain * (0.65 + 0.7 * ground));
+const GRASS_ACCENT: Partial<Record<BiomeId, [number, number, number]>> = (() => {
+  const vale = new THREE.Color(GRASS_TINT.vale);
+  const out: Partial<Record<BiomeId, [number, number, number]>> = {};
+  for (const [biome, hex] of Object.entries(GRASS_TINT) as [BiomeId, number][]) {
+    const c = new THREE.Color(hex);
+    out[biome] = [c.r / vale.r, c.g / vale.g, c.b / vale.b];
+  }
+  // Pale grounds (peaks scree, frost snowfields) land the ground-keyed tint
+  // exactly on the surface value and the blades dissolve into flat slabs;
+  // pull those tufts darker so the silhouette keeps definition.
+  for (const pale of ['peaks', 'frost'] as const) {
+    const a = out[pale];
+    if (a) out[pale] = [a[0] * 0.82, a[1] * 0.85, a[2] * 0.84];
+  }
+  return out;
+})();
+// Bush/fern dressing tint gain over the ground grass colour (same curve as
+// GRASS_TINT_GAIN); above 1 because the kit albedo is much darker than the
+// meadow it stands in.
+const DRESS_GROUND_GAIN: readonly [number, number, number] = [1.7, 1.55, 1.15];
 const SWAMP_CANOPY_TINT = 0x7e8b58;
 // Flowering-bush bloom colorways for the dusk realm (picked per instance).
 const DUSK_BLOOM_TINTS = [0x9e94ba, 0xd88fb0, 0xe8d8a0, 0x8fb8d8, 0xc88fd8];
@@ -314,6 +382,21 @@ const DRESS_TINT: Record<BiomeId, number> = {
   garden: 0x8cc27a,
   gale: 0x84a878,
 };
+// how far the authored-tint dressing path collapses toward white
+const DRESS_TINT_SOFTEN = 0.65;
+const DRESS_TINT_SOFTEN_LOW = 0.56;
+// Same accent normalization as GRASS_ACCENT: dressing tints ride on the
+// ground colour so bushes stop reading as flat biome-constant clumps, while
+// authored casts (violet night shrubs, jungle greens) survive the ride.
+const DRESS_ACCENT: Partial<Record<BiomeId, [number, number, number]>> = (() => {
+  const vale = new THREE.Color(DRESS_TINT.vale);
+  const out: Partial<Record<BiomeId, [number, number, number]>> = {};
+  for (const [biome, hex] of Object.entries(DRESS_TINT) as [BiomeId, number][]) {
+    const c = new THREE.Color(hex);
+    out[biome] = [c.r / vale.r, c.g / vale.g, c.b / vale.b];
+  }
+  return out;
+})();
 // how far tints collapse toward white (1 = no tint at all)
 const LEAF_TINT_SOFTEN = 0.6;
 // The night realm's exception: soften(violet) x green albedo can only land
@@ -324,7 +407,6 @@ const leafSoften = (biome: BiomeId): number =>
   biome === 'night' ? LEAF_TINT_SOFTEN_NIGHT : LEAF_TINT_SOFTEN;
 const BARK_TINT_SOFTEN = 0.85;
 const ROCK_TINT_SOFTEN = 0.45;
-const DRESS_TINT_SOFTEN = 0.65;
 
 // rocks only pick up the snow-dust colorway above the terrain snowline —
 // low-altitude peaks-biome foothills stay mossy/bare (white rocks on green
@@ -358,10 +440,13 @@ export interface FoliageView {
     fogFar: number,
     atmosFogNear: number,
     atmosFogFar: number,
+    projectionPixels: number,
+    dt: number,
+    reducedMotion?: boolean,
   ): void;
   setGrassQuality(level: number): void;
   setModelQuality(level: number): void;
-  perfStats(): FoliagePerfStats;
+  perfStats(out?: FoliagePerfStats): FoliagePerfStats;
 }
 
 export interface FoliagePerfStats {
@@ -481,6 +566,10 @@ interface TreeHideable {
   r: number;
   topY: number;
   hidden: boolean;
+  /** Animated fade level (1 = opaque instance, 0.2 = occluding ghost). */
+  alpha: number;
+  /** Live ghost stand-ins while the fade is active (empty = instanced). */
+  ghosts: InstancedGhostHandle[];
   parts: TreeHidePart[];
 }
 
@@ -497,35 +586,105 @@ function lodDists(): LodDists {
   return lodDistsFor(GFX.leanFoliage);
 }
 
+// Slow travelling gust, shared by the canopy and grass shaders: it scales the
+// sway amplitude (0.2 to 1) instead of adding displacement of its own, so the
+// vegetation swells and calms in coherent waves rather than every plant
+// flapping at one fixed strength. Same rate and world scale in both keeps the
+// canopy and the meadow in the same weather.
+const windGustGlsl = (x: string, z: string): string =>
+  `0.6 + 0.4 * sin(uTime * 0.6 + ${x} * 0.05 + ${z} * 0.04)`;
+
 // Wind sway injection for foliage materials (canopies, bushes, grass cards).
 // Phase comes from the instance's world origin so neighbouring trees
 // desynchronise; weight ramps by local height so bases stay planted.
-function addWind(mat: THREE.Material, strength: number): void {
-  if (!GFX.windSway) return;
+// upNormalBlend bends leaf normals toward world up (uniform-driven so every
+// material shares one shader program): dense canopies otherwise shade almost
+// entirely by sun facing, and their backlit sides crush to black clumps,
+// which is what small meadow pines read as from the east.
+function addWind(mat: THREE.Material, strength: number, upNormalBlend = 0): void {
+  if (!GFX.windSway && upNormalBlend === 0) return;
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = sharedUniforms.uTime;
-    sh.uniforms.uWindStrength = { value: strength };
+    sh.uniforms.uWindStrength = { value: GFX.windSway ? strength : 0 };
+    sh.uniforms.uUpNormalBlend = { value: upNormalBlend };
+    // canopy pivot accumulated from the leaf parts' bounding boxes during
+    // extraction (userData is final by first render, which is when this runs)
+    const pivot = mat.userData as { canopyPivotSum?: number; canopyPivotN?: number };
+    sh.uniforms.uCanopyPivotY = {
+      value: pivot.canopyPivotN ? (pivot.canopyPivotSum ?? 0) / pivot.canopyPivotN : 0,
+    };
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
         `#include <common>
         uniform float uTime;
-        uniform float uWindStrength;`,
+        uniform float uWindStrength;
+        uniform float uUpNormalBlend;
+        uniform float uCanopyPivotY;`,
+      )
+      .replace(
+        '#include <beginnormal_vertex>',
+        `#include <beginnormal_vertex>
+        // Bend leaf normals toward the direction from the canopy pivot
+        // through the vertex, biased upward. The canopy then shades as a lit
+        // volume: sun side bright, shade side dimming through the sky term,
+        // where a straight-up bend gave every card the same N·L and flattened
+        // the whole tree to one value. Model-local position: tree base at the
+        // origin, so no instance transform is needed for the pivot.
+        vec3 canopyRad = vec3(position.x, (position.y - uCanopyPivotY) * 0.75 + 0.55, position.z);
+        vec3 canopyDir = canopyRad / max(length(canopyRad), 1e-4);
+        objectNormal = normalize(mix(objectNormal, canopyDir, uUpNormalBlend));`,
       )
       .replace(
         '#include <begin_vertex>',
         `#include <begin_vertex>
         #ifdef USE_INSTANCING
-          float windPhase = instanceMatrix[3][0] * 0.15 + instanceMatrix[3][2] * 0.17;
+          vec2 windOrigin = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);
         #else
-          float windPhase = 0.0;
+          vec2 windOrigin = vec2(0.0);
         #endif
+        float windPhase = windOrigin.x * 0.15 + windOrigin.y * 0.17;
+        float windGust = ${windGustGlsl('windOrigin.x', 'windOrigin.y')};
         float windAmt = (sin(uTime * 1.7 + windPhase) + 0.5 * sin(uTime * 3.1 + windPhase * 1.3))
-          * uWindStrength * smoothstep(0.0, 1.0, transformed.y);
+          * windGust * uWindStrength * smoothstep(0.0, 1.0, transformed.y);
         transformed.x += windAmt;
         transformed.z += windAmt * 0.6;`,
       );
+    sh.fragmentShader = sh.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        uniform float uUpNormalBlendF;`,
+      )
+      .replace(
+        '#include <normal_fragment_begin>',
+        `#include <normal_fragment_begin>
+        #ifdef DOUBLE_SIDED
+          // The up-bent vertex normal gets flipped toward DOWN on backfaces
+          // by the double-sided chunk, blacking out canopy reverse sides.
+          // Undo the flip in proportion to the bend so unbent materials keep
+          // stock behaviour.
+          normal = mix(normal, normal * faceDirection, uUpNormalBlendF);
+        #endif`,
+      );
+    sh.uniforms.uUpNormalBlendF = { value: upNormalBlend > 0 ? 1 : 0 };
   };
+}
+
+// Leaf materials deliberately use their albedo map as a faint ambient floor.
+// Both slots point at the same texture object, UV channel, and transform, so
+// the fragment shader can reuse the map sample with no arithmetic or sampling
+// difference. This hook runs last so canopy emissive shading stays after it.
+function reuseLeafMapSampleForEmissive(mat: THREE.Material): void {
+  const prev = mat.onBeforeCompile;
+  const prevSrc = typeof prev === 'function' ? prev.toString() : '';
+  const prevKey =
+    typeof mat.customProgramCacheKey === 'function' ? mat.customProgramCacheKey.bind(mat) : null;
+  mat.onBeforeCompile = (shader, renderer) => {
+    prev?.call(mat, shader, renderer);
+    shader.fragmentShader = reuseDiffuseMapSampleForEmissive(shader.fragmentShader);
+  };
+  mat.customProgramCacheKey = () => `foliage-shared-map-emissive|${prevKey ? prevKey() : prevSrc}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -590,8 +749,33 @@ function foliageMaterial(
         metalness: 0,
       })
     : new THREE.MeshLambertMaterial(common);
-  if (pol.windMul > 0) addWind(mat, TREE_WIND_STRENGTH * pol.windMul);
+  // keep the source material's name: the albedo-lift loops and the canopy
+  // pivot accumulation both key off it after the rebuild
+  mat.name = src.name;
+  const upBlend = pol.leaf ? LEAF_UP_NORMAL_BLEND : 0;
+  if (pol.windMul > 0 || upBlend > 0) addWind(mat, TREE_WIND_STRENGTH * pol.windMul, upBlend);
+  if (pol.leaf && std.map) {
+    // Texture-shaped ambient floor: a dense canopy shadow-maps itself into
+    // darkness (worst on small meadow pines, which read as black clumps), and
+    // no diffuse-side tweak survives full shadow. Kept deliberately faint: the
+    // floor is constant, so any more of it also lands on sunlit canopies and
+    // flattens their shading into neon. The shadowed side is carried mostly by
+    // the sky term through the up-bent leaf normals (LEAF_UP_NORMAL_BLEND),
+    // which falls off with light instead of glowing on its own.
+    mat.emissiveMap = std.map;
+    mat.emissive.setRGB(0.155, 0.175, 0.135);
+  }
   applyInstanceCollapse(mat, role);
+  // Trunks take the bark family, the shared boulder fields a stronger stone;
+  // leaf/flower/mushroom names return null so canopies stay clean. Applied
+  // LAST so the worn hook chains the collapse (and any wind) hook.
+  const worn = foliageWornFamilyFor(src.name);
+  if (worn)
+    applySurfaceDetail(mat as THREE.MeshStandardMaterial, worn.family, { strength: worn.strength });
+  // Leaf names return null above: canopies take their own clump-detail layer
+  // (needle/leaf break-up) instead; unknown names no-op inside.
+  applyCanopyDetail(mat, src.name);
+  if (pol.leaf && std.map) reuseLeafMapSampleForEmissive(mat);
   materialCache.set(key, mat);
   return mat;
 }
@@ -656,6 +840,20 @@ function extractParts(url: string): ModelPart[] {
     });
   });
   if (parts.length === 0) throw new Error(`foliage model has no meshes: ${url}`);
+  // Accumulate the canopy pivot (mean leaf-bbox centre) on the shared
+  // material for the sphere-normal bend in addWind. Materials are shared per
+  // (role, name) across a species' GLB variants, so the pivot is a running
+  // average over every variant that uses the sheet, close enough for a
+  // shading direction.
+  for (const part of parts) {
+    if (!part.isLeaf) continue;
+    part.geometry.computeBoundingBox();
+    const bb = part.geometry.boundingBox;
+    if (!bb) continue;
+    const ud = part.material.userData as { canopyPivotSum?: number; canopyPivotN?: number };
+    ud.canopyPivotSum = (ud.canopyPivotSum ?? 0) + (bb.min.y + bb.max.y) / 2;
+    ud.canopyPivotN = (ud.canopyPivotN ?? 0) + 1;
+  }
   // draw barks before leaves: opaque first is kinder to early-z
   parts.sort((a, b) => Number(a.isLeaf) - Number(b.isLeaf));
   // The baked float geometry and converted materials are the renderer-owned
@@ -970,6 +1168,8 @@ function placeSpecies(
         r: 0.55 * d.scale,
         topY: terrainHeight(d.x, d.z, seed) + 7.5 * d.scale,
         hidden: false,
+        alpha: 1,
+        ghosts: [],
         parts: [],
       }));
       hideRegistry.push(...handles);
@@ -1145,8 +1345,21 @@ function buildTrees(
     proxyShape: 'pine',
     cullBarkFar: true, // pine canopies start ~2u up: no proxy needed in fog
   };
+  // Mild oak leaf lift. The old 6.5x here was calibrated on a whole-atlas
+  // average (~0.012) that was both diluted ~3.4x by fully-transparent texels
+  // and attributed to the wrong atlas, measured over the texels alphaTest
+  // keeps, oak is (0.099, 0.197, 0.000) linear, already 2-3x BRIGHTER than
+  // pine. At 6.5x the visible green albedo passed 1.0 (brighter than white)
+  // and canopies read as neon lime with no shading left. 1.35x keeps oaks a
+  // touch brighter than pine without erasing their lit/shade gradation.
+  const oakSets = MODEL_URLS.oak.map(extractParts);
+  for (const parts of oakSets) {
+    for (const part of parts) {
+      if (part.isLeaf) (part.material as THREE.MeshStandardMaterial).color.setRGB(1.35, 1.25, 1.1);
+    }
+  }
   const oakSpec: SpeciesSpec = {
-    sets: MODEL_URLS.oak.map(extractParts),
+    sets: oakSets,
     perBucket: treeVariants,
     salt: 54,
     baseScale: 1.15,
@@ -1366,7 +1579,6 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
-const DRESS_TINT_SOFTEN_LOW = 0.56;
 
 function dressStep(): number {
   return GFX.leanFoliage ? DRESS_STEP_LOW : DRESS_STEP_HIGH;
@@ -1534,6 +1746,29 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
     fern: extractParts(MODEL_URLS.fern[0]),
     mushroom: extractParts(MODEL_URLS.mushroom[0]),
   };
+  // Mild dressing lift. Like the oak lift above, the old 6.5x here came from
+  // a transparent-texel-diluted atlas average; over visible texels the bush
+  // canopy is (0.000, 0.139, 0.025) linear and fern (0.221, 0.260, 0.067).
+  // The old loop was also unfiltered, so the 'Flowers' material, already at
+  // (0.79, 0.58, 0.56), reached 5.2/3.2/2.2 and flowering bushes were the
+  // most blown-out surface in the world. Leaves get a gentle lift; Flowers
+  // get none (their authored albedo is correct).
+  const albedoLift: Partial<Record<DressKind, [number, number, number]>> = {
+    // 1.6/1.5 read as neon against the calmer round-8 ground: the bush sheet
+    // is pure green (red 0), so brightness is the only lever here. The
+    // saturation itself is tamed by canopy_detail's desat luma mix.
+    bush: [1.35, 1.22, 1.08],
+    bushFlowers: [1.35, 1.22, 1.08],
+    fern: [1.15, 1.15, 1.15],
+  };
+  for (const kind of ['bush', 'bushFlowers', 'fern'] as const) {
+    const lift = albedoLift[kind];
+    if (!lift) continue;
+    for (const part of kindParts[kind]) {
+      if (part.material.name === 'Flowers') continue;
+      (part.material as THREE.MeshStandardMaterial).color.setRGB(lift[0], lift[1], lift[2]);
+    }
+  }
   const buckets = new Map<string, DressingSpot[]>();
   for (const spot of generateDressing(seed)) {
     const key = `${Math.floor((spot.z - WORLD_MIN_Z) / BUCKET_DEPTH)}:${spot.x < 0 ? 0 : 1}`;
@@ -1619,16 +1854,24 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
               ),
             );
           } else {
-            im.setColorAt(
-              i,
-              softTint(
-                s.x,
-                s.z,
-                DRESS_TINT[zoneBiomeAt(s.x, s.z)],
-                c,
-                GFX.leanFoliage ? DRESS_TINT_SOFTEN_LOW : DRESS_TINT_SOFTEN,
-              ),
+            // Bushes and ferns grow out of the same meadow as the grass
+            // tufts: key their tint to the ground colour, then ride the
+            // biome accent so authored casts survive. The kit albedo is
+            // dark, hence the lift gain; a flat biome constant left them
+            // reading as near-black clumps on the open field.
+            const dressAccent = DRESS_ACCENT[zoneBiomeAt(s.x, s.z)] ?? [1, 1, 1];
+            groundGrassColorAt(s.x, s.z, seed, c);
+            c.setRGB(
+              Math.min(1.5, DRESS_GROUND_GAIN[0] * dressAccent[0] * (0.65 + 0.7 * c.r)),
+              Math.min(1.5, DRESS_GROUND_GAIN[1] * dressAccent[1] * (0.65 + 0.7 * c.g)),
+              Math.min(1.5, DRESS_GROUND_GAIN[2] * dressAccent[2] * (0.65 + 0.7 * c.b)),
             );
+            c.offsetHSL(
+              (hashAt(s.x, s.z, 1) - 0.5) * 0.03,
+              (hashAt(s.x, s.z, 2) - 0.5) * 0.06,
+              (hashAt(s.x, s.z, 3) - 0.5) * 0.05,
+            );
+            im.setColorAt(i, c);
           }
         });
         im.receiveShadow = true; // dressing casts nothing: too small to matter
@@ -1652,9 +1895,17 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
 // ---------------------------------------------------------------------------
 
 interface GrassRing {
-  update(px: number, pz: number): void;
+  update(
+    px: number,
+    pz: number,
+    camX: number,
+    camY: number,
+    camZ: number,
+    projectionPixels: number,
+    dt: number,
+  ): void;
   setQuality(level: number): void;
-  perfStats(): FoliagePerfStats;
+  perfStats(out?: FoliagePerfStats): FoliagePerfStats;
 }
 
 interface GrassChunk {
@@ -1662,6 +1913,7 @@ interface GrassChunk {
   cx: number;
   cz: number;
   centerX: number;
+  centerY: number;
   centerZ: number;
   ready: boolean;
   queued: boolean;
@@ -1669,7 +1921,40 @@ interface GrassChunk {
   lastUsed: number;
   prioritySq: number;
   mesh?: THREE.InstancedMesh;
+  grassFullCount?: number;
+  grassTransitionCarry: number;
   flowerMesh?: THREE.InstancedMesh;
+  flowerFullCount?: number;
+  flowerTransitionCarry: number;
+}
+
+// Tags every vertex of a tuft/flower card part with the aCap attribute the
+// grass shader reads: 1 on the near-horizontal cap card, 0 on upright cards
+// and flowers. Every merged part carries the attribute so mergeGeometries
+// keeps a uniform layout across parts.
+function tagCapVertices(g: THREE.BufferGeometry, cap: 0 | 1): THREE.BufferGeometry {
+  const arr = new Uint8Array(g.getAttribute('position').count);
+  if (cap) arr.fill(1);
+  g.setAttribute('aCap', new THREE.Uint8BufferAttribute(arr, 1));
+  return g;
+}
+
+// Streamed chunks are immutable after construction. Trim their instance
+// attributes before the first render so WebGL allocates and uploads only the
+// live byte-identical prefix rather than each biome's conservative capacity.
+function trimStaticInstanceAttributes(mesh: THREE.InstancedMesh, count: number): void {
+  const matrix = mesh.instanceMatrix;
+  mesh.instanceMatrix = new THREE.InstancedBufferAttribute(
+    (matrix.array as Float32Array).slice(0, count * 16),
+    16,
+  ).setUsage(matrix.usage);
+  if (mesh.instanceColor) {
+    const color = mesh.instanceColor;
+    mesh.instanceColor = new THREE.InstancedBufferAttribute(
+      (color.array as Float32Array).slice(0, count * color.itemSize),
+      color.itemSize,
+    ).setUsage(color.usage);
+  }
 }
 
 // wind sway + masked edge fade for the grass tufts; the fade keys off the
@@ -1677,16 +1962,33 @@ interface GrassChunk {
 function applyGrassShader(
   mat: THREE.Material,
   uniforms: { uPlayerPos: { value: THREE.Vector2 }; uFadeFar: { value: number } },
+  capBand: GrassCapCollapseBand | null,
 ): void {
+  // On tiers where the solid blade carpet runs (the exact buildBladeGrass
+  // condition in blade_grass.ts), the carpet owns the near-field ground
+  // cover read, and the near-horizontal cap card reads as a lattice of
+  // long flat blades floating above the finer carpet. Collapse cap verts
+  // to the tuft root near the player and grow them back where the carpet
+  // fades out (its fade band runs 27.2 to 34). Tiers without the carpet
+  // keep the cap everywhere: there it is still the only top-down read.
+  const hasCap = capBand !== null;
+  const baseProgramKey = mat.customProgramCacheKey();
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uPlayerPos = uniforms.uPlayerPos;
     sh.uniforms.uFadeFar = uniforms.uFadeFar;
+    const capDecl = hasCap
+      ? `
+        attribute float aCap;
+        uniform vec2 uPlayerPos;`
+      : '';
+    const capCollapse = grassCapCollapseShaderPatch(capBand);
     const wind = GFX.windSway
       ? `
         float windPhase = tuftBase.x * 0.31 + tuftBase.y * 0.27;
+        float windGust = ${windGustGlsl('tuftBase.x', 'tuftBase.y')};
         float windAmt = (sin(uTime * 1.7 + windPhase) + 0.5 * sin(uTime * 3.1 + windPhase * 1.3))
-          * ${GRASS_WIND_STRENGTH.toFixed(3)} * smoothstep(0.0, 0.7, transformed.y);
+          * windGust * ${GRASS_WIND_STRENGTH.toFixed(3)} * smoothstep(0.0, 0.7, transformed.y);
         transformed.x += windAmt;
         transformed.z += windAmt * 0.6;`
       : '';
@@ -1695,7 +1997,7 @@ function applyGrassShader(
         '#include <common>',
         `#include <common>
         uniform float uTime;
-        varying vec2 vTuftWorld;`,
+        varying vec2 vTuftWorld;${capDecl}`,
       )
       .replace(
         '#include <begin_vertex>',
@@ -1704,24 +2006,17 @@ function applyGrassShader(
           vec2 tuftBase = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);
         #else
           vec2 tuftBase = vec2(0.0);
-        #endif
+        #endif${capCollapse}
         ${wind}
         vTuftWorld = tuftBase;`,
       );
-    sh.fragmentShader = sh.fragmentShader
-      .replace(
-        '#include <common>',
-        `#include <common>
-        varying vec2 vTuftWorld;
-        uniform vec2 uPlayerPos;
-        uniform float uFadeFar;`,
-      )
-      .replace(
-        '#include <map_fragment>',
-        `#include <map_fragment>
-        diffuseColor.a *= 1.0 - smoothstep(uFadeFar * 0.7, uFadeFar, distance(vTuftWorld, uPlayerPos));`,
-      );
+    // Every card used the exact up value here already. Keeping it as a shader
+    // constant lets the static geometry omit 12 bytes of normal input per vertex.
+    sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
+    sh.fragmentShader = patchGrassFragmentShader(sh.fragmentShader);
   };
+  const capProgramKey = capBand ? `${capBand.start.toFixed(3)}-${capBand.end.toFixed(3)}` : 'none';
+  mat.customProgramCacheKey = () => `grass-card|cap:${capProgramKey}|${baseProgramKey}`;
 }
 
 /** The overworld jungle grass tint (GRASS_TINT.jungle), for interiors that
@@ -1749,15 +2044,22 @@ export function createGrassTuftMaterial(): THREE.Material {
       roughness: 0.9,
     }),
   );
-  applyGrassShader(mat, {
-    // uFadeFar must comfortably exceed the parked distance: the fade term is
-    // 1 - smoothstep(uFadeFar*0.7, uFadeFar, distance(vTuftWorld, uPlayerPos)),
-    // so with the player parked at (1e6,1e6) a uFadeFar of 1e6 SATURATES the
-    // smoothstep (every tuft sits ~1.414e6 away) and alphaTest discards every
-    // fragment, an invisible scatter. 1e8 keeps the factor at exactly 1.
-    uPlayerPos: { value: new THREE.Vector2(1e6, 1e6) },
-    uFadeFar: { value: 1e8 },
-  });
+  applyGrassShader(
+    mat,
+    {
+      // uFadeFar must comfortably exceed the parked distance: the fade term is
+      // 1 - smoothstep(uFadeFar*0.7, uFadeFar, distance(vTuftWorld, uPlayerPos)),
+      // so with the player parked at (1e6,1e6) a uFadeFar of 1e6 SATURATES the
+      // smoothstep (every tuft sits ~1.414e6 away) and alphaTest discards every
+      // fragment, an invisible scatter. 1e8 keeps the factor at exactly 1.
+      uPlayerPos: { value: new THREE.Vector2(1e6, 1e6) },
+      uFadeFar: { value: 1e8 },
+      // No cap collapse: the near-field blade carpet is an overworld chunk
+      // feature and never runs in the basin interior, so there is no carpet
+      // underneath to collapse the cap card into. Keep the cap everywhere.
+    },
+    null,
+  );
   return mat;
 }
 
@@ -1780,36 +2082,82 @@ function localGrassDisabled(): boolean {
   );
 }
 
-function emptyGrassStats(enabled: boolean, cacheLimit = 0): FoliagePerfStats {
-  return {
-    modelQuality: 1,
-    modelBuckets: 0,
-    modelVisibleBuckets: 0,
-    modelBucketsByLod: {},
-    modelVisibleByLod: {},
-    modelDraws: 0,
-    modelVisibleDraws: 0,
-    modelDrawsByLod: {},
-    modelVisibleDrawsByLod: {},
-    modelTriangles: 0,
-    modelVisibleTriangles: 0,
-    modelTrianglesByLod: {},
-    modelVisibleTrianglesByLod: {},
-    grassEnabled: enabled,
-    grassQuality: enabled ? 1 : 0,
-    grassActiveRadius: 0,
-    grassChunks: 0,
-    grassReadyChunks: 0,
-    grassVisibleChunks: 0,
-    grassQueuedChunks: 0,
-    grassTufts: 0,
-    grassVisibleTufts: 0,
-    grassBuiltChunks: 0,
-    grassDisposedChunks: 0,
-    grassLastBuildMs: 0,
-    grassBuildMs: 0,
-    grassCacheLimit: cacheLimit,
-  };
+function clearNumberRecord(record: Record<string, number>): void {
+  for (const key in record) delete record[key];
+}
+
+function copyNumberRecord(
+  out: Record<string, number>,
+  source: Readonly<Record<string, number>>,
+): void {
+  clearNumberRecord(out);
+  for (const key in source) out[key] = source[key];
+}
+
+function emptyGrassStats(
+  enabled: boolean,
+  cacheLimit = 0,
+  out?: FoliagePerfStats,
+): FoliagePerfStats {
+  const stats =
+    out ??
+    ({
+      modelQuality: 1,
+      modelBuckets: 0,
+      modelVisibleBuckets: 0,
+      modelBucketsByLod: {},
+      modelVisibleByLod: {},
+      modelDraws: 0,
+      modelVisibleDraws: 0,
+      modelDrawsByLod: {},
+      modelVisibleDrawsByLod: {},
+      modelTriangles: 0,
+      modelVisibleTriangles: 0,
+      modelTrianglesByLod: {},
+      modelVisibleTrianglesByLod: {},
+      grassEnabled: enabled,
+      grassQuality: enabled ? 1 : 0,
+      grassActiveRadius: 0,
+      grassChunks: 0,
+      grassReadyChunks: 0,
+      grassVisibleChunks: 0,
+      grassQueuedChunks: 0,
+      grassTufts: 0,
+      grassVisibleTufts: 0,
+      grassBuiltChunks: 0,
+      grassDisposedChunks: 0,
+      grassLastBuildMs: 0,
+      grassBuildMs: 0,
+      grassCacheLimit: cacheLimit,
+    } satisfies FoliagePerfStats);
+  stats.modelQuality = 1;
+  stats.modelBuckets = 0;
+  stats.modelVisibleBuckets = 0;
+  clearNumberRecord(stats.modelBucketsByLod);
+  clearNumberRecord(stats.modelVisibleByLod);
+  stats.modelDraws = 0;
+  stats.modelVisibleDraws = 0;
+  clearNumberRecord(stats.modelDrawsByLod);
+  clearNumberRecord(stats.modelVisibleDrawsByLod);
+  stats.modelTriangles = 0;
+  stats.modelVisibleTriangles = 0;
+  clearNumberRecord(stats.modelTrianglesByLod);
+  clearNumberRecord(stats.modelVisibleTrianglesByLod);
+  stats.grassEnabled = enabled;
+  stats.grassQuality = enabled ? 1 : 0;
+  stats.grassActiveRadius = 0;
+  stats.grassChunks = 0;
+  stats.grassReadyChunks = 0;
+  stats.grassVisibleChunks = 0;
+  stats.grassQueuedChunks = 0;
+  stats.grassTufts = 0;
+  stats.grassVisibleTufts = 0;
+  stats.grassBuiltChunks = 0;
+  stats.grassDisposedChunks = 0;
+  stats.grassLastBuildMs = 0;
+  stats.grassBuildMs = 0;
+  stats.grassCacheLimit = cacheLimit;
+  return stats;
 }
 
 function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
@@ -1833,14 +2181,39 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   // high tier reads as a lush meadow: wider tufts with more blades; low keeps
   // the legacy sprite size
   const lush = !GFX.leanFoliage;
+  const capCollapseBand = grassCapCollapseBand(GFX.bladeCarpetRadius);
+  const capNearCollapse = capCollapseBand !== null;
   const lowPlusGrassScale = GFX.lowPlus ? 1.08 : 1;
   const quad = new THREE.PlaneGeometry(
     lush ? 1.45 : 1.1 * lowPlusGrassScale,
     lush ? 0.9 : 0.7 * lowPlusGrassScale,
   );
-  quad.translate(0, lush ? 0.42 : 0.35 * lowPlusGrassScale, 0);
+  quad.translate(0, lush ? 0.4 : 0.35 * lowPlusGrassScale, 0);
   const quad2 = quad.clone().rotateY(Math.PI / 2);
-  const geo = mergeGeometries([quad, quad2]);
+  // Lush tier gets a third card at 45 degrees with a slight lean and a
+  // narrower/taller silhouette: two perpendicular cards read as a flat
+  // cross from above (the "4-way image"); the offset third card breaks the
+  // X in every direction for one extra quad per tuft. Low tier keeps two.
+  const quad3 = lush
+    ? new THREE.PlaneGeometry(1.15, 1.05)
+        .translate(0, 0.45, 0)
+        .rotateZ(0.12)
+        .rotateY(Math.PI / 4)
+    : null;
+  // A near-horizontal cap card: from a true top-down camera (positive pitch,
+  // the chase camera's common angle) every vertical card goes edge-on and
+  // the meadow read as bare ground with green fans. The cap keeps blade
+  // texture facing the sky for one more quad on the lush tier only.
+  const quadCap = lush
+    ? new THREE.PlaneGeometry(1.05, 1.05).rotateX(-Math.PI / 2 + 0.18).translate(0, 0.34, 0)
+    : null;
+  const capPart = (part: THREE.BufferGeometry, cap: 0 | 1): THREE.BufferGeometry =>
+    capNearCollapse ? tagCapVertices(part, cap) : part;
+  const parts = [capPart(quad, 0), capPart(quad2, 0)];
+  if (quad3) parts.push(capPart(quad3, 0));
+  if (quadCap) parts.push(capPart(quadCap, 1));
+  const geo = mergeGeometries(parts);
+  geo.deleteAttribute('normal');
 
   const tuftTex = grassTuftTexture(lush ? 30 : 18);
   let quality = 1;
@@ -1863,7 +2236,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           alphaTest: 0.35,
         }),
   );
-  applyGrassShader(mat, uniforms);
+  applyGrassShader(mat, uniforms, capCollapseBand);
 
   // ground-cover flowers: a sparse companion set in the same chunks, sharing
   // the sway/fade shader so they move and thin exactly like the grass.
@@ -1872,7 +2245,10 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   const fquad = new THREE.PlaneGeometry(0.95, 0.8);
   fquad.translate(0, 0.38, 0);
   const fquad2 = fquad.clone().rotateY(Math.PI / 2);
+  // Flowers share the sway/fade shader but have no cap card, so they omit the
+  // cap attribute and per-vertex distance/smoothstep path entirely.
   const flowerGeo = mergeGeometries([fquad, fquad2]);
+  flowerGeo.deleteAttribute('normal');
   const FLOWER_PALETTES: Partial<Record<BiomeId, FlowerKind[]>> = {
     // the Veiled Hollow: pinks, purples, whites
     dusk: [
@@ -1951,7 +2327,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           ? new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.3, roughness: 0.85 })
           : new THREE.MeshLambertMaterial({ map: tex, alphaTest: 0.35 }),
       );
-      applyGrassShader(fmMat, uniforms);
+      applyGrassShader(fmMat, uniforms, null);
       flowerMatCache.set(key, fmMat);
     }
     return fmMat;
@@ -1979,6 +2355,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   let disposedChunks = 0;
   let buildMs = 0;
   let lastBuildMs = 0;
+  const instanceCountStep = { count: 0, carry: 0 };
 
   const chunkKey = (cx: number, cz: number): string => `${cx}:${cz}`;
   const chunkCenter = (cidx: number): number => (cidx + 0.5) * GRASS_CHUNK_SIZE;
@@ -1989,12 +2366,15 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       cx,
       cz,
       centerX: chunkCenter(cx),
+      centerY: terrainHeight(chunkCenter(cx), chunkCenter(cz), seed),
       centerZ: chunkCenter(cz),
       ready: false,
       queued: false,
       lastSeen: -1,
       lastUsed: -1,
       prioritySq: Infinity,
+      grassTransitionCarry: 0,
+      flowerTransitionCarry: 0,
     };
     chunks.set(chunk.key, chunk);
     return chunk;
@@ -2015,6 +2395,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     const chunkCap = Math.ceil(maxChunkCount * Math.max(1, GRASS_BIOME_DENSITY[chunkBiome] ?? 1));
     const im = new THREE.InstancedMesh(geo, mat, chunkCap);
     im.userData.renderCategory = 'grass';
+    im.userData.instanceFamily = 'grass-card';
+    im.userData.grassChunkKey = chunk.key;
     im.frustumCulled = true;
     im.receiveShadow = true; // tufts must darken inside canopy shade, not glow through it
     im.count = 0;
@@ -2045,6 +2427,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     );
     const fm = new THREE.InstancedMesh(flowerGeo, flowerMatFor(chunkBiome), flowerCap);
     fm.userData.renderCategory = 'grass';
+    fm.userData.instanceFamily = 'ground-flower';
+    fm.userData.grassChunkKey = chunk.key;
     fm.frustumCulled = true;
     fm.receiveShadow = true;
     fm.count = 0;
@@ -2093,9 +2477,16 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         // and slightly past its hedge line, and across the meadow patches a
         // little beyond where the flowers stop
         const gardenBedTuft = tuftBiome === 'garden' && gardenLushGrassAt(x, z);
+        // Meadow patchiness: the same soil noise that darkens the ground
+        // palette decides where grass actually grows. Dense stands on the
+        // lush dark-green patches thin to near-bare yellowed ground between
+        // them, so the meadow reads as growth following the soil instead of
+        // a uniform scatter of models. Squaring hardens the patch edges.
+        const lushness = groundLushnessAt(x, z, seed);
         const density =
           (lush ? GRASS_DENSITY_HIGH : GRASS_DENSITY_LOW) *
-          (gardenBedTuft ? 0.9 : (GRASS_BIOME_DENSITY[tuftBiome] ?? 1));
+          (gardenBedTuft ? 0.9 : (GRASS_BIOME_DENSITY[tuftBiome] ?? 1)) *
+          (0.25 + 1.7 * lushness * lushness);
         if (r > density) continue;
         const h = terrainHeight(x, z, seed);
         if (h < WATER_LEVEL + 1.6) continue;
@@ -2113,15 +2504,28 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         // anchors too, the frost/garden idiom, which is not what fen wants)
         const fenTuft = tuftBiome === 'fen';
         if (!fenTuft) {
-          const s = (lush ? 0.55 : 0.45) + r * (lush ? 1.1 : 1);
+          // r is the density hash, so it only ever reaches the density cap:
+          // the lush scale tops out near 0.95 rather than sprouting monsters.
+          // Patch cores grow tall and patch edges stay short. With the sparse
+          // areas' accepted hashes skewing small, stragglers between patches
+          // come out smallest of all.
+          const s = ((lush ? 0.55 : 0.45) + r * (lush ? 0.8 : 1)) * (0.72 + lushness * 0.55);
           q.setFromAxisAngle(up, r * 12.4);
           m.compose(v.set(x, h, z), q, sv.set(s, s, s));
           im.setMatrixAt(n, m);
-          c.setHex(GRASS_TINT[tuftBiome]);
+          const accent = GRASS_ACCENT[tuftBiome] ?? [1, 1, 1];
+          groundGrassColorAt(x, z, seed, c);
+          c.setRGB(
+            tuftTintChannel(c.r, GRASS_TINT_GAIN[0] * accent[0]),
+            tuftTintChannel(c.g, GRASS_TINT_GAIN[1] * accent[1]),
+            tuftTintChannel(c.b, GRASS_TINT_GAIN[2] * accent[2]),
+          );
+          // small enough to read as patches (the ground noise already
+          // carries those) rather than per-tuft confetti
           c.offsetHSL(
-            (hashAt(i, j, 3) - 0.5) * 0.05,
-            (hashAt(i, j, 4) - 0.5) * 0.12,
-            (hashAt(i, j, 5) - 0.5) * 0.1,
+            (hashAt(i, j, 3) - 0.5) * 0.024,
+            (hashAt(i, j, 4) - 0.5) * 0.06,
+            (hashAt(i, j, 5) - 0.5) * 0.07,
           );
           im.setColorAt(n, c);
           n++;
@@ -2247,22 +2651,42 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       }
     }
     if (n > 0) {
+      reorderInstanceDataByStableRank(
+        im.instanceMatrix.array as Float32Array,
+        im.instanceColor ? (im.instanceColor.array as Float32Array) : null,
+        n,
+        seed,
+        GRASS_RANK_SALT,
+      );
       im.count = n;
+      trimStaticInstanceAttributes(im, n);
       im.instanceMatrix.needsUpdate = true;
       if (im.instanceColor) im.instanceColor.needsUpdate = true;
       im.computeBoundingSphere();
-      im.visible = chunk.lastSeen === generation;
+      im.visible = false;
       chunk.mesh = im;
+      chunk.grassFullCount = n;
       parent.add(im);
+      freezeStaticMatrices(im);
     }
     if (fn > 0) {
+      reorderInstanceDataByStableRank(
+        fm.instanceMatrix.array as Float32Array,
+        fm.instanceColor ? (fm.instanceColor.array as Float32Array) : null,
+        fn,
+        seed,
+        FLOWER_RANK_SALT,
+      );
       fm.count = fn;
+      trimStaticInstanceAttributes(fm, fn);
       fm.instanceMatrix.needsUpdate = true;
       if (fm.instanceColor) fm.instanceColor.needsUpdate = true;
       fm.computeBoundingSphere();
-      fm.visible = chunk.lastSeen === generation;
+      fm.visible = false;
       chunk.flowerMesh = fm;
+      chunk.flowerFullCount = fn;
       parent.add(fm);
+      freezeStaticMatrices(fm);
     }
     chunk.ready = true;
     builtChunks++;
@@ -2309,17 +2733,136 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     }
   };
 
+  const chunkNearDistance = (chunk: GrassChunk, px: number, pz: number): number => {
+    const minX = chunk.cx * GRASS_CHUNK_SIZE;
+    const minZ = chunk.cz * GRASS_CHUNK_SIZE;
+    const dx = Math.max(minX - px, 0, px - (minX + GRASS_CHUNK_SIZE));
+    const dz = Math.max(minZ - pz, 0, pz - (minZ + GRASS_CHUNK_SIZE));
+    return Math.hypot(dx, dz);
+  };
+
+  const chunkNearCameraDistance = (
+    chunk: GrassChunk,
+    camX: number,
+    camY: number,
+    camZ: number,
+  ): number => {
+    const minX = chunk.cx * GRASS_CHUNK_SIZE;
+    const minZ = chunk.cz * GRASS_CHUNK_SIZE;
+    const dx = Math.max(minX - camX, 0, camX - (minX + GRASS_CHUNK_SIZE));
+    const dz = Math.max(minZ - camZ, 0, camZ - (minZ + GRASS_CHUNK_SIZE));
+    // The centre sample is a conservative vertical approximation for a field
+    // whose cards hug the terrain. A 3u envelope covers normal within-chunk
+    // relief; larger cliff chunks reject grass during construction.
+    const dy = Math.max(0, Math.abs(chunk.centerY - camY) - 3);
+    return Math.hypot(dx, dy, dz);
+  };
+
+  const applyMeshDensity = (
+    chunk: GrassChunk,
+    mesh: THREE.InstancedMesh | undefined,
+    fullCount: number | undefined,
+    referenceHeight: number,
+    densityFloor: number,
+    carryKey: 'grassTransitionCarry' | 'flowerTransitionCarry',
+    nearDistance: number,
+    cameraDistance: number,
+    projectionPixels: number,
+    dt: number,
+    radius: number,
+  ): void => {
+    if (!mesh || !fullCount) return;
+    const fraction = farFieldDensityFractionForValues(
+      nearDistance,
+      radius,
+      projectedPixelSize(referenceHeight, cameraDistance, projectionPixels),
+      densityFloor,
+    );
+    const target = Math.round(fullCount * fraction);
+    // A newly visible cached chunk takes the right prefix before it can
+    // render. Continuously visible chunks change by only a few stable,
+    // spatially scattered instances per frame. A fully faded chunk can drop
+    // immediately because every one of its cards already has zero alpha.
+    if (!mesh.visible || target === 0) {
+      mesh.count = target;
+      chunk[carryKey] = 0;
+    } else {
+      advanceInstanceCountInto(
+        instanceCountStep,
+        mesh.count,
+        target,
+        fullCount,
+        dt,
+        chunk[carryKey],
+      );
+      mesh.count = instanceCountStep.count;
+      chunk[carryKey] = instanceCountStep.carry;
+    }
+  };
+
+  const applyChunkDensity = (
+    chunk: GrassChunk,
+    px: number,
+    pz: number,
+    cameraDistance: number,
+    projectionPixels: number,
+    dt: number,
+  ): void => {
+    const radius = activeRadius();
+    const nearDistance = chunkNearDistance(chunk, px, pz);
+    applyMeshDensity(
+      chunk,
+      chunk.mesh,
+      chunk.grassFullCount,
+      lush ? GRASS_CARD_REFERENCE_HEIGHT_HIGH : GRASS_CARD_REFERENCE_HEIGHT_LOW,
+      GFX.farGrassDensityFloor,
+      'grassTransitionCarry',
+      nearDistance,
+      cameraDistance,
+      projectionPixels,
+      dt,
+      radius,
+    );
+    applyMeshDensity(
+      chunk,
+      chunk.flowerMesh,
+      chunk.flowerFullCount,
+      FLOWER_CARD_REFERENCE_HEIGHT,
+      Math.max(FLOWER_FAR_DENSITY_FLOOR, GFX.farGrassDensityFloor),
+      'flowerTransitionCarry',
+      nearDistance,
+      cameraDistance,
+      projectionPixels,
+      dt,
+      radius,
+    );
+  };
+
   return {
     setQuality(level: number): void {
       quality = Math.min(1, Math.max(0, Number.isFinite(level) ? level : 1));
       uniforms.uFadeFar.value = activeRadius();
     },
-    update(px: number, pz: number): void {
+    update(
+      px: number,
+      pz: number,
+      camX: number,
+      camY: number,
+      camZ: number,
+      projectionPixels: number,
+      dt: number,
+    ): void {
       uniforms.uPlayerPos.value.set(px, pz);
       uniforms.uFadeFar.value = activeRadius();
       if (px > DUNGEON_X_THRESHOLD) {
         // dungeon instances live far outside the strip — no meadow indoors
-        if (parent.visible) parent.visible = false;
+        if (parent.visible) {
+          parent.visible = false;
+          for (const chunk of chunks.values()) {
+            if (chunk.mesh) chunk.mesh.visible = false;
+            if (chunk.flowerMesh) chunk.flowerMesh.visible = false;
+          }
+        }
         return;
       }
       if (!parent.visible) parent.visible = true;
@@ -2343,22 +2886,26 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           chunk.lastSeen = generation;
           chunk.lastUsed = generation;
           chunk.prioritySq = prioritySq;
-          if (chunk.mesh) chunk.mesh.visible = true;
-          if (chunk.flowerMesh) chunk.flowerMesh.visible = true;
           queueChunk(chunk);
         }
       }
 
-      for (const chunk of chunks.values()) {
-        if (chunk.lastSeen === generation) continue;
-        if (chunk.mesh?.visible) chunk.mesh.visible = false;
-        if (chunk.flowerMesh?.visible) chunk.flowerMesh.visible = false;
-      }
       buildQueuedChunks();
+      for (const chunk of chunks.values()) {
+        if (chunk.lastSeen === generation) {
+          const cameraDistance = chunkNearCameraDistance(chunk, camX, camY, camZ);
+          applyChunkDensity(chunk, px, pz, cameraDistance, projectionPixels, dt);
+          if (chunk.mesh) chunk.mesh.visible = true;
+          if (chunk.flowerMesh) chunk.flowerMesh.visible = true;
+        } else {
+          if (chunk.mesh?.visible) chunk.mesh.visible = false;
+          if (chunk.flowerMesh?.visible) chunk.flowerMesh.visible = false;
+        }
+      }
       retireStaleChunks();
     },
-    perfStats(): FoliagePerfStats {
-      const stats = emptyGrassStats(true, cacheLimit);
+    perfStats(out?: FoliagePerfStats): FoliagePerfStats {
+      const stats = emptyGrassStats(true, cacheLimit, out);
       stats.grassQuality = Math.round(quality * 100) / 100;
       stats.grassActiveRadius = activeRadius();
       stats.grassChunks = chunks.size;
@@ -2380,6 +2927,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     },
   };
 }
+
+export const foliageGrassInternalsForTest = { buildGrassRing };
 
 // ---------------------------------------------------------------------------
 // Entry point
@@ -2436,24 +2985,51 @@ function cameraSegmentHitsTree(
 
 function updateTreeHides(
   trees: TreeHideable[],
+  ghosts: InstancedOccluderGhosts,
   eyeX: number,
   eyeY: number,
   eyeZ: number,
   camX: number,
   camY: number,
   camZ: number,
+  dt: number,
+  reducedMotion: boolean,
 ): void {
   // This scans every world tree each frame (3k+ in the shipped field). An
   // indexed loop avoids one iterator result allocation per tree per frame.
+  // A tree crossing the eye-to-camera segment swaps its instances for pooled
+  // ghost meshes and fades toward 20% opacity; once clear and fully opaque the
+  // ghosts return to the pool and the instances come back. The build-time
+  // shadow clones are untouched either way, so faded trees keep their shadows.
   for (let i = 0; i < trees.length; i++) {
     const t = trees[i];
     const hide = cameraSegmentHitsTree(t, eyeX, eyeY, eyeZ, camX, camY, camZ);
-    if (hide === t.hidden) continue;
+    if (!hide && t.ghosts.length === 0) {
+      t.hidden = false;
+      t.alpha = 1;
+      continue;
+    }
     t.hidden = hide;
-    for (let j = 0; j < t.parts.length; j++) {
-      const part = t.parts[j];
-      part.mesh.setMatrixAt(part.index, hide ? part.hiddenMatrix : part.visibleMatrix);
-      part.mesh.instanceMatrix.needsUpdate = true;
+    if (t.ghosts.length === 0) {
+      for (let j = 0; j < t.parts.length; j++) {
+        const part = t.parts[j];
+        part.mesh.setMatrixAt(part.index, part.hiddenMatrix);
+        part.mesh.instanceMatrix.addUpdateRange(part.index * 16, 16);
+        part.mesh.instanceMatrix.needsUpdate = true;
+        t.ghosts.push(ghosts.acquire(part.mesh, part.index, part.visibleMatrix));
+      }
+    }
+    t.alpha = stepOccluderFade(t.alpha, hide, dt, reducedMotion);
+    for (let j = 0; j < t.ghosts.length; j++) ghosts.setAlpha(t.ghosts[j], t.alpha);
+    if (!hide && occluderFadeSettled(t.alpha, false)) {
+      for (let j = 0; j < t.parts.length; j++) {
+        const part = t.parts[j];
+        part.mesh.setMatrixAt(part.index, part.visibleMatrix);
+        part.mesh.instanceMatrix.addUpdateRange(part.index * 16, 16);
+        part.mesh.instanceMatrix.needsUpdate = true;
+      }
+      for (let j = 0; j < t.ghosts.length; j++) ghosts.release(t.ghosts[j]);
+      t.ghosts.length = 0;
     }
   }
 }
@@ -2463,6 +3039,7 @@ export function buildFoliage(seed: number): FoliageView {
   group.name = 'foliage';
   const bucketMeshes: BucketMesh[] = [];
   const treeHideables: TreeHideable[] = [];
+  const treeGhosts = new InstancedOccluderGhosts();
   let modelQuality = GFX.bucketBaselines.foliage;
   let modelVisibleBuckets = 0;
   let modelVisibleDraws = 0;
@@ -2470,9 +3047,9 @@ export function buildFoliage(seed: number): FoliageView {
   const modelBucketsByLod: Record<string, number> = {};
   const modelDrawsByLod: Record<string, number> = {};
   const modelTrianglesByLod: Record<string, number> = {};
-  let modelVisibleByLod: Record<string, number> = {};
-  let modelVisibleDrawsByLod: Record<string, number> = {};
-  let modelVisibleTrianglesByLod: Record<string, number> = {};
+  const modelVisibleByLod: Record<string, number> = {};
+  const modelVisibleDrawsByLod: Record<string, number> = {};
+  const modelVisibleTrianglesByLod: Record<string, number> = {};
   let modelDraws = 0;
   let modelTriangles = 0;
   // Reused by the per-frame bucket cull below. Allocating this input inside the
@@ -2505,11 +3082,12 @@ export function buildFoliage(seed: number): FoliageView {
     ? {
         update(): void {},
         setQuality(): void {},
-        perfStats(): FoliagePerfStats {
-          return emptyGrassStats(false);
+        perfStats(out?: FoliagePerfStats): FoliagePerfStats {
+          return emptyGrassStats(false, 0, out);
         },
       }
     : buildGrassRing(group, seed);
+  freezeStaticMatrices(group);
   return {
     group,
     setGrassQuality(level: number): void {
@@ -2531,9 +3109,23 @@ export function buildFoliage(seed: number): FoliageView {
       fogFar: number,
       atmosFogNear: number,
       atmosFogFar: number,
+      projectionPixels: number,
+      dt: number,
+      reducedMotion = false,
     ): void {
-      grass.update(px, pz);
-      updateTreeHides(treeHideables, eyeX, eyeY, eyeZ, camX, camY, camZ);
+      grass.update(px, pz, camX, camY, camZ, projectionPixels, dt);
+      updateTreeHides(
+        treeHideables,
+        treeGhosts,
+        eyeX,
+        eyeY,
+        eyeZ,
+        camX,
+        camY,
+        camZ,
+        dt,
+        reducedMotion,
+      );
       // Buckets fully behind the fog wall are pure overdraw. The windows
       // themselves, including the real-model -> impostor swap (which follows the
       // zone's fog rather than a build-time constant, so a cone is never caught
@@ -2556,9 +3148,9 @@ export function buildFoliage(seed: number): FoliageView {
       modelVisibleBuckets = 0;
       modelVisibleDraws = 0;
       modelVisibleTriangles = 0;
-      modelVisibleByLod = {};
-      modelVisibleDrawsByLod = {};
-      modelVisibleTrianglesByLod = {};
+      clearNumberRecord(modelVisibleByLod);
+      clearNumberRecord(modelVisibleDrawsByLod);
+      clearNumberRecord(modelVisibleTrianglesByLod);
       // This walks 1k+ buckets every frame. Keep it indexed: the iterator/result
       // churn from `for...of` remained the dominant foliage allocation after the
       // cull input itself became reusable.
@@ -2594,21 +3186,21 @@ export function buildFoliage(seed: number): FoliageView {
         }
       }
     },
-    perfStats(): FoliagePerfStats {
-      const stats = grass.perfStats();
+    perfStats(out?: FoliagePerfStats): FoliagePerfStats {
+      const stats = grass.perfStats(out);
       stats.modelQuality = Math.round(modelQuality * 100) / 100;
       stats.modelBuckets = bucketMeshes.length;
       stats.modelVisibleBuckets = modelVisibleBuckets;
-      stats.modelBucketsByLod = { ...modelBucketsByLod };
-      stats.modelVisibleByLod = { ...modelVisibleByLod };
+      copyNumberRecord(stats.modelBucketsByLod, modelBucketsByLod);
+      copyNumberRecord(stats.modelVisibleByLod, modelVisibleByLod);
       stats.modelDraws = modelDraws;
       stats.modelVisibleDraws = modelVisibleDraws;
-      stats.modelDrawsByLod = { ...modelDrawsByLod };
-      stats.modelVisibleDrawsByLod = { ...modelVisibleDrawsByLod };
+      copyNumberRecord(stats.modelDrawsByLod, modelDrawsByLod);
+      copyNumberRecord(stats.modelVisibleDrawsByLod, modelVisibleDrawsByLod);
       stats.modelTriangles = modelTriangles;
       stats.modelVisibleTriangles = modelVisibleTriangles;
-      stats.modelTrianglesByLod = { ...modelTrianglesByLod };
-      stats.modelVisibleTrianglesByLod = { ...modelVisibleTrianglesByLod };
+      copyNumberRecord(stats.modelTrianglesByLod, modelTrianglesByLod);
+      copyNumberRecord(stats.modelVisibleTrianglesByLod, modelVisibleTrianglesByLod);
       return stats;
     },
   };

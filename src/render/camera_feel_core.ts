@@ -99,7 +99,7 @@ export function punchCameraFov(s: CameraFeelState, degrees: number): void {
   s.punchKick += degrees;
 }
 
-/** Total FOV offset to add on top of the occlusion-compensated FOV. */
+/** Total FOV offset to add on top of the base camera FOV. */
 export function cameraFovOffset(s: CameraFeelState): number {
   const total = s.speedKick + s.punchKick;
   return Math.min(12, Math.max(-8, total));
