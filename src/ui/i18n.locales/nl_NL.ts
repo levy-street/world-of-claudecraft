@@ -1451,6 +1451,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': 'Gewaad van het Groene Hart',
   'entities.items.sunbone_ritual_hauberk.name': 'Zonnebeen-Rituele Maliënkolder',
   'entities.items.greatfang_of_the_basin.name': 'Grootslagtand van het Bekken',
+  'entities.items.sunbone_oracles_crown.name': 'Zonnebeen-Orakelkroon',
+  'entities.items.bloodmane_war_legguards.name': 'Bloedmanen-Oorlogsbeenplaten',
   'entities.items.wyrmcult_spellgrips.name': 'Wurmcultus-Spreukhoudsters',
   'entities.items.yumis_keepsake_locket.name': "Yumi's Aandenken-Medaillon",
   'entities.items.zense_meridian.name': 'Zense-Meridiaan',

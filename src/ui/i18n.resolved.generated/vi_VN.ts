@@ -10334,6 +10334,12 @@ export const vi_VN: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Nanh Lớn Của Vùng Trũng"
       },
+      "sunbone_oracles_crown": {
+        "name": "Vương Miện Tiên Tri Xương Mặt Trời"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Giáp Chân Chiến Bờm Máu"
+      },
       "deathless_greatblade": {
         "name": "Đại Kiếm Bất Tử"
       },

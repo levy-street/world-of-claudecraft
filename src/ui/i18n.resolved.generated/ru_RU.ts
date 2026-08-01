@@ -10334,6 +10334,12 @@ export const ru_RU: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Великий клык Котловины"
       },
+      "sunbone_oracles_crown": {
+        "name": "Корона оракула Солнечной Кости"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Боевые набедренники Кровавой Гривы"
+      },
       "deathless_greatblade": {
         "name": "Бессмертный великий клинок"
       },

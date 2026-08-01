@@ -10334,6 +10334,12 @@ export const zh_CN: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "盆地巨牙"
       },
+      "sunbone_oracles_crown": {
+        "name": "日骨先知之冠"
+      },
+      "bloodmane_war_legguards": {
+        "name": "血鬃战争腿甲"
+      },
       "deathless_greatblade": {
         "name": "不死巨刃"
       },

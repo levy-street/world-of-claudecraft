@@ -1804,6 +1804,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': 'Vêtement du Cœur-verdoyant',
   'entities.items.sunbone_ritual_hauberk.name': 'Haubert rituel Os-solaire',
   'entities.items.greatfang_of_the_basin.name': 'Grand-croc du Bassin',
+  'entities.items.sunbone_oracles_crown.name': "Couronne de l'oracle Os-solaire",
+  'entities.items.bloodmane_war_legguards.name': 'Garde-jambes de guerre Crin-de-sang',
   'entities.items.yumis_keepsake_locket.name': 'Médaillon souvenir de Yumi',
   'entities.items.zense_meridian.name': 'Méridien de Zense',
   'entities.items.zyzzs_deathless_signet.name': 'Chevalière immortelle de Zyzz',

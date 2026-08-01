@@ -10334,6 +10334,12 @@ export const it_IT: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Granzanna del Bacino"
       },
+      "sunbone_oracles_crown": {
+        "name": "Corona dell'Oracolo Ossosole"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Gambali da Guerra Criniera di Sangue"
+      },
       "deathless_greatblade": {
         "name": "Spadone senza morte"
       },

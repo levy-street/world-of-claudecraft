@@ -4230,6 +4230,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': '翠心法衣',
   'entities.items.sunbone_ritual_hauberk.name': '日骨儀式鎖甲',
   'entities.items.greatfang_of_the_basin.name': '盆地巨牙',
+  'entities.items.sunbone_oracles_crown.name': '日骨先知之冠',
+  'entities.items.bloodmane_war_legguards.name': '血鬃戰爭腿甲',
   'entities.items.deathless_greatblade.name': '不死巨刃',
   'entities.items.soulforged_warplate.name': '鑄魂戰甲',
   'entities.items.stormcallers_focus.name': '喚雷之核',

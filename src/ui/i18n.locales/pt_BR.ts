@@ -1377,6 +1377,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': 'Vestimenta do Coração Verdejante',
   'entities.items.sunbone_ritual_hauberk.name': 'Cota de Malha Ritual Ossossol',
   'entities.items.greatfang_of_the_basin.name': 'Grande Presa da Bacia',
+  'entities.items.sunbone_oracles_crown.name': 'Coroa do Oráculo Ossossol',
+  'entities.items.bloodmane_war_legguards.name': 'Guarda-pernas de Guerra Crina de Sangue',
   'entities.items.yumis_keepsake_locket.name': 'Medalhão de Lembrança de Yumi',
   'entities.items.zense_meridian.name': 'Meridiano de Zense',
   'entities.items.zyzzs_deathless_signet.name': 'Sinete Imortal de Zyzz',

@@ -1452,6 +1452,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': 'Szata Zieleniejącego Serca',
   'entities.items.sunbone_ritual_hauberk.name': 'Słonecznokoścista Kolczuga Rytualna',
   'entities.items.greatfang_of_the_basin.name': 'Wielki Kieł Kotliny',
+  'entities.items.sunbone_oracles_crown.name': 'Korona Słonecznokościstej Wyroczni',
+  'entities.items.bloodmane_war_legguards.name': 'Wojenne Nagolenniki Krwistej Grzywy',
   'entities.items.wyrmcult_spellgrips.name': 'Czarodziejskie rękawice kultu żmija',
   'entities.items.yumis_keepsake_locket.name': 'Pamiątkowy medalionik Yumi',
   'entities.items.zense_meridian.name': 'Meridian Zense',

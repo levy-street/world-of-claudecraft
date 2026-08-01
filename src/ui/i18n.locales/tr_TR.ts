@@ -1402,6 +1402,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': 'Yeşeren Kalbin Giysisi',
   'entities.items.sunbone_ritual_hauberk.name': 'Güneşkemik Ritüel Zırh Gömleği',
   'entities.items.greatfang_of_the_basin.name': 'Çukurun Büyük Dişi',
+  'entities.items.sunbone_oracles_crown.name': 'Güneşkemik Kâhin Tacı',
+  'entities.items.bloodmane_war_legguards.name': 'Kanyeleli Savaş Bacak Muhafızları',
   'entities.items.yumis_keepsake_locket.name': "Yumi'nin Yadigâr Madalyonu",
   'entities.items.zense_meridian.name': 'Zense Meridyeni',
   'entities.items.zyzzs_deathless_signet.name': "Zyzz'in Ölümsüz Mühür Yüzüğü",

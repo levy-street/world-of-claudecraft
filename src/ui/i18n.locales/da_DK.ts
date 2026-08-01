@@ -1310,6 +1310,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': 'Grønhjerte-Klædning',
   'entities.items.sunbone_ritual_hauberk.name': 'Solben-Ritualbrynje',
   'entities.items.greatfang_of_the_basin.name': 'Bassinets Storhugtand',
+  'entities.items.sunbone_oracles_crown.name': 'Solben-Orakelkrone',
+  'entities.items.bloodmane_war_legguards.name': 'Blodmanke-Krigsbenbeskyttere',
   'entities.items.yumis_keepsake_locket.name': 'Yumis Minde-Medaljon',
   'entities.items.zense_meridian.name': 'Zense-Meridian',
   'entities.items.zyzzs_deathless_signet.name': 'Zyzzs Udødelige Signetring',

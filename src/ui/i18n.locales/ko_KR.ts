@@ -4385,6 +4385,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': '신록의 심장 예복',
   'entities.items.sunbone_ritual_hauberk.name': '태양뼈 의식 사슬갑옷',
   'entities.items.greatfang_of_the_basin.name': '분지의 대송곳니',
+  'entities.items.sunbone_oracles_crown.name': '태양뼈 예언자의 왕관',
+  'entities.items.bloodmane_war_legguards.name': '피갈기 전쟁 다리갑옷',
   'entities.items.deathless_greatblade.name': '불사 대검',
   'entities.items.soulforged_warplate.name': '혼주조 전투갑옷',
   'entities.items.stormcallers_focus.name': '폭풍소환사의 매개체',

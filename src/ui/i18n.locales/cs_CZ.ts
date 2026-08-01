@@ -1319,6 +1319,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': 'Roucho zeleného srdce',
   'entities.items.sunbone_ritual_hauberk.name': 'Slunečněkostní rituální hauberk',
   'entities.items.greatfang_of_the_basin.name': 'Velký tesák Kotliny',
+  'entities.items.sunbone_oracles_crown.name': 'Slunečněkostní koruna orákula',
+  'entities.items.bloodmane_war_legguards.name': 'Krvavohřívé válečné chrániče nohou',
   'entities.items.wyrmcult_spellgrips.name': 'Kouzelné rukavice kultu dračích',
   'entities.items.yumis_keepsake_locket.name': 'Yumin památeční medailonek',
   'entities.items.zense_meridian.name': 'Zenseho meridián',

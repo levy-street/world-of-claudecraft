@@ -10334,6 +10334,12 @@ export const en_XA: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "[Ĝŕéáţƒáñĝ óƒ ţĥé Ɓášíñ]"
       },
+      "sunbone_oracles_crown": {
+        "name": "[Šúñƀóñé Óŕáçļé'š Çŕóŵñ]"
+      },
+      "bloodmane_war_legguards": {
+        "name": "[Ɓļóóðɱáñé Ŵáŕ-Ļéĝĝúáŕðš]"
+      },
       "deathless_greatblade": {
         "name": "[Ðéáţĥļéšš Ĝŕéáţƀļáðé]"
       },

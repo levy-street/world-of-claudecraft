@@ -10334,6 +10334,12 @@ export const de_DE: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Großfang des Beckens"
       },
+      "sunbone_oracles_crown": {
+        "name": "Sonnenknochen-Orakelkrone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Blutmähnen-Kriegsbeinschienen"
+      },
       "deathless_greatblade": {
         "name": "Todlose Großklinge"
       },

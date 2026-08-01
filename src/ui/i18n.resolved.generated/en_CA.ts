@@ -10334,6 +10334,12 @@ export const en_CA: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Greatfang of the Basin"
       },
+      "sunbone_oracles_crown": {
+        "name": "Sunbone Oracle's Crown"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Bloodmane War-Legguards"
+      },
       "deathless_greatblade": {
         "name": "Deathless Greatblade"
       },

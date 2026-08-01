@@ -10334,6 +10334,12 @@ export const nl_NL: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Grootslagtand van het Bekken"
       },
+      "sunbone_oracles_crown": {
+        "name": "Zonnebeen-Orakelkroon"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Bloedmanen-Oorlogsbeenplaten"
+      },
       "deathless_greatblade": {
         "name": "Doodloos Grootzwaard"
       },

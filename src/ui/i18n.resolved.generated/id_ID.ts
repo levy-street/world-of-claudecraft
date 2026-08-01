@@ -10334,6 +10334,12 @@ export const id_ID: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Taring Agung Cekungan"
       },
+      "sunbone_oracles_crown": {
+        "name": "Mahkota Peramal Sunbone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Zirah Kaki Perang Bloodmane"
+      },
       "deathless_greatblade": {
         "name": "Bilah Agung Nirmaut"
       },

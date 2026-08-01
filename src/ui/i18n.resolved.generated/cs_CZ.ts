@@ -10334,6 +10334,12 @@ export const cs_CZ: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Velký tesák Kotliny"
       },
+      "sunbone_oracles_crown": {
+        "name": "Slunečněkostní koruna orákula"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Krvavohřívé válečné chrániče nohou"
+      },
       "deathless_greatblade": {
         "name": "Nesmrtelná velká čepel"
       },

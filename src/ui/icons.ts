@@ -4444,6 +4444,8 @@ export const ITEM_ART_PENDING = new Set<string>([
   'voidweave_mantle',
   // heroic_loot.ts (Wildheart Basin Tier-2 loot pass; armor art not commissioned yet)
   'basin_stalkers_tunic',
+  'bloodmane_war_legguards',
+  'sunbone_oracles_crown',
   'sunbone_ritual_hauberk',
   'verdant_heart_vestment',
   // wildheart.ts (Zulgar's guaranteed uncommon trio; armor art not commissioned yet)

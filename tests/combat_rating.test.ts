@@ -157,8 +157,9 @@ describe('combat-rating tier ladder', () => {
   it('every ilvl-31 heroic boss-set piece carries exactly one rating', async () => {
     const { HEROIC_ITEMS } = await import('../src/sim/content/heroic_loot');
     const pieces = Object.values(HEROIC_ITEMS).filter((item) => itemLevel(item) === 31);
-    // 28 pre-Wildheart pieces + the 4 Zulgar heroic drops (Tier-2 basin loot pass).
-    expect(pieces).toHaveLength(32);
+    // 28 pre-Wildheart pieces + the 6 Zulgar heroic drops (Tier-2 basin loot
+    // pass, incl. the crown/legguards replacing the retired-hole dup-paths).
+    expect(pieces).toHaveLength(34);
     for (const item of pieces) {
       expect(ratingCount(item), item.id).toBe(1);
       expect(ratingValues(item), item.id).toEqual([item.weapon ? 50 : 40]);

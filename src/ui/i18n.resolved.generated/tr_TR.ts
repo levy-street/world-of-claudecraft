@@ -10334,6 +10334,12 @@ export const tr_TR: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Çukurun Büyük Dişi"
       },
+      "sunbone_oracles_crown": {
+        "name": "Güneşkemik Kâhin Tacı"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Kanyeleli Savaş Bacak Muhafızları"
+      },
       "deathless_greatblade": {
         "name": "Ölümsüz Pala"
       },

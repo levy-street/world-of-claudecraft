@@ -498,6 +498,36 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     sellValue: 15000,
     requiredClass: HEAVY,
   },
+  // Fills the CASTER helmet hole left by the retired soulrend_diadem (same
+  // armor 76 / budget 18, plus the one rating every live heroic piece carries).
+  sunbone_oracles_crown: {
+    id: 'sunbone_oracles_crown',
+    name: "Sunbone Oracle's Crown",
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'helmet',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 76, int: 11, spi: 7 },
+    critRating: ARMOR_RATING,
+    sellValue: 12000,
+    requiredClass: CASTER,
+  },
+  // Fills the HEAVY legs hole left by the retired deathless_warguard_legmail
+  // (same armor 315 / budget 20, plus the rating).
+  bloodmane_war_legguards: {
+    id: 'bloodmane_war_legguards',
+    name: 'Bloodmane War-Legguards',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'legs',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 315, str: 11, sta: 9 },
+    hitRating: ARMOR_RATING,
+    sellValue: 12000,
+    requiredClass: HEAVY,
+  },
   // ================= Heroic Nythraxis, Scourge of Thornpeak (raid) =================
   scepter_of_the_deathless_court: {
     id: 'scepter_of_the_deathless_court',
@@ -669,17 +699,16 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
   ],
   wildheart_high_priest: [
+    // Two groups of three DISTINCT items, the shape every other heroic
+    // five-man uses: per-item rates stay at the house 0.33-0.34 (the earlier
+    // dup-path version pushed the re-listed chests to 0.56-0.66 per kill,
+    // well above any other heroic item in the game).
     { itemId: 'basin_stalkers_tunic', chance: 0.34, rollGroup: 'wildheart_heroic' },
     { itemId: 'verdant_heart_vestment', chance: 0.33, rollGroup: 'wildheart_heroic' },
     { itemId: 'sunbone_ritual_hauberk', chance: 0.33, rollGroup: 'wildheart_heroic' },
-    // The second group re-lists the two retired-hole chests as extra paths. A
-    // repeated winner is safe: pickRollGroupWinner (loot/loot_roll.ts) falls
-    // forward to the next non-awarded entry in this group, so the kill still
-    // pays two DISTINCT epics (greatfang is only ever in this group, so the
-    // fall-forward always terminates).
     { itemId: 'greatfang_of_the_basin', chance: 0.34, rollGroup: 'wildheart_heroic2' },
-    { itemId: 'basin_stalkers_tunic', chance: 0.33, rollGroup: 'wildheart_heroic2' },
-    { itemId: 'sunbone_ritual_hauberk', chance: 0.33, rollGroup: 'wildheart_heroic2' },
+    { itemId: 'sunbone_oracles_crown', chance: 0.33, rollGroup: 'wildheart_heroic2' },
+    { itemId: 'bloodmane_war_legguards', chance: 0.33, rollGroup: 'wildheart_heroic2' },
   ],
   nythraxis_scourge_of_thornpeak: [
     // The heroic set pieces and legendaries come free from the heroic loot swap:

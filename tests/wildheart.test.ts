@@ -350,13 +350,16 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     ).toBeLessThan(0.3);
   });
 
-  it("pins Zulgar's roll groups: guaranteed uncommon sums to 1.0, wildheart_bonus to 0.27", () => {
+  it("pins Zulgar's roll groups: guaranteed uncommon sums to 1.0, wildheart_bonus to 0.18", () => {
     const loot = MOBS.wildheart_high_priest.loot ?? [];
     const groupSum = (group: string) =>
       loot.filter((e) => e.rollGroup === group).reduce((a, e) => a + e.chance, 0);
     expect(loot.filter((e) => e.rollGroup === 'zulgar_guaranteed_uncommon')).toHaveLength(3);
     expect(groupSum('zulgar_guaranteed_uncommon')).toBeCloseTo(1.0, 9);
-    expect(groupSum('wildheart_bonus')).toBeCloseTo(0.27, 9);
+    // 0.06 per epic, the house PER-ITEM bonus rate (Korzul's epics sit at ~0.05
+    // each across a 13-item group; a 3-item pool matches the per-item rate, not
+    // the group's total mass).
+    expect(groupSum('wildheart_bonus')).toBeCloseTo(0.18, 9);
     expect(loot.some((e) => e.copper === 55000 && e.chance === 1)).toBe(true);
     expect(loot.some((e) => e.itemId === 'bone_fragments' && e.chance === 0.8)).toBe(true);
   });
@@ -388,10 +391,12 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     for (const e of entries) {
       expect(['wildheart_heroic', 'wildheart_heroic2']).toContain(e.rollGroup);
     }
-    // The greatfang lives ONLY in the second group: the cross-group duplicate
-    // guard (pickRollGroupWinner) falls forward within a group, so a repeated
-    // chest winner always lands on a non-awarded entry and every heroic kill
-    // still pays two DISTINCT epics.
+    // Six DISTINCT items across the two groups, the shape every other heroic
+    // five-man uses: per-item rates stay at the house 0.33-0.34 (a dup-path
+    // re-listing pushed re-listed chests to 0.56-0.66 per kill, above any
+    // other heroic item in the game).
+    const ids = entries.map((e) => e.itemId);
+    expect(new Set(ids).size).toBe(ids.length);
     expect(
       entries.filter((e) => e.itemId === 'greatfang_of_the_basin').map((e) => e.rollGroup),
     ).toEqual(['wildheart_heroic2']);

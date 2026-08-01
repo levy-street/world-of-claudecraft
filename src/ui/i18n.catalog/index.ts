@@ -1375,6 +1375,8 @@ export const en = {
       verdant_heart_vestment: { name: 'Verdant-Heart Vestment' },
       sunbone_ritual_hauberk: { name: 'Sunbone Ritual Hauberk' },
       greatfang_of_the_basin: { name: 'Greatfang of the Basin' },
+      sunbone_oracles_crown: { name: "Sunbone Oracle's Crown" },
+      bloodmane_war_legguards: { name: 'Bloodmane War-Legguards' },
       deathless_greatblade: { name: 'Deathless Greatblade' },
       soulforged_warplate: { name: 'Soulforged Warplate' },
       stormcallers_focus: { name: "Stormcaller's Focus" },

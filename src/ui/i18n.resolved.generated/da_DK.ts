@@ -10334,6 +10334,12 @@ export const da_DK: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Bassinets Storhugtand"
       },
+      "sunbone_oracles_crown": {
+        "name": "Solben-Orakelkrone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Blodmanke-Krigsbenbeskyttere"
+      },
       "deathless_greatblade": {
         "name": "Udødelig Storklinge"
       },

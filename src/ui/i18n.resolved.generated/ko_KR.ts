@@ -10334,6 +10334,12 @@ export const ko_KR: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "분지의 대송곳니"
       },
+      "sunbone_oracles_crown": {
+        "name": "태양뼈 예언자의 왕관"
+      },
+      "bloodmane_war_legguards": {
+        "name": "피갈기 전쟁 다리갑옷"
+      },
       "deathless_greatblade": {
         "name": "불사 대검"
       },

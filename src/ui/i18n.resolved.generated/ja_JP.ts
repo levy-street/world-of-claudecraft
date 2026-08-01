@@ -10334,6 +10334,12 @@ export const ja_JP: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "盆地の大牙"
       },
+      "sunbone_oracles_crown": {
+        "name": "陽骨の託宣者の冠"
+      },
+      "bloodmane_war_legguards": {
+        "name": "血鬣の戦レッグガード"
+      },
       "deathless_greatblade": {
         "name": "不死の大剣"
       },

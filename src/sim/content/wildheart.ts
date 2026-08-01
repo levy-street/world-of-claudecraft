@@ -1,4 +1,4 @@
-// The Wildheart Basin: a level-20 open-field dungeon hidden behind the Sunken
+﻿// The Wildheart Basin: a level-20 open-field dungeon hidden behind the Sunken
 // Idol in Palmreach. Unlike Orkadia's processional war-camp, this interior is a
 // flooded jungle caldera with two routes around a central beast island. Both
 // paths climb into one ritual terrace beneath a colossal jaguar shrine.
@@ -306,9 +306,9 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'zulgar_guaranteed_uncommon',
       },
       { itemId: 'sunbone_ritual_sarong', chance: 0.33, rollGroup: 'zulgar_guaranteed_uncommon' },
-      { itemId: 'wildheart_tuskblade', chance: 0.09, rollGroup: 'wildheart_bonus' },
-      { itemId: 'wildheart_hexwood_staff', chance: 0.09, rollGroup: 'wildheart_bonus' },
-      { itemId: 'wildheart_fangknife', chance: 0.09, rollGroup: 'wildheart_bonus' },
+      { itemId: 'wildheart_tuskblade', chance: 0.06, rollGroup: 'wildheart_bonus' },
+      { itemId: 'wildheart_hexwood_staff', chance: 0.06, rollGroup: 'wildheart_bonus' },
+      { itemId: 'wildheart_fangknife', chance: 0.06, rollGroup: 'wildheart_bonus' },
     ],
     scale: 2.8,
     color: 0x566f45,

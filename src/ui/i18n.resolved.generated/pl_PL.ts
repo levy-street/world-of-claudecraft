@@ -10334,6 +10334,12 @@ export const pl_PL: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Wielki Kieł Kotliny"
       },
+      "sunbone_oracles_crown": {
+        "name": "Korona Słonecznokościstej Wyroczni"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Wojenne Nagolenniki Krwistej Grzywy"
+      },
       "deathless_greatblade": {
         "name": "Nieśmiertelne wielkie ostrze"
       },

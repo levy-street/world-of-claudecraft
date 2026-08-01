@@ -1423,6 +1423,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': 'Lễ Phục Trái Tim Xanh Tươi',
   'entities.items.sunbone_ritual_hauberk.name': 'Áo Giáp Lưới Nghi Lễ Xương Mặt Trời',
   'entities.items.greatfang_of_the_basin.name': 'Nanh Lớn Của Vùng Trũng',
+  'entities.items.sunbone_oracles_crown.name': 'Vương Miện Tiên Tri Xương Mặt Trời',
+  'entities.items.bloodmane_war_legguards.name': 'Giáp Chân Chiến Bờm Máu',
   'entities.items.yumis_keepsake_locket.name': 'Mề Đay Kỷ Vật của Yumi',
   'entities.items.zense_meridian.name': 'Kinh Mạch Zense',
   'entities.items.zyzzs_deathless_signet.name': 'Nhẫn Ấn Bất Tử của Zyzz',

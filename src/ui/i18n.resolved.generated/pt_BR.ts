@@ -10334,6 +10334,12 @@ export const pt_BR: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Grande Presa da Bacia"
       },
+      "sunbone_oracles_crown": {
+        "name": "Coroa do Oráculo Ossossol"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Guarda-pernas de Guerra Crina de Sangue"
+      },
       "deathless_greatblade": {
         "name": "Grande Lâmina Imortal"
       },

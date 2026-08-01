@@ -10334,6 +10334,12 @@ export const es: EnTranslations = {
       "greatfang_of_the_basin": {
         "name": "Gran Colmillo de la Cuenca"
       },
+      "sunbone_oracles_crown": {
+        "name": "Corona del Oráculo Sunbone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Guardapiernas de Guerra Bloodmane"
+      },
       "deathless_greatblade": {
         "name": "Mandoble Imperecedero"
       },

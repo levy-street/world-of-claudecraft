@@ -4427,6 +4427,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': 'Облачение Зеленеющего Сердца',
   'entities.items.sunbone_ritual_hauberk.name': 'Ритуальная кольчуга Солнечной Кости',
   'entities.items.greatfang_of_the_basin.name': 'Великий клык Котловины',
+  'entities.items.sunbone_oracles_crown.name': 'Корона оракула Солнечной Кости',
+  'entities.items.bloodmane_war_legguards.name': 'Боевые набедренники Кровавой Гривы',
   'entities.items.deathless_greatblade.name': 'Бессмертный великий клинок',
   'entities.items.soulforged_warplate.name': 'Душекованый боевой доспех',
   'entities.items.stormcallers_focus.name': 'Средоточие буревестника',

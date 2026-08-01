@@ -4400,6 +4400,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': '翠心の祭服',
   'entities.items.sunbone_ritual_hauberk.name': '陽骨の儀式ホーバーク',
   'entities.items.greatfang_of_the_basin.name': '盆地の大牙',
+  'entities.items.sunbone_oracles_crown.name': '陽骨の託宣者の冠',
+  'entities.items.bloodmane_war_legguards.name': '血鬣の戦レッグガード',
   'entities.items.deathless_greatblade.name': '不死の大剣',
   'entities.items.soulforged_warplate.name': '魂鍛の戦甲',
   'entities.items.stormcallers_focus.name': 'ストームコーラーの焦点',

@@ -1410,6 +1410,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': 'Busana Jantung Hijau',
   'entities.items.sunbone_ritual_hauberk.name': 'Zirah Ritual Sunbone',
   'entities.items.greatfang_of_the_basin.name': 'Taring Agung Cekungan',
+  'entities.items.sunbone_oracles_crown.name': 'Mahkota Peramal Sunbone',
+  'entities.items.bloodmane_war_legguards.name': 'Zirah Kaki Perang Bloodmane',
   'entities.items.yumis_keepsake_locket.name': 'Liontin Kenangan Yumi',
   'entities.items.zense_meridian.name': 'Meridian Zense',
   'entities.items.zyzzs_deathless_signet.name': 'Cincin Stempel Nirmaut Zyzz',

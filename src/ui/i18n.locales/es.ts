@@ -1272,6 +1272,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.verdant_heart_vestment.name': 'Vestimenta del Corazón Verdeante',
   'entities.items.sunbone_ritual_hauberk.name': 'Loriga Ritual Sunbone',
   'entities.items.greatfang_of_the_basin.name': 'Gran Colmillo de la Cuenca',
+  'entities.items.sunbone_oracles_crown.name': 'Corona del Oráculo Sunbone',
+  'entities.items.bloodmane_war_legguards.name': 'Guardapiernas de Guerra Bloodmane',
   'entities.items.yumis_keepsake_locket.name': 'Guardapelo de recuerdo de Yumi',
   'entities.items.zense_meridian.name': 'Meridiano Zense',
   'entities.items.zyzzs_deathless_signet.name': 'Sello imperecedero de Zyzz',
