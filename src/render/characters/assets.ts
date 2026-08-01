@@ -345,6 +345,9 @@ function attachProp(
 ): THREE.Object3D {
   const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(att.url).scene));
   primeSkinnedSortSpheres(payload);
+  // The source model, so a caller can look up the GLB's own baked idle clips
+  // (the legendary spin/orbit rigs) without re-deriving the url.
+  payload.userData.weaponModelUrl = att.url;
   payload.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) o.userData.weaponMesh = true;
   });
@@ -971,6 +974,7 @@ export function weaponSkinDisplayModel(skinId: string): THREE.Object3D | null {
   // whole 29-skin warmup and could escape an ArmoryInspect click handler.
   if (residentOrEnsure(url) === null) return null;
   const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(url).scene));
+  payload.userData.weaponModelUrl = url;
   payload.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
@@ -981,6 +985,27 @@ export function weaponSkinDisplayModel(skinId: string): THREE.Object3D | null {
   });
   markOwnedWeaponSkinMaterials(payload);
   return payload;
+}
+
+/** The idle VFX clips baked into a weapon model's own GLB — the split-part spin
+ *  and orbit rigs the artist authors in Blender (a legendary's ring pivot, a
+ *  staff's crystal, a mace's captive star and its loose shards). Empty for the
+ *  plain one-piece models, which is every weapon outside the two magical
+ *  Armory tiers. Keyed by the payload's source url (userData.weaponModelUrl),
+ *  so a caller holding only the attached clone can still find them.
+ *
+ *  These clips target the model's OWN nodes by name; SkeletonUtils.clone keeps
+ *  those names, so one shared clip drives every clone through its own mixer. */
+export function weaponModelClips(url: string | undefined): readonly THREE.AnimationClip[] {
+  if (!url || residentOrEnsure(url) === null) return [];
+  // Every real caller holds a payload that attachProp already resolved, so the
+  // GLTF is cached — but a missing model must never cost a character its held
+  // weapon over a cosmetic spin. Fail to "no clips", not to a throw.
+  try {
+    return resolvedGltf(url).animations ?? [];
+  } catch {
+    return [];
+  }
 }
 
 /** Move every held prop (swap slots, the actual equipped offhand, AND fixed

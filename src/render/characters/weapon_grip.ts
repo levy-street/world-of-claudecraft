@@ -57,9 +57,9 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
     scale: 1.3,
   },
   cosmarch_spire_of_the_endless_void: {
-    pos: [-0.0725, 0.7123, 0.0769],
-    rot: [-149.1828, -80.6499, -141.918],
-    scale: 1.5,
+    pos: [-0.0725, 0.37, 0.01],
+    rot: [-140, -75, -145],
+    scale: 1.1,
   },
   emberwish_mote_of_the_dying_sun: {
     pos: [-0.2681, 0.2224, 0.0872],

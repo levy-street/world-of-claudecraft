@@ -19,6 +19,7 @@ import {
   type PreviewAppearance,
   previewAppearanceVisual,
 } from './characters/preview_appearance';
+import { WeaponIdleAnimator } from './characters/weapon_idle_anim';
 import { disposeOwnedWeaponSkinMaterials } from './characters/weapon_skin_materials';
 import { trackWebGLContext } from './context_release';
 import {
@@ -67,6 +68,10 @@ type CachedWeaponRig = {
   root: THREE.Group;
   model: THREE.Object3D;
   vfx: WeaponVfxHandle | null;
+  /** The model's own baked idle clip (split-part spin/orbit), if it ships one.
+   *  The turntable rotates the whole group; this is the motion INSIDE the
+   *  weapon, and without it a legendary's ring hangs dead in the showcase. */
+  idle: WeaponIdleAnimator;
   extras: THREE.Object3D | null;
   float: { bob: number; spin: number; lift: number } | null;
   floatBase: number;
@@ -271,10 +276,13 @@ export function createArmoryPreview(
       extras.position.set(0, 0.02, 0);
       root.add(extras);
     }
+    const idle = new WeaponIdleAnimator();
+    idle.build([model]);
     const rig: CachedWeaponRig = {
       root,
       model,
       vfx,
+      idle,
       extras,
       float: spec ? (TIERS[spec.tier]?.float ?? null) : null,
       floatBase: model.position.y,
@@ -305,6 +313,7 @@ export function createArmoryPreview(
   function disposeWeaponRigs(): void {
     for (const rig of weaponRigs.values()) {
       rig.vfx?.dispose();
+      rig.idle.dispose();
       rig.extras?.removeFromParent();
       disposeOwnedWeaponSkinMaterials(rig.model);
       rig.root.removeFromParent();
@@ -343,6 +352,7 @@ export function createArmoryPreview(
           rig.float.bob * (1 + Math.sin(rig.floatTime * 1.1)) * 0.5;
       }
       rig?.vfx?.update(dt);
+      rig?.idle.update(dt);
     }
     composer.render();
     if (active && !disposed && !prewarming) raf = requestAnimationFrame(animate);
