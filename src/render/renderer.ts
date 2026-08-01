@@ -865,7 +865,7 @@ export interface EntityView {
   compileReady: Promise<void> | null;
   // A live material-variant swap (gateSwapFlagOnCompile) is still linking off-thread
   // for a target whose .visible the per-frame loop recomputes every tick (the mount
-  // root, the base visual root after a skin/visual-key swap) — those lines AND this
+  // root, the base visual root after a skin/visual-key swap): those lines AND this
   // in so a plain hide would not be overwritten later the same frame. See #2571.
   mountCompilePending: boolean;
   visualCompilePending: boolean;
@@ -7555,7 +7555,7 @@ export class Renderer {
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
 
-      // live skin swap — appearance changed (in-game changer or a multiplayer peer).
+      // live skin swap: appearance changed (in-game changer or a multiplayer peer).
       // Gated the same as a base-visual swap (v.visual.root's own materials just
       // changed): a first-sight skin's shader can still link synchronously outside
       // the boot prewarm's variant pool (mob/NPC skins, an uncached combo) (#2571).
