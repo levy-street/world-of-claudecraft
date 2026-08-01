@@ -359,6 +359,11 @@ export const WILDHEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
     doorPos: { x: -232, z: 1112 },
     entry: { x: 0, z: -5 },
     exitOffset: { x: 0, z: -10 },
+    // Opens on Zulgar's death at the shrine terrace (owner request,
+    // live-playtest round 2): the terrace is ~220yd from the entrance exit,
+    // so the cleared run steps out here instead of walking the route back.
+    // Clear of the pyramid collider (r13.8 at z237) and Zulgar's spawn (z213).
+    bossExitPortal: { x: 0, z: 222 },
     spawns: WILDHEART_SPAWN_LIST,
     interior: 'wildheart',
     // The basin answers as one. Pulling Zulgar with any of the route still alive

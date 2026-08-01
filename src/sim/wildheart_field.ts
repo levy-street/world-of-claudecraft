@@ -241,11 +241,19 @@ const WILDHEART_PROP_FOOTPRINTS: Record<WildheartPropKind, WildheartFootprint> =
   wildheart_jaguar_gate: {
     r: 0,
     h: 13,
+    // Three overlapping r2.4 circles per pylon, not two r4.3: the fat pair put
+    // a ~4.7yd invisible ring around each ~2.5yd-wide bone pillar, and a player
+    // walking the visually clear grass beside a pylon hit nothing but air
+    // (live-playtest "invisible wall"). The chain keeps each pylon solid along
+    // its depth while the collider inscribes what the eye sees; the arch
+    // between the pylons stays as open as it looks.
     posts: [
-      { dx: -12.5, dz: -5, r: 4.3 },
-      { dx: -12.5, dz: 4, r: 4.3 },
-      { dx: 12.5, dz: -5, r: 4.3 },
-      { dx: 12.5, dz: 4, r: 4.3 },
+      { dx: -12.5, dz: -5, r: 2.4 },
+      { dx: -12.5, dz: -0.5, r: 2.4 },
+      { dx: -12.5, dz: 4, r: 2.4 },
+      { dx: 12.5, dz: -5, r: 2.4 },
+      { dx: 12.5, dz: -0.5, r: 2.4 },
+      { dx: 12.5, dz: 4, r: 2.4 },
     ],
   },
   wildheart_ritual_pyramid: { r: 12, h: 19 },

@@ -358,6 +358,21 @@ function buildWater(): THREE.Group {
     streamGeometry.setIndex(indices);
     streamGeometry.computeVertexNormals();
     bakeShoreAttributes(streamGeometry, 0, 0);
+    // Carve a VISUAL channel into the baked bathymetry: the stream surface
+    // floats only 0.55yd over its bed, so every vertex sat inside the shader's
+    // 4.5yd foam band and 6yd shallow ramp — the whole strip rendered as pale
+    // foam ("a footpath of water", per the live playtest). A parabolic
+    // mid-channel boost pushes the center toward the deep color while the true
+    // bank depth keeps the foam exactly on the banks. Presentation only: sim
+    // water (wildheartWaterMask) and collision are untouched.
+    {
+      const depthAttr = streamGeometry.getAttribute('aShoreDepth');
+      for (let i = 0; i < depthAttr.count; i++) {
+        const t = ((i % STREAM_COLUMNS) / (STREAM_COLUMNS - 1)) * 2 - 1;
+        depthAttr.setX(i, depthAttr.getX(i) + 4.5 * (1 - t * t));
+      }
+      depthAttr.needsUpdate = true;
+    }
     markSharedGeometry(streamGeometry);
   }
   const stream = new THREE.Mesh(streamGeometry, material);

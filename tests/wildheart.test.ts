@@ -417,9 +417,9 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     expect(ITEMS[heroicVariantId('bloodmane_warleggings')]).toBeUndefined();
   });
 
-  // Kills Zulgar with one direct overkill hit and returns his corpse. Mirrors
-  // the killKorzul harness in tests/heroic_loot_flair.test.ts.
-  function killZulgar(seed: number, difficulty: 'normal' | 'heroic'): Entity {
+  // Kills Zulgar with one direct overkill hit and returns the sim + corpse.
+  // Mirrors the killKorzul harness in tests/heroic_loot_flair.test.ts.
+  function killZulgar(seed: number, difficulty: 'normal' | 'heroic'): { sim: Sim; zulgar: Entity } {
     const sim = makeSim(seed);
     const pid = sim.addPlayer('warrior', 'Looter');
     if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', pid);
@@ -446,7 +446,7 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
       'hit',
     );
     expect(zulgar.dead, `seed ${seed}`).toBe(true);
-    return zulgar;
+    return { sim, zulgar };
   }
 
   it('pays copper plus exactly one guaranteed uncommon when a party kills Zulgar', () => {
@@ -457,7 +457,7 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     ]);
     // Several seeds so the pin holds across roll outcomes, not one lucky draw.
     for (const seed of [3, 11, 42]) {
-      const zulgar = killZulgar(seed, 'normal');
+      const { zulgar } = killZulgar(seed, 'normal');
       expect(zulgar.loot, `seed ${seed} has loot`).toBeTruthy();
       expect(zulgar.loot?.copper, `seed ${seed} copper`).toBeGreaterThan(0);
       const uncommons = (zulgar.loot?.items ?? []).filter((s) => trio.has(s.itemId));
@@ -465,20 +465,76 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     }
   });
 
-  it('pays exactly two DISTINCT heroic epics per heroic Zulgar kill (the dup-path shape)', () => {
-    // The second roll group re-lists two chests from the first, so this pin is
-    // what proves pickRollGroupWinner's fall-forward keeps the two guaranteed
-    // drops distinct instead of voiding a duplicate.
+  it('pays exactly two DISTINCT heroic epics per heroic Zulgar kill', () => {
     const heroicIds = new Set(
       HEROIC_BOSS_LOOT.wildheart_high_priest.flatMap((e) => (e.itemId ? [e.itemId] : [])),
     );
     for (const seed of [3, 11, 42, 97, 123]) {
-      const zulgar = killZulgar(seed, 'heroic');
+      const { zulgar } = killZulgar(seed, 'heroic');
       const drops = (zulgar.loot?.items ?? [])
         .map((s) => s.itemId)
         .filter((id) => heroicIds.has(id));
       expect(drops, `seed ${seed}: two heroic epics`).toHaveLength(2);
       expect(new Set(drops).size, `seed ${seed}: the two epics are distinct`).toBe(2);
+    }
+  });
+
+  it("opens the shrine-terrace exit portal on Zulgar's death, on both difficulties", () => {
+    for (const difficulty of ['normal', 'heroic'] as const) {
+      const { sim } = killZulgar(31, difficulty);
+      const inst = (
+        sim.instances as { dungeonId: string; bossExitId: number | null; objectIds: number[] }[]
+      ).find((i) => i.dungeonId === 'wildheart_basin');
+      if (!inst) throw new Error('instance missing');
+      expect(inst.bossExitId, difficulty).not.toBeNull();
+      const exit = sim.entities.get(inst.bossExitId as number) as Entity;
+      expect(exit?.templateId, difficulty).toBe('dungeon_exit');
+      // At the authored terrace spot, clear of the pyramid collider disc.
+      const origin = instanceOrigin(DUNGEONS.wildheart_basin.index, 0);
+      expect(exit.pos.x - origin.x).toBeCloseTo(0, 5);
+      expect(exit.pos.z - origin.z).toBeCloseTo(222, 5);
+      // The claim owns it: freeInstance drops it with objectIds.
+      expect(inst.objectIds).toContain(inst.bossExitId);
+    }
+    // No portal before the boss dies: a fresh claim spawns none.
+    const sim = makeSim(5);
+    const pid = sim.addPlayer('warrior', 'Walker');
+    expect(enterDungeon(sim.ctx, 'wildheart_basin', pid)).toBe(true);
+    const inst = (sim.instances as { dungeonId: string; bossExitId: number | null }[]).find(
+      (i) => i.dungeonId === 'wildheart_basin',
+    );
+    expect(inst?.bossExitId).toBeNull();
+  });
+
+  it('keeps the jaguar-gate colliders inscribed: the arch and pylon flanks stay walkable', () => {
+    const gate = WILDHEART_FIELD_COLLIDER_SPECS.filter(
+      (spec) => spec.kind === 'wildheart_jaguar_gate',
+    );
+    // Six chained posts (three per pylon): solid along each pylon's depth, but
+    // never wider than the visible pillar. The old two-fat-circles version put
+    // a ~4.7yd invisible ring around each ~2.5yd post and blocked the open
+    // grass beside the gate (live-playtest "invisible wall").
+    expect(gate).toHaveLength(6);
+    for (const post of gate) expect(post.r).toBeLessThanOrEqual(2.7);
+    const origin = instanceOrigin(DUNGEONS.wildheart_basin.index, 0);
+    // Beside the east pylon (just past the pillar's push zone: post r 2.64 +
+    // body 0.5 — the old fat circles blocked a player-sized body out past 19)
+    // and the arch center: a 1.2yd step in every direction must resolve
+    // without a collider push-back.
+    for (const [sx, sz] of [
+      [18.5, 17],
+      [0, 16],
+    ] as const) {
+      for (let a = 0; a < 8; a++) {
+        const angle = (a / 8) * Math.PI * 2;
+        const fx = origin.x + sx + Math.sin(angle) * 1.2;
+        const fz = origin.z + sz + Math.cos(angle) * 1.2;
+        const resolved = resolvePosition(1, fx, fz, 0.5);
+        expect(
+          Math.hypot(resolved.x - fx, resolved.z - fz),
+          `(${sx},${sz}) dir ${a}`,
+        ).toBeLessThan(0.3);
+      }
     }
   });
 });
