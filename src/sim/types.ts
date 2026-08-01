@@ -3398,6 +3398,7 @@ export interface Entity extends ClientMirroredEntityFields {
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
+  chaseStall: number; // seconds an engaged mob has been pinned unable to close on its target; at CHASE_STALL_TIMEOUT (mob/reachability.ts) it evades home like a leash break
   fleeTimer: number; // seconds left in a low-HP panic flee; counts down in the 'flee' state
   fleeReturnTimer: number; // grace after a panic flee hits leash edge, letting it run back before normal leash reset resumes
   hasFled: boolean; // a cowardly mob flees only once per pull; cleared when it resets at spawn
@@ -3858,7 +3859,7 @@ export interface PendingResurrection {
   expiresAt: number;
 }
 
-export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 'resist';
+export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 'resist' | 'evade';
 
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
