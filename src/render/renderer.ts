@@ -233,6 +233,7 @@ import {
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
 } from './prewarm_policy';
+import { resumeDroppedPrewarmEntries } from './prewarm_resume';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
@@ -362,6 +363,12 @@ const VIEW_COMPILE_GATE_MAX_MS = 1500;
 // Reserve at the tail of the view-build budget so the compile + final-frame
 // steps always start before the prewarm deadline (runEntry skips late entries).
 const PREWARM_BUILD_RESERVE_MS = 3000;
+// A manifest entry dropped by the deadline above is resumed once, in
+// background idle time after world entry, instead of being permanently
+// skipped (issue #2571: an abandoned entry's compile debt otherwise pays out
+// later as a mid-play shader-compile stall). Each resumed entry gets its own
+// fresh window so one slow entry cannot immediately re-drop the next.
+const PREWARM_RESUME_ENTRY_MAX_MS = 4000;
 const VIEW_PREWARM_MAX_VIEWS_LOW = 48;
 const VIEW_PREWARM_MAX_VIEWS_HIGH = 72;
 // Constrained (phone WebKit): build only self plus one required/nearby view at
@@ -4348,7 +4355,9 @@ export class Renderer {
     const constrainedPrewarm = policy.minimalManifest;
     const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);
     const started = performance.now();
-    const deadline = started + maxMs;
+    // Extended by resumeDroppedPrewarmEntries below when a dropped entry is
+    // resumed in idle time, so its own internal deadline checks see fresh room.
+    let deadline = started + maxMs;
     // Stop the archetype-build steps early so the later entries — crucially
     // programs.compile — still START before `deadline` (runEntry skips anything
     // that begins past it). Compiling is what kills the in-world freeze.
@@ -4404,6 +4413,11 @@ export class Renderer {
       detail?: () => string;
     };
 
+    // Entries the deadline dropped this pass (runEntry's skip branch below).
+    // Resumed once in background idle time after the loop finishes instead of
+    // being left permanently skipped (issue #2571).
+    const droppedEntries: PrewarmManifestEntry[] = [];
+
     const runEntry = async (entry: PrewarmManifestEntry): Promise<void> => {
       const before = this.prewarmCounts();
       const entryStarted = performance.now();
@@ -4425,6 +4439,7 @@ export class Renderer {
           textureDelta: 0,
           detail: entry.detail?.(),
         });
+        droppedEntries.push(entry);
         return;
       }
       let status: RendererPrewarmManifestEntryStats['status'] = 'completed';
@@ -4458,6 +4473,70 @@ export class Renderer {
         textureDelta: after.textures - before.textures,
         detail: entry.detail?.(),
       });
+    };
+
+    // Hide every temp prewarm group currently staged in the scene without
+    // removing it. Three's compile()/compileAsync() traverse the whole scene
+    // regardless of visibility (see prewarm_pass.ts), so a hidden group still
+    // links its programs; the point is keeping a resumed entry's staged group
+    // (e.g. the Mirefen impact-site clone, positioned right next to the
+    // player) from ever painting a live frame once the loading screen is gone.
+    const hidePrewarmArtifacts = (): void => {
+      for (const group of [
+        doorPrewarmGroup,
+        interiorPrewarmGroup,
+        entityPrewarmGroup,
+        npcPrewarmGroup,
+        playerPrewarmGroup,
+        objectPrewarmGroup,
+        propMaterialPrewarmGroup,
+        foliagePrewarmGroup,
+        landmarkPrewarmGroup,
+      ]) {
+        if (group) group.visible = false;
+      }
+    };
+
+    // Tear down every temp prewarm group staged so far. Shared by the main
+    // pass's finally block and, with clearVfx false, by the background resume
+    // pass: vfx.clear() wipes the whole pooled particle system, which is fine
+    // behind the loading screen but would erase live gameplay particles if
+    // called after world entry (the resumed vfx.atlas burst instead decays on
+    // its own once the real per-frame update loop is ticking).
+    const cleanupPrewarmArtifacts = (opts: { clearVfx: boolean }): void => {
+      if (opts.clearVfx) this.vfx.clear();
+      if (doorPrewarmGroup) this.scene.remove(doorPrewarmGroup);
+      if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
+      if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
+      if (npcPrewarmGroup) this.scene.remove(npcPrewarmGroup);
+      for (const item of entityPrewarmPool) this.storePooledVisual(item.key, item.visual);
+      for (const item of npcPrewarmPool) this.storePooledVisual(item.key, item.visual);
+      if (playerPrewarmGroup) this.scene.remove(playerPrewarmGroup);
+      if (objectPrewarmGroup) {
+        // Re-show the object lights hidden during the prewarm so the pooled objects
+        // (reused for the live ground objects) light normally. (Cast: the manifest
+        // closure assignment is invisible to TS flow analysis here.)
+        (objectPrewarmGroup as THREE.Group).traverse((o: THREE.Object3D) => {
+          if ((o as THREE.PointLight).isPointLight) o.visible = true;
+        });
+        this.scene.remove(objectPrewarmGroup);
+      }
+      if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
+      if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
+      if (landmarkPrewarmGroup) this.scene.remove(landmarkPrewarmGroup);
+      if (weatherPrewarmActive) this.weather.endPrewarm();
+      doorPrewarmGroup = null;
+      interiorPrewarmGroup = null;
+      entityPrewarmGroup = null;
+      npcPrewarmGroup = null;
+      entityPrewarmPool = [];
+      npcPrewarmPool = [];
+      playerPrewarmGroup = null;
+      objectPrewarmGroup = null;
+      propMaterialPrewarmGroup = null;
+      foliagePrewarmGroup = null;
+      landmarkPrewarmGroup = null;
+      weatherPrewarmActive = false;
     };
 
     const manifest: PrewarmManifestEntry[] = [
@@ -4869,27 +4948,37 @@ export class Renderer {
         }
       }
     } finally {
-      this.vfx.clear();
-      if (doorPrewarmGroup) this.scene.remove(doorPrewarmGroup);
-      if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
-      if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
-      if (npcPrewarmGroup) this.scene.remove(npcPrewarmGroup);
-      for (const item of entityPrewarmPool) this.storePooledVisual(item.key, item.visual);
-      for (const item of npcPrewarmPool) this.storePooledVisual(item.key, item.visual);
-      if (playerPrewarmGroup) this.scene.remove(playerPrewarmGroup);
-      if (objectPrewarmGroup) {
-        // Re-show the object lights hidden during the prewarm so the pooled objects
-        // (reused for the live ground objects) light normally. (Cast: the manifest
-        // closure assignment is invisible to TS flow analysis here.)
-        (objectPrewarmGroup as THREE.Group).traverse((o: THREE.Object3D) => {
-          if ((o as THREE.PointLight).isPointLight) o.visible = true;
+      cleanupPrewarmArtifacts({ clearVfx: true });
+    }
+
+    if (droppedEntries.length > 0) {
+      // Fire-and-forget: world-entry timing must not depend on this, so the
+      // stats below are computed and returned immediately regardless. Pay down
+      // whatever the deadline dropped once idle time actually shows up instead
+      // of leaving it permanently unpaid (issue #2571).
+      const resume = droppedEntries.slice();
+      console.info(
+        `[entry-guard] prewarm resume scheduled: dropped=[${resume.map((entry) => entry.id).join(',')}]`,
+      );
+      void resumeDroppedPrewarmEntries(resume, {
+        idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
+        extendDeadline: () => {
+          deadline = performance.now() + PREWARM_RESUME_ENTRY_MAX_MS;
+        },
+        runEntry,
+        afterEntry: hidePrewarmArtifacts,
+      })
+        .then(() => {
+          console.info(
+            `[entry-guard] prewarm resume done: resumed=[${resume.map((entry) => entry.id).join(',')}]`,
+          );
+        })
+        .catch((err) => {
+          console.warn('Renderer prewarm resume failed', err);
+        })
+        .finally(() => {
+          cleanupPrewarmArtifacts({ clearVfx: false });
         });
-        this.scene.remove(objectPrewarmGroup);
-      }
-      if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
-      if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
-      if (landmarkPrewarmGroup) this.scene.remove(landmarkPrewarmGroup);
-      if (weatherPrewarmActive) this.weather.endPrewarm();
     }
 
     const elapsed = performance.now() - started;
