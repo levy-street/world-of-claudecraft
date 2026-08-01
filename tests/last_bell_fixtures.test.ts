@@ -48,10 +48,13 @@ describe('Last Bell campaign fixtures', () => {
     const sim = makeSim();
 
     const ferries = fixtures(sim, 'lb_ferry');
+    // The boarding anchors are DERIVED from the measured ship plan (a hair
+    // inboard of the generated mating edge), so the world spots are pinned
+    // within a float hair rather than as exact literals.
     expect(ferries.map((f) => ({ x: f.pos.x, z: f.pos.z }))).toEqual(
       expect.arrayContaining([
-        { x: 239, z: -48 },
-        { x: 714.5, z: 116.5 },
+        { x: expect.closeTo(237.15, 5), z: expect.closeTo(-48.25, 5) },
+        { x: expect.closeTo(716.35, 5), z: expect.closeTo(116.25, 5) },
       ]),
     );
     expect(ferries).toHaveLength(2);

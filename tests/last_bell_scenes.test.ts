@@ -623,7 +623,10 @@ describe('the voyage cinematic', () => {
               { x: 717, z: 104.5, height: 1.12 },
               { x: 719, z: 108.5, height: 1.24 },
               { x: 721.5, z: 112.5, height: 14.660648 },
-              { x: 723.5, z: 116.5, height: 2 },
+              // The pier-side look-at rides the gangplank anchor, which is
+              // derived from the generated mating edge since the level
+              // crossing landed.
+              { x: 723.5, z: GULLHAVEN_HARBOR.gangplank.z, height: 2 },
             ],
           },
           dur: 6,
@@ -651,7 +654,7 @@ describe('the voyage cinematic', () => {
               { x: 236.5, z: -60, height: 0.96 },
               { x: 234.5, z: -56, height: 1 },
               { x: 232.5, z: -52, height: 12.471553 },
-              { x: 230.4, z: -48, height: 2 },
+              { x: 230.4, z: MAINLAND_HARBOR.gangplank.z, height: 2 },
             ],
           },
           dur: 6,
@@ -691,7 +694,7 @@ describe('the voyage cinematic', () => {
               { x: 818, z: 120, height: 2 },
               { x: 785, z: 122, height: 2 },
               { x: 755, z: 121.5, height: 2 },
-              { x: 723.5, z: 116.5, height: 2 },
+              { x: 723.5, z: GULLHAVEN_HARBOR.gangplank.z, height: 2 },
             ],
           },
           dur: 6.45,
