@@ -454,6 +454,104 @@ function pickKind(kinds: WeightedKinds, t: number): string {
   return kinds[kinds.length - 1][0];
 }
 
+/**
+ * Weighted floor-tile mix per interior variant. Module scope (it reads no
+ * renderer state) so tests can sweep the whole t range for a variant.
+ */
+export function floorKindFor(variant: Variant, t: number): string {
+  // The Drowned Court dresses as the temple (flooded flagstones, pale walls,
+  // faded banners); structural placement keys on the real variant elsewhere.
+  if (variant === 'arena_drowned') return floorKindFor('temple', t);
+  if (variant === 'bastion') {
+    return pickKind(
+      [
+        ['floor_tile_large', 56],
+        ['floor_tile_large_rocks', 5],
+        ['floor_dirt_large', 4],
+        ['floor_dirt_large_rocky', 4],
+        ['grate', 8],
+        ['quad', 23],
+      ],
+      t,
+    );
+  }
+  if (variant === 'sanctum') {
+    return pickKind(
+      [
+        ['floor_tile_large', 68],
+        ['floor_tile_large_rocks', 7],
+        ['floor_dirt_large', 4],
+        ['floor_dirt_large_rocky', 4],
+        ['quad', 17],
+      ],
+      t,
+    );
+  }
+  if (variant === 'temple') {
+    // flooded flagstones: more broken/weeded subdivisions, grate pits draining
+    return pickKind(
+      [
+        ['floor_tile_large', 52],
+        ['floor_tile_large_rocks', 6],
+        ['floor_dirt_large', 4],
+        ['floor_dirt_large_rocky', 4],
+        ['grate', 9],
+        ['quad', 25],
+      ],
+      t,
+    );
+  }
+  if (variant === 'lastkeep') {
+    // a KEPT castle floor: whole flags with decorated insets, no dirt, no
+    // weeds, no grates (the undercroft cells re-key to the crypt mix)
+    return pickKind(
+      [
+        ['floor_tile_large', 72],
+        ['floor_tile_large_rocks', 3],
+        ['quad', 25],
+      ],
+      t,
+    );
+  }
+  // The Source Cave is a working server hall (racks, desks, bookcases), not a
+  // collapsed ruin, and its centre seal is a flat disc laid over these tiles:
+  // the kit's rock-bearing tiles pushed their modelled stones straight through
+  // it (user report). Same crypt kit and dirt patches, no loose rock.
+  if (variant === 'source_cave_library') {
+    return pickKind(
+      [
+        ['floor_tile_large', 64],
+        ['floor_dirt_large', 10],
+        ['quad', 26],
+      ],
+      t,
+    );
+  }
+  if (isDelveVariant(variant)) {
+    // collapsed reliquary: grave-dust over cracked flags, more dirt and rubble
+    return pickKind(
+      [
+        ['floor_tile_large', 54],
+        ['floor_tile_large_rocks', 10],
+        ['floor_dirt_large', 10],
+        ['floor_dirt_large_rocky', 8],
+        ['quad', 18],
+      ],
+      t,
+    );
+  }
+  return pickKind(
+    [
+      ['floor_tile_large', 70],
+      ['floor_tile_large_rocks', 6],
+      ['floor_dirt_large', 6],
+      ['floor_dirt_large_rocky', 5],
+      ['quad', 13],
+    ],
+    t,
+  );
+}
+
 /** Accumulates instance transforms per module kind, then emits InstancedMeshes. */
 class Placements {
   readonly byKind = new Map<string, THREE.Matrix4[]>();
@@ -1542,86 +1640,6 @@ export class DungeonInteriors {
   // Structure
   // -------------------------------------------------------------------------
 
-  private floorKind(variant: Variant, t: number): string {
-    // The Drowned Court dresses as the temple (flooded flagstones, pale walls,
-    // faded banners); structural placement keys on the real variant elsewhere.
-    if (variant === 'arena_drowned') return this.floorKind('temple', t);
-    if (variant === 'bastion') {
-      return pickKind(
-        [
-          ['floor_tile_large', 56],
-          ['floor_tile_large_rocks', 5],
-          ['floor_dirt_large', 4],
-          ['floor_dirt_large_rocky', 4],
-          ['grate', 8],
-          ['quad', 23],
-        ],
-        t,
-      );
-    }
-    if (variant === 'sanctum') {
-      return pickKind(
-        [
-          ['floor_tile_large', 68],
-          ['floor_tile_large_rocks', 7],
-          ['floor_dirt_large', 4],
-          ['floor_dirt_large_rocky', 4],
-          ['quad', 17],
-        ],
-        t,
-      );
-    }
-    if (variant === 'temple') {
-      // flooded flagstones: more broken/weeded subdivisions, grate pits draining
-      return pickKind(
-        [
-          ['floor_tile_large', 52],
-          ['floor_tile_large_rocks', 6],
-          ['floor_dirt_large', 4],
-          ['floor_dirt_large_rocky', 4],
-          ['grate', 9],
-          ['quad', 25],
-        ],
-        t,
-      );
-    }
-    if (variant === 'lastkeep') {
-      // a KEPT castle floor: whole flags with decorated insets, no dirt, no
-      // weeds, no grates (the undercroft cells re-key to the crypt mix)
-      return pickKind(
-        [
-          ['floor_tile_large', 72],
-          ['floor_tile_large_rocks', 3],
-          ['quad', 25],
-        ],
-        t,
-      );
-    }
-    if (isDelveVariant(variant)) {
-      // collapsed reliquary: grave-dust over cracked flags, more dirt and rubble
-      return pickKind(
-        [
-          ['floor_tile_large', 54],
-          ['floor_tile_large_rocks', 10],
-          ['floor_dirt_large', 10],
-          ['floor_dirt_large_rocky', 8],
-          ['quad', 18],
-        ],
-        t,
-      );
-    }
-    return pickKind(
-      [
-        ['floor_tile_large', 70],
-        ['floor_tile_large_rocks', 6],
-        ['floor_dirt_large', 6],
-        ['floor_dirt_large_rocky', 5],
-        ['quad', 13],
-      ],
-      t,
-    );
-  }
-
   private floorQuadKind(variant: Variant, t: number): string {
     if (variant === 'arena_drowned') return this.floorQuadKind('temple', t);
     if (variant === 'bastion') {
@@ -1705,7 +1723,7 @@ export class DungeonInteriors {
         // whose own center falls outside the polygon). Boundary tiles will
         // stair-step; accepted for this kit.
         if (poly && !polygonContainsPoint(poly, x, z)) continue;
-        let kind = this.floorKind(variant, hash2(x * 1.31, z));
+        let kind = floorKindFor(variant, hash2(x * 1.31, z));
         if (kind === 'grate' && Math.abs(x) < 4) kind = 'floor_tile_large'; // keep pits off the walk aisle
         if (kind === 'grate') {
           // floor_tile_grate is 4x2: a pair fills the cell, test each half's own center
@@ -1762,7 +1780,7 @@ export class DungeonInteriors {
       for (let x = minX; x <= maxX; x += FLOOR_CELL) {
         if (!inside(x, z) || inRampBand(x, z)) continue;
         const y = FLOOR_Y + roomLift(x, z);
-        let kind = this.floorKind(cellVariant(x, z), hash2(x * 1.31, z));
+        let kind = floorKindFor(cellVariant(x, z), hash2(x * 1.31, z));
         if (kind === 'grate') kind = 'floor_tile_large'; // no pits in an authored floor
         if (kind === 'quad') {
           for (const dx of [-1, 1]) {
@@ -2714,35 +2732,39 @@ export class DungeonInteriors {
       }
       return;
     }
-    // collapsed masonry in the legacy rubble corners
+    // collapsed masonry in the legacy rubble corners. The Source Cave skips
+    // them for the same reason it skips the rocky tiles: nothing in a live
+    // server hall has caved in yet.
     const rubble: [number, number][] =
-      variant === 'sanctum'
-        ? [
-            [-19, 4],
-            [19, 48],
-            [-19, 95],
-            [18, 150],
-          ]
-        : variant === 'temple'
+      variant === 'source_cave_library'
+        ? []
+        : variant === 'sanctum'
           ? [
-              [-19, -10],
-              [19, 24],
-              [-19, 88],
-              [18, 124],
+              [-19, 4],
+              [19, 48],
+              [-19, 95],
+              [18, 150],
             ]
-          : isDelveVariant(variant)
+          : variant === 'temple'
             ? [
-                [-19, -8],
-                [19, 18],
-                [-19, 58],
-                [18, 84],
-              ] // within the 110u delve room
-            : [
-                [-19, -13],
-                [19, 6],
-                [-18, 70],
-                [19, 108],
-              ];
+                [-19, -10],
+                [19, 24],
+                [-19, 88],
+                [18, 124],
+              ]
+            : isDelveVariant(variant)
+              ? [
+                  [-19, -8],
+                  [19, 18],
+                  [-19, 58],
+                  [18, 84],
+                ] // within the 110u delve room
+              : [
+                  [-19, -13],
+                  [19, 6],
+                  [-18, 70],
+                  [19, 108],
+                ];
     for (const [x, z] of rubble) {
       p.add('rubble_half', x < 0 ? -22 : 22, 0, z, x < 0 ? 0 : Math.PI, 1.1);
     }
