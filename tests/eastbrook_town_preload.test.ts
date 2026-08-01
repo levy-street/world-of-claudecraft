@@ -60,7 +60,6 @@ describe('Eastbrook town preload', () => {
       expect(new Set(newUrls).size).toBe(9);
       expect(allUrls).toHaveLength(11);
       expect(mocks.loadGltf.mock.calls.map(([url]) => url)).toEqual(allUrls);
-<<<<<<< HEAD
       const eastbrookTextureUrls = [
         '/textures/eastbrook_surface_atlas.webp',
         '/textures/eastbrook_surface_normal.webp',
@@ -92,11 +91,6 @@ describe('Eastbrook town preload', () => {
       expect(gateSettled).toBe(false);
       textureLoad.resolve(atlas);
       await gate;
-=======
-      expect(mocks.loadTexture).toHaveBeenCalledWith('/textures/eastbrook_surface_atlas.webp');
-      expect(mocks.registerDeferredPreload).toHaveBeenCalledTimes(allUrls.length + 1);
-      await Promise.all(mocks.registerDeferredPreload.mock.results.map((r) => r.value));
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 
       const data = await import('../src/sim/data');
       data.setActiveWorldContent({ ...data.BUILTIN_WORLD, zones: [] });

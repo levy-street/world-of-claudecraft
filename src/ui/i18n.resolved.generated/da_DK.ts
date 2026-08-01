@@ -2191,11 +2191,7 @@ export const da_DK: EnTranslations = {
         "noRecipient": "Ingen med det navn har en postkasse her.",
         "tooManyParcels": "Et brev kan højst rumme {count} pakker.",
         "noMailQuestItems": "Du kan ikke sende opgavegenstande med posten.",
-<<<<<<< HEAD
         "noMailBound": "That item is bound and cannot be mailed.",
-=======
-        "noMailBound": "Den genstand er bundet og kan ikke sendes med posten.",
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "notEnoughItems": "Du har ikke så mange at sende.",
         "cantAffordPostage": "Du har ikke råd til portoen.",
         "recipientBoxFull": "Modtagerens postkasse er fuld.",
@@ -6556,11 +6552,7 @@ export const da_DK: EnTranslations = {
       "tradeExpired": "Handelsanmodningen er udløbet.",
       "tradeFailed": "Handel mislykkedes: genstande eller penge er ikke længere tilgængelige.",
       "tradeBound": "Den genstand er bundet og kan ikke handles.",
-<<<<<<< HEAD
       "marketListBound": "That item is bound and cannot be listed."
-=======
-      "marketListBound": "Den genstand er bundet og kan ikke sættes til salg."
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     },
     "logs": {
       "standUp": "Du rejser dig op.",

@@ -26,12 +26,8 @@ import {
   zoneBiomeAt,
 } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
-<<<<<<< HEAD
 import { registerPreload } from './assets/preload';
 import { applyCanopyDetail } from './canopy_detail';
-=======
-import { registerDeferredPreload } from './assets/preload';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import {
   applyInstanceCollapse,
   type CollapseRole,
@@ -67,7 +63,6 @@ import {
   parterreFlowerTintAt,
 } from './garden_parterre_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
-<<<<<<< HEAD
 import {
   type GrassCapCollapseBand,
   grassCapCollapseBand,
@@ -84,10 +79,6 @@ import {
 import { attachShadowPassOnlyGate } from './shadow_pass_gate_core';
 import { freezeStaticMatrices } from './static_matrix';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
-=======
-import { attachShadowPassOnlyGate } from './shadow_pass_gate_core';
-import { freezeStaticMatrices } from './static_matrix';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 import { applySurfaceDetail, foliageWornFamilyFor } from './worn_stone';
 

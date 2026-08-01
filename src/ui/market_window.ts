@@ -15,16 +15,7 @@
 
 import { audio } from '../game/audio';
 import type { ItemInstancePayload, ItemSlot } from '../sim/types';
-<<<<<<< HEAD
 import type { IWorld } from '../world_api';
-=======
-import {
-  type IWorld,
-  type MarketInfo,
-  queryDiffersFromEcho,
-  searchDiffersFromEcho,
-} from '../world_api';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
 import { computeDropdownPlacement } from './dropdown_position';

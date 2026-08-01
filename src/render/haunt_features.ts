@@ -10,12 +10,8 @@ import { WRAITHWOOD_PROPS } from '../sim/content/wraithwood';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
-<<<<<<< HEAD
 import { registerPreload } from './assets/preload';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
-=======
-import { registerDeferredPreload } from './assets/preload';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 
 export interface HauntFeaturesView {
   group: THREE.Group;

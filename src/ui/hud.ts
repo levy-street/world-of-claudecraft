@@ -409,11 +409,7 @@ import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
 import { lowHealthVignette } from './low_health';
-<<<<<<< HEAD
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
-=======
-import { LowResourceViewCache } from './low_resource';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
@@ -590,11 +586,7 @@ import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { stackedWindowsVisible } from './window_stack_state_core';
 import { installWorldDropTarget } from './world_drop_target';
-<<<<<<< HEAD
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
-=======
-import { formatXp, XpBarViewCache } from './xp_bar';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
 
@@ -1455,7 +1447,6 @@ export class Hud {
   // up), so the bar tracks real swing speed including haste / ranged weapons.
   private swingPeriod = 0;
   private lastSwingTimer = 0;
-<<<<<<< HEAD
   private lastLowResourceInput = Number.NaN;
   private lastLowResourceMax = Number.NaN;
   private lastLowResourceType: ResourceType | null | undefined;
@@ -1466,14 +1457,10 @@ export class Hud {
     pulseSeconds: 0,
     label: '',
   };
-=======
-  private readonly lowResourceViewCache = new LowResourceViewCache();
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   private lastLowResourceActive = false;
   private lastLowResourceOpacity = 0;
   private lastLowResourcePulseSeconds = 0;
   private lastLowResourceLabel = '';
-<<<<<<< HEAD
   private lastXpLevel = Number.NaN;
   private lastXp = Number.NaN;
   private lastLifetimeXp = Number.NaN;
@@ -1481,9 +1468,6 @@ export class Hud {
   private lastShowOverflow = false;
   private lastXpLanguage = '';
   private xpBarViewCache: XpBarView | null = null;
-=======
-  private readonly xpBarViewCache = new XpBarViewCache();
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   // trading: locally staged offer, pushed to the server on change
   private stagedTrade: { items: InvSlot[]; copper: number } = { items: [], copper: 0 };
   private tradeWasOpen = false;
@@ -7914,10 +7898,6 @@ export class Hud {
       this.targetFramePainter.paint(
         unitFrameViewInto(this.targetFrameBuffer, ABSENT_TARGET_DESCRIPTOR),
       );
-<<<<<<< HEAD
-=======
-      this.targetAurasWindow.clear();
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
       // Hide the target-of-target frame too. Its parent (#target-frame) is already
       // display:none, but paint hidden anyway to reset the painter's portrait gate +
       // cadence id so re-acquiring a target repaints the mini-frame immediately.
@@ -8060,7 +8040,6 @@ export class Hud {
     // painter caches the #xpbar / .rested / #player-frame refs once and routes the
     // --xp-fill / .rested / class writes through the elided helpers.
     const showOverflow = (this.optionsHooks?.settings.get('showOverflowXp') ?? 1) >= 0.5;
-<<<<<<< HEAD
     const xpLanguage = getLanguage();
     let bar = this.xpBarViewCache;
     if (
@@ -8087,17 +8066,6 @@ export class Hud {
       });
       this.xpBarViewCache = bar;
     }
-=======
-    const xpI18nRevision = getI18nRevision();
-    const bar = this.xpBarViewCache.resolve(
-      p.level,
-      sim.xp,
-      sim.lifetimeXp,
-      sim.restedXp,
-      showOverflow,
-      xpI18nRevision,
-    );
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     this.xpBarPainter.paint(bar);
 
     // FCT painter: drive the pooled floating-combat-text ring on the every-frame
@@ -8405,7 +8373,6 @@ export class Hud {
   // runs low. Pure read of replicated state (resource/maxResource/type) so it
   // works offline and online alike. Touches the DOM only on state change.
   private updateLowResource(p: Entity): void {
-<<<<<<< HEAD
     const language = getLanguage();
     if (
       p.resource === this.lastLowResourceInput &&
@@ -8419,16 +8386,6 @@ export class Hud {
     this.lastLowResourceType = p.resourceType;
     this.lastLowResourceLanguage = language;
     const v = lowResourceViewInto(this.lowResourceState, p.resource, p.maxResource, p.resourceType);
-=======
-    const i18nRevision = getI18nRevision();
-    const v = this.lowResourceViewCache.resolve(
-      p.resource,
-      p.maxResource,
-      p.resourceType,
-      i18nRevision,
-    );
-    if (!v) return;
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     const bar = this.pfResourceEl; // the cached ref the family painter also writes
     // `.low` is this method's own class (the unit_frame painter toggles only the
     // mutually-exclusive power-type classes, never `low`), so toggling it each frame

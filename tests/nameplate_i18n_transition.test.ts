@@ -124,45 +124,5 @@ describe('nameplate language-only transitions', () => {
     titlePainter.setNameplateTitle(v, 'prog_veteran');
 
     expect(v.titleEl.textContent).toBe('Veteran');
-<<<<<<< HEAD
-=======
-
-    titlePainter.setNameplateTitle(v, 'prog_champion');
-    expect(v.titleEl.textContent).toBe('Champion');
-
-    titlePainter.setNameplateTitle(v, null);
-    expect(v.titleEl.style.display).toBe('none');
-    expect(v.nameplateTitleId).toBe('');
-  }, 30_000);
-
-  it('repaints a fallback deed title after a same-language chunk retry succeeds', async () => {
-    window.history.replaceState({}, '', '/');
-    vi.resetModules();
-    const [{ NameplatePainter }, i18n, deedI18n] = await Promise.all([
-      import('../src/render/nameplate_painter'),
-      import('../src/ui/i18n'),
-      import('../src/ui/deed_i18n'),
-    ]);
-    i18n.setLanguage('zh_CN');
-    const failedLoad = vi
-      .spyOn(deedI18n.DEED_LOCALE_LOADERS, 'zh_CN')
-      .mockRejectedValueOnce(new Error('simulated title chunk failure'));
-    await expect(deedI18n.ensureDeedLocalesLoaded('zh_CN')).rejects.toThrow(
-      /simulated title chunk failure/,
-    );
-    failedLoad.mockRestore();
-
-    const painter = Object.create(NameplatePainter.prototype) as InstanceType<
-      typeof NameplatePainter
-    >;
-    const titlePainter = painter as unknown as TitleNameplateInvoker;
-    const v = view();
-    titlePainter.setNameplateTitle(v, 'prog_veteran');
-    expect(v.titleEl.textContent).toBe('Veteran');
-
-    await deedI18n.ensureDeedLocalesLoaded('zh_CN');
-    titlePainter.setNameplateTitle(v, 'prog_veteran');
-    expect(v.titleEl.textContent).toBe('老兵');
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   }, 30_000);
 });

@@ -37,16 +37,11 @@ import {
   isEastbrookRebuildWell,
 } from './eastbrook_town';
 import { indexExactVertexTuples } from './exact_index_geometry';
-<<<<<<< HEAD
 import { EMISSIVE_LIGHT, GFX, sharedUniforms, surfaceMat } from './gfx';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
 import { applySurfaceDetail, reapplySurfaceDetailToClone, wornFamilyFor } from './worn_stone';
-=======
-import { GFX, sharedUniforms, surfaceMat } from './gfx';
-import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -1054,7 +1049,6 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const hideables: Hideable[] = [];
   const keepFromMerge = new Set<THREE.Object3D>();
   /**
-<<<<<<< HEAD
    * Mark `g` un-mergeable and register it as fade-when-camera-crossed. Each
    * mesh's material is cloned so the opacity fade touches only this structure
    * (and leaves the shadow pass untouched). The pre-clone shared material is
@@ -1062,16 +1056,6 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
    */
   function registerHideable(g: THREE.Group, fp: Footprint): void {
     const matMap = new Map<THREE.Material, OccluderFadeMat>();
-=======
-   * Mark `g` un-mergeable and register it as hide-when-camera-crossed. Each
-   * mesh's material is cloned so flipping colour/depth writes hides only this
-   * structure (and leaves the shadow pass untouched). The pre-clone shared
-   * material is recorded per mesh so the far-cell bake (buildFarPropCells)
-   * can merge distant copies of these structures on the SHARED materials.
-   */
-  function registerHideable(g: THREE.Group, fp: Footprint): void {
-    const matMap = new Map<THREE.Material, ToggleMat>();
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     const bakeMeshes: HideableBakeMesh[] = [];
     g.traverse((o) => {
       const mesh = o as THREE.Mesh;
@@ -1084,10 +1068,6 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       if (!keepLiveMeshes.has(mesh) && srcMat.transparent !== true) {
         bakeMeshes.push({ mesh, srcMat });
       }
-<<<<<<< HEAD
-=======
-      if (lowProps) return;
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
       const src = mesh.material as THREE.Material;
       let tm = matMap.get(src);
       if (!tm) {
@@ -1104,10 +1084,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       group: g,
       mats: [...matMap.values()],
       hidden: false,
-<<<<<<< HEAD
       alpha: 1,
-=======
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
       cellKey: propCellKey(fp.x, fp.z),
       bakeMeshes,
       suppressed: false,
@@ -2259,7 +2236,6 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
           continue;
         }
         // LOAD-BEARING ORDER: visible=true must be restored BEFORE the
-<<<<<<< HEAD
         // suppressed continue, or a group culled on the prior frame would
         // stay stranded invisible when its cell enters far mode.
         h.group.visible = true;
@@ -2282,31 +2258,6 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         if (occluderFadeSettled(h.alpha, hide)) continue;
         h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion);
         applyOccluderFade(h.mats, h.alpha);
-=======
-        // suppressed continue, or a lowProps group left invisible by the
-        // ghost path (mats.length === 0 hides the whole group) would stay
-        // stranded invisible when its cell enters far mode.
-        h.group.visible = true;
-        // Far mode: the merged cell bake draws instead; flames/transparent
-        // members stay live on the group, and the ghost fade cannot fire.
-        if (h.suppressed) continue;
-        // Hide from the camera while still casting a shadow: disable colour +
-        // depth writes, not the object.
-        const hide = cameraSegmentHitsFootprint(h, eyeX, eyeY, eyeZ, camX, camY, camZ);
-        if (h.mats.length === 0) {
-          h.hidden = hide;
-          h.group.visible = !hide;
-          continue;
-        }
-        if (hide !== h.hidden) {
-          h.hidden = hide;
-          for (let j = 0; j < h.mats.length; j++) {
-            const m = h.mats[j];
-            m.mat.colorWrite = !hide;
-            m.mat.depthWrite = hide ? false : m.depthWrite;
-          }
-        }
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
       }
     },
   };
@@ -2319,7 +2270,6 @@ interface HideableBakeMesh {
   srcMat: THREE.Material;
 }
 
-<<<<<<< HEAD
 // A prop that the camera ghosts through and the renderer fades toward 20%
 // opacity whenever the eye-to-camera segment crosses its footprint (below
 // `topY`). Either a circle (`r`) or an OBB (`hw`/`hd`/`rot`), matching the
@@ -2331,28 +2281,6 @@ interface Hideable {
   mats: OccluderFadeMat[]; // cloned per-structure so the fade is local
   hidden: boolean; // whether the structure occludes the view this frame
   alpha: number; // animated fade level (1 = opaque, 0.2 = occluding)
-=======
-// One mesh of a hideable structure plus its pre-clone SHARED material, the
-// pair the far-cell bake merges on (see buildFarPropCells).
-interface HideableBakeMesh {
-  mesh: THREE.Mesh;
-  srcMat: THREE.Material;
-}
-
-// A prop that the camera ghosts through and the renderer hides whenever the
-// eye-to-camera segment crosses its footprint (below `topY`). Either a circle
-// (`r`) or an OBB (`hw`/`hd`/`rot`), matching the collider it mirrors. "Hidden"
-// disables colour/depth writes rather than `visible = false`, so the structure
-// stays in the shadow pass and keeps casting its shadow.
-//
-// Dual representation: while the camera is far from the structure's cell (the
-// ghost fade can never fire there), its baked meshes are suppressed and the
-// cell's merged bake draws instead (prop_cell_core.ts).
-interface Hideable {
-  group: THREE.Group;
-  mats: ToggleMat[]; // cloned per-structure so the toggle is local
-  hidden: boolean;
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   cellKey: string; // far-cell membership (prop_cell_core)
   bakeMeshes: HideableBakeMesh[]; // meshes swapped out in far mode
   suppressed: boolean; // far mode: baked meshes hidden, merged cell draws
@@ -2383,11 +2311,7 @@ interface FarPropCell {
 
 type Footprint = Omit<
   Hideable,
-<<<<<<< HEAD
   'group' | 'mats' | 'hidden' | 'alpha' | 'cellKey' | 'bakeMeshes' | 'suppressed'
-=======
-  'group' | 'mats' | 'hidden' | 'cellKey' | 'bakeMeshes' | 'suppressed'
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 >;
 
 function circleFootprint(x: number, z: number, r: number, topY: number, cull = r): Footprint {
@@ -2631,11 +2555,7 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
         };
         cell.buckets.set(key, bucket);
       }
-<<<<<<< HEAD
       const geo = normalizedStaticGeometry(mesh.geometry);
-=======
-      const geo = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
       geo.applyMatrix4(mesh.matrixWorld);
       geo.computeBoundingBox();
       if (geo.boundingBox) {

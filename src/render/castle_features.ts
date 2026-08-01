@@ -21,13 +21,8 @@ import {
   WARD_STEPS,
 } from '../sim/castle_layout';
 import { loadGltf } from './assets/loader';
-<<<<<<< HEAD
 import { registerPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
-=======
-import { registerDeferredPreload } from './assets/preload';
-import { surfaceMat } from './gfx';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { PROP_ASSET_DEFS } from './props';
 import { applyWornStone } from './worn_stone';
 

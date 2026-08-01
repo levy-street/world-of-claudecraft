@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-<<<<<<< HEAD
   insertActiveParticleSlot,
-=======
-  packActiveParticleSlotsInto,
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   pointSpriteBoundingRadius,
   spriteEarlyRejectRadiusSq,
 } from '../src/render/vfx_pool_core';
@@ -36,7 +32,6 @@ function setPixel(
 }
 
 describe('VFX particle pool core', () => {
-<<<<<<< HEAD
   it('inserts active slots once in the cloud original ascending blend order', () => {
     const slots = new Int32Array(6);
     let count = 0;
@@ -46,14 +41,6 @@ describe('VFX particle pool core', () => {
 
     expect(count).toBe(5);
     expect([...slots.subarray(0, count)]).toEqual([0, 1, 3, 4, 5]);
-=======
-  it('packs only live slots in the cloud original ascending blend order', () => {
-    const life = new Float32Array([0, 0.2, -1, 0.7, 0, 0.1]);
-    const slots = new Int32Array(life.length);
-
-    expect(packActiveParticleSlotsInto(life, slots)).toBe(3);
-    expect([...slots.subarray(0, 3)]).toEqual([1, 3, 5]);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   });
 
   it('bounds the full point square across live-camera FOV changes', () => {

@@ -20,13 +20,8 @@ import * as THREE from 'three';
 import type { StationDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
-<<<<<<< HEAD
 import { registerPreload } from './assets/preload';
 import { EMISSIVE_LIGHT, GFX, surfaceMat } from './gfx';
-=======
-import { registerDeferredPreload } from './assets/preload';
-import { GFX, surfaceMat } from './gfx';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { type StationPropKind, stationPropPlacements } from './stations_core';
 import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
@@ -109,7 +104,6 @@ export const stationsPreloadInternalsForTest = {
 // root y offset exactly but would drift x/z by offset*(1-scale).
 interface StationTemplatePart {
   geo: THREE.BufferGeometry;
-<<<<<<< HEAD
   mat: THREE.Material | THREE.Material[];
   local: THREE.Matrix4;
 }
@@ -135,12 +129,6 @@ function stationMaterial(src: THREE.Material): THREE.Material {
   return out;
 }
 
-=======
-  mat: THREE.Material;
-  local: THREE.Matrix4;
-}
-
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 function stationTemplateParts(kind: StationPropKind): StationTemplatePart[] {
   const loaded = loadedStationGltf.get(kind);
   if (!loaded) {
@@ -165,13 +153,9 @@ function stationTemplateParts(kind: StationPropKind): StationTemplatePart[] {
     if (child instanceof THREE.Mesh) {
       parts.push({
         geo: child.geometry,
-<<<<<<< HEAD
         mat: Array.isArray(child.material)
           ? child.material.map(stationMaterial)
           : stationMaterial(child.material),
-=======
-        mat: child.material as THREE.Material,
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         local: new THREE.Matrix4().multiplyMatrices(normalize, child.matrixWorld),
       });
     }

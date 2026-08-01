@@ -43,14 +43,9 @@ import {
 import { terrainHeight } from '../sim/world';
 import type { CupInfo } from '../world_api/vale_cup';
 import { loadGltf, releaseGltf } from './assets/loader';
-<<<<<<< HEAD
 import { registerPreload } from './assets/preload';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
 import { casterShadowMayReachCamera, type ScenerySphere } from './resident_scenery_core';
-=======
-import { registerDeferredPreload } from './assets/preload';
-import { GFX, sharedUniforms } from './gfx';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { groundSplatMaps } from './textures';
 import { flagTexture } from './vale_cup_flags';
 

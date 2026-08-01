@@ -93,7 +93,6 @@ describe('Eastbrook mailbox tier-independent preload', () => {
 
       expect(mocks.loadGltf).toHaveBeenCalledTimes(1);
       expect(mocks.loadGltf).toHaveBeenCalledWith('/models/props/mailbox_pillar.glb');
-<<<<<<< HEAD
       const atlasLoads = mocks.loadTexture.mock.calls
         .map(([url], index) => ({
           url,
@@ -117,12 +116,6 @@ describe('Eastbrook mailbox tier-independent preload', () => {
       expect(gateSettled).toBe(false);
       textureLoad.resolve(atlas);
       await gate;
-=======
-      expect(mocks.loadTexture).toHaveBeenCalledTimes(1);
-      expect(mocks.loadTexture).toHaveBeenCalledWith('/textures/eastbrook_surface_atlas.webp');
-      expect(mocks.registerDeferredPreload).toHaveBeenCalledTimes(2);
-      await Promise.all(mocks.registerDeferredPreload.mock.results.map((r) => r.value));
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 
       const first = module.buildMailboxPillar(101).group;
       const second = module.buildMailboxPillar(202).group;

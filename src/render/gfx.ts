@@ -907,7 +907,6 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     bucketBaselines: bucketBaselines(bucketBands),
     budget: GFX_BUDGETS[tier],
     autoGovernor: shouldUseAutoGovernor(tier, hints?.search ?? ''),
-<<<<<<< HEAD
     composer: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     gradePass: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     // N8AO runs on the composer tiers: half-res + Low quality on high keeps
@@ -915,24 +914,6 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     ao: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     msaaSamples: aaPolicy.msaaSamples,
     pixelRatioCap: aaPolicy.pixelRatioCap,
-=======
-    composer: !nativeIosMemoryProfile && (tier === 'high' || tier === 'ultra'),
-    // N8AO runs on both composer tiers: half-res + Low quality on high keeps
-    // it ~1ms-class on real GPUs; ultra gets full-res Medium
-    ao: !nativeIosMemoryProfile && (tier === 'high' || tier === 'ultra'),
-    msaaSamples: (tier === 'high' || tier === 'ultra') && !constrainedMemory ? 4 : 0,
-    pixelRatioCap: tightMemoryProfile
-      ? 1.0
-      : nativeIosMemoryProfile
-        ? 1.25
-        : constrainedMemory
-          ? 1.48
-          : tier === 'low' || tier === 'medium'
-            ? 1.48
-            : tier === 'high'
-              ? 1.75
-              : 2.5,
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     // Shadows are cosmetic and duplicate the visible scene draw. Both constrained browsers and
     // the stricter native-iOS residency profile remove that duplicate pass.
     dynamicShadows: tier !== 'low' && !constrainedMemory,
@@ -977,7 +958,6 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // occlude world sightlines. Keep the constrained profile on the full placement
     // set and reduce only non-occluding grass below.
     leanFoliage: tier === 'low' || (tier === 'medium' && weakIntegratedGpu),
-<<<<<<< HEAD
     grassRadius: nativeIosMemoryProfile
       ? 52
       : tier === 'low'
@@ -1010,34 +990,6 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
                 ? 0.75
                 : 0.8,
     terrainSplat: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
-=======
-    // Tight memory reuses the Advanced sub-knob's lean grass values (34 / 3.8): the
-    // leanest grass the game already ships, so no new visual floor is introduced.
-    grassRadius: tightMemoryProfile
-      ? 34
-      : nativeIosMemoryProfile
-        ? 52
-        : tier === 'low'
-          ? 80
-          : tier === 'medium'
-            ? constrainedMemory
-              ? 62
-              : 76
-            : 82,
-    grassStep: tightMemoryProfile
-      ? 3.8
-      : nativeIosMemoryProfile
-        ? 2.75
-        : tier === 'low'
-          ? 2.05
-          : tier === 'medium'
-            ? constrainedMemory
-              ? 2.35
-              : 2.0
-            : 1.8,
-    terrainSplat:
-      !nativeIosMemoryProfile && (tier === 'medium' || tier === 'high' || tier === 'ultra'),
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     windSway: true,
     maxPointLights: nativeIosMemoryProfile ? 2 : constrainedMemory ? 3 : 6,
     constrainedMemory,

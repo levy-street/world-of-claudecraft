@@ -32,11 +32,7 @@ import {
   WATER_LEVEL,
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
-<<<<<<< HEAD
 import { registerPreload } from './assets/preload';
-=======
-import { registerDeferredPreload } from './assets/preload';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { cloneGeometryForBake } from './geometry_bake_clone';
 import { GFX, surfaceMat } from './gfx';
 import { MIST_DRIFT_AMPLITUDE, SEA_LIGHT_RAYS, SEA_MIST_BANKS } from './sea_mist_core';

@@ -2191,11 +2191,7 @@ export const vi_VN: EnTranslations = {
         "noRecipient": "Không ai mang tên đó có hòm thư ở đây.",
         "tooManyParcels": "Một lá thư chở tối đa {count} bưu kiện.",
         "noMailQuestItems": "Bạn không thể gửi vật phẩm nhiệm vụ qua thư.",
-<<<<<<< HEAD
         "noMailBound": "That item is bound and cannot be mailed.",
-=======
-        "noMailBound": "Vật phẩm đó đã bị ràng buộc và không thể gửi qua thư.",
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "notEnoughItems": "Bạn không có đủ số lượng đó để gửi.",
         "cantAffordPostage": "Bạn không đủ tiền trả bưu phí.",
         "recipientBoxFull": "Hòm thư của người nhận đã đầy.",
@@ -6556,11 +6552,7 @@ export const vi_VN: EnTranslations = {
       "tradeExpired": "Yêu cầu giao dịch đã hết hạn.",
       "tradeFailed": "Giao dịch thất bại: vật phẩm hoặc tiền không còn khả dụng.",
       "tradeBound": "Vật phẩm đó đã bị ràng buộc và không thể giao dịch.",
-<<<<<<< HEAD
       "marketListBound": "That item is bound and cannot be listed."
-=======
-      "marketListBound": "Vật phẩm đó đã bị ràng buộc và không thể rao bán."
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     },
     "logs": {
       "standUp": "Bạn đứng dậy.",

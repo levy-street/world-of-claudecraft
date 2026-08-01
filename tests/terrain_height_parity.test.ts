@@ -11,10 +11,7 @@ import {
   ARENA_X_MIN,
   arenaOrigin,
   BUILTIN_WORLD,
-<<<<<<< HEAD
   COMMUNITY_RIFT_SLOT_COUNT,
-=======
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   DELVE_BAND_X_MIN,
   DELVE_LIST,
   DELVE_SLOT_COUNT,
@@ -28,10 +25,6 @@ import {
   RIFT_BAND_X_MAX,
   RIFT_BAND_X_MIN,
   RIFT_MAX_FLOORS,
-<<<<<<< HEAD
-=======
-  RIFT_SLOT_COUNT,
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   RIFT_X_MIN,
   riftInstanceOrigin,
   STRIP_MAX_X,
@@ -69,13 +62,6 @@ const LANE_COUNT = 2;
 const SEEDS = [20_061, 1_337, 42, 2_147_483_647] as const;
 const ATLAS_STEP = 6;
 const ATLAS_MARGIN = 72;
-<<<<<<< HEAD
-=======
-const FLOAT64_SIGN_BIT = 1n << 63n;
-const FLOAT64_MASK = (1n << 64n) - 1n;
-const float64Bytes = new ArrayBuffer(8);
-const float64View = new DataView(float64Bytes);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 
 interface HeightPoint {
   label: string;
@@ -84,32 +70,6 @@ interface HeightPoint {
   seed: number;
 }
 
-<<<<<<< HEAD
-=======
-function orderedFloat64Bits(value: number): bigint {
-  float64View.setFloat64(0, value, false);
-  const bits = float64View.getBigUint64(0, false);
-  return (bits & FLOAT64_SIGN_BIT) === 0n ? bits | FLOAT64_SIGN_BIT : ~bits & FLOAT64_MASK;
-}
-
-function float64UlpDistance(a: number, b: number): bigint | null {
-  if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
-  const aBits = orderedFloat64Bits(a);
-  const bBits = orderedFloat64Bits(b);
-  return aBits >= bBits ? aBits - bBits : bBits - aBits;
-}
-
-function matchesPortableFloat64Fixture(actual: number, expected: number): boolean {
-  if (Object.is(actual, expected)) return true;
-  // Preserve exact signed-zero and non-finite behavior. Only finite, non-zero
-  // libm results receive the one-ULP allowance needed across supported hosts.
-  if (!Number.isFinite(actual) || !Number.isFinite(expected) || actual === 0 || expected === 0) {
-    return false;
-  }
-  return float64UlpDistance(actual, expected) === 1n;
-}
-
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 function buildPoints(): HeightPoint[] {
   const points: HeightPoint[] = [];
   const seen = new Set<string>();
@@ -366,11 +326,7 @@ function buildPoints(): HeightPoint[] {
       addStencil(`delve ${delve.id} slot ${slot}`, origin.x, origin.z, 120);
     }
   }
-<<<<<<< HEAD
   for (let slot = 0; slot < COMMUNITY_RIFT_SLOT_COUNT; slot++) {
-=======
-  for (let slot = 0; slot < RIFT_SLOT_COUNT; slot++) {
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     for (let floor = 0; floor < RIFT_MAX_FLOORS; floor++) {
       const origin = riftInstanceOrigin(slot, floor);
       addStencil(`rift slot ${slot} floor ${floor}`, origin.x, origin.z, 160);
@@ -400,33 +356,8 @@ function captureFixture(points: readonly HeightPoint[]): Buffer {
   return gzipSync(raw, { level: 9 });
 }
 
-<<<<<<< HEAD
 describe('terrain height bit identity', () => {
   it('keeps terrainHeight and groundHeight Object.is-identical over the authored world corpus', () => {
-=======
-describe('portable float64 fixture comparison', () => {
-  it('accepts adjacent finite values but rejects a two-ULP drift', () => {
-    expect(matchesPortableFloat64Fixture(1.0000000000000002, 1)).toBe(true);
-    expect(matchesPortableFloat64Fixture(1.0000000000000004, 1)).toBe(false);
-    expect(matchesPortableFloat64Fixture(-1.0000000000000002, -1)).toBe(true);
-    expect(matchesPortableFloat64Fixture(-1.0000000000000004, -1)).toBe(false);
-  });
-
-  it('keeps signed zero and non-finite values exact', () => {
-    expect(matchesPortableFloat64Fixture(0, 0)).toBe(true);
-    expect(matchesPortableFloat64Fixture(-0, -0)).toBe(true);
-    expect(matchesPortableFloat64Fixture(0, -0)).toBe(false);
-    expect(matchesPortableFloat64Fixture(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY)).toBe(
-      true,
-    );
-    expect(matchesPortableFloat64Fixture(Number.POSITIVE_INFINITY, Number.MAX_VALUE)).toBe(false);
-    expect(matchesPortableFloat64Fixture(Number.NaN, Number.NaN)).toBe(true);
-  });
-});
-
-describe('terrain height fixture parity', () => {
-  it('keeps terrainHeight and groundHeight within one ULP over the authored world corpus', () => {
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     const points = buildPoints();
     if (UPDATE) writeFileSync(FIXTURE_URL, captureFixture(points));
 
@@ -446,19 +377,9 @@ describe('terrain height fixture parity', () => {
       const expectedTerrain = fixture.readDoubleLE(offset);
       offset += 8;
       comparisons++;
-<<<<<<< HEAD
       if (!Object.is(actualTerrain, expectedTerrain) && mismatches.length < 20) {
         mismatches.push(
           `terrainHeight point ${i} (${point.label}) x=${point.x} z=${point.z} seed=${point.seed}: expected ${expectedTerrain}, received ${actualTerrain}`,
-=======
-      if (
-        !matchesPortableFloat64Fixture(actualTerrain, expectedTerrain) &&
-        mismatches.length < 20
-      ) {
-        const ulps = float64UlpDistance(actualTerrain, expectedTerrain);
-        mismatches.push(
-          `terrainHeight point ${i} (${point.label}) x=${point.x} z=${point.z} seed=${point.seed}: expected ${expectedTerrain}, received ${actualTerrain}, ULP distance ${ulps ?? 'non-finite'}`,
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         );
       }
 
@@ -466,16 +387,9 @@ describe('terrain height fixture parity', () => {
       const expectedGround = fixture.readDoubleLE(offset);
       offset += 8;
       comparisons++;
-<<<<<<< HEAD
       if (!Object.is(actualGround, expectedGround) && mismatches.length < 20) {
         mismatches.push(
           `groundHeight point ${i} (${point.label}) x=${point.x} z=${point.z} seed=${point.seed}: expected ${expectedGround}, received ${actualGround}`,
-=======
-      if (!matchesPortableFloat64Fixture(actualGround, expectedGround) && mismatches.length < 20) {
-        const ulps = float64UlpDistance(actualGround, expectedGround);
-        mismatches.push(
-          `groundHeight point ${i} (${point.label}) x=${point.x} z=${point.z} seed=${point.seed}: expected ${expectedGround}, received ${actualGround}, ULP distance ${ulps ?? 'non-finite'}`,
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         );
       }
     }

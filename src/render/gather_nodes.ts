@@ -54,7 +54,6 @@ export interface GatherNodesView {
   ): void;
 }
 
-<<<<<<< HEAD
 interface GatherNodeShadowEntry {
   readonly bounds: ScenerySphere;
   readonly casters: THREE.Mesh[];
@@ -282,87 +281,6 @@ function buildGatherNodesFromTemplates(
     // rendering. Those cases are not safe to consolidate.
     for (const node of batch.nodes) {
       addIndividualNode(group, template, node, seed, shadowEntries);
-=======
-// One template part per mesh primitive of a node type's model: geometry +
-// material plus the GLB's internal node transform, baked into each instance
-// matrix so the instanced result matches the old per-node scene clones.
-interface NodeTemplatePart {
-  geo: THREE.BufferGeometry;
-  mat: THREE.Material;
-  local: THREE.Matrix4;
-}
-
-function nodeTemplateParts(type: GatherNodeType): NodeTemplatePart[] {
-  // Placement identity with the old per-node scene clones assumes the GLB
-  // scene ROOT has an identity transform (GLTFLoader always creates a fresh
-  // root Group): the old code overwrote the clone root's position, while the
-  // instanced matrices retain any root offset inside `matrixWorld`.
-  const loaded = loadedNodeGltf.get(type);
-  if (loaded) {
-    loaded.updateMatrixWorld(true);
-    const parts: NodeTemplatePart[] = [];
-    loaded.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        parts.push({
-          geo: child.geometry,
-          mat: child.material as THREE.Material,
-          local: child.matrixWorld.clone(),
-        });
-      }
-    });
-    if (parts.length > 0) return parts;
-  }
-  return [
-    {
-      geo: NODE_FALLBACK_GEOMETRY[type](),
-      mat: surfaceMat({ color: NODE_COLOR[type] }),
-      local: new THREE.Matrix4(),
-    },
-  ];
-}
-
-// The 33 world nodes used to be 33 individual scene clones (one draw each,
-// never culled); one InstancedMesh per (node type x model part) collapses
-// them to one draw per part with identical placement.
-export function buildGatherNodes(seed: number): GatherNodesView {
-  const group = new THREE.Group();
-  group.name = 'gatherNodes';
-  // Batch per (type x 180u z-band) rather than one world-spanning mesh per
-  // type, so off-screen bands stay frustum-cullable.
-  const byType = new Map<
-    string,
-    { type: GatherNodeType; nodes: (typeof GATHER_NODES)[number][] }
-  >();
-  for (const node of GATHER_NODES) {
-    const key = `${node.type}:${Math.floor(node.pos.z / 180)}`;
-    const bucket = byType.get(key);
-    if (bucket) bucket.nodes.push(node);
-    else byType.set(key, { type: node.type, nodes: [node] });
-  }
-  const placement = new THREE.Matrix4();
-  const matrix = new THREE.Matrix4();
-  for (const { type, nodes } of byType.values()) {
-    const ids = nodes.map((n) => n.id);
-    for (const part of nodeTemplateParts(type)) {
-      const im = new THREE.InstancedMesh(part.geo, part.mat, nodes.length);
-      im.name = `gatherNodes:${type}`;
-      nodes.forEach((node, i) => {
-        const y = terrainHeight(node.pos.x, node.pos.z, seed);
-        placement.makeTranslation(node.pos.x, y + NODE_Y_OFFSET[type], node.pos.z);
-        matrix.multiplyMatrices(placement, part.local);
-        im.setMatrixAt(i, matrix);
-      });
-      im.instanceMatrix.needsUpdate = true;
-      im.castShadow = true;
-      im.receiveShadow = true;
-      im.computeBoundingBox();
-      im.computeBoundingSphere();
-      // Click/tap-to-harvest target (#1866): the renderer raycasts the node
-      // meshes; instanced hits resolve through instanceId against this list
-      // (the instanced twin of the entity views' `entityId` convention).
-      im.userData.gatherNodeIds = ids;
-      group.add(im);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     }
   }
   const cameraForward = new THREE.Vector3();

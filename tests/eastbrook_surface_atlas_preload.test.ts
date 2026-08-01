@@ -60,7 +60,6 @@ describe('Eastbrook surface atlas preload', () => {
     });
 
     const module = await import('../src/render/eastbrook_surface_atlas');
-<<<<<<< HEAD
     const eastbrookUrls = [
       module.EASTBROOK_SURFACE_ATLAS_URL,
       module.EASTBROOK_SURFACE_NORMAL_URL,
@@ -84,12 +83,6 @@ describe('Eastbrook surface atlas preload', () => {
     expect(gateSettled).toBe(false);
     for (const load of pending.values()) load.resolve(load.texture);
     await gate;
-=======
-    expect(mocks.loadTexture).toHaveBeenCalledTimes(1);
-    expect(mocks.loadTexture).toHaveBeenCalledWith(module.EASTBROOK_SURFACE_ATLAS_URL);
-    expect(mocks.registerDeferredPreload).toHaveBeenCalledTimes(1);
-    await mocks.registerDeferredPreload.mock.results[0].value;
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     expect(module.eastbrookSurfaceAtlasTexture()).toBe(atlas);
     expect(module.eastbrookSurfaceNormalTexture()).toBe(normal);
     expect(module.eastbrookSurfaceRoughnessTexture()).toBe(roughness);

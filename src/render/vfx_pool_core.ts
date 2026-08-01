@@ -4,7 +4,6 @@ const EARLY_REJECT_SRGB_BYTE = 26;
 const SPRITE_CLAMP_INSET = 0.01;
 const FULL_POINT_RADIUS_SQ = 0.5;
 
-<<<<<<< HEAD
 /** Insert one physical pool slot into a sorted unique active prefix. */
 export function insertActiveParticleSlot(slots: Int32Array, count: number, slot: number): number {
   let low = 0;
@@ -18,19 +17,6 @@ export function insertActiveParticleSlot(slots: Int32Array, count: number, slot:
   slots.copyWithin(low + 1, low, count);
   slots[low] = slot;
   return count + 1;
-=======
-/**
- * Fill `slots` with live particle indices in the exact ascending order in
- * which the original fixed pool submits its points.
- */
-export function packActiveParticleSlotsInto(life: ArrayLike<number>, slots: Int32Array): number {
-  let count = 0;
-  for (let slot = 0; slot < life.length; slot++) {
-    if (life[slot] <= 0) continue;
-    slots[count++] = slot;
-  }
-  return count;
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 }
 
 /**

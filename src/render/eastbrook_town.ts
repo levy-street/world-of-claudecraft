@@ -32,13 +32,9 @@ import {
   newEastbrookRoofVisibilityPlan,
 } from './eastbrook_town_visibility_core';
 import { indexExactVertexTuples } from './exact_index_geometry';
-<<<<<<< HEAD
 import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
-=======
-import { GFX, surfaceMat } from './gfx';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 
 const ROOT_NAME = 'eastbrookTownRebuild';

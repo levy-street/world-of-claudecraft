@@ -3532,16 +3532,12 @@ async function startGame(
     return !movementFrozen() ? diagonalMovementVisualFacing(mi, baseFacing) : null;
   }
 
-<<<<<<< HEAD
   const perfNetworkStats = {
     connected: false,
     snapInterval: 0,
     lastSnapAge: -1,
     alpha: 0,
   };
-=======
-  const framePerf = new FramePerfAccounting(perf);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
 
   function frame(now: number): void {
@@ -3579,7 +3575,6 @@ async function startGame(
     }
     playerWasDead = playerDead;
     const frameDtMs = frameDt * 1000;
-<<<<<<< HEAD
     let traceStart = perf.startTrace();
     try {
       input.updateTouchLook(frameDt);
@@ -3598,26 +3593,6 @@ async function startGame(
       updateHoverCursor();
     } finally {
       perf.finishTrace('input.hoverCursor', traceStart, 'active', hoverActive);
-=======
-    framePerf.beginTrace();
-    try {
-      input.updateTouchLook(frameDt);
-    } finally {
-      framePerf.finishTouchLook(frameDtMs);
-    }
-    framePerf.beginTrace();
-    try {
-      gamepad.poll(frameDt);
-    } finally {
-      framePerf.finishGamepad(frameDtMs);
-    }
-    const hoverActive = input.hoverActive;
-    framePerf.beginTrace();
-    try {
-      updateHoverCursor();
-    } finally {
-      framePerf.finishHover(hoverActive);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     }
     perf.markInputFrame(performance.now());
 
@@ -3668,7 +3643,6 @@ async function startGame(
         if (stepFacing !== null) offlineSim.player.facing = stepFacing;
         offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
         perf.markInputSent(performance.now());
-<<<<<<< HEAD
         const simStart = perf.startTime();
         let events: ReturnType<typeof offlineSim.tick>;
         traceStart = perf.startTrace();
@@ -3693,21 +3667,6 @@ async function startGame(
             eventsLength,
           );
           perf.finishTime('events', eventsStart);
-=======
-        let events: ReturnType<typeof offlineSim.tick>;
-        framePerf.beginTimedTrace();
-        try {
-          events = offlineSim.tick();
-        } finally {
-          framePerf.finishSimTick();
-        }
-        const eventsLength = events.length;
-        framePerf.beginTimedTrace();
-        try {
-          hud.handleEvents(events);
-        } finally {
-          framePerf.finishEvents('offline', eventsLength);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         }
         // A tick consumed the latched release facing (movementFacing fed
         // stepFacing above); drop it so it is not re-applied next frame.
@@ -3715,19 +3674,11 @@ async function startGame(
         acc -= DT;
       }
       const pp = offlineSim.player;
-<<<<<<< HEAD
       traceStart = perf.startTrace();
       try {
         updateCamera(frameDt, pp.prevFacing + wrapAngle(pp.facing - pp.prevFacing) * (acc / DT));
       } finally {
         perf.finishTrace('camera.follow', traceStart, 'mode', 'offline', 'frameDtMs', frameDtMs);
-=======
-      framePerf.beginTrace();
-      try {
-        updateCamera(frameDt, pp.prevFacing + wrapAngle(pp.facing - pp.prevFacing) * (acc / DT));
-      } finally {
-        framePerf.finishCamera('offline', frameDtMs, 0, -1);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
       }
       introCameraTick(now);
       renderer.camYaw = input.camYaw;
@@ -3740,7 +3691,6 @@ async function startGame(
         movementFacing;
       const offlineAlpha = acc / DT;
       const offlineViews = renderer.views.size;
-<<<<<<< HEAD
       const rendererStart = perf.startTime();
       traceStart = perf.startTrace();
       try {
@@ -3773,27 +3723,6 @@ async function startGame(
       } finally {
         perf.finishTrace('hud.update', traceStart, 'mode', 'offline');
         perf.finishTime('hud', hudStart);
-=======
-      framePerf.beginTimedTrace();
-      try {
-        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null);
-      } finally {
-        framePerf.finishRenderer('offline', offlineViews, offlineAlpha, frameDtMs);
-      }
-      framePerf.beginTrace();
-      try {
-        updateClickMoveMarker();
-      } finally {
-        framePerf.finishClickMoveMarker();
-      }
-      perf.markInputVisible(performance.now());
-      if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-      framePerf.beginTimedTrace();
-      try {
-        hud.update();
-      } finally {
-        framePerf.finishHud('offline');
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
       }
       perf.tick(now);
       entryDiagnostics.renderedFrame(now);
@@ -3872,7 +3801,6 @@ async function startGame(
       net.playerId,
     );
     const drainedEventsLength = drainedEvents.length;
-<<<<<<< HEAD
     const eventsStart = perf.startTime();
     traceStart = perf.startTrace();
     try {
@@ -3919,46 +3847,6 @@ async function startGame(
       net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1;
     perfNetworkStats.alpha = Math.round(alpha * 100) / 100;
     perf.setNetwork(perfNetworkStats);
-=======
-    framePerf.beginTimedTrace();
-    try {
-      hud.handleEvents(drainedEvents);
-    } finally {
-      framePerf.finishEvents('online', drainedEventsLength);
-    }
-    if (net.consumeProfanityChanged()) {
-      const profanityWordsLength = net.profanityWords.length;
-      framePerf.beginTrace();
-      try {
-        hud.setProfanityWords(net.profanityWords);
-      } finally {
-        framePerf.finishProfanityWords(profanityWordsLength);
-      }
-    }
-    if (net.consumeInventoryChanged()) {
-      framePerf.beginTrace();
-      try {
-        hud.onInventoryChanged();
-      } finally {
-        framePerf.finishInventoryChanged();
-      }
-    }
-    if (net.consumeCosmeticsChanged()) {
-      framePerf.beginTrace();
-      try {
-        hud.onCosmeticsChanged();
-      } finally {
-        framePerf.finishCosmeticsChanged();
-      }
-    }
-    framePerf.publishOnlineNetwork(
-      net.connected,
-      net.snapInterval,
-      net.lastSnapAt,
-      performance.now(),
-      alpha,
-    );
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     // Always-on net-pipeline counters (net_pipeline_stats.ts): fold the
     // snapshots-applied-since-last-frame count, then publish the stats source
     // UNGATED (ruling R9), unlike the overlay-gated setNetwork above; the
@@ -3996,7 +3884,6 @@ async function startGame(
           frameDt,
         );
     const cameraLastSnapAge = net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1;
-<<<<<<< HEAD
     traceStart = perf.startTrace();
     try {
       updateCamera(frameDt, kbFacing ?? interpServerFacing);
@@ -4013,13 +3900,6 @@ async function startGame(
         'lastSnapAge',
         cameraLastSnapAge,
       );
-=======
-    framePerf.beginTrace();
-    try {
-      updateCamera(frameDt, kbFacing ?? interpServerFacing);
-    } finally {
-      framePerf.finishCamera('online', frameDtMs, alpha, cameraLastSnapAge);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     }
     introCameraTick(now);
     renderer.camYaw = input.camYaw;
@@ -4027,12 +3907,8 @@ async function startGame(
     renderer.camDist = input.camDist;
     syncGroundAimReticle();
     const onlineViews = renderer.views.size;
-<<<<<<< HEAD
     const rendererStart = perf.startTime();
     traceStart = perf.startTrace();
-=======
-    framePerf.beginTimedTrace();
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     try {
       renderer.sync(
         alpha,
@@ -4047,7 +3923,6 @@ async function startGame(
         selfAuthoritativeDiscontinuity,
       );
     } finally {
-<<<<<<< HEAD
       perf.finishTrace(
         'renderer.sync',
         traceStart,
@@ -4067,20 +3942,10 @@ async function startGame(
       updateClickMoveMarker();
     } finally {
       perf.finishTrace('ui.clickMoveMarker', traceStart);
-=======
-      framePerf.finishRenderer('online', onlineViews, alpha, frameDtMs);
-    }
-    framePerf.beginTrace();
-    try {
-      updateClickMoveMarker();
-    } finally {
-      framePerf.finishClickMoveMarker();
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     }
     maybeShowImmobileNote(now);
     perf.markInputVisible(performance.now());
     if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-<<<<<<< HEAD
     const hudStart = perf.startTime();
     traceStart = perf.startTrace();
     try {
@@ -4088,13 +3953,6 @@ async function startGame(
     } finally {
       perf.finishTrace('hud.update', traceStart, 'mode', 'online');
       perf.finishTime('hud', hudStart);
-=======
-    framePerf.beginTimedTrace();
-    try {
-      hud.update();
-    } finally {
-      framePerf.finishHud('online');
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     }
     perf.tick(now);
     entryDiagnostics.renderedFrame(now);

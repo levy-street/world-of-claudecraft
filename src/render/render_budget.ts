@@ -169,20 +169,14 @@ const SUBMIT_STALL_HOLD_SECONDS: Record<GfxTier, number> = {
   medium: 14,
   high: 8,
   ultra: 6,
-<<<<<<< HEAD
   insane: 6,
-=======
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 };
 const SUBMIT_STALL_URGENT_HOLD_SECONDS: Record<GfxTier, number> = {
   low: 30,
   medium: 24,
   high: 14,
   ultra: 12,
-<<<<<<< HEAD
   insane: 12,
-=======
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 };
 const SUBMIT_STALL_RECOVERY_CEILING_MS = 42;
 const EXTERNAL_FRAME_CAP_MIN_MS = 28;

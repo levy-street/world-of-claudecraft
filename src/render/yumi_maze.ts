@@ -12,7 +12,6 @@ import { groundHeight } from '../sim/world';
 import { YUMI_MAZE_WALL_HEIGHT, yumiMazeLayout } from '../sim/yumi_maze_layout';
 import type { IWorld } from '../world_api';
 import { loadGltf } from './assets/loader';
-<<<<<<< HEAD
 import { registerPreload } from './assets/preload';
 import { EMISSIVE_LIGHT, surfaceMat } from './gfx';
 import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
@@ -21,10 +20,6 @@ import {
   occluderSegmentHitsBox,
   stepOccluderFade,
 } from './occluder_fade_core';
-=======
-import { registerDeferredPreload } from './assets/preload';
-import { surfaceMat } from './gfx';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { stoneTexture } from './textures';
 
 // GLB-backed static bodies (Tripo-generated, see public/models/props), with a

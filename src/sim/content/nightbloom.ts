@@ -181,14 +181,7 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7.5,
     aggroRadius: 14,
     elite: true,
-<<<<<<< HEAD
     loot: [{ copper: 100, chance: 1 }],
-=======
-    loot: [
-      { copper: 100, chance: 1 },
-      { itemId: 'bone_fragments', chance: 1 },
-    ],
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     scale: 1.5,
     color: 0xb8cce8,
   },
@@ -209,14 +202,7 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 14,
     moveSpeed: 7,
     aggroRadius: 12,
-<<<<<<< HEAD
     loot: [{ copper: 100, chance: 1 }],
-=======
-    loot: [
-      { copper: 100, chance: 1 },
-      { itemId: 'bone_fragments', chance: 0.5 },
-    ],
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     scale: 1.15,
     color: 0x9fb0c4,
   },

@@ -91,7 +91,6 @@ function loader(): GLTFLoader {
   return gltfLoader;
 }
 
-<<<<<<< HEAD
 // Central GLB texture polish: 4-tap anisotropic filtering on every color and
 // normal map sharpens ground-adjacent props and walls at oblique camera angles
 // for free (mip selection alone smears them). Runs once per parsed GLB, right
@@ -121,30 +120,6 @@ function polishGltfTextures(gltf: GLTF): void {
       lift(std.normalMap ?? null);
     }
   });
-=======
-// Dev-channel load telemetry (English on purpose, console.* only): one line per
-// asset fetch start/settle so a device console shows exactly how far through the
-// preload set a WebContent kill lands and which asset preceded it (the iPhone 17
-// Pro entry-kill investigation: WebContent died at 1.54 GB resident mid-decode
-// with no JS error, so sequencing evidence has to come from the console, not
-// from error handlers). Gated like the residency table: dev browsers plus the
-// native iOS profile under diagnosis. The production WEB population must not
-// pay ~700 console lines per entry; the native Release shell suppresses the JS
-// console anyway, and a Debug shell attached for diagnosis sees every line.
-function loadDiagEnabled(): boolean {
-  return import.meta.env.DEV || GFX.nativeIosMemoryProfile;
-}
-let loadDiagSeq = 0;
-function diagStart(kind: string, resolved: string): number {
-  if (!loadDiagEnabled()) return 0;
-  const seq = ++loadDiagSeq;
-  console.info(`[load-diag] ${seq} ${kind} start ${resolved}`);
-  return seq;
-}
-function diagSettle(seq: number, kind: string, resolved: string, ok: boolean): void {
-  if (!loadDiagEnabled()) return;
-  console.info(`[load-diag] ${seq} ${kind} ${ok ? 'done' : 'FAIL'} ${resolved}`);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 }
 
 /** Load + parse a .glb once; subsequent calls share the same parsed scene.

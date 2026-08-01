@@ -2191,11 +2191,7 @@ export const cs_CZ: EnTranslations = {
         "noRecipient": "Nikdo s tímto jménem zde poštovní schránku nemá.",
         "tooManyParcels": "Dopis unese nejvýše {count} balíků.",
         "noMailQuestItems": "Úkolové předměty nelze posílat poštou.",
-<<<<<<< HEAD
         "noMailBound": "That item is bound and cannot be mailed.",
-=======
-        "noMailBound": "Tento předmět je vázaný a nelze ho poslat poštou.",
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "notEnoughItems": "Nemáš tolik kusů k odeslání.",
         "cantAffordPostage": "Nemůžeš si dovolit poštovné.",
         "recipientBoxFull": "Jejich poštovní schránka je plná.",
@@ -6556,11 +6552,7 @@ export const cs_CZ: EnTranslations = {
       "tradeExpired": "Žádost o obchod vypršela.",
       "tradeFailed": "Obchod selhal: předměty nebo peníze už nejsou dostupné.",
       "tradeBound": "Tento předmět je vázaný a nelze ho vyměnit.",
-<<<<<<< HEAD
       "marketListBound": "That item is bound and cannot be listed."
-=======
-      "marketListBound": "Tento předmět je vázaný a nelze ho nabídnout k prodeji."
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     },
     "logs": {
       "standUp": "Vstáváš.",

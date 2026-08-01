@@ -2191,11 +2191,7 @@ export const nl_NL: EnTranslations = {
         "noRecipient": "Niemand met die naam heeft hier een brievenbus.",
         "tooManyParcels": "Een brief draagt hoogstens {count} pakketten.",
         "noMailQuestItems": "Je kunt geen opdrachtvoorwerpen versturen.",
-<<<<<<< HEAD
         "noMailBound": "That item is bound and cannot be mailed.",
-=======
-        "noMailBound": "Dat voorwerp is gebonden en kan niet worden verstuurd.",
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "notEnoughItems": "Zoveel heb je er niet om te versturen.",
         "cantAffordPostage": "Je kunt de porto niet betalen.",
         "recipientBoxFull": "Hun brievenbus is vol.",
@@ -6556,11 +6552,7 @@ export const nl_NL: EnTranslations = {
       "tradeExpired": "Het ruilverzoek is verlopen.",
       "tradeFailed": "Ruil mislukt: voorwerpen of geld niet langer beschikbaar.",
       "tradeBound": "Dat voorwerp is gebonden en kan niet worden verhandeld.",
-<<<<<<< HEAD
       "marketListBound": "That item is bound and cannot be listed."
-=======
-      "marketListBound": "Dat voorwerp is gebonden en kan niet te koop worden aangeboden."
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     },
     "logs": {
       "standUp": "Je staat op.",

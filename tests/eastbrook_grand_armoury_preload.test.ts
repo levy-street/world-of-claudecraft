@@ -52,7 +52,6 @@ describe('Eastbrook Grand Armoury preload', () => {
 
     expect(mocks.loadGltf).toHaveBeenCalledTimes(1);
     expect(mocks.loadGltf).toHaveBeenCalledWith('/models/props/eastbrook_grand_armoury.glb');
-<<<<<<< HEAD
     const atlasLoads = mocks.loadTexture.mock.calls
       .map(([url], index) => ({
         url,
@@ -64,12 +63,6 @@ describe('Eastbrook Grand Armoury preload', () => {
     expect(registrationOrders).toContain(mocks.loadGltf.mock.invocationCallOrder[0] + 1);
     expect(registrationOrders).toContain(atlasLoads[0].order + 1);
     const registered = mocks.registerPreload.mock.calls.map(([promise]) => promise);
-=======
-    expect(mocks.loadTexture).toHaveBeenCalledTimes(1);
-    expect(mocks.loadTexture).toHaveBeenCalledWith('/textures/eastbrook_surface_atlas.webp');
-    expect(mocks.registerDeferredPreload).toHaveBeenCalledTimes(2);
-    const registered = mocks.registerDeferredPreload.mock.results.map((r) => r.value);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     expect(registered.every((promise) => promise instanceof Promise)).toBe(true);
     let gateSettled = false;
     const gate = Promise.all(registered).then(() => {

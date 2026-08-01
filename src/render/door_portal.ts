@@ -2,12 +2,8 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
-<<<<<<< HEAD
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
-=======
-import { registerDeferredPreload } from './assets/preload';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { applyWornStone } from './worn_stone';
 

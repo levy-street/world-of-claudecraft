@@ -290,12 +290,9 @@ const RENDER_PURE_CORES = [
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
-<<<<<<< HEAD
   'src/render/foliage_shader_core.ts',
   'src/render/gfx_aa_policy_core.ts',
   'src/render/gfx_override_core.ts',
-=======
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   'src/render/ground_aim_reticle_core.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
@@ -312,7 +309,6 @@ const RENDER_PURE_CORES = [
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
   'src/render/opaque_draw_order_core.ts',
-<<<<<<< HEAD
   'src/render/perceptual_lod_core.ts',
   'src/render/prop_cell_core.ts',
   'src/render/race_line_core.ts',
@@ -322,15 +318,6 @@ const RENDER_PURE_CORES = [
   'src/render/shadow_pass_gate_core.ts',
   'src/render/terrain_region_core.ts',
   'src/render/terrain_splat_presence_core.ts',
-=======
-  'src/render/prop_cell_core.ts',
-  'src/render/race_line_core.ts',
-  'src/render/scene_census_core.ts',
-  'src/render/renderer_frame_telemetry_core.ts',
-  'src/render/sea_mist_core.ts',
-  'src/render/shadow_pass_gate_core.ts',
-  'src/render/terrain_region_core.ts',
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   'src/render/vfx_pool_core.ts',
   'src/render/view_candidate_pool_core.ts',
   'src/render/water_core.ts',
@@ -343,11 +330,7 @@ const RENDER_PURE_CORES = [
   'src/render/foliage_lod.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
-<<<<<<< HEAD
   'src/render/resident_scenery_core.ts',
-=======
-  'src/render/player_aura_rings_core.ts',
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   'src/render/warrior_cast_fx_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/characters/skeleton_update_core.ts',

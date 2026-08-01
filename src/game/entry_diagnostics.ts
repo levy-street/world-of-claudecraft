@@ -108,15 +108,9 @@ export function createEntryDiagnosticsController(options: {
     if (STICKY_CHECKPOINTS.has(nextCheckpoint)) stickyCheckpoint = nextCheckpoint;
     if (resetTarget === stickyCheckpoint) stickyCheckpoint = null;
     persistence.checkpoint(nextCheckpoint, wallNow(), diagnostics);
-<<<<<<< HEAD
     if (!QUIET_CHECKPOINTS.has(nextCheckpoint)) {
       log(`[entry-diag] checkpoint=${nextCheckpoint}`, diagnostics);
     }
-=======
-    lastCheckpoint = nextCheckpoint;
-    lastDiagnostics = diagnostics;
-    log(`[entry-diag] checkpoint=${nextCheckpoint}`, diagnostics);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   };
 
   const controller: EntryDiagnosticsController = {

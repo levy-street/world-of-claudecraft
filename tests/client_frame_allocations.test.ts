@@ -30,7 +30,6 @@ function findFrameFunction(): ts.FunctionDeclaration {
 }
 
 describe('client frame allocation guards', () => {
-<<<<<<< HEAD
   it('passes no eager allocation to any frame trace scope', () => {
     const frame = findFrameFunction();
     const eagerAllocations: string[] = [];
@@ -40,17 +39,11 @@ describe('client frame allocation guards', () => {
       detailValues: string[];
       finishesInFinally: boolean;
     }> = [];
-=======
-  it('delegates every frame trace scope to the reusable accounting helper', () => {
-    const frame = findFrameFunction();
-    const finishers: Array<{ name: string; finishesInFinally: boolean }> = [];
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 
     const visit = (node: ts.Node): void => {
       if (
         ts.isCallExpression(node) &&
         ts.isPropertyAccessExpression(node.expression) &&
-<<<<<<< HEAD
         node.expression.expression.getText(sourceFile) === 'perf' &&
         node.expression.name.text === 'finishTrace'
       ) {
@@ -63,11 +56,6 @@ describe('client frame allocation guards', () => {
           .slice(2)
           .filter((_, index) => index % 2 === 1)
           .map((argument) => argument.getText(sourceFile).replaceAll("'", ''));
-=======
-        node.expression.expression.getText(sourceFile) === 'framePerf' &&
-        node.expression.name.text.startsWith('finish')
-      ) {
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         let ancestor: ts.Node | undefined = node.parent;
         let finishesInFinally = false;
         while (ancestor && ancestor !== frame) {
@@ -81,7 +69,6 @@ describe('client frame allocation guards', () => {
           }
           ancestor = ancestor.parent;
         }
-<<<<<<< HEAD
         finishedTraces.push({
           name: name.getText(sourceFile).replaceAll("'", ''),
           detailKeys,
@@ -99,15 +86,11 @@ describe('client frame allocation guards', () => {
             eagerAllocations.push(argument.getText(sourceFile));
           }
         }
-=======
-        finishers.push({ name: node.expression.name.text, finishesInFinally });
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
       }
       ts.forEachChild(node, visit);
     };
 
     visit(frame);
-<<<<<<< HEAD
     expect(finishedTraces).toEqual([
       {
         name: 'input.updateTouchLook',
@@ -215,31 +198,6 @@ describe('client frame allocation guards', () => {
     expect(eagerAllocations).toEqual([]);
     expect(frame.getText(sourceFile)).not.toContain('perf.trace(');
     expect(frame.getText(sourceFile)).not.toContain('perf.time(');
-=======
-    expect(finishers).toEqual([
-      { name: 'finishTouchLook', finishesInFinally: true },
-      { name: 'finishGamepad', finishesInFinally: true },
-      { name: 'finishHover', finishesInFinally: true },
-      { name: 'finishSimTick', finishesInFinally: true },
-      { name: 'finishEvents', finishesInFinally: true },
-      { name: 'finishCamera', finishesInFinally: true },
-      { name: 'finishRenderer', finishesInFinally: true },
-      { name: 'finishClickMoveMarker', finishesInFinally: true },
-      { name: 'finishHud', finishesInFinally: true },
-      { name: 'finishEvents', finishesInFinally: true },
-      { name: 'finishProfanityWords', finishesInFinally: true },
-      { name: 'finishInventoryChanged', finishesInFinally: true },
-      { name: 'finishCosmeticsChanged', finishesInFinally: true },
-      { name: 'finishCamera', finishesInFinally: true },
-      { name: 'finishRenderer', finishesInFinally: true },
-      { name: 'finishClickMoveMarker', finishesInFinally: true },
-      { name: 'finishHud', finishesInFinally: true },
-    ]);
-    expect(frame.getText(sourceFile)).not.toContain('perf.trace(');
-    expect(frame.getText(sourceFile)).not.toContain('perf.time(');
-    expect(frame.getText(sourceFile)).not.toContain('perf.finishTrace(');
-    expect(frame.getText(sourceFile)).not.toContain('perf.finishTime(');
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 
     const initializers = new Map<string, string>();
     const findInitializers = (node: ts.Node): void => {

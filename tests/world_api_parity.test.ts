@@ -494,22 +494,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Rift + mounts surface. The v0.31.0 base merge added the release's three new
     // members on top of the branch's 272; making reins usable items then removed
     // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
-<<<<<<< HEAD
     // activeMasterLootRolls, then the renderer-only rift collision token leaves
     // the public seam with 273; the instance-payload pipes then add
     // marketListInstance, leaving 274.
     expect(IWORLD_MEMBERS.length).toBe(274);
     expect(DATA_MEMBERS.length).toBe(71);
     expect(METHOD_MEMBERS.length).toBe(203);
-=======
-    // activeMasterLootRolls, leaving 274; the rift floor timer HUD adds
-    // riftEventMsRemaining and the instance-payload pipes add
-    // marketListInstance, leaving 276. Reactive aura timing adds
-    // reactiveAbilityWindowRemaining, leaving 277.
-    expect(IWORLD_MEMBERS.length).toBe(277);
-    expect(DATA_MEMBERS.length).toBe(72);
-    expect(METHOD_MEMBERS.length).toBe(205);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -735,11 +725,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'revivePet',
       'ridingTrained',
       'riftBossDeathZones',
-<<<<<<< HEAD
-=======
-      'riftCollisionToken',
-      'riftEventMsRemaining',
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
       'riftFloor',
       'salvageItem',
       'saveActionBarLayout',

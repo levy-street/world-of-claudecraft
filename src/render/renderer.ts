@@ -189,11 +189,7 @@ import { FrozenOrbFx } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { gardenMazeCameraLift } from './garden_maze_core';
-<<<<<<< HEAD
 import { buildGatherNodes, type GatherNodesView, resolveGatherNodePick } from './gather_nodes';
-=======
-import { buildGatherNodes, resolveGatherNodePick } from './gather_nodes';
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import {
   GFX,
   type GfxBucketBands,
@@ -250,10 +246,7 @@ import {
   opaqueMaterialFirstSort,
   shouldUseFrontToBackOpaqueSort,
 } from './opaque_draw_order_core';
-<<<<<<< HEAD
 import { projectionScalePixels } from './perceptual_lod_core';
-=======
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
@@ -302,10 +295,7 @@ import {
   type SceneCensusHost,
   type SceneCensusReport,
 } from './scene_census_core';
-<<<<<<< HEAD
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
-=======
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
@@ -1357,7 +1347,6 @@ export class Renderer {
   private drawStats: DrawStatsAccumulator | null = null;
   // Last completed frame's draw delta (what perfStats serves on composer tiers).
   private drawStatsFrame: DrawStatsCounters = { calls: 0, triangles: 0, points: 0, lines: 0 };
-<<<<<<< HEAD
   private opaqueFrontToBackActive: boolean | null = null;
   private readonly opaqueSortPolicyInput: OpaqueSortPolicyInput = {
     drawCalls: 0,
@@ -1367,8 +1356,6 @@ export class Renderer {
     previousFocusX: Number.NaN,
     previousFocusZ: Number.NaN,
   };
-=======
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   // Hitch correlation (scene_census_core): fed per frame only while the ?perf
   // overlay has it enabled, so the fleet pays nothing for it. The sample is a
   // reused scratch object so the per-frame path stays allocation-free.
@@ -1385,23 +1372,10 @@ export class Renderer {
   // The census burst inflates the following frame's dt; skip that one sample
   // so the tracker never charges the census to the scene.
   private hitchSkipNextFrame = false;
-<<<<<<< HEAD
   // Tone-mapping exposure at brightness 1.0. Applied in OutputPass, i.e.
   // AFTER bloom, so this trims the raised sun rig back to the old apparent
   // brightness without moving anything across BLOOM_THRESHOLD.
   private baseExposure = 1;
-=======
-  private opaqueFrontToBackActive: boolean | null = null;
-  private readonly opaqueSortPolicyInput: OpaqueSortPolicyInput = {
-    drawCalls: 0,
-    elapsedSeconds: 0,
-    focusX: 0,
-    focusZ: 0,
-    previousFocusX: Number.NaN,
-    previousFocusZ: Number.NaN,
-  };
-  private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   private tmpV = new THREE.Vector3();
   private tmpPuff = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
@@ -2108,18 +2082,10 @@ export class Renderer {
     // Terrain chunks never move after build (the LOD update only toggles
     // visibility): stop their per-frame matrix recompose (static_matrix.ts).
     freezeStaticSubtreeMatrices(this.terrainView.group);
-<<<<<<< HEAD
-=======
-    bd('terrain');
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     this.waterView = buildWater(this.sim.cfg.seed, this.webgl);
     setRenderCategory(this.waterView.group, 'water');
     this.scene.add(this.waterView.group);
     freezeStaticSubtreeMatrices(this.waterView.group); // water animates via uniforms, never transforms
-<<<<<<< HEAD
-=======
-    bd('water');
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 
     this.foliage = buildFoliage(this.sim.cfg.seed);
     setRenderCategory(this.foliage.group, 'foliage');
@@ -2231,10 +2197,6 @@ export class Renderer {
     this.eastbrookTownView = buildEastbrookTownView(this.sim.cfg.seed);
     setRenderCategory(this.eastbrookTownView.group, 'props');
     this.scene.add(this.eastbrookTownView.group);
-<<<<<<< HEAD
-=======
-    bd('eastbrook-town');
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     freezeStaticSubtreeMatrices(this.eastbrookTownView.group);
 
     // Map-editor play-test: freely placed GLB models (cosmetic, render-only). Loads
@@ -2252,7 +2214,6 @@ export class Renderer {
     setRenderCategory(this.jailScene.group, 'props');
     this.scene.add(this.jailScene.group);
 
-<<<<<<< HEAD
     this.gatherNodes = buildGatherNodes(this.sim.cfg.seed);
     setRenderCategory(this.gatherNodes.group, 'props');
     this.scene.add(this.gatherNodes.group);
@@ -2260,15 +2221,6 @@ export class Renderer {
     // below changes only provably unreachable directional-shadow eligibility.
     freezeStaticSubtreeMatrices(this.gatherNodes.group);
     this.gatherNodeMeshes = this.gatherNodes.group.children;
-=======
-    const gatherNodes = buildGatherNodes(this.sim.cfg.seed);
-    setRenderCategory(gatherNodes.group, 'props');
-    this.scene.add(gatherNodes.group);
-    // Baked into world space at build with no per-frame update(), same as props.
-    freezeStaticSubtreeMatrices(gatherNodes.group);
-    this.gatherNodeMeshes = gatherNodes.group.children;
-    bd('jail-gather');
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 
     // Crafting-station scenery (Professions 2.0): static, except the kitchens
     // fire, whose flame + light join the campfire flicker/ember pass above.
@@ -3824,13 +3776,8 @@ export class Renderer {
     sample.grassVisibleChunks = this.lastFrameStats.foliage.grassVisibleChunks;
     sample.activeViews = this.lastFrameStats.activeViews;
     sample.createdViews = this.lastFrameStats.createdViews;
-<<<<<<< HEAD
     sample.minRenderScale = resolutionRange.minRenderScale;
     sample.maxRenderScale = resolutionRange.maxRenderScale;
-=======
-    sample.minRenderScale = lockedRenderScale;
-    sample.maxRenderScale = lockedRenderScale;
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     const state = this.renderBudgetGovernor.update(sample, this.renderBudgetState);
     this.frameMsEma = state.frameMsEma;
     this.adaptiveCooldown = state.cooldownSeconds;
@@ -8791,16 +8738,7 @@ export class Renderer {
       if (!priorState) this.flamePerceptualStates.set(f, state);
       if (state.emitsEmber) this.vfx.campfireEmber(state.worldPosition, dt);
     }
-<<<<<<< HEAD
     this.budgetFireLights(p.pos.x, p.pos.z, true);
-=======
-    for (let i = 0; i < this.fireLights.length; i++) {
-      const light = this.fireLights[i];
-      const base = (light.userData.baseIntensity as number | undefined) ?? 11;
-      light.intensity = base + Math.sin(this.time * 11 + i * 1.7) * 2.5 * (base / 11);
-    }
-    this.budgetFireLights(p.pos.x, p.pos.z);
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'lights', worldStart);
 
     // water shimmer (low-tier texture scroll; shader water rides uTime)
@@ -9011,15 +8949,12 @@ export class Renderer {
       this.camera.position.y += shakeY;
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
     }
-<<<<<<< HEAD
     this.jailScene.updateVisibility(this.camera, this.sun);
     if (this.sun.castShadow) {
       this.shadowLightDirection.subVectors(this.sun.position, this.sun.target.position).normalize();
       this.gatherNodes.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
       this.valeCupStadium.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
     }
-=======
->>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     this.updateOpaqueDrawOrder(dt);
     if (shakeX !== 0 || shakeY !== 0) this.camera.updateMatrixWorld();
     this.vfx.prepareDraw(this.camera);
