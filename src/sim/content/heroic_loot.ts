@@ -709,6 +709,19 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'greatfang_of_the_basin', chance: 0.34, rollGroup: 'wildheart_heroic2' },
     { itemId: 'sunbone_oracles_crown', chance: 0.33, rollGroup: 'wildheart_heroic2' },
     { itemId: 'bloodmane_war_legguards', chance: 0.33, rollGroup: 'wildheart_heroic2' },
+    // Rare mounts (0.1% each). The basin is the FIFTH heroic five-man and the
+    // catalog's two blues are already paired to Ysolei and Korzul, so rather
+    // than a fifth signature mount it carries equal-rate SECONDARY paths to
+    // both, exactly as the Nythraxis heroic raid does for all four five-man
+    // mounts. Per-MOUNT rate parity is the invariant that matters (0.1%
+    // wherever a blue drops), so the basin is never a cheaper route to either
+    // one. It does make the basin the only five-man offering two blues, so its
+    // aggregate blue rate is 0.2% per heroic clear against Ysolei's and
+    // Korzul's 0.1% (owner call, 2026-08-01). Epic mounts stay rift-S
+    // exclusive and never appear here. Appended AFTER the gear roll groups so
+    // the gear draw order stays byte-identical.
+    { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
+    { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
   ],
   nythraxis_scourge_of_thornpeak: [
     // The heroic set pieces and legendaries come free from the heroic loot swap:

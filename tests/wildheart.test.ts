@@ -438,13 +438,16 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
   it('registers the heroic drop table: two roll groups, each summing to exactly 1.0', () => {
     const entries = HEROIC_BOSS_LOOT.wildheart_high_priest;
     expect(entries).toBeDefined();
+    // Gear rides exclusive roll groups; the mounts are group-less independent
+    // rolls appended after them (the house split, tests/dungeons.test.ts).
+    const gear = entries.filter((e) => e.rollGroup !== undefined);
     const groupSum = (group: string) =>
-      entries.filter((e) => e.rollGroup === group).reduce((a, e) => a + e.chance, 0);
+      gear.filter((e) => e.rollGroup === group).reduce((a, e) => a + e.chance, 0);
     expect(groupSum('wildheart_heroic')).toBeCloseTo(1.0, 9);
     expect(groupSum('wildheart_heroic2')).toBeCloseTo(1.0, 9);
-    // Every entry belongs to one of the two groups (no stray chance rolls), and
-    // the group names never collide with the base table's 'wildheart_bonus'.
-    for (const e of entries) {
+    // Every GEAR entry belongs to one of the two groups (no stray chance rolls),
+    // and the group names never collide with the base table's 'wildheart_bonus'.
+    for (const e of gear) {
       expect(['wildheart_heroic', 'wildheart_heroic2']).toContain(e.rollGroup);
     }
     // Six DISTINCT items across the two groups, the shape every other heroic
@@ -455,10 +458,41 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     expect(new Set(ids).size).toBe(ids.length);
     // Per-item literals, not only group sums: 0.9/0.05/0.05 also sums to 1.0
     // but pays one item far above the house 0.33-0.34 per-item band.
-    expect(entries.map((e) => e.chance)).toEqual([0.34, 0.33, 0.33, 0.34, 0.33, 0.33]);
+    expect(gear.map((e) => e.chance)).toEqual([0.34, 0.33, 0.33, 0.34, 0.33, 0.33]);
     expect(
-      entries.filter((e) => e.itemId === 'greatfang_of_the_basin').map((e) => e.rollGroup),
+      gear.filter((e) => e.itemId === 'greatfang_of_the_basin').map((e) => e.rollGroup),
     ).toEqual(['wildheart_heroic2']);
+    // The mounts must stay group-LESS: folding one into a gear group would make
+    // it compete with (and at 0.1% effectively erase) a guaranteed epic.
+    expect(gear.every((e) => ITEMS[e.itemId!]?.kind !== 'mount')).toBe(true);
+  });
+
+  it('carries equal-rate secondary paths to both blue mounts, and to no other mount', () => {
+    const mounts = HEROIC_BOSS_LOOT.wildheart_high_priest.filter((e) => e.rollGroup === undefined);
+    // The two RARE mounts only. Epic mounts are rift-S exclusive, so a five-man
+    // must never become a back door to one; greens belong to the easier pair.
+    expect(mounts.map((e) => e.itemId).sort()).toEqual([
+      'reins_grag_bear',
+      'reins_stalkglider_snail',
+    ]);
+    // Rate derived from rarity rather than hand-listed, the house pattern: a
+    // blue pays 0.1% wherever it drops, so the basin is never a cheaper route
+    // to either mount than Ysolei or Korzul.
+    for (const e of mounts) {
+      const quality = ITEMS[e.itemId!]?.quality;
+      expect(quality, `${e.itemId} is a rare-tier mount`).toBe('rare');
+      expect(e.chance, `${e.itemId} rate`).toBe(0.001);
+    }
+    // Rate parity against the mounts' own primary sources, read from the live
+    // tables so a retune on either side fails here.
+    const rateOn = (boss: string, itemId: string) =>
+      HEROIC_BOSS_LOOT[boss].find((e) => e.itemId === itemId)?.chance;
+    expect(rateOn('wildheart_high_priest', 'reins_grag_bear')).toBe(
+      rateOn('ysolei', 'reins_grag_bear'),
+    );
+    expect(rateOn('wildheart_high_priest', 'reins_stalkglider_snail')).toBe(
+      rateOn('korzul_the_gravewyrm', 'reins_stalkglider_snail'),
+    );
   });
 
   it('registers the basin as a heroic instance: its epic/rare drops mint heroic variants', () => {
@@ -533,8 +567,13 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
   });
 
   it('pays exactly two DISTINCT heroic epics per heroic Zulgar kill', () => {
+    // GEAR ids only: the two mount entries are group-less 0.1% lotteries that
+    // no realistic seed set hits, so counting them here would make the
+    // reachability assertion below unsatisfiable.
     const heroicIds = new Set(
-      HEROIC_BOSS_LOOT.wildheart_high_priest.flatMap((e) => (e.itemId ? [e.itemId] : [])),
+      HEROIC_BOSS_LOOT.wildheart_high_priest.flatMap((e) =>
+        e.itemId && e.rollGroup !== undefined ? [e.itemId] : [],
+      ),
     );
     const seen = new Set<string>();
     for (const seed of [3, 8, 11, 42, 97, 123]) {
