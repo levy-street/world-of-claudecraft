@@ -198,8 +198,14 @@ const TREE_MODEL_URLS: ReadonlySet<string> = new Set([
   ...MODEL_URLS.twisted,
   ...MODEL_URLS.dead,
 ]);
+const DRESSING_MODEL_URLS: ReadonlySet<string> = new Set([
+  ...MODEL_URLS.bush,
+  ...MODEL_URLS.bushFlowers,
+  ...MODEL_URLS.fern,
+  ...MODEL_URLS.mushroom,
+]);
 const collapseRoleForUrl = (url: string): CollapseRole =>
-  TREE_MODEL_URLS.has(url) ? 'tree' : 'plain';
+  TREE_MODEL_URLS.has(url) ? 'tree' : DRESSING_MODEL_URLS.has(url) ? 'dressing' : 'plain';
 
 // kick off fetches at import; buildFoliage assumes the cache is populated
 const loadedModels = new Map<string, GLTF>();
@@ -513,6 +519,8 @@ interface BucketMesh {
   radius: number;
   minDist?: number;
   maxDist?: number;
+  /** maxDist is enforced per instance; this bucket is a coverage bound only. */
+  maxAtInstance?: boolean;
   // The real model ends, and the impostor begins, at the RUNTIME tree-detail
   // distance (it tracks fog, so it is unknown when the bucket is built). These
   // compose with the numeric caps above rather than replacing them: near-fill
@@ -1882,6 +1890,7 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
           z: bz,
           radius: bRadius,
           maxDist: lodDists().dressFar,
+          maxAtInstance: true,
           lod: 'dressing',
           ...bucketMeshCost(im),
         });
@@ -3062,13 +3071,19 @@ export function buildFoliage(seed: number): FoliageView {
     maxDist: undefined,
     minAtDetail: undefined,
     maxAtDetail: undefined,
+    maxAtInstance: undefined,
     distanceScale: 1,
     detailFar: 0,
     revealScale: 1,
     fogLimit: 0,
   };
   // Reused per frame for the same reason as bucketWindow above.
-  const collapseWindows: InstanceCullWindows = { treeMax: 0, impostorMin: 0, fogCull: 0 };
+  const collapseWindows: InstanceCullWindows = {
+    treeMax: 0,
+    impostorMin: 0,
+    fogCull: 0,
+    dressingMax: 0,
+  };
   buildTrees(group, seed, bucketMeshes, treeHideables);
   buildDressing(group, seed, bucketMeshes);
   for (const b of bucketMeshes) {
@@ -3144,7 +3159,14 @@ export function buildFoliage(seed: number): FoliageView {
       // The vertex shaders enforce these same boundaries per INSTANCE, so a
       // surviving slab no longer drags its whole tree population along with it
       // (foliage_collapse.ts; the windows themselves are instanceCullWindows).
-      updateCollapseUniforms(instanceCullWindowsInto(detailFar, fogLimit, collapseWindows));
+      updateCollapseUniforms(
+        instanceCullWindowsInto(
+          detailFar,
+          fogLimit,
+          lodDists().dressFar * distanceScale,
+          collapseWindows,
+        ),
+      );
       modelVisibleBuckets = 0;
       modelVisibleDraws = 0;
       modelVisibleTriangles = 0;
@@ -3168,6 +3190,7 @@ export function buildFoliage(seed: number): FoliageView {
         bucketWindow.maxDist = b.maxDist;
         bucketWindow.minAtDetail = b.minAtDetail;
         bucketWindow.maxAtDetail = b.maxAtDetail;
+        bucketWindow.maxAtInstance = b.maxAtInstance;
         bucketWindow.distanceScale = distanceScale;
         bucketWindow.detailFar = detailFar;
         bucketWindow.revealScale = revealScale;

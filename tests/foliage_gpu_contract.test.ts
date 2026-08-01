@@ -66,4 +66,24 @@ describe('foliage GPU optimization production wiring', () => {
       'shader.fragmentShader = reuseDiffuseMapSampleForEmissive(shader.fragmentShader);',
     );
   });
+
+  it('keeps nearby dressing buckets covered while capping their instances exactly', () => {
+    const dressingModels = /const DRESSING_MODEL_URLS[^=]*= new Set\(\[([\s\S]*?)\]\);/.exec(
+      foliage,
+    )?.[1];
+    expect(dressingModels).toBeDefined();
+    expect(dressingModels).toContain('...MODEL_URLS.bush,');
+    expect(dressingModels).toContain('...MODEL_URLS.bushFlowers,');
+    expect(dressingModels).toContain('...MODEL_URLS.fern,');
+    expect(dressingModels).toContain('...MODEL_URLS.mushroom,');
+    expect(dressingModels).not.toContain('MODEL_URLS.rock');
+    expect(foliage).toContain("DRESSING_MODEL_URLS.has(url) ? 'dressing' : 'plain'");
+    expect(foliage).toMatch(/material: foliageMaterial\([\s\S]*?collapseRoleForUrl\(url\),\s*\),/);
+    expect(foliage).toMatch(
+      /function foliageMaterial\([\s\S]*?applyInstanceCollapse\(mat, role\);/,
+    );
+    expect(foliage).toContain('maxAtInstance: true,');
+    expect(foliage).toContain('lodDists().dressFar * distanceScale');
+    expect(foliage).toContain('bucketWindow.maxAtInstance = b.maxAtInstance;');
+  });
 });
