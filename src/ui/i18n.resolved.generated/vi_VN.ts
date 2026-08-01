@@ -888,6 +888,13 @@ export const vi_VN: EnTranslations = {
       "heroicName": "{name} Anh Hùng",
       "heroicLocked": "Bạn đang bị khóa với {name} Anh Hùng."
     },
+    "riftTracker": {
+      "title": "Rạn Nứt",
+      "floor": "Tầng {current}/{total}",
+      "closesIn": "Đóng sau {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "B",
       "NE": "ĐB",
@@ -915,6 +922,23 @@ export const vi_VN: EnTranslations = {
       "dock": "Đưa thước đo này trở lại cửa sổ thước đo",
       "separate": "Tách {meter}",
       "regroup": "Ghép lại {meter}"
+    },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Thú cưng đang đầy máu",
@@ -959,13 +983,15 @@ export const vi_VN: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Cóc Nhảy Bóng Tối",
       "name_stormfeather_griffin": "Stormfeather Vươn Trời",
       "name_thunderstrut_gobbler": "Thunderstrut, Gà Tây Vĩ Đại",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_stalkglider_snail": "Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.",
       "desc_aether_hover_cycle": "Một cỗ xe phép thuật cơ khí mạnh mẽ, được thiết kế để di chuyển nhanh và lướt sát mặt đất trong chiến đấu.",
       "desc_shadowjump_toad": "Một con cóc khổng lồ, bước chân vững chãi, được huấn luyện những cú nhảy bóng tối nhanh như chớp có thể vượt qua mọi địa hình.",
       "desc_stormfeather_griffin": "Một con sư tử đầu chim bão uy nghi, rảo bước trên mặt đất bằng những móng vuốt được bọc rune, đôi cánh xếp gọn.",
-      "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông."
+      "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
@@ -1271,6 +1297,51 @@ export const vi_VN: EnTranslations = {
       "badges": {
         "backgrounded": "Chạy Nền",
         "offline": "Ngoại Tuyến"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Current class: {class}",
+      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
+      "noProcs": "No supported proc is available for this character.",
+      "enabled": "Show Aura",
+      "icon": "Spell Icon",
+      "arcs": "Side Crescents",
+      "groundRing": "Ground Ring",
+      "groundRingSpellOrder": "Ground Ring: Spell Order",
+      "crescentsSpellOrder": "Side Crescents: Spell Order",
+      "size": "Size",
+      "iconSize": "Icon Size",
+      "crescentBlockSize": "Crescent Block Size",
+      "groundRingBlockSize": "Ground Ring Block Size",
+      "opacity": "Opacity",
+      "color": "Color",
+      "allOn": "All On",
+      "allOff": "All Off",
+      "reposition": "Setup Positions",
+      "positioning": "Positioning: {aura}",
+      "selectAura": "Aura",
+      "done": "Done",
+      "moveLeft": "Move Left",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "moveRight": "Move Right",
+      "moveEarlier": "Move spell inward",
+      "moveLater": "Move spell outward",
+      "screenPosition": "Screen Position",
+      "spellOrder": "Spell Order",
+      "reset": "Reset Position",
+      "spellPosition": "Spell order {position} / {count}",
+      "procs": {
+        "revenge": "Revenge!",
+        "battleTrance": "Battle Trance",
+        "overpowerCharge": "Redhand Empowerment",
+        "suddenDeath": "Sudden Death",
+        "victoryRush": "Victory Rush",
+        "enrage": "Mayhem: Enraged",
+        "heatingUp": "Heating Up",
+        "arcaneCharge": "Arcane Charges",
+        "aetherRush": "Aether Rush"
       }
     },
     "playerCard": {
@@ -2076,6 +2147,14 @@ export const vi_VN: EnTranslations = {
       "benefits": "Hãy liên kết tài khoản Steam từ ứng dụng máy tính để các kỳ công bạn lập được đồng bộ thành thành tựu Steam.",
       "noTicket": "Steam không cung cấp vé liên kết. Hãy khởi động Steam rồi thử lại."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Hòm Thư",
       "subtitle": "Bưu Quạ",
@@ -2120,6 +2199,7 @@ export const vi_VN: EnTranslations = {
         "noRecipient": "Không ai mang tên đó có hòm thư ở đây.",
         "tooManyParcels": "Một lá thư chở tối đa {count} bưu kiện.",
         "noMailQuestItems": "Bạn không thể gửi vật phẩm nhiệm vụ qua thư.",
+        "noMailBound": "Vật phẩm đó đã bị ràng buộc và không thể gửi qua thư.",
         "notEnoughItems": "Bạn không có đủ số lượng đó để gửi.",
         "cantAffordPostage": "Bạn không đủ tiền trả bưu phí.",
         "recipientBoxFull": "Hòm thư của người nhận đã đầy.",
@@ -2926,6 +3006,14 @@ export const vi_VN: EnTranslations = {
       "account_taken": "Tài khoản Steam đó đã được liên kết với một tài khoản khác.",
       "upstream": "Steam không phản hồi. Hãy thử lại sau giây lát."
     },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
+    },
     "wallet": {
       "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại."
     },
@@ -3530,14 +3618,6 @@ export const vi_VN: EnTranslations = {
       "reptile": {
         "name": "Bò Sát",
         "desc": "Những thợ săn máu lạnh với tiếng rít và cú đớp rất riêng của chúng, khác biệt hoàn toàn so với các dã thú máu nóng."
-      },
-      "murloc": {
-        "name": "Vây Ộp Oạp",
-        "desc": "Giống người cá biết kêu ộp oạp sống ở bờ hồ và vũng nước triều, nhanh chóng vây lấy bất cứ thứ gì lội đến quá gần."
-      },
-      "kobold": {
-        "name": "Tiểu Yêu",
-        "desc": "Những kẻ nhặt nhạnh lăng xăng và tinh linh của bãi cỏ, bờ giậu, phiền toái nhiều hơn là nguy hiểm, cho đến khi chúng tụ tập đông đảo."
       },
       "demon": {
         "name": "Ác Ma",
@@ -6479,10 +6559,12 @@ export const vi_VN: EnTranslations = {
       "arenaQueueTrading": "Hãy hoàn tất giao dịch trước khi xếp hàng.",
       "arenaQueueInstance": "Bạn không thể xếp hàng khi đang ở trong hầm ngục.",
       "tradeInProgress": "Một giao dịch đang diễn ra.",
+      "tradeAlreadyTrading": "Người chơi đó đang giao dịch.",
       "tradeTooFar": "Mục tiêu ở quá xa để giao dịch.",
       "tradeExpired": "Yêu cầu giao dịch đã hết hạn.",
       "tradeFailed": "Giao dịch thất bại: vật phẩm hoặc tiền không còn khả dụng.",
-      "tradeBound": "Vật phẩm đó đã bị ràng buộc và không thể giao dịch."
+      "tradeBound": "Vật phẩm đó đã bị ràng buộc và không thể giao dịch.",
+      "marketListBound": "Vật phẩm đó đã bị ràng buộc và không thể rao bán."
     },
     "logs": {
       "standUp": "Bạn đứng dậy.",
@@ -7227,7 +7309,7 @@ export const vi_VN: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Tàng Hình Cao Cấp",
-        "description": "Biến mất trong 20 giây: xóa 2 hiệu ứng sát thương theo thời gian và bạn nhận ít hơn 90% sát thương khi đang tàng hình và trong chốc lát sau đó. (tài năng pháp sư)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Chuỗi Nóng",
@@ -9745,6 +9827,9 @@ export const vi_VN: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Nhẫn Ấn Của The Last Keep"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

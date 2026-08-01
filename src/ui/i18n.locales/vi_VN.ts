@@ -2215,6 +2215,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Lá thư đó không còn trong hòm thư của bạn.',
   'hudChrome.mailbox.result.needRecipient': 'Hãy ghi tên người nhận cho lá thư của bạn.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Bạn không thể gửi vật phẩm nhiệm vụ qua thư.',
+  'hudChrome.mailbox.result.noMailBound': 'Vật phẩm đó đã bị ràng buộc và không thể gửi qua thư.',
   'hudChrome.mailbox.result.noRecipient': 'Không ai mang tên đó có hòm thư ở đây.',
   'hudChrome.mailbox.result.notEnoughItems': 'Bạn không có đủ số lượng đó để gửi.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Hòm thư của người nhận đã đầy.',
@@ -5798,12 +5799,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Những kẻ xâm lược đến từ bên kia các vết rạn, toàn thân là lửa và ác ý. Nơi nào có một kẻ trong chúng đứng, nơi đó không bao giờ cách xa một vết rạn.',
   'guide.family.demon.name': 'Ác Ma',
-  'guide.family.kobold.desc':
-    'Những kẻ nhặt nhạnh lăng xăng và tinh linh của bãi cỏ, bờ giậu, phiền toái nhiều hơn là nguy hiểm, cho đến khi chúng tụ tập đông đảo.',
-  'guide.family.kobold.name': 'Tiểu Yêu',
-  'guide.family.murloc.desc':
-    'Giống người cá biết kêu ộp oạp sống ở bờ hồ và vũng nước triều, nhanh chóng vây lấy bất cứ thứ gì lội đến quá gần.',
-  'guide.family.murloc.name': 'Vây Ộp Oạp',
   'guide.faqPage.a1':
     'Đúng vậy. Cả trò chơi đều miễn phí chơi đến cấp tối đa, và mã nguồn được mở trên GitHub.',
   'guide.faqPage.a10':
@@ -6656,9 +6651,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetTooFar': 'Mục tiêu ở quá xa.',
   'hud.errors.tooClose': 'Quá gần!',
   'hud.errors.tradeBound': 'Vật phẩm đó đã bị ràng buộc và không thể giao dịch.',
+  'hud.errors.marketListBound': 'Vật phẩm đó đã bị ràng buộc và không thể rao bán.',
   'hud.errors.tradeExpired': 'Yêu cầu giao dịch đã hết hạn.',
   'hud.errors.tradeFailed': 'Giao dịch thất bại: vật phẩm hoặc tiền không còn khả dụng.',
   'hud.errors.tradeInProgress': 'Một giao dịch đang diễn ra.',
+  'hud.errors.tradeAlreadyTrading': 'Người chơi đó đang giao dịch.',
   'hud.errors.tradeTooFar': 'Mục tiêu ở quá xa để giao dịch.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Lệnh không xác định: {command}. Hãy thử /s /y /w /p /g.',
@@ -9532,8 +9529,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Hoàn tất thời gian hồi của Bước Chớp, Màn Sương Giá và Tàng Hình Cao Cấp. (tài năng pháp sư)',
   'entities.abilities.greater_invisibility.name': 'Tàng Hình Cao Cấp',
-  'entities.abilities.greater_invisibility.description':
-    'Biến mất trong 20 giây: xóa 2 hiệu ứng sát thương theo thời gian và bạn nhận ít hơn 90% sát thương khi đang tàng hình và trong chốc lát sau đó. (tài năng pháp sư)',
   'entities.abilities.hot_streak.name': 'Chuỗi Nóng',
   'entities.abilities.hot_streak.description':
     'Nội tại: hai đòn chí mạng liên tiếp bằng phép Lửa của bạn (Tia Tàn Lửa, Mưa Tàn Lửa, Bỏng Rát, Thương Liệt Hỏa hoặc Cú Đánh Lửa) khiến Thương Liệt Hỏa hoặc Cú Đánh Lửa tiếp theo được thi triển tức thì và miễn phí. Phép tiêu hao được tính cho chuỗi TIẾP THEO, kể cả lần thi triển miễn phí; một Cú Đánh Lửa chỉ được tính một lần dù trúng bao nhiêu kẻ địch, và chỉ cú va chạm đầu tiên được tính. (Lửa)',
@@ -10839,4 +10834,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'sim.rift.socketsShut': 'Các hốc khóa kèn kẹt đóng lại. Con đường lay động.',
   'sim.rift.stepBack': 'Bạn bước lùi qua Rạn Nứt.',
   'sim.rift.wayDownOpens': 'Lối đi xuống xé toạc mở ra.',
+  'hudChrome.riftTracker.title': 'Rạn Nứt',
+  'hudChrome.riftTracker.floor': 'Tầng {current}/{total}',
+  'hudChrome.riftTracker.closesIn': 'Đóng sau {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

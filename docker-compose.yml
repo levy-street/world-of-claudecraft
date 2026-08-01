@@ -147,6 +147,15 @@ services:
       STEAM_ENABLED: ${STEAM_ENABLED:-}
       STEAM_APP_ID: ${STEAM_APP_ID:-}
       STEAM_WEB_API_KEY: ${STEAM_WEB_API_KEY:-}
+      # Optional Epic account link and Book of Deeds achievement mirror.
+      # Dark unless EPIC_ENABLED is exactly 1 (see DEPLOY.md). Secrets stay on
+      # the host .env; never commit real values.
+      EPIC_ENABLED: ${EPIC_ENABLED:-}
+      EPIC_PRODUCT_ID: ${EPIC_PRODUCT_ID:-}
+      EPIC_SANDBOX_ID: ${EPIC_SANDBOX_ID:-}
+      EPIC_DEPLOYMENT_ID: ${EPIC_DEPLOYMENT_ID:-}
+      EPIC_CLIENT_ID: ${EPIC_CLIENT_ID:-}
+      EPIC_CLIENT_SECRET: ${EPIC_CLIENT_SECRET:-}
       # Optional deployable SFX packs live outside the image. Export from SFX
       # Studio, run its installer against the host overlay root, and this server
       # reads only the stable runtime manifest plus immutable audio blobs here.

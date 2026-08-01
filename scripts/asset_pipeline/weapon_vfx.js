@@ -1937,7 +1937,9 @@ function deriveEmissive(mat, e) {
   mat.metalnessMap = null;
   mat.roughnessMap = null;
   const img = mat.map?.image;
-  if (!img || !img.width) {
+  // Mirror of src/render/weapon_vfx.ts: a compressed (KTX2) map is not
+  // drawable into a canvas, take the flat-tint fallback instead of throwing.
+  if (!img || !img.width || mat.map?.isCompressedTexture) {
     mat.emissive = new THREE.Color(e.tint);
     mat.emissiveIntensity = 0.3;
     return { prev, tex: null, albedoTex: null };

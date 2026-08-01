@@ -32,10 +32,14 @@ vi.mock('../server/deeds_db', () => ({
   getDeedBroadcasts: vi.fn(async () => true),
 }));
 
-// The Steam mirror observes the recorder (deeds_records calls onDeedRecorded
-// after each character_deeds upsert resolves); spy it so that wiring is pinned
-// here, not only in the mirror's own isolated suite.
+// Storefront mirrors observe the recorder (deeds_records calls each
+// onDeedRecorded after character_deeds upserts resolve); spy both so that
+// dual fan-out (D21) is pinned here, not only in each mirror's own suite.
 vi.mock('../server/steam/mirror', () => ({
+  onDeedRecorded: vi.fn(),
+  reconcileOnLogin: vi.fn(),
+}));
+vi.mock('../server/epic/mirror', () => ({
   onDeedRecorded: vi.fn(),
   reconcileOnLogin: vi.fn(),
 }));
@@ -52,8 +56,9 @@ import {
   recordDeedUnlock,
   recordDeedUnlocks,
 } from '../server/deeds_records';
+import { onDeedRecorded as onEpicDeedRecorded } from '../server/epic/mirror';
 import { GameServer } from '../server/game';
-import { onDeedRecorded } from '../server/steam/mirror';
+import { onDeedRecorded as onSteamDeedRecorded } from '../server/steam/mirror';
 import { DEEDS } from '../src/sim/content/deeds';
 import { announceAttunement } from '../src/sim/professions/attunement_events';
 import type { DeedDef } from '../src/sim/types';
@@ -61,7 +66,8 @@ import type { DeedDef } from '../src/sim/types';
 const insertMock = vi.mocked(insertCharacterDeed);
 const insertDeedsMock = vi.mocked(insertCharacterDeeds);
 const broadcastsFlagMock = vi.mocked(getDeedBroadcasts);
-const onDeedRecordedMock = vi.mocked(onDeedRecorded);
+const onDeedRecordedMock = vi.mocked(onSteamDeedRecorded);
+const onEpicDeedRecordedMock = vi.mocked(onEpicDeedRecorded);
 // The blob-write seam: tests that hold or reject the authoritative save
 // control THIS mock while the real saveCharacter (which owns the publish-
 // after-durable drain) keeps running.
@@ -90,6 +96,8 @@ beforeEach(async () => {
   broadcastsFlagMock.mockResolvedValue(true);
   onDeedRecordedMock.mockClear();
   onDeedRecordedMock.mockImplementation(() => {});
+  onEpicDeedRecordedMock.mockClear();
+  onEpicDeedRecordedMock.mockImplementation(() => {});
   // vi.restoreAllMocks does not touch module-factory vi.fn mocks, so a held
   // or rejecting blob write set by one test must not leak into the next.
   saveStateMock.mockReset();
@@ -263,7 +271,7 @@ describe('recordDeedUnlock', () => {
     expect(insertMock.mock.calls[1][0].deedId).toBe('b');
   });
 
-  it('notifies the Steam mirror once per unlock, only AFTER the insert resolves', async () => {
+  it('notifies Steam and Epic mirrors once per unlock, only AFTER the insert resolves', async () => {
     const order: string[] = [];
     let release: () => void = () => {};
     insertMock.mockImplementationOnce(async () => {
@@ -273,30 +281,39 @@ describe('recordDeedUnlock', () => {
       order.push('insert');
     });
     onDeedRecordedMock.mockImplementation(() => {
-      order.push('mirror');
+      order.push('steam');
+    });
+    onEpicDeedRecordedMock.mockImplementation(() => {
+      order.push('epic');
     });
     recordDeedUnlock({ characterId: 42, accountId: 7 }, 'prog_veteran');
     await new Promise((resolve) => setImmediate(resolve));
-    // The row has not landed yet, so the mirror must not have been told.
+    // The row has not landed yet, so neither mirror must have been told.
     expect(onDeedRecordedMock).not.toHaveBeenCalled();
+    expect(onEpicDeedRecordedMock).not.toHaveBeenCalled();
     release();
     await deedRecordsIdle();
-    expect(order).toEqual(['insert', 'mirror']);
+    // Dual fan-out (D21): Steam then Epic, independent observers.
+    expect(order).toEqual(['insert', 'steam', 'epic']);
     expect(onDeedRecordedMock).toHaveBeenCalledTimes(1);
     expect(onDeedRecordedMock).toHaveBeenCalledWith(7, 'prog_veteran');
+    expect(onEpicDeedRecordedMock).toHaveBeenCalledTimes(1);
+    expect(onEpicDeedRecordedMock).toHaveBeenCalledWith(7, 'prog_veteran');
   });
 
-  it('never notifies the mirror for an unlock whose insert failed (reconcile heals it)', async () => {
+  it('never notifies either mirror for an unlock whose insert failed (reconcile heals it)', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     insertMock.mockRejectedValueOnce(new Error('db down'));
     recordDeedUnlock({ characterId: 42, accountId: 7 }, 'prog_veteran');
     recordDeedUnlock({ characterId: 42, accountId: 7 }, 'prog_first_steps');
     await deedRecordsIdle();
     expect(errorSpy).toHaveBeenCalled();
-    // Only the landed row reached the mirror; the failed one is Steam-invisible
-    // until the next reconcile-on-link.
+    // Only the landed row reached the mirrors; the failed one is invisible
+    // until the next reconcile-on-link / reconcile-on-login.
     expect(onDeedRecordedMock).toHaveBeenCalledTimes(1);
     expect(onDeedRecordedMock).toHaveBeenCalledWith(7, 'prog_first_steps');
+    expect(onEpicDeedRecordedMock).toHaveBeenCalledTimes(1);
+    expect(onEpicDeedRecordedMock).toHaveBeenCalledWith(7, 'prog_first_steps');
   });
 
   it('deedRecordsIdle resolves only after a pending insert completes (the test drain hook)', async () => {
@@ -336,7 +353,7 @@ describe('recordDeedUnlocks (batch drain)', () => {
     expect(insertMock).not.toHaveBeenCalled(); // zero single-row round trips
   });
 
-  it('notifies the Steam mirror once per id, in order, only AFTER the batch insert resolves', async () => {
+  it('notifies Steam and Epic mirrors once per id, in order, only AFTER the batch insert resolves', async () => {
     const order: string[] = [];
     let release: () => void = () => {};
     insertDeedsMock.mockImplementationOnce(async () => {
@@ -346,16 +363,33 @@ describe('recordDeedUnlocks (batch drain)', () => {
       order.push('insert');
     });
     onDeedRecordedMock.mockImplementation((_accountId, id) => {
-      order.push(`mirror:${id}`);
+      order.push(`steam:${id}`);
+    });
+    onEpicDeedRecordedMock.mockImplementation((_accountId, id) => {
+      order.push(`epic:${id}`);
     });
     recordDeedUnlocks({ characterId: 42, accountId: 7 }, ['a', 'b', 'c']);
-    // The batch has not resolved, so no id may have reached Steam yet.
+    // The batch has not resolved, so no id may have reached either mirror yet.
     await new Promise((resolve) => setImmediate(resolve));
     expect(onDeedRecordedMock).not.toHaveBeenCalled();
+    expect(onEpicDeedRecordedMock).not.toHaveBeenCalled();
     release();
     await deedRecordsIdle();
-    expect(order).toEqual(['insert', 'mirror:a', 'mirror:b', 'mirror:c']);
+    expect(order).toEqual([
+      'insert',
+      'steam:a',
+      'epic:a',
+      'steam:b',
+      'epic:b',
+      'steam:c',
+      'epic:c',
+    ]);
     expect(onDeedRecordedMock.mock.calls).toEqual([
+      [7, 'a'],
+      [7, 'b'],
+      [7, 'c'],
+    ]);
+    expect(onEpicDeedRecordedMock.mock.calls).toEqual([
       [7, 'a'],
       [7, 'b'],
       [7, 'c'],

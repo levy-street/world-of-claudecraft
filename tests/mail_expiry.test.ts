@@ -365,6 +365,46 @@ describe('a full sender mailbox', () => {
   });
 });
 
+describe('a full-bags player parcel keeps its real deadline', () => {
+  it('does not pause the attachment clock: an elapsed expiresAt is still eligible for return-to-sender', () => {
+    // Regression pin: a comment on the mailTake bags-full branch used to claim
+    // the expiry clock stays paused (Infinity) whenever a letter is kept for
+    // lack of room, but that is only true for system/npc mail. A player
+    // parcel's real MAIL_ATTACHMENT_EXPIRY_SECONDS deadline is untouched by
+    // that branch and keeps ticking, so it can still fly home to its sender.
+    const { sim, bob, raw } = setupParcel();
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    moveToMailbox(sim, bob);
+
+    // Fill Bob's bags so the attached stack cannot fit.
+    const bobMeta = sim.meta(bob);
+    if (!bobMeta) throw new Error('no meta');
+    bobMeta.bags = [null, null, null, null];
+    bobMeta.inventory = Array.from({ length: 16 }, () => ({ itemId: 'roasted_boar', count: 20 }));
+
+    const gift = sim.mailInfoFor(bob)?.messages.find((m) => m.subject === 'Parcel');
+    if (!gift) throw new Error('parcel not delivered');
+    sim.drainEvents();
+    sim.mailTake(gift.id, bob);
+    const events = sim.drainEvents();
+    expect(events.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
+    // The coin collected but the stack stayed attached, kept on the letter.
+    expect(raw.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+
+    // NOT Infinity: a player parcel's clock is never paused by the bags-full
+    // branch, unlike system/npc mail.
+    expect(Number.isFinite(raw.expiresAt)).toBe(true);
+
+    // An elapsed expiresAt (the real deadline already reached) is still swept
+    // into the return-to-sender flight, exactly as any other unclaimed parcel.
+    raw.expiresAt = sim.time;
+    tickFor(sim, 2);
+    expect(raw.returned).toBe(true);
+    expect(raw.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    expect(raw.copper).toBe(0); // already collected before the bags-full branch
+  });
+});
+
 describe('taking a returned letter', () => {
   it('hands the attachments back and starts the standard emptied clock', () => {
     const { sim, alice, aliceMeta, raw } = setupParcel();

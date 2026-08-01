@@ -2239,6 +2239,50 @@ export const DEEDS: Record<string, DeedDef> = {
       count: 1,
     },
   },
+  // Two camp rares shipped alongside their zones but were left off the first
+  // reckoning of named terrors (chr_marsh_rares / chr_peaks_rares). Design
+  // rule 9 forbids widening those shipped trigger lists, so the missed
+  // rares get their own NEW deeds instead of a retro-edit.
+  chr_marsh_rares_ii: {
+    id: 'chr_marsh_rares_ii',
+    name: 'The Glutton, Reckoned',
+    desc: 'Slay Grubjaw the Glutton, a fourth named terror of Mirefen Marsh left off the first reckoning.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'slain:grubjaw' },
+  },
+  chr_peaks_rares_ii: {
+    id: 'chr_peaks_rares_ii',
+    name: 'More Names Cut into the Crag',
+    desc: 'Slay Old Cragmaw and Shardlord Kazzix, two more named terrors of Thornpeak Heights left off the first reckoning.',
+    category: 'chronicle',
+    renown: 10,
+    trigger: { kind: 'visits', markIds: ['slain:old_cragmaw', 'slain:shardlord_kazzix'] },
+  },
+  // The Gleamstag shipped with the Wildheart Basin content wave as another
+  // persistent camp rare with a unique display name, and was likewise never
+  // wired into the deed credit system; see the RARE_SLAIN_TEMPLATES coverage
+  // test in tests/deeds_content.test.ts.
+  chr_gleamstag: {
+    id: 'chr_gleamstag',
+    name: 'The Legend That Would Not Strike First',
+    desc: 'Slay the Gleamstag, a rare and reclusive elite that will not attack unless cornered.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'slain:gleamstag' },
+  },
+  // Old Marrowshell and Aurelhorn are the Hollow's two wandering rare bosses
+  // (huntsman_deral's chain points at both) but neither their kill quests
+  // nor RARE_SLAIN_TEMPLATES fed a deed; same gap class, found by the same
+  // coverage test.
+  chr_hollow_rares: {
+    id: 'chr_hollow_rares',
+    name: 'The Herd Remembers',
+    desc: 'Slay Old Marrowshell and Aurelhorn, First of the Herd, the two wandering rare bosses of the Hollow.',
+    category: 'chronicle',
+    renown: 10,
+    trigger: { kind: 'visits', markIds: ['slain:old_marrowshell', 'slain:aurelhorn'] },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

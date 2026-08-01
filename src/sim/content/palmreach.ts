@@ -125,6 +125,7 @@ export const PALMREACH_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 105, chance: 1 }],
     scale: 1.15,
     color: 0xe86848,
+    componentTags: ['meat'],
   },
   thicket_boar: {
     id: 'thicket_boar',
@@ -143,6 +144,7 @@ export const PALMREACH_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 105, chance: 1 }],
     scale: 1.2,
     color: 0x6a4e38,
+    componentTags: ['hide', 'meat'],
   },
   canopy_weaver: {
     id: 'canopy_weaver',
@@ -165,6 +167,7 @@ export const PALMREACH_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.25,
     color: 0x4e8a3c,
+    componentTags: ['silk', 'venomSac'],
   },
   idol_guardian: {
     id: 'idol_guardian',
@@ -187,7 +190,7 @@ export const PALMREACH_MOBS: Record<string, MobTemplate> = {
     // on the relic colliders ~6.9yd from its target, 0.4yd past its
     // stationary reach, and stands there forever without swinging.
     phasesThroughObstacles: true,
-    loot: [{ copper: 450, chance: 1 }],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.5,
     color: 0x9aa87e,
   },

@@ -165,7 +165,6 @@ export const tr_TR: Record<string, string> = {
   'stats.avgTick': 'ort. tik',
   'stats.serverRss': 'sunucu rss',
   'online.title': 'Çevrimiçi oyuncular',
-  'online.refreshHint': "her 5sn'de bir yenilenir",
   'online.empty': 'şu anda çevrimiçi kimse yok',
   'online.colCharacter': 'Karakter',
   'online.colClass': 'Sınıf',

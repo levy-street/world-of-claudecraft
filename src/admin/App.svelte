@@ -21,6 +21,7 @@
   import Overview from './pages/Overview.svelte';
   import Accounts from './pages/Accounts.svelte';
   import Characters from './pages/Characters.svelte';
+  import OnlinePlayers from './pages/OnlinePlayers.svelte';
   import Usage from './pages/Usage.svelte';
   import TickPerf from './pages/TickPerf.svelte';
   import Moderation from './pages/Moderation.svelte';
@@ -46,6 +47,7 @@
     overview: Overview,
     accounts: Accounts,
     characters: Characters,
+    'online-players': OnlinePlayers,
     usage: Usage,
     'tick-perf': TickPerf,
     moderation: Moderation,

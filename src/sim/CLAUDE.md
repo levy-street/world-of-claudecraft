@@ -83,6 +83,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `pet/pet_ai.ts` | `updatePet`, follow, ranged attack, target pick |
 | `pet/pet_commands.ts` | the pet command surface + `petOf`/`summonPet`/tame/despawn/`syncPetLevel`/`serializePet`/`restorePet` and the delve pet-park round-trip (`stowPetForDelve`/`restorePetFromDelveStash`) |
 | `items.ts` | equip/use/discard + vendor buy/sell/buyback command bodies (W2 move out of `sim.ts`) |
+| `item_instance_transfer.ts` | shared instanced-transfer rules for the anonymous exchange pipes (market listings + mail parcels, issue 1165): the transfer-lock predicate, the public display trim, payload-matching escrow removal, escrow-slot sanitizing; consumed by `market.ts`, `mail/post_office.ts`, and the ui staging gates (the `removePreferFungible` cross-import precedent) |
 | `interaction.ts` | `lootCorpse`/`pickUpObject`/`interact` + corpse harvest and party auto-loot (W3) |
 | `bags.ts` | pooled bag capacity: the backpack plus equipped bag items raise one flat slot budget |
 | `quests/quest_credit.ts` | kill/collect quest credit + turn-in readiness |
@@ -123,10 +124,16 @@ a row here or a Key files entry (`sim.ts`, `sim_context.ts`, `entity_roster.ts`)
 these before inlining pure logic in a system module: `spell_scaling.ts` (spell/attack
 power coefficients), `stun_dr.ts` (CC diminishing-return categories), `item_level.ts`/
 `item_budget.ts`/`item_level_req.ts` (drop power math), `equipment_rules.ts` (equip
-legality), `cooldown_persist.ts` (cooldown save/load), `unstuck_cooldown.ts` (the hidden
+legality), `launch_paperdoll_slots.ts` (the FROZEN launch-era eleven-slot list, for
+launch-era completeness records ONLY: never validate a slot against it, use
+`isEquipSlot` from `types.ts`, which is derived from the live `ALL_EQUIP_SLOTS`),
+`cooldown_persist.ts` (cooldown save/load), `unstuck_cooldown.ts` (the hidden
 recovery timer across competitive resets), `tab_target.ts`/`assist.ts`/
 `dead_target.ts` (target cycling, /assist, dead-target selectability), `flee_speed.ts`,
 `mob/scan_counters.ts` (the per-tick mob scan-visit tally the server reads post-tick),
+`mob/mechanic_spacing.ts` (the rift boss shared mechanic spacing lock and its
+oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
+`runMobAttackMechanics` drivers),
 `lockpick.ts` (the minigame core behind `delves/lockpick_controller.ts`), `map_doc.ts`
 (the custom-map document/validator), `geometry2d.ts`, `market_query.ts`,
 `market_listing_ids.ts` (the World Market's id allocator: the reserved house band plus

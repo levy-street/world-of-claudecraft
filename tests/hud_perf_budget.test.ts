@@ -548,6 +548,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'xp_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'swing_timer_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'proc_overlay_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'aura_overlay_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
@@ -684,6 +685,14 @@ interface ColdPainter {
 }
 
 const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
+  // One app-viewport rect when the player starts dragging an aura in setup mode. The cached
+  // rect converts pointer moves to persisted normalized X/Y values; the controller owns no
+  // clock and performs no layout read during ordinary combat painting.
+  {
+    file: 'aura_overlay_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
   // The scroll pair is the shape repeated across the windows: read the position before a
   // rebuild, write it back after, so the list does not jump under the player. Legitimate and
   // stable, granted per file, and the count is what makes a THIRD read in the same file (the
@@ -817,6 +826,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   { file: 'options_window.ts', reflowAllow: {}, driverAllow: { requestIdleCallback: 3 } },
   { file: 'professions_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'spellbook_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // The root, trigger, and popover rects position the target-aura configurator inside the
+  // viewport. They run only when the player opens or changes that configurator, or when an
+  // open configurator receives a viewport resize event, never from the aura paint cadence.
+  {
+    file: 'target_auras_window.ts',
+    reflowAllow: { '.getBoundingClientRect': 3 },
+    driverAllow: {},
+  },
   // The tree height-cap fit: the root's max-height (read through the shared getUiScale
   // helper as well, which is why the proxy token is granted here), then the body and root
   // tops and the footer height, then one scrollHeight to decide whether the body scrolls.

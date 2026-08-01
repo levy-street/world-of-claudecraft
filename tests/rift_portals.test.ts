@@ -6,6 +6,7 @@ import {
   RIFT_GEM_IDS,
 } from '../src/sim/content/rift/items';
 import { isRiftPos, ZONES } from '../src/sim/data';
+import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import {
   closeNaturalRiftPortal,
   eligibleRiftZones,
@@ -13,12 +14,16 @@ import {
   RIFT_MIN_LEVEL,
   RIFT_PORTAL_FIRST_AT,
   RIFT_PORTAL_LIFETIME,
+  RIFT_PORTAL_RETRY_DELAY,
   RIFT_PORTAL_ZONE_CYCLE,
   RIFT_TIER_INFO,
   riftTierForZone,
+  riftZoneBoundaryAfterClose,
+  riftZoneNextOpenAt,
+  spawnNaturalRiftPortal,
   updateRiftPortals,
 } from '../src/sim/rift/portals';
-import type { RiftInstance } from '../src/sim/rift/types';
+import type { RiftEvent, RiftInstance } from '../src/sim/rift/types';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
 
@@ -207,9 +212,20 @@ describe('rift portals: one-per-zone rotation scheduler', () => {
     spawnDuePortal(sim);
     const first = sim.naturalRiftPortals[0];
     const firstOpenedAt = first.openedAt;
-    // Seal it early (a first clear closes the way in).
+    // Seal it early (a first clear closes the way in). Production seal always
+    // follows the claim, and the close-gated cadence reads the close time off
+    // the claim's timestamp, so stamp it exactly like the live path does.
     sim.time = firstOpenedAt + 600;
     closeNaturalRiftPortal(sim.ctx, first.id, 'sealed');
+    const sealedEvent = sim.riftEvents.find((e) => e.eventId === first.eventId)!;
+    sealedEvent.status = 'cleared';
+    sealedEvent.firstClear = {
+      partyKey: 'solo:1',
+      memberIds: [1],
+      memberNames: ['Sealer'],
+      duration: 600,
+      clearedAt: sim.time,
+    };
     expect(sim.naturalRiftPortals.some((q) => q.zoneId === first.zoneId)).toBe(false);
     // Before the boundary: the zone must NOT refill.
     sim.time = firstOpenedAt + RIFT_PORTAL_ZONE_CYCLE - 5;
@@ -263,12 +279,13 @@ describe('rift portals: one-per-zone rotation scheduler', () => {
     ).toBe(true);
   });
 
-  it('replaces a naturally expired portal in the same pass (rolling hourly cycle)', () => {
+  it('replaces a naturally expired portal in the same pass (collapse lands on a boundary)', () => {
     const sim = makeSim();
     spawnDuePortal(sim);
     const p = sim.naturalRiftPortals[0];
-    // At the REAL expiry (openedAt + lifetime = the zone boundary), one pass
-    // both collapses the old portal and opens the zone's next event.
+    // At the REAL expiry (openedAt + lifetime, an exact multiple of the cycle,
+    // so itself a boundary), one pass both collapses the old portal and opens
+    // the zone's next event.
     sim.time = p.openedAt + RIFT_PORTAL_LIFETIME + 0.2;
     sim.tickCount += (10 - (sim.tickCount % 20) + 20) % 20;
     updateRiftPortals(sim.ctx);
@@ -279,6 +296,238 @@ describe('rift portals: one-per-zone rotation scheduler', () => {
     // Still exactly one portal per zone across the whole population.
     const zoneIds = sim.naturalRiftPortals.map((q) => q.zoneId);
     expect(new Set(zoneIds).size).toBe(zoneIds.length);
+  });
+});
+
+function eligibleRiftZoneIds(): string[] {
+  return eligibleRiftZones().map((zone) => zone.id);
+}
+
+/** A history-only completed event for a zone that never gets a real entity
+ * (position is a placeholder, never validated for anything but scheduling
+ * math): a cheap way to steer a zone out of (or into) the due set for a
+ * scheduler test. */
+function fakeCollapsedEvent(
+  zoneId: string,
+  ordinal: number,
+  openedAt: number,
+  expiresAt: number,
+): RiftEvent {
+  return {
+    eventId: `rift-fake-${ordinal}`,
+    ordinal,
+    portalId: null,
+    status: 'collapsed',
+    tier: 'C',
+    zoneId,
+    zoneName: zoneId,
+    riftName: 'Fake Rift',
+    seed: 1,
+    baseLevel: 20,
+    openedAt,
+    expiresAt,
+    position: { x: 0, z: 0 },
+    contentId: 'fake',
+    contentHash: 'fake',
+    contentLocked: false,
+    upgradeStatus: 'fallback',
+    upgrade: null,
+    assetPipeline: { status: 'none', jobId: null, requestIds: [] },
+    firstClear: null,
+  };
+}
+
+function advanceToScheduledTick(sim: Sim, time: number): void {
+  sim.time = time;
+  sim.tickCount += (10 - (sim.tickCount % 20) + 20) % 20;
+}
+
+describe('rift portals: per-zone close-gated cadence (issue #2659)', () => {
+  it('riftZoneBoundaryAfterClose: the three worked examples from the issue, pinned exactly', () => {
+    const openedAt = 1000;
+    // Willowfen closes at 1:30: the next rift spawns at the 2:00 mark.
+    expect(riftZoneBoundaryAfterClose(openedAt, openedAt + 5400)).toBe(openedAt + 7200);
+    // Willowfen closes at 0:45: the next rift spawns at the 1:00 mark.
+    expect(riftZoneBoundaryAfterClose(openedAt, openedAt + 2700)).toBe(openedAt + 3600);
+    // Never cleared: it collapses at 2:00, itself a boundary, so the
+    // replacement spawns immediately (no extra cycle tacked on).
+    expect(riftZoneBoundaryAfterClose(openedAt, openedAt + 7200)).toBe(openedAt + 7200);
+  });
+
+  it('a float-accumulated open time cannot push an exact-boundary collapse a cycle late', () => {
+    // Sim time is a sum of DT-sized double additions, so openedAt + 7200 can
+    // read back as elapsed 7200.000000000002 (this openedAt reproduces it:
+    // its expiry crosses 2^14). The boundary math must still treat the
+    // collapse as landing ON the boundary, not one whole cycle past it.
+    const driftedOpen = 9184.550000006593;
+    expect(riftZoneBoundaryAfterClose(driftedOpen, driftedOpen + 7200)).toBe(driftedOpen + 7200);
+  });
+
+  it('a zone whose rift is still open at a boundary spawns nothing, and spawns at the next boundary once it closes', () => {
+    const sim = makeSim();
+    const targetZoneId = 'willowfen';
+    // Park every other eligible zone far beyond this test's whole window so
+    // the scheduler can never pick one of them instead (history-only events).
+    let ordinal = 1000;
+    for (const zoneId of eligibleRiftZoneIds()) {
+      if (zoneId === targetZoneId) continue;
+      sim.riftEvents.push(fakeCollapsedEvent(zoneId, ordinal++, 0, 999_999));
+    }
+
+    expect(spawnNaturalRiftPortal(sim.ctx, 0, { zoneId: targetZoneId })).toBe(true);
+    sim.riftPortalSpawnCount = 1;
+    const portal = sim.naturalRiftPortals.find((p) => p.zoneId === targetZoneId)!;
+    expect(portal.openedAt).toBe(0);
+
+    // The first hourly boundary (1:00): the portal is still standing, so
+    // nothing spawns for this zone at this boundary.
+    advanceToScheduledTick(sim, RIFT_PORTAL_ZONE_CYCLE + 30);
+    updateRiftPortals(sim.ctx);
+    expect(sim.naturalRiftPortals.filter((p) => p.zoneId === targetZoneId)).toHaveLength(1);
+    expect(sim.naturalRiftPortals.find((p) => p.zoneId === targetZoneId)!.id).toBe(portal.id);
+    expect(sim.riftEvents.filter((e) => e.zoneId === targetZoneId)).toHaveLength(1);
+
+    // The rift closes partway through the second hour (well past 1:00, the
+    // boundary it just skipped while still open). An early collapse reads its
+    // close time off `expiresAt`, exactly like the natural one.
+    closeNaturalRiftPortal(sim.ctx, portal.id, 'collapsed');
+    const closedEvent = sim.riftEvents.find((e) => e.zoneId === targetZoneId)!;
+    expect(closedEvent.status).toBe('collapsed');
+    expect(closedEvent.expiresAt).toBe(RIFT_PORTAL_LIFETIME);
+
+    // Just before the second boundary (2:00): still not due.
+    advanceToScheduledTick(sim, 2 * RIFT_PORTAL_ZONE_CYCLE - 120);
+    updateRiftPortals(sim.ctx);
+    expect(sim.naturalRiftPortals.filter((p) => p.zoneId === targetZoneId)).toHaveLength(0);
+
+    // Past the second boundary: it re-evaluates and spawns there.
+    advanceToScheduledTick(sim, 2 * RIFT_PORTAL_ZONE_CYCLE + 120);
+    updateRiftPortals(sim.ctx);
+    expect(
+      sim.naturalRiftPortals.some((p) => p.zoneId === targetZoneId),
+      'the zone reopens at the boundary reached once it closed, not the one it skipped',
+    ).toBe(true);
+  });
+
+  it('an event still open past its collapse (race running inside) blocks the zone until it resolves', () => {
+    const sim = makeSim();
+    const targetZoneId = 'willowfen';
+    let ordinal = 0;
+    for (const zoneId of eligibleRiftZoneIds()) {
+      if (zoneId === targetZoneId) continue;
+      sim.riftEvents.push(fakeCollapsedEvent(zoneId, ordinal++, 0, 999_999));
+    }
+    // The overworld portal collapsed with a party still racing inside: the
+    // event stays 'active' and NO NaturalRiftPortal remains, so the
+    // open-portal guard in the scheduler cannot be what holds the zone
+    // closed; only the still-open dueness branch can.
+    const racing: RiftEvent = {
+      ...fakeCollapsedEvent(targetZoneId, ordinal++, 0, RIFT_PORTAL_LIFETIME),
+      status: 'active',
+    };
+    sim.riftEvents.push(racing);
+    sim.riftPortalSpawnCount = ordinal;
+
+    expect(riftZoneNextOpenAt(sim.ctx, targetZoneId)).toBe(Number.POSITIVE_INFINITY);
+
+    // Way past every boundary: the zone still must not respawn while the
+    // event is open.
+    advanceToScheduledTick(sim, 10 * RIFT_PORTAL_ZONE_CYCLE);
+    updateRiftPortals(sim.ctx);
+    expect(sim.naturalRiftPortals).toHaveLength(0);
+
+    // The race resolves without a clear (runs.ts flips the reaped event to
+    // collapsed): the close reads off expiresAt, long past, so the zone is
+    // due at once.
+    racing.status = 'collapsed';
+    sim.tickCount += 20;
+    updateRiftPortals(sim.ctx);
+    expect(sim.naturalRiftPortals.some((p) => p.zoneId === targetZoneId)).toBe(true);
+  });
+
+  it('spawns at most one portal per scheduler pass when several zones are due together', () => {
+    const sim = makeSim();
+    const ids = eligibleRiftZoneIds();
+    expect(ids.length).toBeGreaterThanOrEqual(4);
+    const dueIds = ids.slice(0, 4);
+    const notDueIds = ids.slice(4);
+    let ordinal = 0;
+    for (const zoneId of dueIds) {
+      // Closed exactly a cycle ago: comfortably due by the check below.
+      sim.riftEvents.push(fakeCollapsedEvent(zoneId, ordinal++, 0, RIFT_PORTAL_ZONE_CYCLE));
+    }
+    for (const zoneId of notDueIds) {
+      sim.riftEvents.push(fakeCollapsedEvent(zoneId, ordinal++, 0, 999_999));
+    }
+    sim.riftPortalSpawnCount = ordinal;
+
+    advanceToScheduledTick(sim, RIFT_PORTAL_ZONE_CYCLE + 500);
+    updateRiftPortals(sim.ctx);
+
+    expect(sim.naturalRiftPortals).toHaveLength(1);
+    expect(dueIds).toContain(sim.naturalRiftPortals[0].zoneId);
+    expect(sim.riftPortalSpawnCount).toBe(ordinal + 1);
+  });
+
+  it('first boot after deploy schedules from history: no starvation off a stale legacy delay, and a still-open zone survives untouched', () => {
+    const source = new Sim({
+      seed: 20260730,
+      playerClass: 'warrior',
+      noPlayer: true,
+      riftPortals: true,
+    });
+    const openZoneId = 'farshore_isle';
+    const closingZoneId = 'willowfen';
+    expect(spawnNaturalRiftPortal(source.ctx, 0, { zoneId: openZoneId })).toBe(true);
+    expect(spawnNaturalRiftPortal(source.ctx, 1, { zoneId: closingZoneId })).toBe(true);
+    source.riftPortalSpawnCount = 2;
+    const openPortal = source.naturalRiftPortals.find((p) => p.zoneId === openZoneId)!;
+    const closingPortal = source.naturalRiftPortals.find((p) => p.zoneId === closingZoneId)!;
+    closeNaturalRiftPortal(source.ctx, closingPortal.id, 'collapsed');
+
+    // A save written by pre-cadence code could leave a multi-hour random
+    // delay behind; it must not survive as a global block once this per-zone
+    // schedule takes over.
+    source.riftPortalNextAt = source.time + 4 * 60 * 60;
+
+    const nowMs = 1_700_000_000_000;
+    const saved = serializeRiftWorldState(source.ctx, nowMs);
+
+    const target = new Sim({
+      seed: 4242,
+      playerClass: 'warrior',
+      noPlayer: true,
+      riftPortals: true,
+    });
+    loadRiftWorldState(target.ctx, saved, nowMs + 250);
+
+    // The still-open zone's portal is restored as itself, never refarmed.
+    expect(target.naturalRiftPortals).toHaveLength(1);
+    expect(target.naturalRiftPortals[0].zoneId).toBe(openZoneId);
+    expect(target.naturalRiftPortals[0].eventId).toBe(openPortal.eventId);
+    // The closed zone's history round-trips: its next boundary is still
+    // computable from it, not lost on reload.
+    expect(target.riftEvents.find((e) => e.zoneId === closingZoneId)?.status).toBe('collapsed');
+    // The stale legacy delay is clamped at load to the short retry backoff.
+    expect(target.riftPortalNextAt - target.time).toBeLessThanOrEqual(RIFT_PORTAL_RETRY_DELAY);
+
+    advanceToScheduledTick(target, RIFT_PORTAL_ZONE_CYCLE + 120);
+    updateRiftPortals(target.ctx);
+    expect(
+      target.naturalRiftPortals.length,
+      'a history-free zone spawns on the first pass after reload; the stale delay does not block it',
+    ).toBe(2);
+    // The new portal belongs to neither restored zone: farshore is still open
+    // and willowfen (collapsed at its 2:00 boundary, still ahead of this
+    // pass) is not due yet, so close-gating survives the round-trip.
+    const newPortal = target.naturalRiftPortals.find((p) => p.eventId !== openPortal.eventId)!;
+    expect(newPortal.zoneId).not.toBe(openZoneId);
+    expect(newPortal.zoneId).not.toBe(closingZoneId);
+    // The zone that was already open is untouched: still exactly one portal,
+    // the very same one restored from the save.
+    const stillOpen = target.naturalRiftPortals.filter((p) => p.zoneId === openZoneId);
+    expect(stillOpen).toHaveLength(1);
+    expect(stillOpen[0].eventId).toBe(openPortal.eventId);
   });
 });
 

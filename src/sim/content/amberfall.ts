@@ -113,12 +113,10 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 9,
     aggroRadius: 0, // grazes the gold meadows, fights only if pressed
-    loot: [
-      { copper: 95, chance: 1 },
-      { itemId: 'gilded_sap_clot', chance: 0.6, questId: 'q_af_amber_from_the_herd' },
-    ],
+    loot: [{ itemId: 'gilded_sap_clot', chance: 0.6, questId: 'q_af_amber_from_the_herd' }],
     scale: 1.15,
     color: 0xd8a848,
+    componentTags: ['hide', 'meat'],
   },
   gloam_fox: {
     id: 'gloam_fox',
@@ -137,6 +135,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 90, chance: 1 }],
     scale: 1,
     color: 0xd87838,
+    componentTags: ['hide', 'fang'],
   },
   orchard_treant: {
     id: 'orchard_treant',
@@ -154,7 +153,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 0, // ancient and calm, until an axe is raised
     elite: true,
     loot: [
-      { copper: 200, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'tangled_weed', chance: 0.4 },
     ],
     scale: 1.4,
@@ -165,7 +164,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     name: 'Harvest Sprite',
     minLevel: 18,
     maxLevel: 19,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 48,
     hpPerLevel: 17,
     dmgBase: 10,
@@ -183,7 +182,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     name: 'Mere Lurker',
     minLevel: 19,
     maxLevel: 20,
-    family: 'murloc',
+    family: 'mudfin',
     hpBase: 58,
     hpPerLevel: 20,
     dmgBase: 12,
@@ -193,7 +192,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 13,
     loot: [
-      { copper: 105, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'mudfin_scale', chance: 0.4 },
     ],
     scale: 1.1,
@@ -208,7 +207,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     name: 'The Meredark',
     minLevel: 20,
     maxLevel: 20,
-    family: 'murloc',
+    family: 'mudfin',
     hpBase: 120,
     hpPerLevel: 30,
     dmgBase: 15,
@@ -219,7 +218,7 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 16,
     elite: true,
     loot: [
-      { copper: 450, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'mudfin_scale', chance: 1 },
     ],
     scale: 1.6,

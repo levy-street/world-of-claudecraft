@@ -119,7 +119,6 @@ export const da_DK: Record<string, string> = {
   'stats.avgTick': 'gns. tick',
   'stats.serverRss': 'server-rss',
   'online.title': 'Spillere online',
-  'online.refreshHint': 'opdaterer hvert 5. sekund',
   'online.empty': 'ingen er online lige nu',
   'online.colCharacter': 'Karakter',
   'online.colClass': 'Klasse',

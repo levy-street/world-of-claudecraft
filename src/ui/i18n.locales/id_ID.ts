@@ -2135,6 +2135,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Surat itu sudah tidak ada di kotakmu.',
   'hudChrome.mailbox.result.needRecipient': 'Sebutkan penerima untuk suratmu.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Kamu tidak bisa mengirim barang misi lewat surat.',
+  'hudChrome.mailbox.result.noMailBound': 'Barang itu terikat dan tidak dapat dikirim lewat surat.',
   'hudChrome.mailbox.result.noRecipient':
     'Tidak ada orang dengan nama itu yang memiliki kotak surat di sini.',
   'hudChrome.mailbox.result.notEnoughItems': 'Kamu tidak punya sebanyak itu untuk dikirim.',
@@ -5739,12 +5740,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Penyerbu dari luar rift, sepenuhnya api dan kebencian. Di mana pun satu berdiri, sebuah celah tak pernah jauh.',
   'guide.family.demon.name': 'Iblis',
-  'guide.family.kobold.desc':
-    'Pemulung kecil yang berlarian dan roh-roh nakal dari tanah lapang dan pagar semak, lebih mengganggu daripada mengancam sampai mereka berkumpul dalam jumlah besar.',
-  'guide.family.kobold.name': 'Berandal',
-  'guide.family.murloc.desc':
-    'Bangsa ikan yang bersuara serak dari tepi danau dan kolam pasang surut, cepat menyerbu apa pun yang mengarungi terlalu dekat.',
-  'guide.family.murloc.name': 'Sirip Kodok',
   'guide.faqPage.a1':
     'Ya. Seluruh permainan gratis dimainkan hingga batas level, dan kode sumbernya terbuka di GitHub.',
   'guide.faqPage.a10':
@@ -6596,9 +6591,11 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetTooFar': 'Sasaran terlalu jauh.',
   'hud.errors.tooClose': 'Terlalu dekat!',
   'hud.errors.tradeBound': 'Barang itu terikat dan tidak dapat diperdagangkan.',
+  'hud.errors.marketListBound': 'Barang itu terikat dan tidak dapat dijual di pasar.',
   'hud.errors.tradeExpired': 'Permintaan perdagangan telah kedaluwarsa.',
   'hud.errors.tradeFailed': 'Perdagangan gagal: barang atau uang sudah tidak tersedia.',
   'hud.errors.tradeInProgress': 'Perdagangan sudah berlangsung.',
+  'hud.errors.tradeAlreadyTrading': 'Pemain itu sedang berdagang.',
   'hud.errors.tradeTooFar': 'Sasaran terlalu jauh untuk berdagang.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Perintah tidak dikenal: {command}. Coba /s /y /w /p /g.',
@@ -9584,8 +9581,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Mengakhiri waktu pemulihan Langkah Kedip, Selubung Beku, dan Ketaklihatan Agung. (talenta mage)',
   'entities.abilities.greater_invisibility.name': 'Ketaklihatan Agung',
-  'entities.abilities.greater_invisibility.description':
-    'Menghilang selama 20 dtk.: menghapus 2 efek kerusakan berkala dan kamu menerima 90% lebih sedikit kerusakan saat tak terlihat dan sesaat setelahnya. (talenta mage)',
   'entities.abilities.hot_streak.name': 'Rentetan Membara',
   'entities.abilities.hot_streak.description':
     'Pasif: dua serangan kritis berturut-turut dengan mantra Api milikmu (Cinderbolt, Cinderfall, Lepuh, Pyrelance, atau Hantaman Api) membuat Pyrelance atau Hantaman Api berikutnya seketika dan gratis. Mantra penghabis dihitung untuk rentetan BERIKUTNYA, termasuk penggunaan gratis; Hantaman Api dihitung sekali berapa pun musuh yang terkena, dan hanya benturan awal yang dapat dihitung. (Api)',
@@ -10920,4 +10915,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'sim.rift.socketsShut': 'Soket-soket berderit menutup. Jalan pun bergerak.',
   'sim.rift.stepBack': 'Kamu melangkah mundur melalui rift.',
   'sim.rift.wayDownOpens': 'Jalan turun terkoyak terbuka.',
+  'hudChrome.riftTracker.title': 'Rift',
+  'hudChrome.riftTracker.floor': 'Lantai {current} dari {total}',
+  'hudChrome.riftTracker.closesIn': 'Tutup dalam {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

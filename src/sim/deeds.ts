@@ -29,6 +29,7 @@ import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
+import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -198,8 +199,12 @@ const SANCTUM_SPEED_DEED = 'dgn_sanctum_speed';
 
 // The named overworld terrors whose kill credit feeds a 'slain:<templateId>'
 // visited mark (the chr_*_rares deeds). Pinned so the visited set stays
-// bounded by construction.
-const RARE_SLAIN_TEMPLATES = new Set([
+// bounded by construction; every live rare CAMPS mob belongs here UNLESS it
+// already has an alternate credit path (the content-integrity test in
+// tests/deeds_content.test.ts cross-checks the exact set against CAMPS/MOBS,
+// with sethrael_palecoil as the one documented exception: its kill is
+// required by q_palecoil, which already feeds prog_mere_at_rest).
+export const RARE_SLAIN_TEMPLATES = new Set([
   'old_greyjaw',
   'mogger',
   'grix_the_tunnelking',
@@ -208,10 +213,16 @@ const RARE_SLAIN_TEMPLATES = new Set([
   'mirejaw_the_ravenous',
   'sloomtooth_the_drowned',
   'sister_nhalia',
+  'grubjaw',
   'ironvein_foreman',
   'brutok_skullsmasher',
   'voskar_emberwing',
   'marrowlord_varkas',
+  'old_cragmaw',
+  'shardlord_kazzix',
+  'gleamstag',
+  'old_marrowshell',
+  'aurelhorn',
 ]);
 
 // Zone fishing catches that count as "a fish" for the chr_ first-cast deeds
@@ -729,24 +740,9 @@ const FLAGS: Record<DeedFlagId, (meta: PlayerMeta, e: Entity) => boolean> = {
   // Guild membership is server-stamped onto the entity; offline it stays ''
   // (never satisfiable there, matching the offline-sandbox model).
   guildMember: (_m, e) => e.guild !== '',
-  // Slot list PINNED as of v1 (the launch EQUIP_SLOTS); a future twelfth slot
-  // does not grow this deed.
-  allEquipSlotsFilled: (m) =>
-    (
-      [
-        'mainhand',
-        'helmet',
-        'neck',
-        'shoulder',
-        'chest',
-        'waist',
-        'legs',
-        'gloves',
-        'feet',
-        'ring1',
-        'ring2',
-      ] as const
-    ).every((slot) => !!m.equipment[slot]),
+  // Slot list PINNED as of v1 (LAUNCH_PAPERDOLL_SLOTS); a future twelfth slot
+  // does not grow this deed, so already-earned rows keep their meaning.
+  allEquipSlotsFilled: (m) => LAUNCH_PAPERDOLL_SLOTS.every((slot) => !!m.equipment[slot]),
   nonDefaultSkin: (m) => m.skinCatalog === 'mech' || m.skin > 0,
   // The marked set resets whenever the authoritative reward window advances,
   // so containment of all four ids already means one complete circuit.

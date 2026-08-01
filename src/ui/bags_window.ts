@@ -20,7 +20,7 @@
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS } from '../sim/data';
-import type { EquipSlot, InvSlot, ItemDef } from '../sim/types';
+import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   BAG_CATEGORIES,
@@ -182,10 +182,13 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  full-screen rule take over instead of leaving a half-width orphan). */
   onClosed(): void;
   addItemToTrade(itemId: string): void;
-  /** Stage a bag item for a Market listing (selects it + repaints the market). */
-  stageMarketSell(itemId: string): void;
-  /** Stage a bag stack as a mail parcel (repaints the mailbox Send tab). */
-  stageMailParcel(itemId: string): void;
+  /** Stage a bag item for a Market listing (selects it + repaints the market).
+   *  `instance` is the clicked slot's payload (issue 1165): an instanced copy stages
+   *  as ITSELF (single-copy listing), a plain stack stages fungibly. */
+  stageMarketSell(itemId: string, instance?: ItemInstancePayload): void;
+  /** Stage a bag stack as a mail parcel (repaints the mailbox Send tab).
+   *  `instance` mirrors stageMarketSell: an instanced copy stages as itself. */
+  stageMailParcel(itemId: string, instance?: ItemInstancePayload): void;
   /** Shift-click: insert a readable item link into the chat input. */
   insertItemChatLink(itemId: string): void;
   /** Open the character sheet's mount picker highlighting this mount (a click
@@ -879,7 +882,7 @@ export class BagsWindow {
   // pure bagItemAction decided. Both buttons run it (right-click is the classic
   // use/equip binding), so the two can never drift apart.
   private runBagAction(item: (typeof ITEMS)[string], s: InvSlot, ev: MouseEvent): void {
-    const action = bagItemAction(item, this.bagMode());
+    const action = bagItemAction(item, this.bagMode(), s.instance);
     switch (action) {
       case 'transferBlockedSoulbound':
         this.deps.showError(t('hudChrome.itemSoulbound'));
@@ -890,8 +893,11 @@ export class BagsWindow {
       case 'mailAttachBlocked':
         this.deps.showError(t('hudChrome.mailbox.cannotMail'));
         return;
+      case 'mailAttachBlockedBound':
+        this.deps.showError(t('hudChrome.mailbox.cannotMail'));
+        return;
       case 'mailAttach':
-        this.deps.stageMailParcel(s.itemId);
+        this.deps.stageMailParcel(s.itemId, s.instance);
         break;
       case 'marketSellBlockedQuest':
         this.deps.showError(t('itemUi.errors.noQuestItems'));
@@ -899,8 +905,11 @@ export class BagsWindow {
       case 'marketSellBlockedNoMarket':
         this.deps.showError(t('itemUi.tooltip.cannotMarket'));
         return;
+      case 'marketSellBlockedBound':
+        this.deps.showError(t('hud.errors.marketListBound'));
+        return;
       case 'marketSell':
-        this.deps.stageMarketSell(s.itemId);
+        this.deps.stageMarketSell(s.itemId, s.instance);
         break;
       case 'vendorSell':
         this.sellBagItem(s, ev);
@@ -964,7 +973,7 @@ export class BagsWindow {
   private attachRowTooltip(row: HTMLElement, item: (typeof ITEMS)[string], s: InvSlot): void {
     this.deps.attachTooltip(row, () => {
       const mode = this.bagMode();
-      const key = bagTooltipHintKey(item, mode);
+      const key = bagTooltipHintKey(item, mode, s.instance);
       const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
       // Advertise the shift-click partial deposit on a splittable stack, the bank
       // window's withdrawPartialHint twin (tied to the deposit hint arm so a

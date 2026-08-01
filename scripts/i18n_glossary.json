@@ -59,6 +59,10 @@
     "steamLink": {
       "note": "Steam account-link vocabulary (the character-select card + apiError.steam.*), locked by the non-Latin fills shipped with the link surface. Steam stays Latin everywhere (brand). Link (the account-link verb): zh_CN 关联, zh_TW 連結, ja 連携, ko 연동, ru привязать (linked state: привязан). Steam achievements (the platform term the deeds mirror writes to): zh_CN Steam 成就, zh_TW Steam 成就, ja Steam実績, ko Steam 도전 과제, ru достижения Steam. Keep each identical wherever the link surface is referenced.",
       "keyPatterns": ["hudChrome.steam.*", "apiError.steam.*"]
+    },
+    "epicLink": {
+      "note": "Epic account-link vocabulary (the character-select card + apiError.epic.*), locked by the non-Latin fills shipped with the link surface. Epic stays Latin everywhere (brand). Link (the account-link verb) follows the Steam link-verb choices per locale: zh_CN 关联, zh_TW 連結, ja 連携, ko 연동, ru привязать (linked state: привязан). Epic achievements (the platform term the deeds mirror writes to): zh_CN Epic 成就, zh_TW Epic 成就, ja Epic実績, ko Epic 도전 과제, ru достижения Epic. Keep each identical wherever the link surface is referenced.",
+      "keyPatterns": ["hudChrome.epic.*", "apiError.epic.*"]
     }
   }
 }

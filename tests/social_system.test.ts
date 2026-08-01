@@ -139,6 +139,20 @@ class FakeDb implements SocialDb {
     const m = this.members.get(c);
     if (m) m.rank = rank;
   }
+  async transferGuildLeader(
+    guildId: number,
+    fromCharId: number,
+    toCharId: number,
+  ): Promise<'ok' | 'not_leader' | 'not_member' | 'no_guild'> {
+    if (!this.guilds.has(guildId)) return 'no_guild';
+    const fromM = this.members.get(fromCharId);
+    if (!fromM || fromM.guildId !== guildId || fromM.rank !== 'leader') return 'not_leader';
+    const toM = this.members.get(toCharId);
+    if (!toM || toM.guildId !== guildId) return 'not_member';
+    toM.rank = 'leader';
+    fromM.rank = 'officer';
+    return 'ok';
+  }
   private lastLogins = new Map<number, string>();
   setLastLogin(id: number, iso: string): void {
     this.lastLogins.set(id, iso);
@@ -1254,6 +1268,30 @@ describe('guild atomicity (#149)', () => {
     await h.svc.guildAccept(h.actor(2));
     expect(h.tx.errorsFor(2).join()).toMatch(/no longer exists/i);
     expect((await h.svc.snapshot(2)).guild).toBeNull();
+  });
+
+  it('two racing /gleader transfers to different targets never both succeed', async () => {
+    // Both calls read "actor is still Guild Master" before either write
+    // lands. The non-atomic flow (two independent setGuildRank writes with
+    // no lock or re-check between them) let both promotions through, so the
+    // guild ended up with two members simultaneously ranked leader.
+    h.add(3, 'Cee');
+    h.tx.setOnline(3);
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.guildInvite(h.actor(1), 'Cee');
+    await h.svc.guildAccept(h.actor(3));
+    h.tx.clear();
+
+    await Promise.all([
+      h.svc.guildTransferLeader(h.actor(1), 'Bet'),
+      h.svc.guildTransferLeader(h.actor(1), 'Cee'),
+    ]);
+
+    const guildId = (await h.db.guildMembership(1))!.guildId;
+    const leaders = (await h.db.guildMembers(guildId)).filter((m) => m.rank === 'leader');
+    expect(leaders).toHaveLength(1);
   });
 });
 

@@ -9,8 +9,18 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). The market draws NO rng.
 
+import { bagCapacity, canGrantCopies, instancedCountCap } from './bags';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
+import {
+  countMatchingUnlocked,
+  grantCopies,
+  holdsMatchingLocked,
+  publicInstanceView,
+  removeMatchingInstance,
+  sanitizeEscrowSlot,
+} from './item_instance_transfer';
+import { removeVendorSellUnits } from './items';
 import { planListingIds, playerListingIdFloor } from './market_listing_ids';
 import {
   MARKET_PAGE_SIZE,
@@ -20,7 +30,15 @@ import {
 } from './market_query';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
+import {
+  cloneInvSlot,
+  cloneItemInstancePayload,
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  type ItemInstancePayload,
+} from './types';
 
 const MARKET_RANGE = INTERACT_RANGE + 2; // you must stand at the Merchant to deal
 // the /listings readout (still on Sim) reports the seller's count against this cap,
@@ -89,6 +107,20 @@ export interface MarketListing {
   price: number; // total copper buyout for the whole stack
   expiresAt: number; // sim.time seconds; Infinity for the Merchant's own stock
   house: boolean; // the Merchant's standing stock: never expires, never depletes, pays no one
+  /** The escrowed copy's full payload for an instanced listing (#1165
+   *  completion: single-copy, count 1, listed via marketListInstance). Absent
+   *  for the plain fungible listings, whose rows stay byte-identical. Wire
+   *  browse rows carry only its publicInstanceView projection. */
+  instance?: ItemInstancePayload;
+  // Recipe id that crafted every unit in this stack (bags.ts InvSlot.craftedRecipeId,
+  // professions/crafting.ts), when the seller's stock carried one. Absent for a
+  // plain, never-crafted stack (and always absent on an instanced row: `instance`
+  // and `craftedRecipeId` are mutually exclusive, one row is either a single
+  // instanced copy or a plain fungible stack). Threaded through buy/cancel/collect
+  // (BUG #9) so a market round trip never launders a crafted item's provenance
+  // and reopens the disenchant anti-farming gate
+  // (professions/enchanting.ts isCraftedDisenchantVictim).
+  craftedRecipeId?: string;
 }
 
 // Gold + items awaiting pickup at the Merchant (sale proceeds, expired
@@ -110,6 +142,10 @@ export interface MarketSave {
     count: number;
     price: number;
     secondsLeft: number;
+    /** Additive (#1165): the escrowed payload of an instanced listing. Absent
+     *  on plain rows and on every pre-payload save, which load unchanged. */
+    instance?: ItemInstancePayload;
+    craftedRecipeId?: string;
   }[];
   collections: { key: string; copper: number; items: InvSlot[] }[];
   nextListingId: number;
@@ -183,7 +219,9 @@ export class Market {
     if (!from) return false;
     const to = this.collectionFor(toKey);
     to.copper += from.copper;
-    to.items.push(...from.items.map((s) => ({ ...s })));
+    // cloneInvSlot: an instanced return's payload must never alias between the
+    // merged-away bucket and the surviving one.
+    to.items.push(...from.items.map(cloneInvSlot));
     this.marketCollections.delete(fromKey);
     return true;
   }
@@ -272,9 +310,9 @@ export class Market {
       return;
     }
     const want = Math.max(1, Math.floor(count));
-    // Per-instance copies (#1165: signer/charges/rolled/boundTo) are inert on the
-    // World Market for now: count and escrow only the fungible stock, so a signed
-    // or bound item is never swept into a listing. (#1146 wires real handling later.)
+    // The PLAIN fungible path: counts and escrows only the fungible stock, so
+    // an instanced copy is never swept into a bulk listing. Instanced copies
+    // list through marketListInstance below (single-copy, payload-selected).
     if (this.ctx.countFungibleItem(itemId, meta.entityId) < want) {
       this.ctx.error(meta.entityId, 'You do not have that many to sell.');
       return;
@@ -300,21 +338,173 @@ export class Market {
       );
       return;
     }
-    this.ctx.removeFungibleItem(itemId, want, meta.entityId); // escrow (fungible-only, #1165)
-    this.marketListings.push({
-      id: this.nextListingId++,
-      sellerKey,
-      sellerName: meta.name,
-      itemId,
-      count: want,
-      price: ask,
-      expiresAt: this.ctx.time + MARKET_LISTING_DURATION,
-      house: false,
+    // Escrow per unit instead of the old blind fungible bulk-decrement, so each
+    // removed unit's craftedRecipeId marker (bags.ts InvSlot.craftedRecipeId,
+    // professions/crafting.ts) is known (BUG #9: losing it here let a crafted
+    // item launder its provenance through the World Market, reopening the
+    // disenchant anti-farming gate, professions/enchanting.ts
+    // isCraftedDisenchantVictim). The always-skip predicate is defence in
+    // depth on top of the countFungibleItem gate above: the market stays
+    // fungible-only (#1165), never touching an instanced or bound copy.
+    // A single sell request can legitimately span two provenance buckets: some
+    // content ships the same item id both crafted and drop-sourced
+    // (recipes.ts: boundstone_helm, gravewyrm_gauntlets), so this groups the
+    // removed units by marker and lists each bucket as its own row rather than
+    // merging them, keeping every listing's craftedRecipeId exact for every
+    // unit in it. The ask splits so every row gets at least MARKET_MIN_PRICE
+    // and the rows this call creates always sum to `ask` exactly; in the
+    // ordinary single-bucket case that is just `ask` on the one row, unchanged
+    // from before.
+    // Preview the bucket split BEFORE escrowing anything: the market only
+    // ever sells fungible (non-instanced) stock here (countFungibleItem
+    // gated `want` above), so this walks the same plain-slot,
+    // highest-index-first order removeVendorSellUnits uses, without
+    // mutating, purely to learn how many distinct craftedRecipeId buckets
+    // the removal will produce. Both the MARKET_MAX_LISTINGS and
+    // MARKET_MIN_PRICE-per-row invariants must hold for the split BEFORE any
+    // item leaves the seller's bag (#2605 review: a dual-provenance stack
+    // could otherwise push the seller over the listing cap, or price a
+    // bucket at 0 copper and hand the item away for free).
+    const previewByRecipe = new Map<string | undefined, number>();
+    let previewLeft = want;
+    for (let i = meta.inventory.length - 1; i >= 0 && previewLeft > 0; i--) {
+      const s = meta.inventory[i];
+      if (s.itemId !== itemId || s.instance) continue;
+      const take = Math.min(s.count, previewLeft);
+      previewByRecipe.set(s.craftedRecipeId, (previewByRecipe.get(s.craftedRecipeId) ?? 0) + take);
+      previewLeft -= take;
+    }
+    const bucketCountPreview = previewByRecipe.size;
+    if (mine + bucketCountPreview > MARKET_MAX_LISTINGS) {
+      this.ctx.error(
+        meta.entityId,
+        `You may keep at most ${MARKET_MAX_LISTINGS} goods on the market at once.`,
+      );
+      return;
+    }
+    if (ask < bucketCountPreview) {
+      this.ctx.error(meta.entityId, 'Name a price of at least 1 copper.');
+      return;
+    }
+    const units = removeVendorSellUnits(this.ctx, itemId, want, meta.entityId, () => true);
+    const byRecipe = new Map<string | undefined, number>();
+    for (const unit of units) {
+      byRecipe.set(unit.craftedRecipeId, (byRecipe.get(unit.craftedRecipeId) ?? 0) + 1);
+    }
+    const buckets = [...byRecipe.entries()];
+    let priceLeft = ask;
+    buckets.forEach(([craftedRecipeId, bucketCount], i) => {
+      const remainingBuckets = buckets.length - i;
+      const bucketPrice =
+        i === buckets.length - 1
+          ? priceLeft
+          : Math.max(
+              MARKET_MIN_PRICE,
+              Math.min(
+                priceLeft - (remainingBuckets - 1) * MARKET_MIN_PRICE,
+                Math.floor((ask * bucketCount) / want),
+              ),
+            );
+      priceLeft -= bucketPrice;
+      this.marketListings.push({
+        id: this.nextListingId++,
+        sellerKey,
+        sellerName: meta.name,
+        itemId,
+        count: bucketCount,
+        price: bucketPrice,
+        expiresAt: this.ctx.time + MARKET_LISTING_DURATION,
+        house: false,
+        ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+      });
     });
     this.ctx.emit({
       type: 'loot',
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
       text: `Listed ${def.name}${want > 1 ? ' x' + want : ''} on the World Market for ${formatMoney(ask)}.`,
+      pid: meta.entityId,
+    });
+  }
+
+  // List ONE instanced copy (#1165 completion): a signed, enchanted, masterwork,
+  // or otherwise payload-carrying copy that is NOT transfer-locked (armed
+  // bindOnTrade or bound boundTo copies never ride an anonymous pipe; the
+  // def-level quest/soulbound/noMarketList rules are unchanged). The copy is
+  // named by its payload, never a bag index, so a reshuffle between staging and
+  // submit cannot redirect the escrow; what enters the book is the payload of
+  // the actual copy removed from the bags (removeMatchingInstance's contract),
+  // never the wire needle. Single-copy by design: count 1, one listing per
+  // copy. The plain fungible path (marketList above) stays byte-identical.
+  marketListInstance(
+    itemId: string,
+    price: number,
+    instance: ItemInstancePayload,
+    pid?: number,
+  ): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    if (p.dead) return;
+    if (instance === null || typeof instance !== 'object') return;
+    if (!this.nearMerchant(p)) {
+      this.ctx.error(meta.entityId, 'You must bring your goods to the Merchant.');
+      return;
+    }
+    const def = ITEMS[itemId];
+    if (!def) return;
+    if (def.kind === 'quest') {
+      this.ctx.error(meta.entityId, 'The Merchant will not broker quest items.');
+      return;
+    }
+    if (def.noMarketList || def.soulbound) {
+      this.ctx.error(meta.entityId, 'That item cannot be listed on the World Market.');
+      return;
+    }
+    if (countMatchingUnlocked(meta, itemId, instance) < 1) {
+      if (holdsMatchingLocked(meta, itemId, instance)) {
+        this.ctx.error(meta.entityId, 'That item is bound and cannot be listed.');
+      } else {
+        this.ctx.error(meta.entityId, 'You do not have that many to sell.');
+      }
+      return;
+    }
+    const ask = Math.floor(price);
+    if (!Number.isFinite(ask) || ask < MARKET_MIN_PRICE) {
+      this.ctx.error(meta.entityId, 'Name a price of at least 1 copper.');
+      return;
+    }
+    if (ask > MARKET_MAX_PRICE) {
+      this.ctx.error(meta.entityId, 'That price is beyond what the Merchant will broker.');
+      return;
+    }
+    const sellerKey = this.marketSellerKey(meta);
+    const mine = this.marketListings.reduce(
+      (n, l) => n + (this.marketListingBelongsTo(l, meta) ? 1 : 0),
+      0,
+    );
+    if (mine >= MARKET_MAX_LISTINGS) {
+      this.ctx.error(
+        meta.entityId,
+        `You may keep at most ${MARKET_MAX_LISTINGS} goods on the market at once.`,
+      );
+      return;
+    }
+    const escrowed = removeMatchingInstance(this.ctx, itemId, instance, meta.entityId);
+    if (!escrowed) return; // revalidation raced away; nothing was removed
+    this.marketListings.push({
+      id: this.nextListingId++,
+      sellerKey,
+      sellerName: meta.name,
+      itemId,
+      count: 1,
+      price: ask,
+      expiresAt: this.ctx.time + MARKET_LISTING_DURATION,
+      house: false,
+      instance: escrowed,
+    });
+    this.ctx.emit({
+      type: 'loot',
+      text: `Listed ${def.name} on the World Market for ${formatMoney(ask)}.`,
       pid: meta.entityId,
     });
   }
@@ -352,12 +542,28 @@ export class Market {
       this.ctx.error(meta.entityId, 'You cannot afford that.');
       return;
     }
-    if (!this.ctx.canAddItem(listing.itemId, listing.count, meta.entityId)) {
+    if (
+      !canGrantCopies(
+        meta.inventory,
+        bagCapacity(meta.bags),
+        listing.itemId,
+        listing.count,
+        listing.instance,
+        listing.craftedRecipeId,
+      )
+    ) {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
     meta.copper -= listing.price;
-    this.ctx.addItem(listing.itemId, listing.count, meta.entityId);
+    grantCopies(
+      this.ctx,
+      meta.entityId,
+      listing.itemId,
+      listing.count,
+      listing.instance,
+      listing.craftedRecipeId,
+    );
     if (!listing.house) {
       const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
       this.collectionFor(listing.sellerKey).copper += proceeds;
@@ -395,12 +601,28 @@ export class Market {
       this.ctx.error(meta.entityId, 'That is not your listing.');
       return;
     }
-    if (!this.ctx.canAddItem(listing.itemId, listing.count, meta.entityId)) {
+    if (
+      !canGrantCopies(
+        meta.inventory,
+        bagCapacity(meta.bags),
+        listing.itemId,
+        listing.count,
+        listing.instance,
+        listing.craftedRecipeId,
+      )
+    ) {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
     this.marketListings.splice(idx, 1);
-    this.ctx.addItem(listing.itemId, listing.count, meta.entityId);
+    grantCopies(
+      this.ctx,
+      meta.entityId,
+      listing.itemId,
+      listing.count,
+      listing.instance,
+      listing.craftedRecipeId,
+    );
     const def = ITEMS[listing.itemId];
     this.ctx.emit({
       type: 'loot',
@@ -437,11 +659,21 @@ export class Market {
       col.copper = 0;
     }
     // Capacity gate: items that don't fit stay in the collection box (never
-    // destroyed); the gold above is always collected.
+    // destroyed); the gold above is always collected. Instance-aware on both
+    // arms so a returned instanced listing keeps its payload here too.
     const kept: typeof col.items = [];
     for (const s of col.items) {
-      if (this.ctx.canAddItem(s.itemId, s.count, meta.entityId)) {
-        this.ctx.addItem(s.itemId, s.count, meta.entityId);
+      if (
+        canGrantCopies(
+          meta.inventory,
+          bagCapacity(meta.bags),
+          s.itemId,
+          s.count,
+          s.instance,
+          s.craftedRecipeId,
+        )
+      ) {
+        grantCopies(this.ctx, meta.entityId, s.itemId, s.count, s.instance, s.craftedRecipeId);
       } else {
         kept.push(s);
       }
@@ -461,7 +693,15 @@ export class Market {
       const l = this.marketListings[i];
       if (l.house || this.ctx.time < l.expiresAt) continue;
       this.marketListings.splice(i, 1);
-      this.collectionFor(l.sellerKey).items.push({ itemId: l.itemId, count: l.count });
+      // Conditional spread: a plain row must not grow an `instance: undefined`/
+      // `craftedRecipeId: undefined` key (rows are persisted and diffed
+      // byte-for-byte). instance and craftedRecipeId are mutually exclusive.
+      this.collectionFor(l.sellerKey).items.push({
+        itemId: l.itemId,
+        count: l.count,
+        ...(l.instance ? { instance: l.instance } : {}),
+        ...(l.craftedRecipeId === undefined ? {} : { craftedRecipeId: l.craftedRecipeId }),
+      });
       const sellerMeta = this.metaByMarketSellerKey(l.sellerKey);
       if (sellerMeta) {
         const def = ITEMS[l.itemId];
@@ -526,6 +766,11 @@ export class Market {
       price: l.price,
       mine: isMine(l),
       house: l.house,
+      // Display projection only (publicInstanceView: signer/enchant/rolled,
+      // never boundTo/bindOnTrade/charges): browse rows are other players'
+      // goods, so the full payload never crosses the wire. Conditional spread:
+      // plain rows stay byte-identical (no `instance: undefined` key).
+      ...(l.instance ? { instance: publicInstanceView(l.instance) } : {}),
     }));
     const col = this.collectionForSeller(meta);
     const myListingCount = this.marketListings.reduce(
@@ -538,10 +783,24 @@ export class Market {
       // SELL/notes read true counts; `pageCount` below paginates the others.
       totalCount: matched.length,
       filter: query.search,
+      // Echo every filter axis, not just the search text: a fresh join (post-
+      // linkdead-grace reconnect) resets this session-only query to default, and
+      // this is the wire signal the client compares its own filter controls
+      // against to detect that drift (world_api/market.ts queryDiffersFromEcho,
+      // issue #2416).
+      itemType: query.itemType,
+      subtype: query.subtype,
+      armorClass: query.armorClass,
+      primaryStat: query.primaryStat,
+      rarity: query.rarity,
       page,
       pageCount,
       collectionCopper: col?.copper ?? 0,
-      collectionItems: col ? col.items.map((s) => ({ ...s })) : [],
+      // cloneInvSlot, not a shallow spread: the offline host hands this array
+      // straight to the UI, and an aliased live payload (mutable rolled/charges
+      // maps) must never leak out of the escrow book. Own goods, so the full
+      // payload (not the public trim) is correct here, the self inv precedent.
+      collectionItems: col ? col.items.map(cloneInvSlot) : [],
       cutPct: Math.round(MARKET_CUT * 100),
       maxListings: MARKET_MAX_LISTINGS,
       myListingCount,
@@ -564,11 +823,17 @@ export class Market {
           secondsLeft: Number.isFinite(l.expiresAt)
             ? Math.max(0, Math.round(l.expiresAt - this.ctx.time))
             : MARKET_LISTING_DURATION,
+          // Deep-cloned (never spread): the save must not alias the live book's
+          // mutable rolled/charges maps. Conditional so plain rows are unchanged.
+          ...(l.instance ? { instance: cloneItemInstancePayload(l.instance) } : {}),
+          ...(l.craftedRecipeId === undefined ? {} : { craftedRecipeId: l.craftedRecipeId }),
         })),
       collections: [...this.marketCollections.entries()].map(([key, c]) => ({
         key,
         copper: c.copper,
-        items: c.items.map((s) => ({ ...s })),
+        // cloneInvSlot, not a shallow spread: an instanced return's payload
+        // must not alias between the live collection and the serialized blob.
+        items: c.items.map(cloneInvSlot),
       })),
       nextListingId: this.nextListingId,
     };
@@ -606,12 +871,19 @@ export class Market {
       // corrected id rehydrates it. Display/buy paths already guard on ITEMS[id].
       if (!ITEMS[l.itemId])
         console.warn(`market: keeping listing with unknown item id ${l.itemId}`);
+      // A persisted instanced row rehydrates its payload (deep-cloned off the
+      // raw blob) and clamps to the single-copy contract: no hand-edited save
+      // can mint a counted stack of one escrowed special copy.
+      const instance =
+        l.instance && typeof l.instance === 'object'
+          ? cloneItemInstancePayload(l.instance)
+          : undefined;
       this.marketListings.push({
         id: plan.ids[i],
         sellerKey: String(l.sellerKey ?? ''),
         sellerName: String(l.sellerName ?? l.sellerKey ?? '?'),
         itemId: l.itemId,
-        count: Math.max(1, l.count | 0),
+        count: instance ? 1 : Math.max(1, l.count | 0),
         price: Math.max(
           MARKET_MIN_PRICE,
           Math.min(MARKET_MAX_PRICE, Math.floor(l.price) || MARKET_MIN_PRICE),
@@ -620,6 +892,8 @@ export class Market {
           this.ctx.time +
           (Number.isFinite(l.secondsLeft) ? Math.max(0, l.secondsLeft) : MARKET_LISTING_DURATION),
         house: false,
+        ...(instance ? { instance } : {}),
+        ...(typeof l.craftedRecipeId === 'string' ? { craftedRecipeId: l.craftedRecipeId } : {}),
       });
     }
     for (const c of save.collections ?? []) {
@@ -629,9 +903,16 @@ export class Market {
         // Keep returned/expired-listing items even when their id is unknown, for
         // the same reason as listings above: a content edit must not silently
         // empty a player's pending pickups. The id stays dormant until corrected.
+        // sanitizeEscrowSlot preserves an instanced return's payload and clamps
+        // its count to the identical-payload merge cap (the character-load rule).
         items: (c.items ?? [])
           .filter((s) => s && typeof s.itemId === 'string')
-          .map((s) => ({ itemId: s.itemId, count: Math.max(1, s.count | 0) })),
+          .map((s) => ({
+            ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance)),
+            ...(typeof s.craftedRecipeId === 'string'
+              ? { craftedRecipeId: s.craftedRecipeId }
+              : {}),
+          })),
       });
     }
     this.nextListingId = plan.nextListingId;
@@ -660,7 +941,12 @@ export class Market {
       const l = this.marketListings[i];
       if (l.house || !ITEMS[l.itemId]?.soulbound) continue;
       this.marketListings.splice(i, 1);
-      this.collectionFor(l.sellerKey).items.push({ itemId: l.itemId, count: l.count });
+      this.collectionFor(l.sellerKey).items.push({
+        itemId: l.itemId,
+        count: l.count,
+        ...(l.instance ? { instance: l.instance } : {}),
+        ...(l.craftedRecipeId === undefined ? {} : { craftedRecipeId: l.craftedRecipeId }),
+      });
     }
   }
 }

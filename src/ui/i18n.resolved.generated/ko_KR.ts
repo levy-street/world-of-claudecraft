@@ -888,6 +888,13 @@ export const ko_KR: EnTranslations = {
       "heroicName": "영웅: {name}",
       "heroicLocked": "영웅 난이도 {name}에 귀속되었습니다."
     },
+    "riftTracker": {
+      "title": "균열",
+      "floor": "{total}층 중 {current}층",
+      "closesIn": "균열이 {time} 후 닫힙니다",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "북",
       "NE": "북동",
@@ -915,6 +922,23 @@ export const ko_KR: EnTranslations = {
       "dock": "이 미터를 미터 창으로 되돌리기",
       "separate": "{meter} 분리",
       "regroup": "{meter} 통합"
+    },
+    "targetAuras": {
+      "title": "대상 오라",
+      "keybindLabel": "대상 강화 및 약화 효과",
+      "all": "All",
+      "debuffs": "약화 효과",
+      "buffs": "강화 효과",
+      "unlock": "대상 오라 창 이동",
+      "lock": "대상 오라 창 잠금",
+      "configureRows": "대상 오라 설정",
+      "fewerRows": "오라 행 수 줄이기",
+      "moreRows": "오라 행 수 늘리기",
+      "visibleRows": "선호하는 오라 행 수: {count}",
+      "showSources": "오라 시전자 이름 표시",
+      "hideSources": "오라 시전자 이름 숨기기",
+      "ownAura": "내 오라",
+      "opacity": "오라 불투명도: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "펫의 체력이 가득 찼습니다",
@@ -959,13 +983,15 @@ export const ko_KR: EnTranslations = {
       "name_shadowjump_toad": "그림자 도약 두꺼비 카마카게",
       "name_stormfeather_griffin": "하늘닿이 폭풍깃",
       "name_thunderstrut_gobbler": "천둥활보 대왕 칠면조",
+      "name_terrorspark_groundshaker": "대지를 뒤흔드는 테러스파크",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
       "desc_aether_hover_cycle": "낮게 떠서 빠르게 전장을 가로지르도록 설계된 강력한 마도 바이크입니다.",
       "desc_shadowjump_toad": "어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.",
       "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.",
-      "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다."
+      "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
+      "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다."
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
@@ -1271,6 +1297,51 @@ export const ko_KR: EnTranslations = {
       "badges": {
         "backgrounded": "백그라운드",
         "offline": "오프라인"
+      }
+    },
+    "auraOverlay": {
+      "title": "오라",
+      "currentClass": "현재 직업: {class}",
+      "previewHint": "위치 설정으로 오라를 옮겨 메뉴를 가리지 마세요.",
+      "noProcs": "이 캐릭터에 지원되는 발동이 없습니다.",
+      "enabled": "오라 표시",
+      "icon": "주문 아이콘",
+      "arcs": "측면 초승달",
+      "groundRing": "지면 고리",
+      "groundRingSpellOrder": "지면 고리: 주문 순서",
+      "crescentsSpellOrder": "측면 초승달: 주문 순서",
+      "size": "크기",
+      "iconSize": "아이콘 크기",
+      "crescentBlockSize": "초승달 블록 크기",
+      "groundRingBlockSize": "지면 고리 블록 크기",
+      "opacity": "불투명도",
+      "color": "색상",
+      "allOn": "모두 켜기",
+      "allOff": "모두 끄기",
+      "reposition": "위치 설정",
+      "positioning": "배치: {aura}",
+      "selectAura": "오라",
+      "done": "완료",
+      "moveLeft": "왼쪽 이동",
+      "moveUp": "위로 이동",
+      "moveDown": "아래로 이동",
+      "moveRight": "오른쪽 이동",
+      "moveEarlier": "주문을 안쪽으로",
+      "moveLater": "주문을 바깥쪽으로",
+      "screenPosition": "화면 위치",
+      "spellOrder": "주문 순서",
+      "reset": "위치 초기화",
+      "spellPosition": "주문 순서 {position} / {count}",
+      "procs": {
+        "revenge": "복수!",
+        "battleTrance": "전투 명상",
+        "overpowerCharge": "적수 강화",
+        "suddenDeath": "급사",
+        "victoryRush": "승리의 돌진",
+        "enrage": "혼란: 격노",
+        "heatingUp": "달아오름",
+        "arcaneCharge": "비전 충전",
+        "aetherRush": "에테르 쇄도"
       }
     },
     "playerCard": {
@@ -2076,6 +2147,14 @@ export const ko_KR: EnTranslations = {
       "benefits": "데스크톱 앱에서 Steam 계정을 연동하면 획득한 업적이 Steam 도전 과제로 반영됩니다.",
       "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Epic 연동",
+      "unlink": "Epic 연동 해제",
+      "linked": "Epic 계정 {id}에 연동됨",
+      "benefits": "Epic 데스크톱 앱에서 Epic 계정을 연동하면 획득한 업적이 Epic 도전 과제로 반영됩니다.",
+      "noProof": "Epic에서 연동 증명을 받지 못했습니다. Epic Games Store에서 실행한 뒤 다시 시도해 주세요."
+    },
     "mailbox": {
       "title": "우편함",
       "subtitle": "레이븐포스트",
@@ -2120,6 +2199,7 @@ export const ko_KR: EnTranslations = {
         "noRecipient": "그 이름을 가진 우편함 주인이 없습니다.",
         "tooManyParcels": "편지 하나에는 소포를 최대 {count}개까지 담을 수 있습니다.",
         "noMailQuestItems": "퀘스트 아이템은 우편으로 보낼 수 없습니다.",
+        "noMailBound": "그 아이템은 귀속되어 우편으로 보낼 수 없습니다.",
         "notEnoughItems": "보낼 수 있는 수량이 부족합니다.",
         "cantAffordPostage": "우편 요금을 낼 수 없습니다.",
         "recipientBoxFull": "상대의 우편함이 가득 찼습니다.",
@@ -2926,6 +3006,14 @@ export const ko_KR: EnTranslations = {
       "account_taken": "해당 Steam 계정은 이미 다른 계정에 연결되어 있습니다.",
       "upstream": "Steam이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
     },
+    "epic": {
+      "disabled": "현재 Epic 연동을 사용할 수 없습니다.",
+      "invalid_token": "Epic이 이 연동 요청을 확인하지 못했습니다. 데스크톱 앱에서 다시 시도해 주세요.",
+      "banned": "해당 Epic 계정은 연동할 수 없습니다.",
+      "already_linked": "계정에 이미 연동된 Epic 계정이 있습니다.",
+      "account_taken": "해당 Epic 계정은 이미 다른 계정에 연결되어 있습니다.",
+      "upstream": "Epic이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
+    },
     "wallet": {
       "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요."
     },
@@ -3531,14 +3619,6 @@ export const ko_KR: EnTranslations = {
         "name": "파충류",
         "desc": "쉭쉭거리는 소리와 날카로운 물어뜯기를 지닌 냉혈 사냥꾼들로, 온혈 야수들과는 뚜렷이 다릅니다."
       },
-      "murloc": {
-        "name": "개굴지느러미족",
-        "desc": "호숫가와 조수 웅덩이에 사는 개골거리는 물고기 인간들로, 물가에 너무 가까이 들어오는 것은 무엇이든 재빨리 떼 지어 덮칩니다."
-      },
-      "kobold": {
-        "name": "장난꾸러기 정령",
-        "desc": "숲속 공터와 산울타리를 종종거리며 뒤지는 약탈꾼과 요정들로, 수가 모이기 전까지는 위협이라기보다 골칫거리에 가깝습니다."
-      },
       "demon": {
         "name": "악마",
         "desc": "균열 너머에서 온 침략자들로, 온통 불길과 악의뿐입니다. 악마 하나가 서 있는 곳이라면, 균열이 결코 멀지 않습니다."
@@ -4076,7 +4156,7 @@ export const ko_KR: EnTranslations = {
           "levelingHeading": "마법부여 올리는 법",
           "levelingBody": "기술을 움직이는 행동은 둘이다. 분해와 마법부여 시전. 성공마다 최대 1점이고, 일의 무게로 환산된다. 일반 분해와 가루만 드는 마법부여는 일반 일, 고급 분해와 정수 마법부여는 고급, 희귀 분해와 모든 Runed나 Greater 마법부여는 희귀, 영웅과 전설 분해는 그보다 높다. 익숙한 숙달 감쇠가 25점 단위로 걸려 일반 일은 기술 75에, 고급 일은 100에, 희귀 일은 정확히 상한 125에 회색이 된다. 마법부여만의 자비도 하나 있다. 천장을 넘는 입력은 0이 아니라 천장으로 내림되니, 맹세 전의 영웅 분해는 아무것도 못 배우는 대신 희귀로 계산된다. 마법부여가 다른 정체성 뒤에서 휴면하면 모든 것이 일반 일로 계산되어 오름세가 75에 멎고, 취미로 두면 희귀 일이 여전히 값을 하되 75 이후 느려질 뿐이다.",
           "marketHeading": "부여된 사본, 출처, 시장",
-          "marketBody": "마법부여는 재료를 소모하고 특정 사본 하나에 표시를 남긴다. 가방 속 사본에 쓰면 별개의 부여된 사본을 돌려받고, 이미 착용 중인 물건에 쓰면 벗었다 다시 입을 필요 없이 그 자리에서 부여된다. 어느 쪽이든 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본에 다른 마법부여를 쓰면 먼저 확인을 거친 뒤 옛 부여를 그대로 대체하며, 옛 부여는 재료 환불 없이 파괴된다. 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 세계 시장은 무표식 일반품만 다루므로 부여품과 서명품은 거래 창에서 직접 오간다. 시장에 올릴 수 있는 절반은 재료 쪽이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다."
+          "marketBody": "마법부여는 재료를 소모하고 특정 사본 하나에 표시를 남긴다. 가방 속 사본에 쓰면 별개의 부여된 사본을 돌려받고, 이미 착용 중인 물건에 쓰면 벗었다 다시 입을 필요 없이 그 자리에서 부여된다. 어느 쪽이든 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본에 다른 마법부여를 쓰면 먼저 확인을 거친 뒤 옛 부여를 그대로 대체하며, 옛 부여는 재료 환불 없이 파괴된다. 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 이제 부여품과 서명품도 세계 시장에 올릴 수 있다. 한 점씩 단일 등록으로 팔리고, 툴팁에 부여와 제작자의 서명이 표시되며, 큰까마귀 우편으로도 똑같이 보낼 수 있다. 재료는 여전히 장사의 든든한 절반이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다."
         }
       },
       "howHeading": "제작 방법",
@@ -4187,7 +4267,7 @@ export const ko_KR: EnTranslations = {
         "sellsHeading": "무엇이 팔리고, 왜 팔리나",
         "sellsBody": "가장 꾸준한 장사는 소모품이다. 쓰면 사라지고 다시 사기 때문이다. 물약, 요리, 마법부여는 모두 소모된다. 검을 한 번 산 전사도 치유 물약은 영원히 산다. 걸작은 프리미엄 시장이다. 주문 제작이 불가능하니 원하는 물건 하나에 진짜 웃돈이 붙고, 그 위의 서명은 걸어 다니는 광고다. 재료가 세 번째 기둥이다. 분해에서 나오는 비전 재료, 분해자에게서 마법부여사에게 곧장 흐르는 Resonant 부산물, 그리고 걸작 발동을 노리는 장인들이 웃돈을 주고 사는 서명된 채집 재료다.",
         "marketHeading": "세계 시장과 수수료",
-        "marketBody": "세계 시장은 Eastbrook의 Merchant와 Highwatch의 Auctioneer Voss가 지키는 서버 전체 거래소다. 등록은 무료다. 보증금이 없고 유찰된 물건은 그대로 돌아온다. 수수료는 성사될 때만 판매가의 5%를 뗀다. 중요한 한계 하나. 시장은 표식 없는 일반품만 다룬다. 서명, 걸작, 마법부여, 귀속된 사본은 등록되지 않으므로, 특별한 물건은 거래 창에서 얼굴을 맞대고 넘긴다. 값은 직접 매기자. 시장은 일반판 시세만 알려 줄 뿐이다.",
+        "marketBody": "세계 시장은 Eastbrook의 Merchant와 Highwatch의 Auctioneer Voss가 지키는 서버 전체 거래소다. 등록은 무료다. 보증금이 없고 유찰된 물건은 그대로 돌아온다. 수수료는 성사될 때만 판매가의 5%를 뗀다. 특별한 물건도 환영이다. 서명, 걸작, 마법부여된 사본은 한 점씩 단일 등록으로 올라가고, 툴팁에 서명까지 그 정체가 그대로 실리며, 일반 더미와 섞이지 않는다. 유일하게 거절되는 것은 귀속된 사본이다. 제작자의 서약에 묶였거나 묶일 예정인 물건은 시장에도 우편에도 오르지 못하니, 서약을 세탁할 길은 없다. 특별한 물건의 값은 직접 매기자. 일반 등록은 일반판 시세만 알려 줄 뿐이다.",
         "workOrdersHeading": "작업 주문",
         "workOrdersNote": "장인마다 자기 단골 재료 한 묶음을 상점가의 {pct}%에 사들이며, {minutes}분마다 되풀이할 수 있다.",
         "colOrder": "작업 주문",
@@ -4246,7 +4326,7 @@ export const ko_KR: EnTranslations = {
       "tradeBody": "가까이 선 사람과는 누구든 얼굴을 맞대고 거래할 수 있습니다. 둘이 함께 쓰는 창에 물건과 동전을 올리고, 양쪽이 모두 확인해야 비로소 교환이 이루어지므로 어느 쪽도 당할 일이 없습니다. 친구에게 전리품을 건네거나 약속을 매듭짓는 간단한 방법입니다.",
       "mailTitle": "레이븐포스트",
       "mailBody": "모든 거점 마을에는 조각한 까마귀 석주가 서 있습니다. 왕국의 편지 배달부, 레이븐포스트의 우편함입니다. 그 앞에 서면 접속 중인 친구든 오래 접속하지 않은 이든 어떤 캐릭터에게나 이름으로 편지를 쓸 수 있고, 약간의 우편 요금으로 동전이나 물건을 편지에 첨부할 수 있습니다. 까마귀가 날아가는 데는 잠시 시간이 걸리며, 도착하면 봉투 표시가 받는 이에게 무언가 기다리고 있음을 알려 줍니다.",
-      "mailHow": "받는 것도 똑같이 거꾸로 하면 됩니다. 어느 석주 앞에서든 편지를 읽고, 담긴 것을 지갑과 가방으로 옮기세요. 편지는 영원히 기다려 주지 않으니, 까마귀가 당신을 포기하기 전에 찾아가세요. 우편이 딱 잘라 거절하는 것이 둘 있습니다. 귀속 아이템과 퀘스트 물품은 당신과 함께 다니거나, 아예 다니지 않습니다. 그리고 보람찬 퀘스트 완료 뒤에는 석주를 눈여겨보세요. 편지를 쓰는 퀘스트 제공자들도 있으니까요.",
+      "mailHow": "받는 것도 똑같이 거꾸로 하면 됩니다. 어느 석주 앞에서든 편지를 읽고, 담긴 것을 지갑과 가방으로 옮기세요. 편지는 영원히 기다려 주지 않으니, 까마귀가 당신을 포기하기 전에 찾아가세요. 우편이 딱 잘라 거절하는 것이 몇 가지 있습니다. 귀속 아이템, 퀘스트 물품, 그리고 이미 귀속되었거나 거래로 귀속될 물건은 당신과 함께 다니거나, 아예 다니지 않습니다. 그리고 보람찬 퀘스트 완료 뒤에는 석주를 눈여겨보세요. 편지를 쓰는 퀘스트 제공자들도 있으니까요.",
       "dailyTitle": "일일 보상",
       "dailyBody": "화면의 보물 상자 버튼을 누르면 일일 보상 창이 열립니다. 매일 몇 가지 과제가 주어지는데, 퀘스트 완수, 잿빛 콜로세움에서의 전투, 베일 컵 경기 승리 등이 있으며, 상품 수레바퀴를 무료로 한 번 돌릴 수도 있습니다. 이 모두가 그날의 순위를 위한 점수가 되고, 그날 최고 점수를 올린 이들은 선택 사항인 커뮤니티 토큰 보유자를 위한 상금 풀을 나눠 갖습니다. 이 중 어느 것도 게임 내에서 힘을 주지는 않습니다. 창 자체가 그날의 규칙과 참가 자격을 설명하고, 순위표를 보여주며, 여러분의 기록을 보관합니다.",
       "marketTitle": "세계 시장",
@@ -6479,10 +6559,12 @@ export const ko_KR: EnTranslations = {
       "arenaQueueTrading": "거래를 끝낸 뒤 대기열에 들어가세요.",
       "arenaQueueInstance": "인스턴스 안에서는 대기열에 들어갈 수 없습니다.",
       "tradeInProgress": "이미 거래가 진행 중입니다.",
+      "tradeAlreadyTrading": "그 플레이어는 이미 거래 중입니다.",
       "tradeTooFar": "대상이 너무 멀어 거래할 수 없습니다.",
       "tradeExpired": "거래 요청이 만료되었습니다.",
       "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다.",
-      "tradeBound": "그 아이템은 귀속되어 거래할 수 없습니다."
+      "tradeBound": "그 아이템은 귀속되어 거래할 수 없습니다.",
+      "marketListBound": "그 아이템은 귀속되어 등록할 수 없습니다."
     },
     "logs": {
       "standUp": "일어섰습니다.",
@@ -7227,7 +7309,7 @@ export const ko_KR: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "상급 투명화",
-        "description": "20초 동안 모습을 감춥니다. 지속 피해 효과 2개를 제거하고 투명 상태인 동안과 해제 직후 받는 피해가 90% 감소합니다. (마법사 특성)"
+        "description": "20초 동안 사라지며 지속 피해 효과를 2개 제거합니다. 투명화가 끝나면 2초 동안 받는 피해가 90% 감소합니다. (마법사 특성)"
       },
       "hot_streak": {
         "name": "몰아치는 열기",
@@ -9745,6 +9827,9 @@ export const ko_KR: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "마지막 요새의 인장"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "테러스파크 시동 열쇠"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

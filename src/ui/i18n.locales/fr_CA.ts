@@ -141,8 +141,6 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Réinitialise la recharge de Pas scintillant, Voile de givre et Invisibilité accrue. (Talent de mage)',
   'entities.abilities.greater_invisibility.name': 'Invisibilité accrue',
-  'entities.abilities.greater_invisibility.description':
-    'Disparais pendant 20 s : enlève 2 effets de dégâts périodiques et réduit de 90% les dégâts que tu subis tant que tu es invisible et pour un court moment après. (Talent de mage)',
   'entities.abilities.hot_streak.name': 'Suite flamboyante',
   'entities.abilities.hot_streak.description':
     "Passif : deux coups critiques de suite avec tes sorts de Feu (Boule de feu, Trait de feu, Brûlure, Explosion pyrotechnique ou Choc de flammes) rendent ta prochaine Explosion pyrotechnique ou ton prochain Choc de flammes instantané et gratuit. Les sorts qui dépensent cet effet comptent pour la suite SUIVANTE, même les incantations gratuites; Choc de flammes ne compte qu'une fois, peu importe le nombre d'ennemis touchés, et seul le premier impact peut compter. (Feu)",

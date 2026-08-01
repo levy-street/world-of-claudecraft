@@ -3247,8 +3247,6 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
   family_elemental: r('storm', 'sky', ['lightning'], ['glow']),
   family_dragonkin: r('fire', 'ember', ['claw_slash'], ['glow']),
   family_reptile: r('earth', 'leafGreen', ['fang']),
-  family_kobold: r('junk', 'gold', ['candle']),
-  family_murloc: r('drink', 'sky', ['droplet'], ['motion']),
   family_sheep: r('nature', 'silverWhite', ['sheep_head']),
   // status / interaction markers
   status_npc: r('parchment', 'gold', ['sigil_rune']),
@@ -4320,6 +4318,7 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_shadowjump_toad',
   'reins_stormfeather_griffin',
   'reins_thunderstrut_gobbler',
+  'reins_terrorspark_groundshaker',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the

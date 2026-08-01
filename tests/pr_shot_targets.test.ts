@@ -28,6 +28,35 @@ describe('classifyDiff', () => {
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual(['player-tooltip']);
   });
 
+  it('captures offensive and healer target auras on desktop', () => {
+    const plan = classifyDiff(['src/ui/target_auras_window.ts']);
+    expect(plan.specific.map((target: { key: string }) => target.key)).toEqual(['target-auras']);
+    expect(plan.specific[0].variants).toEqual([
+      {
+        key: 'lunar-tempest-desktop',
+        charClass: 'druid',
+        charName: 'Morphalo',
+        abilityId: 'moonfire',
+        friendly: false,
+      },
+      {
+        key: 'second-bloom-desktop',
+        charClass: 'druid',
+        charName: 'Morphalo',
+        abilityId: 'regrowth',
+        friendly: true,
+      },
+    ]);
+    const captureSource = plan.specific[0].capture.toString();
+    expect(captureSource).not.toMatch(/sim\.castAbility\s*\(/);
+    expect(captureSource).toContain('.action-btn[data-hotbar-slot="1"]');
+    expect(captureSource).toContain('button.click()');
+    expect(captureSource).toContain("PR_SHOTS_ALLOW_MISSING_TARGET_AURAS === '1'");
+    expect(captureSource).toContain("throw new Error('target aura window is unavailable')");
+    expect(captureSource.match(/#loading-screen/g)).toHaveLength(3);
+    expect(captureSource).toContain("document.body.classList.contains('game-active')");
+  });
+
   it('captures both the market overview and expanded armor filters for market window changes', () => {
     const plan = classifyDiff(['src/ui/market_window.ts']);
     expect(plan.isVisual).toBe(true);

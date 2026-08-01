@@ -77,8 +77,43 @@ describe('perf overlay header/footer clear the corner ornament (padding)', () =>
     expect(componentsCss).not.toContain('#options-menu.perf-wide .panel-title > .x-btn.back-btn');
   });
 
-  it('the window bottom padding clears the bottom-corner ornament for the footer buttons', () => {
-    const bodies = ruleBodies(componentsCss, '#options-menu.perf-wide');
+  it('the scroll wrapper bottom padding clears the bottom-corner ornament for the footer buttons', () => {
+    // Moved off #options-menu.perf-wide itself (issue #2569): that element hosts
+    // the gilded ::before ornament and must stay non-scrolling (see the describe
+    // block below), so the bottom clearance now lives on the .perf-scroll child
+    // that actually scrolls (perf_overlay_settings.ts).
+    const bodies = ruleBodies(componentsCss, '#options-menu.perf-wide .perf-scroll');
     expect(pxValue(bodies, 'padding-bottom')).toBeGreaterThanOrEqual(MIN_CLEARANCE);
+  });
+});
+
+// Rule bodies carry explanatory prose (this file's own comments above are proof
+// enough of that), and that prose is free to mention `overflow-y: auto` as the
+// bug it is guarding against; strip CSS comments before pattern-matching actual
+// declarations so the guard cannot trip over its own explanation.
+function stripCssComments(text: string): string {
+  return text.replace(/\/\*[\s\S]*?\*\//g, '');
+}
+
+describe('perf overlay ornament host never scrolls with the panel content (issue 2569)', () => {
+  it('#options-menu.perf-wide itself declares no auto/scroll overflow (the ::before ornament lives on this exact box)', () => {
+    // The base `.window` rule (layout.css) sets `overflow-y: auto`; if this
+    // element (the one the gilded ::before ornament is attached to) inherited
+    // that unchanged, the ornament would scroll away with the panel content
+    // instead of staying pinned to the window frame.
+    const bodies = ruleBodies(componentsCss, '#options-menu.perf-wide');
+    const overflowDecls = bodies
+      .flatMap((b) => [...stripCssComments(b).matchAll(/\boverflow(?:-y)?:\s*([a-z]+)/g)])
+      .map((m) => m[1]);
+    expect(overflowDecls, 'no rule block overrides overflow/overflow-y').not.toHaveLength(0);
+    for (const value of overflowDecls) {
+      expect(['auto', 'scroll']).not.toContain(value);
+    }
+  });
+
+  it('the .perf-scroll wrapper is the one that actually scrolls', () => {
+    const bodies = ruleBodies(componentsCss, '#options-menu.perf-wide .perf-scroll');
+    const hasScrollY = bodies.some((b) => /overflow-y:\s*(auto|scroll)/.test(stripCssComments(b)));
+    expect(hasScrollY, '.perf-scroll must declare overflow-y: auto or scroll').toBe(true);
   });
 });

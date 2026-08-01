@@ -460,8 +460,8 @@ export interface Aura {
   remaining: number; // seconds
   duration: number;
   value: number; // dot/hot: per tick; slow/haste/speed: multiplier; absorb: remaining; buffs: amount
-  value2?: number; // imbue: judgement min; thorns unused
-  value3?: number; // imbue: judgement max
+  value2?: number; // imbue: judgement min; Greater Invisibility: aftereffect DR
+  value3?: number; // imbue: judgement max; Greater Invisibility: aftereffect duration
   tickInterval?: number;
   tickTimer?: number;
   sourceId: number;
@@ -572,26 +572,14 @@ export type EquipSlot =
   | 'ring1'
   | 'ring2';
 
-// The eleven launch equip slots, frozen for the original full-paperdoll deed and
-// the all-slot PvP sets. Offhand is intentionally not added to this historical
-// list: ALL_EQUIP_SLOTS is the live stat/command surface.
-export const EQUIP_SLOTS: readonly EquipSlot[] = [
-  'mainhand',
-  'helmet',
-  'neck',
-  'shoulder',
-  'chest',
-  'waist',
-  'legs',
-  'gloves',
-  'feet',
-  'ring1',
-  'ring2',
-];
-
 // Every live equipment key, including the redesigned Warrior's additive
-// offhand. Stat derivation and command validators use this list; launch-era
-// completeness rewards continue to use the frozen EQUIP_SLOTS list above.
+// offhand. THE equipment surface: stat derivation, command validators, and
+// anything else that iterates or checks slots reads this list.
+//
+// The frozen eleven-slot launch list is deliberately NOT here beside it; it
+// lives in launch_paperdoll_slots.ts, which explains why. Sitting next to this
+// one under the near-identical name EQUIP_SLOTS, it got picked up twice by code
+// that meant this list.
 export const ALL_EQUIP_SLOTS: readonly EquipSlot[] = [
   'mainhand',
   'offhand',
@@ -606,6 +594,19 @@ export const ALL_EQUIP_SLOTS: readonly EquipSlot[] = [
   'ring1',
   'ring2',
 ];
+
+/** Narrow an untrusted slot string (a wire field, a DOM dataset value, a
+ *  persisted JSONB key) to an EquipSlot against the LIVE slot surface.
+ *
+ *  Use this instead of hand-rolling a membership check. Every hand-rolled one
+ *  needed an `as readonly string[]` cast to compile, and that cast erases
+ *  exactly the type information that would flag the wrong list: five sites
+ *  carried it, four with a comment warning which constant to use, and the
+ *  unguarded fifth dropped every worn offhand's enchant on login. The cast
+ *  belongs here, once, where the list it applies to is not a choice. */
+export function isEquipSlot(value: string): value is EquipSlot {
+  return (ALL_EQUIP_SLOTS as readonly string[]).includes(value);
+}
 
 // What an ITEM declares as its slot. Rings declare the slot KIND ('ring'); the
 // equip path resolves the concrete ring1/ring2 equipment key at equip time
@@ -1139,8 +1140,6 @@ export type MobFamily =
   | 'elemental'
   | 'dragonkin'
   | 'demon'
-  | 'kobold'
-  | 'murloc'
   | 'reptile';
 export type PetMode = 'passive' | 'defensive' | 'aggressive';
 export type PetRole = 'melee_tank' | 'ranged_dps';
@@ -1159,6 +1158,12 @@ export interface MobTemplate {
   armorPerLevel: number;
   moveSpeed: number;
   aggroRadius: number; // base, at equal level
+  // Hard tether (yards from spawnPos): past it the mob evades home to a full
+  // reset, whatever its refreshing leashAnchor says. The soft leash measures
+  // from an anchor every hostile action re-seeds, so a patient player can walk
+  // an ordinary mob across the map one leash-length at a time; a mob carrying
+  // this cannot be kited off its ground (mob/combat_profile.ts).
+  hardLeashRadius?: number;
   loot: LootEntry[];
   scale: number; // render hint
   color: number; // render hint
@@ -2251,16 +2256,14 @@ export type AbilityEffect =
       // caster included, distance 0). Absent = every friendly in radius.
       maxTargets?: number;
     }
-  // Greater Invisibility (mage choice row): one dispatch applies the whole
-  // package (a 'stealth'-kind vanish for `duration`, a buff_dr damage cut for
-  // `duration` + `linger` so it survives an early break, and strips up to
-  // `removeDotCount` damage-over-time auras). One effect so the two self-auras
-  // get distinct ids (the selfBuff case keys auras by the ability id alone).
+  // Greater Invisibility (mage choice row): strips up to `removeDotCount`
+  // damage-over-time auras, vanishes for `duration`, then applies `drValue`
+  // damage reduction for `afterDuration` once the vanish ends.
   | {
       type: 'greaterInvisibility';
       duration: number;
       drValue: number;
-      linger: number;
+      afterDuration: number;
       removeDotCount: number;
     }
   | { type: 'charge' }
@@ -2628,6 +2631,11 @@ export interface ZoneDef {
   // Defaults to 0 (the original zones' central road); the Drakelands set it
   // to the Pale Causeway's head so the Wyrmgate opens where the road arrives.
   southPassX?: number;
+  // Per-zone override of the open-world trash respawn delay (seconds), which
+  // otherwise comes from this zone's level band (src/sim/respawn_policy.ts
+  // trashRespawnSecondsForZone). An explicit SimConfig.respawnSeconds still
+  // wins over it, and a MobTemplate.respawnSeconds still wins over both.
+  trashRespawnSeconds?: number;
 }
 
 // One end of a paired overworld portal. Walking within the pair's trigger
@@ -3348,6 +3356,11 @@ export interface Entity extends ClientMirroredEntityFields {
   warcryTimer: number; // warcry ally-haste pulse countdown
   firedSummons: number; // summonAdds thresholds already triggered
   summonedIds: number[]; // live adds this boss summoned; despawned on reset
+  // Server-local (never on the wire; blankEntity keeps host shapes identical):
+  // true for a mob spawnBossAdds erupted beside its summoner. A slain add
+  // unravels with its corpse instead of respawning at its eruption point,
+  // which is wherever the fight dragged (see mob/locomotion.ts).
+  summonedAdd: boolean;
   enraged: boolean; // enrage mechanic active
   // Heroic-instance mechanic scaling (instances/difficulty.ts applyDungeonMobTuning).
   // Mechanic numbers (aoePulse/bigCast/stomp damage; mendAlly/wardAllies/stoneskin
@@ -3415,6 +3428,13 @@ export interface Entity extends ClientMirroredEntityFields {
    *  Bonewalker). Affix re-trigger checks exclude these so an affix-spawned mob's
    *  own death can never re-trigger the same affix (would otherwise chain forever). */
   affixSpawned?: boolean;
+  /** True for a mob spawned by a RUN or script rather than placed by a CAMP
+   *  (e.g. an escort ambush wave). It has no authored home in the world, so its
+   *  death must not schedule an in-place respawn: handleDeath gives it an
+   *  Infinity respawnTimer and its owner drops it when the run ends. Without
+   *  this, every killed wave member returned as a permanent orphan spawn and
+   *  the run's route accumulated mobs indefinitely. */
+  runScoped?: boolean;
   respawnTimer: number;
   corpseTimer: number;
   lootFfaTimer: number; // seconds of owner-lock left before tap loot opens to all (FFA); Infinity until rollLoot starts it
@@ -3487,6 +3507,18 @@ export interface Entity extends ClientMirroredEntityFields {
   // list are live on THIS spawn (C=1, B=2, A=3, S=4; rift/ranks.ts). Undefined
   // (every non-rift mob, and rift trash) suppresses nothing.
   riftMechanicLimit?: number;
+  // Rift boss mechanic spacing: the minimum gap in seconds between two boss
+  // mechanic fires on THIS spawn, so mechanics never land on top of each other
+  // (mob/mechanic_spacing.ts). Stamped by rift/runs.ts on every rift boss and
+  // miniboss, including the authored citadel set-piece. Undefined (every
+  // non-rift mob) disables the shared lock entirely.
+  riftMechanicSpacing?: number;
+  // Countdown on the shared mechanic lock (mob/mechanic_spacing.ts). Armed each
+  // time a spacing-governed mechanic fires (plus the cast time for a hardcast,
+  // so an instant can never land mid-telegraph); while it runs, every other
+  // spacing-governed mechanic holds at due and fires the tick the lock clears.
+  // Only ever defined on a mob with riftMechanicSpacing.
+  mechanicLockTimer?: number;
   // misc
   dead: boolean;
   // Ghost/spirit state for the WoW-style death -> corpse-run -> resurrect loop.
@@ -3653,6 +3685,7 @@ export type MailResultCode =
   | 'tooManyParcels'
   | 'noMailQuestItems'
   | 'noMailSoulbound'
+  | 'noMailBound'
   | 'notEnoughItems'
   | 'cantAffordPostage'
   | 'recipientBoxFull'
@@ -4592,6 +4625,13 @@ export type SimEvent = { pid?: number } & (
       name: string;
       themeName: string;
       tier: RiftTier | null;
+      // Epoch-ms deadline (via ctx.lockoutNowMs, the same conversion
+      // rift/persistence.ts uses for save/load) after which the rift's backing
+      // world event stops admitting new parties. Null for a dev-spawned rift
+      // (no backing RiftEvent) or once the party has left. The client mirrors
+      // this verbatim and derives a locally-ticking "closes in" countdown from
+      // it, so it never needs a snapshot round trip once a second.
+      expiresAtMs: number | null;
     }
   | {
       type: 'riftRaceResult';
@@ -5040,7 +5080,13 @@ export interface WorldContent {
 export interface SimConfig {
   seed: number;
   playerClass: PlayerClass;
-  respawnSeconds?: number; // mob respawn time (default 25)
+  // Global base mob respawn delay (seconds). LEAVE IT UNSET for a normal world:
+  // open-world trash then respawns on the per-zone level-band tier
+  // (src/sim/respawn_policy.ts), and only mobs outside every zone rect (instanced
+  // interiors) fall back to the 25s default. Setting it pins EVERY mob in the
+  // world to this base instead, which is what the RL env and the fast unit tests
+  // want; that is why it stays possibly-undefined on Sim.cfg.
+  respawnSeconds?: number;
   autoEquip?: boolean; // auto-equip better gear on loot (headless convenience)
   playerName?: string;
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
@@ -5620,6 +5666,49 @@ export function swingMissChance(attacker: Entity, target: Entity): number {
 export function armorReduction(armor: number, attackerLevel: number): number {
   const a = Math.max(0, armor);
   return Math.min(0.75, a / (a + 85 * attackerLevel + 400));
+}
+
+// Enemy mobs' damage against a player is never mitigated away by armor DR by more
+// than this fraction, mirroring MOB_VS_PLAYER_MAX_MISS's floor on melee miss chance
+// (same value, same directional guard). Without this, a heavily armored higher-level
+// player or player-owned pet could reduce a lower-level hostile mob's already-floored
+// hit chance further into near-zero damage per swing, making defensive-pet AFK farming
+// risk-free (see issue #1050).
+export const MOB_VS_PLAYER_MAX_ARMOR_DR = MOB_VS_PLAYER_MAX_MISS;
+
+// Below this many levels under the target, the armor-DR cap is fully saturated at
+// MOB_VS_PLAYER_MAX_ARMOR_DR; between 0 and this span it ramps linearly rather than
+// stepping off a single-level cliff. Mirrors the span ABOVE_LEVEL_MISS_PCT ramps its
+// own above-level penalty over (3 levels), so a mob one level below the target only
+// loses a third of the way toward the cap instead of jumping straight to it.
+const ARMOR_DR_RAMP_LEVELS = 3;
+
+// Effective armor-DR fraction for `attacker`'s hit on `target`, floored directionally
+// the same way swingMissChance floors mob miss. Unlike meleeMissChance, armorReduction
+// itself carries NO level-difference term (only the attacker's level and the target's
+// armor), so unconditionally capping it here would also neuter armor against a
+// same-level or higher-level mob, including raid bosses: a live tanking stat, not an
+// anti-power-level deterrent, and level parity is not what issue #1050 was about.
+// The cap only applies in the exact inverted case the miss/resist floors correct: a
+// LOWER-level hostile mob (or its cleave splash) hitting a higher-level player or
+// player-owned pet. At or above the target's level, armor keeps its full, uncapped
+// scaling in both directions. The cap itself ramps with the level gap (linearly, from
+// the natural uncapped DR at a 1-level gap down to MOB_VS_PLAYER_MAX_ARMOR_DR at
+// ARMOR_DR_RAMP_LEVELS and beyond) rather than snapping straight to the floor at a
+// single level below, so a heavily armored player doesn't take a discontinuous jump in
+// damage taken crossing one level boundary (a mob 3+ levels down keeps the full cap,
+// matching the far-below-level farming case issue #1050 describes).
+export function mobArmorReduction(attacker: Entity, target: Entity, armor: number): number {
+  const dr = armorReduction(armor, attacker.level);
+  const mobAttacker = attacker.kind === 'mob' && attacker.hostile && attacker.ownerId === null;
+  const playerSide = target.kind === 'player' || target.ownerId !== null;
+  const diff = target.level - attacker.level;
+  if (mobAttacker && playerSide && diff > 0) {
+    const t = Math.min(1, diff / ARMOR_DR_RAMP_LEVELS);
+    const rampedCap = dr - (dr - MOB_VS_PLAYER_MAX_ARMOR_DR) * t;
+    return Math.min(dr, rampedCap);
+  }
+  return dr;
 }
 
 // ---------------------------------------------------------------------------

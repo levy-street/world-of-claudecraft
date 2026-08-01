@@ -35,6 +35,8 @@ import {
   claudiumPreAuthRateLimited,
   DISCORD_MAX_PER_MINUTE,
   discordRateLimited,
+  EPIC_LINK_MAX_PER_MINUTE,
+  epicLinkRateLimited,
   MAP_MUTATION_MAX_PER_MINUTE,
   mapMutationRateLimited,
   mergeFusedOutcomes,
@@ -220,6 +222,18 @@ export const STEAM_LINK_POLICY: RateLimitPolicy = {
   limit: STEAM_LINK_MAX_PER_MINUTE,
   windowSeconds: WINDOW_SECONDS,
   tier1: (ctx) => steamLinkRateLimited(ctx.req, ctxAccountId(ctx)),
+  tier2: 'global',
+};
+
+// Epic link attempts (POST /api/epic/link). Twin of STEAM_LINK_POLICY:
+// 'ip+account' (mounts BEHIND the route's auth guard) and deliberately tight
+// for the Phase 5 upstream verify call.
+export const EPIC_LINK_POLICY: RateLimitPolicy = {
+  name: 'epic_link',
+  keyClass: 'ip+account',
+  limit: EPIC_LINK_MAX_PER_MINUTE,
+  windowSeconds: WINDOW_SECONDS,
+  tier1: (ctx) => epicLinkRateLimited(ctx.req, ctxAccountId(ctx)),
   tier2: 'global',
 };
 

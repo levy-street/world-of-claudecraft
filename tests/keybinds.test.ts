@@ -111,6 +111,15 @@ describe('registry', () => {
     expect(discord?.category).toBe('Interface');
     expect(discord?.kind).toBe('edge');
     expect(discord?.defaults).toEqual(['KeyU']);
+    const metersIndex = BIND_ACTIONS.findIndex((a) => a.id === 'meters');
+    const targetAuras = BIND_ACTIONS[metersIndex + 1];
+    expect(targetAuras).toMatchObject({
+      id: 'targetAuras',
+      label: 'Target Buffs and Debuffs',
+      category: 'Interface',
+      kind: 'edge',
+      defaults: ['Shift+KeyJ'],
+    });
     // The Vale Cup window is a rebindable Interface toggle (default T; J and
     // G are taken by targetFriendlyNext and the arena on this branch).
     const valecup = BIND_ACTIONS.find((a) => a.id === 'valecup');
@@ -475,6 +484,28 @@ describe('per-character scope', () => {
     expect(fresh.codeAt('slot11', 0)).toBe('Equal');
     expect(fresh.actionForCode('KeyQ')).toBe('strafeLeft');
     expect(fresh.actionForCode('KeyE')).toBe('strafeRight');
+  });
+
+  it('repairs a stale v0.24.0-window meters:KeyZ binding and its collateral Sheathe eviction', () => {
+    // The v0.24.0 overhaul window also persisted Damage Meters on KeyZ alongside
+    // the Q/E strafe signature. meters is processed before sheathe in
+    // BIND_ACTIONS, so an unrepaired stored meters:['KeyZ', null] claims KeyZ
+    // first and the load-time uniqueness sweep silently evicts Sheathe/Unsheathe
+    // Weapon's untouched default down to unbound.
+    localStorage.setItem(
+      'woc_keybinds:char:alice',
+      JSON.stringify({
+        strafeLeft: [null, null],
+        strafeRight: [null, null],
+        slot10: ['KeyQ', 'Minus'],
+        slot11: ['KeyE', 'Equal'],
+        meters: ['KeyZ', null],
+      }),
+    );
+    const fresh = new Keybinds('char:alice');
+    expect(fresh.codeAt('meters', 0)).toBe('Shift+KeyH');
+    expect(fresh.codeAt('sheathe', 0)).toBe('KeyZ');
+    expect(fresh.actionForCode('KeyZ')).toBe('sheathe');
   });
 
   it('re-seeds an evicted meters binding to Shift+KeyH on a scoped profile', () => {

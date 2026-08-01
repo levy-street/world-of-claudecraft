@@ -273,3 +273,135 @@ describe('buildContinentMapModel: parity + determinism', () => {
     expect(a).toEqual(b);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Party markers (issue 2652): the continent level answers "which zone is the
+// rest of my group in", which the per-zone map cannot (it drops anyone outside
+// the committed zone). Dots only: no name, no zone gate.
+// ---------------------------------------------------------------------------
+
+/** One party member row, only the fields the core reads. */
+interface StubMember {
+  pid: number;
+  cls: string;
+  x: number;
+  z: number;
+  dead: number;
+}
+
+/** worldAt plus a party roster. Self is always pid 1 (matching worldAt's player). */
+function partyWorldAt(
+  shape: 'sim' | 'client',
+  x: number,
+  z: number,
+  members: StubMember[],
+): IWorld {
+  const world = worldAt(shape, x, z) as unknown as { partyInfo: unknown };
+  world.partyInfo = {
+    leader: 1,
+    raid: false,
+    master: { enabled: false, looter: 0, threshold: 'uncommon' },
+    members: members.map((m) => ({ ...m, name: `P${m.pid}`, level: 20 })),
+  };
+  return world as unknown as IWorld;
+}
+
+const SELF: StubMember = { pid: 1, cls: 'warrior', x: 0, z: 0, dead: 0 };
+
+describe('buildContinentMapModel: party markers', () => {
+  it('projects each member to its independently derived point and skips self', () => {
+    // The mage sits in the same southern band as the player; the druid is far
+    // north in the east column, i.e. a completely different zone.
+    const mage: StubMember = { pid: 2, cls: 'mage', x: 120, z: 60, dead: 0 };
+    const druid: StubMember = { pid: 3, cls: 'druid', x: 404, z: 1900, dead: 0 };
+    const m = buildContinentMapModel(
+      input(partyWorldAt('client', 0, 0, [SELF, mage, druid]), CONTINENT_FALLBACK_ASPECT),
+    );
+
+    expect(m.party).toHaveLength(2);
+    for (const [i, member] of [mage, druid].entries()) {
+      const expected = projectPoint(member.x, member.z, m.image);
+      expect(m.party[i].mx).toBeCloseTo(expected.mx, 4);
+      expect(m.party[i].my).toBeCloseTo(expected.my, 4);
+      expect(m.party[i].cls).toBe(member.cls);
+    }
+    // Self carries the "you are here" marker instead, at its own position.
+    expect(m.party.some((p) => p.cls === 'warrior')).toBe(false);
+    expect(m.player).not.toBeNull();
+  });
+
+  it('lands a far-north member inside that zone region, not the player zone', () => {
+    // The reason this level exists: the per-zone map drops an out-of-zone
+    // member entirely, so the continent dot has to fall inside the OTHER zone's
+    // rect. Player in eastbrook_vale (south), member in drakelands (north-east).
+    const m = buildContinentMapModel(
+      input(
+        partyWorldAt('client', 0, 0, [SELF, { pid: 2, cls: 'druid', x: 404, z: 1900, dead: 0 }]),
+        CONTINENT_FALLBACK_ASPECT,
+      ),
+    );
+    expect(m.currentZoneId).toBe('eastbrook_vale');
+    expect(m.party).toHaveLength(1);
+    expect(continentZoneAt(m.regions, m.party[0].mx, m.party[0].my)).toBe('drakelands');
+    expect(zoneAt(404, 1900).id).toBe('drakelands');
+  });
+
+  it('reports the dead flag as a boolean, per member', () => {
+    const m = buildContinentMapModel(
+      input(
+        partyWorldAt('client', 0, 0, [
+          SELF,
+          { pid: 2, cls: 'mage', x: 40, z: 40, dead: 0 },
+          { pid: 3, cls: 'priest', x: -40, z: -40, dead: 1 },
+        ]),
+        CONTINENT_FALLBACK_ASPECT,
+      ),
+    );
+    expect(m.party.map((p) => ({ cls: p.cls, dead: p.dead }))).toEqual([
+      { cls: 'mage', dead: false },
+      { cls: 'priest', dead: true },
+    ]);
+  });
+
+  // The bounds test ANDs four comparisons; give each a case that violates ONLY
+  // it, so dropping any single bound reds the suite. A member inside a dungeon
+  // instance sits south of the overworld strip, which is the real-world case.
+  it.each([
+    ['x too far east', WORLD_MAX_X + 5000, 0],
+    ['x too far west', WORLD_MIN_X - 5000, 0],
+    ['z below the world (dungeon instance band)', 0, WORLD_MIN_Z - 5000],
+    ['z above the world', 0, WORLD_MAX_Z + 5000],
+  ])('drops a member whose %s', (_label, x, z) => {
+    const m = buildContinentMapModel(
+      input(
+        partyWorldAt('client', 0, 0, [
+          SELF,
+          { pid: 2, cls: 'mage', x: x as number, z: z as number, dead: 0 },
+        ]),
+        CONTINENT_FALLBACK_ASPECT,
+      ),
+    );
+    expect(m.party).toEqual([]);
+  });
+
+  it('is empty for a solo player and for a party of one', () => {
+    const solo = buildContinentMapModel(input(worldAt('client', 0, 0), CONTINENT_FALLBACK_ASPECT));
+    expect(solo.party).toEqual([]);
+    const alone = buildContinentMapModel(
+      input(partyWorldAt('client', 0, 0, [SELF]), CONTINENT_FALLBACK_ASPECT),
+    );
+    expect(alone.party).toEqual([]);
+  });
+
+  it('Sim-shaped and ClientWorld-mirror-shaped stubs render the same party', () => {
+    const roster: StubMember[] = [
+      SELF,
+      { pid: 2, cls: 'mage', x: 120, z: 60, dead: 0 },
+      { pid: 3, cls: 'priest', x: -404, z: 1900, dead: 1 },
+    ];
+    const sim = buildContinentMapModel(input(partyWorldAt('sim', 0, 0, roster), 0.86));
+    const client = buildContinentMapModel(input(partyWorldAt('client', 0, 0, roster), 0.86));
+    expect(sim.party).toHaveLength(2);
+    expect(sim).toEqual(client);
+  });
+});

@@ -25,7 +25,7 @@
 // server, and in the headless RL env unchanged.
 
 import { adjacentCrafts, CRAFT_RING, oppositeCraft } from '../content/professions';
-import { COMBO_RECIPES } from '../content/recipes';
+import { ALL_RECIPES, COMBO_RECIPES } from '../content/recipes';
 import type { SimContext } from '../sim_context';
 import {
   type CraftSkills,
@@ -213,8 +213,31 @@ export function hobbyCandidatesForPair(activeArchetype: string, pairedMajor: str
   return [oppositeCraft(activeArchetype).id, oppositeCraft(pairedMajor).id];
 }
 
-/** Choose the higher retained-skill hobby, with ring order as the stable tie
- * break. This is used for first attunement and old-save backfill. */
+// Craft ids with real, reachable content: at least one recipe in
+// content/recipes.ts (ALL_RECIPES) targets it, or it has an enchanting-style
+// action outside the recipe table (today, only enchanting itself, via
+// disenchanting; see professions/enchanting.ts). Jewelcrafting and
+// Inscription have neither (content/deeds.ts's prog_guildsworn comment: "no
+// live skill-gain path yet, zero recipes, no enchanting-style action"), so
+// defaulting a fresh hobby into either soft-locks the slot: no possible skill
+// gain until an unrelated hobby-switch quest moves it. Read once at module
+// load: ALL_RECIPES is a static content table, never mutated at runtime.
+const CRAFTS_WITH_CONTENT: ReadonlySet<string> = new Set([
+  ...ALL_RECIPES.map((recipe) => recipe.professionId),
+  'enchanting',
+]);
+
+function craftHasContent(craftId: string): boolean {
+  return CRAFTS_WITH_CONTENT.has(craftId);
+}
+
+/** Choose the higher retained-skill hobby; among an equal-skill (typically
+ * zero-skill) tie, prefer a candidate with real content (craftHasContent)
+ * over one with none, and only then fall back to ring order as the final
+ * stable tie break. This is used for first attunement and old-save backfill.
+ * Deliberately NOT applied in hobbyCandidatesForPair: the explicit
+ * hobby-switch quest still needs every ring-opposite candidate reachable by
+ * player choice, content or not. */
 export function defaultHobbyForPair(
   activeArchetype: string,
   pairedMajor: string,
@@ -225,6 +248,8 @@ export function defaultHobbyForPair(
   return [...candidates].sort((a, b) => {
     const skillDelta = (skills[b] ?? 0) - (skills[a] ?? 0);
     if (skillDelta !== 0) return skillDelta;
+    const contentDelta = Number(craftHasContent(b)) - Number(craftHasContent(a));
+    if (contentDelta !== 0) return contentDelta;
     return (
       CRAFT_RING.findIndex((craft) => craft.id === a) -
       CRAFT_RING.findIndex((craft) => craft.id === b)

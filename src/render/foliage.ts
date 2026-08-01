@@ -26,7 +26,7 @@ import {
   zoneBiomeAt,
 } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   applyInstanceCollapse,
   type CollapseRole,
@@ -57,6 +57,7 @@ import {
   parterreFlowerTintAt,
 } from './garden_parterre_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
+import { attachShadowPassOnlyGate } from './shadow_pass_gate_core';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
@@ -168,9 +169,13 @@ const loadedModels = new Map<string, GLTF>();
 const extractedParts = new Map<string, ModelPart[]>();
 for (const urls of Object.values(MODEL_URLS)) {
   for (const url of urls) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url).then((g) => {
         loadedModels.set(url, g);
+        // Packaged iOS: extract now and release the parse rather than holding it
+        // until buildFoliage (same rationale and same tier-safety argument as the
+        // props preload; see the comment there and the 17 Pro 1.54 GB kill).
+        if (GFX.nativeIosMemoryProfile) extractParts(url);
       }),
     );
   }
@@ -453,9 +458,13 @@ function triangleCountFor(geometry?: THREE.BufferGeometry): number {
 }
 
 function bucketMeshCost(mesh: THREE.InstancedMesh): Pick<BucketMesh, 'draws' | 'triangles'> {
+  // Shadow-gated clones read count 0 outside the shadow draw; the gate
+  // stashes the real count so the budget telemetry keeps their true cost.
+  const count =
+    (mesh as unknown as { shadowPassFullCount?: number }).shadowPassFullCount ?? mesh.count;
   return {
     draws: drawCountFor(mesh.material, mesh.geometry),
-    triangles: triangleCountFor(mesh.geometry) * Math.max(0, mesh.count),
+    triangles: triangleCountFor(mesh.geometry) * Math.max(0, count),
   };
 }
 
@@ -611,6 +620,17 @@ function bakeGeometry(mesh: THREE.Mesh): THREE.BufferGeometry {
   if (src.index) out.setIndex(src.index.clone());
   out.applyMatrix4(mesh.matrixWorld);
   return out;
+}
+
+/** Dev-channel residency accounting sources (see assets/residency_budget.ts). */
+export function foliageResidencySources(): {
+  extractedGeometries: THREE.BufferGeometry[];
+  parsedScenes: THREE.Object3D[];
+} {
+  return {
+    extractedGeometries: [...extractedParts.values()].flatMap((ps) => ps.map((p) => p.geometry)),
+    parsedScenes: [...loadedModels.values()].map((g) => g.scene),
+  };
 }
 
 function extractParts(url: string): ModelPart[] {
@@ -1032,6 +1052,15 @@ function placeSpecies(
           const shadow = cloneInstancedTo(im, part.geometry, makeShadowOnlyMaterial(part.material));
           shadow.castShadow = true;
           shadow.receiveShadow = false;
+          // ORDER MATTERS: compute the instance-aware bounds while the count
+          // is still full; the gate below zeroes the count, and a lazily
+          // computed sphere at count 0 would cache empty and cull the
+          // clone's shadow forever.
+          shadow.computeBoundingSphere();
+          shadow.computeBoundingBox();
+          // Shadow-pass only: without the gate every clone also costs a
+          // colorWrite-off draw in the color pass (one per casting bucket).
+          attachShadowPassOnlyGate(shadow);
           parent.add(shadow);
           // The shadow pass does NOT follow the fog-EXTENDED detail distance: a
           // tree's shadow past the old radius contributes nothing the eye can

@@ -8,7 +8,6 @@ import type { GameSettings, Settings } from '../game/settings';
 import { sfx } from '../game/sfx';
 import type { UiEffectsTier } from '../game/ui_effects_profile';
 import {
-  auraRefreshIntervalMs,
   cadenceDue,
   coerceFxTier,
   minimapRedrawIntervalMs,
@@ -139,6 +138,7 @@ import { ArenaWindow } from './arena_window';
 import { auraDisplayNameFromSource } from './aura_display_name';
 import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
+import { AuraOverlayController } from './aura_overlay_controller';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
@@ -296,6 +296,7 @@ import {
   abilityStartsAutoAttack,
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
+  isPvpHostileTarget,
 } from './hud/action_bar/attack_on_ability';
 import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './hud/action_bar/consumable_bar_view';
 import {
@@ -365,6 +366,7 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
+import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
 import { TrainLearnTracker } from './hud/vendor/train_learn_core';
@@ -532,6 +534,8 @@ import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
 import { roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
+import { targetAuraSourceName } from './target_auras_view';
+import { TargetAurasWindow } from './target_auras_window';
 import { targetOfTargetId } from './target_of_target';
 import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
@@ -830,6 +834,7 @@ const MAIL_RESULT_ERROR_KEYS: Record<MailResultCode, TranslationKey> = {
   noRecipient: 'hudChrome.mailbox.result.noRecipient',
   tooManyParcels: 'hudChrome.mailbox.result.tooManyParcels',
   noMailQuestItems: 'hudChrome.mailbox.result.noMailQuestItems',
+  noMailBound: 'hudChrome.mailbox.result.noMailBound',
   noMailSoulbound: 'hudChrome.itemSoulbound',
   notEnoughItems: 'hudChrome.mailbox.result.notEnoughItems',
   cantAffordPostage: 'hudChrome.mailbox.result.cantAffordPostage',
@@ -1428,6 +1433,7 @@ export class Hud {
   private selectedCraftTab: string | null = null;
   private readonly delveBoard: DelveBoardController;
   private readonly delveTracker: DelveTrackerController;
+  private readonly riftTracker: RiftFloorTrackerController;
   private readonly lockpickController: LockpickController;
   private readonly riteController: RiteController;
   private readonly questTracker: QuestTrackerController;
@@ -1543,8 +1549,6 @@ export class Hud {
   // party frames are deliberately not stamped (party-member HP is a healer's actionable
   // signal, so it stays on the mediumHud band for every tier: see ui_tier_knobs).
   private lastMinimapDrawAt = 0;
-  private lastBuffBarPaintAt = 0;
-  private lastTargetDebuffsPaintAt = 0;
   private lastTargetFramePaintAt = 0;
   private lastTargetFrameId: number | null = null;
   // Target-of-target frame throttle + identity tracking, the non-self cadence twins
@@ -1568,6 +1572,7 @@ export class Hud {
   // The first-tier tutorial modal's focus trap (#profession-tutorial).
   private professionTutorialTrap: FocusTrapHandle | null = null;
   private meters: Meters;
+  private readonly targetAurasWindow: TargetAurasWindow;
   private tutorial = new TutorialOverlay();
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
@@ -1593,6 +1598,15 @@ export class Hud {
     private keybinds: Keybinds,
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
+    this.auraOverlayController = new AuraOverlayController({
+      writers: this.writerFacet,
+      playerClass: this.sim.cfg.playerClass,
+      playerName: this.sim.player.name,
+      known: () => this.sim.known,
+      talents: () => this.sim.talents,
+      iconUrl: (abilityId) => iconDataUrl('ability', abilityId),
+      paintGroundRings: (rings) => this.renderer.setPlayerAuraRings(rings),
+    });
     this.localIgnoredNames = this.loadLocalIgnoredNames();
     this.meters = new Meters(sim, {
       attachTooltip: (element, html) => this.attachTooltip(element, html),
@@ -1610,6 +1624,34 @@ export class Hud {
           bindActions: (onActivate) => this.bindContextMenuActions(onActivate),
           isMobileLayout: () => this.isMobileLayout(),
         }),
+    });
+    this.targetAurasWindow = new TargetAurasWindow({
+      root: $('#target-auras-window'),
+      writers: this.writerFacet,
+      document,
+      window,
+      storage: localStorage,
+      isMobileLayout: () => this.isMobileLayout(),
+      uiScale: getUiScale,
+      resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
+      renderTooltip: (name, remaining, effectHtml) =>
+        `<div class="tt-title">${esc(name)}</div>${effectHtml}<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`,
+      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      formatCount: (count) => formatNumber(count, { maximumFractionDigits: 0 }),
+      formatPercent: (value) => formatNumber(value, { style: 'percent', maximumFractionDigits: 0 }),
+      unlockLabel: () => t('hudChrome.targetAuras.unlock'),
+      lockLabel: () => t('hudChrome.targetAuras.lock'),
+      configureRowsLabel: () => t('hudChrome.targetAuras.configureRows'),
+      fewerRowsLabel: () => t('hudChrome.targetAuras.fewerRows'),
+      moreRowsLabel: () => t('hudChrome.targetAuras.moreRows'),
+      visibleRowsLabel: (count) =>
+        t('hudChrome.targetAuras.visibleRows', {
+          count: formatNumber(count, { maximumFractionDigits: 0 }),
+        }),
+      showSourcesLabel: () => t('hudChrome.targetAuras.showSources'),
+      hideSourcesLabel: () => t('hudChrome.targetAuras.hideSources'),
+      ownAuraLabel: () => t('hudChrome.targetAuras.ownAura'),
+      opacityLabel: (percent) => t('hudChrome.targetAuras.opacity', { percent }),
     });
     this.actionBarController = new ActionBarController({
       storage: localStorage,
@@ -1634,6 +1676,10 @@ export class Hud {
       mobName: mobDisplayName,
       attachTooltip: (element, html) => this.attachTooltip(element, html),
       closeRitePanel: (restoreFocus) => this.closeRitePanel(restoreFocus),
+    });
+    this.riftTracker = new RiftFloorTrackerController({
+      element: $('#rift-tracker'),
+      world: () => this.sim,
     });
     this.delveBoard = new DelveBoardController({
       element: $('#delve-board'),
@@ -3529,6 +3575,10 @@ export class Hud {
     this.writerFacet,
     this.procOverlayEl,
   );
+  // Player-configurable class proc overlays. The controller builds the native
+  // spell icon plus two side crescents once; its painter only toggles active
+  // state on the hot path. Options > Auras owns preview and placement mode.
+  private readonly auraOverlayController: AuraOverlayController;
   // One-shot login preview gate for the phoenix (see update()).
   private procOverlayPreviewed = false;
   // The per-frame FCT painter: the pooled-div ring that replaced the per-event
@@ -3725,11 +3775,12 @@ export class Hud {
   });
   // Overworld world-map painter (the delve branch stays with delvePainter). Owns
   // the cached current-zone decorations; redraws from the mediumHud band while open.
-  private readonly mapPainter = new MapWindowPainter();
+  // classCss colors party member dots the same way it colors the minimap/delve ones.
+  private readonly mapPainter = new MapWindowPainter(classCss);
   // Continent overview painter (the world map's "zoom out to the whole world"
   // level). Loads the painted world_overview plate once; redraws from the
-  // mediumHud band like the per-zone map.
-  private readonly continentPainter = new ContinentMapPainter();
+  // mediumHud band like the per-zone map. classCss colors its party dots too.
+  private readonly continentPainter = new ContinentMapPainter(classCss);
   // The aura strips are the keyed-pool aura painter, two instances of the
   // auras_view core + AurasPainter: the player buff bar (#buff-bar, mode
   // 'all') and the target strip (#tf-debuffs, mode 'all' too: a target's buffs AND
@@ -3778,8 +3829,9 @@ export class Hud {
   // painter's `own` class), so what you are maintaining reads at a glance among
   // other casters' auras. Extra prominence only, never less information, so every
   // graphics tier keeps it (gameplay-neutral-graphics invariant).
-  private readonly targetDebuffsView = createAurasView('all', this.aurasViewDeps, {
+  private readonly targetAurasView = createAurasView('all', this.aurasViewDeps, {
     ownFirst: true,
+    effectHtmlCacheVersion: getLanguage,
   });
   // The buff-bar painter alone gets attachCancel: right-clicking one of the local player's
   // own helpful buffs cancels it (classic convention). The debuff / target painters reuse
@@ -3817,7 +3869,6 @@ export class Hud {
     this.targetDebuffsEl,
     this.aurasPainterDeps,
     document,
-    () => this.fxTier(),
   );
   // Overworld minimap canvas painter (the delve branch stays with delvePainter). Owns
   // the marker core; redraws from the fastHud (~10Hz) band. classCss colors the party
@@ -3924,8 +3975,8 @@ export class Hud {
     closeBank: () => this.closeBank(),
     onClosed: () => this.onBagsClosed(),
     addItemToTrade: (itemId) => this.addItemToTrade(itemId),
-    stageMarketSell: (itemId) => this.marketWindow.stageSell(itemId),
-    stageMailParcel: (itemId) => this.mailboxWindow.stageParcel(itemId),
+    stageMarketSell: (itemId, instance) => this.marketWindow.stageSell(itemId, instance),
+    stageMailParcel: (itemId, instance) => this.mailboxWindow.stageParcel(itemId, instance),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
     showError: (text) => this.showError(text),
     setPendingPetFeed: (active) => {
@@ -4255,6 +4306,23 @@ export class Hud {
     root: () => $('#options-menu'),
     world: () => this.sim,
     options: () => this.optionsHooks,
+    auraOverlays: () => ({
+      playerClass: () => this.sim.cfg.playerClass,
+      defs: () => this.auraOverlayController.defs(),
+      get: (id) => this.auraOverlayController.get(id),
+      patch: (id, patch) => this.auraOverlayController.patch(id, patch),
+      getLayout: () => this.auraOverlayController.getLayout(),
+      patchLayout: (patch) => this.auraOverlayController.patchLayout(patch),
+      reset: (id) => this.auraOverlayController.reset(id),
+      nudge: (id, part, deltaX, deltaY) =>
+        this.auraOverlayController.nudge(id, part, deltaX, deltaY),
+      setAll: (enabled) => this.auraOverlayController.setAll(enabled),
+      beginPlacement: (id, part) => this.auraOverlayController.beginPlacement(id, part),
+      endPlacement: () => this.auraOverlayController.endPlacement(),
+      setPlacement: (on) => this.auraOverlayController.setPlacement(on),
+      onPositionChange: (listener) => this.auraOverlayController.onPositionChange(listener),
+      onPlacementChange: (listener) => this.auraOverlayController.onPlacementChange(listener),
+    }),
     bugReport: () => this.bugReportHooks,
     keybinds: () => this.keybinds,
     slotActionName: (slot) => {
@@ -4269,6 +4337,7 @@ export class Hud {
     setDropdownValue: (root, value) => this.setDropdownValue(root, value),
     focusFirstInteractive: (root, preferredSelector) =>
       this.focusManager.focusFirst(root, preferredSelector),
+    openFocusTrap: (root, returnFocusTo) => this.focusManager.open({ root, returnFocusTo }),
     closeOthers: () => this.closeOtherWindows('#options-menu'),
     hideTooltip: () => this.hideTooltip(),
     ...this.windowFocus('#options-menu'),
@@ -5320,6 +5389,9 @@ export class Hud {
     // a plain update() early-returns here and re-emits nothing. relocalize()
     // clears it for exactly one rebuild (#2529).
     this.delveTracker.relocalize();
+    // Same reason as delveTracker above: the rift floor tracker's signature is
+    // floor/timer numbers, none of which move with the locale.
+    this.riftTracker.relocalize();
     // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
     // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
@@ -5333,6 +5405,7 @@ export class Hud {
     this.targetFrameMover?.relocalize();
     this.playerFrameMover?.relocalize();
     this.partyFrameMover?.relocalize();
+    this.targetAurasWindow.relocalize();
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
     if ($('#bags').style.display !== 'none') this.renderBags();
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
@@ -5896,13 +5969,18 @@ export class Hud {
           // AOEs (Arcane Explosion, Frost Nova, Thunder Clap, ...) cast with no hostile
           // target, where startAutoAttack does NOT no-op but errors "Invalid attack
           // target." (sim/combat/auto_attack.ts). The explicit Attack button keeps that
-          // error feedback; this convenience path must not trip it.
+          // error feedback; this convenience path must not trip it. hasAutoAttackTarget
+          // also recognizes a live duel/arena opponent (#2451): a player target never
+          // carries the mob-only `hostile` flag, so it errored on every PvP cast.
           const tid = this.sim.player.targetId;
           const target = tid !== null ? (this.sim.entities.get(tid) ?? null) : null;
           if (
             this.optionsHooks?.settings.get('startAttackOnAbilityUse') &&
             abilityStartsAutoAttack(resolved.effects) &&
-            hasAutoAttackTarget(target)
+            hasAutoAttackTarget(
+              target,
+              isPvpHostileTarget(tid, this.sim.duelInfo, this.sim.arenaInfo),
+            )
           ) {
             // A TIMED cast must not engage yet: startAutoAttack aggros the target
             // immediately, so engaging at cast start pulled the mob before any
@@ -7550,14 +7628,14 @@ export class Hud {
     // every frame (the elided writers make a no-op frame free). Buffs and debuffs render to
     // separate rows (classic layout) so a fresh debuff is never lost in a wall of long-lived
     // buffs: two view+painter instances, mode 'buffs' (#buff-bar) and 'debuffs' (#debuff-bar).
-    // The graphics tier coarsens the refresh (tick) granularity: full tiers repaint every
-    // frame (interval 0, cadenceDue always true); low coarsens to ~4Hz. The visible-count cap
-    // is applied inside the painter.
-    if (cadenceDue(this.lastBuffBarPaintAt, now, auraRefreshIntervalMs(fxTier))) {
-      this.lastBuffBarPaintAt = now;
-      this.buffBarPainter.paint(this.buffBarView.tick(p));
-      this.debuffBarPainter.paint(this.debuffBarView.tick(p));
-    }
+    // SELF/player auras are NEVER tier-gated: your own debuffs are the ACTIONABLE read named in
+    // docs/design/graphics-settings-fairness.md (there is no self-dispel, so the aura icon and
+    // its remaining duration are the only way to react to a DoT/curse/CC), so this paints every
+    // frame on every graphics preset. The visible-count cap (auraVisibleCap, still tiered) is
+    // applied inside the painter and is debuff-priority (a shed slot is always a buff, never a
+    // debuff). Only the TARGET (non-self) debuffs strip below stays on the tiered ~4Hz cadence.
+    this.buffBarPainter.paint(this.buffBarView.tick(p));
+    this.debuffBarPainter.paint(this.debuffBarView.tick(p));
 
     // target frame: the SECOND instance of the unit_frame family. The shared
     // frame (display/name/level/hp/absorb/portrait gate) goes through the family
@@ -7667,20 +7745,16 @@ export class Hud {
       // elided toggleClass writer so the per-frame hot path stays write-elided. Normal
       // mode is unaffected (the rule lives only inside @media (forced-colors: active)).
       this.toggleClass(this.targetNameEl, 'hostile', target.hostile);
-      // Tier the target-debuff refresh (tick) granularity like the buff
-      // bar. A target SWAP (targetChanged) forces an immediate repaint so the strip never
-      // shows the previous target's debuffs while throttled on low; otherwise the full
-      // tiers repaint every frame and low coarsens to ~4Hz.
-      if (
-        nonSelfRepaintDue(
-          targetChanged,
-          this.lastTargetDebuffsPaintAt,
-          now,
-          auraRefreshIntervalMs(fxTier),
-        )
-      ) {
-        this.lastTargetDebuffsPaintAt = now;
-        this.targetDebuffsPainter.paint(this.targetDebuffsView.tick(target));
+      // Every target aura is actionable: hostile buffs can be purged, allied buffs
+      // can be maintained, and foreign debuffs coordinate a group. Keep this strip
+      // complete and full-rate on every graphics tier; the painter and window both
+      // elide unchanged DOM writes.
+      const targetAuraState = this.targetAurasView.tick(target);
+      this.targetDebuffsPainter.paint(targetAuraState);
+      if (this.targetAurasWindow.isVisible) {
+        this.targetAurasWindow.paint(entityDisplayName(target), targetAuraState, (sourceId) =>
+          targetAuraSourceName(sourceId, (id) => sim.entities.get(id), entityDisplayName),
+        );
       }
       // target/boss cast bar (e.g. Nythraxis' Deathless Rage), shown under the name +
       // HP so the raid sees exactly when to channel the wardstones. The target
@@ -7751,6 +7825,7 @@ export class Hud {
         this.lastAnnouncedTargetId = null;
       }
       this.targetFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
+      this.targetAurasWindow.clear();
       // Hide the target-of-target frame too. Its parent (#target-frame) is already
       // display:none, but paint hidden anyway to reset the painter's portrait gate +
       // cadence id so re-acquiring a target repaints the mini-frame immediately.
@@ -7805,6 +7880,10 @@ export class Hud {
     } else {
       this.procOverlayPainter.paint(procOverlayState(p.auras), combustionOverlayActive(p.auras));
     }
+    this.auraOverlayController.paint(
+      p.auras,
+      this.sim.reactiveAbilityWindowRemaining('mongoose_bite'),
+    );
 
     // action bar: the slot row, driven by the pure action_bar_view core + the thin
     // ActionBarPainter. Every per-slot icon / cooldown / dimming / count write
@@ -7994,6 +8073,7 @@ export class Hud {
 
       this.updateQuestTracker();
       this.updateDelveTracker();
+      this.updateRiftTracker();
       // Party frames run on the ~4Hz mediumHud band (the enclosing block) for EVERY tier.
       // The tier knobs deliberately do NOT tier them down on low: party-member HP is a healer's
       // only actionable signal (no self-dispel), so a graphics preset must not slow it
@@ -8432,6 +8512,10 @@ export class Hud {
 
   private updateDelveTracker(): void {
     this.delveTracker.update();
+  }
+
+  private updateRiftTracker(): void {
+    this.riftTracker.update();
   }
 
   // -------------------------------------------------------------------------
@@ -8945,6 +9029,10 @@ export class Hud {
     this.meters.toggle();
   }
 
+  toggleTargetAuras(): void {
+    this.targetAurasWindow.toggle();
+  }
+
   // -------------------------------------------------------------------------
   // The Ashen Coliseum - 1v1 arena panel + in-match banner
   // -------------------------------------------------------------------------
@@ -9377,6 +9465,9 @@ export class Hud {
         if (ev.crit && shouldPlayCritSfxForTarget(tgt))
           this.combat('combat_crit', tp.x, tp.y, tp.z, 1.0);
         // pain vocalization only on a crit — never on ordinary hits.
+        // player_hurt_female_1..5 exist under public/audio/sfx but are unwired: no
+        // gender field exists on PlayerMeta yet. Once the model swap defines one,
+        // resolve here via the mobVoiceCue hasCue-fallback pattern (src/ui/combat_sfx.ts).
         if (ev.crit && ev.targetId === sim.playerId) {
           this.combat('player_hurt', tp.x, tp.y, tp.z, 1.0, { cooldown: 0.3 });
         } else {
@@ -9497,6 +9588,10 @@ export class Hud {
           const voice = availableMobVoiceCue(ent.templateId, 'death');
           if (voice && shouldPlayMobVoiceSfxForEntity(ent)) this.combat(voice, p.x, p.y, p.z, 1.0);
         } else if (ent.kind === 'player' && ev.entityId !== sim.playerId) {
+          // player_death_female_1..3 exist under public/audio/sfx but are unwired,
+          // see the player_hurt note above. This branch is OTHER players dying;
+          // your OWN character's death sound is a separate trigger site,
+          // audio.playerDeath() in src/game/audio.ts.
           this.combat('player_death', p.x, p.y, p.z, 1.0);
         }
         return;
@@ -11357,7 +11452,8 @@ export class Hud {
             if (ev.success) {
               const castTid = sim.player.targetId;
               const castTarget = castTid !== null ? (sim.entities.get(castTid) ?? null) : null;
-              if (hasAutoAttackTarget(castTarget)) this.sim.startAutoAttack();
+              const castPvpHostile = isPvpHostileTarget(castTid, sim.duelInfo, sim.arenaInfo);
+              if (hasAutoAttackTarget(castTarget, castPvpHostile)) this.sim.startAutoAttack();
             }
           }
           break;
@@ -11867,10 +11963,12 @@ export class Hud {
       'Finish your trade before queueing.': 'hud.errors.arenaQueueTrading',
       'You cannot queue from inside an instance.': 'hud.errors.arenaQueueInstance',
       'A trade is already in progress.': 'hud.errors.tradeInProgress',
+      'That player is already trading.': 'hud.errors.tradeAlreadyTrading',
       'Target is too far away to trade.': 'hud.errors.tradeTooFar',
       'The trade request has expired.': 'hud.errors.tradeExpired',
       'Trade failed: items or money no longer available.': 'hud.errors.tradeFailed',
       'That item is bound and cannot be traded.': 'hud.errors.tradeBound',
+      'That item is bound and cannot be listed.': 'hud.errors.marketListBound',
       'That quest is not available.': 'questUi.errors.unavailable',
       'That quest is not in your log.': 'questUi.errors.notInLog',
       'That quest is not complete.': 'questUi.errors.incomplete',
@@ -12942,6 +13040,14 @@ export class Hud {
 
   get marketWindowOpen(): boolean {
     return this.marketWindow.isOpen;
+  }
+
+  // Reconnect resync (issue #2416): re-push the market window's own browse query
+  // if it drifted from what the server echoes back after a fresh-join reconnect.
+  // Wired from the client's onReconnected hook (main.ts); a no-op when the window
+  // is closed or the echoed query still matches (see MarketWindow.onReconnected).
+  marketResyncAfterReconnect(): void {
+    this.marketWindow.onReconnected();
   }
 
   openMailbox(): void {

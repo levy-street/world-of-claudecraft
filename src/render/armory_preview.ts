@@ -286,7 +286,10 @@ export function createArmoryPreview(
   }
 
   function selectSkin(next: string | null): void {
-    if (disposed || next === skinId) return;
+    // Re-selecting the CURRENT skin is a no-op only while its rig exists: a
+    // streamed skin clicked before its GLB arrived has skinId set but no rig,
+    // and the reselect after arrival is how the weapon finally appears.
+    if (disposed || (next === skinId && (next === null || activeWeaponRig !== null))) return;
     if (activeWeaponRig) activeWeaponRig.root.visible = false;
     skinId = next;
     selectCharacterRig(next);

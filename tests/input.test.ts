@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Input } from '../src/game/input';
 import { stopAutorunForInteraction } from '../src/game/interaction_autorun';
@@ -9,6 +10,7 @@ const VIEWPORT_W = 1920;
 const VIEWPORT_H = 1080;
 const EDGE = { clientX: 6, clientY: 540 };
 const CENTER = { clientX: 960, clientY: 540 };
+const mainSource = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 
 function installStorage(): void {
   const map = new Map<string, string>();
@@ -961,6 +963,45 @@ describe('Input Discord keybind', () => {
     windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
 
     expect(cb.onUiKey).not.toHaveBeenCalled();
+  });
+});
+
+describe('Input target buffs and debuffs keybind', () => {
+  it("dispatches onUiKey('targetAuras') for the default Shift+J chord", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyJ', repeat: false, shiftKey: true });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('targetAuras');
+    expect(cb.onCycleFriendly).not.toHaveBeenCalled();
+  });
+
+  it('keeps bare J assigned to cycle friendly targets', () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyJ', repeat: false });
+
+    expect(cb.onCycleFriendly).toHaveBeenCalledTimes(1);
+    expect(cb.onUiKey).not.toHaveBeenCalledWith('targetAuras');
+  });
+
+  it('routes both startGame input paths to the HUD toggle', () => {
+    const keyboardStart = mainSource.indexOf('onUiKey: (key) => {');
+    const keyboardRoute = mainSource.slice(
+      keyboardStart,
+      mainSource.indexOf('onEmoteWheel:', keyboardStart),
+    );
+    const gamepadStart = mainSource.indexOf('function dispatchGamepadAction(id: string): void {');
+    const gamepadRoute = mainSource.slice(
+      gamepadStart,
+      mainSource.indexOf('const gamepad =', gamepadStart),
+    );
+    const route = /case 'targetAuras':\s*hud\.toggleTargetAuras\(\);\s*break;/g;
+
+    expect(keyboardStart).toBeGreaterThanOrEqual(0);
+    expect(gamepadStart).toBeGreaterThanOrEqual(0);
+    expect(keyboardRoute.match(route)).toHaveLength(1);
+    expect(gamepadRoute.match(route)).toHaveLength(1);
   });
 });
 

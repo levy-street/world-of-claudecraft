@@ -888,6 +888,13 @@ export const zh_TW: EnTranslations = {
       "heroicName": "英雄難度:{name}",
       "heroicLocked": "你已被鎖定至英雄難度的{name}。"
     },
+    "riftTracker": {
+      "title": "裂隙",
+      "floor": "第 {current} 層，共 {total} 層",
+      "closesIn": "裂隙將在 {time} 後關閉",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "北",
       "NE": "東北",
@@ -915,6 +922,23 @@ export const zh_TW: EnTranslations = {
       "dock": "將此統計停靠回統計視窗",
       "separate": "分離{meter}",
       "regroup": "合併{meter}"
+    },
+    "targetAuras": {
+      "title": "目標光環",
+      "keybindLabel": "目標增益與減益效果",
+      "all": "All",
+      "debuffs": "減益",
+      "buffs": "增益",
+      "unlock": "移動目標光環視窗",
+      "lock": "鎖定目標光環視窗",
+      "configureRows": "設定目標光環",
+      "fewerRows": "減少光環列數",
+      "moreRows": "增加光環列數",
+      "visibleRows": "偏好的光環列數：{count}",
+      "showSources": "顯示光環施放者",
+      "hideSources": "隱藏光環施放者",
+      "ownAura": "你的光環",
+      "opacity": "光環不透明度：{percent}"
     },
     "petFeed": {
       "disabledFullHp": "寵物生命值已滿",
@@ -959,13 +983,15 @@ export const zh_TW: EnTranslations = {
       "name_shadowjump_toad": "影躍蟾蜍卡瑪影",
       "name_stormfeather_griffin": "凌天風暴之羽",
       "name_thunderstrut_gobbler": "雷霆闊步大火雞",
+      "name_terrorspark_groundshaker": "驚雷撼地者",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
       "desc_aether_hover_cycle": "一輛強大的魔導機車，專為快速貼地懸浮的戰鬥穿行而設計。",
       "desc_shadowjump_toad": "一隻體型龐大、步伐穩健的巨蟾，受訓於閃電般的暗影跳躍，可跨越任何地形。",
       "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
-      "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。"
+      "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。",
+      "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
@@ -1271,6 +1297,51 @@ export const zh_TW: EnTranslations = {
       "badges": {
         "backgrounded": "背景執行中",
         "offline": "離線"
+      }
+    },
+    "auraOverlay": {
+      "title": "光環",
+      "currentClass": "目前職業：{class}",
+      "previewHint": "使用「設定位置」移動光環，避免擋住選單。",
+      "noProcs": "此角色沒有可用的支援觸發效果。",
+      "enabled": "顯示光環",
+      "icon": "法術圖示",
+      "arcs": "側邊弧形",
+      "groundRing": "地面圓環",
+      "groundRingSpellOrder": "地面圓環：法術順序",
+      "crescentsSpellOrder": "側邊弧形：法術順序",
+      "size": "大小",
+      "iconSize": "圖示大小",
+      "crescentBlockSize": "弧形區塊大小",
+      "groundRingBlockSize": "地面圓環區塊大小",
+      "opacity": "不透明度",
+      "color": "顏色",
+      "allOn": "全部開啟",
+      "allOff": "全部關閉",
+      "reposition": "設定位置",
+      "positioning": "定位：{aura}",
+      "selectAura": "光環",
+      "done": "完成",
+      "moveLeft": "向左移動",
+      "moveUp": "向上移動",
+      "moveDown": "向下移動",
+      "moveRight": "向右移動",
+      "moveEarlier": "將法術向內移動",
+      "moveLater": "將法術向外移動",
+      "screenPosition": "螢幕位置",
+      "spellOrder": "法術順序",
+      "reset": "重設位置",
+      "spellPosition": "法術順序 {position} / {count}",
+      "procs": {
+        "revenge": "復仇！",
+        "battleTrance": "戰鬥冥想",
+        "overpowerCharge": "赤手充能",
+        "suddenDeath": "猝死",
+        "victoryRush": "乘勝追擊",
+        "enrage": "狂亂：激怒",
+        "heatingUp": "熱身",
+        "arcaneCharge": "秘法充能",
+        "aetherRush": "以太奔湧"
       }
     },
     "playerCard": {
@@ -2076,6 +2147,14 @@ export const zh_TW: EnTranslations = {
       "benefits": "在桌面應用程式中連結你的 Steam 帳號，將你獲得的功績同步為 Steam 成就。",
       "noTicket": "Steam 未提供連結憑證。請先啟動 Steam，然後重試。"
     },
+    "epic": {
+      "title": "Epic",
+      "link": "連結 Epic",
+      "unlink": "取消連結 Epic",
+      "linked": "已連結 Epic 帳號 {id}",
+      "benefits": "在 Epic 桌面應用程式中連結你的 Epic 帳號，將你獲得的功績同步為 Epic 成就。",
+      "noProof": "Epic 未提供連結憑證。請從 Epic Games Store 啟動，然後重試。"
+    },
     "mailbox": {
       "title": "郵箱",
       "subtitle": "渡鴉郵驛",
@@ -2120,6 +2199,7 @@ export const zh_TW: EnTranslations = {
         "noRecipient": "這裡沒有叫這個名字的郵箱主人。",
         "tooManyParcels": "一封信最多可攜帶 {count} 個包裹。",
         "noMailQuestItems": "你不能郵寄任務物品。",
+        "noMailBound": "該物品已綁定，無法郵寄。",
         "notEnoughItems": "你沒有那麼多可寄送的物品。",
         "cantAffordPostage": "你付不起郵資。",
         "recipientBoxFull": "對方的郵箱已滿。",
@@ -2926,6 +3006,14 @@ export const zh_TW: EnTranslations = {
       "account_taken": "該 Steam 帳號已連結到另一個帳號。",
       "upstream": "Steam 未回應。請稍後重試。"
     },
+    "epic": {
+      "disabled": "Epic 連結目前無法使用。",
+      "invalid_token": "Epic 無法驗證此連結請求。請在桌面應用程式中重試。",
+      "banned": "該 Epic 帳號無法連結。",
+      "already_linked": "你的帳號已連結一個 Epic 帳號。",
+      "account_taken": "該 Epic 帳號已連結到另一個帳號。",
+      "upstream": "Epic 未回應。請稍後重試。"
+    },
     "wallet": {
       "handoff_invalid": "錢包授權已過期或無法驗證。請再試一次。"
     },
@@ -3531,14 +3619,6 @@ export const zh_TW: EnTranslations = {
         "name": "爬行類",
         "desc": "冷血的獵手，帶著獨有的嘶聲與撕咬，與溫血的野獸截然不同。"
       },
-      "murloc": {
-        "name": "蛙鰭族",
-        "desc": "棲息於湖岸與潮池、呱呱作響的魚族，任何涉水太近之物都會迅速引來牠們成群圍攻。"
-      },
-      "kobold": {
-        "name": "林間小妖",
-        "desc": "竄行於林間空地與樹籬間的拾荒者與小妖，在成群聚集之前，與其說是威脅，不如說是麻煩。"
-      },
       "demon": {
         "name": "惡魔",
         "desc": "來自裂隙彼端的入侵者，渾身是烈焰與怨毒。凡有一隻現身之處，裂口必不在遠處。"
@@ -4076,7 +4156,7 @@ export const zh_TW: EnTranslations = {
           "levelingHeading": "附魔如何升級",
           "levelingBody": "兩種行動推動技能：分解與施加附魔，每次成功最多一點，按工作的分量折算：普通分解與純粉塵附魔算普通活；優秀分解與精華附魔算優秀活；精良分解與所有Runed或Greater附魔算精良活；史詩與傳說分解更高。熟悉的精通衰減按25點層級作用：普通活在技能75變灰，優秀活在100，精良活恰在125上限。附魔另有一份仁慈：高於命途上限的輸入向下取整而非歸零，宣誓前史詩分解按精良計而非一無所獲；若附魔淪為休眠，一切按普通活計，爬升停在75；作為愛好則精良活仍有收益，只是75之後變慢。",
           "marketHeading": "附魔副本、出處與市場",
-          "marketBody": "施加附魔消耗材料並標記特定的一件副本。用在背包中的副本上，交還一件獨立的附魔副本；用在已穿戴的裝備上，則就地附魔，無需脫下再穿上。無論哪種，加成都永遠跟隨。一件一附魔：對附魔副本施加另一個附魔會先要求確認，然後直接替換舊附魔，舊附魔被摧毀且不退還材料；出售、丟棄與分解都優先取用普通副本，成品不會被誤吞；完全相同的附魔副本還能疊放。傑作與附魔是朋友：傑作完全可附魔，附魔疊加在傑作加成與署名之上互不干擾；署名傑作配Greater附魔是工藝品的極致，仍按設計低於團本戰利品。世界市場只經手無標記的普通貨，附魔與署名件都面對面交易；材料才是可上市的一半：粉塵、精華與碎片自由掛單，掛單免費，成交才抽5%。"
+          "marketBody": "施加附魔消耗材料並標記特定的一件副本。用在背包中的副本上，交還一件獨立的附魔副本；用在已穿戴的裝備上，則就地附魔，無需脫下再穿上。無論哪種，加成都永遠跟隨。一件一附魔：對附魔副本施加另一個附魔會先要求確認，然後直接替換舊附魔，舊附魔被摧毀且不退還材料；出售、丟棄與分解都優先取用普通副本，成品不會被誤吞；完全相同的附魔副本還能疊放。傑作與附魔是朋友：傑作完全可附魔，附魔疊加在傑作加成與署名之上互不干擾；署名傑作配Greater附魔是工藝品的極致，仍按設計低於團本戰利品。附魔與署名件如今也能上架：每件以單件掛單出售，物品提示會顯示附魔與製作者印記，渡鴉郵驛同樣可以寄送；材料依舊是穩定的一半：粉塵、精華與碎片自由掛單，掛單免費，成交才抽5%。"
         }
       },
       "howHeading": "製作流程",
@@ -4187,7 +4267,7 @@ export const zh_TW: EnTranslations = {
         "sellsHeading": "什麼好賣，為什麼",
         "sellsBody": "最穩的生意是消耗品，因為用掉就要再買：藥水、熟食與附魔都隨使用而消失。傑作是高端市場：無法訂做，想要的人只能出高價，而上面的署名就是行走的招牌。原料是第三支柱：分解所得的奧術材料、直接從拆解者流向附魔師的各類Resonant次級材料，以及追逐傑作觸發的工匠願意溢價收購的署名採集品。",
         "marketHeading": "世界市場與抽成",
-        "marketBody": "世界市場是全服交易所，由Eastbrook的Merchant與Highwatch的Auctioneer Voss主持。掛單免費，沒有押金，流拍原樣退回；只在成交時抽取5%。重要限制：市場只經手無標記的普通貨，署名、傑作、附魔或已綁定的副本一律不收，這些特殊物品只能面對面透過交易視窗轉手。",
+        "marketBody": "世界市場是全服交易所，由Eastbrook的Merchant與Highwatch的Auctioneer Voss主持。掛單免費，沒有押金，流拍原樣退回；只在成交時抽取5%。特殊物品同樣歡迎：署名、傑作或附魔的副本會以單件掛單上架，提示中帶著完整的身分與署名，且絕不與普通堆疊混同。唯一拒收的是已綁定的副本：被製作者之約鎖定（或仍待綁定）的物品既不能上市也不能郵寄，綁定無法被洗白。特殊物品請自行定價；普通掛單只能告訴你普通版的行情。",
         "workOrdersHeading": "工作訂單",
         "workOrdersNote": "每位大師都會以商店價的{pct}%收購一批本行常用材料，每{minutes}分鐘可重複一次。",
         "colOrder": "工作訂單",
@@ -4246,7 +4326,7 @@ export const zh_TW: EnTranslations = {
       "tradeBody": "你可以與站在你身旁的任何人面對面交易。雙方都把物品與錢幣放進一個共享的視窗，唯有兩人都確認後交換才會成立，因此誰都不會吃虧。這是把掉落物交給朋友或敲定一筆買賣最簡單的方法。",
       "mailTitle": "渡鴉郵驛",
       "mailBody": "每座主據點城鎮都立著一根雕刻的渡鴉石柱：那是渡鴉郵驛的信箱，這個王國的信件服務。站在石柱旁，即可寫信給任何一位指名的角色，無論是在線的朋友還是久未上線的故人，並支付一小筆郵資，在信中附上錢幣或貨物。渡鴉需要飛上一小段時間；當牠降落時，一個信封指示會告訴收件人有東西在等著。",
-      "mailHow": "收信的方式正好相反：站在任何石柱旁閱讀你的信件，把它們所載之物收進你的錢袋與背包。信件不會永遠等候，所以要在渡鴉對你死心之前領取。有兩樣東西郵驛一概拒收：靈魂綁定的物品與任務物品，它們要麼隨你同行，要麼哪兒也去不了。另外，繳交一個漂亮的任務之後，記得留意石柱；有些任務給予者會寫信。",
+      "mailHow": "收信的方式正好相反：站在任何石柱旁閱讀你的信件，把它們所載之物收進你的錢袋與背包。信件不會永遠等候，所以要在渡鴉對你死心之前領取。有幾樣東西郵驛一概拒收：靈魂綁定的物品、任務物品，以及已綁定或將隨交易綁定的物品，它們要麼隨你同行，要麼哪兒也去不了。另外，繳交一個漂亮的任務之後，記得留意石柱；有些任務給予者會寫信。",
       "dailyTitle": "每日獎勵",
       "dailyBody": "畫面上的寶箱按鈕能開啟每日獎勵視窗。每天都會安排幾項任務：完成任務、在灰燼競技場中作戰、贏得一場溪谷盃比賽，並提供一次免費轉動獎輪的機會，這一切都能換取當日排名的點數；而當日累積最多的玩家，會為持有選用社群代幣者共享一份獎池。這一切都不會在遊戲中賦予任何戰力。視窗本身會載明當日規則與參賽資格，顯示排行榜，並保留你的歷史紀錄。",
       "marketTitle": "世界市場",
@@ -6479,10 +6559,12 @@ export const zh_TW: EnTranslations = {
       "arenaQueueTrading": "請先完成交易再加入佇列。",
       "arenaQueueInstance": "你不能在副本內加入佇列。",
       "tradeInProgress": "已有交易正在進行。",
+      "tradeAlreadyTrading": "該玩家已在交易中。",
       "tradeTooFar": "目標太遠，無法交易。",
       "tradeExpired": "交易請求已過期。",
       "tradeFailed": "交易失敗：物品或金錢已不可用。",
-      "tradeBound": "該物品已綁定，無法交易。"
+      "tradeBound": "該物品已綁定，無法交易。",
+      "marketListBound": "該物品已綁定，無法上架。"
     },
     "logs": {
       "standUp": "你站了起來。",
@@ -7227,7 +7309,7 @@ export const zh_TW: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "強效隱形術",
-        "description": "消失 20 秒：移除 2 個持續傷害效果，並使你在隱形期間及結束後短時間內受到的傷害降低 90%。（法師天賦）"
+        "description": "消失 20 秒並移除 2 個持續傷害效果。隱形結束時，受到的傷害降低 90%，持續 2 秒。（法師天賦）"
       },
       "hot_streak": {
         "name": "熾熱連擊",
@@ -9745,6 +9827,9 @@ export const zh_TW: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "最後的堡壘印戒"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "驚雷撼地者點火鑰匙"
       },
       "conjured_water4": {
         "name": "魔法泉水"

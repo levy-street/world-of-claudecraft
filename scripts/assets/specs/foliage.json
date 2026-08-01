@@ -1,202 +1,202 @@
 {
- "note": "Quaternius Stylized Nature MegaKit (CC0). Built by scripts/assets/build_foliage.mjs (build_assets.mjs + 'simplify' ratio field).",
- "items": [
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/Pine_1.gltf",
-   "out": "models/foliage/pine_1.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.45
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/Pine_2.gltf",
-   "out": "models/foliage/pine_2.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.45
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/Pine_3.gltf",
-   "out": "models/foliage/pine_3.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.45
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/Pine_4.gltf",
-   "out": "models/foliage/pine_4.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.45
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/Pine_5.gltf",
-   "out": "models/foliage/pine_5.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.45
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/CommonTree_1.gltf",
-   "out": "models/foliage/oak_1.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.45
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/CommonTree_2.gltf",
-   "out": "models/foliage/oak_2.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.45
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/CommonTree_3.gltf",
-   "out": "models/foliage/oak_3.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.45
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/CommonTree_4.gltf",
-   "out": "models/foliage/oak_4.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.45
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/CommonTree_5.gltf",
-   "out": "models/foliage/oak_5.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.45
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/TwistedTree_1.gltf",
-   "out": "models/foliage/twisted_1.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.4,
-   "recolor": [
+  "note": "Quaternius Stylized Nature MegaKit (CC0). Built by scripts/assets/build_foliage.mjs (build_assets.mjs + 'simplify' ratio field).",
+  "items": [
     {
-     "match": "Leaves_TwistedTree",
-     "hue": 95,
-     "saturation": 0.6,
-     "brightness": 0.95
-    }
-   ]
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/TwistedTree_2.gltf",
-   "out": "models/foliage/twisted_2.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.4,
-   "recolor": [
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/Pine_1.gltf",
+      "out": "models/foliage/pine_1.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.45
+    },
     {
-     "match": "Leaves_TwistedTree",
-     "hue": 95,
-     "saturation": 0.6,
-     "brightness": 0.95
-    }
-   ]
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/TwistedTree_3.gltf",
-   "out": "models/foliage/twisted_3.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.4,
-   "recolor": [
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/Pine_2.gltf",
+      "out": "models/foliage/pine_2.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.45
+    },
     {
-     "match": "Leaves_TwistedTree",
-     "hue": 95,
-     "saturation": 0.6,
-     "brightness": 0.95
-    }
-   ]
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/DeadTree_1.gltf",
-   "out": "models/foliage/dead_1.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.4
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/DeadTree_2.gltf",
-   "out": "models/foliage/dead_2.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.4
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/DeadTree_3.gltf",
-   "out": "models/foliage/dead_3.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.4
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/Rock_Medium_1.gltf",
-   "out": "models/foliage/rock_1.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/Rock_Medium_2.gltf",
-   "out": "models/foliage/rock_2.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/Rock_Medium_3.gltf",
-   "out": "models/foliage/rock_3.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/Bush_Common.gltf",
-   "out": "models/foliage/bush.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.55,
-   "recolor": [
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/Pine_3.gltf",
+      "out": "models/foliage/pine_3.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.45
+    },
     {
-     "match": "Leaves_TwistedTree",
-     "hue": 115,
-     "saturation": 0.75,
-     "brightness": 1.05
-    }
-   ]
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/Bush_Common_Flowers.gltf",
-   "out": "models/foliage/bush_flowers.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.55,
-   "recolor": [
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/Pine_4.gltf",
+      "out": "models/foliage/pine_4.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.45
+    },
     {
-     "match": "Flowers",
-     "hue": -25,
-     "saturation": 0.55,
-     "brightness": 1.25
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/Pine_5.gltf",
+      "out": "models/foliage/pine_5.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.45
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/CommonTree_1.gltf",
+      "out": "models/foliage/oak_1.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.45
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/CommonTree_2.gltf",
+      "out": "models/foliage/oak_2.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.45
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/CommonTree_3.gltf",
+      "out": "models/foliage/oak_3.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.45
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/CommonTree_4.gltf",
+      "out": "models/foliage/oak_4.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.45
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/CommonTree_5.gltf",
+      "out": "models/foliage/oak_5.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.45
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/TwistedTree_1.gltf",
+      "out": "models/foliage/twisted_1.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.4,
+      "recolor": [
+        {
+          "match": "Leaves_TwistedTree",
+          "hue": 95,
+          "saturation": 0.6,
+          "brightness": 0.95
+        }
+      ]
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/TwistedTree_2.gltf",
+      "out": "models/foliage/twisted_2.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.4,
+      "recolor": [
+        {
+          "match": "Leaves_TwistedTree",
+          "hue": 95,
+          "saturation": 0.6,
+          "brightness": 0.95
+        }
+      ]
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/TwistedTree_3.gltf",
+      "out": "models/foliage/twisted_3.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.4,
+      "recolor": [
+        {
+          "match": "Leaves_TwistedTree",
+          "hue": 95,
+          "saturation": 0.6,
+          "brightness": 0.95
+        }
+      ]
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/DeadTree_1.gltf",
+      "out": "models/foliage/dead_1.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.4
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/DeadTree_2.gltf",
+      "out": "models/foliage/dead_2.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.4
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/DeadTree_3.gltf",
+      "out": "models/foliage/dead_3.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.4
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/Rock_Medium_1.gltf",
+      "out": "models/foliage/rock_1.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/Rock_Medium_2.gltf",
+      "out": "models/foliage/rock_2.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/Rock_Medium_3.gltf",
+      "out": "models/foliage/rock_3.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/Bush_Common.gltf",
+      "out": "models/foliage/bush.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.55,
+      "recolor": [
+        {
+          "match": "Leaves_TwistedTree",
+          "hue": 115,
+          "saturation": 0.75,
+          "brightness": 1.05
+        }
+      ]
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/Bush_Common_Flowers.gltf",
+      "out": "models/foliage/bush_flowers.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.55,
+      "recolor": [
+        {
+          "match": "Flowers",
+          "hue": -25,
+          "saturation": 0.55,
+          "brightness": 1.25
+        }
+      ]
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/Fern_1.gltf",
+      "out": "models/foliage/fern.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_nature/extracted/glTF/Mushroom_Common.gltf",
+      "out": "models/foliage/mushroom.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.5
     }
-   ]
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/Fern_1.gltf",
-   "out": "models/foliage/fern.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_nature/extracted/glTF/Mushroom_Common.gltf",
-   "out": "models/foliage/mushroom.glb",
-   "type": "static",
-   "maxTex": 512,
-   "simplify": 0.5
-  }
- ]
+  ]
 }

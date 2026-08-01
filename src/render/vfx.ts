@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { loadTexture, releaseTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
 
 // Spell & ambience particle system. One pooled THREE.Points cloud drawn with
@@ -101,7 +101,7 @@ const SPR = {
 
 const spriteImages: (TexImageSource | null)[] = SPRITE_FILES.map(() => null);
 for (let i = 0; i < SPRITE_FILES.length; i++) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture(`/vfx/${SPRITE_FILES[i]}.png`, { srgb: true }).then((tex) => {
       spriteImages[i] = tex.image as TexImageSource;
       return tex;

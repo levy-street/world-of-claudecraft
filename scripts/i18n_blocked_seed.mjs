@@ -322,7 +322,6 @@ export const V07_SLASH = [
   'Quest log (5): Aki.',
   'Spellbook (5): Aki.',
   'Target: Aki (level 5 Aki) — Aki.',
-  'That player is already trading.',
   'Threat is only tracked on enemies; Aki is not one.',
   'Threat on Aki (5): Aki.',
   'Time played this session: Aki.',

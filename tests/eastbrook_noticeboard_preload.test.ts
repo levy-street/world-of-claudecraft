@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   loadTexture: vi.fn(),
   releaseGltf: vi.fn(),
   registerPreload: vi.fn(),
+  registerDeferredPreload: vi.fn((start: () => unknown) => start()),
 }));
 
 vi.mock('../src/render/assets/loader', () => ({
@@ -18,6 +19,7 @@ vi.mock('../src/render/assets/loader', () => ({
 
 vi.mock('../src/render/assets/preload', () => ({
   registerPreload: mocks.registerPreload,
+  registerDeferredPreload: mocks.registerDeferredPreload,
 }));
 
 function sourceScene(): THREE.Group {
@@ -77,8 +79,8 @@ describe('Eastbrook noticeboard tier-independent preload', () => {
       expect(mocks.loadGltf).toHaveBeenCalledWith('/models/props/eastbrook_noticeboard.glb');
       expect(mocks.loadTexture).toHaveBeenCalledTimes(1);
       expect(mocks.loadTexture).toHaveBeenCalledWith('/textures/eastbrook_surface_atlas.webp');
-      expect(mocks.registerPreload).toHaveBeenCalledTimes(2);
-      await Promise.all(mocks.registerPreload.mock.calls.map(([registered]) => registered));
+      expect(mocks.registerDeferredPreload).toHaveBeenCalledTimes(2);
+      await Promise.all(mocks.registerDeferredPreload.mock.results.map((r) => r.value));
 
       const first = module.buildEastbrookNoticeboard().group;
       const second = module.buildEastbrookNoticeboard().group;

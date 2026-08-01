@@ -27,11 +27,14 @@ export function keyVaultSignConfigFromEnv(
 export interface DesktopBuilderConfig {
   extraMetadata: {
     wocDesktop: {
-      distribution: 'website' | 'steam';
+      distribution: 'website' | 'steam' | 'epic';
       apiOrigin?: string;
       loginOrigin?: string;
       crashSubmitUrl?: string;
       steamAppId?: string;
+      epicProductId?: string;
+      epicDeploymentId?: string;
+      epicClientId?: string;
     };
   };
   publish: { channel?: UpdateChannel; [key: string]: unknown } | null;
@@ -42,7 +45,8 @@ export interface DesktopBuilderConfig {
     signtoolOptions?: KeyVaultSignConfig & { [key: string]: unknown };
     [key: string]: unknown;
   };
-  linux: { [key: string]: unknown };
+  // Present for website/steam; deleted for epic (no linux EGS target, D6).
+  linux?: { [key: string]: unknown };
   files?: string[];
   asarUnpack?: string[];
   [key: string]: unknown;
@@ -60,6 +64,9 @@ export function desktopBuilderConfig(input: {
   updateChannel?: string | null;
   steamAppId?: string;
   steamworksInstalled?: (() => boolean) | null;
+  epicProductId?: string;
+  epicDeploymentId?: string;
+  epicClientId?: string;
 }): DesktopBuilderConfig;
 
 export function isChannelFeedFile(fileName: unknown, channel: unknown): boolean;

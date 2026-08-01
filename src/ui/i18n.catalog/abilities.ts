@@ -725,7 +725,7 @@ const classAbilityNamesEn = {
       [
         'greater_invisibility',
         'Greater Invisibility',
-        'Vanish for 20 sec: removes 2 damage-over-time effects and you take 90% less damage while invisible and shortly after. (Mage talent)',
+        'Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)',
       ],
       [
         'hot_streak',

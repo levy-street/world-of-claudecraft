@@ -888,6 +888,13 @@ export const sv_SE: EnTranslations = {
       "heroicName": "Heroisk {name}",
       "heroicLocked": "Du är låst till Heroisk {name}."
     },
+    "riftTracker": {
+      "title": "Reva",
+      "floor": "Våning {current} av {total}",
+      "closesIn": "Stänger om {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NÖ",
@@ -915,6 +922,23 @@ export const sv_SE: EnTranslations = {
       "dock": "Docka tillbaka den här mätaren i mätarfönstret",
       "separate": "Separera {meter}",
       "regroup": "Gruppera {meter} igen"
+    },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Husdjuret har fulla livspunkter",
@@ -959,13 +983,15 @@ export const sv_SE: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Skuggsprångspaddan",
       "name_stormfeather_griffin": "Himmelsvidd Stormfjäder",
       "name_thunderstrut_gobbler": "Åskstoltsern, Den stora kalkonen",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "En uthållig, säkerfotad stridshäst som ger ökad reshastighet.",
       "desc_grag_bear": "En uthållig, säkerfotad björn som ger ökad reshastighet.",
       "desc_stalkglider_snail": "En robust, långsamt brinnande snigel som ger ökad reshastighet.",
       "desc_aether_hover_cycle": "En kraftfull magitech-cykel designad för snabb, lågsvävande förflyttning i strid.",
       "desc_shadowjump_toad": "En massiv, säkerfotad jättepadda, tränad i blixtsnabba skuggsprång som täcker all terräng.",
       "desc_stormfeather_griffin": "En kunglig stormgrip som smyger fram på runskodda klor, med vingarna hopfällda.",
-      "desc_thunderstrut_gobbler": "En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln."
+      "desc_thunderstrut_gobbler": "En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.",
@@ -1271,6 +1297,51 @@ export const sv_SE: EnTranslations = {
       "badges": {
         "backgrounded": "I bakgrunden",
         "offline": "Offline"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Current class: {class}",
+      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
+      "noProcs": "No supported proc is available for this character.",
+      "enabled": "Show Aura",
+      "icon": "Spell Icon",
+      "arcs": "Side Crescents",
+      "groundRing": "Ground Ring",
+      "groundRingSpellOrder": "Ground Ring: Spell Order",
+      "crescentsSpellOrder": "Side Crescents: Spell Order",
+      "size": "Size",
+      "iconSize": "Icon Size",
+      "crescentBlockSize": "Crescent Block Size",
+      "groundRingBlockSize": "Ground Ring Block Size",
+      "opacity": "Opacity",
+      "color": "Color",
+      "allOn": "All On",
+      "allOff": "All Off",
+      "reposition": "Setup Positions",
+      "positioning": "Positioning: {aura}",
+      "selectAura": "Aura",
+      "done": "Done",
+      "moveLeft": "Move Left",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "moveRight": "Move Right",
+      "moveEarlier": "Move spell inward",
+      "moveLater": "Move spell outward",
+      "screenPosition": "Screen Position",
+      "spellOrder": "Spell Order",
+      "reset": "Reset Position",
+      "spellPosition": "Spell order {position} / {count}",
+      "procs": {
+        "revenge": "Revenge!",
+        "battleTrance": "Battle Trance",
+        "overpowerCharge": "Redhand Empowerment",
+        "suddenDeath": "Sudden Death",
+        "victoryRush": "Victory Rush",
+        "enrage": "Mayhem: Enraged",
+        "heatingUp": "Heating Up",
+        "arcaneCharge": "Arcane Charges",
+        "aetherRush": "Aether Rush"
       }
     },
     "playerCard": {
@@ -2076,6 +2147,14 @@ export const sv_SE: EnTranslations = {
       "benefits": "Länka ditt Steam-konto från skrivbordsappen så speglas bedrifterna du fullbordar som Steam-prestationer.",
       "noTicket": "Steam lämnade ingen länkbiljett. Starta Steam och försök igen."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Brevlåda",
       "subtitle": "Korpposten",
@@ -2120,6 +2199,7 @@ export const sv_SE: EnTranslations = {
         "noRecipient": "Ingen med det namnet har en brevlåda här.",
         "tooManyParcels": "Ett brev rymmer högst {count} paket.",
         "noMailQuestItems": "Du kan inte skicka uppdragsföremål med post.",
+        "noMailBound": "Det föremålet är bundet och kan inte skickas med post.",
         "notEnoughItems": "Du har inte så många att skicka.",
         "cantAffordPostage": "Du har inte råd med portot.",
         "recipientBoxFull": "Mottagarens brevlåda är full.",
@@ -2926,6 +3006,14 @@ export const sv_SE: EnTranslations = {
       "account_taken": "Det Steam-kontot är redan länkat till ett annat konto.",
       "upstream": "Steam svarade inte. Försök igen om en stund."
     },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
+    },
     "wallet": {
       "handoff_invalid": "Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen."
     },
@@ -3530,14 +3618,6 @@ export const sv_SE: EnTranslations = {
       "reptile": {
         "name": "Reptiler",
         "desc": "Kallblodiga jägare med ett eget väsande och ett snäppande bett, skilda från de varmblodiga djuren."
-      },
-      "murloc": {
-        "name": "Kväkfenor",
-        "desc": "Kväkande fiskfolk från sjöstrand och tidvattenspöl, snabba att svärma allt som vadar för nära."
-      },
-      "kobold": {
-        "name": "Skälmar",
-        "desc": "Krypande asätare och älvor från glänta och häck, mer besvärliga än farliga tills de samlas i antal."
       },
       "demon": {
         "name": "Demoner",
@@ -6479,10 +6559,12 @@ export const sv_SE: EnTranslations = {
       "arenaQueueTrading": "Avsluta din handel innan du köar.",
       "arenaQueueInstance": "Du kan inte köa inifrån en instans.",
       "tradeInProgress": "En handel pågår redan.",
+      "tradeAlreadyTrading": "Den spelaren handlar redan.",
       "tradeTooFar": "Målet är för långt bort för att handla.",
       "tradeExpired": "Handelsförfrågan har gått ut.",
       "tradeFailed": "Handeln misslyckades: föremål eller pengar är inte längre tillgängliga.",
-      "tradeBound": "Det föremålet är bundet och kan inte handlas."
+      "tradeBound": "Det föremålet är bundet och kan inte handlas.",
+      "marketListBound": "Det föremålet är bundet och kan inte säljas."
     },
     "logs": {
       "standUp": "Du reser dig upp.",
@@ -7227,7 +7309,7 @@ export const sv_SE: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Förbättrad osynlighet",
-        "description": "Försvinn i 20 sek.: tar bort 2 skadeeffekter över tid och du tar 90% mindre skada medan du är osynlig och en kort stund efteråt. (magikertalang)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Het svit",
@@ -9745,6 +9827,9 @@ export const sv_SE: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Sista fästets signetring"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

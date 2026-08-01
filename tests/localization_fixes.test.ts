@@ -6,6 +6,8 @@ import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES, ITEMS } from '../src/sim/data';
+import { Sim } from '../src/sim/sim';
+import type { SimEvent } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
 import {
@@ -1241,6 +1243,41 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     }
     setLanguage('en');
     expect(leaks, 'unregistered sim emit strings (add a key/RULE to sim_i18n.ts)').toEqual([]);
+  });
+
+  // BUG #12 regression: the trade-accept-race deny path ('That player is already
+  // trading.', emitted from src/sim/social/trade.ts's tradeAccept when a second
+  // invitee accepts a stale invite while the inviter is already trading someone
+  // else) was miscategorized into the V07_SLASH allowlist, a backstop meant for
+  // undated slash-command diagnostics, not trade errors. That let it bypass
+  // candidateStrings() (and so s3_registered above) despite carrying no real
+  // hud.errors key, unlike its sibling 'A trade is already in progress.'. Drive
+  // the real race through the real Sim to prove the exact string still ships,
+  // then check it against the same exact-map extraction s3_registered itself
+  // uses, so this fails for the true reason (no key), not a stand-in.
+  it('the real trade-accept-race deny text has its own hud.errors key, not a V07_SLASH leak', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const a = sim.addPlayer('warrior', 'Anna');
+    const b = sim.addPlayer('mage', 'Bert');
+    const c = sim.addPlayer('warrior', 'Cara');
+    sim.tradeRequest(b, a);
+    sim.tradeRequest(c, a);
+    sim.tradeAccept(b);
+    sim.events.length = 0;
+    sim.tradeAccept(c);
+    const err = sim.events.find(
+      (e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error',
+    );
+    expect(err?.text).toBe('That player is already trading.');
+
+    expect(
+      arms.localizeErrorText.exact.has('That player is already trading.'),
+      'That player is already trading. must be a real hud.errors EXACT key, matching its sibling A trade is already in progress.',
+    ).toBe(true);
+    expect(
+      ALLOW_V07_SLASH.has('That player is already trading.'),
+      'That player is already trading. must not be parked in the V07_SLASH slash-command backstop allowlist',
+    ).toBe(false);
   });
 
   it('the src/sim/social glob still reaches its modules and feeds the corpus', () => {

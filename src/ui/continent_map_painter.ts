@@ -41,6 +41,10 @@ const REGION_CURRENT_LINE_WIDTH = 2.5;
 const HERE_DOT_RADIUS = 3.5;
 const HERE_RING_RADIUS = 6.5;
 const HERE_RING_LINE_WIDTH = 2;
+// Party member dots (issue 2652): smaller than the player's own dot and with a
+// thinner outline, so self stays the emphasized marker at a glance.
+const PARTY_DOT_RADIUS = 3;
+const PARTY_DOT_LINE_WIDTH = 1.5;
 
 // The --color-map-* design tokens the painter resolves once per redraw. The
 // label/outline/player group is shared with the per-zone map painter; the ocean
@@ -52,6 +56,7 @@ const CONTINENT_COLOR_TOKENS = {
   label: '--color-map-label',
   outline: '--color-map-outline',
   player: '--color-map-player',
+  partyDead: '--color-map-party-dead',
   regionStroke: '--color-map-region-stroke',
   regionHoverFill: '--color-map-region-hover-fill',
   regionHoverStroke: '--color-map-region-hover-stroke',
@@ -79,6 +84,11 @@ export interface ContinentPaintResult {
 export class ContinentMapPainter {
   private art: HTMLImageElement | null = null;
   private artState: 'idle' | 'loading' | 'ready' | 'missing' = 'idle';
+
+  /** classColor resolves a party member's class to its display color (issue
+   *  2652), the same resolver Hud threads into MinimapPainter / DelveMapPainter
+   *  / MapWindowPainter, so a member reads as the same color on every surface. */
+  constructor(private readonly classColor: (cls: string) => string) {}
 
   private ensureArt(): void {
     if (this.artState !== 'idle') return;
@@ -179,6 +189,23 @@ export class ContinentMapPainter {
     if (hovered) {
       ctx.font = LABEL_HOVER_FONT;
       this.label(ctx, hovered, colors);
+    }
+
+    // Party members (issue 2652): one class-colored dot per member (the dead
+    // token for a fallen one), drawn BEFORE the player marker so self always
+    // reads on top when the group is stacked together. No name labels here: the
+    // zone cells are already full of their own labels at this scale, so naming
+    // members stays the per-zone map's job (see ContinentPartyMarker).
+    if (model.party.length > 0) {
+      ctx.strokeStyle = colors.outline;
+      ctx.lineWidth = PARTY_DOT_LINE_WIDTH;
+      for (const member of model.party) {
+        ctx.fillStyle = member.dead ? colors.partyDead : this.classColor(member.cls);
+        ctx.beginPath();
+        ctx.arc(member.mx, member.my, PARTY_DOT_RADIUS, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
     }
 
     // "You are here": a filled dot in a ring at the player's projected position.

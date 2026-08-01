@@ -236,6 +236,67 @@ describe('sending a letter', () => {
     sim.mailDelete(gift.id, bob);
     expect(sim.mailInfoFor(bob)?.messages.some((m) => m.id === gift.id)).toBe(false);
   });
+
+  // Review follow-up on PR #2605 (EnriqueGF, medium): mail was a third laundering
+  // channel for a crafted item's provenance marker (bags.ts InvSlot.craftedRecipeId),
+  // structurally identical to the trade and market paths the PR fixed. Escrowing via
+  // removeVendorSellUnits (instead of a blind removeFungibleItem) and re-granting with
+  // { craftedRecipeId } on mailTake must keep the marker across the flight.
+  it('carries the craftedRecipeId marker through a mailed attachment', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    const bobMeta = sim.meta(bob);
+    if (!aliceMeta || !bobMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    // One crafted copy and one plain (drop-sourced) copy of the same item id, so the
+    // escrow must keep them in separate provenance buckets rather than collapsing them.
+    sim.addItem('roasted_boar', 1, alice, { craftedRecipeId: 'r_roasted_boar' });
+    sim.addItem('roasted_boar', 1, alice);
+    moveToMailbox(sim, alice);
+    sim.mailSend(
+      'Bob',
+      'Provisions',
+      'Eat well.',
+      0,
+      [{ itemId: 'roasted_boar', count: 2 }],
+      alice,
+    );
+    expect(sim.countItem('roasted_boar', alice)).toBe(0);
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+
+    moveToMailbox(sim, bob);
+    const info = sim.mailInfoFor(bob);
+    const parcel = info?.messages.find((m) => m.subject === 'Provisions');
+    if (!parcel) throw new Error('parcel not delivered');
+    // The escrow must have split the attachment into two provenance buckets.
+    expect(parcel.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          itemId: 'roasted_boar',
+          count: 1,
+          craftedRecipeId: 'r_roasted_boar',
+        }),
+        expect.objectContaining({ itemId: 'roasted_boar', count: 1 }),
+      ]),
+    );
+    expect(parcel.items.find((s) => s.craftedRecipeId !== undefined)?.craftedRecipeId).toBe(
+      'r_roasted_boar',
+    );
+
+    sim.mailTake(parcel.id, bob);
+    const bobMeta2 = sim.meta(bob);
+    if (!bobMeta2) throw new Error('no meta');
+    const crafted = bobMeta2.inventory.find(
+      (s) => s.itemId === 'roasted_boar' && s.craftedRecipeId === 'r_roasted_boar',
+    );
+    const plain = bobMeta2.inventory.find(
+      (s) => s.itemId === 'roasted_boar' && s.craftedRecipeId === undefined,
+    );
+    expect(crafted?.count).toBe(1);
+    expect(plain?.count).toBe(1);
+  });
 });
 
 describe('instanced attachments (finding 1)', () => {

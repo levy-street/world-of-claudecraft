@@ -51,6 +51,193 @@ async function openMarketBrowse(page) {
 
 export const TARGETS = [
   {
+    key: 'target-auras',
+    label: 'Target aura window with offensive and healing-over-time effects',
+    when: ['target_auras'],
+    variants: [
+      {
+        key: 'lunar-tempest-desktop',
+        charClass: 'druid',
+        charName: 'Morphalo',
+        abilityId: 'moonfire',
+        friendly: false,
+      },
+      {
+        key: 'second-bloom-desktop',
+        charClass: 'druid',
+        charName: 'Morphalo',
+        abilityId: 'regrowth',
+        friendly: true,
+      },
+    ],
+    async capture(page, variant) {
+      // enterOfflineGame can expose window.__game just before startGame paints the
+      // loading overlay. Observe that transition first so the following hidden
+      // check cannot pass during the brief pre-loading race.
+      try {
+        await page.waitForFunction(
+          () => document.querySelector('#loading-screen')?.classList.contains('visible'),
+          { timeout: 10000 },
+        );
+      } catch {
+        // A warm load can finish before this recipe starts; the hidden-state
+        // check below remains the authoritative readiness condition.
+      }
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      const staged = await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) {
+          return { ok: false, reason: 'offline world is unavailable' };
+        }
+        sim.setPlayerLevel?.(20, player.id);
+        player.resource = player.maxResource;
+        if (
+          shot.friendly &&
+          ![...sim.entities.values()].some(
+            (entity) => entity.friendlyPracticeTarget || entity.name === 'Healing Dummy',
+          )
+        ) {
+          sim.spawnHealerPracticeDummy?.();
+        }
+        const dummy = [...sim.entities.values()].find(
+          (entity) =>
+            entity.templateId === 'training_dummy' &&
+            !entity.dead &&
+            (shot.friendly
+              ? entity.friendlyPracticeTarget || entity.name === 'Healing Dummy'
+              : entity.hostile && entity.name !== 'Healing Dummy'),
+        );
+        if (!dummy) return { ok: false, reason: 'requested training dummy is unavailable' };
+        player.pos.x = dummy.pos.x - 4;
+        player.pos.y = dummy.pos.y;
+        player.pos.z = dummy.pos.z;
+        player.prevPos = { ...player.pos };
+        sim.rebucket?.(player);
+        sim.targetEntity(dummy.id, player.id);
+        game.hud.hotbarActions[0] = { type: 'ability', id: shot.abilityId };
+        game.hud.saveSlotMap?.();
+        return { ok: true, dummyId: dummy.id, dummyName: dummy.name };
+      }, variant);
+      if (!staged.ok) throw new Error(staged.reason);
+
+      // Moving beside a distant practice dummy can trigger the normal zone
+      // streaming overlay on the following frame. Let that transition start,
+      // then wait until the world is visible again before interacting or shooting.
+      await wait(1000);
+      await page.waitForFunction(
+        () => !document.querySelector('#loading-screen')?.classList.contains('visible'),
+        { timeout: 90000, polling: 200 },
+      );
+
+      const panelExists = await page.evaluate(
+        () => !!document.querySelector('#target-auras-window'),
+      );
+      const allowMissingPanel = process.env.PR_SHOTS_ALLOW_MISSING_TARGET_AURAS === '1';
+      if (!panelExists && !allowMissingPanel) {
+        throw new Error('target aura window is unavailable');
+      }
+      if (panelExists) {
+        const panelVisible = await page.evaluate(
+          () => getComputedStyle(document.querySelector('#target-auras-window')).display !== 'none',
+        );
+        if (!panelVisible) {
+          await page.keyboard.down('Shift');
+          await page.keyboard.press('j');
+          await page.keyboard.up('Shift');
+        }
+      }
+      await wait(500);
+
+      // Exercise the same click handler a player uses on the primary action bar;
+      // do not inject an aura or call sim.castAbility from the capture harness.
+      let auraApplied = false;
+      for (let attempt = 0; attempt < 2 && !auraApplied; attempt++) {
+        const clicked = await page.evaluate(
+          ({ dummyId, abilityId }) => {
+            const game = window.__game;
+            const player = game?.sim?.player;
+            const button = document.querySelector('.action-btn[data-hotbar-slot="1"]');
+            if (!game || !player || !button) return false;
+            player.targetId = dummyId;
+            player.resource = player.maxResource;
+            game.hud.hotbarActions[0] = { type: 'ability', id: abilityId };
+            game.hud.saveSlotMap?.();
+            button.click();
+            return true;
+          },
+          { dummyId: staged.dummyId, abilityId: variant.abilityId },
+        );
+        if (!clicked) throw new Error('primary action slot 1 is unavailable');
+        for (let poll = 0; poll < 24 && !auraApplied; poll++) {
+          await wait(200);
+          auraApplied = await page.evaluate(
+            ({ dummyId, abilityId }) =>
+              !!window.__game?.sim?.entities.get(dummyId)?.auras.some((a) => a.id === abilityId),
+            { dummyId: staged.dummyId, abilityId: variant.abilityId },
+          );
+        }
+      }
+
+      if (panelExists && auraApplied) {
+        const expectedName = variant.friendly ? 'Second Bloom' : 'Lunar Tempest';
+        await page.waitForFunction(
+          (name) =>
+            [...document.querySelectorAll('#target-auras-window .ta-name')].some(
+              (el) => el.textContent === name,
+            ),
+          { timeout: 5000, polling: 100 },
+          expectedName,
+        );
+      }
+
+      const proof = await page.evaluate(
+        ({ dummyId, abilityId, expectedName, hasPanel }) => {
+          const target = window.__game?.sim?.entities.get(dummyId);
+          return {
+            targetName: target?.name ?? '',
+            auraApplied: !!target?.auras.some((a) => a.id === abilityId),
+            windowVisible:
+              !hasPanel ||
+              getComputedStyle(document.querySelector('#target-auras-window')).display !== 'none',
+            auraPainted:
+              !hasPanel ||
+              [...document.querySelectorAll('#target-auras-window .ta-name')].some(
+                (el) => el.textContent === expectedName,
+              ),
+          };
+        },
+        {
+          dummyId: staged.dummyId,
+          abilityId: variant.abilityId,
+          expectedName: variant.friendly ? 'Second Bloom' : 'Lunar Tempest',
+          hasPanel: panelExists,
+        },
+      );
+      if (!proof.auraApplied || !proof.windowVisible || !proof.auraPainted) {
+        throw new Error(`target aura proof failed: ${JSON.stringify(proof)}`);
+      }
+      return {};
+    },
+  },
+  {
     key: 'player-tooltip',
     label: 'Player hover tooltip',
     when: ['player_tooltip'],
@@ -3175,7 +3362,7 @@ export const TARGETS = [
   {
     key: 'perf-overlay-ornament',
     label: 'Performance Overlay window: gilded ornament pilot',
-    when: ['ui/perf_ornament_svg'],
+    when: ['ui/perf_ornament_svg', 'ui/perf_overlay_settings'],
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
       // The first-spawn "Choose Your Camera" prompt can still be up (or
@@ -3204,7 +3391,20 @@ export const TARGETS = [
         perfBtn?.click();
       });
       const wide = await pollForSize(page, '#options-menu.perf-wide');
-      return wide ? { clip: '#options-menu' } : {};
+      if (!wide) return {};
+      // Scroll the panel body all the way down: issue #2569 (the ornament
+      // scrolling with the content) only shows up once the panel has
+      // actually scrolled. Try the post-fix `.perf-scroll` wrapper first and
+      // fall back to the pre-fix scrolling host itself, so this one capture
+      // works for both a before and an after shot.
+      await page.evaluate(() => {
+        const scrollHost =
+          document.querySelector('#options-menu.perf-wide .perf-scroll') ??
+          document.querySelector('#options-menu.perf-wide');
+        if (scrollHost) scrollHost.scrollTop = scrollHost.scrollHeight;
+      });
+      await wait(150);
+      return { clip: '#options-menu' };
     },
   },
   {

@@ -138,6 +138,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.1,
     color: 0xd8d0c0,
+    componentTags: ['hide', 'meat'],
   },
   gale_wisp: {
     id: 'gale_wisp',
@@ -180,7 +181,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     name: 'Downs Bandit',
     minLevel: 20,
     maxLevel: 20,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 52,
     hpPerLevel: 18,
     dmgBase: 11,
@@ -190,7 +191,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8.5,
     aggroRadius: 10, // squatting the old raider tents, and keeping them
     loot: [
-      { copper: 110, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'bandit_bandana', chance: 0.5 },
       { itemId: 'linen_scrap', chance: 0.3 },
     ],
@@ -202,7 +203,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     name: 'Wreckfield Thief',
     minLevel: 20,
     maxLevel: 20,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 52,
     hpPerLevel: 18,
     dmgBase: 11,
@@ -212,7 +213,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8.5,
     aggroRadius: 10, // every beached cargo on this coast is theirs by claim
     loot: [
-      { copper: 110, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'bandit_bandana', chance: 0.5 },
       { itemId: 'linen_scrap', chance: 0.3 },
     ],
@@ -235,7 +236,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 14, // every hull on that beach is a grave he keeps
     elite: true,
     loot: [
-      { copper: 450, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'bone_fragments', chance: 1 },
     ],
     scale: 1.45,
@@ -260,7 +261,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7.5,
     aggroRadius: 12,
     loot: [
-      { copper: 110, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.5 },
     ],
     scale: 1.05,

@@ -134,6 +134,15 @@ export interface SocialDb {
   ): Promise<'ok' | 'full' | 'already_member' | 'no_guild'>;
   removeGuildMember(charId: number): Promise<void>;
   setGuildRank(charId: number, rank: GuildRank): Promise<void>;
+  // hand off the Guild Master title atomically: locks the guild row, re-checks
+  // that fromCharId is still the leader and toCharId is still a member of the
+  // SAME guild, then promotes/demotes both rows in one transaction, so two
+  // racing transfers can never both succeed and leave two Guild Masters.
+  transferGuildLeader(
+    guildId: number,
+    fromCharId: number,
+    toCharId: number,
+  ): Promise<'ok' | 'not_leader' | 'not_member' | 'no_guild'>;
   guildMembers(
     guildId: number,
   ): Promise<
@@ -845,8 +854,24 @@ export class SocialService {
       this.err(actor.characterId, `${target.name} is not in your guild.`);
       return;
     }
-    await this.db.setGuildRank(target.id, 'leader');
-    await this.db.setGuildRank(actor.characterId, 'officer');
+    const result = await this.db.transferGuildLeader(
+      membership.guildId,
+      actor.characterId,
+      target.id,
+    );
+    if (result === 'no_guild') {
+      this.err(actor.characterId, 'That guild no longer exists.');
+      return;
+    }
+    if (result === 'not_leader') {
+      // lost a race with another transfer between the checks above and here
+      this.err(actor.characterId, 'Only the Guild Master may promote a new leader.');
+      return;
+    }
+    if (result === 'not_member') {
+      this.err(actor.characterId, `${target.name} is not in your guild.`);
+      return;
+    }
     await this.broadcastGuild(membership.guildId, [
       {
         type: 'log',

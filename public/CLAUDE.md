@@ -34,6 +34,7 @@ have their own `CLAUDE.md` with per-asset notes (public, see above).
 | `models/resources` | resource/loot `.glb` (ores, bars, gems, food, ...) | GLB |
 | `models/tools` | tool `.glb` (hammer, pickaxe, fishing, lockpicks, ...) | GLB |
 | `models/weapons` | weapon/shield `.glb` | GLB |
+| `basis` | KTX2/Basis transcoder (`basis_transcoder.js`/`.wasm`, copied from three's addons) fetched by `src/render/assets/ktx2_support.ts`; deliberately NOT media-manifest hashed, served at the literal `/basis/` path | KTX2Loader |
 | `textures/terrain` | ambientCG PBR sets (`*_Color/NormalGL/Roughness/AmbientOcclusion.jpg`) | texture |
 | `textures/water` | water normal maps (MIT, three.js) | texture |
 | `textures/skins` | per-class skin texture dirs | texture |

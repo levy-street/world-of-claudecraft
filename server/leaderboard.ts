@@ -53,6 +53,10 @@ import {
   searchCharacters,
 } from './db';
 import { type RecentDeedRow, recentDeedsForCharacter } from './deeds_db';
+// From the config module directly (not the ./steam or ./epic barrels): the
+// barrels drag routes.ts and its load-time middleware construction into this
+// module's graph, which partial db mocks in tests cannot serve.
+import { epicEnabled } from './epic/config';
 import { requireAccount } from './http/middleware/require_account';
 import type { Ctx, RouteDef } from './http/types';
 import { json } from './http_util';
@@ -60,9 +64,6 @@ import type { LiveReportTarget } from './moderation_db';
 import { recordUsageMetric } from './provider_usage';
 import { publicReadRateLimited } from './ratelimit';
 import { REALM, REALM_DIRECTORY } from './realm';
-// From the config module directly (not the ./steam barrel): the barrel drags
-// routes.ts and its load-time middleware construction into this module's
-// graph, which partial db mocks in tests cannot serve.
 import { steamEnabled } from './steam/config';
 
 // ---------------------------------------------------------------------------
@@ -610,8 +611,9 @@ async function projectStatsHandler(ctx: Ctx): Promise<void> {
  * GET /api/status: the public realm + online snapshot. LABELED knownDeviation
  * (status-name-list-trim): the online player name-list the legacy arm returned is
  * dropped here, so the public endpoint exposes counts only, not who is online.
- * steam.enabled is the capability advert clients read before rendering any
- * Steam link UI (dual-arm edit: the legacy main.ts twin carries the same field).
+ * steam.enabled / epic.enabled are the capability adverts clients read before
+ * rendering any Steam / Epic link UI (dual-arm edit: the legacy main.ts twin
+ * carries the same fields).
  * players_cap is the configured realm player cap (0 when disabled), also a dual-arm
  * edit: the legacy main.ts twin carries the same field with the same semantics.
  * dev_commands is the capability advert for the /dev GUI: the dev_* cheats ride the
@@ -629,6 +631,7 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     players_online: rt.playersOnline(),
     players_cap: rt.playersCap(),
     steam: { enabled: steamEnabled() },
+    epic: { enabled: epicEnabled() },
     dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
   });
 }

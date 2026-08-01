@@ -124,7 +124,6 @@ export const es: Record<string, string> = {
   'stats.avgTick': 'tick prom.',
   'stats.serverRss': 'rss del servidor',
   'online.title': 'Jugadores en línea',
-  'online.refreshHint': 'se actualiza cada 5s',
   'online.empty': 'nadie en línea ahora mismo',
   'online.colCharacter': 'Personaje',
   'online.colClass': 'Clase',

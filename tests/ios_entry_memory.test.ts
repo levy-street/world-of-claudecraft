@@ -189,3 +189,80 @@ describe('preload registry retains no resolution values', () => {
     await expect(assetsReady()).rejects.toThrow('asset preload failed (1)');
   });
 });
+
+describe('post-entry mob-body streaming (packaged iOS)', () => {
+  // The heaviest character content (creatures + the skeleton family, embedded
+  // 1024-class atlases) is carved out of the boot gate on the packaged shell and
+  // streamed after prewarm, through the fail-soft view-create seam (#2079).
+  // Measured before this: WebContent at 1.54 GB pre-renderer on an iPhone 17 Pro.
+  it('streams mob bodies and Armory skin models; base weapons stay in the gate', () => {
+    expect(assetsSource).toContain(
+      "const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];",
+    );
+    // Weapon SKINS stream (cosmetic, degradable); the BASE item weapons do not,
+    // so the player's own hands are never empty at spawn and the degrade path
+    // below always has a resident fallback.
+    expect(assetsSource).toContain('const streamedSkinUrls = new Set(weaponSkinModelUrls());');
+    // The preview gate sweeps the GATE set, so the launcher never awaits or
+    // re-fetches streamed content.
+    expect(assetsSource).toContain(
+      'const preloadUrls = allPreloadUrls.filter((u) => !streamedUrlSet.has(u));',
+    );
+  });
+
+  it('degrades a not-yet-resident skin to the base weapon instead of throwing', () => {
+    // All three attach resolvers route their skin url through residentOrEnsure,
+    // which kicks the fetch and returns null so the resident fallback applies.
+    expect(assetsSource).toContain(
+      'residentOrEnsure(weaponSkinModelUrl(weaponSkinId)) ?? itemWeaponModelUrl(weaponItemId)',
+    );
+    expect(assetsSource).toContain(
+      'const resident = residentOrEnsure(url) ?? itemOffhandModelUrl(offhandItemId);',
+    );
+    expect(assetsSource).toContain(
+      'const url = residentOrEnsure(weaponSkinModelUrl(weaponSkinId));',
+    );
+    // The launcher ensures the roster's own skins on demand (the mech pattern).
+    expect(mainSource).toContain('ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));');
+  });
+
+  it('degrades a not-yet-resident skin in the Armory display-model path', () => {
+    // weaponSkinDisplayModel feeds the store preview (prewarm loops every skin
+    // id microseconds after the stream pass starts): a non-resident streamed
+    // skin returns null (the rig treats it as unavailable) instead of letting
+    // resolvedGltf throw away the whole warmup or escape a click handler.
+    expect(assetsSource).toContain('if (residentOrEnsure(url) === null) return null;');
+    // The preview recovers on reselect: same-skin no-op only while a rig exists.
+    const previewSource = readFileSync(
+      new URL('../src/render/armory_preview.ts', import.meta.url),
+      'utf8',
+    );
+    expect(previewSource).toContain(
+      'if (disposed || (next === skinId && (next === null || activeWeaponRig !== null))) return;',
+    );
+  });
+
+  it('re-arms a failed streamed body fetch from the visual-build miss path', () => {
+    // A streamed body whose one-shot stream fetch failed must not stay
+    // invisible for the session: resolvedGltf kicks the fetch again before its
+    // fail-soft throw, and the view-create retry gate re-attempts the build.
+    // Gated to streamed urls so a non-streamed miss stays a loud preload bug.
+    expect(assetsSource).toContain('if (streamedUrlSet.has(url)) ensureCharacterUrl(url);');
+  });
+
+  it('starts the stream after prewarm, not inside the entry gate', () => {
+    const prewarmAt = mainSource.indexOf("checkpoint('prewarm-complete'");
+    const streamAt = mainSource.indexOf('startStreamedCharacterPreloads()');
+    const assetsAwaitAt = mainSource.indexOf('await assetsReady(');
+    expect(prewarmAt).toBeGreaterThan(-1);
+    expect(streamAt).toBeGreaterThan(prewarmAt);
+    expect(streamAt).toBeGreaterThan(assetsAwaitAt);
+  });
+
+  it('extracts props and foliage as they land on the packaged shell', () => {
+    const propsSource = read('../src/render/props.ts');
+    const foliageSource = read('../src/render/foliage.ts');
+    expect(propsSource).toContain('if (GFX.nativeIosMemoryProfile) propAsset(key as PropKey);');
+    expect(foliageSource).toContain('if (GFX.nativeIosMemoryProfile) extractParts(url);');
+  });
+});

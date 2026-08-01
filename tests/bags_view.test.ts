@@ -137,6 +137,69 @@ describe('bagItemAction priority order', () => {
   });
 });
 
+describe('transfer-locked instanced copies (issue 1165)', () => {
+  const ARMED = { bindOnTrade: true };
+  const STAMPED = { bindOnTrade: true, boundTo: 7 };
+  const SIGNED = { signer: 'Ayla' };
+
+  it('blocks a locked copy in market-sell mode, in place, for armed AND stamped', () => {
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, marketSell: true }, ARMED)).toBe(
+      'marketSellBlockedBound',
+    );
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, marketSell: true }, STAMPED)).toBe(
+      'marketSellBlockedBound',
+    );
+  });
+
+  it('blocks a locked copy in mail-attach mode, in place, for armed AND stamped', () => {
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, mailAttach: true }, ARMED)).toBe(
+      'mailAttachBlockedBound',
+    );
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, mailAttach: true }, STAMPED)).toBe(
+      'mailAttachBlockedBound',
+    );
+  });
+
+  it('an UNLOCKED instanced copy stages normally: signed goods list and mail', () => {
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, marketSell: true }, SIGNED)).toBe('marketSell');
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, mailAttach: true }, SIGNED)).toBe('mailAttach');
+  });
+
+  it('the def-level gates still outrank the lock: quest/noMarketList block first', () => {
+    expect(bagItemAction(ITEMS.questItem, { ...NO_MODE, marketSell: true }, STAMPED)).toBe(
+      'marketSellBlockedQuest',
+    );
+    expect(bagItemAction(ITEMS.bound, { ...NO_MODE, mailAttach: true }, STAMPED)).toBe(
+      'mailAttachBlocked',
+    );
+  });
+
+  it('a lock never blocks outside the two pipe modes: vendor/bank/trade are unchanged', () => {
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, tradeOpen: true }, STAMPED)).toBe('trade');
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, vendorOpen: true }, STAMPED)).toBe(
+      'vendorSell',
+    );
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, bankDeposit: true }, STAMPED)).toBe(
+      'bankDeposit',
+    );
+  });
+
+  it('the tooltip hint mirrors the block: cannot-market / cannot-mail for locked copies', () => {
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, marketSell: true }, STAMPED)).toBe(
+      'itemUi.tooltip.cannotMarket',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, mailAttach: true }, ARMED)).toBe(
+      'hudChrome.mailbox.cannotMail',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, marketSell: true }, SIGNED)).toBe(
+      'itemUi.tooltip.clickMarketList',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, mailAttach: true }, SIGNED)).toBe(
+      'hudChrome.mailbox.clickAttach',
+    );
+  });
+});
+
 describe('soulbound transfer affordances', () => {
   it('blocks trade, mail, market, and vendor clicks instead of staging a Heroic Mark transfer', () => {
     expect([

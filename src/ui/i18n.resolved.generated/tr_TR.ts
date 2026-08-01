@@ -888,6 +888,13 @@ export const tr_TR: EnTranslations = {
       "heroicName": "Kahramanca {name}",
       "heroicLocked": "Kahramanca {name} akınına kilitlisin."
     },
+    "riftTracker": {
+      "title": "Yarık",
+      "floor": "Kat {current}/{total}",
+      "closesIn": "{time} içinde kapanır",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "K",
       "NE": "KD",
@@ -915,6 +922,23 @@ export const tr_TR: EnTranslations = {
       "dock": "Bu ölçeri ölçerler penceresine geri yerleştirin",
       "separate": "Ayır: {meter}",
       "regroup": "Yeniden grupla: {meter}"
+    },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Evcil hayvanın canı dolu",
@@ -959,13 +983,15 @@ export const tr_TR: EnTranslations = {
       "name_shadowjump_toad": "Gölge Sıçrayan Kurbağa Kama-Kage",
       "name_stormfeather_griffin": "Gökyüzü Erişimli Fırtınatüy",
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
       "desc_stalkglider_snail": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.",
       "desc_aether_hover_cycle": "Savaşta hızlı, alçaktan süzülerek hareket etmek için tasarlanmış güçlü bir büyü-teknoloji motosikleti.",
       "desc_shadowjump_toad": "Her arazi türünü aşan, şimşek hızındaki gölgeli sıçramalarla eğitilmiş, dev ve sağlam adımlı bir kurbağa.",
       "desc_stormfeather_griffin": "Rün nallı pençeleriyle yerde süzülen, kanatları katlı, asil bir fırtına grifonu.",
-      "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi."
+      "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
@@ -1271,6 +1297,51 @@ export const tr_TR: EnTranslations = {
       "badges": {
         "backgrounded": "Arka Planda",
         "offline": "Çevrimdışı"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Current class: {class}",
+      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
+      "noProcs": "No supported proc is available for this character.",
+      "enabled": "Show Aura",
+      "icon": "Spell Icon",
+      "arcs": "Side Crescents",
+      "groundRing": "Ground Ring",
+      "groundRingSpellOrder": "Ground Ring: Spell Order",
+      "crescentsSpellOrder": "Side Crescents: Spell Order",
+      "size": "Size",
+      "iconSize": "Icon Size",
+      "crescentBlockSize": "Crescent Block Size",
+      "groundRingBlockSize": "Ground Ring Block Size",
+      "opacity": "Opacity",
+      "color": "Color",
+      "allOn": "All On",
+      "allOff": "All Off",
+      "reposition": "Setup Positions",
+      "positioning": "Positioning: {aura}",
+      "selectAura": "Aura",
+      "done": "Done",
+      "moveLeft": "Move Left",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "moveRight": "Move Right",
+      "moveEarlier": "Move spell inward",
+      "moveLater": "Move spell outward",
+      "screenPosition": "Screen Position",
+      "spellOrder": "Spell Order",
+      "reset": "Reset Position",
+      "spellPosition": "Spell order {position} / {count}",
+      "procs": {
+        "revenge": "Revenge!",
+        "battleTrance": "Battle Trance",
+        "overpowerCharge": "Redhand Empowerment",
+        "suddenDeath": "Sudden Death",
+        "victoryRush": "Victory Rush",
+        "enrage": "Mayhem: Enraged",
+        "heatingUp": "Heating Up",
+        "arcaneCharge": "Arcane Charges",
+        "aetherRush": "Aether Rush"
       }
     },
     "playerCard": {
@@ -2076,6 +2147,14 @@ export const tr_TR: EnTranslations = {
       "benefits": "Kazandığın yiğitliklerin Steam başarımlarına yansıması için Steam hesabını masaüstü uygulamasından bağla.",
       "noTicket": "Steam bir bağlantı bileti vermedi. Steam'i başlat, sonra tekrar dene."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Posta Kutusu",
       "subtitle": "Kuzgun Postası",
@@ -2120,6 +2199,7 @@ export const tr_TR: EnTranslations = {
         "noRecipient": "Burada bu isimde posta kutusu olan kimse yok.",
         "tooManyParcels": "Bir mektup en fazla {count} paket taşır.",
         "noMailQuestItems": "Görev eşyalarını postayla gönderemezsin.",
+        "noMailBound": "O eşya bağlı ve postayla gönderilemez.",
         "notEnoughItems": "Gönderecek o kadar tane yok.",
         "cantAffordPostage": "Posta ücretini karşılayamazsın.",
         "recipientBoxFull": "Alıcının posta kutusu dolu.",
@@ -2926,6 +3006,14 @@ export const tr_TR: EnTranslations = {
       "account_taken": "Bu Steam hesabı zaten başka bir hesaba bağlı.",
       "upstream": "Steam yanıt vermedi. Birazdan tekrar dene."
     },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
+    },
     "wallet": {
       "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene."
     },
@@ -3530,14 +3618,6 @@ export const tr_TR: EnTranslations = {
       "reptile": {
         "name": "Sürüngenler",
         "desc": "Kendi özgün tıslaması ve ısırışıyla soğukkanlı avcılar; sıcakkanlı yaratıklardan tamamen farklı bir türdür."
-      },
-      "murloc": {
-        "name": "Vırakyüzgeçler",
-        "desc": "Göl kıyısının ve gelgit havuzlarının vraklayan balık halkı, fazla yaklaşan her şeyin üzerine çabucak üşüşür."
-      },
-      "kobold": {
-        "name": "Yaramazlar",
-        "desc": "Çayırların ve çitlerin telaşlı leş yiyicileri ve cinleri, sayıca çoğalana kadar tehlikeden çok baş belasıdırlar."
       },
       "demon": {
         "name": "İblisler",
@@ -6479,10 +6559,12 @@ export const tr_TR: EnTranslations = {
       "arenaQueueTrading": "Sıraya girmeden önce takasını bitir.",
       "arenaQueueInstance": "Bir zindanın içinden sıraya giremezsin.",
       "tradeInProgress": "Zaten devam eden bir takas var.",
+      "tradeAlreadyTrading": "Bu oyuncu zaten takas yapıyor.",
       "tradeTooFar": "Hedef takas için çok uzakta.",
       "tradeExpired": "Takas isteğinin süresi doldu.",
       "tradeFailed": "Takas başarısız: eşyalar ya da para artık mevcut değil.",
-      "tradeBound": "O eşya bağlı ve takas edilemez."
+      "tradeBound": "O eşya bağlı ve takas edilemez.",
+      "marketListBound": "O eşya bağlı ve satışa çıkarılamaz."
     },
     "logs": {
       "standUp": "Ayağa kalkıyorsun.",
@@ -7227,7 +7309,7 @@ export const tr_TR: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Üstün Görünmezlik",
-        "description": "20 sn. boyunca kaybolursun: 2 zamanla hasar etkisini kaldırır ve görünmezken ve hemen sonrasında %90 daha az hasar alırsın. (büyücü yeteneği)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Sıcak Seri",
@@ -9745,6 +9827,9 @@ export const tr_TR: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Son Kale Mührü"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

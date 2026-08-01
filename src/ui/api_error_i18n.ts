@@ -116,6 +116,13 @@ export const API_ERROR_KEYS = {
   'steam.already_linked': 'apiError.steam.already_linked',
   'steam.account_taken': 'apiError.steam.account_taken',
   'steam.upstream': 'apiError.steam.upstream',
+  // epic: the env-gated Epic link family (server/epic/).
+  'epic.disabled': 'apiError.epic.disabled',
+  'epic.invalid_token': 'apiError.epic.invalid_token',
+  'epic.banned': 'apiError.epic.banned',
+  'epic.already_linked': 'apiError.epic.already_linked',
+  'epic.account_taken': 'apiError.epic.account_taken',
+  'epic.upstream': 'apiError.epic.upstream',
   'wallet.handoff_invalid': 'apiError.wallet.handoff_invalid',
   'ota_updates.invalid_input': 'apiError.ota_updates.invalid_input',
 } satisfies Record<string, TranslationKey>;

@@ -75,6 +75,8 @@ export interface GfxRuntimeHints {
 export interface GfxSettings {
   readonly graphicsConfigVersion: number;
   readonly tier: GfxTier;
+  /** Static presentation tier for optional effects controlled by the preset/sub-knob. */
+  readonly effectsTier: GfxTier;
   readonly bucketBands: GfxBucketBands;
   readonly bucketBaselines: GfxBucketLevels;
   readonly budget: GfxRuntimeBudget;
@@ -705,6 +707,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
   let settings: GfxSettings = {
     graphicsConfigVersion: GFX_CONFIG_VERSION,
     tier,
+    effectsTier: tier,
     bucketBands,
     bucketBaselines: bucketBaselines(bucketBands),
     budget: GFX_BUDGETS[tier],
@@ -795,6 +798,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     if ((hints.effectsQuality ?? 1) < EFFECTS_QUALITY_LOW_CUTOFF)
       settings = {
         ...settings,
+        effectsTier: 'low',
         composer: false,
         ao: false,
         msaaSamples: 0,

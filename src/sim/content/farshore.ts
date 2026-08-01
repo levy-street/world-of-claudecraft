@@ -113,7 +113,7 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8.5,
     aggroRadius: 12, // it knows only the way it came and the thing in front of it
     loot: [
-      { copper: 15, chance: 1 },
+      { copper: 20, chance: 1 },
       { itemId: 'farshore_salt_moss', chance: 0.6, questId: 'q_fs_moss_and_mending' },
     ],
     scale: 0.85,
@@ -124,7 +124,7 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     name: 'Breach Wretch',
     minLevel: 3,
     maxLevel: 5,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 30,
     hpPerLevel: 11,
     dmgBase: 6,
@@ -134,7 +134,7 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 9,
     aggroRadius: 11, // the small ones come in numbers, and they come fast
     loot: [
-      { copper: 18, chance: 1 },
+      { copper: 20, chance: 1 },
       { itemId: 'breakscarred_steel', chance: 0.6, questId: 'q_fs_steel_for_the_redoubt' },
     ],
     scale: 0.9,
@@ -157,6 +157,7 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 26, chance: 1 }],
     scale: 1.15,
     color: 0x2f2a44,
+    componentTags: ['hide', 'fang'],
   },
   sundered_horror: {
     id: 'sundered_horror',
@@ -173,7 +174,7 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 15, // the biggest thing the cliffs' break ever let through
     elite: true,
-    loot: [{ copper: 150, chance: 1 }],
+    loot: [{ copper: 35, chance: 1 }],
     scale: 1.45,
     color: 0x8a2f6a,
   },

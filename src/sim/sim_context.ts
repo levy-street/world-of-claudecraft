@@ -160,9 +160,11 @@ export interface SimContextPrimitives {
   readonly cardDuelQueue: number[];
   readonly cardDuels: Map<number, CardDuelMatch>;
   // `world` stays optional (custom play-test map, else undefined; perfLap is the
-  // temporary host-owned tick profiler probe); the rest defaulted.
-  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
-    Pick<SimConfig, 'world' | 'perfLap'>;
+  // temporary host-owned tick profiler probe), and `respawnSeconds` stays
+  // possibly-undefined so respawn_policy.ts can tell an explicit host-pinned
+  // global base from "fall through to the zone tier"; the rest defaulted.
+  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
+    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
   // Per-Sim key for the rift collision registry in colliders.ts (rift/runs.ts
   // registers regions under it, rift-aware collision reads pass it). Per INSTANCE,
   // not per seed: two same-seed Sims in one process must stay isolated.

@@ -416,6 +416,25 @@ describe('graphics tier resolution', () => {
     expect(advanced.maxPointLights).toBe(2);
   });
 
+  it('routes Advanced low effects through the low static effects tier', () => {
+    const low = gfxInternalsForTest.settingsFor('low', {
+      graphicsPreset: 1,
+      effectsQuality: 1,
+    });
+    const advancedLow = gfxInternalsForTest.settingsFor('high', {
+      graphicsPreset: 5,
+      effectsQuality: 0.49,
+    });
+    const advancedFull = gfxInternalsForTest.settingsFor('high', {
+      graphicsPreset: 5,
+      effectsQuality: 0.5,
+    });
+
+    expect(low.effectsTier).toBe('low');
+    expect(advancedLow.effectsTier).toBe('low');
+    expect(advancedFull.effectsTier).toBe('high');
+  });
+
   it('detects the packaged runtime platform from shipping navigator values', () => {
     expect(
       gfxInternalsForTest.mobilePlatformFromNavigator({

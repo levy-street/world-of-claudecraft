@@ -316,7 +316,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     // a tank holding the pack. The inverse of the Summoner's Silencing Shriek.
     disarm: { chance: 0.25, duration: 6, name: 'Disarming Smash', school: 'physical' },
     loot: [
-      { copper: 200, chance: 1 },
+      { copper: 85, chance: 1 },
       { itemId: 'ogre_toe_ring', chance: 0.5 },
       { itemId: 'revenantstep_treads', chance: 0.06 },
     ],

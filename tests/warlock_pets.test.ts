@@ -102,6 +102,58 @@ describe('warlock demon pets', () => {
     expect(sim.entities.has(imp.id)).toBe(false);
   });
 
+  it('gloomshade, the tank demon, auto-taunts by default on summon', () => {
+    // Bug #1356: createDemonPet unconditionally set petAutoTaunt=false for every
+    // demon, so Gloomshade (a "sturdy melee tank that taunts to hold threat", per
+    // this file's header comment) never held aggro unless the owner manually
+    // toggled auto-taunt every session. A melee_tank demon should come up with
+    // auto-taunt already on.
+    const sim = makeSim();
+    sim.setPlayerLevel(12);
+    castAndFinish(sim, 'summon_voidwalker');
+    const pet = sim.petOf(sim.playerId);
+    expect(pet).not.toBeNull();
+    expect(pet!.templateId).toBe('gloomshade');
+    expect(pet!.petAutoTaunt).toBe(true);
+  });
+
+  it('gloomshade does not auto-taunt by default for a grouped owner', () => {
+    // Auto-taunting off a 10s cycle with no target/tank check would rip every
+    // non-boss add off the real party/raid tank. Keep the free default scoped
+    // to solo play; a grouped warlock keeps the manual /pettaunt opt-in.
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: WARLOCK_TEST_WORLD,
+    });
+    const lockPid = sim.addPlayer('warlock', 'Lock');
+    const otherPid = sim.addPlayer('warrior', 'Tank');
+    sim.partyInvite(otherPid, lockPid);
+    sim.partyAccept(otherPid);
+    const lock = sim.entities.get(lockPid)!;
+    sim.setPlayerLevel(12, lockPid);
+    lock.resource = lock.maxResource;
+    sim.castAbility('summon_voidwalker', lockPid);
+    for (let i = 0; i < 20 * 12 && sim.entities.get(lockPid)!.castingAbility; i++) sim.tick();
+    const pet = sim.petOf(lockPid);
+    expect(pet).not.toBeNull();
+    expect(pet!.templateId).toBe('gloomshade');
+    expect(pet!.petAutoTaunt).toBe(false);
+  });
+
+  it('emberkin, the ranged damage demon, does not auto-taunt by default', () => {
+    // Non-tank demons keep the prior default: no free auto-taunt for a demon
+    // that was never described as a threat-holder.
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    castAndFinish(sim, 'summon_imp');
+    const pet = sim.petOf(sim.playerId);
+    expect(pet).not.toBeNull();
+    expect(pet!.templateId).toBe('emberkin');
+    expect(pet!.petAutoTaunt).toBe(false);
+  });
+
   it('a slain demon unravels instead of respawning into the wild', () => {
     const sim = makeSim();
     sim.setPlayerLevel(12);

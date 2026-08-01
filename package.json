@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.32.1",
+  "version": "0.33.0",
   "private": true,
   "license": "MIT",
   "author": {
@@ -20,7 +20,7 @@
     "wiki:content": "node scripts/wiki/build_content.mjs",
     "wiki:stills": "node scripts/wiki/render_model_stills.mjs",
     "sitemap:build": "node scripts/build_sitemap.mjs",
-    "build:native": "VITE_NATIVE_APP=1 VITE_API_ORIGIN=${VITE_API_ORIGIN:-https://worldofclaudecraft.com} npm run build",
+    "build:native": "VITE_NATIVE_APP=1 VITE_API_ORIGIN=${VITE_API_ORIGIN:-https://worldofclaudecraft.com} npm run build && node scripts/build_media_manifest.mjs prune",
     "native:sync": "npm run build:native && npx cap sync",
     "ota:publish": "node scripts/ota/publish_bundle.mjs",
     "native:open:ios": "npm run native:sync && npx cap open ios",
@@ -28,8 +28,11 @@
     "electron:dev": "node scripts/electron-dev.mjs",
     "electron:pack": "node scripts/electron-build.mjs pack",
     "electron:pack:steam": "node scripts/electron-build.mjs pack steam",
+    "electron:pack:epic": "node scripts/electron-build.mjs pack epic",
     "electron:build": "node scripts/electron-build.mjs build",
     "electron:build:steam": "node scripts/electron-build.mjs build steam",
+    "electron:build:epic": "node scripts/electron-build.mjs build epic",
+    "epic:bpt-upload": "node scripts/epic-bpt-upload.mjs",
     "preview": "vite preview",
     "format": "biome format --write .",
     "format:check": "biome format .",

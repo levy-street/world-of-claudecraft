@@ -4,10 +4,14 @@
 // group entering it receives an independent RiftInstance, while every instance
 // points back to the same event and races for its single first-clear claim.
 //
-// Population policy: every eligible zone keeps one open portal, cycling hourly.
-// The zone's next portal opens RIFT_PORTAL_ZONE_CYCLE after the previous one
-// OPENED, so a collapsed portal is replaced as it expires while a first-cleared
-// (sealed) zone stays empty until its boundary and is never instantly refarmed.
+// Population policy: every eligible zone runs its own hourly respawn boundary
+// (RIFT_PORTAL_ZONE_CYCLE), anchored on that zone's previous opening. At a
+// boundary the zone opens a new rift UNLESS its current one is still open, in
+// which case the boundary is skipped and the zone is re-judged at the next
+// one. A first-cleared (sealed) zone stays empty until the first boundary at
+// or after the seal and is never instantly refarmed, while an uncleared portal
+// collapses at RIFT_PORTAL_LIFETIME (an exact multiple of the cycle), which
+// lands on a boundary, so its replacement is due immediately.
 //
 // Determinism: portal placement uses streams derived only from the realm seed
 // and spawn ordinal. They never consume ctx.rng, so enabling Rifts cannot
@@ -32,12 +36,13 @@ import {
 export const RIFT_MIN_LEVEL = 20;
 
 export const RIFT_PORTAL_FIRST_AT = 120;
-export const RIFT_PORTAL_LIFETIME = 60 * 60;
-/** One fresh rift per eligible zone per cycle, anchored on the zone's LAST
- * OPENING (not its close). Equal to the lifetime, so an uncleared portal is
- * replaced the moment it collapses, while a first-cleared (sealed) zone stays
- * empty until its next boundary and can never be immediately refarmed. */
-export const RIFT_PORTAL_ZONE_CYCLE = RIFT_PORTAL_LIFETIME;
+export const RIFT_PORTAL_LIFETIME = 2 * 60 * 60;
+/** Each eligible zone gets its own hourly respawn boundary, anchored on the
+ * zone's own last opening (NOT tied to RIFT_PORTAL_LIFETIME: a portal can
+ * outlive one boundary and still be judged against the next). The lifetime
+ * must stay an exact multiple of this cycle so an uncleared portal's collapse
+ * lands exactly on a boundary and its replacement is due immediately. */
+export const RIFT_PORTAL_ZONE_CYCLE = 60 * 60;
 /** Backoff after a deterministic placement failure before rescanning zones. */
 export const RIFT_PORTAL_RETRY_DELAY = 60;
 /** Completed events retained for history AND per-zone cadence derivation
@@ -108,17 +113,50 @@ export function eligibleRiftZones(): ZoneDef[] {
   return ZONES.filter((zone) => zone.riftPortalEligible && zone.riftTierWeights !== undefined);
 }
 
-/** When `zoneId` may open its next portal. Derived from the event history (the
- * zone's most recent opening plus one cycle), so a server restart preserves the
- * cadence without any new persisted state; a zone with no recorded event is due
- * at the world's first-spawn warmup. */
+/** First hourly boundary at or after a rift's close, counted from that rift's
+ * own opening. Pure and rng-free: a zone's schedule is a deterministic
+ * function of its own event history, never a random draw. `closedAt` equal to
+ * a boundary (a rift that runs its full lifetime to collapse) yields that same
+ * boundary, i.e. the replacement is due immediately, not one cycle later. */
+export function riftZoneBoundaryAfterClose(
+  openedAt: number,
+  closedAt: number,
+  cycle: number = RIFT_PORTAL_ZONE_CYCLE,
+): number {
+  const elapsed = Math.max(0, closedAt - openedAt);
+  // Minus epsilon: sim time accumulates in DT-sized double additions, so an
+  // expiry stored as openedAt + LIFETIME can read back a hair PAST the exact
+  // boundary (elapsed / cycle = 2.0000000000000004). Without the guard that
+  // rounds a collapse up a whole extra cycle and the zone sits empty an
+  // extra hour instead of replacing immediately.
+  return openedAt + Math.ceil(elapsed / cycle - 1e-9) * cycle;
+}
+
+/** The sim-time a zone's rift actually closed, or null while it is still open
+ * (portal standing, or a party still racing inside it past its collapse). A
+ * sealed rift closes at its first-clear claim; a collapsed one at its expiry. */
+function riftEventClosedAt(event: RiftEvent): number | null {
+  if (event.status === 'cleared') return event.firstClear?.clearedAt ?? event.expiresAt;
+  if (event.status === 'collapsed') return event.expiresAt;
+  return null;
+}
+
+/** When `zoneId` may open its next portal: the first hourly boundary at or
+ * after its previous rift CLOSED (riftZoneBoundaryAfterClose). Derived from
+ * the event history alone, so a server restart preserves the cadence without
+ * any new persisted state; a zone with no recorded event is due at the world's
+ * first-spawn warmup, and a zone whose rift is still open is not due at all
+ * (that boundary is skipped and the zone re-judged at the next one). */
 export function riftZoneNextOpenAt(ctx: SimContext, zoneId: string): number {
-  let lastOpenedAt: number | null = null;
+  let last: RiftEvent | null = null;
   for (const event of ctx.riftEvents) {
     if (event.zoneId !== zoneId) continue;
-    if (lastOpenedAt === null || event.openedAt > lastOpenedAt) lastOpenedAt = event.openedAt;
+    if (last === null || event.openedAt > last.openedAt) last = event;
   }
-  return lastOpenedAt === null ? RIFT_PORTAL_FIRST_AT : lastOpenedAt + RIFT_PORTAL_ZONE_CYCLE;
+  if (last === null) return RIFT_PORTAL_FIRST_AT;
+  const closedAt = riftEventClosedAt(last);
+  if (closedAt === null) return Number.POSITIVE_INFINITY;
+  return riftZoneBoundaryAfterClose(last.openedAt, closedAt);
 }
 
 function contentHash(text: string): string {
@@ -313,8 +351,9 @@ function activeRiftZoneIds(ctx: SimContext): Set<string> {
   return new Set(ctx.naturalRiftPortals.map((portal) => portal.zoneId));
 }
 
-/** Once-per-second scheduler: every eligible zone keeps one open portal on the
- * hourly cycle. `riftPortalNextAt` survives only as the placement-failure
+/** Once-per-second scheduler: each eligible zone is judged against its OWN
+ * hourly boundary, gated on its previous rift having CLOSED
+ * (riftZoneNextOpenAt). `riftPortalNextAt` survives only as the placement-failure
  * backoff gate (a failed ordinal re-rolls identical positions, so hammering it
  * every second is pointless; another zone's success advances the ordinal and
  * unwedges it). At most ONE portal spawns per pass: a spawn generates a full

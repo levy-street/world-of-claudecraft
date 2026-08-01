@@ -223,6 +223,10 @@ describe('auto_attack meleeSwing: the white-hit table', () => {
       events.some((e) => e.type === 'damage' && e.kind === 'dodge' && e.sourceId === p.id),
     ).toBe(true);
     expect(p.overpowerUntil).toBeGreaterThan(0); // attacker.overpowerUntil = time + 5
+    expect(sim.reactiveAbilityWindowRemaining('mongoose_bite')).toBeCloseTo(5);
+    expect(sim.reactiveAbilityWindowRemaining('another_ability')).toBe(0);
+    p.overpowerUntil = sim.time - 1;
+    expect(sim.reactiveAbilityWindowRemaining('mongoose_bite')).toBe(0);
   });
 });
 

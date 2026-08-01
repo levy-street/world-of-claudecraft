@@ -298,7 +298,7 @@ describe('banker chest renderer integration', () => {
     const preloadStart = moduleSource.indexOf("if (typeof window !== 'undefined')");
     const preloadEnd = moduleSource.indexOf('type BankerNpcRef', preloadStart);
     const preloadBlock = moduleSource.slice(preloadStart, preloadEnd);
-    expect(preloadBlock).toContain('registerPreload(');
+    expect(preloadBlock).toContain('registerDeferredPreload(');
     expect(preloadBlock).toContain('loadGltf(BANKER_CHEST_ASSET_URL)');
     expect(preloadBlock).not.toContain('GFX');
     expect(preloadBlock).not.toContain('getActiveWorldContent');

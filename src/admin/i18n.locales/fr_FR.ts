@@ -162,7 +162,6 @@ export const fr_FR: Record<string, string> = {
   'stats.avgTick': 'tick moyen',
   'stats.serverRss': 'rss serveur',
   'online.title': 'Joueurs en ligne',
-  'online.refreshHint': 'actualisation toutes les 5 s',
   'online.empty': 'personne en ligne actuellement',
   'online.colCharacter': 'Personnage',
   'online.colClass': 'Classe',

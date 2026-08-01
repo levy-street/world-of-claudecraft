@@ -166,7 +166,6 @@ export const ru_RU: Record<string, string> = {
   'stats.serverRss': 'память сервера',
   'stats.playersCap': 'лимит игроков',
   'online.title': 'Игроки онлайн',
-  'online.refreshHint': 'обновляется каждые 5с',
   'online.empty': 'сейчас никого нет онлайн',
   'online.colCharacter': 'Персонаж',
   'online.colClass': 'Класс',

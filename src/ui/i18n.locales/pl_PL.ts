@@ -2164,6 +2164,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Tego listu nie ma już w twojej skrzynce.',
   'hudChrome.mailbox.result.needRecipient': 'Wskaż odbiorcę listu.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Nie możesz wysyłać pocztą przedmiotów zadań.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Ten przedmiot jest przywiązany i nie można go wysłać pocztą.',
   'hudChrome.mailbox.result.noRecipient': 'Nikt o tym imieniu nie ma tu skrzynki pocztowej.',
   'hudChrome.mailbox.result.notEnoughItems': 'Nie masz aż tylu do wysłania.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Skrzynka odbiorcy jest pełna.',
@@ -5068,12 +5070,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Najeźdźcy zza szczelin, sami z ognia i złośliwości. Gdzie stoi jeden z nich, wyłom nigdy nie jest daleko.',
   'guide.family.demon.name': 'Demony',
-  'guide.family.kobold.desc':
-    'Krzątające się padlinożerne stworki i chochliki polan oraz żywopłotów, bardziej uciążliwe niż groźne, dopóki nie zbiorą się w większej liczbie.',
-  'guide.family.kobold.name': 'Urwisy',
-  'guide.family.murloc.desc':
-    'Rechoczący rybi lud brzegów jeziora i przypływowych sadzawek, chętnie rojący się wokół każdego, kto podejdzie zbyt blisko wody.',
-  'guide.family.murloc.name': 'Rechotopłetwi',
   'guide.faqPage.a1':
     'Tak. Cała gra jest darmowa do maksymalnego poziomu, a kod źródłowy jest otwarty na GitHubie.',
   'guide.faqPage.a10':
@@ -5926,10 +5922,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetMustDodge': 'Twój cel musi najpierw zrobić unik.',
   'hud.errors.targetTooFar': 'Cel jest zbyt daleko.',
   'hud.errors.tradeBound': 'Ten przedmiot jest przywiązany i nie można go wymienić.',
+  'hud.errors.marketListBound':
+    'Ten przedmiot jest przywiązany i nie można go wystawić na sprzedaż.',
   'hud.errors.tooClose': 'Zbyt blisko!',
   'hud.errors.tradeExpired': 'Prośba o wymianę wygasła.',
   'hud.errors.tradeFailed': 'Wymiana nieudana: przedmioty lub pieniądze są już niedostępne.',
   'hud.errors.tradeInProgress': 'Wymiana już trwa.',
+  'hud.errors.tradeAlreadyTrading': 'Ten gracz już prowadzi wymianę.',
   'hud.errors.tradeTooFar': 'Cel jest zbyt daleko, by handlować.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Nieznane polecenie: {command}. Spróbuj /s /y /w /p /g.',
@@ -9681,8 +9680,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Kończy czas odnowienia Migotliwego kroku, Mroźnej zasłony i Większej niewidzialności. (talent maga)',
   'entities.abilities.greater_invisibility.name': 'Większa niewidzialność',
-  'entities.abilities.greater_invisibility.description':
-    'Znikasz na 20 sek.: usuwa 2 efekty obrażeń rozłożonych w czasie, a podczas niewidzialności i krótko po niej otrzymujesz o 90% mniej obrażeń. (talent maga)',
   'entities.abilities.hot_streak.name': 'Gorąca seria',
   'entities.abilities.hot_streak.description':
     'Bierne: dwa trafienia krytyczne z rzędu twoimi zaklęciami Ognia (Żarowy pocisk, Deszcz żaru, Poparzenie, Ognista lanca lub Ognista nawała) sprawiają, że twoja następna Ognista lanca lub Ognista nawała jest natychmiastowa i darmowa. Zaklęcia zużywające efekt liczą się do NASTĘPNEJ serii, również darmowe użycia; Ognista nawała liczy się raz bez względu na liczbę trafionych wrogów i zawsze liczy się tylko pierwsze uderzenie. (Ogień)',
@@ -10859,4 +10856,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     'Wyzwolenie za {seconds} sekund. Poruszenie się, walka, otrzymanie obrażeń lub rozpoczęcie innej czynności anuluje je.',
   'hudChrome.unstuck.unavailable': 'Wyzwolenie jest niedostępne w twoim obecnym stanie.',
+  'hudChrome.riftTracker.title': 'Szczelina',
+  'hudChrome.riftTracker.floor': 'Piętro {current} z {total}',
+  'hudChrome.riftTracker.closesIn': 'Zamyka się za {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

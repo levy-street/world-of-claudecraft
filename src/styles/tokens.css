@@ -60,6 +60,11 @@
     --color-debuff-shadow: #9b59d0;
     --color-debuff-nature: #35a835;
     --color-debuff-holy: #d8b56b;
+    --color-aura-rpg-gold: #ffe14d;
+    --color-aura-rpg-violet: #bd63ff;
+    --color-aura-rpg-electric: #3dc7ff;
+    --aura-glow-core: 5px;
+    --aura-glow-halo: 16px;
 
     --color-bg-dark: #08080d;
     --color-bg-input: #0a0a0f;
@@ -152,6 +157,10 @@
     --color-map-player: #fff;
     --color-map-ally-friend: #4ade80;
     --color-map-ally-guild: #60a5fa;
+    /* party member dots (issue 2652): class-colored when alive; this token
+       replaces the class color for a dead member, matching
+       --color-minimap-party-dead below. */
+    --color-map-party-dead: #9a9a9a;
     --color-map-rock: #8c8b86;
     --color-map-tree: #2f6b34;
     --color-map-oak: #4f8c3a;

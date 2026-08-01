@@ -122,7 +122,6 @@ export const sv_SE: Record<string, string> = {
   'stats.avgTick': 'genomsnittligt tick',
   'stats.serverRss': 'serverns rss',
   'online.title': 'Spelare online',
-  'online.refreshHint': 'uppdateras var 5:e sekund',
   'online.empty': 'ingen är online just nu',
   'online.colCharacter': 'Karaktär',
   'online.colClass': 'Klass',

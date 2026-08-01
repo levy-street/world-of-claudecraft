@@ -888,6 +888,13 @@ export const id_ID: EnTranslations = {
       "heroicName": "{name} Heroik",
       "heroicLocked": "Anda terkunci pada {name} Heroik."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Lantai {current} dari {total}",
+      "closesIn": "Tutup dalam {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "U",
       "NE": "TL",
@@ -915,6 +922,23 @@ export const id_ID: EnTranslations = {
       "dock": "Kembalikan pengukur ini ke jendela pengukur",
       "separate": "Pisahkan {meter}",
       "regroup": "Gabungkan kembali {meter}"
+    },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Peliharaan sudah dalam kondisi darah penuh",
@@ -959,13 +983,15 @@ export const id_ID: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage Sang Kodok Lompat-Bayangan",
       "name_stormfeather_griffin": "Stormfeather Penjelajah Langit",
       "name_thunderstrut_gobbler": "Thunderstrut Sang Kalkun Agung",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_stalkglider_snail": "Siput ulet berenergi tahan lama yang memberikan kecepatan perjalanan tambahan.",
       "desc_aether_hover_cycle": "Sepeda magiteknologi bertenaga besar yang dirancang untuk pergerakan tempur cepat dan melayang rendah.",
       "desc_shadowjump_toad": "Kodok raksasa masif berpijakan mantap, terlatih dalam lompatan bayangan secepat kilat yang mampu menjangkau medan apa pun.",
       "desc_stormfeather_griffin": "Griffin badai yang anggun, melangkah di tanah dengan cakar bersepatu rune, sayap terlipat rapat.",
-      "desc_thunderstrut_gobbler": "Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur."
+      "desc_thunderstrut_gobbler": "Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Tekan {key} untuk menaiki Valorsteed latihan.",
@@ -1271,6 +1297,51 @@ export const id_ID: EnTranslations = {
       "badges": {
         "backgrounded": "Di Latar Belakang",
         "offline": "Luring"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Current class: {class}",
+      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
+      "noProcs": "No supported proc is available for this character.",
+      "enabled": "Show Aura",
+      "icon": "Spell Icon",
+      "arcs": "Side Crescents",
+      "groundRing": "Ground Ring",
+      "groundRingSpellOrder": "Ground Ring: Spell Order",
+      "crescentsSpellOrder": "Side Crescents: Spell Order",
+      "size": "Size",
+      "iconSize": "Icon Size",
+      "crescentBlockSize": "Crescent Block Size",
+      "groundRingBlockSize": "Ground Ring Block Size",
+      "opacity": "Opacity",
+      "color": "Color",
+      "allOn": "All On",
+      "allOff": "All Off",
+      "reposition": "Setup Positions",
+      "positioning": "Positioning: {aura}",
+      "selectAura": "Aura",
+      "done": "Done",
+      "moveLeft": "Move Left",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "moveRight": "Move Right",
+      "moveEarlier": "Move spell inward",
+      "moveLater": "Move spell outward",
+      "screenPosition": "Screen Position",
+      "spellOrder": "Spell Order",
+      "reset": "Reset Position",
+      "spellPosition": "Spell order {position} / {count}",
+      "procs": {
+        "revenge": "Revenge!",
+        "battleTrance": "Battle Trance",
+        "overpowerCharge": "Redhand Empowerment",
+        "suddenDeath": "Sudden Death",
+        "victoryRush": "Victory Rush",
+        "enrage": "Mayhem: Enraged",
+        "heatingUp": "Heating Up",
+        "arcaneCharge": "Arcane Charges",
+        "aetherRush": "Aether Rush"
       }
     },
     "playerCard": {
@@ -2076,6 +2147,14 @@ export const id_ID: EnTranslations = {
       "benefits": "Tautkan akun Steam-mu dari aplikasi desktop agar jasa yang kamu raih tercermin sebagai pencapaian Steam.",
       "noTicket": "Steam tidak memberikan tiket penautan. Jalankan Steam, lalu coba lagi."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Kotak Surat",
       "subtitle": "Pos Gagak",
@@ -2120,6 +2199,7 @@ export const id_ID: EnTranslations = {
         "noRecipient": "Tidak ada orang dengan nama itu yang memiliki kotak surat di sini.",
         "tooManyParcels": "Satu surat memuat paling banyak {count} bingkisan.",
         "noMailQuestItems": "Kamu tidak bisa mengirim barang misi lewat surat.",
+        "noMailBound": "Barang itu terikat dan tidak dapat dikirim lewat surat.",
         "notEnoughItems": "Kamu tidak punya sebanyak itu untuk dikirim.",
         "cantAffordPostage": "Kamu tidak mampu membayar perangkonya.",
         "recipientBoxFull": "Kotak surat mereka penuh.",
@@ -2926,6 +3006,14 @@ export const id_ID: EnTranslations = {
       "account_taken": "Akun Steam itu sudah tertaut ke akun lain.",
       "upstream": "Steam tidak merespons. Coba lagi dalam beberapa saat."
     },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
+    },
     "wallet": {
       "handoff_invalid": "Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi."
     },
@@ -3530,14 +3618,6 @@ export const id_ID: EnTranslations = {
       "reptile": {
         "name": "Reptil",
         "desc": "Pemburu berdarah dingin dengan desis dan cakitan khas mereka sendiri, berbeda dari hewan berdarah panas."
-      },
-      "murloc": {
-        "name": "Sirip Kodok",
-        "desc": "Bangsa ikan yang bersuara serak dari tepi danau dan kolam pasang surut, cepat menyerbu apa pun yang mengarungi terlalu dekat."
-      },
-      "kobold": {
-        "name": "Berandal",
-        "desc": "Pemulung kecil yang berlarian dan roh-roh nakal dari tanah lapang dan pagar semak, lebih mengganggu daripada mengancam sampai mereka berkumpul dalam jumlah besar."
       },
       "demon": {
         "name": "Iblis",
@@ -6479,10 +6559,12 @@ export const id_ID: EnTranslations = {
       "arenaQueueTrading": "Selesaikan dulu perdaganganmu sebelum antre.",
       "arenaQueueInstance": "Kamu tidak bisa antre dari dalam instance.",
       "tradeInProgress": "Perdagangan sudah berlangsung.",
+      "tradeAlreadyTrading": "Pemain itu sedang berdagang.",
       "tradeTooFar": "Sasaran terlalu jauh untuk berdagang.",
       "tradeExpired": "Permintaan perdagangan telah kedaluwarsa.",
       "tradeFailed": "Perdagangan gagal: barang atau uang sudah tidak tersedia.",
-      "tradeBound": "Barang itu terikat dan tidak dapat diperdagangkan."
+      "tradeBound": "Barang itu terikat dan tidak dapat diperdagangkan.",
+      "marketListBound": "Barang itu terikat dan tidak dapat dijual di pasar."
     },
     "logs": {
       "standUp": "Kamu berdiri.",
@@ -7227,7 +7309,7 @@ export const id_ID: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Ketaklihatan Agung",
-        "description": "Menghilang selama 20 dtk.: menghapus 2 efek kerusakan berkala dan kamu menerima 90% lebih sedikit kerusakan saat tak terlihat dan sesaat setelahnya. (talenta mage)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Rentetan Membara",
@@ -9745,6 +9827,9 @@ export const id_ID: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Cincin Stempel Last Keep"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

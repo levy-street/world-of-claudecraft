@@ -888,6 +888,13 @@ export const pt_BR: EnTranslations = {
       "heroicName": "{name} Heroico",
       "heroicLocked": "Você está vinculado a {name} Heroico."
     },
+    "riftTracker": {
+      "title": "Fenda",
+      "floor": "Andar {current} de {total}",
+      "closesIn": "Fecha em {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -915,6 +922,23 @@ export const pt_BR: EnTranslations = {
       "dock": "Devolver este medidor para a janela de medidores",
       "separate": "Separar {meter}",
       "regroup": "Reagrupar {meter}"
+    },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "O mascote está com vida cheia",
@@ -959,13 +983,15 @@ export const pt_BR: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, o Sapo Salta-Sombras",
       "name_stormfeather_griffin": "Pluma-Tormenta Alcança-Céu",
       "name_thunderstrut_gobbler": "Pavoneia-Trovões, o Grande Peru",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_stalkglider_snail": "Um caracol valente e de queima lenta que aumenta a velocidade de viagem.",
       "desc_aether_hover_cycle": "Uma poderosa moto magitec projetada para travessias de combate rápidas e rente ao chão.",
       "desc_shadowjump_toad": "Um sapo gigante, maciço e de passo firme, treinado em saltos sombrios relâmpago por qualquer terreno.",
       "desc_stormfeather_griffin": "Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.",
-      "desc_thunderstrut_gobbler": "Um peru colossal nascido da tempestade que desce do Pico Desperto se pavoneando, com a cauda aberta como uma frente de tempestade."
+      "desc_thunderstrut_gobbler": "Um peru colossal nascido da tempestade que desce do Pico Desperto se pavoneando, com a cauda aberta como uma frente de tempestade.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Pressione {key} para montar no Valorsteed de treinamento.",
@@ -1271,6 +1297,51 @@ export const pt_BR: EnTranslations = {
       "badges": {
         "backgrounded": "Em segundo plano",
         "offline": "Offline"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Current class: {class}",
+      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
+      "noProcs": "No supported proc is available for this character.",
+      "enabled": "Show Aura",
+      "icon": "Spell Icon",
+      "arcs": "Side Crescents",
+      "groundRing": "Ground Ring",
+      "groundRingSpellOrder": "Ground Ring: Spell Order",
+      "crescentsSpellOrder": "Side Crescents: Spell Order",
+      "size": "Size",
+      "iconSize": "Icon Size",
+      "crescentBlockSize": "Crescent Block Size",
+      "groundRingBlockSize": "Ground Ring Block Size",
+      "opacity": "Opacity",
+      "color": "Color",
+      "allOn": "All On",
+      "allOff": "All Off",
+      "reposition": "Setup Positions",
+      "positioning": "Positioning: {aura}",
+      "selectAura": "Aura",
+      "done": "Done",
+      "moveLeft": "Move Left",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "moveRight": "Move Right",
+      "moveEarlier": "Move spell inward",
+      "moveLater": "Move spell outward",
+      "screenPosition": "Screen Position",
+      "spellOrder": "Spell Order",
+      "reset": "Reset Position",
+      "spellPosition": "Spell order {position} / {count}",
+      "procs": {
+        "revenge": "Revenge!",
+        "battleTrance": "Battle Trance",
+        "overpowerCharge": "Redhand Empowerment",
+        "suddenDeath": "Sudden Death",
+        "victoryRush": "Victory Rush",
+        "enrage": "Mayhem: Enraged",
+        "heatingUp": "Heating Up",
+        "arcaneCharge": "Arcane Charges",
+        "aetherRush": "Aether Rush"
       }
     },
     "playerCard": {
@@ -2076,6 +2147,14 @@ export const pt_BR: EnTranslations = {
       "benefits": "Vincule sua conta Steam pelo aplicativo para desktop para espelhar os feitos que você ganhar como conquistas do Steam.",
       "noTicket": "O Steam não forneceu um tíquete de vinculação. Inicie o Steam e tente novamente."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Caixa de Correio",
       "subtitle": "O Correio dos Corvos",
@@ -2120,6 +2199,7 @@ export const pt_BR: EnTranslations = {
         "noRecipient": "Ninguém com esse nome possui caixa de correio aqui.",
         "tooManyParcels": "Uma carta carrega no máximo {count} encomendas.",
         "noMailQuestItems": "Você não pode enviar itens de missão pelo correio.",
+        "noMailBound": "Esse item está vinculado e não pode ser enviado pelo correio.",
         "notEnoughItems": "Você não tem tantos assim para enviar.",
         "cantAffordPostage": "Você não pode pagar a postagem.",
         "recipientBoxFull": "A caixa de correio do destinatário está cheia.",
@@ -2926,6 +3006,14 @@ export const pt_BR: EnTranslations = {
       "account_taken": "Essa conta Steam já está vinculada a outra conta.",
       "upstream": "O Steam não respondeu. Tente novamente em instantes."
     },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
+    },
     "wallet": {
       "handoff_invalid": "Essa autorização de carteira expirou ou não pôde ser verificada. Tente novamente."
     },
@@ -3530,14 +3618,6 @@ export const pt_BR: EnTranslations = {
       "reptile": {
         "name": "Répteis",
         "desc": "Caçadores de sangue frio com seu próprio silvo e bote, distintos das criaturas de sangue quente."
-      },
-      "murloc": {
-        "name": "Coaxa-barbatanas",
-        "desc": "Gente-peixe coaxante de margens de lagos e poças de maré, rápida em enxamear qualquer um que se aproxime demais."
-      },
-      "kobold": {
-        "name": "Traquinas",
-        "desc": "Batedores ágeis e duendes de clareiras e cercas vivas, mais incômodos que perigosos até se juntarem em grande número."
       },
       "demon": {
         "name": "Demônios",
@@ -6479,10 +6559,12 @@ export const pt_BR: EnTranslations = {
       "arenaQueueTrading": "Termine sua troca antes de entrar na fila.",
       "arenaQueueInstance": "Você não pode entrar na fila dentro de uma instância.",
       "tradeInProgress": "Já há uma troca em andamento.",
+      "tradeAlreadyTrading": "Esse jogador já está em uma troca.",
       "tradeTooFar": "O alvo está longe demais para trocar.",
       "tradeExpired": "A solicitação de troca expirou.",
       "tradeFailed": "Troca falhou: itens ou dinheiro não estão mais disponíveis.",
-      "tradeBound": "Esse item está vinculado e não pode ser negociado."
+      "tradeBound": "Esse item está vinculado e não pode ser negociado.",
+      "marketListBound": "Esse item está vinculado e não pode ser colocado à venda."
     },
     "logs": {
       "standUp": "Você se levanta.",
@@ -7227,7 +7309,7 @@ export const pt_BR: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilidade Maior",
-        "description": "Desaparece por 20 s: remove 2 efeitos de dano periódico e reduz o dano recebido em 90% enquanto você está invisível e por pouco tempo depois. (Talento de mago)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Embalo Ardente",
@@ -9745,6 +9827,9 @@ export const pt_BR: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Sinete do Último Reduto"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

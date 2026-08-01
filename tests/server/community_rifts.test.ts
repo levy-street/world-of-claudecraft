@@ -93,17 +93,19 @@ describe('rift population boot and persistence (one-per-zone rotation)', () => {
     fillPopulation(server.sim);
     const zoneCount = eligibleRiftZones().length;
     expect(zoneCount).toBe(11);
-    // Literal cadence pins: the tuning itself is load-bearing (rolling
-    // replacement only works while the cycle equals the lifetime).
-    expect(RIFT_PORTAL_LIFETIME).toBe(60 * 60);
-    expect(RIFT_PORTAL_ZONE_CYCLE).toBe(RIFT_PORTAL_LIFETIME);
+    // Literal cadence pins: the tuning itself is load-bearing (an uncleared
+    // collapse replaces immediately only while the lifetime stays an exact
+    // multiple of the cycle, so the collapse lands on a boundary).
+    expect(RIFT_PORTAL_LIFETIME).toBe(2 * 60 * 60);
+    expect(RIFT_PORTAL_ZONE_CYCLE).toBe(60 * 60);
+    expect(RIFT_PORTAL_LIFETIME % RIFT_PORTAL_ZONE_CYCLE).toBe(0);
     expect(RIFT_PORTAL_FIRST_AT).toBe(120);
     expect(server.sim.naturalRiftPortals).toHaveLength(zoneCount);
     expect(new Set(server.sim.naturalRiftPortals.map((portal) => portal.zoneId)).size).toBe(
       zoneCount,
     );
     for (const portal of server.sim.naturalRiftPortals) {
-      expect(portal.expiresAt - portal.openedAt).toBe(RIFT_PORTAL_ZONE_CYCLE);
+      expect(portal.expiresAt - portal.openedAt).toBe(RIFT_PORTAL_LIFETIME);
     }
     expect(server.sim.riftPortalSpawnCount).toBe(zoneCount);
 
@@ -134,6 +136,13 @@ describe('rift population boot and persistence (one-per-zone rotation)', () => {
     closeNaturalRiftPortal(source.ctx, sealed.id, 'sealed');
     const sealedEvent = source.riftEvents.find((event) => event.eventId === sealed.eventId)!;
     sealedEvent.status = 'cleared'; // production seal always follows the claim
+    sealedEvent.firstClear = {
+      partyKey: 'solo:1',
+      memberIds: [1],
+      memberNames: ['Sealer'],
+      duration: 600,
+      clearedAt: source.time,
+    };
     // Serialize against the real host clock: GameServer.loadRifts restores with
     // Date.now(), so a synthetic past timestamp would read as days of downtime
     // and collapse every event before it loads.
@@ -161,8 +170,9 @@ describe('rift population boot and persistence (one-per-zone rotation)', () => {
     const reopened = sim.naturalRiftPortals.find((portal) => portal.zoneId === sealedZoneId);
     expect(reopened).toBeDefined();
     expect(reopened!.eventId).not.toBe(sealed.eventId);
-    // The boundary window retires and replaces every restored sibling portal
-    // too, so the population is whole again with one portal per zone.
+    // The sealed zone is whole again, and its still-open siblings (2 h
+    // lifetime, only about 1 h elapsed) survive the window untouched, so the
+    // population stays one portal per zone across the board.
     expect(new Set(sim.naturalRiftPortals.map((portal) => portal.zoneId)).size).toBe(zoneCount);
   });
 

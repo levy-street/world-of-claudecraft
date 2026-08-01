@@ -7272,7 +7272,12 @@
        Ignored, Blocked, Raid) whose labels are locale-sized, and the guild
        roster rows carry a name + rank + zone + last-seen line. */
     width: 760px;
-    max-width: calc(100vw - 24px);
+    max-width: calc(
+      100vw -
+      24px -
+      env(safe-area-inset-left, 0px) -
+      env(safe-area-inset-right, 0px)
+    );
     height: 480px;
     max-height: calc(100vh - 24px);
     flex-direction: column;
@@ -10594,12 +10599,355 @@
      the keybind view). Two columns on desktop; collapses to one on narrow/touch. */
   #options-menu.perf-wide {
     width: min(780px, calc(100vw - 32px));
+    /* The gilded corner ornament (its own section, below) is a ::before on this
+       SAME element; the base `.window` rule (layout.css) makes this element the
+       scrolling box (`overflow-y: auto`), which would carry the ornament's
+       pseudo-element away with the scrolled content instead of leaving it
+       pinned to the window frame (issue #2569). Keep this box itself
+       non-scrolling: options_window.ts sets its `display` to `flex` only while
+       this sub-view is open (mirroring #deeds-window), so flex-direction here
+       takes effect exactly then. The .perf-scroll wrapper below owns the
+       actual scroll instead. */
+    overflow: hidden;
+    flex-direction: column;
+  }
+  #options-menu.aura-wide {
+    width: min(780px, calc(100vw - 32px));
+  }
+  #options-menu.aura-placement-hidden {
+    display: none !important;
+  }
+  .aura-placement-toolbar {
+    position: fixed;
+    /* Body-level setup layer: keep it above touch #ui (80/90 while a window is
+       open) and its backdrop (85). Otherwise a live Desktop -> Touch switch can
+       strand this dialog below the HUD until the page is reloaded. */
+    z-index: 100;
+    right: max(12px, env(safe-area-inset-right, 0px));
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    left: max(12px, env(safe-area-inset-left, 0px));
+    display: flex;
+    box-sizing: border-box;
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    max-height: calc(
+      var(--app-vh, 100vh) -
+      24px -
+      env(safe-area-inset-top, 0px) -
+      env(safe-area-inset-bottom, 0px)
+    );
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 auto;
+    padding: 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 8px;
+    background: var(--panel-bg);
+    box-shadow: 0 6px 24px var(--color-art-shadow);
+    overflow-y: auto;
+  }
+  .aura-placement-toolbar strong {
+    flex: 0 0 auto;
+    margin-right: 0;
+    color: var(--color-text-light);
+  }
+  .aura-placement-selection {
+    display: flex;
+    flex: 1 1 940px;
+    min-width: min(100%, 940px);
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .aura-placement-parts {
+    display: grid;
+    flex: 0 0 auto;
+    grid-template-columns: repeat(3, max-content);
+    gap: 8px;
+  }
+  .aura-placement-toolbar .btn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .aura-placement-part {
+    min-height: 40px;
+  }
+  .aura-placement-reset,
+  .aura-placement-done {
+    min-width: 112px;
+    min-height: 40px;
+  }
+  .aura-placement-reset {
+    min-width: 160px;
+  }
+  .aura-placement-toolbar .set-row {
+    flex: 1 1 210px;
+    min-width: 190px;
+    margin: 0;
+  }
+  .aura-placement-sliders {
+    display: grid;
+    flex: 1 1 500px;
+    min-width: 460px;
+    max-width: 720px;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    align-items: center;
+    gap: 16px;
+  }
+  .aura-placement-sliders .set-row {
+    width: 100%;
+    min-width: 0;
+  }
+  .aura-placement-selector {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+  }
+  .aura-placement-select {
+    min-width: 150px;
+    min-height: 40px;
+    color-scheme: dark;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+  }
+  .aura-placement-select option {
+    background: var(--color-bg-dark);
+    color: var(--color-text-light);
+  }
+  .aura-placement-nudge {
+    position: relative;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+  .aura-placement-actions {
+    display: grid;
+    grid-column: 2;
+    grid-template-columns: repeat(4, 40px);
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .aura-placement-footer {
+    display: grid;
+    flex: 1 0 100%;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: end;
+    gap: 16px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  .aura-placement-footer-actions {
+    display: flex;
+    grid-column: 3;
+    align-items: center;
+    justify-self: end;
+    gap: 8px;
+  }
+  .aura-placement-action-hint {
+    grid-column: 1 / -1;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: normal;
+  }
+  .aura-placement-nudge::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    border-top: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    translate: -50% -50%;
+  }
+  .aura-placement-left::before {
+    rotate: -45deg;
+  }
+  .aura-placement-up::before {
+    rotate: 45deg;
+  }
+  .aura-placement-down::before {
+    rotate: -135deg;
+  }
+  .aura-placement-right::before {
+    rotate: 135deg;
+  }
+  @media (max-width: 560px) {
+    .aura-placement-toolbar strong {
+      width: 100%;
+      margin-right: 0;
+      text-align: left;
+    }
+    .aura-placement-selector {
+      flex: 1 1 100%;
+      justify-content: flex-start;
+    }
+    .aura-placement-parts {
+      width: 100%;
+      grid-template-columns: 1fr;
+    }
+    .aura-placement-parts .btn {
+      width: 100%;
+    }
+  }
+  @media (max-width: 760px) {
+    .aura-placement-selection {
+      flex-basis: 100%;
+      min-width: 0;
+    }
+    .aura-placement-sliders {
+      flex: 1 0 100%;
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .aura-placement-footer {
+      grid-template-columns: 1fr;
+    }
+    .aura-placement-actions,
+    .aura-placement-footer-actions {
+      grid-column: 1;
+      justify-self: center;
+    }
+    .aura-placement-footer-actions {
+      display: grid;
+      width: 100%;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .aura-placement-footer-actions .btn {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+  .aura-settings-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+    color: var(--color-text-light);
+  }
+  .aura-settings-intro span {
+    color: var(--color-text-muted);
+  }
+  .aura-bulk-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .aura-bulk-actions .btn {
+    flex: 1;
+  }
+  .aura-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .aura-settings-card {
+    margin: 0;
+  }
+  .aura-settings-chip {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--aura-color, var(--color-aura-rpg-gold));
+    margin: 4px 0 8px;
+  }
+  .aura-settings-chip img {
+    width: 36px;
+    height: 36px;
+    border: 2px solid currentColor;
+    border-radius: 6px;
+  }
+  .aura-settings-chip span {
+    color: var(--color-text-light);
+  }
+  .aura-order-row {
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: var(--color-text-muted);
+  }
+  .aura-order-buttons {
+    display: flex;
+    gap: 6px;
+  }
+  .aura-order-btn {
+    position: relative;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+  .aura-order-btn::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    translate: -50% -50%;
+  }
+  .aura-order-up::before {
+    rotate: 45deg;
+  }
+  .aura-order-down::before {
+    rotate: -135deg;
+  }
+  .aura-settings-chip.aura-overlay-battle {
+    --aura-color: var(--color-aura-rpg-electric);
+  }
+  .aura-settings-chip.aura-overlay-death {
+    --aura-color: var(--color-aura-rpg-violet);
+  }
+  .aura-settings-chip.aura-overlay-victory {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-position-label {
+    margin-top: 8px;
+    color: var(--color-text-light);
+    font-weight: 700;
+  }
+  .aura-reset-btn {
+    width: 100%;
+    margin-top: 8px;
+  }
+  @media (max-width: 680px) {
+    .aura-settings-grid {
+      grid-template-columns: 1fr;
+    }
   }
   /* Streamlined title bar for the perf panel (less bulky than the default chrome). */
   #options-menu.perf-wide .panel-title {
     font-size: 14px;
     padding-bottom: 5px;
     margin-bottom: 7px;
+  }
+  /* The one child that actually scrolls. Bottom padding reserves room for the
+     corner motif's ink reach past the footer buttons (moved off
+     #options-menu.perf-wide itself, which no longer scrolls; see above). */
+  #options-menu.perf-wide .perf-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: 64px;
   }
   .perf-panel {
     display: flex;
@@ -10777,13 +11125,11 @@
       inset 0 1px 0 #ffffff14;
     /* The corner motif's ink reaches roughly 60px in from each corner (the
        84px mask box's spiral/tendril geometry, measured against the real
-       render). The base .window pads its body content (and so the footer,
-       its last child) by only --window-pad (12px), which put the footer
-       buttons under the bottom corners. Scoped padding-bottom override
-       clears it; left/right stay at --window-pad since the body's own
-       content never runs that close to the top corners (only the sticky
-       header does, handled below). */
-    padding-bottom: 64px;
+       render). The bottom clearance the footer buttons need past it lives on
+       the .perf-scroll wrapper instead of here (issue #2569): this element is
+       the ornament's own host and must stay non-scrolling (overflow: hidden,
+       above), so its own padding-bottom would sit on a box that never
+       scrolls and could not carry the footer's last pixels into view. */
   }
   #options-menu.perf-wide::before {
     content: "";

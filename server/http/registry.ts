@@ -31,6 +31,7 @@ import { routes as dailyRewardRoutes } from '../daily_rewards';
 import { routes as deedsRoutes } from '../deeds';
 import { routes as desktopLoginRoutes } from '../desktop_login_routes';
 import { routes as discordRoutes } from '../discord';
+import { routes as epicRoutes } from '../epic';
 import { routes as githubRoutes } from '../github';
 import { routes as internalRoutes } from '../internal';
 import { routes as leaderboardRoutes } from '../leaderboard';
@@ -133,6 +134,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...internalRoutes,
   ...deedsRoutes,
   ...steamRoutes,
+  ...epicRoutes,
   ...otaUpdatesRoutes,
   // new:endpoint spreads appear above this line (npm run new:endpoint)
 ];

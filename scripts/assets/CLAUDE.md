@@ -28,6 +28,18 @@ For reference-image reconstruction and procedural GLB authoring, read the living
 - **`build_foliage.mjs`** is a superset for `foliage.json`: adds `weld + simplify`
   (target `ratio`), strips constant-white `COLOR_0`, and hue-rotates leaf textures
   via `recolor` rules. Use this only for foliage.
+- **`compress_glb_textures.mjs` is the mandatory FINAL step after ANY exporter run.**
+  Every embedded texture in a shipped GLB is KTX2/Basis (`KHR_texture_basisu`) so it
+  stays GPU-compressed in memory instead of decoding to a full RGBA bitmap (the decode
+  amplification of the old webp embeds is what got the native iOS client jetsam-killed
+  at world entry). The exporters above still emit webp; re-running one and committing
+  its raw output silently reverts that asset, and `tests/glb_texture_compression.test.ts`
+  turns the drift red. Recover with
+  `node scripts/assets/compress_glb_textures.mjs && node scripts/build_media_manifest.mjs generate`.
+  It needs the `ktx` tool from KhronosGroup/KTX-Software 4.3+ on PATH (no sudo: expand
+  the release pkg with `pkgutil --expand-full`, add its `bin/` to PATH). The one
+  sanctioned exception, WEAPON_VFX skin models, is excluded automatically (their
+  emissive derivation must drawImage the baseColor; see the test header).
 - **Per-asset procedural exporters** (`banker_chest/`, `eastbrook_town/`,
   `eastbrook_grand_armoury/`, `eastbrook_mailbox/`, `eastbrook_noticeboard/`) author GLBs
   from reference images: deterministic `model.js` factory, browser `export_entry.js`,

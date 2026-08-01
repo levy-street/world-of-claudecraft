@@ -166,7 +166,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7.5,
     aggroRadius: 0, // drifting ambient light, harmless unless harmed
     loot: [
-      { copper: 70, chance: 1 },
+      { copper: 75, chance: 1 },
       { itemId: 'wisp_mote', chance: 0.6, questId: 'q_wisp_lights' },
     ],
     scale: 0.7,
@@ -216,6 +216,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.0,
     color: 0xb9a3cf,
+    componentTags: ['hide', 'meat'],
   },
   veiled_doe: {
     id: 'veiled_doe',
@@ -234,6 +235,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 40, chance: 1 }],
     scale: 0.9,
     color: 0xcdbfdc,
+    componentTags: ['hide', 'meat'],
   },
   gleamstag: {
     id: 'gleamstag',
@@ -264,7 +266,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     name: 'Gleamfolk Pixie',
     minLevel: 15,
     maxLevel: 16,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 50,
     hpPerLevel: 17,
     dmgBase: 8,
@@ -273,7 +275,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 7.5,
     aggroRadius: 0, // the little folk of the village never strike first
-    loot: [{ copper: 70, chance: 1 }],
+    loot: [{ copper: 80, chance: 1 }],
     scale: 1.0,
     color: 0xd8c4f0,
   },
@@ -282,7 +284,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     name: 'Sporeling Gatherer',
     minLevel: 15,
     maxLevel: 15,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 48,
     hpPerLevel: 17,
     dmgBase: 8,
@@ -291,7 +293,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 7,
     aggroRadius: 0, // the mushroom folk tend their rings in peace
-    loot: [{ copper: 65, chance: 1 }],
+    loot: [{ copper: 75, chance: 1 }],
     scale: 0.8,
     color: 0xd8b98a,
   },
@@ -300,7 +302,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     name: 'Corrupted Sporeling',
     minLevel: 16,
     maxLevel: 17,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 60,
     hpPerLevel: 21,
     dmgBase: 13,
@@ -334,7 +336,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 6, // rooted patience; do not test it
     wardAllies: { radius: 14, every: 10, amount: 70, duration: 8, name: 'Bark Ward' },
     loot: [
-      { copper: 150, chance: 1 },
+      { copper: 90, chance: 1 },
       { itemId: 'elder_bark', chance: 0.7, questId: 'q_treant_accord' },
     ],
     scale: 1.45,
@@ -357,7 +359,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 10,
     stoneskin: { amount: 90, every: 12, duration: 8, name: 'Stone Bulwark' },
     loot: [
-      { copper: 170, chance: 1 },
+      { copper: 95, chance: 1 },
       { itemId: 'guardian_core', chance: 0.4 },
     ],
     scale: 1.2,

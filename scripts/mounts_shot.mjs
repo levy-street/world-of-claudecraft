@@ -70,6 +70,7 @@ await page.evaluate(() => {
     'reins_shadowjump_toad',
     'reins_stormfeather_griffin',
     'reins_thunderstrut_gobbler',
+    'reins_terrorspark_groundshaker',
   ])
     sim.addItem(id, 1);
 });

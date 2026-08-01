@@ -122,6 +122,18 @@ contextBridge.exposeInMainWorld('wocDesktop', {
   // rejected) so the shell can cancel the Steam auth ticket (Valve's
   // CancelAuthTicket contract). Fire-and-forget; the main handler is idempotent.
   steamLinkSettled: () => ipcRenderer.invoke('desktop-steam-link-settled'),
+  // An Epic link proof (string) for POST /api/epic/link, or null when Epic is
+  // unavailable (website/steam build, no launcher exchange code, adapter
+  // missing). The main-process handler never rejects; epic.cjs owns every
+  // failure arm.
+  epicLinkProof: () => ipcRenderer.invoke('desktop-epic-link-proof'),
+  // Whether the shell can mint Epic link proofs at all (false on packaged
+  // website/steam builds). Capability can be true even when a given mint
+  // returns null (no native EOS / no launcher session yet).
+  epicLinkSupported: () => ipcRenderer.invoke('desktop-epic-capability'),
+  // Signal that an Epic link attempt has settled so any cancelable adapter
+  // handle can be released. Fire-and-forget; the main handler is idempotent.
+  epicLinkSettled: () => ipcRenderer.invoke('desktop-epic-link-settled'),
   // Auto-update events (website distribution only; the channel is simply
   // silent on Steam/dev builds). Payloads are the whitelisted shapes built in
   // electron/update_events.cjs.

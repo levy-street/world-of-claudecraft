@@ -64,6 +64,10 @@
   body.mobile-touch #proc-overlay {
     scale: 0.2;
   }
+  body.mobile-touch .aura-overlay-arc {
+    top: 14px;
+    height: 156px;
+  }
   /* The HUD overlay must let one-finger panning reach scrollable windows (Bag,
      Market, etc.) on iOS: Safari intersects touch-action down the ancestor
      chain, so `none` here would block child scroll containers and a child's
@@ -2149,6 +2153,74 @@
     overflow-x: hidden;
     z-index: 25;
   }
+  body.mobile-touch #target-auras-window {
+    display: none !important;
+    position: fixed;
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    top: max(220px, calc(env(safe-area-inset-top) + 8px));
+    width: min(
+      280px,
+      calc(100% - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right)))
+    );
+    max-height: min(35vh, 280px);
+    /* Aura rows own their scrolling viewport. Keep the frame overflow visible
+       so the settings disclosure can extend past a narrow single-column frame. */
+    overflow: visible;
+    transform: translateX(-50%);
+  }
+  body.mobile-touch #target-auras-window.ta-filter-debuffs,
+  body.mobile-touch #target-auras-window.ta-filter-buffs {
+    width: min(
+      240px,
+      calc(100% - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right)))
+    );
+  }
+  body.mobile-touch #target-auras-window .ta-row {
+    --ta-row-height: 19px;
+    height: 19px;
+    grid-template-rows: 1fr;
+  }
+  body.mobile-touch #target-auras-window .ta-icon {
+    height: 17px;
+  }
+  body.mobile-touch #target-auras-window.ta-show-sources .ta-row {
+    --ta-row-height: 40px;
+    height: 40px;
+    grid-template-rows: 20px 18px;
+  }
+  body.mobile-touch #target-auras-window.ta-show-sources .ta-icon {
+    height: 38px;
+  }
+  body.mobile-touch #target-auras-window .ta-move-btn {
+    display: none;
+  }
+  body.mobile-touch #target-auras-window .ta-rows-config-btn,
+  body.mobile-touch #target-auras-window .ta-visible-rows-step,
+  body.mobile-touch #target-auras-window .ta-visible-rows-value {
+    width: 40px;
+    height: 40px;
+  }
+  body.mobile-touch #target-auras-window .ta-rows-config-btn {
+    flex-basis: 40px;
+  }
+  body.mobile-touch #target-auras-window .ta-visible-rows-control {
+    top: 44px;
+    right: auto;
+    gap: 16px;
+    padding: 6px 8px;
+    width: min(232px, calc(100vw - 8px));
+  }
+  body.mobile-touch #target-auras-window .ta-opacity-control {
+    min-height: 40px;
+  }
+  body.mobile-touch #target-auras-window .ta-opacity-slider {
+    min-height: 40px;
+  }
+  body.mobile-touch #target-auras-window .ta-filters .mt-tab {
+    min-height: 40px;
+  }
   /* Detached meter windows are a DESKTOP affordance: popping one out, dragging
      it and resizing it are all pointer gestures the mobile HUD does not offer,
      and a phone has no room for three floating panels over the action ring. The
@@ -4164,6 +4236,7 @@
     right: 10px !important;
     width: auto !important;
     box-sizing: border-box;
+    transform: none;
   }
   body.mobile-touch #report-window select,
   body.mobile-touch #report-window textarea {
@@ -5019,6 +5092,18 @@
       min-width: 128px;
       max-height: min(135px, calc(var(--app-vh) / var(--ui-scale, 1) - 112px));
       transform: none;
+    }
+    /* The centre-top lane is clear of the target/party stack on the left and
+       minimap/player auras on the right. The independently scrolling aura lists
+       keep the automatic panel from covering either actionable rail. */
+    body.mobile-touch #target-auras-window {
+      top: max(6px, env(safe-area-inset-top));
+      width: min(
+        280px,
+        calc(100% - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right)))
+      );
+      max-height: min(190px, calc(100dvh - max(12px, env(safe-area-inset-top))));
+      height: min(190px, calc(100dvh - max(12px, env(safe-area-inset-top))));
     }
     body.mobile-touch #banner {
       top: 18%;

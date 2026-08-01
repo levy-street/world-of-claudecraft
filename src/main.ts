@@ -4,7 +4,10 @@
 import './styles/index.css';
 import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
-import { syncAppViewport as syncAppViewportShared } from './game/app_viewport';
+import {
+  syncAppViewport as syncAppViewportShared,
+  syncSettledAppViewport,
+} from './game/app_viewport';
 import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
 import {
@@ -14,7 +17,12 @@ import {
   readBrowserEnv,
 } from './game/browser_env';
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
-import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
+import {
+  cameraFollowShouldSettle,
+  isRespawnFacingResyncEdge,
+  updateFollowCameraYaw,
+  wrapAngle,
+} from './game/camera_follow';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveBrokenByTeleport,
@@ -169,10 +177,15 @@ import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
-import { assetsReady } from './render/assets/preload';
+import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
-import { charactersReady, preloadMechAssets } from './render/characters/assets';
-import { skinCount } from './render/characters/manifest';
+import {
+  charactersReady,
+  ensureCharacterUrl,
+  preloadMechAssets,
+  startStreamedCharacterPreloads,
+} from './render/characters/assets';
+import { skinCount, weaponSkinModelUrl } from './render/characters/manifest';
 import {
   onPortraitsReady,
   onPortraitUpdate,
@@ -267,6 +280,7 @@ import { renderDiscordWidget } from './ui/discord_widget';
 import { finderLootItemIds } from './ui/dungeon_finder_view';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
+import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { attachGatherNodeHoverTooltip, gatherNodeToolGateFor } from './ui/gather_node_tooltip';
 import { gatherToolNoNodeKey } from './ui/gathering_view';
@@ -1169,6 +1183,13 @@ async function startGame(
   } catch {
     // Soft fallback: English is statically resident; boot in English (the picker can retry).
   }
+  // Open the deferred preload lane: the world's assets do not fetch at module
+  // import any more, because decoding them merely to show the LAUNCHER crossed
+  // WKWebView's per-process ceiling (a 12 GB iPhone 17 Pro was killed 1.6 s in and
+  // reloaded forever). This must run BEFORE the await below, which snapshots the
+  // task list, so the Renderer still cannot outrun a load.
+  const deferredStarted = beginDeferredPreloads();
+  console.info(`[entry-guard] world assets: started ${deferredStarted} deferred preloads`);
   try {
     await assetsReady((done, total) => setLoadingProgressRange(done, total, 0, 35));
   } catch (err) {
@@ -1634,6 +1655,9 @@ async function startGame(
           case 'meters':
             hud.toggleMeters();
             break;
+          case 'targetAuras':
+            hud.toggleTargetAuras();
+            break;
           case 'social':
             hud.toggleSocial();
             break;
@@ -1880,6 +1904,9 @@ async function startGame(
         break;
       case 'meters':
         hud.toggleMeters();
+        break;
+      case 'targetAuras':
+        hud.toggleTargetAuras();
         break;
       case 'social':
         hud.toggleSocial();
@@ -2250,12 +2277,14 @@ async function startGame(
         break;
       case 'interfaceMode':
         // Desktop/touch override: update the resolver, then re-apply the layout
-        // (body class, stable viewport) and the on-screen controls live so the
-        // switch takes effect without a reload.
+        // (body class, stable viewport) and the on-screen controls live. Refresh
+        // controls before measuring, then repeat the measurement while the browser
+        // settles its visual viewport so the canvas/camera cannot retain the old
+        // desktop width until a page reload.
         setInterfaceMode(interfaceModeFromSetting(v));
         syncPhoneTouchClass();
-        syncAppViewport();
         mobileControls.refreshInterfaceMode();
+        syncSettledAppViewport(syncAppViewport);
         break;
       case 'gamepadStickDeadzone':
         gamepad.setDeadzone(v);
@@ -2410,6 +2439,15 @@ async function startGame(
   // otherwise, so it is a live affordance offline too (not gated on `online`).
   hud.attachDiscordHook(() => openDiscordEntry());
   if (online) {
+    // Issue #2416: chain onto whatever onReconnected enterWorld already armed
+    // (the reconnect overlay teardown), rather than replacing it: hud does not
+    // exist yet when enterWorld sets that handler, so the market resync has to
+    // be wired here instead, once hud is actually available.
+    const priorOnReconnected = online.onReconnected;
+    online.onReconnected = () => {
+      priorOnReconnected?.();
+      hud.marketResyncAfterReconnect();
+    };
     // A hosted dev/PBE realm booted with ALLOW_DEV_COMMANDS=1 lights the /dev GUI
     // even in a production client build, where import.meta.env.DEV is false. That
     // build flag alone used to gate it, which is why a tester on a dev realm could
@@ -3161,6 +3199,11 @@ async function startGame(
   // eases back to zero so the camera settles in behind the character.
   let lastInterpFacing: number | null = null;
   let wasClickMoving = false;
+  // Tracks the player's dead/ghost state across frames so a respawn/release-spirit
+  // edge (see isRespawnFacingResyncEdge) can resync lastInterpFacing below, the same
+  // way the click-to-move release edge does just underneath it.
+  let prevPlayerDead = world.player.dead;
+  let prevPlayerGhost = world.player.ghost;
   // Tracks camera-driven facing (classic right-mouse mouselook, or Mouse Camera
   // mode while a movement key is held) across frames so its falling edge can
   // commit the final camera yaw to the player facing (see mouselook_release.ts
@@ -3187,6 +3230,17 @@ async function startGame(
     // handoff stays smooth even in pure-follow (non-camera-driven) mode.
     if (wasClickMoving && !clickMoving) lastInterpFacing = interpFacing;
     wasClickMoving = clickMoving;
+    // A respawn/release-spirit forces the player's facing to 0 (see spirit.ts and
+    // entity_roster.ts); resync here too, or the rigid follow term below reads the
+    // gap against the stale pre-death lastInterpFacing as a turn and sticks the
+    // camera off-yaw (see isRespawnFacingResyncEdge for why).
+    const playerDead = world.player.dead;
+    const playerGhost = world.player.ghost;
+    if (isRespawnFacingResyncEdge(prevPlayerDead, prevPlayerGhost, playerDead, playerGhost)) {
+      lastInterpFacing = interpFacing;
+    }
+    prevPlayerDead = playerDead;
+    prevPlayerGhost = playerGhost;
     const next = updateFollowCameraYaw({
       camYaw: input.camYaw,
       interpFacing,
@@ -3959,6 +4013,15 @@ async function startGame(
     // fall back to Three's normal first-use compilation once the zone itself
     // has been materialized successfully.
     console.warn('Renderer prewarm failed', err);
+  }
+  // The entry allocation spike is over: start streaming the mob bodies the
+  // packaged iOS boot gate deliberately excluded (empty everywhere else). A mob
+  // whose GLB is still arriving renders a beat late through the fail-soft
+  // view-create path, instead of its decode competing with the scene build for
+  // the WebContent memory ceiling.
+  const streamedCount = startStreamedCharacterPreloads();
+  if (streamedCount > 0) {
+    console.info(`[entry-guard] streaming ${streamedCount} deferred character assets`);
   }
   // Each preview prewarm mints a SECONDARY WebGL context beside the world
   // renderer: real WebKit GPU-process residency held for a window the player
@@ -5679,6 +5742,13 @@ const activeClassDetailsTimeouts: Record<string, number | null> = {};
 
 // The char-select roster row's real, in-world appearance for the 3D preview.
 function charselectAppearance(c: CharacterSummary): PreviewAppearance {
+  // The packaged iOS shell streams the Armory weapon-skin GLBs after world
+  // entry instead of holding all of them at the launcher, so the preview of a
+  // character wearing one needs ITS skin fetched on demand (the mech lazy-load
+  // pattern). Memoized and a no-op when resident or on eager platforms; a
+  // preview built in the race window shows the base weapon and picks the skin
+  // up on the next selection change.
+  ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
   return {
     cls: c.class,
     skin: c.skin ?? 0,
@@ -8150,6 +8220,7 @@ function wireStartScreens(): void {
   void wireWallet();
   wireGithubLink();
   wireSteamLink(api);
+  wireEpicLink(api);
 
   // mode select
   const onlineBtn = $('#btn-online');
@@ -8196,6 +8267,7 @@ function wireStartScreens(): void {
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
+    void refreshEpicLinkStatus(api);
     // Mandatory recovery-email capture: block realm entry until a pre-email account
     // sets one (a fresh signup already has it, so this is a no-op there).
     await maybePromptRecoveryEmail();
@@ -9280,6 +9352,7 @@ function wireStartScreens(): void {
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
+    void refreshEpicLinkStatus(api);
     // A Discord login usually captured the email already, but confirm and prompt
     // if it did not (e.g. the address was missing on the Discord account).
     void maybePromptRecoveryEmail().then(() => goToLoggedInPlay());
@@ -9565,6 +9638,7 @@ function wireStartScreens(): void {
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
+    void refreshEpicLinkStatus(api);
     // (Discord status is refreshed by enterLoggedInChrome above.)
     // A just-completed Discord login lands straight in play; capture a recovery
     // email first if the Discord grant did not provide one. The desktop-login

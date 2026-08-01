@@ -23,6 +23,7 @@ import {
 import { layoutColliders } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
 import type { LootTier } from '../lockpick';
+import { RIFT_MECHANIC_SPACING_SEC } from '../mob/mechanic_spacing';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
@@ -214,6 +215,14 @@ function emitRiftState(ctx: SimContext, pid: number, inst: RiftInstance, active:
       ? null
       : (ctx.riftEvents.find((candidate) => candidate.eventId === inst.eventId) ?? null);
   const contentId = event?.contentId ?? `procedural-v1:${inst.seed}:${inst.baseLevel}`;
+  // event.expiresAt is sim-clock seconds; convert to an epoch-comparable
+  // deadline through the shared lockoutNowMs seam (the same conversion
+  // rift/persistence.ts performs for save/load), so a client that never runs
+  // the sim tick loop can still tick a "closes in" countdown locally. Null for
+  // a dev-spawned rift, which has no backing RiftEvent (race.ts: dev portals
+  // are "deliberately outside the global race").
+  const expiresAtMs =
+    event === null ? null : Math.round(ctx.lockoutNowMs() + (event.expiresAt - ctx.time) * 1000);
   ctx.emit({
     type: 'riftState',
     pid,
@@ -231,6 +240,7 @@ function emitRiftState(ctx: SimContext, pid: number, inst: RiftInstance, active:
     name: floor.name,
     themeName: floor.themeName,
     tier: inst.tier,
+    expiresAtMs,
   });
 }
 
@@ -301,8 +311,15 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
     // Authored set-piece floors (the Infernal Citadel) are C-only hand-tuned
     // content; their bosses run their full kit at every rank and must not be
     // capped by the procedural rank budget.
-    if ((spawn.boss || spawn.miniboss) && !isSetPieceRift(inst.seed, inst.baseLevel)) {
-      mob.riftMechanicLimit = RIFT_RANK_MECHANIC_BUDGET[rank];
+    if (spawn.boss || spawn.miniboss) {
+      // Shared mechanic spacing (mob/mechanic_spacing.ts): a rift boss never
+      // lands two mechanics on top of each other. Stamped on EVERY rift boss,
+      // including the citadel set-piece (the budget exemption below is about
+      // kit SIZE, not about letting mechanics stack).
+      mob.riftMechanicSpacing = RIFT_MECHANIC_SPACING_SEC;
+      if (!isSetPieceRift(inst.seed, inst.baseLevel)) {
+        mob.riftMechanicLimit = RIFT_RANK_MECHANIC_BUDGET[rank];
+      }
     }
     // Per-run re-grade: a fresh tint (and a little scale variance) so the same
     // template reads as a different creature across rifts. Model + mechanics are

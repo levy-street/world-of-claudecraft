@@ -460,6 +460,19 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     expect(JSON.parse(newCap.body as string).steam).toEqual({ enabled: true });
   });
 
+  it('the /api/status epic advert DIVERGES under EPIC_ENABLED=1: false on legacy, true on new', async () => {
+    // Twin of the Steam status advert above: Epic routes are registry-only
+    // (server/epic/routes.ts), so the legacy ladder hardcodes epic.enabled=false
+    // while the migrated statusHandler reads epicEnabled() live.
+    const { oldCap, newCap } = await captureWithEnv({ EPIC_ENABLED: '1' }, () =>
+      makeReq({ method: 'GET', url: '/api/status' }),
+    );
+    expect(oldCap.status).toBe(200);
+    expect(newCap.status).toBe(200);
+    expect(JSON.parse(oldCap.body as string).epic).toEqual({ enabled: false });
+    expect(JSON.parse(newCap.body as string).epic).toEqual({ enabled: true });
+  });
+
   it('the /api/status dev_commands advert AGREES on both arms under ALLOW_DEV_COMMANDS=1', async () => {
     // Unlike steam.enabled directly above, dev_commands must NOT diverge: the dev_*
     // cheats ride the WEBSOCKET dispatcher, which both ladders serve identically, so
@@ -520,6 +533,16 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     // reason the legacy /api/status advert must read false.
     const { oldCap, newCap } = await captureWithEnv({ STEAM_ENABLED: '1' }, () =>
       makeReq({ method: 'GET', url: '/api/steam/status' }),
+    );
+    expect(oldCap.status).toBe(404);
+    expect(newCap.status).not.toBe(404);
+  });
+
+  it('the Epic link surface 404s on the legacy ladder but is served on the new arm', async () => {
+    // Twin of the Steam registry-only pin: /api/epic/status exists only as a
+    // RouteDef. Legacy 404s; new arm serves (401 without bearer when enabled).
+    const { oldCap, newCap } = await captureWithEnv({ EPIC_ENABLED: '1' }, () =>
+      makeReq({ method: 'GET', url: '/api/epic/status' }),
     );
     expect(oldCap.status).toBe(404);
     expect(newCap.status).not.toBe(404);

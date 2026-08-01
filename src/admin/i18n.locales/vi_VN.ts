@@ -168,7 +168,6 @@ export const vi_VN: Record<string, string> = {
   'stats.avgTick': 'tick trung bình',
   'stats.serverRss': 'rss máy chủ',
   'online.title': 'Người chơi trực tuyến',
-  'online.refreshHint': 'làm mới mỗi 5 giây',
   'online.empty': 'hiện không có ai trực tuyến',
   'online.colCharacter': 'Nhân Vật',
   'online.colClass': 'Lớp',

@@ -40,6 +40,10 @@ vi.mock('../server/steam/mirror', () => ({
   onDeedRecorded: vi.fn(),
   reconcileOnLogin: vi.fn(),
 }));
+vi.mock('../server/epic/mirror', () => ({
+  onDeedRecorded: vi.fn(),
+  reconcileOnLogin: vi.fn(),
+}));
 
 import { GameServer } from '../server/game';
 import { MASTERY_RESET_LETTER_ID } from '../src/sim/professions/mastery_reset';

@@ -2085,6 +2085,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Essa carta não está mais na sua caixa.',
   'hudChrome.mailbox.result.needRecipient': 'Indique um destinatário para a sua carta.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Você não pode enviar itens de missão pelo correio.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Esse item está vinculado e não pode ser enviado pelo correio.',
   'hudChrome.mailbox.result.noRecipient': 'Ninguém com esse nome possui caixa de correio aqui.',
   'hudChrome.mailbox.result.notEnoughItems': 'Você não tem tantos assim para enviar.',
   'hudChrome.mailbox.result.recipientBoxFull': 'A caixa de correio do destinatário está cheia.',
@@ -3355,6 +3357,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.invitationExpired': 'O convite expirou.',
   'hud.errors.targetTooFar': 'O alvo está longe demais.',
   'hud.errors.tradeBound': 'Esse item está vinculado e não pode ser negociado.',
+  'hud.errors.marketListBound': 'Esse item está vinculado e não pode ser colocado à venda.',
   'hud.errors.duelInProgress': 'Já há um duelo em andamento.',
   'hud.errors.challengeExpired': 'O desafio expirou.',
   'hud.errors.arenaAlreadyInMatch': 'Você já está em uma luta de arena.',
@@ -3363,6 +3366,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': 'Termine sua troca antes de entrar na fila.',
   'hud.errors.arenaQueueInstance': 'Você não pode entrar na fila dentro de uma instância.',
   'hud.errors.tradeInProgress': 'Já há uma troca em andamento.',
+  'hud.errors.tradeAlreadyTrading': 'Esse jogador já está em uma troca.',
   'hud.errors.tradeTooFar': 'O alvo está longe demais para trocar.',
   'hud.errors.tradeExpired': 'A solicitação de troca expirou.',
   'hud.errors.tradeFailed': 'Troca falhou: itens ou dinheiro não estão mais disponíveis.',
@@ -3918,8 +3922,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Encerra o tempo de recarga de Passo Cintilante, Véu de Gelo e Invisibilidade Maior. (Talento de mago)',
   'entities.abilities.greater_invisibility.name': 'Invisibilidade Maior',
-  'entities.abilities.greater_invisibility.description':
-    'Desaparece por 20 s: remove 2 efeitos de dano periódico e reduz o dano recebido em 90% enquanto você está invisível e por pouco tempo depois. (Talento de mago)',
   'entities.abilities.hot_streak.name': 'Embalo Ardente',
   'entities.abilities.hot_streak.description':
     'Passivo: dois acertos críticos seguidos com suas magias de Fogo (Bola de Fogo, Impacto de Fogo, Calcinar, Piroexplosão ou Coluna de Chamas) tornam sua próxima Piroexplosão ou Coluna de Chamas instantânea e gratuita. As magias que consomem o efeito contam para o PRÓXIMO embalo, inclusive lançamentos gratuitos; Coluna de Chamas conta uma vez, não importa quantos inimigos atinja, e apenas o impacto inicial pode contar. (Fogo)',
@@ -6080,12 +6082,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.name': 'Demônios',
   'guide.family.demon.desc':
     'Invasores de além das fendas, todo fogo e rancor. Onde um se encontra, uma brecha nunca está longe.',
-  'guide.family.kobold.name': 'Traquinas',
-  'guide.family.kobold.desc':
-    'Batedores ágeis e duendes de clareiras e cercas vivas, mais incômodos que perigosos até se juntarem em grande número.',
-  'guide.family.murloc.name': 'Coaxa-barbatanas',
-  'guide.family.murloc.desc':
-    'Gente-peixe coaxante de margens de lagos e poças de maré, rápida em enxamear qualquer um que se aproxime demais.',
   'guide.faqPage.a1':
     'Sim. O jogo inteiro é gratuito até o nível máximo, e o código-fonte é aberto no GitHub.',
   'guide.faqPage.a2':
@@ -10926,4 +10922,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     'Desbloqueio em {seconds} segundos. Mover-se, lutar, sofrer dano ou iniciar outra ação o cancela.',
   'hudChrome.unstuck.unavailable': 'Desbloqueio não está disponível no seu estado atual.',
+  'hudChrome.riftTracker.title': 'Fenda',
+  'hudChrome.riftTracker.floor': 'Andar {current} de {total}',
+  'hudChrome.riftTracker.closesIn': 'Fecha em {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

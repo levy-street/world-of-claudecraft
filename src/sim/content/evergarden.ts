@@ -155,7 +155,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 9,
     aggroRadius: 0, // clipped leaves grazing the lawn; it minds its own shape
     loot: [
-      { copper: 105, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'evergarden_bloom_clipping', chance: 0.65, questId: 'q_eg_bloom_clippings' },
     ],
     scale: 1.15,
@@ -175,7 +175,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 11,
     moveSpeed: 8.5,
     aggroRadius: 11, // some of the shapes were pruned into hunger
-    loot: [{ copper: 105, chance: 1 }],
+    loot: [{ copper: 100, chance: 1 }],
     scale: 1.15,
     color: 0x4a8a4e,
   },
@@ -194,7 +194,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8.5,
     aggroRadius: 11, // the castle's old garrison still walks its rounds
     loot: [
-      { copper: 115, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'linen_scrap', chance: 0.3 },
     ],
     scale: 1.0,
@@ -205,7 +205,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     name: 'Hedge Gnome',
     minLevel: 20,
     maxLevel: 20,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 52,
     hpPerLevel: 18,
     dmgBase: 11,
@@ -215,7 +215,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8.5,
     aggroRadius: 10, // the unseen groundskeepers, and they hate trespass
     loot: [
-      { copper: 105, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'hedgewick_shears', chance: 0.6, questId: 'q_eg_stolen_shears' },
     ],
     scale: 0.95,
@@ -237,7 +237,7 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 12, // the court is his, and the maze feeds him trespassers
     elite: true,
     loot: [
-      { copper: 450, chance: 1 },
+      { copper: 100, chance: 1 },
       { itemId: 'tangled_weed', chance: 1 },
     ],
     scale: 1.45,

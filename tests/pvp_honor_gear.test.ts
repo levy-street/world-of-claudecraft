@@ -17,8 +17,9 @@ import {
   itemSourceLevel,
   primaryStatSum,
 } from '../src/sim/item_level';
+import { LAUNCH_PAPERDOLL_SLOTS } from '../src/sim/launch_paperdoll_slots';
 import { pvpFractionsFromRatings } from '../src/sim/pvp';
-import { EQUIP_SLOTS, type EquipSlot, type PlayerClass } from '../src/sim/types';
+import type { EquipSlot, PlayerClass } from '../src/sim/types';
 
 const SLOT_PRICES: Record<string, number> = {
   mainhand: 800,
@@ -259,7 +260,7 @@ describe('FURY WARFARE class and role coverage', () => {
   it('provides every supported equipment slot to every intended class profile', () => {
     for (const profile of PROFILES) {
       const ids = profileItemIds(profile);
-      expect(ids).toHaveLength(EQUIP_SLOTS.length);
+      expect(ids).toHaveLength(LAUNCH_PAPERDOLL_SLOTS.length);
 
       const concreteSlots = new Set<EquipSlot>();
       for (const id of ids) {
@@ -270,7 +271,7 @@ describe('FURY WARFARE class and role coverage', () => {
           concreteSlots.add(slot);
         }
       }
-      expect([...concreteSlots].sort(), profile.name).toEqual([...EQUIP_SLOTS].sort());
+      expect([...concreteSlots].sort(), profile.name).toEqual([...LAUNCH_PAPERDOLL_SLOTS].sort());
 
       for (const cls of profile.classes) {
         for (const id of ids) {

@@ -888,6 +888,13 @@ export const nl_NL: EnTranslations = {
       "heroicName": "Heroïsch {name}",
       "heroicLocked": "Je bent vergrendeld voor Heroïsch {name}."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Verdieping {current} van {total}",
+      "closesIn": "Sluit over {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NO",
@@ -915,6 +922,23 @@ export const nl_NL: EnTranslations = {
       "dock": "Deze meter terugzetten in het metervenster",
       "separate": "{meter} loskoppelen",
       "regroup": "{meter} weer samenvoegen"
+    },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Huisdier heeft volledige gezondheid",
@@ -959,13 +983,15 @@ export const nl_NL: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage de Schaduwspringpad",
       "name_stormfeather_griffin": "Hemelreik Stormveder",
       "name_thunderstrut_gobbler": "Donderstap de Grote Kalkoen",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
       "desc_stalkglider_snail": "Een taaie, langzaam brandende slak die extra reissnelheid geeft.",
       "desc_aether_hover_cycle": "Een krachtige magitech-motor, ontworpen voor snelle, laag zwevende verplaatsing tijdens gevechten.",
       "desc_shadowjump_toad": "Een enorme, standvastige reuzenpad, getraind in bliksemsnelle schaduwsprongen die elk terrein overbruggen.",
       "desc_stormfeather_griffin": "Een koninklijke stormgriffioen die met runenbeslagen klauwen over de grond sluipt, vleugels opgevouwen.",
-      "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk."
+      "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Druk op {key} om op de trainings-Moedros te stijgen.",
@@ -1271,6 +1297,51 @@ export const nl_NL: EnTranslations = {
       "badges": {
         "backgrounded": "Op achtergrond",
         "offline": "Offline"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Current class: {class}",
+      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
+      "noProcs": "No supported proc is available for this character.",
+      "enabled": "Show Aura",
+      "icon": "Spell Icon",
+      "arcs": "Side Crescents",
+      "groundRing": "Ground Ring",
+      "groundRingSpellOrder": "Ground Ring: Spell Order",
+      "crescentsSpellOrder": "Side Crescents: Spell Order",
+      "size": "Size",
+      "iconSize": "Icon Size",
+      "crescentBlockSize": "Crescent Block Size",
+      "groundRingBlockSize": "Ground Ring Block Size",
+      "opacity": "Opacity",
+      "color": "Color",
+      "allOn": "All On",
+      "allOff": "All Off",
+      "reposition": "Setup Positions",
+      "positioning": "Positioning: {aura}",
+      "selectAura": "Aura",
+      "done": "Done",
+      "moveLeft": "Move Left",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "moveRight": "Move Right",
+      "moveEarlier": "Move spell inward",
+      "moveLater": "Move spell outward",
+      "screenPosition": "Screen Position",
+      "spellOrder": "Spell Order",
+      "reset": "Reset Position",
+      "spellPosition": "Spell order {position} / {count}",
+      "procs": {
+        "revenge": "Revenge!",
+        "battleTrance": "Battle Trance",
+        "overpowerCharge": "Redhand Empowerment",
+        "suddenDeath": "Sudden Death",
+        "victoryRush": "Victory Rush",
+        "enrage": "Mayhem: Enraged",
+        "heatingUp": "Heating Up",
+        "arcaneCharge": "Arcane Charges",
+        "aetherRush": "Aether Rush"
       }
     },
     "playerCard": {
@@ -2076,6 +2147,14 @@ export const nl_NL: EnTranslations = {
       "benefits": "Koppel je Steam-account vanuit de desktop-app om de daden die je behaalt te spiegelen naar Steam-prestaties.",
       "noTicket": "Steam gaf geen koppelticket af. Start Steam en probeer het daarna opnieuw."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Brievenbus",
       "subtitle": "De Ravenpost",
@@ -2120,6 +2199,7 @@ export const nl_NL: EnTranslations = {
         "noRecipient": "Niemand met die naam heeft hier een brievenbus.",
         "tooManyParcels": "Een brief draagt hoogstens {count} pakketten.",
         "noMailQuestItems": "Je kunt geen opdrachtvoorwerpen versturen.",
+        "noMailBound": "Dat voorwerp is gebonden en kan niet worden verstuurd.",
         "notEnoughItems": "Zoveel heb je er niet om te versturen.",
         "cantAffordPostage": "Je kunt de porto niet betalen.",
         "recipientBoxFull": "Hun brievenbus is vol.",
@@ -2926,6 +3006,14 @@ export const nl_NL: EnTranslations = {
       "account_taken": "Dat Steam-account is al aan een ander account gekoppeld.",
       "upstream": "Steam reageerde niet. Probeer het zo meteen opnieuw."
     },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
+    },
     "wallet": {
       "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw."
     },
@@ -3530,14 +3618,6 @@ export const nl_NL: EnTranslations = {
       "reptile": {
         "name": "Reptielen",
         "desc": "Koudbloedige jagers met een eigen sis en snap, onderscheiden van de warmbloedige dieren."
-      },
-      "murloc": {
-        "name": "Kwaakvinnen",
-        "desc": "Krassende vismensen van oever en getijdenpoel, snel om te zwermen op alles wat te dicht bij het water waadt."
-      },
-      "kobold": {
-        "name": "Kwelgeesten",
-        "desc": "Scharrelende plunderaars en geesten van open plek en heg, meer overlast dan gevaar tot ze zich in aantal verzamelen."
       },
       "demon": {
         "name": "Demonen",
@@ -6479,10 +6559,12 @@ export const nl_NL: EnTranslations = {
       "arenaQueueTrading": "Rond je ruil af voordat je in de wachtrij gaat.",
       "arenaQueueInstance": "Je kunt niet in de wachtrij gaan vanuit een instantie.",
       "tradeInProgress": "Er is al een ruil aan de gang.",
+      "tradeAlreadyTrading": "Die speler is al aan het ruilen.",
       "tradeTooFar": "Het doelwit is te ver weg om mee te ruilen.",
       "tradeExpired": "Het ruilverzoek is verlopen.",
       "tradeFailed": "Ruil mislukt: voorwerpen of geld niet langer beschikbaar.",
-      "tradeBound": "Dat voorwerp is gebonden en kan niet worden verhandeld."
+      "tradeBound": "Dat voorwerp is gebonden en kan niet worden verhandeld.",
+      "marketListBound": "Dat voorwerp is gebonden en kan niet te koop worden aangeboden."
     },
     "logs": {
       "standUp": "Je staat op.",
@@ -7227,7 +7309,7 @@ export const nl_NL: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Grotere onzichtbaarheid",
-        "description": "Verdwijn gedurende 20 sec.: verwijdert 2 effecten met schade over tijd en je loopt 90% minder schade op terwijl je onzichtbaar bent en kort daarna. (magiërstalent)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Hete reeks",
@@ -9745,6 +9827,9 @@ export const nl_NL: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Zegel van de Laatste Burcht"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

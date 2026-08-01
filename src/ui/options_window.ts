@@ -40,8 +40,10 @@ import {
 } from '../game/settings';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
+import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_settings';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
+import type { FocusTrapHandle } from './focus_manager';
 import type { BugReportHooks, OptionsHooks } from './hud';
 import type { ChatClock } from './hud/chat/chat_timestamp';
 import {
@@ -155,6 +157,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   bags: 'hud.keybinds.actions.bags',
   nameplates: 'hud.keybinds.actions.nameplates',
   meters: 'hud.keybinds.actions.meters',
+  targetAuras: 'hudChrome.targetAuras.keybindLabel',
   social: 'hud.keybinds.actions.social',
   arena: 'hud.keybinds.actions.arena',
   dungeonFinder: 'hudChrome.finder.title',
@@ -198,6 +201,8 @@ export interface OptionsWindowDeps {
   world(): IWorld;
   /** The options seam main.ts wires after Input exists (null until attached). */
   options(): OptionsHooks | null;
+  /** Player-specific proc overlay editor, owned by Hud (null until wired). */
+  auraOverlays?: () => AuraOverlayHooks;
   /** The bug-report seam (online only; its presence gates the Report a Bug row). */
   bugReport(): BugReportHooks | null;
   /** The keybind store (read labels, rebind, reset). */
@@ -218,6 +223,8 @@ export interface OptionsWindowDeps {
   setDropdownValue(root: HTMLElement, value: string): void;
   /** Focus the first interactive element (or a preferred selector) inside a root. */
   focusFirstInteractive(root: HTMLElement, preferredSelector?: string): void;
+  /** Open a nested dialog on the shared HUD focus-manager stack. */
+  openFocusTrap(root: () => HTMLElement, returnFocusTo: HTMLElement): FocusTrapHandle;
   /** Clear transient overlays when the menu opens (closeOtherWindows). */
   closeOthers(): void;
   hideTooltip(): void;
@@ -319,13 +326,20 @@ export class OptionsWindow {
   // The Options > Performance panel, lazily built and reused (it caches the live
   // position-slider handles so a drag-to-move can update them in place).
   private perfSettings: PerfOverlaySettingsPanel | null = null;
+  private auraSettings: AuraOverlaySettingsPanel | null = null;
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
+  // Tracked separately from the root's inline `display` (rather than reading
+  // it back, the char-window precedent): the Performance sub-view needs
+  // `display: flex` (its scroll wrapper needs a flex column, issue 2569)
+  // while every other sub-view stays `block`, so no single string value means
+  // "open" any more (the deeds/bank-window precedent for the same reason).
+  private opened = false;
 
   constructor(private readonly deps: OptionsWindowDeps) {}
 
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.opened;
   }
 
   toggle(): void {
@@ -344,8 +358,8 @@ export class OptionsWindow {
     this.view = 'main';
     this.capturingKey = null;
     this.keybindNote = '';
+    this.opened = true;
     this.render();
-    this.deps.root().style.display = 'block';
     music.pauseForMenu();
     audio.click();
   }
@@ -354,9 +368,12 @@ export class OptionsWindow {
   // the panel, drop the key-capture + tooltip + perf overlay placement, resume
   // music, and return focus to the opener (WCAG 2.2 AA).
   close(): void {
+    this.opened = false;
     this.deps.root().style.display = 'none';
     this.capturingKey = null;
     this.deps.options()?.perfOverlay.setPlacement(false);
+    this.auraSettings?.closePlacement();
+    this.deps.auraOverlays?.().setPlacement(false);
     this.deps.hideTooltip();
     music.resumeFromMenu();
     const target = this.returnFocus;
@@ -402,8 +419,10 @@ export class OptionsWindow {
     // leaving it so the other sub-views (and the main menu) keep their default width.
     if (this.view !== 'keybinds') el.classList.remove('kb-wide');
     if (this.view !== 'performance') el.classList.remove('perf-wide');
+    if (this.view !== 'auras') el.classList.remove('aura-wide');
     // The overlay is draggable only while the Performance sub-view is open.
     this.deps.options()?.perfOverlay.setPlacement(this.view === 'performance');
+    this.deps.auraOverlays?.().setPlacement(this.view === 'auras');
     switch (this.view) {
       case 'keybinds':
         this.renderKeybinds();
@@ -416,6 +435,9 @@ export class OptionsWindow {
         break;
       case 'interface':
         this.renderInterface();
+        break;
+      case 'auras':
+        this.renderAuras();
         break;
       case 'controller':
         this.renderController();
@@ -435,6 +457,14 @@ export class OptionsWindow {
     // buildTitle (it rerender()s internally, which would drop a listener added
     // here).
     el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());
+    // Performance is the one sub-view whose scroll wrapper needs a flex column
+    // (`.perf-scroll`, components.css, issue 2569); every other sub-view stays
+    // the plain block card. render() re-runs on every navigation (goBack, a
+    // menu entry), so this always reflects the CURRENT view, not just the one
+    // active when the window first opened. A perf control's own self-rerender
+    // (perf_overlay_settings.ts) rebuilds only its own subtree and never
+    // touches this display value, which is already correct while that view stays open.
+    if (this.opened) el.style.display = this.view === 'performance' ? 'flex' : 'block';
   }
 
   // Return to the Game Menu root without closing the window. The title-bar back
@@ -1193,6 +1223,23 @@ export class OptionsWindow {
     if (!hooks) return;
     this.perfSettings ??= new PerfOverlaySettingsPanel(this.perfSettingsHost(hooks));
     this.perfSettings.render(this.deps.root());
+  }
+
+  private renderAuras(): void {
+    const hooks = this.deps.auraOverlays?.();
+    if (!hooks) return;
+    this.deps.root().classList.add('aura-wide');
+    const body = this.settingsViewShell(t('hudChrome.auraOverlay.title'));
+    this.auraSettings ??= new AuraOverlaySettingsPanel({
+      auras: hooks,
+      click: () => audio.click(),
+      openFocusTrap: this.deps.openFocusTrap,
+    });
+    this.auraSettings.render(body);
+    this.deps
+      .root()
+      .querySelector('[data-close]')
+      ?.addEventListener('click', () => this.close());
   }
 
   private perfSettingsHost(hooks: OptionsHooks): PerfSettingsHost {

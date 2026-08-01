@@ -2006,6 +2006,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Det brevet finns inte längre i din låda.',
   'hudChrome.mailbox.result.needRecipient': 'Ange en mottagare för ditt brev.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Du kan inte skicka uppdragsföremål med post.',
+  'hudChrome.mailbox.result.noMailBound': 'Det föremålet är bundet och kan inte skickas med post.',
   'hudChrome.mailbox.result.noRecipient': 'Ingen med det namnet har en brevlåda här.',
   'hudChrome.mailbox.result.notEnoughItems': 'Du har inte så många att skicka.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Mottagarens brevlåda är full.',
@@ -4944,12 +4945,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.family.demon.desc':
     'Inkräktare bortom revorna, idel eld och ondska. Där en står är en bräsch aldrig långt borta.',
   'guide.family.demon.name': 'Demoner',
-  'guide.family.kobold.desc':
-    'Krypande asätare och älvor från glänta och häck, mer besvärliga än farliga tills de samlas i antal.',
-  'guide.family.kobold.name': 'Skälmar',
-  'guide.family.murloc.desc':
-    'Kväkande fiskfolk från sjöstrand och tidvattenspöl, snabba att svärma allt som vadar för nära.',
-  'guide.family.murloc.name': 'Kväkfenor',
   'guide.faqPage.a1':
     'Ja. Hela spelet är gratis att spela ända till nivåtaket, och källkoden är öppen på GitHub.',
   'guide.faqPage.a10':
@@ -5797,7 +5792,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.tradeFailed':
     'Handeln misslyckades: föremål eller pengar är inte längre tillgängliga.',
   'hud.errors.tradeInProgress': 'En handel pågår redan.',
+  'hud.errors.tradeAlreadyTrading': 'Den spelaren handlar redan.',
   'hud.errors.tradeBound': 'Det föremålet är bundet och kan inte handlas.',
+  'hud.errors.marketListBound': 'Det föremålet är bundet och kan inte säljas.',
   'hud.errors.tradeTooFar': 'Målet är för långt bort för att handla.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Okänt kommando: {command}. Prova /s /y /w /p /g.',
@@ -9483,8 +9480,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Avslutar nedkylningen för Flimmersteg, Frostslöja och Förbättrad osynlighet. (magikertalang)',
   'entities.abilities.greater_invisibility.name': 'Förbättrad osynlighet',
-  'entities.abilities.greater_invisibility.description':
-    'Försvinn i 20 sek.: tar bort 2 skadeeffekter över tid och du tar 90% mindre skada medan du är osynlig och en kort stund efteråt. (magikertalang)',
   'entities.abilities.hot_streak.name': 'Het svit',
   'entities.abilities.hot_streak.description':
     'Passiv: två kritiska träffar i rad med dina Eldbesvärjelser (Glödbult, Glödfall, Skålla, Pyrolans eller Flamslag) gör nästa Pyrolans eller Flamslag omedelbar och kostnadsfri. Förbrukarna räknas till NÄSTA svit, även kostnadsfria kast; ett Flamslag räknas en gång oavsett hur många fiender det träffar, och endast den första träffen kan räknas. (Eld)',
@@ -10799,4 +10794,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.started':
     'Fastna-hjälp om {seconds} sekunder. Att röra sig, strida, ta skada eller påbörja en annan handling avbryter den.',
   'hudChrome.unstuck.unavailable': 'Fastna-hjälp är inte tillgänglig i ditt nuvarande tillstånd.',
+  'hudChrome.riftTracker.title': 'Reva',
+  'hudChrome.riftTracker.floor': 'Våning {current} av {total}',
+  'hudChrome.riftTracker.closesIn': 'Stänger om {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
 };

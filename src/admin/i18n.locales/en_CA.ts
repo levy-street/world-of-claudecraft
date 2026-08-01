@@ -28,7 +28,6 @@ export const en_CA: Record<string, string> = {
   'stats.avgTick': 'avg tick',
   'stats.serverRss': 'server rss',
   'online.title': 'Players online',
-  'online.refreshHint': 'refreshes every 5s',
   'online.empty': 'nobody online right now',
   'online.colCharacter': 'Character',
   'online.colClass': 'Class',
