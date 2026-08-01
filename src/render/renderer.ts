@@ -42,6 +42,9 @@ import { attachAvatarFallback } from '../ui/avatar_fallback';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
+import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
+import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
+import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
@@ -67,10 +70,10 @@ import {
 } from './camera_feel_core';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
+import { type CharacterWeaponAura, characterWeaponAuraInto } from './character_effects';
 import {
   addCharacterEffectAura,
   CHARACTER_EFFECT_RECKLESSNESS,
-  CHARACTER_EFFECT_SANGUINE,
   CHARACTER_EFFECT_SOUL_REND,
   hasCharacterEffect,
 } from './character_effects_core';
@@ -397,7 +400,7 @@ const VIEW_PREWARM_MAX_MS = 12000;
 const VIEW_PREWARM_MAX_MS_CONSTRAINED = 5000;
 const PREWARM_COMPILE_MAX_MS_CONSTRAINED = 2500;
 // Shader linking is the whole point of the prewarm: if it doesn't finish, the
-// first in-world frame that needs a program compiles it synchronously — the
+// first in-world frame that needs a program compiles it synchronously, the
 // multi-hundred-ms (up to ~1.7s) freeze players feel when new model types
 // appear. So the compile step gets its own budget (it normally drains in <~100ms
 // with KHR_parallel_shader_compile) rather than racing the leftover view-build
@@ -428,7 +431,7 @@ const PERSISTENT_PORTAL_VIEW_PREWARM_LIMIT = 16;
 // rigs further than this stop casting articulated shadows (~7 draws each) and
 // hand off to a single-draw static-pose shadow proxy (the merged far-LOD mesh
 // with a colorWrite-off material) so mid-ground NPCs keep their grounding for
-// ~1/7 the cost — the pose freeze is invisible in a shadow blob this far out
+// ~1/7 the cost, the pose freeze is invisible in a shadow blob this far out
 const ENTITY_SHADOW_RANGE_SQ = 25 * 25;
 const ENTITY_PROXY_SHADOW_RANGE_SQ = 62 * 62;
 // loot sparkles further than this are hidden (sub-pixel, real draw cost)
@@ -469,7 +472,7 @@ const TILT_SAMPLE_SPAN = 0.55;
 // Beyond this (squared) an entity's footsteps/movement are inaudible, so we skip
 // the surface sample + dispatch entirely. Kept under the engine's own cutoff (46u).
 const SFX_MOVE_RANGE_SQ = 42 * 42;
-// Stride length (world units travelled) between footfalls — longer at a run.
+// Stride length (world units travelled) between footfalls, longer at a run.
 const FOOT_STRIDE_WALK = 0.95;
 const FOOT_STRIDE_RUN = 1.55;
 // Mount clips contain a full gait beat (usually two contacts), so their cadence
@@ -555,7 +558,7 @@ const INFERNAL_SUN_INTENSITY = 0.54;
 const INFERNAL_HEMI_INTENSITY = 0.32;
 const INFERNAL_ENV_INTENSITY = 0.1;
 const INFERNAL_RIM_BOOST = 2.15;
-// raw HDRI PMREMs integrate the real sun the dome shader clamps away —
+// raw HDRI PMREMs integrate the real sun the dome shader clamps away,
 // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
 const IBL_RAW_SCALE = 0.55;
 const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability — bosses crushed to black at 0.14
@@ -866,7 +869,7 @@ export interface EntityView {
   offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
   weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
   weaponStowed: boolean; // last-rendered sheathe state (Z key), diffed for live stow toggles
-  /** unscaled height — nameplate/vfx anchor reads height * e.scale */
+  /** unscaled height, nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
   liveScale: number;
@@ -1610,10 +1613,21 @@ export class Renderer {
   vfx: Vfx;
   private raceLine: RaceLine;
   private mountBeacon: MountBeacon;
+  // Per-ability spell VFX subsystem: the spec-driven painter plus the pooled
+  // primitive engine (ribbons, shock rings, decals, windup orbs, buff orbits;
+  // see src/render/ability_vfx/).
+  private abilityVfx: AbilityVfx;
+  private abilityVfxFx: AbilityVfxFx;
   private lightPulses: LightPulses;
   // Flash a pooled talent-moment point light at an entity's feet (see
   // light_pulses.ts); bound once in the constructor over the views map.
-  private pulseAt: (id: number, school: string, intensity: number, duration: number) => void;
+  private pulseAt: (
+    id: number,
+    school: string,
+    intensity: number,
+    duration: number,
+    range?: number,
+  ) => void;
   private frozenOrbFx!: FrozenOrbFx;
   private mageGroundFx!: MageGroundFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
@@ -1623,6 +1637,7 @@ export class Renderer {
     theme: 'frost',
     value: 0,
   };
+  private readonly weaponAuraScratch: CharacterWeaponAura = { color: 0, tip: false };
   private glacialFrontVisual!: GlacialFrontVisual;
   private fishingBobbers!: FishingBobberVisual;
   private weather: Weather;
@@ -1735,7 +1750,7 @@ export class Renderer {
     this.scene.matrixAutoUpdate = false;
     this.ambientPointSources = buildWorldAmbientSources(this.sim.cfg.seed);
     // No default-framebuffer MSAA on any tier: high/ultra get AA from the
-    // composer's MSAA HalfFloat target, low is meant to run without AA — and
+    // composer's MSAA HalfFloat target, low is meant to run without AA, and
     // requesting it here would hit software GL (the autodetect can only run
     // after the context exists) with the most expensive setting there is.
     this.webgl = new THREE.WebGLRenderer({
@@ -1845,7 +1860,7 @@ export class Renderer {
       LOW_GFX ? 325 : 700,
     );
 
-    // sky dome — follows the camera so the world strip never outruns it.
+    // sky dome, follows the camera so the world strip never outruns it.
     // High tier: shader gradient + sun glow with biome-aware horizon tints;
     // low keeps the legacy canvas-gradient dome.
     const initialX = this.sim.player.pos.x;
@@ -1949,7 +1964,8 @@ export class Renderer {
     const discTex = (r: number, g: number, b: number): THREE.CanvasTexture => {
       const cv = document.createElement('canvas');
       cv.width = cv.height = 128;
-      const ctx = cv.getContext('2d')!;
+      const ctx = cv.getContext('2d');
+      if (!ctx) throw new Error('2D canvas context unavailable');
       const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
       grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 1)`);
       grad.addColorStop(0.82, `rgba(${r}, ${g}, ${b}, 1)`); // solid plateau = crisp disc
@@ -1961,7 +1977,8 @@ export class Renderer {
     const glowTex = (r: number, g: number, b: number): THREE.CanvasTexture => {
       const cv = document.createElement('canvas');
       cv.width = cv.height = 128;
-      const ctx = cv.getContext('2d')!;
+      const ctx = cv.getContext('2d');
+      if (!ctx) throw new Error('2D canvas context unavailable');
       const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
       grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.5)`);
       grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
@@ -2014,7 +2031,8 @@ export class Renderer {
       const shaft = document.createElement('canvas');
       shaft.width = 64;
       shaft.height = 256;
-      const sctx = shaft.getContext('2d')!;
+      const sctx = shaft.getContext('2d');
+      if (!sctx) throw new Error('2D canvas context unavailable');
       const gh = sctx.createLinearGradient(0, 0, 0, 256);
       gh.addColorStop(0, 'rgba(255,240,200,0)');
       gh.addColorStop(0.45, 'rgba(255,240,200,0.55)');
@@ -2273,7 +2291,7 @@ export class Renderer {
       );
     }
 
-    // selection ring — a classic target reticle: a base ring plus four
+    // selection ring, a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
     // frame (see drapeRingLocalY / sync) so it stays legible on slopes instead
     // of sinking into the uphill ground; the ticks keep the classic spin on a
@@ -2460,18 +2478,113 @@ export class Renderer {
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
-    this.vfx = new Vfx(this.scene, (id, frac) => {
+    const vfxAnchor = (id: number, frac: number) => {
       const v = this.views.get(id);
       if (!v) return null;
       const e = this.sim.entities.get(id);
       const h = v.height * (e?.scale ?? 1) * frac;
       return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
-    });
+    };
+    this.vfx = new Vfx(this.scene, vfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
-    this.pulseAt = (id, school, intensity, duration) => {
+    this.abilityVfxFx = new AbilityVfxFx(this.scene, this.camera, vfxAnchor, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
+    this.abilityVfxFx.setViewportScale(
+      this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(),
+      60,
+    );
+    this.abilityVfx = new AbilityVfx({
+      vfx: this.vfx,
+      fx: this.abilityVfxFx,
+      anchor: vfxAnchor,
+      spawnAoeRing: (x, z, radius, school, colorHex) =>
+        this.spawnAoeRing(x, z, radius, school, colorHex),
+      triggerAttack: (id, abilityId) => this.triggerAttack(id, abilityId),
+      lightPulse: (id, school, intensity, duration, range) =>
+        this.pulseAt(id, school, intensity, duration, range),
+      setAuraGlow: (id, colorHex, intensity) => {
+        const v = this.views.get(id);
+        if (v) this.activeVisual(v)?.setAuraGlow(colorHex, intensity);
+      },
+      playShoutAnim: (id) => {
+        const v = this.views.get(id);
+        const vis = v ? this.activeVisual(v) : null;
+        if (vis && !vis.isMidOneShot) vis.playEmote('cheer', 1);
+      },
+      isMob: (id) => this.sim.entities.get(id)?.kind === 'mob',
+      castingAbilityOf: (id) => this.sim.entities.get(id)?.castingAbility ?? null,
+      isMidOneShot: (id) => {
+        const v = this.views.get(id);
+        return v ? !!this.activeVisual(v)?.isMidOneShot : false;
+      },
+      localPlayerId: () => this.sim.player.id,
+      hasGestureClip: (id, abilityId) => {
+        const v = this.views.get(id);
+        const vis = v ? this.activeVisual(v) : null;
+        return vis ? vis.hasAttackClipOverride(abilityId) : false;
+      },
+      isInstantAbility: (abilityId) => {
+        const def = ABILITIES[abilityId];
+        return !def || (def.castTime <= 0 && !def.channel && !def.empowerStages);
+      },
+      // heavy VFX moments (fissures, gavel verdicts, finisher crits) ride the
+      // Fiesta trauma accumulator; the fx engine has already applied distance
+      // falloff and its rolling anti-spam budget
+      addShake: (amount) => this.addShake(amount),
+      // contact-frame hitstop: only THAT rig's animation clock slows (the
+      // world, sim, and every other character keep running); the visual
+      // guards against stacking
+      animHold: (id, scale, dur) => {
+        const v = this.views.get(id);
+        if (v) this.activeVisual(v)?.holdFrame(scale, dur);
+      },
+      // caster windup lean, fed per frame by the staged ceremony
+      bodyLean: (id, amount) => {
+        const v = this.views.get(id);
+        if (v) this.activeVisual(v)?.setWindupLean(amount);
+      },
+      // screen feedback (crit flash, finisher ripples): composer-gated like
+      // bloom, skipped for reduced-motion players
+      screenFlash: (strength) => {
+        if (this.post && !this.reducedMotion()) this.post.screenFlash(strength);
+      },
+      screenImpact: (x, y, z, strength) => this.screenImpactAt(x, y, z, strength),
+      // per-ability procedural audio (release whooshes, palette impact
+      // identities, zone pulses, crit stings) rides the injected spatial
+      // audio sink; offline/headless hosts without one stay silent
+      abilityAudio: (kind, palette, power, x, y, z, opts) =>
+        this.audioSink?.abilityAudio?.(kind, palette, power, x, y, z, opts),
+    });
+    // Dev-only ability VFX probe surface (scripts/ability_vfx_probe.mjs):
+    // self-installs onto window.__game once main.ts has assembled it, so the
+    // probe wiring lives entirely inside the subsystem it measures and the
+    // production bundle carries none of it.
+    if (import.meta.env.DEV && typeof window !== 'undefined') {
+      const install = () => {
+        const g = (window as unknown as { __game?: Record<string, unknown> }).__game;
+        if (!g) {
+          setTimeout(install, 250);
+          return;
+        }
+        if (!g.abilityVfxStats) {
+          g.abilityVfxStats = () => this.abilityVfxStats();
+          g.abilityVfxGlow = (id: number) => this.abilityVfxGlow(id);
+          g.abilityVfxGroundAuras = (id: number) => this.abilityVfxGroundAuras(id);
+          g.abilityVfxAttackCount = () => this.abilityVfxAttackCount();
+          g.abilityVfxProbe = {
+            specs: ABILITY_VFX_SPECS,
+            fullSpecs: ABILITY_VFX_FULL_SPECS,
+            abilities: ABILITIES,
+          };
+        }
+      };
+      setTimeout(install, 250);
+    }
+    this.pulseAt = (id, school, intensity, duration, range) => {
       const v = this.views.get(id);
       if (!v) return;
-      this.lightPulses.pulse(v.group.position, school, intensity, duration);
+      this.lightPulses.pulse(v.group.position, school, intensity, duration, range);
     };
 
     // Show-jumping racing line: self-scoped course guidance, hidden outside the
@@ -2586,6 +2699,7 @@ export class Renderer {
       devicePxHeight *= rect.renderHeight / rect.targetHeight;
     }
     this.vfx.setViewportScale(devicePxHeight, 60);
+    this.abilityVfxFx.setViewportScale(devicePxHeight, 60);
     // Weapon-skin VFX point sprites size against the device-pixel height too:
     // future rigs read the module value, live rigs re-scale in place.
     setWeaponVfxViewportHeight(devicePxHeight);
@@ -3271,6 +3385,7 @@ export class Renderer {
     this.foliage.setGrassQuality(state.levels.grass);
     this.foliage.setModelQuality(state.levels.foliage);
     this.vfx.setQuality(state.levels.vfx);
+    this.abilityVfx.setQuality(state.levels.vfx);
     this.effectivePointLights = Math.max(1, Math.round(GFX.maxPointLights * state.levels.lighting));
     if (
       Math.abs(previousScale - this.effectiveRenderScale) >= 0.001 &&
@@ -4035,6 +4150,7 @@ export class Renderer {
       this.reducedMotion(),
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
+    this.abilityVfx.update(dt);
     this.vfx.update(dt);
     this.vfx.prepareDraw(this.camera);
     this.frozenOrbFx.update(dt);
@@ -4258,7 +4374,7 @@ export class Renderer {
     return { group, pooled };
   }
 
-  // Every NPC visual MODEL once (NPCs were not prewarmed at all — entering a zone hub
+  // Every NPC visual MODEL once (NPCs were not prewarmed at all, entering a zone hub
   // compiled their shaders live). Most NPCs share a handful of models (npc_knight,
   // npc_mage, ...), so dedup by model key (visualKeyFor) builds each only once.
   private buildNpcPrewarmGroup(
@@ -4318,6 +4434,26 @@ export class Renderer {
         visual.root.visible = true;
         place(visual.root);
       }
+    }
+    // One EXTRA rig per class wearing the ability-VFX aura glow: setAuraGlow's
+    // on-edge swaps the rig materials for private clones, and on the tinted
+    // player rigs that clone links a NEW program. Without this seed the FIRST
+    // spec'd cast of a session compiles it synchronously mid-frame - the
+    // measured 'mage' program link landing inside the player's own cast
+    // moment (e.g. mid Solemn Prayer cast bar). Seeding glow-lit copies here
+    // puts the clone materials in front of programs.compile while the base
+    // rigs above still carry the un-glowed originals; the group is removed in
+    // the prewarm finally, but the linked programs stay cached for the
+    // session.
+    for (const cls of ALL_CLASSES) {
+      if (performance.now() >= deadline) return { group, visualCount: idx };
+      const color = CLASSES[cls]?.color ?? 0xffffff;
+      const entity = this.prewarmEntity('player', cls, color, 1, 0, -11_500 - idx);
+      const visual = createCharacterVisual(entity);
+      if (!visual) continue;
+      visual.root.visible = true;
+      visual.setAuraGlow(0xffffff, 0.02);
+      place(visual.root);
     }
     return { group, visualCount: idx };
   }
@@ -4406,6 +4542,15 @@ export class Renderer {
     for (const mat of mats) {
       const textureMat = mat as TextureBackedMaterial;
       for (const key of textureKeys) this.prewarmTexture(textureMat[key]);
+      // ShaderMaterials (ability-vfx pools, custom fx) hold their textures in
+      // uniforms, invisible to the standard-key walk above.
+      const shaderMat = mat as THREE.ShaderMaterial;
+      if (shaderMat.isShaderMaterial) {
+        for (const uniform of Object.values(shaderMat.uniforms)) {
+          const value = uniform?.value as { isTexture?: boolean } | null | undefined;
+          if (value?.isTexture) this.prewarmTexture(value as THREE.Texture);
+        }
+      }
     }
   }
 
@@ -4673,8 +4818,8 @@ export class Renderer {
     const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);
     const started = performance.now();
     const deadline = started + maxMs;
-    // Stop the archetype-build steps early so the later entries — crucially
-    // programs.compile — still START before `deadline` (runEntry skips anything
+    // Stop the archetype-build steps early so the later entries, crucially
+    // programs.compile, still START before `deadline` (runEntry skips anything
     // that begins past it). Compiling is what kills the in-world freeze.
     const buildDeadline = deadline - PREWARM_BUILD_RESERVE_MS;
     const manifestEntries: RendererPrewarmManifestEntryStats[] = [];
@@ -4897,7 +5042,7 @@ export class Renderer {
       },
       {
         // Players are the #1 shader-compile trigger in a crowd, so build their
-        // archetypes first (before the long mob tail) — guaranteed within budget.
+        // archetypes first (before the long mob tail), guaranteed within budget.
         id: 'entities.player-archetypes',
         category: 'entities',
         priority: 34,
@@ -5083,6 +5228,28 @@ export class Renderer {
         detail: () => `bursts=${vfxPrewarmBursts}`,
       },
       {
+        // Spawn one of every pooled ability-VFX primitive (rings, decals,
+        // pillar, shell, slash ribbon, overlay sprite). The pools build their
+        // meshes visible=false, so neither the render passes nor
+        // programs.compile ever see their ShaderMaterials, the first spec'd
+        // cast in the open world used to link them synchronously. The spawns
+        // also bind the per-style decal textures, so the texture re-walk below
+        // uploads the whole canvas set now. abilityVfxFx.clear() in the
+        // finally block hides everything again.
+        id: 'vfx.ability-primitives',
+        category: 'vfx',
+        priority: 62,
+        required: false,
+        run: () => {
+          this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
+          this.scene.traverse((child) => {
+            const renderable = child as RenderableDiagnosticObject;
+            if (renderable.userData.renderCategory !== 'vfx' || !renderable.material) return;
+            this.prewarmMaterialTextures(renderable.material);
+          });
+        },
+      },
+      {
         id: 'world.initial-frame',
         category: 'world',
         priority: 70,
@@ -5101,7 +5268,7 @@ export class Renderer {
           const compileStart = performance.now();
           // Use a dedicated budget, not `deadline - now`: linking every program now is
           // exactly what prevents the in-world freeze, so a near-empty leftover budget
-          // must not cut it short (the old bug — the async compile timed out and the
+          // must not cut it short (the old bug, the async compile timed out and the
           // programs linked synchronously on first sight instead).
           // Constrained (phone WebKit) without KHR_parallel_shader_compile: BOTH arms
           // below are one multi-second synchronous main-thread block (compileAsync
@@ -5230,6 +5397,7 @@ export class Renderer {
       }
     } finally {
       this.vfx.clear();
+      this.abilityVfxFx.clear();
       if (doorPrewarmGroup) this.scene.remove(doorPrewarmGroup);
       if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
       if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
@@ -5307,6 +5475,26 @@ export class Renderer {
   handleEvent(ev: SimEvent): void {
     switch (ev.type) {
       case 'spellfx': {
+        // Goad: the warrior audibly swears at the victim - a grawlix bark over
+        // the caster's head, riding the completion cue every client receives,
+        // so other players see the taunt too. Before the claim: the painter
+        // owns the wave/sequence, the bubble is this renderer's own read.
+        // Pure symbols, so it is i18n-exempt (CLAUDE.md: emojis/symbols need
+        // no t() entry) - it must read as swearing in every locale.
+        if (ev.fx === 'selfCast' && ev.ability === 'taunt') {
+          this.showChatBubble(ev.sourceId, '$@#%&*!', false, 1.8);
+        }
+        // Spec-driven per-ability visuals claim the event first; unknown
+        // ability/fx falls through to the generic school-colored arms below.
+        if (this.abilityVfx.handleSpellfx(ev)) break;
+        // 'selfCast' is a renderer-only cue this layer introduced (see
+        // casting_lifecycle: the silent completions that emit no damage,
+        // projectile or castFx). It has no legacy meaning, so an ability the
+        // painter declines (no spec, or an archetype it does not claim) must
+        // draw NOTHING rather than reach the terminal school nova below and
+        // pop a burst that never existed before (sport_second_wind is the
+        // reachable case today).
+        if (ev.fx === 'selfCast') break;
         if (ev.fx === 'blinkStep') {
           // A teleport step (Flickerstep / Shadowstep): reset the cached self
           // position so the body snaps to the authoritative destination. A
@@ -5436,6 +5624,14 @@ export class Renderer {
         break;
       }
       case 'spellfxAt': {
+        // Spec-driven ground-cast visuals claim the point-anchored cues first
+        // (aimed 'nova'/'burst' landings and 'tick' zone pulses). The painter
+        // deliberately never claims meteorFall/snowZone/runeCircle/orb: those
+        // four are stateful lifetime visuals (a ball timed to its landing,
+        // snowfall over the zone's whole life, a persistent inscription, the
+        // roaming orb) that its one-shot sequences would read worse than, so
+        // their dedicated arms below stay authoritative.
+        if (this.abilityVfx.handleSpellfxAt(ev)) break;
         // The Frozen Orb flight, animated locally from its three moments:
         // 'release' starts the drift, 'halt'/'resume' freeze and restart it at
         // the server's real coordinates when the orb latches onto an enemy.
@@ -5511,6 +5707,8 @@ export class Renderer {
           this.triggerHit(ev.targetId);
           if (ev.school === 'physical') this.vfx.meleeSpark(ev.targetId, ev.crit);
         }
+        // spec-driven per-ability impact accent (no-op for unknown abilities)
+        this.abilityVfx.onDamage(ev);
         break;
       }
       case 'heal2':
@@ -5765,6 +5963,18 @@ export class Renderer {
     punchCameraFov(this.camFeel, degrees);
   }
 
+  // Ability-VFX screen feedback (spec.screenFx finishers / big novas): a
+  // world-anchored radial distortion ripple plus a faint flash on the post
+  // chain. Composer-gated like bloom (the low tier renders direct and pays
+  // nothing) and skipped entirely for reduced-motion players.
+  private screenImpactAt(x: number, y: number, z: number, strength: number): void {
+    if (!this.post || this.reducedMotion()) return;
+    this.post.screenRipple(x, y, z, strength);
+    // spectacle calibration: the finisher pop reads brighter (still well under
+    // the pass's 0.4 clamp and the ~3-frame decay, a pop, never a strobe)
+    this.post.screenFlash(0.12 * strength);
+  }
+
   // A golden pillar bursts up off a fighter who just locked in an augment.
   fiestaAugmentBurst(entityId: number): void {
     this.vfx.levelUpPillar(entityId);
@@ -5928,7 +6138,7 @@ export class Renderer {
       body = built.body;
       portal = built.portal;
       height = 4.6;
-      objectMesh = body!;
+      objectMesh = built.body;
       // World-spawned ranked portals carry their rank as a big floating badge
       // (colour square + letter) so the tier reads from across the zone.
       if (e.templateId === 'rift_portal' && e.riftTier) {
@@ -5995,7 +6205,7 @@ export class Renderer {
       const built = buildDelveInteractable(e.templateId, e.id);
       body = built.group;
       height = built.height;
-      objectMesh = body!;
+      objectMesh = built.group;
       // Pressure plates are flush to the floor, no sparkle clutter overhead.
       if (
         e.templateId !== 'delve_pressure_plate' &&
@@ -6035,7 +6245,7 @@ export class Renderer {
         height = built.height;
         objectPoolKey = null;
       }
-      objectMesh = body!;
+      objectMesh = body;
       if (!this.sparkleMat) {
         this.sparkleMat = new THREE.SpriteMaterial({
           map: sparkleTexture(),
@@ -6119,25 +6329,27 @@ export class Renderer {
 
     let clickTarget: THREE.Object3D;
     if (visual) {
-      // raycasting skinned meshes is expensive — pick against the invisible
+      // raycasting skinned meshes is expensive, pick against the invisible
       // capsule proxy instead (three's raycaster ignores `visible`)
       if (!isQuestVision) visual.clickProxy.userData.entityId = e.id;
       clickTarget = visual.clickProxy;
     } else {
-      group.add(body!);
-      body?.traverse((o) => {
-        o.userData.entityId = e.id;
-      });
-      // Prop builders hang their ambience handles (rolling rock, orbiting
-      // shards, pulsing veins, pylon flame, the mail votive) on the BODY they
-      // return, but the per-frame animation pass reads them from the view
-      // GROUP: hoist them across or every one of those animations sits inert.
+      // every object branch above built a body; the bare group is a benign
+      // fallback for the (unreachable) no-body case
       if (body) {
+        group.add(body);
+        body.traverse((o) => {
+          o.userData.entityId = e.id;
+        });
+        // Prop builders hang their ambience handles (rolling rock, orbiting
+        // shards, pulsing veins, pylon flame, the mail votive) on the BODY they
+        // return, but the per-frame animation pass reads them from the view
+        // GROUP: hoist them across or every one of those animations sits inert.
         for (const key of ['rollRock', 'riftOrbiters', 'riftPulse', 'riftFlame', 'mailGlow']) {
           if (body.userData[key] !== undefined) group.userData[key] = body.userData[key];
         }
       }
-      clickTarget = body!;
+      clickTarget = body ?? group;
     }
     group.scale.setScalar(e.scale);
     group.position.set(e.pos.x, e.pos.y, e.pos.z);
@@ -6491,10 +6703,32 @@ export class Renderer {
     else this.lightOwnerGroups.delete(v.group);
   }
 
+  // Dev probe surface (scripts/ability_vfx_probe.mjs via window.__game):
+  // per-ability claim/primitive counters from the ability VFX painter, the
+  // live body-glow intensity of an entity, and the one-shot swing counter.
+  abilityVfxStats(): Record<string, { claimed: number; primitives: number }> {
+    return this.abilityVfx.statsSnapshot();
+  }
+
+  abilityVfxGlow(entityId: number): number {
+    return this.abilityVfx.glowIntensityOf(entityId);
+  }
+
+  abilityVfxGroundAuras(entityId: number): number {
+    return this.abilityVfx.groundAuraCountOf(entityId);
+  }
+
+  abilityVfxAttackCount(): number {
+    return this.attackTriggerCount;
+  }
+
+  private attackTriggerCount = 0;
+
   triggerAttack(entityId: number, abilityId?: string): void {
     const v = this.views.get(entityId);
     const visual = v ? this.activeVisual(v) : null;
     if (!visual) return;
+    this.attackTriggerCount++;
     if (isSpinAttackAbility(abilityId)) visual.playWhirl();
     else visual.playAttack(abilityId);
   }
@@ -7034,7 +7268,7 @@ export class Renderer {
         fog.near = 12;
         fog.far = 78;
       } else if (desired === 'nythraxis') {
-        // the raid arena is huge (±230) — push the murk back so ~50yd reads
+        // the raid arena is huge (±230), push the murk back so ~50yd reads
         // clear (linear-fog midpoint (near+far)/2 = 50), not the old ~30
         fog.color.setHex(0x020106);
         fog.near = 20;
@@ -7085,7 +7319,7 @@ export class Renderer {
       }
       // interiors must not leak daylight: drop sun + sky ambient + IBL
       // underground so the torch point lights own the scene; restore outside.
-      // The rim glow cranks up instead — silhouettes must split from the murk.
+      // The rim glow cranks up instead, silhouettes must split from the murk.
       if (!this.lowGfx) {
         const mazeNight = desired === 'yumiMaze';
         const wildheartSun = desired === 'wildheartField';
@@ -7322,7 +7556,7 @@ export class Renderer {
     if (idx >= 0) this.clickTargets.splice(idx, 1);
     if (v.visual) {
       // Character geometry/materials are shared per-asset caches and must
-      // survive interest churn — dispose only per-instance mixer bindings.
+      // survive interest churn, dispose only per-instance mixer bindings.
       if (v.visualPoolKey) this.storePooledVisual(v.visualPoolKey, v.visual);
       else v.visual.dispose();
       v.sheepVisual?.dispose();
@@ -7576,7 +7810,7 @@ export class Renderer {
         v.group.visible = false;
         continue;
       }
-      // form swaps (polymorph sheep, druid forms) — computed up front because
+      // form swaps (polymorph sheep, druid forms), computed up front because
       // the shadow gates below must not run the base rig's proxy under a form.
       // One pass over the aura list instead of repeated .some() scans per entity per
       // frame; the flag combination below preserves the original precedence.
@@ -7626,7 +7860,6 @@ export class Renderer {
       const fireballForm = !polyed && !bear && !cat && !travel && hasFireballForm;
       const _stealthed = hasStealth;
       const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
-      const hasSanguineAura = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SANGUINE);
       const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
       // Pose carries information the player acts on (own feedback, the read on
       // the current target, pet combat, a cast windup telegraph) rather than
@@ -7656,7 +7889,7 @@ export class Renderer {
       if (!isSelf) {
         // Per-frame visibility uses the same create/destroy hysteresis as view
         // retention (above) so a rig hovering right at the draw edge
-        // doesn't toggle visible/invisible every frame — that hard cutoff is the
+        // doesn't toggle visible/invisible every frame, that hard cutoff is the
         // actual on-screen boundary flicker. group.visible carries last frame's
         // state: once shown, keep it until past the 96yd destroy radius (where
         // the view is torn down anyway); while hidden, show only within 80yd.
@@ -7693,7 +7926,7 @@ export class Renderer {
               !v.mountVisual &&
               !fireballForm,
           );
-          // sheep/forms keep articulated shadows through the whole proxy band —
+          // sheep/forms keep articulated shadows through the whole proxy band:
           // a frozen humanoid proxy silhouette would be wrong under a form
           const wantFormShadow = wantShadow || inProxyBand;
           v.sheepVisual?.setShadow(wantFormShadow);
@@ -7898,13 +8131,13 @@ export class Renderer {
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
 
-      // live skin swap — appearance changed (in-game changer or a multiplayer peer)
+      // live skin swap, appearance changed (in-game changer or a multiplayer peer)
       if (e.skin !== v.skin) {
         v.skin = e.skin;
         v.visual.setSkin(e.skin);
       }
 
-      // live held-weapon swap — equipped mainhand changed (self equip or a peer's
+      // live held-weapon swap, equipped mainhand changed (self equip or a peer's
       // gear update); setWeapon no-ops on classes with a fixed weapon (hunter)
       if (e.mainhandItemId !== v.mainhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
@@ -7925,7 +8158,8 @@ export class Renderer {
         v.visual.setWeaponSkin(e.weaponSkinId);
         this.reconcileViewLights(v);
       }
-      v.visual.setWeaponAura(hasSanguineAura);
+      const weaponAura = characterWeaponAuraInto(e, this.weaponAuraScratch);
+      v.visual.setWeaponAura(weaponAura ? weaponAura.color : null, weaponAura?.tip ?? false);
 
       // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
       // props between the hands and the on-back pose (self or a peer)
@@ -8017,13 +8251,19 @@ export class Renderer {
               : travel && v.travelVisual
                 ? v.travelVisual
                 : v.visual;
+      const stealthGhost = shouldRenderStealthGhost(this.sim.playerId, e);
       const ghost =
         ghostWolf ||
-        shouldRenderStealthGhost(this.sim.playerId, e) ||
+        stealthGhost ||
         e.templateId.startsWith('vision_') ||
         e.ghost || // a released player spirit renders translucent (the ghost run)
         e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
-      active.setGhost(ghost);
+      // Duskveil/Smokestep wear the denser stealth fade; every spirit read
+      // (ghost run, ghost wolf, visions, the graveyard angel) keeps the thin
+      // ethereal one. A dead stealther is a spirit first.
+      const ghostStyle =
+        stealthGhost && !ghostWolf && !e.ghost ? ('stealth' as const) : ('spirit' as const);
+      active.setGhost(ghost, ghostStyle);
       active.setSoulRend(hasSoulRend);
       // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
       // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
@@ -8087,7 +8327,7 @@ export class Renderer {
       const visuallyDead = isVisuallyDead(e) && !e.ghost;
       // `onGround` is authoritative offline but is never sent in online snapshots
       // (ClientWorld defaults it to true), so for players fall back to deriving the
-      // airborne state from foot height vs terrain — keeps the jump pose working in
+      // airborne state from foot height vs terrain, keeps the jump pose working in
       // both worlds without a wire change. Gated to players (only they jump) to keep
       // the extra groundHeight sample off the hot path for mobs/NPCs.
       // The local player uses the predictor's kernel onGround when it is active:
@@ -8280,7 +8520,7 @@ export class Renderer {
             );
           }
         } else {
-          // standing still — prime the accumulator so the first step after moving
+          // standing still, prime the accumulator so the first step after moving
           // lands promptly rather than after a full stride of travel.
           v.stepAccum = FOOT_STRIDE_WALK * 0.6;
         }
@@ -8516,6 +8756,9 @@ export class Renderer {
         }
       }
 
+      // per-ability windup orb + buff-orbit bands (spec-driven; no-op for
+      // entities with no spec'd cast or aura)
+      this.abilityVfx.syncEntity(e);
       if (st.casting) {
         this.vfx.castSparkle(
           e.id,
@@ -8523,8 +8766,10 @@ export class Renderer {
             ? 'frost'
             : e.castingAbility === 'demon_heal'
               ? 'shadow'
-              : (ABILITIES[e.castingAbility!]?.school ?? 'arcane'),
+              : (ABILITIES[e.castingAbility ?? '']?.school ?? 'arcane'),
           dt,
+          // per-ability spec color when the casting ability has one
+          this.abilityVfx.sparkleColorFor(e.castingAbility),
         );
       }
       if (hasSoulRend) {
@@ -8761,6 +9006,7 @@ export class Renderer {
       this.sim.questState('q_riding_lessons') === 'active' && !this.sim.mountRaceView(),
       this.time,
     );
+    this.abilityVfx.update(dt);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
@@ -8962,8 +9208,12 @@ export class Renderer {
     this.updateOpaqueDrawOrder(dt);
     if (shakeX !== 0 || shakeY !== 0) this.camera.updateMatrixWorld();
     this.vfx.prepareDraw(this.camera);
-    if (this.post) this.post.render();
-    else this.webgl.render(this.scene, this.camera);
+    if (this.post) {
+      // screen-fx pass state (ripple re-projection, flash decay) advances
+      // with the camera finalized for this frame
+      this.post.updateScreenFx(dt);
+      this.post.render();
+    } else this.webgl.render(this.scene, this.camera);
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;
@@ -9152,7 +9402,7 @@ export class Renderer {
     // triangles against its enclosed caldera rim. The basin keeps the sun,
     // sky, and outdoor grade while reserving these shafts for the overworld.
     const outdoor = this.fogState === 'outdoor';
-    // azimuth-only alignment — the chase cam always pitches down while the
+    // azimuth-only alignment, the chase cam always pitches down while the
     // sun sits high, so a full 3D dot product would never light the shafts
     this.camera.getWorldDirection(this.tmpV);
     this.tmpV.y = 0;
@@ -9542,7 +9792,7 @@ export class Renderer {
             : biome === 'marsh' || biome === 'haunt'
               ? 'rain' // the haunted wood drips under a permanent drizzle
               : null;
-      // Only at the water's edge / in it — sampled at the player, so a loose
+      // Only at the water's edge / in it, sampled at the player, so a loose
       // threshold made the loop bleed across the low marsh from far off.
       const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
@@ -9553,8 +9803,14 @@ export class Renderer {
   }
 
   // Hang a speech bubble over an entity's head; it follows the entity and
-  // fades out after a few seconds (longer for longer messages).
-  showChatBubble(entityId: number, text: string, style?: boolean | ChatBubbleStyle): void {
+  // fades out after a few seconds (longer for longer messages), or after the
+  // caller's explicit ttl (short reaction barks like Goad's grawlix).
+  showChatBubble(
+    entityId: number,
+    text: string,
+    style?: boolean | ChatBubbleStyle,
+    ttlSec?: number,
+  ): void {
     // Back-compat: the older 3-arg call passes a bare `yell` boolean; the chat
     // gate passes a full descriptor (the party channel tint).
     const s: ChatBubbleStyle = typeof style === 'boolean' ? { yell: style } : (style ?? {});
@@ -9575,7 +9831,7 @@ export class Renderer {
     b.el.style.borderColor = s.border ?? '';
     // wall-clock ttl: sim/render time can run slower than real time under
     // frame-delta clamping, which would keep bubbles up too long
-    b.until = performance.now() + 1000 * Math.min(10, 3.5 + text.length * 0.045);
+    b.until = performance.now() + 1000 * (ttlSec ?? Math.min(10, 3.5 + text.length * 0.045));
   }
 
   private updateChatBubbles(): void {
@@ -9595,7 +9851,7 @@ export class Renderer {
         continue;
       }
       // culled rigs (beyond ENTITY_DRAW_RANGE) stop updating group.position,
-      // so a yell from 80–100u away would hang frozen over empty terrain —
+      // so a yell from 80 to 100u away would hang frozen over empty terrain:
       // fall back to the live entity position when the rig isn't being drawn
       if (v.group.visible) this.tmpV.copy(v.group.position);
       else this.tmpV.set(e.pos.x, e.pos.y, e.pos.z);
@@ -9617,7 +9873,7 @@ export class Renderer {
   }
 
   // Click-to-move (#95): where a screen click meets the ground. Intersects a
-  // horizontal plane at the player's foot height — robust on the gentle terrain
+  // horizontal plane at the player's foot height, robust on the gentle terrain
   // here and far cheaper than raycasting the terrain mesh.
   groundPoint(clientX: number, clientY: number, planeY: number): { x: number; z: number } | null {
     this.raycastNdc.set(
@@ -9702,7 +9958,7 @@ export class Renderer {
   // character within a small screen radius when nothing was hit directly.
   pickSloppy(clientX: number, clientY: number): number | null {
     // Forgiving assist: nothing under the ray, so snap to the nearest
-    // targetable character within a small screen radius — chibi proportions
+    // targetable character within a small screen radius, chibi proportions
     // and melee scrums (often hidden behind the player's own model) make
     // precise capsule clicks fiddly. Objects (doors/loot) still need a
     // direct hit; the local player never competes for the click.

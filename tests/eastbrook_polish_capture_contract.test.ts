@@ -360,13 +360,15 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned: the graphics overhaul changed the fingerprinted
-      // runtimeRender inputs (the renderer integration and view-priority policy
-      // leaves), so this composite mints fresh on top of the 0.33.0 version
-      // sync's re-mint. The GLB source-fingerprint leaves are unchanged from
-      // release/v0.33.0, no pipeline input or geometry value changed, and no
-      // capture was retaken.
-      fingerprint: '9d38235f6a16ce60925c0faa28567775cbdb640f1749686c866ffeb9e5a10cb9',
+      // Deliberately re-pinned. Three independent causes stack in this merge:
+      // the 0.33.0 version sync moved every GLB source-fingerprint leaf
+      // (#2729), the graphics overhaul changed the renderer-integration and
+      // view-priority leaves, and this branch edits src/render/renderer.ts as
+      // well. So the composite mints fresh and matches no parent's literal.
+      // No pipeline input or geometry value changed, and no capture was
+      // retaken.
+      fingerprint: '69a1db26a13326093d091a0fd31c1a625735baf90fc1a60b5ee45ec5f38f3e84',
+
       components: {
         captureContract: {
           id: 'polish-v2',

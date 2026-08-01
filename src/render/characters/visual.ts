@@ -1,7 +1,7 @@
 // Per-entity character visual: a SkeletonUtils clone of a manifest asset with
 // its own AnimationMixer, a clip-driven state machine fed by renderer-derived
 // state, a baked static idle-pose far LOD, and a shadow-only proxy for the
-// mid-distance band. All geometry/materials are shared caches — dispose()
+// mid-distance band. All geometry/materials are shared caches, dispose()
 // only releases mixer bindings.
 import * as THREE from 'three';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
@@ -152,6 +152,20 @@ const env01 = (t: number, a: number, b: number): number => {
 };
 const HIT_REACT_COOLDOWN = 0.9;
 
+// Contact-frame hitstop (gallery melee "bite": timeScale ~0.07 for ~0.11s at
+// contact). Only THIS rig's animation clock slows, the world, the sim, and
+// every other character keep running, so it is multiplayer-safe by
+// construction. After a hold ends, a short refractory swallows re-triggers so
+// a fast swing chain cannot smear the rig into slow motion.
+const HOLD_REFRACTORY_S = 0.25;
+// Windup lean spring (gallery updateBodyFeel: -0.085 rad ease during windup,
+// released through a small forward recoil snap). Fed per frame; auto-releases
+// when feeding stops.
+const LEAN_FEED_S = 0.12;
+const LEAN_RECOIL_S = 0.14;
+const LEAN_MAX_RAD = 0.12;
+
+// Lie_Idle already lays the rig flat, a touch of extra pitch reads as a
 // The climb's baked clips (player rigs all ship both): Spellcast_Raise's
 // first stretch throws the arms overhead (the reach to the lip), and
 // Sit_Floor_Down run BACKWARD is a floor-crouch rising to a stand (the
@@ -168,8 +182,7 @@ const CLIMB_HANDOFF_END = 0.72;
 /** Climb phase by which the top-out stands fully upright. */
 const CLIMB_TOPOUT_END = 0.98;
 
-// Lie_Idle already lays the rig flat — a touch of extra pitch reads as a
-// surface glide; clip-less rigs (creatures) get the full procedural prone
+// Lie_Idle already lays the rig flat, a touch of extra pitch reads as a
 const SWIM_PITCH_CLIP = 0.35;
 const SWIM_PITCH_PROCEDURAL = 1.18;
 const SWIM_RISE = 0.95; // body must break the surface or only the hat floats
@@ -179,6 +192,9 @@ const SPIN_ATTACK_TIMESCALE = 1.6;
 const SPIN_ONCE_DURATION = 0.55;
 const SPIN_ONCE_RATE = 18;
 const GHOST_OPACITY = 0.34;
+// Stealth (Duskveil/Smokestep) reads as a faded-but-solid silhouette, a touch
+// denser than the spirit run's 0.34 (owner: stealth was "too transparent").
+const STEALTH_OPACITY = 0.45;
 const SOUL_REND_OPACITY = 0.58;
 const SOUL_REND_TINT = new THREE.Color(0x4f0505);
 const SHADOWFORM_OPACITY = 0.9;
@@ -192,6 +208,10 @@ const MOONKIN_TINT = new THREE.Color(0x9d6bff);
 // dark enough that the body still shades and the flames read against it.
 const METAMORPH_TINT = new THREE.Color(0x4f2170);
 
+/** Translucent-rig flavor: 'spirit' is the thin ghost run (released spirits,
+ *  ghost wolf, the graveyard angel); 'stealth' is the denser Duskveil fade. */
+export type GhostStyle = 'spirit' | 'stealth';
+
 /** The live mixer facts the pure watchdog decides on (see anim_state.ts). */
 function readActionWeight(a: THREE.AnimationAction, into?: AnimActionWeight): AnimActionWeight {
   const scheduled = a.isScheduled();
@@ -202,7 +222,7 @@ function readActionWeight(a: THREE.AnimationAction, into?: AnimActionWeight): An
   return into;
 }
 
-// shared invisible click capsule — raycaster ignores `visible`, render doesn't
+// shared invisible click capsule, raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
 function clickGeo(): THREE.CylinderGeometry {
   if (!clickGeoSingleton) {
@@ -225,10 +245,67 @@ function shadowOnlyMat(): THREE.Material {
   return shadowOnlySingleton;
 }
 
+// Tip-scoped weapon aura: how far up the blade the wash starts (fraction of
+// the blade's long axis measured from the grip) and how quickly it ramps in.
+const WEAPON_AURA_TIP_START = 0.55;
+const WEAPON_AURA_TIP_RAMP = 0.35;
+
+/** A private clone of the weapon mesh geometry carrying an RGBA vertex-color
+ *  ramp: opaque white at the blade tip fading to alpha 0 toward the grip, so
+ *  an additive overlay in this geometry reads as a tipped weapon (Adder's
+ *  Bite) instead of the full soak. The blade axis is the geometry's longest
+ *  bbox extent; the tip is whichever end of it sits farther from the grip
+ *  (the holder origin, transformed into this mesh's local space so quantized
+ *  or recentered geometry cannot flip the ramp). Returns null when the
+ *  geometry cannot be ramped (no position attribute); callers fall back to
+ *  the full-blade overlay. The clone is aura-owned: dispose it with the aura. */
+function tipFadedWeaponGeometry(
+  mesh: THREE.Mesh,
+  holder: THREE.Object3D,
+): THREE.BufferGeometry | null {
+  const srcPos = mesh.geometry.getAttribute('position');
+  if (!srcPos) return null;
+  // grip point (the holder origin; weapon models author the grip at origin)
+  // in this mesh's local space: compose the mesh -> holder chain from TRS
+  // (world matrices can be stale during a rebuild), then invert.
+  const toHolder = new THREE.Matrix4().compose(mesh.position, mesh.quaternion, mesh.scale);
+  const step = new THREE.Matrix4();
+  let node = mesh.parent;
+  while (node && node !== holder) {
+    step.compose(node.position, node.quaternion, node.scale);
+    toHolder.premultiply(step);
+    node = node.parent;
+  }
+  const gripLocal = new THREE.Vector3(0, 0, 0);
+  if (node === holder) gripLocal.applyMatrix4(toHolder.invert());
+  const box = new THREE.Box3().setFromBufferAttribute(srcPos as THREE.BufferAttribute);
+  const size = new THREE.Vector3();
+  box.getSize(size);
+  const axis = size.x >= size.y && size.x >= size.z ? 'x' : size.y >= size.z ? 'y' : 'z';
+  const min = box.min[axis];
+  const max = box.max[axis];
+  const span = max - min;
+  if (!(span > 1e-6)) return null;
+  // orient the ramp: 1 at the end farther from the grip (the tip)
+  const tipAtMax = max - gripLocal[axis] >= gripLocal[axis] - min;
+  const geometry = mesh.geometry.clone();
+  const pos = geometry.getAttribute('position');
+  const rgba = new Float32Array(pos.count * 4);
+  for (let i = 0; i < pos.count; i++) {
+    const v = axis === 'x' ? pos.getX(i) : axis === 'y' ? pos.getY(i) : pos.getZ(i);
+    let t = (v - min) / span;
+    if (!tipAtMax) t = 1 - t;
+    const alpha = Math.min(1, Math.max(0, (t - WEAPON_AURA_TIP_START) / WEAPON_AURA_TIP_RAMP));
+    rgba.set([1, 1, 1, alpha], i * 4);
+  }
+  geometry.setAttribute('color', new THREE.BufferAttribute(rgba, 4));
+  return geometry;
+}
+
 export class CharacterVisual {
   /** add to the entity group; pivot at feet, faces +Z; renderer applies e.scale */
   readonly root = new THREE.Group();
-  /** unscaled world-unit height — nameplate anchor = height * e.scale + 0.5 */
+  /** unscaled world-unit height, nameplate anchor = height * e.scale + 0.5 */
   readonly height: number;
   /** invisible capsule for picking (userData.entityId set by the renderer) */
   readonly clickProxy: THREE.Mesh;
@@ -264,6 +341,7 @@ export class CharacterVisual {
   private stowArmBone: THREE.Object3D | null | undefined;
   private disposed = false;
   private ghosted = false;
+  private ghostStyle: GhostStyle = 'spirit';
   private mixer: THREE.AnimationMixer;
   private skeletonUpdates: SkeletonUpdateCache;
   private actions = new Map<string, THREE.AnimationAction>();
@@ -281,12 +359,20 @@ export class CharacterVisual {
    *  overlay clone as "original" and the golden ring never restores. */
   private haloBaseMaterial: THREE.Material | THREE.Material[] | null = null;
   private weaponAuraMeshes: THREE.Mesh[] = [];
-  private weaponAuraOn = false;
+  private weaponAuraColor: number | null = null;
+  private weaponAuraTip = false;
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
   private moonkinMaterials = new Map<THREE.Material, THREE.Material>();
   private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
+  // Ability VFX body glow (the gallery rim read): per-visual material clones
+  // carrying an emissive tint while a spec'd cast or buff aura is live. Cloned
+  // once per original because base materials are SHARED per-asset caches;
+  // writing emissive on those would leak the glow across every same-skin rig.
+  private auraGlowMaterials = new Map<THREE.Material, THREE.Material>();
+  private auraGlowColor = 0xffffff;
+  private auraGlowIntensity = 0;
 
   private baseState: BaseState = 'idle';
   private current: THREE.AnimationAction | null = null;
@@ -306,6 +392,15 @@ export class CharacterVisual {
   private initialized = false;
   private attackIdx = 0;
   private hitCooldown = 0;
+  // contact-frame hitstop state (see HOLD_REFRACTORY_S)
+  private holdT = 0;
+  private holdScale = 1;
+  private holdCooldown = 0;
+  // windup lean spring (see LEAN_FEED_S); applied on poseWrap pitch
+  private lean = 0;
+  private leanTarget = 0;
+  private leanFeed = 0;
+  private leanRecoil = 0;
   private pendingDt = 0;
   private swimBlend = 0;
   private swimBobTime = 0;
@@ -437,7 +532,7 @@ export class CharacterVisual {
       }
     }
 
-    // capsule from measured body extents — long/wide creatures (wolves,
+    // capsule from measured body extents, long/wide creatures (wolves,
     // dragons) were nearly unclickable with a height-derived sliver
     const r = prep.clickRadius;
     this.clickRadius = r;
@@ -484,6 +579,7 @@ export class CharacterVisual {
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean): void {
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
+    if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
     // Deferred sheathe swap: lands at the gesture's windup peak (see
     // setWeaponStowed), where the clip is also cut so the chop's downswing never
     // plays. Ticks even when `animate` is false so a throttled rig still settles.
@@ -493,7 +589,7 @@ export class CharacterVisual {
       this.endStowGesture();
     }
 
-    // death is a level sim-side — edge-trigger the clip locally
+    // death is a level sim-side, edge-trigger the clip locally
     if (s.dead && !this.wasDead) this.enterDeath();
     else if (!s.dead && this.wasDead) this.revive();
     this.wasDead = s.dead;
@@ -551,6 +647,20 @@ export class CharacterVisual {
     const proneAngle = this.action(this.def.clips.swim) ? SWIM_PITCH_CLIP : SWIM_PITCH_PROCEDURAL;
     this.swimBlend = advanceSwimBlend(this.swimBlend, s.swimming && !s.dead, dt);
     this.swimBobTime += dt;
+    // windup lean/recoil spring: while fed (setWindupLean each ceremony frame)
+    // the body eases back toward the target; when feeding stops (the release)
+    // it snaps forward through a small recoil, then settles to neutral
+    if (this.leanFeed > 0) {
+      this.leanFeed -= dt;
+      this.lean += (this.leanTarget - this.lean) * Math.min(1, dt * 10);
+      if (this.leanFeed <= 0) this.leanRecoil = LEAN_RECOIL_S;
+    } else if (this.leanRecoil > 0) {
+      this.leanRecoil -= dt;
+      this.lean += (-this.leanTarget * 0.45 - this.lean) * Math.min(1, dt * 22);
+    } else if (this.lean !== 0) {
+      this.lean += -this.lean * Math.min(1, dt * 9);
+      if (Math.abs(this.lean) < 1e-3) this.lean = 0;
+    }
     // Ledge climb rides the SAME pose channels rather than fighting them:
     // these three lines are rewritten every frame, so a climb pose written
     // anywhere else would be stomped. Blend and phase are advanced here too.
@@ -559,15 +669,20 @@ export class CharacterVisual {
     // Pitch into the wall through the pull, level out as the body tops the
     // lip so the plant lands upright.
     const climbLevel = 1 - env01(this.climbPhase, 0.62, 0.98);
-    this.poseWrap.rotation.x = proneAngle * this.swimBlend + CLIMB_BODY_PITCH * climb * climbLevel;
+    // Both pose contributions ride the SAME channel and are additive offsets:
+    // the windup lean/recoil spring above and the ledge-climb pitch. Writing
+    // either one alone here would silently stomp the other (main's note: this
+    // line is rewritten every frame, so a pose written elsewhere is lost).
+    this.poseWrap.rotation.x =
+      proneAngle * this.swimBlend + this.lean + CLIMB_BODY_PITCH * climb * climbLevel;
     this.poseWrap.rotation.z = 0;
     this.poseWrap.position.y =
       this.swimBlend * (SWIM_RISE + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
       // Compress at the start of the pull, back to neutral as the body rises.
       CLIMB_BODY_DUCK * climb * (1 - env01(this.climbPhase, 0.1, 0.55));
 
-    // distant corpses show the static idle far mesh — tip it over
-    if (this.farMesh && this.farMesh.visible) {
+    // distant corpses show the static idle far mesh, tip it over
+    if (this.farMesh?.visible) {
       if (s.dead) {
         this.farMesh.rotation.z = Math.PI / 2;
         this.farMesh.position.y = this.height * 0.16;
@@ -577,7 +692,15 @@ export class CharacterVisual {
       }
     }
 
-    this.pendingDt = Math.min(MIXER_DT_CAP, this.pendingDt + dt);
+    // hitstop: the held rig integrates a slowed dt (its clock, not the world's)
+    this.pendingDt = Math.min(
+      MIXER_DT_CAP,
+      this.pendingDt + (this.holdT > 0 ? dt * this.holdScale : dt),
+    );
+    if (this.holdT > 0) {
+      this.holdT -= dt;
+      if (this.holdT <= 0) this.holdCooldown = HOLD_REFRACTORY_S;
+    }
     if (animate) {
       // BEFORE the mixer integrates: scrub the climb's baked clips (weights
       // and frozen times are mixer INPUTS, unlike the additive lifts below).
@@ -819,6 +942,15 @@ export class CharacterVisual {
     this.fadeTo(this.action(this.def.clips.cast) ?? this.action(this.def.clips.idle), FADE, false);
   }
 
+  /** An authored per-ability one-shot exists on this rig (attackByAbility
+   *  entry with a live action). The ability-VFX painter gates its ceremonial
+   *  cast gestures on this, so a heal/blessing cue can never fall back to a
+   *  weapon swing on a rig without the authored clip. */
+  hasAttackClipOverride(abilityId: string): boolean {
+    const override = this.def.clips.attackByAbility?.[abilityId];
+    return override !== undefined && this.action(override) !== null;
+  }
+
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
     const override = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
@@ -856,6 +988,33 @@ export class CharacterVisual {
     if (!clips || clips.length === 0) return;
     this.hitCooldown = HIT_REACT_COOLDOWN;
     this.playOneShot(clips[Math.floor(Math.random() * clips.length)], 1.2);
+  }
+
+  /** Contact-frame hitstop: hold THIS rig's animation at `scale` speed for
+   *  `dur` seconds (the melee "bite"; also the struck target's flinch-freeze).
+   *  Overlapping requests merge, longest duration, slowest scale, and the
+   *  post-hold refractory swallows rapid re-triggers, so stacking strikes can
+   *  never chain the rig into visible slow motion. */
+  holdFrame(scale: number, dur: number): void {
+    if (this.deadLock || dur <= 0) return;
+    if (this.holdT > 0) {
+      this.holdT = Math.max(this.holdT, dur);
+      this.holdScale = Math.min(this.holdScale, Math.max(0.02, scale));
+      return;
+    }
+    if (this.holdCooldown > 0) return;
+    this.holdT = dur;
+    this.holdScale = Math.max(0.02, scale);
+  }
+
+  /** Feed the cast-windup lean for this frame (anticipation): the body eases
+   *  toward `amount` rad of backward pitch while fed each frame; once feeding
+   *  stops (the release moment) the spring snaps through a small forward
+   *  recoil back to neutral. Rig-group rotation only, no bone surgery. */
+  setWindupLean(amount: number): void {
+    if (this.deadLock) return;
+    this.leanTarget = -Math.min(LEAN_MAX_RAD, Math.max(0, amount));
+    this.leanFeed = LEAN_FEED_S;
   }
 
   playEmote(id: OverheadEmoteId, repeatsOverride?: number): void {
@@ -942,7 +1101,7 @@ export class CharacterVisual {
   }
 
   // -------------------------------------------------------------------------
-  // LOD / shadow plumbing (memoized — called every frame by the renderer)
+  // LOD / shadow plumbing (memoized, called every frame by the renderer)
   // -------------------------------------------------------------------------
 
   /**
@@ -978,10 +1137,48 @@ export class CharacterVisual {
     return this.far;
   }
 
-  setGhost(on: boolean): void {
-    if (on === this.ghosted) return;
+  setGhost(on: boolean, style: GhostStyle = 'spirit'): void {
+    if (on === this.ghosted && style === this.ghostStyle) return;
     this.ghosted = on;
+    this.ghostStyle = style;
     this.applyVisualMaterials();
+  }
+
+  /** Ability VFX body glow (buff/cast rim): tint the rig's emissive toward the
+   *  spec color at the given intensity (0 restores the shared originals). The
+   *  material swap runs only on the off/on edge; while on, per-frame calls just
+   *  rewrite emissive on this visual's private clones. Death and shapeshift
+   *  treatments keep priority over the glow. */
+  setAuraGlow(colorHex: number, intensity: number): void {
+    const on = intensity > 0.01;
+    const wasOn = this.auraGlowIntensity > 0.01;
+    this.auraGlowColor = colorHex;
+    this.auraGlowIntensity = intensity;
+    if (on !== wasOn) this.applyVisualMaterials();
+    if (!on) return;
+    for (const glow of this.auraGlowMaterials.values()) this.writeAuraGlow(glow);
+  }
+
+  private writeAuraGlow(material: THREE.Material): void {
+    const m = material as THREE.Material & { emissive?: THREE.Color; emissiveIntensity?: number };
+    if (!m.emissive) return;
+    m.emissive.setHex(this.auraGlowColor);
+    // the gallery cap: the rim accents the body, never repaints it
+    m.emissiveIntensity = Math.min(0.85, this.auraGlowIntensity);
+  }
+
+  private auraGlowMaterial(material: THREE.Material): THREE.Material {
+    if ((material as THREE.Material & { emissive?: THREE.Color }).emissive === undefined)
+      return material; // no emissive channel (low-tier basic materials): no glow
+    const cached = this.auraGlowMaterials.get(material);
+    if (cached) {
+      this.writeAuraGlow(cached);
+      return cached;
+    }
+    const glow = material.clone();
+    this.writeAuraGlow(glow);
+    this.auraGlowMaterials.set(material, glow);
+    return glow;
   }
 
   setSoulRend(on: boolean): void {
@@ -1025,14 +1222,14 @@ export class CharacterVisual {
     this.applySkinMaterials(skinIndex);
     // If the alternate atlas for this skin has not finished loading yet,
     // skinTexture() returned null and the body is showing the embedded default.
-    // Load it on demand and re-apply once it arrives — but only if this is still
+    // Load it on demand and re-apply once it arrives, but only if this is still
     // the requested skin (a newer setSkin must win). Without this, a freshly
     // selected skin stayed on the default until a relog warmed the atlas cache.
     const pending = ensureSkinTexture(this.key, skinIndex);
     if (pending) {
       void pending
         .then(() => {
-          // Bail if the model was disposed while the atlas was loading — applying
+          // Bail if the model was disposed while the atlas was loading, applying
           // materials to a torn-down model is wasted work (and re-snapshots a stale
           // material map). Also guard that this is still the requested skin.
           if (!this.disposed && this.skinIndex === skinIndex) this.applySkinMaterials(skinIndex);
@@ -1080,8 +1277,7 @@ export class CharacterVisual {
   }
 
   /** Swap the held mainhand weapon model at runtime (gear equip/unequip); no-op if
-   *  unchanged or if this class keeps a fixed weapon (hunter crossbow, mobs/NPCs —
-   *  no VisualDef.weaponSlot). Mirrors setSkin: re-attach the prop, re-run the
+   *  unchanged or if this class keeps a fixed weapon (hunter crossbow, mobs/NPCs,    *  no VisualDef.weaponSlot). Mirrors setSkin: re-attach the prop, re-run the
    *  shared material pass, re-snapshot the original-material map, then re-apply any
    *  active ghost/soul-rend overlay. Cheap (one prop clone) and keeps the mixer/
    *  animation state, unlike a full visual rebuild. */
@@ -1229,15 +1425,23 @@ export class CharacterVisual {
     this.rebuildWeaponAura();
   }
 
-  setWeaponAura(on: boolean): void {
-    if (on === this.weaponAuraOn) return;
-    this.weaponAuraOn = on;
+  /** Hold the imbued-weapon overlay in `colorHex` (null clears it). Driven per
+   *  frame by the renderer from characterWeaponAuraInto - the buff spec's
+   *  weaponAura knob - so the soak lives exactly as long as the worn aura
+   *  (Sanguine Blade's blood red, Pyrebrand's flame lick, Rimebound's rime).
+   *  `tip` scopes the overlay to the blade's far end (Adder's Bite's green
+   *  tip against Festering Venom's full-blade wash). */
+  setWeaponAura(colorHex: number | null, tip = false): void {
+    if (colorHex === this.weaponAuraColor && tip === this.weaponAuraTip) return;
+    this.weaponAuraColor = colorHex;
+    this.weaponAuraTip = tip;
     this.rebuildWeaponAura();
   }
 
   private rebuildWeaponAura(): void {
     this.disposeWeaponAura();
-    if (!this.weaponAuraOn) return;
+    if (this.weaponAuraColor === null) return;
+    const auraColor = this.weaponAuraColor;
 
     const weaponHolders: THREE.Object3D[] = [];
     this.model.traverse((o) => {
@@ -1248,15 +1452,22 @@ export class CharacterVisual {
     mainhand.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
+      const tipGeometry = this.weaponAuraTip ? tipFadedWeaponGeometry(mesh, mainhand) : null;
       const aura = new THREE.Mesh(
-        mesh.geometry,
+        tipGeometry ?? mesh.geometry,
         new THREE.MeshBasicMaterial({
-          color: 0x45ff9a,
+          // Additive translucent clone of the weapon mesh in the spec-authored
+          // soak color (sanguine_aura keeps its established bright blood red;
+          // the shaman imbues author their own warm/icy hues). Brightness
+          // class is fixed here - only the hue is data. Tip scope rides a
+          // vertex-alpha ramp baked into the cloned geometry.
+          color: auraColor,
           transparent: true,
           opacity: 0.42,
           depthWrite: false,
           blending: THREE.AdditiveBlending,
           side: THREE.DoubleSide,
+          vertexColors: tipGeometry !== null,
         }),
       );
       aura.position.copy(mesh.position);
@@ -1264,6 +1475,7 @@ export class CharacterVisual {
       aura.scale.copy(mesh.scale).multiplyScalar(1.08);
       aura.renderOrder = 3;
       aura.userData.weaponVfxMesh = true;
+      if (tipGeometry) aura.userData.ownsAuraGeometry = true;
       mesh.parent.add(aura);
       this.weaponAuraMeshes.push(aura);
     });
@@ -1273,6 +1485,9 @@ export class CharacterVisual {
     for (const mesh of this.weaponAuraMeshes) {
       mesh.removeFromParent();
       (mesh.material as THREE.Material).dispose();
+      // full-blade auras share the weapon's cached geometry (never disposed);
+      // tip auras own their vertex-alpha clone
+      if (mesh.userData.ownsAuraGeometry) mesh.geometry.dispose();
     }
     this.weaponAuraMeshes.length = 0;
   }
@@ -1370,6 +1585,7 @@ export class CharacterVisual {
     disposeOwnedWeaponSkinMaterials(this.model, this.originalMaterials, [
       this.ghostMaterials,
       this.soulRendMaterials,
+      this.auraGlowMaterials,
     ]);
   }
 
@@ -1377,10 +1593,12 @@ export class CharacterVisual {
     const materials = new Set<THREE.Material>([
       ...this.ghostMaterials.values(),
       ...this.soulRendMaterials.values(),
+      ...this.auraGlowMaterials.values(),
     ]);
     for (const material of materials) material.dispose();
     this.ghostMaterials.clear();
     this.soulRendMaterials.clear();
+    this.auraGlowMaterials.clear();
   }
 
   /** Move every held prop between the hands and the sheathed on-back pose (the
@@ -1476,7 +1694,7 @@ export class CharacterVisual {
     this.skeletonUpdates.dispose();
     this.root.removeFromParent();
     // SkeletonUtils.clone gives each instance exclusive Skeletons whose GPU
-    // bone textures the renderer allocates lazily — release them here or
+    // bone textures the renderer allocates lazily, release them here or
     // online interest churn strands one per despawned entity. Geometries and
     // materials remain shared per-asset caches and are never disposed.
     const skeletons = new Set<THREE.Skeleton>();
@@ -1545,16 +1763,28 @@ export class CharacterVisual {
     if (this.metamorph) return this.metamorphMaterial(material);
     if (this.moonkin) return this.moonkinMaterial(material);
     if (this.shadowform) return this.shadowformMaterial(material);
+    // lowest priority: the ability VFX buff/cast body glow
+    if (this.auraGlowIntensity > 0.01) return this.auraGlowMaterial(material);
     return material;
   }
 
   private ghostMaterial(material: THREE.Material): THREE.Material {
+    const opacity = this.ghostStyle === 'stealth' ? STEALTH_OPACITY : GHOST_OPACITY;
     const cached = this.ghostMaterials.get(material);
-    if (cached) return cached;
+    if (cached) {
+      // one cache serves both flavors; rewrite the opacity on style flips
+      // (stealth -> die -> ghost run reuses the same clones)
+      cached.opacity = opacity;
+      return cached;
+    }
     const ghost = material.clone();
     ghost.transparent = true;
-    ghost.opacity = GHOST_OPACITY;
-    ghost.depthWrite = false;
+    ghost.opacity = opacity;
+    // depthWrite stays ON: with it off the whole rig depth-blends against
+    // itself, so back faces and far limbs shine through the chest - the x-ray
+    // the owner reported on Duskveil. Writing depth lets nearer faces occlude
+    // farther ones and the body reads as one uniformly faded silhouette.
+    ghost.depthWrite = true;
     this.ghostMaterials.set(material, ghost);
     return ghost;
   }

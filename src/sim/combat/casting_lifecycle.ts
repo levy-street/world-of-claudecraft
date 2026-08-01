@@ -39,7 +39,7 @@ import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
-import type { AbilityDef, Entity, Vec3 } from '../types';
+import type { AbilityDef, AbilityEffect, Entity, Vec3 } from '../types';
 import {
   angleTo,
   armorReduction,
@@ -550,9 +550,9 @@ function resolveDeadAllyTarget(
   const id = overrideId ?? p.targetId;
   if (id === null) return null;
   const t = ctx.entities.get(id);
-  if (!t || !t.dead || t.kind !== 'player') return null;
+  if (!t?.dead || t.kind !== 'player') return null;
   const party = ctx.partyOf(p.id);
-  return party && party.members.includes(t.id) ? t : null;
+  return party?.members.includes(t.id) ? t : null;
 }
 
 function vanishedLowBlowFallbackTarget(
@@ -787,7 +787,7 @@ export function castAbility(
     // silently burns the cast on an empty selection.
     if (ability.partyOnlyTarget && target.id !== p.id) {
       const party = ctx.partyOf(p.id);
-      if (!party || !party.members.includes(target.id)) {
+      if (!party?.members.includes(target.id)) {
         ctx.error(p.id, 'That ally is not in your group.');
         return;
       }
@@ -1313,6 +1313,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
       school: res.def.school,
       fx: 'nova',
       radius,
+      ability: res.def.id,
     });
     const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
     // How many enemies this pulse actually struck: Blizzard's Frozen Orb
@@ -1371,6 +1372,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
         school: res.def.school,
         fx: 'nova',
         radius: eff.radius,
+        ability: res.def.id,
       });
       for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
         if (!ctx.hasLineOfSight(p, m)) continue;
@@ -1439,6 +1441,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
         school: res.def.school,
         fx: 'nova',
         radius: eff.radius,
+        ability: res.def.id,
       });
       const radiusSq = eff.radius * eff.radius;
       for (const ally of ctx.entities.values()) {
@@ -1475,6 +1478,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     targetId: target.id,
     school: res.def.school,
     fx: 'projectile',
+    ability: res.def.id,
   });
   // Each channel bolt (e.g. Arcane Missiles) deals its damage on arrival, not on the
   // tick it is fired; a target that dies mid-flight fizzles it (the drain's guard).
@@ -1524,6 +1528,39 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     }
   });
 }
+
+// Effect types whose resolution already reaches the renderer on its own:
+// immediate damage lands as damage events (the per-ability VFX layer's strike
+// read), and the movement/sport kinds drive their own visible motion (charge
+// run, blink snap, leap arc, Vale Cup ball handling). A hostile-targeted
+// completion built ONLY of other effects (sunder, interrupt, taunt, stun,
+// incapacitate, a finisher's haste buff...) emits nothing at all, so
+// applyAbility gives those the same renderer-only 'selfCast' cue untargeted
+// completions get. Damaging casts stay excluded - their read arrives via the
+// damage event, and a second cue would double-stage the visuals.
+const SELF_ANNOUNCING_EFFECTS: ReadonlySet<AbilityEffect['type']> = new Set([
+  'weaponDamage',
+  'weaponStrike',
+  'directDamage',
+  'chainDamage',
+  'finisherDamage',
+  'aoeDamage',
+  'empoweredCone',
+  'judgement',
+  'drainTick',
+  'consumeAura',
+  'groundAoE',
+  'frozenOrb',
+  'charge',
+  'feralCharge',
+  'blinkForward',
+  'repositionToAim',
+  'ballKick',
+  'ballPass',
+  'ballShoot',
+  'sportDash',
+  'sportShove',
+]);
 
 function applyAbility(
   ctx: SimContext,
@@ -1715,6 +1752,23 @@ function applyAbility(
   ) {
     spendAbilityCost(ctx, p, meta, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
+    // A friendly-target completion (heals, ally blessings, dispels) resolves
+    // right here: no damage event, no projectile, no castFx - the heal2/aura
+    // events that follow only feed numbers and the small legacy glow, so
+    // without a cue the per-ability VFX layer is blind to the cast that just
+    // happened (Last Rite healed with no ceremony at all). Emit the same
+    // renderer-only 'selfCast' cue the other silent completions get, carrying
+    // the ALLY so the painter can anchor the ceremony's landing on them.
+    if (!ability.castFx && !togglingOff) {
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: p.id,
+        targetId: (target ?? p).id,
+        school: ability.school,
+        fx: 'selfCast',
+        ability: ability.id,
+      });
+    }
     ctx.runEffects(p, meta, target, res);
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')
@@ -1743,6 +1797,7 @@ function applyAbility(
       // A spell may override the flying-bolt visual (e.g. Lightning Bolt draws a
       // jagged electric strike); the projectile MECHANIC below is unchanged.
       fx: ability.projectileFx ?? 'projectile',
+      ability: ability.id,
       ...(isSpell ? {} : { attackAnimation: 'ranged-shot' as const }),
     });
     // The bolt is now in flight: its hit roll and effects resolve when it reaches the
@@ -1792,6 +1847,25 @@ function applyAbility(
       targetId: p.id,
       school: ability.school,
       fx: ability.castFx,
+      ability: ability.id,
+    });
+  } else if (
+    !togglingOff &&
+    (!target || target === p || !res.effects.some((eff) => SELF_ANNOUNCING_EFFECTS.has(eff.type)))
+  ) {
+    // An untargeted/self completion (Shadewolf, summon rites, forms, aspects)
+    // otherwise emits nothing at all, leaving the per-ability VFX layer blind
+    // to the cast that just happened. The same blindness hits hostile-targeted
+    // pure-utility completions (Armor Shear's sunder, Jawcrack's interrupt,
+    // Goad's taunt, stuns/saps/finisher buffs): no damage event, no castFx,
+    // nothing. Emit the cue for both, carrying the victim so the painter can
+    // anchor the utility read at the target. Renderer-only; no mechanic.
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: p.id,
+      targetId: (target ?? p).id,
+      school: ability.school,
+      fx: 'selfCast',
       ability: ability.id,
     });
   }
