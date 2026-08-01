@@ -299,6 +299,31 @@ For off-box safety, sync the directory to S3 occasionally:
   the host `.env` into the game container. The key is a secret: it must never
   appear in logs or client code. Linking is a cosmetic mirror for deed
   achievements only; login with Steam does not exist.
+- **Epic link + achievement mirror**: players can link an Epic account so
+  their Book of Deeds achievements mirror to Epic Online Services
+  (`server/epic/`). It is **off until configured** (merge-safe dark default):
+  with `EPIC_ENABLED` unset or not exactly `1`, every `/api/epic/*` route
+  answers `epic.disabled`, the mirror is inert, `/api/status` advertises
+  `epic: { enabled: false }`, and no client renders Epic link UI. Default CI
+  and `npm test` need no Epic secrets. To enable, set the following in the
+  server runtime env (Docker Compose passes them from the host `.env` into the
+  game container):
+
+  | Key | Required when lit | Notes |
+  |---|---|---|
+  | `EPIC_ENABLED` | yes (exactly `1`) | Any other value keeps the surface dark |
+  | `EPIC_PRODUCT_ID` | yes | EOS product id |
+  | `EPIC_DEPLOYMENT_ID` | yes | EOS deployment id |
+  | `EPIC_CLIENT_ID` | yes | EOS client id used by the server |
+  | `EPIC_CLIENT_SECRET` | yes | Server only; never logged; never stamped into desktop builds |
+  | `EPIC_SANDBOX_ID` | optional | Only if the chosen verify path needs it |
+
+  Linking is a **cosmetic** mirror for deed achievements (and optional future
+  ownership checks) only. **Login with Epic does not exist**; identity stays
+  email + Discord. Client-supplied Epic account ids are never trusted. Do not
+  confuse these server keys with BuildPatchTool upload credentials
+  (`EPIC_BPT_*` in `docs/epic-games-integration/bpt-upload.md`), which never
+  belong on the game server.
 - **Claudium economy service**: `WOC_ECONOMY_SERVICE_URL` is resolved by the
   game server. Use `http://127.0.0.1:8798/v1/claudium/` only when both services
   run directly on the host. For the Compose game container with a host-run

@@ -71,6 +71,7 @@ describe('describeFct: color token by kind + flags', () => {
     miss: { self: 'miss-self', other: 'miss-other' },
     dodge: { self: 'dodge-self', other: 'dodge-other' },
     resist: { self: 'miss-self', other: 'miss-other' },
+    evade: { self: 'miss-self', other: 'miss-other' },
     'damage-done-ability': { self: 'damage-done-ability', other: 'damage-done-ability' },
     'damage-done-auto': { self: 'damage-done-auto', other: 'damage-done-auto' },
     'damage-taken': { self: 'damage-taken', other: 'damage-taken' },
@@ -97,8 +98,9 @@ describe('describeFct: color token by kind + flags', () => {
     for (const kind of Object.keys(expected) as FctKind[]) {
       const selfToken = describeFct(makeEvent({ kind, isSelf: true }), 0.5).colorToken;
       const otherToken = describeFct(makeEvent({ kind, isSelf: false }), 0.5).colorToken;
-      // resist reuses the miss token (self grey / other white), so it varies with isSelf too.
-      if (kind === 'miss' || kind === 'dodge' || kind === 'resist')
+      // resist and evade reuse the miss token (self grey / other white), so they vary
+      // with isSelf too.
+      if (kind === 'miss' || kind === 'dodge' || kind === 'resist' || kind === 'evade')
         expect(selfToken).not.toBe(otherToken);
       else expect(selfToken).toBe(otherToken);
     }

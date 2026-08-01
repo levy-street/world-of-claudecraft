@@ -923,6 +923,23 @@ export const de_DE: EnTranslations = {
       "separate": "{meter} trennen",
       "regroup": "{meter} wieder eingliedern"
     },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Begleiter hat volle Gesundheit",
       "disabledNoFood": "Kein Futter in deinen Taschen heilt deinen Begleiter"
@@ -2130,6 +2147,14 @@ export const de_DE: EnTranslations = {
       "benefits": "Verknüpfe dein Steam-Konto über die Desktop-App, um die Taten, die du erringst, als Steam-Errungenschaften zu spiegeln.",
       "noTicket": "Steam hat kein Verknüpfungsticket geliefert. Starte Steam und versuch es dann erneut."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Briefkasten",
       "subtitle": "Die Rabenpost",
@@ -2980,6 +3005,14 @@ export const de_DE: EnTranslations = {
       "already_linked": "Dein Konto ist bereits mit einem Steam-Konto verknüpft.",
       "account_taken": "Dieses Steam-Konto ist bereits mit einem anderen Konto verknüpft.",
       "upstream": "Steam hat nicht geantwortet. Versuch es gleich noch einmal."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut."
@@ -6418,6 +6451,7 @@ export const de_DE: EnTranslations = {
       "floatingDodge": "Ausgewichen",
       "floatingParry": "Pariert",
       "floatingResist": "Widerstand",
+      "floatingEvade": "Entgangen",
       "floatingHealFull": "Voll",
       "floatingHealAbsorbed": "Absorbiert",
       "cannotMove": "Bewegungsunfähig!",
@@ -6430,6 +6464,7 @@ export const de_DE: EnTranslations = {
       "dodged": "{target} weicht Eurem {ability} aus.",
       "parried": "Deine {ability} wird von {target} pariert.",
       "resisted": "{target} widersteht Eurem {ability}.",
+      "evaded": "{target} entgeht deiner {ability}.",
       "healSelf": "Euer {ability} heilt Euch um {amount}.",
       "healSelfCrit": "Euer {ability} heilt Euch kritisch um {amount}.",
       "healOther": "Euer {ability} heilt {target} um {amount}.",

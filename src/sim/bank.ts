@@ -113,6 +113,11 @@ export function moveBetweenContainers(
 
   const want = count === undefined ? slot.count : Math.floor(count);
   if (!(want > 0) || want > slot.count) return { moved: 0, refusal: 'invalid' };
+  // Thread the plain-stack craftedRecipeId marker (bags.ts InvSlot.craftedRecipeId)
+  // into BOTH the fit check and the grant: without it a bank deposit/withdraw round
+  // trip strips the marker (addStacked/countFit key their merge on it), silently
+  // laundering a crafted item's disenchant-gate provenance into a plain drop, the
+  // same class of bug the trade/market fix closed.
   if (countFit(dest, destCapacity, slot.itemId, want, undefined, slot.craftedRecipeId) < want) {
     return { moved: 0, refusal: 'no_fit' };
   }

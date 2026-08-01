@@ -773,6 +773,19 @@ CREATE TABLE IF NOT EXISTS steam_links (
   steam_id TEXT NOT NULL UNIQUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- Epic account links (the deeds achievement mirror). Copies the steam_links
+-- shape: one Epic account per WoCC account (account_id is the PK) and one
+-- WoCC account per Epic id (epic_account_id is UNIQUE). A row is a cosmetic-
+-- mirror pointer only, proven by a server-verified link proof at link time
+-- (server/epic/): it is NEVER an identity or session source, and login stays
+-- email + Discord only. Accessors live in server/epic/epic_db.ts. Purely
+-- additive leaf: a pre-Epic rollback binary never references it, and the
+-- CASCADE keeps account deletion consistent even under old code.
+CREATE TABLE IF NOT EXISTS epic_links (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  epic_account_id TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 CREATE TABLE IF NOT EXISTS daily_reward_days (
   day TEXT NOT NULL,
   realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',

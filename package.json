@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.32.4",
+  "version": "0.33.0",
   "private": true,
   "license": "MIT",
   "author": {
@@ -28,8 +28,11 @@
     "electron:dev": "node scripts/electron-dev.mjs",
     "electron:pack": "node scripts/electron-build.mjs pack",
     "electron:pack:steam": "node scripts/electron-build.mjs pack steam",
+    "electron:pack:epic": "node scripts/electron-build.mjs pack epic",
     "electron:build": "node scripts/electron-build.mjs build",
     "electron:build:steam": "node scripts/electron-build.mjs build steam",
+    "electron:build:epic": "node scripts/electron-build.mjs build epic",
+    "epic:bpt-upload": "node scripts/epic-bpt-upload.mjs",
     "preview": "vite preview",
     "format": "biome format --write .",
     "format:check": "biome format .",

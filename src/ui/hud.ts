@@ -8,7 +8,6 @@ import type { GameSettings, Settings } from '../game/settings';
 import { sfx } from '../game/sfx';
 import type { UiEffectsTier } from '../game/ui_effects_profile';
 import {
-  auraRefreshIntervalMs,
   cadenceDue,
   coerceFxTier,
   minimapRedrawIntervalMs,
@@ -535,6 +534,8 @@ import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
 import { roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
+import { targetAuraSourceName } from './target_auras_view';
+import { TargetAurasWindow } from './target_auras_window';
 import { targetOfTargetId } from './target_of_target';
 import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
@@ -1548,7 +1549,6 @@ export class Hud {
   // party frames are deliberately not stamped (party-member HP is a healer's actionable
   // signal, so it stays on the mediumHud band for every tier: see ui_tier_knobs).
   private lastMinimapDrawAt = 0;
-  private lastTargetDebuffsPaintAt = 0;
   private lastTargetFramePaintAt = 0;
   private lastTargetFrameId: number | null = null;
   // Target-of-target frame throttle + identity tracking, the non-self cadence twins
@@ -1572,6 +1572,7 @@ export class Hud {
   // The first-tier tutorial modal's focus trap (#profession-tutorial).
   private professionTutorialTrap: FocusTrapHandle | null = null;
   private meters: Meters;
+  private readonly targetAurasWindow: TargetAurasWindow;
   private tutorial = new TutorialOverlay();
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
@@ -1623,6 +1624,34 @@ export class Hud {
           bindActions: (onActivate) => this.bindContextMenuActions(onActivate),
           isMobileLayout: () => this.isMobileLayout(),
         }),
+    });
+    this.targetAurasWindow = new TargetAurasWindow({
+      root: $('#target-auras-window'),
+      writers: this.writerFacet,
+      document,
+      window,
+      storage: localStorage,
+      isMobileLayout: () => this.isMobileLayout(),
+      uiScale: getUiScale,
+      resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
+      renderTooltip: (name, remaining, effectHtml) =>
+        `<div class="tt-title">${esc(name)}</div>${effectHtml}<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`,
+      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      formatCount: (count) => formatNumber(count, { maximumFractionDigits: 0 }),
+      formatPercent: (value) => formatNumber(value, { style: 'percent', maximumFractionDigits: 0 }),
+      unlockLabel: () => t('hudChrome.targetAuras.unlock'),
+      lockLabel: () => t('hudChrome.targetAuras.lock'),
+      configureRowsLabel: () => t('hudChrome.targetAuras.configureRows'),
+      fewerRowsLabel: () => t('hudChrome.targetAuras.fewerRows'),
+      moreRowsLabel: () => t('hudChrome.targetAuras.moreRows'),
+      visibleRowsLabel: (count) =>
+        t('hudChrome.targetAuras.visibleRows', {
+          count: formatNumber(count, { maximumFractionDigits: 0 }),
+        }),
+      showSourcesLabel: () => t('hudChrome.targetAuras.showSources'),
+      hideSourcesLabel: () => t('hudChrome.targetAuras.hideSources'),
+      ownAuraLabel: () => t('hudChrome.targetAuras.ownAura'),
+      opacityLabel: (percent) => t('hudChrome.targetAuras.opacity', { percent }),
     });
     this.actionBarController = new ActionBarController({
       storage: localStorage,
@@ -3800,8 +3829,9 @@ export class Hud {
   // painter's `own` class), so what you are maintaining reads at a glance among
   // other casters' auras. Extra prominence only, never less information, so every
   // graphics tier keeps it (gameplay-neutral-graphics invariant).
-  private readonly targetDebuffsView = createAurasView('all', this.aurasViewDeps, {
+  private readonly targetAurasView = createAurasView('all', this.aurasViewDeps, {
     ownFirst: true,
+    effectHtmlCacheVersion: getLanguage,
   });
   // The buff-bar painter alone gets attachCancel: right-clicking one of the local player's
   // own helpful buffs cancels it (classic convention). The debuff / target painters reuse
@@ -3839,7 +3869,6 @@ export class Hud {
     this.targetDebuffsEl,
     this.aurasPainterDeps,
     document,
-    () => this.fxTier(),
   );
   // Overworld minimap canvas painter (the delve branch stays with delvePainter). Owns
   // the marker core; redraws from the fastHud (~10Hz) band. classCss colors the party
@@ -5376,6 +5405,7 @@ export class Hud {
     this.targetFrameMover?.relocalize();
     this.playerFrameMover?.relocalize();
     this.partyFrameMover?.relocalize();
+    this.targetAurasWindow.relocalize();
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
     if ($('#bags').style.display !== 'none') this.renderBags();
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
@@ -7715,20 +7745,16 @@ export class Hud {
       // elided toggleClass writer so the per-frame hot path stays write-elided. Normal
       // mode is unaffected (the rule lives only inside @media (forced-colors: active)).
       this.toggleClass(this.targetNameEl, 'hostile', target.hostile);
-      // Tier the target-debuff refresh (tick) granularity like the buff
-      // bar. A target SWAP (targetChanged) forces an immediate repaint so the strip never
-      // shows the previous target's debuffs while throttled on low; otherwise the full
-      // tiers repaint every frame and low coarsens to ~4Hz.
-      if (
-        nonSelfRepaintDue(
-          targetChanged,
-          this.lastTargetDebuffsPaintAt,
-          now,
-          auraRefreshIntervalMs(fxTier),
-        )
-      ) {
-        this.lastTargetDebuffsPaintAt = now;
-        this.targetDebuffsPainter.paint(this.targetDebuffsView.tick(target));
+      // Every target aura is actionable: hostile buffs can be purged, allied buffs
+      // can be maintained, and foreign debuffs coordinate a group. Keep this strip
+      // complete and full-rate on every graphics tier; the painter and window both
+      // elide unchanged DOM writes.
+      const targetAuraState = this.targetAurasView.tick(target);
+      this.targetDebuffsPainter.paint(targetAuraState);
+      if (this.targetAurasWindow.isVisible) {
+        this.targetAurasWindow.paint(entityDisplayName(target), targetAuraState, (sourceId) =>
+          targetAuraSourceName(sourceId, (id) => sim.entities.get(id), entityDisplayName),
+        );
       }
       // target/boss cast bar (e.g. Nythraxis' Deathless Rage), shown under the name +
       // HP so the raid sees exactly when to channel the wardstones. The target
@@ -7799,6 +7825,7 @@ export class Hud {
         this.lastAnnouncedTargetId = null;
       }
       this.targetFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
+      this.targetAurasWindow.clear();
       // Hide the target-of-target frame too. Its parent (#target-frame) is already
       // display:none, but paint hidden anyway to reset the painter's portrait gate +
       // cadence id so re-acquiring a target repaints the mini-frame immediately.
@@ -9002,6 +9029,10 @@ export class Hud {
     this.meters.toggle();
   }
 
+  toggleTargetAuras(): void {
+    this.targetAurasWindow.toggle();
+  }
+
   // -------------------------------------------------------------------------
   // The Ashen Coliseum - 1v1 arena panel + in-match banner
   // -------------------------------------------------------------------------
@@ -9411,11 +9442,16 @@ export class Hud {
         }
         if ((ev.absorbed ?? 0) > 0 || ev.kind === 'block')
           this.combat('combat_block', tp.x, tp.y, tp.z, 0.55);
-        // The miss/dodge/resist/parry "avoid" cues are interface feedback (they report
-        // an outcome, not a world impact), so the Interface & Feedback Sounds toggle
-        // silences them. The early return stays either way, so a muted avoid never
-        // falls through to an impact sound.
-        if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
+        // The miss/dodge/resist/parry/evade "avoid" cues are interface feedback (they
+        // report an outcome, not a world impact), so the Interface & Feedback Sounds
+        // toggle silences them. The early return stays either way, so a muted avoid
+        // never falls through to an impact sound.
+        if (
+          ev.kind === 'miss' ||
+          ev.kind === 'dodge' ||
+          ev.kind === 'resist' ||
+          ev.kind === 'evade'
+        ) {
           if (audio.feedbackEnabled) this.combat('combat_dodge', tp.x, tp.y, tp.z, 0.5);
           return;
         }
@@ -9695,7 +9731,8 @@ export class Hud {
             ev.kind === 'miss' ||
             ev.kind === 'dodge' ||
             ev.kind === 'parry' ||
-            ev.kind === 'resist'
+            ev.kind === 'resist' ||
+            ev.kind === 'evade'
           ) {
             // self vs other (carried on the shape's isSelf) drives the avoidance colour
             // token (#bbb vs #fff); the localized word stays at the call site. A resisted
@@ -9720,7 +9757,9 @@ export class Hud {
                         ? t('hud.combat.floatingDodge')
                         : ev.kind === 'parry'
                           ? t('hud.combat.floatingParry')
-                          : t('hud.combat.floatingResist'),
+                          : ev.kind === 'evade'
+                            ? t('hud.combat.floatingEvade')
+                            : t('hud.combat.floatingResist'),
                   target: tgt,
                 },
                 now,
@@ -9738,7 +9777,9 @@ export class Hud {
                     ? 'hud.combat.dodged'
                     : ev.kind === 'parry'
                       ? 'hud.combat.parried'
-                      : 'hud.combat.resisted';
+                      : ev.kind === 'evade'
+                        ? 'hud.combat.evaded'
+                        : 'hud.combat.resisted';
               this.combatLog(
                 t(logKey, {
                   ability: combatAbilityName(ev.ability),

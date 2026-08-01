@@ -452,9 +452,24 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.targetDebuffsPainter.paint',
     band: 'frame',
-    gate: "target && target.kind !== 'object' && nonSelfRepaintDue(targetChanged, this.lastTargetDebuffsPaintAt, now, auraRefreshIntervalMs(fxTier))",
+    gate: "target && target.kind !== 'object'",
     surface: 'chrome',
-    why: 'the target debuff strip, tier-coarsened, swap-bypassed',
+    why: 'the complete target aura strip, full-rate and tier-neutral because every aura is actionable',
+  },
+  {
+    call: 'this.targetAurasView.tick',
+    band: 'frame',
+    gate: "target && target.kind !== 'object'",
+    surface: 'none',
+    why: 'derives the complete own-first model shared by the classic strip and optional detail window',
+  },
+  {
+    call: 'this.targetAurasWindow.paint',
+    band: 'frame',
+    gate: "target && target.kind !== 'object' && this.targetAurasWindow.isVisible",
+    surface: 'window',
+    guard: { kind: 'callsite' },
+    why: 'updates the pooled detailed target-aura panel, with a target swap bypassing the cadence',
   },
   {
     call: 'this.targetCastBarPainter.paint',
@@ -490,6 +505,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "!(target && target.kind !== 'object')",
     surface: 'chrome',
     why: 'hides the target frame when there is no target',
+  },
+  {
+    call: 'this.targetAurasWindow.clear',
+    band: 'frame',
+    gate: "!(target && target.kind !== 'object')",
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'target_auras_window.ts',
+      proof: 'if (this.cleared) return;',
+    },
+    why: 'clears the target aura rows while preserving the always-visible transparent handle',
   },
   {
     call: 'this.totFramePainter.paint',
@@ -1278,6 +1305,33 @@ const observedKeys = scan.sites.map((s) => {
 });
 
 describe('Hud.update() drives exactly the registered set, on the registered bands', () => {
+  it('keeps the classic target strip complete and reuses that model for the detail window', () => {
+    const source = readFileSync(HUD_PATH, 'utf8');
+    expect(source).toMatch(
+      /targetAurasView = createAurasView\('all', this\.aurasViewDeps, \{\s*ownFirst: true,\s*effectHtmlCacheVersion: getLanguage,\s*\}\);/,
+    );
+    expect(source).toMatch(
+      /const targetAuraState = this\.targetAurasView\.tick\(target\);\s*this\.targetDebuffsPainter\.paint\(targetAuraState\);\s*if \(this\.targetAurasWindow\.isVisible\) \{\s*this\.targetAurasWindow\.paint\([^,]+, targetAuraState,/,
+    );
+    expect(source).not.toContain('targetSummaryAurasView');
+  });
+
+  it('keeps target aura visibility and refresh tier-neutral', () => {
+    const source = readFileSync(HUD_PATH, 'utf8');
+    const painterStart = source.indexOf('private readonly targetDebuffsPainter');
+    const painterEnd = source.indexOf('private readonly minimapPainter', painterStart);
+    const painterDefinition = source.slice(painterStart, painterEnd);
+
+    expect(painterStart).toBeGreaterThanOrEqual(0);
+    expect(painterDefinition).toMatch(
+      /private readonly targetDebuffsPainter = new AurasPainter\(\s*this\.writerFacet,\s*this\.targetDebuffsEl,\s*this\.aurasPainterDeps,\s*document,\s*\);/,
+    );
+    expect(source).not.toContain('lastTargetDebuffsPaintAt');
+    expect(source).toMatch(
+      /toggleTargetAuras\(\): void \{\s*this\.targetAurasWindow\.toggle\(\);\s*\}/,
+    );
+  });
+
   it('feeds the server-authoritative Hunter reactive window into the aura overlay', () => {
     expect(HUD_SOURCE).toMatch(
       /this\.auraOverlayController\.paint\(\s*p\.auras,\s*this\.sim\.reactiveAbilityWindowRemaining\('mongoose_bite'\),?\s*\)/,
@@ -1351,7 +1405,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 39, chrome: 71, none: 14 });
+    ).toEqual({ window: 41, chrome: 71, none: 15 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1363,9 +1417,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     for (const row of HUD_UPDATE_DRIVES)
       if (row.guard) byKind[row.guard.kind] = (byKind[row.guard.kind] ?? 0) + 1;
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
-      module: 21,
+      module: 22,
       hud: 5,
-      callsite: 9,
+      callsite: 10,
       none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
@@ -1422,6 +1476,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // an in-place comparison against the retained numbers; same guard, same place, no
         // per-frame allocation.
         'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
+        'target_auras_window.ts: if (this.cleared) return;',
         'vale_cup_betting.ts: if (view.sig !== this.lastSig) {',
         'vale_cup_briefing.ts: if (view.sig !== this.lastSig) {',
         'vale_cup_window.ts: if (view.sig === this.lastSig) return;',

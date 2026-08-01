@@ -923,6 +923,23 @@ export const vi_VN: EnTranslations = {
       "separate": "Tách {meter}",
       "regroup": "Ghép lại {meter}"
     },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Thú cưng đang đầy máu",
       "disabledNoFood": "Không có thức ăn nào trong túi đồ của bạn có thể chữa lành thú cưng"
@@ -2130,6 +2147,14 @@ export const vi_VN: EnTranslations = {
       "benefits": "Hãy liên kết tài khoản Steam từ ứng dụng máy tính để các kỳ công bạn lập được đồng bộ thành thành tựu Steam.",
       "noTicket": "Steam không cung cấp vé liên kết. Hãy khởi động Steam rồi thử lại."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Hòm Thư",
       "subtitle": "Bưu Quạ",
@@ -2980,6 +3005,14 @@ export const vi_VN: EnTranslations = {
       "already_linked": "Tài khoản của bạn đã liên kết với một tài khoản Steam.",
       "account_taken": "Tài khoản Steam đó đã được liên kết với một tài khoản khác.",
       "upstream": "Steam không phản hồi. Hãy thử lại sau giây lát."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại."
@@ -6418,6 +6451,7 @@ export const vi_VN: EnTranslations = {
       "floatingDodge": "Né",
       "floatingParry": "Gạt Đòn",
       "floatingResist": "Kháng",
+      "floatingEvade": "Lẩn Tránh",
       "floatingHealFull": "Đầy",
       "floatingHealAbsorbed": "Hấp Thụ",
       "cannotMove": "Không thể di chuyển!",
@@ -6430,6 +6464,7 @@ export const vi_VN: EnTranslations = {
       "dodged": "{ability} của bạn bị {target} né.",
       "parried": "{ability} của bạn bị {target} gạt đòn.",
       "resisted": "{target} kháng lại {ability} của bạn.",
+      "evaded": "{target} lẩn tránh {ability} của bạn.",
       "healSelf": "{ability} của bạn hồi {amount} máu cho bạn.",
       "healSelfCrit": "{ability} của bạn chí mạng hồi {amount} máu cho bạn.",
       "healOther": "{ability} của bạn hồi {amount} máu cho {target}.",

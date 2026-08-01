@@ -444,6 +444,37 @@ export function resetSteamLinkRateLimits(): void {
   steamLinkAccountAttempts.clear();
 }
 
+// Epic link attempts get their own per-IP AND per-account bucket, twin of the
+// Steam link throttle: every allowed attempt will cost an upstream verify call
+// (Phase 5), so the budget is deliberately tight, and a link flood can never
+// burn a player's login budget.
+export const EPIC_LINK_MAX_PER_MINUTE = 5;
+const epicLinkIpAttempts = new Map<string, number[]>();
+const epicLinkAccountAttempts = new Map<number, number[]>();
+
+export function epicLinkRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    epicLinkIpAttempts,
+    requestIp(req),
+    EPIC_LINK_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    epicLinkAccountAttempts,
+    accountId,
+    EPIC_LINK_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset Epic link throttles. Test-only: keeps scoped buckets isolated. */
+export function resetEpicLinkRateLimits(): void {
+  epicLinkIpAttempts.clear();
+  epicLinkAccountAttempts.clear();
+}
+
 export function walletLinkRateLimited(
   req: http.IncomingMessage,
   accountId: number,

@@ -923,6 +923,23 @@ export const nl_NL: EnTranslations = {
       "separate": "{meter} loskoppelen",
       "regroup": "{meter} weer samenvoegen"
     },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Huisdier heeft volledige gezondheid",
       "disabledNoFood": "Geen voedsel in je tassen dat je huisdier kan genezen"
@@ -2130,6 +2147,14 @@ export const nl_NL: EnTranslations = {
       "benefits": "Koppel je Steam-account vanuit de desktop-app om de daden die je behaalt te spiegelen naar Steam-prestaties.",
       "noTicket": "Steam gaf geen koppelticket af. Start Steam en probeer het daarna opnieuw."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Brievenbus",
       "subtitle": "De Ravenpost",
@@ -2980,6 +3005,14 @@ export const nl_NL: EnTranslations = {
       "already_linked": "Je account heeft al een gekoppeld Steam-account.",
       "account_taken": "Dat Steam-account is al aan een ander account gekoppeld.",
       "upstream": "Steam reageerde niet. Probeer het zo meteen opnieuw."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw."
@@ -6418,6 +6451,7 @@ export const nl_NL: EnTranslations = {
       "floatingDodge": "Ontwijking",
       "floatingParry": "Parering",
       "floatingResist": "Weerstaan",
+      "floatingEvade": "Ontlopen",
       "floatingHealFull": "Vol",
       "floatingHealAbsorbed": "Geabsorbeerd",
       "cannotMove": "Kan niet bewegen!",
@@ -6430,6 +6464,7 @@ export const nl_NL: EnTranslations = {
       "dodged": "Je {ability} wordt ontweken door {target}.",
       "parried": "Je {ability} wordt gepareerd door {target}.",
       "resisted": "{target} weerstaat je {ability}.",
+      "evaded": "{target} ontloopt je {ability}.",
       "healSelf": "Je {ability} geneest je voor {amount}.",
       "healSelfCrit": "Je {ability} geneest je kritiek voor {amount}.",
       "healOther": "Je {ability} geneest {target} voor {amount}.",

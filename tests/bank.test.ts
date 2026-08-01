@@ -647,6 +647,34 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
       expect(dst).toEqual([]);
     }
   });
+
+  // Review follow-up on PR #2605 (EnriqueGF, high): the bank laundered a crafted
+  // item's provenance because moveBetweenContainers dropped the plain-stack
+  // craftedRecipeId marker (bags.ts InvSlot.craftedRecipeId), the same class of bug
+  // the trade/market fix closed for those two paths. A deposit/withdraw round trip
+  // must keep the marker, and a crafted stack must never silently merge with a
+  // drop-sourced stack of the same item.
+  it('carries the craftedRecipeId marker through a deposit/withdraw round trip', () => {
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' }];
+    const dst: InvSlot[] = [];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(src).toEqual([]);
+    expect(dst).toEqual([{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' }]);
+    // And back the other way (withdraw is the same primitive, source/dest swapped).
+    const back: InvSlot[] = [];
+    expect(moveBetweenContainers(dst, 0, undefined, back, 10)).toEqual({ moved: 3 });
+    expect(back).toEqual([{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' }]);
+  });
+
+  it('never merges a crafted stack into a plain stack of the same item id, or vice versa', () => {
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' }];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 5 }];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 2)).toEqual({ moved: 3 });
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 5 },
+      { itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' },
+    ]);
+  });
 });
 
 // ---------------------------------------------------------------------------

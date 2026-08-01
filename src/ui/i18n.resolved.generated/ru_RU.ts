@@ -923,6 +923,23 @@ export const ru_RU: EnTranslations = {
       "separate": "Отделить: {meter}",
       "regroup": "Вернуть: {meter}"
     },
+    "targetAuras": {
+      "title": "Ауры цели",
+      "keybindLabel": "Усиления и ослабления цели",
+      "all": "All",
+      "debuffs": "Ослабления",
+      "buffs": "Усиления",
+      "unlock": "Переместить окно аур цели",
+      "lock": "Закрепить окно аур цели",
+      "configureRows": "Настроить ауры цели",
+      "fewerRows": "Уменьшить число строк аур",
+      "moreRows": "Увеличить число строк аур",
+      "visibleRows": "Предпочтительное число строк аур: {count}",
+      "showSources": "Показать создателей аур",
+      "hideSources": "Скрыть создателей аур",
+      "ownAura": "Ваша аура",
+      "opacity": "Непрозрачность аур: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Питомец полностью здоров",
       "disabledNoFood": "В ваших сумках нет еды, которая могла бы вылечить питомца"
@@ -2130,6 +2147,14 @@ export const ru_RU: EnTranslations = {
       "benefits": "Привяжите аккаунт Steam в настольном приложении, чтобы ваши деяния отражались в достижениях Steam.",
       "noTicket": "Steam не выдал билет для привязки. Запустите Steam и повторите попытку."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Привязать Epic",
+      "unlink": "Отвязать Epic",
+      "linked": "Привязан аккаунт Epic {id}",
+      "benefits": "Привяжите аккаунт Epic в настольном приложении Epic, чтобы ваши деяния отражались в достижениях Epic.",
+      "noProof": "Epic не выдал подтверждение для привязки. Запустите игру из Epic Games Store и повторите попытку."
+    },
     "mailbox": {
       "title": "Почтовый ящик",
       "subtitle": "Вороновая почта",
@@ -2980,6 +3005,14 @@ export const ru_RU: EnTranslations = {
       "already_linked": "К вашему аккаунту уже привязан аккаунт Steam.",
       "account_taken": "Этот аккаунт Steam уже привязан к другому аккаунту.",
       "upstream": "Steam не отвечает. Повторите попытку чуть позже."
+    },
+    "epic": {
+      "disabled": "Привязка Epic сейчас недоступна.",
+      "invalid_token": "Epic не смог подтвердить этот запрос на привязку. Повторите попытку из настольного приложения.",
+      "banned": "Этот аккаунт Epic нельзя привязать.",
+      "already_linked": "К вашему аккаунту уже привязан аккаунт Epic.",
+      "account_taken": "Этот аккаунт Epic уже привязан к другому аккаунту.",
+      "upstream": "Epic не отвечает. Повторите попытку чуть позже."
     },
     "wallet": {
       "handoff_invalid": "Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку."
@@ -6418,6 +6451,7 @@ export const ru_RU: EnTranslations = {
       "floatingDodge": "Уклон",
       "floatingParry": "Парировано",
       "floatingResist": "Сопротивление",
+      "floatingEvade": "Ускользание",
       "floatingHealFull": "Полное",
       "floatingHealAbsorbed": "Поглощено",
       "cannotMove": "Не двигается!",
@@ -6430,6 +6464,7 @@ export const ru_RU: EnTranslations = {
       "dodged": "{target} уклоняется от вашего {ability}.",
       "parried": "{target} парирует ваш {ability}.",
       "resisted": "{target} сопротивляется вашему {ability}.",
+      "evaded": "{target} ускользает от вашего {ability}.",
       "healSelf": "Ваше {ability} исцеляет вас на {amount}.",
       "healSelfCrit": "Ваше {ability} критически исцеляет вас на {amount}.",
       "healOther": "Ваше {ability} исцеляет {target} на {amount}.",

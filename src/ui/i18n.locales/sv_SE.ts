@@ -9764,6 +9764,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Din chans att helt parera ett närstridsanfall framifrån utan att ta någon skada. Ett slag bakifrån kan inte pareras.',
   'hud.combat.floatingParry': 'Parerade',
   'hud.combat.parried': 'Din {ability} pareras av {target}.',
+  'hud.combat.floatingEvade': 'Undkom',
+  'hud.combat.evaded': '{target} undkommer din {ability}.',
   'hudChrome.options.mouseoverCast': 'Kasta via muspekaren på gruppramarna',
   'hudChrome.options.showTargetOfTarget': 'Visa målets mål',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Målets mål',

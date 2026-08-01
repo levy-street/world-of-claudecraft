@@ -9748,6 +9748,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Tvoje šance zcela odrazit čelní útok na blízko a neutrpět žádné poškození. Úder zezadu odrazit nelze.',
   'hud.combat.floatingParry': 'Odraženo',
   'hud.combat.parried': '{target} odráží tvoji schopnost {ability}.',
+  'hud.combat.floatingEvade': 'Uniknutí',
+  'hud.combat.evaded': '{target} uniká tvé schopnosti {ability}.',
   'hudChrome.options.mouseoverCast': 'Sesílání najetím myší na rámech skupiny',
   'hudChrome.options.showTargetOfTarget': 'Zobrazit cíl cíle',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Značka tvé značky',

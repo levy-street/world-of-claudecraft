@@ -9964,6 +9964,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Twoja szansa na całkowite sparowanie ataku wręcz z przodu, bez otrzymania obrażeń. Ciosu zadanego od tyłu nie można sparować.',
   'hud.combat.floatingParry': 'Parowanie',
   'hud.combat.parried': 'Twój {ability} zostaje sparowany przez {target}.',
+  'hud.combat.floatingEvade': 'Uniknięcie',
+  'hud.combat.evaded': '{target} unika twojego {ability}.',
   'hudChrome.options.mouseoverCast': 'Rzucanie po najechaniu na ramki drużyny',
   'hudChrome.options.showTargetOfTarget': 'Pokaż cel celu',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Cel celu',

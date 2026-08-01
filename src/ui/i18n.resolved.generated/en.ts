@@ -923,6 +923,23 @@ export const en: EnTranslations = {
       "separate": "Separate {meter}",
       "regroup": "Regroup {meter}"
     },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Pet is at full health",
       "disabledNoFood": "No food in your bags will heal your pet"
@@ -2130,6 +2147,14 @@ export const en: EnTranslations = {
       "benefits": "Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.",
       "noTicket": "Steam did not provide a link ticket. Start Steam, then try again."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Mailbox",
       "subtitle": "The Ravenpost",
@@ -2980,6 +3005,14 @@ export const en: EnTranslations = {
       "already_linked": "Your account already has a linked Steam account.",
       "account_taken": "That Steam account is already linked to another account.",
       "upstream": "Steam did not respond. Try again in a moment."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
@@ -6418,6 +6451,7 @@ export const en: EnTranslations = {
       "floatingDodge": "Dodge",
       "floatingParry": "Parry",
       "floatingResist": "Resist",
+      "floatingEvade": "Evade",
       "floatingHealFull": "Full",
       "floatingHealAbsorbed": "Absorbed",
       "cannotMove": "Can't move!",
@@ -6430,6 +6464,7 @@ export const en: EnTranslations = {
       "dodged": "Your {ability} is dodged by {target}.",
       "parried": "Your {ability} is parried by {target}.",
       "resisted": "Your {ability} is resisted by {target}.",
+      "evaded": "Your {ability} is evaded by {target}.",
       "healSelf": "Your {ability} heals you for {amount}.",
       "healSelfCrit": "Your {ability} critically heals you for {amount}.",
       "healOther": "Your {ability} heals {target} for {amount}.",

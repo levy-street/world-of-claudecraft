@@ -106,6 +106,99 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
 });
 
 describe('createAurasView: derivation per mode', () => {
+  it('caches tooltip effect HTML until its descriptor inputs or locale version change', () => {
+    let locale = 'en';
+    let calls = 0;
+    const view = createAurasView(
+      'all',
+      {
+        ...deps(),
+        auraEffectHtml: (input) => {
+          calls++;
+          return `${locale}:${input.value}`;
+        },
+      },
+      { effectHtmlCacheVersion: () => locale },
+    );
+    const input = aura({ id: 'fortitude', value: 5, remaining: 30 });
+
+    expect(view.tick(entity([input])).slots[0].effectHtml).toBe('en:5');
+    expect(calls).toBe(1);
+
+    input.remaining = 29;
+    expect(view.tick(entity([input])).slots[0].effectHtml).toBe('en:5');
+    expect(calls).toBe(1);
+
+    input.value = 6;
+    expect(view.tick(entity([input])).slots[0].effectHtml).toBe('en:6');
+    expect(calls).toBe(2);
+
+    locale = 'it';
+    expect(view.tick(entity([input])).slots[0].effectHtml).toBe('it:6');
+    expect(calls).toBe(3);
+  });
+
+  it('invalidates cached tooltip HTML for every effect descriptor input', () => {
+    const changes: ReadonlyArray<readonly [string, (input: AuraInput) => void]> = [
+      ['id', (input) => (input.id = 'renewed_fortitude')],
+      ['kind', (input) => (input.kind = 'hot')],
+      ['value', (input) => (input.value = 6)],
+      ['value2', (input) => (input.value2 = 3)],
+      ['value3', (input) => (input.value3 = 4)],
+      ['tickInterval', (input) => (input.tickInterval = 1)],
+      ['school', (input) => (input.school = 'frost')],
+      ['stacks', (input) => (input.stacks = 3)],
+    ];
+
+    for (const [field, change] of changes) {
+      let calls = 0;
+      const view = createAurasView(
+        'all',
+        {
+          ...deps(),
+          auraEffectHtml: (input) => {
+            calls++;
+            return JSON.stringify(input);
+          },
+        },
+        { effectHtmlCacheVersion: () => 'en' },
+      );
+      const input = aura({
+        id: 'fortitude',
+        kind: 'dot',
+        value: 5,
+        value2: 2,
+        value3: 3,
+        tickInterval: 2,
+        school: 'fire',
+        stacks: 2,
+      });
+      const before = view.tick(entity([input])).slots[0].effectHtml;
+
+      change(input);
+      const after = view.tick(entity([input])).slots[0].effectHtml;
+
+      expect({ field, calls }).toEqual({ field, calls: 2 });
+      expect(after).not.toBe(before);
+    }
+  });
+
+  it('resolves tooltip effect HTML every tick when cache versioning is not enabled', () => {
+    let calls = 0;
+    const view = createAurasView('all', {
+      ...deps(),
+      auraEffectHtml: () => {
+        calls++;
+        return `call:${calls}`;
+      },
+    });
+    const input = aura({ id: 'fortitude' });
+
+    expect(view.tick(entity([input])).slots[0].effectHtml).toBe('call:1');
+    expect(view.tick(entity([input])).slots[0].effectHtml).toBe('call:2');
+    expect(calls).toBe(2);
+  });
+
   it("mode 'all' keeps every aura; mode 'debuffs' keeps only debuffs", () => {
     const auras = [
       aura({ id: 'might', kind: 'buff_ap', value: 50 }),

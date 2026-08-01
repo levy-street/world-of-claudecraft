@@ -923,6 +923,23 @@ export const da_DK: EnTranslations = {
       "separate": "Adskil {meter}",
       "regroup": "Saml {meter} igen"
     },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Kæledyret har fuldt helbred",
       "disabledNoFood": "Ingen mad i dine tasker vil hele dit kæledyr"
@@ -2130,6 +2147,14 @@ export const da_DK: EnTranslations = {
       "benefits": "Tilknyt din Steam-konto fra skrivebordsappen for at spejle de bedrifter, du opnår, som Steam-præstationer.",
       "noTicket": "Steam udstedte ingen tilknytningsbillet. Start Steam, og prøv så igen."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Postkasse",
       "subtitle": "Ravneposten",
@@ -2980,6 +3005,14 @@ export const da_DK: EnTranslations = {
       "already_linked": "Din konto har allerede en tilknyttet Steam-konto.",
       "account_taken": "Den Steam-konto er allerede knyttet til en anden konto.",
       "upstream": "Steam svarede ikke. Prøv igen om et øjeblik."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen."
@@ -6418,6 +6451,7 @@ export const da_DK: EnTranslations = {
       "floatingDodge": "Undvigelse",
       "floatingParry": "Pareret",
       "floatingResist": "Modstået",
+      "floatingEvade": "Undgået",
       "floatingHealFull": "Fuld",
       "floatingHealAbsorbed": "Absorberet",
       "cannotMove": "Kan ikke bevæge dig!",
@@ -6430,6 +6464,7 @@ export const da_DK: EnTranslations = {
       "dodged": "Din {ability} undviges af {target}.",
       "parried": "Din {ability} pareres af {target}.",
       "resisted": "{target} modstår din {ability}.",
+      "evaded": "Din {ability} undgås af {target}.",
       "healSelf": "Din {ability} helbreder dig for {amount}.",
       "healSelfCrit": "Din {ability} helbreder dig kritisk for {amount}.",
       "healOther": "Din {ability} helbreder {target} for {amount}.",

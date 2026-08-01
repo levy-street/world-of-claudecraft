@@ -923,6 +923,23 @@ export const ja_JP: EnTranslations = {
       "separate": "{meter}を分離",
       "regroup": "{meter}を統合"
     },
+    "targetAuras": {
+      "title": "ターゲットのオーラ",
+      "keybindLabel": "ターゲットのバフとデバフ",
+      "all": "All",
+      "debuffs": "デバフ",
+      "buffs": "バフ",
+      "unlock": "ターゲットオーラウィンドウを移動",
+      "lock": "ターゲットオーラウィンドウをロック",
+      "configureRows": "ターゲットオーラを設定",
+      "fewerRows": "オーラ行数を少なくする",
+      "moreRows": "オーラ行数を多くする",
+      "visibleRows": "優先するオーラ行数: {count}",
+      "showSources": "オーラの使用者名を表示",
+      "hideSources": "オーラの使用者名を非表示",
+      "ownAura": "自分のオーラ",
+      "opacity": "オーラの不透明度: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "ペットは満タンの体力です",
       "disabledNoFood": "バッグの中にペットを回復できる食べ物がありません"
@@ -2130,6 +2147,14 @@ export const ja_JP: EnTranslations = {
       "benefits": "デスクトップアプリからSteamアカウントを連携すると、獲得した功績がSteam実績に反映されます。",
       "noTicket": "Steamから連携チケットを取得できませんでした。Steamを起動してからもう一度お試しください。"
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Epicと連携",
+      "unlink": "Epic連携を解除",
+      "linked": "Epicアカウント {id} と連携済み",
+      "benefits": "EpicデスクトップアプリからEpicアカウントを連携すると、獲得した功績がEpic実績に反映されます。",
+      "noProof": "Epicから連携証明を取得できませんでした。Epic Games Storeから起動してからもう一度お試しください。"
+    },
     "mailbox": {
       "title": "メールボックス",
       "subtitle": "レイヴンポスト",
@@ -2980,6 +3005,14 @@ export const ja_JP: EnTranslations = {
       "already_linked": "このアカウントには既にSteamアカウントが連携されています。",
       "account_taken": "そのSteamアカウントは既に別のアカウントに連携されています。",
       "upstream": "Steamから応答がありません。しばらくしてからもう一度お試しください。"
+    },
+    "epic": {
+      "disabled": "Epic連携は現在利用できません。",
+      "invalid_token": "Epicがこの連携リクエストを確認できませんでした。デスクトップアプリからもう一度お試しください。",
+      "banned": "そのEpicアカウントは連携できません。",
+      "already_linked": "このアカウントには既にEpicアカウントが連携されています。",
+      "account_taken": "そのEpicアカウントは既に別のアカウントに連携されています。",
+      "upstream": "Epicから応答がありません。しばらくしてからもう一度お試しください。"
     },
     "wallet": {
       "handoff_invalid": "ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。"
@@ -6418,6 +6451,7 @@ export const ja_JP: EnTranslations = {
       "floatingDodge": "回避",
       "floatingParry": "受け流し",
       "floatingResist": "抵抗",
+      "floatingEvade": "完全回避",
       "floatingHealFull": "満タン",
       "floatingHealAbsorbed": "吸収",
       "cannotMove": "動けない！",
@@ -6430,6 +6464,7 @@ export const ja_JP: EnTranslations = {
       "dodged": "{target}は{ability}を回避しました。",
       "parried": "{target}は{ability}を受け流しました。",
       "resisted": "{target}は{ability}に抵抗しました。",
+      "evaded": "{target}は{ability}を完全回避しました。",
       "healSelf": "{ability}が自分を{amount}回復しました。",
       "healSelfCrit": "{ability}が自分をクリティカルで{amount}回復しました。",
       "healOther": "{ability}が{target}を{amount}回復しました。",

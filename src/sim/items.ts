@@ -60,7 +60,11 @@ interface EquippedInventoryUnit {
   craftedRecipeId: string | undefined;
 }
 
-interface VendorRemovedUnit {
+// Exported for social/trade.ts and market.ts (BUG #9): the trade swap and the
+// World Market escrow both need the same per-unit craftedRecipeId tracking a
+// vendor sell/buyback already had, so they reuse this shape and the walk
+// below instead of duplicating it.
+export interface VendorRemovedUnit {
   instance: ItemInstancePayload | undefined;
   craftedRecipeId: string | undefined;
 }
@@ -215,7 +219,14 @@ export function removePreferFungible(
   return consumed;
 }
 
-function removeVendorSellUnits(
+// Per-unit removal that reports each removed unit's ItemInstancePayload AND
+// its plain-stack craftedRecipeId marker (bags.ts InvSlot.craftedRecipeId),
+// walking plain (non-instanced) slots first, then instanced ones, both
+// highest-index-first (the same order removeFungibleItem/removeItem use, so
+// a caller switching from those to this is a behavior-preserving swap). The
+// optional `skip` predicate spares any instanced copy it matches, same
+// contract as removePreferFungible's.
+export function removeVendorSellUnits(
   ctx: SimContext,
   itemId: string,
   count: number,

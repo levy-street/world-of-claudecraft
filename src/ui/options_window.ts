@@ -157,6 +157,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   bags: 'hud.keybinds.actions.bags',
   nameplates: 'hud.keybinds.actions.nameplates',
   meters: 'hud.keybinds.actions.meters',
+  targetAuras: 'hudChrome.targetAuras.keybindLabel',
   social: 'hud.keybinds.actions.social',
   arena: 'hud.keybinds.actions.arena',
   dungeonFinder: 'hudChrome.finder.title',

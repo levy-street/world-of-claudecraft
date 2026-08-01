@@ -191,6 +191,13 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['Shift+KeyH'],
   },
   {
+    id: 'targetAuras',
+    label: 'Target Buffs and Debuffs',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyJ'],
+  },
+  {
     id: 'social',
     label: 'Friends & Guild',
     category: 'Interface',

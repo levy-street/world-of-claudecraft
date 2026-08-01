@@ -950,12 +950,29 @@ export class Api {
     await this.delete('/api/github', {});
   }
 
+  // The /api/status capability adverts (steam, epic, dev commands) are read
+  // back to back on the same refresh paths, so concurrent reads collapse into
+  // ONE request. In-flight only, keyed by the realm base: nothing is memoized
+  // past settle, so every non-overlapping call still reads the server fresh,
+  // and a realm switch mid-flight never serves the old realm's document.
+  private statusDocInFlight: { base: string; doc: Promise<any> } | null = null;
+
+  private statusDoc(): Promise<any> {
+    const hit = this.statusDocInFlight;
+    if (hit !== null && hit.base === this.base) return hit.doc;
+    const doc = this.get('/api/status').finally(() => {
+      if (this.statusDocInFlight?.doc === doc) this.statusDocInFlight = null;
+    });
+    this.statusDocInFlight = { base: this.base, doc };
+    return doc;
+  }
+
   // ── Steam link (deed achievement mirror) ───────────────────────────────────
   // The public capability advert: whether this server has the Steam surface
   // lit. Read BEFORE any authed steam call so a dark server renders no link UI.
   async steamAdvert(): Promise<boolean> {
     try {
-      const data = await this.get('/api/status');
+      const data = await this.statusDoc();
       return (data.steam as { enabled?: boolean } | undefined)?.enabled === true;
     } catch {
       return false;
@@ -968,7 +985,7 @@ export class Api {
   // so a forged true opens an inert window. Fails closed on any error.
   async devCommandsAdvert(): Promise<boolean> {
     try {
-      const data = await this.get('/api/status');
+      const data = await this.statusDoc();
       return data.dev_commands === true;
     } catch {
       return false;
@@ -989,6 +1006,36 @@ export class Api {
   // Unlink Steam from the current account. Idempotent.
   async unlinkSteam(): Promise<void> {
     await this.delete('/api/steam/link', {});
+  }
+
+  // ── Epic link (deed achievement mirror) ────────────────────────────────────
+  // The public capability advert: whether this server has the Epic surface lit.
+  // Read BEFORE any authed epic call so a dark server renders no link UI (D3, D18).
+  // Rides the shared single-flight status read: the Steam and Epic refreshes
+  // run back to back on every login path, and one document serves both.
+  async epicAdvert(): Promise<boolean> {
+    try {
+      const data = await this.statusDoc();
+      return (data.epic as { enabled?: boolean } | undefined)?.enabled === true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Current account's Epic link status ({ enabled, linked, epicAccountId? }).
+  async epicStatus(): Promise<Record<string, unknown>> {
+    return this.get('/api/epic/status');
+  }
+
+  // Link via a desktop-shell proof; the server verifies it upstream and answers
+  // the verified id (never client-named; D11, D17).
+  async epicLink(proof: string): Promise<{ linked: boolean; epicAccountId: string }> {
+    return this.post('/api/epic/link', { proof });
+  }
+
+  // Unlink Epic from the current account. Idempotent.
+  async unlinkEpic(): Promise<void> {
+    await this.delete('/api/epic/link', {});
   }
 
   // ── Shareable player card + referrals ──────────────────────────────────────
@@ -1266,6 +1313,7 @@ function blankEntity(id: number): Entity {
     spawnPos: { x: 0, y: 0, z: 0 },
     leashAnchor: null,
     evadeStall: 0,
+    chaseStall: 0,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,

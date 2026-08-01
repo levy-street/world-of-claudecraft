@@ -140,8 +140,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 825,
-      "state": "90b58094",
-      "events": "edac4c54",
+      "state": "bb276d39",
+      "events": "b3f73855",
       "rng": {
         "draws": 16,
         "digest": "7bcc9d72"
@@ -151,7 +151,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 825,
-      "state": "bab470f5",
+      "state": "b8ab2ae4",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -162,7 +162,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 825,
-      "state": "8556c20a",
+      "state": "a620179d",
       "events": "45eebae7",
       "rng": {
         "draws": 180,
@@ -173,7 +173,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 825,
-      "state": "254c4db9",
+      "state": "c093909e",
       "events": "741638a5",
       "rng": {
         "draws": 340,
@@ -184,8 +184,8 @@
       "tick": 100,
       "time": 5,
       "nextId": 825,
-      "state": "5bb53ecf",
-      "events": "e7303d66",
+      "state": "5199be9b",
+      "events": "adf4c800",
       "rng": {
         "draws": 540,
         "digest": "0a2a5ba3"
@@ -195,7 +195,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 825,
-      "state": "b7679abc",
+      "state": "9c6a3440",
       "events": "741638a5",
       "rng": {
         "draws": 729,
@@ -206,7 +206,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 825,
-      "state": "0dbfa138",
+      "state": "f72ab0a4",
       "events": "741638a5",
       "rng": {
         "draws": 729,
@@ -463,7 +463,7 @@
           "facing": -1.570796,
           "fallStartY": 7.280921,
           "fiveSecondRule": 99,
-          "hp": 358,
+          "hp": 354,
           "id": 823,
           "inCombat": true,
           "kind": "mob",
@@ -568,7 +568,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 825,
-      "state": "385a586a",
+      "state": "2417cc36",
       "events": "741638a5",
       "rng": {
         "draws": 942,
@@ -579,7 +579,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 825,
-      "state": "f8ac12fd",
+      "state": "5fc147f9",
       "events": "741638a5",
       "rng": {
         "draws": 1164,
@@ -590,7 +590,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 825,
-      "state": "8d9b5704",
+      "state": "11cabe20",
       "events": "741638a5",
       "rng": {
         "draws": 1415,
@@ -601,7 +601,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 825,
-      "state": "8d9b5704",
+      "state": "11cabe20",
       "events": "741638a5",
       "rng": {
         "draws": 1415,
@@ -844,7 +844,7 @@
           "facing": 1.570796,
           "fallStartY": 7.280921,
           "fiveSecondRule": 99,
-          "hp": 366,
+          "hp": 362,
           "id": 823,
           "kind": "mob",
           "level": 12,

@@ -280,6 +280,16 @@ describe('options_window: bug-report dispatch + async states (cluster 2)', () =>
 });
 
 describe('options_window: keybind rebind dispatch (cluster 5)', () => {
+  it('localizes the Target Buffs and Debuffs row through its chrome key', () => {
+    expect(painter).toContain("targetAuras: 'hudChrome.targetAuras.keybindLabel'");
+    const displayName = painter.slice(
+      painter.indexOf('private actionDisplayName('),
+      painter.indexOf('private gamepadActionOptions('),
+    );
+    expect(displayName).toContain('BIND_ACTION_LABEL_KEYS[actionId]');
+    expect(displayName).toContain('t(BIND_ACTION_LABEL_KEYS[actionId])');
+  });
+
   it('captures a key and binds it to the same action/index', () => {
     expect(painter).toContain('private beginCapture(actionId: string, index: number');
     expect(painter).toContain('hooks.captureKey((code)');

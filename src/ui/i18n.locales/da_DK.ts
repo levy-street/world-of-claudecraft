@@ -9759,6 +9759,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Din chance for helt at parere et frontalt nærkampsangreb uden at tage skade. Et slag bagfra kan ikke pareres.',
   'hud.combat.floatingParry': 'Pareret',
   'hud.combat.parried': 'Din {ability} pareres af {target}.',
+  'hud.combat.floatingEvade': 'Undgået',
+  'hud.combat.evaded': 'Din {ability} undgås af {target}.',
   'hudChrome.options.mouseoverCast': 'Museover-kast på grupperammer',
   'hudChrome.options.showTargetOfTarget': 'Vis målets mål',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Målets Mål',

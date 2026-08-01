@@ -923,6 +923,23 @@ export const zh_TW: EnTranslations = {
       "separate": "分離{meter}",
       "regroup": "合併{meter}"
     },
+    "targetAuras": {
+      "title": "目標光環",
+      "keybindLabel": "目標增益與減益效果",
+      "all": "All",
+      "debuffs": "減益",
+      "buffs": "增益",
+      "unlock": "移動目標光環視窗",
+      "lock": "鎖定目標光環視窗",
+      "configureRows": "設定目標光環",
+      "fewerRows": "減少光環列數",
+      "moreRows": "增加光環列數",
+      "visibleRows": "偏好的光環列數：{count}",
+      "showSources": "顯示光環施放者",
+      "hideSources": "隱藏光環施放者",
+      "ownAura": "你的光環",
+      "opacity": "光環不透明度：{percent}"
+    },
     "petFeed": {
       "disabledFullHp": "寵物生命值已滿",
       "disabledNoFood": "你的背包中沒有可以治療寵物的食物"
@@ -2130,6 +2147,14 @@ export const zh_TW: EnTranslations = {
       "benefits": "在桌面應用程式中連結你的 Steam 帳號，將你獲得的功績同步為 Steam 成就。",
       "noTicket": "Steam 未提供連結憑證。請先啟動 Steam，然後重試。"
     },
+    "epic": {
+      "title": "Epic",
+      "link": "連結 Epic",
+      "unlink": "取消連結 Epic",
+      "linked": "已連結 Epic 帳號 {id}",
+      "benefits": "在 Epic 桌面應用程式中連結你的 Epic 帳號，將你獲得的功績同步為 Epic 成就。",
+      "noProof": "Epic 未提供連結憑證。請從 Epic Games Store 啟動，然後重試。"
+    },
     "mailbox": {
       "title": "郵箱",
       "subtitle": "渡鴉郵驛",
@@ -2980,6 +3005,14 @@ export const zh_TW: EnTranslations = {
       "already_linked": "你的帳號已連結一個 Steam 帳號。",
       "account_taken": "該 Steam 帳號已連結到另一個帳號。",
       "upstream": "Steam 未回應。請稍後重試。"
+    },
+    "epic": {
+      "disabled": "Epic 連結目前無法使用。",
+      "invalid_token": "Epic 無法驗證此連結請求。請在桌面應用程式中重試。",
+      "banned": "該 Epic 帳號無法連結。",
+      "already_linked": "你的帳號已連結一個 Epic 帳號。",
+      "account_taken": "該 Epic 帳號已連結到另一個帳號。",
+      "upstream": "Epic 未回應。請稍後重試。"
     },
     "wallet": {
       "handoff_invalid": "錢包授權已過期或無法驗證。請再試一次。"
@@ -6418,6 +6451,7 @@ export const zh_TW: EnTranslations = {
       "floatingDodge": "閃避",
       "floatingParry": "招架",
       "floatingResist": "抵抗",
+      "floatingEvade": "迴避",
       "floatingHealFull": "已滿",
       "floatingHealAbsorbed": "被吸收",
       "cannotMove": "無法移動！",
@@ -6430,6 +6464,7 @@ export const zh_TW: EnTranslations = {
       "dodged": "{target}閃避了你的{ability}。",
       "parried": "你的{ability}被{target}招架了。",
       "resisted": "{target}抵抗了你的{ability}。",
+      "evaded": "你的{ability}被{target}迴避了。",
       "healSelf": "你的{ability}為你恢復 {amount} 點生命。",
       "healSelfCrit": "你的{ability}對你造成暴擊治療，恢復 {amount} 點生命。",
       "healOther": "你的{ability}為{target}恢復 {amount} 點生命。",

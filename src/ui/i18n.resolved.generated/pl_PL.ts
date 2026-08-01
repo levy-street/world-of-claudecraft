@@ -923,6 +923,23 @@ export const pl_PL: EnTranslations = {
       "separate": "Odłącz {meter}",
       "regroup": "Zgrupuj {meter} ponownie"
     },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Zwierzę ma pełne zdrowie",
       "disabledNoFood": "W twoich torbach nie ma jedzenia, które uleczy twoje zwierzę"
@@ -2130,6 +2147,14 @@ export const pl_PL: EnTranslations = {
       "benefits": "Połącz swoje konto Steam z poziomu aplikacji na komputer, aby zdobywane czyny znajdowały odbicie w osiągnięciach Steam.",
       "noTicket": "Steam nie wystawił biletu połączenia. Uruchom Steam i spróbuj ponownie."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Skrzynka pocztowa",
       "subtitle": "Krucza Poczta",
@@ -2980,6 +3005,14 @@ export const pl_PL: EnTranslations = {
       "already_linked": "Twoje konto ma już połączone konto Steam.",
       "account_taken": "To konto Steam jest już połączone z innym kontem.",
       "upstream": "Steam nie odpowiada. Spróbuj ponownie za chwilę."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie."
@@ -6418,6 +6451,7 @@ export const pl_PL: EnTranslations = {
       "floatingDodge": "Unik",
       "floatingParry": "Parowanie",
       "floatingResist": "Odparto",
+      "floatingEvade": "Uniknięcie",
       "floatingHealFull": "Pełne",
       "floatingHealAbsorbed": "Pochłonięte",
       "cannotMove": "Nie można się ruszyć!",
@@ -6430,6 +6464,7 @@ export const pl_PL: EnTranslations = {
       "dodged": "Twój {ability} zostaje uniknięty przez {target}.",
       "parried": "Twój {ability} zostaje sparowany przez {target}.",
       "resisted": "{target} odpiera twoje {ability}.",
+      "evaded": "{target} unika twojego {ability}.",
       "healSelf": "Twój {ability} leczy cię o {amount}.",
       "healSelfCrit": "Twój {ability} leczy cię krytycznie o {amount}.",
       "healOther": "Twój {ability} leczy {target} o {amount}.",

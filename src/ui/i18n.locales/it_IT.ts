@@ -400,6 +400,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "In parte. Le nove ricette comuni da campo (l'arma iniziale, le staple di armatura, cibo e pozioni) si possono lavorare ovunque, in qualsiasi momento. Tutto cio che sta sopra e legato a un tipo di stazione: fucina, cucine, farmacia, conceria, telaio o officina, e devi essere entro 20 metri dalla stazione perche la lavorazione vada a buon fine.\n\nA 75 di competenza in un mestiere ti specializzi, e insieme a uno sconto del 20 percento sui materiali ottieni una stazione mobile: piazzala in campo e rimane per 10 minuti, servendo le ricette di quel mestiere come se fossi alla vera stazione. La stazione mobile e solo per la lavorazione: imparare le ricette e sciogliere le commissioni richiedono sempre la vera stazione in citta.",
   'hud.combat.floatingParry': 'Parata',
   'hud.combat.parried': 'Il tuo {ability} viene parato da {target}.',
+  'hud.combat.floatingEvade': 'Evitato',
+  'hud.combat.evaded': 'Il tuo {ability} viene evitato da {target}.',
   'hud.logs.keptBoundOne': 'Conservata {count} copia vincolata.',
   'hud.logs.keptBoundMany': 'Conservate {count} copie vincolate.',
   'hud.pet.waterJet': "Getto d'Acqua",

@@ -923,6 +923,23 @@ export const zh_CN: EnTranslations = {
       "separate": "分离{meter}",
       "regroup": "合并{meter}"
     },
+    "targetAuras": {
+      "title": "目标光环",
+      "keybindLabel": "目标增益和减益效果",
+      "all": "All",
+      "debuffs": "减益",
+      "buffs": "增益",
+      "unlock": "移动目标光环窗口",
+      "lock": "锁定目标光环窗口",
+      "configureRows": "设置目标光环",
+      "fewerRows": "减少光环行数",
+      "moreRows": "增加光环行数",
+      "visibleRows": "首选光环行数：{count}",
+      "showSources": "显示光环施放者",
+      "hideSources": "隐藏光环施放者",
+      "ownAura": "你的光环",
+      "opacity": "光环不透明度：{percent}"
+    },
     "petFeed": {
       "disabledFullHp": "宠物生命值已满",
       "disabledNoFood": "你的背包中没有可以治疗宠物的食物"
@@ -2130,6 +2147,14 @@ export const zh_CN: EnTranslations = {
       "benefits": "在桌面客户端中关联你的 Steam 账号，将你获得的功绩同步为 Steam 成就。",
       "noTicket": "Steam 未提供关联凭据。请先启动 Steam，然后重试。"
     },
+    "epic": {
+      "title": "Epic",
+      "link": "关联 Epic",
+      "unlink": "取消关联 Epic",
+      "linked": "已关联 Epic 账号 {id}",
+      "benefits": "在 Epic 桌面客户端中关联你的 Epic 账号，将你获得的功绩同步为 Epic 成就。",
+      "noProof": "Epic 未提供关联凭据。请从 Epic Games Store 启动，然后重试。"
+    },
     "mailbox": {
       "title": "邮箱",
       "subtitle": "渡鸦邮驿",
@@ -2980,6 +3005,14 @@ export const zh_CN: EnTranslations = {
       "already_linked": "你的账号已关联一个 Steam 账号。",
       "account_taken": "该 Steam 账号已关联到另一个账号。",
       "upstream": "Steam 未响应。请稍后重试。"
+    },
+    "epic": {
+      "disabled": "Epic 关联当前不可用。",
+      "invalid_token": "Epic 无法验证此关联请求。请在桌面客户端中重试。",
+      "banned": "该 Epic 账号无法关联。",
+      "already_linked": "你的账号已关联一个 Epic 账号。",
+      "account_taken": "该 Epic 账号已关联到另一个账号。",
+      "upstream": "Epic 未响应。请稍后重试。"
     },
     "wallet": {
       "handoff_invalid": "钱包授权已过期或无法验证。请重试。"
@@ -6418,6 +6451,7 @@ export const zh_CN: EnTranslations = {
       "floatingDodge": "闪避",
       "floatingParry": "招架",
       "floatingResist": "抵抗",
+      "floatingEvade": "回避",
       "floatingHealFull": "已满",
       "floatingHealAbsorbed": "被吸收",
       "cannotMove": "无法移动！",
@@ -6430,6 +6464,7 @@ export const zh_CN: EnTranslations = {
       "dodged": "{target}闪避了你的{ability}。",
       "parried": "{target}招架了你的{ability}。",
       "resisted": "{target}抵抗了你的{ability}。",
+      "evaded": "{target}回避了你的{ability}。",
       "healSelf": "你的{ability}为你恢复 {amount} 点生命。",
       "healSelfCrit": "你的{ability}对你造成暴击治疗，恢复 {amount} 点生命。",
       "healOther": "你的{ability}为{target}恢复 {amount} 点生命。",

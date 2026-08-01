@@ -1165,6 +1165,39 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // Epic link family (server/epic/routes.ts): registry-only RouteDefs, twin of
+  // the Steam trio. Env-gated dark (epic.disabled 503 until EPIC_ENABLED=1);
+  // linking is NEVER an identity or session source.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/epic/link',
+    handler: 'server/epic/routes.ts linkHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'epicLinkRateLimited',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'DELETE',
+    path: '/api/epic/link',
+    handler: 'server/epic/routes.ts unlinkHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/epic/status',
+    handler: 'server/epic/routes.ts statusHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   {
     dispatcher: DISPATCH.mainApi,
     method: 'POST',

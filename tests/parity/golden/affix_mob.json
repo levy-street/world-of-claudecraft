@@ -148,8 +148,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 823,
-      "state": "de5f6b35",
-      "events": "95cd6b6a",
+      "state": "582ca5ae",
+      "events": "5969a9a6",
       "rng": {
         "draws": 17,
         "digest": "15e6b652"
@@ -159,7 +159,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 823,
-      "state": "c7d6a497",
+      "state": "24f75838",
       "events": "85abf49a",
       "rng": {
         "draws": 29,
@@ -170,7 +170,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 823,
-      "state": "bdfb2dd1",
+      "state": "5e0d97d4",
       "events": "f4f7257b",
       "rng": {
         "draws": 100,
@@ -195,7 +195,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 200,
-            "damageTaken": 210
+            "damageTaken": 211
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -297,7 +297,7 @@
           "dodgeChance": 0.066,
           "fallStartY": 1.5,
           "fiveSecondRule": 101.5,
-          "hp": 375,
+          "hp": 374,
           "id": 816,
           "inCombat": true,
           "kind": "player",
@@ -316,7 +316,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 19.482692,
+          "resource": 19.757692,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -464,7 +464,7 @@
       "tick": 54,
       "time": 2.7,
       "nextId": 823,
-      "state": "ef2e52e4",
+      "state": "a227b66d",
       "events": "741638a5",
       "rng": {
         "draws": 130,
@@ -489,7 +489,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 200,
-            "damageTaken": 210
+            "damageTaken": 211
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -592,7 +592,7 @@
           "dodgeChance": 0.066,
           "fallStartY": 1.5,
           "fiveSecondRule": 101.7,
-          "hp": 375,
+          "hp": 374,
           "id": 816,
           "inCombat": true,
           "kind": "player",
@@ -611,7 +611,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 19.482692,
+          "resource": 19.757692,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,

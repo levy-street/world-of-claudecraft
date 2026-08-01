@@ -9746,6 +9746,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Önden gelen bir yakın dövüş saldırısını hiç hasar almadan tümüyle karşılama şansın. Arkadan gelen bir darbe karşılanamaz.',
   'hud.combat.floatingParry': 'Karşılama',
   'hud.combat.parried': '{ability} yeteneğin {target} tarafından karşılandı.',
+  'hud.combat.floatingEvade': 'Kaçınma',
+  'hud.combat.evaded': '{target}, {ability} yeteneğinden kaçındı.',
   'hudChrome.options.mouseoverCast': 'Grup Çerçevelerinde İmleçle Büyü Yapma',
   'hudChrome.options.showTargetOfTarget': 'Hedefin Hedefini Göster',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Hedefin Hedefi',

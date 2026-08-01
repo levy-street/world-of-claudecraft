@@ -9867,6 +9867,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Peluang Anda untuk sepenuhnya menangkis serangan jarak dekat dari depan, tanpa menerima kerusakan. Pukulan dari belakang tidak dapat ditangkis.',
   'hud.combat.floatingParry': 'Tangkis',
   'hud.combat.parried': '{ability}-mu ditangkis oleh {target}.',
+  'hud.combat.floatingEvade': 'Hindar',
+  'hud.combat.evaded': '{ability}-mu dihindari oleh {target}.',
   'hudChrome.options.mouseoverCast': 'Rapal Saat Menyorot Bingkai Kelompok',
   'hudChrome.options.showTargetOfTarget': 'Tampilkan Sasaran dari Sasaran',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Sasaran dari Sasaran',

@@ -94,6 +94,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.targetFrameMover.relocalize|',
   'this.playerFrameMover.relocalize|',
   'this.partyFrameMover.relocalize|',
+  'this.targetAurasWindow.relocalize|',
   'this.questlogWindow.render|this.questlogWindow.isOpen',
   "this.renderBags|$('#bags').style.display !== 'none'",
   "this.renderVendor|this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block'",

@@ -826,6 +826,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   { file: 'options_window.ts', reflowAllow: {}, driverAllow: { requestIdleCallback: 3 } },
   { file: 'professions_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'spellbook_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // The root, trigger, and popover rects position the target-aura configurator inside the
+  // viewport. They run only when the player opens or changes that configurator, or when an
+  // open configurator receives a viewport resize event, never from the aura paint cadence.
+  {
+    file: 'target_auras_window.ts',
+    reflowAllow: { '.getBoundingClientRect': 3 },
+    driverAllow: {},
+  },
   // The tree height-cap fit: the root's max-height (read through the shared getUiScale
   // helper as well, which is why the proxy token is granted here), then the body and root
   // tops and the footer height, then one scrollHeight to decide whether the body scrolls.

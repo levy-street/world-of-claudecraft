@@ -175,6 +175,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     spawnPos: { ...pos },
     leashAnchor: null,
     evadeStall: 0,
+    chaseStall: 0,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,

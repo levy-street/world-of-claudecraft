@@ -72,6 +72,12 @@ const EXPECTED_CODES = [
   'steam.already_linked',
   'steam.account_taken',
   'steam.upstream',
+  'epic.disabled',
+  'epic.invalid_token',
+  'epic.banned',
+  'epic.already_linked',
+  'epic.account_taken',
+  'epic.upstream',
   'ota_updates.invalid_input',
 ];
 

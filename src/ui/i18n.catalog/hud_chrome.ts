@@ -690,6 +690,23 @@ export const hudChromeStrings = {
     separate: 'Separate {meter}',
     regroup: 'Regroup {meter}',
   },
+  targetAuras: {
+    title: 'Target Auras',
+    keybindLabel: 'Target Buffs and Debuffs',
+    all: 'All',
+    debuffs: 'Debuffs',
+    buffs: 'Buffs',
+    unlock: 'Move target aura window',
+    lock: 'Lock target aura window',
+    configureRows: 'Configure target auras',
+    fewerRows: 'Prefer fewer aura rows',
+    moreRows: 'Prefer more aura rows',
+    visibleRows: 'Preferred aura rows: {count}',
+    showSources: 'Show aura sources',
+    hideSources: 'Hide aura sources',
+    ownAura: 'Your aura',
+    opacity: 'Aura opacity: {percent}',
+  },
   // Pet action bar disabled-state tooltips: the feed/heal-pet button stays
   // visible (never hidden) while it cannot currently be used, so a hunter
   // sees WHY instead of a button that looks broken.
@@ -2335,6 +2352,20 @@ export const hudChromeStrings = {
     benefits:
       'Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.',
     noTicket: 'Steam did not provide a link ticket. Start Steam, then try again.',
+  },
+  // Epic account link (the deeds achievement mirror), the stacked card beside
+  // the Steam one on character select. Renders only when the server's
+  // /api/status advert says the Epic surface is lit; linking itself is
+  // desktop epic-channel only (the shell mints the proof), website/steam/web
+  // show status + Unlink. Linking is never a sign-in method (D2).
+  epic: {
+    title: 'Epic',
+    link: 'Link Epic',
+    unlink: 'Unlink Epic',
+    linked: 'Linked to Epic account {id}',
+    benefits:
+      'Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.',
+    noProof: 'Epic did not provide a link proof. Launch from the Epic Games Store, then try again.',
   },
   // The Ravenpost mailbox window + envelope indicator. Authored letter
   // sender/subject/body localize via entities.letters.* (world_entity_i18n),

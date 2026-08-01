@@ -17,16 +17,25 @@ function makeTradeCtx() {
   const tradeInvites = new Map<number, { fromPid: number; expires: number }>();
   const partyInvites = new Map<number, { fromPid: number; expires: number }>();
   const duelInvites = new Map<number, { fromPid: number; expires: number }>();
-  const bags = new Map<number, Map<string, number>>();
   const events: any[] = [];
   let time = 0;
+  // A thin Map-like view over the player's real `inventory` array (the
+  // PlayerMeta shape), not a second, independent store: trade.ts's removal
+  // path (removeVendorSellUnits, BUG #9) walks meta.inventory directly to
+  // track each removed unit's craftedRecipeId marker, so this fake ctx has
+  // to keep the SAME one source of truth a real Sim does, or the walk finds
+  // nothing to remove. One plain (non-instanced) slot per itemId is enough
+  // for this fake's documented simplification: every held copy is fungible.
   const bag = (pid: number) => {
-    let b = bags.get(pid);
-    if (!b) {
-      b = new Map();
-      bags.set(pid, b);
-    }
-    return b;
+    const inv: { itemId: string; count: number }[] = players.get(pid)!.inventory;
+    return {
+      get: (itemId: string): number | undefined => inv.find((s) => s.itemId === itemId)?.count,
+      set: (itemId: string, count: number): void => {
+        const slot = inv.find((s) => s.itemId === itemId);
+        if (slot) slot.count = count;
+        else inv.push({ itemId, count });
+      },
+    };
   };
   const ctx = {
     get time() {
@@ -219,9 +228,16 @@ describe('trade module (direct, no Sim)', () => {
           if (inv[i].itemId === itemId && !inv[i].instance && inv[i].count <= 0) inv.splice(i, 1);
         }
       },
-      addItem: (itemId: string, count: number, pid?: number) => {
+      addItem: (
+        itemId: string,
+        count: number,
+        pid?: number,
+        opts?: { craftedRecipeId?: string },
+      ) => {
         const inv = players.get(pid!).inventory;
-        inv.push({ itemId, count });
+        const slot: any = { itemId, count };
+        if (opts?.craftedRecipeId !== undefined) slot.craftedRecipeId = opts.craftedRecipeId;
+        inv.push(slot);
       },
       // Merge-aware like the real Sim.addItemInstance (identical-payload
       // stacking): byte-equal mergeable payloads share a stack up
@@ -305,6 +321,37 @@ describe('trade module (direct, no Sim)', () => {
     tradeMod.tradeConfirm(ctx, 2);
 
     // Trade must be rejected, not silently overflow the receiver to 17 slots.
+    expect(players.get(2).inventory).toHaveLength(16);
+    expect(players.get(1).inventory).toHaveLength(1);
+    expect(events.some((e) => e.type === 'error' && /not enough bag space/.test(e.text))).toBe(
+      true,
+    );
+  });
+
+  // #2605 review (Rubsey/OSSBrain): fitsAfterSwap must bucket the plain
+  // (fungible) receive by craftedRecipeId, the same way grantOffer grants it,
+  // or the capacity simulation can see room in an existing marker-free stack
+  // that the real grant (addStacked, keyed on the marker) cannot merge into,
+  // underpredicting the receiver's slot usage and overflowing their bags.
+  it('rejects a trade that would push the receiver over bag capacity via a crafted-provenance plain grant', () => {
+    const receiverInv = [
+      { itemId: 'wolf_fang', count: 1 }, // marker-free plain stack (room to stack under a naive fit)
+      ...Array.from({ length: 15 }, (_, i) => ({ itemId: `filler_${i}`, count: 1 })),
+    ];
+    const { ctx, players, events } = makeInstancedTradeCtx(
+      [{ itemId: 'wolf_fang', count: 1, craftedRecipeId: 'recipe_wolf_fang' }],
+      receiverInv,
+    );
+    expect(players.get(2).inventory).toHaveLength(16);
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    // Trade must be rejected, not silently overflow the receiver to 17 slots
+    // by assuming the crafted-marker grant merges into the marker-free stack.
     expect(players.get(2).inventory).toHaveLength(16);
     expect(players.get(1).inventory).toHaveLength(1);
     expect(events.some((e) => e.type === 'error' && /not enough bag space/.test(e.text))).toBe(

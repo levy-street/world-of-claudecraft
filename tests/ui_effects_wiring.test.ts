@@ -97,6 +97,20 @@ describe('hud.css - FCT crit sheds the pop at low (keeps the number)', () => {
   });
 });
 
+describe('hud.css - target aura expiry sheds motion at low without hiding the cue', () => {
+  it('replaces the blink with a static brightness marker only on the low tier', () => {
+    expect(hudCss).toMatch(
+      /@media \(prefers-reduced-motion: no-preference\) \{\s*\.ta-row\.expiring \.ta-icon \{\s*animation: aura-expire-blink/,
+    );
+    const rule = hudCss.match(
+      /:root\[data-fx-level="low"\] \.ta-row\.expiring \.ta-icon \{[^}]*\}/,
+    );
+    expect(rule).not.toBeNull();
+    expect(rule?.[0]).toContain('animation: none;');
+    expect(rule?.[0]).toContain('filter: brightness(1.4);');
+  });
+});
+
 describe('applier - the diff-guarded, debounced, matchMedia-driven DOM host', () => {
   it('owns the OS prefers-reduced-motion channel with a change listener', () => {
     expect(applier).toContain("window.matchMedia('(prefers-reduced-motion: reduce)')");

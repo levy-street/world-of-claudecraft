@@ -385,6 +385,54 @@ export class PgSocialDb implements SocialDb {
     ]);
   }
 
+  async transferGuildLeader(
+    guildId: number,
+    fromCharId: number,
+    toCharId: number,
+  ): Promise<'ok' | 'not_leader' | 'not_member' | 'no_guild'> {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      // lock the guild row so a racing transfer serializes behind this one:
+      // without this, two /gleader calls can both read "actor is still
+      // leader" before either write lands, and both promotions go through.
+      const g = await client.query('SELECT id FROM guilds WHERE id = $1 FOR UPDATE', [guildId]);
+      if (g.rowCount === 0) {
+        await client.query('ROLLBACK');
+        return 'no_guild';
+      }
+      const rows = await client.query(
+        'SELECT character_id, rank FROM guild_members WHERE guild_id = $1 AND character_id IN ($2, $3)',
+        [guildId, fromCharId, toCharId],
+      );
+      const fromRow = rows.rows.find((r) => r.character_id === fromCharId);
+      const toRow = rows.rows.find((r) => r.character_id === toCharId);
+      // re-check under the lock: the actor may have lost leadership (or the
+      // target may have left) to a transfer that committed first.
+      if (!fromRow || fromRow.rank !== 'leader') {
+        await client.query('ROLLBACK');
+        return 'not_leader';
+      }
+      if (!toRow) {
+        await client.query('ROLLBACK');
+        return 'not_member';
+      }
+      await client.query("UPDATE guild_members SET rank = 'leader' WHERE character_id = $1", [
+        toCharId,
+      ]);
+      await client.query("UPDATE guild_members SET rank = 'officer' WHERE character_id = $1", [
+        fromCharId,
+      ]);
+      await client.query('COMMIT');
+      return 'ok';
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
   async setGuildMotd(guildId: number, motd: string, setBy: string): Promise<void> {
     await this.pool.query('UPDATE guilds SET motd = $2, motd_set_by = $3 WHERE id = $1', [
       guildId,

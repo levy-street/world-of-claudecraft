@@ -395,6 +395,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'En parte. Las nueve recetas de campo comunes (el arma, armadura, comida y pociones básicas de inicio) se crean en cualquier lugar, en cualquier momento. Todo lo que está por encima de ellas está vinculado a un tipo de estación: forja, cocinas, botica, curtiduría, telar o taller de herramientas, y debes estar a menos de 20 yardas de la estación para que la creación se complete.\n\nA habilidad 75 en un oficio te especializas, y junto con un descuento del 20 por ciento en materiales obtienes una estación móvil: colócala en el campo y permanece durante 10 minutos, sirviendo las recetas de ese oficio como si estuvieras en la real. La estación móvil es solo para crear: aprender recetas y desvincular encargos siempre requieren la verdadera estación en el pueblo.',
   'hud.combat.floatingParry': 'Parada',
   'hud.combat.parried': 'Tu {ability} es parada por {target}.',
+  'hud.combat.floatingEvade': 'Evasión',
+  'hud.combat.evaded': 'Tu {ability} es evadida por {target}.',
   'hud.logs.keptBoundOne': 'Se conservó {count} copia vinculada.',
   'hud.logs.keptBoundMany': 'Se conservaron {count} copias vinculadas.',
   'hud.pet.waterJet': 'Chorro de Agua',

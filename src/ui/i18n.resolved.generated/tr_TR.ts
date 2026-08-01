@@ -923,6 +923,23 @@ export const tr_TR: EnTranslations = {
       "separate": "Ayır: {meter}",
       "regroup": "Yeniden grupla: {meter}"
     },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Evcil hayvanın canı dolu",
       "disabledNoFood": "Çantalarında evcil hayvanını iyileştirecek yiyecek yok"
@@ -2130,6 +2147,14 @@ export const tr_TR: EnTranslations = {
       "benefits": "Kazandığın yiğitliklerin Steam başarımlarına yansıması için Steam hesabını masaüstü uygulamasından bağla.",
       "noTicket": "Steam bir bağlantı bileti vermedi. Steam'i başlat, sonra tekrar dene."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Posta Kutusu",
       "subtitle": "Kuzgun Postası",
@@ -2980,6 +3005,14 @@ export const tr_TR: EnTranslations = {
       "already_linked": "Hesabına zaten bağlı bir Steam hesabı var.",
       "account_taken": "Bu Steam hesabı zaten başka bir hesaba bağlı.",
       "upstream": "Steam yanıt vermedi. Birazdan tekrar dene."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene."
@@ -6418,6 +6451,7 @@ export const tr_TR: EnTranslations = {
       "floatingDodge": "Savuşturma",
       "floatingParry": "Karşılama",
       "floatingResist": "Direnildi",
+      "floatingEvade": "Kaçınma",
       "floatingHealFull": "Dolu",
       "floatingHealAbsorbed": "Emildi",
       "cannotMove": "Hareket edemezsin!",
@@ -6430,6 +6464,7 @@ export const tr_TR: EnTranslations = {
       "dodged": "{ability} yeteneğin {target} tarafından savuşturuldu.",
       "parried": "{ability} yeteneğin {target} tarafından karşılandı.",
       "resisted": "{target}, {ability} yeteneğine direndi.",
+      "evaded": "{target}, {ability} yeteneğinden kaçındı.",
       "healSelf": "{ability} yeteneğin seni {amount} iyileştirdi.",
       "healSelfCrit": "{ability} yeteneğin seni kritik {amount} iyileştirdi.",
       "healOther": "{ability} yeteneğin {target} hedefini {amount} iyileştirdi.",

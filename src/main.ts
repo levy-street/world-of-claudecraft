@@ -280,6 +280,7 @@ import { renderDiscordWidget } from './ui/discord_widget';
 import { finderLootItemIds } from './ui/dungeon_finder_view';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
+import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { attachGatherNodeHoverTooltip, gatherNodeToolGateFor } from './ui/gather_node_tooltip';
 import { gatherToolNoNodeKey } from './ui/gathering_view';
@@ -1654,6 +1655,9 @@ async function startGame(
           case 'meters':
             hud.toggleMeters();
             break;
+          case 'targetAuras':
+            hud.toggleTargetAuras();
+            break;
           case 'social':
             hud.toggleSocial();
             break;
@@ -1900,6 +1904,9 @@ async function startGame(
         break;
       case 'meters':
         hud.toggleMeters();
+        break;
+      case 'targetAuras':
+        hud.toggleTargetAuras();
         break;
       case 'social':
         hud.toggleSocial();
@@ -8213,6 +8220,7 @@ function wireStartScreens(): void {
   void wireWallet();
   wireGithubLink();
   wireSteamLink(api);
+  wireEpicLink(api);
 
   // mode select
   const onlineBtn = $('#btn-online');
@@ -8259,6 +8267,7 @@ function wireStartScreens(): void {
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
+    void refreshEpicLinkStatus(api);
     // Mandatory recovery-email capture: block realm entry until a pre-email account
     // sets one (a fresh signup already has it, so this is a no-op there).
     await maybePromptRecoveryEmail();
@@ -9343,6 +9352,7 @@ function wireStartScreens(): void {
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
+    void refreshEpicLinkStatus(api);
     // A Discord login usually captured the email already, but confirm and prompt
     // if it did not (e.g. the address was missing on the Discord account).
     void maybePromptRecoveryEmail().then(() => goToLoggedInPlay());
@@ -9628,6 +9638,7 @@ function wireStartScreens(): void {
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
+    void refreshEpicLinkStatus(api);
     // (Discord status is refreshed by enterLoggedInChrome above.)
     // A just-completed Discord login lands straight in play; capture a recovery
     // email first if the Discord grant did not provide one. The desktop-login

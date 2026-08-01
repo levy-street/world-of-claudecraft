@@ -26,6 +26,7 @@ import {
   CLAUDIUM_SPEND_POLICY,
   CLAUDIUM_SPEND_PRE_AUTH_POLICY,
   DISCORD_POLICY,
+  EPIC_LINK_POLICY,
   MAP_MUTATION_POLICY,
   PUBLIC_READ_POLICY,
   type RateLimitPolicy,
@@ -71,6 +72,7 @@ import {
   CLAUDIUM_QUOTE_MAX_PER_MINUTE,
   CLAUDIUM_SPEND_MAX_PER_MINUTE,
   DISCORD_MAX_PER_MINUTE,
+  EPIC_LINK_MAX_PER_MINUTE,
   MAP_MUTATION_MAX_PER_MINUTE,
   PUBLIC_READ_MAX_PER_MINUTE,
   REPORTS_CREATE_MAX_PER_MINUTE,
@@ -217,6 +219,12 @@ describe('rate-limit POLICIES derive from the limiter constants and hold their v
       policy: STEAM_LINK_POLICY,
       name: 'steam_link',
       source: STEAM_LINK_MAX_PER_MINUTE,
+      limit: 5,
+    },
+    {
+      policy: EPIC_LINK_POLICY,
+      name: 'epic_link',
+      source: EPIC_LINK_MAX_PER_MINUTE,
       limit: 5,
     },
     {
