@@ -38,6 +38,7 @@ import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest'
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { weaponAttackStyle } from './weapon_attack_style_core';
+import { WeaponIdleAnimator } from './weapon_idle_anim';
 import {
   disposeOwnedWeaponSkinMaterials,
   markOwnedWeaponSkinMaterials,
@@ -242,6 +243,10 @@ export class CharacterVisual {
   private offhandItemId: string | null;
   private weaponSkinId: string | null = null;
   private weaponVfx: WeaponVfxHandle[] = [];
+  // The held model's OWN baked clip (a legendary's ring spin, a staff crystal's
+  // orbit). Separate from `mixer`, which drives the humanoid rig: these clips
+  // target nodes inside the attached weapon prop, not the character skeleton.
+  private weaponIdle = new WeaponIdleAnimator();
   // Skin payloads whose orientation blends to a root-relative pin (see
   // applySkinOrientation): bows aim upright DURING the shot, bow-slot guns
   // carry forward OUTSIDE it. qGrip is the authored grip-local orientation.
@@ -1210,6 +1215,10 @@ export class CharacterVisual {
     this.rebuildCasters();
     this.applyVisualMaterials();
     this.buildWeaponVfx(payloads);
+    // Re-bind the held model's own idle clip to the payloads that now exist.
+    // The old mixers pointed at prop clones that were just removed, so this has
+    // to run on EVERY re-attach, not only on a skin change.
+    this.weaponIdle.build(payloads);
     this.rebuildWeaponAura();
   }
 
@@ -1296,12 +1305,24 @@ export class CharacterVisual {
     return true;
   }
 
-  /** Advance the weapon-skin VFX (shader time, pulse, flicker). Cheap no-op
-   *  without an active skin; the renderer calls it once per entity per frame.
-   *  Also re-pins bow payload orientation (see reattachHeldWeapon). */
+  /** Advance the weapon-skin VFX (shader time, pulse, flicker) and the held
+   *  model's own baked idle clip. Cheap no-op without an active skin; the
+   *  renderer calls it once per entity per frame. Also re-pins bow payload
+   *  orientation (see reattachHeldWeapon). */
   updateWeaponVfx(dt: number): void {
     this.applySkinOrientation(dt);
     for (const handle of this.weaponVfx) handle.update(dt);
+    // Unlike the rig mixer this is NOT LOD-throttled: it is a couple of node
+    // transforms per animated payload, and the skins that carry one are exactly
+    // the ones a player paid to be seen wearing.
+    this.weaponIdle.update(dt);
+  }
+
+  /** Advance ONLY the held model's baked idle clip, for rigs that show the
+   *  weapon without running its particle VFX (the character-sheet paperdoll,
+   *  which has never driven updateWeaponVfx). */
+  updateWeaponIdleAnim(dt: number): void {
+    this.weaponIdle.update(dt);
   }
 
   /** Blend pinned skin payloads between the authored grip glue and their
@@ -1453,6 +1474,7 @@ export class CharacterVisual {
     this.disposed = true;
     this.disposeWeaponAura();
     this.disposeWeaponVfx();
+    this.weaponIdle.dispose();
     this.disposeWeaponSkinMaterials();
     this.disposeEffectMaterials();
     this.mixer.stopAllAction();

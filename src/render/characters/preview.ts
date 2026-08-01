@@ -431,6 +431,9 @@ export class CharacterPreview {
     // Update animations inside visual
     if (this.currentVisual) {
       this.currentVisual.update(dt, PREVIEW_ANIM_STATE, true);
+      // The held skin's own clip too, so an Armory legendary's ring keeps
+      // turning on the character sheet exactly as it does in the world.
+      this.currentVisual.updateWeaponIdleAnim(dt);
     }
 
     this.renderer.render(this.scene, this.camera);
