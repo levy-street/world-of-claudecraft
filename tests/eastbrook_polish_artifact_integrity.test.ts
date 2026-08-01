@@ -609,15 +609,15 @@ function readJsonFile<T>(filePath: string): T {
 }
 
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
-  '10d42dddf7eea5fee922fe38fa3ad291d2745675cd4a573ceb4a6f2c2a07cfab';
+  '4d3ec4b5413f6db4b30939ce883d093875f3a29a0ff6dcb32140cbaa783217bf';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '49b3aece9a2b42365e5b6d1e806c674a8818c4a7995c64e9db120c7ddc949bf5';
+  'dec485ef88517fdf5800c9a611fc240e318f4ea5da4bc770f4f7d6c772f60f00';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'b3a49fd4fa887920af5de4b6fb93e2b9b3c6c0351e9a2ba00d6567e44083e88b';
+  'b8e15eb684763ae45fe5fb4795eb4cbc4c8b651236bb9c2d1f826a391d44a9b2';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1474,14 +1474,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // The release/v0.33.0 resync of the draw-call diet branch moved the
-    // runtimeRender.renderer.sha256 leaf (census hooks and the diet's batching
-    // seams merged over the streaming and cull deltas), so the composite
-    // polish provenance followed, and this seal follows the composite. Every
-    // measured value (frame timings, draw stats, triangle and scenario
+    // The 0.33.0 version sync bumped package-lock.json, a hashed input to every
+    // GLB source fingerprint, so the town/mailbox/noticeboard leaves moved, the
+    // composite polish provenance followed, and this seal follows the composite.
+    // Every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '99875450e29ab96bc623ae8640763199c50ec7241595039c4e7d405540964840',
+      '102cedcd2d5e3997b3aace8fc45332e7ae5f619aeb004c5cfba7d3c083af09a7',
     );
   });
 
