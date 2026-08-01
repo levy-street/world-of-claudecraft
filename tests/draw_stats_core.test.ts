@@ -116,10 +116,10 @@ describe('draw_stats_core', () => {
     expect(first.calls).not.toBe(5300);
   });
 
-  it('pins the R2 config version that segments the new draw-count semantics', () => {
-    // Deliberate future bumps move this pin; it exists to catch an accidental
-    // revert of the packet 0 ruling R2 segmentation marker.
-    expect(GFX_CONFIG_VERSION).toBe(18);
+  it('pins the config version that segments perceptual scenery LOD telemetry', () => {
+    // Deliberate future bumps move this pin; v19 separates the first relaxed
+    // scenery contract from the pixel-exact v18 renderer.
+    expect(GFX_CONFIG_VERSION).toBe(19);
   });
 
   it('clamps a backward counter jump at zero, per field, and recovers', () => {

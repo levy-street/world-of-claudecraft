@@ -186,8 +186,8 @@ The new noticeboard is a real, future-extensible world service:
 - Template `noticeboard_eastbrook`; position `(10,-8)`; yaw `-0.7853981633974483`.
 - Dimensions `2.4 x 2.6 x 0.6`; front standing point
   `(9.010050506338834,-7.010050506338834)`; authored interaction radius `4`.
-- Spawned as a non-consumed lootable object with an OBB collider, `camGhost:true`, and camera top
-  derived from terrain plus height.
+- Spawned as a non-consumed lootable object with an OBB collider and a visual/sight top derived
+  from terrain plus height.
 - Direct click/tap, proximity `F`/Use, and the programmatic targeted-interaction command emit the
   same personal structured event
   `{ type:'noticeboard', noticeboardId:'noticeboard_eastbrook', state:'empty', pid }`.

@@ -193,10 +193,14 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13,
     moveSpeed: 8.5,
     aggroRadius: 11, // the castle's old garrison still walks its rounds
+<<<<<<< HEAD
+    loot: [{ copper: 100, chance: 1 }],
+=======
     loot: [
       { copper: 100, chance: 1 },
       { itemId: 'linen_scrap', chance: 0.3 },
     ],
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     scale: 1.0,
     color: 0xb8c4d0, // burnished plate
   },
@@ -236,10 +240,14 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8.5,
     aggroRadius: 12, // the court is his, and the maze feeds him trespassers
     elite: true,
+<<<<<<< HEAD
+    loot: [{ copper: 100, chance: 1 }],
+=======
     loot: [
       { copper: 100, chance: 1 },
       { itemId: 'tangled_weed', chance: 1 },
     ],
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     scale: 1.45,
     color: 0x2e6a34,
   },

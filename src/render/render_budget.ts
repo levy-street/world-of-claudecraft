@@ -122,6 +122,21 @@ const CAPS_BY_TIER: Record<GfxTier, RenderBudgetCaps> = {
     minVfxLevel: 0.86,
     minLightingLevel: 0.78,
   },
+  // Insane: the everything-on showcase preset. Slightly looser caps than
+  // ultra (it deliberately draws more), same quality floors: the governor may
+  // still shed density in a genuine disaster but never below ultra's floor.
+  insane: {
+    targetCalls: 900,
+    urgentCalls: 1_200,
+    targetTriangles: 7_500_000,
+    urgentTriangles: 10_000_000,
+    targetGrassTufts: 8_000,
+    urgentGrassTufts: 11_000,
+    minGrassLevel: 0.78,
+    minFoliageLevel: 0.78,
+    minVfxLevel: 0.86,
+    minLightingLevel: 0.78,
+  },
 };
 
 function round2(v: number): number {
@@ -154,12 +169,20 @@ const SUBMIT_STALL_HOLD_SECONDS: Record<GfxTier, number> = {
   medium: 14,
   high: 8,
   ultra: 6,
+<<<<<<< HEAD
+  insane: 6,
+=======
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 };
 const SUBMIT_STALL_URGENT_HOLD_SECONDS: Record<GfxTier, number> = {
   low: 30,
   medium: 24,
   high: 14,
   ultra: 12,
+<<<<<<< HEAD
+  insane: 12,
+=======
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 };
 const SUBMIT_STALL_RECOVERY_CEILING_MS = 42;
 const EXTERNAL_FRAME_CAP_MIN_MS = 28;

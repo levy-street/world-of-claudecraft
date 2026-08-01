@@ -27,6 +27,8 @@ describe('renderer CPU hot path', () => {
     expect(renderer).toContain(
       'private readonly nameplateBatch = document.createDocumentFragment()',
     );
+<<<<<<< HEAD
+=======
     expect(renderer).toContain(
       'createdViews += this.createRequiredViews(p, createdViewTypes, this.nameplateBatch)',
     );
@@ -35,6 +37,7 @@ describe('renderer CPU hot path', () => {
     );
     expect(renderer).toContain('this.createView(e, nameplateParent)');
     expect(renderer).toContain('nameplateParent.appendChild(np)');
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     expect(renderer).toContain('this.nameplateLayer.appendChild(this.nameplateBatch)');
   });
 
@@ -119,7 +122,11 @@ describe('renderer CPU hot path', () => {
     expect(renderer).toContain('freezeStaticSubtreeMatrices(this.terrainView.group)');
     expect(renderer).toContain('freezeStaticSubtreeMatrices(this.waterView.group)');
     expect(renderer).toContain('freezeStaticSubtreeMatrices(this.eastbrookTownView.group)');
+<<<<<<< HEAD
+    expect(renderer).toContain('freezeStaticSubtreeMatrices(this.gatherNodes.group)');
+=======
     expect(renderer).toContain('freezeStaticSubtreeMatrices(gatherNodes.group)');
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   });
 
   it('compares nameplate primitives before formatting unchanged DOM strings', () => {

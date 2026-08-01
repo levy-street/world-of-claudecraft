@@ -2191,7 +2191,11 @@ export const fr_FR: EnTranslations = {
         "noRecipient": "Personne de ce nom ne possède de boîte aux lettres ici.",
         "tooManyParcels": "Une lettre transporte au plus {count} colis.",
         "noMailQuestItems": "Vous ne pouvez pas envoyer d'objets de quête par courrier.",
+<<<<<<< HEAD
+        "noMailBound": "That item is bound and cannot be mailed.",
+=======
         "noMailBound": "Cet objet est lié et ne peut pas être envoyé par courrier.",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "notEnoughItems": "Vous n'en avez pas autant à envoyer.",
         "cantAffordPostage": "Vous n'avez pas de quoi payer l'affranchissement.",
         "recipientBoxFull": "Sa boîte aux lettres est pleine.",
@@ -6254,11 +6258,15 @@ export const fr_FR: EnTranslations = {
       "graphicsPresetMedium": "Moyenne",
       "graphicsPresetHigh": "Haute",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrême",
       "graphicsPresetAdvanced": "Avancée",
       "terrainDetail": "Détail du terrain",
       "foliageDensity": "Densité de feuillage",
       "effectsQuality": "Effets et éclairage",
       "shadowQuality": "Qualité des ombres",
+      "surfaceDetail": "Détail des surfaces",
+      "surfaceDetailBasic": "Basique",
+      "surfaceDetailFull": "Complet",
       "terrainLow": "Bas",
       "terrainHigh": "Élevé",
       "touchOpacity": "Opacité des commandes tactiles",
@@ -6548,7 +6556,11 @@ export const fr_FR: EnTranslations = {
       "tradeExpired": "La demande d'échange a expiré.",
       "tradeFailed": "Échange échoué : objets ou argent indisponibles.",
       "tradeBound": "Cet objet est lié et ne peut pas être échangé.",
+<<<<<<< HEAD
+      "marketListBound": "That item is bound and cannot be listed."
+=======
       "marketListBound": "Cet objet est lié et ne peut pas être mis en vente."
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     },
     "logs": {
       "standUp": "Vous vous levez.",

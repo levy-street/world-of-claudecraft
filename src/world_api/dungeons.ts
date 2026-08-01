@@ -48,10 +48,6 @@ export interface IWorldDungeons {
   raidLockouts(): RaidLockout[];
   // The active procedural Rift floor for the local player (null outside a rift).
   riftFloor: RiftFloorView | null;
-  // Key into the per-Sim rift collision registry (sim/colliders.ts), used by the
-  // renderer's camera occlusion inside a rift. Per world INSTANCE, not per seed;
-  // 0 where no rift regions are registered (the online ClientWorld).
-  riftCollisionToken: number;
   // Live lethal death zones on the current rift boss floor (empty outside a rift or
   // before the A-rank mechanic fires). The renderer draws a pulsing red decal ring
   // at each zone position so players can see and react to the telegraph.

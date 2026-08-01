@@ -19,7 +19,7 @@ export type BrowserEngine = 'chromium' | 'webkit' | 'gecko' | 'unknown';
 export type CssEffectsTier = 'full' | 'reduced' | 'minimal';
 
 /** Renderer tier mirror — kept as a string union so this module never imports render/. */
-export type RenderTier = 'low' | 'medium' | 'high' | 'ultra';
+export type RenderTier = 'low' | 'medium' | 'high' | 'ultra' | 'insane';
 
 export interface BrowserEnv {
   readonly engine: BrowserEngine;
@@ -65,7 +65,10 @@ export function detectBrowserEngine(ua: string): { engine: BrowserEngine; versio
     return { engine: 'gecko', version: majorFrom(s, /Firefox\/(\d+)/) };
   }
   if (/(?:Chrome|Chromium|CriOS|Edg|OPR)\/\d/.test(s)) {
-    return { engine: 'chromium', version: majorFrom(s, /(?:Chrome|Chromium|CriOS|Edg|OPR)\/(\d+)/) };
+    return {
+      engine: 'chromium',
+      version: majorFrom(s, /(?:Chrome|Chromium|CriOS|Edg|OPR)\/(\d+)/),
+    };
   }
   if (/AppleWebKit/.test(s) && /Version\/\d/.test(s) && !/Chrome|Chromium/.test(s)) {
     return { engine: 'webkit', version: majorFrom(s, /Version\/(\d+)/) };
@@ -90,9 +93,12 @@ export function cssEffectsTier(input: {
   override?: number;
 }): CssEffectsTier {
   switch (input.override) {
-    case BROWSER_EFFECTS_FULL: return 'full';
-    case BROWSER_EFFECTS_REDUCED: return 'reduced';
-    case BROWSER_EFFECTS_MINIMAL: return 'minimal';
+    case BROWSER_EFFECTS_FULL:
+      return 'full';
+    case BROWSER_EFFECTS_REDUCED:
+      return 'reduced';
+    case BROWSER_EFFECTS_MINIMAL:
+      return 'minimal';
   }
   const { engine, version, mobile, renderTier } = input;
   // The GPU pipeline already gave up — match it in the DOM.
@@ -124,9 +130,15 @@ export function cssEffectsTier(input: {
  * stamp both re-apply from scratch). Pure data so the module stays DOM-free.
  */
 export const BROWSER_BODY_CLASSES = [
-  'fx-full', 'fx-reduced', 'fx-minimal',
-  'engine-chromium', 'engine-webkit', 'engine-gecko', 'engine-unknown',
-  'is-mobile', 'is-desktop',
+  'fx-full',
+  'fx-reduced',
+  'fx-minimal',
+  'engine-chromium',
+  'engine-webkit',
+  'engine-gecko',
+  'engine-unknown',
+  'is-mobile',
+  'is-desktop',
 ] as const;
 
 /** The body classes that drive the adaptive CSS in index.html. */

@@ -2191,7 +2191,11 @@ export const de_DE: EnTranslations = {
         "noRecipient": "Niemand mit diesem Namen unterhält hier einen Briefkasten.",
         "tooManyParcels": "Ein Brief trägt höchstens {count} Pakete.",
         "noMailQuestItems": "Questgegenstände können nicht verschickt werden.",
+<<<<<<< HEAD
+        "noMailBound": "That item is bound and cannot be mailed.",
+=======
         "noMailBound": "Dieser Gegenstand ist gebunden und kann nicht verschickt werden.",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "notEnoughItems": "So viele davon hast du nicht zum Versenden.",
         "cantAffordPostage": "Du kannst dir das Porto nicht leisten.",
         "recipientBoxFull": "Der Briefkasten des Empfängers ist voll.",
@@ -6254,11 +6258,15 @@ export const de_DE: EnTranslations = {
       "graphicsPresetMedium": "Mittel",
       "graphicsPresetHigh": "Hoch",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrem",
       "graphicsPresetAdvanced": "Erweitert",
       "terrainDetail": "Geländedetail",
       "foliageDensity": "Pflanzendichte",
       "effectsQuality": "Effekte und Licht",
       "shadowQuality": "Schattenqualität",
+      "surfaceDetail": "Oberflächendetail",
+      "surfaceDetailBasic": "Einfach",
+      "surfaceDetailFull": "Voll",
       "terrainLow": "Niedrig",
       "terrainHigh": "Hoch",
       "touchOpacity": "Deckkraft der Touch-Steuerung",
@@ -6548,7 +6556,11 @@ export const de_DE: EnTranslations = {
       "tradeExpired": "Die Handelsanfrage ist abgelaufen.",
       "tradeFailed": "Handel fehlgeschlagen: Gegenstände oder Geld sind nicht mehr verfügbar.",
       "tradeBound": "Dieser Gegenstand ist gebunden und kann nicht gehandelt werden.",
+<<<<<<< HEAD
+      "marketListBound": "That item is bound and cannot be listed."
+=======
       "marketListBound": "Dieser Gegenstand ist gebunden und kann nicht zum Verkauf angeboten werden."
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     },
     "logs": {
       "standUp": "Ihr steht auf.",

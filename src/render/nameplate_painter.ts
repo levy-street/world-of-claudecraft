@@ -566,7 +566,11 @@ export class NameplatePainter {
   // invalidate it without doing per-frame title resolution or string work.
   private setNameplateTitle(v: EntityView, titleId: string | null | undefined): void {
     const id = titleId ?? '';
+<<<<<<< HEAD
+    const i18nRevision = titleId ? getI18nRevision() : 0;
+=======
     const i18nRevision = titleId ? getDeedTitleI18nRevision() : 0;
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     if (id === v.nameplateTitleId && i18nRevision === v.nameplateTitleI18nRevision) return;
     v.nameplateTitleId = id;
     v.nameplateTitleI18nRevision = i18nRevision;

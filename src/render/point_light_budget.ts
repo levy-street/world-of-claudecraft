@@ -8,6 +8,8 @@ export interface RankedPointLight {
   base: number | null;
   /** Moving VFX lights refresh their world position and intensity every frame. */
   dynamic: boolean;
+  /** Stable index in the renderer's fire-light registry, absent for view lights. */
+  fireIndex?: number;
 }
 
 export interface ReconciledViewPointLights {
@@ -77,6 +79,24 @@ export function applyPointLightBudget(
     } else if (counted && !shine) {
       entry.light.intensity = 0;
     }
+  }
+}
+
+/** Flicker only fire lights that the completed budget says can contribute. */
+export function flickerContributingFireLights(
+  ranked: readonly RankedPointLight[],
+  time: number,
+  visibleCount: number,
+  liveBudget: number,
+  rangeSq: number,
+): void {
+  const contributingCount = Math.min(ranked.length, visibleCount, liveBudget);
+  for (let index = 0; index < contributingCount; index++) {
+    const entry = ranked[index];
+    const fireIndex = entry.fireIndex;
+    if (fireIndex === undefined || entry.d2 >= rangeSq) continue;
+    const base = (entry.light.userData.baseIntensity as number | undefined) ?? 11;
+    entry.light.intensity = base + Math.sin(time * 11 + fireIndex * 1.7) * 2.5 * (base / 11);
   }
 }
 

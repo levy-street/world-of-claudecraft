@@ -11,7 +11,11 @@
     "mode": "composite-sha256",
     "algorithm": "sha256",
     "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+    "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
     "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     "components": {
       "townAsset": {
         "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -28,7 +32,11 @@
       "runtimeRender": {
         "town": {
           "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+          "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
           "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         },
         "mailbox": {
           "path": "src/render/mailbox.ts",
@@ -40,7 +48,11 @@
         },
         "renderer": {
           "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+          "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
           "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         },
         "viewPriorityPolicy": {
           "path": "src/render/prewarm_policy.ts",
@@ -85,7 +97,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -102,7 +118,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -114,7 +134,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -1380,7 +1404,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -1397,7 +1425,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -1409,7 +1441,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -2675,7 +2711,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -2692,7 +2732,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -2704,7 +2748,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -3970,7 +4018,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -3987,7 +4039,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -3999,7 +4055,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -5265,7 +5325,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -5282,7 +5346,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -5294,7 +5362,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -6560,7 +6632,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -6577,7 +6653,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -6589,7 +6669,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -7855,7 +7939,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -7872,7 +7960,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -7884,7 +7976,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -9150,7 +9246,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -9167,7 +9267,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -9179,7 +9283,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -10445,7 +10553,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -10462,7 +10574,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -10474,7 +10590,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -11740,7 +11860,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -11757,7 +11881,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -11769,7 +11897,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -13035,7 +13167,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -13052,7 +13188,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -13064,7 +13204,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -14330,7 +14474,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -14347,7 +14495,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -14359,7 +14511,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -15625,7 +15781,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -15642,7 +15802,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -15654,7 +15818,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -16920,7 +17088,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -16937,7 +17109,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -16949,7 +17125,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -19180,7 +19360,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -19197,7 +19381,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -19209,7 +19397,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -20475,7 +20667,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -20492,7 +20688,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -20504,7 +20704,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -21770,7 +21974,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -21787,7 +21995,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -21799,7 +22011,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -23065,7 +23281,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -23082,7 +23302,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -23094,7 +23318,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -24360,7 +24588,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -24377,7 +24609,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -24389,7 +24625,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -25655,7 +25895,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -25672,7 +25916,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -25684,7 +25932,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -26950,7 +27202,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -26967,7 +27223,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -26979,7 +27239,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -28298,7 +28562,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -28315,7 +28583,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -28327,7 +28599,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",
@@ -29593,7 +29869,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
+<<<<<<< HEAD
+        "fingerprint": "583abf8de40eb6689c1383adba437f6d9a24b623c0f86518c1ff5a373675ce83",
+=======
         "fingerprint": "85273902a450afdb4808fb20c4c6ac57bb26f783989364cc02b5d7191a1018e6",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -29610,7 +29890,11 @@
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
+<<<<<<< HEAD
+              "sha256": "7db62ec903cc9cc2598bab404872b21b53ffd499ddeeb7a6cece636ad980f18e"
+=======
               "sha256": "9c7a239dc85fe901d8306d5459d6785da2130ccc314776dedff37d48dfbaf4d9"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -29622,7 +29906,11 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
+<<<<<<< HEAD
+              "sha256": "92ed99705afe96881db4f7446255eb72ac7479dc5f1715f6d0c87d37263fc512"
+=======
               "sha256": "5267c8c164e8a074275a77b7249966ccb1b0d9dae1ae3f079a3c2d074e00bdd0"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
             },
             "viewPriorityPolicy": {
               "path": "src/render/prewarm_policy.ts",

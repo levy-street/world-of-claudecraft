@@ -10,6 +10,37 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+<<<<<<< HEAD
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
+  ],
+  "es_ES": [
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
+  ],
+  "fr_FR": [
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
+  ],
+  "fr_CA": [
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
+  ],
+  "en_CA": [],
+  "it_IT": [
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
+  ],
+  "de_DE": [
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
+=======
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -393,8 +424,14 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ja_JP": [
     "hudChrome.targetAuras.all"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   ],
   "pt_BR": [
+<<<<<<< HEAD
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hudChrome.mailbox.result.noMailBound"
+=======
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -458,8 +495,81 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [
     "hudChrome.targetAuras.all"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   ],
   "cs_CZ": [
+<<<<<<< HEAD
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hud.options.graphicsPresetInsane",
+    "hud.options.surfaceDetail",
+    "hud.options.surfaceDetailBasic",
+    "hud.options.surfaceDetailFull",
+    "hudChrome.mailbox.result.noMailBound"
+  ],
+  "nl_NL": [
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hud.options.graphicsPresetInsane",
+    "hud.options.surfaceDetail",
+    "hud.options.surfaceDetailBasic",
+    "hud.options.surfaceDetailFull",
+    "hudChrome.mailbox.result.noMailBound"
+  ],
+  "pl_PL": [
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hud.options.graphicsPresetInsane",
+    "hud.options.surfaceDetail",
+    "hud.options.surfaceDetailBasic",
+    "hud.options.surfaceDetailFull",
+    "hudChrome.mailbox.result.noMailBound"
+  ],
+  "id_ID": [
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hud.options.graphicsPresetInsane",
+    "hud.options.surfaceDetail",
+    "hud.options.surfaceDetailBasic",
+    "hud.options.surfaceDetailFull",
+    "hudChrome.mailbox.result.noMailBound"
+  ],
+  "tr_TR": [
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hud.options.graphicsPresetInsane",
+    "hud.options.surfaceDetail",
+    "hud.options.surfaceDetailBasic",
+    "hud.options.surfaceDetailFull",
+    "hudChrome.mailbox.result.noMailBound"
+  ],
+  "sv_SE": [
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hud.options.graphicsPresetInsane",
+    "hud.options.surfaceDetail",
+    "hud.options.surfaceDetailBasic",
+    "hud.options.surfaceDetailFull",
+    "hudChrome.mailbox.result.noMailBound"
+  ],
+  "vi_VN": [
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hud.options.graphicsPresetInsane",
+    "hud.options.surfaceDetail",
+    "hud.options.surfaceDetailBasic",
+    "hud.options.surfaceDetailFull",
+    "hudChrome.mailbox.result.noMailBound"
+  ],
+  "da_DK": [
+    "hud.errors.marketListBound",
+    "hud.errors.tradeAlreadyTrading",
+    "hud.options.graphicsPresetInsane",
+    "hud.options.surfaceDetail",
+    "hud.options.surfaceDetailBasic",
+    "hud.options.surfaceDetailFull",
+    "hudChrome.mailbox.result.noMailBound"
+=======
     "entities.abilities.greater_invisibility.description",
     "entities.items.reins_terrorspark_groundshaker.name",
     "hudChrome.auraOverlay.allOff",
@@ -954,5 +1064,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.targetAuras.title",
     "hudChrome.targetAuras.unlock",
     "hudChrome.targetAuras.visibleRows"
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   ]
 };

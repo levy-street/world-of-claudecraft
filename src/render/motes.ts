@@ -149,14 +149,16 @@ export function buildMotes(seed: number): MotesView {
   geo.setAttribute('color', colorAttribute);
 
   const mat = new THREE.PointsMaterial({
-    size: GFX.standardMaterials ? 0.5 : 0.7,
+    size: GFX.standardMaterials ? 0.3 : 0.46,
     map: moteSprite(),
     vertexColors: true,
     transparent: true,
     depthWrite: false, // glows shouldn't punch holes in what's behind them
     blending: THREE.AdditiveBlending,
     sizeAttenuation: true,
-    opacity: 0.85,
+    // 0.62 x 0.38u additive white-core dots read as bright noise speckling
+    // every daylight shot; drifting dust should be felt, not counted
+    opacity: 0.45,
   });
 
   const points = new THREE.Points(geo, mat);

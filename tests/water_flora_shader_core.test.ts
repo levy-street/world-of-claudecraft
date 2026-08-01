@@ -31,10 +31,14 @@ describe('water flora packed ORM shader', () => {
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(() => new Promise(() => {})),
     }));
+<<<<<<< HEAD
+    vi.doMock('../src/render/assets/preload', () => ({ registerPreload: vi.fn() }));
+=======
     vi.doMock('../src/render/assets/preload', () => ({
       registerDeferredPreload: vi.fn(),
       registerPreload: vi.fn(),
     }));
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     const { waterFloraShaderInternalsForTest } = await import('../src/render/water_flora');
 
     const orm = new THREE.Texture();
@@ -73,10 +77,14 @@ describe('water flora packed ORM shader', () => {
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(() => new Promise(() => {})),
     }));
+<<<<<<< HEAD
+    vi.doMock('../src/render/assets/preload', () => ({ registerPreload: vi.fn() }));
+=======
     vi.doMock('../src/render/assets/preload', () => ({
       registerDeferredPreload: vi.fn(),
       registerPreload: vi.fn(),
     }));
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     const { waterFloraShaderInternalsForTest } = await import('../src/render/water_flora');
 
     const makeMaterial = (): {
@@ -134,9 +142,12 @@ describe('water flora packed ORM shader', () => {
       ao.magFilter = THREE.NearestFilter;
     });
     rejects((_material, _orm, ao) => {
+<<<<<<< HEAD
+=======
       ao.minFilter = THREE.NearestFilter;
     });
     rejects((_material, _orm, ao) => {
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
       ao.anisotropy = 2;
     });
     rejects((_material, _orm, ao) => {

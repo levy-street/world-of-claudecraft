@@ -1275,7 +1275,7 @@ export function delveSlotAt(delveIndex: number, z: number, modules: readonly str
 }
 
 // Memoized: the default chain is a pure function of the static DELVES table, and
-// callers (collision/camera fallback) hit it per-frame inside the delve band, so
+// callers (collision and render fallbacks) hit it per-frame inside the delve band, so
 // cache one frozen array per delve id instead of reallocating each call.
 const DEFAULT_DELVE_MODULES = new Map<string, readonly string[]>();
 

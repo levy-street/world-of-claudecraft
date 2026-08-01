@@ -5,10 +5,15 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/render/assets/loader', () => ({
   loadTexture: vi.fn(async () => ({ image: null })),
+<<<<<<< HEAD
+}));
+vi.mock('../src/render/assets/preload', () => ({
+=======
   releaseTexture: vi.fn(),
 }));
 vi.mock('../src/render/assets/preload', () => ({
   registerDeferredPreload: vi.fn(),
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   registerPreload: vi.fn(),
 }));
 
@@ -25,7 +30,13 @@ interface VfxProbe {
   alphaAttr: Float32Array;
   spriteAttr: Float32Array;
   rotAttr: Float32Array;
+<<<<<<< HEAD
+  activeSlots: Int32Array;
   activeCount: number;
+  head: number;
+=======
+  activeCount: number;
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   drawBuffer: THREE.InterleavedBuffer;
   spriteRadiusSq: Float32Array;
   onContextRestored(): void;
@@ -103,11 +114,27 @@ describe('pooled VFX cloud', () => {
     probe.spawn(1, 0, -10, 0, 0, 0, 0xffffff, 1, 1, 0, 0, 0);
     probe.spawn(100, 0, -10, 0, 0, 0, 0xffffff, 1, 1, 0, 0, 0);
     vfx.update(0.1);
+<<<<<<< HEAD
+    expect([...probe.activeSlots.subarray(0, probe.activeCount)]).toEqual([0, 2, 3]);
+    let lifeReads = 0;
+    probe.life = new Proxy(probe.life, {
+      get(target, property) {
+        if (typeof property === 'string' && /^\d+$/.test(property)) lifeReads++;
+        const value = Reflect.get(target, property, target);
+        return typeof value === 'function' ? value.bind(target) : value;
+      },
+    });
+=======
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 
     const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
     camera.lookAt(0, 0, -10);
     camera.updateMatrixWorld();
     vfx.prepareDraw(camera);
+<<<<<<< HEAD
+    expect(lifeReads).toBe(probe.activeCount);
+=======
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     expect(geometry.drawRange.count).toBe(2);
     expect([position.getX(0), position.getX(1)]).toEqual([-1, 1]);
     expect(position.data.updateRanges).toEqual([{ start: 0, count: 22 }]);
@@ -243,6 +270,22 @@ describe('pooled VFX cloud', () => {
     expect(capacityPosition.getX(0)).toBe(4_096);
     expect(capacityPosition.getX(1)).toBe(1);
     expect(capacityPosition.getX(4_095)).toBe(4_095);
+<<<<<<< HEAD
+
+    capacityProbe.life[0] = 0.05;
+    capacityVfx.update(0.1);
+    expect(capacityProbe.activeCount).toBe(4_095);
+    expect(capacityProbe.activeSlots[0]).toBe(1);
+
+    capacityProbe.head = 0;
+    capacityProbe.spawn(8_192, 0, -10, 0, 0, 0, 0xffffff, 1, 1, 0, 0, 0);
+    expect(capacityProbe.activeCount).toBe(4_096);
+    expect([...capacityProbe.activeSlots.subarray(0, 3)]).toEqual([0, 1, 2]);
+    capacityVfx.prepareDraw(camera);
+    expect(capacityPosition.getX(0)).toBe(8_192);
+    expect(capacityPosition.getX(1)).toBe(1);
+=======
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   });
 
   it('keeps settled idle frames upload-free and rearms prewarm after context restore', () => {
@@ -276,6 +319,23 @@ describe('pooled VFX cloud', () => {
       fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url)),
       'utf8',
     );
+<<<<<<< HEAD
+    // Every prepareDraw that feeds a render must pack against the FINAL camera
+    // pose, so each render site is immediately preceded by updateMatrixWorld.
+    // Pinned structurally: the previous version anchored on a neighbouring
+    // block of unrelated camera-shake code, which drifted and left this test
+    // failing for reasons that had nothing to do with the invariant.
+    const renderSites = [
+      ...source.matchAll(/this\.vfx\.prepareDraw\(this\.camera\);\n\s*if \(this\.post\)/g),
+    ];
+    expect(renderSites).toHaveLength(2);
+    for (const site of renderSites) {
+      expect(
+        source.slice(0, site.index).trimEnd().endsWith('this.camera.updateMatrixWorld();'),
+      ).toBe(true);
+    }
+    expect(source).toContain(`async captureScreenshot(maxEdge = 1280, quality = 0.7)`);
+=======
     expect(source).toMatch(
       /if \(shakeX !== 0 \|\| shakeY !== 0\) this\.camera\.updateMatrixWorld\(\);\n\s*this\.vfx\.prepareDraw\(this\.camera\);\n\s*if \(this\.post\)/,
     );
@@ -284,6 +344,7 @@ describe('pooled VFX cloud', () => {
       this.camera.updateMatrixWorld();
       this.vfx.prepareDraw(this.camera);
       if (this.post) this.post.render();`);
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     expect(source.match(/this\.vfx\.prepareDraw\(this\.camera\);/g)).toHaveLength(3);
     expect(source).toContain(`this.vfx.update(dt);
     this.vfx.prepareDraw(this.camera);

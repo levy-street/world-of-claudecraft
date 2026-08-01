@@ -21,7 +21,9 @@ export const SETTING_RANGES = {
   // run and a strong desktop is not capped below what it can drive. A masked/inconclusive device
   // stays on this medium default and keeps re-detecting on later boots (see graphicsDefaultApplied).
   // An explicit player choice (stored here) is never overridden.
-  graphicsPreset: { min: 1, max: 5, def: 2 },
+  // max 6: 1 low .. 4 ultra, 5 advanced, 6 insane (the everything-on showcase;
+  // manual opt-in only, hardware detection never selects it).
+  graphicsPreset: { min: 1, max: 6, def: 2 },
   // Adaptive browser-effects tier for the DOM/CSS layer (distinct from the WebGL
   // graphicsPreset above). 0 = Auto: detect the engine (Chromium/WebKit/Gecko),
   // version and desktop-vs-mobile and tone down the most GPU-expensive CSS
@@ -30,10 +32,18 @@ export const SETTING_RANGES = {
   // 3 = Minimal. Purely presentational; never touches the sim. See browser_env.ts.
   browserEffects: { min: 0, max: 3, def: 0 },
   // Advanced-only: 0 keeps terrain/foliage cheap, 1 enables high terrain.
-  terrainDetail: { min: 0, max: 1, def: 1 },
-  foliageDensity: { min: 0, max: 1, def: 1 },
+  // Advanced-preset sub-settings (only read when graphicsPreset is 5). The
+  // historical rows were binary 0/1; round 10 extended them to level ladders
+  // (0 Low, 0.5 Medium, 1 High, 2 Insane; effectsQuality stops at 1) mapped
+  // in gfx.ts settingsFor. Backward compatible by construction: a stored 0
+  // still means Low and a stored 1 still means High.
+  terrainDetail: { min: 0, max: 2, def: 1 },
+  foliageDensity: { min: 0, max: 2, def: 1 },
   effectsQuality: { min: 0, max: 1, def: 1 },
-  shadowQuality: { min: 0, max: 1, def: 1 },
+  shadowQuality: { min: 0, max: 2, def: 1 },
+  // The worn-surface triplanar layer dial (0 Off, 0.5 Basic, 1 Full, 2
+  // Insane), new in round 10: the town-street frame-cost dial.
+  surfaceDetail: { min: 0, max: 2, def: 1 },
   // vertical camera field of view in degrees. def 60 keeps the shipped look;
   // a wider FOV shows more of the world (good for situational awareness) while
   // a narrower one zooms in. Purely a comfort/visibility preference.

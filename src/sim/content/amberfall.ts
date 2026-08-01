@@ -152,10 +152,14 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 6.5,
     aggroRadius: 0, // ancient and calm, until an axe is raised
     elite: true,
+<<<<<<< HEAD
+    loot: [{ copper: 100, chance: 1 }],
+=======
     loot: [
       { copper: 100, chance: 1 },
       { itemId: 'tangled_weed', chance: 0.4 },
     ],
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     scale: 1.4,
     color: 0xc89838,
   },
@@ -191,10 +195,14 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13,
     moveSpeed: 8,
     aggroRadius: 13,
+<<<<<<< HEAD
+    loot: [{ copper: 100, chance: 1 }],
+=======
     loot: [
       { copper: 100, chance: 1 },
       { itemId: 'mudfin_scale', chance: 0.4 },
     ],
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     scale: 1.1,
     color: 0xa8b048,
   },
@@ -217,10 +225,14 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 16,
     elite: true,
+<<<<<<< HEAD
+    loot: [{ copper: 100, chance: 1 }],
+=======
     loot: [
       { copper: 100, chance: 1 },
       { itemId: 'mudfin_scale', chance: 1 },
     ],
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     scale: 1.6,
     color: 0x5a7038,
   },

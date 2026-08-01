@@ -19,6 +19,7 @@ import {
   planGardenMazePieces,
 } from './garden_maze_core';
 import { GFX } from './gfx';
+import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface GardenFeaturesView {
   group: THREE.Group;
@@ -264,6 +265,9 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
         m2 = source.clone();
         const c = (m2 as THREE.MeshStandardMaterial).color;
         if (c) c.multiply(new THREE.Color(0.62, 0.98, 0.64));
+        // giant specimen trunks take the coarse landmark bark grain
+        if (isBarkMaterialName(source.name))
+          applySurfaceDetail(m2 as THREE.MeshStandardMaterial, 'bark', GREAT_TREE_BARK_DETAIL);
         clipped.set(source.uuid, m2);
       }
       return m2;

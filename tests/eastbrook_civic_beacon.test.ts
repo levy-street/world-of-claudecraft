@@ -219,6 +219,13 @@ describe('Eastbrook civic beacon shader animation', () => {
     const mask = micro.geometry.getAttribute(EASTBROOK_CIVIC_MASK_ATTRIBUTE);
     const bytes = mask.array as Uint8Array;
     const selectedCount = bytes.reduce((sum, value) => sum + (value === 255 ? 1 : 0), 0);
+<<<<<<< HEAD
+    // The merge preserves exact full-tuple indices instead of de-indexing, so
+    // the box fixture contributes its 24 UNIQUE vertices (4 per face, since the
+    // per-face normals differ) rather than the 36 it expands to when every
+    // triangle carries its own copy. Same rendered geometry, fewer vertices.
+    const civicTemplateVertexCount = 24;
+=======
     const index = micro.geometry.getIndex();
     let selectedIndexCount = 0;
     if (index) {
@@ -226,6 +233,7 @@ describe('Eastbrook civic beacon shader animation', () => {
         selectedIndexCount += bytes[index.getX(element)] === 255 ? 1 : 0;
       }
     }
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 
     expect(mask.normalized).toBe(true);
     expect(mask.count).toBe(micro.geometry.getAttribute('position').count);
@@ -244,10 +252,10 @@ describe('Eastbrook civic beacon shader animation', () => {
     });
     expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 18, shadowDraws: 9 });
 
-    view.update(0, 5, 0, 0, 0, 0, 100, true);
+    view.update(0, 5, 0, 0, 0, 0, 100, 1, true);
     const shader = compileMaterial(micro.material as THREE.Material);
     expect(shader.uniforms.uEastbrookCivicReducedMotion.value).toBe(1);
-    view.update(0, 5, 0, 0, 0, 0, 100, false);
+    view.update(0, 5, 0, 0, 0, 0, 100, 1, false);
     expect(shader.uniforms.uEastbrookCivicReducedMotion.value).toBe(0);
     expect(view.update.toString()).not.toMatch(/\bnew\s+/);
   });

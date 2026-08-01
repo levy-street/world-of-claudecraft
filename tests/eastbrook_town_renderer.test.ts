@@ -264,27 +264,50 @@ describe('Eastbrook town renderer', () => {
     }
   });
 
-  it('roof-ghosts only building volumes and restores them without touching microgeometry', () => {
+  it('roof-fades only building volumes to 20% and restores them without touching microgeometry', () => {
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
     const bank = EASTBROOK_LAYOUT.buildings[0];
     const bankGroup = view.group.getObjectByName(`eastbrookBuilding:${bank.id}`);
     const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch') as THREE.Mesh;
     if (!bankGroup || !micro) throw new Error('renderer fixture lost Eastbrook scene nodes');
     const bankMaterials = meshesOf(bankGroup).map((mesh) => mesh.material as THREE.Material);
+    const authored = bankMaterials.map((material) => ({
+      transparent: material.transparent,
+      opacity: material.opacity,
+      depthWrite: material.depthWrite,
+    }));
     const microMaterial = micro.material as THREE.Material;
 
-    view.update(45, 2, 45, bank.position.x, 2, bank.position.z, 200);
-    expect(bankMaterials.every((material) => !material.colorWrite && !material.depthWrite)).toBe(
-      true,
-    );
-    expect(microMaterial.colorWrite).toBe(true);
+    // Occlusion snaps to the ghost target on its first positive-dt frame.
+    view.update(45, 2, 45, bank.position.x, 2, bank.position.z, 200, 0.05);
+    expect(
+      bankMaterials.every(
+        (material, i) =>
+          material.transparent &&
+          material.depthWrite &&
+          Math.abs(material.opacity - authored[i].opacity * 0.2) < 1e-9,
+      ),
+    ).toBe(true);
+    // Further occluded frames remain at exactly 20% of the authored opacity.
+    view.update(45, 2, 45, bank.position.x, 2, bank.position.z, 200, 10);
+    expect(
+      bankMaterials.every(
+        (material, i) => Math.abs(material.opacity - authored[i].opacity * 0.2) < 1e-9,
+      ),
+    ).toBe(true);
+    expect(microMaterial.opacity).toBe(1);
     expect(microMaterial.depthWrite).toBe(true);
 
-    view.update(45, 30, 45, bank.position.x, 30, bank.position.z, 200);
-    expect(bankMaterials.every((material) => material.colorWrite && material.depthWrite)).toBe(
-      true,
-    );
-    expect(microMaterial.colorWrite).toBe(true);
+    view.update(45, 30, 45, bank.position.x, 30, bank.position.z, 200, 10);
+    expect(
+      bankMaterials.every(
+        (material, i) =>
+          material.transparent === authored[i].transparent &&
+          material.opacity === authored[i].opacity &&
+          material.depthWrite === authored[i].depthWrite,
+      ),
+    ).toBe(true);
+    expect(microMaterial.opacity).toBe(1);
   });
 
   it('uses Lambert vertex-color materials on Low without changing geometry or draw counts', () => {
@@ -446,9 +469,9 @@ describe('Eastbrook town renderer', () => {
       (mesh) => mesh.userData.eastbrookMicroBatch || mesh.userData.eastbrookWallInstances,
     );
     expect(staticBatches).toHaveLength(6);
-    view.update(1000, 5, 1000, 1000, 5, 1000, 100);
+    view.update(1000, 5, 1000, 1000, 5, 1000, 100, 1);
     expect(staticBatches.every((mesh) => !mesh.visible)).toBe(true);
-    view.update(0, 5, 0, 0, 5, 0, 100);
+    view.update(0, 5, 0, 0, 5, 0, 100, 1);
     expect(staticBatches.every((mesh) => mesh.visible)).toBe(true);
   });
 
@@ -464,7 +487,7 @@ describe('Eastbrook town renderer', () => {
       microBatchCount: 0,
       wallBatchCount: 0,
     });
-    expect(() => view.update(0, 0, 0, 0, 0, 0, 100)).not.toThrow();
+    expect(() => view.update(0, 0, 0, 0, 0, 0, 100, 1)).not.toThrow();
   });
 
   it('recognizes only the exact built-in records replaced by the dedicated renderer', () => {

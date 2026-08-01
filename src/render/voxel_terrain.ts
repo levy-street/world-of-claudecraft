@@ -26,7 +26,7 @@ kickVoxelTex('grassC', 'Grass001_Color.jpg');
 kickVoxelTex('rockC', 'Rock051_Color.jpg');
 kickVoxelTex('rockStreakC', 'Rock029_Color.jpg');
 kickVoxelTex('roadC', 'PavingStones046_Color.jpg'); // packed walkway/road stone
-kickVoxelTex('dirtC', 'Ground048_Color.jpg');
+kickVoxelTex('dirtC', 'Ground023_Color.jpg');
 kickVoxelTex('mudC', 'Ground071_Color.jpg');
 kickVoxelTex('sandC', 'Ground080_Color.jpg');
 kickVoxelTex('snowC', 'Snow010A_Color.jpg');

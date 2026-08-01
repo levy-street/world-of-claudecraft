@@ -18,6 +18,24 @@ const STICKY_CHECKPOINTS = new Set<EntryCheckpoint>([
   'quest-dialog-open',
 ]);
 
+// Checkpoints that REPEAT during an ordinary session: the 2-second render
+// heartbeat, and the window open/close pairs a player toggles all game long.
+// They still stamp the crash probe (that is what actually diagnoses a failed
+// entry after the fact) but they do not echo to the console, where they were
+// the bulk of the client's log volume and drowned out the one-shot entry
+// breadcrumbs that a load-failure report is actually read for.
+const QUIET_CHECKPOINTS = new Set<EntryCheckpoint>([
+  'rendering',
+  'mobile-more-open',
+  'mobile-more-closed',
+  'settings-open',
+  'settings-closed',
+  'character-open',
+  'character-closed',
+  'quest-dialog-open',
+  'quest-dialog-closed',
+]);
+
 const STICKY_RESETS = new Map<EntryCheckpoint, EntryCheckpoint>([
   ['webgl-context-restored', 'webgl-context-lost'],
   ['connection-restored', 'connection-lost'],
@@ -90,9 +108,15 @@ export function createEntryDiagnosticsController(options: {
     if (STICKY_CHECKPOINTS.has(nextCheckpoint)) stickyCheckpoint = nextCheckpoint;
     if (resetTarget === stickyCheckpoint) stickyCheckpoint = null;
     persistence.checkpoint(nextCheckpoint, wallNow(), diagnostics);
+<<<<<<< HEAD
+    if (!QUIET_CHECKPOINTS.has(nextCheckpoint)) {
+      log(`[entry-diag] checkpoint=${nextCheckpoint}`, diagnostics);
+    }
+=======
     lastCheckpoint = nextCheckpoint;
     lastDiagnostics = diagnostics;
     log(`[entry-diag] checkpoint=${nextCheckpoint}`, diagnostics);
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   };
 
   const controller: EntryDiagnosticsController = {

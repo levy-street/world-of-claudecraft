@@ -118,5 +118,7 @@ export function governorDrawSignal(
   tier: GfxTier,
   frame: DrawStatsCounters,
 ): Readonly<DrawStatsCounters> {
-  return tier === 'high' || tier === 'ultra' ? COMPOSER_TIER_LEGACY_DRAW_SIGNAL : frame;
+  return tier === 'high' || tier === 'ultra' || tier === 'insane'
+    ? COMPOSER_TIER_LEGACY_DRAW_SIGNAL
+    : frame;
 }

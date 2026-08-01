@@ -195,6 +195,17 @@ const boolToggle = (
   opts: Pick<BoolToggleControl, 'disabled' | 'rerender'> = {},
 ): BoolToggleControl => ({ control: 'boolToggle', key, labelKey, on: s.bool(key), ...opts });
 
+/** The option value nearest the stored setting (the level ladders persist
+ *  half-step values like 0.5, which plain rounding would mis-select). Exact
+ *  matches behave exactly as before. */
+export function nearestOptionValue(value: number, options: ChoiceOption[]): number {
+  let best = options[0]?.value ?? 0;
+  for (const option of options) {
+    if (Math.abs(option.value - value) < Math.abs(best - value)) best = option.value;
+  }
+  return best;
+}
+
 const choice = (
   s: OptionsSettingsSource,
   key: string,
@@ -205,17 +216,39 @@ const choice = (
   control: 'choice',
   key,
   labelKey,
-  current: Math.round(s.num(key)),
+  current: nearestOptionValue(s.num(key), options),
   options,
   rerender,
 });
 
 const note = (textKey: TranslationKey): NoteControl => ({ control: 'note', textKey });
 
-// The two-value low/high choice shared by the four advanced-preset sub-pickers.
-const lowHighOptions: ChoiceOption[] = [
-  { value: 0, labelKey: 'hud.options.terrainLow' },
-  { value: 1, labelKey: 'hud.options.terrainHigh' },
+// The advanced-preset sub-setting ladders (round 10). Values are the
+// PERSISTED numbers gfx.ts maps to knob levels: the historical binary rows
+// stored 0 (Low) and 1 (High), so those keep their meaning and the new
+// levels slot in at 0.5 (Medium) and 2 (Insane). Labels reuse the preset
+// quality words so the ladders read consistently with the preset picker.
+const qualityLadderOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hud.options.graphicsPresetLow' },
+  { value: 0.5, labelKey: 'hud.options.graphicsPresetMedium' },
+  { value: 1, labelKey: 'hud.options.graphicsPresetHigh' },
+  { value: 2, labelKey: 'hud.options.graphicsPresetInsane' },
+];
+// Effects & Lighting stops at High (the full high-tier post stack); the
+// ultra/insane tiers' full-res AO rides the preset, not this dial.
+const effectsLadderOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hud.options.graphicsPresetLow' },
+  { value: 0.5, labelKey: 'hud.options.graphicsPresetMedium' },
+  { value: 1, labelKey: 'hud.options.graphicsPresetHigh' },
+];
+// The worn-surface layer dial (the town-street cost driver): Off sheds the
+// layer, Basic keeps grime/normals without parallax, Full runs the ultra
+// execution, Insane the everything-on walk.
+const surfaceDetailOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hud.options.off' },
+  { value: 0.5, labelKey: 'hud.options.surfaceDetailBasic' },
+  { value: 1, labelKey: 'hud.options.surfaceDetailFull' },
+  { value: 2, labelKey: 'hud.options.graphicsPresetInsane' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -285,18 +318,25 @@ export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv)
     { value: 3, labelKey: 'hud.options.graphicsPresetHigh' },
   ];
   if (!env.nativeShell) {
+    // Display order runs up the quality ladder (Insane sits above Ultra) with
+    // the expert Advanced profile last; the persisted VALUES stay historical
+    // (5 = Advanced predates 6 = Insane and can never renumber).
     graphicsPresetOptions.push(
       { value: 4, labelKey: 'hud.options.graphicsPresetUltra' },
+      { value: 6, labelKey: 'hud.options.graphicsPresetInsane' },
       { value: 5, labelKey: 'hud.options.graphicsPresetAdvanced' },
     );
   }
   out.push(choice(s, 'graphicsPreset', 'hud.options.graphicsQuality', graphicsPresetOptions, true));
-  // Advanced preset (5) reveals the four per-system low/high pickers.
+  // Advanced preset (5) reveals the per-system level ladders (round 10:
+  // four-step quality dials replacing the historical Low/High binaries, plus
+  // the new Surface Detail dial).
   if (Math.round(s.num('graphicsPreset')) === 5) {
-    out.push(choice(s, 'terrainDetail', 'hud.options.terrainDetail', lowHighOptions));
-    out.push(choice(s, 'foliageDensity', 'hud.options.foliageDensity', lowHighOptions));
-    out.push(choice(s, 'effectsQuality', 'hud.options.effectsQuality', lowHighOptions));
-    out.push(choice(s, 'shadowQuality', 'hud.options.shadowQuality', lowHighOptions));
+    out.push(choice(s, 'terrainDetail', 'hud.options.terrainDetail', qualityLadderOptions));
+    out.push(choice(s, 'foliageDensity', 'hud.options.foliageDensity', qualityLadderOptions));
+    out.push(choice(s, 'surfaceDetail', 'hud.options.surfaceDetail', surfaceDetailOptions));
+    out.push(choice(s, 'effectsQuality', 'hud.options.effectsQuality', effectsLadderOptions));
+    out.push(choice(s, 'shadowQuality', 'hud.options.shadowQuality', qualityLadderOptions));
   }
   out.push(
     choice(s, 'browserEffects', 'hudChrome.options.browserEffects', [

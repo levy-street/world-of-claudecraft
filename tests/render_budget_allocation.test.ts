@@ -31,6 +31,8 @@ describe('render budget allocation contract', () => {
       assertAllocationStable(() => governor.update(SAMPLE, out), 64, 'render budget state'),
     ).not.toThrow();
   });
+<<<<<<< HEAD
+=======
 
   it('returns the caller-owned state from every update exit path', () => {
     const fastRecoveryBudget = {
@@ -94,4 +96,5 @@ describe('render budget allocation contract', () => {
     expect(stalledOut.reason).toBe('submit-stall');
     expect(stalledOut.stallHoldSeconds).toBeGreaterThan(0);
   });
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 });

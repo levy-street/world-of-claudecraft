@@ -2191,7 +2191,11 @@ export const tr_TR: EnTranslations = {
         "noRecipient": "Burada bu isimde posta kutusu olan kimse yok.",
         "tooManyParcels": "Bir mektup en fazla {count} paket taşır.",
         "noMailQuestItems": "Görev eşyalarını postayla gönderemezsin.",
+<<<<<<< HEAD
+        "noMailBound": "That item is bound and cannot be mailed.",
+=======
         "noMailBound": "O eşya bağlı ve postayla gönderilemez.",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "notEnoughItems": "Gönderecek o kadar tane yok.",
         "cantAffordPostage": "Posta ücretini karşılayamazsın.",
         "recipientBoxFull": "Alıcının posta kutusu dolu.",
@@ -6254,11 +6258,15 @@ export const tr_TR: EnTranslations = {
       "graphicsPresetMedium": "Orta",
       "graphicsPresetHigh": "Yüksek",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Gelişmiş",
       "terrainDetail": "Arazi Ayrıntısı",
       "foliageDensity": "Bitki Yoğunluğu",
       "effectsQuality": "Efektler ve Aydınlatma",
       "shadowQuality": "Gölge Kalitesi",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Düşük",
       "terrainHigh": "Yüksek",
       "touchOpacity": "Dokunmatik Denetim Saydamlığı",
@@ -6548,7 +6556,11 @@ export const tr_TR: EnTranslations = {
       "tradeExpired": "Takas isteğinin süresi doldu.",
       "tradeFailed": "Takas başarısız: eşyalar ya da para artık mevcut değil.",
       "tradeBound": "O eşya bağlı ve takas edilemez.",
+<<<<<<< HEAD
+      "marketListBound": "That item is bound and cannot be listed."
+=======
       "marketListBound": "O eşya bağlı ve satışa çıkarılamaz."
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     },
     "logs": {
       "standUp": "Ayağa kalkıyorsun.",

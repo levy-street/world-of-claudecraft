@@ -15,10 +15,14 @@ import {
   updateEastbrookCivicBeaconMotion,
 } from './eastbrook_civic_beacon';
 import {
+  applyEastbrookTownSurfaceDetail,
   EASTBROOK_SURFACE_ATLAS_URL,
+  EASTBROOK_SURFACE_NORMAL_SCALE,
   eastbrookSurfaceAtlasMetadata,
   eastbrookSurfaceAtlasTexture,
   eastbrookSurfaceGeometry,
+  eastbrookSurfaceNormalTexture,
+  eastbrookSurfaceRoughnessTexture,
   eastbrookTownSemanticForColor,
 } from './eastbrook_surface_atlas';
 import {
@@ -28,7 +32,13 @@ import {
   newEastbrookRoofVisibilityPlan,
 } from './eastbrook_town_visibility_core';
 import { indexExactVertexTuples } from './exact_index_geometry';
+<<<<<<< HEAD
+import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
+import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
+import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+=======
 import { GFX, surfaceMat } from './gfx';
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 
 const ROOT_NAME = 'eastbrookTownRebuild';
@@ -86,8 +96,9 @@ interface TownAssetTemplate {
 
 interface RoofHideTarget extends EastbrookRoofVisibilityTarget {
   group: THREE.Group;
-  materials: THREE.Material[];
+  mats: OccluderFadeMat[];
   hidden: boolean;
+  alpha: number;
 }
 
 export interface EastbrookTownView {
@@ -100,6 +111,7 @@ export interface EastbrookTownView {
     eyeY: number,
     eyeZ: number,
     fogFar: number,
+    dt: number,
     reducedMotion?: boolean,
   ): void;
 }
@@ -263,14 +275,37 @@ function prepareTemplates(
 }
 
 function materialOptions(emissive: boolean, atlas = eastbrookSurfaceAtlasTexture()) {
+  // Baked PBR companions ride the color atlas's cell UVs (Standard tier only;
+  // Lambert tiers skip the bind outright, surfaceMat would drop the maps).
+  // Emissive windows keep their authored flat look.
+  const detail = !emissive && GFX.standardMaterials;
+  const normalMap = detail ? eastbrookSurfaceNormalTexture() : undefined;
+  const roughnessMap = detail ? eastbrookSurfaceRoughnessTexture() : undefined;
   return {
     color: 0xffffff,
     map: emissive ? undefined : atlas,
     vertexColors: true,
-    roughness: emissive ? 0.55 : 0.86,
+    normalMap,
+    roughnessMap,
+    // The rough atlas bakes per-cell base roughness, so it is the authority
+    // when bound; the flat 0.86 stays the fallback while it has not loaded.
+    roughness: emissive ? 0.55 : roughnessMap ? 1 : 0.86,
     metalness: emissive ? 0.08 : 0,
     emissive: emissive ? 0xffffff : 0x000000,
-    emissiveIntensity: emissive ? (GFX.standardMaterials ? 1 : 0.72) : 1,
+    // White x vertex color (vertex_color_emissive.ts), so the amber/cyan pane
+    // tints carry the hue and their luma (0.47 amber) sets how far this has to
+    // climb to clear post.ts BLOOM_THRESHOLD. At the old intensity 1 no window
+    // in town glowed while sunlit plaster nearly did.
+    // EMISSIVE_GLOW is calibrated against the bloom threshold; without the
+    // composer the raise just desaturates the amber to a pasted-on cream,
+    // so non-bloom tiers keep the authored pane level.
+    emissiveIntensity: emissive
+      ? GFX.standardMaterials && GFX.composer
+        ? EMISSIVE_GLOW
+        : GFX.standardMaterials
+          ? 1
+          : 0.72
+      : 1,
     flatShading: !GFX.standardMaterials,
   } as const;
 }
@@ -281,8 +316,18 @@ function townMaterial(
   independent = false,
 ): THREE.Material {
   const shared = surfaceMat(materialOptions(emissive, atlas));
+  if (shared instanceof THREE.MeshStandardMaterial && shared.normalMap) {
+    // Idempotent on the shared cached material; the key includes the map, so
+    // only the town's atlas-normal material ever carries this scale.
+    shared.normalScale.setScalar(EASTBROOK_SURFACE_NORMAL_SCALE);
+  }
   const material = independent ? shared.clone() : shared;
-  return emissive ? modulateEmissiveByVertexColor(material) : material;
+  // Conservative triplanar detail OVER the baked atlas (the baked cells are
+  // stretched per-face and judged too flat alone); applied after the clone
+  // decision because Material.clone drops onBeforeCompile hooks.
+  return emissive
+    ? modulateEmissiveByVertexColor(material)
+    : applyEastbrookTownSurfaceDetail(material);
 }
 
 function scaledGeometry(
@@ -406,8 +451,9 @@ function buildBuilding(
     group,
     hideTarget: {
       group,
-      materials,
+      mats: materials.map(occluderFadeMat),
       hidden: false,
+      alpha: 1,
       x: building.position.x,
       z: building.position.z,
       halfWidth: dimensions.width / 2,
@@ -864,6 +910,7 @@ function buildFromTemplates(
       eyeY: number,
       eyeZ: number,
       fogFar: number,
+      dt: number,
       reducedMotion = false,
     ): void {
       updateEastbrookCivicBeaconMotion(microBuild.civicBeaconState, reducedMotion);
@@ -886,13 +933,11 @@ function buildFromTemplates(
           fogFar,
         );
         target.group.visible = roofVisibilityPlan.visible;
-        if (!roofVisibilityPlan.visible || !roofVisibilityPlan.hiddenChanged) continue;
+        if (!roofVisibilityPlan.visible) continue;
         target.hidden = roofVisibilityPlan.hidden;
-        for (let materialIndex = 0; materialIndex < target.materials.length; materialIndex++) {
-          const material = target.materials[materialIndex];
-          material.colorWrite = !roofVisibilityPlan.hidden;
-          material.depthWrite = !roofVisibilityPlan.hidden;
-        }
+        if (occluderFadeSettled(target.alpha, target.hidden)) continue;
+        target.alpha = stepOccluderFade(target.alpha, target.hidden, dt, reducedMotion);
+        applyOccluderFade(target.mats, target.alpha);
       }
     },
   };

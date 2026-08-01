@@ -124,6 +124,8 @@ describe('nameplate language-only transitions', () => {
     titlePainter.setNameplateTitle(v, 'prog_veteran');
 
     expect(v.titleEl.textContent).toBe('Veteran');
+<<<<<<< HEAD
+=======
 
     titlePainter.setNameplateTitle(v, 'prog_champion');
     expect(v.titleEl.textContent).toBe('Champion');
@@ -161,5 +163,6 @@ describe('nameplate language-only transitions', () => {
     await deedI18n.ensureDeedLocalesLoaded('zh_CN');
     titlePainter.setNameplateTitle(v, 'prog_veteran');
     expect(v.titleEl.textContent).toBe('老兵');
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   }, 30_000);
 });

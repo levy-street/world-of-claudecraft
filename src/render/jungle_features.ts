@@ -21,6 +21,7 @@ import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { buildDeckWood } from './deck_render';
 import { GFX } from './gfx';
+import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface JungleFeaturesView {
   group: THREE.Group;
@@ -347,6 +348,9 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
         m2 = source.clone();
         const c = (m2 as THREE.MeshStandardMaterial).color;
         if (c) c.multiply(new THREE.Color(0.75, 1.05, 0.7));
+        // giant banyan trunks take the coarse landmark bark grain
+        if (isBarkMaterialName(source.name))
+          applySurfaceDetail(m2 as THREE.MeshStandardMaterial, 'bark', GREAT_TREE_BARK_DETAIL);
         lushened.set(source.uuid, m2);
       }
       return m2;

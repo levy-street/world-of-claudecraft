@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { BiomeId } from '../sim/types';
+import { transitionAlpha, WEATHER_ENVIRONMENT_RESPONSE } from './environment_transition_core';
 
 // Ambient precipitation. One pooled THREE.Points cloud rides inside a box that
 // follows the camera (the same "ride along" trick the sky dome uses), so a
@@ -233,7 +234,7 @@ export class Weather {
       target = STYLES[this.mode].target;
     }
 
-    const k = 1 - Math.exp(-dt * 1.8);
+    const k = transitionAlpha(dt, WEATHER_ENVIRONMENT_RESPONSE);
     this.intensity += (target - this.intensity) * k;
     this.material.opacity = this.intensity;
 

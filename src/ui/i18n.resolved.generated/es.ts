@@ -2191,7 +2191,11 @@ export const es: EnTranslations = {
         "noRecipient": "Nadie con ese nombre tiene buzón aquí.",
         "tooManyParcels": "Una carta lleva como máximo {count} paquetes.",
         "noMailQuestItems": "No puedes enviar objetos de misión por correo.",
+<<<<<<< HEAD
+        "noMailBound": "That item is bound and cannot be mailed.",
+=======
         "noMailBound": "Ese objeto está vinculado y no puede enviarse por correo.",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "notEnoughItems": "No tienes tantos para enviar.",
         "cantAffordPostage": "No puedes costear el franqueo.",
         "recipientBoxFull": "Su buzón está lleno.",
@@ -6254,11 +6258,15 @@ export const es: EnTranslations = {
       "graphicsPresetMedium": "Media",
       "graphicsPresetHigh": "Alta",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrema",
       "graphicsPresetAdvanced": "Avanzada",
       "terrainDetail": "Detalle del terreno",
       "foliageDensity": "Densidad de vegetación",
       "effectsQuality": "Efectos e iluminación",
       "shadowQuality": "Calidad de sombras",
+      "surfaceDetail": "Detalle de superficies",
+      "surfaceDetailBasic": "Básico",
+      "surfaceDetailFull": "Completo",
       "terrainLow": "Bajo",
       "terrainHigh": "Alto",
       "touchOpacity": "Opacidad de controles táctiles",
@@ -6548,7 +6556,11 @@ export const es: EnTranslations = {
       "tradeExpired": "La solicitud de comercio ha expirado.",
       "tradeFailed": "Comercio fallido: los objetos o el dinero ya no están disponibles.",
       "tradeBound": "Ese objeto está vinculado y no puede comerciarse.",
+<<<<<<< HEAD
+      "marketListBound": "That item is bound and cannot be listed."
+=======
       "marketListBound": "Ese objeto está vinculado y no puede ponerse a la venta."
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     },
     "logs": {
       "standUp": "Te pones de pie.",

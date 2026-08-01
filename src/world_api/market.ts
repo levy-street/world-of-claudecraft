@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+import type { MarketQuery } from '../sim/market_query';
+=======
 import type {
   MarketArmorClassFilter,
   MarketItemTypeFilter,
@@ -6,6 +9,7 @@ import type {
   MarketRarityFilter,
   MarketSubtypeFilter,
 } from '../sim/market_query';
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 
 // ---------------------------------------------------------------------------

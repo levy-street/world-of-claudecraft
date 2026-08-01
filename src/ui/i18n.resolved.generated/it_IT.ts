@@ -2191,7 +2191,11 @@ export const it_IT: EnTranslations = {
         "noRecipient": "Nessuno con quel nome ha una cassetta postale qui.",
         "tooManyParcels": "Una lettera trasporta al massimo {count} pacchi.",
         "noMailQuestItems": "Non puoi spedire oggetti delle missioni.",
+<<<<<<< HEAD
+        "noMailBound": "That item is bound and cannot be mailed.",
+=======
         "noMailBound": "Quell'oggetto è legato e non può essere spedito.",
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         "notEnoughItems": "Non ne hai così tanti da spedire.",
         "cantAffordPostage": "Non puoi permetterti l'affrancatura.",
         "recipientBoxFull": "La sua cassetta postale è piena.",
@@ -6254,11 +6258,15 @@ export const it_IT: EnTranslations = {
       "graphicsPresetMedium": "Media",
       "graphicsPresetHigh": "Alta",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Estrema",
       "graphicsPresetAdvanced": "Avanzata",
       "terrainDetail": "Dettaglio terreno",
       "foliageDensity": "Densità vegetazione",
       "effectsQuality": "Effetti e luci",
       "shadowQuality": "Qualità ombre",
+      "surfaceDetail": "Dettaglio superfici",
+      "surfaceDetailBasic": "Base",
+      "surfaceDetailFull": "Completo",
       "terrainLow": "Basso",
       "terrainHigh": "Alto",
       "touchOpacity": "Opacità comandi touch",
@@ -6548,7 +6556,11 @@ export const it_IT: EnTranslations = {
       "tradeExpired": "La richiesta di scambio è scaduta.",
       "tradeFailed": "Scambio fallito: oggetti o denaro non più disponibili.",
       "tradeBound": "Quell'oggetto è legato e non può essere scambiato.",
+<<<<<<< HEAD
+      "marketListBound": "That item is bound and cannot be listed."
+=======
       "marketListBound": "Quell'oggetto è legato e non può essere messo in vendita."
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     },
     "logs": {
       "standUp": "Ti alzi.",

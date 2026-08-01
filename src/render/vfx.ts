@@ -3,7 +3,11 @@ import { loadTexture, releaseTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
 import {
+<<<<<<< HEAD
+  insertActiveParticleSlot,
+=======
   packActiveParticleSlotsInto,
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   pointSpriteBoundingRadius,
   spriteEarlyRejectRadiusSq,
 } from './vfx_pool_core';
@@ -122,17 +126,26 @@ for (let i = 0; i < SPRITE_FILES.length; i++) {
   );
 }
 
+<<<<<<< HEAD
+=======
 // The composed atlas canvas, kept module-level and reused. A SECOND Vfx in the
 // same page is real (the editor viewport's reload() builds a fresh Renderer, and
 // each Renderer owns a Vfx), and composeParticleAtlas() releases its source
 // sprites, so recomposing would silently paint all 16 cells as fallback discs.
 // Retaining the one 1024x1024 canvas instead of 16 decoded sources is also the
 // cheaper half of that trade.
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 interface ParticleAtlas {
   texture: THREE.CanvasTexture;
   earlyRejectRadiusSq: Float32Array;
 }
 
+<<<<<<< HEAD
+// Compose the atlas once. Any cell whose PNG is unavailable (e.g. unit tests
+// that construct Vfx without the preload gate) falls back to a soft painted
+// disc so the system always renders something sane.
+function buildAtlasTexture(): ParticleAtlas {
+=======
 interface ComposedParticleAtlas {
   canvas: HTMLCanvasElement;
   earlyRejectRadiusSq: Float32Array;
@@ -144,6 +157,7 @@ let composedAtlas: ComposedParticleAtlas | null = null;
 // that construct Vfx without the preload gate) falls back to a soft painted
 // disc so the system always renders something sane.
 function composeParticleAtlas(): ComposedParticleAtlas {
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   const size = ATLAS_GRID * ATLAS_CELL;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
@@ -218,7 +232,30 @@ function buildAtlasTexture(): ParticleAtlas {
   tex.magFilter = THREE.LinearFilter;
   tex.generateMipmaps = false;
 
+<<<<<<< HEAD
+  // The live fragment shader discards black atlas borders after sampling.
+  // Bound every sprite from the exact composed canvas so it can reject a
+  // strict subset of those fragments before rotation and the texture tap.
+  const earlyRejectRadiusSq = new Float32Array(SPRITE_FILES.length);
+  earlyRejectRadiusSq.fill(0.5);
+  try {
+    const pixels = ctx.getImageData(0, 0, size, size).data;
+    for (let i = 0; i < SPRITE_FILES.length; i++) {
+      earlyRejectRadiusSq[i] = spriteEarlyRejectRadiusSq(
+        pixels,
+        size,
+        (i % ATLAS_GRID) * ATLAS_CELL,
+        Math.floor(i / ATLAS_GRID) * ATLAS_CELL,
+        ATLAS_CELL,
+      );
+    }
+  } catch {
+    // A restricted canvas keeps the original full-point path.
+  }
+  return { texture: tex, earlyRejectRadiusSq };
+=======
   return { texture: tex, earlyRejectRadiusSq: composedAtlas.earlyRejectRadiusSq };
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
 }
 
 export const SCHOOL_COLORS: Record<string, number> = {
@@ -282,9 +319,14 @@ export class Vfx {
   private spriteAttr: Float32Array;
   private rotAttr: Float32Array;
   private activeSlots: Int32Array;
+<<<<<<< HEAD
+  private activeSlotFlags: Uint8Array;
+  private activeCount = 0;
+=======
   private activeSlotIndex: Int32Array;
   private activeCount = 0;
   private renderSlots: Int32Array;
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   private drawData: Float32Array;
   private drawBuffer: THREE.InterleavedBuffer;
   private spriteRadiusSq: Float32Array;
@@ -321,9 +363,13 @@ export class Vfx {
     this.spriteAttr = new Float32Array(CAPACITY);
     this.rotAttr = new Float32Array(CAPACITY);
     this.activeSlots = new Int32Array(CAPACITY);
+<<<<<<< HEAD
+    this.activeSlotFlags = new Uint8Array(CAPACITY);
+=======
     this.activeSlotIndex = new Int32Array(CAPACITY);
     this.activeSlotIndex.fill(-1);
     this.renderSlots = new Int32Array(CAPACITY);
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     this.drawData = new Float32Array(CAPACITY * DRAW_STRIDE);
     this.drawBuffer = new THREE.InterleavedBuffer(this.drawData, DRAW_STRIDE);
     this.drawBuffer.setUsage(THREE.DynamicDrawUsage);
@@ -472,7 +518,11 @@ export class Vfx {
     this.size.fill(0);
     this.alphaAttr.fill(0);
     this.activeCount = 0;
+<<<<<<< HEAD
+    this.activeSlotFlags.fill(0);
+=======
     this.activeSlotIndex.fill(-1);
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     this.points.geometry.setDrawRange(0, 0);
     this.points.visible = !this.cloudWarmed;
   }
@@ -518,9 +568,15 @@ export class Vfx {
   ): void {
     const i = this.head;
     this.head = (this.head + 1) % CAPACITY;
+<<<<<<< HEAD
+    if (this.activeSlotFlags[i] === 0) {
+      this.activeSlotFlags[i] = 1;
+      this.activeCount = insertActiveParticleSlot(this.activeSlots, this.activeCount, i);
+=======
     if (this.activeSlotIndex[i] < 0) {
       this.activeSlotIndex[i] = this.activeCount;
       this.activeSlots[this.activeCount++] = i;
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
     }
     this.pos[i * 3] = x;
     this.pos[i * 3 + 1] = y;
@@ -553,10 +609,17 @@ export class Vfx {
     this.cullFrustum.setFromProjectionMatrix(this.cullViewProjection);
     const perspective = (camera as THREE.PerspectiveCamera).isPerspectiveCamera === true;
     const cameraProjectionScale = Math.abs(camera.projectionMatrix.elements[5]);
+<<<<<<< HEAD
+    let count = 0;
+    for (let active = 0; active < this.activeCount; active++) {
+      const slot = this.activeSlots[active];
+      if (this.life[slot] <= 0) continue;
+=======
     const liveCount = packActiveParticleSlotsInto(this.life, this.renderSlots);
     let count = 0;
     for (let live = 0; live < liveCount; live++) {
       const slot = this.renderSlots[live];
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
       const src3 = slot * 3;
       const x = this.pos[src3];
       const y = this.pos[src3 + 1];
@@ -1743,11 +1806,19 @@ export class Vfx {
       }
     }
 
+<<<<<<< HEAD
+    // Advance only live state slots, compacting expired entries in place. The
+    // active prefix stays numerically sorted, so draw packing is the same
+    // ascending physical-slot filter as the original fixed-pool scan.
+    let write = 0;
+    for (let active = 0; active < this.activeCount; active++) {
+=======
     // Advance only live state slots. Rendering is repacked separately in
     // ascending slot order so additive blend accumulation stays byte-for-byte
     // ordered like the original fixed pool.
     let active = 0;
     while (active < this.activeCount) {
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
       const slot = this.activeSlots[active];
       const slot3 = slot * 3;
       this.life[slot] -= dt;
@@ -1758,11 +1829,20 @@ export class Vfx {
       this.pos[slot3 + 2] += this.vel[slot3 + 2] * dt;
       this.alphaAttr[slot] = f < 0.25 ? f * 4 : 1;
       if (this.life[slot] > 0) {
+<<<<<<< HEAD
+        this.activeSlots[write++] = slot;
+=======
         active++;
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
         continue;
       }
 
       this.size[slot] = 0;
+<<<<<<< HEAD
+      this.activeSlotFlags[slot] = 0;
+    }
+    this.activeCount = write;
+=======
       this.activeSlotIndex[slot] = -1;
       this.activeCount--;
       if (active < this.activeCount) {
@@ -1771,5 +1851,6 @@ export class Vfx {
         this.activeSlotIndex[moved] = active;
       }
     }
+>>>>>>> b5f0d1f09de234121ffab1fdcf021f66e199a9b8
   }
 }
