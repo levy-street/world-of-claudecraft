@@ -76,6 +76,37 @@ describe('Last Bell harbors', () => {
     }
   });
 
+  it('keeps the boarding bridge LAST in decks (the identity contract)', () => {
+    for (const harbor of HARBORS) {
+      expect(harbor.decks.at(-1), `${harbor.id} bridge order`).toBe(harbor.bridge);
+      expect(
+        harbor.bridgeRails.every((rail) => harbor.rails.includes(rail)),
+        `${harbor.id} bridge rails registered`,
+      ).toBe(true);
+    }
+  });
+
+  it('lands the seam ramps on walkable shoulders, never open water', () => {
+    // The climb between the outer pier and the raised berth head runs over
+    // the carved basin; the pier deck continues under the ramp so a
+    // sideways step off either shoulder lands on planks, not in the sea.
+    for (const harbor of HARBORS) {
+      const seamRamp = harbor.ramps.at(-1);
+      if (!seamRamp) throw new Error(`${harbor.id} lost its seam ramp`);
+      for (const seed of SEEDS) {
+        for (let x = seamRamp.x - seamRamp.hw + 0.2; x <= seamRamp.x + seamRamp.hw; x += 0.75) {
+          for (const side of [-1, 1]) {
+            const z = seamRamp.z + side * (seamRamp.hd + 0.25);
+            expect(
+              groundHeight(x, z, seed),
+              `${harbor.id} seam ramp shoulder at ${x.toFixed(1)},${z.toFixed(1)} seed ${seed}`,
+            ).toBeGreaterThan(WATER_LEVEL);
+          }
+        }
+      }
+    }
+  });
+
   it('lands every entry ramp within a walkable step of the ground on every seed', () => {
     // The three shore/town entries: just beyond the ramp's low edge, the
     // bare ground must sit within the movement climb gate of the ramp lip

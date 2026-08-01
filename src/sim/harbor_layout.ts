@@ -481,9 +481,10 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     // pier head (x 196..206, z -54..-42), all past the shelf tail
     { x: 201, z: -48, hw: 5, hd: 6, y: -0.2 },
     // the grand extension: a long outer pier and a berth head running the
-    // boardwalk out to the carved-deep basin where the tall ship lies
-    // (same height as the head, so the run is seamless)
-    { x: 212.5, z: -48, hw: 7, hd: 2.8, y: -0.2 },
+    // boardwalk out to the carved-deep basin where the tall ship lies. The
+    // pier runs UNDER the seam ramp all the way to the raised head's edge,
+    // so the ramp's shoulders land on deck instead of open water.
+    { x: 215, z: -48, hw: 9.5, hd: 2.8, y: -0.2 },
     // berth head at the ship's deck height (the seam ramp below makes the
     // climb), split around the boarding corridor so the turning hull clears
     // the two outer deck corners while the boarding route stays flush. The
@@ -535,9 +536,9 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     { x: 206, z: -43.6, hw: 1.6, rot: Math.PI / 2 },
     { x: 196, z: -52.7, hw: 1.3, rot: Math.PI / 2 },
     { x: 196, z: -43.3, hw: 1.3, rot: Math.PI / 2 },
-    // outer pier run
-    { x: 212.5, z: -50.8, hw: 7, rot: 0 },
-    { x: 212.5, z: -45.2, hw: 7, rot: 0 },
+    // outer pier run, fencing the seam ramp's shoulders up to the head
+    { x: 215, z: -50.8, hw: 9.5, rot: 0 },
+    { x: 215, z: -45.2, hw: 9.5, rot: 0 },
     // berth head; the east edge gap is derived from the generated ship
     // mating edge, so the boarding bridge never overlaps either rail segment
     // The south run stops at the split deck corner, leaving the turning
@@ -631,8 +632,10 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     // gangplank onto the ship's deck stays a walkable slope
     { x: 757, z: 116, hw: 4, hd: 5.5, y: 0.2 },
     // the grand extension: the boardwalk runs on west over the deep bay to
-    // the berth head where the tall ship lies (same height, seamless)
-    { x: 741, z: 116, hw: 9, hd: 2.8, y: 0.2 },
+    // the berth head where the tall ship lies. The run continues UNDER the
+    // seam ramp to the raised head's edge so the ramp's shoulders land on
+    // deck instead of open water.
+    { x: 739.2, z: 116, hw: 10.8, hd: 2.8, y: 0.2 },
     // berth head at the ship's deck height (the seam ramp below makes the
     // climb), split around the boarding corridor so the turning hull clears
     // the two outer deck corners while the boarding route stays flush. The
@@ -683,9 +686,9 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     { x: 757, z: 121.5, hw: 4, rot: 0 },
     { x: 761, z: 111.65, hw: 1.15, rot: Math.PI / 2 },
     { x: 761, z: 120.35, hw: 1.15, rot: Math.PI / 2 },
-    // outer run
-    { x: 741, z: 113.2, hw: 9, rot: 0 },
-    { x: 741, z: 118.8, hw: 9, rot: 0 },
+    // outer run, fencing the seam ramp's shoulders up to the head
+    { x: 739.2, z: 113.2, hw: 10.8, rot: 0 },
+    { x: 739.2, z: 118.8, hw: 10.8, rot: 0 },
     // berth head; the west edge gap is derived from the mirrored generated
     // ship mating edge, so the boarding bridge never overlaps either rail
     // segment. The south run starts at the split deck corner, leaving the
