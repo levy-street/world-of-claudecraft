@@ -27,6 +27,8 @@ import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './s
 
 const baseEnTable = {
   'log.deathwardSaves': 'A deathward saves you!',
+  'log.riftGem': 'A rift gem hums in your grasp.',
+  'log.riftBrazier': 'The waybrazier takes your flame.',
   'error.lineOfSight': 'Line of sight.',
   'error.notInGroup': 'That ally is not in your group.',
   'error.noDeadAlly': 'You must target a dead ally in your group.',

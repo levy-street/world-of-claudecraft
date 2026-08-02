@@ -4631,6 +4631,21 @@ export type SimEvent = { pid?: number } & (
   // (the same pure generator the server ran). `active:false` clears it on leave.
   // Text-free structured fields (like skinEvent/craftResult): the client renders
   // its own localized floor label from name/themeName.
+  // Course floor deck state: a crumble deck armed (touch, or a chase wave
+  // reaching it at a FUTURE `at`). World-visible so every client mirrors the
+  // registry the floor query and the renderer read. ox/oz is the floor
+  // origin; the registries key on courseInstKey(ox, oz).
+  | { type: 'riftDeckState'; ox: number; oz: number; deck: number; at: number }
+  // Personal course progress (gems, waybraziers): pid-scoped, so a client
+  // mirrors only its OWN registry entries and renders its own progress.
+  | {
+      type: 'riftCourseMark';
+      pid: number;
+      ox: number;
+      oz: number;
+      kind: 'gem' | 'brazier';
+      index: number;
+    }
   | {
       type: 'riftState';
       pid: number;

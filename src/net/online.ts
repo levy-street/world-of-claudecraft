@@ -27,6 +27,12 @@ import { resolveSportKit } from '../sim/content/vale_cup';
 import { resolveActiveWeaponSkin, withWeaponSkinApplied } from '../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import {
+  armCourseCrumble,
+  collectCourseGem,
+  lightCourseCheckpoint,
+  setCourseClock,
+} from '../sim/course';
+import {
   ALL_RECIPES,
   abilitiesKnownAt,
   CLASSES,
@@ -43,6 +49,7 @@ import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
+import { courseInstKey } from '../sim/rift/course_runtime';
 import type { ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
@@ -2207,6 +2214,8 @@ export class ClientWorld implements IWorld {
         this.applyCraftResultEvent(ev as SimEvent);
         this.applyRiftStateEvent(ev as SimEvent);
         this.applyRiftDeathZoneSpawnEvent(ev as SimEvent);
+        this.applyRiftDeckStateEvent(ev as SimEvent);
+        this.applyRiftCourseMarkEvent(ev as SimEvent);
         this.applyMasterworkEvent(ev as SimEvent);
         this.applyDisenchantResultEvent(ev as SimEvent);
         this.applyEnchantResultEvent(ev as SimEvent);
@@ -2424,6 +2433,9 @@ export class ClientWorld implements IWorld {
       this.playerId = snap.self.id;
     }
     const timerWire = this.prepareSnapshotTimers(snap.tw, snap.time);
+    // The course clock rides sim time: local collision (course decks), the
+    // renderer's feature animation, and the server all read one instant.
+    if (typeof snap.time === 'number') setCourseClock(snap.time);
     // the interpolation alpha the render loop reached on its last frame
     // (same formula and caps as main.ts); used below to re-anchor the new
     // interpolation segment at the pose currently on screen
@@ -4523,6 +4535,25 @@ export class ClientWorld implements IWorld {
       radius: ev.radius,
       expiresAtMs: performance.now() + ev.durationSecs * 1000,
     });
+  }
+
+  // Mirror course deck state (crumble arming, chase waves) into the shared
+  // registry the floor query and the renderer read. The event may carry a
+  // FUTURE `at` (a chase wave still travelling); the kernel treats those as
+  // solid until their moment.
+  private applyRiftDeckStateEvent(ev: SimEvent): void {
+    if (ev.type !== 'riftDeckState') return;
+    armCourseCrumble(courseInstKey(ev.ox, ev.oz), ev.deck, ev.at);
+  }
+
+  // Personal course progress (gems, waybraziers): pid-scoped events, so this
+  // client only ever mirrors its OWN marks, which is exactly what the
+  // renderer should show.
+  private applyRiftCourseMarkEvent(ev: SimEvent): void {
+    if (ev.type !== 'riftCourseMark') return;
+    const key = courseInstKey(ev.ox, ev.oz);
+    if (ev.kind === 'gem') collectCourseGem(key, ev.pid, ev.index);
+    else lightCourseCheckpoint(key, ev.pid, ev.index);
   }
 
   private applyCraftResultEvent(ev: SimEvent): void {

@@ -180,7 +180,18 @@ export function courseSupportAt(
     if (Math.abs(lx - c.x) > deck.hw || Math.abs(lz - c.z) > deck.hd) continue;
     const top = courseDeckTop(deck, t);
     if (top > maxY) continue;
-    if (best && top <= best.top) continue;
+    // Strictly higher wins; a TIE prefers the moving deck. A rider standing
+    // in the boarding overlap (ferry flush against its board deck) must be
+    // treated as aboard, or the ferry departs without them.
+    if (best) {
+      if (top < best.top - 1e-9) continue;
+      if (
+        Math.abs(top - best.top) <= 1e-9 &&
+        !(deck.kind === 'ferry' && best.deck.kind !== 'ferry')
+      ) {
+        continue;
+      }
+    }
     if (!courseDeckSolid(deck, i, instKey, t)) continue;
     best = { deck, index: i, top };
   }

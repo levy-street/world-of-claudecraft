@@ -433,6 +433,7 @@ export type { MailSave } from './mail/post_office';
 // stays valid now that the type lives in market.ts.
 export type { MarketSave } from './market';
 
+import { setCourseClock } from './course';
 import { updateSwimFatigue } from './fatigue';
 import type { CombatExitMemory } from './instance_exit_memory';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
@@ -467,6 +468,10 @@ import {
   onNodeGatheredForQuests,
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
+import {
+  riftCourseSupportY,
+  updateRiftCourses as updateRiftCoursesImpl,
+} from './rift/course_runtime';
 import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
 import {
   enchantRiftItem as enchantRiftItemImpl,
@@ -1922,6 +1927,7 @@ export class Sim {
           deedsMod.onFallDeathForDeeds(this.ctx, target);
         }
       },
+      courseSupportAt: (x, z, maxY) => riftCourseSupportY(this.riftCollisionToken, x, z, maxY),
     };
     // Party/raid machine (A1): constructed after ctx (it consumes the seam). The
     // ctx party callbacks are lazy arrows, so this assignment before any tick/command
@@ -5022,6 +5028,11 @@ export class Sim {
     // behavior, so every phase here is byte-identical (the parity gate proves it).
     this.time += DT;
     this.tickCount++;
+    // The course clock: one authority for every dynamic-deck read this tick
+    // (rift parkour floors; src/sim/course/). Set before ANY movement or
+    // floor query so sim collision and, on the client, the renderer share
+    // the same instant.
+    setCourseClock(this.time);
     // Optional per-phase timing hook (cfg.perfLap): the host attributes the elapsed
     // time since its previous mark to the named phase. Undefined offline/headless, so
     // this is a no-op there; it draws no rng and mutates nothing either way, keeping
@@ -5184,6 +5195,7 @@ export class Sim {
     liftRiftEntitiesImpl(this.ctx); // stand rift mobs/objects on the raised tier
     tickRiftLockpicksImpl(this.ctx); // per-tick rift-cache lockpick step clock
     tickRiftBossDeathZonesImpl(this.ctx); // lethal boss zone fuses + detonation
+    updateRiftCoursesImpl(this.ctx); // parkour-course features; draws no rng
     if (this.cfg.riftPortals) updateRiftPortalsImpl(this.ctx);
     // Escort runs walk their NPC + watch ambush waves (rng-free; src/sim/escort.ts).
     updateEscortsImpl(this.ctx);
