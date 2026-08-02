@@ -5694,8 +5694,24 @@ export class Renderer {
         if (ev.fx === 'windup') {
           // A petSpell windup telegraph: start the throw animation now; the
           // projectile for this throw follows petSpell.windup later, timed to
-          // the clip's release pose.
-          this.triggerAttack(ev.sourceId);
+          // the clip's release pose. `ability` rides along so a mob one-shot
+          // can pick its authored clip via attackByAbility (the dragonkin
+          // brood's Cleave/Stun); every petSpell emitter sends none, so their
+          // rotation is unchanged.
+          this.triggerAttack(ev.sourceId, ev.ability);
+          break;
+        }
+        if (ev.fx === 'shout' || ev.fx === 'flourish') {
+          // Dragonkin brood cues (the only sim emitters of these fx kinds):
+          // 'shout' is the brood's rooted engage bellow (broodguards and the
+          // broodlords; the lords' version also cracks the clutch awake), and
+          // 'flourish' is a whelp's hatch pounce. Both play the visual's
+          // flourish one-shot (Shout / JumpAttack); the shout adds a pulse so
+          // the wake-up reads at a distance.
+          const v = this.views.get(ev.sourceId);
+          const vis = v ? this.activeVisual(v) : null;
+          vis?.playFlourish();
+          if (ev.fx === 'shout') this.pulseAt(ev.sourceId, ev.school, 1.8, 0.5);
           break;
         }
         // Player ranged attacks begin when their projectile launches. The live

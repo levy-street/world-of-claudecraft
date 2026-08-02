@@ -107,6 +107,12 @@ export interface VisualDef {
    *  ring would clip. */
   haloUpOffset?: number;
   haloRadius?: number;
+  /** Two-state prop mob (the dragonkin egg): the GLB ships BOTH state meshes
+   *  seated at the origin; alive shows `hide` only, and death swaps to `show`
+   *  (the cracked-open shell IS the corpse). assembleModel seeds the alive
+   *  state; CharacterVisual's enterDeath/revive flip it. Node names as
+   *  authored in the GLB. */
+  corpseMeshSwap?: { hide: string; show: string };
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
@@ -197,6 +203,50 @@ const MOUNT_RIGGED: ClipMap = {
   run: 'Run',
   attack: [],
   death: 'Death',
+};
+
+// The Drakelands dragonkin brood (tmp/dragonkin_build.mjs bakes): artist
+// clips on the 25-bone mixamorig core. Run reuses the walk cycle (the rigs
+// ship no separate sprint; visual timeScale matching covers the chase). The
+// broodlord's specials resolve per mechanic: FireBreath rides the cast slot
+// (breathCone shows a real bar), Cleave/Stun ride attackByAbility off the
+// 'windup' spellfx ability ids, and Shout is the flourish one-shot the
+// 'shout'/'flourish' spellfx cues play.
+const DRAGONKIN_BROODLORD: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Walk',
+  attack: ['Attack'],
+  attackByAbility: { brood_cleave: 'Cleave', brood_stun: 'Stun' },
+  death: 'Death',
+  cast: 'FireBreath',
+  flourish: 'Shout',
+};
+const DRAGONKIN_BROODGUARD: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Walk',
+  attack: ['Attack'],
+  death: 'Death',
+  flourish: 'Shout',
+};
+const DRAGONKIN_WHELP: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Walk',
+  attack: ['JumpAttack'],
+  death: 'Death',
+  flourish: 'JumpAttack',
+};
+// Clipless two-state prop mobs (the dragonkin egg): every action() lookup
+// misses harmlessly (fadeTo null-guards), so the mesh just stands; state
+// changes are mesh-visibility swaps (VisualDef.corpseMeshSwap), not clips.
+const STATIC_PROP: ClipMap = {
+  idle: '',
+  walk: '',
+  run: '',
+  attack: [],
+  death: '',
 };
 
 // Custom baked wolf rig (wolf_basic/greyjaw, Dog_Animation donor skeleton): the
@@ -888,6 +938,17 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 4.4,
     lazyPreload: true,
   },
+  // The Drakemaw Raptor (broodlord legendary drop): saddle-broken Tripo biped
+  // whose hips-down run cycle ships as Run, retimed as Walk, plus synthesized
+  // Idle bob and side-topple Death (tmp/dragonkin_raptor_gaits.mjs).
+  mount_drakemaw_raptor: {
+    url: `${MOUNTS_DIR}/drakemaw_raptor.glb`,
+    height: 3.4,
+    clips: MOUNT_RIGGED,
+    walkRef: 2.4,
+    runRef: 10,
+    lazyPreload: true,
+  },
 
   // Ambient Highwatch stable horse (sim mob 'stable_horse', MOB_KEYS below). Reuses
   // the Valorsteed GLB + its authored gait clips so it renders and ambles as a real
@@ -1179,6 +1240,46 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: FLOATING,
     tint: 'entity',
     tintStrength: 0.2,
+  },
+  // --- The Drakelands dragonkin brood (v0.35 rework) ---------------------
+  // Tripo sculpts on the 25-bone mixamorig core with artist-authored clips,
+  // baked by tmp/dragonkin_build.mjs. The brood replaces the old floating
+  // dragonevolved wyrm ONLY in the Drakelands (per-template MOB_KEYS
+  // overrides below); the other dragonkin-family mobs keep the family
+  // fallback above.
+  mob_dragonkin_broodlord: {
+    url: `${CREATURES}/dragonkin_elite.glb`,
+    height: 2.6,
+    clips: DRAGONKIN_BROODLORD,
+    // 'entity' tint: the broodlords wash dark scale-brown (template color)
+    // while Cindraleth shares this def gold (her 0xf0b040), so the matriarch
+    // reads as the gilded mother of the same brood.
+    tint: 'entity',
+    tintStrength: 0.12,
+  },
+  mob_dragonkin_broodguard: {
+    url: `${CREATURES}/dragonkin_mob.glb`,
+    height: 2.2,
+    clips: DRAGONKIN_BROODGUARD,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  mob_dragonkin_whelp: {
+    url: `${CREATURES}/dragonkin_baby.glb`,
+    height: 1.05,
+    clips: DRAGONKIN_WHELP,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  // The egg is a clipless two-shell prop mob: alive shows Egg_Closed, death
+  // swaps to Egg_Open (the cracked shell IS the corpse; see corpseMeshSwap).
+  mob_dragon_egg: {
+    url: `${CREATURES}/dragon_egg.glb`,
+    height: 0.95,
+    clips: STATIC_PROP,
+    corpseMeshSwap: { hide: 'Egg_Closed', show: 'Egg_Open' },
+    tint: 'entity',
+    tintStrength: 0.08,
   },
   // Bog Thrall (The Drowned Litany): unused floating ghost rig, a stronger
   // fit for an undead swarm add than the generic skel_minion skeleton
@@ -1627,6 +1728,16 @@ const MOB_KEYS: Record<string, string> = {
   wildheart_hexcaller: 'mob_wildheart_hexcaller',
   wildheart_beastmaster: 'mob_wildheart_beastmaster',
   wildheart_high_priest: 'mob_wildheart_high_priest',
+  // The Drakelands dragonkin brood (v0.35): per-template overrides so the
+  // rework replaces every dragon model IN THE DRAKELANDS (Cindraleth
+  // included, re-tinted gold by her template color) while the dragonkin
+  // family fallback (the floating dragonevolved wyrm) stays for the sanctum,
+  // temple, rift, and Galecrest dragonkin.
+  drakemaw_broodlord: 'mob_dragonkin_broodlord',
+  cindraleth_maw_matriarch: 'mob_dragonkin_broodlord',
+  dragonkin_broodguard: 'mob_dragonkin_broodguard',
+  dragonkin_whelp: 'mob_dragonkin_whelp',
+  dragonkin_egg: 'mob_dragon_egg',
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',

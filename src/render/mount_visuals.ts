@@ -78,6 +78,9 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // Its rigid-body clips animate the suspension and track wheels without a
   // procedural bob, keeping the pilot locked to the saddle.
   terrorspark_groundshaker: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
+  // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
+  // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
+  drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
 };
 
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */
