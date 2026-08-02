@@ -1350,3 +1350,97 @@ describe('guild bank ops: the stale-rank scenario and determinism', () => {
     expect(draws).toBe(0);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Phase 3: the persistence-facing sim helpers the server wires up (the evict,
+// the disband-guard holdings read, and the create-then-charge fee deduction).
+// The SQL side lives in server/db.ts and is pinned in the server suites.
+// ---------------------------------------------------------------------------
+
+describe('evictGuildBank (the sanctioned evict) + guildBankHoldings', () => {
+  it('evict drops the book, releases load-once, and a reload sees fresh data', () => {
+    const sim = makeOfficerSim({ treasury: 7_000 });
+    expect(sim.guildBanks.has(GUILD_ID)).toBe(true);
+    // Load-once: while live, a reload attempt is skipped (unflushed deposits).
+    sim.loadGuildBank(GUILD_ID, { treasury: 1, inventory: [], purchasedSlots: 0 });
+    expect(book(sim).treasury).toBe(7_000);
+    sim.evictGuildBank(GUILD_ID);
+    expect(sim.guildBanks.has(GUILD_ID)).toBe(false);
+    // Evict-then-load is the reload path: the fresh row now seats.
+    sim.loadGuildBank(GUILD_ID, { treasury: 1, inventory: [], purchasedSlots: 0 });
+    expect(book(sim).treasury).toBe(1);
+    // A re-created guild id never inherits a stale book: evicting again leaves
+    // the map empty until the server loads or seeds a new (empty) book.
+    sim.evictGuildBank(GUILD_ID);
+    expect(sim.guildBanks.size).toBe(0);
+    expect(() => sim.evictGuildBank(GUILD_ID)).not.toThrow(); // idempotent
+  });
+
+  it('holdings reports the live copper and item count, and null with no book', () => {
+    const sim = makeOfficerSim({ treasury: 300 });
+    sim.addItem('wolf_fang', 3);
+    const idx = meta(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang');
+    sim.guildBankDepositFor(sim.playerId, idx, 3);
+    expect(sim.guildBankHoldings(GUILD_ID)).toEqual({ copper: 300, items: 1 });
+    // An empty book reports zeros (a disband may proceed)...
+    sim.evictGuildBank(GUILD_ID);
+    sim.loadGuildBank(GUILD_ID, null);
+    expect(sim.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 0 });
+    // ...but NO book is null, which the server treats as fail-closed: an
+    // unloaded book cannot prove the DB row is empty.
+    sim.evictGuildBank(GUILD_ID);
+    expect(sim.guildBankHoldings(GUILD_ID)).toBeNull();
+    expect(sim.guildBankHoldings(999)).toBeNull();
+  });
+
+  it('holdings is a pure read: it never mutates the book or creates one', () => {
+    const sim = makeOfficerSim({ treasury: 55 });
+    const before = fingerprint(sim);
+    sim.guildBankHoldings(GUILD_ID);
+    sim.guildBankHoldings(12345); // absent guild: must not lazily create a book
+    expect(fingerprint(sim)).toBe(before);
+    expect(sim.guildBanks.has(12345)).toBe(false);
+  });
+});
+
+describe('chargeGuildCreationFeeFor (create-then-charge, the sim half)', () => {
+  it('charges exactly the fee once when the purse covers it', () => {
+    const sim = freshSim();
+    meta(sim).copper = 150_000;
+    expect(sim.chargeGuildCreationFeeFor(sim.playerId)).toBe(100_000); // 10g, pinned literal
+    expect(meta(sim).copper).toBe(50_000);
+  });
+
+  it('clamps to the purse when copper was spent mid-flight (never negative)', () => {
+    // The dispatch gate refused poor founders BEFORE the DB create; a shortfall
+    // here means a mid-flight spend, and the guild already exists (create first,
+    // then charge), so the charge takes what is there rather than refusing.
+    const sim = freshSim();
+    meta(sim).copper = 40_000;
+    expect(sim.chargeGuildCreationFeeFor(sim.playerId)).toBe(40_000);
+    expect(meta(sim).copper).toBe(0);
+    // Nothing left charges nothing (and stays at zero, never negative).
+    expect(sim.chargeGuildCreationFeeFor(sim.playerId)).toBe(0);
+    expect(meta(sim).copper).toBe(0);
+  });
+
+  it('an unresolvable pid charges nothing and never throws', () => {
+    const sim = freshSim();
+    expect(sim.chargeGuildCreationFeeFor(999999)).toBe(0);
+    expect(sim.chargeGuildCreationFeeFor(Number.NaN)).toBe(0);
+  });
+
+  it('charging draws no rng and emits no player line (silent by design)', () => {
+    const sim = freshSim();
+    meta(sim).copper = 200_000;
+    sim.drainEvents();
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws++;
+    });
+    sim.chargeGuildCreationFeeFor(sim.playerId);
+    sim.rng.setObserver(null);
+    expect(draws).toBe(0);
+    expect(sim.drainEvents().filter((e) => e.type === 'error' || e.type === 'log')).toEqual([]);
+  });
+});

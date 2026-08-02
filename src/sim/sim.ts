@@ -9449,6 +9449,24 @@ export class Sim {
     return guildBankMod.serializeGuildBank(this.ctx, guildId);
   }
 
+  // The sanctioned evict (disband, or the first half of an evict-then-load
+  // reload). The server's guild_banks row cascades away with the guilds DELETE.
+  evictGuildBank(guildId: number): void {
+    guildBankMod.evictGuildBank(this.ctx, guildId);
+  }
+
+  // The disband guard's read: what the LIVE book holds, or null when no book
+  // is loaded (callers fail closed on null; an unloaded book proves nothing).
+  guildBankHoldings(guildId: number): { copper: number; items: number } | null {
+    return guildBankMod.guildBankHoldings(this.ctx, guildId);
+  }
+
+  // Create-then-charge (state.md): the server calls this only AFTER the guild
+  // row committed. Returns the copper actually charged (clamped to the purse).
+  chargeGuildCreationFeeFor(pid: number): number {
+    return guildBankMod.chargeGuildCreationFee(this.ctx, pid);
+  }
+
   // The five op bodies + the gated info read, as pid-first SERVER entry points
   // (the bankInfoFor pattern). These are deliberately distinct from the IWorld
   // facet members (guildBankDeposit etc. in the social no-op block above): the

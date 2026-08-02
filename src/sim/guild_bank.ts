@@ -181,6 +181,47 @@ export function serializeGuildBank(ctx: SimContext, guildId: number): GuildBankS
   };
 }
 
+/** The SANCTIONED evict: drop a guild's book from the live map. Called by the
+ *  server on a committed disband (the guild_banks row cascades away with the
+ *  guilds DELETE), and as the first half of the evict-then-load reload path
+ *  loadGuildBank documents. Keeps the map bounded on a long-lived realm and
+ *  ensures a re-created guild id can never inherit a stale book. Callers must
+ *  never hold a book reference across an evict. */
+export function evictGuildBank(ctx: SimContext, guildId: number): void {
+  ctx.guildBanks.delete(guildId);
+}
+
+/** What a guild's live book holds, for the server's disband guard (a disband
+ *  must be refused while the bank holds ANY copper or item, or the cascade
+ *  delete would destroy them). Null when the guild has no loaded book: the
+ *  caller must fail CLOSED on null (refuse the disband), because an unloaded
+ *  book cannot prove the DB row is empty. A pure read; never mutates. */
+export function guildBankHoldings(
+  ctx: SimContext,
+  guildId: number,
+): { copper: number; items: number } | null {
+  const book = ctx.guildBanks.get(guildId);
+  if (!book) return null;
+  return { copper: book.treasury, items: book.inventory.length };
+}
+
+/** Deduct the guild creation fee from the acting player's purse, returning the
+ *  copper actually charged. Called by the server AFTER the guild row commits
+ *  (create-then-charge, state.md: a crash between the two yields a free guild,
+ *  never lost gold). The server refuses a poor founder BEFORE any DB work, so
+ *  a shortfall here means copper was spent mid-flight: the charge clamps to
+ *  the purse (never negative) rather than refusing a guild that already
+ *  exists. Deliberately emits NO player line (the "You found the guild" arm
+ *  is the celebration; the purse delta rides the normal self snapshot). */
+export function chargeGuildCreationFee(ctx: SimContext, pid: number): number {
+  const r = resolveActor(ctx, pid);
+  if (!r) return 0;
+  const charged = Math.min(r.meta.copper, GUILD_CREATION_FEE_COPPER);
+  if (charged <= 0) return 0;
+  r.meta.copper -= charged;
+  return charged;
+}
+
 /** The server-callable membership stamp body (Sim.setPlayerGuildMembership is
  *  the thin facade delegate beside setPlayerGuild). Host-trusted but normalized
  *  anyway: a malformed guild id or rank stamps null rather than garbage. The
