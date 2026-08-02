@@ -2151,6 +2151,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': 'Глава гильдии',
   'hud.social.ranks.officer': 'Офицер',
   'hud.social.ranks.member': 'Участник',
+  'hud.social.tenure.veteran': 'Ветеран',
   'hud.social.guildHeadOne': 'вы {rank}, {count} участник',
   'hud.social.guildHeadMany': 'вы {rank}, {count} участников',
   'hud.trade.title': 'Обмен с {name}',

@@ -6733,6 +6733,10 @@ export const vi_VN: EnTranslations = {
         "officer": "Sĩ Quan",
         "member": "Thành Viên"
       },
+      "tenure": {
+        "new": "New",
+        "veteran": "Veteran"
+      },
       "guildHeadOne": "bạn là {rank}, {count} thành viên",
       "guildHeadMany": "bạn là {rank}, {count} thành viên"
     },

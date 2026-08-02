@@ -2112,6 +2112,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': '길드장',
   'hud.social.ranks.officer': '장교',
   'hud.social.ranks.member': '회원',
+  'hud.social.tenure.veteran': '베테랑',
   'hud.social.guildHeadOne': '당신은 {rank}, {count}명 회원',
   'hud.social.guildHeadMany': '당신은 {rank}, {count}명 회원',
   'hud.trade.title': '{name}님과 거래',

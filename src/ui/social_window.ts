@@ -42,6 +42,8 @@ import {
   raidView,
   type SocialTab,
   socialStructSig,
+  type TenureTier,
+  tenureTier,
 } from './social_view';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
@@ -119,6 +121,12 @@ function rankLabel(rank: string): string {
     : rank === 'officer'
       ? t('hud.social.ranks.officer')
       : t('hud.social.ranks.member');
+}
+
+// Tenure badge text for a keyed tier from the pure core (tenureTier); the
+// mapping mirrors rankLabel so the core stays i18n-free.
+function tenureLabel(tier: TenureTier): string {
+  return tier === 'new' ? t('hud.social.tenure.new') : t('hud.social.tenure.veteran');
 }
 
 export class SocialWindow {
@@ -570,7 +578,14 @@ export class SocialWindow {
     // name; the ellipsized .soc-name cell trims the title tail first.
     const memberTitle = m.activeTitle ? deedTitleText(m.activeTitle) : '';
     const memberTitleSpan = memberTitle ? `<span class="soc-title">${esc(memberTitle)}</span>` : '';
-    const nameInner = `${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${memberTitleSpan}`;
+    // Tenure badge (New under 14 days, Veteran at 90+): always-visible chip
+    // text (never hover-only), between the rank chip and the deed title. The
+    // client clock is fine here (ui code, not sim).
+    const tier = tenureTier(m.joinedAt, Date.now());
+    const tenureSpan = tier
+      ? `<span class="rank soc-tenure-${tier}">${esc(tenureLabel(tier))}</span>`
+      : '';
+    const nameInner = `${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${tenureSpan}${memberTitleSpan}`;
     const name =
       m.online && !m.self
         ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`

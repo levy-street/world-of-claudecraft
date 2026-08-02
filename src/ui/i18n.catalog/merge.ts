@@ -644,6 +644,8 @@ const mergeStringsEn = {
       },
       statusWithZone: '{status} - {zone}',
       ranks: { leader: 'Guild Master', officer: 'Officer', member: 'Member' },
+      // Guild-roster tenure badges: joined under 14 days ago / 90 days or more.
+      tenure: { new: 'New', veteran: 'Veteran' },
       guildHeadOne: 'you are {rank}, {count} member',
       guildHeadMany: 'you are {rank}, {count} members',
     },

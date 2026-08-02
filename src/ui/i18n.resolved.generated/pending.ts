@@ -12,6 +12,8 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
@@ -19,6 +21,8 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
@@ -26,6 +30,8 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
@@ -33,6 +39,8 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
@@ -41,6 +49,8 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
@@ -48,40 +58,51 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "zh_CN": [
+    "hud.social.tenure.new",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "zh_TW": [
+    "hud.social.tenure.new",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "ko_KR": [
+    "hud.social.tenure.new",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "ja_JP": [
+    "hud.social.tenure.new",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "pt_BR": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "ru_RU": [
+    "hud.social.tenure.new",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "cs_CZ": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
@@ -89,6 +110,8 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
@@ -96,6 +119,8 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
@@ -103,6 +128,8 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
@@ -110,6 +137,8 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
@@ -117,6 +146,8 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
@@ -124,6 +155,8 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
@@ -131,6 +164,8 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
+    "hud.social.tenure.new",
+    "hud.social.tenure.veteran",
     "hudChrome.social.billboard.loginLine",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"

@@ -6733,6 +6733,10 @@ export const cs_CZ: EnTranslations = {
         "officer": "Důstojník",
         "member": "Člen"
       },
+      "tenure": {
+        "new": "New",
+        "veteran": "Veteran"
+      },
       "guildHeadOne": "jsi {rank}, {count} člen",
       "guildHeadMany": "jsi {rank}, {count} členů"
     },

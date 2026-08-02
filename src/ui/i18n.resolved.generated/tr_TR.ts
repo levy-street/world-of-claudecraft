@@ -6733,6 +6733,10 @@ export const tr_TR: EnTranslations = {
         "officer": "Subay",
         "member": "Üye"
       },
+      "tenure": {
+        "new": "New",
+        "veteran": "Veteran"
+      },
       "guildHeadOne": "{rank} rütbesindesin, {count} üye",
       "guildHeadMany": "{rank} rütbesindesin, {count} üye"
     },

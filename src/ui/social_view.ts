@@ -101,6 +101,10 @@ export interface GuildRow {
    *  The painter formats it (relative/date) and localizes; the core just
    *  passes it through. */
   lastLogin: string | null;
+  /** Epoch-ms timestamp of when the member joined the guild, or null if
+   *  unknown. The painter derives the tenure badge from it (tenureTier);
+   *  the core just passes it through. */
+  joinedAt: number | null;
   /** The selected Book of Deeds title as a DEED ID (null untitled), as on
    *  FriendRow. */
   activeTitle: string | null;
@@ -158,6 +162,7 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
       status: m.status,
       zone: m.zone,
       lastLogin: m.lastLogin ?? null,
+      joinedAt: m.joinedAt ?? null,
       activeTitle: m.activeTitle ?? null,
       rank: m.rank,
       self,
@@ -179,6 +184,28 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
       rows,
     },
   };
+}
+
+/** Membership under 14 days marks a member "new". */
+export const TENURE_NEW_MS = 14 * 24 * 60 * 60 * 1000;
+/** Membership of 90 days or more marks a member "veteran". */
+export const TENURE_VETERAN_MS = 90 * 24 * 60 * 60 * 1000;
+
+export type TenureTier = 'new' | 'veteran';
+
+/**
+ * Guild-roster tenure tier from the member's joinedAt (epoch ms) and the
+ * caller's clock: under 14 days is 'new', 90 days or more is 'veteran', in
+ * between (and unknown joinedAt) is no badge. A joinedAt in the future (clock
+ * skew) lands in the 'new' arm by construction. Returns a keyed tier, never
+ * display text: the painter localizes.
+ */
+export function tenureTier(joinedAt: number | null, now: number): TenureTier | null {
+  if (joinedAt === null) return null;
+  const tenureMs = now - joinedAt;
+  if (tenureMs < TENURE_NEW_MS) return 'new';
+  if (tenureMs >= TENURE_VETERAN_MS) return 'veteran';
+  return null;
 }
 
 export type GuildRosterGroup = 'online' | 'offline';

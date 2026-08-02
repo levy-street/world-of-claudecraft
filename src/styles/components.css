@@ -7477,6 +7477,16 @@
     margin-left: 4px;
     text-decoration: none;
   }
+  /* Guild-roster tenure chip (New under 14 days, Veteran at 90+): shares the
+     .rank chip metrics, tinted by tier so it reads apart from the accent rank
+     chip; sits between the rank chip and the deed title inside the ellipsized
+     .soc-name cell. */
+  .soc-name .soc-tenure-new {
+    color: var(--color-friendly);
+  }
+  .soc-name .soc-tenure-veteran {
+    color: var(--color-primary);
+  }
   .soc-sub {
     color: var(--color-text-muted);
     font-size: 11px;

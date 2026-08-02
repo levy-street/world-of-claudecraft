@@ -11,6 +11,9 @@ import {
   type SocialTab,
   socialDot,
   socialStructSig,
+  TENURE_NEW_MS,
+  TENURE_VETERAN_MS,
+  tenureTier,
 } from '../src/ui/social_view';
 import type {
   FriendInfo,
@@ -232,6 +235,58 @@ describe('per-tab row models', () => {
     expect(rows.find((r) => r.name === 'NeverSeen')?.lastLogin).toBeNull();
   });
 
+  it('maps each member joinedAt into the guild row (null when unknown)', () => {
+    const joined = Date.UTC(2026, 0, 2, 3, 4, 5);
+    const social: SocialInfo = {
+      ...SOCIAL,
+      guild: {
+        ...(SOCIAL.guild as GuildInfo),
+        members: [
+          guildMember({ name: 'Dated', rank: 'member', joinedAt: joined }),
+          guildMember({ name: 'Undated', rank: 'member' }),
+        ],
+      },
+    };
+    const rows = guildView(social, 'Me').guild!.rows;
+    expect(rows.find((r) => r.name === 'Dated')?.joinedAt).toBe(joined);
+    expect(rows.find((r) => r.name === 'Undated')?.joinedAt).toBeNull();
+  });
+});
+
+describe('tenureTier', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const NOW = Date.UTC(2026, 7, 1); // any fixed clock; the helper is pure
+
+  it('pins the locked thresholds: 14 days new, 90 days veteran', () => {
+    expect(TENURE_NEW_MS).toBe(14 * DAY);
+    expect(TENURE_VETERAN_MS).toBe(90 * DAY);
+  });
+
+  it('marks a member new strictly under 14 days (13d23h boundary)', () => {
+    expect(tenureTier(NOW - (13 * DAY + 23 * 60 * 60 * 1000), NOW)).toBe('new');
+  });
+
+  it('drops the new badge at exactly 14 days', () => {
+    expect(tenureTier(NOW - 14 * DAY, NOW)).toBeNull();
+  });
+
+  it('shows no badge through 89 days', () => {
+    expect(tenureTier(NOW - 89 * DAY, NOW)).toBeNull();
+  });
+
+  it('marks a member veteran at exactly 90 days and beyond', () => {
+    expect(tenureTier(NOW - 90 * DAY, NOW)).toBe('veteran');
+    expect(tenureTier(NOW - 400 * DAY, NOW)).toBe('veteran');
+  });
+
+  it('treats a just-joined and a future (clock-skewed) joinedAt as new', () => {
+    expect(tenureTier(NOW, NOW)).toBe('new');
+    expect(tenureTier(NOW + DAY, NOW)).toBe('new');
+  });
+
+  it('shows no badge when joinedAt is unknown', () => {
+    expect(tenureTier(null, NOW)).toBeNull();
+  });
 });
 
 describe('guildRosterItems (online-first grouping + hide-offline filter)', () => {

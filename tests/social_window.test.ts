@@ -190,11 +190,37 @@ describe('social_window: Book of Deeds title spans (both roster surfaces)', () =
       "const memberTitle = m.activeTitle ? deedTitleText(m.activeTitle) : '';",
     );
     expect(painter).toContain('<span class="soc-title">${esc(memberTitle)}</span>');
-    // name, then rank chip, then title: a long title trims off the tail and
-    // can never push the chip out of the ellipsized cell.
+    // name, then rank chip, then tenure chip, then title: a long title trims
+    // off the tail and can never push either chip out of the ellipsized cell.
     expect(painter).toContain(
-      '${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${memberTitleSpan}',
+      '${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${tenureSpan}${memberTitleSpan}',
     );
+  });
+});
+
+describe('social_window: guild tenure badges', () => {
+  // The tier decision (14/90-day thresholds) is pure and unit-tested in
+  // social_view.test.ts; these pins hold the RENDER arm: the tier comes from
+  // the pure core (never a local date computation), the chip is always-visible
+  // text (never hover-only title=), and both labels are t() keys.
+  it('derives the tier from the pure core with the client clock', () => {
+    expect(painter).toContain('const tier = tenureTier(m.joinedAt, Date.now());');
+  });
+
+  it('renders the badge as an always-visible chip, tinted by tier', () => {
+    expect(painter).toContain(
+      '`<span class="rank soc-tenure-${tier}">${esc(tenureLabel(tier))}</span>`',
+    );
+  });
+
+  it('localizes both badge labels through t() keys', () => {
+    expect(painter).toContain("t('hud.social.tenure.new')");
+    expect(painter).toContain("t('hud.social.tenure.veteran')");
+  });
+
+  it('styles both tier chips with tokens inside the name cell', () => {
+    expect(componentsCss).toContain('.soc-name .soc-tenure-new');
+    expect(componentsCss).toContain('.soc-name .soc-tenure-veteran');
   });
 });
 

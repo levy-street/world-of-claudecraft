@@ -6733,6 +6733,10 @@ export const en_XA: EnTranslations = {
         "officer": "[Óƒƒíçéŕ]",
         "member": "[Ɱéɱƀéŕ]"
       },
+      "tenure": {
+        "new": "[Ñéŵ]",
+        "veteran": "[Ʋéţéŕáñ]"
+      },
       "guildHeadOne": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕ]",
       "guildHeadMany": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]"
     },

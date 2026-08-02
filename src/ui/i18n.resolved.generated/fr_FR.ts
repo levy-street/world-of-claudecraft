@@ -6733,6 +6733,10 @@ export const fr_FR: EnTranslations = {
         "officer": "Officier",
         "member": "Membre"
       },
+      "tenure": {
+        "new": "New",
+        "veteran": "Veteran"
+      },
       "guildHeadOne": "vous êtes {rank}, {count} membre",
       "guildHeadMany": "vous êtes {rank}, {count} membres"
     },

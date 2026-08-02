@@ -6733,6 +6733,10 @@ export const id_ID: EnTranslations = {
         "officer": "Perwira",
         "member": "Anggota"
       },
+      "tenure": {
+        "new": "New",
+        "veteran": "Veteran"
+      },
       "guildHeadOne": "Anda adalah {rank}, {count} anggota",
       "guildHeadMany": "Anda adalah {rank}, {count} anggota"
     },
