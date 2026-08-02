@@ -25,6 +25,11 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/activity', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/perf/summary', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/perf/raw', permission: 'analytics.read' },
+  // World Market tracker analytics (sale history + listing snapshots).
+  { method: 'GET', pattern: '/admin/api/market/overview', permission: 'analytics.read' },
+  { method: 'GET', pattern: '/admin/api/market/item', permission: 'analytics.read' },
+  { method: 'GET', pattern: '/admin/api/market/flips', permission: 'analytics.read' },
+  { method: 'GET', pattern: '/admin/api/market/movers', permission: 'analytics.read' },
   // Server tick-loop profiling capture: ops-sensitive, admin/superadmin only.
   { method: 'GET', pattern: '/admin/api/perf/tick', permission: 'ops.perf' },
   { method: 'POST', pattern: '/admin/api/perf/tick/capture', permission: 'ops.perf' },

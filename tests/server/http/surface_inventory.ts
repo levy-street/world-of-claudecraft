@@ -1779,6 +1779,49 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // World Market tracker analytics: registry-only RouteDefs born AFTER the
+  // migration, per the new-route rule (server/http/CLAUDE.md): no legacy
+  // ladder arm, and the legacy rollback answers 404 for them by design.
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/market/overview',
+    handler: 'server/admin.ts marketOverviewHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/market/item',
+    handler: 'server/admin.ts marketItemHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/market/flips',
+    handler: 'server/admin.ts marketFlipsHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/market/movers',
+    handler: 'server/admin.ts marketMoversHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // v0.22.0 release merge: staff identity + fine-grained role management
   // (accounts.admin_roles; the central ADMIN_ROUTE_PERMISSIONS gate authorizes
   // every authed admin route, so authScope stays the shared admin gate).

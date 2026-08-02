@@ -252,3 +252,228 @@ export async function anonymizeMarketSalesForCharacter(
     [characterId],
   );
 }
+
+// ---------------------------------------------------------------------------
+// Analytics reads for the admin market tracker endpoints (server/admin.ts).
+// All realm-scoped; every read rides market_sales_realm_sold_at,
+// market_sales_item, or market_listing_snapshots_item. House rows are
+// EXCLUDED from every price statistic: the Merchant's standing stock sells at
+// fixed build constants, so folding it in would drag every median toward
+// vendor pricing. Unit prices are derived (total / quantity) at read time so
+// the stored integers stay exact; percentile_cont needs float math anyway.
+// Buyer/seller ids are deliberately absent from every row shape here: these
+// feeds are designed to be exposable to players later, and the internal id
+// columns must never ride along.
+
+// The per-item aggregate over a sliding window, the input to the overview,
+// flip finder, and movers. offsetHours shifts the window back in time
+// (offsetHours=24, windowHours=24 reads "the 24h before the last 24h"), which
+// is how the movers compare two adjacent windows with one query shape.
+export interface MarketSaleStatsRow {
+  itemId: string;
+  sales: number;
+  quantity: number;
+  medianUnitPriceCopper: number;
+  avgUnitPriceCopper: number;
+  minUnitPriceCopper: number;
+  maxUnitPriceCopper: number;
+}
+
+export async function marketSaleStatsByItem(
+  pool: Pool,
+  realm: string,
+  windowHours: number,
+  offsetHours = 0,
+): Promise<MarketSaleStatsRow[]> {
+  const window = Math.max(1, Math.floor(windowHours));
+  const offset = Math.max(0, Math.floor(offsetHours));
+  const res = await pool.query(
+    `SELECT item_id,
+            count(*)::int AS sales,
+            sum(quantity)::bigint AS quantity,
+            percentile_cont(0.5) WITHIN GROUP (ORDER BY total_price_copper::float8 / quantity)
+              AS median_unit,
+            avg(total_price_copper::float8 / quantity) AS avg_unit,
+            min(total_price_copper::float8 / quantity) AS min_unit,
+            max(total_price_copper::float8 / quantity) AS max_unit
+       FROM market_sales
+      WHERE realm = $1 AND house = FALSE
+        AND sold_at > now() - (($2::int + $3::int) * INTERVAL '1 hour')
+        AND sold_at <= now() - ($3::int * INTERVAL '1 hour')
+      GROUP BY item_id`,
+    [realm, window, offset],
+  );
+  return res.rows.map((row) => ({
+    itemId: row.item_id,
+    sales: Number(row.sales),
+    quantity: Number(row.quantity),
+    medianUnitPriceCopper: Number(row.median_unit),
+    avgUnitPriceCopper: Number(row.avg_unit),
+    minUnitPriceCopper: Number(row.min_unit),
+    maxUnitPriceCopper: Number(row.max_unit),
+  }));
+}
+
+// One item's sale price time series, bucketed server-side so the wire carries
+// chart points, never raw rows. The bucket is validated against this
+// whitelist and passed to date_trunc as a bind parameter, so no caller string
+// ever reaches the SQL text.
+export const MARKET_HISTORY_BUCKETS = ['hour', 'day', 'week'] as const;
+export type MarketHistoryBucket = (typeof MARKET_HISTORY_BUCKETS)[number];
+
+export interface MarketPriceHistoryRow {
+  bucketStart: Date;
+  sales: number;
+  quantity: number;
+  medianUnitPriceCopper: number;
+  avgUnitPriceCopper: number;
+  minUnitPriceCopper: number;
+  maxUnitPriceCopper: number;
+}
+
+export async function marketItemPriceHistory(
+  pool: Pool,
+  realm: string,
+  itemId: string,
+  bucket: MarketHistoryBucket,
+  sinceDays: number,
+): Promise<MarketPriceHistoryRow[]> {
+  if (!MARKET_HISTORY_BUCKETS.includes(bucket)) throw new Error(`bad bucket: ${bucket}`);
+  const days = Math.max(1, Math.floor(sinceDays));
+  const res = await pool.query(
+    `SELECT date_trunc($4, sold_at) AS bucket_start,
+            count(*)::int AS sales,
+            sum(quantity)::bigint AS quantity,
+            percentile_cont(0.5) WITHIN GROUP (ORDER BY total_price_copper::float8 / quantity)
+              AS median_unit,
+            avg(total_price_copper::float8 / quantity) AS avg_unit,
+            min(total_price_copper::float8 / quantity) AS min_unit,
+            max(total_price_copper::float8 / quantity) AS max_unit
+       FROM market_sales
+      WHERE realm = $1 AND item_id = $2 AND house = FALSE
+        AND sold_at > now() - ($3::int * INTERVAL '1 day')
+      GROUP BY bucket_start
+      ORDER BY bucket_start`,
+    [realm, itemId, days, bucket],
+  );
+  return res.rows.map((row) => ({
+    bucketStart: row.bucket_start,
+    sales: Number(row.sales),
+    quantity: Number(row.quantity),
+    medianUnitPriceCopper: Number(row.median_unit),
+    avgUnitPriceCopper: Number(row.avg_unit),
+    minUnitPriceCopper: Number(row.min_unit),
+    maxUnitPriceCopper: Number(row.max_unit),
+  }));
+}
+
+// One item's lowest-ask time series from the listing snapshots, bucketed the
+// same way (min of the derived unit ask per bucket).
+export interface MarketAskHistoryRow {
+  bucketStart: Date;
+  lowestAskUnitCopper: number;
+  avgListingCount: number;
+  avgTotalQuantity: number;
+}
+
+export async function marketItemAskHistory(
+  pool: Pool,
+  realm: string,
+  itemId: string,
+  bucket: MarketHistoryBucket,
+  sinceDays: number,
+): Promise<MarketAskHistoryRow[]> {
+  if (!MARKET_HISTORY_BUCKETS.includes(bucket)) throw new Error(`bad bucket: ${bucket}`);
+  const days = Math.max(1, Math.floor(sinceDays));
+  const res = await pool.query(
+    `SELECT date_trunc($4, captured_at) AS bucket_start,
+            min(lowest_ask_total_copper::float8 / lowest_ask_quantity) AS lowest_unit,
+            avg(listing_count)::float8 AS avg_listings,
+            avg(total_quantity)::float8 AS avg_quantity
+       FROM market_listing_snapshots
+      WHERE realm = $1 AND item_id = $2
+        AND captured_at > now() - ($3::int * INTERVAL '1 day')
+      GROUP BY bucket_start
+      ORDER BY bucket_start`,
+    [realm, itemId, days, bucket],
+  );
+  return res.rows.map((row) => ({
+    bucketStart: row.bucket_start,
+    lowestAskUnitCopper: Number(row.lowest_unit),
+    avgListingCount: Number(row.avg_listings),
+    avgTotalQuantity: Number(row.avg_quantity),
+  }));
+}
+
+// The current book: every item's row from the most recent capture. All rows
+// of one capture share one captured_at (insertMarketListingSnapshotRows), so
+// the latest capture is exactly the rows at max(captured_at). An item absent
+// here has no player listings right now.
+export interface MarketLatestSnapshotRow {
+  itemId: string;
+  capturedAt: Date;
+  listingCount: number;
+  totalQuantity: number;
+  lowestAskTotalCopper: number;
+  lowestAskQuantity: number;
+}
+
+export async function marketLatestSnapshots(
+  pool: Pool,
+  realm: string,
+): Promise<MarketLatestSnapshotRow[]> {
+  const res = await pool.query(
+    `SELECT item_id, captured_at, listing_count, total_quantity,
+            lowest_ask_total_copper, lowest_ask_quantity
+       FROM market_listing_snapshots
+      WHERE realm = $1
+        AND captured_at = (
+          SELECT max(captured_at) FROM market_listing_snapshots WHERE realm = $1)`,
+    [realm],
+  );
+  return res.rows.map((row) => ({
+    itemId: row.item_id,
+    capturedAt: row.captured_at,
+    listingCount: Number(row.listing_count),
+    totalQuantity: Number(row.total_quantity),
+    lowestAskTotalCopper: Number(row.lowest_ask_total_copper),
+    lowestAskQuantity: Number(row.lowest_ask_quantity),
+  }));
+}
+
+// One item's most recent individual sales for the detail page ticker. House
+// rows are included here (flagged): "someone bought 5 from the Merchant at
+// 140c" is real demand signal even though it never moves the player median.
+export interface MarketRecentSaleRow {
+  soldAt: Date;
+  quantity: number;
+  totalPriceCopper: number;
+  house: boolean;
+  instanced: boolean;
+  craftedRecipeId: string | null;
+}
+
+export async function marketRecentSales(
+  pool: Pool,
+  realm: string,
+  itemId: string,
+  limit: number,
+): Promise<MarketRecentSaleRow[]> {
+  const capped = Math.min(100, Math.max(1, Math.floor(limit)));
+  const res = await pool.query(
+    `SELECT sold_at, quantity, total_price_copper, house, instanced, crafted_recipe_id
+       FROM market_sales
+      WHERE realm = $1 AND item_id = $2
+      ORDER BY sold_at DESC
+      LIMIT $3`,
+    [realm, itemId, capped],
+  );
+  return res.rows.map((row) => ({
+    soldAt: row.sold_at,
+    quantity: Number(row.quantity),
+    totalPriceCopper: Number(row.total_price_copper),
+    house: row.house,
+    instanced: row.instanced,
+    craftedRecipeId: row.crafted_recipe_id,
+  }));
+}
