@@ -244,7 +244,7 @@ describe('character visual effects', () => {
     // and unread. The overlay's own coverage lives in the cases above.
     expect(renderer).not.toContain('hasSanguineAura');
     expect(renderer).toContain(
-      'v.visual.setWeaponAura(weaponAura ? weaponAura.color : null, weaponAura?.tip ?? false);',
+      'v.visual.setWeaponAura(\n        hasWeaponAura ? this.weaponAuraScratch.color : null,',
     );
     expect(renderer).toContain('active.setSoulRend(hasSoulRend);');
     expect(renderer).toContain("if (hasSoulRend) {\n        this.vfx.castSparkle(e.id, 'shadow'");

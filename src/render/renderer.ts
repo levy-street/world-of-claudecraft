@@ -70,7 +70,7 @@ import {
 } from './camera_feel_core';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
-import { type CharacterWeaponAura, characterWeaponAuraInto } from './character_effects';
+import { type CharacterWeaponAura, characterWeaponAuraFromAura } from './character_effects';
 import {
   addCharacterEffectAura,
   CHARACTER_EFFECT_RECKLESSNESS,
@@ -8042,8 +8042,10 @@ export class Renderer {
       let hasFrostNovaRoot = false;
       let mageBarrierState: MageBarrierState | null = null;
       let characterEffects = 0;
+      let hasWeaponAura = false;
       for (const a of e.auras) {
         characterEffects = addCharacterEffectAura(characterEffects, a);
+        if (!hasWeaponAura) hasWeaponAura = characterWeaponAuraFromAura(a, this.weaponAuraScratch);
         if (a.kind === 'polymorph') hasPoly = true;
         if (a.kind === 'form_bear') hasBear = true;
         if (a.id === 'ghost_wolf') hasGhostWolf = true;
@@ -8386,8 +8388,10 @@ export class Renderer {
         if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
       }
-      const weaponAura = characterWeaponAuraInto(e, this.weaponAuraScratch);
-      v.visual.setWeaponAura(weaponAura ? weaponAura.color : null, weaponAura?.tip ?? false);
+      v.visual.setWeaponAura(
+        hasWeaponAura ? this.weaponAuraScratch.color : null,
+        hasWeaponAura && this.weaponAuraScratch.tip,
+      );
 
       // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
       // props between the hands and the on-back pose (self or a peer)
