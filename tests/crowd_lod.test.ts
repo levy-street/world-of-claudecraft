@@ -11,6 +11,7 @@ import {
   farAnimCadence,
   farAnimRangeScale,
   midAnimCadence,
+  shouldRunCharacterVisualWork,
   showsStaticFarMesh,
 } from '../src/render/crowd_lod';
 import { assertAllocationStable } from './util/alloc_probe';
@@ -133,6 +134,20 @@ describe('animatesEveryFrame', () => {
 
   it('does not exempt a stranger just because the player has no target', () => {
     expect(animatesEveryFrame(STRANGER, SELF, null, null)).toBe(false);
+  });
+});
+
+describe('shouldRunCharacterVisualWork', () => {
+  it('sleeps cosmetic rigs outside the frustum', () => {
+    expect(shouldRunCharacterVisualWork(false, false)).toBe(false);
+  });
+
+  it('keeps visible rigs on the full presentation path', () => {
+    expect(shouldRunCharacterVisualWork(true, false)).toBe(true);
+  });
+
+  it('keeps actionable off-screen rigs live', () => {
+    expect(shouldRunCharacterVisualWork(false, true)).toBe(true);
   });
 });
 

@@ -104,6 +104,15 @@ export function animatesEveryFrame(
 }
 
 /**
+ * Whether the character presentation needs its full per-frame visual work.
+ * Off-screen cosmetic rigs may accumulate mixer time without rebuilding their
+ * pose, but anything the player can act on stays live even when frustum-culled.
+ */
+export function shouldRunCharacterVisualWork(onScreen: boolean, actionable: boolean): boolean {
+  return onScreen || actionable;
+}
+
+/**
  * How often a rig in the animated far band advances its mixer, in frames: every
  * 4th in a calm scene, stretching to every 6th once the crowd is dense. Slower
  * than the mid band on purpose (a pose that small is read as motion, not as
