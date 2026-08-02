@@ -484,15 +484,23 @@ export class PerfMonitor {
     // four mainMs buckets ride in every fleet report, overlay on or off. The
     // overlay mount, the markInput* chain, and the dev-trace spans (gated
     // inside recordDevTraceSpan) stay behind their flags.
-    const start = performance.now();
+    const start = this.startTime();
     try {
       return fn();
     } finally {
-      const ms = performance.now() - start;
-      this.lastBucketMs[bucket] = round(ms);
-      this.buckets[bucket].push(ms);
-      this.recordDevTraceSpan(bucket, start, ms, 'bucket');
+      this.finishTime(bucket, start);
     }
+  }
+
+  startTime(): number {
+    return performance.now();
+  }
+
+  finishTime(bucket: TimedBucket, start: number): void {
+    const ms = performance.now() - start;
+    this.lastBucketMs[bucket] = round(ms);
+    this.buckets[bucket].push(ms);
+    this.recordDevTraceSpan(bucket, start, ms, 'bucket');
   }
 
   trace<T>(name: string, fn: () => T, detail?: Record<string, unknown>): T {
@@ -503,6 +511,35 @@ export class PerfMonitor {
     } finally {
       this.recordDevTraceSpan(name, start, performance.now() - start, 'scope', detail);
     }
+  }
+
+  startTrace(): number {
+    return this.traceEnabled ? performance.now() : 0;
+  }
+
+  finishTrace(
+    name: string,
+    start: number,
+    detailKey1?: string,
+    detailValue1?: unknown,
+    detailKey2?: string,
+    detailValue2?: unknown,
+    detailKey3?: string,
+    detailValue3?: unknown,
+    detailKey4?: string,
+    detailValue4?: unknown,
+  ): void {
+    // Callers pass interned keys and primitive values, so the default disabled
+    // path reaches this return without allocating a detail object or callback.
+    if (!this.traceEnabled) return;
+    let detail: Record<string, unknown> | undefined;
+    if (detailKey1 !== undefined) {
+      detail = { [detailKey1]: detailValue1 };
+      if (detailKey2 !== undefined) detail[detailKey2] = detailValue2;
+      if (detailKey3 !== undefined) detail[detailKey3] = detailValue3;
+      if (detailKey4 !== undefined) detail[detailKey4] = detailValue4;
+    }
+    this.recordDevTraceSpan(name, start, performance.now() - start, 'scope', detail);
   }
 
   setNetwork(stats: PerfSnapshot['network']): void {

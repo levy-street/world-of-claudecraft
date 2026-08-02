@@ -29,7 +29,7 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
-import { lockNormalDungeonResetOnBossKill } from '../instances/dungeons';
+import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -133,7 +133,29 @@ export function dealDamage(
     !canDetectStealthedTarget(source, target, PET_STEALTH_DETECTION_RADIUS)
   )
     return 0;
-  if (target.gm || target.devGod) return 0; // GMs and /dev god are invulnerable (every damage path funnels here)
+  if (target.gm || target.devGod) {
+    // GMs and /dev god are invulnerable (every damage path funnels here). For
+    // /dev god under ALLOW_DEV_COMMANDS the hit still EMITS as a zero-damage
+    // event: the renderer keys attacker swing animations and FCT off damage
+    // events, so a silent return made every melee mob look like it "follows
+    // but never attacks" during god-mode playtests (the live-test report).
+    // Presentation only, no threat, procs, deed counters, or rng. Real GMs
+    // (production, no devCommands) stay fully silent as before.
+    if (target.devGod && ctx.devCommands && source) {
+      ctx.emit({
+        type: 'damage',
+        sourceId: source.id,
+        targetId: target.id,
+        amount: 0,
+        crit: false,
+        school,
+        ability,
+        kind,
+        ...(attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
+      });
+    }
+    return 0;
+  }
   // Ice Block (Cold Coffin): while encased in stasis the mage is FULLY immune to
   // damage (owner 2026-07-13), so nothing gets through until it is cancelled or
   // expires. Every damage path funnels here, so this covers melee, spells, and DoTs.
@@ -143,7 +165,25 @@ export function dealDamage(
   // Classic mechanics make it immune while it retreats, so it can't be chipped
   // down or killed outright for a risk-free kill. Owned pets use pet AI, not
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
-  if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return 0;
+  // Direct attacks report an Evade result (FCT word + combat log line); DoT and
+  // reflect ticks stay silent so a dotted evader does not spam a word per tick.
+  // The early return keeps every downstream effect off: no threat, no combat
+  // entry, no stealth break, no tap.
+  if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) {
+    if (direct && source) {
+      ctx.emit({
+        type: 'damage',
+        sourceId: source.id,
+        targetId: target.id,
+        amount: 0,
+        crit: false,
+        school,
+        ability,
+        kind: 'evade',
+      });
+    }
+    return 0;
+  }
   amount = Math.max(0, amount);
   const attackAnimation = attackAnimationStarted ? { attackAnimationStarted: true as const } : {};
 
@@ -1362,6 +1402,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
     ctx.awardHeroicMarks(e, heroicRewardRecipients);
+    // A bossExitPortal dungeon opens its far-end exit the moment the final
+    // boss falls (both difficulties; no-op everywhere else).
+    spawnBossExitPortal(ctx, e);
     // Nythraxis normal and heroic raid lockouts use a wider room sweep than
     // generic dungeon claims. Run it after heroic settlement so its lock stamp
     // cannot make first-clear participants look previously rewarded.

@@ -29,7 +29,12 @@ export interface IWorldInventory {
   unequipBag(socket: number): void;
   useItem(itemId: string): void;
   discardItem(itemId: string, count?: number): void;
-  buyItem(npcId: number, itemId: string): void;
+  // `bulk` requests as many units as the buyer can currently afford in one
+  // purchase, capped at the item's bag stack size (VendorGoodsRow.bulkQuantity
+  // previews the count); the server re-derives and validates the final quantity
+  // (bulkBuyQuantity), never trusting the client's math. Omitted/false buys the
+  // ordinary single unit (or the food/drink staple stack), byte-identical to today.
+  buyItem(npcId: number, itemId: string, bulk?: boolean): void;
   sellItem(itemId: string, count?: number): void;
   // Sell every gray (poor-quality) item in the bags at once while a vendor is open.
   // Quest items and anything flagged noVendorSell are left untouched.

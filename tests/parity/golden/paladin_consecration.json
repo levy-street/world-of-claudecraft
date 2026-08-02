@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 821,
-      "state": "833e1781",
+      "nextId": 832,
+      "state": "2d66b505",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,7 +54,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 816,
+          "entityId": 827,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
@@ -93,7 +93,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 95,
-          "id": 816,
+          "id": 827,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -137,9 +137,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 822,
-      "state": "01edcb65",
-      "events": "20200a44",
+      "nextId": 833,
+      "state": "db8b14d5",
+      "events": "8a1576f8",
       "rng": {
         "draws": 6,
         "digest": "c04e063a"
@@ -148,8 +148,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 822,
-      "state": "a6c2645e",
+      "nextId": 833,
+      "state": "e048ed22",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -159,9 +159,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 822,
-      "state": "e9a12824",
-      "events": "fb77d930",
+      "nextId": 833,
+      "state": "bd6737dd",
+      "events": "6c86e51a",
       "rng": {
         "draws": 181,
         "digest": "dd944acc"
@@ -170,8 +170,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 822,
-      "state": "0bc3a52b",
+      "nextId": 833,
+      "state": "e52a8d92",
       "events": "741638a5",
       "rng": {
         "draws": 343,
@@ -181,9 +181,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 822,
-      "state": "0d552f95",
-      "events": "fb9615a1",
+      "nextId": 833,
+      "state": "d270d2e3",
+      "events": "1bf67ee6",
       "rng": {
         "draws": 538,
         "digest": "caea2b22"
@@ -192,8 +192,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 822,
-      "state": "52c91584",
+      "nextId": 833,
+      "state": "0eca5eea",
       "events": "741638a5",
       "rng": {
         "draws": 741,
@@ -203,9 +203,9 @@
     {
       "tick": 140,
       "time": 7,
-      "nextId": 822,
-      "state": "fa768f5e",
-      "events": "d462bd77",
+      "nextId": 833,
+      "state": "d0cc4ae0",
+      "events": "b2448c1c",
       "rng": {
         "draws": 955,
         "digest": "51c79c00"
@@ -214,8 +214,8 @@
     {
       "tick": 160,
       "time": 8,
-      "nextId": 822,
-      "state": "7e0a6118",
+      "nextId": 833,
+      "state": "0b109b92",
       "events": "741638a5",
       "rng": {
         "draws": 1187,
@@ -225,9 +225,9 @@
     {
       "tick": 180,
       "time": 9,
-      "nextId": 822,
-      "state": "e5728a4d",
-      "events": "c02ec87a",
+      "nextId": 833,
+      "state": "ecf7c6d6",
+      "events": "ffda31d6",
       "rng": {
         "draws": 1431,
         "digest": "1765274f"
@@ -236,8 +236,8 @@
     {
       "tick": 200,
       "time": 10,
-      "nextId": 822,
-      "state": "24e5c404",
+      "nextId": 833,
+      "state": "7865b793",
       "events": "741638a5",
       "rng": {
         "draws": 1691,
@@ -247,8 +247,8 @@
     {
       "tick": 201,
       "time": 10.05,
-      "nextId": 822,
-      "state": "0db56f48",
+      "nextId": 833,
+      "state": "c32460cf",
       "events": "741638a5",
       "rng": {
         "draws": 1702,
@@ -274,7 +274,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 163,
-            "damageTaken": 50
+            "damageTaken": 57
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -321,7 +321,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 816,
+          "entityId": 827,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
@@ -361,8 +361,8 @@
           "dodgeChance": 0.068,
           "fallStartY": 1.5,
           "fiveSecondRule": 10,
-          "hp": 49950,
-          "id": 816,
+          "hp": 49943,
+          "id": 827,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -395,7 +395,7 @@
             "sta": 60,
             "str": 60
           },
-          "targetId": 821,
+          "targetId": 832,
           "templateId": "paladin",
           "weapon": {
             "max": 5,
@@ -404,7 +404,7 @@
           }
         },
         {
-          "aggroTargetId": 816,
+          "aggroTargetId": 827,
           "aiState": "attack",
           "combatTimer": 1.95,
           "comboUntil": -1,
@@ -416,7 +416,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 39837,
-          "id": 821,
+          "id": 832,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -446,11 +446,11 @@
             "armor": 40
           },
           "swingTimer": 0.05,
-          "tappedById": 816,
+          "tappedById": 827,
           "templateId": "forest_wolf",
           "threat": [
             [
-              816,
+              827,
               164
             ]
           ],

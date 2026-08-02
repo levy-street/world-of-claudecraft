@@ -162,20 +162,11 @@ if (speedRunes.length === 0 || powerRunes.length === 0) throw new Error('missing
 // Colliders
 // ---------------------------------------------------------------------------
 
-// Structural asset families are the CANDIDATES for real camera occlusion (the
-// chase cam pulls in rather than clipping through a castle wall); organic
-// clutter is camGhost like every open-world placement, so the cam glides
-// through a tree line.
-const STRUCTURAL =
-  /^(dungeon\/(wall|barrier|pillar|arch)|city\/|medieval_village_v2\/|biome\/dungeon_arch_stone|props\/timber_pillar|props\/column_broken)/;
-// ...but only when the piece is actually tall enough to be a wall. A structural
-// family also supplies plinths, floor slabs and stair bases, and a body standing
-// beside a knee-high stone can see straight over it, so the camera must too:
-// anything shorter than this rides camGhost and the boom glides across it. Set
-// above the flag podium (2.5yd) and below the shortest curtain run (5.7yd);
-// without it the chase camera collapses to first person in the flag court, which
-// is where the mode's most contested fight happens.
-const CAMERA_SOLID_MIN_HEIGHT = 3.5;
+// The chase camera no longer reads collider metadata at all: the release
+// removed geometry-driven camera zoom in favour of fading occluders, and the
+// `camGhost` flag plus the structural/height classification that fed it went
+// with it. `cameraTopY` stays, because SIGHT still reads it (a castle wall
+// blocks a cast; a crate you can see over does not).
 
 const colliders = [];
 
@@ -245,7 +236,6 @@ for (const p of placements) {
         cameraTopY: round(walkY),
         moveTopY: round(walkY),
         standable: true,
-        camGhost: true,
       });
       deckSurfaces.push({ x: p.x, z: p.z, hw: sx / 2, hd: sz / 2, rot: p.rotY ?? 0, topY: walkY });
     } else {
@@ -271,7 +261,6 @@ for (const p of placements) {
         cameraTopY: round(topY),
         moveTopY: round(topY),
         standable: true,
-        camGhost: true,
         topSlope: { kind: 'ridge', axis: 'z', pitch: round(rise / run, 5), eaveY: round(eaveY) },
       });
       deckSurfaces.push({
@@ -298,12 +287,10 @@ for (const p of placements) {
       z: round(p.z),
       r: round(sx / 2),
       cameraTopY: round(base + sx),
-      camGhost: true,
     });
   } else {
     pushObb(p.x, p.z, sx / 2, sz / 2, p.rotY ?? 0, {
       cameraTopY: round(base + sy),
-      camGhost: true,
     });
   }
 }
@@ -398,7 +385,6 @@ for (const p of placements) {
         cameraTopY: round(yHi),
         moveTopY: round(yHi),
         standable: true,
-        camGhost: true,
       });
       deckSurfaces.push({
         x: p.x + center.x,
@@ -413,7 +399,6 @@ for (const p of placements) {
         cameraTopY: round(yHi),
         moveTopY: round(yHi),
         standable: true,
-        camGhost: true,
         topSlope: {
           kind: 'ridge',
           axis: 'z',
@@ -443,7 +428,6 @@ for (const p of placements) {
   const data = assetData[p.assetId];
   const { s, sx, sy, sz, seat, ry } = placementFrame(p);
   const tilted = Boolean(p.rotX || p.rotZ);
-  const structural = STRUCTURAL.test(p.assetId);
   if (mode === 'basic') {
     const r = Math.max(0.1, Math.min(30, p.collideRadius ?? collideRadiusFor(s, p.assetId)));
     colliders.push({
@@ -452,7 +436,6 @@ for (const p of placements) {
       z: round(p.z),
       r: round(r),
       cameraTopY: round(seat + 2.2 * sy),
-      camGhost: true,
     });
     circleFallbackCount++;
     continue;
@@ -549,11 +532,8 @@ for (const p of placements) {
       // Clutter whose top a body can hop over keeps the parkour contract the
       // open world has: low tops are passable and standable.
       const lowTop = top - surface <= 1.6;
-      // Only a piece tall enough to actually block the view occludes the camera.
-      const camSolid = structural && top - surface >= CAMERA_SOLID_MIN_HEIGHT;
       pushObb(cx, cz, hw, hd, rot, {
         cameraTopY: round(top),
-        ...(camSolid ? {} : { camGhost: true }),
         ...(lowTop ? { moveTopY: round(top), standable: true } : {}),
       });
       bakedBoxCount++;
@@ -568,7 +548,6 @@ for (const p of placements) {
       z: round(p.z),
       r: round(r),
       cameraTopY: round(seat + 2.2 * sy),
-      camGhost: true,
     });
     circleFallbackCount++;
   }
@@ -584,7 +563,7 @@ for (const b of map.blockers ?? []) {
   const cz = (b.z1 + b.z2) / 2;
   const rot = Math.atan2(-dz, dx);
   const topY = Math.max(heightAt(b.x1, b.z1), heightAt(b.x2, b.z2), heightAt(cx, cz)) + 12;
-  pushObb(cx, cz, len / 2 + 0.35, 0.6, rot, { cameraTopY: round(topY), camGhost: true });
+  pushObb(cx, cz, len / 2 + 0.35, 0.6, rot, { cameraTopY: round(topY) });
 }
 
 // ---------------------------------------------------------------------------

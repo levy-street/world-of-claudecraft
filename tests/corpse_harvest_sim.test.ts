@@ -63,6 +63,12 @@ type SimInternals = {
   players: Map<number, PlayerMeta>;
 };
 
+function mustPlayer(internals: SimInternals, pid: number): PlayerMeta {
+  const meta = internals.players.get(pid);
+  if (!meta) throw new Error(`missing player ${pid}`);
+  return meta;
+}
+
 function setup(seed = 11) {
   const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
   const internals = sim as unknown as SimInternals;
@@ -140,7 +146,7 @@ function harvestCommand(
   if (opts.townFocus) internals.players.get(a)!.townFocus = { ...opts.townFocus };
   opts.arrange?.(rig, corpse);
   sim.drainEvents();
-  const before = structuredClone(internals.players.get(a)!.inventory);
+  const before = structuredClone(mustPlayer(internals, a).inventory);
   let draws = 0;
   const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
   rng.setObserver(() => {
@@ -161,8 +167,8 @@ function harvestCommand(
     errors: events
       .filter((e): e is Extract<typeof e, { type: 'error' }> => e.type === 'error')
       .map((e) => e.text),
-    inventory: structuredClone(internals.players.get(a)!.inventory),
-    items: internals.players.get(a)!.inventory.length,
+    inventory: structuredClone(mustPlayer(internals, a).inventory),
+    items: mustPlayer(internals, a).inventory.length,
     claimedBy: corpse.harvestClaimedBy,
     corpseTimer: corpse.corpseTimer,
   };
@@ -330,7 +336,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     noYieldMob.corpseTimer = 9999;
     noYieldMob.respawnTimer = 9999;
     internals.entities.set(noYieldMob.id, noYieldMob);
-    const before = internals.players.get(a)!.inventory.length;
+    const before = mustPlayer(internals, a).inventory.length;
     sim.drainEvents();
     let draws = 0;
     const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
@@ -351,7 +357,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     expect(noYieldMob.harvestClaimedBy).toBeNull();
     expect(draws).toBe(0);
     expect(noYieldMob.corpseTimer).toBe(9999);
-    expect(internals.players.get(a)!.inventory.length).toBe(before);
+    expect(mustPlayer(internals, a).inventory.length).toBe(before);
     // A second player gets the same answer, not a "already harvested" one: the
     // corpse was never claimed, so there is no claim to lose the race for.
     sim.harvestCorpse(noYieldMob.id, undefined, b);
@@ -883,8 +889,8 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     const roomy = setup(153);
     roomy.sim.harvestCorpse(roomy.mob.id, ['fang'], roomy.a);
     const signedSlot = roomy.internals.players
-      .get(roomy.a)!
-      .inventory.find((s) => s.itemId === 'wolf_fang');
+      .get(roomy.a)
+      ?.inventory.find((s) => s.itemId === 'wolf_fang');
     // The premium arm really is the one under test: the units landed stamped.
     expect(signedSlot?.instance?.signer).toBe('Alpha');
     const signedQty = roomy.sim.countItem('wolf_fang', roomy.a);
@@ -942,7 +948,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.harvestCorpse(corpse.id, ['cloth'], a);
-    const slot = internals.players.get(a)!.inventory.find((s) => s.itemId === 'homespun_cloth');
+    const slot = mustPlayer(internals, a).inventory.find((s) => s.itemId === 'homespun_cloth');
     expect(slot?.instance?.signer).toBe('Alpha');
     expect(slot?.count).toBe(2);
     // The two families really do land on different counts, so neither literal
@@ -1116,7 +1122,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     sim.harvestCorpse(corpse.id, components, a);
     rng.setObserver(null);
     return {
-      inventory: structuredClone(internals.players.get(a)!.inventory),
+      inventory: structuredClone(mustPlayer(internals, a).inventory),
       events: sim.drainEvents(),
       draws,
       claimedBy: corpse.harvestClaimedBy,
@@ -1208,7 +1214,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     // Signed instances never merge into a plain stack, so a doubled jackpot
     // would show up as instance slots, not as a bigger count.
     expect(
-      internals.players.get(a)!.inventory.filter((s) => s.instance?.signer === 'Alpha'),
+      mustPlayer(internals, a).inventory.filter((s) => s.instance?.signer === 'Alpha'),
     ).toHaveLength(0);
   });
 
@@ -1286,9 +1292,9 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     // Ledger order follows the pick's first-occurrence order, meat before hide,
     // which is also the chat-line order the player reads (#2457).
     expect(result[0].yields.map((y) => y.itemId)).toEqual(['game_meat', 'rough_hide']);
-    expect(
-      internals.players.get(a)!.inventory.filter((s) => s.itemId === 'game_meat'),
-    ).toHaveLength(1);
+    expect(mustPlayer(internals, a).inventory.filter((s) => s.itemId === 'game_meat')).toHaveLength(
+      1,
+    );
   });
 
   it('leaves the corpse lifecycle exactly where a single-tag harvest leaves it', () => {
@@ -1502,7 +1508,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
     sim.harvestCorpse(corpse.id, components, a);
     rng.setObserver(null);
     return {
-      inventory: structuredClone(internals.players.get(a)!.inventory),
+      inventory: structuredClone(mustPlayer(internals, a).inventory),
       events: sim.drainEvents(),
       draws,
       claimedBy: corpse.harvestClaimedBy,
@@ -2404,7 +2410,7 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
     broadcast(server);
     const client = bareClient(sb.pid);
     (client as any).applySnapshot(lastSnap(fcB.sent));
-    expect(client.entities.get(mob.id)!.harvestClaimedBy).toBeNull();
+    expect(client.entities.get(mob.id)?.harvestClaimedBy).toBeNull();
 
     // Bravo walks far out of interest range; the server evicts the corpse from
     // this session's sent set, and the claim lands while it is out of view.
@@ -2566,7 +2572,7 @@ describe('a repeated component tag over the wire, through a real GameServer (#24
     rng.setObserver(null);
     return {
       raw,
-      inventory: structuredClone(internals.players.get(session.pid)!.inventory),
+      inventory: structuredClone(mustPlayer(internals, session.pid).inventory),
       hides: server.sim.countItem('rough_hide', session.pid),
       draws,
       claimedBy: mob.harvestClaimedBy,
@@ -2661,7 +2667,7 @@ describe('an invalid component tag over the wire, through a real GameServer (#25
     rng.setObserver(null);
     return {
       raw,
-      inventory: structuredClone(internals.players.get(session.pid)!.inventory),
+      inventory: structuredClone(mustPlayer(internals, session.pid).inventory),
       hides: server.sim.countItem('rough_hide', session.pid),
       fangs: server.sim.countItem('wolf_fang', session.pid),
       draws,
@@ -3057,7 +3063,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // fully unmapped, moves this row instead of leaving the new case untested.
     const allUnmapped = Object.entries(MOBS)
       .filter(([, m]) => (m.componentTags?.length ?? 0) > 0)
-      .filter(([, m]) => !m.componentTags!.some((t) => HARVEST_COMPONENT_ITEMS[t]))
+      .filter(([, m]) => !m.componentTags?.some((t) => HARVEST_COMPONENT_ITEMS[t]))
       .map(([id]) => id);
     expect(allUnmapped).toEqual(['fen_troll']);
     expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
@@ -3183,7 +3189,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     corpse.respawnTimer = 9999;
     quietInternals.entities.set(corpse.id, corpse);
     quiet.drainEvents();
-    expect(issued.inventory).toEqual(quietInternals.players.get(quietA)!.inventory);
+    expect(issued.inventory).toEqual(mustPlayer(quietInternals, quietA).inventory);
     expect(issued.corpse.harvestClaimedBy).toBe(corpse.harvestClaimedBy);
     expect(issued.corpse.corpseTimer).toBe(corpse.corpseTimer);
     // Same rng stream position: the next draw either world takes is the same
@@ -3353,7 +3359,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     });
     expect(mixed).toHaveLength(10);
     for (const [id, m] of mixed) {
-      const mapped = m.componentTags!.filter((t) => HARVEST_COMPONENT_ITEMS[t]);
+      const mapped = m.componentTags?.filter((t) => HARVEST_COMPONENT_ITEMS[t]);
       const r = harvestAt(id, mapped);
       expect(r.errors, `${id} errors`).toEqual([]);
       expect(r.claimedBy, `${id} claim`).not.toBeNull();

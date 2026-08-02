@@ -41,6 +41,8 @@ export interface MeterFrameConfig {
   /** Size used when the panel is measured while hidden (first open). */
   fallbackSize: { w: number; h: number };
   limits?: MeterFrameLimits;
+  /** Optional interaction gate for a panel that exposes an explicit lock toggle. */
+  canInteract?(): boolean;
 }
 
 export interface MeterFrameDeps {
@@ -133,6 +135,34 @@ export class MeterFrame {
     if (this.geo) this.apply();
   }
 
+  /** Change only the panel width, preserving a saved position and height. */
+  setWidth(width: number): void {
+    if (this.blocked() || !Number.isFinite(width)) return;
+    const limits = this.cfg.limits ?? METER_FRAME_LIMITS;
+    const clamped = Math.max(limits.minWidth, Math.min(limits.maxWidth, width));
+    if (!this.geo) {
+      this.cfg.el.style.width = `${clamped}px`;
+      return;
+    }
+    this.geo = { ...this.geo, width: clamped };
+    this.apply();
+    this.persist();
+  }
+
+  /** Change only the panel height, preserving a saved position and width. */
+  setHeight(height: number): void {
+    if (this.blocked() || !Number.isFinite(height)) return;
+    const limits = this.cfg.limits ?? METER_FRAME_LIMITS;
+    const clamped = Math.max(limits.minHeight, Math.min(limits.maxHeight, height));
+    if (!this.geo) {
+      this.cfg.el.style.height = `${clamped}px`;
+      return;
+    }
+    this.geo = { ...this.geo, height: clamped };
+    this.apply();
+    this.persist();
+  }
+
   /** Drop the custom box and return the panel to its stylesheet anchor. */
   reset(): void {
     this.geo = null;
@@ -169,6 +199,11 @@ export class MeterFrame {
     return this.geo !== null && !this.blocked();
   }
 
+  /** Current visual width when the player has established a custom frame. */
+  get currentWidth(): number | null {
+    return this.geo?.width ?? null;
+  }
+
   private blocked(): boolean {
     return this.deps.isMobileLayout();
   }
@@ -186,7 +221,8 @@ export class MeterFrame {
   }
 
   private onMoveStart(event: PointerEvent): void {
-    if (this.blocked() || this.gesture || event.button !== 0) return;
+    if (this.blocked() || this.cfg.canInteract?.() === false || this.gesture || event.button !== 0)
+      return;
     // A press on a tab, pager or close button is that button's, never a drag:
     // the title bar is both the control strip and the move handle.
     const target = event.target as HTMLElement | null;
@@ -203,7 +239,8 @@ export class MeterFrame {
   }
 
   private onResizeStart(event: PointerEvent): void {
-    if (this.blocked() || this.gesture || event.button !== 0) return;
+    if (this.blocked() || this.cfg.canInteract?.() === false || this.gesture || event.button !== 0)
+      return;
     this.ensureGeometry();
     if (!this.geo) return;
     this.gesture = {

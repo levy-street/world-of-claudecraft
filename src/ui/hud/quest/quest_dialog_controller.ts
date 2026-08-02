@@ -53,8 +53,15 @@ export interface QuestDialogControllerDeps {
   itemTooltip(item: ItemDef): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   openChronicles(): void;
-  openVendor(npcId: number): void;
-  openHeroicVendor(npcId: number): void;
+  // opener: this dialog's own trap opener (the element that opened the quest
+  // dialog, e.g. the world interact prompt), handed in because bindRoute hides
+  // #quest-dialog (display:none) before calling this; the in-dialog button that
+  // was clicked would itself be inside the now-hidden subtree by close time,
+  // and an activeFocusable() read taken afterward would find nothing focusable
+  // either way, so the WCAG 2.4.3 return-to-opener chain would silently drop
+  // to <body> without an explicit, still-live element handed in.
+  openVendor(npcId: number, opener?: HTMLElement | null): void;
+  openHeroicVendor(npcId: number, opener?: HTMLElement | null): void;
   openTrain(npcId: number): void;
   openUnbind(npcId: number): void;
   openMarket(): void;
@@ -393,8 +400,8 @@ export class QuestDialogController {
         item.disabled = true;
       });
     });
-    this.bindRoute('[data-vendor]', () => this.deps.openVendor(npc.id));
-    this.bindRoute('[data-heroic-shop]', () => this.deps.openHeroicVendor(npc.id));
+    this.bindRoute('[data-vendor]', (opener) => this.deps.openVendor(npc.id, opener));
+    this.bindRoute('[data-heroic-shop]', (opener) => this.deps.openHeroicVendor(npc.id, opener));
     this.bindRoute('[data-train]', () => this.deps.openTrain(npc.id));
     this.bindRoute('[data-unbind]', () => this.deps.openUnbind(npc.id));
     this.bindRoute('[data-market]', this.deps.openMarket);
@@ -602,10 +609,21 @@ export class QuestDialogController {
     );
   }
 
-  private bindRoute(selector: string, open: () => void): void {
+  private bindRoute(selector: string, open: (opener: HTMLElement | null) => void): void {
     this.deps.element.querySelector(selector)?.addEventListener('click', () => {
+      // Hand the successor window this dialog's OWN trap opener, not the active
+      // element inside #quest-dialog: close(false) hides the dialog, and by the
+      // time the successor closes, an in-dialog button lives inside a
+      // display:none subtree and fails FocusManager.canFocus (getClientRects()
+      // is empty), so the return-to-opener chain would silently drop to <body>.
+      // The trap's own opener (what focused the dialog before it opened) is a
+      // sibling element outside the dialog, so it stays live and visible after
+      // close(false), the same way openBank()'s live side-rail button does. See
+      // openVendor's deps comment for why the successor window needs this
+      // handed in explicitly rather than reading activeFocusable() itself.
+      const opener = this.trap?.opener() ?? null;
       this.close(false);
-      open();
+      open(opener);
     });
   }
 

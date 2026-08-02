@@ -80,6 +80,7 @@ export interface InputCallbacks {
       | 'escape'
       | 'chat'
       | 'meters'
+      | 'targetAuras'
       | 'social'
       | 'arena'
       | 'valecup'
@@ -1008,6 +1009,9 @@ export class Input {
         return;
       case 'meters':
         this.cb.onUiKey('meters');
+        return;
+      case 'targetAuras':
+        this.cb.onUiKey('targetAuras');
         return;
       case 'social':
         this.cb.onUiKey('social');

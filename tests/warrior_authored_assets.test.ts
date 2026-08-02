@@ -9,19 +9,19 @@ import { abilityImageUrl } from '../src/ui/icons';
 const AUTHORED_ICONS = {
   double_charge: {
     sourcePack: 'custom-user',
-    sourceFile: 'C:/Users/joseg/Desktop/Doble carga.png',
+    sourceFile: 'desktop/Doble carga.png',
     output: 'double_charge.webp',
     blob: '335e3c113f7bb729caec313b14b586d3c9ba0d30',
   },
   crushing_charge: {
     sourcePack: 'custom-user',
-    sourceFile: 'C:/Users/joseg/Desktop/el otro cargar.png',
+    sourceFile: 'desktop/el otro cargar.png',
     output: 'crushing_charge.webp',
     blob: '3f0f9c858635c054f59c950e8259833699f8b47c',
   },
   combat_mastery: {
     sourcePack: 'custom-user',
-    sourceFile: 'C:/Users/joseg/Desktop/Nuevo talento.png',
+    sourceFile: 'desktop/Nuevo talento.png',
     output: 'combat_mastery.webp',
     blob: '756978b7da595ec543be28cec98b03da79a60d9b',
   },

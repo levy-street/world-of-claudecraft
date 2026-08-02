@@ -389,6 +389,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Developer-only mount. It is intentionally absent from vendors, quests,
+  // creature loot, heroic loot, and Rift reward pools. Use /dev mounts or
+  // /dev give reins_terrorspark_groundshaker while the feature remains under development.
+  reins_terrorspark_groundshaker: {
+    id: 'reins_terrorspark_groundshaker',
+    name: 'Ignition Key: Terrorspark Groundshaker',
+    kind: 'mount',
+    mount: 'terrorspark_groundshaker',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   mistveil_cord: {
     id: 'mistveil_cord',
     name: 'Mistveil Cord',

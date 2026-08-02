@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "ef0bdef08bcd0e7c3069d5f1033a45d9953eb34f053f8f5e44d42c6713ef582c",
-  "catalogHash": "37318b660d19a3709f669fd0c1f74974a03d21c4985dc5f4f516e094d784320f",
+  "bundleId": "242e90b0bcd7c91dd00676576b85a2302bd2e37ab401b227396a4207ed619325",
+  "catalogHash": "84cbcbe7eaed06729e9ca12e47d7e01d2ebdad196ec7222f788322a16e8fe0c5",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2609,6 +2609,18 @@
           "url": "/audio/sfx/mount_run_stormfeather_griffin.mp3?v=9fb6a774e864",
           "bytes": 13835,
           "sha256": "9fb6a774e864979c3410e939f13943dea8bca2b61ba0c37aca490cf797ffa734"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_terrorspark_groundshaker": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_terrorspark_groundshaker.mp3?v=7508c4a5ad92",
+          "bytes": 15716,
+          "sha256": "7508c4a5ad925cbf152c3143b23215c1e1a653ea0f30b9b9d7a89044d9849b06"
         }
       ],
       "gain": 1,

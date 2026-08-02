@@ -18,6 +18,13 @@
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
 import { createGroundObject, createMob } from '../entity';
+import {
+  COMBAT_EXIT_MEMORY_SECONDS,
+  type CombatExitThreatEntry,
+  recordCombatExit,
+  takeCombatExit,
+} from '../instance_exit_memory';
+import { retargetMob } from '../mob/targeting';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { arenaQueueLeave } from '../social/arena';
@@ -99,6 +106,38 @@ export function lockNormalDungeonResetOnBossKill(ctx: SimContext, mob: Entity): 
   }
 }
 
+/**
+ * Open the far-end exit portal a `DungeonDef.bossExitPortal` dungeon earns by
+ * killing its final boss. The Wildheart Basin's shrine terrace sits ~220yd
+ * from the entrance exit with no corridor back, so the cleared run steps
+ * through here instead of retracing the whole route. Spawned only on the
+ * final boss's death (that IS the "portal opens" beat), on both difficulties;
+ * the object joins inst.objectIds so freeInstance tears it down with the
+ * claim. Draws no rng.
+ */
+export function spawnBossExitPortal(ctx: SimContext, mob: Entity): void {
+  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
+  if (!inst || inst.bossExitId !== null) return;
+  const dungeon = DUNGEONS[inst.dungeonId];
+  const portal = dungeon?.bossExitPortal;
+  if (!portal) return;
+  if (mob.templateId !== HEROIC_DUNGEON_TUNING[inst.dungeonId]?.finalBossId) return;
+  const origin = instanceOrigin(dungeon.index, inst.slot);
+  const exit = createGroundObject(
+    ctx.nextId++,
+    '',
+    `${dungeon.name} Exit`,
+    ctx.groundPos(origin.x + portal.x, origin.z + portal.z),
+  );
+  exit.templateId = 'dungeon_exit';
+  exit.dungeonId = dungeon.id;
+  exit.objectItemId = null;
+  exit.lootable = true;
+  ctx.addEntity(exit);
+  inst.objectIds.push(exit.id);
+  inst.bossExitId = exit.id;
+}
+
 // Joining a party during a reset cooldown inherits that party's active dungeon
 // locks. Otherwise fresh characters could take over the replacement claim, rotate
 // the ephemeral party id, and open another run before the five-minute boundary.
@@ -178,16 +217,24 @@ export function heroicLockoutId(dungeonId: string): string {
   return `${dungeonId}:heroic`;
 }
 
+// True when this exit-portal id is live and the player stands inside its door
+// trigger; a null id (no portal spawned) simply misses. Kept allocation-free:
+// updateDoorTriggers runs per player per tick over the whole instance pool.
+function touchesExitPortal(ctx: SimContext, p: Entity, exitId: number | null): boolean {
+  if (exitId === null) return false;
+  const exit = ctx.entities.get(exitId);
+  return exit !== undefined && dist2d(p.pos, exit.pos) < DOOR_TRIGGER_RADIUS;
+}
+
 // Walking into a dungeon door teleports you through it (no click needed).
 // Party members who walk in land in the same instance via instanceKeyFor.
 export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
   if (p.kind !== 'player') return;
   if (p.pos.x > DUNGEON_X_THRESHOLD) {
-    // inside: walking into the exit portal climbs back out
+    // inside: walking into the entrance exit, or the boss-death portal a
+    // bossExitPortal dungeon opens at the far end, climbs back out
     for (const inst of ctx.instances) {
-      if (inst.exitId === null) continue;
-      const exit = ctx.entities.get(inst.exitId);
-      if (exit && dist2d(p.pos, exit.pos) < DOOR_TRIGGER_RADIUS) {
+      if (touchesExitPortal(ctx, p, inst.exitId) || touchesExitPortal(ctx, p, inst.bossExitId)) {
         leaveDungeon(ctx, p.id);
         return;
       }
@@ -385,6 +432,10 @@ export function enterDungeon(
   const passingThroughNythraxisCrypt =
     dungeonId === 'nythraxis_crypt' && corpseRunClaim !== undefined;
   if (p.ghost && !passingThroughNythraxisCrypt) resurrectOnInstanceReentry(ctx, r.meta, p, p.pos);
+  // A living return within the memory window resumes whatever mid-combat exit
+  // this player left behind in this exact claim (issue #2653); a still-dead
+  // ghost passing through has nothing to resume (mobs never target the dead).
+  if (!p.dead) resumeRememberedCombat(ctx, inst, r.meta.entityId);
   ctx.emit({ type: 'log', text: dungeon.enterText, color: '#b9f', pid: r.meta.entityId });
   // Stepping through the moongate is a Chronicle task.
   if (dungeonId === 'drowned_temple') ctx.markVisited(r.meta, 'dungeon:drowned_temple');
@@ -500,11 +551,29 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
 // Drop one departing player (and every entity they own) from the hate tables of
 // all mobs in the instance, releasing any aggro locked onto them. With the table
 // entry gone, updateMobTarget re-targets the remaining party next tick, or the
-// mob evades home when nobody is left on the table.
+// mob evades home when nobody is left on the table. A player leaving while a mob
+// is genuinely fighting them also has that exact threat value snapshotted onto
+// the claim (issue #2653): re-entering the SAME live instance shortly after
+// resumes the fight (resumeRememberedCombat) instead of granting a free,
+// unengaged reset. An out-of-combat walk-out (mob never aggroed, or already
+// dead) drops nothing worth remembering, so no memory entry is made.
 function scrubInstanceThreat(ctx: SimContext, inst: InstanceSlot, pid: number): void {
+  const mobThreat: CombatExitThreatEntry[] = [];
   for (const id of inst.mobIds) {
     const mob = ctx.entities.get(id);
     if (!mob || mob.dead) continue;
+    const priorThreat = mob.threat.get(pid);
+    if (mob.inCombat && priorThreat !== undefined && priorThreat > 0) {
+      mobThreat.push([id, priorThreat, mob.evadeEpoch]);
+      // Hold this mob's evade-home reset open until the memory window lapses
+      // (issue #2653): a genuinely-fighting leaver's mob must not heal or
+      // clear its hate table out from under a same-claim re-entry. Extends
+      // rather than shortens an already-live hold from an earlier leaver.
+      mob.combatExitHoldUntil = Math.max(
+        mob.combatExitHoldUntil,
+        ctx.time + COMBAT_EXIT_MEMORY_SECONDS,
+      );
+    }
     dropThreat(mob, pid);
     for (const srcId of [...mob.threat.keys()]) {
       if (ctx.entities.get(srcId)?.ownerId === pid) dropThreat(mob, srcId);
@@ -513,6 +582,30 @@ function scrubInstanceThreat(ctx: SimContext, inst: InstanceSlot, pid: number): 
       const tgt = ctx.entities.get(mob.aggroTargetId);
       if (mob.aggroTargetId === pid || tgt?.ownerId === pid) mob.aggroTargetId = null;
     }
+  }
+  recordCombatExit(inst.combatExitMemory, pid, ctx.time, mobThreat);
+}
+
+// Reapply a still-live mid-combat exit snapshot (issue #2653): if `pid` left this
+// SAME claim while genuinely fighting within the memory window, restore the
+// exact threat scrubbed at the door and force any mob that lost its target back
+// into the fight, instead of letting it sit idle/evading until manually re-pulled.
+// A lapsed or absent memory entry is a no-op: the claim resets exactly as before.
+//
+// Safe to restore unconditionally (no evadeEpoch check needed): resetEvadingMob
+// defers on `combatExitHoldUntil` for exactly this window, so a mob this snapshot
+// covers cannot have evade-reset or been re-pulled by anyone else in the meantime
+// (an 'evade' mob is damage-immune, see combat/damage.ts). A mob that DID evade
+// since (e.g. it was never actually held, a stale/foreign id) is caught below by
+// the dead/missing guard; `evadeEpoch` stays on the snapshot only as a diagnostic.
+function resumeRememberedCombat(ctx: SimContext, inst: InstanceSlot, pid: number): void {
+  const rec = takeCombatExit(inst.combatExitMemory, pid, ctx.time);
+  if (!rec) return;
+  for (const [mobId, threat] of rec.mobThreat) {
+    const mob = ctx.entities.get(mobId);
+    if (!mob || mob.dead) continue;
+    mob.threat.set(pid, threat);
+    if (mob.aggroTargetId === null) retargetMob(ctx, mob);
   }
 }
 
@@ -539,6 +632,7 @@ function claimInstance(
   inst.claimedAt = ctx.time;
   inst.clearedBy = new Set();
   inst.enteredBy = new Set();
+  inst.combatExitMemory = new Map();
   const origin = instanceOriginOf(inst);
   for (const spawn of dungeon.spawns) {
     const template = MOBS[spawn.mobId];
@@ -613,11 +707,13 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   inst.mobIds = [];
   inst.objectIds = [];
   inst.exitId = null;
+  inst.bossExitId = null; // the entity itself was dropped with objectIds
   inst.emptyFor = 0;
   inst.resetAvailableAt = 0;
   inst.claimedAt = undefined;
   inst.clearedBy = new Set();
   inst.enteredBy = new Set();
+  inst.combatExitMemory = new Map();
 }
 
 // Explicit classic-style reset for the caller's standard dungeon claims. Durable

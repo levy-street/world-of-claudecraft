@@ -22,8 +22,15 @@ import {
 } from '../data';
 import { layoutColliders } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
+import {
+  COMBAT_EXIT_MEMORY_SECONDS,
+  type CombatExitThreatEntry,
+  recordCombatExit,
+  takeCombatExit,
+} from '../instance_exit_memory';
 import type { LootTier } from '../lockpick';
 import { RIFT_MECHANIC_SPACING_SEC } from '../mob/mechanic_spacing';
+import { retargetMob } from '../mob/targeting';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
@@ -250,7 +257,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const floor = floorForInstance(inst);
 
-  // Publish the generated collision so movement/pathing/LoS/camera respect it.
+  // Publish the generated collision so movement, pathing, and LoS respect it.
   setRiftRegion(ctx.riftCollisionToken, origin.x, origin.z, layoutColliders(floor.layout));
 
   inst.mobIds = [];
@@ -453,6 +460,12 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.orbId = null;
   inst.orbActive = false;
   inst.bossDeathZones = [];
+  // A floor's mobs are torn down here (descendRift, or a full teardown below):
+  // any remembered mid-combat exit still holding their ids can never resolve
+  // again once IDs are freed, but the map is inert only because `nextId` is
+  // monotonic. Clear it explicitly so a new floor's freshly spawned mobs can
+  // never accidentally collide with a stale entry.
+  inst.combatExitMemory = new Map();
 }
 
 function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
@@ -475,6 +488,7 @@ function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
   inst.rewarded = false;
   inst.progressed = false;
   inst.bossDeathZones = [];
+  inst.combatExitMemory = new Map();
   if (eventId !== null) {
     const event = ctx.riftEvents.find((candidate) => candidate.eventId === eventId);
     const anotherRun = ctx.riftInstances.some(
@@ -665,6 +679,9 @@ export function enterRift(
         : (ctx.riftEvents.find((candidate) => candidate.eventId === eventId)?.upgrade ?? null);
     inst.seed = seed >>> 0;
     inst.baseLevel = Math.max(1, Math.min(60, Math.round(baseLevel)));
+    // Belt-and-suspenders with freeRiftInstance's clear: a freshly claimed slot
+    // must never carry a stale exit memory from whoever last held it.
+    inst.combatExitMemory = new Map();
     inst.floorIndex = 0;
     inst.floorCount = floorForInstance(inst, 0).floorCount;
     // Return spot: never inside the portal's walk-in radius, or leaving the
@@ -695,6 +712,11 @@ export function enterRift(
   }
 
   inst.memberIds.add(r.meta.entityId);
+  // A living return within the memory window resumes whatever mid-combat exit
+  // this player left behind in this exact run (issue #2653); a corpse-running
+  // ghost has nothing to resume (mobs never target the dead, and riftInstanceInCombat
+  // above already bars a ghost from re-entering while any mob is still engaged).
+  if (!deadEntry) resumeRememberedCombat(ctx, inst, r.meta.entityId);
 
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const floor = floorForInstance(inst);
@@ -779,6 +801,15 @@ export function leaveRift(ctx: SimContext, pid?: number): void {
   if (!inst) return;
   // Tear down any lock attempt in progress so a half-picked cache doesn't linger.
   if (inst.lockpick) riftLockpickAbort(ctx, inst, r.meta.entityId);
+  // Unlike the dungeon door, nothing here scrubs the leaver's threat directly:
+  // the mob keeps its target and simply chases the player's new (overworld)
+  // position, dragging itself past its own leash within a few seconds and
+  // evading home to a full, unengaged reset (issue #2653: the same net effect
+  // as the dungeon door's explicit scrub, just via the leash break instead of
+  // a direct drop). Snapshot whatever was genuinely being fought before that
+  // plays out, so a prompt return can resume the fight instead of walking into
+  // a fresh, unengaged pack.
+  snapshotCombatExit(ctx, inst, r.meta.entityId);
   forceExitRiftPlayer(ctx, inst, r.meta.entityId, false);
   ctx.emit({
     type: 'log',
@@ -1346,6 +1377,52 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
     // race and complete as losers when their boss falls (completeLosingRun).
   }
   return true;
+}
+
+// Snapshot pid's dropped threat for the run's memory (issue #2653), same
+// eligibility rule as the dungeon-door scrub: only a mob that was genuinely
+// `inCombat` with real threat on the leaver counts, so an out-of-combat beacon
+// walk-out (nothing pulled, or the pack already dead) leaves no memory entry.
+function snapshotCombatExit(ctx: SimContext, inst: RiftInstance, pid: number): void {
+  const mobThreat: CombatExitThreatEntry[] = [];
+  for (const id of inst.mobIds) {
+    const mob = ctx.entities.get(id);
+    if (!mob || mob.dead || !mob.inCombat) continue;
+    const threat = mob.threat.get(pid);
+    if (threat !== undefined && threat > 0) {
+      mobThreat.push([id, threat, mob.evadeEpoch]);
+      // Hold this mob's evade-home reset open until the memory window lapses
+      // (issue #2653), same as the dungeon-door scrub: the leash break that is
+      // about to happen must not heal or clear the hate table out from under a
+      // same-run re-entry. Extends rather than shortens an already-live hold.
+      mob.combatExitHoldUntil = Math.max(
+        mob.combatExitHoldUntil,
+        ctx.time + COMBAT_EXIT_MEMORY_SECONDS,
+      );
+    }
+  }
+  recordCombatExit(inst.combatExitMemory, pid, ctx.time, mobThreat);
+}
+
+// Reapply a still-live mid-combat exit snapshot: if pid left this SAME run while
+// genuinely fighting within the memory window, restore the exact threat scrubbed
+// at the beacon/exit and force any mob that lost its target back into the fight,
+// instead of leaving it idle/evading until manually re-pulled. A lapsed or
+// absent memory entry is a no-op: the run resets exactly as before.
+//
+// Safe to restore unconditionally (no evadeEpoch check needed): resetEvadingMob
+// defers on `combatExitHoldUntil` for exactly this window, so a mob this snapshot
+// covers cannot have evade-reset or been re-pulled by anyone else in the meantime
+// (an 'evade' mob is damage-immune, see combat/damage.ts).
+function resumeRememberedCombat(ctx: SimContext, inst: RiftInstance, pid: number): void {
+  const rec = takeCombatExit(inst.combatExitMemory, pid, ctx.time);
+  if (!rec) return;
+  for (const [mobId, threat] of rec.mobThreat) {
+    const mob = ctx.entities.get(mobId);
+    if (!mob || mob.dead) continue;
+    mob.threat.set(pid, threat);
+    if (mob.aggroTargetId === null) retargetMob(ctx, mob);
+  }
 }
 
 /** True while any living mob of the instance is engaged: the window in which

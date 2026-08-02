@@ -6,8 +6,15 @@ const mocks = vi.hoisted(() => ({
   loadTexture: vi.fn(),
   releaseGltf: vi.fn(),
   registerPreload: vi.fn(),
-  registerDeferredPreload: vi.fn((start: () => unknown) => start()),
 }));
+
+function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
 
 vi.mock('../src/render/assets/loader', () => ({
   loadGltf: mocks.loadGltf,
@@ -17,7 +24,9 @@ vi.mock('../src/render/assets/loader', () => ({
 
 vi.mock('../src/render/assets/preload', () => ({
   registerPreload: mocks.registerPreload,
-  registerDeferredPreload: mocks.registerDeferredPreload,
+  // Deferred lane: start the thunk immediately so these registration-order and
+  // asset-set assertions observe the same promises the eager lane produced.
+  registerDeferredPreload: (start: () => Promise<unknown>) => mocks.registerPreload(start()),
 }));
 
 afterEach(() => {
@@ -34,20 +43,39 @@ describe('Eastbrook Grand Armoury preload', () => {
     const stone = new THREE.MeshStandardMaterial({ vertexColors: true });
     stone.name = 'ArmouryStone';
     scene.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), stone));
-    mocks.loadGltf.mockReturnValue(Promise.resolve({ scene }));
+    const gltfLoad = deferred<{ scene: THREE.Group }>();
+    mocks.loadGltf.mockReturnValue(gltfLoad.promise);
     const atlas = new THREE.Texture();
-    mocks.loadTexture.mockResolvedValue(atlas);
+    const textureLoad = deferred<THREE.Texture>();
+    mocks.loadTexture.mockReturnValue(textureLoad.promise);
 
     const module = await import('../src/render/eastbrook_grand_armoury');
 
     expect(mocks.loadGltf).toHaveBeenCalledTimes(1);
     expect(mocks.loadGltf).toHaveBeenCalledWith('/models/props/eastbrook_grand_armoury.glb');
-    expect(mocks.loadTexture).toHaveBeenCalledTimes(1);
-    expect(mocks.loadTexture).toHaveBeenCalledWith('/textures/eastbrook_surface_atlas.webp');
-    expect(mocks.registerDeferredPreload).toHaveBeenCalledTimes(2);
-    const registered = mocks.registerDeferredPreload.mock.results.map((r) => r.value);
+    const atlasLoads = mocks.loadTexture.mock.calls
+      .map(([url], index) => ({
+        url,
+        order: mocks.loadTexture.mock.invocationCallOrder[index],
+      }))
+      .filter(({ url }) => url === '/textures/eastbrook_surface_atlas.webp');
+    expect(atlasLoads.map(({ url }) => url)).toEqual(['/textures/eastbrook_surface_atlas.webp']);
+    const registrationOrders = new Set(mocks.registerPreload.mock.invocationCallOrder);
+    expect(registrationOrders).toContain(mocks.loadGltf.mock.invocationCallOrder[0] + 1);
+    expect(registrationOrders).toContain(atlasLoads[0].order + 1);
+    const registered = mocks.registerPreload.mock.calls.map(([promise]) => promise);
     expect(registered.every((promise) => promise instanceof Promise)).toBe(true);
-    await Promise.all(registered);
+    let gateSettled = false;
+    const gate = Promise.all(registered).then(() => {
+      gateSettled = true;
+    });
+    await Promise.resolve();
+    expect(gateSettled).toBe(false);
+    gltfLoad.resolve({ scene });
+    await Promise.resolve();
+    expect(gateSettled).toBe(false);
+    textureLoad.resolve(atlas);
+    await gate;
 
     const building = {
       kind: 'inn',

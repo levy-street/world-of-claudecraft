@@ -27,6 +27,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -87,7 +89,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "es_ES": [
     "guide.nav.ravenrift",
@@ -107,6 +111,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -167,7 +173,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "fr_FR": [
     "guide.nav.ravenrift",
@@ -187,6 +195,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -247,7 +257,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "fr_CA": [
     "guide.nav.ravenrift",
@@ -267,6 +279,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -327,7 +341,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "en_CA": [],
   "it_IT": [
@@ -348,6 +364,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -408,7 +426,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "de_DE": [
     "guide.nav.ravenrift",
@@ -428,6 +448,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -488,27 +510,37 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "zh_CN": [
     "hudChrome.bg.clock",
     "hudChrome.pvp.bracket1v1",
-    "hudChrome.pvp.bracket2v2"
+    "hudChrome.pvp.bracket2v2",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "zh_TW": [
     "hudChrome.bg.clock",
     "hudChrome.pvp.bracket1v1",
-    "hudChrome.pvp.bracket2v2"
+    "hudChrome.pvp.bracket2v2",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "ko_KR": [
     "hudChrome.bg.clock",
     "hudChrome.pvp.bracket1v1",
-    "hudChrome.pvp.bracket2v2"
+    "hudChrome.pvp.bracket2v2",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "ja_JP": [
     "hudChrome.bg.clock",
     "hudChrome.pvp.bracket1v1",
-    "hudChrome.pvp.bracket2v2"
+    "hudChrome.pvp.bracket2v2",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "pt_BR": [
     "guide.nav.ravenrift",
@@ -528,6 +560,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -588,12 +622,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "ru_RU": [
     "hudChrome.bg.clock",
     "hudChrome.pvp.bracket1v1",
-    "hudChrome.pvp.bracket2v2"
+    "hudChrome.pvp.bracket2v2",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "cs_CZ": [
     "guide.nav.ravenrift",
@@ -613,6 +651,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -673,7 +713,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "nl_NL": [
     "guide.nav.ravenrift",
@@ -693,6 +735,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -753,7 +797,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "pl_PL": [
     "guide.nav.ravenrift",
@@ -773,6 +819,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -833,7 +881,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "id_ID": [
     "guide.nav.ravenrift",
@@ -853,6 +903,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -913,7 +965,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "tr_TR": [
     "guide.nav.ravenrift",
@@ -933,6 +987,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -993,7 +1049,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "sv_SE": [
     "guide.nav.ravenrift",
@@ -1013,6 +1071,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -1073,7 +1133,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "vi_VN": [
     "guide.nav.ravenrift",
@@ -1093,6 +1155,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -1153,7 +1217,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ],
   "da_DK": [
     "guide.nav.ravenrift",
@@ -1173,6 +1239,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.ravenriftPage.respawnBody",
     "guide.ravenriftPage.respawnHeading",
     "hud.keybinds.actions.arena",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
     "hudChrome.bg.azure",
     "hudChrome.bg.blurb",
     "hudChrome.bg.board.assists",
@@ -1233,6 +1301,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundAssist",
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
   ]
 };

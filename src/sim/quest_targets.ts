@@ -1,15 +1,23 @@
 // Pure quest-objective target/location resolution over the static content
 // tables, shared by the presentation layers: the world map draws translucent
-// "your objective lives here" areas from questObjectiveAreas(), and the mob
-// hover tooltip lists the objectives a mob advances via questObjectivesForMob(). A host-agnostic leaf
+// "your objective lives here" areas from questObjectiveAreas(), the quest-giver
+// glyphs from questGiverNpcMarkers(), and the mob hover tooltip lists the
+// objectives a mob advances via questObjectivesForMob(). A host-agnostic leaf
 // like threat.ts / format_money.ts: no DOM, no rng, no Sim state. Everything
 // derives from the QUESTS/CAMPS/MOBS/GROUND_OBJECTS/NPCS content plus the
 // player's live quest log, so the offline Sim and the online ClientWorld
 // mirror produce identical output, and (unlike world.entities) none of it is
-// interest-radius limited: a camp far across the zone still resolves.
+// interest-radius limited: a camp or quest giver far across the zone still resolves.
 
 import { CAMPS, ESCORTS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
-import { type QuestObjective, type QuestProgress, questObjectiveRequired } from './types';
+import { nodeMaterialFor } from './professions/gathering';
+import {
+  isQuestTurnInNpc,
+  type QuestObjective,
+  type QuestProgress,
+  type QuestState,
+  questObjectiveRequired,
+} from './types';
 
 /** Identity of one quest objective (the map tooltip resolves its localized
  *  label + live counts from this; the pure layers never carry text). */
@@ -175,11 +183,65 @@ export function questObjectiveAreas(
         if (node.type === obj.nodeType)
           push(ref, { x: node.pos.x, z: node.pos.z }, POINT_AREA_RADIUS);
       }
+    } else if (obj.type === 'gather' && obj.itemId) {
+      // itemId-only gather objective (no nodeType): credit only flows through
+      // onNodeGatheredForQuests when a matching node is harvested, so the pin
+      // must be the nodes whose material resolves to this itemId, the
+      // symmetric counterpart of the nodeType arm above (never mob camps or
+      // ground-object clusters, which never grant this objective's credit).
+      for (const node of GATHER_NODES) {
+        if (nodeMaterialFor(node.type, node.zoneId).itemId === obj.itemId)
+          push(ref, { x: node.pos.x, z: node.pos.z }, POINT_AREA_RADIUS);
+      }
     } else if (obj.type === 'escort') {
       // The escort begins where the idle escortee stands (its def start point).
       const escort = ESCORTS[obj.escortId];
       if (escort) push(ref, { x: escort.start.x, z: escort.start.z }, POINT_AREA_RADIUS);
     }
+  }
+  return out;
+}
+
+/** One quest-giver/turn-in glyph location: '?' (turn-in ready) beats '!'
+ *  (available) the same way the live map glyph does. Carries the quest
+ *  identities behind it so the hover tooltip can resolve their localized text. */
+export interface QuestGiverNpcMarker {
+  pos: { x: number; z: number };
+  ready: boolean;
+  quests: { questId: string; ready: boolean }[];
+}
+
+/**
+ * Every static NPC currently offering an available quest or holding a ready
+ * turn-in, resolved from the NPCS content table rather than world.entities so
+ * (like questObjectiveAreas above) it is never interest-radius limited: a
+ * quest giver far across an online zone still surfaces its glyph. Dynamic
+ * NPCs (spawned on demand by their owning system, e.g. mid-encounter or
+ * per-graveyard) are skipped: they carry no fixed placement to resolve here.
+ */
+export function questGiverNpcMarkers(
+  questState: (questId: string) => QuestState,
+): QuestGiverNpcMarker[] {
+  const out: QuestGiverNpcMarker[] = [];
+  for (const npc of Object.values(NPCS)) {
+    if (npc.dynamic) continue;
+    const avail = npc.questIds.filter(
+      (q) => QUESTS[q].giverNpcId === npc.id && questState(q) === 'available',
+    );
+    const readyQuests = npc.questIds.filter(
+      (q) => isQuestTurnInNpc(QUESTS[q], npc.id) && questState(q) === 'ready',
+    );
+    if (avail.length === 0 && readyQuests.length === 0) continue;
+    out.push({
+      // fresh {x,z}: never alias the shared NPCS content the sim places from
+      pos: { x: npc.pos.x, z: npc.pos.z },
+      ready: readyQuests.length > 0,
+      // turn-ins first: the '?' state wins the glyph, so its quests lead the tooltip
+      quests: [
+        ...readyQuests.map((questId) => ({ questId, ready: true })),
+        ...avail.map((questId) => ({ questId, ready: false })),
+      ],
+    });
   }
   return out;
 }

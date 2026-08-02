@@ -66,7 +66,7 @@ function purgeItem(itemId: string): void {
 // The marquee bar, mirrored from server/deeds_records.ts isMarqueeDeed (kept
 // inline so this suite stays sim-pure: importing the server module drags the
 // db pool into the graph; the REAL predicate agreeing with these inputs is
-// pinned in tests/deed_records.test.ts, profession exemplar included).
+// pinned in tests/deed_records_table.test.ts, profession exemplar included).
 function marqueeBar(deedId: string): boolean {
   const def = DEEDS[deedId];
   return def.renown >= 25 || def.reward !== undefined;
@@ -296,10 +296,12 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       }
     }
     // Hunted literal (seed 4242, after every beat above, re-recorded after the
-    // Eastbrook camp respacing merged into this branch, which thins the zone-1
-    // camp counts and shifts every world-gen draw downstream, so neither
-    // parent's recording holds): the koi bites on session index 29.
-    expect(koiSession).toBe(29);
+    // Idol Guardian gained phasesThroughObstacles on this branch: its ambient
+    // wander no longer stalls on the Sunken Idol relic colliders, so its
+    // wander-arrival timing moves and every shared-stream draw after it shifts
+    // (the same cause as this branch's parity golden re-mint): the koi bites
+    // on session index 39.
+    expect(koiSession).toBe(39);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -312,10 +314,12 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Bank the run's loot: the hunts need free bags for the x5 windfalls, and
     // no later beat reads the inventory. Pure state cleanup, zero draws.
     meta.inventory.length = 0;
-    // Hunted literals (seed 4242, after every beat above, re-recorded after the
-    // Eastbrook camp respacing merged into this branch, which shifts every
-    // world-gen draw downstream): the harvest index where each flavor's 1-in-90
-    // event fires under the shared stream.
+    // Hunted literals (seed 4242, after every beat above, re-recorded after
+    // the Idol Guardian gained phasesThroughObstacles on this branch: its
+    // ambient wander no longer stalls on the Sunken Idol relic colliders, so
+    // every shared-stream draw after its wander-arrival shifts, the same
+    // cause as this branch's parity golden re-mint): the harvest index where
+    // each flavor's 1-in-90 event fires under the shared stream.
     // #2343: each hunt's harvest needs its profession's tool in bags. The
     // tier-1 tools ride the whole beat (purgeItem never touches them) and
     // addItem draws no rng, so the hunted hitAt literals hold.
@@ -325,18 +329,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 122 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 57 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 7,
+        hitAt: 126,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 159,
+        hitAt: 2,
       },
     ];
     for (const hunt of hunts) {
@@ -394,9 +398,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
     // Hunted literal (seed 4242, after every beat above, re-recorded after the
-    // Eastbrook camp respacing merged into this branch): the rare-or-better
-    // rarity roll that mints the signed specimen lands on attempt index 7.
-    expect(hitAt).toBe(7);
+    // Idol Guardian gained phasesThroughObstacles on this branch: its wander
+    // no longer stalls on the relic colliders, shifting every shared-stream
+    // draw after it): the rare-or-better rarity roll that mints the signed
+    // specimen lands on attempt index 19.
+    expect(hitAt).toBe(19);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

@@ -1,34 +1,45 @@
-# Desktop release runbook (Electron: website download + Steam)
+# Desktop release runbook (Electron: website download + Steam + Epic)
 
 How to build, sign, publish, and verify the World of ClaudeCraft desktop app.
 The longer companion explainer (what shipped, per-platform update/signing
 mechanics, step-by-step release walkthroughs) is `docs/desktop-ship-notes.md`.
-One codebase produces two distribution channels:
+One codebase produces three distribution channels:
 
 | Channel | Command | Output | Updates |
 |---|---|---|---|
 | website | `npm run electron:build` | `release/` installers + update feed files | in-app via electron-updater |
 | steam | `npm run electron:build:steam` | `release-steam/` loose per-OS layouts | SteamPipe depots only (in-app updater OFF) |
+| epic | `npm run electron:build:epic` | `release-epic/` loose Win+Mac layouts | Epic BPT only (in-app updater OFF) |
 
 Sign-in is email and Discord only, identical to the web flow: email/password logs in
 inside the app, and "Continue with Discord" opens the player's default browser on the
 `/desktop-login` page, which hands a one-time code back to the app over the
-`worldofclaudecraft://desktop-login` deep link. There is no Steam sign-in on any
-channel; on the Steam channel the shell's one Steam surface is the account-link
-ticket behind the Book of Deeds achievement mirror (`electron/steam.cjs`).
+`worldofclaudecraft://desktop-login` deep link. There is no Steam or Epic sign-in on
+any channel; on the Steam channel the shell's one Steam surface is the account-link
+ticket behind the Book of Deeds achievement mirror (`electron/steam.cjs`). Epic
+account-link and achievement mirror surfaces live under
+`docs/epic-games-integration/` (dark by default; see `DEPLOY.md`). Packaging,
+BuildPatchTool upload, portal checklist, and server env keys are in this runbook
+(Epic section below), `docs/epic-games-integration/bpt-upload.md`,
+`docs/epic-games-integration/portal-checklist.md`, and `DEPLOY.md`. Live portal
+and store work is tracked in
+https://github.com/levy-street/world-of-claudecraft/issues/2708.
 
 The build stamps `wocDesktop` into the packaged `package.json` (electron-builder
 `extraMetadata`, wired in `scripts/electron-build.mjs` +
 `scripts/electron-builder-config.mjs`): the `distribution` channel, the `apiOrigin`
 the Vite bundle was baked with, the main-process-only `loginOrigin`, the optional
-`crashSubmitUrl`, and (steam channel only) the `steamAppId` fed by the
-`WOC_STEAM_APP_ID` build env. The shell resolves the stamp at runtime in
-`electron/desktop_config.cjs`, and a PACKAGED build ignores the `WOC_*` and
-`VITE_DESKTOP_*` runtime env vars entirely (the stamp is final), so a local env var
-cannot steer an installed app to another API, login page, updater state, or crash
-endpoint. The updater runs only for a PACKAGED WEBSITE build; there is deliberately
-no way to force it on in a Steam build. To try either channel unpacked, set
-`WOC_DISTRIBUTION=website|steam` on `npm run electron:dev`.
+`crashSubmitUrl`, (steam channel only) the `steamAppId` fed by the
+`WOC_STEAM_APP_ID` build env, and (epic channel only) the `epicProductId` /
+`epicDeploymentId` / `epicClientId` fed by `WOC_EPIC_PRODUCT_ID` /
+`WOC_EPIC_DEPLOYMENT_ID` / `WOC_EPIC_CLIENT_ID`. Website builds need no Steam or
+Epic env. The shell resolves the stamp at runtime in `electron/desktop_config.cjs`,
+and a PACKAGED build ignores the `WOC_*` and `VITE_DESKTOP_*` runtime env vars
+entirely (the stamp is final), so a local env var cannot steer an installed app to
+another API, login page, updater state, or crash endpoint. The updater runs only
+for a PACKAGED WEBSITE build; there is deliberately no way to force it on in a
+Steam or Epic build. To try a channel unpacked, set
+`WOC_DISTRIBUTION=website|steam|epic` on `npm run electron:dev`.
 
 Update tracks (prod/dev split): the publish channel is derived from the baked
 `apiOrigin` by one rule shared between build and runtime
@@ -53,14 +64,16 @@ channel like everything else did, so they will auto-update onto production
 builds; give dev testers a fresh post-split dev build rather than expecting
 their old installs to stay on dev.
 
-`npm run electron:pack` / `electron:pack:steam` are the fast local variants
-(`--dir`, host arch only, no installers). Release builds use the full arch matrix in
-`package.json` `build`: macOS universal (dmg + zip), Windows x64 + arm64 (nsis + zip),
-Linux x64 + arm64 (AppImage + deb). To smoke-test a packaged build against a local
-server: `VITE_DESKTOP_API_ORIGIN=http://localhost:8787 npm run electron:pack` (a
-BUILD-time value: baked into the bundle and stamped into the app; such a build
-lands on the `dev` update channel automatically and cannot produce production
-feed files).
+`npm run electron:pack` / `electron:pack:steam` / `electron:pack:epic` are the fast
+local variants (`--dir`, host arch only, no installers). Epic packs still require
+the three `WOC_EPIC_*` build ids and emit Win+Mac dir layouts only (no linux).
+Release builds use the full arch matrix in `package.json` `build`: macOS universal
+(dmg + zip), Windows x64 + arm64 (nsis + zip), Linux x64 + arm64 (AppImage + deb)
+for website; steam and epic override to loose `dir` targets (epic: no linux). To
+smoke-test a packaged build against a local server:
+`VITE_DESKTOP_API_ORIGIN=http://localhost:8787 npm run electron:pack` (a BUILD-time
+value: baked into the bundle and stamped into the app; such a build lands on the
+`dev` update channel automatically and cannot produce production feed files).
 
 Build each OS on its own runner (mac artifacts on macOS, Windows artifacts on Windows,
 Linux artifacts on Linux). Cross-building is not part of this runbook.
@@ -78,6 +91,9 @@ Linux artifacts on Linux). Cross-building is not part of this runbook.
 | Update host: a static HTTPS host / bucket serving `https://updates.worldofclaudecraft.com/desktop/` | website auto-update feed + installer downloads | e.g. Cloudflare R2 bucket behind that hostname (any static host works; the app only GETs) |
 | Steam partner account + app ID + three depot IDs | Steam distribution | partner.steamgames.com |
 | Steamworks publisher Web API key (+ `STEAM_ENABLED=1`, `STEAM_APP_ID`) | the Book of Deeds achievement mirror + account link (`server/steam/`) | game-server runtime env `STEAM_WEB_API_KEY` (see `DEPLOY.md`) |
+| Epic org + product (+ sandboxes, clients, artifacts) | Epic Games Store distribution | [dev.epicgames.com/portal](https://dev.epicgames.com/portal) (see `docs/epic-games-integration/portal-checklist.md`) |
+| Epic EOS client id/secret (+ `EPIC_ENABLED=1`, product/deployment ids) | Book of Deeds achievement mirror + account link (`server/epic/`) | game-server runtime env (see `DEPLOY.md`); never the BPT client secret |
+| Epic BPT client id/secret + organization/artifact ids | BuildPatchTool binary upload to Dev sandbox | local shell only; never commit; see `docs/epic-games-integration/bpt-upload.md` |
 | Optional: a crash-minidump endpoint (e.g. a Sentry project's minidump URL) | crash uploads | build env `WOC_CRASH_SUBMIT_URL` (https only) |
 
 Never commit any of these values; they are env vars in CI or the local shell.
@@ -105,6 +121,10 @@ carries for desktop:
 - The Steam account-link routes and the Book of Deeds achievement mirror
   (`server/steam/`), env-gated OFF until `STEAM_ENABLED=1` is set (`DEPLOY.md`,
   operational notes).
+- The Epic account-link routes and Book of Deeds achievement mirror
+  (`server/epic/`), env-gated OFF until `EPIC_ENABLED=1` is set (`DEPLOY.md`).
+  Dark default answers `epic.disabled` and advertises `epic.enabled: false`;
+  linking is cosmetic only (no login with Epic).
 
 Verify after deploying (should print the origin back):
 
@@ -394,6 +414,73 @@ Rules that keep this working:
 - `steam_appid.txt` is not needed (`electron/steam.cjs` passes the app id
   straight to `init`) and must not ship.
 
+## Epic Games Store
+
+Build: `npm run electron:build:epic` on a Windows runner and a macOS runner
+(signing env still applies on mac; Epic mac builds must ALSO be Developer ID
+signed + notarized, same as Steam). The build refuses to run without all three
+non-empty build ids (whitespace-only refused too):
+
+| Build env | Stamped into `wocDesktop` |
+|---|---|
+| `WOC_EPIC_PRODUCT_ID` | `epicProductId` |
+| `WOC_EPIC_DEPLOYMENT_ID` | `epicDeploymentId` |
+| `WOC_EPIC_CLIENT_ID` | `epicClientId` |
+
+Server-only secrets (`EPIC_CLIENT_SECRET`, BPT client secret) never land in the
+client stamp. Website and steam builds need none of the `WOC_EPIC_*` vars.
+Publish is always null on this channel (`publish: null`); there is no
+`app-update.yml` and electron-updater never runs (Epic BuildPatchTool owns
+patches). Output layouts in `release-epic/`:
+
+- `mac-universal/World of ClaudeCraft.app` (one universal `.app`)
+- `win-unpacked/` (x64; Windows-on-ARM runs it via emulation)
+
+There is **no Linux** epic target or depot (v1 ships Windows + macOS only).
+Linux players stay on the website AppImage/deb or Steam.
+
+Launch relative paths for BPT `-AppLaunch` (inside each BuildRoot):
+
+| OS | BuildRoot (upload the loose tree) | AppLaunch (relative to BuildRoot) |
+|---|---|---|
+| Windows | `release-epic/win-unpacked/` | `World of ClaudeCraft.exe` |
+| macOS | `release-epic/mac-universal/` | `World of ClaudeCraft.app/Contents/MacOS/World of ClaudeCraft` (exact nested MacOS binary name as emitted; confirm on first pack) |
+
+Rules that keep this working:
+
+- Upload **loose directory trees** only (BPT `UploadBinary` over `BuildRoot`).
+  Never upload website NSIS/DMG/AppImage/deb installers, steam `release-steam/`
+  trees, git checkouts, `.env` files, or server secrets as the EGS binary.
+- Mac: upload the loose `.app` tree (or its parent layout that still contains
+  the bundle). Prefer a macOS host so Apple symlinks and the notarized seal
+  stay intact (same class of hazard as Steam mac depot uploads).
+- Updates ship as new BPT binaries labeled and promoted through Epic Release
+  Management (Dev sandbox first, then Live when ready). The in-app updater is
+  off on this channel (runtime stamp) AND the build has no publish feed.
+- Desktop Epic shell: `electron/epic.cjs` is the only main-process surface
+  (capability + link proof + settle). Missing native EOS degrades to null;
+  website/steam packages never load it. Achievements reach Epic through the
+  **server** mirror (`server/epic/`), not client-reported unlocks.
+- Unpackaged dev only: `WOC_DISTRIBUTION=epic` and `WOC_EPIC_DEV=1` on
+  `npm run electron:dev` (optional id overrides). Packaged stamps ignore
+  runtime `WOC_*` channel escapes.
+- Fast local dir pack (host arch, still needs the three ids):
+  `npm run electron:pack:epic`.
+
+Full BuildPatchTool install, credential placeholders, sandbox vs Live,
+fail-closed upload script, and portal checklist:
+
+- `docs/epic-games-integration/bpt-upload.md`
+- `docs/epic-games-integration/portal-checklist.md`
+- Optional operator script: `node scripts/epic-bpt-upload.mjs` (or
+  `npm run epic:bpt-upload`). Not part of `npm test` / `npm run gate` / default
+  CI. Fails closed when BPT credentials or product/artifact ids are missing.
+  No live upload until the maintainer provides real org credentials and runs
+  it deliberately.
+
+Cannot complete a real BPT upload or store submission until the Epic org and
+product exist. Coding and merge stay dark-safe without those credentials.
+
 ## Error logging, crash dumps, privacy
 
 - Shell log file (rotating, 5 MB + one archive; paths follow the package NAME,
@@ -508,8 +595,9 @@ Rules that keep this working:
 5. Website channel only: with a higher-version build on the feed, the update toast
    appears, "Restart now" applies it, and a player who quits instead gets it on next
    launch; after the restart the log's startup banner still shows the production
-   `apiOrigin` channel (`updateChannel: latest`). Steam channel: confirm the log
-   says the updater is disabled and no update network traffic occurs.
+   `apiOrigin` channel (`updateChannel: latest`). Steam and Epic channels: confirm
+   the log says the updater is disabled and no update network traffic occurs
+   (SteamPipe / BPT own patches).
 6. Crash surfaces: `kill -SEGV <renderer pid>` THREE times within a minute (a
    task-manager "end task" is classified as a benign `killed` exit and does not
    trigger recovery). The first two SEGVs each produce a log entry and a bounded

@@ -32,7 +32,7 @@ performance evidence. Bare `polish/` evidence paths below are relative to
 
 ## Authored layout geometry
 
-Primary evidence is `tests/eastbrook_layout.test.ts`, with literal polish anchors also pinned in
+Primary evidence is `tests/eastbrook_layout_suite.test.ts`, with literal polish anchors also pinned in
 `tests/eastbrook_polish_capture_contract.test.ts`.
 
 | ID     | Requirement                                            | Current measured result                                                                                                                 | Status |

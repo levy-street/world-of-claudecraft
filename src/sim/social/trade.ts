@@ -15,7 +15,7 @@ import type { TradeInfo } from '../../world_api';
 import { addStacked, bagCapacity, countFit, removeStacked } from '../bags';
 import { RIFT_GEAR_ITEM_IDS } from '../content/rift/items';
 import { ITEMS } from '../data';
-import { removePreferFungible } from '../items';
+import { removeVendorSellUnits, type VendorRemovedUnit } from '../items';
 import type { PlayerMeta, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
 import { dist2d, type InvSlot, type ItemInstancePayload } from '../types';
@@ -177,13 +177,21 @@ export function tradeSetOffer(
 }
 
 // Removal phase of the swap: consumes one side's offer out of their bags,
-// preserving each slot's ItemInstancePayload (enchants, signed materials,
-// rolled quality, boundTo) for grantOffer instead of re-granting plain copies.
-// removePreferFungible already reports exactly which consumed slots carried an
-// instance; grantOffer only had to route those payloads back in through
-// addItemInstance rather than discarding them, the same way discardItem never
-// needed to because a discarded item's payload does not need to reappear
-// anywhere. sellItem is NOT the same case: it records vendor buyback (items.ts
+// preserving each removed unit's ItemInstancePayload (enchants, signed
+// materials, rolled quality, boundTo) AND its plain-stack craftedRecipeId
+// marker (bags.ts InvSlot.craftedRecipeId, professions/crafting.ts) for
+// grantOffer instead of re-granting a marker-free plain copy. Losing the
+// marker let a crafted item launder its provenance across a trade: the
+// recipient's copy looked identical to a never-crafted one, so disenchanting
+// it granted full Enchanting skill and bypassed the anti-farming gate
+// (professions/enchanting.ts isCraftedDisenchantVictim) the same way an
+// untracked vendor buyback used to before items.ts's removeVendorSellUnits/
+// recordVendorBuyback started threading the marker through sell/buyback.
+// Trade reuses that exact per-unit removal instead of removePreferFungible,
+// which only ever reported the instanced remainder and bulk-decremented the
+// plain count with no record of which stack (and therefore which marker) it
+// came from.
+// sellItem is NOT the same case: it records vendor buyback (items.ts
 // sellItem), and buyback re-grants a plain copy today, so a sold instanced item
 // still loses its payload there; that is a pre-existing sibling of this bug,
 // not fixed by this change.
@@ -192,7 +200,7 @@ export function tradeSetOffer(
 // consumes just-received copies (removeItem scans highest-index-first, exactly
 // where addItemInstance pushes) and a swapped instance bounces straight back
 // to its owner, or gets spared while a plain copy crosses in its place.
-type PendingGrant = { itemId: string; plainCount: number; instances: ItemInstancePayload[] };
+type PendingGrant = { itemId: string; units: VendorRemovedUnit[] };
 
 function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): PendingGrant[] {
   const grants: PendingGrant[] = [];
@@ -200,30 +208,44 @@ function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): Pendin
     // A trade removal NEVER consumes a trade-locked copy. The offer
     // was already clamped to the unbound count (tradeSetOffer / offerCovered),
     // so enough unbound copies exist; the skip predicate is defence in depth so
-    // removePreferFungible's highest-index-first walk spares a bound copy even
-    // if one sits above an unbound one. Every OTHER caller passes no predicate
-    // and keeps its byte-identical behavior.
-    const instances = removePreferFungible(ctx, s.itemId, s.count, fromPid, isTradeLocked);
-    grants.push({ itemId: s.itemId, plainCount: s.count - instances.length, instances });
+    // removeVendorSellUnits's highest-index-first walk spares a bound copy even
+    // if one sits above an unbound one.
+    const units = removeVendorSellUnits(ctx, s.itemId, s.count, fromPid, isTradeLocked);
+    grants.push({ itemId: s.itemId, units });
   }
   return grants;
 }
 
 function grantOffer(ctx: SimContext, grants: PendingGrant[], toPid: number): void {
   for (const g of grants) {
-    if (g.plainCount > 0) ctx.addItem(g.itemId, g.plainCount, toPid);
-    for (const instance of g.instances) {
+    // Plain units (no instance payload) re-grant bucketed by craftedRecipeId:
+    // a marker-free stack and a crafted stack of the same itemId stay two
+    // separate stacks on arrival (bags.ts addStacked keys its merge on the
+    // marker too), instead of one addItem call washing every plain unit's
+    // provenance into whichever marker happened to be checked last.
+    const plainByRecipe = new Map<string | undefined, number>();
+    for (const unit of g.units) {
+      if (unit.instance) continue;
+      plainByRecipe.set(unit.craftedRecipeId, (plainByRecipe.get(unit.craftedRecipeId) ?? 0) + 1);
+    }
+    for (const [craftedRecipeId, count] of plainByRecipe) {
+      ctx.addItem(g.itemId, count, toPid, { craftedRecipeId });
+    }
+    for (const unit of g.units) {
+      if (!unit.instance) continue;
       // Bind-on-trade stamp: a payload armed with bindOnTrade locks
       // to the recipient the first time it changes hands. The instances here
-      // are per-unit deep clones (removeItem's contract; the final unit of a
-      // fully-consumed slot is the original, whose slot is already gone), so
-      // stamping boundTo in place is safe and never aliases a surviving stack.
-      // Generic over the payload: any future bind-on-trade good rides this same
-      // arm with nothing item-specific here.
-      if (instance.bindOnTrade === true && instance.boundTo === undefined) {
-        instance.boundTo = toPid;
+      // are per-unit deep clones (removeVendorSellUnits mirrors removeItem's
+      // contract; the final unit of a fully-consumed slot is the original,
+      // whose slot is already gone), so stamping boundTo in place is safe and
+      // never aliases a surviving stack. Generic over the payload: any future
+      // bind-on-trade good rides this same arm with nothing item-specific here.
+      if (unit.instance.bindOnTrade === true && unit.instance.boundTo === undefined) {
+        unit.instance.boundTo = toPid;
       }
-      ctx.addItemInstance(g.itemId, instance, toPid);
+      ctx.addItemInstance(g.itemId, unit.instance, toPid, 1, {
+        craftedRecipeId: unit.craftedRecipeId,
+      });
     }
   }
 }
@@ -280,8 +302,28 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     for (const s of receives) {
       const plainCount = Math.min(s.count, ctx.countFungibleItem(s.itemId, giver.entityId));
       if (plainCount > 0) {
-        if (countFit(scratch, capacity, s.itemId, plainCount) < plainCount) return false;
-        addStacked(scratch, s.itemId, plainCount);
+        // grantOffer re-grants the plain units bucketed by craftedRecipeId (a
+        // marker-free stack and a crafted stack of the same itemId never merge
+        // on arrival, bags.ts addStacked keys on the marker); model that same
+        // bucket split here, walking the giver's plain slots highest-index-
+        // first (removeVendorSellUnits's order) instead of one flat
+        // marker-free countFit/addStacked call, or this capacity pre-check
+        // can see room in a stack the real grant cannot merge into and
+        // underpredict the receiver's slot usage (#2605 review).
+        const plainByRecipe = new Map<string | undefined, number>();
+        let plainLeft = plainCount;
+        for (let i = giver.inventory.length - 1; i >= 0 && plainLeft > 0; i--) {
+          const g = giver.inventory[i];
+          if (g.itemId !== s.itemId || g.instance) continue;
+          const take = Math.min(g.count, plainLeft);
+          plainByRecipe.set(g.craftedRecipeId, (plainByRecipe.get(g.craftedRecipeId) ?? 0) + take);
+          plainLeft -= take;
+        }
+        for (const [craftedRecipeId, count] of plainByRecipe) {
+          if (countFit(scratch, capacity, s.itemId, count, undefined, craftedRecipeId) < count)
+            return false;
+          addStacked(scratch, s.itemId, count, undefined, craftedRecipeId);
+        }
       }
       let remaining = s.count - plainCount;
       for (let i = giver.inventory.length - 1; i >= 0 && remaining > 0; i--) {

@@ -699,7 +699,6 @@
     border: 1px solid #4a3d1d;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
-    color: var(--color-text-muted);
     cursor: var(--cursor-point);
     opacity: 0.6;
     z-index: 7;
@@ -2828,7 +2827,7 @@
   }
   .mt-tab {
     background: #1a1410;
-    border: 1px solid var(--color-border-showcase);
+    border: 1px solid var(--gold);
     border-radius: 3px;
     color: var(--color-text-muted);
     font-size: 11px;
@@ -2901,6 +2900,506 @@
   .mt-row:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: -1px;
+  }
+
+  /* ---------- target aura window ---------- */
+  .ta-panel {
+    width: 220px;
+    height: var(--ta-preferred-height, 534px);
+    max-height: calc(100vh - 16px);
+    padding: 3px;
+    flex-direction: column;
+    container-type: inline-size;
+  }
+  /* The panel itself is only a positioning surface. Aura rows provide their
+     own meter-like plates; the outer box stays invisible like the reference
+     layout, including under frosted/custom panel themes. */
+  #target-auras-window {
+    border: 0;
+    outline: 0;
+    border-radius: 0;
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+  .ta-panel .panel-title {
+    min-height: 18px;
+    margin-bottom: 4px;
+    padding: 0 1px 2px;
+    justify-content: flex-start;
+    border-bottom: 1px dashed color-mix(in srgb, var(--gold-dim) 55%, transparent);
+    background: transparent;
+    opacity: 0.58;
+  }
+  .ta-panel .panel-title:hover,
+  .ta-panel.ta-unlocked .panel-title {
+    opacity: 0.9;
+  }
+  .ta-panel .ta-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-size: clamp(10px, 5.5cqw, 15px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ta-panel.empty .ta-target,
+  .ta-panel.empty .ta-sections {
+    display: none;
+  }
+  /* Unlocking doubles as a resize preview: empty columns return with one
+     skeletal row, so the player can judge both halves before real auras arrive. */
+  .ta-panel.empty.ta-unlocked .ta-sections {
+    display: grid;
+  }
+  .ta-panel.ta-unlocked {
+    outline: 1px dashed color-mix(in srgb, var(--gold) 62%, transparent);
+    outline-offset: 2px;
+  }
+  .ta-move-btn {
+    position: relative;
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    margin-left: auto;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--color-text-muted) 42%, transparent);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-bg-input) 72%, transparent);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    opacity: 0.78;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 1px 3px #0009;
+  }
+  .ta-rows-config-btn {
+    position: relative;
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    margin-left: auto;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--color-text-muted) 42%, transparent);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-bg-input) 72%, transparent);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    opacity: 0.78;
+  }
+  .ta-rows-config-btn::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    background-color: currentColor;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%205h10v2H3V5zm0%206h14v2H3v-2zm0%206h18v2H3v-2zm14-13h4v4h-4V4zm-4%206h4v4h-4v-4zm4%206h4v4h-4v-4z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%205h10v2H3V5zm0%206h14v2H3v-2zm0%206h18v2H3v-2zm14-13h4v4h-4V4zm-4%206h4v4h-4v-4zm4%206h4v4h-4v-4z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  .ta-rows-config-btn:hover,
+  .ta-rows-config-btn:focus-visible,
+  .ta-rows-config-btn[aria-expanded="true"] {
+    color: var(--gold);
+    border-color: var(--gold);
+    opacity: 1;
+  }
+  .ta-rows-config-btn:focus-visible,
+  .ta-visible-rows-step:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .ta-visible-rows-control {
+    position: absolute;
+    top: 28px;
+    right: auto;
+    left: 0;
+    z-index: 3;
+    align-items: center;
+    flex-wrap: wrap;
+    width: min(150px, calc(100vw - 16px));
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 3px;
+    background: var(--color-bg-input);
+    box-shadow: 0 2px 6px #0009;
+  }
+  .ta-visible-rows-step,
+  .ta-visible-rows-value {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+  }
+  .ta-visible-rows-step {
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--gold-dim) 60%, transparent);
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--color-bg-dark) 82%, transparent);
+    color: var(--color-text-light);
+    cursor: var(--cursor-point);
+    font-size: 18px;
+    line-height: 1;
+  }
+  .ta-visible-rows-step:hover,
+  .ta-visible-rows-step:focus-visible,
+  .ta-source-toggle.on {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  .ta-visible-rows-step[aria-disabled="true"] {
+    cursor: default;
+    opacity: 0.35;
+  }
+  .ta-visible-rows-value {
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+  }
+  .ta-source-toggle {
+    position: relative;
+    margin-left: 6px;
+  }
+  .ta-source-toggle::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    background-color: currentColor;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%2012a4%204%200%201%200%200-8%204%204%200%200%200%200%208zm0%202c-4.4%200-8%202.2-8%205v1h16v-1c0-2.8-3.6-5-8-5z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%2012a4%204%200%201%200%200-8%204%204%200%200%200%200%208zm0%202c-4.4%200-8%202.2-8%205v1h16v-1c0-2.8-3.6-5-8-5z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  .ta-opacity-control {
+    display: flex;
+    flex: 1 0 100%;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .ta-opacity-slider {
+    flex: 1 1 auto;
+    min-width: 0;
+    accent-color: var(--gold);
+    cursor: var(--cursor-point);
+  }
+  .ta-opacity-value {
+    flex: 0 0 38px;
+    color: var(--color-text-light);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .ta-move-btn::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    background-color: currentColor;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%201.5%208.5%205H11v6H5V8.5L1.5%2012%205%2015.5V13h6v6H8.5L12%2022.5%2015.5%2019H13v-6h6v2.5L22.5%2012%2019%208.5V11h-6V5h2.5z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%201.5%208.5%205H11v6H5V8.5L1.5%2012%205%2015.5V13h6v6H8.5L12%2022.5%2015.5%2019H13v-6h6v2.5L22.5%2012%2019%208.5V11h-6V5h2.5z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  .ta-move-btn.active {
+    color: var(--gold);
+    border-color: var(--gold);
+    opacity: 1;
+  }
+  .ta-move-btn.active::before {
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7%2010V7a5%205%200%200%201%2010%200v3h1.2A1.8%201.8%200%200%201%2020%2011.8v7.4A1.8%201.8%200%200%201%2018.2%2021H5.8A1.8%201.8%200%200%201%204%2019.2v-7.4A1.8%201.8%200%200%201%205.8%2010H7zm2%200h6V7a3%203%200%200%200-6%200v3z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7%2010V7a5%205%200%200%201%2010%200v3h1.2A1.8%201.8%200%200%201%2020%2011.8v7.4A1.8%201.8%200%200%201%2018.2%2021H5.8A1.8%201.8%200%200%201%204%2019.2v-7.4A1.8%201.8%200%200%201%205.8%2010H7zm2%200h6V7a3%203%200%200%200-6%200v3z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  .ta-move-btn:hover,
+  .ta-move-btn:focus-visible {
+    color: var(--gold);
+    border-color: var(--gold);
+    opacity: 1;
+  }
+  .ta-move-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .ta-panel:not(.ta-unlocked) .panel-resize-grip {
+    display: none;
+  }
+  .ta-target {
+    margin: 0 0 6px;
+    overflow: hidden;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ta-filters {
+    display: flex;
+    flex: 1 0 100%;
+    flex-wrap: nowrap;
+    width: 100%;
+    gap: 2px;
+    margin: 0;
+  }
+  .ta-filters .mt-tab {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 24px;
+    padding: 1px 3px;
+    overflow: hidden;
+    font-size: 9px;
+    line-height: 16px;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
+  .ta-filters .mt-tab.on {
+    background: color-mix(in srgb, var(--gold-dim) 22%, transparent);
+  }
+  .ta-section {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+  }
+  .ta-sections {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+  .ta-panel.ta-filter-debuffs .ta-sections,
+  .ta-panel.ta-filter-buffs .ta-sections {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ta-buff-section {
+    padding-left: 8px;
+    border-left: 1px solid color-mix(in srgb, var(--gold-dim) 40%, transparent);
+  }
+  .ta-sections.only-one .ta-section:not(.empty-section) {
+    grid-column: 1 / -1;
+    padding-left: 0;
+    border-left: 0;
+  }
+  .ta-section.empty-section {
+    display: none;
+  }
+  .ta-panel.ta-unlocked .ta-section.empty-section {
+    display: flex;
+  }
+  .ta-panel.ta-filter-debuffs .ta-section.ta-buff-section,
+  .ta-panel.ta-filter-buffs .ta-section.ta-debuff-section {
+    display: none;
+  }
+  .ta-panel.ta-unlocked.ta-filter-all .ta-sections.only-one .ta-section:not(.empty-section) {
+    grid-column: auto;
+    padding-left: 0;
+    border-left: 0;
+  }
+  .ta-section-title {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3px;
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 10px;
+    line-height: 14px;
+    text-transform: uppercase;
+  }
+  .ta-debuff-section .ta-section-title {
+    color: var(--color-hostile);
+  }
+  .ta-buff-section .ta-section-title {
+    color: var(--gold);
+  }
+  .ta-rows {
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .ta-panel .ta-rows {
+    flex: 1 1 auto;
+    max-height: var(--ta-visible-rows-height, 468px);
+  }
+  .ta-panel.ta-unlocked .empty-section .ta-rows::before {
+    content: "";
+    display: block;
+    height: clamp(17px, 4.2cqw, 20px);
+    border: 1px dashed color-mix(in srgb, var(--gold-dim) 48%, transparent);
+    border-radius: 2px;
+    background: repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-bg-input) 48%, transparent) 0 7px,
+      transparent 7px 14px
+    );
+    opacity: 0.6;
+  }
+  .ta-row {
+    --ta-row-height: clamp(17px, 4.2cqw, 20px);
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--ta-row-height) minmax(0, 1fr) auto;
+    grid-template-rows: 1fr;
+    height: var(--ta-row-height);
+    margin-bottom: 3px;
+    overflow: hidden;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 2px;
+    background: var(--color-bg-input);
+    opacity: var(--ta-row-opacity, 1);
+  }
+  .ta-row.own {
+    border-color: var(--gold);
+    box-shadow:
+      inset 3px 0 0 color-mix(in srgb, var(--gold) 82%, transparent),
+      inset 0 0 12px color-mix(in srgb, var(--gold) 13%, transparent);
+  }
+  .ta-row.debuff {
+    border-left-color: var(--color-hostile);
+  }
+  .ta-row.debuff.own {
+    border-left-color: var(--gold);
+  }
+  .ta-show-sources .ta-row {
+    --ta-row-height: clamp(36px, 8.5cqw, 46px);
+    grid-template-rows: 55% 45%;
+  }
+  .ta-show-sources.ta-unlocked .empty-section .ta-rows::before {
+    height: clamp(36px, 8.5cqw, 46px);
+  }
+  .ta-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: 0;
+    background: color-mix(in srgb, var(--gold-dim) 28%, transparent);
+  }
+  .ta-row.debuff .ta-fill {
+    background: color-mix(in srgb, var(--color-hostile) 25%, transparent);
+  }
+  .ta-icon {
+    position: relative;
+    z-index: 1;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    width: calc(var(--ta-row-height) - 2px);
+    height: calc(var(--ta-row-height) - 2px);
+    border-right: 1px solid var(--color-border-showcase);
+    background-position: center;
+    background-size: cover;
+  }
+  .ta-stacks {
+    position: absolute;
+    right: 1px;
+    bottom: 0;
+    color: var(--color-text-light);
+    font-size: 10px;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px var(--color-bg-dark);
+  }
+  .ta-stacks.empty {
+    display: none;
+  }
+  .ta-name,
+  .ta-source,
+  .ta-time {
+    position: relative;
+    z-index: 1;
+  }
+  .ta-name {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    overflow: hidden;
+    padding-left: 5px;
+    color: var(--color-text-light);
+    font-size: clamp(10.5px, 2.8cqw, 13px);
+    font-weight: bold;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ta-row.own .ta-name {
+    padding-left: 12px;
+  }
+  .ta-source {
+    display: none;
+    grid-column: 2;
+    grid-row: 2;
+    overflow: hidden;
+    padding-left: 5px;
+    color: var(--color-text-muted);
+    font-size: clamp(9.5px, 2.3cqw, 11px);
+    line-height: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ta-show-sources .ta-name {
+    align-self: end;
+  }
+  .ta-show-sources .ta-source {
+    display: block;
+  }
+  .ta-time {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    align-self: center;
+    padding: 0 5px;
+    color: var(--color-text-light);
+    font-size: clamp(10.5px, 2.5cqw, 12px);
+    font-variant-numeric: tabular-nums;
+  }
+  .ta-own-marker {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .ta-row.own::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    left: calc(var(--ta-row-height) - 4px);
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border: 1px solid #fff2b0;
+    background: var(--gold);
+    box-shadow: 0 0 4px #000;
+    transform: translateY(-50%) rotate(45deg);
+  }
+  .ta-row:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ta-row.expiring .ta-icon {
+      animation: aura-expire-blink 0.8s ease-in-out infinite;
+    }
+  }
+  /* Expiry remains visible on Low without keeping a compositor animation alive
+     for every expiring target aura. Full tiers retain the blink above. */
+  :root[data-fx-level="low"] .ta-row.expiring .ta-icon {
+    animation: none;
+    filter: brightness(1.4);
+  }
+  /* Low retains the actionable own-aura stripe and diamond while dropping the
+     per-row glow. Higher presets keep the subtle inset tint. */
+  :root[data-fx-level="low"] .ta-row.own {
+    box-shadow: inset 3px 0 0 color-mix(in srgb, var(--gold) 82%, transparent);
   }
   /* Hover breakdown painted into the shared #tooltip box (meters.ts): one row
      per ability, or per contributor on the Threat tab. The mini bar sits behind
@@ -5858,6 +6357,265 @@
      the lit rules below override it with a quick ON transition so the bird still
      lights crisply. Shared by the fire and the Chronomancy variants. */
   transition: opacity 0.7s ease;
+}
+
+/* Configurable Warrior proc frames. The cold controller owns placement and
+   appearance vars; the hot painter only toggles .active. */
+@layer components {
+  #aura-overlays {
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: var(--app-vw, 100vw);
+    height: var(--app-vh, 100vh);
+    z-index: 31;
+    pointer-events: none;
+  }
+  #aura-overlays.placement {
+    z-index: 34;
+    pointer-events: auto;
+  }
+  .aura-overlay-frame {
+    --aura-color: var(--color-aura-rpg-gold);
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--aura-color);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 0.16s ease,
+      filter 0.16s ease;
+  }
+  .aura-overlay-arcs-shell {
+    position: absolute;
+    left: var(--aura-arcs-x);
+    top: var(--aura-arcs-y);
+    width: 300px;
+    height: 220px;
+    translate: -50% -50%;
+    scale: var(--aura-arcs-scale);
+    pointer-events: none;
+  }
+  .aura-overlay-frame.active:not(.disabled) {
+    opacity: var(--aura-opacity);
+  }
+  #aura-overlays.placement .aura-overlay-frame {
+    opacity: 0;
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-preview {
+    opacity: 0.28;
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-target {
+    opacity: var(--aura-opacity);
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-icon,
+  #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-timer,
+  #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-arcs-shell {
+    display: block;
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-icon {
+    pointer-events: auto;
+    cursor: pointer;
+    touch-action: none;
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-target.placement-icon .aura-overlay-icon,
+  #aura-overlays.placement
+    .aura-overlay-frame.placement-target.placement-arcs
+    .aura-overlay-arcs-shell {
+    pointer-events: auto;
+    outline: 1px dashed var(--gold);
+    outline-offset: 4px;
+    touch-action: none;
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-target.placement-icon .aura-overlay-icon {
+    cursor: grab;
+  }
+  #aura-overlays.placement
+    .aura-overlay-frame.placement-target.placement-arcs
+    .aura-overlay-arcs-shell {
+    cursor: pointer;
+  }
+  #aura-overlays.placement
+    :is(.aura-overlay-arcs-shell, .aura-overlay-icon, .aura-overlay-move-handle).dragging {
+    cursor: grabbing;
+    filter: brightness(1.25);
+  }
+  .aura-overlay-arc {
+    position: absolute;
+    top: 18px;
+    width: 72px;
+    height: 184px;
+    pointer-events: none;
+    filter: drop-shadow(0 0 calc(var(--aura-glow-core) * var(--fx-shadow, 1)) currentColor)
+      drop-shadow(0 0 calc(var(--aura-glow-halo) * var(--fx-shadow, 1)) currentColor);
+  }
+  .aura-overlay-arc-left {
+    left: 20px;
+    border-left: 9px solid currentColor;
+    border-radius: 100% 0 0 100%;
+  }
+  .aura-overlay-arc-right {
+    right: 20px;
+    border-right: 9px solid currentColor;
+    border-radius: 0 100% 100% 0;
+  }
+  .aura-overlay-icon {
+    position: absolute;
+    left: clamp(
+      calc(var(--aura-icon-half) + env(safe-area-inset-left, 0px)),
+      var(--aura-icon-x),
+      calc(var(--app-vw, 100vw) - var(--aura-icon-half) - env(safe-area-inset-right, 0px))
+    );
+    top: clamp(
+      calc(var(--aura-icon-half) + env(safe-area-inset-top, 0px)),
+      var(--aura-icon-y),
+      calc(var(--app-vh, 100vh) - var(--aura-icon-half) - env(safe-area-inset-bottom, 0px))
+    );
+    width: 58px;
+    height: 58px;
+    translate: -50% -50%;
+    scale: var(--aura-icon-scale);
+    border: 2px solid currentColor;
+    border-radius: 9px;
+    box-shadow:
+      0 0 calc(var(--aura-glow-core) * var(--fx-shadow, 1)) currentColor,
+      0 0 calc(var(--aura-glow-halo) * var(--fx-shadow, 1)) currentColor;
+    opacity: 0.88;
+  }
+  .aura-overlay-timer {
+    position: absolute;
+    z-index: 1;
+    left: clamp(
+      calc(var(--aura-icon-half) + env(safe-area-inset-left, 0px)),
+      var(--aura-icon-x),
+      calc(var(--app-vw, 100vw) - var(--aura-icon-half) - env(safe-area-inset-right, 0px))
+    );
+    top: clamp(
+      calc(var(--aura-icon-half) + env(safe-area-inset-top, 0px)),
+      var(--aura-icon-y),
+      calc(var(--app-vh, 100vh) - var(--aura-icon-half) - env(safe-area-inset-bottom, 0px))
+    );
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    translate: -50% -50%;
+    scale: var(--aura-icon-scale);
+    border-radius: 7px;
+    background: conic-gradient(
+      from 0deg,
+      transparent var(--aura-remaining-ratio, 0%),
+      rgb(0 0 0 / 62%) 0
+    );
+    color: white;
+    font-size: 20px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    text-shadow:
+      0 1px 2px black,
+      0 0 4px black;
+    pointer-events: none;
+  }
+  .aura-overlay-move-handle {
+    position: absolute;
+    z-index: 2;
+    display: none;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 50%;
+    background: var(--panel-bg);
+    cursor: var(--cursor-point);
+    pointer-events: auto;
+    touch-action: none;
+    color: var(--gold);
+  }
+  .aura-overlay-move-handle::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    background: currentColor;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202l4%204h-3v5h5V8l4%204-4%204v-3h-5v5h3l-4%204-4-4h3v-5H6v3l-4-4%204-4v3h5V6H8l4-4z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202l4%204h-3v5h5V8l4%204-4%204v-3h-5v5h3l-4%204-4-4h3v-5H6v3l-4-4%204-4v3h5V6H8l4-4z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  #aura-overlays.placement .placement-target.placement-icon .aura-overlay-move-handle {
+    display: block;
+  }
+  #aura-overlays.placement .placement-target.placement-icon .aura-overlay-move-handle {
+    left: var(--aura-icon-x);
+    top: var(--aura-icon-y);
+    translate: 24px -48px;
+  }
+  #aura-overlays.placement .placement-target.placement-arcs .aura-overlay-move-handle {
+    left: var(--aura-arcs-x);
+    top: var(--aura-arcs-y);
+    translate: 126px -124px;
+  }
+  body.mobile-touch .aura-overlay-move-handle {
+    width: 40px;
+    height: 40px;
+  }
+  .aura-overlay-frame.hide-icon :is(.aura-overlay-icon, .aura-overlay-timer),
+  .aura-overlay-frame.hide-arcs .aura-overlay-arcs-shell {
+    display: none;
+  }
+  .aura-overlay-frame.loadout-hidden {
+    display: none;
+  }
+  .aura-overlay-battle {
+    --aura-color: var(--color-aura-rpg-electric);
+  }
+  .aura-overlay-death {
+    --aura-color: var(--color-aura-rpg-violet);
+  }
+  .aura-overlay-victory {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-overlay-fire {
+    --aura-color: #ff8a33;
+  }
+  .aura-overlay-frost {
+    --aura-color: #54d9ff;
+  }
+  .aura-overlay-arcane {
+    --aura-color: #bd63ff;
+  }
+  .aura-overlay-paladin {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-overlay-hunter {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-overlay-rogue {
+    --aura-color: var(--color-aura-rpg-violet);
+  }
+  .aura-overlay-priest {
+    --aura-color: var(--color-aura-rpg-electric);
+  }
+  .aura-overlay-shaman {
+    --aura-color: var(--color-aura-rpg-electric);
+  }
+  .aura-overlay-warlock {
+    --aura-color: var(--color-aura-rpg-violet);
+  }
+  .aura-overlay-druid {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  body.reduce-motion .aura-overlay-frame {
+    transition: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .aura-overlay-frame {
+      transition: none;
+    }
+  }
 }
 /* The login preview: for a few seconds after entering the world the whole
    bird glows dimly, so the player can see where it lives and drag it BEFORE

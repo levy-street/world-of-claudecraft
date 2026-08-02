@@ -23,6 +23,9 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const handled = matches(mainSide, /ipcMain\.handle\('([^']+)'/g);
     expect([...invoked].sort()).toEqual(
       expect.arrayContaining([
+        'desktop-epic-capability',
+        'desktop-epic-link-proof',
+        'desktop-epic-link-settled',
         'desktop-login-open-browser',
         'desktop-login-take-code',
         'desktop-set-strings',
@@ -90,6 +93,16 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(body).toContain('steamShell.cancelLinkTicket()');
   });
 
+  it('the epic-link-settled handler body cancels the live proof handle', () => {
+    // Mirror of the Steam settle contract: the channel exists so the shell can
+    // release any cancelable EOS adapter handle promptly after the link POST.
+    const main = read('electron/main.cjs');
+    const start = main.indexOf("ipcMain.handle('desktop-epic-link-settled'");
+    expect(start).toBeGreaterThan(-1);
+    const body = main.slice(start, main.indexOf('});', start));
+    expect(body).toContain('epicShell.cancelLinkProof()');
+  });
+
   it('reports whether the external wallet authorization page actually opened', () => {
     const main = read('electron/main.cjs');
     const start = main.indexOf("ipcMain.handle('desktop-wallet-open-browser'");
@@ -118,6 +131,9 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'steamLinkTicket',
       'steamLinkSupported',
       'steamLinkSettled',
+      'epicLinkProof',
+      'epicLinkSupported',
+      'epicLinkSettled',
       'walletConnectionSupported',
       'openWalletBrowser',
       'takeWalletHandoffCode',

@@ -80,7 +80,7 @@ function harness(initial: LockpickView | null, host: 'online' | 'offline' = 'onl
     '<div id="lockpick-panel" class="window panel" style="display:none"></div>';
   const panel = document.getElementById('lockpick-panel') as HTMLElement;
   const release = vi.fn();
-  const trap: FocusTrapHandle = { focusFirst: vi.fn(), release };
+  const trap: FocusTrapHandle = { focusFirst: vi.fn(), release, opener: vi.fn(() => null) };
   // Two spies for ATTRIBUTION only. Production wires the dep as
   // `hideTooltip: () => this.hideTooltip()` where the controller is built, so in the client
   // these ARE one call; splitting them here lets a case say which caller owed the hide, and

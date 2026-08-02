@@ -139,7 +139,9 @@ export function hasWaterShaderAssets(): boolean {
 }
 
 const DEEP_COLOR = new THREE.Color(0x0d3a52);
-const SHALLOW_COLOR = new THREE.Color(0x2d8077);
+/** Canonical shallow-water tint, exported for surfaces that must match the
+ *  sea palette without the full shader (the Wildheart waterfall ribbons). */
+export const SHALLOW_COLOR = new THREE.Color(0x2d8077);
 const SKY_TINT = new THREE.Color(0x7fb2e0); // matches the sky horizon band
 const SUN_COLOR = new THREE.Color(0xfff0d4);
 
@@ -266,6 +268,7 @@ const WATER_FRAG = /* glsl */ `
   uniform float uWaveEnabled;
   uniform vec2 uWaveOrigin;
   uniform float uWaveSize;
+  uniform float uShoreEdgeFade;
   varying vec3 vWPos;
   varying float vShoreDepth;
   varying float vShoreSlope;
@@ -344,6 +347,13 @@ const WATER_FRAG = /* glsl */ `
       mix(${glsl(WATER_SHALLOW_ALPHA)}, ${glsl(WATER_DEEP_ALPHA)}, opacityDepth),
       surfaceAccent * 0.95
     );
+    // Contour waterline (uShoreEdgeFade, interior strips/pools only): the
+    // surface dissolves where the baked depth reaches zero, so the visible
+    // bank is the terrain's own wet line, never the mesh rectangle. The noise
+    // term wobbles the line so it reads as a shore, not a clip path. Off (0)
+    // collapses the mix to 1.0: the overworld shader is byte-identical.
+    float edgeWobble = 0.18 * sin(vWPos.x * 1.7 + vWPos.z * 2.3) + 0.12 * sin(vWPos.z * 4.1 - vWPos.x * 3.3);
+    alpha *= mix(1.0, smoothstep(0.12, 0.85, vShoreDepth + edgeWobble * uShoreEdgeFade), uShoreEdgeFade);
     gl_FragColor = vec4(col, alpha);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -362,7 +372,9 @@ function disposeOwned(meshes: THREE.Mesh[]): void {
   for (const material of materials) material.dispose();
 }
 
-function zeroWaveUniforms(): WaterWaveUniforms {
+/** Inert wave uniforms for surfaces with no interactive height field (no
+ *  renderer to run the simulation, or an interior pool outside its window). */
+export function zeroWaveUniforms(): WaterWaveUniforms {
   return {
     uWaveState: { value: WATER_TEX.n1 },
     uWaveEnabled: { value: 0 },
@@ -371,15 +383,26 @@ function zeroWaveUniforms(): WaterWaveUniforms {
   };
 }
 
-function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterView {
-  // legacy procedural maps still get generated (unused) to preserve the
-  // shared-LCG call order in textures.ts for everything generated after
-  waterNormalMaps();
-  const simulation = renderer ? new WaterSimulation(renderer) : null;
-  const wave = simulation ? simulation.uniforms : zeroWaveUniforms();
-  // ONE material for every zone plane and the apron, so the field's uniform
-  // objects (shared by reference, like uTime) drive the whole surface.
-  const material = new THREE.ShaderMaterial({
+/**
+ * The one overworld water surface material (dual-scroll + swell normal maps,
+ * fresnel sky tint, HDR sun glints, shore foam, fog). Exported so interior
+ * builders (the Wildheart Basin) draw the exact same surface; geometry fed to
+ * it must carry aShoreDepth/aShoreSlope attributes. Callers gate on
+ * GFX.standardMaterials && hasWaterShaderAssets() exactly like buildWater.
+ *
+ * `shoreEdgeFade` fades the surface to nothing where the baked depth reaches
+ * zero, so the WATERLINE follows the terrain contour instead of the geometry
+ * boundary. The overworld planes leave it off (their rect edges hide under
+ * carved bathymetry and the apron); an interior strip or pool laid over its
+ * own heightfield turns it on so a rectangular mesh cannot read as a
+ * hard-edged sheet. Off is the exact pre-option shader (the mix collapses to
+ * 1.0), so overworld output is unchanged.
+ */
+export function createWaterSurfaceMaterial(
+  wave: WaterWaveUniforms,
+  opts?: { shoreEdgeFade?: boolean },
+): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
     uniforms: {
       ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
       uNorm1: { value: WATER_TEX.n1 },
@@ -395,6 +418,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       uWaveEnabled: wave.uWaveEnabled,
       uWaveOrigin: wave.uWaveOrigin,
       uWaveSize: wave.uWaveSize,
+      uShoreEdgeFade: { value: opts?.shoreEdgeFade ? 1 : 0 },
     },
     vertexShader: WATER_VERT,
     fragmentShader: WATER_FRAG,
@@ -402,6 +426,17 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     depthWrite: false,
     fog: true,
   });
+}
+
+function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterView {
+  // legacy procedural maps still get generated (unused) to preserve the
+  // shared-LCG call order in textures.ts for everything generated after
+  waterNormalMaps();
+  const simulation = renderer ? new WaterSimulation(renderer) : null;
+  const wave = simulation ? simulation.uniforms : zeroWaveUniforms();
+  // ONE material for every zone plane and the apron, so the field's uniform
+  // objects (shared by reference, like uTime) drive the whole surface.
+  const material = createWaterSurfaceMaterial(wave);
 
   const meshes: THREE.Mesh[] = [];
   const group = new THREE.Group();

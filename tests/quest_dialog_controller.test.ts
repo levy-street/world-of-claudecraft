@@ -71,7 +71,15 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
   } as unknown as IWorld;
   const release = vi.fn();
   const focusFirst = vi.fn();
-  const trap: FocusTrapHandle = { release, focusFirst };
+  // The element the dialog's OWN focus trap recorded as ITS opener (e.g. the
+  // world interact prompt that opened the quest dialog): stays connected and
+  // visible outside #quest-dialog, unlike a button inside the dialog, which
+  // close(false) hides before a successor window's restore() would run.
+  const trapOpener = document.createElement('button');
+  trapOpener.id = 'world-interact-prompt';
+  document.body.appendChild(trapOpener);
+  const trapOpenerFn = vi.fn(() => trapOpener as HTMLElement | null);
+  const trap: FocusTrapHandle = { release, focusFirst, opener: trapOpenerFn };
   const voice = {
     play: vi.fn(),
     isPlaying: vi.fn(() => true),
@@ -139,6 +147,8 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
     reportTelemetry,
     release,
     focusFirst,
+    trapOpener,
+    trapOpenerFn,
     voice,
     openChronicles,
     openVendor,
@@ -352,8 +362,10 @@ describe('QuestDialogController', () => {
     vendorNpc.vendorItems = ['minor_healing_potion'];
     const vendor = harness(vendorNpc);
     vendor.controller.open(vendorNpc.id);
-    vendor.element.querySelector<HTMLButtonElement>('[data-vendor]')?.click();
-    expect(vendor.openVendor).toHaveBeenCalledWith(vendorNpc.id);
+    const vendorButton = vendor.element.querySelector<HTMLButtonElement>('[data-vendor]');
+    vendorButton?.focus();
+    vendorButton?.click();
+    expect(vendor.openVendor).toHaveBeenCalledWith(vendorNpc.id, vendor.trapOpener);
     expect(vendor.release).toHaveBeenCalledWith(false);
 
     const marketId = Object.values(NPCS).find((definition) => definition.market)?.id;
@@ -367,8 +379,10 @@ describe('QuestDialogController', () => {
 
     const heroic = harness(npc(42, heroicId));
     heroic.controller.open(42);
-    heroic.element.querySelector<HTMLButtonElement>('[data-heroic-shop]')?.click();
-    expect(heroic.openHeroicVendor).toHaveBeenCalledWith(42);
+    const heroicButton = heroic.element.querySelector<HTMLButtonElement>('[data-heroic-shop]');
+    heroicButton?.focus();
+    heroicButton?.click();
+    expect(heroic.openHeroicVendor).toHaveBeenCalledWith(42, heroic.trapOpener);
 
     const boardNpcId = DELVES.collapsed_reliquary.boardNpcId;
     const board = harness(npc(43, boardNpcId));
@@ -385,6 +399,46 @@ describe('QuestDialogController', () => {
     cardMaster.controller.open(45);
     cardMaster.element.querySelector<HTMLButtonElement>('[data-card-duel]')?.click();
     expect(cardMaster.openCardDuel).toHaveBeenCalledTimes(1);
+  });
+
+  it("hands the successor window the DIALOG TRAP's own opener, not the in-dialog button (WCAG 2.4.3)", () => {
+    // Regression for the second review finding on PR #2619: the first fix
+    // captured document.activeElement (the in-dialog gossip button) BEFORE
+    // close(false) hid #quest-dialog, but that button still lives INSIDE the
+    // dialog's own subtree, so by the time the successor window's
+    // focusManager.restore() runs later (after close(false) has taken
+    // effect), the button fails FocusManager.canFocus (display:none ancestor,
+    // getClientRects().length === 0) and focus still falls to <body>. The
+    // real fix hands the successor the quest dialog's OWN trap opener
+    // instead: a sibling element outside the dialog (e.g. the world interact
+    // prompt) that stays connected and visible for the whole time the vendor
+    // window is open, exactly like openBank()'s live side-rail button.
+    const vendorNpc = npc(50, ordinaryNpcId());
+    vendorNpc.vendorItems = ['minor_healing_potion'];
+    const test = harness(vendorNpc);
+    test.controller.open(vendorNpc.id);
+    const vendorButton = test.element.querySelector<HTMLButtonElement>('[data-vendor]');
+    expect(vendorButton).not.toBeNull();
+    vendorButton?.focus();
+    expect(test.document.activeElement).toBe(vendorButton);
+
+    vendorButton?.click();
+
+    // The dialog is hidden by the time openVendor is invoked...
+    expect(test.element.style.display).toBe('none');
+    // ...openVendor received the trap's OWN opener, read from the trap
+    // handle rather than document.activeElement...
+    expect(test.trapOpenerFn).toHaveBeenCalled();
+    expect(test.openVendor).toHaveBeenCalledWith(vendorNpc.id, test.trapOpener);
+    // ...and, unlike the in-dialog button, that element sits OUTSIDE the
+    // hidden #quest-dialog subtree: jsdom never lays out real geometry (so
+    // FocusManager.canFocus's getClientRects() check cannot be exercised
+    // here), but this is the structural precondition it depends on, and it
+    // is exactly what the in-dialog button fails once close(false) hides its
+    // ancestor.
+    expect(test.trapOpener.isConnected).toBe(true);
+    expect(test.element.contains(test.trapOpener)).toBe(false);
+    expect(vendorButton && test.element.contains(vendorButton)).toBe(true);
   });
 
   it('a station master offers the Train option and routes it to openTrain', () => {

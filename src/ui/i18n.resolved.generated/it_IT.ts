@@ -923,6 +923,23 @@ export const it_IT: EnTranslations = {
       "separate": "Separa {meter}",
       "regroup": "Raggruppa {meter}"
     },
+    "targetAuras": {
+      "title": "Aure del bersaglio",
+      "keybindLabel": "Potenziamenti e indebolimenti del bersaglio",
+      "all": "Tutti",
+      "debuffs": "Indebolimenti",
+      "buffs": "Potenziamenti",
+      "unlock": "Sposta la finestra delle aure del bersaglio",
+      "lock": "Blocca la finestra delle aure del bersaglio",
+      "configureRows": "Configura le aure del bersaglio",
+      "fewerRows": "Preferisci meno righe di aure",
+      "moreRows": "Preferisci più righe di aure",
+      "visibleRows": "Righe di aure preferite: {count}",
+      "showSources": "Mostra le fonti delle aure",
+      "hideSources": "Nascondi le fonti delle aure",
+      "ownAura": "La tua aura",
+      "opacity": "Opacità delle aure: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Il famiglio e a salute piena",
       "disabledNoFood": "Nessun cibo nelle borse curera il tuo famiglio"
@@ -967,13 +984,15 @@ export const it_IT: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, il Rospo Saltombra",
       "name_stormfeather_griffin": "Piumatempesta Toccacielo",
       "name_thunderstrut_gobbler": "Passotuono, il Gran Tacchino",
+      "name_terrorspark_groundshaker": "Terrorscintilla, Scuoteterra",
       "desc_valorsteed": "Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_grag_bear": "Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_stalkglider_snail": "Una lumaca tenace e a combustione lenta che aumenta la velocità di viaggio.",
       "desc_aether_hover_cycle": "Una potente moto magitech pensata per spostamenti da combattimento rapidi e radenti.",
       "desc_shadowjump_toad": "Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.",
       "desc_stormfeather_griffin": "Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.",
-      "desc_thunderstrut_gobbler": "Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta."
+      "desc_thunderstrut_gobbler": "Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta.",
+      "desc_terrorspark_groundshaker": "Una macchina corazzata compatta con cingoli pesanti, un cannone di grosso calibro e una sella costruita per piloti impavidi."
     },
     "mountTraining": {
       "mountPrompt": "Premi {key} per salire sul Valorsteed di addestramento.",
@@ -1343,6 +1362,51 @@ export const it_IT: EnTranslations = {
       "badges": {
         "backgrounded": "In secondo piano",
         "offline": "Offline"
+      }
+    },
+    "auraOverlay": {
+      "title": "Aure",
+      "currentClass": "Classe attuale: {class}",
+      "previewHint": "Usa Configura posizioni per spostare un’aura senza coprire il menu.",
+      "noProcs": "Nessun proc supportato è disponibile per questo personaggio.",
+      "enabled": "Mostra aura",
+      "icon": "Icona incantesimo",
+      "arcs": "Mezzelune laterali",
+      "groundRing": "Anello a terra",
+      "groundRingSpellOrder": "Anello a terra: ordine degli incantesimi",
+      "crescentsSpellOrder": "Mezzelune laterali: ordine degli incantesimi",
+      "size": "Dimensione",
+      "iconSize": "Dimensione icona",
+      "crescentBlockSize": "Dimensione blocchi mezzaluna",
+      "groundRingBlockSize": "Dimensione blocchi anello a terra",
+      "opacity": "Opacità",
+      "color": "Colore",
+      "allOn": "Attiva tutto",
+      "allOff": "Disattiva tutto",
+      "reposition": "Configura posizioni",
+      "positioning": "Posizionamento: {aura}",
+      "selectAura": "Aura",
+      "done": "Fine",
+      "moveLeft": "Sposta a sinistra",
+      "moveUp": "Sposta su",
+      "moveDown": "Sposta giù",
+      "moveRight": "Sposta a destra",
+      "moveEarlier": "Sposta l’incantesimo verso l’interno",
+      "moveLater": "Sposta l’incantesimo verso l’esterno",
+      "screenPosition": "Posizione sullo schermo",
+      "spellOrder": "Ordine degli incantesimi",
+      "reset": "Ripristina posizione",
+      "spellPosition": "Ordine incantesimi {position} / {count}",
+      "procs": {
+        "revenge": "Vendetta!",
+        "battleTrance": "Trance di Battaglia",
+        "overpowerCharge": "Potenziamento di Mano Rossa",
+        "suddenDeath": "Morte Improvvisa",
+        "victoryRush": "Impeto della Vittoria",
+        "enrage": "Carneficina: Infuriato",
+        "heatingUp": "Riscaldamento",
+        "arcaneCharge": "Cariche Arcane",
+        "aetherRush": "Impeto d’Etere"
       }
     },
     "playerCard": {
@@ -2151,6 +2215,14 @@ export const it_IT: EnTranslations = {
       "linked": "Collegato all'account Steam {id}",
       "benefits": "Collega il tuo account Steam dall'app desktop per rispecchiare le imprese che ottieni negli obiettivi di Steam.",
       "noTicket": "Steam non ha fornito un ticket di collegamento. Avvia Steam e riprova."
+    },
+    "epic": {
+      "title": "Epic",
+      "link": "Collega Epic",
+      "unlink": "Scollega Epic",
+      "linked": "Collegato all’account Epic {id}",
+      "benefits": "Collega il tuo account Epic dall’app desktop di Epic per riportare le imprese che ottieni negli obiettivi Epic.",
+      "noProof": "Epic non ha fornito una prova di collegamento. Avvia dall’Epic Games Store, poi riprova."
     },
     "mailbox": {
       "title": "Cassetta postale",
@@ -3002,6 +3074,14 @@ export const it_IT: EnTranslations = {
       "already_linked": "Il tuo account ha già un account Steam collegato.",
       "account_taken": "Quell'account Steam è già collegato a un altro account.",
       "upstream": "Steam non ha risposto. Riprova tra un istante."
+    },
+    "epic": {
+      "disabled": "Il collegamento con Epic non è disponibile al momento.",
+      "invalid_token": "Epic non ha potuto verificare questa richiesta di collegamento. Riprova dall’app desktop.",
+      "banned": "Quell’account Epic non può essere collegato.",
+      "already_linked": "Il tuo account ha già un account Epic collegato.",
+      "account_taken": "Quell’account Epic è già collegato a un altro account.",
+      "upstream": "Epic non ha risposto. Riprova tra un momento."
     },
     "wallet": {
       "handoff_invalid": "L'autorizzazione del portafoglio è scaduta o non ha potuto essere verificata. Riprova."
@@ -6257,11 +6337,15 @@ export const it_IT: EnTranslations = {
       "graphicsPresetMedium": "Media",
       "graphicsPresetHigh": "Alta",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Estrema",
       "graphicsPresetAdvanced": "Avanzata",
       "terrainDetail": "Dettaglio terreno",
       "foliageDensity": "Densità vegetazione",
       "effectsQuality": "Effetti e luci",
       "shadowQuality": "Qualità ombre",
+      "surfaceDetail": "Dettaglio superfici",
+      "surfaceDetailBasic": "Base",
+      "surfaceDetailFull": "Completo",
       "terrainLow": "Basso",
       "terrainHigh": "Alto",
       "touchOpacity": "Opacità comandi touch",
@@ -6425,6 +6509,8 @@ export const it_IT: EnTranslations = {
       "joinParty": "Unisciti al gruppo",
       "guildInvite": "{name} ti invita a unirti a {guild}.",
       "joinGuild": "Unisciti alla gilda",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} vuole commerciare con te.",
       "openTrade": "Apri scambio",
       "duelRequest": "{name} ti ha sfidato a duello!",
@@ -6438,6 +6524,7 @@ export const it_IT: EnTranslations = {
       "floatingDodge": "Schivata",
       "floatingParry": "Parata",
       "floatingResist": "Resistito",
+      "floatingEvade": "Evitato",
       "floatingHealFull": "Pieno",
       "floatingHealAbsorbed": "Assorbito",
       "cannotMove": "Non puoi muoverti!",
@@ -6450,6 +6537,7 @@ export const it_IT: EnTranslations = {
       "dodged": "{target} schiva il tuo {ability}.",
       "parried": "Il tuo {ability} viene parato da {target}.",
       "resisted": "{target} resiste al tuo {ability}.",
+      "evaded": "Il tuo {ability} viene evitato da {target}.",
       "healSelf": "Il tuo {ability} ti cura di {amount}.",
       "healSelfCrit": "Il tuo {ability} ti cura criticamente di {amount}.",
       "healOther": "Il tuo {ability} cura {target} di {amount}.",
@@ -7017,6 +7105,8 @@ export const it_IT: EnTranslations = {
       "close": "Chiudi venditore",
       "hint": "Clicca su un oggetto nelle borse per venderlo mentre questa finestra è aperta.",
       "buyAria": "Compra {item} per {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Riacquisto",
       "buybackEmpty": "Nessun oggetto",
       "buybackAria": "Riacquista {item} per {price}",
@@ -7296,7 +7386,7 @@ export const it_IT: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilità superiore",
-        "description": "Svanisci per 20 s: rimuove 2 effetti di danno periodico e riduce i danni subiti del 90% mentre sei invisibile e per breve tempo dopo. (Talento del mago)"
+        "description": "Svanisci per 20 s e rimuovi 2 effetti di danno nel tempo. Quando l’invisibilità termina, subisci il 90% di danni in meno per 2 s. (Talento del mago)"
       },
       "hot_streak": {
         "name": "Vampata",
@@ -9635,6 +9725,18 @@ export const it_IT: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Pugnale Zanna di Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Spiedo da Bestie del Signore delle Zanne"
+      },
+      "bloodmane_warleggings": {
+        "name": "Cosciali da Guerra Criniera di Sangue"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Brache da Agguato Artiglio di Vite"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sarong Rituale Ossosole"
+      },
       "thick_winter_pelt": {
         "name": "Pelliccia Invernale Spessa"
       },
@@ -9802,6 +9904,9 @@ export const it_IT: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Sigillo dell’Ultima Rocca"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Chiave d’accensione: Terrorscintilla, Scuoteterra"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
@@ -10378,6 +10483,24 @@ export const it_IT: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Bende del coro dei wyrm"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunica del Predatore del Bacino"
+      },
+      "verdant_heart_vestment": {
+        "name": "Veste del Cuore Verdeggiante"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Usbergo Rituale Ossosole"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Granzanna del Bacino"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Corona dell'Oracolo Ossosole"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Gambali da Guerra Criniera di Sangue"
       },
       "deathless_greatblade": {
         "name": "Spadone senza morte"

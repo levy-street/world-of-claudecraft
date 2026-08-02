@@ -7,6 +7,16 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const da_DK: Record<string, string> = {
+  'onlinePlayers.autoRefresh': 'Automatisk opdatering ({minutes} min.)',
+  'onlinePlayers.count': '{count} spillere online',
+  'onlinePlayers.countFiltered': '{shown} af {total} online',
+  'onlinePlayers.filteredEmpty': 'ingen spiller online matcher denne søgning',
+  'onlinePlayers.loadFailed': 'kunne ikke indlæse spillere online',
+  'onlinePlayers.loading': 'indlæser spillere online…',
+  'onlinePlayers.refresh': 'Opdater',
+  'onlinePlayers.searchLabel': 'Søg efter spillere online',
+  'onlinePlayers.searchPlaceholder': 'Søg spiller, klasse, zone…',
+  'onlinePlayers.sortHint': 'klik på en kolonne for at sortere',
   'alert.passwordLength': 'Indtast en ny adgangskode på 6 til 128 tegn.',
   'detail.resetPassword': 'Nulstil adgangskode',
   'dialog.actionResetPassword': 'Angiv en ny adgangskode og log ud af alle enheder',
@@ -119,7 +129,6 @@ export const da_DK: Record<string, string> = {
   'stats.avgTick': 'gns. tick',
   'stats.serverRss': 'server-rss',
   'online.title': 'Spillere online',
-  'online.refreshHint': 'opdaterer hvert 5. sekund',
   'online.empty': 'ingen er online lige nu',
   'online.colCharacter': 'Karakter',
   'online.colClass': 'Klasse',

@@ -10,6 +10,8 @@ import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayout } from '../src/world_api/action_bar';
+import { bustAdminGuildListReads } from './admin_guilds_read';
+import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import { validCharName } from './auth';
 import type { BankBonusFacts } from './bank_entitlements';
@@ -773,6 +775,19 @@ CREATE TABLE IF NOT EXISTS steam_links (
   steam_id TEXT NOT NULL UNIQUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- Epic account links (the deeds achievement mirror). Copies the steam_links
+-- shape: one Epic account per WoCC account (account_id is the PK) and one
+-- WoCC account per Epic id (epic_account_id is UNIQUE). A row is a cosmetic-
+-- mirror pointer only, proven by a server-verified link proof at link time
+-- (server/epic/): it is NEVER an identity or session source, and login stays
+-- email + Discord only. Accessors live in server/epic/epic_db.ts. Purely
+-- additive leaf: a pre-Epic rollback binary never references it, and the
+-- CASCADE keeps account deletion consistent even under old code.
+CREATE TABLE IF NOT EXISTS epic_links (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  epic_account_id TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 CREATE TABLE IF NOT EXISTS daily_reward_days (
   day TEXT NOT NULL,
   realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
@@ -1091,6 +1106,7 @@ export async function ensureSchema(): Promise<void> {
     // fresh database SCHEMA alone could not create it.
     await client.query(DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL);
     await client.query(SOCIAL_SCHEMA);
+    await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(OAUTH_SCHEMA);
     // Discord integration tables (links, oauth states, pending logins, reward
     // economy). FK-references accounts(id), so it runs after SCHEMA. Applied
@@ -2893,6 +2909,7 @@ export async function reclaimDeactivatedName(name: string): Promise<boolean> {
       [row.id, freed],
     );
     await client.query('COMMIT');
+    bustAdminGuildListReads();
     return true;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -2907,7 +2924,9 @@ export async function deleteCharacter(accountId: number, characterId: number): P
     'DELETE FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
   );
-  return (res.rowCount ?? 0) > 0;
+  const deleted = (res.rowCount ?? 0) > 0;
+  if (deleted) bustAdminGuildListReads();
+  return deleted;
 }
 
 // How many characters this account has on each realm, deliberately NOT
@@ -2960,7 +2979,9 @@ export async function renameCharacter(
      RETURNING id, account_id, name, class, level, state, is_gm, force_rename`,
     [characterId, accountId, name, REALM],
   );
-  return res.rows[0] ?? null;
+  const renamed = res.rows[0] ?? null;
+  if (renamed) bustAdminGuildListReads();
+  return renamed;
 }
 
 // Persist a character row. Returns true when the write landed. When a leaseNonce is
@@ -3218,7 +3239,23 @@ export interface LifetimeXpLeaderRow {
   // The selected Book of Deeds title (a deed id the client localizes; never
   // English), null when untitled. The charactersForDeedsBoard read shape.
   activeTitle: string | null;
+  // The character's guild display name, null when unguilded. Shown beside the
+  // name on both ranked surfaces (the home-page board and the in-game panel),
+  // the same `<Guild>` treatment the nameplate already uses.
+  guild: string | null;
 }
+
+// Guild display name per ranked character, as a SELECT-list scalar subquery so
+// the ranking itself is untouched: the WHERE / ORDER BY still key on the bare
+// LIFETIME_XP_EXPR, so the expression indexes keep serving both arms. Correlated
+// on characters.id, which is guild_members' primary key (a character sits in at
+// most one guild), so the lookup is a single index probe per ranked row and the
+// membership row alone decides the guild (no realm predicate needed: the global
+// arm ranks characters from every realm).
+const LEADER_GUILD_NAME_SQL = `(SELECT g.name
+                  FROM guild_members gm
+                  JOIN guilds g ON g.id = gm.guild_id
+                 WHERE gm.character_id = characters.id) AS guild_name`;
 
 // `global: true` ranks across every realm (for the home-page board); otherwise
 // it is scoped to this process's realm (the in-game panel). Both paths filter
@@ -3238,7 +3275,8 @@ export async function topLifetimeXp(
           `SELECT name, class, level, realm,
                 COALESCE((state->>'lifetimeXp')::bigint, 0) AS lifetime_xp,
                 COALESCE((state->>'prestigeRank')::int, 0)  AS prestige_rank,
-                state->>'activeTitle' AS active_title
+                state->>'activeTitle' AS active_title,
+                ${LEADER_GUILD_NAME_SQL}
            FROM characters
           WHERE state IS NOT NULL
             AND ${LIFETIME_XP_EXPR} > 0
@@ -3252,7 +3290,8 @@ export async function topLifetimeXp(
           `SELECT name, class, level, realm,
                 COALESCE((state->>'lifetimeXp')::bigint, 0) AS lifetime_xp,
                 COALESCE((state->>'prestigeRank')::int, 0)  AS prestige_rank,
-                state->>'activeTitle' AS active_title
+                state->>'activeTitle' AS active_title,
+                ${LEADER_GUILD_NAME_SQL}
            FROM characters
           WHERE realm = $1 AND state IS NOT NULL
             AND ${LIFETIME_XP_EXPR} > 0
@@ -3273,6 +3312,8 @@ export async function topLifetimeXp(
     // Normalized like charactersForDeedsBoard: a non-empty string or null.
     activeTitle:
       typeof r.active_title === 'string' && r.active_title !== '' ? r.active_title : null,
+    // Same normalization: the subquery yields NULL for an unguilded character.
+    guild: typeof r.guild_name === 'string' && r.guild_name !== '' ? r.guild_name : null,
   }));
 }
 

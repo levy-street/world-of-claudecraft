@@ -124,16 +124,26 @@ export function removeMatchingInstance(
  *  every current source row is destroyed after the grant, a surviving source
  *  (a future instanced house listing, which never depletes) must never alias
  *  one payload object into every buyer's bags. Capacity is the caller's
- *  pre-check (bags.ts canGrantCopies, this function's twin). */
+ *  pre-check (bags.ts canGrantCopies, this function's twin).
+ *
+ *  `craftedRecipeId` (bags.ts InvSlot.craftedRecipeId, professions/crafting.ts)
+ *  is the PLAIN-STACK provenance marker, orthogonal to `instance`: a row on
+ *  the market/mail book carries one or the other, never both (an instanced
+ *  copy is escrowed through marketListInstance/its own pipe; a plain crafted
+ *  stack through marketList/mailSendResolved). It is a no-op on the instanced
+ *  arm and threaded into the plain grant otherwise, so a market/mail round
+ *  trip never launders a crafted item's provenance and reopens the disenchant
+ *  anti-farming gate (professions/enchanting.ts isCraftedDisenchantVictim). */
 export function grantCopies(
   ctx: SimContext,
   pid: number,
   itemId: string,
   count: number,
   instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
 ): void {
   if (instance) ctx.addItemInstance(itemId, cloneItemInstancePayload(instance), pid, count);
-  else ctx.addItem(itemId, count, pid);
+  else ctx.addItem(itemId, count, pid, { craftedRecipeId });
 }
 
 /** Rebuild a persisted exchange-escrow slot (market collection item, mail

@@ -182,15 +182,21 @@ export function canAddItem(
  *  mail claim, vendor buyback), payload-aware on both arms (#2139: the
  *  pre-check must model the grant identically or the overflow class re-opens):
  *  with `instance` absent this is canAddItem, with it canGrantItemInstance.
- *  Its grant twin is item_instance_transfer.ts grantCopies. */
+ *  Also threads the plain-stack `craftedRecipeId` marker: a caller granting a
+ *  crafted plain stack must pre-check with the same marker `grantCopies`
+ *  grants with, or the fit check can see room in a marker-free stack that the
+ *  actual grant (keyed on the marker by addStacked) cannot merge into,
+ *  overfilling the recipient's bags past the modelled cap. Its grant twin is
+ *  item_instance_transfer.ts grantCopies. */
 export function canGrantCopies(
   inventory: readonly InvSlot[],
   capacity: number,
   itemId: string,
   count: number,
   instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
 ): boolean {
-  return countFit(inventory, capacity, itemId, count, instance) >= count;
+  return countFit(inventory, capacity, itemId, count, instance, craftedRecipeId) >= count;
 }
 
 /** True when EVERY add in the batch fits together (simulated cumulatively on a

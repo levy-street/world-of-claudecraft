@@ -40,8 +40,10 @@ import {
 } from '../game/settings';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
+import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_settings';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
+import type { FocusTrapHandle } from './focus_manager';
 import type { BugReportHooks, OptionsHooks } from './hud';
 import type { ChatClock } from './hud/chat/chat_timestamp';
 import {
@@ -155,6 +157,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   bags: 'hud.keybinds.actions.bags',
   nameplates: 'hud.keybinds.actions.nameplates',
   meters: 'hud.keybinds.actions.meters',
+  targetAuras: 'hudChrome.targetAuras.keybindLabel',
   social: 'hud.keybinds.actions.social',
   arena: 'hud.keybinds.actions.arena',
   dungeonFinder: 'hudChrome.finder.title',
@@ -199,6 +202,8 @@ export interface OptionsWindowDeps {
   world(): IWorld;
   /** The options seam main.ts wires after Input exists (null until attached). */
   options(): OptionsHooks | null;
+  /** Player-specific proc overlay editor, owned by Hud (null until wired). */
+  auraOverlays?: () => AuraOverlayHooks;
   /** The bug-report seam (online only; its presence gates the Report a Bug row). */
   bugReport(): BugReportHooks | null;
   /** The keybind store (read labels, rebind, reset). */
@@ -219,6 +224,8 @@ export interface OptionsWindowDeps {
   setDropdownValue(root: HTMLElement, value: string): void;
   /** Focus the first interactive element (or a preferred selector) inside a root. */
   focusFirstInteractive(root: HTMLElement, preferredSelector?: string): void;
+  /** Open a nested dialog on the shared HUD focus-manager stack. */
+  openFocusTrap(root: () => HTMLElement, returnFocusTo: HTMLElement): FocusTrapHandle;
   /** Clear transient overlays when the menu opens (closeOtherWindows). */
   closeOthers(): void;
   hideTooltip(): void;
@@ -320,6 +327,7 @@ export class OptionsWindow {
   // The Options > Performance panel, lazily built and reused (it caches the live
   // position-slider handles so a drag-to-move can update them in place).
   private perfSettings: PerfOverlaySettingsPanel | null = null;
+  private auraSettings: AuraOverlaySettingsPanel | null = null;
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
   // Tracked separately from the root's inline `display` (rather than reading
@@ -365,6 +373,8 @@ export class OptionsWindow {
     this.deps.root().style.display = 'none';
     this.capturingKey = null;
     this.deps.options()?.perfOverlay.setPlacement(false);
+    this.auraSettings?.closePlacement();
+    this.deps.auraOverlays?.().setPlacement(false);
     this.deps.hideTooltip();
     music.resumeFromMenu();
     const target = this.returnFocus;
@@ -410,8 +420,10 @@ export class OptionsWindow {
     // leaving it so the other sub-views (and the main menu) keep their default width.
     if (this.view !== 'keybinds') el.classList.remove('kb-wide');
     if (this.view !== 'performance') el.classList.remove('perf-wide');
+    if (this.view !== 'auras') el.classList.remove('aura-wide');
     // The overlay is draggable only while the Performance sub-view is open.
     this.deps.options()?.perfOverlay.setPlacement(this.view === 'performance');
+    this.deps.auraOverlays?.().setPlacement(this.view === 'auras');
     switch (this.view) {
       case 'keybinds':
         this.renderKeybinds();
@@ -424,6 +436,9 @@ export class OptionsWindow {
         break;
       case 'interface':
         this.renderInterface();
+        break;
+      case 'auras':
+        this.renderAuras();
         break;
       case 'controller':
         this.renderController();
@@ -720,8 +735,23 @@ export class OptionsWindow {
     const wrap = document.createElement('div');
     wrap.className = 'set-choice';
     const sync = () => {
-      const current = Math.round(hooks.settings.get(key));
-      for (const btn of [...wrap.querySelectorAll<HTMLButtonElement>('button[data-value]')]) {
+      // Nearest-option select (not Math.round): the round-10 level ladders
+      // persist half-step values (0.5 = Medium), which rounding would
+      // mis-highlight as the next button up. Exact stored values (every
+      // historical row) behave exactly as before.
+      const raw = hooks.settings.get(key);
+      const buttons = [...wrap.querySelectorAll<HTMLButtonElement>('button[data-value]')];
+      let current = Number.NaN;
+      let bestDistance = Number.POSITIVE_INFINITY;
+      for (const btn of buttons) {
+        const value = Number(btn.dataset.value);
+        const distance = Math.abs(value - raw);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          current = value;
+        }
+      }
+      for (const btn of buttons) {
         const selected = Number(btn.dataset.value) === current;
         btn.classList.toggle('sel', selected);
         btn.setAttribute('aria-pressed', String(selected));
@@ -1209,6 +1239,23 @@ export class OptionsWindow {
     if (!hooks) return;
     this.perfSettings ??= new PerfOverlaySettingsPanel(this.perfSettingsHost(hooks));
     this.perfSettings.render(this.deps.root());
+  }
+
+  private renderAuras(): void {
+    const hooks = this.deps.auraOverlays?.();
+    if (!hooks) return;
+    this.deps.root().classList.add('aura-wide');
+    const body = this.settingsViewShell(t('hudChrome.auraOverlay.title'));
+    this.auraSettings ??= new AuraOverlaySettingsPanel({
+      auras: hooks,
+      click: () => audio.click(),
+      openFocusTrap: this.deps.openFocusTrap,
+    });
+    this.auraSettings.render(body);
+    this.deps
+      .root()
+      .querySelector('[data-close]')
+      ?.addEventListener('click', () => this.close());
   }
 
   private perfSettingsHost(hooks: OptionsHooks): PerfSettingsHost {

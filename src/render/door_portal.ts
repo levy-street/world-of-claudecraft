@@ -3,7 +3,9 @@ import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { GFX } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
+import { applyWornStone } from './worn_stone';
 
 // GLB-backed arch body (Tripo-generated, see public/models/props), with a
 // procedural fallback (arch + keystone + plinths below) for pre-load races /
@@ -80,7 +82,17 @@ const portalMats = new Map<string, THREE.MeshBasicMaterial>();
 const ORB_Y = 2.15;
 
 function doorStoneMaterial(): THREE.Material {
-  stoneMat ??= markSharedMaterial(new THREE.MeshLambertMaterial({ color: 0x6a6a72 }));
+  if (!stoneMat) {
+    // Low tier keeps the cheap Lambert; the standard tier upgrades the arch
+    // to a MeshStandardMaterial so it can carry the worn-stone layer.
+    if (GFX.standardMaterials) {
+      const mat = new THREE.MeshStandardMaterial({ color: 0x6a6a72, roughness: 0.9 });
+      applyWornStone(mat);
+      stoneMat = markSharedMaterial(mat);
+    } else {
+      stoneMat = markSharedMaterial(new THREE.MeshLambertMaterial({ color: 0x6a6a72 }));
+    }
+  }
   return stoneMat;
 }
 

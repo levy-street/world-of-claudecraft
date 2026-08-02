@@ -111,6 +111,15 @@ describe('registry', () => {
     expect(discord?.category).toBe('Interface');
     expect(discord?.kind).toBe('edge');
     expect(discord?.defaults).toEqual(['KeyU']);
+    const metersIndex = BIND_ACTIONS.findIndex((a) => a.id === 'meters');
+    const targetAuras = BIND_ACTIONS[metersIndex + 1];
+    expect(targetAuras).toMatchObject({
+      id: 'targetAuras',
+      label: 'Target Buffs and Debuffs',
+      category: 'Interface',
+      kind: 'edge',
+      defaults: ['Shift+KeyJ'],
+    });
     // The Vale Cup window is a rebindable Interface toggle (default T; J and
     // G are taken by targetFriendlyNext and the arena on this branch).
     const valecup = BIND_ACTIONS.find((a) => a.id === 'valecup');

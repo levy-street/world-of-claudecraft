@@ -60,6 +60,11 @@
     --color-debuff-shadow: #9b59d0;
     --color-debuff-nature: #35a835;
     --color-debuff-holy: #d8b56b;
+    --color-aura-rpg-gold: #ffe14d;
+    --color-aura-rpg-violet: #bd63ff;
+    --color-aura-rpg-electric: #3dc7ff;
+    --aura-glow-core: 5px;
+    --aura-glow-halo: 16px;
 
     --color-bg-dark: #08080d;
     --color-bg-input: #0a0a0f;

@@ -328,8 +328,10 @@ describe('renderer wiring pin', () => {
     // Anchored inside sync()'s per-frame fx block (the water-phase marker),
     // NOT the one-time prewarm pass: the exact regression the frontend
     // reviewer caught on first wiring.
+    // The release renamed the phase marker to a method on the renderer
+    // (markRendererWorldPhase); the anchor is the water phase either way.
     expect(src).toMatch(
-      /markWorldPhase\('water', worldStart\);\s*\n\s*this\.bgFx\.update\(this\.time\);/,
+      /WorldPhase\([^)]*'water', worldStart\);\s*\n\s*this\.bgFx\.update\(this\.time\);/,
     );
   });
 });

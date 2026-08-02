@@ -162,7 +162,7 @@ as the score and tie-break on that row. Cross-surface agreement is pinned by
    visible-but-unearnable deed is worse than none).
 4. Tests: `tests/deeds_content.test.ts` pins the catalog (ids, renown
    values, trigger integrity against the real content tables);
-   `tests/deeds_sites.test.ts` covers grant sites. New counters and sites
+   `tests/deeds_sites_pin.test.ts` covers grant sites. New counters and sites
    get decisive assertions in the same change.
 5. Regenerate the wiki (`npm run wiki:content`, gated by
    `tests/guide.test.ts`); hidden deeds are filtered structurally and must

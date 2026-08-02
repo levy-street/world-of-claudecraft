@@ -37,6 +37,7 @@ describe('AdminNav', () => {
     expect(screen.getByRole('link', { name: t('nav.players') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.accounts') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.characters') })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: t('nav.guilds') })).toBeInTheDocument();
   });
 
   it('groups bot detector pages between moderation and support', () => {
@@ -116,9 +117,10 @@ describe('AdminNav', () => {
     expect(screen.getByRole('link', { name: t('nav.reports') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.history') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.blockedIps') })).toBeInTheDocument();
-    // Accounts and characters both require accounts.read, so both are visible.
+    // Accounts, characters, and guilds require accounts.read, so all are visible.
     expect(screen.getByRole('link', { name: t('nav.accounts') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.characters') })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: t('nav.guilds') })).toBeInTheDocument();
     // Whole sections without a granted permission disappear: overview needs
     // analytics.read, and Operations/Usage needs ops_usage.read, neither granted.
     expect(screen.queryByRole('link', { name: t('nav.usage') })).not.toBeInTheDocument();
@@ -127,5 +129,17 @@ describe('AdminNav', () => {
     expect(screen.queryByRole('link', { name: t('nav.bugReports') })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: t('nav.unstuckReports') })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: t('nav.staff') })).not.toBeInTheDocument();
+  });
+
+  it('hides the guild directory without accounts.read', () => {
+    grantPermissions(['moderation.read']);
+    render(AdminNav, {
+      route: { page: 'moderation' },
+      onSelect: () => {},
+      onClose: () => {},
+    });
+
+    expect(screen.queryByRole('link', { name: t('nav.guilds') })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: t('nav.players') })).not.toBeInTheDocument();
   });
 });

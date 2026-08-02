@@ -1,9 +1,19 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  type CharacterWeaponAura,
   characterRecklessnessActive,
-  characterSanguineAuraActive,
   characterSoulRendActive,
+  characterWeaponAuraColor,
+  characterWeaponAuraInto,
 } from '../src/render/character_effects';
+import {
+  CHARACTER_EFFECT_RECKLESSNESS,
+  CHARACTER_EFFECT_SANGUINE,
+  CHARACTER_EFFECT_SOUL_REND,
+  characterEffectFlags,
+  hasCharacterEffect,
+} from '../src/render/character_effects_core';
 import type { Entity } from '../src/sim/types';
 
 function entity(partial: Partial<Entity>): Entity {
@@ -120,9 +130,124 @@ describe('character visual effects', () => {
       school: 'physical',
     } as const;
 
-    expect(characterSanguineAuraActive(entity({ auras: [sanguine] }))).toBe(true);
+    expect(characterWeaponAuraColor(entity({ auras: [sanguine] }))).toBe(0xff4636);
     expect(characterRecklessnessActive(entity({ auras: [reckless] }))).toBe(true);
-    expect(characterSanguineAuraActive(entity({ auras: [reckless] }))).toBe(false);
+    expect(characterWeaponAuraColor(entity({ auras: [reckless] }))).toBe(null);
     expect(characterRecklessnessActive(entity({ auras: [sanguine] }))).toBe(false);
+  });
+
+  it('resolves the shaman imbues to their full-duration weapon soak colors', () => {
+    const imbue = (id: string, school: 'fire' | 'frost' | 'physical') =>
+      ({
+        id,
+        name: id,
+        kind: 'imbue',
+        remaining: 300,
+        duration: 300,
+        value: 8,
+        sourceId: 1,
+        school,
+      }) as const;
+
+    expect(characterWeaponAuraColor(entity({ auras: [imbue('flametongue_weapon', 'fire')] }))).toBe(
+      0xff5a26,
+    );
+    expect(characterWeaponAuraColor(entity({ auras: [imbue('frostbrand_weapon', 'frost')] }))).toBe(
+      0xbfe4ff,
+    );
+    // Rockbiter authors no weaponAura knob (owner opted only the two elemental
+    // imbues in): its orbit band keeps carrying the read alone.
+    expect(
+      characterWeaponAuraColor(entity({ auras: [imbue('rockbiter_weapon', 'physical')] })),
+    ).toBe(null);
+  });
+
+  it('scopes the rogue poisons: Festering Venom soaks the blade, Adders Bite tips it', () => {
+    const coat = (id: string) =>
+      ({
+        id,
+        name: id,
+        kind: 'imbue',
+        remaining: 1800,
+        duration: 1800,
+        value: 8,
+        sourceId: 1,
+        school: 'nature',
+      }) as const;
+    const scratch: CharacterWeaponAura = { color: 0, tip: false };
+
+    // The mechanically bigger coat (14 damage/swing) wears the bigger read:
+    // the full-blade sickly-green wash for the aura's whole 30 min.
+    const deadly = characterWeaponAuraInto(entity({ auras: [coat('deadly_poison')] }), scratch);
+    expect(deadly).toEqual({ color: 0x58d63c, tip: false });
+
+    // The lesser coat (8 damage/swing) reads as a green-TIPPED weapon.
+    const instant = characterWeaponAuraInto(entity({ auras: [coat('instant_poison')] }), scratch);
+    expect(instant).toEqual({ color: 0x8fd455, tip: true });
+
+    expect(characterWeaponAuraInto(entity({ auras: [] }), scratch)).toBe(null);
+  });
+
+  it('folds mixed aura identities into one renderer-pass bit mask', () => {
+    const soulRend = {
+      id: 'nythraxis_soul_rend',
+      kind: 'vulnerability',
+    } as const;
+    const sanguine = {
+      id: 'sanguine_aura',
+      kind: 'sanguine',
+    } as const;
+    const reckless = {
+      id: 'recklessness',
+      kind: 'buff_reckless',
+    } as const;
+    const unrelated = {
+      id: 'ice_block',
+      kind: 'stasis',
+    } as const;
+
+    const flags = characterEffectFlags([unrelated, reckless, soulRend, sanguine]);
+    expect(hasCharacterEffect(flags, CHARACTER_EFFECT_SOUL_REND)).toBe(true);
+    expect(hasCharacterEffect(flags, CHARACTER_EFFECT_SANGUINE)).toBe(true);
+    expect(hasCharacterEffect(flags, CHARACTER_EFFECT_RECKLESSNESS)).toBe(true);
+    expect(characterEffectFlags([unrelated])).toBe(0);
+  });
+
+  it.each([
+    ['Soul Rend', { id: 'nythraxis_soul_rend', kind: 'vulnerability' }, [true, false, false]],
+    ['Sanguine', { id: 'sanguine_aura', kind: 'sanguine' }, [false, true, false]],
+    ['Recklessness', { id: 'recklessness', kind: 'buff_reckless' }, [false, false, true]],
+  ] as const)(
+    'keeps the %s flag independent from every other character effect',
+    (_, aura, expected) => {
+      const flags = characterEffectFlags([aura]);
+      expect([
+        hasCharacterEffect(flags, CHARACTER_EFFECT_SOUL_REND),
+        hasCharacterEffect(flags, CHARACTER_EFFECT_SANGUINE),
+        hasCharacterEffect(flags, CHARACTER_EFFECT_RECKLESSNESS),
+      ]).toEqual(expected);
+    },
+  );
+
+  it('pins every folded renderer flag to its intended visual consumer', () => {
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(renderer).toContain(
+      'const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);',
+    );
+    expect(renderer).toContain(
+      'const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);',
+    );
+    // The sanguine FLAG no longer drives the weapon overlay: the spec-driven
+    // characterWeaponAuraInto supersedes it (it carries a color and a tip
+    // scope, and covers the shaman imbues and the rogue poisons too), so the
+    // flag and its bit are gone from the renderer rather than left computed
+    // and unread. The overlay's own coverage lives in the cases above.
+    expect(renderer).not.toContain('hasSanguineAura');
+    expect(renderer).toContain(
+      'v.visual.setWeaponAura(weaponAura ? weaponAura.color : null, weaponAura?.tip ?? false);',
+    );
+    expect(renderer).toContain('active.setSoulRend(hasSoulRend);');
+    expect(renderer).toContain("if (hasSoulRend) {\n        this.vfx.castSparkle(e.id, 'shadow'");
+    expect(renderer).toContain('if (hasRecklessness) {\n        this.vfx.recklessFlame(e.id, dt);');
   });
 });

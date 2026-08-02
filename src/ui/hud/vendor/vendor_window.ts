@@ -24,7 +24,10 @@ import type { VendorGoodsRow, VendorPrice, VendorView } from './vendor_view';
  */
 export interface VendorWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
-  onBuy(itemId: string): void;
+  /** `bulk` (#2374): true for a ctrl/cmd-click on the row or a click on its
+   *  "Buy Stack" control, requesting the largest affordable stack instead of
+   *  the ordinary single unit. */
+  onBuy(itemId: string, bulk?: boolean): void;
   onBuyBack(
     itemId: string,
     index: number,
@@ -104,13 +107,41 @@ export function renderVendorWindow(
       t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
     );
     row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}</span><span class="vi-price">${goodsPriceHtml(goods, deps)}</span>`;
-    row.addEventListener('click', () => deps.onBuy(itemId));
+    // Ctrl/Cmd-click requests a bulk purchase (#2374), the desktop mirror of
+    // the "Buy Stack" tile below; both funnel through the same onBuy(itemId, true).
+    row.addEventListener('click', (ev) => deps.onBuy(itemId, ev.ctrlKey || ev.metaKey));
     deps.attachTooltip(
       row,
       () =>
         `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
     );
     goodsGrid.appendChild(row);
+    // A separate, always-visible tile (never a nested <button>, never hidden
+    // behind a modifier key) so the bulk purchase is reachable identically on
+    // touch and desktop: the mobile-parity affordance for the ctrl-click
+    // gesture above. Only offered when the row actually qualifies for a bulk
+    // purchase of more than one unit (see bulkQuantity in vendor_view.ts).
+    if (goods.bulkQuantity !== undefined && goods.bulkQuantity > 1) {
+      const bulkRow = document.createElement('button');
+      bulkRow.type = 'button';
+      bulkRow.className = 'vendor-item vendor-item-bulk';
+      bulkRow.disabled = !goods.bulkAffordable;
+      const bulkCount = formatNumber(goods.bulkQuantity, { maximumFractionDigits: 0 });
+      const bulkCopper = Math.max(0, item.buyValue ?? 0) * goods.bulkQuantity;
+      const bulkPrice = formatLocalizedMoney(bulkCopper);
+      bulkRow.setAttribute(
+        'aria-label',
+        t('itemUi.vendor.buyStackAria', { item: itemName, count: bulkCount, price: bulkPrice }),
+      );
+      bulkRow.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(t('itemUi.vendor.buyStack', { count: bulkCount }))}</span><span class="vi-price">${deps.moneyHtml(bulkCopper)}</span>`;
+      bulkRow.addEventListener('click', () => deps.onBuy(itemId, true));
+      deps.attachTooltip(
+        bulkRow,
+        () =>
+          `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.vendor.buyStack', { count: bulkCount }))}</div>`,
+      );
+      goodsGrid.appendChild(bulkRow);
+    }
   }
   if (view.goods.length > 0) el.appendChild(goodsGrid);
 

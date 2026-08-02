@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { syncAppViewport } from '../src/game/app_viewport';
+import {
+  APP_VIEWPORT_SETTLE_DELAYS_MS,
+  syncAppViewport,
+  syncSettledAppViewport,
+} from '../src/game/app_viewport';
 
 interface FakeWin {
   innerWidth: number;
@@ -120,5 +124,20 @@ describe('syncAppViewport', () => {
     syncAppViewport(win as unknown as Window);
     expect(props['--app-vw']).toBe('1px');
     expect(props['--app-vh']).toBe('1px');
+  });
+
+  it('re-measures after a live interface-mode layout has settled', () => {
+    const calls: number[] = [];
+    const scheduled: { callback: () => void; delayMs: number }[] = [];
+    syncSettledAppViewport(
+      () => calls.push(calls.length),
+      (callback, delayMs) => scheduled.push({ callback, delayMs }),
+    );
+
+    expect(calls).toHaveLength(1);
+    expect(APP_VIEWPORT_SETTLE_DELAYS_MS).toEqual([250, 800]);
+    expect(scheduled.map(({ delayMs }) => delayMs)).toEqual([250, 800]);
+    for (const { callback } of scheduled) callback();
+    expect(calls).toHaveLength(3);
   });
 });

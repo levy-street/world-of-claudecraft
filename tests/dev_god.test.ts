@@ -63,6 +63,53 @@ describe('/dev god cheat', () => {
     expect(before - boss.hp).toBe(10000);
   });
 
+  it('emits one zero-damage presentation event when a mob hits a devGod target', () => {
+    // The renderer keys attacker swing animations and FCT off damage events,
+    // so a silent invulnerability return made every melee mob look like a
+    // passive follower during god-mode playtests. The hit must surface as a
+    // zero-damage event, and ONLY as that event: no threat, deed, or proc
+    // side effects ride along and the target never loses hp.
+    const { sim, pid } = godSim();
+    const p = sim.player;
+    sim.chat('/dev god', pid);
+    const mob = spawnMob(sim);
+    sim.drainEvents();
+    deal(sim, mob, p, 500);
+    const events = sim.drainEvents();
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      type: 'damage',
+      sourceId: mob.id,
+      targetId: p.id,
+      amount: 0,
+      school: 'physical',
+    });
+    expect(p.hp).toBe(p.maxHp);
+  });
+
+  it('keeps the zero-damage emit dev-only: no event without the gate, for GMs, or sourceless', () => {
+    // devGod forced on without the dev gate (the production shape): silent.
+    const off = godSim(false);
+    off.sim.player.devGod = true;
+    const offMob = spawnMob(off.sim);
+    off.sim.drainEvents();
+    deal(off.sim, offMob, off.sim.player, 500);
+    expect(off.sim.drainEvents().filter((e) => e.type === 'damage')).toHaveLength(0);
+    // A real GM (not devGod) stays fully silent even with dev commands on.
+    const gm = godSim();
+    gm.sim.player.gm = true;
+    const gmMob = spawnMob(gm.sim);
+    gm.sim.drainEvents();
+    deal(gm.sim, gmMob, gm.sim.player, 500);
+    expect(gm.sim.drainEvents().filter((e) => e.type === 'damage')).toHaveLength(0);
+    // Sourceless damage (an environment tick) has no attacker to animate.
+    const env = godSim();
+    env.sim.chat('/dev god', env.sim.playerId);
+    env.sim.drainEvents();
+    deal(env.sim, null, env.sim.player, 500);
+    expect(env.sim.drainEvents().filter((e) => e.type === 'damage')).toHaveLength(0);
+  });
+
   it('is gated: without dev commands, /dev god does nothing', () => {
     const { sim, pid } = godSim(false);
     sim.chat('/dev god', pid);

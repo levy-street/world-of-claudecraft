@@ -923,6 +923,23 @@ export const nl_NL: EnTranslations = {
       "separate": "{meter} loskoppelen",
       "regroup": "{meter} weer samenvoegen"
     },
+    "targetAuras": {
+      "title": "Auras van het doel",
+      "keybindLabel": "Buffs en debuffs van het doel",
+      "all": "Alle",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Venster met auras van het doel verplaatsen",
+      "lock": "Venster met auras van het doel vergrendelen",
+      "configureRows": "Auras van het doel instellen",
+      "fewerRows": "Voorkeur voor minder aurarijen",
+      "moreRows": "Voorkeur voor meer aurarijen",
+      "visibleRows": "Voorkeursaantal aurarijen: {count}",
+      "showSources": "Aurabronnen tonen",
+      "hideSources": "Aurabronnen verbergen",
+      "ownAura": "Jouw aura",
+      "opacity": "Auradekking: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Huisdier heeft volledige gezondheid",
       "disabledNoFood": "Geen voedsel in je tassen dat je huisdier kan genezen"
@@ -967,13 +984,15 @@ export const nl_NL: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage de Schaduwspringpad",
       "name_stormfeather_griffin": "Hemelreik Stormveder",
       "name_thunderstrut_gobbler": "Donderstap de Grote Kalkoen",
+      "name_terrorspark_groundshaker": "Schrikvonk, de Grondschudder",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
       "desc_stalkglider_snail": "Een taaie, langzaam brandende slak die extra reissnelheid geeft.",
       "desc_aether_hover_cycle": "Een krachtige magitech-motor, ontworpen voor snelle, laag zwevende verplaatsing tijdens gevechten.",
       "desc_shadowjump_toad": "Een enorme, standvastige reuzenpad, getraind in bliksemsnelle schaduwsprongen die elk terrein overbruggen.",
       "desc_stormfeather_griffin": "Een koninklijke stormgriffioen die met runenbeslagen klauwen over de grond sluipt, vleugels opgevouwen.",
-      "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk."
+      "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.",
+      "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten."
     },
     "mountTraining": {
       "mountPrompt": "Druk op {key} om op de trainings-Moedros te stijgen.",
@@ -1343,6 +1362,51 @@ export const nl_NL: EnTranslations = {
       "badges": {
         "backgrounded": "Op achtergrond",
         "offline": "Offline"
+      }
+    },
+    "auraOverlay": {
+      "title": "Aura’s",
+      "currentClass": "Huidige klasse: {class}",
+      "previewHint": "Gebruik Posities instellen om een aura te verplaatsen zonder het menu te bedekken.",
+      "noProcs": "Er is geen ondersteunde proc beschikbaar voor dit personage.",
+      "enabled": "Aura tonen",
+      "icon": "Spreukpictogram",
+      "arcs": "Zijhalvemanen",
+      "groundRing": "Grondring",
+      "groundRingSpellOrder": "Grondring: spreukvolgorde",
+      "crescentsSpellOrder": "Zijhalvemanen: spreukvolgorde",
+      "size": "Grootte",
+      "iconSize": "Pictogramgrootte",
+      "crescentBlockSize": "Blokgrootte halvemaan",
+      "groundRingBlockSize": "Blokgrootte grondring",
+      "opacity": "Dekking",
+      "color": "Kleur",
+      "allOn": "Alles aan",
+      "allOff": "Alles uit",
+      "reposition": "Posities instellen",
+      "positioning": "Positioneren: {aura}",
+      "selectAura": "Aura",
+      "done": "Klaar",
+      "moveLeft": "Naar links verplaatsen",
+      "moveUp": "Omhoog verplaatsen",
+      "moveDown": "Omlaag verplaatsen",
+      "moveRight": "Naar rechts verplaatsen",
+      "moveEarlier": "Spreuk naar binnen verplaatsen",
+      "moveLater": "Spreuk naar buiten verplaatsen",
+      "screenPosition": "Schermpositie",
+      "spellOrder": "Spreukvolgorde",
+      "reset": "Positie resetten",
+      "spellPosition": "Spreukvolgorde {position} / {count}",
+      "procs": {
+        "revenge": "Wraak!",
+        "battleTrance": "Gevechtstrance",
+        "overpowerCharge": "Roodhand-versterking",
+        "suddenDeath": "Plotse Dood",
+        "victoryRush": "Overwinningsroes",
+        "enrage": "Amok: Razend",
+        "heatingUp": "Opwarmen",
+        "arcaneCharge": "Arcane ladingen",
+        "aetherRush": "Aetherstormloop"
       }
     },
     "playerCard": {
@@ -2151,6 +2215,14 @@ export const nl_NL: EnTranslations = {
       "linked": "Gekoppeld aan Steam-account {id}",
       "benefits": "Koppel je Steam-account vanuit de desktop-app om de daden die je behaalt te spiegelen naar Steam-prestaties.",
       "noTicket": "Steam gaf geen koppelticket af. Start Steam en probeer het daarna opnieuw."
+    },
+    "epic": {
+      "title": "Epic",
+      "link": "Epic koppelen",
+      "unlink": "Epic ontkoppelen",
+      "linked": "Gekoppeld aan Epic-account {id}",
+      "benefits": "Koppel je Epic-account via de Epic-desktop-app om de daden die je verdient te spiegelen naar Epic-prestaties.",
+      "noProof": "Epic heeft geen koppelingsbewijs geleverd. Start via de Epic Games Store en probeer het opnieuw."
     },
     "mailbox": {
       "title": "Brievenbus",
@@ -3002,6 +3074,14 @@ export const nl_NL: EnTranslations = {
       "already_linked": "Je account heeft al een gekoppeld Steam-account.",
       "account_taken": "Dat Steam-account is al aan een ander account gekoppeld.",
       "upstream": "Steam reageerde niet. Probeer het zo meteen opnieuw."
+    },
+    "epic": {
+      "disabled": "Epic-koppeling is momenteel niet beschikbaar.",
+      "invalid_token": "Epic kon dit koppelingsverzoek niet verifiëren. Probeer het opnieuw vanuit de desktop-app.",
+      "banned": "Dat Epic-account kan niet worden gekoppeld.",
+      "already_linked": "Je account heeft al een gekoppeld Epic-account.",
+      "account_taken": "Dat Epic-account is al gekoppeld aan een ander account.",
+      "upstream": "Epic reageerde niet. Probeer het zo meteen opnieuw."
     },
     "wallet": {
       "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw."
@@ -6257,11 +6337,15 @@ export const nl_NL: EnTranslations = {
       "graphicsPresetMedium": "Gemiddeld",
       "graphicsPresetHigh": "Hoog",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extreem",
       "graphicsPresetAdvanced": "Geavanceerd",
       "terrainDetail": "Terreindetail",
       "foliageDensity": "Bladerdichtheid",
       "effectsQuality": "Effecten en belichting",
       "shadowQuality": "Schaduwkwaliteit",
+      "surfaceDetail": "Oppervlaktedetail",
+      "surfaceDetailBasic": "Basis",
+      "surfaceDetailFull": "Volledig",
       "terrainLow": "Laag",
       "terrainHigh": "Hoog",
       "touchOpacity": "Doorzichtigheid aanraakbediening",
@@ -6425,6 +6509,8 @@ export const nl_NL: EnTranslations = {
       "joinParty": "Groep betreden",
       "guildInvite": "{name} nodigt je uit om lid te worden van {guild}.",
       "joinGuild": "Gilde betreden",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} wil met je handelen.",
       "openTrade": "Handel openen",
       "duelRequest": "{name} heeft je uitgedaagd tot een duel!",
@@ -6438,6 +6524,7 @@ export const nl_NL: EnTranslations = {
       "floatingDodge": "Ontwijking",
       "floatingParry": "Parering",
       "floatingResist": "Weerstaan",
+      "floatingEvade": "Ontlopen",
       "floatingHealFull": "Vol",
       "floatingHealAbsorbed": "Geabsorbeerd",
       "cannotMove": "Kan niet bewegen!",
@@ -6450,6 +6537,7 @@ export const nl_NL: EnTranslations = {
       "dodged": "Je {ability} wordt ontweken door {target}.",
       "parried": "Je {ability} wordt gepareerd door {target}.",
       "resisted": "{target} weerstaat je {ability}.",
+      "evaded": "{target} ontloopt je {ability}.",
       "healSelf": "Je {ability} geneest je voor {amount}.",
       "healSelfCrit": "Je {ability} geneest je kritiek voor {amount}.",
       "healOther": "Je {ability} geneest {target} voor {amount}.",
@@ -7017,6 +7105,8 @@ export const nl_NL: EnTranslations = {
       "close": "Handelaar sluiten",
       "hint": "Klik op een voorwerp in je tassen om het te verkopen terwijl dit venster open is.",
       "buyAria": "Koop {item} voor {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Terugkopen",
       "buybackEmpty": "Geen voorwerpen",
       "buybackAria": "Koop {item} terug voor {price}",
@@ -7296,7 +7386,7 @@ export const nl_NL: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Grotere onzichtbaarheid",
-        "description": "Verdwijn gedurende 20 sec.: verwijdert 2 effecten met schade over tijd en je loopt 90% minder schade op terwijl je onzichtbaar bent en kort daarna. (magiërstalent)"
+        "description": "Verdwijn 20 sec. en verwijder 2 effecten met schade over tijd. Wanneer de onzichtbaarheid eindigt, krijg je 2 sec. lang 90% minder schade. (magiërstalent)"
       },
       "hot_streak": {
         "name": "Hete reeks",
@@ -9635,6 +9725,18 @@ export const nl_NL: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Slagtandmes van Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Beestenspeer van de Slagtandheer"
+      },
+      "bloodmane_warleggings": {
+        "name": "Bloedmanen-Oorlogsbeenkappen"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Rankklauw-Sluipbroek"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Zonnebeen-Rituele Sarong"
+      },
       "thick_winter_pelt": {
         "name": "Dikke Wintervacht"
       },
@@ -9802,6 +9904,9 @@ export const nl_NL: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Zegel van de Laatste Burcht"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Contactsleutel: Schrikvonk, de Grondschudder"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"
@@ -10378,6 +10483,24 @@ export const nl_NL: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Wurmkoor-Handwindsels"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tuniek van de Bekkensluiper"
+      },
+      "verdant_heart_vestment": {
+        "name": "Gewaad van het Groene Hart"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Zonnebeen-Rituele Maliënkolder"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Grootslagtand van het Bekken"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Zonnebeen-Orakelkroon"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Bloedmanen-Oorlogsbeenplaten"
       },
       "deathless_greatblade": {
         "name": "Doodloos Grootzwaard"

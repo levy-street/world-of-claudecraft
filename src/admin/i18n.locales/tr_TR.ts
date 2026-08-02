@@ -7,6 +7,16 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const tr_TR: Record<string, string> = {
+  'onlinePlayers.autoRefresh': 'Otomatik yenileme ({minutes} dk)',
+  'onlinePlayers.count': '{count} çevrimiçi',
+  'onlinePlayers.countFiltered': '{total} çevrimiçi oyuncudan {shown} tanesi',
+  'onlinePlayers.filteredEmpty': 'bu aramayla eşleşen çevrimiçi oyuncu yok',
+  'onlinePlayers.loadFailed': 'çevrimiçi oyuncular yüklenemedi',
+  'onlinePlayers.loading': 'çevrimiçi oyuncular yükleniyor…',
+  'onlinePlayers.refresh': 'Yenile',
+  'onlinePlayers.searchLabel': 'Çevrimiçi oyuncu ara',
+  'onlinePlayers.searchPlaceholder': 'Oyuncu, sınıf, bölge ara…',
+  'onlinePlayers.sortHint': 'sıralamak için bir sütuna tıklayın',
   'detail.dailyRewardsActions': 'Günlük Ödüller için moderasyon işlemleri',
   'detail.dailyRewardsBan': 'Günlük Ödüllerden yasakla',
   'detail.dailyRewardsBanReason': 'Günlük Ödüller yasak gerekçesi: {value}',
@@ -165,7 +175,6 @@ export const tr_TR: Record<string, string> = {
   'stats.avgTick': 'ort. tik',
   'stats.serverRss': 'sunucu rss',
   'online.title': 'Çevrimiçi oyuncular',
-  'online.refreshHint': "her 5sn'de bir yenilenir",
   'online.empty': 'şu anda çevrimiçi kimse yok',
   'online.colCharacter': 'Karakter',
   'online.colClass': 'Sınıf',

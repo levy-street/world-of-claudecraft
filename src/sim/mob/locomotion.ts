@@ -1009,6 +1009,14 @@ function pulseLoudYell(ctx: SimContext, mob: Entity): void {
 // An evading mob has reached its spawn (walking or phasing): drop the pull
 // entirely and return to idle at full health, ready to be pulled again.
 export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
+  // A player just left this exact mob mid-combat (issue #2653): defer the
+  // reset while their instance_exit_memory.ts window is still live, so the
+  // mob stays parked in 'evade' (damage-immune, hate table and HP untouched;
+  // see combat/damage.ts) instead of healing and clearing. That keeps it
+  // unreachable to anyone else and preserves the exact state a same-claim
+  // re-entry restores. Once the window lapses this same call site fires
+  // again next tick (still arrived at spawnPos) and performs the real reset.
+  if (mob.combatExitHoldUntil > ctx.time) return;
   mob.aiState = 'idle';
   mob.hp = mob.maxHp;
   mob.auras = [];
@@ -1016,6 +1024,12 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.tappedById = null;
   mob.leashAnchor = null;
   mob.evadeStall = 0;
+  mob.chaseStall = 0;
+  // A full evade-home reset ends this pull for good (issue #2653 follow-up):
+  // bump the epoch so a mid-combat exit snapshot stamped against the OLD pull
+  // (instance_exit_memory.ts) is recognized as stale and never reapplied onto
+  // whoever re-pulls this mob fresh inside the same memory window.
+  mob.evadeEpoch++;
   mob.fleeTimer = 0;
   mob.fleeReturnTimer = 0;
   mob.hasFled = false;

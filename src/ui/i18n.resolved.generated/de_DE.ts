@@ -923,6 +923,23 @@ export const de_DE: EnTranslations = {
       "separate": "{meter} trennen",
       "regroup": "{meter} wieder eingliedern"
     },
+    "targetAuras": {
+      "title": "Auren des Ziels",
+      "keybindLabel": "Stärkungs- und Schwächungszauber des Ziels",
+      "all": "Alle",
+      "debuffs": "Schwächungszauber",
+      "buffs": "Stärkungszauber",
+      "unlock": "Fenster der Zielauren verschieben",
+      "lock": "Fenster der Zielauren sperren",
+      "configureRows": "Auren des Ziels konfigurieren",
+      "fewerRows": "Weniger Aura-Reihen bevorzugen",
+      "moreRows": "Mehr Aura-Reihen bevorzugen",
+      "visibleRows": "Bevorzugte Aura-Reihen: {count}",
+      "showSources": "Aura-Quellen anzeigen",
+      "hideSources": "Aura-Quellen ausblenden",
+      "ownAura": "Deine Aura",
+      "opacity": "Aura-Deckkraft: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Begleiter hat volle Gesundheit",
       "disabledNoFood": "Kein Futter in deinen Taschen heilt deinen Begleiter"
@@ -967,13 +984,15 @@ export const de_DE: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage die Schattensprungkröte",
       "name_stormfeather_griffin": "Himmelsgreif Sturmfeder",
       "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
+      "name_terrorspark_groundshaker": "Schreckfunke, der Bodenerschütterer",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
       "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
       "desc_aether_hover_cycle": "Ein mächtiges Magitech-Rad für schnelles, bodennah schwebendes Kampfmanövrieren.",
       "desc_shadowjump_toad": "Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.",
       "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.",
-      "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront."
+      "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront.",
+      "desc_terrorspark_groundshaker": "Eine kompakte gepanzerte Maschine mit schweren Ketten, einer großkalibrigen Kanone und einem Sattel für furchtlose Piloten."
     },
     "mountTraining": {
       "mountPrompt": "Drücke {key}, um das Übungs-Valorross zu besteigen.",
@@ -1343,6 +1362,51 @@ export const de_DE: EnTranslations = {
       "badges": {
         "backgrounded": "Im Hintergrund",
         "offline": "Offline"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auren",
+      "currentClass": "Aktuelle Klasse: {class}",
+      "previewHint": "Nutze Positionen einrichten, um eine Aura zu verschieben, ohne das Menü zu verdecken.",
+      "noProcs": "Für diesen Charakter ist kein unterstützter Proc verfügbar.",
+      "enabled": "Aura anzeigen",
+      "icon": "Zaubersymbol",
+      "arcs": "Seitliche Halbmonde",
+      "groundRing": "Bodenring",
+      "groundRingSpellOrder": "Bodenring: Zauberreihenfolge",
+      "crescentsSpellOrder": "Seitliche Halbmonde: Zauberreihenfolge",
+      "size": "Größe",
+      "iconSize": "Symbolgröße",
+      "crescentBlockSize": "Blockgröße der Halbmonde",
+      "groundRingBlockSize": "Blockgröße des Bodenrings",
+      "opacity": "Deckkraft",
+      "color": "Farbe",
+      "allOn": "Alle an",
+      "allOff": "Alle aus",
+      "reposition": "Positionen einrichten",
+      "positioning": "Positionierung: {aura}",
+      "selectAura": "Aura",
+      "done": "Fertig",
+      "moveLeft": "Nach links",
+      "moveUp": "Nach oben",
+      "moveDown": "Nach unten",
+      "moveRight": "Nach rechts",
+      "moveEarlier": "Zauber nach innen verschieben",
+      "moveLater": "Zauber nach außen verschieben",
+      "screenPosition": "Bildschirmposition",
+      "spellOrder": "Zauberreihenfolge",
+      "reset": "Position zurücksetzen",
+      "spellPosition": "Zauberreihenfolge {position} / {count}",
+      "procs": {
+        "revenge": "Rache!",
+        "battleTrance": "Kampftrance",
+        "overpowerCharge": "Rothand-Stärkung",
+        "suddenDeath": "Plötzlicher Tod",
+        "victoryRush": "Siegesrausch",
+        "enrage": "Gemetzel: Rasend",
+        "heatingUp": "Aufheizen",
+        "arcaneCharge": "Arkane Ladungen",
+        "aetherRush": "Aether-Ansturm"
       }
     },
     "playerCard": {
@@ -2151,6 +2215,14 @@ export const de_DE: EnTranslations = {
       "linked": "Mit Steam-Konto {id} verknüpft",
       "benefits": "Verknüpfe dein Steam-Konto über die Desktop-App, um die Taten, die du erringst, als Steam-Errungenschaften zu spiegeln.",
       "noTicket": "Steam hat kein Verknüpfungsticket geliefert. Starte Steam und versuch es dann erneut."
+    },
+    "epic": {
+      "title": "Epic",
+      "link": "Epic verknüpfen",
+      "unlink": "Epic-Verknüpfung aufheben",
+      "linked": "Mit Epic-Konto {id} verknüpft",
+      "benefits": "Verknüpfe dein Epic-Konto über die Epic-Desktop-App, um deine erspielten Taten als Epic-Erfolge zu spiegeln.",
+      "noProof": "Epic hat keinen Verknüpfungsnachweis geliefert. Starte über den Epic Games Store und versuche es erneut."
     },
     "mailbox": {
       "title": "Briefkasten",
@@ -3002,6 +3074,14 @@ export const de_DE: EnTranslations = {
       "already_linked": "Dein Konto ist bereits mit einem Steam-Konto verknüpft.",
       "account_taken": "Dieses Steam-Konto ist bereits mit einem anderen Konto verknüpft.",
       "upstream": "Steam hat nicht geantwortet. Versuch es gleich noch einmal."
+    },
+    "epic": {
+      "disabled": "Die Epic-Verknüpfung ist derzeit nicht verfügbar.",
+      "invalid_token": "Epic konnte diese Verknüpfungsanfrage nicht bestätigen. Versuche es erneut über die Desktop-App.",
+      "banned": "Dieses Epic-Konto kann nicht verknüpft werden.",
+      "already_linked": "Dein Konto ist bereits mit einem Epic-Konto verknüpft.",
+      "account_taken": "Dieses Epic-Konto ist bereits mit einem anderen Konto verknüpft.",
+      "upstream": "Epic hat nicht geantwortet. Versuche es gleich noch einmal."
     },
     "wallet": {
       "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut."
@@ -6257,11 +6337,15 @@ export const de_DE: EnTranslations = {
       "graphicsPresetMedium": "Mittel",
       "graphicsPresetHigh": "Hoch",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrem",
       "graphicsPresetAdvanced": "Erweitert",
       "terrainDetail": "Geländedetail",
       "foliageDensity": "Pflanzendichte",
       "effectsQuality": "Effekte und Licht",
       "shadowQuality": "Schattenqualität",
+      "surfaceDetail": "Oberflächendetail",
+      "surfaceDetailBasic": "Einfach",
+      "surfaceDetailFull": "Voll",
       "terrainLow": "Niedrig",
       "terrainHigh": "Hoch",
       "touchOpacity": "Deckkraft der Touch-Steuerung",
@@ -6425,6 +6509,8 @@ export const de_DE: EnTranslations = {
       "joinParty": "Gruppe beitreten",
       "guildInvite": "{name} lädt Euch ein, {guild} beizutreten.",
       "joinGuild": "Gilde beitreten",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} möchte mit Euch handeln.",
       "openTrade": "Handel öffnen",
       "duelRequest": "{name} hat Euch zu einem Duell herausgefordert!",
@@ -6438,6 +6524,7 @@ export const de_DE: EnTranslations = {
       "floatingDodge": "Ausgewichen",
       "floatingParry": "Pariert",
       "floatingResist": "Widerstand",
+      "floatingEvade": "Entgangen",
       "floatingHealFull": "Voll",
       "floatingHealAbsorbed": "Absorbiert",
       "cannotMove": "Bewegungsunfähig!",
@@ -6450,6 +6537,7 @@ export const de_DE: EnTranslations = {
       "dodged": "{target} weicht Eurem {ability} aus.",
       "parried": "Deine {ability} wird von {target} pariert.",
       "resisted": "{target} widersteht Eurem {ability}.",
+      "evaded": "{target} entgeht deiner {ability}.",
       "healSelf": "Euer {ability} heilt Euch um {amount}.",
       "healSelfCrit": "Euer {ability} heilt Euch kritisch um {amount}.",
       "healOther": "Euer {ability} heilt {target} um {amount}.",
@@ -7017,6 +7105,8 @@ export const de_DE: EnTranslations = {
       "close": "Händler schließen",
       "hint": "Klickt auf einen Gegenstand in Euren Taschen, um ihn zu verkaufen, solange dieses Fenster geöffnet ist.",
       "buyAria": "{item} für {price} kaufen",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Rückkauf",
       "buybackEmpty": "Keine Gegenstände",
       "buybackAria": "{item} für {price} zurückkaufen",
@@ -7296,7 +7386,7 @@ export const de_DE: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Große Unsichtbarkeit",
-        "description": "Ihr verschwindet 20 Sek. lang: Entfernt 2 Effekte mit regelmäßigem Schaden und verringert Euren erlittenen Schaden während der Unsichtbarkeit und kurz danach um 90%. (Magiertalent)"
+        "description": "Verschwindet für 20 Sek. und entfernt 2 Effekte mit Schaden über Zeit. Wenn die Unsichtbarkeit endet, erleidet Ihr 2 Sek. lang 90% weniger Schaden. (Magiertalent)"
       },
       "hot_streak": {
         "name": "Heiße Serie",
@@ -9635,6 +9725,18 @@ export const de_DE: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Zulgars Fangmesser"
       },
+      "fanglords_beastspear": {
+        "name": "Bestienspeer des Fangfürsten"
+      },
+      "bloodmane_warleggings": {
+        "name": "Blutmähnen-Kriegsbeinschützer"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Rankenklauen-Pirschhose"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sonnenknochen-Ritualsarong"
+      },
       "thick_winter_pelt": {
         "name": "Dickes Winterfell"
       },
@@ -9802,6 +9904,9 @@ export const de_DE: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Siegelring von Last Keep"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Zündschlüssel: Schreckfunke, der Bodenerschütterer"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
@@ -10378,6 +10483,24 @@ export const de_DE: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Wyrmchor-Handwickel"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunika des Beckenpirschers"
+      },
+      "verdant_heart_vestment": {
+        "name": "Grünherz-Gewand"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Sonnenknochen-Ritualkettenhemd"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Großfang des Beckens"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Sonnenknochen-Orakelkrone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Blutmähnen-Kriegsbeinschienen"
       },
       "deathless_greatblade": {
         "name": "Todlose Großklinge"

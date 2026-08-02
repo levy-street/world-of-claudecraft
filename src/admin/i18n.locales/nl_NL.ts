@@ -7,6 +7,16 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const nl_NL: Record<string, string> = {
+  'onlinePlayers.autoRefresh': 'Automatisch verversen ({minutes} min)',
+  'onlinePlayers.count': '{count} spelers online',
+  'onlinePlayers.countFiltered': '{shown} van {total} online',
+  'onlinePlayers.filteredEmpty': 'geen enkele online speler komt overeen met deze zoekopdracht',
+  'onlinePlayers.loadFailed': 'laden van online spelers mislukt',
+  'onlinePlayers.loading': 'online spelers laden…',
+  'onlinePlayers.refresh': 'Verversen',
+  'onlinePlayers.searchLabel': 'Online spelers zoeken',
+  'onlinePlayers.searchPlaceholder': 'Zoek speler, klasse, gebied…',
+  'onlinePlayers.sortHint': 'klik op een kolom om te sorteren',
   'alert.passwordLength': 'Voer een nieuw wachtwoord van 6 tot 128 tekens in.',
   'detail.resetPassword': 'Wachtwoord opnieuw instellen',
   'dialog.actionResetPassword': 'Stel een nieuw wachtwoord in en meld elk apparaat af',
@@ -121,7 +131,6 @@ export const nl_NL: Record<string, string> = {
   'stats.avgTick': 'gem. tick',
   'stats.serverRss': 'server-rss',
   'online.title': 'Spelers online',
-  'online.refreshHint': 'vernieuwt elke 5s',
   'online.empty': 'niemand op dit moment online',
   'online.colCharacter': 'Personage',
   'online.colClass': 'Klasse',

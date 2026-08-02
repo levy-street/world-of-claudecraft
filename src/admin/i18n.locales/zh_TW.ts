@@ -7,6 +7,16 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const zh_TW: Record<string, string> = {
+  'onlinePlayers.autoRefresh': '自動重新整理（{minutes} 分鐘）',
+  'onlinePlayers.count': '{count} 人在線',
+  'onlinePlayers.countFiltered': '{total} 名在線玩家中的 {shown} 名',
+  'onlinePlayers.filteredEmpty': '沒有在線玩家符合此搜尋',
+  'onlinePlayers.loadFailed': '載入在線玩家失敗',
+  'onlinePlayers.loading': '正在載入在線玩家…',
+  'onlinePlayers.refresh': '重新整理',
+  'onlinePlayers.searchLabel': '搜尋在線玩家',
+  'onlinePlayers.searchPlaceholder': '搜尋玩家、職業、區域…',
+  'onlinePlayers.sortHint': '點擊欄標題排序',
   'detail.dailyRewardsActions': '每日獎勵管理操作',
   'detail.dailyRewardsBan': '禁止參與每日獎勵',
   'detail.dailyRewardsBanReason': '每日獎勵封禁原因：{value}',
@@ -163,7 +173,6 @@ export const zh_TW: Record<string, string> = {
   'stats.serverRss': '伺服器RSS',
   'stats.playersCap': '玩家上限',
   'online.title': '在線玩家',
-  'online.refreshHint': '每5秒重新整理',
   'online.empty': '目前無人在線',
   'online.colCharacter': '角色',
   'online.colClass': '職業',

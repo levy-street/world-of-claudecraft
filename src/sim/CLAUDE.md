@@ -73,6 +73,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `progression/talents.ts` | `applyTalents`/`spendTalent`/`setSpec`/`respec`/loadouts/`recomputeTalents` |
 | `mob/targeting.ts` | `updateMobTarget`, `retargetMob`, highest-threat target, trivial-target check |
 | `mob/combat_profile.ts` | mob combat profile selection, effective melee reach, and the general chase/attack profile runner |
+| `mob/reachability.ts` | the unreachable-target stall detector (`chaseStalledUnreachable` over `Entity.chaseStall`): the classic evade trigger consumed by `mob/combat_profile.ts`'s engaged postludes; draws no rng |
 | `mob/locomotion.ts` | `updateMob` dispatcher, `resetEvadingMob`, flee recovery, spawn-block; `onBossDeath` points-at `encounters/nythraxis` |
 | `mob/mob_swing.ts` | the mob on-hit affix cascade (`runMobSwingAffixes`); the base hit-table shell stays on `Sim` |
 | `mob/lifecycle.ts` | `respawnMob`, despawn summoned adds, frenzy packmates, death-throes, corpse detonate |
@@ -125,7 +126,10 @@ a row here or a Key files entry (`sim.ts`, `sim_context.ts`, `entity_roster.ts`)
 these before inlining pure logic in a system module: `spell_scaling.ts` (spell/attack
 power coefficients), `stun_dr.ts` (CC diminishing-return categories), `item_level.ts`/
 `item_budget.ts`/`item_level_req.ts` (drop power math), `equipment_rules.ts` (equip
-legality), `cooldown_persist.ts` (cooldown save/load), `unstuck_cooldown.ts` (the hidden
+legality), `launch_paperdoll_slots.ts` (the FROZEN launch-era eleven-slot list, for
+launch-era completeness records ONLY: never validate a slot against it, use
+`isEquipSlot` from `types.ts`, which is derived from the live `ALL_EQUIP_SLOTS`),
+`cooldown_persist.ts` (cooldown save/load), `unstuck_cooldown.ts` (the hidden
 recovery timer across competitive resets), `tab_target.ts`/`assist.ts`/
 `dead_target.ts` (target cycling, /assist, dead-target selectability), `flee_speed.ts`,
 `mob/scan_counters.ts` (the per-tick mob scan-visit tally the server reads post-tick),

@@ -20,6 +20,8 @@ import type {
 } from '../src/ui/hud/vendor/vendor_view';
 import { renderVendorWindow, type VendorWindowDeps } from '../src/ui/hud/vendor/vendor_window';
 
+const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8');
+
 function item(id: string): ItemDef {
   return {
     id,
@@ -115,6 +117,143 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
   });
 });
 
+describe('renderVendorWindow: bulk purchase (#2374)', () => {
+  it('a row with no bulkQuantity renders only the ordinary buy tile', () => {
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'bread',
+        item: item('bread'),
+        price: { copper: 5, honor: 0 },
+        quantity: 1,
+        affordable: true,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view, deps());
+
+    expect(el.querySelectorAll('.vendor-item').length).toBe(1);
+    expect(el.querySelector('.vendor-item-bulk')).toBeNull();
+  });
+
+  it('a row with bulkQuantity of exactly 1 stays a single tile (no redundant Buy Stack)', () => {
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'thread',
+        item: item('thread'),
+        price: { copper: 12, honor: 0 },
+        quantity: 1,
+        affordable: false,
+        bulkQuantity: 1,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view, deps());
+
+    expect(el.querySelectorAll('.vendor-item').length).toBe(1);
+    expect(el.querySelector('.vendor-item-bulk')).toBeNull();
+  });
+
+  it('a row with bulkQuantity > 1 renders a second, always-visible Buy Stack tile', () => {
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'thread',
+        item: item('thread'),
+        price: { copper: 12, honor: 0 },
+        quantity: 1,
+        affordable: true,
+        bulkQuantity: 20,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    let bulkCalled: [string, boolean | undefined] | undefined;
+    renderVendorWindow(
+      el,
+      'Vendor',
+      view,
+      deps({ onBuy: (itemId, bulk) => (bulkCalled = [itemId, bulk]) }),
+    );
+
+    const rows = el.querySelectorAll('.vendor-item');
+    expect(rows.length).toBe(2);
+    const bulkRow = el.querySelector('.vendor-item-bulk') as HTMLButtonElement | null;
+    expect(bulkRow).not.toBeNull();
+    expect(bulkRow?.parentElement).toBe(el.querySelector('.vendor-goods-grid'));
+    expect(bulkRow?.getAttribute('aria-label')).toContain('20');
+
+    bulkRow?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(bulkCalled).toEqual(['thread', true]);
+  });
+
+  it('the Buy Stack tile is disabled whenever the bulk purchase itself is unaffordable', () => {
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'thread',
+        item: item('thread'),
+        price: { copper: 12, honor: 0 },
+        quantity: 1,
+        affordable: false,
+        bulkQuantity: 3,
+        bulkAffordable: false,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view, deps());
+
+    const bulkRow = el.querySelector('.vendor-item-bulk') as HTMLButtonElement | null;
+    expect(bulkRow?.disabled).toBe(true);
+  });
+
+  it('the Buy Stack tile stays enabled when the ordinary row is unaffordable but the bulk purchase is (food/drink stack-of-5 case)', () => {
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'loaf',
+        item: item('loaf'),
+        price: { copper: 50, honor: 0 },
+        quantity: 5,
+        affordable: false,
+        bulkQuantity: 3,
+        bulkAffordable: true,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view, deps());
+
+    const row = el.querySelector('.vendor-item:not(.vendor-item-bulk)') as HTMLButtonElement | null;
+    const bulkRow = el.querySelector('.vendor-item-bulk') as HTMLButtonElement | null;
+    expect(row?.disabled).toBe(true);
+    expect(bulkRow?.disabled).toBe(false);
+  });
+
+  it('ctrl-click and cmd-click on the ordinary tile also request a bulk purchase', () => {
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'thread',
+        item: item('thread'),
+        price: { copper: 12, honor: 0 },
+        quantity: 1,
+        affordable: true,
+        bulkQuantity: 20,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    const calls: (boolean | undefined)[] = [];
+    renderVendorWindow(el, 'Vendor', view, deps({ onBuy: (_itemId, bulk) => calls.push(bulk) }));
+
+    const mainRow = el.querySelector('.vendor-item:not(.vendor-item-bulk)') as HTMLButtonElement;
+    mainRow.dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
+    mainRow.dispatchEvent(new MouseEvent('click', { bubbles: true, metaKey: true }));
+    mainRow.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(calls).toEqual([true, true, false]);
+  });
+});
+
 describe('renderHeroicVendorWindow: goods grid wrapping', () => {
   it('appends rows as children of .vendor-goods-grid', () => {
     const rows: HeroicShopRow[] = [
@@ -188,5 +327,74 @@ describe('#vendor-window desktop width cap: divides by --window-scale and clears
         }
       }
     }
+  });
+});
+
+describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', () => {
+  // Unlike vendor_view.ts/vendor_window.ts (pure core + thin painter), the
+  // open/close/focus lifecycle for #vendor-window lives directly on the Hud
+  // coordinator (openVendor/closeVendor/openHeroicVendor/closeHeroicVendor),
+  // the same shape openBank/closeBank use for the bank companion. So this
+  // suite pins the SOURCE wiring the bank_window.test.ts "hud.ts wiring"
+  // section pins for bank: the non-trapping capture/return pair, matching
+  // bankWindow (NOT windowFocus, which would install a Tab trap and break the
+  // vendor + bags cluster, which is documented as a companion, not modal).
+  // Anchors resolve with indexOf, which returns -1 (not undefined) on a miss;
+  // a slice built from two -1s or one -1 plus a real offset can still
+  // silently contain the expected substring (e.g. slice(-1, 40) === the
+  // WHOLE tail of the file), so a renamed anchor must be caught explicitly
+  // rather than trusted to make the body assertions fail for the right
+  // reason.
+  const anchor = (needle: string): number => {
+    const at = hud.indexOf(needle);
+    expect(at, `anchor not found in hud.ts: ${JSON.stringify(needle)}`).toBeGreaterThanOrEqual(0);
+    return at;
+  };
+  const openVendorStart = anchor('openVendor(npcId: number, opener?: HTMLElement | null): void {');
+  const openVendorEnd = anchor('private renderVendor(): void {');
+  const openHeroicVendorStart = anchor(
+    'openHeroicVendor(npcId: number, opener?: HTMLElement | null): void {',
+  );
+  const openHeroicVendorEnd = anchor('private renderHeroicVendor(): void {');
+  const closeHeroicVendorStart = anchor('closeHeroicVendor(): void {');
+  const closeVendorStart = anchor('closeVendor(): void {');
+  const vendorOpenGetterStart = anchor('get vendorOpen(): boolean {');
+  expect(openVendorEnd).toBeGreaterThan(openVendorStart);
+  expect(openHeroicVendorEnd).toBeGreaterThan(openHeroicVendorStart);
+  expect(closeVendorStart).toBeGreaterThan(closeHeroicVendorStart);
+  expect(vendorOpenGetterStart).toBeGreaterThan(closeVendorStart);
+  const openVendorBody = hud.slice(openVendorStart, openVendorEnd);
+  const openHeroicVendorBody = hud.slice(openHeroicVendorStart, openHeroicVendorEnd);
+  const closeHeroicVendorBody = hud.slice(closeHeroicVendorStart, closeVendorStart);
+  const closeVendorBody = hud.slice(closeVendorStart, vendorOpenGetterStart);
+
+  it('captures the opener on openVendor and openHeroicVendor via the shared FocusManager, with an explicit opener overriding the fallback', () => {
+    expect(openVendorBody).toContain(
+      'this.vendorOpenerFocus = opener !== undefined ? opener : this.focusManager.activeFocusable();',
+    );
+    expect(openHeroicVendorBody).toContain(
+      'this.vendorOpenerFocus = opener !== undefined ? opener : this.focusManager.activeFocusable();',
+    );
+  });
+
+  it('returns focus to the opener on closeVendor and closeHeroicVendor', () => {
+    expect(closeVendorBody).toContain('this.focusManager.restore(this.vendorOpenerFocus);');
+    expect(closeHeroicVendorBody).toContain('this.focusManager.restore(this.vendorOpenerFocus);');
+  });
+
+  it('never installs a Tab trap for #vendor-window (non-modal bags companion)', () => {
+    expect(hud).not.toMatch(/this\.windowFocus\('#vendor-window'\)/);
+  });
+
+  it('closeVendor is a no-op when the copper vendor tenant is not open (Esc/generic close on the heroic tenant)', () => {
+    // closeManagedWindow('vendor-window') calls closeVendor() then closeHeroicVendor()
+    // unconditionally, since either tenant can hold the shared #vendor-window container.
+    // Without this guard, closeVendor still ran while only the heroic tenant was open,
+    // clearing the shared vendorOpenerFocus (and firing hideTooltip/mobile-bags teardown)
+    // before closeHeroicVendor got a chance to restore it, so the generic close path
+    // (Escape, walking out of range via the topmost-window dispatcher) dropped the
+    // WCAG 2.4.3 focus return even though the explicit close button worked.
+    expect(closeVendorBody).toContain('// Guard');
+    expect(closeVendorBody).toContain('if (this.openVendorNpcId === null) return;');
   });
 });

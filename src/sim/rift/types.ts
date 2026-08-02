@@ -8,6 +8,7 @@
 // Sim layer: no DOM/Three imports. This file is types only.
 
 import type { DungeonLayout, InteriorStyle } from '../dungeon_layout';
+import type { CombatExitMemory } from '../instance_exit_memory';
 import type { LockSession } from '../lockpick';
 import type { DelveHazardZone, RiftTier } from '../types';
 
@@ -351,6 +352,12 @@ export interface RiftInstance {
    * to the boss's cast time; at zero it detonates (lethal to anyone inside `radius`).
    * Cleared on boss death or floor reset. */
   bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number }>;
+  /** Recently-exited-mid-combat memory (issue #2653): a player who left this run
+   * through the beacon/exit while a mob was actively fighting them has their
+   * dropped threat snapshotted here for a short window. Re-entering before it
+   * lapses resumes the fight instead of granting a free, unengaged reset
+   * (rift/runs.ts). Session state, cleared with the claim. */
+  combatExitMemory: CombatExitMemory;
 }
 
 /** The rift as a whole (derived from the descriptor's seed + baseLevel), used for

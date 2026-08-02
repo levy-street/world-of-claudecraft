@@ -208,6 +208,26 @@ describe('action-bar layout persistence (wire round trip)', () => {
     expect(resumedSnap.self.hbl).toEqual(LAYOUT_AFTER_MIDSESSION_EDIT);
   });
 
+  it('resume keeps the saved layout when the caller omits hotbarLayout in meta', () => {
+    // ws_auth.ts (the real reconnect path) always supplies hotbarLayout, but an
+    // in-process/test caller passing meta = {} must not have the session's
+    // layout reset to null: that would read to the client as "server has no
+    // copy, seed from this device" and clobber a real saved layout.
+    const server = new GameServer();
+    const firstFc = fakeWs();
+    const session = join(server, firstFc, 12, 'BareResumer', { hotbarLayout: LAYOUT });
+    broadcast(server);
+    expect(lastSnap(firstFc.sent).self.hbl).toEqual(LAYOUT);
+
+    session.linkdead = true;
+    const secondFc = fakeWs();
+    const resumed = join(server, secondFc, 12, 'BareResumer');
+    expect(resumed).toBe(session);
+    broadcast(server);
+    const resumedSnap = lastSnap(secondFc.sent);
+    expect(resumedSnap.self.hbl).toEqual(LAYOUT);
+  });
+
   it('drops a garbage / oversized payload server-side without crashing or persisting', async () => {
     const server = new GameServer();
     const fc = fakeWs();

@@ -371,10 +371,10 @@ export async function handlePerfReport(
     realm: REALM,
     graphicsPreset: choiceIn(
       body.graphicsPreset,
-      ['auto', 'low', 'medium', 'high', 'ultra', 'advanced'],
+      ['auto', 'low', 'medium', 'high', 'ultra', 'insane', 'advanced'],
       'auto',
     ),
-    gfxTier: choiceIn(body.gfxTier, ['low', 'medium', 'high', 'ultra'], 'low'),
+    gfxTier: choiceIn(body.gfxTier, ['low', 'medium', 'high', 'ultra', 'insane'], 'low'),
     autoGovernor: Boolean(body.autoGovernor),
     targetFps: intIn(body.targetFps, 0, 240, 0),
     renderScale: numberIn(body.renderScale, 0.3, 1.5, 1),

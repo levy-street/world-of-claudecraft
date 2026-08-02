@@ -57,19 +57,20 @@ What each knob does, and why it is gameplay-neutral:
   instead of 10 Hz. Cosmetic: the minimap never draws enemy players (only PvE aggro mobs and
   allies), and the same aggro signal is full-rate in the 3D world and on nameplates.
 - Auras, `src/ui/auras_painter.ts`: on low, the visible-count cap is DEBUFF-PRIORITY. The
-  player buff bar (`createAurasView('all')`) interleaves buffs and debuffs in sim-application
-  order; the cap sheds BUFF overflow only (`if (!s.isDebuff && rendered >= cap) continue`), so
-  a debuff is never culled. Full tiers are byte-identical (cap is +Infinity). The player's OWN
-  buff and debuff bars are never tier-gated: they repaint every frame on every preset, because
-  your own debuffs are the ACTIONABLE read named above. Only the TARGET's (non-self) debuffs
-  strip coarsens its repaint cadence to about 4 Hz on low (at the human reaction floor and the
-  same rate the party frames run at on every tier), the same non-self throttle the target frame
-  body uses.
+  player's own buff bar (`createAurasView('buffs')`) and debuff bar (`createAurasView('debuffs')`)
+  are two separate view instances; the cap sheds BUFF overflow only
+  (`if (!s.isDebuff && rendered >= cap) continue`), so a debuff is never culled. Full tiers are
+  byte-identical (cap is +Infinity). The player's OWN buff and debuff bars are never tier-gated:
+  they repaint every frame on every preset, because your own debuffs are the ACTIONABLE read
+  named above. The TARGET's (non-self) debuffs strip (`createAurasView('all')`, which
+  interleaves buffs and debuffs in sim-application order) is likewise never tier-gated: it can
+  carry a purgeable buff, an allied maintained buff, or a group-coordinated foreign debuff that a
+  player reacts to, so it repaints every frame on every preset just like the player's own bars.
 - Target frame, hud + `unit_frame_painter.ts`: on low, the target frame BODY (HP / level /
   portrait) refreshes at about 10 Hz; a target SWAP bypasses the throttle
-  (`nonSelfRepaintDue`), and the cast bar is painted OUTSIDE the throttle (full rate, so
-  interrupt timing is never degraded). Cosmetic: 100 ms is below the reaction loop and target
-  HP is a coarse read.
+  (`nonSelfRepaintDue`), and the cast bar and the debuffs strip are both painted OUTSIDE the
+  throttle (full rate, so interrupt timing and target aura reads are never degraded). Cosmetic:
+  100 ms is below the reaction loop and target HP is a coarse read.
 - Party frames: deliberately NOT tiered. Party-member HP is a healer's only actionable signal,
   so it stays on the 4 Hz mediumHud band for EVERY tier. (An earlier draft throttled it to
   2 Hz on low; the re-audit removed that. The perf win was illusory anyway, because

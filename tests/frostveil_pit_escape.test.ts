@@ -1,5 +1,5 @@
 // Every enterable landform must be leavable on foot (the rule the Drakemaw
-// caldera suite enforces, tests/terrain_escape.test.ts). The Frostveil's
+// caldera suite enforces, tests/terrain_escape_walkout.test.ts). The Frostveil's
 // Glacier Tarn broke it: the tarn and its northern finger carve one merged
 // bowl whose sandy pond floor sits 10 to 25yd under a terraced icy rim, and a
 // player who jumped in could not climb back out at any azimuth (the player

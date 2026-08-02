@@ -923,6 +923,23 @@ export const es_ES: EnTranslations = {
       "separate": "Separar {meter}",
       "regroup": "Reagrupar {meter}"
     },
+    "targetAuras": {
+      "title": "Auras del objetivo",
+      "keybindLabel": "Beneficios y perjuicios del objetivo",
+      "all": "Todos",
+      "debuffs": "Perjuicios",
+      "buffs": "Beneficios",
+      "unlock": "Mover la ventana de auras del objetivo",
+      "lock": "Bloquear la ventana de auras del objetivo",
+      "configureRows": "Configurar las auras del objetivo",
+      "fewerRows": "Preferir menos filas de auras",
+      "moreRows": "Preferir más filas de auras",
+      "visibleRows": "Filas de auras preferidas: {count}",
+      "showSources": "Mostrar las fuentes de las auras",
+      "hideSources": "Ocultar las fuentes de las auras",
+      "ownAura": "Tu aura",
+      "opacity": "Opacidad de las auras: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "La mascota tiene la salud al maximo",
       "disabledNoFood": "No hay comida en tus bolsas que cure a tu mascota"
@@ -967,13 +984,15 @@ export const es_ES: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, el Sapo Saltasombras",
       "name_stormfeather_griffin": "Plumatormenta Alcanzacielos",
       "name_thunderstrut_gobbler": "Pavoneatruenos, el Gran Pavo",
+      "name_terrorspark_groundshaker": "Aterrachispa, Sacudetierras",
       "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_stalkglider_snail": "Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.",
       "desc_aether_hover_cycle": "Una potente moto magitecnológica diseñada para desplazamientos de combate veloces a baja altura.",
       "desc_shadowjump_toad": "Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.",
       "desc_stormfeather_griffin": "Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.",
-      "desc_thunderstrut_gobbler": "Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta."
+      "desc_thunderstrut_gobbler": "Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta.",
+      "desc_terrorspark_groundshaker": "Una máquina blindada y compacta con orugas pesadas, un cañón de gran calibre y una silla hecha para pilotos intrépidos."
     },
     "mountTraining": {
       "mountPrompt": "Pulsa {key} para montar el Corcel del Valor de entrenamiento.",
@@ -1343,6 +1362,51 @@ export const es_ES: EnTranslations = {
       "badges": {
         "backgrounded": "En segundo plano",
         "offline": "Sin conexión"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Clase actual: {class}",
+      "previewHint": "Usa Configurar posiciones para mover un aura sin tapar el menú.",
+      "noProcs": "No hay ningún proc compatible para este personaje.",
+      "enabled": "Mostrar aura",
+      "icon": "Icono de hechizo",
+      "arcs": "Medialunas laterales",
+      "groundRing": "Anillo en el suelo",
+      "groundRingSpellOrder": "Anillo en el suelo: orden de hechizos",
+      "crescentsSpellOrder": "Medialunas laterales: orden de hechizos",
+      "size": "Tamaño",
+      "iconSize": "Tamaño del icono",
+      "crescentBlockSize": "Tamaño de bloque de medialuna",
+      "groundRingBlockSize": "Tamaño de bloque del anillo en el suelo",
+      "opacity": "Opacidad",
+      "color": "Color",
+      "allOn": "Activar todas",
+      "allOff": "Desactivar todas",
+      "reposition": "Configurar posiciones",
+      "positioning": "Posicionando: {aura}",
+      "selectAura": "Aura",
+      "done": "Listo",
+      "moveLeft": "Mover a la izquierda",
+      "moveUp": "Mover arriba",
+      "moveDown": "Mover abajo",
+      "moveRight": "Mover a la derecha",
+      "moveEarlier": "Mover el hechizo hacia dentro",
+      "moveLater": "Mover el hechizo hacia fuera",
+      "screenPosition": "Posición en pantalla",
+      "spellOrder": "Orden de hechizos",
+      "reset": "Restablecer posición",
+      "spellPosition": "Orden de hechizos {position} / {count}",
+      "procs": {
+        "revenge": "¡Venganza!",
+        "battleTrance": "Trance de Batalla",
+        "overpowerCharge": "Potenciación de Mano Roja",
+        "suddenDeath": "Muerte Súbita",
+        "victoryRush": "Ímpetu de Victoria",
+        "enrage": "Estrago: Enfurecido",
+        "heatingUp": "Calentando",
+        "arcaneCharge": "Cargas Arcanas",
+        "aetherRush": "Oleada de Éter"
       }
     },
     "playerCard": {
@@ -2152,6 +2216,14 @@ export const es_ES: EnTranslations = {
       "benefits": "Vincula tu cuenta de Steam desde la aplicación de escritorio para reflejar las gestas que consigas como logros de Steam.",
       "noTicket": "Steam no proporcionó un ticket de vinculación. Inicia Steam y vuelve a intentarlo."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Vincular Epic",
+      "unlink": "Desvincular Epic",
+      "linked": "Vinculado a la cuenta de Epic {id}",
+      "benefits": "Vincula tu cuenta de Epic desde la aplicación de escritorio de Epic para reflejar las gestas que consigas en logros de Epic.",
+      "noProof": "Epic no proporcionó una prueba de vinculación. Inicia desde la Epic Games Store y vuelve a intentarlo."
+    },
     "mailbox": {
       "title": "Buzón",
       "subtitle": "El Correo del Cuervo",
@@ -2196,7 +2268,7 @@ export const es_ES: EnTranslations = {
         "noRecipient": "Nadie con ese nombre tiene buzón aquí.",
         "tooManyParcels": "Una carta lleva como máximo {count} paquetes.",
         "noMailQuestItems": "No puedes enviar objetos de misión por correo.",
-        "noMailBound": "Ese objeto está vinculado y no puede enviarse por correo.",
+        "noMailBound": "Este objeto está vinculado y no puede enviarse por correo.",
         "notEnoughItems": "No tienes tantos para enviar.",
         "cantAffordPostage": "No puedes costear el franqueo.",
         "recipientBoxFull": "Su buzón está lleno.",
@@ -3002,6 +3074,14 @@ export const es_ES: EnTranslations = {
       "already_linked": "Tu cuenta ya tiene una cuenta de Steam vinculada.",
       "account_taken": "Esa cuenta de Steam ya está vinculada a otra cuenta.",
       "upstream": "Steam no respondió. Inténtalo de nuevo en un momento."
+    },
+    "epic": {
+      "disabled": "La vinculación con Epic no está disponible en este momento.",
+      "invalid_token": "Epic no pudo verificar esta solicitud de vinculación. Inténtalo de nuevo desde la aplicación de escritorio.",
+      "banned": "Esa cuenta de Epic no se puede vincular.",
+      "already_linked": "Tu cuenta ya tiene una cuenta de Epic vinculada.",
+      "account_taken": "Esa cuenta de Epic ya está vinculada a otra cuenta.",
+      "upstream": "Epic no respondió. Inténtalo de nuevo en un momento."
     },
     "wallet": {
       "handoff_invalid": "La autorización de la cartera ha caducado o no se ha podido verificar. Inténtalo de nuevo."
@@ -6257,11 +6337,15 @@ export const es_ES: EnTranslations = {
       "graphicsPresetMedium": "Media",
       "graphicsPresetHigh": "Alta",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrema",
       "graphicsPresetAdvanced": "Avanzada",
       "terrainDetail": "Detalle del terreno",
       "foliageDensity": "Densidad de vegetación",
       "effectsQuality": "Efectos e iluminación",
       "shadowQuality": "Calidad de sombras",
+      "surfaceDetail": "Detalle de superficies",
+      "surfaceDetailBasic": "Básico",
+      "surfaceDetailFull": "Completo",
       "terrainLow": "Bajo",
       "terrainHigh": "Alto",
       "touchOpacity": "Opacidad de controles táctiles",
@@ -6425,6 +6509,8 @@ export const es_ES: EnTranslations = {
       "joinParty": "Unirse al grupo",
       "guildInvite": "{name} te invita a unirte a {guild}.",
       "joinGuild": "Unirse a hermandad",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} quiere comerciar contigo.",
       "openTrade": "Abrir comercio",
       "duelRequest": "¡{name} te ha desafiado a un duelo!",
@@ -6438,6 +6524,7 @@ export const es_ES: EnTranslations = {
       "floatingDodge": "Esquiva",
       "floatingParry": "Rechazo",
       "floatingResist": "Resistido",
+      "floatingEvade": "Eludido",
       "floatingHealFull": "Completo",
       "floatingHealAbsorbed": "Absorbido",
       "cannotMove": "¡No puedes moverte!",
@@ -6450,6 +6537,7 @@ export const es_ES: EnTranslations = {
       "dodged": "{target} esquiva tu {ability}.",
       "parried": "{target} rechaza tu {ability}.",
       "resisted": "{target} resiste tu {ability}.",
+      "evaded": "{target} elude tu {ability}.",
       "healSelf": "Tu {ability} te sana {amount}.",
       "healSelfCrit": "Tu {ability} te sana críticamente {amount}.",
       "healOther": "Tu {ability} sana a {target} por {amount}.",
@@ -6546,12 +6634,12 @@ export const es_ES: EnTranslations = {
       "arenaQueueTrading": "Termina tu comercio antes de entrar en cola.",
       "arenaQueueInstance": "No puedes entrar en cola desde una instancia.",
       "tradeInProgress": "Ya hay un comercio en curso.",
-      "tradeAlreadyTrading": "Ese jugador ya está comerciando.",
+      "tradeAlreadyTrading": "Ese jugador ya está tradeando.",
       "tradeTooFar": "El objetivo está demasiado lejos para comerciar.",
       "tradeExpired": "La solicitud de comercio ha expirado.",
       "tradeFailed": "Comercio fallido: los objetos o el dinero ya no están disponibles.",
       "tradeBound": "Ese objeto está vinculado y no puede comerciarse.",
-      "marketListBound": "Ese objeto está vinculado y no puede ponerse a la venta."
+      "marketListBound": "Este objeto está vinculado y no puede ponerse a la venta."
     },
     "logs": {
       "standUp": "Te pones de pie.",
@@ -7017,6 +7105,8 @@ export const es_ES: EnTranslations = {
       "close": "Cerrar vendedor",
       "hint": "Haz clic en un objeto de tus bolsas para venderlo mientras esta ventana esté abierta.",
       "buyAria": "Comprar {item} por {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Recomprar",
       "buybackEmpty": "Sin objetos",
       "buybackAria": "Recomprar {item} por {price}",
@@ -7296,7 +7386,7 @@ export const es_ES: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilidad mejorada",
-        "description": "Te esfumas durante 20 s: suprime 2 efectos de daño periódico y reduce el daño recibido un 90% mientras sigues invisible y durante un breve periodo posterior. (Talento de mago)"
+        "description": "Desapareces durante 20 s y eliminas 2 efectos de daño periódico. Cuando termina la invisibilidad, recibes un 90% menos de daño durante 2 s. (Talento de mago)"
       },
       "hot_streak": {
         "name": "Racha ardiente",
@@ -9635,6 +9725,18 @@ export const es_ES: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Cuchillo Colmillo de Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Lanza de Bestias del Fanglord"
+      },
+      "bloodmane_warleggings": {
+        "name": "Perneras de Guerra Bloodmane"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Calzas de Acecho Vineclaw"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Pareo Ritual Sunbone"
+      },
       "thick_winter_pelt": {
         "name": "Piel Gruesa de Invierno"
       },
@@ -9802,6 +9904,9 @@ export const es_ES: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Sello del Last Keep"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Llave de encendido: Aterrachispa, Sacudetierras"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"
@@ -10378,6 +10483,24 @@ export const es_ES: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Vendas del Coro del Wyrm"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Túnica del Acechador de la Cuenca"
+      },
+      "verdant_heart_vestment": {
+        "name": "Vestimenta del Corazón Verdeante"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Loriga Ritual Sunbone"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Gran Colmillo de la Cuenca"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Corona del Oráculo Sunbone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Guardapiernas de Guerra Bloodmane"
       },
       "deathless_greatblade": {
         "name": "Mandoble Imperecedero"

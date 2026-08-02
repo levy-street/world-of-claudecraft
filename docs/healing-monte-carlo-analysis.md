@@ -232,7 +232,7 @@ in this worktree (branch `analysis/healing-montecarlo`):
   `src/sim/mob/mob_swing.ts` (on-swing hook beside the cleave affix),
   `src/sim/types.ts` (state field). Tests:
   `tests/nythraxis_gravebreaker_charged.test.ts` (new, red against the old
-  design), six rewritten pins in `tests/nythraxis_raid.test.ts`, parity
+  design), six rewritten pins in `tests/nythraxis_raid_unit.test.ts`, parity
   scenario updated and `nythraxis_full_pull` golden re-minted
   (`UPDATE_PARITY=1`). Green: nythraxis suites (148), parity (183),
   architecture guard, `tsc`. Run the full gate before merging.

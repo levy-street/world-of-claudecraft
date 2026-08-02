@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // db.ts builds a pg Pool and requires DATABASE_URL at import time; stub both so
 // the module loads and every query goes through a spy we can assert against.
-const dbMock = vi.hoisted(() => ({ query: vi.fn(), connect: vi.fn() }));
+const dbMock = vi.hoisted(() => ({
+  query: vi.fn(),
+  connect: vi.fn(),
+  bustGuildList: vi.fn(),
+}));
 vi.hoisted(() => {
   process.env.DATABASE_URL = 'postgres://test/test';
 });
@@ -10,6 +14,9 @@ vi.mock('pg', () => ({
   Pool: function Pool() {
     return { query: dbMock.query, connect: dbMock.connect };
   },
+}));
+vi.mock('../server/admin_guilds_read', () => ({
+  bustAdminGuildListReads: dbMock.bustGuildList,
 }));
 
 import { configureCommunityTestAccounts } from '../server/community_test_accounts';
@@ -37,6 +44,7 @@ beforeEach(() => {
   configureCommunityTestAccounts(false);
   dbMock.query.mockReset();
   dbMock.connect.mockReset();
+  dbMock.bustGuildList.mockReset();
 });
 
 describe('community test account transaction', () => {
@@ -145,14 +153,25 @@ describe('deleteCharacter', () => {
     expect(params).toContain(REALM);
     // id + account + realm — the same three predicates getCharacter/renameCharacter use
     expect(params).toEqual(expect.arrayContaining([42, 7, REALM]));
+    expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
   });
 
   it('reports whether a row was actually deleted', async () => {
     dbMock.query.mockResolvedValueOnce({ rowCount: 0 } as any);
     expect(await deleteCharacter(7, 42)).toBe(false);
+    expect(dbMock.bustGuildList).not.toHaveBeenCalled();
 
     dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
     expect(await deleteCharacter(7, 42)).toBe(true);
+    expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
+  });
+
+  it('does not invalidate the guild directory when the delete fails', async () => {
+    dbMock.query.mockRejectedValueOnce(new Error('delete failed'));
+
+    await expect(deleteCharacter(7, 42)).rejects.toThrow('delete failed');
+
+    expect(dbMock.bustGuildList).not.toHaveBeenCalled();
   });
 });
 
@@ -191,9 +210,19 @@ describe('renameCharacter', () => {
       rowCount: 1,
     } as any);
     expect((await renameCharacter(7, 42, 'Newname'))?.name).toBe('Newname');
+    expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
 
     dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
     expect(await renameCharacter(7, 42, 'Newname')).toBeNull();
+    expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
+  });
+
+  it('does not invalidate the guild directory when the rename fails', async () => {
+    dbMock.query.mockRejectedValueOnce(new Error('rename failed'));
+
+    await expect(renameCharacter(7, 42, 'Newname')).rejects.toThrow('rename failed');
+
+    expect(dbMock.bustGuildList).not.toHaveBeenCalled();
   });
 });
 
@@ -229,7 +258,12 @@ describe('reclaimDeactivatedName', () => {
     expect(updateCall![0]).toMatch(/force_rename\s*=\s*TRUE/i);
     expect(updateCall![1][0]).toBe(99); // scoped to the orphaned character id
     expect(updateCall![1][1]).toBe('SturdyStubsa'); // archival placeholder
-    expect(calls.map((c) => c[0])).toContain('COMMIT');
+    const commitIndex = calls.findIndex((c) => c[0] === 'COMMIT');
+    expect(commitIndex).toBeGreaterThanOrEqual(0);
+    expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
+    expect(client.query.mock.invocationCallOrder[commitIndex]).toBeLessThan(
+      dbMock.bustGuildList.mock.invocationCallOrder[0],
+    );
     expect(client.release).toHaveBeenCalledTimes(1);
   });
 
@@ -249,6 +283,7 @@ describe('reclaimDeactivatedName', () => {
     expect(verbs).not.toContain('COMMIT');
     expect(verbs).toContain('ROLLBACK');
     expect(verbs.some((s) => /UPDATE characters/i.test(s))).toBe(false);
+    expect(dbMock.bustGuildList).not.toHaveBeenCalled();
   });
 
   it('does nothing when the name is not held at all', async () => {

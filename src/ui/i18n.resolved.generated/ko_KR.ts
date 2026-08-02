@@ -923,6 +923,23 @@ export const ko_KR: EnTranslations = {
       "separate": "{meter} 분리",
       "regroup": "{meter} 통합"
     },
+    "targetAuras": {
+      "title": "대상 오라",
+      "keybindLabel": "대상 강화 및 약화 효과",
+      "all": "전체",
+      "debuffs": "약화 효과",
+      "buffs": "강화 효과",
+      "unlock": "대상 오라 창 이동",
+      "lock": "대상 오라 창 잠금",
+      "configureRows": "대상 오라 설정",
+      "fewerRows": "오라 행 수 줄이기",
+      "moreRows": "오라 행 수 늘리기",
+      "visibleRows": "선호하는 오라 행 수: {count}",
+      "showSources": "오라 시전자 이름 표시",
+      "hideSources": "오라 시전자 이름 숨기기",
+      "ownAura": "내 오라",
+      "opacity": "오라 불투명도: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "펫의 체력이 가득 찼습니다",
       "disabledNoFood": "가방에 펫을 치유할 음식이 없습니다"
@@ -967,13 +984,15 @@ export const ko_KR: EnTranslations = {
       "name_shadowjump_toad": "그림자 도약 두꺼비 카마카게",
       "name_stormfeather_griffin": "하늘닿이 폭풍깃",
       "name_thunderstrut_gobbler": "천둥활보 대왕 칠면조",
+      "name_terrorspark_groundshaker": "대지를 뒤흔드는 테러스파크",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
       "desc_aether_hover_cycle": "낮게 떠서 빠르게 전장을 가로지르도록 설계된 강력한 마도 바이크입니다.",
       "desc_shadowjump_toad": "어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.",
       "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.",
-      "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다."
+      "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
+      "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다."
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
@@ -1343,6 +1362,51 @@ export const ko_KR: EnTranslations = {
       "badges": {
         "backgrounded": "백그라운드",
         "offline": "오프라인"
+      }
+    },
+    "auraOverlay": {
+      "title": "오라",
+      "currentClass": "현재 직업: {class}",
+      "previewHint": "위치 설정으로 오라를 옮겨 메뉴를 가리지 마세요.",
+      "noProcs": "이 캐릭터에 지원되는 발동이 없습니다.",
+      "enabled": "오라 표시",
+      "icon": "주문 아이콘",
+      "arcs": "측면 초승달",
+      "groundRing": "지면 고리",
+      "groundRingSpellOrder": "지면 고리: 주문 순서",
+      "crescentsSpellOrder": "측면 초승달: 주문 순서",
+      "size": "크기",
+      "iconSize": "아이콘 크기",
+      "crescentBlockSize": "초승달 블록 크기",
+      "groundRingBlockSize": "지면 고리 블록 크기",
+      "opacity": "불투명도",
+      "color": "색상",
+      "allOn": "모두 켜기",
+      "allOff": "모두 끄기",
+      "reposition": "위치 설정",
+      "positioning": "배치: {aura}",
+      "selectAura": "오라",
+      "done": "완료",
+      "moveLeft": "왼쪽 이동",
+      "moveUp": "위로 이동",
+      "moveDown": "아래로 이동",
+      "moveRight": "오른쪽 이동",
+      "moveEarlier": "주문을 안쪽으로",
+      "moveLater": "주문을 바깥쪽으로",
+      "screenPosition": "화면 위치",
+      "spellOrder": "주문 순서",
+      "reset": "위치 초기화",
+      "spellPosition": "주문 순서 {position} / {count}",
+      "procs": {
+        "revenge": "복수!",
+        "battleTrance": "전투 명상",
+        "overpowerCharge": "적수 강화",
+        "suddenDeath": "급사",
+        "victoryRush": "승리의 돌진",
+        "enrage": "혼란: 격노",
+        "heatingUp": "달아오름",
+        "arcaneCharge": "비전 충전",
+        "aetherRush": "에테르 쇄도"
       }
     },
     "playerCard": {
@@ -2151,6 +2215,14 @@ export const ko_KR: EnTranslations = {
       "linked": "Steam 계정 {id}에 연동됨",
       "benefits": "데스크톱 앱에서 Steam 계정을 연동하면 획득한 업적이 Steam 도전 과제로 반영됩니다.",
       "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요."
+    },
+    "epic": {
+      "title": "Epic",
+      "link": "Epic 연동",
+      "unlink": "Epic 연동 해제",
+      "linked": "Epic 계정 {id}에 연동됨",
+      "benefits": "Epic 데스크톱 앱에서 Epic 계정을 연동하면 획득한 업적이 Epic 도전 과제로 반영됩니다.",
+      "noProof": "Epic에서 연동 증명을 받지 못했습니다. Epic Games Store에서 실행한 뒤 다시 시도해 주세요."
     },
     "mailbox": {
       "title": "우편함",
@@ -3002,6 +3074,14 @@ export const ko_KR: EnTranslations = {
       "already_linked": "계정에 이미 연동된 Steam 계정이 있습니다.",
       "account_taken": "해당 Steam 계정은 이미 다른 계정에 연결되어 있습니다.",
       "upstream": "Steam이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
+    },
+    "epic": {
+      "disabled": "현재 Epic 연동을 사용할 수 없습니다.",
+      "invalid_token": "Epic이 이 연동 요청을 확인하지 못했습니다. 데스크톱 앱에서 다시 시도해 주세요.",
+      "banned": "해당 Epic 계정은 연동할 수 없습니다.",
+      "already_linked": "계정에 이미 연동된 Epic 계정이 있습니다.",
+      "account_taken": "해당 Epic 계정은 이미 다른 계정에 연결되어 있습니다.",
+      "upstream": "Epic이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
     },
     "wallet": {
       "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요."
@@ -6257,11 +6337,15 @@ export const ko_KR: EnTranslations = {
       "graphicsPresetMedium": "중간",
       "graphicsPresetHigh": "높음",
       "graphicsPresetUltra": "울트라",
+      "graphicsPresetInsane": "극한",
       "graphicsPresetAdvanced": "고급",
       "terrainDetail": "지형 세부 묘사",
       "foliageDensity": "초목 밀도",
       "effectsQuality": "효과 및 조명",
       "shadowQuality": "그림자 품질",
+      "surfaceDetail": "표면 디테일",
+      "surfaceDetailBasic": "기본",
+      "surfaceDetailFull": "전체",
       "terrainLow": "낮음",
       "terrainHigh": "높음",
       "touchOpacity": "터치 조작 투명도",
@@ -6425,6 +6509,8 @@ export const ko_KR: EnTranslations = {
       "joinParty": "파티 참가",
       "guildInvite": "{name}님이 {guild}에 초대했습니다.",
       "joinGuild": "길드 참가",
+      "guildInviteCancelled": "길드 이름이 변경되어 대기 중인 길드 초대가 취소되었습니다.",
+      "guildRenamed": "운영팀이 회원님의 길드 이름을 {name}(으)로 변경했습니다.",
       "tradeRequest": "{name}님이 거래를 원합니다.",
       "openTrade": "거래 열기",
       "duelRequest": "{name}님이 결투를 신청했습니다!",
@@ -6438,6 +6524,7 @@ export const ko_KR: EnTranslations = {
       "floatingDodge": "회피",
       "floatingParry": "무기 막기",
       "floatingResist": "저항",
+      "floatingEvade": "완전 회피",
       "floatingHealFull": "가득 참",
       "floatingHealAbsorbed": "흡수됨",
       "cannotMove": "이동 불가!",
@@ -6450,6 +6537,7 @@ export const ko_KR: EnTranslations = {
       "dodged": "{target}이 {ability}을 회피했습니다.",
       "parried": "{target}이 당신의 {ability}을 무기로 막았습니다.",
       "resisted": "{target}이 {ability}을 저항했습니다.",
+      "evaded": "{target}이 당신의 {ability}을 완전히 회피했습니다.",
       "healSelf": "{ability}이 자신을 {amount}만큼 치유했습니다.",
       "healSelfCrit": "{ability}이 자신을 치명타 치유로 {amount}만큼 회복했습니다.",
       "healOther": "{ability}이 {target}을 {amount}만큼 치유했습니다.",
@@ -7017,6 +7105,8 @@ export const ko_KR: EnTranslations = {
       "close": "상인 닫기",
       "hint": "이 창이 열려 있을 때 가방의 아이템을 클릭하면 판매합니다.",
       "buyAria": "{price}에 {item} 구매",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "되사기",
       "buybackEmpty": "물품 없음",
       "buybackAria": "{item}을(를) {price}에 되사기",
@@ -7296,7 +7386,7 @@ export const ko_KR: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "상급 투명화",
-        "description": "20초 동안 모습을 감춥니다. 지속 피해 효과 2개를 제거하고 투명 상태인 동안과 해제 직후 받는 피해가 90% 감소합니다. (마법사 특성)"
+        "description": "20초 동안 사라지며 지속 피해 효과를 2개 제거합니다. 투명화가 끝나면 2초 동안 받는 피해가 90% 감소합니다. (마법사 특성)"
       },
       "hot_streak": {
         "name": "몰아치는 열기",
@@ -9635,6 +9725,18 @@ export const ko_KR: EnTranslations = {
       "wildheart_fangknife": {
         "name": "줄가르의 송곳니칼"
       },
+      "fanglords_beastspear": {
+        "name": "송곳니 군주의 야수창"
+      },
+      "bloodmane_warleggings": {
+        "name": "피갈기 전쟁 다리보호구"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "덩굴발톱 잠행 바지"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "태양뼈 의식 사롱"
+      },
       "thick_winter_pelt": {
         "name": "두꺼운 겨울 모피"
       },
@@ -9802,6 +9904,9 @@ export const ko_KR: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "마지막 요새의 인장"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "테러스파크 시동 열쇠"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
@@ -10378,6 +10483,24 @@ export const ko_KR: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "용노래 손싸개"
+      },
+      "basin_stalkers_tunic": {
+        "name": "분지 추적자의 튜닉"
+      },
+      "verdant_heart_vestment": {
+        "name": "신록의 심장 예복"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "태양뼈 의식 사슬갑옷"
+      },
+      "greatfang_of_the_basin": {
+        "name": "분지의 대송곳니"
+      },
+      "sunbone_oracles_crown": {
+        "name": "태양뼈 예언자의 왕관"
+      },
+      "bloodmane_war_legguards": {
+        "name": "피갈기 전쟁 다리갑옷"
       },
       "deathless_greatblade": {
         "name": "불사 대검"

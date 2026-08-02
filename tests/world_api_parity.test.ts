@@ -113,6 +113,7 @@ export const IWORLD_MEMBERS = [
   { name: 'questsDone', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
+  { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
   { name: 'castAbility', kind: 'method' },
   { name: 'castAbilityAt', kind: 'method' },
   { name: 'castAbilityBySlot', kind: 'method' },
@@ -325,7 +326,6 @@ export const IWORLD_MEMBERS = [
   // Maker's Bond unbind service (Professions 2.0).
   { name: 'unbindItem', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
-  { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
   { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
@@ -503,10 +503,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
     // activeMasterLootRolls, leaving 274; the rift floor timer HUD adds
     // riftEventMsRemaining and the instance-payload pipes add
-    // marketListInstance, leaving 276.
+    // marketListInstance, leaving 276. Reactive aura timing adds
+    // reactiveAbilityWindowRemaining, leaving 277; this branch removes the
+    // renderer-only riftCollisionToken with third-person camera collision,
+    // leaving 276.
     expect(IWORLD_MEMBERS.length).toBe(280);
-    expect(DATA_MEMBERS.length).toBe(73);
-    expect(METHOD_MEMBERS.length).toBe(207);
+    expect(DATA_MEMBERS.length).toBe(72);
+    expect(METHOD_MEMBERS.length).toBe(208);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -719,6 +722,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questState',
       'questsDone',
       'raidLockouts',
+      'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'realm',
       'recipeList',
@@ -735,7 +739,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'revivePet',
       'ridingTrained',
       'riftBossDeathZones',
-      'riftCollisionToken',
       'riftEventMsRemaining',
       'riftFloor',
       'salvageItem',
@@ -863,7 +866,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'recipeList',
       'renown',
       'restedXp',
-      'riftCollisionToken',
       'riftFloor',
       'socialInfo',
       'stationPlacements',
@@ -1025,6 +1027,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'prestige',
       'questState',
       'raidLockouts',
+      'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'releaseEmpoweredAbility',
       'releaseSpirit',
@@ -1161,6 +1164,7 @@ const FACET_COMBAT = [
   'known',
   'activeFrostRings',
   'activeTemporalHourglasses',
+  'reactiveAbilityWindowRemaining',
   'castAbility',
   'castAbilityAt',
   'castAbilityBySlot',
@@ -1441,7 +1445,6 @@ const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
   'raidLockouts',
-  'riftCollisionToken',
   'riftFloor',
   'riftBossDeathZones',
   'riftEventMsRemaining',

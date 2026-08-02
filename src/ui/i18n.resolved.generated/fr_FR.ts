@@ -923,6 +923,23 @@ export const fr_FR: EnTranslations = {
       "separate": "Séparer {meter}",
       "regroup": "Regrouper {meter}"
     },
+    "targetAuras": {
+      "title": "Auras de la cible",
+      "keybindLabel": "Améliorations et affaiblissements de la cible",
+      "all": "Tous",
+      "debuffs": "Affaiblissements",
+      "buffs": "Améliorations",
+      "unlock": "Déplacer la fenêtre des auras de la cible",
+      "lock": "Verrouiller la fenêtre des auras de la cible",
+      "configureRows": "Configurer les auras de la cible",
+      "fewerRows": "Préférer moins de rangées d’auras",
+      "moreRows": "Préférer plus de rangées d’auras",
+      "visibleRows": "Rangées d’auras préférées : {count}",
+      "showSources": "Afficher les sources des auras",
+      "hideSources": "Masquer les sources des auras",
+      "ownAura": "Votre aura",
+      "opacity": "Opacité des auras : {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Le familier est à pleine santé",
       "disabledNoFood": "Aucune nourriture dans vos sacs ne peut soigner votre familier"
@@ -967,13 +984,15 @@ export const fr_FR: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, le Crapaud Saute-Ombre",
       "name_stormfeather_griffin": "Plume-d’Orage Toise-Ciel",
       "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
+      "name_terrorspark_groundshaker": "Terrétincelle, l’Ébranleur de sol",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
       "desc_aether_hover_cycle": "Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.",
       "desc_shadowjump_toad": "Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.",
       "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.",
-      "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage."
+      "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.",
+      "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides."
     },
     "mountTraining": {
       "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
@@ -1343,6 +1362,51 @@ export const fr_FR: EnTranslations = {
       "badges": {
         "backgrounded": "En arrière-plan",
         "offline": "Hors ligne"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Classe actuelle : {class}",
+      "previewHint": "Utilisez Configurer les positions pour déplacer une aura sans masquer le menu.",
+      "noProcs": "Aucun proc pris en charge n’est disponible pour ce personnage.",
+      "enabled": "Afficher l’aura",
+      "icon": "Icône du sort",
+      "arcs": "Croissants latéraux",
+      "groundRing": "Anneau au sol",
+      "groundRingSpellOrder": "Anneau au sol : ordre des sorts",
+      "crescentsSpellOrder": "Croissants latéraux : ordre des sorts",
+      "size": "Taille",
+      "iconSize": "Taille de l’icône",
+      "crescentBlockSize": "Taille des blocs du croissant",
+      "groundRingBlockSize": "Taille des blocs de l’anneau au sol",
+      "opacity": "Opacité",
+      "color": "Couleur",
+      "allOn": "Tout activer",
+      "allOff": "Tout désactiver",
+      "reposition": "Configurer les positions",
+      "positioning": "Positionnement : {aura}",
+      "selectAura": "Aura",
+      "done": "Terminé",
+      "moveLeft": "Déplacer vers la gauche",
+      "moveUp": "Déplacer vers le haut",
+      "moveDown": "Déplacer vers le bas",
+      "moveRight": "Déplacer vers la droite",
+      "moveEarlier": "Déplacer le sort vers l’intérieur",
+      "moveLater": "Déplacer le sort vers l’extérieur",
+      "screenPosition": "Position à l’écran",
+      "spellOrder": "Ordre des sorts",
+      "reset": "Réinitialiser la position",
+      "spellPosition": "Ordre des sorts {position} / {count}",
+      "procs": {
+        "revenge": "Vengeance !",
+        "battleTrance": "Transe de combat",
+        "overpowerCharge": "Renforcement de Main rouge",
+        "suddenDeath": "Mort subite",
+        "victoryRush": "Ruée victorieuse",
+        "enrage": "Carnage : enragé",
+        "heatingUp": "Montée en chaleur",
+        "arcaneCharge": "Charges des Arcanes",
+        "aetherRush": "Ruée d’Aether"
       }
     },
     "playerCard": {
@@ -2151,6 +2215,14 @@ export const fr_FR: EnTranslations = {
       "linked": "Lié au compte Steam {id}",
       "benefits": "Liez votre compte Steam depuis l'application de bureau pour que les hauts faits que vous obtenez se reflètent dans vos succès Steam.",
       "noTicket": "Steam n'a pas fourni de ticket de liaison. Lancez Steam, puis réessayez."
+    },
+    "epic": {
+      "title": "Epic",
+      "link": "Lier Epic",
+      "unlink": "Délier Epic",
+      "linked": "Lié au compte Epic {id}",
+      "benefits": "Liez votre compte Epic depuis l’application de bureau Epic pour refléter les hauts faits que vous obtenez dans les succès Epic.",
+      "noProof": "Epic n’a pas fourni de preuve de liaison. Lancez le jeu depuis l’Epic Games Store, puis réessayez."
     },
     "mailbox": {
       "title": "Boîte aux lettres",
@@ -3002,6 +3074,14 @@ export const fr_FR: EnTranslations = {
       "already_linked": "Votre compte est déjà lié à un compte Steam.",
       "account_taken": "Ce compte Steam est déjà lié à un autre compte.",
       "upstream": "Steam n'a pas répondu. Réessayez dans un instant."
+    },
+    "epic": {
+      "disabled": "La liaison Epic n’est pas disponible pour le moment.",
+      "invalid_token": "Epic n’a pas pu vérifier cette demande de liaison. Réessayez depuis l’application de bureau.",
+      "banned": "Ce compte Epic ne peut pas être lié.",
+      "already_linked": "Votre compte est déjà lié à un compte Epic.",
+      "account_taken": "Ce compte Epic est déjà lié à un autre compte.",
+      "upstream": "Epic n’a pas répondu. Réessayez dans un instant."
     },
     "wallet": {
       "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez."
@@ -6257,11 +6337,15 @@ export const fr_FR: EnTranslations = {
       "graphicsPresetMedium": "Moyenne",
       "graphicsPresetHigh": "Haute",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrême",
       "graphicsPresetAdvanced": "Avancée",
       "terrainDetail": "Détail du terrain",
       "foliageDensity": "Densité de feuillage",
       "effectsQuality": "Effets et éclairage",
       "shadowQuality": "Qualité des ombres",
+      "surfaceDetail": "Détail des surfaces",
+      "surfaceDetailBasic": "Basique",
+      "surfaceDetailFull": "Complet",
       "terrainLow": "Bas",
       "terrainHigh": "Élevé",
       "touchOpacity": "Opacité des commandes tactiles",
@@ -6425,6 +6509,8 @@ export const fr_FR: EnTranslations = {
       "joinParty": "Rejoindre le groupe",
       "guildInvite": "{name} vous invite à rejoindre {guild}.",
       "joinGuild": "Rejoindre la guilde",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} veut échanger avec vous.",
       "openTrade": "Ouvrir l'échange",
       "duelRequest": "{name} vous a provoqué en duel !",
@@ -6438,6 +6524,7 @@ export const fr_FR: EnTranslations = {
       "floatingDodge": "Esquive",
       "floatingParry": "Parade",
       "floatingResist": "Résisté",
+      "floatingEvade": "Évasion",
       "floatingHealFull": "Plein",
       "floatingHealAbsorbed": "Absorbé",
       "cannotMove": "Immobilisé !",
@@ -6450,6 +6537,7 @@ export const fr_FR: EnTranslations = {
       "dodged": "{target} esquive votre {ability}.",
       "parried": "Votre {ability} est parée par {target}.",
       "resisted": "{target} résiste à votre {ability}.",
+      "evaded": "Votre {ability} est évitée par {target}.",
       "healSelf": "Votre {ability} vous rend {amount} points de vie.",
       "healSelfCrit": "Votre {ability} vous rend un soin critique de {amount}.",
       "healOther": "Votre {ability} soigne {target} pour {amount}.",
@@ -7017,6 +7105,8 @@ export const fr_FR: EnTranslations = {
       "close": "Fermer le vendeur",
       "hint": "Cliquez sur un objet dans vos sacs pour le vendre tant que cette fenêtre est ouverte.",
       "buyAria": "Acheter {item} pour {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Rachat",
       "buybackEmpty": "Aucun objet",
       "buybackAria": "Racheter {item} pour {price}",
@@ -7296,7 +7386,7 @@ export const fr_FR: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Invisibilité supérieure",
-        "description": "Vous disparaissez pendant 20 s : dissipe 2 effets de dégâts sur la durée et réduit les dégâts subis de 90% tant que vous êtes invisible et peu après. (Talent de mage)"
+        "description": "Vous disparaissez pendant 20 s et dissipez 2 effets de dégâts sur la durée. À la fin de l’invisibilité, vous subissez 90% de dégâts en moins pendant 2 s. (Talent de mage)"
       },
       "hot_streak": {
         "name": "Bonne série",
@@ -9635,6 +9725,18 @@ export const fr_FR: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Couteau-croc de Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Épieu de bêtes du Seigneur des crocs"
+      },
+      "bloodmane_warleggings": {
+        "name": "Jambières de guerre Crin-de-sang"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Culottes de traque Griffe-de-liane"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sarong rituel Os-solaire"
+      },
       "thick_winter_pelt": {
         "name": "Épaisse fourrure d'hiver"
       },
@@ -9802,6 +9904,9 @@ export const fr_FR: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Chevalière de The Last Keep"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Clé de contact : Terrétincelle, l’Ébranleur de sol"
       },
       "conjured_water4": {
         "name": "Eau de source invoquée"
@@ -10378,6 +10483,24 @@ export const fr_FR: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Bandes de mains du Choeur du Wyrm"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Tunique du traqueur du Bassin"
+      },
+      "verdant_heart_vestment": {
+        "name": "Vêtement du Cœur-verdoyant"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Haubert rituel Os-solaire"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Grand-croc du Bassin"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Couronne de l'oracle Os-solaire"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Garde-jambes de guerre Crin-de-sang"
       },
       "deathless_greatblade": {
         "name": "Grande lame immortelle"

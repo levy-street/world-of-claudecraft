@@ -8,7 +8,7 @@
 // other surface (a window, the HUD chrome, the action bar) is inert, so releasing a
 // stack over the chat box never destroys it.
 
-import { ALL_EQUIP_SLOTS, type EquipSlot } from '../sim/types';
+import { type EquipSlot, isEquipSlot } from '../sim/types';
 
 /** The world surface: the one element the destroy drop accepts. */
 const WORLD_CANVAS_SELECTOR = '#game-canvas';
@@ -32,13 +32,10 @@ export function resolveDropTargetAt(
   if (!el) return { kind: 'none' };
   const socket = el.closest?.('[data-equip-slot]') as HTMLElement | null;
   const raw = socket?.dataset.equipSlot;
-  // Validate against the canonical slot list rather than trusting the attribute:
-  // a stale or hand-edited value must resolve to no target, never to a wrong slot.
-  // ALL_EQUIP_SLOTS (includes the additive 'offhand' slot), not the frozen
-  // EQUIP_SLOTS, else a finger-drag released over the offhand socket resolves to
-  // no target.
-  if (raw && (ALL_EQUIP_SLOTS as readonly string[]).includes(raw)) {
-    return { kind: 'equip', slot: raw as EquipSlot };
+  // Validate rather than trusting the attribute: a stale or hand-edited value
+  // must resolve to no target, never to a wrong slot.
+  if (raw && isEquipSlot(raw)) {
+    return { kind: 'equip', slot: raw };
   }
   // A bag cell (the manual-order drop): its data-bag-index IS an inventory index
   // while the grid shows the raw array order, which is the only view that stamps it.

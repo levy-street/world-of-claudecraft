@@ -9,7 +9,9 @@
 //
 // DOM-free and i18n-free so tests/vendor_view.test.ts can drive it directly.
 
+import { stackSizeOf } from '../../../sim/bags';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
+import { bulkBuyQuantity } from '../../../sim/vendor_buy_stack';
 import { vendorStackSize } from '../../../sim/vendor_stack';
 
 export interface VendorGoodsRow {
@@ -21,6 +23,20 @@ export interface VendorGoodsRow {
   quantity: number;
   /** Advisory UI state only; the authoritative buy path rechecks both balances. */
   affordable: boolean;
+  /** Present when a bulk ("Buy Stack") purchase is offered for this row: as many
+   *  units as the buyer can currently afford in one purchase, capped at the
+   *  item's real bag stack size (bulkBuyQuantity, the same helper buyItem uses
+   *  authoritatively, so this preview can never promise more than the server
+   *  will grant). Undefined for a non-stacking item, a mount, or anything
+   *  carrying an Honor price (Honor is a per-purchase cost, never
+   *  stack-multiplied; see VendorPrice.honor). */
+  bulkQuantity?: number;
+  /** Advisory UI state for the bulk row only, checked against the bulk total
+   *  rather than the ordinary row's price (see `affordable`): a bulk quantity
+   *  is floor-affordable by construction, so a food/drink row whose ordinary
+   *  5-unit price the player cannot afford can still offer a smaller,
+   *  affordable bulk purchase. Undefined whenever `bulkQuantity` is. */
+  bulkAffordable?: boolean;
 }
 
 export interface VendorPrice {
@@ -82,12 +98,26 @@ export function buildVendorView(
       honor: Math.max(0, Math.floor(item.priceHonor ?? 0)),
     };
     if (price.copper <= 0 && price.honor <= 0) continue;
+    // Bulk eligibility mirrors buyItem's server-side gate exactly (items.ts):
+    // plain copper price, no Honor component, never a mount (buying several
+    // copies of the same reins would only waste gold), and the item must
+    // actually stack in the bags.
+    const unitCopper = Math.max(0, item.buyValue ?? 0);
+    const bulkEligible =
+      item.kind !== 'mount' && price.honor <= 0 && unitCopper > 0 && stackSizeOf(item) > 1;
+    const bulkQuantity = bulkEligible
+      ? Math.max(1, bulkBuyQuantity(item, unitCopper, balances.copper))
+      : undefined;
     goods.push({
       itemId,
       item,
       price,
       quantity,
       affordable: balances.copper >= price.copper && balances.honor >= price.honor,
+      ...(bulkQuantity !== undefined && {
+        bulkQuantity,
+        bulkAffordable: balances.copper >= unitCopper * bulkQuantity,
+      }),
     });
   }
   const buyback: VendorBuybackRow[] = [];

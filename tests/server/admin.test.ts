@@ -34,20 +34,24 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   type AdminRuntime,
+  configureAdminGuildBoardCacheBust,
   configureAdminPlayersCap,
   configureAdminRuntime,
   resetAdminDbForTests,
+  resetAdminGuildBoardCacheBustForTests,
   resetAdminPlayersCapForTests,
   resetAdminRuntimeForTests,
   routes,
   setAdminDbForTests,
 } from '../../server/admin';
+import { resetAdminGuildListReadsForTests } from '../../server/admin_guilds_read';
 import { pool } from '../../server/db';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
 import { apiRegistry } from '../../server/http/registry';
 import type { Method, Middleware } from '../../server/http/types';
 import {
+  authFailureCount,
   rateLimited,
   resetAuthFailures,
   resetRateLimitClock,
@@ -124,6 +128,7 @@ function installAdminRuntime(overrides: Partial<Record<keyof AdminRuntime, unkno
     isIpBlocked: vi.fn(() => false),
     liveSharedIps: vi.fn(() => []),
     liveAccountIds: vi.fn(() => new Set<number>()),
+    liveCharacterIds: vi.fn(() => new Set<number>()),
     disconnectAccount: vi.fn(),
     muteAccountChat: vi.fn(),
     liftChatMuteLive: vi.fn(),
@@ -132,6 +137,9 @@ function installAdminRuntime(overrides: Partial<Record<keyof AdminRuntime, unkno
     reloadBlockedIps: vi.fn(async () => {}),
     disconnectByIp: vi.fn(),
     applyAccountFlairLive: vi.fn(),
+    social: {
+      guildRenamed: vi.fn(),
+    },
     ...overrides,
   };
   configureAdminRuntime(rt as unknown as AdminRuntime);
@@ -224,7 +232,9 @@ afterEach(() => {
   resetRateLimitClock();
   resetAdminDbForTests();
   resetAdminRuntimeForTests();
+  resetAdminGuildBoardCacheBustForTests();
   resetAdminPlayersCapForTests();
+  resetAdminGuildListReadsForTests();
   vi.clearAllMocks();
   vi.restoreAllMocks();
 });
@@ -575,6 +585,130 @@ describe('POST /admin/api/login', () => {
       error: null,
     });
   });
+
+  // Regression coverage for BUG #15: admin login checked only password + staff
+  // role and never the account's TOTP second factor (unlike POST /api/login,
+  // server/auth_routes.ts loginHandler), so an operator with 2FA enabled could
+  // sign into the highest-privilege surface in the app with a bare password.
+  describe('two-factor', () => {
+    it('returns twoFactorRequired without a token when 2FA is on and no code is supplied', async () => {
+      const saveToken = vi.fn(async () => {});
+      const verifyLoginTwoFactor = vi.fn(async () => true);
+      setDb({
+        rateLimited: allowedRateLimit,
+        findAccount: async () =>
+          ({
+            id: 9,
+            username: 'bob',
+            password_hash: 'h',
+            totp_enabled_at: '2020-01-01T00:00:00.000Z',
+          }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        verifyLoginTwoFactor,
+        saveToken,
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'pw' },
+      });
+      expect(r.status).toBe(200);
+      expect(r.body).toEqual({ success: true, data: { twoFactorRequired: true }, error: null });
+      // No code + no recovery code: the verifier is never consulted and no token issues.
+      expect(verifyLoginTwoFactor).not.toHaveBeenCalled();
+      expect(saveToken).not.toHaveBeenCalled();
+    });
+
+    it('401s an invalid 2FA code and records a failure', async () => {
+      const verifyLoginTwoFactor = vi.fn(async () => false);
+      setDb({
+        rateLimited: allowedRateLimit,
+        findAccount: async () =>
+          ({
+            id: 9,
+            username: 'bob',
+            password_hash: 'h',
+            totp_enabled_at: '2020-01-01T00:00:00.000Z',
+          }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        verifyLoginTwoFactor,
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'pw', code: '000000' },
+      });
+      expect(r.status).toBe(401);
+      expect(r.body).toEqual({
+        success: false,
+        data: null,
+        error: 'invalid authentication code',
+      });
+      expect(verifyLoginTwoFactor).toHaveBeenCalledTimes(1);
+      expect(authFailureCount()).toBe(1);
+    });
+
+    it('200s and issues a token for a good 2FA code', async () => {
+      setDb({
+        rateLimited: allowedRateLimit,
+        findAccount: async () =>
+          ({
+            id: 9,
+            username: 'bob',
+            password_hash: 'h',
+            totp_enabled_at: '2020-01-01T00:00:00.000Z',
+          }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        verifyLoginTwoFactor: async () => true,
+        touchLogin: async () => {},
+        newToken: () => 'tok789',
+        saveToken: async () => {},
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'pw', code: '123456' },
+      });
+      expect(r.status).toBe(200);
+      expect(r.body).toEqual({
+        success: true,
+        data: {
+          token: 'tok789',
+          username: 'bob',
+          roles: ['viewer'],
+          permissions: ['analytics.read', 'accounts.read', 'support.read', 'moderation.read'],
+        },
+        error: null,
+      });
+    });
+
+    it('accepts a recovery code in place of a live TOTP code', async () => {
+      const verifyLoginTwoFactor = vi.fn(async () => true);
+      setDb({
+        rateLimited: allowedRateLimit,
+        findAccount: async () =>
+          ({
+            id: 9,
+            username: 'bob',
+            password_hash: 'h',
+            totp_enabled_at: '2020-01-01T00:00:00.000Z',
+          }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        verifyLoginTwoFactor,
+        touchLogin: async () => {},
+        newToken: () => 'tokRecovery',
+        saveToken: async () => {},
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'pw', recoveryCode: 'ABCD-EFGH' },
+      });
+      expect(r.status).toBe(200);
+      expect((r.body as { data: { token: string } }).data.token).toBe('tokRecovery');
+      expect(verifyLoginTwoFactor).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 9 }),
+        '',
+        'ABCD-EFGH',
+      );
+    });
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -868,6 +1002,261 @@ describe('page/limit pagination contract', () => {
       data: { reports: [], hotspots: [], hasMore: false, nextBeforeId: null },
       error: null,
     });
+  });
+});
+
+describe('guild administration', () => {
+  it('denies guild reads and writes before their database functions when permissions are absent', async () => {
+    const listAdminGuilds = vi.fn();
+    const adminGuildDetail = vi.fn();
+    const listAdminGuildHistory = vi.fn();
+    const renameAdminGuild = vi.fn();
+    authedAdminDb({
+      adminRolesForAccount: async () => ({ username: 'op', roles: ['unknown-role'] }),
+      listAdminGuilds,
+      adminGuildDetail,
+      listAdminGuildHistory,
+      renameAdminGuild,
+    });
+    installAdminRuntime();
+
+    const read = await runRoute('GET', '/admin/api/guilds', {
+      headers: { authorization: BEARER },
+    });
+    expect(read.status).toBe(403);
+    expect(listAdminGuilds).not.toHaveBeenCalled();
+
+    const detail = await runRoute('GET', '/admin/api/guilds/:id', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+    });
+    expect(detail.status).toBe(403);
+    expect(adminGuildDetail).not.toHaveBeenCalled();
+
+    const history = await runRoute('GET', '/admin/api/guilds/:id/history', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+    });
+    expect(history.status).toBe(403);
+    expect(listAdminGuildHistory).not.toHaveBeenCalled();
+
+    authedAdminDb({
+      adminRolesForAccount: async () => ({ username: 'op', roles: ['viewer'] }),
+      renameAdminGuild,
+    });
+    const write = await runRoute('POST', '/admin/api/guilds/:id/rename', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+      body: { name: 'New Name', reason: 'reason' },
+    });
+    expect(write.status).toBe(403);
+    expect(renameAdminGuild).not.toHaveBeenCalled();
+  });
+
+  it('lists current-realm guilds through bounded page parameters', async () => {
+    const listAdminGuilds = vi.fn(
+      async (_search: string, page: number, limit: number, _sort: string, _dir: string) => ({
+        rows: [{ id: 4, name: 'Keepers' }],
+        total: 1,
+        page,
+        limit,
+      }),
+    );
+    authedAdminDb({ listAdminGuilds });
+    installAdminRuntime();
+
+    const response = await runRoute('GET', '/admin/api/guilds', {
+      url: '/admin/api/guilds?search=Keep&page=2&limit=10&sort=member_count&dir=asc',
+      headers: { authorization: BEARER },
+    });
+
+    expect(listAdminGuilds).toHaveBeenCalledWith('Keep', 2, 10, 'member_count', 'asc');
+    expect(response.body).toEqual({
+      success: true,
+      data: {
+        rows: [{ id: 4, name: 'Keepers' }],
+        total: 1,
+        page: 2,
+        limit: 10,
+      },
+      error: null,
+    });
+  });
+
+  it('returns 503 before a third distinct member-count read can occupy the pool', async () => {
+    const resolvers: Array<
+      (value: { rows: never[]; total: number; page: number; limit: number }) => void
+    > = [];
+    const listAdminGuilds = vi.fn(
+      async (_search: string, _page: number, _limit: number) =>
+        new Promise<{ rows: never[]; total: number; page: number; limit: number }>((resolve) => {
+          resolvers.push(resolve);
+        }),
+    );
+    authedAdminDb({ listAdminGuilds });
+    installAdminRuntime();
+
+    const first = runRoute('GET', '/admin/api/guilds', {
+      url: '/admin/api/guilds?sort=member_count&page=1',
+      headers: { authorization: BEARER },
+    });
+    const second = runRoute('GET', '/admin/api/guilds', {
+      url: '/admin/api/guilds?sort=member_count&page=2',
+      headers: { authorization: BEARER },
+    });
+    await vi.waitFor(() => expect(listAdminGuilds).toHaveBeenCalledTimes(2));
+
+    const rejected = await runRoute('GET', '/admin/api/guilds', {
+      url: '/admin/api/guilds?sort=member_count&page=3',
+      headers: { authorization: BEARER },
+    });
+    expect(rejected.status).toBe(503);
+    expect(rejected.body).toEqual({
+      success: false,
+      data: null,
+      error: 'guild list busy, try again',
+    });
+    expect(listAdminGuilds).toHaveBeenCalledTimes(2);
+
+    // The admission control exists for the aggregating sort, so the default
+    // name-sorted directory must still load while that class is saturated.
+    const directory = runRoute('GET', '/admin/api/guilds', {
+      url: '/admin/api/guilds?page=1',
+      headers: { authorization: BEARER },
+    });
+    await vi.waitFor(() => expect(listAdminGuilds).toHaveBeenCalledTimes(3));
+
+    resolvers.forEach((resolve, index) => {
+      resolve({ rows: [], total: 0, page: index + 1, limit: 25 });
+    });
+    const settled = await directory;
+    expect(settled.status).not.toBe(503);
+    await Promise.all([first, second]);
+  });
+
+  it('merges online character ids into the minimal guild roster', async () => {
+    authedAdminDb({
+      adminGuildDetail: async () => ({
+        guild: { id: 4, name: 'Keepers', realm: 'test', createdAt: 'now', memberCount: 2 },
+        members: [
+          { characterId: 8, characterName: 'Alice' },
+          { characterId: 9, characterName: 'Bob' },
+        ],
+      }),
+    });
+    installAdminRuntime({ liveCharacterIds: vi.fn(() => new Set([9])) });
+
+    const response = await runRoute('GET', '/admin/api/guilds/:id', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+    });
+
+    expect(response.body).toEqual({
+      success: true,
+      data: {
+        guild: { id: 4, name: 'Keepers', realm: 'test', createdAt: 'now', memberCount: 2 },
+        members: [
+          { characterId: 8, characterName: 'Alice', online: false },
+          { characterId: 9, characterName: 'Bob', online: true },
+        ],
+      },
+      error: null,
+    });
+  });
+
+  it('returns the retained rename history independently from roster reads', async () => {
+    const listAdminGuildHistory = vi.fn(async () => [
+      { id: 1, oldName: 'Old Name', newName: 'Keepers' },
+    ]);
+    authedAdminDb({ listAdminGuildHistory });
+    installAdminRuntime();
+
+    const response = await runRoute('GET', '/admin/api/guilds/:id/history', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+    });
+
+    expect(listAdminGuildHistory).toHaveBeenCalledWith(4);
+    expect(response.body).toEqual({
+      success: true,
+      data: { rows: [{ id: 1, oldName: 'Old Name', newName: 'Keepers' }] },
+      error: null,
+    });
+  });
+
+  it('pushes and invalidates only after the committed rename succeeds', async () => {
+    const renameAdminGuild = vi.fn(async () => ({
+      result: {
+        guildId: 4,
+        oldName: 'Old Name',
+        newName: 'Keepers',
+        memberCharacterIds: [8, 9],
+      },
+    }));
+    authedAdminDb({ renameAdminGuild });
+    const guildRenamed = vi.fn();
+    installAdminRuntime({ social: { guildRenamed } });
+    const bustCaches = vi.fn();
+    configureAdminGuildBoardCacheBust(bustCaches);
+
+    const response = await runRoute('POST', '/admin/api/guilds/:id/rename', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+      body: { name: 'Keepers', reason: 'offensive name' },
+    });
+
+    expect(renameAdminGuild).toHaveBeenCalledWith(4, 'Keepers', 'offensive name', ADMIN_ACCOUNT_ID);
+    expect(guildRenamed).toHaveBeenCalledWith(4, 'Old Name', 'Keepers', [8, 9]);
+    expect(bustCaches).toHaveBeenCalledOnce();
+    expect(response.body).toEqual({
+      success: true,
+      data: { id: 4, name: 'Keepers' },
+      error: null,
+    });
+  });
+
+  it('does not emit a live event or invalidate caches when rename validation fails', async () => {
+    authedAdminDb({ renameAdminGuild: async () => ({ error: 'invalid_reason' }) });
+    const guildRenamed = vi.fn();
+    installAdminRuntime({ social: { guildRenamed } });
+    const bustCaches = vi.fn();
+    configureAdminGuildBoardCacheBust(bustCaches);
+
+    const response = await runRoute('POST', '/admin/api/guilds/:id/rename', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+      body: { name: 'Keepers', reason: '' },
+    });
+
+    expect(response.status).toBe(400);
+    expect(guildRenamed).not.toHaveBeenCalled();
+    expect(bustCaches).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['invalid_name', 400, 'guild name must be 3-24 letters with single spaces'],
+    ['invalid_reason', 400, 'a moderation reason is required (500 chars max)'],
+    ['not_found', 404, 'guild not found'],
+    ['same_name', 400, 'guild name must change'],
+    ['name_taken', 409, 'guild name is already taken'],
+    ['member_limit_exceeded', 409, 'guild member limit exceeded'],
+  ] as const)('maps %s rename failures to the admin envelope', async (error, status, message) => {
+    authedAdminDb({ renameAdminGuild: async () => ({ error }) });
+    const guildRenamed = vi.fn();
+    installAdminRuntime({ social: { guildRenamed } });
+    const bustCaches = vi.fn();
+    configureAdminGuildBoardCacheBust(bustCaches);
+
+    const response = await runRoute('POST', '/admin/api/guilds/:id/rename', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+      body: { name: 'New Name', reason: 'reason' },
+    });
+
+    expect(response.status).toBe(status);
+    expect(response.body).toEqual({ success: false, data: null, error: message });
+    expect(guildRenamed).not.toHaveBeenCalled();
+    expect(bustCaches).not.toHaveBeenCalled();
   });
 });
 

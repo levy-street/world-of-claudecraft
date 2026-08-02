@@ -6,7 +6,7 @@
 // talkable entities by `kind === 'npc'`, and so no shipped client (desktop,
 // mobile or gamepad) could dispatch the interact command that reaches the sim's
 // tryStartEscort. The escort quest was uncompletable in-game while
-// tests/escort.test.ts stayed green, because that suite calls sim.interact()
+// tests/escort_quest.test.ts stayed green, because that suite calls sim.interact()
 // directly. These tests deliberately enter through the CLIENT surface instead.
 import { describe, expect, it, vi } from 'vitest';
 import {

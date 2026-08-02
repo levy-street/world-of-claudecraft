@@ -49,8 +49,9 @@ export function isAttackHoverTarget(e: Entity | undefined): boolean {
 
 export function activePvpOpponentIds(
   world: Pick<PickInteractionWorld, 'player' | 'playerId' | 'duelInfo' | 'arenaInfo'>,
+  ids = new Set<number>(),
 ): Set<number> {
-  const ids = new Set<number>();
+  ids.clear();
   const selfId = world.playerId ?? world.player.id;
   if (world.duelInfo?.state === 'active' && world.duelInfo.otherPid !== selfId)
     ids.add(world.duelInfo.otherPid);

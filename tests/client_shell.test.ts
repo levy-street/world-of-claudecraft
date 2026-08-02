@@ -91,6 +91,10 @@ const newsFeedTs = readFileSync(new URL('../src/ui/news_feed.ts', import.meta.ur
   /\r\n/g,
   '\n',
 );
+const highscoreBoardTs = readFileSync(
+  new URL('../src/ui/highscore_board.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -622,7 +626,9 @@ describe('client HTML shell', () => {
     // character-bound) through toggleClass. No raw classList/style write on either
     // frame survives (those silently collapse the hot-DOM skip rate).
     expect(hudTs).toContain('const targetRank = targetRankView(targetTemplate);');
-    expect(hudTs).toContain('levelText: String(target.level),');
+    // Written into the reused target descriptor rather than a per-frame object
+    // literal; the routing this test guards is unchanged.
+    expect(hudTs).toContain('targetFrame.levelText = String(target.level);');
     expect(hudTs).toContain(
       "this.toggleClass(this.targetFrameEl, 'elite', targetUsesEliteFrame(targetRank));",
     );
@@ -1572,11 +1578,13 @@ describe('client HTML shell', () => {
   });
 
   it('renders the high scores leaderboard responsively on mobile', () => {
-    expect(mainTs).toContain(
+    // The board markup moved to src/ui/highscore_board.ts (extracted out of main.ts,
+    // the news_feed.ts precedent); the mobile data-label captions moved with it.
+    expect(highscoreBoardTs).toContain(
       // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
       '<span class="hs-realm" data-label="${esc(realmLabel)}">${esc(r.realm ?? \'\')}</span>',
     );
-    expect(mainTs).toContain(
+    expect(highscoreBoardTs).toContain(
       // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
       '<span class="hs-xp" data-label="${esc(lifetimeXpLabel)}">${formatXp(r.lifetimeXp)}</span>',
     );

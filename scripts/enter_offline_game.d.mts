@@ -5,6 +5,7 @@ export interface OfflineEntryOptions {
   dismissMobilePreflight?: boolean;
   mobilePreflightTimeoutMs?: number;
   gameBootTimeoutMs?: number;
+  selectorTimeoutMs?: number;
 }
 
 export function enterOfflineGame(page: unknown, opts?: OfflineEntryOptions): Promise<boolean>;

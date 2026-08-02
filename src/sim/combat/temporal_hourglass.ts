@@ -145,6 +145,7 @@ function spawnGroundHourglass(
     tickTimer: effect.groundDuration,
     school: 'arcane',
     ability: abilityName,
+    abilityId: TEMPORAL_HOURGLASS_ID,
     temporalHourglass: {
       id: `${caster.id}:${Math.round(ctx.time / DT)}`,
       abilityId: TEMPORAL_HOURGLASS_ID,

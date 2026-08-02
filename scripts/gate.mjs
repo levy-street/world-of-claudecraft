@@ -1,24 +1,73 @@
 // The full local pre-merge gate: the CI checks from .github/workflows/ci.yml run
-// locally. Order: the PR tier's combined step list (CI splits it across the
-// parallel pr-gate and pr-checks jobs and fans the test step across a 4-shard
-// matrix; this script runs the same list serially with ONE full unsharded
-// vitest run by design), with the parallel lint job's changed-files biome pulled forward
-// as an early fast-fail; on a release/** branch the steps run release-tier
-// (I18N_RELEASE_TIER=1), mirroring the release-gate job. This script exists
-// because ad-hoc shell chains get the gate
-// wrong in two known ways: piping `npm test` through `tail` masks vitest's exit
-// code (a red run can print "PASS"), and an unbounded full run saturates every
-// core and flakes the heavy sim suites when other work shares the machine
-// (failing files that then pass in isolation). Steps run sequentially with
-// inherited stdio and stop at the first failure.
+// locally. CI splits each tier into a parallel pair (PR: pr-gate + pr-checks;
+// release: release-gate + release-checks) and fans each test job across an
+// 8-shard matrix; this script runs the SAME combined step list serially with
+// ONE full unsharded vitest run by design (no shard flag). The parallel lint
+// job's changed-files biome is pulled forward as an early fast-fail; on a
+// release/** branch the steps run release-tier (I18N_RELEASE_TIER=1), mirroring
+// the release-gate test job's job-level flag. This script exists because
+// ad-hoc shell chains get the gate wrong in two known ways: piping `npm test`
+// through `tail` masks vitest's exit code (a red run can print "PASS"), and an
+// unbounded full run saturates every core and flakes the heavy sim suites when
+// other work shares the machine (failing files that then pass in isolation).
+// Steps run sequentially with inherited stdio and stop at the first failure.
 // Keep the step list in sync with .github/workflows/ci.yml (and vice versa).
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
+import { computeGateWorkers } from './lib/gate_workers.mjs';
+import {
+  formatInstallSyncFailure,
+  parseInstallProblems,
+  shouldCheckInstallSync,
+} from './lib/npm_install_sync.mjs';
 import { FFMPEG_PATH, FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 
-const workers = Math.max(1, Math.floor(os.availableParallelism() / 2));
+// Halving the core count only protects a gate run from ITSELF; it does nothing when a
+// second `npm run gate` (or any other heavy vitest run) is happening in a sibling
+// worktree on the same machine, which this repo's own parallel-worktree workflow makes
+// routine. computeGateWorkers additionally clamps to available memory, since a vitest
+// fork worker that starts swapping presents as a flaky failure, not a slow one. Override
+// with GATE_MAX_WORKERS=<n> when you know better than the heuristic (e.g. deliberately
+// running several gates at once and want each one to take a smaller share).
+const workers = computeGateWorkers({
+  cpuCount: os.availableParallelism(),
+  freeMemBytes: os.freemem(),
+  envOverride: process.env.GATE_MAX_WORKERS,
+});
 // npm/npx resolve to .cmd files on Windows, which spawnSync only finds via a shell.
 const shell = process.platform === 'win32';
+
+// Verify node_modules is what package-lock.json actually pins, BEFORE any other
+// step. `npm ci` always resets this in CI, so CI never sees drift; a long-lived
+// local checkout can drift silently (a stray `npm install <pkg>`, or just going
+// stale) and the first symptom is usually a confusing tsc or build failure many
+// minutes into the gate that looks like a real regression in the change under
+// test. `npm ls --depth=0 --json` costs under a second and names the actual
+// problem instead of a downstream symptom. No CI job runs this script (CI always
+// starts from a fresh `npm ci`), so nothing else catches a false-positive block;
+// WOC_SKIP_DEP_SYNC=1 is the escape hatch for a checkout this check gets wrong,
+// and other preflights that need to test their OWN failure mode in isolation
+// (tests/sfx_gate_preflight.test.ts) set it explicitly rather than relying on the
+// side effect of an empty PATH also making `npm` itself unspawnable.
+if (process.env.WOC_SKIP_DEP_SYNC !== '1') {
+  const npmLs = spawnSync('npm', ['ls', '--depth=0', '--json'], { encoding: 'utf8', shell });
+  if (shouldCheckInstallSync(npmLs)) {
+    try {
+      const installProblems = parseInstallProblems(npmLs.stdout);
+      if (installProblems.length > 0) {
+        console.error(
+          `[gate] FAIL at "dependency sync"\n${formatInstallSyncFailure(installProblems)}`,
+        );
+        process.exit(1);
+      }
+    } catch (err) {
+      // npm ran but did not produce parseable JSON: a problem with the check
+      // itself, not evidence of drift, so warn and let the gate continue rather
+      // than fail on output we cannot interpret.
+      console.error(`[gate] WARN: dependency sync check skipped: ${err.message}`);
+    }
+  }
+}
 
 // Probe the resolved binaries BY EXECUTION: the ffmpeg-static/ffprobe-static
 // packages download their binary via an allowlisted install script, so a
@@ -87,6 +136,4 @@ for (const [name, cmd, args, hint] of steps) {
   }
 }
 
-console.log(
-  `\n[gate] PASS: all ${steps.length} steps green (vitest workers capped at ${workers}, half the cores)`,
-);
+console.log(`\n[gate] PASS: all ${steps.length} steps green (vitest workers: ${workers})`);

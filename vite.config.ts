@@ -374,6 +374,11 @@ export default defineConfig({
       DATABASE_URL:
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
+    // D11 path-matrix follow-on tried LPT and stripe sequencers under
+    // scripts/ci_balanced_sequencer.mjs; both missed the balance bar and stayed
+    // unwired. Default vitest sha1-contiguous --shard is live. passWithNoTests
+    // false so an empty pack cannot green a future re-wired sequencer.
+    passWithNoTests: false,
     globalSetup: ['./tests/global_setup.ts'],
     // Runs per test file (unlike globalSetup, which runs once outside any
     // jsdom environment); see the file for why this is needed on Node 22+.

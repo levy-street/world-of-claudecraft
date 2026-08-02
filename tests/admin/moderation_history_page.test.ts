@@ -44,8 +44,23 @@ const page = {
       adminAccountId: 7,
       adminUsername: 'moderator',
     },
+    {
+      source: 'guild',
+      id: 5,
+      accountId: null,
+      username: null,
+      ip: null,
+      guildId: 42,
+      guildName: 'Ashen Vale',
+      action: 'guild_rename',
+      reason: 'offensive guild name',
+      createdAt: '2026-06-03T00:15:00Z',
+      expiresAt: null,
+      adminAccountId: 7,
+      adminUsername: 'moderator',
+    },
   ],
-  total: 3,
+  total: 4,
   page: 1,
   limit: 100,
 };
@@ -75,12 +90,21 @@ describe('ModerationHistoryPage', () => {
     expect(await screen.findByText('follow up')).toBeInTheDocument();
     expect(screen.getAllByText(t('moderationHistory.actionNote')).length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: 'target' })).toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: 'moderator' })).toHaveLength(3);
+    expect(screen.getAllByRole('button', { name: 'moderator' })).toHaveLength(4);
     expect(screen.getByText(t('moderationHistory.actionIpBlock'))).toBeInTheDocument();
     // In-game kick/kill actions land in the same audit feed and must be labeled, not "Other action".
     expect(screen.getByText(t('moderationHistory.actionKick'))).toBeInTheDocument();
     expect(screen.queryByText(t('moderationHistory.actionUnknown'))).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: '203.0.113.7' })).toBeInTheDocument();
+    // A guild rename is realm-scoped, not account-scoped: it has no account target,
+    // so the row must link the guild instead of degrading to "unknown".
+    expect(screen.getByText(t('moderationHistory.actionGuildRename'))).toBeInTheDocument();
+    expect(screen.getByText('offensive guild name')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Ashen Vale' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('42'),
+    );
+    expect(screen.queryByText(t('common.unknown'))).not.toBeInTheDocument();
     expect(
       screen.getByRole('columnheader', { name: t('moderationHistoryPage.colReason') }),
     ).toBeInTheDocument();

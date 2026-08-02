@@ -65,15 +65,14 @@ import {
 } from '../src/sim/talent_allocation_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
-  ALL_EQUIP_SLOTS,
   type Aura,
   DT,
   dist2d,
   type Entity,
-  type EquipSlot,
   emptyMoveInput,
   type ItemInstancePayload,
   isDungeonDifficulty,
+  isEquipSlot,
   MAX_LEVEL,
   type MobFamily,
   RUN_SPEED,
@@ -158,6 +157,12 @@ import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
+// Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
+// barrels), the same way deeds_records imports onDeedRecorded: the barrels
+// drag routes.ts (and its load-time requireAccount over the db module) into
+// every test that partial-mocks the db, the known overlay-mock breakage class.
+// Dual fan-out (D21): Steam and Epic reconcile independently.
+import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
 import { shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { mergedPrsForLogin } from './github_contributors';
@@ -223,11 +228,7 @@ import {
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
-// Imported from the mirror module DIRECTLY (not the ./steam barrel), the same
-// way deeds_records imports onDeedRecorded: the barrel drags routes.ts (and its
-// load-time requireAccount over the db module) into every test that
-// partial-mocks the db, the known overlay-mock breakage class.
-import { reconcileOnLogin } from './steam/mirror';
+import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { recordUnstuckEvent } from './unstuck_records';
@@ -929,7 +930,8 @@ interface WireAura {
   // into -0 -> 0 and flip a stat-sap's isAuraDebuff classification. Omitted only when exactly 0,
   // which decodes back to 0, so value-less auras and an old server are unchanged.
   value?: number;
-  // imbue judgement min/max bonus-damage range (aura_effect imbueRange); only imbue sets these.
+  // Optional secondary aura values: imbue judgement's min/max damage range and
+  // Greater Invisibility's reduction/aftereffect duration.
   value2?: number;
   value3?: number;
   // dot/hot tick cadence in seconds, so the tooltip's "every N sec" is right online.
@@ -953,6 +955,12 @@ interface WireAura {
   src?: number;
   // Encounter-owned control marker. Omitted for ordinary auras.
   ub?: 1;
+  // Break-threshold ARMED marker (Lingering Dread's soak-before-snap fear):
+  // presence only, never the live soak value - the number decrements per hit
+  // and would churn the stable aura cache, while the client (the victim-worn
+  // dread band in src/render/ability_vfx) only keys on whether the talent
+  // armed the fear at all. Omitted for ordinary auras.
+  bt?: 1;
 }
 
 interface WhoRosterRow {
@@ -1080,8 +1088,9 @@ function wireAura(a: Aura): WireAura {
   // an old server are unchanged. A hover tooltip magnitude is non-actionable cosmetic text,
   // so sending it cannot let a graphics preset hide anything (graphics-settings fairness).
   if (a.value !== 0) w.value = a.value;
-  // imbue judgement min/max range; dot/hot tick cadence; non-physical school. Each rides
-  // only when it carries meaning, so ordinary auras stay lean and decode to their defaults.
+  // Optional secondary aura values (imbue range or Greater Invisibility aftereffect);
+  // dot/hot cadence; non-physical school. Each rides only when it carries meaning, so
+  // ordinary auras stay lean and decode to their defaults.
   if (a.value2 !== undefined) w.value2 = a.value2;
   if (a.value3 !== undefined) w.value3 = a.value3;
   if (a.tickInterval !== undefined) w.tickInterval = a.tickInterval;
@@ -1097,6 +1106,7 @@ function wireAura(a: Aura): WireAura {
   // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
   if (a.sourceId) w.src = a.sourceId;
   if (a.unbreakableControl) w.ub = 1;
+  if (a.breakThreshold !== undefined) w.bt = 1;
   return w;
 }
 
@@ -1611,6 +1621,16 @@ export class GameServer {
     return this.sessionsByCharacterId.has(characterId);
   }
 
+  // Cheap admin readout: character ids with a live socket only. Linkdead
+  // sessions stay resident for resume semantics but are not shown as online.
+  liveCharacterIds(): Set<number> {
+    const ids = new Set<number>();
+    for (const session of this.sessionsByCharacterId.values()) {
+      if (!session.linkdead && session.ws.readyState === 1) ids.add(session.characterId);
+    }
+    return ids;
+  }
+
   // -------------------------------------------------------------------------
   // Social presence/transport: bridges the persistent SocialService to the
   // live client map + sim. Keyed by character id (stable across sessions),
@@ -1954,6 +1974,17 @@ export class GameServer {
       },
       pushSnapshot: (id) => {
         void this.sendSocialSnapshot(id);
+      },
+      onGuildRenamed: (id, guildId, oldName, newName) => {
+        const s = this.sessionByCharacterId(id);
+        if (!s) return;
+        // Vale Cup banner/credit identity moves before the live entity stamp;
+        // this is a rename, never a leave/rejoin or a deed transition.
+        this.sim.renamePlayerGuild(s.pid, oldName, newName);
+        this.send(s, {
+          t: 'events',
+          list: [{ type: 'guildRenamed', guildId, newName }],
+        });
       },
       onBlocksChanged: (id, ids) => {
         const s = this.sessionByCharacterId(id);
@@ -3015,26 +3046,31 @@ export class GameServer {
     // loaded ids: every join-time grant is a deterministic function of the
     // already-durable blob, so a crash that loses the index rows costs nothing
     // to replay, and the batch is a DB write only (it never calls
-    // onDeedRecorded, so it never drives Steam; Steam's own login catch-up is
-    // reconcileOnLogin below). Fire-and-forget: it never blocks or reorders the
-    // join, and resumes skip it (they return above without reloading state).
+    // onDeedRecorded, so it never drives storefront mirrors; each storefront's
+    // own login catch-up is reconcileOnLogin below). Fire-and-forget: it never
+    // blocks or reorders the join, and resumes skip it (they return above
+    // without reloading state).
     reconcileCharacterDeeds({ characterId, accountId }, [
       ...(this.sim.meta(pid)?.deedsEarned.keys() ?? []),
     ]);
-    // Steam mirror drift heal (the steady-state counterpart to the link-time
-    // reconcile): a live achievement push can exhaust its retry ladder and
-    // drop, and an already-linked account never re-links, so the login
-    // reconcile is the only path that replays it. Chained BEHIND the deeds
-    // records FIFO rather than run beside it: reconcileOnLogin stamps a 6h TTL
-    // then reads earnedDeedIds, so if it ran before the reconcile above healed a
-    // dropped character_deeds row it would miss that id and the TTL would
-    // throttle the retry for 6h. Awaiting the tail first guarantees its read
-    // observes the healed rows. deedRecordsIdle is NOT awaited on the join path
-    // (join latency is unchanged); the continuation is fire-and-forget, fully
-    // guarded, per-account throttled, and a no-op unless STEAM_ENABLED and the
-    // account is linked.
+    // Storefront mirror drift heal (the steady-state counterpart to the
+    // link-time reconcile): a live achievement push can exhaust its retry
+    // ladder and drop, and an already-linked account never re-links, so the
+    // login reconcile is the only path that replays it. Chained BEHIND the
+    // deeds records FIFO rather than run beside it: each reconcileOnLogin
+    // stamps a 6h TTL then reads earnedDeedIds, so if it ran before the
+    // reconcile above healed a dropped character_deeds row it would miss that
+    // id and the TTL would throttle the retry for 6h. Awaiting the tail first
+    // guarantees its read observes the healed rows. deedRecordsIdle is NOT
+    // awaited on the join path (join latency is unchanged); the continuation
+    // is fire-and-forget, fully guarded, per-account throttled, and a no-op
+    // unless each storefront's flag is on and the account is linked. Steam and
+    // Epic run independently (D21): one outage must not block the other.
     void deedRecordsIdle()
-      .then(() => reconcileOnLogin(accountId))
+      .then(() => {
+        reconcileSteamOnLogin(accountId);
+        reconcileEpicOnLogin(accountId);
+      })
       .catch(() => {});
     openPlaySession(accountId, characterId, name, meta, initialLevel)
       .then((id) => {
@@ -3129,8 +3165,14 @@ export class GameServer {
     // Re-validate the freshly-read layout (untrusted at rest), same as a fresh
     // join. Without this, a mid-session save that already landed durably would
     // be clobbered by the stale join-time snapshot once lastSent resets below
-    // forces a resend.
-    session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
+    // forces a resend. Only refresh when the caller actually supplies a layout:
+    // ws_auth.ts always does on the real reconnect path, but an in-process/test
+    // caller that omits it (meta = {}) must keep the session's saved value
+    // rather than being reset to null, matching the sibling bankBonus
+    // "absent means keep" pattern above.
+    if (meta.hotbarLayout !== undefined) {
+      session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
+    }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
     session.lastSent = {};
@@ -3913,6 +3955,13 @@ export class GameServer {
     return state ? state.level : null;
   }
 
+  // Force-close every live session for the account. A bearer token is a reusable
+  // wire credential, not a per-socket identity: an earlier revision tried to spare
+  // the caller's own session by comparing the live socket's auth token against the
+  // request's bearer token, but a stolen/shared token authenticates identically on
+  // both, so that comparison could just as easily spare an attacker's connection.
+  // Kick unconditionally; a legitimate caller's own other tab reconnects with the
+  // fresh credentials the same as any other client would.
   disconnectAccount(accountId: number, reason: string): void {
     for (const session of [...this.clients.values()]) {
       if (session.accountId !== accountId) continue;
@@ -4438,10 +4487,7 @@ export class GameServer {
           // sim's own resolver rather than trusting the client. The sim then
           // re-validates the slot against the item itself.
           const aimed =
-            typeof msg.slot === 'string' &&
-            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
-              ? (msg.slot as EquipSlot)
-              : undefined;
+            typeof msg.slot === 'string' && isEquipSlot(msg.slot) ? msg.slot : undefined;
           if (aimed) sim.equipItemToSlot(msg.item, aimed, pid);
           else sim.equipItem(msg.item, pid);
         }
@@ -4454,13 +4500,8 @@ export class GameServer {
         }
         break;
       case 'unequip_item':
-        // ALL_EQUIP_SLOTS, not the frozen EQUIP_SLOTS: the latter omits the
-        // additive 'offhand' slot, so any offhand unequip was silently dropped here.
-        if (
-          typeof msg.slot === 'string' &&
-          (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
-        ) {
-          sim.unequipItem(msg.slot as EquipSlot, pid);
+        if (typeof msg.slot === 'string' && isEquipSlot(msg.slot)) {
+          sim.unequipItem(msg.slot, pid);
         }
         break;
       case 'use':
@@ -4476,7 +4517,7 @@ export class GameServer {
         break;
       case 'buy':
         if (typeof msg.npc === 'number' && typeof msg.item === 'string')
-          sim.buyItem(msg.npc, msg.item, pid);
+          sim.buyItem(msg.npc, msg.item, pid, msg.bulk === true);
         break;
       case 'sell':
         if (typeof msg.item === 'string') {
@@ -4531,11 +4572,7 @@ export class GameServer {
           // to undefined, which is the bagged arm. The sim then re-validates that
           // the named slot is actually wearing this item id and, without the
           // confirm flag below, that the worn copy is not already enchanted.
-          const worn =
-            typeof msg.slot === 'string' &&
-            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
-              ? (msg.slot as EquipSlot)
-              : undefined;
+          const worn = typeof msg.slot === 'string' && isEquipSlot(msg.slot) ? msg.slot : undefined;
           // `confirm` (#2415): the explicit consent to replace an existing
           // enchant. A strict boolean-true check (the dispatch type-guard
           // rule, the craft_item `commission` precedent); anything else reads
@@ -6070,6 +6107,7 @@ export class GameServer {
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
       drk: p.drinking ? { remaining: round2(p.drinking.remaining) } : null,
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
+      opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
       ddiff: this.sim.dungeonDifficulty(anchorSession.pid),
     });

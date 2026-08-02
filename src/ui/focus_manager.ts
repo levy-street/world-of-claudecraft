@@ -76,6 +76,14 @@ export interface FocusTrapHandle {
    * recorded opener (the old restoreFocus behavior).
    */
   release(returnFocus?: boolean): void;
+  /**
+   * The element recorded as this trap's opener (what release() would restore focus
+   * to). Exposed so a successor window opened FROM WITHIN the trapped window (e.g.
+   * quest dialog -> vendor) can hand its own opener chain forward instead of
+   * capturing an element inside the trap's own subtree, which is about to be
+   * hidden and would fail canFocus by the time the successor closes.
+   */
+  opener(): HTMLElement | null;
 }
 
 interface TrapState {
@@ -158,6 +166,7 @@ export class FocusManager {
         if (this.stack.length === 0) this.stopListening();
         if (returnFocus) this.restore(state.opener);
       },
+      opener: () => state.opener,
     };
   }
 

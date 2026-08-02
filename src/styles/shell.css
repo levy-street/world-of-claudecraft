@@ -1419,6 +1419,13 @@
   .hs-vlvl {
     color: var(--color-text-muted, #b9ac82);
   }
+  /* The `<Guild>` tag beside a ranked player's name. It rides inside .hs-name
+     rather than as its own grid column, so both the desktop grid and the mobile
+     stacked areas below keep their existing column/area sets. */
+  .hs-guild {
+    color: var(--color-text-muted, #b9ac82);
+    font-size: 11px;
+  }
   .hs-lvl,
   .hs-vlvl {
     text-align: center;
@@ -3116,15 +3123,16 @@
       justify-content: flex-end;
       margin: 0;
     }
-    /* $WOC Wallet and Developer become two matching stacked cards on the
+    /* Wallet, Developer, Steam, and Epic become matching stacked cards on the
        account bar: the service name reads as the card's own header, the
        action row sits under it, and the helper caption anchors the foot,
        instead of a label floating beside a button row with its caption
        dangling underneath. Overrides the base .cs-wallet row layout (label
        beside actions, separator border-top), which the card/mobile layouts
-       keep. */
+       keep. Each card still starts hidden until its own advert / link state
+       lights it. */
     body:not(.mobile-touch) #charselect-panel.cs-wow
-      :is(.cs-wallet-group, .cs-github-group, .cs-steam-group) {
+      :is(.cs-wallet-group, .cs-github-group, .cs-steam-group, .cs-epic-group) {
       flex-direction: column;
       align-items: stretch;
       justify-content: flex-start;
@@ -3150,13 +3158,27 @@
       max-width: 300px;
       font-size: 10px;
     }
-    /* Below 1800px the two cards (verified wallet + linked developer) plus
-       the realm/sort controls no longer fit the account bar on one line
-       with their helper captions, so the bar wraps tall and eats stage
-       height: drop the captions (every action keeps its title/aria text)
-       so the wrapped cards stay short. */
+    /* Below 1800px the stacked account cards plus the realm/sort controls
+       no longer fit the account bar on one line with their helper captions,
+       so the bar wraps tall and eats stage height: drop the captions (every
+       action keeps its title/aria text) so the wrapped cards stay short. */
     @media (max-width: 1799px) {
       body:not(.mobile-touch) #charselect-panel.cs-wow .cs-wallet-help {
+        display: none;
+      }
+    }
+    /* The 1800px threshold above was tuned for the two-to-three-card bar.
+       With BOTH storefront cards lit (Steam and Epic advertised together,
+       the four-card worst case beside wallet + developer) the captioned
+       cards alone run past 1300px, so a 1920px bar wraps tall again: in
+       that state the captions drop up to a wider threshold. Caption text is
+       helper copy only; every action keeps its title/aria text, so nothing
+       actionable is hidden. */
+    @media (max-width: 2199px) {
+      body:not(.mobile-touch)
+        #charselect-panel.cs-wow
+        .cs-head-row:has(.cs-steam-group:not([hidden])):has(.cs-epic-group:not([hidden]))
+        .cs-wallet-help {
         display: none;
       }
     }

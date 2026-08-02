@@ -51,6 +51,7 @@ import {
   isNonSpellCast,
   POTION_COOLDOWN,
 } from './types';
+import { bulkBuyQuantity } from './vendor_buy_stack';
 import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
@@ -60,7 +61,11 @@ interface EquippedInventoryUnit {
   craftedRecipeId: string | undefined;
 }
 
-interface VendorRemovedUnit {
+// Exported for social/trade.ts and market.ts (BUG #9): the trade swap and the
+// World Market escrow both need the same per-unit craftedRecipeId tracking a
+// vendor sell/buyback already had, so they reuse this shape and the walk
+// below instead of duplicating it.
+export interface VendorRemovedUnit {
   instance: ItemInstancePayload | undefined;
   craftedRecipeId: string | undefined;
 }
@@ -215,7 +220,14 @@ export function removePreferFungible(
   return consumed;
 }
 
-function removeVendorSellUnits(
+// Per-unit removal that reports each removed unit's ItemInstancePayload AND
+// its plain-stack craftedRecipeId marker (bags.ts InvSlot.craftedRecipeId),
+// walking plain (non-instanced) slots first, then instanced ones, both
+// highest-index-first (the same order removeFungibleItem/removeItem use, so
+// a caller switching from those to this is a behavior-preserving swap). The
+// optional `skip` predicate spares any instanced copy it matches, same
+// contract as removePreferFungible's.
+export function removeVendorSellUnits(
   ctx: SimContext,
   itemId: string,
   count: number,
@@ -630,7 +642,13 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
   }
 }
 
-export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: number): void {
+export function buyItem(
+  ctx: SimContext,
+  npcId: number,
+  itemId: string,
+  pid?: number,
+  bulk?: boolean,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
@@ -699,7 +717,21 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   // Food and drink are handed over in a stack (vendorStackSize); the player pays
   // the per-unit buyValue for every unit, so the per-unit price stays classic and
   // vendor buy price stays above the per-unit sell value (no buy-low/sell-high loop).
-  const qty = vendorStackSize(def);
+  //
+  // Bulk purchase ("buy a stack", #2374): as many units as the buyer can afford
+  // in one purchase, capped at the item's real bag stack size, requested via
+  // ctrl/cmd-click (desktop) or the vendor row's Buy Stack control (touch).
+  // Restricted to plain copper-priced stackable goods: Honor is authored as a
+  // per-purchase price, never stack-multiplied (see VendorPrice in
+  // vendor_view.ts), and a mount purchase must always stay exactly one (buying
+  // several copies of the same reins would only waste gold, and mountOwned only
+  // guards against a SECOND purchase, not a bulk quantity within this one). The
+  // result is floored at 1 so an unaffordable bulk request still hits the normal
+  // "Not enough money" check below instead of silently buying zero.
+  const bulkEligible = bulk === true && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount';
+  const qty = bulkEligible
+    ? Math.max(1, bulkBuyQuantity(def, freeVendor ? 0 : copperUnitPrice, meta.copper))
+    : vendorStackSize(def);
   const copperCost = freeVendor ? 0 : copperUnitPrice * qty;
   const honorCost = freeVendor ? 0 : honorPrice;
   if (meta.copper < copperCost) {

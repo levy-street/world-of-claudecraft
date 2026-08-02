@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import './_setup';
 import { render, screen } from '@testing-library/svelte';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const overviewData = {
   accounts: 12,
@@ -53,6 +53,8 @@ const onlineHistoryData = {
   ],
 };
 
+const mocks = vi.hoisted(() => ({ apiGet: vi.fn() }));
+
 vi.mock('../../src/admin/api', () => ({
   ApiError: class ApiError extends Error {
     status: number;
@@ -61,13 +63,7 @@ vi.mock('../../src/admin/api', () => ({
       this.status = status;
     }
   },
-  apiGet: vi.fn(async (path: string) => {
-    if (path.startsWith('/admin/api/overview')) return overviewData;
-    if (path.startsWith('/admin/api/online-history')) return onlineHistoryData;
-    if (path.startsWith('/admin/api/online')) return { players: [] };
-    if (path.startsWith('/admin/api/activity')) return activityData;
-    throw new Error(`unexpected path ${path}`);
-  }),
+  apiGet: mocks.apiGet,
   apiPost: vi.fn(),
   getToken: () => 'tok',
   getAdminName: () => 'alice',
@@ -77,8 +73,18 @@ vi.mock('../../src/admin/api', () => ({
 import { t } from '../../src/admin/i18n';
 import Overview from '../../src/admin/pages/Overview.svelte';
 
+beforeEach(() => {
+  mocks.apiGet.mockReset();
+  mocks.apiGet.mockImplementation(async (path: string) => {
+    if (path.startsWith('/admin/api/overview')) return overviewData;
+    if (path.startsWith('/admin/api/online-history')) return onlineHistoryData;
+    if (path.startsWith('/admin/api/activity')) return activityData;
+    throw new Error(`unexpected path ${path}`);
+  });
+});
+
 describe('Overview', () => {
-  it('renders live stats, online players, and activity controls', async () => {
+  it('renders live stats and activity controls', async () => {
     render(Overview);
     expect(await screen.findByText(t('stats.onlineNow'))).toBeInTheDocument();
     expect(await screen.findByText(t('stats.siteUsersNow'))).toBeInTheDocument();
@@ -86,10 +92,21 @@ describe('Overview', () => {
     // card wired to the wrong field would not render 512) both render.
     expect(screen.getByText(t('stats.playersCap'))).toBeInTheDocument();
     expect(screen.getByText('512')).toBeInTheDocument();
-    expect(screen.getByText(t('online.empty'))).toBeInTheDocument();
     expect(screen.getByRole('button', { name: t('charts.range.24h') })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
+  });
+
+  // The live roster moved to its own Players page: the dashboard must not render it
+  // nor keep paying for the roster request on its 5s tick.
+  it('no longer fetches or renders the online roster', async () => {
+    render(Overview);
+    await screen.findByText(t('stats.onlineNow'));
+
+    expect(screen.queryByText(t('online.colCharacter'))).not.toBeInTheDocument();
+    expect(
+      mocks.apiGet.mock.calls.map(([path]) => path).filter((path) => path === '/admin/api/online'),
+    ).toEqual([]);
   });
 });

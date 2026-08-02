@@ -73,6 +73,13 @@ describe('perf monitor ungated mainMs buckets', () => {
     expect(perf.snapshot(1000).mainMs.events.count).toBe(2);
   });
 
+  it('records the same bucket through the allocation-free start and finish seam', () => {
+    const perf = new PerfMonitor(null);
+    const start = perf.startTime();
+    perf.finishTime('renderer', start);
+    expect(perf.snapshot(1000).mainMs.renderer.count).toBe(1);
+  });
+
   it('keeps the overlay mount, input chain, and dev-trace spans gated while buckets record', () => {
     const { appendChild } = installBrowserGlobals();
     const perf = new PerfMonitor(null);

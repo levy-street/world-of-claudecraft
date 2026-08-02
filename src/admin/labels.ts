@@ -16,6 +16,18 @@ export function reasonLabel(reason: string): string {
   );
 }
 
+const GUILD_RANK_KEYS: Record<string, string> = {
+  leader: 'guilds.rank.leader',
+  officer: 'guilds.rank.officer',
+  member: 'guilds.rank.member',
+};
+
+export function guildRankLabel(rank: string | null): string {
+  if (!rank) return t('common.emptyValue');
+  const key = GUILD_RANK_KEYS[rank];
+  return key ? t(key) : rank;
+}
+
 // Audit-log action kind (server enum) -> localized label + badge variant. ONE table,
 // shared by the account-scoped ModerationHistory component and the realm-wide
 // ModerationHistoryPage, which each used to carry their own copy of this switch: a
@@ -23,8 +35,9 @@ export function reasonLabel(reason: string): string {
 // unlabelled "Other action", which defeats the point of auditing it.
 //
 // The keys are the union of server/moderation_db.ts MODERATION_ACTIONS (the closed set
-// written to account_moderation_actions.action) and the ip_blocks history kinds
-// (block / unblock), which only the realm-wide page can surface.
+// written to account_moderation_actions.action), the ip_blocks history kinds
+// (block / unblock), and the guild audit kind (guild_rename, server/admin_db.ts
+// GUILD_RENAME_ACTION), the last two of which only the realm-wide page can surface.
 // tests/admin/moderation_action_labels.test.ts pins the table against MODERATION_ACTIONS
 // so the next new kind cannot silently regress to "Other action".
 export type ModerationBadgeVariant = 'default' | 'neutral' | 'warn' | 'bad' | 'success';
@@ -53,6 +66,9 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   unblock: 'moderationHistory.actionIpUnblock',
   reactivate: 'moderationHistory.actionReactivate',
   chat_strikes_reset: 'moderationHistory.actionResetChatStrikes',
+  // Realm-scoped rather than account-scoped: written by the guild backoffice into
+  // guild_moderation_actions, surfaced only by the realm-wide page.
+  guild_rename: 'moderationHistory.actionGuildRename',
 };
 
 const BAD_ACTIONS = new Set(['ban', 'block', 'daily_rewards_ban', 'daily_rewards_ip_ban']);

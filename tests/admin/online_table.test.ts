@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import './_setup';
-import { fireEvent, render, screen } from '@testing-library/svelte';
+import { fireEvent, render, screen, within } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const accountModalOpen = vi.fn();
@@ -58,5 +58,27 @@ describe('OnlineTable', () => {
   it('shows the empty message for no players', () => {
     render(OnlineTable, { players: [] });
     expect(screen.getByText(t('online.empty'))).toBeInTheDocument();
+  });
+
+  it('renders plain headers without a sort handler and sort buttons with one', async () => {
+    const { unmount } = render(OnlineTable, { players });
+    const plainHeader = screen.getByRole('columnheader', { name: t('online.colLevel') });
+    expect(plainHeader).not.toHaveAttribute('aria-sort');
+    expect(within(plainHeader).queryByRole('button')).not.toBeInTheDocument();
+    unmount();
+
+    const onSort = vi.fn();
+    render(OnlineTable, { players, sort: 'level', dir: 'desc', onSort });
+    const sortableHeader = screen.getByRole('columnheader', {
+      name: new RegExp(t('online.colLevel')),
+    });
+    expect(sortableHeader).toHaveAttribute('aria-sort', 'descending');
+    // Position has no meaningful order, so it stays a plain header even when sorting.
+    expect(screen.getByRole('columnheader', { name: t('online.colPos') })).not.toHaveAttribute(
+      'aria-sort',
+    );
+
+    await fireEvent.click(within(sortableHeader).getByRole('button'));
+    expect(onSort).toHaveBeenCalledWith('level');
   });
 });

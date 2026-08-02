@@ -49,6 +49,80 @@ async function openMarketBrowse(page) {
   return pollForSize(page, '#market-window');
 }
 
+// The home page's global board is a REST read (`/api/leaderboard?scope=global...`),
+// and a screenshot host has no populated realm behind it, so answer that one request
+// with a representative cross-realm page before the document loads. Everything after
+// the fetch is the real code path: Api.leaderboard, the board module, the stylesheet.
+// Installed via evaluateOnNewDocument, in string form because this script runs under
+// tsx (whose keepNames rewrite breaks nested functions inside an evaluate callback).
+async function stubGlobalLeaderboardFetch(page) {
+  const leaders = [
+    {
+      rank: 1,
+      name: 'Zyzz',
+      cls: 'warrior',
+      level: 20,
+      lifetimeXp: 5200000,
+      prestigeRank: 2,
+      guild: 'Monarchs',
+      realm: 'Claudemoon',
+    },
+    {
+      rank: 2,
+      name: 'Aldwin',
+      cls: 'mage',
+      level: 20,
+      lifetimeXp: 4100000,
+      prestigeRank: 0,
+      guild: 'Monarchs',
+      realm: 'Claudemoon',
+    },
+    {
+      rank: 3,
+      name: 'Selene',
+      cls: 'priest',
+      level: 19,
+      lifetimeXp: 3650000,
+      prestigeRank: 0,
+      guild: 'Dawnward Company',
+      realm: 'Duskhold',
+    },
+    {
+      rank: 4,
+      name: 'Brightoak',
+      cls: 'druid',
+      level: 19,
+      lifetimeXp: 2900000,
+      prestigeRank: 0,
+      realm: 'Claudemoon',
+    },
+    {
+      rank: 5,
+      name: 'Morgatha',
+      cls: 'warlock',
+      level: 18,
+      lifetimeXp: 2450000,
+      prestigeRank: 0,
+      guild: 'Ashen Pact',
+      realm: 'Duskhold',
+    },
+  ].map((r) => ({ ...r, virtualLevel: 12, title: null }));
+  await page.evaluateOnNewDocument(`(() => {
+    const leaders = ${JSON.stringify(leaders)};
+    const real = window.fetch.bind(window);
+    window.fetch = (input, init) => {
+      const url = String(typeof input === 'string' ? input : (input && input.url) || '');
+      if (url.indexOf('/api/leaderboard') !== -1) {
+        return Promise.resolve(new Response(JSON.stringify({ leaders }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }));
+      }
+      return real(input, init);
+    };
+  })()`);
+}
+
 export const TARGETS = [
   {
     key: 'ravenrift',
@@ -229,6 +303,193 @@ export const TARGETS = [
         await wait(1200);
       }
       await wait(2600); // let the field build + banners settle
+      return {};
+    },
+  },
+  {
+    key: 'target-auras',
+    label: 'Target aura window with offensive and healing-over-time effects',
+    when: ['target_auras'],
+    variants: [
+      {
+        key: 'lunar-tempest-desktop',
+        charClass: 'druid',
+        charName: 'Morphalo',
+        abilityId: 'moonfire',
+        friendly: false,
+      },
+      {
+        key: 'second-bloom-desktop',
+        charClass: 'druid',
+        charName: 'Morphalo',
+        abilityId: 'regrowth',
+        friendly: true,
+      },
+    ],
+    async capture(page, variant) {
+      // enterOfflineGame can expose window.__game just before startGame paints the
+      // loading overlay. Observe that transition first so the following hidden
+      // check cannot pass during the brief pre-loading race.
+      try {
+        await page.waitForFunction(
+          () => document.querySelector('#loading-screen')?.classList.contains('visible'),
+          { timeout: 10000 },
+        );
+      } catch {
+        // A warm load can finish before this recipe starts; the hidden-state
+        // check below remains the authoritative readiness condition.
+      }
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      const staged = await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) {
+          return { ok: false, reason: 'offline world is unavailable' };
+        }
+        sim.setPlayerLevel?.(20, player.id);
+        player.resource = player.maxResource;
+        if (
+          shot.friendly &&
+          ![...sim.entities.values()].some(
+            (entity) => entity.friendlyPracticeTarget || entity.name === 'Healing Dummy',
+          )
+        ) {
+          sim.spawnHealerPracticeDummy?.();
+        }
+        const dummy = [...sim.entities.values()].find(
+          (entity) =>
+            entity.templateId === 'training_dummy' &&
+            !entity.dead &&
+            (shot.friendly
+              ? entity.friendlyPracticeTarget || entity.name === 'Healing Dummy'
+              : entity.hostile && entity.name !== 'Healing Dummy'),
+        );
+        if (!dummy) return { ok: false, reason: 'requested training dummy is unavailable' };
+        player.pos.x = dummy.pos.x - 4;
+        player.pos.y = dummy.pos.y;
+        player.pos.z = dummy.pos.z;
+        player.prevPos = { ...player.pos };
+        sim.rebucket?.(player);
+        sim.targetEntity(dummy.id, player.id);
+        game.hud.hotbarActions[0] = { type: 'ability', id: shot.abilityId };
+        game.hud.saveSlotMap?.();
+        return { ok: true, dummyId: dummy.id, dummyName: dummy.name };
+      }, variant);
+      if (!staged.ok) throw new Error(staged.reason);
+
+      // Moving beside a distant practice dummy can trigger the normal zone
+      // streaming overlay on the following frame. Let that transition start,
+      // then wait until the world is visible again before interacting or shooting.
+      await wait(1000);
+      await page.waitForFunction(
+        () => !document.querySelector('#loading-screen')?.classList.contains('visible'),
+        { timeout: 90000, polling: 200 },
+      );
+
+      const panelExists = await page.evaluate(
+        () => !!document.querySelector('#target-auras-window'),
+      );
+      const allowMissingPanel = process.env.PR_SHOTS_ALLOW_MISSING_TARGET_AURAS === '1';
+      if (!panelExists && !allowMissingPanel) {
+        throw new Error('target aura window is unavailable');
+      }
+      if (panelExists) {
+        const panelVisible = await page.evaluate(
+          () => getComputedStyle(document.querySelector('#target-auras-window')).display !== 'none',
+        );
+        if (!panelVisible) {
+          await page.keyboard.down('Shift');
+          await page.keyboard.press('j');
+          await page.keyboard.up('Shift');
+        }
+      }
+      await wait(500);
+
+      // Exercise the same click handler a player uses on the primary action bar;
+      // do not inject an aura or call sim.castAbility from the capture harness.
+      let auraApplied = false;
+      for (let attempt = 0; attempt < 2 && !auraApplied; attempt++) {
+        const clicked = await page.evaluate(
+          ({ dummyId, abilityId }) => {
+            const game = window.__game;
+            const player = game?.sim?.player;
+            const button = document.querySelector('.action-btn[data-hotbar-slot="1"]');
+            if (!game || !player || !button) return false;
+            player.targetId = dummyId;
+            player.resource = player.maxResource;
+            game.hud.hotbarActions[0] = { type: 'ability', id: abilityId };
+            game.hud.saveSlotMap?.();
+            button.click();
+            return true;
+          },
+          { dummyId: staged.dummyId, abilityId: variant.abilityId },
+        );
+        if (!clicked) throw new Error('primary action slot 1 is unavailable');
+        for (let poll = 0; poll < 24 && !auraApplied; poll++) {
+          await wait(200);
+          auraApplied = await page.evaluate(
+            ({ dummyId, abilityId }) =>
+              !!window.__game?.sim?.entities.get(dummyId)?.auras.some((a) => a.id === abilityId),
+            { dummyId: staged.dummyId, abilityId: variant.abilityId },
+          );
+        }
+      }
+
+      if (panelExists && auraApplied) {
+        const expectedName = variant.friendly ? 'Second Bloom' : 'Lunar Tempest';
+        await page.waitForFunction(
+          (name) =>
+            [...document.querySelectorAll('#target-auras-window .ta-name')].some(
+              (el) => el.textContent === name,
+            ),
+          { timeout: 5000, polling: 100 },
+          expectedName,
+        );
+      }
+
+      const proof = await page.evaluate(
+        ({ dummyId, abilityId, expectedName, hasPanel }) => {
+          const target = window.__game?.sim?.entities.get(dummyId);
+          return {
+            targetName: target?.name ?? '',
+            auraApplied: !!target?.auras.some((a) => a.id === abilityId),
+            windowVisible:
+              !hasPanel ||
+              getComputedStyle(document.querySelector('#target-auras-window')).display !== 'none',
+            auraPainted:
+              !hasPanel ||
+              [...document.querySelectorAll('#target-auras-window .ta-name')].some(
+                (el) => el.textContent === expectedName,
+              ),
+          };
+        },
+        {
+          dummyId: staged.dummyId,
+          abilityId: variant.abilityId,
+          expectedName: variant.friendly ? 'Second Bloom' : 'Lunar Tempest',
+          hasPanel: panelExists,
+        },
+      );
+      if (!proof.auraApplied || !proof.windowVisible || !proof.auraPainted) {
+        throw new Error(`target aura proof failed: ${JSON.stringify(proof)}`);
+      }
       return {};
     },
   },
@@ -2451,6 +2712,84 @@ export const TARGETS = [
       }
       if (variant?.clipMinimap) return { clip: '#minimap' };
       return {};
+    },
+  },
+  {
+    key: 'player-board-guild',
+    label: 'High-score window: the player board with each name guild-tagged',
+    when: ['src/ui/leaderboard_view.ts', 'src/ui/leaderboard_window.ts'],
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Thorgar' },
+      { key: 'mobile', charClass: 'warrior', charName: 'Thorgar', mobile: true },
+    ],
+    // Guilds are a server-only social system, so the offline Sim's own board
+    // carries no guild names (Entity.guild stays '' offline). Stub the IWorld read
+    // with a representative ranked page the way the Renown target does: the real
+    // pure core plus painter then render the tag exactly as the live board would,
+    // including the unguilded row that must show no tag at all.
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      await wait(300);
+      await page.evaluate(() => {
+        const game = window.__game;
+        if (!game) return;
+        const row = (rank, name, cls, level, lifetimeXp, guild) => ({
+          rank,
+          name,
+          cls,
+          level,
+          virtualLevel: 12,
+          lifetimeXp,
+          prestigeRank: rank === 1 ? 2 : 0,
+          title: null,
+          ...(guild ? { guild } : {}),
+        });
+        const fakePage = {
+          leaders: [
+            row(1, 'Zyzz', 'warrior', 20, 5_200_000, 'Monarchs'),
+            row(2, 'Aldwin', 'mage', 20, 4_100_000, 'Monarchs'),
+            row(3, 'Selene', 'priest', 19, 3_650_000, 'Dawnward Company'),
+            row(4, 'Brightoak', 'druid', 19, 2_900_000),
+            row(5, 'Morgatha', 'warlock', 18, 2_450_000, 'Ashen Pact'),
+          ],
+          page: 0,
+          pageCount: 1,
+          total: 5,
+          pageSize: 50,
+        };
+        game.world.leaderboard = async () => fakePage;
+        game.hud.toggleLeaderboard();
+      });
+      const open = await pollForSize(page, '#leaderboard-window .lb-row-players', 10, 300);
+      if (!open) throw new Error('player board rows did not render');
+      return { clip: '#leaderboard-window' };
+    },
+  },
+  {
+    key: 'home-highscores-guild',
+    label: 'Home page High Scores board with each name guild-tagged',
+    when: ['src/ui/highscore_board.ts', 'styles/shell.css'],
+    // The pre-game marketing shell, so `landing` (no world entry): the board is a
+    // home-page view, and entering the world replaces the shell with the HUD.
+    variants: [
+      { key: 'desktop', landing: true, beforeLoad: stubGlobalLeaderboardFetch },
+      { key: 'mobile', landing: true, mobile: true, beforeLoad: stubGlobalLeaderboardFetch },
+    ],
+    async capture(page) {
+      // Open the real view through its nav button, then wait for the board the
+      // stubbed /api/leaderboard response feeds.
+      await page.evaluate(() => {
+        document.querySelector('#nav-btn-highscores')?.click();
+      });
+      // :not(.hs-head) on purpose: the header row is display:none on mobile-touch,
+      // so polling the first .hs-row would never report a size there.
+      const open = await pollForSize(page, '#hs-leaderboard .hs-row:not(.hs-head)', 20, 300);
+      if (!open) throw new Error('home-page high-score rows did not render');
+      return { clip: '#highscores-view .hs-panel' };
     },
   },
   {

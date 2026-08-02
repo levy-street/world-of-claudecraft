@@ -7,6 +7,16 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const it_IT: Record<string, string> = {
+  'onlinePlayers.autoRefresh': 'Aggiornamento automatico ({minutes} min)',
+  'onlinePlayers.count': '{count} giocatori online',
+  'onlinePlayers.countFiltered': '{shown} di {total} online',
+  'onlinePlayers.filteredEmpty': 'nessun giocatore online corrisponde a questa ricerca',
+  'onlinePlayers.loadFailed': 'caricamento dei giocatori online non riuscito',
+  'onlinePlayers.loading': 'caricamento dei giocatori online…',
+  'onlinePlayers.refresh': 'Aggiorna',
+  'onlinePlayers.searchLabel': 'Cerca giocatori online',
+  'onlinePlayers.searchPlaceholder': 'Cerca giocatore, classe, zona…',
+  'onlinePlayers.sortHint': 'fai clic su una colonna per ordinare',
   'alert.passwordLength': 'Inserisci una nuova password da 6 a 128 caratteri.',
   'detail.resetPassword': 'Reimposta password',
   'dialog.actionResetPassword': 'Imposta una nuova password e disconnetti ogni dispositivo',
@@ -122,7 +132,6 @@ export const it_IT: Record<string, string> = {
   'stats.avgTick': 'tick medio',
   'stats.serverRss': 'rss server',
   'online.title': 'Giocatori online',
-  'online.refreshHint': 'si aggiorna ogni 5s',
   'online.empty': 'nessuno online al momento',
   'online.colCharacter': 'Personaggio',
   'online.colClass': 'Classe',

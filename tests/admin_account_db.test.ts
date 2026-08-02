@@ -28,6 +28,7 @@ vi.mock('../server/realm', () => ({
 import {
   accountDetail,
   dailyRewardPointEvents,
+  GUILD_RENAME_ACTION,
   listAccounts,
   listModerationActions,
 } from '../server/admin_db';
@@ -117,6 +118,68 @@ describe('admin account detail query', () => {
     // The ip-bans probe keeps an aged-out account-to-IP link visible through
     // the association-ledger arm after the raw play_sessions rows fold away.
     expect(mocks.query.mock.calls[4][0]).toContain('SELECT 1 FROM account_ip_associations assoc');
+    expect(mocks.query.mock.calls[1][0]).toContain(
+      'LEFT JOIN guild_members gm ON gm.character_id = c.id',
+    );
+    expect(mocks.query.mock.calls[1][0]).toContain(
+      'LEFT JOIN guilds g ON g.id = gm.guild_id AND g.realm = c.realm',
+    );
+  });
+
+  it('maps guild identity and rank onto account characters without extra reads', async () => {
+    mocks.query
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 7,
+            username: 'alice',
+            created_at: '2026-01-01T00:00:00Z',
+            last_login: null,
+            is_admin: false,
+            banned_at: null,
+            suspended_until: null,
+            moderation_reason: '',
+            chat_muted_until: null,
+            chat_mute_reason: '',
+            chat_strikes: 0,
+            is_ai: false,
+            is_streamer: false,
+            streamer_links: {},
+            last_login_ip: null,
+            playtime_seconds: 0,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 9,
+            name: 'Alice',
+            class: 'mage',
+            level: 12,
+            copper: 0,
+            xp: 0,
+            pos: null,
+            created_at: '2026-01-01T00:00:00Z',
+            updated_at: '2026-01-02T00:00:00Z',
+            guild_id: 4,
+            guild_name: 'Keepers',
+            guild_rank: 'leader',
+          },
+        ],
+      })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] });
+
+    const detail = await accountDetail(7);
+
+    expect(detail?.characters[0]).toMatchObject({
+      guildId: 4,
+      guildName: 'Keepers',
+      guildRank: 'leader',
+    });
+    expect(mocks.query).toHaveBeenCalledTimes(5);
   });
 
   it('lists accounts through the plain pool read with the lifetime playtime rollup term', async () => {
@@ -239,7 +302,7 @@ describe('admin account detail query', () => {
     expect(mocks.query.mock.calls[0][1]).toEqual([7, '2026-07-16', 'test-realm', 250]);
   });
 
-  it('lists moderation actions newest first, mapping both account and ip sources', async () => {
+  it('lists moderation actions newest first, mapping account, ip and guild sources', async () => {
     mocks.query
       .mockResolvedValueOnce({
         rows: [
@@ -249,6 +312,8 @@ describe('admin account detail query', () => {
             account_id: null,
             username: null,
             ip: '203.0.113.7',
+            guild_id: null,
+            guild_name: null,
             action: 'block',
             reason: 'proxy abuse',
             created_at: '2026-06-03T03:00:00Z',
@@ -262,6 +327,8 @@ describe('admin account detail query', () => {
             account_id: 9,
             username: 'target',
             ip: null,
+            guild_id: null,
+            guild_name: null,
             action: 'note',
             reason: 'follow up',
             created_at: '2026-06-03T02:00:00Z',
@@ -269,9 +336,24 @@ describe('admin account detail query', () => {
             admin_account_id: 7,
             admin_username: 'moderator',
           },
+          {
+            source: 'guild',
+            id: '5',
+            account_id: null,
+            username: null,
+            ip: null,
+            guild_id: 42,
+            guild_name: 'Ashen Vale',
+            action: 'guild_rename',
+            reason: 'offensive guild name',
+            created_at: '2026-06-03T01:00:00Z',
+            expires_at: null,
+            admin_account_id: 7,
+            admin_username: 'moderator',
+          },
         ],
       })
-      .mockResolvedValueOnce({ rows: [{ total: 2 }] });
+      .mockResolvedValueOnce({ rows: [{ total: 3 }] });
 
     const history = await listModerationActions('all', 7, 1, 100);
 
@@ -283,6 +365,8 @@ describe('admin account detail query', () => {
           accountId: null,
           username: null,
           ip: '203.0.113.7',
+          guildId: null,
+          guildName: null,
           action: 'block',
           reason: 'proxy abuse',
           createdAt: '2026-06-03T03:00:00Z',
@@ -296,6 +380,8 @@ describe('admin account detail query', () => {
           accountId: 9,
           username: 'target',
           ip: null,
+          guildId: null,
+          guildName: null,
           action: 'note',
           reason: 'follow up',
           createdAt: '2026-06-03T02:00:00Z',
@@ -303,38 +389,69 @@ describe('admin account detail query', () => {
           adminAccountId: 7,
           adminUsername: 'moderator',
         },
+        {
+          source: 'guild',
+          id: 5,
+          accountId: null,
+          username: null,
+          ip: null,
+          guildId: 42,
+          guildName: 'Ashen Vale',
+          action: GUILD_RENAME_ACTION,
+          reason: 'offensive guild name',
+          createdAt: '2026-06-03T01:00:00Z',
+          expiresAt: null,
+          adminAccountId: 7,
+          adminUsername: 'moderator',
+        },
       ],
-      total: 2,
+      total: 3,
       page: 1,
       limit: 100,
     });
     expect(mocks.query).toHaveBeenNthCalledWith(
       1,
       expect.stringContaining('ORDER BY created_at DESC, id DESC, source'),
-      [100, 0],
+      ['test-realm', 100, 0],
     );
     expect(mocks.query.mock.calls[0][0]).toContain('UNION ALL');
     expect(mocks.query.mock.calls[0][0]).toContain('FROM blocked_ip_actions ip_action');
-    // 'all' has no tab filter, so the page params start at $1: LIMIT $1 OFFSET $2.
-    expect(mocks.query.mock.calls[0][0]).toContain('LIMIT $1 OFFSET $2');
+    expect(mocks.query.mock.calls[0][0]).toContain('FROM guild_moderation_actions guild_action');
+    // The guild arm stamps its action kind as a literal; the dashboard label table
+    // keys off the same constant, so drift between them would silently bucket every
+    // rename into "Other action".
+    expect(mocks.query.mock.calls[0][0]).toContain(`'${GUILD_RENAME_ACTION}' AS action`);
+    // Only the guild arm is realm-scoped: accounts and blocked IPs are global.
+    expect(mocks.query.mock.calls[0][0]).toContain('WHERE guild_action.realm = $1');
+    expect(mocks.query.mock.calls[0][0]).not.toContain('action_log.realm');
+    // The current guild name wins, but a deleted guild still renders its audited name.
+    expect(mocks.query.mock.calls[0][0]).toContain(
+      'COALESCE(guild.name, guild_action.new_name) AS guild_name',
+    );
+    // 'all' has only the realm param, so paging is LIMIT $2 OFFSET $3.
+    expect(mocks.query.mock.calls[0][0]).toContain('LIMIT $2 OFFSET $3');
     // The count query wraps the same union with no paging params.
-    expect(mocks.query.mock.calls[1][1]).toEqual([]);
+    expect(mocks.query.mock.calls[1][1]).toEqual(['test-realm']);
   });
 
-  it('scopes the mine tab to the current moderator across both sources', async () => {
+  it('scopes the mine tab to the current moderator across all three sources', async () => {
     mocks.query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ total: 0 }] });
 
     await listModerationActions('mine', 7, 1, 100);
 
-    expect(mocks.query.mock.calls[0][0]).toContain('WHERE action_log.admin_account_id = $1');
+    expect(mocks.query.mock.calls[0][0]).toContain('WHERE action_log.admin_account_id = $2');
     // The ip branch is scoped to the moderator, NOT pruned with WHERE false (that is notes).
-    expect(mocks.query.mock.calls[0][0]).toContain('WHERE ip_action.admin_account_id = $1');
+    expect(mocks.query.mock.calls[0][0]).toContain('WHERE ip_action.admin_account_id = $2');
+    // The guild branch keeps its realm scope AND takes the moderator filter.
+    expect(mocks.query.mock.calls[0][0]).toContain(
+      'WHERE guild_action.realm = $1 AND guild_action.admin_account_id = $2',
+    );
     expect(mocks.query.mock.calls[0][0]).not.toContain('WHERE false');
     expect(mocks.query.mock.calls[0][0]).not.toContain("action = 'note'");
-    // params = [adminAccountId], so paging shifts to LIMIT $2 OFFSET $3.
-    expect(mocks.query.mock.calls[0][0]).toContain('LIMIT $2 OFFSET $3');
-    expect(mocks.query.mock.calls[0][1]).toEqual([7, 100, 0]);
-    expect(mocks.query.mock.calls[1][1]).toEqual([7]);
+    // params = [realm, adminAccountId], so paging shifts to LIMIT $3 OFFSET $4.
+    expect(mocks.query.mock.calls[0][0]).toContain('LIMIT $3 OFFSET $4');
+    expect(mocks.query.mock.calls[0][1]).toEqual(['test-realm', 7, 100, 0]);
+    expect(mocks.query.mock.calls[1][1]).toEqual(['test-realm', 7]);
   });
 
   it('scopes the notes tab to notes created by the current moderator', async () => {
@@ -343,13 +460,17 @@ describe('admin account detail query', () => {
     await listModerationActions('notes', 7, 2, 100);
 
     expect(mocks.query.mock.calls[0][0]).toContain(
-      "WHERE action_log.admin_account_id = $1 AND action_log.action = 'note'",
+      "WHERE action_log.admin_account_id = $2 AND action_log.action = 'note'",
     );
     expect(mocks.query.mock.calls[0][0]).toContain('FROM blocked_ip_actions ip_action');
+    // A guild rename is never a note, so BOTH non-account arms are pruned here.
     expect(mocks.query.mock.calls[0][0]).toContain('WHERE false');
-    // params = [adminAccountId], so paging shifts to LIMIT $2 OFFSET $3.
-    expect(mocks.query.mock.calls[0][0]).toContain('LIMIT $2 OFFSET $3');
-    expect(mocks.query.mock.calls[0][1]).toEqual([7, 100, 100]);
-    expect(mocks.query.mock.calls[1][1]).toEqual([7]);
+    // The guild arm keeps referencing $1 while pruned: Postgres refuses to parse
+    // a statement whose parameter no arm mentions.
+    expect(mocks.query.mock.calls[0][0]).toContain('WHERE guild_action.realm = $1 AND false');
+    // params = [realm, adminAccountId], so paging shifts to LIMIT $3 OFFSET $4.
+    expect(mocks.query.mock.calls[0][0]).toContain('LIMIT $3 OFFSET $4');
+    expect(mocks.query.mock.calls[0][1]).toEqual(['test-realm', 7, 100, 100]);
+    expect(mocks.query.mock.calls[1][1]).toEqual(['test-realm', 7]);
   });
 });

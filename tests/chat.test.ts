@@ -1254,12 +1254,13 @@ describe('chat module (direct, no Sim)', () => {
     expect(meta).toBeDefined();
     // Every catalog mount is owned (the reins item is in the bags)...
     expect(ownedMounts(meta as any)).toEqual([...MOUNT_KEYS]);
+    expect(ownedMounts(meta as any)).toContain('terrorspark_groundshaker');
     // ...and the level 1 rider was raised to 20, the stablemaster's buy gate and
     // the only level that still matters in the mount flow (mounts themselves have
     // no per-mount level gate).
     expect(sim.entities.get(pid)?.level).toBe(20);
     expect(
-      events.some((e: any) => e.type === 'log' && /^\[dev\] Granted 7 mount reins/.test(e.text)),
+      events.some((e: any) => e.type === 'log' && /^\[dev\] Granted 8 mount reins/.test(e.text)),
     ).toBe(true);
     // A second run is idempotent: everything already owned, nothing granted twice.
     sim.chat('/dev mounts', pid);

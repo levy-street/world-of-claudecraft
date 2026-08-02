@@ -34,6 +34,16 @@ describe('options_window: no magic values', () => {
   });
 });
 
+describe('options_window: aura menu routing', () => {
+  it('routes the top-level Auras view to its settings panel and placement preview', () => {
+    expect(painter).toContain("case 'auras':");
+    expect(painter).toContain('this.renderAuras();');
+    // Optional chain: unstuck tests (and any pre-wire path) close without hooks.
+    expect(painter).toContain("this.deps.auraOverlays?.().setPlacement(this.view === 'auras')");
+    expect(painter).toContain('this.auraSettings.render(body);');
+  });
+});
+
 describe('options_window: tier boundary', () => {
   it('reads the graphics preset as a plain setting value, never the governor/cutoff', () => {
     expect(painter).not.toContain('ui_effects_profile');
@@ -270,6 +280,16 @@ describe('options_window: bug-report dispatch + async states (cluster 2)', () =>
 });
 
 describe('options_window: keybind rebind dispatch (cluster 5)', () => {
+  it('localizes the Target Buffs and Debuffs row through its chrome key', () => {
+    expect(painter).toContain("targetAuras: 'hudChrome.targetAuras.keybindLabel'");
+    const displayName = painter.slice(
+      painter.indexOf('private actionDisplayName('),
+      painter.indexOf('private gamepadActionOptions('),
+    );
+    expect(displayName).toContain('BIND_ACTION_LABEL_KEYS[actionId]');
+    expect(displayName).toContain('t(BIND_ACTION_LABEL_KEYS[actionId])');
+  });
+
   it('captures a key and binds it to the same action/index', () => {
     expect(painter).toContain('private beginCapture(actionId: string, index: number');
     expect(painter).toContain('hooks.captureKey((code)');

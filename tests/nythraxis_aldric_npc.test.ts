@@ -25,7 +25,7 @@ const ALDRIC_ID = 'brother_aldric_raid';
 const FINAL_QUEST = 'q_nythraxis_scourges_end';
 const BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 
-// --- harness (mirrors tests/nythraxis_raid.test.ts) -------------------------
+// --- harness (mirrors tests/nythraxis_raid_unit.test.ts) -------------------------
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });

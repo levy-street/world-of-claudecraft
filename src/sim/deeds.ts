@@ -29,6 +29,7 @@ import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
+import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -121,6 +122,9 @@ const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   ysolei: 'drowned_temple',
   korzul_the_gravewyrm: 'gravewyrm_sanctum',
   nythraxis_scourge_of_thornpeak: 'nythraxis_boss_arena',
+  // Without this entry Zulgar kills write no dungeonClears record, so the
+  // dgn_wildheart_basin deed pair ships permanently unearnable (0/1 forever).
+  wildheart_high_priest: 'wildheart_basin',
 };
 
 // Perfection tasks: zero player deaths inside the boss's heroic instance
@@ -740,24 +744,9 @@ const FLAGS: Record<DeedFlagId, (meta: PlayerMeta, e: Entity) => boolean> = {
   // Guild membership is server-stamped onto the entity; offline it stays ''
   // (never satisfiable there, matching the offline-sandbox model).
   guildMember: (_m, e) => e.guild !== '',
-  // Slot list PINNED as of v1 (the launch EQUIP_SLOTS); a future twelfth slot
-  // does not grow this deed.
-  allEquipSlotsFilled: (m) =>
-    (
-      [
-        'mainhand',
-        'helmet',
-        'neck',
-        'shoulder',
-        'chest',
-        'waist',
-        'legs',
-        'gloves',
-        'feet',
-        'ring1',
-        'ring2',
-      ] as const
-    ).every((slot) => !!m.equipment[slot]),
+  // Slot list PINNED as of v1 (LAUNCH_PAPERDOLL_SLOTS); a future twelfth slot
+  // does not grow this deed, so already-earned rows keep their meaning.
+  allEquipSlotsFilled: (m) => LAUNCH_PAPERDOLL_SLOTS.every((slot) => !!m.equipment[slot]),
   nonDefaultSkin: (m) => m.skinCatalog === 'mech' || m.skin > 0,
   // The marked set resets whenever the authoritative reward window advances,
   // so containment of all four ids already means one complete circuit.

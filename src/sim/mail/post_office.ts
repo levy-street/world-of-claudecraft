@@ -33,6 +33,7 @@ import {
   removeMatchingInstance,
   sanitizeEscrowSlot,
 } from '../item_instance_transfer';
+import { removeVendorSellUnits } from '../items';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -457,11 +458,19 @@ export class PostOffice {
       this.result(meta.entityId, 'recipientBoxFull');
       return;
     }
-    // Escrow: coin and goods leave the sender now, ride with the raven. A plain
-    // entry removes fungible stock only (an instanced copy is never consumed as
-    // a plain stack member); an instanced entry escrows the ACTUAL matching
-    // copy, whose payload (removeMatchingInstance's contract, never the wire
-    // needle) is what the letter carries.
+    // Escrow: coin and goods leave the sender now, ride with the raven. An
+    // instanced entry escrows the ACTUAL matching copy, whose payload
+    // (removeMatchingInstance's contract, never the wire needle) is what the
+    // letter carries. A plain entry escrows via removeVendorSellUnits (the
+    // trade/market walk) with a `skip` that spares every instanced copy
+    // (matching the countFungibleItem check above, so an instanced copy is
+    // never consumed as a plain stack member), so the escrow reports each
+    // removed unit's plain-stack craftedRecipeId marker (bags.ts
+    // InvSlot.craftedRecipeId): otherwise a mailed crafted item lands at the
+    // recipient with no marker, laundering the disenchant-gate provenance the
+    // same way the trade/market fix closed. A single plain entry can legitimately
+    // span two provenance buckets (the market's boundstone_helm case), so it
+    // splits into one parcel per bucket rather than merging them.
     meta.copper -= coin + MAIL_POSTAGE;
     const parcels: InvSlot[] = [];
     for (const s of items) {
@@ -469,8 +478,25 @@ export class PostOffice {
         const escrowed = removeMatchingInstance(this.ctx, s.itemId, s.instance, meta.entityId);
         if (escrowed) parcels.push({ itemId: s.itemId, count: 1, instance: escrowed });
       } else {
-        this.ctx.removeFungibleItem(s.itemId, Math.floor(s.count), meta.entityId);
-        parcels.push({ itemId: s.itemId, count: Math.floor(s.count) });
+        const count = Math.floor(s.count);
+        const consumed = removeVendorSellUnits(
+          this.ctx,
+          s.itemId,
+          count,
+          meta.entityId,
+          () => true,
+        );
+        const byRecipe = new Map<string | undefined, number>();
+        for (const unit of consumed) {
+          byRecipe.set(unit.craftedRecipeId, (byRecipe.get(unit.craftedRecipeId) ?? 0) + 1);
+        }
+        for (const [craftedRecipeId, bucketCount] of byRecipe) {
+          parcels.push({
+            itemId: s.itemId,
+            count: bucketCount,
+            ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+          });
+        }
       }
     }
     this.book({
@@ -521,9 +547,20 @@ export class PostOffice {
     for (const s of m.items) {
       // The shared payload-aware pair (bags.ts canGrantCopies + grantCopies):
       // an instanced parcel needs instanced room and lands through
-      // addItemInstance so its payload survives delivery.
-      if (canGrantCopies(meta.inventory, bagCapacity(meta.bags), s.itemId, s.count, s.instance)) {
-        grantCopies(this.ctx, meta.entityId, s.itemId, s.count, s.instance);
+      // addItemInstance so its payload survives delivery; a plain parcel
+      // threads its craftedRecipeId marker through so a mailed crafted item
+      // keeps its provenance on arrival, the same as the market fix.
+      if (
+        canGrantCopies(
+          meta.inventory,
+          bagCapacity(meta.bags),
+          s.itemId,
+          s.count,
+          s.instance,
+          s.craftedRecipeId,
+        )
+      ) {
+        grantCopies(this.ctx, meta.entityId, s.itemId, s.count, s.instance, s.craftedRecipeId);
       } else {
         kept.push(s);
       }
@@ -785,9 +822,15 @@ export class PostOffice {
       // edit): dormant, recoverable data, exactly like market listings.
       // sanitizeEscrowSlot preserves an instanced parcel's payload and clamps
       // its count to the identical-payload merge cap (the character-load rule).
+      // A plain parcel's craftedRecipeId marker rides alongside it (dropped by
+      // sanitizeEscrowSlot, which is instance-only), so a mail restart never
+      // strips a crafted item's provenance out of an in-flight attachment.
       const items = (m.items ?? [])
         .filter((s) => s && typeof s.itemId === 'string')
-        .map((s) => sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance)));
+        .map((s) => ({
+          ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance)),
+          ...(typeof s.craftedRecipeId === 'string' ? { craftedRecipeId: s.craftedRecipeId } : {}),
+        }));
       const kind: MailKind = m.kind === 'player' || m.kind === 'npc' ? m.kind : 'system';
       const recipientName = String(m.recipientName ?? m.recipientKey);
       const senderName = String(m.senderName ?? '?');

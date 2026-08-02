@@ -46,6 +46,7 @@ export function spawnHunterTrap(
     tickTimer: effect.trap.lifetime,
     school: 'frost',
     ability: abilityName,
+    abilityId,
     hunterTrap: {
       abilityId,
       armRemaining: effect.trap.armTime,
@@ -82,6 +83,7 @@ export function tickHunterTrap(ctx: SimContext, effect: GroundAoE): void {
       school: 'frost',
       fx: 'nova',
       radius: SHIMMER_RADIUS,
+      ability: trap.abilityId,
     });
   }
   for (const target of ctx.hostilesInRadius(
@@ -120,6 +122,7 @@ export function tickHunterTrap(ctx: SimContext, effect: GroundAoE): void {
       school: 'frost',
       fx: 'nova',
       radius: effect.radius,
+      ability: trap.abilityId,
     });
     break;
   }

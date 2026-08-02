@@ -88,6 +88,11 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'raging_gale',
       'raised_guard',
       'pummel',
+      // Seething Fury: authored as a plain L10 active (def below) but orphaned
+      // when the v2 talent integration deleted the v1 class-tree grant
+      // (war_berserker_rage) without re-homing it - abilitiesKnownAt could
+      // never return it (owner report: unfindable on a live L20 warrior).
+      'berserker_rage',
       'execute',
       'furious_mending',
       'iron_resolve',
@@ -5960,13 +5965,19 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'arcane',
     requiresTarget: false,
-    // One dispatch applies the vanish, the damage cut (duration + linger so it
-    // survives an early break), and strips up to two DoTs (effect_dispatch).
+    // One dispatch strips up to two DoTs and applies the vanish. Its configured
+    // damage cut starts only once that vanish ends (effect_dispatch).
     effects: [
-      { type: 'greaterInvisibility', duration: 20, drValue: 0.9, linger: 3, removeDotCount: 2 },
+      {
+        type: 'greaterInvisibility',
+        duration: 20,
+        drValue: 0.9,
+        afterDuration: 2,
+        removeDotCount: 2,
+      },
     ],
     description:
-      'Vanish for 20 sec: removes 2 damage-over-time effects and you take 90% less damage while invisible and shortly after. (Mage talent)',
+      'Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)',
   },
   rings_of_frost: {
     id: 'rings_of_frost',

@@ -51,22 +51,35 @@ export interface WaterScheduleState {
   stepSeconds: number;
 }
 
+/** The tier union re-stated locally: this is a registered pure core and must
+ *  stay Three-free, so it cannot import gfx.ts (which imports three). Insane
+ *  deliberately matches ultra: the water field is already at its quality
+ *  ceiling there and a larger allocation would only spend memory. */
+type WaterTier = 'low' | 'medium' | 'high' | 'ultra' | 'insane';
+
 /** Fixed allocation size per tier, so re-anchoring never resizes an attachment. */
-export function waterSimulationTargetResolution(tier: 'low' | 'medium' | 'high' | 'ultra'): number {
-  if (tier === 'ultra') return 128;
+export function waterSimulationTargetResolution(tier: WaterTier): number {
+  if (tier === 'ultra' || tier === 'insane') return 128;
   if (tier === 'high') return 96;
   if (tier === 'medium') return 64;
   return 48;
 }
 
 /** Bounded height-field allocation and fixed rate for the camera-anchored field. */
-export function waterFieldPlan(tier: 'low' | 'medium' | 'high' | 'ultra'): WaterFieldPlan {
+export function waterFieldPlan(tier: WaterTier): WaterFieldPlan {
   const resolution = waterSimulationTargetResolution(tier);
   return {
     resolution,
     cellSize: WATER_FIELD_CELL_SIZE,
     size: resolution * WATER_FIELD_CELL_SIZE,
-    stepHz: tier === 'ultra' ? 30 : tier === 'high' ? 24 : tier === 'medium' ? 20 : 15,
+    stepHz:
+      tier === 'ultra' || tier === 'insane'
+        ? 30
+        : tier === 'high'
+          ? 24
+          : tier === 'medium'
+            ? 20
+            : 15,
   };
 }
 
@@ -144,11 +157,13 @@ export const WATER_FOAM_WIDTH_YARDS = 4.5;
 
 // Half-width of the central difference used for the seabed gradient, in yards.
 // The zone plane bakes at ~2 yard vertex spacing, so sampling wider than that
-// would smear a cove's slope into its neighbour's.
-const SHORE_SLOPE_SAMPLE_HALF_WIDTH = 1.5;
+// would smear a cove's slope into its neighbour's. Exported so interior shore
+// bakes (wildheart_terrain.ts) sample with the same contract the shader
+// expects instead of mirroring the value.
+export const SHORE_SLOPE_SAMPLE_HALF_WIDTH = 1.5;
 // Below this the seabed is flat enough that depth carries no direction, and
 // dividing by it would explode the derived shoreline distance.
-const MIN_SHORE_SLOPE = 1e-3;
+export const MIN_SHORE_SLOPE = 1e-3;
 
 /**
  * Magnitude of the seabed gradient at (x, z): yards of depth gained per yard

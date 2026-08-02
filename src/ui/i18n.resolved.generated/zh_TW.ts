@@ -923,6 +923,23 @@ export const zh_TW: EnTranslations = {
       "separate": "分離{meter}",
       "regroup": "合併{meter}"
     },
+    "targetAuras": {
+      "title": "目標光環",
+      "keybindLabel": "目標增益與減益效果",
+      "all": "全部",
+      "debuffs": "減益",
+      "buffs": "增益",
+      "unlock": "移動目標光環視窗",
+      "lock": "鎖定目標光環視窗",
+      "configureRows": "設定目標光環",
+      "fewerRows": "減少光環列數",
+      "moreRows": "增加光環列數",
+      "visibleRows": "偏好的光環列數：{count}",
+      "showSources": "顯示光環施放者",
+      "hideSources": "隱藏光環施放者",
+      "ownAura": "你的光環",
+      "opacity": "光環不透明度：{percent}"
+    },
     "petFeed": {
       "disabledFullHp": "寵物生命值已滿",
       "disabledNoFood": "你的背包中沒有可以治療寵物的食物"
@@ -967,13 +984,15 @@ export const zh_TW: EnTranslations = {
       "name_shadowjump_toad": "影躍蟾蜍卡瑪影",
       "name_stormfeather_griffin": "凌天風暴之羽",
       "name_thunderstrut_gobbler": "雷霆闊步大火雞",
+      "name_terrorspark_groundshaker": "驚雷撼地者",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
       "desc_aether_hover_cycle": "一輛強大的魔導機車，專為快速貼地懸浮的戰鬥穿行而設計。",
       "desc_shadowjump_toad": "一隻體型龐大、步伐穩健的巨蟾，受訓於閃電般的暗影跳躍，可跨越任何地形。",
       "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
-      "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。"
+      "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。",
+      "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
@@ -1343,6 +1362,51 @@ export const zh_TW: EnTranslations = {
       "badges": {
         "backgrounded": "背景執行中",
         "offline": "離線"
+      }
+    },
+    "auraOverlay": {
+      "title": "光環",
+      "currentClass": "目前職業：{class}",
+      "previewHint": "使用「設定位置」移動光環，避免擋住選單。",
+      "noProcs": "此角色沒有可用的支援觸發效果。",
+      "enabled": "顯示光環",
+      "icon": "法術圖示",
+      "arcs": "側邊弧形",
+      "groundRing": "地面圓環",
+      "groundRingSpellOrder": "地面圓環：法術順序",
+      "crescentsSpellOrder": "側邊弧形：法術順序",
+      "size": "大小",
+      "iconSize": "圖示大小",
+      "crescentBlockSize": "弧形區塊大小",
+      "groundRingBlockSize": "地面圓環區塊大小",
+      "opacity": "不透明度",
+      "color": "顏色",
+      "allOn": "全部開啟",
+      "allOff": "全部關閉",
+      "reposition": "設定位置",
+      "positioning": "定位：{aura}",
+      "selectAura": "光環",
+      "done": "完成",
+      "moveLeft": "向左移動",
+      "moveUp": "向上移動",
+      "moveDown": "向下移動",
+      "moveRight": "向右移動",
+      "moveEarlier": "將法術向內移動",
+      "moveLater": "將法術向外移動",
+      "screenPosition": "螢幕位置",
+      "spellOrder": "法術順序",
+      "reset": "重設位置",
+      "spellPosition": "法術順序 {position} / {count}",
+      "procs": {
+        "revenge": "復仇！",
+        "battleTrance": "戰鬥冥想",
+        "overpowerCharge": "赤手充能",
+        "suddenDeath": "猝死",
+        "victoryRush": "乘勝追擊",
+        "enrage": "狂亂：激怒",
+        "heatingUp": "熱身",
+        "arcaneCharge": "秘法充能",
+        "aetherRush": "以太奔湧"
       }
     },
     "playerCard": {
@@ -2151,6 +2215,14 @@ export const zh_TW: EnTranslations = {
       "linked": "已連結 Steam 帳號 {id}",
       "benefits": "在桌面應用程式中連結你的 Steam 帳號，將你獲得的功績同步為 Steam 成就。",
       "noTicket": "Steam 未提供連結憑證。請先啟動 Steam，然後重試。"
+    },
+    "epic": {
+      "title": "Epic",
+      "link": "連結 Epic",
+      "unlink": "取消連結 Epic",
+      "linked": "已連結 Epic 帳號 {id}",
+      "benefits": "在 Epic 桌面應用程式中連結你的 Epic 帳號，將你獲得的功績同步為 Epic 成就。",
+      "noProof": "Epic 未提供連結憑證。請從 Epic Games Store 啟動，然後重試。"
     },
     "mailbox": {
       "title": "郵箱",
@@ -3002,6 +3074,14 @@ export const zh_TW: EnTranslations = {
       "already_linked": "你的帳號已連結一個 Steam 帳號。",
       "account_taken": "該 Steam 帳號已連結到另一個帳號。",
       "upstream": "Steam 未回應。請稍後重試。"
+    },
+    "epic": {
+      "disabled": "Epic 連結目前無法使用。",
+      "invalid_token": "Epic 無法驗證此連結請求。請在桌面應用程式中重試。",
+      "banned": "該 Epic 帳號無法連結。",
+      "already_linked": "你的帳號已連結一個 Epic 帳號。",
+      "account_taken": "該 Epic 帳號已連結到另一個帳號。",
+      "upstream": "Epic 未回應。請稍後重試。"
     },
     "wallet": {
       "handoff_invalid": "錢包授權已過期或無法驗證。請再試一次。"
@@ -6257,11 +6337,15 @@ export const zh_TW: EnTranslations = {
       "graphicsPresetMedium": "中",
       "graphicsPresetHigh": "高",
       "graphicsPresetUltra": "超高",
+      "graphicsPresetInsane": "極致",
       "graphicsPresetAdvanced": "進階",
       "terrainDetail": "地形細節",
       "foliageDensity": "植被密度",
       "effectsQuality": "特效與光照",
       "shadowQuality": "陰影品質",
+      "surfaceDetail": "表面細節",
+      "surfaceDetailBasic": "基礎",
+      "surfaceDetailFull": "完整",
       "terrainLow": "低",
       "terrainHigh": "高",
       "touchOpacity": "觸控控制透明度",
@@ -6425,6 +6509,8 @@ export const zh_TW: EnTranslations = {
       "joinParty": "加入隊伍",
       "guildInvite": "{name} 邀請你加入 {guild}。",
       "joinGuild": "加入公會",
+      "guildInviteCancelled": "由於公會已重新命名，一項待處理的公會邀請已取消。",
+      "guildRenamed": "你的公會已被管理團隊重新命名為 {name}。",
       "tradeRequest": "{name} 想與你交易。",
       "openTrade": "開啟交易",
       "duelRequest": "{name} 向你發起了決鬥挑戰！",
@@ -6438,6 +6524,7 @@ export const zh_TW: EnTranslations = {
       "floatingDodge": "閃避",
       "floatingParry": "招架",
       "floatingResist": "抵抗",
+      "floatingEvade": "迴避",
       "floatingHealFull": "已滿",
       "floatingHealAbsorbed": "被吸收",
       "cannotMove": "無法移動！",
@@ -6450,6 +6537,7 @@ export const zh_TW: EnTranslations = {
       "dodged": "{target}閃避了你的{ability}。",
       "parried": "你的{ability}被{target}招架了。",
       "resisted": "{target}抵抗了你的{ability}。",
+      "evaded": "你的{ability}被{target}迴避了。",
       "healSelf": "你的{ability}為你恢復 {amount} 點生命。",
       "healSelfCrit": "你的{ability}對你造成暴擊治療，恢復 {amount} 點生命。",
       "healOther": "你的{ability}為{target}恢復 {amount} 點生命。",
@@ -7017,6 +7105,8 @@ export const zh_TW: EnTranslations = {
       "close": "關閉商人",
       "hint": "此視窗開啟時，點擊背包中的物品即可出售。",
       "buyAria": "以 {price} 購買 {item}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "買回",
       "buybackEmpty": "沒有物品",
       "buybackAria": "以 {price} 買回 {item}",
@@ -7296,7 +7386,7 @@ export const zh_TW: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "強效隱形術",
-        "description": "消失 20 秒：移除 2 個持續傷害效果，並使你在隱形期間及結束後短時間內受到的傷害降低 90%。（法師天賦）"
+        "description": "消失 20 秒並移除 2 個持續傷害效果。隱形結束時，受到的傷害降低 90%，持續 2 秒。（法師天賦）"
       },
       "hot_streak": {
         "name": "熾熱連擊",
@@ -9635,6 +9725,18 @@ export const zh_TW: EnTranslations = {
       "wildheart_fangknife": {
         "name": "祖爾加的獠牙匕首"
       },
+      "fanglords_beastspear": {
+        "name": "獠牙領主的獸矛"
+      },
+      "bloodmane_warleggings": {
+        "name": "血鬃戰爭護腿"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "藤爪潛行馬褲"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "日骨儀式紗籠"
+      },
       "thick_winter_pelt": {
         "name": "厚實冬毛皮"
       },
@@ -9802,6 +9904,9 @@ export const zh_TW: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "最後的堡壘印戒"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "驚雷撼地者點火鑰匙"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -10378,6 +10483,24 @@ export const zh_TW: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "龍唱裹手"
+      },
+      "basin_stalkers_tunic": {
+        "name": "盆地潛獵者外衣"
+      },
+      "verdant_heart_vestment": {
+        "name": "翠心法衣"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "日骨儀式鎖甲"
+      },
+      "greatfang_of_the_basin": {
+        "name": "盆地巨牙"
+      },
+      "sunbone_oracles_crown": {
+        "name": "日骨先知之冠"
+      },
+      "bloodmane_war_legguards": {
+        "name": "血鬃戰爭腿甲"
       },
       "deathless_greatblade": {
         "name": "不死巨刃"

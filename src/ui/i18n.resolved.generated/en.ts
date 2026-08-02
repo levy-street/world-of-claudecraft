@@ -923,6 +923,23 @@ export const en: EnTranslations = {
       "separate": "Separate {meter}",
       "regroup": "Regroup {meter}"
     },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
+    },
     "petFeed": {
       "disabledFullHp": "Pet is at full health",
       "disabledNoFood": "No food in your bags will heal your pet"
@@ -967,13 +984,15 @@ export const en: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
       "name_stormfeather_griffin": "Sky-Reach Stormfeather",
       "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
-      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
@@ -1343,6 +1362,51 @@ export const en: EnTranslations = {
       "badges": {
         "backgrounded": "Backgrounded",
         "offline": "Offline"
+      }
+    },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Current class: {class}",
+      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
+      "noProcs": "No supported proc is available for this character.",
+      "enabled": "Show Aura",
+      "icon": "Spell Icon",
+      "arcs": "Side Crescents",
+      "groundRing": "Ground Ring",
+      "groundRingSpellOrder": "Ground Ring: Spell Order",
+      "crescentsSpellOrder": "Side Crescents: Spell Order",
+      "size": "Size",
+      "iconSize": "Icon Size",
+      "crescentBlockSize": "Crescent Block Size",
+      "groundRingBlockSize": "Ground Ring Block Size",
+      "opacity": "Opacity",
+      "color": "Color",
+      "allOn": "All On",
+      "allOff": "All Off",
+      "reposition": "Setup Positions",
+      "positioning": "Positioning: {aura}",
+      "selectAura": "Aura",
+      "done": "Done",
+      "moveLeft": "Move Left",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "moveRight": "Move Right",
+      "moveEarlier": "Move spell inward",
+      "moveLater": "Move spell outward",
+      "screenPosition": "Screen Position",
+      "spellOrder": "Spell Order",
+      "reset": "Reset Position",
+      "spellPosition": "Spell order {position} / {count}",
+      "procs": {
+        "revenge": "Revenge!",
+        "battleTrance": "Battle Trance",
+        "overpowerCharge": "Redhand Empowerment",
+        "suddenDeath": "Sudden Death",
+        "victoryRush": "Victory Rush",
+        "enrage": "Mayhem: Enraged",
+        "heatingUp": "Heating Up",
+        "arcaneCharge": "Arcane Charges",
+        "aetherRush": "Aether Rush"
       }
     },
     "playerCard": {
@@ -2151,6 +2215,14 @@ export const en: EnTranslations = {
       "linked": "Linked to Steam account {id}",
       "benefits": "Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.",
       "noTicket": "Steam did not provide a link ticket. Start Steam, then try again."
+    },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
     },
     "mailbox": {
       "title": "Mailbox",
@@ -3002,6 +3074,14 @@ export const en: EnTranslations = {
       "already_linked": "Your account already has a linked Steam account.",
       "account_taken": "That Steam account is already linked to another account.",
       "upstream": "Steam did not respond. Try again in a moment."
+    },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
       "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
@@ -6257,11 +6337,15 @@ export const en: EnTranslations = {
       "graphicsPresetMedium": "Medium",
       "graphicsPresetHigh": "High",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Advanced",
       "terrainDetail": "Terrain Detail",
       "foliageDensity": "Foliage Density",
       "effectsQuality": "Effects & Lighting",
       "shadowQuality": "Shadow Quality",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Low",
       "terrainHigh": "High",
       "touchOpacity": "Touch Controls Opacity",
@@ -6425,6 +6509,8 @@ export const en: EnTranslations = {
       "joinParty": "Join Party",
       "guildInvite": "{name} invites you to join {guild}.",
       "joinGuild": "Join Guild",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} wants to trade with you.",
       "openTrade": "Open Trade",
       "duelRequest": "{name} has challenged you to a duel!",
@@ -6438,6 +6524,7 @@ export const en: EnTranslations = {
       "floatingDodge": "Dodge",
       "floatingParry": "Parry",
       "floatingResist": "Resist",
+      "floatingEvade": "Evade",
       "floatingHealFull": "Full",
       "floatingHealAbsorbed": "Absorbed",
       "cannotMove": "Can't move!",
@@ -6450,6 +6537,7 @@ export const en: EnTranslations = {
       "dodged": "Your {ability} is dodged by {target}.",
       "parried": "Your {ability} is parried by {target}.",
       "resisted": "Your {ability} is resisted by {target}.",
+      "evaded": "Your {ability} is evaded by {target}.",
       "healSelf": "Your {ability} heals you for {amount}.",
       "healSelfCrit": "Your {ability} critically heals you for {amount}.",
       "healOther": "Your {ability} heals {target} for {amount}.",
@@ -7017,6 +7105,8 @@ export const en: EnTranslations = {
       "close": "Close vendor",
       "hint": "Click an item in your bags to sell it while this window is open.",
       "buyAria": "Buy {item} for {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Buyback",
       "buybackEmpty": "No items",
       "buybackAria": "Buy back {item} for {price}",
@@ -7296,7 +7386,7 @@ export const en: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Greater Invisibility",
-        "description": "Vanish for 20 sec: removes 2 damage-over-time effects and you take 90% less damage while invisible and shortly after. (Mage talent)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Hot Streak",
@@ -9635,6 +9725,18 @@ export const en: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Fangknife of Zulgar"
       },
+      "fanglords_beastspear": {
+        "name": "Fanglord's Beastspear"
+      },
+      "bloodmane_warleggings": {
+        "name": "Bloodmane Warleggings"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Vineclaw Stalking Breeches"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sunbone Ritual Sarong"
+      },
       "thick_winter_pelt": {
         "name": "Thick Winter Pelt"
       },
@@ -9802,6 +9904,9 @@ export const en: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Signet of the Last Keep"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"
@@ -10378,6 +10483,24 @@ export const en: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Wyrmchoir Handwraps"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Basin Stalker's Tunic"
+      },
+      "verdant_heart_vestment": {
+        "name": "Verdant-Heart Vestment"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Sunbone Ritual Hauberk"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Greatfang of the Basin"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Sunbone Oracle's Crown"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Bloodmane War-Legguards"
       },
       "deathless_greatblade": {
         "name": "Deathless Greatblade"

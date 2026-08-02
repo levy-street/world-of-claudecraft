@@ -139,7 +139,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           id: 'mag_r8_greater_invis',
           name: 'Greater Invisibility',
           description:
-            'Grants Greater Invisibility: vanish for 20 sec, removing 2 damage-over-time effects and taking 90% less damage while invisible and shortly after.',
+            'Grants Greater Invisibility: vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec.',
           icon: 'greater_invisibility',
           effect: { grant: { ability: 'greater_invisibility' } },
         },

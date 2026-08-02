@@ -562,6 +562,27 @@ export function vcupQueueLeave(ctx: SimContext, pid?: number): void {
   for (const mPid of queued.unit.pids) ctx.emit({ type: 'vcupUnqueued', pid: mPid });
 }
 
+// Preserve the banner selected at queue/match entry when moderation renames
+// the represented guild. This is an identity update, not a leave/rejoin: only
+// exact old-name entries for this pid move, and all queue/match semantics stay
+// untouched.
+export function vcupRenameGuild(
+  ctx: SimContext,
+  pid: number,
+  oldName: string,
+  newName: string,
+): void {
+  for (const bracket of VC_BRACKETS) {
+    for (const unit of ctx.vcup.queues[bracket]) {
+      if (unit.guilds[pid] === oldName) unit.guilds[pid] = newName;
+    }
+  }
+  const matches = [ctx.vcup.match, ...ctx.vcup.practices];
+  for (const match of matches) {
+    if (match?.guildEntry.get(pid) === oldName) match.guildEntry.set(pid, newName);
+  }
+}
+
 /** Silent removal of a leaver's whole unit (the removePlayer teardown arm). */
 export function vcupDequeue(ctx: SimContext, pid: number): boolean {
   const queued = vcupQueuedUnitOf(ctx, pid);

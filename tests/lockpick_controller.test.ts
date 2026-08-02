@@ -38,7 +38,7 @@ function harness(initialState: LockpickView | null = null) {
   const keyboard = new FakeWindow(1280, 720);
   const focusFirst = vi.fn();
   const release = vi.fn();
-  const trap: FocusTrapHandle = { focusFirst, release };
+  const trap: FocusTrapHandle = { focusFirst, release, opener: vi.fn(() => null) };
   const openFocusTrap = vi.fn(() => trap);
   const engage = vi.fn();
   const act = vi.fn();

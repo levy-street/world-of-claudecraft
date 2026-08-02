@@ -20,7 +20,8 @@ import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
-import { addRimGlow, GFX } from '../gfx';
+import { addRimGlow, EMISSIVE_GLOW, GFX } from '../gfx';
+import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
@@ -39,8 +40,9 @@ import {
   weaponSkinModelUrl,
   weaponSkinModelUrls,
 } from './manifest';
-import { mergeSkinnedParts } from './rig_merge';
+import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
+import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
@@ -729,7 +731,7 @@ export function mechAssetsReady(): boolean {
 }
 
 // Lazy fetch for rideable mount GLBs (the mech pattern, per visual key): a
-// mount loads on the first sight of a rider, so seven mount models never
+// mount loads on the first sight of a rider, so eight mount models never
 // weigh on every client's boot. Memoized per key; mounts have no skin or
 // emissive atlases, so the GLB is the whole job.
 const mountAssetPromises = new Map<string, Promise<void>>();
@@ -783,8 +785,18 @@ const optimizedSceneCache = new Map<string, THREE.Object3D>();
 function optimizedScene(url: string): THREE.Object3D {
   const hit = optimizedSceneCache.get(url);
   if (hit) return hit;
-  const root = cloneSkinned(resolvedGltf(url).scene);
-  mergeSkinnedParts(root);
+  const source = resolvedGltf(url);
+  const clips = [...source.animations];
+  for (const def of Object.values(VISUALS)) {
+    if (def.url !== url) continue;
+    for (const animationUrl of def.animUrls ?? []) {
+      const animationSource = gltfByUrl.get(assetUrl(animationUrl));
+      if (animationSource) clips.push(...animationSource.animations);
+    }
+  }
+  const root = cloneSkinned(source.scene);
+  mergeSkinnedParts(root, animatedNodeNames(clips));
+  optimizeSkinGpuLayout(root);
   primeSkinnedSortSpheres(root);
   optimizedSceneCache.set(url, root);
   return root;
@@ -1015,6 +1027,8 @@ const sourceMaterials = new WeakMap<THREE.Mesh, THREE.Material | THREE.Material[
 const tintScratch = new THREE.Color();
 const lowReadabilityWhite = new THREE.Color(0xffffff);
 const weaponHighlight = new THREE.Color(0xfff0c2);
+/** KayKit weapon materials whose NAME marks them as a wooden part. */
+const WOOD_WEAPON_NAME = /handle|wood|shaft|bow|staff/i;
 type MaterialRole = 'body' | 'weapon';
 
 function applyLowReadabilityLift(
@@ -1039,6 +1053,23 @@ function applyWeaponMaterialPolish(
     std.roughness = Math.min(std.roughness, 0.55);
     std.metalness = Math.max(std.metalness, 0.12);
     std.emissive.copy(mat.color).multiplyScalar(0.025);
+    // Metal blades/heads get a per-material env boost so they pick up the sky
+    // and dungeon IBL: scene.environment ships dim by design (~0.4 outdoors,
+    // 0.05 in dungeons) and metals read as dull plastic under it. Per-material
+    // envMapIntensity multiplies the scene value, so only metal brightens; the
+    // 0.3 gate keeps leather grips and wood hafts out of the boost. VFX skins
+    // stash and neutralize this while a rig owns the material (weapon_vfx.ts
+    // deriveEmissive), so the boost never fights an active skin.
+    if (std.metalness > 0.3) std.envMapIntensity = 1.6;
+    // Wood-named weapon parts (hafts, bow limbs, staves) on materials that
+    // ship NO roughness map get the shared wood surface-detail layer, in
+    // OBJECT space so the grain rides the held weapon instead of swimming
+    // through the world projection (AO + roughness only; see worn_stone.ts).
+    // Metal blades without maps keep just the polish above, and faces/bodies
+    // never take the layer: this helper only runs for role === 'weapon'.
+    if (!std.roughnessMap && WOOD_WEAPON_NAME.test(std.name)) {
+      applySurfaceDetail(std, 'wood', { strength: 0.3, tileScale: 1.6, objectSpace: true });
+    }
   }
 }
 
@@ -1059,6 +1090,20 @@ export function tintedMaterial(
   if (GFX.standardMaterials) {
     mat = s.clone();
     addRimGlow(mat); // dungeon silhouette rim (uRimBoost contract)
+    // The skeletons and the necromancer share a `Glow` eye material authored
+    // at strength 1, whose two tints straddled the old bloom threshold on luma
+    // weights alone: the yellow pair (0.907) lit up, the cyan pair (0.842)
+    // never did. Pin both to the glow band so a skull reads the same way
+    // whatever color its eyes are. Case is load-bearing here: the weapons'
+    // `weapons_glow` ships at strength 1.5, already over the line, and
+    // weapon_vfx.ts animates its intensity per frame.
+    if (mat.name.includes('Glow')) mat.emissiveIntensity = EMISSIVE_GLOW;
+    // Cloth-named and armor-metal-named rig materials (paladin_metallic) take
+    // the shared surface-detail layer at LOW strength in OBJECT space (rigs
+    // animate; a world projection swims). Class-body/skin atlases and 'Glow'
+    // materials never match (riggedWornFamilyFor's allowlist has no fallback).
+    const worn = riggedWornFamilyFor(mat.name);
+    if (worn) applySurfaceDetail(mat, worn.family, { strength: worn.strength, objectSpace: true });
   } else {
     if ((src as THREE.MeshBasicMaterial).isMeshBasicMaterial) {
       mat = (src as THREE.MeshBasicMaterial).clone();
@@ -1067,6 +1112,7 @@ export function tintedMaterial(
       mat = new THREE.MeshLambertMaterial({
         map: s.map ?? null,
         color: s.color ? s.color.clone() : new THREE.Color(0xffffff),
+        vertexColors: s.vertexColors,
         transparent: s.transparent,
         opacity: s.opacity,
         side: s.side,
@@ -1088,7 +1134,16 @@ export function tintedMaterial(
     sm.emissiveIntensity = 1.0;
     sm.needsUpdate = true;
   }
-  if (role === 'weapon') applyWeaponMaterialPolish(mat);
+  if (role === 'weapon') {
+    applyWeaponMaterialPolish(mat);
+  } else if ((mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+    // Body/armor: clamp the authored roughness into a matte cloth/leather band.
+    // Some kit materials ship near-zero roughness (reads wet/plastic under the
+    // key light) and others at 1.0 (dead flat); the band keeps every character
+    // in one coherent painted-surface response without touching metalness.
+    const std = mat as THREE.MeshStandardMaterial;
+    std.roughness = Math.min(Math.max(std.roughness, 0.55), 0.9);
+  }
   if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role);
   matCache.set(key, mat);
   return mat;

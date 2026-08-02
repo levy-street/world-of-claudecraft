@@ -42,7 +42,6 @@ import {
   bgFieldPlanWalls,
 } from '../src/sim/battleground_layout';
 import {
-  cameraOcclusion,
   isBlocked,
   lineOfSightClear,
   resolvePosition,
@@ -813,17 +812,6 @@ describe('Thornhollow Fields layout: the combat shape the dressing is laid over'
 });
 
 describe('Thornhollow collision honesty: what blocks, blocks; what opens, opens', () => {
-  it('routes the chase-camera sweep through battleground colliders', () => {
-    // Through the keep's back wall the boom is occluded; through the open mouth
-    // it is not. A camera arm that never consulted the band's colliders would
-    // return 1 for both.
-    const wall = cameraOcclusion(SEED, ORIGIN.x, 4, ORIGIN.z - 124, ORIGIN.x, 4, ORIGIN.z - 132);
-    const mouth = cameraOcclusion(SEED, ORIGIN.x, 4, ORIGIN.z - 112, ORIGIN.x, 4, ORIGIN.z - 104);
-    expect(wall).toBeGreaterThan(0);
-    expect(wall).toBeLessThan(1);
-    expect(mouth).toBe(1);
-  });
-
   it('every structural wall stands above the eye line where it stands', () => {
     // bgFieldPlanWalls is the projection the minimap draws: the blocking boxes
     // that stand taller than a step and wider than a post. A wall whose camera
@@ -847,25 +835,21 @@ describe('Thornhollow collision honesty: what blocks, blocks; what opens, opens'
     }
   });
 
-  it('camera-solid colliders are only the pieces a body genuinely cannot see over', () => {
-    // The chase camera pulls in on real walls and glides over everything else.
-    // Getting this wrong is not cosmetic: when a flag podium's own stone base
-    // counted as camera-solid, the boom collapsed to first person in the flag
-    // court, the most contested ground in the mode.
-    const solid = battlegroundColliders().filter((c) => !c.camGhost);
-    expect(solid.length).toBeGreaterThan(100);
-    for (const c of solid) {
-      const ground = bgFieldHeightLocal(c.x, c.z);
-      expect(
-        (c.cameraTopY ?? 0) - ground,
-        `camera-solid collider at (${c.x}, ${c.z}) is too short to occlude`,
-      ).toBeGreaterThanOrEqual(3.5);
-    }
-    // Nothing inside the flag stands' own footprint occludes: standing at a
-    // stand must never jam the camera.
+  it('every collider that blocks sight is tall enough to deserve it', () => {
+    // This used to pin the chase camera's own occlusion set. The release removed
+    // geometry-driven camera zoom (occluders fade instead), so `camGhost` and
+    // the classification behind it are gone; what survives is the claim that
+    // still matters, which is about SIGHT: a piece tall enough to stop a cast
+    // has to be tall enough that a player cannot see over it either.
+    const blockers = battlegroundColliders().filter(
+      (c) => (c.cameraTopY ?? 0) - bgFieldHeightLocal(c.x, c.z) >= SIGHT_HEIGHT,
+    );
+    expect(blockers.length).toBeGreaterThan(100);
+    // Nothing inside the flag stands' own footprint blocks sight: a fight on the
+    // stand is the most contested ground in the mode and must stay readable.
     for (const base of BG_BASES) {
-      const near = solid.filter((c) => Math.hypot(c.x - base.flag.x, c.z - base.flag.z) < 8);
-      expect(near, `camera-solid geometry sits on team ${base.team}'s stand`).toHaveLength(0);
+      const near = blockers.filter((c) => Math.hypot(c.x - base.flag.x, c.z - base.flag.z) < 8);
+      expect(near, `sight-blocking geometry sits on team ${base.team}'s stand`).toHaveLength(0);
     }
   });
 

@@ -409,6 +409,105 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     expect(meta.copper).toBeLessThan(before);
   });
 
+  it('buyItem bulk purchase buys the full stack size when fully affordable', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    // minor_healing_potion: buyValue 40, no explicit stackSize (default 20).
+    meta.copper = 40 * 20;
+    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, true);
+    expect(sim.countItem('minor_healing_potion', pid)).toBe(20);
+    expect(meta.copper).toBe(0);
+  });
+
+  it('buyItem bulk purchase buys a floor-affordable quantity when short on copper', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    meta.copper = 250; // floor(250 / 40) = 6
+    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, true);
+    expect(sim.countItem('minor_healing_potion', pid)).toBe(6);
+    expect(meta.copper).toBe(250 - 6 * 40); // 10
+  });
+
+  it('buyItem bulk purchase still refuses (never buys zero) when even one unit is unaffordable', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    meta.copper = 5; // less than the 40-copper unit price
+    sim.drainEvents();
+    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, true);
+    expect(errorTexts(sim.drainEvents())).toContain('Not enough money.');
+    expect(sim.countItem('minor_healing_potion', pid)).toBe(0);
+    expect(meta.copper).toBe(5);
+  });
+
+  it('buyItem bulk purchase leaves food/drink at the ordinary single-unit price per unit', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    meta.copper = 100_000;
+    items.buyItem(ctx, wilkes.id, 'baked_bread', pid, true);
+    // baked_bread: buyValue 25, kind food (vendorStackSize 5 normally, but a
+    // bulk request overrides that with the real bag stack size, DEFAULT_STACK
+    // 20), paid per-unit at the same listed price either way.
+    expect(sim.countItem('baked_bread', pid)).toBe(20);
+    expect(meta.copper).toBe(100_000 - 25 * 20);
+  });
+
+  it('buyItem bulk purchase is a no-op multiplier for an Honor-priced item (stays exactly 1)', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'HonorBulkBuyer');
+    const meta = sim.meta(pid)!;
+    const fury = [...sim.entities.values()].find((entity) => entity.templateId === 'fury')!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = fury.pos.x;
+    player.pos.z = fury.pos.z;
+    meta.inventory.length = 0;
+    meta.honor = 10_000;
+
+    items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid, true);
+
+    expect(sim.countItem('final_argument_greatblade', pid)).toBe(1);
+    expect(meta.honor).toBe(10_000 - 800);
+  });
+
+  it('buyItem bulk purchase never buys more than one mount, even with ample gold', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'MountBulkBuyer');
+    sim.setPlayerLevel(20);
+    const meta = sim.meta(pid)!;
+    meta.inventory.length = 0;
+    meta.ridingTrained = true;
+    meta.copper = 100_000_000; // vastly more than the item's own bag stack size
+    const marla = [...sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'stablemaster_marla',
+    )!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = marla.pos.x;
+    player.pos.z = marla.pos.z;
+
+    items.buyItem(ctxOf(sim), marla.id, 'reins_valorsteed', pid, true);
+
+    expect(sim.countItem('reins_valorsteed', pid)).toBe(1);
+    expect(meta.copper).toBe(100_000_000 - 100_000); // reins_valorsteed buyValue 100_000
+  });
+
+  it('buyItem bulk purchase is still gated by bag capacity (refuses, never partial)', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    meta.copper = 40 * 20; // enough to afford the full stack of 20
+    // Fill every bag slot with an unrelated item so there is no room left for
+    // a fresh minor_healing_potion stack.
+    meta.inventory = Array.from({ length: 16 }, () => ({ itemId: 'worn_sword', count: 1 }));
+    sim.drainEvents();
+    items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid, true);
+    expect(errorTexts(sim.drainEvents())).toContain('Your bags are full.');
+    expect(sim.countItem('minor_healing_potion', pid)).toBe(0);
+    expect(meta.copper).toBe(40 * 20);
+  });
+
   it('sellAllJunk bulk-sells only gray items, records each stack, emits one summary line', () => {
     const sim = makeWorld();
     const { pid, meta } = vendorPlayer(sim);

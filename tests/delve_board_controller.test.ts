@@ -49,7 +49,7 @@ function makeHarness(validNpc = true) {
   } as unknown as IWorld;
   const focusFirst = vi.fn();
   const release = vi.fn();
-  const trap: FocusTrapHandle = { focusFirst, release };
+  const trap: FocusTrapHandle = { focusFirst, release, opener: vi.fn(() => null) };
   const openFocusTrap = vi.fn(() => trap);
   const closeOtherWindows = vi.fn();
   const hideTooltip = vi.fn();

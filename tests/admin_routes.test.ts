@@ -56,6 +56,10 @@ describe('admin route permission map', () => {
     expect(permissionForAdminRoute('GET', '/admin/api/accounts/42/daily-rewards-events')).toBe(
       'accounts.read',
     );
+    expect(permissionForAdminRoute('GET', '/admin/api/guilds')).toBe('accounts.read');
+    expect(permissionForAdminRoute('GET', '/admin/api/guilds/42')).toBe('accounts.read');
+    expect(permissionForAdminRoute('GET', '/admin/api/guilds/42/history')).toBe('moderation.read');
+    expect(permissionForAdminRoute('POST', '/admin/api/guilds/42/rename')).toBe('moderation.act');
     expect(permissionForAdminRoute('POST', '/admin/api/accounts/42/reset-password')).toBe(
       'accounts.password',
     );

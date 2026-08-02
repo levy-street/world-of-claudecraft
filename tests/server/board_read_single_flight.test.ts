@@ -116,6 +116,7 @@ function xpRows(tag: string): LifetimeXpLeaderRow[] {
       lifetimeXp: 1_000,
       prestigeRank: 0,
       activeTitle: null,
+      guild: null,
     },
   ];
 }

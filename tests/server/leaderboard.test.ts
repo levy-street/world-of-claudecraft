@@ -543,7 +543,7 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
 // ---------------------------------------------------------------------------
 
 describe('status handler (name-list trim deviation)', () => {
-  it('returns counts only: { ok, realm, players_online, players_cap, steam, dev_commands } with NO names list', async () => {
+  it('returns counts only: { ok, realm, players_online, players_cap, steam, epic, dev_commands } with NO names list', async () => {
     configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4, playersCap: () => 250 }));
     const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
     await handlerFor('/api/status')(ctx);
@@ -556,6 +556,7 @@ describe('status handler (name-list trim deviation)', () => {
       // The configured realm cap, advertised so the client realm list can show Full.
       players_cap: 250,
       steam: { enabled: false },
+      epic: { enabled: false },
       // The /dev GUI capability advert. False here because the suite runs without
       // ALLOW_DEV_COMMANDS, which is also the production posture.
       dev_commands: false,
@@ -617,6 +618,22 @@ describe('status handler (name-list trim deviation)', () => {
     } finally {
       if (saved === undefined) delete process.env.STEAM_ENABLED;
       else process.env.STEAM_ENABLED = saved;
+    }
+  });
+
+  it('adverts epic.enabled true when EPIC_ENABLED=1 (the capability advert)', async () => {
+    const saved = process.env.EPIC_ENABLED;
+    process.env.EPIC_ENABLED = '1';
+    try {
+      configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4 }));
+      const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
+      await handlerFor('/api/status')(ctx);
+      const { status, body } = captured(ctx.res);
+      expect(status).toBe(200);
+      expect((body as { epic: { enabled: boolean } }).epic).toEqual({ enabled: true });
+    } finally {
+      if (saved === undefined) delete process.env.EPIC_ENABLED;
+      else process.env.EPIC_ENABLED = saved;
     }
   });
 });

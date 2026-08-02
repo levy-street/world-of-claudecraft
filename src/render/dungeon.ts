@@ -57,13 +57,16 @@ import {
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
-import { sharedUniforms } from './gfx';
+import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
+import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
+import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { radialGlowTexture } from './textures';
 import { buildWildheartFieldInterior } from './wildheart_props';
+import { applySurfaceDetail } from './worn_stone';
 
-const FLAME_EMISSIVE_HIGH = 2.2;
+const FLAME_EMISSIVE_HIGH = EMISSIVE_LIGHT;
 // dungeon torch point lights: pumped + hung low so warm pools break up the
 // floor (the daylight rig is dropped underground; torches carry the scene)
 const DUNGEON_LIGHT_Y = 6.4;
@@ -464,11 +467,6 @@ class Placements {
   }
 }
 
-interface ToggleMat {
-  mat: THREE.Material;
-  depthWrite: boolean;
-}
-
 interface ArenaWallFootprint {
   x: number;
   z: number;
@@ -492,8 +490,9 @@ interface PendingArenaWalls {
 
 interface ArenaHideable {
   group: THREE.Group;
-  mats: ToggleMat[];
+  mats: OccluderFadeMat[];
   hidden: boolean;
+  alpha: number;
   footprint: ArenaWallFootprint;
 }
 
@@ -790,7 +789,10 @@ export class DungeonInteriors {
     const daisRaised = opts?.style?.daisRaised;
     const group = new THREE.Group();
     const p = new Placements();
-    const arenaWalls = isArenaVariant(variant) ? this.pendingArenaWalls(layout, ox, oz) : undefined;
+    // Every standard-layout interior routes its outer walls through the
+    // hideable-wall path (formerly arena-only), so any wall crossing the
+    // eye-to-camera segment fades to 20% opacity instead of blanking the view.
+    const arenaWalls = this.pendingArenaWalls(layout, ox, oz);
 
     // Authored room-graph floor (the set-piece citadel): its rooms/doors/decor
     // replace the single-room shell entirely. Walls come from the SAME segment
@@ -902,15 +904,32 @@ export class DungeonInteriors {
     return group;
   }
 
-  update(camX: number, camY: number, camZ: number, eyeX: number, eyeY: number, eyeZ: number): void {
+  /**
+   * Prune wall hideables owned by a retired interior root, so the per-frame
+   * fade scan does not grow across rift floor rebuilds.
+   */
+  retireHideables(doomed: ReadonlySet<THREE.Object3D>): void {
+    for (let i = this.arenaHideables.length - 1; i >= 0; i--) {
+      if (doomed.has(this.arenaHideables[i].group)) this.arenaHideables.splice(i, 1);
+    }
+  }
+
+  update(
+    camX: number,
+    camY: number,
+    camZ: number,
+    eyeX: number,
+    eyeY: number,
+    eyeZ: number,
+    dt: number,
+    reducedMotion = false,
+  ): void {
     for (const h of this.arenaHideables) {
       const hide = arenaWallSegmentHits(h.footprint, eyeX, eyeY, eyeZ, camX, camY, camZ);
-      if (hide === h.hidden) continue;
       h.hidden = hide;
-      for (const m of h.mats) {
-        m.mat.colorWrite = !hide;
-        m.mat.depthWrite = hide ? false : m.depthWrite;
-      }
+      if (occluderFadeSettled(h.alpha, hide)) continue;
+      h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion);
+      applyOccluderFade(h.mats, h.alpha);
     }
   }
 
@@ -1314,6 +1333,13 @@ export class DungeonInteriors {
     } else {
       mat = new THREE.MeshStandardMaterial({ color: 0x777788, roughness: 0.95 });
     }
+    // The dungeon packs are flat-palette GLBs (solid-color swatch textures),
+    // so the walls read as untextured plastic under the interior lights. The
+    // shared triplanar stone family (which replaced the old UV-space rock
+    // detail normal here) gives every pack material grain, AO-band grime, and
+    // the high/ultra parallax height response.
+    if ((mat as THREE.MeshStandardMaterial).isMeshStandardMaterial)
+      applySurfaceDetail(mat as THREE.MeshStandardMaterial, 'stone');
     this.packMats.set(pack, mat);
     return mat;
   }
@@ -1345,6 +1371,10 @@ export class DungeonInteriors {
       | THREE.MeshLambertMaterial
       | THREE.MeshStandardMaterial;
     base.color.multiply(new THREE.Color(tint));
+    // Material.clone() drops the onBeforeCompile hook, so the tinted clone
+    // re-applies the stone layer (identity-keyed guard: clones are fresh).
+    if ((base as THREE.MeshStandardMaterial).isMeshStandardMaterial)
+      applySurfaceDetail(base as THREE.MeshStandardMaterial, 'stone');
     mat = base;
     this.tintedMats.set(key, mat);
     return mat;
@@ -1423,14 +1453,23 @@ export class DungeonInteriors {
 
   private emitArenaHideable(group: THREE.Group, pending: PendingArenaWall, variant: Variant): void {
     const wallGroup = new THREE.Group();
-    const mats: ToggleMat[] = [];
+    const mats: OccluderFadeMat[] = [];
+    const isMarsh = variant === 'delve_marsh' || variant === 'delve_marsh_apse';
     for (const [kind, matrices] of pending.placements.byKind) {
       const asset = moduleAssets.get(kind);
       if (!asset) {
         console.warn(`dungeon: unknown arena wall module kind '${kind}'`);
         continue;
       }
-      const material = this.material(asset.pack).clone();
+      // Hideable walls bypass emit(), so the marsh's wet-mossy grade is picked
+      // here the same way emit() would before the per-wall clone.
+      const base =
+        isMarsh && WALL_PILLAR_KINDS.has(kind)
+          ? this.marshMaterial(asset.pack, 'wall')
+          : isMarsh && RECEIVER_KINDS.has(kind)
+            ? this.marshMaterial(asset.pack, 'floor')
+            : this.material(asset.pack);
+      const material = base.clone();
       // Hideable walls bypass emit(), so the Drowned Court's wet-stone tint is
       // applied to this per-wall clone directly (structural stone only: the
       // banners keep their true colors, same scoping as the marsh tint).
@@ -1439,13 +1478,17 @@ export class DungeonInteriors {
           new THREE.Color(DROWNED_WALL_TINT),
         );
       }
-      mats.push({ mat: material, depthWrite: material.depthWrite });
+      mats.push(occluderFadeMat(material));
       const mesh = new THREE.InstancedMesh(asset.geo, material, matrices.length);
       for (let i = 0; i < matrices.length; i++) mesh.setMatrixAt(i, matrices[i]);
       mesh.instanceMatrix.needsUpdate = true;
       mesh.computeBoundingSphere();
+      // Shadow parity with the pre-hideable look: arena variants keep their
+      // wall shadows; every other interior's shell walls stay shadowless, the
+      // same as when emit() merged them (CASTER_KINDS has no wall kinds).
       mesh.castShadow =
-        !this.lowGfx && (CASTER_KINDS.has(kind) || ARENA_WALL_CASTER_KINDS.has(kind));
+        !this.lowGfx &&
+        (CASTER_KINDS.has(kind) || (isArenaVariant(variant) && ARENA_WALL_CASTER_KINDS.has(kind)));
       mesh.receiveShadow = RECEIVER_KINDS.has(kind);
       wallGroup.add(mesh);
     }
@@ -1455,6 +1498,7 @@ export class DungeonInteriors {
       group: wallGroup,
       mats,
       hidden: false,
+      alpha: 1,
       footprint: pending.footprint,
     });
   }

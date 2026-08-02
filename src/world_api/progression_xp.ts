@@ -19,6 +19,11 @@ export interface LeaderboardEntry {
   // localizes through deed_i18n.ts (never display text), null when untitled
   // (the DeedsLeaderboardEntry shape).
   title: string | null;
+  // The character's guild display name, shown beside the name in the `<Guild>`
+  // treatment the nameplate already uses. Absent when unguilded (guilds live only
+  // in the server social DB, so the offline Sim resolves it from the entity's
+  // passive display field, which stays '' offline).
+  guild?: string;
   realm?: string; // present on the global (cross-realm) home-page board
 }
 

@@ -44,7 +44,12 @@ import {
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
 } from './account';
-import { configureAdminPlayersCap, configureAdminRuntime, handleAdminApi } from './admin';
+import {
+  configureAdminGuildBoardCacheBust,
+  configureAdminPlayersCap,
+  configureAdminRuntime,
+  handleAdminApi,
+} from './admin';
 import {
   currentSitePresenceUsers,
   distinctOnlineSampleRealms,
@@ -184,6 +189,7 @@ import {
 } from './discord';
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
+import { stopEpicMirror } from './epic/mirror';
 import { GameServer } from './game';
 import {
   handleGitHubCallback,
@@ -488,6 +494,10 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     prestigeRank: r.prestigeRank,
     // a deed id (never display text); the client localizes via deed_i18n
     title: r.activeTitle,
+    // The guild tag shown beside the name. Omitted (not null) for an unguilded
+    // character, the `realm` treatment below, so an unguilded row is byte-unchanged
+    // on the wire.
+    ...(r.guild ? { guild: r.guild } : {}),
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
   // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
@@ -1903,14 +1913,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'GET' && url === '/api/status') {
       // steam.enabled is the capability advert clients read before rendering any
-      // Steam link UI. HARDCODED false on the legacy ladder: the Steam surface
-      // exists only as RouteDefs (server/steam/routes.ts), which the legacy arm
-      // never serves, so every /api/steam/* 404s here. Advertising the capability
-      // on an arm that then 404s it would strand a client into a dead link flow.
-      // Under the default 'new' dispatch the migrated statusHandler
-      // (server/leaderboard.ts) reads the real steamEnabled(), where the routes
-      // are live. This is a deliberate divergence from the new arm under
-      // STEAM_ENABLED=1 (pinned in tests/server/http/parity.test.ts).
+      // Steam / Epic link UI. HARDCODED false on the legacy ladder: those surfaces
+      // exist only as RouteDefs (server/steam/routes.ts, server/epic/routes.ts),
+      // which the legacy arm never serves, so every /api/steam/* and /api/epic/*
+      // 404s here. Advertising the capability on an arm that then 404s it would
+      // strand a client into a dead link flow. Under the default 'new' dispatch
+      // the migrated statusHandler (server/leaderboard.ts) reads the real
+      // steamEnabled() / epicEnabled(), where the routes are live. This is a
+      // deliberate divergence from the new arm under STEAM_ENABLED=1 or
+      // EPIC_ENABLED=1 (pinned in tests/server/http/parity.test.ts).
       return json(res, 200, {
         ok: true,
         realm: REALM,
@@ -1921,6 +1932,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         players_cap: canonicalPlayersCap(),
         names: [...liveGame().clients.values()].map((s) => s.name),
         steam: { enabled: false },
+        epic: { enabled: false },
         // The /dev GUI capability advert. NOT hardcoded like steam.enabled above:
         // the dev_* cheats ride the websocket dispatcher, which this arm serves
         // exactly as the migrated one does, so advertising the real env here
@@ -2060,7 +2072,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const callerToken = bearerToken(req);
       if (!callerToken)
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
-      return handleAccountChangePassword(req, res, accountId, callerToken);
+      return handleAccountChangePassword(req, res, accountId, callerToken, {
+        disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
+      });
     }
     // Password reset is for users who are locked out, so both routes are
     // unauthenticated (rate-limited + web-login guarded above, and each handler is
@@ -2069,7 +2083,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleAccountPasswordForgot(req, res);
     }
     if (req.method === 'POST' && url === '/api/account/password/reset') {
-      return handleAccountPasswordReset(req, res);
+      return handleAccountPasswordReset(req, res, {
+        disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
+      });
     }
     if (req.method === 'POST' && url === '/api/account/logout') {
       const callerToken = bearerToken(req);
@@ -2907,6 +2923,7 @@ export async function startServer(): Promise<http.Server> {
   // (unlike AdminRuntime), so it rides its own seam, fed the SAME canonical source
   // /api/status uses, keeping the cap byte-identical across the status and overview reads.
   configureAdminPlayersCap(canonicalPlayersCap);
+  configureAdminGuildBoardCacheBust(bustBoardCaches);
   configureInternalRuntime(game);
   // Bot detector: replay this realm's saved config overrides onto the fresh
   // detector. Boot applies what it can; a stale entry (schema drift after a
@@ -3208,14 +3225,17 @@ export async function startServer(): Promise<http.Server> {
     // delays and drops queued telemetry before the shared pool closes.
     const unstuckReportsDrained = await stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS);
     if (!unstuckReportsDrained) console.warn('unstuck report drain deadline reached');
-    // Stop and drain the Steam mirror's in-memory push FIFO too (right after the
-    // deeds records it observes): an unlock still queued here would be lost on
-    // pool.end(), and the next reconcile (on link or on login) is its only
-    // replay. stopSteamMirror flips the shutdown flag and races the drain tail
-    // against a 5s deadline, so a stuck upstream cannot hang the shutdown;
-    // failures are swallowed inside the worker, so this never throws. A no-op
-    // when the mirror is dark.
-    await stopSteamMirror(5000);
+    // Stop and drain each storefront mirror's in-memory push FIFO too (right
+    // after the deeds records they observe): an unlock still queued here would
+    // be lost on pool.end(), and the next reconcile (on link or on login) is
+    // its only replay. Each stop*Mirror flips its shutdown flag and races the
+    // drain tail against a 5s deadline, so a stuck upstream cannot hang the
+    // shutdown; failures are swallowed inside the worker, so this never
+    // throws. A no-op when that mirror is dark. Steam and Epic drain
+    // independently (D21) and CONCURRENTLY: the two stops share one 5s
+    // wall-clock budget, so a wedged Steam upstream cannot delay the Epic
+    // drain (or double the shutdown window) by serializing behind it.
+    await Promise.all([stopSteamMirror(5000), stopEpicMirror(5000)]);
     // Drop every character load lease this process holds so a clean restart can
     // reload its characters immediately instead of waiting out the lease TTL.
     // Runs before pool.end(); a failure here must not abort the shutdown, so log

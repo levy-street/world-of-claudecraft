@@ -2488,9 +2488,12 @@
   }
   /* Players (lifetime-XP) board: the base grid plus the trailing Book of
      Deeds title column (the Renown tab's .lb-deed-title treatment; the muted
-     cell ellipsizes, so a long title never widens the row). */
+     cell ellipsizes, so a long title never widens the row). The name cell now
+     also carries the `<Guild>` tag, so the two text columns SHARE the leftover
+     width (both minmax(0, ...) so either can ellipsize instead of widening the
+     row) with the name taking the larger part. */
   .lb-row-players {
-    grid-template-columns: 44px 1fr 44px 48px 96px 90px;
+    grid-template-columns: 44px minmax(0, 1.9fr) 44px 48px 96px minmax(0, 1fr);
   }
   .lb-row.lb-daily {
     grid-template-columns: 44px 1fr 96px;
@@ -2515,6 +2518,13 @@
     grid-template-columns: 44px 1fr 56px 110px;
   }
   .lb-realm {
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  /* The `<Guild>` tag beside a ranked player's name (player board + the sticky
+     standing row). Rides inside .lb-name like the Renown tab's realm tag, so the
+     shared row grid keeps its column set. */
+  .lb-guild {
     color: var(--color-text-muted);
     font-size: 11px;
   }
@@ -5160,6 +5170,15 @@
   .vendor-item:disabled:hover {
     background: transparent;
   }
+  /* Bulk ("Buy Stack") tile (#2374): a plain sibling tile beside the ordinary
+     single-unit buy tile (never a nested <button> inside it), so a gold top
+     accent is the only cue distinguishing the two at a glance. */
+  .vendor-item-bulk {
+    border-top: 2px solid var(--gold);
+  }
+  .vendor-item-bulk .vi-name {
+    color: var(--gold);
+  }
   .vendor-sell-junk {
     display: flex;
     align-items: center;
@@ -7272,7 +7291,12 @@
        Ignored, Blocked, Raid) whose labels are locale-sized, and the guild
        roster rows carry a name + rank + zone + last-seen line. */
     width: 760px;
-    max-width: calc(100vw - 24px);
+    max-width: calc(
+      100vw -
+      24px -
+      env(safe-area-inset-left, 0px) -
+      env(safe-area-inset-right, 0px)
+    );
     height: 480px;
     max-height: calc(100vh - 24px);
     flex-direction: column;
@@ -11062,6 +11086,329 @@
        actual scroll instead. */
     overflow: hidden;
     flex-direction: column;
+  }
+  #options-menu.aura-wide {
+    width: min(780px, calc(100vw - 32px));
+  }
+  #options-menu.aura-placement-hidden {
+    display: none !important;
+  }
+  .aura-placement-toolbar {
+    position: fixed;
+    /* Body-level setup layer: keep it above touch #ui (80/90 while a window is
+       open) and its backdrop (85). Otherwise a live Desktop -> Touch switch can
+       strand this dialog below the HUD until the page is reloaded. */
+    z-index: 100;
+    right: max(12px, env(safe-area-inset-right, 0px));
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    left: max(12px, env(safe-area-inset-left, 0px));
+    display: flex;
+    box-sizing: border-box;
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    max-height: calc(
+      var(--app-vh, 100vh) -
+      24px -
+      env(safe-area-inset-top, 0px) -
+      env(safe-area-inset-bottom, 0px)
+    );
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 auto;
+    padding: 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 8px;
+    background: var(--panel-bg);
+    box-shadow: 0 6px 24px var(--color-art-shadow);
+    overflow-y: auto;
+  }
+  .aura-placement-toolbar strong {
+    flex: 0 0 auto;
+    margin-right: 0;
+    color: var(--color-text-light);
+  }
+  .aura-placement-selection {
+    display: flex;
+    flex: 1 1 940px;
+    min-width: min(100%, 940px);
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .aura-placement-parts {
+    display: grid;
+    flex: 0 0 auto;
+    grid-template-columns: repeat(3, max-content);
+    gap: 8px;
+  }
+  .aura-placement-toolbar .btn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .aura-placement-part {
+    min-height: 40px;
+  }
+  .aura-placement-reset,
+  .aura-placement-done {
+    min-width: 112px;
+    min-height: 40px;
+  }
+  .aura-placement-reset {
+    min-width: 160px;
+  }
+  .aura-placement-toolbar .set-row {
+    flex: 1 1 210px;
+    min-width: 190px;
+    margin: 0;
+  }
+  .aura-placement-sliders {
+    display: grid;
+    flex: 1 1 500px;
+    min-width: 460px;
+    max-width: 720px;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    align-items: center;
+    gap: 16px;
+  }
+  .aura-placement-sliders .set-row {
+    width: 100%;
+    min-width: 0;
+  }
+  .aura-placement-selector {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+  }
+  .aura-placement-select {
+    min-width: 150px;
+    min-height: 40px;
+    color-scheme: dark;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+  }
+  .aura-placement-select option {
+    background: var(--color-bg-dark);
+    color: var(--color-text-light);
+  }
+  .aura-placement-nudge {
+    position: relative;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+  .aura-placement-actions {
+    display: grid;
+    grid-column: 2;
+    grid-template-columns: repeat(4, 40px);
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .aura-placement-footer {
+    display: grid;
+    flex: 1 0 100%;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: end;
+    gap: 16px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  .aura-placement-footer-actions {
+    display: flex;
+    grid-column: 3;
+    align-items: center;
+    justify-self: end;
+    gap: 8px;
+  }
+  .aura-placement-action-hint {
+    grid-column: 1 / -1;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: normal;
+  }
+  .aura-placement-nudge::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    border-top: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    translate: -50% -50%;
+  }
+  .aura-placement-left::before {
+    rotate: -45deg;
+  }
+  .aura-placement-up::before {
+    rotate: 45deg;
+  }
+  .aura-placement-down::before {
+    rotate: -135deg;
+  }
+  .aura-placement-right::before {
+    rotate: 135deg;
+  }
+  @media (max-width: 560px) {
+    .aura-placement-toolbar strong {
+      width: 100%;
+      margin-right: 0;
+      text-align: left;
+    }
+    .aura-placement-selector {
+      flex: 1 1 100%;
+      justify-content: flex-start;
+    }
+    .aura-placement-parts {
+      width: 100%;
+      grid-template-columns: 1fr;
+    }
+    .aura-placement-parts .btn {
+      width: 100%;
+    }
+  }
+  @media (max-width: 760px) {
+    .aura-placement-selection {
+      flex-basis: 100%;
+      min-width: 0;
+    }
+    .aura-placement-sliders {
+      flex: 1 0 100%;
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .aura-placement-footer {
+      grid-template-columns: 1fr;
+    }
+    .aura-placement-actions,
+    .aura-placement-footer-actions {
+      grid-column: 1;
+      justify-self: center;
+    }
+    .aura-placement-footer-actions {
+      display: grid;
+      width: 100%;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .aura-placement-footer-actions .btn {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+  .aura-settings-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+    color: var(--color-text-light);
+  }
+  .aura-settings-intro span {
+    color: var(--color-text-muted);
+  }
+  .aura-bulk-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .aura-bulk-actions .btn {
+    flex: 1;
+  }
+  .aura-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .aura-settings-card {
+    margin: 0;
+  }
+  .aura-settings-chip {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--aura-color, var(--color-aura-rpg-gold));
+    margin: 4px 0 8px;
+  }
+  .aura-settings-chip img {
+    width: 36px;
+    height: 36px;
+    border: 2px solid currentColor;
+    border-radius: 6px;
+  }
+  .aura-settings-chip span {
+    color: var(--color-text-light);
+  }
+  .aura-order-row {
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: var(--color-text-muted);
+  }
+  .aura-order-buttons {
+    display: flex;
+    gap: 6px;
+  }
+  .aura-order-btn {
+    position: relative;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+  .aura-order-btn::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    translate: -50% -50%;
+  }
+  .aura-order-up::before {
+    rotate: 45deg;
+  }
+  .aura-order-down::before {
+    rotate: -135deg;
+  }
+  .aura-settings-chip.aura-overlay-battle {
+    --aura-color: var(--color-aura-rpg-electric);
+  }
+  .aura-settings-chip.aura-overlay-death {
+    --aura-color: var(--color-aura-rpg-violet);
+  }
+  .aura-settings-chip.aura-overlay-victory {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-position-label {
+    margin-top: 8px;
+    color: var(--color-text-light);
+    font-weight: 700;
+  }
+  .aura-reset-btn {
+    width: 100%;
+    margin-top: 8px;
+  }
+  @media (max-width: 680px) {
+    .aura-settings-grid {
+      grid-template-columns: 1fr;
+    }
   }
   /* Streamlined title bar for the perf panel (less bulky than the default chrome). */
   #options-menu.perf-wide .panel-title {

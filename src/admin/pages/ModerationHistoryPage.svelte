@@ -8,6 +8,7 @@
   import { moderationActionLabel, moderationActionVariant } from '../labels';
   import AccountLink from '../components/AccountLink.svelte';
   import Badge from '../components/Badge.svelte';
+  import GuildLink from '../components/GuildLink.svelte';
   import IpLink from '../components/IpLink.svelte';
   import Pager from '../components/Pager.svelte';
   import Panel from '../components/Panel.svelte';
@@ -103,6 +104,8 @@
                   />
                 {:else if entry.source === 'ip' && entry.ip}
                   <IpLink ip={entry.ip} />
+                {:else if entry.source === 'guild' && entry.guildId !== null && entry.guildName}
+                  <GuildLink guildId={entry.guildId} label={entry.guildName} />
                 {:else}
                   {t('common.unknown')}
                 {/if}

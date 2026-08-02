@@ -2041,6 +2041,9 @@ describe('warlock demon summons', () => {
     expect(sim.entities.has(imp.id)).toBe(false);
     expect(voidwalker.maxHp).toBeGreaterThan(imp.maxHp);
     expect(voidwalker.stats.armor).toBeGreaterThan(imp.stats.armor);
+    // Bug #1356: the tank demon now auto-taunts from the moment it is summoned,
+    // with no manual toggle required.
+    expect(voidwalker.petAutoTaunt).toBe(true);
 
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
@@ -2048,15 +2051,17 @@ describe('warlock demon summons', () => {
     teleport(sim, sim.player, wolf.pos.x + 8, wolf.pos.z);
     sim.targetEntity(wolf.id);
     sim.petAttack();
-    for (let i = 0; i < 20; i++) sim.tick();
-
-    expect(wolf.forcedTargetId).not.toBe(voidwalker.id);
-    expect(voidwalker.petTauntTimer).toBe(0);
-
-    sim.setPetAutoTaunt(true);
     for (let i = 0; i < 20 && wolf.forcedTargetId !== voidwalker.id; i++) sim.tick();
+
     expect(wolf.forcedTargetId).toBe(voidwalker.id);
     expect(voidwalker.petTauntTimer).toBeGreaterThan(0);
+
+    // The toggle still works: turning auto-taunt off disables future forced Growls.
+    sim.setPetAutoTaunt(false);
+    expect(voidwalker.petAutoTaunt).toBe(false);
+    wolf.forcedTargetId = null;
+    for (let i = 0; i < 20 * (10 + 2); i++) sim.tick();
+    expect(wolf.forcedTargetId).not.toBe(voidwalker.id);
   });
 
   it('recasting the same demon dismisses it and summons a fresh one', () => {

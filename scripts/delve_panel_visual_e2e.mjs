@@ -62,7 +62,7 @@ const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
   protocolTimeout: 60000,
-  userDataDir: `C:/Users/Sud0S/AppData/Local/Temp/woc-litany-visual-e2e-${Date.now()}`,
+  userDataDir: `C:woc-litany-visual-e2e-${Date.now()}`,
   args: [
     '--window-size=1280,820',
     '--use-angle=swiftshader',

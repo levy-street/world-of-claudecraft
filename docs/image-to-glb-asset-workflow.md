@@ -371,7 +371,8 @@ GAME_URL=http://127.0.0.1:5184 SHOT_PREFIX=after EXPECT_CHEST=1 \
 The helper captures desktop Ultra at 1600 by 900 and mobile Low at 844 by 390. It suppresses
 the GPU notice and unrelated hostile nameplates only in the capture page, reports the
 resolved banker, camera, chest state, and browser errors, and writes matched files under
-`docs/screenshots/banker-chest/`. Stop both dev servers after inspection.
+`docs/screenshots/banker-chest/` (created on demand by the capture script; treat as
+regenerable PR evidence, not permanent tree content). Stop both dev servers after inspection.
 
 Use desktop Ultra and mobile Low as the two ends of the presentation contract. Confirm:
 
@@ -384,16 +385,11 @@ Use desktop Ultra and mobile Low as the two ends of the presentation contract. C
 - Shadows stop at the normal entity shadow distance.
 - Browser page errors are absent. Separate expected offline API failures from render errors.
 
-The accepted banker chest evidence is:
-
-| Target | Before | After |
-|---|---|---|
-| Desktop Ultra | ![Desktop before](screenshots/banker-chest/before-desktop-ultra.png) | ![Desktop after](screenshots/banker-chest/after-desktop-ultra.png) |
-| Mobile Low | ![Mobile before](screenshots/banker-chest/before-mobile-low.png) | ![Mobile after](screenshots/banker-chest/after-mobile-low.png) |
-
-The mobile view loses some fine rune definition, which is acceptable because the chest's
-silhouette, lock, banding, and role remain clear and no gameplay information depends on
-the fine detail.
+The accepted banker chest evidence is regenerable, not kept in-tree after merge. Re-run the
+capture commands above (desktop Ultra and mobile Low) when you need before/after shots for
+review. The mobile view loses some fine rune definition, which is acceptable because the
+chest's silhouette, lock, banding, and role remain clear and no gameplay information depends
+on the fine detail.
 
 ## 8. Run the contribution gates
 
@@ -465,6 +461,36 @@ the full-color source is committed evidence and must never ship as the runtime m
 future asset genuinely needs a patterned finish, add a cell to the shared atlas (or a
 sibling shared atlas) with the same derivation-and-pin treatment; per-asset embedded
 textures remain the last resort and need a fresh performance case.
+
+**The one asset that made that case: the Terrorspark Groundshaker mount.** It is a rideable hero mount the
+player looks at from the chase camera for the whole session, so a shared grayscale grain
+cell could not carry it: it needs an independent roughness and normal response per material
+family, which vertex colors cannot express at all. It embeds six procedurally generated maps
+(metal and fabric, each albedo + tangent normal + packed occlusion/roughness/metalness) built
+by `scripts/assets/terrorspark_groundshaker/surface_maps.mjs`, plus a baked macro band in `COLOR_0`
+(`surface_shading.mjs`: cavity occlusion against the neighbouring parts, ground contact and
+grime, settled dust, thinned paint on up-facing bevels and seam darkening on the rest). Read
+the shape of that solution before copying it:
+
+- **World-space box projection, not UV islands.** UVs are projected per triangle from the
+  dominant face-normal axis, so texel density is fixed in yards and one shared map set serves
+  parts of wildly different size. There is no unwrap to maintain.
+- **Fold the UVs, then restore the scale.** `quantize()` skips any texcoord outside [0, 1] and
+  leaves it float32, which cost more than the rest of the geometry put together. Fold each
+  projection group back by whole repeats (free: the maps tile with period 1), normalize into
+  the unit range, and hand the discarded scale to `KHR_texture_transform`.
+- **Resolution is per channel, not per material.** The albedo carries the scratch and chip
+  detail and costs a few KiB; the relief fields are band-limited well below their own Nyquist
+  frequency and ship at half resolution.
+- **Author every channel from its own field.** Aliasing albedo into roughness or normal is on
+  the object-sculpt spec's `mustAvoid` list, and it looks like it.
+- **Give the dark families headroom.** The baked darkening bands need somewhere to go: at the
+  original blockout values the treads and cannon crushed to flat black, so those palette
+  entries were lifted at the same hue.
+
+Cost: 275 KiB to 572 KiB, which sits alongside the other authored mounts (valorsteed 562 KiB,
+gobbler 555 KiB) rather than above them, and mounts load lazily per visual key. A prop or a
+building still has no case for this; do not read the Terrorspark Groundshaker as a general licence.
 
 ### Budgets that held up
 

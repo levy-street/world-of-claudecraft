@@ -12,35 +12,59 @@ on:
 permissions:
   contents: read
 
-# Two-tier i18n gate, split by git ref in this one file:
+# Cancel superseded pull_request runs for the same PR. Group by event name plus
+# PR number (or ref for pushes) so release/** pushes and other events stay
+# isolated from ordinary PR traffic and cannot cancel each other (D4).
+# cancel-in-progress is true for every event in this group; release isolation
+# comes from the event_name segment, not from disabling cancel on push.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Two-tier i18n gate, split by git ref in this one file. Each tier is a parallel
+# pair (tests job + checks job, no needs edge either way) so wall clock is
+# max(tests, checks), not their sum. Locally `npm run gate` (scripts/gate.mjs)
+# still runs the combined step list serially with ONE full unsharded vitest.
 #
-#   pr-gate       cheap, English-only-legal tier. Runs on pull requests, on pushes
-#                 to non-release branches (main, dev-*), and on manual dispatch.
-#                 It runs `npm test` WITHOUT I18N_RELEASE_TIER, so the release-only
-#                 checks (s3_localized, copied-English rendered content, 21-locale
-#                 key parity, empty-`pending`) are skipped. What it still enforces:
-#                 registry-in-sync, s3_registered (every emit maps to a registered
-#                 key/RULE), and placeholder parity for the translations that
-#                 actually exist. An English-only PR (sparse overlay) passes here.
-#                 The test suite runs as a 4-shard matrix (each shard executes a
-#                 quarter of the test files), so the job's wall time is the
-#                 slowest quarter, not the whole suite.
+#   pr-gate       cheap, English-only-legal TEST job. Runs on pull requests, on
+#                 pushes to non-release branches (main, dev-*), and on manual
+#                 dispatch. It runs `npm test` WITHOUT I18N_RELEASE_TIER, so the
+#                 release-only checks (s3_localized, copied-English rendered
+#                 content, 21-locale key parity, empty-`pending`) are skipped.
+#                 What it still enforces: registry-in-sync, s3_registered (every
+#                 emit maps to a registered key/RULE), and placeholder parity for
+#                 the translations that actually exist. An English-only PR
+#                 (sparse overlay) passes here. The suite is an 8-shard matrix
+#                 (each shard executes a partition of the test files), so the
+#                 job's wall time is the slowest shard, not the whole suite.
 #
 #   pr-checks     the PR tier's serialized checks (i18n freshness + coverage
 #                 summary, malware gate, game/admin typecheck, env/server/client
-#                 builds), split into their own job so they run in parallel with
-#                 pr-gate and the PR critical path is max(tests, checks), not
-#                 their sum. Same triggers as pr-gate.
+#                 builds), parallel with pr-gate. Same triggers as pr-gate.
 #
-#   release-gate  full 21-locale tier. Runs on release/** pushes and on the
-#                 release-to-main PR merge result, with I18N_RELEASE_TIER=1. A merely
-#                 `pending` (untranslated) key cannot survive this gate. Its test
-#                 step runs the same 4-shard matrix as pr-gate; the serialized
-#                 checks and builds run once, on shard 1 only.
+#   release-gate  full 21-locale TEST job. Runs on release/** pushes and on the
+#                 release-to-main PR merge result, with job-level
+#                 I18N_RELEASE_TIER=1 so every shard is release-tier. A merely
+#                 `pending` (untranslated) key cannot survive this gate. Same
+#                 8-shard matrix as pr-gate; tests only (no builds).
+#
+#   release-checks the release tier's serialized checks (same step list as
+#                 pr-checks), parallel with release-gate. Same triggers as
+#                 release-gate. Does not set I18N_RELEASE_TIER (freshness,
+#                 malware, typecheck, and builds do not need it; the test job
+#                 alone carries the tier flag).
 #
 # The release tier is a superset: its `npm test` runs every PR-tier check plus the
-# release-only ones, and the release-gate job also typechecks and builds
-# env/server/client serially in the one job.
+# release-only ones; typecheck and the three builds live in release-checks.
+#
+# Path filters (D10): a cheap `changes` job classifies pull_request diffs as
+# code vs docs-only. Docs/markdown/screenshot-only PRs keep lint (and any other
+# always-on cheap jobs) but skip pr-gate, pr-checks, and browser-gate. Any touch
+# of the code path set forces the full PR tier. push to main/dev-* and
+# workflow_dispatch always report code=true (full PR tier when unsure).
+# Release/** pushes and release-to-main PRs never consult the filter:
+# release-gate, release-checks, and release-version-gate stay always-full
+# (no path skip on those jobs).
 
 jobs:
   release-version-gate:
@@ -64,6 +88,78 @@ jobs:
       - name: Verify release version surfaces
         run: npm run release:check
 
+  # Classify whether this run touches the code path set (D10). Prefer native
+  # git-diff + job if over third-party path-filter actions. Default code=true
+  # (fail closed toward the full suite); only a confirmed docs-only PR sets
+  # code=false. Release jobs never need this job and never read its output.
+  changes:
+    name: Detect code path changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          # Full history so the PR base and head SHAs resolve for git diff.
+          # This job is cheap (no npm install); depth is not a wall concern.
+          fetch-depth: 0
+
+      - name: Classify changed paths
+        id: filter
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          # Single write at the end. Default true = full PR tier (fail closed).
+          code=true
+          if [ "$EVENT_NAME" != "pull_request" ]; then
+            echo "non-PR event: full PR tier (code=true)"
+            echo "code=$code" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -z "${BASE_SHA:-}" ] || [ -z "${HEAD_SHA:-}" ]; then
+            echo "missing PR base/head SHAs: full PR tier (code=true)"
+            echo "code=$code" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Ensure both ends exist (shallow edge cases / force-push races).
+          git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null || git fetch --no-tags --depth=1 origin "$BASE_SHA"
+          git cat-file -e "${HEAD_SHA}^{commit}" 2>/dev/null || git fetch --no-tags --depth=1 origin "$HEAD_SHA"
+          # Triple-dot: commits reachable from HEAD but not from the merge base
+          # with BASE (the PR's own changes). ACMRD covers add/copy/mod/rename/delete.
+          mapfile -t files < <(git diff --name-only --diff-filter=ACMRD "$BASE_SHA"..."$HEAD_SHA")
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "empty file list: full PR tier (code=true)"
+            echo "code=$code" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          code=false
+          for f in "${files[@]}"; do
+            case "$f" in
+              src/*|server/*|tests/*|headless/*|bot/*|scripts/*|\
+              package.json|package-lock.json|\
+              tsconfig.json|tsconfig.admin.json|\
+              vite.config.ts|vitest.browser.config.ts|\
+              biome.json|\
+              .github/workflows/*|\
+              electron/*|android/*|ios/*|public/*|\
+              deploy/*|mediawiki/*|\
+              Dockerfile|Dockerfile.*|docker-compose.yml|docker-compose.yaml)
+                code=true
+                break
+                ;;
+            esac
+          done
+          if [ "$code" = "true" ]; then
+            echo "code path change detected: full PR tier"
+          else
+            echo "docs-only (or non-code) change: skip pr-gate, pr-checks, browser-gate"
+          fi
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+
   # Biome formatter + linter, adopted as a forward ratchet: only files actually
   # changed by this push/PR are checked (`--changed`), so the large existing tree
   # is never retroactively reformatted, while every new diff must pass format+lint.
@@ -75,10 +171,10 @@ jobs:
 
     steps:
       - name: Check out repository
+        # Default shallow checkout. Biome --changed --since only needs the base
+        # commit object, which the next step fetches with --depth=1 when missing.
+        # Full-history checkout was pure waste: it dominated the job wall time.
         uses: actions/checkout@v6
-        with:
-          # Full history so `biome --changed --since` can diff against the base ref.
-          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -95,14 +191,24 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BASE_REF: ${{ github.base_ref }}
           BEFORE_SHA: ${{ github.event.before }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
+          zeros='0000000000000000000000000000000000000000'
           if [ "$EVENT_NAME" = "pull_request" ]; then
             git fetch --no-tags --depth=1 origin "$BASE_REF"
             echo "ref=origin/$BASE_REF" >> "$GITHUB_OUTPUT"
-          elif [ -n "$BEFORE_SHA" ] && git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+          elif [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "$zeros" ]; then
+            # Shallow checkout is tip-only; fetch the pre-push tip alone.
+            if ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$BEFORE_SHA"
+            fi
             echo "ref=$BEFORE_SHA" >> "$GITHUB_OUTPUT"
-          else
+          elif git rev-parse --verify --quiet HEAD~1 >/dev/null; then
             echo "ref=HEAD~1" >> "$GITHUB_OUTPUT"
+          else
+            # New branch / missing before SHA: compare against default branch tip.
+            git fetch --no-tags --depth=1 origin "$DEFAULT_BRANCH"
+            echo "ref=origin/$DEFAULT_BRANCH" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Biome check (changed files only)
@@ -112,6 +218,10 @@ jobs:
 
   browser-gate:
     name: Browser regressions (Chromium)
+    # Skip on confirmed docs-only PRs (no browser tests/code touched). Non-PR
+    # and code PRs keep the job (changes.code defaults true off PR events).
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -127,6 +237,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Resolve Playwright version for cache key
+        id: playwright-version
+        run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright Chromium browsers
+        # Restores ~/.cache/ms-playwright when the Playwright version matches.
+        # The install step always runs: on a hit it is a cheap no-op for the
+        # browser download and only ensures OS deps; on a miss it downloads.
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+          restore-keys: |
+            playwright-chromium-${{ runner.os }}-
+
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
@@ -135,24 +260,29 @@ jobs:
 
   # The PR tier is two parallel jobs: pr-gate runs the test suite while pr-checks
   # runs the serialized checks, so the PR critical path is max(tests, checks)
-  # instead of their sum. pr-gate additionally fans the suite across a 4-shard
-  # matrix (vitest --shard: a sha1-hash partition of the test FILES), so its wall
-  # time is the slowest quarter. Locally `npm run gate` (scripts/gate.mjs) runs
-  # the SAME combined step list serially with ONE full unsharded vitest run by
-  # design (bounded workers); keep that script's step list in sync when adding
-  # or removing a step in either job.
+  # instead of their sum. pr-gate additionally fans the suite across an 8-shard
+  # matrix (vitest --shard=i/8: sha1-contiguous file packs). D11 path-matrix
+  # follow-on tried LPT and stripe sequencers (scripts/ci_balanced_sequencer.mjs);
+  # both missed D11 and are unwired. Wall time is the slowest shard. Locally
+  # `npm run gate` (scripts/gate.mjs) runs the SAME combined step list serially
+  # with ONE full unsharded vitest run by design (bounded workers); keep that
+  # script's step list in sync when adding or removing a step in either job.
   pr-gate:
     name: PR gate (English-only legal)
-    if: (github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch'
+    # Compose release-to-main exclusion with the code path filter (D10). Do not
+    # drop either arm: release-to-main must still select release-*, and docs-only
+    # PRs must skip this matrix. needs.changes only; no needs edge to pr-checks.
+    needs: changes
+    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch') && needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
 
-    # fail-fast stays off: shards pass or fail independently, so one red quarter
-    # never cancels the other three and a failure report always covers the whole
+    # fail-fast stays off: shards pass or fail independently, so one red shard
+    # never cancels the others and a failure report always covers the whole
     # suite.
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
       - name: Check out repository
@@ -169,13 +299,13 @@ jobs:
 
       # `npm test` regenerates the i18n artifacts itself (pretest) in EVERY
       # shard BY DESIGN (the S3 guard, guide freshness, and the git-subprocess
-      # suites need the generated artifacts no matter which shard they hash
-      # into), so this job needs no explicit i18n:gen step; the freshness diff
-      # lives in pr-checks.
+      # suites need the generated artifacts no matter which shard the balanced
+      # sequencer assigns them to), so this job needs no explicit i18n:gen step;
+      # the freshness diff lives in pr-checks.
       # Full Sim suites are CPU-heavy. Keep each shard at half the runner's
       # available cores, matching the bounded local gate.
-      - name: Run tests (PR tier, shard ${{ matrix.shard }} of 4)
-        run: npm test -- --shard=${{ matrix.shard }}/4 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
+      - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
+        run: npm test -- --shard=${{ matrix.shard }}/8 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
 
   # Runs in parallel with pr-gate: same if-condition, no needs edge in either
   # direction. The default pull_request merge-ref checkout MUST be preserved
@@ -183,7 +313,10 @@ jobs:
   # not just the PR head.
   pr-checks:
     name: PR checks (freshness, typecheck, builds)
-    if: (github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch'
+    # Same composition as pr-gate: release exclusion + code path filter. Skipped
+    # entirely on docs-only PRs (malware/typecheck/builds are code-path gates).
+    needs: changes
+    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch') && needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -225,6 +358,19 @@ jobs:
       - name: Malicious-code gate
         run: npm run security:gate
 
+      # tsc's own incremental cache (node_modules/.cache/tsc/buildinfo.json, via
+      # check:ts's --incremental flag). Keyed on the lockfile and tsconfig so a
+      # dependency or compiler-option change starts clean; tsc still verifies
+      # every file's content hash against the cache, so a stale restore only
+      # saves the unchanged-file re-check, never hides a real type error.
+      - name: Cache tsc incremental buildinfo
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/tsc
+          key: tsc-buildinfo-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-${{ github.sha }}
+          restore-keys: |
+            tsc-buildinfo-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-
+
       - name: Typecheck
         run: npm run check:types
 
@@ -237,23 +383,28 @@ jobs:
       - name: Build client
         run: npm run build
 
+  # The release tier is two parallel jobs: release-gate runs the full 21-locale
+  # test suite while release-checks runs the serialized checks, so the release
+  # critical path is max(tests, checks) instead of tests-then-builds on shard 1.
+  # Locally `npm run gate` (scripts/gate.mjs) still runs the SAME combined step
+  # list serially with ONE full unsharded vitest by design; keep that script's
+  # step list in sync when adding or removing a step in either job.
   release-gate:
     name: Release gate (full 21-locale)
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
     runs-on: ubuntu-latest
 
-    # The release tier; this single flag turns on every release-only check.
+    # Job-level: every matrix shard must see the release tier. Moving this onto
+    # a single step would silently run the other shards at PR tier (D8).
     env:
       I18N_RELEASE_TIER: '1'
 
-    # The same 4-shard matrix as pr-gate: the test step partitions across the
-    # four runners, while every serialized check and build below carries a
-    # single-shard condition so it runs exactly once (on shard 1) instead of
-    # four times. fail-fast stays off so shards report independently.
+    # Same 8-shard matrix as pr-gate. fail-fast stays off so shards report
+    # independently. Serialized checks live in release-checks, not here.
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
       - name: Check out repository
@@ -268,55 +419,79 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # This job's checks also run locally as `npm run gate` (scripts/gate.mjs),
-      # which stays serial with ONE full unsharded test run by design; keep that
-      # script's step list in sync when adding or removing a step here.
+      # `npm test` regenerates the i18n artifacts itself (pretest) in EVERY
+      # shard BY DESIGN (the S3 guard, guide freshness, and the git-subprocess
+      # suites need the generated artifacts no matter which shard the balanced
+      # sequencer assigns them to), so this job needs no explicit i18n:gen step;
+      # the freshness diff lives in release-checks.
+      # Full Sim suites are CPU-heavy. Keep each shard at half the runner's
+      # available cores, matching the bounded local gate.
+      - name: Run tests (release tier - 21-locale + empty-pending, shard ${{ matrix.shard }} of 8)
+        run: npm test -- --shard=${{ matrix.shard }}/8 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
+
+  # Runs in parallel with release-gate: same if-condition, no needs edge in
+  # either direction. Does not set I18N_RELEASE_TIER; the checks here do not
+  # depend on it, and the test job alone owns the tier flag.
+  release-checks:
+    name: Release checks (freshness, typecheck, builds)
+    if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Generate i18n artifacts
-        if: matrix.shard == 1
         run: npm run i18n:gen
 
-      # Fast, legible fail BEFORE the long test/build run if a committed generated
+      # Post the coverage counts of the gitignored i18n.status.summary.json (written
+      # by the i18n:gen step above) to the job summary as the out-of-band audit trail.
+      - name: Post i18n coverage summary
+        run: node scripts/i18n_coverage_summary.mjs
+
+      # Fast, legible fail BEFORE the long build steps if a committed generated
       # artifact drifted from source (someone changed an overlay or a catalog key but
       # forgot to regenerate). The status registry and its counts summary are both
       # gitignored; the diff covers the committed line-item locale slices AND the
       # generated TranslationKey union. The test suite also enforces this, this just
       # surfaces it sooner.
       - name: Verify committed i18n artifacts are fresh
-        if: matrix.shard == 1
         run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated src/ui/i18n.catalog/translation_keys.generated.ts
 
-      # Post the coverage counts of the gitignored i18n.status.summary.json to the job summary as the out-of-band audit trail.
-      - name: Post i18n coverage summary
-        if: matrix.shard == 1
-        run: node scripts/i18n_coverage_summary.mjs
-
-      # Release-gate malicious-code scan (see the PR-gate job for the rationale).
+      # Release-tier malicious-code scan (see pr-checks for the rationale).
       # --gate fails only on a HIGH-severity signature surviving the path-aware
       # priors; the full agent-judged pass is the `release-malware-audit` skill.
       - name: Malicious-code gate
-        if: matrix.shard == 1
         run: npm run security:gate
 
-      # Sharded like pr-gate; `npm test` (pretest) regenerates the i18n
-      # artifacts in EVERY shard so the artifact-dependent suites pass no
-      # matter which shard they hash into.
-      # Full Sim suites are CPU-heavy. Keep each shard at half the runner's
-      # available cores, matching the bounded local gate.
-      - name: Run tests (release tier - 21-locale + empty-pending, shard ${{ matrix.shard }} of 4)
-        run: npm test -- --shard=${{ matrix.shard }}/4 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
+      # Same tsc incremental cache as pr-checks (#2758). release-checks is not
+      # matrixed, so no matrix.shard gate (Phase 4: checks run once, not on
+      # release-gate shard 1).
+      - name: Cache tsc incremental buildinfo
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/tsc
+          key: tsc-buildinfo-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-${{ github.sha }}
+          restore-keys: |
+            tsc-buildinfo-${{ runner.os }}-${{ hashFiles('package-lock.json', 'tsconfig.json') }}-
 
       - name: Typecheck
-        if: matrix.shard == 1
         run: npm run check:types
 
       - name: Build headless environment
-        if: matrix.shard == 1
         run: npm run build:env
 
       - name: Build server
-        if: matrix.shard == 1
         run: npm run build:server
 
       - name: Build client
-        if: matrix.shard == 1
         run: npm run build

@@ -280,9 +280,8 @@ A scheduler opens ranked portals automatically. Tuning is `RIFT_TIER_INFO` plus 
 ## Client sync + render
 
 - `IWorld.riftFloor` (`RiftFloorView`) + a `riftState` event carry the descriptor
-  to the client; the renderer regenerates geometry/fog from it. `riftCollisionToken`
-  is on `IWorld` for the renderer's camera occlusion (0 on the online `ClientWorld`,
-  which never registers rift regions; the server owns collision).
+  to the client; the renderer regenerates geometry/fog from it. Collision isolation
+  remains private to each `Sim`; it is not part of `IWorld` or `ClientWorld`.
 - The world portal renders a bespoke "dimensional gate" GLB
   (`public/models/props/rift_portal.glb`, in the boot preload) via
   `buildRiftGateBody` in `src/render/door_portal.ts`, with a rank-tinted swirling
@@ -331,7 +330,7 @@ LETTER is a game glyph (like item-quality colour), not translated.
   gate (deny + admit + rank stamping), and sealing paying NO Heroic Marks at any
   rank (the no-marks contract, incl. the untouched heroic daily ledger).
 - Cross-cutting guards that also cover rifts: `tests/world_api_parity.test.ts`
-  (the `riftFloor`/`riftCollisionToken` IWorld members), `tests/architecture.test.ts`
+  (the `riftFloor` IWorld member), `tests/architecture.test.ts`
   (sim purity + the `rift_rank`/render pure-core registration), `tests/sim_context.test.ts`
   + `tests/entity_roster.test.ts` (the seam stubs), and `tests/localization_fixes.test.ts`
   (S3 rift emit drift).

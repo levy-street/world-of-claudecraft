@@ -163,6 +163,7 @@ describe('i18n whole-catalog completeness', () => {
       'hudChrome.discord.title', // "Discord" - brand
       'hudChrome.discord.open', // "Discord" - brand
       'hudChrome.steam.title', // "Steam" - brand
+      'hudChrome.epic.title', // "Epic" - brand
       'hudChrome.discord.panelTitle', // "World of ClaudeCraft" - brand
       'hudChrome.discord.linkedTitle', // "Discord: {name}" - brand + player name
       'hudChrome.keybinds.discord', // "Discord" - brand (Key Bindings action label)

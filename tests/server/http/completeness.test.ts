@@ -113,6 +113,8 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/steam/link',
   '/api/steam/status',
   '/api/battleground/leaderboard',
+  '/api/epic/link',
+  '/api/epic/status',
   '/api/ota/updates',
 ]);
 
@@ -316,6 +318,11 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'POST', path: '/api/steam/link' },
     { method: 'DELETE', path: '/api/steam/link' },
     { method: 'GET', path: '/api/steam/status' },
+    // The Epic link trio (server/epic/routes.ts): registry-only twin of Steam,
+    // env-gated dark until EPIC_ENABLED=1.
+    { method: 'POST', path: '/api/epic/link' },
+    { method: 'DELETE', path: '/api/epic/link' },
+    { method: 'GET', path: '/api/epic/status' },
     // The OTA update check (server/ota_updates.ts): registry-only like the
     // deeds trio, env-gated dark until OTA_MANIFEST_URL is set.
     { method: 'POST', path: '/api/ota/updates' },

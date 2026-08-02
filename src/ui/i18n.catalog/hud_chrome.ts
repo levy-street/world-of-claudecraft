@@ -690,6 +690,23 @@ export const hudChromeStrings = {
     separate: 'Separate {meter}',
     regroup: 'Regroup {meter}',
   },
+  targetAuras: {
+    title: 'Target Auras',
+    keybindLabel: 'Target Buffs and Debuffs',
+    all: 'All',
+    debuffs: 'Debuffs',
+    buffs: 'Buffs',
+    unlock: 'Move target aura window',
+    lock: 'Lock target aura window',
+    configureRows: 'Configure target auras',
+    fewerRows: 'Prefer fewer aura rows',
+    moreRows: 'Prefer more aura rows',
+    visibleRows: 'Preferred aura rows: {count}',
+    showSources: 'Show aura sources',
+    hideSources: 'Hide aura sources',
+    ownAura: 'Your aura',
+    opacity: 'Aura opacity: {percent}',
+  },
   // Pet action bar disabled-state tooltips: the feed/heal-pet button stays
   // visible (never hidden) while it cannot currently be used, so a hunter
   // sees WHY instead of a button that looks broken.
@@ -755,6 +772,7 @@ export const hudChromeStrings = {
     name_shadowjump_toad: 'Kama-Kage the Shadow-Jump Toad',
     name_stormfeather_griffin: 'Sky-Reach Stormfeather',
     name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
+    name_terrorspark_groundshaker: 'Terrorspark Groundshaker',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -766,6 +784,8 @@ export const hudChromeStrings = {
       'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
     desc_thunderstrut_gobbler:
       'A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.',
+    desc_terrorspark_groundshaker:
+      'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
   },
   // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
   // Marla lends the player a training Valorsteed for the paddock race. Finishing
@@ -1275,6 +1295,51 @@ export const hudChromeStrings = {
     badges: {
       backgrounded: 'Backgrounded',
       offline: 'Offline',
+    },
+  },
+  auraOverlay: {
+    title: 'Auras',
+    currentClass: 'Current class: {class}',
+    previewHint: 'Use Setup Positions to move an aura without covering the menu.',
+    noProcs: 'No supported proc is available for this character.',
+    enabled: 'Show Aura',
+    icon: 'Spell Icon',
+    arcs: 'Side Crescents',
+    groundRing: 'Ground Ring',
+    groundRingSpellOrder: 'Ground Ring: Spell Order',
+    crescentsSpellOrder: 'Side Crescents: Spell Order',
+    size: 'Size',
+    iconSize: 'Icon Size',
+    crescentBlockSize: 'Crescent Block Size',
+    groundRingBlockSize: 'Ground Ring Block Size',
+    opacity: 'Opacity',
+    color: 'Color',
+    allOn: 'All On',
+    allOff: 'All Off',
+    reposition: 'Setup Positions',
+    positioning: 'Positioning: {aura}',
+    selectAura: 'Aura',
+    done: 'Done',
+    moveLeft: 'Move Left',
+    moveUp: 'Move Up',
+    moveDown: 'Move Down',
+    moveRight: 'Move Right',
+    moveEarlier: 'Move spell inward',
+    moveLater: 'Move spell outward',
+    screenPosition: 'Screen Position',
+    spellOrder: 'Spell Order',
+    reset: 'Reset Position',
+    spellPosition: 'Spell order {position} / {count}',
+    procs: {
+      revenge: 'Revenge!',
+      battleTrance: 'Battle Trance',
+      overpowerCharge: 'Redhand Empowerment',
+      suddenDeath: 'Sudden Death',
+      victoryRush: 'Victory Rush',
+      enrage: 'Mayhem: Enraged',
+      heatingUp: 'Heating Up',
+      arcaneCharge: 'Arcane Charges',
+      aetherRush: 'Aether Rush',
     },
   },
   playerCard: {
@@ -2369,6 +2434,20 @@ export const hudChromeStrings = {
     benefits:
       'Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.',
     noTicket: 'Steam did not provide a link ticket. Start Steam, then try again.',
+  },
+  // Epic account link (the deeds achievement mirror), the stacked card beside
+  // the Steam one on character select. Renders only when the server's
+  // /api/status advert says the Epic surface is lit; linking itself is
+  // desktop epic-channel only (the shell mints the proof), website/steam/web
+  // show status + Unlink. Linking is never a sign-in method (D2).
+  epic: {
+    title: 'Epic',
+    link: 'Link Epic',
+    unlink: 'Unlink Epic',
+    linked: 'Linked to Epic account {id}',
+    benefits:
+      'Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.',
+    noProof: 'Epic did not provide a link proof. Launch from the Epic Games Store, then try again.',
   },
   // The Ravenpost mailbox window + envelope indicator. Authored letter
   // sender/subject/body localize via entities.letters.* (world_entity_i18n),

@@ -7,6 +7,16 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ja_JP: Record<string, string> = {
+  'onlinePlayers.autoRefresh': '自動更新（{minutes} 分）',
+  'onlinePlayers.count': '{count} 人がオンライン',
+  'onlinePlayers.countFiltered': 'オンライン {total} 人中 {shown} 人',
+  'onlinePlayers.filteredEmpty': 'この検索に一致するオンラインのプレイヤーはいません',
+  'onlinePlayers.loadFailed': 'オンラインのプレイヤーを読み込めませんでした',
+  'onlinePlayers.loading': 'オンラインのプレイヤーを読み込み中…',
+  'onlinePlayers.refresh': '更新',
+  'onlinePlayers.searchLabel': 'オンラインのプレイヤーを検索',
+  'onlinePlayers.searchPlaceholder': 'プレイヤー、クラス、ゾーンを検索…',
+  'onlinePlayers.sortHint': '列をクリックして並べ替え',
   'detail.dailyRewardsActions': 'デイリー報酬のモデレーション操作',
   'detail.dailyRewardsBan': 'デイリー報酬から除外',
   'detail.dailyRewardsBanReason': 'デイリー報酬の除外理由：{value}',
@@ -165,7 +175,6 @@ export const ja_JP: Record<string, string> = {
   'stats.serverRss': 'サーバーRSS',
   'stats.playersCap': 'プレイヤー上限',
   'online.title': 'オンラインのプレイヤー',
-  'online.refreshHint': '5秒ごとに更新',
   'online.empty': '現在オンラインのプレイヤーはいません',
   'online.colCharacter': 'キャラクター',
   'online.colClass': 'クラス',

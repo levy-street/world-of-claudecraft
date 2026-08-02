@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { delveInteractableVisible } from './delve_interactable_visibility_core';
+import { STONE_DETAIL_NORMAL_SCALE, stoneDetailNormal } from './detail_normals';
 import { buildDungeonPropMesh } from './dungeon';
 import { GFX, surfaceMat } from './gfx';
 
@@ -101,23 +102,44 @@ function buildStandaloneGlbFitWidth(
 // ---------------------------------------------------------------------------
 
 function stoneMat(color: number): THREE.Material {
-  return surfaceMat({
+  // Same shared rock detail normal as the dungeon pack materials (one texture,
+  // one extra bind for the whole stone family), so the procedural delve masses
+  // match the surrounding walls' faint grain. Stays matte: roughness untouched.
+  // surfaceMat keys on the normalMap uuid, so the post-set normalScale is
+  // consistent for every material carrying this texture.
+  const detail = GFX.standardMaterials ? stoneDetailNormal() : null;
+  const mat = surfaceMat({
     color,
     roughness: 0.92,
     metalness: 0.0,
     flatShading: !GFX.standardMaterials,
+    normalMap: detail ?? undefined,
   });
+  if (detail && (mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+    (mat as THREE.MeshStandardMaterial).normalScale.set(
+      STONE_DETAIL_NORMAL_SCALE,
+      STONE_DETAIL_NORMAL_SCALE,
+    );
+  }
+  return mat;
 }
 
 function ironMat(color: number, emissive?: number, emissiveIntensity?: number): THREE.Material {
-  return surfaceMat({
+  const mat = surfaceMat({
     color,
     roughness: 0.65,
-    metalness: 0.55,
+    metalness: 0.6,
     flatShading: !GFX.standardMaterials,
     emissive,
     emissiveIntensity,
   });
+  // Iron reflects the dungeon IBL: per-material envMapIntensity multiplies the
+  // deliberately dim scene environment (0.05 in dungeons), so only the metal
+  // brightens. Safe to set on the shared surfaceMat instance: the key
+  // (color, roughness 0.65, metalness 0.6) IS the iron family.
+  const std = mat as THREE.MeshStandardMaterial;
+  if (std.isMeshStandardMaterial) std.envMapIntensity = 1.4;
+  return mat;
 }
 
 function glowMat(color: number, opacity = 0.28): THREE.Material {

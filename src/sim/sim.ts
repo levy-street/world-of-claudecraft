@@ -84,6 +84,7 @@ import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
+import { applyGreaterInvisibilityAftereffect } from './combat/greater_invisibility';
 import {
   applyHeal as applyHealImpl,
   consumeHealAbsorb as consumeHealAbsorbImpl,
@@ -98,7 +99,7 @@ import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
-import { isSpellResisted } from './combat/spell_resist';
+import { isMobSpellResisted } from './combat/spell_resist';
 import { isCritImmuneTank } from './combat/tank_crit_immunity';
 import { warriorMeleeDefense } from './combat/warrior_hit_table';
 import { ensureWarriorStance } from './combat/warrior_stances';
@@ -107,7 +108,6 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
-import { MAILBOXES } from './content/mailboxes';
 import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
 import type { GatheringProfessionId } from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
@@ -172,7 +172,6 @@ import {
   isRiftPos,
   MOBS,
   migrateLegacyInstancePos,
-  NPCS,
   QUESTS,
   RIFT_SLOT_COUNT,
   riftInstanceOrigin,
@@ -437,6 +436,7 @@ export type { MailSave } from './mail/post_office';
 export type { MarketSave } from './market';
 
 import { updateSwimFatigue } from './fatigue';
+import type { CombatExitMemory } from './instance_exit_memory';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
 import {
   applyDungeonMobTuning,
@@ -565,7 +565,6 @@ import {
   type Aura,
   type AuraKind,
   angleTo,
-  armorReduction,
   assertCanonicalEastbrookNoticeboardDef,
   type CrowdControlDrCategory,
   type CrowdControlDrState,
@@ -581,7 +580,6 @@ import {
   type DungeonDifficulty,
   dist2d,
   type Entity,
-  EQUIP_SLOTS,
   type EquipSlot,
   type ErrorReason,
   type EscortRunState,
@@ -593,6 +591,7 @@ import {
   type ItemInstancePayload,
   isConsuming,
   isDungeonDifficulty,
+  isEquipSlot,
   isPetClass,
   isQuestTurnInNpc,
   LEASH_DISTANCE,
@@ -608,6 +607,7 @@ import {
   type MountRaceSession,
   type MountTrainingSession,
   type MoveInput,
+  mobArmorReduction,
   type NoticeboardDef,
   type OverheadEmoteId,
   PARTY_XP_RANGE,
@@ -967,6 +967,9 @@ export interface InstanceSlot {
   mobIds: number[];
   objectIds: number[];
   exitId: number | null;
+  // The exit portal a DungeonDef.bossExitPortal dungeon spawns at the final
+  // boss's death (also present in objectIds, which owns its teardown).
+  bossExitId: number | null;
   emptyFor: number;
   // Sim-time until this live claim may be manually replaced again. Claim-owned
   // authority prevents party roster or leadership churn from rotating away the
@@ -986,6 +989,12 @@ export interface InstanceSlot {
   // when they actually entered this run: a door-camper or a member parked in
   // town takes the lockout without turning roster membership into mailed income.
   enteredBy: Set<number>;
+  // Recently-exited-mid-combat memory (issue #2653): a player who left this claim
+  // while a mob was actively fighting them has their dropped threat snapshotted
+  // here for a short window. Re-entering before it lapses resumes the fight
+  // instead of granting a free, unengaged reset (instances/dungeons.ts). Session
+  // state, cleared with the claim, same as clearedBy/enteredBy above.
+  combatExitMemory: CombatExitMemory;
 }
 
 export interface ResolvedAbility {
@@ -1844,6 +1853,10 @@ export class Sim {
     }
     return hourglasses;
   }
+  reactiveAbilityWindowRemaining(abilityId: string): number {
+    if (abilityId !== 'mongoose_bite') return 0;
+    return Math.max(0, this.player.overpowerUntil - this.time);
+  }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.
   private frozenOrbs: FrozenOrbState[] = [];
@@ -2074,10 +2087,12 @@ export class Sim {
             mobIds: [],
             objectIds: [],
             exitId: null,
+            bossExitId: null,
             emptyFor: 0,
             resetAvailableAt: 0,
             clearedBy: new Set(),
             enteredBy: new Set(),
+            combatExitMemory: new Map(),
           });
         }
         continue;
@@ -2103,10 +2118,12 @@ export class Sim {
           mobIds: [],
           objectIds: [],
           exitId: null,
+          bossExitId: null,
           emptyFor: 0,
           resetAvailableAt: 0,
           clearedBy: new Set(),
           enteredBy: new Set(),
+          combatExitMemory: new Map(),
         });
       }
     }
@@ -2225,6 +2242,7 @@ export class Sim {
         progressed: false,
         seqResetAt: -Infinity,
         bossDeathZones: [],
+        combatExitMemory: new Map(),
       });
     }
 
@@ -2635,15 +2653,15 @@ export class Sim {
       for (const [slot, instance] of Object.entries(
         s.equipmentInstance ?? s.equipmentInstances ?? {},
       )) {
-        if (!(EQUIP_SLOTS as readonly string[]).includes(slot) || !instance) continue;
-        const itemId = meta.equipment[slot as EquipSlot];
+        if (!isEquipSlot(slot) || !instance) continue;
+        const itemId = meta.equipment[slot];
         if (!itemId) continue;
         // A rift payload is validated against the worn item (anti-tamper); any
         // other instance (an enchant) deep-clones through the shared rules.
         const clean = instance.rift
           ? sanitizeRiftGearInstance(itemId, instance, player.id)
           : cloneItemInstancePayload(instance);
-        if (clean) meta.equipmentInstance[slot as EquipSlot] = clean;
+        if (clean) meta.equipmentInstance[slot] = clean;
       }
       // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
       // bank arm below): a counted instanced slot loads capped at what
@@ -3780,6 +3798,14 @@ export class Sim {
     deedsMod.markDeedsDirty(this.ctx, pid); // soc_guild_joined reads the stamped name
   }
 
+  /** Rename an existing guild identity without applying leave/join semantics. */
+  renamePlayerGuild(pid: number, oldName: string, newName: string): void {
+    const e = this.entities.get(pid);
+    if (!e || e.guild !== oldName) return;
+    valeCupMod.vcupRenameGuild(this.ctx, pid, oldName, newName);
+    e.guild = newName;
+  }
+
   /** Cosmetic skin-select event: rolls a rarity rank (once) and emits the
    *  personal `skinEvent` cue that opens the client overlay. Re-using the token
    *  re-shows the already-rolled rank — no reroll — so a player can't spam-roll.
@@ -3966,6 +3992,10 @@ export class Sim {
         prestigeRank: meta.prestigeRank,
         // the selected Book of Deeds title (a deed id), like the server fill
         title: meta.activeTitle,
+        // The guild tag beside the name, read off the passive display field the
+        // host stamps (setPlayerGuild). Omitted rather than empty, like the server
+        // fill; offline that is always the case, since guilds are server-only.
+        ...(e.guild ? { guild: e.guild } : {}),
       }));
     return Promise.resolve(paginateLeaderboard(rows, page, pageSize));
   }
@@ -5752,12 +5782,17 @@ export class Sim {
   ): void {
     const source = this.entities.get(effect.sourceId);
     if (!source || source.dead) return;
+    // The pulse cue anchors at the ZONE (the hazard is what ticks), not the
+    // caster, and names the ability so the renderer can play its authored fx.
     this.emit({
-      type: 'spellfx',
-      sourceId: source.id,
-      targetId: source.id,
+      type: 'spellfxAt',
+      x: effect.pos.x,
+      z: effect.pos.z,
       school: effect.school,
       fx: 'tick',
+      radius: effect.radius,
+      ability: effect.abilityId,
+      sourceId: source.id,
     });
     // Rune of Power (mage choice row): a FRIENDLY zone pulse. Buffs every ally
     // standing inside (refresh keeps it while they stay near, and it falls off
@@ -5920,6 +5955,10 @@ export class Sim {
     const removed = removeCancelableAura(e.auras, auraId);
     if (!removed) return;
     this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
+    if (removed.kind === 'stealth') {
+      e.stealthed = e.auras.some((a) => a.kind === 'stealth');
+    }
+    applyGreaterInvisibilityAftereffect(this.ctx, e, removed);
     if (auraAffectsStats(removed)) {
       recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta), meta.equipmentInstance);
     }
@@ -6244,10 +6283,11 @@ export class Sim {
   private breakStealth(e: Entity): void {
     const idx = e.auras.findIndex((a) => a.kind === 'stealth');
     if (idx < 0) return;
-    const name = e.auras[idx].name;
+    const removed = e.auras[idx];
     e.auras.splice(idx, 1);
     e.stealthed = false; // keep the cache live without waiting for updateAuras
-    this.emit({ type: 'aura', targetId: e.id, name, gained: false });
+    this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
+    applyGreaterInvisibilityAftereffect(this.ctx, e, removed);
   }
 
   private breakGhostWolf(e: Entity): void {
@@ -6815,7 +6855,7 @@ export class Sim {
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
     dmg *= this.petDamageMult(mob);
     const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
-    dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
+    dmg *= 1 - mobArmorReduction(mob, target, this.effectiveArmor(target));
     const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
     if (blocked) {
       dmg = Math.max(1, dmg - target.blockValue);
@@ -6878,8 +6918,10 @@ export class Sim {
     pet.facing = steadyAngleTo(pet.pos, target.pos, pet.facing);
     pet.swingTimer -= DT;
     // Emit the projectile + resolve the hit (resisted, not missed: the same
-    // semantics as player casts). Shared by the instant path and the windup
-    // release below; the caller owns the swing-timer bookkeeping.
+    // semantics as player casts, but isMobSpellResisted floors a hostile mob's
+    // resist chance against a player-side target the same way swingMissChance
+    // floors mob melee miss). Shared by the instant path and the windup release
+    // below; the caller owns the swing-timer bookkeeping.
     const fire = () => {
       this.emit({
         type: 'spellfx',
@@ -6888,7 +6930,7 @@ export class Sim {
         school: spell.school,
         fx: 'projectile',
       });
-      if (isSpellResisted(this.rng, pet.level, target.level, pet.hitBonus)) {
+      if (isMobSpellResisted(this.rng, pet, target, pet.hitBonus)) {
         this.emit({
           type: 'damage',
           sourceId: pet.id,
@@ -7813,8 +7855,32 @@ export class Sim {
     return items.useItem(this.ctx, itemId, pid);
   }
 
-  buyItem(npcId: number, itemId: string, pid?: number): void {
-    items.buyItem(this.ctx, npcId, itemId, pid);
+  // Two overloads, same trick as buyBackItem below: the IWorld shape UI/production
+  // code calls (npcId, itemId, bulk?) versus the legacy test/server shape that
+  // already threads a pid positionally in the third slot (npcId, itemId, pid?).
+  // Disambiguated by typeof so every existing `sim.buyItem(npc, item, pid)` call
+  // site keeps working unchanged.
+  buyItem(npcId: number, itemId: string, bulk?: boolean): void;
+  buyItem(npcId: number, itemId: string, pid?: number, bulk?: boolean): void;
+  buyItem(
+    npcId: number,
+    itemId: string,
+    bulkOrPid?: boolean | number,
+    pidOrBulk?: number | boolean,
+  ): void {
+    const pid =
+      typeof bulkOrPid === 'number'
+        ? bulkOrPid
+        : typeof pidOrBulk === 'number'
+          ? pidOrBulk
+          : undefined;
+    const bulk =
+      typeof bulkOrPid === 'boolean'
+        ? bulkOrPid
+        : typeof pidOrBulk === 'boolean'
+          ? pidOrBulk
+          : undefined;
+    items.buyItem(this.ctx, npcId, itemId, pid, bulk);
   }
 
   sellItem(itemId: string, count = 1, pid?: number): void {

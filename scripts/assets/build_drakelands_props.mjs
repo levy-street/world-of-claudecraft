@@ -37,7 +37,7 @@ const ITEMS = [
   { src: 'dragon+eggs+3d+model.glb', out: 'dragon_eggs.glb', target: 5000 },
   { src: 'giant+red+crystal+flowers+3d+model.glb', out: 'ember_lily.glb', target: 4000 },
 ];
-const SRC_DIR = '/Users/demihenderson/Downloads/drakelands';
+const SRC_DIR = '<redacted-local-path>';
 const OUT_DIR = 'public/models/props';
 
 await MeshoptDecoder.ready;

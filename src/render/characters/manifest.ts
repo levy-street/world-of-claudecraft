@@ -593,18 +593,27 @@ export const VISUALS: Record<string, VisualDef> = {
         slam: '2H_Melee_Attack_Chop',
         red_harvest: '2H_Melee_Attack_Chop',
         breachmaker: '2H_Melee_Attack_Chop',
-        shield_slam: '2H_Melee_Attack_Chop',
+        // Shieldcrack slams the SHIELD (offhand arm), not the sword: the
+        // synthesized bash (scripts/_add_shield_bash_anim.mjs) drives the
+        // left arm carrying the handslot.l shield; the weapon hand stays back.
+        shield_slam: 'Shield_Bash',
         raging_gale: 'Dualwield_Melee_Attack_Chop',
         bloodthirst: 'Dualwield_Melee_Attack_Chop',
-        cleave: '1H_Melee_Attack_Chop',
+        // Reaping Arc and Revenge hit everything in the frontal arc: the
+        // synthesized flat reap (scripts/_add_sweep_slice_anim.mjs), not the
+        // top-to-bottom chop (owner: "sideways sword sweep").
+        cleave: '1H_Melee_Attack_Slice_Horizontal',
+        revenge: '1H_Melee_Attack_Slice_Horizontal',
         thunder_clap: '1H_Melee_Attack_Chop',
         faultline: '1H_Melee_Attack_Chop',
-        revenge: '1H_Melee_Attack_Chop',
         heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
         overpower: '1H_Melee_Attack_Slice_Diagonal',
         hamstring: '1H_Melee_Attack_Slice_Diagonal',
         sanguine_aura: 'Spellcast_Raise',
         raised_guard: 'Block',
+        // Jawcrack is a bare-fist interrupt: the synthesized punch
+        // (scripts/_add_pummel_punch_anim.mjs), not a weapon swing.
+        pummel: 'Punch_A',
       },
     },
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
@@ -647,7 +656,22 @@ export const VISUALS: Record<string, VisualDef> = {
   player_rogue: {
     url: `${PLAYERS}/rogue.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['Dualwield_Melee_Attack_Chop']),
+    clips: {
+      ...kaykit(['Dualwield_Melee_Attack_Chop']),
+      attackByAbility: {
+        // Throat Wire is a wire strangle, not a dagger swing: the synthesized
+        // two-handed choke (scripts/_add_garrote_choke_anim.mjs) reaches to
+        // neck height and yanks back to the chest with a brief hold.
+        garrote: 'Garrote_Choke',
+        // Boot is a kick, not a swing: the synthesized snap kick
+        // (scripts/_add_boot_kick_anim.mjs) chambers the knee and fires the
+        // leg forward at gut height.
+        kick: 'Kick_A',
+        // Dirt Toss throws dirt, not daggers: the synthesized crouch-scoop
+        // and underhand fling (scripts/_add_dirt_throw_anim.mjs).
+        blind: 'Dirt_Throw',
+      },
+    },
     show: ['Rogue_Cape'],
     attach: [
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
@@ -659,7 +683,14 @@ export const VISUALS: Record<string, VisualDef> = {
   player_priest: {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['2H_Melee_Attack_Chop']),
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      attackByAbility: {
+        // Lingering Grace is a blessing, not a staff swing: the one-hand
+        // raise (a stock mage.glb clip) reads as the priest offering the HoT.
+        renew: 'Spellcast_Raise',
+      },
+    },
     // The priest's Light: a warm golden halo ring above the crown. The mage
     // model's pointed hat is canon here, and at the default lift the ring
     // plane crosses the hat cone where it is wide, clipping through it; +0.15
@@ -771,7 +802,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0xd08b45,
     tintStrength: 0.35,
   },
-  // Druid Travel Form: a daft chicken-cow hybrid (custom GLB). No tint — its
+  // Druid Travel Form: a daft chicken-cow hybrid (custom GLB). No tint: its
   // authored cow-spots/comb/beak colours carry the look.
   form_travel: {
     url: `${CREATURES}/chicken_cow.glb`,
@@ -845,6 +876,16 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: MOUNT_RIGGED,
     walkRef: 1.8,
     runRef: 4.5,
+    lazyPreload: true,
+  },
+  // Compact fantasy tank. One wheel revolution per locomotion clip matches
+  // its authored tread cadence at the reference ground speeds below.
+  mount_terrorspark_groundshaker: {
+    url: `${MOUNTS_DIR}/terrorspark_groundshaker.glb`,
+    height: 2.8,
+    clips: MOUNT_RIGGED,
+    walkRef: 3,
+    runRef: 4.4,
     lazyPreload: true,
   },
 

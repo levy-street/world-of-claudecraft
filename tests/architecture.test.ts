@@ -111,6 +111,19 @@ function forbiddenRenderCoreImport(spec: string): string | null {
 const IMPORT_RE = /\b(?:import|export)\b[^;'"]*?\bfrom\s*['"]([^'"]+)['"]/g;
 const DYN_IMPORT_RE = /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
 const DOM_GLOBAL_RE = /\b(document|window|navigator|localStorage|sessionStorage)\s*[.[]/;
+
+// Value-position sibling of DOM_GLOBAL_RE above. The member-access form requires an
+// identifier immediately after a `.`/`[`, so it cannot see a browser global reached
+// any other way: a feature-detect (`typeof localStorage !== 'undefined' ?
+// localStorage : null`, the shape guild_hide_offline.ts and party_collapse.ts each
+// used to duplicate before being unified into src/ui/safe_local_storage.ts), a type
+// check against the same global (`instanceof Document` / `instanceof Window` /
+// `instanceof Storage`), or the global handed over bare in assignment/return/argument
+// position. Scoped narrower than the src/ui module-classification sweep's
+// UI_HOST_VALUE_RE below (no prose-safety burden here: a pure core carries no
+// player-facing English the way an i18n catalog does).
+const DOM_GLOBAL_VALUE_RE =
+  /\btypeof\s+(?:document|window|navigator|localStorage|sessionStorage)\b|\binstanceof\s+(?:Document|Window|Navigator|Storage)\b|(?:[=(]|\breturn\b)\s*(?:document|window|navigator|localStorage|sessionStorage)\s*[),;]/;
 const NONDETERMINISM_RE = /\b(Math\.random|Date\.now|performance\.now)\b/;
 
 const simFiles = walk(simRoot);
@@ -125,6 +138,7 @@ const simFiles = walk(simRoot);
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/aura_overlay_view.ts',
   'src/ui/proc_overlay_view.ts',
   'src/ui/camera_prompt_core.ts',
   'src/ui/chat_ignore_core.ts',
@@ -240,6 +254,7 @@ const UI_PURE_CORES = [
   'src/ui/mobile_hud_layout.ts',
   'src/ui/mobile_fullscreen_window_core.ts',
   'src/ui/auras_view.ts',
+  'src/ui/target_auras_view.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/gathering_view.ts',
   'src/ui/gather_tool_tooltip.ts',
@@ -267,7 +282,14 @@ const UI_PURE_CORES = [
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
+  'src/ui/safe_local_storage.ts',
 ].map((rel) => join(repoRoot, rel));
+
+// The one pure core allowed to trip DOM_GLOBAL_VALUE_RE: the shared safeLocalStorage()
+// feature-detect every persisted-toggle pure core now imports instead of duplicating.
+// Every OTHER registered pure core must stay clear of it; the honesty check below
+// keeps this from becoming a blanket exemption nobody needs.
+const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_storage.ts')]);
 
 // Pure logic cores that live in src/render (the painter half is Three-side):
 // cast_bar (the overhead cast/channel state) and nameplate_view (the per-entity
@@ -281,35 +303,58 @@ const UI_PURE_CORES = [
 // (Date.now stays in the renderer that calls it), so a Vitest can drive any
 // moment of the cycle.
 const RENDER_PURE_CORES = [
+  'src/render/ability_vfx_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/battleground_core.ts',
   'src/render/battleground_fx_core.ts',
   'src/render/battleground_lantern_fx_core.ts',
   'src/render/battleground_rune_vfx_core.ts',
+  'src/render/blade_grass_dense_core.ts',
   'src/render/camera_boom_core.ts',
+  'src/render/compile_gate.ts',
   'src/render/camera_director_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
+  'src/render/character_effects_core.ts',
+  'src/render/character_view_core.ts',
   'src/render/chunk_residency_core.ts',
+  'src/render/cliff_scree_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
+  'src/render/foliage_shader_core.ts',
+  'src/render/gfx_aa_policy_core.ts',
+  'src/render/gfx_override_core.ts',
+  'src/render/ground_aim_reticle_core.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
   'src/render/env_prefilter_core.ts',
+  'src/render/environment_transition_core.ts',
   'src/render/ground_tilt_core.ts',
+  'src/render/grass_cap_collapse_core.ts',
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
+  'src/render/occluder_fade_core.ts',
+  'src/render/point_light_shader_core.ts',
+  'src/render/dynamic_resolution_core.ts',
+  'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
+  'src/render/opaque_draw_order_core.ts',
+  'src/render/perceptual_lod_core.ts',
   'src/render/prop_cell_core.ts',
   'src/render/race_line_core.ts',
+  'src/render/renderer_frame_telemetry_core.ts',
   'src/render/scene_census_core.ts',
   'src/render/sea_mist_core.ts',
   'src/render/shadow_pass_gate_core.ts',
   'src/render/terrain_region_core.ts',
+  'src/render/terrain_splat_presence_core.ts',
+  'src/render/vfx_pool_core.ts',
+  'src/render/view_candidate_pool_core.ts',
   'src/render/water_core.ts',
   'src/render/water_flora_core.ts',
+  'src/render/water_flora_shader_core.ts',
   'src/render/day_night_core.ts',
   'src/render/authored_walls_core.ts',
   'src/render/garden_maze_core.ts',
@@ -317,8 +362,12 @@ const RENDER_PURE_CORES = [
   'src/render/foliage_lod.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
+  'src/render/prewarm_resume.ts',
+  'src/render/resident_scenery_core.ts',
+  'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/zone_feature_visibility_core.ts',
+  'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
@@ -332,8 +381,10 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/render/foliage_lod.ts',
+  'src/render/compile_gate.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
+  'src/render/prewarm_resume.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/unit_portrait.ts',
@@ -367,6 +418,7 @@ const BARE_NAMED = [
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/render/cast_bar.ts',
+  'src/ui/safe_local_storage.ts',
 ].map((rel) => join(repoRoot, rel));
 
 function importSpecs(src: string): string[] {
@@ -626,11 +678,52 @@ describe('src/ui pure-core invariants', () => {
     ).toEqual([]);
   });
 
-  it('touches no DOM/browser globals', () => {
-    const violations = scanLines(UI_PURE_CORES, DOM_GLOBAL_RE);
+  it('touches no DOM/browser globals (member access AND value-position typeof/instanceof/direct-assign)', () => {
+    const memberViolations = scanLines(UI_PURE_CORES, DOM_GLOBAL_RE);
+    const valueScanFiles = UI_PURE_CORES.filter((f) => !DOM_GLOBAL_VALUE_ALLOWLIST.has(f));
+    const valueViolations = scanLines(valueScanFiles, DOM_GLOBAL_VALUE_RE);
+    const violations = [...memberViolations, ...valueViolations];
     expect(
       violations,
       `src/ui pure cores must run headless (no DOM globals):\n${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  // Honesty check for DOM_GLOBAL_VALUE_ALLOWLIST (mirrors the UI_DOM_MODULES honesty
+  // check below): the exemption must name an actually-registered pure core that
+  // actually needs it, so it cannot rot into a blanket opt-out nobody uses.
+  it('keeps the value-position DOM exemption honest (registered, and still needs it)', () => {
+    for (const f of DOM_GLOBAL_VALUE_ALLOWLIST) {
+      const shown = relative(repoRoot, f);
+      expect(
+        UI_PURE_CORES,
+        `${shown} must be a registered pure core to need this exemption`,
+      ).toContain(f);
+      const code = stripComments(readFileSync(f, 'utf8'));
+      expect(
+        DOM_GLOBAL_VALUE_RE.test(code),
+        `${shown} no longer trips DOM_GLOBAL_VALUE_RE; drop the stale exemption`,
+      ).toBe(true);
+    }
+  });
+
+  // Regression for the purity-guard gap: DOM_GLOBAL_RE above only matches member
+  // access (window.x), so a pure core probing localStorage in VALUE position
+  // (`typeof localStorage !== 'undefined' ? localStorage : null`) was entirely
+  // invisible to it. party_collapse.ts and guild_hide_offline.ts each used to
+  // duplicate exactly that idiom; the fix moves it into the one shared module
+  // allowed to use it (src/ui/safe_local_storage.ts) and adds DOM_GLOBAL_VALUE_RE
+  // to catch a future regression of the same shape. This pins the two ORIGINAL
+  // files clean of the raw idiom using the real production regex, not a copy.
+  it('party_collapse.ts / guild_hide_offline.ts no longer carry the raw value-position localStorage probe', () => {
+    const files = [
+      join(repoRoot, 'src/ui/party_collapse.ts'),
+      join(repoRoot, 'src/ui/guild_hide_offline.ts'),
+    ];
+    const violations = scanLines(files, DOM_GLOBAL_VALUE_RE);
+    expect(
+      violations,
+      `these pure cores must import safeLocalStorage from src/ui/safe_local_storage.ts rather than duplicating the value-position probe:\n${violations.join('\n')}`,
     ).toEqual([]);
   });
 
@@ -692,6 +785,29 @@ describe('purity scan matchers keep their teeth (the shared DOM / determinism re
       'const navigatorState = 1;',
     ]) {
       expect(DOM_GLOBAL_RE.test(negative), negative).toBe(false);
+    }
+  });
+
+  it('DOM_GLOBAL_VALUE_RE matches the value-position idiom (typeof/instanceof/direct-assign) and rejects benign lookalikes', () => {
+    for (const positive of [
+      "typeof localStorage !== 'undefined' ? localStorage : null",
+      "typeof window === 'undefined'",
+      'const s = localStorage;',
+      'return sessionStorage;',
+      'callback(document)',
+      'x instanceof Storage',
+      'y instanceof Window',
+    ]) {
+      expect(DOM_GLOBAL_VALUE_RE.test(positive), positive).toBe(true);
+    }
+    for (const negative of [
+      'const windowless = computeViewport();',
+      "'Press M to close the map window. Then click the marker.',",
+      'const typeofWindow = probe();',
+      'this.documentTitle = t;',
+      'const storageQuota = 5;',
+    ]) {
+      expect(DOM_GLOBAL_VALUE_RE.test(negative), negative).toBe(false);
     }
   });
 
@@ -781,6 +897,75 @@ describe('src/render pure-core invariants', () => {
   });
 });
 
+// Pure re-derivation of "the registered cores whose name is bare (not _view/_core)"
+// from a pair of pure-core arrays. Factored into a function (rather than inlined in
+// the `it()` below) so the regression test further down can run the EXACT same
+// derivation against a mutated copy of the real arrays instead of hand-duplicating
+// the logic, which would risk the two silently drifting apart.
+function deriveBareNamedCores(uiCores: string[], renderCores: string[]): string[] {
+  const viewOrCoreRe = /_(?:view|core)\.ts$/;
+  return [
+    ...new Set(
+      [...uiCores, ...renderCores]
+        .filter((f) => !viewOrCoreRe.test(f))
+        .map((f) => relative(repoRoot, f)),
+    ),
+  ].sort();
+}
+
+// Independent, hand-maintained pin for the BARE_NAMED forward-completeness check
+// below. Deliberately NOT derived from UI_PURE_CORES / RENDER_PURE_CORES (the arrays
+// deriveBareNamedCores() above already cross-references): a synchronized two-list
+// delete (the same bare-named path removed from BOTH its purity allowlist AND
+// BARE_NAMED in the same edit) keeps the derived check green, because derivedBare is
+// computed FROM the very arrays the delete just shrank, so both sides lose the same
+// entry and the equality holds despite the module silently dropping out of every
+// purity scan. This literal array is the third, independent pin: extend it BY HAND
+// in the same change that adds, renames, or removes a bare-named core from either
+// allowlist, so a synchronized delete leaves BARE_NAMED disagreeing with THIS list
+// instead of only agreeing with itself.
+const EXPECTED_BARE_NAMED = [
+  'src/game/ui_effects_profile.ts',
+  'src/game/ui_tier_knobs.ts',
+  'src/render/cast_bar.ts',
+  'src/render/compile_gate.ts',
+  'src/render/foliage_lod.ts',
+  'src/render/prewarm_pass.ts',
+  'src/render/prewarm_policy.ts',
+  'src/render/prewarm_resume.ts',
+  'src/ui/absorb_bar.ts',
+  'src/ui/bag_item_context_menu.ts',
+  'src/ui/chat_bubble_style.ts',
+  'src/ui/clock.ts',
+  'src/ui/compass.ts',
+  'src/ui/coords.ts',
+  'src/ui/fct_event.ts',
+  'src/ui/focus_order.ts',
+  'src/ui/gather_tool_tooltip.ts',
+  'src/ui/guild_hide_offline.ts',
+  'src/ui/hud/delve/delve_map.ts',
+  'src/ui/hud/quest/quest_tracker.ts',
+  'src/ui/item_slot_labels.ts',
+  'src/ui/live_region_politeness.ts',
+  'src/ui/log_event_route.ts',
+  'src/ui/low_health.ts',
+  'src/ui/low_resource.ts',
+  'src/ui/minimap_markers.ts',
+  'src/ui/mob_idle_sfx.ts',
+  'src/ui/mobile_hud_layout.ts',
+  'src/ui/party_collapse.ts',
+  'src/ui/party_frames.ts',
+  'src/ui/pet_action_icons.ts',
+  'src/ui/quality_glow.ts',
+  'src/ui/rest_indicator.ts',
+  'src/ui/roving_index.ts',
+  'src/ui/safe_local_storage.ts',
+  'src/ui/swing_timer.ts',
+  'src/ui/unit_frame.ts',
+  'src/ui/unit_portrait.ts',
+  'src/ui/xp_bar.ts',
+];
+
 describe('curated bare-named pure cores (cross-check)', () => {
   // Bare names are enforced by this curated cross-check while *_view / *_core are
   // auto-swept by onDiskCores(): the sweep's /_(?:view|core)\.ts$/ regex cannot see a
@@ -808,15 +993,45 @@ describe('curated bare-named pure cores (cross-check)', () => {
     // basename is bare (not _view / _core). A new bare-named core added to an allowlist
     // but forgotten here would escape both onDiskCores() (bare name) and the loop above
     // (not listed), reopening the gap; this equality makes that omission fail.
-    const viewOrCoreRe = /_(?:view|core)\.ts$/;
-    const derivedBare = [...UI_PURE_CORES, ...RENDER_PURE_CORES]
-      .filter((f) => !viewOrCoreRe.test(f))
-      .map((f) => relative(repoRoot, f))
-      .sort();
+    const derivedBare = deriveBareNamedCores(UI_PURE_CORES, RENDER_PURE_CORES);
+    const bareNamedRel = [...new Set(BARE_NAMED.map((f) => relative(repoRoot, f)))].sort();
     expect(
-      [...new Set(derivedBare)],
+      derivedBare,
       'BARE_NAMED must equal the registered cores whose name is bare (not _view/_core)',
-    ).toEqual([...new Set(BARE_NAMED.map((f) => relative(repoRoot, f)))].sort());
+    ).toEqual(bareNamedRel);
+
+    // Independent third pin (not derived from the arrays above): catches a
+    // synchronized delete that the derived check just above cannot (see
+    // EXPECTED_BARE_NAMED's own comment). Extend EXPECTED_BARE_NAMED by hand
+    // whenever a bare-named core is added, renamed, or removed.
+    expect(
+      bareNamedRel,
+      `BARE_NAMED must equal the hand-maintained EXPECTED_BARE_NAMED pin (update BOTH together):\n${bareNamedRel.join('\n')}`,
+    ).toEqual(EXPECTED_BARE_NAMED);
+  });
+
+  // Regression: the derived-completeness check above re-derives its expected list
+  // FROM UI_PURE_CORES / RENDER_PURE_CORES, the very arrays a delete would shrink.
+  // A synchronized two-list delete (the same bare-named path removed from BOTH its
+  // purity allowlist AND BARE_NAMED in one edit) keeps that check green, because
+  // both sides lose the same entry together, while the module silently drops out of
+  // every purity scan (it is bare-named, so onDiskCores()'s *_view/*_core sweep
+  // cannot see it either). EXPECTED_BARE_NAMED is hand-maintained and independent of
+  // the arrays under test, so it disagrees with BARE_NAMED after the same mutation.
+  it('the independent EXPECTED_BARE_NAMED pin catches a synchronized delete the derived check misses', () => {
+    const target = join(repoRoot, 'src/ui/party_collapse.ts');
+    const mutatedUiCores = UI_PURE_CORES.filter((f) => f !== target);
+    const mutatedBareNamed = BARE_NAMED.filter((f) => f !== target);
+
+    const derivedBare = deriveBareNamedCores(mutatedUiCores, RENDER_PURE_CORES);
+    const mutatedBareNamedRel = [
+      ...new Set(mutatedBareNamed.map((f) => relative(repoRoot, f))),
+    ].sort();
+    // The OLD derived check: still green after the synchronized delete (the gap).
+    expect(derivedBare).toEqual(mutatedBareNamedRel);
+    // The NEW independent pin: red, because EXPECTED_BARE_NAMED still lists
+    // party_collapse.ts and the mutated BARE_NAMED no longer does.
+    expect(mutatedBareNamedRel).not.toEqual(EXPECTED_BARE_NAMED);
   });
 });
 
@@ -916,9 +1131,13 @@ const SWEPT_BY_NAME_RE = /_(?:view|core|painter)\.ts$/;
 // portrait_chip, proc_overlay_dom), a `typeof window !== 'undefined'` probe, a
 // `(globalThis as {...}).ResizeObserver` cast, `instanceof HTMLElement`
 // (dialog_key_activation), and a bare `new Date()`.
-// (DOM_GLOBAL_RE itself is deliberately left alone: widening it would redden the
-// two registered pure cores that probe `typeof localStorage`, which is a separate
-// change with a separate blast radius.)
+// (DOM_GLOBAL_RE itself is deliberately left alone here too: the src/ui pure-core
+// scan above layers its own narrower value-position sibling, DOM_GLOBAL_VALUE_RE,
+// on top of it instead, scoped to that one file family and allowlisting only
+// src/ui/safe_local_storage.ts, the shared `typeof localStorage` feature-detect
+// guild_hide_offline.ts and party_collapse.ts both used to duplicate. Widening
+// DOM_GLOBAL_RE itself would still touch sim/world_api/render, which have no
+// instance of this idiom today and stay out of scope for this fix.)
 //
 // Deliberately OUT of scope, so the absence is a decision rather than an
 // oversight: `setTimeout` / `setInterval` / `queueMicrotask` / `fetch` /
@@ -1078,6 +1297,7 @@ const UI_DOM_MODULES = [
   'src/ui/dialog_key_activation.ts',
   'src/ui/discord_widget.ts',
   'src/ui/entry_guard_banner.ts',
+  'src/ui/epic_link.ts',
   'src/ui/focus_manager.ts',
   'src/ui/focus_restore.ts',
   'src/ui/form_draft.ts',
@@ -1122,6 +1342,9 @@ const UI_DOM_MODULES = [
   'src/ui/mobile_wallet_launcher.ts',
   'src/ui/mount_race_controls.ts',
   'src/ui/mount_race_strip.ts',
+  'src/ui/aura_overlay_config.ts',
+  'src/ui/aura_overlay_controller.ts',
+  'src/ui/aura_overlay_settings.ts',
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
   'src/ui/options_window.ts',
@@ -1146,6 +1369,7 @@ const UI_DOM_MODULES = [
   'src/ui/steam_link.ts',
   'src/ui/store_stack_diag.ts',
   'src/ui/talents_window.ts',
+  'src/ui/target_auras_window.ts',
   'src/ui/theme.ts',
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',

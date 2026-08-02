@@ -7,6 +7,16 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const sv_SE: Record<string, string> = {
+  'onlinePlayers.autoRefresh': 'Automatisk uppdatering ({minutes} min)',
+  'onlinePlayers.count': '{count} spelare online',
+  'onlinePlayers.countFiltered': '{shown} av {total} online',
+  'onlinePlayers.filteredEmpty': 'ingen spelare online matchar den här sökningen',
+  'onlinePlayers.loadFailed': 'kunde inte ladda spelare online',
+  'onlinePlayers.loading': 'laddar spelare online…',
+  'onlinePlayers.refresh': 'Uppdatera',
+  'onlinePlayers.searchLabel': 'Sök spelare online',
+  'onlinePlayers.searchPlaceholder': 'Sök spelare, klass, zon…',
+  'onlinePlayers.sortHint': 'klicka på en kolumn för att sortera',
   'alert.passwordLength': 'Ange ett nytt lösenord på 6 till 128 tecken.',
   'detail.resetPassword': 'Återställ lösenord',
   'dialog.actionResetPassword': 'Ange ett nytt lösenord och logga ut alla enheter',
@@ -122,7 +132,6 @@ export const sv_SE: Record<string, string> = {
   'stats.avgTick': 'genomsnittligt tick',
   'stats.serverRss': 'serverns rss',
   'online.title': 'Spelare online',
-  'online.refreshHint': 'uppdateras var 5:e sekund',
   'online.empty': 'ingen är online just nu',
   'online.colCharacter': 'Karaktär',
   'online.colClass': 'Klass',

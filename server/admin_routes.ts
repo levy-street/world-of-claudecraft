@@ -29,6 +29,18 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/perf/tick', permission: 'ops.perf' },
   { method: 'POST', pattern: '/admin/api/perf/tick/capture', permission: 'ops.perf' },
   { method: 'GET', pattern: '/admin/api/characters', permission: 'accounts.read' },
+  { method: 'GET', pattern: '/admin/api/guilds', permission: 'accounts.read' },
+  { method: 'GET', pattern: /^\/admin\/api\/guilds\/(\d+)$/, permission: 'accounts.read' },
+  {
+    method: 'GET',
+    pattern: /^\/admin\/api\/guilds\/(\d+)\/history$/,
+    permission: 'moderation.read',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/guilds\/(\d+)\/rename$/,
+    permission: 'moderation.act',
+  },
 
   { method: 'GET', pattern: '/admin/api/accounts', permission: 'accounts.read' },
   { method: 'GET', pattern: /^\/admin\/api\/accounts\/(\d+)$/, permission: 'accounts.read' },

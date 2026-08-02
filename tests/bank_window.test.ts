@@ -197,7 +197,7 @@ describe('bank_window: hud.ts wiring', () => {
       /openBank\(\): void \{[\s\S]{0,600}?if \(this\.vendorOpen\) this\.closeVendor\(\);[\s\S]{0,600}?classList\.add\('bank-open'\)/,
     );
     expect(hud).toMatch(
-      /openVendor\(npcId: number\): void \{[\s\S]{0,600}?if \(this\.bankWindowOpen\) this\.closeBank\(\);/,
+      /openVendor\(npcId: number, opener\?: HTMLElement \| null\): void \{[\s\S]{0,600}?if \(this\.bankWindowOpen\) this\.closeBank\(\);/,
     );
   });
 
@@ -208,7 +208,7 @@ describe('bank_window: hud.ts wiring', () => {
     // arms need their own wiring or the two windows overlap and the mobile
     // cluster-close precedence strands the bank at half-width with its x-btn hidden.
     expect(hud).toMatch(
-      /openHeroicVendor\(npcId: number\): void \{[\s\S]{0,600}?if \(this\.bankWindowOpen\) this\.closeBank\(\);/,
+      /openHeroicVendor\(npcId: number, opener\?: HTMLElement \| null\): void \{[\s\S]{0,600}?if \(this\.bankWindowOpen\) this\.closeBank\(\);/,
     );
     expect(hud).toMatch(
       /openBank\(\): void \{[\s\S]{0,600}?if \(this\.openHeroicVendorNpcId !== null\) this\.closeHeroicVendor\(\);[\s\S]{0,600}?classList\.add\('bank-open'\)/,

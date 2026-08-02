@@ -44,6 +44,9 @@ const accountDetail = {
       name: 'Merlin',
       class: 'mage',
       level: 42,
+      guildId: 12,
+      guildName: 'Arcane Circle',
+      guildRank: 'officer',
       copper: 456,
       xp: 123,
       pos: { x: 1, z: 2 },
@@ -85,6 +88,9 @@ const charactersPage = {
       copper: 456,
       accountId: 1,
       username: 'alice',
+      guildId: 12,
+      guildName: 'Arcane Circle',
+      guildRank: 'officer',
       createdAt: '2026-01-01T00:00:00Z',
       updatedAt: '2026-06-01T00:00:00Z',
     },
@@ -151,6 +157,8 @@ describe('Players pages', () => {
     render(Characters);
     expect(await screen.findByText('Merlin')).toBeInTheDocument();
     expect(screen.getByPlaceholderText(t('characters.searchPlaceholder'))).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Arcane Circle' })).toBeInTheDocument();
+    expect(screen.getByText(t('guilds.rank.officer'))).toBeInTheDocument();
     expect(
       screen.getByRole('columnheader', { name: new RegExp(t('characters.colLevel')) }),
     ).toBeInTheDocument();
@@ -181,6 +189,10 @@ describe('Players pages', () => {
     expect(within(summary).getByText(t('accounts.colId'))).toBeInTheDocument();
     expect(within(dialog).getByRole('button', { name: t('detail.forceNameChange') })).toHaveClass(
       'btn-sm',
+    );
+    expect(within(dialog).getByRole('link', { name: 'Arcane Circle' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('page=guilds&guildId=12'),
     );
     expect(screen.getByText(t('moderation.badgeOnline'))).toBeInTheDocument();
     expect(screen.getByText(t('detail.statusActive'))).toBeInTheDocument();

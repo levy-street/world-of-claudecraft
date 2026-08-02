@@ -109,14 +109,6 @@ export function isActiveEscortee(ctx: SimContext, e: Entity): boolean {
   return false;
 }
 
-function idleEscortDefFor(ctx: SimContext, e: Entity): EscortDef | null {
-  for (const state of ctx.escortRuns.values()) {
-    if (state.npcId !== e.id || state.run !== null) continue;
-    return ESCORTS[state.escortId] ?? null;
-  }
-  return null;
-}
-
 // Interact hook: if this player stands near an idle escortee whose quest they
 // have active, start the run. Called with the player's explicit target first,
 // then with a proximity scan fallback (interaction.ts). Returns true when a
@@ -265,7 +257,7 @@ function creditEscort(ctx: SimContext, def: EscortDef, npc: Entity): void {
   const objective = quest.objectives[objectiveIndex];
   for (const meta of ctx.players.values()) {
     const qp = meta.questLog.get(def.questId);
-    if (!qp || qp.state !== 'active') continue;
+    if (qp?.state !== 'active') continue;
     const p = ctx.entities.get(meta.entityId);
     if (!p || p.dead || dist2d(p.pos, npc.pos) > def.creditRadius) continue;
     const required = questObjectiveRequired(quest, qp, objectiveIndex);

@@ -104,10 +104,13 @@ describe('graphics tier resolution', () => {
     expect(tierFromHints({ ...desktop, graphicsPreset: 3 }, false)).toBe('high');
     expect(tierFromHints({ ...desktop, graphicsPreset: 4 }, false)).toBe('ultra');
     expect(tierFromHints({ ...desktop, graphicsPreset: 5 }, false)).toBe('high');
+    expect(tierFromHints({ ...desktop, graphicsPreset: 6 }, false)).toBe('insane');
     expect(tierFromHints({ ...desktop, search: '?gfx=low', graphicsPreset: 3 }, false)).toBe('low');
+    expect(tierFromHints({ ...desktop, search: '?gfx=insane' }, false)).toBe('insane');
+    expect(forcedTierFromSearch('?gfx=insane')).toBe('insane');
   });
 
-  it('labels presets and runs the budget governor on every tier except ultra', () => {
+  it('labels presets and runs the budget governor on every tier by default', () => {
     expect(graphicsPresetLabel(undefined)).toBe('ultra');
     expect(graphicsPresetLabel(0)).toBe('low');
     expect(graphicsPresetLabel(1)).toBe('low');
@@ -115,17 +118,19 @@ describe('graphics tier resolution', () => {
     expect(graphicsPresetLabel(3)).toBe('high');
     expect(graphicsPresetLabel(4)).toBe('ultra');
     expect(graphicsPresetLabel(5)).toBe('advanced');
-    // The governor follows the RESOLVED tier: ON for low/medium/high, OFF only at ultra. A
-    // first-run inconclusive device (the medium fallback) now keeps the governor ON to adapt; the
-    // old unset-preset -> ultra label used to opt it out (no runtime adaptation on weak devices).
+    expect(graphicsPresetLabel(6)).toBe('insane');
+    // The governor follows the RESOLVED tier and stays armed on every tier. Ultra and insane use
+    // loose budgets so a transient dip cannot fight the selected preset.
     expect(shouldUseAutoGovernor('low', '')).toBe(true);
     expect(shouldUseAutoGovernor('medium', '')).toBe(true);
     expect(shouldUseAutoGovernor('high', '')).toBe(true);
-    expect(shouldUseAutoGovernor('ultra', '')).toBe(false);
-    // The URL governor override beats the tier (force on even at ultra, off below it).
+    expect(shouldUseAutoGovernor('ultra', '')).toBe(true);
+    expect(shouldUseAutoGovernor('insane', '')).toBe(true);
+    // The URL governor override beats the tier.
     expect(shouldUseAutoGovernor('ultra', '?gfx=ultra&governor=1')).toBe(true);
     expect(shouldUseAutoGovernor('low', '?governor=0')).toBe(false);
-    expect(shouldUseAutoGovernor('ultra', '?gfx=ultra')).toBe(false);
+    expect(shouldUseAutoGovernor('ultra', '?gfx=ultra')).toBe(true);
+    expect(shouldUseAutoGovernor('ultra', '?gfx=ultra&governor=0')).toBe(false);
   });
 
   it('keeps every quality tier bounded by explicit runtime budgets', () => {
@@ -136,8 +141,16 @@ describe('graphics tier resolution', () => {
       expect(budget.minRenderScaleMobile).toBeGreaterThanOrEqual(0.5);
       expect(budget.dropFrameMs).toBeLessThan(budget.urgentFrameMs);
       expect(budget.recoverFrameMs).toBeLessThan(budget.dropFrameMs);
-      expect(tier).toMatch(/^(low|medium|high|ultra)$/);
+      expect(tier).toMatch(/^(low|medium|high|ultra|insane)$/);
     }
+    // Premium tiers use literal-pinned disaster thresholds. High reacts at 22/32ms, while
+    // ultra and insane wait for sustained 30ms pressure or a 44ms urgent frame.
+    expect(GFX_BUDGETS.high.dropFrameMs).toBe(22);
+    expect(GFX_BUDGETS.high.urgentFrameMs).toBe(32);
+    expect(GFX_BUDGETS.ultra.dropFrameMs).toBe(30);
+    expect(GFX_BUDGETS.ultra.urgentFrameMs).toBe(44);
+    expect(GFX_BUDGETS.insane.dropFrameMs).toBe(30);
+    expect(GFX_BUDGETS.insane.urgentFrameMs).toBe(44);
   });
 
   it('defines tunable bucket bands for every quality tier', () => {
@@ -164,7 +177,7 @@ describe('graphics tier resolution', () => {
         expect(band.min).toBeLessThanOrEqual(band.baseline);
         expect(band.baseline).toBeLessThanOrEqual(band.max);
       }
-      expect(tier).toMatch(/^(low|medium|high|ultra)$/);
+      expect(tier).toMatch(/^(low|medium|high|ultra|insane)$/);
     }
     expect(GFX_BUCKET_BANDS.low.grass.baseline).toBeGreaterThan(GFX_BUCKET_BANDS.low.grass.min);
     expect(GFX_BUCKET_BANDS.low.foliage.baseline).toBeGreaterThan(GFX_BUCKET_BANDS.low.foliage.min);
@@ -202,26 +215,165 @@ describe('graphics tier resolution', () => {
     expect(medium.shadowMap).toBeGreaterThan(low.shadowMap);
     expect(medium.shadowMap).toBeLessThan(high.shadowMap);
     expect(medium.pixelRatioCap).toBeLessThan(high.pixelRatioCap);
+    expect(medium.msaaSamples).toBe(0);
+    expect(medium.smaa).toBe(true);
 
     expect(high.standardMaterials).toBe(true);
     expect(high.dynamicShadows).toBe(true);
     expect(high.composer).toBe(true);
     expect(high.ao).toBe(true);
-    expect(high.msaaSamples).toBe(4);
+    expect(high.msaaSamples).toBe(0);
+    expect(high.smaa).toBe(true);
     expect(high.shadowMap).toBe(4096);
 
     expect(ultra.standardMaterials).toBe(true);
     expect(ultra.composer).toBe(true);
     expect(ultra.ao).toBe(true);
-    expect(ultra.msaaSamples).toBe(4);
+    expect(ultra.msaaSamples).toBe(0);
+    expect(ultra.smaa).toBe(true);
     expect(ultra.shadowMap).toBe(high.shadowMap);
-    expect(ultra.pixelRatioCap).toBeGreaterThan(high.pixelRatioCap);
+    expect(ultra.pixelRatioCap).toBe(high.pixelRatioCap);
     expect(GFX_BUCKET_BANDS.ultra.grass.baseline).toBeGreaterThan(
       GFX_BUCKET_BANDS.high.grass.baseline,
     );
     expect(GFX_BUCKET_BANDS.ultra.foliage.baseline).toBeGreaterThan(
       GFX_BUCKET_BANDS.high.foliage.baseline,
     );
+  });
+
+  it('insane is the everything-on tier above ultra, and only ever a manual opt-in', () => {
+    const high = gfxInternalsForTest.settingsFor('high');
+    const ultra = gfxInternalsForTest.settingsFor('ultra');
+    const insane = gfxInternalsForTest.settingsFor('insane');
+    // Full premium pipeline, matching ultra's knobs (the tiers differ inside
+    // the render layers: worn-stone taps, terrain micro-shadow).
+    expect(insane.standardMaterials).toBe(true);
+    expect(insane.composer).toBe(true);
+    expect(insane.ao).toBe(true);
+    expect(insane.gradePass).toBe(true);
+    expect(insane.msaaSamples).toBe(0);
+    expect(insane.smaa).toBe(true);
+    expect(insane.shadowMap).toBe(ultra.shadowMap);
+    expect(insane.pixelRatioCap).toBe(ultra.pixelRatioCap);
+    expect(insane.grassRadius).toBe(ultra.grassRadius);
+    expect(insane.grassStep).toBe(ultra.grassStep);
+    expect(
+      ['low', 'medium', 'high', 'ultra', 'insane'].map(
+        (tier) =>
+          gfxInternalsForTest.settingsFor(tier as 'low' | 'medium' | 'high' | 'ultra' | 'insane')
+            .farGrassDensityFloor,
+      ),
+    ).toEqual([0.55, 0.62, 0.7, 0.75, 0.8]);
+    expect(insane.terrainSplat).toBe(true);
+    expect(insane.leanFoliage).toBe(false);
+    // The round-10 detail-layer ladder: the overhaul's near-field layers
+    // (worn surfaces, blade carpet, cliff scree, canopy clumps, terrain
+    // relief) run at high and up ONLY; medium keeps its pre-overhaul look and
+    // cost. Insane owns the 4-tap full-clamp worn parallax and shares the
+    // terrain micro-shadow (relief 3) with ultra; high runs the shallower
+    // 3-tap 0.65-clamp walk and relief 2 (no micro-shadow).
+    const medium = gfxInternalsForTest.settingsFor('medium');
+    for (const below of [gfxInternalsForTest.settingsFor('low'), medium]) {
+      expect(below.surfaceDetail).toBe(false);
+      expect(below.surfaceDetailTaps).toBe(0);
+      expect(below.bladeCarpetRadius).toBe(0);
+      expect(below.cliffScree).toBe(false);
+      expect(below.canopyDetail).toBe(false);
+      expect(below.terrainRelief).toBe(0);
+    }
+    for (const tier of [high, ultra, insane]) {
+      expect(tier.surfaceDetail).toBe(true);
+      expect(tier.bladeCarpetRadius).toBe(34);
+      expect(tier.cliffScree).toBe(true);
+      expect(tier.canopyDetail).toBe(true);
+      expect(tier.bloom).toBe(true);
+    }
+    expect(high.surfaceDetailTaps).toBe(3);
+    expect(high.surfaceDetailClampK).toBe(0.65);
+    expect(ultra.surfaceDetailTaps).toBe(3);
+    expect(ultra.surfaceDetailClampK).toBe(0.85);
+    expect(insane.surfaceDetailTaps).toBe(4);
+    expect(insane.surfaceDetailClampK).toBe(1);
+    expect(high.terrainRelief).toBe(2);
+    expect(ultra.terrainRelief).toBe(3);
+    expect(insane.terrainRelief).toBe(3);
+    expect(high.aoFullRes).toBe(false);
+    expect(ultra.aoFullRes).toBe(true);
+    expect(insane.aoFullRes).toBe(true);
+    expect(high.smaa).toBe(true);
+    // Hardware detection can never land on insane: the strongest recognized
+    // desktop resolves to ultra (4); insane is a manual choice only.
+    expect(
+      resolveDefaultGraphicsPreset({
+        ...desktop,
+        deviceMemory: 8,
+        hardwareConcurrency: 16,
+        gpuRenderer: 'NVIDIA GeForce RTX 4090',
+      }),
+    ).toBe(4);
+  });
+
+  it('the advanced sub-setting ladders map onto the same tier knobs, back-compatibly', () => {
+    const adv = (overrides: Partial<GfxRuntimeHints>) =>
+      gfxInternalsForTest.settingsFor('high', { graphicsPreset: 5, ...overrides });
+    // Historical binary values keep their meaning: 0 is Low, 1 is High.
+    const legacyLowTerrain = adv({ terrainDetail: 0 });
+    expect(legacyLowTerrain.terrainSplat).toBe(false);
+    expect(legacyLowTerrain.terrainRelief).toBe(0);
+    expect(adv({ terrainDetail: 1 }).terrainRelief).toBe(2);
+    // The new levels: Medium (0.5) buys cavity-only relief, Insane (2) the
+    // ultra micro-shadow execution.
+    expect(adv({ terrainDetail: 0.5 }).terrainRelief).toBe(1);
+    expect(adv({ terrainDetail: 2 }).terrainRelief).toBe(3);
+    // Foliage: Low keeps the historical sparse tufts and sheds the overhaul
+    // layers; Medium buys the reduced carpet; Insane extends the ring.
+    const foliageLow = adv({ foliageDensity: 0 });
+    expect(foliageLow.grassStep).toBe(3.8);
+    expect(foliageLow.farGrassDensityFloor).toBe(0.5);
+    expect(foliageLow.bladeCarpetRadius).toBe(0);
+    expect(foliageLow.cliffScree).toBe(false);
+    expect(foliageLow.canopyDetail).toBe(false);
+    const foliageMedium = adv({ foliageDensity: 0.5 });
+    expect(foliageMedium.farGrassDensityFloor).toBe(0.62);
+    expect(foliageMedium.bladeCarpetRadius).toBe(24);
+    expect(foliageMedium.cliffScree).toBe(false);
+    expect(adv({ foliageDensity: 1 }).bladeCarpetRadius).toBe(34);
+    expect(adv({ foliageDensity: 2 }).bladeCarpetRadius).toBe(40);
+    expect(adv({ foliageDensity: 2 }).farGrassDensityFloor).toBe(0.85);
+    // Surface Detail (the town-cost dial): Off / Basic / Full / Insane.
+    const surfaceOff = adv({ surfaceDetail: 0 });
+    expect(surfaceOff.surfaceDetail).toBe(false);
+    expect(surfaceOff.surfaceDetailTaps).toBe(0);
+    const surfaceBasic = adv({ surfaceDetail: 0.5 });
+    expect(surfaceBasic.surfaceDetail).toBe(true);
+    expect(surfaceBasic.surfaceDetailTaps).toBe(0);
+    expect(adv({ surfaceDetail: 1 }).surfaceDetailTaps).toBe(3);
+    expect(adv({ surfaceDetail: 1 }).surfaceDetailClampK).toBe(0.85);
+    expect(adv({ surfaceDetail: 2 }).surfaceDetailTaps).toBe(4);
+    expect(adv({ surfaceDetail: 2 }).surfaceDetailClampK).toBe(1);
+    // Effects & Lighting: Low is the grade-only mini composer; Medium adds
+    // N8AO without bloom/SMAA; High keeps the full high-tier stack.
+    const effectsLow = adv({ effectsQuality: 0 });
+    expect(effectsLow.composer).toBe(false);
+    expect(effectsLow.gradePass).toBe(true);
+    expect(effectsLow.ao).toBe(false);
+    expect(effectsLow.msaaSamples).toBe(0);
+    expect(effectsLow.smaa).toBe(true);
+    const effectsMedium = adv({ effectsQuality: 0.5 });
+    expect(effectsMedium.ao).toBe(true);
+    expect(effectsMedium.bloom).toBe(false);
+    expect(effectsMedium.smaa).toBe(false);
+    const effectsHigh = adv({ effectsQuality: 1 });
+    expect(effectsHigh.ao).toBe(true);
+    expect(effectsHigh.bloom).toBe(true);
+    expect(effectsHigh.smaa).toBe(true);
+    // Shadows: pure map-size steps; terrain-cast joins at High.
+    expect(adv({ shadowQuality: 0 }).shadowMap).toBe(1024);
+    expect(adv({ shadowQuality: 0 }).terrainCastShadows).toBe(false);
+    expect(adv({ shadowQuality: 0.5 }).shadowMap).toBe(2560);
+    expect(adv({ shadowQuality: 1 }).shadowMap).toBe(4096);
+    expect(adv({ shadowQuality: 1 }).terrainCastShadows).toBe(true);
+    expect(adv({ shadowQuality: 2 }).shadowMap).toBe(8192);
   });
 
   it('sheds the memory-spike knobs on constrained (phone-class) browsers, cosmetics only', () => {
@@ -262,6 +414,7 @@ describe('graphics tier resolution', () => {
     expect(medium.leanFoliage).toBe(false);
     expect(medium.grassRadius).toBe(62);
     expect(medium.grassStep).toBe(2.35);
+    expect(medium.farGrassDensityFloor).toBe(0.55);
     expect(medium.maxPointLights).toBe(3);
     expect(high.composer).toBe(desktopHigh.composer);
     expect(high.ao).toBe(desktopHigh.ao);
@@ -316,6 +469,7 @@ describe('graphics tier resolution', () => {
     expect(medium.pixelRatioCap).toBeLessThanOrEqual(1.25);
     expect(medium.grassRadius).toBeLessThan(62);
     expect(medium.grassStep).toBeGreaterThan(2.35);
+    expect(medium.farGrassDensityFloor).toBe(0.5);
     expect(medium.maxPointLights).toBe(2);
     expect(medium.maxPooledCharacterVisuals).toBe(6);
 
@@ -414,6 +568,25 @@ describe('graphics tier resolution', () => {
       effectsQuality: 0,
     });
     expect(advanced.maxPointLights).toBe(2);
+  });
+
+  it('routes Advanced low effects through the low static effects tier', () => {
+    const low = gfxInternalsForTest.settingsFor('low', {
+      graphicsPreset: 1,
+      effectsQuality: 1,
+    });
+    const advancedLow = gfxInternalsForTest.settingsFor('high', {
+      graphicsPreset: 5,
+      effectsQuality: 0.49,
+    });
+    const advancedFull = gfxInternalsForTest.settingsFor('high', {
+      graphicsPreset: 5,
+      effectsQuality: 0.5,
+    });
+
+    expect(low.effectsTier).toBe('low');
+    expect(advancedLow.effectsTier).toBe('low');
+    expect(advancedFull.effectsTier).toBe('high');
   });
 
   it('detects the packaged runtime platform from shipping navigator values', () => {

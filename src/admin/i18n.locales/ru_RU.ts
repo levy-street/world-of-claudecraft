@@ -7,6 +7,16 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ru_RU: Record<string, string> = {
+  'onlinePlayers.autoRefresh': 'Автообновление ({minutes} мин)',
+  'onlinePlayers.count': '{count} в сети',
+  'onlinePlayers.countFiltered': '{shown} из {total} в сети',
+  'onlinePlayers.filteredEmpty': 'ни один игрок в сети не соответствует этому поиску',
+  'onlinePlayers.loadFailed': 'не удалось загрузить игроков в сети',
+  'onlinePlayers.loading': 'загрузка игроков в сети…',
+  'onlinePlayers.refresh': 'Обновить',
+  'onlinePlayers.searchLabel': 'Поиск игроков в сети',
+  'onlinePlayers.searchPlaceholder': 'Поиск по игроку, классу, зоне…',
+  'onlinePlayers.sortHint': 'нажмите на столбец для сортировки',
   'detail.dailyRewardsActions': 'Действия модерации ежедневных наград',
   'detail.dailyRewardsBan': 'Запретить участие в ежедневных наградах',
   'detail.dailyRewardsBanReason': 'Причина запрета ежедневных наград: {value}',
@@ -166,7 +176,6 @@ export const ru_RU: Record<string, string> = {
   'stats.serverRss': 'память сервера',
   'stats.playersCap': 'лимит игроков',
   'online.title': 'Игроки онлайн',
-  'online.refreshHint': 'обновляется каждые 5с',
   'online.empty': 'сейчас никого нет онлайн',
   'online.colCharacter': 'Персонаж',
   'online.colClass': 'Класс',
