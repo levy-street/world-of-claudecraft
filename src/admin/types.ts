@@ -888,3 +888,23 @@ export interface MarketMoversResponse {
   risers: MarketMoverRow[];
   fallers: MarketMoverRow[];
 }
+
+export type MarketAlertDirection = 'below' | 'above';
+
+export interface MarketAlertRow {
+  id: number;
+  itemId: string;
+  name: string;
+  metric: string;
+  direction: MarketAlertDirection;
+  thresholdCopper: number;
+  active: boolean;
+  createdAt: string;
+  lastTriggeredAt: string | null;
+  lastValueCopper: number | null;
+}
+
+export interface MarketAlertsResponse {
+  realm: string;
+  rows: MarketAlertRow[];
+}

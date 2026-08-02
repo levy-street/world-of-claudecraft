@@ -100,7 +100,25 @@ const itemData = {
   ],
 };
 
-const mocks = vi.hoisted(() => ({ apiGet: vi.fn() }));
+const alertsData = {
+  realm: 'eastbrook',
+  rows: [
+    {
+      id: 7,
+      itemId: 'wolf_fang',
+      name: 'Wolf Fang',
+      metric: 'lowest_ask',
+      direction: 'below',
+      thresholdCopper: 150,
+      active: true,
+      createdAt: '2026-08-01T00:00:00Z',
+      lastTriggeredAt: '2026-08-02T00:00:00Z',
+      lastValueCopper: 120,
+    },
+  ],
+};
+
+const mocks = vi.hoisted(() => ({ apiGet: vi.fn(), apiPost: vi.fn() }));
 
 vi.mock('../../src/admin/api', () => ({
   ApiError: class ApiError extends Error {
@@ -111,7 +129,7 @@ vi.mock('../../src/admin/api', () => ({
     }
   },
   apiGet: mocks.apiGet,
-  apiPost: vi.fn(),
+  apiPost: mocks.apiPost,
   getToken: () => 'tok',
   getAdminName: () => 'alice',
   clearSession: () => {},
@@ -119,15 +137,19 @@ vi.mock('../../src/admin/api', () => ({
 
 import { t } from '../../src/admin/i18n';
 import Market from '../../src/admin/pages/Market.svelte';
+import MarketAlerts from '../../src/admin/pages/MarketAlerts.svelte';
 import MarketFlips from '../../src/admin/pages/MarketFlips.svelte';
 import MarketItemDetail from '../../src/admin/pages/MarketItemDetail.svelte';
 
 beforeEach(() => {
   mocks.apiGet.mockReset();
+  mocks.apiPost.mockReset();
+  mocks.apiPost.mockResolvedValue({ ok: true });
   mocks.apiGet.mockImplementation(async (path: string) => {
     if (path.startsWith('/admin/api/market/overview')) return overviewData;
     if (path.startsWith('/admin/api/market/flips')) return flipsData;
     if (path.startsWith('/admin/api/market/item')) return itemData;
+    if (path.startsWith('/admin/api/market/alerts')) return alertsData;
     throw new Error(`unexpected path ${path}`);
   });
 });
@@ -196,5 +218,37 @@ describe('Market item detail page', () => {
     });
     render(MarketItemDetail, { props: { item: 'nope' } });
     expect(await screen.findByText(t('market.unknownItem'))).toBeInTheDocument();
+  });
+});
+
+describe('Price alerts page', () => {
+  // Role-scoped queries throughout: the create form's datalist repeats every
+  // item name, so a bare findByText('Wolf Fang') is ambiguous by design.
+  it('renders the alert with its condition and last-fired value', async () => {
+    render(MarketAlerts);
+    expect(await screen.findByRole('link', { name: 'Wolf Fang' })).toBeInTheDocument();
+    expect(screen.getByText(t('market.conditionBelow', { price: '1s 50c' }))).toBeInTheDocument();
+    // Ask when fired: 120c -> "1s 20c".
+    expect(screen.getByText('1s 20c')).toBeInTheDocument();
+  });
+
+  it('creating an alert posts the form and refreshes the list', async () => {
+    render(MarketAlerts);
+    await screen.findByRole('link', { name: 'Wolf Fang' });
+    const itemInput = screen.getByLabelText(t('market.alertItemLabel'));
+    await fireEvent.input(itemInput, { target: { value: 'spring_water' } });
+    await fireEvent.click(screen.getByRole('button', { name: t('market.alertCreate') }));
+    expect(mocks.apiPost).toHaveBeenCalledWith('/admin/api/market/alerts', {
+      item: 'spring_water',
+      direction: 'below',
+      thresholdCopper: 10000,
+    });
+  });
+
+  it('deleting an alert posts its id', async () => {
+    render(MarketAlerts);
+    await screen.findByRole('link', { name: 'Wolf Fang' });
+    await fireEvent.click(screen.getByRole('button', { name: t('market.alertDelete') }));
+    expect(mocks.apiPost).toHaveBeenCalledWith('/admin/api/market/alerts/delete', { id: 7 });
   });
 });

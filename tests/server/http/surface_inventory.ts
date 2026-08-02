@@ -1822,6 +1822,36 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/market/alerts',
+    handler: 'server/admin.ts marketAlertsGetHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/market/alerts',
+    handler: 'server/admin.ts marketAlertsPostHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/market/alerts/delete',
+    handler: 'server/admin.ts marketAlertsDeleteHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // v0.22.0 release merge: staff identity + fine-grained role management
   // (accounts.admin_roles; the central ADMIN_ROUTE_PERMISSIONS gate authorizes
   // every authed admin route, so authScope stays the shared admin gate).

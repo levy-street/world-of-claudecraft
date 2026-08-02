@@ -5,9 +5,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // no pg mock and no DATABASE_URL requirement.
 import {
   anonymizeMarketSalesForCharacter,
+  deleteMarketAlert,
+  insertMarketAlert,
   insertMarketListingSnapshotRows,
   insertMarketSaleRow,
+  loadActiveMarketAlerts,
   type MarketListingSnapshotRow,
+  markMarketAlertTriggered,
   pruneMarketListingSnapshotsBatch,
   reconcileMarketSalesCharacterIds,
 } from '../server/market_tracker_db';
@@ -144,6 +148,53 @@ describe('anonymizeMarketSalesForCharacter', () => {
     expect(query.mock.calls[0][1]).toEqual([42]);
     expect(query.mock.calls[1][0]).toContain('SET seller_character_id = NULL');
     expect(query.mock.calls[1][1]).toEqual([42]);
+  });
+});
+
+describe('market alerts SQL', () => {
+  it('insert stamps the v1 metric and the creator, returning the id', async () => {
+    query.mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 });
+    const id = await insertMarketAlert(pool, {
+      realm: 'eastbrook',
+      itemId: 'wolf_fang',
+      direction: 'below',
+      thresholdCopper: 150,
+      createdByAccountId: 9,
+    });
+    expect(id).toBe(7);
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toContain('INSERT INTO market_alerts');
+    expect(sql).toContain('RETURNING id');
+    expect(params).toEqual(['eastbrook', 'wolf_fang', 'lowest_ask', 'below', 150, 9]);
+  });
+
+  it('delete is realm-scoped and reports whether a row went', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 1 });
+    await expect(deleteMarketAlert(pool, 'eastbrook', 7)).resolves.toBe(true);
+    expect(query.mock.calls[0][0]).toContain('WHERE realm = $1 AND id = $2');
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    await expect(deleteMarketAlert(pool, 'eastbrook', 8)).resolves.toBe(false);
+  });
+
+  it('the evaluation load takes only active lowest-ask alerts', async () => {
+    query.mockResolvedValueOnce({
+      rows: [{ id: '7', item_id: 'wolf_fang', direction: 'below', threshold_copper: '150' }],
+      rowCount: 1,
+    });
+    const alerts = await loadActiveMarketAlerts(pool, 'eastbrook');
+    expect(alerts).toEqual([
+      { id: 7, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 150 },
+    ]);
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toContain('WHERE realm = $1 AND active AND metric = $2');
+    expect(params).toEqual(['eastbrook', 'lowest_ask']);
+  });
+
+  it('marking a trigger rounds the carried value', async () => {
+    await markMarketAlertTriggered(pool, 7, 199.5);
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toContain('SET last_triggered_at = now(), last_value_copper = $2');
+    expect(params).toEqual([7, 200]);
   });
 });
 

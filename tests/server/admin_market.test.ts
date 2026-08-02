@@ -47,13 +47,14 @@ async function runRoute(
   path: string,
   url: string,
   headers?: Record<string, string>,
+  body?: unknown,
 ) {
   const route = routes.find((r) => r.method === method && r.path === path);
   if (!route) throw new Error(`no route ${method} ${path}`);
   const terminal: Middleware = async (c) => {
     await route.handler(c);
   };
-  const ctx = fakeCtx({ method, url, headers });
+  const ctx = fakeCtx({ method, url, headers, body });
   await compose([
     withErrors({ surface: route.meta?.envelope }),
     ...(route.middleware ?? []),
@@ -261,5 +262,116 @@ describe('GET /admin/api/market/movers', () => {
       { authorization: BEARER },
     );
     expect(r.body.data.windowHours).toBe(24);
+  });
+});
+
+describe('market alerts routes', () => {
+  it('lists alerts with the item name resolved from the catalog', async () => {
+    authedAdminDb({
+      listMarketAlerts: async () => [
+        {
+          id: 7,
+          itemId: 'wolf_fang',
+          metric: 'lowest_ask',
+          direction: 'below',
+          thresholdCopper: 150,
+          active: true,
+          createdAt: new Date('2026-08-01T00:00:00Z'),
+          lastTriggeredAt: null,
+          lastValueCopper: null,
+        },
+      ],
+    });
+    const r = await runRoute('GET', '/admin/api/market/alerts', '/admin/api/market/alerts', {
+      authorization: BEARER,
+    });
+    expect(r.status).toBe(200);
+    // The name comes from the real ITEMS registry, so a wrong join reddens here.
+    expect(r.body.data.rows[0]).toMatchObject({
+      id: 7,
+      itemId: 'wolf_fang',
+      name: 'Cracked Wolf Fang',
+    });
+  });
+
+  it('creates an alert stamped with the caller and echoes the id', async () => {
+    const insert = vi.fn(async () => 42);
+    authedAdminDb({ insertMarketAlert: insert });
+    const r = await runRoute(
+      'POST',
+      '/admin/api/market/alerts',
+      '/admin/api/market/alerts',
+      { authorization: BEARER },
+      { item: 'wolf_fang', direction: 'below', thresholdCopper: 150 },
+    );
+    expect(r.status).toBe(200);
+    expect(r.body.data).toEqual({ id: 42 });
+    expect(insert).toHaveBeenCalledWith({
+      itemId: 'wolf_fang',
+      direction: 'below',
+      thresholdCopper: 150,
+      createdByAccountId: ADMIN_ACCOUNT_ID,
+    });
+  });
+
+  it('refuses an unknown item, a bad direction, and a bad threshold', async () => {
+    const insert = vi.fn(async () => 42);
+    authedAdminDb({ insertMarketAlert: insert });
+    const unknown = await runRoute(
+      'POST',
+      '/admin/api/market/alerts',
+      '/admin/api/market/alerts',
+      { authorization: BEARER },
+      { item: 'nope', direction: 'below', thresholdCopper: 150 },
+    );
+    expect(unknown.status).toBe(404);
+    const direction = await runRoute(
+      'POST',
+      '/admin/api/market/alerts',
+      '/admin/api/market/alerts',
+      { authorization: BEARER },
+      { item: 'wolf_fang', direction: 'sideways', thresholdCopper: 150 },
+    );
+    expect(direction.status).toBe(400);
+    for (const bad of [0, -5, 1.5, 5_000_001, 'x']) {
+      const r = await runRoute(
+        'POST',
+        '/admin/api/market/alerts',
+        '/admin/api/market/alerts',
+        { authorization: BEARER },
+        { item: 'wolf_fang', direction: 'below', thresholdCopper: bad },
+      );
+      expect(r.status).toBe(400);
+    }
+    expect(insert).not.toHaveBeenCalled();
+  });
+
+  it('deletes by id and 404s a missing alert', async () => {
+    const del = vi.fn(async (id: number) => id === 7);
+    authedAdminDb({ deleteMarketAlert: del });
+    const gone = await runRoute(
+      'POST',
+      '/admin/api/market/alerts/delete',
+      '/admin/api/market/alerts/delete',
+      { authorization: BEARER },
+      { id: 7 },
+    );
+    expect(gone.status).toBe(200);
+    const missing = await runRoute(
+      'POST',
+      '/admin/api/market/alerts/delete',
+      '/admin/api/market/alerts/delete',
+      { authorization: BEARER },
+      { id: 8 },
+    );
+    expect(missing.status).toBe(404);
+    const invalid = await runRoute(
+      'POST',
+      '/admin/api/market/alerts/delete',
+      '/admin/api/market/alerts/delete',
+      { authorization: BEARER },
+      { id: 'x' },
+    );
+    expect(invalid.status).toBe(400);
   });
 });

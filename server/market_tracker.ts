@@ -18,10 +18,13 @@
 import type { MarketListing } from '../src/sim/market';
 import { pool } from './db';
 import {
+  type ActiveMarketAlert,
   insertMarketListingSnapshotRows,
   insertMarketSaleRow,
+  loadActiveMarketAlerts,
   type MarketListingSnapshotRow,
   type MarketSaleRow,
+  markMarketAlertTriggered,
   reconcileMarketSalesCharacterIds,
 } from './market_tracker_db';
 import { REALM } from './realm';
@@ -176,16 +179,48 @@ export function snapshotMarketListings(
   return [...byItem.values()];
 }
 
+// Which alerts fire against this capture's book: an alert on the lowest unit
+// ask compares against its item's cheapest-by-unit stack. PURE. An item
+// absent from the rows has no player listings, so a 'below' alert cannot
+// fire (there is nothing to buy); an 'above' alert cannot either (there is
+// no ask at all), matching the metric's name.
+export function evaluateMarketAlerts(
+  alerts: readonly ActiveMarketAlert[],
+  rows: readonly MarketListingSnapshotRow[],
+): { id: number; valueCopper: number }[] {
+  const askByItem = new Map(
+    rows.map((row) => [row.itemId, row.lowestAskTotalCopper / row.lowestAskQuantity]),
+  );
+  const fired: { id: number; valueCopper: number }[] = [];
+  for (const alert of alerts) {
+    const ask = askByItem.get(alert.itemId);
+    if (ask === undefined) continue;
+    const met =
+      alert.direction === 'below' ? ask < alert.thresholdCopper : ask > alert.thresholdCopper;
+    if (met) fired.push({ id: alert.id, valueCopper: ask });
+  }
+  return fired;
+}
+
 // Snapshot the book fire-and-forget (the main.ts interval never awaits it).
 // An empty book writes nothing. One capture timestamp is taken here, before
 // chunking, so every row of this tick shares it (see market_tracker_db.ts).
+// Alert evaluation rides the same FIFO link, AFTER the insert, so a capture
+// and its alert state can never interleave with the next tick's.
 export function recordMarketListingSnapshot(listings: readonly MarketListing[]): void {
   try {
     const rows = snapshotMarketListings(listings);
     if (rows.length === 0) return;
     const capturedAt = new Date();
     tail = tail
-      .then(() => insertMarketListingSnapshotRows(pool, rows, capturedAt))
+      .then(async () => {
+        await insertMarketListingSnapshotRows(pool, rows, capturedAt);
+        const alerts = await loadActiveMarketAlerts(pool, REALM);
+        if (alerts.length === 0) return;
+        for (const fired of evaluateMarketAlerts(alerts, rows)) {
+          await markMarketAlertTriggered(pool, fired.id, fired.valueCopper);
+        }
+      })
       .catch((err) => {
         console.error('market_tracker snapshot write failed:', err);
       });

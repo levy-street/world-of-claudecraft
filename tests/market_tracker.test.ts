@@ -22,18 +22,26 @@ vi.mock('../server/market_tracker_db', () => ({
   pruneMarketListingSnapshots: vi.fn(async () => 0),
   anonymizeMarketSalesForCharacter: vi.fn(async () => {}),
   reconcileMarketSalesCharacterIds: vi.fn(async () => {}),
+  loadActiveMarketAlerts: vi.fn(async () => []),
+  markMarketAlertTriggered: vi.fn(async () => {}),
 }));
 
 import { GameServer } from '../server/game';
 import {
   captureMarketBuy,
   diffMarketBuy,
+  evaluateMarketAlerts,
   marketTrackerIdle,
   recordMarketBuy,
   recordMarketListingSnapshot,
   snapshotMarketListings,
 } from '../server/market_tracker';
-import { insertMarketListingSnapshotRows, insertMarketSaleRow } from '../server/market_tracker_db';
+import {
+  insertMarketListingSnapshotRows,
+  insertMarketSaleRow,
+  loadActiveMarketAlerts,
+  markMarketAlertTriggered,
+} from '../server/market_tracker_db';
 import { REALM } from '../server/realm';
 import type { MarketListing } from '../src/sim/market';
 import { groundHeight } from '../src/sim/world';
@@ -202,6 +210,51 @@ describe('snapshotMarketListings (pure)', () => {
   });
 });
 
+describe('evaluateMarketAlerts (pure)', () => {
+  const rows = snapshotMarketListings([
+    // wolf_fang: 1000 / 5 = 200c a unit.
+    listing({ id: 1, itemId: 'wolf_fang', count: 5, price: 1000 }),
+  ]);
+
+  it('fires below/above against the cheapest unit ask, with the value carried', () => {
+    const fired = evaluateMarketAlerts(
+      [
+        { id: 1, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 250 },
+        { id: 2, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 150 },
+        { id: 3, itemId: 'wolf_fang', direction: 'above', thresholdCopper: 150 },
+        { id: 4, itemId: 'wolf_fang', direction: 'above', thresholdCopper: 250 },
+      ],
+      rows,
+    );
+    expect(fired).toEqual([
+      { id: 1, valueCopper: 200 },
+      { id: 3, valueCopper: 200 },
+    ]);
+  });
+
+  it('an item with no listings fires nothing in either direction', () => {
+    const fired = evaluateMarketAlerts(
+      [
+        { id: 1, itemId: 'spring_water', direction: 'below', thresholdCopper: 999999 },
+        { id: 2, itemId: 'spring_water', direction: 'above', thresholdCopper: 1 },
+      ],
+      rows,
+    );
+    expect(fired).toEqual([]);
+  });
+
+  it('the threshold itself does not fire (strict comparison)', () => {
+    const fired = evaluateMarketAlerts(
+      [
+        { id: 1, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 200 },
+        { id: 2, itemId: 'wolf_fang', direction: 'above', thresholdCopper: 200 },
+      ],
+      rows,
+    );
+    expect(fired).toEqual([]);
+  });
+});
+
 // ── GameServer dispatch integration ───────────────────────────────────────────
 
 function fakeWs() {
@@ -356,5 +409,19 @@ describe('market sale dispatch integration', () => {
     recordMarketListingSnapshot([]);
     await marketTrackerIdle();
     expect(snapshotInsertMock).not.toHaveBeenCalled();
+  });
+
+  it('the snapshot tick evaluates alerts after the insert and marks the fired one', async () => {
+    const loadAlerts = vi.mocked(loadActiveMarketAlerts);
+    const markTriggered = vi.mocked(markMarketAlertTriggered);
+    loadAlerts.mockResolvedValueOnce([
+      { id: 7, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 250 },
+      { id: 8, itemId: 'wolf_fang', direction: 'below', thresholdCopper: 100 },
+    ]);
+    recordMarketListingSnapshot([listing({ itemId: 'wolf_fang', count: 5, price: 1000 })]);
+    await marketTrackerIdle();
+    expect(snapshotInsertMock).toHaveBeenCalledTimes(1);
+    expect(markTriggered).toHaveBeenCalledTimes(1);
+    expect(markTriggered).toHaveBeenCalledWith(expect.anything(), 7, 200);
   });
 });

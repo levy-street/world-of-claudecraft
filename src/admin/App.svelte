@@ -38,6 +38,7 @@
   import UnstuckReports from './pages/UnstuckReports.svelte';
   import IpAssociations from './pages/IpAssociations.svelte';
   import Market from './pages/Market.svelte';
+  import MarketAlerts from './pages/MarketAlerts.svelte';
   import MarketFlips from './pages/MarketFlips.svelte';
   import MarketItemDetail from './pages/MarketItemDetail.svelte';
   import MarketMovers from './pages/MarketMovers.svelte';
@@ -69,6 +70,7 @@
     market: Market,
     'market-flips': MarketFlips,
     'market-movers': MarketMovers,
+    'market-alerts': MarketAlerts,
     staff: Staff,
   } satisfies Record<Exclude<AdminPage, 'guilds'>, Component>;
   // Permission route guard (presentation only; the server re-checks every

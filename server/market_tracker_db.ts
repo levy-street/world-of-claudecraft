@@ -78,6 +78,20 @@ CREATE INDEX IF NOT EXISTS market_listing_snapshots_item
   ON market_listing_snapshots(realm, item_id, captured_at DESC);
 CREATE INDEX IF NOT EXISTS market_listing_snapshots_captured
   ON market_listing_snapshots(captured_at);
+CREATE TABLE IF NOT EXISTS market_alerts (
+  id BIGSERIAL PRIMARY KEY,
+  realm TEXT NOT NULL,
+  item_id TEXT NOT NULL,
+  metric TEXT NOT NULL,
+  direction TEXT NOT NULL,
+  threshold_copper BIGINT NOT NULL,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_by_account_id INT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_triggered_at TIMESTAMPTZ,
+  last_value_copper BIGINT
+);
+CREATE INDEX IF NOT EXISTS market_alerts_realm_active ON market_alerts(realm, active);
 `;
 
 // One append-only row per completed World Market purchase. quantity is the
@@ -476,4 +490,123 @@ export async function marketRecentSales(
     instanced: row.instanced,
     craftedRecipeId: row.crafted_recipe_id,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Price alerts: standing operator config, evaluated by the snapshot observer
+// (server/market_tracker.ts) each capture tick against the lowest listed unit
+// ask. v1 supports the one actionable metric ('lowest_ask'); the metric column
+// exists so a median-based alert can land later without a table change. The
+// created_by_account_id column is internal audit metadata and is deliberately
+// absent from the read row shape, matching the tracker's no-identity contract.
+
+export const MARKET_ALERT_METRIC = 'lowest_ask';
+export const MARKET_ALERT_DIRECTIONS = ['below', 'above'] as const;
+export type MarketAlertDirection = (typeof MARKET_ALERT_DIRECTIONS)[number];
+
+export interface MarketAlertRow {
+  id: number;
+  itemId: string;
+  metric: string;
+  direction: MarketAlertDirection;
+  thresholdCopper: number;
+  active: boolean;
+  createdAt: Date;
+  lastTriggeredAt: Date | null;
+  lastValueCopper: number | null;
+}
+
+export async function listMarketAlerts(pool: Pool, realm: string): Promise<MarketAlertRow[]> {
+  const res = await pool.query(
+    `SELECT id, item_id, metric, direction, threshold_copper, active,
+            created_at, last_triggered_at, last_value_copper
+       FROM market_alerts
+      WHERE realm = $1
+      ORDER BY id`,
+    [realm],
+  );
+  return res.rows.map((row) => ({
+    id: Number(row.id),
+    itemId: row.item_id,
+    metric: row.metric,
+    direction: row.direction,
+    thresholdCopper: Number(row.threshold_copper),
+    active: row.active,
+    createdAt: row.created_at,
+    lastTriggeredAt: row.last_triggered_at,
+    lastValueCopper: row.last_value_copper === null ? null : Number(row.last_value_copper),
+  }));
+}
+
+export async function insertMarketAlert(
+  pool: Pool,
+  alert: {
+    realm: string;
+    itemId: string;
+    direction: MarketAlertDirection;
+    thresholdCopper: number;
+    createdByAccountId: number | null;
+  },
+): Promise<number> {
+  const res = await pool.query(
+    `INSERT INTO market_alerts
+       (realm, item_id, metric, direction, threshold_copper, created_by_account_id)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING id`,
+    [
+      alert.realm,
+      alert.itemId,
+      MARKET_ALERT_METRIC,
+      alert.direction,
+      alert.thresholdCopper,
+      alert.createdByAccountId,
+    ],
+  );
+  return Number(res.rows[0].id);
+}
+
+export async function deleteMarketAlert(pool: Pool, realm: string, id: number): Promise<boolean> {
+  const res = await pool.query('DELETE FROM market_alerts WHERE realm = $1 AND id = $2', [
+    realm,
+    id,
+  ]);
+  return (res.rowCount ?? 0) > 0;
+}
+
+// The evaluation tick's working set: active lowest-ask alerts only, the
+// minimal columns the pure condition check needs.
+export interface ActiveMarketAlert {
+  id: number;
+  itemId: string;
+  direction: MarketAlertDirection;
+  thresholdCopper: number;
+}
+
+export async function loadActiveMarketAlerts(
+  pool: Pool,
+  realm: string,
+): Promise<ActiveMarketAlert[]> {
+  const res = await pool.query(
+    `SELECT id, item_id, direction, threshold_copper
+       FROM market_alerts
+      WHERE realm = $1 AND active AND metric = $2`,
+    [realm, MARKET_ALERT_METRIC],
+  );
+  return res.rows.map((row) => ({
+    id: Number(row.id),
+    itemId: row.item_id,
+    direction: row.direction,
+    thresholdCopper: Number(row.threshold_copper),
+  }));
+}
+
+export async function markMarketAlertTriggered(
+  pool: Pool,
+  id: number,
+  valueCopper: number,
+): Promise<void> {
+  await pool.query(
+    'UPDATE market_alerts SET last_triggered_at = now(), last_value_copper = $2 WHERE id = $1',
+    [id, Math.round(valueCopper)],
+  );
 }

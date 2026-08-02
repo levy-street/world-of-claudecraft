@@ -1110,6 +1110,25 @@ export const en = {
   'market.unwatch': 'Remove {name} from the watchlist',
   'market.watched': 'On watchlist',
   'market.addToWatchlist': 'Add to watchlist',
+  'nav.marketAlerts': 'Price Alerts',
+  'market.alertCreateTitle': 'New alert',
+  'market.alertItemPlaceholder': 'item id, e.g. wolf_fang',
+  'market.alertItemLabel': 'Item id',
+  'market.alertDirectionLabel': 'Alert direction',
+  'market.alertBelow': 'lowest ask below',
+  'market.alertAbove': 'lowest ask above',
+  'market.alertThreshold': 'Threshold (copper)',
+  'market.alertCreate': 'Create alert',
+  'market.alertCreateFailed': 'Could not create the alert.',
+  'market.alertHint':
+    'Alerts are checked against the cheapest listed ask on every 5 minute market capture.',
+  'market.alertsEmpty': 'No alerts yet.',
+  'market.colCondition': 'Condition',
+  'market.colLastFired': 'Last fired',
+  'market.colLastValue': 'Ask when fired',
+  'market.conditionBelow': 'lowest ask below {price}',
+  'market.conditionAbove': 'lowest ask above {price}',
+  'market.alertDelete': 'Delete',
 };
 
 export type AdminTranslations = typeof en;

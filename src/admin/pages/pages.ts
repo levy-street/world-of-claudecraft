@@ -18,6 +18,7 @@ export type AdminPage =
   | 'market'
   | 'market-flips'
   | 'market-movers'
+  | 'market-alerts'
   | 'suspicious-players'
   | 'detection-calibration'
   | 'antibot-config'
@@ -89,6 +90,7 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
       { id: 'market', labelKey: 'nav.marketOverview', permission: 'analytics.read' },
       { id: 'market-flips', labelKey: 'nav.marketFlips', permission: 'analytics.read' },
       { id: 'market-movers', labelKey: 'nav.marketMovers', permission: 'analytics.read' },
+      { id: 'market-alerts', labelKey: 'nav.marketAlerts', permission: 'market.alerts' },
     ],
   },
   {

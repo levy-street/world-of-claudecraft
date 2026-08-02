@@ -30,6 +30,11 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/market/item', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/market/flips', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/market/movers', permission: 'analytics.read' },
+  // Price alerts are standing config, so writes (and the page's read) sit
+  // behind their own permission rather than the read-only analytics grant.
+  { method: 'GET', pattern: '/admin/api/market/alerts', permission: 'market.alerts' },
+  { method: 'POST', pattern: '/admin/api/market/alerts', permission: 'market.alerts' },
+  { method: 'POST', pattern: '/admin/api/market/alerts/delete', permission: 'market.alerts' },
   // Server tick-loop profiling capture: ops-sensitive, admin/superadmin only.
   { method: 'GET', pattern: '/admin/api/perf/tick', permission: 'ops.perf' },
   { method: 'POST', pattern: '/admin/api/perf/tick/capture', permission: 'ops.perf' },
