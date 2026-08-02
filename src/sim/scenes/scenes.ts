@@ -277,7 +277,12 @@ function resolveAndApply(
     }
     case 'camera': {
       if (applyOnly) return null;
-      if (op.shot.kind === 'release') return { kind: 'camera', shot: { kind: 'release' } };
+      if (op.shot.kind === 'release') {
+        return {
+          kind: 'camera',
+          shot: op.shot.pose ? { kind: 'release', pose: op.shot.pose } : { kind: 'release' },
+        };
+      }
       if (op.shot.kind === 'dolly') {
         const points = op.shot.points.map((point) => resolveRigPoint(ctx, origin, point));
         const authoredLookAt = op.shot.lookAt;
@@ -398,6 +403,18 @@ function resolveAndApply(
   }
 }
 
+/** The end op re-carries the def's authored release pose: a skip drops the
+ * un-emitted camera/release op, and the director's unconditional end teardown
+ * must hand the camera back to the same authored pose either way. */
+function sceneEndOp(def: SceneDef | undefined): SceneWireOp {
+  for (const op of def?.ops ?? []) {
+    if (op.kind === 'camera' && op.shot.kind === 'release' && op.shot.pose) {
+      return { kind: 'end', releasePose: op.shot.pose };
+    }
+  }
+  return { kind: 'end' };
+}
+
 function finishScene(ctx: SimContext, playback: ScenePlayback, skipped: boolean): void {
   const def = sceneById(playback.sceneId);
   // Settle every already-emitted walk at its authored endpoint on both natural
@@ -418,7 +435,7 @@ function finishScene(ctx: SimContext, playback: ScenePlayback, skipped: boolean)
   // End is unconditional teardown, including stale walk state whose player
   // entity disappeared before the endpoint could be placed.
   clearScriptedPlayerWalks(ctx, playback.claimId);
-  emitTerminalToStartedAudience(ctx, playback, { kind: 'end' });
+  emitTerminalToStartedAudience(ctx, playback, sceneEndOp(def));
   ctx.scenePlaybacks.delete(playback.claimId);
 }
 
@@ -464,7 +481,7 @@ export function updateScenes(ctx: SimContext): void {
       );
     if (!claimAlive) {
       clearScriptedPlayerWalks(ctx, playback.claimId);
-      emitTerminalToStartedAudience(ctx, playback, { kind: 'end' });
+      emitTerminalToStartedAudience(ctx, playback, sceneEndOp(def));
       ctx.scenePlaybacks.delete(playback.claimId);
       continue;
     }

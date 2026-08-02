@@ -595,35 +595,18 @@ describe('the voyage cinematic', () => {
 
     const shotKinds = (scene: typeof out): string[] =>
       scene.ops.flatMap((op) => (op.kind === 'camera' ? [op.shot.kind] : []));
-    expect(shotKinds(out)).toEqual(['dolly', 'attach', 'attach', 'dolly', 'release']);
-    expect(shotKinds(back)).toEqual(['dolly', 'attach', 'attach', 'dolly', 'release']);
-    expect(shotKinds(q0)).toEqual(['dolly', 'attach', 'attach', 'dolly', 'dolly', 'release']);
+    // J3: one angle family. Every journey leg (cast-off, open water, approach)
+    // is an attach shot in the same wide abeam frame; only the accepted
+    // landing dolly (and Q0's statue/toll dollies) remain authored moves.
+    expect(shotKinds(out)).toEqual(['attach', 'attach', 'attach', 'dolly', 'release']);
+    expect(shotKinds(back)).toEqual(['attach', 'attach', 'attach', 'dolly', 'release']);
+    expect(shotKinds(q0)).toEqual(['attach', 'attach', 'attach', 'dolly', 'dolly', 'release']);
 
     const dollySpecs = (scene: typeof out) =>
       scene.ops.flatMap((op) =>
         op.kind === 'camera' && op.shot.kind === 'dolly' ? [{ at: op.at, shot: op.shot }] : [],
       );
-    const outOpeningShot = {
-      kind: 'dolly',
-      points: [
-        { x: 230, z: -52, height: 15.92 },
-        { x: 230, z: -52, height: 18.62 },
-        { x: 230, z: -52, height: 21.42 },
-        { x: 230, z: -52, height: 24.12 },
-      ],
-      lookAt: {
-        kind: 'spline',
-        points: [
-          { x: 243.6, z: -41.8, height: 0.17 },
-          { x: 244.4, z: -44.35, height: 2.87 },
-          { x: 245.4, z: -47.6, height: 5.67 },
-          { x: 245.6, z: -47.7, height: 8.37 },
-        ],
-      },
-      dur: 5.2,
-    };
     expect(dollySpecs(out)).toEqual([
-      { at: expect.closeTo(1.05, 8), shot: outOpeningShot },
       {
         at: 19.05,
         shot: {
@@ -653,28 +636,6 @@ describe('the voyage cinematic', () => {
     ]);
     expect(dollySpecs(back)).toEqual([
       {
-        at: expect.closeTo(1.05, 8),
-        shot: {
-          kind: 'dolly',
-          points: [
-            { x: 723, z: 110, height: 18.73 },
-            { x: 723, z: 110, height: 21.43 },
-            { x: 723, z: 110, height: 24.23 },
-            { x: 723, z: 110, height: 26.93 },
-          ],
-          lookAt: {
-            kind: 'spline',
-            points: [
-              { x: 711.9, z: 121.5, height: 0.17 },
-              { x: 710.7, z: 120.3, height: 2.87 },
-              { x: 708.6, z: 117, height: 5.67 },
-              { x: 707.65, z: 112.16, height: 8.37 },
-            ],
-          },
-          dur: 5.2,
-        },
-      },
-      {
         at: 19.05,
         shot: {
           kind: 'dolly',
@@ -700,7 +661,6 @@ describe('the voyage cinematic', () => {
       },
     ]);
     expect(dollySpecs(q0)).toEqual([
-      { at: expect.closeTo(1.05, 8), shot: outOpeningShot },
       {
         at: 19.05,
         shot: {
@@ -753,32 +713,42 @@ describe('the voyage cinematic', () => {
             ]
           : [],
       );
-    // Two attaches per direction: the C5 beam shot abeam on the southern
-    // side (the Old Beacon composition), then the bow-quarter arrival.
+    // Three attaches per direction, ONE frame (J3): cast-off and open water
+    // ride the departure ship, the approach rides the arrival ship, all in
+    // the same wide abeam composition so every dissolve reads as the same
+    // boat further along her crossing. The return mirrors the abeam side.
+    const outJourney = {
+      offset: { x: 2, y: 14, z: -44 },
+      lookAt: { x: 2, y: 15.5, z: -11.5 },
+    };
+    const backJourney = {
+      offset: { x: 2, y: 14, z: 44 },
+      lookAt: { x: 2, y: 15.5, z: 11.5 },
+    };
     expect(attachSpecs(out)).toEqual([
-      {
-        target: 'harbor_ship_mainland',
-        offset: { x: 6.6, y: 9.2, z: -11 },
-        lookAt: { x: 10.2, y: 8.6, z: 0 },
-      },
-      {
-        target: 'harbor_ship_gullhaven',
-        offset: { x: 6.6, y: 20, z: -20 },
-        lookAt: { x: 24, y: 8.6, z: 0 },
-      },
+      { target: 'harbor_ship_mainland', ...outJourney },
+      { target: 'harbor_ship_mainland', ...outJourney },
+      { target: 'harbor_ship_gullhaven', ...outJourney },
     ]);
     expect(attachSpecs(back)).toEqual([
-      {
-        target: 'harbor_ship_gullhaven',
-        offset: { x: 6.6, y: 9.2, z: 11 },
-        lookAt: { x: 3.05, y: 8.6, z: 0 },
-      },
-      {
-        target: 'harbor_ship_mainland',
-        offset: { x: 6.6, y: 20, z: 20 },
-        lookAt: { x: 24, y: 8.6, z: 0 },
-      },
+      { target: 'harbor_ship_gullhaven', ...backJourney },
+      { target: 'harbor_ship_gullhaven', ...backJourney },
+      { target: 'harbor_ship_mainland', ...backJourney },
     ]);
+    expect(attachSpecs(q0)).toEqual(attachSpecs(out));
+
+    // J3 release hand-back: every voyage walks the player to the destination
+    // gangplank, so every release carries the authored north-facing pose the
+    // director restores (clear line, never behind the mast).
+    const releaseShots = (scene: typeof out) =>
+      scene.ops.flatMap((op) =>
+        op.kind === 'camera' && op.shot.kind === 'release' ? [op.shot] : [],
+      );
+    for (const scene of [out, back, q0]) {
+      expect(releaseShots(scene)).toEqual([
+        { kind: 'release', pose: { yaw: 0, pitch: 0.35, dist: 9 } },
+      ]);
+    }
 
     const walks = (scene: typeof out) =>
       scene.ops.flatMap((op) =>
@@ -977,7 +947,14 @@ describe('the voyage cinematic', () => {
     expect(sim.ctx.scenePlaybacks.size).toBe(1);
     expect(requestSceneSkip(sim.ctx)).toBe(true);
     const ops = sceneOps(collect(sim, 2));
-    expect(ops.some((e) => e.op.kind === 'end')).toBe(true);
+    const end = ops.find((e) => e.op.kind === 'end');
+    expect(end).toBeDefined();
+    // The skip drops the un-emitted camera/release op, so the end op itself
+    // re-carries the authored hand-back pose for the director's teardown.
+    expect(end?.op).toEqual({
+      kind: 'end',
+      releasePose: { yaw: 0, pitch: 0.35, dist: 9 },
+    });
     expect(sim.ctx.scenePlaybacks.size).toBe(0);
     // The crossing happened at pay time and skip settles the un-emitted walk
     // at the pier-side end of the gangplank.

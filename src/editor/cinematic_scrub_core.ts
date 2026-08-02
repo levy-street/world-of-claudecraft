@@ -246,7 +246,9 @@ function evaluateCamera(
 }
 
 function resolveCameraShot(shot: CameraShotDef, world: CinematicScrubWorld): SceneCameraShot {
-  if (shot.kind === 'release') return { kind: 'release' };
+  if (shot.kind === 'release') {
+    return shot.pose ? { kind: 'release', pose: shot.pose } : { kind: 'release' };
+  }
   if (shot.kind === 'attach') {
     return {
       kind: 'attach',

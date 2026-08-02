@@ -4439,6 +4439,17 @@ export type SceneRigCameraShot =
       lookAt: SceneRigPoint;
     };
 
+/** Authored gameplay pose a release hands the camera back to. Without one the
+ * release restores the pre-scene pose, whose yaw is player state the author
+ * cannot know; a scene that has WALKED the player somewhere must author this
+ * so the restored camera has a clear line to the player (the voyage mast
+ * blocked exactly this hand-back). Focus stays on the live player position. */
+export interface SceneReleasePose {
+  yaw: number;
+  pitch: number;
+  dist: number;
+}
+
 export type SceneCameraShot =
   | {
       kind: 'focus';
@@ -4452,11 +4463,13 @@ export type SceneCameraShot =
       dur: number;
     }
   | SceneRigCameraShot
-  | { kind: 'release' };
+  | { kind: 'release'; pose?: SceneReleasePose };
 
 export type SceneWireOp =
   | { kind: 'start'; duration: number }
-  | { kind: 'end' }
+  // A skip drops the un-emitted camera/release op, so the end op re-carries
+  // the scene's authored release pose for the same clear hand-back.
+  | { kind: 'end'; releasePose?: SceneReleasePose }
   | { kind: 'line'; speaker: string; speakerEntityId: number | null; key: string; dur: number }
   | { kind: 'camera'; shot: SceneCameraShot }
   | { kind: 'letterbox'; on: boolean }

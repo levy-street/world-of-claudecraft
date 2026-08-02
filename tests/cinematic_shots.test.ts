@@ -351,6 +351,10 @@ interface ReleaseDelta {
   readonly fullBlack: boolean;
   readonly position: number;
   readonly orientationDeg: number;
+  /** The gameplay pose the director restores: the authored release pose when
+   * one is carried on the wire op, else the captured live pose. */
+  readonly restored: ScenePose;
+  readonly authoredPose: boolean;
 }
 
 interface SyntheticPresentationFixture {
@@ -403,6 +407,7 @@ interface SyntheticCameraSceneOptions {
   readonly includeRelease?: boolean;
   readonly includeUnlock?: boolean;
   readonly includeLetterboxOff?: boolean;
+  readonly releasePose?: { yaw: number; pitch: number; dist: number };
   readonly extraOps?: readonly SyntheticSceneOpDef[];
   readonly presentationFixture?: SyntheticPresentationFixture;
 }
@@ -421,6 +426,7 @@ function syntheticCameraScene(
     includeRelease = true,
     includeUnlock = true,
     includeLetterboxOff = true,
+    releasePose,
     extraOps = [],
     presentationFixture,
   } = options;
@@ -474,7 +480,13 @@ function syntheticCameraScene(
           ] satisfies SceneOpDef[])
         : []),
       ...(includeRelease
-        ? ([{ at: releaseAt, kind: 'camera', shot: { kind: 'release' } }] satisfies SceneOpDef[])
+        ? ([
+            {
+              at: releaseAt,
+              kind: 'camera',
+              shot: releasePose ? { kind: 'release', pose: releasePose } : { kind: 'release' },
+            },
+          ] satisfies SceneOpDef[])
         : []),
       ...(includeUnlock
         ? ([{ at: releaseAt, kind: 'inputLock', on: false }] satisfies SceneOpDef[])
@@ -650,6 +662,35 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
       },
     ),
     expectedCheck: null,
+  },
+  {
+    // The J3 hand-back guard: the authored release pose parks the restored
+    // gameplay camera on the far side of the mainland ship's main mast from
+    // the player, so the full-camera-top sight line must report it.
+    def: syntheticCameraScene(
+      'scn_test_lint_release_sight_bad',
+      2.2,
+      [
+        {
+          at: 0,
+          kind: 'camera',
+          shot: {
+            kind: 'dolly',
+            points: [
+              { x: 252, z: -30, height: 12 },
+              { x: 250, z: -32, height: 12 },
+            ],
+            lookAt: { kind: 'point', point: { x: 247, z: -30, height: 6 } },
+            dur: 1.6,
+          },
+        },
+      ],
+      {
+        releasePose: { yaw: -Math.PI / 2, pitch: 0.6, dist: 10 },
+        presentationFixture: { playerStart: { x: 234, z: -40.95 } },
+      },
+    ),
+    expectedCheck: 'cut.releaseSightLine',
   },
   {
     def: syntheticCameraScene('scn_test_lint_terrain_clearance_bad', 1.7, [
@@ -2064,7 +2105,12 @@ function resolveSyntheticRigPoint(point: { x: number; z: number; height: number 
 function syntheticWireOp(op: SceneOpDef): SceneWireOp | null {
   switch (op.kind) {
     case 'camera': {
-      if (op.shot.kind === 'release') return { kind: 'camera', shot: { kind: 'release' } };
+      if (op.shot.kind === 'release') {
+        return {
+          kind: 'camera',
+          shot: op.shot.pose ? { kind: 'release', pose: op.shot.pose } : { kind: 'release' },
+        };
+      }
       if (op.shot.kind === 'focus') {
         if (op.shot.actorId !== undefined) {
           throw new Error('actor focus controls require authoritative Sim capture');
@@ -2494,6 +2540,10 @@ function sightLineOcclusion(
   seed: number,
   time: number,
   activeProps: ReadonlyMap<string, ActiveProp>,
+  // 'deck' caps hull volumes at deck height (a shot may look across the deck);
+  // 'camera' keeps their full authored camera tops, so masts and rigging count
+  // as the solid structure a restored gameplay camera must not sit behind.
+  hullTops: 'deck' | 'camera' = 'deck',
 ): SightLineOcclusion | null {
   const delta = subtract(subject, camera);
   const distance = length(delta);
@@ -2522,11 +2572,14 @@ function sightLineOcclusion(
         const clearance = point.y - rampY - SIGHT_LINE_TERRAIN_MARGIN_YARDS;
         consider(`${harbor.id} ramp`, clearance, point, traveled);
       }
-      const hullTopY = Math.max(
-        ...harbor.shipDecks.map(
-          (deck) => shipDeckLocalBounds(harbor, deck, runtimeWaterLevel).centerY,
-        ),
-      );
+      const hullTopY =
+        hullTops === 'camera'
+          ? Number.POSITIVE_INFINITY
+          : Math.max(
+              ...harbor.shipDecks.map(
+                (deck) => shipDeckLocalBounds(harbor, deck, runtimeWaterLevel).centerY,
+              ),
+            );
       const clearance = shipHullPointClearance(
         harbor,
         shipFrameAt(harbor, time, activeProps),
@@ -3588,10 +3641,11 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
       if (timed.op.kind === 'camera' && timed.op.shot.kind === 'release' && director.hasLast) {
         const live = frameAt(scene, timed.at).live;
         const fromPose = copyPose(director.last);
+        const authoredPose = timed.op.shot.pose;
         const gameplayPose: ScenePose = {
-          yaw: live.yaw,
-          pitch: live.pitch,
-          dist: live.dist,
+          yaw: authoredPose?.yaw ?? live.yaw,
+          pitch: authoredPose?.pitch ?? live.pitch,
+          dist: authoredPose?.dist ?? live.dist,
           focusX: live.playerX,
           focusY: live.playerY,
           focusZ: live.playerZ,
@@ -3604,6 +3658,8 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
           fullBlack: sceneOverlayView(overlay, timed.at).fadeOpacity >= FULL_BLACK_OPACITY,
           position: length(subtract(fromGeometry.camera, gameplayGeometry.camera)),
           orientationDeg: directionAngleDeg(fromGeometry.forward, gameplayGeometry.forward),
+          restored: gameplayPose,
+          authoredPose: authoredPose !== undefined,
         });
       }
       if (timed.op.kind === 'prop') {
@@ -4081,6 +4137,55 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
         )} deg release orientation delta or full black`,
         measured: `${finalReleaseDelta.orientationDeg.toFixed(2)} deg at fade 0`,
       });
+    }
+  }
+
+  // The restored gameplay camera must have a clear line to the player. The
+  // release pose is authored (SceneReleasePose): a scene that WALKED the
+  // player somewhere must carry one, and the pose it carries must not leave
+  // the camera behind a mast, hull, pier, or terrain at the destination.
+  // (cut.releaseDelta only measures pose deltas; this is the occlusion arm
+  // the J2 voyage shipped without.)
+  if (finalReleaseDelta) {
+    const walked = scene.authoredOps.some((op) => op.kind === 'playerWalk');
+    if (!finalReleaseDelta.authoredPose && walked) {
+      report({
+        sceneId: scene.id,
+        check: 'cut.releaseSightLine',
+        opIndex: finalReleaseDelta.timedOp.index,
+        opKind: opKind(finalReleaseDelta.timedOp.op),
+        time: finalReleaseDelta.time,
+        threshold:
+          'an authored release hand-back pose whenever a scene walks the player to a new spot',
+        measured: 'playerWalk scene releases to the unknowable pre-scene camera pose',
+      });
+    }
+    if (finalReleaseDelta.authoredPose) {
+      const geometry = geometryForPose(finalReleaseDelta.restored);
+      const occlusion = sightLineOcclusion(
+        geometry.camera,
+        geometry.lookAt,
+        scene.seed,
+        finalReleaseDelta.time,
+        activePropsAt(scene, finalReleaseDelta.time),
+        'camera',
+      );
+      if (occlusion) {
+        report({
+          sceneId: scene.id,
+          check: 'cut.releaseSightLine',
+          opIndex: finalReleaseDelta.timedOp.index,
+          opKind: opKind(finalReleaseDelta.timedOp.op),
+          time: finalReleaseDelta.time,
+          threshold:
+            'a clear sight line from the restored gameplay camera to the player, with ship structure solid to its full camera tops',
+          measured: `${occlusion.label} with ${occlusion.clearance.toFixed(
+            2,
+          )} yd clearance at (${occlusion.point.x.toFixed(2)}, ${occlusion.point.y.toFixed(
+            2,
+          )}, ${occlusion.point.z.toFixed(2)})`,
+        });
+      }
     }
   }
 
