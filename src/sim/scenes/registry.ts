@@ -4,7 +4,7 @@
 // entities, entity.ts reaches data.ts, and data.ts imports campaign content.
 
 import type { LastBellPropCueId } from '../content/last_bell_cinematics';
-import type { SceneRigPoint } from '../types';
+import type { SceneReleasePose, SceneRigPoint } from '../types';
 
 export const SCENE_SAMPLED_MUSIC_DIRECTIVES = [
   'lb_bell_toll_one',
@@ -82,7 +82,9 @@ export type SceneOpDef = { at: number } & (
           }
         | SceneDollyShotDef
         | SceneAttachShotDef
-        | { kind: 'release' };
+        // pose: the authored gameplay hand-back (required whenever the scene
+        // walked the player somewhere new; see SceneReleasePose in types.ts).
+        | { kind: 'release'; pose?: SceneReleasePose };
     }
   | { kind: 'letterbox'; on: boolean }
   | { kind: 'inputLock'; on: boolean }

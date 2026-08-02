@@ -475,6 +475,53 @@ describe('release', () => {
     applySceneOp(s, { kind: 'camera', shot: { kind: 'release' } }, 0);
     expect(sceneCameraActive(s)).toBe(false);
   });
+
+  it('a release with an authored pose eases to that pose instead of the pre-scene pose', () => {
+    const s = stateWithShot(0);
+    scenePose(s, 0, LIVE, noEntities);
+    scenePose(s, 2, LIVE, noEntities); // shot pose held: yaw 2, pitch 0.5, dist 8
+    const pose = { yaw: 0, pitch: 0.35, dist: 9 };
+    applySceneOp(s, { kind: 'camera', shot: { kind: 'release', pose } }, 3);
+    const drifted: SceneLivePose = { ...LIVE, yaw: -2, playerX: 6, playerZ: 8 };
+    const mid = scenePose(s, 3 + SCENE_RELEASE_SEC / 2, drifted, noEntities);
+    expect(mid?.yaw).toBeCloseTo((2 + 0) / 2, 6); // toward the AUTHORED yaw 0, not prePose 1
+    expect(mid?.pitch).toBeCloseTo((0.5 + 0.35) / 2, 6);
+    expect(mid?.dist).toBeCloseTo((8 + 9) / 2, 6);
+    expect(mid?.focusX).toBeCloseTo(8, 6); // focus still rides the live player
+    expect(scenePose(s, 3 + SCENE_RELEASE_SEC + 0.001, drifted, noEntities)).toBeNull();
+  });
+
+  it('the end op re-carries the authored release pose for the skip path', () => {
+    const s = stateWithShot(0);
+    scenePose(s, 0, LIVE, noEntities);
+    scenePose(s, 2, LIVE, noEntities);
+    // The camera/release op was dropped by the skip; end alone must ease to
+    // the authored pose all the same.
+    applySceneOp(s, { kind: 'end', releasePose: { yaw: 0, pitch: 0.35, dist: 9 } }, 3);
+    const mid = scenePose(s, 3 + SCENE_RELEASE_SEC / 2, LIVE, noEntities);
+    expect(mid?.yaw).toBeCloseTo(1, 6); // halfway from shot yaw 2 to authored yaw 0
+    expect(mid?.dist).toBeCloseTo((8 + 9) / 2, 6);
+  });
+
+  it('a new scene never inherits the previous release pose', () => {
+    const s = stateWithShot(0);
+    scenePose(s, 0, LIVE, noEntities);
+    scenePose(s, 2, LIVE, noEntities);
+    applySceneOp(
+      s,
+      { kind: 'camera', shot: { kind: 'release', pose: { yaw: 3, pitch: 0.9, dist: 20 } } },
+      3,
+    );
+    // The release ease completes and clears its pose with the camera.
+    expect(scenePose(s, 3 + SCENE_RELEASE_SEC + 0.001, LIVE, noEntities)).toBeNull();
+    applySceneOp(s, { kind: 'start', duration: 10 }, 5);
+    applySceneOp(s, FOCUS_SHOT, 5);
+    scenePose(s, 5, LIVE, noEntities);
+    scenePose(s, 7, LIVE, noEntities);
+    applySceneOp(s, { kind: 'end' }, 8);
+    const mid = scenePose(s, 8 + SCENE_RELEASE_SEC / 2, LIVE, noEntities);
+    expect(mid?.yaw).toBeCloseTo((2 + 1) / 2, 6); // back to prePose yaw 1, not the stale 3
+  });
 });
 
 describe('music directives', () => {

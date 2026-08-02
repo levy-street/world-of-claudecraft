@@ -12,7 +12,12 @@
 // ALWAYS releases the input lock and the music silence and starts the camera
 // release, whatever state the scene was in.
 
-import type { SceneCameraShot, SceneReconnectState, SceneWireOp } from '../sim/types';
+import type {
+  SceneCameraShot,
+  SceneReconnectState,
+  SceneReleasePose,
+  SceneWireOp,
+} from '../sim/types';
 import {
   evaluateSceneRigPose,
   type SceneAttachmentResolver,
@@ -54,6 +59,10 @@ export interface SceneDirectorState {
   /** Gameplay pose captured when the scene first took the camera; the release
    *  eases back to it so user zoom/pitch survive the scene. */
   prePose: { yaw: number; pitch: number; dist: number } | null;
+  /** Authored hand-back pose from the release (or end) op; when present the
+   *  release eases here instead of prePose, so a scene that moved the player
+   *  restores a camera with a clear, authored line to them. */
+  releasePose: SceneReleasePose | null;
   /** Reused output containers (per-frame path: no allocation). */
   readonly pose: ScenePose;
   readonly last: ScenePose;
@@ -80,6 +89,7 @@ export function createSceneDirectorState(): SceneDirectorState {
     releaseStartAt: 0,
     from: null,
     prePose: null,
+    releasePose: null,
     pose: { yaw: 0, pitch: 0, dist: 0, focusX: 0, focusY: 0, focusZ: 0 },
     last,
     rigEaseFrom: { pose: last, duration: SCENE_RIG_ENTRY_SEC },
@@ -118,12 +128,17 @@ export function applySceneOp(
   switch (op.kind) {
     case 'start':
       s.sceneActive = true;
+      // A prior scene whose release never took the camera can leave its pose
+      // latched; a new scene must never inherit it.
+      s.releasePose = null;
       return null;
     case 'end':
       // Unconditional teardown: release the lock and hand the camera back even
       // if the inputLock(off) / camera release ops never arrived (skip path).
+      // The end op re-carries the authored release pose for that skip path.
       s.sceneActive = false;
       s.inputLocked = false;
+      if (op.releasePose) s.releasePose = op.releasePose;
       beginRelease(s, nowSec);
       return null;
     case 'inputLock':
@@ -131,6 +146,7 @@ export function applySceneOp(
       return null;
     case 'camera':
       if (op.shot.kind === 'release') {
+        if (op.shot.pose) s.releasePose = op.shot.pose;
         beginRelease(s, nowSec);
       } else {
         // A new shot eases from wherever the camera is NOW (the previous
@@ -177,6 +193,7 @@ function clearCamera(s: SceneDirectorState): void {
   s.releasing = false;
   s.from = null;
   s.prePose = null;
+  s.releasePose = null;
   s.hasLast = false;
   s.staticPoseLatched = false;
 }
@@ -211,7 +228,7 @@ export function scenePose(
     }
     const t = clamp01((nowSec - s.releaseStartAt) / SCENE_RELEASE_SEC);
     const g = sceneCameraEase(t);
-    const target = s.prePose ?? live;
+    const target = s.releasePose ?? s.prePose ?? live;
     out.yaw = lerpAngle(from.yaw, target.yaw, g);
     out.pitch = lerp(from.pitch, target.pitch, g);
     out.dist = lerp(from.dist, target.dist, g);
@@ -327,9 +344,10 @@ function representativeElapsed(shot: SceneActiveShot): number {
 }
 
 function restoreGameplayPose(s: SceneDirectorState, live: SceneLivePose, out: ScenePose): void {
-  out.yaw = s.prePose?.yaw ?? live.yaw;
-  out.pitch = s.prePose?.pitch ?? live.pitch;
-  out.dist = s.prePose?.dist ?? live.dist;
+  const target = s.releasePose ?? s.prePose;
+  out.yaw = target?.yaw ?? live.yaw;
+  out.pitch = target?.pitch ?? live.pitch;
+  out.dist = target?.dist ?? live.dist;
   out.focusX = live.playerX;
   out.focusY = live.playerY;
   out.focusZ = live.playerZ;

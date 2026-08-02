@@ -134,6 +134,7 @@ export type MechanicalCheck =
   | 'cut.firstTransition'
   | 'cut.finalRelease'
   | 'cut.releaseDelta'
+  | 'cut.releaseSightLine'
   | 'cut.fadeSlack'
   | 'fade.symmetry'
   | 'timing.opWithinDuration'
@@ -172,6 +173,7 @@ export const MECHANICAL_CHECKS = [
   'cut.firstTransition',
   'cut.finalRelease',
   'cut.releaseDelta',
+  'cut.releaseSightLine',
   'cut.fadeSlack',
   'fade.symmetry',
   'timing.opWithinDuration',

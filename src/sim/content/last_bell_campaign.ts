@@ -255,6 +255,42 @@ type VoyageCoreBeat = keyof typeof VOYAGE_CORE_BEATS;
 type ReleaseBeat = 'release' | 'end';
 type Q0StoryBeat = 'statue' | 'toll';
 
+// J3, the voyage camera language. One angle family carries the whole journey:
+// every leg (cast-off, open water, and the approach) is an ATTACH shot rigid
+// with the sailing ship, holding the SAME wide abeam frame. The offsets are
+// ship-local: 44 yd abeam and 14 yd up frames the ENTIRE hull with her masts
+// inside the 60 degree frustum and water and sky around her, and the look-at
+// pulled 11.5 yd toward the camera keeps the framing subject inside the
+// linter's 5 percent floor while the hull itself reads at journey scale.
+// Because all three shots share one local frame, every covered cut dissolves
+// from the ship mid-frame to the ship mid-frame, same size, same heading:
+// one boat further along her crossing, never a new boat. Variation inside a
+// shot comes free from the attach rig: the sea, the coast, and the harbor
+// slide past while she holds steady.
+const JOURNEY_CAMERA_ABEAM_YARDS = 44;
+const JOURNEY_CAMERA_HEIGHT_YARDS = 14;
+const JOURNEY_LOOKAT_INSET_YARDS = 11.5;
+const JOURNEY_LOOKAT_HEIGHT_YARDS = 15.5;
+const JOURNEY_ALONG_YARDS = 2;
+
+function journeyOffsets(side: 1 | -1): {
+  offset: { x: number; y: number; z: number };
+  lookAt: { x: number; y: number; z: number };
+} {
+  return {
+    offset: {
+      x: JOURNEY_ALONG_YARDS,
+      y: JOURNEY_CAMERA_HEIGHT_YARDS,
+      z: side * JOURNEY_CAMERA_ABEAM_YARDS,
+    },
+    lookAt: {
+      x: JOURNEY_ALONG_YARDS,
+      y: JOURNEY_LOOKAT_HEIGHT_YARDS,
+      z: side * JOURNEY_LOOKAT_INSET_YARDS,
+    },
+  };
+}
+
 interface VoyageDirection {
   readonly departureHarbor: HarborDef;
   readonly arrivalHarbor: HarborDef;
@@ -265,20 +301,17 @@ interface VoyageDirection {
     readonly openWater: LastBellPropPathSegmentId;
     readonly arrival: LastBellPropPathSegmentId;
   };
-  // One continuous crane move carries the whole cast-off: the camera rises
-  // from beside the boarding bridge and drifts seaward while the look-at
-  // tracks the rider's deck as she gets under way. No cuts inside it.
-  readonly openingShot: SceneDollyShotDef;
-  // The C5 beam shot on the open-water leg: camera abeam on the southern
-  // side, gaze panned toward the bow so the Old Beacon lighthouse stands
-  // clearly on the horizon behind her.
-  readonly beamOffset: { x: number; y: number; z: number };
-  readonly beamLookAt: { x: number; y: number; z: number };
-  readonly bowOffset: { x: number; y: number; z: number };
-  readonly arrivalLookAt: { x: number; y: number; z: number };
+  // The one journey frame, ship-local. side -1 rides the out crossing's
+  // southern flank; the return mirrors it so the camera keeps open water
+  // behind it in both directions.
+  readonly journeySide: 1 | -1;
   readonly walkTo: { x: number; z: number };
   readonly walkSpeed: number;
   readonly landingShot: SceneDollyShotDef;
+  // The authored hand-back: the release eases the camera to this gameplay
+  // pose around the player at the destination gangplank, camera on the pier
+  // side with a clear line (the pre-scene yaw would put it behind the mast).
+  readonly releasePose: { yaw: number; pitch: number; dist: number };
 }
 
 const OUTBOUND: VoyageDirection = {
@@ -287,35 +320,7 @@ const OUTBOUND: VoyageDirection = {
   departureTarget: 'harbor_ship_mainland',
   arrivalTarget: 'harbor_ship_gullhaven',
   segmentIds: LAST_BELL_VOYAGE_SEGMENT_IDS.out,
-  // A rising jib over the berth head: the camera position holds its spot
-  // and climbs (no along-course translation, so the ship's screen drift is
-  // purely her own motion), while the gaze pans at a fraction of her
-  // angular rate, always lagging, letting her slide across the frame.
-  openingShot: {
-    kind: 'dolly',
-    points: [
-      { x: 230, z: -52, height: 15.92 },
-      { x: 230, z: -52, height: 18.62 },
-      { x: 230, z: -52, height: 21.42 },
-      { x: 230, z: -52, height: 24.12 },
-    ],
-    // The gaze eases to a near-hold after mid-shot: she draws ahead of the
-    // frame on her own way just as the fade to open water covers her.
-    lookAt: {
-      kind: 'spline',
-      points: [
-        { x: 243.6, z: -41.8, height: 0.17 },
-        { x: 244.4, z: -44.35, height: 2.87 },
-        { x: 245.4, z: -47.6, height: 5.67 },
-        { x: 245.6, z: -47.7, height: 8.37 },
-      ],
-    },
-    dur: 5.2,
-  },
-  beamOffset: { x: 6.6, y: 9.2, z: -11 },
-  beamLookAt: { x: 10.2, y: 8.6, z: 0 },
-  bowOffset: { x: 6.6, y: 20, z: -20 },
-  arrivalLookAt: { x: 24, y: 8.6, z: 0 },
+  journeySide: -1,
   walkTo: { x: GULLHAVEN_HARBOR.gangplank.x, z: GULLHAVEN_HARBOR.gangplank.z },
   walkSpeed: 2.75,
   landingShot: {
@@ -345,6 +350,11 @@ const OUTBOUND: VoyageDirection = {
     },
     dur: LANDING_SHOT_SECONDS,
   },
+  // Hand back looking north from just south of the gangplank: the player
+  // front and center, the moored ship off to the side, nothing between
+  // camera and player. Yaw 0 also matches the landing dolly's final gaze,
+  // so the release ease is a settle, not a swing.
+  releasePose: { yaw: 0, pitch: 0.35, dist: 9 },
 };
 
 const RETURN: VoyageDirection = {
@@ -353,30 +363,7 @@ const RETURN: VoyageDirection = {
   departureTarget: 'harbor_ship_gullhaven',
   arrivalTarget: 'harbor_ship_mainland',
   segmentIds: LAST_BELL_VOYAGE_SEGMENT_IDS.back,
-  // The mirrored rising jib for the island departure.
-  openingShot: {
-    kind: 'dolly',
-    points: [
-      { x: 723, z: 110, height: 18.73 },
-      { x: 723, z: 110, height: 21.43 },
-      { x: 723, z: 110, height: 24.23 },
-      { x: 723, z: 110, height: 26.93 },
-    ],
-    lookAt: {
-      kind: 'spline',
-      points: [
-        { x: 711.9, z: 121.5, height: 0.17 },
-        { x: 710.7, z: 120.3, height: 2.87 },
-        { x: 708.6, z: 117, height: 5.67 },
-        { x: 707.65, z: 112.16, height: 8.37 },
-      ],
-    },
-    dur: 5.2,
-  },
-  beamOffset: { x: 6.6, y: 9.2, z: 11 },
-  beamLookAt: { x: 3.05, y: 8.6, z: 0 },
-  bowOffset: { x: 6.6, y: 20, z: 20 },
-  arrivalLookAt: { x: 24, y: 8.6, z: 0 },
+  journeySide: 1,
   walkTo: { x: MAINLAND_HARBOR.gangplank.x, z: MAINLAND_HARBOR.gangplank.z },
   walkSpeed: 2.75,
   landingShot: {
@@ -404,13 +391,16 @@ const RETURN: VoyageDirection = {
     },
     dur: LANDING_SHOT_SECONDS,
   },
+  // The same north-facing hand-back as the Gullhaven arrival: south of the
+  // gangplank, clear of the hull, aligned with the landing dolly's gaze.
+  releasePose: { yaw: 0, pitch: 0.35, dist: 9 },
 };
 
 function attachShot(
   target: string,
   harbor: HarborDef,
   offset: { x: number; y: number; z: number },
-  lookAt: { x: number; y: number; z: number } = { x: 6.6, y: 8.6, z: 0 },
+  lookAt: { x: number; y: number; z: number },
 ): SceneAttachShotDef {
   return {
     kind: 'attach',
@@ -455,14 +445,25 @@ function voyageTimeline(
   direction: VoyageDirection,
   includeHarborLine = false,
 ): SceneTimelineEntry<VoyageCoreBeat>[] {
+  const journey = journeyOffsets(direction.journeySide);
   return [
     { at: 0, kind: 'letterbox', on: true },
     { at: 0, kind: 'inputLock', on: true },
     { at: 0, kind: 'music', directive: 'lb_harbor_ambience' },
-    // No cuts at the start: the scene opens under its own fade onto ONE
-    // continuous crane move that carries the whole cast-off. The cue lands
-    // during the black hold, so the fade-in reveals her under way.
-    coveredCut('open', direction.openingShot, VOYAGE_CUT),
+    // The scene opens under its own fade straight onto the journey frame,
+    // riding the departure ship. The cast-off cue lands during the black
+    // hold, so the fade-in reveals her whole, already under way, the berth
+    // sliding astern.
+    coveredCut(
+      'open',
+      attachShot(
+        direction.departureTarget,
+        direction.departureHarbor,
+        journey.offset,
+        journey.lookAt,
+      ),
+      VOYAGE_CUT,
+    ),
     {
       at: 'castOff',
       kind: 'prop',
@@ -477,13 +478,15 @@ function voyageTimeline(
       target: direction.departureTarget,
       cue: direction.segmentIds.openWater,
     },
+    // The SAME frame on the open-water leg: the dissolve reads as the same
+    // boat further out, mid-strait.
     coveredCut(
       'openWater',
       attachShot(
         direction.departureTarget,
         direction.departureHarbor,
-        direction.beamOffset,
-        direction.beamLookAt,
+        journey.offset,
+        journey.lookAt,
       ),
       VOYAGE_CUT,
     ),
@@ -493,14 +496,11 @@ function voyageTimeline(
       target: direction.arrivalTarget,
       cue: direction.segmentIds.arrival,
     },
+    // And the SAME frame again for the approach: she swings toward the berth
+    // inside the shot while the camera rides with her.
     coveredCut(
       'seaArrival',
-      attachShot(
-        direction.arrivalTarget,
-        direction.arrivalHarbor,
-        direction.bowOffset,
-        direction.arrivalLookAt,
-      ),
+      attachShot(direction.arrivalTarget, direction.arrivalHarbor, journey.offset, journey.lookAt),
       VOYAGE_CUT,
     ),
     ...arrivalTimeline(direction, includeHarborLine),
@@ -564,7 +564,7 @@ function q0StoryTimeline(): SceneTimelineEntry<Q0StoryBeat>[] {
   ];
 }
 
-function releaseTimeline(): SceneTimelineEntry<ReleaseBeat>[] {
+function releaseTimeline(direction: VoyageDirection): SceneTimelineEntry<ReleaseBeat>[] {
   return [
     {
       at: beat('release', -(VOYAGE_FADE_SECONDS + DT)),
@@ -573,7 +573,10 @@ function releaseTimeline(): SceneTimelineEntry<ReleaseBeat>[] {
       dur: VOYAGE_FADE_SECONDS,
     },
     { at: 'release', kind: 'fade', to: 'black', dur: 0 },
-    { at: 'release', kind: 'camera', shot: { kind: 'release' } },
+    // The walk moved the player to the destination gangplank, so the release
+    // hands back the AUTHORED pose (pier side, clear line to the player)
+    // instead of the pre-scene yaw the mast used to block.
+    { at: 'release', kind: 'camera', shot: { kind: 'release', pose: direction.releasePose } },
     fadeInTail(beat('release', DT), VOYAGE_FADE_SECONDS),
     { at: 'end', kind: 'letterbox', on: false },
     { at: 'end', kind: 'inputLock', on: false },
@@ -585,7 +588,7 @@ registerScene(
     id: 'scn_lb_ferry_depart_out',
     beats: RERIDE_BEATS,
     releaseMargin: 0,
-    timeline: [...voyageTimeline(OUTBOUND), ...releaseTimeline()],
+    timeline: [...voyageTimeline(OUTBOUND), ...releaseTimeline(OUTBOUND)],
   }),
 );
 
@@ -594,7 +597,7 @@ registerScene(
     id: 'scn_lb_ferry_depart_back',
     beats: RERIDE_BEATS,
     releaseMargin: 0,
-    timeline: [...voyageTimeline(RETURN), ...releaseTimeline()],
+    timeline: [...voyageTimeline(RETURN), ...releaseTimeline(RETURN)],
   }),
 );
 
@@ -603,7 +606,11 @@ registerScene(
     id: 'scn_lb_q0_voyage',
     beats: Q0_VOYAGE_BEATS,
     releaseMargin: 0,
-    timeline: [...voyageTimeline(OUTBOUND, true), ...q0StoryTimeline(), ...releaseTimeline()],
+    timeline: [
+      ...voyageTimeline(OUTBOUND, true),
+      ...q0StoryTimeline(),
+      ...releaseTimeline(OUTBOUND),
+    ],
   }),
 );
 
