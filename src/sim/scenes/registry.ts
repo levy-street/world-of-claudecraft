@@ -41,11 +41,20 @@ export type SceneDollyLookAtDef =
       fallback: SceneRigPointDef;
     };
 
+/** How a shot takes the camera from the previous pose. 'snap' holds the
+ * shot's own frame from its first tick (every covered cut sets this: the
+ * fade-in must reveal the new shot already composed, never the travel from
+ * the old one). 'ease' (also the default when absent) glides in from the
+ * live pose over SCENE_RIG_ENTRY_SEC, for shots that take the camera
+ * visibly; a visible ease is linted like any other camera motion. */
+export type SceneShotEntry = 'snap' | 'ease';
+
 export interface SceneDollyShotDef {
   kind: 'dolly';
   points: readonly SceneRigPointDef[];
   lookAt: SceneDollyLookAtDef;
   dur: number;
+  entry?: SceneShotEntry;
   /** Presentation fixture or entity id expected near the authored look-at. */
   subjectRef?: string;
 }
@@ -59,6 +68,7 @@ export interface SceneAttachShotDef {
   offset: SceneRigPoint;
   /** Exact look-at point in the target's local frame. */
   lookAt: SceneRigPoint;
+  entry?: SceneShotEntry;
   /** Presentation fixture or entity id expected near the authored look-at. */
   subjectRef?: string;
 }
@@ -77,6 +87,7 @@ export type SceneOpDef = { at: number } & (
             pitch?: number;
             yaw?: number;
             dur: number;
+            entry?: SceneShotEntry;
             /** Presentation fixture or entity id expected near the authored look-at. */
             subjectRef?: string;
           }

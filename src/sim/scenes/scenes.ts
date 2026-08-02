@@ -313,7 +313,13 @@ function resolveAndApply(
         }
         return {
           kind: 'camera',
-          shot: { kind: 'dolly', points, lookAt, dur: op.shot.dur },
+          shot: {
+            kind: 'dolly',
+            points,
+            lookAt,
+            dur: op.shot.dur,
+            ...(op.shot.entry ? { entry: op.shot.entry } : {}),
+          },
         };
       }
       if (op.shot.kind === 'attach') {
@@ -329,6 +335,7 @@ function resolveAndApply(
             },
             offset: op.shot.offset,
             lookAt: op.shot.lookAt,
+            ...(op.shot.entry ? { entry: op.shot.entry } : {}),
           },
         };
       }
@@ -348,6 +355,7 @@ function resolveAndApply(
           pitch: op.shot.pitch ?? 0.3,
           yaw: op.shot.yaw ?? 0,
           dur: op.shot.dur,
+          ...(op.shot.entry ? { entry: op.shot.entry } : {}),
         },
       };
     }

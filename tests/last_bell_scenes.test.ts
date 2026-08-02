@@ -631,6 +631,8 @@ describe('the voyage cinematic', () => {
             ],
           },
           dur: 6,
+          // Covered cuts snap: the fade-in reveals the shot already composed.
+          entry: 'snap',
         },
       },
     ]);
@@ -657,6 +659,7 @@ describe('the voyage cinematic', () => {
             ],
           },
           dur: 6,
+          entry: 'snap',
         },
       },
     ]);
@@ -674,6 +677,7 @@ describe('the voyage cinematic', () => {
             point: { x: 818, z: 120, height: 2 },
           },
           dur: 4.8,
+          entry: 'snap',
           subjectRef: 'statueBlock',
         },
       },
@@ -697,6 +701,7 @@ describe('the voyage cinematic', () => {
             ],
           },
           dur: 6.45,
+          entry: 'snap',
         },
       },
     ]);

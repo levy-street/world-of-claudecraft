@@ -4420,12 +4420,19 @@ export type SceneDollyLookAt =
       fallback: SceneRigPoint;
     };
 
+/** How a shot takes the camera from the previous pose: 'snap' holds the
+ * shot's own frame from its first tick (covered cuts, so the fade-in never
+ * reveals travel from the old shot); 'ease' or absent glides in from the
+ * live pose over SCENE_RIG_ENTRY_SEC. */
+export type SceneShotEntryWire = 'snap' | 'ease';
+
 export type SceneRigCameraShot =
   | {
       kind: 'dolly';
       points: readonly SceneRigPoint[];
       lookAt: SceneDollyLookAt;
       dur: number;
+      entry?: SceneShotEntryWire;
     }
   | {
       kind: 'attach';
@@ -4437,6 +4444,7 @@ export type SceneRigCameraShot =
       offset: SceneRigPoint;
       /** Exact look-at point in the target's local frame. */
       lookAt: SceneRigPoint;
+      entry?: SceneShotEntryWire;
     };
 
 /** Authored gameplay pose a release hands the camera back to. Without one the
@@ -4461,6 +4469,7 @@ export type SceneCameraShot =
       pitch: number;
       yaw: number;
       dur: number;
+      entry?: SceneShotEntryWire;
     }
   | SceneRigCameraShot
   | { kind: 'release'; pose?: SceneReleasePose };

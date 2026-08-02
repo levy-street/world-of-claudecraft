@@ -405,6 +405,70 @@ describe('rig shot delegation', () => {
     expect(camera.z).toBeCloseTo(18, 10);
   });
 
+  it('a snap-entry rig shot holds its own frame from the first tick (covered cuts)', () => {
+    const s = createSceneDirectorState();
+    applySceneOp(s, { kind: 'start', duration: 10 }, 0);
+    const shot: SceneWireOp = {
+      kind: 'camera',
+      shot: {
+        kind: 'dolly',
+        points: [
+          { x: 2, y: 6, z: 4 },
+          { x: 10, y: 8, z: 12 },
+        ],
+        lookAt: { kind: 'point', point: { x: 6, y: 3, z: 8 } },
+        dur: 2,
+        entry: 'snap',
+      },
+    };
+    applySceneOp(s, shot, 0);
+    // The first frame and every frame inside the old entry window are the
+    // pure rig pose: a fade-in can never reveal travel from the live pose.
+    for (const at of [0, SCENE_RIG_ENTRY_SEC / 2]) {
+      const pose = scenePose(s, at, LIVE, noEntities);
+      const authored = evaluateSceneRigPose(
+        s.shot as Extract<SceneCameraShot, { kind: 'dolly' }>,
+        at,
+        noEntities,
+        () => null,
+      );
+      expect(pose).not.toBeNull();
+      if (!pose) return;
+      expect(pose.yaw).toBeCloseTo(authored.yaw, 10);
+      expect(pose.pitch).toBeCloseTo(authored.pitch, 10);
+      expect(pose.dist).toBeCloseTo(authored.dist, 10);
+      expect(pose.focusX).toBeCloseTo(authored.focusX, 10);
+      expect(pose.focusY).toBeCloseTo(authored.focusY, 10);
+      expect(pose.focusZ).toBeCloseTo(authored.focusZ, 10);
+    }
+  });
+
+  it('a snap-entry focus shot holds its composed pose instead of panning in', () => {
+    const s = createSceneDirectorState();
+    applySceneOp(s, { kind: 'start', duration: 10 }, 0);
+    applySceneOp(
+      s,
+      {
+        kind: 'camera',
+        shot: {
+          kind: 'focus',
+          entityId: null,
+          x: 10,
+          y: 2,
+          z: 20,
+          dist: 8,
+          pitch: 0.5,
+          yaw: 2,
+          dur: 2,
+          entry: 'snap',
+        },
+      },
+      0,
+    );
+    const pose = scenePose(s, 0, LIVE, noEntities);
+    expect(pose).toMatchObject({ yaw: 2, pitch: 0.5, dist: 8, focusX: 10, focusY: 2, focusZ: 20 });
+  });
+
   it('reuses the existing release ease after a rig shot', () => {
     const s = createSceneDirectorState();
     applySceneOp(s, { kind: 'start', duration: 10 }, 0);

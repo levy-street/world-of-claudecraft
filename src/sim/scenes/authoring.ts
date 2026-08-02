@@ -132,6 +132,15 @@ function expandCoveredCut<Beat extends string>(
   const fadeLeadAt = cutAt - requiredLeadSeconds;
   const fadeClearAt = cutAt + halfHold;
 
+  // The cut is covered, so the shot must SNAP: the fade-in reveals the new
+  // shot already composed. An entry ease here would sweep the camera from
+  // the old shot's pose while the overlay is already clearing, showing
+  // exactly the travel the cover exists to hide (J5 round, owner issue 3;
+  // the scene-opening slingshot of issue 7 was the same ease from the
+  // pre-scene live pose).
+  const shot: SceneCameraShotDef =
+    entry.shot.kind === 'release' ? entry.shot : { ...entry.shot, entry: 'snap' };
+
   return [
     {
       at: fadeLeadAt,
@@ -140,7 +149,7 @@ function expandCoveredCut<Beat extends string>(
       dur: fadeSeconds,
     },
     { at: cutAt, kind: 'fade', to: 'black', dur: 0 },
-    { at: cutAt, kind: 'camera', shot: entry.shot },
+    { at: cutAt, kind: 'camera', shot },
     {
       at: fadeClearAt,
       kind: 'fade',

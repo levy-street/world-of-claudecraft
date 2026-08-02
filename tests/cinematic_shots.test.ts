@@ -432,10 +432,24 @@ function syntheticCameraScene(
   } = options;
   const preRollSeconds = MIN_PERCEPTUAL_FADE_SECONDS + SAMPLE_INTERVAL_SEC;
   const shiftedDuration = duration + preRollSeconds;
-  const shiftOp = <Op extends SyntheticSceneOpDef>(op: Op): Op => ({
-    ...op,
-    at: Number.isFinite(op.at) && op.at >= 0 ? op.at + preRollSeconds : op.at,
-  });
+  const shiftOp = (op: SyntheticSceneOpDef): SyntheticSceneOpDef => {
+    const shifted = {
+      ...op,
+      at: Number.isFinite(op.at) && op.at >= 0 ? op.at + preRollSeconds : op.at,
+    };
+    // Synthetic controls exercise specific checks, not entry travel: their
+    // rig shots snap like the shipped covered cuts unless a control authors
+    // entry 'ease' explicitly (the closed-exemption control does). Focus
+    // shots keep their authored pan; it is their own linted motion.
+    if (
+      shifted.kind === 'camera' &&
+      (shifted.shot.kind === 'dolly' || shifted.shot.kind === 'attach') &&
+      shifted.shot.entry === undefined
+    ) {
+      return { ...shifted, shot: { ...shifted.shot, entry: 'snap' } };
+    }
+    return shifted;
+  };
   const releaseAt = shiftedDuration - 0.1;
   return {
     id,
@@ -661,6 +675,84 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
         presentationFixture: { playerStart: MAINLAND_HARBOR.berth },
       },
     ),
+    expectedCheck: null,
+  },
+  {
+    // The closed entry-ease exemption (J5 round, owner issues 3 and 7): a
+    // covered cut whose shot still EASES sweeps the camera from the old
+    // pose while the fade-in is already revealing it. The exemption now
+    // applies only under full black, so the visible half of that sweep must
+    // trip the motion caps. The 180 degree flip between the two dollies
+    // makes the 0.8 s ease an unmissable whip pan.
+    def: syntheticCameraScene('scn_test_lint_covered_cut_ease_bad', 3.9, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: -1, z: -10, height: 6 },
+            { x: 1, z: -10, height: 6 },
+          ],
+          lookAt: { kind: 'point', point: { x: 0, z: 0, height: 2 } },
+          dur: 1,
+        },
+      },
+      { at: 1.35, kind: 'fade', to: 'black', dur: MIN_PERCEPTUAL_FADE_SECONDS },
+      { at: 1.8, kind: 'fade', to: 'black', dur: 0 },
+      {
+        at: 1.8,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: -1, z: 10, height: 6 },
+            { x: 1, z: 10, height: 6 },
+          ],
+          lookAt: { kind: 'point', point: { x: 0, z: 0, height: 2 } },
+          dur: 1,
+          entry: 'ease',
+        },
+      },
+      { at: 1.85, kind: 'fade', to: 'clear', dur: MIN_PERCEPTUAL_FADE_SECONDS },
+    ]),
+    expectedCheck: 'motion.panRate',
+  },
+  {
+    // The snap twin of the control above: the identical covered cut with the
+    // shipped snap entry holds the new frame from the first tick, so the
+    // same fade-in reveals a composed shot and the closed linter stays green.
+    def: syntheticCameraScene('scn_test_lint_covered_cut_snap_pass', 3.9, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: -1, z: -10, height: 6 },
+            { x: 1, z: -10, height: 6 },
+          ],
+          lookAt: { kind: 'point', point: { x: 0, z: 0, height: 2 } },
+          dur: 1,
+        },
+      },
+      { at: 1.35, kind: 'fade', to: 'black', dur: MIN_PERCEPTUAL_FADE_SECONDS },
+      { at: 1.8, kind: 'fade', to: 'black', dur: 0 },
+      {
+        at: 1.8,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: -1, z: 10, height: 6 },
+            { x: 1, z: 10, height: 6 },
+          ],
+          lookAt: { kind: 'point', point: { x: 0, z: 0, height: 2 } },
+          dur: 1,
+        },
+      },
+      { at: 1.85, kind: 'fade', to: 'clear', dur: MIN_PERCEPTUAL_FADE_SECONDS },
+    ]),
     expectedCheck: null,
   },
   {
@@ -2153,6 +2245,7 @@ function syntheticWireOp(op: SceneOpDef): SceneWireOp | null {
             pitch: op.shot.pitch ?? 0.3,
             yaw: op.shot.yaw ?? 0,
             dur: op.shot.dur,
+            ...(op.shot.entry ? { entry: op.shot.entry } : {}),
           },
         };
       }
@@ -2184,6 +2277,7 @@ function syntheticWireOp(op: SceneOpDef): SceneWireOp | null {
                   points: op.shot.lookAt.points.map(resolveSyntheticRigPoint),
                 },
           dur: op.shot.dur,
+          ...(op.shot.entry ? { entry: op.shot.entry } : {}),
         },
       };
     }
@@ -3880,9 +3974,15 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
     const poseCopy = copyPose(pose);
     const geometry = geometryForPose(poseCopy);
     const fullBlack = overlayModel.fadeOpacity >= FULL_BLACK_OPACITY;
+    // A snap-entry shot never eases, so nothing is exempt for it; an easing
+    // shot's entry window is exempt ONLY while the overlay is at full black.
+    // The old unconditional exemption was the hole that hid the covered-cut
+    // sweep: the fade-in revealed a camera still traveling and every check
+    // skipped those samples.
     const rigEntryEase =
       activeShot !== null &&
       activeShot.kind !== 'focus' &&
+      activeShot.entry !== 'snap' &&
       !scene.disableLivePoseEase &&
       time - currentCameraOp.at < SCENE_RIG_ENTRY_SEC;
     const subject = activeShot ? subjectForShot(activeShot, poseCopy, resolveEntity) : null;
@@ -3923,10 +4023,10 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
       ships,
       subject,
       subjectScreen: subject ? screenPoint(geometry, subject) : null,
-      entryEase: rigEntryEase,
+      entryEase: rigEntryEase && fullBlack,
     };
     samples.push(sample);
-    if (rigEntryEase) {
+    if (rigEntryEase && fullBlack) {
       previous = null;
       continue;
     }
