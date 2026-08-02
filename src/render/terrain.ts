@@ -1400,6 +1400,10 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     size: number;
     spacing: number;
   }[] = [];
+  let lastVisibilityX = Number.NaN;
+  let lastVisibilityZ = Number.NaN;
+  let lastVisibilityFar = Number.NaN;
+  let lastVisibilityChunkCount = -1;
 
   // True when the chunk cell overlaps a mountain-wall band: an inter-zone
   // ridge line (ZONES[i].zMax) or the world rim. Those chunks always take the
@@ -1779,11 +1783,24 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       pool?.dispose();
     },
     update(camX: number, camZ: number, fogFar: number): void {
+      if (
+        camX === lastVisibilityX &&
+        camZ === lastVisibilityZ &&
+        fogFar === lastVisibilityFar &&
+        chunks.length === lastVisibilityChunkCount
+      ) {
+        return;
+      }
+      lastVisibilityX = camX;
+      lastVisibilityZ = camZ;
+      lastVisibilityFar = fogFar;
+      lastVisibilityChunkCount = chunks.length;
       // fully-fogged chunks are pure overdraw; drop them before the frustum
+      const fogFarSq = fogFar * fogFar;
       for (const chunk of chunks) {
         const dx = Math.max(Math.abs(camX - chunk.x) - chunk.half, 0);
         const dz = Math.max(Math.abs(camZ - chunk.z) - chunk.half, 0);
-        chunk.mesh.visible = Math.hypot(dx, dz) < fogFar;
+        chunk.mesh.visible = fogFar > 0 && dx * dx + dz * dz < fogFarSq;
       }
     },
     rebuildRegion(minX: number, minZ: number, maxX: number, maxZ: number): void {
