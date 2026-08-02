@@ -1570,7 +1570,11 @@ function masterLoot(): Scenario {
     // scenario's last coverage line (resolveLootRoll's tie-break rng.int), so the
     // seed is re-hunted to keep two rollers level rather than re-recorded to
     // whatever the new draw happens to be.
-    build: () => new Sim({ seed: 1326, playerClass: 'warrior', noPlayer: true }),
+    // Re-hunted again 1326 -> 1077 by the Drakelands dragonkin brood rework
+    // (same class of change: the appended brood camps shift the shared rng at
+    // world gen, dissolving 1326's tie; swept via tmp/_ml_sweep.mts for the
+    // next seed where two rollers level AND Bbb takes the tie-break).
+    build: () => new Sim({ seed: 1077, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       const a = sim.addPlayer('warrior', 'Aaa');
@@ -3862,7 +3866,7 @@ function hitRatingHeroic(withHitGear: boolean): Scenario {
       'same shared-RNG draw count/order as the ungeared spell-resist path',
     ],
     sampleEvery: 10,
-    build: () => new Sim({ seed: 1021, playerClass: 'mage' }),
+    build: () => new Sim({ seed: 1022, playerClass: 'mage' }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       sim.setPlayerLevel(20);
@@ -4743,6 +4747,6 @@ export const SCENARIOS: Scenario[] = [
   g1bXpPrestige(),
   playerTrade(),
   chatSocial(),
-  professionsCraft(),
+  professionsCraft(19),
   professionsGather(),
 ];
