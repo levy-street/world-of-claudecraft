@@ -493,6 +493,18 @@ export const COMMAND_NAMES = [
   // Guild billboard: set (or clear, with '') the officer-editable message
   // pinned atop the social window's Guild tab (SocialService.guildSetMotd).
   'guild_set_motd',
+  // The Guild Bank cluster (officer-plus shared treasury + item store,
+  // src/sim/guild_bank.ts). Its own guild_bank_* tokens forever, NEVER a reuse
+  // of the personal bank_* strings (state.md decision; pinned by
+  // tests/command_facets.test.ts). `slot` is a container index and `count`
+  // optional (the bank_* wire idiom); `amount` is copper. The Sim owns every
+  // gameplay rule (banker proximity, officer-plus rank, quest-bind, caps,
+  // table price); the server validates shape only.
+  'guild_bank_deposit_gold',
+  'guild_bank_withdraw_gold',
+  'guild_bank_deposit',
+  'guild_bank_withdraw',
+  'guild_bank_buy_slots',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -566,6 +578,7 @@ export type WorldFacet =
   | 'IWorldDailyRewards'
   | 'IWorldTelemetry'
   | 'IWorldBank'
+  | 'IWorldGuildBank'
   | 'IWorldValeCup'
   | 'IWorldDungeonFinder'
   | 'IWorldActionBar'
@@ -743,6 +756,14 @@ export const COMMAND_FACETS = {
   bank_deposit: 'IWorldBank',
   bank_withdraw: 'IWorldBank',
   bank_buy_slots: 'IWorldBank',
+  // IWorldGuildBank: the officer-plus shared guild treasury + item store
+  // (snake_case wire strings, by design; its OWN tokens, never a bank_* reuse).
+  // guildBankInfo is a proximity + rank gated snapshot read (no send, untagged).
+  guild_bank_deposit_gold: 'IWorldGuildBank',
+  guild_bank_withdraw_gold: 'IWorldGuildBank',
+  guild_bank_deposit: 'IWorldGuildBank',
+  guild_bank_withdraw: 'IWorldGuildBank',
+  guild_bank_buy_slots: 'IWorldGuildBank',
   // IWorldValeCup: the Vale Cup boarball queue. cupInfo is a snapshot read (no
   // send); vcup_practice starts a private instanced practice bout (online + off).
   vcup_queue: 'IWorldValeCup',

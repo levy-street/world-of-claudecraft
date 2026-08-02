@@ -3382,6 +3382,7 @@ const ALL_DELTA_KEYS = [
   'ench',
   'equip',
   'gprof',
+  'guildBank',
   'hbl',
   'honor',
   'inv',
@@ -3455,6 +3456,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   ench: 'lastEnchantResult',
   equip: 'equipment',
   gprof: 'gatheringProficiency',
+  guildBank: 'guildBankInfo',
   inv: 'inventory',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
@@ -3553,6 +3555,15 @@ function dirtyEveryDeltaField(): {
   const banker = sim.entities.get(sim.bankerIds[0]);
   if (banker) banker.pos = { ...p.pos };
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
+  // `guildBank`: guildBankInfoFor additionally needs an officer-plus membership
+  // stamp and a loaded guild book (the banker relocated above covers proximity);
+  // a non-empty treasury + slot makes the mirror distinguishable.
+  sim.setPlayerGuildMembership(lp, { guildId: 7, rank: 'officer' });
+  sim.loadGuildBank(7, {
+    treasury: 12345,
+    inventory: [{ itemId: 'wolf_fang', count: 4 }],
+    purchasedSlots: 6,
+  });
 
   // Direct PlayerMeta fields.
   // The reins item both dirties `inv` further and flips `mntOwn` (the owned
@@ -3925,6 +3936,15 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
+    expect(client.guildBankInfo).not.toBeNull(); // guildBank -> guildBankInfo
+    // guild bank mirror: the officer-gated boundary clone survives the wire whole
+    expect(client.guildBankInfo).toEqual({
+      treasury: 12345,
+      slots: [{ itemId: 'wolf_fang', count: 4 }],
+      capacity: 18,
+      purchasedSlots: 6,
+      nextExpansionPrice: 100000,
+    });
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
     // mloot -> masterLootPrompts, via the activeMasterLootRolls() accessor. Roll 2
     // only: the curate-phase master roll is master-looter-only, and roll 1 (a plain
@@ -4192,9 +4212,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 62 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(62);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(62);
+  it('ALL_DELTA_KEYS contains exactly 63 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(63); // +1: guildBank (Guild Bank Phase 2)
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(63);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4216,7 +4236,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62.
-    expect(scraped.size).toBe(62);
+    expect(scraped.size).toBe(63); // +1: guildBank (Guild Bank Phase 2)
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

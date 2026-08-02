@@ -599,6 +599,14 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'bank_deposit',
   'bank_withdraw',
   'bank_buy_slots',
+  // Guild bank ops that touch the SELF snapshot: the item moves rewrite the
+  // carried inventory and the gold moves the purse. guild_bank_buy_slots is
+  // deliberately absent (it spends only the guild treasury, which rides the
+  // ungated maybe('guildBank') stream, never a heavy self field).
+  'guild_bank_deposit_gold',
+  'guild_bank_withdraw_gold',
+  'guild_bank_deposit',
+  'guild_bank_withdraw',
   'pet_feed',
   'dev_give',
   'dev_level',
@@ -5422,6 +5430,37 @@ export class GameServer {
         recordBankOp('buy_slots', session, before, sim.bankInfoFor(pid));
         break;
       }
+      // Guild Bank: the officer-plus shared treasury + item store. Shape-only
+      // checks here (the bank_* idiom): the Sim owns every gameplay rule
+      // (banker proximity, officer-plus rank via the session membership stamp,
+      // quest-bind, treasury cap, table price, capacity). `slot` is a container
+      // index, `count` optional (omit = whole stack), `amount` copper. The
+      // bank_ledger observer rows land in Phase 3 alongside persistence.
+      case 'guild_bank_deposit_gold':
+        if (typeof msg.amount === 'number') sim.guildBankDepositGoldFor(pid, msg.amount);
+        break;
+      case 'guild_bank_withdraw_gold':
+        if (typeof msg.amount === 'number') sim.guildBankWithdrawGoldFor(pid, msg.amount);
+        break;
+      case 'guild_bank_deposit':
+        if (typeof msg.slot === 'number')
+          sim.guildBankDepositFor(
+            pid,
+            msg.slot,
+            typeof msg.count === 'number' ? msg.count : undefined,
+          );
+        break;
+      case 'guild_bank_withdraw':
+        if (typeof msg.slot === 'number')
+          sim.guildBankWithdrawFor(
+            pid,
+            msg.slot,
+            typeof msg.count === 'number' ? msg.count : undefined,
+          );
+        break;
+      case 'guild_bank_buy_slots':
+        sim.guildBankBuySlotsFor(pid);
+        break;
       // Book of Deeds: select/clear the displayed title. The sim validator
       // owns every rule (deed earned + title reward; null clears; invalid
       // input is a silent no-op); the server only shape-checks the payload.
@@ -6242,6 +6281,13 @@ export class GameServer {
     // pattern). Not heavy-gated: it appears from proximity, not this session's
     // own dirty-marking commands.
     maybe('bank', this.sim.bankInfoFor(anchorSession.pid));
+    // guild bank info follows the same pattern with a stricter gate: null
+    // unless the player is alive, at a banker, AND stamped officer-plus in a
+    // guild whose book is loaded (sim guildBankInfoFor), so members and
+    // walked-away/dead/demoted/departed officers all read null. Not
+    // heavy-gated for the same reason as bank: it can change from OTHER
+    // officers' deposits, not just this session's own commands.
+    maybe('guildBank', this.sim.guildBankInfoFor(anchorSession.pid));
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).

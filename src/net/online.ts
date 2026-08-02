@@ -1471,10 +1471,11 @@ export class ClientWorld implements IWorld {
   // (`s.bank`, delta-omitted). Null away from a banker (proximity-gated by the
   // server), so it only rides the wire while the player stands at a bursar. ---
   bankInfo: BankInfo | null = null;
-  // --- IWorldGuildBank: Phase 1 foundation stub. Stays null until Phase 2
-  // wires the maybe('guildBank') snapshot mirror (officer-plus AND proximity
-  // gated server-side); the facet lands now so both worlds satisfy the parity
-  // pin together. ---
+  // --- IWorldGuildBank: guild bank contents view, mirrored from the snapshot
+  // self (`s.guildBank`, delta-omitted). Null away from a banker, while dead,
+  // for member rank, and outside a guild (proximity + officer-plus gated by
+  // the server), so it only rides the wire for an officer actually standing
+  // at a bursar. ---
   guildBankInfo: GuildBankInfo | null = null;
   // --- IWorldDeeds: the Book of Deeds self mirror, from the snapshot self
   // (`s.deeds`/`s.dstats` heavy-gated, `s.renown`/`s.atitle` per-tick diffed).
@@ -3209,6 +3210,10 @@ export class ClientWorld implements IWorld {
       // "no bank"); away from a banker the server encodes it as null. Never default
       // to null/empty on omission, that would wipe an open bank window's mirror.
       if (s.bank !== undefined) this.bankInfo = s.bank;
+      // `guildBank` follows the same delta contract; the server encodes null
+      // away from a banker, on death, for member rank, and outside a guild
+      // (the proximity + officer-plus gate lives in sim guildBankInfoFor).
+      if (s.guildBank !== undefined) this.guildBankInfo = s.guildBank;
       // --- IWorldDeeds self-decode: `deeds`/`dstats` are heavy-gated,
       // `renown`/`atitle` per-tick diffed (all four delta-omitted: a missing
       // key keeps the prior mirror). The wire carries plain objects/arrays
@@ -4431,15 +4436,35 @@ export class ClientWorld implements IWorld {
   bankBuySlots(): void {
     this.cmd({ cmd: 'bank_buy_slots' });
   }
-  // --- IWorldGuildBank: Phase 1 stubs, inert until Phase 2 registers the
-  // guild_bank_* wire tokens (no send may exist before its token is in
-  // COMMAND_NAMES, the W0b lockstep). The server re-validates officer-plus
-  // rank, banker proximity, capacity, and quest-item rules on every send. ---
-  guildBankDepositGold(_amount: number): void {}
-  guildBankWithdrawGold(_amount: number): void {}
-  guildBankDeposit(_slotIndex: number, _count?: number): void {}
-  guildBankWithdraw(_slotIndex: number, _count?: number): void {}
-  guildBankBuySlots(): void {}
+  // --- IWorldGuildBank: the officer-plus shared treasury + item store
+  // (snake_case guild_bank_* wire strings, never a bank_* reuse). The server
+  // owns every gameplay rule (officer-plus rank, banker proximity, caps,
+  // capacity, quest-item policy) and validates shape only at dispatch; these
+  // sends are fire-and-forget like the personal bank's, with the result
+  // arriving through the maybe('guildBank') snapshot mirror + event stream. ---
+  guildBankDepositGold(amount: number): void {
+    this.cmd({ cmd: 'guild_bank_deposit_gold', amount });
+  }
+  guildBankWithdrawGold(amount: number): void {
+    this.cmd({ cmd: 'guild_bank_withdraw_gold', amount });
+  }
+  guildBankDeposit(slotIndex: number, count?: number): void {
+    this.cmd({
+      cmd: 'guild_bank_deposit',
+      slot: slotIndex,
+      ...(count !== undefined ? { count } : {}),
+    });
+  }
+  guildBankWithdraw(slotIndex: number, count?: number): void {
+    this.cmd({
+      cmd: 'guild_bank_withdraw',
+      slot: slotIndex,
+      ...(count !== undefined ? { count } : {}),
+    });
+  }
+  guildBankBuySlots(): void {
+    this.cmd({ cmd: 'guild_bank_buy_slots' });
+  }
   // --- IWorldDeeds: title selection. No optimistic local write (the bank
   // precedent): the mirror updates from the `atitle` snapshot echo once the
   // sim validator accepts, so a rejected send leaves the client untouched. ---

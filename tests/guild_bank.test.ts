@@ -2,17 +2,23 @@
 // (constants, capacity ladder, the sanitizeGuildBankState load path, the
 // per-guild book map with its load/serialize seam) plus the session-only
 // PlayerMeta.guildMembership stamp and its parity-trace exclusion.
+// Phase 2 (ops and wire): the five op bodies behind the pid-first Sim entry
+// points (guildBank*For), the full refusal matrix (a decisive negative test
+// per dimension on every op; no refusal path mutates), the gated info read
+// with its null transitions (walk-away, death, demotion, leave), the stale-
+// rank scenario, determinism, and the five ClientWorld wire sends.
 //
 // Constants and capacities are pinned to LITERAL numbers (never compared to the
 // exported constant, which would be a zero-protection self-comparison), so a
-// table regression flips an assertion. Op bodies (deposit/withdraw/buy) and the
-// wire land in Phase 2 and are tested there.
+// table regression flips an assertion.
 import { describe, expect, it } from 'vitest';
 // Type-only import (erased at compile, never executed): pins the sim-side rank
 // redeclaration to the server's source of truth so the two cannot drift silently.
 import type { GuildRank as ServerGuildRank } from '../server/social';
 import { ClientWorld } from '../src/net/online';
+import { bagCapacity } from '../src/sim/bags';
 import { sanitizeBankState } from '../src/sim/bank';
+import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
 import {
   createEmptyGuildBankState,
   GUILD_BANK_BASE_SLOTS,
@@ -28,6 +34,7 @@ import {
   sanitizeGuildBankState,
 } from '../src/sim/guild_bank';
 import { Sim } from '../src/sim/sim';
+import type { Entity, WorldContent } from '../src/sim/types';
 import { META_EXCLUDE, samplePlayerMeta } from './parity/trace';
 
 // The 6-tier expansion ladder from docs/guild-bank/state.md, pinned as literals.
@@ -458,19 +465,611 @@ describe('the Phase 1 facet stubs are inert in BOTH worlds', () => {
     expect(sim.players.get(sim.playerId)?.copper).toBe(copperBefore);
   });
 
-  it('ClientWorld: the five Phase 1 stubs send NOTHING on the wire (the W0b lockstep)', () => {
+  it('ClientWorld: the five facet members send their guild_bank_* wire commands (no empty body)', () => {
     // Bare-prototype probe (the action_bar_layout_client idiom): no WebSocket,
-    // cmd spied. A send appearing here before its guild_bank_* token exists in
-    // COMMAND_NAMES is exactly the drift this pin exists to catch.
+    // cmd spied. Phase 1 pinned these to send NOTHING (no token existed yet);
+    // Phase 2 registered the guild_bank_* tokens, so the pin flips: every one
+    // of the five bodies MUST send its exact payload (the Phase 1 QA carried-
+    // forward acceptance line: no guildBank* method body in online.ts is empty).
     // biome-ignore lint/suspicious/noExplicitAny: bare prototype probe needs the private cmd seam
     const client: any = Object.create(ClientWorld.prototype);
     const sent: unknown[] = [];
     client.cmd = (payload: unknown) => sent.push(payload);
-    client.guildBankDepositGold(5);
-    client.guildBankWithdrawGold(5);
-    client.guildBankDeposit(0, 1);
-    client.guildBankWithdraw(0, 1);
+    client.guildBankDepositGold(1500);
+    client.guildBankWithdrawGold(2500);
+    client.guildBankDeposit(3, 2);
+    client.guildBankDeposit(4);
+    client.guildBankWithdraw(5, 1);
+    client.guildBankWithdraw(6);
     client.guildBankBuySlots();
-    expect(sent).toEqual([]);
+    expect(sent).toEqual([
+      { cmd: 'guild_bank_deposit_gold', amount: 1500 },
+      { cmd: 'guild_bank_withdraw_gold', amount: 2500 },
+      { cmd: 'guild_bank_deposit', slot: 3, count: 2 },
+      { cmd: 'guild_bank_deposit', slot: 4 },
+      { cmd: 'guild_bank_withdraw', slot: 5, count: 1 },
+      { cmd: 'guild_bank_withdraw', slot: 6 },
+      { cmd: 'guild_bank_buy_slots' },
+    ]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 2: the op bodies + the gated info read, driven through the pid-first
+// server entry points (guildBank*For) on the REAL Sim. The offline IWorld
+// facet arm stays inert (pinned above); these entry points are how the
+// authoritative server acts for a session's pid.
+// ---------------------------------------------------------------------------
+
+// The three Gilded Strongbox bursars (banker NPCs), one per town hub, and a
+// slim world (the tests/bank.test.ts idiom): op tests need real bankers and
+// terrain, not the full continent's ambient spawns.
+const BANKERS = ['bursar_fernando', 'bursar_petra_vell', 'bursar_aldous_crane'] as const;
+const GUILD_BANK_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: Object.fromEntries(BANKERS.map((id) => [id, BUILTIN_WORLD.npcs[id]])),
+  groundObjects: [],
+};
+
+const GUILD_ID = 7;
+
+function moveToBanker(sim: Sim, pid = sim.playerId): Entity {
+  let banker: Entity | null = null;
+  for (const e of sim.entities.values()) {
+    if (e.kind === 'npc' && e.templateId === BANKERS[0]) banker = e;
+  }
+  if (!banker) throw new Error('banker is not spawned in the world');
+  const p = sim.entities.get(pid);
+  if (!p) throw new Error(`missing player ${pid}`);
+  p.pos = { ...banker.pos };
+  p.prevPos = { ...p.pos };
+  sim.rebucket(p);
+  return banker;
+}
+
+function moveFarFromBankers(sim: Sim, pid = sim.playerId): void {
+  const p = sim.entities.get(pid);
+  if (!p) throw new Error(`missing player ${pid}`);
+  p.pos = { x: 500, y: p.pos.y, z: 500 };
+  p.prevPos = { ...p.pos };
+  sim.rebucket(p);
+}
+
+// An officer standing at a banker with their guild's book loaded: the fully
+// authorized baseline every dimension below degrades from one axis at a time.
+function makeOfficerSim(
+  opts: { rank?: GuildRank; treasury?: number; purchasedSlots?: number } = {},
+): Sim {
+  const sim = new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    autoEquip: false,
+    world: GUILD_BANK_TEST_WORLD,
+  });
+  moveToBanker(sim);
+  sim.setPlayerGuildMembership(sim.playerId, { guildId: GUILD_ID, rank: opts.rank ?? 'officer' });
+  sim.loadGuildBank(GUILD_ID, {
+    treasury: opts.treasury ?? 100_000,
+    inventory: [],
+    purchasedSlots: opts.purchasedSlots ?? 0,
+  });
+  return sim;
+}
+
+const meta = (sim: Sim, pid = sim.playerId) => {
+  const m = sim.players.get(pid);
+  if (!m) throw new Error(`missing meta ${pid}`);
+  return m;
+};
+const book = (sim: Sim) => {
+  const b = sim.guildBanks.get(GUILD_ID);
+  if (!b) throw new Error('missing guild book');
+  return b;
+};
+const hasErr = (evs: { type: string; text?: string }[], text: string) =>
+  evs.some((e) => e.type === 'error' && e.text === text);
+const hasLog = (evs: { type: string; text?: string }[], text: string) =>
+  evs.some((e) => e.type === 'log' && e.text === text);
+
+// A full state fingerprint for no-mutation assertions: player purse+inventory
+// plus the whole book. Any refusal path must leave it byte-identical.
+function fingerprint(sim: Sim): string {
+  return JSON.stringify({
+    copper: meta(sim).copper,
+    inventory: meta(sim).inventory,
+    book: sim.guildBanks.get(GUILD_ID) ?? null,
+  });
+}
+
+// Every op, invoked with well-formed arguments, so the shared refusal
+// dimensions below run against ALL five ops rather than a sampled one.
+const OPS: { name: string; run: (sim: Sim) => void }[] = [
+  { name: 'guildBankDepositGoldFor', run: (sim) => sim.guildBankDepositGoldFor(sim.playerId, 10) },
+  {
+    name: 'guildBankWithdrawGoldFor',
+    run: (sim) => sim.guildBankWithdrawGoldFor(sim.playerId, 10),
+  },
+  { name: 'guildBankDepositFor', run: (sim) => sim.guildBankDepositFor(sim.playerId, 0, 1) },
+  { name: 'guildBankWithdrawFor', run: (sim) => sim.guildBankWithdrawFor(sim.playerId, 0, 1) },
+  { name: 'guildBankBuySlotsFor', run: (sim) => sim.guildBankBuySlotsFor(sim.playerId) },
+];
+
+describe('guild bank ops: the shared refusal dimensions (every op, one axis at a time)', () => {
+  it('dead: every op is silently inert (the market/mail town-service idiom)', () => {
+    for (const op of OPS) {
+      const sim = makeOfficerSim();
+      sim.addItem('wolf_fang', 3);
+      book(sim).inventory.push({ itemId: 'wolf_fang', count: 2 });
+      const p = sim.entities.get(sim.playerId);
+      if (!p) throw new Error('missing player');
+      p.dead = true;
+      const before = fingerprint(sim);
+      sim.drainEvents();
+      op.run(sim);
+      expect(fingerprint(sim), op.name).toBe(before);
+      expect(sim.drainEvents(), op.name).toEqual([]);
+    }
+  });
+
+  it('out of range: every op refuses with the banker-distance error and mutates nothing', () => {
+    for (const op of OPS) {
+      const sim = makeOfficerSim();
+      sim.addItem('wolf_fang', 3);
+      book(sim).inventory.push({ itemId: 'wolf_fang', count: 2 });
+      moveFarFromBankers(sim);
+      const before = fingerprint(sim);
+      sim.drainEvents();
+      op.run(sim);
+      expect(fingerprint(sim), op.name).toBe(before);
+      expect(hasErr(sim.drainEvents(), 'You are too far from the banker.'), op.name).toBe(true);
+    }
+  });
+
+  it('no guild: every op refuses with the no-guild error and mutates nothing', () => {
+    for (const op of OPS) {
+      const sim = makeOfficerSim();
+      sim.addItem('wolf_fang', 3);
+      book(sim).inventory.push({ itemId: 'wolf_fang', count: 2 });
+      sim.setPlayerGuildMembership(sim.playerId, null);
+      const before = fingerprint(sim);
+      sim.drainEvents();
+      op.run(sim);
+      expect(fingerprint(sim), op.name).toBe(before);
+      expect(hasErr(sim.drainEvents(), 'You are not in a guild.'), op.name).toBe(true);
+    }
+  });
+
+  it('member rank: every op refuses with the officer-gate error and mutates nothing', () => {
+    for (const op of OPS) {
+      const sim = makeOfficerSim({ rank: 'member' });
+      sim.addItem('wolf_fang', 3);
+      book(sim).inventory.push({ itemId: 'wolf_fang', count: 2 });
+      const before = fingerprint(sim);
+      sim.drainEvents();
+      op.run(sim);
+      expect(fingerprint(sim), op.name).toBe(before);
+      expect(
+        hasErr(sim.drainEvents(), 'Only guild officers may use the guild bank.'),
+        op.name,
+      ).toBe(true);
+    }
+  });
+
+  it('unloaded book: every op is silently inert (host wiring state, not a player error)', () => {
+    for (const op of OPS) {
+      const sim = new Sim({
+        seed: 42,
+        playerClass: 'warrior',
+        autoEquip: false,
+        world: GUILD_BANK_TEST_WORLD,
+      });
+      moveToBanker(sim);
+      sim.setPlayerGuildMembership(sim.playerId, { guildId: GUILD_ID, rank: 'officer' });
+      sim.addItem('wolf_fang', 3);
+      const copperBefore = meta(sim).copper;
+      const invBefore = JSON.stringify(meta(sim).inventory);
+      sim.drainEvents();
+      op.run(sim);
+      expect(sim.guildBanks.size, op.name).toBe(0);
+      expect(meta(sim).copper, op.name).toBe(copperBefore);
+      expect(JSON.stringify(meta(sim).inventory), op.name).toBe(invBefore);
+      expect(sim.drainEvents(), op.name).toEqual([]);
+    }
+  });
+
+  it('leader rank passes the officer-plus gate on every op (the positive arm)', () => {
+    const sim = makeOfficerSim({ rank: 'leader', treasury: 100_000 });
+    meta(sim).copper = 5_000;
+    sim.drainEvents();
+    sim.guildBankDepositGoldFor(sim.playerId, 2_000);
+    expect(book(sim).treasury).toBe(102_000);
+    sim.guildBankWithdrawGoldFor(sim.playerId, 500);
+    expect(book(sim).treasury).toBe(101_500);
+    sim.addItem('wolf_fang', 3);
+    sim.guildBankDepositFor(
+      sim.playerId,
+      meta(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang'),
+    );
+    expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
+    sim.guildBankWithdrawFor(sim.playerId, 0, 1);
+    expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
+    sim.guildBankBuySlotsFor(sim.playerId);
+    expect(book(sim).purchasedSlots).toBe(6);
+    expect(book(sim).treasury).toBe(51_500); // 101500 - 50000 (tier-1 price literal)
+  });
+});
+
+describe('guildBankDepositGoldFor / guildBankWithdrawGoldFor', () => {
+  it('malformed amounts are silently inert on both gold ops (shape, the cheat/desync arm)', () => {
+    const sim = makeOfficerSim();
+    meta(sim).copper = 10_000;
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    for (const bad of [0, -5, 1.5, Number.NaN, Number.POSITIVE_INFINITY, 2 ** 53]) {
+      sim.guildBankDepositGoldFor(sim.playerId, bad);
+      sim.guildBankWithdrawGoldFor(sim.playerId, bad);
+    }
+    expect(fingerprint(sim)).toBe(before);
+    expect(sim.drainEvents()).toEqual([]);
+  });
+
+  it('deposit refuses when the player lacks the copper, mutating nothing', () => {
+    const sim = makeOfficerSim();
+    meta(sim).copper = 999;
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankDepositGoldFor(sim.playerId, 1_000);
+    expect(fingerprint(sim)).toBe(before);
+    expect(hasErr(sim.drainEvents(), 'Not enough money.')).toBe(true);
+  });
+
+  it('deposit refuses past the treasury cap and accepts exactly to it (never truncates)', () => {
+    const sim = makeOfficerSim({ treasury: 999_999_000 });
+    meta(sim).copper = 5_000;
+    sim.drainEvents();
+    // 999_999_000 + 1_001 would end at 1_000_000_001 > 1e9: refused whole.
+    sim.guildBankDepositGoldFor(sim.playerId, 1_001);
+    expect(book(sim).treasury).toBe(999_999_000);
+    expect(meta(sim).copper).toBe(5_000);
+    expect(hasErr(sim.drainEvents(), 'The guild treasury cannot hold that much.')).toBe(true);
+    // Exactly to the cap (1e9, the state.md literal) is allowed.
+    sim.guildBankDepositGoldFor(sim.playerId, 1_000);
+    expect(book(sim).treasury).toBe(1_000_000_000);
+    expect(meta(sim).copper).toBe(4_000);
+  });
+
+  it('deposit moves the copper atomically and emits the formatted notice', () => {
+    const sim = makeOfficerSim({ treasury: 0 });
+    meta(sim).copper = 50_007;
+    sim.drainEvents();
+    sim.guildBankDepositGoldFor(sim.playerId, 30_507); // 3g 5s 7c
+    expect(meta(sim).copper).toBe(19_500);
+    expect(book(sim).treasury).toBe(30_507);
+    expect(hasLog(sim.drainEvents(), 'You deposit 3g 5s 7c into the guild treasury.')).toBe(true);
+  });
+
+  it('withdraw refuses when the treasury does not hold the amount, mutating nothing', () => {
+    const sim = makeOfficerSim({ treasury: 999 });
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankWithdrawGoldFor(sim.playerId, 1_000);
+    expect(fingerprint(sim)).toBe(before);
+    expect(hasErr(sim.drainEvents(), 'The guild treasury does not hold that much.')).toBe(true);
+  });
+
+  it('withdraw refuses when it would overflow the player purse past the safe-integer bound', () => {
+    const sim = makeOfficerSim({ treasury: 1_000 });
+    meta(sim).copper = Number.MAX_SAFE_INTEGER - 500;
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankWithdrawGoldFor(sim.playerId, 501);
+    expect(fingerprint(sim)).toBe(before);
+    expect(hasErr(sim.drainEvents(), 'You cannot carry that much money.')).toBe(true);
+    // Exactly to the bound is allowed: the refusal is a bound, not a fudge.
+    sim.guildBankWithdrawGoldFor(sim.playerId, 500);
+    expect(meta(sim).copper).toBe(Number.MAX_SAFE_INTEGER);
+    expect(book(sim).treasury).toBe(500);
+  });
+
+  it('withdraw moves the copper atomically and emits the formatted notice', () => {
+    const sim = makeOfficerSim({ treasury: 100_000 });
+    meta(sim).copper = 100;
+    sim.drainEvents();
+    sim.guildBankWithdrawGoldFor(sim.playerId, 12_034); // 1g 20s 34c
+    expect(meta(sim).copper).toBe(12_134);
+    expect(book(sim).treasury).toBe(87_966);
+    expect(hasLog(sim.drainEvents(), 'You withdraw 1g 20s 34c from the guild treasury.')).toBe(
+      true,
+    );
+  });
+
+  it('gold round trips conserve total copper (deposit then withdraw)', () => {
+    const sim = makeOfficerSim({ treasury: 40_000 });
+    meta(sim).copper = 60_000;
+    const total = () => meta(sim).copper + book(sim).treasury;
+    expect(total()).toBe(100_000);
+    sim.guildBankDepositGoldFor(sim.playerId, 25_000);
+    expect(total()).toBe(100_000);
+    sim.guildBankWithdrawGoldFor(sim.playerId, 55_000);
+    expect(total()).toBe(100_000);
+    expect(meta(sim).copper).toBe(90_000);
+    expect(book(sim).treasury).toBe(10_000);
+  });
+});
+
+describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
+  it('refuses quest items with the personal-bank error, mutating nothing', () => {
+    const sim = makeOfficerSim();
+    meta(sim).inventory.push({ itemId: 'boar_hide', count: 2 }); // kind: 'quest'
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankDepositFor(
+      sim.playerId,
+      meta(sim).inventory.findIndex((s) => s.itemId === 'boar_hide'),
+    );
+    expect(fingerprint(sim)).toBe(before);
+    expect(hasErr(sim.drainEvents(), 'You cannot store quest items in the bank.')).toBe(true);
+  });
+
+  it('an out-of-bounds or non-integer slot index is silently inert on both item ops', () => {
+    const sim = makeOfficerSim();
+    sim.addItem('wolf_fang', 2);
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 2 });
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    for (const bad of [-1, 99, 0.5, Number.NaN]) {
+      sim.guildBankDepositFor(sim.playerId, bad);
+      sim.guildBankWithdrawFor(sim.playerId, bad);
+    }
+    expect(fingerprint(sim)).toBe(before);
+    expect(sim.drainEvents()).toEqual([]);
+  });
+
+  it('deposit refuses when the guild bank is full, mutating nothing', () => {
+    const sim = makeOfficerSim();
+    // Fill all 12 base slots with non-mergeable instanced singles.
+    for (let i = 0; i < GUILD_BANK_BASE_SLOTS; i++) {
+      book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { signer: `S${i}` } });
+    }
+    sim.addItem('linen_scrap', 1);
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankDepositFor(
+      sim.playerId,
+      meta(sim).inventory.findIndex((s) => s.itemId === 'linen_scrap'),
+    );
+    expect(fingerprint(sim)).toBe(before);
+    expect(hasErr(sim.drainEvents(), 'The guild bank is full.')).toBe(true);
+  });
+
+  it('withdraw refuses when the bags are full, mutating nothing', () => {
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'linen_scrap', count: 1 });
+    const m = meta(sim);
+    const cap = bagCapacity(m.bags);
+    while (m.inventory.length < cap) {
+      m.inventory.push({
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { signer: `B${m.inventory.length}` },
+      });
+    }
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankWithdrawFor(sim.playerId, 0);
+    expect(fingerprint(sim)).toBe(before);
+    expect(hasErr(sim.drainEvents(), 'Your bags are full.')).toBe(true);
+  });
+
+  it('deposits a partial count, decrements the source, and emits the item notice', () => {
+    const sim = makeOfficerSim();
+    sim.addItem('wolf_fang', 10);
+    sim.drainEvents();
+    const idx = meta(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang');
+    sim.guildBankDepositFor(sim.playerId, idx, 4);
+    expect(meta(sim).inventory.find((s) => s.itemId === 'wolf_fang')?.count).toBe(6);
+    expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 4 }]);
+    expect(
+      hasLog(sim.drainEvents(), `You deposit ${ITEMS.wolf_fang.name} into the guild bank.`),
+    ).toBe(true);
+  });
+
+  it('withdraws a partial count back into the bags and emits the item notice', () => {
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 5 });
+    sim.drainEvents();
+    sim.guildBankWithdrawFor(sim.playerId, 0, 2);
+    expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
+    expect(meta(sim).inventory.find((s) => s.itemId === 'wolf_fang')?.count).toBe(2);
+    expect(
+      hasLog(sim.drainEvents(), `You withdraw ${ITEMS.wolf_fang.name} from the guild bank.`),
+    ).toBe(true);
+  });
+
+  it('an instanced stack moves WHOLE regardless of the requested count (indivisible)', () => {
+    const sim = makeOfficerSim();
+    const payload = { signer: 'Ana' };
+    meta(sim).inventory.push({ itemId: 'wolf_fang', count: 3, instance: { ...payload } });
+    const idx = meta(sim).inventory.findIndex((s) => s.instance?.signer === 'Ana');
+    sim.guildBankDepositFor(sim.playerId, idx, 1); // partial request: still all 3
+    expect(meta(sim).inventory.some((s) => s.instance?.signer === 'Ana')).toBe(false);
+    expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 3, instance: payload }]);
+    sim.guildBankWithdrawFor(sim.playerId, 0, 1); // and back, whole again
+    expect(book(sim).inventory).toEqual([]);
+    expect(meta(sim).inventory.find((s) => s.instance?.signer === 'Ana')).toEqual({
+      itemId: 'wolf_fang',
+      count: 3,
+      instance: payload,
+    });
+  });
+
+  it('a plain crafted stack keeps its craftedRecipeId marker across the round trip', () => {
+    const sim = makeOfficerSim();
+    meta(sim).inventory.push({ itemId: 'wolf_fang', count: 2, craftedRecipeId: 'r_test' });
+    const idx = meta(sim).inventory.findIndex((s) => s.craftedRecipeId === 'r_test');
+    sim.guildBankDepositFor(sim.playerId, idx);
+    expect(book(sim).inventory).toEqual([
+      { itemId: 'wolf_fang', count: 2, craftedRecipeId: 'r_test' },
+    ]);
+    sim.guildBankWithdrawFor(sim.playerId, 0);
+    expect(book(sim).inventory).toEqual([]);
+    expect(meta(sim).inventory.find((s) => s.craftedRecipeId === 'r_test')?.count).toBe(2);
+  });
+});
+
+describe('guildBankBuySlotsFor', () => {
+  it('walks the whole ladder from the treasury at the literal prices', () => {
+    const sim = makeOfficerSim({ treasury: 4_400_000 }); // the 440g ladder total
+    const copperBefore = meta(sim).copper;
+    sim.drainEvents();
+    const prices = [50_000, 100_000, 250_000, 500_000, 1_000_000, 2_500_000];
+    let treasury = 4_400_000;
+    for (let tier = 0; tier < prices.length; tier++) {
+      sim.guildBankBuySlotsFor(sim.playerId);
+      treasury -= prices[tier];
+      expect(book(sim).treasury).toBe(treasury);
+      expect(book(sim).purchasedSlots).toBe(6 * (tier + 1));
+    }
+    expect(book(sim).treasury).toBe(0);
+    expect(book(sim).purchasedSlots).toBe(36); // 48-slot cap = 12 base + 36
+    // Paid from the TREASURY only: personal copper never moves.
+    expect(meta(sim).copper).toBe(copperBefore);
+    expect(hasLog(sim.drainEvents(), 'You purchase additional guild bank slots.')).toBe(true);
+  });
+
+  it('refuses at the ladder end, mutating nothing', () => {
+    const sim = makeOfficerSim({ treasury: 10_000_000, purchasedSlots: 36 });
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankBuySlotsFor(sim.playerId);
+    expect(fingerprint(sim)).toBe(before);
+    expect(hasErr(sim.drainEvents(), 'The guild bank cannot be expanded further.')).toBe(true);
+  });
+
+  it('refuses when the treasury cannot afford the table price, mutating nothing', () => {
+    const sim = makeOfficerSim({ treasury: 49_999 });
+    meta(sim).copper = 10_000_000; // personal wealth must NOT substitute
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankBuySlotsFor(sim.playerId);
+    expect(fingerprint(sim)).toBe(before);
+    expect(hasErr(sim.drainEvents(), 'Your guild cannot afford that expansion.')).toBe(true);
+  });
+});
+
+describe('guildBankInfoFor (the maybe(guildBank) stream read)', () => {
+  it('returns the boundary-cloned view for an authorized officer at the banker', () => {
+    const sim = makeOfficerSim({ treasury: 12_345, purchasedSlots: 6 });
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } });
+    const info = sim.guildBankInfoFor(sim.playerId);
+    expect(info).toEqual({
+      treasury: 12_345,
+      slots: [{ itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } }],
+      capacity: 18,
+      purchasedSlots: 6,
+      nextExpansionPrice: 100_000, // tier-2 literal
+    });
+    // Boundary clone: mutating the returned view never reaches the live book.
+    if (!info) throw new Error('unreachable');
+    info.slots[0].count = 99;
+    if (info.slots[0].instance) info.slots[0].instance.signer = 'Tampered';
+    expect(book(sim).inventory[0].count).toBe(2);
+    expect(book(sim).inventory[0].instance?.signer).toBe('Ana');
+  });
+
+  it('reports a null nextExpansionPrice once the ladder is exhausted', () => {
+    const sim = makeOfficerSim({ purchasedSlots: 36 });
+    expect(sim.guildBankInfoFor(sim.playerId)?.nextExpansionPrice).toBeNull();
+    expect(sim.guildBankInfoFor(sim.playerId)?.capacity).toBe(48);
+  });
+
+  it('leader sees the bank; member sees null (the officer-plus gate)', () => {
+    expect(makeOfficerSim({ rank: 'leader' }).guildBankInfoFor(7_777_777)).toBeNull(); // unknown pid arm
+    const leader = makeOfficerSim({ rank: 'leader' });
+    expect(leader.guildBankInfoFor(leader.playerId)).not.toBeNull();
+    const member = makeOfficerSim({ rank: 'member' });
+    expect(member.guildBankInfoFor(member.playerId)).toBeNull();
+  });
+
+  it('goes null on walk-away, death, demotion, and leave (the stream transitions)', () => {
+    const sim = makeOfficerSim();
+    expect(sim.guildBankInfoFor(sim.playerId)).not.toBeNull();
+    // walk away, and back
+    moveFarFromBankers(sim);
+    expect(sim.guildBankInfoFor(sim.playerId)).toBeNull();
+    moveToBanker(sim);
+    expect(sim.guildBankInfoFor(sim.playerId)).not.toBeNull();
+    // death, and revival
+    const p = sim.entities.get(sim.playerId);
+    if (!p) throw new Error('missing player');
+    p.dead = true;
+    expect(sim.guildBankInfoFor(sim.playerId)).toBeNull();
+    p.dead = false;
+    expect(sim.guildBankInfoFor(sim.playerId)).not.toBeNull();
+    // demotion (the stale-rank re-stamp), and re-promotion
+    sim.setPlayerGuildMembership(sim.playerId, { guildId: GUILD_ID, rank: 'member' });
+    expect(sim.guildBankInfoFor(sim.playerId)).toBeNull();
+    sim.setPlayerGuildMembership(sim.playerId, { guildId: GUILD_ID, rank: 'officer' });
+    expect(sim.guildBankInfoFor(sim.playerId)).not.toBeNull();
+    // leave (stamp cleared)
+    sim.setPlayerGuildMembership(sim.playerId, null);
+    expect(sim.guildBankInfoFor(sim.playerId)).toBeNull();
+  });
+
+  it('is null while the guild book is not loaded (never fabricates an empty book)', () => {
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      autoEquip: false,
+      world: GUILD_BANK_TEST_WORLD,
+    });
+    moveToBanker(sim);
+    sim.setPlayerGuildMembership(sim.playerId, { guildId: GUILD_ID, rank: 'officer' });
+    expect(sim.guildBankInfoFor(sim.playerId)).toBeNull();
+    expect(sim.guildBanks.size).toBe(0);
+  });
+});
+
+describe('guild bank ops: the stale-rank scenario and determinism', () => {
+  it('a demote landing mid-session gates the very next op and nulls the stream', () => {
+    const sim = makeOfficerSim({ treasury: 10_000 });
+    meta(sim).copper = 5_000;
+    sim.drainEvents();
+    sim.guildBankDepositGoldFor(sim.playerId, 1_000);
+    expect(book(sim).treasury).toBe(11_000); // authorized while officer
+    // The server re-stamps on demote (the onGuildMembershipChanged hook):
+    sim.setPlayerGuildMembership(sim.playerId, { guildId: GUILD_ID, rank: 'member' });
+    sim.drainEvents();
+    sim.guildBankDepositGoldFor(sim.playerId, 1_000);
+    expect(book(sim).treasury).toBe(11_000); // the NEXT op is already refused
+    expect(hasErr(sim.drainEvents(), 'Only guild officers may use the guild bank.')).toBe(true);
+    expect(sim.guildBankInfoFor(sim.playerId)).toBeNull();
+  });
+
+  it('the whole Phase 2 op surface draws NO rng (determinism)', () => {
+    const sim = makeOfficerSim({ treasury: 100_000 });
+    meta(sim).copper = 50_000;
+    sim.addItem('wolf_fang', 5);
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws++;
+    });
+    sim.rng.next();
+    expect(draws).toBe(1); // positive control
+    draws = 0;
+    sim.guildBankDepositGoldFor(sim.playerId, 1_000);
+    sim.guildBankWithdrawGoldFor(sim.playerId, 500);
+    const idx = meta(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang');
+    sim.guildBankDepositFor(sim.playerId, idx, 2);
+    sim.guildBankWithdrawFor(sim.playerId, 0, 1);
+    sim.guildBankBuySlotsFor(sim.playerId);
+    sim.guildBankInfoFor(sim.playerId);
+    // And a refusal from every dimension family:
+    sim.guildBankDepositGoldFor(sim.playerId, 10 ** 12);
+    sim.setPlayerGuildMembership(sim.playerId, { guildId: GUILD_ID, rank: 'member' });
+    sim.guildBankBuySlotsFor(sim.playerId);
+    sim.rng.setObserver(null);
+    expect(draws).toBe(0);
   });
 });
