@@ -26,7 +26,7 @@ import { bagCapacity, bagsFullError, instancedCountCap } from './bags';
 import { moveBetweenContainers, nearBanker } from './bank';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
-import { isTransferLockedInstance } from './item_instance_transfer';
+import { isTransferLockedInstance, publicInstanceView } from './item_instance_transfer';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, type InvSlot } from './types';
@@ -210,19 +210,38 @@ function normalizeGuildMembership(m: GuildMembership | null): GuildMembership | 
 // stays inert forever (offline play never has a guild).
 // ---------------------------------------------------------------------------
 
+/** The ranks the guild bank trusts, as a POSITIVE allowlist shared by the op
+ *  gate (requireOfficerBook) and the info read (guildBankInfoFor) so the two
+ *  can never drift into a phantom-window or a leak. Exactly leader and
+ *  officer: a rank ever added to GUILD_RANKS (an initiate tier, say) is
+ *  DENIED here until this set is deliberately revisited, because a shared
+ *  treasury must fail closed, never open. tests/guild_bank.test.ts sweeps
+ *  every rank through both gates and pins the passing set. */
+const GUILD_BANK_RANKS: ReadonlySet<GuildRank> = new Set(['leader', 'officer']);
+
+/** Resolve the REQUIRED acting pid, refusing a non-integer at runtime. The
+ *  facade types pid as required, but Sim.resolve falls back to the primary
+ *  (local) player when handed undefined, and an economy op must never fail
+ *  open into acting for the wrong player, so the module guards the claim
+ *  itself instead of leaning on the type checker alone. */
+function resolveActor(ctx: SimContext, pid: number): ReturnType<SimContext['resolve']> {
+  return Number.isInteger(pid) ? ctx.resolve(pid) : null;
+}
+
 /** The shared officer-plus authorization step every op runs AFTER the shape
  *  check: resolves the acting player's stamped membership and the guild's live
- *  book. A missing stamp and a member rank each REFUSE with a player line; a
- *  stamped guild whose book is not loaded returns silently, because that is a
- *  host wiring state (Phase 3 boot-loads every book before players join), not
- *  a condition the player caused or can act on. Never mutates. */
+ *  book. A missing stamp and a rank outside GUILD_BANK_RANKS each REFUSE with
+ *  a player line; a stamped guild whose book is not loaded returns silently,
+ *  because that is a host wiring state (Phase 3 boot-loads every book before
+ *  players join), not a condition the player caused or can act on. Never
+ *  mutates. */
 function requireOfficerBook(ctx: SimContext, meta: PlayerMeta): GuildBankState | null {
   const m = meta.guildMembership;
   if (!m) {
     ctx.error(meta.entityId, 'You are not in a guild.');
     return null;
   }
-  if (m.rank === 'member') {
+  if (!GUILD_BANK_RANKS.has(m.rank)) {
     ctx.error(meta.entityId, 'Only guild officers may use the guild bank.');
     return null;
   }
@@ -258,7 +277,7 @@ function guildBankPipeRefusal(slot: InvSlot): string | null {
  *  these (the offline facet arm is inert), so there is no local-player
  *  fallback to fail open into. */
 export function guildBankDepositGold(ctx: SimContext, amount: number, pid: number): void {
-  const r = ctx.resolve(pid);
+  const r = resolveActor(ctx, pid);
   if (!r) return;
   const { meta, e: p } = r;
   if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
@@ -287,7 +306,7 @@ export function guildBankDepositGold(ctx: SimContext, amount: number, pid: numbe
  *  treasury does not hold the amount, and refuses (never clamps) a withdrawal
  *  that would overflow the player's own copper past the integer-safe bound. */
 export function guildBankWithdrawGold(ctx: SimContext, amount: number, pid: number): void {
-  const r = ctx.resolve(pid);
+  const r = resolveActor(ctx, pid);
   if (!r) return;
   const { meta, e: p } = r;
   if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
@@ -326,7 +345,7 @@ export function guildBankDeposit(
   count: number | undefined,
   pid: number,
 ): void {
-  const r = ctx.resolve(pid);
+  const r = resolveActor(ctx, pid);
   if (!r) return;
   const { meta, e: p } = r;
   if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
@@ -371,7 +390,7 @@ export function guildBankWithdraw(
   count: number | undefined,
   pid: number,
 ): void {
-  const r = ctx.resolve(pid);
+  const r = resolveActor(ctx, pid);
   if (!r) return;
   const { meta, e: p } = r;
   if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
@@ -416,7 +435,7 @@ export function guildBankWithdraw(
  *  (never personal copper), at the table price for the current purchase count
  *  (never client-supplied). Blocked at the ladder's end; no refusal mutates. */
 export function guildBankBuySlots(ctx: SimContext, pid: number): void {
-  const r = ctx.resolve(pid);
+  const r = resolveActor(ctx, pid);
   if (!r) return;
   const { meta, e: p } = r;
   if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
@@ -440,6 +459,20 @@ export function guildBankBuySlots(ctx: SimContext, pid: number): void {
   ctx.notice(meta.entityId, 'You purchase additional guild bank slots.');
 }
 
+/** The wire view of ONE book slot: a boundary clone, downgraded to the public
+ *  projection when the pipe policy refuses the copy. Deposits can never seat a
+ *  locked copy, so this only ever fires on a tampered or legacy Phase 3 row,
+ *  which guildBankWithdraw also refuses: such a slot is dormant, and its
+ *  boundTo / bindOnTrade fields (another character's bind identity) must not
+ *  be broadcast to every officer just because the row exists. */
+function guildBankSlotView(slot: InvSlot): InvSlot {
+  const view = cloneInvSlot(slot);
+  if (view.instance && guildBankPipeRefusal(slot) !== null) {
+    view.instance = publicInstanceView(view.instance);
+  }
+  return view;
+}
+
 /** The proximity + rank gated guild bank snapshot the server's maybe('guildBank')
  *  stream reads (the bankInfoFor pattern): null unless the player is alive,
  *  within reach of a banker NPC, stamped officer-plus, and their guild's book is
@@ -447,24 +480,27 @@ export function guildBankBuySlots(ctx: SimContext, pid: number): void {
  *  personal bank's on purpose: the stream must go null on death, demotion,
  *  leave, and walk-away (each pinned in tests/guild_bank.test.ts). A pure read:
  *  it draws NO rng and never hands out live sim slot references. Ships the
- *  full instance payloads (cloneInvSlot), not the publicInstanceView
- *  projection, BY DECISION: officers co-own the pooled contents and a
- *  withdrawer needs the real payload (charges), while the fields the
- *  projection exists to hide (boundTo, armed bindOnTrade) can never enter the
- *  book at all: guildBankPipeRefusal refuses locked copies in BOTH directions. */
+ *  full instance payload for every slot the pipe policy allows, because
+ *  officers co-own the pooled contents and a withdrawer needs the real
+ *  payload (charges). A slot the policy REFUSES (only reachable from a
+ *  tampered or legacy Phase 3 row, since deposit keeps locked copies out) is
+ *  dormant and unwithdrawable, so it degrades to the publicInstanceView
+ *  projection: no boundTo or armed bindOnTrade (another character's bind
+ *  identity) rides the wire to every officer. The read and the withdraw gate
+ *  therefore agree slot for slot. */
 export function guildBankInfoFor(ctx: SimContext, pid: number): GuildBankInfo | null {
-  const r = ctx.resolve(pid);
+  const r = resolveActor(ctx, pid);
   if (!r) return null;
   const { meta, e: p } = r;
   if (p.dead) return null;
   if (!nearBanker(ctx, p)) return null;
   const m = meta.guildMembership;
-  if (!m || m.rank === 'member') return null;
+  if (!m || !GUILD_BANK_RANKS.has(m.rank)) return null;
   const book = ctx.guildBanks.get(m.guildId);
   if (!book) return null;
   return {
     treasury: book.treasury,
-    slots: book.inventory.map(cloneInvSlot),
+    slots: book.inventory.map(guildBankSlotView),
     capacity: guildBankCapacity(book),
     purchasedSlots: book.purchasedSlots,
     nextExpansionPrice: guildBankNextExpansionPrice(book),

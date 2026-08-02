@@ -879,6 +879,68 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     expect(hasErr(evs, 'That item cannot be stored in the guild bank.')).toBe(true);
   });
 
+  it('refuses every pipe dimension on WITHDRAW, not just the two sampled ones', () => {
+    // guildBankPipeRefusal is shared, but the WITHDRAW call site is its own
+    // line: sweep all four dimensions through it so a dropped call or a
+    // reordered early return on this arm reddens here.
+    const sim = makeOfficerSim();
+    const questItemId = Object.keys(ITEMS).find((id) => ITEMS[id]?.kind === 'quest');
+    const noListId = Object.keys(ITEMS).find(
+      (id) => ITEMS[id]?.noMarketList && ITEMS[id]?.kind !== 'quest' && !ITEMS[id]?.soulbound,
+    );
+    if (!questItemId || !noListId) throw new Error('missing pipe-policy fixtures');
+    const rows: { slot: Record<string, unknown>; err: string }[] = [
+      { slot: { itemId: questItemId, count: 1 }, err: 'You cannot store quest items in the bank.' },
+      {
+        slot: { itemId: 'reins_grag_bear', count: 1 },
+        err: 'You cannot store soulbound items in the guild bank.',
+      },
+      {
+        slot: { itemId: noListId, count: 1 },
+        err: 'That item cannot be stored in the guild bank.',
+      },
+      {
+        slot: { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } },
+        err: 'That item cannot be stored in the guild bank.',
+      },
+      {
+        slot: { itemId: 'wolf_fang', count: 1, instance: { bindOnTrade: true } },
+        err: 'That item cannot be stored in the guild bank.',
+      },
+    ];
+    for (const [i, row] of rows.entries()) {
+      book(sim).inventory.push(row.slot as never);
+      const before = fingerprint(sim);
+      sim.drainEvents();
+      sim.guildBankWithdrawFor(sim.playerId, i);
+      expect(fingerprint(sim), row.err).toBe(before);
+      expect(hasErr(sim.drainEvents(), row.err), row.err).toBe(true);
+    }
+  });
+
+  it('a malformed count is silently inert on both item ops (never grants free units)', () => {
+    const sim = makeOfficerSim();
+    sim.addItem('wolf_fang', 3);
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 3 });
+    const depositIndex = meta(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang');
+    // Over-count is the one that would mint units if the guard were lost.
+    for (const badCount of [0, -1, 99, Number.NaN, Number.POSITIVE_INFINITY]) {
+      const before = fingerprint(sim);
+      sim.drainEvents();
+      sim.guildBankDepositFor(sim.playerId, depositIndex, badCount);
+      sim.guildBankWithdrawFor(sim.playerId, 0, badCount);
+      expect(fingerprint(sim), String(badCount)).toBe(before);
+      expect(sim.drainEvents(), String(badCount)).toEqual([]);
+    }
+    // A fractional count FLOORS rather than refusing: the shared
+    // moveBetweenContainers contract the personal bank already rides, pinned
+    // here so the guild bank cannot drift from it silently.
+    sim.drainEvents();
+    sim.guildBankDepositFor(sim.playerId, depositIndex, 1.5);
+    expect(book(sim).inventory.find((s) => s.itemId === 'wolf_fang')?.count).toBe(4);
+    expect(meta(sim).inventory.find((s) => s.itemId === 'wolf_fang')?.count).toBe(2);
+  });
+
   it('un-credits a collect objective on deposit and re-credits it on withdraw', () => {
     // Every content collect item is quest-kind today (and the pipe policy
     // denies those), so the onInventoryChangedForQuests wiring is defensive
@@ -1136,6 +1198,110 @@ describe('guildBankInfoFor (the maybe(guildBank) stream read)', () => {
     sim.setPlayerGuildMembership(sim.playerId, { guildId: GUILD_ID, rank: 'officer' });
     expect(sim.guildBankInfoFor(sim.playerId)).toBeNull();
     expect(sim.guildBanks.size).toBe(0);
+  });
+});
+
+describe('guild bank authorization: the rank allowlist and per-guild isolation', () => {
+  it('exactly leader and officer pass BOTH gates; every other rank fails closed', () => {
+    // Swept over GUILD_RANKS itself, so a rank added to the ladder without
+    // revisiting the allowlist reddens here instead of silently gaining
+    // deposit, withdraw, and treasury-funded expansion purchase. The op gate
+    // and the info read are asserted TOGETHER: a drift between them is a
+    // phantom window (read yes, ops no) or a leak (ops yes, read no).
+    const ALLOWED: readonly GuildRank[] = ['leader', 'officer'];
+    for (const rank of GUILD_RANKS) {
+      const sim = makeOfficerSim({ rank, treasury: 100_000 });
+      meta(sim).copper = 5_000;
+      const before = fingerprint(sim);
+      sim.drainEvents();
+      sim.guildBankDepositGoldFor(sim.playerId, 1_000);
+      const opAllowed = fingerprint(sim) !== before;
+      const readAllowed = sim.guildBankInfoFor(sim.playerId) !== null;
+      expect(opAllowed, `op gate for '${rank}'`).toBe(ALLOWED.includes(rank));
+      expect(readAllowed, `info read for '${rank}'`).toBe(ALLOWED.includes(rank));
+      expect(opAllowed, `gates agree for '${rank}'`).toBe(readAllowed);
+    }
+  });
+
+  it('a rank outside the allowlist fails CLOSED, not open (the future-rank arm)', () => {
+    // Stands in for a rank added to the ladder later (an initiate tier). The
+    // stamp normalizer only admits current GUILD_RANKS, so the future rank is
+    // written straight onto the meta, exactly as a later normalizer would.
+    // A denylist gate (`rank === 'member'`) would let this through: that is
+    // the regression this pins.
+    const sim = makeOfficerSim({ treasury: 100_000 });
+    meta(sim).copper = 5_000;
+    meta(sim).guildMembership = { guildId: GUILD_ID, rank: 'initiate' as GuildRank };
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankDepositGoldFor(sim.playerId, 1_000);
+    expect(fingerprint(sim)).toBe(before);
+    expect(hasErr(sim.drainEvents(), 'Only guild officers may use the guild bank.')).toBe(true);
+    expect(sim.guildBankInfoFor(sim.playerId)).toBeNull();
+  });
+
+  it('an officer of one guild can never read or mutate another guild book', () => {
+    // The gate must key the book on the STAMPED guild id, not "the only book
+    // loaded": with two live books a lookup that ignored m.guildId would let
+    // an officer of 7 drain 8's treasury.
+    // The OTHER guild's book is loaded FIRST, so a lookup that grabbed "the
+    // first loaded book" instead of the stamped one would resolve to it.
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      autoEquip: false,
+      world: GUILD_BANK_TEST_WORLD,
+    });
+    moveToBanker(sim);
+    const OTHER_GUILD = GUILD_ID + 1;
+    sim.loadGuildBank(OTHER_GUILD, {
+      treasury: 777_000,
+      inventory: [{ itemId: 'wolf_fang', count: 9 }],
+      purchasedSlots: 6,
+    });
+    sim.setPlayerGuildMembership(sim.playerId, { guildId: GUILD_ID, rank: 'officer' });
+    sim.loadGuildBank(GUILD_ID, { treasury: 100_000, inventory: [], purchasedSlots: 0 });
+    const otherBefore = JSON.stringify(sim.guildBanks.get(OTHER_GUILD));
+    meta(sim).copper = 5_000;
+    sim.drainEvents();
+    sim.guildBankDepositGoldFor(sim.playerId, 1_000);
+    sim.guildBankWithdrawGoldFor(sim.playerId, 500);
+    sim.guildBankBuySlotsFor(sim.playerId);
+    // Every mutation landed in the stamped guild's book; the other is untouched.
+    expect(JSON.stringify(sim.guildBanks.get(OTHER_GUILD))).toBe(otherBefore);
+    expect(book(sim).treasury).toBe(100_000 + 1_000 - 500 - 50_000);
+    // And the read reports the stamped guild's book, never the other's.
+    const info = sim.guildBankInfoFor(sim.playerId);
+    expect(info?.treasury).toBe(50_500);
+    expect(info?.slots).toEqual([]);
+  });
+
+  it('a locked copy in a tampered book is projected, never broadcast whole', () => {
+    // Deposits keep locked copies out, so only a tampered/legacy Phase 3 row
+    // holds one. It is unwithdrawable, so the read must not ship another
+    // character's bind identity (boundTo / armed bindOnTrade) to every
+    // officer; cosmetic fields survive, and an ALLOWED copy keeps its full
+    // payload (a withdrawer needs charges).
+    const sim = makeOfficerSim();
+    book(sim).inventory.push(
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { boundTo: 424242, signer: 'Aleph', charges: { zap: 3 } },
+      },
+      { itemId: 'wolf_fang', count: 1, instance: { bindOnTrade: true, enchant: 'minor_haste' } },
+      { itemId: 'wolf_fang', count: 1, instance: { charges: { zap: 5 }, signer: 'Bet' } },
+    );
+    const info = sim.guildBankInfoFor(sim.playerId);
+    expect(info?.slots[0].instance).toEqual({ signer: 'Aleph' }); // boundTo + charges stripped
+    expect(info?.slots[1].instance).toEqual({ enchant: 'minor_haste' }); // bindOnTrade stripped
+    expect(info?.slots[2].instance).toEqual({ charges: { zap: 5 }, signer: 'Bet' }); // allowed: full payload
+    // And the projection never mutated the book itself.
+    expect(book(sim).inventory[0].instance).toEqual({
+      boundTo: 424242,
+      signer: 'Aleph',
+      charges: { zap: 3 },
+    });
   });
 });
 
