@@ -1,7 +1,8 @@
 # Plan: Companion Home P0
 
-Status: **implementation**  
-Scope: out-of-game companion **Home** only - claim/spin status, play balances, roster strip.  
+Status: **implemented (Home P0 + P1 enrichments)**  
+Scope: out-of-game companion **Home** - claim/spin, play balances, multi-realm roster,
+Renown chip, daily payout history.  
 Repo: `world-of-claudecraft` (must be same-origin for bearer session APIs).
 
 ## 1. Goal
@@ -12,11 +13,13 @@ the full game client:
 1. **Daily spin / claim status** - see eligibility, streak-ish score, whether today's
    spin is claimed; spin if available.
 2. **Play balances** - Claudium soft currency from `/api/claudium/balance`.
-3. **Roster strip** - character list from `/api/characters` with name, class, level,
-   online badge.
+3. **Roster strip** - multi-realm character list (fan-out via `Api.realms` + `setRealm`)
+   with name, class, level, realm, online badge.
 4. **Auth** - restore `woc_session` or email/password login via existing `Api`.
+5. **Renown chip (P1)** - deeds leaderboard self rank / top percent.
+6. **Daily history (P1)** - recent payout rows from `/api/daily-rewards/history`.
 
-No combat, no full inventory, no deeds board (P1), no push (v2).
+No combat, no full inventory, no push (v2).
 
 ## 2. Why here (not wallet repo)
 
@@ -30,9 +33,12 @@ and fight CORS. Wallet repo stays custody; companion lives next to `play.html`.
 | --- | --- | --- |
 | Session restore | localStorage `woc_session` | `Api.restoreSession` |
 | Login | `POST /api/login` | `Api.login` |
-| Roster | `GET /api/characters` | `Api.characters` |
+| Realm directory | `GET /api/realms` | `Api.realms` |
+| Roster (per realm) | `GET /api/characters` | `Api.characters` after `setRealm` |
 | Daily status | `GET /api/daily-rewards` | `Api.dailyRewards` |
 | Spin | `POST /api/daily-rewards/spin` | `Api.spinDailyReward` |
+| Daily history | `GET /api/daily-rewards/history` | `Api.dailyRewardHistory` |
+| Renown self | `GET /api/leaderboard?board=deeds` | `Api.deedsLeaderboard` |
 | Claudium | `GET /api/claudium/balance` | `EconomySdk.balance` |
 
 ## 4. Architecture
@@ -64,13 +70,15 @@ Pure `home_model.ts` is unit-tested without network. Render is thin.
 
 | Risk | Mitigation |
 | --- | --- |
-| i18n gate | Catalog keys under `companion.*` + i18n:gen |
+| i18n gate | Catalog keys under `companion.*` in `src/ui/i18n.catalog/companion.ts` + i18n:gen |
 | Daily rewards feature flag off | Empty/unavailable state from API |
-| Multi-realm characters | List for current realm only (Api.characters); note in UI |
+| Multi-realm characters | Fan-out via `realmsToFetch` + per-realm `characters()`; skip unreachable realms |
+| Deeds board offline | Soft empty page from `Api.deedsLeaderboard`; chip shows unavailable/unranked |
 
 ## 7. Exit criteria
 
 - `companion.html` loads at `/companion`
-- Unit tests for home model
-- Manual: login → see roster + daily + Claudium → spin when eligible
+- Unit tests for home model (spin, multi-realm merge, deeds, history)
+- Manual: login → see multi-realm roster + daily + Claudium + Renown + history → spin when eligible
 - Pre-push floor green
+- i18n catalog includes `companion.*` (locale fills at release)

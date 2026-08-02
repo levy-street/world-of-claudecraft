@@ -1,8 +1,16 @@
-// Companion Home shell: session restore, login, load home data, spin.
+// Companion Home shell: session restore, login, multi-realm roster, spin, deeds, history.
 
 import { EconomyClient } from '../net/economy_sdk';
 import { Api } from '../net/online';
-import { applySpinResult, buildHomeModel, type CompanionHomeModel } from './home_model';
+import {
+  applySpinResult,
+  buildHomeModel,
+  type CompanionHomeModel,
+  type CompanionRosterCard,
+  mapRoster,
+  mergeRosterCards,
+  realmsToFetch,
+} from './home_model';
 import { type CompanionT, renderHome, renderLoading, renderLogin } from './home_render';
 
 export interface CompanionAppOptions {
@@ -84,20 +92,50 @@ export class CompanionApp {
     }
   }
 
+  /** Fan out character fetches across realms that hold this account's chars. */
+  private async loadMultiRealmRoster(): Promise<CompanionRosterCard[]> {
+    const previousBase = this.api.base;
+    const directory = await this.api.realms();
+    const targets = realmsToFetch(directory, previousBase);
+    const batches: CompanionRosterCard[] = [];
+    try {
+      for (const entry of targets) {
+        if (entry.url) {
+          this.api.setRealm(entry.url);
+        } else {
+          this.api.base = previousBase;
+        }
+        try {
+          const characters = await this.api.characters();
+          batches.push(...mapRoster(characters, entry.name));
+        } catch {
+          // Unreachable or unauthorized realm: skip; other realms still load.
+        }
+      }
+    } finally {
+      this.api.base = previousBase;
+    }
+    return mergeRosterCards(batches);
+  }
+
   private async loadHome(): Promise<void> {
     renderLoading(this.root, this.t);
     const username = this.api.username ?? 'player';
     try {
-      const [characters, daily, claudium] = await Promise.all([
-        this.api.characters(),
+      const [roster, daily, claudium, deeds, history] = await Promise.all([
+        this.loadMultiRealmRoster(),
         this.api.dailyRewards(),
         this.economy.balance(),
+        this.api.deedsLeaderboard(0, 1),
+        this.api.dailyRewardHistory(),
       ]);
       this.home = buildHomeModel({
         username,
-        characters,
+        roster,
         daily,
         claudium,
+        deeds,
+        history,
         playUrl: this.playUrl,
       });
       this.paintHome();
@@ -138,7 +176,6 @@ export class CompanionApp {
       this.home = applySpinResult(this.home, result);
     } catch (error) {
       const message = error instanceof Error ? error.message : this.t('companion.home.spinFailed');
-      // Re-paint with error as eligibility-style banner: reload full status.
       await this.loadHome();
       if (this.home) {
         const banner = document.createElement('p');

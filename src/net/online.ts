@@ -901,8 +901,52 @@ export class Api {
     return this.post('/api/daily-rewards/spin', {});
   }
 
+  // Soft-empty on failure (matches ClientWorld): history is optional companion
+  // chrome and must not fail the parent surface when the endpoint is dark.
   async dailyRewardHistory(): Promise<DailyRewardHistory> {
-    return this.get('/api/daily-rewards/history');
+    try {
+      const res = await fetch(apiUrl('/api/daily-rewards/history', this.base), {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      });
+      if (!res.ok) return { payouts: [] };
+      return (await res.json()) as DailyRewardHistory;
+    } catch {
+      return { payouts: [] };
+    }
+  }
+
+  // Renown (deeds) board for companion Home and other non-world surfaces.
+  // Bearer rides the read so a ranked caller's `self` standing is returned.
+  // Failure resolves the empty page (never throws) so optional chips stay soft.
+  async deedsLeaderboard(
+    page = 0,
+    pageSize = LEADERBOARD_PAGE_SIZE,
+  ): Promise<DeedsLeaderboardPage> {
+    const empty: DeedsLeaderboardPage = {
+      leaders: [],
+      page: 0,
+      pageCount: 1,
+      total: 0,
+      pageSize,
+    };
+    try {
+      const res = await fetch(
+        apiUrl(`/api/leaderboard?board=deeds&page=${page}&pageSize=${pageSize}`, this.base),
+        { headers: this.token ? { Authorization: `Bearer ${this.token}` } : {} },
+      );
+      if (!res.ok) return empty;
+      const data = await res.json();
+      return {
+        leaders: data.leaders ?? [],
+        page: data.page ?? page,
+        pageCount: data.pageCount ?? 1,
+        total: data.total ?? data.leaders?.length ?? 0,
+        pageSize: data.pageSize ?? pageSize,
+        ...(data.self ? { self: data.self } : {}),
+      };
+    } catch {
+      return empty;
+    }
   }
 
   // Unlink Discord. A Discord-provisioned account (no real password yet) must send a

@@ -2438,6 +2438,70 @@ export const en_XA: EnTranslations = {
       "invalid_input": "[Íñʋáļíð íñþúţ.]"
     }
   },
+  "companion": {
+    "home": {
+      "brand": "[ŴÓÇ Çóɱþáñíóñ]",
+      "logout": "[Ļóĝ óúţ]",
+      "dailyTitle": "[Ðáíļý ŕéŵáŕðš]",
+      "dayLine": "[Ðáý {day} · Ŕéšéţš íñ {reset}]",
+      "scoreLine": "[Šçóŕé {score} · Ŕáñķ {rank}]",
+      "unranked": "[-]",
+      "eligible": "[Éļíĝíƀļé ƒóŕ ţóðáý'š šþíñ.]",
+      "eligibility": {
+        "noWallet": "[Ļíñķ á ŵáļļéţ íñ ţĥé ĝáɱé ţó ƀéçóɱé éļíĝíƀļé ƒóŕ ðáíļý ŕéŵáŕðš.]",
+        "underMinimum": "[Ĥóļð ɱóŕé $ŴÓÇ ţó ɱééţ ţĥé ðáíļý ŕéŵáŕðš ɱíñíɱúɱ.]",
+        "priceUnavailable": "[Ðáíļý ŕéŵáŕðš þŕíçíñĝ íš ţéɱþóŕáŕíļý úñáʋáíļáƀļé.]",
+        "banned": "[Ţĥíš áççóúñţ çáññóţ úšé ðáíļý ŕéŵáŕðš ŕíĝĥţ ñóŵ.]",
+        "unknown": "[Ñóţ éļíĝíƀļé ƒóŕ ðáíļý ŕéŵáŕðš.]"
+      },
+      "spinCta": "[Šþíñ ñóŵ]",
+      "spinClaimed": "[Çļáíɱéð · +{points} þţš]",
+      "spinUnavailable": "[Šþíñ úñáʋáíļáƀļé]",
+      "spinning": "[Šþíññíñĝ…]",
+      "spinFailed": "[Šþíñ ƒáíļéð. Ţŕý áĝáíñ.]",
+      "playBalances": "[Þļáý ƀáļáñçéš]",
+      "claudium": "[Çļáúðíúɱ]",
+      "roster": "[Ŕóšţéŕ]",
+      "rosterEmpty": "[Ñó çĥáŕáçţéŕš ýéţ. Óþéñ ţĥé ĝáɱé ţó çŕéáţé óñé.]",
+      "rosterMeta": "[Ļʋ {level} {classId} · {online}]",
+      "rosterMetaRealm": "[Ļʋ {level} {classId} · {realm} · {online}]",
+      "rosterMultiRealm": "[Çĥáŕáçţéŕš áçŕóšš áļļ ýóúŕ ŵóŕļðš.]",
+      "online": "[Óñļíñé]",
+      "offline": "[Óƒƒļíñé]",
+      "openGame": "[Óþéñ ĝáɱé]",
+      "refresh": "[Ŕéƒŕéšĥ]",
+      "loading": "[Ļóáðíñĝ…]",
+      "loadFailed": "[Çóúļð ñóţ ļóáð çóɱþáñíóñ ðáţá.]",
+      "deedsTitle": "[Ŕéñóŵñ]",
+      "deedsUnavailable": "[Ŕéñóŵñ ƀóáŕð úñáʋáíļáƀļé.]",
+      "deedsUnranked": "[Ñóţ ýéţ ŕáñķéð óñ ţĥé Ŕéñóŵñ ƀóáŕð.]",
+      "deedsRank": "[Ŕáñķ #{rank} · Ţóþ {topPercent}%]",
+      "deedsRankRenown": "[Ŕáñķ #{rank} · Ţóþ {topPercent}% · {renown} Ŕéñóŵñ]",
+      "historyTitle": "[Ŕéçéñţ ðáíļý þáýóúţš]",
+      "historyEmpty": "[Ñó ðáíļý þáýóúţ ĥíšţóŕý ýéţ.]",
+      "historyRank": "[Ŕáñķ #{rank}]",
+      "historyMeta": "[{points} þţš · {prize} · {status}]",
+      "historyTx": "[Ʋíéŵ ţŕáñšáçţíóñ]",
+      "historyStatus": {
+        "pending": "[Þéñðíñĝ]",
+        "paid": "[Þáíð]",
+        "failed": "[Ƒáíļéð]",
+        "skipped": "[Šķíþþéð]"
+      }
+    },
+    "login": {
+      "title": "[Šíĝñ íñ]",
+      "help": "[Úšé ýóúŕ Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ áççóúñţ.]",
+      "username": "[Úšéŕñáɱé]",
+      "password": "[Þáššŵóŕð]",
+      "submit": "[Šíĝñ íñ]",
+      "busy": "[Šíĝñíñĝ íñ…]",
+      "missingFields": "[Éñţéŕ úšéŕñáɱé áñð þáššŵóŕð.]",
+      "failed": "[Šíĝñ-íñ ƒáíļéð.]",
+      "sessionExpired": "[Šéššíóñ éẋþíŕéð. Šíĝñ íñ áĝáíñ.]",
+      "twoFactor": "[Ţŵó-ƒáçţóŕ ļóĝíñ íš ŕéɋúíŕéð. Úšé ţĥé ƒúļļ ĝáɱé çļíéñţ.]"
+    }
+  },
   "guide": {
     "brand": "[Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ]",
     "brandShort": "[ÇļáúðéÇŕáƒţ]",

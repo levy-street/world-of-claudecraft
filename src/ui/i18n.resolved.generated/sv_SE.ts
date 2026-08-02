@@ -2438,6 +2438,70 @@ export const sv_SE: EnTranslations = {
       "invalid_input": "Ogiltig indata."
     }
   },
+  "companion": {
+    "home": {
+      "brand": "WOC Companion",
+      "logout": "Log out",
+      "dailyTitle": "Daily rewards",
+      "dayLine": "Day {day} · Resets in {reset}",
+      "scoreLine": "Score {score} · Rank {rank}",
+      "unranked": "-",
+      "eligible": "Eligible for today's spin.",
+      "eligibility": {
+        "noWallet": "Link a wallet in the game to become eligible for daily rewards.",
+        "underMinimum": "Hold more $WOC to meet the daily rewards minimum.",
+        "priceUnavailable": "Daily rewards pricing is temporarily unavailable.",
+        "banned": "This account cannot use daily rewards right now.",
+        "unknown": "Not eligible for daily rewards."
+      },
+      "spinCta": "Spin now",
+      "spinClaimed": "Claimed · +{points} pts",
+      "spinUnavailable": "Spin unavailable",
+      "spinning": "Spinning…",
+      "spinFailed": "Spin failed. Try again.",
+      "playBalances": "Play balances",
+      "claudium": "Claudium",
+      "roster": "Roster",
+      "rosterEmpty": "No characters yet. Open the game to create one.",
+      "rosterMeta": "Lv {level} {classId} · {online}",
+      "rosterMetaRealm": "Lv {level} {classId} · {realm} · {online}",
+      "rosterMultiRealm": "Characters across all your worlds.",
+      "online": "Online",
+      "offline": "Offline",
+      "openGame": "Open game",
+      "refresh": "Refresh",
+      "loading": "Loading…",
+      "loadFailed": "Could not load companion data.",
+      "deedsTitle": "Renown",
+      "deedsUnavailable": "Renown board unavailable.",
+      "deedsUnranked": "Not yet ranked on the Renown board.",
+      "deedsRank": "Rank #{rank} · Top {topPercent}%",
+      "deedsRankRenown": "Rank #{rank} · Top {topPercent}% · {renown} Renown",
+      "historyTitle": "Recent daily payouts",
+      "historyEmpty": "No daily payout history yet.",
+      "historyRank": "Rank #{rank}",
+      "historyMeta": "{points} pts · {prize} · {status}",
+      "historyTx": "View transaction",
+      "historyStatus": {
+        "pending": "Pending",
+        "paid": "Paid",
+        "failed": "Failed",
+        "skipped": "Skipped"
+      }
+    },
+    "login": {
+      "title": "Sign in",
+      "help": "Use your World of ClaudeCraft account.",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Sign in",
+      "busy": "Signing in…",
+      "missingFields": "Enter username and password.",
+      "failed": "Sign-in failed.",
+      "sessionExpired": "Session expired. Sign in again.",
+      "twoFactor": "Two-factor login is required. Use the full game client."
+    }
+  },
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",

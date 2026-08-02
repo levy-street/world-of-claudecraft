@@ -1,7 +1,12 @@
 // DOM renderer for Companion Home. Player-facing strings go through `t`.
 
-import type { CompanionHomeModel, SpinAction } from './home_model';
-import { formatClaudium, formatResetCountdown } from './home_model';
+import type {
+  CompanionHistoryRow,
+  CompanionHomeModel,
+  DeedsStanding,
+  SpinAction,
+} from './home_model';
+import { formatClaudium, formatPrizeUsd, formatResetCountdown } from './home_model';
 
 export type CompanionT = (key: string, vars?: Record<string, string | number>) => string;
 
@@ -39,6 +44,62 @@ function spinButtonLabel(t: CompanionT, spin: SpinAction): string {
     return t('companion.home.spinClaimed', { points: spin.points });
   }
   return t('companion.home.spinUnavailable');
+}
+
+function deedsCopy(t: CompanionT, deeds: DeedsStanding): string {
+  if (deeds.kind === 'unavailable') return t('companion.home.deedsUnavailable');
+  if (deeds.kind === 'unranked') return t('companion.home.deedsUnranked');
+  if (deeds.renown !== null) {
+    return t('companion.home.deedsRankRenown', {
+      rank: deeds.rank,
+      topPercent: deeds.topPercent,
+      renown: deeds.renown,
+    });
+  }
+  return t('companion.home.deedsRank', {
+    rank: deeds.rank,
+    topPercent: deeds.topPercent,
+  });
+}
+
+function historyStatusLabel(t: CompanionT, status: string): string {
+  const key = `companion.home.historyStatus.${status}`;
+  const localized = t(key);
+  return localized === key ? status : localized;
+}
+
+function renderHistoryList(t: CompanionT, history: readonly CompanionHistoryRow[]): HTMLElement {
+  if (history.length === 0) {
+    return el('p', 'companion-empty', t('companion.home.historyEmpty'));
+  }
+  const list = el('ul', 'companion-history');
+  for (const row of history) {
+    const li = el('li', 'companion-history-item');
+    const head = el('div', 'companion-history-head');
+    head.append(
+      el('span', 'companion-history-day', row.day),
+      el('span', 'companion-history-rank', t('companion.home.historyRank', { rank: row.rank })),
+    );
+    const meta = el(
+      'span',
+      'companion-history-meta',
+      t('companion.home.historyMeta', {
+        points: row.points,
+        prize: formatPrizeUsd(row.prizeUsd),
+        status: historyStatusLabel(t, row.status),
+      }),
+    );
+    li.append(head, meta);
+    if (row.txSignature) {
+      const tx = el('a', 'companion-history-tx', t('companion.home.historyTx'));
+      tx.href = `https://solscan.io/tx/${encodeURIComponent(row.txSignature)}`;
+      tx.target = '_blank';
+      tx.rel = 'noopener noreferrer';
+      li.append(tx);
+    }
+    list.append(li);
+  }
+  return list;
 }
 
 export interface HomeRenderHandlers {
@@ -101,6 +162,12 @@ export function renderHome(
   hero.append(spinBtn);
   shell.append(hero);
 
+  // Deeds / Renown standing chip
+  const deeds = el('section', 'companion-card companion-deeds');
+  deeds.append(el('h2', 'companion-section', t('companion.home.deedsTitle')));
+  deeds.append(el('p', 'companion-deeds-line', deedsCopy(t, model.deeds)));
+  shell.append(deeds);
+
   // Play balances
   const balances = el('section', 'companion-card');
   balances.append(el('h2', 'companion-section', t('companion.home.playBalances')));
@@ -113,6 +180,9 @@ export function renderHome(
   // Roster
   const roster = el('section', 'companion-card');
   roster.append(el('h2', 'companion-section', t('companion.home.roster')));
+  if (model.multiRealm) {
+    roster.append(el('p', 'companion-meta', t('companion.home.rosterMultiRealm')));
+  }
   if (model.emptyRoster) {
     roster.append(el('p', 'companion-empty', t('companion.home.rosterEmpty')));
   } else {
@@ -120,21 +190,27 @@ export function renderHome(
     for (const c of model.roster) {
       const li = el('li', 'companion-roster-item');
       const name = el('span', 'companion-roster-name', c.name);
-      const meta = el(
-        'span',
-        'companion-roster-meta',
-        t('companion.home.rosterMeta', {
-          level: c.level,
-          classId: c.classId,
-          online: c.online ? t('companion.home.online') : t('companion.home.offline'),
-        }),
-      );
+      const metaVars: Record<string, string | number> = {
+        level: c.level,
+        classId: c.classId,
+        online: c.online ? t('companion.home.online') : t('companion.home.offline'),
+      };
+      const metaText = c.realm
+        ? t('companion.home.rosterMetaRealm', { ...metaVars, realm: c.realm })
+        : t('companion.home.rosterMeta', metaVars);
+      const meta = el('span', 'companion-roster-meta', metaText);
       li.append(name, meta);
       list.append(li);
     }
     roster.append(list);
   }
   shell.append(roster);
+
+  // Daily reward history
+  const history = el('section', 'companion-card');
+  history.append(el('h2', 'companion-section', t('companion.home.historyTitle')));
+  history.append(renderHistoryList(t, model.history));
+  shell.append(history);
 
   // Actions
   const actions = el('div', 'companion-actions');
