@@ -71,10 +71,14 @@ function stripComments(src: string): string {
 }
 
 // A specifier a host-agnostic sim file must never import. Returns the offending
-// layer/package, or null when the import is allowed.
+// layer/package, or null when the import is allowed. `server/` is banned like the
+// browser host layers (even type-only): server modules drag Node-only deps (pg,
+// node:*) that would break the sim in the browser, and shared server contracts are
+// REDECLARED in the sim with a test-side lockstep pin instead (the GuildRank
+// precedent: src/sim/guild_bank.ts GUILD_RANKS pinned by tests/guild_bank.test.ts).
 function forbiddenImport(spec: string): string | null {
   if (spec === 'three' || spec.startsWith('three/')) return 'three';
-  const layer = spec.match(/(?:^|\/)(render|ui|game|net)\//);
+  const layer = spec.match(/(?:^|\/)(render|ui|game|net|server)\//);
   return layer ? layer[1] : null;
 }
 
@@ -446,7 +450,7 @@ describe('src/sim architecture invariants', () => {
     expect(simFiles.length).toBeGreaterThan(10);
   });
 
-  it('imports nothing from render/ui/game/net or three (host-agnostic core)', () => {
+  it('imports nothing from render/ui/game/net/server or three (host-agnostic core)', () => {
     const violations = scanImports(simFiles, forbiddenImport);
     expect(violations, `src/sim must stay host-agnostic:\n${violations.join('\n')}`).toEqual([]);
   });
