@@ -34,6 +34,7 @@ import { clearThreat } from '../threat';
 import { dist2d, type Entity, NYTHRAXIS_BOSS_ID } from '../types';
 import { groundHeight } from '../world';
 import { resetMobCharge } from './charge';
+import { resetDeckLeap } from './deck_leap';
 import { resetMechanicSpacing } from './mechanic_spacing';
 
 const PACK_FRENZY_AURA_ID = 'pack_frenzy'; // attack-speed buff granted to surviving packmates
@@ -99,6 +100,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.infernoGatesFired = 0;
   // Charge resets READY (cooldown 0), not telegraphed: a fresh life opens with it.
   resetMobCharge(mob);
+  resetDeckLeap(mob);
   mob.mendTimer = MOBS[mob.templateId]?.mendAlly?.every ?? 0;
   mob.wardTimer = MOBS[mob.templateId]?.wardAllies?.every ?? 0;
   mob.channelTimer = MOBS[mob.templateId]?.channelHeal?.every ?? 0;

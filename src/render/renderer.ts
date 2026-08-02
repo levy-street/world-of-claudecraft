@@ -33,6 +33,7 @@ import {
   zoneAt,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
+import { courseInstKey } from '../sim/rift/course_runtime';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
@@ -290,6 +291,7 @@ import {
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
+import { buildRiftCourseFeatures } from './rift_course';
 import { buildRiftRankBadge } from './rift_rank';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import {
@@ -7005,6 +7007,9 @@ export class Renderer {
   // share the loader cache and the instance-held kit materials, so only the
   // scene-graph nodes and the light/flame registries are reclaimed.
   private riftInteriorGroups = new Map<string, THREE.Group>();
+  // Per-frame course feature ticks, keyed like riftInteriorGroups and
+  // retired with them.
+  private riftCourseTicks = new Map<string, (displayTime: number) => void>();
   // Protect Yumi maze interiors, one per match slot, built lazily like the
   // arena copies; their update() anchors the team beacons each frame.
   private yumiMazeViews = new Map<number, YumiMazeView>();
@@ -7384,8 +7389,24 @@ export class Renderer {
                   this.retireInteriorGroup(staleGroup);
                   this.riftInteriorGroups.delete(staleKey);
                   this.builtInteriors.delete(staleKey);
+                  this.riftCourseTicks.delete(staleKey);
                 }
                 this.riftInteriorGroups.set(key, group);
+                // The parkour course: built into the same group so it
+                // retires with the floor, animated per frame off the shared
+                // course clock and registries the sim's floor query reads.
+                if (floor.course) {
+                  this.riftCourseTicks.set(
+                    key,
+                    buildRiftCourseFeatures(
+                      group,
+                      floor.course,
+                      courseInstKey(o.x, o.z),
+                      this.lowGfx,
+                      () => this.sim.player?.id ?? -1,
+                    ),
+                  );
+                }
               })
               .catch((err) => {
                 console.error('Failed to build rift interior:', err);
@@ -9308,6 +9329,9 @@ export class Renderer {
       dt,
       this.reducedMotion(),
     );
+    if (this.riftCourseTicks.size > 0) {
+      for (const tick of this.riftCourseTicks.values()) tick(this.time);
+    }
     this.dungeons?.update(
       this.camera.position.x,
       this.camera.position.y,

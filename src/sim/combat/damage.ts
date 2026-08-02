@@ -30,6 +30,7 @@ import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
+import { resetDeckLeap } from '../mob/deck_leap';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -1074,6 +1075,9 @@ function reflectSpellWard(
 
 export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
   resetProcState(e);
+  // Seat a body killed mid-leap on its landing: the dead branch of updateMob
+  // returns before movement, so without this the corpse hangs in the air.
+  if (e.mobLeap) resetDeckLeap(e);
   e.dead = true;
   e.hp = 0;
   ctx.clearNonPlayerStatAuras(e);

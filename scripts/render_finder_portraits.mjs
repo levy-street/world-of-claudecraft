@@ -42,7 +42,19 @@ const bundled = await esbuild.build({
   bundle: true,
   format: 'iife',
   platform: 'browser',
-  define: { 'import.meta.env.DEV': 'true', 'import.meta.env.PROD': 'false' },
+  define: {
+    'import.meta.env.DEV': 'true',
+    'import.meta.env.PROD': 'false',
+    // client_origin.ts and runtime.ts (in the render graph since the
+    // graphics overhaul) read the origin/app env keys; without defines
+    // esbuild lowers import.meta to an empty shim and the page dies before
+    // the first render. All headless-irrelevant, so they define to undefined.
+    'import.meta.env.VITE_NATIVE_APP': 'undefined',
+    'import.meta.env.VITE_API_ORIGIN': 'undefined',
+    'import.meta.env.VITE_DESKTOP_API_ORIGIN': 'undefined',
+    'import.meta.env.VITE_DESKTOP_APP': 'undefined',
+    'import.meta.env.VITE_DESKTOP_RELATIVE_API': 'undefined',
+  },
   write: false,
   logLevel: 'silent',
 });

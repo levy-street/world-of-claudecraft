@@ -11154,6 +11154,9 @@ export const da_DK: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "Azgorath, Kulens Herre"
       },
+      "rift_vaulter": {
+        "name": "Riftbound Vaulter"
+      },
       "wildheart_stalker": {
         "name": "Rankeklo-Sniger"
       },

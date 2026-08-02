@@ -71,6 +71,7 @@ import {
   updateMobChargeDash,
 } from './charge';
 import { updateMobCombatProfile } from './combat_profile';
+import { resetDeckLeap, tryDeckLeap, updateDeckLeap } from './deck_leap';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -272,6 +273,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 
   if (!mob.hostile) mob.hostile = true;
 
+  // A deck-to-deck leap in flight owns this body and completes no matter
+  // what, so it resolves BEFORE the stun branch and every mechanic below:
+  // over a rift course there is no safe place to abort an arc
+  // (mob/deck_leap.ts). Inert and free for any mob without one in the air.
+  if (updateDeckLeap(ctx, mob)) return;
+
   const isNythraxis = mob.templateId === NYTHRAXIS_BOSS_ID;
   if (mob.inCombat || (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')) {
     const nythraxisScriptLocked =
@@ -433,6 +440,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         pulseAntiKiteSnare(ctx, mob);
         pulseLoudYell(ctx, mob);
         tryStartMobCharge(ctx, mob);
+        // Parkour pursuit: cross to the tier the target stands on. Inert for
+        // every template without deckLeap, and outside a course region.
+        tryDeckLeap(ctx, mob);
       });
       if (result === 'runAttackMechanics') runMobAttackMechanics(ctx, mob);
       break;
@@ -1055,6 +1065,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.infernoPulsesFired = 0;
   mob.infernoGatesFired = 0;
   // Charge resets READY (cooldown 0), not telegraphed: the next pull opens with it.
+  resetDeckLeap(mob);
   resetMobCharge(mob);
   mob.aoeSlowTimer = MOBS[mob.templateId]?.aoeSlow?.every ?? 0;
   mob.loudYellTimer = MOBS[mob.templateId]?.battleYells?.every ?? 0;

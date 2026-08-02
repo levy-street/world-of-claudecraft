@@ -248,6 +248,10 @@ export interface RiftFloorPlan {
   /** A switch-gated portcullis blocking the nave, or null. Only on otherwise-plain
    * floors (no puzzle/hazard/roller/platform), so it is the floor's one mechanic. */
   gate: RiftGate | null;
+  /** The parkour course, or null on floors that did not roll one. Generated
+   *  from its own salt stream (course_gen.ts) and regenerated client-side
+   *  from the descriptor like the rest of the plan: zero wire footprint. */
+  course: import('../course').CoursePlan | null;
   /** True for a HAND-AUTHORED set-piece floor (its `layout` carries `rooms`/`doors`/
    * `decor` instead of a generated single-room shell). The procedural playability
    * invariants (one nave, a clear central spine, a dais at the far end) do not apply. */

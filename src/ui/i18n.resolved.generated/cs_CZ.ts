@@ -11154,6 +11154,9 @@ export const cs_CZ: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "Azgorath, pán Jámy"
       },
+      "rift_vaulter": {
+        "name": "Riftbound Vaulter"
+      },
       "wildheart_stalker": {
         "name": "Liánodrápý plíživec"
       },

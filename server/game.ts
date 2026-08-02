@@ -1128,6 +1128,11 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     const t = e.climb.elapsed / e.climb.duration;
     out.cl = Math.max(1, Math.min(99, Math.round(t * 100)));
   }
+  // Airborne bit. onGround is authoritative in the sim for players AND for
+  // course leapers mid-arc (mob/deck_leap.ts), but the client's only other
+  // signal is a terrain heuristic gated to players. Present-when-true like
+  // every bit above, so a grounded body costs zero bytes.
+  if (!e.onGround) out.air = 1;
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.forcedTargetId !== null) out.ft = e.forcedTargetId;

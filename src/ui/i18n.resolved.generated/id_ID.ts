@@ -11154,6 +11154,9 @@ export const id_ID: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "Azgorath, Tuan Jurang"
       },
+      "rift_vaulter": {
+        "name": "Riftbound Vaulter"
+      },
       "wildheart_stalker": {
         "name": "Pengintai Vineclaw"
       },

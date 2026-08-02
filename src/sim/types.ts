@@ -1436,6 +1436,14 @@ export interface MobTemplate {
     name: string;
     school?: string;
   };
+  // Deck-to-deck leaping (mob/deck_leap.ts). Inert outside a rift parkour
+  // course region. range caps the leap, rise how far above its feet a
+  // landing may sit, cooldown the seconds between leaps. Draws no rng.
+  deckLeap?: {
+    range: number;
+    rise: number;
+    cooldown: number;
+  };
   // Periodic self-shield: the mob wraps itself in a damage-absorbing barrier
   // every `every` seconds, soaking up to `amount` damage for `duration` seconds.
   // Reuses the existing `absorb` aura (soaked first in dealDamage) - no new combat math.
@@ -3500,6 +3508,11 @@ export interface Entity extends ClientMirroredEntityFields {
   // True while the ice slide is carrying the player: the renderer holds a frozen
   // braced pose (no run cycle) so they read as gliding, not sprinting. Wired (`sld`).
   riftSliding?: boolean;
+  // Deck-to-deck leap (mob/deck_leap.ts). While mobLeap is non-null the arc
+  // OWNS this body's position: the locomotion dispatcher and the rift lift
+  // pass both yield, or the mob would be snapped to a floor mid-flight.
+  mobLeap?: MobLeapFlight | null;
+  mobLeapReadyAt?: number;
   // Cooldown gate (sim time) between rolling-boulder knockbacks, so a single pass
   // shoves + chips once rather than every tick of overlap.
   riftRollerUntil?: number;
@@ -3638,6 +3651,20 @@ export interface NythraxisDialogueCue {
   at: number;
   speaker: 'nythraxis' | 'aldric';
   text: string;
+}
+
+/** An in-flight deck-to-deck mob leap (mob/deck_leap.ts). Closed form in
+ *  `elapsed`, so the whole arc replays from the same numbers on any host. */
+export interface MobLeapFlight {
+  fromX: number;
+  fromY: number;
+  fromZ: number;
+  toX: number;
+  toY: number;
+  toZ: number;
+  elapsed: number;
+  duration: number;
+  apex: number;
 }
 
 export interface NythraxisEncounterState {
@@ -4631,6 +4658,24 @@ export type SimEvent = { pid?: number } & (
   // (the same pure generator the server ran). `active:false` clears it on leave.
   // Text-free structured fields (like skinEvent/craftResult): the client renders
   // its own localized floor label from name/themeName.
+  // Course floor deck state: a crumble deck armed (touch, or a chase wave
+  // reaching it at a FUTURE `at`). World-visible so every client mirrors the
+  // registry the floor query and the renderer read. ox/oz is the floor
+  // origin; the registries key on courseInstKey(ox, oz).
+  | { type: 'riftDeckState'; ox: number; oz: number; deck: number; at: number }
+  // A mob launching a deck-to-deck leap: the takeoff cue, anchored at the
+  // LANDING so interest routing reaches everyone who sees the arc arrive.
+  | { type: 'mobLeap'; entityId: number; x: number; y: number; z: number }
+  // Personal course progress (gems, waybraziers): pid-scoped, so a client
+  // mirrors only its OWN registry entries and renders its own progress.
+  | {
+      type: 'riftCourseMark';
+      pid: number;
+      ox: number;
+      oz: number;
+      kind: 'gem' | 'brazier';
+      index: number;
+    }
   | {
       type: 'riftState';
       pid: number;

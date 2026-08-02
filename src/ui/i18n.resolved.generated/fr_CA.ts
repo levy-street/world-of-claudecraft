@@ -11154,6 +11154,9 @@ export const fr_CA: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "Azgorath, Seigneur de la Fosse"
       },
+      "rift_vaulter": {
+        "name": "Riftbound Vaulter"
+      },
       "wildheart_stalker": {
         "name": "Traqueur Griffe-de-liane"
       },

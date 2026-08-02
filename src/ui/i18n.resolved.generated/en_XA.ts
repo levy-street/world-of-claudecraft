@@ -11154,6 +11154,9 @@ export const en_XA: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "[Ážĝóŕáţĥ, Ļóŕð óƒ ţĥé Þíţ]"
       },
+      "rift_vaulter": {
+        "name": "[Ŕíƒţƀóúñð Ʋáúļţéŕ]"
+      },
       "wildheart_stalker": {
         "name": "[Ʋíñéçļáŵ Šţáļķéŕ]"
       },

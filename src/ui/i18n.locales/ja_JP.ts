@@ -8038,6 +8038,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.edda_reedhand.name': 'エッダ・リードハンド',
   'entities.mobs.tolling_bell.name': '鳴り響く鐘',
   'entities.mobs.rift_spawnling.name': 'リフトの落とし子',
+  'entities.mobs.rift_vaulter.name': '亀裂の跳躍者',
   'entities.mobs.rift_bonewalker.name': '蘇りし骨歩き',
   'entities.mobs.rift_frost_revenant.name': '氷縛の亡霊',
   'entities.mobs.rift_rime_elemental.name': '樹氷のエレメンタル',

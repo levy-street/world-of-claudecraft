@@ -2615,6 +2615,7 @@ export type TranslationKeyFlat =
   | 'entities.mobs.rift_stormscale.name'
   | 'entities.mobs.rift_thornback.name'
   | 'entities.mobs.rift_tide_thrall.name'
+  | 'entities.mobs.rift_vaulter.name'
   | 'entities.mobs.rift_venom_weaver.name'
   | 'entities.mobs.rift_void_acolyte.name'
   | 'entities.mobs.riftspawn.name'

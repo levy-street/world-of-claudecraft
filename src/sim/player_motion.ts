@@ -169,6 +169,12 @@ export interface PlayerMotionDeps {
     kind: 'hit',
     noRage: boolean,
   ): void;
+  /** Rift parkour-course decks: the highest solid deck top under (x, z) at
+   *  or below maxY, in world Y, or -Infinity. The live Sim binds a
+   *  registry-aware closure (rift/course_runtime.ts); the online display
+   *  extrapolator binds nothing, because self-prediction is off in rifts.
+   *  Optional so every existing deps shape stays valid. */
+  courseSupportAt?(x: number, z: number, maxY: number): number;
 }
 
 export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInput): void {
@@ -485,13 +491,20 @@ function verticalPass(
   // beside the body never lifts it); airborne it reaches MANTLE_REACH above
   // the feet, so a jump that carries the body over a rim seats on the top:
   // the mantle. Away from props this IS the terrain height.
-  const support = floorHeightAt(
+  let support = floorHeightAt(
     deps.seed,
     p.pos.x,
     p.pos.z,
     BODY_RADIUS,
     p.pos.y + (p.onGround ? 0 : MANTLE_REACH),
   );
+  // Rift course decks are support too: reach-gated exactly like prop tops,
+  // so a jump seats on a deck and a vanished deck (crumble, blink) collapses
+  // support to the room floor and the body genuinely falls.
+  if (deps.courseSupportAt) {
+    const deck = deps.courseSupportAt(p.pos.x, p.pos.z, p.pos.y + (p.onGround ? 0 : MANTLE_REACH));
+    if (deck > support) support = deck;
+  }
   const deepWater = ground < waterLevelAt(p.pos.x, p.pos.z) - SWIM_DEPTH;
   if (deepWater && p.pos.y <= swimSurfaceY(p.pos.x, p.pos.z) + 0.05) {
     // treading water at the surface

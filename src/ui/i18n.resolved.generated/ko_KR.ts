@@ -11154,6 +11154,9 @@ export const ko_KR: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "구렁의 군주 아즈고라스"
       },
+      "rift_vaulter": {
+        "name": "균열 도약자"
+      },
       "wildheart_stalker": {
         "name": "덩굴발톱 추적자"
       },

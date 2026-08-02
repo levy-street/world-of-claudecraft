@@ -12,6 +12,7 @@
 
 import { clearRiftRegion, resolveMovement, setRiftRegion } from '../colliders';
 import { delveChestItemsForTier } from '../content/delves/lockpick_tiers';
+import { courseClockNow, courseSupportAt } from '../course';
 import {
   DUNGEON_FLOOR_Y,
   isRiftPos,
@@ -34,6 +35,12 @@ import { retargetMob } from '../mob/targeting';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
+import {
+  clearRiftCourseRegion,
+  courseArrivalFor,
+  courseInstKey,
+  setRiftCourseRegion,
+} from './course_runtime';
 import { closeNaturalRiftPortal, RIFT_MIN_LEVEL, RIFT_TIER_INFO } from './portals';
 import { addRiftClearGearLoot, addRiftProgressionLoot } from './progression';
 import { claimRiftFirstClear, markRiftEventActive } from './race';
@@ -259,6 +266,14 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
 
   // Publish the generated collision so movement, pathing, and LoS respect it.
   setRiftRegion(ctx.riftCollisionToken, origin.x, origin.z, layoutColliders(floor.layout));
+  // And the parkour course, when this floor rolled one: the movement
+  // kernel's support hook and the per-tick feature phase both read the
+  // registry, keyed by the same token.
+  if (floor.course) {
+    setRiftCourseRegion(ctx.riftCollisionToken, origin.x, origin.z, floor.course);
+  } else {
+    clearRiftCourseRegion(ctx.riftCollisionToken, origin.x, origin.z);
+  }
 
   inst.mobIds = [];
   inst.objectIds = [];
@@ -435,6 +450,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   if (inst.cacheId !== null) dropObjects(ctx, [inst.cacheId]);
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   clearRiftRegion(ctx.riftCollisionToken, origin.x, origin.z);
+  clearRiftCourseRegion(ctx.riftCollisionToken, origin.x, origin.z);
   inst.mobIds = [];
   inst.objectIds = [];
   inst.pylonIds = [];
@@ -722,6 +738,14 @@ export function enterRift(
   const floor = floorForInstance(inst);
   const p = r.e;
   p.pos = ctx.groundPos(origin.x + floor.entry.x, origin.z + floor.entry.z);
+  // Crash-style checkpointing: a runner who lit a waybrazier on this floor
+  // re-enters ON it (their own progress; a party mate's brazier moves nobody).
+  if (floor.course) {
+    const back = courseArrivalFor(floor.course, courseInstKey(origin.x, origin.z), p.id);
+    if (back) {
+      p.pos = { x: origin.x + back.x, y: DUNGEON_FLOOR_Y + back.y, z: origin.z + back.z };
+    }
+  }
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.facing = 0;
@@ -1097,7 +1121,12 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
     // Switch-gate: stepping the plate raises the linked portcullis for good.
     if (floor.gate && !inst.gateOpen) {
       const sw = inst.switchId !== null ? ctx.entities.get(inst.switchId) : null;
-      if (sw && dist2d(p.pos, sw.pos) < SWITCH_TRIGGER_RADIUS) {
+      // On a course floor the plate stands on the SUMMIT deck: pressing it
+      // requires being AT summit height, or a walker on the floor directly
+      // beneath would open the gate without touching the course.
+      const summitOk =
+        !floor.course || Math.abs(p.pos.y - (DUNGEON_FLOOR_Y + floor.course.summit.y)) < 2.5;
+      if (sw && summitOk && dist2d(p.pos, sw.pos) < SWITCH_TRIGGER_RADIUS) {
         inst.gateOpen = true;
         sw.templateId = 'rift_switch_on';
         const gate = inst.gateId !== null ? ctx.entities.get(inst.gateId) : null;
@@ -1577,11 +1606,47 @@ export function liftRiftEntities(ctx: SimContext): void {
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null) continue;
     const floor = floorForInstance(inst);
-    if (!floor.platform && !floor.layout.rooms?.some((r) => (r.lift ?? 0) !== 0)) continue;
+    const course = floor.course;
+    if (!course && !floor.platform && !floor.layout.rooms?.some((r) => (r.lift ?? 0) !== 0)) {
+      continue;
+    }
     const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
+    const instKey = courseInstKey(origin.x, origin.z);
     const lift = (id: number): void => {
       const e = ctx.entities.get(id);
-      if (e) e.pos.y = DUNGEON_FLOOR_Y + riftLiftAt(floor, e.pos.x - origin.x, e.pos.z - origin.z);
+      if (!e) return;
+      // A leaping mob's arc OWNS its y (mob/deck_leap.ts); flattening it back
+      // to the floor mid-flight would teleport the body out of its jump.
+      if (e.mobLeap) return;
+      let y = DUNGEON_FLOOR_Y + riftLiftAt(floor, e.pos.x - origin.x, e.pos.z - origin.z);
+      // Objects the course places on decks ride them (the summit plate), and
+      // COURSE MOBS keep the tier they are on: support within a stride of
+      // their current height, so a vaulter that landed on the floor stays
+      // down and one on a deck stays up. Floor-level entities under high
+      // decks are untouched (nothing within a stride above them).
+      if (course && e.kind === 'mob') {
+        const stand = courseSupportAt(
+          course,
+          instKey,
+          e.pos.x - origin.x,
+          e.pos.z - origin.z,
+          courseClockNow(),
+          e.pos.y - DUNGEON_FLOOR_Y + 1.0,
+        );
+        if (stand) y = Math.max(y, DUNGEON_FLOOR_Y + stand.top);
+      }
+      if (course && inst.switchId !== null && id === inst.switchId) {
+        const stand = courseSupportAt(
+          course,
+          instKey,
+          e.pos.x - origin.x,
+          e.pos.z - origin.z,
+          courseClockNow(),
+          y - DUNGEON_FLOOR_Y + 8.5,
+        );
+        if (stand) y = Math.max(y, DUNGEON_FLOOR_Y + stand.top);
+      }
+      e.pos.y = y;
     };
     for (const id of inst.mobIds) lift(id);
     for (const id of inst.objectIds) lift(id);

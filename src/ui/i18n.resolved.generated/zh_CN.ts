@@ -11154,6 +11154,9 @@ export const zh_CN: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "深渊之主阿兹戈拉斯"
       },
+      "rift_vaulter": {
+        "name": "裂隙跃击者"
+      },
       "wildheart_stalker": {
         "name": "藤爪潜猎者"
       },

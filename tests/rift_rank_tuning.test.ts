@@ -608,9 +608,19 @@ describe('rift ranks: non-lethal mechanic damage cap (heroic_s safety rule)', ()
 
 describe('rift ranks: A/S one-shot rolling boulder', () => {
   function rollerSeed(): number {
+    // The lane must exist at EVERY baseLevel this suite enters with: the
+    // parkour-course roll is rank-dependent, and a course floor suppresses
+    // its rollers (one headline mechanic at a time).
     for (let s = 1; s < 800; s++) {
       const f = generateRiftFloor(s, 20, 0);
-      if (!f.isBoss && f.rollers.length > 0) return s;
+      if (
+        !f.isBoss &&
+        f.rollers.length > 0 &&
+        generateRiftFloor(s, 22, 0).rollers.length > 0 &&
+        generateRiftFloor(s, 25, 0).rollers.length > 0
+      ) {
+        return s;
+      }
     }
     throw new Error('no roller seed found');
   }

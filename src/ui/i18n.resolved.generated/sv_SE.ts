@@ -11154,6 +11154,9 @@ export const sv_SE: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "Azgorath, Gropens herre"
       },
+      "rift_vaulter": {
+        "name": "Riftbound Vaulter"
+      },
       "wildheart_stalker": {
         "name": "Rankklons smygare"
       },
