@@ -62,7 +62,7 @@ describe('post effect composer', () => {
     expect(setSize).toHaveBeenCalledWith(1280, 720);
   });
 
-  it('floors fixed targets and applies a whole-pixel scene region without reallocating', () => {
+  it('floors fixed targets to whole pixels', () => {
     const target = new THREE.WebGLRenderTarget(320, 180, {
       depthBuffer: false,
       samples: 0,
@@ -72,17 +72,35 @@ describe('post effect composer', () => {
     const resizeTarget = vi.spyOn(target, 'setSize');
 
     composer.setSizeAndPixelRatio(641, 361, 1.5);
+
     expect(resizeTarget).toHaveBeenLastCalledWith(961, 541);
+    expect(target.width).toBe(961);
+    expect(target.height).toBe(541);
+  });
 
-    resizeTarget.mockClear();
-    composer.setRenderRegion(640, 360);
-    expect(target.viewport.toArray()).toEqual([0, 0, 640, 360]);
-    expect(target.scissor.toArray()).toEqual([0, 0, 640, 360]);
-    expect(target.scissorTest).toBe(true);
-    expect(resizeTarget).not.toHaveBeenCalled();
+  it('never clamps a ping-pong target to a render region', () => {
+    // The dynamic-resolution region used to be applied here, to every ping-pong
+    // target. That regions every pass that writes to one, not just the scene
+    // draw, so the grade's expansion landed back inside the sub-rect and the tail
+    // pass stretched a never-written margin over the canvas. The region belongs
+    // to the scene pass alone (see post_region_render_pass.ts).
+    const target = new THREE.WebGLRenderTarget(640, 360, {
+      depthBuffer: false,
+      samples: 0,
+      type: THREE.HalfFloatType,
+    });
+    const composer = new PostEffectComposer(rendererStub(), target, 640, 360, false);
 
-    composer.setRenderRegion(961, 541);
-    expect(target.scissorTest).toBe(false);
+    expect('setRenderRegion' in composer).toBe(false);
+    for (const renderTarget of [composer.renderTarget1, composer.renderTarget2]) {
+      expect(renderTarget.scissorTest).toBe(false);
+      expect(renderTarget.viewport.toArray()).toEqual([
+        0,
+        0,
+        renderTarget.width,
+        renderTarget.height,
+      ]);
+    }
   });
 
   it('keeps independent ping-pong targets when a tail pass needs them', () => {

@@ -1,6 +1,5 @@
 import type { N8AOPass } from 'n8ao';
 import * as THREE from 'three';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
@@ -11,6 +10,7 @@ import { PostEffectComposer } from './post_composer';
 import { StaticOpaqueN8AOPass } from './post_n8ao';
 import { OutputGradePass } from './post_output_grade';
 import { postPipelinePlan } from './post_plan_core';
+import { RegionRenderPass } from './post_region_render_pass';
 import { renderLayerDisabled } from './render_dev_flags';
 
 // Post chain: N8AO (high: half-res Low, ultra+insane: full-res Medium)
@@ -161,6 +161,9 @@ export function buildComposer(
   });
   const composer = new PostEffectComposer(webgl, target, width, height, plan.singleComposerBuffer);
 
+  // The scene pass owns the dynamic-resolution region (see post_region_render_pass.ts):
+  // scoping it to this one draw is what keeps every later pass full-extent.
+  let scenePass: RegionRenderPass | null = null;
   let ao: N8AOPass | null = null;
   if (plan.scene.pass === 'n8ao') {
     // N8AOPass replaces RenderPass. A separate scene pass would be discarded.
@@ -198,7 +201,8 @@ export function buildComposer(
     }
     composer.addPass(ao);
   } else {
-    composer.addPass(new RenderPass(scene, camera));
+    scenePass = new RegionRenderPass(scene, camera);
+    composer.addPass(scenePass);
   }
 
   let bloom: UnrealBloomPass | null = null;
@@ -257,13 +261,21 @@ export function buildComposer(
       // logical aspect, not the drawing-buffer extent.
       aspect = width / Math.max(1, height);
       if (gradeOnly) {
-        composer.setRenderRegion(composer.renderTarget1.width, composer.renderTarget1.height);
+        if (scenePass) scenePass.region = null;
         grade.setInputUvRect(1, 1, 1, 1);
       }
     },
     setRenderRegion(region: DynamicResolutionRect): void {
       if (!gradeOnly) return;
-      composer.setRenderRegion(region.renderWidth, region.renderHeight);
+      // Region the scene draw only. The grade then reads that sub-rect and
+      // writes its expansion at the destination's FULL extent, so no pass after
+      // it can emit a partial frame.
+      if (scenePass) {
+        scenePass.region =
+          region.renderWidth < region.targetWidth || region.renderHeight < region.targetHeight
+            ? { width: region.renderWidth, height: region.renderHeight }
+            : null;
+      }
       grade.setInputUvRect(region.uvScaleX, region.uvScaleY, region.uvMaxX, region.uvMaxY);
     },
     render(): void {

@@ -50,19 +50,10 @@ export class PostEffectComposer extends EffectComposer {
     for (const pass of this.passes) pass.setSize(effectiveWidth, effectiveHeight);
   }
 
-  setRenderRegion(width: number, height: number): void {
-    const targets =
-      this.renderTarget1 === this.renderTarget2
-        ? [this.renderTarget1]
-        : [this.renderTarget1, this.renderTarget2];
-    for (const target of targets) {
-      const renderWidth = Math.min(target.width, Math.max(1, Math.floor(width)));
-      const renderHeight = Math.min(target.height, Math.max(1, Math.floor(height)));
-      target.viewport.set(0, 0, renderWidth, renderHeight);
-      target.scissor.set(0, 0, renderWidth, renderHeight);
-      target.scissorTest = renderWidth < target.width || renderHeight < target.height;
-    }
-  }
+  // No setRenderRegion here on purpose. Clamping the ping-pong targets regions
+  // every pass that writes to one, not just the scene draw, which strands a
+  // never-written margin for the tail pass to stretch over the canvas. The
+  // region belongs to the scene pass alone (see post_region_render_pass.ts).
 
   override setSize(width: number, height: number): void {
     const state = this as unknown as EffectComposerSizeState;

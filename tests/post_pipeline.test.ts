@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { dynamicResolutionRect } from '../src/render/dynamic_resolution_core';
+import type { RegionRenderPass } from '../src/render/post_region_render_pass';
 
 const disabledLayers = new Set<string>();
 const gfxSettings = vi.hoisted(() => ({
@@ -157,7 +158,7 @@ describe('live post pipeline', () => {
     );
 
     expect(post.composer.passes.map((pass) => pass.constructor.name)).toEqual([
-      'RenderPass',
+      'RegionRenderPass',
       'OutputGradePass',
       'ShaderPass',
       'SMAAPass',
@@ -179,9 +180,21 @@ describe('live post pipeline', () => {
       minRenderScale: 0.68,
     });
     post.setRenderRegion(rect);
-    expect(post.composer.renderTarget1.viewport.toArray()).toEqual([0, 0, 960, 540]);
-    expect(post.composer.renderTarget1.scissor.toArray()).toEqual([0, 0, 960, 540]);
-    expect(post.composer.renderTarget1.scissorTest).toBe(true);
+    // The region rides the scene pass, which applies and drops it around its own
+    // draw. Both composer targets therefore stay full-extent, so the grade's
+    // expansion and the tail SMAA pass each cover the whole frame. Regioning the
+    // targets here is what left a frozen margin for SMAA to stretch to the canvas.
+    const scenePass = post.composer.passes[0] as RegionRenderPass;
+    expect(scenePass.region).toEqual({ width: 960, height: 540 });
+    for (const renderTarget of [post.composer.renderTarget1, post.composer.renderTarget2]) {
+      expect(renderTarget.scissorTest).toBe(false);
+      expect(renderTarget.viewport.toArray()).toEqual([
+        0,
+        0,
+        renderTarget.width,
+        renderTarget.height,
+      ]);
+    }
     expect(post.grade.uniforms.uInputUvRect.value.toArray()).toEqual([
       rect.uvScaleX,
       rect.uvScaleY,
