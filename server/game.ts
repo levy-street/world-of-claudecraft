@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { createHmac, randomInt, randomUUID } from 'node:crypto';
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
 import {
@@ -322,6 +322,8 @@ import {
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
+import { createPokerService, type PokerService } from './poker_service';
+import { createPokerWireController, type PokerWireController } from './poker_wire';
 import { nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
@@ -337,7 +339,6 @@ import {
 import type { GuildRank, Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
-import { createPokerService } from './poker_service';
 // Imported from the mirror module DIRECTLY (not the ./steam barrel), the same
 // way deeds_records imports onDeedRecorded: the barrel drags routes.ts (and its
 // load-time requireAccount over the db module) into every test that
@@ -685,7 +686,7 @@ const MAIL_WIRE_PROMPT_CMDS = new Set<string>([
 type ClientMessage = Record<string, unknown> & {
   ability?: string;
   accept?: boolean;
-  action?: string;
+  action?: unknown;
   activities?: unknown;
   activity?: string;
   alloc?: unknown;
@@ -734,9 +735,7 @@ type ClientMessage = Record<string, unknown> & {
   tableId?: string;
   handNumber?: number;
   actionSequence?: number;
-  action?: unknown;
   seatIndex?: number;
-  copper?: number;
   watch?: boolean;
   rid?: number;
   role?: string;
@@ -1898,11 +1897,8 @@ export class GameServer {
   private readonly moderation: ModerationService<ClientSession>;
   private readonly generalChatQuota: GeneralChatQuotaCoordinator;
   private readonly generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
-  private readonly pokerService = createPokerService({
-    db: { query: (text, values) => pool.query(text, values) },
-    featureEnabled: () => process.env.POKER_FEATURE_ENABLED === '1',
-    nowMs: () => Date.now(),
-  });
+  private readonly pokerService: PokerService;
+  private readonly pokerWire: PokerWireController<ClientSession>;
   private wireCache = new Map<number, EntityWireCache>();
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
@@ -2163,6 +2159,46 @@ export class GameServer {
     });
     this.riftUpgrader = new RiftUpgradeCoordinator(riftUpgraderConfigFromEnv());
     this.riftAssets = new RiftAssetCoordinator(riftAssetConfigFromEnv());
+    let pokerWire: PokerWireController<ClientSession> | null = null;
+    const pokerAuditHashKey = process.env.POKER_AUDIT_HASH_KEY?.trim() ?? '';
+    const pokerFeatureEnabled = () =>
+      process.env.POKER_FEATURE_ENABLED === '1' && pokerAuditHashKey.length >= 32;
+    this.pokerService = createPokerService({
+      db: { query: (text, values) => pool.query(text, values) },
+      realm: REALM,
+      featureEnabled: pokerFeatureEnabled,
+      nowMs: () => Date.now(),
+      seed: () => randomInt(1, 0x1_0000_0000),
+      secureSeed: () => [
+        randomInt(0, 0x1_0000_0000),
+        randomInt(0, 0x1_0000_0000),
+        randomInt(0, 0x1_0000_0000),
+        randomInt(0, 0x1_0000_0000),
+      ],
+      audit: (event) => {
+        const ip = this.sessionsByCharacterId.get(event.characterId)?.ip;
+        const correlationId =
+          ip && pokerAuditHashKey.length >= 32
+            ? createHmac('sha256', pokerAuditHashKey).update(ip).digest('hex').slice(0, 24)
+            : null;
+        console.info(
+          '[poker-audit]',
+          JSON.stringify({ ...event, realm: REALM, timestamp: Date.now(), correlationId }),
+        );
+      },
+      onChanged: (tableId, result) => pokerWire?.broadcast(tableId, result),
+    });
+    this.pokerWire = createPokerWireController({
+      enabled: pokerFeatureEnabled,
+      participationAllowed: (accountId) =>
+        !(process.env.POKER_SUSPENDED_ACCOUNT_IDS ?? '')
+          .split(',')
+          .some((value) => Number(value.trim()) === accountId),
+      send: (session, message) => this.send(session, message),
+      service: this.pokerService,
+      sessionForCharacter: (characterId) => this.sessionsByCharacterId.get(characterId) ?? null,
+    });
+    pokerWire = this.pokerWire;
     this.social = new SocialService(
       this.socialDb,
       this.socialTransport(),
@@ -2929,6 +2965,9 @@ export class GameServer {
           }
           this.recordPerfCaptureCallback(ticksRun);
           this.expireLinkdeadSessions();
+          void this.pokerService
+            .tick(Date.now())
+            .catch((err) => console.error('poker tick failed:', err));
           // Anchor the achieved-rate meter to the wall clock (hrtime), never to
           // callback counts: late timer fires and the dt clamp are exactly the
           // losses it exists to expose.
@@ -4108,6 +4147,7 @@ export class GameServer {
     } catch (err) {
       console.error('curator standing refresh failed:', err);
     }
+    void this.pokerWire.resume(session).catch((err) => console.error('poker resume failed:', err));
     return session;
   }
 
@@ -4221,6 +4261,7 @@ export class GameServer {
     // flap), so the fresh join notice would read as a glitch.
     if (session.jailed) this.teleportJailedSession(session);
     void this.sendSocialSnapshot(session.characterId);
+    void this.pokerWire.resume(session).catch((err) => console.error('poker resume failed:', err));
     return session;
   }
 
@@ -4354,6 +4395,13 @@ export class GameServer {
         console.error('failed to close play session:', err),
       );
     }
+    // Preserve the leave path's synchronous disconnect contract: callers that
+    // fire-and-forget leave() must observe the client as gone before the first
+    // database await. Keep sessionsByCharacterId until Poker cleanup completes
+    // so its audit callback can still derive the session correlation id.
+    await this.pokerService
+      .releaseCharacter(session.characterId)
+      .catch((err) => console.error('poker leave cleanup failed:', err));
     // Deserting a live Vale Cup match resolves BEFORE the leave save so the
     // benched slot and the counted loss are in the state serializeCharacter
     // persists (idempotent: removePlayer runs it again harmlessly below).
@@ -6630,20 +6678,35 @@ export class GameServer {
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
       return;
     }
+    if (typeof msg.t === 'string' && msg.t.startsWith('poker_')) {
+      if (!this.consumeLane(session, 'command', receivedAtMs / 1000)) return;
+    }
+    if (msg.t === 'poker_list') {
+      void this.pokerWire.list(session);
+      return;
+    }
     if (msg.t === 'poker_action') {
-      void this.handlePokerAction(session, msg, receivedAtMs);
+      void this.pokerWire.action(session, msg);
       return;
     }
     if (msg.t === 'poker_join') {
-      void this.handlePokerJoin(session, msg);
+      void this.pokerWire.join(session, msg);
       return;
     }
     if (msg.t === 'poker_leave') {
-      void this.handlePokerLeave(session, msg);
+      void this.pokerWire.leave(session, msg);
+      return;
+    }
+    if (msg.t === 'poker_rebuy') {
+      void this.pokerWire.rebuy(session, msg);
       return;
     }
     if (msg.t === 'poker_watch') {
-      void this.handlePokerWatch(session, msg);
+      void this.pokerWire.watch(session, msg);
+      return;
+    }
+    if (msg.t === 'poker_stop_watch') {
+      void this.pokerWire.stopWatching(session, msg);
       return;
     }
     if (msg.t !== 'cmd') {
@@ -10887,70 +10950,6 @@ export class GameServer {
     delete session.lastSent.dcomp;
     delete session.lastSent.dclears;
     delete session.lastSent.delveDaily;
-  }
-
-  private async handlePokerJoin(session: ClientSession, msg: ClientMessage): Promise<void> {
-    if (!this.pokerEnabled()) {
-      this.send(session, { t: 'poker_error', error: 'Poker feature is disabled' });
-      return;
-    }
-    const tableId = typeof msg.tableId === 'string' ? msg.tableId : '';
-    const seatIndex = typeof msg.seatIndex === 'number' ? msg.seatIndex : 0;
-    await this.pokerService.buyIn({
-      tableId,
-      accountId: session.accountId,
-      characterId: session.characterId,
-      seatIndex,
-      copper: typeof msg.copper === 'number' ? msg.copper : 2_000,
-    }).catch((err) => {
-      this.send(session, { t: 'poker_error', error: String(err.message ?? err) });
-    });
-    this.send(session, { t: 'poker_snapshot', snapshot: this.pokerService.snapshot(tableId, session.characterId) });
-  }
-
-  private async handlePokerLeave(session: ClientSession, msg: ClientMessage): Promise<void> {
-    const tableId = typeof msg.tableId === 'string' ? msg.tableId : '';
-    await this.pokerService.leaveTable({ tableId, characterId: session.characterId });
-    this.send(session, { t: 'poker_snapshot', snapshot: this.pokerService.snapshot(tableId, session.characterId) });
-  }
-
-  private async handlePokerWatch(session: ClientSession, msg: ClientMessage): Promise<void> {
-    const tableId = typeof msg.tableId === 'string' ? msg.tableId : '';
-    this.send(session, { t: 'poker_snapshot', snapshot: this.pokerService.snapshot(tableId, null) });
-  }
-
-  private async handlePokerAction(session: ClientSession, msg: ClientMessage, receivedAtMs: number): Promise<void> {
-    if (!this.pokerEnabled()) {
-      this.send(session, { t: 'poker_error', error: 'Poker feature is disabled' });
-      return;
-    }
-    const tableId = typeof msg.tableId === 'string' ? msg.tableId : '';
-    const action = msg.action;
-    if (!tableId || !action || typeof action !== 'object') {
-      this.send(session, { t: 'poker_error', error: 'Invalid action' });
-      return;
-    }
-    const actionType = (action as Record<string, unknown>).type;
-    const mappedAction = actionType === 'fold' || actionType === 'check' || actionType === 'call'
-      ? { type: actionType }
-      : actionType === 'bet' || actionType === 'raise'
-        ? { type: actionType, to: Number((action as Record<string, unknown>).to ?? 0) }
-        : actionType === 'all-in'
-          ? { type: 'all-in' }
-          : null;
-    if (!mappedAction) {
-      this.send(session, { t: 'poker_error', error: 'Invalid action' });
-      return;
-    }
-    await this.pokerService.act(tableId, session.characterId, mappedAction).catch((err) => {
-      this.send(session, { t: 'poker_error', error: String(err.message ?? err) });
-    });
-    this.send(session, { t: 'poker_snapshot', snapshot: this.pokerService.snapshot(tableId, session.characterId) });
-    void receivedAtMs;
-  }
-
-  private pokerEnabled(): boolean {
-    return process.env.POKER_FEATURE_ENABLED === '1';
   }
 
   private send(session: ClientSession, obj: unknown): void {

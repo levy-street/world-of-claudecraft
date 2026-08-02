@@ -68,6 +68,7 @@ import {
   recordCharacterCreation,
 } from './player_metrics_db';
 import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
+import { POKER_SCHEMA } from './poker_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
@@ -1321,6 +1322,7 @@ export async function ensureSchema(): Promise<void> {
     // unconditionally (idempotent), like the other schema modules.
     await client.query(MAPS_SCHEMA);
     await client.query(USER_ASSETS_SCHEMA);
+    await client.query(POKER_SCHEMA);
     // Audit trail for the map/asset moderation actions above (unpublish,
     // block, unblock). FK-references accounts(id), so it runs after SCHEMA.
     // Applied unconditionally (idempotent), like the other schema modules.

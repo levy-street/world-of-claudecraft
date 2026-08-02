@@ -1,9 +1,10 @@
 import type { PokerAction, PokerViewerSnapshot } from '../sim/poker/engine';
 
 export interface PokerPlaytestActionView {
-  action: PokerAction;
   kind: PokerAction['type'];
   amount: number | null;
+  minTo: number | null;
+  maxTo: number | null;
 }
 
 export interface PokerPlaytestView {
@@ -16,6 +17,7 @@ export interface PokerPlaytestView {
   actorSeat: number | null;
   actions: PokerPlaytestActionView[];
   lastPayout: number;
+  rake: number;
 }
 
 export interface PokerPlaytestSeatView {
@@ -38,7 +40,10 @@ function cardLabel(card: { rank: string; suit: string }): string {
   return `${card.rank}${suit}`;
 }
 
-export function buildPokerPlaytestView(snapshot: PokerViewerSnapshot): PokerPlaytestView {
+export function buildPokerPlaytestView(
+  snapshot: PokerViewerSnapshot,
+  viewerSeat: number | null,
+): PokerPlaytestView {
   const legal = snapshot.legalActions;
   const result = snapshot.street === null ? snapshot.lastResult : null;
   const revealedCardsBySeat = new Map(
@@ -48,14 +53,13 @@ export function buildPokerPlaytestView(snapshot: PokerViewerSnapshot): PokerPlay
   if (legal) {
     for (const kind of legal.actions) {
       if (kind === 'bet' || kind === 'raise') {
-        if (legal.minTo !== null) {
-          actions.push({ kind, amount: legal.minTo, action: { type: kind, to: legal.minTo } });
-        }
+        actions.push({ kind, amount: null, minTo: legal.minTo, maxTo: legal.maxTo });
       } else {
         actions.push({
           kind,
           amount: kind === 'call' ? legal.toCall : null,
-          action: { type: kind },
+          minTo: null,
+          maxTo: null,
         });
       }
     }
@@ -80,10 +84,11 @@ export function buildPokerPlaytestView(snapshot: PokerViewerSnapshot): PokerPlay
     street: snapshot.street,
     pot: snapshot.pots.reduce((sum, pot) => sum + pot.amount, 0),
     communityCards: (result?.communityCards ?? snapshot.communityCards).map(cardLabel),
-    playerCards: snapshot.seats[0]?.holeCards?.map(cardLabel) ?? [],
-    seats: Array.from({ length: 6 }, (_, seatIndex) => {
+    playerCards:
+      viewerSeat === null ? [] : (snapshot.seats[viewerSeat]?.holeCards?.map(cardLabel) ?? []),
+    seats: Array.from({ length: snapshot.config.numSeats }, (_, seatIndex) => {
       const seat = snapshot.seats[seatIndex] ?? null;
-      const own = seatIndex === 0;
+      const own = viewerSeat !== null && seatIndex === viewerSeat;
       const revealedCards = revealedCardsBySeat.get(seatIndex);
       return {
         seat: seatIndex,
@@ -92,13 +97,13 @@ export function buildPokerPlaytestView(snapshot: PokerViewerSnapshot): PokerPlay
         bet: seat?.bet ?? 0,
         folded: seat?.folded ?? false,
         acting: snapshot.actorSeat === seatIndex,
-        cards: revealedCards ?? (own ? seat?.holeCards?.map(cardLabel) ?? [] : []),
+        cards: revealedCards ?? (own ? (seat?.holeCards?.map(cardLabel) ?? []) : []),
         cardsVisible:
-          revealedCards !== undefined || Boolean(snapshot.street !== null && seat?.inHand && !seat.folded),
+          revealedCards !== undefined ||
+          Boolean(snapshot.street !== null && seat?.inHand && !seat.folded),
         own,
         dealer: snapshot.button === seatIndex,
-        blind:
-          smallBlindSeat === seatIndex ? 'small' : bigBlindSeat === seatIndex ? 'big' : null,
+        blind: smallBlindSeat === seatIndex ? 'small' : bigBlindSeat === seatIndex ? 'big' : null,
         blindAmount:
           smallBlindSeat === seatIndex
             ? snapshot.config.smallBlind
@@ -110,6 +115,22 @@ export function buildPokerPlaytestView(snapshot: PokerViewerSnapshot): PokerPlay
     actorSeat: snapshot.actorSeat,
     actions,
     lastPayout:
-      snapshot.lastResult?.payouts.find((payout) => payout.seat === 0)?.amount ?? 0,
+      viewerSeat === null
+        ? 0
+        : (snapshot.lastResult?.payouts.find((payout) => payout.seat === viewerSeat)?.amount ?? 0),
+    rake: snapshot.lastResult?.rake ?? 0,
   };
+}
+
+export function pokerActionFromInput(
+  action: PokerPlaytestActionView,
+  rawAmount?: string,
+): PokerAction | null {
+  if (action.kind !== 'bet' && action.kind !== 'raise') return { type: action.kind };
+  if (rawAmount === undefined || !/^\d+$/.test(rawAmount.trim())) return null;
+  const to = Number(rawAmount);
+  if (!Number.isSafeInteger(to)) return null;
+  if (action.minTo !== null && to < action.minTo) return null;
+  if (action.maxTo !== null && to > action.maxTo) return null;
+  return { type: action.kind, to };
 }

@@ -1,8 +1,8 @@
 {
-    "chat.tools.terminal.autoApprove": {
-        "/^where\\.exe node ; where\\.exe npm ; where\\.exe npx$/": {
-            "approve": true,
-            "matchCommandLine": true
-        }
+  "chat.tools.terminal.autoApprove": {
+    "/^where\\.exe node ; where\\.exe npm ; where\\.exe npx$/": {
+      "approve": true,
+      "matchCommandLine": true
     }
+  }
 }

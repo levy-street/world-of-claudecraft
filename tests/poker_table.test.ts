@@ -105,9 +105,10 @@ describe('deterministic poker table', () => {
         actions?.actions.includes('check') ? { type: 'check' } : { type: 'call' },
       );
     }
+    const beforeCashOut = table.chipTotal();
     const cashOut = table.standUp(1);
-    expect(table.chipTotal()).toBe(1_200 - cashOut);
-    expect(persistedChipTotal(table)).toBe(1_200 - cashOut);
+    expect(table.chipTotal()).toBe(beforeCashOut - cashOut);
+    expect(persistedChipTotal(table)).toBe(beforeCashOut - cashOut);
   });
 
   it('keeps hole cards private to their viewer', () => {
@@ -222,10 +223,49 @@ describe('deterministic poker table', () => {
 
     const state = table.serialize();
     expect(state.hand).toBeNull();
-    expect(table.chipTotal()).toBe(200);
-    expect(state.seats.reduce((sum, seat) => sum + (seat?.stack ?? 0), 0)).toBe(200);
+    expect(table.chipTotal()).toBe(180);
+    expect(state.seats.reduce((sum, seat) => sum + (seat?.stack ?? 0), 0)).toBe(180);
     expect(state.lastResult?.communityCards).toHaveLength(5);
-    expect(state.lastResult?.payouts.reduce((sum, payout) => sum + payout.amount, 0)).toBe(200);
+    expect(state.lastResult?.rake).toBe(20);
+    expect(state.lastResult?.rakeByPot).toEqual([20]);
+    expect(state.lastResult?.payouts.reduce((sum, payout) => sum + payout.amount, 0)).toBe(180);
+  });
+
+  it('returns an uncalled all-in excess before building pots or charging rake', () => {
+    const table = tableWithPlayers([500, 100]);
+    table.startHand();
+    table.act(1, { type: 'all-in' });
+    table.act(2, { type: 'call' });
+
+    const result = table.serialize().lastResult;
+    expect(result?.pots.map((pot) => pot.amount)).toEqual([200]);
+    expect(result?.rakeByPot).toEqual([20]);
+    expect(
+      (result?.payouts.reduce((sum, payout) => sum + payout.amount, 0) ?? 0) + (result?.rake ?? 0),
+    ).toBe(200);
+    expect(table.chipTotal()).toBe(580);
+  });
+
+  it('supports a persisted 128-bit server seed without collapsing it to one word', () => {
+    const deckFor = (seed: [number, number, number, number]): string[] => {
+      const table = PokerTable.create(CONFIG, new Rng(1), seed);
+      table.sitDown(0, 1, 1_000);
+      table.sitDown(1, 2, 1_000);
+      table.startHand();
+      const restored = PokerTable.restore(table.serialize());
+      expect(restored.serialize()).toEqual(table.serialize());
+      return table.serialize().hand?.deck.map(cardKey) ?? [];
+    };
+
+    expect(deckFor([1, 2, 3, 4])).not.toEqual(deckFor([1, 2, 3, 5]));
+  });
+
+  it('still consumes exactly one shared RNG draw when a secure server seed is provided', () => {
+    const rng = new Rng(77);
+    const draws: number[] = [];
+    rng.setObserver((value) => draws.push(value));
+    PokerTable.create(CONFIG, rng, [1, 2, 3, 4]);
+    expect(draws).toHaveLength(1);
   });
 
   it('conserves chips through folds, calls, raises, side pots, and cash-out', () => {
@@ -239,12 +279,39 @@ describe('deterministic poker table', () => {
 
     const state = table.serialize();
     expect(state.hand).toBeNull();
-    expect(table.chipTotal()).toBe(900);
-    expect(state.seats.reduce((sum, seat) => sum + (seat?.stack ?? 0), 0)).toBe(900);
+    expect(table.chipTotal()).toBe(830);
+    expect(state.seats.reduce((sum, seat) => sum + (seat?.stack ?? 0), 0)).toBe(830);
     expect(state.lastResult?.pots.map((pot) => pot.amount)).toEqual([300, 400]);
+    expect(state.lastResult?.rakeByPot).toEqual([30, 40]);
+    expect(
+      (state.lastResult?.payouts.reduce((sum, payout) => sum + payout.amount, 0) ?? 0) +
+        (state.lastResult?.rake ?? 0),
+    ).toBe(700);
     const playerOneBeforeCashOut = state.seats[0]?.stack ?? 0;
     expect(table.standUp(1)).toBe(playerOneBeforeCashOut);
-    expect(table.chipTotal()).toBe(900 - playerOneBeforeCashOut);
+    expect(table.chipTotal()).toBe(830 - playerOneBeforeCashOut);
+  });
+
+  it('takes no rake when a hand ends before the flop', () => {
+    const table = tableWithPlayers([100, 100]);
+    table.startHand();
+    table.act(1, { type: 'fold' });
+
+    const result = table.serialize().lastResult;
+    expect(result?.communityCards).toEqual([]);
+    expect(result?.rake).toBe(0);
+    expect(result?.payouts.reduce((sum, payout) => sum + payout.amount, 0)).toBe(
+      result?.pots.reduce((sum, pot) => sum + pot.amount, 0),
+    );
+  });
+
+  it('publishes and persists the next expected action sequence', () => {
+    const table = tableWithPlayers([100, 100]);
+    table.startHand();
+    expect(table.snapshotFor(1).actionSequence).toBe(0);
+    table.act(1, { type: 'call' });
+    expect(table.snapshotFor(2).actionSequence).toBe(1);
+    expect(table.serialize().actionSequence).toBe(1);
   });
 
   it('round-trips an active hand and continues byte-identically', () => {
@@ -325,8 +392,9 @@ describe('deterministic poker table', () => {
           (sum, seat) => sum + (seat ? seat.stack + seat.committed : 0),
           0,
         );
-        expect(actualTotal).toBe(expectedTotal);
-        expect(persisted.chipTotal).toBe(expectedTotal);
+        const expectedOutstanding = expectedTotal - (persisted.lastResult?.rake ?? 0);
+        expect(actualTotal).toBe(expectedOutstanding);
+        expect(persisted.chipTotal).toBe(expectedOutstanding);
       }
       expect(table.serialize().hand).toBeNull();
     }

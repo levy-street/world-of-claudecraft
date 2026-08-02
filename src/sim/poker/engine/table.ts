@@ -1,5 +1,6 @@
 import type { Rng } from '../../rng';
 import { Rng as SeededRng } from '../../rng';
+import { calculateRakeForPots } from '../rules';
 import { cardKey, type PokerCard, shuffleDeck, validateDistinctCards } from './cards';
 import { pokerInvariant } from './error';
 import { comparePokerHands, evaluateSevenCardHand } from './hand';
@@ -83,12 +84,15 @@ export interface PokerHandResult {
   payouts: Array<{ seat: number; playerId: PokerPlayerId; amount: number }>;
   winners: number[];
   revealedHoleCards: Array<{ seat: number; cards: PokerCard[] }>;
+  rake: number;
+  rakeByPot: number[];
 }
 
 export interface PokerViewerSnapshot {
   tableId: string;
   config: PokerTableConfig;
   handNumber: number;
+  actionSequence: number;
   button: number | null;
   street: PokerStreet | null;
   actorSeat: number | null;
@@ -102,8 +106,9 @@ export interface PokerViewerSnapshot {
 export interface PokerTableStateV1 {
   version: 1;
   config: PokerTableConfig;
-  tableSeed: number;
+  tableSeed: number | [number, number, number, number];
   handNumber: number;
+  actionSequence: number;
   lastButton: number;
   seats: Array<PokerSeatState | null>;
   hand: PokerHandState | null;
@@ -210,30 +215,89 @@ function mixHandSeed(tableSeed: number, handNumber: number): number {
   return value === 0 ? 0x6d2b79f5 : value;
 }
 
+type PokerSeed128 = [number, number, number, number];
+
+class PokerRng128 {
+  private readonly state: PokerSeed128;
+
+  constructor(seed: PokerSeed128, handNumber: number) {
+    this.state = seed.map((word, index) => {
+      let value = (word ^ Math.imul(handNumber + index, 0x9e3779b1)) >>> 0;
+      value = Math.imul(value ^ (value >>> 16), 0x85ebca6b);
+      value = Math.imul(value ^ (value >>> 13), 0xc2b2ae35);
+      return (value ^ (value >>> 16)) >>> 0;
+    }) as PokerSeed128;
+    if (this.state.every((word) => word === 0)) this.state[0] = 0x6d2b79f5;
+  }
+
+  private nextU32(): number {
+    const [a, b, c, d] = this.state;
+    const result = Math.imul(((Math.imul(b, 5) << 7) | (Math.imul(b, 5) >>> 25)) >>> 0, 9);
+    const t = b << 9;
+    this.state[2] = c ^ a;
+    this.state[3] = d ^ b;
+    this.state[1] = b ^ this.state[2];
+    this.state[0] = a ^ this.state[3];
+    this.state[2] ^= t;
+    this.state[3] = (this.state[3] << 11) | (this.state[3] >>> 21);
+    return result >>> 0;
+  }
+
+  int(min: number, max: number): number {
+    return min + Math.floor((this.nextU32() / 0x1_0000_0000) * (max - min + 1));
+  }
+}
+
+function handRng(tableSeed: number | PokerSeed128, handNumber: number): Pick<Rng, 'int'> {
+  return Array.isArray(tableSeed)
+    ? new PokerRng128(tableSeed, handNumber)
+    : new SeededRng(mixHandSeed(tableSeed, handNumber));
+}
+
 export class PokerTable {
   private readonly configValue: PokerTableConfig;
-  private readonly tableSeed: number;
+  private readonly tableSeed: number | PokerSeed128;
   private seatsValue: Array<PokerSeatState | null>;
   private handNumberValue = 0;
+  private actionSequenceValue = 0;
   private lastButton = -1;
   private handValue: PokerHandState | null = null;
   private lastResultValue: PokerHandResult | null = null;
   private chipTotalValue = 0;
 
-  private constructor(config: PokerTableConfig, tableSeed: number) {
+  private constructor(config: PokerTableConfig, tableSeed: number | PokerSeed128) {
     this.configValue = normalizedConfig(config);
-    this.tableSeed = tableSeed >>> 0 || 0x6d2b79f5;
+    this.tableSeed = Array.isArray(tableSeed)
+      ? ([...tableSeed] as PokerSeed128)
+      : tableSeed >>> 0 || 0x6d2b79f5;
     this.seatsValue = new Array(this.configValue.numSeats).fill(null);
   }
 
-  static create(config: PokerTableConfig, rng: Pick<Rng, 'int'>): PokerTable {
-    return new PokerTable(config, rng.int(1, 0xffffffff));
+  static create(
+    config: PokerTableConfig,
+    rng: Pick<Rng, 'int'>,
+    secureSeed?: PokerSeed128,
+  ): PokerTable {
+    const fallbackSeed = rng.int(1, 0xffffffff);
+    return new PokerTable(config, secureSeed ?? fallbackSeed);
   }
 
   static restore(value: unknown): PokerTable {
     const state = requireRestorableState(value);
-    validateInteger(state.tableSeed, 'Table seed', 1);
-    pokerInvariant(state.tableSeed <= 0xffffffff, 'Table seed is outside uint32 range');
+    if (Array.isArray(state.tableSeed)) {
+      pokerInvariant(state.tableSeed.length === 4, 'Secure table seed must contain four words');
+      for (const word of state.tableSeed) {
+        validateInteger(word, 'Secure table seed word');
+        pokerInvariant(word <= 0xffffffff, 'Secure table seed word is outside uint32 range');
+      }
+      pokerInvariant(
+        state.tableSeed.some((word) => word !== 0),
+        'Secure table seed is empty',
+      );
+    } else {
+      validateInteger(state.tableSeed, 'Table seed', 1);
+      pokerInvariant(state.tableSeed <= 0xffffffff, 'Table seed is outside uint32 range');
+    }
     const table = new PokerTable(state.config, state.tableSeed);
     validateInteger(state.handNumber, 'Hand number');
     validateInteger(state.chipTotal, 'Chip total');
@@ -245,6 +309,10 @@ export class PokerTable {
     );
     pokerInvariant(state.seats.length === table.configValue.numSeats, 'Seat count changed');
     table.handNumberValue = state.handNumber;
+    table.actionSequenceValue =
+      Number.isSafeInteger(state.actionSequence) && state.actionSequence >= 0
+        ? state.actionSequence
+        : 0;
     table.lastButton = state.lastButton;
     table.seatsValue = state.seats.map((seat) => (seat ? table.cloneSeat(seat) : null));
     table.handValue = state.hand ? table.cloneHand(state.hand) : null;
@@ -320,6 +388,7 @@ export class PokerTable {
     );
     pokerInvariant(participating.length >= 2, 'At least two funded players are required');
     this.handNumberValue++;
+    this.actionSequenceValue = 0;
     this.lastResultValue = null;
     this.lastButton = this.nextSeat(this.lastButton, participating);
     const headsUp = participating.length === 2;
@@ -327,14 +396,14 @@ export class PokerTable {
       ? this.lastButton
       : this.nextSeat(this.lastButton, participating);
     const bigBlindSeat = this.nextSeat(smallBlindSeat, participating);
-    const handRng = new SeededRng(mixHandSeed(this.tableSeed, this.handNumberValue));
+    const rng = handRng(this.tableSeed, this.handNumberValue);
     this.handValue = {
       handNumber: this.handNumberValue,
       button: this.lastButton,
       smallBlindSeat,
       bigBlindSeat,
       street: 'preflop',
-      deck: shuffleDeck(handRng),
+      deck: shuffleDeck(rng),
       deckIndex: 0,
       burned: [],
       communityCards: [],
@@ -438,6 +507,7 @@ export class PokerTable {
         this.finishPlayerAction(seatIndex);
         pokerInvariant(this.chipsInTable() === before, 'Poker action changed the chip total');
         this.afterAction(seatIndex);
+        this.actionSequenceValue++;
         this.assertChipConservation();
         return;
       }
@@ -486,6 +556,7 @@ export class PokerTable {
 
     pokerInvariant(this.chipsInTable() === before, 'Poker action changed the chip total');
     this.afterAction(seatIndex);
+    this.actionSequenceValue++;
     this.assertChipConservation();
   }
 
@@ -496,6 +567,7 @@ export class PokerTable {
       tableId: this.configValue.id,
       config: cloneConfig(this.configValue),
       handNumber: this.handNumberValue,
+      actionSequence: this.actionSequenceValue,
       button: hand?.button ?? (this.lastButton >= 0 ? this.lastButton : null),
       street: hand?.street ?? null,
       actorSeat: hand?.actorSeat ?? null,
@@ -525,8 +597,9 @@ export class PokerTable {
     return {
       version: 1,
       config: cloneConfig(this.configValue),
-      tableSeed: this.tableSeed,
+      tableSeed: Array.isArray(this.tableSeed) ? [...this.tableSeed] : this.tableSeed,
       handNumber: this.handNumberValue,
+      actionSequence: this.actionSequenceValue,
       lastButton: this.lastButton,
       seats: this.seatsValue.map((seat) => (seat ? this.cloneSeat(seat) : null)),
       hand: this.handValue ? this.cloneHand(this.handValue) : null,
@@ -729,6 +802,16 @@ export class PokerTable {
     return pots;
   }
 
+  private returnUncalledExcess(): void {
+    const committed = this.seatsValue
+      .flatMap((seat, index) => (seat && seat.committed > 0 ? [{ seat, index }] : []))
+      .sort((a, b) => b.seat.committed - a.seat.committed);
+    if (committed.length < 2 || committed[0].seat.committed === committed[1].seat.committed) return;
+    const excess = committed[0].seat.committed - committed[1].seat.committed;
+    committed[0].seat.committed -= excess;
+    committed[0].seat.stack += excess;
+  }
+
   private settleHand(showdown: boolean): void {
     const hand = this.handValue;
     pokerInvariant(hand, 'Poker hand is missing');
@@ -739,10 +822,13 @@ export class PokerTable {
         for (let i = 0; i < count; i++) hand.communityCards.push(this.drawCard());
       }
     }
+    this.returnUncalledExcess();
     const pots = this.buildPots();
+    const rakeByPot = calculateRakeForPots(pots, hand.communityCards.length >= 3);
+    const rake = rakeByPot.reduce((sum, amount) => sum + amount, 0);
     const payouts = new Map<number, number>();
     const winners = new Set<number>();
-    for (const pot of pots) {
+    for (const [potIndex, pot] of pots.entries()) {
       pokerInvariant(pot.eligibleSeats.length > 0, 'Poker pot has no eligible player');
       let winningSeats: number[];
       if (pot.eligibleSeats.length === 1 || !showdown) {
@@ -763,8 +849,9 @@ export class PokerTable {
           .filter((candidate) => comparePokerHands(candidate.hand, best) === 0)
           .map((candidate) => candidate.seatIndex);
       }
-      const basePayout = Math.floor(pot.amount / winningSeats.length);
-      let odd = pot.amount % winningSeats.length;
+      const netPot = pot.amount - (rakeByPot[potIndex] ?? 0);
+      const basePayout = Math.floor(netPot / winningSeats.length);
+      let odd = netPot % winningSeats.length;
       for (const seatIndex of winningSeats) {
         payouts.set(seatIndex, (payouts.get(seatIndex) ?? 0) + basePayout);
         winners.add(seatIndex);
@@ -781,6 +868,7 @@ export class PokerTable {
       pokerInvariant(seat, 'Poker payout seat is missing');
       seat.stack += amount;
     }
+    this.chipTotalValue -= rake;
     const revealedHoleCards = showdown
       ? this.activeSeatIndices().map((seatIndex) => ({
           seat: seatIndex,
@@ -798,6 +886,8 @@ export class PokerTable {
       })),
       winners: [...winners],
       revealedHoleCards,
+      rake,
+      rakeByPot,
     };
     for (const seat of this.seatsValue) {
       if (!seat) continue;
@@ -841,6 +931,8 @@ export class PokerTable {
       pots: result.pots.map((pot) => ({ ...pot, eligibleSeats: [...pot.eligibleSeats] })),
       payouts: result.payouts.map((payout) => ({ ...payout })),
       winners: [...result.winners],
+      rake: Number.isSafeInteger(result.rake) ? result.rake : 0,
+      rakeByPot: Array.isArray(result.rakeByPot) ? [...result.rakeByPot] : result.pots.map(() => 0),
       revealedHoleCards: result.revealedHoleCards.map((entry) => ({
         seat: entry.seat,
         cards: cloneCards(entry.cards),
@@ -849,6 +941,7 @@ export class PokerTable {
   }
 
   private validateRestoredState(): void {
+    validateInteger(this.actionSequenceValue, 'Action sequence', 0);
     const playerIds = this.seatsValue.flatMap((seat) => (seat ? [seat.playerId] : []));
     pokerInvariant(new Set(playerIds).size === playerIds.length, 'Duplicate poker player');
     for (const seat of this.seatsValue) {
@@ -891,7 +984,7 @@ export class PokerTable {
       validateInteger(hand.deckIndex, 'Deck index');
       pokerInvariant(hand.deckIndex <= hand.deck.length, 'Deck index exceeds deck');
       validateDistinctCards(hand.deck, 52);
-      const expectedDeck = shuffleDeck(new SeededRng(mixHandSeed(this.tableSeed, hand.handNumber)));
+      const expectedDeck = shuffleDeck(handRng(this.tableSeed, hand.handNumber));
       pokerInvariant(
         expectedDeck.every((card, index) => cardKey(card) === cardKey(hand.deck[index])),
         'Restored poker deck does not match its seed',
@@ -1011,10 +1104,7 @@ export class PokerTable {
     if (!result) return;
     validateInteger(result.handNumber, 'Result hand number', 1);
     pokerInvariant(result.handNumber <= this.handNumberValue, 'Result is from a future hand');
-    pokerInvariant(
-      result.communityCards.length === 0 || result.communityCards.length === 5,
-      'Invalid result board',
-    );
+    pokerInvariant([0, 3, 4, 5].includes(result.communityCards.length), 'Invalid result board');
     const revealedCards = result.revealedHoleCards.flatMap((entry) => entry.cards);
     validateDistinctCards([...result.communityCards, ...revealedCards]);
     let potTotal = 0;
@@ -1025,6 +1115,15 @@ export class PokerTable {
       pokerInvariant(pot.eligibleSeats.length > 0, 'Result pot has no eligible seat');
       for (const seat of pot.eligibleSeats) this.validateSeatIndex(seat);
     }
+    validateInteger(result.rake, 'Result rake', 0);
+    pokerInvariant(result.rakeByPot.length === result.pots.length, 'Result rake pots changed');
+    let rakeTotal = 0;
+    for (const [index, amount] of result.rakeByPot.entries()) {
+      validateInteger(amount, 'Result pot rake', 0);
+      pokerInvariant(amount <= (result.pots[index]?.amount ?? -1), 'Result rake exceeds pot');
+      rakeTotal += amount;
+    }
+    pokerInvariant(rakeTotal === result.rake, 'Result rake total changed');
     let payoutTotal = 0;
     for (const payout of result.payouts) {
       this.validateSeatIndex(payout.seat);
@@ -1033,7 +1132,10 @@ export class PokerTable {
       pokerInvariant(Number.isSafeInteger(payoutTotal + payout.amount), 'Result payouts overflow');
       payoutTotal += payout.amount;
     }
-    pokerInvariant(payoutTotal === potTotal, 'Result payouts do not match pots');
+    pokerInvariant(
+      payoutTotal + result.rake === potTotal,
+      'Result payouts and rake do not match pots',
+    );
     pokerInvariant(
       result.winners.every((seat) => result.payouts.some((payout) => payout.seat === seat)),
       'Result winner has no payout',

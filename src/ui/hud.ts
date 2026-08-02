@@ -86,6 +86,7 @@ import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
+import type { PokerClientPort } from '../sim/poker/protocol';
 import {
   computeRespecCost,
   FOCUS_POINT_BUDGET,
@@ -182,7 +183,6 @@ import { blockLandingLogKey } from './block_landing_feedback_core';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
-import { type PokerPlaytestPort, PokerPlaytestWindow } from './poker_playtest_window';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { charSheetRefreshSig } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
@@ -600,6 +600,7 @@ import {
   type PlayerTooltipModel,
   playerTooltipHtml,
 } from './player_tooltip_view';
+import { PokerPlaytestWindow } from './poker_playtest_window';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import {
   buildPostEntryPreviewPrewarmUnits,
@@ -860,7 +861,7 @@ export interface HudFeatures {
   dailyRewardsEnabled: boolean;
   devCommandsEnabled?: boolean;
   constrainedMemory?: boolean;
-  pokerPlaytest?: PokerPlaytestPort;
+  pokerPlaytest?: PokerClientPort;
 }
 
 export interface BugReportPayload {
@@ -2094,7 +2095,9 @@ export class Hud {
     this.pokerPlaytestWindow = features.pokerPlaytest
       ? new PokerPlaytestWindow({
           root: () => $('#poker-playtest-window'),
-          session: features.pokerPlaytest,
+          launcher: () => $('#mm-poker'),
+          client: features.pokerPlaytest,
+          now: () => Date.now(),
           closeOthers: () => this.closeOtherWindows('#poker-playtest-window'),
           sound: {
             deal: () => audio.cardShuffle(),
@@ -2105,6 +2108,7 @@ export class Hud {
           ...this.windowFocus('#poker-playtest-window'),
         })
       : null;
+    if (!this.pokerPlaytestWindow) $('#mm-poker').hidden = true;
     this.actionBarController = new ActionBarController({
       storage: localStorage,
       playerClass: this.sim.cfg.playerClass,
@@ -6403,6 +6407,7 @@ export class Hud {
     this.lastPlayerFrameMaxHp = Number.NaN;
     this.lastPlayerFrameResource = Number.NaN;
     this.lastPlayerFrameMaxResource = Number.NaN;
+    this.pokerPlaytestWindow?.render();
     this.syncDailyRewardsSurfaceLabels();
     this.storePromoCard?.relocalize({
       open: t('hudChrome.wocStore.title'),
