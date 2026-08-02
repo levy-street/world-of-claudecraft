@@ -1,5 +1,6 @@
 import type { NetPipelineSummary } from '../net/net_pipeline_stats';
 import { type AssetTimingSnapshot, assetTimingSnapshot } from '../render/assets/stats';
+import { type BottleneckReading, classifyBottleneck } from '../render/bottleneck_core';
 import type { Renderer } from '../render/renderer';
 import {
   censusTableLines,
@@ -25,6 +26,14 @@ export interface PerfSnapshot {
   };
   mainMs: Record<string, { count: number; avg: number; p95: number; max: number }>;
   renderer: ReturnType<Renderer['perfStats']> | null;
+  /**
+   * GL programs linked since the entry prewarm settled (cumulative); null
+   * until the prewarm finishes or when no renderer exists. Growth here is
+   * mid-play compile debt, the ANGLE/D3D11 freeze driver (#2571).
+   */
+  programsLinkedPostPrewarm: number | null;
+  /** One-line resource attribution for this window (bottleneck_core). */
+  bottleneck: BottleneckReading | null;
   hud: { hotDomWrites: number; hotDomSkippedWrites: number; hotDomSkipRate: number } | null;
   assets: AssetTimingSnapshot;
   network: { connected: boolean; snapInterval: number; lastSnapAge: number; alpha: number } | null;
@@ -397,6 +406,11 @@ export class PerfMonitor {
   private inputToVisibleMs = new NumberSampleRing(MAX_SAMPLES);
   private longTaskMs = new NumberSampleRing(MAX_SAMPLES);
   private longTaskTotalMs = 0;
+  // 1 Hz post-prewarm GL program counts (ungated, like the heap sawtooth):
+  // the 30 s window delta feeds the bottleneck verdict's compile-stall arm,
+  // and the cumulative count rides every fleet report. 64 slots hold a
+  // minute of samples, twice the widest window read.
+  private programWindow = new TimedNumberSampleRing(64);
   private lastLongTaskAt = 0;
   private longTaskObserver: PerformanceObserver | null = null;
   private readonly traceEnabled: boolean;
@@ -811,6 +825,11 @@ export class PerfMonitor {
       this.frameWindow.entries().map((entry) => ({ at: entry.at, ms: entry.value })),
       now,
     );
+    // 1 Hz program-count sample, ungated, and only once the prewarm settled:
+    // boot compiles are the prewarm's job, mid-play growth is the defect.
+    if (this.renderer && this.renderer.prewarmProgramBaseline() !== null) {
+      this.programWindow.push(now, this.renderer.programCount());
+    }
     // Production telemetry reports on its own 75 s / 5 min cadence. Without a
     // visible diagnostic overlay there is nothing to ASSEMBLE every second:
     // doing so sorted every history and copied renderer stats for no consumer.
@@ -843,6 +862,40 @@ export class PerfMonitor {
       };
     };
     const inputDebug = this.readInputDebug();
+    const rendererStats = this.renderer?.perfStats() ?? null;
+    const last30s = windowSummary(30_000);
+    const longTaskSummary = summarize(this.longTaskMs.toArray());
+    // Post-prewarm program growth: the cumulative count for the beacon, the
+    // 30 s window delta for the verdict. Program counts can shrink when
+    // programs dispose, so both clamp at zero.
+    const programBaseline = this.renderer?.prewarmProgramBaseline() ?? null;
+    const programsLinkedPostPrewarm =
+      programBaseline !== null && rendererStats
+        ? Math.max(0, rendererStats.programs - programBaseline)
+        : null;
+    const programSpan = this.programWindow.snapshotSince(now - MAX_WINDOW_MS);
+    const programDelta30s =
+      programSpan.values.length >= 2
+        ? Math.max(0, programSpan.values[programSpan.values.length - 1] - programSpan.values[0])
+        : 0;
+    // Verdict floor: the GPU ring needs enough resolved frames for a stable
+    // p95 before its number outranks the CPU-side inferences.
+    const gpuStats = rendererStats?.gpu ?? null;
+    const bottleneck = rendererStats
+      ? classifyBottleneck({
+          frameP95Ms: last30s.frameMs.p95,
+          targetFrameMs: 1000 / Math.max(1, rendererStats.budget.targetFps),
+          gpuFrameP95Ms: gpuStats && gpuStats.frames >= 30 ? gpuStats.frameP95Ms : null,
+          submitP95Ms: rendererStats.phaseMs.submit.p95,
+          rendererCpuP95Ms: rendererStats.phaseMs.total.p95,
+          mainOtherAvgMs:
+            (mainMs.sim?.avg ?? 0) + (mainMs.hud?.avg ?? 0) + (mainMs.events?.avg ?? 0),
+          longTaskP95Ms: longTaskSummary.p95,
+          programDelta: programDelta30s,
+          externalFrameCap: rendererStats.renderBudget.externalFrameCap,
+          effectiveRenderScale: rendererStats.effectiveRenderScale,
+        })
+      : null;
     const snapshot: PerfSnapshot = {
       seconds: round(seconds),
       frames: this.frames,
@@ -850,11 +903,13 @@ export class PerfMonitor {
       frameMs: summarizeFrames(this.frameMs.toArray()),
       windows: {
         last10s: windowSummary(10_000),
-        last30s: windowSummary(30_000),
+        last30s,
         worst10s: this.worstWindow.current(),
       },
       mainMs: mainMs as PerfSnapshot['mainMs'],
-      renderer: this.renderer?.perfStats() ?? null,
+      renderer: rendererStats,
+      programsLinkedPostPrewarm,
+      bottleneck,
       hud: this.hud?.perfStats() ?? null,
       assets: assetTimingSnapshot(),
       network: this.network,
@@ -872,7 +927,7 @@ export class PerfMonitor {
       },
       browser: {
         longTasks: {
-          ...summarize(this.longTaskMs.toArray()),
+          ...longTaskSummary,
           totalMs: round(this.longTaskTotalMs),
           lastAge: this.lastLongTaskAt > 0 ? round(now - this.lastLongTaskAt) : -1,
         },
@@ -1029,6 +1084,20 @@ export class PerfMonitor {
       ? `hitch ${h.hitches} (compile ${h.byCause['shader-compile']} tex ${h.byCause['texture-upload']} view ${h.byCause['view-create']} other ${h.byCause.other})  prog +${h.programsAdded}`
       : null;
     const censusLines = this.lastCensusLines;
+    const gpu = r?.gpu ?? null;
+    const gpuLine = gpu
+      ? `gpu ${gpu.frameAvgMs}ms p95 ${gpu.frameP95Ms} (${
+          gpu.sections.map((sec) => `${sec.label} ${sec.avgMs}`).join(' ') || 'no sections'
+        }) dj ${gpu.disjoints}`
+      : `gpu timer ${r?.gpuTimerSupported === false ? 'unsupported' : '-'}`;
+    const verdict = s.bottleneck;
+    const verdictLine = verdict
+      ? `verdict ${verdict.verdict} (${verdict.confidence}): ${verdict.detail}`
+      : null;
+    const progLine =
+      s.programsLinkedPostPrewarm !== null
+        ? `prog post-prewarm +${s.programsLinkedPostPrewarm}  backend ${r?.angleBackend ?? '-'}  pcompile ${r?.parallelCompile ? 'y' : 'n'}`
+        : null;
     this.overlayText.textContent = [
       `fps ${s.fps}  p95 ${s.frameMs.p95}ms  >50 ${s.frameMs.long50}`,
       `10s fps ${s.windows.last10s.fps}  p95 ${s.windows.last10s.frameMs.p95}ms  >50 ${s.windows.last10s.frameMs.long50}`,
@@ -1036,6 +1105,9 @@ export class PerfMonitor {
       `render ${s.mainMs.renderer.avg}/${s.mainMs.renderer.p95}ms  hud ${s.mainMs.hud.avg}/${s.mainMs.hud.p95}ms`,
       `hud writes ${hud?.hotDomWrites ?? 0}  skip ${Math.round((hud?.hotDomSkipRate ?? 0) * 100)}%`,
       `rph e ${rp?.entities.p95 ?? 0} w ${rp?.world.p95 ?? 0} np ${rp?.nameplates.p95 ?? 0} sub ${rp?.submit.p95 ?? 0}ms`,
+      gpuLine,
+      ...(verdictLine ? [verdictLine] : []),
+      ...(progLine ? [progLine] : []),
       `calls ${r?.calls ?? 0}  tris ${r?.triangles ?? 0}  tex ${r?.textures ?? 0}`,
       `scale ${r?.effectiveRenderScale ?? 0}/${r?.renderScale ?? 0}  tier ${r?.tier ?? '-'}`,
       `assets wait ${s.assets.preload.waitMs}ms  gltf ${gltf?.count ?? 0}/${gltf?.p95Ms ?? 0}ms  hdr ${hdr?.count ?? 0}/${hdr?.p95Ms ?? 0}ms  tex ${tex?.count ?? 0}/${tex?.p95Ms ?? 0}ms`,

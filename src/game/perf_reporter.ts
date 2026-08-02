@@ -9,9 +9,10 @@ import type { WorldTelemetry } from './world_telemetry';
 declare const __APP_VERSION__: string;
 declare const __APP_BUILD_ID__: string;
 
-// Bumped to 2 for the packet 0 report dimensions (zone, crowd, views,
-// worst-10s; ruling R6). The server's intIn clamp keeps version-1 clients valid.
-const PERF_REPORT_SCHEMA_VERSION = 2;
+// Bumped to 3 for the Windows bottleneck diagnostics (GPU timer percentiles,
+// ANGLE backend, post-prewarm program growth, bottleneck verdict). The
+// server's intIn clamp keeps version-1 and version-2 clients valid.
+const PERF_REPORT_SCHEMA_VERSION = 3;
 
 const FIRST_REPORT_MS = 75_000;
 const REPEAT_REPORT_MS = 5 * 60_000;
@@ -20,6 +21,10 @@ const DEV_TRACE_REPEAT_REPORT_MS = 15_000;
 const MIN_REPORT_SECONDS = 20;
 const MIN_DEV_TRACE_REPORT_SECONDS = 5;
 const MIN_REPORT_FRAMES = 30;
+// GPU whole-frame percentiles ship only once the timer ring holds enough
+// resolved frames for a stable p95; mirrors the verdict floor the monitor
+// applies before a GPU number outranks the CPU-side inferences (perf.ts).
+const MIN_GPU_TIMER_FRAMES = 30;
 const FETCH_KEEPALIVE_MAX_BYTES = 60 * 1024;
 const SESSION_KEY = 'woc_perf_session_id';
 
@@ -267,6 +272,10 @@ function payloadFromSnapshot(
   const suggestionIds = analyzePerfSuggestions(snapshot, location.search, { desktopShell }).map(
     (suggestion) => suggestion.id,
   );
+  // GPU whole-frame percentiles ride only with enough resolved frames for a
+  // stable p95; below the floor (or with no timer at all) they ship null so
+  // fleet aggregates never average a two-frame fluke.
+  const gpu = renderer.gpu && renderer.gpu.frames >= MIN_GPU_TIMER_FRAMES ? renderer.gpu : null;
   return {
     schemaVersion: PERF_REPORT_SCHEMA_VERSION,
     releaseVersion: __APP_VERSION__,
@@ -313,6 +322,16 @@ function payloadFromSnapshot(
     crowdBucket: crowdBucketLabel(activeViews),
     worst10sFrameP95Ms: snapshot.windows.worst10s?.frameMs.p95 ?? null,
     suggestionIds,
+    gpuFrameP50Ms: gpu?.frameP50Ms ?? null,
+    gpuFrameP95Ms: gpu?.frameP95Ms ?? null,
+    gpuTimerSupported: renderer.gpuTimerSupported,
+    angleBackend: renderer.angleBackend,
+    parallelCompile: renderer.parallelCompile,
+    programsPostPrewarm: snapshot.programsLinkedPostPrewarm,
+    // Verdict token and confidence only: bottleneck.detail is dev-only English
+    // prose (the perf-overlay carve-out) and must never ride the wire.
+    bottleneck: snapshot.bottleneck?.verdict ?? null,
+    bottleneckConfidence: snapshot.bottleneck?.confidence ?? null,
     rawSummary: {
       graphicsConfigVersion: renderer.graphicsConfigVersion,
       seconds: snapshot.seconds,
@@ -320,6 +339,7 @@ function payloadFromSnapshot(
       windows: snapshot.windows,
       mainMs: snapshot.mainMs,
       rendererPhaseMs: renderer.phaseMs,
+      rendererGpuSections: renderer.gpu?.sections ?? null,
       rendererFoliage: renderer.foliage,
       rendererBudget: renderer.renderBudget,
       rendererQualityBuckets: renderer.qualityBuckets,

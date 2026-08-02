@@ -216,6 +216,10 @@ describe('perf monitor scene census wiring', () => {
       }),
       captureSceneCensus: censusReport,
       perfStats: () => null,
+      // The 1 Hz post-prewarm program tracker (perf.ts tick) reads these two
+      // cheap accessors; a null baseline models "prewarm still running".
+      programCount: () => 0,
+      prewarmProgramBaseline: () => null,
     };
   }
 

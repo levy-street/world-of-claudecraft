@@ -1,5 +1,6 @@
 // Opt-in real-Postgres roundtrip for insertClientPerfReport and the phase 03
-// dimension columns plus the phase 05 suggestion_ids array. The insert's 44
+// dimension columns plus the phase 05 suggestion_ids array and the schema 3
+// bottleneck diagnostics columns. The insert's 52
 // positional parameters are the one place a renumbering slip lands values in
 // the wrong columns while every mocked-pool suite stays green, so this
 // roundtrip is the ONLY decisive guard: it writes a row of pairwise-distinct
@@ -42,7 +43,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     // Every value is distinct from every other so ANY positional swap between
     // two columns of a compatible type flips at least one assertion below.
     await db.insertClientPerfReport({
-      schemaVersion: 2,
+      schemaVersion: 3,
       releaseVersion: '0.30.0-test',
       buildId: 'roundtripbuild',
       sessionId: `${MARKER}-row`,
@@ -85,6 +86,14 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       visibleViews: 31,
       worst10sFrameP95Ms: 180.5,
       suggestionIds: ['hardware-acceleration', 'high-dpi'],
+      gpuFrameP50Ms: 6.25,
+      gpuFrameP95Ms: 13.75,
+      gpuTimerSupported: true,
+      angleBackend: 'd3d11',
+      parallelCompile: false,
+      programsPostPrewarm: 17,
+      bottleneck: 'compile-stalls',
+      bottleneckConfidence: 'medium',
       rawSummary: { roundtrip: true, seconds: 77 },
     });
 
@@ -93,7 +102,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     ]);
     expect(res.rowCount).toBe(1);
     const r = res.rows[0];
-    expect(r.schema_version).toBe(2);
+    expect(r.schema_version).toBe(3);
     expect(r.release_version).toBe('0.30.0-test');
     expect(r.build_id).toBe('roundtripbuild');
     expect(r.account_id).toBeNull();
@@ -137,6 +146,15 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     // The pg driver maps a JS string array to TEXT[]; order must survive.
     expect(r.suggestion_ids).toEqual(['hardware-acceleration', 'high-dpi']);
     expect(r.raw_summary).toEqual({ roundtrip: true, seconds: 77 });
+    // Schema 3 bottleneck diagnostics columns.
+    expect(r.gpu_frame_p50_ms).toBeCloseTo(6.25, 5);
+    expect(r.gpu_frame_p95_ms).toBeCloseTo(13.75, 5);
+    expect(r.gpu_timer_supported).toBe(true);
+    expect(r.angle_backend).toBe('d3d11');
+    expect(r.parallel_compile).toBe(false);
+    expect(r.programs_post_prewarm).toBe(17);
+    expect(r.bottleneck).toBe('compile-stalls');
+    expect(r.bottleneck_confidence).toBe('medium');
   });
 
   it('serves the row back through clientPerfRaw with the dimensions and suggestion ids mapped', async () => {
@@ -169,7 +187,11 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       [`${MARKER}-legacy`, 'gameplay'],
     );
     const res = await db.pool.query(
-      'SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms, suggestion_ids FROM client_perf_reports WHERE session_id = $1',
+      `SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
+              suggestion_ids, gpu_frame_p50_ms, gpu_frame_p95_ms, gpu_timer_supported,
+              angle_backend, parallel_compile, programs_post_prewarm, bottleneck,
+              bottleneck_confidence
+         FROM client_perf_reports WHERE session_id = $1`,
       [`${MARKER}-legacy`],
     );
     expect(res.rows[0]).toEqual({
@@ -179,6 +201,16 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       visible_views: 0,
       worst_10s_frame_p95_ms: 0,
       suggestion_ids: [],
+      // The schema 3 diagnostics columns are deliberately nullable with no
+      // defaults: a pre-v3 row reads NULL ("not measured"), never zero.
+      gpu_frame_p50_ms: null,
+      gpu_frame_p95_ms: null,
+      gpu_timer_supported: null,
+      angle_backend: null,
+      parallel_compile: null,
+      programs_post_prewarm: null,
+      bottleneck: null,
+      bottleneck_confidence: null,
     });
   });
 
