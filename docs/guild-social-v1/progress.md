@@ -3,7 +3,7 @@
 | Phase | Status | Started | Completed |
 |---|---|---|---|
 | Phase 1: billboard on login | Complete | 2026-08-02 | 2026-08-02 |
-| Phase 1 QA | Not started | | |
+| Phase 1 QA | Complete | 2026-08-02 | 2026-08-02 |
 | Phase 2: tenure badges + name screening | Not started | | |
 | Phase 2 QA (final, offers teardown) | Not started | | |
 
@@ -16,8 +16,8 @@
       resume no re-show); extend `tests/guild_billboard_wire.test.ts` or a sibling.
 
 ## Phase 1 QA checklist
-- [ ] All Phase 1 acceptance criteria verified; fixes applied and committed.
-- [ ] No dead code, no unused imports, S3 guard green.
+- [x] All Phase 1 acceptance criteria verified; fixes applied and committed.
+- [x] No dead code, no unused imports, S3 guard green.
 
 ## Phase 2 deliverables
 - [ ] `joinedAt` (epoch ms) on the guild member wire row: `server/social.ts` snapshot build,
@@ -57,6 +57,34 @@ Phase 1 (2026-08-02):
   Guild filter tab) with its color from `chatChannelColor('guild')`, not a hex literal.
 - Known accepted quirks (deliberate, consistent with existing surfaces): the MOTD setter
   sees both the existing `result.set` confirm and the new billboard line; `[[i:...]]`
-  tokens in the MOTD render as item links (same decoder as player chat); the echo, like
-  the social window's own billboard render, does not pass through the profanity mask; a
-  cleared-then-reset identical MOTD re-shows by design.
+  tokens in the MOTD render as item links (same decoder as player chat); a
+  cleared-then-reset identical MOTD re-shows by design. (The profanity-mask quirk
+  originally listed here was overturned by the Phase 1 QA ruling below.)
+
+Phase 1 QA (2026-08-02):
+- Audit result: implementation verified against every Phase 1 acceptance criterion; all
+  claimed seam-review fixes confirmed in the committed code (drive-registry row with the
+  71-to-72 chrome split bump, `chatChannelColor('guild')` + guild channel tag, named
+  `updateGuildBillboardEcho`, the three architecture-list registrations, both-world-shape
+  tests). Validation suites, `npx tsc --noEmit`, `npm run ci:changed`, and an `i18n:gen`
+  freshness re-run all green; no dead code or unused imports; only the five M16 overlay
+  rows touched.
+- Deferred ruling 1 (character switch without reload): NO FIX NEEDED. A `Hud` is 1:1 with
+  a character: `new Hud(` has exactly one call site inside `startGame` in `src/main.ts`,
+  gated by the one-way `hasBegunWorldEntry` latch, and every route back to character
+  select (options logout, account logout, fatal overlay) is a `location.reload()`. The
+  `lastShownGuildMotd` latch cannot carry across characters. It DOES survive linkdead
+  resume, and `ClientWorld.socialInfo` is never reset to null on reconnect, so the
+  no-re-show-on-resume rule holds too.
+- Deferred ruling 2 (profanity mask): MASK, fixed in this QA pass. Consistency within the
+  chat pane wins over consistency with the social window: guild chat bodies in the same
+  pane are masked (`appendChatMessageBody`), so the echo now splices
+  `this.maskChat(motdLine.emit)` (whole-string, the chat-bubble precedent). The latch
+  keys on the raw text, so toggling Filter Profanity never re-triggers the line. Known
+  narrow edge, accepted: a soft-word substring inside an `[[i:...]]` item id would star
+  the token and degrade the link to `[?]` (masking errs toward filtering). The social
+  window `billboardHtml` stays unmasked (pre-existing, its editor input shows raw text;
+  out of scope here).
+- Residual nice-to-have (not fixed, pre-existing `appendLog` behavior): a MOTD containing
+  only a `[[q:id]]` token renders it literally in the echo (the item-link branch keys on
+  `'[[i:'`), while guild chat would render a quest link.

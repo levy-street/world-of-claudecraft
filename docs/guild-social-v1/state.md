@@ -1,6 +1,6 @@
 # Guild Social v1: cross-phase state
 
-Current phase: Phase 1 complete (2026-08-02); Phase 1 QA next.
+Current phase: Phase 1 QA complete (2026-08-02); Phase 2 next.
 
 ## Locked design decisions
 - Base branch `release/v0.34.0`; branch `feature/guild-social-v1`; this PR lands BEFORE the
@@ -11,7 +11,10 @@ Current phase: Phase 1 complete (2026-08-02); Phase 1 QA next.
   login shows it (nothing shown yet), a mid-session `guild_set_motd` change shows it again,
   linkdead resume does not (the Hud and module state survive resume). No server change.
 - The MOTD text is player-authored: spliced verbatim into the localized template, escaped,
-  never linkified, never passed through `t()` itself.
+  never linkified, never passed through `t()` itself. (Phase 1 QA drift: "verbatim" means
+  untranslated; the chat-log echo DOES run the display-side profanity mask
+  (`Hud.maskChat`) like every other player-authored chat-pane body, per the QA ruling in
+  progress.md. The latch still keys on the raw text.)
 - Tenure thresholds: New is under 14 days since `joinedAt`; Veteran is 90 days or more; in
   between renders no badge. Client clock (`Date.now` in ui code is fine; never in sim).
 - `joinedAt` rides the wire as epoch milliseconds on each guild member row, sourced from
@@ -67,6 +70,8 @@ Current phase: Phase 1 complete (2026-08-02); Phase 1 QA next.
   appended to the chat log on the `guild` channel with `chatChannelColor('guild')`.
   The module is registered in `UI_PURE_CORES` + `BARE_NAMED` + `EXPECTED_BARE_NAMED`
   (`tests/architecture.test.ts`).
+- Phase 1 QA: the echo splices `this.maskChat(motdLine.emit)` (profanity mask, QA ruling;
+  see progress.md for both deferred-item rulings). No other code drift.
 
 ## Known gotchas
 - The social snapshot is re-pushed on ANY social change; the login-line module must key off
