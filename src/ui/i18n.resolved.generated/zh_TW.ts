@@ -6734,7 +6734,7 @@ export const zh_TW: EnTranslations = {
         "member": "成員"
       },
       "tenure": {
-        "new": "New",
+        "new": "新人",
         "veteran": "老兵"
       },
       "guildHeadOne": "你是{rank}，{count}名成員",

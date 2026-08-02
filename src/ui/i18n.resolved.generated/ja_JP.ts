@@ -6734,7 +6734,7 @@ export const ja_JP: EnTranslations = {
         "member": "メンバー"
       },
       "tenure": {
-        "new": "New",
+        "new": "新入り",
         "veteran": "古参"
       },
       "guildHeadOne": "あなたは{rank}、{count}人のメンバー",

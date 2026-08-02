@@ -93,3 +93,26 @@ describe('guild motd login line decision', () => {
     expect(d.nextShown).toBe(text);
   });
 });
+
+describe('the HUD consumer contract (source pins)', () => {
+  // The decision module is pure and fully covered above; the one seam with no
+  // behavior test is its single consumer, so the HUD-side contracts are pinned
+  // at the source level (the social_window precedent): the emitted text runs
+  // through the display-side profanity mask like every other player-authored
+  // chat-pane body, the line is tagged to the guild channel, and its color
+  // derives from the channel's single source of truth, never a hex literal.
+  it('masks, channel-tags, and channel-colors the echo in hud.ts', async () => {
+    const { readFileSync } = await import('node:fs');
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const start = hud.indexOf('private updateGuildBillboardEcho()');
+    expect(start).toBeGreaterThan(-1);
+    const method = hud.slice(start, hud.indexOf('\n  }', start));
+    expect(method).toContain('decideGuildMotdLine(this.lastShownGuildMotd, this.sim.socialInfo)');
+    expect(method).toContain(
+      "t('hudChrome.social.billboard.loginLine', { text: this.maskChat(motdLine.emit) })",
+    );
+    expect(method).toContain("chatChannelColor('guild')");
+    expect(method).toContain("'guild',");
+    expect(method).not.toMatch(/#[0-9a-fA-F]{3,8}/);
+  });
+});

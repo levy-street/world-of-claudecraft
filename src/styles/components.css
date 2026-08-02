@@ -7483,11 +7483,14 @@
      tokens (theme.ts runs both through ensureReadable per preset), never the
      raw accent or a static green: New pops as body text, Veteran sits muted,
      and both read apart from the accent-gold rank chip on every preset. The
-     tiers stay distinguishable by their text alone (forced-colors safe). */
-  .soc-name .soc-tenure-new {
+     tiers stay distinguishable by their text alone (forced-colors safe).
+     The compound .rank.soc-tenure-* selector out-specifies the .soc-name
+     .rank tint by design (never a source-order tie): reordering the file
+     cannot regress the chip back to rank gold. */
+  .soc-name .rank.soc-tenure-new {
     color: var(--color-text-light);
   }
-  .soc-name .soc-tenure-veteran {
+  .soc-name .rank.soc-tenure-veteran {
     color: var(--color-text-muted);
   }
   .soc-sub {

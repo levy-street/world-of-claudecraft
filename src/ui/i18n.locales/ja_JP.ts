@@ -2128,6 +2128,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': 'ギルドマスター',
   'hud.social.ranks.officer': '士官',
   'hud.social.ranks.member': 'メンバー',
+  'hud.social.tenure.new': '新入り',
   'hud.social.tenure.veteran': '古参',
   'hud.social.guildHeadOne': 'あなたは{rank}、{count}人のメンバー',
   'hud.social.guildHeadMany': 'あなたは{rank}、{count}人のメンバー',

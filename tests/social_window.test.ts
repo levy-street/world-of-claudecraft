@@ -232,8 +232,11 @@ describe('social_window: guild tenure badges (source pins)', () => {
   });
 
   it('styles both tier chips with panel-aware text tokens inside the name cell', () => {
-    expect(componentsCss).toContain('.soc-name .soc-tenure-new');
-    expect(componentsCss).toContain('.soc-name .soc-tenure-veteran');
+    // The compound .rank.soc-tenure-* selector is load-bearing: it must
+    // OUT-SPECIFY the .soc-name .rank gold tint rather than tie with it on
+    // source order, so a stylesheet reorder cannot regress the chips.
+    expect(componentsCss).toContain('.soc-name .rank.soc-tenure-new');
+    expect(componentsCss).toContain('.soc-name .rank.soc-tenure-veteran');
     // The chips must ride the theme's ensureReadable text tokens, never the
     // raw accent (invisible next to the gold rank chip on dark presets) or a
     // static green (sub-AA on the light Parchment panel). Each rule is sliced
@@ -244,10 +247,10 @@ describe('social_window: guild tenure badges (source pins)', () => {
       expect(start).toBeGreaterThan(-1);
       return componentsCss.slice(start, componentsCss.indexOf('}', start));
     };
-    const newRule = rule('.soc-name .soc-tenure-new');
+    const newRule = rule('.soc-name .rank.soc-tenure-new');
     expect(newRule).toContain('var(--color-text-light)');
     expect(newRule).not.toContain('var(--color-text-muted)');
-    const veteranRule = rule('.soc-name .soc-tenure-veteran');
+    const veteranRule = rule('.soc-name .rank.soc-tenure-veteran');
     expect(veteranRule).toContain('var(--color-text-muted)');
     expect(veteranRule).not.toContain('var(--color-text-light)');
     for (const section of [newRule, veteranRule]) {

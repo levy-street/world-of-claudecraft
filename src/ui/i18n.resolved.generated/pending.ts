@@ -65,22 +65,18 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.buyStackAria"
   ],
   "zh_CN": [
-    "hud.social.tenure.new",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "zh_TW": [
-    "hud.social.tenure.new",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "ko_KR": [
-    "hud.social.tenure.new",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "ja_JP": [
-    "hud.social.tenure.new",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -94,7 +90,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.buyStackAria"
   ],
   "ru_RU": [
-    "hud.social.tenure.new",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
