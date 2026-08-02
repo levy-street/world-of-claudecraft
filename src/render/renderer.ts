@@ -9487,10 +9487,14 @@ export class Renderer {
       this.gatherNodes.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
       this.valeCupStadium.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
     }
+    // GPU frame timing opens here: beginFrame only polls prior results and
+    // opens the frame record (no GL query starts until the first section
+    // split inside the render below), so it sits above the pinned
+    // updateMatrixWorld -> prepareDraw -> render adjacency (tests/vfx.test.ts).
+    this.gpuTimer?.beginFrame();
     this.updateOpaqueDrawOrder(dt);
     if (shakeX !== 0 || shakeY !== 0) this.camera.updateMatrixWorld();
     this.vfx.prepareDraw(this.camera);
-    this.gpuTimer?.beginFrame();
     if (this.post) {
       // screen-fx pass state (ripple re-projection, flash decay) advances
       // with the camera finalized for this frame
