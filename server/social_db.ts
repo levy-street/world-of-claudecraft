@@ -394,12 +394,21 @@ export class PgSocialDb implements SocialDb {
     bustAdminGuildListReads();
   }
 
-  async setGuildRank(charId: number, rank: GuildRank): Promise<void> {
-    await this.pool.query('UPDATE guild_members SET rank = $2 WHERE character_id = $1', [
-      charId,
-      rank,
-    ]);
+  async setGuildRank(charId: number, guildId: number, rank: GuildRank): Promise<boolean> {
+    // Both predicates matter: the guild_id guard means a rank change decided
+    // against guild A can never rewrite a row the target has since moved to
+    // guild B, and the checked rowcount tells the caller whether the UPDATE
+    // actually landed (a leave/kick/disband may have removed the row between
+    // the caller's membership read and this write). The caller must treat
+    // false as a refusal and stamp NOTHING: the live sim's guild membership
+    // stamp authorizes guild bank access, so stamping a rank the DB refused
+    // is privilege escalation.
+    const res = await this.pool.query(
+      'UPDATE guild_members SET rank = $2 WHERE character_id = $1 AND guild_id = $3',
+      [charId, rank, guildId],
+    );
     bustAdminGuildListReads();
+    return (res.rowCount ?? 0) > 0;
   }
 
   async transferGuildLeader(

@@ -91,7 +91,7 @@ describe('PgSocialDb case-insensitive guild creation', () => {
 
     await db.deleteGuild(12);
     await db.removeGuildMember(8);
-    await db.setGuildRank(8, 'officer');
+    await db.setGuildRank(8, 12, 'officer');
 
     expect(mocks.bustGuildList).toHaveBeenCalledTimes(3);
   });

@@ -133,7 +133,13 @@ export interface SocialDb {
     limit: number,
   ): Promise<'ok' | 'full' | 'already_member' | 'no_guild'>;
   removeGuildMember(charId: number): Promise<void>;
-  setGuildRank(charId: number, rank: GuildRank): Promise<void>;
+  // Rank write predicated on BOTH the character and the guild the caller
+  // authorized against, returning whether a row actually moved. False means
+  // the target left that guild (or switched guilds) between the caller's
+  // membership read and this write: the caller must treat it as a refusal
+  // and stamp nothing (the live membership stamp gates the guild bank, so a
+  // stamp the DB refused is privilege escalation, see guildSetRank).
+  setGuildRank(charId: number, guildId: number, rank: GuildRank): Promise<boolean>;
   // hand off the Guild Master title atomically: locks the guild row, re-checks
   // that fromCharId is still the leader and toCharId is still a member of the
   // SAME guild, then promotes/demotes both rows in one transaction, so two
@@ -1107,10 +1113,21 @@ export class SocialService {
       this.err(actor.characterId, `${target.name} is already ${RANK_LABEL[rank]}.`);
       return;
     }
-    await this.db.setGuildRank(target.id, rank);
-    // Rank moved in the DB: stamp the live sim before any push resolves. A
-    // demote lands on the guild bank's officer gate IMMEDIATELY (the
-    // stale-rank window is privilege-escalation-shaped).
+    const moved = await this.db.setGuildRank(target.id, membership.guildId, rank);
+    if (!moved) {
+      // The target's row left this guild (a leave, kick, disband, or guild
+      // switch committed between the membership read above and the UPDATE):
+      // the predicated write matched no row, so NOTHING changed in the DB and
+      // NOTHING may be stamped. Stamping here would assert a rank the DB
+      // refused, which the guild bank's officer gate would honor: privilege
+      // escalation with no corrective push (a removed character is no longer
+      // in pushGuild's member list).
+      this.err(actor.characterId, `${target.name} is not in your guild.`);
+      return;
+    }
+    // Rank moved in the DB (row confirmed): stamp the live sim before any
+    // push resolves. A demote lands on the guild bank's officer gate
+    // IMMEDIATELY (the stale-rank window is privilege-escalation-shaped).
     this.tx.onGuildMembershipChanged(target.id, {
       guildId: membership.guildId,
       guildName: membership.guildName,

@@ -135,9 +135,13 @@ class FakeDb implements SocialDb {
   async removeGuildMember(c: number): Promise<void> {
     this.members.delete(c);
   }
-  async setGuildRank(c: number, rank: GuildRank): Promise<void> {
+  async setGuildRank(c: number, guildId: number, rank: GuildRank): Promise<boolean> {
+    // Mirrors the real predicate: character AND guild must both match, and the
+    // caller learns whether a row actually moved (false = refused, stamp nothing).
     const m = this.members.get(c);
-    if (m) m.rank = rank;
+    if (!m || m.guildId !== guildId) return false;
+    m.rank = rank;
+    return true;
   }
   async transferGuildLeader(
     guildId: number,
@@ -1374,6 +1378,54 @@ describe('guild membership stamps (onGuildMembershipChanged)', () => {
     await h.svc.guildSetRank(h.actor(1), 'Gimel', 'officer'); // not in the guild: refused
     await h.svc.guildSetRank(h.actor(1), 'Bet', 'member'); // already member: refused
     expect(h.tx.membershipStamps).toEqual([]);
+  });
+
+  it('a promote whose UPDATE matched no row (target left mid-flight) stamps NOTHING', async () => {
+    // The privilege-escalation race the predicated setGuildRank closes: the
+    // leader promotes Bet, but Bet's guildLeave commits between guildSetRank's
+    // membership read and its UPDATE. The write matches zero rows, so the
+    // service must refuse and never stamp the officer rank the DB refused
+    // (the guild bank's officer gate honors the stamp, and a removed
+    // character gets no corrective push).
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await joinBet();
+    const realSetGuildRank = h.db.setGuildRank.bind(h.db);
+    h.db.setGuildRank = async (c, guildId, rank) => {
+      await h.svc.guildLeave(h.actor(2)); // the leave commits just before the UPDATE
+      return realSetGuildRank(c, guildId, rank);
+    };
+    h.tx.membershipStamps = [];
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    // Only the leave's own null stamp: no officer stamp may follow it.
+    expect(h.tx.membershipStamps).toEqual([{ id: 2, membership: null }]);
+    expect(await h.db.guildMembership(2)).toBeNull();
+  });
+
+  it('a promote racing a guild SWITCH cannot rewrite the new guild or stamp the old one', async () => {
+    // Same window, worse shape: Bet leaves guild A and founds guild B before
+    // A's promote UPDATE lands. The guild_id predicate must miss (B's row is
+    // untouched) and no stamp may assert an officer rank in A.
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await joinBet();
+    const realSetGuildRank = h.db.setGuildRank.bind(h.db);
+    h.db.setGuildRank = async (c, guildId, rank) => {
+      await h.svc.guildLeave(h.actor(2));
+      await h.svc.guildCreate(h.actor(2), 'Second Banner');
+      return realSetGuildRank(c, guildId, rank);
+    };
+    h.tx.membershipStamps = [];
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    // The leave's null stamp and the create's leader stamp for guild B, and
+    // nothing else: no officer-in-A stamp, and B's row keeps its leader rank.
+    expect(h.tx.membershipStamps).toEqual([
+      { id: 2, membership: null },
+      { id: 2, membership: { guildId: 2, guildName: 'Second Banner', rank: 'leader' } },
+    ]);
+    expect(await h.db.guildMembership(2)).toEqual({
+      guildId: 2,
+      guildName: 'Second Banner',
+      rank: 'leader',
+    });
   });
 
   it('kick stamps the target null (even offline); a refused kick stamps nothing', async () => {
