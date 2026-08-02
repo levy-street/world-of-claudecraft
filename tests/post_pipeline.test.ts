@@ -135,13 +135,12 @@ describe('live post pipeline', () => {
       [40, 23],
     ]);
     expect(bloom.compositeMaterial.fragmentShader).not.toContain('bloomTintColors');
+    // Each mip factor must still multiply its own blurred sample, so count the
+    // pair rather than the two halves independently.
     expect(
       bloom.compositeMaterial.fragmentShader.match(
-        /lerpBloomFactor\s*\(\s*bloomFactors\s*\[\s*\d\s*\]\s*\)/g,
+        /lerpBloomFactor\s*\(\s*bloomFactors\s*\[\s*\d\s*\]\s*\)\s*\*\s*texture2D\s*\(\s*blurTexture[1-5]\s*,/g,
       ),
-    ).toHaveLength(5);
-    expect(
-      bloom.compositeMaterial.fragmentShader.match(/texture2D\s*\(\s*blurTexture[1-5]\s*,/g),
     ).toHaveLength(5);
   });
 
