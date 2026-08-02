@@ -34,6 +34,32 @@ export const CONSTRAINED_TEXTURE_MAX_MS = 1200;
 export const CONSTRAINED_ENTRY_VIEW_RAMP_MS = 300;
 export const NEARBY_LANDMARK_STREAM_RADIUS = 16;
 
+/** Size a character pool to authored demand with a bounded entry cost. */
+export function prewarmMobCopies(
+  commonTemplate: boolean,
+  authoredSpawnCount: number,
+  baseCopies: number,
+  maxCopies: number,
+): number {
+  const base = Math.max(1, Math.floor(baseCopies));
+  if (!commonTemplate) return 1;
+  const authored = Number.isFinite(authoredSpawnCount)
+    ? Math.max(0, Math.floor(authoredSpawnCount))
+    : 0;
+  const cap = Math.max(base, Math.floor(maxCopies));
+  return Math.min(cap, Math.max(base, authored));
+}
+
+/** A template is fully warmed only when every requested pool copy exists. */
+export function prewarmTemplateCompleted(requestedCopies: number, builtCopies: number): boolean {
+  return (
+    Number.isFinite(requestedCopies) &&
+    Number.isFinite(builtCopies) &&
+    requestedCopies > 0 &&
+    builtCopies >= requestedCopies
+  );
+}
+
 export interface MandatoryLandmarkCandidate {
   kind: string;
   templateId: string | null;

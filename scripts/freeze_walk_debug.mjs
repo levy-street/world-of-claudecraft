@@ -16,6 +16,7 @@ const BASE_URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const GFX = process.env.PERF_GFX ?? 'ultra';
 const KLASS = process.env.PERF_CLASS ?? 'warrior';
 const WALK_MS = Number(process.env.WALK_MS ?? 14000);
+const SETTLE_MS = Number(process.env.PERF_SETTLE_MS ?? 3500);
 const HEADLESS = process.env.HEADED === '1' ? false : 'new';
 const OUT =
   process.env.PERF_OUT ??
@@ -51,6 +52,59 @@ async function boot(page) {
   // fast without every frame being a multi-second rasterisation "freeze".
   await page.setViewport({ width: 480, height: 320 });
   await page.evaluateOnNewDocument(() => {
+    window.__slowGfxCalls = [];
+    window.__mainLongTasks = [];
+    const observeLongTasks = () => {
+      if (typeof PerformanceObserver === 'undefined') return;
+      try {
+        const observer = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            if (entry.duration >= 20) {
+              window.__mainLongTasks.push({
+                name: entry.name,
+                durationMs: Math.round(entry.duration),
+                startTimeMs: Math.round(entry.startTime),
+              });
+            }
+          }
+        });
+        observer.observe({ type: 'longtask', buffered: true });
+      } catch {}
+    };
+    const wrapSlowGraphicsCall = (prototype, name) => {
+      const original = prototype?.[name];
+      if (typeof original !== 'function') return;
+      prototype[name] = function (...args) {
+        const started = performance.now();
+        try {
+          return original.apply(this, args);
+        } finally {
+          const durationMs = performance.now() - started;
+          if (durationMs >= 20) {
+            window.__slowGfxCalls.push({
+              name,
+              durationMs: Math.round(durationMs),
+              atMs: Math.round(started),
+            });
+          }
+        }
+      };
+    };
+    for (const prototype of [WebGLRenderingContext.prototype, WebGL2RenderingContext.prototype]) {
+      for (const name of [
+        'bufferData',
+        'bufferSubData',
+        'texImage2D',
+        'texSubImage2D',
+        'compileShader',
+        'linkProgram',
+        'drawElements',
+        'drawArrays',
+      ]) {
+        wrapSlowGraphicsCall(prototype, name);
+      }
+    }
+    observeLongTasks();
     window.__armFreeze = () => {
       const g = window.__game,
         r = g.renderer,
@@ -80,13 +134,19 @@ async function boot(page) {
           try {
             lf = g.perf.report()?.renderer?.lastFrame ?? null;
           } catch {}
+          const renderer = g.renderer;
           const pp = g.sim.player.pos;
           window.__freezes.push({
+            atMs: Math.round(now),
             dtMs: Math.round(dt),
             dProg,
             x: Math.round(pp.x),
             z: Math.round(pp.z),
             createdViewTypes: lf?.createdViewTypes ?? null,
+            phaseMs: lf?.phaseMs ?? null,
+            worldPhaseMs: lf?.worldPhaseMs ?? null,
+            zonePrepare: renderer?.lastZonePrepareStats ?? null,
+            zonePrewarm: renderer?.lastZonePrewarmStats ?? null,
             newKeys,
           });
         }
@@ -111,7 +171,7 @@ async function boot(page) {
       Boolean(window.__game?.sim?.player && window.__game?.renderer && window.__game?.perf?.report),
     { timeout: 120000 },
   );
-  await sleep(3500); // let prewarm finish + settle
+  await sleep(SETTLE_MS); // let prewarm/initial terrain settle
 }
 
 async function run() {
@@ -128,6 +188,8 @@ async function run() {
     args,
   });
   const page = await browser.newPage();
+  const profiler =
+    process.env.PERF_CPU_PROFILE === '1' ? await page.target().createCDPSession() : null;
   const errors = [];
   page.on('pageerror', (e) => errors.push(`PAGEERROR: ${e.message}`));
   try {
@@ -145,6 +207,10 @@ async function run() {
     // in. Teleport-stepping (vs real walking) is reliable on slow swiftshader and
     // still triggers the same lazy material/program builds; we want the program
     // SET that compiles, not the streaming dynamics.
+    if (profiler) {
+      await profiler.send('Profiler.enable');
+      await profiler.send('Profiler.start');
+    }
     await page.evaluate(() => window.__armFreeze());
     const startZ = -10;
     const endZ = 170;
@@ -163,6 +229,9 @@ async function run() {
 
     const freezes = await page.evaluate(() => window.__freezes ?? []);
     const baseKeys = await page.evaluate(() => window.__benchBaseKeys ?? []);
+    const slowGfxCalls = await page.evaluate(() => window.__slowGfxCalls ?? []);
+    const mainLongTasks = await page.evaluate(() => window.__mainLongTasks ?? []);
+    const cpuProfile = profiler ? (await profiler.send('Profiler.stop')).profile : null;
 
     // Classify.
     const byClass = {};
@@ -181,10 +250,14 @@ async function run() {
       startZ,
       endZ,
       walkMs: WALK_MS,
+      settleMs: SETTLE_MS,
       totalNewPrograms: totalNew,
       byClass,
       baseKeys,
       freezes,
+      slowGfxCalls,
+      mainLongTasks,
+      cpuProfile,
       errors,
     };
     fs.writeFileSync(OUT, `${JSON.stringify(artifact, null, 2)}\n`);
@@ -210,8 +283,28 @@ async function run() {
         .map(([c, n]) => `${n}x ${c}`)
         .join(', ');
       console.log(
-        `  ${String(f.dtMs).padStart(5)}ms @${f.x},${f.z} +${f.dProg}prog  views=${f.createdViewTypes?.join('|') ?? '-'}  ${cs}`,
+        `  ${String(f.dtMs).padStart(5)}ms @${f.x},${f.z} +${f.dProg}prog ` +
+          `views=${f.createdViewTypes?.join('|') ?? '-'} ` +
+          `phases=${formatPhases(f.phaseMs, f.worldPhaseMs)}  ${cs}`,
       );
+    }
+    console.log(`\nslow WebGL calls >=20ms: ${slowGfxCalls.length}`);
+    for (const call of slowGfxCalls.slice(-20)) console.log(`  ${call.name} ${call.durationMs}ms`);
+    console.log(`main long tasks >=20ms: ${mainLongTasks.length}`);
+    for (const task of mainLongTasks.slice(-20)) console.log(`  ${task.name} ${task.durationMs}ms`);
+    if (cpuProfile) {
+      const nodeById = new Map(cpuProfile.nodes.map((node) => [node.id, node]));
+      const samples = new Map();
+      for (const id of cpuProfile.samples ?? []) {
+        const node = nodeById.get(id);
+        const key = node
+          ? `${node.callFrame.functionName || '(anonymous)'} @ ${node.callFrame.url}`
+          : String(id);
+        samples.set(key, (samples.get(key) ?? 0) + 1);
+      }
+      console.log('\nCPU profile top samples:');
+      for (const [key, count] of [...samples].sort((a, b) => b[1] - a[1]).slice(0, 20))
+        console.log(`  ${String(count).padStart(4)} ${key}`);
     }
     console.log(`\nwrote ${OUT}`);
     if (errors.length)
@@ -220,6 +313,23 @@ async function run() {
     await page.close();
     await browser.close();
   }
+}
+
+function formatPhases(phases, worldPhases) {
+  if (!phases) return '-';
+  const top = Object.entries(phases)
+    .filter(([, value]) => Number.isFinite(value?.max ?? value))
+    .sort((a, b) => (b[1]?.max ?? b[1]) - (a[1]?.max ?? a[1]))
+    .slice(0, 3)
+    .map(([name, value]) => `${name}:${(value?.max ?? value).toFixed(1)}`);
+  const world = worldPhases
+    ? Object.entries(worldPhases)
+        .filter(([, value]) => Number.isFinite(value?.max ?? value))
+        .sort((a, b) => (b[1]?.max ?? b[1]) - (a[1]?.max ?? a[1]))
+        .slice(0, 2)
+        .map(([name, value]) => `${name}:${(value?.max ?? value).toFixed(1)}`)
+    : [];
+  return [...top, ...world.map((entry) => `world.${entry}`)].join(',') || '-';
 }
 
 run().catch((e) => {
