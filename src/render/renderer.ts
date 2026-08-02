@@ -9309,14 +9309,18 @@ export class Renderer {
           v.group.visible = false;
           continue;
         }
+        // mid-distance rigs keep rendering but leave the shadow pass.
+        // A deck rider on a live ship cue draws at the ship, right in front
+        // of the scene camera; its distance from the parked player entity is
+        // irrelevant, so it keeps the near articulated rig and a real shadow
+        // for the whole cue (J8: the ferryman froze or dropped his shadow
+        // mid-crossing because d2 measured the departure harbor).
+        const wantShadow = deckRiderActive || d2 < shadowRangeSq;
+        const inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
         if (v.visual) {
           visibleRigCount++; // crowd-density signal for next frame's adaptive LOD
-        }
-        if (shadowsEnabled) {
-          // mid-distance rigs keep rendering but leave the shadow pass
-          const wantShadow = d2 < shadowRangeSq;
-          const inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
-          v.visual?.setShadow(wantShadow);
+          v.visual.setShadow(wantShadow);
+          v.isFar = !deckRiderActive && showsStaticFarMesh(d2, lodBands, actionablePose);
           // past the articulated gate the static-pose proxy carries the
           // shadow; an active form's own rig keeps casting instead. A mounted
           // rider also skips the proxy: its baked ground-level idle silhouette
@@ -9507,7 +9511,17 @@ export class Renderer {
       // Audio and state derivation below remain active even for hidden actors.
       let charOnScreen = true;
       if (this.cullCharacters && id !== p.id) {
-        this.cullSphere.center.set(x, y + v.height * 0.5 * e.scale, z);
+        // The sphere is centered on the group's LIVE position, not on the
+        // interpolated entity coordinates: a deck rider's group was moved to
+        // its resolved ship pose above, while its entity stays parked at a
+        // harbor that can be far outside the shot's frustum (J8: the
+        // ferryman vanished on the open-water leg on shadowless tiers).
+        // For every other rig the two positions are identical.
+        this.cullSphere.center.set(
+          v.group.position.x,
+          v.group.position.y + v.height * 0.5 * e.scale,
+          v.group.position.z,
+        );
         this.cullSphere.radius = (v.height * 0.7 + 1.5) * e.scale;
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
