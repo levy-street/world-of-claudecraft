@@ -9,7 +9,8 @@ export interface AdminNavigation {
 export type AdminRoute =
   | { page: Exclude<AdminPage, 'guilds'> }
   | { page: 'guilds'; guildId?: number }
-  | { page: 'ip'; ip: string };
+  | { page: 'ip'; ip: string }
+  | { page: 'market-item'; item: string };
 
 const NAVIGATION_CONTEXT = Symbol('admin-navigation');
 
@@ -26,6 +27,7 @@ export function getAdminNavigation(): AdminNavigation | null {
 export function parseAdminRoute(url: URL): AdminRoute {
   const page = url.searchParams.get('page');
   const ip = url.searchParams.get('ip')?.trim();
+  const item = url.searchParams.get('item')?.trim();
   if (page === 'ip' && ip) return { page: 'ip', ip };
   if (page === 'guilds') {
     const rawGuildId = url.searchParams.get('guildId');
@@ -34,6 +36,7 @@ export function parseAdminRoute(url: URL): AdminRoute {
       ? { page: 'guilds', guildId }
       : { page: 'guilds' };
   }
+  if (page === 'market-item' && item) return { page: 'market-item', item };
   if (PAGES.some((candidate) => candidate.id === page)) {
     return { page: page as Exclude<AdminPage, 'guilds'> };
   }
@@ -56,6 +59,8 @@ export function routeHref(route: AdminRoute): string {
   } else {
     url.searchParams.delete('guildId');
   }
+  if (route.page === 'market-item') url.searchParams.set('item', route.item);
+  else url.searchParams.delete('item');
   return `${url.pathname}${url.search}${url.hash}`;
 }
 

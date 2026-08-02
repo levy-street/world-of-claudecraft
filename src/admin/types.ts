@@ -752,3 +752,139 @@ export interface PerfCaptureStatus {
   endsAt: number | null; // epoch ms the in-flight capture closes
   last: PerfCaptureResult | null;
 }
+
+// World Market tracker (Market pages). Client mirrors of the server shapes in
+// server/market_analytics.ts and server/market_tracker_db.ts (the src/admin
+// import boundary forbids importing them); Dates arrive as ISO strings. All
+// copper values are per-unit unless the name says Total. These payloads never
+// carry buyer or seller identity by server contract.
+export interface MarketSaleStats {
+  itemId: string;
+  sales: number;
+  quantity: number;
+  medianUnitPriceCopper: number;
+  avgUnitPriceCopper: number;
+  minUnitPriceCopper: number;
+  maxUnitPriceCopper: number;
+}
+
+export interface MarketOverviewItem {
+  itemId: string;
+  name: string;
+  quality: string;
+  kind: string;
+  vendorSellCopper: number;
+  vendorBuyCopper: number | null;
+  listable: boolean;
+  lowestAskUnitCopper: number | null;
+  lowestAskTotalCopper: number | null;
+  lowestAskQuantity: number | null;
+  listingCount: number;
+  listedQuantity: number;
+  houseUnitAskCopper: number | null;
+  sales24h: MarketSaleStats | null;
+  sales7d: MarketSaleStats | null;
+}
+
+export interface MarketOverviewResponse {
+  realm: string;
+  cutPct: number;
+  capturedAt: string | null;
+  items: MarketOverviewItem[];
+}
+
+export interface MarketPriceHistoryPoint {
+  bucketStart: string;
+  sales: number;
+  quantity: number;
+  medianUnitPriceCopper: number;
+  avgUnitPriceCopper: number;
+  minUnitPriceCopper: number;
+  maxUnitPriceCopper: number;
+}
+
+export interface MarketAskHistoryPoint {
+  bucketStart: string;
+  lowestAskUnitCopper: number;
+  avgListingCount: number;
+  avgTotalQuantity: number;
+}
+
+export interface MarketRecentSale {
+  soldAt: string;
+  quantity: number;
+  totalPriceCopper: number;
+  house: boolean;
+  instanced: boolean;
+  craftedRecipeId: string | null;
+}
+
+export interface MarketCatalogItem {
+  itemId: string;
+  name: string;
+  quality: string;
+  kind: string;
+  vendorSellCopper: number;
+  vendorBuyCopper: number | null;
+  listable: boolean;
+}
+
+export type MarketHistoryBucket = 'hour' | 'day' | 'week';
+
+export interface MarketItemDetailResponse {
+  realm: string;
+  cutPct: number;
+  item: MarketCatalogItem;
+  bucket: MarketHistoryBucket;
+  days: number;
+  priceHistory: MarketPriceHistoryPoint[];
+  askHistory: MarketAskHistoryPoint[];
+  recentSales: MarketRecentSale[];
+}
+
+export interface MarketFlipRow {
+  itemId: string;
+  name: string;
+  quality: string;
+  kind: string;
+  buyTotalCopper: number;
+  buyQuantity: number;
+  buyUnitCopper: number;
+  typicalUnitCopper: number;
+  netUnitCopper: number;
+  marginUnitCopper: number;
+  marginTotalCopper: number;
+  roi: number;
+  sales7d: number;
+  soldQuantity7d: number;
+  houseUnitAskCopper: number | null;
+}
+
+export interface MarketFlipsResponse {
+  realm: string;
+  cutPct: number;
+  capturedAt: string | null;
+  minSales: number;
+  rows: MarketFlipRow[];
+}
+
+export interface MarketMoverRow {
+  itemId: string;
+  name: string;
+  quality: string;
+  kind: string;
+  currentMedianUnitCopper: number;
+  previousMedianUnitCopper: number;
+  changeUnitCopper: number;
+  changePct: number;
+  salesCurrent: number;
+  salesPrevious: number;
+}
+
+export interface MarketMoversResponse {
+  realm: string;
+  windowHours: number;
+  minSales: number;
+  risers: MarketMoverRow[];
+  fallers: MarketMoverRow[];
+}

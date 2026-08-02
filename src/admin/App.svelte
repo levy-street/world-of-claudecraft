@@ -15,6 +15,7 @@
     firstVisiblePage,
     IP_ROUTE_PERMISSION,
     itemForPage,
+    MARKET_ITEM_ROUTE_PERMISSION,
   } from './pages/pages';
   import Login from './components/Login.svelte';
   import AdminShell from './components/AdminShell.svelte';
@@ -36,6 +37,10 @@
   import BugReports from './pages/BugReports.svelte';
   import UnstuckReports from './pages/UnstuckReports.svelte';
   import IpAssociations from './pages/IpAssociations.svelte';
+  import Market from './pages/Market.svelte';
+  import MarketFlips from './pages/MarketFlips.svelte';
+  import MarketItemDetail from './pages/MarketItemDetail.svelte';
+  import MarketMovers from './pages/MarketMovers.svelte';
   import Staff from './pages/Staff.svelte';
 
   // Root of the admin SPA. Shows the login overlay until authed, then the shared
@@ -61,6 +66,9 @@
     'blocked-ips': BlockedIps,
     'bug-reports': BugReports,
     'unstuck-reports': UnstuckReports,
+    market: Market,
+    'market-flips': MarketFlips,
+    'market-movers': MarketMovers,
     staff: Staff,
   } satisfies Record<Exclude<AdminPage, 'guilds'>, Component>;
   // Permission route guard (presentation only; the server re-checks every
@@ -69,13 +77,20 @@
   let guardedRoute = $derived.by((): AdminRoute | null => {
     if (!auth.permissionsLoaded) return null;
     const permission =
-      route.page === 'ip' ? IP_ROUTE_PERMISSION : itemForPage(route.page).permission;
+      route.page === 'ip'
+        ? IP_ROUTE_PERMISSION
+        : route.page === 'market-item'
+          ? MARKET_ITEM_ROUTE_PERMISSION
+          : itemForPage(route.page).permission;
     if (auth.can(permission)) return route;
     const fallback = firstVisiblePage((candidate) => auth.can(candidate));
     return fallback === null ? null : { page: fallback };
   });
   let Page = $derived(
-    guardedRoute === null || guardedRoute.page === 'ip' || guardedRoute.page === 'guilds'
+    guardedRoute === null ||
+    guardedRoute.page === 'ip' ||
+    guardedRoute.page === 'guilds' ||
+    guardedRoute.page === 'market-item'
       ? null
       : PAGE_COMPONENTS[guardedRoute.page],
   );
@@ -119,6 +134,10 @@
       {:else if guardedRoute.page === 'guilds'}
         {#key guardedRoute.guildId ?? 'directory'}
           <Guilds guildId={guardedRoute.guildId} />
+        {/key}
+      {:else if guardedRoute.page === 'market-item'}
+        {#key guardedRoute.item}
+          <MarketItemDetail item={guardedRoute.item} />
         {/key}
       {:else if Page}
         <Page />

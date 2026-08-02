@@ -15,6 +15,9 @@ export type AdminPage =
   | 'guilds'
   | 'moderation'
   | 'moderation-history'
+  | 'market'
+  | 'market-flips'
+  | 'market-movers'
   | 'suspicious-players'
   | 'detection-calibration'
   | 'antibot-config'
@@ -79,6 +82,16 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     ],
   },
   {
+    id: 'market',
+    labelKey: 'nav.market',
+    defaultPage: 'market',
+    items: [
+      { id: 'market', labelKey: 'nav.marketOverview', permission: 'analytics.read' },
+      { id: 'market-flips', labelKey: 'nav.marketFlips', permission: 'analytics.read' },
+      { id: 'market-movers', labelKey: 'nav.marketMovers', permission: 'analytics.read' },
+    ],
+  },
+  {
     id: 'bot-detector',
     labelKey: 'nav.botDetector',
     defaultPage: 'suspicious-players',
@@ -126,6 +139,10 @@ export function itemForPage(page: AdminPage): AdminNavItem {
 // The IP-associations detail route lives outside the nav tree; it reads the
 // same data as the accounts/shared-IP pages.
 export const IP_ROUTE_PERMISSION: AdminPermission = 'accounts.read';
+
+// The market item detail route also lives outside the nav tree; it reads the
+// same analytics data as the Market pages.
+export const MARKET_ITEM_ROUTE_PERMISSION: AdminPermission = 'analytics.read';
 
 export type PermissionCheck = (permission: AdminPermission) => boolean;
 
