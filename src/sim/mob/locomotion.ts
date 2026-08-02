@@ -54,6 +54,7 @@ import {
   LEASH_DISTANCE,
   MELEE_RANGE,
   type MobTemplate,
+  normAngle,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
   SISTER_NHALIA_BOSS_ID,
@@ -61,6 +62,7 @@ import {
   TOLLING_BELL_TEMPLATE_ID,
   type Vec3,
 } from '../types';
+import { applyBroodBurn } from './dragonkin_brood';
 import { groundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
 import { isAmbientMob, updateAmbientMob } from './ambient';
@@ -953,6 +955,74 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       }
     }
   }
+  // Dragonkin fire breath (breathCone): bigCast's cast machinery aimed down a
+  // frontal cone instead of a radius. The mob shows a real cast bar for
+  // castTime (the telegraph; it keeps meleeing), then the breath lands on
+  // every living player inside `range` yards AND the `arcDeg` cone about the
+  // mob's CURRENT facing, so sidestepping the cone during the bar is the
+  // counterplay. Cadence lazy-seeds on the first engaged tick (the first
+  // breath lands one full interval into the fight, the stomp/bigCast
+  // telegraph convention) and is appended AFTER every existing driver so no
+  // existing mechanic's rng draw moves.
+  const breath = MOBS[mob.templateId]?.breathCone;
+  if (breath && !riftMechanicSuppressed(mob, 'breathCone')) {
+    if (mob.castingAbility === breath.castId) {
+      mob.castRemaining = Math.max(0, mob.castRemaining - DT);
+      if (mob.castRemaining <= 0) {
+        mob.castingAbility = null;
+        mob.castTotal = 0;
+        mob.castRemaining = 0;
+        mob.castTargetId = null;
+        const school = (breath.school ?? 'fire') as Aura['school'];
+        // The renderer draws the breath as a terrain-hugging cone off the
+        // mob's live facing (the existing fireCone visual), not a nova ring.
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: mob.id,
+          targetId: mob.id,
+          school,
+          fx: 'fireCone',
+          range: breath.range,
+          angle: breath.arcDeg,
+        });
+        if (!MOBS[mob.templateId]?.quietMechanics)
+          ctx.emit({
+            type: 'log',
+            text: `${mob.name} unleashes ${breath.name}!`,
+            color: '#ff9933',
+            entityId: mob.id,
+          });
+        const capBreath = mobInRiftInstance(ctx, mob);
+        const halfArc = (breath.arcDeg * Math.PI) / 180 / 2;
+        for (const meta of ctx.players.values()) {
+          const pe = ctx.entities.get(meta.entityId);
+          if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > breath.range) continue;
+          if (Math.abs(normAngle(angleTo(mob.pos, pe.pos) - mob.facing)) > halfArc) continue;
+          let dmg = Math.round(
+            ctx.rng.range(breath.min, breath.max) * (mob.mechanicDamageMult ?? 1),
+          );
+          if (capBreath) dmg = capRiftNonLethalMechanicDamage(dmg, pe.maxHp);
+          ctx.dealDamage(mob, pe, dmg, false, school, breath.name, 'hit', true);
+          if (breath.burn && !pe.dead) applyBroodBurn(ctx, mob, pe, breath.burn);
+        }
+      }
+    } else {
+      // Not in the rift spacing governor's table: breathCone ships on the
+      // open-world dragonkin only (no rift boss carries it), and the governed
+      // table requires a MANDATORY per-entity timer field. If a rift boss
+      // ever takes a breath cone, register breathTimer there first.
+      mob.breathTimer ??= breath.every;
+      mob.breathTimer -= DT;
+      if (mob.breathTimer <= 0 && mob.castingAbility === null) {
+        mob.breathTimer = breath.every + breath.castTime;
+        mob.castingAbility = breath.castId;
+        mob.castTotal = breath.castTime;
+        mob.castRemaining = breath.castTime;
+        mob.castTargetId = null;
+        mob.channeling = false;
+      }
+    }
+  }
 }
 
 // Howling Gale: the anti-kite snare pulse. A boss whose template declares `aoeSlow`
@@ -1074,10 +1144,22 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.deathZoneCastTimer = deathZoneCastDef?.every ?? 0;
   const deathZoneStrikeDef = MOBS[mob.templateId]?.deathZoneStrike;
   mob.deathZoneStrikeTimer = deathZoneStrikeDef?.every ?? 0;
+  // The dragonkin brood pull-state dies with the pull too: the breath cadence
+  // reseeds lazily (undefined -> full interval on the next engaged tick), a
+  // mid-flight breath bar clears with the bigCast family below, the cleave
+  // cadence restarts, the counter-stun re-arms, and the next pull opens with
+  // the engage shout again.
+  const breathDef = MOBS[mob.templateId]?.breathCone;
+  mob.breathTimer = undefined;
+  mob.swingCleaveCount = undefined;
+  mob.counterStunReadyAt = undefined;
+  mob.shoutFired = undefined;
+  mob.shoutIntroUntil = undefined;
   if (
     (bigCastDef && mob.castingAbility === bigCastDef.castId) ||
     (deathZoneCastDef && mob.castingAbility === deathZoneCastDef.castId) ||
-    (deathZoneStrikeDef && mob.castingAbility === deathZoneStrikeDef.castId)
+    (deathZoneStrikeDef && mob.castingAbility === deathZoneStrikeDef.castId) ||
+    (breathDef && mob.castingAbility === breathDef.castId)
   ) {
     mob.castingAbility = null;
     mob.castTotal = 0;

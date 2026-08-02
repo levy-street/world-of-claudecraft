@@ -117,6 +117,22 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
     mob.castTargetId = null;
   }
   mob.yelledEngage = false;
+  // Dragonkin brood pull-state resets with the respawn (the resetEvadingMob
+  // twin): breath cadence reseeds lazily, cleave cadence and counter-stun
+  // re-arm, the fresh spawn shouts again on its first pull, and a respawned
+  // egg is whole again (unhatched, no pending ripple, no ward tag).
+  mob.breathTimer = undefined;
+  mob.swingCleaveCount = undefined;
+  mob.counterStunReadyAt = undefined;
+  mob.shoutFired = undefined;
+  mob.shoutIntroUntil = undefined;
+  mob.broodCracked = undefined;
+  mob.broodHatched = undefined;
+  mob.broodChainAt = undefined;
+  mob.broodWardOnHatch = undefined;
+  mob.leapUntil = undefined;
+  mob.leapBurnPending = undefined;
+  mob.wardOneHit = undefined;
   mob.wanderTimer = ctx.rng.range(2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
   for (const meta of ctx.players.values()) {

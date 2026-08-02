@@ -19,7 +19,8 @@ export type MountKey =
   | 'shadowjump_toad'
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
-  | 'terrorspark_groundshaker';
+  | 'terrorspark_groundshaker'
+  | 'drakemaw_raptor';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -95,6 +96,15 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   terrorspark_groundshaker: {
     key: 'terrorspark_groundshaker',
     name: 'Terrorspark Groundshaker',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  // The Drakemaw legendary: a saddle-broken brood raptor, dropped by the four
+  // Drakemaw Broodlords (content/drakelands.ts) at the heroic-blue mount rate
+  // (0.1%). The only open-world farmable epic mount.
+  drakemaw_raptor: {
+    key: 'drakemaw_raptor',
+    name: 'Drakemaw Raptor',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
