@@ -245,7 +245,11 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
       { copper: 90, chance: 1 },
       { itemId: 'emberwing_scale', chance: 0.5, questId: 'q_dk_scales_of_the_maw' },
     ],
-    scale: 1.15,
+    // Playtest bump: 30% over the first cut. Still inside the stock melee
+    // profile's honest reach (the bespoke-reach threshold is the scale-2
+    // wildheart case); the menace ladder reads whelp 0.85 -> guard 1.5 ->
+    // broodlord 2.25 -> matriarch 2.85.
+    scale: 1.5,
     color: 0x3e6b4f,
     engageShout: { rootSeconds: 1.3 },
   },
