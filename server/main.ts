@@ -275,9 +275,10 @@ import {
 } from './maps_routes';
 import {
   marketTrackerIdle,
-  pruneMarketTrackerSnapshots,
+  reconcileMarketTrackerCharacterIds,
   recordMarketListingSnapshot,
 } from './market_tracker';
+import { pruneMarketListingSnapshotsBatch } from './market_tracker_db';
 import { metaEventSourceUrl, metaRequestUserData, trackAccountCreated } from './meta_capi';
 import {
   cleanReportReason,
@@ -3141,6 +3142,12 @@ export async function startServer(): Promise<http.Server> {
     recordMarketListingSnapshot(game.sim.marketListings);
   }, MARKET_SNAPSHOT_INTERVAL_MS);
   marketSnapshotInterval.unref();
+  // Heal any character id the delete-time anonymize could not reach (a FIFO
+  // flush racing the delete, or a deletion made by a build without the
+  // anonymize call); repeated by the daily sweep below.
+  void reconcileMarketTrackerCharacterIds().catch((err) =>
+    console.error('market sales reconcile failed:', err),
+  );
   await game.loadMail();
   // Guild bank books boot-load BEFORE listen() below, so every non-oversized
   // guild's book is live before any player can join (Guild Bank Phase 3: this
@@ -3169,8 +3176,8 @@ export async function startServer(): Promise<http.Server> {
     void pruneGitHubOAuthStates(pool).catch((err) =>
       console.error('github oauth state prune failed:', err),
     );
-    void pruneMarketTrackerSnapshots().catch((err) =>
-      console.error('market snapshot prune failed:', err),
+    void reconcileMarketTrackerCharacterIds().catch((err) =>
+      console.error('market sales reconcile failed:', err),
     );
   }, DAILY_PRUNE_INTERVAL_MS).unref();
   setInterval(() => {
@@ -3450,6 +3457,12 @@ export async function startServer(): Promise<http.Server> {
         // LIMIT-bounded per account (chatModerationForAccount).
         name: 'chat_violations',
         pruneBatch: (n) => pruneChatViolationsBatch(config.chatViolationRetentionDays, n),
+      // World Market tracker listing snapshots (the sales table is
+      // keep-forever by design, see market_tracker_db.ts).
+      {
+        name: 'market_listing_snapshots',
+        pruneBatch: (n) =>
+          pruneMarketListingSnapshotsBatch(pool, config.marketSnapshotRetentionDays, n),
       },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group

@@ -47,6 +47,7 @@ describe('retention sweep wiring in server/main.ts', () => {
       'prunePlayerReportsBatch(',
       'pruneBugReportsBatch(',
       'pruneChatViolationsBatch(',
+      'pruneMarketListingSnapshotsBatch(',
     ]) {
       expect(preListen).not.toContain(call);
     }
@@ -101,6 +102,10 @@ describe('retention sweep wiring in server/main.ts', () => {
       'prunePlayerReportsBatch(',
       'pruneBugReportsBatch(',
       'pruneChatViolationsBatch(',
+      // market_listing_snapshots accrues ~288 captures a day per listed item;
+      // its retention lives only in this sweep (market_sales is keep-forever
+      // by design, documented at its DDL in server/market_tracker_db.ts).
+      'pruneMarketListingSnapshotsBatch(',
     ]) {
       expect(count(MAIN, call)).toBe(1);
     }
@@ -153,6 +158,9 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(MAIN).toContain('prunePlayerReportsBatch(config.playerReportRetentionDays, n)');
     expect(MAIN).toContain('pruneBugReportsBatch(config.bugReportRetentionDays, n)');
     expect(MAIN).toContain('pruneChatViolationsBatch(config.chatViolationRetentionDays, n)');
+    expect(MAIN).toContain(
+      'pruneMarketListingSnapshotsBatch(pool, config.marketSnapshotRetentionDays, n)',
+    );
   });
 
   it('sweeps the play-session fold before the association ager', () => {

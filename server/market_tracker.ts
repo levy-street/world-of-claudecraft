@@ -22,7 +22,7 @@ import {
   insertMarketSaleRow,
   type MarketListingSnapshotRow,
   type MarketSaleRow,
-  pruneMarketListingSnapshots,
+  reconcileMarketSalesCharacterIds,
 } from './market_tracker_db';
 import { REALM } from './realm';
 
@@ -67,13 +67,21 @@ export function captureMarketBuy(
 }
 
 // A sellerKey is USUALLY the seller's character id as a string, but legacy
-// listings can carry a character NAME and a headless seller a bare entity id
-// (src/sim/market.ts marketSellerKey). Only an unambiguous all-digit key maps
-// to a character id column value; anything else (and the house's '') is null.
+// listings can carry a character NAME and a sim without a character (headless
+// env, offline mode) a bare entity id (src/sim/market.ts marketSellerKey).
+// Only an all-digit key inside the INT column range is even a candidate
+// (anything else, and the house's '', is null); the insert then validates the
+// candidate against a live characters row (market_tracker_db.ts), so a stale
+// or entity-id key that matches no character lands as null instead of a bogus
+// attribution or a failed insert. A numeric key that happens to equal an
+// UNRELATED character's id is not detectable here; production dispatch always
+// joins with a real character id, so that residue is limited to legacy blob
+// rows and accepted.
+const PG_INT_MAX = 2_147_483_647;
 function sellerCharacterIdOf(sellerKey: string): number | null {
   if (!/^\d+$/.test(sellerKey)) return null;
   const id = Number(sellerKey);
-  return Number.isSafeInteger(id) ? id : null;
+  return Number.isSafeInteger(id) && id <= PG_INT_MAX ? id : null;
 }
 
 // Observe success by diffing the buyer's purse around the call: success debits
@@ -186,10 +194,12 @@ export function recordMarketListingSnapshot(listings: readonly MarketListing[]):
   }
 }
 
-// Daily retention sweep, called from the main.ts prune interval. Awaited by
-// its caller with a .catch, never by the game loop.
-export function pruneMarketTrackerSnapshots(): Promise<number> {
-  return pruneMarketListingSnapshots(pool);
+// Boot/daily anonymize reconcile (see market_tracker_db.ts for the two
+// windows it closes). Awaited by its caller with a .catch, never by the loop.
+// Snapshot retention is NOT here: the nightly retention sweep drives
+// pruneMarketListingSnapshotsBatch directly (registered in main.ts).
+export function reconcileMarketTrackerCharacterIds(): Promise<void> {
+  return reconcileMarketSalesCharacterIds(pool);
 }
 
 // The current FIFO tail, for tests and the main.ts shutdown drain.

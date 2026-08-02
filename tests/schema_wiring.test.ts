@@ -351,8 +351,10 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS market_sales');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS market_listing_snapshots');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_sales_item');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_sales_realm_sold_at');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_sales_buyer');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_sales_seller');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_listing_snapshots_item');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_listing_snapshots_captured');
   });
 

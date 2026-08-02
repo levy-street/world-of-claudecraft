@@ -21,6 +21,7 @@ vi.mock('../server/market_tracker_db', () => ({
   insertMarketListingSnapshotRows: vi.fn(async () => {}),
   pruneMarketListingSnapshots: vi.fn(async () => 0),
   anonymizeMarketSalesForCharacter: vi.fn(async () => {}),
+  reconcileMarketSalesCharacterIds: vi.fn(async () => {}),
 }));
 
 import { GameServer } from '../server/game';
@@ -150,6 +151,15 @@ describe('diffMarketBuy (pure)', () => {
     expect(diffMarketBuy(BUYER, named, 4000)?.sellerCharacterId).toBeNull();
     const mixed = captureMarketBuy([listing({ sellerKey: '12abc' })], 1000, 5000);
     expect(diffMarketBuy(BUYER, mixed, 4000)?.sellerCharacterId).toBeNull();
+  });
+
+  it('a numeric sellerKey past the INT column range maps to a null seller id', () => {
+    // 2^31 and up would overflow the INT column and fail the whole insert,
+    // silently dropping the sale row; the candidate is clamped out instead.
+    const huge = captureMarketBuy([listing({ sellerKey: '2147483648' })], 1000, 5000);
+    expect(diffMarketBuy(BUYER, huge, 4000)?.sellerCharacterId).toBeNull();
+    const max = captureMarketBuy([listing({ sellerKey: '2147483647' })], 1000, 5000);
+    expect(diffMarketBuy(BUYER, max, 4000)?.sellerCharacterId).toBe(2147483647);
   });
 });
 

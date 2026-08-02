@@ -35,6 +35,13 @@ import type { Pool } from 'pg';
 // NULL, house TRUE) are recorded too: they are real purchases at known prices
 // and a permanent ask ceiling the flip finder must see. The house flag, not a
 // NULL seller, is what distinguishes them from a deleted/legacy seller.
+//
+// Retention: market_sales is KEEP-FOREVER by design (the whole point is
+// long-range price history, and sale volume bounds growth to megabytes a
+// year); it deliberately does NOT register with the retention sweep. Revisit
+// with a fold-into-rollups if volume ever grows past that. The snapshot table
+// IS swept nightly: see pruneMarketListingSnapshotsBatch below, registered in
+// main.ts under the MARKET_SNAPSHOT_RETENTION_DAYS config knob.
 export const MARKET_TRACKER_SCHEMA = `
 CREATE TABLE IF NOT EXISTS market_sales (
   id BIGSERIAL PRIMARY KEY,
@@ -92,13 +99,19 @@ export interface MarketSaleRow {
   sellerCharacterId: number | null;
 }
 
+// The seller id is validated at insert time: a sellerKey is only USUALLY a
+// character id (a stale blob row can carry a sim entity id that never had a
+// characters row), so the scalar subquery maps a candidate matching no live
+// character to NULL instead of recording a bogus attribution or failing the
+// insert. Buyer ids come from the live session, so they are trusted directly.
 export async function insertMarketSaleRow(pool: Pool, row: MarketSaleRow): Promise<void> {
   await pool.query(
     `INSERT INTO market_sales
        (realm, listing_id, item_id, quantity, total_price_copper, house,
         instanced, crafted_recipe_id, buyer_character_id, buyer_account_id,
         seller_character_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+             (SELECT id FROM characters WHERE id = $11))`,
     [
       row.realm,
       row.listingId,
@@ -112,6 +125,27 @@ export async function insertMarketSaleRow(pool: Pool, row: MarketSaleRow): Promi
       row.buyerAccountId,
       row.sellerCharacterId,
     ],
+  );
+}
+
+// Boot/daily reconcile for the two windows the delete-time anonymize cannot
+// cover: a sale row flushed off the FIFO after its seller was anonymized, and
+// a character deleted by a build without the anonymize call (rollback or a
+// mixed fleet on the shared Postgres). Ids are validated against a live
+// characters row at insert time (above), so any id with no characters row here
+// is a deleted character, never a legitimate foreign key. Both UPDATEs ride
+// the partial indexes; idempotent and safe to run concurrently across realm
+// processes, so no advisory lock is needed.
+export async function reconcileMarketSalesCharacterIds(pool: Pool): Promise<void> {
+  await pool.query(
+    `UPDATE market_sales SET buyer_character_id = NULL
+     WHERE buyer_character_id IS NOT NULL
+       AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.id = buyer_character_id)`,
+  );
+  await pool.query(
+    `UPDATE market_sales SET seller_character_id = NULL
+     WHERE seller_character_id IS NOT NULL
+       AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.id = seller_character_id)`,
   );
 }
 
@@ -175,68 +209,30 @@ export async function insertMarketListingSnapshotRows(
 
 // Snapshots are a rolling window: beyond the horizon the per-capture rows stop
 // earning their storage (sales history, which is kept, answers the long-range
-// questions). 90 days of 5-minute captures is the working set the phase-3
-// charts read.
-export const MARKET_SNAPSHOT_RETENTION_DAYS = 90;
-
-// Serialize the sweep across realm processes sharing one Postgres, the
-// pruneUnstuckReports idiom: first process in wins the try-lock, everyone else
-// no-ops until the next daily tick. Key is arbitrary but must be unique among
-// the repo's advisory keys.
-export const MARKET_SNAPSHOT_PRUNE_ADVISORY_KEY = 0x574f4306;
-
-// Bounded batches, the pruneUnstuckReports idiom: each batch rides the
-// market_listing_snapshots_captured index and the ladder comfortably exceeds
-// the worst-case daily accrual (a few tens of thousands of rows per realm per
-// day), so a sweep that falls behind one day catches up the next.
-export const MARKET_SNAPSHOT_PRUNE_BATCH_SIZE = 10_000;
-export const MARKET_SNAPSHOT_PRUNE_MAX_BATCHES = 10;
-
-export async function pruneMarketListingSnapshots(pool: Pool): Promise<number> {
-  const client = await pool.connect();
-  let lockAcquired = false;
-  let releaseError: Error | undefined;
-  try {
-    const lock = await client.query<{ acquired: boolean }>(
-      'SELECT pg_try_advisory_lock($1::int) AS acquired',
-      [MARKET_SNAPSHOT_PRUNE_ADVISORY_KEY],
-    );
-    lockAcquired = lock.rows[0]?.acquired === true;
-    if (!lockAcquired) return 0;
-
-    let total = 0;
-    for (let batch = 0; batch < MARKET_SNAPSHOT_PRUNE_MAX_BATCHES; batch += 1) {
-      const res = await client.query(
-        `WITH expired AS (
-           SELECT id
-           FROM market_listing_snapshots
-           WHERE captured_at < now() - ($1::int * INTERVAL '1 day')
-           ORDER BY captured_at ASC, id ASC
-           LIMIT $2
-           FOR UPDATE SKIP LOCKED
-         )
-         DELETE FROM market_listing_snapshots AS s
-         USING expired
-         WHERE s.id = expired.id`,
-        [MARKET_SNAPSHOT_RETENTION_DAYS, MARKET_SNAPSHOT_PRUNE_BATCH_SIZE],
-      );
-      const deleted = res.rowCount ?? 0;
-      total += deleted;
-      if (deleted < MARKET_SNAPSHOT_PRUNE_BATCH_SIZE) break;
-    }
-    return total;
-  } finally {
-    if (lockAcquired) {
-      try {
-        await client.query('SELECT pg_advisory_unlock($1::int)', [
-          MARKET_SNAPSHOT_PRUNE_ADVISORY_KEY,
-        ]);
-      } catch (err) {
-        releaseError = err instanceof Error ? err : new Error(String(err));
-      }
-    }
-    client.release(releaseError);
-  }
+// questions). One bounded batch per call in the pruneChatLogsBatch shape: the
+// caller is the nightly retention sweep (registered in main.ts), which owns
+// the advisory lock, the once-per-day clock, the per-run row budget, and the
+// pruned-N observability line, so none of that is re-implemented here. The
+// LIMIT subquery rides the market_listing_snapshots_captured index; retention
+// days come from config (MARKET_SNAPSHOT_RETENTION_DAYS, 0 = keep forever).
+export async function pruneMarketListingSnapshotsBatch(
+  pool: Pool,
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  // A fractional value must clamp to at least one day, never floor to '0 days'.
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM market_listing_snapshots
+      WHERE id IN (
+        SELECT id FROM market_listing_snapshots
+         WHERE captured_at < now() - ($1 || ' days')::interval
+         ORDER BY captured_at
+         LIMIT $2)`,
+    [String(days), Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
 }
 
 // Explicit anonymize-on-delete (there is no FK to do it for us, see the schema

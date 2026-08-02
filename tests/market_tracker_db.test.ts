@@ -7,20 +7,13 @@ import {
   anonymizeMarketSalesForCharacter,
   insertMarketListingSnapshotRows,
   insertMarketSaleRow,
-  MARKET_SNAPSHOT_PRUNE_ADVISORY_KEY,
-  MARKET_SNAPSHOT_PRUNE_BATCH_SIZE,
-  MARKET_SNAPSHOT_RETENTION_DAYS,
   type MarketListingSnapshotRow,
-  pruneMarketListingSnapshots,
+  pruneMarketListingSnapshotsBatch,
+  reconcileMarketSalesCharacterIds,
 } from '../server/market_tracker_db';
 
 const query = vi.fn();
-const clientQuery = vi.fn();
-const release = vi.fn();
-const pool = {
-  query,
-  connect: vi.fn(async () => ({ query: clientQuery, release })),
-} as any;
+const pool = { query } as any;
 
 function snapshotRow(over: Partial<MarketListingSnapshotRow> = {}): MarketListingSnapshotRow {
   return {
@@ -37,9 +30,6 @@ function snapshotRow(over: Partial<MarketListingSnapshotRow> = {}): MarketListin
 beforeEach(() => {
   query.mockReset();
   query.mockResolvedValue({ rows: [], rowCount: 0 });
-  clientQuery.mockReset();
-  release.mockReset();
-  (pool.connect as ReturnType<typeof vi.fn>).mockClear();
 });
 
 describe('insertMarketSaleRow', () => {
@@ -66,6 +56,9 @@ describe('insertMarketSaleRow', () => {
     // Eleven bind params, no interpolation: the last placeholder is $11.
     expect(sql).toContain('$11');
     expect(sql).not.toContain('$12');
+    // The seller candidate is validated against a live characters row so a
+    // stale or entity-id sellerKey lands as NULL, never a bogus attribution.
+    expect(sql).toContain('(SELECT id FROM characters WHERE id = $11)');
     expect(params).toEqual([
       'eastbrook',
       5001,
@@ -116,46 +109,30 @@ describe('insertMarketListingSnapshotRows', () => {
   });
 });
 
-describe('pruneMarketListingSnapshots', () => {
-  it('takes the advisory try-lock, deletes in bounded batches, and unlocks', async () => {
-    clientQuery
-      .mockResolvedValueOnce({ rows: [{ acquired: true }], rowCount: 1 })
-      .mockResolvedValueOnce({ rows: [], rowCount: MARKET_SNAPSHOT_PRUNE_BATCH_SIZE })
-      .mockResolvedValueOnce({ rows: [], rowCount: 3 })
-      .mockResolvedValueOnce({ rows: [], rowCount: 1 });
-    const total = await pruneMarketListingSnapshots(pool);
-    expect(total).toBe(MARKET_SNAPSHOT_PRUNE_BATCH_SIZE + 3);
-    // lock, full batch, short batch (stop), unlock.
-    expect(clientQuery).toHaveBeenCalledTimes(4);
-    expect(clientQuery.mock.calls[0][0]).toContain('pg_try_advisory_lock');
-    expect(clientQuery.mock.calls[0][1]).toEqual([MARKET_SNAPSHOT_PRUNE_ADVISORY_KEY]);
-    const [deleteSql, deleteParams] = clientQuery.mock.calls[1];
-    expect(deleteSql).toContain('DELETE FROM market_listing_snapshots');
-    expect(deleteSql).toContain('FOR UPDATE SKIP LOCKED');
-    expect(deleteParams).toEqual([
-      MARKET_SNAPSHOT_RETENTION_DAYS,
-      MARKET_SNAPSHOT_PRUNE_BATCH_SIZE,
-    ]);
-    expect(clientQuery.mock.calls[3][0]).toContain('pg_advisory_unlock');
-    expect(release).toHaveBeenCalledTimes(1);
+describe('pruneMarketListingSnapshotsBatch', () => {
+  it('issues one LIMIT-bounded DELETE riding the captured_at index', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 42 });
+    const deleted = await pruneMarketListingSnapshotsBatch(pool, 90, 1000);
+    expect(deleted).toBe(42);
+    expect(query).toHaveBeenCalledTimes(1);
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toContain('DELETE FROM market_listing_snapshots');
+    expect(sql).toContain('LIMIT $2');
+    expect(sql).toContain('ORDER BY captured_at');
+    expect(params).toEqual(['90', 1000]);
   });
 
-  it('another process holding the lock means a clean no-op', async () => {
-    clientQuery.mockResolvedValueOnce({ rows: [{ acquired: false }], rowCount: 1 });
-    const total = await pruneMarketListingSnapshots(pool);
-    expect(total).toBe(0);
-    expect(clientQuery).toHaveBeenCalledTimes(1);
-    expect(release).toHaveBeenCalledTimes(1);
+  it('retention 0 or garbage means keep forever: no statement at all', async () => {
+    expect(await pruneMarketListingSnapshotsBatch(pool, 0, 1000)).toBe(0);
+    expect(await pruneMarketListingSnapshotsBatch(pool, -5, 1000)).toBe(0);
+    expect(await pruneMarketListingSnapshotsBatch(pool, Number.NaN, 1000)).toBe(0);
+    expect(query).not.toHaveBeenCalled();
   });
 
-  it('always releases the client, unlocking even when a batch throws', async () => {
-    clientQuery
-      .mockResolvedValueOnce({ rows: [{ acquired: true }], rowCount: 1 })
-      .mockRejectedValueOnce(new Error('delete failed'))
-      .mockResolvedValueOnce({ rows: [], rowCount: 0 });
-    await expect(pruneMarketListingSnapshots(pool)).rejects.toThrow('delete failed');
-    expect(clientQuery.mock.calls[2][0]).toContain('pg_advisory_unlock');
-    expect(release).toHaveBeenCalledTimes(1);
+  it('a fractional retention clamps to at least one day, never zero', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    await pruneMarketListingSnapshotsBatch(pool, 0.5, 1000);
+    expect(query.mock.calls[0][1]).toEqual(['1', 1000]);
   });
 });
 
@@ -167,5 +144,20 @@ describe('anonymizeMarketSalesForCharacter', () => {
     expect(query.mock.calls[0][1]).toEqual([42]);
     expect(query.mock.calls[1][0]).toContain('SET seller_character_id = NULL');
     expect(query.mock.calls[1][1]).toEqual([42]);
+  });
+});
+
+describe('reconcileMarketSalesCharacterIds', () => {
+  it('nulls ids whose characters row no longer exists, one UPDATE per column', async () => {
+    await reconcileMarketSalesCharacterIds(pool);
+    expect(query).toHaveBeenCalledTimes(2);
+    const [buyerSql] = query.mock.calls[0];
+    const [sellerSql] = query.mock.calls[1];
+    expect(buyerSql).toContain('SET buyer_character_id = NULL');
+    expect(buyerSql).toContain('NOT EXISTS');
+    expect(buyerSql).toContain('buyer_character_id IS NOT NULL');
+    expect(sellerSql).toContain('SET seller_character_id = NULL');
+    expect(sellerSql).toContain('NOT EXISTS');
+    expect(sellerSql).toContain('seller_character_id IS NOT NULL');
   });
 });
