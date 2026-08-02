@@ -2993,6 +2993,34 @@ export async function renameCharacter(
 // pair would race the takeover that steals the lease between the two. The no-nonce path
 // (tests, resumes, meta-less sessions) writes unconditionally and returns true, exactly
 // as before.
+// The ONE fenced character UPDATE the whole save family issues
+// (saveCharacterState, saveCharacterAndMarketState, and the guild bank escrow
+// sibling). Extracted so the lease fence stays byte-identical across the
+// family: the fence rides the write statement itself (never a separate
+// pre-check that would race a takeover), and a nonce that matches no lease row
+// touches nothing, which every caller must treat as "persist NOTHING".
+function characterUpdateStatement(
+  characterId: number,
+  level: number,
+  stateJson: string,
+  leaseNonce: string | undefined,
+): { text: string; values: unknown[] } {
+  return leaseNonce === undefined
+    ? {
+        text: 'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
+        values: [characterId, level, stateJson],
+      }
+    : {
+        text: `UPDATE characters SET level = $2, state = $3, updated_at = now()
+            WHERE id = $1
+              AND EXISTS (
+                SELECT 1 FROM character_leases
+                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
+              )`,
+        values: [characterId, level, stateJson, PROCESS_LEASE_HOLDER, leaseNonce],
+      };
+}
+
 export async function saveCharacterState(
   characterId: number,
   level: number,
@@ -3003,22 +3031,9 @@ export async function saveCharacterState(
   // A character save should wait out a slow database rather than lose state, so
   // run it on the raised heavy allowance; still bounded so a leave / shutdown
   // flush cannot hang past the container stop grace.
+  const stmt = characterUpdateStatement(characterId, level, JSON.stringify(cleanState), leaseNonce);
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-    leaseNonce === undefined
-      ? query('UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1', [
-          characterId,
-          level,
-          JSON.stringify(cleanState),
-        ])
-      : query(
-          `UPDATE characters SET level = $2, state = $3, updated_at = now()
-            WHERE id = $1
-              AND EXISTS (
-                SELECT 1 FROM character_leases
-                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
-              )`,
-          [characterId, level, JSON.stringify(cleanState), PROCESS_LEASE_HOLDER, leaseNonce],
-        ),
+    query(stmt.text, stmt.values),
   );
   return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
 }
@@ -3038,6 +3053,12 @@ export async function saveCharacterAndMarketState(
   market: MarketSave,
   mail: MailSave,
   leaseNonce?: string,
+  // Guild bank books dirtied by this character's session (Guild Bank Phase 3):
+  // they are escrows exactly like the market/mail blobs (an item leaves the
+  // bags and becomes a book slot in one Sim action), so a leave flush that
+  // carries both MUST land them in this same fenced transaction. Optional and
+  // additive: omitted (or empty) writes exactly what this function always has.
+  guildBanks?: readonly GuildBankSave[],
 ): Promise<boolean> {
   // Gate the escrow flush on the boot backfill just like saveMarketState:
   // this writes the realm-market row, so it must not run before ensureSchema
@@ -3058,21 +3079,13 @@ export async function saveCharacterAndMarketState(
     // no row: ROLL BACK before touching the market/mail rows and report false. The
     // escrow halves must never land without the bag half, and a displaced session
     // must not overwrite the realm's shared Market/Ravenpost escrow either.
-    const charRes =
-      leaseNonce === undefined
-        ? await client.query(
-            'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
-            [characterId, level, JSON.stringify(cleanState)],
-          )
-        : await client.query(
-            `UPDATE characters SET level = $2, state = $3, updated_at = now()
-              WHERE id = $1
-                AND EXISTS (
-                  SELECT 1 FROM character_leases
-                   WHERE character_id = $1 AND holder = $4 AND nonce = $5
-                )`,
-            [characterId, level, JSON.stringify(cleanState), PROCESS_LEASE_HOLDER, leaseNonce],
-          );
+    const stmt = characterUpdateStatement(
+      characterId,
+      level,
+      JSON.stringify(cleanState),
+      leaseNonce,
+    );
+    const charRes = await client.query(stmt.text, stmt.values);
     if (leaseNonce !== undefined && (charRes.rowCount ?? 0) === 0) {
       await client.query('ROLLBACK');
       return false;
@@ -3090,6 +3103,13 @@ export async function saveCharacterAndMarketState(
        ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
       [mailStateKey(REALM), JSON.stringify(mail)],
     );
+    // Guild bank books ride the SAME fenced transaction (Guild Bank Phase 3):
+    // the character UPDATE above already passed the lease fence, so these can
+    // never land for a displaced session, and a failure anywhere rolls back
+    // the character, market, mail, and book halves together.
+    for (const gb of guildBanks ?? []) {
+      await writeGuildBankRow(client, gb);
+    }
     await client.query('COMMIT');
     return true;
   } catch (err) {
@@ -3098,6 +3118,125 @@ export async function saveCharacterAndMarketState(
   } finally {
     client.release();
   }
+}
+
+// ---------------------------------------------------------------------------
+// Guild bank persistence (Guild Bank Phase 3). One JSONB book per guild in
+// guild_banks (DDL in server/social_db.ts SOCIAL_SCHEMA, the schema family
+// that owns guilds; the row cascades away with its guilds DELETE). The book is
+// an escrow shared with character state: every write rides a transaction that
+// carries the character-lease fence, through saveCharacterAndMarketState above
+// (the leave flush) or saveCharacterAndGuildBankState below (the game-loop
+// save). There is deliberately NO standalone saveGuildBankState: a book write
+// outside the fence is the dupe shape this phase exists to prevent.
+// ---------------------------------------------------------------------------
+
+export interface GuildBankSave {
+  guildId: number;
+  // The serialized GuildBankState (src/sim/guild_bank.ts serializeGuildBank).
+  // Callers must SKIP guilds whose serialize returned null (no loaded book):
+  // an empty book must never overwrite a real row.
+  data: unknown;
+}
+
+// The one guild_banks write statement, only ever issued on a client that is
+// inside the fenced escrow transaction (see the section comment above).
+async function writeGuildBankRow(
+  client: { query: (text: string, values: unknown[]) => Promise<unknown> },
+  gb: GuildBankSave,
+): Promise<void> {
+  await client.query(
+    `INSERT INTO guild_banks (guild_id, realm, data, updated_at) VALUES ($1, $2, $3, now())
+     ON CONFLICT (guild_id) DO UPDATE SET realm = EXCLUDED.realm, data = EXCLUDED.data,
+       updated_at = now()`,
+    [gb.guildId, REALM, JSON.stringify(gb.data)],
+  );
+}
+
+// The game-loop escrow save: the acting character's state AND the guild books
+// their session dirtied, in ONE transaction carrying the character-lease
+// fence. The sibling of saveCharacterAndMarketState for saves that carry no
+// market/mail half (the autosave path); a fence miss rolls back everything and
+// returns false, exactly like the market sibling, so a displaced session can
+// never persist either half. No market gate assertion: this writes no
+// world_state row, and books only exist in the sim after the boot load (or the
+// guild_create seed), both of which run after ensureSchema.
+export async function saveCharacterAndGuildBankState(
+  characterId: number,
+  level: number,
+  state: CharacterState,
+  guildBanks: readonly GuildBankSave[],
+  leaseNonce?: string,
+): Promise<boolean> {
+  const cleanState = sanitizeRemovedZone1Content(state).state;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    // Same rationale as saveCharacterAndMarketState: an escrow flush waits out
+    // a slow database on the heavy allowance. SET LOCAL reverts at COMMIT.
+    await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
+    const stmt = characterUpdateStatement(
+      characterId,
+      level,
+      JSON.stringify(cleanState),
+      leaseNonce,
+    );
+    const charRes = (await client.query(stmt.text, stmt.values)) as { rowCount: number | null };
+    if (leaseNonce !== undefined && (charRes.rowCount ?? 0) === 0) {
+      await client.query('ROLLBACK');
+      return false;
+    }
+    for (const gb of guildBanks) {
+      await writeGuildBankRow(client, gb);
+    }
+    await client.query('COMMIT');
+    return true;
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+// Upper bound on a guild_banks row this process will LOAD, enforced in SQL
+// (pg_column_size) so an oversized blob never even crosses the wire. A
+// legitimate book is a few KB (48 slots max by the expansion ladder); a row
+// past this bound is tampered or corrupt, and the boot load SKIPS it entirely,
+// leaving that guild's ops silently inert and the row untouched on disk
+// (items are never destroyed by a load path), rather than loading an empty
+// book that the next save would persist over the real row.
+export const GUILD_BANK_ROW_MAX_BYTES = 262_144;
+
+export interface GuildBankRow {
+  guildId: number;
+  // Parsed JSONB (pg hands objects, never strings), or null when the guild has
+  // no guild_banks row yet (a pre-feature guild: it gets an empty book) or the
+  // row is oversized (skipped; see the flag).
+  data: unknown;
+  oversized: boolean;
+}
+
+// Every guild on this realm with its bank book, for the boot load. LEFT JOIN
+// so a guild with no row still appears (data null -> empty book): a realm
+// created before the guild bank shipped loads exactly like one created after.
+export async function loadGuildBankRows(): Promise<GuildBankRow[]> {
+  const res = await pool.query(
+    `SELECT g.id AS guild_id,
+            (gb.guild_id IS NOT NULL) AS has_row,
+            COALESCE(pg_column_size(gb.data), 0) AS data_bytes,
+            CASE WHEN COALESCE(pg_column_size(gb.data), 0) <= $2 THEN gb.data ELSE NULL END
+              AS data
+       FROM guilds g LEFT JOIN guild_banks gb ON gb.guild_id = g.id
+      WHERE g.realm = $1
+      ORDER BY g.id`,
+    [REALM, GUILD_BANK_ROW_MAX_BYTES],
+  );
+  return res.rows.map((r) => ({
+    guildId: Number(r.guild_id),
+    data: r.data ?? null,
+    oversized: r.has_row === true && Number(r.data_bytes) > GUILD_BANK_ROW_MAX_BYTES,
+  }));
 }
 
 export async function isAdminAccount(accountId: number): Promise<boolean> {
@@ -3937,24 +4076,26 @@ export async function pruneChatLogsBatch(
 // ---------------------------------------------------------------------------
 // Bank ledger: one append-only row per SUCCESSFUL bank op, written fire-and-forget
 // off the game loop by server/bank_ledger.ts. See the bank_ledger DDL block in
-// SCHEMA above; realm is passed explicitly (the table carries no DEFAULT), and
-// container is always 'personal' with a NULL container_id until the guild bank
-// lands. `instance` is the item's per-instance payload (or null for a plain
-// fungible stack / a buy_slots row), serialized the same way as characters.state.
+// SCHEMA above; realm is passed explicitly (the table carries no DEFAULT).
+// container discriminates the personal bank ('personal', container_id NULL)
+// from the guild bank ('guild', container_id = guild id; Guild Bank Phase 3).
+// The gold and create_fee ops exist only for the guild container. `instance`
+// is the item's per-instance payload (or null for a plain fungible stack / a
+// copper-only row), serialized the same way as characters.state.
 // ---------------------------------------------------------------------------
 
 export interface BankLedgerRow {
   realm: string;
   characterId: number;
   accountId: number;
-  op: 'deposit' | 'withdraw' | 'buy_slots';
+  op: 'deposit' | 'withdraw' | 'buy_slots' | 'deposit_gold' | 'withdraw_gold' | 'create_fee';
   itemId: string | null;
   count: number | null;
   instance: unknown;
   copperDelta: number;
   purchasedSlotsAfter: number;
-  container: 'personal';
-  containerId: null;
+  container: 'personal' | 'guild';
+  containerId: number | null;
 }
 
 export async function insertBankLedgerRow(row: BankLedgerRow): Promise<void> {

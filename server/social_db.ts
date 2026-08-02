@@ -141,6 +141,23 @@ CREATE TABLE IF NOT EXISTS guild_events (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS guild_events_guild_day ON guild_events(guild_id, day);
+
+-- Guild bank books (Guild Bank Phase 3): one JSONB book per guild (treasury,
+-- inventory, purchasedSlots; the shape src/sim/guild_bank.ts owns). Lives in
+-- this schema family because guilds owns the parent row: a committed disband
+-- cascades the book away (the disband guard in server/social.ts refuses while
+-- the bank holds anything, so the cascade never destroys items or copper).
+-- Boot-loaded per realm (realm rides the row for that read); every write runs
+-- inside the character-lease-fenced escrow transaction in server/db.ts, never
+-- standalone. realm carries no DEFAULT deliberately: the interpolated-default
+-- pattern is last-boot-wins across realm processes, so every insert passes
+-- realm explicitly.
+CREATE TABLE IF NOT EXISTS guild_banks (
+  guild_id INT PRIMARY KEY REFERENCES guilds(id) ON DELETE CASCADE,
+  realm TEXT NOT NULL,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 `;
 
 const CHAR_COLS = 'id, name, class AS cls, level, realm';
