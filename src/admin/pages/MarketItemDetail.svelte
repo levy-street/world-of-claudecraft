@@ -9,6 +9,7 @@
   import { getAdminNavigation, routeHref } from '../navigation';
   import { t } from '../i18n';
   import { buildPriceChartPoints, buildVolumeChartPoints } from '../market_view';
+  import { readMarketWatchlist, toggleMarketWatchlist } from '../market_watchlist';
   import { auth } from '../state/auth.svelte';
   import type { MarketHistoryBucket, MarketItemDetailResponse } from '../types';
 
@@ -22,6 +23,7 @@
   let notFound = $state(false);
   let bucket = $state<MarketHistoryBucket>('day');
   let days = $state(30);
+  let watchlist = $state<Set<string>>(readMarketWatchlist());
   let requestId = 0;
 
   // Week buckets label like days (there is no dedicated week formatter and
@@ -93,6 +95,19 @@
   <PageHeader title={data.item.name} />
   <Panel>
     <div class="item-facts">
+      <button
+        type="button"
+        class="watch"
+        class:watched={watchlist.has(item)}
+        aria-pressed={watchlist.has(item)}
+        onclick={() => {
+          watchlist = toggleMarketWatchlist(watchlist, item);
+        }}
+      >
+        {watchlist.has(item)
+          ? `★ ${t('market.watched')}`
+          : `☆ ${t('market.addToWatchlist')}`}
+      </button>
       <span class="text-dim">{data.item.quality} {data.item.kind}</span>
       <span class="text-dim">
         {t('market.vendorSell', { price: fmtCopper(data.item.vendorSellCopper) })}
@@ -202,5 +217,9 @@
 
   .window-toggle .active {
     outline: 2px solid var(--gold);
+  }
+
+  .watch.watched {
+    color: var(--gold);
   }
 </style>

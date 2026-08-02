@@ -1074,5 +1074,11 @@ export const en_XA: AdminTranslations = {
   "market.colSource": "[Šóúŕçé]",
   "market.sourceHouse": "[Ɱéŕçĥáñţ šţóçķ]",
   "market.sourceInstanced": "[Íñšţáñçéð]",
-  "market.sourcePlayer": "[Þļáýéŕ]"
+  "market.sourcePlayer": "[Þļáýéŕ]",
+  "market.watchlistOnly": "[Ŵáţçĥļíšţ ({count})]",
+  "market.colWatch": "[Ŵáţçĥļíšţ]",
+  "market.watch": "[Áðð {name} ţó ţĥé ŵáţçĥļíšţ]",
+  "market.unwatch": "[Ŕéɱóʋé {name} ƒŕóɱ ţĥé ŵáţçĥļíšţ]",
+  "market.watched": "[Óñ ŵáţçĥļíšţ]",
+  "market.addToWatchlist": "[Áðð ţó ŵáţçĥļíšţ]"
 };

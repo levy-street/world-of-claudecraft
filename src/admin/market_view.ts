@@ -20,6 +20,10 @@ export interface MarketOverviewViewOptions {
   query: string;
   kind: string; // 'all' or an ItemKind value
   listedOnly: boolean;
+  // Starred item ids (src/admin/market_watchlist.ts); watchlistOnly narrows
+  // the table to them.
+  watchlist: ReadonlySet<string>;
+  watchlistOnly: boolean;
   sort: MarketSortColumn;
   dir: MarketSortDirection;
   page: number;
@@ -64,6 +68,7 @@ export function buildMarketOverviewView(
     (row) =>
       (options.kind === 'all' || row.kind === options.kind) &&
       (!options.listedOnly || row.listingCount > 0) &&
+      (!options.watchlistOnly || options.watchlist.has(row.itemId)) &&
       (query === '' ||
         row.name.toLowerCase().includes(query) ||
         row.itemId.toLowerCase().includes(query)),

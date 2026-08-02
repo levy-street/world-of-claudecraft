@@ -11,6 +11,7 @@
     type MarketSortColumn,
     type MarketSortDirection,
   } from '../market_view';
+  import { readMarketWatchlist, toggleMarketWatchlist } from '../market_watchlist';
   import { auth } from '../state/auth.svelte';
   import type { MarketOverviewResponse } from '../types';
 
@@ -21,6 +22,8 @@
   let search = $state('');
   let kind = $state('all');
   let listedOnly = $state(false);
+  let watchlist = $state<Set<string>>(readMarketWatchlist());
+  let watchlistOnly = $state(false);
   let sort = $state<MarketSortColumn>('sales7d');
   let dir = $state<MarketSortDirection>('desc');
   let page = $state(1);
@@ -31,12 +34,18 @@
       query: search,
       kind,
       listedOnly,
+      watchlist,
+      watchlistOnly,
       sort,
       dir,
       page,
       locale: adminLanguageTag(),
     }),
   );
+
+  function toggleWatch(itemId: string): void {
+    watchlist = toggleMarketWatchlist(watchlist, itemId);
+  }
 
   async function refresh(): Promise<void> {
     const currentRequest = ++requestId;
@@ -107,6 +116,16 @@
       />
       {t('market.listedOnly')}
     </label>
+    <label class="listed-only">
+      <input
+        type="checkbox"
+        bind:checked={watchlistOnly}
+        onchange={() => {
+          page = 1;
+        }}
+      />
+      {t('market.watchlistOnly', { count: fmtNumber(watchlist.size) })}
+    </label>
     <span class="text-dim">
       {t('market.count', { count: fmtNumber(view.total) })}
     </span>
@@ -141,6 +160,7 @@
       <table>
         <thead>
           <tr>
+            <th class="watch-col" aria-label={t('market.colWatch')}></th>
             {@render sortHeader('name', t('market.colItem'))}
             <th>{t('market.colKind')}</th>
             {@render sortHeader('ask', t('market.colLowestAsk'))}
@@ -154,6 +174,20 @@
         <tbody>
           {#each view.rows as row (row.itemId)}
             <tr>
+              <td class="watch-col">
+                <button
+                  type="button"
+                  class="watch"
+                  class:watched={watchlist.has(row.itemId)}
+                  aria-pressed={watchlist.has(row.itemId)}
+                  aria-label={watchlist.has(row.itemId)
+                    ? t('market.unwatch', { name: row.name })
+                    : t('market.watch', { name: row.name })}
+                  onclick={() => toggleWatch(row.itemId)}
+                >
+                  {watchlist.has(row.itemId) ? '★' : '☆'}
+                </button>
+              </td>
               <td>
                 <MarketItemLink itemId={row.itemId} name={row.name} />
                 <span class="quality q-{row.quality}">{row.quality}</span>
@@ -205,5 +239,25 @@
     margin-left: 8px;
     font-size: 0.85em;
     color: var(--text-soft);
+  }
+
+  .watch {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 1.1em;
+    color: var(--text-soft);
+    cursor: pointer;
+  }
+
+  .watch.watched {
+    color: var(--gold);
+  }
+
+  @media (pointer: coarse) {
+    .watch {
+      min-width: 40px;
+      min-height: 40px;
+    }
   }
 </style>

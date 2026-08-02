@@ -46,6 +46,8 @@ const OPTS = {
   query: '',
   kind: 'all',
   listedOnly: false,
+  watchlist: new Set<string>(),
+  watchlistOnly: false,
   sort: 'name' as const,
   dir: 'asc' as const,
   page: 1,
@@ -70,6 +72,16 @@ describe('buildMarketOverviewView', () => {
     const items = [item(), item({ itemId: 'bare', name: 'Bare', listingCount: 0 })];
     const view = buildMarketOverviewView(items, { ...OPTS, listedOnly: true });
     expect(view.rows.map((row) => row.itemId)).toEqual(['wolf_fang']);
+  });
+
+  it('watchlistOnly narrows the table to starred items', () => {
+    const items = [item(), item({ itemId: 'starred', name: 'Starred' })];
+    const view = buildMarketOverviewView(items, {
+      ...OPTS,
+      watchlist: new Set(['starred']),
+      watchlistOnly: true,
+    });
+    expect(view.rows.map((row) => row.itemId)).toEqual(['starred']);
   });
 
   it('null asks sink to the bottom in both sort directions', () => {

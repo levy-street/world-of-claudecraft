@@ -1104,6 +1104,12 @@ export const en = {
   'market.sourceHouse': 'Merchant stock',
   'market.sourceInstanced': 'Instanced',
   'market.sourcePlayer': 'Player',
+  'market.watchlistOnly': 'Watchlist ({count})',
+  'market.colWatch': 'Watchlist',
+  'market.watch': 'Add {name} to the watchlist',
+  'market.unwatch': 'Remove {name} from the watchlist',
+  'market.watched': 'On watchlist',
+  'market.addToWatchlist': 'Add to watchlist',
 };
 
 export type AdminTranslations = typeof en;

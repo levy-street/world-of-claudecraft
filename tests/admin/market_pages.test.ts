@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import './_setup';
-import { render, screen } from '@testing-library/svelte';
+import { fireEvent, render, screen } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const overviewData = {
@@ -145,6 +145,19 @@ describe('Market overview page', () => {
       'href',
       expect.stringContaining('page=market-item'),
     );
+  });
+
+  it('starring a row persists it to the watchlist store', async () => {
+    render(Market);
+    const star = await screen.findByRole('button', {
+      name: t('market.watch', { name: 'Wolf Fang' }),
+    });
+    expect(star).toHaveAttribute('aria-pressed', 'false');
+    await fireEvent.click(star);
+    expect(
+      screen.getByRole('button', { name: t('market.unwatch', { name: 'Wolf Fang' }) }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    expect(localStorage.getItem('claudecraft_admin_market_watchlist')).toBe('["wolf_fang"]');
   });
 });
 
