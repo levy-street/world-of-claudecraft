@@ -1,6 +1,9 @@
 # Guild Social v1: cross-phase state
 
-Current phase: Phase 2 complete (2026-08-02); Phase 2 QA (final) next.
+Current phase: Phase 2 QA (final) complete (2026-08-02). Verdict PASS-WITH-FOLLOWUPS: all
+review fixes committed; `npm run gate` and the PR are the orchestrator's remaining steps,
+and packet teardown awaits the user's explicit confirmation (docs/guild-social-v1/ left in
+place). Full matrix results and the deferral ledger: progress.md.
 
 ## Locked design decisions
 - Base branch `release/v0.34.0`; branch `feature/guild-social-v1`; this PR lands BEFORE the
@@ -98,6 +101,17 @@ Current phase: Phase 2 complete (2026-08-02); Phase 2 QA (final) next.
   (`tests/architecture.test.ts`).
 - Phase 1 QA: the echo splices `this.maskChat(motdLine.emit)` (profanity mask, QA ruling;
   see progress.md for both deferred-item rulings). No other code drift.
+- Phase 2 QA (final): test-only seam pins in `tests/server/title_reads.test.ts` (the
+  `gm.joined_at` SQL alias + epoch map + finite guard), `tests/server_i18n.test.ts` (the
+  refusal literal in the samples), `tests/social_system.test.ts` (game.ts offensiveName
+  wiring source pin, fail-closed ctor via ts-expect-error, format-gate-before-screen
+  negative), `tests/social_frames.test.ts` (socialpos preserves joinedAt), and
+  `tests/guild_motd_login.test.ts` (HUD echo mask/channel/color source pin). Code drift:
+  the tenure chip CSS selectors are now `.soc-name .rank.soc-tenure-*` (specificity
+  de-tie vs the rank tint; the HTML class list is unchanged), and
+  `hud.social.tenure.new` has five non-Latin overlay fills like Veteran. Screenshot
+  tooling: `scripts/pr_shot_targets.mjs` stages joinedAt in the guild-roster fixture and
+  adds a `guild-login-line` target; captures live in `docs/screenshots/guild-social-v1/`.
 
 ## Known gotchas
 - The social snapshot is re-pushed on ANY social change; the login-line module must key off
