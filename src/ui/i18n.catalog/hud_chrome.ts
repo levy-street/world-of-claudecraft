@@ -2582,7 +2582,8 @@ export const hudChromeStrings = {
       label: 'Guild Billboard',
       empty: 'Nothing on the billboard yet.',
       // Chat-log echo at login and on a mid-session billboard change; {text} is
-      // the player-authored MOTD, spliced verbatim (Hud.log renders plain text).
+      // the player-authored MOTD, untranslated and profanity-masked like any
+      // other chat-pane body (appendLog escapes it; [[i:...]] renders as links).
       loginLine: 'Guild billboard: {text}',
       setBy: 'Set by {name}',
       save: 'Save',

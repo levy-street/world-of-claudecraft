@@ -8322,16 +8322,20 @@ export class Hud {
   // Guild billboard echo into the chat log: latched on the MOTD VALUE (not on
   // social-frame arrival), so it fires once at login and once per mid-session
   // text change, and never on unrelated social snapshot re-pushes. The MOTD text
-  // is player-authored and spliced verbatim; the line is tagged to the guild
-  // channel so the Guild filter tab shows it and the color derives from the
-  // channel's single source of truth.
+  // is player-authored: spliced into the template untranslated, but run through
+  // the same profanity mask as every other player-authored body in this pane
+  // (guild chat masks, so the echo one line below it must too; the chat-bubble
+  // path is the whole-string precedent). The latch keys on the RAW text, so
+  // toggling the filter mid-session never re-triggers the line. Tagged to the
+  // guild channel so the Guild filter tab shows it and the color derives from
+  // the channel's single source of truth.
   private updateGuildBillboardEcho(): void {
     const motdLine = decideGuildMotdLine(this.lastShownGuildMotd, this.sim.socialInfo);
     this.lastShownGuildMotd = motdLine.nextShown;
     if (motdLine.emit !== null) {
       this.appendLog(
         this.chatLogEl,
-        t('hudChrome.social.billboard.loginLine', { text: motdLine.emit }),
+        t('hudChrome.social.billboard.loginLine', { text: this.maskChat(motdLine.emit) }),
         chatChannelColor('guild'),
         true,
         'guild',
