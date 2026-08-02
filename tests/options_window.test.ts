@@ -131,8 +131,11 @@ describe('options_window: interface tab split', () => {
     // selecting a tab updates the session tab then re-renders the whole view
     expect(painter).toContain('this.interfaceTab = id as InterfaceTab;');
     expect(painter).toMatch(
-      /wireTabStrip\(el, 'opt-tab', \(id, focusFollow\) => \{\s*this\.interfaceTab = id as InterfaceTab;\s*this\.renderInterface\(\);/,
+      /wireTabStrip\(el, 'opt-tab', \(id, focusFollow\) => \{\s*this\.interfaceTab = id as InterfaceTab;\s*this\.render\(\);/,
     );
+    // render() is the only allowed caller because it rewires the title Back
+    // control after renderInterface() replaces the subtree.
+    expect(painter.match(/this\.renderInterface\(\)/g) ?? []).toHaveLength(1);
     // the panel body is the tabpanel the strip points at
     expect(painter).toContain("panelId: 'interface-tabpanel',");
     expect(painter).toContain("body.setAttribute('role', 'tabpanel');");
@@ -181,6 +184,34 @@ describe('options_window: interface tab split', () => {
     for (const sig of ['toggle(): void {', 'close(): void {', 'private goBack(): void {']) {
       expect(methodBody(sig), `${sig} must not touch interfaceTab`).not.toContain('interfaceTab');
     }
+  });
+});
+
+describe('options_window: controller rebuild routing', () => {
+  it('keeps render() as the only renderController caller so Back is rewired', () => {
+    expect(painter.match(/this\.renderController\(\)/g) ?? []).toHaveLength(1);
+    expect(painter).toContain("if (this.isOpen && this.view === 'controller') this.render();");
+  });
+
+  it('keeps every settings sub-view rebuild behind render()', () => {
+    const renderDispatcher = painter.slice(
+      painter.indexOf('private render(): void {'),
+      painter.indexOf('private renderMain(): void {'),
+    );
+    for (const [view, renderer] of [
+      ['graphics', 'renderGraphics'],
+      ['audio', 'renderAudio'],
+      ['keybinds', 'renderKeybinds'],
+    ]) {
+      expect(painter.match(new RegExp(`this\\.${renderer}\\(\\)`, 'g')) ?? []).toHaveLength(1);
+      expect(renderDispatcher).toMatch(new RegExp(`case '${view}':\\s*this\\.${renderer}\\(\\);`));
+    }
+    expect(painter).toContain("if (key === 'attackMove') this.render();");
+    expect(painter).toMatch(/this\.deps\.keybinds\(\)\.reset\(\);[\s\S]{0,300}?this\.render\(\);/);
+    expect(painter).toMatch(
+      /this\.keybindNote = t\('hud\.options\.keybindCapture',[\s\S]{0,200}?this\.render\(\);\s*hooks\.captureKey/,
+    );
+    expect(painter).toContain('if (this.isOpen) this.render();');
   });
 });
 
@@ -235,7 +266,7 @@ describe('options_window: changeLanguage hardening (PR #730)', () => {
     );
     expect(lang).toContain('.changeLanguage(selected');
     // success re-renders the panel; failure reverts the dropdown in place
-    expect(lang).toContain('this.renderInterface()');
+    expect(lang).toContain('this.render()');
     expect(lang).toContain('this.deps.setDropdownValue(dropdown, getLanguage())');
     // the trigger never gets stuck disabled on a throw
     expect(lang).toContain('.catch(');
