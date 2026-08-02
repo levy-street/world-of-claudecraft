@@ -739,6 +739,19 @@ ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS worst_10s_frame_p95_ms 
 -- against the server allowlist in perf_report.ts before storage (filter,
 -- dedupe, cap 3). Pre-column and healthy rows both read as the empty array.
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS suggestion_ids TEXT[] NOT NULL DEFAULT '{}';
+-- Schema version 3: Windows bottleneck diagnostics (GPU timer percentiles,
+-- ANGLE backend token, post-prewarm program growth, bottleneck verdict).
+-- Deliberately nullable, no defaults: a pre-v3 row, or a client without the
+-- GPU timer extension, reads NULL ("not measured") so fleet aggregates never
+-- fold an unmeasured session into a legitimate zero.
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gpu_frame_p50_ms REAL;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gpu_frame_p95_ms REAL;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gpu_timer_supported BOOLEAN;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS angle_backend TEXT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS parallel_compile BOOLEAN;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS programs_post_prewarm INT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS bottleneck TEXT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS bottleneck_confidence TEXT;
 -- Non-custodial Solana wallet links (PRD: docs/prd/woc/wallet-link.md). One
 -- wallet per account (account_id is the PK) and one account per wallet (pubkey
 -- is UNIQUE). The server never holds keys; ownership is proven by a signed
@@ -3519,6 +3532,14 @@ export interface ClientPerfReportInsert {
   visibleViews: number;
   worst10sFrameP95Ms: number;
   suggestionIds: string[];
+  gpuFrameP50Ms: number | null;
+  gpuFrameP95Ms: number | null;
+  gpuTimerSupported: boolean;
+  angleBackend: string | null;
+  parallelCompile: boolean;
+  programsPostPrewarm: number | null;
+  bottleneck: string | null;
+  bottleneckConfidence: string | null;
   rawSummary: Record<string, unknown>;
 }
 
@@ -3533,7 +3554,9 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
        browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source,
        crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
-       suggestion_ids, raw_summary
+       suggestion_ids, raw_summary,
+       gpu_frame_p50_ms, gpu_frame_p95_ms, gpu_timer_supported, angle_backend,
+       parallel_compile, programs_post_prewarm, bottleneck, bottleneck_confidence
      ) VALUES (
        $1, $2, $3, $4, $5, $6, $7,
        $8, $9, $10, $11, $12, $13,
@@ -3543,7 +3566,9 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        $27, $28, $29, $30, $31,
        $32, $33, $34, $35, $36, $37,
        $38, $39, $40, $41, $42,
-       $43, $44
+       $43, $44,
+       $45, $46, $47, $48,
+       $49, $50, $51, $52
      )`,
     [
       row.schemaVersion,
@@ -3590,6 +3615,14 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
       row.worst10sFrameP95Ms,
       row.suggestionIds,
       JSON.stringify(row.rawSummary),
+      row.gpuFrameP50Ms,
+      row.gpuFrameP95Ms,
+      row.gpuTimerSupported,
+      row.angleBackend,
+      row.parallelCompile,
+      row.programsPostPrewarm,
+      row.bottleneck,
+      row.bottleneckConfidence,
     ],
   );
 }

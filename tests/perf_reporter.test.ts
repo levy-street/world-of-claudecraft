@@ -217,6 +217,12 @@ function snapshot(): PerfSnapshot {
       worst10s: null,
     },
     mainMs: { renderer: { count: 1, avg: 5, p95: 5, max: 5 } },
+    programsLinkedPostPrewarm: 4,
+    bottleneck: {
+      verdict: 'balanced',
+      confidence: 'high',
+      detail: 'frame p95 19ms within target 16.7ms',
+    },
     renderer: {
       graphicsConfigVersion: 16,
       tier: 'high',
@@ -300,6 +306,10 @@ function snapshot(): PerfSnapshot {
       },
       glVendor: 'Apple',
       glRenderer: 'ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Pro)',
+      angleBackend: 'metal',
+      parallelCompile: true,
+      gpu: null,
+      gpuTimerSupported: false,
       contextLost: 0,
       contextRestored: 0,
       phaseMs: {
@@ -677,9 +687,99 @@ describe('perf reporter report dimensions', () => {
     expect(empty.worst10sFrameP95Ms).toBeNull();
   });
 
-  it('stamps schema version 2 on the payload', () => {
+  it('stamps schema version 3 on the payload', () => {
     const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42)!;
-    expect(body.schemaVersion).toBe(2);
+    expect(body.schemaVersion).toBe(3);
+  });
+});
+
+describe('perf reporter bottleneck diagnostics (schema 3)', () => {
+  const { payloadFromSnapshot } = perfReporterInternalsForTest;
+
+  function gpuStats(frames: number): NonNullable<NonNullable<PerfSnapshot['renderer']>['gpu']> {
+    return {
+      frames,
+      frameAvgMs: 6.2,
+      frameP50Ms: 5.8,
+      frameP95Ms: 11.4,
+      frameMaxMs: 21.9,
+      sections: [
+        { label: 'scene', avgMs: 4.1, p95Ms: 8.2, samples: frames },
+        { label: 'post', avgMs: 2.1, p95Ms: 3.4, samples: frames },
+      ],
+      disjoints: 1,
+      starvedFrames: 2,
+    };
+  }
+
+  it('maps the diagnostics snapshot fields onto the flat v3 payload', () => {
+    const snap = snapshot();
+    snap.renderer!.gpu = gpuStats(120);
+    snap.renderer!.gpuTimerSupported = true;
+    const body = payloadFromSnapshot(snap, new Settings(), 'sess1', 42)!;
+    expect(body.gpuFrameP50Ms).toBe(5.8);
+    expect(body.gpuFrameP95Ms).toBe(11.4);
+    expect(body.gpuTimerSupported).toBe(true);
+    expect(body.angleBackend).toBe('metal');
+    expect(body.parallelCompile).toBe(true);
+    expect(body.programsPostPrewarm).toBe(4);
+    expect(body.bottleneck).toBe('balanced');
+    expect(body.bottleneckConfidence).toBe('high');
+    // The per-section GPU spans ride the nested raw summary, beside the CPU
+    // phase spans, never as flat fleet dimensions.
+    expect(
+      (body.rawSummary as { rendererGpuSections?: Array<{ label: string; avgMs: number }> })
+        .rendererGpuSections,
+    ).toEqual([
+      { label: 'scene', avgMs: 4.1, p95Ms: 8.2, samples: 120 },
+      { label: 'post', avgMs: 2.1, p95Ms: 3.4, samples: 120 },
+    ]);
+  });
+
+  it('nulls the gpu percentiles when the renderer has no gpu timer stats', () => {
+    // The base fixture carries gpu: null, gpuTimerSupported: false.
+    const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42)!;
+    expect(body.gpuFrameP50Ms).toBeNull();
+    expect(body.gpuFrameP95Ms).toBeNull();
+    expect(body.gpuTimerSupported).toBe(false);
+    expect((body.rawSummary as { rendererGpuSections?: unknown }).rendererGpuSections).toBeNull();
+  });
+
+  it('nulls the gpu percentiles below the 30 resolved-frame floor and ships them at it', () => {
+    const below = snapshot();
+    below.renderer!.gpu = gpuStats(29);
+    const belowBody = payloadFromSnapshot(below, new Settings(), 'sess1', 42)!;
+    expect(belowBody.gpuFrameP50Ms).toBeNull();
+    expect(belowBody.gpuFrameP95Ms).toBeNull();
+    // The sections still ride the raw summary: context, not a percentile claim.
+    expect(
+      (belowBody.rawSummary as { rendererGpuSections?: unknown[] }).rendererGpuSections,
+    ).toHaveLength(2);
+
+    const atFloor = snapshot();
+    atFloor.renderer!.gpu = gpuStats(30);
+    const atFloorBody = payloadFromSnapshot(atFloor, new Settings(), 'sess1', 42)!;
+    expect(atFloorBody.gpuFrameP50Ms).toBe(5.8);
+    expect(atFloorBody.gpuFrameP95Ms).toBe(11.4);
+  });
+
+  it('nulls the verdict and program fields when the snapshot carries none', () => {
+    const snap = snapshot();
+    snap.bottleneck = null;
+    snap.programsLinkedPostPrewarm = null;
+    const body = payloadFromSnapshot(snap, new Settings(), 'sess1', 42)!;
+    expect(body.bottleneck).toBeNull();
+    expect(body.bottleneckConfidence).toBeNull();
+    expect(body.programsPostPrewarm).toBeNull();
+  });
+
+  it('never ships the dev-only bottleneck detail prose', () => {
+    const snap = snapshot();
+    const detail = snap.bottleneck!.detail;
+    expect(detail).toBe('frame p95 19ms within target 16.7ms');
+    const body = payloadFromSnapshot(snap, new Settings(), 'sess1', 42)!;
+    expect(JSON.stringify(body)).not.toContain(detail);
+    expect(body).not.toHaveProperty('bottleneckDetail');
   });
 });
 

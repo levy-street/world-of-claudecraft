@@ -116,9 +116,9 @@ describe('perf report ingestion', () => {
     expect(insertClientPerfReport).toHaveBeenCalledTimes(1);
     expect(insertClientPerfReport).toHaveBeenCalledWith(
       expect.objectContaining({
-        // 99 clamps to the current schema version (2 since the phase 03
-        // dimensions, ruling R6).
-        schemaVersion: 2,
+        // 99 clamps to the current schema version (3 since the Windows
+        // bottleneck diagnostics).
+        schemaVersion: 3,
         accountId: 10,
         characterId: 55,
         graphicsPreset: 'ultra',
@@ -232,7 +232,7 @@ describe('perf report ingestion', () => {
     expect(perfReportInternalsForTest.PERF_REPORT_SCHEMA_VERSION).toBe(
       perfReporterInternalsForTest.PERF_REPORT_SCHEMA_VERSION,
     );
-    expect(perfReportInternalsForTest.PERF_REPORT_SCHEMA_VERSION).toBe(2);
+    expect(perfReportInternalsForTest.PERF_REPORT_SCHEMA_VERSION).toBe(3);
   });
 
   it('accepts every fixed crowd label and folds hostile crowd input to unknown', async () => {
@@ -408,6 +408,165 @@ describe('perf report ingestion', () => {
     );
     expect(insertClientPerfReport).toHaveBeenCalledWith(
       expect.objectContaining({ suggestionIds: [] }),
+    );
+  });
+
+  it('stores the schema 3 bottleneck diagnostics fields on the row', async () => {
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'diag-valid',
+          gpuFrameP50Ms: 5.8,
+          gpuFrameP95Ms: 11.4,
+          gpuTimerSupported: true,
+          angleBackend: 'd3d11',
+          parallelCompile: true,
+          programsPostPrewarm: 12,
+          bottleneck: 'compile-stalls',
+          bottleneckConfidence: 'high',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.81' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        gpuFrameP50Ms: 5.8,
+        gpuFrameP95Ms: 11.4,
+        gpuTimerSupported: true,
+        angleBackend: 'd3d11',
+        parallelCompile: true,
+        programsPostPrewarm: 12,
+        bottleneck: 'compile-stalls',
+        bottleneckConfidence: 'high',
+      }),
+    );
+  });
+
+  it('accepts every allowlisted angle backend, verdict, and confidence token', async () => {
+    const { KNOWN_ANGLE_BACKENDS, KNOWN_BOTTLENECK_VERDICTS, KNOWN_BOTTLENECK_CONFIDENCES } =
+      perfReportInternalsForTest;
+    for (const backend of KNOWN_ANGLE_BACKENDS) {
+      vi.mocked(insertClientPerfReport).mockClear();
+      await handlePerfReport(
+        fakeReq(
+          { sessionId: `diag-backend-${backend}`, angleBackend: backend, rawSummary: {} },
+          { remoteAddress: '203.0.113.82' },
+        ),
+        fakeRes(),
+      );
+      expect(insertClientPerfReport).toHaveBeenCalledWith(
+        expect.objectContaining({ angleBackend: backend }),
+      );
+    }
+    for (const verdict of KNOWN_BOTTLENECK_VERDICTS) {
+      vi.mocked(insertClientPerfReport).mockClear();
+      await handlePerfReport(
+        fakeReq(
+          { sessionId: `diag-verdict-${verdict}`, bottleneck: verdict, rawSummary: {} },
+          { remoteAddress: '203.0.113.83' },
+        ),
+        fakeRes(),
+      );
+      expect(insertClientPerfReport).toHaveBeenCalledWith(
+        expect.objectContaining({ bottleneck: verdict }),
+      );
+    }
+    for (const confidence of KNOWN_BOTTLENECK_CONFIDENCES) {
+      vi.mocked(insertClientPerfReport).mockClear();
+      await handlePerfReport(
+        fakeReq(
+          {
+            sessionId: `diag-confidence-${confidence}`,
+            bottleneckConfidence: confidence,
+            rawSummary: {},
+          },
+          { remoteAddress: '203.0.113.84' },
+        ),
+        fakeRes(),
+      );
+      expect(insertClientPerfReport).toHaveBeenCalledWith(
+        expect.objectContaining({ bottleneckConfidence: confidence }),
+      );
+    }
+  });
+
+  it('folds hostile diagnostics values to null and clamps the numeric ones', async () => {
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'diag-hostile',
+          gpuFrameP50Ms: 'not-a-number',
+          gpuFrameP95Ms: 1e9,
+          // Boolean coercion, the same deliberate rule as autoGovernor: any
+          // truthy junk stores true, never a string.
+          gpuTimerSupported: 'yes',
+          angleBackend: 'metal2000; DROP TABLE accounts',
+          parallelCompile: 0,
+          programsPostPrewarm: -5,
+          bottleneck: 'quantum-bound',
+          bottleneckConfidence: 'certain',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.85' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        gpuFrameP50Ms: null,
+        gpuFrameP95Ms: 10_000,
+        gpuTimerSupported: true,
+        angleBackend: null,
+        parallelCompile: false,
+        programsPostPrewarm: 0,
+        bottleneck: null,
+        bottleneckConfidence: null,
+      }),
+    );
+
+    vi.mocked(insertClientPerfReport).mockClear();
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'diag-hostile-2',
+          gpuFrameP50Ms: -3,
+          gpuFrameP95Ms: null,
+          programsPostPrewarm: 9e9,
+          bottleneck: 42,
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.86' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        gpuFrameP50Ms: 0,
+        gpuFrameP95Ms: null,
+        programsPostPrewarm: 100_000,
+        bottleneck: null,
+      }),
+    );
+  });
+
+  it('defaults the schema 3 diagnostics fields when a v2 client omits them', async () => {
+    await handlePerfReport(
+      fakeReq({ sessionId: 'diag-old-client', rawSummary: {} }, { remoteAddress: '203.0.113.87' }),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        gpuFrameP50Ms: null,
+        gpuFrameP95Ms: null,
+        gpuTimerSupported: false,
+        angleBackend: null,
+        parallelCompile: false,
+        programsPostPrewarm: null,
+        bottleneck: null,
+        bottleneckConfidence: null,
+      }),
     );
   });
 

@@ -10,9 +10,10 @@ import { json, readBody } from './http_util';
 import { rateLimitNow, requestIp, windowedRateLimitOutcome } from './ratelimit';
 import { REALM } from './realm';
 
-// Bumped to 2 for the packet 0 report dimensions (zone, crowd, views,
-// worst-10s; ruling R6); the intIn clamp below keeps version-1 clients valid.
-const PERF_REPORT_SCHEMA_VERSION = 2;
+// Bumped to 3 for the Windows bottleneck diagnostics (GPU timer percentiles,
+// ANGLE backend, post-prewarm program growth, bottleneck verdict); the intIn
+// clamp below keeps version-1 and version-2 clients valid.
+const PERF_REPORT_SCHEMA_VERSION = 3;
 
 // Fixed crowd labels (ruling R3). server/ cannot import src/game, so this is
 // a deliberate copy of src/game/crowd_bucket.ts CROWD_BUCKET_LABELS;
@@ -32,6 +33,34 @@ const KNOWN_PERF_SUGGESTION_IDS = [
   'browser-stalls',
   'heap-pressure',
   'context-loss',
+] as const;
+// Bottleneck verdict tokens (schema version 3). Same deliberate-copy pattern
+// as the suggestion ids: server/ cannot import src/render, so this mirrors
+// src/render/bottleneck_core.ts BOTTLENECK_VERDICTS and the cross-boundary
+// pin in tests/bottleneck_verdict_parity.test.ts is the drift guard.
+const KNOWN_BOTTLENECK_VERDICTS = [
+  'compile-stalls',
+  'vsync-capped',
+  'balanced',
+  'gpu-bound',
+  'render-cpu-bound',
+  'cpu-main-bound',
+  'unknown',
+] as const;
+const KNOWN_BOTTLENECK_CONFIDENCES = ['high', 'medium', 'low'] as const;
+// ANGLE backend tokens (schema version 3): the exact angleBackendToken output
+// set from src/render/angle_identity_core.ts (the backend union plus the
+// 'angle-unknown' coarse fallback). Anything else folds to null.
+const KNOWN_ANGLE_BACKENDS = [
+  'd3d11',
+  'd3d11on12',
+  'd3d9',
+  'opengl',
+  'vulkan',
+  'metal',
+  'swiftshader',
+  'warp',
+  'angle-unknown',
 ] as const;
 // The client analyzer caps its output at 3 suggestions per report; the server
 // re-imposes the same ceiling so a hostile payload cannot widen the column.
@@ -137,6 +166,18 @@ function textIn(value: unknown, max: number, fallback = ''): string {
 function choiceIn(value: unknown, choices: readonly string[], fallback: string): string {
   const text = textIn(value, 64);
   return choices.includes(text) ? text : fallback;
+}
+
+// Nullable twin of choiceIn for the schema 3 diagnostics: an unknown or
+// absent token stores as NULL (not measured), never a fabricated default.
+function nullableChoiceIn(value: unknown, choices: readonly string[]): string | null {
+  const text = textIn(value, 64);
+  return choices.includes(text) ? text : null;
+}
+
+function nullableIntIn(value: unknown, min: number, max: number): number | null {
+  const n = nullableNumberIn(value, min, max);
+  return n === null ? null : Math.floor(n);
 }
 
 // Allowlist-filter, dedupe, and cap the client-supplied suggestion ids (ruling
@@ -421,6 +462,14 @@ export async function handlePerfReport(
     visibleViews: intIn(body.visibleViews, 0, 100_000, 0),
     worst10sFrameP95Ms: numberIn(body.worst10sFrameP95Ms, 0, 1000, 0),
     suggestionIds: suggestionIdsIn(body.suggestionIds),
+    gpuFrameP50Ms: nullableNumberIn(body.gpuFrameP50Ms, 0, 10_000),
+    gpuFrameP95Ms: nullableNumberIn(body.gpuFrameP95Ms, 0, 10_000),
+    gpuTimerSupported: Boolean(body.gpuTimerSupported),
+    angleBackend: nullableChoiceIn(body.angleBackend, KNOWN_ANGLE_BACKENDS),
+    parallelCompile: Boolean(body.parallelCompile),
+    programsPostPrewarm: nullableIntIn(body.programsPostPrewarm, 0, 100_000),
+    bottleneck: nullableChoiceIn(body.bottleneck, KNOWN_BOTTLENECK_VERDICTS),
+    bottleneckConfidence: nullableChoiceIn(body.bottleneckConfidence, KNOWN_BOTTLENECK_CONFIDENCES),
     rawSummary: rawSummary(body.rawSummary, devTraceAllowed),
   };
 
@@ -439,5 +488,8 @@ export const perfReportInternalsForTest = {
   suggestionIdsIn,
   CROWD_BUCKET_LABELS,
   KNOWN_PERF_SUGGESTION_IDS,
+  KNOWN_BOTTLENECK_VERDICTS,
+  KNOWN_BOTTLENECK_CONFIDENCES,
+  KNOWN_ANGLE_BACKENDS,
   PERF_REPORT_SCHEMA_VERSION,
 };
