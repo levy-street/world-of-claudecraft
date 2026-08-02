@@ -1,14 +1,25 @@
-// System-level CPU/GPU sampling for the perf baseline harness. macmon
-// (brew install macmon) reads Apple Silicon GPU/CPU utilization without sudo;
-// where it is missing the sampler still runs and reports the browser
-// process-tree CPU via ps, leaving the GPU fields null (the pure aggregation in
-// scripts/lib/perf_baseline_store.mjs treats absent metrics as advisory, never a
-// gate failure). Not pure (child processes + timers): anything testable lives in
-// the store module, per scripts/CLAUDE.md.
+// System-level CPU/GPU sampling for the perf baseline harness, dispatched by
+// platform. darwin (and any other non-Windows platform): macmon (brew install
+// macmon) reads Apple Silicon GPU/CPU utilization without sudo; where it is
+// missing the sampler still runs and reports the browser process-tree CPU via
+// ps, leaving the GPU fields null. win32: delegates to system_sampler_win.mjs
+// (nvidia-smi or typeperf for GPU, PowerShell CIM one-shots for the browser
+// process tree) with the identical return shape. Absent metrics stay advisory
+// either way (the pure aggregation in scripts/lib/perf_baseline_store.mjs never
+// gates on them). Not pure (child processes + timers): anything testable lives
+// in the store module, per scripts/CLAUDE.md.
 import { execFile, spawn } from 'node:child_process';
 import { sumProcessTreeCpu } from '../lib/perf_baseline_store.mjs';
+import { startSystemSamplerWin } from './system_sampler_win.mjs';
 
 export function startSystemSampler({ browserPid = null, intervalMs = 700 } = {}) {
+  // Windows has neither macmon nor `ps -Ao`; the win32 arm fills the same
+  // point fields from nvidia-smi/typeperf and PowerShell CIM instead.
+  if (process.platform === 'win32') return startSystemSamplerWin({ browserPid, intervalMs });
+  return startSystemSamplerPosix({ browserPid, intervalMs });
+}
+
+function startSystemSamplerPosix({ browserPid, intervalMs }) {
   const points = [];
   let macmonState = 'pending';
   let child = null;
