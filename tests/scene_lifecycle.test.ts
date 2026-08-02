@@ -619,3 +619,82 @@ describe('registered scene skip parity sweep', () => {
     });
   }
 });
+
+// The impure SceneDirector wrapper owns the end-op teardown path; a bare
+// rebuild of the end op there once dropped the authored release pose, so the
+// skip path restored the unknowable pre-scene yaw (the J2 mast block). This
+// drives the REAL wrapper, not the pure core.
+describe('scene director wrapper release pose', () => {
+  it('the end op keeps its authored release pose through the wrapper teardown', () => {
+    let clock = 0;
+    const world = {
+      get presentationTime() {
+        return clock;
+      },
+      playerId: 7,
+      entities: new Map(),
+      sceneSkip: () => {},
+    } as unknown as import('../src/world_api').IWorld;
+    const director = new SceneDirector({
+      world: () => world,
+      nowSec: () => clock,
+      musicSilence: () => {},
+      reducedMotion: () => false,
+    });
+    const live: SceneLivePose = {
+      yaw: 1,
+      pitch: 0.3,
+      dist: 12,
+      playerX: 0,
+      playerY: 0,
+      playerZ: 0,
+    };
+    const opening: SimEvent[] = [
+      {
+        type: 'scene',
+        sceneId: 'scn_wrapper_pose',
+        pid: 7,
+        op: { kind: 'start', duration: 10 },
+      },
+      {
+        type: 'scene',
+        sceneId: 'scn_wrapper_pose',
+        pid: 7,
+        op: {
+          kind: 'camera',
+          shot: {
+            kind: 'focus',
+            entityId: null,
+            x: 10,
+            y: 2,
+            z: 20,
+            dist: 8,
+            pitch: 0.5,
+            yaw: 2,
+            dur: 2,
+          },
+        },
+      },
+    ];
+    director.handleEvents(opening);
+    director.cameraPose(live);
+    clock = 2;
+    director.cameraPose(live); // shot pose held: yaw 2, dist 8
+    clock = 3;
+    // Skip path: only the end op arrives, re-carrying the authored pose.
+    const ending: SimEvent[] = [
+      {
+        type: 'scene',
+        sceneId: 'scn_wrapper_pose',
+        pid: 7,
+        op: { kind: 'end', releasePose: { yaw: 0, pitch: 0.35, dist: 9 } },
+      },
+    ];
+    director.handleEvents(ending);
+    clock = 3 + SCENE_RELEASE_SEC / 2;
+    const mid = director.cameraPose(live);
+    expect(mid?.yaw).toBeCloseTo((2 + 0) / 2, 6); // toward the AUTHORED yaw 0, not live yaw 1
+    expect(mid?.dist).toBeCloseTo((8 + 9) / 2, 6);
+    expect(mid?.pitch).toBeCloseTo((0.5 + 0.35) / 2, 6);
+  });
+});
