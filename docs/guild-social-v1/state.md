@@ -1,6 +1,6 @@
 # Guild Social v1: cross-phase state
 
-Current phase: Phase 1 QA complete (2026-08-02); Phase 2 next.
+Current phase: Phase 2 complete (2026-08-02); Phase 2 QA (final) next.
 
 ## Locked design decisions
 - Base branch `release/v0.34.0`; branch `feature/guild-social-v1`; this PR lands BEFORE the
@@ -60,11 +60,37 @@ Current phase: Phase 1 QA complete (2026-08-02); Phase 2 next.
 ## Ledger (fill in as phases complete)
 - New files: `src/ui/guild_motd_login.ts` (pure decision helper `decideGuildMotdLine`),
   `tests/guild_motd_login.test.ts`.
-- New wire fields: (Phase 2 will add `joinedAt` to the guild member row of the social frame)
+- New wire fields: `joinedAt` (epoch ms, `number | null`) on each guild member row of the
+  social frame, sourced from `guild_members.joined_at` (NOT NULL in the DDL; the null arm
+  is defensive and renders no badge). Nullable end to end mirroring `lastLogin`:
+  `server/social_db.ts` query map, `SocialDb`/`GuildMemberEntry` (`server/social.ts`),
+  `GuildMemberInfo` (`src/world_api/social_graph.ts`), `GuildRow` (`src/ui/social_view.ts`).
+  ClientWorld needed no decode change (whole-object social-frame assignment), and the
+  `socialpos` in-place merge does not touch it.
 - New i18n keys: `hudChrome.social.billboard.loginLine` ('Guild billboard: {text}'), plus
   its five M16 non-Latin overlay fills (ja_JP, ko_KR, ru_RU, zh_CN, zh_TW) in the same
   change; generated i18n artifacts regenerated via `npm run i18n:gen`.
-- New server literals + DICT rows: (none yet)
+- New server literals + DICT rows: `'That guild name is not allowed.'` emitted by
+  `SocialService.guildCreate` on a screened name; DICT key `guild.nameNotAllowed` filled in
+  every locale of `src/ui/server_i18n.ts` and `src/ui/server_i18n.newlocales.ts` (H3
+  parity), placeholder-free so the EXACT matcher auto-registers it.
+- Phase 2 i18n keys: `hud.social.tenure.new` ('New') and `hud.social.tenure.veteran`
+  ('Veteran') in `src/ui/i18n.catalog/merge.ts` (the `hud.social` owner); 'Veteran' is
+  wordy per M16, so its five non-Latin overlay fills (ja_JP, ko_KR, ru_RU, zh_CN, zh_TW)
+  landed in the same change; artifacts regenerated via `npm run i18n:gen`.
+- Phase 2 wiring: `tenureTier(joinedAt, now)` + `TENURE_NEW_MS`/`TENURE_VETERAN_MS` are
+  pure exports of `src/ui/social_view.ts` (already in `UI_PURE_CORES`; the clock is a
+  parameter, `Date.now()` stays in the painter). `guildMemberRowHtml(m, now)` is a
+  module-level EXPORTED function of `social_window.ts` (extracted in review so the render
+  arm is behavior-tested; the caller hoists one `Date.now()` per rebuild). The badge is a
+  `<span class="rank soc-tenure-<tier>">` chip after the rank chip (always-visible text),
+  tinted with the PANEL-AWARE text tokens (`--color-text-light` new,
+  `--color-text-muted` veteran) in `src/styles/components.css`, never the raw accent or a
+  static green (review: same-gold-as-rank on dark presets, sub-AA on Parchment).
+  Screening is a REQUIRED 4th `SocialService` constructor param (review: no fail-open
+  default; a host that forgets it fails to compile); `server/game.ts` passes
+  `offensiveName`; FakeDb tests inject via `setup({ isNameOffensive })`, whose harness
+  default screens nothing.
 - Phase 1 wiring: `Hud.updateGuildBillboardEcho()` on the `Hud.update()` slow band (row
   registered in `tests/hud_update_drive.test.ts`), latch field `Hud.lastShownGuildMotd`,
   appended to the chat log on the `guild` channel with `chatChannelColor('guild')`.

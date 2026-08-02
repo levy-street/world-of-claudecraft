@@ -4,7 +4,7 @@
 |---|---|---|---|
 | Phase 1: billboard on login | Complete | 2026-08-02 | 2026-08-02 |
 | Phase 1 QA | Complete | 2026-08-02 | 2026-08-02 |
-| Phase 2: tenure badges + name screening | Not started | | |
+| Phase 2: tenure badges + name screening | Complete | 2026-08-02 | 2026-08-02 |
 | Phase 2 QA (final, offers teardown) | Not started | | |
 
 ## Phase 1 deliverables
@@ -20,13 +20,13 @@
 - [x] No dead code, no unused imports, S3 guard green.
 
 ## Phase 2 deliverables
-- [ ] `joinedAt` (epoch ms) on the guild member wire row: `server/social.ts` snapshot build,
+- [x] `joinedAt` (epoch ms) on the guild member wire row: `server/social.ts` snapshot build,
       `server/social_db.ts` query, `src/world_api/social_graph.ts` `GuildMemberInfo`.
-- [ ] Tenure tier pure function + badge render in the roster (social_view + social_window).
-- [ ] English i18n keys for the two badges.
-- [ ] `guildCreate` screening: injected predicate wired to `offensiveName`, new error
+- [x] Tenure tier pure function + badge render in the roster (social_view + social_window).
+- [x] English i18n keys for the two badges.
+- [x] `guildCreate` screening: injected predicate wired to `offensiveName`, new error
       literal + `server_i18n.ts` DICT row, `FakeDb` test coverage.
-- [ ] Tests: tenure boundaries (13d23h, 14d, 89d, 90d), wire round-trip with `joinedAt`,
+- [x] Tests: tenure boundaries (13d23h, 14d, 89d, 90d), wire round-trip with `joinedAt`,
       screening accept/refuse cases.
 
 ## Phase 2 QA checklist
@@ -60,6 +60,46 @@ Phase 1 (2026-08-02):
   tokens in the MOTD render as item links (same decoder as player chat); a
   cleared-then-reset identical MOTD re-shows by design. (The profanity-mask quirk
   originally listed here was overturned by the Phase 1 QA ruling below.)
+
+Phase 2 (2026-08-02):
+- joinedAt is nullable end to end mirroring lastLogin (`number | null`): the DDL is NOT
+  NULL so the live query always yields a value; null is the defensive arm (and the FakeDb
+  default, deliberately, so an unstamped test member can never read as an epoch-0
+  Veteran). The DB map guards with Number.isFinite (discord_db precedent, review fix).
+- Screening ordering pinned by test: validateGuildName first, then the predicate on the
+  TRIMMED name, then the DB call, so a refused create leaves no row, no founder credit,
+  no membership. The refusal literal is asserted byte-for-byte so it cannot desync from
+  the server_i18n EXACT matcher row (guild.nameNotAllowed, all 22 locales, H3 green).
+- Review dispatch (per the matrix): privacy-security-review APPROVE (0 BLOCKING),
+  cross-platform-sync PASS (0 BLOCKING, 0 SHOULD-FIX), frontend-seam-reviewer PASS with
+  fixes (0 BLOCKING). All BLOCKING/SHOULD-FIX items fixed in commits 757f00ef4 and
+  4daca27b5: required (fail-closed) screening ctor param, finite joined_at guard,
+  panel-aware chip tokens (--color-text-light / --color-text-muted; the first cut's
+  --color-primary resolved to the same gold as the rank chip on dark presets and
+  --color-friendly went sub-AA on Parchment), and behavioral render tests for
+  guildMemberRowHtml (extracted to a module-level exported function with one hoisted
+  clock read per rebuild).
+- SHOULD-FIX items resolved by verification, not code: guild_create rate limiting is
+  covered by the WS pre-parse (R6) + lane-token (R5) budgets with the flood kick
+  (server/game.ts consumeLane); before/after screenshots are owned by the Phase 2 QA
+  step per this packet's plan (capture with pr-screenshots: roster badges desktop +
+  mobile, and the login line).
+- Deferred (recorded for Phase 2 QA / follow-up, all NICE-TO-HAVE or out of scope):
+  (1) no moderation audit row on a screened-name refusal (consistent with the character
+  and pet name screens, which are equally silent; a counter or moderation_db row is the
+  right shape if wanted); (2) admin renameAdminGuild runs validateGuildName but not
+  offensiveName (operator remediation path, deliberate; state in the PR body);
+  (3) offensiveName's space-stripping normalization can false-positive on multi-word
+  guild names whose join spans a banned term (filter tuned for spaceless usernames;
+  usability risk, not a bypass); (4) a member crossing a tenure boundary while the panel
+  sits open keeps the old badge until the next social frame or reopen (commented in the
+  painter; a wall-clock driver would break the cold-window contract); (5) mobile online
+  rows wrap rather than ellipsize (pre-existing .soc-name.soc-link mobile rule), and the
+  whisper button's accessible name concatenates name+rank+tenure+title with no separator
+  (pre-existing pattern): both VERIFY-in-browser items for the QA phase's mobile/axe
+  passes; (6) joinedAt rides as epoch ms while sibling lastLogin is ISO (both documented
+  in-place; align only if a formatter is ever shared); admin_guilds_db exposes a raw
+  Date under the same joinedAt name to a different consumer.
 
 Phase 1 QA (2026-08-02):
 - Audit result: implementation verified against every Phase 1 acceptance criterion; all
