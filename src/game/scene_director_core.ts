@@ -283,13 +283,16 @@ export function scenePose(
     s.from = copyPose(s.last);
     s.shotStartAt = nowSec;
   }
+  // A snap-entry shot (a covered cut) holds its own frame from the first
+  // tick: no entry ease, so a fade-in can never reveal travel from the
+  // previous shot's pose.
   evaluateActiveShot(
     s,
     shot,
     nowSec - s.shotStartAt,
     resolveEntity,
     resolveAttachment ?? noAttachments,
-    true,
+    shot.entry !== 'snap',
     undefined,
     out,
   );
@@ -324,7 +327,9 @@ function evaluateActiveShot(
   }
   const focus = (shot.entityId !== null ? resolveEntity(shot.entityId) : null) ?? shot;
   const t = shot.dur > 0 ? clamp01(elapsedSec / shot.dur) : 1;
-  const g = sceneCameraEase(t);
+  // A snap-entry focus shot holds its composed end pose instead of panning
+  // in from the previous pose; its pan IS its entry travel.
+  const g = shot.entry === 'snap' ? 1 : sceneCameraEase(t);
   out.yaw = lerpAngle(from.yaw, shot.yaw, g);
   out.pitch = lerp(from.pitch, shot.pitch, g);
   out.dist = lerp(from.dist, shot.dist, g);
