@@ -223,6 +223,8 @@ import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import type { GuildBankState, GuildMembership } from './guild_bank';
+import * as guildBankMod from './guild_bank';
 import * as interaction from './interaction';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
@@ -1111,6 +1113,14 @@ export interface PlayerMeta {
   // never persisted, never sim-mutated, always [] offline; capacity itself rides
   // bank.bonusSlots. Excluded from the parity meta sample (tests/parity/trace.ts).
   bankBonusSources: BankBonusSource[];
+  // Server-stamped guild membership (guild id + rank), the authorization input
+  // the Guild Bank's officer-plus gate reads; written only through
+  // setPlayerGuildMembership (guild_bank.ts). Session-only exactly like
+  // bankBonusSources: guilds live in the server social DB, so this is never
+  // serialized into CharacterState (the server re-stamps at join and on every
+  // membership or rank change), never sim-mutated, always null offline.
+  // Excluded from the parity meta sample (tests/parity/trace.ts).
+  guildMembership: GuildMembership | null;
   vendorBuyback: InvSlot[];
   copper: number;
   equipment: PlayerEquipment;
@@ -1788,6 +1798,11 @@ export class Sim {
   // sim needs, and any banker is a valid place to stand and use the bank. Exposed
   // as a live SimContext view so bank.ts gates deposit/withdraw/buy on proximity.
   bankerIds: number[] = [];
+  // Guild Bank books: guild id -> live GuildBankState, loaded by the server per
+  // realm through loadGuildBank (guild_bank.ts owns the shape; Phase 3 wires the
+  // DB) and exposed as a live SimContext view. Always empty offline: guilds are
+  // a server social system, so the offline sim never creates a book.
+  guildBanks: Map<number, GuildBankState> = new Map();
   /** When true, /dev level|tp|give chat commands are accepted (local dev only). */
   readonly devCommands: boolean;
   // Entities spawned by the last /dev sandbox (dummy + practice bots), so re-running
@@ -2471,6 +2486,7 @@ export class Sim {
       bags: Array<string | null>(BAG_SOCKETS).fill(null),
       bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
       bankBonusSources: [],
+      guildMembership: null,
       vendorBuyback: [],
       copper: 0,
       equipment: {
@@ -3743,6 +3759,16 @@ export class Sim {
     e.guild = newName;
   }
 
+  /** Server-callable session stamp of a player's guild membership (id + rank),
+   *  the authorization input the Guild Bank gates on; the id/rank contract and
+   *  the session-only rationale live on PlayerMeta.guildMembership. Called at
+   *  join and on every membership or rank change; pass null on leave, kick, or
+   *  disband. Offline/headless never call it, so the stamp stays null there.
+   *  Thin delegate into guild_bank.ts. */
+  setPlayerGuildMembership(pid: number, membership: GuildMembership | null): void {
+    guildBankMod.stampGuildMembership(this.ctx, pid, membership);
+  }
+
   /** Cosmetic skin-select event: rolls a rarity rank (once) and emits the
    *  personal `skinEvent` cue that opens the client overlay. Re-using the token
    *  re-shows the already-rolled rank — no reroll — so a player can't spam-roll.
@@ -4377,6 +4403,11 @@ export class Sim {
       // NPC id, read by bank.ts's proximity gate. Sim-owned, never reassigned.
       get bankerIds() {
         return sim.bankerIds;
+      },
+      // Guild Bank book map: guild id -> live book, read and written only
+      // through the guild_bank.ts helpers. Sim-owned, never reassigned.
+      get guildBanks() {
+        return sim.guildBanks;
       },
       // The Vale Cup holder (queues/deserters/botPids mutated in place; the
       // match slot reassigned inside the holder, so no setter is needed).
@@ -8787,6 +8818,16 @@ export class Sim {
   guildEventCreate(_day: string, _hour: number | null, _title: string, _note: string): void {}
   guildEventRemove(_eventId: number): void {}
   guildSetMotd(_text: string): void {}
+  // The Guild Bank is a guild feature, and guilds live in the server social DB,
+  // so offline play never has one: the read is null and the commands are inert
+  // (the socialInfo idiom). Phase 2 wires the online path (the guild_bank_*
+  // tokens and the snapshot-fed info read); the offline arm stays inert forever.
+  guildBankInfo: null = null;
+  guildBankDepositGold(_amount: number): void {}
+  guildBankWithdrawGold(_amount: number): void {}
+  guildBankDeposit(_slotIndex: number, _count?: number): void {}
+  guildBankWithdraw(_slotIndex: number, _count?: number): void {}
+  guildBankBuySlots(): void {}
   searchCharacters(_query: string): Promise<import('../world_api').CharacterSearchResult[]> {
     return Promise.resolve([]);
   }
@@ -9388,6 +9429,23 @@ export class Sim {
 
   bankInfoFor(pid: number): import('../world_api').BankInfo | null {
     return bankMod.bankInfoFor(this.ctx, pid);
+  }
+
+  // -------------------------------------------------------------------------
+  // The Guild Bank: the shared guild treasury + item store (Phase 1 foundation)
+  // -------------------------------------------------------------------------
+
+  // Thin delegates to the guild bank free functions (guild_bank.ts). The books
+  // live on Sim (guildBanks, a SimContext view keyed by guild id); the server
+  // feeds and drains them through this pure shape-in/shape-out seam in Phase 3
+  // (it owns the SQL). Op bodies and the gated info read land in Phase 2.
+
+  loadGuildBank(guildId: number, raw: unknown): void {
+    guildBankMod.loadGuildBank(this.ctx, guildId, raw);
+  }
+
+  serializeGuildBank(guildId: number): GuildBankState | null {
+    return guildBankMod.serializeGuildBank(this.ctx, guildId);
   }
 
   // -------------------------------------------------------------------------

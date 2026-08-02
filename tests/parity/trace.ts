@@ -218,6 +218,12 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   // persisted, never sim-mutated. The bonus CAPACITY it explains IS pinned (the
   // sampled meta.bank.bonusSlots), so excluding the rows loses no gameplay net.
   'bankBonusSources',
+  // Server-stamped guild membership (id + rank) behind the Guild Bank's officer
+  // gate; session-only exactly like bankBonusSources (never persisted, never
+  // sim-mutated, always null offline), so sampling it would churn goldens for
+  // no gameplay reason. The book state it authorizes IS sim-owned and testable
+  // directly (Sim.guildBanks).
+  'guildMembership',
   'known', // derived from class/level/talents
   'talentMods', // derived from talents (recomputed)
   'fiestaMods', // derived from talentMods + augments
