@@ -138,3 +138,57 @@ in stills; J2 (voyage) is mechanically green but rejected on watch. All
 suites green on the tip: tsc, cinematic_shots (zero exemptions),
 scene_lifecycle, last_bell_* suites, ferry walks and clearance, parity
 191, terrain digests. Dev server for this worktree runs on :5173.
+
+## Implemented (J3 + J4, 2026-08-02)
+
+J3 landed as one angle family (commit "feat(scenes): re-author the voyage
+as one wide angle family with an authored hand-back"). Every journey leg
+(cast-off, open water, approach) is an ATTACH shot in the same ship-local
+frame: 44 yd abeam, 14 yd up, look-at pulled 11.5 yd toward the camera so
+the framing subject stays inside the linter's 5 percent floor while the
+whole hull, masts included, sits in the 60 degree frustum with water and
+sky around her (the journeyOffsets helper in
+src/sim/content/last_bell_campaign.ts). The out crossing rides local -z,
+the return mirrors to +z; every covered cut dissolves ship-mid-frame to
+ship-mid-frame at identical size and heading. The landing dollies and the
+Q0 statue and toll shots are untouched.
+
+The release hand-back is authored: SceneReleasePose rides the
+camera/release op and is re-carried on the end op for the skip path
+(sceneEndOp in src/sim/scenes/scenes.ts); the director eases to it instead
+of the pre-scene yaw, and the write-back through input.camYaw makes the
+landing seamless. All three voyages hand back yaw 0, pitch 0.35, dist 9:
+just south of the destination gangplank, aligned with the landing dolly's
+final gaze, clear of the hull. The mechanical guard this doc asked for is
+cut.releaseSightLine in tests/cinematic_shots.test.ts: a scene that walks
+the player must author a release pose, and the restored camera must have a
+clear sight line to the player against ship structure at FULL camera tops
+(masts count), with a synthetic failing control aimed through the mainland
+main mast.
+
+J4 landed as measured art plus render-side seam fixes (commit
+"fix(harbor): close the J4 boarding seam and ship art defects"):
+
+1. The gangway cut clips straddling triangles exactly against the cut box
+   (cutTrianglesInBox in scripts/assets/lib/glb_edit.mjs, all vertex
+   attributes interpolated), removing the spanning sliver class entirely.
+2. The bridge's boards visually overrun the measured hull skin by 0.6 yd
+   (BRIDGE_HULL_VISUAL_OVERLAP_YARDS) so the brow seats into the hull;
+   collision in harbor_layout.ts is untouched.
+3. Each mast base wears a measured two-tier wooden step in the deck tones
+   (FERRY_BUILD.mastStep in build.mjs), covering the near-black baked
+   albedo; the re-measured plan widens the mast obstacle to match, so
+   collision and visuals still agree.
+4. Bridge rail caps are flush at the hull end
+   (bridgeRailCapOverhang).
+5. The berth-head rects and the bridge draw as ONE world-anchored plank
+   field over a solid underslab (src/render/harbor_boarding_junction_core.ts,
+   registered in RENDER_PURE_CORES, Node-tested), killing the crossing
+   board directions, the row misalignment, and the water lines through the
+   seams.
+
+Before/after screenshots: docs/screenshots/last-bell-j4-boarding-seams.
+Re-pinned: tests/last_bell_scenes.test.ts (shot tables, release pose),
+tests/grand_ferry_ship_asset.test.ts (bytes and sha), the regenerated
+GLB and plan. Watch evidence and refreshed contact sheets accompany the
+same change set.
