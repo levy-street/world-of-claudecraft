@@ -139,15 +139,23 @@ export function sanitizeGuildBankState(raw: unknown): GuildBankState {
 
 /** Install a guild's book through the ONE load path. Pure shape-in: the server
  *  hands raw JSONB in Phase 3; no SQL here. A non-positive or non-integer guild
- *  id is ignored so a tampered row can never mint a garbage key. */
+ *  id is ignored so a tampered row can never mint a garbage key. LOAD-ONCE: a
+ *  guild whose book is already live is skipped, because overwriting it would
+ *  silently drop deposits not yet flushed to the DB (items are NEVER destroyed).
+ *  To reload (realm maintenance, the Phase 3 disband evict), delete the map
+ *  entry first; callers must always re-get the book after any evict + reload,
+ *  never hold a reference across one. */
 export function loadGuildBank(ctx: SimContext, guildId: number, raw: unknown): void {
   if (!Number.isInteger(guildId) || guildId <= 0) return;
+  if (ctx.guildBanks.has(guildId)) return;
   ctx.guildBanks.set(guildId, sanitizeGuildBankState(raw));
 }
 
 /** Snapshot a guild's book for persistence, deep-cloned (cloneInvSlot, never a
  *  shallow spread) so the save never aliases the live inventory's mutable
- *  instance payloads. Pure shape-out: the server owns the SQL (Phase 3). */
+ *  instance payloads. Pure shape-out: the server owns the SQL (Phase 3).
+ *  Null means the guild has NO loaded book: the persistence caller must SKIP
+ *  the write entirely, never persist an empty book over a real row. */
 export function serializeGuildBank(ctx: SimContext, guildId: number): GuildBankState | null {
   const book = ctx.guildBanks.get(guildId);
   if (!book) return null;
