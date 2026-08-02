@@ -57,6 +57,20 @@ export const HARBOR_PLANK_STYLE: JunctionPlankStyle = {
  * measured skin line. */
 export const BRIDGE_HULL_VISUAL_OVERLAP_YARDS = 0.6;
 
+/** The apron at the bridge's hull end (J5 round, owner issue 2): the hull
+ * tapers across the gangway station, so the rectangular visual overlap
+ * left a dark water wedge between the plank end and the receding hull side,
+ * right where the rider stands. Three filler rects extend the plank field:
+ * a wing past each side rail and a forward strip across the opening, each
+ * reaching hullward to just short of the measured ship deck section it
+ * fronts (the sections in HarborDef.shipDecks are the transformed silhouette
+ * stations, so a wider section means a closer wall and a shorter reach, and
+ * stopping one groove shy of the section edge keeps the boards from
+ * co-planing with the ship's own deck floor). */
+export const BRIDGE_APRON_LATERAL_YARDS = 0.5;
+export const BRIDGE_APRON_BACK_LAP_YARDS = 0.7;
+export const BRIDGE_APRON_DECK_SEAM_YARDS = 0.03;
+
 /** Rail caps normally overhang their post run at both ends; a bridge rail's
  * hull-end cap is cut flush instead, so nothing runs on past the plank line
  * toward the hull side. */
@@ -114,6 +128,77 @@ export function bridgeVisualRect(harbor: HarborDef): HarborDeck {
     return { ...bridge, x: bridge.x + frame.hullward * grow, hw: bridge.hw + grow };
   }
   return { ...bridge, z: bridge.z + frame.hullward * grow, hd: bridge.hd + grow };
+}
+
+/**
+ * The three apron filler rects at the bridge's hull end (see the apron
+ * constants above): a wing past each side rail and a forward strip across
+ * the opening. Purely visual: they join the aligned plank field but never
+ * touch the walkable rects. The clamp sections exclude the gangway landing
+ * (last shipDecks entry by contract), which is a walkable threshold with no
+ * floor mesh of its own.
+ */
+export function bridgeApronRects(harbor: HarborDef): readonly HarborDeck[] {
+  const frame = junctionFrame(harbor);
+  const bridge = harbor.bridge;
+  const axis = frame.axis;
+  const hullward = frame.hullward;
+  const skin = axis === 'x' ? bridge.x + hullward * bridge.hw : bridge.z + hullward * bridge.hd;
+  const across = axis === 'x' ? bridge.z : bridge.x;
+  const acrossHalf = axis === 'x' ? bridge.hd : bridge.hw;
+  const sections = harbor.shipDecks.slice(0, -1);
+  const reachFor = (across0: number, across1: number): number | null => {
+    let reach: number | null = null;
+    for (const section of sections) {
+      const s0 = axis === 'x' ? section.z - section.hd : section.x - section.hw;
+      const s1 = axis === 'x' ? section.z + section.hd : section.x + section.hw;
+      // A section clamps a piece only when the piece genuinely fronts it;
+      // the generated section boundaries carry microscopic float slivers
+      // against the bridge edges (the gangway sits ON a section boundary).
+      if (Math.min(s1, across1) - Math.max(s0, across0) <= 0.01) continue;
+      const inboardEdge =
+        axis === 'x'
+          ? hullward > 0
+            ? section.x - section.hw
+            : section.x + section.hw
+          : hullward > 0
+            ? section.z - section.hd
+            : section.z + section.hd;
+      const candidate = inboardEdge - hullward * BRIDGE_APRON_DECK_SEAM_YARDS;
+      if (reach === null || hullward * (candidate - reach) < 0) reach = candidate;
+    }
+    return reach;
+  };
+  const back = skin - hullward * BRIDGE_APRON_BACK_LAP_YARDS;
+  const forward = skin + hullward * BRIDGE_HULL_VISUAL_OVERLAP_YARDS;
+  const pieces: { along0: number; along1: number; across0: number; across1: number }[] = [];
+  for (const side of [-1, 1]) {
+    const across0 = across + side * acrossHalf + (side < 0 ? -BRIDGE_APRON_LATERAL_YARDS : 0);
+    const across1 = across + side * acrossHalf + (side < 0 ? 0 : BRIDGE_APRON_LATERAL_YARDS);
+    const reach = reachFor(across0, across1);
+    if (reach === null || hullward * (reach - back) <= 0.05) continue;
+    pieces.push({ along0: back, along1: reach, across0, across1 });
+  }
+  const stripReach = reachFor(across - acrossHalf, across + acrossHalf);
+  if (stripReach !== null && hullward * (stripReach - forward) > 0.05) {
+    pieces.push({
+      along0: forward,
+      along1: stripReach,
+      across0: across - acrossHalf,
+      across1: across + acrossHalf,
+    });
+  }
+  return pieces.map((piece) => {
+    const alongLo = Math.min(piece.along0, piece.along1);
+    const alongHi = Math.max(piece.along0, piece.along1);
+    const alongCenter = (alongLo + alongHi) / 2;
+    const alongHalf = (alongHi - alongLo) / 2;
+    const acrossCenter = (piece.across0 + piece.across1) / 2;
+    const acrossHalfExtent = (piece.across1 - piece.across0) / 2;
+    return axis === 'x'
+      ? { x: alongCenter, z: acrossCenter, hw: alongHalf, hd: acrossHalfExtent, y: bridge.y }
+      : { x: acrossCenter, z: alongCenter, hw: acrossHalfExtent, hd: alongHalf, y: bridge.y };
+  });
 }
 
 /** Cap overhangs for a rail run: bridge rails are flush at the hull end and
@@ -193,9 +278,10 @@ export function junctionPlankBoxes(
   const frame = junctionFrame(harbor);
   const anchor = frame.axis === 'x' ? harbor.bridge.z : harbor.bridge.x;
   const boxes: JunctionWoodBox[] = [];
-  const rects = frame.rects.map((rect) =>
-    toFieldRect(rect === harbor.bridge ? bridgeVisualRect(harbor) : rect, frame.axis),
-  );
+  const rects = [
+    ...frame.rects.map((rect) => (rect === harbor.bridge ? bridgeVisualRect(harbor) : rect)),
+    ...bridgeApronRects(harbor),
+  ].map((rect) => toFieldRect(rect, frame.axis));
   for (const rect of rects) {
     // Solid underslab flush under the boards: covers the grooves from above.
     boxes.push(
