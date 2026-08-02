@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   type BucketWindowInput,
   bucketVisible,
+  bucketVisibleSquared,
   fogBlendAt,
   foliageDistanceScale,
   foliageFogLimit,
@@ -348,6 +349,57 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
     const rock = windowFor({ centerDist: 200, maxDist: LOD_HIGH.rockFar, distanceScale: 0.5 });
     expect(bucketVisible(rock)).toBe(false);
     expect(bucketVisible({ ...rock, distanceScale: 1 })).toBe(true);
+  });
+});
+
+describe('foliage LOD: squared bucket culling preserves visibility decisions', () => {
+  it('matches linear culling across caps, detail bands, and fog boundaries', () => {
+    const cases: BucketWindowInput[] = [
+      windowFor({ centerDist: 0, radius: 0 }),
+      windowFor({ centerDist: 117.5, radius: 60, minDist: 80 }),
+      windowFor({ centerDist: 309, radius: 120, maxDist: 310 }),
+      realTrees(368 + 120, { detailFar: 368, radius: 120 }),
+      impostors(368 - 120, { detailFar: 368, radius: 120 }),
+      windowFor({ centerDist: 399, radius: 20, fogLimit: 400 }),
+      windowFor({ centerDist: 400, radius: 0, fogLimit: 400 }),
+      windowFor({
+        centerDist: 205,
+        radius: 35,
+        minDist: 40,
+        maxDist: 360,
+        minAtDetail: true,
+        maxAtDetail: true,
+        detailFar: 240,
+        revealScale: 0.97,
+        fogLimit: 430,
+      }),
+    ];
+
+    for (const input of cases) {
+      const { centerDist, ...rest } = input;
+      expect(
+        bucketVisibleSquared({ ...rest, centerDistSq: centerDist * centerDist }),
+        `center distance ${centerDist}`,
+      ).toBe(bucketVisible(input));
+    }
+  });
+
+  it('keeps strict boundary behavior at the detail and fog edges', () => {
+    const detailFar = 368;
+    const radius = 120;
+    const cases = [
+      impostors(detailFar - radius, { detailFar, radius }),
+      realTrees(detailFar + radius, { detailFar, radius }),
+      windowFor({ centerDist: 400, fogLimit: 400 }),
+      windowFor({ centerDist: 399.999, fogLimit: 400 }),
+    ];
+
+    for (const input of cases) {
+      const { centerDist, ...rest } = input;
+      expect(bucketVisibleSquared({ ...rest, centerDistSq: centerDist * centerDist })).toBe(
+        bucketVisible(input),
+      );
+    }
   });
 });
 
