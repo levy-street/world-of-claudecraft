@@ -142,7 +142,10 @@ describe('infernal citadel: seed selection', () => {
   // band with the plate on the course summit. Verified narrow before re-pinning, by
   // digesting every floor field EXCEPT {course, puzzle, hazards, iceZone, rollers,
   // platform, objects, gate} over this test's own seed list on both sides of the
-  // change: byte-identical, so layout, style, spawns and entry never moved.
+  // change: byte-identical, so layout, style and entry never moved. A second
+  // narrow pass after course sentries landed excluded `spawns` as well:
+  // course floors append rift_vaulter spawns from the course stream, and
+  // non-course floors keep their spawn lists byte-identical.
   it('regenerates procedural floors byte-identically to the pre-set-piece baseline', () => {
     // Hand-picked on the base branch, so the seed list itself cannot drift with the
     // set-piece roll.
@@ -158,7 +161,7 @@ describe('infernal citadel: seed selection', () => {
       }
     }
     expect(h.digest('hex')).toBe(
-      'e967c2013fa57d70ec080899457c5ba2dd865411d66bb669387033fa914cb183',
+      '83fc446e4978e0eef464aedc889ed296499d5ef62c2eda033f4b3f874434bcbf',
     );
   });
 });

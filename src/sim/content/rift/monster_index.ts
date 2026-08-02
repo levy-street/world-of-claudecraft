@@ -116,6 +116,10 @@ function abilitiesFor(template: MobTemplate): string[] {
 }
 
 function themesFor(templateId: string): string[] {
+  // Course fauna (a deckLeap template) spawns on ANY theme's parkour course,
+  // never through a theme roster, so it belongs to every theme. Deliberately
+  // keyed on the mechanic, not an id list: the next leaper inherits it.
+  if (RIFT_MOBS[templateId]?.deckLeap) return Object.keys(THEME_ROSTERS);
   return Object.entries(THEME_ROSTERS)
     .filter(([, ids]) => ids.includes(templateId))
     .map(([theme]) => theme);

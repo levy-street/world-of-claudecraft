@@ -58,6 +58,7 @@ export {
   courseCheckpointFor,
   courseCrumbleArmedAt,
   courseCrumblePhase,
+  courseGemCollected,
   courseGemCount,
   courseRopeFloorAt,
   courseRopeOffset,

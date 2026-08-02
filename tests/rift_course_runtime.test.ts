@@ -8,7 +8,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { CourseDeckKind } from '../src/sim/course';
 import { courseClockNow, courseDeckCentre, resetCourseState } from '../src/sim/course';
-import { DUNGEON_FLOOR_Y, riftInstanceOrigin } from '../src/sim/data';
+import { DUNGEON_FLOOR_Y, MOBS, riftInstanceOrigin } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import { resetRiftCourseRegions } from '../src/sim/rift/course_runtime';
 import { RIFT_RANK_BASE_LEVEL } from '../src/sim/rift/ranks';
 import { generateRiftFloor } from '../src/sim/rift/rift_gen';
@@ -193,5 +194,81 @@ describe('the summit gate plate', () => {
     );
     for (let t = 0; t < 40 && !inst.gateOpen; t++) sim.tick();
     expect(inst.gateOpen, 'the summit press opens the gate').toBe(true);
+  });
+});
+
+describe('the riftbound vaulter', () => {
+  it('leaps to a target on another tier, arcs visibly, and lands hunting', () => {
+    // A course floor with a vaulter and a real deck to stand its target on.
+    const found = (() => {
+      for (let seed = 1; seed < 4000; seed++) {
+        const plan = generateRiftFloor(seed, BASE, 0);
+        if (!plan.course) continue;
+        if (!plan.spawns.some((sp) => sp.templateId === 'rift_vaulter')) continue;
+        const stand = plan.course.route.find((w) => !w.via && w.y > 2.4);
+        if (stand) return { seed, stand };
+      }
+      throw new Error('no vaulter course floor found');
+    })();
+    const { sim, origin } = enter(found.seed);
+    // enter() cleared the trash: bring ONE vaulter back by spawning fresh at
+    // the course base via the plan record.
+    const plan = generateRiftFloor(found.seed, BASE, 0);
+    const vs = plan.spawns.find((sp) => sp.templateId === 'rift_vaulter');
+    expect(vs).toBeTruthy();
+    if (!vs) return;
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null);
+    if (!inst) return;
+    const mob = createMob(
+      (sim as unknown as { nextId: number }).nextId++,
+      MOBS.rift_vaulter,
+      BASE,
+      { x: origin.x + vs.x, y: DUNGEON_FLOOR_Y, z: origin.z + vs.z },
+    );
+    (sim as unknown as { addEntity: (e: unknown) => void }).addEntity(mob);
+    inst.mobIds.push(mob.id);
+
+    // The player stands on a raised course deck; the vaulter starts on the
+    // floor below within aggro range.
+    standAt(
+      sim,
+      origin.x + found.stand.x,
+      DUNGEON_FLOOR_Y + found.stand.y,
+      origin.z + found.stand.z,
+    );
+    mob.pos.x = origin.x + found.stand.x + 4;
+    mob.pos.z = origin.z + found.stand.z;
+    mob.pos.y = DUNGEON_FLOOR_Y;
+    mob.prevPos = { ...mob.pos };
+    sim.player.hp = sim.player.maxHp;
+
+    let sawEvent = false;
+    let sawAirborne = false;
+    let peak = mob.pos.y;
+    for (let t = 0; t < 20 * 20 && !sawEvent; t++) {
+      standAt(
+        sim,
+        origin.x + found.stand.x,
+        DUNGEON_FLOOR_Y + found.stand.y,
+        origin.z + found.stand.z,
+      );
+      sim.player.hp = sim.player.maxHp;
+      for (const ev of sim.tick()) {
+        if (ev.type === 'mobLeap' && ev.entityId === mob.id) sawEvent = true;
+      }
+    }
+    expect(sawEvent, 'the vaulter never leapt').toBe(true);
+    for (let t = 0; t < 20 * 3 && mob.mobLeap; t++) {
+      sim.tick();
+      sim.player.hp = sim.player.maxHp;
+      sawAirborne ||= mob.onGround === false;
+      peak = Math.max(peak, mob.pos.y);
+      // The arc must never be flattened by the lift pass mid-flight.
+      expect(mob.pos.y).toBeGreaterThanOrEqual(DUNGEON_FLOOR_Y - 0.01);
+    }
+    expect(sawAirborne, 'the arc cleared the ground (jump clip contract)').toBe(true);
+    expect(peak, 'a real arc, not a slide').toBeGreaterThan(DUNGEON_FLOOR_Y + 1.2);
+    expect(mob.mobLeap, 'the arc completed').toBeFalsy();
+    expect(mob.pos.y).toBeGreaterThan(DUNGEON_FLOOR_Y + found.stand.y - 1.5);
   });
 });

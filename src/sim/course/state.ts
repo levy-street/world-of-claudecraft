@@ -159,6 +159,11 @@ export function courseGemCount(instKey: string, pid: number): number {
   return gems.get(checkpointKey(instKey, pid))?.size ?? 0;
 }
 
+/** Has `pid` collected gem `index`? The renderer hides YOUR collected gems. */
+export function courseGemCollected(instKey: string, pid: number, index: number): boolean {
+  return gems.get(checkpointKey(instKey, pid))?.has(index) === true;
+}
+
 // ---------------------------------------------------------------------------
 // Tightropes. A damped harmonic oscillator per rope whose forcing is the load
 // standing on it: one steady walker barely disturbs it; a second body arriving

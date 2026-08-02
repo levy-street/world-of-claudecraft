@@ -84,6 +84,32 @@ const ADDS: Record<string, MobTemplate> = {
 
 // ---- Trash: two per environment family, spanning distinct render models ----
 const TRASH: Record<string, MobTemplate> = {
+  // The course vaulter: the parkour bestiary. It leaps between tiers after
+  // its target (MobTemplate.deckLeap; only fires inside a course region), so
+  // the climb is never a safe gallery. UNDEAD family on purpose: that rig
+  // carries a real jump clip, so the arc reads as a jump.
+  rift_vaulter: {
+    id: 'rift_vaulter',
+    name: 'Riftbound Vaulter',
+    minLevel: 20,
+    maxLevel: 28,
+    family: 'undead',
+    elite: true,
+    hpBase: 52,
+    hpPerLevel: 19,
+    dmgBase: 11,
+    dmgPerLevel: 2.5,
+    attackSpeed: 1.9,
+    armorPerLevel: 14,
+    moveSpeed: 7.5,
+    aggroRadius: 15,
+    deckLeap: { range: 14, rise: 3.2, cooldown: 3.5 },
+    // Course fauna pays like any trash: coin, a slim shot at a signature
+    // rare (the guile band suits an acrobat), and the essence trickle.
+    loot: trashLoot(240, 'riftbound_band_of_guile'),
+    scale: 0.95,
+    color: 0x8a7c9e,
+  },
   // Frostbound (undead + elemental, blue/white)
   rift_frost_revenant: {
     id: 'rift_frost_revenant',

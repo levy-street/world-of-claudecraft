@@ -917,6 +917,27 @@ export function generateRiftFloor(
       }
     }
   }
+  // Course sentries: vaulters on the course's rest decks, drawn from the
+  // course stream so the main stream stays untouched. They leap between
+  // tiers after their targets (mob/deck_leap.ts), so the climb fights back.
+  if (course) {
+    const rank = riftRankForBaseLevel(baseLevel);
+    const vaulters = rank === 'C' ? 1 : rank === 'B' ? 2 : rank === 'A' ? 2 : 3;
+    const vRng = new Rng(mixSeed(seed, RIFT_COURSE_SALT + 0x300 + clampedIndex));
+    // Only waypoints whose FLOOR footprint is clear: a spawn point must pass
+    // the same furniture clearance every other spawn does (the mob stands at
+    // floor level until the lift pass seats it on its deck).
+    const stands = course.route.filter((w) => !w.via && isClear(geo.colliders, w.x, w.z, BODY_R));
+    for (let v = 0; v < vaulters && stands.length > 2; v++) {
+      const at = stands[vRng.int(1, stands.length - 1)];
+      spawns.push({
+        templateId: 'rift_vaulter',
+        x: at.x,
+        z: at.z,
+        level: floorLevel,
+      });
+    }
+  }
   const finalObjects = course
     ? objects.filter(
         (o) =>

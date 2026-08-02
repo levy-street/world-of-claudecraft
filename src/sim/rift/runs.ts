@@ -1615,10 +1615,26 @@ export function liftRiftEntities(ctx: SimContext): void {
     const lift = (id: number): void => {
       const e = ctx.entities.get(id);
       if (!e) return;
+      // A leaping mob's arc OWNS its y (mob/deck_leap.ts); flattening it back
+      // to the floor mid-flight would teleport the body out of its jump.
+      if (e.mobLeap) return;
       let y = DUNGEON_FLOOR_Y + riftLiftAt(floor, e.pos.x - origin.x, e.pos.z - origin.z);
-      // ONLY the objects a course deliberately places on decks ride them
-      // (today: the summit gate plate). A floor-level object that happens to
-      // sit under a high spur deck must never be hoisted onto it.
+      // Objects the course places on decks ride them (the summit plate), and
+      // COURSE MOBS keep the tier they are on: support within a stride of
+      // their current height, so a vaulter that landed on the floor stays
+      // down and one on a deck stays up. Floor-level entities under high
+      // decks are untouched (nothing within a stride above them).
+      if (course && e.kind === 'mob') {
+        const stand = courseSupportAt(
+          course,
+          instKey,
+          e.pos.x - origin.x,
+          e.pos.z - origin.z,
+          courseClockNow(),
+          e.pos.y - DUNGEON_FLOOR_Y + 1.0,
+        );
+        if (stand) y = Math.max(y, DUNGEON_FLOOR_Y + stand.top);
+      }
       if (course && inst.switchId !== null && id === inst.switchId) {
         const stand = courseSupportAt(
           course,
