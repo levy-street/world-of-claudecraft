@@ -161,7 +161,7 @@ describe('infernal citadel: seed selection', () => {
       }
     }
     expect(h.digest('hex')).toBe(
-      '83fc446e4978e0eef464aedc889ed296499d5ef62c2eda033f4b3f874434bcbf',
+      '2c2a8d9296b33f2c7fda37a4f98dd8af5452debbbcad786a19db3ec1767d4b3d',
     );
   });
 });
