@@ -11,6 +11,8 @@ import { describe, expect, it } from 'vitest';
 // Type-only import (erased at compile, never executed): pins the sim-side rank
 // redeclaration to the server's source of truth so the two cannot drift silently.
 import type { GuildRank as ServerGuildRank } from '../server/social';
+import { ClientWorld } from '../src/net/online';
+import { sanitizeBankState } from '../src/sim/bank';
 import {
   createEmptyGuildBankState,
   GUILD_BANK_BASE_SLOTS,
@@ -52,7 +54,9 @@ describe('guild bank constants (state.md contract)', () => {
     expect(GUILD_BANK_BASE_SLOTS).toBe(12);
     expect(GUILD_BANK_EXPANSION_SLOTS).toBe(6);
     expect([...GUILD_BANK_EXPANSION_PRICES]).toEqual(PRICES);
-    expect(PRICES.reduce((a, b) => a + b, 0)).toBe(LADDER_TOTAL);
+    // Reduce over the EXPORT (not the file-local literal) so the 440g claim is
+    // load-bearing against the shipped table, not a tautology.
+    expect(GUILD_BANK_EXPANSION_PRICES.reduce((a, b) => a + b, 0)).toBe(LADDER_TOTAL);
     expect(GUILD_BANK_TREASURY_CAP).toBe(1000000000);
   });
 
@@ -75,6 +79,13 @@ describe('guildBankCapacity + guildBankNextExpansionPrice', () => {
     expect(guildBankCapacity(maxed)).toBe(48);
     expect(guildBankNextExpansionPrice(maxed)).toBeNull();
   });
+
+  it('floors a non-multiple purchasedSlots when pricing (defensive arm)', () => {
+    // Sanitize guarantees whole expansions, so this arm is defensive; pin it
+    // anyway so the floor cannot silently become a round-up (price skip).
+    const odd: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 7 };
+    expect(guildBankNextExpansionPrice(odd)).toBe(100000); // tier 1 price, not tier 2
+  });
 });
 
 describe('createEmptyGuildBankState', () => {
@@ -93,6 +104,9 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
     expect(sanitizeGuildBankState(null)).toEqual(EMPTY);
     expect(sanitizeGuildBankState('garbage')).toEqual(EMPTY);
     expect(sanitizeGuildBankState(42)).toEqual(EMPTY);
+    // A valid object with every key ABSENT defaults per-field (not the
+    // short-circuit path above): pins the whole-object default end to end.
+    expect(sanitizeGuildBankState({})).toEqual(EMPTY);
   });
 
   it('clamps treasury into [0, cap], flooring fractions and zeroing garbage', () => {
@@ -153,10 +167,72 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
         { itemId: 'wolf_fang', count: 4, instance: { signer: 'Ana', charges: { zap: 2 } } },
         // Unknown def: the merge-legal ceiling does not apply.
         { itemId: 'unknown_id_xyz', count: 30, instance: { signer: 'Ana' } },
+        // Truthy non-object instance: degrades to a PLAIN slot, no garbage payload.
+        { itemId: 'wolf_fang', count: 2, instance: 'not-an-object' },
       ],
     }).inventory;
-    expect(out.map((s) => s.count)).toEqual([1, 2, 1, 20, 1, 30]);
+    expect(out.map((s) => s.count)).toEqual([1, 2, 1, 20, 1, 30, 2]);
     expect(out[2]).toEqual({ itemId: 'worn_sword', count: 1, instance: { signer: 'Ana' } });
+    expect(out[6]).toEqual({ itemId: 'wolf_fang', count: 2 });
+    expect('instance' in out[6]).toBe(false);
+  });
+
+  it('preserves craftedRecipeId and drops a non-string or empty one (both arms pinned)', () => {
+    // The crafted-provenance marker is part of "items are NEVER destroyed":
+    // losing it on load is the same bug class bank.ts pins (tests/bank.test.ts).
+    const out = sanitizeGuildBankState({
+      inventory: [
+        { itemId: 'wolf_fang', count: 2, craftedRecipeId: 'recipe_a' },
+        { itemId: 'wolf_fang', count: 2, craftedRecipeId: '' },
+        { itemId: 'wolf_fang', count: 2, craftedRecipeId: 7 },
+      ],
+    }).inventory;
+    expect(out).toEqual([
+      { itemId: 'wolf_fang', count: 2, craftedRecipeId: 'recipe_a' },
+      { itemId: 'wolf_fang', count: 2 },
+      { itemId: 'wolf_fang', count: 2 },
+    ]);
+    // toEqual treats an undefined-valued key as absent, so pin absence directly.
+    expect('craftedRecipeId' in out[1]).toBe(false);
+    expect('craftedRecipeId' in out[2]).toBe(false);
+  });
+
+  it('tolerates an overstacked PLAIN slot uncapped (the bank.ts pre-bag idiom, pinned)', () => {
+    // Deliberate choice, shared with sanitizeBankState: a plain (non-instanced)
+    // slot's count has no tamper ceiling (instancedCountCap returns Infinity
+    // without a payload), so legacy overstacks survive a load as-is. If either
+    // sanitizer ever clamps plain counts, change BOTH and update this pin.
+    const out = sanitizeGuildBankState({
+      inventory: [{ itemId: 'wolf_fang', count: 999 }],
+    }).inventory;
+    expect(out).toEqual([{ itemId: 'wolf_fang', count: 999 }]);
+  });
+
+  it('stays in lockstep with sanitizeBankState on the shared inventory arm', () => {
+    // The inventory loop is a deliberate second copy of bank.ts (rule of three;
+    // extract a shared leaf on the third copy). This pin feeds one hostile
+    // fixture through BOTH sanitizers and asserts the inventory arms agree, so
+    // a tamper-rule hardening applied to one silently skipping the other fails
+    // here instead of shipping divergent load paths.
+    const hostile = {
+      inventory: [
+        null,
+        7,
+        'x',
+        { count: 3 },
+        { itemId: '', count: 3 },
+        { itemId: 'wolf_fang', count: -5 },
+        { itemId: 'wolf_fang', count: 2.9 },
+        { itemId: 'wolf_fang', count: 999 },
+        { itemId: 'worn_sword', count: 5, instance: { signer: 'Ana' } },
+        { itemId: 'wolf_fang', count: 21, instance: { signer: 'Ana' } },
+        { itemId: 'wolf_fang', count: 4, instance: { signer: 'Ana', charges: { zap: 2 } } },
+        { itemId: 'unknown_id_xyz', count: 30, instance: { signer: 'Ana' } },
+        { itemId: 'wolf_fang', count: 2, craftedRecipeId: 'jerky' },
+        { itemId: 'wolf_fang', count: 2, craftedRecipeId: '' },
+      ],
+    };
+    expect(sanitizeGuildBankState(hostile).inventory).toEqual(sanitizeBankState(hostile).inventory);
   });
 
   it('tolerates an over-capacity inventory without truncating (items are never destroyed)', () => {
@@ -173,7 +249,9 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
     const raw = {
       treasury: 123456,
       purchasedSlots: 12,
-      inventory: [{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }],
+      inventory: [
+        { itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' }, craftedRecipeId: 'jerky' },
+      ],
     };
     const once = sanitizeGuildBankState(raw);
     expect(sanitizeGuildBankState(once)).toEqual(once);
@@ -187,6 +265,27 @@ describe('the per-guild book map (Sim.guildBanks + load/serialize seam)', () => 
     const sim = freshSim();
     sim.loadGuildBank(3, { treasury: -50, purchasedSlots: 7, inventory: 'nope' });
     expect(sim.guildBanks.get(3)).toEqual({ treasury: 0, inventory: [], purchasedSlots: 6 });
+  });
+
+  it('is load-once: a second load never clobbers a live book (unflushed deposits)', () => {
+    const sim = freshSim();
+    sim.loadGuildBank(3, {
+      treasury: 500,
+      purchasedSlots: 6,
+      inventory: [{ itemId: 'wolf_fang', count: 3 }],
+    });
+    const live = sim.guildBanks.get(3);
+    sim.loadGuildBank(3, { treasury: 0, purchasedSlots: 0, inventory: [] });
+    expect(sim.guildBanks.get(3)).toBe(live); // same object: the reload was skipped
+    expect(sim.guildBanks.get(3)).toEqual({
+      treasury: 500,
+      purchasedSlots: 6,
+      inventory: [{ itemId: 'wolf_fang', count: 3 }],
+    });
+    // Evict-then-load is the sanctioned reload path (Phase 3 disband/maintenance).
+    sim.guildBanks.delete(3);
+    sim.loadGuildBank(3, { treasury: 9, purchasedSlots: 0, inventory: [] });
+    expect(sim.guildBanks.get(3)).toEqual({ treasury: 9, purchasedSlots: 0, inventory: [] });
   });
 
   it('ignores a non-positive or non-integer guild id (no garbage keys)', () => {
@@ -270,6 +369,9 @@ describe('the session-only guild membership stamp (PlayerMeta.guildMembership)',
       { guildId: 1.5, rank: 'officer' },
       { guildId: Number.NaN, rank: 'officer' },
       { guildId: 3, rank: 'boss' },
+      // Truthy non-objects: the typeof guard arm, not the !m arm null takes.
+      42,
+      'guild 3 officer',
     ]) {
       sim.setPlayerGuildMembership(pid, { guildId: 3, rank: 'member' }); // arm with a valid stamp
       sim.setPlayerGuildMembership(pid, bad as never);
@@ -297,15 +399,34 @@ describe('the session-only guild membership stamp (PlayerMeta.guildMembership)',
     sim.rng.setObserver(() => {
       draws++;
     });
+    // Positive control: prove the observer really counts before asserting zero.
+    sim.rng.next();
+    expect(draws).toBe(1);
+    draws = 0;
     sim.loadGuildBank(3, {
       treasury: 500,
       purchasedSlots: 6,
       inventory: [{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }],
     });
     sim.serializeGuildBank(3);
+    sim.serializeGuildBank(99); // the unknown-guild arm
     sim.setPlayerGuildMembership(sim.playerId, { guildId: 3, rank: 'officer' });
     sim.setPlayerGuildMembership(sim.playerId, null);
     sanitizeGuildBankState({ treasury: -1, purchasedSlots: 99, inventory: [null, 'x'] });
+    createEmptyGuildBankState();
+    const book = sim.guildBanks.get(3);
+    expect(book).toBeDefined();
+    if (book) {
+      guildBankCapacity(book);
+      guildBankNextExpansionPrice(book);
+    }
+    // The offline facet arm: the null read and all five inert commands.
+    void sim.guildBankInfo;
+    sim.guildBankDepositGold(1);
+    sim.guildBankWithdrawGold(1);
+    sim.guildBankDeposit(0, 1);
+    sim.guildBankWithdraw(0, 1);
+    sim.guildBankBuySlots();
     sim.rng.setObserver(null);
     expect(draws).toBe(0);
   });
@@ -319,5 +440,37 @@ describe('the session-only guild membership stamp (PlayerMeta.guildMembership)',
     const before = JSON.stringify(samplePlayerMeta(meta));
     sim.setPlayerGuildMembership(sim.playerId, { guildId: 3, rank: 'officer' });
     expect(JSON.stringify(samplePlayerMeta(meta))).toBe(before);
+  });
+});
+
+describe('the Phase 1 facet stubs are inert in BOTH worlds', () => {
+  it('offline Sim: null read and five no-op commands mutate nothing (inert forever)', () => {
+    const sim = freshSim();
+    expect(sim.guildBankInfo).toBeNull();
+    const copperBefore = sim.players.get(sim.playerId)?.copper;
+    sim.guildBankDepositGold(5);
+    sim.guildBankWithdrawGold(5);
+    sim.guildBankDeposit(0, 1);
+    sim.guildBankWithdraw(0, 1);
+    sim.guildBankBuySlots();
+    expect(sim.guildBanks.size).toBe(0);
+    expect(sim.guildBankInfo).toBeNull();
+    expect(sim.players.get(sim.playerId)?.copper).toBe(copperBefore);
+  });
+
+  it('ClientWorld: the five Phase 1 stubs send NOTHING on the wire (the W0b lockstep)', () => {
+    // Bare-prototype probe (the action_bar_layout_client idiom): no WebSocket,
+    // cmd spied. A send appearing here before its guild_bank_* token exists in
+    // COMMAND_NAMES is exactly the drift this pin exists to catch.
+    // biome-ignore lint/suspicious/noExplicitAny: bare prototype probe needs the private cmd seam
+    const client: any = Object.create(ClientWorld.prototype);
+    const sent: unknown[] = [];
+    client.cmd = (payload: unknown) => sent.push(payload);
+    client.guildBankDepositGold(5);
+    client.guildBankWithdrawGold(5);
+    client.guildBankDeposit(0, 1);
+    client.guildBankWithdraw(0, 1);
+    client.guildBankBuySlots();
+    expect(sent).toEqual([]);
   });
 });
