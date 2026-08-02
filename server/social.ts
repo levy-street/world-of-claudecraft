@@ -353,6 +353,11 @@ export class SocialService {
     private readonly db: SocialDb,
     private readonly tx: SocialTransport,
     private readonly now: () => number = () => Date.now(),
+    // Guild-name content screen, injected so the service stays hermetic in tests:
+    // production wires offensiveName from server/auth.ts (server/game.ts); the
+    // default screens nothing. Applies at creation only; existing guild names are
+    // never retro-scanned here.
+    private readonly isNameOffensive: (name: string) => boolean = () => false,
   ) {}
 
   // -------------------------------------------------------------------------
@@ -773,6 +778,12 @@ export class SocialService {
     const name = validateGuildName(rawName);
     if (!name) {
       this.err(actor.characterId, 'Guild names are 3-24 letters (spaces allowed).');
+      return;
+    }
+    // Content screen (server-authoritative; the client has no say): refuse an
+    // offensive name before any row is created, so a refused create never exists.
+    if (this.isNameOffensive(name)) {
+      this.err(actor.characterId, 'That guild name is not allowed.');
       return;
     }
     const result = await this.db.createGuildWithLeader(name, actor.characterId);

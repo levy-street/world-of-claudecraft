@@ -325,12 +325,14 @@ class FakeTransport implements SocialTransport {
   }
 }
 
-// Test harness: characters 1..N, with helpers to flip presence.
-function setup() {
+// Test harness: characters 1..N, with helpers to flip presence. Tests that
+// exercise guild-name screening inject their own predicate; everything else
+// runs with the constructor default (screen nothing).
+function setup(cfg: { isNameOffensive?: (name: string) => boolean } = {}) {
   const db = new FakeDb();
   const tx = new FakeTransport(db);
   let clock = 1000;
-  const svc = new SocialService(db, tx, () => clock);
+  const svc = new SocialService(db, tx, () => clock, cfg.isNameOffensive);
   const actors = new Map<number, { characterId: number; name: string }>();
   const add = (id: number, name: string, opts: { cls?: string; level?: number } = {}) => {
     db.addChar(id, name, opts.cls, opts.level);
@@ -779,6 +781,47 @@ describe('guilds', () => {
     h.tx.clear();
     await h.svc.guildCreate(h.actor(2), 'iron vanguard');
     expect(h.tx.errorsFor(2).join()).toMatch(/already exists/i);
+  });
+
+  it('refuses an offensive guild name at creation via the injected screen', async () => {
+    const screened: string[] = [];
+    const s = setup({
+      isNameOffensive: (name) => {
+        screened.push(name);
+        return /forbidden/i.test(name);
+      },
+    });
+    s.add(1, 'Aleph');
+    s.tx.setOnline(1);
+    await s.svc.guildCreate(s.actor(1), '  Forbidden Legion  ');
+    // The exact English literal is load-bearing: server_i18n's EXACT matcher
+    // localizes it byte-for-byte (guild.nameNotAllowed).
+    expect(s.tx.errorsFor(1)).toEqual(['That guild name is not allowed.']);
+    // The screen sees the VALIDATED (trimmed) name, after the format gate.
+    expect(screened).toEqual(['Forbidden Legion']);
+    // A refused create leaves nothing behind: no guild row, no founder credit,
+    // no membership.
+    expect(s.db.guildCount()).toBe(0);
+    expect(s.tx.founded).toEqual([]);
+    expect((await s.svc.snapshot(1)).guild).toBeNull();
+  });
+
+  it('accepts a clean guild name through the same screen', async () => {
+    const s = setup({ isNameOffensive: (name) => /forbidden/i.test(name) });
+    s.add(1, 'Aleph');
+    s.tx.setOnline(1);
+    await s.svc.guildCreate(s.actor(1), 'Iron Vanguard');
+    expect(s.tx.errorsFor(1)).toEqual([]);
+    expect(s.tx.founded).toEqual([1]);
+    expect((await s.svc.snapshot(1)).guild?.name).toBe('Iron Vanguard');
+  });
+
+  it('does not screen when no predicate is injected (constructor default)', async () => {
+    // The default screens nothing: FakeDb suites that never inject a predicate
+    // must keep creating guilds freely.
+    await h.svc.guildCreate(h.actor(1), 'Forbidden Legion');
+    expect(h.tx.errorsFor(1)).toEqual([]);
+    expect((await h.svc.snapshot(1)).guild?.name).toBe('Forbidden Legion');
   });
 
   it('fires onGuildFounded exactly once, on the committed create only (the soc_guild_founded feed)', async () => {
