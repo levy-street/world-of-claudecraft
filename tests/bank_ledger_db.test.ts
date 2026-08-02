@@ -98,3 +98,53 @@ describe('insertBankLedgerRow', () => {
     ]);
   });
 });
+
+describe('insertBankLedgerRow (guild container rows, Guild Bank Phase 3)', () => {
+  it('writes a guild deposit_gold row with container=guild and the guild id', async () => {
+    await insertBankLedgerRow({
+      realm: REALM,
+      characterId: 42,
+      accountId: 7,
+      op: 'deposit_gold',
+      itemId: null,
+      count: null,
+      instance: null,
+      copperDelta: 1500,
+      purchasedSlotsAfter: 6,
+      container: 'guild',
+      containerId: 913,
+    });
+    const [, params] = dbMock.query.mock.calls[0];
+    expect(params).toEqual([REALM, 42, 7, 'deposit_gold', null, null, null, 1500, 6, 'guild', 913]);
+  });
+
+  it('writes the create_fee row shape (negated fee, zero slots)', async () => {
+    await insertBankLedgerRow({
+      realm: REALM,
+      characterId: 42,
+      accountId: 7,
+      op: 'create_fee',
+      itemId: null,
+      count: null,
+      instance: null,
+      copperDelta: -100000,
+      purchasedSlotsAfter: 0,
+      container: 'guild',
+      containerId: 913,
+    });
+    const [, params] = dbMock.query.mock.calls[0];
+    expect(params).toEqual([
+      REALM,
+      42,
+      7,
+      'create_fee',
+      null,
+      null,
+      null,
+      -100000,
+      0,
+      'guild',
+      913,
+    ]);
+  });
+});

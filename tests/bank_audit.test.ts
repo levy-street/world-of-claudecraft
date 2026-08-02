@@ -209,3 +209,261 @@ describe('formatReport', () => {
     expect(report).not.toContain('FINDING:');
   });
 });
+
+// ---------------------------------------------------------------------------
+// Guild container rows (Guild Bank Phase 3): grouped per GUILD (container_id,
+// the anonymous exchange pipe), treasury replay, and book reconciliation.
+// ---------------------------------------------------------------------------
+
+// A guild row: container 'guild', keyed by container_id.
+function G(o: Partial<BankLedgerAuditRow>): BankLedgerAuditRow {
+  return L({ container: 'guild', container_id: 913, ...o });
+}
+
+const guildKindsFor = (findings: BankAuditFinding[], guildId: number) =>
+  findings.filter((f) => f.guildId === guildId).map((f) => f.kind);
+
+describe('auditBank (guild container)', () => {
+  it('a clean cross-officer session reconciles against the guild book with zero findings', () => {
+    // Officer 1 deposits gold and an item; officer 2 withdraws part of the
+    // item and buys an expansion from the treasury; the book matches the net.
+    const findings = auditBank({
+      ledgerRows: [
+        G({ id: 1, character_id: 1, op: 'create_fee', copper_delta: -100000 }),
+        G({ id: 2, character_id: 1, op: 'deposit_gold', copper_delta: 80000 }),
+        G({ id: 3, character_id: 1, op: 'deposit', item_id: 'wolf_fang', count: 5 }),
+        G({ id: 4, character_id: 2, op: 'withdraw', item_id: 'wolf_fang', count: 2 }),
+        G({
+          id: 5,
+          character_id: 2,
+          op: 'buy_slots',
+          copper_delta: -50000,
+          purchased_slots_after: 6,
+        }),
+        G({
+          id: 6,
+          character_id: 2,
+          op: 'withdraw_gold',
+          copper_delta: -10000,
+          purchased_slots_after: 6,
+        }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: {
+            treasury: 20000,
+            inventory: [{ itemId: 'wolf_fang', count: 3 }],
+            purchasedSlots: 6,
+          },
+        },
+      ],
+    });
+    expect(findings).toEqual([]);
+  });
+
+  it('conservation holds per GUILD, not per character: a cross-officer withdraw is clean', () => {
+    // Officer 2 withdraws what officer 1 deposited. A per-character grouping
+    // (the personal rule) would flag officer 2 with negative_net; the pipe
+    // grouping must not.
+    const findings = auditBank({
+      ledgerRows: [
+        G({ id: 1, character_id: 1, op: 'deposit', item_id: 'wolf_fang', count: 3 }),
+        G({ id: 2, character_id: 2, op: 'withdraw', item_id: 'wolf_fang', count: 3 }),
+      ],
+      characters: [],
+    });
+    expect(findings).toEqual([]);
+  });
+
+  it('flags a guild withdraw of items that were never deposited (negative_net)', () => {
+    const findings = auditBank({
+      ledgerRows: [G({ id: 1, character_id: 2, op: 'withdraw', item_id: 'wolf_fang', count: 1 })],
+      characters: [],
+    });
+    expect(guildKindsFor(findings, 913)).toEqual(['negative_net']);
+    expect(findings[0]).toMatchObject({ container: 'guild', characterId: null, guildId: 913 });
+  });
+
+  it('flags a treasury that goes negative in replay (more copper out than in)', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        G({ id: 1, character_id: 1, op: 'deposit_gold', copper_delta: 5000 }),
+        G({ id: 2, character_id: 2, op: 'withdraw_gold', copper_delta: -8000 }),
+      ],
+      characters: [],
+    });
+    expect(guildKindsFor(findings, 913)).toEqual(['negative_treasury']);
+  });
+
+  it('create_fee is the founder purse, excluded from the treasury replay', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        // If create_fee counted, the replay would start at -100000 and flag.
+        G({ id: 1, character_id: 1, op: 'create_fee', copper_delta: -100000 }),
+        G({ id: 2, character_id: 1, op: 'deposit_gold', copper_delta: 100 }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: { treasury: 100, inventory: [], purchasedSlots: 0 },
+        },
+      ],
+    });
+    expect(findings).toEqual([]);
+  });
+
+  it('reconciles books against replay: item, treasury, and purchased mismatches', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        G({ id: 1, character_id: 1, op: 'deposit_gold', copper_delta: 500 }),
+        G({ id: 2, character_id: 1, op: 'deposit', item_id: 'wolf_fang', count: 1 }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: {
+            treasury: 999, // ledger says 500
+            inventory: [{ itemId: 'wolf_fang', count: 4 }], // ledger says 1
+            purchasedSlots: 6, // ledger says 0
+          },
+        },
+      ],
+    });
+    expect(guildKindsFor(findings, 913).sort()).toEqual([
+      'ledger_state_mismatch',
+      'purchased_mismatch',
+      'treasury_mismatch',
+    ]);
+  });
+
+  it('a book holding items with NO ledger rows is the corruption signature', () => {
+    const findings = auditBank({
+      ledgerRows: [],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 44,
+          realm: 'Claudemoon',
+          data: { treasury: 7, inventory: [{ itemId: 'iron_ore', count: 2 }], purchasedSlots: 0 },
+        },
+      ],
+    });
+    expect(guildKindsFor(findings, 44).sort()).toEqual([
+      'ledger_state_mismatch',
+      'treasury_mismatch',
+    ]);
+  });
+
+  it('a disbanded guild (rows, no book) reconciles items+treasury against empty and skips purchased', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        G({ id: 1, character_id: 1, op: 'deposit_gold', copper_delta: 50000 }),
+        G({
+          id: 2,
+          character_id: 1,
+          op: 'buy_slots',
+          copper_delta: -50000,
+          purchased_slots_after: 6,
+        }),
+        G({
+          id: 3,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'wolf_fang',
+          count: 1,
+          purchased_slots_after: 6,
+        }),
+        G({
+          id: 4,
+          character_id: 2,
+          op: 'withdraw',
+          item_id: 'wolf_fang',
+          count: 1,
+          purchased_slots_after: 6,
+        }),
+      ],
+      characters: [],
+      guildBanks: [], // the guilds DELETE cascaded the book away
+    });
+    // Net items 0, treasury 0, purchased 6 with no row: all clean by design.
+    expect(findings).toEqual([]);
+  });
+
+  it('flags each guild-only shape anomaly exactly once', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        // deposit_gold with the wrong sign (0 pins the <= boundary and keeps
+        // the treasury replay at zero, isolating the shape finding).
+        G({ id: 1, character_id: 1, op: 'deposit_gold', copper_delta: 0, container_id: 70 }),
+        // withdraw_gold with the wrong sign.
+        G({ id: 2, character_id: 1, op: 'withdraw_gold', copper_delta: 5, container_id: 71 }),
+        // gold op carrying item fields.
+        G({
+          id: 3,
+          character_id: 1,
+          op: 'deposit_gold',
+          copper_delta: 5,
+          item_id: 'wolf_fang',
+          count: 1,
+          container_id: 72,
+        }),
+        // create_fee that charged nothing (or positive).
+        G({ id: 4, character_id: 1, op: 'create_fee', copper_delta: 0, container_id: 73 }),
+        // create_fee claiming expansions at birth.
+        G({
+          id: 5,
+          character_id: 1,
+          op: 'create_fee',
+          copper_delta: -100000,
+          purchased_slots_after: 6,
+          container_id: 74,
+        }),
+        // a gold op smuggled into the personal container.
+        L({ id: 6, character_id: 1, op: 'deposit_gold', copper_delta: 5 }),
+        // a guild row with no guild id.
+        G({
+          id: 7,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'wolf_fang',
+          count: 1,
+          container_id: null,
+        }),
+      ],
+      characters: [],
+    });
+    expect(guildKindsFor(findings, 70)).toEqual(['bad_gold_delta']);
+    expect(guildKindsFor(findings, 71)).toEqual(['bad_gold_delta']);
+    expect(guildKindsFor(findings, 72)).toEqual(['item_on_gold_op']);
+    expect(guildKindsFor(findings, 73)).toEqual(['nonnegative_create_fee']);
+    expect(guildKindsFor(findings, 74)).toEqual(['slots_on_create_fee']);
+    expect(findings.some((f) => f.kind === 'gold_op_outside_guild')).toBe(true);
+    expect(findings.some((f) => f.kind === 'missing_container_id')).toBe(true);
+  });
+});
+
+describe('formatReport (guild rows)', () => {
+  it('summarizes the guild container and names the guild in FINDING lines', () => {
+    const rows = [G({ id: 1, character_id: 1, op: 'deposit', item_id: 'wolf_fang', count: 2 })];
+    const finding: BankAuditFinding = {
+      container: 'guild',
+      realm: 'Claudemoon',
+      characterId: null,
+      guildId: 913,
+      kind: 'negative_treasury',
+      detail: 'treasury fell to -1 at row 9',
+    };
+    const report = formatReport(rows, [finding]);
+    expect(report).toContain('container guild: ledger rows 1: findings 1');
+    expect(report).toContain(
+      'FINDING: container guild: realm Claudemoon: guild 913: negative_treasury: treasury fell to -1 at row 9',
+    );
+  });
+});

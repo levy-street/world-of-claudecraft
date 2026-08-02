@@ -320,3 +320,143 @@ describe('bank ledger dispatch integration', () => {
     await bankLedgerIdle();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Guild bank rows (Guild Bank Phase 3): the pure guild differ and the shared
+// FIFO recorder. GuildBankInfo fixtures mirror the info() helper above.
+// ---------------------------------------------------------------------------
+
+import { diffGuildBankOp, guildCreateFeeDelta, recordGuildBankDeltas } from '../server/bank_ledger';
+import type { GuildBankInfo } from '../src/world_api';
+
+function ginfo(
+  treasury: number,
+  slots: GuildBankInfo['slots'] = [],
+  purchasedSlots = 0,
+  nextExpansionPrice: number | null = 50000,
+): GuildBankInfo {
+  return { treasury, slots, capacity: 12 + purchasedSlots, purchasedSlots, nextExpansionPrice };
+}
+
+describe('diffGuildBankOp (pure)', () => {
+  it('deposit_gold records the positive treasury delta', () => {
+    expect(diffGuildBankOp('deposit_gold', ginfo(1000), ginfo(3500))).toEqual([
+      { itemId: null, count: null, instance: null, copperDelta: 2500, purchasedSlotsAfter: 0 },
+    ]);
+  });
+
+  it('withdraw_gold records the negative treasury delta', () => {
+    expect(diffGuildBankOp('withdraw_gold', ginfo(3500), ginfo(1000))).toEqual([
+      { itemId: null, count: null, instance: null, copperDelta: -2500, purchasedSlotsAfter: 0 },
+    ]);
+  });
+
+  it('a gold op whose treasury moved the WRONG direction records nothing', () => {
+    // Direction-checked per op: a mislabeled call can never fabricate a row.
+    expect(diffGuildBankOp('deposit_gold', ginfo(3500), ginfo(1000))).toEqual([]);
+    expect(diffGuildBankOp('withdraw_gold', ginfo(1000), ginfo(3500))).toEqual([]);
+  });
+
+  it('an item deposit/withdraw diffs the book multiset like the personal bank', () => {
+    expect(
+      diffGuildBankOp('deposit', ginfo(0, []), ginfo(0, [{ itemId: 'wolf_fang', count: 3 }])),
+    ).toEqual([
+      { itemId: 'wolf_fang', count: 3, instance: null, copperDelta: 0, purchasedSlotsAfter: 0 },
+    ]);
+    expect(
+      diffGuildBankOp(
+        'withdraw',
+        ginfo(0, [{ itemId: 'wolf_fang', count: 3 }]),
+        ginfo(0, [{ itemId: 'wolf_fang', count: 1 }]),
+      ),
+    ).toEqual([
+      { itemId: 'wolf_fang', count: 2, instance: null, copperDelta: 0, purchasedSlotsAfter: 0 },
+    ]);
+  });
+
+  it('buy_slots negates the BEFORE table price the treasury paid', () => {
+    expect(
+      diffGuildBankOp('buy_slots', ginfo(60000, [], 0, 50000), ginfo(10000, [], 6, 100000)),
+    ).toEqual([
+      { itemId: null, count: null, instance: null, copperDelta: -50000, purchasedSlotsAfter: 6 },
+    ]);
+  });
+
+  it('identical or null snapshots (refusals) record nothing', () => {
+    expect(diffGuildBankOp('deposit_gold', ginfo(500), ginfo(500))).toEqual([]);
+    expect(diffGuildBankOp('deposit', null, ginfo(500))).toEqual([]);
+    expect(diffGuildBankOp('withdraw', ginfo(500), null)).toEqual([]);
+    expect(diffGuildBankOp('buy_slots', ginfo(500, [], 6), ginfo(500, [], 6))).toEqual([]);
+  });
+});
+
+describe('recordGuildBankDeltas + guildCreateFeeDelta (the FIFO writer)', () => {
+  beforeEach(() => {
+    insertMock.mockClear();
+    insertMock.mockResolvedValue(undefined);
+  });
+
+  it('writes container=guild rows with the guild id and the caller identity', async () => {
+    recordGuildBankDeltas(
+      'deposit_gold',
+      { characterId: 42, accountId: 7 },
+      913,
+      diffGuildBankOp('deposit_gold', ginfo(0), ginfo(1500)),
+    );
+    await bankLedgerIdle();
+    expect(insertMock).toHaveBeenCalledTimes(1);
+    expect(insertMock).toHaveBeenCalledWith({
+      realm: REALM,
+      characterId: 42,
+      accountId: 7,
+      op: 'deposit_gold',
+      itemId: null,
+      count: null,
+      instance: null,
+      copperDelta: 1500,
+      purchasedSlotsAfter: 0,
+      container: 'guild',
+      containerId: 913,
+    });
+  });
+
+  it('the create_fee row negates the charged purse copper with zero slots', async () => {
+    recordGuildBankDeltas('create_fee', { characterId: 42, accountId: 7 }, 913, [
+      guildCreateFeeDelta(100000),
+    ]);
+    await bankLedgerIdle();
+    expect(insertMock).toHaveBeenCalledTimes(1);
+    expect(insertMock.mock.calls[0][0]).toMatchObject({
+      op: 'create_fee',
+      copperDelta: -100000,
+      purchasedSlotsAfter: 0,
+      container: 'guild',
+      containerId: 913,
+    });
+  });
+
+  it('an empty delta list (a refusal) writes nothing', async () => {
+    recordGuildBankDeltas('withdraw', { characterId: 1, accountId: 1 }, 913, []);
+    await bankLedgerIdle();
+    expect(insertMock).not.toHaveBeenCalled();
+  });
+
+  it('is fire-and-forget: returns void and a rejecting insert never throws', async () => {
+    insertMock.mockRejectedValueOnce(new Error('db down'));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(
+      recordGuildBankDeltas('deposit', { characterId: 1, accountId: 1 }, 913, [
+        { itemId: 'wolf_fang', count: 1, instance: null, copperDelta: 0, purchasedSlotsAfter: 0 },
+      ]),
+    ).toBeUndefined();
+    await bankLedgerIdle();
+    expect(errSpy).toHaveBeenCalled();
+    errSpy.mockRestore();
+    // The chain survives: the next write still lands in order.
+    recordGuildBankDeltas('deposit', { characterId: 1, accountId: 1 }, 913, [
+      { itemId: 'wolf_fang', count: 2, instance: null, copperDelta: 0, purchasedSlotsAfter: 0 },
+    ]);
+    await bankLedgerIdle();
+    expect(insertMock).toHaveBeenCalledTimes(2);
+  });
+});

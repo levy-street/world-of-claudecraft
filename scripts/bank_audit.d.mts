@@ -26,19 +26,32 @@ export interface BankAuditCharacter {
   state: unknown;
 }
 
+// One guild_banks row projection ({ guild_id, realm, data }); data arrives
+// parsed (JSONB) from Postgres, or as a JSON string from a fixture.
+export interface BankAuditGuildBank {
+  guild_id: number | string;
+  realm: string;
+  data: unknown;
+}
+
 export interface BankAuditFinding {
   container: string;
   realm: string;
-  characterId: number;
+  // Personal findings carry the character; guild findings carry the guild
+  // (characterId null) because the guild bank is an anonymous exchange pipe.
+  characterId: number | null;
+  guildId?: number | null;
   kind: string;
   detail: string;
 }
 
 // The pure checker: replays the ledger against the persisted bank state and
-// returns every shape or conservation anomaly, grouped by container.
+// returns every shape or conservation anomaly, grouped by container. Guild
+// reconciliation runs only when guildBanks is provided.
 export function auditBank(input: {
   ledgerRows: BankLedgerAuditRow[];
   characters: BankAuditCharacter[];
+  guildBanks?: BankAuditGuildBank[];
 }): BankAuditFinding[];
 
 // A one-line-per-finding report grouped by container, plus per-container counts.

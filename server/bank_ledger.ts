@@ -14,7 +14,7 @@
 // anything, and the observer can never throw into the caller. A character lives on
 // one realm process, so the FIFO preserves that character's op order.
 
-import type { BankInfo } from '../src/world_api';
+import type { BankInfo, GuildBankInfo } from '../src/world_api';
 import { insertBankLedgerRow } from './db';
 import { REALM } from './realm';
 
@@ -161,4 +161,159 @@ export function recordBankOp(
 // The current FIFO tail, for tests to await the queue draining deterministically.
 export function bankLedgerIdle(): Promise<void> {
   return tail;
+}
+
+// ---------------------------------------------------------------------------
+// Guild bank rows (Guild Bank Phase 3). Same observer discipline as the
+// personal bank above: the sim ops return void and emit no success event, so
+// the dispatch site diffs Sim.guildBankInfoFor(pid) BEFORE and AFTER each op.
+// Rows write container='guild' with container_id = guild id into the SAME
+// bank_ledger table; the two gold ops record the TREASURY's copper delta
+// (positive on deposit_gold, negative on withdraw_gold), buy_slots the
+// negated table price the treasury paid, and item ops carry no copper, so a
+// guild's non-fee copper deltas replay to its live treasury (the audit
+// script's conservation check). create_fee is the one row with no diff: the
+// founder's personal copper, written by the guild_create success arm.
+// The dispatch site needs the diff itself (a non-empty diff marks the book
+// dirty for the escrow save), so the differ is exported pure and the recorder
+// takes the computed deltas; both share the personal FIFO tail, preserving a
+// character's cross-container op order.
+// ---------------------------------------------------------------------------
+
+export type GuildBankLedgerOp =
+  | 'deposit_gold'
+  | 'withdraw_gold'
+  | 'deposit'
+  | 'withdraw'
+  | 'buy_slots';
+
+// Observe a guild bank op's outcome by diffing the before/after
+// guildBankInfoFor snapshots. Empty means refused / no-op (nothing to record,
+// nothing dirty). A successful op always has non-null snapshots on both sides
+// (the op itself requires the banker, rank, and book the read gates on), so a
+// null on either side is a refusal by construction. A refused (projected)
+// slot's key is stable across the pair: the pipe policy refuses it in both
+// directions, so it can never move, and equal payloads project identically.
+export function diffGuildBankOp(
+  op: GuildBankLedgerOp,
+  before: GuildBankInfo | null,
+  after: GuildBankInfo | null,
+): BankOpDelta[] {
+  if (!before || !after) return [];
+
+  if (op === 'deposit_gold' || op === 'withdraw_gold') {
+    const delta = after.treasury - before.treasury;
+    if (op === 'deposit_gold' && delta <= 0) return [];
+    if (op === 'withdraw_gold' && delta >= 0) return [];
+    return [
+      {
+        itemId: null,
+        count: null,
+        instance: null,
+        copperDelta: delta,
+        purchasedSlotsAfter: after.purchasedSlots,
+      },
+    ];
+  }
+
+  if (op === 'buy_slots') {
+    if (after.purchasedSlots <= before.purchasedSlots) return [];
+    // The treasury paid exactly the BEFORE snapshot's next table price
+    // (non-null by construction on a real purchase); guard null as 0.
+    const price = before.nextExpansionPrice ?? 0;
+    return [
+      {
+        itemId: null,
+        count: null,
+        instance: null,
+        copperDelta: -price,
+        purchasedSlotsAfter: after.purchasedSlots,
+      },
+    ];
+  }
+
+  // Item ops: the personal-bank multiset diff over the book's slots.
+  const beforeCounts = countByKey(before.slots);
+  const afterCounts = countByKey(after.slots);
+  const keys = new Set<string>([...beforeCounts.keys(), ...afterCounts.keys()]);
+  const out: BankOpDelta[] = [];
+  for (const key of keys) {
+    const b = beforeCounts.get(key)?.count ?? 0;
+    const a = afterCounts.get(key)?.count ?? 0;
+    const delta = a - b;
+    if (op === 'deposit' && delta > 0) {
+      const slot = afterCounts.get(key)?.slot as BankSlot;
+      out.push({
+        itemId: slot.itemId,
+        count: delta,
+        instance: slot.instance ?? null,
+        copperDelta: 0,
+        purchasedSlotsAfter: after.purchasedSlots,
+      });
+    } else if (op === 'withdraw' && delta < 0) {
+      const slot = beforeCounts.get(key)?.slot as BankSlot;
+      out.push({
+        itemId: slot.itemId,
+        count: -delta,
+        instance: slot.instance ?? null,
+        copperDelta: 0,
+        purchasedSlotsAfter: after.purchasedSlots,
+      });
+    }
+  }
+  return out;
+}
+
+// Record a successful guild bank op's deltas fire-and-forget onto the shared
+// FIFO tail (never awaited by the game loop; a rejected insert logs and never
+// blocks or reorders anything). The caller computed the deltas via
+// diffGuildBankOp (it needs the success signal to mark the book dirty), so
+// this only enqueues; an empty array writes nothing.
+export function recordGuildBankDeltas(
+  op: GuildBankLedgerOp | 'create_fee',
+  who: { characterId: number; accountId: number },
+  guildId: number,
+  deltas: readonly BankOpDelta[],
+): void {
+  try {
+    for (const delta of deltas) {
+      tail = tail
+        .then(() =>
+          insertBankLedgerRow({
+            realm: REALM,
+            characterId: who.characterId,
+            accountId: who.accountId,
+            op,
+            itemId: delta.itemId,
+            count: delta.count,
+            instance: delta.instance,
+            copperDelta: delta.copperDelta,
+            purchasedSlotsAfter: delta.purchasedSlotsAfter,
+            container: 'guild',
+            containerId: guildId,
+          }),
+        )
+        .catch((err) => {
+          console.error('bank_ledger guild write failed:', err);
+        });
+    }
+  } catch (err) {
+    // The observer must never fault the dispatch path.
+    console.error('bank_ledger recordGuildBankDeltas failed:', err);
+  }
+}
+
+// The guild_create fee row (create-then-charge: written only after the guild
+// row committed AND the sim purse was actually charged). purchased_slots_after
+// is 0: a newborn guild has no expansions. copper_delta is the negated copper
+// the founder's PURSE paid (never treasury copper), so the audit script
+// excludes create_fee from the treasury replay.
+export function guildCreateFeeDelta(chargedCopper: number): BankOpDelta {
+  return {
+    itemId: null,
+    count: null,
+    instance: null,
+    copperDelta: -chargedCopper,
+    purchasedSlotsAfter: 0,
+  };
 }

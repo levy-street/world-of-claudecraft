@@ -6,10 +6,17 @@
 // deposit/withdraw for a character must reconstruct exactly the items its bank
 // holds now, and no withdraw may ever remove an item that was never deposited.
 //
-// Everything is grouped and REPORTED BY CONTAINER from day one: v1 sees only the
-// 'personal' container, but a future guild bank writes 'guild' rows into the SAME
-// table and inherits this audit unchanged (its own state source would wire in
-// then; here the state reconciliation runs for 'personal' only).
+// Everything is grouped and REPORTED BY CONTAINER: 'personal' rows group per
+// character and reconcile against characters.state.bank; 'guild' rows (Guild
+// Bank Phase 3) group per GUILD (container_id), because the guild bank is an
+// anonymous exchange pipe (officer A deposits, officer B withdraws), so item
+// conservation only holds across the whole guild, never per character. Guild
+// groups additionally replay the treasury (deposit_gold + withdraw_gold +
+// buy_slots copper deltas; create_fee is the founder's PERSONAL copper and is
+// excluded) and reconcile against the guild_banks book when it is provided. A
+// guild with ledger rows but no book row reconciles items and treasury against
+// an EMPTY book (a disbanded guild: the disband guard proves both were zero)
+// but skips the purchased reconciliation (expansions survive to the last row).
 //
 // Structure: PURE exported functions (unit-tested directly) plus a main() that
 // only runs when the file is executed directly. main() talks to Postgres via pg;
@@ -74,7 +81,12 @@ function checkRowShape(row, findings) {
   const base = {
     container: row.container ?? 'personal',
     realm: row.realm,
+    // Shape findings keep the acting character for attribution; guild rows
+    // additionally carry their guild (the group key the report names).
     characterId: row.character_id,
+    ...((row.container ?? 'personal') === 'guild'
+      ? { guildId: row.container_id == null ? null : Number(row.container_id) }
+      : {}),
   };
   if (row.op === 'deposit' || row.op === 'withdraw') {
     if (row.count == null || Number(row.count) <= 0) {
@@ -113,27 +125,98 @@ function checkRowShape(row, findings) {
         detail: `buy_slots row ${row.id} has copper_delta ${String(row.copper_delta)}`,
       });
     }
+  } else if (row.op === 'deposit_gold' || row.op === 'withdraw_gold') {
+    // Guild treasury moves: copper-only rows with a direction-checked delta.
+    if (row.item_id != null || row.count != null) {
+      findings.push({
+        ...base,
+        kind: 'item_on_gold_op',
+        detail: `${row.op} row ${row.id} carries item fields`,
+      });
+    }
+    if (row.op === 'deposit_gold' && Number(row.copper_delta) <= 0) {
+      findings.push({
+        ...base,
+        kind: 'bad_gold_delta',
+        detail: `deposit_gold row ${row.id} has non-positive copper_delta ${String(row.copper_delta)}`,
+      });
+    }
+    if (row.op === 'withdraw_gold' && Number(row.copper_delta) >= 0) {
+      findings.push({
+        ...base,
+        kind: 'bad_gold_delta',
+        detail: `withdraw_gold row ${row.id} has non-negative copper_delta ${String(row.copper_delta)}`,
+      });
+    }
+  } else if (row.op === 'create_fee') {
+    // The founder's purse paid the (positive) creation fee; a newborn guild
+    // has no expansions yet.
+    if (Number(row.copper_delta) >= 0) {
+      findings.push({
+        ...base,
+        kind: 'nonnegative_create_fee',
+        detail: `create_fee row ${row.id} has copper_delta ${String(row.copper_delta)}`,
+      });
+    }
+    if (Number(row.purchased_slots_after) !== 0) {
+      findings.push({
+        ...base,
+        kind: 'slots_on_create_fee',
+        detail: `create_fee row ${row.id} has purchased_slots_after ${String(row.purchased_slots_after)}`,
+      });
+    }
+  }
+  // The gold and fee ops exist only for the guild container, and every guild
+  // row must name its guild (container_id is the group key).
+  const container = row.container ?? 'personal';
+  const guildOnlyOp =
+    row.op === 'deposit_gold' || row.op === 'withdraw_gold' || row.op === 'create_fee';
+  if (guildOnlyOp && container !== 'guild') {
+    findings.push({
+      ...base,
+      kind: 'gold_op_outside_guild',
+      detail: `${row.op} row ${row.id} has container '${container}'`,
+    });
+  }
+  if (container === 'guild' && row.container_id == null) {
+    findings.push({
+      ...base,
+      kind: 'missing_container_id',
+      detail: `guild row ${row.id} has no container_id`,
+    });
   }
 }
 
 // The pure checker. `ledgerRows` are bank_ledger rows (snake_case, id-ascending
 // preferred but re-sorted here); `characters` are { id, realm, state } records.
 // Returns findings [{ container, realm, characterId, kind, detail }].
-export function auditBank({ ledgerRows, characters }) {
+export function auditBank({ ledgerRows, characters, guildBanks }) {
   const findings = [];
   const rows = [...ledgerRows].sort((a, b) => Number(a.id) - Number(b.id));
 
   // A) Per-row shape checks.
   for (const row of rows) checkRowShape(row, findings);
 
-  // Group id-ascending rows by container + character.
+  // Group id-ascending rows: personal per character, guild per GUILD
+  // (container_id), because guild item conservation only holds across the
+  // whole anonymous pipe, never per depositing character.
   const groups = new Map();
   for (const row of rows) {
     const container = row.container ?? 'personal';
-    const key = `${container}::${row.character_id}`;
+    const key =
+      container === 'guild' ? `guild::${row.container_id}` : `${container}::${row.character_id}`;
     let group = groups.get(key);
     if (!group) {
-      group = { container, characterId: row.character_id, realm: row.realm, rows: [] };
+      group =
+        container === 'guild'
+          ? {
+              container,
+              characterId: null,
+              guildId: row.container_id == null ? null : Number(row.container_id),
+              realm: row.realm,
+              rows: [],
+            }
+          : { container, characterId: row.character_id, realm: row.realm, rows: [] };
       groups.set(key, group);
     }
     group.rows.push(row);
@@ -143,9 +226,27 @@ export function auditBank({ ledgerRows, characters }) {
   const personalNet = new Map();
   const personalFinalPurchased = new Map();
 
+  // Guild-container replay results, keyed by guild id.
+  const guildNet = new Map();
+  const guildTreasury = new Map();
+  const guildFinalPurchased = new Map();
+  const guildRealm = new Map();
+
   // B) Per-group monotonicity + conservation replay.
   for (const group of groups.values()) {
-    const base = { container: group.container, realm: group.realm, characterId: group.characterId };
+    const base =
+      group.container === 'guild'
+        ? {
+            container: group.container,
+            realm: group.realm,
+            characterId: null,
+            guildId: group.guildId,
+          }
+        : {
+            container: group.container,
+            realm: group.realm,
+            characterId: group.characterId,
+          };
 
     let prevPurchased = null;
     let finalPurchased = null;
@@ -184,6 +285,35 @@ export function auditBank({ ledgerRows, characters }) {
     if (group.container === 'personal') {
       personalNet.set(group.characterId, net);
       personalFinalPurchased.set(group.characterId, finalPurchased);
+    }
+
+    if (group.container === 'guild') {
+      // Treasury replay: deposit_gold, withdraw_gold, and buy_slots all move
+      // TREASURY copper; create_fee moved the founder's purse and is excluded.
+      // The running balance must never fall below zero: more copper leaving
+      // the treasury than ever entered it is a dupe/corruption signature.
+      let treasury = 0;
+      let flaggedTreasury = false;
+      for (const row of group.rows) {
+        if (row.op !== 'deposit_gold' && row.op !== 'withdraw_gold' && row.op !== 'buy_slots') {
+          continue;
+        }
+        treasury += Number(row.copper_delta);
+        if (treasury < 0 && !flaggedTreasury) {
+          flaggedTreasury = true;
+          findings.push({
+            ...base,
+            kind: 'negative_treasury',
+            detail: `treasury fell to ${treasury} at row ${row.id}: more copper left than ever entered`,
+          });
+        }
+      }
+      if (group.guildId != null) {
+        guildNet.set(group.guildId, net);
+        guildTreasury.set(group.guildId, treasury);
+        guildFinalPurchased.set(group.guildId, finalPurchased);
+        guildRealm.set(group.guildId, group.realm);
+      }
     }
   }
 
@@ -241,6 +371,79 @@ export function auditBank({ ledgerRows, characters }) {
     }
   }
 
+  // D) State reconciliation for the guild container, when the guild_banks
+  // records are provided ({ guild_id, realm, data }). Guild banks are
+  // birth-complete too (the table ships with the ledger's guild rows; every
+  // book starts empty), so ledger replay must match the persisted book. A
+  // guild with rows but NO book row is a disbanded guild: items and treasury
+  // reconcile against an EMPTY book (the disband guard proved both were zero),
+  // while the purchased reconciliation is skipped (expansions legitimately
+  // survive to the last row). A book with contents but no ledger activity is
+  // the same corruption signature as the personal container's case above.
+  if (guildBanks) {
+    const bookByGuild = new Map();
+    for (const rec of guildBanks) bookByGuild.set(Number(rec.guild_id), rec);
+    const guildIds = new Set([...guildNet.keys(), ...bookByGuild.keys()]);
+    for (const guildId of guildIds) {
+      const rec = bookByGuild.get(guildId) ?? null;
+      const base = {
+        container: 'guild',
+        realm: rec?.realm ?? guildRealm.get(guildId) ?? '',
+        characterId: null,
+        guildId,
+      };
+      let book = rec?.data ?? null;
+      if (typeof book === 'string') {
+        try {
+          book = JSON.parse(book);
+        } catch {
+          book = null;
+        }
+      }
+      if (!book || typeof book !== 'object') book = null;
+      const effective = book ?? { treasury: 0, inventory: [], purchasedSlots: 0 };
+
+      const net = guildNet.get(guildId) ?? new Map();
+      const stateM = stateMultiset(effective);
+      const keys = new Set([...net.keys(), ...stateM.keys()]);
+      for (const key of keys) {
+        const ledgerCount = net.get(key) ?? 0;
+        const stateCount = stateM.get(key) ?? 0;
+        if (ledgerCount !== stateCount) {
+          findings.push({
+            ...base,
+            kind: 'ledger_state_mismatch',
+            detail: `item ${itemIdFromKey(key)}: ledger net ${ledgerCount} does not match guild book ${stateCount}`,
+          });
+        }
+      }
+
+      const ledgerTreasury = guildTreasury.get(guildId) ?? 0;
+      const stateTreasury = Number(effective.treasury ?? 0);
+      if (ledgerTreasury !== stateTreasury) {
+        findings.push({
+          ...base,
+          kind: 'treasury_mismatch',
+          detail: `ledger treasury replay ${ledgerTreasury} does not match guild book treasury ${stateTreasury}`,
+        });
+      }
+
+      if (rec) {
+        const finalPurchased = guildFinalPurchased.get(guildId);
+        if (finalPurchased != null) {
+          const statePurchased = Number(effective.purchasedSlots ?? 0);
+          if (statePurchased !== finalPurchased) {
+            findings.push({
+              ...base,
+              kind: 'purchased_mismatch',
+              detail: `final ledger purchased_slots_after ${finalPurchased} does not match guild book purchasedSlots ${statePurchased}`,
+            });
+          }
+        }
+      }
+    }
+  }
+
   return findings;
 }
 
@@ -258,8 +461,11 @@ export function formatReport(ledgerRows, findings) {
     lines.push(`container ${container}: ledger rows ${rowCount}: findings ${findingCount}`);
   }
   for (const finding of findings) {
+    // Guild findings name the guild (the group key); personal ones the character.
+    const who =
+      finding.guildId != null ? `guild ${finding.guildId}` : `character ${finding.characterId}`;
     lines.push(
-      `FINDING: container ${finding.container}: realm ${finding.realm}: character ${finding.characterId}: ${finding.kind}: ${finding.detail}`,
+      `FINDING: container ${finding.container}: realm ${finding.realm}: ${who}: ${finding.kind}: ${finding.detail}`,
     );
   }
   if (findings.length === 0) lines.push('OK: no shape or conservation anomalies found.');
@@ -289,7 +495,9 @@ async function main() {
     );
     const chars = await pool.query('SELECT id, realm, state FROM characters');
     const characters = chars.rows.map((r) => ({ id: r.id, realm: r.realm, state: r.state }));
-    const findings = auditBank({ ledgerRows: ledger.rows, characters });
+    // Guild books for the guild-container reconciliation (Guild Bank Phase 3).
+    const banks = await pool.query('SELECT guild_id, realm, data FROM guild_banks');
+    const findings = auditBank({ ledgerRows: ledger.rows, characters, guildBanks: banks.rows });
     console.log(formatReport(ledger.rows, findings));
     process.exitCode = findings.length > 0 ? 1 : 0;
   } finally {
