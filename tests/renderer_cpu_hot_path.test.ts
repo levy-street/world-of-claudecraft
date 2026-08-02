@@ -121,4 +121,11 @@ describe('renderer CPU hot path', () => {
     expect(nameplates).toContain('name === v.nameplateStaticName');
     expect(nameplates).not.toContain("e.auras.some((a) => a.kind === 'stealth')");
   });
+  it('sleeps cosmetic character FX outside the actionable pose carve-out', () => {
+    expect(renderer).toContain(
+      'const runCharacterFx = shouldRunCharacterFx(charOnScreen, actionablePose);',
+    );
+    expect(renderer).toContain('if (runCharacterFx) {\n        this.abilityVfx.syncEntity(e);');
+    expect(renderer).toContain("this.vfx.formAura(e.id, 'metamorph', dt)");
+  });
 });
