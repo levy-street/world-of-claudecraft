@@ -1,6 +1,6 @@
 # Guild Social v1: cross-phase state
 
-Current phase: Phase 1 (not started).
+Current phase: Phase 1 complete (2026-08-02); Phase 1 QA next.
 
 ## Locked design decisions
 - Base branch `release/v0.34.0`; branch `feature/guild-social-v1`; this PR lands BEFORE the
@@ -55,10 +55,18 @@ Current phase: Phase 1 (not started).
   `tests/social_window.test.ts`, `tests/social_frames.test.ts`.
 
 ## Ledger (fill in as phases complete)
-- New files: (none yet)
+- New files: `src/ui/guild_motd_login.ts` (pure decision helper `decideGuildMotdLine`),
+  `tests/guild_motd_login.test.ts`.
 - New wire fields: (Phase 2 will add `joinedAt` to the guild member row of the social frame)
-- New i18n keys: (none yet)
+- New i18n keys: `hudChrome.social.billboard.loginLine` ('Guild billboard: {text}'), plus
+  its five M16 non-Latin overlay fills (ja_JP, ko_KR, ru_RU, zh_CN, zh_TW) in the same
+  change; generated i18n artifacts regenerated via `npm run i18n:gen`.
 - New server literals + DICT rows: (none yet)
+- Phase 1 wiring: `Hud.updateGuildBillboardEcho()` on the `Hud.update()` slow band (row
+  registered in `tests/hud_update_drive.test.ts`), latch field `Hud.lastShownGuildMotd`,
+  appended to the chat log on the `guild` channel with `chatChannelColor('guild')`.
+  The module is registered in `UI_PURE_CORES` + `BARE_NAMED` + `EXPECTED_BARE_NAMED`
+  (`tests/architecture.test.ts`).
 
 ## Known gotchas
 - The social snapshot is re-pushed on ANY social change; the login-line module must key off
