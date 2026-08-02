@@ -33,7 +33,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { addBoxMesh, plankedSlabBoxes, removeTrianglesInBox } from '../lib/glb_edit.mjs';
+import { addBoxMesh, cutTrianglesInBox, plankedSlabBoxes } from '../lib/glb_edit.mjs';
 import { documentTriangles, glbIO } from '../lib/glb_geometry.mjs';
 import {
   buildColumnIndex,
@@ -121,6 +121,24 @@ export const FERRY_BUILD = Object.freeze({
 
   /** A rail run is this thick, matching the harbour's own railing colliders. */
   railHalfThickness: 0.14,
+
+  /** The wooden mast step clad over each mast's base. The art bakes deep
+   *  shadow into the collar there (near-black albedo that reads as a hole in
+   *  the deck under game lighting), so the base gets the same treatment as
+   *  the floor: honest carpentry in the deck's own tones. Position and
+   *  footprint are MEASURED off the mast obstacle; only the step's margins
+   *  and height are authored intent. */
+  mastStep: Object.freeze({
+    /** Obstacles no wider than this (in world yards) are mast-like; the long
+     *  thin pin-rail rows along the bulwarks stay untouched. */
+    maxObstacleHalfWidth: 1.3,
+    baseMargin: 0.45,
+    baseHeight: 1.15,
+    capMargin: 0.22,
+    capHeight: 1.35,
+    /** Sink the base slightly below the laid deck so no seam shows. */
+    sink: 0.1,
+  }),
 });
 
 /**
@@ -201,8 +219,7 @@ function bandDeck(stations, fromX, toX, bandLength, mergeTolerance, sideMargin) 
 function reserveOpening(bands, openingMinX, openingMaxX) {
   const owner = bands.find(
     (band) =>
-      (openingMinX + openingMaxX) / 2 >= band.fromX &&
-      (openingMinX + openingMaxX) / 2 <= band.toX,
+      (openingMinX + openingMaxX) / 2 >= band.fromX && (openingMinX + openingMaxX) / 2 <= band.toX,
   );
   if (!owner) return bands;
   const kept = [];
@@ -300,7 +317,10 @@ export async function buildGrandFerry() {
     hd: snap(band.halfSpan),
     y: deckY,
   }));
-  report.clearance = clearance.map((s) => ({ x: snap(s.x * scale), span: snap(s.halfSpan * scale) }));
+  report.clearance = clearance.map((s) => ({
+    x: snap(s.x * scale),
+    span: snap(s.halfSpan * scale),
+  }));
   report.deckRects = deckRects;
 
   // ---- 2. edit: deck her, then open the bulwark for the gangplank ----------
@@ -347,9 +367,12 @@ export async function buildGrandFerry() {
   if (bulwarkTop === null) throw new Error('ferry survey found no port bulwark at the gangway');
   report.bulwarkTop = bulwarkTop;
   // The cut spans from the deck up past the measured cap and outward through
-  // the hull skin, so the opening is clear rather than merely thinned.
+  // the hull skin, so the opening is clear rather than merely thinned. It
+  // CLIPS straddling triangles exactly against the box: the centroid test
+  // used before let the surviving half of a long art quad span the opening
+  // as a stretched sliver (the owner-inspection spikes and pale strands).
   const cutTop = bulwarkTop + world(0.6);
-  const removed = removeTrianglesInBox(document, {
+  const cut = cutTrianglesInBox(document, {
     x: gangwayX,
     y: (deckY + cutTop) / 2,
     z: -(gangwayRect.hd + pristineBounds.max[2]) / 2,
@@ -357,8 +380,71 @@ export async function buildGrandFerry() {
     hh: (cutTop - deckY) / 2,
     hd: (pristineBounds.max[2] - gangwayRect.hd) / 2 + world(0.5),
   });
-  if (removed === 0) throw new Error('gangway cut removed nothing: the opening would be closed');
-  report.gangwayTrianglesRemoved = removed;
+  if (cut.removed === 0) {
+    throw new Error('gangway cut removed nothing: the opening would be closed');
+  }
+  report.gangwayTrianglesRemoved = cut.removed;
+  report.gangwayTrianglesClipped = cut.clipped;
+
+  // ---- 2b. clad each mast base in a wooden step -----------------------------
+  // Measured off the decked-and-cut hull so the mast obstacles are exactly the
+  // clusters the collision plan will see; the cladding then joins those
+  // clusters and the final measurement widens the obstacle to match the step.
+  const preCladMeasurement = measureMesh(documentTriangles(document), {
+    gridStep: step,
+    headroom: world(FERRY_BUILD.probe.headroom),
+    bodyWidth: world(FERRY_BUILD.probe.bodyWidth),
+    levelTolerance: world(FERRY_BUILD.probe.levelTolerance),
+    maxRectsPerLevel: 6,
+    minLevelCells: 10,
+  });
+  const mastObstacles = deckRects
+    .flatMap((rect) =>
+      measureFootprintObstacles(preCladMeasurement, rect, {
+        tolerance: world(0.35),
+        maxRects: 4,
+        minCells: 3,
+      }),
+    )
+    .filter(
+      (obstacle) =>
+        obstacle.hw <= world(FERRY_BUILD.mastStep.maxObstacleHalfWidth) &&
+        obstacle.hd <= world(FERRY_BUILD.mastStep.maxObstacleHalfWidth),
+    );
+  if (mastObstacles.length === 0) {
+    throw new Error('mast step cladding found no mast-like deck obstacle');
+  }
+  const stepSpec = FERRY_BUILD.mastStep;
+  const mastStepBoxes = mastObstacles.flatMap((mast) => {
+    const baseBottom = deckY - world(stepSpec.sink);
+    const baseTop = deckY + world(stepSpec.baseHeight);
+    const capTop = baseTop + world(stepSpec.capHeight);
+    return [
+      {
+        x: mast.x,
+        y: (baseBottom + baseTop) / 2,
+        z: mast.z,
+        hw: mast.hw + world(stepSpec.baseMargin),
+        hh: (baseTop - baseBottom) / 2,
+        hd: mast.hd + world(stepSpec.baseMargin),
+        color: FERRY_BUILD.deck.tones[1],
+      },
+      {
+        x: mast.x,
+        y: (baseTop + capTop) / 2,
+        z: mast.z,
+        hw: mast.hw + world(stepSpec.capMargin),
+        hh: (capTop - baseTop) / 2,
+        hd: mast.hd + world(stepSpec.capMargin),
+        color: FERRY_BUILD.deck.tones[0],
+      },
+    ];
+  });
+  addBoxMesh(document, 'GrandFerryMastStep', mastStepBoxes, { roughness: 0.9, metalness: 0 });
+  report.mastSteps = mastObstacles.map((mast) => ({
+    x: snap(mast.x * scale),
+    z: snap(mast.z * scale),
+  }));
 
   // ---- 3. measure the edited result ----------------------------------------
   const edited = documentTriangles(document);
@@ -487,9 +573,7 @@ function assemblePlan({
   // box reaches out over open water beside the taper, where it blocks nothing
   // real but does occlude sight lines the cinematic linter checks.
   const endBlock = (id, kind, from, to) => {
-    const span = stations.filter(
-      (station) => station.x >= from - 1e-9 && station.x <= to + 1e-9,
-    );
+    const span = stations.filter((station) => station.x >= from - 1e-9 && station.x <= to + 1e-9);
     if (span.length < 2) return;
     // Camera height for a solid end comes off the highest DECK LEVEL over it
     // (a sterncastle is real structure the camera must not enter), never off

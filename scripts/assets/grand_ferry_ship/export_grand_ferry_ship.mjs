@@ -41,9 +41,9 @@ if (verifyStaged && rawOnly) {
   throw new Error('--verify-staged cannot be combined with --raw-only');
 }
 
-/** The deck the build lays is the one mesh this pipeline generates; the rest
- *  is the artist's. Both must survive to the shipped file. */
-const REQUIRED_MESHES = Object.freeze(['GrandFerryDeck']);
+/** The deck and mast steps the build lays are the meshes this pipeline
+ *  generates; the rest is the artist's. All must survive to the shipped file. */
+const REQUIRED_MESHES = Object.freeze(['GrandFerryDeck', 'GrandFerryMastStep']);
 const TRIANGLE_CEILING = 12_000;
 const SHIPPING_BYTE_CEILING = 320 * 1024;
 

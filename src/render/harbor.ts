@@ -33,6 +33,14 @@ import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
 import { GFX, surfaceMat } from './gfx';
 import {
+  boardingJunctionRects,
+  bridgeRailCapOverhang,
+  bridgeVisualRect,
+  junctionPlankBoxes,
+  RAIL_CAP_OVERHANG_YARDS,
+  type RailCapOverhang,
+} from './harbor_boarding_junction_core';
+import {
   type HarborDeckRiderResolution,
   harborDeckRiderMidInteraction,
   missingDeckRiderWarning,
@@ -169,33 +177,44 @@ function addAsset(
 // the deck's length), staggered joints, alternating tones; a darker skirt
 // beam around the rim and pilings down into the water. The boarding bridge
 // passes withPilings false: it is a suspended brow onto the hull, so posts
-// dangling against the ship's side would read as a mistake.
-function buildDeck(wood: WoodBuckets, deck: HarborDeck, seed: number, withPilings = true): void {
-  const alongX = deck.hw >= deck.hd; // boards run along the longer axis
-  const runHalf = alongX ? deck.hw : deck.hd;
-  const acrossHalf = alongX ? deck.hd : deck.hw;
-  const rows = Math.max(1, Math.round((acrossHalf * 2) / BOARD_PITCH));
-  const rowPitch = (acrossHalf * 2) / rows;
-  for (let r = 0; r < rows; r++) {
-    const across = -acrossHalf + rowPitch * (r + 0.5);
-    const stagger = (r % 3) * (BOARD_MAX_LEN / 3);
-    for (let start = -runHalf - stagger; start < runHalf; start += BOARD_MAX_LEN) {
-      const s = Math.max(start, -runHalf);
-      const e = Math.min(start + BOARD_MAX_LEN - 0.06, runHalf);
-      if (e - s < 0.3) continue;
-      const mid = (s + e) / 2;
-      const tone = BOARD_TONES[(r + Math.round((start + runHalf) / BOARD_MAX_LEN)) % 3];
-      const bx = deck.x + (alongX ? mid : across);
-      const bz = deck.z + (alongX ? across : mid);
-      wood.box(
-        tone,
-        alongX ? e - s : rowPitch - 0.04,
-        BOARD_THICK,
-        alongX ? rowPitch - 0.04 : e - s,
-        bx,
-        deck.y - BOARD_THICK / 2,
-        bz,
-      );
+// dangling against the ship's side would read as a mistake. The boarding
+// junction rects pass withBoards false: their boards come from the shared
+// aligned field (harbor_boarding_junction_core), and this keeps only their
+// skirts and pilings.
+function buildDeck(
+  wood: WoodBuckets,
+  deck: HarborDeck,
+  seed: number,
+  withPilings = true,
+  withBoards = true,
+): void {
+  if (withBoards) {
+    const alongX = deck.hw >= deck.hd; // boards run along the longer axis
+    const runHalf = alongX ? deck.hw : deck.hd;
+    const acrossHalf = alongX ? deck.hd : deck.hw;
+    const rows = Math.max(1, Math.round((acrossHalf * 2) / BOARD_PITCH));
+    const rowPitch = (acrossHalf * 2) / rows;
+    for (let r = 0; r < rows; r++) {
+      const across = -acrossHalf + rowPitch * (r + 0.5);
+      const stagger = (r % 3) * (BOARD_MAX_LEN / 3);
+      for (let start = -runHalf - stagger; start < runHalf; start += BOARD_MAX_LEN) {
+        const s = Math.max(start, -runHalf);
+        const e = Math.min(start + BOARD_MAX_LEN - 0.06, runHalf);
+        if (e - s < 0.3) continue;
+        const mid = (s + e) / 2;
+        const tone = BOARD_TONES[(r + Math.round((start + runHalf) / BOARD_MAX_LEN)) % 3];
+        const bx = deck.x + (alongX ? mid : across);
+        const bz = deck.z + (alongX ? across : mid);
+        wood.box(
+          tone,
+          alongX ? e - s : rowPitch - 0.04,
+          BOARD_THICK,
+          alongX ? rowPitch - 0.04 : e - s,
+          bx,
+          deck.y - BOARD_THICK / 2,
+          bz,
+        );
+      }
     }
   }
   // skirt beams under the deck rim
@@ -224,7 +243,15 @@ function buildDeck(wood: WoodBuckets, deck: HarborDeck, seed: number, withPiling
 
 // A railing run over its collider segment: chunky posts, a wide flat cap
 // rail, and a mid rail. rot 0 runs along world x, Math.PI / 2 along world z.
-function buildRail(wood: WoodBuckets, rail: HarborRail, deckY: number): void {
+// The cap overhangs its post run at both ends by default; the boarding
+// bridge's rails pass a one-sided overhang so nothing floats naked over the
+// water gap at the hull end.
+function buildRail(
+  wood: WoodBuckets,
+  rail: HarborRail,
+  deckY: number,
+  capOverhang: RailCapOverhang | null = null,
+): void {
   const len = rail.hw * 2;
   const nPosts = Math.max(2, Math.ceil(len / 2.0) + 1);
   for (let i = 0; i < nPosts; i++) {
@@ -233,14 +260,20 @@ function buildRail(wood: WoodBuckets, rail: HarborRail, deckY: number): void {
     const pz = rail.rot === 0 ? rail.z : rail.z + t;
     wood.box(POST_TONE, 0.2, HARBOR_RAIL_HEIGHT, 0.2, px, deckY + HARBOR_RAIL_HEIGHT / 2, pz);
   }
+  const overhang = capOverhang ?? {
+    negative: RAIL_CAP_OVERHANG_YARDS,
+    positive: RAIL_CAP_OVERHANG_YARDS,
+  };
+  const capLen = len + overhang.negative + overhang.positive;
+  const capShift = (overhang.positive - overhang.negative) / 2;
   wood.box(
     BOARD_TONES[0],
-    rail.rot === 0 ? len + 0.24 : 0.26,
+    rail.rot === 0 ? capLen : 0.26,
     0.09,
-    rail.rot === 0 ? 0.26 : len + 0.24,
-    rail.x,
+    rail.rot === 0 ? 0.26 : capLen,
+    rail.x + (rail.rot === 0 ? capShift : 0),
     deckY + HARBOR_RAIL_HEIGHT + 0.045,
-    rail.z,
+    rail.z + (rail.rot === 0 ? 0 : capShift),
   );
   wood.box(
     POST_TONE,
@@ -728,9 +761,34 @@ export function buildHarbors(seed: number, deps: HarborSceneDeps): { group: THRE
     const g = new THREE.Group();
     const wood = new WoodBuckets();
     rampMeshes = [];
-    for (const deck of harbor.decks) buildDeck(wood, deck, seed, deck !== harbor.bridge);
+    // The boarding junction (berth-head rects + bridge) draws its boards as
+    // ONE aligned field so the crossing reads as a single deck; buildDeck
+    // keeps contributing their skirts and pilings. The bridge's skirt wraps
+    // the visually extended rect that seats the brow into the hull.
+    const junctionRects = boardingJunctionRects(harbor);
+    for (const deck of harbor.decks) {
+      const junction = junctionRects.includes(deck);
+      const skirtRect = deck === harbor.bridge ? bridgeVisualRect(harbor) : deck;
+      buildDeck(wood, skirtRect, seed, deck !== harbor.bridge, !junction);
+    }
+    for (const box of junctionPlankBoxes(harbor, {
+      pitch: BOARD_PITCH,
+      thickness: BOARD_THICK,
+      maxLength: BOARD_MAX_LEN,
+      groove: 0.03,
+      jointGap: 0.06,
+      tones: BOARD_TONES,
+      trimTone: TRIM_TONE,
+    })) {
+      wood.box(box.tone, box.w, box.h, box.d, box.x, box.y, box.z);
+    }
     for (const rail of harbor.rails) {
-      buildRail(wood, rail, harborSurfaceHeight(harbor, rail.x, rail.z));
+      buildRail(
+        wood,
+        rail,
+        harborSurfaceHeight(harbor, rail.x, rail.z),
+        bridgeRailCapOverhang(harbor, rail),
+      );
     }
     for (const ramp of harbor.ramps) buildRamp(wood, ramp);
     for (const d of harbor.dressing) {

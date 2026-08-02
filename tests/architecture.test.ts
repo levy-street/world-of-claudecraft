@@ -451,6 +451,7 @@ const RENDER_PURE_CORES = [
   'src/render/camera_director_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
+  'src/render/harbor_boarding_junction_core.ts',
   'src/render/harbor_deck_rider_core.ts',
   'src/render/harbor_deck_stand_in_core.ts',
   'src/render/harbor_ship_attach_core.ts',
