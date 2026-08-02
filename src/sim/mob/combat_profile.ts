@@ -11,6 +11,7 @@ import {
   LEASH_DISTANCE,
   steadyAngleTo,
 } from '../types';
+import { chainPullTransitHoldsLeash, clearChainPullInbound } from './chain_pull_transit';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
 import { chaseStalledUnreachable } from './reachability';
 import { retargetMob, updateMobTarget } from './targeting';
@@ -31,6 +32,7 @@ function startEvadeHome(mob: Entity): void {
   mob.aggroTargetId = null;
   clearThreat(mob);
   mob.leashAnchor = null;
+  clearChainPullInbound(mob);
   mob.castingAbility = null;
   mob.castTotal = 0;
   mob.castRemaining = 0;
@@ -98,7 +100,16 @@ export function updateMobCombatProfile(
       mob.fleeReturnTimer = Math.max(0, mob.fleeReturnTimer - DT);
       if (dist2d(mob.pos, leashAnchor) <= leash - 1) mob.fleeReturnTimer = 0;
     }
-    if (dist2d(mob.pos, leashAnchor) > leash && mob.fleeReturnTimer <= 0) {
+    // A chain-pulled mob answering the call from the far end of the instance
+    // starts OUTSIDE its own leash sphere by design (the pull anchors it on the
+    // puller), so the soft leash is suspended until it arrives. Evaluated
+    // unconditionally, like the flee grace above: the call is what SPENDS the
+    // grace on the arrival tick, so short-circuiting it past the distance test
+    // would leave an arrived mob permanently unleashed. It holds nothing else,
+    // so the hard tether above and the stall postlude below still apply. See
+    // mob/chain_pull_transit.ts.
+    const inTransit = chainPullTransitHoldsLeash(mob, leashAnchor, leash);
+    if (dist2d(mob.pos, leashAnchor) > leash && mob.fleeReturnTimer <= 0 && !inTransit) {
       startEvadeHome(mob);
       return 'done';
     }
