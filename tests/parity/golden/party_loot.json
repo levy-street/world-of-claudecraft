@@ -8,12 +8,12 @@
     "multi-player party"
   ],
   "draws": 2,
-  "drawDigest": "686de655",
+  "drawDigest": "1bc57503",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 900,
+      "nextId": 924,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,12 +27,12 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 903,
-      "state": "7c6cdb3d",
-      "events": "1eabcd66",
+      "nextId": 927,
+      "state": "d2111c0f",
+      "events": "740e821e",
       "rng": {
         "draws": 2,
-        "digest": "686de655"
+        "digest": "1bc57503"
       },
       "label": "final",
       "players": [
@@ -74,7 +74,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 900,
+          "entityId": 924,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -139,7 +139,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 901,
+          "entityId": 925,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -179,7 +179,7 @@
               "name": "Battle Stance",
               "remaining": 3599.85,
               "school": "physical",
-              "sourceId": 900
+              "sourceId": 924
             }
           ],
           "blockChance": 0.05,
@@ -192,7 +192,7 @@
           "fallStartY": 0.954697,
           "fiveSecondRule": 99.15,
           "hp": 100,
-          "id": 900,
+          "id": 924,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -242,7 +242,7 @@
           "fallStartY": 0.774854,
           "fiveSecondRule": 99.15,
           "hp": 54,
-          "id": 901,
+          "id": 925,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -294,7 +294,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 902,
+          "id": 926,
           "kind": "mob",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -319,7 +319,7 @@
           "stats": {
             "armor": 10
           },
-          "tappedById": 900,
+          "tappedById": 924,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,

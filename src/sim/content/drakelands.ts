@@ -831,6 +831,20 @@ export const DRAKELANDS_BROOD_CAMPS: CampDef[] = [
   { mobId: 'dragonkin_broodguard', center: { x: 302, z: 2302 }, radius: 9, count: 3 },
   { mobId: 'dragonkin_broodguard', center: { x: 268, z: 2252 }, radius: 8, count: 2 },
   { mobId: 'dragonkin_broodguard', center: { x: 438, z: 2384 }, radius: 8, count: 2 },
+  // Guard clutches (playtest wave 2, appended at this list's tail so every
+  // camp above keeps its world-gen draws): a loose scatter of eggs beside
+  // each broodguard patrol, so the guards walk among shells and a fight in
+  // the pack risks waking hatchlings. Centers sit offset from the patrols
+  // AND clear of the road lines (the crater-rim, north-rim, and dune-fork
+  // legs), so no walk-by pops them; the guards themselves never can (only a
+  // player inside proximityRadius springs a shell).
+  { mobId: 'dragonkin_egg', center: { x: 372, z: 2242 }, radius: 7, count: 4 },
+  { mobId: 'dragonkin_egg', center: { x: 401, z: 2303 }, radius: 7, count: 4 },
+  { mobId: 'dragonkin_egg', center: { x: 344, z: 2286 }, radius: 6, count: 3 },
+  { mobId: 'dragonkin_egg', center: { x: 421, z: 2334 }, radius: 7, count: 3 },
+  { mobId: 'dragonkin_egg', center: { x: 306, z: 2308 }, radius: 7, count: 4 },
+  { mobId: 'dragonkin_egg', center: { x: 264, z: 2258 }, radius: 7, count: 3 },
+  { mobId: 'dragonkin_egg', center: { x: 441, z: 2380 }, radius: 7, count: 3 },
 ];
 
 export const DRAKELANDS_PROPS: ZonePropsDef = {

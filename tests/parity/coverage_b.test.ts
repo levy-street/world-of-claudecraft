@@ -207,8 +207,9 @@ describe('coverage: each scenario fires its subsystem', () => {
     // tie-break's winner moved, because this branch's content shifts the shared rng
     // and not master-loot logic itself.
     // Re-seeded 1326 -> 1077 by the dragonkin brood rework (appended world-gen
-    // camps, same class of shift): the rollers level at 95, d below at 93.
-    expect(needRolls).toEqual([95, 95, 93]); // b and c tie at the top, d below
+    // camps, same class of shift), then 1077 -> 3073 by its second content
+    // wave (the broodguard clutches): the rollers level at 38, d below at 28.
+    expect(needRolls).toEqual([38, 38, 28]); // b and c tie at the top, d below
     // The tie-break picked b, and that outcome is the one observable effect of the
     // master-loot-only draw, so it is pinned by name and by winning roll. WHICH of
     // the tied rollers wins is the rng's call and may move with the seed; that a

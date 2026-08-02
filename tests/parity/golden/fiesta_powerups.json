@@ -8,13 +8,13 @@
     "hazard ring burn (fiestaRingDamage) outside the closing ring",
     "down + respawn-timer revive (fiestaRevive)"
   ],
-  "draws": 5157,
-  "drawDigest": "cf470e30",
+  "draws": 5200,
+  "drawDigest": "321d94e6",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 900,
+      "nextId": 924,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 904,
-      "state": "c1e13d64",
-      "events": "051909b5",
+      "nextId": 928,
+      "state": "6a609be2",
+      "events": "ea31287b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 904,
-      "state": "c1af69a9",
-      "events": "cbcd3d39",
+      "nextId": 928,
+      "state": "5fa2ec23",
+      "events": "23c7887d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -50,9 +50,9 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 904,
-      "state": "dea109dd",
-      "events": "2bc7a75d",
+      "nextId": 928,
+      "state": "e1ec22c7",
+      "events": "fceff5a5",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -61,8 +61,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 904,
-      "state": "6254529e",
+      "nextId": 928,
+      "state": "6e8feb2c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,595 +72,595 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 904,
-      "state": "7ed5a854",
-      "events": "a539a025",
+      "nextId": 928,
+      "state": "7926f21e",
+      "events": "f4eefb25",
       "rng": {
-        "draws": 66,
-        "digest": "b74c61a4"
+        "draws": 68,
+        "digest": "24c06996"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 904,
-      "state": "e55b3213",
+      "nextId": 928,
+      "state": "9a6d1749",
       "events": "741638a5",
       "rng": {
-        "draws": 141,
-        "digest": "2f808abc"
+        "draws": 143,
+        "digest": "a7f7032c"
       }
     },
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 904,
-      "state": "977f56d3",
-      "events": "df23b0d5",
+      "nextId": 928,
+      "state": "3db557e9",
+      "events": "e94d716d",
       "rng": {
         "draws": 236,
-        "digest": "fe313a75"
+        "digest": "d1a1b37e"
       }
     },
     {
       "tick": 80,
       "time": 4,
-      "nextId": 904,
-      "state": "81afe1a4",
+      "nextId": 928,
+      "state": "b1e60806",
       "events": "741638a5",
       "rng": {
-        "draws": 343,
-        "digest": "c48c5bfc"
+        "draws": 333,
+        "digest": "ede0238e"
       }
     },
     {
       "tick": 90,
       "time": 4.5,
-      "nextId": 904,
-      "state": "7b4b8512",
-      "events": "464ea985",
+      "nextId": 928,
+      "state": "5728d900",
+      "events": "d484652d",
       "rng": {
-        "draws": 443,
-        "digest": "c29c8c6d"
+        "draws": 446,
+        "digest": "d57dbbce"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 904,
-      "state": "bfbe8f51",
+      "nextId": 928,
+      "state": "184a4ba3",
       "events": "741638a5",
       "rng": {
-        "draws": 546,
-        "digest": "a78f3bb3"
+        "draws": 562,
+        "digest": "392da618"
       }
     },
     {
       "tick": 110,
       "time": 5.5,
-      "nextId": 904,
-      "state": "db00816d",
-      "events": "9198285f",
+      "nextId": 928,
+      "state": "96c04f77",
+      "events": "7dcad583",
       "rng": {
-        "draws": 665,
-        "digest": "501f2eb0"
+        "draws": 681,
+        "digest": "29bc92c9"
       }
     },
     {
       "tick": 120,
       "time": 6,
-      "nextId": 904,
-      "state": "6a7ec5fa",
+      "nextId": 928,
+      "state": "3f296fc8",
       "events": "741638a5",
       "rng": {
-        "draws": 775,
-        "digest": "42ce9981"
+        "draws": 799,
+        "digest": "114f3b11"
       }
     },
     {
       "tick": 130,
       "time": 6.5,
-      "nextId": 904,
-      "state": "f2dd5804",
+      "nextId": 928,
+      "state": "67818ffe",
       "events": "741638a5",
       "rng": {
-        "draws": 885,
-        "digest": "2c1b19ca"
+        "draws": 910,
+        "digest": "137728a3"
       }
     },
     {
       "tick": 140,
       "time": 7,
-      "nextId": 904,
-      "state": "3c96b5a3",
+      "nextId": 928,
+      "state": "4ca7a3f9",
       "events": "741638a5",
       "rng": {
-        "draws": 1008,
-        "digest": "ff1c33ef"
+        "draws": 1042,
+        "digest": "2f8629ba"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 904,
-      "state": "2a4f261f",
+      "nextId": 928,
+      "state": "0b182685",
       "events": "741638a5",
       "rng": {
-        "draws": 1145,
-        "digest": "1a94c68b"
+        "draws": 1181,
+        "digest": "f19c585a"
       }
     },
     {
       "tick": 160,
       "time": 8,
-      "nextId": 904,
-      "state": "0d670958",
+      "nextId": 928,
+      "state": "02433cca",
       "events": "741638a5",
       "rng": {
-        "draws": 1272,
-        "digest": "efd27b33"
+        "draws": 1332,
+        "digest": "f794c722"
       }
     },
     {
       "tick": 170,
       "time": 8.5,
-      "nextId": 904,
-      "state": "90b95782",
+      "nextId": 928,
+      "state": "a8661760",
       "events": "741638a5",
       "rng": {
-        "draws": 1409,
-        "digest": "e98d8c0c"
+        "draws": 1459,
+        "digest": "32ebad5e"
       }
     },
     {
       "tick": 180,
       "time": 9,
-      "nextId": 904,
-      "state": "8d147db9",
+      "nextId": 928,
+      "state": "b021326b",
       "events": "741638a5",
       "rng": {
-        "draws": 1538,
-        "digest": "67b9293f"
+        "draws": 1595,
+        "digest": "9d77b3f5"
       }
     },
     {
       "tick": 190,
       "time": 9.5,
-      "nextId": 904,
-      "state": "ffa2de75",
+      "nextId": 928,
+      "state": "e2af5617",
       "events": "741638a5",
       "rng": {
-        "draws": 1675,
-        "digest": "549ce6cd"
+        "draws": 1739,
+        "digest": "f625f8c1"
       }
     },
     {
       "tick": 200,
       "time": 10,
-      "nextId": 904,
-      "state": "fe9c0bee",
+      "nextId": 928,
+      "state": "593bcbf4",
       "events": "741638a5",
       "rng": {
-        "draws": 1813,
-        "digest": "c05ca699"
+        "draws": 1873,
+        "digest": "1bb26be0"
       }
     },
     {
       "tick": 210,
       "time": 10.5,
-      "nextId": 904,
-      "state": "6550045f",
+      "nextId": 928,
+      "state": "20aed335",
       "events": "741638a5",
       "rng": {
-        "draws": 1886,
-        "digest": "6a6bb399"
+        "draws": 1930,
+        "digest": "aa09dd15"
       }
     },
     {
       "tick": 220,
       "time": 11,
-      "nextId": 904,
-      "state": "0a3bb080",
+      "nextId": 928,
+      "state": "515ee5ba",
       "events": "741638a5",
       "rng": {
-        "draws": 1964,
-        "digest": "210c3130"
+        "draws": 1994,
+        "digest": "021b8675"
       }
     },
     {
       "tick": 230,
       "time": 11.5,
-      "nextId": 904,
-      "state": "111f58f4",
+      "nextId": 928,
+      "state": "fe695ade",
       "events": "741638a5",
       "rng": {
-        "draws": 2046,
-        "digest": "37f8364f"
+        "draws": 2089,
+        "digest": "86f4edb5"
       }
     },
     {
       "tick": 240,
       "time": 12,
-      "nextId": 904,
-      "state": "4f38a32b",
+      "nextId": 928,
+      "state": "3f74f0a9",
       "events": "741638a5",
       "rng": {
-        "draws": 2128,
-        "digest": "04e5aedc"
+        "draws": 2157,
+        "digest": "16916ceb"
       }
     },
     {
       "tick": 250,
       "time": 12.5,
-      "nextId": 904,
-      "state": "3186ea39",
+      "nextId": 928,
+      "state": "1fe29a23",
       "events": "741638a5",
       "rng": {
-        "draws": 2209,
-        "digest": "25ff242c"
+        "draws": 2249,
+        "digest": "7586252a"
       }
     },
     {
       "tick": 260,
       "time": 13,
-      "nextId": 904,
-      "state": "73223c2a",
+      "nextId": 928,
+      "state": "c02fd5c0",
       "events": "741638a5",
       "rng": {
-        "draws": 2280,
-        "digest": "451f36e0"
+        "draws": 2344,
+        "digest": "4055966c"
       }
     },
     {
       "tick": 270,
       "time": 13.5,
-      "nextId": 904,
-      "state": "ff8818e6",
-      "events": "c4b9d8e1",
+      "nextId": 928,
+      "state": "19bc1ccc",
+      "events": "b0883a79",
       "rng": {
-        "draws": 2362,
-        "digest": "aef6773c"
+        "draws": 2432,
+        "digest": "616ff043"
       }
     },
     {
       "tick": 280,
       "time": 14,
-      "nextId": 904,
-      "state": "ce6b18dd",
+      "nextId": 928,
+      "state": "06a8596f",
       "events": "741638a5",
       "rng": {
-        "draws": 2442,
-        "digest": "9e3002a5"
+        "draws": 2516,
+        "digest": "e54a6cc3"
       }
     },
     {
       "tick": 290,
       "time": 14.5,
-      "nextId": 904,
-      "state": "de25c62b",
+      "nextId": 928,
+      "state": "766e8db1",
       "events": "741638a5",
       "rng": {
-        "draws": 2526,
-        "digest": "a9897cf0"
+        "draws": 2601,
+        "digest": "0d62949d"
       }
     },
     {
       "tick": 300,
       "time": 15,
-      "nextId": 904,
-      "state": "2e872c34",
+      "nextId": 928,
+      "state": "6f18840e",
       "events": "741638a5",
       "rng": {
-        "draws": 2618,
-        "digest": "034a43cb"
+        "draws": 2691,
+        "digest": "99a71ecf"
       }
     },
     {
       "tick": 310,
       "time": 15.5,
-      "nextId": 904,
-      "state": "c0e88b60",
+      "nextId": 928,
+      "state": "4fa7e91a",
       "events": "741638a5",
       "rng": {
-        "draws": 2719,
-        "digest": "32d116cd"
+        "draws": 2792,
+        "digest": "1c8c36f6"
       }
     },
     {
       "tick": 320,
       "time": 16,
-      "nextId": 904,
-      "state": "e19e190f",
+      "nextId": 928,
+      "state": "e2db922d",
       "events": "741638a5",
       "rng": {
-        "draws": 2825,
-        "digest": "48cbbd1c"
+        "draws": 2896,
+        "digest": "686e0331"
       }
     },
     {
       "tick": 330,
       "time": 16.5,
-      "nextId": 904,
-      "state": "aa998ce1",
+      "nextId": 928,
+      "state": "1149976b",
       "events": "741638a5",
       "rng": {
-        "draws": 2910,
-        "digest": "2bfbbb53"
+        "draws": 3016,
+        "digest": "270b2824"
       }
     },
     {
       "tick": 340,
       "time": 17,
-      "nextId": 904,
-      "state": "e2ed7ab2",
+      "nextId": 928,
+      "state": "d355f508",
       "events": "741638a5",
       "rng": {
-        "draws": 3006,
-        "digest": "8500361e"
+        "draws": 3106,
+        "digest": "acc681d4"
       }
     },
     {
       "tick": 350,
       "time": 17.5,
-      "nextId": 904,
-      "state": "5c701696",
+      "nextId": 928,
+      "state": "55d1f20c",
       "events": "741638a5",
       "rng": {
-        "draws": 3111,
-        "digest": "0c529e3d"
+        "draws": 3197,
+        "digest": "5210d71e"
       }
     },
     {
       "tick": 360,
       "time": 18,
-      "nextId": 904,
-      "state": "ecf5cb25",
+      "nextId": 928,
+      "state": "eb5d4697",
       "events": "741638a5",
       "rng": {
-        "draws": 3209,
-        "digest": "db1c7046"
+        "draws": 3285,
+        "digest": "d7d37641"
       }
     },
     {
       "tick": 370,
       "time": 18.5,
-      "nextId": 904,
-      "state": "464148a3",
+      "nextId": 928,
+      "state": "72ce02b1",
       "events": "741638a5",
       "rng": {
-        "draws": 3321,
-        "digest": "0016aa04"
+        "draws": 3372,
+        "digest": "1aa03db3"
       }
     },
     {
       "tick": 380,
       "time": 19,
-      "nextId": 904,
-      "state": "af033f44",
+      "nextId": 928,
+      "state": "d02fec66",
       "events": "741638a5",
       "rng": {
-        "draws": 3420,
-        "digest": "31231fa2"
+        "draws": 3470,
+        "digest": "c3579ac1"
       }
     },
     {
       "tick": 390,
       "time": 19.5,
-      "nextId": 904,
-      "state": "2240bbb0",
+      "nextId": 928,
+      "state": "73a368f2",
       "events": "741638a5",
       "rng": {
-        "draws": 3524,
-        "digest": "3b8cfcad"
+        "draws": 3560,
+        "digest": "4e889b7e"
       }
     },
     {
       "tick": 400,
       "time": 20,
-      "nextId": 904,
-      "state": "efa72257",
+      "nextId": 928,
+      "state": "5c65d79d",
       "events": "741638a5",
       "rng": {
-        "draws": 3616,
-        "digest": "a1387ae8"
+        "draws": 3643,
+        "digest": "d40f19b2"
       }
     },
     {
       "tick": 410,
       "time": 20.5,
-      "nextId": 904,
-      "state": "2c940e5c",
+      "nextId": 928,
+      "state": "3e15ef06",
       "events": "741638a5",
       "rng": {
-        "draws": 3701,
-        "digest": "b914a604"
+        "draws": 3743,
+        "digest": "7b285592"
       }
     },
     {
       "tick": 420,
       "time": 21,
-      "nextId": 904,
-      "state": "fe261587",
+      "nextId": 928,
+      "state": "e82b279d",
       "events": "741638a5",
       "rng": {
-        "draws": 3799,
-        "digest": "3c869303"
+        "draws": 3833,
+        "digest": "c5953bbf"
       }
     },
     {
       "tick": 430,
       "time": 21.5,
-      "nextId": 904,
-      "state": "1ed0585e",
-      "events": "d36046fb",
+      "nextId": 928,
+      "state": "d58c75b0",
+      "events": "2d8e184b",
       "rng": {
-        "draws": 3888,
-        "digest": "468214eb"
+        "draws": 3929,
+        "digest": "87b01487"
       }
     },
     {
       "tick": 440,
       "time": 22,
-      "nextId": 904,
-      "state": "aea31c36",
-      "events": "d36046fb",
+      "nextId": 928,
+      "state": "d35b095c",
+      "events": "2d8e184b",
       "rng": {
-        "draws": 3969,
-        "digest": "f85e250a"
+        "draws": 4005,
+        "digest": "d6d35ee8"
       }
     },
     {
       "tick": 450,
       "time": 22.5,
-      "nextId": 904,
-      "state": "9b5ff248",
-      "events": "5baf8236",
+      "nextId": 928,
+      "state": "7658477a",
+      "events": "3d5997f8",
       "rng": {
-        "draws": 4050,
-        "digest": "1ebbab5f"
+        "draws": 4091,
+        "digest": "73d3d6a3"
       }
     },
     {
       "tick": 460,
       "time": 23,
-      "nextId": 904,
-      "state": "074cbc46",
-      "events": "d36046fb",
+      "nextId": 928,
+      "state": "ca158a20",
+      "events": "2d8e184b",
       "rng": {
-        "draws": 4148,
-        "digest": "ccbd94b2"
+        "draws": 4167,
+        "digest": "6d2b9b74"
       }
     },
     {
       "tick": 470,
       "time": 23.5,
-      "nextId": 904,
-      "state": "ecb79b6a",
-      "events": "b1493cae",
+      "nextId": 928,
+      "state": "4d99da68",
+      "events": "f8aa95d4",
       "rng": {
-        "draws": 4239,
-        "digest": "cf574c28"
+        "draws": 4254,
+        "digest": "08634a42"
       }
     },
     {
       "tick": 480,
       "time": 24,
-      "nextId": 904,
-      "state": "6f043a5d",
-      "events": "2a05864a",
+      "nextId": 928,
+      "state": "b733118f",
+      "events": "c1efdd98",
       "rng": {
-        "draws": 4312,
-        "digest": "b740732a"
+        "draws": 4344,
+        "digest": "99eac083"
       }
     },
     {
       "tick": 490,
       "time": 24.5,
-      "nextId": 904,
-      "state": "2f8b220f",
-      "events": "6c48c5da",
+      "nextId": 928,
+      "state": "d0a52027",
+      "events": "12533dfc",
       "rng": {
-        "draws": 4404,
-        "digest": "52d43fa0"
+        "draws": 4420,
+        "digest": "4dbe464c"
       }
     },
     {
       "tick": 500,
       "time": 25,
-      "nextId": 904,
-      "state": "bf409c13",
-      "events": "030bc2e4",
+      "nextId": 928,
+      "state": "28bf5f0f",
+      "events": "add365ac",
       "rng": {
-        "draws": 4479,
-        "digest": "16ebb4cf"
+        "draws": 4503,
+        "digest": "020c0d1d"
       }
     },
     {
       "tick": 510,
       "time": 25.5,
-      "nextId": 904,
-      "state": "cc09d190",
-      "events": "030bc2e4",
+      "nextId": 928,
+      "state": "8e532c10",
+      "events": "add365ac",
       "rng": {
-        "draws": 4576,
-        "digest": "9598d158"
+        "draws": 4610,
+        "digest": "b31dc204"
       }
     },
     {
       "tick": 520,
       "time": 26,
-      "nextId": 904,
-      "state": "914b25ca",
-      "events": "030bc2e4",
+      "nextId": 928,
+      "state": "c0ae9bf6",
+      "events": "add365ac",
       "rng": {
-        "draws": 4675,
-        "digest": "19c19132"
+        "draws": 4706,
+        "digest": "a220091e"
       }
     },
     {
       "tick": 530,
       "time": 26.5,
-      "nextId": 904,
-      "state": "a785a4c3",
-      "events": "3fc902bc",
+      "nextId": 928,
+      "state": "a6935fab",
+      "events": "b1a9ecae",
       "rng": {
-        "draws": 4751,
-        "digest": "e7307cce"
+        "draws": 4787,
+        "digest": "1c36ec35"
       }
     },
     {
       "tick": 540,
       "time": 27,
-      "nextId": 904,
-      "state": "363df28c",
-      "events": "0039a099",
+      "nextId": 928,
+      "state": "357147fc",
+      "events": "2f89186f",
       "rng": {
-        "draws": 4854,
-        "digest": "de406ea4"
+        "draws": 4885,
+        "digest": "e14e790e"
       }
     },
     {
       "tick": 550,
       "time": 27.5,
-      "nextId": 904,
-      "state": "501c774f",
-      "events": "a7f17a0d",
+      "nextId": 928,
+      "state": "793e2121",
+      "events": "8b34e5e3",
       "rng": {
-        "draws": 4958,
-        "digest": "12c980c4"
+        "draws": 4975,
+        "digest": "4508d36d"
       }
     },
     {
       "tick": 560,
       "time": 28,
-      "nextId": 904,
-      "state": "7c224b84",
-      "events": "d36046fb",
+      "nextId": 928,
+      "state": "f42af2d2",
+      "events": "2d8e184b",
       "rng": {
-        "draws": 5055,
-        "digest": "506c34cd"
+        "draws": 5068,
+        "digest": "e65baded"
       }
     },
     {
       "tick": 570,
       "time": 28.5,
-      "nextId": 904,
-      "state": "dc64b9c2",
-      "events": "d36046fb",
+      "nextId": 928,
+      "state": "d4ff28e4",
+      "events": "2d8e184b",
       "rng": {
-        "draws": 5131,
-        "digest": "90157990"
+        "draws": 5184,
+        "digest": "d7d42b17"
       }
     },
     {
       "tick": 573,
       "time": 28.65,
-      "nextId": 904,
-      "state": "06a27db9",
+      "nextId": 928,
+      "state": "4f192d9f",
       "events": "741638a5",
       "rng": {
-        "draws": 5157,
-        "digest": "cf470e30"
+        "draws": 5200,
+        "digest": "321d94e6"
       },
       "label": "final",
       "players": [
@@ -708,7 +708,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 900,
+          "entityId": 924,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -777,7 +777,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 901,
+          "entityId": 925,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -847,7 +847,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 902,
+          "entityId": 926,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -913,7 +913,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 903,
+          "entityId": 927,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -966,7 +966,7 @@
               "name": "Battle Stance",
               "remaining": 3598.8,
               "school": "physical",
-              "sourceId": 900
+              "sourceId": 924
             }
           ],
           "blockChance": 0.05,
@@ -978,7 +978,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 127.65,
           "hp": 767,
-          "id": 900,
+          "id": 924,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1026,7 +1026,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 127.65,
           "hp": 271,
-          "id": 901,
+          "id": 925,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1076,7 +1076,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 127.65,
           "hp": 448,
-          "id": 902,
+          "id": 926,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1133,7 +1133,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 127.65,
           "hp": 325,
-          "id": 903,
+          "id": 927,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

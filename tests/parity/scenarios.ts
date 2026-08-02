@@ -1574,7 +1574,9 @@ function masterLoot(): Scenario {
     // (same class of change: the appended brood camps shift the shared rng at
     // world gen, dissolving 1326's tie; swept via tmp/_ml_sweep.mts for the
     // next seed where two rollers level AND Bbb takes the tie-break).
-    build: () => new Sim({ seed: 1077, playerClass: 'warrior', noPlayer: true }),
+    // And 1077 -> 3073 by the brood's second content wave (the broodguard
+    // clutches appended at the camp tail), the same sweep.
+    build: () => new Sim({ seed: 3073, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       const a = sim.addPlayer('warrior', 'Aaa');
@@ -4748,5 +4750,5 @@ export const SCENARIOS: Scenario[] = [
   playerTrade(),
   chatSocial(),
   professionsCraft(19),
-  professionsGather(),
+  professionsGather(3),
 ];
