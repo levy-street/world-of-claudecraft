@@ -984,6 +984,7 @@ export const ru_RU: EnTranslations = {
       "name_stormfeather_griffin": "Штормокрыл Поднебесный",
       "name_thunderstrut_gobbler": "Громоступ, великий индюк",
       "name_terrorspark_groundshaker": "Страхоискр, сотрясатель земли",
+      "name_drakemaw_raptor": "Drakemaw Raptor",
       "desc_valorsteed": "Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.",
       "desc_grag_bear": "Выносливый и твердо стоящий на лапах медведь, повышающий скорость передвижения.",
       "desc_stalkglider_snail": "Стойкая неторопливая улитка, повышающая скорость передвижения.",
@@ -991,7 +992,8 @@ export const ru_RU: EnTranslations = {
       "desc_shadowjump_toad": "Огромная устойчивая жаба, обученная молниеносным теневым прыжкам по любой местности.",
       "desc_stormfeather_griffin": "Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.",
       "desc_thunderstrut_gobbler": "Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.",
-      "desc_terrorspark_groundshaker": "Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов."
+      "desc_terrorspark_groundshaker": "Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов.",
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
     },
     "mountTraining": {
       "mountPrompt": "Нажми {key}, чтобы оседлать учебного Доблестного скакуна.",
@@ -9841,6 +9843,9 @@ export const ru_RU: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ключ зажигания Страхоискра"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Reins of the Drakemaw Raptor"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },
@@ -11015,6 +11020,18 @@ export const ru_RU: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Синдралет, Матриарх Дрейкмо"
+      },
+      "dragonkin_egg": {
+        "name": "Dragonkin Egg"
+      },
+      "dragonkin_whelp": {
+        "name": "Dragonkin Whelp"
+      },
+      "dragonkin_broodguard": {
+        "name": "Dragonkin Broodguard"
+      },
+      "drakemaw_broodlord": {
+        "name": "Drakemaw Broodlord"
       },
       "gilded_stag": {
         "name": "Золочёный олень"

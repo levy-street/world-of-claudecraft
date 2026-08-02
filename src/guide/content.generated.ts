@@ -1794,7 +1794,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll fires burn in the dunes.",
     "families": [
       "troll",
-      "undead"
+      "undead",
+      "dragonkin"
     ]
   },
   {
@@ -2868,6 +2869,26 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_dragonkin",
         "tint": "#bcd2e6",
         "still": "/guide-stills/mob_dragonkin__bcd2e6.webp"
+      },
+      {
+        "name": "Dragonkin Broodguard",
+        "min": 19,
+        "max": 20,
+        "rare": false,
+        "templateId": "dragonkin_broodguard",
+        "model": "mob_dragonkin_broodguard",
+        "tint": "#3e6b4f",
+        "still": "/guide-stills/mob_dragonkin_broodguard__3e6b4f.webp"
+      },
+      {
+        "name": "Dragonkin Egg",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "dragonkin_egg",
+        "model": "mob_dragon_egg",
+        "tint": "#69a06a",
+        "still": "/guide-stills/mob_dragon_egg__69a06a.webp"
       }
     ]
   },
@@ -4707,6 +4728,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   {
     "id": "chr_hollow_rares",
     "name": "The Herd Remembers",
+    "category": "chronicle",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "chr_drakemaw_broodlord",
+    "name": "Clutch Breaker",
+    "category": "chronicle",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "chr_maw_matriarch",
+    "name": "The Sky Goes Quiet",
     "category": "chronicle",
     "renown": 10,
     "feat": false
@@ -10040,6 +10075,18 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 1.4,
     "hover": 0.15,
     "tintStrength": 0.45
+  },
+  "mob_dragon_egg": {
+    "url": "models/creatures/dragon_egg.glb",
+    "idle": "",
+    "height": 0.95,
+    "tintStrength": 0.08
+  },
+  "mob_dragonkin_broodguard": {
+    "url": "models/creatures/dragonkin_mob.glb",
+    "idle": "Idle",
+    "height": 2.2,
+    "tintStrength": 0.1
   },
   "mob_ghost": {
     "url": "models/creatures/ghost.glb",
