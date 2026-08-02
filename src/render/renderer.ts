@@ -50,6 +50,7 @@ import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
+import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { attachBankerChestToNpcView } from './banker_chest';
 import { type BirdsView, buildBirds } from './birds';
 import { type BladeGrassView, buildBladeGrass } from './blade_grass';
@@ -112,7 +113,7 @@ import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack
 import { fogFarForBuiltGround } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
-import { raceCompileGate } from './compile_gate';
+import { CompileGateQueue } from './compile_gate';
 import { trackWebGLContext } from './context_release';
 import {
   animatesEveryFrame,
@@ -143,12 +144,7 @@ import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
-import {
-  createDrawStatsAccumulator,
-  type DrawStatsAccumulator,
-  type DrawStatsCounters,
-  governorDrawSignal,
-} from './draw_stats_core';
+import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
 import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
 import {
   dynamicResolutionAllocationScale,
@@ -262,7 +258,11 @@ import {
   reconcileViewPointLights,
 } from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
-import { runBackgroundPrewarm } from './prewarm_pass';
+import {
+  boundedPrewarmVisibility,
+  runBackgroundPrewarm,
+  withHiddenPrewarmGroups,
+} from './prewarm_pass';
 import {
   constrainedEntryViewCreateBudget,
   interactionLandmarkViewPriority,
@@ -270,11 +270,19 @@ import {
   orderedPrewarmIds,
   type PrewarmPolicy,
   partitionMandatoryLandmarkCandidates,
+  prewarmBuildDeadline,
   prewarmEntryRuns,
+  prewarmEntryShouldDefer,
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
 } from './prewarm_policy';
-import { resumeDroppedPrewarmEntries } from './prewarm_resume';
+import {
+  buildPrewarmCompileUnits,
+  type PrewarmResumeEntry,
+  type PrewarmResumeUnit,
+  resumeDroppedPrewarmEntries,
+  settlePrewarmBeforePublish,
+} from './prewarm_resume';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
@@ -406,26 +414,20 @@ const PREWARM_COMPILE_MAX_MS_CONSTRAINED = 2500;
 // multi-hundred-ms (up to ~1.7s) freeze players feel when new model types
 // appear. So the compile step gets its own budget (it normally drains in <~100ms
 // with KHR_parallel_shader_compile) rather than racing the leftover view-build
-// budget, which could starve it to a timeout. The cap only bites if a driver
-// stalls the parallel-compile queue; keep it modest, since a long hold here is
-// itself worse than the freeze it prevents.
+// budget, which could starve it. This threshold is diagnostic only: an async
+// compile cannot be cancelled, so returning at the threshold would let it
+// overlap later warm units and gameplay.
 const PREWARM_COMPILE_MAX_MS = 10000;
 // A background prewarm waits for a browser idle slot between its per-group
 // compile chunks; the timeout forces progress under sustained frame load.
 const IDLE_PREWARM_TIMEOUT_MS = 250;
-// Safety ceiling for the per-view async-compile gate: if KHR_parallel_shader_compile
-// somehow never reports a program ready, show the view anyway (degrading to the old
-// synchronous first-use compile) rather than stranding an entity invisible.
+// Diagnostic threshold for a live async-compile gate. The compile cannot be
+// cancelled, so the target remains hidden and the serial gate remains occupied
+// until the driver settles instead of overlapping first-draw or later links.
 const VIEW_COMPILE_GATE_MAX_MS = 1500;
 // Reserve at the tail of the view-build budget so the compile + final-frame
 // steps always start before the prewarm deadline (runEntry skips late entries).
 const PREWARM_BUILD_RESERVE_MS = 3000;
-// A manifest entry dropped by the deadline above is resumed once, in
-// background idle time after world entry, instead of being permanently
-// skipped (issue #2571: an abandoned entry's compile debt otherwise pays out
-// later as a mid-play shader-compile stall). Each resumed entry gets its own
-// fresh window so one slow entry cannot immediately re-drop the next.
-const PREWARM_RESUME_ENTRY_MAX_MS = 4000;
 const VIEW_PREWARM_MAX_VIEWS_LOW = 48;
 const VIEW_PREWARM_MAX_VIEWS_HIGH = 72;
 // Constrained (phone WebKit): build only self plus one required/nearby view at
@@ -952,7 +954,7 @@ export interface EntityView {
   isFar: boolean;
   // hidden until its shader programs finish linking off-thread (async-compile gate)
   compilePending: boolean;
-  // Resolves when compilePending clears, including the bounded fail-soft timeout.
+  // Resolves when compilePending clears after the non-cancellable link settles.
   compileReady: Promise<void> | null;
   // A live material-variant swap (gateSwapFlagOnCompile) is still linking off-thread
   // for a target whose .visible the per-frame loop recomputes every tick (the mount
@@ -1357,13 +1359,9 @@ export class Renderer {
   // already at its budget. Cosmetic only: the fairness floor for an actionable
   // pose lives in crowd_lod.ts and never reads this.
   private lastBudgetPressure = 0;
-  // Composer tiers only (packet 0 R1): with info.autoReset off, this turns the
-  // monotonic WebGL counters into per-frame deltas; null on every other profile
-  // (low/medium, native-iOS high/ultra, advanced with effects shed), which keep
-  // three's per-render auto-reset and their live reads bit-identical to before.
-  private drawStats: DrawStatsAccumulator | null = null;
-  // Last completed frame's draw delta (what perfStats serves on composer tiers).
-  private drawStatsFrame: DrawStatsCounters = { calls: 0, triangles: 0, points: 0, lines: 0 };
+  // Post-processing profiles only: owns manual counter setup, logical-frame
+  // deltas, governor reads, perf reads, and out-of-band resets as one contract.
+  private drawStats: LogicalFrameDrawStats | null = null;
   private opaqueFrontToBackActive: boolean | null = null;
   private readonly opaqueSortPolicyInput: OpaqueSortPolicyInput = {
     drawCalls: 0,
@@ -1584,6 +1582,9 @@ export class Renderer {
   // the visible-zone lane finishes preparing it. Share that in-flight work:
   // duplicate prewarm grids were measured running concurrently for 5.7s.
   private pendingZonePrewarms = new Map<string, Promise<void>>();
+  // One shared lane for background work that touches WebGL. Idle callbacks from
+  // independent zone/sky/archetype tasks can otherwise all start in one frame.
+  private backgroundGpuWork = createBackgroundGpuQueue();
   // Static terrain/water/features just beyond the current zone are built in a
   // single background lane when their rectangles enter the relaxed fog
   // horizon, so a walked boundary crossing lands on already-resident ground.
@@ -1624,6 +1625,7 @@ export class Renderer {
   // KHR_parallel_shader_compile present: lets us link new programs off-thread and
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
+  private readonly liveCompileGates = new CompileGateQueue(this.backgroundGpuWork);
   vfx: Vfx;
   private raceLine: RaceLine;
   private mountBeacon: MountBeacon;
@@ -1789,11 +1791,9 @@ export class Renderer {
       // three r165's render() resets info per pass (after the shadow pass, see
       // draw_stats_core.ts header), so with the composer's multiple passes every
       // post-frame reader saw only the final fullscreen pass (1 call/1 triangle).
-      // Accumulate manually instead: counters run monotonically and sync() takes
-      // per-frame deltas. Non-composer profiles keep the auto-reset so their
-      // governor input and telemetry stay bit-identical (packet 0 R1).
-      this.webgl.info.autoReset = false;
-      this.drawStats = createDrawStatsAccumulator();
+      // The session owns manual accumulation and every downstream consumer.
+      // Direct profiles keep Three's normal auto-reset path.
+      this.drawStats = createLogicalFrameDrawStats(this.webgl.info);
     }
     // The lightweight material path does not preload HDR sky/water assets.
     // Keep the renderer's HDR/IBL branch aligned with that preload decision.
@@ -2806,13 +2806,19 @@ export class Renderer {
       this.prewarmTexture(domeSource);
       return;
     }
-    // A DataTexture upload is synchronous even from requestIdleCallback.
-    // Split HDRIs into bounded row batches, then run the much smaller 512px
-    // PMREM between idle slots. This keeps background zone preparation from
-    // turning a future biome's sky into one 30+ MB gameplay frame.
+    // A DataTexture upload is synchronous even from requestIdleCallback. Newer
+    // Three runtimes can split HDRIs into row batches; pinned r165 lacks update
+    // ranges and pays one full upload. Either way each atomic WebGL call enters
+    // the shared queue so it cannot overlap a live shader compile.
     await this.prewarmTextureInIdle(envSource);
-    await idleSlot(IDLE_PREWARM_TIMEOUT_MS);
-    this.ensureEnvironmentBiome(zone.biome);
+    // PMREM generation is indivisible in Three r165. Defer two timed-out
+    // callbacks before deliberately paying that single unit under sustained
+    // load, rather than running it on the first forced callback.
+    await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
+    await this.backgroundGpuWork.run(
+      () => this.ensureEnvironmentBiome(zone.biome),
+      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+    );
     await this.prewarmTextureInIdle(domeSource);
   }
 
@@ -2881,6 +2887,7 @@ export class Renderer {
       onProgress?.(96, 100);
       this.lastAttachedFeatureGroups = [];
       this.ensureZoneFeatures(zone);
+      const featureGroups = this.lastAttachedFeatureGroups.slice();
       // A background prepare precompiles every program this zone just added
       // (water lakes, bespoke biome features), one idle slot apart: a program
       // whose driver link has not finished BLOCKS the main thread at its first
@@ -2889,15 +2896,20 @@ export class Renderer {
       // only once the programs report ready, so the live render never pays it.
       if (opts?.pace === 'idle') {
         try {
-          if (this.asyncCompileSupported) {
-            for (const obj of [...waterMeshes, ...this.lastAttachedFeatureGroups]) {
-              await idleSlot(IDLE_PREWARM_TIMEOUT_MS);
-              await Promise.race([
-                this.webgl.compileAsync(obj, this.camera, this.scene),
-                sleep(PREWARM_COMPILE_MAX_MS),
-              ]);
+          await withHiddenPrewarmGroups(featureGroups, async () => {
+            if (this.asyncCompileSupported) {
+              for (const obj of [...waterMeshes, ...featureGroups]) {
+                await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
+                // Await the linker before revealing the object or advancing to
+                // another unit. Submit one object at a time so live work can
+                // jump queued visible-zone prewarm without overlapping it.
+                await this.backgroundGpuWork.run(
+                  () => this.compilePrewarmColorPrograms(obj, false),
+                  GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+                );
+              }
             }
-          }
+          });
         } finally {
           // Water meshes from an idle build enter hidden, preventing a live
           // frame from winning the race against compileAsync. Reveal only once
@@ -2954,6 +2966,10 @@ export class Renderer {
       const npcPrewarm = this.buildNpcPrewarmGroup(zone, deadline);
       const mobGroup = mobPrewarm.group;
       const npcGroup = npcPrewarm.group;
+      // Hide before scene attachment. The shared GPU queue may be occupied by
+      // sky/feature work for many frames before runBackgroundPrewarm starts.
+      mobGroup.visible = false;
+      npcGroup.visible = false;
       this.scene.add(mobGroup, npcGroup);
       const tBuild = performance.now();
       let tCompile = tBuild;
@@ -2966,48 +2982,52 @@ export class Renderer {
         // handed, and a full-scene walk was a measured multi-hundred-ms stall
         // per streamed zone. Live frames keep rendering across that whole
         // awaited window, so runBackgroundPrewarm keeps both groups invisible
-        // until the synchronous warm pass (a visible group is a grid of T-posed
+        // between its bounded child uploads (a visible group is a grid of T-posed
         // rigs stacked next to the player). The gating path (behind the loading
         // screen) keeps render-first, which also covers renderers without
         // KHR_parallel_shader_compile.
         if (opts?.background) {
           await runBackgroundPrewarm([mobGroup, npcGroup], {
             supportsAsyncCompile: this.asyncCompileSupported,
-            idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
+            idleSlot: () =>
+              idleSlot(IDLE_PREWARM_TIMEOUT_MS, {
+                maxTimeoutDeferrals: 2,
+              }),
             compileChild: async (child) => {
-              await Promise.race([
-                this.webgl.compileAsync(child as THREE.Object3D, this.camera, this.scene),
-                sleep(PREWARM_COMPILE_MAX_MS),
-              ]);
-              await this.compileSkinnedShadowPrograms(child as THREE.Object3D);
+              const childRoot = child as THREE.Object3D;
+              await this.backgroundGpuWork.run(
+                () => this.compilePrewarmColorPrograms(childRoot, true),
+                GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+              );
+              await this.backgroundGpuWork.run(
+                () => this.compileSkinnedShadowPrograms(childRoot),
+                GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+              );
+            },
+            prepareChildAssets: (child) => {
+              this.prewarmObjectTextures(child as THREE.Object3D);
             },
             warmChild: (groupLike, child) => {
               const group = groupLike as THREE.Group;
-              const target = child as THREE.Object3D;
-              const visibility = group.children.map((entry) => entry.visible);
-              try {
-                for (const entry of group.children) entry.visible = entry === target;
-                this.renderPrewarmPass(1 / 60, { offscreen: true });
-              } finally {
-                for (let i = 0; i < group.children.length; i++) {
-                  group.children[i].visible = visibility[i];
-                }
-              }
+              const childRoot = child as THREE.Object3D;
+              this.renderBoundedPrewarmRoot(group, childRoot);
             },
             renderWarmPass: () => {
               tCompile = performance.now();
               this.renderPrewarmPass(1 / 60, { offscreen: true });
             },
+            runUpload: (work) =>
+              this.backgroundGpuWork.run(work, GPU_WORK_PRIORITY.VISIBLE_PREWARM),
           });
+          tCompile = performance.now();
         } else {
+          mobGroup.visible = true;
+          npcGroup.visible = true;
           tCompile = performance.now();
           this.renderPrewarmPass(1 / 60);
           // The gating path compiles after the pass, exactly as before.
           if (this.asyncCompileSupported) {
-            await Promise.race([
-              this.webgl.compileAsync(this.scene, this.camera),
-              sleep(PREWARM_COMPILE_MAX_MS),
-            ]);
+            await this.compilePrewarmColorPrograms(this.scene, false);
           }
         }
         this.prewarmedZonePrograms.add(zoneId);
@@ -3473,6 +3493,7 @@ export class Renderer {
   } {
     const info = this.webgl.info;
     const renderBudget = this.renderBudgetGovernor.state();
+    const drawStatsFrame = this.drawStats ? this.drawStats.currentFrame() : null;
     return {
       graphicsConfigVersion: GFX.graphicsConfigVersion,
       tier: GFX.tier,
@@ -3508,11 +3529,11 @@ export class Renderer {
       // passes); other profiles keep the live post-frame read, where three's
       // per-render auto-reset drops those passes, so add them back at 1 draw call
       // and 2 triangles each.
-      calls: this.drawStats
-        ? this.drawStatsFrame.calls
+      calls: drawStatsFrame
+        ? drawStatsFrame.calls
         : info.render.calls + this.lastWaterSimulationPasses,
-      triangles: this.drawStats
-        ? this.drawStatsFrame.triangles
+      triangles: drawStatsFrame
+        ? drawStatsFrame.triangles
         : info.render.triangles + this.lastWaterSimulationPasses * 2,
       geometries: info.memory.geometries,
       textures: info.memory.textures,
@@ -3886,22 +3907,17 @@ export class Renderer {
       this.renderBudgetMinScale(),
       this.renderBudgetMaxScale(),
     );
-    // Composer tiers route through governorDrawSignal, which pins the frozen
-    // legacy constant (1 call/1 triangle, the pre-accumulator post-frame read)
-    // so the governor's draw arm stays exactly as dead as before (packet 0 R1).
-    // Every other profile (including non-composer high/ultra: native iOS,
-    // advanced with effects shed) keeps the live read below, bit-identical.
-    const drawSignal = this.drawStats
-      ? governorDrawSignal(GFX.tier, this.drawStatsFrame)
-      : info.render;
+    // Post-processing tiers route the measured logical frame through the
+    // session's governor signal. Direct profiles keep Three's live read.
+    const drawSignal = this.drawStats ? this.drawStats.governorSignal(GFX.tier) : info.render;
     const sample = this.renderBudgetSample;
     sample.dt = dt;
     sample.frameMs = frameMs;
     // Non-composer profiles read info.render live, where three's per-render
     // auto-reset drops the off-screen water-simulation passes: add them back
     // (1 draw call / 2 triangles per pass). Composer tiers pass drawSignal
-    // through untouched, so the frozen legacy constant stays exact and the
-    // water passes already inside drawStatsFrame are never counted twice.
+    // through untouched, and their water passes are already present in
+    // the logical-frame session, so they must not be counted twice.
     sample.calls = drawSignal.calls + (this.drawStats ? 0 : this.lastWaterSimulationPasses);
     sample.triangles =
       drawSignal.triangles + (this.drawStats ? 0 : this.lastWaterSimulationPasses * 2);
@@ -4525,6 +4541,11 @@ export class Renderer {
     if (pending) return pending;
     const task = uploadDataTextureInChunks(this.webgl, texture, {
       beforeChunk: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
+      uploadChunk: (chunkTexture) =>
+        this.backgroundGpuWork.run(
+          () => this.webgl.initTexture(chunkTexture),
+          GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        ),
     })
       .then(() => {
         this.gpuReadyTextures.add(texture);
@@ -4619,6 +4640,40 @@ export class Renderer {
   }
 
   /**
+   * Link a root's exact live colour-program variant before a bounded upload.
+   * Three r165 chooses output colour space from the current render target in
+   * compileAsync's synchronous prologue. Restore that global before awaiting
+   * the parallel linker so live frames never inherit the prewarm target.
+   */
+  private async compilePrewarmColorPrograms(
+    root: THREE.Object3D,
+    includeOffscreenVariant: boolean,
+  ): Promise<void> {
+    const compileAtTarget = async (target: THREE.WebGLRenderTarget | null): Promise<void> => {
+      const previousTarget = this.webgl.getRenderTarget();
+      let compilePromise: Promise<THREE.Object3D>;
+      try {
+        this.webgl.setRenderTarget(target);
+        compilePromise = this.webgl.compileAsync(root, this.camera, this.scene);
+      } finally {
+        this.webgl.setRenderTarget(previousTarget);
+      }
+      await compilePromise;
+    };
+
+    // Direct tiers draw to the canvas in gameplay, so retain that variant.
+    if (!this.post) await compileAtTarget(null);
+
+    // Composer tiers draw the scene into a render target. Direct tiers also
+    // need this second variant before their bounded offscreen geometry upload,
+    // otherwise that upload itself can synchronously link a new program.
+    if (this.post || includeOffscreenVariant) {
+      this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
+      await compileAtTarget(this.prewarmRenderTarget);
+    }
+  }
+
+  /**
    * compileAsync(scene, camera) does not enumerate Three's renderer-owned
    * shadow materials. Temporarily put equivalent MeshDepthMaterials on the
    * real skinned rigs so KHR_parallel_shader_compile can link those variants
@@ -4661,14 +4716,16 @@ export class Renderer {
         this.webgl.setRenderTarget(previousTarget);
         this.scene.fog = previousFog;
       }
-      await Promise.race([compilePromise, sleep(PREWARM_COMPILE_MAX_MS)]);
+      // Do not race a timer here. The underlying linker cannot be cancelled,
+      // so a timeout only lets it overlap the next child and gameplay.
+      await compilePromise;
     } finally {
       for (const swap of swaps) swap.mesh.material = swap.material;
     }
   }
 
-  // A tiny throwaway target for the background warm pass, so the warm frame
-  // (the prewarm grid is visible during that one call) is never presented on
+  // A tiny throwaway target for background child uploads, so a prewarm root
+  // that is briefly visible during its bounded call is never presented on
   // the canvas. Lazily built once and kept: 8x8 RGBA plus depth is negligible.
   private prewarmRenderTarget: THREE.WebGLRenderTarget | null = null;
 
@@ -4746,8 +4803,8 @@ export class Renderer {
   // the census harness reads in the same task). The accumulator hand-off is
   // composer-tiers-only, where the counters run monotonically.
   private discardOutOfBandDraws(): void {
-    if (this.drawStats) this.drawStats.noteOutOfBand(this.webgl.info.render);
-    this.webgl.info.reset();
+    if (this.drawStats) this.drawStats.discardOutOfBand();
+    else this.webgl.info.reset();
   }
 
   private updateOpaqueDrawOrder(elapsedSeconds: number): void {
@@ -4755,7 +4812,9 @@ export class Renderer {
     const focusX = this.cameraLookAt.x;
     const focusZ = this.cameraLookAt.z;
     const input = this.opaqueSortPolicyInput;
-    input.drawCalls = this.drawStats ? this.drawStatsFrame.calls : this.webgl.info.render.calls;
+    input.drawCalls = this.drawStats
+      ? this.drawStats.currentFrame().calls
+      : this.webgl.info.render.calls;
     input.elapsedSeconds = elapsedSeconds;
     input.focusX = focusX;
     input.focusZ = focusZ;
@@ -4767,6 +4826,43 @@ export class Renderer {
     this.webgl.setOpaqueSort(useFrontToBack ? opaqueFrontToBackSort : opaqueMaterialFirstSort);
   }
 
+  private renderBoundedPrewarmRoot(group: THREE.Group, childRoot: THREE.Object3D): void {
+    const sceneVisibility = this.scene.children.map((entry) => entry.visible);
+    const groupVisibility = group.children.map((entry) => entry.visible);
+    const previousTarget = this.webgl.getRenderTarget();
+    const previousShadowAutoUpdate = this.webgl.shadowMap.autoUpdate;
+    const previousShadowNeedsUpdate = this.webgl.shadowMap.needsUpdate;
+    try {
+      for (const entry of this.scene.children) {
+        const isLight = (entry as THREE.Light).isLight === true;
+        const keepVisible = entry === group || isLight || entry === this.sun.target;
+        entry.visible = boundedPrewarmVisibility(entry.visible, keepVisible);
+      }
+      group.visible = true;
+      for (const entry of group.children) entry.visible = entry === childRoot;
+
+      // Keep the real shadow-enabled colour-program variant, but do not rebuild
+      // Insane's 4096px shadow map for every child upload. The separate shadow
+      // compile lane above already links the skinned depth variants.
+      this.webgl.shadowMap.autoUpdate = false;
+      this.webgl.shadowMap.needsUpdate = false;
+      this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
+      this.webgl.setRenderTarget(this.prewarmRenderTarget);
+      this.webgl.render(this.scene, this.camera);
+    } finally {
+      this.webgl.setRenderTarget(previousTarget);
+      this.webgl.shadowMap.autoUpdate = previousShadowAutoUpdate;
+      this.webgl.shadowMap.needsUpdate = previousShadowNeedsUpdate;
+      for (let i = 0; i < group.children.length; i++) {
+        group.children[i].visible = groupVisibility[i];
+      }
+      for (let i = 0; i < this.scene.children.length; i++) {
+        this.scene.children[i].visible = sceneVisibility[i];
+      }
+      this.discardOutOfBandDraws();
+    }
+  }
+
   private renderPrewarmPass(dt: number, opts?: { offscreen?: boolean }): void {
     this.prewarmWorldFrame(dt);
     this.updateOpaqueDrawOrder(dt);
@@ -4776,17 +4872,23 @@ export class Renderer {
     // (the post chain itself is already warm from live frames). Without a
     // composer the live variant is the canvas one, so the pass keeps
     // rendering to the canvas; at worst that is a single presented frame.
-    if (opts?.offscreen && this.post) {
-      this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
-      const previousTarget = this.webgl.getRenderTarget();
-      this.webgl.setRenderTarget(this.prewarmRenderTarget);
-      this.webgl.render(this.scene, this.camera);
-      this.webgl.setRenderTarget(previousTarget);
-      return;
+    try {
+      if (opts?.offscreen && this.post) {
+        this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
+        const previousTarget = this.webgl.getRenderTarget();
+        try {
+          this.webgl.setRenderTarget(this.prewarmRenderTarget);
+          this.webgl.render(this.scene, this.camera);
+        } finally {
+          this.webgl.setRenderTarget(previousTarget);
+        }
+        return;
+      }
+      if (this.post) this.post.render();
+      else this.webgl.render(this.scene, this.camera);
+    } finally {
+      this.discardOutOfBandDraws();
     }
-    if (this.post) this.post.render();
-    else this.webgl.render(this.scene, this.camera);
-    this.discardOutOfBandDraws();
   }
 
   private diagnosticsBaselineForPrewarm(): RendererPrewarmDiagnosticsBaselineStats | null {
@@ -4820,6 +4922,7 @@ export class Renderer {
       constrainedMemory: GFX.constrainedMemory,
       asyncCompileSupported: this.asyncCompileSupported,
       lowGfx: this.lowGfx,
+      finishFullManifestBeforeReveal: GFX.tier === 'insane' && !GFX.constrainedMemory,
       defaultMaxMs: VIEW_PREWARM_MAX_MS,
       constrainedMaxMs: VIEW_PREWARM_MAX_MS_CONSTRAINED,
       defaultCompileMaxMs: PREWARM_COMPILE_MAX_MS,
@@ -4833,14 +4936,18 @@ export class Renderer {
     const started = performance.now();
     // Extended by resumeDroppedPrewarmEntries below when a dropped entry is
     // resumed in idle time, so its own internal deadline checks see fresh room.
-    let deadline = started + maxMs;
+    const deadline = started + maxMs;
     // Stop the archetype-build steps early so the later entries, crucially
     // programs.compile, still START before `deadline` (runEntry skips anything
     // that begins past it). Compiling is what kills the in-world freeze.
     // Mutable: extended alongside `deadline` when a dropped entry is resumed, so
     // a resumed entities.player-archetypes/entities.npc-archetypes does not see
     // a stale, already-past budget and silently build nothing (#2571 review).
-    let buildDeadline = deadline - PREWARM_BUILD_RESERVE_MS;
+    const buildDeadline = prewarmBuildDeadline(
+      deadline,
+      PREWARM_BUILD_RESERVE_MS,
+      policy.finishFullManifestBeforeReveal,
+    );
     const manifestEntries: RendererPrewarmManifestEntryStats[] = [];
     const startCounts = this.prewarmCounts();
     const createdViewTypes: string[] = [];
@@ -4865,6 +4972,7 @@ export class Renderer {
     let npcPrewarmGroup: THREE.Group | null = null;
     let entityPrewarmPool: { key: string; visual: CharacterVisual }[] = [];
     let npcPrewarmPool: { key: string; visual: CharacterVisual }[] = [];
+    let deferPoolPublication = false;
     let playerPrewarmGroup: THREE.Group | null = null;
     let objectPrewarmGroup: THREE.Group | null = null;
     let propMaterialPrewarmGroup: THREE.Group | null = null;
@@ -4896,24 +5004,16 @@ export class Renderer {
       required: boolean;
       /** This small entry still runs if an earlier required view consumed maxMs. */
       deadlineExempt?: boolean;
-      /**
-       * False for an entry the background resume pass must never rerun: one whose
-       * run() presents real frames in a tight synchronous loop (sky.current-zone,
-       * render.settle-passes: reviving THAT after world entry is the exact same
-       * long-task freeze this pass exists to prevent, just relocated) or spawns a
-       * visible, un-hideable side effect on the live, shared systems (vfx.atlas's
-       * particle burst has no group to gate, unlike foliage/landmark/interior).
-       * Left permanently dropped is the correct outcome for these; defaults true.
-       */
-      resumable?: boolean;
+      /** Explicit small units that may resume after world entry. The absence of
+       * this hook is intentional: a whole manifest entry is never rerun live. */
+      resumeUnits?: () => readonly PrewarmResumeUnit[];
       run: () => void | Promise<void>;
       detail?: () => string;
     };
 
-    // Entries the deadline dropped this pass (runEntry's skip branch below).
-    // Resumed once in background idle time after the loop finishes instead of
-    // being left permanently skipped (issue #2571).
-    const droppedEntries: PrewarmManifestEntry[] = [];
+    // Explicitly bounded units captured when their manifest entry misses the
+    // loading deadline. Whole entry callbacks are never resumed live.
+    const droppedEntries: PrewarmResumeEntry[] = [];
 
     const runEntry = async (
       entry: PrewarmManifestEntry,
@@ -4928,7 +5028,14 @@ export class Renderer {
     ): Promise<void> => {
       const before = this.prewarmCounts();
       const entryStarted = performance.now();
-      if (entryStarted >= deadline && !entry.deadlineExempt) {
+      if (
+        prewarmEntryShouldDefer(
+          entryStarted,
+          deadline,
+          entry.deadlineExempt ?? false,
+          policy.finishFullManifestBeforeReveal,
+        )
+      ) {
         target.push({
           id: entry.id,
           category: entry.category,
@@ -4946,7 +5053,8 @@ export class Renderer {
           textureDelta: 0,
           detail: entry.detail?.(),
         });
-        if (entry.resumable !== false) droppedEntries.push(entry);
+        const units = entry.resumeUnits?.() ?? [];
+        if (units.length > 0) droppedEntries.push({ id: entry.id, units });
         return;
       }
       let status: RendererPrewarmManifestEntryStats['status'] = 'completed';
@@ -5010,7 +5118,7 @@ export class Renderer {
     // behind the loading screen but would erase live gameplay particles if
     // called after world entry (the resumed vfx.atlas burst instead decays on
     // its own once the real per-frame update loop is ticking).
-    const cleanupPrewarmArtifacts = (opts: { clearVfx: boolean }): void => {
+    const cleanupPrewarmArtifacts = (opts: { clearVfx: boolean; publishPools: boolean }): void => {
       if (opts.clearVfx) {
         this.vfx.clear();
         this.abilityVfxFx.clear();
@@ -5019,8 +5127,10 @@ export class Renderer {
       if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
       if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
       if (npcPrewarmGroup) this.scene.remove(npcPrewarmGroup);
-      for (const item of entityPrewarmPool) this.storePooledVisual(item.key, item.visual);
-      for (const item of npcPrewarmPool) this.storePooledVisual(item.key, item.visual);
+      if (opts.publishPools) {
+        for (const item of entityPrewarmPool) this.storePooledVisual(item.key, item.visual);
+        for (const item of npcPrewarmPool) this.storePooledVisual(item.key, item.visual);
+      }
       if (playerPrewarmGroup) this.scene.remove(playerPrewarmGroup);
       if (objectPrewarmGroup) {
         // Re-show the object lights hidden during the prewarm so the pooled objects
@@ -5038,10 +5148,12 @@ export class Renderer {
       if (weatherPrewarmActive) this.weather.endPrewarm();
       doorPrewarmGroup = null;
       interiorPrewarmGroup = null;
-      entityPrewarmGroup = null;
-      npcPrewarmGroup = null;
-      entityPrewarmPool = [];
-      npcPrewarmPool = [];
+      if (opts.publishPools) {
+        entityPrewarmGroup = null;
+        npcPrewarmGroup = null;
+        entityPrewarmPool = [];
+        npcPrewarmPool = [];
+      }
       playerPrewarmGroup = null;
       objectPrewarmGroup = null;
       propMaterialPrewarmGroup = null;
@@ -5050,6 +5162,15 @@ export class Renderer {
       landmarkPrewarmGroup = null;
       weatherPrewarmActive = false;
     };
+
+    const textureResumeUnits = (
+      idPrefix: string,
+      textures: readonly THREE.Texture[],
+    ): PrewarmResumeUnit[] =>
+      [...new Set(textures)].map((texture, index) => ({
+        id: `${idPrefix}:${index}`,
+        run: () => this.prewarmTexture(texture),
+      }));
 
     const manifest: PrewarmManifestEntry[] = [
       {
@@ -5107,7 +5228,7 @@ export class Renderer {
         run: () => {
           createdViews += this.createPersistentPortalViews(
             createdViewTypes,
-            deadline,
+            buildDeadline,
             remainingPrewarmViewBudget(policy.maxViews, createdViews),
           );
         },
@@ -5124,7 +5245,7 @@ export class Renderer {
           createdViews += this.createCandidateViews(
             remainingPrewarmViewBudget(policy.maxViews, createdViews),
             createdViewTypes,
-            deadline,
+            buildDeadline,
           );
         },
         detail: () => `created=${createdViews};candidates=${candidateViews}`,
@@ -5270,6 +5391,11 @@ export class Renderer {
         category: 'props',
         priority: 47,
         required: false,
+        resumeUnits: () =>
+          textureResumeUnits('surface-detail', [
+            ...surfaceDetailPrewarmTextures(),
+            ...canopyDetailPrewarmTextures(),
+          ]),
         run: () => {
           const textures = [...surfaceDetailPrewarmTextures(), ...canopyDetailPrewarmTextures()];
           for (const texture of textures) this.prewarmTexture(texture);
@@ -5317,6 +5443,7 @@ export class Renderer {
         category: 'world',
         priority: 50,
         required: true,
+        resumeUnits: () => textureResumeUnits('scene', this.collectInitialSceneTextures()),
         run: async () => {
           textureUploads = constrainedPrewarm
             ? await this.prewarmInitialSceneTexturesBatched(
@@ -5332,11 +5459,8 @@ export class Renderer {
         category: 'vfx',
         priority: 60,
         required: false,
-        // Unlike foliage/landmark/interior, this spawns real particles into the
-        // shared pooled VFX system with no group to hide: resuming it live would
-        // be an unprompted, unexplained particle burst near the player
-        // mid-gameplay, not a hidden-then-revealed compile (#2571 review).
-        resumable: false,
+        // No resumeUnits: this spawns real particles into the shared pooled VFX
+        // system, so rerunning it live would create an unexplained burst.
         run: () => {
           const offsets = [
             [0, -4],
@@ -5389,6 +5513,35 @@ export class Renderer {
         category: 'world',
         priority: 80,
         required: true,
+        // If the loading deadline drops the monolithic compile, retain only
+        // explicit archetype-sized roots. Three r165's compileAsync first runs
+        // a synchronous traversal, so the live resume lane must never receive
+        // this.scene or another whole manifest entry.
+        resumeUnits: () => {
+          if (!this.asyncCompileSupported || !this.webgl.compileAsync) return [];
+          deferPoolPublication =
+            (entityPrewarmPool.length > 0 && (entityPrewarmGroup?.children.length ?? 0) > 0) ||
+            (npcPrewarmPool.length > 0 && (npcPrewarmGroup?.children.length ?? 0) > 0);
+          const groups: readonly [string, THREE.Group | null][] = [
+            ['doors', doorPrewarmGroup],
+            ['interiors', interiorPrewarmGroup],
+            ['players', playerPrewarmGroup],
+            ['mobs', entityPrewarmGroup],
+            ['npcs', npcPrewarmGroup],
+            ['objects', objectPrewarmGroup],
+            ['props', propMaterialPrewarmGroup],
+            ['foliage', foliagePrewarmGroup],
+            ['great-tree', greatTreePrewarmGroup],
+            ['landmark', landmarkPrewarmGroup],
+          ];
+          return buildPrewarmCompileUnits(
+            groups.flatMap(([id, group]) => (group ? [{ id, roots: group.children }] : [])),
+            async (root) => {
+              await this.compilePrewarmColorPrograms(root, false);
+              await this.compileSkinnedShadowPrograms(root);
+            },
+          );
+        },
         run: async () => {
           const compileStart = performance.now();
           // Use a dedicated budget, not `deadline - now`: linking every program now is
@@ -5405,32 +5558,20 @@ export class Renderer {
             compileMs = 0;
             return;
           }
-          if (this.webgl.compileAsync) {
-            compileMode = 'async';
-            for (const group of [playerPrewarmGroup, entityPrewarmGroup, npcPrewarmGroup]) {
-              if (group) {
-                await this.compileSkinnedShadowPrograms(group);
-                compiledSkinnedShadowGroups++;
-              }
+          compileMode = 'async';
+          for (const group of [playerPrewarmGroup, entityPrewarmGroup, npcPrewarmGroup]) {
+            if (group) {
+              await this.compileSkinnedShadowPrograms(group);
+              compiledSkinnedShadowGroups++;
             }
-            let settled = false;
-            const compilePromise = this.webgl
-              .compileAsync(this.scene, this.camera)
-              .then(() => {
-                settled = true;
-              })
-              .catch((err: unknown) => {
-                settled = true;
-                console.warn('Renderer async prewarm compile failed', err);
-              });
-            await Promise.race([compilePromise, sleep(policy.compileMaxMs)]);
-            compileTimedOut = !settled;
-            compileMs = roundMs(performance.now() - compileStart);
-          } else {
-            compileMode = 'sync';
-            this.webgl.compile(this.scene, this.camera);
-            compileMs = roundMs(performance.now() - compileStart);
           }
+          await this.compilePrewarmColorPrograms(this.scene, false).catch((err: unknown) => {
+            console.warn('Renderer async prewarm compile failed', err);
+          });
+          compileMs = roundMs(performance.now() - compileStart);
+          // Keep the historical diagnostic field as a budget-overrun signal,
+          // but never abandon a still-running compile behind the loading gate.
+          compileTimedOut = compileMs > policy.compileMaxMs;
         },
         detail: () =>
           `mode=${compileMode};timedOut=${compileTimedOut};skinnedShadowGroups=${compiledSkinnedShadowGroups}`,
@@ -5440,10 +5581,7 @@ export class Renderer {
         category: 'sky',
         priority: 90,
         required: false,
-        // Resuming this live would run real presented renders in a tight
-        // synchronous loop after the loading curtain is gone: the same
-        // long-task freeze this pass exists to prevent (#2571 review).
-        resumable: false,
+        // No resumeUnits: this would present real frames in a synchronous loop.
         run: () => {
           const points = [p.pos, activeZone.hub];
           for (const point of points) {
@@ -5459,10 +5597,7 @@ export class Renderer {
         category: this.post ? 'post' : 'world',
         priority: 100,
         required: false,
-        // Same reason as sky.current-zone above: a tight loop of real presented
-        // renders, not an off-thread compile. Resuming it live would reintroduce
-        // the exact long-task freeze this pass exists to prevent.
-        resumable: false,
+        // No resumeUnits: this is a tight loop of real presented renders.
         run: () => {
           const minPasses = this.lowGfx ? 8 : 10;
           while (renderPasses < minPasses && performance.now() < deadline) {
@@ -5533,43 +5668,41 @@ export class Renderer {
         }
       }
     } finally {
-      cleanupPrewarmArtifacts({ clearVfx: true });
+      cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication });
     }
 
     if (droppedEntries.length > 0) {
-      // Fire-and-forget: world-entry timing must not depend on this, so the
-      // stats below are computed and returned immediately regardless. Pay down
-      // whatever the deadline dropped once idle time actually shows up instead
-      // of leaving it permanently unpaid (issue #2571).
+      // Fire-and-forget: world-entry timing does not depend on this. Every
+      // retained item is an explicit small unit, never a whole entry rerun.
       const resume = droppedEntries.slice();
-      // Recorded separately from `manifestEntries`: that array already backs
-      // the frozen counts on the `stats` this function returns below, so a
-      // resumed entry must never push back into it (see runEntry's `target`
-      // param above).
-      const resumedManifestEntries: RendererPrewarmManifestEntryStats[] = [];
+      const failedResumeUnits: string[] = [];
       console.info(
         `[entry-guard] prewarm resume scheduled: dropped=[${resume.map((entry) => entry.id).join(',')}]`,
       );
-      void resumeDroppedPrewarmEntries(resume, {
-        idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
-        extendDeadline: () => {
-          deadline = performance.now() + PREWARM_RESUME_ENTRY_MAX_MS;
-          buildDeadline = deadline - PREWARM_BUILD_RESERVE_MS;
-        },
-        runEntry: (entry) => runEntry(entry, resumedManifestEntries),
-        afterEntry: hidePrewarmArtifacts,
-      })
+      void settlePrewarmBeforePublish(
+        () =>
+          resumeDroppedPrewarmEntries(resume, {
+            idleSlot: () =>
+              idleSlot(IDLE_PREWARM_TIMEOUT_MS, {
+                maxTimeoutDeferrals: 2,
+              }),
+            runUnit: (unit) => this.backgroundGpuWork.run(unit.run, GPU_WORK_PRIORITY.BOOT_RESUME),
+            afterEntry: hidePrewarmArtifacts,
+            onUnitError: (entry, unit, error) => {
+              failedResumeUnits.push(`${entry.id}:${unit.id}`);
+              console.warn(`Renderer prewarm resume unit failed: ${entry.id}:${unit.id}`, error);
+            },
+          }),
+        () => cleanupPrewarmArtifacts({ clearVfx: false, publishPools: true }),
+      )
         .then(() => {
-          const outcomes = resumedManifestEntries
-            .map((entry) => `${entry.id}=${entry.status}`)
-            .join(',');
-          console.info(`[entry-guard] prewarm resume done: ${outcomes}`);
+          const unitCount = resume.reduce((sum, entry) => sum + entry.units.length, 0);
+          console.info(
+            `[entry-guard] prewarm resume done: units=${unitCount};failed=[${failedResumeUnits.join(',')}]`,
+          );
         })
         .catch((err) => {
           console.warn('Renderer prewarm resume failed', err);
-        })
-        .finally(() => {
-          cleanupPrewarmArtifacts({ clearVfx: false });
         });
     }
 
@@ -6763,10 +6896,10 @@ export class Renderer {
     }
   }
 
-  // Shared core for every compile gate below: link `target`'s programs OFF the
+  // Shared core for every compile gate below: link `target`'s programs off the
   // main thread (KHR_parallel_shader_compile via compileAsync) against the live
-  // scene's exact lights + environment, racing the shared fail-soft ceiling so a
-  // driver that never reports completion can't strand a caller hidden forever.
+  // scene's exact lights + environment. The same priority arbiter owns live
+  // views and background uploads, so their WebGL work never overlaps.
   //
   // Deliberately ONE call per gated target, not batched into one call per frame.
   // #2571's third fix asked for exactly that batching, on the premise that "each
@@ -6792,10 +6925,23 @@ export class Renderer {
   // save a cheap boolean-flag walk). Given the traversal that actually matters is
   // already correctly scoped, and a real batch would cost more than it saves,
   // this stays one call per target.
-  private compileGate(target: THREE.Object3D): Promise<void> {
-    return raceCompileGate(
+  private compilePriorityFor(target: THREE.Object3D): number {
+    let current: THREE.Object3D | null = target;
+    while (current) {
+      if (current.userData.entityId === this.sim.player.targetId) {
+        return GPU_WORK_PRIORITY.ACTIONABLE_VIEW;
+      }
+      current = current.parent;
+    }
+    return GPU_WORK_PRIORITY.LIVE_VIEW;
+  }
+
+  private compileGate(target: THREE.Object3D): Promise<unknown> {
+    const priority = this.compilePriorityFor(target);
+    return this.liveCompileGates.run(
       () => this.webgl.compileAsync(target, this.camera, this.scene),
       VIEW_COMPILE_GATE_MAX_MS,
+      { priority },
     );
   }
 
@@ -6811,6 +6957,9 @@ export class Renderer {
     if (!this.asyncCompileSupported) return null;
     view.compilePending = true;
     group.visible = false;
+    // The DOM nameplate, target marker, health, and cast bar remain available
+    // while the 3D group is gated, so actionable information has an immediate
+    // placeholder without first-drawing a still-linking shader.
     return this.compileGate(group).then(() => {
       view.compilePending = false;
     });
@@ -7900,7 +8049,7 @@ export class Renderer {
     // (all composer + shadow passes) and re-arm the baseline BEFORE the governor
     // reads its draw signal below. The WebGL counters themselves stay monotonic
     // (autoReset is off); out-of-band renders reset them via discardOutOfBandDraws.
-    if (this.drawStats) this.drawStats.beginFrame(this.webgl.info.render, this.drawStatsFrame);
+    if (this.drawStats) this.drawStats.beginFrame();
     this.updateAdaptiveResolution(dt);
     this.viewportPollTimer += dt;
     if (this.viewportPollTimer >= 0.25) {

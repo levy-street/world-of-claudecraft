@@ -3415,6 +3415,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // [dev] /dev god cheat state, kept OFF the production gm flag so it never touches a
   // real game master (who could otherwise deal 100x or have their invuln toggled).
   devGod?: boolean;
+  /** Profiler-only invulnerability. The dev-gated server command sets this
+   *  idempotently so combat presentation remains active without /dev god's
+   *  outgoing damage multiplier. Server-private and never persisted. */
+  profilerInvulnerable?: boolean;
   /** Owner of a mob created by /dev spawn. Server-private and never persisted. */
   devSpawnOwnerId?: number;
   /** Dev/test healer target: friendly-selectable inert dummy instance. */

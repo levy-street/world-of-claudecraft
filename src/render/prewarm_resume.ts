@@ -1,46 +1,87 @@
-// Sequencing for resuming world-entry prewarm manifest entries that the
-// original wall-clock deadline dropped (renderer.ts's prewarmInitialScene).
-// A dropped entry was previously silently and permanently skipped, so its
-// compile cost paid out later as a mid-play shader-compile stall instead of
-// during the loading screen (issue #2571). This module is the pure
-// sequencing policy, Three/DOM-free and Vitest-driven; renderer.ts supplies
-// the actual work through hooks.
+// Bounded background sequencing for prewarm work dropped by the world-entry
+// deadline. A resume entry contains explicit small units. There is deliberately
+// no whole-entry callback: requestIdleCallback cannot preempt synchronous work
+// once it starts, including Three r165's compileAsync traversal prologue.
+
+export interface PrewarmResumeUnit {
+  id: string;
+  run: () => void | Promise<void>;
+}
 
 export interface PrewarmResumeEntry {
   id: string;
+  units: readonly PrewarmResumeUnit[];
+}
+
+export interface PrewarmResumeGroup<T> {
+  id: string;
+  roots: readonly T[];
 }
 
 export interface PrewarmResumeHooks<T extends PrewarmResumeEntry> {
-  /** Wait for a browser idle slot (or its bounded fallback) before each entry. */
-  idleSlot: () => Promise<void>;
-  /** Give the entry a fresh deadline window so its own internal checks don't
-   *  immediately re-drop it the moment it resumes. */
-  extendDeadline: () => void;
-  /** Re-run the dropped entry's original manifest logic. */
-  runEntry: (entry: T) => Promise<void>;
-  /** Runs after the entry settles, before the next entry's idle wait. Lets the
-   *  caller hide whatever scene state the entry just staged so it never sits
-   *  visible in front of the player between idle slots. */
+  idleSlot: () => Promise<unknown>;
+  runUnit?: (unit: PrewarmResumeUnit) => void | Promise<void>;
   afterEntry?: (entry: T) => void;
+  onUnitError?: (entry: T, unit: PrewarmResumeUnit, error: unknown) => void;
+}
+
+/** Publishes retained prewarm artifacts only after all resumed work settles. */
+export async function settlePrewarmBeforePublish<T>(
+  work: () => T | Promise<T>,
+  publish: () => void,
+): Promise<T> {
+  try {
+    return await work();
+  } finally {
+    publish();
+  }
 }
 
 /**
- * Resume every dropped entry, one at a time, each behind its own idle slot
- * and freshly extended deadline, in the same order they were originally
- * scheduled. Order matters: a later entry can depend on state an earlier one
- * staged (the whole-scene shader compile depends on the groups staged before
- * it in the manifest). `runEntry` is expected to report and swallow its own
- * per-entry failures (renderer.ts's runEntry does), so a rejection here
- * simply stops resuming the remaining entries rather than retrying.
+ * Turns materialized archetype roots into explicit resume units. Reference
+ * deduplication prevents one shared root from being compiled twice when it is
+ * reachable through more than one prewarm group. The caller supplies the
+ * compile operation so this seam stays Three-free and executable in Node.
+ */
+export function buildPrewarmCompileUnits<T extends object>(
+  groups: readonly PrewarmResumeGroup<T>[],
+  compile: (root: T) => unknown | Promise<unknown>,
+): PrewarmResumeUnit[] {
+  const seen = new Set<T>();
+  const units: PrewarmResumeUnit[] = [];
+  for (const group of groups) {
+    for (let index = 0; index < group.roots.length; index++) {
+      const root = group.roots[index];
+      if (seen.has(root)) continue;
+      seen.add(root);
+      units.push({
+        id: `${group.id}:${index}`,
+        run: async () => {
+          await compile(root);
+        },
+      });
+    }
+  }
+  return units;
+}
+
+/**
+ * Runs one explicitly bounded unit per idle slot. A failed unit is reported and
+ * skipped so independent shader families later in the manifest still warm.
  */
 export async function resumeDroppedPrewarmEntries<T extends PrewarmResumeEntry>(
   dropped: readonly T[],
   hooks: PrewarmResumeHooks<T>,
 ): Promise<void> {
   for (const entry of dropped) {
-    await hooks.idleSlot();
-    hooks.extendDeadline();
-    await hooks.runEntry(entry);
+    for (const unit of entry.units) {
+      await hooks.idleSlot();
+      try {
+        await (hooks.runUnit ? hooks.runUnit(unit) : unit.run());
+      } catch (error) {
+        hooks.onUnitError?.(entry, unit, error);
+      }
+    }
     hooks.afterEntry?.(entry);
   }
 }

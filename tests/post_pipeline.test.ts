@@ -144,7 +144,7 @@ describe('live post pipeline', () => {
     ).toHaveLength(5);
   });
 
-  it('gives medium tail SMAA without multisampling the geometry target', async () => {
+  it('keeps medium region-safe with only RenderPass and remapped OutputGrade', async () => {
     gfxSettings.smaa = true;
     gfxSettings.msaaSamples = 0;
     vi.stubGlobal('Image', class {});
@@ -161,14 +161,10 @@ describe('live post pipeline', () => {
     expect(post.composer.passes.map((pass) => pass.constructor.name)).toEqual([
       'RenderPass',
       'OutputGradePass',
-      'ShaderPass',
-      'SMAAPass',
     ]);
-    expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
+    expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
     expect(post.composer.renderTarget1.samples).toBe(0);
-    expect(post.composer.renderTarget2.samples).toBe(0);
     expect(post.composer.renderTarget1.depthBuffer).toBe(true);
-    expect(post.composer.renderTarget2.depthBuffer).toBe(true);
     expect(post.composer.renderTarget1.resolveDepthBuffer).toBe(false);
     expect(post.supportsDynamicResolution).toBe(true);
 
@@ -242,7 +238,7 @@ describe('live post pipeline', () => {
     }
   });
 
-  it('removes tail SMAA through the attribution kill switch', async () => {
+  it('keeps ScreenFx on distinct buffers when the SMAA attribution switch is off', async () => {
     disabledLayers.add('smaa');
     const { buildComposer } = await import('../src/render/post');
     const post = buildComposer(
@@ -259,6 +255,6 @@ describe('live post pipeline', () => {
       'OutputGradePass',
       'ShaderPass',
     ]);
-    expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
+    expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
   });
 });
