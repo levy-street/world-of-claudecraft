@@ -306,7 +306,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
             online: false,
             rank: 'member',
             lastLogin: null,
-            joinedAt: null,
+            joinedAt: Date.UTC(2026, 0, 2, 3, 4, 5),
           },
         ],
         events: [],
@@ -343,6 +343,9 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
     const m4 = c.socialInfo!.guild!.members.find((m) => m.id === 4)!;
     expect(m4).toMatchObject({ x: 30, z: 40, zone: 'Westwood', status: 'dungeon', online: true });
     expect(m4.activeTitle).toBeNull();
+    // the in-place merge must never clobber joinedAt (tenure badges would
+    // silently vanish on the first position push after login)
+    expect(m4.joinedAt).toBe(Date.UTC(2026, 0, 2, 3, 4, 5));
   });
 
   it('`socialpos` is a no-op when there is no prior socialInfo (guarded)', () => {

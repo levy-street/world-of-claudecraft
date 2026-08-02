@@ -210,6 +210,14 @@ describe('social_window: guild tenure badges (source pins)', () => {
   it('derives the tier from the pure core with one clock read per rebuild', () => {
     expect(painter).toContain('const now = Date.now();');
     expect(painter).toContain('const tier = tenureTier(m.joinedAt, now);');
+    // The row builder itself must stay clock-free (the caller threads `now`),
+    // so a per-row Date.now() cannot sneak back in behind the hoisted read.
+    const rowBuilder = painter.slice(
+      painter.indexOf('export function guildMemberRowHtml'),
+      painter.indexOf('export class SocialWindow'),
+    );
+    expect(rowBuilder.length).toBeGreaterThan(0);
+    expect(rowBuilder).not.toContain('Date.now()');
   });
 
   it('escapes the localized chip text', () => {
@@ -228,22 +236,33 @@ describe('social_window: guild tenure badges (source pins)', () => {
     expect(componentsCss).toContain('.soc-name .soc-tenure-veteran');
     // The chips must ride the theme's ensureReadable text tokens, never the
     // raw accent (invisible next to the gold rank chip on dark presets) or a
-    // static green (sub-AA on the light Parchment panel).
-    const start = componentsCss.indexOf('.soc-name .soc-tenure-new');
-    const section = componentsCss.slice(
-      start,
-      componentsCss.indexOf('}', componentsCss.indexOf('.soc-name .soc-tenure-veteran')),
-    );
-    expect(section).toContain('var(--color-text-light)');
-    expect(section).toContain('var(--color-text-muted)');
-    expect(section).not.toContain('var(--color-primary)');
-    expect(section).not.toContain('var(--color-friendly)');
+    // static green (sub-AA on the light Parchment panel). Each rule is sliced
+    // on its own so the PER-TIER binding is pinned (swapping the two tokens
+    // between the tiers must fail, not just dropping one from the union).
+    const rule = (selector: string): string => {
+      const start = componentsCss.indexOf(selector);
+      expect(start).toBeGreaterThan(-1);
+      return componentsCss.slice(start, componentsCss.indexOf('}', start));
+    };
+    const newRule = rule('.soc-name .soc-tenure-new');
+    expect(newRule).toContain('var(--color-text-light)');
+    expect(newRule).not.toContain('var(--color-text-muted)');
+    const veteranRule = rule('.soc-name .soc-tenure-veteran');
+    expect(veteranRule).toContain('var(--color-text-muted)');
+    expect(veteranRule).not.toContain('var(--color-text-light)');
+    for (const section of [newRule, veteranRule]) {
+      expect(section).not.toContain('var(--color-primary)');
+      expect(section).not.toContain('var(--color-friendly)');
+    }
   });
 });
 
 describe('social_window: guild tenure badges (rendered rows)', () => {
   const DAY = 24 * 60 * 60 * 1000;
-  const NOW = Date.UTC(2026, 7, 1);
+  // Deliberately YEARS away from the real clock: an implementation that
+  // ignored the `now` parameter and read Date.now() inside the row builder
+  // would flip the new (3d) and no-chip (40d) cases below to veteran.
+  const NOW = Date.UTC(2021, 0, 1);
   const row = (over: Partial<GuildRow> = {}): GuildRow => ({
     name: 'Gorak',
     cls: 'warrior',

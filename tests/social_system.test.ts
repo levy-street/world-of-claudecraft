@@ -825,6 +825,48 @@ describe('guilds', () => {
     expect((await h.svc.snapshot(1)).guild?.name).toBe('Forbidden Legion');
   });
 
+  it('refuses a format-invalid name with the rules message before the screen ever runs', async () => {
+    // Ordering pin, negative arm: validateGuildName gates FIRST, so a name that
+    // fails the format rules is refused with nameRules and the predicate is
+    // never consulted (swapping the two blocks flips which error this gets).
+    const screened: string[] = [];
+    const s = setup({
+      isNameOffensive: (name) => {
+        screened.push(name);
+        return true;
+      },
+    });
+    s.add(1, 'Aleph');
+    s.tx.setOnline(1);
+    await s.svc.guildCreate(s.actor(1), 'xx');
+    expect(s.tx.errorsFor(1).join()).toMatch(/3-24/);
+    expect(screened).toEqual([]);
+  });
+
+  it('requires every SocialService construction site to choose a screening predicate', () => {
+    const db = new FakeDb();
+    const tx = new FakeTransport(db);
+    // Fail-closed pin: the 4th constructor param deliberately has no default,
+    // so a host that forgets it fails to compile. Restoring a fail-open
+    // default makes this construction legal and tsc then rejects the
+    // unused expect-error, failing the gate.
+    // @ts-expect-error three args must not construct a SocialService
+    const svc = new SocialService(db, tx, () => 1000);
+    expect(svc).toBeInstanceOf(SocialService);
+  });
+
+  it('wires the real offensiveName screen at the production construction site (source pin)', async () => {
+    // The whole suite injects its own predicates, so the one edge connecting
+    // the tested service to the real screen is server/game.ts; pin it at the
+    // source level (title_reads precedent) so replacing it with () => false
+    // cannot ship silently.
+    const { readFileSync } = await import('node:fs');
+    const game = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
+    const site = game.slice(game.indexOf('new SocialService('));
+    expect(site.length).toBeGreaterThan(0);
+    expect(site.slice(0, 400)).toContain('offensiveName(');
+  });
+
   it('fires onGuildFounded exactly once, on the committed create only (the soc_guild_founded feed)', async () => {
     // Every refusal arm must stay silent: an invalid name, then a real
     // founding, then a duplicate name, then a create while already guilded.
