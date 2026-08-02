@@ -265,6 +265,7 @@ import {
   type ListReadGuardState,
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
+import { captureMarketBuy, recordMarketBuy } from './market_tracker';
 import { trackReachedLevel5 } from './meta_capi';
 import {
   applyMobScanTick,
@@ -7879,7 +7880,15 @@ export class GameServer {
         }
         break;
       case 'market_buy':
-        if (typeof msg.id === 'number') sim.marketBuy(msg.id, pid);
+        if (typeof msg.id === 'number') {
+          // Market-sale history observer (the recordBankOp idiom below): the
+          // sim's marketBuy returns void and emits no success event, so capture
+          // the listing + purse before the call and let recordMarketBuy derive
+          // success from the purse debit. Fire-and-forget; never awaited here.
+          const capture = captureMarketBuy(sim.marketListings, msg.id, sim.meta(pid)?.copper ?? null);
+          sim.marketBuy(msg.id, pid);
+          recordMarketBuy(session, capture, sim.meta(pid)?.copper ?? null);
+        }
         break;
       case 'market_cancel':
         if (typeof msg.id === 'number') sim.marketCancel(msg.id, pid);

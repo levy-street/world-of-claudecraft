@@ -50,6 +50,7 @@ import {
   marketStateKey,
   runMarketBackfill,
 } from './market_backfill';
+import { anonymizeMarketSalesForCharacter, MARKET_TRACKER_SCHEMA } from './market_tracker_db';
 import { OAUTH_SCHEMA } from './oauth_db';
 import { PLAY_SESSION_RETENTION_SCHEMA } from './play_session_retention_db';
 import {
@@ -1280,6 +1281,11 @@ export async function ensureSchema(): Promise<void> {
     // block, unblock). FK-references accounts(id), so it runs after SCHEMA.
     // Applied unconditionally (idempotent), like the other schema modules.
     await client.query(CONTENT_MODERATION_SCHEMA);
+    // World Market tracker history (completed sales + listing-book snapshots),
+    // written fire-and-forget by server/market_tracker.ts. No FK dependencies
+    // by design (see market_tracker_db.ts); applied unconditionally
+    // (idempotent), like the other schema modules.
+    await client.query(MARKET_TRACKER_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);
@@ -3266,6 +3272,15 @@ export async function deleteCharacter(accountId: number, characterId: number): P
   // already gone) changes nothing and must not enqueue.
   if (deleted) enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
   if (deleted) bustAdminGuildListReads();
+  if (deleted) {
+    // Market-sale history keeps its rows past a character deletion but drops
+    // the internal character-id columns (no FK does this for us, see
+    // market_tracker_db.ts). Best-effort: a failure here must not un-delete
+    // the character, so log and report the deletion anyway.
+    await anonymizeMarketSalesForCharacter(pool, characterId).catch((err) =>
+      console.error('market_sales anonymize failed for character', characterId, err),
+    );
+  }
   return deleted;
 }
 

@@ -342,6 +342,20 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS rate_limits');
   });
 
+  it('applies the market tracker schema (sale history + listing snapshots)', async () => {
+    // Same "defined but never wired" guard as DISCORD_SCHEMA above: the market
+    // analytics writers (server/market_tracker.ts) are fire-and-forget, so a
+    // missing table would only ever surface as silent row loss in the logs.
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS market_sales');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS market_listing_snapshots');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_sales_item');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_sales_buyer');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_sales_seller');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_listing_snapshots_captured');
+  });
+
   it('applies the compact player-metrics schema without a boot backfill', async () => {
     // Both phases, in the order server/main.ts runs them: the schema
     // transaction, then the CONCURRENTLY builds, which are now a SEPARATE call

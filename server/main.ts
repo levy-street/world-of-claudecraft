@@ -273,6 +273,11 @@ import {
   mapsListMineCore,
   mapsPublicListCore,
 } from './maps_routes';
+import {
+  marketTrackerIdle,
+  pruneMarketTrackerSnapshots,
+  recordMarketListingSnapshot,
+} from './market_tracker';
 import { metaEventSourceUrl, metaRequestUserData, trackAccountCreated } from './meta_capi';
 import {
   cleanReportReason,
@@ -434,6 +439,11 @@ const STATIC_PAGE_ALIASES = new Map([
 // startServer reads config.chatLogRetentionDays / .perfReportRetentionDays /
 // .maxWsPerIpHard, and handleApi reads activeConfig().turnstileSecret.
 const ADMIN_ONLINE_SAMPLE_MS = 60_000;
+// World Market tracker: aggregate the in-memory listing book into
+// market_listing_snapshots rows on this cadence (zero database reads per tick;
+// see server/market_tracker.ts). 5 minutes resolves the intraday price curve
+// the admin charts draw without measurable write volume.
+const MARKET_SNAPSHOT_INTERVAL_MS = 5 * 60_000;
 // Each realm re-reads the blocklist on this interval so edits on another realm
 // process propagate and expired blocks fall out.
 const BLOCKED_IP_REFRESH_MS = 60_000;
@@ -3123,6 +3133,14 @@ export async function startServer(): Promise<http.Server> {
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
+  // Market tracker snapshots start only AFTER loadMarket resolves, or the
+  // eager first capture would record a false empty book. The interval handle
+  // is cleared in shutdown so no capture races the FIFO drain there.
+  recordMarketListingSnapshot(game.sim.marketListings);
+  const marketSnapshotInterval = setInterval(() => {
+    recordMarketListingSnapshot(game.sim.marketListings);
+  }, MARKET_SNAPSHOT_INTERVAL_MS);
+  marketSnapshotInterval.unref();
   await game.loadMail();
   // Guild bank books boot-load BEFORE listen() below, so every non-oversized
   // guild's book is live before any player can join (Guild Bank Phase 3: this
@@ -3150,6 +3168,9 @@ export async function startServer(): Promise<http.Server> {
     );
     void pruneGitHubOAuthStates(pool).catch((err) =>
       console.error('github oauth state prune failed:', err),
+    );
+    void pruneMarketTrackerSnapshots().catch((err) =>
+      console.error('market snapshot prune failed:', err),
     );
   }, DAILY_PRUNE_INTERVAL_MS).unref();
   setInterval(() => {
@@ -3479,6 +3500,12 @@ export async function startServer(): Promise<http.Server> {
     // go missing until that character's next login (the join reconcile is the
     // only heal). Rejections log inside the writer, so the drain never throws.
     await deedRecordsIdle();
+    // Stop the market snapshot interval FIRST so no new capture enqueues behind
+    // the drain, then drain the market tracker FIFO (sale rows + snapshots)
+    // for the same reason as the two drains above. Rejections log inside the
+    // writer, so the drain never throws.
+    clearInterval(marketSnapshotInterval);
+    await marketTrackerIdle();
     // Stop accepted /unstuck report intake and drain only to a finite deadline.
     // Per-query timeouts bound an active write; deadline expiry aborts retry
     // delays and drops queued telemetry before the shared pool closes.
