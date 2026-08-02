@@ -99,9 +99,7 @@ describe('harbor deck stand-in render wiring', () => {
       "import { GRAND_FERRY_SHIP_PLAN } from '../sim/grand_ferry_ship_plan.generated';",
     );
     expect(HARBOR_SOURCE).toContain('const HARBOR_SHIP_STANDARD_SCALE =');
-    expect(HARBOR_SOURCE).toContain(
-      'x: HARBOR_SHIP_BOARDING_DECK.x * HARBOR_SHIP_STANDARD_SCALE,',
-    );
+    expect(HARBOR_SOURCE).toContain('x: HARBOR_SHIP_BOARDING_DECK.x * HARBOR_SHIP_STANDARD_SCALE,');
     expect(HARBOR_SOURCE).toContain(
       '(HARBOR_SHIP_BOARDING_DECK.y - GRAND_FERRY_SHIP_PLAN.model.keelY) * HARBOR_SHIP_STANDARD_SCALE,',
     );

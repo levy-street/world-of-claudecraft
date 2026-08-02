@@ -61,9 +61,7 @@ export function verifyPlanAgainstMesh(triangles, plan, options = {}) {
   };
   for (const key of ['length', 'beam', 'height', 'keelY']) {
     if (Math.abs(measured[key] - plan.model[key]) > boundsEpsilon) {
-      problems.push(
-        `model.${key}: plan says ${plan.model[key]}, mesh measures ${measured[key]}`,
-      );
+      problems.push(`model.${key}: plan says ${plan.model[key]}, mesh measures ${measured[key]}`);
     }
   }
 

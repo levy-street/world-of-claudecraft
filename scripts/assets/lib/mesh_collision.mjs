@@ -546,7 +546,8 @@ export function measureSideClearance(triangles, index, region, atY, options = {}
   // Testing for obstruction instead cannot tell a thin bulwark from a spar.
   const hasFloor = (x, z) =>
     columnHits(triangles, index, x, z).some(
-      (hit) => hit.up >= (options.upNormalMin ?? DEFAULT_UP_NORMAL_MIN) &&
+      (hit) =>
+        hit.up >= (options.upNormalMin ?? DEFAULT_UP_NORMAL_MIN) &&
         hit.y >= atY - depth &&
         hit.y <= atY + rise,
     );
