@@ -5,7 +5,7 @@
 // into its gates, and produces the per-frame camera override pose that is
 // applied over the input camera exactly like the first-spawn introCameraTick.
 
-import type { SimEvent } from '../sim/types';
+import type { SceneReleasePose, SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   applySceneOp,
@@ -80,7 +80,9 @@ export class SceneDirector {
       if (ev.pid !== undefined && ev.pid !== world.playerId) continue;
       const eventNowSec = ev.presentationTime ?? this.deps.nowSec();
       if (ev.op.kind === 'end') {
-        this.teardown(eventNowSec);
+        // The end op re-carries the authored release pose for the skip path
+        // (the camera/release op was dropped); it must survive the teardown.
+        this.teardown(eventNowSec, ev.op.releasePose);
         continue;
       }
       const directive = applySceneOp(this.state, ev.op, eventNowSec);
@@ -140,9 +142,11 @@ export class SceneDirector {
     if (consumeSceneTeardownWatchdog(this.teardownWatchdog, nowSec)) this.teardown(nowSec);
   }
 
-  private teardown(nowSec: number): void {
+  private teardown(nowSec: number, releasePose?: SceneReleasePose): void {
     clearSceneTeardownWatchdog(this.teardownWatchdog);
-    applySceneOp(this.state, { kind: 'end' }, nowSec);
+    // The watchdog arm calls this with no op and therefore no pose; a real
+    // end event passes its authored hand-back through.
+    applySceneOp(this.state, releasePose ? { kind: 'end', releasePose } : { kind: 'end' }, nowSec);
     // A skipped scene drops its remaining presentation ops (a scheduled
     // 'resume' included), so every terminal path restores music and parks
     // every prop cue.

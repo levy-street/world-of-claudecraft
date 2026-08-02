@@ -10,20 +10,15 @@ import {
   boardingJunctionRects,
   bridgeRailCapOverhang,
   bridgeVisualRect,
+  HARBOR_PLANK_STYLE,
   junctionPlankBoxes,
   RAIL_CAP_OVERHANG_YARDS,
 } from '../src/render/harbor_boarding_junction_core';
 import { GULLHAVEN_HARBOR, HARBORS, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 
-const STYLE = {
-  pitch: 0.38,
-  thickness: 0.12,
-  maxLength: 5.2,
-  groove: 0.03,
-  jointGap: 0.06,
-  tones: [0x8a795e, 0x7c6b52, 0x93826b],
-  trimTone: 0x5d4e3c,
-} as const;
+// The SHIPPED style: what buildHarbors feeds the field. Testing a fixture
+// copy would go silently stale when a board constant moves.
+const STYLE = HARBOR_PLANK_STYLE;
 
 describe('boarding junction field', () => {
   it('collects exactly the berth-head-height rects, bridge included', () => {

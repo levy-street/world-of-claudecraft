@@ -245,6 +245,18 @@ export function cutTrianglesInBox(document, box) {
       if (!position) continue;
       const semantics = primitive.listSemantics();
       const accessors = semantics.map((semantic) => primitive.getAttribute(semantic));
+      for (const semantic of semantics) {
+        // The merge below rebuilds every attribute as plain floats read via
+        // getElement, which preserves values exactly for float and normalized
+        // sources alike. Skin joints are INDICES, not quantities: converting
+        // or interpolating them is meaningless, so refuse skinned meshes
+        // until a caller handles them deliberately.
+        if (semantic.startsWith('JOINTS')) {
+          throw new Error(
+            `cutTrianglesInBox: ${semantic} is an index attribute; skinned meshes are unsupported`,
+          );
+        }
+      }
       const indices = primitive.getIndices();
       const count = indices ? indices.getCount() : position.getCount();
       const vertexIndex = (slot) => (indices ? indices.getScalar(slot) : slot);

@@ -405,14 +405,16 @@ function resolveAndApply(
 
 /** The end op re-carries the def's authored release pose: a skip drops the
  * un-emitted camera/release op, and the director's unconditional end teardown
- * must hand the camera back to the same authored pose either way. */
+ * must hand the camera back to the same authored pose either way. The LAST
+ * authored release wins, matching the final release a watched scene ends on. */
 function sceneEndOp(def: SceneDef | undefined): SceneWireOp {
+  let pose: SceneWireOp | null = null;
   for (const op of def?.ops ?? []) {
     if (op.kind === 'camera' && op.shot.kind === 'release' && op.shot.pose) {
-      return { kind: 'end', releasePose: op.shot.pose };
+      pose = { kind: 'end', releasePose: op.shot.pose };
     }
   }
-  return { kind: 'end' };
+  return pose ?? { kind: 'end' };
 }
 
 function finishScene(ctx: SimContext, playback: ScenePlayback, skipped: boolean): void {
@@ -468,7 +470,7 @@ export function updateScenes(ctx: SimContext): void {
     const def = sceneById(playback.sceneId);
     if (!def) {
       clearScriptedPlayerWalks(ctx, playback.claimId);
-      emitTerminalToStartedAudience(ctx, playback, { kind: 'end' });
+      emitTerminalToStartedAudience(ctx, playback, sceneEndOp(def));
       ctx.scenePlaybacks.delete(playback.claimId);
       continue;
     }

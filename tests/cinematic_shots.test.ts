@@ -693,6 +693,30 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     expectedCheck: 'cut.releaseSightLine',
   },
   {
+    // The other arm of the same check: a scene that WALKS the player and then
+    // releases without an authored hand-back pose restores the unknowable
+    // pre-scene camera, which is the exact defect class the pose exists for.
+    def: syntheticCameraScene('scn_test_lint_release_pose_missing_bad', 2.2, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 170, z: -58, height: 8 },
+            { x: 172, z: -58, height: 8 },
+          ],
+          lookAt: { kind: 'point', point: { x: 173, z: -48, height: 2 } },
+          dur: 1.6,
+        },
+      },
+      { at: 0.2, kind: 'playerWalk', to: { x: 176, z: -48 }, speed: 3 },
+    ]),
+    expectedCheck: 'cut.releaseSightLine',
+    expectedMeasured: 'unknowable pre-scene camera pose',
+    playerStart: { x: 173, z: -48 },
+  },
+  {
     def: syntheticCameraScene('scn_test_lint_terrain_clearance_bad', 1.7, [
       {
         at: 0,

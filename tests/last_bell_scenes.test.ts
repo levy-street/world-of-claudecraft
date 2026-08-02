@@ -878,7 +878,12 @@ describe('the voyage cinematic', () => {
       .filter((e): e is typeof e & { op: { kind: 'line'; key: string } } => e.op.kind === 'line')
       .map((e) => e.op.key);
     expect(lineKeys).toEqual(['lb.q0.scene.harbor', 'lb.q0.scene.plinth', 'lb.q0.scene.toll']);
-    expect(tail.some((e) => e.op.kind === 'end')).toBe(true);
+    // Natural completion carries the same authored hand-back the skip path
+    // re-carries, so the director restores one pose whichever way it ends.
+    expect(tail.find((e) => e.op.kind === 'end')?.op).toEqual({
+      kind: 'end',
+      releasePose: { yaw: 0, pitch: 0.35, dist: 9 },
+    });
     expect(sim.ctx.scenePlaybacks.size).toBe(0);
     expect(sim.player.pos).toEqual(gullhavenEnd);
   });

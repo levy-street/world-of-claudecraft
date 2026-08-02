@@ -37,14 +37,29 @@ export interface JunctionPlankStyle {
   trimTone: number;
 }
 
+/** The one harbor plank style: the boardwalk constants the whole harbor
+ * builder draws with, exported from the core so the junction field, the
+ * per-rect decks in render/harbor.ts, and the Node tests all pin the SAME
+ * values (a fixture copy would go silently stale). Muted driftwood tones. */
+export const HARBOR_PLANK_STYLE: JunctionPlankStyle = {
+  pitch: 0.38,
+  thickness: 0.12,
+  maxLength: 5.2,
+  groove: 0.03,
+  jointGap: 0.06,
+  tones: [0x8a795e, 0x7c6b52, 0x93826b],
+  trimTone: 0x5d4e3c,
+};
+
 /** How far the bridge's VISUAL planking runs past the measured hull skin so
  * the brow seats into the hull instead of ending over a slice of water. The
  * walkable rect in harbor_layout is untouched: collision still ends at the
  * measured skin line. */
 export const BRIDGE_HULL_VISUAL_OVERLAP_YARDS = 0.6;
 
-/** Rail caps normally overhang their post run at both ends; at the bridge's
- * hull end that overhang floats in mid-air, so it is cut flush there. */
+/** Rail caps normally overhang their post run at both ends; a bridge rail's
+ * hull-end cap is cut flush instead, so nothing runs on past the plank line
+ * toward the hull side. */
 export const RAIL_CAP_OVERHANG_YARDS = 0.12;
 
 export interface RailCapOverhang {
@@ -60,6 +75,11 @@ interface JunctionFrame {
   rects: readonly HarborDeck[];
 }
 
+// The junction rects share the bridge's generated height by provenance (all
+// derive from the ship's measured mating edge); the epsilon guards against a
+// future re-measure that lands them a float bit apart.
+const JUNCTION_HEIGHT_EPSILON = 1e-9;
+
 function junctionFrame(harbor: HarborDef): JunctionFrame {
   const alongX =
     Math.abs(harbor.berth.x - harbor.bridge.x) >= Math.abs(harbor.berth.z - harbor.bridge.z);
@@ -71,7 +91,9 @@ function junctionFrame(harbor: HarborDef): JunctionFrame {
   return {
     axis,
     hullward,
-    rects: harbor.decks.filter((deck) => deck.y === harbor.bridge.y),
+    rects: harbor.decks.filter(
+      (deck) => Math.abs(deck.y - harbor.bridge.y) < JUNCTION_HEIGHT_EPSILON,
+    ),
   };
 }
 
@@ -194,9 +216,10 @@ export function junctionPlankBoxes(
       const rowLo = Math.max(anchor + row * style.pitch + style.groove / 2, rect.across0);
       const rowHi = Math.min(anchor + (row + 1) * style.pitch - style.groove / 2, rect.across1);
       if (rowHi - rowLo < style.groove) continue;
-      // World-phased butt joints: ((row % 3) + 3) % 3 keeps the stagger cycle
-      // stable for negative rows.
-      const stagger = (((row % 3) + 3) % 3) * (style.maxLength / 3);
+      // World-phased butt joints; the double-modulo keeps the stagger and
+      // tone cycles stable for negative rows.
+      const cycle = style.tones.length;
+      const stagger = (((row % cycle) + cycle) % cycle) * (style.maxLength / cycle);
       const firstJoint =
         Math.floor((rect.along0 - stagger) / style.maxLength) * style.maxLength + stagger;
       for (let start = firstJoint; start < rect.along1; start += style.maxLength) {
@@ -204,7 +227,7 @@ export function junctionPlankBoxes(
         const to = Math.min(start + style.maxLength - style.jointGap, rect.along1);
         if (to - from < style.pitch * 0.5) continue;
         const board = Math.round(start / style.maxLength);
-        const tone = style.tones[(((row + board) % 3) + 3) % 3];
+        const tone = style.tones[(((row + board) % cycle) + cycle) % cycle];
         boxes.push(
           fieldBox(
             frame.axis,

@@ -36,6 +36,7 @@ import {
   boardingJunctionRects,
   bridgeRailCapOverhang,
   bridgeVisualRect,
+  HARBOR_PLANK_STYLE,
   junctionPlankBoxes,
   RAIL_CAP_OVERHANG_YARDS,
   type RailCapOverhang,
@@ -59,16 +60,18 @@ import { type PropPathSample, type PropPathSegment, propPathPoseAt } from './pro
 import { type PropAsset, propAsset } from './props';
 import { radialGlowTexture } from './textures';
 
-const BOARD_PITCH = 0.38; // plank width + seam
-const BOARD_THICK = 0.12;
-const BOARD_MAX_LEN = 5.2; // staggered joint length
+// The plank dimensions and driftwood tones come from the one exported style
+// in harbor_boarding_junction_core, so the per-rect decks here and the
+// aligned junction field can never drift apart.
+const BOARD_PITCH = HARBOR_PLANK_STYLE.pitch; // plank width + seam
+const BOARD_THICK = HARBOR_PLANK_STYLE.thickness;
+const BOARD_MAX_LEN = HARBOR_PLANK_STYLE.maxLength; // staggered joint length
 const PILE_RADIUS = 0.26;
 const PILE_MAX_DROP = 8; // pilings vanish into the deep; no need to reach -13.5
 const CLEAT_PITCH = 0.75; // grip strips down a gangway ramp
 
-// Muted driftwood tones; the deck alternates the three, trim runs darker.
-const BOARD_TONES = [0x8a795e, 0x7c6b52, 0x93826b] as const;
-const TRIM_TONE = 0x5d4e3c;
+const BOARD_TONES = HARBOR_PLANK_STYLE.tones;
+const TRIM_TONE = HARBOR_PLANK_STYLE.trimTone;
 const POST_TONE = 0x63533f;
 
 function woodMat(color: number): THREE.Material {
@@ -771,15 +774,7 @@ export function buildHarbors(seed: number, deps: HarborSceneDeps): { group: THRE
       const skirtRect = deck === harbor.bridge ? bridgeVisualRect(harbor) : deck;
       buildDeck(wood, skirtRect, seed, deck !== harbor.bridge, !junction);
     }
-    for (const box of junctionPlankBoxes(harbor, {
-      pitch: BOARD_PITCH,
-      thickness: BOARD_THICK,
-      maxLength: BOARD_MAX_LEN,
-      groove: 0.03,
-      jointGap: 0.06,
-      tones: BOARD_TONES,
-      trimTone: TRIM_TONE,
-    })) {
+    for (const box of junctionPlankBoxes(harbor, HARBOR_PLANK_STYLE)) {
       wood.box(box.tone, box.w, box.h, box.d, box.x, box.y, box.z);
     }
     for (const rail of harbor.rails) {
