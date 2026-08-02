@@ -23,6 +23,12 @@ STEP 2: parallel review agents (COVERAGE not filtering; standard truncation resu
 - Test coverage: a decisive negative test per refusal dimension on every op; snapshot
   null-transition tests; determinism assertion present.
 - Dead code and cleanup; sim import invariant.
+- Carried forward from Phase 1 QA (acceptance lines, each verified explicitly):
+  no `guildBank*` method body in `src/net/online.ts` is empty (all five Phase 1
+  stubs filled with real sends); every leave/kick/disband call site pairs
+  `setPlayerGuild` with `setPlayerGuildMembership` (or uses one combined entry
+  point), and join plus every rank change re-stamps; re-audit the
+  `guildMembership` parity-trace exclusion now that the officer gate reads it.
 - Per the dispatch matrix: architecture-reviewer, cross-platform-sync,
   privacy-security-review, qa-checklist.
 STEP 3: fix all BLOCKING and SHOULD-FIX; rerun the Phase 2 validation rows; commit fixes

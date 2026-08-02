@@ -1,6 +1,6 @@
 # Guild Bank: cross-phase state
 
-Current phase: Phase 1 complete (2026-08-02); Phase 1 QA next.
+Current phase: Phase 1 QA complete (2026-08-02, PASS-WITH-FOLLOWUPS); Phase 2 next.
 
 ## Locked design decisions
 - Base `release/v0.34.0`, branch `feature/guild-bank`. PR A (`feature/guild-social-v1`)
@@ -120,6 +120,12 @@ Current phase: Phase 1 complete (2026-08-02); Phase 1 QA next.
     `tests/parity/harness.test.ts` pinned exclusion list; SimContextHost fixtures in
     `tests/sim_context.test.ts` (+ live-view case) and `tests/entity_roster.test.ts`;
     `src/sim/CLAUDE.md` module table row.
+  - Phase 1 QA drift: `loadGuildBank` is LOAD-ONCE (skip when the book is live;
+    evict-then-load to reload); `serializeGuildBank` null means SKIP the write;
+    `tests/architecture.test.ts` now bans `server/` imports from `src/sim/`;
+    `tests/guild_bank.test.ts` grew to 33 tests (sanitizer lockstep pin vs
+    `sanitizeBankState`, craftedRecipeId, inert-facet pins in both worlds);
+    `docs/guild-bank/phase-02-qa.md` carries the Phase 1 acceptance lines.
 - Phase 2 wire tokens / dispatch cases / sim_i18n rows:
 - Phase 3 DDL / db functions / ledger ops / fee wiring:
 - Phase 4 UI modules / i18n keys / screenshots:
@@ -134,3 +140,9 @@ Current phase: Phase 1 complete (2026-08-02); Phase 1 QA next.
   demoted to member, or leaves the guild; each of those is a test case.
 - `require('typescript')` dual-alias and lockfile rules in CONTRIBUTING.md apply if any
   dependency work happens (none is expected).
+- `loadGuildBank` is load-once: it never clobbers a live book (unflushed deposits).
+  Reload = delete the map entry, then load; always re-get the book after, never hold
+  a reference across an evict. A null `serializeGuildBank` means the guild has no
+  loaded book: Phase 3 must SKIP that write, never persist an empty book over a row.
+- `sanitizeGuildBankState` accepts a parsed OBJECT only: a JSON string yields an
+  empty book. The Phase 3 DB read must hand `loadGuildBank` parsed JSONB, pinned.

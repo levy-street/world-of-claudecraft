@@ -3,7 +3,7 @@
 | Phase | Status | Started | Completed |
 |---|---|---|---|
 | Phase 1: foundation | Done | 2026-08-02 | 2026-08-02 |
-| Phase 1 QA | Not started | | |
+| Phase 1 QA | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-02 |
 | Phase 2: ops and wire | Not started | | |
 | Phase 2 QA | Not started | | |
 | Phase 3: persistence | Not started | | |
@@ -55,6 +55,8 @@
 - [ ] Every deliverable and acceptance item verified; BLOCKING and SHOULD-FIX fixed.
 - [ ] Tests decisive; no orphaned tests; no dead code; matrix suites green.
 
+Phase 1 QA: both lines verified and closed on 2026-08-02 (see Notes).
+
 ## Notes
 Phase 1 (2026-08-02):
 - The stamp landed as ONE field, `PlayerMeta.guildMembership: GuildMembership | null`
@@ -85,3 +87,45 @@ Phase 1 (2026-08-02):
     verify `sim.guildBanks.has(guildId)` after boot-loading.
   - The sanitize inventory loop is a deliberate second copy of `bank.ts` (rule
     of three); extract a shared leaf if a third copy appears.
+
+Phase 1 QA (2026-08-02), fresh auditor, verdict PASS-WITH-FOLLOWUPS:
+- Reviews dispatched (all four, COVERAGE not filtering): architecture-reviewer
+  PASS (0 blocking, 3 should-fix), cross-platform-sync APPROVE (0/0),
+  test-coverage-auditor CHANGES REQUESTED (1 blocking, 6 should-fix),
+  qa-checklist READY (0 blocking, 3 should-fix). Every BLOCKING and SHOULD-FIX
+  was fixed in this QA pass or pinned into a later phase's acceptance lines.
+- Code fixes landed: `loadGuildBank` is now LOAD-ONCE (a second load skips
+  rather than clobbering a live book with unflushed deposits; evict-then-load
+  is the sanctioned reload path, pinned by test); `serializeGuildBank` now
+  documents that null means SKIP the write, never persist an empty book (the
+  Phase 3 acceptance test must pin it); the sim architecture guard
+  (`tests/architecture.test.ts` forbiddenImport) now bans `server/` imports
+  from `src/sim/` (even type-only; verified to fail on an injected probe), so
+  the GuildRank-redeclaration contract is enforced, not just documented.
+- Test coverage closed (tests/guild_bank.test.ts, 26 to 33 tests): the
+  craftedRecipeId sanitize dimension (both arms, key-absence pinned, and in
+  the round-trip); truthy-non-object `instance` degrades to a plain slot;
+  truthy-non-object membership stamps normalize to null; `sanitize({})` whole
+  object default; overstacked PLAIN slot counts pinned uncapped (the bank.ts
+  pre-bag idiom, deliberate); a sanitizer LOCKSTEP pin feeds one hostile
+  fixture through both `sanitizeGuildBankState` and `sanitizeBankState` and
+  requires identical inventory arms (guards the deliberate second copy until
+  the rule-of-three extraction); the zero-rng test now covers the whole Phase 1
+  surface (capacity/price/empty-state/facet arm) with a positive observer
+  control; the offline Sim facet arm is behaviorally pinned inert (null read,
+  five commands mutate nothing); the five ClientWorld stubs are pinned to send
+  NOTHING on the wire (bare-prototype cmd spy).
+- Tracked forward, not fixable in Phase 1 (acceptance lines added to
+  phase-02-qa.md): the independent `setPlayerGuild` / `setPlayerGuildMembership`
+  stamps (prefer ONE combined entry point when the server call sites land; a
+  stale rank stamp is privilege-escalation-shaped once the officer gate reads
+  it); no empty `guildBank*` body in online.ts after Phase 2; re-audit the
+  parity exclusion. New Phase 2 notes: pin offline-empty `Sim.guildBanks` and
+  op purity (ops as pure functions of book + actor) once op bodies read the
+  map; decide `nextExpansionPrice` vs the personal bank's `nextExpansionCost`
+  naming before Phase 4 renders both. New Phase 3 notes: a null
+  `serializeGuildBank` must SKIP the DB write (never write an empty book over
+  a real row); the server hands `loadGuildBank` a PARSED object (a JSON string
+  raw yields an empty book by design, pin the parse at the DB read); bound the
+  raw row size server-side before load (the sim tolerates unbounded inventory
+  length by contract).
