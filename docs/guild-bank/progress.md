@@ -4,7 +4,7 @@
 |---|---|---|---|
 | Phase 1: foundation | Done | 2026-08-02 | 2026-08-02 |
 | Phase 1 QA | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-02 |
-| Phase 2: ops and wire | Not started | | |
+| Phase 2: ops and wire | Done | 2026-08-02 | 2026-08-02 |
 | Phase 2 QA | Not started | | |
 | Phase 3: persistence | Not started | | |
 | Phase 3 QA | Not started | | |
@@ -22,20 +22,23 @@
       `ClientWorld` stubs + parity pin update.
 
 ## Phase 2 deliverables
-- [ ] Op bodies in `src/sim/guild_bank.ts` (deposit/withdraw gold, deposit/withdraw item,
+- [x] Op bodies in `src/sim/guild_bank.ts` (deposit/withdraw gold, deposit/withdraw item,
       buy slots) with the full validation order and rank/proximity gates.
-- [ ] `guildBankInfoFor` (proximity + rank gated, boundary-cloned).
-- [ ] Wire end to end: five `guild_bank_*` tokens in `COMMAND_NAMES`/`COMMAND_FACETS`,
+- [x] `guildBankInfoFor` (proximity + rank gated, boundary-cloned).
+- [x] Wire end to end: five `guild_bank_*` tokens in `COMMAND_NAMES`/`COMMAND_FACETS`,
       `online.ts` stubs, `game.ts` allowlist + shape-check dispatch, `maybe('guildBank')`
       snapshot + delta-key registry.
-- [ ] Server stamping hooks: join path + every membership/rank change in `SocialService`.
-- [ ] `sim_i18n.ts` matcher rows for every new sim emit (same change).
-- [ ] Tests: op suite (permissions, clamps, capacity, quest-bind, indivisible instanced
+- [x] Server stamping hooks: join path + every membership/rank change in `SocialService`.
+- [x] `sim_i18n.ts` matcher rows for every new sim emit (same change).
+- [x] Tests: op suite (permissions, clamps, capacity, quest-bind, indivisible instanced
       stacks), command schema/facets, snapshot gating (away/dead/demoted/left), determinism.
 
 ## Phase 3 deliverables
 - [ ] `guild_banks` DDL (additive, idempotent) + boot load per realm + book injection into
-      the sim.
+      the sim. MUST also seed an empty book at `guild_create` (a freshly founded guild
+      has no row to boot-load, and ops never lazily create one), add the disband evict,
+      and land BEFORE any Phase 4 UI ships: until books load, every op is deliberately
+      silent-inert (Phase 2 review finding, tracked).
 - [ ] Escrow save: acting character + touched book in one transaction with the lease
       fence; rollback on fence miss; round-trip + crash-shape tests.
 - [ ] Ledger observer for guild ops (`container='guild'`), `create_fee` row, audit script
@@ -58,6 +61,78 @@
 Phase 1 QA: both lines verified and closed on 2026-08-02 (see Notes).
 
 ## Notes
+Phase 2 (2026-08-02):
+- Sim ops landed as free functions over SimContext in `src/sim/guild_bank.ts` with a
+  shared `requireOfficerBook` gate helper. Validation order exactly per state.md.
+  Reused emit strings (too-far, quest-item, "Not enough money.", "You are not in a
+  guild.") resolve via existing sim/server matchers; the 12 NEW strings are English-only
+  `error.guildBank*` / `log.guildBank*` rows in sim_i18n plus 4 RULES entries (money
+  fragments splice verbatim, item names via locItem). Gold-op sentences end "guild
+  treasury", item-op sentences end "guild bank", so the money and item rules can never
+  shadow each other. `guild_bank.ts` joined the S3 scan list in the same commit.
+- The SERVER entry points are pid-first `guildBank*For` methods on the Sim facade
+  (the bankInfoFor pattern), because the IWorld facet arm is inert-forever offline
+  (locked Phase 1 decision); dispatch calls those, never the facet members.
+- A stamped guild whose book is NOT loaded refuses SILENTLY (host wiring state, not a
+  player error): ops must never lazily create a book, because loadGuildBank is
+  load-once and a lazy empty book would shadow the Phase 3 DB row (dupe-shaped).
+  `guildBankInfoFor` likewise returns null with no book, so the Phase 4 tab never
+  renders before persistence wires up.
+- Withdraw-gold refuses past `Number.MAX_SAFE_INTEGER` on the purse (no game copper
+  cap exists; the bound is exact because both operands are safe integers).
+- `guildBankInfoFor` gates on DEAD as well (stricter than personal bankInfoFor):
+  acceptance requires the stream to null on death.
+- Wire: 5 tokens appended (append-only) + IWorldGuildBank facet tags; pins bumped:
+  send 174->179, dispatch 185->190, delta keys 62->63 (`guildBank` ->
+  `guildBankInfo`), dirty fixture + round-trip assertion added. The four
+  self-touching commands joined HEAVY_SELF_CMDS; guild_bank_buy_slots deliberately
+  did not (treasury-only, rides the ungated guildBank stream).
+- Stamps: `SocialTransport.onGuildMembershipChanged` is called synchronously at every
+  committed mutation site (create, accept, leave both arms, kick, setRank, transfer
+  BOTH rows: target leader + former leader officer, disband every member online or
+  not). The game.ts arm is the ONE combined entry point (pairs setPlayerGuild +
+  setPlayerGuildMembership; Phase 1 QA carried-forward line closed). A per-session
+  `guildStampSeq` fence makes sendSocialSnapshot (which now stamps the PAIR at
+  join/push) skip its stamp when a synchronous one landed mid-flight, closing the
+  in-flight-snapshot stale-rank window. Refused mutations stamp nothing (pinned per
+  site in tests/social_system.test.ts).
+- Parity-trace exclusion re-audited (carried-forward line): `guildMembership` stays
+  excluded; rationale recorded in tests/parity/trace.ts (host-injected authorization
+  input, always null offline where ops refuse; the gated state itself IS sampled).
+- tests/guild_bank.test.ts grew 33 -> 65 tests (shared refusal dimensions run against
+  ALL five ops via an OPS table; treasury-cap edge at exactly the cap; purse bound at
+  exactly MAX_SAFE_INTEGER; indivisible instanced stacks; craftedRecipeId round trip;
+  copper conservation; info null transitions; stale-rank scenario; zero-rng over the
+  whole op surface; the ClientWorld pin FLIPPED from send-nothing to the five exact
+  payloads, closing the "no empty online.ts body" carried-forward line).
+
+Phase 2 review (2026-08-02): architecture-reviewer (1 BLOCKING, 5 SHOULD-FIX, 6 NOTE),
+privacy-security-review (CHANGES REQUESTED: 1 BLOCKING, 2 SHOULD-FIX, 2 NIT),
+cross-platform-sync (APPROVE: 0 BLOCKING, 2 SHOULD-FIX, 3 NIT). All dispatched fresh,
+COVERAGE not filtering. Resolution:
+- BLOCKING (both): the deposit gate only refused quest items while the guild bank is an
+  anonymous exchange pipe. FIXED: `guildBankPipeRefusal` (quest / soulbound /
+  noMarketList / `isTransferLockedInstance`) on deposit AND withdraw, one negative test
+  per dimension plus the tampered-book withdraw arm; state.md decision line revised.
+- SHOULD-FIX fixed: guildStampSeq fence test (`tests/guild_stamp_fence.test.ts`, real
+  GameServer + deferred snapshot, mutation-checked); collect-quest un-credit/re-credit
+  test; `src/sim/CLAUDE.md` module row updated; required pid on all five ops (NOTE
+  upgraded, fails-open hazard); gold commands dropped from HEAVY_SELF_CMDS with a
+  truthful comment (copper is always-sent); stale describe title renamed.
+- SHOULD-FIX tracked to Phase 3 (not Phase 2 scope by the locked plan: no DDL, no
+  ledger): books are never boot-loaded so the live wire is deliberately silent-inert
+  until Phase 3 (guarded: ops never lazily create a book, load-once shadow hazard);
+  bank_ledger observer rows; guild_create empty-book seed; disband evict. Pinned in the
+  Phase 3 deliverables above. Guild bank ops are NOT deeds banker business by design
+  (module header comment); revisit in Phase 4 if wanted.
+- NITs deferred with rationale: firstJoin retro-deed fence race (cosmetic, needs a
+  same-millisecond join+mutation; both reviewers call the raced outcome acceptable);
+  item notices omit counts (cosmetic; no personal-bank precedent to match);
+  guildBankInfoFor full-payload ruling recorded in-code (locked copies can never enter
+  the book, so publicInstanceView's hidden fields are unreachable); spectate parity
+  with the personal bank (moderator-only, read-only, precedent-consistent);
+  resolveOfficerBook extraction is a rule-of-three watch item.
+
 Phase 1 (2026-08-02):
 - The stamp landed as ONE field, `PlayerMeta.guildMembership: GuildMembership | null`
   (`{ guildId, rank }`), not two: one `META_EXCLUDE` entry, atomic clear on leave.

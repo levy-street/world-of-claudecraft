@@ -1,6 +1,6 @@
 # Guild Bank: cross-phase state
 
-Current phase: Phase 1 QA complete (2026-08-02, PASS-WITH-FOLLOWUPS); Phase 2 next.
+Current phase: Phase 2 complete (2026-08-02); Phase 2 QA next.
 
 ## Locked design decisions
 - Base `release/v0.34.0`, branch `feature/guild-bank`. PR A (`feature/guild-social-v1`)
@@ -12,8 +12,15 @@ Current phase: Phase 1 QA complete (2026-08-02, PASS-WITH-FOLLOWUPS); Phase 2 ne
   escrow persistence in one transaction). See brainstorm.md for the full rationale.
 - Access: banker NPC proximity (the personal-bank `nearBanker` gate), Guild tab inside the
   existing bank window. Offline: no-op everywhere, tab never renders.
-- Quest items refused; instanced stacks move whole (`moveBetweenContainers`); items are
-  never destroyed by any load or refusal path.
+- Item policy (revised in Phase 2 review; supersedes the original "quest items refused"
+  line): the guild bank is an ANONYMOUS EXCHANGE PIPE (officer A deposits, officer B
+  withdraws), so it carries the full World Market / Ravenpost pipe policy, not the
+  personal bank's self-storage quest-only rule: quest, `soulbound`, `noMarketList`
+  (covers the rift-gear family), and per-copy transfer locks
+  (`isTransferLockedInstance`: armed `bindOnTrade` or bound `boundTo`) are ALL refused,
+  in BOTH directions (withdraw refuses too, so a tampered/legacy row can never complete
+  a laundering; the copy stays dormant in the book). Instanced stacks move whole
+  (`moveBetweenContainers`); items are never destroyed by any load or refusal path.
 - Disband refused while the bank holds any copper or item.
 - Creation fee ordering: create the guild in the DB first, then deduct the fee in the sim
   and save; a crash between them yields a free guild, never lost gold. Never charge first.
@@ -127,6 +134,61 @@ Current phase: Phase 1 QA complete (2026-08-02, PASS-WITH-FOLLOWUPS); Phase 2 ne
     `sanitizeBankState`, craftedRecipeId, inert-facet pins in both worlds);
     `docs/guild-bank/phase-02-qa.md` carries the Phase 1 acceptance lines.
 - Phase 2 wire tokens / dispatch cases / sim_i18n rows:
+  - Tokens appended to `COMMAND_NAMES` (append-only, end of table):
+    `guild_bank_deposit_gold {amount}`, `guild_bank_withdraw_gold {amount}`,
+    `guild_bank_deposit {slot, count?}`, `guild_bank_withdraw {slot, count?}`,
+    `guild_bank_buy_slots`; all five tagged `IWorldGuildBank` in
+    `COMMAND_FACETS` (+ the `WorldFacet` union member).
+  - `src/sim/guild_bank.ts` op section: `requireOfficerBook` (shared gate),
+    `guildBankDepositGold`, `guildBankWithdrawGold`, `guildBankDeposit`,
+    `guildBankWithdraw`, `guildBankBuySlots`, `guildBankInfoFor`; imports
+    `nearBanker` + `moveBetweenContainers` from `bank.ts` (nearBanker now
+    exported) and `formatMoney`. Missing-book refusals are SILENT (never
+    lazily create a book: load-once shadow hazard).
+  - `src/sim/sim.ts`: pid-first server entry points `guildBankDepositGoldFor`,
+    `guildBankWithdrawGoldFor`, `guildBankDepositFor`, `guildBankWithdrawFor`,
+    `guildBankBuySlotsFor`, `guildBankInfoFor`. The IWorld facet arm stays
+    inert (offline no-guild, locked decision).
+  - `server/game.ts`: five shape-only dispatch cases (after the bank_* cases);
+    `maybe('guildBank', sim.guildBankInfoFor(pid))` beside `maybe('bank')`;
+    HEAVY_SELF_CMDS += the two gold + two item commands (NOT buy_slots);
+    `ClientSession.guildStampSeq` fence; `sendSocialSnapshot` stamps the
+    setPlayerGuild + setPlayerGuildMembership PAIR behind the fence check;
+    transport `onGuildMembershipChanged` combined stamp entry point.
+  - `server/social.ts`: `SocialTransport.onGuildMembershipChanged`; synchronous
+    calls at guildCreate, guildAccept, guildLeave (both arms), guildKick,
+    guildSetRank, guildTransferLeader (both rows), guildDisband (every member).
+  - `src/net/online.ts`: five real sends; `s.guildBank` decode into
+    `guildBankInfo` (delta contract).
+  - sim_i18n rows (English-only, no overlay edits): `error.guildBankNoGuild`,
+    `error.guildBankRank`, `error.guildBankFull`, `error.guildBankSoulbound`,
+    `error.guildBankNoTransfer`, `error.guildBankTreasuryCap`,
+    `error.guildBankTreasuryShort`, `error.guildBankCarryCap`,
+    `error.guildBankCannotAfford`, `error.guildBankMaxSlots`,
+    `log.guildBankSlotsPurchased`, `log.guildBankDepositGold`,
+    `log.guildBankWithdrawGold`, `log.guildBankDepositItem`,
+    `log.guildBankWithdrawItem` + 4 RULES (money verbatim, items via locItem).
+    Reused strings: bankTooFar, bankQuestItem, 'Not enough money.',
+    bagsFullError ('You are not in a guild.' also resolves via server_i18n
+    guild.notInOne; the sim emit owns its own EXACT row).
+  - Review-driven (Phase 2 review, all three reviewers): the anonymous-pipe
+    item policy (`guildBankPipeRefusal`, both directions); ops take a REQUIRED
+    pid (no local-player fallback to fail open into); the two gold commands
+    left HEAVY_SELF_CMDS (copper rides the always-sent base self);
+    `tests/guild_stamp_fence.test.ts` pins the guildStampSeq fence against a
+    real GameServer with a deferred snapshot (mutation-checked decisive);
+    deeds banker-business credit is personal-bank-scoped BY DESIGN (module
+    header comment); `guildBankInfoFor` ships full payloads BY DECISION
+    (locked copies can never enter the book, so publicInstanceView's hidden
+    fields are unreachable); `src/sim/CLAUDE.md` row updated.
+  - Pins updated: `tests/command_schema.test.ts` (send 179, dispatch 190),
+    `tests/command_facets.test.ts` (GUILD_BANK_TAGS block),
+    `tests/snapshots.test.ts` (63 delta keys, `guildBank: 'guildBankInfo'`,
+    dirty fixture + round-trip assertion), `tests/localization_fixes.test.ts`
+    (guild_bank.ts on the S3 scan list), `tests/parity/trace.ts` (exclusion
+    re-audit comment), `tests/guild_bank.test.ts` (65 tests; ClientWorld pin
+    flipped to the five exact payloads), `tests/social_system.test.ts`
+    (FakeTransport.membershipStamps recorder + per-site stamp suite).
 - Phase 3 DDL / db functions / ledger ops / fee wiring:
 - Phase 4 UI modules / i18n keys / screenshots:
 
