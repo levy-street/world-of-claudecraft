@@ -2,7 +2,7 @@
 
 | Phase | Status | Started | Completed |
 |---|---|---|---|
-| Phase 1: foundation | Not started | | |
+| Phase 1: foundation | Done | 2026-08-02 | 2026-08-02 |
 | Phase 1 QA | Not started | | |
 | Phase 2: ops and wire | Not started | | |
 | Phase 2 QA | Not started | | |
@@ -12,13 +12,13 @@
 | Phase 4 QA (final, offers teardown) | Not started | | |
 
 ## Phase 1 deliverables
-- [ ] `src/sim/guild_bank.ts`: state type, constants (from state.md), capacity, sanitize,
+- [x] `src/sim/guild_bank.ts`: state type, constants (from state.md), capacity, sanitize,
       empty-state factory; unit tests including clamp and never-destroy-items cases.
-- [ ] Session-only guild membership stamp on `PlayerMeta` + server-callable stamp entry
+- [x] Session-only guild membership stamp on `PlayerMeta` + server-callable stamp entry
       point; parity-trace exclusion; tests.
-- [ ] `SimContext` view exposing the books (append-only extension); sim holds the
+- [x] `SimContext` view exposing the books (append-only extension); sim holds the
       per-guild map.
-- [ ] `src/world_api/guild_bank.ts` facet + barrel aggregation + `Sim` offline no-ops +
+- [x] `src/world_api/guild_bank.ts` facet + barrel aggregation + `Sim` offline no-ops +
       `ClientWorld` stubs + parity pin update.
 
 ## Phase 2 deliverables
@@ -56,4 +56,32 @@
 - [ ] Tests decisive; no orphaned tests; no dead code; matrix suites green.
 
 ## Notes
-(fill in per phase)
+Phase 1 (2026-08-02):
+- The stamp landed as ONE field, `PlayerMeta.guildMembership: GuildMembership | null`
+  (`{ guildId, rank }`), not two: one `META_EXCLUDE` entry, atomic clear on leave.
+  `GuildRank` is redeclared in `src/sim/guild_bank.ts` (sim never imports `server/`);
+  the string values mirror `server/social.ts`.
+- `guildBankNextExpansionPrice` landed with the capacity math (it is a pure table
+  lookup `guildBankInfoFor` needs in Phase 2, not an op body).
+- Sim facade delegates: `setPlayerGuildMembership` (beside `setPlayerGuild`),
+  `loadGuildBank`/`serializeGuildBank` (the Phase 3 persistence seam, pure shape
+  in/out). The offline facet arm is inert forever (the `socialInfo` idiom).
+- The two SimContextHost test fixtures (`tests/sim_context.test.ts`,
+  `tests/entity_roster.test.ts`) gained the `guildBanks` view; parity goldens
+  did not churn (full `tests/parity/` green).
+- Review outcomes (architecture-reviewer + cross-platform-sync, both approve, 0
+  blocking): the two SHOULD-FIX items landed in Phase 1 (`GUILD_RANKS` tuple +
+  type/value lockstep pin against `server/social.ts` `GuildRank` in
+  `tests/guild_bank.test.ts`, and a zero-rng-draw observer test over the whole
+  Phase 1 surface). Deferred follow-ups carried forward:
+  - Phase 2: `setPlayerGuild` and `setPlayerGuildMembership` are independent
+    stamps; the leave/kick/disband call sites MUST pair them (or use one
+    combined entry point), and Phase 2 QA adds the acceptance line "no
+    `guildBank*` method body in `src/net/online.ts` is empty".
+  - Phase 2: re-audit the `guildMembership` parity-trace exclusion when the
+    officer gate starts reading the field.
+  - Phase 3: add an unload/evict path for `Sim.guildBanks` (disband hook) so
+    the map is not unbounded on a long-lived realm; the server load path should
+    verify `sim.guildBanks.has(guildId)` after boot-loading.
+  - The sanitize inventory loop is a deliberate second copy of `bank.ts` (rule
+    of three); extract a shared leaf if a third copy appears.

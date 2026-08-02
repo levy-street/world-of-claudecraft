@@ -1,6 +1,6 @@
 # Guild Bank: cross-phase state
 
-Current phase: Phase 1 (not started).
+Current phase: Phase 1 complete (2026-08-02); Phase 1 QA next.
 
 ## Locked design decisions
 - Base `release/v0.34.0`, branch `feature/guild-bank`. PR A (`feature/guild-social-v1`)
@@ -97,6 +97,29 @@ Current phase: Phase 1 (not started).
 
 ## Ledger (fill in as phases complete)
 - Phase 1 files / IWorld members / pins updated:
+  - New: `src/sim/guild_bank.ts` (constants, `GuildBankState`, `GuildRank`,
+    `GuildMembership`, `guildBankCapacity`, `guildBankNextExpansionPrice`,
+    `createEmptyGuildBankState`, `sanitizeGuildBankState`, `loadGuildBank`,
+    `serializeGuildBank`, `stampGuildMembership`); `src/world_api/guild_bank.ts`
+    (`GuildBankInfo`, `IWorldGuildBank`); `tests/guild_bank.test.ts`.
+  - `src/sim/sim.ts`: `PlayerMeta.guildMembership` (session-only, null offline),
+    `Sim.guildBanks` map, host-literal `guildBanks` getter, delegates
+    `setPlayerGuildMembership` / `loadGuildBank` / `serializeGuildBank`, offline
+    facet no-ops (`guildBankInfo: null` + five inert commands).
+  - `src/sim/sim_context.ts`: `guildBanks` view (append-only) + factory binding.
+  - `src/net/online.ts`: `guildBankInfo: null` mirror + five inert command stubs
+    (no wire sends; tokens are Phase 2).
+  - `src/world_api.ts`: facet map row, import, `extends IWorldGuildBank`,
+    `GuildBankInfo` re-export. No `COMMAND_NAMES`/`COMMAND_FACETS` changes.
+  - IWorld members added (6): `guildBankInfo` (data), `guildBankDepositGold`,
+    `guildBankWithdrawGold`, `guildBankDeposit`, `guildBankWithdraw`,
+    `guildBankBuySlots` (methods).
+  - Pins updated: `tests/world_api_parity.test.ts` (IWORLD_MEMBERS + three sorted
+    sets, `FACET_GUILD_BANK` + exhaustiveness, registry, facet count 31, member
+    counts 282/72/210); `tests/parity/trace.ts` `META_EXCLUDE` + `guildMembership`;
+    `tests/parity/harness.test.ts` pinned exclusion list; SimContextHost fixtures in
+    `tests/sim_context.test.ts` (+ live-view case) and `tests/entity_roster.test.ts`;
+    `src/sim/CLAUDE.md` module table row.
 - Phase 2 wire tokens / dispatch cases / sim_i18n rows:
 - Phase 3 DDL / db functions / ledger ops / fee wiring:
 - Phase 4 UI modules / i18n keys / screenshots:
