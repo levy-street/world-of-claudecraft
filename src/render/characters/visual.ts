@@ -716,6 +716,30 @@ export class CharacterVisual {
   }
 
   /**
+   * Advance only clocks that must not stall while this cosmetic rig is outside
+   * the camera frustum. The next visible update consumes the bounded mixer
+   * debt, while the expensive state machine, pose writes, and bone palette work
+   * stay asleep. Renderer-owned actionable rigs never use this path.
+   */
+  advanceOffscreen(dt: number): void {
+    this.hitCooldown = Math.max(0, this.hitCooldown - dt);
+    if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
+    const stowTick = tickStow(this.stow, dt);
+    if (stowTick !== 'none') {
+      if (stowTick === 'swap') this.applyStowSwap();
+      this.endStowGesture();
+    }
+    this.pendingDt = Math.min(
+      MIXER_DT_CAP,
+      this.pendingDt + (this.holdT > 0 ? dt * this.holdScale : dt),
+    );
+    if (this.holdT > 0) {
+      this.holdT -= dt;
+      if (this.holdT <= 0) this.holdCooldown = HOLD_REFRACTORY_S;
+    }
+  }
+
+  /**
    * The baked half of the climb, on the rigs that ship the clips (all player
    * archetypes): the REACH rides Spellcast_Raise scrubbed up to its
    * arms-overhead crest and held, and the TOP-OUT rides Sit_Floor_Down played

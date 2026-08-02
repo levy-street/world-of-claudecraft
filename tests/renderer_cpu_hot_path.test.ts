@@ -121,4 +121,13 @@ describe('renderer CPU hot path', () => {
     expect(nameplates).toContain('name === v.nameplateStaticName');
     expect(nameplates).not.toContain("e.auras.some((a) => a.kind === 'stealth')");
   });
+
+  it('sleeps off-screen cosmetic rigs while preserving the actionable carve-out', () => {
+    expect(renderer).toContain(
+      'const fullVisualWork = shouldRunCharacterVisualWork(charOnScreen, actionablePose);',
+    );
+    expect(renderer).toContain('else active.advanceOffscreen(dt);');
+    expect(renderer).toContain('else v.mountVisual.advanceOffscreen(dt);');
+    expect(renderer).toContain('if (fullVisualWork) v.visual.updateWeaponVfx(dt);');
+  });
 });

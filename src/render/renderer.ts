@@ -121,6 +121,7 @@ import {
   characterLodBandsInto,
   crowdLodScaleSq,
   midAnimCadence,
+  shouldRunCharacterVisualWork,
   showsStaticFarMesh,
 } from './crowd_lod';
 import { daisVisualLift } from './dais_lift';
@@ -8911,10 +8912,15 @@ export class Renderer {
         const cadence = animCadenceFrames(d2, lodBands);
         animate = cadence <= 1 || (this.frameIdx + e.id) % cadence === 0;
       }
-      active.update(dt, st, animate);
+      // Frustum-culled rigs still receive the gameplay-safe state derivation
+      // above, but cosmetic pose, mount, and weapon VFX work can sleep until
+      // they re-enter the view. The actionable predicate is the hard carve-out.
+      const fullVisualWork = shouldRunCharacterVisualWork(charOnScreen, actionablePose);
+      if (fullVisualWork) active.update(dt, st, animate);
+      else active.advanceOffscreen(dt);
       // weapon-skin VFX ride the humanoid rig's held weapon; advancing them is a
       // few uniform writes per handle, so they stay smooth at every LOD tier
-      v.visual.updateWeaponVfx(dt);
+      if (fullVisualWork) v.visual.updateWeaponVfx(dt);
       // The sheathe swap is deferred to the gesture midpoint, so the rig (and any
       // skin VFX point light on it) is rebuilt inside update(), not at the diff.
       if (v.visual.consumeWeaponGraphDirty()) this.reconcileViewLights(v);
@@ -8933,7 +8939,8 @@ export class Renderer {
         mst.airborne = airborne;
         mst.backwards = st.backwards;
         mst.swimming = st.swimming;
-        v.mountVisual.update(dt, mst, animate);
+        if (fullVisualWork) v.mountVisual.update(dt, mst, animate);
+        else v.mountVisual.advanceOffscreen(dt);
         // the rider floats WITH the procedural bob (the hover cycle's idle
         // float), not just the mount body
         const bob = mountBobY(mountSpec, this.time, moving);
