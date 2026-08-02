@@ -16,6 +16,15 @@ import type { CharInfo, CharRef, GuildEventRow, GuildRank, SocialDb } from './so
 // kept as an alias for the schema's column default; the live realm is REALM
 export const DEFAULT_REALM = REALM;
 
+/** guild_members.joined_at (TIMESTAMPTZ) as finite epoch ms, or null. The
+ *  explicit finite guard (the discord_db joined-at precedent) keeps a bad
+ *  driver value from riding the wire as NaN. */
+function joinedAtEpochMs(raw: unknown): number | null {
+  if (raw === null || raw === undefined) return null;
+  const ms = new Date(raw as string | Date).getTime();
+  return Number.isFinite(ms) ? ms : null;
+}
+
 export const SOCIAL_SCHEMA = `
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS realm TEXT NOT NULL DEFAULT '${DEFAULT_REALM.replace(/'/g, "''")}';
 CREATE INDEX IF NOT EXISTS characters_realm ON characters(realm);
@@ -490,7 +499,7 @@ export class PgSocialDb implements SocialDb {
     return res.rows.map(({ active_title, ...r }) => ({
       ...r,
       lastLogin: r.lastLogin ? new Date(r.lastLogin).toISOString() : null,
-      joinedAt: r.joinedAt ? new Date(r.joinedAt).getTime() : null,
+      joinedAt: joinedAtEpochMs(r.joinedAt),
       activeTitle: typeof active_title === 'string' && active_title !== '' ? active_title : null,
     }));
   }

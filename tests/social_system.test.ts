@@ -327,12 +327,13 @@ class FakeTransport implements SocialTransport {
 
 // Test harness: characters 1..N, with helpers to flip presence. Tests that
 // exercise guild-name screening inject their own predicate; everything else
-// runs with the constructor default (screen nothing).
+// runs with the harness default (screen nothing). The constructor itself has
+// no default: every host must decide what it screens.
 function setup(cfg: { isNameOffensive?: (name: string) => boolean } = {}) {
   const db = new FakeDb();
   const tx = new FakeTransport(db);
   let clock = 1000;
-  const svc = new SocialService(db, tx, () => clock, cfg.isNameOffensive);
+  const svc = new SocialService(db, tx, () => clock, cfg.isNameOffensive ?? (() => false));
   const actors = new Map<number, { characterId: number; name: string }>();
   const add = (id: number, name: string, opts: { cls?: string; level?: number } = {}) => {
     db.addChar(id, name, opts.cls, opts.level);
@@ -816,9 +817,9 @@ describe('guilds', () => {
     expect((await s.svc.snapshot(1)).guild?.name).toBe('Iron Vanguard');
   });
 
-  it('does not screen when no predicate is injected (constructor default)', async () => {
-    // The default screens nothing: FakeDb suites that never inject a predicate
-    // must keep creating guilds freely.
+  it('does not screen when the harness injects no predicate (screen-nothing default)', async () => {
+    // The harness default screens nothing: FakeDb suites that never inject a
+    // predicate must keep creating guilds freely.
     await h.svc.guildCreate(h.actor(1), 'Forbidden Legion');
     expect(h.tx.errorsFor(1)).toEqual([]);
     expect((await h.svc.snapshot(1)).guild?.name).toBe('Forbidden Legion');

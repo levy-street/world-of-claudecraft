@@ -354,10 +354,11 @@ export class SocialService {
     private readonly tx: SocialTransport,
     private readonly now: () => number = () => Date.now(),
     // Guild-name content screen, injected so the service stays hermetic in tests:
-    // production wires offensiveName from server/auth.ts (server/game.ts); the
-    // default screens nothing. Applies at creation only; existing guild names are
-    // never retro-scanned here.
-    private readonly isNameOffensive: (name: string) => boolean = () => false,
+    // production wires offensiveName from server/auth.ts (server/game.ts). Required
+    // on purpose (no fail-open default): every construction site must decide what
+    // it screens. Applies at creation only; existing guild names are never
+    // retro-scanned here.
+    private readonly isNameOffensive: (name: string) => boolean,
   ) {}
 
   // -------------------------------------------------------------------------
