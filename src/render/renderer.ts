@@ -271,6 +271,8 @@ import {
   type PrewarmPolicy,
   partitionMandatoryLandmarkCandidates,
   prewarmEntryRuns,
+  prewarmMobCopies,
+  prewarmTemplateCompleted,
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
 } from './prewarm_policy';
@@ -413,6 +415,11 @@ const PREWARM_COMPILE_MAX_MS = 10000;
 // A background prewarm waits for a browser idle slot between its per-group
 // compile chunks; the timeout forces progress under sustained frame load.
 const IDLE_PREWARM_TIMEOUT_MS = 250;
+// Feature builders contain authored geometry (stairs, piers, rails and hulls)
+// that cannot be split after construction. Do not pay that one-shot cost for a
+// zone whose entry is still outside the interactive neighborhood; terrain and
+// sky can stream ahead safely, while the feature queue catches up near entry.
+const ZONE_STREAM_START_DISTANCE = 120;
 // Safety ceiling for the per-view async-compile gate: if KHR_parallel_shader_compile
 // somehow never reports a program ready, show the view anyway (degrading to the old
 // synchronous first-use compile) rather than stranding an entity invisible.
@@ -652,6 +659,7 @@ const PREWARM_OBJECT_ITEM_IDS = [
   'crypt_ritual_circle',
 ] as const;
 const PREWARM_MOB_POOL_COPIES = 3;
+const PREWARM_MOB_POOL_MAX_COPIES = 8;
 const PREWARM_OBJECT_POOL_COPIES = 2;
 // The common templates above are pooled several-deep (they spawn in groups); every
 // OTHER mob model is still built once so its shader program compiles at load.
@@ -1665,6 +1673,7 @@ export class Renderer {
   private shakeElapsed = 0;
   private fiestaRing: THREE.Mesh | null = null;
   private fiestaPowerupMeshes = new Map<number, THREE.Mesh>();
+  private readonly fiestaPowerupSeen = new Set<number>();
   // Per-entity power-up glow: emits a coloured swirl around the carrier until it expires.
   private fiestaGlows = new Map<number, { color: number; until: number; nextSwirl: number }>();
   // Per-target heal-glow throttle (ms since a target last bloomed a heal glow). A
@@ -2807,12 +2816,15 @@ export class Renderer {
       return;
     }
     // A DataTexture upload is synchronous even from requestIdleCallback.
-    // Split HDRIs into bounded row batches, then run the much smaller 512px
-    // PMREM between idle slots. This keeps background zone preparation from
-    // turning a future biome's sky into one 30+ MB gameplay frame.
+    // Split HDRIs into bounded row batches. The loading-screen path runs the
+    // much smaller 512px PMREM; the background lane only warms source pixels,
+    // so it cannot turn a future biome's sky into a 30+ MB gameplay frame.
     await this.prewarmTextureInIdle(envSource);
-    await idleSlot(IDLE_PREWARM_TIMEOUT_MS);
-    this.ensureEnvironmentBiome(zone.biome);
+    // PMREM generation is synchronous GPU work despite being started from an
+    // idle callback. On a real GPU it produced 300-400ms long tasks while the
+    // player crossed into Mirefen. Keep the raw HDRI warm for the dome, but
+    // leave the IBL on the already resident biome during gameplay; the
+    // loading-screen path above still builds every required entry PMREM.
     await this.prewarmTextureInIdle(domeSource);
   }
 
@@ -2833,14 +2845,21 @@ export class Renderer {
     opts?: { pace?: 'fast' | 'idle' },
   ): Promise<void> {
     const zoneId = this.zoneIdAt(x, z);
-    if (zoneId === null || this.preparedZones.has(zoneId)) {
+    if (zoneId === null) {
+      onProgress?.(1, 1);
+      return Promise.resolve();
+    }
+    const zone = zoneAt(x, z);
+    const idlePace = opts?.pace === 'idle';
+    const needsNearbyFeatures =
+      this.zoneNeedsFeaturePrepare(zone) &&
+      (!idlePace || this.zoneEntryIsNear(zone, this.camera.position.x, this.camera.position.z));
+    if (this.preparedZones.has(zoneId) && !needsNearbyFeatures) {
       onProgress?.(1, 1);
       return Promise.resolve();
     }
     const pending = this.pendingZonePrepares.get(zoneId);
     if (pending) return pending;
-    const zone = zoneAt(x, z);
-    const idlePace = opts?.pace === 'idle';
     const task = (async () => {
       const started = performance.now();
       onProgress?.(0, 100);
@@ -2869,10 +2888,10 @@ export class Renderer {
         (done, total) => onProgress?.(5 + Math.round((done / Math.max(1, total)) * 83), 100),
         { priority: { x, z }, pace: opts?.pace },
       );
-      // The group itself was frozen while still empty in the constructor.
-      // Freeze the children added by this zone as well; subsequent zones are
-      // handled by their own prepare pass.
-      freezeStaticMatrices(this.terrainView.group);
+      // Each streamed chunk freezes its own matrix in attachChunk(). Do not
+      // walk the whole world terrain group here: once several zones are
+      // resident that redundant updateMatrixWorld traversal becomes a visible
+      // long task exactly when a new zone finishes streaming.
       const terrainDone = performance.now();
       onProgress?.(89, 100);
       const waterMeshes = await this.waterView.ensureZone(zone, { pace: opts?.pace });
@@ -2880,13 +2899,12 @@ export class Renderer {
       const waterDone = performance.now();
       onProgress?.(96, 100);
       this.lastAttachedFeatureGroups = [];
-      this.ensureZoneFeatures(zone);
-      // A background prepare precompiles every program this zone just added
-      // (water lakes, bespoke biome features), one idle slot apart: a program
-      // whose driver link has not finished BLOCKS the main thread at its first
-      // draw (getUniforms queries ACTIVE_UNIFORMS synchronously), which was a
-      // measured multi-hundred-ms stall per new biome. compileAsync resolves
-      // only once the programs report ready, so the live render never pays it.
+      if (needsNearbyFeatures) this.ensureZoneFeatures(zone);
+      // The loading-screen path precompiles every program this zone just added
+      // (water lakes, bespoke biome features), one idle slot apart. The live
+      // streaming path deliberately leaves shader work to the per-view compile
+      // gate: compileAsync has a synchronous Three.js prologue that can still
+      // block a gameplay frame even when the driver supports parallel compile.
       if (opts?.pace === 'idle') {
         try {
           if (this.asyncCompileSupported) {
@@ -2943,11 +2961,12 @@ export class Renderer {
 
   async prewarmZoneAt(x: number, z: number, opts?: { background?: boolean }): Promise<void> {
     const zoneId = this.zoneIdAt(x, z);
-    if (zoneId === null || this.prewarmedZonePrograms.has(zoneId)) return;
+    if (zoneId === null) return;
+    const zone = zoneAt(x, z);
+    if (this.prewarmedZonePrograms.has(zoneId) && !this.zoneNeedsEntityPrewarm(zone)) return;
     const pending = this.pendingZonePrewarms.get(zoneId);
     if (pending) return pending;
     const task = (async () => {
-      const zone = zoneAt(x, z);
       const deadline = performance.now() + 5000;
       const t0 = performance.now();
       const mobPrewarm = this.buildEntityPrewarmGroup(zone);
@@ -2958,46 +2977,19 @@ export class Renderer {
       const tBuild = performance.now();
       let tCompile = tBuild;
       try {
-        // A background prewarm (the visible-zone streaming lane) links the new
-        // programs off-thread BEFORE the warm pass renders with them, so the
-        // pass never compiles inside a live gameplay frame. Compile the PREWARM
-        // GROUPS, one idle slot apart, never the whole scene: compileAsync's
-        // synchronous prologue walks and re-initializes every material it is
-        // handed, and a full-scene walk was a measured multi-hundred-ms stall
-        // per streamed zone. Live frames keep rendering across that whole
-        // awaited window, so runBackgroundPrewarm keeps both groups invisible
-        // until the synchronous warm pass (a visible group is a grid of T-posed
-        // rigs stacked next to the player). The gating path (behind the loading
-        // screen) keeps render-first, which also covers renderers without
-        // KHR_parallel_shader_compile.
+        // A background prewarm (the visible-zone streaming lane) only builds
+        // and pools visuals. Even compileAsync has a synchronous Three.js
+        // prologue, and the real-GPU freeze walk measured multi-second tasks
+        // while a neighbouring zone was being prepared. Streamed entities use
+        // their existing per-view compile gate when they become interactive;
+        // the full shader/warm pass remains on the loading-screen path.
         if (opts?.background) {
           await runBackgroundPrewarm([mobGroup, npcGroup], {
-            supportsAsyncCompile: this.asyncCompileSupported,
+            supportsAsyncCompile: false,
+            runWarmPass: false,
             idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
-            compileChild: async (child) => {
-              await Promise.race([
-                this.webgl.compileAsync(child as THREE.Object3D, this.camera, this.scene),
-                sleep(PREWARM_COMPILE_MAX_MS),
-              ]);
-              await this.compileSkinnedShadowPrograms(child as THREE.Object3D);
-            },
-            warmChild: (groupLike, child) => {
-              const group = groupLike as THREE.Group;
-              const target = child as THREE.Object3D;
-              const visibility = group.children.map((entry) => entry.visible);
-              try {
-                for (const entry of group.children) entry.visible = entry === target;
-                this.renderPrewarmPass(1 / 60, { offscreen: true });
-              } finally {
-                for (let i = 0; i < group.children.length; i++) {
-                  group.children[i].visible = visibility[i];
-                }
-              }
-            },
-            renderWarmPass: () => {
-              tCompile = performance.now();
-              this.renderPrewarmPass(1 / 60, { offscreen: true });
-            },
+            compileChild: async () => {},
+            renderWarmPass: () => {},
           });
         } else {
           tCompile = performance.now();
@@ -3010,13 +3002,13 @@ export class Renderer {
             ]);
           }
         }
-        this.prewarmedZonePrograms.add(zoneId);
+        if (!this.zoneNeedsEntityPrewarm(zone)) this.prewarmedZonePrograms.add(zoneId);
       } finally {
         mobGroup.removeFromParent();
         npcGroup.removeFromParent();
-        // Only publish visuals to the live pool after the warm pass. Background
-        // gameplay can otherwise take one out of its T-pose grid while the
-        // prewarm awaits idle compile slots, leaving its shadow variant cold.
+        // Publish the built visuals only after the prewarm group is detached.
+        // Background streaming has no warm pass, so its per-view compile gate
+        // remains responsible for first-use shader readiness.
         for (const item of mobPrewarm.pooled) this.storePooledVisual(item.key, item.visual);
         for (const item of npcPrewarm.pooled) this.storePooledVisual(item.key, item.visual);
         this.lastZonePrewarmStats = {
@@ -3086,7 +3078,14 @@ export class Renderer {
       horizon,
       forwardX,
       forwardZ,
-    ).filter((zone) => !this.preparedZones.has(zone.id) && !this.pendingZonePrepares.has(zone.id));
+    ).filter(
+      (zone) =>
+        this.zoneEntryIsNear(zone, cameraX, cameraZ) &&
+        (!this.preparedZones.has(zone.id) ||
+          !this.prewarmedZonePrograms.has(zone.id) ||
+          this.zoneNeedsFeaturePrepare(zone)) &&
+        !this.pendingZonePrepares.has(zone.id),
+    );
     this.pumpVisibleZonePrepareQueue();
   }
 
@@ -3094,7 +3093,12 @@ export class Renderer {
     if (this.visibleZonePrepareActive) return;
     const zone = this.visibleZonePrepareQueue.shift();
     if (!zone) return;
-    if (this.preparedZones.has(zone.id) || this.pendingZonePrepares.has(zone.id)) {
+    if (
+      (this.preparedZones.has(zone.id) &&
+        this.prewarmedZonePrograms.has(zone.id) &&
+        !this.zoneNeedsFeaturePrepare(zone)) ||
+      this.pendingZonePrepares.has(zone.id)
+    ) {
       this.pumpVisibleZonePrepareQueue();
       return;
     }
@@ -3145,6 +3149,9 @@ export class Renderer {
   // per-frame distance cull in updateZoneFeatureVisibility. Measured ONCE here:
   // these groups are static and matrix-frozen, so the bounds never move.
   private zoneFeatureGroups: { group: THREE.Group; footprint: FeatureFootprint | null }[] = [];
+  private zoneFeatureVisibilityX = Number.NaN;
+  private zoneFeatureVisibilityZ = Number.NaN;
+  private zoneFeatureVisibilityFar = Number.NaN;
 
   private attachZoneFeature(
     view: { group: THREE.Group; glowLights?: THREE.PointLight[]; cullGroups?: THREE.Group[] },
@@ -3194,6 +3201,9 @@ export class Renderer {
         footprint: measureFeatureFootprint(cullGroup),
       });
     }
+    // A newly attached group must be evaluated even when camera and fog are
+    // unchanged from the previous frame.
+    this.zoneFeatureVisibilityX = Number.NaN;
   }
 
   // Hide feature groups the fog has already swallowed. Terrain and foliage both
@@ -3203,6 +3213,16 @@ export class Renderer {
   private updateZoneFeatureVisibility(fogFar: number): void {
     const camX = this.camera.position.x;
     const camZ = this.camera.position.z;
+    if (
+      camX === this.zoneFeatureVisibilityX &&
+      camZ === this.zoneFeatureVisibilityZ &&
+      fogFar === this.zoneFeatureVisibilityFar
+    ) {
+      return;
+    }
+    this.zoneFeatureVisibilityX = camX;
+    this.zoneFeatureVisibilityZ = camZ;
+    this.zoneFeatureVisibilityFar = fogFar;
     for (const entry of this.zoneFeatureGroups) {
       entry.group.visible = isZoneFeatureVisible(entry.footprint, camX, camZ, fogFar);
     }
@@ -3281,6 +3301,38 @@ export class Renderer {
       default:
         break;
     }
+  }
+
+  private zoneNeedsFeaturePrepare(zone: ZoneDef): boolean {
+    switch (zone.biome) {
+      case 'dusk':
+        return !this.realmFlora;
+      case 'ember':
+        return !this.emberFeatures || !this.castleFeatures;
+      case 'frost':
+        return !this.frostSky;
+      case 'fen':
+        return !this.fenFeatures;
+      case 'amber':
+        return !this.amberFeatures;
+      case 'night':
+        return !this.nightFeatures;
+      case 'haunt':
+        return !this.hauntFeatures;
+      case 'jungle':
+        return !this.jungleFeatures;
+      case 'garden':
+        return !this.gardenFeatures;
+      case 'gale':
+        return !this.galeFeatures;
+      default:
+        return false;
+    }
+  }
+
+  private zoneEntryIsNear(zone: ZoneDef, cameraX: number, cameraZ: number): boolean {
+    const entry = zoneEntryPoint(zone, cameraX, cameraZ);
+    return Math.hypot(entry.x - cameraX, entry.z - cameraZ) <= ZONE_STREAM_START_DISTANCE;
   }
 
   /** Toggle biome-driven ambient precipitation (snow/rain). */
@@ -4348,6 +4400,28 @@ export class Renderer {
     return [...ids].sort();
   }
 
+  private authoredMobSpawnCountInZone(zone: ZoneDef, templateId: string): number {
+    let count = 0;
+    for (const camp of CAMPS) {
+      if (camp.mobId === templateId && zoneAt(camp.center.x, camp.center.z).id === zone.id) {
+        count += camp.count;
+      }
+    }
+    return count;
+  }
+
+  private zoneNeedsEntityPrewarm(zone: ZoneDef): boolean {
+    if (this.templateIdsInZone(zone, 'mob').some((id) => !this.prewarmedMobTemplates.has(id))) {
+      return true;
+    }
+    return this.templateIdsInZone(zone, 'npc').some((id) => {
+      const npc = NPCS[id];
+      if (!npc) return false;
+      const entity = this.prewarmEntity('npc', npc.id, npc.color, 1);
+      return !this.prewarmedNpcModels.has(visualKeyFor(entity));
+    });
+  }
+
   private buildEntityPrewarmGroup(zone: ZoneDef): {
     group: THREE.Group;
     pooled: { key: string; visual: CharacterVisual }[];
@@ -4363,9 +4437,10 @@ export class Renderer {
       group.add(obj);
       idx++;
     };
-    const build = (templateId: string, copies: number): void => {
+    const build = (templateId: string, copies: number): number => {
       const template = MOBS[templateId];
-      if (!template) return;
+      if (!template) return 0;
+      let built = 0;
       for (let i = 0; i < copies; i++) {
         const entity = this.prewarmEntity('mob', template.id, template.color, template.scale);
         const visual = createCharacterVisual(entity);
@@ -4375,15 +4450,26 @@ export class Renderer {
         if (poolKey) pooled.push({ key: poolKey, visual });
         visual.root.visible = true;
         place(visual.root);
+        built++;
       }
+      return built;
     };
     // Warm only templates that can appear in this zone. The per-template set
     // persists across transitions, so shared families are paid once per session.
     for (const templateId of this.templateIdsInZone(zone, 'mob')) {
       if (this.prewarmedMobTemplates.has(templateId)) continue;
-      const copies = PREWARM_MOB_COMMON_IDS.has(templateId) ? PREWARM_MOB_POOL_COPIES : 1;
-      build(templateId, copies);
-      this.prewarmedMobTemplates.add(templateId);
+      const copies = prewarmMobCopies(
+        PREWARM_MOB_COMMON_IDS.has(templateId),
+        this.authoredMobSpawnCountInZone(zone, templateId),
+        PREWARM_MOB_POOL_COPIES,
+        PREWARM_MOB_POOL_MAX_COPIES,
+      );
+      const built = build(templateId, copies);
+      // Do not permanently suppress a retry when a streamed/failed asset made
+      // the first build empty. A later zone-prewarm pass can then seed the pool.
+      if (prewarmTemplateCompleted(copies, built)) {
+        this.prewarmedMobTemplates.add(templateId);
+      }
     }
     return { group, pooled };
   }
@@ -5606,7 +5692,9 @@ export class Renderer {
       diagnosticsBaseline,
     };
     this.lastPrewarmStats = stats;
-    this.prewarmedZonePrograms.add(activeZone.id);
+    if (!this.zoneNeedsEntityPrewarm(activeZone)) {
+      this.prewarmedZonePrograms.add(activeZone.id);
+    }
     // Dev-channel diagnostic (pairs with main.ts's "[entry-guard] scene built"): one
     // line naming where the entry-time main-thread budget went, for isolating
     // world-entry process kills on real devices.
@@ -6174,7 +6262,8 @@ export class Renderer {
   private updateFiestaPowerups(dt: number): void {
     const match = this.sim.arenaInfo?.match;
     const list = match?.fiesta && match.state === 'active' ? match.fiesta.powerups : [];
-    const seen = new Set<number>();
+    const seen = this.fiestaPowerupSeen;
+    seen.clear();
     for (const p of list) {
       seen.add(p.id);
       let m = this.fiestaPowerupMeshes.get(p.id);

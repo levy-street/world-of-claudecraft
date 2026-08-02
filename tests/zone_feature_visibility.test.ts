@@ -67,6 +67,12 @@ describe('zone feature distance visibility', () => {
       expect(isZoneFeatureVisible(FEN, FEN.centerX, FEN.centerZ, far)).toBe(true);
     }
   });
+
+  it('preserves the strict fog boundary for squared-distance culling', () => {
+    const footprint = { centerX: 0, centerZ: 0, halfX: 0, halfZ: 0 };
+    expect(isZoneFeatureVisible(footprint, 3, 4, 5)).toBe(false);
+    expect(isZoneFeatureVisible(footprint, 3, 4, 5.01)).toBe(true);
+  });
 });
 
 describe('unseeded instance-matrix guard', () => {

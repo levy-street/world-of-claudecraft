@@ -45,9 +45,13 @@ export function featureEdgeDistance(
   camX: number,
   camZ: number,
 ): number {
+  return Math.sqrt(featureEdgeDistanceSq(footprint, camX, camZ));
+}
+
+function featureEdgeDistanceSq(footprint: FeatureFootprint, camX: number, camZ: number): number {
   const dx = Math.max(Math.abs(camX - footprint.centerX) - footprint.halfX, 0);
   const dz = Math.max(Math.abs(camZ - footprint.centerZ) - footprint.halfZ, 0);
-  return Math.hypot(dx, dz);
+  return dx * dx + dz * dz;
 }
 
 /**
@@ -63,7 +67,9 @@ export function isZoneFeatureVisible(
   drawDistance: number,
 ): boolean {
   if (!footprint) return true;
-  return featureEdgeDistance(footprint, camX, camZ) < drawDistance;
+  // This is a hot per-frame path. Compare squared distances so each registered
+  // feature avoids a sqrt while preserving the strict fog boundary.
+  return featureEdgeDistanceSq(footprint, camX, camZ) < drawDistance * drawDistance;
 }
 
 /**

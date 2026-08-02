@@ -10,6 +10,8 @@ import {
   type PrewarmPolicyInput,
   partitionMandatoryLandmarkCandidates,
   prewarmEntryRuns,
+  prewarmMobCopies,
+  prewarmTemplateCompleted,
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
 } from '../src/render/prewarm_policy';
@@ -155,6 +157,24 @@ describe('remainingPrewarmViewBudget', () => {
   it('normalizes fractional and invalid budgets', () => {
     expect(remainingPrewarmViewBudget(2.9, 1.2)).toBe(1);
     expect(remainingPrewarmViewBudget(-1, 0)).toBe(0);
+  });
+});
+
+describe('character pool sizing and completion', () => {
+  it('covers authored camp demand while respecting the bounded pool cap', () => {
+    expect(prewarmMobCopies(true, 6, 3, 8)).toBe(6);
+    expect(prewarmMobCopies(true, 99, 3, 8)).toBe(8);
+    expect(prewarmMobCopies(true, 0, 3, 8)).toBe(3);
+    expect(prewarmMobCopies(false, 6, 3, 8)).toBe(1);
+  });
+
+  it('normalizes invalid authored counts and requires every requested copy', () => {
+    expect(prewarmMobCopies(true, Number.NaN, 3, 8)).toBe(3);
+    expect(prewarmTemplateCompleted(3, 2)).toBe(false);
+    expect(prewarmTemplateCompleted(3, 3)).toBe(true);
+    expect(prewarmTemplateCompleted(3, 4)).toBe(true);
+    expect(prewarmTemplateCompleted(0, 0)).toBe(false);
+    expect(prewarmTemplateCompleted(3, Number.NaN)).toBe(false);
   });
 });
 

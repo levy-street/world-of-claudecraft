@@ -32,6 +32,8 @@ export interface BackgroundPrewarmHooks {
   warmChild?: (group: PrewarmGroupLike, child: unknown) => void;
   /** The synchronous warm pass; the groups are visible exactly for this call. */
   renderWarmPass: () => void;
+  /** Skip all shader work when a streamed zone is not yet interactive. */
+  runWarmPass?: boolean;
 }
 
 export async function runBackgroundPrewarm(
@@ -40,7 +42,7 @@ export async function runBackgroundPrewarm(
 ): Promise<void> {
   for (const group of groups) group.visible = false;
   try {
-    if (hooks.supportsAsyncCompile) {
+    if (hooks.runWarmPass !== false && hooks.supportsAsyncCompile) {
       for (const group of groups) {
         for (const child of [...group.children]) {
           await hooks.idleSlot();
@@ -58,8 +60,10 @@ export async function runBackgroundPrewarm(
       }
       await hooks.idleSlot();
     }
-    for (const group of groups) group.visible = true;
-    hooks.renderWarmPass();
+    if (hooks.runWarmPass !== false) {
+      for (const group of groups) group.visible = true;
+      hooks.renderWarmPass();
+    }
   } finally {
     for (const group of groups) group.visible = false;
   }

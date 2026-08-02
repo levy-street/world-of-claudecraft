@@ -101,6 +101,28 @@ describe('runBackgroundPrewarm', () => {
     expect(groups[0].visible).toBe(false);
   });
 
+  it('can defer streamed shader work until the zone becomes interactive', async () => {
+    const groups = [group(2)];
+    let compileCalls = 0;
+    let passRan = false;
+    await runBackgroundPrewarm(groups, {
+      supportsAsyncCompile: true,
+      runWarmPass: false,
+      idleSlot: async () => {
+        throw new Error('deferred prewarm must not yield');
+      },
+      compileChild: async () => {
+        compileCalls++;
+      },
+      renderWarmPass: () => {
+        passRan = true;
+      },
+    });
+    expect(compileCalls).toBe(0);
+    expect(passRan).toBe(false);
+    expect(groups[0].visible).toBe(false);
+  });
+
   it('leaves the groups hidden when a compile throws', async () => {
     const groups = [group(2)];
     await expect(
