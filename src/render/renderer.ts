@@ -46,6 +46,7 @@ import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
+import { angleBackendToken, parseGlIdentity } from './angle_identity_core';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
@@ -205,6 +206,7 @@ import {
   urlForcedTier,
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
+import { type GpuSectionTimer, type GpuTimerStats, probeGpuTimer } from './gpu_timer';
 import { buildGreatTreePrewarmGroup } from './great_tree_prewarm';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
@@ -1705,6 +1707,9 @@ export class Renderer {
   private nameplateTimer = 0;
   private glVendor = '';
   private glRenderer = '';
+  private angleBackend: string | null = null;
+  private gpuTimer: GpuSectionTimer | null = null;
+  private gpuTimerSupported = false;
   private contextLostCount = 0;
   private contextRestoredCount = 0;
   private phaseSamples: Record<RendererPhase, NumberSampleRing> = {
@@ -1783,8 +1788,21 @@ export class Renderer {
       this.contextRestoredCount++;
       this.captureGlIdentity();
       this.vfx.onContextRestored();
+      // Query objects from the lost context are dead husks: drop the whole
+      // timer and re-probe against the restored context.
+      this.gpuTimer?.dispose();
+      const gpuReprobe = probeGpuTimer(this.webgl);
+      this.gpuTimer = gpuReprobe.timer;
+      this.gpuTimerSupported = gpuReprobe.supported;
     });
     initGfxTier(this.webgl); // software-GL autodetect needs the live context
+    // GPU frame/section timing (EXT_disjoint_timer_query_webgl2): real GPU
+    // milliseconds per frame, split per post pass by the composer markers
+    // below. Cheap (a handful of query objects per frame), so it runs
+    // whenever the extension exists; ?gputimer=off is the kill switch.
+    const gpuProbe = probeGpuTimer(this.webgl);
+    this.gpuTimer = gpuProbe.timer;
+    this.gpuTimerSupported = gpuProbe.supported;
     if (GFX.composer || GFX.gradePass) {
       // three r165's render() resets info per pass (after the shadow pass, see
       // draw_stats_core.ts header), so with the composer's multiple passes every
@@ -2620,7 +2638,13 @@ export class Renderer {
         this.camera,
         this.viewport.width,
         this.viewport.height,
-        { gradeOnly: !GFX.composer },
+        {
+          gradeOnly: !GFX.composer,
+          // Reads the live field so a context-restore re-probe keeps working;
+          // split() outside a beginFrame (prewarm, census, screenshots) is a
+          // no-op by the core's contract.
+          gpuSectionSplit: (label) => this.gpuTimer?.split(label),
+        },
       );
 
     const resize = () => this.resizeViewport();
@@ -2664,9 +2688,11 @@ export class Renderer {
       this.glRenderer = String(
         dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
       );
+      this.angleBackend = angleBackendToken(parseGlIdentity(this.glRenderer));
     } catch {
       this.glVendor = '';
       this.glRenderer = '';
+      this.angleBackend = null;
     }
   }
 
@@ -3424,6 +3450,19 @@ export class Renderer {
     };
   }
 
+  /**
+   * Cheap live GL program count for the 1 Hz post-prewarm growth tracker
+   * (src/game/perf.ts); perfStats() allocates far too much for that cadence.
+   */
+  programCount(): number {
+    return this.webgl.info.programs?.length ?? 0;
+  }
+
+  /** Program count when the entry prewarm settled; null while it still runs. */
+  prewarmProgramBaseline(): number | null {
+    return this.lastPrewarmStats?.programsAfter ?? null;
+  }
+
   perfStats(): {
     graphicsConfigVersion: number;
     tier: string;
@@ -3464,6 +3503,10 @@ export class Renderer {
     foliage: FoliagePerfStats;
     glVendor: string;
     glRenderer: string;
+    angleBackend: string | null;
+    parallelCompile: boolean;
+    gpu: GpuTimerStats | null;
+    gpuTimerSupported: boolean;
     contextLost: number;
     contextRestored: number;
     phaseMs: RendererPhaseStats;
@@ -3522,6 +3565,10 @@ export class Renderer {
       foliage: this.foliage.perfStats(),
       glVendor: this.glVendor,
       glRenderer: this.glRenderer,
+      angleBackend: this.angleBackend,
+      parallelCompile: this.asyncCompileSupported,
+      gpu: this.gpuTimer ? this.gpuTimer.stats() : null,
+      gpuTimerSupported: this.gpuTimerSupported,
       contextLost: this.contextLostCount,
       contextRestored: this.contextRestoredCount,
       phaseMs: this.rendererPhaseStats(),
@@ -9443,12 +9490,18 @@ export class Renderer {
     this.updateOpaqueDrawOrder(dt);
     if (shakeX !== 0 || shakeY !== 0) this.camera.updateMatrixWorld();
     this.vfx.prepareDraw(this.camera);
+    this.gpuTimer?.beginFrame();
     if (this.post) {
       // screen-fx pass state (ripple re-projection, flash decay) advances
       // with the camera finalized for this frame
       this.post.updateScreenFx(dt);
       this.post.render();
-    } else this.webgl.render(this.scene, this.camera);
+    } else {
+      // No composer (low tier): the whole frame is one GPU section.
+      this.gpuTimer?.split('scene');
+      this.webgl.render(this.scene, this.camera);
+    }
+    this.gpuTimer?.endFrame();
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;

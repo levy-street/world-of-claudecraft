@@ -6,6 +6,7 @@ import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import type { DynamicResolutionRect } from './dynamic_resolution_core';
 import { GFX, sharedUniforms } from './gfx';
+import { GpuSectionMarkerPass } from './gpu_timer';
 import { PreparedBloomPass } from './post_bloom';
 import { PostEffectComposer } from './post_composer';
 import { StaticOpaqueN8AOPass } from './post_n8ao';
@@ -130,7 +131,7 @@ export function buildComposer(
   camera: THREE.Camera,
   width: number,
   height: number,
-  opts?: { gradeOnly?: boolean },
+  opts?: { gradeOnly?: boolean; gpuSectionSplit?: (label: string) => void },
 ): PostPipeline {
   // Grade-only mini chain for the medium tier: RenderPass -> OutputGradePass,
   // one fullscreen grade pass over the direct path, followed by SMAA. No AO
@@ -161,7 +162,17 @@ export function buildComposer(
   });
   const composer = new PostEffectComposer(webgl, target, width, height, plan.singleComposerBuffer);
 
+  // GPU section markers (gpu_timer.ts): a zero-draw pass BEFORE each real pass
+  // closes the previous TIME_ELAPSED query and opens the named one. Never
+  // added after the final pass: the composer routes the last enabled pass to
+  // the canvas, and a trailing marker would steal that slot.
+  const split = opts?.gpuSectionSplit;
+  const mark = (label: string): void => {
+    if (split) composer.addPass(new GpuSectionMarkerPass(split, label));
+  };
+
   let ao: N8AOPass | null = null;
+  mark('scene');
   if (plan.scene.pass === 'n8ao') {
     // N8AOPass replaces RenderPass. A separate scene pass would be discarded.
     ao = new StaticOpaqueN8AOPass(scene, camera, size.x, size.y);
@@ -204,12 +215,14 @@ export function buildComposer(
   let bloom: UnrealBloomPass | null = null;
   if (plan.composerPasses.includes('bloom')) {
     bloom = new PreparedBloomPass(size.clone(), BLOOM_STRENGTH, BLOOM_RADIUS, BLOOM_THRESHOLD);
+    mark('bloom');
     composer.addPass(bloom);
   }
   const grade = new OutputGradePass(
     sharedUniforms.uTime,
     bloom instanceof PreparedBloomPass ? bloom.bloomTexture : null,
   );
+  mark('grade');
   composer.addPass(grade);
 
   // Screen-fx pass (display space, straight after the grade and BEFORE the
@@ -219,6 +232,7 @@ export function buildComposer(
   // everything else, then self-disables whenever no ripple/flash is live;
   // EffectComposer simply skips a disabled pass, so toggling is free.
   const screenFx = new ShaderPass(ScreenFxShader);
+  mark('screenfx');
   composer.addPass(screenFx);
   const rippleSlots = Array.from({ length: SCREEN_RIPPLE_SLOTS }, () => ({
     x: 0,
@@ -243,7 +257,10 @@ export function buildComposer(
   // edge pass.
   // ?smaa=off is the dev-only perf-attribution kill switch. It keeps the
   // post-AA cost attributable while comparing the revised tier policy.
-  if (plan.composerPasses.includes('smaa')) composer.addPass(new SMAAPass(size.x, size.y));
+  if (plan.composerPasses.includes('smaa')) {
+    mark('smaa');
+    composer.addPass(new SMAAPass(size.x, size.y));
+  }
 
   return {
     composer,

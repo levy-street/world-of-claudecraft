@@ -298,8 +298,11 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // moment of the cycle.
 const RENDER_PURE_CORES = [
   'src/render/ability_vfx_core.ts',
+  'src/render/angle_identity_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/blade_grass_dense_core.ts',
+  'src/render/bottleneck_core.ts',
+  'src/render/gpu_timer_core.ts',
   'src/render/camera_boom_core.ts',
   'src/render/compile_gate.ts',
   'src/render/camera_director_core.ts',
