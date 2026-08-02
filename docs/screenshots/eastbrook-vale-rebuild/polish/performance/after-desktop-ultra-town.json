@@ -14,7 +14,7 @@
     "mode": "composite-sha256",
     "algorithm": "sha256",
     "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-    "fingerprint": "9d38235f6a16ce60925c0faa28567775cbdb640f1749686c866ffeb9e5a10cb9",
+    "fingerprint": "c4ff5868169ffecb708e1e60528af788a70c48366f0ce0e29f2f0995894d6749",
     "components": {
       "townAsset": {
         "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -43,7 +43,7 @@
         },
         "renderer": {
           "path": "src/render/renderer.ts",
-          "sha256": "abc8c3c3067e6d99c5e24967ef172750dcdba8811476934ae70a14cfef99965e"
+          "sha256": "a52cdfa0394c318df0b36cc63715dfaa457178f39fe869a4520a54537078a074"
         },
         "viewPriorityPolicy": {
           "path": "src/render/prewarm_policy.ts",
