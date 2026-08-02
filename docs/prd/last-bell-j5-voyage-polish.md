@@ -218,3 +218,53 @@ the J4 seam fixes are owner-accepted except the corner hole above; the J3
 journey framing and the landing dollies are accepted; the cut transitions,
 the opening slingshot, the docking approach, the mid-shot ferryman, and
 the boardwalk railing are the open set, J5 to J9 above.
+
+## Outcome (implemented 2026-08-02, J5 to J9 all landed)
+
+- J5: cause was BOTH leads. buildRail drew each run at one center-sampled
+  height (rails dove under the seam ramps at both harbors), and each
+  berth-head corridor kept a 2.4 yard authored opening past the split-deck
+  corner. Rails now follow the surface they protect
+  (src/render/harbor_rail_profile_core.ts, level runs byte-identical), the
+  corridor openings are closed with rails the clearance suite proves the
+  sweep misses, and the audit the owner asked for is
+  src/sim/harbor_rail_audit.ts + tests/harbor_rail_audit.test.ts (deck-edge
+  coverage arm and drawn-profile arm, failing controls on both). The audit
+  immediately caught two shipped Gullhaven defects, both fixed: a 3 yard
+  open-water channel between the outer run (ended x 750) and the pier head
+  (starts x 753), and the head seam ramp buried so deep under the lower
+  pier the walkway stepped down two sheer yards.
+- J6: silhouette-derived apron (bridgeApronRects): a wing past each side
+  rail and a forward strip, each clamped one groove shy of the measured
+  ship deck section it fronts (HarborDef.shipDecks IS the transformed
+  silhouette), so the boards meet the receding hull and never co-plane
+  with the ship floor. Junction test pins the pieces.
+- J7: covered cuts author entry 'snap' on their camera op; the director
+  holds the new shot's frame from its first tick. The linter's entry-ease
+  exemption now applies only under full black and never to snap shots; a
+  synthetic control (scn_test_lint_covered_cut_ease_bad) proves a fade-in
+  over an easing camera trips the motion caps, with a snap twin green.
+  The opening slingshot was the same ease from the destination live pose.
+- J8: every culling arm measured the ferryman's PARKED coordinates while
+  his rig rode the ship. The character frustum cull now centers on the
+  group's live position, and deck riders on a live cue keep the near
+  articulated rig with a real shadow (no far-LOD swap). Renderer-loop
+  change; verify on watch at the open-water beat.
+- J9: the towardBerth lint metric (travel toward the shore line at 0.95
+  with the bow pinned to travel) mathematically forced the 1.4 rad swing;
+  it is re-derived as a yaw-swing cap (0.45 rad) with the over-swing
+  synthetic control authored in the old parking shape. New glides run down
+  each hull's parked axis (mainland from the north strait side, Gullhaven
+  from the north bay), 0.3 rad decaying to 0, seaward lateral bias keeping
+  the swept hull clear of every rail; two new mid-sea basin stamps carve
+  the stern-reach water (gap digest re-minted, Eastbrook pin unmoved).
+
+Gate state: tsc, biome (changed files), and every touched suite green
+(cinematic_shots with the closed exemption and new controls, ferry berth
+clearance, harbor rail audit, boarding junction, scenes, harbors, fare,
+Q0, terrain chunks, farshore, trajectory reports). Heavy sim suites still
+flake under full-parallel load and pass in bounded batches, as documented
+in the J3/J4 state note. Still owed to close the loop: the watch pass
+(full crossings both directions), on-foot rail inspection at both docks,
+and fresh contact sheets; the mechanical gate is necessary, never
+sufficient.
