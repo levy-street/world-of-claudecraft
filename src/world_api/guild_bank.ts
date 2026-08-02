@@ -10,8 +10,10 @@ import type { InvSlot } from '../sim/types';
 // (GUILD_BANK_EXPANSION_PRICES in src/sim/guild_bank.ts); the treasury is
 // capped and deposits beyond the cap are refused, never truncated.
 //
-// Phase 1 lands the facet with stubs in both worlds; the guild_bank_* wire
-// tokens, dispatch, and the snapshot mirror land in Phase 2.
+// The guild_bank_* wire tokens, dispatch, and the snapshot mirror are live:
+// ClientWorld sends them and the server acts through the sim's pid-first
+// guildBank*For entry points. The offline Sim arm is inert forever (offline
+// play never has a guild). Books are not persisted until Phase 3.
 // ---------------------------------------------------------------------------
 
 export interface GuildBankInfo {

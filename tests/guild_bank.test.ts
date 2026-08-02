@@ -636,7 +636,10 @@ describe('guild bank ops: the shared refusal dimensions (every op, one axis at a
       sim.drainEvents();
       op.run(sim);
       expect(fingerprint(sim), op.name).toBe(before);
-      expect(hasErr(sim.drainEvents(), 'You are not in a guild.'), op.name).toBe(true);
+      expect(
+        hasErr(sim.drainEvents(), 'You must be in a guild to use the guild bank.'),
+        op.name,
+      ).toBe(true);
     }
   });
 

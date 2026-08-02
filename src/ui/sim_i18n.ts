@@ -51,7 +51,13 @@ const baseEnTable = {
   // log.* lines are the success notices. The four parameterized log.* rows are
   // matched by RULES entries; the rest register in the EXACT matcher
   // automatically.
-  'error.guildBankNoGuild': 'You are not in a guild.',
+  // Deliberately NOT the bare 'You are not in a guild.': that exact sentence is
+  // already server_i18n's guild.notInOne (emitted 8x from server/social.ts), and
+  // the hud runs the server matcher FIRST, so a duplicate row here would be dead
+  // at runtime while still shipping a second per-locale copy free to diverge.
+  // The guild-bank refusal names its own feature instead, so this row is the
+  // ONE that renders it.
+  'error.guildBankNoGuild': 'You must be in a guild to use the guild bank.',
   'error.guildBankRank': 'Only guild officers may use the guild bank.',
   'error.guildBankFull': 'The guild bank is full.',
   // The anonymous-pipe item policy refusals (guildBankPipeRefusal): soulbound

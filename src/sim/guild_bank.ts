@@ -238,7 +238,7 @@ function resolveActor(ctx: SimContext, pid: number): ReturnType<SimContext['reso
 function requireOfficerBook(ctx: SimContext, meta: PlayerMeta): GuildBankState | null {
   const m = meta.guildMembership;
   if (!m) {
-    ctx.error(meta.entityId, 'You are not in a guild.');
+    ctx.error(meta.entityId, 'You must be in a guild to use the guild bank.');
     return null;
   }
   if (!GUILD_BANK_RANKS.has(m.rank)) {

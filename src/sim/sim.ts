@@ -9451,7 +9451,7 @@ export class Sim {
 
   // The five op bodies + the gated info read, as pid-first SERVER entry points
   // (the bankInfoFor pattern). These are deliberately distinct from the IWorld
-  // facet members (guildBankDeposit etc. in the social no-op block below): the
+  // facet members (guildBankDeposit etc. in the social no-op block above): the
   // offline facet arm is inert forever because offline play never has a guild,
   // while the authoritative server acts for an explicit pid through these. All
   // gameplay rules (proximity, rank, quest-bind, caps, capacity) live in

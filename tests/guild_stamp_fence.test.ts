@@ -119,6 +119,88 @@ describe('the guild membership stamp fence (guildStampSeq)', () => {
     expect(sim.entities.get(session.pid)?.guild).toBe(''); // the name stamp cleared with it
   });
 
+  it('each guild_bank_* token routes to its OWN sim entry point with the right arguments', () => {
+    // The command_schema counts prove five cases EXIST; nothing proved which
+    // handler each reaches. pid and slot are both numbers, so a swapped case
+    // or a transposed argument list type-checks and passes every other suite.
+    const server = new GameServer();
+    const session = joinServer(server, 6, 'Dispatcher');
+    const pid = session.pid;
+    const calls: string[] = [];
+    for (const name of [
+      'guildBankDepositGoldFor',
+      'guildBankWithdrawGoldFor',
+      'guildBankDepositFor',
+      'guildBankWithdrawFor',
+      'guildBankBuySlotsFor',
+    ] as const) {
+      // biome-ignore lint/suspicious/noExplicitAny: spying the pid-first facade seam
+      (server.sim as any)[name] = (...args: unknown[]) => calls.push(`${name}(${args.join(',')})`);
+    }
+    const send = (msg: Record<string, unknown>) =>
+      priv(server).dispatchMessage(session, { t: 'cmd', ...msg }, JSON.stringify(msg), 0);
+    send({ cmd: 'guild_bank_deposit_gold', amount: 1500 });
+    send({ cmd: 'guild_bank_withdraw_gold', amount: 2500 });
+    send({ cmd: 'guild_bank_deposit', slot: 3, count: 2 });
+    send({ cmd: 'guild_bank_deposit', slot: 4 });
+    send({ cmd: 'guild_bank_withdraw', slot: 5, count: 1 });
+    send({ cmd: 'guild_bank_withdraw', slot: 6 });
+    send({ cmd: 'guild_bank_buy_slots' });
+    expect(calls).toEqual([
+      `guildBankDepositGoldFor(${pid},1500)`,
+      `guildBankWithdrawGoldFor(${pid},2500)`,
+      `guildBankDepositFor(${pid},3,2)`,
+      `guildBankDepositFor(${pid},4,)`, // count omitted stays undefined (whole stack)
+      `guildBankWithdrawFor(${pid},5,1)`,
+      `guildBankWithdrawFor(${pid},6,)`,
+      `guildBankBuySlotsFor(${pid})`,
+    ]);
+    // Shape rejects never reach the sim at all.
+    calls.length = 0;
+    send({ cmd: 'guild_bank_deposit_gold', amount: 'lots' });
+    send({ cmd: 'guild_bank_deposit_gold' });
+    send({ cmd: 'guild_bank_deposit' });
+    send({ cmd: 'guild_bank_withdraw', slot: '3' });
+    expect(calls).toEqual([]);
+  });
+
+  it('a stamp BEFORE the flight does not fence it: the snapshot still applies', async () => {
+    // The fence means "skip only when the seq moved DURING this flight", not
+    // "skip whenever the seq is non-zero". Without this arm, a wrong check
+    // (comparing against 0 instead of the captured seq) passes the whole
+    // suite while silently freezing every later snapshot stamp.
+    const server = new GameServer();
+    const session = joinServer(server, 4, 'Prior');
+    const sim = server.sim;
+    priv(server).social.tx.onGuildMembershipChanged(4, {
+      guildId: 7,
+      guildName: 'Iron Vanguard',
+      rank: 'member',
+    });
+    expect(session.guildStampSeq).toBeGreaterThan(0); // the fence value is already non-zero
+    // A LATER snapshot (its read started after that stamp) must be applied.
+    priv(server).social.snapshot = async () => guildSnap('officer');
+    await priv(server).sendSocialSnapshot(4);
+    expect(sim.players.get(session.pid)?.guildMembership).toEqual({ guildId: 7, rank: 'officer' });
+  });
+
+  it('an offline character id stamps nothing and never throws', async () => {
+    const server = new GameServer();
+    joinServer(server, 5, 'Online');
+    // disband stamps EVERY member, online or not: the offline arm must no-op.
+    expect(() =>
+      priv(server).social.tx.onGuildMembershipChanged(999999, {
+        guildId: 7,
+        guildName: 'Iron Vanguard',
+        rank: 'officer',
+      }),
+    ).not.toThrow();
+    expect(() => priv(server).social.tx.onGuildMembershipChanged(999999, null)).not.toThrow();
+    for (const meta of server.sim.players.values()) {
+      expect(meta.guildMembership).toBeNull();
+    }
+  });
+
   it('with no mid-flight stamp the chokepoint stamps the PAIR (the join path)', async () => {
     const server = new GameServer();
     const session = joinServer(server, 3, 'Joiner');
