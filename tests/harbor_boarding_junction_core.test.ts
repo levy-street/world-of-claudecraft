@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import {
   BRIDGE_HULL_VISUAL_OVERLAP_YARDS,
   boardingJunctionRects,
+  bridgeApronRects,
   bridgeRailCapOverhang,
   bridgeVisualRect,
   HARBOR_PLANK_STYLE,
@@ -70,9 +71,12 @@ describe('boarding junction field', () => {
 
   it('lays every board inside its rect on one shared row grid', () => {
     for (const harbor of HARBORS) {
-      const rects = boardingJunctionRects(harbor).map((rect) =>
-        rect === harbor.bridge ? bridgeVisualRect(harbor) : rect,
-      );
+      const rects = [
+        ...boardingJunctionRects(harbor).map((rect) =>
+          rect === harbor.bridge ? bridgeVisualRect(harbor) : rect,
+        ),
+        ...bridgeApronRects(harbor),
+      ];
       const anchor = harbor.bridge.z;
       const boxes = junctionPlankBoxes(harbor, STYLE);
       const boards = boxes.filter((box) => box.tone !== STYLE.trimTone);
@@ -96,6 +100,56 @@ describe('boarding junction field', () => {
         const clipped = owners.some((rect) => Math.abs(lo - (rect.z - rect.hd)) < 1e-9);
         expect(onGrid || clipped, `board row edge at ${lo}`).toBe(true);
       }
+    }
+  });
+
+  it('seats a hull-end apron that meets the measured silhouette (J6)', () => {
+    for (const harbor of HARBORS) {
+      const apron = bridgeApronRects(harbor);
+      // A wing past each side rail plus the forward strip across the opening.
+      expect(apron.length, harbor.id).toBe(3);
+      const hullward = harbor.berth.x >= harbor.bridge.x ? 1 : -1;
+      const skin = harbor.bridge.x + hullward * harbor.bridge.hw;
+      const visualEnd = skin + hullward * BRIDGE_HULL_VISUAL_OVERLAP_YARDS;
+      const sections = harbor.shipDecks.slice(0, -1);
+      for (const piece of apron) {
+        expect(piece.y).toBe(harbor.bridge.y);
+        // Never co-planes with a measured ship deck section: the boards stop
+        // shy of every section's inboard edge, so the ship's own floor plane
+        // is never fought. The generated section boundaries carry sub-mm
+        // float slivers against the bridge edges, hence the 1e-3 floor.
+        for (const section of sections) {
+          const overlapX =
+            Math.min(piece.x + piece.hw, section.x + section.hw) -
+            Math.max(piece.x - piece.hw, section.x - section.hw);
+          const overlapZ =
+            Math.min(piece.z + piece.hd, section.z + section.hd) -
+            Math.max(piece.z - piece.hd, section.z - section.hd);
+          expect(
+            overlapX > 1e-3 && overlapZ > 1e-3,
+            `${harbor.id} apron piece at ${piece.x},${piece.z} overlaps a ship deck section`,
+          ).toBe(false);
+        }
+      }
+      // The forward strip carries the boards from the old visual end onward
+      // to the measured deck edge, closing the dark slot across the opening.
+      const strip = apron.find((piece) => Math.abs(piece.z - harbor.bridge.z) < 1e-9);
+      expect(strip, harbor.id).toBeDefined();
+      if (strip) {
+        const far = hullward > 0 ? strip.x + strip.hw : strip.x - strip.hw;
+        expect(hullward * (far - visualEnd), harbor.id).toBeGreaterThan(0.5);
+      }
+      // The receding-taper side's wing reaches well past the skin line, the
+      // corner where the owner's screenshot showed water.
+      const wings = apron.filter((piece) => Math.abs(piece.z - harbor.bridge.z) > 1e-9);
+      expect(wings.length, harbor.id).toBe(2);
+      expect(
+        wings.some((wing) => {
+          const far = hullward > 0 ? wing.x + wing.hw : wing.x - wing.hw;
+          return hullward * (far - skin) > 0.9;
+        }),
+        harbor.id,
+      ).toBe(true);
     }
   });
 
