@@ -56,6 +56,7 @@ import type { IWorldDuelArena } from '../src/world_api/duel_arena';
 import type { IWorldDungeonFinder } from '../src/world_api/dungeon_finder';
 import type { IWorldDungeons } from '../src/world_api/dungeons';
 import type { IWorldEntityRoster } from '../src/world_api/entity_roster';
+import type { IWorldGuildBank } from '../src/world_api/guild_bank';
 import type { IWorldInteraction } from '../src/world_api/interaction';
 import type { IWorldInventory } from '../src/world_api/inventory';
 import type { IWorldLoot } from '../src/world_api/loot';
@@ -275,6 +276,14 @@ export const IWORLD_MEMBERS = [
   { name: 'bankDeposit', kind: 'method' },
   { name: 'bankWithdraw', kind: 'method' },
   { name: 'bankBuySlots', kind: 'method' },
+  // --- guild bank: officer-plus proximity-gated read + gold/item/buy commands
+  //     (Phase 1 stubs in both worlds; the wire lands in Phase 2) ---
+  { name: 'guildBankInfo', kind: 'data' },
+  { name: 'guildBankDepositGold', kind: 'method' },
+  { name: 'guildBankWithdrawGold', kind: 'method' },
+  { name: 'guildBankDeposit', kind: 'method' },
+  { name: 'guildBankWithdraw', kind: 'method' },
+  { name: 'guildBankBuySlots', kind: 'method' },
   // --- dungeons + delves commands and reads ---
   { name: 'enterDungeon', kind: 'method' },
   { name: 'leaveDungeon', kind: 'method' },
@@ -499,10 +508,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // marketListInstance, leaving 276. Reactive aura timing adds
     // reactiveAbilityWindowRemaining, leaving 277; this branch removes the
     // renderer-only riftCollisionToken with third-person camera collision,
-    // leaving 276.
-    expect(IWORLD_MEMBERS.length).toBe(276);
-    expect(DATA_MEMBERS.length).toBe(71);
-    expect(METHOD_MEMBERS.length).toBe(205);
+    // leaving 276. The Guild Bank foundation adds the six IWorldGuildBank
+    // members (one data read + five commands), leaving 282.
+    expect(IWORLD_MEMBERS.length).toBe(282);
+    expect(DATA_MEMBERS.length).toBe(72);
+    expect(METHOD_MEMBERS.length).toBe(210);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -620,6 +630,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendlyTabTarget',
       'gatheringProficiency',
       'guildAccept',
+      'guildBankBuySlots',
+      'guildBankDeposit',
+      'guildBankDepositGold',
+      'guildBankInfo',
+      'guildBankWithdraw',
+      'guildBankWithdrawGold',
       'guildCreate',
       'guildDecline',
       'guildDemote',
@@ -825,6 +841,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipment',
       'equipmentInstances',
       'gatheringProficiency',
+      'guildBankInfo',
       'hobbyCraft',
       'honor',
       'inventory',
@@ -946,6 +963,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendRemove',
       'friendlyTabTarget',
       'guildAccept',
+      'guildBankBuySlots',
+      'guildBankDeposit',
+      'guildBankDepositGold',
+      'guildBankWithdraw',
+      'guildBankWithdrawGold',
       'guildCreate',
       'guildDecline',
       'guildDemote',
@@ -1416,6 +1438,18 @@ const FACET_BANK = [
 ] as const satisfies readonly (keyof IWorldBank)[];
 type _ExhaustBank = AssertNever<Exclude<keyof IWorldBank, (typeof FACET_BANK)[number]>>;
 
+const FACET_GUILD_BANK = [
+  'guildBankInfo',
+  'guildBankDepositGold',
+  'guildBankWithdrawGold',
+  'guildBankDeposit',
+  'guildBankWithdraw',
+  'guildBankBuySlots',
+] as const satisfies readonly (keyof IWorldGuildBank)[];
+type _ExhaustGuildBank = AssertNever<
+  Exclude<keyof IWorldGuildBank, (typeof FACET_GUILD_BANK)[number]>
+>;
+
 const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
@@ -1573,6 +1607,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   market: FACET_MARKET,
   mail: FACET_MAIL,
   bank: FACET_BANK,
+  guildBank: FACET_GUILD_BANK,
   dungeons: FACET_DUNGEONS,
   delves: FACET_DELVES,
   dailyRewards: FACET_DAILY_REWARDS,
@@ -1587,7 +1622,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(30);
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(31);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1615,8 +1650,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(276);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(276);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(282);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(282);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

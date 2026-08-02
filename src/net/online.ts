@@ -102,6 +102,7 @@ import {
   type DevLeaderboardPage,
   type DuelInfo,
   type FriendInfo,
+  type GuildBankInfo,
   type GuildLeaderboardPage,
   type IWorld,
   isOverheadEmoteId,
@@ -1470,6 +1471,11 @@ export class ClientWorld implements IWorld {
   // (`s.bank`, delta-omitted). Null away from a banker (proximity-gated by the
   // server), so it only rides the wire while the player stands at a bursar. ---
   bankInfo: BankInfo | null = null;
+  // --- IWorldGuildBank: Phase 1 foundation stub. Stays null until Phase 2
+  // wires the maybe('guildBank') snapshot mirror (officer-plus AND proximity
+  // gated server-side); the facet lands now so both worlds satisfy the parity
+  // pin together. ---
+  guildBankInfo: GuildBankInfo | null = null;
   // --- IWorldDeeds: the Book of Deeds self mirror, from the snapshot self
   // (`s.deeds`/`s.dstats` heavy-gated, `s.renown`/`s.atitle` per-tick diffed).
   // PRESENTATION-ONLY EVENTS: `deedUnlocked` rides the events queue for HUD
@@ -4425,6 +4431,15 @@ export class ClientWorld implements IWorld {
   bankBuySlots(): void {
     this.cmd({ cmd: 'bank_buy_slots' });
   }
+  // --- IWorldGuildBank: Phase 1 stubs, inert until Phase 2 registers the
+  // guild_bank_* wire tokens (no send may exist before its token is in
+  // COMMAND_NAMES, the W0b lockstep). The server re-validates officer-plus
+  // rank, banker proximity, capacity, and quest-item rules on every send. ---
+  guildBankDepositGold(_amount: number): void {}
+  guildBankWithdrawGold(_amount: number): void {}
+  guildBankDeposit(_slotIndex: number, _count?: number): void {}
+  guildBankWithdraw(_slotIndex: number, _count?: number): void {}
+  guildBankBuySlots(): void {}
   // --- IWorldDeeds: title selection. No optimistic local write (the bank
   // precedent): the mirror updates from the `atitle` snapshot echo once the
   // sim validator accepts, so a rejected send leaves the client untouched. ---

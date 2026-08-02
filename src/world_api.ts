@@ -41,6 +41,8 @@
 //                                            content + basic crafting action landed in #1127)
 //   bank.ts             IWorldBank           per-character deposit box (proximity-gated info +
 //                                            deposit/withdraw/buy-slots)
+//   guild_bank.ts       IWorldGuildBank      shared guild treasury + item store (officer-plus,
+//                                            proximity-gated info + gold/item/buy-slots commands)
 //   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
 //   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
@@ -71,6 +73,7 @@ import type { IWorldDuelArena } from './world_api/duel_arena';
 import type { IWorldDungeonFinder } from './world_api/dungeon_finder';
 import type { IWorldDungeons } from './world_api/dungeons';
 import type { IWorldEntityRoster } from './world_api/entity_roster';
+import type { IWorldGuildBank } from './world_api/guild_bank';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
 import type { IWorldLoot } from './world_api/loot';
@@ -187,6 +190,7 @@ export type {
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
+export type { GuildBankInfo } from './world_api/guild_bank';
 export type { WorldInteractionOutcome } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
@@ -260,6 +264,7 @@ export interface IWorld
     IWorldTelemetry,
     IWorldProfessions,
     IWorldBank,
+    IWorldGuildBank,
     IWorldValeCup,
     IWorldDungeonFinder,
     IWorldActionBar,
