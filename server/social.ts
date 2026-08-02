@@ -207,6 +207,19 @@ export interface SocialTransport {
   // (guildsFounded is the one server-produced DeedStatKey; see its doc in
   // src/sim/types.ts)
   onGuildFounded(characterId: number): void;
+  // A guild membership or rank mutation just COMMITTED in the DB for this
+  // character. The transport owner re-stamps the live sim SYNCHRONOUSLY (the
+  // session-only PlayerMeta.guildMembership stamp plus the nameplate guild
+  // name, one combined entry point), because the Guild Bank's officer-plus
+  // gate reads the stamped rank: routing this through the async pushSnapshot
+  // path alone would leave a stale-rank window between the DB commit and the
+  // snapshot's arrival. Called with null on leave, kick, and disband. Offline
+  // characters have no live sim state to stamp (the owner no-ops); the join
+  // path re-stamps them from the snapshot chokepoint.
+  onGuildMembershipChanged(
+    characterId: number,
+    membership: { guildId: number; guildName: string; rank: GuildRank } | null,
+  ): void;
   // true if `recipientId` has `senderCharacterId` on their BLOCK list, so
   // guild/officer chat can honour the same filter say/whisper already apply
   isBlocking(recipientId: number, senderCharacterId: number): boolean;
@@ -778,6 +791,13 @@ export class SocialService {
       );
       return;
     }
+    // Founder is seated as leader in the same transaction as the create: stamp
+    // the live sim before any push resolves (the guild bank rank gate).
+    this.tx.onGuildMembershipChanged(actor.characterId, {
+      guildId: result.guildId,
+      guildName: name,
+      rank: 'leader',
+    });
     // Founder credit rides the transport seam: soc_guild_founded reads the
     // guildsFounded deed stat, which only this success arm may ever produce
     // (a refused create above must never reach it).
@@ -869,6 +889,12 @@ export class SocialService {
       this.err(actor.characterId, 'That guild is full.');
       return;
     }
+    // Seated in the DB: stamp the live sim before any push resolves.
+    this.tx.onGuildMembershipChanged(actor.characterId, {
+      guildId: invite.guildId,
+      guildName: invite.guildName,
+      rank: 'member',
+    });
     await this.broadcastGuild(invite.guildId, [
       { type: 'log', text: `${actor.name} has joined the guild.`, color: '#40ff7f' },
     ]);
@@ -897,6 +923,9 @@ export class SocialService {
       return;
     }
     await this.db.removeGuildMember(actor.characterId);
+    // Removed in the DB: clear the live sim stamp before any push resolves
+    // (both arms below; the guild bank rank gate must not see a stale rank).
+    this.tx.onGuildMembershipChanged(actor.characterId, null);
     if (others.length === 0) {
       // last member out: the guild ceases to exist
       await this.db.deleteGuild(membership.guildId);
@@ -955,6 +984,18 @@ export class SocialService {
       this.err(actor.characterId, `${target.name} is not in your guild.`);
       return;
     }
+    // Both rows moved in one DB transaction (target -> leader, former leader
+    // -> officer): stamp both live sims before any push resolves.
+    this.tx.onGuildMembershipChanged(target.id, {
+      guildId: membership.guildId,
+      guildName: membership.guildName,
+      rank: 'leader',
+    });
+    this.tx.onGuildMembershipChanged(actor.characterId, {
+      guildId: membership.guildId,
+      guildName: membership.guildName,
+      rank: 'officer',
+    });
     await this.broadcastGuild(membership.guildId, [
       {
         type: 'log',
@@ -979,6 +1020,9 @@ export class SocialService {
     const members = await this.db.guildMembers(membership.guildId);
     await this.db.deleteGuild(membership.guildId);
     for (const m of members) {
+      // Every member's stamp clears, online or not (the transport no-ops for
+      // characters with no live session; they re-stamp null at next join).
+      this.tx.onGuildMembershipChanged(m.id, null);
       if (this.tx.isOnline(m.id)) {
         this.info(m.id, `<${membership.guildName}> has been disbanded.`, '#ffd100');
         this.push(m.id);
@@ -1019,6 +1063,8 @@ export class SocialService {
       return;
     }
     await this.db.removeGuildMember(target.id);
+    // Removed in the DB: clear the live sim stamp before any push resolves.
+    this.tx.onGuildMembershipChanged(target.id, null);
     if (this.tx.isOnline(target.id)) {
       this.info(target.id, `You have been removed from <${membership.guildName}>.`, '#ffd100');
       this.push(target.id);
@@ -1062,6 +1108,14 @@ export class SocialService {
       return;
     }
     await this.db.setGuildRank(target.id, rank);
+    // Rank moved in the DB: stamp the live sim before any push resolves. A
+    // demote lands on the guild bank's officer gate IMMEDIATELY (the
+    // stale-rank window is privilege-escalation-shaped).
+    this.tx.onGuildMembershipChanged(target.id, {
+      guildId: membership.guildId,
+      guildName: membership.guildName,
+      rank,
+    });
     await this.broadcastGuild(membership.guildId, [
       { type: 'log', text: `${target.name} is now ${RANK_LABEL[rank]}.`, color: '#40ff7f' },
     ]);

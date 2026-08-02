@@ -768,6 +768,13 @@ export interface ClientSession {
   // last social snapshot. Drives the cheap periodic position push (no DB) that
   // keeps allies live on the world map.
   socialTrackedIds?: number[];
+  // Monotonic fence for the sim guild stamps (name + membership). Bumped by
+  // every SYNCHRONOUS stamp from a committed membership/rank mutation
+  // (onGuildMembershipChanged); sendSocialSnapshot captures it before its DB
+  // read and skips its own (possibly staler) stamp when the fence moved, so an
+  // in-flight snapshot can never roll the guild bank's officer gate back to a
+  // pre-demote rank.
+  guildStampSeq: number;
   // IP address at join time (from requestMetadata); used for per-IP session counting.
   ip: string;
   userAgent: string;
@@ -1959,6 +1966,25 @@ export class GameServer {
         const meta = s ? this.sim.meta(s.pid) : null;
         if (meta) this.sim.ctx.bumpDeedStat(meta, 'guildsFounded', 1);
       },
+      // The ONE combined guild stamp entry point (Guild Bank Phase 2): every
+      // committed membership/rank mutation lands here SYNCHRONOUSLY from its
+      // SocialService call site, pairing the nameplate name stamp
+      // (setPlayerGuild) with the session-only membership stamp
+      // (setPlayerGuildMembership) so the two can never diverge. The seq bump
+      // fences the async snapshot chokepoint (sendSocialSnapshot): a snapshot
+      // whose DB read STARTED before this commit must never re-apply its stale
+      // rank over this fresher stamp, because the guild bank's officer gate
+      // reads it (a stale officer stamp is privilege-escalation-shaped).
+      onGuildMembershipChanged: (id, membership) => {
+        const s = this.sessionByCharacterId(id);
+        if (!s) return; // offline: nothing live to stamp; the join path covers them
+        s.guildStampSeq++;
+        this.sim.setPlayerGuild(s.pid, membership?.guildName ?? '');
+        this.sim.setPlayerGuildMembership(
+          s.pid,
+          membership ? { guildId: membership.guildId, rank: membership.rank } : null,
+        );
+      },
       isBlocking: (recipientId, senderCharacterId) => {
         const s = this.sessionByCharacterId(recipientId);
         return s ? s.blockedIds.has(senderCharacterId) : false;
@@ -1986,17 +2012,32 @@ export class GameServer {
     const session = this.sessionByCharacterId(charId);
     if (!session) return;
     try {
+      // Capture the stamp fence BEFORE the DB read: if a synchronous
+      // membership stamp (onGuildMembershipChanged) lands while the snapshot
+      // is in flight, this read may be staler than the live stamps and must
+      // not overwrite them below.
+      const seqBefore = session.guildStampSeq;
       const snap = await this.social.snapshot(charId);
       this.send(session, { t: 'social', ...snap });
       // Stamp the guild name onto the player's world entity so it rides the
-      // identity wire and shows under their nameplate for everyone nearby. This
-      // is the single chokepoint hit on join and on every membership change.
+      // identity wire and shows under their nameplate for everyone nearby,
+      // PAIRED with the session-only membership stamp the guild bank's
+      // officer-plus gate reads (the two must never diverge). This chokepoint
+      // is hit on join and on every membership change; committed mutations
+      // ALSO stamp synchronously at their SocialService call sites, and the
+      // fence check keeps this async arm from rolling one of those back.
       // On the FIRST join-time stamp (firstJoin), a pre-existing guild arrives a
       // beat after addPlayer's retro pass (the name lives in the social DB, not
       // the blob), so retroDeeds re-credits soc_guild_joined silently instead of
       // firing the live banner for an existing member; later changes are genuine
       // live joins and pass firstJoin false.
-      this.sim.setPlayerGuild(session.pid, snap.guild?.name ?? '', { retroDeeds: firstJoin });
+      if (session.guildStampSeq === seqBefore) {
+        this.sim.setPlayerGuild(session.pid, snap.guild?.name ?? '', { retroDeeds: firstJoin });
+        this.sim.setPlayerGuildMembership(
+          session.pid,
+          snap.guild ? { guildId: snap.guild.id, rank: snap.guild.rank } : null,
+        );
+      }
       // remember who to track for the live position push (friends + guildmates)
       session.socialTrackedIds = [
         ...snap.friends.map((f) => f.id),
@@ -2949,6 +2990,7 @@ export class GameServer {
       chatStrikes: meta.chatStrikes ?? 0,
       blockedIds: new Set(),
       blockListLoaded: false,
+      guildStampSeq: 0,
       ignoredIds: new Set(),
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
