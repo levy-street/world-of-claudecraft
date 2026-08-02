@@ -821,6 +821,13 @@ export const HARBOR_TERRAIN_EDITS = [
   { x: 378.7, z: -0.9, radius: 40, delta: -12, falloff: 'smooth', mode: 'level' },
   { x: 415, z: 13, radius: 40, delta: -12, falloff: 'smooth', mode: 'level' },
   { x: 451.5, z: 27, radius: 40, delta: -12, falloff: 'smooth', mode: 'level' },
+  // The J9 arrival lanes: the re-authored bow-first glides run down each
+  // hull's parked axis, and the stern reaches past the old carved chain at
+  // the seaward end of both approaches (mainland from the north strait
+  // side, Gullhaven from the north bay). Same mid-sea deepening pattern as
+  // the basins above; no walkable or shoreline impact.
+  { x: 259, z: 12, radius: 26, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 696, z: 178, radius: 28, delta: -12, falloff: 'smooth', mode: 'level' },
 ] as const;
 
 // The deck rect containing (x, z), or null. Later rects win ties so a seam

@@ -44,8 +44,19 @@ export const LAST_BELL_PROP_PATH_SEGMENTS = {
     duration: 5.5,
     ease: 'linear',
   },
+  // Arrival glides (J9): a long shallow bow-first slide into the berth,
+  // 0.3 rad of total yaw decaying to 0 at the parked pose, so the attached
+  // camera sees the berth drift into frame and grow instead of the whole
+  // world pivoting through an 80 degree parking manoeuvre. Both approaches
+  // run down the hull's parked axis with a seaward lateral bias that keeps
+  // the whole swept hull clear of the pier rails while the yaw unwinds (the
+  // local z here; the world path bows because pose positions rotate by the
+  // COMBINED yaw in composeHarborShipAttachFrame). Gullhaven from the north
+  // bay (world start (694, 160)), the mainland from the north strait side
+  // (world start (258, -4)); the J9 basin stamps in harbor_layout carve the
+  // stern-reach water at both starts.
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.arrival]: {
-    start: { x: -40, y: 0, z: -13, yaw: -Math.PI / 2 },
+    start: { x: -43.351, y: 0, z: -6.478, yaw: -0.3 },
     end: { x: 0, y: 0, z: 0, yaw: 0 },
     duration: 7,
     ease: 'linear',
@@ -63,7 +74,7 @@ export const LAST_BELL_PROP_PATH_SEGMENTS = {
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.arrival]: {
-    start: { x: -40, y: 0, z: 13, yaw: Math.PI / 2 },
+    start: { x: -43.385, y: 0, z: 4.898, yaw: 0.3 },
     end: { x: 0, y: 0, z: 0, yaw: 0 },
     duration: 7,
     ease: 'linear',

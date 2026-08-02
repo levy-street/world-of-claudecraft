@@ -543,7 +543,7 @@ describe('the voyage cinematic', () => {
         ease: 'linear',
       },
       outArrival: {
-        start: { x: -40, y: 0, z: -13, yaw: -Math.PI / 2 },
+        start: { x: -43.351, y: 0, z: -6.478, yaw: -0.3 },
         end: { x: 0, y: 0, z: 0, yaw: 0 },
         duration: 7,
         ease: 'linear',
@@ -561,7 +561,7 @@ describe('the voyage cinematic', () => {
         ease: 'linear',
       },
       backArrival: {
-        start: { x: -40, y: 0, z: 13, yaw: Math.PI / 2 },
+        start: { x: -43.385, y: 0, z: 4.898, yaw: 0.3 },
         end: { x: 0, y: 0, z: 0, yaw: 0 },
         duration: 7,
         ease: 'linear',

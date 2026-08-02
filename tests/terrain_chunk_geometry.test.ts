@@ -144,7 +144,11 @@ describe('generated chunk geometry is stable', () => {
     // HARBOR_TERRAIN_EDITS stamps carve honest depth under the filmed
     // open-water leg on the crossing track. Mid-sea gap cells only; the
     // in-rect Eastbrook pin above did not move.
-    expect(digestOf(gapFill)).toBe('98ddb2c80a4619d5555ccb4eb807c35d');
+    // Re-minted for the J9 arrival lanes: two deep-level HARBOR_TERRAIN_EDITS
+    // stamps carve the stern-reach water under the re-authored bow-first
+    // docking glides (mainland north strait side, Gullhaven north bay).
+    // Mid-sea gap cells only; the in-rect Eastbrook pin above did not move.
+    expect(digestOf(gapFill)).toBe('d4e5c50eb6f1c475a0227b9c22a7ee1a');
 
     terrain.cancelStreaming();
   });

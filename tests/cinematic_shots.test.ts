@@ -67,6 +67,7 @@ import {
   hullWorldCollision,
   length,
   MAX_ARRIVAL_BERTH_DISTANCE_YARDS,
+  MAX_ARRIVAL_YAW_SWING_RADIANS,
   MAX_DOLLY_SPEED_YARDS_PER_SEC,
   MAX_HELD_SHOT_SECONDS,
   MAX_ON_CAMERA_PROP_ACCELERATION_YARDS_PER_SEC_SQUARED,
@@ -386,7 +387,7 @@ const SYNTHETIC_PARKED_GLIDE_CUE = 'scn_test_lint_berth_pose_parked_pass';
 const SYNTHETIC_LANDWARD_ARRIVAL_CUE = 'scn_test_lint_arrival_direction_bad';
 const SYNTHETIC_REVERSED_BOW_ARRIVAL_CUE = 'scn_test_lint_arrival_bow_bad';
 const SYNTHETIC_MISSED_BERTH_ARRIVAL_CUE = 'scn_test_lint_arrival_berth_bad';
-const SYNTHETIC_CROSSWIND_ARRIVAL_CUE = 'scn_test_lint_arrival_travel_bad';
+const SYNTHETIC_OVERSWING_ARRIVAL_CUE = 'scn_test_lint_arrival_swing_bad';
 const SYNTHETIC_HULL_CLIP_CUE = 'scn_test_lint_hull_clip_bad';
 const SYNTHETIC_RIDER_DRIFT_CUE = 'scn_test_lint_rider_drift_bad';
 const SYNTHETIC_ATTACH_PASS_CUE = 'scn_test_lint_attach_pass';
@@ -1456,12 +1457,12 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     expectedMeasured: 'bow dot -1.000',
   },
   {
-    def: syntheticCameraScene('scn_test_lint_arrival_travel_bad', 1.7, [
+    def: syntheticCameraScene('scn_test_lint_arrival_swing_bad', 1.7, [
       {
         at: 0,
         kind: 'prop',
         target: 'harbor_ship_gullhaven',
-        cue: SYNTHETIC_CROSSWIND_ARRIVAL_CUE,
+        cue: SYNTHETIC_OVERSWING_ARRIVAL_CUE,
       },
       {
         at: 0,
@@ -1476,7 +1477,7 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
       },
     ]),
     expectedCheck: 'prop.arrivalDirection',
-    expectedMeasured: 'travel dot 0.514',
+    expectedMeasured: 'yaw swing 1.636',
   },
   {
     def: syntheticCameraScene('scn_test_lint_arrival_berth_bad', 1.7, [
@@ -1915,9 +1916,11 @@ const PROP_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> = {
     duration: 4.3,
     ease: 'easeInOutSine',
   },
-  [SYNTHETIC_CROSSWIND_ARRIVAL_CUE]: {
-    start: { x: -23.323808, y: 0, z: 0, yaw: 2.429963 },
-    end: { x: 0, y: 0, z: 0, yaw: 2.429963 },
+  // The J2-era parking manoeuvre shape: bow-first and seaward, but the hull
+  // rotates 1.64 rad on the way in, so ONLY the yaw-swing arm trips.
+  [SYNTHETIC_OVERSWING_ARRIVAL_CUE]: {
+    start: { x: -41, y: 0, z: 0, yaw: -1.6359 },
+    end: { x: 0, y: 0, z: 0, yaw: 0 },
     duration: 4.3,
     ease: 'easeInOutSine',
   },
@@ -1964,7 +1967,7 @@ const ARRIVAL_HARBOR_BY_CUE = new Map<string, HarborDef['id']>([
   [SYNTHETIC_LANDWARD_ARRIVAL_CUE, 'gullhaven'],
   [SYNTHETIC_REVERSED_BOW_ARRIVAL_CUE, 'gullhaven'],
   [SYNTHETIC_MISSED_BERTH_ARRIVAL_CUE, 'gullhaven'],
-  [SYNTHETIC_CROSSWIND_ARRIVAL_CUE, 'gullhaven'],
+  [SYNTHETIC_OVERSWING_ARRIVAL_CUE, 'gullhaven'],
 ]);
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SCENE_TRIGGER_FILES = [
@@ -2534,7 +2537,7 @@ function arrivalDirectionMetrics(
   segment: PropPathSegment,
 ): {
   seawardStart: number;
-  towardBerth: number;
+  yawSwing: number;
   bowFirst: number;
   berthDistance: number;
 } {
@@ -2547,6 +2550,8 @@ function arrivalDirectionMetrics(
     start: startFrame.position,
     end: endFrame.position,
     bow,
+    startYaw: startFrame.yaw,
+    endYaw: endFrame.yaw,
   });
 }
 
@@ -3883,7 +3888,7 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
                 const approach = arrivalDirectionMetrics(harbor, segment);
                 if (
                   approach.seawardStart < MIN_ARRIVAL_SEAWARD_START_YARDS ||
-                  approach.towardBerth < MIN_ARRIVAL_DIRECTION_DOT ||
+                  approach.yawSwing > MAX_ARRIVAL_YAW_SWING_RADIANS ||
                   approach.bowFirst < MIN_ARRIVAL_DIRECTION_DOT ||
                   approach.berthDistance > MAX_ARRIVAL_BERTH_DISTANCE_YARDS
                 ) {
@@ -3895,14 +3900,16 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
                     time: timed.at,
                     threshold: `start at least ${MIN_ARRIVAL_SEAWARD_START_YARDS.toFixed(
                       1,
-                    )} yd seaward, travel and bow dots at least ${MIN_ARRIVAL_DIRECTION_DOT.toFixed(
+                    )} yd seaward, yaw swing at most ${MAX_ARRIVAL_YAW_SWING_RADIANS.toFixed(
+                      2,
+                    )} rad, bow dot at least ${MIN_ARRIVAL_DIRECTION_DOT.toFixed(
                       2,
                     )}, end within ${MAX_ARRIVAL_BERTH_DISTANCE_YARDS.toFixed(1)} yd of berth`,
                     measured: `seaward ${approach.seawardStart.toFixed(
                       2,
-                    )} yd, travel dot ${approach.towardBerth.toFixed(
+                    )} yd, yaw swing ${approach.yawSwing.toFixed(
                       3,
-                    )}, bow dot ${approach.bowFirst.toFixed(
+                    )} rad, bow dot ${approach.bowFirst.toFixed(
                       3,
                     )}, berth ${approach.berthDistance.toFixed(2)} yd`,
                   });

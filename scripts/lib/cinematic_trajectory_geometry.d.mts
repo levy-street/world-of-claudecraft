@@ -27,7 +27,7 @@ export interface SegmentMetrics {
 
 export interface ArrivalApproachMetrics {
   readonly seawardStart: number;
-  readonly towardBerth: number;
+  readonly yawSwing: number;
   readonly bowFirst: number;
   readonly berthDistance: number;
 }
@@ -50,4 +50,6 @@ export function measureArrivalApproach(input: {
   readonly start: FlatPoint;
   readonly end: FlatPoint;
   readonly bow: FlatPoint;
+  readonly startYaw: number;
+  readonly endYaw: number;
 }): ArrivalApproachMetrics;
