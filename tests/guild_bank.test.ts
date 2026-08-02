@@ -18,7 +18,7 @@ import type { GuildRank as ServerGuildRank } from '../server/social';
 import { ClientWorld } from '../src/net/online';
 import { bagCapacity } from '../src/sim/bags';
 import { sanitizeBankState } from '../src/sim/bank';
-import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
+import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import {
   createEmptyGuildBankState,
   GUILD_BANK_BASE_SLOTS,
@@ -450,7 +450,7 @@ describe('the session-only guild membership stamp (PlayerMeta.guildMembership)',
   });
 });
 
-describe('the Phase 1 facet stubs are inert in BOTH worlds', () => {
+describe('the guild bank facet: inert offline, live online', () => {
   it('offline Sim: null read and five no-op commands mutate nothing (inert forever)', () => {
     const sim = freshSim();
     expect(sim.guildBankInfo).toBeNull();
@@ -810,6 +810,114 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     );
     expect(fingerprint(sim)).toBe(before);
     expect(hasErr(sim.drainEvents(), 'You cannot store quest items in the bank.')).toBe(true);
+  });
+
+  // The guild bank is an ANONYMOUS EXCHANGE PIPE (officer A deposits, officer B
+  // withdraws), so it carries the full market/mail pipe policy, not the
+  // personal bank's self-storage quest-only rule: one decisive negative test
+  // per dimension, on the deposit side AND the tampered-book withdraw side.
+  it('refuses soulbound items on deposit (the anonymous-pipe policy), mutating nothing', () => {
+    const sim = makeOfficerSim();
+    expect(ITEMS.reins_grag_bear.soulbound).toBe(true); // fixture guard
+    meta(sim).inventory.push({ itemId: 'reins_grag_bear', count: 1 });
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankDepositFor(
+      sim.playerId,
+      meta(sim).inventory.findIndex((s) => s.itemId === 'reins_grag_bear'),
+    );
+    expect(fingerprint(sim)).toBe(before);
+    expect(hasErr(sim.drainEvents(), 'You cannot store soulbound items in the guild bank.')).toBe(
+      true,
+    );
+  });
+
+  it('refuses noMarketList items on deposit, mutating nothing', () => {
+    const sim = makeOfficerSim();
+    expect(ITEMS.riding_training.noMarketList).toBe(true); // fixture guard
+    meta(sim).inventory.push({ itemId: 'riding_training', count: 1 });
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankDepositFor(
+      sim.playerId,
+      meta(sim).inventory.findIndex((s) => s.itemId === 'riding_training'),
+    );
+    expect(fingerprint(sim)).toBe(before);
+    expect(hasErr(sim.drainEvents(), 'That item cannot be stored in the guild bank.')).toBe(true);
+  });
+
+  it('refuses transfer-locked copies on deposit: bound (boundTo) and armed (bindOnTrade)', () => {
+    for (const instance of [{ boundTo: 424242 }, { bindOnTrade: true }]) {
+      const sim = makeOfficerSim();
+      meta(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { ...instance } });
+      const before = fingerprint(sim);
+      sim.drainEvents();
+      sim.guildBankDepositFor(sim.playerId, meta(sim).inventory.length - 1);
+      expect(fingerprint(sim), JSON.stringify(instance)).toBe(before);
+      expect(
+        hasErr(sim.drainEvents(), 'That item cannot be stored in the guild bank.'),
+        JSON.stringify(instance),
+      ).toBe(true);
+    }
+  });
+
+  it('refuses the pipe policy on WITHDRAW too: a tampered book cannot complete a transfer', () => {
+    // Deposits keep these out, so only a tampered/legacy Phase 3 row can hold
+    // one; the copy must stay dormant in the book, never reach another player.
+    const sim = makeOfficerSim();
+    book(sim).inventory.push(
+      { itemId: 'reins_grag_bear', count: 1 }, // soulbound def
+      { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } }, // bound copy
+    );
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankWithdrawFor(sim.playerId, 0);
+    sim.guildBankWithdrawFor(sim.playerId, 1);
+    expect(fingerprint(sim)).toBe(before);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'You cannot store soulbound items in the guild bank.')).toBe(true);
+    expect(hasErr(evs, 'That item cannot be stored in the guild bank.')).toBe(true);
+  });
+
+  it('un-credits a collect objective on deposit and re-credits it on withdraw', () => {
+    // Every content collect item is quest-kind today (and the pipe policy
+    // denies those), so the onInventoryChangedForQuests wiring is defensive
+    // for future content; pin it with a synthetic collect quest over a plain
+    // fungible (the tests/bank.test.ts idiom).
+    const sim = makeOfficerSim();
+    const m = meta(sim);
+    QUESTS.__guild_bank_uncredit = {
+      ...QUESTS.q_widows,
+      id: '__guild_bank_uncredit',
+      objectives: [{ type: 'collect', itemId: 'wolf_fang', count: 5, label: 'Wolf Fang' }],
+    };
+    try {
+      m.questLog.set('__guild_bank_uncredit', {
+        questId: '__guild_bank_uncredit',
+        counts: [0],
+        state: 'active',
+      });
+      sim.addItem('wolf_fang', 5); // the add-side recompute credits and readies it
+      expect(m.questLog.get('__guild_bank_uncredit')).toMatchObject({
+        counts: [5],
+        state: 'ready',
+      });
+      sim.guildBankDepositFor(
+        sim.playerId,
+        m.inventory.findIndex((s) => s.itemId === 'wolf_fang'),
+      );
+      expect(m.questLog.get('__guild_bank_uncredit')).toMatchObject({
+        counts: [0],
+        state: 'active',
+      });
+      sim.guildBankWithdrawFor(sim.playerId, 0);
+      expect(m.questLog.get('__guild_bank_uncredit')).toMatchObject({
+        counts: [5],
+        state: 'ready',
+      });
+    } finally {
+      delete QUESTS.__guild_bank_uncredit;
+    }
   });
 
   it('an out-of-bounds or non-integer slot index is silently inert on both item ops', () => {

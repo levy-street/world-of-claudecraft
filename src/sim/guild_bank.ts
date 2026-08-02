@@ -10,9 +10,13 @@
 //
 // Every op follows the bank/vendor validation order (state.md): resolve, dead
 // check, banker proximity, shape, policy (officer-plus rank via the session
-// stamp, quest-bind), price from the table, affordability, capacity (inside
-// moveBetweenContainers' all-or-nothing fit check), then the atomic mutation,
-// then emits. NO refusal path mutates anything.
+// stamp, then the anonymous-pipe item policy: quest, soulbound, noMarketList,
+// per-copy transfer locks; see guildBankPipeRefusal), price from the table,
+// affordability, capacity (inside moveBetweenContainers' all-or-nothing fit
+// check), then the atomic mutation, then emits. NO refusal path mutates
+// anything. Deliberately NOT banker business for the Book of Deeds: the
+// Gilded Strongbox NPC ledger credit (onBankerBusinessForDeeds) is scoped to
+// the PERSONAL bank by design; revisit with the Phase 4 UI if wanted.
 //
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
@@ -22,6 +26,7 @@ import { bagCapacity, bagsFullError, instancedCountCap } from './bags';
 import { moveBetweenContainers, nearBanker } from './bank';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
+import { isTransferLockedInstance } from './item_instance_transfer';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, type InvSlot } from './types';
@@ -224,9 +229,35 @@ function requireOfficerBook(ctx: SimContext, meta: PlayerMeta): GuildBankState |
   return ctx.guildBanks.get(m.guildId) ?? null;
 }
 
+/** The guild bank is an ANONYMOUS EXCHANGE PIPE (officer A deposits, officer B
+ *  withdraws), NOT self-storage like the personal bank, so it carries the full
+ *  pipe policy the World Market and Ravenpost mail enforce, not bank.ts's
+ *  deliberately narrow quest-only rule (whose own comment scopes it to
+ *  self-storage): def-level quest / soulbound / noMarketList (the rift-gear
+ *  family rides noMarketList, the item_instance_transfer.ts contract), plus
+ *  the per-copy transfer lock (an armed bindOnTrade or bound boundTo copy
+ *  never rides an anonymous pipe where no stamp can land). Checked on BOTH
+ *  directions: deposit keeps them out, and withdraw refuses them too so a
+ *  tampered or legacy Phase 3 row can never complete the laundering (such a
+ *  copy stays dormant in the book, the items-are-never-destroyed load
+ *  philosophy). Returns the refusal line, or null when the slot may move. */
+function guildBankPipeRefusal(slot: InvSlot): string | null {
+  const def = ITEMS[slot.itemId];
+  if (def?.kind === 'quest') return 'You cannot store quest items in the bank.';
+  if (def?.soulbound) return 'You cannot store soulbound items in the guild bank.';
+  if (def?.noMarketList) return 'That item cannot be stored in the guild bank.';
+  if (isTransferLockedInstance(slot.instance)) {
+    return 'That item cannot be stored in the guild bank.';
+  }
+  return null;
+}
+
 /** Deposit personal copper into the guild treasury. Refuses (never truncates)
- *  a deposit that would push the treasury past GUILD_BANK_TREASURY_CAP. */
-export function guildBankDepositGold(ctx: SimContext, amount: number, pid?: number): void {
+ *  a deposit that would push the treasury past GUILD_BANK_TREASURY_CAP.
+ *  `pid` is required on every op: only the server's pid-first facade calls
+ *  these (the offline facet arm is inert), so there is no local-player
+ *  fallback to fail open into. */
+export function guildBankDepositGold(ctx: SimContext, amount: number, pid: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
@@ -255,7 +286,7 @@ export function guildBankDepositGold(ctx: SimContext, amount: number, pid?: numb
 /** Withdraw treasury copper into the acting officer's purse. Refuses when the
  *  treasury does not hold the amount, and refuses (never clamps) a withdrawal
  *  that would overflow the player's own copper past the integer-safe bound. */
-export function guildBankWithdrawGold(ctx: SimContext, amount: number, pid?: number): void {
+export function guildBankWithdrawGold(ctx: SimContext, amount: number, pid: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
@@ -283,16 +314,17 @@ export function guildBankWithdrawGold(ctx: SimContext, amount: number, pid?: num
   ctx.notice(meta.entityId, `You withdraw ${formatMoney(amount)} from the guild treasury.`);
 }
 
-/** Deposit a carried-inventory slot into the guild bank. Quest items are
- *  refused (the personal-bank rule); an instanced stack moves WHOLE or not at
- *  all, and capacity holds the all-or-nothing line, both inside
- *  moveBetweenContainers. A counted fungible leaving the bags pokes the
- *  collect-quest recompute, exactly like the personal bank. */
+/** Deposit a carried-inventory slot into the guild bank. The full anonymous-
+ *  pipe policy applies (guildBankPipeRefusal: quest, soulbound, noMarketList,
+ *  per-copy transfer locks); an instanced stack moves WHOLE or not at all, and
+ *  capacity holds the all-or-nothing line, both inside moveBetweenContainers.
+ *  A counted fungible leaving the bags pokes the collect-quest recompute,
+ *  exactly like the personal bank. */
 export function guildBankDeposit(
   ctx: SimContext,
   slotIndex: number,
-  count?: number,
-  pid?: number,
+  count: number | undefined,
+  pid: number,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -306,8 +338,9 @@ export function guildBankDeposit(
   const book = requireOfficerBook(ctx, meta);
   if (!book) return;
   const slot = meta.inventory[slotIndex];
-  if (ITEMS[slot.itemId]?.kind === 'quest') {
-    ctx.error(meta.entityId, 'You cannot store quest items in the bank.');
+  const refusal = guildBankPipeRefusal(slot);
+  if (refusal !== null) {
+    ctx.error(meta.entityId, refusal);
     return;
   }
   // Captured before the move: a whole-stack success splices the source slot out.
@@ -329,12 +362,14 @@ export function guildBankDeposit(
 }
 
 /** Withdraw a guild bank slot back into the acting officer's bags: the mirror
- *  of guildBankDeposit, gated by the bag capacity. */
+ *  of guildBankDeposit, gated by the bag capacity AND the same anonymous-pipe
+ *  policy (see guildBankPipeRefusal: a tampered/legacy row's locked copy must
+ *  never complete a cross-character transfer). */
 export function guildBankWithdraw(
   ctx: SimContext,
   slotIndex: number,
-  count?: number,
-  pid?: number,
+  count: number | undefined,
+  pid: number,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -350,6 +385,14 @@ export function guildBankWithdraw(
   const book = requireOfficerBook(ctx, meta);
   if (!book) return;
   if (slotIndex >= book.inventory.length) return;
+  // The pipe policy holds on the way OUT too: a tampered or legacy Phase 3 row
+  // holding a locked/soulbound copy must never complete a cross-character
+  // transfer; it stays dormant in the book (items are never destroyed).
+  const refusal = guildBankPipeRefusal(book.inventory[slotIndex]);
+  if (refusal !== null) {
+    ctx.error(meta.entityId, refusal);
+    return;
+  }
   // Captured before the move: a whole-stack success splices the source slot out.
   const itemName =
     ITEMS[book.inventory[slotIndex].itemId]?.name ?? book.inventory[slotIndex].itemId;
@@ -372,7 +415,7 @@ export function guildBankWithdraw(
 /** Buy the next 6-slot guild bank expansion, paid from the guild TREASURY
  *  (never personal copper), at the table price for the current purchase count
  *  (never client-supplied). Blocked at the ladder's end; no refusal mutates. */
-export function guildBankBuySlots(ctx: SimContext, pid?: number): void {
+export function guildBankBuySlots(ctx: SimContext, pid: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
@@ -403,7 +446,12 @@ export function guildBankBuySlots(ctx: SimContext, pid?: number): void {
  *  loaded; else a boundary-cloned view. The DEAD gate is stricter than the
  *  personal bank's on purpose: the stream must go null on death, demotion,
  *  leave, and walk-away (each pinned in tests/guild_bank.test.ts). A pure read:
- *  it draws NO rng and never hands out live sim slot references. */
+ *  it draws NO rng and never hands out live sim slot references. Ships the
+ *  full instance payloads (cloneInvSlot), not the publicInstanceView
+ *  projection, BY DECISION: officers co-own the pooled contents and a
+ *  withdrawer needs the real payload (charges), while the fields the
+ *  projection exists to hide (boundTo, armed bindOnTrade) can never enter the
+ *  book at all: guildBankPipeRefusal refuses locked copies in BOTH directions. */
 export function guildBankInfoFor(ctx: SimContext, pid: number): GuildBankInfo | null {
   const r = ctx.resolve(pid);
   if (!r) return null;

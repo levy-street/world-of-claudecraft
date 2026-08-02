@@ -51,8 +51,14 @@ const baseEnTable = {
   // log.* lines are the success notices. The four parameterized log.* rows are
   // matched by RULES entries; the rest register in the EXACT matcher
   // automatically.
+  'error.guildBankNoGuild': 'You are not in a guild.',
   'error.guildBankRank': 'Only guild officers may use the guild bank.',
   'error.guildBankFull': 'The guild bank is full.',
+  // The anonymous-pipe item policy refusals (guildBankPipeRefusal): soulbound
+  // gets its own line; noMarketList and transfer-locked copies share the
+  // generic one (the mail noMailQuestItems grouping precedent).
+  'error.guildBankSoulbound': 'You cannot store soulbound items in the guild bank.',
+  'error.guildBankNoTransfer': 'That item cannot be stored in the guild bank.',
   'error.guildBankTreasuryCap': 'The guild treasury cannot hold that much.',
   'error.guildBankTreasuryShort': 'The guild treasury does not hold that much.',
   'error.guildBankCarryCap': 'You cannot carry that much money.',

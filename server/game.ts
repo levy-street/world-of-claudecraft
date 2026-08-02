@@ -599,12 +599,11 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'bank_deposit',
   'bank_withdraw',
   'bank_buy_slots',
-  // Guild bank ops that touch the SELF snapshot: the item moves rewrite the
-  // carried inventory and the gold moves the purse. guild_bank_buy_slots is
-  // deliberately absent (it spends only the guild treasury, which rides the
-  // ungated maybe('guildBank') stream, never a heavy self field).
-  'guild_bank_deposit_gold',
-  'guild_bank_withdraw_gold',
+  // Guild bank ops that touch a HEAVY self field: the two item moves rewrite
+  // the carried inventory (heavy-gated `inv`). The gold ops and buy_slots are
+  // deliberately absent: copper rides the ALWAYS-SENT base self object (not
+  // the heavy gate) and the treasury/slots ride the ungated maybe('guildBank')
+  // stream, so listing them would only buy a redundant heavy re-serialize.
   'guild_bank_deposit',
   'guild_bank_withdraw',
   'pet_feed',
