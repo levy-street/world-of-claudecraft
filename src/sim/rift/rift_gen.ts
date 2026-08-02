@@ -26,8 +26,14 @@ import {
 import { polygonIsStarShaped, polygonSelfIntersects, polygonSignedArea } from '../geometry2d';
 import { Rng } from '../rng';
 import { authoredLiftAt } from './authored';
+import { planCourse, RIFT_COURSE_SALT, RIFT_COURSE_TUNING } from './course_gen';
 import { riftMinSpawnZ } from './entry_clearance';
-import { RIFT_RANK_BASE_LEVEL, riftFloorLevel, riftHeroicTuningFor } from './ranks';
+import {
+  RIFT_RANK_BASE_LEVEL,
+  riftFloorLevel,
+  riftHeroicTuningFor,
+  riftRankForBaseLevel,
+} from './ranks';
 import { buildStyle, mixSeed } from './style';
 import type {
   RiftFloorPlan,
@@ -843,9 +849,92 @@ export function generateRiftFloor(
     rng.chance(0.5)
       ? planGate(rng, geo)
       : null;
-  if (gate) {
-    objects.push({ kind: 'gate', x: gate.x, z: gate.z, name: 'Rift Gate' });
-    objects.push({ kind: 'switch', x: gate.switchX, z: gate.switchZ, name: 'Rune Switch' });
+
+  // The parkour course. Rolled and built from its OWN salt streams (the
+  // SET_PIECE_CHANCE pattern), so every draw above happened exactly as it
+  // always did and a non-course floor stays byte-identical. On a course
+  // floor the rolled headline mechanics are DISCARDED after the fact (their
+  // draws stay consumed): one headline mechanic reads at a time, and here it
+  // is the course.
+  const course = isBoss
+    ? null
+    : planCourse(seed, clampedIndex, baseLevel, {
+        zMin: geo.layout.zMin,
+        zMax: geo.layout.zMax,
+        entryZ: entryZFor(geo.layout),
+        daisZ: geo.layout.dais.z,
+        halfWidthAt: geo.halfWidthAt,
+      });
+  let finalGate = gate;
+  if (course) {
+    // On a course floor the gate is COURSE-SHAPED or absent: a rolled gate
+    // keeps its floor gated but is rebuilt at the north gate band with its
+    // plate on the summit (its rolled position could sit SOUTH of the
+    // summit, and a plate beyond its own gate is a softlock); a floor that
+    // rolled none may still gain one at the rank's gate chance.
+    const rank = riftRankForBaseLevel(baseLevel);
+    const gateRng = new Rng(mixSeed(seed, RIFT_COURSE_SALT + 0x200 + clampedIndex));
+    const gated = gate !== null || gateRng.chance(RIFT_COURSE_TUNING[rank].gateChance);
+    finalGate = null;
+    const zGate = geo.layout.dais.z - 22;
+    if (gated && zGate > course.summit.z + 4 && zGate > geo.layout.zMin + 30) {
+      // The plate must clear the floor furniture IN PLAN VIEW (the clearance
+      // sweep in rift_gen.test.ts holds for every interactable): the summit
+      // deck flies over pillars and tombs, but the plate object stands at
+      // their (x, z). Deterministic spiral over the deck footprint; a summit
+      // with no clear spot (rare clutter) simply drops the gate.
+      const plate = ((): { x: number; z: number } | null => {
+        for (const [dx, dz] of [
+          [0, 0],
+          [0.8, 0],
+          [-0.8, 0],
+          [0, 0.8],
+          [0, -0.8],
+          [1.4, 1.4],
+          [-1.4, 1.4],
+          [1.4, -1.4],
+          [-1.4, -1.4],
+          [1.8, 0],
+          [-1.8, 0],
+          [0, 1.8],
+          [0, -1.8],
+        ] as const) {
+          const px = course.summit.x + dx;
+          const pz = course.summit.z + dz;
+          if (isClear(geo.colliders, px, pz, 1.0)) return { x: px, z: pz };
+        }
+        return null;
+      })();
+      if (plate) {
+        finalGate = {
+          x: 0,
+          z: zGate,
+          hw: Math.max(AISLE_HALF + 3, geo.halfWidthAt(zGate)),
+          hd: 1.6,
+          switchX: plate.x,
+          switchZ: plate.z,
+        };
+      }
+    }
+  }
+  const finalObjects = course
+    ? objects.filter(
+        (o) =>
+          o.kind !== 'rune_pylon' &&
+          o.kind !== 'ice_goal' &&
+          o.kind !== 'boulder' &&
+          o.kind !== 'boulder_pad' &&
+          o.kind !== 'seq_rune',
+      )
+    : objects;
+  if (finalGate) {
+    finalObjects.push({ kind: 'gate', x: finalGate.x, z: finalGate.z, name: 'Rift Gate' });
+    finalObjects.push({
+      kind: 'switch',
+      x: finalGate.switchX,
+      z: finalGate.switchZ,
+      name: 'Rune Switch',
+    });
   }
 
   const plan: RiftFloorPlan = {
@@ -860,13 +949,14 @@ export function generateRiftFloor(
     style,
     entry: { x: 0, z: entryZFor(geo.layout) },
     spawns,
-    objects,
-    puzzle,
-    hazards,
-    iceZone,
-    rollers,
-    platform,
-    gate,
+    objects: finalObjects,
+    puzzle: course ? { kind: 'none', pylonCount: 0 } : puzzle,
+    hazards: course ? [] : hazards,
+    iceZone: course ? null : iceZone,
+    rollers: course ? [] : rollers,
+    platform: course ? null : platform,
+    gate: finalGate,
+    course,
   };
 
   if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();

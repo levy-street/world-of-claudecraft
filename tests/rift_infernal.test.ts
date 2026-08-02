@@ -136,6 +136,13 @@ describe('infernal citadel: seed selection', () => {
   // the same packs are spread across a shorter band. Verified narrow before re-pinning,
   // by digesting every floor field EXCEPT `spawns` across seeds 1 to 200 on both sides of
   // the change: that digest is byte-identical, so only spawn positions moved here.
+  // DELIBERATE re-pin (parkour courses): plans gained a `course` field, and a floor
+  // that ROLLS a course (its own 0xc0d0 salt stream, rank-scaled chance) discards its
+  // rolled puzzle/hazards/rollers/iceZone/platform and rebuilds its gate at the north
+  // band with the plate on the course summit. Verified narrow before re-pinning, by
+  // digesting every floor field EXCEPT {course, puzzle, hazards, iceZone, rollers,
+  // platform, objects, gate} over this test's own seed list on both sides of the
+  // change: byte-identical, so layout, style, spawns and entry never moved.
   it('regenerates procedural floors byte-identically to the pre-set-piece baseline', () => {
     // Hand-picked on the base branch, so the seed list itself cannot drift with the
     // set-piece roll.
@@ -151,7 +158,7 @@ describe('infernal citadel: seed selection', () => {
       }
     }
     expect(h.digest('hex')).toBe(
-      'c1bdf1d27a9d3a5450c758d7e0aadda33cd9c765ed40e11ed308c3ae8de5db1a',
+      'e967c2013fa57d70ec080899457c5ba2dd865411d66bb669387033fa914cb183',
     );
   });
 });

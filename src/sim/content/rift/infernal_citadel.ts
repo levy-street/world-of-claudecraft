@@ -394,6 +394,9 @@ export function buildInfernalCitadelFloor(
     gate: pit
       ? null
       : { x: 0, z: GATE_Z, hw: 18, hd: 1.6, switchX: 0, switchZ: 0, openOnOrb: true },
+    // Authored floors never carry a generated parkour course: the citadel's
+    // relief is its own hand-built room graph.
+    course: null,
   };
 }
 

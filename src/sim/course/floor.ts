@@ -117,8 +117,11 @@ export interface CoursePlan {
   /** The course's top anchor: where a gate switch or prize stands. */
   summit: { x: number; z: number; y: number };
   /** Golden-route waypoints in climb order, for the envelope audit and the
-   *  traversal bot. Built WITH the geometry so the two cannot drift. */
-  route: Array<{ x: number; z: number; y: number }>;
+   *  traversal bot. Built WITH the geometry so the two cannot drift. A
+   *  waypoint marked via 'ride' is reached by a mechanic (ferry, rope,
+   *  geyser, wave, chase), not a jump, so the jump-envelope audit skips the
+   *  leg INTO it. */
+  route: Array<{ x: number; z: number; y: number; via?: 'ride' }>;
 }
 
 /** A deck's centre at clock time t (ferries move; everything else is where
