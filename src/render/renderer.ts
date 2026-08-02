@@ -3149,6 +3149,9 @@ export class Renderer {
   // per-frame distance cull in updateZoneFeatureVisibility. Measured ONCE here:
   // these groups are static and matrix-frozen, so the bounds never move.
   private zoneFeatureGroups: { group: THREE.Group; footprint: FeatureFootprint | null }[] = [];
+  private zoneFeatureVisibilityX = Number.NaN;
+  private zoneFeatureVisibilityZ = Number.NaN;
+  private zoneFeatureVisibilityFar = Number.NaN;
 
   private attachZoneFeature(
     view: { group: THREE.Group; glowLights?: THREE.PointLight[]; cullGroups?: THREE.Group[] },
@@ -3198,6 +3201,9 @@ export class Renderer {
         footprint: measureFeatureFootprint(cullGroup),
       });
     }
+    // A newly attached group must be evaluated even when camera and fog are
+    // unchanged from the previous frame.
+    this.zoneFeatureVisibilityX = Number.NaN;
   }
 
   // Hide feature groups the fog has already swallowed. Terrain and foliage both
@@ -3207,6 +3213,16 @@ export class Renderer {
   private updateZoneFeatureVisibility(fogFar: number): void {
     const camX = this.camera.position.x;
     const camZ = this.camera.position.z;
+    if (
+      camX === this.zoneFeatureVisibilityX &&
+      camZ === this.zoneFeatureVisibilityZ &&
+      fogFar === this.zoneFeatureVisibilityFar
+    ) {
+      return;
+    }
+    this.zoneFeatureVisibilityX = camX;
+    this.zoneFeatureVisibilityZ = camZ;
+    this.zoneFeatureVisibilityFar = fogFar;
     for (const entry of this.zoneFeatureGroups) {
       entry.group.visible = isZoneFeatureVisible(entry.footprint, camX, camZ, fogFar);
     }
