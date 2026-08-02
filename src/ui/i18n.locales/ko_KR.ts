@@ -712,6 +712,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': '오프라인 길드원 숨기기',
   'hudChrome.social.billboard.label': '길드 게시판',
   'hudChrome.social.billboard.empty': '게시판에 아직 아무 내용도 없습니다.',
+  'hudChrome.social.billboard.loginLine': '길드 게시판: {text}',
   'hudChrome.social.billboard.setBy': '{name} 설정',
   'hudChrome.social.billboard.save': '저장',
   'hudChrome.social.billboard.placeholder': '길드에 전할 메시지를 작성하세요',

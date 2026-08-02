@@ -2334,6 +2334,7 @@ export const ja_JP: EnTranslations = {
       "billboard": {
         "label": "ギルド掲示板",
         "empty": "掲示板にはまだ何もありません。",
+        "loginLine": "ギルド掲示板：{text}",
         "setBy": "{name}が設定",
         "save": "保存",
         "placeholder": "ギルドへのメッセージを書く",

@@ -712,6 +712,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': 'Скрыть офлайн участников гильдии',
   'hudChrome.social.billboard.label': 'Доска объявлений гильдии',
   'hudChrome.social.billboard.empty': 'На доске объявлений пока пусто.',
+  'hudChrome.social.billboard.loginLine': 'Доска объявлений гильдии: {text}',
   'hudChrome.social.billboard.setBy': 'Разместил(а): {name}',
   'hudChrome.social.billboard.save': 'Сохранить',
   'hudChrome.social.billboard.placeholder': 'Напишите сообщение для гильдии',

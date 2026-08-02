@@ -2334,6 +2334,7 @@ export const cs_CZ: EnTranslations = {
       "billboard": {
         "label": "Cechovní nástěnka",
         "empty": "Na nástěnce zatím nic není.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Nastaveno {name}",
         "save": "Uložit",
         "placeholder": "Napiš zprávu pro cech",

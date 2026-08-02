@@ -2334,6 +2334,7 @@ export const sv_SE: EnTranslations = {
       "billboard": {
         "label": "Gillets anslagstavla",
         "empty": "Inget på anslagstavlan än.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Skriven av {name}",
         "save": "Spara",
         "placeholder": "Skriv ett meddelande till gillet",

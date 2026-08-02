@@ -2334,6 +2334,7 @@ export const tr_TR: EnTranslations = {
       "billboard": {
         "label": "Lonca Panosu",
         "empty": "Panoda henüz bir şey yok.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Ayarlayan: {name}",
         "save": "Kaydet",
         "placeholder": "Lonca için bir mesaj yaz",

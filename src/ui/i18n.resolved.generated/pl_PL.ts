@@ -2334,6 +2334,7 @@ export const pl_PL: EnTranslations = {
       "billboard": {
         "label": "Tablica ogłoszeń gildii",
         "empty": "Na tablicy ogłoszeń nic jeszcze nie ma.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Ustawione przez {name}",
         "save": "Zapisz",
         "placeholder": "Napisz wiadomość dla gildii",

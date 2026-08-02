@@ -7610,6 +7610,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.social.billboard.empty'
   | 'hudChrome.social.billboard.inputLabel'
   | 'hudChrome.social.billboard.label'
+  | 'hudChrome.social.billboard.loginLine'
   | 'hudChrome.social.billboard.placeholder'
   | 'hudChrome.social.billboard.result.notOfficer'
   | 'hudChrome.social.billboard.result.set'

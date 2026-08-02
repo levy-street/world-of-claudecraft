@@ -2334,6 +2334,7 @@ export const da_DK: EnTranslations = {
       "billboard": {
         "label": "Laugsopslagstavle",
         "empty": "Der er intet på opslagstavlen endnu.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Sat af {name}",
         "save": "Gem",
         "placeholder": "Skriv en besked til lauget",

@@ -693,6 +693,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': '隐藏离线公会成员',
   'hudChrome.social.billboard.label': '公会公告板',
   'hudChrome.social.billboard.empty': '公告板上还没有内容。',
+  'hudChrome.social.billboard.loginLine': '公会公告板：{text}',
   'hudChrome.social.billboard.setBy': '由 {name} 设置',
   'hudChrome.social.billboard.save': '保存',
   'hudChrome.social.billboard.placeholder': '给公会写一条消息',

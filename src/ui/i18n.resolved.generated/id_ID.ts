@@ -2334,6 +2334,7 @@ export const id_ID: EnTranslations = {
       "billboard": {
         "label": "Papan Pengumuman Serikat",
         "empty": "Belum ada apa pun di papan pengumuman.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Ditetapkan oleh {name}",
         "save": "Simpan",
         "placeholder": "Tulis pesan untuk serikat",

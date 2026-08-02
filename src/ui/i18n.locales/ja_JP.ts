@@ -714,6 +714,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': 'オフラインのギルドメンバーを非表示',
   'hudChrome.social.billboard.label': 'ギルド掲示板',
   'hudChrome.social.billboard.empty': '掲示板にはまだ何もありません。',
+  'hudChrome.social.billboard.loginLine': 'ギルド掲示板：{text}',
   'hudChrome.social.billboard.setBy': '{name}が設定',
   'hudChrome.social.billboard.save': '保存',
   'hudChrome.social.billboard.placeholder': 'ギルドへのメッセージを書く',

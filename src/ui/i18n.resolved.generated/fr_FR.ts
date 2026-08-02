@@ -2334,6 +2334,7 @@ export const fr_FR: EnTranslations = {
       "billboard": {
         "label": "Tableau d'affichage de la guilde",
         "empty": "Rien sur le tableau d'affichage pour le moment.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Défini par {name}",
         "save": "Enregistrer",
         "placeholder": "Écrivez un message pour la guilde",

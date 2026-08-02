@@ -2334,6 +2334,7 @@ export const en: EnTranslations = {
       "billboard": {
         "label": "Guild Billboard",
         "empty": "Nothing on the billboard yet.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Set by {name}",
         "save": "Save",
         "placeholder": "Write a message for the guild",

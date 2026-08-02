@@ -2334,6 +2334,7 @@ export const en_XA: EnTranslations = {
       "billboard": {
         "label": "[Ĝúíļð Ɓíļļƀóáŕð]",
         "empty": "[Ñóţĥíñĝ óñ ţĥé ƀíļļƀóáŕð ýéţ.]",
+        "loginLine": "[Ĝúíļð ƀíļļƀóáŕð: {text}]",
         "setBy": "[Šéţ ƀý {name}]",
         "save": "[Šáʋé]",
         "placeholder": "[Ŵŕíţé á ɱéššáĝé ƒóŕ ţĥé ĝúíļð]",

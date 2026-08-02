@@ -2334,6 +2334,7 @@ export const de_DE: EnTranslations = {
       "billboard": {
         "label": "Gildenpinnwand",
         "empty": "Noch nichts an der Pinnwand.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Festgelegt von {name}",
         "save": "Speichern",
         "placeholder": "Schreib eine Nachricht für die Gilde...",
