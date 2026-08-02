@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import type { GuildRow } from '../src/ui/social_view';
+import { guildMemberRowHtml } from '../src/ui/social_window';
 
 // Source-level guards for the social painter. The pure row + signature decisions are
 // unit-tested in social_view.test.ts; here we pin the no-magic-values
@@ -198,16 +200,19 @@ describe('social_window: Book of Deeds title spans (both roster surfaces)', () =
   });
 });
 
-describe('social_window: guild tenure badges', () => {
+describe('social_window: guild tenure badges (source pins)', () => {
   // The tier decision (14/90-day thresholds) is pure and unit-tested in
-  // social_view.test.ts; these pins hold the RENDER arm: the tier comes from
-  // the pure core (never a local date computation), the chip is always-visible
-  // text (never hover-only title=), and both labels are t() keys.
-  it('derives the tier from the pure core with the client clock', () => {
-    expect(painter).toContain('const tier = tenureTier(m.joinedAt, Date.now());');
+  // social_view.test.ts; the behavioral render cases live in the next
+  // describe. These pins hold the contracts a rendered string cannot prove:
+  // the tier comes from the pure core with ONE hoisted clock read per rebuild
+  // (never a per-row date computation), both labels are t() keys, and every
+  // splice passes esc().
+  it('derives the tier from the pure core with one clock read per rebuild', () => {
+    expect(painter).toContain('const now = Date.now();');
+    expect(painter).toContain('const tier = tenureTier(m.joinedAt, now);');
   });
 
-  it('renders the badge as an always-visible chip, tinted by tier', () => {
+  it('escapes the localized chip text', () => {
     expect(painter).toContain(
       '`<span class="rank soc-tenure-${tier}">${esc(tenureLabel(tier))}</span>`',
     );
@@ -218,9 +223,76 @@ describe('social_window: guild tenure badges', () => {
     expect(painter).toContain("t('hud.social.tenure.veteran')");
   });
 
-  it('styles both tier chips with tokens inside the name cell', () => {
+  it('styles both tier chips with panel-aware text tokens inside the name cell', () => {
     expect(componentsCss).toContain('.soc-name .soc-tenure-new');
     expect(componentsCss).toContain('.soc-name .soc-tenure-veteran');
+    // The chips must ride the theme's ensureReadable text tokens, never the
+    // raw accent (invisible next to the gold rank chip on dark presets) or a
+    // static green (sub-AA on the light Parchment panel).
+    const start = componentsCss.indexOf('.soc-name .soc-tenure-new');
+    const section = componentsCss.slice(
+      start,
+      componentsCss.indexOf('}', componentsCss.indexOf('.soc-name .soc-tenure-veteran')),
+    );
+    expect(section).toContain('var(--color-text-light)');
+    expect(section).toContain('var(--color-text-muted)');
+    expect(section).not.toContain('var(--color-primary)');
+    expect(section).not.toContain('var(--color-friendly)');
+  });
+});
+
+describe('social_window: guild tenure badges (rendered rows)', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const NOW = Date.UTC(2026, 7, 1);
+  const row = (over: Partial<GuildRow> = {}): GuildRow => ({
+    name: 'Gorak',
+    cls: 'warrior',
+    level: 10,
+    online: false,
+    dot: 'off',
+    status: undefined,
+    zone: undefined,
+    lastLogin: null,
+    activeTitle: null,
+    rank: 'member',
+    self: false,
+    canWhisper: false,
+    canTransfer: false,
+    canPromote: false,
+    canDemote: false,
+    canKick: false,
+    joinedAt: null,
+    ...over,
+  });
+
+  it('renders the New chip, after the rank chip, for a 3-day member', () => {
+    const html = guildMemberRowHtml(row({ joinedAt: NOW - 3 * DAY }), NOW);
+    expect(html).toContain('<span class="rank soc-tenure-new">New</span>');
+    // name, then rank chip, then tenure chip: the order is load-bearing for
+    // the ellipsized cell (the title/tenure tail trims before the rank chip).
+    expect(html.indexOf('soc-tenure-new')).toBeGreaterThan(html.indexOf('class="rank"'));
+  });
+
+  it('renders the Veteran chip for a 200-day member', () => {
+    const html = guildMemberRowHtml(row({ joinedAt: NOW - 200 * DAY }), NOW);
+    expect(html).toContain('<span class="rank soc-tenure-veteran">Veteran</span>');
+    expect(html).not.toContain('soc-tenure-new');
+  });
+
+  it('renders no tenure chip at all for a 40-day member (no empty span)', () => {
+    const html = guildMemberRowHtml(row({ joinedAt: NOW - 40 * DAY }), NOW);
+    expect(html).not.toContain('soc-tenure');
+    expect(html).not.toContain('><</span>'); // no empty decorated chip
+  });
+
+  it('renders no tenure chip when joinedAt is unknown', () => {
+    expect(guildMemberRowHtml(row(), NOW)).not.toContain('soc-tenure');
+  });
+
+  it('escapes the member name around the chips', () => {
+    const html = guildMemberRowHtml(row({ name: 'Bad<img src=x>', joinedAt: NOW - 3 * DAY }), NOW);
+    expect(html).not.toContain('<img');
+    expect(html).toContain('Bad&lt;img');
   });
 });
 
@@ -232,7 +304,9 @@ describe('social_window: guild billboard', () => {
     expect(painter).toContain('${esc(g.motd)}');
     const section = painter.slice(
       painter.indexOf('private billboardHtml'),
-      painter.indexOf('private guildMemberRowHtml'),
+      // billboardHtml is the last method before raidHtml now that the roster
+      // row builder is a module-level function (exported for behavior tests).
+      painter.indexOf('private raidHtml'),
     );
     expect(section.length).toBeGreaterThan(0);
     expect(section).not.toContain('<a ');
@@ -293,8 +367,9 @@ describe('social_window: guild billboard', () => {
 
     const section = painter.slice(
       painter.indexOf('private billboardHtml'),
-      painter.indexOf('private guildMemberRowHtml'),
+      painter.indexOf('private raidHtml'),
     );
+    expect(section.length).toBeGreaterThan(0);
     expect(section).toContain('<div class="soc-billboard-msg">$' + '{esc(g.motd)}</div>');
     expect(section).not.toContain('class="soc-billboard-msg" data-');
   });

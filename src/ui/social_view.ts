@@ -198,7 +198,10 @@ export type TenureTier = 'new' | 'veteran';
  * caller's clock: under 14 days is 'new', 90 days or more is 'veteran', in
  * between (and unknown joinedAt) is no badge. A joinedAt in the future (clock
  * skew) lands in the 'new' arm by construction. Returns a keyed tier, never
- * display text: the painter localizes.
+ * display text: the painter localizes. Cosmetic-only by design: the tier is
+ * derived from the viewer's own clock and only styles the viewer's roster,
+ * so it must never gate a permission or any gameplay outcome; if tenure ever
+ * becomes gameplay-relevant, compute it server-side first.
  */
 export function tenureTier(joinedAt: number | null, now: number): TenureTier | null {
   if (joinedAt === null) return null;
