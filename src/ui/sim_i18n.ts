@@ -45,6 +45,24 @@ const baseEnTable = {
   'error.bankMaxSlots': 'Your bank cannot be expanded further.',
   'error.bankTooFar': 'You are too far from the banker.',
   'log.bankSlotsPurchased': 'You purchase additional bank slots.',
+  // Guild Bank (src/sim/guild_bank.ts): the officer-plus shared treasury +
+  // item store. The error.* lines are the refusal toasts (too-far, quest-item,
+  // and "Not enough money." reuse the existing rows above / the hud arm); the
+  // log.* lines are the success notices. The four parameterized log.* rows are
+  // matched by RULES entries; the rest register in the EXACT matcher
+  // automatically.
+  'error.guildBankRank': 'Only guild officers may use the guild bank.',
+  'error.guildBankFull': 'The guild bank is full.',
+  'error.guildBankTreasuryCap': 'The guild treasury cannot hold that much.',
+  'error.guildBankTreasuryShort': 'The guild treasury does not hold that much.',
+  'error.guildBankCarryCap': 'You cannot carry that much money.',
+  'error.guildBankCannotAfford': 'Your guild cannot afford that expansion.',
+  'error.guildBankMaxSlots': 'The guild bank cannot be expanded further.',
+  'log.guildBankSlotsPurchased': 'You purchase additional guild bank slots.',
+  'log.guildBankDepositGold': 'You deposit {money} into the guild treasury.',
+  'log.guildBankWithdrawGold': 'You withdraw {money} from the guild treasury.',
+  'log.guildBankDepositItem': 'You deposit {item} into the guild bank.',
+  'log.guildBankWithdrawItem': 'You withdraw {item} from the guild bank.',
   'error.specLevel': 'You may choose a specialization at level {level}.',
   'error.equipLevel': 'You must be level {level} to equip that.',
   'error.mountLevel': 'You must be level {level} to ride that mount.',
@@ -9688,6 +9706,27 @@ const RULES: Rule[] = [
   {
     re: /^Card Duel requires another player online\.$/,
     build: () => tSim('error.cardDuelUnavailable'),
+  },
+  // Guild Bank success notices (src/sim/guild_bank.ts). The money fragment is
+  // sim-formatted ("3g 5s 7c") and splices verbatim like the market price rows;
+  // item names re-localize through the entity dictionary. The "treasury" /
+  // "guild bank" sentence tails are deliberately distinct so the money and item
+  // forms can never shadow each other.
+  {
+    re: /^You deposit (.+) into the guild treasury\.$/,
+    build: (m) => tSim('log.guildBankDepositGold', { money: m[1] }),
+  },
+  {
+    re: /^You withdraw (.+) from the guild treasury\.$/,
+    build: (m) => tSim('log.guildBankWithdrawGold', { money: m[1] }),
+  },
+  {
+    re: /^You deposit (.+) into the guild bank\.$/,
+    build: (m) => tSim('log.guildBankDepositItem', { item: locItem(m[1]) }),
+  },
+  {
+    re: /^You withdraw (.+) from the guild bank\.$/,
+    build: (m) => tSim('log.guildBankWithdrawItem', { item: locItem(m[1]) }),
   },
 ];
 

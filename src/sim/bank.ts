@@ -133,8 +133,10 @@ const BANKER_RANGE = INTERACT_RANGE + 2;
 
 /** True when the player entity stands within reach of any live banker NPC. Iterates
  *  the ctx.bankerIds anchor list (seeded by the Sim ctor) against the live entities,
- *  the same liveness checks nearMerchant uses (present + kind 'npc'). */
-function nearBanker(ctx: SimContext, e: Entity): boolean {
+ *  the same liveness checks nearMerchant uses (present + kind 'npc'). Exported so
+ *  the guild bank (guild_bank.ts) shares the ONE proximity gate with the personal
+ *  bank rather than growing a second reach rule. */
+export function nearBanker(ctx: SimContext, e: Entity): boolean {
   for (const id of ctx.bankerIds) {
     const b = ctx.entities.get(id);
     if (b && b.kind === 'npc' && dist2d(e.pos, b.pos) <= BANKER_RANGE) return true;

@@ -8820,8 +8820,9 @@ export class Sim {
   guildSetMotd(_text: string): void {}
   // The Guild Bank is a guild feature, and guilds live in the server social DB,
   // so offline play never has one: the read is null and the commands are inert
-  // (the socialInfo idiom). Phase 2 wires the online path (the guild_bank_*
-  // tokens and the snapshot-fed info read); the offline arm stays inert forever.
+  // (the socialInfo idiom), forever. The online path is live: ClientWorld sends
+  // the guild_bank_* tokens and the server acts for an explicit pid through the
+  // guildBank*For entry points (see the Guild Bank facade section below).
   guildBankInfo: null = null;
   guildBankDepositGold(_amount: number): void {}
   guildBankWithdrawGold(_amount: number): void {}
@@ -9438,7 +9439,7 @@ export class Sim {
   // Thin delegates to the guild bank free functions (guild_bank.ts). The books
   // live on Sim (guildBanks, a SimContext view keyed by guild id); the server
   // feeds and drains them through this pure shape-in/shape-out seam in Phase 3
-  // (it owns the SQL). Op bodies and the gated info read land in Phase 2.
+  // (it owns the SQL).
 
   loadGuildBank(guildId: number, raw: unknown): void {
     guildBankMod.loadGuildBank(this.ctx, guildId, raw);
@@ -9446,6 +9447,38 @@ export class Sim {
 
   serializeGuildBank(guildId: number): GuildBankState | null {
     return guildBankMod.serializeGuildBank(this.ctx, guildId);
+  }
+
+  // The five op bodies + the gated info read, as pid-first SERVER entry points
+  // (the bankInfoFor pattern). These are deliberately distinct from the IWorld
+  // facet members (guildBankDeposit etc. in the social no-op block below): the
+  // offline facet arm is inert forever because offline play never has a guild,
+  // while the authoritative server acts for an explicit pid through these. All
+  // gameplay rules (proximity, rank, quest-bind, caps, capacity) live in
+  // guild_bank.ts; the server validates shape only.
+
+  guildBankDepositGoldFor(pid: number, amount: number): void {
+    guildBankMod.guildBankDepositGold(this.ctx, amount, pid);
+  }
+
+  guildBankWithdrawGoldFor(pid: number, amount: number): void {
+    guildBankMod.guildBankWithdrawGold(this.ctx, amount, pid);
+  }
+
+  guildBankDepositFor(pid: number, slotIndex: number, count?: number): void {
+    guildBankMod.guildBankDeposit(this.ctx, slotIndex, count, pid);
+  }
+
+  guildBankWithdrawFor(pid: number, slotIndex: number, count?: number): void {
+    guildBankMod.guildBankWithdraw(this.ctx, slotIndex, count, pid);
+  }
+
+  guildBankBuySlotsFor(pid: number): void {
+    guildBankMod.guildBankBuySlots(this.ctx, pid);
+  }
+
+  guildBankInfoFor(pid: number): import('../world_api').GuildBankInfo | null {
+    return guildBankMod.guildBankInfoFor(this.ctx, pid);
   }
 
   // -------------------------------------------------------------------------

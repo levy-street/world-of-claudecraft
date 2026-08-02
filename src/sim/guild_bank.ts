@@ -1,18 +1,28 @@
 // The Guild Bank: a shared, guild-owned treasury plus pooled item store, the
 // guild-scale sibling of the personal bank (bank.ts). Phase 1 (foundation)
-// lands the state model, the ONE load path, the per-guild book map helpers,
-// and the session-only membership stamp; the op bodies (deposit/withdraw/buy)
-// and the proximity/rank-gated info read land with the wire in Phase 2, and
-// the DB persistence that feeds loadGuildBank/serializeGuildBank in Phase 3.
+// landed the state model, the ONE load path, the per-guild book map helpers,
+// and the session-only membership stamp; Phase 2 (this file's op section)
+// lands the five op bodies and the proximity/rank-gated info read; the DB
+// persistence that feeds loadGuildBank/serializeGuildBank is Phase 3.
 //
 // Books are keyed by the server social DB's guild id. Offline play never has a
 // guild, so the map stays empty and every IWorld guild-bank member is inert.
 //
+// Every op follows the bank/vendor validation order (state.md): resolve, dead
+// check, banker proximity, shape, policy (officer-plus rank via the session
+// stamp, quest-bind), price from the table, affordability, capacity (inside
+// moveBetweenContainers' all-or-nothing fit check), then the atomic mutation,
+// then emits. NO refusal path mutates anything.
+//
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
 
-import { instancedCountCap } from './bags';
+import type { GuildBankInfo } from '../world_api';
+import { bagCapacity, bagsFullError, instancedCountCap } from './bags';
+import { moveBetweenContainers, nearBanker } from './bank';
 import { ITEMS } from './data';
+import { formatMoney } from './format_money';
+import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, type InvSlot } from './types';
 
@@ -186,4 +196,229 @@ function normalizeGuildMembership(m: GuildMembership | null): GuildMembership | 
   if (!Number.isInteger(m.guildId) || m.guildId <= 0) return null;
   if (!GUILD_RANKS.includes(m.rank)) return null;
   return { guildId: m.guildId, rank: m.rank };
+}
+
+// ---------------------------------------------------------------------------
+// Phase 2: the op bodies + the gated info read. Free functions over SimContext
+// (the bank.ts idiom); the Sim facade exposes them to the server through the
+// pid-first `guildBank*For` entry points, while the offline IWorld facet arm
+// stays inert forever (offline play never has a guild).
+// ---------------------------------------------------------------------------
+
+/** The shared officer-plus authorization step every op runs AFTER the shape
+ *  check: resolves the acting player's stamped membership and the guild's live
+ *  book. A missing stamp and a member rank each REFUSE with a player line; a
+ *  stamped guild whose book is not loaded returns silently, because that is a
+ *  host wiring state (Phase 3 boot-loads every book before players join), not
+ *  a condition the player caused or can act on. Never mutates. */
+function requireOfficerBook(ctx: SimContext, meta: PlayerMeta): GuildBankState | null {
+  const m = meta.guildMembership;
+  if (!m) {
+    ctx.error(meta.entityId, 'You are not in a guild.');
+    return null;
+  }
+  if (m.rank === 'member') {
+    ctx.error(meta.entityId, 'Only guild officers may use the guild bank.');
+    return null;
+  }
+  return ctx.guildBanks.get(m.guildId) ?? null;
+}
+
+/** Deposit personal copper into the guild treasury. Refuses (never truncates)
+ *  a deposit that would push the treasury past GUILD_BANK_TREASURY_CAP. */
+export function guildBankDepositGold(ctx: SimContext, amount: number, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e: p } = r;
+  if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
+  if (!nearBanker(ctx, p)) {
+    ctx.error(meta.entityId, 'You are too far from the banker.');
+    return;
+  }
+  // Shape: malformed input (cheat/desync), no player line, the bank.ts idiom.
+  if (!Number.isSafeInteger(amount) || amount <= 0) return;
+  const book = requireOfficerBook(ctx, meta);
+  if (!book) return;
+  if (meta.copper < amount) {
+    ctx.error(meta.entityId, 'Not enough money.');
+    return;
+  }
+  if (book.treasury + amount > GUILD_BANK_TREASURY_CAP) {
+    ctx.error(meta.entityId, 'The guild treasury cannot hold that much.');
+    return;
+  }
+  meta.copper -= amount;
+  book.treasury += amount;
+  ctx.notice(meta.entityId, `You deposit ${formatMoney(amount)} into the guild treasury.`);
+}
+
+/** Withdraw treasury copper into the acting officer's purse. Refuses when the
+ *  treasury does not hold the amount, and refuses (never clamps) a withdrawal
+ *  that would overflow the player's own copper past the integer-safe bound. */
+export function guildBankWithdrawGold(ctx: SimContext, amount: number, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e: p } = r;
+  if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
+  if (!nearBanker(ctx, p)) {
+    ctx.error(meta.entityId, 'You are too far from the banker.');
+    return;
+  }
+  // Shape: malformed input (cheat/desync), no player line, the bank.ts idiom.
+  if (!Number.isSafeInteger(amount) || amount <= 0) return;
+  const book = requireOfficerBook(ctx, meta);
+  if (!book) return;
+  if (book.treasury < amount) {
+    ctx.error(meta.entityId, 'The guild treasury does not hold that much.');
+    return;
+  }
+  // Both operands are safe integers, so the difference is exact: the check can
+  // never be fooled by float rounding at the 2^53 boundary.
+  if (amount > Number.MAX_SAFE_INTEGER - meta.copper) {
+    ctx.error(meta.entityId, 'You cannot carry that much money.');
+    return;
+  }
+  book.treasury -= amount;
+  meta.copper += amount;
+  ctx.notice(meta.entityId, `You withdraw ${formatMoney(amount)} from the guild treasury.`);
+}
+
+/** Deposit a carried-inventory slot into the guild bank. Quest items are
+ *  refused (the personal-bank rule); an instanced stack moves WHOLE or not at
+ *  all, and capacity holds the all-or-nothing line, both inside
+ *  moveBetweenContainers. A counted fungible leaving the bags pokes the
+ *  collect-quest recompute, exactly like the personal bank. */
+export function guildBankDeposit(
+  ctx: SimContext,
+  slotIndex: number,
+  count?: number,
+  pid?: number,
+): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e: p } = r;
+  if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
+  if (!nearBanker(ctx, p)) {
+    ctx.error(meta.entityId, 'You are too far from the banker.');
+    return;
+  }
+  if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= meta.inventory.length) return;
+  const book = requireOfficerBook(ctx, meta);
+  if (!book) return;
+  const slot = meta.inventory[slotIndex];
+  if (ITEMS[slot.itemId]?.kind === 'quest') {
+    ctx.error(meta.entityId, 'You cannot store quest items in the bank.');
+    return;
+  }
+  // Captured before the move: a whole-stack success splices the source slot out.
+  const itemName = ITEMS[slot.itemId]?.name ?? slot.itemId;
+  const result = moveBetweenContainers(
+    meta.inventory,
+    slotIndex,
+    count,
+    book.inventory,
+    guildBankCapacity(book),
+  );
+  if (result.refusal === 'no_fit') {
+    ctx.error(meta.entityId, 'The guild bank is full.');
+    return;
+  }
+  if (result.refusal) return; // 'invalid': malformed input (cheat/desync), no player line
+  ctx.onInventoryChangedForQuests(meta);
+  ctx.notice(meta.entityId, `You deposit ${itemName} into the guild bank.`);
+}
+
+/** Withdraw a guild bank slot back into the acting officer's bags: the mirror
+ *  of guildBankDeposit, gated by the bag capacity. */
+export function guildBankWithdraw(
+  ctx: SimContext,
+  slotIndex: number,
+  count?: number,
+  pid?: number,
+): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e: p } = r;
+  if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
+  if (!nearBanker(ctx, p)) {
+    ctx.error(meta.entityId, 'You are too far from the banker.');
+    return;
+  }
+  // The primitive half of the shape check; the bounds half needs the book,
+  // which the rank gate resolves below.
+  if (!Number.isInteger(slotIndex) || slotIndex < 0) return;
+  const book = requireOfficerBook(ctx, meta);
+  if (!book) return;
+  if (slotIndex >= book.inventory.length) return;
+  // Captured before the move: a whole-stack success splices the source slot out.
+  const itemName =
+    ITEMS[book.inventory[slotIndex].itemId]?.name ?? book.inventory[slotIndex].itemId;
+  const result = moveBetweenContainers(
+    book.inventory,
+    slotIndex,
+    count,
+    meta.inventory,
+    bagCapacity(meta.bags),
+  );
+  if (result.refusal === 'no_fit') {
+    bagsFullError(ctx, meta.entityId);
+    return;
+  }
+  if (result.refusal) return; // 'invalid': malformed input (cheat/desync), no player line
+  ctx.onInventoryChangedForQuests(meta);
+  ctx.notice(meta.entityId, `You withdraw ${itemName} from the guild bank.`);
+}
+
+/** Buy the next 6-slot guild bank expansion, paid from the guild TREASURY
+ *  (never personal copper), at the table price for the current purchase count
+ *  (never client-supplied). Blocked at the ladder's end; no refusal mutates. */
+export function guildBankBuySlots(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e: p } = r;
+  if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
+  if (!nearBanker(ctx, p)) {
+    ctx.error(meta.entityId, 'You are too far from the banker.');
+    return;
+  }
+  const book = requireOfficerBook(ctx, meta);
+  if (!book) return;
+  const price = guildBankNextExpansionPrice(book);
+  if (price === null) {
+    ctx.error(meta.entityId, 'The guild bank cannot be expanded further.');
+    return;
+  }
+  if (book.treasury < price) {
+    ctx.error(meta.entityId, 'Your guild cannot afford that expansion.');
+    return;
+  }
+  book.treasury -= price;
+  book.purchasedSlots += GUILD_BANK_EXPANSION_SLOTS;
+  ctx.notice(meta.entityId, 'You purchase additional guild bank slots.');
+}
+
+/** The proximity + rank gated guild bank snapshot the server's maybe('guildBank')
+ *  stream reads (the bankInfoFor pattern): null unless the player is alive,
+ *  within reach of a banker NPC, stamped officer-plus, and their guild's book is
+ *  loaded; else a boundary-cloned view. The DEAD gate is stricter than the
+ *  personal bank's on purpose: the stream must go null on death, demotion,
+ *  leave, and walk-away (each pinned in tests/guild_bank.test.ts). A pure read:
+ *  it draws NO rng and never hands out live sim slot references. */
+export function guildBankInfoFor(ctx: SimContext, pid: number): GuildBankInfo | null {
+  const r = ctx.resolve(pid);
+  if (!r) return null;
+  const { meta, e: p } = r;
+  if (p.dead) return null;
+  if (!nearBanker(ctx, p)) return null;
+  const m = meta.guildMembership;
+  if (!m || m.rank === 'member') return null;
+  const book = ctx.guildBanks.get(m.guildId);
+  if (!book) return null;
+  return {
+    treasury: book.treasury,
+    slots: book.inventory.map(cloneInvSlot),
+    capacity: guildBankCapacity(book),
+    purchasedSlots: book.purchasedSlots,
+    nextExpansionPrice: guildBankNextExpansionPrice(book),
+  };
 }

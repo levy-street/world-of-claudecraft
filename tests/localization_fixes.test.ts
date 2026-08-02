@@ -1082,6 +1082,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
     // emit the quest-item/full/afford/max-slots refusals + the purchase notice.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bank.ts'), 'utf8'),
+    // Guild Bank: the officer-plus shared treasury + item store op bodies emit
+    // the rank/full/treasury-cap/short/carry-cap/afford/max-slots refusals plus
+    // the four money/item success notices (sim_i18n error.guildBank* /
+    // log.guildBank* rows); too-far, quest-item, no-guild, and "Not enough
+    // money." reuse literals already matched from other scanned files, but the
+    // ONLY emitter occurrences of the new strings live here.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/guild_bank.ts'), 'utf8'),
     // Riding lesson: the mount_train_begin guard refusals and the driver's
     // notices (level/range/quest/in-progress/success/left-yard literals).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts_training.ts'), 'utf8'),
