@@ -7675,6 +7675,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.edda_reedhand.name': '艾达·芦手',
   'entities.mobs.tolling_bell.name': '鸣钟',
   'entities.mobs.rift_spawnling.name': '裂隙孽生体',
+  'entities.mobs.rift_vaulter.name': '裂隙跃击者',
   'entities.mobs.rift_bonewalker.name': '复生骨行者',
   'entities.mobs.rift_frost_revenant.name': '霜缚亡魂',
   'entities.mobs.rift_rime_elemental.name': '白霜元素',

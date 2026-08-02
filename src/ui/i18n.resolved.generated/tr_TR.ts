@@ -11154,6 +11154,9 @@ export const tr_TR: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "Azgorath, Çukurun Efendisi"
       },
+      "rift_vaulter": {
+        "name": "Riftbound Vaulter"
+      },
       "wildheart_stalker": {
         "name": "Sarmaşık Pençeli Avcı"
       },

@@ -11154,6 +11154,9 @@ export const vi_VN: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "Azgorath, Chúa Tể Vực Ngục"
       },
+      "rift_vaulter": {
+        "name": "Riftbound Vaulter"
+      },
       "wildheart_stalker": {
         "name": "Kẻ Rình Rập Vuốt Dây Leo"
       },

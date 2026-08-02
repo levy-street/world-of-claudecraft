@@ -213,6 +213,8 @@ const MOB_IDS = [
   'rift_pact_acolyte',
   'rift_boss_ritualist',
   'rift_boss_pitlord',
+  // Course fauna (appended: per-locale name arrays align positionally)
+  'rift_vaulter',
   // The Wildheart Basin jungle dungeon (src/sim/content/wildheart.ts).
   'wildheart_stalker',
   'wildheart_ravager',

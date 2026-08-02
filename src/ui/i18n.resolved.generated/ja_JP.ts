@@ -11154,6 +11154,9 @@ export const ja_JP: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "奈落の王アズゴラス"
       },
+      "rift_vaulter": {
+        "name": "亀裂の跳躍者"
+      },
       "wildheart_stalker": {
         "name": "蔦爪の追跡者"
       },

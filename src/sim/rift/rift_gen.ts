@@ -927,7 +927,10 @@ export function generateRiftFloor(
     // Only waypoints whose FLOOR footprint is clear: a spawn point must pass
     // the same furniture clearance every other spawn does (the mob stands at
     // floor level until the lift pass seats it on its deck).
-    const stands = course.route.filter((w) => !w.via && isClear(geo.colliders, w.x, w.z, BODY_R));
+    const entryClear = riftMinSpawnZ(entryZFor(geo.layout));
+    const stands = course.route.filter(
+      (w) => !w.via && w.z >= entryClear && isClear(geo.colliders, w.x, w.z, BODY_R),
+    );
     for (let v = 0; v < vaulters && stands.length > 2; v++) {
       const at = stands[vRng.int(1, stands.length - 1)];
       spawns.push({

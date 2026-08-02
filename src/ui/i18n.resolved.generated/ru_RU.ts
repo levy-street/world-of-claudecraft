@@ -11154,6 +11154,9 @@ export const ru_RU: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "Азгорат, Владыка Бездны"
       },
+      "rift_vaulter": {
+        "name": "Прыгун разлома"
+      },
       "wildheart_stalker": {
         "name": "Лазутчик Лозокогтя"
       },

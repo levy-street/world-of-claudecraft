@@ -8165,6 +8165,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.edda_reedhand.name': 'Эдда Тростниковая Рука',
   'entities.mobs.tolling_bell.name': 'Звонящий Колокол',
   'entities.mobs.rift_spawnling.name': 'Отпрыск Разлома',
+  'entities.mobs.rift_vaulter.name': 'Прыгун разлома',
   'entities.mobs.rift_bonewalker.name': 'Восставший Костоход',
   'entities.mobs.rift_frost_revenant.name': 'Скованный Морозом Возвращенец',
   'entities.mobs.rift_rime_elemental.name': 'Изморозевый Элементаль',

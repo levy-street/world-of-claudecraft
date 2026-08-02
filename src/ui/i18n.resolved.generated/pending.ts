@@ -10,24 +10,28 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "es_ES": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "fr_FR": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "fr_CA": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -35,12 +39,14 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "de_DE": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -63,6 +69,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.buyStackAria"
   ],
   "pt_BR": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -73,48 +80,56 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.buyStackAria"
   ],
   "cs_CZ": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "nl_NL": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "pl_PL": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "id_ID": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "tr_TR": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "sv_SE": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "vi_VN": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
   "da_DK": [
+    "entities.mobs.rift_vaulter.name",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",

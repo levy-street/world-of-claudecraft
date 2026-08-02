@@ -11154,6 +11154,9 @@ export const nl_NL: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "Azgorath, Heer van de Kuil"
       },
+      "rift_vaulter": {
+        "name": "Riftbound Vaulter"
+      },
       "wildheart_stalker": {
         "name": "Rankklauw-Sluiper"
       },
