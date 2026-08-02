@@ -90,6 +90,10 @@ export const MAX_SCENE_CAPTURE_SECONDS = 180;
 export const MIN_ARRIVAL_SEAWARD_START_YARDS = 12;
 // Arrival travel and the ship's bow must align closely with the direct course to the berth.
 export const MIN_ARRIVAL_DIRECTION_DOT = 0.95;
+// The hull may rotate at most this much over the whole arrival glide: a
+// mostly-straight, bow-first slide into the berth, never a world-pivoting
+// parking manoeuvre around the attached camera (J9, owner issues 5 and 6).
+export const MAX_ARRIVAL_YAW_SWING_RADIANS = 0.45;
 // The final arrival pose must land on the destination berth before the hidden park cue.
 export const MAX_ARRIVAL_BERTH_DISTANCE_YARDS = 0.5;
 // A berth-anchored glide endpoint must meet the rendered parked position within this tolerance.

@@ -220,6 +220,11 @@ function arrivalCueIds(runtime) {
 function arrivalMetrics(runtime, harbor, segment) {
   const metrics = segmentMetrics(runtime, harbor, segment);
   const startFrame = shipFrameForPose(runtime, harbor, runtime.propPathPoseAt(segment, 0));
+  const endFrame = shipFrameForPose(
+    runtime,
+    harbor,
+    runtime.propPathPoseAt(segment, segment.duration),
+  );
   const bow = { x: Math.cos(startFrame.yaw), z: -Math.sin(startFrame.yaw) };
   return measureArrivalApproach({
     berth: harbor.berth,
@@ -227,6 +232,8 @@ function arrivalMetrics(runtime, harbor, segment) {
     start: metrics.start,
     end: metrics.end,
     bow,
+    startYaw: startFrame.yaw,
+    endYaw: endFrame.yaw,
   });
 }
 
@@ -340,7 +347,7 @@ export function reportScene(runtime, scene) {
       )} ${metrics.maximumSpeed.toFixed(1)}yd/s`;
       if (arrivalIds.has(active.cue)) {
         const approach = arrivalMetrics(runtime, attachedHarbor, active.segment);
-        arrival = `sea ${approach.seawardStart.toFixed(1)} dot ${approach.towardBerth.toFixed(
+        arrival = `sea ${approach.seawardStart.toFixed(1)} swing ${approach.yawSwing.toFixed(
           3,
         )} bow ${approach.bowFirst.toFixed(3)} berth ${approach.berthDistance.toFixed(1)}`;
       }

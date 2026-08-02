@@ -52,7 +52,7 @@ export function measureSegment(sampleWorld, duration, sampleRateHz) {
   };
 }
 
-export function measureArrivalApproach({ berth, landward, start, end, bow }) {
+export function measureArrivalApproach({ berth, landward, start, end, bow, startYaw, endYaw }) {
   const seaward = normalizeFlat({
     x: berth.x - landward.x,
     z: berth.z - landward.z,
@@ -65,13 +65,24 @@ export function measureArrivalApproach({ berth, landward, start, end, bow }) {
     x: end.x - start.x,
     z: end.z - start.z,
   });
-  const landwardDirection = { x: -seaward.x, z: -seaward.z };
   return {
     seawardStart: flatDot(startFromBerth, seaward),
-    towardBerth: flatDot(travel, landwardDirection),
+    // How far the hull rotates over the whole glide. The old metric demanded
+    // travel toward the landward line, which mathematically forced the bow
+    // (also pinned to travel) into a wide swing and the world-pivot parking
+    // manoeuvre the owner rejected (J9); the swing cap encodes the intended
+    // grammar directly: a mostly-straight, bow-first slide into the berth.
+    yawSwing: Math.abs(wrapAngle(endYaw - startYaw)),
     bowFirst: flatDot(travel, bow),
     berthDistance: Math.hypot(end.x - berth.x, end.z - berth.z),
   };
+}
+
+function wrapAngle(delta) {
+  let wrapped = delta;
+  while (wrapped > Math.PI) wrapped -= 2 * Math.PI;
+  while (wrapped < -Math.PI) wrapped += 2 * Math.PI;
+  return wrapped;
 }
 
 function normalizeFlat(point) {
