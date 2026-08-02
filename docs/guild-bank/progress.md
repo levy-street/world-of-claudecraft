@@ -5,7 +5,7 @@
 | Phase 1: foundation | Done | 2026-08-02 | 2026-08-02 |
 | Phase 1 QA | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-02 |
 | Phase 2: ops and wire | Done | 2026-08-02 | 2026-08-02 |
-| Phase 2 QA | Not started | | |
+| Phase 2 QA | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-02 |
 | Phase 3: persistence | Not started | | |
 | Phase 3 QA | Not started | | |
 | Phase 4: UI | Not started | | |
@@ -99,12 +99,78 @@ Phase 2 (2026-08-02):
 - Parity-trace exclusion re-audited (carried-forward line): `guildMembership` stays
   excluded; rationale recorded in tests/parity/trace.ts (host-injected authorization
   input, always null offline where ops refuse; the gated state itself IS sampled).
-- tests/guild_bank.test.ts grew 33 -> 65 tests (shared refusal dimensions run against
+- tests/guild_bank.test.ts grew substantially (shared refusal dimensions run against
   ALL five ops via an OPS table; treasury-cap edge at exactly the cap; purse bound at
   exactly MAX_SAFE_INTEGER; indivisible instanced stacks; craftedRecipeId round trip;
   copper conservation; info null transitions; stale-rank scenario; zero-rng over the
   whole op surface; the ClientWorld pin FLIPPED from send-nothing to the five exact
   payloads, closing the "no empty online.ts body" carried-forward line).
+
+Phase 2 QA (2026-08-02), fresh auditor, verdict PASS-WITH-FOLLOWUPS:
+- Reviews dispatched fresh (COVERAGE not filtering): architecture-reviewer (0 blocking,
+  3 should-fix, 9 note), privacy-security-review (1 CRITICAL, 2 warning, 5 info),
+  cross-platform-sync (0 critical, 3 warning), test-coverage-auditor (7 should-fix,
+  8 nit), qa-checklist. Every BLOCKING and SHOULD-FIX was fixed here or pinned into
+  Phase 3's acceptance lines.
+- CRITICAL fixed (the one real exploit, constructed and reproduced): `setGuildRank`
+  had NO `guild_id` predicate and discarded its rowcount, and `guildSetRank` stamped
+  the live sim unconditionally after it. A promote racing a leave, kick, disband, or
+  guild switch made the UPDATE match zero rows while the sim was stamped
+  `{guildId: A, rank: 'officer'}`. Because the stamp IS the guild bank's authorization
+  input and `pushGuild` never reaches a character no longer in the roster, the bogus
+  officer rank persisted until relog (and the `guildStampSeq` fence actively protected
+  it). Fix: the write predicates on character AND guild and returns whether a row
+  moved; `guildSetRank` refuses without stamping when it did not. Two regression tests
+  drive the real race (mid-flight leave, mid-flight guild switch), both mutation-checked.
+- SHOULD-FIX fixed in this pass: the officer gate was a DENYLIST (`rank === 'member'`),
+  which fails OPEN for any rank added later, and it was duplicated between the op gate
+  and the info read: both now share one positive `GUILD_BANK_RANKS` allowlist, swept
+  over every rank plus a future-rank arm that a denylist fails. `guildBankInfoFor`
+  shipped whole instance payloads justified by "locked copies can never enter the
+  book", which covers deposits but NOT the sanitize load path a tampered/legacy row
+  arrives through: a refused (unwithdrawable) slot now degrades to `publicInstanceView`,
+  so no `boundTo`/armed `bindOnTrade` bind identity is broadcast to every officer.
+  Runtime pid guard added (the required-pid claim was type-only; `Sim.resolve`
+  falls back to the local player on undefined). Dispatch routing was pinned by COUNT
+  only: a spy test now names each entry point and its argument order plus the shape
+  rejects. The fence suite only proved the SKIP arm (a check against 0 instead of the
+  captured seq passed everything): the apply arm and the offline-id no-op are pinned.
+  `error.guildBankNoGuild` duplicated `server_i18n`'s `guild.notInOne` verbatim, which
+  the hud matcher resolves FIRST, leaving the sim row dead while shipping a second
+  divergable per-locale copy: the guild bank refusal now names its own feature.
+  Cross-guild isolation, the full withdraw-side pipe sweep (all four dimensions, not
+  two), and malformed-count negatives added.
+- Exploit catalog run against the code as written, all NEGATIVE: double-dispatch in one
+  tick (ops are synchronous and all-or-nothing, no await inside any body);
+  deposit+withdraw interleavings (conservation pinned); capacity scratch-vs-real
+  divergence (`countFit` gates before `addStacked` mutates, one primitive, no scratch
+  copy exists to diverge); treasury cap at exactly the cap (accepted) and one past
+  (refused whole, never truncated); purse bound at exactly MAX_SAFE_INTEGER (accepted)
+  and one past (refused); instanced-stack splitting (moves whole or not at all);
+  `craftedRecipeId` laundering (threaded through both the fit check and the grant).
+  The stale-rank window was the ONE live hole and it is closed above.
+- Silent-inertness verified safe: no `server/` caller of `loadGuildBank` exists, so
+  every op dead-ends at `requireOfficerBook`'s `?? null` with no player line and,
+  critically, no lazy book creation (`get`, never `set`), so nothing can shadow the
+  Phase 3 DB row. Confirmed the four Phase 3 prerequisites are pinned as acceptance
+  lines in phase-03-persistence.md (boot-load, guild_create empty-book seed, disband
+  evict, ledger rows before any Phase 4 UI).
+- Carried-forward lines all verified explicitly: the five `online.ts` bodies are
+  non-empty and payload-pinned to literal wire tokens; `onGuildMembershipChanged` is
+  the ONE combined entry point at every one of the 8 mutation sites (each pinned, with
+  refused mutations pinning zero stamps); the `guildMembership` parity exclusion
+  re-audited and correct (host-injected authorization input, null offline, and the
+  state it gates is fully sampled).
+- Validation: `npx tsc --noEmit` clean; the 10-suite run 784 passed / 3 skipped (was
+  773, +11); `tests/parity` + `social_db_guild_names` + `i18n_completeness` 197 passed;
+  `npm run ci:changed` exit 0. Every new guard mutation-checked (guard neutered ->
+  the new test fails -> restored).
+- Deferred with rationale (NOTEs, none blocking): withdraw-direction refusal copy is
+  deposit-voiced ("cannot store") and would need its own i18n rows; item notices omit
+  counts; a dormant unknown-item-id row emits its raw id in the withdraw notice; the
+  spectator arm mirrors the anchor's guild bank exactly as `maybe('bank')` already
+  does; admin guild RENAME does not re-stamp the nameplate name (membership id + rank,
+  the gate input, are unaffected); the first-join retro-deeds fence edge (cosmetic).
 
 Phase 2 review (2026-08-02): architecture-reviewer (1 BLOCKING, 5 SHOULD-FIX, 6 NOTE),
 privacy-security-review (CHANGES REQUESTED: 1 BLOCKING, 2 SHOULD-FIX, 2 NIT),
@@ -177,7 +243,7 @@ Phase 1 QA (2026-08-02), fresh auditor, verdict PASS-WITH-FOLLOWUPS:
   (`tests/architecture.test.ts` forbiddenImport) now bans `server/` imports
   from `src/sim/` (even type-only; verified to fail on an injected probe), so
   the GuildRank-redeclaration contract is enforced, not just documented.
-- Test coverage closed (tests/guild_bank.test.ts, 26 to 33 tests): the
+- Test coverage closed (tests/guild_bank.test.ts): the
   craftedRecipeId sanitize dimension (both arms, key-absence pinned, and in
   the round-trip); truthy-non-object `instance` degrades to a plain slot;
   truthy-non-object membership stamps normalize to null; `sanitize({})` whole

@@ -85,6 +85,20 @@ STEP 5 - ACCEPTANCE:
       runs clean on a scripted session.
 - [ ] Creation refused when poor (nothing created, nothing charged); fee charged exactly
       once on success; disband refused until the bank is empty.
+- [ ] guild_create seeds an empty book into the LIVE sim in the same success arm that
+      stamps the founder (ops never lazily create a book, the load-once shadow hazard:
+      without the seed the founder's bank is silent-inert until a realm restart); the
+      boot load verifies sim.guildBanks.has(guildId) for every loaded guild.
+- [ ] Disband (after the empty-bank guard passes) EVICTS the guild's book from
+      Sim.guildBanks and deletes/ignores its row, so the map stays bounded on a
+      long-lived realm and a re-created guild id can never inherit a stale book.
+- [ ] A null serializeGuildBank return SKIPS the DB write, pinned by test (never
+      persist an empty book over a real row); the DB read hands loadGuildBank a PARSED
+      object, pinned by test (a raw JSON string yields an empty book by design); the
+      raw row size is bounded server-side before load.
+- [ ] The Phase 2 silent-inert live wire is released ONLY by this phase: books
+      boot-load before players join, and the ledger observer is live BEFORE any
+      Phase 4 UI ships (economy mutations must never run unaudited).
 
 STEP 6 - DOCS: update progress.md + state.md ledger (DDL, db functions, ledger ops).
 

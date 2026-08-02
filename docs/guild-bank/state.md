@@ -1,6 +1,6 @@
 # Guild Bank: cross-phase state
 
-Current phase: Phase 2 complete (2026-08-02); Phase 2 QA next.
+Current phase: Phase 2 QA complete (2026-08-02, PASS-WITH-FOLLOWUPS); Phase 3 next.
 
 ## Locked design decisions
 - Base `release/v0.34.0`, branch `feature/guild-bank`. PR A (`feature/guild-social-v1`)
@@ -130,7 +130,7 @@ Current phase: Phase 2 complete (2026-08-02); Phase 2 QA next.
   - Phase 1 QA drift: `loadGuildBank` is LOAD-ONCE (skip when the book is live;
     evict-then-load to reload); `serializeGuildBank` null means SKIP the write;
     `tests/architecture.test.ts` now bans `server/` imports from `src/sim/`;
-    `tests/guild_bank.test.ts` grew to 33 tests (sanitizer lockstep pin vs
+    `tests/guild_bank.test.ts` grew (sanitizer lockstep pin vs
     `sanitizeBankState`, craftedRecipeId, inert-facet pins in both worlds);
     `docs/guild-bank/phase-02-qa.md` carries the Phase 1 acceptance lines.
 - Phase 2 wire tokens / dispatch cases / sim_i18n rows:
@@ -186,9 +186,37 @@ Current phase: Phase 2 complete (2026-08-02); Phase 2 QA next.
     `tests/snapshots.test.ts` (63 delta keys, `guildBank: 'guildBankInfo'`,
     dirty fixture + round-trip assertion), `tests/localization_fixes.test.ts`
     (guild_bank.ts on the S3 scan list), `tests/parity/trace.ts` (exclusion
-    re-audit comment), `tests/guild_bank.test.ts` (65 tests; ClientWorld pin
+    re-audit comment), `tests/guild_bank.test.ts` (ClientWorld pin
     flipped to the five exact payloads), `tests/social_system.test.ts`
     (FakeTransport.membershipStamps recorder + per-site stamp suite).
+  - Phase 2 QA drift (fresh auditor, PASS-WITH-FOLLOWUPS):
+    - `SocialDb.setGuildRank(charId, guildId, rank)` now predicates on the guild
+      too and RETURNS whether a row moved; `guildSetRank` refuses (and stamps
+      NOTHING) when it did not. The old signature stamped a rank the DB refused
+      whenever a promote raced a leave/kick/disband/guild-switch, which the
+      guild bank's officer gate then honored with no corrective push. Any new
+      membership write must follow the same rule: confirm the row, then stamp.
+    - The officer gate is a POSITIVE allowlist, `GUILD_BANK_RANKS`
+      (`{leader, officer}`), shared by `requireOfficerBook` AND
+      `guildBankInfoFor`. A rank added to `GUILD_RANKS` is DENIED until the
+      allowlist is deliberately revisited (swept per rank + a future-rank arm).
+    - `guildBankInfoFor` projects a pipe-REFUSED slot through
+      `publicInstanceView` (`guildBankSlotView`) instead of shipping the whole
+      payload. The old full-payload ruling only held for the deposit path; a
+      tampered/legacy row arrives via `sanitizeGuildBankState`, which does not
+      filter locks. Allowed slots still ship full payloads (charges).
+    - Ops guard the required pid at RUNTIME (`resolveActor`), because
+      `Sim.resolve(undefined)` falls back to the local player.
+    - `error.guildBankNoGuild` is now 'You must be in a guild to use the guild
+      bank.': the bare 'You are not in a guild.' duplicated `server_i18n`'s
+      `guild.notInOne`, which the hud matcher resolves FIRST (the sim row was
+      dead while shipping a second divergable locale copy). Reused-string note
+      in the Phase 2 ledger above is superseded for this one row.
+    - New pins: dispatch ROUTING (each token to its own entry point with its
+      argument order, plus shape rejects) and the fence's APPLY arm, both in
+      `tests/guild_stamp_fence.test.ts`; cross-guild isolation, the future-rank
+      arm, the locked-slot projection, the four-dimension withdraw pipe sweep,
+      and malformed-count negatives in `tests/guild_bank.test.ts`.
 - Phase 3 DDL / db functions / ledger ops / fee wiring:
 - Phase 4 UI modules / i18n keys / screenshots:
 
@@ -208,3 +236,8 @@ Current phase: Phase 2 complete (2026-08-02); Phase 2 QA next.
   loaded book: Phase 3 must SKIP that write, never persist an empty book over a row.
 - `sanitizeGuildBankState` accepts a parsed OBJECT only: a JSON string yields an
   empty book. The Phase 3 DB read must hand `loadGuildBank` parsed JSONB, pinned.
+- The membership stamp IS the guild bank's authorization. Never stamp from a DB
+  write whose result you did not check: a write that matched no row must refuse
+  and stamp nothing (the Phase 2 QA CRITICAL). `sanitizeGuildBankState` does NOT
+  filter transfer locks, so any NEW wire surface reading the book must project
+  refused slots like `guildBankSlotView` does, not assume the deposit gate.
