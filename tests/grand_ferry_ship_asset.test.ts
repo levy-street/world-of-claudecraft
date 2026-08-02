@@ -32,13 +32,16 @@ const ART_SOURCE = path.join(
   REPO_ROOT,
   'scripts/assets/grand_ferry_ship/source/grand_ferry_ship_art.glb',
 );
-const EXPORTER = path.join(REPO_ROOT, 'scripts/assets/grand_ferry_ship/export_grand_ferry_ship.mjs');
+const EXPORTER = path.join(
+  REPO_ROOT,
+  'scripts/assets/grand_ferry_ship/export_grand_ferry_ship.mjs',
+);
 
 // Re-mint deliberately (run the exporter, take the reported values) whenever
 // the art or the build intent changes. A surprise diff here means the shipped
 // boat is not the one this repo builds.
-const ASSET_BYTES = 222204;
-const ASSET_SHA256 = '554e4a558d5f0f6bada5d758285bf5fd3943b4dcecedef54d8d6e64aabf1d710';
+const ASSET_BYTES = 224640;
+const ASSET_SHA256 = '2003db97268185d985d5a276f7398eb3de347881b5419d60442ed8f15b0a563f';
 const ART_SHA256 = '9bfe1c2d385ce636488f01e0b4c31691e3aacbc5ef5b11e25e65e54d5fcf08d6';
 
 async function shippedTriangles(): Promise<number[][][]> {
@@ -117,19 +120,15 @@ describe('grand ferry shipped artifact', () => {
     expect(Object.keys(MEDIA_ASSETS)).toContain('models/props/grand_ferry_ship.glb');
   });
 
-  it(
-    'rebuilds the staged asset and plan byte for byte from the art source',
-    () => {
-      const result = spawnSync(process.execPath, [EXPORTER, '--verify-staged', '--no-preview'], {
-        cwd: REPO_ROOT,
-        encoding: 'utf8',
-        maxBuffer: 32 * 1024 * 1024,
-      });
-      expect(result.status, result.stderr ?? '').toBe(0);
-      expect(result.stdout).toContain('staged artifact verified');
-    },
-    240_000,
-  );
+  it('rebuilds the staged asset and plan byte for byte from the art source', () => {
+    const result = spawnSync(process.execPath, [EXPORTER, '--verify-staged', '--no-preview'], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+      maxBuffer: 32 * 1024 * 1024,
+    });
+    expect(result.status, result.stderr ?? '').toBe(0);
+    expect(result.stdout).toContain('staged artifact verified');
+  }, 240_000);
 });
 
 describe('grand ferry plan reaches both berths', () => {
@@ -143,7 +142,8 @@ describe('grand ferry plan reaches both berths', () => {
       // coordinates lost the moment the deck was re-measured.
       for (const anchor of [harbor.boarding, harbor.keeperPost, harbor.deckArrival]) {
         const aboard = harbor.shipDecks.some(
-          (deck) => Math.abs(anchor.x - deck.x) <= deck.hw && Math.abs(anchor.z - deck.z) <= deck.hd,
+          (deck) =>
+            Math.abs(anchor.x - deck.x) <= deck.hw && Math.abs(anchor.z - deck.z) <= deck.hd,
         );
         expect(aboard, `${harbor.id} anchor ${anchor.x},${anchor.z}`).toBe(true);
       }
