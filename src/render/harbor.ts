@@ -52,6 +52,11 @@ import {
   deckStandInParentTransform,
   disposeDeckStandIn,
 } from './harbor_deck_stand_in_core';
+import {
+  type RailSurfaceSampler,
+  railHeightProfile,
+  railProfileTopAt,
+} from './harbor_rail_profile_core';
 import { composeHarborShipAttachFrame } from './harbor_ship_attach_core';
 import { HarborShipCueRegistry } from './harbor_ship_cue_registry';
 import { firstHarborHullColliderOverlap } from './harbor_ship_tripwire_core';
@@ -118,9 +123,11 @@ class WoodBuckets {
     z: number,
     rotY = 0,
     rotX = 0,
+    rotZ = 0,
   ): void {
     const geo = new THREE.BoxGeometry(w, h, d);
     if (rotX) geo.rotateX(rotX);
+    if (rotZ) geo.rotateZ(rotZ);
     if (rotY) geo.rotateY(rotY);
     geo.translate(x, y, z);
     const list = this.buckets.get(tone) ?? [];
@@ -246,47 +253,76 @@ function buildDeck(
 
 // A railing run over its collider segment: chunky posts, a wide flat cap
 // rail, and a mid rail. rot 0 runs along world x, Math.PI / 2 along world z.
+// The run follows the walkable surface it protects (harbor_rail_profile_core):
+// a level run draws exactly the classic three-box rail, a run beside a seam
+// ramp slopes its cap and mid rail with the climb, and a run crossing an
+// authored deck step holds the higher cap across the bay, stair-rail style.
 // The cap overhangs its post run at both ends by default; the boarding
 // bridge's rails pass a one-sided overhang so nothing floats naked over the
 // water gap at the hull end.
 function buildRail(
   wood: WoodBuckets,
   rail: HarborRail,
-  deckY: number,
+  surfaceAt: RailSurfaceSampler,
   capOverhang: RailCapOverhang | null = null,
 ): void {
-  const len = rail.hw * 2;
-  const nPosts = Math.max(2, Math.ceil(len / 2.0) + 1);
-  for (let i = 0; i < nPosts; i++) {
-    const t = -rail.hw + (len * i) / (nPosts - 1);
-    const px = rail.rot === 0 ? rail.x + t : rail.x;
-    const pz = rail.rot === 0 ? rail.z : rail.z + t;
-    wood.box(POST_TONE, 0.2, HARBOR_RAIL_HEIGHT, 0.2, px, deckY + HARBOR_RAIL_HEIGHT / 2, pz);
+  const profile = railHeightProfile(rail, surfaceAt);
+  const alongX = rail.rot === 0;
+  for (const post of profile.posts) {
+    const top = railProfileTopAt(profile, post.along);
+    const base = Math.min(post.footingY, top - HARBOR_RAIL_HEIGHT);
+    wood.box(POST_TONE, 0.2, top - base, 0.2, post.x, (base + top) / 2, post.z);
   }
   const overhang = capOverhang ?? {
     negative: RAIL_CAP_OVERHANG_YARDS,
     positive: RAIL_CAP_OVERHANG_YARDS,
   };
-  const capLen = len + overhang.negative + overhang.positive;
-  const capShift = (overhang.positive - overhang.negative) / 2;
-  wood.box(
-    BOARD_TONES[0],
-    rail.rot === 0 ? capLen : 0.26,
-    0.09,
-    rail.rot === 0 ? 0.26 : capLen,
-    rail.x + (rail.rot === 0 ? capShift : 0),
-    deckY + HARBOR_RAIL_HEIGHT + 0.045,
-    rail.z + (rail.rot === 0 ? 0 : capShift),
-  );
-  wood.box(
-    POST_TONE,
-    rail.rot === 0 ? len : 0.1,
-    0.1,
-    rail.rot === 0 ? 0.1 : len,
-    rail.x,
-    deckY + HARBOR_RAIL_HEIGHT * 0.55,
-    rail.z,
-  );
+  for (const [index, span] of profile.spans.entries()) {
+    const negOver = index === 0 ? overhang.negative : 0;
+    const posOver = index === profile.spans.length - 1 ? overhang.positive : 0;
+    const run = span.along1 - span.along0;
+    const slope = run <= 1e-9 ? 0 : (span.top1 - span.top0) / run;
+    // The overhang continues the span along its own pitch line.
+    const along0 = span.along0 - negOver;
+    const along1 = span.along1 + posOver;
+    const top0 = span.top0 - slope * negOver;
+    const top1 = span.top1 + slope * posOver;
+    const mid = (along0 + along1) / 2;
+    const cx = alongX ? rail.x + mid : rail.x;
+    const cz = alongX ? rail.z : rail.z + mid;
+    const pitch = Math.atan2(top1 - top0, along1 - along0);
+    // rotateZ lifts the +x end; rotateX drops the +z end (see buildRamp).
+    const rotX = alongX ? 0 : -pitch;
+    const rotZ = alongX ? pitch : 0;
+    const capLen = Math.hypot(along1 - along0, top1 - top0);
+    const yTop = (top0 + top1) / 2;
+    wood.box(
+      BOARD_TONES[0],
+      alongX ? capLen : 0.26,
+      0.09,
+      alongX ? 0.26 : capLen,
+      cx,
+      yTop + 0.045,
+      cz,
+      0,
+      rotX,
+      rotZ,
+    );
+    const midRunLen = Math.hypot(run, span.top1 - span.top0);
+    const midAlong = (span.along0 + span.along1) / 2;
+    wood.box(
+      POST_TONE,
+      alongX ? midRunLen : 0.1,
+      0.1,
+      alongX ? 0.1 : midRunLen,
+      alongX ? rail.x + midAlong : rail.x,
+      (span.top0 + span.top1) / 2 - HARBOR_RAIL_HEIGHT * 0.45,
+      alongX ? rail.z : rail.z + midAlong,
+      0,
+      rotX,
+      rotZ,
+    );
+  }
 }
 
 // A ramp as a planked gangway: one sloped surface box matching the walkable
@@ -777,13 +813,9 @@ export function buildHarbors(seed: number, deps: HarborSceneDeps): { group: THRE
     for (const box of junctionPlankBoxes(harbor, HARBOR_PLANK_STYLE)) {
       wood.box(box.tone, box.w, box.h, box.d, box.x, box.y, box.z);
     }
+    const surfaceAt: RailSurfaceSampler = (x, z) => harborSurfaceHeight(harbor, x, z);
     for (const rail of harbor.rails) {
-      buildRail(
-        wood,
-        rail,
-        harborSurfaceHeight(harbor, rail.x, rail.z),
-        bridgeRailCapOverhang(harbor, rail),
-      );
+      buildRail(wood, rail, surfaceAt, bridgeRailCapOverhang(harbor, rail));
     }
     for (const ramp of harbor.ramps) buildRamp(wood, ramp);
     for (const d of harbor.dressing) {

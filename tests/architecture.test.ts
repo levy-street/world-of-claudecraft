@@ -454,6 +454,7 @@ const RENDER_PURE_CORES = [
   'src/render/harbor_boarding_junction_core.ts',
   'src/render/harbor_deck_rider_core.ts',
   'src/render/harbor_deck_stand_in_core.ts',
+  'src/render/harbor_rail_profile_core.ts',
   'src/render/harbor_ship_attach_core.ts',
   'src/render/harbor_ship_tripwire_core.ts',
   'src/render/harbor_ship_update_core.ts',

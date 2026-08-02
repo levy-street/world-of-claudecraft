@@ -546,6 +546,11 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     // hull's arrival sweep open. buildRail seats a post at this endpoint.
     { x: 226.5, z: -54.5, hw: 2, rot: 0 },
     { x: 227.7, z: -41.5, hw: 3.2, rot: 0 },
+    // the corridor's south edge past the split-deck corner (x 228.5..230.9):
+    // continues the bridge rail line back to the corner so the last stretch
+    // before the brow is fully railed (J5). The ferry berth clearance suite
+    // proves the arrival sweep clears it.
+    { x: 229.7, z: MAINLAND_PIER_GANGWAY_GAP.min, hw: 1.2, rot: 0 },
     // west cross rails at the berth head's raised edge above the seam ramp
     { x: 224.5, z: -52.65, hw: 1.85, rot: Math.PI / 2 },
     { x: 224.5, z: -43.35, hw: 1.85, rot: Math.PI / 2 },
@@ -635,8 +640,10 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     // the grand extension: the boardwalk runs on west over the deep bay to
     // the berth head where the tall ship lies. The run continues UNDER the
     // seam ramp to the raised head's edge so the ramp's shoulders land on
-    // deck instead of open water.
-    { x: 739.2, z: 116, hw: 10.8, hd: 2.8, y: 0.2 },
+    // deck instead of open water, and east all the way to the pier head's
+    // edge (x 753): the rail audit (J5) caught the original run ending at
+    // x 750, a three yard open-water channel in the middle of the walkway.
+    { x: 740.7, z: 116, hw: 12.3, hd: 2.8, y: 0.2 },
     // berth head at the ship's deck height (the seam ramp below makes the
     // climb), split around the boarding corridor so the turning hull clears
     // the two outer deck corners while the boarding route stays flush. The
@@ -688,14 +695,19 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     { x: 761, z: 111.65, hw: 1.15, rot: Math.PI / 2 },
     { x: 761, z: 120.35, hw: 1.15, rot: Math.PI / 2 },
     // outer run, fencing the seam ramp's shoulders up to the head
-    { x: 739.2, z: 113.2, hw: 10.8, rot: 0 },
-    { x: 739.2, z: 118.8, hw: 10.8, rot: 0 },
+    { x: 740.7, z: 113.2, hw: 12.3, rot: 0 },
+    { x: 740.7, z: 118.8, hw: 12.3, rot: 0 },
     // berth head; the west edge gap is derived from the mirrored generated
     // ship mating edge, so the boarding bridge never overlaps either rail
     // segment. The south run starts at the split deck corner, leaving the
     // turning hull's arrival sweep open. buildRail seats a post there.
     { x: 726.7, z: 110, hw: 1.7, rot: 0 },
     { x: 725.5, z: 123, hw: 2.9, rot: 0 },
+    // the corridor's south edge past the split-deck corner (x 722.6..725):
+    // continues the bridge rail line back to the corner so the last stretch
+    // before the brow is fully railed (J5). The ferry berth clearance suite
+    // proves the arrival sweep clears it.
+    { x: 723.8, z: GULLHAVEN_PIER_GANGWAY_GAP.min, hw: 1.2, rot: 0 },
     {
       x: (722.5 + GULLHAVEN_PIER_GANGWAY_GAP.min) / 2,
       z: 123,
@@ -720,7 +732,11 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     // deck seams stepping down toward the head
     { x: 779, z: 116, hw: 1.5, hd: 2.5, dir: 'x-', highY: 5.9, lowY: 4.2 },
     { x: 768.75, z: 116, hw: 1.25, hd: 2.5, dir: 'x-', highY: 4.2, lowY: 2.6 },
-    { x: 761.75, z: 116, hw: 2.25, hd: 2.5, dir: 'x-', highY: 2.6, lowY: 0.2 },
+    // high edge tucked just half a yard inside the lower pier's west edge
+    // (the mainland seam pattern) so the exposed step at the edge stays
+    // small: the rail audit (J5) caught the original placement burying the
+    // whole climb under the pier, a two yard sheer step at the seam.
+    { x: 758.75, z: 116, hw: 2.25, hd: 2.5, dir: 'x-', highY: 2.6, lowY: 0.2 },
     // the climb: one long gentle seam ramp from the outer run up to the
     // raised berth head (the crossing beyond it is level all the way aboard)
     { x: 730.4, z: 116, hw: 2, hd: 2.5, dir: 'x+', highY: GULLHAVEN_BERTH_HEAD_Y, lowY: 0.2 },
