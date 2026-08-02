@@ -54,15 +54,14 @@ import {
   LEASH_DISTANCE,
   MELEE_RANGE,
   type MobTemplate,
-  normAngle,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
+  normAngle,
   SISTER_NHALIA_BOSS_ID,
   steadyAngleTo,
   TOLLING_BELL_TEMPLATE_ID,
   type Vec3,
 } from '../types';
-import { applyBroodBurn } from './dragonkin_brood';
 import { groundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
 import { isAmbientMob, updateAmbientMob } from './ambient';
@@ -73,6 +72,7 @@ import {
   updateMobChargeDash,
 } from './charge';
 import { updateMobCombatProfile } from './combat_profile';
+import { applyBroodBurn } from './dragonkin_brood';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -396,7 +396,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       if (mob.wanderTimer <= 0) {
         if (mob.wanderTarget) {
           mob.wanderTarget = null;
-          mob.wanderTimer = ctx.rng.range(3, 10);
+          // wanderHaste divides the pause AFTER the draw (identical rng
+          // stream for every template; see the MobTemplate field comment).
+          mob.wanderTimer = ctx.rng.range(3, 10) / (MOBS[mob.templateId]?.wanderHaste ?? 1);
         } else {
           const ang = ctx.rng.range(0, Math.PI * 2);
           const r = ctx.rng.range(MIN_WANDER_RADIUS, MAX_WANDER_RADIUS);

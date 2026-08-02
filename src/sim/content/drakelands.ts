@@ -177,10 +177,13 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     color: 0x69a06a,
     // Dies to any single hit; the hatched whelp is the real fight.
     xpMult: 0,
+    // Chain 5.5 (under the ring spacing) so shooting one egg ripples its
+    // neighbors without a single roadside egg unzipping a whole scatter
+    // field; proximity 3 means a boot practically ON the shell.
     broodEgg: {
-      chainRadius: 7,
+      chainRadius: 5.5,
       chainDelay: 0.3,
-      proximityRadius: 3.5,
+      proximityRadius: 3,
       hatchMobId: 'dragonkin_whelp',
     },
   },
@@ -208,10 +211,17 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     // Swarm chaff: a sliver of kill XP each so a cracked clutch is a hazard,
     // not an XP farm.
     xpMult: 0.3,
+    // Restless hatchlings: the wander pause divides by 3, so loose whelps
+    // skitter around their patch instead of standing statuesque.
+    wanderHaste: 3,
+    // The pounce is a CALCULATED leap: duration derives from the live
+    // distance at launch (speed = moveSpeed x leapSpeedMult, capped at
+    // leapSeconds), triggered from anywhere inside leapRange, and loose
+    // whelps re-pounce on aggro after a cooldown (dragonkin_brood.ts).
     broodWhelp: {
-      leapRange: 16,
+      leapRange: 24,
       leapSpeedMult: 2.6,
-      leapSeconds: 1.2,
+      leapSeconds: 1.5,
       burn: { perTick: 5, interval: 1, duration: 6, name: 'Hatchling Burn' },
     },
   },
@@ -270,7 +280,10 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
       { itemId: 'emberwing_scale', chance: 0.9, questId: 'q_dk_scales_of_the_maw' },
       { itemId: 'reins_drakemaw_raptor', chance: 0.001 },
     ],
-    scale: 1.5,
+    // Menace scale: half again over the first cut. Its melee reach follows
+    // through the bespoke combat profile (mob_combat.ts), never the visual
+    // alone (the Wildheart whiff lesson).
+    scale: 2.25,
     color: 0x50392e,
     yells: {
       engage: 'The brood wakes! Rise, hatchlings, and strip their bones!',
@@ -283,7 +296,8 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     arcCleave: {
       every: 5,
       arcDeg: 150,
-      range: 6,
+      // reaches past the scale-2.25 body's own melee arc (mob_combat.ts)
+      range: 8,
       mult: 1.0,
       name: 'Brood Cleave',
       burn: { perTick: 4, interval: 1, duration: 8, name: 'Seared Scales' },
@@ -293,7 +307,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
       name: 'Fire Breath',
       castTime: 1.6,
       every: 14,
-      range: 12,
+      range: 13,
       arcDeg: 60,
       min: 26,
       max: 34,
@@ -390,7 +404,9 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 20,
     elite: true,
     loot: [{ copper: 100, chance: 1 }],
-    scale: 1.9,
+    // The matriarch keeps her half-again margin over the grown broodlords
+    // (reach profile beside theirs in mob_combat.ts).
+    scale: 2.85,
     color: 0xf0b040,
     yells: {
       engage: 'You crunch across MY nursery, little thief. The Maw remembers its own.',
@@ -403,7 +419,8 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     arcCleave: {
       every: 5,
       arcDeg: 150,
-      range: 7,
+      // reaches past the scale-2.85 body's own melee arc (mob_combat.ts)
+      range: 9,
       mult: 1.0,
       name: 'Maw Cleave',
       burn: { perTick: 5, interval: 1, duration: 8, name: 'Seared Scales' },
@@ -413,7 +430,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
       name: 'Fire Breath',
       castTime: 1.6,
       every: 12,
-      range: 13,
+      range: 14,
       arcDeg: 60,
       min: 30,
       max: 38,
@@ -800,8 +817,10 @@ export const DRAKELANDS_BROOD_CAMPS: CampDef[] = [
   // ...and the matriarch's own clutch in the crater
   { mobId: 'dragonkin_egg', center: { x: 436, z: 2348 }, radius: 10, count: 8 },
   // loose scatter fields between the nests (sparser than the rings, so a
-  // careless boot pops a local cascade, not the whole field)
-  { mobId: 'dragonkin_egg', center: { x: 390, z: 2312 }, radius: 12, count: 5 },
+  // careless boot pops a local cascade, not the whole field). The first
+  // field sits EAST of the crater-rim road terminus (390, 2298): centered on
+  // the road it cascaded on every walk-by and read as pre-hatched.
+  { mobId: 'dragonkin_egg', center: { x: 404, z: 2318 }, radius: 10, count: 5 },
   { mobId: 'dragonkin_egg', center: { x: 330, z: 2300 }, radius: 12, count: 5 },
   { mobId: 'dragonkin_egg', center: { x: 430, z: 2380 }, radius: 12, count: 5 },
   // broodguard patrols: the caldera belt, Bloodglass, and the dune approach

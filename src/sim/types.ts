@@ -1223,6 +1223,12 @@ export interface MobTemplate {
   // combat and heals to full a few seconds after the last hit. Guarded in
   // enterCombat (sim.ts) and updateMob (mob/locomotion.ts).
   dummy?: boolean;
+  // Idle-wander liveliness multiplier (default 1). Divides the wander PAUSE
+  // rolled between hops, so a restless creature (the dragonkin whelp) putters
+  // around its patch instead of standing statuesque. Applied AFTER the shared
+  // rng draw: the draw count, order, and drawn values are identical for every
+  // template, so the parity draw digest never moves.
+  wanderHaste?: number;
   // Purely-ambient decoration (the Highwatch stable horses): never hostile,
   // never aggros/fights, un-attackable and un-tameable, but wanders a bounded
   // patch. Spawned RNG-free (like the dummy) so it never perturbs the shared
@@ -3435,7 +3441,8 @@ export interface Entity extends ClientMirroredEntityFields {
   // wrapped in the named one-hit ward (engageShout.wardWhelps, stamped at
   // shout time; chain breaks beyond the shout radius never carry it)
   broodWardOnHatch?: { duration: number; name: string };
-  leapUntil?: number; // whelp: sim-time end of the hatch pounce speed burst
+  leapUntil?: number; // whelp: sim-time end of the pounce speed burst (duration derives from launch distance)
+  leapReadyAt?: number; // whelp: sim-time the NEXT pounce may launch (re-pounce cooldown)
   leapBurnPending?: boolean; // whelp: first landed swing still owes the pounce burn
   wardOneHit?: boolean; // whelp: one-hit ward live (brood module strips it after it soaks)
   stoneskinTimer: number; // periodic self-absorb barrier countdown

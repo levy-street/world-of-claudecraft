@@ -141,6 +141,40 @@ describe('whelp pounce', () => {
     expect(whelp.moveSpeed).toBeCloseTo(def.moveSpeed);
   });
 
+  it('the pounce duration derives from the launch distance and a loose whelp re-pounces off cooldown', () => {
+    const sim = makeSim();
+    const player = levelUp(sim, sim.playerId, 'warrior');
+    const egg = spawn(sim, 'dragonkin_egg', 6, 0);
+    (sim as any).dealDamage(null, egg, 1, false, 'physical', 'test', 'hit', true);
+    tick(sim, 1);
+    const [whelp] = whelpsOf(sim);
+    const def = MOBS.dragonkin_whelp.broodWhelp!;
+    const speed = MOBS.dragonkin_whelp.moveSpeed * def.leapSpeedMult;
+    // 6yd at ~26 yd/s clamps to the minimum hop, far under the cap
+    const firstLeap = whelp.leapUntil! - (sim as any).time;
+    expect(firstLeap).toBeGreaterThan(0);
+    expect(firstLeap).toBeLessThan(def.leapSeconds);
+    // the cooldown armed alongside the launch
+    expect(whelp.leapReadyAt! - (sim as any).time).toBeCloseTo(8, 0);
+    // let the burst expire and the speed restore
+    tick(sim, Math.ceil(def.leapSeconds * 20) + 2);
+    expect(whelp.leapUntil).toBeUndefined();
+    expect(whelp.moveSpeed).toBeCloseTo(MOBS.dragonkin_whelp.moveSpeed);
+    // park the victim inside the leap window and clear the cooldown: the
+    // loose whelp launches the jump attack again, owing a fresh burn
+    player.pos = { x: whelp.pos.x + 15, y: player.pos.y, z: whelp.pos.z };
+    whelp.leapBurnPending = false;
+    whelp.leapReadyAt = 0;
+    tick(sim, 1);
+    expect(whelp.leapUntil).toBeDefined();
+    expect(whelp.leapBurnPending).toBe(true);
+    expect(whelp.moveSpeed).toBeCloseTo(speed);
+    // ~15yd at ~26 yd/s: a real calculated leap, longer than the minimum hop
+    const releap = whelp.leapUntil! - (sim as any).time;
+    expect(releap).toBeGreaterThan(0.4);
+    expect(releap).toBeLessThanOrEqual(def.leapSeconds);
+  });
+
   it('the hatch prefers a healer over a closer non-healer', () => {
     const sim = makeSim();
     const healerPid = sim.addPlayer('priest', 'Mendy');
@@ -271,8 +305,7 @@ describe('broodlord kit', () => {
     // not hp deltas: any aura application recalcs a player and clamps a
     // hand-inflated pool, so hp arithmetic lies here).
     const cleaveHit = (sim as any).events.find(
-      (ev: any) =>
-        ev.type === 'damage' && ev.targetId === buddy.id && ev.amount > 0,
+      (ev: any) => ev.type === 'damage' && ev.targetId === buddy.id && ev.amount > 0,
     );
     expect(cleaveHit).toBeDefined();
     expect(buddy.auras.some((a) => a.name === 'Seared Scales')).toBe(true);

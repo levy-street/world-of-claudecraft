@@ -131,6 +131,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.broodChainAt = undefined;
   mob.broodWardOnHatch = undefined;
   mob.leapUntil = undefined;
+  mob.leapReadyAt = undefined;
   mob.leapBurnPending = undefined;
   mob.wardOneHit = undefined;
   mob.wanderTimer = ctx.rng.range(2, 8);

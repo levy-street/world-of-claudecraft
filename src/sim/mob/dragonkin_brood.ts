@@ -26,6 +26,7 @@
 // deterministic across hosts).
 
 import { MOBS } from '../data';
+import { createMob } from '../entity';
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
 import {
@@ -36,7 +37,6 @@ import {
   type MobTemplate,
   type Vec3,
 } from '../types';
-import { createMob } from '../entity';
 
 // One-hit ward: the absorb is sized far past any single player hit, and the
 // upkeep pass strips it the tick after it soaks ANYTHING, so exactly one hit
@@ -45,11 +45,49 @@ const WARD_ABSORB = 9999;
 const WARD_AURA_ID = 'brood_ward';
 // How far from a cracking egg the hatchling looks for prey (and the shout /
 // proximity ambush hand it a victim to pounce).
-const HATCH_TARGET_RANGE = 18;
+const HATCH_TARGET_RANGE = 24;
 // Threat the hatch seeds on its chosen victim: enough that proximity aggro
 // off other players does not immediately re-roll the pick, small enough that
 // a taunt or a big heal peels it (the counterplay).
 const HATCH_THREAT = 60;
+// The pounce is a CALCULATED leap: it never runs shorter than this (a
+// point-blank hatch still reads as a hop, and the render one-shot needs its
+// windup), and loose whelps that re-acquire a player may pounce again after
+// this cooldown, so the jump attack stays their signature past the hatch.
+const LEAP_MIN_SECONDS = 0.4;
+const REPOUNCE_COOLDOWN = 8;
+// Beyond melee contact but inside broodWhelp.leapRange: the re-pounce window.
+const REPOUNCE_MIN_DIST = 5;
+
+/** Launch the whelp's pounce at `victim`: duration derives from the LIVE
+ *  distance at launch (speed = authored moveSpeed x leapSpeedMult, capped at
+ *  leapSeconds), the landing owes the burn, and the renderer plays the
+ *  JumpAttack one-shot off the flourish cue. Draws no rng. */
+function startPounce(
+  ctx: SimContext,
+  whelp: Entity,
+  def: NonNullable<MobTemplate['broodWhelp']>,
+  victim: Entity,
+): void {
+  const tmplSpeed = MOBS[whelp.templateId]?.moveSpeed ?? whelp.moveSpeed;
+  const speed = tmplSpeed * def.leapSpeedMult;
+  const dist = dist2d(whelp.pos, victim.pos);
+  const duration = Math.min(def.leapSeconds, Math.max(LEAP_MIN_SECONDS, dist / Math.max(speed, 1)));
+  whelp.aggroTargetId = victim.id;
+  whelp.aiState = 'chase';
+  addThreat(whelp, victim.id, HATCH_THREAT);
+  whelp.leapUntil = ctx.time + duration;
+  whelp.leapReadyAt = ctx.time + REPOUNCE_COOLDOWN;
+  whelp.leapBurnPending = true;
+  whelp.moveSpeed = speed;
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: whelp.id,
+    targetId: victim.id,
+    school: 'fire',
+    fx: 'flourish',
+  });
+}
 
 function burnAuraId(spec: MobBurnSpec): string {
   // Shared name -> shared debuff row (cleave + breath both refresh 'Seared
@@ -155,26 +193,12 @@ function hatchEgg(ctx: SimContext, egg: Entity, def: NonNullable<MobTemplate['br
   }
 
   // The pounce: pick a victim (healer > dps > closest), seed threat so the
-  // pick sticks, and burst toward them; the first landed swing owes the
-  // pounce burn (mob_swing's broodWhelp arm applies it and clears the flag).
+  // pick sticks, and leap the calculated distance; the first landed swing
+  // owes the pounce burn (mob_swing's broodWhelp arm applies and clears it).
   const wDef = MOBS[def.hatchMobId]?.broodWhelp;
   const victim = pickWhelpVictim(ctx, egg.pos);
   if (victim && wDef && dist2d(victim.pos, egg.pos) <= wDef.leapRange) {
-    whelp.aggroTargetId = victim.id;
-    whelp.aiState = 'chase';
-    addThreat(whelp, victim.id, HATCH_THREAT);
-    whelp.leapUntil = ctx.time + wDef.leapSeconds;
-    whelp.leapBurnPending = true;
-    whelp.moveSpeed = whelp.moveSpeed * wDef.leapSpeedMult;
-    // The renderer plays the hatchling's JumpAttack one-shot off the
-    // flourish cue (clips.flourish, the skeleton-awaken/boss-taunt slot).
-    ctx.emit({
-      type: 'spellfx',
-      sourceId: whelp.id,
-      targetId: victim.id,
-      school: 'fire',
-      fx: 'flourish',
-    });
+    startPounce(ctx, whelp, wDef, victim);
   }
 }
 
@@ -250,10 +274,27 @@ export function updateDragonkinBrood(ctx: SimContext): void {
     }
 
     if (tmpl.broodWhelp && !e.dead) {
-      // Pounce expiry: the hatch burst restores to authored template speed.
+      // Pounce expiry: the burst restores to authored template speed.
       if (e.leapUntil !== undefined && ctx.time >= e.leapUntil) {
         e.leapUntil = undefined;
         e.moveSpeed = tmpl.moveSpeed;
+      }
+      // Re-pounce: a loose whelp that has (re)acquired a player launches the
+      // jump attack again once the cooldown clears and the victim sits in
+      // the leap window (past melee contact, inside leapRange), so the
+      // signature move survives the hatch moment. Draws no rng.
+      if (
+        e.leapUntil === undefined &&
+        e.aggroTargetId !== null &&
+        ctx.time >= (e.leapReadyAt ?? 0)
+      ) {
+        const victim = ctx.entities.get(e.aggroTargetId);
+        if (victim && !victim.dead && victim.kind === 'player') {
+          const d = dist2d(victim.pos, e.pos);
+          if (d >= REPOUNCE_MIN_DIST && d <= tmpl.broodWhelp.leapRange) {
+            startPounce(ctx, e, tmpl.broodWhelp, victim);
+          }
+        }
       }
       // One-hit ward strip: the tick after the absorb soaks ANY damage, it
       // shatters, so exactly one hit is eaten whole.
