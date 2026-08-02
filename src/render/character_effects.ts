@@ -19,6 +19,19 @@ export interface CharacterWeaponAura {
   tip: boolean;
 }
 
+/** Resolve one aura without requiring a second scan of the entity's aura list. */
+export function characterWeaponAuraFromAura(
+  aura: Pick<Entity['auras'][number], 'id'>,
+  out: CharacterWeaponAura,
+): boolean {
+  const buff = ABILITY_VFX_FULL_SPECS[aura.id]?.buff;
+  const tint = buff?.weaponAura;
+  if (tint === undefined) return false;
+  out.color = abilityHexColor(tint);
+  out.tip = buff?.weaponAuraScope === 'tip';
+  return true;
+}
+
 /** The held weapon's imbued-overlay color + scope, filled into the caller's
  *  scratch (allocation-free per frame), or null when no worn aura asks for
  *  one. Data-driven off the full spec's buff.weaponAura knob (aura id ==
@@ -33,11 +46,7 @@ export function characterWeaponAuraInto(
   out: CharacterWeaponAura,
 ): CharacterWeaponAura | null {
   for (const a of e.auras) {
-    const buff = ABILITY_VFX_FULL_SPECS[a.id]?.buff;
-    const tint = buff?.weaponAura;
-    if (tint !== undefined) {
-      out.color = abilityHexColor(tint);
-      out.tip = buff?.weaponAuraScope === 'tip';
+    if (characterWeaponAuraFromAura(a, out)) {
       return out;
     }
   }
