@@ -842,7 +842,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/garden_iron_gate.glb": "/media/models/props/garden_iron_gate.1fe493f22453.glb",
   "models/props/garden_iron_pillar.glb": "/media/models/props/garden_iron_pillar.463bb02aee04.glb",
   "models/props/golden_horse_statue.glb": "/media/models/props/golden_horse_statue.555562ae1c36.glb",
-  "models/props/grand_ferry_ship.glb": "/media/models/props/grand_ferry_ship.ae6a2adcaf5c.glb",
+  "models/props/grand_ferry_ship.glb": "/media/models/props/grand_ferry_ship.1995439f005c.glb",
   "models/props/gravestone_bevel.glb": "/media/models/props/gravestone_bevel.cdcbdc82f589.glb",
   "models/props/gravestone_cross.glb": "/media/models/props/gravestone_cross.aff624c9711a.glb",
   "models/props/gravestone_decorative.glb": "/media/models/props/gravestone_decorative.103bc41813e3.glb",
