@@ -467,24 +467,30 @@ export class PgSocialDb implements SocialDb {
     return { motd: row?.motd ?? '', motdSetBy: row?.motdSetBy ?? '' };
   }
 
-  async guildMembers(
-    guildId: number,
-  ): Promise<
-    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  async guildMembers(guildId: number): Promise<
+    (CharInfo & {
+      rank: GuildRank;
+      lastLogin: string | null;
+      activeTitle: string | null;
+      joinedAt: number | null;
+    })[]
   > {
     const res = await this.pool.query(
       `SELECT c.id, c.name, c.class AS cls, c.level, c.realm, c.last_login AS "lastLogin", gm.rank,
-              c.state->>'activeTitle' AS active_title
+              gm.joined_at AS "joinedAt", c.state->>'activeTitle' AS active_title
        FROM guild_members gm JOIN characters c ON c.id = gm.character_id
        WHERE gm.guild_id = $1 ORDER BY gm.joined_at`,
       [guildId],
     );
     // last_login is a TIMESTAMPTZ; serialize to an ISO string for the wire (never a
-    // raw Date), null when the character has never entered the world. active_title
-    // normalizes exactly like charactersForDeedsBoard (a deed id or null).
+    // raw Date), null when the character has never entered the world. joined_at is
+    // NOT NULL in the DDL, so the null arm is defensive only; it rides the wire as
+    // epoch milliseconds (drives the roster tenure badges). active_title normalizes
+    // exactly like charactersForDeedsBoard (a deed id or null).
     return res.rows.map(({ active_title, ...r }) => ({
       ...r,
       lastLogin: r.lastLogin ? new Date(r.lastLogin).toISOString() : null,
+      joinedAt: r.joinedAt ? new Date(r.joinedAt).getTime() : null,
       activeTitle: typeof active_title === 'string' && active_title !== '' ? active_title : null,
     }));
   }

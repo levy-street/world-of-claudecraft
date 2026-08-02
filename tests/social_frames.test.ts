@@ -215,6 +215,46 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
     expect(members.find((m) => m.name === 'NeverSeen')?.lastLogin).toBeNull();
   });
 
+  it('the `social` frame carries each guild member joinedAt (epoch ms) through unchanged', () => {
+    const c = bareClient(7);
+    const joined = Date.UTC(2026, 0, 2, 3, 4, 5);
+    feed(c, {
+      t: 'social',
+      guild: {
+        id: 1,
+        name: 'Guild',
+        rank: 'leader',
+        members: [
+          {
+            id: 3,
+            name: 'Dated',
+            cls: 'priest',
+            level: 9,
+            realm: 'R1',
+            online: false,
+            rank: 'member',
+            lastLogin: null,
+            joinedAt: joined,
+          },
+          {
+            id: 4,
+            name: 'Undated',
+            cls: 'mage',
+            level: 2,
+            realm: 'R1',
+            online: false,
+            rank: 'member',
+            lastLogin: null,
+            joinedAt: null,
+          },
+        ],
+      },
+    });
+    const members = c.socialInfo!.guild!.members;
+    expect(members.find((m) => m.name === 'Dated')?.joinedAt).toBe(joined);
+    expect(members.find((m) => m.name === 'Undated')?.joinedAt).toBeNull();
+  });
+
   it('`socialpos` merges position in place for matched ids and leaves unmatched rows untouched', () => {
     const c = bareClient(7);
     const social: SocialInfo = {
@@ -266,6 +306,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
             online: false,
             rank: 'member',
             lastLogin: null,
+            joinedAt: null,
           },
         ],
         events: [],

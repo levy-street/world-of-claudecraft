@@ -41,7 +41,12 @@ function friend(over: Partial<FriendInfo> & { name: string }): FriendInfo {
 }
 
 function guildMember(over: Partial<GuildMemberInfo> & { name: string }): GuildMemberInfo {
-  return { ...friend(over), rank: over.rank ?? 'member', lastLogin: over.lastLogin ?? null };
+  return {
+    ...friend(over),
+    rank: over.rank ?? 'member',
+    lastLogin: over.lastLogin ?? null,
+    joinedAt: over.joinedAt ?? null,
+  };
 }
 
 function partyMember(
@@ -226,6 +231,7 @@ describe('per-tab row models', () => {
     expect(rows.find((r) => r.name === 'Seen')?.lastLogin).toBe(iso);
     expect(rows.find((r) => r.name === 'NeverSeen')?.lastLogin).toBeNull();
   });
+
 });
 
 describe('guildRosterItems (online-first grouping + hide-offline filter)', () => {

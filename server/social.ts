@@ -53,6 +53,10 @@ export interface GuildMemberEntry extends CharInfo {
   // ISO-8601 timestamp of the member's most recent world-entry, or null if never
   // recorded. Serialized server-side (server/social_db.ts) and shown in the roster.
   lastLogin: string | null;
+  // Epoch-ms timestamp of when the member joined the guild (guild_members.joined_at,
+  // NOT NULL in the DDL, so null is the defensive arm only). Drives the client's
+  // roster tenure badges.
+  joinedAt: number | null;
   // The selected Book of Deeds title (a deed id, null untitled), as on FriendEntry.
   activeTitle: string | null;
   online: boolean;
@@ -143,10 +147,13 @@ export interface SocialDb {
     fromCharId: number,
     toCharId: number,
   ): Promise<'ok' | 'not_leader' | 'not_member' | 'no_guild'>;
-  guildMembers(
-    guildId: number,
-  ): Promise<
-    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  guildMembers(guildId: number): Promise<
+    (CharInfo & {
+      rank: GuildRank;
+      lastLogin: string | null;
+      activeTitle: string | null;
+      joinedAt: number | null;
+    })[]
   >;
   // guild billboard (motd): the officer-set message + setter name on the guilds row
   setGuildMotd(guildId: number, motd: string, setBy: string): Promise<void>;

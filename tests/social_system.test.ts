@@ -157,10 +157,19 @@ class FakeDb implements SocialDb {
   setLastLogin(id: number, iso: string): void {
     this.lastLogins.set(id, iso);
   }
-  async guildMembers(
-    guildId: number,
-  ): Promise<
-    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  // Epoch-ms guild-join stamps (guild_members.joined_at). Unstamped members
+  // report null (the wire's defensive arm), never a fake epoch-0 "Veteran".
+  private joinedAts = new Map<number, number>();
+  setJoinedAt(id: number, epochMs: number): void {
+    this.joinedAts.set(id, epochMs);
+  }
+  async guildMembers(guildId: number): Promise<
+    (CharInfo & {
+      rank: GuildRank;
+      lastLogin: string | null;
+      activeTitle: string | null;
+      joinedAt: number | null;
+    })[]
   > {
     return [...this.members.entries()]
       .filter(([, m]) => m.guildId === guildId)
@@ -168,6 +177,7 @@ class FakeDb implements SocialDb {
         ...this.chars.get(cid)!,
         rank: m.rank,
         lastLogin: this.lastLogins.get(cid) ?? null,
+        joinedAt: this.joinedAts.get(cid) ?? null,
       }));
   }
   guildCount(): number {
@@ -694,6 +704,19 @@ describe('guilds', () => {
     const aleph = snap.guild?.members.find((m) => m.name === 'Aleph');
     expect(bet?.lastLogin).toBe(iso);
     expect(aleph?.lastLogin).toBeNull(); // never stamped
+  });
+
+  it('carries each guild member joined_at through the snapshot as epoch ms', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    const joined = Date.UTC(2026, 6, 3, 12, 0, 0);
+    h.db.setJoinedAt(2, joined);
+    const snap = await h.svc.snapshot(1);
+    const bet = snap.guild?.members.find((m) => m.name === 'Bet');
+    const aleph = snap.guild?.members.find((m) => m.name === 'Aleph');
+    expect(bet?.joinedAt).toBe(joined);
+    expect(aleph?.joinedAt).toBeNull(); // never stamped in the fake
   });
 
   it("refreshes guildmates' panels when a member comes online, even non-friends (#100)", async () => {

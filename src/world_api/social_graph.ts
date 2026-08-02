@@ -27,6 +27,10 @@ export interface GuildMemberInfo extends FriendInfo {
   // ISO-8601 timestamp of this member's last world entry, or null if never
   // recorded. Rides the 'social' frame; drives the "last seen" roster readout.
   lastLogin: string | null;
+  // Epoch-ms timestamp of when this member joined the guild, or null when the
+  // server did not send one. Rides the 'social' frame; drives the roster tenure
+  // badges (New / Veteran).
+  joinedAt: number | null;
 }
 
 // One guild calendar event (the event calendar's guild lane). `day` is a UTC
