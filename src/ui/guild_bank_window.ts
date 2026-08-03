@@ -144,14 +144,12 @@ export class GuildBankTab {
     const deposit = document.createElement('button');
     deposit.type = 'button';
     deposit.className = 'gbank-gold-btn';
-    deposit.dataset.focusKey = 'gbank:deposit-gold';
     deposit.textContent = t('hudChrome.bank.guildDepositGold');
     deposit.disabled = !model.treasury.canDepositGold;
     deposit.addEventListener('click', () => this.showGoldPrompt('deposit', model.treasury.copper));
     const withdraw = document.createElement('button');
     withdraw.type = 'button';
     withdraw.className = 'gbank-gold-btn';
-    withdraw.dataset.focusKey = 'gbank:withdraw-gold';
     withdraw.textContent = t('hudChrome.bank.guildWithdrawGold');
     withdraw.disabled = !model.treasury.canWithdrawGold;
     withdraw.addEventListener('click', () =>
@@ -182,10 +180,10 @@ export class GuildBankTab {
     const item = ITEMS[slot.itemId];
     const cell = document.createElement('button');
     cell.type = 'button';
-    // Keyed by wire index so a repaint keeps focus on the cell the user was on
-    // (BankWindow.restoreControlFocus); an identity shift is the click guard's
-    // problem, not focus's.
-    cell.dataset.focusKey = `gbank:slot:${slot.slotIndex}`;
+    // Focus keys are BankWindow's business: annotateGuildFocusKeys stamps every
+    // guild control after renderInto returns, keeping the shared focus-key
+    // namespace inside the one module that imports focus_restore (the guard in
+    // tests/focus_restore.test.ts pins that single-reader rule).
     const dormantClass = slot.dormant ? ' gbank-dormant' : '';
     const itemName = item ? itemDisplayName(item) : t('hudChrome.bank.guildUnknownItem');
     const count = this.fmt(slot.count);
@@ -463,7 +461,6 @@ export class GuildBankTab {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = `bank-buy-btn${buy.affordable ? '' : ' gbank-buy-short'}`;
-    btn.dataset.focusKey = 'gbank:buy';
     const short = buy.affordable
       ? ''
       : `<span class="gbank-buy-short-label">${esc(t('hudChrome.bank.guildTreasuryShort'))}</span>`;

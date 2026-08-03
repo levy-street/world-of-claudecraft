@@ -400,6 +400,7 @@ export class BankWindow {
     }
     if (this.tab === 'guild') {
       this.guildPane.renderInto(el, guildModel);
+      this.annotateGuildFocusKeys(el);
       this.restoreScroll(el, prevScrollTop);
       // The guild pane has no search box, so a searchFocus capture degrades
       // through the key ladder to the close button, never to <body>.
@@ -460,6 +461,26 @@ export class BankWindow {
     } else if (hadFocus) {
       this.restoreControlFocus(el, focusKey);
     }
+  }
+
+  // Stamp the guild pane's controls with their focus keys AFTER renderInto
+  // returned: the shared data-focus-key namespace stays inside this module,
+  // the one that imports focus_restore (the single-reader guard in
+  // tests/focus_restore.test.ts), and the pane stays focus-agnostic. Cells are
+  // keyed by wire index: fillGrid appends model.slots in order (slotIndex ==
+  // array index) before the empty pad, so DOM order IS slot order; the pinned
+  // focus test drives a real repaint over a focused cell, so a reorder that
+  // broke this coupling goes red there.
+  private annotateGuildFocusKeys(el: HTMLElement): void {
+    let slotIndex = 0;
+    for (const cell of el.querySelectorAll<HTMLElement>('.bank-grid .bank-item:not(.empty)')) {
+      cell.dataset.focusKey = `gbank:slot:${slotIndex++}`;
+    }
+    const [deposit, withdraw] = Array.from(el.querySelectorAll<HTMLElement>('.gbank-gold-btn'));
+    if (deposit) deposit.dataset.focusKey = 'gbank:deposit-gold';
+    if (withdraw) withdraw.dataset.focusKey = 'gbank:withdraw-gold';
+    const buy = el.querySelector<HTMLElement>('.bank-buy-btn');
+    if (buy) buy.dataset.focusKey = 'gbank:buy';
   }
 
   // Re-land focus after a full rebuild: the control the user was on (resolved
