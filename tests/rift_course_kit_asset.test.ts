@@ -93,9 +93,7 @@ describe('rift course kit: shipped GLB contract', () => {
         for (const prim of mesh.listPrimitives()) {
           const indices = prim.getIndices();
           const position = prim.getAttribute('POSITION');
-          triangles += Math.floor(
-            (indices ? indices.getCount() : (position?.getCount() ?? 0)) / 3,
-          );
+          triangles += Math.floor((indices ? indices.getCount() : (position?.getCount() ?? 0)) / 3);
           if (prim.getAttribute('COLOR_0')) color = true;
         }
       }
@@ -134,7 +132,9 @@ describe('rift course kit: shipped GLB contract', () => {
     const hashes = Object.fromEntries(
       CONTRACTS.map((c) => [
         c.key,
-        createHash('sha256').update(readFileSync(path.join(ROOT, c.file))).digest('hex'),
+        createHash('sha256')
+          .update(readFileSync(path.join(ROOT, c.file)))
+          .digest('hex'),
       ]),
     );
     // Re-pin deliberately on any intended re-export, alongside the
