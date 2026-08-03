@@ -12252,11 +12252,11 @@ export const en: EnTranslations = {
       },
       "q_ogre_bounty": {
         "title": "The Captain's Bounty",
-        "text": "Maren's totems tell me all I need to know: the clans are bought, and my wall is their first errand. I will not wait for them to muster. Fourteen more Thornpeak Ogres, {playerName} - and I will pay bounty on every one.",
+        "text": "Maren's totems name the hand that bought the clans: an ogre they call Brakka the Wallbreaker, and he is mustering the rest against my gate. Cut off the head and the clans scatter. Bring me Brakka, {playerName}, and Highwatch will pay a captain's bounty.",
         "completion": "Bounty paid in full. The foothills are quieter - now we deal with the ones doing the buying.",
         "objectives": {
           "0": {
-            "label": "Thornpeak Ogre slain"
+            "label": "Brakka the Wallbreaker slain"
           }
         }
       },
@@ -12322,26 +12322,20 @@ export const en: EnTranslations = {
       },
       "q_cult_orders": {
         "title": "Orders from Below",
-        "text": "The zealots move with purpose now - watches set, supplies counted, like soldiers before a siege. Cultists who organize are cultists taking orders, {playerName}. Kill eight more and bring me four sets of their written orders. I would know the hand that commands them.",
+        "text": "The zealots move with purpose now, watches set and supplies counted, like soldiers before a siege. Cultists who organize are cultists taking orders, {playerName}. One of them is carrying written orders from below. Find the zealot who has them and bring the orders to me: I would know the hand that commands them.",
         "completion": "This script... I last saw its like in Morthen's grimoire, in Eastbrook. The same hand has guided every grave we have fought over, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealot slain"
-          },
-          "1": {
-            "label": "Wyrmcult Orders"
+            "label": "Orders from Below"
           }
         }
       },
       "q_necromancers": {
         "title": "The Phylactery Ring",
-        "text": "The orders speak of a \"ring of phylacteries\" - soul-vessels, {playerName}, set about the Sanctum to feed it. The cult's necromancers carry them like holy relics. Kill eight necromancers and bring me three phylacteries unbroken. I must know what souls they hold.",
+        "text": "The orders speak of a \"ring of phylacteries\", soul-vessels, {playerName}, set about the Sanctum to feed it. The cult's necromancers carry them like holy relics. Take five phylacteries from them, unbroken, and bring them to me. I must know what souls they hold.",
         "completion": "Light forgive us. These hold the dead of the Vale and the fen - every corpse the Gravecallers ever raised, harvested. They were never building an army, {playerName}. They were gathering a tithe.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Necromancer slain"
-          },
-          "1": {
             "label": "Ritual Phylactery"
           }
         }
@@ -12358,11 +12352,11 @@ export const en: EnTranslations = {
       },
       "q_revenant_vanguard": {
         "title": "Bones of the Vanguard",
-        "text": "The revenants are forming ranks, {playerName} - true ranks, shield-lines and columns, drilling with no drummer. They are being mustered for the Sanctum gate. Break fourteen more before that march begins, and Highwatch will owe you its best steel.",
+        "text": "The revenants are forming ranks, {playerName}, true ranks, shield-lines and columns, drilling with no drummer. Break their vanguard and bring me ten of their bones, so the smiths can read how they were bound. Do it before the march begins, and Highwatch will owe you its best steel.",
         "completion": "The fields lie still again. Take this - it was made for the defenders of the wall, and no one has earned it more.",
         "objectives": {
           "0": {
-            "label": "Boneclad Revenant slain"
+            "label": "Vanguard Bone recovered"
           }
         }
       },

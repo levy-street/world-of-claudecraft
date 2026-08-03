@@ -296,6 +296,30 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     scale: 1.3,
     color: 0x9e7b53,
   },
+  brakka_wallbreaker: {
+    id: 'brakka_wallbreaker',
+    name: 'Brakka the Wallbreaker',
+    minLevel: 17,
+    maxLevel: 17,
+    family: 'ogre',
+    elite: true,
+    hpBase: 80,
+    hpPerLevel: 26,
+    dmgBase: 13,
+    dmgPerLevel: 3,
+    attackSpeed: 2.5,
+    armorPerLevel: 24,
+    moveSpeed: 6.5,
+    aggroRadius: 13,
+    concuss: { chance: 0.3, duration: 2, name: 'Wallbreaker Smash' },
+    loot: [
+      { copper: 300, chance: 1 },
+      { itemId: 'ogre_toe_ring', chance: 1 },
+      { itemId: 'cragprowl_belt', chance: 0.3 },
+    ],
+    scale: 1.7,
+    color: 0x7a5230,
+  },
   ogre_crusher: {
     id: 'ogre_crusher',
     name: 'Thornpeak Crusher',
@@ -479,7 +503,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 11,
     loot: [
       { copper: 90, chance: 1 },
-      { itemId: 'wyrmcult_orders', chance: 0.5, questId: 'q_cult_orders' },
+      { itemId: 'wyrmcult_orders', chance: 0.1, questId: 'q_cult_orders' },
       { itemId: 'frayed_prayer_beads', chance: 0.35 },
       { itemId: 'shardsong_mantle', chance: 0.04 },
     ],
@@ -541,6 +565,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { copper: 100, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.6 },
       { itemId: 'runed_bone_shard', chance: 0.7, questId: 'q_nythraxis_restless_dead' },
+      { itemId: 'vanguard_bone', chance: 0.7, questId: 'q_revenant_vanguard' },
       // A grindable long-shot at the epic T1 cloth legs that also drop from
       // Marrowlord Varkas: a rare per-kill chance so the bonefields are a
       // farmable path to the legwraps, not just the once-per-respawn rare.
@@ -1471,11 +1496,16 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: "The Captain's Bounty",
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: "Maren's totems tell me all I need to know: the clans are bought, and my wall is their first errand. I will not wait for them to muster. Fourteen more Thornpeak Ogres, $N — and I will pay bounty on every one.",
+    text: "Maren's totems name the hand that bought the clans: an ogre they call Brakka the Wallbreaker, and he is mustering the rest against my gate. Cut off the head and the clans scatter. Bring me Brakka, $N, and Highwatch will pay a captain's bounty.",
     completionText:
       'Bounty paid in full. The foothills are quieter — now we deal with the ones doing the buying.',
     objectives: [
-      { type: 'kill', targetMobId: 'thornpeak_ogre', count: 14, label: 'Thornpeak Ogre slain' },
+      {
+        type: 'kill',
+        targetMobId: 'brakka_wallbreaker',
+        count: 1,
+        label: 'Brakka the Wallbreaker slain',
+      },
     ],
     xpReward: 3000,
     copperReward: 1500,
@@ -1596,12 +1626,11 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Orders from Below',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'The zealots move with purpose now — watches set, supplies counted, like soldiers before a siege. Cultists who organize are cultists taking orders, $N. Kill eight more and bring me four sets of their written orders. I would know the hand that commands them.',
+    text: 'The zealots move with purpose now, watches set and supplies counted, like soldiers before a siege. Cultists who organize are cultists taking orders, $N. One of them is carrying written orders from below. Find the zealot who has them and bring the orders to me: I would know the hand that commands them.',
     completionText:
       "This script... I last saw its like in Morthen's grimoire, in Eastbrook. The same hand has guided every grave we have fought over, $N.",
     objectives: [
-      { type: 'kill', targetMobId: 'wyrmcult_zealot', count: 8, label: 'Wyrmcult Zealot slain' },
-      { type: 'collect', itemId: 'wyrmcult_orders', count: 4, label: 'Wyrmcult Orders' },
+      { type: 'collect', itemId: 'wyrmcult_orders', count: 1, label: 'Orders from Below' },
     ],
     xpReward: 3800,
     copperReward: 1800,
@@ -1613,17 +1642,11 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Phylactery Ring',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'The orders speak of a "ring of phylacteries" — soul-vessels, $N, set about the Sanctum to feed it. The cult\'s necromancers carry them like holy relics. Kill eight necromancers and bring me three phylacteries unbroken. I must know what souls they hold.',
+    text: 'The orders speak of a "ring of phylacteries", soul-vessels, $N, set about the Sanctum to feed it. The cult\'s necromancers carry them like holy relics. Take five phylacteries from them, unbroken, and bring them to me. I must know what souls they hold.',
     completionText:
       'Light forgive us. These hold the dead of the Vale and the fen — every corpse the Gravecallers ever raised, harvested. They were never building an army, $N. They were gathering a tithe.',
     objectives: [
-      {
-        type: 'kill',
-        targetMobId: 'wyrmcult_necromancer',
-        count: 8,
-        label: 'Wyrmcult Necromancer slain',
-      },
-      { type: 'collect', itemId: 'ritual_phylactery', count: 3, label: 'Ritual Phylactery' },
+      { type: 'collect', itemId: 'ritual_phylactery', count: 5, label: 'Ritual Phylactery' },
     ],
     xpReward: 4200,
     copperReward: 2200,
@@ -1657,15 +1680,15 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Bones of the Vanguard',
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: 'The revenants are forming ranks, $N — true ranks, shield-lines and columns, drilling with no drummer. They are being mustered for the Sanctum gate. Break fourteen more before that march begins, and Highwatch will owe you its best steel.',
+    text: 'The revenants are forming ranks, $N, true ranks, shield-lines and columns, drilling with no drummer. Break their vanguard and bring me ten of their bones, so the smiths can read how they were bound. Do it before the march begins, and Highwatch will owe you its best steel.',
     completionText:
       'The fields lie still again. Take this — it was made for the defenders of the wall, and no one has earned it more.',
     objectives: [
       {
-        type: 'kill',
-        targetMobId: 'boneclad_revenant',
-        count: 14,
-        label: 'Boneclad Revenant slain',
+        type: 'collect',
+        itemId: 'vanguard_bone',
+        count: 10,
+        label: 'Vanguard Bone recovered',
       },
     ],
     xpReward: 4500,
@@ -2065,6 +2088,8 @@ export const ZONE3_CAMPS: CampDef[] = [
   // Ogres: eastern foothills rising to Drogmar's war-camp
   { mobId: 'thornpeak_ogre', center: { x: -90, z: 700 }, radius: 22, count: 7 },
   { mobId: 'thornpeak_ogre', center: { x: -60, z: 730 }, radius: 18, count: 6 },
+  // Quest capstone: the elite ogre chieftain for q_ogre_bounty.
+  { mobId: 'brakka_wallbreaker', center: { x: -78, z: 716 }, radius: 3, count: 1 },
   { mobId: 'ogre_crusher', center: { x: -125, z: 740 }, radius: 18, count: 8 },
   { mobId: 'warlord_drogmar', center: { x: -132, z: 748 }, radius: 2, count: 1 },
   // A lone rare ogre prowls the ridge north of the warband
@@ -2225,6 +2250,13 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'quest',
     sellValue: 0,
     questId: 'q_necromancers',
+  },
+  vanguard_bone: {
+    id: 'vanguard_bone',
+    name: 'Vanguard Bone',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_revenant_vanguard',
   },
   gravewyrm_sigil: {
     id: 'gravewyrm_sigil',

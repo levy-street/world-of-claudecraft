@@ -4360,6 +4360,8 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 export const ITEM_ART_PENDING = new Set<string>([
   // zone2.ts (Mirefen): a world-object label item (Mudfin Hut), never shown in bags.
   'murloc_hut',
+  // zone3.ts (Thornpeak): quest collect item, procedural icon until art ships.
+  'vanguard_bone',
   // amberfall.ts
   'amberfall_sap_bucket',
   'gilded_sap_clot',
