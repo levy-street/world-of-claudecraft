@@ -1654,6 +1654,10 @@ const MOB_KEYS: Record<string, string> = {
   // instead of the family fallback (beast -> wolf, undead -> skeleton minion).
   mirefen_widowling: 'mob_spider',
   spider_egg_sac: 'mob_spider_egg_sac',
+  // Broodmother clutch (q_broodmother): the destructible eggs reuse the egg-sac
+  // model (not a live spider), and the hatchling is a small spider.
+  spider_egg: 'mob_spider_egg_sac',
+  widow_hatchling: 'mob_spider',
   sump_troll_devourer: 'mob_troll',
   grave_silt_bulwark: 'mob_ogre',
   drowned_cantor: 'delve_mob_acolyte',
