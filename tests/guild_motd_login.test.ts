@@ -99,9 +99,13 @@ describe('the HUD consumer contract (source pins)', () => {
   // behavior test is its single consumer, so the HUD-side contracts are pinned
   // at the source level (the social_window precedent): the emitted text runs
   // through the display-side profanity mask like every other player-authored
-  // chat-pane body, the line is tagged to the guild channel, and its color
-  // derives from the channel's single source of truth, never a hex literal.
-  it('masks, channel-tags, and channel-colors the echo in hud.ts', async () => {
+  // chat-pane body, the line is tagged to the guild channel, its color
+  // derives from the channel's single source of truth (never a hex literal),
+  // and the append is PLAIN TEXT (the trailing `true`): the billboard's home
+  // rendering is esc()'d plain text, so the echo must not linkify item
+  // tokens from guild-controlled text (the behavioral half is in
+  // tests/guild_motd_plaintext.test.ts).
+  it('masks, channel-tags, channel-colors, and plain-appends the echo in hud.ts', async () => {
     const { readFileSync } = await import('node:fs');
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     const start = hud.indexOf('private updateGuildBillboardEcho()');
@@ -113,6 +117,10 @@ describe('the HUD consumer contract (source pins)', () => {
     );
     expect(method).toContain("chatChannelColor('guild')");
     expect(method).toContain("'guild',");
+    // The plainText opt-out rides the call (the 7th argument): dropping it
+    // re-opens the linkified-MOTD surface, so its presence is pinned here and
+    // its EFFECT is pinned behaviorally in tests/guild_motd_plaintext.test.ts.
+    expect(method).toMatch(/undefined,\s*\n\s*true,\s*\n\s*\);/);
     expect(method).not.toMatch(/#[0-9a-fA-F]{3,8}/);
   });
 });

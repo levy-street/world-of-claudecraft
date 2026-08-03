@@ -8507,12 +8507,18 @@ export class Hud {
     const motdLine = decideGuildMotdLine(this.lastShownGuildMotd, this.sim.socialInfo);
     this.lastShownGuildMotd = motdLine.nextShown;
     if (motdLine.emit !== null) {
+      // plainText: the billboard's home rendering (social_window.ts) is
+      // esc()'d plain text, so the echo must not linkify [[i:...]] tokens
+      // from guild-controlled text into trusted clickable item links; the
+      // line renders verbatim, exactly as the billboard panel shows it.
       this.appendLog(
         this.chatLogEl,
         t('hudChrome.social.billboard.loginLine', { text: this.maskChat(motdLine.emit) }),
         chatChannelColor('guild'),
         true,
         'guild',
+        undefined,
+        true,
       );
     }
   }
@@ -12673,6 +12679,13 @@ export class Hud {
     timestamp = false,
     chan = 'system',
     decorativeIconUrl?: string,
+    // True forces the single-text-node path even on the chat pane: the line
+    // renders VERBATIM and [[i:...]]/[[q:...]] tokens are never turned into
+    // links. For player-authored surfaces whose home rendering is plain
+    // escaped text (the guild billboard echo: the social pane shows the MOTD
+    // via esc(), so guild-controlled text must not mint trusted clickable
+    // item links in chat either).
+    plainText = false,
   ): void {
     const wasNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
     const div = document.createElement('div');
@@ -12688,8 +12701,9 @@ export class Hud {
     }
     // Loot lines carry name-free item tokens ([[i:id]]); render those as clickable
     // links via the shared chat item-link renderer. Plain system/combat lines keep
-    // the fast text-node path (the substring test never fires for tokenless lines).
-    if (el === this.chatLogEl && text.includes('[[i:')) {
+    // the fast text-node path (the substring test never fires for tokenless lines),
+    // and a plainText caller opts out entirely (see the parameter note above).
+    if (!plainText && el === this.chatLogEl && text.includes('[[i:')) {
       for (const seg of parseChatSegments(text)) {
         if (seg.kind === 'item') this.appendChatItemLink(div, seg.itemId);
         else if (seg.kind === 'quest')

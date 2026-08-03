@@ -178,8 +178,10 @@ Server + wire agent deliverables:
   English error literal following the existing guildCreate error style.
 - The new literal's DICT row in src/ui/server_i18n.ts in the SAME change (S3 guard).
 UI agent deliverables:
-- Tenure tier helper (pure, in or beside social_view.ts): under 14 days New, 90 days or
-  more Veteran, else none; boundary-tested at 13d23h, 14d, 89d, 90d.
+- Tenure tier helper (pure, in or beside social_view.ts): under 7 days Recruit, 30 days
+  or more Veteran, else none; boundary-tested either side of both thresholds. (As
+  shipped: the plan originally said New/14d + Veteran/90d; the tiers were retuned to
+  Recruit/7d + Veteran/30d during implementation, see state.md.)
 - Badge render in the roster rows in social_window.ts; two short English i18n keys under
   the hud.social.* roster namespace; badges never rely on hover; mobile-checked.
 
@@ -202,7 +204,8 @@ STEP 4 - COMMIT CADENCE (explicit paths):
 - fix(social): screen guild names for offensive content at creation
 
 STEP 5 - ACCEPTANCE:
-- [ ] Roster shows New under 14 days, nothing 14 to 89 days, Veteran at 90 days or more.
+- [ ] Roster shows Recruit under 7 days, nothing 7 to 29 days, Veteran at 30 days or
+      more (retuned from the original New/14d + Veteran/90d, see state.md).
 - [ ] joinedAt round-trips server to client; pre-existing tests updated, none orphaned.
 - [ ] guildCreate refuses a screened name with a localized error; FakeDb tests cover
       accept and refuse; the client cannot bypass (command path only).

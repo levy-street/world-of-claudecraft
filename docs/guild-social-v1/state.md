@@ -21,9 +21,11 @@ place). Full matrix results and the deferral ledger: progress.md.
 - Tenure display, REVISED 2026-08-02 (user-approved design revision, superseding the
   original rank-chip-plus-tenure-chip model): each roster row shows ONE chip. Officers and
   the leader show their rank label exactly as before, never a tenure chip; a non-officer
-  member shows the tenure tier AS the displayed role label: New (under 14 days since
-  `joinedAt`), Member (14 to 89 days, and the null-`joinedAt` defensive arm), Veteran
-  (90 days or more). Thresholds unchanged. Display-only: the underlying GuildRank, every
+  member shows the tenure tier AS the displayed role label: Recruit (under 7 days since
+  `joinedAt`), Member (7 to 29 days, and the null-`joinedAt` defensive arm), Veteran
+  (30 days or more; the shipped `TENURE_RECRUIT_MS`/`TENURE_VETERAN_MS` constants in
+  `src/ui/social_view.ts`, revised from the plan's original New/14d + Veteran/90d during
+  implementation). Display-only: the underlying GuildRank, every
   permission computation, the context menu, sorting, and the wire shape are untouched.
   Client clock (`Date.now` in ui code is fine; never in sim).
 - `joinedAt` rides the wire as epoch milliseconds on each guild member row, sourced from
