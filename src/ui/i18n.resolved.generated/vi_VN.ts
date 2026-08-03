@@ -959,6 +959,18 @@ export const vi_VN: EnTranslations = {
       "petAggressive": "Thú Cưng: Hung Hăng",
       "mount": "Cưỡi Thú / Xuống Thú"
     },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+    },
     "mounts": {
       "title": "Thú Cưỡi",
       "close": "Đóng",
@@ -6216,6 +6228,7 @@ export const vi_VN: EnTranslations = {
         "add": "Thêm kênh trò chuyện",
         "addTitle": "Thêm kênh",
         "close": "Đóng thẻ {channel}",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Nhắn {channel}",
         "names": {
           "say": "Nói",

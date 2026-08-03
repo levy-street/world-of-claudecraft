@@ -23,7 +23,6 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
 import { bagCapacity } from '../src/sim/bags';
 import { GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -36,6 +35,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { bareClient } from './helpers/bare_client';
 
 function mustMeta(sim: Sim, pid: number) {
   const meta = sim.players.get(pid);
@@ -791,55 +791,6 @@ function lastSnap(sent: any[]): any {
     if (sent[i].t === 'snap') return sent[i];
   }
   return null;
-}
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot
-// directly (the bareClient idiom from tests/snapshots.test.ts).
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = 'warrior';
-  c.spectating = null;
-  c.cupInfo = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
 }
 
 describe('node tool gating over the live server', () => {

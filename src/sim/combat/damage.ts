@@ -133,15 +133,14 @@ export function dealDamage(
     !canDetectStealthedTarget(source, target, PET_STEALTH_DETECTION_RADIUS)
   )
     return 0;
-  if (target.gm || target.devGod) {
-    // GMs and /dev god are invulnerable (every damage path funnels here). For
-    // /dev god under ALLOW_DEV_COMMANDS the hit still EMITS as a zero-damage
-    // event: the renderer keys attacker swing animations and FCT off damage
-    // events, so a silent return made every melee mob look like it "follows
-    // but never attacks" during god-mode playtests (the live-test report).
+  if (target.gm || target.devGod || (target.profilerInvulnerable && ctx.devCommands)) {
+    // GMs, /dev god, and the profiler-only flag are invulnerable (every damage
+    // path funnels here). The two dev-only modes still EMIT a zero-damage event:
+    // the renderer keys attacker swing animations and FCT off damage events, so
+    // a silent return would remove the combat presentation load being profiled.
     // Presentation only, no threat, procs, deed counters, or rng. Real GMs
     // (production, no devCommands) stay fully silent as before.
-    if (target.devGod && ctx.devCommands && source) {
+    if ((target.devGod || target.profilerInvulnerable) && ctx.devCommands && source) {
       ctx.emit({
         type: 'damage',
         sourceId: source.id,

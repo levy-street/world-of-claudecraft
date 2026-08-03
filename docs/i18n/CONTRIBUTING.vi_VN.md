@@ -40,25 +40,31 @@ chúng tôi.
 
 ## Bắt đầu
 
-Bạn sẽ cần [Node.js 26](https://nodejs.org/) và npm, đúng các phiên bản mà CI và
-ảnh production đang dùng. Các bản major cũ hơn chưa được kiểm thử. Đối với máy chủ
-nhiều người chơi, bạn cũng sẽ cần [Docker](https://www.docker.com/) để chạy
-Postgres.
+Bạn sẽ cần [Node.js 26](https://nodejs.org/) và **pnpm 10.34.x** (pin chính xác nằm trong `package.json` tại `packageManager`, hiện là `pnpm@10.34.5`). Các major Node cũ hơn chưa được kiểm thử. Với máy chủ multiplayer, bạn cũng nên có [Docker](https://www.docker.com/) để chạy Postgres.
+
+**Corepack không bắt buộc.** Cài pnpm một lần bằng npm đi kèm Node. Cùng một đường trên macOS, Linux và Windows.
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Install dependencies
-npm ci
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
-# 3. Point git at the repository hooks (once per clone)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
 git config core.hooksPath .githooks
 
-# 4. Run the offline client (no server or database needed)
-npm run dev          # open the URL it prints (usually http://localhost:5173)
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+`npm run <script>` vẫn chạy sau khi cài bằng pnpm (Node kèm npm), nhưng **cài đặt và cập nhật lockfile phải qua pnpm**. Đừng commit `package-lock.json`; nguồn sự thật duy nhất là `pnpm-lock.yaml`.
 
 Như vậy là đủ để chơi thế giới ngoại tuyến và làm việc trên hầu hết mọi thứ. Để
 chạy toàn bộ ngăn xếp trực tuyến, trước tiên bạn cần có một mật khẩu cơ sở dữ liệu
@@ -67,13 +73,13 @@ trong môi trường của mình:
 ```bash
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
-npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
-npm run server       # build and run the authoritative game server on :8787
-npm run dev          # in another terminal; the client proxies to the server
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
 Nếu bạn định chạy toàn bộ cổng kiểm tra được mô tả bên dưới, hãy cài đặt một lần
-trình duyệt mà nó điều khiển: `npx playwright install chromium`.
+trình duyệt mà nó điều khiển: `pnpm exec playwright install chromium`.
 
 [README](README.vi_VN.md) có đầy đủ hướng dẫn về cách lưu trữ, phát triển và chơi,
 và các tệp `CLAUDE.md` rải rác khắp kho mã ghi lại các quy ước cho từng khu vực.
@@ -103,12 +109,7 @@ phân giải sang JS API của TypeScript 6 (thông qua lớp bọc
   `--singleThreaded` tắt toàn bộ tính song song. Kiểm tra một tệp đơn lẻ theo kiểu
   tùy hứng (`npx tsc somefile.ts`) sẽ báo lỗi khi thư mục có một `tsconfig.json`;
   hãy truyền `--ignoreConfig` để có lại hành vi cũ.
-- **Tệp khóa.** Chỉ tạo lại `package-lock.json` bằng
-  `npx npm@10 install --package-lock-only`: tệp này dùng ngữ nghĩa của npm 10, và
-  các bản npm major mới hơn (bao gồm npm 11 đi kèm Node 26 của CI) âm thầm loại bỏ
-  các mục peer tùy chọn lồng nhau của `svelte-check`, khiến `npm ci` mất đồng bộ
-  trên CI. Bản thân `npm ci` thì an toàn với mọi bản npm major. Sau khi tạo lại,
-  hãy xác nhận `npm ci --dry-run` đồng bộ với cả npm 10 lẫn npm trên máy bạn.
+- **Tệp khóa.** Lockfile là `pnpm-lock.yaml` (pnpm 10 / lockfileVersion 9). Chỉ cập nhật bằng `pnpm install`, `pnpm add` hoặc `pnpm update` từ gốc repo này (không sửa tay). Commit `pnpm-lock.yaml` cùng thay đổi `package.json`. CI cài bằng `pnpm install --frozen-lockfile`; lockfile cũ sẽ fail. Đừng đưa thêm lockfile thứ hai (`package-lock.json` / yarn.lock): lockfile kép lệch lặng lẽ và bị cấm. Nhiễu peer dependency từ cây wallet/solana tùy chọn được chấp nhận qua `.npmrc` (`strict-peer-dependencies=false`); đừng nới thêm mà không đo.
 - **Khi nào cần xem lại.** Hãy gộp bí danh kép trở lại thành một phụ thuộc
   `typescript` duy nhất khi CẢ HAI điều kiện đều thỏa: JS API ổn định của
   TypeScript 7.1 đã phát hành (TypeScript 7.0 hoàn toàn không có JS API; phương án
@@ -163,7 +164,7 @@ phân giải sang JS API của TypeScript 6 (thông qua lớp bọc
   Dữ liệu mà bộ dựng hình hay HUD đọc sẽ đi qua giao diện `IWorld`
   (`src/world_api/`) và được hiện thực ở cả thế giới ngoại tuyến lẫn trực tuyến;
   một hệ thống mô phỏng mới nằm sau `SimContext`; một endpoint REST mới là một
-  mô-đun route mà bạn có thể tạo khung bằng `npm run new:endpoint`.
+  mô-đun route mà bạn có thể tạo khung bằng `pnpm run new:endpoint`.
 - **Đừng chỉnh sửa thủ công các tệp được sinh tự động** như `*.generated.ts`. Hãy
   tạo lại chúng thông qua quá trình build.
 - **Quy ước văn phong của dự án: không dùng gạch ngang dài, gạch ngang ngắn hay
@@ -180,7 +181,7 @@ Việc định dạng do [Biome](https://biomejs.dev/) đảm nhiệm, được 
 `biome.json`: thụt lề 2 khoảng trắng, dòng dài 100 cột, nháy đơn, và dấu phẩy cuối.
 Chỉ định dạng những tệp bạn đã chạm vào
 (`npx @biomejs/biome check --write <your-file.ts>`) và kiểm tra chúng bằng
-`npm run ci:changed`. CI chỉ kiểm soát các tệp đã thay đổi, nên xin đừng định dạng
+`pnpm run ci:changed`. CI chỉ kiểm soát các tệp đã thay đổi, nên xin đừng định dạng
 lại phần còn lại của cây mã: một lượt chạy trên toàn kho mã sẽ làm lộ ra khoản nợ
 kỹ thuật tồn đọng từ lâu, vốn không phải việc bạn phải sửa.
 
@@ -190,13 +191,13 @@ Hãy chạy cổng kiểm tra của kho mã trên máy của bạn. Đó chính 
 thi:
 
 ```bash
-npm run gate
+pnpm run gate
 ```
 
 Trong lúc lặp đi lặp lại, hãy chạy một bộ kiểm thử đơn lẻ
-(`npx vitest run tests/sim.test.ts`) và `npm run ci:changed` để kiểm tra định dạng;
-`npm test` chạy tất cả, và bản đồ các bộ kiểm thử nằm trong `tests/CLAUDE.md`. Toàn
-bộ `npm run gate` bao gồm độ tươi mới của các tạo phẩm được sinh tự động, lượt quét
+(`npx vitest run tests/sim.test.ts`) và `pnpm run ci:changed` để kiểm tra định dạng;
+`pnpm test` chạy tất cả, và bản đồ các bộ kiểm thử nằm trong `tests/CLAUDE.md`. Toàn
+bộ `pnpm run gate` bao gồm độ tươi mới của các tạo phẩm được sinh tự động, lượt quét
 mã độc, định dạng trên các tệp đã thay đổi, kiểm tra tính tuân thủ của hiệu ứng âm
 thanh, toàn bộ bộ kiểm thử, một lượt kiểm thử hồi quy trên trình duyệt thật, lượt
 kiểm tra kiểu nghiêm ngặt, và các bản build máy khách, máy chủ cùng không giao
@@ -222,13 +223,13 @@ danh sách kiểm tra ngắn. Xin hãy điền vào đó:
 - Liên kết đến bất kỳ vấn đề liên quan nào (ví dụ, "Closes #123").
 - Thêm **ảnh chụp màn hình hoặc một đoạn clip cho các thay đổi giao diện**, trên
   máy tính để bàn và di động.
-- Xác nhận rằng `npm run gate` đạt và các chuỗi mới hiển thị với người chơi tuân
+- Xác nhận rằng `pnpm run gate` đạt và các chuỗi mới hiển thị với người chơi tuân
   theo chính sách "tiếng Anh trước" dành cho người đóng góp được nêu bên dưới.
 
 Trên PR của bạn, CI sẽ chạy định dạng và linting trên các tệp bạn đã thay đổi, toàn
 bộ bộ kiểm thử chia thành bốn phân mảnh song song, một lượt kiểm thử hồi quy trên
 trình duyệt, cùng lượt kiểm tra kiểu và các bản build máy khách, máy chủ và không
-giao diện. Điều đó khớp với những gì `npm run gate` chạy trên máy bạn, nên một cổng
+giao diện. Điều đó khớp với những gì `pnpm run gate` chạy trên máy bạn, nên một cổng
 kiểm tra xanh là dấu hiệu tốt cho một PR xanh.
 
 Một lần chạy CI thành công và một danh sách kiểm tra hoàn chỉnh là những gì chúng
@@ -267,7 +268,7 @@ cần thêm bản gốc tiếng Anh.
   trung lập với ngôn ngữ, phải được bản địa hóa lại tại ranh giới máy khách trong
   cùng một thay đổi. Bài kiểm tra bảo vệ
   `npx vitest run tests/localization_fixes.test.ts` thực thi điều này.
-- Sau khi thêm hoặc thay đổi bất kỳ chuỗi nào, hãy chạy `npm run i18n:gen` và commit
+- Sau khi thêm hoặc thay đổi bất kỳ chuỗi nào, hãy chạy `pnpm run i18n:gen` và commit
   các gói được sinh lại trong cùng một thay đổi. Cả cổng kiểm tra lẫn CI đều so sánh
   các tạo phẩm đã commit với một lượt sinh lại từ đầu, nên một gói lỗi thời sẽ làm
   hỏng bản build.
@@ -290,7 +291,7 @@ Bạn không cần viết bất kỳ mã trò chơi nào để làm điều đó
    bản talent trong các mô-đun `talent_i18n`, còn bảng điều khiển quản trị có bộ
    riêng của nó dưới `src/admin/i18n.locales/`.
 2. Cải thiện các bản dịch hiện có, hoặc điền vào bất kỳ bản dịch nào đọc còn gượng.
-3. Chạy `npm run i18n:gen`, commit các gói được sinh lại cùng với thay đổi lớp phủ
+3. Chạy `pnpm run i18n:gen`, commit các gói được sinh lại cùng với thay đổi lớp phủ
    của bạn, rồi chạy các bộ kiểm thử bản địa hóa
    (`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`)
    và mở một PR. Chỉ kiểm tra kiểu thôi sẽ không cho bạn biết liệu có thiếu khóa nào

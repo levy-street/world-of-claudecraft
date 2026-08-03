@@ -1,7 +1,18 @@
 /* @layer tokens: the :root design tokens (palette, typography, font sizes). Semantic
    color tokens are the single source of truth for values that recur across this sheet
    and the scoped component <style> blocks; genuinely one-off colors stay inline at
-   their call site. Imported first by the admin.css barrel. */
+   their call site. Imported first by the admin.css barrel.
+
+   Light/dark theme: the block below is the DEFAULT (dark, unchanged from the original
+   shipped palette). `:root[data-theme="light"]` overrides every color token with a
+   parchment-flavored light palette; nothing outside this file needs to know a second
+   theme exists, since every consumer already reads the semantic --tokens rather than a
+   literal hex. `state/theme.svelte.ts` stamps the `data-theme` attribute (persisted via
+   `theme.ts`); `admin.html` stamps it synchronously pre-paint for a returning
+   light-mode operator so there is no flash of the dark default on load. Every light
+   value below was checked against WCAG AA (>=4.5:1 body text, >=3:1 large text/non-text
+   UI) against the panel/bg-app pairing it is actually read against; see
+   `tests/admin/theme_contrast.test.ts`. */
 @layer tokens {
   :root {
     --gold: #ffd100;
@@ -10,10 +21,26 @@
     --border-soft: #463a1c;
     --border-subtle: #2a2414;
     --panel-bg: linear-gradient(170deg, #15151f 0%, #0b0b12 60%, #08080d 100%);
+    --panel-vignette: inset 0 0 24px #0006;
     --bg-app: #060609;
     --surface-sunken: #090910;
     --surface-inset: #0d0d14;
+    --surface-active: #241a0e;
     --btn-flat-bg: #1a1410;
+    --btn-grad-from: #211b10;
+    --btn-grad-to: #151109;
+    --btn-grad-from-hover: #2a2112;
+    --btn-grad-to-hover: #18120a;
+    --btn-accent-grad-from: #4a3a14;
+    --btn-accent-grad-to: #241c08;
+    --btn-accent-text: #ffd100;
+    --nav-bg: #0b0b11;
+    --nav-hover-bg: #1a160f;
+    --callout-bg: #171207;
+    --callout-border: #8a6f2d;
+    --focus-glow: #c8a83833;
+    --calendar-icon-filter: invert(72%) sepia(60%) saturate(450%) hue-rotate(2deg) brightness(95%);
+    --native-color-scheme: dark;
     --title-font: "Palatino Linotype", Palatino, Georgia, serif;
     --ui-font: "Arial", "Helvetica", sans-serif;
     --text: #e8d8a8;
@@ -28,9 +55,83 @@
     --control-border: #51462d;
     --control-border-hover: #68572c;
     --control-placeholder: #746b52;
+    --chart-secondary: #8cc7ff;
+    --badge-warn-border: #c98c36;
+    --badge-warn-text: #ffbf66;
+    --badge-neutral-border: #5d5645;
+    --badge-neutral-text: #b8ad91;
+    --badge-success-border: #348b56;
+    --badge-success-text: #7bea9f;
+    --badge-success-bg: #0c2114;
+    --toggle-on-bg: #17301f;
+    --title-shadow: 1px 1px 2px #000;
+    --panel-outline: 1px solid #000;
     --font-size-base: 14px;
     --font-size-small: 12px;
     --font-size-table: 14px;
     --font-size-section: 14px;
+  }
+
+  /* A purpose-built light palette rather than a parchment monochrome: the game
+     client's warm gold/bronze survives as the one strong accent (brand, links,
+     the accent button), but backgrounds/panels/nav/chips move to a cool, low-
+     saturation off-white so a dense operator dashboard (long moderation
+     sessions, wide tables) has real tonal separation instead of one flat
+     yellow field. Every value below is re-checked against the same WCAG AA
+     pairing rules as before; see tests/admin/theme_contrast.test.ts. */
+  :root[data-theme="light"] {
+    --gold: #8b5e1a;
+    --gold-dim: #7d5820;
+    --border: #d6d0c4;
+    --border-soft: #e0dbd0;
+    --border-subtle: #ece7dc;
+    --panel-bg: linear-gradient(170deg, #ffffff 0%, #faf8f3 60%, #f4f1ea 100%);
+    --panel-vignette: inset 0 0 16px #0000000a;
+    --bg-app: #f4f1ea;
+    --surface-sunken: #ebe6dc;
+    --surface-inset: #f3efe6;
+    --surface-active: #efe6d4;
+    --btn-flat-bg: #ebe6dc;
+    --btn-grad-from: #f5f0e6;
+    --btn-grad-to: #ebe4d4;
+    --btn-grad-from-hover: #f8f4ec;
+    --btn-grad-to-hover: #efe8d8;
+    --btn-accent-grad-from: #916a2c;
+    --btn-accent-grad-to: #7d5a1e;
+    --btn-accent-text: #fff8e6;
+    --nav-bg: #f0ebe3;
+    --nav-hover-bg: #e8e0d2;
+    --callout-bg: #f2ecdf;
+    --callout-border: #a9793a;
+    --focus-glow: #8b5e1a33;
+    --calendar-icon-filter: none;
+    --native-color-scheme: light;
+    --text: #1c1917;
+    --text-bright: #100d0a;
+    --text-soft: #44403c;
+    --text-dim: #57534e;
+    --color-danger: #a83a2a;
+    --color-danger-border: #7d2d20;
+    --row-hover: #efe9de;
+    --control-bg: #ffffff;
+    --control-bg-hover: #f2ede2;
+    --control-border: #d6d0c4;
+    --control-border-hover: #8b5e1a;
+    --control-placeholder: #79746c;
+    --chart-secondary: #2f6fb0;
+    --badge-warn-border: #96631c;
+    --badge-warn-text: #7a4a12;
+    --badge-neutral-border: #8a8478;
+    --badge-neutral-text: #57534e;
+    --badge-success-border: #2f7a4a;
+    --badge-success-text: #1f6b3a;
+    --badge-success-bg: #dcefdf;
+    --toggle-on-bg: #cfe8d6;
+    /* The dark palette's black outline/shadow were depth tricks for a dark panel;
+       on parchment they read as a sooty halo, so light drops them rather than
+       inheriting the dark values (an outline-free border still separates the
+       panel via --border). */
+    --title-shadow: none;
+    --panel-outline: none;
   }
 }

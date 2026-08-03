@@ -39,7 +39,10 @@ function craftMasterwork() {
 // bareClient pattern from tests/snapshots.test.ts). Class-field initializers
 // do NOT run under Object.create, which is exactly the liveness point: the
 // lastMasterwork property only comes to exist when the real event-apply path
-// assigns it, so an unwired mirror cannot pass by initializer default.
+// assigns it, so an unwired mirror cannot pass by initializer default. Kept
+// bespoke on purpose (issue #2088): the shared tests/helpers/bare_client.ts
+// bareClient() always sets lastMasterwork, which would defeat this liveness
+// point.
 function bareClient(): ClientWorld {
   const c = Object.create(ClientWorld.prototype) as ClientWorld;
   (c as unknown as { eventQueue: SimEvent[] }).eventQueue = [];

@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // The detachable meter windows: popping Healing / Threat out of the tabbed
 // damage window, docking them back, and each panel keeping its own segment

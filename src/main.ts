@@ -224,6 +224,7 @@ import {
 } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
+import { bagOwnedMounts } from './sim/mounts';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
@@ -324,6 +325,7 @@ import {
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
 import { applyMinimapOrnamentVars } from './ui/minimap_gilded_ornament';
 import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
+import { mobileMountAction } from './ui/mount_quick_summon';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { loadNewsInto } from './ui/news_feed';
@@ -1787,7 +1789,17 @@ async function startGame(
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
     onDeeds: () => hud.toggleDeeds(),
-    onMountToggle: () => world.toggleMounted(),
+    onMountToggle: () => {
+      // Dismount is the shared toggleMounted() path (unchanged); summoning an
+      // owned mount from a single tap goes through its reins item directly,
+      // since toggleMounted() itself never summons (src/ui/mount_quick_summon.ts).
+      // bagOwnedMounts (bags only, never bank) matches what useItem can
+      // actually summon: world.ownedMounts() includes bank-only reins that
+      // useItem would refuse (#2739 followup).
+      const action = mobileMountAction(world.player.mountKey, bagOwnedMounts(world.inventory));
+      if (action.kind === 'summon') world.useItem(action.itemId);
+      else world.toggleMounted();
+    },
     onProfessions: () => hud.toggleProfessions(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
@@ -2767,7 +2779,15 @@ async function startGame(
     // ignoreFences: the player can hop fences, so route straight over them
     // instead of around, resolveMove fires the jump as we reach the rail.
     // swim: the player can swim, so let the route cross/enter water.
-    return findPlayerPath(world.cfg.seed, world.player.pos, target, undefined, true, true);
+    return findPlayerPath(
+      world.cfg.seed,
+      world.player.pos,
+      target,
+      undefined,
+      true,
+      true,
+      world.riftCollisionToken,
+    );
   }
 
   function resolvedClickMoveTarget(target: { x: number; z: number }): {
@@ -2775,7 +2795,7 @@ async function startGame(
     z: number;
   } {
     // swim: keep a clicked water destination instead of snapping it to shore.
-    return resolvePlayerDestination(world.cfg.seed, target, true);
+    return resolvePlayerDestination(world.cfg.seed, target, true, world.riftCollisionToken);
   }
 
   function syncGroundAimReticle(): void {
@@ -3384,7 +3404,15 @@ async function startGame(
               clickMoveStuckSince = now;
               input.rerouteClickMoveTarget(
                 goal,
-                findPlayerPath(world.cfg.seed, world.player.pos, goal, undefined, false, true),
+                findPlayerPath(
+                  world.cfg.seed,
+                  world.player.pos,
+                  goal,
+                  undefined,
+                  false,
+                  true,
+                  world.riftCollisionToken,
+                ),
               );
             } else {
               input.clearClickMove();
@@ -3641,7 +3669,13 @@ async function startGame(
         );
         Object.assign(offlineSim.moveInput, mi);
         const stepFacing = movementFacing ?? facing;
-        if (stepFacing !== null) offlineSim.player.facing = stepFacing;
+        // A stun locks facing (issue #2426): stepPlayerMotion already blocks
+        // turnLeft/turnRight while stunned, but mouselook/controller facing is
+        // applied out of band, here, before tick(), and must honor the same gate
+        // or a stunned player can still turn to face away from a positional attack.
+        if (stepFacing !== null && !isStunned(offlineSim.player)) {
+          offlineSim.player.facing = stepFacing;
+        }
         offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
         perf.markInputSent(performance.now());
         const simStart = perf.startTime();

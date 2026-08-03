@@ -6,11 +6,11 @@
   .panel {
     background: var(--panel-bg);
     border: 1px solid var(--border);
-    outline: 1px solid #000;
+    outline: var(--panel-outline);
     border-radius: 6px;
     box-shadow:
       0 2px 16px #000c,
-      inset 0 0 24px #0006,
+      var(--panel-vignette),
       inset 0 1px 0 #ffffff14;
     padding: 14px;
   }
@@ -19,7 +19,7 @@
     color: var(--gold);
     font-size: 16px;
     letter-spacing: 0.5px;
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: var(--title-shadow);
     border-bottom: 1px solid var(--border-soft);
     padding-bottom: 6px;
     margin-bottom: 10px;
@@ -60,8 +60,8 @@
     width: 100%;
     margin-top: 14px;
     padding: 9px;
-    background: linear-gradient(#4a3a14, #241c08);
-    color: var(--gold);
+    background: linear-gradient(var(--btn-accent-grad-from), var(--btn-accent-grad-to));
+    color: var(--btn-accent-text);
     border: 1px solid var(--gold-dim);
     border-radius: 4px;
     font-size: 14px;
@@ -107,7 +107,7 @@
   td {
     text-align: left;
     padding: 7px 10px;
-    border-bottom: 1px solid #1f1a10;
+    border-bottom: 1px solid var(--border-subtle);
     white-space: nowrap;
   }
   th {
@@ -146,7 +146,7 @@
     align-items: center;
     gap: 6px;
     padding: 3px 6px 3px 9px;
-    background: #1b1610;
+    background: var(--surface-sunken);
     border: 1px solid var(--border-soft);
     border-radius: 12px;
     font-size: 13px;
@@ -154,14 +154,14 @@
   .word-del {
     background: none;
     border: none;
-    color: #c98;
+    color: var(--text-dim);
     cursor: pointer;
     font-size: 15px;
     line-height: 1;
     padding: 0 2px;
   }
   .word-del:hover {
-    color: #f55;
+    color: var(--color-danger);
   }
   .word-add {
     display: flex;
@@ -198,7 +198,7 @@
     padding: 4px 0;
   }
   .ip-block code {
-    background: #100d0b;
+    background: var(--surface-sunken);
     padding: 2px 6px;
     border-radius: 3px;
   }
@@ -266,7 +266,7 @@
     font-family: var(--title-font);
     font-size: 24px;
     color: var(--gold);
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: var(--title-shadow);
   }
   .stat .k {
     font-size: var(--font-size-small);
@@ -355,27 +355,30 @@
     font-size: var(--font-size-small);
   }
   .badge.warn {
-    border-color: #c98c36;
-    color: #ffbf66;
+    border-color: var(--badge-warn-border);
+    color: var(--badge-warn-text);
   }
   .badge.bad {
     border-color: var(--color-danger-border);
     color: var(--color-danger);
   }
   .badge.neutral {
-    border-color: #5d5645;
-    color: #b8ad91;
-    background: #171611;
+    border-color: var(--badge-neutral-border);
+    color: var(--badge-neutral-text);
+    background: var(--surface-sunken);
   }
   .badge.success {
-    border-color: #348b56;
-    color: #7bea9f;
-    background: #0c2114;
+    border-color: var(--badge-success-border);
+    color: var(--badge-success-text);
+    background: var(--badge-success-bg);
   }
   .badge.admin {
-    border-color: var(--gold);
+    /* Deliberately NOT theme tokens: this chip stays a fixed gold plate with dark
+       text in both themes (var(--gold) itself darkens in light mode for body-text
+       contrast, which would leave dark text on a dark chip). */
+    border-color: #ffd100;
     color: #090909;
-    background: var(--gold);
+    background: #ffd100;
     font-weight: 700;
     text-transform: uppercase;
   }

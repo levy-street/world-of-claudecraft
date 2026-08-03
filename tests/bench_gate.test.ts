@@ -125,6 +125,15 @@ describe('evaluateCrowdRun composer-tier draw sanity', () => {
     expect(v.failures[0]).toContain('fullscreen floor');
   });
 
+  it.each(['medium', 'insane'])('enforces the fullscreen floor for %s', (tier) => {
+    const v = evaluateCrowdRun({
+      samples: [crowdSample({ tier, calls: FULLSCREEN_DRAW_FLOOR })],
+      minFps: null,
+    });
+    expect(v.ok).toBe(false);
+    expect(v.failures[0]).toContain(`composer tier ${tier}`);
+  });
+
   it('fails a composer tier with missing draw evidence', () => {
     const v = evaluateCrowdRun({
       samples: [crowdSample({ tier: 'high', calls: undefined })],
@@ -156,7 +165,7 @@ describe('evaluateCrowdRun composer-tier draw sanity', () => {
   });
 
   it('pins the composer tier list and the floor constant', () => {
-    expect(COMPOSER_TIERS).toEqual(['high', 'ultra']);
+    expect(COMPOSER_TIERS).toEqual(['medium', 'high', 'ultra', 'insane']);
     expect(FULLSCREEN_DRAW_FLOOR).toBe(1);
   });
 });

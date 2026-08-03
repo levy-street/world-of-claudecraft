@@ -1431,10 +1431,10 @@ const VALE_LAND_LOBES = [
   { x: -100, z: 85, r: 70 }, // the western downs and Mirror Lake's shore
   { x: -95, z: -55, r: 70 }, // the southwest pastures (Grix's tunnel)
   { x: 45, z: -85, r: 84 }, // the south fields (the bandit camp)
-  { x: 108, z: -52, r: 60 }, // the southeast rise (mogger's hollow)
-  { x: 100, z: 70, r: 62 }, // the east meadows
+  { x: 108, z: -52, r: 60 }, // the southwest rise (mogger's hollow)
+  { x: 100, z: 70, r: 62 }, // the west meadows
   { x: 60, z: 138, r: 55 }, // Brightwood Glade's north wood
-  { x: 150, z: -46, r: 44 }, // the east point: the causeway's mainland root
+  { x: 150, z: -46, r: 44 }, // the west point: the causeway's mainland root
 ] as const;
 const VALE_BAYS = [
   { x: -192, z: 25, r: 60 }, // the west bay
@@ -1473,7 +1473,7 @@ function applyValeCoast(x: number, z: number, h: number): number {
   return h + (floor + (h - floor) * t - h) * w;
 }
 
-// The Ferrywalk: a natural sandbar causeway from the vale's east point across
+// The Ferrywalk: a natural sandbar causeway from the vale's west point across
 // the strait to the Farshore's Landing, so the island is reached on foot (no
 // teleport). A curving spit of low ground raised out of the shallows; the
 // deeper water to either side keeps its swim fatigue.

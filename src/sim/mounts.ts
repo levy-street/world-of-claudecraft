@@ -66,20 +66,38 @@ export function mountOwned(meta: PlayerMeta, key: string): boolean {
   );
 }
 
+/** The catalog subset present in `slots`, in catalog order. Shared by
+ *  `ownedMounts` (bags + bank) and `bagOwnedMounts` (bags only, #2739
+ *  followup): a single pass collecting reins itemIds into mount keys. */
+function collectMountKeys(slots: readonly { itemId: string }[]): MountKey[] {
+  const owned = new Set<string>();
+  for (const s of slots) {
+    const def = ITEMS[s.itemId];
+    if (def?.kind === 'mount') owned.add(def.mount);
+  }
+  return MOUNT_KEYS.filter((key) => owned.has(key));
+}
+
 /** The owned subset of the catalog, in catalog order. Empty for a fresh player.
  *  Single pass over bags + bank: the server rebuilds this per snapshot, so it
  *  never scans the containers once per catalog mount. */
 export function ownedMounts(meta: PlayerMeta): MountKey[] {
-  const owned = new Set<string>();
-  const collect = (slots: readonly { itemId: string }[]): void => {
-    for (const s of slots) {
-      const def = ITEMS[s.itemId];
-      if (def?.kind === 'mount') owned.add(def.mount);
-    }
-  };
-  collect(meta.inventory);
-  collect(meta.bank.inventory);
-  return MOUNT_KEYS.filter((key) => owned.has(key));
+  return collectMountKeys([...meta.inventory, ...meta.bank.inventory]);
+}
+
+/** The owned subset of the catalog whose reins are in BAGS right now (never
+ *  the bank), in catalog order. `summonMountItem` (routed through
+ *  `IWorldInventory.useItem`) can only click a bagged item: `useItem` gates on
+ *  `Sim.countItem`, which is bags-only by design (a bank withdrawal is a
+ *  separate, deliberate step). A picker built from the wider `ownedMounts()`
+ *  (bags + bank) can therefore hand `useItem` an itemId it will refuse with
+ *  "You don't have that item.", or skip past a bagged mount that sorts after
+ *  a bank-only one in catalog order. Callers that must resolve an itemId to
+ *  actually SUMMON (the mobile quick-action button; `mount_quick_summon.ts`)
+ *  use this instead of `ownedMounts()`; a picker that only ever DISPLAYS the
+ *  collection (the Mounts window) still wants the wider bags+bank list. */
+export function bagOwnedMounts(inventory: readonly { itemId: string }[]): MountKey[] {
+  return collectMountKeys(inventory);
 }
 
 // Recompute the player's derived stats after a mount state change (aura strips,

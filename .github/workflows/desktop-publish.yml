@@ -98,14 +98,19 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       # Full website-channel build: vite client bundle baked for production,
       # then electron-builder producing the Linux arch matrix from
@@ -231,14 +236,19 @@ jobs:
             exit 1
           fi
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       # CSC_LINK is the base64 .p12 (electron-builder consumes it directly);
       # the App Store Connect API key must be a file on disk, so the .p8
@@ -376,14 +386,19 @@ jobs:
             exit 1
           fi
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       # The sign hook shells out to the AzureSignTool dotnet global tool; the
       # runner's dotnet tools directory is already on PATH.

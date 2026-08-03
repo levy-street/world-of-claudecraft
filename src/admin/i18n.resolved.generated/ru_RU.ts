@@ -44,6 +44,7 @@ export const ru_RU: AdminTranslations = {
   "nav.primaryLabel": "Административная навигация",
   "nav.openMenu": "Открыть навигацию",
   "nav.closeMenu": "Закрыть навигацию",
+  "theme.darkModeLabel": "Dark mode",
   "stats.onlineNow": "сейчас онлайн",
   "stats.onlineAccounts": "аккаунты онлайн",
   "stats.siteUsersNow": "пользователи сайта сейчас",

@@ -4965,6 +4965,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.add': '添加聊天频道',
   'hud.core.chatChannels.addTitle': '添加频道',
   'hud.core.chatChannels.close': '关闭{channel}标签',
+  'hud.core.chatChannels.moveHint': '重新排列{channel}标签：拖动，或使用 Alt+左和 Alt+右',
   'hud.core.chatChannels.names.general': '综合',
   'hud.core.chatChannels.names.guild': '公会',
   'hud.core.chatChannels.names.lfg': '组队',
@@ -8670,6 +8671,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.tips.pvp': '提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '骑乘 / 下骑',
+  // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
+  'hudChrome.actionBar.editKeys': '编辑动作条按键',
+  'hudChrome.actionBar.editKeysHint': '点击动作条上的一个槽位，然后按下按键进行绑定。',
+  'hudChrome.actionBar.bannerHint': '点击一个槽位，然后按下按键进行绑定。完成后点击“完成”。',
+  'hudChrome.actionBar.bannerCapturing': '按下按键以绑定该槽位……',
+  'hudChrome.actionBar.boundToKey': '已绑定至 {key}。',
+  'hudChrome.actionBar.reset': '重置',
+  'hudChrome.actionBar.cancel': '取消',
+  'hudChrome.actionBar.resetConfirmTitle': '重置动作条按键？',
+  'hudChrome.actionBar.resetConfirmBody':
+    '第一条动作条将恢复为默认按键，第二条和第三条动作条将变为未绑定状态。此操作无法撤销。',
   'hudChrome.mobile.mounts': '坐骑',
   'hudChrome.mounts.title': '坐骑',
   'hudChrome.mounts.close': '关闭',

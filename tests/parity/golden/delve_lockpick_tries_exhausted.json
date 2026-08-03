@@ -1,22 +1,22 @@
 {
-  "scenario": "delve_lockpick_fail",
+  "scenario": "delve_lockpick_tries_exhausted",
   "seed": 2024,
   "sampleEvery": 10,
   "ticks": 71,
   "coverage": [
     "delve run (collapsed_reliquary finale)",
-    "lockpick minigame (server-authoritative timeout jam)",
-    "tickLockpickTimeout -> lockpickStepTimeout -> lockpickBurnTry -> lockpickFail",
-    "jammed chest (attemptAvailable=false) + surface exit opens"
+    "lockpick minigame (server-authoritative timeout -> unsolved consolation grant)",
+    "tickLockpickTimeout -> lockpickStepTimeout -> lockpickBurnTry -> lockpickSucceed(solved=false)",
+    "chest opens at LOW tier (attemptAvailable=false, looted=true), no deed, no coffer + surface exit opens"
   ],
-  "draws": 3,
-  "drawDigest": "b660d801",
+  "draws": 5,
+  "drawDigest": "b94cd26d",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 925,
-      "state": "5941e000",
+      "nextId": 832,
+      "state": "592c188c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -53,7 +53,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 920,
+          "entityId": 827,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -90,7 +90,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 920,
+          "id": 827,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -142,9 +142,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 935,
-      "state": "825e9013",
-      "events": "e54c177f",
+      "nextId": 842,
+      "state": "8afb6a36",
+      "events": "634a7414",
       "rng": {
         "draws": 3,
         "digest": "b660d801"
@@ -153,9 +153,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 935,
-      "state": "076fb9f9",
-      "events": "df515c4c",
+      "nextId": 842,
+      "state": "fbfdf770",
+      "events": "5c615462",
       "rng": {
         "draws": 3,
         "digest": "b660d801"
@@ -164,8 +164,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 935,
-      "state": "20bbd36b",
+      "nextId": 842,
+      "state": "64fbae2e",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -175,8 +175,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 935,
-      "state": "15bfbbdd",
+      "nextId": 842,
+      "state": "fafbd0f4",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -186,8 +186,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 935,
-      "state": "26fb2cb3",
+      "nextId": 842,
+      "state": "76f5ad56",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -197,8 +197,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 935,
-      "state": "22d3b769",
+      "nextId": 842,
+      "state": "0b6cfae0",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -208,14 +208,14 @@
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 936,
-      "state": "23bd0465",
-      "events": "6934560d",
+      "nextId": 843,
+      "state": "16fab036",
+      "events": "5281f358",
       "rng": {
-        "draws": 3,
-        "digest": "b660d801"
+        "draws": 5,
+        "digest": "b94cd26d"
       },
-      "label": "lockpick-jammed",
+      "label": "lockpick-tries-exhausted",
       "players": [
         {
           "activeLoadout": -1,
@@ -232,10 +232,11 @@
           "bank": {},
           "cls": "rogue",
           "companionUpgrades": {},
+          "copper": 14,
           "counters": {
             "damageDealt": 636,
             "kills": 1,
-            "xpGained": 198
+            "xpGained": 898
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -257,6 +258,10 @@
               ""
             ],
             [
+              "dlv_reliquary",
+              ""
+            ],
+            [
               "dlv_varric_ringers",
               ""
             ],
@@ -269,9 +274,20 @@
               ""
             ]
           ],
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 920,
+          "delveClears": {
+            "collapsed_reliquary:normal": 1
+          },
+          "delveDaily": {
+            "firstClearXp": [
+              "collapsed_reliquary:normal"
+            ],
+            "markClears": 1
+          },
+          "delveLoreUnlocked": [
+            "eastbrook_ledger"
+          ],
+          "delveMarks": 1,
+          "entityId": 827,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -286,16 +302,16 @@
               "itemId": "baked_bread"
             }
           ],
-          "lifetimeXp": 11398,
+          "lifetimeXp": 12098,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 25,
+          "renown": 30,
           "talents": {
             "rows": {}
           },
           "townFocus": {},
-          "xp": 198
+          "xp": 898
         }
       ],
       "entities": [
@@ -310,7 +326,7 @@
           "dualWielding": true,
           "fiveSecondRule": 102.45,
           "hp": 50000,
-          "id": 920,
+          "id": 827,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -367,7 +383,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 934,
+          "id": 841,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -388,7 +404,7 @@
             "z": -1176
           },
           "stats": {},
-          "templateId": "delve_locked_chest",
+          "templateId": "delve_reward_chest",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -400,23 +416,23 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 936,
-      "state": "7ad8045f",
+      "nextId": 843,
+      "state": "f021df50",
       "events": "741638a5",
       "rng": {
-        "draws": 3,
-        "digest": "b660d801"
+        "draws": 5,
+        "digest": "b94cd26d"
       }
     },
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 936,
-      "state": "51513c6d",
+      "nextId": 843,
+      "state": "1ebabd2e",
       "events": "741638a5",
       "rng": {
-        "draws": 3,
-        "digest": "b660d801"
+        "draws": 5,
+        "digest": "b94cd26d"
       },
       "label": "final",
       "players": [
@@ -435,10 +451,11 @@
           "bank": {},
           "cls": "rogue",
           "companionUpgrades": {},
+          "copper": 14,
           "counters": {
             "damageDealt": 636,
             "kills": 1,
-            "xpGained": 198
+            "xpGained": 898
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -460,6 +477,10 @@
               ""
             ],
             [
+              "dlv_reliquary",
+              ""
+            ],
+            [
               "dlv_varric_ringers",
               ""
             ],
@@ -472,9 +493,20 @@
               ""
             ]
           ],
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 920,
+          "delveClears": {
+            "collapsed_reliquary:normal": 1
+          },
+          "delveDaily": {
+            "firstClearXp": [
+              "collapsed_reliquary:normal"
+            ],
+            "markClears": 1
+          },
+          "delveLoreUnlocked": [
+            "eastbrook_ledger"
+          ],
+          "delveMarks": 1,
+          "entityId": 827,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -489,16 +521,16 @@
               "itemId": "baked_bread"
             }
           ],
-          "lifetimeXp": 11398,
+          "lifetimeXp": 12098,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 25,
+          "renown": 30,
           "talents": {
             "rows": {}
           },
           "townFocus": {},
-          "xp": 198
+          "xp": 898
         }
       ],
       "entities": [
@@ -513,7 +545,7 @@
           "dualWielding": true,
           "fiveSecondRule": 102.55,
           "hp": 50000,
-          "id": 920,
+          "id": 827,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -570,7 +602,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 934,
+          "id": 841,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -591,7 +623,7 @@
             "z": -1176
           },
           "stats": {},
-          "templateId": "delve_locked_chest",
+          "templateId": "delve_reward_chest",
           "weapon": {
             "max": 2,
             "min": 1,

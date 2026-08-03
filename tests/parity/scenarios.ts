@@ -1155,19 +1155,24 @@ function delveLockpick(): Scenario {
   };
 }
 
-// Delve + lockpick FAIL/jam: enter the same Collapsed Reliquary finale, engage the
-// reward chest, then idle past the server-authoritative per-step clock so the single
-// premium try burns -> the chest jams (attemptAvailable=false) and the surface exit
-// opens (the party is never stranded). Pins the timeout/burn-try/fail path the
-// success-only delve_lockpick golden does not exercise.
-function delveLockpickFail(): Scenario {
+// Delve + lockpick tries-exhausted: enter the same Collapsed Reliquary finale, engage
+// the reward chest, then idle past the server-authoritative per-step clock so the
+// single premium try burns -> tries run out but the chest STILL opens
+// (attemptAvailable=false because the reward was granted, not because it jammed;
+// issue #2585 removed the "lose the chest" failure outcome) and the surface exit
+// opens. This was NOT a solve, so the grant is capped at the base LOW loot tier
+// (never the Premium ante's tier, never the flawless-solve deeds, never the
+// Bountiful Coffer guarantee): idling out a high ante must never beat picking the
+// lock. Pins the timeout/burn-try/unsolved-grant path the success-only
+// delve_lockpick golden does not exercise.
+function delveLockpickTriesExhausted(): Scenario {
   return {
-    name: 'delve_lockpick_fail',
+    name: 'delve_lockpick_tries_exhausted',
     coverage: [
       'delve run (collapsed_reliquary finale)',
-      'lockpick minigame (server-authoritative timeout jam)',
-      'tickLockpickTimeout -> lockpickStepTimeout -> lockpickBurnTry -> lockpickFail',
-      'jammed chest (attemptAvailable=false) + surface exit opens',
+      'lockpick minigame (server-authoritative timeout -> unsolved consolation grant)',
+      'tickLockpickTimeout -> lockpickStepTimeout -> lockpickBurnTry -> lockpickSucceed(solved=false)',
+      'chest opens at LOW tier (attemptAvailable=false, looted=true), no deed, no coffer + surface exit opens',
     ],
     sampleEvery: 10,
     build: () => new Sim({ seed: 2024, playerClass: 'rogue', autoEquip: true }),
@@ -1210,10 +1215,12 @@ function delveLockpickFail(): Scenario {
         sim.lockpickEngage(chestId, 1); // premium ante: a single try
         rec.tick(1);
         // Idle past the single-try step deadline (3000ms / 50ms = 60 ticks) so the sim
-        // clock burns the try -> lockpickFail jams the chest and opens the surface exit.
+        // clock burns the try -> tries exhausted, so lockpickSucceed grants the LOW
+        // consolation tier (not the Premium ante's tier) and opens the surface exit,
+        // without the flawless-solve deeds or the Bountiful Coffer guarantee.
         rec.tick(64);
       }
-      rec.snapshot('lockpick-jammed');
+      rec.snapshot('lockpick-tries-exhausted');
       rec.tick(2);
     },
   };
@@ -4706,7 +4713,7 @@ export const SCENARIOS: Scenario[] = [
   duelToWinner(),
   arena2v2Wipe(),
   delveLockpick(),
-  delveLockpickFail(),
+  delveLockpickTriesExhausted(),
   drownedLitany(),
   partyLoot(),
   partyRaid(),

@@ -243,6 +243,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/action_bar/action_bar_view.ts',
   'src/ui/hud/action_bar/action_bar_layout_core.ts',
   'src/ui/hud/action_bar/action_bar_visibility_core.ts',
+  'src/ui/hud/action_bar/action_bar_bind_core.ts',
   'src/ui/hud/action_bar/mobile_action_page_view.ts',
   'src/ui/hud/action_bar/consumable_bar_view.ts',
   'src/ui/mobile_hud_layout.ts',
@@ -296,6 +297,8 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // day_night_core is the clock-to-grade math of the world day/night cycle
 // (Date.now stays in the renderer that calls it), so a Vitest can drive any
 // moment of the cycle.
+// post_bloom_shader_core is the host-agnostic GLSL source patch for the
+// identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/ability_vfx_core.ts',
   'src/render/arena_water_band_core.ts',
@@ -326,6 +329,7 @@ const RENDER_PURE_CORES = [
   'src/render/eastbrook_town_visibility_core.ts',
   'src/render/occluder_fade_core.ts',
   'src/render/point_light_shader_core.ts',
+  'src/render/post_bloom_shader_core.ts',
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',

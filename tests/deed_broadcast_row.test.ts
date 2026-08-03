@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // Round-trip behavior of the options-window deed-broadcast account row
 // (buildDeedBroadcastRow): loads the persisted accounts.deed_broadcasts state
 // before enabling, flips optimistically on click with the server echo winning,

@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // The bags -> paperdoll drag: the pure drop decision (equip_drop_core.ts) and the
 // touch release hit test (item_drop_hit_test.ts).

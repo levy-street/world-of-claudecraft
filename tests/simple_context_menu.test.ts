@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import { beforeEach, describe, expect, it } from 'vitest';
 import { openSimpleMenu, type SimpleMenuDeps } from '../src/ui/simple_context_menu';
 

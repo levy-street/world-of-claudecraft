@@ -1859,6 +1859,86 @@ export const TARGETS = [
     },
   },
   {
+    // The Key Bindings panel with the per-slot action-bar rows replaced by a
+    // single "Edit action bar keys" entry (issue #1238).
+    key: 'actionbar-keybind-menu-entry',
+    label: 'Key Bindings menu: single "Edit action bar keys" entry',
+    when: ['ui/hud/action_bar/action_bar_bind_core', 'ui/options_window.ts', 'game/keybinds.ts'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        // Key Bindings is the first row on the main options menu.
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[0]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .kb-actionbar-edit');
+      return open ? { clip: '#options-menu' } : {};
+    },
+  },
+  {
+    // Choosing the entry above closes the menu and opens the on-bar mode: a
+    // banner over the live action bar, a slot selected and highlighted, and
+    // the "press a key" status line (issue #1238).
+    key: 'actionbar-keybind-mode-banner',
+    label: 'On-bar key-binding mode: banner + a selected slot',
+    when: ['ui/hud/action_bar/action_bar_bind_core', 'ui/hud.ts', 'styles/hud.css'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[0]?.click();
+      });
+      await pollForSize(page, '#options-menu .kb-actionbar-edit');
+      await page.evaluate(() => document.querySelector('.kb-actionbar-edit')?.click());
+      const open = await pollForSize(page, '#actionbar-bind-banner');
+      if (open) {
+        await page.evaluate(() => {
+          document.querySelectorAll('#actionbar .action-btn')[3]?.click();
+        });
+        await wait(400);
+      }
+      return open ? { clip: '#bottom-bar' } : {};
+    },
+  },
+  {
+    // Reset (behind a confirm) restores bar 1's defaults and unbinds every
+    // other bar; Keybinds.resetSlots() backs it (issue #1238).
+    key: 'actionbar-keybind-reset-confirm',
+    label: 'On-bar key-binding mode: Reset confirm dialog',
+    when: ['ui/hud/action_bar/action_bar_bind_core', 'ui/hud.ts', 'game/keybinds.ts'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[0]?.click();
+      });
+      await pollForSize(page, '#options-menu .kb-actionbar-edit');
+      await page.evaluate(() => document.querySelector('.kb-actionbar-edit')?.click());
+      await pollForSize(page, '#actionbar-bind-banner');
+      await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('#actionbar-bind-banner button'));
+        buttons[0]?.click(); // Reset (Done is the second button)
+      });
+      const open = await pollForSize(page, '#confirm-dialog');
+      return open ? { clip: '#confirm-dialog' } : {};
+    },
+  },
+  {
     key: 'guild-roster',
     label: 'Social window: Guild tab roster grouped by online status',
     // Match the SOURCE files (the `.ts` suffix keeps `ui/social_view` from also
@@ -2125,6 +2205,60 @@ export const TARGETS = [
         document
           .querySelector('#chatlog-tabs button[data-tab="combat"]')
           ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      });
+      await wait(200);
+      return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
+    key: 'chat-tab-reorder-before',
+    label: 'Chat tab strip: World then Guild opened, before reordering (#1365)',
+    when: ['ui/hud/chat/chat_channels', 'ui/hud/chat/chat_window_controller'],
+    // Opens two channel tabs (World, then Guild) through the real "+" add-channel
+    // picker, in that order, so the "before" strip reads World, Guild left to
+    // right. chat-tab-reorder-after (next target, same shared page/session) then
+    // reorders them and shoots the strip again.
+    async capture(page) {
+      await pollForSize(page, '#chatlog-wrap', 60, 500);
+      for (const action of ['world', 'guild']) {
+        await page.evaluate(() => {
+          document
+            .querySelector('.chat-tab-add')
+            ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        });
+        await wait(200);
+        await page.evaluate((act) => {
+          document
+            .querySelector(`.ctx-item[data-act="${act}"]`)
+            ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        }, action);
+        await wait(200);
+      }
+      await page.evaluate(() => {
+        document
+          .querySelector('#chatlog-tabs button[data-tab="all"]')
+          ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      });
+      await wait(200);
+      return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
+    key: 'chat-tab-reorder-after',
+    label: 'Chat tab strip: World moved past Guild via Alt+ArrowRight (#1365)',
+    when: ['ui/hud/chat/chat_channels', 'ui/hud/chat/chat_window_controller'],
+    // Runs right after chat-tab-reorder-before on the same shared page, so the
+    // World/Guild tabs opened there are still present. Drives the real
+    // Alt+ArrowRight keyboard reorder path bound on the World tab button (the
+    // same reorderChatTabs/persist path a drag uses), so the strip flips to
+    // Guild, World.
+    async capture(page) {
+      await page.evaluate(() => {
+        document
+          .querySelector('#chatlog-tabs button[data-tab="world"]')
+          ?.dispatchEvent(
+            new KeyboardEvent('keydown', { key: 'ArrowRight', altKey: true, bubbles: true }),
+          );
       });
       await wait(200);
       return { clip: '#chatlog-wrap' };

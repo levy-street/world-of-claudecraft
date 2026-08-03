@@ -71,7 +71,7 @@ const armouryFinalPipelineEnabled =
     item.src?.endsWith('eastbrook_grand_armoury-final.glb'),
   ) ?? false;
 const ARMOURY_SHIPPING_BYTE_CEILING = 160 * 1024;
-const ARMOURY_SHIPPING_SHA256 = '1414ab894e15f01dfcd90267fdaad0e580215bce0631d4a6978a4f83973f84c0';
+const ARMOURY_SHIPPING_SHA256 = '05c8ecb5eb3a3c22cab1a38c1f42c705f22c3463ad8d6dcc900bcd7c19e3b868';
 const MANIFEST_HASH_LENGTH = 12;
 
 function expectAssetExistsAndManifested(url: string): void {
@@ -577,7 +577,7 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
       'scripts/assets/specs/eastbrook_grand_armoury.json',
       'scripts/assets/eastbrook_grand_armoury/source_fingerprint.mjs',
       'scripts/assets/build_assets.mjs',
-      'package-lock.json',
+      'pnpm-lock.yaml',
     ]);
     expect(eastbrookGrandArmourySourceFingerprint(repoDir)).toMatch(/^[0-9a-f]{64}$/);
   });
@@ -593,7 +593,7 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
       const knownFingerprint = eastbrookGrandArmourySourceFingerprint(fixtureRoot);
       expect(knownFingerprint).toBe(
-        'b4b18c6f18c4961912a8c556ce6823082b45bd247efeda9ceed69eb68339c726',
+        'd65cf120df170c401df25d801c1f55288451dbe82a44740e678af166d293b02e',
       );
 
       const mutatedPath = path.join(fixtureRoot, EASTBROOK_GRAND_ARMOURY_SOURCE_FILES[0]);

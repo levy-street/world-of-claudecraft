@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // DOM behavioral guard for the Guide router's fragment handling. Back/Forward
 // (popstate) and a language switch must keep the URL #anchor so a deep-linked

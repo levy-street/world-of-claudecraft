@@ -524,10 +524,20 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
       ctx.error(meta.entityId, "You can't do that while swimming.");
       return;
     }
+    // Food and drink occupy separate slots, so you can do both at once, but
+    // using either kind again before its own in-flight use lands (a double
+    // click, or two quick keypresses landing in the same tick) must not
+    // spend a second item to overwrite the first's slot (#2565).
+    const slot = def.kind === 'food' ? 'eating' : 'drinking';
+    if (p[slot] !== null) {
+      ctx.error(
+        meta.entityId,
+        def.kind === 'food' ? 'You are already eating.' : 'You are already drinking.',
+      );
+      return;
+    }
     ctx.removeItem(itemId, 1, meta.entityId);
     p.sitting = true;
-    // food and drink occupy separate slots, so you can do both at once
-    const slot = def.kind === 'food' ? 'eating' : 'drinking';
     p[slot] = {
       itemId,
       kind: def.kind,

@@ -835,7 +835,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'A Trade for Every Hand',
     giverNpcId: 'foreman_odell',
     turnInNpcId: 'foreman_odell',
-    text: "Every soul in Eastbrook works a trade besides the sword, $N. There are ore veins in the rocks around the Copper Dig, southwest of town. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
+    text: "Every soul in Eastbrook works a trade besides the sword, $N. There are ore veins in the rocks around the Copper Dig, southeast of town. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
     completionText:
       "See? Ore gathered and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
     objectives: [{ type: 'gather', nodeType: 'ore', count: 5, label: 'Ore vein harvested' }],
@@ -960,7 +960,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Stolen Supplies',
     giverNpcId: 'trader_wilkes',
     turnInNpcId: 'trader_wilkes',
-    text: 'Those bandits hit my last wagon and made off with four crates of goods — tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southeast hills. Steal them back for me, would you?',
+    text: 'Those bandits hit my last wagon and made off with four crates of goods, tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southwest hills. Steal them back for me, would you?',
     completionText: 'My crates! Barely a scratch on them. You are a wonder.',
     objectives: [
       { type: 'collect', itemId: 'supply_crate', count: 4, label: 'Stolen Supply Crate' },
@@ -1134,7 +1134,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Mogger Must Fall',
     giverNpcId: 'marshal_redbrook',
     turnInNpcId: 'marshal_redbrook',
-    text: 'Mogger has split carts, flattened fences, and killed enough livestock to empty half the Vale. Do not face him alone. Take two strong companions into the eastern meadow and put the brute down for good.',
+    text: 'Mogger has split carts, flattened fences, and killed enough livestock to empty half the Vale. Do not face him alone. Take two strong companions into the western meadow and put the brute down for good.',
     completionText:
       "Mogger dead at last. Eastbrook's fields are safer, and you leave the Vale with one more tale worth retelling.",
     objectives: [{ type: 'kill', targetMobId: 'mogger', count: 1, label: 'Mogger slain' }],
@@ -1254,7 +1254,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Threads Rejoined',
     giverNpcId: 'weaver_ottilie',
     turnInNpcId: 'weaver_ottilie',
-    text: 'Back at my loom after all. I hold no grudge, $N, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the webwood spiders crowding the western woods, and the labor will settle your hands before they touch good silk again.',
+    text: 'Back at my loom after all. I hold no grudge, $N, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the webwood spiders crowding the eastern woods, and the labor will settle your hands before they touch good silk again.',
     completionText:
       'Steady again. Leatherworking and Tailoring return to your hands as majors. Measure twice this time before you wander.',
     objectives: [
@@ -1273,7 +1273,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Back on the Stove',
     giverNpcId: 'cook_marlow',
     turnInNpcId: 'cook_marlow',
-    text: 'Well, look who is back at my pot. No hard feelings, $N, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the east meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.',
+    text: 'Well, look who is back at my pot. No hard feelings, $N, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the west meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.',
     completionText:
       'There is the old flavor. Alchemy and Cooking are back on your stove as majors. Stay a while this time.',
     objectives: [{ type: 'kill', targetMobId: 'wild_boar', count: 5, label: 'Wild Boar hunted' }],
@@ -1472,13 +1472,13 @@ export const ZONE1_CAMPS: CampDef[] = [
   // Nudged north to stay ahead of the widened wolf runs (q_greyjaw sends the
   // player to "the deep woods north of the wolf runs").
   { mobId: 'old_greyjaw', center: { x: 0, z: 100 }, radius: 8, count: 1 },
-  // Boars: east meadow
+  // Boars: west meadow
   { mobId: 'wild_boar', center: { x: 63, z: 16 }, radius: 26, count: 5 },
   { mobId: 'wild_boar', center: { x: 84, z: -27 }, radius: 23.5, count: 4 },
   { mobId: 'mogger', center: { x: 118, z: -26 }, radius: 5, count: 1 },
-  // Spiders: western woods
+  // Spiders: eastern woods
   { mobId: 'webwood_spider', center: { x: -68, z: 2 }, radius: 28.5, count: 6 },
-  // Murlocs: lake shore northwest, camp still straddles the waterline. This camp is
+  // Murlocs: lake shore northeast, camp still straddles the waterline. This camp is
   // radius-capped by Mirror Lake, not by its neighbours: the terrain flatten disc is
   // radius * 1.8, so a radius wide enough for 11.5 yd spacing drags a 59 yd flatten
   // across the lake and lifts its bed above swim depth (the lake stops needing a
@@ -1491,15 +1491,15 @@ export const ZONE1_CAMPS: CampDef[] = [
   // the documented exception and the lake guard live in
   // tests/eastbrook_camp_spacing.test.ts.
   { mobId: 'mudfin_murloc', center: { x: -75, z: 57 }, radius: 15, count: 5 },
-  // Kobolds: mine southwest. Held in place (the mine and its colliders are here).
+  // Kobolds: mine southeast. Held in place (the mine and its colliders are here).
   { mobId: 'tunnel_rat', center: { x: -82, z: -62 }, radius: 33, count: 8 },
-  // Bandits: southeast camp. Shifted off its own campfire collider and clear of the
+  // Bandits: southwest camp. Shifted off its own campfire collider and clear of the
   // boar meadow; the tents, crates and supply drops all stay inside the disc, and it
   // no longer merges with the outpost below.
   { mobId: 'vale_bandit', center: { x: 50, z: -72 }, radius: 28.5, count: 6 },
   { mobId: 'vale_bandit', center: { x: 90, z: -90 }, radius: 16, count: 5 },
   { mobId: 'gorrak', center: { x: 92, z: -92 }, radius: 2, count: 1 },
-  // Undead: ruins northeast. The chapel guardians below are the same population, so
+  // Undead: ruins northwest. The chapel guardians below are the same population, so
   // they may still flank the altar inside this disc.
   { mobId: 'restless_bones', center: { x: 82, z: 78 }, radius: 28.5, count: 6 },
   { mobId: 'captain_verlan', center: { x: 92, z: 90 }, radius: 4, count: 1 },
@@ -1557,11 +1557,11 @@ export const ZONE1_OBJECTS: GroundObjectDef[] = [
 // Roads from town toward each hub — used for terrain painting and the map.
 export const ZONE1_ROADS: { x: number; z: number }[][] = [
   [...EASTBROOK_LAYOUT.roads[0].points, { x: -8, z: 30 }, { x: -15, z: 55 }, { x: -2, z: 78 }], // north to wolves
-  [...EASTBROOK_LAYOUT.roads[1].points, { x: 30, z: 8 }, { x: 55, z: 12 }], // east to boars
-  [...EASTBROOK_LAYOUT.roads[2].points, { x: 30, z: -30 }, { x: 50, z: -50 }, { x: 65, z: -65 }], // southeast to bandits
-  [...EASTBROOK_LAYOUT.roads[3].points, { x: -35, z: 25 }, { x: -58, z: 48 }, { x: -66, z: 58 }], // northwest to lake
-  [...EASTBROOK_LAYOUT.roads[4].points, { x: -30, z: -28 }, { x: -55, z: -45 }, { x: -70, z: -55 }], // southwest to mine
-  [...EASTBROOK_LAYOUT.roads[5].points, { x: 35, z: 35 }, { x: 60, z: 60 }, { x: 78, z: 74 }], // northeast to ruins
+  [...EASTBROOK_LAYOUT.roads[1].points, { x: 30, z: 8 }, { x: 55, z: 12 }], // west to boars
+  [...EASTBROOK_LAYOUT.roads[2].points, { x: 30, z: -30 }, { x: 50, z: -50 }, { x: 65, z: -65 }], // southwest to bandits
+  [...EASTBROOK_LAYOUT.roads[3].points, { x: -35, z: 25 }, { x: -58, z: 48 }, { x: -66, z: 58 }], // northeast to lake
+  [...EASTBROOK_LAYOUT.roads[4].points, { x: -30, z: -28 }, { x: -55, z: -45 }, { x: -70, z: -55 }], // southeast to mine
+  [...EASTBROOK_LAYOUT.roads[5].points, { x: 35, z: 35 }, { x: 60, z: 60 }, { x: 78, z: 74 }], // northwest to ruins
 ];
 
 // ---------------------------------------------------------------------------
