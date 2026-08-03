@@ -8670,6 +8670,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.tips.pvp': '提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '骑乘 / 下骑',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    '鼠标按键同样可用：绑定时按下中键 (M3) 或拇指键 (M4、M5)。左键和右键保留给镜头使用。',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': '编辑动作条按键',
   'hudChrome.actionBar.editKeysHint': '点击动作条上的一个槽位，然后按下按键进行绑定。',

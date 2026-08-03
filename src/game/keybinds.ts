@@ -12,6 +12,7 @@
 // game menu, so it stays out of the registry and is refused by bind().
 
 import { repairStoredBindings } from './keybinds_repair';
+import { isReservedMouseCode, mouseCodeLabel } from './mouse_binds';
 
 export type BindKind = 'held' | 'edge';
 
@@ -431,11 +432,17 @@ export function comboMods(combo: string): KeyMods {
 }
 
 export function isReservedCode(combo: string): boolean {
-  return comboCode(combo) === 'Escape'; // the game-menu key is never rebindable
+  const code = comboCode(combo);
+  // Escape always toggles the game menu; the left and right mouse buttons drive
+  // mouselook, click-to-move, and click-picking (see mouse_binds.ts). Neither is
+  // ever rebindable.
+  return code === 'Escape' || isReservedMouseCode(code);
 }
 
 // short on-screen label for a single e.code (the keycap glyph)
 function codeLabel(code: string): string {
+  const mouse = mouseCodeLabel(code); // "Mouse4" -> "M4"
+  if (mouse !== null) return mouse;
   if (/^Digit\d$/.test(code)) return code.slice(5);
   if (/^Key[A-Z]$/.test(code)) return code.slice(3);
   if (/^F\d{1,2}$/.test(code)) return code;

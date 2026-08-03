@@ -957,7 +957,8 @@ export const cs_CZ: EnTranslations = {
       "petTaunt": "Mazlíček: Provokace",
       "petDefensive": "Mazlíček: Obranný",
       "petAggressive": "Mazlíček: Agresivní",
-      "mount": "Nasednout / Sesednout"
+      "mount": "Nasednout / Sesednout",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",

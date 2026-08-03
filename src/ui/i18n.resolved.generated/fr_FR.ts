@@ -957,7 +957,8 @@ export const fr_FR: EnTranslations = {
       "petTaunt": "Familier : provoquer",
       "petDefensive": "Familier : défensif",
       "petAggressive": "Familier : agressif",
-      "mount": "Monter / Descendre"
+      "mount": "Monter / Descendre",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",

@@ -957,7 +957,8 @@ export const ja_JP: EnTranslations = {
       "petTaunt": "ペット：挑発",
       "petDefensive": "ペット：防御",
       "petAggressive": "ペット：攻撃的",
-      "mount": "騎乗 / 降車"
+      "mount": "騎乗 / 降車",
+      "mouseHint": "マウスボタンも使えます。割り当て中に中ボタン (M3) やサイドボタン (M4、M5) を押してください。左右のボタンはカメラ用に予約されています。"
     },
     "actionBar": {
       "editKeys": "アクションバーのキーを編集",

@@ -9,6 +9,7 @@ import type { MoveInput } from '../sim/types';
 import { detectBrowserEngine } from './browser_env';
 import { cursorForHover, type HoverCursorKind } from './cursors';
 import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
+import { bindableMouseCodeForButton, isReservedMouseButton } from './mouse_binds';
 import {
   inForcedPointerLockCooldown,
   pointerLockNeedsSyncGesture,
@@ -206,6 +207,13 @@ export class Input {
   // Physical key code -> action-bar slot currently held down, so key UP (or a
   // blur) releases the matching slot (drives the hold-to-charge shoot).
   private heldSlotCodes = new Map<string, number>();
+  // MouseEvent.button indices whose press this frame was consumed by a binding
+  // (or by the rebind capture), so the matching `auxclick` can be cancelled too.
+  // Chromium and Gecko navigate back/forward on the thumb buttons; cancelling
+  // both events is what keeps a bound thumb button from also leaving the page.
+  // An UNBOUND button is deliberately left alone, so browser navigation behaves
+  // exactly as it does today for every player who binds nothing.
+  private consumedMouseButtons = new Set<number>();
   // mouse-look sensitivity, in radians per pixel of drag; the old fixed value
   // was BASE_LOOK_SENS — setCameraSpeed scales it from the settings menu
   private lookSensitivity = BASE_LOOK_SENS;
@@ -315,6 +323,11 @@ export class Input {
     document.addEventListener('contextmenu', (e) => this.onContextMenu(e));
     document.addEventListener('selectstart', (e) => this.onSelectStart(e));
     canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
+    // The bindable mouse buttons (middle and up) listen on the WINDOW, not the
+    // canvas: a thumb button bound to an ability has to fire while the cursor
+    // rests over the HUD too, exactly like the keyboard does.
+    window.addEventListener('mousedown', (e) => this.onBindableMouseDown(e));
+    window.addEventListener('auxclick', (e) => this.onAuxClick(e));
     window.addEventListener('mouseup', (e) => this.onMouseUp(e));
     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
     canvas.addEventListener(
@@ -780,6 +793,9 @@ export class Input {
       this.cb.onEmoteWheel(false);
     }
     if (reason !== 'pointerlock') this.releaseHeldSlots();
+    // Focus loss swallows the auxclick that would have cleared these, so drop
+    // them here rather than letting a stale entry cancel a later, unrelated click.
+    if (reason !== 'pointerlock') this.consumedMouseButtons.clear();
     this.updateCursor();
     if (hadInput) this.noteIntent('move');
   }
@@ -928,16 +944,27 @@ export class Input {
   }
 
   private onKeyUp(e: KeyboardEvent): void {
-    if (this.keys.delete(e.code)) this.noteIntent('move');
-    if (this.emoteWheelHeldCodes.delete(e.code) && this.emoteWheelHeldCodes.size === 0) {
+    if (this.releaseBoundCode(e.code)) e.preventDefault();
+  }
+
+  // The release half of a bound press, shared by the keyboard (onKeyUp) and the
+  // bindable mouse buttons (onMouseUp): drop the code from the held-movement
+  // set, close the emote wheel once its last held code lifts, and end a slot
+  // that was charging. Returns true when the emote wheel closed, the one case
+  // the caller cancels the event's default for.
+  private releaseBoundCode(code: string): boolean {
+    if (this.keys.delete(code)) this.noteIntent('move');
+    let closedEmoteWheel = false;
+    if (this.emoteWheelHeldCodes.delete(code) && this.emoteWheelHeldCodes.size === 0) {
       this.cb.onEmoteWheel(false);
-      e.preventDefault();
+      closedEmoteWheel = true;
     }
-    const slot = this.heldSlotCodes.get(e.code);
+    const slot = this.heldSlotCodes.get(code);
     if (slot !== undefined) {
-      this.heldSlotCodes.delete(e.code);
+      this.heldSlotCodes.delete(code);
       this.cb.onAbilityUp(slot);
     }
+    return closedEmoteWheel;
   }
 
   // Release every held slot (fire onAbilityUp), e.g. on blur/menu, so a charge in
@@ -1056,6 +1083,11 @@ export class Input {
   }
 
   private onMouseDown(e: MouseEvent): void {
+    // Only left and right take part in the camera drag / click-pick gesture. An
+    // extra (bindable) button returns early so pressing it never resets a drag
+    // already in flight, and so its release cannot synthesize a world click;
+    // its binding dispatch is the window-level onBindableMouseDown below.
+    if (!isReservedMouseButton(e.button)) return;
     if (e.button === 0) this.leftDown = true;
     if (e.button === 2) this.rightDown = true;
     if (e.button === 0 || e.button === 2) e.preventDefault?.();
@@ -1096,7 +1128,92 @@ export class Input {
     this.updateCursor();
   }
 
+  // A bindable mouse button (middle, thumb back/forward, and anything past them;
+  // see mouse_binds.ts) behaves exactly like a key: it feeds the rebind capture,
+  // fires held and edge actions through the same Keybinds lookups, and honors the
+  // same guards (a focused text field, a menu that suppresses game keys). Held
+  // and edge may both fire on one press, the same intentional co-fire onKeyDown
+  // allows (move while casting).
+  private onBindableMouseDown(e: MouseEvent): void {
+    const code = bindableMouseCodeForButton(e.button);
+    if (code === null) return; // left/right belong to the camera and click-pick
+    // A press whose release lands outside the window never gets its auxclick, so
+    // its entry would linger and cancel a later, unrelated one. Drop any stale
+    // entry for this button up front: consumeMouseButton re-adds it if this press
+    // is consumed too, which makes the set self-correcting one press at a time.
+    this.consumedMouseButtons.delete(e.button);
+    const combo = makeCombo(code, {
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      shift: e.shiftKey,
+      meta: e.metaKey,
+    });
+    if (this.captureCb) {
+      const cb = this.captureCb;
+      this.captureCb = null;
+      this.consumeMouseButton(e);
+      cb(combo);
+      return;
+    }
+    const tag = (document.activeElement?.tagName ?? '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+    if (this.cb.canUseGameKeys && !this.cb.canUseGameKeys()) return;
+    // Attack Move mode wins over whatever else shares the button, as on the keyboard.
+    if (
+      this.attackMoveEnabled &&
+      this.hoverActive &&
+      this.keybinds.codesForAction('attackMove').includes(combo)
+    ) {
+      this.consumeMouseButton(e);
+      this.cb.onAttackMove?.(this.hoverX, this.hoverY);
+      return;
+    }
+    const held = this.keybinds.heldActionForCode(code);
+    if (held === 'emoteWheel') {
+      this.emoteWheelHeldCodes.add(code);
+      this.cb.onEmoteWheel(true);
+    } else if (held !== null) {
+      this.keys.add(code);
+      if (held === 'forward' || held === 'back') this.autorun = false;
+      if (held === 'jump')
+        this.keyJumpUntil = Math.max(this.keyJumpUntil, performance.now() + KEY_JUMP_LATCH_MS);
+      this.noteMovementIntent();
+    }
+    const edge = this.keybinds.edgeActionForCombo(combo);
+    if (edge !== null) {
+      if (edge.startsWith('slot')) {
+        // Slot buttons use DOWN/UP so a slot can hold to charge, same as slot keys.
+        const slot = Number(edge.slice(4));
+        this.heldSlotCodes.set(code, slot);
+        this.cb.onAbilityDown(slot);
+      } else {
+        this.dispatchEdge(edge);
+      }
+    }
+    if (held !== null || edge !== null) this.consumeMouseButton(e);
+  }
+
+  // Cancel the browser's own action for a press the game just used (thumb-button
+  // history navigation, middle-click autoscroll) and remember the button so its
+  // follow-up auxclick is cancelled too.
+  private consumeMouseButton(e: MouseEvent): void {
+    e.preventDefault?.();
+    this.consumedMouseButtons.add(e.button);
+  }
+
+  private onAuxClick(e: MouseEvent): void {
+    if (!this.consumedMouseButtons.delete(e.button)) return;
+    e.preventDefault?.();
+  }
+
   private onMouseUp(e: MouseEvent): void {
+    // Release the binding half first: it is the only part an extra button has,
+    // and it must run whether the release arrives as pointerup or mouseup.
+    const boundCode = bindableMouseCodeForButton(e.button);
+    if (boundCode !== null) {
+      if (this.releaseBoundCode(boundCode)) e.preventDefault?.();
+      return;
+    }
     if (e.button === 0) this.leftDown = false;
     if (e.button === 2) this.rightDown = false;
     if (e.button === 0 || e.button === 2) this.noteIntent(e.button === 2 ? 'look' : 'move');

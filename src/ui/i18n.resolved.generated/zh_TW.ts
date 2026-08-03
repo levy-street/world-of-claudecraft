@@ -957,7 +957,8 @@ export const zh_TW: EnTranslations = {
       "petTaunt": "寵物：嘲諷",
       "petDefensive": "寵物：防禦",
       "petAggressive": "寵物：攻擊性",
-      "mount": "騎乘 / 下騎"
+      "mount": "騎乘 / 下騎",
+      "mouseHint": "滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭使用。"
     },
     "actionBar": {
       "editKeys": "編輯動作列按鍵",

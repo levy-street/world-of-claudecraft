@@ -85,6 +85,17 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
   steals it). Up to 2 codes/action (primary + secondary). The default layout is
   classic-fidelity-critical and is covered by `tests/keybinds.test.ts`; keep it
   green. `mobile_controls.ts`/`settings.ts` have tests too.
+- **Mouse buttons are keybinds, not a parallel system.** `mouse_binds.ts` maps a
+  `MouseEvent.button` to the pseudo-code `Mouse<n>` in the CLASSIC numbering
+  players use (middle is `Mouse3`, the thumb pair is `Mouse4`/`Mouse5`), so the
+  one `Keybinds` store, its uniqueness sweep, modifier chords, persistence, and
+  the action-bar keycaps all carry mouse bindings unchanged. `Mouse1`/`Mouse2`
+  (left/right) are reserved like `Escape`: they own mouselook, click-to-move,
+  and click-picking. `input.ts` is the thin consumer (`onBindableMouseDown`);
+  it cancels the browser default (thumb-button history navigation, middle-click
+  autoscroll) only for a press a binding actually consumed, so an unbound button
+  keeps its normal browser behavior. Pinned by `tests/mouse_binds.test.ts` plus
+  the mouse-binding suites in `tests/keybinds.test.ts` and `tests/input.test.ts`.
 - **i18n (root `t()` rules apply), the local facts:** the `t()` surfaces here are
   the mobile haptics toggle (`t('hudChrome.mobile.haptics'/'...hapticsOff')` in
   `mobile_controls.ts`), the `interactions.ts` error toasts (`questUi.errors.tooFar`,

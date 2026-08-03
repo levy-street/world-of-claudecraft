@@ -23,6 +23,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -40,6 +41,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -57,6 +59,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -74,6 +77,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -92,6 +96,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -109,6 +114,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -146,6 +152,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -168,6 +175,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -185,6 +193,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -202,6 +211,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -219,6 +229,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -236,6 +247,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -253,6 +265,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -270,6 +283,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ],
@@ -287,6 +301,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.keybinds.mouseHint",
     "itemUi.vendor.buyStack",
     "itemUi.vendor.buyStackAria"
   ]

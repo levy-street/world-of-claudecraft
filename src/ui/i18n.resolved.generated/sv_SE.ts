@@ -957,7 +957,8 @@ export const sv_SE: EnTranslations = {
       "petTaunt": "Djur: Provocera",
       "petDefensive": "Djur: Defensivt",
       "petAggressive": "Djur: Aggressivt",
-      "mount": "Sitt upp / Stig av"
+      "mount": "Sitt upp / Stig av",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",

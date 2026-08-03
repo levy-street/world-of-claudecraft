@@ -768,3 +768,60 @@ describe('modifiers and held (movement) actions', () => {
     expect(kb.heldActionForCode('Digit1')).toBe(null);
   });
 });
+
+describe('mouse buttons as bindable keys', () => {
+  it('binds a mouse pseudo-code to an action-bar slot and labels it as a keycap', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    expect(kb.edgeActionForCombo('Mouse4')).toBe('slot3');
+    expect(kb.primaryLabel('slot3')).toBe('M4');
+    expect(keyCapLabel(kb.primaryLabel('slot3'))).toBe('m4');
+  });
+
+  it('binds a mouse button to a held (movement) action so the per-frame poll matches', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('strafeLeft', 0, 'Mouse5')).toBe(true);
+    expect(kb.heldActionForCode('Mouse5')).toBe('strafeLeft');
+  });
+
+  it('keeps a mouse chord distinct from the bare button, like a key chord', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot4', 0, 'Shift+Mouse4')).toBe(true);
+    expect(kb.bind('slot5', 0, 'Mouse4')).toBe(true);
+    expect(kb.edgeActionForCombo('Shift+Mouse4')).toBe('slot4');
+    expect(kb.edgeActionForCombo('Mouse4')).toBe('slot5');
+    expect(kb.primaryLabel('slot4')).toBe('Shift+M4');
+  });
+
+  it('refuses the left and right buttons, which the camera and click-picking own', () => {
+    const kb = new Keybinds();
+    expect(isReservedCode('Mouse1')).toBe(true);
+    expect(isReservedCode('Mouse2')).toBe(true);
+    expect(isReservedCode('Shift+Mouse2')).toBe(true); // a chord on them is reserved too
+    expect(isReservedCode('Mouse3')).toBe(false);
+    expect(kb.bind('slot3', 0, 'Mouse1')).toBe(false);
+    expect(kb.bind('slot3', 0, 'Mouse2')).toBe(false);
+    // the refused binds left the slot on its default, not unbound or overwritten
+    expect(kb.codeAt('slot3', 0)).toBe('Digit4');
+  });
+
+  it('evicts a mouse binding when its button is reassigned, like any other code', () => {
+    const kb = new Keybinds();
+    kb.bind('slot3', 0, 'Mouse4');
+    kb.bind('slot7', 0, 'Mouse4');
+    expect(kb.codeAt('slot3', 0)).toBe(null);
+    expect(kb.edgeActionForCombo('Mouse4')).toBe('slot7');
+  });
+
+  it('persists a mouse binding across reloads, and drops a stored reserved one', () => {
+    const kb = new Keybinds();
+    kb.bind('slot3', 0, 'Mouse4');
+    expect(new Keybinds().codeAt('slot3', 0)).toBe('Mouse4');
+    // A hand-edited / legacy blob holding a reserved button must not load: the
+    // camera button would otherwise fire an ability on every click.
+    localStorage.setItem('woc_keybinds', JSON.stringify({ slot3: ['Mouse1', null] }));
+    const reloaded = new Keybinds();
+    expect(reloaded.codeAt('slot3', 0)).toBe(null);
+    expect(reloaded.edgeActionForCombo('Mouse1')).toBe(null);
+  });
+});
