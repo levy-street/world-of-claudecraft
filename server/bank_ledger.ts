@@ -388,6 +388,32 @@ export function recordGuildBankEscrowDeficit(
   ]);
 }
 
+// Record the residue a session ABANDONS: unflushed deltas whose character half
+// is already durable but whose book half never landed and never can, because
+// the session is gone (fenced out, or logged out with an escrow deficit still
+// outstanding). Same anomaly op and the same audit meaning as the deficit row
+// above; one row per abandoned delta, and there are normally one or two.
+export function recordGuildBankAbandonedDeltas(
+  who: { characterId: number; accountId: number },
+  guildId: number,
+  deltas: readonly {
+    op: string;
+    itemId: string | null;
+    count: number | null;
+    copperDelta: number;
+  }[],
+): void {
+  for (const d of deltas) {
+    const isItem = d.op === 'deposit' || d.op === 'withdraw';
+    recordGuildBankEscrowDeficit(who, guildId, {
+      kind: isItem ? 'missing_items' : 'treasury_underflow',
+      op: d.op,
+      itemId: isItem ? d.itemId : null,
+      shortfall: isItem ? Math.abs(Number(d.count) || 0) : Math.abs(d.copperDelta),
+    });
+  }
+}
+
 // The guild_create fee row (reserve-at-gate: the purse was charged at the
 // dispatch gate; the row is written only in the create's committed success
 // arm, which consumes that reservation). purchased_slots_after is 0: a

@@ -106,6 +106,7 @@ import {
   type GuildBankLedgerOp,
   guildCreateFeeDelta,
   recordBankOp,
+  recordGuildBankAbandonedDeltas,
   recordGuildBankDeltas,
   recordGuildBankEscrowDeficit,
 } from './bank_ledger';
@@ -3542,6 +3543,14 @@ export class GameServer {
     // serialization and removePlayer then discards that unsaved reward.
     this.sim.preparePlayerLeave(session.pid);
     await this.saveCharacterOnLeave(session);
+    // Whatever book work this session still holds can never commit now: it has
+    // no save left. Undo the part whose character half never landed, and
+    // record the part whose character half did (an escrow deficit that ran out
+    // of saves to retry on). The exhausted-retry arm inside saveCharacterOnLeave
+    // already cleared its own marks, so this is a no-op there.
+    if (session.dirtyGuildBanks.size > 0) {
+      this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
+    }
     this.sessionsByCharacterId.delete(session.characterId);
     // Release the per-character load lease so a fresh login (here or on another
     // process) can reload the character without waiting out the TTL. Order
@@ -4045,6 +4054,11 @@ export class GameServer {
       dead.settledGuildBankOps.delete(guildId);
       dead.guildBankDeficitSkips.delete(guildId);
       if (settled < log.length) this.sim.revertGuildBankDeltas(guildId, log.slice(settled));
+      // The settled prefix is the opposite case: its CHARACTER half is
+      // durable, so undoing it would credit the live book with value this
+      // character kept. It dies here unwritten, which is a permanent residue,
+      // so it goes into the ledger as an anomaly rather than vanishing.
+      if (settled > 0) recordGuildBankAbandonedDeltas(dead, guildId, log.slice(0, settled));
     }
   }
 

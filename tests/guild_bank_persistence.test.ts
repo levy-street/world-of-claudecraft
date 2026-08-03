@@ -1358,6 +1358,51 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     expect(priv(server).social.tx.beginGuildBankDelete(GUILD_ID)).toEqual({ copper: 0, items: 0 });
   });
 
+  it('a LEAVING session records the escrow deficit it can no longer retry', async () => {
+    // A transient deficit is retried on the next save; a session that logs out
+    // has no next save, so what it holds becomes permanent the moment it goes.
+    // The part whose character half never landed is undone from the live book;
+    // the part whose character half DID land (the settled prefix) is the
+    // residue, and it goes into bank_ledger as an anomaly instead of vanishing
+    // with the session object.
+    const server = new GameServer();
+    const a = joinServer(server, 1, 'ConsumerA').session;
+    const b = joinServer(server, 2, 'DepositorB').session;
+    officerSetup(server, a, 0);
+    moveToBanker(server, b.pid);
+    server.sim.setPlayerGuildMembership(b.pid, { guildId: GUILD_ID, rank: 'officer' });
+    const bMeta = server.sim.players.get(b.pid);
+    if (!bMeta) throw new Error('missing meta');
+    bMeta.copper = 500_000;
+    // B deposits (live only), A consumes it, A saves: A's own delta cannot be
+    // replayed onto a durable book that never got B's deposit.
+    dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 40_000 });
+    server.sim.setPlayerGuildMembership(a.pid, { guildId: GUILD_ID, rank: 'officer' });
+    dispatch(server, a, { cmd: 'guild_bank_withdraw_gold', amount: 40_000 });
+    await priv(server).saveCharacter(a);
+    expect(a.dirtyGuildBanks.has(GUILD_ID)).toBe(true); // held for a retry
+    expect(a.settledGuildBankOps.get(GUILD_ID)).toBe(1);
+    expect(durableBook()).toEqual({ treasury: 0, inventory: [], purchasedSlots: 24 });
+
+    // A logs out before B's deposit ever became durable.
+    dbMock.insertBankLedgerRow.mockClear();
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await priv(server).leave(a);
+    errSpy.mockRestore();
+    await bankLedgerIdle();
+    expect(a.dirtyGuildBanks.size).toBe(0);
+    const rows = dbMock.insertBankLedgerRow.mock.calls.map((c) => (c as unknown[])[0]);
+    expect(rows).toContainEqual(
+      expect.objectContaining({
+        op: 'escrow_deficit',
+        characterId: 1,
+        container: 'guild',
+        containerId: GUILD_ID,
+        copperDelta: -40_000,
+      }),
+    );
+  });
+
   it('an exhausted leave flush undoes the books it could never commit', async () => {
     // The leave save retries then gives up; the session tears down, so its
     // live-book mutations can never converge to durable truth and the guard
