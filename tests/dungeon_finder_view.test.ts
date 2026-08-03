@@ -46,6 +46,7 @@ function input(over: Partial<DungeonFinderViewInput> = {}): DungeonFinderViewInp
     playerId: 1,
     specRole: null,
     party: null,
+    partyLeaderName: null,
     lockouts: [],
     tab: 'catalogue',
     selectedActivityId: null,
@@ -300,6 +301,70 @@ describe('dungeon finder view core', () => {
       ),
     );
     expect(applied.board.listings[0].canApply).toBe(false);
+  });
+
+  it('hides premade groups the player is already part of (issue 2031)', () => {
+    const ownListing = {
+      id: 7,
+      activityId: 'hollow_crypt_normal',
+      leaderName: 'Lead',
+      tags: [],
+      size: 1,
+      capacity: 5,
+      needed: { tank: 0, healer: 1, dps: 3 },
+      members: [{ cls: 'warrior' as const, level: 8, role: 'tank' as const }],
+    };
+    const otherListing = {
+      id: 8,
+      activityId: 'hollow_crypt_normal',
+      leaderName: 'Someone Else',
+      tags: [],
+      size: 1,
+      capacity: 5,
+      needed: { tank: 0, healer: 1, dps: 3 },
+      members: [{ cls: 'priest' as const, level: 8, role: 'healer' as const }],
+    };
+
+    // I lead a listing: it never shows up in my own browse results.
+    const leaderView = live(
+      buildDungeonFinderView(
+        input({
+          tab: 'board',
+          board: [ownListing, otherListing],
+          info: makeInfo('sim', {
+            myListing: { id: 7, activityId: 'hollow_crypt_normal', tags: [], applicants: [] },
+          }),
+        }),
+      ),
+    );
+    expect(leaderView.board.listings.map((l) => l.id)).toEqual([8]);
+    // The browse-list filter is separate from the leader's own-listing panel: hiding id
+    // 7 from `listings` must not also drop it from `myListing`.
+    expect(leaderView.board.myListing).toEqual({
+      id: 7,
+      activityId: 'hollow_crypt_normal',
+      tags: [],
+      applicants: [],
+    });
+
+    // I am a party MEMBER (not the leader) of the listed group: still hidden.
+    const memberView = live(
+      buildDungeonFinderView(
+        input({
+          tab: 'board',
+          board: [ownListing, otherListing],
+          party: { leader: 99, size: 2 },
+          partyLeaderName: 'Lead',
+        }),
+      ),
+    );
+    expect(memberView.board.listings.map((l) => l.id)).toEqual([8]);
+
+    // Solo, no party, no listing of my own: everything stays visible.
+    const soloView = live(
+      buildDungeonFinderView(input({ tab: 'board', board: [ownListing, otherListing] })),
+    );
+    expect(soloView.board.listings.map((l) => l.id)).toEqual([7, 8]);
   });
 
   it('hides premade listings for a dungeon the viewer is locked out of (#2030)', () => {

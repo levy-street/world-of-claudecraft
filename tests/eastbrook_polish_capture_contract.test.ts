@@ -360,18 +360,18 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned, stacked causes: the local-gate-perf
-      // migration moved the lockfile leaf to pnpm-lock.yaml (a hashed input
-      // to every GLB source fingerprint, so the town, mailbox and
-      // noticeboard leaves all minted fresh), and the far-field work moved
-      // the renderer-integration leaf twice (the impostor bake + fog-free
+      // Deliberately re-pinned, stacked causes on the renderer-integration
+      // leaf: the far-field work moved it (the impostor bake + fog-free
       // vista split + horizonHazePlan band, then the #2793 review round:
-      // the vistaLive readiness gate, far-layer teardown in
-      // cancelTerrainStreaming, far-tile invalidation at stroke end, and
-      // the shared farFieldPolicy source). Not one Eastbrook pipeline
-      // input or geometry value changed, and no capture was retaken (the
-      // per-asset seal suites stay green untouched).
-      fingerprint: 'c23e850035e1c74a96c385e2d8832cd3fbbb312e34c369e42dd6855c5eb17d28',
+      // vistaLive readiness gate, far-layer teardown, stroke-end far-tile
+      // invalidation, the shared farFieldPolicy source) and the release
+      // moved it again gating the shapeshift-form visual swap on async
+      // compile (#2571); before that the local-gate-perf migration moved
+      // the lockfile leaf to pnpm-lock.yaml, re-minting every GLB source
+      // fingerprint. Not one Eastbrook pipeline input or geometry value
+      // changed, and no capture was retaken (the per-asset seal suites
+      // stay green untouched).
+      fingerprint: '40c318ca9a185aa39e9141c924b870d21a271c8f5fb72be868710952e00f3f3e',
       components: {
         captureContract: {
           id: 'polish-v2',

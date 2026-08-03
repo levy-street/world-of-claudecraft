@@ -4343,6 +4343,42 @@ export const TARGETS = [
       return { clip: '#bags' };
     },
   },
+  {
+    key: 'vale-cup-skill-deed-copy',
+    label: 'Book of Deeds: Vale Cup skill deeds spell out rated 3v3+ and the save floor (#2767)',
+    when: ['sim/content/deeds.ts', 'ui/deeds_window', 'ui/deeds_view', 'ui/deed_i18n'],
+    // Open the Book of Deeds on the pvp category and search the exact clause every
+    // silently-gated Vale Cup skill deed now shares, so the frame shows Hat Trick
+    // Hero, Safe Hands, and Nothing Gets Past Me together with their spelled-out
+    // rated/3v3+/save-floor conditions, not the whole (much longer) pvp category.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      // openDeeds occasionally does not stick on the very first call (seen on both
+      // a loaded shared sandbox and a clean CI runner): retry the open a few times
+      // rather than a single fire-and-poll, mirroring the p14-bag-glyphs target's
+      // check-before-toggle defensiveness above.
+      let opened = false;
+      for (let attempt = 0; attempt < 3 && !opened; attempt++) {
+        await page.evaluate(() => {
+          const el = document.querySelector('#deeds-window');
+          if (el) el.style.display = 'none';
+          window.__game?.hud?.openDeeds?.('pvp');
+        });
+        opened = await pollForSize(page, '#deeds-window', 10, 500);
+      }
+      if (!opened) {
+        throw new Error('deeds window did not open');
+      }
+      await page.evaluate(() => {
+        const input = document.querySelector('#deeds-window .deed-search');
+        if (!(input instanceof HTMLInputElement)) return;
+        input.value = '3v3 bracket or larger';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      await wait(400);
+      return { clip: '#deeds-window' };
+    },
+  },
 ];
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and

@@ -87,3 +87,22 @@ export class CompileGateQueue {
     return result;
   }
 }
+
+/**
+ * Clears a shared "which target is this pending swap for" token, but only if it
+ * still names `owner`. Some renderer.ts call sites reuse ONE EntityView field
+ * across a family of mutually exclusive gated swaps instead of one pending flag
+ * per swap target (e.g. shapeshift-form creation: sheep/bear/cat/travel share a
+ * single formCompilePending token because at most one of them is ever active or
+ * newly built per entity per frame). The shared CompileGateQueue runs gates one
+ * at a time, but a NEWER swap can still be registered while an OLDER one is
+ * still in flight (a fast form-to-form reswap before the first compile settles).
+ * Without this guard, the older gate's onSettled would clear the token as soon
+ * as it resolves, revealing the newer target before its own compile is done:
+ * exactly the freeze this gate exists to prevent. Passing the raw setter
+ * (`current => null`) instead of this guard is only safe when the field is
+ * dedicated to a single target, as mountCompilePending/visualCompilePending are.
+ */
+export function settlePendingSwap<T>(current: T | null, owner: T): T | null {
+  return current === owner ? null : current;
+}
