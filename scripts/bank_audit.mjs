@@ -493,7 +493,16 @@ async function main() {
     );
   }
 
-  const pool = new Pool({ connectionString: databaseUrl, max: 2 });
+  // A bounded statement timeout so a runaway seq scan on a large ledger can
+  // never hold a production connection open indefinitely (this is an offline
+  // operator tool pointed at a quiesced realm; failing loudly beats camping a
+  // connection). Pagination is a recorded deferral: revisit with a keyset
+  // cursor once bank_ledger reaches millions of rows.
+  const pool = new Pool({
+    connectionString: databaseUrl,
+    max: 2,
+    options: '-c statement_timeout=300000',
+  });
   try {
     const ledger = await pool.query(
       `SELECT id, realm, character_id, op, item_id, count, instance,
@@ -501,7 +510,11 @@ async function main() {
          FROM bank_ledger
         ORDER BY id`,
     );
-    const chars = await pool.query('SELECT id, realm, state FROM characters');
+    // Only the bank slice of each character blob: the audit reads nothing
+    // else, and buffering every full state blob is the expensive part.
+    const chars = await pool.query(
+      `SELECT id, realm, jsonb_build_object('bank', state->'bank') AS state FROM characters`,
+    );
     const characters = chars.rows.map((r) => ({ id: r.id, realm: r.realm, state: r.state }));
     // Guild books for the guild-container reconciliation (Guild Bank Phase 3).
     const banks = await pool.query('SELECT guild_id, realm, data FROM guild_banks');

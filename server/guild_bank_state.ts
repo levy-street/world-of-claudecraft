@@ -84,7 +84,10 @@ export function collectGuildBankSaves(
   guildIds: Iterable<number>,
 ): GuildBankSave[] {
   const saves: GuildBankSave[] = [];
-  for (const guildId of guildIds) {
+  // Ascending guild-id order so every escrow transaction locks guild_banks
+  // rows in one global order: two transactions carrying overlapping book
+  // sets can then never deadlock on reversed row-lock order.
+  for (const guildId of [...guildIds].sort((a, b) => a - b)) {
     const data = serialize(guildId);
     if (data === null || data === undefined) continue;
     saves.push({ guildId, data });

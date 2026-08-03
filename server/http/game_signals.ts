@@ -16,18 +16,20 @@
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values here are the ws-message direction (a fixed two) and the
-// inbound drop cause (the fixed six-value WS_DROP_CAUSES set). Nothing
+// inbound drop cause (the fixed seven-value WS_DROP_CAUSES set). Nothing
 // per-player (account id, character id, name, ip) is ever passed as a label.
 
 /** The two directions a ws frame is counted under: client-to-server or server-to-client. */
 export type WsMessageDirection = 'in' | 'out';
 
 /**
- * The fixed six causes an inbound ws frame can be dropped for: the two
+ * The fixed seven causes an inbound ws frame can be dropped for: the two
  * pre-parse gate causes (server/msg_rate_limit.ts), the three post-parse
- * lanes (server/msg_lanes.ts), and the list-read guard on the ignore/block
- * readouts (server/list_read_guard.ts). This closed set IS the cause label's
- * whole vocabulary; it never grows per-player or per-message.
+ * lanes (server/msg_lanes.ts), the list-read guard on the ignore/block
+ * readouts (server/list_read_guard.ts), and the guild-bank op guard
+ * (server/guild_bank_op_guard.ts, each allowed op is a keep-forever ledger
+ * write). This closed set IS the cause label's whole vocabulary; it never
+ * grows per-player or per-message.
  */
 export const WS_DROP_CAUSES = [
   'rate',
@@ -36,9 +38,10 @@ export const WS_DROP_CAUSES = [
   'lane_command',
   'lane_chat',
   'list_read',
+  'guild_bank',
 ] as const;
 
-/** One of the fixed six inbound drop causes. */
+/** One of the fixed seven inbound drop causes. */
 export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
 
 /**

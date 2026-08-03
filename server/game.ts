@@ -127,6 +127,7 @@ import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
   closePlaySession,
+  GUILD_BANK_ROW_MAX_BYTES,
   grantAccountMechChroma,
   grantAccountWeaponSkins,
   heartbeatCharacterLeases,
@@ -176,6 +177,11 @@ import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
+import {
+  consumeGuildBankOpToken,
+  createGuildBankOpGuard,
+  type GuildBankOpGuardState,
+} from './guild_bank_op_guard';
 import {
   collectGuildBankSaves,
   isMalformedGuildBankRow,
@@ -287,6 +293,10 @@ const LOCKPICK_ACTIONS = new Set<PickAction>(['hardSet', 'set', 'steady', 'ease'
 const LEAVE_SAVE_MAX_ATTEMPTS = 5;
 const LEAVE_SAVE_RETRY_BASE_MS = 250;
 const LEAVE_SAVE_RETRY_MAX_MS = 4000;
+// Queue depth past which the shared market serial writer warns (rate-limited
+// to once a minute): the observable form of the accepted dirty-book-autosave
+// coupling documented at the writer's declaration.
+const MARKET_WRITE_QUEUE_WARN_DEPTH = 16;
 // Usage notices for the two PLAYER chat-suppression tiers. Kept as constants
 // because the S3 localization guard scans sendChatNotice literals, and
 // src/ui/server_i18n.ts carries the matching rules. (A "mute" is the ADMIN
@@ -731,6 +741,11 @@ export interface ClientSession {
   // refusals above the far-above-human budget drop and tally into the same
   // abuse window.
   listReadGuard: ListReadGuardState;
+  // Token bucket for the five guild bank ops (Guild Bank Phase 3 QA): every
+  // allowed op is a keep-forever bank_ledger write plus an unflushed-delta
+  // log entry, so the rate is capped far above human banking cadence and
+  // refusals tally into the shared abuse window like every other shed frame.
+  guildBankOpGuard: GuildBankOpGuardState;
   chatMutedUntil: number | null;
   chatMuteReason: string;
   // Hard-word enforcement strike count driving the mute ladder. Account-scoped:
@@ -803,8 +818,16 @@ export interface ClientSession {
   // unflushed ops on the same book, these are surgically REVERTED from the
   // live book (Sim.revertGuildBankDeltas) instead of evict-and-reload, so the
   // dead session's orphaned ops can never ride another officer's save (the
-  // Phase 3 QA dupe fix) while the live session's ops survive.
+  // Phase 3 QA dupe fix) while the live session's ops survive. Bounded per
+  // guild by GUILD_BANK_UNFLUSHED_OP_CAP; overflow (only reachable while
+  // commits are failing for minutes at the guarded op rate) empties the log
+  // and flags the guild in revertLostGuildBanks.
   unflushedGuildBankOps: Map<number, GuildBankOpDelta[]>;
+  // Guilds whose unflushed-op log overflowed its cap: the surgical revert is
+  // no longer possible for this session, so the reconcile falls back to
+  // evict-and-reload from durable truth for them. Cleared when a successful
+  // commit drains the guild's dirty mark.
+  revertLostGuildBanks: Set<number>;
   // IP address at join time (from requestMetadata); used for per-IP session counting.
   ip: string;
   userAgent: string;
@@ -1482,7 +1505,32 @@ export class GameServer {
   // a queue their transactions could commit out of capture order and persist an
   // older snapshot over a newer one. Snapshots are captured inside the queued
   // thunk, so commit order equals capture order equals freshness order.
-  private readonly enqueueMarketWrite = createSerialWriter();
+  // ACCEPTED (Guild Bank Phase 3 QA, database-performance review): dirty-book
+  // character autosaves ALSO ride this one writer (the locked design: the
+  // leave flush writes market, mail, AND books in one transaction, so a
+  // second queue would reopen the interleaving this writer exists to
+  // prevent), which collapses their effective save concurrency to 1 and can
+  // queue a leave flush behind an autosave batch. The depth watch below makes
+  // that collapse loud; if the warn fires in production, the escalation path
+  // is a per-guild serializer for the autosave arm (state.md records it).
+  private readonly marketSerialWriter = createSerialWriter();
+  private marketWriteQueueDepth = 0;
+  private lastMarketQueueWarnMs = 0;
+  private readonly enqueueMarketWrite = <T>(write: () => Promise<T>): Promise<T> => {
+    this.marketWriteQueueDepth++;
+    if (
+      this.marketWriteQueueDepth > MARKET_WRITE_QUEUE_WARN_DEPTH &&
+      Date.now() - this.lastMarketQueueWarnMs > 60_000
+    ) {
+      this.lastMarketQueueWarnMs = Date.now();
+      console.warn(
+        `market serial writer queue depth ${this.marketWriteQueueDepth}: dirty-book autosaves are queueing behind the shared writer; escrow save latency is rising`,
+      );
+    }
+    return this.marketSerialWriter(write).finally(() => {
+      this.marketWriteQueueDepth--;
+    });
+  };
   private readonly enqueueRiftWrite = createSerialWriter();
   private restartCountdownStartedAt: number | null = null;
   private readonly restartCountdownTimers: NodeJS.Timeout[] = [];
@@ -2076,6 +2124,7 @@ export class GameServer {
         for (const s of this.sessionsByCharacterId.values()) {
           s.dirtyGuildBanks.delete(guildId);
           s.unflushedGuildBankOps.delete(guildId);
+          s.revertLostGuildBanks.delete(guildId);
         }
       },
       // The disband guard's read: the LIVE sim book's holdings (null with no
@@ -3095,6 +3144,7 @@ export class GameServer {
       msgRate: createMsgRateBucket(Date.now() / 1000),
       msgLanes: createMsgLanes(Date.now() / 1000),
       listReadGuard: createListReadGuard(Date.now() / 1000),
+      guildBankOpGuard: createGuildBankOpGuard(Date.now() / 1000),
       chatMutedUntil: meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null,
       chatMuteReason: meta.reason ?? '',
       chatStrikes: meta.chatStrikes ?? 0,
@@ -3103,6 +3153,7 @@ export class GameServer {
       guildStampSeq: 0,
       dirtyGuildBanks: new Map(),
       unflushedGuildBankOps: new Map(),
+      revertLostGuildBanks: new Set(),
       ignoredIds: new Set(),
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
@@ -3512,32 +3563,39 @@ export class GameServer {
       // index (and Steam, chained off it) never runs ahead of durable state.
       const recordUpTo = session.pendingDeedRecords.length;
       if (state && e) {
-        if (session.spectating) {
-          state.pos = {
-            x: session.spectating.savedPos.x,
-            z: session.spectating.savedPos.z,
-          };
-          state.pet = session.spectating.stowedPet;
-        }
-        if (session.jailVisit) {
-          state.pos = {
-            x: session.jailVisit.savedPos.x,
-            z: session.jailVisit.savedPos.z,
-          };
-          state.facing = session.jailVisit.savedFacing;
-          state.pet = session.jailVisit.stowedPet;
-        }
-        if (session.jailed) {
-          const jailPos = this.jailSpawnFor(session);
-          state.pos = { x: jailPos.x, z: jailPos.z };
-          state.jail = session.jailed;
-          state.dead = false;
-          state.ghost = false;
-          state.corpsePos = null;
-          state.hp = Math.max(1, state.hp);
-        } else {
-          delete state.jail;
-        }
+        // The session-position/jail fixups, applicable to ANY snapshot of this
+        // character (the T0 one below, or a re-serialized one inside the
+        // queued escrow thunk).
+        const applyFixups = (s: NonNullable<typeof state>): NonNullable<typeof state> => {
+          if (session.spectating) {
+            s.pos = {
+              x: session.spectating.savedPos.x,
+              z: session.spectating.savedPos.z,
+            };
+            s.pet = session.spectating.stowedPet;
+          }
+          if (session.jailVisit) {
+            s.pos = {
+              x: session.jailVisit.savedPos.x,
+              z: session.jailVisit.savedPos.z,
+            };
+            s.facing = session.jailVisit.savedFacing;
+            s.pet = session.jailVisit.stowedPet;
+          }
+          if (session.jailed) {
+            const jailPos = this.jailSpawnFor(session);
+            s.pos = { x: jailPos.x, z: jailPos.z };
+            s.jail = session.jailed;
+            s.dead = false;
+            s.ghost = false;
+            s.corpsePos = null;
+            s.hp = Math.max(1, s.hp);
+          } else {
+            delete s.jail;
+          }
+          return s;
+        };
+        applyFixups(state);
         // Use the SERIALIZED level (not e.level): during a 2v2 Fiesta bout e.level
         // is temporarily 20, but serializeCharacter reports the real level — so the
         // character-list/leaderboard `level` column never reflects the temp state.
@@ -3597,12 +3655,26 @@ export class GameServer {
           // both siblings ride the character-lease fence). Run through the
           // market queue and capture the market/book snapshots at write time
           // so this commit can't clobber newer ones.
-          saved = await this.enqueueMarketWrite(() =>
-            opts.withMarket
+          saved = await this.enqueueMarketWrite(() => {
+            // BOTH escrow halves are captured HERE, in one synchronous step at
+            // write time, after the serial-writer wait: an op dispatched
+            // during the wait mutates the live character AND the live book,
+            // so a character blob serialized before the wait paired with a
+            // book serialized inside it would commit two different instants
+            // (a deposit lands in both halves, a withdraw in neither: the
+            // Phase 3 QA database-review BLOCKING). Re-serializing may fail
+            // only if the player left mid-wait; then the T0 snapshot (whose
+            // ops are all pre-wait) is still self-consistent with the books
+            // its session could have dirtied. recordUpTo stays captured at
+            // T0: the fresher blob can only contain MORE than it publishes,
+            // never less (publish never runs ahead of durable state).
+            const fresh = this.sim.serializeCharacter(session.pid);
+            const snap = fresh ? applyFixups(fresh) : state;
+            return opts.withMarket
               ? saveCharacterAndMarketState(
                   session.characterId,
-                  state.level,
-                  state,
+                  snap.level,
+                  snap,
                   this.sim.serializeMarket(),
                   this.sim.serializeMail(),
                   session.leaseNonce,
@@ -3610,12 +3682,12 @@ export class GameServer {
                 )
               : saveCharacterAndGuildBankState(
                   session.characterId,
-                  state.level,
-                  state,
+                  snap.level,
+                  snap,
                   collectBooks(),
                   session.leaseNonce,
-                ),
-          );
+                );
+          });
         } else {
           saved = await saveCharacterState(
             session.characterId,
@@ -3667,6 +3739,9 @@ export class GameServer {
         for (const [guildId, seq] of carriedGuildBankSeqs) {
           if (session.dirtyGuildBanks.get(guildId) === seq) {
             session.dirtyGuildBanks.delete(guildId);
+            // Everything this session had done to the book is durable: the
+            // overflow flag (if any) no longer describes unflushed state.
+            session.revertLostGuildBanks.delete(guildId);
           }
           const committed = carriedGuildBankOpCounts.get(guildId) ?? 0;
           const log = session.unflushedGuildBankOps.get(guildId);
@@ -3797,6 +3872,17 @@ export class GameServer {
       );
       return;
     }
+    // Soft size watch (a quarter of the hard bound): a legitimate 48-slot
+    // book is a few KB, so a row this large is growing toward the skip bound
+    // (or corrupt-but-well-shaped) and deserves operator eyes BEFORE it trips
+    // the hard skip and goes inert.
+    for (const row of rows) {
+      if (!row.oversized && (row.dataBytes ?? 0) > GUILD_BANK_ROW_MAX_BYTES / 4) {
+        console.warn(
+          `guild bank row for guild ${row.guildId} is ${row.dataBytes} bytes (soft watch threshold ${GUILD_BANK_ROW_MAX_BYTES / 4}); it still loads, but investigate before it reaches the hard bound and goes inert`,
+        );
+      }
+    }
     const result = loadGuildBanksIntoSim(this.sim, rows);
     for (const guildId of result.oversized) {
       console.error(
@@ -3812,6 +3898,14 @@ export class GameServer {
       console.error(`guild bank book for guild ${guildId} failed to load into the sim`);
     }
   }
+
+  // Upper bound on one session's per-guild unflushed-op log (Guild Bank
+  // Phase 3 QA): at the guarded op rate (guild_bank_op_guard.ts) reaching it
+  // takes minutes of continuously failing commits. Overflow trades the
+  // surgical revert for the evict-and-reload reconcile rather than growing
+  // without bound during a DB outage. Pinned in
+  // tests/guild_bank_persistence.test.ts.
+  static readonly GUILD_BANK_UNFLUSHED_OP_CAP = 500;
 
   // Schedule a guild's book for the next fenced escrow save of this session.
   private markGuildBankDirty(session: ClientSession, guildId: number): void {
@@ -3872,27 +3966,46 @@ export class GameServer {
         }
       }
       const deadOps = dead.unflushedGuildBankOps.get(guildId) ?? [];
+      const revertLost = dead.revertLostGuildBanks.has(guildId);
       dead.dirtyGuildBanks.delete(guildId);
       dead.unflushedGuildBankOps.delete(guildId);
-      if (anotherSessionDirty) {
+      dead.revertLostGuildBanks.delete(guildId);
+      if (anotherSessionDirty && !revertLost) {
         // Surgical revert: undo ONLY the dead session's unflushed ops.
         this.sim.revertGuildBankDeltas(guildId, deadOps);
         continue;
       }
-      // Evict FIRST: if the reload read fails, an inert (absent) book is the
-      // fail-safe state; a book known to be ahead of durable truth is not.
+      // Either no other session is dirty, or this session's overflowed log
+      // makes the surgical revert impossible (revertLost): return the live
+      // book to durable truth. Evict FIRST: if the reload read fails, an
+      // inert (absent) book is the fail-safe state; a book known to be ahead
+      // of durable truth is not. The read retries like the boot load (this
+      // arm often runs exactly when the DB is sick, e.g. after an exhausted
+      // leave flush) so one failed logout cannot leave a guild's bank inert
+      // until restart on a single transient error.
       this.sim.evictGuildBank(guildId);
-      try {
-        const row = await loadGuildBankRow(guildId);
-        if (row.oversized || isMalformedGuildBankRow(row.data)) {
-          console.error(
-            `guild bank row for guild ${guildId} is oversized or malformed on reconcile; left unloaded`,
-          );
-          continue;
+      const attempts = 3;
+      for (let attempt = 1; attempt <= attempts; attempt++) {
+        try {
+          const row = await loadGuildBankRow(guildId);
+          if (row.oversized || isMalformedGuildBankRow(row.data)) {
+            console.error(
+              `guild bank row for guild ${guildId} is oversized or malformed on reconcile; left unloaded`,
+            );
+            break;
+          }
+          this.sim.loadGuildBank(guildId, row.data);
+          break;
+        } catch (err) {
+          if (attempt === attempts) {
+            console.error(
+              `guild bank reconcile failed for guild ${guildId} after ${attempts} attempts (left unloaded until restart; ops inert, guild deletion refused fail-closed):`,
+              err,
+            );
+          } else {
+            await new Promise((r) => setTimeout(r, 250 * attempt));
+          }
         }
-        this.sim.loadGuildBank(guildId, row.data);
-      } catch (err) {
-        console.error(`guild bank reconcile failed for guild ${guildId} (left unloaded):`, err);
       }
     }
   }
@@ -3931,6 +4044,13 @@ export class GameServer {
         craftedRecipeId: d.craftedRecipeId ?? null,
         copperDelta: d.copperDelta,
       });
+    }
+    if (log.length > GameServer.GUILD_BANK_UNFLUSHED_OP_CAP) {
+      // Overflow (commits failing for minutes): drop the surgical-revert
+      // capability for this session and let the reconcile evict-and-reload
+      // instead, keeping memory bounded.
+      log.length = 0;
+      session.revertLostGuildBanks.add(guildId);
     }
     session.unflushedGuildBankOps.set(guildId, log);
     recordGuildBankDeltas(op, session, guildId, deltas);
@@ -4562,6 +4682,21 @@ export class GameServer {
   private consumeListRead(session: ClientSession, nowSec: number): boolean {
     if (consumeListReadToken(session.listReadGuard, nowSec)) return true;
     gameMetricsCounters().wsMessageDropped('list_read');
+    if (tallyDrop(session.msgRate, nowSec) === 'kick') {
+      gameMetricsCounters().wsRateKick();
+      void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
+    }
+    return false;
+  }
+
+  /** Draw a guild-bank op guard token (Guild Bank Phase 3 QA): every allowed
+   *  op can write a keep-forever bank_ledger row, so ops above the
+   *  far-above-human budget are dropped and tally into the same abuse window
+   *  as every other shed frame, making a sustained ledger-write flood
+   *  kickable. Returns whether to run the op. */
+  private consumeGuildBankOp(session: ClientSession, nowSec: number): boolean {
+    if (consumeGuildBankOpToken(session.guildBankOpGuard, nowSec)) return true;
+    gameMetricsCounters().wsMessageDropped('guild_bank');
     if (tallyDrop(session.msgRate, nowSec) === 'kick') {
       gameMetricsCounters().wsRateKick();
       void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
@@ -5896,6 +6031,7 @@ export class GameServer {
       // rows (container='guild') and the dirty mark that schedules the book
       // for the fenced escrow save. A refusal diffs empty: no row, no mark.
       case 'guild_bank_deposit_gold':
+        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
         if (typeof msg.amount === 'number') {
           const amount = msg.amount;
           this.runGuildBankOp(session, pid, 'deposit_gold', () =>
@@ -5904,6 +6040,7 @@ export class GameServer {
         }
         break;
       case 'guild_bank_withdraw_gold':
+        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
         if (typeof msg.amount === 'number') {
           const amount = msg.amount;
           this.runGuildBankOp(session, pid, 'withdraw_gold', () =>
@@ -5912,6 +6049,7 @@ export class GameServer {
         }
         break;
       case 'guild_bank_deposit':
+        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
         if (typeof msg.slot === 'number') {
           const slot = msg.slot;
           const count = typeof msg.count === 'number' ? msg.count : undefined;
@@ -5921,6 +6059,7 @@ export class GameServer {
         }
         break;
       case 'guild_bank_withdraw':
+        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
         if (typeof msg.slot === 'number') {
           const slot = msg.slot;
           const count = typeof msg.count === 'number' ? msg.count : undefined;
@@ -5930,6 +6069,7 @@ export class GameServer {
         }
         break;
       case 'guild_bank_buy_slots':
+        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
         this.runGuildBankOp(session, pid, 'buy_slots', () => sim.guildBankBuySlotsFor(pid));
         break;
       // Book of Deeds: select/clear the displayed title. The sim validator

@@ -3215,6 +3215,12 @@ export interface GuildBankRow {
   // row is oversized (skipped; see the flag).
   data: unknown;
   oversized: boolean;
+  // Uncompressed serialized size of the stored blob (0 with no row): the boot
+  // load warns well below the hard bound, because a legitimate book is a few
+  // KB and a corrupt-but-well-shaped row far above that would otherwise load
+  // silently and be re-persisted by every save. Optional so test fixtures can
+  // omit it; both loaders always set it.
+  dataBytes?: number;
 }
 
 // Every guild on this realm with its bank book, for the boot load. LEFT JOIN
@@ -3222,24 +3228,45 @@ export interface GuildBankRow {
 // created before the guild bank shipped loads exactly like one created after.
 // The bound measures the UNCOMPRESSED serialized bytes (octet_length of the
 // text form): pg_column_size reports post-TOAST compressed size, which would
-// let a highly compressible multi-megabyte blob slip under the bound.
+// let a highly compressible multi-megabyte blob slip under the bound. The
+// length is computed ONCE per row (the LATERAL), because octet_length(::text)
+// detoasts and serializes the whole blob; keyset batches bound the per-
+// statement work and Node-side buffering, and the read rides the heavy
+// statement allowance like every other known-long boot read (a slow boot
+// must load the books, not fail into the all-banks-inert arm).
+export const GUILD_BANK_BOOT_BATCH = 500;
+
 export async function loadGuildBankRows(): Promise<GuildBankRow[]> {
-  const res = await pool.query(
-    `SELECT g.id AS guild_id,
-            (gb.guild_id IS NOT NULL) AS has_row,
-            COALESCE(octet_length(gb.data::text), 0) AS data_bytes,
-            CASE WHEN COALESCE(octet_length(gb.data::text), 0) <= $2 THEN gb.data ELSE NULL END
-              AS data
-       FROM guilds g LEFT JOIN guild_banks gb ON gb.guild_id = g.id
-      WHERE g.realm = $1
-      ORDER BY g.id`,
-    [REALM, GUILD_BANK_ROW_MAX_BYTES],
-  );
-  return res.rows.map((r) => ({
-    guildId: Number(r.guild_id),
-    data: r.data ?? null,
-    oversized: r.has_row === true && Number(r.data_bytes) > GUILD_BANK_ROW_MAX_BYTES,
-  }));
+  const out: GuildBankRow[] = [];
+  let lastId = 0;
+  for (;;) {
+    const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+      query(
+        `SELECT g.id AS guild_id,
+                (gb.guild_id IS NOT NULL) AS has_row,
+                b.data_bytes,
+                CASE WHEN b.data_bytes <= $2 THEN gb.data ELSE NULL END AS data
+           FROM guilds g
+           LEFT JOIN guild_banks gb ON gb.guild_id = g.id
+           LEFT JOIN LATERAL (SELECT COALESCE(octet_length(gb.data::text), 0) AS data_bytes) b
+             ON true
+          WHERE g.realm = $1 AND g.id > $3
+          ORDER BY g.id
+          LIMIT $4`,
+        [REALM, GUILD_BANK_ROW_MAX_BYTES, lastId, GUILD_BANK_BOOT_BATCH],
+      ),
+    );
+    for (const r of res.rows) {
+      out.push({
+        guildId: Number(r.guild_id),
+        data: r.data ?? null,
+        oversized: r.has_row === true && Number(r.data_bytes) > GUILD_BANK_ROW_MAX_BYTES,
+        dataBytes: Number(r.data_bytes) || 0,
+      });
+    }
+    if (res.rows.length < GUILD_BANK_BOOT_BATCH) return out;
+    lastId = Number(res.rows[res.rows.length - 1].guild_id);
+  }
 }
 
 // One guild's book row, for the fence-out reconcile (GameServer
@@ -3256,11 +3283,12 @@ export async function loadGuildBankRow(guildId: number): Promise<GuildBankRow> {
     [guildId, GUILD_BANK_ROW_MAX_BYTES],
   );
   const row = res.rows[0];
-  if (!row) return { guildId, data: null, oversized: false };
+  if (!row) return { guildId, data: null, oversized: false, dataBytes: 0 };
   return {
     guildId,
     data: row.data ?? null,
     oversized: Number(row.data_bytes) > GUILD_BANK_ROW_MAX_BYTES,
+    dataBytes: Number(row.data_bytes) || 0,
   };
 }
 

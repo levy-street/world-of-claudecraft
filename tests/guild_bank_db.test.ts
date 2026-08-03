@@ -16,6 +16,7 @@ vi.mock('pg', () => ({
 }));
 
 import {
+  GUILD_BANK_BOOT_BATCH,
   GUILD_BANK_ROW_MAX_BYTES,
   loadGuildBankRow,
   loadGuildBankRows,
@@ -193,10 +194,25 @@ describe('saveCharacterAndMarketState carrying guild books (the leave flush)', (
   });
 });
 
-describe('loadGuildBankRows (the bounded boot read)', () => {
+describe('loadGuildBankRows (the bounded, batched boot read)', () => {
+  // The boot read now rides runWithStatementTimeout (a client transaction
+  // carrying SET LOCAL statement_timeout on the HEAVY allowance): a slow boot
+  // must load the books, not fail into the all-banks-inert arm. The client
+  // stub answers the SELECT with the given rows per call.
+  function bootClient(pages: unknown[][]) {
+    let page = 0;
+    const query = vi.fn().mockImplementation((sql: string) => {
+      if (/SELECT g\.id/i.test(String(sql))) {
+        return Promise.resolve({ rows: pages[page++] ?? [], rowCount: 0 });
+      }
+      return Promise.resolve({ rows: [], rowCount: 0 });
+    });
+    return { query, release: vi.fn() };
+  }
+
   it('reads every realm guild via LEFT JOIN with the size bound applied IN SQL', async () => {
-    dbMock.query.mockResolvedValueOnce({
-      rows: [
+    const client = bootClient([
+      [
         { guild_id: 7, has_row: true, data_bytes: 120, data: BOOK },
         { guild_id: 8, has_row: false, data_bytes: 0, data: null }, // pre-feature guild
         {
@@ -206,30 +222,64 @@ describe('loadGuildBankRows (the bounded boot read)', () => {
           data: null, // the CASE bound already withheld the blob server-side
         },
       ],
-      rowCount: 3,
-    } as never);
+    ]);
+    dbMock.connect.mockResolvedValue(client as never);
 
     const rows = await loadGuildBankRows();
 
-    const [sql, params] = dbMock.query.mock.calls[0];
+    const sqls = client.query.mock.calls.map((c) => String(c[0]));
+    // The heavy statement allowance rides the read's transaction.
+    expect(sqls.some((s) => /SET LOCAL statement_timeout = 60000/.test(s))).toBe(true);
+    const selectCall = client.query.mock.calls.find((c) => /SELECT g\.id/i.test(String(c[0])));
+    const [sql, params] = selectCall as [string, unknown[]];
     expect(String(sql)).toContain('LEFT JOIN guild_banks');
     // octet_length of the TEXT form: the bound measures uncompressed bytes
     // (pg_column_size reports post-TOAST compressed size, which a highly
-    // compressible multi-megabyte blob slips under).
+    // compressible multi-megabyte blob slips under), and the expensive
+    // detoast-and-serialize is computed ONCE per row via the LATERAL, never
+    // twice.
     expect(String(sql)).toContain('octet_length(gb.data::text)');
+    expect((String(sql).match(/octet_length/g) ?? []).length).toBe(1);
+    expect(String(sql)).toContain('LATERAL');
     expect(String(sql)).not.toContain('pg_column_size');
     expect(String(sql)).toContain('g.realm = $1');
-    expect(params).toEqual([REALM, GUILD_BANK_ROW_MAX_BYTES]);
+    expect(params).toEqual([REALM, GUILD_BANK_ROW_MAX_BYTES, 0, GUILD_BANK_BOOT_BATCH]);
 
     // The row with a book hands the PARSED object through untouched; the
     // no-row guild reports data null (empty book downstream); the oversized
     // row is flagged so the boot load SKIPS it (never loads an empty book
     // over a real row).
     expect(rows).toEqual([
-      { guildId: 7, data: BOOK, oversized: false },
-      { guildId: 8, data: null, oversized: false },
-      { guildId: 9, data: null, oversized: true },
+      { guildId: 7, data: BOOK, oversized: false, dataBytes: 120 },
+      { guildId: 8, data: null, oversized: false, dataBytes: 0 },
+      {
+        guildId: 9,
+        data: null,
+        oversized: true,
+        dataBytes: GUILD_BANK_ROW_MAX_BYTES + 1,
+      },
     ]);
+  });
+
+  it('keyset-batches: a full page fetches the next page from the last guild id', async () => {
+    const fullPage = Array.from({ length: GUILD_BANK_BOOT_BATCH }, (_, i) => ({
+      guild_id: i + 1,
+      has_row: false,
+      data_bytes: 0,
+      data: null,
+    }));
+    const client = bootClient([
+      fullPage,
+      [{ guild_id: GUILD_BANK_BOOT_BATCH + 5, has_row: false, data_bytes: 0, data: null }],
+    ]);
+    dbMock.connect.mockResolvedValue(client as never);
+
+    const rows = await loadGuildBankRows();
+    expect(rows).toHaveLength(GUILD_BANK_BOOT_BATCH + 1);
+    const selects = client.query.mock.calls.filter((c) => /SELECT g\.id/i.test(String(c[0])));
+    expect(selects).toHaveLength(2);
+    // The second page resumes after the first page's last id.
+    expect((selects[1][1] as unknown[])[2]).toBe(GUILD_BANK_BOOT_BATCH);
   });
 
   it('pins the row bound itself (a silent widening would unbound the load)', () => {
@@ -246,16 +296,26 @@ describe('loadGuildBankRows (the bounded boot read)', () => {
     expect(String(sql)).toContain('FROM guild_banks');
     expect(String(sql)).toContain('octet_length(data::text)');
     expect(params).toEqual([7, GUILD_BANK_ROW_MAX_BYTES]);
-    expect(row).toEqual({ guildId: 7, data: BOOK, oversized: false });
+    expect(row).toEqual({ guildId: 7, data: BOOK, oversized: false, dataBytes: 99 });
   });
 
   it('loadGuildBankRow reports no-row as null data and an oversized row flagged', async () => {
     dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as never);
-    expect(await loadGuildBankRow(8)).toEqual({ guildId: 8, data: null, oversized: false });
+    expect(await loadGuildBankRow(8)).toEqual({
+      guildId: 8,
+      data: null,
+      oversized: false,
+      dataBytes: 0,
+    });
     dbMock.query.mockResolvedValueOnce({
       rows: [{ data_bytes: GUILD_BANK_ROW_MAX_BYTES + 1, data: null }],
       rowCount: 1,
     } as never);
-    expect(await loadGuildBankRow(9)).toEqual({ guildId: 9, data: null, oversized: true });
+    expect(await loadGuildBankRow(9)).toEqual({
+      guildId: 9,
+      data: null,
+      oversized: true,
+      dataBytes: GUILD_BANK_ROW_MAX_BYTES + 1,
+    });
   });
 });

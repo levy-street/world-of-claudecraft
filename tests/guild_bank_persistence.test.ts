@@ -24,6 +24,7 @@ const dbMock = vi.hoisted(() => ({
 
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
+  GUILD_BANK_ROW_MAX_BYTES: 262144,
   saveCharacterState: dbMock.saveCharacterState,
   saveCharacterAndGuildBankState: dbMock.saveCharacterAndGuildBankState,
   saveCharacterAndMarketState: dbMock.saveCharacterAndMarketState,
@@ -479,6 +480,128 @@ describe('the escrow save arm (GameServer.saveCharacter)', () => {
   });
 });
 
+describe('escrow snapshot consistency across the serial-writer wait', () => {
+  it('an op dispatched DURING the queue wait lands in both halves or neither, never one', async () => {
+    // The database-review BLOCKING: the character blob used to be serialized
+    // BEFORE the serial-writer wait while the book was serialized inside the
+    // queued thunk, so a deposit dispatched during the wait persisted the
+    // item in the bags snapshot (T0) AND the book snapshot (T1): a dupe on
+    // crash. Both halves are now captured in one synchronous step inside the
+    // thunk.
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'MidWait');
+    officerSetup(server, session);
+    server.sim.addItem('wolf_fang', 1);
+    // Pre-dirty the book so the save routes through the queued escrow path.
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1_000 });
+    // Occupy the shared serial writer so the save has a real queue wait.
+    let releaseWriter: (() => void) | undefined;
+    const blocker = new Promise<void>((resolve) => {
+      releaseWriter = resolve;
+    });
+    void priv(server).enqueueMarketWrite(() => blocker);
+    const savePromise = priv(server).saveCharacter(session);
+    // While the save waits on the queue, the officer deposits the item.
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    const idx = meta.inventory.findIndex((s) => s.itemId === 'wolf_fang');
+    dispatch(server, session, { cmd: 'guild_bank_deposit', slot: idx });
+    releaseWriter?.();
+    await savePromise;
+    const [, , state, books] = dbMock.saveCharacterAndGuildBankState.mock.calls[0] as unknown as [
+      number,
+      number,
+      { inventory: { itemId: string }[] },
+      { guildId: number; data: { inventory: { itemId: string }[] } }[],
+    ];
+    const inBags = state.inventory.some((s) => s.itemId === 'wolf_fang');
+    const inBook = books[0]?.data.inventory.some((s) => s.itemId === 'wolf_fang') ?? false;
+    // One copy total across the committed transaction: in the book, not the bags.
+    expect(inBook).toBe(true);
+    expect(inBags).toBe(false);
+    // The mid-wait op was fully captured, so its mark and log are consumed.
+    expect(session.dirtyGuildBanks.size).toBe(0);
+    expect(session.unflushedGuildBankOps.size).toBe(0);
+  });
+});
+
+describe('the guild bank op guard (the keep-forever ledger write meter)', () => {
+  const dispatchAt = (
+    server: GameServer,
+    session: ClientSession,
+    msg: Record<string, unknown>,
+    receivedAtMs: number,
+  ) =>
+    priv(server).dispatchMessage(session, { t: 'cmd', ...msg }, JSON.stringify(msg), receivedAtMs);
+
+  it('caps a ledger-write flood at the bucket and refills over time', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Flooder');
+    officerSetup(server, session);
+    const t0 = Date.now();
+    // The burst allows 10 ops; the 11th (same instant) is dropped before the
+    // sim runs, so it writes no ledger row and moves no copper.
+    for (let i = 0; i < 11; i++) {
+      dispatchAt(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1 }, t0);
+    }
+    expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(100_010);
+    await bankLedgerIdle();
+    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(10);
+    // Two tokens per second of refill: five seconds later the next op runs.
+    // The awaited ledger idle let the join-time social snapshot resolve
+    // against the EMPTY mocked social DB, which re-stamped membership null
+    // (correct server behavior; not under test here): re-stamp the officer.
+    server.sim.setPlayerGuildMembership(session.pid, { guildId: GUILD_ID, rank: 'officer' });
+    dispatchAt(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1 }, t0 + 5_000);
+    expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(100_011);
+  });
+});
+
+describe('the unflushed-op log cap (bounded memory under a failing DB)', () => {
+  it('pins the cap and falls back to evict-and-reload once the surgical revert is lost', async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: reading a private static pin
+    expect((GameServer as any).GUILD_BANK_UNFLUSHED_OP_CAP).toBe(500);
+    const server = new GameServer();
+    const a = joinServer(server, 1, 'Overflow').session;
+    const b = joinServer(server, 2, 'OtherDirty').session;
+    officerSetup(server, a);
+    moveToBanker(server, b.pid);
+    server.sim.setPlayerGuildMembership(b.pid, { guildId: GUILD_ID, rank: 'officer' });
+    const bMeta = server.sim.players.get(b.pid);
+    if (!bMeta) throw new Error('missing meta');
+    bMeta.copper = 50_000;
+    dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 1_000 });
+    // Fill A's log to the cap, then one more op overflows it: the log empties
+    // and the surgical revert is marked lost for that guild.
+    const synthetic = Array.from({ length: 500 }, () => ({
+      op: 'deposit_gold' as const,
+      itemId: null,
+      count: null,
+      instance: null,
+      copperDelta: 1,
+    }));
+    a.unflushedGuildBankOps.set(GUILD_ID, [...synthetic]);
+    dispatch(server, a, { cmd: 'guild_bank_deposit_gold', amount: 500 });
+    expect(a.unflushedGuildBankOps.get(GUILD_ID) ?? []).toEqual([]);
+    expect(a.revertLostGuildBanks.has(GUILD_ID)).toBe(true);
+    // A fences out while B is dirty: with the revert lost, the reconcile must
+    // NOT skip (that resurrects the dupe) and must NOT trust a partial log;
+    // it falls back to evict-and-reload from durable truth.
+    const durable = { treasury: 100_000, inventory: [], purchasedSlots: 0 };
+    dbMock.loadGuildBankRow.mockResolvedValueOnce({
+      guildId: GUILD_ID,
+      data: durable,
+      oversized: false,
+    });
+    a.leaseNonce = 'stale-nonce';
+    dbMock.saveCharacterAndGuildBankState.mockResolvedValueOnce(false);
+    await priv(server).saveCharacter(a);
+    expect(dbMock.loadGuildBankRow).toHaveBeenCalledTimes(1);
+    expect(server.sim.guildBanks.get(GUILD_ID)).toEqual(durable);
+    expect(a.revertLostGuildBanks.has(GUILD_ID)).toBe(false);
+  });
+});
+
 describe('collectGuildBankSaves (the null-serialize skip, unit)', () => {
   it('skips null serializations and keeps real books', () => {
     const books = new Map<number, GuildBankState>([
@@ -487,6 +610,34 @@ describe('collectGuildBankSaves (the null-serialize skip, unit)', () => {
     expect(collectGuildBankSaves((gid) => books.get(gid) ?? null, [7, 8])).toEqual([
       { guildId: 7, data: { treasury: 5, inventory: [], purchasedSlots: 0 } },
     ]);
+  });
+
+  it('emits saves in ascending guild-id order (the global row-lock order)', () => {
+    // Two escrow transactions carrying overlapping book sets must lock
+    // guild_banks rows in one global order or they can deadlock.
+    const book = { treasury: 1, inventory: [], purchasedSlots: 0 };
+    const saves = collectGuildBankSaves(() => book, [9, 3, 7]);
+    expect(saves.map((s) => s.guildId)).toEqual([3, 7, 9]);
+  });
+});
+
+describe('the reconcile read retry (one failed logout must not disable a bank)', () => {
+  it('retries a transient loadGuildBankRow failure and reloads on a later attempt', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Retry');
+    officerSetup(server, session);
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
+    const durable = { treasury: 100_000, inventory: [], purchasedSlots: 0 };
+    dbMock.loadGuildBankRow
+      .mockRejectedValueOnce(new Error('transient'))
+      .mockResolvedValueOnce({ guildId: GUILD_ID, data: durable, oversized: false });
+    session.leaseNonce = 'stale-nonce';
+    dbMock.saveCharacterAndGuildBankState.mockResolvedValueOnce(false);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await priv(server).saveCharacter(session);
+    errSpy.mockRestore();
+    expect(dbMock.loadGuildBankRow).toHaveBeenCalledTimes(2);
+    expect(server.sim.guildBanks.get(GUILD_ID)).toEqual(durable);
   });
 });
 
