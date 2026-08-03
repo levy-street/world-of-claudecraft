@@ -206,7 +206,7 @@ describe('post-entry mob-body streaming (packaged iOS)', () => {
     // The preview gate sweeps the GATE set, so the launcher never awaits or
     // re-fetches streamed content.
     expect(assetsSource).toContain(
-      'const preloadUrls = allPreloadUrls.filter((u) => !streamedUrlSet.has(u));',
+      'const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));',
     );
   });
 
@@ -262,7 +262,7 @@ describe('post-entry mob-body streaming (packaged iOS)', () => {
   it('extracts props and foliage as they land on the packaged shell', () => {
     const propsSource = read('../src/render/props.ts');
     const foliageSource = read('../src/render/foliage.ts');
-    expect(propsSource).toContain('if (GFX.nativeIosMemoryProfile) propAsset(key as PropKey);');
+    expect(propsSource).toContain('if (GFX.nativeIosMemoryProfile) propAsset(key);');
     expect(foliageSource).toContain('if (GFX.nativeIosMemoryProfile) extractParts(url);');
   });
 });

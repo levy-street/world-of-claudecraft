@@ -41,6 +41,8 @@ export interface GraphicsRebuildCoordinatorDeps<
   ): Promise<void>;
   /** Tear down secondary portrait/preview contexts after target assets are ready. */
   resetAuxiliaryRenderers(): void;
+  /** Capture the same-context pair before terminal shutdown can partially fail. */
+  captureRendererContext(renderer: Renderer): RecycledContext;
   shutdownRenderer(renderer: Renderer): Promise<RecycledContext>;
   recycleContext(recycled: RecycledContext): Promise<RecycledContext>;
   activateProfile(settings: Settings): number;
@@ -169,8 +171,8 @@ export class GraphicsRebuildCoordinator<
   ): Promise<GraphicsRebuildOutcome> {
     let recycled: RecycledContext | null = null;
     let candidate: Renderer | null = null;
-    let oldRendererStopped = false;
-    let auxiliaryRenderersReset = false;
+    let oldRendererShutdownStarted = false;
+    let auxiliaryRenderersResetAttempted = false;
 
     try {
       this.deps.setClientPaused(true);
@@ -194,12 +196,16 @@ export class GraphicsRebuildCoordinator<
       );
       this.assertCurrent(generation);
       this.deps.markCrashPhase('assets-prepared', from, target, generation);
+      // Both operations can tear down part of their owned surface before they
+      // throw. Mark the attempt first so recovery never republishes a partial
+      // client as though the operation had not started.
+      auxiliaryRenderersResetAttempted = true;
       this.deps.resetAuxiliaryRenderers();
-      auxiliaryRenderersReset = true;
 
       // Target assets are ready before the old renderer gives up the context.
+      recycled = this.deps.captureRendererContext(oldRenderer);
+      oldRendererShutdownStarted = true;
       recycled = await this.deps.shutdownRenderer(oldRenderer);
-      oldRendererStopped = true;
       this.assertCurrent(generation);
       this.deps.markCrashPhase('renderer-stopped', from, target, generation);
       recycled = await this.deps.recycleContext(recycled);
@@ -217,13 +223,13 @@ export class GraphicsRebuildCoordinator<
       this.finishRecoverable(target);
       return { status: 'applied' };
     } catch (cause) {
-      if (!oldRendererStopped) {
+      if (!oldRendererShutdownStarted) {
         // Asset/curtain failures leave the old renderer and old persisted
         // settings untouched. If secondary contexts had already been reset,
         // recommit the still-live renderer so its consumers and previews are
         // restored before the curtain lifts.
         try {
-          if (auxiliaryRenderersReset) this.deps.commit(oldRenderer, from);
+          if (auxiliaryRenderersResetAttempted) this.deps.commit(oldRenderer, from);
           this.finishRecoverable(from);
           return { status: 'rolled-back', cause };
         } catch (restoreCause) {

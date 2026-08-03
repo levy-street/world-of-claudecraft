@@ -1628,6 +1628,16 @@ export const gfxInternalsForTest = {
   stableFingerprintValue,
   mobilePlatformFromNavigator,
   probeGpuRenderer,
+  overrideSettings: (overrides: Partial<GfxSettings>): (() => void) => {
+    const previous = GFX;
+    GFX = deepFreeze({ ...GFX, ...overrides });
+    let restored = false;
+    return () => {
+      if (restored) return;
+      restored = true;
+      GFX = previous;
+    };
+  },
   resetGpuRendererProbe: () => {
     gpuRendererProbed = false;
     probedGpuRenderer = undefined;

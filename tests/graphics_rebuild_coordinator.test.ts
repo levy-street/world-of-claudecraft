@@ -6,7 +6,7 @@ import {
 } from '../src/game/graphics_rebuild_coordinator';
 
 type Snapshot = Readonly<{ graphicsPreset: number; terrainDetail: number }>;
-type FakeRenderer = { id: string };
+type FakeRenderer = { id: string; stopped?: boolean };
 type FakeContext = { id: string };
 
 const OLD: Snapshot = { graphicsPreset: 3, terrainDetail: 2 };
@@ -38,6 +38,10 @@ function fixture(
       progress(1, 1);
     },
     resetAuxiliaryRenderers: () => events.push('aux:reset'),
+    captureRendererContext: (renderer) => {
+      events.push(`context:capture:${renderer.id}`);
+      return { id: `context:${renderer.id}` };
+    },
     shutdownRenderer: async (renderer) => {
       events.push(`shutdown:${renderer.id}`);
       return { id: `context:${renderer.id}` };
@@ -70,6 +74,7 @@ function fixture(
       events.push(`validate:${renderer.id}`);
     },
     commit: (renderer, next) => {
+      if (renderer.stopped) throw new Error('cannot commit a stopped renderer');
       events.push(`commit:${renderer.id}:${next.graphicsPreset}`);
       current = renderer;
       settings = next;
@@ -133,6 +138,7 @@ describe('GraphicsRebuildCoordinator', () => {
       'assets',
       'crash:assets-prepared',
       'aux:reset',
+      'context:capture:old',
       'shutdown:old',
       'crash:renderer-stopped',
       'recycle:context:old',
@@ -182,6 +188,52 @@ describe('GraphicsRebuildCoordinator', () => {
     });
     expect(f.events).not.toContain('shutdown:old');
     expect(f.current().id).toBe('old');
+    expect(f.settings()).toBe(OLD);
+  });
+
+  it('restores auxiliary renderers when the second reset throws after the first teardown', async () => {
+    const problem = new Error('portrait reset failed');
+    let resets = 0;
+    const f = fixture({
+      resetAuxiliaryRenderers: () => {
+        resets++;
+        resets++;
+        throw problem;
+      },
+    });
+
+    await expect(f.coordinator.rebuild(TARGET)).resolves.toEqual({
+      status: 'rolled-back',
+      cause: problem,
+    });
+    expect(resets).toBe(2);
+    expect(f.events).toContain('commit:old:3');
+    expect(f.events).not.toContain('shutdown:old');
+    expect(f.current().id).toBe('old');
+  });
+
+  it('rebuilds the old profile when shutdown rejects after the renderer became unusable', async () => {
+    const problem = new Error('shutdown disposal failed');
+    let stoppedRendererId: string | null = null;
+    const f = fixture({
+      shutdownRenderer: async (renderer) => {
+        stoppedRendererId = renderer.id;
+        renderer.stopped = true;
+        throw problem;
+      },
+    });
+
+    await expect(f.coordinator.rebuild(TARGET)).resolves.toEqual({
+      status: 'rolled-back',
+      cause: problem,
+    });
+    expect(stoppedRendererId).toBe('old');
+    expect(f.events).toContain('context:capture:old');
+    expect(f.events).toContain('recycle:context:old');
+    expect(f.events).toContain('activate:3');
+    expect(f.events).toContain('build:3:context:old');
+    expect(f.events).toContain('commit:build-1:3');
+    expect(f.current().id).toBe('build-1');
     expect(f.settings()).toBe(OLD);
   });
 

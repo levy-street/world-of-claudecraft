@@ -56,6 +56,14 @@ export interface UiEffectsInput {
  */
 export const EFFECTS_QUALITY_LOW_CUTOFF = 0.5;
 
+/** The loading curtain's normal opacity duration, also mirrored in shell.css. */
+export const LOADING_CURTAIN_FADE_MS = 350;
+
+/** Reduced motion removes the curtain synchronously instead of waiting on a visual fade. */
+export function loadingCurtainFadeMs(reduceMotion: boolean): number {
+  return reduceMotion ? 0 : LOADING_CURTAIN_FADE_MS;
+}
+
 /**
  * Resolve the UI effects profile from the static preset label, the effectsQuality
  * slider, and the effective reduced-motion flag. Pure: same input always yields the

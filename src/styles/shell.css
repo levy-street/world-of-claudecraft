@@ -1992,7 +1992,7 @@
     justify-content: space-between;
     padding: 6vh 0 7vh;
     opacity: 1;
-    transition: opacity 0.35s ease;
+    transition: opacity calc(0.35s * var(--motion-scale)) ease;
   }
   #loading-screen.visible {
     display: flex;
@@ -2027,7 +2027,13 @@
     height: 100%;
     width: 0%;
     background: linear-gradient(180deg, var(--color-primary), var(--color-primary-dim));
-    transition: width 0.2s ease;
+    transition: width calc(0.2s * var(--motion-scale)) ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #loading-screen,
+    #ls-fill {
+      transition: none;
+    }
   }
   #ls-status {
     color: var(--color-text-light);

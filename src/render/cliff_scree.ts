@@ -68,7 +68,9 @@ function loadRocks(): Promise<void> {
   return rocksReady;
 }
 
-export function prepareCliffScreeProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+export function prepareCliffScreeProfileAssets(
+  target: Pick<GfxSettings, 'cliffScree'>,
+): Promise<void> {
   return target.cliffScree ? loadRocks() : Promise.resolve();
 }
 
@@ -170,14 +172,17 @@ function bakeRocks(): BakedRocks | null {
   return baked;
 }
 
-export function buildCliffScree(seed: number): CliffScreeView {
+export function buildCliffScree(
+  seed: number,
+  settings: Pick<GfxSettings, 'cliffScree'> = GFX,
+): CliffScreeView {
   const group = new THREE.Group();
   group.name = 'cliffScree';
   // Form shadows are the whole point of the scatter, and it is one of the
   // graphics-overhaul detail layers: HIGH AND UP only (GFX.detailLayers).
   // Medium keeps its pre-overhaul look and frame budget (the round-10 medium
   // regate). The omitted dressing does not alter the shared walkable surface.
-  if (!GFX.cliffScree) {
+  if (!settings.cliffScree) {
     return { group, update: () => undefined, invalidate: () => undefined };
   }
 

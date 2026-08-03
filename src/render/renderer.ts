@@ -2736,45 +2736,35 @@ export class Renderer {
   private disposeRendererResources(): void {
     if (this.rendererResourcesDisposed) return;
     this.rendererResourcesDisposed = true;
-    try {
-      this.post?.dispose();
-    } catch {
-      // Best-effort cleanup must continue through partially built passes.
-    }
+    const cleanupErrors: unknown[] = [];
+    const bestEffort = (cleanup: () => void): void => {
+      try {
+        cleanup();
+      } catch (error) {
+        cleanupErrors.push(error);
+      }
+    };
+
+    bestEffort(() => this.post?.dispose());
     this.post = null;
-    try {
-      this.prewarmRenderTarget?.dispose();
-    } catch {
-      // Best effort.
-    }
+    bestEffort(() => this.prewarmRenderTarget?.dispose());
     this.prewarmRenderTarget = null;
-    try {
-      this.pmremGenerator?.dispose();
-    } catch {
-      // Best effort.
-    }
+    bestEffort(() => this.pmremGenerator?.dispose());
     this.pmremGenerator = null;
     for (const target of this.envRTs.values()) {
-      try {
-        target.dispose();
-      } catch {
-        // Best effort.
-      }
+      bestEffort(() => target.dispose());
     }
     this.envRTs.clear();
     for (const material of this.prewarmDepthMaterials.values()) {
-      try {
-        material.dispose();
-      } catch {
-        // Best effort.
-      }
+      bestEffort(() => material.dispose());
     }
     this.prewarmDepthMaterials.clear();
-    for (const bubble of this.chatBubbles.values()) bubble.el.remove();
+    for (const bubble of this.chatBubbles.values()) bestEffort(() => bubble.el.remove());
     this.chatBubbles.clear();
-    for (const id of [...this.views.keys()]) this.removeView(id, true);
+    for (const id of [...this.views.keys()]) bestEffort(() => this.removeView(id, true));
+    this.views.clear();
     for (const pool of this.visualPool.values()) {
-      for (const visual of pool) visual.dispose();
+      for (const visual of pool) bestEffort(() => visual.dispose());
     }
     this.visualPool.clear();
     this.pooledVisualCount = 0;
@@ -2784,24 +2774,20 @@ export class Renderer {
     this.viewLights.length = 0;
     // The layer is renderer-owned. Clearing it catches a pending DocumentFragment
     // batch or any renderer DOM surface added after the explicit maps above.
-    this.nameplateLayer.replaceChildren();
-    try {
-      this.travelSpeedFx?.dispose();
-    } catch {
-      // Best effort.
-    }
-    this.scene.clear();
+    bestEffort(() => this.nameplateLayer.replaceChildren());
+    bestEffort(() => this.travelSpeedFx?.dispose());
+    bestEffort(() => this.scene.clear());
     const webgl = this.webgl as THREE.WebGLRenderer | undefined;
-    if (!webgl) return;
-    try {
-      webgl.setAnimationLoop(null);
-    } catch {
-      // Best effort.
+    if (webgl) {
+      bestEffort(() => webgl.setAnimationLoop(null));
+      bestEffort(() => webgl.dispose());
     }
-    try {
-      webgl.dispose();
-    } catch {
-      // Best effort.
+    if (cleanupErrors.length > 0) {
+      try {
+        console.warn('Renderer terminal cleanup completed with failures', cleanupErrors);
+      } catch {
+        // Reporting must not turn terminal best-effort cleanup into a rejection.
+      }
     }
   }
 
@@ -7157,6 +7143,18 @@ export class Renderer {
     );
   }
 
+  private recoverRejectedCompileGate(
+    error: unknown,
+    generation: number,
+    restore: () => void,
+  ): void {
+    // Shutdown rejects queued GPU work on purpose. A stale completion must not
+    // mutate the next renderer generation or produce a misleading live error.
+    if (this.shutdownStarted || generation !== this.lifecycleGeneration) return;
+    restore();
+    console.error('Live shader compile gate failed', error);
+  }
+
   // Generic anti-freeze layer. A freshly-streamed view links its shader programs
   // SYNCHRONOUSLY on first draw - a 50-1700ms frame stall (the open-world travel
   // hitch). Instead link them OFF the main thread and keep the view hidden until
@@ -7168,6 +7166,7 @@ export class Renderer {
   private gateViewOnCompile(view: EntityView, group: THREE.Group): Promise<void> | null {
     if (!this.asyncCompileSupported) return null;
     const generation = this.lifecycleGeneration;
+    const priorVisibility = group.visible;
     view.compilePending = true;
     group.visible = false;
     // The DOM nameplate, target marker, health, and cast bar remain available
@@ -7179,7 +7178,12 @@ export class Renderer {
           view.compilePending = false;
         }
       },
-      () => {},
+      (error) => {
+        this.recoverRejectedCompileGate(error, generation, () => {
+          view.compilePending = false;
+          group.visible = priorVisibility;
+        });
+      },
     );
   }
 
@@ -7203,7 +7207,11 @@ export class Renderer {
           target.visible = true;
         }
       },
-      () => {},
+      (error) => {
+        this.recoverRejectedCompileGate(error, generation, () => {
+          target.visible = true;
+        });
+      },
     );
   }
 
@@ -7225,7 +7233,9 @@ export class Renderer {
       () => {
         if (!this.shutdownStarted && generation === this.lifecycleGeneration) onSettled();
       },
-      () => {},
+      (error) => {
+        this.recoverRejectedCompileGate(error, generation, onSettled);
+      },
     );
   }
 

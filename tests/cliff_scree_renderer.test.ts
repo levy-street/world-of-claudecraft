@@ -57,65 +57,55 @@ afterEach(() => {
 describe('cliff scree renderer', () => {
   it('gates the view by tier, places instanced rocks, and can invalidate unchanged slots', async () => {
     mocks.loadGltf.mockImplementation(() => Promise.resolve(rockGltf()));
-    const { GFX } = await import('../src/render/gfx');
-    const original = GFX.cliffScree;
-    const mutableGfx = GFX as unknown as { cliffScree: boolean };
-    try {
-      mutableGfx.cliffScree = false;
-      const module = await import('../src/render/cliff_scree');
-      await Promise.all(mocks.registerPreload.mock.calls.map(([promise]) => promise));
+    const module = await import('../src/render/cliff_scree');
+    await Promise.all(mocks.registerPreload.mock.calls.map(([promise]) => promise));
 
-      const low = module.buildCliffScree(1337);
-      expect(low.group.children).toEqual([]);
-      expect(() => low.invalidate()).not.toThrow();
+    const low = module.buildCliffScree(1337, { cliffScree: false });
+    expect(low.group.children).toEqual([]);
+    expect(() => low.invalidate()).not.toThrow();
 
-      mutableGfx.cliffScree = true;
-      const high = module.buildCliffScree(1337);
-      expect(high.group.children).toHaveLength(3);
-      expect(high.group.children.every((child) => child instanceof THREE.InstancedMesh)).toBe(true);
+    await module.prepareCliffScreeProfileAssets({ cliffScree: true });
+    const high = module.buildCliffScree(1337, { cliffScree: true });
+    expect(high.group.children).toHaveLength(3);
+    expect(high.group.children.every((child) => child instanceof THREE.InstancedMesh)).toBe(true);
 
-      for (let pass = 0; pass < 8; pass++) high.update(0, 0);
-      const meshes = high.group.children as THREE.InstancedMesh[];
-      expect(meshes.map((mesh) => mesh.count)).toEqual(expectedCountsAt(1337, 0, 0, meshes.length));
-      expect(
-        meshes.every((mesh) =>
-          mesh.instanceMatrix.updateRanges.some(
-            (range) => range.start === 0 && range.count === mesh.count * 16,
-          ),
+    for (let pass = 0; pass < 8; pass++) high.update(0, 0);
+    const meshes = high.group.children as THREE.InstancedMesh[];
+    expect(meshes.map((mesh) => mesh.count)).toEqual(expectedCountsAt(1337, 0, 0, meshes.length));
+    expect(
+      meshes.every((mesh) =>
+        mesh.instanceMatrix.updateRanges.some(
+          (range) => range.start === 0 && range.count === mesh.count * 16,
         ),
-      ).toBe(true);
-      const matrix = new THREE.Matrix4();
-      let visibleInstances = 0;
-      for (const mesh of meshes) {
-        for (let index = 0; index < mesh.count; index++) {
-          mesh.getMatrixAt(index, matrix);
-          expect(Math.abs(matrix.determinant())).toBeGreaterThan(1e-8);
-          visibleInstances++;
-        }
+      ),
+    ).toBe(true);
+    const matrix = new THREE.Matrix4();
+    let visibleInstances = 0;
+    for (const mesh of meshes) {
+      for (let index = 0; index < mesh.count; index++) {
+        mesh.getMatrixAt(index, matrix);
+        expect(Math.abs(matrix.determinant())).toBeGreaterThan(1e-8);
+        visibleInstances++;
       }
-      expect(visibleInstances).toBeGreaterThan(0);
-
-      const versions = meshes.map((mesh) => mesh.instanceMatrix.version);
-      high.update(0, 0);
-      expect(meshes.map((mesh) => mesh.instanceMatrix.version)).toEqual(versions);
-
-      // Walking reassigns live slots to empty cells as well as the reverse.
-      // Exact second-position counts prove stale matrices cannot survive.
-      const movedX = SCREE_CELL * 7;
-      const movedZ = SCREE_CELL * 5;
-      for (let pass = 0; pass < 8; pass++) high.update(movedX, movedZ);
-      expect(meshes.map((mesh) => mesh.count)).toEqual(
-        expectedCountsAt(1337, movedX, movedZ, meshes.length),
-      );
-
-      high.invalidate();
-      high.update(movedX, movedZ);
-      expect(meshes.every((mesh, index) => mesh.instanceMatrix.version > versions[index])).toBe(
-        true,
-      );
-    } finally {
-      mutableGfx.cliffScree = original;
     }
+    expect(visibleInstances).toBeGreaterThan(0);
+
+    const versions = meshes.map((mesh) => mesh.instanceMatrix.version);
+    high.update(0, 0);
+    expect(meshes.map((mesh) => mesh.instanceMatrix.version)).toEqual(versions);
+
+    // Walking reassigns live slots to empty cells as well as the reverse.
+    // Exact second-position counts prove stale matrices cannot survive.
+    const movedX = SCREE_CELL * 7;
+    const movedZ = SCREE_CELL * 5;
+    for (let pass = 0; pass < 8; pass++) high.update(movedX, movedZ);
+    expect(meshes.map((mesh) => mesh.count)).toEqual(
+      expectedCountsAt(1337, movedX, movedZ, meshes.length),
+    );
+
+    high.invalidate();
+    high.update(movedX, movedZ);
+    expect(meshes.every((mesh, index) => mesh.instanceMatrix.version > versions[index])).toBe(true);
   });
 
   it('is mounted and advanced by Renderer', () => {

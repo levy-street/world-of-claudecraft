@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { Renderer } from '../src/render/renderer';
 
 const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 
@@ -63,7 +64,7 @@ describe('Renderer lifecycle wiring', () => {
     expect(disposal).toContain('this.post?.dispose()');
     expect(disposal).toContain('this.chatBubbles.clear()');
     expect(disposal).toContain('this.removeView(id, true)');
-    expect(disposal).toContain('for (const visual of pool) visual.dispose()');
+    expect(disposal).toContain('for (const visual of pool) bestEffort(() => visual.dispose())');
     expect(disposal).toContain('this.objectPool.clear()');
     expect(disposal).toContain('this.nameplateLayer.replaceChildren()');
     expect(disposal).toContain('this.scene.clear()');
@@ -92,5 +93,67 @@ describe('Renderer lifecycle wiring', () => {
     expect(cleanup).toContain('this.beginRendererShutdown()');
     expect(cleanup).toContain('this.disposeRendererResources()');
     expect(cleanup).toContain('throw error');
+  });
+
+  it('returns the recyclable pair and finishes terminal cleanup after a view disposal throws', async () => {
+    const events: string[] = [];
+    const canvas = {} as HTMLCanvasElement;
+    const context = {} as WebGL2RenderingContext;
+    const renderer = Object.create(Renderer.prototype) as Record<string, unknown> & {
+      shutdown(): Promise<{ canvas: HTMLCanvasElement; context: WebGL2RenderingContext }>;
+    };
+    renderer.shutdownTask = null;
+    renderer.rendererResourcesDisposed = false;
+    renderer.canvas = canvas;
+    renderer.webgl = {
+      getContext: () => context,
+      setAnimationLoop: (loop: unknown) => events.push(`loop:${String(loop)}`),
+      dispose: () => events.push('webgl:dispose'),
+    };
+    renderer.pendingZonePrepares = new Map();
+    renderer.pendingZonePrewarms = new Map();
+    renderer.textureUploadTaskSet = new Set();
+    renderer.backgroundGpuWork = { shutdown: async () => events.push('queue:shutdown') };
+    renderer.beginRendererShutdown = () => events.push('shutdown:begin');
+    renderer.post = null;
+    renderer.prewarmRenderTarget = null;
+    renderer.pmremGenerator = null;
+    renderer.envRTs = new Map();
+    renderer.prewarmDepthMaterials = new Map();
+    renderer.chatBubbles = new Map();
+    renderer.views = new Map([[17, {}]]);
+    renderer.removeView = () => {
+      events.push('view:dispose');
+      throw new Error('injected view disposal failure');
+    };
+    renderer.visualPool = new Map([['player', [{ dispose: () => events.push('pool:dispose') }]]]);
+    renderer.objectPool = new Map();
+    renderer.clickTargets = [];
+    renderer.gatherNodeMeshes = [];
+    renderer.viewLights = [];
+    renderer.nameplateLayer = {
+      replaceChildren: () => events.push('nameplates:clear'),
+    };
+    renderer.travelSpeedFx = { dispose: () => events.push('travel:dispose') };
+    renderer.scene = { clear: () => events.push('scene:clear') };
+    const report = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await expect(renderer.shutdown()).resolves.toEqual({ canvas, context });
+    expect(events).toEqual([
+      'shutdown:begin',
+      'queue:shutdown',
+      'view:dispose',
+      'pool:dispose',
+      'nameplates:clear',
+      'travel:dispose',
+      'scene:clear',
+      'loop:null',
+      'webgl:dispose',
+    ]);
+    expect(report).toHaveBeenCalledWith(
+      'Renderer terminal cleanup completed with failures',
+      expect.arrayContaining([expect.any(Error)]),
+    );
+    report.mockRestore();
   });
 });
