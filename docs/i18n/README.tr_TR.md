@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Karakterine isim ver, dokuz sınıftan herhangi birini seç ve merkezlerle çevrili bir pazar kasabası olan **Eastbrook Vale**'de (seviye 1-7) başla: kuzeyde kurt patikaları, doğuda yaban domuzu çayırları, batıda Sableweb ormanları, kuzeybatıda Mirror Lake, güneybatıda burrower'ların bastığı bir bakır kazısı ve kuzeydoğuda huzursuz ölülerin yıkık bir şapeli, güneydoğuda da Gorrak'ın haydut kampı. Kuzey yolu, bir dağ geçidinden **Mirefen Marsh**'a (6-13, merkez Fenbridge) ve oradan yukarıya **Thornpeak Heights**'a (13-20, merkez Highwatch) tırmanır. Dünya tohumu `src/main.ts` içinde sabittir, bu yüzden her ziyarette aynı yerdir.
+Karakterine isim ver, dokuz sınıftan herhangi birini seç ve merkezlerle çevrili bir pazar kasabası olan **Eastbrook Vale**'de (seviye 1-7) başla: kuzeyde kurt patikaları, doğuda yaban domuzu çayırları, batıda Sableweb ormanları, kuzeybatıda Mirror Lake, güneybatıda burrower'ların bastığı bir bakır kazısı ve kuzeydoğuda huzursuz ölülerin yıkık bir şapeli, güneydoğuda da Gorrak'ın haydut kampı. Kuzey yolu, bir dağ geçidinden **Mirefen Marsh**'a (6-13, merkez Fenbridge) ve oradan yukarıya **Thornpeak Heights**'a (13-20, merkez Highwatch) tırmanır. Dünya tohumu `src/sim/world_seed.ts` içinde sabittir, bu yüzden her ziyarette aynı yerdir.
 
 ### Windows, Linux ve macOS için masaüstü uygulamaları
 

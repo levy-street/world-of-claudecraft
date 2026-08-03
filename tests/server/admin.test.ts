@@ -45,6 +45,7 @@ import {
   setAdminDbForTests,
 } from '../../server/admin';
 import { resetAdminGuildListReadsForTests } from '../../server/admin_guilds_read';
+import { characterProfessionsSheet } from '../../server/character_professions';
 import { pool } from '../../server/db';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
@@ -3350,5 +3351,627 @@ describe('account flair (AI mark + streamer links)', () => {
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'boom' });
     expect(rt.applyAccountFlairLive).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 12. R35 GM professions tooling: the inspector read + the two audited restores.
+// ---------------------------------------------------------------------------
+
+describe('R35 professions inspector (GET /admin/api/characters/:id/professions)', () => {
+  const BLOB_ROW = {
+    id: 5,
+    name: 'Aldric',
+    class: 'warrior',
+    level: 12,
+    accountId: 9,
+    username: 'aldric-owner',
+    state: {
+      gatheringProficiency: { mining: 42.5 },
+      craftSkills: { alchemy: 30 },
+      knownRecipes: ['recipe_a', 'recipe_b'],
+      toolEffectSlots: {
+        mining: {
+          effectId: 'gatherers_cache',
+          durability: 3,
+          maxDurability: 16,
+          craftedBy: 'Mira',
+          confirmMode: 'always',
+        },
+      },
+      // One live node id (enriched from content) and one retired id (null
+      // enrichment; the load-side filter would drop it in game).
+      nodeHarvestCooldowns: { ore_eastbrook_1: 120, retired_node_xyz: 30 },
+      archetype: { activeArchetype: 'alchemy', pairedMajor: 'engineering', hobbyCraft: null },
+      masteryResetApplied: true,
+      proficiencyDisplayHealApplied: true,
+      recipesGrandfathered: true,
+    },
+    updatedAt: '2026-07-30T12:00:00.000Z',
+  };
+
+  it('shapes the stored blob for an OFFLINE character (live false, save clock kept)', async () => {
+    const characterProfessionsRow = vi.fn(async () => BLOB_ROW);
+    authedAdminDb({ characterProfessionsRow });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(200);
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(characterProfessionsRow).toHaveBeenCalledWith(5, true); // offline: fetch the blob
+    expect(sheet.name).toBe('Aldric');
+    expect(sheet.live).toBe(false);
+    expect(sheet.updatedAt).toBe('2026-07-30T12:00:00.000Z');
+    expect(sheet.preMigration).toBe(false); // the fixture carries all three one-shot flags
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 42.5 });
+    // Every gathering profession renders, absent ones as 0.
+    expect(sheet.gathering).toContainEqual({ professionId: 'fishing', proficiency: 0 });
+    expect(sheet.crafting).toContainEqual({ craftId: 'alchemy', skill: 30, tier: 1 });
+    expect(sheet.knownRecipes).toBe(2);
+    // The sheet runs the LOADER'S normalizeArchetypeState, so the stored
+    // null hobby renders as the default the next login resolves for the
+    // alchemy+engineering pair (enchanting; inscription has no content).
+    expect(sheet.archetype).toEqual({
+      activeArchetype: 'alchemy',
+      pairedMajor: 'engineering',
+      hobbyCraft: 'enchanting',
+    });
+    expect(sheet.slots).toEqual([
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        durability: 3,
+        maxDurability: 16,
+        craftedBy: 'Mira',
+        confirmMode: 'always',
+      },
+    ]);
+    // Sorted longest-remaining first; the live node enriches, the retired one
+    // reads null zone/type.
+    expect(sheet.nodeTimers).toEqual([
+      {
+        nodeId: 'ore_eastbrook_1',
+        zoneId: 'eastbrook_vale',
+        nodeType: 'ore',
+        remainingSeconds: 120,
+      },
+      { nodeId: 'retired_node_xyz', zoneId: null, nodeType: null, remainingSeconds: 30 },
+    ]);
+    // The server-authored effect vocabulary the restore-slot select renders.
+    expect(sheet.toolEffectIds).toEqual(['gatherers_cache', 'artisans_eye', 'quickening_charm']);
+  });
+
+  it('overlays a LIVE serializeCharacter snapshot when the character is online here', async () => {
+    const characterProfessionsRow = vi.fn(async () => BLOB_ROW);
+    authedAdminDb({ characterProfessionsRow });
+    installAdminRuntime({
+      adminCharacterState: vi.fn(() => ({ gatheringProficiency: { mining: 43.5 } })),
+    });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(200);
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.live).toBe(true);
+    expect(sheet.updatedAt).toBeNull(); // a live snapshot is "now"
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 43.5 });
+    // A live read discards the blob, so the query must not fetch it.
+    expect(characterProfessionsRow).toHaveBeenCalledWith(5, false);
+  });
+
+  it('falls back to the legacy pre-rename professions key (dual-key read)', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        ...BLOB_ROW,
+        state: { professions: { herbalism: 7 } },
+      })),
+    });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.gathering).toContainEqual({ professionId: 'herbalism', proficiency: 7 });
+  });
+
+  it('404s an unknown character with the standard envelope', async () => {
+    authedAdminDb({ characterProfessionsRow: vi.fn(async () => null) });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(404);
+    expect(r.body).toEqual({ success: false, data: null, error: 'character not found' });
+  });
+});
+
+describe('R35 GM restores (restore-item / restore-slot)', () => {
+  it('restore-item audits FIRST, then mints on the live session', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 2, reason: 'lost to issue 2514' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(recordProfessionsRestore).toHaveBeenCalledWith({
+      characterId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      action: 'restore_item',
+      detail: 'copper_mining_pick x2',
+      reason: 'lost to issue 2514',
+    });
+    expect(rt.adminRestoreItem).toHaveBeenCalledWith(5, 'copper_mining_pick', 2);
+    // A grant may never exist unaudited: the audit row precedes the mint.
+    const auditOrder = recordProfessionsRestore.mock.invocationCallOrder[0];
+    const mintOrder = (rt.adminRestoreItem as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0];
+    expect(auditOrder).toBeLessThan(mintOrder);
+  });
+
+  it('restore-item refuses an offline character BEFORE any audit write', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => false),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'character is not online on this realm',
+    });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+    expect(rt.adminRestoreItem).not.toHaveBeenCalled();
+    expect(rt.adminCharacterOnline).toHaveBeenCalledWith(5);
+  });
+
+  it('restore-item refuses an unknown item and an out-of-range count pre-audit', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const bad = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'not_a_real_item', count: 1, reason: 'lost' },
+    });
+    expect(bad.status).toBe(400);
+    expect(bad.body).toEqual({ success: false, data: null, error: 'unknown item id' });
+    const over = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 21, reason: 'lost' },
+    });
+    expect(over.status).toBe(400);
+    expect(over.body).toEqual({
+      success: false,
+      data: null,
+      error: 'count must be a whole number between 1 and 20',
+    });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+
+  it('restore-item surfaces a missing reason as the audited write refusal', async () => {
+    authedAdminDb({
+      recordProfessionsRestore: vi.fn(async () => {
+        throw new Error('moderation reason is required');
+      }),
+    });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1 },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'moderation reason is required',
+    });
+    expect(rt.adminRestoreItem).not.toHaveBeenCalled(); // no unaudited grant
+  });
+
+  it('restore-slot audits then re-mints, with the profession/effect detail', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(recordProfessionsRestore).toHaveBeenCalledWith({
+      characterId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      action: 'restore_slot',
+      detail: 'mining/gatherers_cache',
+      reason: 'row vanished',
+    });
+    expect(rt.adminRestoreToolEffectSlot).toHaveBeenCalledWith(5, 'mining', 'gatherers_cache');
+  });
+
+  it('restore-slot maps the sim refusals to their own error prose', async () => {
+    authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'no_tool'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'the character owns no tool for that profession',
+    });
+    expect(rt.adminRestoreToolEffectSlot).toHaveBeenCalled();
+  });
+
+  it('restore-slot refuses a craft (non-gathering) profession id pre-audit', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'cooking', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'unknown gathering profession id',
+    });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+});
+
+describe('R35 GM restores: refusal prose arms', () => {
+  it('restore-slot maps already_slotted and invalid_request to their own prose', async () => {
+    authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'already_slotted'),
+    });
+    const slotted = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(slotted.status).toBe(400);
+    expect(slotted.body).toEqual({
+      success: false,
+      data: null,
+      error: 'that profession already has a slotted effect',
+    });
+    (rt.adminRestoreToolEffectSlot as ReturnType<typeof vi.fn>).mockReturnValue('invalid_request');
+    const badPair = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(badPair.status).toBe(400);
+    expect(badPair.body).toEqual({
+      success: false,
+      data: null,
+      error: 'that effect cannot be slotted on that profession',
+    });
+  });
+
+  it('both restores surface the post-audit leave race as their own prose', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true), // online at the pre-check...
+      adminRestoreItem: vi.fn(() => 'offline'), // ...gone by the mint
+      adminRestoreToolEffectSlot: vi.fn(() => 'offline'),
+    });
+    const raceProse = 'character went offline before the restore landed';
+    const item = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+    });
+    expect(item.status).toBe(400);
+    expect(item.body).toEqual({ success: false, data: null, error: raceProse });
+    const slot = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'lost' },
+    });
+    expect(slot.status).toBe(400);
+    expect(slot.body).toEqual({ success: false, data: null, error: raceProse });
+    // The race is the ONE place an audit row may outlive a failed grant, so
+    // the row must exist for the history to stay honest.
+    expect(recordProfessionsRestore).toHaveBeenCalledTimes(2);
+  });
+
+  it('restore-slot refuses an unknown effect id pre-audit', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'not_an_effect', reason: 'lost' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'unknown tool effect id' });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+});
+
+describe('R35 professions inspector: fix-round edge pins', () => {
+  it('survives a NULL characters.state row (created but never entered)', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        id: 5,
+        name: 'Unborn',
+        class: 'warrior',
+        level: 1,
+        accountId: 9,
+        username: 'alice',
+        state: null,
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      })),
+    });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(200);
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 0 });
+    expect(sheet.slots).toEqual([]);
+    expect(sheet.nodeTimers).toEqual([]);
+    expect(sheet.knownRecipes).toBe(0);
+    // Never-entered is emptyBlob, NOT pre-migration: first login takes the
+    // construction path the one-shot migrations never touch.
+    expect(sheet.preMigration).toBe(false);
+  });
+
+  it('marks a pre-migration blob and clamps a tampered node timer', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        id: 5,
+        name: 'Veteran',
+        class: 'warrior',
+        level: 12,
+        accountId: 9,
+        username: 'alice',
+        // A pre-curve blob: no one-shot flags, an over-cap node timer, and a
+        // fishing slot the loader drops plus a legacy confirm-mode row.
+        state: {
+          gatheringProficiency: { mining: 50 },
+          // 99999 pins the clamp; the negative and NaN rows pin the
+          // loader's positive() filter (garbage never renders).
+          nodeHarvestCooldowns: {
+            ore_eastbrook_1: 99999,
+            ore_eastbrook_2: -5,
+            ore_eastbrook_3: Number.NaN,
+          },
+          toolEffectSlots: {
+            fishing: {
+              effectId: 'gatherers_cache',
+              durability: 3,
+              maxDurability: 16,
+              confirmMode: 'always',
+            },
+            mining: { effectId: 'gatherers_cache', durability: 3, maxDurability: 16 },
+          },
+        },
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      })),
+    });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    // The one-shot load migrations have not run: the operator is warned.
+    expect(sheet.preMigration).toBe(true);
+    // The load-side clamp: never display a wait the game would not honor
+    // (ore respawn is 240s).
+    expect(sheet.nodeTimers).toEqual([
+      {
+        nodeId: 'ore_eastbrook_1',
+        zoneId: 'eastbrook_vale',
+        nodeType: 'ore',
+        remainingSeconds: 240,
+      },
+    ]);
+    // The loader's slot rules: the refused fishing row DROPS; the legacy
+    // row without a confirmMode reads 'always'.
+    expect(sheet.slots).toEqual([
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        durability: 3,
+        maxDurability: 16,
+        craftedBy: null,
+        confirmMode: 'always',
+      },
+    ]);
+  });
+
+  it('a LIVE snapshot is never pre-migration even when its flags are absent', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        id: 5,
+        name: 'Live',
+        class: 'warrior',
+        level: 12,
+        accountId: 9,
+        username: 'alice',
+        state: null,
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      })),
+    });
+    installAdminRuntime({
+      adminCharacterState: vi.fn(() => ({ gatheringProficiency: { mining: 1 } })),
+    });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.live).toBe(true);
+    expect(sheet.preMigration).toBe(false);
+  });
+});
+
+describe('characterProfessionsSheet: the per-field normalizer arms (pure)', () => {
+  const baseInput = (state: Record<string, unknown>) => ({
+    characterId: 5,
+    name: 'Aldric',
+    class: 'warrior',
+    level: 12,
+    accountId: 9,
+    username: 'alice',
+    state: state as never,
+    live: false,
+    updatedAt: null as string | null,
+    emptyBlob: false,
+  });
+  const ALL_FLAGS = {
+    masteryResetApplied: true,
+    proficiencyDisplayHealApplied: true,
+    recipesGrandfathered: true,
+  };
+
+  it('preMigration fires when ANY single one-shot flag is missing (per-dimension)', () => {
+    // The check ORs three independent flags; each case drops exactly one so
+    // a deleted conjunct in the source fails its own case.
+    for (const missing of [
+      'masteryResetApplied',
+      'proficiencyDisplayHealApplied',
+      'recipesGrandfathered',
+    ] as const) {
+      const flags: Record<string, boolean> = { ...ALL_FLAGS };
+      delete flags[missing];
+      const sheet = characterProfessionsSheet(baseInput(flags));
+      expect(sheet.preMigration, `missing ${missing} must warn`).toBe(true);
+    }
+    expect(characterProfessionsSheet(baseInput(ALL_FLAGS)).preMigration).toBe(false);
+  });
+
+  it('clamps out-of-range proficiencies and craft skills the way the login does', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({
+        ...ALL_FLAGS,
+        gatheringProficiency: { mining: 999, logging: -5 },
+        craftSkills: { alchemy: 99999 },
+      }),
+    );
+    // mining maxSkill is 100 (content); a tampered 999 renders as the value
+    // the next login resolves, and a negative floors at 0.
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 100 });
+    expect(sheet.gathering).toContainEqual({ professionId: 'logging', proficiency: 0 });
+    const alchemy = sheet.crafting.find((c) => c.craftId === 'alchemy');
+    expect(alchemy?.skill).toBeLessThanOrEqual(300);
+    expect(Number.isFinite(alchemy?.skill)).toBe(true);
+  });
+
+  it('drops a ZERO node timer (the > 0 boundary) and tie-breaks equal timers by node id', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({
+        ...ALL_FLAGS,
+        nodeHarvestCooldowns: { ore_eastbrook_1: 0, zz_retired: 30, aa_retired: 30 },
+      }),
+    );
+    // The literal 0 row is not "pending", it is the loader's drop boundary.
+    expect(sheet.nodeTimers.map((t) => t.nodeId)).toEqual(['aa_retired', 'zz_retired']);
+  });
+
+  it('counts knownRecipes through the loader Set (duplicates collapse)', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({ ...ALL_FLAGS, knownRecipes: ['recipe_a', 'recipe_a', 'recipe_a'] }),
+    );
+    expect(sheet.knownRecipes).toBe(1);
+  });
+
+  it('renders a corrupt non-iterable knownRecipes as 0 instead of a 500', () => {
+    // The loader THROWS on this blob (such a character cannot log in), which
+    // is exactly why the sheet must not: the inspector is the tool an
+    // operator opens to diagnose it. Guarded on iterability, not isArray,
+    // so a string still counts its characters the way the loader Set does.
+    expect(
+      characterProfessionsSheet(baseInput({ ...ALL_FLAGS, knownRecipes: 42 })).knownRecipes,
+    ).toBe(0);
+    expect(
+      characterProfessionsSheet(baseInput({ ...ALL_FLAGS, knownRecipes: {} })).knownRecipes,
+    ).toBe(0);
+    expect(
+      characterProfessionsSheet(baseInput({ ...ALL_FLAGS, knownRecipes: 'abc' })).knownRecipes,
+    ).toBe(3);
+  });
+
+  it('repairs an invalid archetype the way the login does (trio nulls together)', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({
+        ...ALL_FLAGS,
+        archetype: { activeArchetype: 'not_a_craft', pairedMajor: 'engineering', hobbyCraft: null },
+      }),
+    );
+    // normalizeArchetypeState refuses the invalid active craft, and without
+    // an active there is no pair and no hobby: the operator sees the reset
+    // the next login performs, not the raw stored trio.
+    expect(sheet.archetype).toEqual({ activeArchetype: null, pairedMajor: null, hobbyCraft: null });
+  });
+});
+
+describe('R35 restore-item: the defensive invalid_item arm', () => {
+  it('maps a runtime invalid_item to its own prose, never the offline race', async () => {
+    authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'invalid_item'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'unknown item id' });
   });
 });

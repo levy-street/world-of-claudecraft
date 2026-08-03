@@ -5,6 +5,7 @@
 // is the same pure/IO split the server uses (wallet_link.ts vs wallet.ts).
 import { specialRoleByKey, specialRoleByName } from '../src/sim/discord_roles';
 import { DISCORD_STATUS_DEFS, discordStatusByIndex } from '../src/sim/discord_tier';
+import type { VcNationId } from '../src/sim/types';
 
 // ── Gateway ──────────────────────────────────────────────────────────────────
 // Intents we need: guild metadata, members (privileged), voice states (who is in
@@ -542,7 +543,8 @@ export function buildRelayMessage(item: RelayItem, gameUrl: string): Record<stri
   return payload;
 }
 
-// ── Significant-activity feed (level 20 / rare drop / duel / arena) ───────────
+// ── Significant-activity feed (level 20 / rare drop / duel / arena / Vale Cup /
+// masterwork / deed) ──────────────────────────────────────────────────────────
 export interface ActivityParticipant {
   name: string;
   discordUserId: string | null;
@@ -550,17 +552,53 @@ export interface ActivityParticipant {
 }
 
 export interface ActivityItem {
-  kind: 'levelup' | 'rareloot' | 'duel' | 'arena';
+  kind: 'levelup' | 'rareloot' | 'duel' | 'arena' | 'vale_cup' | 'masterwork' | 'deed';
   realm: string;
   profileUrl: string | null;
   level?: number;
-  itemName?: string;
+  itemName?: string; // rareloot; masterwork; the first-koi deed's catch
   quality?: string;
   winnerName?: string;
   loserName?: string;
   ratingDelta?: number;
+  bracket?: number; // vale_cup (1..5, an NvN bout)
+  scoreA?: number; // vale_cup
+  scoreB?: number; // vale_cup
+  winnerNation?: string; // vale_cup (VcNationId of the winning side)
+  deedId?: string; // deed
+  deedName?: string; // deed (English deed name; Discord posts are English)
+  deedTitle?: string; // deed, when the deed rewards a title
   participants: ActivityParticipant[];
 }
+
+// English banner-nation names for the Vale Cup card. Discord posts are English
+// by design (every builder in this file), so this mirrors the game catalog's
+// hudChrome.vcup.nation.* English values; typing the record over VcNationId
+// makes a future nation fail the build here until it is labeled. Exported so
+// tests/discord_bot.test.ts can pin the values against that catalog (the test
+// imports both; this file must NOT import the ui catalog, the bot stays
+// standalone), so a catalog reword reddens this copy.
+export const VC_NATION_LABELS: Record<VcNationId, string> = {
+  vale: 'Eastbrook Vale',
+  mirefen: 'The Mirefen',
+  thornpeak: 'Thornpeak',
+  coliseum: 'The Ashen Coliseum',
+  choir: 'The Pale Choir',
+  ogre: 'The Ogre Clans',
+  moon: 'The Pale Moon',
+  copperdig: 'The Copper Dig',
+};
+
+/** English nation label, falling back to the raw id for a nation this bot
+ *  build does not know (a newer server mid-deploy). */
+export function vcNationLabel(id: string): string {
+  return VC_NATION_LABELS[id as VcNationId] ?? id;
+}
+
+// The first-koi deed (col_glimmerfin, "Glimmer of Hope"; the deed NAME is
+// what arrives as deedName): the one feed-visible deed whose card reads as a
+// catch rather than a deed record.
+export const FIRST_KOI_DEED_ID = 'col_glimmerfin';
 
 // Per-quality embed accent for a rare drop (epic purple, legendary orange).
 function qualityColor(quality: string | undefined): number {
@@ -575,10 +613,12 @@ function mentionFor(name: string, parts: readonly ActivityParticipant[]): string
 
 /**
  * Full createMessage payload for one activity card: a content line that pings the
- * linked participant(s) and a rich, per-kind embed. Pure data; the REST layer
- * sends it. Unit-tested in tests/discord_bot.test.ts.
+ * linked participant(s) and a rich, per-kind embed, or null for a kind this bot
+ * build does not know (a newer server mid-deploy enqueues it; posting would
+ * render an empty embed, the pre-fix vale_cup failure). Pure data; the REST
+ * layer sends it. Unit-tested in tests/discord_bot.test.ts.
  */
-export function buildActivityMessage(item: ActivityItem): Record<string, unknown> {
+export function buildActivityMessage(item: ActivityItem): Record<string, unknown> | null {
   const subject = item.participants[0];
   const subjectName = subject?.name ?? item.winnerName ?? '';
   const subjectAvatar = subject
@@ -602,16 +642,19 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
       break;
     case 'rareloot':
       author = ':gem: Rare Drop';
-      title = item.itemName ?? 'A rare item';
+      // Every title fallback below is `||`, never `??`: an EMPTY name from the
+      // server must degrade to the generic title, and `??` would keep the empty
+      // string, which Discord rejects (an embed title cannot be blank).
+      title = item.itemName || 'A rare item';
       description =
-        `A **${item.quality ?? 'rare'}** drop` +
+        `A **${item.quality || 'rare'}** drop` +
         (subject ? ` for ${mentionFor(subjectName, item.participants)}` : '') +
         ` on ${item.realm}!`;
       color = qualityColor(item.quality);
       break;
     case 'duel':
       author = ':crossed_swords: Duel';
-      title = `${item.winnerName ?? subjectName} wins!`;
+      title = `${item.winnerName || subjectName} wins!`;
       description =
         `${mentionFor(item.winnerName ?? '', item.participants)} defeated ` +
         `${mentionFor(item.loserName ?? '', item.participants)} in a duel on ${item.realm}.`;
@@ -628,6 +671,52 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
         ` on ${item.realm}.`;
       color = 0x9b59b6;
       break;
+    case 'vale_cup': {
+      // One card per decided rated match; participants are the winning side.
+      // The winner's score reads first whichever column (A or B) it sat in.
+      const nation = vcNationLabel(item.winnerNation ?? '');
+      const hi = Math.max(item.scoreA ?? 0, item.scoreB ?? 0);
+      const lo = Math.min(item.scoreA ?? 0, item.scoreB ?? 0);
+      const bracket = item.bracket !== undefined ? ` ${item.bracket}v${item.bracket}` : '';
+      const winners = item.participants.length
+        ? item.participants.map((p) => mentionFor(p.name, item.participants)).join(', ')
+        : subjectName;
+      author = ':trophy: Vale Cup';
+      title = `${nation} win the${bracket} match!`;
+      description = `${winners} took the Sowfield ${hi} to ${lo} for ${nation} on ${item.realm}.`;
+      color = 0xf0b743;
+      break;
+    }
+    case 'masterwork':
+      author = ':hammer: Masterwork';
+      title = item.itemName || 'A masterwork piece';
+      description =
+        `A **masterwork** ${item.itemName || 'piece'} from the hands of ` +
+        `${mentionFor(subjectName, item.participants)} on ${item.realm}!`;
+      color = 0xd9a334;
+      break;
+    case 'deed':
+      if (item.deedId === FIRST_KOI_DEED_ID) {
+        // The first-koi moment reads as a catch, not a deed record.
+        author = ':fish: Rare Catch';
+        title = item.deedName || 'A rare catch';
+        description =
+          `${mentionFor(subjectName, item.participants)} landed their ` +
+          `first ${item.itemName || 'rare catch'} on ${item.realm}!`;
+        color = 0x3fa7d6;
+      } else {
+        author = ':scroll: Deed Complete';
+        title = item.deedName || 'A deed of renown';
+        description =
+          `${mentionFor(subjectName, item.participants)} completed ` +
+          `"${item.deedName || 'a deed'}"` +
+          (item.deedTitle !== undefined ? ` and earned the title "${item.deedTitle}"` : '') +
+          ` on ${item.realm}.`;
+        color = 0xf0b743;
+      }
+      break;
+    default:
+      return null;
   }
 
   const embed: Record<string, unknown> = {

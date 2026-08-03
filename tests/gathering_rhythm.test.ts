@@ -33,6 +33,7 @@ vi.mock('../server/db', () => ({
 import { type ClientSession, GameServer } from '../server/game';
 import { bagCapacity } from '../src/sim/bags';
 import { cancelCast, updateCasting } from '../src/sim/combat/casting_lifecycle';
+import { handleDeath } from '../src/sim/combat/damage';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { ABILITIES, LAKE, MOBS } from '../src/sim/data';
@@ -178,15 +179,23 @@ describe('bite delay draw contract and rod-tiered bounds', () => {
   });
 
   it('the reel window arms at bite time with the rod-widened width', () => {
+    // Literal tick widths, deliberately not re-derived from the sim's own
+    // function: these are what the live loop must actually produce.
+    //   pole      tier 1 common   2.50s -> 50
+    //   ironreel  tier 2 common   3.25s -> 65  (tier rung only, rarity is 0)
+    //   silver.   tier 3 uncommon 4.25s -> 85  (two tier rungs plus one rarity)
+    // The silverstream row is 85 rather than 80 because a rod's own rarity
+    // widens the window too, and it is the row that separates a rarity-reading
+    // implementation from a tier-only one.
     for (const [rod, windowTicks] of [
-      [null, 60],
-      ['ironreel_fishing_rod', 75],
-      ['silverstream_fishing_rod', 90],
+      [null, 50],
+      ['ironreel_fishing_rod', 65],
+      ['silverstream_fishing_rod', 85],
     ] as [string | null, number][]) {
       const sim = makeSim(4242);
       const meta = mustMeta(sim, sim.playerId);
       // #2343 implement gate: the base arm carries the tier-1 pole (identical
-      // to the old bare hands), so the base 60-tick window literal holds.
+      // to the old bare hands), so the base 50-tick window literal holds.
       sim.addItem(rod ?? 'simple_fishing_pole', 1);
       teleportToValeShore(sim);
       const p = sim.player;
@@ -252,7 +261,12 @@ describe('reel deadline boundary', () => {
     sim.tickCount = p.fishReelDeadlineTick + 1;
     sim.events = [];
     updateCasting(sim.ctx, p, meta); // the miss fires here, before any press
-    expect(sim.events).toContainEqual({ type: 'fishingGotAway', pid: sim.playerId });
+    expect(sim.events).toContainEqual({
+      type: 'fishingGotAway',
+      pid: sim.playerId,
+      zoneId: 'eastbrook_vale',
+      band: 0,
+    });
     expect(p.castingAbility).toBe(null);
     expect(p.fishReelDeadlineTick).toBe(0);
     // The very next press starts a fresh session, not a reel.
@@ -294,7 +308,7 @@ describe('hidden-state wire invariant', () => {
     expect(a.stream[114][0]).toBe(15);
   });
 
-  it('no wire snapshot carries fishBiteAtTick, fishReelDeadlineTick, or gatherCastNodeId', () => {
+  it('no wire snapshot carries fishBiteAtTick, fishReelDeadlineTick, fishCastZoneId, gatherCastNodeId, gatherCastToolRarity, or gatherCastEffectConfirmed', () => {
     interface FakeClient {
       sent: any[];
       ws: any;
@@ -346,19 +360,34 @@ describe('hidden-state wire invariant', () => {
     gatherer.pos.y = terrainHeight(NODE.pos.x, NODE.pos.z, server.sim.cfg.seed);
     gatherer.prevPos = { ...gatherer.pos };
     server.sim.addItem('copper_mining_pick', 1, sb.pid); // #2343: node harvest needs the tool
-    expect(server.sim.harvestNode(NODE.id, sb.pid)).toBe(true);
+    // A slotted effect makes the R47 cast-start capture non-inert too, so
+    // the fifth hidden field is provably live at scan time (an inert field
+    // would pass the absence checks vacuously).
+    server.sim.addItemInstance('gatherers_cache', { signer: 'HiddenGatherer' }, sb.pid, 1);
+    server.sim.slotToolEffect('mining', 'gatherers_cache', undefined, sb.pid);
+    // CONFIRMED on purpose, so the R40 consent capture is provably live
+    // (true) at scan time too, the same vacuity rule as the rarity capture.
+    expect(server.sim.harvestNode(NODE.id, true, sb.pid)).toBe(true);
     server.sim.tick(); // both casts mid-flight
     // The hidden fields ARE nonzero right now, so an accidental broadcast
     // would be visible in this exact snapshot.
     expect(angler.fishBiteAtTick).toBeGreaterThan(0);
     expect(gatherer.gatherCastNodeId).toBe(NODE.id);
+    expect(gatherer.gatherCastToolRarity).toBe('common');
+    expect(gatherer.gatherCastEffectConfirmed).toBe(true);
     (server as any).broadcastSnapshots();
     const payload = fcA.sent.join('\n') + fcB.sent.join('\n');
-    // Sanity: we are scanning real snapshot payloads with live cast fields.
+    // Sanity: we are scanning real snapshot payloads with live cast fields,
+    // and the hidden fields are provably NON-inert at scan time (an inert
+    // field would pass the absence checks vacuously).
+    expect(angler.fishCastZoneId).not.toBe('');
     expect(payload).toContain('castRem');
     expect(payload.includes('fishBiteAtTick')).toBe(false);
     expect(payload.includes('fishReelDeadlineTick')).toBe(false);
+    expect(payload.includes('fishCastZoneId')).toBe(false);
     expect(payload.includes('gatherCastNodeId')).toBe(false);
+    expect(payload.includes('gatherCastToolRarity')).toBe(false);
+    expect(payload.includes('gatherCastEffectConfirmed')).toBe(false);
     // Second scan AFTER the bite fires, so the reel deadline is provably
     // NONZERO at snapshot time too (the review coverage pass: a value-gated
     // leak that serialized the deadline only while armed would have slipped
@@ -366,6 +395,7 @@ describe('hidden-state wire invariant', () => {
     const biteTick = angler.fishBiteAtTick;
     while (server.sim.tickCount <= biteTick) server.sim.tick();
     expect(angler.fishReelDeadlineTick).toBeGreaterThan(0);
+    expect(angler.fishCastZoneId).not.toBe('');
     fcA.sent.length = 0;
     fcB.sent.length = 0;
     (server as any).broadcastSnapshots();
@@ -373,7 +403,10 @@ describe('hidden-state wire invariant', () => {
     expect(biterPayload).toContain('castRem');
     expect(biterPayload.includes('fishBiteAtTick')).toBe(false);
     expect(biterPayload.includes('fishReelDeadlineTick')).toBe(false);
+    expect(biterPayload.includes('fishCastZoneId')).toBe(false);
     expect(biterPayload.includes('gatherCastNodeId')).toBe(false);
+    expect(biterPayload.includes('gatherCastToolRarity')).toBe(false);
+    expect(biterPayload.includes('gatherCastEffectConfirmed')).toBe(false);
   });
 });
 
@@ -399,7 +432,7 @@ describe('gather cast duration', () => {
     sim.addItem('mithril_mining_pick', 1, pid); // mining tier 3
     mustMeta(sim, pid).gatheringProficiency.mining = 150; // band 1
     sim.drainEvents();
-    expect(sim.harvestNode('ore_mirefen_t2', pid)).toBe(true);
+    expect(sim.harvestNode('ore_mirefen_t2', undefined, pid)).toBe(true);
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing entity');
     // 2.5 - (3 - 2) * 0.4 - 1 * 0.15, independently computed (closeTo: the
@@ -420,7 +453,7 @@ describe('gather completion re-validation', () => {
     const pid = sim.addPlayer('warrior', 'Revalidated');
     sim.addItem('copper_mining_pick', 1, pid); // #2343: tier-1 tool keeps castTotal at base
     teleportOntoNode(sim, pid, NODE.id);
-    expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
     sim.drainEvents();
     return { sim, pid, meta: mustMeta(sim, pid) };
   }
@@ -483,7 +516,7 @@ describe('node-tier-relative proficiency gain through the live cast loop', () =>
     meta.gatheringProficiency.mining = proficiency;
     sim.addItem('copper_mining_pick', 1, pid); // #2343: node harvest needs the tool
     teleportOntoNode(sim, pid, NODE.id);
-    expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
     completeCastNow(sim, pid);
     const queued = meta.pendingGatherGrants.map((g) => g.amount);
     drainGatheringGrants(meta);
@@ -507,7 +540,7 @@ describe('move cancel is free', () => {
     const pid = sim.playerId;
     sim.addItem('copper_mining_pick', 1, pid); // #2343: node harvest needs the tool
     teleportOntoNode(sim, pid, NODE.id);
-    expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
     sim.moveInput.forward = true;
     let draws = 0;
     sim.rng.setObserver(() => draws++);
@@ -541,7 +574,7 @@ describe('same-seed determinism across the whole rhythm loop', () => {
       try {
         teleportOntoNode(sim, pid, NODE.id);
         sim.addItem('copper_mining_pick', 1, pid); // #2343 tool gate; addItem draws no rng
-        sim.harvestNode(NODE.id, pid);
+        sim.harvestNode(NODE.id, undefined, pid);
         for (let i = 0; i < 60 && sim.player.castingAbility; i++) events.push(...sim.tick());
         events.push(...sim.drainEvents());
         teleportToValeShore(sim);
@@ -672,7 +705,7 @@ describe('interrupt immunity and damage-cancels-not-pushback', () => {
     const pid = sim.addPlayer('warrior', 'Struck');
     sim.addItem('copper_mining_pick', 1, pid); // #2343: node harvest needs the tool
     teleportOntoNode(sim, pid, NODE.id);
-    expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing entity');
     const template = MOBS.forest_wolf;
@@ -692,6 +725,183 @@ describe('interrupt immunity and damage-cancels-not-pushback', () => {
   });
 });
 
+describe('a fully absorbed hit still ends a session (and still pushes no spell back)', () => {
+  const absorbAura = (owner: number, value: number) =>
+    ({
+      id: 'test_absorb',
+      name: 'Test Barrier',
+      kind: 'absorb',
+      value,
+      remaining: 30,
+      duration: 30,
+      sourceId: owner,
+      school: 'arcane',
+    }) as Entity['auras'][number];
+
+  it('a fully absorbed hit cancels a gather cast; the shield soaks and the timer survives', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Shielded');
+    sim.addItem('copper_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, NODE.id);
+    expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    p.auras.push(absorbAura(pid, 100));
+    const hpBefore = p.hp;
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999903, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    sim.drainEvents();
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'hit', true);
+    // The hit counts both ways: the shield soaked ALL of it (no hp loss)
+    // and the session still ended, exactly like an unabsorbed hit.
+    expect(p.hp).toBe(hpBefore);
+    const shield = p.auras.find((a) => a.kind === 'absorb');
+    expect(shield?.value).toBe(95);
+    expect(p.castingAbility).toBe(null);
+    expect(p.gatherCastNodeId).toBe('');
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'castStop', success: false }),
+    );
+    expect(sim.countItem(NODE_MATERIAL.itemId, pid)).toBe(0);
+    expect(sim.nodeHarvestableByMeFor(NODE.id, pid)).toBe(true);
+  });
+
+  it('a fully absorbed hit cancels a fishing session and zeroes the hidden reel state', () => {
+    const sim = makeSim();
+    const meta = mustMeta(sim, sim.playerId);
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    p.auras.push(absorbAura(p.id, 100));
+    const hpBefore = p.hp;
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999904, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'hit', true);
+    expect(p.hp).toBe(hpBefore);
+    expect(p.castingAbility).toBe(null);
+    expect(p.fishBiteAtTick).toBe(0);
+    expect(p.fishReelDeadlineTick).toBe(0);
+  });
+
+  it('a fully absorbed hit still pushes no SPELL back (the classic rule survives the widening)', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Chanter');
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999905, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    // Absorbed arm: a spell cast in flight, hit fully soaked: untouched.
+    p.castingAbility = 'fireball';
+    p.castTotal = 2;
+    p.castRemaining = 2;
+    p.auras.push(absorbAura(pid, 100));
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'hit', true);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castRemaining).toBe(2);
+    // Contrast arm: the same hit past the shield DOES push the cast back.
+    p.auras.length = 0;
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'hit', true);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castRemaining).toBeGreaterThan(2);
+  });
+});
+
+describe('a BLOCKED swing still ends a session (and still pushes no spell back)', () => {
+  // kind 'block' lands at least one point of damage and still rolls its
+  // knockback rider, so it must end a session exactly like a clean hit;
+  // spell pushback keeps its classic hit-only gate.
+  it('a blocked hit cancels a gather cast', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Blocker');
+    sim.addItem('copper_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, NODE.id);
+    expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999906, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    sim.drainEvents();
+    sim.dealDamage(wolf, p, 1, false, 'physical', null, 'block', true);
+    expect(p.castingAbility).toBe(null);
+    expect(p.gatherCastNodeId).toBe('');
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'castStop', success: false }),
+    );
+  });
+
+  it('a non-landing kind never cancels, independent of the amount conjunct', () => {
+    // The kind list is now enumerable ('hit' | 'block') and the comment
+    // beside the widened arm promises miss/dodge/parry never cancel. A real
+    // miss carries amount 0, which the amount conjunct also excludes, so
+    // this pin feeds a SYNTHETIC amount through kind 'miss' to isolate the
+    // kind axis: widening the kind list reds here and nowhere else.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Whiffed');
+    sim.addItem('copper_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, NODE.id);
+    expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999908, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    sim.drainEvents();
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'miss', true);
+    expect(p.castingAbility).not.toBe(null);
+    expect(p.gatherCastNodeId).not.toBe('');
+  });
+
+  it('a blocked hit cancels a fishing session, absorbed or not', () => {
+    const sim = makeSim();
+    const meta = mustMeta(sim, sim.playerId);
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    p.auras.push({
+      id: 'test_absorb',
+      name: 'Test Barrier',
+      kind: 'absorb',
+      value: 100,
+      remaining: 30,
+      duration: 30,
+      sourceId: p.id,
+      school: 'arcane',
+    } as Entity['auras'][number]);
+    const hpBefore = p.hp;
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999907, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'block', true);
+    expect(p.hp).toBe(hpBefore); // fully absorbed block
+    expect(p.castingAbility).toBe(null);
+    expect(p.fishCastZoneId).toBe('');
+  });
+
+  it('a blocked hit still pushes no SPELL back', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Chanter');
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999908, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    p.castingAbility = 'fireball';
+    p.castTotal = 2;
+    p.castRemaining = 2;
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'block', true);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castRemaining).toBe(2);
+  });
+});
+
 describe('the reel window follows the rod held at BITE time, not cast start', () => {
   // The window re-scans the rod when the bite fires (fishing.ts documents the
   // re-scan); these two arms kill a cached-at-cast-start implementation from
@@ -706,7 +916,7 @@ describe('the reel window follows the rod held at BITE time, not cast start', ()
     sim.removeItem('silverstream_fishing_rod', 1);
     sim.tickCount = p.fishBiteAtTick;
     updateCasting(sim.ctx, p, meta);
-    expect(p.fishReelDeadlineTick - sim.tickCount).toBe(60);
+    expect(p.fishReelDeadlineTick - sim.tickCount).toBe(50);
   });
 
   it('a rod picked up between cast start and the bite widens the window', () => {
@@ -722,7 +932,10 @@ describe('the reel window follows the rod held at BITE time, not cast start', ()
     sim.addItem('silverstream_fishing_rod', 1);
     sim.tickCount = p.fishBiteAtTick;
     updateCasting(sim.ctx, p, meta);
-    expect(p.fishReelDeadlineTick - sim.tickCount).toBe(90);
+    // 85: the tier-3 rod's two tier rungs plus its UNCOMMON rarity rung. The
+    // re-scan therefore has to pick up both axes off the rod acquired
+    // mid-session, not just its tier.
+    expect(p.fishReelDeadlineTick - sim.tickCount).toBe(85);
   });
 });
 
@@ -737,7 +950,7 @@ describe('every gather start-deny arm leaves no cast and draws nothing', () => {
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     try {
-      expect(sim.harvestNode(nodeId, pid)).toBe(false);
+      expect(sim.harvestNode(nodeId, undefined, pid)).toBe(false);
     } finally {
       sim.rng.setObserver(null);
     }
@@ -801,14 +1014,14 @@ describe('every gather start-deny arm leaves no cast and draws nothing', () => {
     if (!p) throw new Error('missing entity');
     sim.addItem('copper_mining_pick', 1, pid); // #2343: node harvest needs the tool
     teleportOntoNode(sim, pid, NODE.id);
-    expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
     const total = p.castTotal;
     const nodeId = p.gatherCastNodeId;
     sim.drainEvents();
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     try {
-      expect(sim.harvestNode(NODE.id, pid)).toBe(false);
+      expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(false);
     } finally {
       sim.rng.setObserver(null);
     }
@@ -841,6 +1054,7 @@ describe('death clears the hidden cast state (review fix)', () => {
     expect(sim.player.castingAbility).toBe(null);
     expect(sim.player.fishBiteAtTick).toBe(0);
     expect(sim.player.fishReelDeadlineTick).toBe(0);
+    expect(sim.player.fishCastZoneId).toBe('');
     expect(sim.player.gatherCastNodeId).toBe('');
   });
 
@@ -851,7 +1065,7 @@ describe('death clears the hidden cast state (review fix)', () => {
     if (!p) throw new Error('missing entity');
     sim.addItem('copper_mining_pick', 1, pid); // #2343: node harvest needs the tool
     teleportOntoNode(sim, pid, NODE.id);
-    expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
     expect(p.gatherCastNodeId).toBe(NODE.id);
     sim.dealDamage(null, p, p.maxHp + 50, false, 'physical', null, 'hit');
     expect(p.dead).toBe(true);
@@ -859,6 +1073,7 @@ describe('death clears the hidden cast state (review fix)', () => {
     expect(p.gatherCastNodeId).toBe('');
     expect(p.fishBiteAtTick).toBe(0);
     expect(p.fishReelDeadlineTick).toBe(0);
+    expect(p.fishCastZoneId).toBe('');
   });
 });
 
@@ -867,11 +1082,14 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
   // storage decision names (cancelCast, arena reset, fiesta down, the
   // defensive session-cap end), each mutation-decisive: deleting the clear
   // under test reds exactly its arm.
-  it('a fresh entity starts with all three hidden fields inert', () => {
+  it('a fresh entity starts with every hidden field inert', () => {
     const sim = makeSim(4242);
     expect(sim.player.gatherCastNodeId).toBe('');
+    expect(sim.player.gatherCastToolRarity).toBe('');
+    expect(sim.player.gatherCastEffectConfirmed).toBe(false);
     expect(sim.player.fishBiteAtTick).toBe(0);
     expect(sim.player.fishReelDeadlineTick).toBe(0);
+    expect(sim.player.fishCastZoneId).toBe('');
   });
 
   it('cancelCast inside the armed reel window clears both fishing fields, so the next session cannot instant-reel off a stale deadline', () => {
@@ -884,10 +1102,16 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     sim.tickCount = p.fishBiteAtTick;
     updateCasting(sim.ctx, p, meta); // the bite arms the window
     expect(p.fishReelDeadlineTick).toBeGreaterThan(sim.tickCount);
+    expect(p.fishCastZoneId).toBe('eastbrook_vale');
+    p.gatherCastToolRarity = 'epic'; // belt-and-braces: every field clears
+    p.gatherCastEffectConfirmed = true;
     cancelCast(sim.ctx, p);
     expect(p.castingAbility).toBe(null);
+    expect(p.gatherCastToolRarity).toBe('');
+    expect(p.gatherCastEffectConfirmed).toBe(false);
     expect(p.fishBiteAtTick).toBe(0);
     expect(p.fishReelDeadlineTick).toBe(0);
+    expect(p.fishCastZoneId).toBe('');
     // Without the cancelCast clears, this recast would still see the OLD
     // deadline armed and the immediate re-press would land a catch with no
     // bite: the re-press must stay the busy error instead.
@@ -915,11 +1139,17 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     teleportToValeShore(sim);
     startFishing(sim.ctx, sim.player, meta);
     expect(sim.player.fishBiteAtTick).toBeGreaterThan(0);
-    sim.player.gatherCastNodeId = NODE.id; // belt-and-braces: all three clear
+    sim.player.gatherCastNodeId = NODE.id; // belt-and-braces: every field clears
+    sim.player.gatherCastToolRarity = 'epic';
+    sim.player.gatherCastEffectConfirmed = true;
+    expect(sim.player.fishCastZoneId).toBe('eastbrook_vale');
     readyArenaFighter(sim.ctx, sim.player, { clearPrep: false });
     expect(sim.player.gatherCastNodeId).toBe('');
+    expect(sim.player.gatherCastToolRarity).toBe('');
+    expect(sim.player.gatherCastEffectConfirmed).toBe(false);
     expect(sim.player.fishBiteAtTick).toBe(0);
     expect(sim.player.fishReelDeadlineTick).toBe(0);
+    expect(sim.player.fishCastZoneId).toBe('');
   });
 
   it('the fiesta down path clears the hidden fields', () => {
@@ -930,10 +1160,39 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     startFishing(sim.ctx, sim.player, meta);
     expect(sim.player.fishBiteAtTick).toBeGreaterThan(0);
     sim.player.gatherCastNodeId = NODE.id;
+    sim.player.gatherCastToolRarity = 'epic';
+    sim.player.gatherCastEffectConfirmed = true;
+    expect(sim.player.fishCastZoneId).toBe('eastbrook_vale');
     fiestaDownEntity(sim.ctx, sim.player, null);
     expect(sim.player.gatherCastNodeId).toBe('');
+    expect(sim.player.gatherCastToolRarity).toBe('');
+    expect(sim.player.gatherCastEffectConfirmed).toBe(false);
     expect(sim.player.fishBiteAtTick).toBe(0);
     expect(sim.player.fishReelDeadlineTick).toBe(0);
+    expect(sim.player.fishCastZoneId).toBe('');
+  });
+
+  it('the death path clears the hidden fields (a lethal non-hit tick reaches it directly)', () => {
+    // handleDeath is the one cast-exit path cancelCast does not own; the
+    // parity samplers rely on inert values at every at-rest frame, so each
+    // of the five fields must return to inert here too.
+    const sim = makeSim(4242);
+    const meta = mustMeta(sim, sim.playerId);
+    sim.addItem('simple_fishing_pole', 1); // #2343: casting needs an implement
+    teleportToValeShore(sim);
+    startFishing(sim.ctx, sim.player, meta);
+    expect(sim.player.fishBiteAtTick).toBeGreaterThan(0);
+    sim.player.gatherCastNodeId = NODE.id; // belt-and-braces: every field clears
+    sim.player.gatherCastToolRarity = 'epic';
+    sim.player.gatherCastEffectConfirmed = true;
+    handleDeath(sim.ctx, sim.player, null);
+    expect(sim.player.dead).toBe(true);
+    expect(sim.player.gatherCastNodeId).toBe('');
+    expect(sim.player.gatherCastToolRarity).toBe('');
+    expect(sim.player.gatherCastEffectConfirmed).toBe(false);
+    expect(sim.player.fishBiteAtTick).toBe(0);
+    expect(sim.player.fishReelDeadlineTick).toBe(0);
+    expect(sim.player.fishCastZoneId).toBe('');
   });
 
   it('the defensive session-cap end gets away with zero draws and clears the hidden fields', () => {
@@ -958,13 +1217,19 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
       sim.rng.setObserver(null);
     }
     expect(draws).toBe(0);
-    expect(sim.events).toContainEqual({ type: 'fishingGotAway', pid: sim.playerId });
+    expect(sim.events).toContainEqual({
+      type: 'fishingGotAway',
+      pid: sim.playerId,
+      zoneId: 'eastbrook_vale',
+      band: 0,
+    });
     expect(sim.events).toContainEqual(
       expect.objectContaining({ type: 'castStop', success: false }),
     );
     expect(p.castingAbility).toBe(null);
     expect(p.fishBiteAtTick).toBe(0);
     expect(p.fishReelDeadlineTick).toBe(0);
+    expect(p.fishCastZoneId).toBe('');
   });
 });
 
@@ -977,7 +1242,7 @@ describe('the widened useItem busy guard covers the gather cast (QA pin)', () =>
     sim.addItem('minor_mana_potion', 1, pid);
     sim.addItem('copper_mining_pick', 1, pid); // #2343: node harvest needs the tool
     teleportOntoNode(sim, pid, NODE.id);
-    expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
     const nodeId = p.gatherCastNodeId;
     sim.drainEvents();
     sim.useItem('minor_mana_potion', pid);

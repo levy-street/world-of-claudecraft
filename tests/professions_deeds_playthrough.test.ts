@@ -262,12 +262,19 @@ describe('scripted playthrough (one sim, live sites only)', () => {
   // 90s budget: the re-hunted koi session sits at index 26 in the shared
   // stream, and every session ticks the REAL world to its bite.
   // Raised timeout (the climb_slope idiom): this beat drives thousands of
-  // REAL world ticks (27 bite-and-reel sessions plus bounded combat waits),
+  // REAL world ticks (9 bite-and-reel sessions plus bounded combat waits),
   // which overruns the 5s default under CI/core contention; every loop is
   // guard-bounded, so a genuine hang still terminates into a failed pin.
   it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', {
     timeout: 90_000,
   }, () => {
+    // The rare catch is a skill-scaled row now (content/items.ts): its weight
+    // is 1 in a hundred at band 0 and 6 at band 2. This angler is already at
+    // fishing's cap (beat 9) but has been fishing on the starter pole, which
+    // holds the effective band at 0 through the silent rod cap. The top rod is
+    // what lets the band they earned actually pay, which is the whole point of
+    // the row, so the hunt runs with it in the bags.
+    sim.addItem('silverstream_fishing_rod', 1, pid);
     let koiSession = -1;
     let sawBiteOnKoiSession = false;
     for (let s = 0; s < 120 && koiSession < 0; s++) {
@@ -295,13 +302,13 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         sawBiteOnKoiSession = bit;
       }
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded after the
-    // Idol Guardian gained phasesThroughObstacles on this branch: its ambient
-    // wander no longer stalls on the Sunken Idol relic colliders, so its
-    // wander-arrival timing moves and every shared-stream draw after it shifts
-    // (the same cause as this branch's parity golden re-mint): the koi bites
-    // on session index 39.
-    expect(koiSession).toBe(39);
+    // Hunted literal (seed 4242, after every beat above, re-recorded on the
+    // v0.34.0 release merge: BOTH parents moved the shared stream since the
+    // last recording, the packet's tuned band tables and world-gen on one
+    // side and the release's Idol Guardian phasesThroughObstacles wander
+    // timing on the other, the same cause as this merge's parity golden
+    // re-mint): the koi bites on session index 42.
+    expect(koiSession).toBe(42);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -329,18 +336,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 57 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 58 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 126,
+        hitAt: 87,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 2,
+        hitAt: 79,
       },
     ];
     for (const hunt of hunts) {
@@ -355,7 +362,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         // (the gather_rare_events.test.ts hunt idiom).
         purgeItem(hunt.itemId);
         delete meta.nodeHarvestReadyAt[hunt.nodeId];
-        if (!sim.harvestNode(hunt.nodeId, pid)) throw new Error(`${hunt.nodeId} cast denied`);
+        if (!sim.harvestNode(hunt.nodeId, undefined, pid))
+          throw new Error(`${hunt.nodeId} cast denied`);
         player.castingAbility = null;
         player.castRemaining = 0;
         sim.ctx.completeGatherCast(player, meta);
@@ -397,12 +405,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       sim.harvestCorpse(mob.id, ['hide'], pid);
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded after the
-    // Idol Guardian gained phasesThroughObstacles on this branch: its wander
-    // no longer stalls on the relic colliders, shifting every shared-stream
-    // draw after it): the rare-or-better rarity roll that mints the signed
-    // specimen lands on attempt index 19.
-    expect(hitAt).toBe(19);
+    // Hunted literal (seed 4242, after every beat above, re-recorded on the
+    // v0.34.0 release merge, the same both-parents stream shift as the koi
+    // literal above): the rare-or-better rarity roll that mints the signed
+    // specimen lands on attempt index 2.
+    expect(hitAt).toBe(2);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-为你的角色命名，从九个职业中任选其一，你将从 **Eastbrook Vale**（1 至 7 级）开始，这是一座集市镇，四周环绕着各处据点：北面是狼群出没地，东面是野猪草甸，西面是 Sableweb 林地，西北是 Mirror Lake，西南是一处遍布掘地怪的铜矿坑，东北是一座栖息着不安息亡者的废弃礼拜堂，东南则是 Gorrak 的强盗营地。北路翻越一道山口进入 **Mirefen Marsh**（6 至 13 级，据点 Fenbridge），再向上通往 **Thornpeak Heights**（13 至 20 级，据点 Highwatch）。世界种子在 `src/main.ts` 中固定，所以每次造访都是同一个地方。
+为你的角色命名，从九个职业中任选其一，你将从 **Eastbrook Vale**（1 至 7 级）开始，这是一座集市镇，四周环绕着各处据点：北面是狼群出没地，东面是野猪草甸，西面是 Sableweb 林地，西北是 Mirror Lake，西南是一处遍布掘地怪的铜矿坑，东北是一座栖息着不安息亡者的废弃礼拜堂，东南则是 Gorrak 的强盗营地。北路翻越一道山口进入 **Mirefen Marsh**（6 至 13 级，据点 Fenbridge），再向上通往 **Thornpeak Heights**（13 至 20 级，据点 Highwatch）。世界种子在 `src/sim/world_seed.ts` 中固定，所以每次造访都是同一个地方。
 
 ### 面向 Windows、Linux 和 macOS 的桌面应用
 

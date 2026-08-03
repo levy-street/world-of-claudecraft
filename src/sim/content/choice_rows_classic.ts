@@ -1908,7 +1908,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Hellglass Ward',
           description:
             'Every 3rd damaging Fire or Shadow spell raises a demonic ward absorbing 90 damage for 10 sec.',
-          icon: 'summon_felhound',
+          icon: 'summon_felhunter',
           effect: {
             proc: {
               id: 'wlk_grimoire_of_carnage',

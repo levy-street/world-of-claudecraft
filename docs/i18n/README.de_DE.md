@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Benenne deinen Charakter, wähle eine der neun Klassen, und du startest in **Eastbrook Vale** (Stufen 1-7), einer Marktstadt, umringt von Knotenpunkten: Wolfsreviere im Norden, Eberwiesen im Osten, die Sableweb-Wälder im Westen, Mirror Lake im Nordwesten, eine von Buddlern verseuchte Kupfergrube im Südwesten und eine zerstörte Kapelle der ruhelosen Toten im Nordosten, mit Gorraks Banditenlager im Südosten. Die Nordstraße erklimmt einen Gebirgspass hinauf nach **Mirefen Marsh** (6-13, Knotenpunkt Fenbridge) und weiter hinauf zu den **Thornpeak Heights** (13-20, Knotenpunkt Highwatch). Der Welt-Seed ist in `src/main.ts` fixiert, daher ist es bei jedem Besuch derselbe Ort.
+Benenne deinen Charakter, wähle eine der neun Klassen, und du startest in **Eastbrook Vale** (Stufen 1-7), einer Marktstadt, umringt von Knotenpunkten: Wolfsreviere im Norden, Eberwiesen im Osten, die Sableweb-Wälder im Westen, Mirror Lake im Nordwesten, eine von Buddlern verseuchte Kupfergrube im Südwesten und eine zerstörte Kapelle der ruhelosen Toten im Nordosten, mit Gorraks Banditenlager im Südosten. Die Nordstraße erklimmt einen Gebirgspass hinauf nach **Mirefen Marsh** (6-13, Knotenpunkt Fenbridge) und weiter hinauf zu den **Thornpeak Heights** (13-20, Knotenpunkt Highwatch). Der Welt-Seed ist in `src/sim/world_seed.ts` fixiert, daher ist es bei jedem Besuch derselbe Ort.
 
 ### Desktop-Apps für Windows, Linux und macOS
 

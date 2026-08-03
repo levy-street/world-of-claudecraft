@@ -10,12 +10,19 @@
 // plus an output sellValue re-price), so the frozen list below is EMPTY.
 import { describe, expect, it } from 'vitest';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
-import { ALL_RECIPES, COMBO_RECIPES, LADDER_RECIPES, recipeById } from '../src/sim/content/recipes';
+import {
+  ALL_RECIPES,
+  COMBO_RECIPES,
+  LADDER_RECIPES,
+  ROD_RECIPES,
+  recipeById,
+  TOOL_EFFECT_RECIPES,
+} from '../src/sim/content/recipes';
 import { ITEMS, NPCS, STATIONS } from '../src/sim/data';
 import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { stationsOfType, stationTypeForCraft } from '../src/sim/professions/stations';
-import { PRE_TRAINING_RECIPE_IDS } from '../src/sim/professions/training';
+import { PRE_TRAINING_RECIPE_IDS, trainingStationTypeFor } from '../src/sim/professions/training';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 
 // --- economy math (the locked reagent-value rule) --------------------------
@@ -108,27 +115,30 @@ describe('THE ECONOMY INVARIANT', () => {
     return total;
   }
 
-  it('every fully-vendor-fed recipe vendors strictly below its cheapest achievable input', () => {
-    const stocked = vendorStockedIds();
-    // Copper-loop membership needs BOTH facts: stocked by some NPC AND
-    // carrying a copper buyValue (the FURY honor vendor's priceHonor stock
-    // is in NPCS too; honor-priced goods have no copper basis and must
-    // never classify a recipe into this arm).
-    const vendorFed = ALL_RECIPES.filter((recipe) =>
+  // The set this bound runs over is keyed on the PRICE BASIS, not on live
+  // vendor stock. It used to be derived from vendorItems, which made it
+  // fragile in the worst way: the gathered-material delist emptied the live
+  // stocked set, and a set-derived loop that empties stops asserting without
+  // ever going red. The counterfactual is the durable question anyway. A recipe
+  // whose every reagent carries a copper buyValue is ONE vendor row away from
+  // being a pure-gold infinite-supply loop, so it must clear the bound today,
+  // whether or not a counter stocks it today.
+  function counterfactuallyVendorFedRecipes(): ProfessionRecipeRecord[] {
+    // A copper buyValue is the whole test (the FURY honor vendor's priceHonor
+    // stock has no copper basis and must never classify a recipe into this arm).
+    return ALL_RECIPES.filter((recipe) =>
       recipe.reagents.every((reagent) => {
         const def = ITEMS[reagent.itemId];
-        return (
-          stocked.has(reagent.itemId) &&
-          !!def &&
-          typeof def.buyValue === 'number' &&
-          def.buyValue > 0
-        );
+        return !!def && typeof def.buyValue === 'number' && def.buyValue > 0;
       }),
     );
-    // Membership pin: the vendor-fed set is exactly these six loops. A new
-    // recipe (or a new vendor row) that makes another recipe fully
-    // vendor-fed must be added HERE deliberately, and it then rides the
-    // cheapest-achievable-input bound below.
+  }
+
+  it('every recipe a vendor COULD fully feed vendors strictly below its cheapest input', () => {
+    const vendorFed = counterfactuallyVendorFedRecipes();
+    // Membership pin: exactly these six loops. A new recipe (or a new buyValue
+    // on a reagent) that makes another recipe counterfactually vendor-fed must
+    // be added HERE deliberately, and it then rides the bound below.
     expect(vendorFed.map((recipe) => recipe.id).sort()).toEqual([
       'recipe_ashwood_axe',
       'recipe_goldleaf_mana_draught',
@@ -137,6 +147,11 @@ describe('THE ECONOMY INVARIANT', () => {
       'recipe_sunpetal_mana_draught',
       'recipe_thorium_mining_pick',
     ]);
+    // NON-VACUITY FLOOR, the point of the rewrite: the loop below must never be
+    // allowed to run over an empty set. The toEqual above would catch a drop to
+    // zero today, but the floor states the requirement directly, so a future
+    // edit that relaxes the membership pin cannot quietly take the teeth with it.
+    expect(vendorFed.length).toBeGreaterThanOrEqual(6);
     for (const recipe of vendorFed) {
       expect(
         outputValue(recipe),
@@ -150,6 +165,38 @@ describe('THE ECONOMY INVARIANT', () => {
     // so without this pin a discount regression would silently widen the
     // bound and let a 300-to-440 re-price slip through green.
     expect(minAchievableInputValue(recipeById('recipe_sootscale_mantle')!)).toBe(300);
+  });
+
+  it('no recipe is fully vendor-fed in live stock, and the bound above does not rest on that', () => {
+    const stocked = vendorStockedIds();
+    const liveVendorFed = ALL_RECIPES.filter((recipe) =>
+      recipe.reagents.every((reagent) => {
+        const def = ITEMS[reagent.itemId];
+        return (
+          stocked.has(reagent.itemId) &&
+          !!def &&
+          typeof def.buyValue === 'number' &&
+          def.buyValue > 0
+        );
+      }),
+    );
+    // Since the gathered-material delist, every one of the six loops has at
+    // least one reagent no NPC sells. This records that fact; it is NOT what
+    // the bound runs over.
+    expect(liveVendorFed.map((recipe) => recipe.id)).toEqual([]);
+    // The live set is a subset of the counterfactual one by construction, and
+    // the counterfactual one is what still carries the assertions. Stating the
+    // subset relation as a SET operation, not as a loop over liveVendorFed:
+    // that loop runs zero times against the emptiness asserted one line up,
+    // which is the same assert-nothing shape this rewrite exists to remove.
+    const counterfactual = new Set(counterfactuallyVendorFedRecipes().map((r) => r.id));
+    const liveIds = liveVendorFed.map((recipe) => recipe.id);
+    expect(liveIds.filter((id) => !counterfactual.has(id))).toEqual([]);
+    expect(counterfactual.size).toBeGreaterThan(0);
+    // vendorStockedIds itself must be live, or the emptiness above is a lie
+    // told by a broken reader rather than a fact about the content.
+    expect(stocked.size).toBeGreaterThan(20);
+    expect(stocked.has('arcanite_bar')).toBe(true);
   });
 
   it('(a) every legacy member predates trainer acquisition (in PRE_TRAINING_RECIPE_IDS)', () => {
@@ -178,12 +225,16 @@ describe('THE ECONOMY INVARIANT', () => {
 
 describe('REFERENTIAL INTEGRITY', () => {
   // The real trainer-home rule (professions/training.ts resolveTrain): a train
-  // attempt locates the station via stationTypeForCraft(recipe.professionId),
-  // NOT via recipe.stationType. That is how the three station-free COMBO_RECIPES
-  // (no stationType field) still resolve a home: their professionId maps to a
-  // station type in STATION_TYPE_BY_CRAFT. So the teachable-home check walks
-  // professionId, and every trainer recipe must map to an existing station type
-  // that has at least one placed station with an existing master NPC.
+  // attempt locates the station via trainingStationTypeFor(recipe): the
+  // recipe's OWN stationType when it has one, else the station serving its
+  // craft. The fallback arm is how the three station-free COMBO_RECIPES (no
+  // stationType field) resolve a home (their professionId maps to a station
+  // type in STATION_TYPE_BY_CRAFT); the explicit arm is how the
+  // enchanting-home TOOL_EFFECT_RECIPES resolve one (enchanting has no
+  // station, the charms bind to the toolworks). So the teachable-home check
+  // walks the same shared resolution the sim and the trainer window use, and
+  // every trainer recipe must resolve an existing station type that has at
+  // least one placed station with an existing master NPC.
   const RUNTIME_STATION_TYPES = new Set(Object.values(STATION_TYPE_BY_CRAFT));
 
   it('every recipe reagent and result resolves to a real ItemDef', () => {
@@ -200,10 +251,11 @@ describe('REFERENTIAL INTEGRITY', () => {
     for (const recipe of ALL_RECIPES) {
       if (!recipe.acquisition?.includes('trainer')) continue;
       trainerRecipes += 1;
-      const type = stationTypeForCraft(recipe.professionId);
+      const type = trainingStationTypeFor(recipe);
       expect(
         type,
-        `${recipe.id}: professionId ${recipe.professionId} has no station type`,
+        `${recipe.id}: no teachable home (no stationType, and professionId ` +
+          `${recipe.professionId} has no station type)`,
       ).toBeDefined();
       const stations = stationsOfType(STATIONS, type as NonNullable<typeof type>);
       expect(stations.length, `${recipe.id}: no station of type ${type}`).toBeGreaterThan(0);
@@ -214,8 +266,18 @@ describe('REFERENTIAL INTEGRITY', () => {
         ).toBeDefined();
       }
     }
-    // The 54 ladder recipes plus the 3 grandfathered combos all carry 'trainer'.
-    expect(trainerRecipes).toBe(LADDER_RECIPES.length + COMBO_RECIPES.length);
+    // The 54 ladder recipes plus the 3 grandfathered combos all carry
+    // 'trainer', and so do the two crafted rods and the two tool-effect
+    // charms: the pre-training id list is frozen, so anything authored after
+    // that switch has to be learned.
+    expect(trainerRecipes).toBe(
+      LADDER_RECIPES.length +
+        COMBO_RECIPES.length +
+        ROD_RECIPES.length +
+        TOOL_EFFECT_RECIPES.length,
+    );
+    expect(ROD_RECIPES).toHaveLength(2);
+    expect(TOOL_EFFECT_RECIPES).toHaveLength(2);
   });
 
   it('the three station-free combo recipes resolve a home via professionId, not stationType', () => {

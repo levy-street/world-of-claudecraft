@@ -337,7 +337,493 @@
       "sourcePack": "custom-user",
       "sourceFile": "desktop/Nuevo talento.png",
       "output": "combat_mastery.webp"
+    },
+    {
+      "abilityId": "cleaving_blows",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/cleaving_blows.png",
+      "output": "cleaving_blows.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A broad axe sweep striking two targets while a spent charge rune reignites.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/bloodthirst.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warrior/charge.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Cleaving Blows (cleaving_blows)\nCanonical mechanic: Passive Fury trait: Red Harvest refunds one stored Twinstrike charge and its corresponding recharge timer.\nSubject: A broad axe sweep striking two targets while a spent charge rune reignites.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "deep_wounds",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/deep_wounds.png",
+      "output": "deep_wounds.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A deep sword gouge across armor opening into two heavy blood pulses.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/execute.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft project-generated art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/skills/warrior/bloodthirst.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Gaping Wounds (deep_wounds)\nCanonical mechanic: Passive Arms spellbook marker for Maiming Strike's bleed: 30 Physical damage over 6 sec, ticking every 3 sec.\nSubject: A deep sword gouge across armor opening into two heavy blood pulses.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "diabolical_twinstrike",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/diabolical_twinstrike.png",
+      "output": "diabolical_twinstrike.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Two mirrored blades crossing through a demonic red Enrage flame.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/bloodthirst.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warrior/execute.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft project-generated art",
+          "license": "Project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Diabolical Twinstrike (diabolical_twinstrike)\nCanonical mechanic: Passive Fury trait: while Enraged, Twinstrike's weapon multiplier and flat bonus are each increased by 15%.\nSubject: Two mirrored blades crossing through a demonic red Enrage flame.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "enrage_passive",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/enrage_passive.png",
+      "output": "enrage_passive.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Twin axes inside a crimson frenzy halo, with three motion bands representing damage, haste, and movement.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/bloodthirst.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warrior/charge.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Mayhem (enrage_passive)\nCanonical mechanic: Passive Fury spellbook marker. Bloodletting has a 30% chance and Red Harvest a 100% chance to grant 4 sec Enrage: +7% damage, +25% haste, and 10% movement speed.\nSubject: Twin axes inside a crimson frenzy halo, with three motion bands representing damage, haste, and movement.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "measured_fury",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/measured_fury.png",
+      "output": "measured_fury.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Calm scarred helm above a Rage gauge being precisely shaved by one notch.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/shield_slam.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warrior/bloodthirst.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Measured Fury (measured_fury)\nCanonical mechanic: Passive Arms trait: positive Rage costs are rounded to 90% at the resolved-cost choke point.\nSubject: Calm scarred helm above a Rage gauge being precisely shaved by one notch.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "seasoned_soldier",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/seasoned_soldier.png",
+      "output": "seasoned_soldier.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Veteran helm struck by a critical star, feeding a glowing Rage droplet.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/bloodthirst.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warrior/execute.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft project-generated art",
+          "license": "Project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Seasoned Soldier (seasoned_soldier)\nCanonical mechanic: Passive Arms trait: critical white auto-attacks generate 10% more Rage.\nSubject: Veteran helm struck by a critical star, feeding a glowing Rage droplet.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sport_boot",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/sport_boot.png",
+      "output": "sport_boot.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An armored boot launching the Vale Cup ball on a long medium-high arc.",
+      "references": [
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_goal.webp",
+          "role": "style reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_save.webp",
+          "role": "subject reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_clean_sheet.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Big Boot (sport_boot)\nCanonical mechanic: Vale Cup move: off-GCD Big Boot launches the ball at power 24, loft 7, up to 30 yd; 6 sec cooldown.\nSubject: An armored boot launching the Vale Cup ball on a long medium-high arc.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sport_dive",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/sport_dive.png",
+      "output": "sport_dive.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A fully extended gloved keeper diving into a Vale Cup ball's catch halo.",
+      "references": [
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_goal.webp",
+          "role": "style reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_save.webp",
+          "role": "subject reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_clean_sheet.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Dive (sport_dive)\nCanonical mechanic: Vale Cup keeper move: off-GCD Dive dashes 8 yd and catches a crossing ball; 8 sec cooldown.\nSubject: A fully extended gloved keeper diving into a Vale Cup ball's catch halo.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sport_feint",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/sport_feint.png",
+      "output": "sport_feint.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Two crossed boot afterimages zigzagging around a stationary Vale Cup ball.",
+      "references": [
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_goal.webp",
+          "role": "style reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_save.webp",
+          "role": "subject reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_clean_sheet.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Feint (sport_feint)\nCanonical mechanic: Vale Cup move: off-GCD Feint dashes 5 yd toward the aim point; 8 sec cooldown.\nSubject: Two crossed boot afterimages zigzagging around a stationary Vale Cup ball.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sport_hoof",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/sport_hoof.png",
+      "output": "sport_hoof.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A heavy boot hammering the Vale Cup ball horizontally with compressed speed streaks.",
+      "references": [
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_goal.webp",
+          "role": "style reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_save.webp",
+          "role": "subject reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_clean_sheet.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Hoof It (sport_hoof)\nCanonical mechanic: Vale Cup move: off-GCD Hoof It drives the ball at power 26, loft 4, up to 30 yd; 8 sec cooldown.\nSubject: A heavy boot hammering the Vale Cup ball horizontally with compressed speed streaks.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sport_kick",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/sport_kick.png",
+      "output": "sport_kick.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An armored boot tapping the Vale Cup ball along a low ground trajectory.",
+      "references": [
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_goal.webp",
+          "role": "style reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_save.webp",
+          "role": "subject reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_clean_sheet.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Kick (sport_kick)\nCanonical mechanic: Vale Cup move: off-GCD Kick rolls the ball toward the aim point at power 16, loft 3, up to 18 yd; 1.2 sec cooldown.\nSubject: An armored boot tapping the Vale Cup ball along a low ground trajectory.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sport_pass",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/sport_pass.png",
+      "output": "sport_pass.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Two teammates linked by a ground-hugging Vale Cup ball arrow aimed ahead of the receiver.",
+      "references": [
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_goal.webp",
+          "role": "style reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_save.webp",
+          "role": "subject reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_clean_sheet.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Pass (sport_pass)\nCanonical mechanic: Vale Cup move: off-GCD Pass auto-paces and leads the targeted teammate, capped at power 26 and 42 yd; 1 sec cooldown.\nSubject: Two teammates linked by a ground-hugging Vale Cup ball arrow aimed ahead of the receiver.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sport_punt",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/sport_punt.png",
+      "output": "sport_punt.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A keeper's boot under an airborne Vale Cup ball tracing the tallest kick arc.",
+      "references": [
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_goal.webp",
+          "role": "style reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_save.webp",
+          "role": "subject reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_clean_sheet.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Long Punt (sport_punt)\nCanonical mechanic: Vale Cup move: off-GCD Long Punt launches the ball at power 26, loft 9, up to 34 yd; 10 sec cooldown.\nSubject: A keeper's boot under an airborne Vale Cup ball tracing the tallest kick arc.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sport_second_wind",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/sport_second_wind.png",
+      "output": "sport_second_wind.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Running greaves wrapped in fresh green wind ribbons beside the Vale Cup ball.",
+      "references": [
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_goal.webp",
+          "role": "style reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_save.webp",
+          "role": "subject reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_clean_sheet.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Fresh Legs (sport_second_wind)\nCanonical mechanic: Vale Cup move: off-GCD Fresh Legs increases movement speed by 50% for 4 sec; 12 sec cooldown.\nSubject: Running greaves wrapped in fresh green wind ribbons beside the Vale Cup ball.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sport_shoot",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/sport_shoot.png",
+      "output": "sport_shoot.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A charged boot, goal mouth, and rising Vale Cup ball crossing a visible power ring.",
+      "references": [
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_goal.webp",
+          "role": "style reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_save.webp",
+          "role": "subject reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_clean_sheet.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Shoot (sport_shoot)\nCanonical mechanic: Vale Cup charged shot: aim distance scales ground speed and loft up to power 28 and loft 11 over 34 yd; excess charge can clear the crossbar; 1.4 sec cooldown.\nSubject: A charged boot, goal mouth, and rising Vale Cup ball crossing a visible power ring.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sport_shoulder",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/sport_shoulder.png",
+      "output": "sport_shoulder.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An armored shoulder colliding with a ball carrier while the Vale Cup ball pops loose.",
+      "references": [
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_goal.webp",
+          "role": "style reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_first_save.webp",
+          "role": "subject reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/deeds/pvp_vcup_clean_sheet.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft maintainer-commissioned bespoke art",
+          "license": "Project asset, rights reserved"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Shoulder (sport_shoulder)\nCanonical mechanic: Vale Cup move: off-GCD Shoulder stuns the target for 1.2 sec and shoves them 4 yd without damage; 10 sec cooldown.\nSubject: An armored shoulder colliding with a ball carrier while the Vale Cup ball pops loose.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sudden_death",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/warrior/sudden_death.png",
+      "output": "sudden_death.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A skull over a broken health ring, bisected by an execution slash and zero-cost spark.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/execute.webp",
+          "role": "subject reference",
+          "provenance": "World of ClaudeCraft project-generated art",
+          "license": "Project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/skills/warrior/charge.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warrior\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Sudden Death (sudden_death)\nCanonical mechanic: Passive Arms trait: each connected auto-attack has a 10% chance to grant a 10 sec aura making Early Grave free and usable at any target health.\nSubject: A skull over a broken health ring, bisected by an execution slash and zero-cost spark.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
   ],
-  "deferredStayProcedural": {}
+  "deferredStayProcedural": {},
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
 }

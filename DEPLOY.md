@@ -230,6 +230,140 @@ For off-box safety, sync the directory to S3 occasionally:
   cannot honor future expiry times. Operators must either remove still-active timed bans
   before rollback or explicitly accept that they will become permanent until manually
   unbanned. Do not alter the nullable `expires_at` column during rollback.
+- **Professions rollback caveats**: `characters.state` is written whole, so rolling
+  back to a binary that predates a professions field erases that field on the first
+  autosave. Across the professions persistence release specifically: node respawn
+  timers (`nodeHarvestCooldowns`) are erased, which reopens the node relog exploit
+  for the rollback window (accepted trade, no player value lost); slotted tool
+  effects (`toolEffectSlots`) are erased the same way, and since the
+  acquisition craft shipped that is REAL PLAYER-VALUE LOSS (a slot costs a
+  crafted charm of arcane reagents plus its recharges, and the erased
+  `craftedBy` discount provenance cannot be re-minted), so a rollback across
+  the acquisition-craft boundary needs a restore-from-backup plan and the
+  release notes must carry the caveat; the tier-mail acknowledgement
+  prune is a one-way heal that fires on the first UPGRADE load, so a rollback
+  cannot undo it and the only recovery is a database backup; and any FUTURE
+  proficiency or craft cap raise is rollback-destructive
+  (the old binary clamps raised values on load and persists the loss), so a
+  rollback across a cap change needs a restore-from-backup plan for professions
+  counters. Details: "Rollback erases newer fields" in
+  `docs/design/professions-tuning-packet.md`.
+- **Client/server deploy order for content releases**: deploy the SERVER first, then
+  let clients update. Web and desktop bundles refresh on their next load. The iOS
+  binary rides App Store review and cannot pick up a same-day bundle (LiveUpdates
+  is off), so submit it early, hold its release until it is approved, release the
+  binary, and deploy the server right behind it: the binary must be out before the
+  server moves, and the gap between the two must stay short. The two mid-window
+  mixes degrade differently, and the order above keeps both windows short:
+  - OLD client on NEW server (the guarded direction): item ids the bundle predates
+    render with the fallback icon and their raw id in the trade window, bags, and
+    bank; profession grant lines name the raw id; vendor rows show the old
+    bundle's stock and prices while the purchase path charges the server's own
+    truth (a mismatch is display-only); denial toasts fall back to their generic
+    wording. Gather-node skew depends on the node family, because each side
+    collides against its own bundle's positions: moved or added ORE and WOOD
+    collide invisibly at their server spots and stand as solid stale props at
+    their old client spots (both read as rubber-band corrections), while HERB
+    skew is walk-through phantom props only (herb clusters carry no collider).
+    All of THAT is cosmetic and self-heals when the client updates. Two
+    v0.32.0 surfaces on this leg are NOT cosmetic: the world grew far past
+    the old bundle's terrain rectangle, so a stale tab can walk east,
+    west, or north into ground its renderer has no mesh for (a void with the wrong
+    zone name and music, walkable because the server's rim moved outward);
+    and the instance plane REBASED (INSTANCE_X_BASE), so a stale tab that
+    enters any dungeon, delve, or arena after the deploy is teleported to
+    coordinates its renderer draws as a black, collider-less void, with the
+    exit object invisible, until relog (login is protected: a saved
+    inside-instance position ejects to the door). The release left the
+    fail-closed layout gate at ONLINE_WORLD_LAYOUT_VERSION 3 through both
+    changes, so stale bundles are still admitted at reconnect; bumping it
+    is the one-line mechanical answer if the maintainer resolves the
+    surfaced forced-refresh question toward refusing stale sessions.
+  - NEW client on OLD server (the bounded direction): every gather node the
+    release relocated is unusable, because the client shows it where the old
+    server does not have it. Among the zones the deployed server HAS, the
+    worst cases are Eastbrook tier-1 herbalism and Mirefen's tier-2 band,
+    each a fully moved-or-new group; the eleven expansion zones are a
+    different class entirely (their ground does not exist on the old server,
+    so everything there is dead until the server deploys), and new client
+    surfaces advertise nodes, items, and minimap markers the old server
+    denies.
+    This window exists only between a client release and the server deploy, so
+    close it by deploying the server as soon as the clients are staged. (An
+    old server answers a command it does not know by logging a protocol
+    anomaly to the bot detector and spending a rate-limit token. The
+    professions tuning packet itself adds TWO commands, slot_tool_effect and
+    recharge_tool_effect, neither dev-gated, both wired to shipped
+    professions-window buttons; on the FORWARD leg those buttons stay
+    unreachable for an ordinary player because an old server never mints a
+    charm and never sends the tslot rows the buttons render from, so only a
+    hand-built frame spends tokens through them. On a ROLLBACK leg the
+    premise flips: charms already crafted survive in bags (the pre-packet
+    loader keeps unknown-id slots as dormant data), so the slot buttons
+    render from real inventory and an ordinary click spends rate-limit
+    tokens and logs anomalies against the rolled-back server until the
+    packet server returns. The v0.32.0 expansion the branch
+    merged with adds eleven more commands, none dev-gated, of which FOUR are
+    reachable from the shipped client's own surfaces: the mount key, the two
+    race controls, and the Settings unstuck action. On this leg an ordinary
+    player pressing the mount key or using unstuck spends rate-limit tokens
+    and logs anomalies until the server deploys, one more reason to keep the
+    binary-to-server gap short. One more version-skewed CONSUMER rides this
+    deploy: the discord-bot container's activity feed predates the packet's
+    masterwork and deed card kinds (and the expansion's vale_cup kind), so
+    restart the bot with the server or those cards post as empty embeds
+    Discord rejects until it picks up the new build.)
+  Release-specific caveat for the professions tuning deploy: the guards above
+  describe bundles built from this release onward. The bundle DEPLOYED TODAY
+  predates them, and its trade window throws while rendering an offer that
+  stages ANY item id the bundle predates (the packet's fine-grade materials
+  and rods, and equally the expansion's whole tradeable catalog: rift
+  essence and gems, the new-zone gear, none of it soulbound), freezing that
+  trade panel for the stale session until the page reloads. The sibling
+  loot-window throw is unreachable through the PACKET's ids as long as
+  they remain gathering, recipe, vendor, and delve-shop
+  content only, out of every mob and chest loot table, so keep them out
+  until clients have rolled; it is NOT unreachable for the merged release as
+  a whole, because the v0.32.0 expansion put four mount reins into the
+  heroic loot of five encounters the deployed bundle already knows (the
+  Morthen, Vael, Ysolei, and Korzul heroic finales plus the Nythraxis raid),
+  so a solo or free-for-all heroic clear that drops one freezes a stale
+  session's corpse loot window the same way, and the v0.34.0 sync widened
+  the same arm: the release's Heroic Wildheart Basin loot pass (Zulgar) put
+  six more epic ids into heroic boss loot that a stale bundle
+  does not know. The reins odds are the mount drop rates (0.5 and 0.1
+  percent) while the Wildheart ids drop at ordinary heroic rates, the party
+  need/greed path is already guarded at the base, and the frozen id set
+  (reins exceptions plus the Wildheart additions) is pinned by the
+  deploy-window test's snapshot. Rift-run loot is a second release-content arm on
+  the same window (the run builders push the rift catalog onto boss corpse
+  lists at runtime, outside every content-table sweep); it requires the
+  stale tab to get inside a rift at all, and whether the old bundle's
+  generic object interaction reaches a rift portal has not been verified
+  either way. Both arms are inputs to the surfaced
+  forced-refresh-at-deploy question. Two more
+  deployed-bundle arms need no loot table at all, because the
+  fine grades are minted by HARVESTING with an outclassing tool: a stale tab
+  that gathers one sees it land in an INVISIBLE bag cell (and bank cell after
+  a deposit) that still consumes capacity, and the profession chat line names
+  the raw id. Cosmetic and self-healing on reload, but they will read as
+  "my ore vanished" in reports, so expect them for as long as stale tabs
+  live. Stale sessions are ended by the pre-deploy restart countdown, but a
+  reconnect rides the same stale page: only a page reload picks up the new
+  bundle.
+  The caveats above were measured against 9d7a1a021, the commit deployed
+  today; the branch has since merged the true v0.32.0 tip (0b427afca, 685
+  commits past the measured base), re-synced repeatedly through
+  release/v0.33.0 (last at 2ae71a7fbf), and then merged release/v0.34.0
+  (94f5ac63d8, at merge 706bec2d21), which together are what the
+  merged-branch numbers above describe. If the live server moves before
+  this branch deploys, re-run the compatibility diff against the commit
+  actually deployed before trusting any "N new X" claim.
+  The loot-table exclusion is enforced by
+  `tests/stale_client_rollout.test.ts` for the deploy window (delete that
+  pin once clients have rolled). Per-surface analysis for the professions
+  tuning release: the stale-client compatibility phase of
+  `docs/design/professions-tuning-packet-review.md`.
 - **Bank ledger audit**: `node scripts/bank_audit.mjs` (reads `DATABASE_URL` from the
   environment) replays the append-only `bank_ledger` against live character bank state
   and exits non-zero on any discrepancy. Run it after an economy incident or a restore.
@@ -379,6 +513,29 @@ For off-box safety, sync the directory to S3 occasionally:
   and `/readyz` need no token, but they are for the container healthcheck and the
   host watchdog, which read them locally and never through Caddy; nothing on the
   public internet needs them.
+  Series-cardinality note for the v0.32.0 deploy: the zone label vocabulary
+  behind the harvest and fishing counter families grew from 3 zones to 14,
+  so every zone-labeled counter now pre-registers 42 series (zone x tier or
+  zone x band) instead of 9, about 4.7x per family, and dashboards or alerts
+  that enumerate zone label values need re-pointing at the new ids. The
+  full cross product is still pre-registered at boot by design (a Prometheus
+  counter cannot backfill a scrape), and no per-request cardinality bound
+  changed: the vocabularies stay content-derived and bounded.
+- **Multi-realm scraping**: one server process hosts exactly one realm, and no
+  exported series carries a `realm` label (pinned by the exporter tests; the
+  DB-backed business family filters on the realm in its queries instead). Give
+  each realm process its own scrape target and attach realm identity as a
+  target label in the scrape config, e.g.
+  `static_configs: [{ targets: ['127.0.0.1:8787'], labels: { realm: 'emberfall' } }]`
+  per realm port. Counters then sum cleanly across realms
+  (`sum(woc_fishing_catches_total)` is world-wide). The one exception:
+  `woc_rod_fee_copper` is a static content gauge published IDENTICALLY by
+  every realm process, so aggregate it with `max()` (or `avg()`), never
+  `sum()`. Both series carry a `recipe` label and the two rod fees DIFFER,
+  so the aggregation must keep that label or the product multiplies every
+  training by the single highest fee: the copper the rod fees took across
+  realms is
+  `sum(sum by (recipe) (woc_rod_fee_payments_total) * max by (recipe) (woc_rod_fee_copper))`.
 - **Discord bot series (Grafana)**: the bot reports its rate-limit governor
   counters on the presence push it already sends, so `/metrics` carries them with
   no extra scrape target and no bot-side endpoint. Cumulative counters
@@ -532,14 +689,30 @@ For off-box safety, sync the directory to S3 occasionally:
     not a capacity estimate: what a realm can actually carry depends on the host, so
     measure yours and set the number you measured.
   - `DAILY_REWARD_EVENTS_RETENTION_DAYS=`, `ONLINE_SAMPLES_RETENTION_DAYS=`,
-    `SITE_PRESENCE_RETENTION_DAYS=`, `PLAY_SESSION_RETENTION_DAYS=`, and
-    `ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS=` (empty) follow the
+    `SITE_PRESENCE_RETENTION_DAYS=`, `PLAY_SESSION_RETENTION_DAYS=`,
+    `ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS=`, and
+    `UNSTUCK_REPORT_RETENTION_DAYS=` (empty) follow the
     `CHAT_LOG_RETENTION_DAYS` contract exactly: an empty line means the default,
-    and an explicit `0` is keep-forever.
+    and an explicit `0` is keep-forever. The unstuck table carries account and
+    character ids plus positions, so audit its window with the same care as
+    the IP tables.
   - `RETENTION_SWEEP_UTC_HOUR=` and `RETENTION_SWEEP_MAX_ROWS_PER_RUN=` are NOT
     keep-forever-shaped: their raw value is trimmed, so an empty or whitespace line
     also reads as the DEFAULT, but an explicit `0` is a live value: a 00:00 UTC
     sweep hour, or a zero-row budget that disables the nightly sweep.
+- **`DB_POOL_MAX_CLIENTS`: production deliberately stays at the default of 10.**
+  The load rig measured the wall this buys: on the 10-client default a login ramp
+  pins the pool from roughly 487 concurrent players, `woc_db_pool_clients{state="waiting"}`
+  oscillates with the 30-second autosave waves, and joins slow to a crawl, while the
+  players already in stay playable. The SYMPTOM an operator sees is players reporting
+  "Authentication timed out" while `woc_db_pool_clients{state="waiting"}` holds above
+  zero between autosave waves; that pair means pool saturation, not an auth outage.
+  The response: raise `DB_POOL_MAX_CLIENTS` a few clients at a time (it accepts 1 to 97
+  and rejects loudly outside that), never straight to the ceiling, and keep the budget
+  arithmetic in view: realms sharing one `DATABASE_URL` multiply, and each realm also
+  takes one boot client, so realms x pool + realms must stay at or under the 97 usable
+  connections on stock `postgres:16` (`max_connections` 100, 3 superuser-reserved).
+  The boot log warns when the configured multiplication breaks that budget.
 - **Nightly retention sweep.** The batched retention prunes run once per UTC day
   at `RETENTION_SWEEP_UTC_HOUR` (default 05:00 UTC) behind a database advisory
   lock, so with several processes on one database exactly one of them sweeps.

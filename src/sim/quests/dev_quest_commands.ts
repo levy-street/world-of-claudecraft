@@ -1,4 +1,5 @@
 import { QUESTS } from '../data';
+import { countAcrossGrades } from '../professions/material_grades';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type QuestDef, type QuestProgress, questObjectiveRequired } from '../types';
@@ -21,7 +22,11 @@ function satisfyTrackedQuestForDev(
   quest.objectives.forEach((obj, index) => {
     const required = questObjectiveRequired(quest, qp, index);
     if (obj.type === 'collect' && obj.itemId) {
-      const have = ctx.countItem(obj.itemId, meta.entityId);
+      // Grade-aware like the real credit path (quest_credit.ts): a bag already
+      // full of the fine grade satisfies the objective, so the cheat must not
+      // mint plain copies on top of it and report a different total than the
+      // player's own tracker shows.
+      const have = countAcrossGrades(obj.itemId, (id) => ctx.countItem(id, meta.entityId));
       if (have < required) {
         ctx.addItem(obj.itemId, required - have, meta.entityId);
         collectChanged = true;

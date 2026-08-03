@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-キャラクターに名前をつけ、9つのクラスのいずれかを選ぶと、**Eastbrook Vale**（レベル1から7）からスタートします。ここは複数の拠点に囲まれた市場町です。北には狼の通り道、東にはイノシシの草原、西には the Sableweb の森、北西には Mirror Lake、南西には穴掘りだらけの銅鉱の採掘場、北東には安らげぬ死者の崩れた礼拝堂、そして南東には Gorrak の盗賊キャンプがあります。北の街道は山道を登って **Mirefen Marsh**（6から13、拠点 Fenbridge）へ、さらに **Thornpeak Heights**（13から20、拠点 Highwatch）へと続きます。世界のシードは `src/main.ts` で固定されているので、訪れるたびに同じ場所です。
+キャラクターに名前をつけ、9つのクラスのいずれかを選ぶと、**Eastbrook Vale**（レベル1から7）からスタートします。ここは複数の拠点に囲まれた市場町です。北には狼の通り道、東にはイノシシの草原、西には the Sableweb の森、北西には Mirror Lake、南西には穴掘りだらけの銅鉱の採掘場、北東には安らげぬ死者の崩れた礼拝堂、そして南東には Gorrak の盗賊キャンプがあります。北の街道は山道を登って **Mirefen Marsh**（6から13、拠点 Fenbridge）へ、さらに **Thornpeak Heights**（13から20、拠点 Highwatch）へと続きます。世界のシードは `src/sim/world_seed.ts` で固定されているので、訪れるたびに同じ場所です。
 
 ### Windows、Linux、macOS 向けデスクトップアプリ
 

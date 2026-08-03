@@ -81,6 +81,7 @@
     "env": "npm run build:env && node dist-env/env_server.cjs",
     "bench": "npm run build:env && node dist-env/env_server.cjs --bench",
     "perf:load": "node scripts/server_load_jitter.mjs",
+    "perf:professions": "node scripts/load_professions.mjs",
     "audit:quests": "node scripts/quest_audit_graph.mjs",
     "audit:zone1": "npm run audit:quests",
     "db:up": "docker compose up -d postgres",

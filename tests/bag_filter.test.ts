@@ -1,4 +1,8 @@
 import { describe, expect, it } from 'vitest';
+// Aliased: this file declares a small synthetic ITEMS table for the filter
+// arms, so the real merged catalog (needed for the reachability census) comes
+// in renamed.
+import { ITEMS as REAL_ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import {
   applyBagFilter,
@@ -7,6 +11,7 @@ import {
   bagFilterIsDefault,
   bagOrderIsManual,
   DEFAULT_BAG_FILTER,
+  matchesCategory,
   parseBagFilter,
   serializeBagFilter,
 } from '../src/ui/bag_filter';
@@ -33,6 +38,9 @@ const ITEMS: Record<string, ItemDef> = {
   bread: { id: 'bread', name: 'Crusty Bread', kind: 'food', quality: 'common' },
   pelt: { id: 'pelt', name: 'Wolf Pelt', kind: 'junk', quality: 'poor' },
   rod: { id: 'rod', name: 'Fishing Rod', kind: 'tool', quality: 'common' },
+  // A REAL catalog id: the material chip is honest-taxonomy set membership
+  // (src/sim/material_taxonomy.ts), so a synthetic id can never match it.
+  iron_ore: { id: 'iron_ore', name: 'Iron Ore', kind: 'junk', quality: 'common' },
   keystone: { id: 'keystone', name: 'Crypt Keystone', kind: 'quest', quality: 'common' },
   relic: { id: 'relic', name: 'Ancient Relic', kind: 'armor', slot: 'chest', quality: 'legendary' },
   reins: {
@@ -63,7 +71,7 @@ function ids(slots: InvSlot[]): string[] {
   return slots.map((s) => s.itemId);
 }
 
-describe('applyBagFilter — category filtering', () => {
+describe('applyBagFilter: category filtering', () => {
   it('returns everything (insertion order) for "all" + "recent"', () => {
     const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'recent', search: '' });
     expect(ids(out)).toEqual(ids(INV));
@@ -84,9 +92,29 @@ describe('applyBagFilter — category filtering', () => {
     expect(ids(out)).toEqual(['potion', 'bread']);
   });
 
-  it('keeps junk and tools as materials', () => {
-    const out = applyBagFilter(INV, lookup, { category: 'material', sort: 'recent', search: '' });
-    expect(ids(out)).toEqual(['pelt', 'rod']);
+  it('keeps only honest materials: grey junk and tools no longer match the chip', () => {
+    // The material chip narrowed from junk-or-tool to the derived taxonomy
+    // (phase 19): the real material matches; the grey pelt and the tool are
+    // out (the tool moves to its own chip below).
+    const inv: InvSlot[] = [
+      { itemId: 'pelt', count: 5 },
+      { itemId: 'iron_ore', count: 2 },
+      { itemId: 'rod', count: 1 },
+      { itemId: 'blade', count: 1 },
+    ];
+    const out = applyBagFilter(inv, lookup, { category: 'material', sort: 'recent', search: '' });
+    expect(ids(out)).toEqual(['iron_ore']);
+  });
+
+  it('keeps only tools under the tool chip (the displaced implements)', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'pelt', count: 5 },
+      { itemId: 'iron_ore', count: 2 },
+      { itemId: 'rod', count: 1 },
+      { itemId: 'blade', count: 1 },
+    ];
+    const out = applyBagFilter(inv, lookup, { category: 'tool', sort: 'recent', search: '' });
+    expect(ids(out)).toEqual(['rod']);
   });
 
   it('keeps only quest items', () => {
@@ -106,14 +134,36 @@ describe('applyBagFilter — category filtering', () => {
     expect(ids(out)).toEqual(['reins']);
   });
 
-  it('drops slots whose item is missing from the table', () => {
+  it('keeps an unknown-id slot visible in the everything view (stale-client guard, R34)', () => {
+    // Inventory is server truth: a bundle one deploy behind the server can
+    // hold ids it predates, and each one still occupies a real, counted bag
+    // slot. Dropping it from the everything view is how a counted slot turns
+    // invisible, the exact failure the phase 11 guard removes.
     const inv: InvSlot[] = [...INV, { itemId: 'ghost', count: 1 }];
     const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'recent', search: '' });
-    expect(ids(out)).not.toContain('ghost');
+    expect(ids(out)).toEqual([...ids(INV), 'ghost']);
+  });
+
+  it('excludes an unknown-id slot from every category chip and from a name search', () => {
+    // With no def there is no kind to classify and no display name to match;
+    // only the everything view keeps the slot. The search arm also proves a
+    // query does not match the raw id (a player searches names, not ids).
+    const inv: InvSlot[] = [...INV, { itemId: 'ghost', count: 1 }];
+    for (const category of BAG_CATEGORIES) {
+      if (category === 'all') continue;
+      const out = applyBagFilter(inv, lookup, { category, sort: 'recent', search: '' });
+      expect(ids(out), category).not.toContain('ghost');
+    }
+    const searched = applyBagFilter(inv, lookup, {
+      category: 'all',
+      sort: 'recent',
+      search: 'ghost',
+    });
+    expect(ids(searched)).not.toContain('ghost');
   });
 });
 
-describe('applyBagFilter — search', () => {
+describe('applyBagFilter: search', () => {
   it('matches a case-insensitive name substring', () => {
     const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'recent', search: 'red' });
     expect(ids(out)).toEqual(['blade']);
@@ -134,7 +184,7 @@ describe('applyBagFilter — search', () => {
   });
 });
 
-describe('applyBagFilter — sorting', () => {
+describe('applyBagFilter: sorting', () => {
   it('sorts by quality descending (legendary first, poor last), ties keep insertion order', () => {
     const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'quality', search: '' });
     expect(ids(out)).toEqual([
@@ -170,6 +220,43 @@ describe('applyBagFilter — sorting', () => {
     applyBagFilter(INV, lookup, { category: 'all', sort: 'quality', search: '' });
     expect(ids(INV)).toEqual(before);
   });
+
+  it('ranks an unknown-id slot below poor in the quality sort, never a throw', () => {
+    // The unknown slot is prepended so landing LAST proves ranking, not
+    // stable-order luck; before the guard this sort dereferenced the missing
+    // def through a non-null assertion.
+    const inv: InvSlot[] = [{ itemId: 'ghost', count: 1 }, ...INV];
+    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'quality', search: '' });
+    expect(ids(out)).toEqual([
+      'relic',
+      'helm',
+      'blade',
+      'potion',
+      'keystone',
+      'bread',
+      'dagger',
+      'rod',
+      'pelt',
+      'ghost',
+    ]);
+  });
+
+  it('name-sorts an unknown-id slot by its raw id', () => {
+    const inv: InvSlot[] = [{ itemId: 'ghost', count: 1 }, ...INV];
+    const out = applyBagFilter(inv, lookup, { category: 'all', sort: 'name', search: '' });
+    expect(ids(out)).toEqual([
+      'relic',
+      'bread',
+      'keystone',
+      'rod',
+      'ghost',
+      'helm',
+      'potion',
+      'blade',
+      'dagger',
+      'pelt',
+    ]);
+  });
 });
 
 describe('serialize / parse round-trip', () => {
@@ -200,6 +287,19 @@ describe('BAG_CATEGORIES', () => {
 
   it('includes the mounts category', () => {
     expect(BAG_CATEGORIES).toContain('mount');
+  });
+
+  it('pins the whole chip row, in order', () => {
+    expect([...BAG_CATEGORIES]).toEqual([
+      'all',
+      'weapon',
+      'armor',
+      'consumable',
+      'material',
+      'tool',
+      'quest',
+      'mount',
+    ]);
   });
 });
 
@@ -233,5 +333,57 @@ describe('bagOrderIsManual (the reorder gate)', () => {
     expect(bagOrderIsManual({ category: 'all', sort: 'name', search: '' })).toBe(false);
     expect(bagOrderIsManual({ category: 'weapon', sort: 'recent', search: '' })).toBe(false);
     expect(bagOrderIsManual({ category: 'all', sort: 'recent', search: 'clo' })).toBe(false);
+  });
+});
+
+describe('chip reachability census: the All-only set, pinned', () => {
+  // The market pins "no item reachable only through All" as a doctrine
+  // (tests/market_filters.test.ts); the bags/bank chips deliberately do NOT
+  // carry it: the 2026-08-01 settlement ruled grey trash and the five trophy
+  // oddments out of every chip (Q3/Q4), and the six bag-kind items matched no
+  // chip before the narrowing either. This census makes the ruling
+  // enforceable: a chip or taxonomy edit that strands MORE items (or quietly
+  // rescues one the settlement excluded) reds an exact-set diff naming it.
+  const ALL_ONLY = [
+    'amber_hide',
+    'bandit_bandana',
+    'bogiron_nugget',
+    'briny_idol',
+    'chipped_tusk',
+    'cracked_fetish',
+    'cracked_ogre_tusk',
+    'cracked_wyrm_scale',
+    'deepfen_pearl',
+    'emberwing_cinderscale',
+    'frayed_prayer_beads',
+    'gleamstag_charm',
+    'gravewoven_bag',
+    'guardian_core',
+    'inert_storm_shard',
+    'last_keep_signet',
+    'linen_pouch',
+    'mistcallers_duffel',
+    'moonpale_scale',
+    'mudfin_scale',
+    'ogre_toe_ring',
+    'old_cragmaws_pelt',
+    'pale_pearl',
+    'silkspun_satchel',
+    'soft_down',
+    'soggy_boot',
+    'soggy_moccasin',
+    'stag_antler',
+    'tallow_candle',
+    'tangled_weed',
+    'travelers_knapsack',
+    'wolfhide_satchel',
+  ] as const;
+
+  it('exactly the ruled 26 junk items plus the 6 bag-kind items match no chip', () => {
+    const allOnly = Object.values(REAL_ITEMS)
+      .filter((def) => !BAG_CATEGORIES.some((c) => c !== 'all' && matchesCategory(def, c)))
+      .map((d) => d.id)
+      .sort();
+    expect(allOnly).toEqual([...ALL_ONLY]);
   });
 });

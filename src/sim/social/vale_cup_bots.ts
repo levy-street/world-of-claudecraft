@@ -12,7 +12,7 @@
 // of sim state (pid parity picks the stagger slot, positions pick the play), so
 // a backfilled match on the live server perturbs no shared rng draw order.
 
-import { VC_NATION_IDS } from '../content/vale_cup';
+import { VC_ALLROUNDER_ONLY_MAX_BRACKET, VC_NATION_IDS } from '../content/vale_cup';
 import { DUNGEON_X_THRESHOLD } from '../data';
 import type { PlayerMeta, Sim } from '../sim';
 import {
@@ -69,7 +69,7 @@ const VC_BOT_NAMES = [
 // Bot kit assignment when filling a side, by seat index within the side:
 // seat 0 keeps goal (3v3 and up), the last seat sweeps, the middle strikes.
 function botRoleForSeat(seat: number, bracket: VcBracket): SportRole {
-  if (bracket <= 2) return 'allrounder';
+  if (bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return 'allrounder';
   if (seat === 0) return 'keeper';
   if (seat === bracket - 1) return 'sweeper';
   return 'striker';
@@ -121,7 +121,9 @@ function fillSideWithBots(sim: Sim, side: VcSide, bracket: VcBracket): void {
     const hasKeeper = side.pids.some((p) => side.roles[p] === 'keeper');
     const lastSeat = side.pids.length === bracket - 1;
     const role: SportRole =
-      bracket >= 3 && !hasKeeper && lastSeat ? 'keeper' : botRoleForSeat(seat, bracket);
+      bracket > VC_ALLROUNDER_ONLY_MAX_BRACKET && !hasKeeper && lastSeat
+        ? 'keeper'
+        : botRoleForSeat(seat, bracket);
     const bot = spawnCupBot(sim, role);
     side.pids.push(bot.pid);
     side.roles[bot.pid] = bot.role;

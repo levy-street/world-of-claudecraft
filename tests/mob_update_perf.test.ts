@@ -3,8 +3,8 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const WORLD_SEED = 20061;
 const CLUSTER = { x: 0, z: 60 };
 // Enough clustered engaged mobs to exercise a high-load realm shape (the fresh
 // world already spawns ~400 mobs/npcs/objects and this adds 100 players + the pack).

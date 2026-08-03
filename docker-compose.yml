@@ -51,6 +51,10 @@ services:
       # advertises the value so the client realm list can show Full honestly. Empty
       # (unset) yields the built-in default of 5000; an explicit 0 disables the cap.
       MAX_PLAYERS_PER_REALM: ${MAX_PLAYERS_PER_REALM:-}
+      # Runtime: Postgres clients this process keeps in its pool (server/db.ts).
+      # Empty (unset) yields the built-in default of 10; accepted range is 1 to
+      # 97 and anything else falls back to the default with an error at boot.
+      DB_POOL_MAX_CLIENTS: ${DB_POOL_MAX_CLIENTS:-}
       # Community test realms can opt in to a ready-made level-20 roster for
       # every newly created account. The production-safe default is disabled.
       PROVISION_TEST_ACCOUNTS: ${PROVISION_TEST_ACCOUNTS:-0}
