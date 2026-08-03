@@ -126,11 +126,11 @@ describe('guild-tab bag click routing (behavioral, real BagsWindow)', () => {
   it('the shift split prompt submit sends guildBankDeposit(index, count)', () => {
     const h = harness([{ itemId: plainId, count: 5 }], true);
     clickCellFor(h.root, plainId, true);
-    const prompt = document.querySelector('.bank-deposit-prompt');
+    const prompt = document.querySelector('.bank-deposit-prompt') as HTMLElement;
     expect(prompt).not.toBeNull();
-    const input = prompt?.querySelector('.prompt-number') as HTMLInputElement;
+    const input = prompt.querySelector('.prompt-number') as HTMLInputElement;
     input.value = '3';
-    (prompt?.querySelector('.btn') as HTMLElement).click();
+    (prompt.querySelector('.btn') as HTMLElement).click();
     expect(h.calls).toEqual(['guildBankDeposit:0,3']);
   });
 

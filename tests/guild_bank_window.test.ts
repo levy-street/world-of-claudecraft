@@ -293,11 +293,11 @@ describe('guild pane actions round-trip through the facet', () => {
     clickGuildTab(h);
     const cell = h.root.querySelector('.bank-grid .bank-item') as HTMLElement;
     cell.dispatchEvent(new MouseEvent('click', { shiftKey: true, bubbles: true }));
-    const prompt = document.querySelector('.gbank-quantity-prompt');
+    const prompt = document.querySelector('.gbank-quantity-prompt') as HTMLElement;
     expect(prompt).not.toBeNull();
-    const input = prompt?.querySelector('.prompt-number') as HTMLInputElement;
+    const input = prompt.querySelector('.prompt-number') as HTMLInputElement;
     input.value = '3';
-    (prompt?.querySelector('.btn') as HTMLElement).click();
+    (prompt.querySelector('.btn') as HTMLElement).click();
     expect(h.calls).toContain('guildBankWithdraw:0,3');
   });
 
@@ -307,13 +307,13 @@ describe('guild pane actions round-trip through the facet', () => {
     h.window.open();
     clickGuildTab(h);
     (h.root.querySelectorAll('.gbank-gold-btn')[0] as HTMLElement).click();
-    const prompt = document.querySelector('.gbank-gold-prompt');
+    const prompt = document.querySelector('.gbank-gold-prompt') as HTMLElement;
     expect(prompt).not.toBeNull();
-    const inputs = Array.from(prompt?.querySelectorAll<HTMLInputElement>('.coininput') ?? []);
+    const inputs = Array.from(prompt.querySelectorAll<HTMLInputElement>('.coininput'));
     inputs[0].value = '2'; // 2g
     inputs[1].value = '3'; // 3s
     inputs[2].value = '45'; // 45c
-    (prompt?.querySelector('.btn') as HTMLElement).click();
+    (prompt.querySelector('.btn') as HTMLElement).click();
     expect(h.calls).toContain('guildBankDepositGold:20345');
   });
 
@@ -325,10 +325,10 @@ describe('guild pane actions round-trip through the facet', () => {
     h.window.open();
     clickGuildTab(h);
     (h.root.querySelectorAll('.gbank-gold-btn')[0] as HTMLElement).click();
-    const prompt = document.querySelector('.gbank-gold-prompt');
-    const inputs = Array.from(prompt?.querySelectorAll<HTMLInputElement>('.coininput') ?? []);
+    const prompt = document.querySelector('.gbank-gold-prompt') as HTMLElement;
+    const inputs = Array.from(prompt.querySelectorAll<HTMLInputElement>('.coininput'));
     inputs[0].value = '9'; // 9g requested, only 1000c held
-    (prompt?.querySelector('.btn') as HTMLElement).click();
+    (prompt.querySelector('.btn') as HTMLElement).click();
     expect(h.calls.filter((c) => c.startsWith('guildBankDepositGold'))).toEqual([]);
     // The prompt stays open and voices the refusal in its live-region line.
     expect(document.querySelector('.gbank-gold-prompt')).not.toBeNull();
@@ -341,10 +341,10 @@ describe('guild pane actions round-trip through the facet', () => {
     h.window.open();
     clickGuildTab(h);
     (h.root.querySelectorAll('.gbank-gold-btn')[0] as HTMLElement).click();
-    const prompt = document.querySelector('.gbank-gold-prompt');
-    const inputs = Array.from(prompt?.querySelectorAll<HTMLInputElement>('.coininput') ?? []);
+    const prompt = document.querySelector('.gbank-gold-prompt') as HTMLElement;
+    const inputs = Array.from(prompt.querySelectorAll<HTMLInputElement>('.coininput'));
     inputs[0].value = '2'; // 2g > 1000c headroom (and within the purse)
-    (prompt?.querySelector('.btn') as HTMLElement).click();
+    (prompt.querySelector('.btn') as HTMLElement).click();
     expect(h.calls.filter((c) => c.startsWith('guildBankDepositGold'))).toEqual([]);
     expect(document.querySelector('.gbank-gold-error')?.textContent).toBe(
       'The guild treasury cannot hold that much.',
@@ -368,10 +368,10 @@ describe('guild pane actions round-trip through the facet', () => {
     h.window.open();
     clickGuildTab(h);
     (h.root.querySelectorAll('.gbank-gold-btn')[1] as HTMLElement).click();
-    const prompt = document.querySelector('.gbank-gold-prompt');
-    const inputs = Array.from(prompt?.querySelectorAll<HTMLInputElement>('.coininput') ?? []);
+    const prompt = document.querySelector('.gbank-gold-prompt') as HTMLElement;
+    const inputs = Array.from(prompt.querySelectorAll<HTMLInputElement>('.coininput'));
     inputs[0].value = '1'; // 1g requested, treasury holds 700c
-    (prompt?.querySelector('.btn') as HTMLElement).click();
+    (prompt.querySelector('.btn') as HTMLElement).click();
     expect(h.calls).toContain('guildBankWithdrawGold:700');
   });
 
@@ -380,8 +380,8 @@ describe('guild pane actions round-trip through the facet', () => {
     h.window.open();
     clickGuildTab(h);
     (h.root.querySelectorAll('.gbank-gold-btn')[0] as HTMLElement).click();
-    const prompt = document.querySelector('.gbank-gold-prompt');
-    (prompt?.querySelector('.btn') as HTMLElement).click(); // all fields still 0
+    const prompt = document.querySelector('.gbank-gold-prompt') as HTMLElement;
+    (prompt.querySelector('.btn') as HTMLElement).click(); // all fields still 0
     expect(h.calls.filter((c) => c.startsWith('guildBankDepositGold'))).toEqual([]);
   });
 
@@ -390,9 +390,9 @@ describe('guild pane actions round-trip through the facet', () => {
     h.window.open();
     clickGuildTab(h);
     (h.root.querySelector('.bank-buy-btn') as HTMLElement).click();
-    const prompt = document.querySelector('.gbank-buy-prompt');
+    const prompt = document.querySelector('.gbank-buy-prompt') as HTMLElement;
     expect(prompt).not.toBeNull();
-    (prompt?.querySelector('.btn') as HTMLElement).click();
+    (prompt.querySelector('.btn') as HTMLElement).click();
     expect(h.calls).toContain('guildBankBuySlots');
   });
 
