@@ -324,6 +324,7 @@ const RENDER_PURE_CORES = [
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
   'src/render/character_effects_core.ts',
+  'src/render/character_fx_culling_core.ts',
   'src/render/character_view_core.ts',
   'src/render/chunk_residency_core.ts',
   'src/render/cliff_scree_core.ts',

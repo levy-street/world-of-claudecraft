@@ -81,6 +81,7 @@ import {
   CHARACTER_EFFECT_SOUL_REND,
   hasCharacterEffect,
 } from './character_effects_core';
+import { shouldRunCharacterFx } from './character_fx_culling_core';
 import { characterViewOutsideHysteresis } from './character_view_core';
 import {
   type AnimState,
@@ -8691,6 +8692,7 @@ export class Renderer {
         this.cullSphere.radius = (v.height * 0.7 + 1.5) * e.scale;
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
+      const runCharacterFx = shouldRunCharacterFx(charOnScreen, actionablePose);
 
       // live skin swap: appearance changed (in-game changer or a multiplayer peer).
       // NOT gated: unlike a base-visual swap, the old rig is not being replaced,
@@ -9371,42 +9373,49 @@ export class Renderer {
 
       // per-ability windup orb + buff-orbit bands (spec-driven; no-op for
       // entities with no spec'd cast or aura)
-      this.abilityVfx.syncEntity(e);
-      if (st.casting) {
-        this.vfx.castSparkle(
-          e.id,
-          waterJetVisualChannel
-            ? 'frost'
-            : e.castingAbility === 'demon_heal'
-              ? 'shadow'
-              : (ABILITIES[e.castingAbility ?? '']?.school ?? 'arcane'),
-          dt,
-          // per-ability spec color when the casting ability has one
-          this.abilityVfx.sparkleColorFor(e.castingAbility),
-        );
-      }
-      if (hasSoulRend) {
-        this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
-      }
-      if (hasRecklessness) {
-        this.vfx.recklessFlame(e.id, dt);
-        if (!v.recklessOn) {
-          v.recklessOn = true;
-          this.recklessSkulls.spawn(v.group, active.height * e.scale);
+      if (runCharacterFx) {
+        this.abilityVfx.syncEntity(e);
+        if (st.casting) {
+          this.vfx.castSparkle(
+            e.id,
+            waterJetVisualChannel
+              ? 'frost'
+              : e.castingAbility === 'demon_heal'
+                ? 'shadow'
+                : (ABILITIES[e.castingAbility ?? '']?.school ?? 'arcane'),
+            dt,
+            // per-ability spec color when the casting ability has one
+            this.abilityVfx.sparkleColorFor(e.castingAbility),
+          );
         }
-      } else if (v.recklessOn) {
+        if (hasSoulRend) {
+          this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
+        }
+        if (hasRecklessness) {
+          this.vfx.recklessFlame(e.id, dt);
+          if (!v.recklessOn) {
+            v.recklessOn = true;
+            this.recklessSkulls.spawn(v.group, active.height * e.scale);
+          }
+        } else if (v.recklessOn) {
+          v.recklessOn = false;
+        }
+        // Shapeshift-form particle auras riding the tints above: metamorph fire,
+        // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
+        // (the auras themselves drop, but a corpse must not smolder for a frame).
+        if (!e.dead) {
+          if (hasMetamorph) this.vfx.formAura(e.id, 'metamorph', dt);
+          else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
+          else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
+        }
+        // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
+        if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
+      } else {
+        // Reset the re-entry latch without paying for particle work while the
+        // rig is hidden. If the aura survives, the skull presentation is
+        // spawned again on the first visible frame.
         v.recklessOn = false;
       }
-      // Shapeshift-form particle auras riding the tints above: metamorph fire,
-      // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
-      // (the auras themselves drop, but a corpse must not smolder for a frame).
-      if (!e.dead) {
-        if (hasMetamorph) this.vfx.formAura(e.id, 'metamorph', dt);
-        else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
-        else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
-      }
-      // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
-      if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
 
       // skip the draw for off-screen rigs (pose/audio above already ran)
       if (!charOnScreen) v.group.visible = false;
