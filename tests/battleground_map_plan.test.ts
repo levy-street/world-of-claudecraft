@@ -455,6 +455,16 @@ const mapPainterCode = MAP_PAINTER_SRC.replace(/\/\*[\s\S]*?\*\//g, '').replace(
   '$1',
 );
 
+// The shared mark painter, held to the same rule: the plate's crowns, stipples
+// and headstones are drawn from this ONE module (the minimap's cached
+// battleground raster bakes the same marks with it).
+const marksPainterCode = readFileSync(
+  new URL('../src/ui/hud/battleground/battleground_atlas_marks_painter.ts', import.meta.url),
+  'utf8',
+)
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^:])\/\/.*$/gm, '$1');
+
 // The ONLY colour literals allowed to survive in this file, by CONSTANT NAME.
 // A new name may not be added here without the same justification the two
 // groups below carry; interface chrome belongs in MAP_CHROME_TOKENS with a CSS
@@ -479,18 +489,10 @@ const TERRAIN_PALETTE_CONSTANTS = [
   // SURROUND_FILL is the old growth the hollow was cut out of, filling the
   // plate margin outside the ramparts.
   'SURROUND_FILL',
-  // CROWN_*/BOULDER_* are the painted marks over it and over the field: a blob
-  // plus its lit northwest face, map_terrain's clumped-crown read drawn as two
-  // arcs instead of per pixel. Green for the trees, grey for rock and rubble.
-  'CROWN_FILL',
-  'CROWN_LIT',
-  'BOULDER_FILL',
-  'BOULDER_LIT',
-  // HEADSTONE_* are the same read at graveyard scale: the stipples that say
-  // what the plot's grave-ground surface is, paler and colder than the field's
-  // boulders so a plot never reads as a rock field.
-  'HEADSTONE_FILL',
-  'HEADSTONE_LIT',
+  // The MARK palette (crowns, boulders, headstones) is deliberately NOT here
+  // any more: the mark read and its colours moved to the shared
+  // battleground_atlas_marks_painter, which the minimap's cached battleground
+  // raster bakes the same marks with. It is held to this same rule below.
   // LABEL_HALO is the parchment each landmark name is written on. Its partner
   // (the ink the name is written IN) is the --color-bg-map-ink TOKEN, which is
   // the split this rule exists to enforce: the halo is plate material, the ink
@@ -536,6 +538,55 @@ describe('Thornhollow Fields map painter: no magic colours (canvas sub-rule)', (
     // The terrain palette is used BY NAME there, so the scan above is not
     // passing merely because the draw bodies stopped painting the ground.
     for (const name of TERRAIN_PALETTE_CONSTANTS) expect(drawBody).toContain(name);
+  });
+
+  it('draws its marks through the SHARED mark painter, and defines none of its own', () => {
+    // The mark read (a blob plus its lit northwest face, map_terrain's
+    // clumped-crown read drawn as two arcs) and its palette live in ONE module
+    // now, because the minimap's cached battleground raster bakes the same
+    // marks. A second copy here would let the two surfaces drift into drawing
+    // the same tree two ways, which is the whole reason the ground already
+    // shares bg_field_relief_core.
+    expect(mapPainterCode).toContain(
+      "import { drawBgAtlasMarks } from './battleground_atlas_marks_painter'",
+    );
+    expect(
+      mapPainterCode.match(/drawBgAtlasMarks\(bctx,/g) ?? [],
+      'the plate still draws marks in two passes: the crowns outside the ramparts, under the field slab, and everything else over it',
+    ).toHaveLength(2);
+    // and it kept no private mark drawer or mark palette of its own.
+    expect(mapPainterCode).not.toContain('private drawMark(');
+    for (const name of ['CROWN_FILL', 'CROWN_LIT', 'BOULDER_FILL', 'HEADSTONE_FILL']) {
+      expect(mapPainterCode, `${name} is still defined here as well`).not.toContain(
+        `const ${name} =`,
+      );
+    }
+    // The shared module takes the same no-magic-colours rule the plate does: the
+    // mark palette is sampled terrain dressing (green canopy, grey rock, pale
+    // headstone), and nothing in it may be a colour a player reads as interface.
+    const stray: string[] = [];
+    for (const line of marksPainterCode.split('\n')) {
+      if (!/#[0-9a-fA-F]{3,8}\b/.test(line) && !/\brgba?\s*\(/.test(line)) continue;
+      if (/const [A-Z_]+ = '#[0-9a-fA-F]{3,8}';/.test(line)) continue;
+      stray.push(line.trim());
+    }
+    expect(stray, `unowned colour literals: ${stray.join(' | ')}`).toEqual([]);
+    for (const name of [
+      'CROWN_FILL',
+      'CROWN_LIT',
+      'BOULDER_FILL',
+      'BOULDER_LIT',
+      'HEADSTONE_FILL',
+      'HEADSTONE_LIT',
+    ]) {
+      expect(marksPainterCode, `${name} is not a literal palette entry there`).toMatch(
+        new RegExp(`const ${name} = '#[0-9a-fA-F]{3,8}';`),
+      );
+    }
+    // It resolves nothing and owns no element: it is handed a context and a
+    // projection, which is what keeps it out of the token-resolving bucket.
+    expect(marksPainterCode).not.toContain('getComputedStyle');
+    expect(marksPainterCode).not.toContain('document.');
   });
 
   it('resolves the chrome tokens in the SAME single cached getComputedStyle pass', () => {

@@ -23,22 +23,9 @@ import {
   BG_SURFACE_GRAVE,
   bgFieldSurfaceAt,
   paintBgFieldAtlas,
-  paintBgFieldRelief,
 } from '../src/ui/bg_field_relief_core';
 
 const CHANNELS = 4;
-
-function paint(
-  w: number,
-  h: number,
-  pxPerYard: number,
-  originX: number,
-  originZ: number,
-): Uint8ClampedArray {
-  const data = new Uint8ClampedArray(w * h * CHANNELS);
-  paintBgFieldRelief(data, w, h, pxPerYard, originX, originZ);
-  return data;
-}
 
 /** The rgb of pixel (ix, iy) in a `w`-wide buffer. */
 function pixel(data: Uint8ClampedArray, w: number, ix: number, iy: number): number[] {
@@ -51,114 +38,19 @@ function luma(rgb: number[]): number {
   return 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
 }
 
-/** One field point, sampled with no left neighbour so hillshade cannot tilt it. */
-function tone(x: number, z: number): number {
-  return luma(pixel(paint(1, 1, 1, x + 0.5, z + 0.5), 1, 0, 0));
-}
-
-describe('bg_field_relief_core: the shaded field underlay', () => {
-  it('fills every pixel opaquely (a partial sheet would blit as a hole)', () => {
-    const w = 40;
-    const h = 70;
-    const data = paint(w, h, 1, BG_HALF_X, BG_HALF_Z);
-    expect(data).toHaveLength(w * h * CHANNELS);
-    for (let i = 0; i < w * h; i++) {
-      expect(data[i * CHANNELS + 3]).toBe(255);
-    }
-    // and it is not one flat colour: the sheet crosses the terrace front.
-    const distinct = new Set<string>();
-    for (let i = 0; i < w * h; i++) {
-      distinct.add(`${data[i * CHANNELS]},${data[i * CHANNELS + 1]},${data[i * CHANNELS + 2]}`);
-    }
-    expect(distinct.size).toBeGreaterThan(8);
-  });
-
-  it('is deterministic: same buffer for the same request', () => {
-    const a = paint(24, 24, 2, 40, 40);
-    const b = paint(24, 24, 2, 40, 40);
-    expect(Array.from(a)).toEqual(Array.from(b));
-  });
-
-  it('orders the ramp by real field height: bowl darkest, keep terrace lightest', () => {
-    // Four rungs of the ACTUAL field, deepest first. The relief is shallow by
-    // design (about five yards top to bottom), which is exactly why the ramp
-    // has to stay ordered: a ramp packed for the old 40yd field would flatten
-    // all four of these into one tone.
-    const bowl = tone(0, 0); // the bottom of the Ruin Courtyard bowl, about -2.3yd
-    const shoulder = tone(0, -30); // the bowl's shoulder, about -1.4yd
-    const chamber = tone(0, -90); // the field chamber the flag run crosses, about 0.2yd
-    const terrace = tone(0, -120); // the Crimson keep terrace, about 2.1yd
-    expect(bowl).toBeLessThan(shoulder);
-    expect(shoulder).toBeLessThan(chamber);
-    expect(chamber).toBeLessThan(terrace);
-    // And the spread is worth having: the deepest and highest ground on the
-    // field must be visibly different, not two neighbouring greys.
-    expect(terrace - bowl).toBeGreaterThan(30);
-  });
-
-  it('maps +x toward column 0 (the map is drawn east-left)', () => {
-    // Two sheets over the same ground, the second's origin one yard further
-    // along -x: every column of the second must reproduce the NEXT column of
-    // the first. A raster built with the x axis the other way round would
-    // reproduce the PREVIOUS one instead, which is the mirrored plan bug.
-    const w = 12;
-    const a = paint(w, 3, 1, 45, 45);
-    const b = paint(w, 3, 1, 44, 45);
-    for (let iy = 0; iy < 3; iy++) {
-      // column 0 of each sheet has no left neighbour, so start at 1.
-      for (let ix = 1; ix < w - 1; ix++) {
-        expect(pixel(b, w, ix, iy)).toEqual(pixel(a, w, ix + 1, iy));
-      }
-    }
-  });
-
-  it('maps +z toward row 0 (the away half is drawn up)', () => {
-    const w = 6;
-    const h = 12;
-    const a = paint(w, h, 1, 45, 45);
-    const b = paint(w, h, 1, 45, 44);
-    for (let iy = 0; iy < h - 1; iy++) {
-      for (let ix = 1; ix < w; ix++) {
-        expect(pixel(b, w, ix, iy)).toEqual(pixel(a, w, ix, iy + 1));
-      }
-    }
-  });
-
-  it('honours pxPerYard: a finer sheet covers the same ground in more pixels', () => {
-    // Both sheets span the same 8x8yd window off the same origin, one at 1 and
-    // one at 2 px/yd, so they must describe the same ground rather than two
-    // different windows. Compared as mean tone, since the finer sheet samples
-    // between the coarse one's cells (bilinear heights) and shades against
-    // nearer neighbours.
-    const mean = (data: Uint8ClampedArray): number => {
-      let sum = 0;
-      const n = data.length / CHANNELS;
-      for (let i = 0; i < n; i++) {
-        sum += luma([data[i * CHANNELS], data[i * CHANNELS + 1], data[i * CHANNELS + 2]]);
-      }
-      return sum / n;
-    };
-    // Sampled over FLAT ground (the floor of the courtyard bowl): the
-    // hillshade reads a per-PIXEL height difference, so on a slope the two
-    // resolutions legitimately shade differently and would prove nothing about
-    // the mapping.
-    const coarse = mean(paint(8, 8, 1, 4, 4));
-    const fine = mean(paint(16, 16, 2, 4, 4));
-    expect(Math.abs(fine - coarse)).toBeLessThan(3);
-    expect(coarse).toBeGreaterThan(0);
-    // and the ramp really is doing work: the same-sized window over the keep
-    // terrace front is a different tone entirely.
-    const terrace = mean(paint(8, 8, 1, 4, -108));
-    expect(Math.abs(terrace - coarse)).toBeGreaterThan(10);
-  });
-});
-
 // ---------------------------------------------------------------------------
-// The ATLAS plate raster (the M-map's field surface), the second style over the
-// same field. Everything above still holds for the minimap's wash; what is new
-// here is the authored GROUND PAINT driving the base colour, and the fact that
-// the away team's view is produced by walking the field the other way round
-// rather than by rotating a finished raster.
+// The ATLAS plate raster: the ONE field surface both map backgrounds rasterize,
+// the M-map's plate at several px/yd and the minimap's cached sheet at 2.5. The
+// minimap's older, cheaper one-axis wash (paintBgFieldRelief) is gone with the
+// last of its callers, so the arms it carried are held here instead, against the
+// raster that is actually shipped: the buffer is fully painted and opaque (a
+// half-filled sheet blits as a transparent hole), the hypsometric ordering
+// matches the real field (the sunken Ruin Courtyard must not read like a keep
+// terrace), and the origin/pxPerYard mapping runs in the map's direction. That
+// last one cannot be caught by comparing terrain samples, since the field is
+// point-symmetric and a mirrored raster still shows a plausible field; it IS
+// caught by shifting the origin by a known offset and asserting the raster
+// shifts the matching way.
 
 function atlas(
   w: number,
@@ -284,17 +176,67 @@ describe('bg_field_relief_core: the atlas plate raster', () => {
     for (let i = 0; i < w * h; i++) {
       distinct.add(`${data[i * CHANNELS]},${data[i * CHANNELS + 1]},${data[i * CHANNELS + 2]}`);
     }
-    // The mottle, the contours and the inked surface edges mean an atlas plate
-    // carries far more distinct tones than the minimap's flat hypsometric wash
-    // over the same window.
-    expect(distinct.size).toBeGreaterThan(
-      new Set(
-        Array.from({ length: w * h }, (_v, i) => {
-          const wash = paint(w, h, 1, BG_HALF_X, BG_HALF_Z);
-          return `${wash[i * CHANNELS]},${wash[i * CHANNELS + 1]},${wash[i * CHANNELS + 2]}`;
-        }),
-      ).size,
-    );
+    // The mottle, the contours and the inked surface edges mean the plate is
+    // drawn ground rather than a wash: a large fraction of the window's pixels
+    // are their own tone. The wash this replaced managed a few dozen tones over
+    // the same window, which is what a hypsometric ramp plus one-axis shading
+    // can produce; a plate that lost its mottle would collapse back to that.
+    expect(distinct.size).toBeGreaterThan((w * h) / 4);
+  });
+
+  it('maps +x toward column 0 (the map is drawn east-left)', () => {
+    // Two sheets over the same ground, the second's origin one yard further
+    // along -x: every column of the second must reproduce the NEXT column of
+    // the first. A raster built with the x axis the other way round would
+    // reproduce the PREVIOUS one instead, which is the mirrored plan bug, and
+    // it is the one mistake the field's own point symmetry hides from a
+    // terrain-sample comparison. Column 0 and row 0 have no left/up neighbour,
+    // so the shading and the inked verge legitimately differ there.
+    const w = 12;
+    const h = 4;
+    const a = atlas(w, h, 1, 45, 45, 1);
+    const b = atlas(w, h, 1, 44, 45, 1);
+    for (let iy = 1; iy < h; iy++) {
+      for (let ix = 1; ix < w - 1; ix++) {
+        expect(pixel(b, w, ix, iy)).toEqual(pixel(a, w, ix + 1, iy));
+      }
+    }
+  });
+
+  it('maps +z toward row 0 (the away half is drawn up)', () => {
+    const w = 6;
+    const h = 12;
+    const a = atlas(w, h, 1, 45, 45, 1);
+    const b = atlas(w, h, 1, 45, 44, 1);
+    for (let iy = 1; iy < h - 1; iy++) {
+      for (let ix = 1; ix < w; ix++) {
+        expect(pixel(b, w, ix, iy)).toEqual(pixel(a, w, ix, iy + 1));
+      }
+    }
+  });
+
+  it('honours pxPerYard: the same ground reads the same at both raster scales', () => {
+    // The two surfaces rasterize this plate at different resolutions (the
+    // minimap sheet at 2.5px/yd, the M-map plate at several), so a plate whose
+    // shading tracked a per-PIXEL height difference would hand them two
+    // different-looking fields. The hillshade gain is per YARD and scaled by
+    // pxPerYard at use precisely so it does not. Both windows span the same
+    // 8x8yd of the courtyard bowl floor.
+    const mean = (data: Uint8ClampedArray): number => {
+      let sum = 0;
+      const n = data.length / CHANNELS;
+      for (let i = 0; i < n; i++) {
+        sum += luma([data[i * CHANNELS], data[i * CHANNELS + 1], data[i * CHANNELS + 2]]);
+      }
+      return sum / n;
+    };
+    const coarse = mean(atlas(8, 8, 1, 4, 4, 1));
+    const fine = mean(atlas(16, 16, 2, 4, 4, 1));
+    expect(Math.abs(fine - coarse)).toBeLessThan(2);
+    expect(coarse).toBeGreaterThan(0);
+    // and the plate really is describing ground rather than returning one tone:
+    // the same-sized window over the keep terrace is a different tone entirely.
+    expect(Math.abs(mean(atlas(8, 8, 1, 4, -114, 1)) - coarse)).toBeGreaterThan(10);
   });
 
   it('is deterministic: same request, same pixels, so the plate cannot drift', () => {

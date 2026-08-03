@@ -23,12 +23,22 @@ The Thornhollow Fields 5v5 capture-the-flag HUD surface behind the `index.ts` ba
   half of the surface, rasterized once per (canvas size, team orientation, i18n revision)
   into an offscreen canvas and blitted, in the same hand-drawn atlas language
   `src/ui/map_terrain.ts` paints the overworld in. Its per-pixel work is the
-  pure core `src/ui/bg_field_relief_core.ts` (`paintBgFieldAtlas`, sharing the
-  hypsometric ramp and the pixel convention with the minimap's cheaper
-  `paintBgFieldRelief`); its drawn marks and label anchors are
-  `battleground_atlas_view.ts`. The plate is built in the VIEWING orientation,
-  never built once and rotated: a rotated raster carries the northwest light
-  around with it and stands the labels on their heads.
+  pure core `src/ui/bg_field_relief_core.ts` (`paintBgFieldAtlas`); its mark and
+  label ANCHORS are the pure core `battleground_atlas_view.ts`. The plate is
+  built in the VIEWING orientation, never built once and rotated: a rotated
+  raster carries the northwest light around with it and stands the labels on
+  their heads.
+- `battleground_atlas_marks_painter.ts`: how one atlas mark is DRAWN (a blob
+  plus its lit northwest face) plus the mark palette, in one module because the
+  MINIMAP's session-cached battleground raster (`src/ui/minimap_painter.ts`
+  `ensureBattlegroundBg`) bakes the same marks over the same
+  `paintBgFieldAtlas` ground. The two surfaces share both halves of the plate
+  art on purpose: one field must not be described two ways. What the minimap
+  does NOT bake is the landmark labels (illegible at 2.5px/yd, and its blit is
+  a moving sub-rect), and its walls keep the resolved `--color-minimap-outline`
+  token rather than the plate's slate-plus-cast-shadow treatment, because walls
+  are actionable cover and the plate's treatment is drawn at several times that
+  scale.
 
 Rules that bind here: the pure cores are registered in `UI_PURE_CORES`
 (tests/architecture.test.ts) and stay DOM/i18n-free; flag states and the

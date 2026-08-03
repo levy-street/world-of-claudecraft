@@ -24,7 +24,9 @@
 //      the northwest (all of it in the pure core,
 //      bg_field_relief_core.paintBgFieldAtlas),
 //   5. the keep floors, the crowns standing inside the walls, the boulder and
-//      rubble stipples, and the headstones on the two plots,
+//      rubble stipples, and the headstones on the two plots (the mark read
+//      itself is the shared battleground_atlas_marks_painter, which the
+//      MINIMAP's cached raster bakes the same marks with),
 //   6. the wall plan: every real wall box, cast southeast and inked,
 //   7. the carved slab edge, the ink line where the field meets the lip,
 //   8. the landmark labels the map's own LOCATION rectangles name.
@@ -52,7 +54,8 @@ import { BG_BASES, BG_FLAG_Z, bgFieldPlanWalls } from '../../../sim/battleground
 import { TH_LOCATIONS } from '../../../sim/thornhollow_field.generated';
 import { paintBgFieldAtlas } from '../../bg_field_relief_core';
 import { getI18nRevision, type TranslationKey, t } from '../../i18n';
-import { type BgAtlasLabelId, bgAtlasLabels, bgAtlasMarks } from './battleground_atlas_view';
+import { drawBgAtlasMarks } from './battleground_atlas_marks_painter';
+import { type BgAtlasLabelId, type BgAtlasMark, bgAtlasLabels } from './battleground_atlas_view';
 import type { BgMapModel } from './battleground_map_view';
 
 // REQUIRED tokens: the plan does not draw until every one of them resolves (an
@@ -93,20 +96,13 @@ const KEEP_FLOOR = '#a49c8f';
 const KEEP_FLOOR_ALPHA = 0.4;
 const WALL_FILL = '#333a48';
 // The atlas plate's own cartography, same precedent and the same reason a token
-// cannot serve: the lip and the crowns are painted UNDER a raster the pure core
-// writes as raw bytes, and the halo exists to hold ink on that raster.
-// SURROUND is the old growth the hollow was cut out of; CROWN/BOULDER/HEADSTONE
-// are the painted marks over it, each with a lit northwest side; LABEL_HALO is
-// the parchment the landmark names are written on.
+// cannot serve: the lip is painted UNDER a raster the pure core writes as raw
+// bytes, and the halo exists to hold ink on that raster. SURROUND is the old
+// growth the hollow was cut out of; LABEL_HALO is the parchment the landmark
+// names are written on. The marks standing on both (crowns, boulders,
+// headstones) carry their own palette in the shared
+// battleground_atlas_marks_painter, which the minimap raster draws from too.
 const SURROUND_FILL = '#3d4a33';
-const CROWN_FILL = '#4a5f38';
-const CROWN_LIT = '#71894f';
-const BOULDER_FILL = '#8e8b82';
-const BOULDER_LIT = '#b3b0a6';
-// Headstones read as paler, colder stone than the field's boulders, so a plot
-// stipples differently from a rock field at the same mark size.
-const HEADSTONE_FILL = '#9aa0a4';
-const HEADSTONE_LIT = '#c3c8ca';
 const LABEL_HALO = '#efe6cf';
 
 const FIELD_PAD_PX = 18;
@@ -142,9 +138,6 @@ const SLAB_EDGE_WIDTH = 1.5;
 const WALL_SHADOW_PX = 1.6;
 const WALL_SHADOW_ALPHA = 0.55;
 const WALL_INK_WIDTH = 0.7;
-const LIT_OFFSET = 0.24; // fraction of a mark's radius, toward the light
-const LIT_RADIUS = 0.66; // fraction of a mark's radius
-const MARK_MIN_R_PX = 0.7; // below this a mark is grit, not a drawn thing
 
 // Landmark labels. Sized off the plate rather than fixed, so the same plate
 // reads at a phone's map canvas and a desktop's.
@@ -392,13 +385,13 @@ export class BattlegroundMapPainter {
     bctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // 2. the crowns standing OUTSIDE the walls, drawn before the field slab so
-    //    the rampart line cuts them the way the wall really does.
-    const marks = bgAtlasMarks();
-    for (const mark of marks) {
-      if (mark.kind !== 'crown') continue;
-      if (Math.abs(mark.x) <= halfX && Math.abs(mark.z) <= halfZ) continue;
-      this.drawMark(bctx, fx(mark.x), fy(mark.z), mark.r * s, CROWN_FILL, CROWN_LIT);
-    }
+    //    the rampart line cuts them the way the wall really does. The mark read
+    //    itself is the shared routine the minimap raster bakes its own marks
+    //    with, so the two surfaces cannot draw the same tree two ways.
+    const proj = { fx, fy, s };
+    const onField = (mark: BgAtlasMark): boolean =>
+      Math.abs(mark.x) <= halfX && Math.abs(mark.z) <= halfZ;
+    drawBgAtlasMarks(bctx, proj, (mark) => mark.kind === 'crown' && !onField(mark));
 
     // 3. the slab's cast shadow on the lip (light from the northwest, so the
     //    shadow falls southeast). The part under the field is painted over by
@@ -428,20 +421,9 @@ export class BattlegroundMapPainter {
 
     // 5b. the marks standing on the field: crowns first, then the boulder and
     //     rubble stipples, then the headstones on the two graveyard plots, each
-    //     lit from the northwest like the crowns outside.
-    for (const mark of marks) {
-      if (mark.kind !== 'crown') continue;
-      if (Math.abs(mark.x) > halfX || Math.abs(mark.z) > halfZ) continue;
-      this.drawMark(bctx, fx(mark.x), fy(mark.z), mark.r * s, CROWN_FILL, CROWN_LIT);
-    }
-    for (const mark of marks) {
-      if (mark.kind !== 'boulder') continue;
-      this.drawMark(bctx, fx(mark.x), fy(mark.z), mark.r * s, BOULDER_FILL, BOULDER_LIT);
-    }
-    for (const mark of marks) {
-      if (mark.kind !== 'headstone') continue;
-      this.drawMark(bctx, fx(mark.x), fy(mark.z), mark.r * s, HEADSTONE_FILL, HEADSTONE_LIT);
-    }
+    //     lit from the northwest like the crowns outside. The shared routine
+    //     owns that order, so this pass is everything step 2 did not draw.
+    drawBgAtlasMarks(bctx, proj, (mark) => mark.kind !== 'crown' || onField(mark));
 
     // 6. The wall plan: every non-ghost box collider of the field (keep
     // curtains, court walls, gate structures, the ruins), each cast southeast
@@ -487,27 +469,6 @@ export class BattlegroundMapPainter {
     this.plan = canvas;
     this.planKey = key;
     return canvas;
-  }
-
-  /** One painted atlas mark: a blob in `fill` with a lit face toward the
-   *  northwest, the hand-drawn crown read map_terrain paints per pixel. */
-  private drawMark(
-    bctx: CanvasRenderingContext2D,
-    cx: number,
-    cy: number,
-    r: number,
-    fill: string,
-    lit: string,
-  ): void {
-    if (r < MARK_MIN_R_PX) return;
-    bctx.fillStyle = fill;
-    bctx.beginPath();
-    bctx.arc(cx, cy, r, 0, FULL_CIRCLE);
-    bctx.fill();
-    bctx.fillStyle = lit;
-    bctx.beginPath();
-    bctx.arc(cx - r * LIT_OFFSET, cy - r * LIT_OFFSET, r * LIT_RADIUS, 0, FULL_CIRCLE);
-    bctx.fill();
   }
 
   /** Write every landmark name the authored map exposes, in the atlas serif,

@@ -644,9 +644,13 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // canvas.dataset.portrait, 4 accesses around one async image decode, two of them writes at
 // the start of a decode and two of them reads that abandon a decode whose unit changed;
 // perf_graph is handed both its context and its color and reaches for neither.
+// battleground_atlas_marks_painter is handed its context AND its projection and owns no
+// element at all: it is the mark read the M-map plate and the minimap's cached battleground
+// raster share, so it resolves nothing and reads nothing.
 const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'continent_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/delve/delve_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  { file: 'hud/battleground/battleground_atlas_marks_painter.ts', allow: {}, reflowAllow: {} },
   // the M-map Thornhollow Fields plan: canvas-only, redrawn on the map cadence;
   // like minimap it caches its one --color-* group resolve for the session
   {

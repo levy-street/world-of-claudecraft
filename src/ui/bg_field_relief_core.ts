@@ -7,9 +7,9 @@
 //
 // Heights come from `bgFieldHeightLocal`, the ONE surface the sim, the server
 // and the renderer all sample, so a shaded rise on the map is a rise a fighter
-// really walks. The colours are a hypsometric ramp over the authored field (the
+// really walks. The tinting is a hypsometric ramp over the authored field (the
 // sunken Ruin Courtyard, the ravine floor the flag run crosses, the chamber
-// swells, then the two keep terraces) plus a west-to-east hillshade.
+// swells, then the two keep terraces) under a hillshade lit from the northwest.
 //
 // The field's relief is DELIBERATELY shallow, because the layout under it is
 // combat-tuned on flat ground: about five yards from the bottom of the
@@ -23,18 +23,19 @@
 // design token cannot be read from a raw pixel buffer anyway. Every HUD-chrome
 // colour drawn OVER this stays a token in the calling painter.
 //
-// TWO STYLES, ONE SURFACE. `paintBgFieldRelief` is the small, cheap wash the
-// MINIMAP blits a sub-rect of: one-axis hillshade over the hypsometric ramp,
-// nothing else, because at a hundred pixels across anything finer is noise.
-// `paintBgFieldAtlas` is the M-map's plate, drawn once per size at several
-// times that scale, and it is the hand-drawn fantasy atlas plate the overworld
-// map paints (src/ui/map_terrain.ts): the field's AUTHORED ground paint as the
-// base colour (plus the two graveyard plots, stamped over it as their own
-// surface family), hypsometric tinting through the same ramp, fbm vegetation
-// mottling, contour banding, inked edges where one authored surface meets
-// another, and two-axis hillshade lit from the northwest. Both share the ramp,
-// the height source, and the pixel-to-yards convention below, so the two map
-// surfaces can never describe two different fields.
+// ONE STYLE, TWO SURFACES. `paintBgFieldAtlas` is the hand-drawn fantasy atlas
+// plate the overworld map paints (src/ui/map_terrain.ts): the field's AUTHORED
+// ground paint as the base colour (plus the two graveyard plots, stamped over
+// it as their own surface family), hypsometric tinting through the shared ramp,
+// fbm vegetation mottling, contour banding, inked edges where one authored
+// surface meets another, and two-axis hillshade lit from the northwest. BOTH
+// map backgrounds rasterize it, each once per session at its own scale: the
+// M-map's plate at several pixels per yard, the minimap's cached sheet at 2.5.
+// It replaced the second, cheaper one-axis wash the minimap used to blit, which
+// described the same field a different way for no read a player gains; the
+// hillshade gain here is per YARD and scaled by pxPerYard at use, so the same
+// ground shades the same at both scales rather than flattening out on the
+// coarser one.
 
 import {
   BG_PAINT_CELL,
@@ -62,13 +63,6 @@ const RELIEF_RAMP: readonly ReliefStop[] = [
   [2.8, 216, 208, 187], // the crest behind each keep
 ];
 
-// Hillshade from the west-to-east slope, reusing the already-sampled
-// left-neighbour height so relief costs no extra height samples (the
-// map_terrain.ts technique). Clamped so a slope cannot blow out to white or
-// crush to black.
-const SHADE_GAIN = 2.2;
-const SHADE_MIN = 0.58;
-const SHADE_MAX = 1.36;
 const OPAQUE = 255;
 
 /** Linear-interpolated ramp colour for one height, written into `out`. */
@@ -96,44 +90,8 @@ function rampRgb(h: number, out: [number, number, number]): void {
   out[2] = last[3];
 }
 
-/**
- * Paint a `w` by `h` RGBA buffer with the field's shaded relief.
- *
- * The pixel grid follows the map convention BOTH consumers draw in: the world's
- * east is -x, so +x runs toward column 0 (map-left), and +z runs toward row 0
- * (map-up). `originX` / `originZ` are therefore the field-local yards at the
- * buffer's top-left corner, and one pixel is `1 / pxPerYard` yards.
- */
-export function paintBgFieldRelief(
-  data: Uint8ClampedArray,
-  w: number,
-  h: number,
-  pxPerYard: number,
-  originX: number,
-  originZ: number,
-): void {
-  const rgb: [number, number, number] = [0, 0, 0];
-  for (let iy = 0; iy < h; iy++) {
-    const lz = originZ - (iy + 0.5) / pxPerYard;
-    let prevH = 0;
-    for (let ix = 0; ix < w; ix++) {
-      const lx = originX - (ix + 0.5) / pxPerYard;
-      const height = bgFieldHeightLocal(lx, lz);
-      rampRgb(height, rgb);
-      const left = ix === 0 ? height : prevH;
-      prevH = height;
-      const shade = Math.max(SHADE_MIN, Math.min(SHADE_MAX, 1 + (height - left) * SHADE_GAIN));
-      const k = (iy * w + ix) * 4;
-      data[k] = rgb[0] * shade;
-      data[k + 1] = rgb[1] * shade;
-      data[k + 2] = rgb[2] * shade;
-      data[k + 3] = OPAQUE;
-    }
-  }
-}
-
 // ---------------------------------------------------------------------------
-// The atlas plate (the M-map's field surface).
+// The atlas plate (the field surface BOTH map backgrounds rasterize).
 // ---------------------------------------------------------------------------
 
 /** The authored surface a cell was painted with, reduced to the families the
@@ -279,9 +237,14 @@ const ATLAS_SHADE_MAX = 1.34;
 /**
  * Paint a `w` by `h` RGBA buffer with the field's ATLAS plate.
  *
- * Same pixel convention as `paintBgFieldRelief` with one extra degree of
- * freedom: `axis` is +1 for the home-at-the-bottom view of team 0 and -1 for
- * team 1, which walks the point-symmetric field the other way round and so
+ * The pixel grid follows the map convention BOTH consumers draw in: the world's
+ * east is -x, so +x runs toward column 0 (map-left), and +z runs toward row 0
+ * (map-up). `originX` / `originZ` are therefore the field-local yards at the
+ * buffer's top-left corner, and one pixel is `1 / pxPerYard` yards.
+ *
+ * `axis` is the one extra degree of freedom: +1 for the world orientation (the
+ * minimap always, and the home-at-the-bottom view of team 0) and -1 for team
+ * 1's M-map, which walks the point-symmetric field the other way round and so
  * produces the 180-degree-rotated plate directly. Rotating the finished raster
  * instead would carry the light around with it and leave the plate lit from the
  * southeast for one of the two teams.

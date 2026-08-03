@@ -1,3 +1,4 @@
+export * from './battleground_atlas_marks_painter';
 export * from './battleground_atlas_view';
 export * from './battleground_kill_feed_painter';
 export * from './battleground_kill_feed_view';

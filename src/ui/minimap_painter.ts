@@ -35,7 +35,8 @@ import {
 } from '../sim/data';
 import { yumiMazeLayout } from '../sim/yumi_maze_layout';
 import type { IWorld } from '../world_api';
-import { paintBgFieldRelief } from './bg_field_relief_core';
+import { paintBgFieldAtlas } from './bg_field_relief_core';
+import { drawBgAtlasMarks } from './hud/battleground';
 import { createMinimapMarkers, type MinimapMarker, type NpcGlyph } from './minimap_markers';
 import type { PainterHostWriters } from './painter_host';
 
@@ -139,11 +140,24 @@ const MAZE_BG_WALL_ALPHA = 0.75;
 
 // Thornhollow Fields battleground background: the same cached-raster technique over
 // bgFieldPlanWalls() (every REAL box collider of the authored Thornhollow
-// field, so the minimap shows exactly what blocks movement) laid over a shaded
-// relief underlay sampled from the field's own heightfield. The relief is what
-// makes the raster carry information away from the keeps: Thornhollow's walls
-// are concentrated in the two fortresses, so a walls-only sheet leaves the
-// whole flag run, the flank ridges and the Fightpit blank.
+// field, so the minimap shows exactly what blocks movement) laid over the
+// field's ATLAS GROUND. The ground is what makes the raster carry information
+// away from the keeps: Thornhollow's walls are concentrated in the two
+// fortresses, so a walls-only sheet leaves the whole flag run, the flank ridges
+// and the Fightpit blank.
+//
+// It is the SAME atlas plate the M-key map draws (see
+// hud/battleground/battleground_map_painter.ts), built from the same two shared
+// modules so the two surfaces can never describe two different fields:
+// bg_field_relief_core.paintBgFieldAtlas writes the ground (the authored paint
+// as base color with the two graveyard plots as their own surface family,
+// hypsometric tinting, fbm mottle, contour banding, inked surface edges,
+// northwest hillshade), then battleground_atlas_marks_painter bakes the crowns,
+// the boulder and rubble stipples and the graveyard headstones over it.
+// Deliberately NOT baked: the plate's LANDMARK LABELS. At this scale a name is
+// a few pixels tall, and the raster is blitted as a player-centered sub-rect, so
+// baked text would smear across the window instead of sitting on its landmark.
+// The M-map is where the field is read by name.
 //
 // The field is 240x452yd, so this raster does NOT reuse the maze's constants:
 // one square pad off the long half-extent at 3px/yd would be 1500x1500 (2.25M
@@ -155,9 +169,13 @@ const MAZE_BG_WALL_ALPHA = 0.75;
 const BG_FIELD_PX_PER_YARD = 2.5;
 const BG_FIELD_PAD_X_YD = BG_HALF_X + MAZE_BG_MARGIN_YD;
 const BG_FIELD_PAD_Z_YD = BG_HALF_Z + MAZE_BG_MARGIN_YD;
-// Walls sit on the relief rather than on bare canvas, so they carry a touch
-// more weight than the maze's stubs do.
-const BG_FIELD_WALL_ALPHA = 0.85;
+// Walls sit on painted ground rather than on bare canvas, so they carry a touch
+// more weight than the maze's stubs do. Raised from 0.85 with the atlas ground:
+// the old hypsometric wash was a pale sand (luma about 180) and the atlas paints
+// the same lanes as turf and worn dirt (luma about 130), so an unchanged alpha
+// would have handed the one ACTIONABLE layer on this raster less separation than
+// it had before. Walls are cover; the ground under them is decoration.
+const BG_FIELD_WALL_ALPHA = 0.95;
 
 // Draw the corpse skull centered at (x, y): `fill` paints the bone, `socket` the
 // dark eye/nose hollows so the shape reads even over light terrain.
@@ -453,14 +471,30 @@ export class MinimapPainter {
     ctx.restore();
   }
 
-  // Rasterize the fixed Thornhollow field once: the shaded terrain relief (the
-  // pure core writes it straight into an ImageData; the ramp is sampled ground,
-  // not chrome, so it is the one thing here that is not a token) with the
-  // field's real wall plan over it in the outline token. Both are drawn in the
-  // live projection's axes, +X map-left and +Z map-up.
+  // Rasterize the fixed Thornhollow field ONCE and hold it for the session, in
+  // three layers, each drawn in the live projection's axes (+X map-left,
+  // +Z map-up) so the sub-rect blit in paintBattleground stays a plain blit:
+  //   1. the atlas ground, written straight into an ImageData by the shared pure
+  //      core (authored ground paint, the two graveyard plots as their own
+  //      surface family, hypsometric tint, mottle, contours, inked surface
+  //      edges, northwest hillshade). It is sampled terrain, not chrome, which
+  //      is why it is the one thing here that is not a token,
+  //   2. the atlas marks (tree crowns, boulder and rubble stipples, graveyard
+  //      headstones) through the shared mark painter the M-map plate uses,
+  //   3. the field's real wall plan over both, in the outline token.
+  // No landmark labels (see the header): illegible at 2.5px/yd and smeared by
+  // the player-centered blit.
+  //
+  // The ground and the marks cost a one-time build of tens of ms on the first
+  // battleground paint, an order of magnitude more than the flat wash they
+  // replaced. That is paid ONCE per session for a raster the redraw only blits,
+  // so it buys no per-frame cost at all; paintBattleground is still blit plus
+  // markers.
   //
   // Tier-identical: walls are actionable cover, so no preset or governor gates
-  // any of this (the graphics-settings fairness invariant).
+  // any of this (the graphics-settings fairness invariant). The ground and the
+  // marks are cosmetic and are drawn for everyone for the same reason: a knob
+  // that shed them would still have to leave the walls exactly as they are.
   private ensureBattlegroundBg(colors: MinimapColors): HTMLCanvasElement {
     if (this.battlegroundBg) return this.battlegroundBg;
     const s = BG_FIELD_PX_PER_YARD;
@@ -471,9 +505,24 @@ export class MinimapPainter {
     canvas.height = h;
     const bctx = canvas.getContext('2d');
     if (!bctx) return canvas;
-    const relief = bctx.createImageData(w, h);
-    paintBgFieldRelief(relief.data, w, h, s, BG_FIELD_PAD_X_YD, BG_FIELD_PAD_Z_YD);
-    bctx.putImageData(relief, 0, 0);
+    const ground = bctx.createImageData(w, h);
+    // axis +1: the minimap is drawn in WORLD orientation and never turned for a
+    // team, so both teams are handed the identical raster, lit from the
+    // screen's northwest (the M-map is the surface that owns the turned view).
+    paintBgFieldAtlas(ground.data, w, h, s, BG_FIELD_PAD_X_YD, BG_FIELD_PAD_Z_YD, 1);
+    bctx.putImageData(ground, 0, 0);
+    drawBgAtlasMarks(bctx, {
+      fx: (x: number) => (BG_FIELD_PAD_X_YD - x) * s,
+      fy: (z: number) => (BG_FIELD_PAD_Z_YD - z) * s,
+      s,
+    });
+    // Walls last, so cover always reads over the ground and the marks. They keep
+    // the resolved outline token rather than the M-map's slate fill plus cast
+    // shadow and ink: that treatment is drawn at several times this scale, where
+    // a 1.6px cast and a 0.7px ink line are a fraction of a wall, while here a
+    // curtain is about 2px of raster and the cast alone would be most of it. The
+    // token also tracks the HUD's own contrast (theme, forced-colors), which a
+    // fixed slate literal cannot.
     bctx.globalAlpha = BG_FIELD_WALL_ALPHA;
     bctx.fillStyle = colors.outline;
     // Thornhollow's walls are placed structures, not axis-aligned segments, so
