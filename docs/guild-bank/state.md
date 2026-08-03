@@ -44,10 +44,12 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
 
 ## Constants (single source of truth for the plan; land in `src/sim/guild_bank.ts`)
 - `GUILD_CREATION_FEE_COPPER = 100_000` (10 gold).
-- `GUILD_BANK_BASE_SLOTS = 12`.
+- `GUILD_BANK_BASE_SLOTS = 24` (revised 2026-08-03, user-directed: was 12; matches the
+  personal bank's free base).
 - `GUILD_BANK_EXPANSION_SLOTS = 6`.
-- `GUILD_BANK_EXPANSION_PRICES = [50_000, 100_000, 250_000, 500_000, 1_000_000, 2_500_000]`
-  copper (5g, 10g, 25g, 50g, 100g, 250g; 440g total; max 48 slots). Price is ALWAYS a
+- `GUILD_BANK_EXPANSION_PRICES = [25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000]`
+  copper (2g50s, 5g, 10g, 25g, 50g, 100g; 192g50s total; max 60 slots; revised
+  2026-08-03 from the 440g/48-slot ladder). Price is ALWAYS a
   table lookup indexed by purchased-expansion count, never client-supplied. Paid from the
   treasury, not personal copper.
 - `GUILD_BANK_TREASURY_CAP = 1_000_000_000` copper (100,000 gold). Deposits that would

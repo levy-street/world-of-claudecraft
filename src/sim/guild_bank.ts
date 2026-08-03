@@ -38,8 +38,9 @@ import { cloneInvSlot, type InvSlot } from './types';
  *  exploit (see chargeGuildCreationFee below and docs/guild-bank/state.md). */
 export const GUILD_CREATION_FEE_COPPER = 100_000;
 
-/** Slots every guild bank starts with, before any expansion. */
-export const GUILD_BANK_BASE_SLOTS = 12;
+/** Slots every guild bank starts with, before any expansion (matches the
+ *  personal bank's free base so a fresh guild is immediately useful). */
+export const GUILD_BANK_BASE_SLOTS = 24;
 
 /** Slots one treasury-bought expansion adds; also the granularity purchasedSlots
  *  stays on (sanitize floors to a whole expansion so price indexing stays coherent). */
@@ -47,10 +48,10 @@ export const GUILD_BANK_EXPANSION_SLOTS = 6;
 
 /** Copper price of each successive expansion, ALWAYS looked up by
  *  purchased-expansion count (never client-supplied) and paid from the guild
- *  treasury, not personal copper. 5g, 10g, 25g, 50g, 100g, 250g; 440g total;
- *  max 48 slots (base 12 + 6 expansions of 6). */
+ *  treasury, not personal copper. 2g50s, 5g, 10g, 25g, 50g, 100g; 192g50s
+ *  total; max 60 slots (base 24 + 6 expansions of 6). */
 export const GUILD_BANK_EXPANSION_PRICES: readonly number[] = [
-  50_000, 100_000, 250_000, 500_000, 1_000_000, 2_500_000,
+  25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000,
 ];
 
 /** Treasury ceiling in copper (100,000 gold). A deposit that would exceed it is

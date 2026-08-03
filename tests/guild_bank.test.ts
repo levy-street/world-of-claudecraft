@@ -38,9 +38,9 @@ import type { Entity, WorldContent } from '../src/sim/types';
 import { META_EXCLUDE, samplePlayerMeta } from './parity/trace';
 
 // The 6-tier expansion ladder from docs/guild-bank/state.md, pinned as literals.
-const PRICES = [50000, 100000, 250000, 500000, 1000000, 2500000];
-const LADDER_TOTAL = 4400000; // 440 gold across all six expansions
-const CAPS = [12, 18, 24, 30, 36, 42, 48]; // base 12 + 6 per purchased expansion
+const PRICES = [25000, 50000, 100000, 250000, 500000, 1000000];
+const LADDER_TOTAL = 1925000; // 192g50s across all six expansions
+const CAPS = [24, 30, 36, 42, 48, 54, 60]; // base 24 + 6 per purchased expansion
 
 const EMPTY: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 0 };
 
@@ -58,10 +58,10 @@ type _ServerRankCoversSim = AssertExtends<GuildRank, ServerGuildRank>;
 describe('guild bank constants (state.md contract)', () => {
   it('pins the creation fee, slot geometry, price ladder, and treasury cap', () => {
     expect(GUILD_CREATION_FEE_COPPER).toBe(100000);
-    expect(GUILD_BANK_BASE_SLOTS).toBe(12);
+    expect(GUILD_BANK_BASE_SLOTS).toBe(24);
     expect(GUILD_BANK_EXPANSION_SLOTS).toBe(6);
     expect([...GUILD_BANK_EXPANSION_PRICES]).toEqual(PRICES);
-    // Reduce over the EXPORT (not the file-local literal) so the 440g claim is
+    // Reduce over the EXPORT (not the file-local literal) so the ladder-total claim is
     // load-bearing against the shipped table, not a tautology.
     expect(GUILD_BANK_EXPANSION_PRICES.reduce((a, b) => a + b, 0)).toBe(LADDER_TOTAL);
     expect(GUILD_BANK_TREASURY_CAP).toBe(1000000000);
@@ -81,9 +81,9 @@ describe('guildBankCapacity + guildBankNextExpansionPrice', () => {
     }
   });
 
-  it('maxed banks report 48 slots and no further price', () => {
+  it('maxed banks report 60 slots and no further price', () => {
     const maxed: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 36 };
-    expect(guildBankCapacity(maxed)).toBe(48);
+    expect(guildBankCapacity(maxed)).toBe(60);
     expect(guildBankNextExpansionPrice(maxed)).toBeNull();
   });
 
@@ -91,7 +91,7 @@ describe('guildBankCapacity + guildBankNextExpansionPrice', () => {
     // Sanitize guarantees whole expansions, so this arm is defensive; pin it
     // anyway so the floor cannot silently become a round-up (price skip).
     const odd: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 7 };
-    expect(guildBankNextExpansionPrice(odd)).toBe(100000); // tier 1 price, not tier 2
+    expect(guildBankNextExpansionPrice(odd)).toBe(50000); // tier 1 price, not tier 2
   });
 });
 
@@ -248,8 +248,8 @@ describe('sanitizeGuildBankState (the ONE load path)', () => {
       purchasedSlots: 0,
     };
     const book = sanitizeGuildBankState(raw);
-    expect(book.inventory.length).toBe(60); // way past the 12-slot budget, all kept
-    expect(guildBankCapacity(book)).toBe(12);
+    expect(book.inventory.length).toBe(60); // way past the 24-slot budget, all kept
+    expect(guildBankCapacity(book)).toBe(24);
   });
 
   it('round-trips its own output unchanged and never aliases the raw slots', () => {
@@ -699,7 +699,7 @@ describe('guild bank ops: the shared refusal dimensions (every op, one axis at a
     expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
     sim.guildBankBuySlotsFor(sim.playerId);
     expect(book(sim).purchasedSlots).toBe(6);
-    expect(book(sim).treasury).toBe(51_500); // 101500 - 50000 (tier-1 price literal)
+    expect(book(sim).treasury).toBe(76_500); // 101500 - 25000 (tier-1 price literal)
   });
 });
 
@@ -1093,11 +1093,11 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
 
 describe('guildBankBuySlotsFor', () => {
   it('walks the whole ladder from the treasury at the literal prices', () => {
-    const sim = makeOfficerSim({ treasury: 4_400_000 }); // the 440g ladder total
+    const sim = makeOfficerSim({ treasury: 1_925_000 }); // the 192g50s ladder total
     const copperBefore = meta(sim).copper;
     sim.drainEvents();
-    const prices = [50_000, 100_000, 250_000, 500_000, 1_000_000, 2_500_000];
-    let treasury = 4_400_000;
+    const prices = [25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000];
+    let treasury = 1_925_000;
     for (let tier = 0; tier < prices.length; tier++) {
       sim.guildBankBuySlotsFor(sim.playerId);
       treasury -= prices[tier];
@@ -1121,7 +1121,7 @@ describe('guildBankBuySlotsFor', () => {
   });
 
   it('refuses when the treasury cannot afford the table price, mutating nothing', () => {
-    const sim = makeOfficerSim({ treasury: 49_999 });
+    const sim = makeOfficerSim({ treasury: 24_999 });
     meta(sim).copper = 10_000_000; // personal wealth must NOT substitute
     const before = fingerprint(sim);
     sim.drainEvents();
@@ -1139,9 +1139,9 @@ describe('guildBankInfoFor (the maybe(guildBank) stream read)', () => {
     expect(info).toEqual({
       treasury: 12_345,
       slots: [{ itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } }],
-      capacity: 18,
+      capacity: 30,
       purchasedSlots: 6,
-      nextExpansionPrice: 100_000, // tier-2 literal
+      nextExpansionPrice: 50_000, // tier-2 literal
     });
     // Boundary clone: mutating the returned view never reaches the live book.
     if (!info) throw new Error('unreachable');
@@ -1154,7 +1154,7 @@ describe('guildBankInfoFor (the maybe(guildBank) stream read)', () => {
   it('reports a null nextExpansionPrice once the ladder is exhausted', () => {
     const sim = makeOfficerSim({ purchasedSlots: 36 });
     expect(sim.guildBankInfoFor(sim.playerId)?.nextExpansionPrice).toBeNull();
-    expect(sim.guildBankInfoFor(sim.playerId)?.capacity).toBe(48);
+    expect(sim.guildBankInfoFor(sim.playerId)?.capacity).toBe(60);
   });
 
   it('leader sees the bank; member sees null (the officer-plus gate)', () => {
@@ -1272,10 +1272,10 @@ describe('guild bank authorization: the rank allowlist and per-guild isolation',
     sim.guildBankBuySlotsFor(sim.playerId);
     // Every mutation landed in the stamped guild's book; the other is untouched.
     expect(JSON.stringify(sim.guildBanks.get(OTHER_GUILD))).toBe(otherBefore);
-    expect(book(sim).treasury).toBe(100_000 + 1_000 - 500 - 50_000);
+    expect(book(sim).treasury).toBe(100_000 + 1_000 - 500 - 25_000);
     // And the read reports the stamped guild's book, never the other's.
     const info = sim.guildBankInfoFor(sim.playerId);
-    expect(info?.treasury).toBe(50_500);
+    expect(info?.treasury).toBe(75_500);
     expect(info?.slots).toEqual([]);
   });
 
