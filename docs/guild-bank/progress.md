@@ -32,15 +32,23 @@ Three independent slices, one commit each.
       text). Every failure mode on the dupe-sensitive paths reported only through
       `console.error` / `console.warn`, so it was invisible to production alerting. One
       closed-vocabulary counter through the existing `gameMetricsCounters` seam:
-      `woc_guild_bank_incidents_total{kind}` over the fixed five `GUILD_BANK_INCIDENTS`
-      (`escrow_save_failed`, `save_fenced_out`, `reconcile`, `book_unloaded`,
-      `ledger_write_failed`), pre-registered at zero like the ws drop causes. Guild id
-      stays in the log line and is NEVER a label (the bounded-cardinality contract).
+      `woc_guild_bank_incidents_total{kind}` over the fixed six `GUILD_BANK_INCIDENTS`
+      (`escrow_save_failed`, `save_fenced_out`, `escrow_quarantined`, `reconcile`,
+      `book_unloaded`, `ledger_write_failed`), pre-registered at zero like the ws drop
+      causes. Guild id stays in the log line and is NEVER a label (the
+      bounded-cardinality contract).
       Each increment sits beside its existing loud log, and the escrow-save arm rethrows
-      unchanged. Emission sites: `server/game.ts` (the escrow save `.catch`, the
-      `saved === false` fence-out when books were carried, per-guild in
-      `reconcileUnflushableGuildBooks`, and every "left unloaded" arm in both the boot
-      load and the reconcile reload) plus `server/bank_ledger.ts`
+      unchanged. Rebased onto the escrow root fix when the two lines merged:
+      `escrow_save_failed` now also covers a REFUSED book half (`GuildBankEscrowRefused`,
+      not only a thrown write), `escrow_quarantined` was ADDED for the terminal arm the
+      refusal design introduced (a refusal that can never resolve abandons the session),
+      and the reconcile counter moved to `revertOwnGuildBookOps`, the one reconcile site
+      left after the evict-and-reload arm and the cross-session scan were deleted, where
+      it counts only a guild whose unflushed log actually had work to undo.
+      Emission sites: `server/game.ts` (the escrow save `catch`, the
+      `saved === false` fence-out when books were carried, the quarantine in
+      `handleGuildBankEscrowRefusal`, per-guild in `revertOwnGuildBookOps`, and every
+      "left unloaded" arm of the boot load) plus `server/bank_ledger.ts`
       (`recordGuildBankDeltas`). Tests drive the real paths in
       `tests/guild_bank_persistence.test.ts` with a recording sink, with decisive
       negatives (a failed/fenced save carrying NO book books nothing) and a vacuity
