@@ -501,19 +501,32 @@ function requireOfficerBook(ctx: SimContext, meta: PlayerMeta): GuildBankState |
  *  tampered or legacy Phase 3 row can never complete the laundering (such a
  *  copy stays dormant in the book, the items-are-never-destroyed load
  *  philosophy). Returns the refusal line, or null when the slot may move.
+ *
+ *  The WHETHER is direction-independent (the same four dimensions refuse both
+ *  ways, so `!== null` stays the one dormant predicate every reader shares);
+ *  only the WORDING is direction-aware. `dir` defaults to 'deposit', the arm
+ *  every non-withdraw reader (the slot-view projection, the UI parity pin)
+ *  wants. Deposit names the dimension (quest / soulbound / generic, the mail
+ *  noMailQuestItems grouping precedent); WITHDRAW is one line for every
+ *  dimension, because "you cannot STORE that" is simply false when the copy is
+ *  already sitting in the book and the player asked to take it out.
  *  EXPORTED for the UI parity pin only (tests/guild_bank_view.test.ts drives
  *  this and the client-side dormant predicate over the whole item table so a
  *  new refusal dimension cannot silently desync the Guild tab's rendering);
  *  no host calls it directly. */
-export function guildBankPipeRefusal(slot: InvSlot): string | null {
+export function guildBankPipeRefusal(
+  slot: InvSlot,
+  dir: 'deposit' | 'withdraw' = 'deposit',
+): string | null {
   const def = ITEMS[slot.itemId];
-  if (def?.kind === 'quest') return 'You cannot store quest items in the bank.';
+  const quest = def?.kind === 'quest';
+  const refused =
+    quest || !!def?.soulbound || !!def?.noMarketList || isTransferLockedInstance(slot.instance);
+  if (!refused) return null;
+  if (dir === 'withdraw') return 'That item cannot be withdrawn from the guild bank.';
+  if (quest) return 'You cannot store quest items in the guild bank.';
   if (def?.soulbound) return 'You cannot store soulbound items in the guild bank.';
-  if (def?.noMarketList) return 'That item cannot be stored in the guild bank.';
-  if (isTransferLockedInstance(slot.instance)) {
-    return 'That item cannot be stored in the guild bank.';
-  }
-  return null;
+  return 'That item cannot be stored in the guild bank.';
 }
 
 /** Deposit personal copper into the guild treasury. Refuses (never truncates)
@@ -651,8 +664,10 @@ export function guildBankWithdraw(
   if (slotIndex >= book.inventory.length) return;
   // The pipe policy holds on the way OUT too: a tampered or legacy Phase 3 row
   // holding a locked/soulbound copy must never complete a cross-character
-  // transfer; it stays dormant in the book (items are never destroyed).
-  const refusal = guildBankPipeRefusal(book.inventory[slotIndex]);
+  // transfer; it stays dormant in the book (items are never destroyed). The
+  // 'withdraw' arm picks the direction's own wording: a deposit-worded "you
+  // cannot store that" is false for a copy already in the book.
+  const refusal = guildBankPipeRefusal(book.inventory[slotIndex], 'withdraw');
   if (refusal !== null) {
     ctx.error(meta.entityId, refusal);
     return;

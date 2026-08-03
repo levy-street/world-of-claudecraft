@@ -32,6 +32,7 @@ import {
   type GuildRank,
   guildBankCapacity,
   guildBankNextExpansionPrice,
+  guildBankPipeRefusal,
   guildBankRungsBought,
   sanitizeGuildBankState,
 } from '../src/sim/guild_bank';
@@ -841,7 +842,7 @@ describe('guildBankDepositGoldFor / guildBankWithdrawGoldFor', () => {
 });
 
 describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
-  it('refuses quest items with the personal-bank error, mutating nothing', () => {
+  it('refuses quest items with the GUILD-worded error, never the personal-bank line', () => {
     const sim = makeOfficerSim();
     meta(sim).inventory.push({ itemId: 'boar_hide', count: 2 }); // kind: 'quest'
     const before = fingerprint(sim);
@@ -851,7 +852,11 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
       meta(sim).inventory.findIndex((s) => s.itemId === 'boar_hide'),
     );
     expect(fingerprint(sim)).toBe(before);
-    expect(hasErr(sim.drainEvents(), 'You cannot store quest items in the bank.')).toBe(true);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'You cannot store quest items in the guild bank.')).toBe(true);
+    // Decisive negative: the personal bank's line must NOT be what the guild
+    // pane shows (it names the wrong bank, the defect this arm fixes).
+    expect(hasErr(evs, 'You cannot store quest items in the bank.')).toBe(false);
   });
 
   // The guild bank is an ANONYMOUS EXCHANGE PIPE (officer A deposits, officer B
@@ -917,8 +922,11 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     sim.guildBankWithdrawFor(sim.playerId, 1);
     expect(fingerprint(sim)).toBe(before);
     const evs = sim.drainEvents();
-    expect(hasErr(evs, 'You cannot store soulbound items in the guild bank.')).toBe(true);
-    expect(hasErr(evs, 'That item cannot be stored in the guild bank.')).toBe(true);
+    // The WITHDRAW direction speaks its own line: telling an officer they
+    // "cannot store" a copy already sitting in the book is simply wrong.
+    expect(hasErr(evs, 'That item cannot be withdrawn from the guild bank.')).toBe(true);
+    expect(hasErr(evs, 'You cannot store soulbound items in the guild bank.')).toBe(false);
+    expect(hasErr(evs, 'That item cannot be stored in the guild bank.')).toBe(false);
   });
 
   it('refuses every pipe dimension on WITHDRAW, not just the two sampled ones', () => {
@@ -931,33 +939,49 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
       (id) => ITEMS[id]?.noMarketList && ITEMS[id]?.kind !== 'quest' && !ITEMS[id]?.soulbound,
     );
     if (!questItemId || !noListId) throw new Error('missing pipe-policy fixtures');
+    // Every dimension refuses with the ONE withdraw-direction line (the wording
+    // is direction-aware, the refusal set is not).
+    const out = 'That item cannot be withdrawn from the guild bank.';
     const rows: { slot: Record<string, unknown>; err: string }[] = [
-      { slot: { itemId: questItemId, count: 1 }, err: 'You cannot store quest items in the bank.' },
-      {
-        slot: { itemId: 'reins_grag_bear', count: 1 },
-        err: 'You cannot store soulbound items in the guild bank.',
-      },
-      {
-        slot: { itemId: noListId, count: 1 },
-        err: 'That item cannot be stored in the guild bank.',
-      },
-      {
-        slot: { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } },
-        err: 'That item cannot be stored in the guild bank.',
-      },
-      {
-        slot: { itemId: 'wolf_fang', count: 1, instance: { bindOnTrade: true } },
-        err: 'That item cannot be stored in the guild bank.',
-      },
+      { slot: { itemId: questItemId, count: 1 }, err: out },
+      { slot: { itemId: 'reins_grag_bear', count: 1 }, err: out },
+      { slot: { itemId: noListId, count: 1 }, err: out },
+      { slot: { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } }, err: out },
+      { slot: { itemId: 'wolf_fang', count: 1, instance: { bindOnTrade: true } }, err: out },
     ];
     for (const [i, row] of rows.entries()) {
       book(sim).inventory.push(row.slot as never);
       const before = fingerprint(sim);
       sim.drainEvents();
       sim.guildBankWithdrawFor(sim.playerId, i);
-      expect(fingerprint(sim), row.err).toBe(before);
-      expect(hasErr(sim.drainEvents(), row.err), row.err).toBe(true);
+      expect(fingerprint(sim), JSON.stringify(row.slot)).toBe(before);
+      expect(hasErr(sim.drainEvents(), row.err), JSON.stringify(row.slot)).toBe(true);
     }
+  });
+
+  it('the pipe refusal set is direction-independent; only the wording moves', () => {
+    // The dormant predicate every reader shares is `!== null`, so the two
+    // directions must agree slot for slot even though they word it differently.
+    const questItemId = Object.keys(ITEMS).find((id) => ITEMS[id]?.kind === 'quest');
+    if (!questItemId) throw new Error('missing quest fixture');
+    const refused = [
+      { itemId: questItemId, count: 1 },
+      { itemId: 'reins_grag_bear', count: 1 },
+      { itemId: 'riding_training', count: 1 },
+      { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } },
+      { itemId: 'wolf_fang', count: 1, instance: { bindOnTrade: true } },
+    ];
+    for (const slot of refused) {
+      const dep = guildBankPipeRefusal(slot);
+      const wit = guildBankPipeRefusal(slot, 'withdraw');
+      expect(dep, JSON.stringify(slot)).not.toBeNull();
+      expect(wit, JSON.stringify(slot)).not.toBeNull();
+      expect(wit, JSON.stringify(slot)).toBe('That item cannot be withdrawn from the guild bank.');
+      expect(dep, JSON.stringify(slot)).not.toBe(wit);
+    }
+    // A plain copy is allowed BOTH ways (the vacuity guard).
+    expect(guildBankPipeRefusal({ itemId: 'wolf_fang', count: 1 })).toBeNull();
+    expect(guildBankPipeRefusal({ itemId: 'wolf_fang', count: 1 }, 'withdraw')).toBeNull();
   });
 
   it('a malformed count is silently inert on both item ops (never grants free units)', () => {
