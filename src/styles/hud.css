@@ -6423,12 +6423,17 @@
   }
   /* ---------- World Market collect indicator ---------- */
   /* The Merchant's coin: sale proceeds or returned items wait for collection.
-     Same rim-satellite family as the envelope; claims the top-RIGHT corner
-     (raid-lockout owns bottom-left, the envelope bottom-right; guarded by
-     tests/minimap_rim_badges.test.ts). */
+     Same rim-satellite family as the envelope, and it claims the top-LEFT
+     corner (raid-lockout owns bottom-left, the envelope bottom-right, the
+     day/night dial top-right). It shipped at top/right, which the dial already
+     held, and the dial is later in the DOM at the same z-index, so the coin was
+     painted over completely: an actionable control buried under an aria-hidden
+     decoration, visible together only when proceeds happen to be waiting, which
+     is why it went unnoticed. tests/minimap_rim_badges.test.ts keeps the four
+     corners one-to-one and holds the touch sheet's re-anchoring to match. */
   #market-indicator {
     position: absolute;
-    right: 4px;
+    left: 4px;
     top: 4px;
     z-index: 3;
     display: inline-flex;

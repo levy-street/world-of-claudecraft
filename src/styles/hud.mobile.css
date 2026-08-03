@@ -2132,6 +2132,11 @@
   }
   /* The Merchant's coin continues the same disc-control row, left of the envelope. */
   body.mobile-touch #market-indicator {
+    /* Clear the desktop anchor before re-anchoring on the other side: the coin
+       pins left on the disc, and left + width + right all non-auto is
+       over-constrained (LTR drops `right`), so without this it never joins the
+       row. Same reason #raid-lockout clears left and #mail-indicator bottom. */
+    left: auto;
     right: calc(100% + 138px);
     top: 156px;
     width: 44px;
