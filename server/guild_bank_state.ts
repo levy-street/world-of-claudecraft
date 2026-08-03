@@ -12,10 +12,10 @@ import {
   type GuildBankDeltaDeficit,
   type GuildBankOpDelta,
   type GuildBankState,
+  netGuildBankOpLogForReplay,
   sanitizeGuildBankState,
 } from '../src/sim/guild_bank';
 import type { GuildBankRow } from './db';
-import { netGuildBankOpLogForReplay } from './guild_bank_op_log';
 
 // The slice of the Sim facade this module needs (structural, so tests can
 // hand the real Sim and the types never drag the whole class in).

@@ -23,6 +23,19 @@
 // item identities), which makes the cap effectively unreachable instead of
 // destructive.
 //
+// The obligation above is stated over the FORWARD replay, which is what the
+// log is a payload for. The same log is also the reconcile's undo list, and
+// there the compacted form is not merely equal but strictly better behaved: a
+// run like [withdraw 5, deposit 5] nets to nothing, so undoing it moves
+// nothing, where undoing the original against a live book another officer has
+// since emptied would clamp on the removal and then GRANT 5 back. Compaction
+// therefore cannot make the inverse worse; it removes a clamped residue.
+//
+// The replay-EQUIVALENT netting the escrow merge falls back to is deliberately
+// NOT here: it must stay locked to applyGuildBankDeltasTo's semantics (rung 0
+// moves purse copper the book never held, so its charge must not be netted in),
+// so it lives beside the applier as netGuildBankOpLogForReplay.
+//
 // Node-testable without the server: a pure function over plain deltas.
 
 import type { GuildBankOpDelta } from '../src/sim/guild_bank';
@@ -128,70 +141,5 @@ export function compactGuildBankOpLog(log: readonly GuildBankOpDelta[]): GuildBa
     segment.push(d);
   }
   out.push(...compactSegment(segment));
-  return out;
-}
-
-/** A REPLAY-ONLY normalization of a log, for the escrow merge's fallback
- *  attempt. Same final book as the ordered replay, with every intermediate dip
- *  removed:
- *
- *   - slot ops keep their order and their absolute ladder witness, but their
- *     treasury CHARGE is lifted out (the ladder is monotone, so the grants are
- *     order independent among themselves);
- *   - item deltas net per identity;
- *   - every copper delta in the log, including the lifted slot charges, nets
- *     into ONE gold delta applied LAST.
- *
- *  The final treasury is base + sum(copperDeltas) either way, and the final
- *  item multiset and ladder position are unchanged, so this is the same
- *  outcome; what it removes is the ORDERING artifact where this session's own
- *  withdraw ran against a live book that held another officer's copper and the
- *  durable replay put that officer's whole log first. Never used for the log
- *  itself (the session's bookkeeping needs one entry per op).
- */
-export function netGuildBankOpLogForReplay(log: readonly GuildBankOpDelta[]): GuildBankOpDelta[] {
-  const out: GuildBankOpDelta[] = [];
-  let copper = 0;
-  const items = new Map<string, { sample: GuildBankOpDelta; net: number }>();
-  for (const d of log) {
-    copper += Number(d.copperDelta) || 0;
-    if (isSlotOp(d)) {
-      out.push({ ...d, copperDelta: 0 });
-      continue;
-    }
-    if (d.op !== 'deposit' && d.op !== 'withdraw') continue;
-    if (typeof d.itemId !== 'string' || d.itemId === '') continue;
-    const count = Math.max(0, Math.floor(Number(d.count)) || 0);
-    if (count === 0) continue;
-    const key = identityKey(d);
-    const entry = items.get(key) ?? { sample: d, net: 0 };
-    entry.net += d.op === 'deposit' ? count : -count;
-    items.set(key, entry);
-  }
-  for (const { sample, net } of items.values()) {
-    if (net === 0) continue;
-    out.push({
-      op: net > 0 ? 'deposit' : 'withdraw',
-      itemId: sample.itemId,
-      count: Math.abs(net),
-      instance: sample.instance ?? null,
-      craftedRecipeId: sample.craftedRecipeId ?? null,
-      copperDelta: 0,
-      purchasedSlotsBefore: 0,
-      purchasedSlotsAfter: 0,
-    });
-  }
-  if (copper !== 0) {
-    out.push({
-      op: copper > 0 ? 'deposit_gold' : 'withdraw_gold',
-      itemId: null,
-      count: null,
-      instance: null,
-      craftedRecipeId: null,
-      copperDelta: copper,
-      purchasedSlotsBefore: 0,
-      purchasedSlotsAfter: 0,
-    });
-  }
   return out;
 }

@@ -35,6 +35,7 @@ import {
   guildBankCapacity,
   guildBankNextExpansionPrice,
   guildBankRungsBought,
+  netGuildBankOpLogForReplay,
   revertGuildBankDeltasTo,
   sanitizeGuildBankState,
 } from '../src/sim/guild_bank';
@@ -2064,6 +2065,158 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
     }
     // The property is only worth what it covered.
     expect(checked).toBeGreaterThan(200);
+  });
+
+  it('the identity holds only while the LADDER WITNESS matches: the asymmetries, pinned', () => {
+    // The pair is an inverse on ONE book whose ladder stands where the delta's
+    // witness says. Forward runs on durable truth and backward on the live
+    // book, so a slot op can meet a ladder that has moved, and there the two
+    // are deliberately not symmetric. Both cases are correct in production
+    // (the forward one because another officer's committed rung must not be
+    // re-granted; the backward one because a paid rung must not be destroyed),
+    // and both are recorded here so neither reads as a surprise.
+    const expansion: GuildBankOpDelta = {
+      op: 'buy_slots',
+      itemId: null,
+      count: null,
+      instance: null,
+      craftedRecipeId: null,
+      copperDelta: -GUILD_BANK_RUNG_PRICES[1],
+      purchasedSlotsBefore: 24,
+      purchasedSlotsAfter: 30,
+    };
+    // Base ALREADY at the op's target: the raise is a no-op forwards (the rung
+    // is already there) but the inverse's compare-and-swap matches, so a round
+    // trip on this base lowers the ladder. Not reachable in production: the
+    // inverse only ever runs on the book the witness was recorded from.
+    const ahead: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 30 };
+    expect(applyGuildBankDeltasTo(ahead, [expansion]).deficit).toBeNull();
+    expect(ahead.purchasedSlots).toBe(30);
+    revertGuildBankDeltasTo(ahead, [expansion]);
+    expect(ahead.purchasedSlots).toBe(24);
+    // Base PAST the op's target: the charge lands (the guild did pay this
+    // rung; a later rung is what advanced the ladder) and the inverse's
+    // compare-and-swap misses, so nothing is undone.
+    const past: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 36 };
+    expect(applyGuildBankDeltasTo(past, [expansion]).deficit).toBeNull();
+    expect(past.treasury).toBe(75_000);
+    expect(past.purchasedSlots).toBe(36);
+    revertGuildBankDeltasTo(past, [expansion]);
+    expect(past.treasury).toBe(75_000);
+    expect(past.purchasedSlots).toBe(36);
+  });
+
+  it('a rung is NEVER granted without its charge (all-or-nothing, unlike gold)', () => {
+    // Granting the ladder while the treasury cannot cover the price would put
+    // a FREE rung in durable truth, and if the session then died the charge
+    // would never arrive. The gold arm carries a residual instead; the slot
+    // arm waits.
+    const expansion: GuildBankOpDelta = {
+      op: 'buy_slots',
+      itemId: null,
+      count: null,
+      instance: null,
+      craftedRecipeId: null,
+      copperDelta: -GUILD_BANK_RUNG_PRICES[1],
+      purchasedSlotsBefore: 24,
+      purchasedSlotsAfter: 30,
+    };
+    for (const treasury of [0, 1, GUILD_BANK_RUNG_PRICES[1] - 1]) {
+      const book: GuildBankState = { treasury, inventory: [], purchasedSlots: 24 };
+      const r = applyGuildBankDeltasTo(book, [expansion]);
+      expect(`treasury ${treasury}: ${r.deficit?.kind}`).toBe(
+        `treasury ${treasury}: treasury_underflow`,
+      );
+      expect(r.residual).toBeNull(); // nothing partly applied
+      expect(book.purchasedSlots).toBe(24); // no free rung
+      expect(book.treasury).toBe(treasury); // and no partial charge
+    }
+  });
+
+  it('the NETTED replay reaches the same book as the ordered one, open_bank included', () => {
+    // netGuildBankOpLogForReplay is the escrow merge's fallback when the
+    // ordered replay stalls on a cross-session ordering artifact, so it must
+    // land on exactly the book the ordered replay would. The trap it exists to
+    // avoid: rung 0 carries the officer's PURSE price as its copperDelta and
+    // the applier never moves it, so netting that number in would destroy
+    // 90_000 copper on every netted replay of a log containing an opening.
+    const gold = (copperDelta: number): GuildBankOpDelta => ({
+      op: copperDelta > 0 ? 'deposit_gold' : 'withdraw_gold',
+      itemId: null,
+      count: null,
+      instance: null,
+      craftedRecipeId: null,
+      copperDelta,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    });
+    const item = (op: 'deposit' | 'withdraw', count: number): GuildBankOpDelta => ({
+      op,
+      itemId: 'wolf_fang',
+      count,
+      instance: null,
+      craftedRecipeId: null,
+      copperDelta: 0,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    });
+    const open: GuildBankOpDelta = {
+      op: 'open_bank',
+      itemId: null,
+      count: null,
+      instance: null,
+      craftedRecipeId: null,
+      copperDelta: -GUILD_BANK_RUNG_PRICES[0],
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 24,
+    };
+    const expand: GuildBankOpDelta = {
+      op: 'buy_slots',
+      itemId: null,
+      count: null,
+      instance: null,
+      craftedRecipeId: null,
+      copperDelta: -GUILD_BANK_RUNG_PRICES[1],
+      purchasedSlotsBefore: 24,
+      purchasedSlotsAfter: 30,
+    };
+    const logs: GuildBankOpDelta[][] = [
+      [gold(-150_000), gold(300_000), open],
+      [open, gold(300_000), expand, item('deposit', 4), item('withdraw', 1)],
+      [gold(50_000), item('deposit', 3), gold(-20_000), item('withdraw', 2)],
+      [open, expand],
+    ];
+    const base = (): GuildBankState => ({
+      treasury: 200_000,
+      inventory: [{ itemId: 'wolf_fang', count: 2 }],
+      purchasedSlots: 0,
+    });
+    for (const log of logs) {
+      const ordered = base();
+      const netted = base();
+      const a = applyGuildBankDeltasTo(ordered, log);
+      const b = applyGuildBankDeltasTo(netted, netGuildBankOpLogForReplay(log));
+      const tag = log.map((d) => d.op).join(',');
+      expect(`${tag}: ${a.deficit?.kind ?? 'ok'}`).toBe(`${tag}: ok`);
+      expect(`${tag}: ${b.deficit?.kind ?? 'ok'}`).toBe(`${tag}: ok`);
+      expect(`${tag}: ${fingerprint(netted)}`).toBe(`${tag}: ${fingerprint(ordered)}`);
+    }
+    // Decisively, on the exact shape the trap needs: 200_000 - 150_000 +
+    // 300_000 = 350_000, and rung 0's 90_000 purse price is NOT among the
+    // numbers the book moves. Netting it in would write 260_000 here.
+    const netted = base();
+    expect(applyGuildBankDeltasTo(netted, netGuildBankOpLogForReplay(logs[0])).deficit).toBeNull();
+    expect(netted.treasury).toBe(350_000);
+    expect(netted.purchasedSlots).toBe(24);
+    // And the netted form ORDERS the single gold move last, which is the whole
+    // point: the ordered replay of this same log stalls on the intermediate
+    // dip below zero when the base is smaller.
+    const small: GuildBankState = { treasury: 100_000, inventory: [], purchasedSlots: 0 };
+    expect(applyGuildBankDeltasTo({ ...small, inventory: [] }, logs[0]).deficit?.kind).toBe(
+      'treasury_underflow',
+    );
+    expect(applyGuildBankDeltasTo(small, netGuildBankOpLogForReplay(logs[0])).deficit).toBeNull();
+    expect(small.treasury).toBe(250_000);
   });
 
   it('the forward replay of NON-slot deltas is order independent', () => {

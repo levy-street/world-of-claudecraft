@@ -3215,14 +3215,29 @@ async function writeGuildBankRow(
   client: { query: (text: string, values: unknown[]) => Promise<unknown> },
   gb: GuildBankSave,
 ): Promise<GuildBankWriteResult> {
-  const read = (await client.query(
-    `SELECT octet_length(data::text) AS data_bytes,
-            CASE WHEN octet_length(data::text) <= $2 THEN data ELSE NULL END AS data
-       FROM guild_banks
-      WHERE guild_id = $1
-        FOR UPDATE`,
-    [gb.guildId, GUILD_BANK_ROW_MAX_BYTES],
-  )) as { rows: { data_bytes?: unknown; data?: unknown }[] };
+  const lockedRead = async () =>
+    (await client.query(
+      `SELECT octet_length(data::text) AS data_bytes,
+              CASE WHEN octet_length(data::text) <= $2 THEN data ELSE NULL END AS data
+         FROM guild_banks
+        WHERE guild_id = $1
+          FOR UPDATE`,
+      [gb.guildId, GUILD_BANK_ROW_MAX_BYTES],
+    )) as { rows: { data_bytes?: unknown; data?: unknown }[] };
+  let read = await lockedRead();
+  if (!read.rows?.[0]) {
+    // FOR UPDATE locks ROWS, so a guild with no row yet locks nothing and two
+    // processes could both merge onto the empty base, the second upsert
+    // discarding the first's deltas. Seed the empty row first (idempotent,
+    // and a no-op for every save after the guild's first), then re-read it
+    // under the lock. Only ever runs once per guild in the whole realm's life.
+    await client.query(
+      `INSERT INTO guild_banks (guild_id, realm, data, updated_at) VALUES ($1, $2, $3, now())
+       ON CONFLICT (guild_id) DO NOTHING`,
+      [gb.guildId, REALM, JSON.stringify({ treasury: 0, inventory: [], purchasedSlots: 0 })],
+    );
+    read = await lockedRead();
+  }
   const row = read.rows?.[0];
   const oversized = row ? Number(row.data_bytes) > GUILD_BANK_ROW_MAX_BYTES : false;
   const merged = mergeGuildBankRow(row ? (row.data ?? null) : null, gb.deltas, { oversized });
@@ -3360,29 +3375,6 @@ export async function loadGuildBankRows(): Promise<GuildBankRow[]> {
     if (res.rows.length < GUILD_BANK_BOOT_BATCH) return out;
     lastId = Number(res.rows[res.rows.length - 1].guild_id);
   }
-}
-
-// One guild's book row, for the fence-out reconcile (GameServer
-// reconcileFencedOutGuildBooks): after a displaced session's escrow save
-// fences out, the live book is reloaded from durable truth. Same bound and
-// parsed-JSONB contract as the boot read; a guild with no row reports data
-// null (an empty book, matching what a restart would load).
-export async function loadGuildBankRow(guildId: number): Promise<GuildBankRow> {
-  const res = await pool.query(
-    `SELECT octet_length(data::text) AS data_bytes,
-            CASE WHEN octet_length(data::text) <= $2 THEN data ELSE NULL END AS data
-       FROM guild_banks
-      WHERE guild_id = $1`,
-    [guildId, GUILD_BANK_ROW_MAX_BYTES],
-  );
-  const row = res.rows[0];
-  if (!row) return { guildId, data: null, oversized: false, dataBytes: 0 };
-  return {
-    guildId,
-    data: row.data ?? null,
-    oversized: Number(row.data_bytes) > GUILD_BANK_ROW_MAX_BYTES,
-    dataBytes: Number(row.data_bytes) || 0,
-  };
 }
 
 export async function isAdminAccount(accountId: number): Promise<boolean> {

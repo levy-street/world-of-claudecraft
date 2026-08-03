@@ -1403,6 +1403,128 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     );
   });
 
+  it('a give-up keeps the REST of the carried batch marked settled', async () => {
+    // Giving up drops only the delta that cannot land, never the work queued
+    // behind it. Everything behind it still has a DURABLE character half, so
+    // it must stay SETTLED: if the count were cleared, a later fence-out would
+    // replay it backward onto the live book and re-grant value the character
+    // kept (a withdraw) or vaporize value it lost (a deposit).
+    const server = new GameServer();
+    const a = joinServer(server, 1, 'ConsumerA').session;
+    officerSetup(server, a, 0);
+    server.sim.addItem('wolf_fang', 4, a.pid);
+    // A's log: a withdraw durable truth can never satisfy (no other session is
+    // dirty, so it gives up on the first attempt), then a deposit behind it.
+    a.unflushedGuildBankOps.set(GUILD_ID, [
+      {
+        op: 'withdraw_gold',
+        itemId: null,
+        count: null,
+        instance: null,
+        craftedRecipeId: null,
+        copperDelta: -50_000,
+        purchasedSlotsBefore: 24,
+        purchasedSlotsAfter: 24,
+      },
+      {
+        op: 'deposit_gold',
+        itemId: null,
+        count: null,
+        instance: null,
+        craftedRecipeId: null,
+        copperDelta: 7_000,
+        purchasedSlotsBefore: 24,
+        purchasedSlotsAfter: 24,
+      },
+    ]);
+    a.dirtyGuildBanks.set(GUILD_ID, 1);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await priv(server).saveCharacter(a);
+    errSpy.mockRestore();
+    // The blocker is gone; the deposit behind it survives AND is marked settled.
+    expect(a.unflushedGuildBankOps.get(GUILD_ID)).toHaveLength(1);
+    expect(a.unflushedGuildBankOps.get(GUILD_ID)?.[0].copperDelta).toBe(7_000);
+    expect(a.settledGuildBankOps.get(GUILD_ID)).toBe(1);
+    // So a fence-out now undoes NOTHING of it on the live book.
+    const before = server.sim.guildBanks.get(GUILD_ID)?.treasury;
+    priv(server).revertOwnGuildBookOps(a, [GUILD_ID]);
+    expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(before);
+  });
+
+  it('an unusable row RECORDS the deltas it drops, never only a console line', () => {
+    // The row is preserved for a human, and retrying cannot help, so the
+    // carried deltas are dropped: their CHARACTER half just committed, which
+    // makes this a permanent escrow tear and therefore an audit trail, not a
+    // log line.
+    const merged = mergeGuildBankRow(null, [], { oversized: true });
+    expect(merged.data).toBeNull();
+    expect(merged.result.rowUnusable).toBe(true);
+  });
+
+  it('an unusable row on a real save writes the escrow anomaly rows', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'BadRow2');
+    officerSetup(server, session);
+    oversizedGuilds.add(GUILD_ID);
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
+    dbMock.insertBankLedgerRow.mockClear();
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await priv(server).saveCharacter(session);
+    errSpy.mockRestore();
+    await bankLedgerIdle();
+    const rows = dbMock.insertBankLedgerRow.mock.calls.map((c) => (c as unknown[])[0]);
+    expect(rows).toContainEqual(
+      expect.objectContaining({ op: 'escrow_deficit', containerId: GUILD_ID }),
+    );
+  });
+
+  it("the cap compaction leaves an IN-FLIGHT save's captured prefix alone", async () => {
+    // The post-commit release consumes the carried prefix BY INDEX, so a
+    // compaction that reshuffled the log while the write was awaited would
+    // make it eat the wrong entries: persisting work twice, or dropping it.
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'CapRacer');
+    officerSetup(server, session);
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1_000 });
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
+    const real = dbMock.saveCharacterAndGuildBankState.getMockImplementation();
+    if (!real) throw new Error('missing impl');
+    dbMock.saveCharacterAndGuildBankState.mockImplementationOnce(
+      // biome-ignore lint/suspicious/noExplicitAny: forwarding the double's own args
+      async (...args: any[]) => {
+        // Mid-write: pad the log past the cap so the next op compacts it.
+        const log = session.unflushedGuildBankOps.get(GUILD_ID) ?? [];
+        session.unflushedGuildBankOps.set(GUILD_ID, [
+          ...log,
+          ...Array.from({ length: 500 }, () => ({
+            op: 'deposit_gold' as const,
+            itemId: null,
+            count: null,
+            instance: null,
+            craftedRecipeId: null,
+            copperDelta: 0,
+            purchasedSlotsBefore: 24,
+            purchasedSlotsAfter: 24,
+          })),
+        ]);
+        server.sim.setPlayerGuildMembership(session.pid, { guildId: GUILD_ID, rank: 'officer' });
+        dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 4_000 });
+        return real(...args);
+      },
+    );
+    await priv(server).saveCharacter(session);
+    // The two carried deposits are durable and consumed exactly once...
+    expect(durableBook()).toEqual({ treasury: 103_000, inventory: [], purchasedSlots: 24 });
+    // ...and the mid-write op is still queued, not swallowed by the splice.
+    const rest = session.unflushedGuildBankOps.get(GUILD_ID) ?? [];
+    expect(rest.reduce((n, d) => n + d.copperDelta, 0)).toBe(4_000);
+    expect(session.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
+    // A second save drains it, with no double-persist.
+    server.sim.setPlayerGuildMembership(session.pid, { guildId: GUILD_ID, rank: 'officer' });
+    await priv(server).saveCharacter(session);
+    expect(durableBook()).toEqual({ treasury: 107_000, inventory: [], purchasedSlots: 24 });
+  });
+
   it('an exhausted leave flush undoes the books it could never commit', async () => {
     // The leave save retries then gives up; the session tears down, so its
     // live-book mutations can never converge to durable truth and the guard

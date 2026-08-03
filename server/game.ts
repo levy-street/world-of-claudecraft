@@ -849,6 +849,13 @@ export interface ClientSession {
   // Consecutive escrow-deficit skips per guild, the retry bound for the arm
   // above.
   guildBankDeficitSkips: Map<number, number>;
+  // How many leading log entries per guild an IN-FLIGHT escrow save captured.
+  // The post-commit release consumes exactly that many by index, so the cap's
+  // compaction must leave that prefix alone while the write is awaited or the
+  // splice would eat the wrong entries (persisting work twice, or dropping
+  // it). Set when the payload is captured, cleared when the save settles,
+  // including on a throw.
+  inFlightGuildBankOps: Map<number, number>;
   // IP address at join time (from requestMetadata); used for per-IP session counting.
   ip: string;
   userAgent: string;
@@ -3203,6 +3210,7 @@ export class GameServer {
       unflushedGuildBankOps: new Map(),
       settledGuildBankOps: new Map(),
       guildBankDeficitSkips: new Map(),
+      inFlightGuildBankOps: new Map(),
       ignoredIds: new Set(),
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
@@ -3699,12 +3707,12 @@ export class GameServer {
           carriedGuildBankSeqs.length = 0;
           carriedGuildBankOpCounts.clear();
           guildBankResults.length = 0;
+          session.inFlightGuildBankOps.clear();
           for (const entry of session.dirtyGuildBanks) {
             carriedGuildBankSeqs.push(entry);
-            carriedGuildBankOpCounts.set(
-              entry[0],
-              session.unflushedGuildBankOps.get(entry[0])?.length ?? 0,
-            );
+            const carried = session.unflushedGuildBankOps.get(entry[0])?.length ?? 0;
+            carriedGuildBankOpCounts.set(entry[0], carried);
+            session.inFlightGuildBankOps.set(entry[0], carried);
           }
           return collectGuildBankDeltas(
             (guildId) => this.sim.serializeGuildBank(guildId),
@@ -3720,42 +3728,48 @@ export class GameServer {
           // both siblings ride the character-lease fence). Run through the
           // market queue and capture the market/book snapshots at write time
           // so this commit can't clobber newer ones.
-          saved = await this.enqueueMarketWrite(() => {
-            // BOTH escrow halves are captured HERE, in one synchronous step at
-            // write time, after the serial-writer wait: an op dispatched
-            // during the wait mutates the live character AND the live book,
-            // so a character blob serialized before the wait paired with a
-            // book serialized inside it would commit two different instants
-            // (a deposit lands in both halves, a withdraw in neither: the
-            // Phase 3 QA database-review BLOCKING). Re-serializing may fail
-            // only if the player left mid-wait; then the T0 snapshot (whose
-            // ops are all pre-wait) is still self-consistent with the books
-            // its session could have dirtied. recordUpTo stays captured at
-            // T0: the fresher blob can only contain MORE than it publishes,
-            // never less (publish never runs ahead of durable state).
-            const fresh = this.sim.serializeCharacter(session.pid);
-            const snap = fresh ? applyFixups(fresh) : state;
-            persistedLevel = snap.level;
-            return opts.withMarket
-              ? saveCharacterAndMarketState(
-                  session.characterId,
-                  snap.level,
-                  snap,
-                  this.sim.serializeMarket(),
-                  this.sim.serializeMail(),
-                  session.leaseNonce,
-                  collectDeltas(),
-                  guildBankResults,
-                )
-              : saveCharacterAndGuildBankState(
-                  session.characterId,
-                  snap.level,
-                  snap,
-                  collectDeltas(),
-                  session.leaseNonce,
-                  guildBankResults,
-                );
-          });
+          try {
+            saved = await this.enqueueMarketWrite(() => {
+              // BOTH escrow halves are captured HERE, in one synchronous step at
+              // write time, after the serial-writer wait: an op dispatched
+              // during the wait mutates the live character AND the live book,
+              // so a character blob serialized before the wait paired with a
+              // book serialized inside it would commit two different instants
+              // (a deposit lands in both halves, a withdraw in neither: the
+              // Phase 3 QA database-review BLOCKING). Re-serializing may fail
+              // only if the player left mid-wait; then the T0 snapshot (whose
+              // ops are all pre-wait) is still self-consistent with the books
+              // its session could have dirtied. recordUpTo stays captured at
+              // T0: the fresher blob can only contain MORE than it publishes,
+              // never less (publish never runs ahead of durable state).
+              const fresh = this.sim.serializeCharacter(session.pid);
+              const snap = fresh ? applyFixups(fresh) : state;
+              persistedLevel = snap.level;
+              return opts.withMarket
+                ? saveCharacterAndMarketState(
+                    session.characterId,
+                    snap.level,
+                    snap,
+                    this.sim.serializeMarket(),
+                    this.sim.serializeMail(),
+                    session.leaseNonce,
+                    collectDeltas(),
+                    guildBankResults,
+                  )
+                : saveCharacterAndGuildBankState(
+                    session.characterId,
+                    snap.level,
+                    snap,
+                    collectDeltas(),
+                    session.leaseNonce,
+                    guildBankResults,
+                  );
+            });
+          } finally {
+            // Whatever happened to the write, no payload is in flight any
+            // more: the cap's compaction may touch the whole log again.
+            session.inFlightGuildBankOps.clear();
+          }
         } else {
           saved = await saveCharacterState(
             session.characterId,
@@ -4114,11 +4128,16 @@ export class GameServer {
     if (result.rowUnusable) {
       // Not a deficit: the stored row is oversized or structurally not a book
       // and must be preserved for a human. Retrying cannot help, so release
-      // the mark and leave the row alone (the boot skip rule).
+      // the mark and leave the row alone (the boot skip rule). The carried
+      // deltas' CHARACTER halves just committed, though, so dropping them is a
+      // permanent escrow tear and goes into the ledger as an anomaly rather
+      // than only into a console line.
+      const abandoned = (session.unflushedGuildBankOps.get(guildId) ?? []).slice(0, carried);
       consume(carried);
       release();
+      if (abandoned.length > 0) recordGuildBankAbandonedDeltas(session, guildId, abandoned);
       console.error(
-        `guild bank row for guild ${guildId} is oversized or malformed; escrow save left it untouched (ops stay live, the row is preserved)`,
+        `guild bank row for guild ${guildId} is oversized or malformed; escrow save left it untouched (ops stay live, the row is preserved, ${abandoned.length} delta(s) recorded as an escrow anomaly)`,
       );
       return;
     }
@@ -4156,7 +4175,13 @@ export class GameServer {
     // behind it, and record the residue. Dropping the whole remainder would
     // destroy deposits that were merely waiting their turn.
     consume(1);
-    session.settledGuildBankOps.delete(guildId);
+    // The rest of the carried batch still has a DURABLE character half, so it
+    // must stay marked settled: clearing the count here would let a later
+    // fence-out replay it backward onto the live book and re-grant value the
+    // character kept.
+    const stillSettled = pending - 1;
+    if (stillSettled > 0) session.settledGuildBankOps.set(guildId, stillSettled);
+    else session.settledGuildBankOps.delete(guildId);
     session.guildBankDeficitSkips.delete(guildId);
     if (!session.unflushedGuildBankOps.has(guildId)) session.dirtyGuildBanks.delete(guildId);
     if (result.deficit) {
@@ -4239,12 +4264,19 @@ export class GameServer {
       // is semantics-preserving (server/guild_bank_op_log.ts). The settled
       // prefix (character half durable, book half pending) is compacted
       // separately so the boundary survives.
-      const settled = Math.min(session.settledGuildBankOps.get(guildId) ?? 0, log.length);
-      const head = compactGuildBankOpLog(log.slice(0, settled));
-      const tail = compactGuildBankOpLog(log.slice(settled));
-      log = [...head, ...tail];
-      if (head.length > 0) session.settledGuildBankOps.set(guildId, head.length);
-      else session.settledGuildBankOps.delete(guildId);
+      // Two prefixes must survive compaction verbatim: the SETTLED one (its
+      // character half is durable, and the boundary decides what a reconcile
+      // may undo) and any IN-FLIGHT one (a save already captured that many
+      // entries and will consume them by index when it commits).
+      const protect = Math.min(
+        Math.max(
+          session.settledGuildBankOps.get(guildId) ?? 0,
+          session.inFlightGuildBankOps.get(guildId) ?? 0,
+        ),
+        log.length,
+      );
+      const head = log.slice(0, protect);
+      log = [...head, ...compactGuildBankOpLog(log.slice(protect))];
     }
     session.unflushedGuildBankOps.set(guildId, log);
     recordGuildBankDeltas(effectiveOp, session, guildId, deltas);

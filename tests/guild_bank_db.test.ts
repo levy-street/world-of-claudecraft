@@ -133,8 +133,16 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
     const lockCalls = client.query.mock.calls.filter((c) =>
       /FROM guild_banks[\s\S]*FOR UPDATE/i.test(String(c[0])),
     );
-    expect(lockCalls.map((c) => (c[1] as unknown[])[0])).toEqual([7, 9]);
+    // Two locked reads per guild here, because this stub answers the first
+    // with no row: FOR UPDATE locks ROWS, so a guild with no row yet locks
+    // nothing and two processes could both merge onto the empty base. The
+    // seed-then-relock only runs on a guild's first-ever write.
+    expect(lockCalls.map((c) => (c[1] as unknown[])[0])).toEqual([7, 7, 9, 9]);
     expect((lockCalls[0][1] as unknown[])[1]).toBe(GUILD_BANK_ROW_MAX_BYTES);
+    const seedCalls = client.query.mock.calls.filter((c) =>
+      /ON CONFLICT \(guild_id\) DO NOTHING/i.test(String(c[0])),
+    );
+    expect(seedCalls.map((c) => (c[1] as unknown[])[0])).toEqual([7, 9]);
     const charIndex = sqls.findIndex((s2) => /UPDATE characters/i.test(s2));
     const lockIndex = sqls.findIndex((s2) => /FOR UPDATE/i.test(s2));
     expect(charIndex).toBeGreaterThan(0);
@@ -143,7 +151,7 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
     // MERGED book (this stub's SELECT returns no row, so the base is the empty
     // book and the merge is exactly this session's deltas).
     const bankCalls = client.query.mock.calls.filter((c) =>
-      /INSERT INTO guild_banks/i.test(String(c[0])),
+      /INSERT INTO guild_banks[\s\S]*DO UPDATE/i.test(String(c[0])),
     );
     expect(bankCalls.map((c) => (c[1] as unknown[])[0])).toEqual([7, 9]);
     expect(String(bankCalls[0][0])).toContain('ON CONFLICT (guild_id) DO UPDATE');

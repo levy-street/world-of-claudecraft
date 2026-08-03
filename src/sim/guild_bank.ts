@@ -291,9 +291,17 @@ export function refundGuildCreationFee(ctx: SimContext, pid: number, amount: num
  *    never persist those deltas (its escrow save fenced out, or its leave flush
  *    exhausted its retries), leaving every other session's work intact.
  *
- *  The two are exact inverses and live side by side on purpose; the identity
- *  property (revert(apply(book, d)) === book) is pinned in
- *  tests/guild_bank.test.ts so they cannot drift apart. */
+ *  The two live side by side on purpose. They are exact inverses OF EACH OTHER
+ *  ON ONE BOOK whenever each delta's absolute ladder witness matches the book
+ *  it is applied to, which is the case the live book always satisfies (the
+ *  witness was recorded from that very book); the identity property is pinned
+ *  over that corpus in tests/guild_bank.test.ts. They are deliberately NOT a
+ *  round trip across DIFFERENT books: forward runs on durable truth and
+ *  backward on the live book, and a slot op replayed onto a ladder that has
+ *  since moved is a raise-to-N no-op forwards while the inverse's
+ *  compare-and-swap declines to undo anything (or, on a book standing exactly
+ *  where a LATER rung left it, undoes that rung instead). Those asymmetries
+ *  are pinned as explicit cases rather than left to the identity sweep. */
 export interface GuildBankOpDelta {
   op: 'deposit_gold' | 'withdraw_gold' | 'deposit' | 'withdraw' | 'buy_slots' | 'open_bank';
   itemId: string | null;
@@ -447,12 +455,19 @@ export interface GuildBankApplyResult {
  *  is why a session can only ever persist ITS OWN work.
  *
  *  Applies the longest PREFIX it can and stops at the first delta durable
- *  truth cannot satisfy, leaving the book exactly at that prefix (never
- *  half-way through a single delta). Prefix rather than all-or-nothing because
- *  two officers' logs can legitimately depend on each other: officer A's
- *  deposit funds officer B's expansion while officer B's opening grants the
- *  slots officer A's expansion needs, and an all-or-nothing rule makes that
- *  pair deadlock, each waiting for a row the other cannot write.
+ *  truth cannot satisfy. Prefix rather than all-or-nothing because two
+ *  officers' logs can legitimately depend on each other: officer A's deposit
+ *  funds officer B's expansion while officer B's opening grants the slots
+ *  officer A's expansion needs, and an all-or-nothing rule makes that pair
+ *  deadlock, each waiting for a row the other cannot write.
+ *
+ *  The book is left at that prefix PLUS at most one PARTLY applied delta, and
+ *  a partly applied delta is always described by `residual`: the fungible arms
+ *  (gold, item counts) move what durable truth can cover and hand the leftover
+ *  back, because clamping the shortfall away would mint it. The two arms that
+ *  are all-or-nothing are the slot ops (a rung must never be granted without
+ *  its charge) and a delta whose base covers NONE of it (residual null, the
+ *  entry stays in the log exactly as it is).
  *
  *  Deliberately does NOT re-check capacity: the book contract already
  *  tolerates over-capacity (capacity only blocks new deposits) and the live op
@@ -497,21 +512,18 @@ export function applyGuildBankDeltasTo(
       if (d.op === 'buy_slots') {
         const next = book.treasury + d.copperDelta;
         if (next < 0 || next > GUILD_BANK_TREASURY_CAP) {
-          // The rung itself was paid for in the live world, so the GRANT
-          // lands; only the treasury charge is short, and its remainder rides
-          // on as a gold residual for the next save.
-          const room = next < 0 ? -book.treasury : GUILD_BANK_TREASURY_CAP - book.treasury;
-          book.treasury = next < 0 ? 0 : GUILD_BANK_TREASURY_CAP;
-          book.purchasedSlots = Math.max(book.purchasedSlots, d.purchasedSlotsAfter);
-          return stop(
-            {
-              kind: next < 0 ? 'treasury_underflow' : 'treasury_overflow',
-              op: d.op,
-              itemId: null,
-              shortfall: Math.abs(d.copperDelta - room),
-            },
-            room === 0 ? null : goldResidual(d.copperDelta - room),
-          );
+          // ALL OR NOTHING, unlike the gold arm below: granting the rung while
+          // the treasury cannot cover its price would leave a FREE rung in
+          // durable truth, and if this session then died the charge would
+          // never arrive. The whole delta waits instead, and the retry applies
+          // the grant and the charge together once the other officer's deposit
+          // has landed.
+          return stop({
+            kind: next < 0 ? 'treasury_underflow' : 'treasury_overflow',
+            op: d.op,
+            itemId: null,
+            shortfall: next < 0 ? -next : next - GUILD_BANK_TREASURY_CAP,
+          });
         }
         book.treasury = next;
       }
@@ -615,6 +627,84 @@ export function revertGuildBankDeltasTo(
     if (d.op === 'deposit') removeMatching(book, d, count);
     else if (d.op === 'withdraw') grantMatching(book, d, count);
   }
+}
+
+/** Key-order-independent identity for netting: the same three-dimensional
+ *  (itemId, canonical instance payload, craft provenance) key the replay and
+ *  the inverse match on. */
+function deltaIdentityKey(d: GuildBankOpDelta): string {
+  return `${d.itemId ?? ''}|${canonicalJson(d.instance ?? null)}|${d.craftedRecipeId ?? ''}`;
+}
+
+/** A REPLAY-EQUIVALENT normalization of a delta log: the same final book as
+ *  applyGuildBankDeltasTo would reach, with every intermediate dip removed.
+ *
+ *   - slot ops keep their order and their absolute ladder witness, but their
+ *     treasury CHARGE is lifted out (the ladder is monotone, so the grants are
+ *     order independent among themselves);
+ *   - item deltas net per identity;
+ *   - every copper delta the applier would MOVE nets into ONE gold delta
+ *     applied last. open_bank's copperDelta is deliberately EXCLUDED, because
+ *     rung 0 was purse-paid and the applier never moves it either: folding it
+ *     in would destroy that copper on every netted replay.
+ *
+ *  Lives here, beside the applier it must agree with, rather than on the
+ *  server side: the two drifting apart is a silent conservation break, so they
+ *  are reviewed as one file. The escrow merge uses this as its fallback when
+ *  the ordered replay stalls on an artifact of CROSS-SESSION ordering (this
+ *  officer withdrew while the live book still held another officer's copper,
+ *  and the durable replay put that officer's whole log first). */
+export function netGuildBankOpLogForReplay(log: readonly GuildBankOpDelta[]): GuildBankOpDelta[] {
+  const out: GuildBankOpDelta[] = [];
+  let copper = 0;
+  const items = new Map<string, { sample: GuildBankOpDelta; net: number }>();
+  for (const d of log) {
+    if (d.op === 'open_bank' || d.op === 'buy_slots') {
+      // buy_slots spent TREASURY copper, so its charge is lifted into the net;
+      // open_bank spent the acting officer's PURSE, which the book never held.
+      if (d.op === 'buy_slots') copper += Number(d.copperDelta) || 0;
+      out.push({ ...d, copperDelta: 0 });
+      continue;
+    }
+    if (d.op === 'deposit_gold' || d.op === 'withdraw_gold') {
+      copper += Number(d.copperDelta) || 0;
+      continue;
+    }
+    if (d.op !== 'deposit' && d.op !== 'withdraw') continue;
+    if (typeof d.itemId !== 'string' || d.itemId === '') continue;
+    const count = deltaCount(d);
+    if (count === 0) continue;
+    const key = deltaIdentityKey(d);
+    const entry = items.get(key) ?? { sample: d, net: 0 };
+    entry.net += d.op === 'deposit' ? count : -count;
+    items.set(key, entry);
+  }
+  for (const { sample, net } of items.values()) {
+    if (net === 0) continue;
+    out.push({
+      op: net > 0 ? 'deposit' : 'withdraw',
+      itemId: sample.itemId,
+      count: Math.abs(net),
+      instance: sample.instance ?? null,
+      craftedRecipeId: sample.craftedRecipeId ?? null,
+      copperDelta: 0,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    });
+  }
+  if (copper !== 0) {
+    out.push({
+      op: copper > 0 ? 'deposit_gold' : 'withdraw_gold',
+      itemId: null,
+      count: null,
+      instance: null,
+      craftedRecipeId: null,
+      copperDelta: copper,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    });
+  }
+  return out;
 }
 
 /** The ctx-facing delegate (Sim.revertGuildBankDeltas): undo a dead session's
