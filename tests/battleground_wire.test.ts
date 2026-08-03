@@ -47,36 +47,18 @@ import { ClientWorld } from '../src/net/online';
 import { BG_FLAG_Z, BG_PLAY_HALF_X, BG_PLAY_HALF_Z } from '../src/sim/battleground_layout';
 import { battlegroundOrigin, bgOriginAt } from '../src/sim/data';
 import type { PlayerClass } from '../src/sim/types';
+import { bareClient, type FakeClient, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
-interface FakeClient {
-  sent: any[];
-  ws: any;
-}
-
-function fakeWs(): FakeClient {
-  const sent: any[] = [];
-  return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
-}
-
-function lastSnap(sent: any[]): any {
-  for (let i = sent.length - 1; i >= 0; i--) {
-    if (sent[i].t === 'snap') return sent[i];
-  }
-  return null;
-}
-
-function joinServer(
+/** The shared joinServer plus the queue's level floor: wire tests stage
+ *  eligible champions unless a case is exercising the floor itself. */
+function joinBgServer(
   server: GameServer,
   fc: FakeClient,
   characterId: number,
   name: string,
   cls: PlayerClass = 'warrior',
 ): ClientSession {
-  const session = server.join(fc.ws, characterId, characterId, name, cls, null);
-  if ('error' in session) throw new Error(session.error);
-  session.blockListLoaded = true;
-  // The queue has a level floor (BG_MIN_LEVEL); wire tests stage eligible
-  // champions unless a case is exercising the floor itself.
+  const session = joinServer(server, fc, characterId, name, cls);
   const e = server.sim.entities.get(session.pid);
   if (e) e.level = 20;
   return session;
@@ -124,10 +106,10 @@ function start2v2(server: GameServer): Bg2v2 {
   const wsB = fakeWs();
   const wsC = fakeWs();
   const wsD = fakeWs();
-  const allyA = joinServer(server, wsA, 71, 'AllyOne');
-  const allyB = joinServer(server, wsB, 72, 'AllyTwo');
-  const foeC = joinServer(server, wsC, 73, 'FoeOne');
-  const foeD = joinServer(server, wsD, 74, 'FoeTwo');
+  const allyA = joinBgServer(server, wsA, 71, 'AllyOne');
+  const allyB = joinBgServer(server, wsB, 72, 'AllyTwo');
+  const foeC = joinBgServer(server, wsC, 73, 'FoeOne');
+  const foeD = joinBgServer(server, wsD, 74, 'FoeTwo');
   for (const s of [allyA, allyB, foeC, foeD]) cmd(server, s, { cmd: 'bg_queue' });
   cmd(server, allyA, { cmd: 'dev_bg_start' });
   const match = server.sim.bgMatchFor(allyA.pid)!;
@@ -150,57 +132,11 @@ function withDevCommands(run: () => void): void {
   }
 }
 
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly.
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = 'warrior';
-  c.spectating = null;
-  c.cupInfo = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.bgInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  return c;
-}
-
 describe('bg_queue / bg_leave dispatch', () => {
   it('bg_queue enqueues the session pid and bg_leave clears it', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Rifter');
+    const session = joinBgServer(server, fc, 1, 'Rifter');
 
     expect(server.sim.bgInfoFor(session.pid)!.queued).toBe(false);
     cmd(server, session, { cmd: 'bg_queue' });
@@ -215,7 +151,7 @@ describe('the bg self key over the wire', () => {
   it('rides the snapshot with the base rating and mirrors into ClientWorld.bgInfo', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Ladderling');
+    const session = joinBgServer(server, fc, 1, 'Ladderling');
 
     (server as any).broadcastSnapshots();
     const snap = lastSnap(fc.sent);
@@ -336,14 +272,14 @@ describe('match-scoped interest: own team and field objects, never enemy players
       process.env.ALLOW_DEV_COMMANDS = '1';
       const server = new GameServer();
       const fa = fakeWs();
-      const a = joinServer(server, fa, 1, 'SlotZeroA');
-      const b = joinServer(server, fakeWs(), 2, 'SlotZeroB');
+      const a = joinBgServer(server, fa, 1, 'SlotZeroA');
+      const b = joinBgServer(server, fakeWs(), 2, 'SlotZeroB');
       cmd(server, a, { cmd: 'bg_queue' });
       cmd(server, b, { cmd: 'bg_queue' });
       cmd(server, a, { cmd: 'dev_bg_start' });
       const fc = fakeWs();
-      const c = joinServer(server, fc, 3, 'SlotOneC');
-      const d = joinServer(server, fakeWs(), 4, 'SlotOneD');
+      const c = joinBgServer(server, fc, 3, 'SlotOneC');
+      const d = joinBgServer(server, fakeWs(), 4, 'SlotOneD');
       cmd(server, c, { cmd: 'bg_queue' });
       cmd(server, d, { cmd: 'bg_queue' });
       cmd(server, c, { cmd: 'dev_bg_start' });
@@ -437,7 +373,7 @@ describe('the bg readout refreshes match-wide on a respawn wave', () => {
     withDevCommands(() => {
       const server = new GameServer();
       const bg = start2v2(server);
-      const bystander = joinServer(server, fakeWs(), 90, 'Bystander'); // no match
+      const bystander = joinBgServer(server, fakeWs(), 90, 'Bystander'); // no match
       const foe = server.sim.entities.get(bg.foeC.pid)!;
       const advance = (): void => {
         (server.sim as any).tickCount = server.sim.tickCount + 1;
@@ -481,8 +417,8 @@ describe('dev_bg_start env gate', () => {
     try {
       delete process.env.ALLOW_DEV_COMMANDS;
       const server = new GameServer();
-      const a = joinServer(server, fakeWs(), 1, 'Crimson');
-      const b = joinServer(server, fakeWs(), 2, 'Azure');
+      const a = joinBgServer(server, fakeWs(), 1, 'Crimson');
+      const b = joinBgServer(server, fakeWs(), 2, 'Azure');
       cmd(server, a, { cmd: 'bg_queue' });
       cmd(server, b, { cmd: 'bg_queue' });
       expect(server.sim.bgInfoFor(a.pid)!.queued).toBe(true);
@@ -514,7 +450,7 @@ describe('bg_flag dispatch', () => {
   it('is a server-side no-op for a player not in a match (never throws)', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Flagless');
+    const session = joinBgServer(server, fc, 1, 'Flagless');
     expect(() => cmd(server, session, { cmd: 'bg_flag' })).not.toThrow();
     expect(server.sim.bgInfoFor(session.pid)!.match).toBeNull();
   });

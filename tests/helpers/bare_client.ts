@@ -109,6 +109,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.delveRun = null;
   c.companionState = null;
   c.riftFloor = null;
+  c.riftCollisionToken = 0;
   c.lockpickState = null;
   c.delveMarks = 0;
   c.companionUpgrades = {};
