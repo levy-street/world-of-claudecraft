@@ -961,15 +961,16 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     name: 'Back to the Shallows',
     giverNpcId: 'warden_fenwick',
     turnInNpcId: 'warden_fenwick',
-    text: "Aldric says those idols are cult-make — which means the mudfins are hauling the marsh's old evil up one armful at a time. I will not have it washing onto my causeway. Go back to the shallows and break the dredging for good: 14 more snappers.",
+    text: "Aldric says those idols are cult-make, which means the mudfins are hauling the marsh's old evil up one armful at a time, and it all funnels through their reed-huts on the shallows. I will not have it washing onto my causeway. Take this firebottle, get right up against each hut, and burn the lot. Five should break their dredging for good.",
     completionText:
       "Ruthless and thorough. If this marsh ever dries out, there's warden's work waiting for you.",
     objectives: [
-      { type: 'kill', targetMobId: 'deepfen_murloc', count: 14, label: 'Deepfen Snapper slain' },
+      { type: 'interact', targetObjectItemId: 'murloc_hut', count: 5, label: 'Murloc huts burned' },
     ],
     xpReward: 1100,
     copperReward: 450,
     itemRewards: {},
+    requiredItems: ['firebottle'],
     requiresQuest: 'q_idols',
   },
   q_widows: {
@@ -1346,6 +1347,19 @@ export const ZONE2_CAMPS: CampDef[] = [
 ];
 
 export const ZONE2_OBJECTS: GroundObjectDef[] = [
+  {
+    // Murloc huts torched with a firebottle for "Back to the Shallows"
+    // (q_deepfen_purge); positions match the mud-hut props at the shallows.
+    itemId: 'murloc_hut',
+    name: 'Mudfin Hut',
+    positions: [
+      { x: -78, z: 269 },
+      { x: -83, z: 266 },
+      { x: -74, z: 275 },
+      { x: -117, z: 346 },
+      { x: -123, z: 354 },
+    ],
+  },
   {
     itemId: 'fen_muster_order',
     name: 'Fenbridge Muster Order',

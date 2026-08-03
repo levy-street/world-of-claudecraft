@@ -1536,6 +1536,23 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     questId: 'q_boars',
   },
+  // Thrown at murloc huts for "Back to the Shallows" (q_deepfen_purge). Reusable:
+  // it is not consumed, so a 5s throw cooldown paces the burns instead.
+  firebottle: {
+    id: 'firebottle',
+    name: 'Firebottle',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_deepfen_purge',
+  },
+  // Name/label entry for the burnable murloc-hut world objects (q_deepfen_purge).
+  murloc_hut: {
+    id: 'murloc_hut',
+    name: 'Mudfin Hut',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_deepfen_purge',
+  },
   gravecaller_sigil: {
     id: 'gravecaller_sigil',
     name: "Gravecaller's Sigil",

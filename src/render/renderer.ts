@@ -6056,6 +6056,15 @@ export class Renderer {
         this.fishingBobbers.bite(ev.pid);
         break;
       }
+      case 'worldObjectBurning': {
+        // A torched murloc hut (q_deepfen_purge) bursts into flame. First-pass
+        // fire cue: a strong low burst plus a taller follow-up so it reads as
+        // catching, not a single puff. The lingering blaze is iterated in playtest.
+        const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
+        this.vfx.burst(new THREE.Vector3(ev.x, gy + 0.6, ev.z), 'fire', 48, 2.2);
+        this.vfx.burst(new THREE.Vector3(ev.x, gy + 1.4, ev.z), 'fire', 30, 1.6);
+        break;
+      }
       case 'yumiTeleport': {
         // Arcane burst at both ends of the cat's blink (the event is personal
         // per participant; ignore copies addressed to other local pids so an

@@ -3465,6 +3465,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // of combat before despawning. updateMob starts the despawnTimer countdown when
   // the add leashes home and cancels it while the add is back in combat.
   leashDespawnSecs?: number;
+  // Torched murloc hut (q_deepfen_purge): sim time until which the hut is ablaze
+  // and cannot be re-lit. Transient, sim-internal (the burn VFX rides an event).
+  burnBurstUntil?: number;
   damageIdleDespawnTimer?: number;
   lootable: boolean;
   loot: CorpseLoot | null;
@@ -4010,6 +4013,15 @@ export type SimEvent = { pid?: number } & (
   // Interacting with a town noticeboard. Structured and personal: the client
   // owns localized feedback, and online routing sends it only to the reader.
   | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
+  | {
+      // A world object (a torched murloc hut, q_deepfen_purge) bursts into flames.
+      // The renderer plays a fire burst at (x, z) for durationSecs. Visual-only.
+      type: 'worldObjectBurning';
+      objectId: number;
+      x: number;
+      z: number;
+      durationSecs: number;
+    }
   | { type: 'mailArrived'; senderName: string; letterId?: string }
   | { type: 'mailResult'; code: MailResultCode; value?: number; name?: string }
   // Guild calendar outcome. Emitted only by the server's SocialService (the

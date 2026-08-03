@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { questGateBlocksDamage } from '../src/sim/combat/quest_damage_gate';
-import { CAMPS, MOBS, QUESTS } from '../src/sim/data';
+import { ZONE2_OBJECTS } from '../src/sim/content/zone2';
+import { CAMPS, ITEMS, MOBS, QUESTS } from '../src/sim/data';
+import {
+  FIREBOTTLE_COOLDOWN_SECS,
+  firebottleBurnCheck,
+  HUT_BURN_RANGE,
+} from '../src/sim/interactions/firebottle_hut';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { Entity, QuestProgress } from '../src/sim/types';
 
@@ -97,6 +103,68 @@ describe('Mirefen quest de-duplication', () => {
     });
     it('never gates an ordinary mob', () => {
       expect(questGateBlocksDamage(players(), player, widow)).toBe(false);
+    });
+  });
+
+  describe('Back to the Shallows becomes a firebottle burn (q_deepfen_purge)', () => {
+    it('grants a firebottle and repoints the objective to burning 5 huts', () => {
+      const q = QUESTS.q_deepfen_purge;
+      expect(q.requiredItems).toContain('firebottle');
+      expect(q.objectives).toHaveLength(1);
+      const o = q.objectives[0];
+      expect(o.type).toBe('interact');
+      if (o.type === 'interact') {
+        expect(o.targetObjectItemId).toBe('murloc_hut');
+        expect(o.count).toBe(5);
+      }
+      // the old deepfen_murloc kill duplicate (shared with q_deepfen) is gone
+      expect(q.objectives.some((x) => x.type === 'kill')).toBe(false);
+    });
+
+    it('defines the firebottle and hut items', () => {
+      expect(ITEMS.firebottle?.questId).toBe('q_deepfen_purge');
+      expect(ITEMS.murloc_hut?.name).toBeTruthy();
+    });
+
+    it('places 5 burnable huts at the shallows', () => {
+      const huts = ZONE2_OBJECTS.find((o) => o.itemId === 'murloc_hut');
+      expect(huts).toBeDefined();
+      expect(huts?.positions.length).toBe(5);
+    });
+  });
+
+  describe('firebottle burn gating (firebottleBurnCheck)', () => {
+    const base = {
+      onQuest: true,
+      hasBottle: true,
+      distance: 1,
+      time: 100,
+      bottleReadyAt: 0,
+      hutBurningUntil: 0,
+    };
+    it('succeeds up against the hut, holding a ready bottle, on the quest', () => {
+      expect(firebottleBurnCheck(base)).toEqual({ ok: true });
+    });
+    it('requires the quest, a bottle, and close range', () => {
+      expect(firebottleBurnCheck({ ...base, onQuest: false })).toMatchObject({
+        reason: 'notOnQuest',
+      });
+      expect(firebottleBurnCheck({ ...base, hasBottle: false })).toMatchObject({
+        reason: 'noBottle',
+      });
+      expect(firebottleBurnCheck({ ...base, distance: HUT_BURN_RANGE + 0.1 })).toMatchObject({
+        reason: 'tooFar',
+      });
+      expect(firebottleBurnCheck({ ...base, distance: HUT_BURN_RANGE })).toEqual({ ok: true });
+    });
+    it('enforces the 5s bottle cooldown and the hut relight', () => {
+      expect(FIREBOTTLE_COOLDOWN_SECS).toBe(5);
+      expect(firebottleBurnCheck({ ...base, bottleReadyAt: 101 })).toMatchObject({
+        reason: 'onCooldown',
+      });
+      expect(firebottleBurnCheck({ ...base, hutBurningUntil: 101 })).toMatchObject({
+        reason: 'alreadyBurning',
+      });
     });
   });
 });
