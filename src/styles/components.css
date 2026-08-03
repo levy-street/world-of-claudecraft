@@ -6569,6 +6569,91 @@
     border-color: #6f5a2a;
     background: linear-gradient(#2a2436, #161220);
   }
+  /* The Guild pane's Contents / Log sub-strip. Its own tab class rather than a
+     shared .bank-tab: the outer Personal/Guild strip is wired by querying
+     .bank-tab, so a shared class would hand these buttons to the wrong
+     handler. Visually a quieter sibling (smaller, no gradient) so the nesting
+     reads as a sub-choice and not a second top-level strip. */
+  .gbank-view-tabs {
+    margin: 2px 0 4px;
+  }
+  .gbank-view-tab {
+    flex: 1;
+    padding: 6px 0;
+    font-size: 12px;
+    font-family: var(--title-font);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    background: #15100d;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    text-align: center;
+  }
+  .gbank-view-tab:hover {
+    color: var(--gold);
+  }
+  .gbank-view-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .gbank-view-tab.on {
+    color: var(--gold);
+    border-color: #6f5a2a;
+    background: #221c14;
+  }
+  /* The activity log: the officer-visible history of guild bank actions. A
+     plain reading surface (no controls in a row), so it is a list rather than a
+     grid, and it fills the pane so the shared .bank-scroll inside it scrolls
+     instead of the window. */
+  .gbank-log {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+  }
+  .gbank-log-note {
+    flex: none;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 0 0 4px;
+  }
+  .gbank-log-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .gbank-log-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 4px 6px;
+    border-radius: 3px;
+    background: #17120e;
+  }
+  .gbank-log-row:nth-child(even) {
+    background: #1c1611;
+  }
+  .gbank-log-time {
+    flex: none;
+    font-size: 10px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+  .gbank-log-text {
+    font-size: 12px;
+    /* Names and item names are player/content text of unbounded width: wrap
+       rather than clipping a sentence a player is meant to be able to read. */
+    overflow-wrap: anywhere;
+  }
+  /* Loading / refused / empty all share the .bank-empty look; the refusal is
+     tinted because "you may not read this" is not the same news as "nothing has
+     happened", and the words say so too (never color alone). */
+  .gbank-log-refused {
+    color: var(--color-text-error);
+  }
   /* Guild treasury header row: label + coin readout + the two gold actions. */
   .gbank-treasury {
     display: flex;

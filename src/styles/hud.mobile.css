@@ -3787,6 +3787,7 @@
   /* Guild tab controls hold the 40px touch floor: the Personal/Guild tabs and
      the treasury gold buttons are primary tap targets on the phone pairing. */
   body.mobile-touch #bank-window .bank-tab,
+  body.mobile-touch #bank-window .gbank-view-tab,
   body.mobile-touch #bank-window .gbank-gold-btn {
     min-height: 40px;
   }
@@ -3816,6 +3817,15 @@
       font-size: 10px;
     }
     body.mobile-touch #bank-window .gbank-buy-note {
+      font-size: 10px;
+    }
+    /* The log's own fixed chrome: the sub-strip and the scope line. The rows
+       themselves scroll, so only the chrome above them is compressed. */
+    body.mobile-touch #bank-window .gbank-view-tabs {
+      margin: 1px 0 2px;
+    }
+    body.mobile-touch #bank-window .gbank-log-note {
+      margin: 0 0 2px;
       font-size: 10px;
     }
   }

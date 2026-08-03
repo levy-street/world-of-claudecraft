@@ -2572,6 +2572,36 @@ export const hudChromeStrings = {
     // The gold prompt's refusal line when a non-zero amount cannot move at
     // all right now (empty purse on deposit, full treasury, empty treasury).
     guildGoldCannotMove: 'That amount cannot be moved right now.',
+    // The Guild pane's Contents / Log sub-strip and the ACTIVITY LOG itself.
+    // The log is the social trust mechanism the officer-only design rests on:
+    // every op already writes an audit row, and this is what lets the guild see
+    // who moved shared property. Sentences are plain language with the actor
+    // spliced as a VALUE (a player-authored character name is never a key), the
+    // time rendered by the i18n date formatter, and money by formatMoney.
+    // (Wordy values, M16: the five non-Latin fills land in this same change.)
+    guildViewsAria: 'Guild bank views',
+    guildContentsTab: 'Contents',
+    guildLogTab: 'Log',
+    logAria: 'Guild bank activity log',
+    logNote: 'The 50 most recent guild bank actions.',
+    logLoading: 'Loading the guild bank log...',
+    logEmpty: 'Nothing has been moved in or out of the guild bank yet.',
+    // A refusal is deliberately NOT an empty list: "you may not read this" and
+    // "nobody has done anything" are opposite facts.
+    logRefused: 'Only guild officers can read the guild bank log.',
+    // The stand-in when a row's character no longer exists.
+    logFormerMember: 'A former guild member',
+    logDepositItem: '{actor} deposited {count} {item}',
+    logWithdrawItem: '{actor} withdrew {count} {item}',
+    logDepositMoney: '{actor} deposited {amount}',
+    logWithdrawMoney: '{actor} withdrew {amount}',
+    logBuySlots: '{actor} bought a bank expansion for {amount}',
+    logOpenBank: '{actor} opened the guild bank for {amount}',
+    logCharterFee: '{actor} paid the guild charter fee of {amount}',
+    // An operator removal is shown so a disappearance is never an unexplained
+    // gap, and it names NOBODY: the underlying row's character is the escrow
+    // carrier, a bystander who did not order it.
+    logAdminPurge: 'An administrator removed {count} {item}',
   },
   // The event calendar window: recurring system events plus the guild lane
   // (booked by officers and the Guild Master, mirrored via socialInfo).

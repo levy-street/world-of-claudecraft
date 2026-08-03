@@ -31,6 +31,8 @@ import type { IWorld } from '../world_api';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { buildGuildBankLogView, guildBankLogSignature } from './guild_bank_log_view';
+import { GuildBankLogPane } from './guild_bank_log_window';
 import {
   buildGuildBankView,
   clampGoldAmount,
@@ -48,6 +50,8 @@ import { QUALITY_COLOR } from './icons';
 import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { tSim } from './sim_i18n';
+import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
+import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
 
 // The unranked quality fallback as a CSS custom property (mirrors bank_window's
@@ -85,8 +89,44 @@ export interface GuildBankTabDeps extends PainterHostPresentation {
   requestRender(): void;
 }
 
+/** The two views inside the Guild pane: the bank itself, and its activity log. */
+export type GuildBankPaneView = 'contents' | 'log';
+
 export class GuildBankTab {
+  // Which view of the Guild pane is showing. Owned here (not by BankWindow)
+  // because the sub-strip, the log pane, and the on-demand fetch trigger are
+  // all this pane's business; BankWindow reads it through the getters below for
+  // its repaint gate and its scroll scoping.
+  private view: GuildBankPaneView = 'contents';
+  private readonly logPane = new GuildBankLogPane({
+    itemDef: (id) => knownItemDef(ITEMS, id),
+  });
+
   constructor(private readonly deps: GuildBankTabDeps) {}
+
+  /** The active sub-view, for BankWindow's per-pane scroll scoping. */
+  get activeView(): GuildBankPaneView {
+    return this.view;
+  }
+
+  /** Reset to the bank contents. BankWindow calls this on close so a reopened
+   *  bank never starts on the log (and never refetches it unasked). */
+  resetView(): void {
+    this.view = 'contents';
+  }
+
+  /**
+   * The repaint key for the log, or null while the log view is CLOSED.
+   *
+   * The null arm is load-bearing: reading world.guildBankLog() is what REQUESTS
+   * the log, so asking for a signature while the contents view is showing would
+   * turn "fetch on demand" into a poll for every officer standing at a banker.
+   * Only an open log view touches it.
+   */
+  logRefreshKey(): string | null {
+    if (this.view !== 'log') return null;
+    return guildBankLogSignature(this.deps.world().guildBankLog());
+  }
 
   /** Build the guild pane model from the live world. Exposed so BankWindow can
    *  branch on 'hidden' (tab fallback) without duplicating the core call. The
@@ -109,6 +149,17 @@ export class GuildBankTab {
    *  per paint, never two). */
   renderInto(el: HTMLElement, model: GuildBankViewModel): void {
     if (model.kind === 'hidden') return; // raced null: BankWindow falls back next paint
+    // The Contents / Log sub-strip. It renders for the UNOPENED bank too: the
+    // treasury works from day one, so a bank nobody has opened can already have
+    // gold movements and a charter fee worth reading.
+    this.renderViewStrip(el);
+    if (this.view === 'log') {
+      // Reading the log is what REQUESTS it (cold data, no snapshot key), so
+      // this call is the whole fetch trigger and it only happens here, on a
+      // paint of the open log view.
+      this.logPane.renderInto(el, buildGuildBankLogView(this.deps.world().guildBankLog()));
+      return;
+    }
     if (model.kind === 'unopened') {
       // No rung bought yet: the treasury works from day one, the item store
       // does not exist until an officer opens it from their own purse.
@@ -140,6 +191,37 @@ export class GuildBankTab {
     scroll.appendChild(grid);
     el.appendChild(scroll);
     el.appendChild(this.buildBuyRow(model));
+  }
+
+  // The Contents / Log sub-strip: the shared WAI-ARIA tab strip core, the same
+  // building block BankWindow's Personal/Guild strip uses. Its own aria-label,
+  // because a nested tablist that borrowed the outer one's name would announce
+  // two identically-named tab lists. No panelId (the sections mount directly on
+  // the window root, the bank strip's precedent).
+  private renderViewStrip(el: HTMLElement): void {
+    el.insertAdjacentHTML(
+      'beforeend',
+      tabStripHtml(
+        tabStripModel({
+          ariaLabel: t('hudChrome.bank.guildViewsAria'),
+          stripClass: 'bank-tabs gbank-view-tabs',
+          tabClass: 'gbank-view-tab',
+          selectedClass: 'on',
+          tabs: [
+            { id: 'contents', label: t('hudChrome.bank.guildContentsTab') },
+            { id: 'log', label: t('hudChrome.bank.guildLogTab') },
+          ],
+          selected: this.view,
+        }),
+      ),
+    );
+    wireTabStrip(el, 'gbank-view-tab', (id, focusFollow) => {
+      if (id !== 'contents' && id !== 'log') return;
+      if (this.view !== id) audio.click();
+      this.view = id;
+      this.deps.requestRender();
+      if (focusFollow) focusActiveTab(this.deps.root(), 'gbank-view-tab', 'on');
+    });
   }
 
   private fmt(n: number): string {

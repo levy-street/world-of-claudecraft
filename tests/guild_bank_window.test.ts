@@ -12,7 +12,7 @@ import { ITEMS } from '../src/sim/data';
 import { GUILD_BANK_RUNG_PRICES, GUILD_BANK_TREASURY_CAP } from '../src/sim/guild_bank';
 import type { InvSlot } from '../src/sim/types';
 import { BankWindow, type BankWindowDeps } from '../src/ui/bank_window';
-import type { BankInfo, GuildBankInfo, IWorld } from '../src/world_api';
+import type { BankInfo, GuildBankInfo, GuildBankLogView, IWorld } from '../src/world_api';
 
 // Real merged-table ids so the pane renders true defs: a plain stackable, a
 // quest def, and a soulbound def (each derived, never hardcoded, so a content
@@ -58,6 +58,8 @@ interface Harness {
     guildBankInfo: GuildBankInfo | null;
     inventory: InvSlot[];
     copper: number;
+    /** The activity log the pane's on-demand read answers with. */
+    logView: GuildBankLogView;
   };
   calls: string[];
   /** Tooltip factories in attach order (the escape pin renders them). */
@@ -75,6 +77,13 @@ function harness(guild: GuildBankInfo | null): Harness {
     guildBankInfo: guild,
     inventory: [] as InvSlot[],
     copper: 5_000,
+    // The activity log's on-demand read. Every call is recorded, so a test can
+    // prove the log is fetched only while its view is OPEN.
+    logView: { state: 'loading', entries: [] } as GuildBankLogView,
+    guildBankLog: () => {
+      calls.push('guildBankLog');
+      return world.logView;
+    },
     bankDeposit: (...a: unknown[]) => calls.push(`bankDeposit:${a.join(',')}`),
     bankWithdraw: (...a: unknown[]) => calls.push(`bankWithdraw:${a.join(',')}`),
     bankBuySlots: () => calls.push('bankBuySlots'),
@@ -110,6 +119,15 @@ function harness(guild: GuildBankInfo | null): Harness {
 function clickGuildTab(h: Harness): void {
   (h.root.querySelector('.bank-tab[data-tab="guild"]') as HTMLElement).click();
 }
+
+function clickLogTab(h: Harness): void {
+  (h.root.querySelector('.gbank-view-tab[data-tab="log"]') as HTMLElement).click();
+}
+
+const logRows = (h: Harness): string[] =>
+  Array.from(h.root.querySelectorAll('.gbank-log-row .gbank-log-text')).map(
+    (n) => n.textContent ?? '',
+  );
 
 beforeEach(() => {
   localStorage.clear();
@@ -150,7 +168,7 @@ describe('guild_bank_window: no magic values (the bank_window twin)', () => {
     // pinned here: deleting either rule must go red.
     const mobileCss = readFileSync('src/styles/hud.mobile.css', 'utf8');
     expect(mobileCss).toMatch(
-      /body\.mobile-touch #bank-window \.bank-tab,\s*body\.mobile-touch #bank-window \.gbank-gold-btn \{\s*min-height: 40px;/,
+      /body\.mobile-touch #bank-window \.bank-tab,\s*body\.mobile-touch #bank-window \.gbank-view-tab,\s*body\.mobile-touch #bank-window \.gbank-gold-btn \{\s*min-height: 40px;/,
     );
     expect(mobileCss).toMatch(
       /body\.mobile-touch \.gbank-coin-row \.coininput \{\s*min-height: 40px;\s*font-size: 16px;/,
@@ -669,5 +687,248 @@ describe('the UNOPENED pane (rung 0: open the guild bank from the officer purse)
     expect(h.root.querySelector('.gbank-open-row')).toBeNull();
     expect(h.root.querySelector('.bank-grid')).not.toBeNull();
     expect(h.root.querySelector('.bank-capacity')).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The ACTIVITY LOG view inside the Guild pane. The log is the social trust
+// mechanism the officer-only bank rests on, so the properties that matter are:
+// it is fetched ONLY when its view is open (cold data, never the 20 Hz stream),
+// its three non-row states are three distinct renderings, and a player-authored
+// character name reaches the DOM as TEXT and never as markup.
+// ---------------------------------------------------------------------------
+
+const AT = Date.UTC(2026, 7, 3, 12, 30);
+
+const logEntry = (over: Record<string, unknown> = {}) =>
+  ({
+    id: 5,
+    at: AT,
+    actor: 'Kara',
+    op: 'withdraw',
+    itemId: plainId,
+    count: 3,
+    copper: null,
+    ...over,
+  }) as GuildBankLogView['entries'][number];
+
+describe('guild_bank_window: the activity log view', () => {
+  it('renders the Contents / Log sub-strip on the Guild pane, with Contents selected', () => {
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    const tabs = Array.from(h.root.querySelectorAll('.gbank-view-tab')).map(
+      (t) => (t as HTMLElement).dataset.tab,
+    );
+    expect(tabs).toEqual(['contents', 'log']);
+    expect(h.root.querySelector('.gbank-view-tab.on')?.getAttribute('data-tab')).toBe('contents');
+    // The nested strip carries its OWN aria-label: two identically-named tab
+    // lists in one dialog would be indistinguishable to a screen reader.
+    const strips = Array.from(h.root.querySelectorAll('[role="tablist"]')).map((s) =>
+      s.getAttribute('aria-label'),
+    );
+    expect(new Set(strips).size).toBe(strips.length);
+  });
+
+  it('does NOT read the log while the contents view is showing (on demand, not a poll)', () => {
+    // Reading guildBankLog() is what REQUESTS it, so a pane that read it every
+    // paint would turn every officer standing at a banker into a poller.
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    h.window.refreshIfChanged();
+    expect(h.calls).not.toContain('guildBankLog');
+  });
+
+  it('reads the log as soon as its view is opened', () => {
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    expect(h.calls).toContain('guildBankLog');
+    expect(h.root.querySelector('.gbank-view-tab.on')?.getAttribute('data-tab')).toBe('log');
+  });
+
+  it('renders the LOADING line while no answer has arrived', () => {
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    const notice = h.root.querySelector('.gbank-log-notice');
+    expect(notice?.classList.contains('gbank-log-loading')).toBe(true);
+    expect(notice?.textContent?.length).toBeGreaterThan(0);
+    expect(h.root.querySelectorAll('.gbank-log-row').length).toBe(0);
+  });
+
+  it('renders an EMPTY history in words, distinct from the refusal', () => {
+    const h = harness(guildInfo());
+    h.world.logView = { state: 'ready', entries: [] };
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    const notice = h.root.querySelector('.gbank-log-notice');
+    expect(notice?.classList.contains('gbank-log-empty')).toBe(true);
+    expect(notice?.getAttribute('aria-live')).toBeNull();
+  });
+
+  it('renders a REFUSAL as a refusal, never as an empty history', () => {
+    // The load-bearing distinction: "you may not read this" and "nobody has
+    // done anything" are opposite facts, and a drained bank must never be able
+    // to look like an untouched one.
+    const h = harness(guildInfo());
+    h.world.logView = { state: 'refused', entries: [] };
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    const notice = h.root.querySelector('.gbank-log-notice');
+    expect(notice?.classList.contains('gbank-log-refused')).toBe(true);
+    expect(notice?.classList.contains('gbank-log-empty')).toBe(false);
+    // It can appear WHILE the pane is being read (a demotion mid-view), so it
+    // announces rather than changing silently.
+    expect(notice?.getAttribute('role')).toBe('status');
+    expect(notice?.getAttribute('aria-live')).toBe('polite');
+    // The two lines must not be the same string, or the distinction is cosmetic.
+    const refusedText = notice?.textContent ?? '';
+    const empty = harness(guildInfo());
+    empty.world.logView = { state: 'ready', entries: [] };
+    empty.window.open();
+    clickGuildTab(empty);
+    clickLogTab(empty);
+    expect(refusedText).not.toBe(empty.root.querySelector('.gbank-log-notice')?.textContent);
+  });
+
+  it('renders one plain-language row per entry, newest first, with a formatted time', () => {
+    const h = harness(guildInfo());
+    h.world.logView = {
+      state: 'ready',
+      entries: [logEntry({ id: 4 }), logEntry({ id: 9, actor: 'Bren', op: 'deposit' })],
+    };
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    const rows = logRows(h);
+    expect(rows.length).toBe(2);
+    expect(rows[0]).toContain('Bren'); // id 9 sorts first
+    expect(rows[1]).toContain('Kara');
+    // A real item NAME, not the raw id.
+    expect(rows[0]).not.toContain(plainId);
+    // Every row carries a rendered timestamp (the i18n date formatter's output,
+    // never a raw epoch number).
+    for (const time of h.root.querySelectorAll('.gbank-log-time')) {
+      expect(time.textContent?.length).toBeGreaterThan(0);
+      expect(time.textContent).not.toContain(String(AT));
+    }
+  });
+
+  it('renders money rows through formatMoney, never a raw copper count', () => {
+    const h = harness(guildInfo());
+    h.world.logView = {
+      state: 'ready',
+      entries: [logEntry({ id: 3, op: 'deposit_gold', itemId: null, count: null, copper: 25_000 })],
+    };
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    expect(logRows(h)[0]).not.toContain('25000');
+    expect(logRows(h)[0]).toContain('Kara');
+  });
+
+  it('names NOBODY on an operator purge', () => {
+    // The ledger row behind an admin_purge carries the escrow CARRIER, a
+    // bystander. Naming them would tell the guild a guildmate destroyed their
+    // property.
+    const h = harness(guildInfo());
+    h.world.logView = {
+      state: 'ready',
+      entries: [logEntry({ id: 3, op: 'admin_purge', actor: 'Carrier' })],
+    };
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    expect(logRows(h)[0]).not.toContain('Carrier');
+    expect(logRows(h)[0].length).toBeGreaterThan(0);
+  });
+
+  it('splices a hostile character name as TEXT, never as markup', () => {
+    const h = harness(guildInfo());
+    h.world.logView = {
+      state: 'ready',
+      entries: [logEntry({ id: 3, actor: '<img src=x onerror=alert(1)>' })],
+    };
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    expect(h.root.querySelector('.gbank-log-list img')).toBeNull();
+    expect(logRows(h)[0]).toContain('<img src=x onerror=alert(1)>');
+  });
+
+  it('a missing actor renders a localized stand-in, not a blank gap', () => {
+    const h = harness(guildInfo());
+    h.world.logView = { state: 'ready', entries: [logEntry({ id: 3, actor: null })] };
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    expect(logRows(h)[0].trim().length).toBeGreaterThan(0);
+    expect(logRows(h)[0].startsWith(' ')).toBe(false);
+  });
+
+  it('bag clicks do NOT route to the guild bank while the log is showing', () => {
+    // The bag-deposit routing exists because the guild GRID is on screen to
+    // drop into. On a reading surface a bag click must not silently deposit.
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    expect(h.window.guildTabActive).toBe(true);
+    clickLogTab(h);
+    expect(h.window.guildTabActive).toBe(false);
+  });
+
+  it('closing the window resets the pane to Contents (a reopen never refetches unasked)', () => {
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    h.window.close();
+    h.calls.length = 0;
+    h.window.open();
+    clickGuildTab(h);
+    expect(h.root.querySelector('.gbank-view-tab.on')?.getAttribute('data-tab')).toBe('contents');
+    expect(h.calls).not.toContain('guildBankLog');
+  });
+
+  it('the UNOPENED bank still offers the log (the treasury works from day one)', () => {
+    const h = harness(
+      guildInfo({ purchasedSlots: 0, capacity: 0, nextExpansionPrice: GUILD_BANK_RUNG_PRICES[0] }),
+    );
+    h.window.open();
+    clickGuildTab(h);
+    expect(h.root.querySelector('.gbank-view-tab[data-tab="log"]')).not.toBeNull();
+    clickLogTab(h);
+    expect(h.calls).toContain('guildBankLog');
+  });
+
+  it('repaints when the log answer lands, without a driver of its own', () => {
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    h.window.refreshIfChanged(); // latch the loading signature
+    h.world.logView = { state: 'ready', entries: [logEntry({ id: 3 })] };
+    h.window.refreshIfChanged();
+    expect(logRows(h).length).toBe(1);
+  });
+
+  it('keyboard focus survives a repaint driven by another officer op', () => {
+    const h = harness(guildInfo());
+    h.world.logView = { state: 'ready', entries: [logEntry({ id: 3 })] };
+    h.window.open();
+    clickGuildTab(h);
+    clickLogTab(h);
+    const tab = h.root.querySelector('.gbank-view-tab[data-tab="log"]') as HTMLElement;
+    expect(tab.dataset.focusKey).toBe('gbank:view:log');
+    tab.focus();
+    h.world.guildBankInfo = guildInfo({ treasury: 99_000 });
+    h.window.refreshIfChanged();
+    expect((document.activeElement as HTMLElement)?.dataset.focusKey).toBe('gbank:view:log');
   });
 });

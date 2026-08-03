@@ -48,7 +48,7 @@ import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
-import { GuildBankTab } from './guild_bank_window';
+import { type GuildBankPaneView, GuildBankTab } from './guild_bank_window';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { knownItemDef } from './known_item';
@@ -196,6 +196,11 @@ export class BankWindow {
   // The pane the LAST paint drew, so the .bank-scroll offset is restored only
   // within one pane (a tab switch starts at the top, never mid-list).
   private lastRenderedTab: BankTabId = 'personal';
+  // ...and which GUILD sub-view it drew, for the same reason one level down:
+  // the contents grid and the log list both mount a .bank-scroll, so without
+  // this the grid's offset would be pasted onto the log the moment a player
+  // switched between them.
+  private lastRenderedGuildView: GuildBankPaneView = 'contents';
   // The guild pane painter (guild_bank_view.ts core + guild_bank_window.ts),
   // sharing this window's presentation bag and prompt-dialog chrome.
   private readonly guildPane: GuildBankTab;
@@ -257,7 +262,16 @@ export class BankWindow {
    *  between the mirror nulling (demotion, walk-away) and the slow-band
    *  repaint can never route a bag click at the guild facet. */
   get guildTabActive(): boolean {
-    return this.opened && this.tab === 'guild' && this.deps.world().guildBankInfo !== null;
+    return (
+      this.opened &&
+      this.tab === 'guild' &&
+      // ONLY the contents view routes bag clicks. The log is a reading surface:
+      // a bag click while the player is reading the history must not silently
+      // deposit the item they clicked (the whole point of that routing is that
+      // the guild grid is on screen to drop into).
+      this.guildPane.activeView === 'contents' &&
+      this.deps.world().guildBankInfo !== null
+    );
   }
 
   // Re-interacting with the banker while already open must not re-run the open
@@ -296,6 +310,11 @@ export class BankWindow {
     // next open starts on Personal, never on a pane that may no longer exist.
     this.tab = 'personal';
     this.lastRenderedTab = 'personal';
+    // ...including the Guild pane's own sub-view: a reopened bank starts on the
+    // contents, so the log is never refetched by an open the player did not
+    // aim at it.
+    this.guildPane.resetView();
+    this.lastRenderedGuildView = 'contents';
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
@@ -474,6 +493,12 @@ export class BankWindow {
   // focus test drives a real repaint over a focused cell, so a reorder that
   // broke this coupling goes red there.
   private annotateGuildFocusKeys(el: HTMLElement): void {
+    // The Contents / Log sub-strip first: the log repaints on ANY officer's op
+    // (its cache busts and the response lands), so a keyboard user reading it
+    // must not be thrown off the strip by somebody else's deposit.
+    for (const tab of el.querySelectorAll<HTMLElement>('.gbank-view-tab')) {
+      tab.dataset.focusKey = `gbank:view:${tab.dataset.tab}`;
+    }
     let slotIndex = 0;
     for (const cell of el.querySelectorAll<HTMLElement>('.bank-grid .bank-item:not(.empty)')) {
       cell.dataset.focusKey = `gbank:slot:${slotIndex++}`;
@@ -504,9 +529,12 @@ export class BankWindow {
   // which pane this paint drew. Every render path that mounts a scroll region
   // routes through here so the offset can never leak across panes.
   private restoreScroll(el: HTMLElement, prevScrollTop: number): void {
+    const view = this.guildPane.activeView;
+    const samePane = this.lastRenderedTab === this.tab && this.lastRenderedGuildView === view;
     const scroll = el.querySelector('.bank-scroll') as HTMLElement | null;
-    if (scroll) scroll.scrollTop = this.lastRenderedTab === this.tab ? prevScrollTop : 0;
+    if (scroll) scroll.scrollTop = samePane ? prevScrollTop : 0;
     this.lastRenderedTab = this.tab;
+    this.lastRenderedGuildView = view;
   }
 
   // Per-frame (slow divider): refresh the grid when the mirror changes; close when the
@@ -545,6 +573,14 @@ export class BankWindow {
         g.slots,
         g.purchasedSlots === 0 ? this.deps.world().copper : null,
       ],
+      // The activity log's own repaint arm, and NULL unless the log view is
+      // actually open: the log is fetched on demand by reading it, so pulling
+      // it into the signature unconditionally would make every officer standing
+      // at a banker poll for a payload they are not looking at. When the view
+      // IS open this is what turns the response landing (loading -> ready, or a
+      // fresh row after another officer's op busted the server cache) into a
+      // repaint, with no timer of its own.
+      this.guildPane.logRefreshKey(),
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
