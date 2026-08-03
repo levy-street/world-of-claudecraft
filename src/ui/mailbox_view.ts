@@ -4,7 +4,8 @@
 // (mailbox_window.ts) draws. Registered in UI_PURE_CORES; unit-tested against
 // both Sim- and ClientWorld-shaped inputs in tests/mailbox_view.test.ts.
 
-import type { InvSlot } from '../sim/types';
+import { itemInstancePayloadsEqual } from '../sim/item_instance_merge';
+import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import type { MailInfo, MailKindView } from '../world_api';
 
 export type MailTab = 'inbox' | 'send';
@@ -115,6 +116,42 @@ export function parseParcelQty(raw: string, owned: number, fallback: number): nu
   const parsed = Number.parseInt(raw.trim(), 10);
   const base = Number.isFinite(parsed) ? parsed : fallback;
   return clampParcelQty(Number.isFinite(base) ? base : 1, 0, owned);
+}
+
+/** How many byte-equal copies of one instanced payload are already staged.
+ *  Byte-equal copies are interchangeable (item_instance_merge.ts is the one
+ *  equality rule the sim escrows by), so they are counted, never deduped. */
+export function stagedInstancedCopies(
+  staged: readonly InvSlot[],
+  itemId: string,
+  instance: ItemInstancePayload,
+): number {
+  let n = 0;
+  for (const s of staged) {
+    if (s.itemId === itemId && s.instance && itemInstancePayloadsEqual(s.instance, instance)) {
+      n += s.count;
+    }
+  }
+  return n;
+}
+
+/** True when one more copy of this exact instanced payload may be staged.
+ *  Bounded by BOTH what the player actually holds unlocked and the letter's
+ *  parcel limit, mirroring the sim's own escrow validation
+ *  (mail/post_office.ts counts every entry naming the same payload against
+ *  countMatchingUnlocked). The sim has always accepted several byte-equal
+ *  instanced entries in one letter; the window used to dedupe them down to
+ *  one, which made a stack of signed rare materials mailable only one copy per
+ *  letter, at full postage each. */
+export function canStageInstancedCopy(
+  staged: readonly InvSlot[],
+  itemId: string,
+  instance: ItemInstancePayload,
+  ownedUnlocked: number,
+  maxAttachments: number,
+): boolean {
+  if (staged.length >= Math.max(0, Math.floor(maxAttachments))) return false;
+  return stagedInstancedCopies(staged, itemId, instance) < Math.max(0, Math.floor(ownedUnlocked));
 }
 
 // The full price of sending: the attached coin plus the flat postage.
