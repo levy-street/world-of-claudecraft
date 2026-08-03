@@ -212,6 +212,7 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'no member of that guild is online to persist the change': 'error.guildBankNoCarrier',
   'that slot is not a stuck item': 'error.guildBankSlotNotStuck',
   'the change could not be saved and was rolled back': 'error.guildBankSaveFailed',
+  'that guild is being deleted, so its bank is closed': 'error.guildBankDeleting',
   'the guild bank change was refused': 'error.guildBankPurgeRefused',
   'guild name must be 3-24 letters with single spaces': 'error.guildNameInvalid',
   // The guild list's 503 single-flight busy path (the one guild prose the

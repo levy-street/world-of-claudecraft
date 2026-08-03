@@ -3495,6 +3495,15 @@ describe('guild bank dormant-slot purge', () => {
         status: 503,
         error: 'the change could not be saved and was rolled back',
       },
+      {
+        // The guild-delete window: its OWN reason, and deliberately not the
+        // save_failed one. Nothing was attempted, so nothing was saved and
+        // nothing was rolled back, and 409 (a conflict with a delete already in
+        // flight) is not 503 (a transient the operator should retry into).
+        reason: 'delete_in_flight',
+        status: 409,
+        error: 'that guild is being deleted, so its bank is closed',
+      },
     ] as const;
     for (const c of cases) {
       const recordAdminGuildBankPurge = vi.fn();

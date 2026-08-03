@@ -194,6 +194,11 @@ const GUILD_BANK_NOT_LOADED = 'that guild has no loaded bank';
 const GUILD_BANK_NO_CARRIER = 'no member of that guild is online to persist the change';
 const GUILD_BANK_SLOT_NOT_DORMANT = 'that slot is not a stuck item';
 const GUILD_BANK_SAVE_FAILED = 'the change could not be saved and was rolled back';
+// The guild-delete window. Deliberately NOT the save_failed line: nothing was
+// attempted, so nothing was saved and nothing was rolled back, and the
+// instruction is the opposite one (the bank is going away with the guild, so
+// there is nothing to retry).
+const GUILD_BANK_DELETING = 'that guild is being deleted, so its bank is closed';
 const GUILD_BANK_PURGE_REFUSED = 'the guild bank change was refused';
 
 function guildRenameFailure(error: AdminGuildRenameError): { status: number; message: string } {
@@ -262,6 +267,10 @@ async function purgeGuildBankSlotOutcome(
         return { ok: false, status: 400, message: GUILD_BANK_SLOT_NOT_DORMANT };
       case 'save_failed':
         return { ok: false, status: 503, message: GUILD_BANK_SAVE_FAILED };
+      case 'delete_in_flight':
+        // 409, not 503: this is a state conflict with a delete that is already
+        // in flight, not a transient failure the operator should retry into.
+        return { ok: false, status: 409, message: GUILD_BANK_DELETING };
     }
     // Fail closed: a refusal reason added later must never fall through into
     // the success return below (which would read `removed` off a refusal).

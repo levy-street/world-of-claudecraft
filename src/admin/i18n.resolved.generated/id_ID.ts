@@ -538,6 +538,7 @@ export const id_ID: AdminTranslations = {
   "error.guildBankSlotNotStuck": "That slot holds an ordinary item the guild can withdraw itself, so it cannot be removed here.",
   "error.guildBankItemRequired": "Enter the item id you expect that slot to hold.",
   "error.guildBankSaveFailed": "The change could not be saved and was rolled back. Try again in a moment.",
+  "error.guildBankDeleting": "This guild is being deleted, so its bank is closed. Nothing was changed.",
   "error.guildBankPurgeRefused": "The guild bank change was refused.",
   "moderation.title": "Moderasi",
   "moderation.reportsTitle": "Laporan",

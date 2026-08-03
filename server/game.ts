@@ -4591,22 +4591,31 @@ export class GameServer {
     actorAccountId: number,
   ): Promise<
     | { ok: true; removed: { itemId: string; count: number }; carrierCharacterId: number }
-    | { ok: false; reason: 'no_book' | 'no_carrier' | 'not_dormant' | 'save_failed' }
+    | {
+        ok: false;
+        reason: 'no_book' | 'no_carrier' | 'not_dormant' | 'save_failed' | 'delete_in_flight';
+      }
   > {
     if (!Number.isInteger(guildId) || guildId <= 0) return { ok: false, reason: 'no_book' };
     // The guild-delete window refuses every book mutation (runGuildBankOp
     // pre-empts the operator arm too), so pre-check it here rather than let the
-    // purge read back as 'that slot is not a stuck item'. 'save_failed' is the
-    // honest answer and the honest instruction: nothing landed, the window is
-    // two DB round trips wide, try again. Effectively unreachable, because a
-    // guild only takes the window after proving its bank EMPTY and a dormant
-    // slot is exactly what keeps that guard failing; kept because the window's
-    // contract is stated over every op, not over the player ones.
+    // purge read back as 'that slot is not a stuck item'.
+    //
+    // Its OWN reason, not save_failed: nothing was attempted, so nothing was
+    // saved and nothing was rolled back, and telling an operator their change
+    // "was rolled back" describes an event that did not happen. What actually
+    // happened is that the guild is being deleted right now, which is both a
+    // different instruction (the bank is going away; do not retry the purge)
+    // and a different state (no mutation, no ledger row, no dirty mark).
+    // Effectively unreachable, because a guild only takes the window after
+    // proving its bank EMPTY and a dormant slot is exactly what keeps that
+    // guard failing; kept because the window's contract is stated over every
+    // op, not over the player ones.
     if (this.guildBankDeleteWindows.has(guildId)) {
       console.error(
         `guild bank admin purge for guild ${guildId} refused: a guild delete is in flight for it`,
       );
-      return { ok: false, reason: 'save_failed' };
+      return { ok: false, reason: 'delete_in_flight' };
     }
     const before = this.sim.guildBankHoldings(guildId);
     if (before === null) return { ok: false, reason: 'no_book' };

@@ -538,6 +538,7 @@ export const en_XA: AdminTranslations = {
   "error.guildBankSlotNotStuck": "[Ţĥáţ šļóţ ĥóļðš áñ óŕðíñáŕý íţéɱ ţĥé ĝúíļð çáñ ŵíţĥðŕáŵ íţšéļƒ, šó íţ çáññóţ ƀé ŕéɱóʋéð ĥéŕé.]",
   "error.guildBankItemRequired": "[Éñţéŕ ţĥé íţéɱ íð ýóú éẋþéçţ ţĥáţ šļóţ ţó ĥóļð.]",
   "error.guildBankSaveFailed": "[Ţĥé çĥáñĝé çóúļð ñóţ ƀé šáʋéð áñð ŵáš ŕóļļéð ƀáçķ. Ţŕý áĝáíñ íñ á ɱóɱéñţ.]",
+  "error.guildBankDeleting": "[Ţĥíš ĝúíļð íš ƀéíñĝ ðéļéţéð, šó íţš ƀáñķ íš çļóšéð. Ñóţĥíñĝ ŵáš çĥáñĝéð.]",
   "error.guildBankPurgeRefused": "[Ţĥé ĝúíļð ƀáñķ çĥáñĝé ŵáš ŕéƒúšéð.]",
   "moderation.title": "[Ɱóðéŕáţíóñ]",
   "moderation.reportsTitle": "[Ŕéþóŕţš]",
