@@ -259,7 +259,15 @@ type Step =
   | { k: 'leaveflush'; a: ActorIndex }
   | { k: 'writerwait'; a: ActorIndex; inner: Step[] } // serial-writer wait, ops land mid-wait
   | { k: 'fence'; a: ActorIndex } // lease fence / self-takeover + reconcile/revert
-  | { k: 'leaveflushfail'; a: ActorIndex }; // leave flush exhausts its retries -> reconcile
+  | { k: 'leaveflushfail'; a: ActorIndex } // leave flush exhausts its retries -> reconcile
+  // The OPERATOR dormant-slot purge (server/game.ts adminPurgeGuildBankSlot).
+  // It is an OP (it mutates a book through runGuildBankOp exactly like a player
+  // withdraw, takes an unflushed delta, and reverts on a fence-out), but it
+  // AWAITS its own escrow save, so it rides the async event lane rather than
+  // the synchronous op lane. Before this it never met the concurrency or
+  // fence-injection machinery at all, even though it mutates a book like any
+  // other op.
+  | { k: 'purge' };
 
 const OP_KINDS: Step['k'][] = ['deposit', 'withdraw', 'deposit_gold', 'withdraw_gold', 'buy'];
 
@@ -325,8 +333,8 @@ function genSteps(seed: number, cfg: GenConfig): Step[] {
           inner.push(genOp(rnd, ia, cfg.opKindsByActor?.[ia] ?? OP_KINDS));
         }
         steps.push({ k: 'writerwait', a, inner });
-      } else if (ev === 'saveall') {
-        steps.push({ k: 'saveall' });
+      } else if (ev === 'saveall' || ev === 'purge') {
+        steps.push({ k: ev });
       } else {
         steps.push({ k: ev, a } as Step);
       }
@@ -350,6 +358,8 @@ function fmtStep(s: Step): string {
       return `writerwait(a${s.a}, mid-wait:[${s.inner.map(fmtStep).join(', ')}])`;
     case 'saveall':
       return 'saveall(shutdown flush)';
+    case 'purge':
+      return 'purge(operator dormant-slot purge)';
     default:
       return `${s.k}(a${(s as { a: ActorIndex }).a})`;
   }
@@ -402,11 +412,53 @@ function ladderBurn(purchasedSlots: number): number {
   return sum;
 }
 
+/** The DORMANT copies the book starts with: each carries a per-copy transfer
+ *  lock, so the anonymous-pipe policy refuses it in BOTH directions and no
+ *  player op can ever move it. They exist so the OPERATOR purge has something
+ *  legal to remove; they are the reason that hatch exists in the first place
+ *  (an item a later content update locks, stranded in a book forever).
+ *
+ *  Seeded into the book rather than into bags because a deposit would refuse
+ *  them, which is the whole point. The birth-complete ledger row that explains
+ *  their presence is written in makeWorld. */
+const DORMANT_SEED: InvSlot[] = [
+  { itemId: 'wolf_fang', count: 2, instance: { boundTo: 901 } },
+  { itemId: 'wolf_fang', count: 1, instance: { boundTo: 902 } },
+  { itemId: 'copper_ore', count: 3, instance: { boundTo: 903 } },
+];
+
+/** The copies a book's dormant seed proves were DESTROYED: seeded minus still
+ *  present. A purge removes a copy from the world with no counterpart (that is
+ *  what makes it a destructive operator tool), so conservation needs the same
+ *  kind of closed-form sink term the ladder burn already supplies.
+ *
+ *  Derived from STATE rather than tallied as the harness watches purges go by,
+ *  and that is load-bearing: a fenced-out escrow REVERTS a purge, putting the
+ *  copy back, and a durable row can lag a live book by an unflushed one. A
+ *  counter would drift on both; a difference against present state is exact in
+ *  every view, at every instant, with no bookkeeping to keep in sync. */
+function addPurgeBurn(t: Totals, book: GuildBankState | null | undefined): void {
+  const inv = book?.inventory ?? [];
+  for (const seed of DORMANT_SEED) {
+    const key = `${seed.itemId}|${canonical(seed.instance ?? null)}|${seed.craftedRecipeId ?? ''}`;
+    let present = 0;
+    for (const slot of inv) {
+      const slotKey = `${slot.itemId}|${canonical(slot.instance ?? null)}|${slot.craftedRecipeId ?? ''}`;
+      if (slotKey === key) present += Number(slot.count) || 0;
+    }
+    const destroyed = seed.count - present;
+    if (destroyed === 0) continue;
+    t.items.set(seed.itemId, (t.items.get(seed.itemId) ?? 0) + destroyed);
+    t.fine.set(key, (t.fine.get(key) ?? 0) + destroyed);
+  }
+}
+
 function addBook(t: Totals, book: GuildBankState | null | undefined): void {
   if (!book) return;
   t.copper += Number(book.treasury) || 0;
   t.copper += ladderBurn(Number(book.purchasedSlots) || 0);
   addSlots(t, book.inventory);
+  addPurgeBurn(t, book);
 }
 
 function totalsEqual(a: Totals, b: Totals): boolean {
@@ -452,6 +504,10 @@ function diffTotals(expected: Totals, actual: Totals): string {
 // ---------------------------------------------------------------------------
 const BANKERS = ['bursar_fernando', 'bursar_petra_vell', 'bursar_aldous_crane'];
 const GUILD_ID = 4242;
+// The acting operator behind an injected purge. An admin account, never one of
+// the two officers: the ledger row books the OPERATOR'S account beside the
+// carrier's character, which is the one row shape where the two differ.
+const OPERATOR_ACCOUNT_ID = 9001;
 const START_COPPER = 400_000;
 // The treasury starts EMPTY on purpose: scripts/bank_audit.mjs treats a guild
 // book as birth-complete (every copper in it must be replayable from ledger
@@ -549,7 +605,7 @@ async function makeWorld(): Promise<World> {
   }
   server.sim.loadGuildBank(GUILD_ID, {
     treasury: START_TREASURY,
-    inventory: [],
+    inventory: DORMANT_SEED.map((s) => ({ ...s, instance: { ...s.instance } })),
     purchasedSlots: 0,
   });
   const w: World = { server, actors, clock: Date.now(), rolledBack: false };
@@ -561,7 +617,67 @@ async function makeWorld(): Promise<World> {
     store.chars.set(a.characterId, store.clone(server.sim.serializeCharacter(a.pid)) as never);
   }
   store.ledger.length = 0;
+  // The guild book is BIRTH-COMPLETE to scripts/bank_audit.mjs: every copy in
+  // it must be replayable from ledger rows. The dormant seed models copies
+  // deposited before a content update locked them, so it gets the deposit rows
+  // that deposit would have written. They deliberately carry NO counterparty
+  // side: they are exactly the pre-feature rows the audit must SKIP rather than
+  // read as balanced, so every run also exercises that path.
+  // Written through the SAME writer the server uses, so they take ids from the
+  // one counter and can never collide with (or sort ahead of) a real op's row.
+  for (const seed of DORMANT_SEED) {
+    await store.insertBankLedgerRow({
+      realm: 'Claudemoon',
+      characterId: actors[0].characterId,
+      accountId: actors[0].characterId,
+      op: 'deposit',
+      itemId: seed.itemId,
+      count: seed.count,
+      instance: seed.instance ?? null,
+      copperDelta: 0,
+      purchasedSlotsAfter: 0,
+      container: 'guild',
+      containerId: GUILD_ID,
+      counterpartyCopperDelta: null,
+      counterpartyCount: null,
+    });
+  }
   return w;
+}
+
+/** The OPERATOR purge, as an injected event. Picks the first slot the
+ *  anonymous-pipe policy actually refuses (the only kind the hatch will touch)
+ *  and runs the REAL admin entry point, which mutates through runGuildBankOp
+ *  and then AWAITS its own escrow save, so it meets the fence, the refusal, and
+ *  the serial writer exactly like a player op does. A refusal (no dormant slot
+ *  left, no carrier, a delete window, a save that did not survive) is a no-op
+ *  by design and is tallied so the sweep can report which arms it reached. */
+async function applyPurge(w: World): Promise<void> {
+  const book = w.server.sim.guildBanks.get(GUILD_ID);
+  if (!book) return;
+  const index = book.inventory.findIndex(
+    (slot) =>
+      DORMANT_SEED.some(
+        (seed) =>
+          seed.itemId === slot.itemId &&
+          canonical(seed.instance ?? null) === canonical(slot.instance ?? null),
+      ) && (slot.count ?? 0) > 0,
+  );
+  if (index < 0) {
+    coverage.bump(coverage.events, 'purge:nothing-dormant');
+    return;
+  }
+  const itemId = book.inventory[index].itemId;
+  const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  let result: Awaited<ReturnType<GameServer['adminPurgeGuildBankSlot']>>;
+  try {
+    result = await w.server.adminPurgeGuildBankSlot(GUILD_ID, index, itemId, OPERATOR_ACCOUNT_ID);
+  } finally {
+    warnSpy.mockRestore();
+    errSpy.mockRestore();
+  }
+  coverage.bump(coverage.events, result.ok ? 'purge:removed' : `purge:refused-${result.reason}`);
 }
 
 /** Keep the oracle's view of who can still persist honest.
@@ -616,7 +732,7 @@ const dispatch = (w: World, a: Actor, msg: Record<string, unknown>): void => {
 /** Execute one OP (synchronous by construction: every guild bank command
  *  resolves inside the dispatch call). Returns false when the actor is gone. */
 function applyOp(w: World, s: Step): boolean {
-  if (s.k === 'saveall') return false;
+  if (s.k === 'saveall' || s.k === 'purge') return false;
   const a = w.actors[(s as { a: ActorIndex }).a];
   if (!a || !a.alive) return false;
   stampAll(w);
@@ -663,6 +779,10 @@ function applyOp(w: World, s: Step): boolean {
 async function applyEvent(w: World, s: Step): Promise<void> {
   if (s.k === 'saveall') {
     await w.server.saveAll('shutdown');
+    return;
+  }
+  if (s.k === 'purge') {
+    await applyPurge(w);
     return;
   }
   const a = w.actors[(s as { a: ActorIndex }).a];
@@ -749,6 +869,7 @@ const EVENT_KINDS = new Set<Step['k']>([
   'leaveflushfail',
   'writerwait',
   'fence',
+  'purge',
 ]);
 const isEvent = (s: Step): boolean => EVENT_KINDS.has(s.k);
 
@@ -911,7 +1032,9 @@ async function runSteps(steps: Step[], check: Check): Promise<RunResult> {
     coverage.steps++;
     if (isEvent(s)) {
       const target = w.actors[(s as { a?: ActorIndex }).a ?? 0];
-      if (s.k === 'saveall' || target?.alive) coverage.bump(coverage.events, s.k);
+      if (s.k === 'saveall' || s.k === 'purge' || target?.alive) {
+        coverage.bump(coverage.events, s.k);
+      }
       await applyEvent(w, s);
     } else {
       applyOp(w, s);
@@ -1151,7 +1274,7 @@ describe('P2 conservation with save events interleaved', () => {
     const cfg: GenConfig = {
       depth: 34,
       eventRate: 0.3,
-      events: ['autosave', 'saveall', 'leaveflush', 'writerwait'],
+      events: ['autosave', 'saveall', 'leaveflush', 'writerwait', 'purge'],
     };
     const { failures } = await sweep(seeds(400, 1000), cfg, 'effective');
     expect(reportFailures('P2', failures)).toBe('');
@@ -1166,7 +1289,7 @@ describe('P3 durable conservation after a clean flush, ledger agreeing', () => {
     const cfg: GenConfig = {
       depth: 30,
       eventRate: 0.25,
-      events: ['autosave', 'saveall', 'writerwait'],
+      events: ['autosave', 'saveall', 'writerwait', 'purge'],
     };
     const { failures } = await sweep(seeds(350, 2000), cfg, 'durable-after-quiesce');
     expect(reportFailures('P3', failures)).toBe('');
@@ -1189,7 +1312,7 @@ describe('P4 conservation across lease fences (self-takeover + own-ops undo)', (
     const cfg: GenConfig = {
       depth: 26,
       eventRate: 0.28,
-      events: ['autosave', 'fence', 'writerwait', 'leaveflush'],
+      events: ['autosave', 'fence', 'writerwait', 'leaveflush', 'purge'],
     };
     const { failures } = await sweep(seeds(300, 3000), cfg, 'effective');
     expect(reportFailures('P4-fence', failures)).toBe('');
@@ -1199,7 +1322,7 @@ describe('P4 conservation across lease fences (self-takeover + own-ops undo)', (
     const cfg: GenConfig = {
       depth: 24,
       eventRate: 0.3,
-      events: ['autosave', 'fence', 'writerwait'],
+      events: ['autosave', 'fence', 'writerwait', 'purge'],
     };
     const { failures } = await sweep(seeds(300, 4000), cfg, 'durable-after-quiesce-no-ledger');
     expect(reportFailures('P4-durable', failures)).toBe('');
@@ -1209,7 +1332,7 @@ describe('P4 conservation across lease fences (self-takeover + own-ops undo)', (
     const cfg: GenConfig = {
       depth: 26,
       eventRate: 0.28,
-      events: ['autosave', 'fence', 'writerwait'],
+      events: ['autosave', 'fence', 'writerwait', 'purge'],
     };
     const { failures } = await sweep(seeds(300, 6000), cfg, 'effective');
     expect(reportFailures('P4-other-dirty', failures)).toBe('');
@@ -1546,6 +1669,13 @@ describe('coverage of the property sweeps', () => {
       // own-ops undo, on both the fence and the exhausted-leave path.
       'fence:own-ops-undone',
       'exhausted-leave:own-ops-undone',
+      // The OPERATOR purge now rides the concurrency and fence-injection
+      // sweeps like any other book mutation. Both arms must be reached: a
+      // purge that actually removed a copy, and one refused because the seed
+      // was exhausted. A sweep where every purge refused would prove nothing.
+      'purge',
+      'purge:removed',
+      'purge:nothing-dormant',
     ]) {
       expect(`${ev}:${(coverage.events.get(ev) ?? 0) > 0}`).toBe(`${ev}:true`);
     }
