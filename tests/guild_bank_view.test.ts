@@ -316,6 +316,11 @@ describe('dormant predicate parity with the sim pipe', () => {
     for (const id of Object.keys(REAL_ITEMS)) {
       const slot: InvSlot = { itemId: id, count: 1 };
       const refused = guildBankPipeRefusal(slot) !== null;
+      // The client mirror is documented as the WITHDRAW-side predicate, and the
+      // sim's refusal SET is claimed direction-independent, so sweep BOTH arms
+      // over the whole table: a `dir`-conditional slipping into the refusal
+      // decision (not just its wording) reddens here.
+      expect(guildBankPipeRefusal(slot, 'withdraw') !== null, id).toBe(refused);
       if (refused) dormantDefs++;
       expect(guildBankSlotDormant(slot, REAL_ITEMS[id]), id).toBe(refused);
     }

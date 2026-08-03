@@ -1574,6 +1574,17 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',
+    path: '/admin/api/guilds/:id/bank/purge-slot',
+    handler: 'guildBankPurgeMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/guilds\/(\d+)\/bank\/purge-slot$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
     path: '/admin/api/chat-filter/words',
     handler: 'handleAdminApi arm: /admin/api/chat-filter/words',
     contentType: PROBLEM_JSON,

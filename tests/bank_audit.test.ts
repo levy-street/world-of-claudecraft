@@ -609,6 +609,135 @@ describe('auditBank (guild container)', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// admin_purge: the operator escape hatch for a permanently unwithdrawable
+// (dormant) guild bank slot. It removes items, so the item replay must account
+// for it; without that arm the purged copy reads as an unexplained shortfall
+// against the live book forever.
+// ---------------------------------------------------------------------------
+
+describe('auditBank (guild container, admin_purge)', () => {
+  it('replays a purge as a REMOVAL: the book reconciles with zero findings', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        G({
+          id: 1,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'wolf_fang',
+          count: 5,
+          purchased_slots_after: 24,
+        }),
+        G({
+          id: 2,
+          character_id: 1,
+          op: 'admin_purge',
+          item_id: 'wolf_fang',
+          count: 2,
+          purchased_slots_after: 24,
+        }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: {
+            treasury: 0,
+            inventory: [{ itemId: 'wolf_fang', count: 3 }],
+            purchasedSlots: 24,
+          },
+        },
+      ],
+    });
+    expect(findings).toEqual([]);
+  });
+
+  it('WITHOUT the purge row the same book would not reconcile (the arm is load-bearing)', () => {
+    // The decisive control for the case above: drop only the admin_purge row
+    // and the replay over-counts the book by exactly the purged copies.
+    const findings = auditBank({
+      ledgerRows: [
+        G({
+          id: 1,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'wolf_fang',
+          count: 5,
+          purchased_slots_after: 24,
+        }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: {
+            treasury: 0,
+            inventory: [{ itemId: 'wolf_fang', count: 3 }],
+            purchasedSlots: 24,
+          },
+        },
+      ],
+    });
+    expect(guildKindsFor(findings, 913).length).toBeGreaterThan(0);
+  });
+
+  it('moves NO treasury copper: a purge alone leaves the treasury replay at zero', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        G({
+          id: 1,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'wolf_fang',
+          count: 1,
+          purchased_slots_after: 24,
+        }),
+        G({
+          id: 2,
+          character_id: 1,
+          op: 'admin_purge',
+          item_id: 'wolf_fang',
+          count: 1,
+          purchased_slots_after: 24,
+        }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: { treasury: 0, inventory: [], purchasedSlots: 24 },
+        },
+      ],
+    });
+    expect(findings).toEqual([]);
+  });
+
+  it('shape-checks a purge row like any other item op (count, item_id, copper)', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        G({ id: 1, character_id: 1, op: 'admin_purge', item_id: null, count: 0, copper_delta: 7 }),
+      ],
+      characters: [],
+    });
+    expect(new Set(guildKindsFor(findings, 913))).toEqual(
+      new Set(['bad_count', 'missing_item_id', 'copper_on_item_op']),
+    );
+  });
+
+  it('is a GUILD-only op: a personal-container purge row is flagged', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        L({ id: 1, character_id: 1, op: 'admin_purge', item_id: 'wolf_fang', count: 1 }),
+      ],
+      characters: [],
+    });
+    expect(findingKindsFor(findings, 1)).toContain('gold_op_outside_guild');
+  });
+});
+
 describe('formatReport (guild rows)', () => {
   it('summarizes the guild container and names the guild in FINDING lines', () => {
     const rows = [G({ id: 1, character_id: 1, op: 'deposit', item_id: 'wolf_fang', count: 2 })];

@@ -3746,7 +3746,13 @@ export class GameServer {
           }
           return saves;
         };
-        if (opts.withMarket || session.dirtyGuildBanks.size > 0) {
+        // Captured BEFORE the await: a save that carries a guild book is the
+        // dupe-sensitive escrow shape, and the dirty marks it would clear are
+        // still set while the write is in flight, so a throw below must be
+        // attributable even though carriedGuildBankSeqs is filled only once
+        // the queued closure actually runs.
+        const carriesGuildBooks = session.dirtyGuildBanks.size > 0;
+        if (opts.withMarket || carriesGuildBooks) {
           // Atomic on the leave path so a logout bag-flush can never tear away
           // from the global Market escrow (see saveCharacterAndMarketState),
           // and on any save carrying a guild book so the character half and
@@ -3792,6 +3798,17 @@ export class GameServer {
                   );
             });
           } catch (err) {
+            // The whole escrow rolled back: the character half AND every book
+            // half, whether the db layer threw (a transport fault) or the merge
+            // REFUSED a book half. The live sim is now ahead of durable truth
+            // for those books until a later save or a reconcile lands, which is
+            // exactly the window the dupe guards live in, so it must be visible
+            // in production, not only in a log line. The counter observes, it
+            // never swallows: the refusal arm still runs below and a foreign
+            // error is still rethrown.
+            if (carriesGuildBooks) {
+              gameMetricsCounters().guildBankIncident('escrow_save_failed');
+            }
             // A REFUSED book half aborts the whole transaction, character row
             // included, so this save persisted nothing at all. Skip every
             // post-save step (no lastSave, no deed publish, no mark release:
@@ -3825,6 +3842,13 @@ export class GameServer {
         // saves. Only an explicit false is a fence-out: the no-nonce legacy path
         // returns true, so a strict comparison never mistakes an ordinary save for one.
         if (saved === false) {
+          // Same dupe-sensitive shape as the throw above, reached the other
+          // way: the write matched no row, so nothing persisted. Counted only
+          // when this save actually carried books (an ordinary fenced-out
+          // character save is not a guild bank incident).
+          if (carriedGuildBankSeqs.length > 0) {
+            gameMetricsCounters().guildBankIncident('save_fenced_out');
+          }
           console.warn(
             `character ${session.characterId} (${session.name}) save fenced out by a same-account takeover; skipping deed publish and lastSave`,
           );
@@ -4046,17 +4070,24 @@ export class GameServer {
       }
     }
     const result = loadGuildBanksIntoSim(this.sim, rows);
+    // Each of these leaves ONE guild's book unloaded until a restart: its ops
+    // are inert and its disband is refused fail-closed, an outage for that
+    // guild rather than a transient. Counted per guild beside the loud log
+    // (the guild id stays in the log; it is never a metric label).
     for (const guildId of result.oversized) {
+      gameMetricsCounters().guildBankIncident('book_unloaded');
       console.error(
         `guild bank row for guild ${guildId} exceeds the size bound; left unloaded (ops stay inert, the row is preserved)`,
       );
     }
     for (const guildId of result.malformed) {
+      gameMetricsCounters().guildBankIncident('book_unloaded');
       console.error(
         `guild bank row for guild ${guildId} is structurally not a book; left unloaded (ops stay inert, the row is preserved)`,
       );
     }
     for (const guildId of result.missing) {
+      gameMetricsCounters().guildBankIncident('book_unloaded');
       console.error(`guild bank book for guild ${guildId} failed to load into the sim`);
     }
   }
@@ -4118,7 +4149,17 @@ export class GameServer {
       dead.dirtyGuildBanks.delete(guildId);
       dead.unflushedGuildBankOps.delete(guildId);
       dead.guildBankDeficitSkips.delete(guildId);
-      if (log.length > 0) this.sim.revertGuildBankDeltas(guildId, log);
+      if (log.length === 0) continue;
+      // Counted per GUILD, the unit the remedy applies to: reaching this at
+      // all means a session that can never commit again held unflushed book
+      // ops, the shape the Phase 3 QA dupe lived in. This is the ONE reconcile
+      // site under the escrow root fix (the fence-out, the exhausted leave
+      // flush, the teardown sweep, and the escrow-refusal quarantine all land
+      // here), so the counter lives here rather than at four call sites. A
+      // guild whose log is already empty is a bookkeeping no-op, not an
+      // incident, and is not counted.
+      gameMetricsCounters().guildBankIncident('reconcile');
+      this.sim.revertGuildBankDeltas(guildId, log);
     }
   }
 
@@ -4230,6 +4271,13 @@ export class GameServer {
       quarantine = true;
     }
     if (!quarantine) return;
+    // The terminal arm of the escrow design and the one an operator should
+    // alert on: a live session is being abandoned because its book half can
+    // never be replayed onto durable truth. Counted once per SESSION (the unit
+    // the remedy applies to; the per-guild reverts it triggers are counted as
+    // 'reconcile' inside revertOwnGuildBookOps), beside the loud log that
+    // carries the guild id and the deficit.
+    gameMetricsCounters().guildBankIncident('escrow_quarantined');
     // The character half is the half that would carry the value the book half
     // could not, so this session must never save again.
     session.escrowQuarantined = true;
@@ -4243,35 +4291,62 @@ export class GameServer {
     }
   }
 
-  // Run one dispatched guild bank op with the observer pair around it: the
-  // before/after guildBankInfoFor diff (the personal bank's recordBankOp
-  // idiom) detects success, writes the fire-and-forget ledger rows, and marks
-  // the acting player's guild book dirty for the escrow save. Never awaited,
-  // never a gameplay dependency; a refused op diffs empty and does nothing.
+  // Run one guild bank op with the observer pair around it: the before/after
+  // book diff (the personal bank's recordBankOp idiom) detects success, writes
+  // the fire-and-forget ledger rows, and marks the guild book dirty for the
+  // escrow save. Never awaited, never a gameplay dependency; a refused op
+  // diffs empty and does nothing.
+  //
+  // THE ONLY server-side guild book mutation path. `target` says how to read
+  // the book around the mutation:
+  //  - `{ pid }`  a dispatched player op: the gated guildBankInfoFor read, and
+  //    the guild id comes from that player's membership stamp.
+  //  - `{ guildId, actorAccountId }`  the OPERATOR path (the admin dormant-slot
+  //    purge), which has no acting player: the ungated guild-scoped read, the
+  //    guild id is explicit, and the LEDGER ROW IS ATTRIBUTED TO THE OPERATOR'S
+  //    ACCOUNT rather than the carrier's owner, so the evidence names who
+  //    ordered the removal. `session` is then only the CARRIER whose fenced
+  //    escrow save takes the book (see adminPurgeGuildBankSlot).
+  // Extending this seam rather than writing a second mutation path is the
+  // Phase 3 acceptance line: the diff feeds BOTH the bank_ledger rows and the
+  // per-session unflushed-delta log the fence-out revert depends on, so a
+  // mutation outside it would be invisible to the audit and unrevertable.
   private runGuildBankOp(
     session: ClientSession,
-    pid: number,
+    target: { pid: number } | { guildId: number; actorAccountId: number },
     op: GuildBankLedgerOp,
     run: () => void,
   ): void {
     // A guild whose DELETE is already in flight has passed its empty-bank
     // guard, so its row is about to cascade away: an op landing now would be
-    // destroyed by that cascade with its dirty mark wiped by the post-commit
-    // hook. Refuse before the sim runs, so nothing mutates, no ledger row is
-    // written and no book is marked dirty, and TELL the player why: the window
-    // is only two DB round trips wide, but a deposit that appears to do
-    // nothing at all is worse than one that says to try again.
-    const actingGuildId = this.sim.meta(pid)?.guildMembership?.guildId;
+    // destroyed by that cascade with its dirty mark and unflushed log wiped by
+    // the post-commit hook (onGuildDisbanded), leaving an orphaned ledger row
+    // behind. Refuse before the sim runs, so nothing mutates, no ledger row is
+    // written and no book is marked dirty. The window's contract
+    // (beginGuildBankDelete) is stated over THIS method, so it covers the
+    // operator arm too; only the player arm has somebody to TELL, and it is
+    // told, because the window is only two DB round trips wide but a deposit
+    // that appears to do nothing at all is worse than one that says to try
+    // again. The operator arm's answer is shaped by adminPurgeGuildBankSlot,
+    // which pre-checks the same window so it can name the reason.
+    const actingGuildId =
+      'pid' in target ? this.sim.meta(target.pid)?.guildMembership?.guildId : target.guildId;
     if (actingGuildId !== undefined && this.guildBankDeleteWindows.has(actingGuildId)) {
       // English on the wire, re-localized by the client matcher
       // (src/ui/server_i18n.ts guild.bankClosing), the server-text contract:
       // src/sim and server stay language-agnostic.
-      this.sendChatNotice(session, 'The guild bank is closing. Try again in a moment.');
+      if ('pid' in target) {
+        this.sendChatNotice(session, 'The guild bank is closing. Try again in a moment.');
+      }
       return;
     }
-    const before = this.sim.guildBankInfoFor(pid);
+    const read = () =>
+      'pid' in target
+        ? this.sim.guildBankInfoFor(target.pid)
+        : this.sim.guildBankInfoForGuild(target.guildId);
+    const before = read();
     run();
-    const after = this.sim.guildBankInfoFor(pid);
+    const after = read();
     // Rung 0 of the ladder OPENS the bank from the acting officer's own PURSE
     // (the sim decides which rung is next off the BEFORE book); it gets its
     // own ledger op name so the audit's treasury replay can exclude the
@@ -4287,9 +4362,11 @@ export class GameServer {
         : op;
     const deltas = diffGuildBankOp(effectiveOp, before, after);
     if (deltas.length === 0) return;
-    // A successful op requires a stamped officer-plus membership, and the
-    // stamp cannot change inside the synchronous run() above.
-    const guildId = this.sim.meta(pid)?.guildMembership?.guildId;
+    // A successful player op requires a stamped officer-plus membership, and
+    // the stamp cannot change inside the synchronous run() above. The operator
+    // path names its guild outright (it has no acting player to read).
+    const guildId =
+      'pid' in target ? this.sim.meta(target.pid)?.guildMembership?.guildId : target.guildId;
     if (guildId === undefined) return;
     this.markGuildBankDirty(session, guildId);
     // Record the op in the session's unflushed log: this log is the escrow
@@ -4326,7 +4403,137 @@ export class GameServer {
       log = [...head, ...compactGuildBankOpLog(log.slice(protect))];
     }
     session.unflushedGuildBankOps.set(guildId, log);
-    recordGuildBankDeltas(effectiveOp, session, guildId, deltas);
+    // Attribution: a player op is the acting character's own; an operator op
+    // keeps the carrier's character (the column is NOT NULL and an operator may
+    // hold no character) but books the OPERATOR'S account, so the row names who
+    // ordered it instead of the bystander who lent the escrow transaction.
+    const who =
+      'pid' in target
+        ? session
+        : { characterId: session.characterId, accountId: target.actorAccountId };
+    recordGuildBankDeltas(effectiveOp, who, guildId, deltas);
+  }
+
+  /** The OPERATOR escape hatch for a dormant guild bank slot (the admin route
+   *  in server/admin.ts). A slot holding an item a later content change flagged
+   *  soulbound / noMarketList / transfer-locked is refused in BOTH directions,
+   *  so it can never be withdrawn, guildBankHoldings stays non-zero forever,
+   *  and the guild can never disband. No player action clears it; this does.
+   *
+   *  Runs through runGuildBankOp like every other book mutation, so the removal
+   *  gets its bank_ledger row (op 'admin_purge', carrying the item id, count,
+   *  and the REAL instance payload as evidence) and its per-session unflushed
+   *  delta, and rides the same fenced escrow save. There is no standalone book
+   *  write by design.
+   *
+   *  ATTRIBUTION: the ledger row's ACCOUNT is the acting operator
+   *  (`actorAccountId`), never the carrier's owner, so the evidence trail names
+   *  who ordered the removal rather than a bystander. Its character column is
+   *  the carrier (the column is NOT NULL and an operator may hold no character
+   *  at all); an `admin_purge` row is therefore the one shape where account and
+   *  character belong to different people, which is the signal, not a defect.
+   *  The operator's REASON rides the audited guild_moderation_actions row the
+   *  admin route writes beside this (the rename precedent).
+   *
+   *  THE CARRIER: books persist only inside a character's fenced escrow
+   *  transaction, so the purge needs a live session to ride. It uses a session
+   *  of the TARGET GUILD (officer-plus first, any member otherwise), never an
+   *  unrelated player's, so the dirty mark and the fence-out revert stay among
+   *  that guild's own sessions. With nobody from the guild online there is no
+   *  carrier and the purge is refused rather than mutating a live book it could
+   *  not persist. The membership read is the SESSION STAMP, so a player kicked
+   *  from the guild since login can still be the carrier until their stamp
+   *  refreshes: harmless (the carrier only lends its escrow transaction; it is
+   *  never charged, credited, or named as the actor), and pinned by test.
+   *
+   *  DURABILITY IS AWAITED, not optimistic: a fenced-out escrow save REVERTS
+   *  the purge (revertOwnGuildBookOps replays the admin_purge delta backward
+   *  onto the live book, exactly as it does a player withdraw), and a REFUSED
+   *  escrow rolls the whole transaction back and quarantines the carrier, so
+   *  answering before the save landed would tell an operator a slot is cleared
+   *  while the copy is on its way back. This awaits the save and reports
+   *  'save_failed' unless the book actually still lacks the copy afterwards. */
+  async adminPurgeGuildBankSlot(
+    guildId: number,
+    slotIndex: number,
+    expectItemId: string,
+    actorAccountId: number,
+  ): Promise<
+    | { ok: true; removed: { itemId: string; count: number }; carrierCharacterId: number }
+    | { ok: false; reason: 'no_book' | 'no_carrier' | 'not_dormant' | 'save_failed' }
+  > {
+    if (!Number.isInteger(guildId) || guildId <= 0) return { ok: false, reason: 'no_book' };
+    // The guild-delete window refuses every book mutation (runGuildBankOp
+    // pre-empts the operator arm too), so pre-check it here rather than let the
+    // purge read back as 'that slot is not a stuck item'. 'save_failed' is the
+    // honest answer and the honest instruction: nothing landed, the window is
+    // two DB round trips wide, try again. Effectively unreachable, because a
+    // guild only takes the window after proving its bank EMPTY and a dormant
+    // slot is exactly what keeps that guard failing; kept because the window's
+    // contract is stated over every op, not over the player ones.
+    if (this.guildBankDeleteWindows.has(guildId)) {
+      console.error(
+        `guild bank admin purge for guild ${guildId} refused: a guild delete is in flight for it`,
+      );
+      return { ok: false, reason: 'save_failed' };
+    }
+    const before = this.sim.guildBankHoldings(guildId);
+    if (before === null) return { ok: false, reason: 'no_book' };
+    const carrier = this.guildBankSaveCarrier(guildId);
+    if (!carrier) return { ok: false, reason: 'no_carrier' };
+    let purged: { itemId: string; count: number } | null = null;
+    this.runGuildBankOp(carrier, { guildId, actorAccountId }, 'admin_purge', () => {
+      const slot = this.sim.purgeDormantGuildBankSlot(guildId, slotIndex, expectItemId);
+      if (slot) purged = { itemId: slot.itemId, count: slot.count };
+    });
+    // Read through an explicitly typed local: the assignment above happens
+    // inside a callback, which the control-flow analysis cannot see.
+    const removed = purged as { itemId: string; count: number } | null;
+    // Null means the sim refused: no such index, the slot does not hold the
+    // named item, or it is an ordinary withdrawable copy. Nothing mutated, so
+    // the observer diffed empty too.
+    if (removed === null) return { ok: false, reason: 'not_dormant' };
+    try {
+      await this.saveCharacter(carrier);
+    } catch (err) {
+      // The live book is purged and the dirty mark survives, so a later save
+      // still converges; the operator is told it did not land YET, which is the
+      // honest answer to "is this guild disbandable now".
+      console.error(`guild bank admin purge save failed for guild ${guildId}:`, err);
+      return { ok: false, reason: 'save_failed' };
+    }
+    // A fence-out inside that save reverts (or reloads away) the removal, so
+    // confirm against live state rather than trusting the call returned. A
+    // concurrent deposit landing inside the save window can make this read
+    // conservative (reporting save_failed on a purge that did land); erring
+    // toward "go and check" is the right direction for a destructive tool.
+    const after = this.sim.guildBankHoldings(guildId);
+    if (after === null || after.items >= before.items) {
+      console.error(
+        `guild bank admin purge for guild ${guildId} did not survive its escrow save (fence-out or reload)`,
+      );
+      return { ok: false, reason: 'save_failed' };
+    }
+    console.warn(
+      `guild bank admin purge: account ${actorAccountId} removed ${removed.count}x ${removed.itemId} from guild ${guildId} (carried by character ${carrier.characterId})`,
+    );
+    return { ok: true, removed, carrierCharacterId: carrier.characterId };
+  }
+
+  /** A live session that can carry guild `guildId`'s book into a fenced escrow
+   *  save: an officer-plus member first (the rank that already moves this book
+   *  every day), else any member. Null when nobody from the guild is online.
+   *  Reads the SESSION membership stamp, so it can pick a player whose stamp is
+   *  stale (see adminPurgeGuildBankSlot for why that is harmless). */
+  private guildBankSaveCarrier(guildId: number): ClientSession | null {
+    let fallback: ClientSession | null = null;
+    for (const session of this.sessionsByCharacterId.values()) {
+      const m = this.sim.meta(session.pid)?.guildMembership;
+      if (!m || m.guildId !== guildId) continue;
+      if (m.rank === 'leader' || m.rank === 'officer') return session;
+      fallback ??= session;
+    }
+    return fallback;
   }
 
   async loadRifts(): Promise<void> {
@@ -6321,7 +6528,7 @@ export class GameServer {
         if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
         if (typeof msg.amount === 'number') {
           const amount = msg.amount;
-          this.runGuildBankOp(session, pid, 'deposit_gold', () =>
+          this.runGuildBankOp(session, { pid }, 'deposit_gold', () =>
             sim.guildBankDepositGoldFor(pid, amount),
           );
         }
@@ -6330,7 +6537,7 @@ export class GameServer {
         if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
         if (typeof msg.amount === 'number') {
           const amount = msg.amount;
-          this.runGuildBankOp(session, pid, 'withdraw_gold', () =>
+          this.runGuildBankOp(session, { pid }, 'withdraw_gold', () =>
             sim.guildBankWithdrawGoldFor(pid, amount),
           );
         }
@@ -6340,7 +6547,7 @@ export class GameServer {
         if (typeof msg.slot === 'number') {
           const slot = msg.slot;
           const count = typeof msg.count === 'number' ? msg.count : undefined;
-          this.runGuildBankOp(session, pid, 'deposit', () =>
+          this.runGuildBankOp(session, { pid }, 'deposit', () =>
             sim.guildBankDepositFor(pid, slot, count),
           );
         }
@@ -6350,14 +6557,14 @@ export class GameServer {
         if (typeof msg.slot === 'number') {
           const slot = msg.slot;
           const count = typeof msg.count === 'number' ? msg.count : undefined;
-          this.runGuildBankOp(session, pid, 'withdraw', () =>
+          this.runGuildBankOp(session, { pid }, 'withdraw', () =>
             sim.guildBankWithdrawFor(pid, slot, count),
           );
         }
         break;
       case 'guild_bank_buy_slots':
         if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
-        this.runGuildBankOp(session, pid, 'buy_slots', () => sim.guildBankBuySlotsFor(pid));
+        this.runGuildBankOp(session, { pid }, 'buy_slots', () => sim.guildBankBuySlotsFor(pid));
         break;
       // Book of Deeds: select/clear the displayed title. The sim validator
       // owns every rule (deed earned + title reward; null clears; invalid

@@ -14,6 +14,13 @@ Teardown of docs/guild-bank/ awaits the user's explicit confirmation.
   escrow persistence in one transaction). See brainstorm.md for the full rationale.
 - Access: banker NPC proximity (the personal-bank `nearBanker` gate), Guild tab inside the
   existing bank window. Offline: no-op everywhere, tab never renders.
+- Refusal WORDING is direction-aware (2026-08-03): `guildBankPipeRefusal(slot, dir)`
+  defaults to `'deposit'`; the refusal SET is direction-independent (the one dormant
+  predicate), only the sentence changes. Deposit names the dimension
+  (`error.guildBankQuestItem` / `error.guildBankSoulbound` / `error.guildBankNoTransfer`),
+  withdraw speaks one line for all four (`error.guildBankWithdrawRefused`), because
+  "you cannot store that" is false for a copy already in the book. The bags pre-empt
+  voices the same keys.
 - Item policy (revised in Phase 2 review; supersedes the original "quest items refused"
   line): the guild bank is an ANONYMOUS EXCHANGE PIPE (officer A deposits, officer B
   withdraws), so it carries the full World Market / Ravenpost pipe policy, not the
@@ -594,19 +601,72 @@ What remains accepted:
   the DELETE and its post-commit hooks, and tells the actor so
   (`guild.bankClosing`). Before it, an op landing in that gap was destroyed outright by
   the FK cascade with its dirty mark wiped by the post-commit hook.
-- Dormant pipe-refused slots can make a bank permanently non-emptiable (DEFERRED, v1
-  limitation): an item a later content update flags soulbound/noMarketList is refused in
-  BOTH directions (anonymous-pipe policy), so it can never be withdrawn, and the disband
-  guard then refuses forever. Known and deliberate for v1 (items are never destroyed);
-  requires an admin escape hatch (an operator tool that mails the dormant copy back to
-  its depositor or archives the book) before it can bite a real guild. Tracked in
-  progress.md deferrals; the future PR body must call it out.
 - `revertOwnGuildBookOps` is SYNCHRONOUS on purpose: it takes the session's log, its
   settled-prefix count, and its marks in one step with no await between them. Any future
   edit that splits those across an await reopens a mark-release race. Same trap class for
   the `collectDeltas` capture inside the queued save closure, which must keep taking the
   marks, the log COPY, and the carried counts at one instant (the log is appended to by
   ops dispatched during the awaited write).
+- Dormant pipe-refused slots could make a bank permanently non-emptiable (v1 limitation,
+  REMEDIED 2026-08-03 on `feature/guild-bank-followups`): an item a later content update
+  flags soulbound/noMarketList is refused in BOTH directions (anonymous-pipe policy), so
+  it can never be withdrawn, and the disband guard then refused forever. The operator
+  escape hatch is now `POST /admin/api/guilds/:id/bank/purge-slot` (permission
+  `guildbank.purge`, SUPERADMIN-ONLY: it destroys player property with no in-game undo,
+  so it sits in `SUPERADMIN_ONLY_PERMISSIONS` beside `staff.manage` and no
+  dashboard-grantable role reaches it) -> `GameServer.adminPurgeGuildBankSlot` -> the
+  sim's `purgeDormantGuildBankSlot`, which removes exactly ONE slot the pipe actually
+  refuses (an ordinary withdrawable copy is refused, pinned by test) and rides
+  `runGuildBankOp` like every other book mutation: `bank_ledger` op `admin_purge`
+  carrying item id, count and the real instance payload as evidence, the per-session
+  unflushed delta (so a fence-out reverts it), and the same fenced escrow save. Removing
+  the last dormant slot unblocks disband end to end (pinned).
+  ACCOUNTABILITY (the privacy-security review's line): the request requires a moderation
+  REASON held to the same bar as the guild rename beside it, plus the itemId the operator
+  believes sits at that index (a confirmation token: a purge splices the slot out, so
+  every higher index shifts down and a stale listing would otherwise destroy the wrong
+  dormant copy). The `bank_ledger` row's ACCOUNT is the acting operator, never the
+  carrier's owner (its character column is the carrier, because the column is NOT NULL
+  and an operator may hold no character: an `admin_purge` row is the one shape where
+  account and character belong to different people, which is the signal). A
+  `guild_moderation_actions` row with `action = 'guild_bank_purge'` records who, why, and
+  what, so a purge shows up in the realm moderation history like every other admin act;
+  that table gained an additive `action` column defaulting to `guild_rename` (the literal
+  the history union used to hardcode).
+  DURABILITY IS AWAITED: a fenced-out escrow save REVERTS the purge (the `admin_purge`
+  delta replays backward through `revertGuildBankDeltasTo` exactly like a player
+  withdraw) and a REFUSED escrow rolls the whole transaction back and quarantines the
+  carrier, so the endpoint confirms the removal survived its save and answers 503
+  `save_failed` otherwise, rather than telling an operator a slot is cleared while the
+  copy is on its way back. The guild-delete window refuses the operator arm too
+  (`runGuildBankOp` pre-empts both targets), and `adminPurgeGuildBankSlot` pre-checks it
+  so the refusal reads as `save_failed` ("try again") rather than "not a stuck item".
+  The `admin_purge` delta is a REMOVAL everywhere the machinery reasons about one: the
+  forward replay (`applyGuildBankDeltasTo`, all-or-nothing against durable truth), the
+  inverse, the replay-equivalent netting (`netGuildBankOpLogForReplay`), and the
+  unflushed-log compactor (`compactGuildBankOpLog`), so an operator purge can never be
+  the one delta a compaction or a netted rescue silently drops.
+  Three accepted limits: the purge needs a live session OF THAT GUILD to carry the escrow
+  save (books never persist standalone), so it refuses `no_carrier` when nobody from the
+  guild is online (the carrier is chosen off the session membership stamp, so a stale
+  ex-member can still carry: harmless, it only lends its escrow transaction and is never
+  charged, credited, or named as the actor); it PURGES rather than mailing the copy back
+  (the book keeps no depositor identity, and the mail pipe refuses the same copy); and
+  there is no admin READ surface yet, so an operator discovers slot indices out of band
+  (SQL on `guild_banks`) until the UI follow-up. The admin dashboard control is that
+  follow-up: it needs a guild-bank read endpoint (slot list with indices + dormant flags)
+  plus a confirm flow; the operator error strings already carry their ADMIN_ERROR_KEYS
+  matcher rows and English catalog entries so it is drop-in.
+- Guild bank incidents are metered (2026-08-03): `woc_guild_bank_incidents_total{kind}`
+  over the fixed six `GUILD_BANK_INCIDENTS` (escrow_save_failed, save_fenced_out,
+  escrow_quarantined, reconcile, book_unloaded, ledger_write_failed) through the
+  `gameMetricsCounters` seam, pre-registered at zero. Guild id stays in the loud log and
+  is never a metric label. Each counter sits BESIDE its log, never instead of it.
+  `escrow_save_failed` covers BOTH ways an escrow save rolls both halves back (the db
+  layer throwing, and the merge REFUSING a book half); `escrow_quarantined` is the
+  terminal arm (the refusal ran out of retries or could never resolve, so the session is
+  abandoned) and is the one worth paging on; `reconcile` counts one per GUILD whose
+  unflushed log `revertOwnGuildBookOps` actually undid.
 - A create-fee reservation whose refund arm finds the founder gone (refused create racing
   a clean logout) cannot refund in the live sim; it is logged loudly for operator
   compensation, and no create_fee ledger row is written for it. Watch item: a refund

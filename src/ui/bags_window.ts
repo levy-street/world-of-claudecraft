@@ -961,7 +961,10 @@ export class BagsWindow {
       // The guild pipe's pre-empt denies, each voicing the exact line the sim
       // would refuse with (its established sim_i18n keys), sending nothing.
       case 'guildBankDepositBlockedQuest':
-        this.deps.showError(tSim('error.bankQuestItem'));
+        // The guild pipe's OWN quest line, not the personal bank's
+        // error.bankQuestItem: the sim voices error.guildBankQuestItem here, and
+        // a pre-empt that voiced a different sentence would silently diverge.
+        this.deps.showError(tSim('error.guildBankQuestItem'));
         return;
       case 'guildBankDepositBlockedSoulbound':
         this.deps.showError(tSim('error.guildBankSoulbound'));

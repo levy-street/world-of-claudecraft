@@ -13,7 +13,10 @@
 // conservation only holds across the whole guild, never per character. Guild
 // groups additionally replay the treasury (deposit_gold + withdraw_gold +
 // buy_slots copper deltas; create_fee and open_bank are PERSONAL purse copper
-// and are excluded) and reconcile against the guild_banks book when it is provided. A
+// and are excluded) and reconcile against the guild_banks book when it is provided.
+// admin_purge (the operator escape hatch for a permanently unwithdrawable
+// dormant slot, server/game.ts adminPurgeGuildBankSlot) replays as an item
+// REMOVAL alongside withdraw and moves no copper at all. A
 // guild with ledger rows but no book row reconciles items and treasury against
 // an EMPTY book (a disbanded guild: the disband guard proves both were zero)
 // but skips the purchased reconciliation (expansions survive to the last row).
@@ -121,7 +124,7 @@ function checkRowShape(row, findings) {
       ? { guildId: row.container_id == null ? null : Number(row.container_id) }
       : {}),
   };
-  if (row.op === 'deposit' || row.op === 'withdraw') {
+  if (row.op === 'deposit' || row.op === 'withdraw' || row.op === 'admin_purge') {
     if (row.count == null || Number(row.count) <= 0) {
       findings.push({
         ...base,
@@ -258,14 +261,16 @@ function checkRowShape(row, findings) {
       });
     }
   }
-  // The gold, fee, and open ops exist only for the guild container, and every
-  // guild row must name its guild (container_id is the group key).
+  // The gold, fee, open, and admin-purge ops exist only for the guild
+  // container, and every guild row must name its guild (container_id is the
+  // group key).
   const container = row.container ?? 'personal';
   const guildOnlyOp =
     row.op === 'deposit_gold' ||
     row.op === 'withdraw_gold' ||
     row.op === 'create_fee' ||
     row.op === 'open_bank' ||
+    row.op === 'admin_purge' ||
     row.op === ESCROW_DEFICIT_OP;
   if (guildOnlyOp && container !== 'guild') {
     findings.push({
@@ -366,7 +371,10 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
     const net = new Map();
     const flaggedNegative = new Set();
     for (const row of group.rows) {
-      if (row.op !== 'deposit' && row.op !== 'withdraw') continue;
+      // admin_purge removes a dormant copy from a guild book, so it replays as
+      // a REMOVAL exactly like a withdraw: without it the purged copy would
+      // read as an unexplained shortfall against the live book forever.
+      if (row.op !== 'deposit' && row.op !== 'withdraw' && row.op !== 'admin_purge') continue;
       const key = multisetKey(row.item_id, row.instance);
       const delta = row.op === 'deposit' ? Number(row.count) : -Number(row.count);
       const next = (net.get(key) ?? 0) + delta;

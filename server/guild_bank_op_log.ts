@@ -63,7 +63,12 @@ function compactSegment(segment: readonly GuildBankOpDelta[]): GuildBankOpDelta[
       sawGold = true;
       continue;
     }
-    if (d.op !== 'deposit' && d.op !== 'withdraw') {
+    // admin_purge (the operator escape hatch) is a REMOVAL exactly like a
+    // withdraw, so it nets with one rather than falling through to the
+    // passthrough: same three-dimensional identity, same forward replay, same
+    // inverse. Netting it keeps the compacted log's revert identical to the
+    // original's, which a reordered passthrough would only accidentally be.
+    if (d.op !== 'deposit' && d.op !== 'withdraw' && d.op !== 'admin_purge') {
       // Not a shape this compactor understands: carry it through verbatim
       // rather than dropping it (never lose committed-intent work).
       passthrough.push(d);

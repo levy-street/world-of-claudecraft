@@ -4252,7 +4252,11 @@ export interface BankLedgerRow {
     // (server/bank_ledger.ts GUILD_BANK_ESCROW_DEFICIT_OP), the audit trail
     // for value one officer consumed that another never made durable.
     // scripts/bank_audit.mjs reports these and excludes them from every replay.
-    | 'escrow_deficit';
+    | 'escrow_deficit'
+    // The operator escape hatch: one DORMANT guild bank slot removed
+    // (server/game.ts adminPurgeGuildBankSlot). A real book mutation, so it
+    // replays as an item removal like a withdraw.
+    | 'admin_purge';
   itemId: string | null;
   count: number | null;
   instance: unknown;

@@ -34,6 +34,7 @@ import {
   type GuildRank,
   guildBankCapacity,
   guildBankNextExpansionPrice,
+  guildBankPipeRefusal,
   guildBankRungsBought,
   netGuildBankOpLogForReplay,
   revertGuildBankDeltasTo,
@@ -845,7 +846,7 @@ describe('guildBankDepositGoldFor / guildBankWithdrawGoldFor', () => {
 });
 
 describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
-  it('refuses quest items with the personal-bank error, mutating nothing', () => {
+  it('refuses quest items with the GUILD-worded error, never the personal-bank line', () => {
     const sim = makeOfficerSim();
     meta(sim).inventory.push({ itemId: 'boar_hide', count: 2 }); // kind: 'quest'
     const before = fingerprint(sim);
@@ -855,7 +856,11 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
       meta(sim).inventory.findIndex((s) => s.itemId === 'boar_hide'),
     );
     expect(fingerprint(sim)).toBe(before);
-    expect(hasErr(sim.drainEvents(), 'You cannot store quest items in the bank.')).toBe(true);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'You cannot store quest items in the guild bank.')).toBe(true);
+    // Decisive negative: the personal bank's line must NOT be what the guild
+    // pane shows (it names the wrong bank, the defect this arm fixes).
+    expect(hasErr(evs, 'You cannot store quest items in the bank.')).toBe(false);
   });
 
   // The guild bank is an ANONYMOUS EXCHANGE PIPE (officer A deposits, officer B
@@ -921,8 +926,11 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     sim.guildBankWithdrawFor(sim.playerId, 1);
     expect(fingerprint(sim)).toBe(before);
     const evs = sim.drainEvents();
-    expect(hasErr(evs, 'You cannot store soulbound items in the guild bank.')).toBe(true);
-    expect(hasErr(evs, 'That item cannot be stored in the guild bank.')).toBe(true);
+    // The WITHDRAW direction speaks its own line: telling an officer they
+    // "cannot store" a copy already sitting in the book is simply wrong.
+    expect(hasErr(evs, 'That item cannot be withdrawn from the guild bank.')).toBe(true);
+    expect(hasErr(evs, 'You cannot store soulbound items in the guild bank.')).toBe(false);
+    expect(hasErr(evs, 'That item cannot be stored in the guild bank.')).toBe(false);
   });
 
   it('refuses every pipe dimension on WITHDRAW, not just the two sampled ones', () => {
@@ -935,33 +943,49 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
       (id) => ITEMS[id]?.noMarketList && ITEMS[id]?.kind !== 'quest' && !ITEMS[id]?.soulbound,
     );
     if (!questItemId || !noListId) throw new Error('missing pipe-policy fixtures');
+    // Every dimension refuses with the ONE withdraw-direction line (the wording
+    // is direction-aware, the refusal set is not).
+    const out = 'That item cannot be withdrawn from the guild bank.';
     const rows: { slot: Record<string, unknown>; err: string }[] = [
-      { slot: { itemId: questItemId, count: 1 }, err: 'You cannot store quest items in the bank.' },
-      {
-        slot: { itemId: 'reins_grag_bear', count: 1 },
-        err: 'You cannot store soulbound items in the guild bank.',
-      },
-      {
-        slot: { itemId: noListId, count: 1 },
-        err: 'That item cannot be stored in the guild bank.',
-      },
-      {
-        slot: { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } },
-        err: 'That item cannot be stored in the guild bank.',
-      },
-      {
-        slot: { itemId: 'wolf_fang', count: 1, instance: { bindOnTrade: true } },
-        err: 'That item cannot be stored in the guild bank.',
-      },
+      { slot: { itemId: questItemId, count: 1 }, err: out },
+      { slot: { itemId: 'reins_grag_bear', count: 1 }, err: out },
+      { slot: { itemId: noListId, count: 1 }, err: out },
+      { slot: { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } }, err: out },
+      { slot: { itemId: 'wolf_fang', count: 1, instance: { bindOnTrade: true } }, err: out },
     ];
     for (const [i, row] of rows.entries()) {
       book(sim).inventory.push(row.slot as never);
       const before = fingerprint(sim);
       sim.drainEvents();
       sim.guildBankWithdrawFor(sim.playerId, i);
-      expect(fingerprint(sim), row.err).toBe(before);
-      expect(hasErr(sim.drainEvents(), row.err), row.err).toBe(true);
+      expect(fingerprint(sim), JSON.stringify(row.slot)).toBe(before);
+      expect(hasErr(sim.drainEvents(), row.err), JSON.stringify(row.slot)).toBe(true);
     }
+  });
+
+  it('the pipe refusal set is direction-independent; only the wording moves', () => {
+    // The dormant predicate every reader shares is `!== null`, so the two
+    // directions must agree slot for slot even though they word it differently.
+    const questItemId = Object.keys(ITEMS).find((id) => ITEMS[id]?.kind === 'quest');
+    if (!questItemId) throw new Error('missing quest fixture');
+    const refused = [
+      { itemId: questItemId, count: 1 },
+      { itemId: 'reins_grag_bear', count: 1 },
+      { itemId: 'riding_training', count: 1 },
+      { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } },
+      { itemId: 'wolf_fang', count: 1, instance: { bindOnTrade: true } },
+    ];
+    for (const slot of refused) {
+      const dep = guildBankPipeRefusal(slot);
+      const wit = guildBankPipeRefusal(slot, 'withdraw');
+      expect(dep, JSON.stringify(slot)).not.toBeNull();
+      expect(wit, JSON.stringify(slot)).not.toBeNull();
+      expect(wit, JSON.stringify(slot)).toBe('That item cannot be withdrawn from the guild bank.');
+      expect(dep, JSON.stringify(slot)).not.toBe(wit);
+    }
+    // A plain copy is allowed BOTH ways (the vacuity guard).
+    expect(guildBankPipeRefusal({ itemId: 'wolf_fang', count: 1 })).toBeNull();
+    expect(guildBankPipeRefusal({ itemId: 'wolf_fang', count: 1 }, 'withdraw')).toBeNull();
   });
 
   it('a malformed count is silently inert on both item ops (never grants free units)', () => {
@@ -2007,12 +2031,16 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
     if (roll < 0.85) {
       // Withdraw an identity the book actually holds, so the forward replay
       // has something to remove (a missing copy is the DEFICIT arm, covered
-      // separately below).
+      // separately below). A share of these are the OPERATOR removal
+      // (admin_purge), which the machinery must treat exactly like a withdraw:
+      // generating it here puts it under the whole forward/inverse identity
+      // property rather than under one hand-written case.
       const slot = book.inventory[Math.floor(rnd() * book.inventory.length)];
+      const removal = rnd() < 0.25 ? 'admin_purge' : 'withdraw';
       if (!slot) return { ...base, op: 'deposit_gold', copperDelta: 1 };
       return {
         ...base,
-        op: 'withdraw',
+        op: removal,
         itemId: slot.itemId,
         count: 1 + Math.floor(rnd() * slot.count),
         instance: slot.instance ? clone(slot.instance) : null,
@@ -2216,6 +2244,45 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
     expect(small.treasury).toBe(250_000);
   });
 
+  it('an admin_purge is a REMOVAL in the netted replay, never a dropped delta', () => {
+    // The netted form is the escrow merge's rescue path, so a delta it drops
+    // is one the durable row silently keeps while the live book no longer has
+    // it. The operator purge is exactly the delta most likely to be forgotten
+    // here, because it is the only removal a player never dispatched.
+    const purge = (count: number): GuildBankOpDelta => ({
+      op: 'admin_purge',
+      itemId: 'wolf_fang',
+      count,
+      instance: { boundTo: 7 },
+      craftedRecipeId: null,
+      copperDelta: 0,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 0,
+    });
+    const deposit = (count: number): GuildBankOpDelta => ({ ...purge(count), op: 'deposit' });
+    const base = (): GuildBankState => ({
+      treasury: 10_000,
+      inventory: [{ itemId: 'wolf_fang', count: 3, instance: { boundTo: 7 } }],
+      purchasedSlots: 24,
+    });
+    // A lone purge survives netting and removes exactly its copies.
+    const netted = base();
+    expect(applyGuildBankDeltasTo(netted, netGuildBankOpLogForReplay([purge(2)]))).toBeNull();
+    expect(fingerprint(netted)).toBe(
+      fingerprint(
+        (() => {
+          const ordered = base();
+          applyGuildBankDeltasTo(ordered, [purge(2)]);
+          return ordered;
+        })(),
+      ),
+    );
+    expect(netted.inventory).toEqual([{ itemId: 'wolf_fang', count: 1, instance: { boundTo: 7 } }]);
+    // And it nets AGAINST a deposit of the same identity, the same way a
+    // withdraw would: deposit 2 then purge 2 is a no-op on the book.
+    expect(netGuildBankOpLogForReplay([deposit(2), purge(2)])).toEqual([]);
+  });
+
   it('the forward replay of NON-slot deltas is order independent', () => {
     for (let seed = 1; seed <= 300; seed++) {
       const rnd = rngFor(seed + 10_000);
@@ -2356,5 +2423,177 @@ describe('applyGuildBankDeltasTo / revertGuildBankDeltasTo (the forward + invers
       { itemId: 'iron_sword', count: 1 },
       { itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' },
     ]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The operator escape hatch for a DORMANT slot (purgeDormantGuildBankSlot +
+// guildBankInfoForGuild). A slot holding an item a later content change flagged
+// soulbound / noMarketList / transfer-locked is refused in BOTH directions, so
+// no player action can ever clear it and the disband guard refuses forever.
+// This is the remedy, and its scope is the whole point: it must be unable to
+// touch anything a guild could withdraw itself.
+// ---------------------------------------------------------------------------
+
+describe('purgeDormantGuildBankSlot (the admin escape hatch)', () => {
+  const DORMANT = [
+    { itemId: 'reins_grag_bear', count: 1 }, // soulbound def
+    { itemId: 'riding_training', count: 1 }, // noMarketList def
+    { itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } }, // bound copy
+    { itemId: 'wolf_fang', count: 1, instance: { bindOnTrade: true } }, // armed copy
+  ];
+
+  it('removes each dormant dimension and returns the removed copy as evidence', () => {
+    for (const slot of DORMANT) {
+      const sim = makeOfficerSim();
+      book(sim).inventory.push({ itemId: 'wolf_fang', count: 3 }, { ...slot } as never);
+      const removed = sim.purgeDormantGuildBankSlot(GUILD_ID, 1, slot.itemId);
+      expect(removed, JSON.stringify(slot)).toEqual(slot);
+      // Only the dormant slot left; the ordinary stack beside it is untouched.
+      expect(book(sim).inventory).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
+    }
+  });
+
+  it('the returned evidence is a CLONE, not a live reference into the book', () => {
+    const sim = makeOfficerSim();
+    book(sim).inventory.push(
+      { itemId: 'wolf_fang', count: 1, instance: { boundTo: 7 } },
+      { itemId: 'wolf_fang', count: 1, instance: { boundTo: 8 } },
+    );
+    const live = book(sim).inventory[0];
+    const removed = sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'wolf_fang');
+    if (!removed?.instance) throw new Error('expected an instance payload');
+    // Decisive: a live reference would be the SAME object, and mutating the
+    // evidence would reach the payload the surviving book slot still shares.
+    expect(removed).not.toBe(live);
+    expect(removed.instance).not.toBe(live.instance);
+    removed.instance.boundTo = 999;
+    expect(book(sim).inventory[0]).toEqual({
+      itemId: 'wolf_fang',
+      count: 1,
+      instance: { boundTo: 8 },
+    });
+  });
+
+  it('REFUSES when the named itemId does not match the slot (the index-shift guard)', () => {
+    // A purge splices the slot out, so every higher index shifts down by one.
+    // An operator working from a stale listing must not destroy a different
+    // dormant copy than the one they read.
+    const sim = makeOfficerSim();
+    book(sim).inventory.push(
+      { itemId: 'reins_grag_bear', count: 1 },
+      { itemId: 'riding_training', count: 1 },
+    );
+    const before = fingerprint(sim);
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 1, 'reins_grag_bear')).toBeNull();
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 0, '')).toBeNull();
+    expect(fingerprint(sim)).toBe(before);
+    // The matching name still purges.
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 1, 'riding_training')).not.toBeNull();
+  });
+
+  it('REFUSES an ordinary withdrawable slot: this is not a delete-any-item tool', () => {
+    const sim = makeOfficerSim();
+    book(sim).inventory.push(
+      { itemId: 'wolf_fang', count: 5 },
+      { itemId: 'iron_sword', count: 1, craftedRecipeId: 'smith_iron_sword' },
+    );
+    const before = fingerprint(sim);
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'wolf_fang')).toBeNull();
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 1, 'iron_sword')).toBeNull();
+    expect(fingerprint(sim)).toBe(before);
+  });
+
+  it('refuses a missing book, and every out-of-range or malformed index, mutating nothing', () => {
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'reins_grag_bear', count: 1 });
+    const before = fingerprint(sim);
+    for (const bad of [-1, 1, 99, 0.5, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(
+        sim.purgeDormantGuildBankSlot(GUILD_ID, bad, 'reins_grag_bear'),
+        String(bad),
+      ).toBeNull();
+    }
+    expect(fingerprint(sim)).toBe(before);
+    // No book for that guild at all: refuse, never mint one.
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID + 1, 0, 'reins_grag_bear')).toBeNull();
+    expect(sim.guildBanks.has(GUILD_ID + 1)).toBe(false);
+  });
+
+  it('clears the disband guard once the last dormant slot is gone', () => {
+    // The whole reason the hatch exists: guildBankHoldings is the disband
+    // guard's read, and a dormant slot keeps it non-zero forever.
+    const sim = makeOfficerSim({ treasury: 0 });
+    book(sim).inventory.push({ itemId: 'reins_grag_bear', count: 1 });
+    expect(sim.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 1 });
+    expect(sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'reins_grag_bear')).not.toBeNull();
+    expect(sim.guildBankHoldings(GUILD_ID)).toEqual({ copper: 0, items: 0 });
+  });
+
+  it('draws no rng (the purge and the operator read are pure book work)', () => {
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'reins_grag_bear', count: 1 });
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws++;
+    });
+    sim.rng.next();
+    expect(draws).toBe(1); // positive control
+    draws = 0;
+    sim.guildBankInfoForGuild(GUILD_ID);
+    sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'reins_grag_bear'); // the success arm
+    sim.purgeDormantGuildBankSlot(GUILD_ID, 0, 'reins_grag_bear'); // and a refusal
+    expect(draws).toBe(0);
+    sim.rng.setObserver(null);
+  });
+});
+
+describe('guildBankInfoForGuild (the ungated operator read)', () => {
+  it('reads the book by guild id with no proximity, rank, or alive gate', () => {
+    const sim = makeOfficerSim({ treasury: 4_242 });
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 2 });
+    // Degrade every gate the PLAYER read applies: away from the banker, demoted
+    // to member, and dead. The player read goes null; the operator read does not.
+    sim.setPlayerGuildMembership(sim.playerId, { guildId: GUILD_ID, rank: 'member' });
+    const p = sim.entities.get(sim.playerId);
+    if (!p) throw new Error('missing player');
+    p.dead = true;
+    expect(sim.guildBankInfoFor(sim.playerId)).toBeNull();
+    const info = sim.guildBankInfoForGuild(GUILD_ID);
+    expect(info?.treasury).toBe(4_242);
+    expect(info?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
+  });
+
+  it('keeps the REAL instance payload on a dormant slot (the player read projects it)', () => {
+    // The evidence contract: the ledger row for a purge is derived from this
+    // read, so a publicInstanceView projection here would erase exactly the
+    // bind identity an operator needs to reconstruct what was removed.
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { boundTo: 424242 } });
+    expect(sim.guildBankInfoForGuild(GUILD_ID)?.slots[0].instance).toEqual({ boundTo: 424242 });
+    // The player read still projects it away (unchanged behavior).
+    expect(sim.guildBankInfoFor(sim.playerId)?.slots[0].instance).not.toEqual({
+      boundTo: 424242,
+    });
+  });
+
+  it('returns null for a guild with no loaded book (callers fail closed)', () => {
+    const sim = makeOfficerSim();
+    expect(sim.guildBankInfoForGuild(GUILD_ID + 1)).toBeNull();
+  });
+
+  it('never hands out a live reference into the book', () => {
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { boundTo: 7 } });
+    const info = sim.guildBankInfoForGuild(GUILD_ID);
+    const slot = info?.slots[0];
+    if (!slot?.instance) throw new Error('expected an instance payload');
+    slot.count = 9999;
+    slot.instance.boundTo = 999;
+    expect(book(sim).inventory[0]).toEqual({
+      itemId: 'wolf_fang',
+      count: 1,
+      instance: { boundTo: 7 },
+    });
   });
 });

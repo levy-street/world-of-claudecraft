@@ -137,7 +137,7 @@ describe('guild-tab bag click routing (behavioral, real BagsWindow)', () => {
 
   it('each pipe deny voices its exact sim line and dispatches nothing', () => {
     const denies: Array<[string, string]> = [
-      [questId, tSim('error.bankQuestItem')],
+      [questId, tSim('error.guildBankQuestItem')],
       [soulboundId, tSim('error.guildBankSoulbound')],
       [noMarketId, tSim('error.guildBankNoTransfer')],
     ];
@@ -160,7 +160,13 @@ describe('guild-tab bag click routing (behavioral, real BagsWindow)', () => {
     // Key identity alone would pass with a reworded catalog row; the whole
     // point of pre-empting is voicing the EXACT line the sim would refuse
     // with, so pin each key's resolved text to the sim gate's own return.
-    expect(tSim('error.bankQuestItem')).toBe(guildBankPipeRefusal({ itemId: questId, count: 1 }));
+    expect(tSim('error.guildBankQuestItem')).toBe(
+      guildBankPipeRefusal({ itemId: questId, count: 1 }),
+    );
+    // and NOT the personal bank's line, the divergence this pin exists to catch.
+    expect(tSim('error.bankQuestItem')).not.toBe(
+      guildBankPipeRefusal({ itemId: questId, count: 1 }),
+    );
     expect(tSim('error.guildBankSoulbound')).toBe(
       guildBankPipeRefusal({ itemId: soulboundId, count: 1 }),
     );

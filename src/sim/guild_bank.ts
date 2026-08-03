@@ -303,7 +303,14 @@ export function refundGuildCreationFee(ctx: SimContext, pid: number, amount: num
  *  where a LATER rung left it, undoes that rung instead). Those asymmetries
  *  are pinned as explicit cases rather than left to the identity sweep. */
 export interface GuildBankOpDelta {
-  op: 'deposit_gold' | 'withdraw_gold' | 'deposit' | 'withdraw' | 'buy_slots' | 'open_bank';
+  op:
+    | 'deposit_gold'
+    | 'withdraw_gold'
+    | 'deposit'
+    | 'withdraw'
+    | 'buy_slots'
+    | 'open_bank'
+    | 'admin_purge';
   itemId: string | null;
   count: number | null;
   instance: InvSlot['instance'] | null;
@@ -527,10 +534,12 @@ export function applyGuildBankDeltasTo(
       grantMatching(book, d, count);
       continue;
     }
-    // withdraw: the copies must actually be in durable truth. A shortfall
-    // means another officer's un-durable deposit is what this session
-    // consumed, and papering over it is what mints the copy. Counted BEFORE
-    // removing anything, so a refused replay never half-empties a slot.
+    // withdraw (and admin_purge, the operator escape hatch, which removes a
+    // dormant copy exactly the way a withdraw removes a live one): the copies
+    // must actually be in durable truth. A shortfall means another officer's
+    // un-durable deposit is what this session consumed, and papering over it
+    // is what mints the copy. Counted BEFORE removing anything, so a refused
+    // replay never half-empties a slot.
     const held = countMatching(book, d);
     if (held < count) {
       return {
@@ -585,7 +594,10 @@ export function revertGuildBankDeltasTo(
     const count = deltaCount(d);
     if (count === 0) continue;
     if (d.op === 'deposit') removeMatching(book, d, count);
-    else if (d.op === 'withdraw') grantMatching(book, d, count);
+    // A withdraw and an admin_purge both REMOVED a copy, so both are undone by
+    // putting it back. Missing the purge arm here would leave a fenced-out
+    // operator removal live on the book with nothing durable behind it.
+    else if (d.op === 'withdraw' || d.op === 'admin_purge') grantMatching(book, d, count);
   }
 }
 
@@ -640,7 +652,11 @@ export function netGuildBankOpLogForReplay(log: readonly GuildBankOpDelta[]): Gu
       copper += Number(d.copperDelta) || 0;
       continue;
     }
-    if (d.op !== 'deposit' && d.op !== 'withdraw') continue;
+    // admin_purge is a REMOVAL like a withdraw, so it nets with one: dropping
+    // it here would make the netted rescue replay a book that still holds the
+    // purged copy while the live book no longer does, which is the same
+    // divergence the ordered replay exists to refuse.
+    if (d.op !== 'deposit' && d.op !== 'withdraw' && d.op !== 'admin_purge') continue;
     if (typeof d.itemId !== 'string' || d.itemId === '') continue;
     const count = deltaCount(d);
     if (count === 0) continue;
@@ -769,19 +785,32 @@ function requireOfficerBook(ctx: SimContext, meta: PlayerMeta): GuildBankState |
  *  tampered or legacy Phase 3 row can never complete the laundering (such a
  *  copy stays dormant in the book, the items-are-never-destroyed load
  *  philosophy). Returns the refusal line, or null when the slot may move.
+ *
+ *  The WHETHER is direction-independent (the same four dimensions refuse both
+ *  ways, so `!== null` stays the one dormant predicate every reader shares);
+ *  only the WORDING is direction-aware. `dir` defaults to 'deposit', the arm
+ *  every non-withdraw reader (the slot-view projection, the UI parity pin)
+ *  wants. Deposit names the dimension (quest / soulbound / generic, the mail
+ *  noMailQuestItems grouping precedent); WITHDRAW is one line for every
+ *  dimension, because "you cannot STORE that" is simply false when the copy is
+ *  already sitting in the book and the player asked to take it out.
  *  EXPORTED for the UI parity pin only (tests/guild_bank_view.test.ts drives
  *  this and the client-side dormant predicate over the whole item table so a
  *  new refusal dimension cannot silently desync the Guild tab's rendering);
  *  no host calls it directly. */
-export function guildBankPipeRefusal(slot: InvSlot): string | null {
+export function guildBankPipeRefusal(
+  slot: InvSlot,
+  dir: 'deposit' | 'withdraw' = 'deposit',
+): string | null {
   const def = ITEMS[slot.itemId];
-  if (def?.kind === 'quest') return 'You cannot store quest items in the bank.';
+  const quest = def?.kind === 'quest';
+  const refused =
+    quest || !!def?.soulbound || !!def?.noMarketList || isTransferLockedInstance(slot.instance);
+  if (!refused) return null;
+  if (dir === 'withdraw') return 'That item cannot be withdrawn from the guild bank.';
+  if (quest) return 'You cannot store quest items in the guild bank.';
   if (def?.soulbound) return 'You cannot store soulbound items in the guild bank.';
-  if (def?.noMarketList) return 'That item cannot be stored in the guild bank.';
-  if (isTransferLockedInstance(slot.instance)) {
-    return 'That item cannot be stored in the guild bank.';
-  }
-  return null;
+  return 'That item cannot be stored in the guild bank.';
 }
 
 /** Deposit personal copper into the guild treasury. Refuses (never truncates)
@@ -919,8 +948,10 @@ export function guildBankWithdraw(
   if (slotIndex >= book.inventory.length) return;
   // The pipe policy holds on the way OUT too: a tampered or legacy Phase 3 row
   // holding a locked/soulbound copy must never complete a cross-character
-  // transfer; it stays dormant in the book (items are never destroyed).
-  const refusal = guildBankPipeRefusal(book.inventory[slotIndex]);
+  // transfer; it stays dormant in the book (items are never destroyed). The
+  // 'withdraw' arm picks the direction's own wording: a deposit-worded "you
+  // cannot store that" is false for a copy already in the book.
+  const refusal = guildBankPipeRefusal(book.inventory[slotIndex], 'withdraw');
   if (refusal !== null) {
     ctx.error(meta.entityId, refusal);
     return;
@@ -1025,11 +1056,84 @@ export function guildBankInfoFor(ctx: SimContext, pid: number): GuildBankInfo | 
   if (!m || !GUILD_BANK_RANKS.has(m.rank)) return null;
   const book = ctx.guildBanks.get(m.guildId);
   if (!book) return null;
+  return bookSnapshot(book, guildBankSlotView);
+}
+
+/** The one snapshot shape both reads hand back, parameterized ONLY by how a
+ *  slot is viewed. Sharing the body keeps the player read and the operator read
+ *  from drifting in capacity / price / ordering; the slot view is the single
+ *  deliberate difference. */
+function bookSnapshot(book: GuildBankState, view: (slot: InvSlot) => InvSlot): GuildBankInfo {
   return {
     treasury: book.treasury,
-    slots: book.inventory.map(guildBankSlotView),
+    slots: book.inventory.map(view),
     capacity: guildBankCapacity(book),
     purchasedSlots: book.purchasedSlots,
     nextExpansionPrice: guildBankNextExpansionPrice(book),
   };
+}
+
+/** The UNGATED book snapshot for one guild id, for the server's operator path
+ *  (there is no acting player, so there is no proximity / rank / alive gate to
+ *  apply). Null when the guild has no loaded book, exactly like every other
+ *  Phase 3 host seam, so the caller fails closed.
+ *
+ *  Deliberately NOT downgraded to the publicInstanceView projection the player
+ *  read applies to a dormant slot: this read exists so the admin escape hatch's
+ *  ledger row can preserve the REAL instance payload as evidence of what was
+ *  removed, and a projected payload would erase exactly the bind identity an
+ *  operator needs to reconstruct the copy. It is server-only (never an IWorld
+ *  member, so it can never ride the wire to a client) and its slots are
+ *  boundary clones like every other read here: no live reference escapes. */
+export function guildBankInfoForGuild(ctx: SimContext, guildId: number): GuildBankInfo | null {
+  const book = ctx.guildBanks.get(guildId);
+  if (!book) return null;
+  return bookSnapshot(book, cloneInvSlot);
+}
+
+/** The operator escape hatch for a DORMANT guild bank slot: remove exactly one
+ *  slot the anonymous-pipe policy refuses, returning the removed copy (a
+ *  boundary clone) as the evidence the server writes into its ledger row, or
+ *  null when the removal is refused.
+ *
+ *  WHY IT EXISTS: an item a later content update flags soulbound / noMarketList
+ *  / transfer-locked is refused in BOTH directions, so it can never be
+ *  withdrawn, guildBankHoldings stays non-zero forever, and the disband guard
+ *  then refuses forever. No player action can clear it (the v1 limitation
+ *  recorded in docs/guild-bank/state.md); this is the operator remedy.
+ *
+ *  SCOPE, deliberately narrow: it removes ONLY a slot guildBankPipeRefusal
+ *  actually refuses. An ordinary withdrawable copy is refused here (null), so
+ *  the hatch can never become a "delete any guild's items" tool, and an
+ *  operator who wants to remove a live item has to make the guild withdraw it
+ *  the normal way. A missing book, a non-integer or out-of-range index, and a
+ *  healthy slot all refuse without mutating anything.
+ *
+ *  Purge, not mail: the item is removed. Mailing the copy back to its depositor
+ *  needs a depositor identity the book does not keep, and the mail pipe refuses
+ *  the same copy anyway; recorded as a possible follow-up in the packet docs. */
+export function purgeDormantGuildBankSlot(
+  ctx: SimContext,
+  guildId: number,
+  slotIndex: number,
+  expectItemId: string,
+): InvSlot | null {
+  const book = ctx.guildBanks.get(guildId);
+  if (!book) return null;
+  if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= book.inventory.length) {
+    return null;
+  }
+  const slot = book.inventory[slotIndex];
+  // CONFIRMATION TOKEN, not decoration: a purge splices the slot out, so every
+  // higher index shifts down by one, and an operator working from a stale
+  // listing would otherwise destroy a DIFFERENT dormant copy than the one they
+  // read. The caller must name the item it believes sits at that index.
+  if (typeof expectItemId !== 'string' || slot.itemId !== expectItemId) return null;
+  // The one policy gate: only a copy the pipe actually refuses is purgeable.
+  // Direction is irrelevant here (the refusal SET is direction-independent), so
+  // the default read is the right one.
+  if (guildBankPipeRefusal(slot) === null) return null;
+  const removed = cloneInvSlot(slot);
+  book.inventory.splice(slotIndex, 1);
+  return removed;
 }

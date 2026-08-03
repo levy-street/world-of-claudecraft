@@ -3,7 +3,8 @@
 // sim entity count, achieved sim Hz, per-phase loop timing) plus the
 // throughput counters (ws frames handled, inbound frames dropped by cause,
 // flood kicks, input frames proven missed, chat messages, characters
-// created), all registered on the SAME prom-client registry the RED exporter builds
+// created, guild-bank incidents by kind), all registered on the SAME prom-client
+// registry the RED exporter builds
 // (server/http/metrics.ts). Prometheus attaches env / service=game / server_name at
 // scrape time, so nothing here emits those.
 //
@@ -16,14 +17,17 @@
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values are the fixed tick-phase names, the two per-phase stats
-// (p95, max), the two ws directions (in, out), and the fixed six inbound drop
-// causes (WS_DROP_CAUSES). Nothing per-player (account id,
-// character id, name, ip) is ever a label. The tick-phase series count is fixed at
+// (p95, max), the two ws directions (in, out), the fixed inbound drop
+// causes (WS_DROP_CAUSES), and the fixed guild-bank incident kinds
+// (GUILD_BANK_INCIDENTS). Nothing per-player and nothing per-guild (account id,
+// character id, guild id, name, ip) is ever a label. The tick-phase series count is fixed at
 // WOC_TICK_PHASES.length * 2, independent of the profiler's internal phase set.
 
 import { Counter, Gauge, type Registry } from 'prom-client';
 import {
   type GameMetricsCounters,
+  GUILD_BANK_INCIDENTS,
+  type GuildBankIncident,
   WS_DROP_CAUSES,
   type WsDropCause,
   type WsMessageDirection,
@@ -64,6 +68,9 @@ export const WOC_CHAT_MESSAGES_TOTAL = 'woc_chat_messages_total';
 
 /** Total characters successfully created. */
 export const WOC_CHARACTERS_CREATED_TOTAL = 'woc_characters_created_total';
+
+/** Total guild-bank incidents on the dupe-sensitive paths, by kind. */
+export const WOC_GUILD_BANK_INCIDENTS_TOTAL = 'woc_guild_bank_incidents_total';
 
 /**
  * The FIXED set of loop phases surfaced on woc_sim_tick_phase_seconds. These are
@@ -252,6 +259,17 @@ export function registerGameStateMetrics(
     registers: [registry],
   });
 
+  const guildBankIncidents = new Counter({
+    name: WOC_GUILD_BANK_INCIDENTS_TOTAL,
+    help: 'Total guild-bank incidents on the dupe-sensitive paths (escrow save, fence-out, escrow quarantine, reconcile, unloaded book, ledger write), by kind.',
+    labelNames: ['kind'],
+    registers: [registry],
+  });
+  // Same zero-backfill as the drop causes: these series are the ones an
+  // operator alerts on, and an alert rule cannot fire on a series that does
+  // not exist until its first incident.
+  for (const kind of GUILD_BANK_INCIDENTS) guildBankIncidents.inc({ kind }, 0);
+
   return {
     wsMessage(direction: WsMessageDirection): void {
       try {
@@ -293,6 +311,14 @@ export function registerGameStateMetrics(
         charactersCreated.inc();
       } catch {
         // Drop the sample rather than propagate into the create path.
+      }
+    },
+    guildBankIncident(kind: GuildBankIncident): void {
+      try {
+        guildBankIncidents.inc({ kind });
+      } catch {
+        // Drop the sample rather than propagate into the save / reconcile /
+        // ledger path this measures (the whole point of measuring it).
       }
     },
   };

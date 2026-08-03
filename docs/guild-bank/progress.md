@@ -11,6 +11,119 @@
 | Phase 4: UI | Done | 2026-08-02 | 2026-08-02 |
 | Phase 4 QA (final, offers teardown) | Done (PASS-WITH-FOLLOWUPS) | 2026-08-02 | 2026-08-03 |
 | Pricing redesign (user-directed) | Done | 2026-08-03 | 2026-08-03 |
+| Follow-ups (stacked branch, 3 slices) | Done | 2026-08-03 | 2026-08-03 |
+
+## Follow-ups (2026-08-03, branch `feature/guild-bank-followups` off `feature/guild-bank`)
+Three independent slices, one commit each.
+
+- [x] **Slice 1: guild-worded, direction-aware pipe refusals.** The quest refusal reused
+      the PERSONAL bank's line (`error.bankQuestItem`, "in the bank"), which names the
+      wrong bank in the guild pane, and every dimension was deposit-voiced even on the
+      withdraw arm. `guildBankPipeRefusal(slot, dir)` now takes a direction defaulting
+      to `'deposit'`: the refusal SET stays direction-independent (the `!== null` dormant
+      predicate every reader shares is unchanged, pinned by a new test), only the wording
+      moves. New sim_i18n rows `error.guildBankQuestItem` (deposit) and
+      `error.guildBankWithdrawRefused` (all four dimensions on withdraw), each with its
+      five non-Latin M16 fills. The `bags_window.ts` pre-empt moved to the new quest key
+      in the SAME change, and the cross-pin in `tests/bags_guild_deposit_routing.test.ts`
+      now also asserts the personal line is NOT the guild one. Closes the Phase 4 NOTE
+      "withdraw-direction refusal copy is deposit-voiced".
+- [x] **Slice 2: guild bank incident counters** (server-only, no schema change, no player
+      text). Every failure mode on the dupe-sensitive paths reported only through
+      `console.error` / `console.warn`, so it was invisible to production alerting. One
+      closed-vocabulary counter through the existing `gameMetricsCounters` seam:
+      `woc_guild_bank_incidents_total{kind}` over the fixed five `GUILD_BANK_INCIDENTS`
+      (`escrow_save_failed`, `save_fenced_out`, `reconcile`, `book_unloaded`,
+      `ledger_write_failed`), pre-registered at zero like the ws drop causes. Guild id
+      stays in the log line and is NEVER a label (the bounded-cardinality contract).
+      Each increment sits beside its existing loud log, and the escrow-save arm rethrows
+      unchanged. Emission sites: `server/game.ts` (the escrow save `.catch`, the
+      `saved === false` fence-out when books were carried, per-guild in
+      `reconcileUnflushableGuildBooks`, and every "left unloaded" arm in both the boot
+      load and the reconcile reload) plus `server/bank_ledger.ts`
+      (`recordGuildBankDeltas`). Tests drive the real paths in
+      `tests/guild_bank_persistence.test.ts` with a recording sink, with decisive
+      negatives (a failed/fenced save carrying NO book books nothing) and a vacuity
+      guard; the exposition shape is pinned in `tests/server/http/game_metrics.test.ts`.
+- [x] **Slice 3: the admin escape hatch for a dormant slot.** REMEDIES the v1 limitation
+      below: an item a later content change flags soulbound / noMarketList /
+      transfer-locked was refused in both directions, so `guildBankHoldings` stayed
+      non-zero forever and the guild could never disband, with no player action able to
+      clear it.
+      - Sim: `purgeDormantGuildBankSlot(ctx, guildId, slotIndex)` removes exactly one
+        slot `guildBankPipeRefusal` refuses and returns the removed clone as evidence;
+        an ordinary withdrawable copy, a bad index, and a missing book all refuse
+        without mutating. Plus `guildBankInfoForGuild`, the ungated guild-id read,
+        deliberately NOT downgraded to `publicInstanceView` (the projection would erase
+        the very bind identity the evidence row needs); server-only, never IWorld.
+      - Server: `GameServer.adminPurgeGuildBankSlot` runs the removal through
+        `runGuildBankOp`, which was EXTENDED (not duplicated) to take
+        `{ pid } | { guildId }` so the operator path shares the one observed mutation
+        path: same `bank_ledger` row, same per-session unflushed delta the fence-out
+        revert depends on, same fenced escrow save. A fence-out reverts a purge exactly
+        like a withdraw (pinned end to end).
+      - Ledger: new op `admin_purge` (declared in `GuildBankOpDelta`, `GuildBankLedgerOp`,
+        and `BankLedgerRow['op']`, with the sim/server lockstep type pin already in
+        place). It carries item id, count, and the REAL instance payload.
+        `scripts/bank_audit.mjs` gained its four registrations (shape chain, guild-only
+        predicate, item replay as a REMOVAL, excluded from the treasury replay) with a
+        load-bearing control test proving the book stops reconciling without the arm.
+      - Route: `POST /admin/api/guilds/:id/bank/purge-slot`, both dispatch arms (RouteDef
+        + the legacy ladder, the dual-edit rule) over one shared outcome helper, behind
+        the NEW permission `guildbank.purge` (its own permission, not `moderation.act`:
+        it destroys player property, and it is kept out of the moderator and viewer
+        bundles). Surface-inventory row added.
+      - THE CARRIER CONSTRAINT (accepted, documented): books persist only inside a
+        character's fenced escrow transaction (there is no standalone book write by
+        design), so the purge rides a live session of the TARGET GUILD (officer-plus
+        first, any member otherwise). With nobody from the guild online it refuses with
+        `no_carrier` (409) rather than mutating a book it could not persist.
+      - Deferred, recorded here: (a) MAIL DELIVERY of the purged copy back to its
+        depositor: the book keeps no depositor identity and the mail pipe refuses the
+        same copy, so v1 purges; (b) the ADMIN DASHBOARD control: a usable UI needs a
+        guild-bank READ surface the admin API does not have (slot list with indices +
+        dormant flags) plus a confirm flow, which is a second endpoint and a new panel,
+        so the API + tests shipped and the UI is a follow-up. Until it lands an operator
+        discovers slot indices out of band (SQL on `guild_banks`). The six operator error
+        strings already carry their `ADMIN_ERROR_KEYS` matcher rows and English catalog
+        entries so the UI follow-up is drop-in.
+
+- [x] **Slice 3 review pass** (privacy-security-review CHANGES REQUESTED 0 BLOCKING /
+      3 SHOULD-FIX / 8 NIT; architecture-reviewer 0 BLOCKING / 5 SHOULD-FIX / 6 NOTE).
+      Everything BLOCKING/SHOULD-FIX was fixed in the same commit; the theme was that a
+      property-destroying endpoint had WEAKER accountability than the cosmetic rename
+      beside it.
+      - ATTRIBUTION: the `admin_purge` ledger row now books the ACTING OPERATOR's
+        account (`runGuildBankOp`'s operator arm takes `actorAccountId`), not the
+        carrier's owner. Its character column stays the carrier, because the column is
+        NOT NULL and an operator may hold no character; that mixed row is the signal.
+      - AUDIT: a moderation REASON is now required and validated at the same
+        `ADMIN_GUILD_REASON_MAX` bar as the rename, and `recordAdminGuildBankPurge`
+        writes a `guild_moderation_actions` row (`action = 'guild_bank_purge'`, the
+        operator, the reason, and what was removed) so a purge appears in the realm
+        moderation history. That table gained an ADDITIVE `action TEXT NOT NULL DEFAULT
+        'guild_rename'` column (the literal the history union used to hardcode), so
+        every pre-existing row backfills correctly. A failed audit insert cannot
+        un-remove the item, so it is reported as `audited: false`, never thrown.
+      - DURABILITY: the endpoint no longer answers 200 optimistically. It AWAITS the
+        fenced escrow save and confirms the removal survived (a fence-out reverts it),
+        answering 503 `save_failed` otherwise; both the throw arm and the fence-out
+        revert arm are pinned by test.
+      - PERMISSION (the maintainer's design call): `guildbank.purge` moved into
+        `SUPERADMIN_ONLY_PERMISSIONS`, so no dashboard-grantable role reaches it,
+        `admin` included. Easy to relax; an item removed under a too-broad grant cannot
+        be un-destroyed.
+      - INDEX-SHIFT SAFETY (architecture SHOULD-FIX): the request must also name the
+        `itemId` it expects at that index, and the sim refuses on a mismatch. A purge
+        splices the slot out, so every higher index shifts down by one and an operator
+        working from a stale listing could otherwise destroy the wrong dormant copy.
+      - Fail-closed default on the refusal switch (a future reason 500s rather than
+        falling through to the success return); the ladder arm's position AFTER the
+        central permission gate is now source-pinned, as is the fact that both dispatch
+        arms run the ONE shared helper; the whole-item-table dormant parity sweep now
+        exercises BOTH direction arms; the evidence-clone test was made decisive
+        (identity assertions, not just absence); the stale-membership-stamp carrier case
+        is documented and pinned (the carrier is never charged, credited, or named).
 
 ## Pricing redesign (2026-08-03, user-directed)
 - [x] `GUILD_CREATION_FEE_COPPER` 100_000 -> 10_000 (1 gold); pure constant change,

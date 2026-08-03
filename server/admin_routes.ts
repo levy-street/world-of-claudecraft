@@ -41,6 +41,13 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/guilds\/(\d+)\/rename$/,
     permission: 'moderation.act',
   },
+  // The dormant guild bank slot escape hatch: destroys player property, so it
+  // carries its own permission, not moderation.act.
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/guilds\/(\d+)\/bank\/purge-slot$/,
+    permission: 'guildbank.purge',
+  },
 
   { method: 'GET', pattern: '/admin/api/accounts', permission: 'accounts.read' },
   { method: 'GET', pattern: /^\/admin\/api\/accounts\/(\d+)$/, permission: 'accounts.read' },
