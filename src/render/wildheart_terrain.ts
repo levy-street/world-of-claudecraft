@@ -735,6 +735,23 @@ function colorGeometry(geometry: THREE.BufferGeometry, color: number): THREE.Buf
 
 let rimMaterial: THREE.Material | null = null;
 
+export function resetWildheartTerrainProfileCaches(): void {
+  groundMaterials.clear();
+  pathMaterial = null;
+  waterMaterial = null;
+  waterFallbackMaterial = null;
+  arenaMaterial = null;
+  foliageTrunkMaterial = null;
+  foliageDarkMaterial = null;
+  foliageMidMaterial = null;
+  foliageLightMaterial = null;
+  waterfallMaterial = null;
+  waterfallFoamMaterial = null;
+  fireflyMaterials.clear();
+  basinGrassMaterial = null;
+  rimMaterial = null;
+}
+
 // Opaque flat-shaded vertex-color material for the edge-closing geometry (the
 // module's vertexMaterial() is the translucent path overlay, not reusable).
 function rimVertexMaterial(): THREE.Material {

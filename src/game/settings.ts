@@ -433,6 +433,32 @@ export class Settings {
     return { ...this.values };
   }
 
+  /** Validate every value, apply the whole patch, then persist the settings blob once. */
+  patch(patch: Partial<GameSettings>): GameSettings {
+    const staged: Record<string, boolean | number> = {};
+    for (const [key, value] of Object.entries(patch)) {
+      if ((BOOL_KEYS as readonly string[]).includes(key)) {
+        if (typeof value !== 'boolean') {
+          throw new TypeError(`Invalid boolean setting: ${key}`);
+        }
+        staged[key] = value;
+        continue;
+      }
+      if ((NUMERIC_KEYS as readonly string[]).includes(key)) {
+        if (typeof value !== 'number' || !Number.isFinite(value)) {
+          throw new TypeError(`Invalid numeric setting: ${key}`);
+        }
+        staged[key] = clampNumeric(key as NumericSettingKey, value);
+        continue;
+      }
+      throw new TypeError(`Unknown setting: ${key}`);
+    }
+
+    this.values = { ...this.values, ...staged } as GameSettings;
+    this.save();
+    return this.all();
+  }
+
   /** Clamp + store a value; returns the value actually applied. */
   set<K extends NumericSettingKey>(key: K, value: number): number;
   set<K extends BoolSettingKey>(key: K, value: boolean): boolean;

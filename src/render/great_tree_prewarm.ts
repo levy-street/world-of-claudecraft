@@ -23,23 +23,31 @@
 import * as THREE from 'three';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { GFX } from './gfx';
+import { GFX, type GfxSettings } from './gfx';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 /** Same asset the four zone-feature modules clone their giants from. */
 const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
 
 let greatTreeScene: THREE.Group | null = null;
-// GFX.surfaceDetail (high+): below it applySurfaceDetail no-ops, so the
-// decorated clone would compile the same plain programs the foliage prewarm
-// already covers (the round-10 medium regate).
-if (GFX.surfaceDetail) {
-  registerDeferredPreload(() =>
-    loadGltf(GREAT_TREE_URL).then((gltf) => {
+let greatTreeTask: Promise<void> | null = null;
+
+/** Prepare the great-tree prewarm source selected by an explicit target profile. */
+export function prepareGreatTreeProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  if (!target.surfaceDetail || greatTreeScene) return Promise.resolve();
+  if (greatTreeTask) return greatTreeTask;
+  greatTreeTask = loadGltf(GREAT_TREE_URL)
+    .then((gltf) => {
       greatTreeScene = gltf.scene;
-    }),
-  );
+    })
+    .catch((err) => {
+      greatTreeTask = null;
+      throw err;
+    });
+  return greatTreeTask;
 }
+
+registerDeferredPreload(() => prepareGreatTreeProfileAssets(GFX));
 
 // media-manifest coverage hook (tests/render_glb_replacement_assets.test.ts)
 export const greatTreePrewarmPreloadInternalsForTest = { urls: [GREAT_TREE_URL] };

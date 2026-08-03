@@ -114,6 +114,10 @@ interface StationTemplatePart {
 // the 'tools' palette atlas reads as workbench wood).
 const stationMatCache = new Map<string, THREE.Material>();
 
+export function resetStationProfileCaches(): void {
+  stationMatCache.clear();
+}
+
 function stationMaterial(src: THREE.Material): THREE.Material {
   const cached = stationMatCache.get(src.uuid);
   if (cached) return cached;

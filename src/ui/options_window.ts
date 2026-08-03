@@ -23,6 +23,11 @@ import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
 import { GAMEPAD_NONE, gamepadButtonLabel } from '../game/gamepad_map';
 import {
+  GRAPHICS_REBUILD_KEYS,
+  type GraphicsSettingsSnapshot,
+  normalizeGraphicsSettingsSnapshot,
+} from '../game/graphics_rebuild_core';
+import {
   BIND_ACTIONS,
   BIND_CATEGORIES,
   isReservedCode,
@@ -44,7 +49,7 @@ import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import type { FocusTrapHandle } from './focus_manager';
-import type { BugReportHooks, OptionsHooks } from './hud';
+import type { BugReportHooks, GraphicsApplyOutcome, OptionsHooks } from './hud';
 import type { ChatClock } from './hud/chat/chat_timestamp';
 import {
   formatNumber,
@@ -65,6 +70,8 @@ import {
   buildInterfaceControls,
   buildOptionsMenu,
   type ChoiceControl,
+  copyGraphicsDraft,
+  graphicsDraftDirty,
   INTERFACE_TAB_LABEL_KEY,
   INTERFACE_TAB_ORDER,
   type InterfaceTab,
@@ -79,6 +86,7 @@ import {
   type ToggleControl,
   toggleIsOn,
   toggleNextValue,
+  withGraphicsDraft,
 } from './options_view';
 import { PerfOverlaySettingsPanel, type PerfSettingsHost } from './perf_overlay_settings';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
@@ -101,6 +109,12 @@ const BUG_DESC_MAX_LEN = 2000;
 // Full-scale percent for the slider gold-fill gradient (the --range-fill custom
 // property is 0%..100%). Named so the fill math carries no bare literal.
 const RANGE_FILL_FULL_PCT = 100;
+const GRAPHICS_REBUILD_KEY_SET: ReadonlySet<string> = new Set(GRAPHICS_REBUILD_KEYS);
+
+interface NumericChoiceBinding {
+  get(key: NumericSettingKey): number;
+  set(key: NumericSettingKey, value: number): void;
+}
 
 // Endonyms for the in-game language picker; never localized (they render
 // identically in every locale, matching the homepage footer picker), keyed by
@@ -338,6 +352,16 @@ export class OptionsWindow {
   // while every other sub-view stays `block`, so no single string value means
   // "open" any more (the deeds/bank-window precedent for the same reason).
   private opened = false;
+  // Renderer-bound graphics values are edited locally. Closing the Options
+  // window discards these fields without touching Settings or the live renderer.
+  private graphicsDraft: GraphicsSettingsSnapshot | null = null;
+  private graphicsApplied: GraphicsSettingsSnapshot | null = null;
+  private graphicsBusy = false;
+  private graphicsOutcome: GraphicsApplyOutcome | null = null;
+  // Invalidates an async settlement after the window has closed and discarded
+  // its draft. The coordinator still finishes safely; the closed painter simply
+  // does not rebuild hidden DOM with stale local state.
+  private graphicsApplyGeneration = 0;
 
   constructor(private readonly deps: OptionsWindowDeps) {}
 
@@ -371,7 +395,17 @@ export class OptionsWindow {
   // the panel, drop the key-capture + tooltip + perf overlay placement, resume
   // music, and return focus to the opener (WCAG 2.2 AA).
   close(): void {
+    // Keep the submitted draft attached to its single-flight transaction. If
+    // the window closed and reopened mid-swap, a second draft could otherwise
+    // settle against the first transaction's result.
+    if (this.graphicsBusy) return;
+    this.graphicsApplyGeneration += 1;
+    this.graphicsDraft = null;
+    this.graphicsApplied = null;
+    this.graphicsBusy = false;
+    this.graphicsOutcome = null;
     this.opened = false;
+    this.deps.root().removeAttribute('aria-busy');
     this.deps.root().style.display = 'none';
     this.capturingKey = null;
     this.deps.options()?.perfOverlay.setPlacement(false);
@@ -403,6 +437,7 @@ export class OptionsWindow {
 
   private render(): void {
     const el = this.deps.root();
+    if (this.view !== 'graphics') el.removeAttribute('aria-busy');
     // WCAG 2.2 AA: the Esc/options menu is a focus-trapped window, so name the
     // root and give it a dialog role.
     // Name the dialog per sub-view. Every sub-view paints a <span id="options-title">
@@ -556,6 +591,7 @@ export class OptionsWindow {
     controls: OptionsControl[],
     hooks: OptionsHooks,
     rerender: (focusKey?: BoolSettingKey) => void,
+    choiceBinding?: NumericChoiceBinding,
   ): void {
     for (const c of controls) {
       switch (c.control) {
@@ -569,7 +605,7 @@ export class OptionsWindow {
           this.settingBoolToggle(parent, c, hooks, c.rerender ? (key) => rerender(key) : undefined);
           break;
         case 'choice':
-          this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined);
+          this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined, choiceBinding);
           break;
         case 'note':
           this.noteRow(parent, c.textKey);
@@ -726,6 +762,7 @@ export class OptionsWindow {
     c: ChoiceControl,
     hooks: OptionsHooks,
     onChange?: () => void,
+    binding?: NumericChoiceBinding,
   ): void {
     const key = c.key as NumericSettingKey;
     const label = t(c.labelKey);
@@ -741,7 +778,7 @@ export class OptionsWindow {
       // persist half-step values (0.5 = Medium), which rounding would
       // mis-highlight as the next button up. Exact stored values (every
       // historical row) behave exactly as before.
-      const raw = hooks.settings.get(key);
+      const raw = binding?.get(key) ?? hooks.settings.get(key);
       const buttons = [...wrap.querySelectorAll<HTMLButtonElement>('button[data-value]')];
       let current = Number.NaN;
       let bestDistance = Number.POSITIVE_INFINITY;
@@ -769,7 +806,8 @@ export class OptionsWindow {
       btn.setAttribute('aria-label', optionLabel);
       btn.addEventListener('click', () => {
         audio.click();
-        hooks.onSettingChange(key, option.value);
+        if (binding) binding.set(key, option.value);
+        else hooks.onSettingChange(key, option.value);
         sync();
         onChange?.();
       });
@@ -827,18 +865,28 @@ export class OptionsWindow {
   // that view renders (issue 2341), rather than wiping the whole GameSettings
   // object. NoteControl/MusicToggleControl carry no key and are filtered out
   // by optionsControlKeys.
-  private settingsViewFooter(controls: OptionsControl[]): void {
+  private settingsViewFooter(
+    controls: OptionsControl[],
+    resetAction?: (hooks: OptionsHooks, keys: readonly (keyof GameSettings)[]) => void,
+    resetDisabled = false,
+  ): void {
     const el = this.deps.root();
     const keys = optionsControlKeys(controls) as (keyof GameSettings)[];
     const reset = document.createElement('button');
     reset.className = 'btn';
     reset.textContent = t('hud.options.resetToDefaults');
+    reset.disabled = resetDisabled;
     reset.addEventListener('click', () => {
       audio.click();
       const hooks = this.deps.options();
-      hooks?.settings.reset(keys);
+      if (!hooks) return;
+      if (resetAction) {
+        resetAction(hooks, keys);
+        return;
+      }
+      hooks.settings.reset(keys);
       // re-apply only this view's settings to their subsystem, then redraw
-      for (const k of keys) hooks?.onSettingChange(k, hooks.settings.get(k));
+      for (const k of keys) hooks.onSettingChange(k, hooks.settings.get(k));
       this.render();
     });
     const back = document.createElement('button');
@@ -850,38 +898,177 @@ export class OptionsWindow {
   }
 
   // -------------------------------------------------------------------------
-  // Graphics (cluster 3): static WebGL preset as a plain setting value; no
-  // governor read, no effects-quality cutoff.
+  // Graphics (cluster 3): the six renderer-bound choices are a disposable local
+  // draft. Every other row in this panel continues to write live.
   // -------------------------------------------------------------------------
+
+  private ensureGraphicsDraft(hooks: OptionsHooks): GraphicsSettingsSnapshot {
+    if (!this.graphicsDraft || !this.graphicsApplied) {
+      const applied = copyGraphicsDraft(hooks.graphicsApplied());
+      this.graphicsApplied = applied;
+      this.graphicsDraft = copyGraphicsDraft(applied);
+    }
+    return this.graphicsDraft;
+  }
+
+  private graphicsChoiceBinding(hooks: OptionsHooks): NumericChoiceBinding {
+    return {
+      get: (key) => {
+        if (!GRAPHICS_REBUILD_KEY_SET.has(key)) return hooks.settings.get(key);
+        return this.ensureGraphicsDraft(hooks)[key as keyof GraphicsSettingsSnapshot];
+      },
+      set: (key, value) => {
+        if (!GRAPHICS_REBUILD_KEY_SET.has(key)) {
+          hooks.onSettingChange(key, value);
+          return;
+        }
+        const draft = this.ensureGraphicsDraft(hooks);
+        this.graphicsDraft = copyGraphicsDraft({ ...draft, [key]: value });
+        this.graphicsOutcome = null;
+      },
+    };
+  }
+
+  private graphicsDirty(): boolean {
+    return !!(
+      this.graphicsDraft &&
+      this.graphicsApplied &&
+      graphicsDraftDirty(GRAPHICS_REBUILD_KEYS, this.graphicsDraft, this.graphicsApplied)
+    );
+  }
+
+  private settleGraphicsApply(
+    generation: number,
+    submitted: GraphicsSettingsSnapshot,
+    outcome: GraphicsApplyOutcome,
+  ): void {
+    if (generation !== this.graphicsApplyGeneration) return;
+    this.graphicsBusy = false;
+    this.graphicsOutcome = outcome;
+    if (outcome === 'applied' || outcome === 'saved') {
+      this.graphicsApplied = copyGraphicsDraft(submitted);
+      this.graphicsDraft = copyGraphicsDraft(submitted);
+    }
+    if (this.opened && this.view === 'graphics') {
+      this.renderGraphics();
+      this.deps.focusFirstInteractive(
+        this.deps.root(),
+        outcome === 'failed' || outcome === 'fatal' ? '[data-graphics-apply]' : undefined,
+      );
+    }
+  }
+
+  private applyGraphicsDraft(): void {
+    const hooks = this.deps.options();
+    if (!hooks || !this.graphicsDraft || this.graphicsBusy || !this.graphicsDirty()) return;
+    const submitted = copyGraphicsDraft(this.graphicsDraft);
+    const generation = ++this.graphicsApplyGeneration;
+    this.graphicsBusy = true;
+    this.graphicsOutcome = null;
+    this.renderGraphics();
+    // The clicked Apply button is replaced by the busy render and becomes
+    // disabled. Move focus to the first remaining control rather than letting it
+    // fall to <body>; settlement returns it to Retry/Reload when actionable.
+    this.deps.focusFirstInteractive(this.deps.root());
+    void Promise.resolve()
+      .then(() => hooks.applyGraphics(submitted))
+      .then((outcome) => this.settleGraphicsApply(generation, submitted, outcome))
+      .catch(() => this.settleGraphicsApply(generation, submitted, 'failed'));
+  }
+
+  private resetGraphicsDraft(
+    hooks: OptionsHooks,
+    renderedKeys: readonly (keyof GameSettings)[],
+  ): void {
+    const liveKeys = renderedKeys.filter((key) => !GRAPHICS_REBUILD_KEY_SET.has(key));
+    hooks.settings.reset(liveKeys);
+    for (const key of liveKeys) hooks.onSettingChange(key, hooks.settings.get(key));
+    this.graphicsDraft = normalizeGraphicsSettingsSnapshot({});
+    this.graphicsOutcome = null;
+    this.renderGraphics();
+  }
+
+  private graphicsApplyRegion(): HTMLElement {
+    const region = document.createElement('div');
+    region.className = 'graphics-apply';
+    region.setAttribute('aria-busy', String(this.graphicsBusy));
+
+    const status = document.createElement('div');
+    status.className = 'graphics-apply-status';
+    const outcome = this.graphicsOutcome;
+    const alert = outcome === 'failed' || outcome === 'fatal';
+    status.setAttribute('role', alert ? 'alert' : 'status');
+    if (this.graphicsBusy) status.textContent = t('hudChrome.options.graphicsApplying');
+    else if (outcome === 'applied') status.textContent = t('hudChrome.options.graphicsApplied');
+    else if (outcome === 'saved') status.textContent = t('hudChrome.options.graphicsSaved');
+    else if (outcome === 'failed') status.textContent = t('hudChrome.options.graphicsFailed');
+    else if (outcome === 'fatal') status.textContent = t('hudChrome.options.graphicsFatal');
+    else if (this.graphicsDirty()) status.textContent = t('hudChrome.options.graphicsDraftChanged');
+
+    const action = document.createElement('button');
+    action.type = 'button';
+    action.className = 'btn graphics-apply-btn';
+    action.dataset.graphicsApply = '';
+    if (outcome === 'fatal') {
+      action.textContent = t('hudChrome.options.graphicsReload');
+      action.addEventListener('click', () => {
+        audio.click();
+        location.reload();
+      });
+    } else {
+      action.textContent = t(
+        outcome === 'failed'
+          ? 'hudChrome.options.graphicsRetry'
+          : 'hudChrome.options.graphicsApply',
+      );
+      action.disabled = this.graphicsBusy || !this.graphicsDirty();
+      action.addEventListener('click', () => {
+        audio.click();
+        this.applyGraphicsDraft();
+      });
+    }
+    region.append(status, action);
+    return region;
+  }
 
   private renderGraphics(): void {
     const hooks = this.deps.options();
     const body = this.settingsViewShell(t('hud.options.graphics'));
-    const controls = hooks
-      ? buildGraphicsControls(this.settingsSource(hooks), {
-          touch: useTouchInterface(),
-          nativeShell: isNativeAppShell(),
-        })
-      : [];
-    if (hooks) this.applyControls(body, controls, hooks, () => this.renderGraphics());
+    const draft = hooks ? this.ensureGraphicsDraft(hooks) : null;
+    const controls =
+      hooks && draft
+        ? buildGraphicsControls(
+            withGraphicsDraft(this.settingsSource(hooks), GRAPHICS_REBUILD_KEYS, draft),
+            {
+              touch: useTouchInterface(),
+              nativeShell: isNativeAppShell(),
+            },
+          )
+        : [];
+    if (hooks)
+      this.applyControls(
+        body,
+        controls,
+        hooks,
+        () => this.renderGraphics(),
+        this.graphicsChoiceBinding(hooks),
+      );
+    const unavailable = this.graphicsBusy || this.graphicsOutcome === 'fatal';
+    body.inert = unavailable;
+    body.classList.toggle('graphics-controls-disabled', unavailable);
     const el = this.deps.root();
+    if (this.graphicsBusy) el.setAttribute('aria-busy', 'true');
+    else el.removeAttribute('aria-busy');
     const note = document.createElement('div');
     note.className = 'set-note';
     note.textContent = t('hud.options.graphicsNote');
     el.appendChild(note);
-    const reloadNote = document.createElement('div');
-    reloadNote.className = 'set-note';
-    reloadNote.textContent = t('hud.options.graphicsReloadNote');
-    const reload = document.createElement('button');
-    reload.type = 'button';
-    reload.className = 'btn';
-    reload.textContent = t('hud.options.reloadNow');
-    reload.addEventListener('click', () => {
-      audio.click();
-      location.reload();
-    });
-    el.append(reloadNote, reload);
-    this.settingsViewFooter(controls);
+    el.appendChild(this.graphicsApplyRegion());
+    this.settingsViewFooter(
+      controls,
+      (optionsHooks, keys) => this.resetGraphicsDraft(optionsHooks, keys),
+      unavailable,
+    );
   }
 
   // -------------------------------------------------------------------------

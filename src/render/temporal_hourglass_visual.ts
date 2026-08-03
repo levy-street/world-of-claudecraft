@@ -36,40 +36,60 @@ function buildClockTexture(): THREE.DataTexture {
 
 const CLOCK_TEXTURE = buildClockTexture();
 
-const GOLD = surfaceMat({
-  color: 0xd8a83e,
-  emissive: 0x6b3f08,
-  emissiveIntensity: 0.35,
-  roughness: 0.3,
-  metalness: 0.72,
-});
-const GLASS = surfaceMat({
-  color: 0x9befff,
-  emissive: 0x1757a0,
-  emissiveIntensity: 0.38,
-  roughness: 0.08,
-  side: THREE.DoubleSide,
-}).clone();
-GLASS.transparent = true;
-GLASS.opacity = 0.28;
-GLASS.depthWrite = false;
+interface TemporalHourglassMaterials {
+  gold: THREE.Material;
+  glass: THREE.Material;
+  protectiveEnergy: THREE.Material;
+  hostileEnergy: THREE.Material;
+}
 
-const PROTECTIVE_ENERGY = surfaceMat({
-  color: 0x8ff7ff,
-  emissive: 0x20b5ff,
-  emissiveIntensity: 1.2,
-  roughness: 0.22,
-});
-const HOSTILE_ENERGY = surfaceMat({
-  color: 0xff7d9b,
-  emissive: 0xb3206b,
-  emissiveIntensity: 1.2,
-  roughness: 0.22,
-});
+let profileMaterials: TemporalHourglassMaterials | null = null;
+
+function temporalHourglassMaterials(): TemporalHourglassMaterials {
+  if (profileMaterials) return profileMaterials;
+  const glass = surfaceMat({
+    color: 0x9befff,
+    emissive: 0x1757a0,
+    emissiveIntensity: 0.38,
+    roughness: 0.08,
+    side: THREE.DoubleSide,
+  }).clone();
+  glass.transparent = true;
+  glass.opacity = 0.28;
+  glass.depthWrite = false;
+  profileMaterials = {
+    gold: surfaceMat({
+      color: 0xd8a83e,
+      emissive: 0x6b3f08,
+      emissiveIntensity: 0.35,
+      roughness: 0.3,
+      metalness: 0.72,
+    }),
+    glass,
+    protectiveEnergy: surfaceMat({
+      color: 0x8ff7ff,
+      emissive: 0x20b5ff,
+      emissiveIntensity: 1.2,
+      roughness: 0.22,
+    }),
+    hostileEnergy: surfaceMat({
+      color: 0xff7d9b,
+      emissive: 0xb3206b,
+      emissiveIntensity: 1.2,
+      roughness: 0.22,
+    }),
+  };
+  return profileMaterials;
+}
+
+export function resetTemporalHourglassProfileCaches(): void {
+  profileMaterials = null;
+}
 
 /** Small physical hourglass placed at the controlled character's feet. */
 export class TemporalHourglassVisual {
   readonly group = new THREE.Group();
+  private readonly materials = temporalHourglassMaterials();
   private readonly energy: THREE.Group;
   private readonly overheadClock: THREE.Sprite;
   private mode: TemporalHourglassMode | null = null;
@@ -83,7 +103,7 @@ export class TemporalHourglassVisual {
       ['bottom', 0.06],
       ['top', 0.76],
     ] as const) {
-      const base = new THREE.Mesh(BASE_GEOMETRY, GOLD);
+      const base = new THREE.Mesh(BASE_GEOMETRY, this.materials.gold);
       base.name = `temporal-hourglass-${name}`;
       base.position.y = y;
       this.group.add(base);
@@ -91,17 +111,17 @@ export class TemporalHourglassVisual {
 
     for (let index = 0; index < 3; index++) {
       const angle = (index / 3) * Math.PI * 2;
-      const pillar = new THREE.Mesh(PILLAR_GEOMETRY, GOLD);
+      const pillar = new THREE.Mesh(PILLAR_GEOMETRY, this.materials.gold);
       pillar.name = `temporal-hourglass-pillar-${index}`;
       pillar.position.set(Math.cos(angle) * 0.28, 0.41, Math.sin(angle) * 0.28);
       this.group.add(pillar);
     }
 
-    const upperGlass = new THREE.Mesh(GLASS_GEOMETRY, GLASS);
+    const upperGlass = new THREE.Mesh(GLASS_GEOMETRY, this.materials.glass);
     upperGlass.name = 'temporal-hourglass-upper-glass';
     upperGlass.position.y = 0.57;
     this.group.add(upperGlass);
-    const lowerGlass = new THREE.Mesh(GLASS_GEOMETRY, GLASS);
+    const lowerGlass = new THREE.Mesh(GLASS_GEOMETRY, this.materials.glass);
     lowerGlass.name = 'temporal-hourglass-lower-glass';
     lowerGlass.position.y = 0.25;
     lowerGlass.rotation.z = Math.PI;
@@ -109,14 +129,14 @@ export class TemporalHourglassVisual {
 
     this.energy = new THREE.Group();
     this.energy.name = 'temporal-hourglass-energy';
-    const upperSand = new THREE.Mesh(SAND_GEOMETRY, PROTECTIVE_ENERGY);
+    const upperSand = new THREE.Mesh(SAND_GEOMETRY, this.materials.protectiveEnergy);
     upperSand.name = 'temporal-hourglass-upper-sand';
     upperSand.position.y = 0.57;
-    const lowerSand = new THREE.Mesh(SAND_GEOMETRY, PROTECTIVE_ENERGY);
+    const lowerSand = new THREE.Mesh(SAND_GEOMETRY, this.materials.protectiveEnergy);
     lowerSand.name = 'temporal-hourglass-lower-sand';
     lowerSand.position.y = 0.19;
     lowerSand.rotation.z = Math.PI;
-    const ring = new THREE.Mesh(RING_GEOMETRY, PROTECTIVE_ENERGY);
+    const ring = new THREE.Mesh(RING_GEOMETRY, this.materials.protectiveEnergy);
     ring.name = 'temporal-hourglass-ring';
     ring.rotation.x = Math.PI / 2;
     ring.position.y = 0.035;
@@ -146,7 +166,8 @@ export class TemporalHourglassVisual {
     this.mode = mode;
     this.group.visible = mode !== null;
     if (!mode) return;
-    const material = mode === 'protective' ? PROTECTIVE_ENERGY : HOSTILE_ENERGY;
+    const material =
+      mode === 'protective' ? this.materials.protectiveEnergy : this.materials.hostileEnergy;
     for (const child of this.energy.children) (child as THREE.Mesh).material = material;
     this.overheadClock.material.color.setHex(mode === 'protective' ? 0x8ff7ff : 0xff7d9b);
     this.overheadClock.position.y = height + 0.65;

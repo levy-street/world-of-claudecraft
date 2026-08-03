@@ -49,6 +49,41 @@ describe('createBackgroundGpuQueue', () => {
     await expect(later).resolves.toBe('later');
   });
 
+  it('cancels queued work, rejects new work, and quiesces the active unit', async () => {
+    const queue = createBackgroundGpuQueue();
+    const events: string[] = [];
+    let releaseActive!: () => void;
+    const active = queue.run(
+      () =>
+        new Promise<void>((resolve) => {
+          events.push('active:start');
+          releaseActive = resolve;
+        }),
+    );
+    const pending = queue.run(async () => {
+      events.push('pending');
+    });
+    await Promise.resolve();
+
+    const shutdownError = new Error('renderer generation ended');
+    const pendingRejected = expect(pending).rejects.toBe(shutdownError);
+    const shutdown = queue.shutdown(shutdownError).then(() => events.push('shutdown'));
+    expect(queue.shutdown()).toBe(queue.shutdown());
+    await expect(queue.run(async () => {})).rejects.toBe(shutdownError);
+    expect(events).toEqual(['active:start']);
+
+    releaseActive();
+    await Promise.all([active, pendingRejected, shutdown]);
+    expect(events).toEqual(['active:start', 'shutdown']);
+  });
+
+  it('shuts down idempotently while idle', async () => {
+    const queue = createBackgroundGpuQueue();
+    const first = queue.shutdown();
+    expect(queue.shutdown()).toBe(first);
+    await expect(first).resolves.toBeUndefined();
+  });
+
   it('runs higher-priority pending work first and preserves FIFO within a priority', async () => {
     const queue = createBackgroundGpuQueue();
     const events: string[] = [];

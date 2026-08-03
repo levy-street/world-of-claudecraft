@@ -402,6 +402,10 @@ function addBackdrop(group: THREE.Group): void {
 // immutable per the loader cache rule).
 const displayMats = new Map<THREE.Material, THREE.Material>();
 
+export function resetJailSceneProfileCaches(): void {
+  displayMats.clear();
+}
+
 function displayMaterial(src: THREE.Material): THREE.Material {
   let mat = displayMats.get(src);
   if (mat) return mat;

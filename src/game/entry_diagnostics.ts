@@ -57,7 +57,7 @@ export interface EntryDiagnosticsController {
   renderedFrame: (now: number) => void;
   markStable: (message?: string) => void;
   suspend: () => void;
-  resume: () => void;
+  resume: (preset?: number) => void;
   stop: (message?: string) => void;
 }
 
@@ -162,8 +162,9 @@ export function createEntryDiagnosticsController(options: {
       suspended = true;
       persistence.clear();
     },
-    resume(): void {
+    resume(preset): void {
       if (!armed || !suspended) return;
+      if (preset !== undefined) activePreset = preset;
       suspended = false;
       persistence.start(activePreset, wallNow());
       if (lastCheckpoint) {
@@ -209,6 +210,6 @@ export function suspendActiveEntryDiagnostics(): void {
   activeController?.suspend();
 }
 
-export function resumeActiveEntryDiagnostics(): void {
-  activeController?.resume();
+export function resumeActiveEntryDiagnostics(preset?: number): void {
+  activeController?.resume(preset);
 }

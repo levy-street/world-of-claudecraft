@@ -360,12 +360,9 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned: the lockfile leaf is pnpm-lock.yaml after the local-gate-perf migration (previously package-lock.json at 0.33.1),
-      // a hashed input to every GLB source fingerprint, so the town, mailbox and
-      // noticeboard leaves all moved and this composite mints fresh (atop the v0.33
-      // render recovery's renderer integration leaf). Not one pipeline input or
-      // geometry value changed, and no capture was retaken.
-      fingerprint: 'fd1b2a46947d588aa6c0e62a04885a8039ed3fb1c2d1e281342f80168b16d590',
+      // Deliberately re-pinned after the renderer lifecycle and profile-aware
+      // Eastbrook runtime inputs changed. No measured capture was retaken.
+      fingerprint: '2e1377687f4e31d7d71cfcd8c50604dc2124358896abdddeb5b6ff1db92b9534',
       components: {
         captureContract: {
           id: 'polish-v2',

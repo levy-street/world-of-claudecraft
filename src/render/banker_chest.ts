@@ -33,6 +33,11 @@ let loadedBankerChestGltf: THREE.Group | null = null;
 let preparedBankerChestTemplate: THREE.Group | null = null;
 let fallbackBankerChestTemplate: THREE.Group | null = null;
 
+export function resetBankerChestProfileCaches(): void {
+  preparedBankerChestTemplate = null;
+  fallbackBankerChestTemplate = null;
+}
+
 if (typeof window !== 'undefined') {
   registerDeferredPreload(() =>
     loadGltf(BANKER_CHEST_ASSET_URL).then((gltf) => {

@@ -8,7 +8,7 @@ import {
   SKY_ENVIRONMENT_RESPONSE,
   stepEnvironmentBlend,
 } from './environment_transition_core';
-import { GFX } from './gfx';
+import { GFX, type GfxSettings } from './gfx';
 import { skyTexture } from './textures';
 
 // HDRI sky dome. Cloud cover comes from the sky HDRIs themselves; there is
@@ -385,12 +385,18 @@ const hdriStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
 // the zone streaming lane would otherwise pay inside live frames.
 const envHdriStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
 const backdropStore: Partial<Record<SkyKey, THREE.Texture>> = {};
-const skyAssetTasks = new Map<SkyKey, Promise<void>>();
+const skyAssetTasks = new Map<string, Promise<void>>();
 
-export function ensureSkyBiomeAssets(biomes: readonly SkyKey[]): Promise<void> {
-  if (!GFX.standardMaterials) return Promise.resolve();
+export function ensureSkyBiomeAssets(
+  biomes: readonly SkyKey[],
+  target: Readonly<GfxSettings> = GFX,
+): Promise<void> {
+  if (!target.standardMaterials) return Promise.resolve();
+  const hdriUrls = BIOME_HDRI;
+  const backdropUrls = BIOME_BACKDROP;
   const tasks = [...new Set(biomes)].map((biome) => {
-    const existing = skyAssetTasks.get(biome);
+    const taskKey = `${biome}|${hdriUrls[biome]}|${backdropUrls[biome]}`;
+    const existing = skyAssetTasks.get(taskKey);
     if (existing) return existing;
     // Every shipped biome currently uses its HDRI as the sole sky source.
     // Loading an 8k painted backdrop at strength 0 still made Three upload it
@@ -399,11 +405,11 @@ export function ensureSkyBiomeAssets(biomes: readonly SkyKey[]): Promise<void> {
     // available for authored non-zero strengths without fetching dead assets.
     const backdropTask =
       BIOME_BACKDROP_STRENGTH[biome] > 0
-        ? loadTexture(BIOME_BACKDROP[biome], { srgb: true })
+        ? loadTexture(backdropUrls[biome], { srgb: true })
             .then((tex) => {
               tex.wrapS = THREE.RepeatWrapping;
               tex.wrapT = THREE.ClampToEdgeWrapping;
-              const mips = !GFX.constrainedMemory;
+              const mips = !target.constrainedMemory;
               tex.minFilter = mips ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter;
               tex.magFilter = THREE.LinearFilter;
               tex.generateMipmaps = mips;
@@ -412,7 +418,7 @@ export function ensureSkyBiomeAssets(biomes: readonly SkyKey[]): Promise<void> {
             .catch(() => undefined)
         : Promise.resolve();
     const task = Promise.all([
-      loadHdr(BIOME_HDRI[biome]).then((tex) => {
+      loadHdr(hdriUrls[biome]).then((tex) => {
         tex.wrapS = THREE.RepeatWrapping;
         hdriStore[biome] = tex;
       }),
@@ -423,8 +429,13 @@ export function ensureSkyBiomeAssets(biomes: readonly SkyKey[]): Promise<void> {
         envHdriStore[biome] = tex;
       }),
       backdropTask,
-    ]).then(() => undefined);
-    skyAssetTasks.set(biome, task);
+    ])
+      .then(() => undefined)
+      .catch((err) => {
+        skyAssetTasks.delete(taskKey);
+        throw err;
+      });
+    skyAssetTasks.set(taskKey, task);
     return task;
   });
   return Promise.all(tasks).then(() => undefined);
@@ -660,8 +671,12 @@ export function skyBiomesAt(x: number, z: number): readonly SkyKey[] {
   return blend.from === blend.to ? [blend.from] : [blend.from, blend.to];
 }
 
-export function ensureSkyAssetsAt(x: number, z: number): Promise<void> {
-  return ensureSkyBiomeAssets(skyBiomesAt(x, z));
+export function ensureSkyAssetsAt(
+  x: number,
+  z: number,
+  target: Readonly<GfxSettings> = GFX,
+): Promise<void> {
+  return ensureSkyBiomeAssets(skyBiomesAt(x, z), target);
 }
 
 // u offset that moves a given HDRI's sun azimuth onto SUN_ANCHOR's azimuth

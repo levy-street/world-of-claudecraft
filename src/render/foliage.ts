@@ -62,7 +62,12 @@ import {
   parterreBushSpots,
   parterreFlowerTintAt,
 } from './garden_parterre_core';
-import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
+import {
+  configureMaskedDoubleSidedVegetationMaterial,
+  GFX,
+  type GfxSettings,
+  sharedUniforms,
+} from './gfx';
 import {
   type GrassCapCollapseBand,
   grassCapCollapseBand,
@@ -186,17 +191,23 @@ const FOLIAGE_MODEL_URLS_LOW = {
   fern: [`${MODEL_DIR}fern.glb`],
   mushroom: [`${MODEL_DIR}mushroom.glb`],
 };
-const MODEL_URLS = GFX.leanFoliage ? FOLIAGE_MODEL_URLS_LOW : FOLIAGE_MODEL_URLS_HIGH;
+type FoliageModelUrls = typeof FOLIAGE_MODEL_URLS_HIGH;
+
+function foliageModelUrlsFor(target: Pick<GfxSettings, 'leanFoliage'>): FoliageModelUrls {
+  return target.leanFoliage ? FOLIAGE_MODEL_URLS_LOW : FOLIAGE_MODEL_URLS_HIGH;
+}
+
+const foliageModelUrls = (): FoliageModelUrls => foliageModelUrlsFor(GFX);
 
 // Which per-instance collapse window a model's materials take: tree species
 // end at the real-model/impostor swap; everything else (rocks, dressing) runs
 // to the fog cull. Keyed by source URL so a future kit reusing one material
 // name across a tree and a bush still gets each usage its own window.
 const TREE_MODEL_URLS: ReadonlySet<string> = new Set([
-  ...MODEL_URLS.pine,
-  ...MODEL_URLS.oak,
-  ...MODEL_URLS.twisted,
-  ...MODEL_URLS.dead,
+  ...FOLIAGE_MODEL_URLS_HIGH.pine,
+  ...FOLIAGE_MODEL_URLS_HIGH.oak,
+  ...FOLIAGE_MODEL_URLS_HIGH.twisted,
+  ...FOLIAGE_MODEL_URLS_HIGH.dead,
 ]);
 const collapseRoleForUrl = (url: string): CollapseRole =>
   TREE_MODEL_URLS.has(url) ? 'tree' : 'plain';
@@ -204,18 +215,57 @@ const collapseRoleForUrl = (url: string): CollapseRole =>
 // kick off fetches at import; buildFoliage assumes the cache is populated
 const loadedModels = new Map<string, GLTF>();
 const extractedParts = new Map<string, ModelPart[]>();
-for (const urls of Object.values(MODEL_URLS)) {
-  for (const url of urls) {
-    registerDeferredPreload(() =>
-      loadGltf(url).then((g) => {
-        loadedModels.set(url, g);
-        // Packaged iOS: extract now and release the parse rather than holding it
-        // until buildFoliage (same rationale and same tier-safety argument as the
-        // props preload; see the comment there and the 17 Pro 1.54 GB kill).
-        if (GFX.nativeIosMemoryProfile) extractParts(url);
-      }),
-    );
-  }
+const foliageLoadTasks = new Map<string, Promise<void>>();
+
+function prepareFoliageSource(url: string): Promise<void> {
+  if (loadedModels.has(url)) return Promise.resolve();
+  const existing = foliageLoadTasks.get(url);
+  if (existing) return existing;
+  const task = loadGltf(url)
+    .then((gltf) => {
+      loadedModels.set(url, gltf);
+      foliageLoadTasks.delete(url);
+    })
+    .catch((err) => {
+      foliageLoadTasks.delete(url);
+      throw err;
+    });
+  foliageLoadTasks.set(url, task);
+  return task;
+}
+
+/** Prepare the foliage source set selected by an explicit target profile. */
+export function prepareFoliageProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  // Existing extracted URLs belong to the active renderer. Reload their
+  // released source scenes before the coordinator clears derived caches, so
+  // its old-profile rollback arm can still rebuild after a target failure.
+  const urls = new Set([
+    ...Object.values(foliageModelUrlsFor(target)).flat(),
+    ...extractedParts.keys(),
+  ]);
+  return Promise.all([...urls].map(prepareFoliageSource)).then(() => undefined);
+}
+
+const ALL_FOLIAGE_MODEL_URLS = new Set([
+  ...Object.values(FOLIAGE_MODEL_URLS_HIGH).flat(),
+  ...Object.values(FOLIAGE_MODEL_URLS_LOW).flat(),
+]);
+let deferredFoliageModelUrls: ReadonlySet<string> | null = null;
+function deferredFoliageUrlsForBoot(): ReadonlySet<string> {
+  deferredFoliageModelUrls ??= new Set(Object.values(foliageModelUrlsFor(GFX)).flat());
+  return deferredFoliageModelUrls;
+}
+for (const url of ALL_FOLIAGE_MODEL_URLS) {
+  registerDeferredPreload(() => {
+    // Read GFX when the deferred lane opens, after startup safety and device
+    // defaults have settled. Non-target recipes stay cheap no-op tasks.
+    if (!deferredFoliageUrlsForBoot().has(url)) return Promise.resolve();
+    return prepareFoliageSource(url).then(() => {
+      // Packaged iOS still extracts each source as it lands so parsed scenes
+      // do not accumulate before the renderer build.
+      if (GFX.nativeIosMemoryProfile) extractParts(url);
+    });
+  });
 }
 
 // Desaturated biome tints riding instanceColor. The textured models carry
@@ -724,6 +774,13 @@ interface ModelPart {
 // collapse window) with a dressing one
 const materialCache = new Map<string, THREE.Material>();
 
+/** Drop profile-derived foliage parts/materials while retaining source URL recipes. */
+export function resetFoliageProfileCaches(): void {
+  extractedParts.clear();
+  materialCache.clear();
+  farTrunkCache.clear();
+}
+
 function foliageMaterial(
   src: THREE.Material,
   hasVertexColors: boolean,
@@ -1029,16 +1086,17 @@ export function buildFoliageMaterialPrewarmGroup(): THREE.Group {
   };
   // One mesh per material, keyed on the real per-species extracted parts so the
   // geometry attributes (uv / normal / tangent / color) match the live buckets.
+  const modelUrls = foliageModelUrls();
   const speciesUrls = [
-    ...MODEL_URLS.pine,
-    ...MODEL_URLS.oak,
-    ...MODEL_URLS.twisted,
-    ...MODEL_URLS.dead,
-    ...MODEL_URLS.rock,
-    MODEL_URLS.bush[0],
-    MODEL_URLS.bushFlowers[0],
-    MODEL_URLS.fern[0],
-    MODEL_URLS.mushroom[0],
+    ...modelUrls.pine,
+    ...modelUrls.oak,
+    ...modelUrls.twisted,
+    ...modelUrls.dead,
+    ...modelUrls.rock,
+    modelUrls.bush[0],
+    modelUrls.bushFlowers[0],
+    modelUrls.fern[0],
+    modelUrls.mushroom[0],
   ];
   for (const url of speciesUrls) {
     for (const part of extractParts(url)) add(part.geometry, part.material);
@@ -1299,6 +1357,7 @@ function buildTrees(
   registry: BucketMesh[],
   hideRegistry: TreeHideable[],
 ): void {
+  const modelUrls = foliageModelUrls();
   // The Evergarden curates its trees: no random trees or boulders inside a
   // parterre bed, and NO wild pines anywhere on the lawns (kind 'tree' is
   // the pine; the realm keeps its oaks, topiary, and specimen elders)
@@ -1335,7 +1394,7 @@ function buildTrees(
   // shape per species before, and software GL pays per triangle
   const treeVariants = GFX.leanFoliage ? 1 : 2;
   const pineSpec: SpeciesSpec = {
-    sets: MODEL_URLS.pine.map(extractParts),
+    sets: modelUrls.pine.map(extractParts),
     perBucket: treeVariants,
     salt: 51,
     baseScale: 1.1,
@@ -1352,7 +1411,7 @@ function buildTrees(
   // pine. At 6.5x the visible green albedo passed 1.0 (brighter than white)
   // and canopies read as neon lime with no shading left. 1.35x keeps oaks a
   // touch brighter than pine without erasing their lit/shade gradation.
-  const oakSets = MODEL_URLS.oak.map(extractParts);
+  const oakSets = modelUrls.oak.map(extractParts);
   for (const parts of oakSets) {
     for (const part of parts) {
       if (part.isLeaf) (part.material as THREE.MeshStandardMaterial).color.setRGB(1.35, 1.25, 1.1);
@@ -1370,7 +1429,7 @@ function buildTrees(
     farTrunkProxy: true, // oak crowns float without a trunk stand-in
   };
   const twistedSpec: SpeciesSpec = {
-    sets: MODEL_URLS.twisted.map(extractParts),
+    sets: modelUrls.twisted.map(extractParts),
     perBucket: treeVariants,
     salt: 57,
     baseScale: 0.5,
@@ -1381,7 +1440,7 @@ function buildTrees(
     proxyShape: 'twisted',
   };
   const deadSpec: SpeciesSpec = {
-    sets: MODEL_URLS.dead.map(extractParts),
+    sets: modelUrls.dead.map(extractParts),
     perBucket: 1,
     salt: 60,
     baseScale: 0.7,
@@ -1394,7 +1453,7 @@ function buildTrees(
 
   // rocks: 3 single variants + a merged 3-boulder cluster, each in a mossy-top
   // and a snow-dusted colorway (baked vertex colors over the rock texture)
-  const rockParts = MODEL_URLS.rock.map(extractParts);
+  const rockParts = modelUrls.rock.map(extractParts);
   // source rock GLBs ship no COLOR_0, so the cached material resolves with
   // vertexColors:false — but every rock geometry below goes through
   // bakeTopTint (moss/snow vertex colors). Clone with vertexColors on, or
@@ -1740,11 +1799,12 @@ function generateDressing(seed: number): DressingSpot[] {
 }
 
 function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]): void {
+  const modelUrls = foliageModelUrls();
   const kindParts: Record<DressKind, ModelPart[]> = {
-    bush: extractParts(MODEL_URLS.bush[0]),
-    bushFlowers: extractParts(MODEL_URLS.bushFlowers[0]),
-    fern: extractParts(MODEL_URLS.fern[0]),
-    mushroom: extractParts(MODEL_URLS.mushroom[0]),
+    bush: extractParts(modelUrls.bush[0]),
+    bushFlowers: extractParts(modelUrls.bushFlowers[0]),
+    fern: extractParts(modelUrls.fern[0]),
+    mushroom: extractParts(modelUrls.mushroom[0]),
   };
   // Mild dressing lift. Like the oak lift above, the old 6.5x here came from
   // a transparent-texel-diluted atlas average; over visible texels the bush

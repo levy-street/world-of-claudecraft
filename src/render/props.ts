@@ -37,7 +37,7 @@ import {
   isEastbrookRebuildWell,
 } from './eastbrook_town';
 import { indexExactVertexTuples } from './exact_index_geometry';
-import { EMISSIVE_LIGHT, GFX, sharedUniforms, surfaceMat } from './gfx';
+import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
@@ -83,7 +83,7 @@ export interface PropsResult {
   ): void;
 }
 
-const MERGE_BAND_DEPTH = GFX.standardMaterials ? 180 : 90;
+const mergeBandDepth = (): number => (GFX.standardMaterials ? 180 : 90);
 
 // ---------------------------------------------------------------------------
 // Asset registry — loads kick off at module import; main.ts awaits
@@ -357,6 +357,7 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
 type PropKey = keyof typeof PROP_ASSET_DEFS;
 
 const loadedProps = new Map<string, GLTF>();
+const propLoadTasks = new Map<string, Promise<void>>();
 const ALL_PROP_KEYS = Object.keys(PROP_ASSET_DEFS) as PropKey[];
 
 // The props the renderer actually RENDERS at the low graphics tier: a subset, since
@@ -431,31 +432,57 @@ function preloadPropKeys(_importTierStandardMaterials: boolean): Set<PropKey> {
   return new Set<PropKey>(ALL_PROP_KEYS);
 }
 
-// Headless sim/test imports never fetch; the browser kicks loads immediately.
-if (typeof window !== 'undefined') {
-  const preloadKeys = preloadPropKeys(GFX.standardMaterials);
-  for (const [key, def] of Object.entries(PROP_ASSET_DEFS)) {
-    if (!preloadKeys.has(key as PropKey)) continue;
-    registerDeferredPreload(() =>
-      loadGltf(def.url).then((gltf) => {
-        loadedProps.set(key, gltf);
-        // Packaged iOS: extract IMMEDIATELY and release the parse, instead of
-        // holding all 194 parsed scenes until buildProps runs in the Renderer
-        // ctor. Measured on an iPhone 17 Pro, WebContent died at 1.54 GB mid
-        // preload with the renderer never reached, so build-time extraction
-        // never got the chance to release anything; extracting per-prop as it
-        // lands keeps only the float geometry + converted materials resident
-        // (exactly what build-time extraction retains) and frees the parse's
-        // duplicate buffers progressively. Tier-safe HERE ONLY because
-        // nativeIosMemoryProfile derives from hints alone and pins
-        // standardMaterials=false at import AND live resolve, so the converted
-        // material class cannot drift the way an import-time TIER read would
-        // (the farmCrate P0). Also moves the extraction CPU out of the
-        // synchronous scene build, which shortens the entry stall.
-        if (GFX.nativeIosMemoryProfile) propAsset(key as PropKey);
-      }),
-    );
-  }
+let deferredPropKeys: ReadonlySet<PropKey> | null = null;
+function deferredPropKeysForBoot(): ReadonlySet<PropKey> {
+  deferredPropKeys ??= preloadPropKeys(GFX.standardMaterials);
+  return deferredPropKeys;
+}
+
+function profilePropKeys(target: Readonly<GfxSettings>): readonly PropKey[] {
+  return target.standardMaterials ? ALL_PROP_KEYS : LOW_TIER_PROP_KEYS;
+}
+
+function preparePropSource(key: PropKey): Promise<void> {
+  if (loadedProps.has(key)) return Promise.resolve();
+  const existing = propLoadTasks.get(key);
+  if (existing) return existing;
+  const task = loadGltf(PROP_ASSET_DEFS[key].url)
+    .then((gltf) => {
+      loadedProps.set(key, gltf);
+      propLoadTasks.delete(key);
+    })
+    .catch((err) => {
+      propLoadTasks.delete(key);
+      throw err;
+    });
+  propLoadTasks.set(key, task);
+  return task;
+}
+
+/** Prepare the prop source set selected by an explicit target profile. */
+export function preparePropProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  // Existing extracted keys belong to the active renderer. Reload their
+  // released source scenes before the coordinator clears derived caches, so
+  // its old-profile rollback arm can still rebuild after a target failure.
+  const keys = new Set<PropKey>([
+    ...profilePropKeys(target),
+    ...(extractCache.keys() as MapIterator<PropKey>),
+  ]);
+  return Promise.all([...keys].map(preparePropSource)).then(() => undefined);
+}
+
+for (const key of ALL_PROP_KEYS) {
+  registerDeferredPreload(() => {
+    // Resolve GFX when the deferred lane opens, after startup safety and device
+    // defaults have settled. The boot set remains the historical cross-tier
+    // superset; live profile preparation may load only the requested target.
+    if (!deferredPropKeysForBoot().has(key)) return Promise.resolve();
+    return preparePropSource(key).then(() => {
+      // Preserve the packaged-iOS boot path: extract each source as it lands
+      // and release its parsed scene before the renderer build.
+      if (GFX.nativeIosMemoryProfile) propAsset(key);
+    });
+  });
 }
 
 /** Dev-channel residency accounting sources (see assets/residency_budget.ts). */
@@ -535,6 +562,14 @@ interface PropAsset {
 
 const extractCache = new Map<string, PropAsset>();
 const matConvCache = new Map<string, THREE.Material>();
+
+/** Drop profile-derived prop geometry/materials while retaining unresolved source recipes. */
+export function resetPropProfileCaches(): void {
+  extractCache.clear();
+  matConvCache.clear();
+  delvePortalMatCache.clear();
+  drowningVeilMatCache.clear();
+}
 
 /** Kit materials whose NAME marks them as metal (measured across the shipped
  *  kits: MI_Trim_Metal, WornIron, ArmouryMetal, MailboxMetal). Kept in
@@ -1159,7 +1194,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     tmpQuat.setFromEuler(typeof rot === 'number' ? new THREE.Euler(0, rot, 0) : rot);
     if (typeof scale === 'number') tmpScale.setScalar(scale);
     else tmpScale.set(scale[0], scale[1], scale[2]);
-    const band = Math.floor((z - WORLD_MIN_Z) / MERGE_BAND_DEPTH);
+    const band = Math.floor((z - WORLD_MIN_Z) / mergeBandDepth());
     // Split bands into x-halves (the foliage bucket pattern): a world-wide
     // band's bounding sphere always intersects the shadow frustum, so it
     // re-submits into the shadow map every frame; half-bands cull.
@@ -2647,7 +2682,7 @@ function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE
     const material = mesh.material as THREE.Material;
     const worldX = mesh.matrixWorld.elements[12];
     const worldZ = mesh.matrixWorld.elements[14];
-    const band = Math.floor((worldZ - WORLD_MIN_Z) / MERGE_BAND_DEPTH);
+    const band = Math.floor((worldZ - WORLD_MIN_Z) / mergeBandDepth());
     // x-halved like the instance batches above: world-wide merged bands
     // defeat shadow-frustum culling (their bounds always intersect it).
     const key = `${material.uuid}:${mesh.castShadow ? 1 : 0}:${worldX < 0 ? 'w' : 'e'}:${band}`;

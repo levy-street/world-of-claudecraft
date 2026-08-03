@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   clickMoveButtonLabel,
   normalizeClickMoveButton,
@@ -354,6 +354,41 @@ describe('Settings', () => {
     const snap = s.all();
     snap.cameraSpeed = 99;
     expect(s.get('cameraSpeed')).not.toBe(99);
+  });
+
+  it('patches multiple validated settings atomically with one persistence write', () => {
+    const s = new Settings();
+    const write = vi.spyOn(localStorage, 'setItem');
+
+    const applied = s.patch({
+      graphicsPreset: 99,
+      terrainDetail: -1,
+      showFps: true,
+    });
+
+    expect(applied.graphicsPreset).toBe(SETTING_RANGES.graphicsPreset.max);
+    expect(applied.terrainDetail).toBe(SETTING_RANGES.terrainDetail.min);
+    expect(applied.showFps).toBe(true);
+    expect(s.all()).toEqual(applied);
+    expect(write).toHaveBeenCalledTimes(1);
+    expect(new Settings().get('graphicsPreset')).toBe(SETTING_RANGES.graphicsPreset.max);
+  });
+
+  it('rejects an invalid patch without changing memory or persistence', () => {
+    const s = new Settings();
+    const before = s.all();
+    const write = vi.spyOn(localStorage, 'setItem');
+
+    expect(() =>
+      s.patch({
+        cameraSpeed: 0.4,
+        showFps: 'yes' as unknown as boolean,
+      }),
+    ).toThrow(TypeError);
+
+    expect(s.all()).toEqual(before);
+    expect(write).not.toHaveBeenCalled();
+    expect(new Settings().all()).toEqual(before);
   });
 });
 

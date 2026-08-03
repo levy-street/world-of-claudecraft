@@ -115,6 +115,10 @@ const SKIP_PARTS: Partial<Record<CastleKey, RegExp>> = {
 // materials. The clones are module-owned: castle features build once and are
 // never disposed with a view (the lastkeep_dressing shared-material caveat).
 const wornKitMats = new Map<THREE.Material, THREE.Material>();
+
+export function resetCastleFeatureProfileCaches(): void {
+  wornKitMats.clear();
+}
 function wornKitMaterial(src: THREE.Material): THREE.Material {
   if (!GFX.standardMaterials) return src;
   let mat = wornKitMats.get(src);

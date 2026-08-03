@@ -42,6 +42,8 @@ export interface SamplerOnline {
 
 export interface SamplerDeps {
   renderer: SamplerRenderer;
+  /** Mutable-renderer hosts use this getter so an in-place swap is reflected. */
+  getRenderer?: () => SamplerRenderer;
   meter: SamplerMeter;
   /** The online client, or null when running the offline browser world. */
   getOnline: () => SamplerOnline | null;
@@ -90,7 +92,7 @@ export function createMetricsSampler(deps: SamplerDeps): () => MetricsSample {
   const isBackgrounded = deps.isBackgrounded ?? defaultIsBackgrounded;
 
   return (): MetricsSample => {
-    const r = deps.renderer.perfStats();
+    const r = (deps.getRenderer?.() ?? deps.renderer).perfStats();
     const online = deps.getOnline();
     const isOnline = online != null;
     const echo = deps.getEchoMs();

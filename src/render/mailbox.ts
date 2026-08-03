@@ -25,13 +25,29 @@ let preparedMailboxTemplate: THREE.Group | null = null;
 let fallbackMailboxTemplate: THREE.Group | null = null;
 let sharedGlowGeometry: THREE.SphereGeometry | null = null;
 let sharedGlowMaterial: THREE.Material | null = null;
+let mailboxLoadTask: Promise<void> | null = null;
 
-if (typeof window !== 'undefined') {
-  registerDeferredPreload(() =>
-    loadGltf(MAILBOX_ASSET_URL).then((gltf) => {
+export function prepareMailboxProfileAssets(): Promise<void> {
+  if (loadedMailboxGltf) return Promise.resolve();
+  if (mailboxLoadTask) return mailboxLoadTask;
+  mailboxLoadTask = loadGltf(MAILBOX_ASSET_URL)
+    .then((gltf) => {
       loadedMailboxGltf = gltf;
-    }),
-  );
+      mailboxLoadTask = null;
+    })
+    .catch((err) => {
+      mailboxLoadTask = null;
+      throw err;
+    });
+  return mailboxLoadTask;
+}
+
+if (typeof window !== 'undefined') registerDeferredPreload(prepareMailboxProfileAssets);
+
+export function resetMailboxProfileCaches(): void {
+  preparedMailboxTemplate = null;
+  fallbackMailboxTemplate = null;
+  sharedGlowMaterial = null;
 }
 
 function materialTint(material: THREE.Material): THREE.Color {
