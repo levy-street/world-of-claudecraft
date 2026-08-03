@@ -11993,11 +11993,11 @@ export const en: EnTranslations = {
       },
       "q_deepfen_purge": {
         "title": "Back to the Shallows",
-        "text": "Aldric says those idols are cult-make - which means the mudfins are hauling the marsh's old evil up one armful at a time. I will not have it washing onto my causeway. Go back to the shallows and break the dredging for good: 14 more snappers.",
+        "text": "Aldric says those idols are cult-make, which means the mudfins are hauling the marsh's old evil up one armful at a time, and it all funnels through their reed-huts on the shallows. I will not have it washing onto my causeway. Take this firebottle, get right up against each hut, and burn the lot. Five should break their dredging for good.",
         "completion": "Ruthless and thorough. If this marsh ever dries out, there's warden's work waiting for you.",
         "objectives": {
           "0": {
-            "label": "Deepfen Snapper slain"
+            "label": "Murloc huts burned"
           }
         }
       },
@@ -12016,11 +12016,11 @@ export const en: EnTranslations = {
       },
       "q_broodmother": {
         "title": "The Broodmother",
-        "text": "You have seen the webs - now ask yourself what spins cables thick as a man's wrist. The wardens call her the Broodmother, and her clutch hangs over Widow Thicket like a second canopy. Burn through 8 more widows and put the old mother down before that clutch opens.",
+        "text": "You have seen the webs, now ask yourself what spins cables thick as a man's wrist. The wardens call her the Broodmother, and her clutch hangs over Widow Thicket like a second canopy. Smash 8 of her eggs and put the old mother down before the rest can hatch. Mind the clutch, some eggs will not go quietly.",
         "completion": "Dead? Truly dead? Then the thicket is just trees again. The Light bless your blade, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Mirefen Widow slain"
+            "label": "Broodmother eggs destroyed"
           },
           "1": {
             "label": "The Broodmother slain"
@@ -12049,11 +12049,11 @@ export const en: EnTranslations = {
       },
       "q_no_rest": {
         "title": "No Rest in the Reeds",
-        "text": "The rite on those censers binds the drowned to rise wherever the marsh touches them - and the marsh touches everything. There will be no rest in these reeds until the dead outnumber the living. We cannot unmake the rite yet, but we can empty it of soldiers. Lay 14 more of the Drowned Dead to rest.",
-        "completion": "You give the dead more mercy than their masters ever did. Take this - you have more than earned it.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
+        "completion": "You give the dead more mercy than their masters ever did. Take this, you have more than earned it.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "The Drowned Warlord slain"
           }
         }
       },
