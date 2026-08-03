@@ -403,6 +403,7 @@ export const en_XA: AdminTranslations = {
   "moderationHistory.actionRestoreItem": "[Íţéɱ ŕéšţóŕé]",
   "moderationHistory.actionRestoreSlot": "[Šļóţ ŕéšţóŕé]",
   "moderationHistory.actionGuildRename": "[Ĝúíļð ŕéñáɱé]",
+  "moderationHistory.actionGuildBankPurge": "[Ĝúíļð ƀáñķ þúŕĝé]",
   "moderationHistory.actionUnknown": "[Óţĥéŕ áçţíóñ]",
   "moderationHistoryPage.title": "[Ɱóðéŕáţíóñ ĥíšţóŕý]",
   "moderationHistoryPage.hint": "[ļáţéšţ áçţíóñš, ñéŵéšţ ƒíŕšţ]",

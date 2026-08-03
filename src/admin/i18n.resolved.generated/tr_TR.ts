@@ -403,6 +403,7 @@ export const tr_TR: AdminTranslations = {
   "moderationHistory.actionRestoreItem": "Item restore",
   "moderationHistory.actionRestoreSlot": "Slot restore",
   "moderationHistory.actionGuildRename": "Lonca yeniden adlandırma",
+  "moderationHistory.actionGuildBankPurge": "Guild bank purge",
   "moderationHistory.actionUnknown": "Diğer eylem",
   "moderationHistoryPage.title": "Moderasyon geçmişi",
   "moderationHistoryPage.hint": "en son işlemler, en yeniler önce",

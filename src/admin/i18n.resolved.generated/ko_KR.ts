@@ -403,6 +403,7 @@ export const ko_KR: AdminTranslations = {
   "moderationHistory.actionRestoreItem": "Item restore",
   "moderationHistory.actionRestoreSlot": "Slot restore",
   "moderationHistory.actionGuildRename": "길드 이름 변경",
+  "moderationHistory.actionGuildBankPurge": "Guild bank purge",
   "moderationHistory.actionUnknown": "기타 조치",
   "moderationHistoryPage.title": "운영 기록",
   "moderationHistoryPage.hint": "최신 조치를 최근 순으로 표시",

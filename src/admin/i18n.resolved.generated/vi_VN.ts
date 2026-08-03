@@ -403,6 +403,7 @@ export const vi_VN: AdminTranslations = {
   "moderationHistory.actionRestoreItem": "Item restore",
   "moderationHistory.actionRestoreSlot": "Slot restore",
   "moderationHistory.actionGuildRename": "Đổi tên bang hội",
+  "moderationHistory.actionGuildBankPurge": "Guild bank purge",
   "moderationHistory.actionUnknown": "Hành động khác",
   "moderationHistoryPage.title": "Lịch Sử Kiểm Duyệt",
   "moderationHistoryPage.hint": "thao tác mới nhất, mục mới trước",

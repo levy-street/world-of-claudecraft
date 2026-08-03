@@ -1,5 +1,6 @@
 import type { PoolClient } from 'pg';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { GUILD_BANK_PURGE_ACTION } from '../server/admin_db';
 
 const mocks = vi.hoisted(() => ({
   query: vi.fn(),
@@ -545,9 +546,14 @@ describe('recordAdminGuildBankPurge', () => {
 
     const [sql, params] = mocks.query.mock.calls[1];
     expect(sql).toContain('INSERT INTO guild_moderation_actions');
-    expect(sql).toContain("'guild_bank_purge'");
+    // The action kind is BOUND, not inlined, so this row and the dashboard's
+    // label table read the one shared constant (server/admin_db.ts
+    // GUILD_MODERATION_ACTIONS) instead of two copies of a literal.
+    expect(sql).not.toContain("'guild_bank_purge'");
+    expect(params[5]).toBe(GUILD_BANK_PURGE_ACTION);
+    expect(GUILD_BANK_PURGE_ACTION).toBe('guild_bank_purge');
     // old_name and new_name share $3: a purge never renames.
-    expect(sql).toContain("VALUES ($1, $2, 'guild_bank_purge', $3, $3, $4, $5)");
+    expect(sql).toContain('VALUES ($1, $2, $6, $3, $3, $4, $5)');
     expect(params[0]).toBe(913);
     expect(params[2]).toBe('Iron Vanguard');
     // The reason carries what was removed, so the moderation history reads on

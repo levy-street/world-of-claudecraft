@@ -2065,6 +2065,36 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     expect(result.ok && result.carrierCharacterId).toBe(member.characterId);
   });
 
+  it('reports save_failed when the escrow REFUSES the purge, and the copy comes back', async () => {
+    // The other way a purge can fail to land under the escrow design, and the
+    // one the fence-out arm does not cover: the merge replays the admin_purge
+    // as a REMOVAL onto durable truth and finds nothing there to remove (the
+    // copy is live-only), so the whole transaction rolls back, the carrier is
+    // quarantined, and revertOwnGuildBookOps puts the copy back on the live
+    // book. The operator must be told it did not land.
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Officer');
+    officerSetup(server, session);
+    // Live-only on purpose: seatDormant would seat durable truth too.
+    const live = server.sim.guildBanks.get(GUILD_ID);
+    if (!live) throw new Error('missing book');
+    live.inventory.push({ ...DORMANT_SLOT } as never);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const result = await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
+    errSpy.mockRestore();
+    expect(result).toEqual({ ok: false, reason: 'save_failed' });
+    // Reverted, not left removed: the admin_purge delta replays backward
+    // exactly like a player withdraw would.
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([DORMANT_SLOT]);
+    // And the refusal rolled the CHARACTER half back with it, so the carrier is
+    // quarantined and holds no leftover book work.
+    expect(session.escrowQuarantined).toBe(true);
+    expect(session.dirtyGuildBanks.size).toBe(0);
+    expect(session.unflushedGuildBankOps.size).toBe(0);
+    // Durable truth is untouched: nothing was written for a refused escrow.
+    expect(durableBook()).toEqual({ treasury: 100_000, inventory: [], purchasedSlots: 24 });
+  });
+
   it('a STALE membership stamp can still carry, and the carrier is never charged', async () => {
     // The carrier is chosen off the SESSION stamp, so a player kicked from the
     // guild since login can still lend their escrow transaction. That is

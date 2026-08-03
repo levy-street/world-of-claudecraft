@@ -1,4 +1,5 @@
 import type { PoolClient } from 'pg';
+import { GUILD_BANK_PURGE_ACTION } from './admin_db';
 import { bustAdminGuildListReads, normalizeAdminGuildSearch } from './admin_guilds_read';
 import type { AdminGuildSort, AdminGuildSortDirection } from './admin_guilds_sort';
 import { pool } from './db';
@@ -388,7 +389,16 @@ export async function recordAdminGuildBankPurge(input: {
   await pool.query(
     `INSERT INTO guild_moderation_actions
        (guild_id, realm, action, old_name, new_name, reason, admin_account_id)
-     VALUES ($1, $2, 'guild_bank_purge', $3, $3, $4, $5)`,
-    [input.guildId, REALM, name, detail.slice(0, ADMIN_GUILD_REASON_MAX), input.adminAccountId],
+     VALUES ($1, $2, $6, $3, $3, $4, $5)`,
+    [
+      input.guildId,
+      REALM,
+      name,
+      detail.slice(0, ADMIN_GUILD_REASON_MAX),
+      input.adminAccountId,
+      // The shared constant, never a second copy of the literal: the dashboard
+      // label table and the history union key off the same value.
+      GUILD_BANK_PURGE_ACTION,
+    ],
   );
 }

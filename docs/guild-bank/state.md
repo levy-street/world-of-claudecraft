@@ -722,3 +722,14 @@ What remains accepted:
   and stamp nothing (the Phase 2 QA CRITICAL). `sanitizeGuildBankState` does NOT
   filter transfer locks, so any NEW wire surface reading the book must project
   refused slots like `guildBankSlotView` does, not assume the deposit gate.
+- release/v0.34.0 sync (2026-08-03): `GameServer.saveCharacter` is now
+  `Promise<boolean>` (the release's audited GM restores read it). Its contract was
+  WIDENED here rather than narrowed: false means THE BLOB DID NOT PERSIST, which on
+  this branch has three shapes, the lease fence-out (the release's meaning), the
+  escrow refusing a book half, and a quarantined session. Any new caller reading it
+  must treat all three the same way. The same sync's stale-client sweep replaced raw
+  `ITEMS[id]` reads with `knownItemDef(ITEMS, id)` throughout bags/bank; the guild
+  pane's reads follow it. `bagUnknownAction` deliberately offers NOTHING on the Guild
+  tab (a client without the def cannot evaluate the pipe's four refusal dimensions,
+  and a refused copy strands dormant), which is now an explicit arm with its own pin
+  rather than a side effect of the two bank modes being exclusive.

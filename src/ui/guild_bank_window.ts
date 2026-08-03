@@ -45,6 +45,7 @@ import {
 } from './guild_bank_view';
 import { formatMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { tSim } from './sim_i18n';
 import { svgIcon } from './ui_icons';
@@ -93,7 +94,11 @@ export class GuildBankTab {
    *  marker; the opened pane ignores it (snapshot-only enablement). */
   model(): GuildBankViewModel {
     const world = this.deps.world();
-    return buildGuildBankView(world.guildBankInfo, (id) => ITEMS[id], world.copper);
+    // knownItemDef, never a raw ITEMS index: a prototype key ('constructor',
+    // '__proto__') indexes to a truthy Function, which would send an unknown
+    // server item id down the KNOWN arm below. The release's stale-client sweep
+    // made every other bags/bank read go through this; the guild pane follows.
+    return buildGuildBankView(world.guildBankInfo, (id) => knownItemDef(ITEMS, id), world.copper);
   }
 
   /** Append the guild pane sections (capacity, treasury, grid, buy row; for
@@ -277,7 +282,7 @@ export class GuildBankTab {
   }
 
   private buildCell(slot: GuildBankSlotModel): HTMLElement {
-    const item = ITEMS[slot.itemId];
+    const item = knownItemDef(ITEMS, slot.itemId);
     const cell = document.createElement('button');
     cell.type = 'button';
     // Focus keys are BankWindow's business: annotateGuildFocusKeys stamps every
@@ -368,7 +373,7 @@ export class GuildBankTab {
   private showWithdrawQuantityPrompt(slotIndex: number, maxCount: number): void {
     const slot = this.deps.world().guildBankInfo?.slots[slotIndex];
     if (!slot) return;
-    const item = ITEMS[slot.itemId];
+    const item = knownItemDef(ITEMS, slot.itemId);
     const itemName = item ? itemDisplayName(item) : slot.itemId;
     showQuantityPrompt(
       {

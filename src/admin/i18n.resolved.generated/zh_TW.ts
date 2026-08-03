@@ -403,6 +403,7 @@ export const zh_TW: AdminTranslations = {
   "moderationHistory.actionRestoreItem": "Item restore",
   "moderationHistory.actionRestoreSlot": "Slot restore",
   "moderationHistory.actionGuildRename": "公會更名",
+  "moderationHistory.actionGuildBankPurge": "Guild bank purge",
   "moderationHistory.actionUnknown": "其他動作",
   "moderationHistoryPage.title": "管理歷史",
   "moderationHistoryPage.hint": "最新操作，新記錄優先",

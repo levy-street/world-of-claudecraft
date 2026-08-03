@@ -403,6 +403,7 @@ export const ja_JP: AdminTranslations = {
   "moderationHistory.actionRestoreItem": "Item restore",
   "moderationHistory.actionRestoreSlot": "Slot restore",
   "moderationHistory.actionGuildRename": "ギルド名変更",
+  "moderationHistory.actionGuildBankPurge": "Guild bank purge",
   "moderationHistory.actionUnknown": "その他のアクション",
   "moderationHistoryPage.title": "モデレーション履歴",
   "moderationHistoryPage.hint": "最新の操作を新しい順に表示",

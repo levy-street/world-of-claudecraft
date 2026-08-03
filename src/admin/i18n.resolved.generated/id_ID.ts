@@ -403,6 +403,7 @@ export const id_ID: AdminTranslations = {
   "moderationHistory.actionRestoreItem": "Item restore",
   "moderationHistory.actionRestoreSlot": "Slot restore",
   "moderationHistory.actionGuildRename": "Ganti nama guild",
+  "moderationHistory.actionGuildBankPurge": "Guild bank purge",
   "moderationHistory.actionUnknown": "Tindakan lainnya",
   "moderationHistoryPage.title": "Riwayat moderasi",
   "moderationHistoryPage.hint": "tindakan terbaru, yang teranyar lebih dahulu",

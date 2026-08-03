@@ -403,6 +403,7 @@ export const da_DK: AdminTranslations = {
   "moderationHistory.actionRestoreItem": "Item restore",
   "moderationHistory.actionRestoreSlot": "Slot restore",
   "moderationHistory.actionGuildRename": "Laug omdøbt",
+  "moderationHistory.actionGuildBankPurge": "Guild bank purge",
   "moderationHistory.actionUnknown": "Anden handling",
   "moderationHistoryPage.title": "Moderationshistorik",
   "moderationHistoryPage.hint": "Seneste handlinger, nyeste først",

@@ -403,6 +403,7 @@ export const en: AdminTranslations = {
   "moderationHistory.actionRestoreItem": "Item restore",
   "moderationHistory.actionRestoreSlot": "Slot restore",
   "moderationHistory.actionGuildRename": "Guild rename",
+  "moderationHistory.actionGuildBankPurge": "Guild bank purge",
   "moderationHistory.actionUnknown": "Other action",
   "moderationHistoryPage.title": "Moderation history",
   "moderationHistoryPage.hint": "latest actions, newest first",

@@ -403,6 +403,7 @@ export const ru_RU: AdminTranslations = {
   "moderationHistory.actionRestoreItem": "Item restore",
   "moderationHistory.actionRestoreSlot": "Slot restore",
   "moderationHistory.actionGuildRename": "Переименование гильдии",
+  "moderationHistory.actionGuildBankPurge": "Guild bank purge",
   "moderationHistory.actionUnknown": "Другое действие",
   "moderationHistoryPage.title": "История модерации",
   "moderationHistoryPage.hint": "последние действия, новые в начале",

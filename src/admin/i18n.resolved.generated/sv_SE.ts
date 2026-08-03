@@ -403,6 +403,7 @@ export const sv_SE: AdminTranslations = {
   "moderationHistory.actionRestoreItem": "Item restore",
   "moderationHistory.actionRestoreSlot": "Slot restore",
   "moderationHistory.actionGuildRename": "Gillesnamn ändrat",
+  "moderationHistory.actionGuildBankPurge": "Guild bank purge",
   "moderationHistory.actionUnknown": "Annan åtgärd",
   "moderationHistoryPage.title": "Modereringshistorik",
   "moderationHistoryPage.hint": "Senaste åtgärderna, nyaste först",

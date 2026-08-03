@@ -403,6 +403,7 @@ export const cs_CZ: AdminTranslations = {
   "moderationHistory.actionRestoreItem": "Item restore",
   "moderationHistory.actionRestoreSlot": "Slot restore",
   "moderationHistory.actionGuildRename": "Přejmenování cechu",
+  "moderationHistory.actionGuildBankPurge": "Guild bank purge",
   "moderationHistory.actionUnknown": "Jiná akce",
   "moderationHistoryPage.title": "Historie moderace",
   "moderationHistoryPage.hint": "Nejnovější akce jako první",
