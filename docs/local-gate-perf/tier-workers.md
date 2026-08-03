@@ -28,8 +28,8 @@ Classification for baselines also lives in `classifyMachineTier`
 
 | Variable | Effect |
 |---|---|
-| (unset) | CPU/2 and free-mem clamp only |
-| `GATE_WORKER_TIER=low` | Cap workers at **2** after the free-mem clamp |
+| (unset) | CPU/2 and available-memory clamp only |
+| `GATE_WORKER_TIER=low` | Cap workers at **2** after the available-memory clamp |
 | `GATE_WORKER_TIER=medium` | Cap at **4** after the clamp |
 | `GATE_WORKER_TIER=high` | Cap at **8** after the clamp |
 | `GATE_MAX_WORKERS=<n>` | **Expert absolute override** (bypasses heuristic and tier cap). Use when you deliberately share a machine (lower n) or you know freemem is solid (raise n). Invalid values fall back to the heuristic. |
@@ -83,6 +83,8 @@ Full OS status matrix (verified / smoke / untested) and the contributor
 
 ## What not to do
 
-- Do not remove or bypass the free-mem clamp in `computeGateWorkers` to chase wall time.
+- Do not remove or bypass the available-memory clamp in `computeGateWorkers` to chase wall
+  time. Widening the SENSOR (`scripts/lib/gate_memory.mjs`) is the supported way to fix a
+  platform where the reading is wrong; the clamp itself stays.
 - Do not document `gate:fast` as the only or default pre-merge check.
 - Do not raise CI shard count or weaken `.githooks/pre-push` from this packet without owner sign-off (see `state.md` OPEN items).

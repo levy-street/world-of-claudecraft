@@ -56,7 +56,7 @@ must go through pnpm**.
 1. **Iterating on code?** `gate:fast`. Green fast path alone never means "done".
 2. **About to merge or claim done?** `gate` (full).
 3. **Machine feels thrashy / many agent worktrees?** set `GATE_WORKER_TIER=low`
-   (cap 2) or `GATE_MAX_WORKERS=n`. Never remove the free-mem clamp.
+   (cap 2) or `GATE_MAX_WORKERS=n`. Never remove the available-memory clamp.
 4. **Only want tests for one source file?** `test:related -- <file>`.
 5. **Experimental turbo-test / Bun?** not default; see Phase 10; do not use for
    merge signal.
@@ -90,7 +90,7 @@ Status key:
 
 | OS | Overall | Evidence | Known issues / gaps |
 |---|---|---|---|
-| **macOS** (darwin arm64) | **verified** | All packet phases on M1 (Fernando high-tier); gate:fast + gate_profile + pnpm + turbo | Multi-worktree freemem clamp is the usual limiter, not CPU |
+| **macOS** (darwin arm64) | **verified** | All packet phases on M1 (Fernando high-tier); gate:fast + gate_profile + pnpm + turbo | Availability now comes from `vm_stat` (`scripts/lib/gate_memory.mjs`); before that, `os.freemem()` read near zero on a healthy host and made the clamp, not CPU, the limiter |
 | **Linux** (x64) | **smoke** via CI | `.github/workflows/ci.yml` `runs-on: ubuntu-latest`; pnpm frozen install, 8-way vitest shards, builds, types | No dedicated local Linux wall in this packet; CI is sharded (local full gate is unsharded by design) |
 | **Windows** (win32) | **smoke** (code review + prior shell policy) | `shell: process.platform === 'win32'` in gate, gate_fast, gate_profile, pretest; path normalize `\` -> `/` in `gate_fast_plan`; hoisted pnpm for fewer symlink needs | **No Windows host run this packet.** Defender can slow installs. Prefer PowerShell/cmd env syntax. Optional: Defender exclusion on pnpm store. Git Bash generally works. |
 

@@ -24,6 +24,7 @@ import {
   GATE_FAST_STEP_NAMES,
   resolveFastChangedBase,
 } from './lib/gate_fast_plan.mjs';
+import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
 import {
   computeGateWorkers,
   parseGateWorkerTier,
@@ -38,7 +39,12 @@ const tier = parseGateWorkerTier(tierRaw);
 const tierCap = resolveGateWorkerTierCap(tierRaw);
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),
-  freeMemBytes: os.freemem(),
+  // See lib/gate_memory.mjs: os.freemem() under-reports availability on macOS and used to
+  // pin this day-loop path to a single worker too.
+  freeMemBytes: resolveAvailableMemoryBytes({
+    platform: process.platform,
+    freeMemBytes: os.freemem(),
+  }),
   envOverride: process.env.GATE_MAX_WORKERS,
   tierCap,
 });
