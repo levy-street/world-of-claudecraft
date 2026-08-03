@@ -18,7 +18,7 @@
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values here are the ws-message direction (a fixed two), the
 // inbound drop cause (the fixed seven-value WS_DROP_CAUSES set), the guild-bank
-// incident kind (the fixed seven-value GUILD_BANK_INCIDENTS set), the copper-flow
+// incident kind (the fixed nine-value GUILD_BANK_INCIDENTS set), the copper-flow
 // source, the harvest band and node tier (the fixed sets in
 // server/economy_telemetry.ts), and the fishing band and rod recipe id (the
 // fixed sets in server/fishing_telemetry.ts, whose zone label reuses the same
@@ -54,18 +54,31 @@ export const WS_DROP_CAUSES = [
 export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
 
 /**
- * The fixed seven guild-bank incident kinds. Every one of these is an abnormal
+ * The fixed nine guild-bank incident kinds. Every one of these is an abnormal
  * event on a DUPE-SENSITIVE path (the escrow save, the lease fence-out revert,
  * the reconcile, the durable-truth read, the keep-forever ledger) that
  * otherwise reports only through console.error / console.warn, i.e. it is
  * invisible to production alerting:
- * - `escrow_save_failed`: a save carrying at least one guild book failed, so
- *   the character half AND the book half rolled back. Both ways in count: the
- *   db layer threw, or the escrow merge REFUSED a book half because this
- *   session consumed value durable truth never held (GuildBankEscrowRefused).
- *   The live sim is ahead of durable truth until a later save or a reconcile
- *   lands. A refusal that resolves on the retry is normal concurrency, so the
- *   rate matters here, not the first sample.
+ * - `escrow_save_failed`: a save carrying at least one guild book FAILED, so
+ *   the character half AND the book half rolled back and nothing this session
+ *   did since its last save is durable. Two ways in: the db layer threw (a
+ *   transport fault), or the escrow merge refused a book half and that refusal
+ *   was TERMINAL (see escrow_quarantined). The live sim is ahead of durable
+ *   truth until a later save or a reconcile lands.
+ *   Deliberately NOT counted for a refusal that will be RETRIED: that is
+ *   ordinary concurrency between two officers of one guild, it happens on a
+ *   healthy realm, and folding it in here made `> 0` alerting useless. It is
+ *   `escrow_refused_retry` below instead. This counter being non-zero means
+ *   something actually went wrong.
+ * - `escrow_refused_retry`: the escrow merge refused a book half because
+ *   another session still holds unflushed work for that guild, so the save is
+ *   retried once their commit makes the replay applicable (which the refusal
+ *   immediately flushes for). NORMAL CONCURRENCY, not a failure: nothing was
+ *   consumed, the marks and the log are exactly as they were, and the ordinary
+ *   case clears in a round trip. Counted per GUILD (the unit the retry applies
+ *   to), like `reconcile`. Watch its RATE, not its presence: a sustained climb
+ *   means officers are contending faster than the flush resolves, and the
+ *   terminal arm it precedes is `escrow_quarantined`.
  * - `save_fenced_out`: that same save matched no row (a same-account takeover
  *   rotated the character lease), so the carried books need reconciling.
  * - `escrow_quarantined`: a refusal ran out of retries, or nothing could ever
@@ -90,21 +103,29 @@ export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
  *   columns exist to make visible, and no legitimate op can produce it. Paged
  *   on alongside `escrow_quarantined`: a single sample is a defect, not a
  *   transient.
+ * - `counterparty_unstamped`: a guild bank_ledger row was written with NO
+ *   counterparty side at all. Its NULL columns are indistinguishable from a
+ *   pre-feature row, so the audit will skip that op forever: the convention
+ *   that "NULL means written before the columns existed" is only a convention,
+ *   and this is what makes a live write site breaking it visible instead of
+ *   silent. A single sample is a defect.
  * This closed set IS the kind label's whole vocabulary; it never grows
  * per-guild or per-player (guild id is NEVER a label; the loud log line beside
  * each increment carries the identifying detail).
  */
 export const GUILD_BANK_INCIDENTS = [
   'escrow_save_failed',
+  'escrow_refused_retry',
   'save_fenced_out',
   'escrow_quarantined',
   'reconcile',
   'book_unloaded',
   'ledger_write_failed',
   'counterparty_orphan',
+  'counterparty_unstamped',
 ] as const;
 
-/** One of the fixed seven guild-bank incident kinds. */
+/** One of the fixed nine guild-bank incident kinds. */
 export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
 
 /**

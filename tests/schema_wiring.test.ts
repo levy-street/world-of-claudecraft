@@ -256,6 +256,16 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS bank_ledger');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS bank_ledger_character');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS bank_ledger_created');
+    // The counterparty (payer/payee) half of every guild row, added at boot on
+    // existing databases. Pinned BY NAME, not only by the additive-style scan
+    // below: deleting either statement would leave the scan perfectly happy
+    // while every guild op silently became unauditable.
+    expect(applied).toContain(
+      'ALTER TABLE bank_ledger ADD COLUMN IF NOT EXISTS counterparty_copper_delta BIGINT',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE bank_ledger ADD COLUMN IF NOT EXISTS counterparty_count INT',
+    );
     // Additive-only style within the two new blocks: inside the ONE core-SCHEMA
     // query call, slice from each CREATE TABLE to the next CREATE TABLE (or the end
     // of that call for the last table) and assert nothing destructive or

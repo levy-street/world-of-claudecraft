@@ -350,6 +350,20 @@ export function recordGuildBankDeltas(
 ): void {
   try {
     for (const delta of deltas) {
+      // The nullable counterparty columns rest entirely on "NULL can only ever
+      // mean a row written before they existed". Nothing in the schema enforces
+      // that: the fields are optional on BankOpDelta and the insert coerces
+      // undefined to NULL, so a future guild write site that forgets to stamp
+      // would put an indistinguishable NULL into a KEEP-FOREVER table, and the
+      // audit would skip that op forever without anybody knowing. Make the
+      // convention self-detecting rather than merely documented: an unstamped
+      // guild delta is counted and logged at the moment it is written.
+      if (delta.counterpartyCopperDelta == null && delta.counterpartyCount == null) {
+        gameMetricsCounters().guildBankIncident('counterparty_unstamped');
+        console.error(
+          `bank_ledger guild ${op} row for guild ${guildId} (character ${who.characterId}) carries NO counterparty side: the audit can never balance this op, and its NULL is indistinguishable from a pre-feature row`,
+        );
+      }
       tail = tail
         .then(() =>
           insertBankLedgerRow({
@@ -539,7 +553,7 @@ export function recordGuildBankCounterpartyOrphan(
 // newborn guild has no expansions. copper_delta is the negated copper the
 // founder's PURSE paid (never treasury copper), so the audit script excludes
 // create_fee from the treasury replay.
-export function guildCreateFeeDelta(chargedCopper: number): BankOpDelta {
+export function guildCreateFeeDelta(chargedCopper: number, pursePaid: number): BankOpDelta {
   return {
     itemId: null,
     count: null,
@@ -547,13 +561,14 @@ export function guildCreateFeeDelta(chargedCopper: number): BankOpDelta {
     copperDelta: -chargedCopper,
     purchasedSlotsBefore: 0,
     purchasedSlotsAfter: 0,
-    // The counterparty IS the founder's purse, and `chargedCopper` is what the
-    // gate actually took from it (the reserve-at-gate charge, re-read from the
-    // reservation, never a client number), so the two columns agree by
-    // construction on a correct charge: the book gained nothing, the purse
-    // paid the fee, and the fee left the world. A row where they DISAGREE is a
-    // founder who paid a different amount than the fee that was recorded.
-    counterpartyCopperDelta: -chargedCopper,
+    // `pursePaid` is an INDEPENDENT MEASUREMENT, not a restatement of
+    // chargedCopper: the gate snapshots the founder's purse either side of the
+    // charge and passes what it actually observed leaving. Deriving it from
+    // chargedCopper instead would make the balance identity algebraically zero
+    // for every input, i.e. a check that cannot fail, which is worse than no
+    // check because it reads as coverage. As two measurements, a charge the
+    // sim reported taking but the purse never gave up is a finding.
+    counterpartyCopperDelta: pursePaid,
     counterpartyCount: 0,
   };
 }

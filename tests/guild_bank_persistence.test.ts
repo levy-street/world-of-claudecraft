@@ -1799,8 +1799,45 @@ describe('guild bank incident counters at their real emission sites', () => {
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     await priv(server).saveCharacter(session);
     errSpy.mockRestore();
+    // escrow_save_failed is booked on this TERMINAL arm (the save really did
+    // fail for good), not at the throw site, so a refusal that merely retries
+    // never reaches it.
     expect(rec.kinds).toEqual(['escrow_save_failed', 'escrow_quarantined', 'reconcile']);
     expect(session.escrowQuarantined).toBe(true);
+  });
+
+  it('counts escrow_refused_retry, and NOT escrow_save_failed, on a retried refusal', async () => {
+    // ORDINARY CONCURRENCY between two officers of one guild: the refusal
+    // resolves as soon as the other session commits, nothing was consumed, and
+    // the marks and log are exactly as they were. Sharing escrow_save_failed
+    // made that counter useless for `> 0` alerting, which is the whole point of
+    // the split, so this test's decisive assertion is the ABSENCE of
+    // escrow_save_failed, not only the presence of the new kind.
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Waiter');
+    const { session: other } = joinServer(server, 2, 'Holder');
+    officerSetup(server, session);
+    moveToBanker(server, other.pid);
+    server.sim.setPlayerGuildMembership(other.pid, { guildId: GUILD_ID, rank: 'officer' });
+    const otherMeta = server.sim.players.get(other.pid);
+    if (!otherMeta) throw new Error('missing meta');
+    otherMeta.copper = 500_000;
+    // The other officer deposits and does NOT flush: durable truth is behind
+    // the live book by exactly their deposit.
+    dispatch(server, other, { cmd: 'guild_bank_deposit_gold', amount: 50_000 });
+    expect(other.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
+    // This officer consumes value durable truth does not hold yet, so its own
+    // escrow replay is refused until the other one commits.
+    dispatch(server, session, { cmd: 'guild_bank_withdraw_gold', amount: 120_000 });
+    const rec = recordingIncidents();
+    setGameMetricsCounters(rec.sink);
+    await priv(server).saveCharacter(session);
+    expect(rec.kinds).toEqual(['escrow_refused_retry']);
+    expect(rec.kinds).not.toContain('escrow_save_failed');
+    // Nothing was consumed: the mark and the unflushed log survive for the retry.
+    expect(session.escrowQuarantined).toBe(false);
+    expect(session.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
+    expect(session.unflushedGuildBankOps.get(GUILD_ID)?.length).toBe(1);
   });
 
   it('counts book_unloaded once per guild the BOOT load leaves unloaded', async () => {

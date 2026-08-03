@@ -319,6 +319,10 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     // alert on, so a rename must fail here rather than silently retire a rule.
     expect(GUILD_BANK_INCIDENTS).toEqual([
       'escrow_save_failed',
+      // A refusal that will RETRY is ordinary concurrency, not a failure, and
+      // it has its own kind so an operator alerting on escrow_save_failed > 0
+      // is not drowned in it.
+      'escrow_refused_retry',
       'save_fenced_out',
       'escrow_quarantined',
       'reconcile',
@@ -327,6 +331,9 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       // A guild bank op that moved a purse while the book stood still: the
       // dupe signature the bank_ledger counterparty columns exist to surface.
       'counterparty_orphan',
+      // A guild row written with no counterparty side at all, whose NULL would
+      // otherwise be indistinguishable from a pre-feature row forever.
+      'counterparty_unstamped',
     ]);
 
     // Scrape BEFORE any increment: an alert rule cannot fire on a series that

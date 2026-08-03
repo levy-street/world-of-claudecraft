@@ -76,6 +76,7 @@ import {
   bankLedgerIdle,
   GUILD_BANK_COUNTERPARTY_ORPHAN_OP,
   GUILD_BANK_ESCROW_DEFICIT_OP,
+  recordGuildBankDeltas,
 } from '../server/bank_ledger';
 import { type ClientSession, GameServer } from '../server/game';
 import {
@@ -182,6 +183,33 @@ describe('stampCounterpartyDeltas (pure)', () => {
     expect(deltas[0]).toMatchObject({ counterpartyCopperDelta: 0, counterpartyCount: -9 });
   });
 
+  it('RETURNS the undrained remainder rather than dropping it', () => {
+    // Movement no delta claimed balances every written row by construction and
+    // would leave no trace at all: the same invisible purse/book crossing this
+    // feature exists to surface, arriving from the other side. The caller gives
+    // it the orphan treatment, so the stamp must hand it back.
+    const deltas: CounterpartyStampTarget[] = [{ itemId: 'wolf_fang' }];
+    const left = stampCounterpartyDeltas(
+      deltas,
+      counterpartyMovement(
+        actor(0, [{ itemId: 'wolf_fang', count: 4 }]),
+        actor(0, [{ itemId: 'copper_ore', count: 9 }]),
+      ),
+    );
+    expect(deltas[0].counterpartyCount).toBe(-4);
+    expect([...left.items.entries()]).toEqual([['copper_ore', 9]]);
+    expect(counterpartyIdle(left)).toBe(false);
+  });
+
+  it('returns an IDLE remainder when every movement was claimed', () => {
+    const deltas: CounterpartyStampTarget[] = [{ itemId: 'wolf_fang' }];
+    const left = stampCounterpartyDeltas(
+      deltas,
+      counterpartyMovement(actor(500, [{ itemId: 'wolf_fang', count: 4 }]), actor(200, [])),
+    );
+    expect(counterpartyIdle(left)).toBe(true);
+  });
+
   it('DRAINS the movement, so two rows can never book one purse movement twice', () => {
     // A guild op produces exactly one delta in practice; the drain is what
     // makes a future multi-key op unable to report a doubled mint.
@@ -205,6 +233,16 @@ describe('stampCounterpartyDeltas (pure)', () => {
     // double-booked.
     expect(copper.reduce((a, b) => a + b, 0)).toBe(-600);
     expect(counts.reduce((a, b) => a + b, 0)).toBe(-4);
+  });
+
+  it('a second row for one item id gets ZERO, not the movement again', () => {
+    const deltas: CounterpartyStampTarget[] = [{ itemId: 'wolf_fang' }, { itemId: 'wolf_fang' }];
+    const left = stampCounterpartyDeltas(
+      deltas,
+      counterpartyMovement(actor(0, [{ itemId: 'wolf_fang', count: 6 }]), actor(0, [])),
+    );
+    expect(deltas.map((d) => d.counterpartyCount)).toEqual([-6, 0]);
+    expect(counterpartyIdle(left)).toBe(true);
   });
 
   it('always stamps NUMBERS, so a null column can only mean pre-feature', () => {
@@ -524,6 +562,91 @@ describe('the counterparty side, end to end through the dispatch observer', () =
     expect(row).toMatchObject({ count: 2, counterparty_count: 0, counterparty_copper_delta: 0 });
     // The book lost 2, nobody received them, 2 were destroyed: it balances.
     expect(audit(server).filter((f) => f.kind.startsWith('counterparty_'))).toEqual([]);
+  });
+
+  it('CATCHES bags moving under an id no ledger row names (the leftover arm)', async () => {
+    // The book moved, so an ordinary row IS written and it balances by
+    // construction. Only the undrained remainder reveals the extra movement.
+    const server = new GameServer();
+    const session = officerAtBanker(server, 1, 'Officer1');
+    server.sim.loadGuildBank(GUILD_ID, {
+      treasury: 0,
+      inventory: [{ itemId: 'wolf_fang', count: 5 }],
+      purchasedSlots: 24,
+    });
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 500_000;
+
+    const kinds: GuildBankIncident[] = [];
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      guildBankIncident: (kind: GuildBankIncident) => kinds.push(kind),
+    } as GameMetricsCounters);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    priv(server).runGuildBankOp(session, { pid: session.pid }, 'withdraw', () => {
+      const book = server.sim.guildBanks.get(GUILD_ID);
+      if (!book) throw new Error('missing book');
+      book.inventory[0].count -= 1;
+      server.sim.addItem('wolf_fang', 1, session.pid, { silent: true }); // the honest half
+      server.sim.addItem('copper_ore', 8, session.pid, { silent: true }); // the mint
+    });
+    errSpy.mockRestore();
+    await bankLedgerIdle();
+
+    // The withdraw row itself balances: 1 out of the book, 1 into the bags.
+    const withdrawRow = ledgerRows().find((r) => r.op === 'withdraw');
+    expect(withdrawRow).toMatchObject({ count: 1, counterparty_count: 1 });
+    // The copper_ore that appeared from nowhere is the orphan.
+    const orphan = ledgerRows().find((r) => r.op === COUNTERPARTY_ORPHAN_OP);
+    expect(orphan).toMatchObject({ item_id: 'copper_ore', counterparty_count: 8 });
+    expect(kinds).toEqual(['counterparty_orphan']);
+    expect(audit(server).map((f) => f.kind)).toContain('counterparty_orphan');
+  });
+
+  it('COUNTS a guild row written with no counterparty side at all', async () => {
+    // The nullable design rests on "NULL means pre-feature". Nothing in the
+    // schema enforces it, so a write site that forgets to stamp must be loud at
+    // write time rather than invisible in a keep-forever table forever after.
+    const kinds: GuildBankIncident[] = [];
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      guildBankIncident: (kind: GuildBankIncident) => kinds.push(kind),
+    } as GameMetricsCounters);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    recordGuildBankDeltas('deposit_gold', { characterId: 1, accountId: 1 }, GUILD_ID, [
+      {
+        itemId: null,
+        count: null,
+        instance: null,
+        copperDelta: 1_500,
+        purchasedSlotsBefore: 24,
+        purchasedSlotsAfter: 24,
+      },
+    ]);
+    await bankLedgerIdle();
+    // Read the spy BEFORE restoring it: mockRestore drops the call record.
+    const loggedLoudly = errSpy.mock.calls.length > 0;
+    errSpy.mockRestore();
+    expect(kinds).toEqual(['counterparty_unstamped']);
+    // The counter sits BESIDE the log, never instead of it.
+    expect(loggedLoudly).toBe(true);
+    // A STAMPED delta is silent, including one stamped with recorded zeros.
+    kinds.length = 0;
+    recordGuildBankDeltas('admin_purge', { characterId: 1, accountId: 1 }, GUILD_ID, [
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsBefore: 24,
+        purchasedSlotsAfter: 24,
+        counterpartyCopperDelta: 0,
+        counterpartyCount: 0,
+      },
+    ]);
+    await bankLedgerIdle();
+    expect(kinds).toEqual([]);
   });
 
   it('the two anomaly op names are pinned in lockstep with the audit script', () => {

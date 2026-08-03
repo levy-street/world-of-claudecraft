@@ -120,11 +120,18 @@ export function counterpartyIdle(movement: CounterpartyMovement): boolean {
  *
  *  Every delta ends up with a NUMBER, never undefined: a guild row that
  *  reaches the ledger always carries a recorded counterparty side, and NULL in
- *  the column means only "written before this existed" or "personal bank". */
+ *  the column means only "written before this existed" or "personal bank".
+ *
+ *  RETURNS THE UNDRAINED REMAINDER, and the caller must not drop it. Movement
+ *  that no delta claimed is bags (or a purse) moving under an item id the book
+ *  never touched, which balances every written row by construction and would
+ *  otherwise leave NO trace at all: the same invisible purse/book crossing this
+ *  whole feature exists to surface, arriving from the other side. The caller
+ *  gives it the orphan treatment (counterpartyOrphan below). */
 export function stampCounterpartyDeltas(
   deltas: readonly CounterpartyStampTarget[],
   movement: CounterpartyMovement,
-): void {
+): CounterpartyMovement {
   let copper = movement.copper;
   const items = new Map(movement.items);
   for (const delta of deltas) {
@@ -135,8 +142,10 @@ export function stampCounterpartyDeltas(
       continue;
     }
     delta.counterpartyCount = items.get(delta.itemId) ?? 0;
-    items.set(delta.itemId, 0);
+    items.delete(delta.itemId);
   }
+  for (const [id, delta] of items) if (delta === 0) items.delete(id);
+  return { copper, items };
 }
 
 /** The ORPHAN row's payload, or null when there is nothing orphaned.

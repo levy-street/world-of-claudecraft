@@ -1080,6 +1080,13 @@ CREATE INDEX IF NOT EXISTS bank_ledger_created ON bank_ledger(created_at);
 -- the audit SKIPS those rather than reading a 0 default as a balanced op,
 -- which would turn silence into a false all-clear. Signed from the acting
 -- character's point of view: negative means the purse/bags GAVE.
+--
+-- NOTE on the count column's value domain: every other op writes it as a
+-- POSITIVE magnitude with the direction carried by the op name. The two
+-- anomaly ops ('escrow_deficit' and 'counterparty_orphan') write it SIGNED,
+-- because neither has a direction in its name and direction is the first thing
+-- an operator needs. A reader that assumes a non-negative count must exclude
+-- those two ops.
 ALTER TABLE bank_ledger ADD COLUMN IF NOT EXISTS counterparty_copper_delta BIGINT;
 ALTER TABLE bank_ledger ADD COLUMN IF NOT EXISTS counterparty_count INT;
 -- Earned-deed records: one row per (character, deed), written fire-and-forget

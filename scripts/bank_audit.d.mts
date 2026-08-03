@@ -64,6 +64,12 @@ export const GUILD_BUY_POSITIONS: readonly number[];
 export const ESCROW_DEFICIT_OP: string;
 export const COUNTERPARTY_ORPHAN_OP: string;
 
+// The counterparty half of the ledger SELECT list, given the columns the
+// database actually has. A database that predates the counterparty columns
+// selects typed NULLs instead, so the audit degrades into its "unbalanceable,
+// skipped" path rather than dying on a restored pg_dump.
+export function counterpartySelectList(presentColumns: Iterable<string>): string;
+
 // The pure checker: replays the ledger against the persisted bank state and
 // returns every shape or conservation anomaly, grouped by container. Guild
 // reconciliation runs only when guildBanks is provided.

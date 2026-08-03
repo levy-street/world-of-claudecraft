@@ -5,6 +5,7 @@ import {
   type BankAuditFinding,
   type BankLedgerAuditRow,
   COUNTERPARTY_ORPHAN_OP,
+  counterpartySelectList,
   formatReport,
   GUILD_BUY_POSITIONS,
   OPEN_BANK_SLOTS_AFTER,
@@ -468,6 +469,31 @@ describe('auditBank (the counterparty balance)', () => {
     expect(findings[0].detail).toContain('did not move at all');
   });
 
+  it('DEGRADES rather than dying on a database that predates the columns', () => {
+    // DEPLOY.md tells operators to run this tool after a restore, so a restored
+    // pg_dump (or a replica that has not booted the new schema) is exactly the
+    // incident it exists for. Naming a missing column unconditionally would
+    // fail the whole audit precisely then.
+    expect(counterpartySelectList(['counterparty_copper_delta', 'counterparty_count'])).toBe(
+      'counterparty_copper_delta, counterparty_count',
+    );
+    expect(counterpartySelectList([])).toBe(
+      'NULL::bigint AS counterparty_copper_delta, NULL::int AS counterparty_count',
+    );
+    // A half-migrated database (one ALTER applied, the other not) still reads.
+    expect(counterpartySelectList(['counterparty_copper_delta'])).toBe(
+      'counterparty_copper_delta, NULL::int AS counterparty_count',
+    );
+    // The aliases are what keep the row shape stable, so the NULLs land in the
+    // skip path rather than reading as an unrecognized column.
+    for (const list of [
+      counterpartySelectList([]),
+      counterpartySelectList(['counterparty_count']),
+    ]) {
+      expect(list).toContain('AS counterparty_copper_delta');
+    }
+  });
+
   it('reports how many guild rows it could NOT balance, so silence is never mistaken for proof', () => {
     const report = formatReport(
       withoutCounterparty(BALANCED_SESSION),
@@ -480,8 +506,14 @@ describe('auditBank (the counterparty balance)', () => {
     expect(report).toContain(
       'container guild: rows with no recorded counterparty side (pre-feature, unbalanceable): 8',
     );
-    // A fully recorded ledger reports zero unbalanceable rows.
-    expect(formatReport(BALANCED_SESSION, [])).toContain('unbalanceable): 0');
+    // And it names the HIGHEST id lacking one, so an operator can tell a frozen
+    // historical gap from one a live write site is still growing.
+    expect(report).toContain('container guild: highest id with no counterparty side: 8');
+    // A fully recorded ledger reports zero unbalanceable rows, and says nothing
+    // about a highest id (there is none).
+    const clean = formatReport(BALANCED_SESSION, []);
+    expect(clean).toContain('unbalanceable): 0');
+    expect(clean).not.toContain('highest id with no counterparty side');
   });
 });
 

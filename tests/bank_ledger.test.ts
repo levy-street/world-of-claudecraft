@@ -573,7 +573,7 @@ describe('recordGuildBankDeltas + guildCreateFeeDelta (the FIFO writer)', () => 
 
   it('the create_fee row negates the charged purse copper with zero slots', async () => {
     recordGuildBankDeltas('create_fee', { characterId: 42, accountId: 7 }, 913, [
-      guildCreateFeeDelta(100000),
+      guildCreateFeeDelta(100000, -100000),
     ]);
     await bankLedgerIdle();
     expect(insertMock).toHaveBeenCalledTimes(1);

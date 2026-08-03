@@ -201,6 +201,7 @@ import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import {
   type CounterpartyActor,
+  type CounterpartyMovement,
   counterpartyIdle,
   counterpartyMovement,
   counterpartyOrphan,
@@ -1501,7 +1502,11 @@ export class GameServer {
   // double-refund.
   private readonly pendingGuildCreateFees = new Map<
     number,
-    { accountId: number; amount: number }
+    // `pursePaid` is the SIGNED copper the founder's purse was observed to
+    // move across the charge (negative), snapshotted at the gate rather than
+    // derived from `amount`, so the create_fee ledger row's two halves are two
+    // independent measurements and their balance check can actually fail.
+    { accountId: number; amount: number; pursePaid: number }
   >();
   // Guilds whose bank is CLOSED because a guild-delete is in flight: the
   // window between the empty-bank guard passing and the guilds DELETE (which
@@ -2177,7 +2182,7 @@ export class GameServer {
             'create_fee',
             { characterId: id, accountId: fee.accountId },
             guildId,
-            [guildCreateFeeDelta(fee.amount)],
+            [guildCreateFeeDelta(fee.amount, fee.pursePaid)],
           );
         }
         const s = this.sessionByCharacterId(id);
@@ -3871,14 +3876,23 @@ export class GameServer {
             });
           } catch (err) {
             // The whole escrow rolled back: the character half AND every book
-            // half, whether the db layer threw (a transport fault) or the merge
-            // REFUSED a book half. The live sim is now ahead of durable truth
-            // for those books until a later save or a reconcile lands, which is
-            // exactly the window the dupe guards live in, so it must be visible
-            // in production, not only in a log line. The counter observes, it
+            // half. The live sim is now ahead of durable truth for those books
+            // until a later save or a reconcile lands, which is exactly the
+            // window the dupe guards live in, so it must be visible in
+            // production, not only in a log line. The counter observes, it
             // never swallows: the refusal arm still runs below and a foreign
             // error is still rethrown.
-            if (carriesGuildBooks) {
+            //
+            // A REFUSAL is deliberately not counted here. Two officers of one
+            // guild contending is ordinary concurrency and the usual outcome is
+            // "refused, will retry, resolves in a round trip", which is not a
+            // failure and must not share a counter kind with one (an operator
+            // alerting on escrow_save_failed > 0 was getting that noise).
+            // handleGuildBankEscrowRefusal below owns the vocabulary instead:
+            // escrow_refused_retry per guild on the retry arm, and this
+            // escrow_save_failed once for the session on the TERMINAL arm,
+            // where the save really did fail for good.
+            if (carriesGuildBooks && !(err instanceof GuildBankEscrowRefused)) {
               gameMetricsCounters().guildBankIncident('escrow_save_failed');
             }
             // A REFUSED book half aborts the whole transaction, character row
@@ -4309,6 +4323,14 @@ export class GameServer {
         !result.rowUnusable &&
         skips < GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS;
       if (canResolve) {
+        // ORDINARY CONCURRENCY, not a failure: another officer of this guild
+        // holds unflushed work, their commit is what makes this replay
+        // applicable, and the flush below makes that a round trip rather than
+        // an autosave interval. Nothing was consumed and nothing is lost, so
+        // it gets its own counter kind: sharing escrow_save_failed made that
+        // counter unusable for `> 0` alerting. Counted per GUILD, the unit the
+        // retry applies to.
+        gameMetricsCounters().guildBankIncident('escrow_refused_retry');
         session.guildBankDeficitSkips.set(guildId, skips);
         // Do not wait out an autosave interval: FLUSH the sessions whose
         // unflushed work this replay is waiting on, so the retry lands a round
@@ -4346,6 +4368,12 @@ export class GameServer {
       quarantine = true;
     }
     if (!quarantine) return;
+    // TERMINAL: this refusal will never resolve, so the save really did fail
+    // for good (character half included, nothing durable). That is what
+    // escrow_save_failed means, and it is booked here rather than at the throw
+    // site so a refusal that merely RETRIES never reaches it. Counted once per
+    // SAVE, matching the db-threw arm above.
+    gameMetricsCounters().guildBankIncident('escrow_save_failed');
     // The terminal arm of the escrow design and the one an operator should
     // alert on: a live session is being abandoned because its book half can
     // never be replayed onto durable truth. Counted once per SESSION (the unit
@@ -4463,42 +4491,53 @@ export class GameServer {
     // path names its guild outright (it has no acting player to read).
     const guildId =
       'pid' in target ? this.sim.meta(target.pid)?.guildMembership?.guildId : target.guildId;
+    // Attribution: a player op is the acting character's own; an operator op
+    // keeps the carrier's character (the column is NOT NULL and an operator may
+    // hold no character) but books the OPERATOR'S account, so the row names who
+    // ordered it instead of the bystander who lent the escrow transaction.
+    const who =
+      'pid' in target
+        ? session
+        : { characterId: session.characterId, accountId: target.actorAccountId };
+    // Movement of the acting character's purse or bags that NO ledger row
+    // accounts for. Two ways to get here, and both are the same defect seen
+    // from different sides:
+    //  - the book did not move at all (deltas empty), so no ordinary row is
+    //    written and the value that left the purse would leave no trace;
+    //  - the book moved, but the purse/bags ALSO moved under an id no row
+    //    names, so every written row balances by construction and the extra
+    //    movement is invisible again.
+    // Neither can happen legitimately (an op moves both sides or refuses and
+    // moves neither), so both get the loud path: an anomaly ledger row for the
+    // offline audit, a counter for production alerting, and a log line naming
+    // the guild. Never a silent drop.
+    const reportOrphan = (unaccounted: CounterpartyMovement) => {
+      if (guildId === undefined || counterpartyIdle(unaccounted)) return;
+      const orphan = counterpartyOrphan(unaccounted);
+      if (!orphan) return;
+      gameMetricsCounters().guildBankIncident('counterparty_orphan');
+      console.error(
+        `guild bank counterparty orphan on ${effectiveOp} for guild ${guildId} (character ${session.characterId}): the acting character's purse/bags moved value no ledger row accounts for (copper ${orphan.copperDelta}${orphan.itemId ? `, ${orphan.count} x ${orphan.itemId}` : ''})`,
+      );
+      recordGuildBankCounterpartyOrphan(
+        who,
+        guildId,
+        after?.purchasedSlots ?? before?.purchasedSlots ?? 0,
+        orphan,
+        counterpartyOrphanEvidence(effectiveOp, unaccounted),
+      );
+    };
     if (deltas.length === 0) {
-      // The book did not move. If the acting character's purse or bags DID,
-      // this op moved value across the purse/book boundary in one direction
-      // only, which is the mint (or the loss) the counterparty side exists to
-      // catch, and it is the one shape that writes no ordinary row at all. No
-      // legitimate op reaches here, so it is recorded loudly rather than
-      // returned from silently: an anomaly ledger row for the offline audit, a
-      // counter for production alerting, and the log line that names the guild.
-      if (guildId !== undefined && !counterpartyIdle(movement)) {
-        const orphan = counterpartyOrphan(movement);
-        if (orphan) {
-          gameMetricsCounters().guildBankIncident('counterparty_orphan');
-          console.error(
-            `guild bank counterparty orphan on ${effectiveOp} for guild ${guildId} (character ${session.characterId}): the book did not move but the acting character's purse/bags did (copper ${orphan.copperDelta}${orphan.itemId ? `, ${orphan.count} x ${orphan.itemId}` : ''})`,
-          );
-          const who =
-            'pid' in target
-              ? session
-              : { characterId: session.characterId, accountId: target.actorAccountId };
-          recordGuildBankCounterpartyOrphan(
-            who,
-            guildId,
-            after?.purchasedSlots ?? before?.purchasedSlots ?? 0,
-            orphan,
-            counterpartyOrphanEvidence(effectiveOp, movement),
-          );
-        }
-      }
+      reportOrphan(movement);
       return;
     }
     if (guildId === undefined) return;
     // Stamp the payer/payee half onto the rows the book diff produced. The
     // stamp DRAINS the movement across the deltas, so the recorded numbers sum
     // to exactly what moved and a multi-row op can never book one purse
-    // movement twice.
-    stampCounterpartyDeltas(deltas, movement);
+    // movement twice. Whatever is LEFT is movement no row claimed, and it goes
+    // down the orphan path rather than being dropped.
+    const unaccounted = stampCounterpartyDeltas(deltas, movement);
     this.markGuildBankDirty(session, guildId);
     // Record the op in the session's unflushed log: this log is the escrow
     // save's WRITE PAYLOAD (replayed forward onto durable truth) and the
@@ -4534,15 +4573,10 @@ export class GameServer {
       log = [...head, ...compactGuildBankOpLog(log.slice(protect))];
     }
     session.unflushedGuildBankOps.set(guildId, log);
-    // Attribution: a player op is the acting character's own; an operator op
-    // keeps the carrier's character (the column is NOT NULL and an operator may
-    // hold no character) but books the OPERATOR'S account, so the row names who
-    // ordered it instead of the bystander who lent the escrow transaction.
-    const who =
-      'pid' in target
-        ? session
-        : { characterId: session.characterId, accountId: target.actorAccountId };
     recordGuildBankDeltas(effectiveOp, who, guildId, deltas);
+    // AFTER the op's own rows, so the anomaly reads as a follow-on to them:
+    // purse/bags movement that none of those rows accounts for.
+    reportOrphan(unaccounted);
   }
 
   /** The OPERATOR escape hatch for a dormant guild bank slot (the admin route
@@ -6374,7 +6408,13 @@ export class GameServer {
           // while one is in flight is dropped (the double-click race), so the
           // success/refund arms can never mismatch reservations.
           if (this.pendingGuildCreateFees.has(session.characterId)) break;
+          const purseBefore = meta.copper;
           const charged = this.sim.chargeGuildCreationFeeFor(pid);
+          // What the PURSE actually did, read back from the sim rather than
+          // inferred from `charged`: the create_fee row records both, so a
+          // charge the sim reported taking that the purse never gave up is a
+          // finding instead of an arithmetic identity.
+          const pursePaid = (this.sim.meta(pid)?.copper ?? purseBefore) - purseBefore;
           if (charged < GUILD_CREATION_FEE_COPPER) {
             // The purse check above passed but the charge came back short: the
             // pid resolved meta-only (no live entity) or a state edge. Never
@@ -6388,6 +6428,7 @@ export class GameServer {
           this.pendingGuildCreateFees.set(session.characterId, {
             accountId: session.accountId,
             amount: charged,
+            pursePaid,
           });
           void this.social
             .guildCreate(this.actorFor(session), msg.name)

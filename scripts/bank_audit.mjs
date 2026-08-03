@@ -166,6 +166,24 @@ function itemSinkOf(row) {
   return row.op === 'admin_purge' ? Number(row.count) || 0 : 0;
 }
 
+/** The counterparty half of the ledger SELECT list, given the column names the
+ *  database actually has. DEGRADE, never die: DEPLOY.md tells operators to run
+ *  this tool after a restore, and a restored pg_dump (or a replica that has not
+ *  booted the new schema) is exactly the incident it exists for, so naming a
+ *  missing column unconditionally would fail the whole audit precisely then. An
+ *  absent column is selected as a typed NULL, which lands in the already
+ *  implemented "unbalanceable, skipped" path and is reported as such.
+ *  Exported so the fallback is unit-testable without a database. */
+export function counterpartySelectList(presentColumns) {
+  const has = new Set(presentColumns);
+  return [
+    has.has('counterparty_copper_delta')
+      ? 'counterparty_copper_delta'
+      : 'NULL::bigint AS counterparty_copper_delta',
+    has.has('counterparty_count') ? 'counterparty_count' : 'NULL::int AS counterparty_count',
+  ].join(', ');
+}
+
 /** True when this row records a counterparty side at all. NULL on BOTH columns
  *  means NOT RECORDED (a pre-feature row, or a personal-container row, which
  *  never writes one), and the balance is skipped rather than evaluated against
@@ -773,12 +791,25 @@ export function formatReport(ledgerRows, findings) {
     // all-clear than it is: the skipped rows are exactly the ones whose
     // purse/book conservation this audit still cannot see.
     if (container === 'guild') {
-      const unbalanceable = rows.filter(
-        (r) => !ANOMALY_OPS.has(r.op) && !hasCounterparty(r),
-      ).length;
+      const missing = rows.filter((r) => !ANOMALY_OPS.has(r.op) && !hasCounterparty(r));
       lines.push(
-        `container guild: rows with no recorded counterparty side (pre-feature, unbalanceable): ${unbalanceable}`,
+        `container guild: rows with no recorded counterparty side (pre-feature, unbalanceable): ${missing.length}`,
       );
+      // The HIGHEST such id, so an operator can tell a frozen historical gap
+      // from a growing one. NULL is supposed to mean "written before the
+      // columns existed", but nothing in the schema enforces that: a write
+      // site that forgot to stamp would put an indistinguishable NULL into a
+      // keep-forever table. If this id keeps climbing across runs, the
+      // convention is being broken by live code, not by history.
+      if (missing.length > 0) {
+        const highest = missing.reduce(
+          (max, r) => (Number(r.id) > max ? Number(r.id) : max),
+          Number.NEGATIVE_INFINITY,
+        );
+        lines.push(
+          `container guild: highest id with no counterparty side: ${highest} (frozen if it does not climb between runs; a rising value means a live write site is not stamping)`,
+        );
+      }
     }
   }
   for (const finding of findings) {
@@ -817,6 +848,27 @@ async function main() {
     options: '-c statement_timeout=300000',
   });
   try {
+    // DEGRADE, never die, on a database that predates the counterparty
+    // columns. DEPLOY.md tells operators to run this tool after a restore, and
+    // a restored pg_dump (or a replica that has not booted the new schema yet)
+    // is exactly the incident it exists for: naming the columns unconditionally
+    // would fail the whole audit with "column does not exist" precisely then.
+    // Absent columns select as NULL, which lands in the already-implemented
+    // "unbalanceable, skipped" path and is reported as such.
+    const present = await pool.query(
+      `SELECT column_name FROM information_schema.columns
+        WHERE table_name = 'bank_ledger'
+          AND column_name IN ('counterparty_copper_delta', 'counterparty_count')`,
+    );
+    const has = new Set(present.rows.map((r) => r.column_name));
+    const counterpartyColumns = counterpartySelectList(has);
+    if (has.size < 2) {
+      console.warn(
+        'bank_ledger predates the counterparty columns on this database: the per-op ' +
+          'purse/book balance cannot be checked and every guild row is reported as ' +
+          'unbalanceable. Boot a realm process against it to apply the schema.',
+      );
+    }
     const ledger = await pool.query(
       // Two more columns, no new predicate: this is the same single ordered
       // scan of the whole table it always was, so it needs no new index (the
@@ -824,7 +876,7 @@ async function main() {
       // bank_ledger reaches millions of rows still stands, unchanged).
       `SELECT id, realm, character_id, op, item_id, count, instance,
               copper_delta, purchased_slots_after, container, container_id,
-              counterparty_copper_delta, counterparty_count
+              ${counterpartyColumns}
          FROM bank_ledger
         ORDER BY id`,
     );
