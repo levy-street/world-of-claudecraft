@@ -4113,12 +4113,15 @@ async function startGame(
 
   function frame(now: number): void {
     requestAnimationFrame(frame);
-    if (graphicsRebuildPaused) {
-      last = now;
-      acc = 0;
-      return;
-    }
-    maybeWarmCurrentZone();
+    // maybeWarmCurrentZone() deliberately does NOT run here. It reads the
+    // player's position AND the scene director, and at the top of the frame
+    // those two disagree: a synchronous world command (the ferry fare answers
+    // through world.answerSceneChoice straight off the click) teleports the
+    // entity immediately while the 'scene' start op it queues only reaches
+    // the director when this frame drains events. Deciding here saw the
+    // destination with no scene covering it and raised the blocking loading
+    // screen mid-voyage. Each host calls it below, once its own events for
+    // this frame have landed.
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;
@@ -4264,18 +4267,8 @@ async function startGame(
         sceneFacingInput.pendingReleaseFacing = null;
         acc -= DT;
       }
-      // Re-check immediately after the tick loop, before renderer.sync() below reads
-      // offlineSim.player.pos for this frame. The call at the top of frame() only sees
-      // the position as of the START of the frame; a tick above can itself teleport the
-      // player (release-spirit/resurrect landing in a different zone, a dungeon door or
-      // portal trigger reached mid-tick), which the top-of-frame call has no way to see.
-      // Left unchecked, this frame would still render the just-teleported position with
-      // no loading curtain and an unprepared destination zone (a one-frame flash of an
-      // empty/black view). maybeWarmCurrentZone() is idempotent per call (it early-returns
-      // once a warmup is already in flight or the zone is ready), so calling it twice in
-      // one frame is safe; it does not remove the top-of-frame call, which still owns the
-      // input-suspend handling and catches a teleport triggered from outside the tick
-      // (e.g. a UI action) before this frame's tick even runs.
+      // Offline: the tick above drained this frame's events, so the scene
+      // director now agrees with the entity's position.
       maybeWarmCurrentZone();
       const pp = offlineSim.player;
       traceStart = perf.startTrace();
@@ -4335,8 +4328,10 @@ async function startGame(
     }
 
     // online: inputs stream on a timer inside ClientWorld; here we mirror state
-    const net = online;
-    if (!net) return;
+    // Online: drainMirroredSceneInput above already applied this frame's scene
+    // ops, so the same position/scene agreement holds here.
+    maybeWarmCurrentZone();
+    const net = online!;
     spectateBadge.update(net.spectating);
     const spectateFacing = net.consumeSpectateFacing();
     if (spectateFacing !== null) input.camYaw = spectateFacing;
