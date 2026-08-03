@@ -126,7 +126,7 @@ type LegKind =
 export const RIFT_COURSE_TUNING: Record<RiftTier, CourseTuning> = {
   C: {
     chance: 0.3,
-    legs: [7, 10],
+    legs: [4, 6],
     gap: [2.0, 3.2],
     deckHw: 1.3,
     rise: [0.3, 0.9],
@@ -137,13 +137,13 @@ export const RIFT_COURSE_TUNING: Record<RiftTier, CourseTuning> = {
     blinkPeriod: 5,
     blinkDuty: 0.68,
     hazardChance: 0.18,
-    gems: 2,
+    gems: 1,
     gateChance: 0,
     kinds: ['static', 'static', 'static', 'piston', 'crumbleRun'],
   },
   B: {
     chance: 0.38,
-    legs: [9, 13],
+    legs: [5, 8],
     gap: [2.4, 3.8],
     deckHw: 1.2,
     rise: [0.4, 1.1],
@@ -154,13 +154,13 @@ export const RIFT_COURSE_TUNING: Record<RiftTier, CourseTuning> = {
     blinkPeriod: 4.4,
     blinkDuty: 0.6,
     hazardChance: 0.28,
-    gems: 3,
+    gems: 2,
     gateChance: 0.45,
     kinds: ['static', 'static', 'piston', 'crumbleRun', 'blinkRun', 'rope'],
   },
   A: {
     chance: 0.45,
-    legs: [11, 15],
+    legs: [6, 9],
     gap: [2.8, 4.2],
     deckHw: 1.1,
     rise: [0.5, 1.25],
@@ -171,7 +171,7 @@ export const RIFT_COURSE_TUNING: Record<RiftTier, CourseTuning> = {
     blinkPeriod: 4,
     blinkDuty: 0.55,
     hazardChance: 0.38,
-    gems: 3,
+    gems: 2,
     gateChance: 0.55,
     kinds: [
       'static',
@@ -187,7 +187,7 @@ export const RIFT_COURSE_TUNING: Record<RiftTier, CourseTuning> = {
   },
   S: {
     chance: 0.5,
-    legs: [13, 17],
+    legs: [7, 10],
     gap: [3.0, 4.6],
     deckHw: 1.0,
     rise: [0.5, 1.4],
@@ -198,7 +198,7 @@ export const RIFT_COURSE_TUNING: Record<RiftTier, CourseTuning> = {
     blinkPeriod: 3.6,
     blinkDuty: 0.5,
     hazardChance: 0.5,
-    gems: 4,
+    gems: 3,
     gateChance: 0.65,
     kinds: [
       'piston',
@@ -417,7 +417,7 @@ export function planCourse(
       y = a.y;
       push({ x, z, hw, hd: hw, y });
       const period = rng.range(4.5, 6);
-      const count = 5;
+      const count = 4;
       for (let i = 1; i <= count; i++) {
         const nz = Math.min(z1, z + i * 2.4);
         decks.push({
@@ -525,7 +525,7 @@ export function planCourse(
       if (runLen > 1) route.push({ x: decks[decks.length - 1].x, z, y, via: 'ride' });
       prevHalf = 1.1;
     } else if (kind === 'blinkRun') {
-      const runLen = rng.int(2, 4);
+      const runLen = rng.int(2, 3);
       let lastZ = z;
       for (let i = 0; i < runLen; i++) {
         lastZ = Math.min(z1, z + i * 2.2);

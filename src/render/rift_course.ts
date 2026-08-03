@@ -32,23 +32,57 @@ import {
   hazardPos,
   sweeperAngle,
 } from '../sim/course';
+import { buildRiftCourseProp } from './rift_course_props';
 
 const EMBER = 0xff8a3e;
 const ARCANE = 0x8f6fe8;
 const GEM = 0x4fd8c8;
 
+/** A house-style scenery flame: emissive, flickered and ember-emitting once
+ *  registered in the renderer's flame list, exactly like the dungeon
+ *  torches. The old static additive cones bypassed all of that, which is
+ *  why they read as placeholder. */
+function makeSceneryFlame(radius: number, height: number, lowGfx: boolean): THREE.Mesh {
+  const flame = new THREE.Mesh(
+    new THREE.ConeGeometry(radius, height, 6),
+    new THREE.MeshLambertMaterial({
+      color: 0xffc36b,
+      emissive: 0xff7a1e,
+      emissiveIntensity: lowGfx ? 1.6 : 2.4,
+      transparent: true,
+      opacity: 0.92,
+    }),
+  );
+  flame.matrixAutoUpdate = true;
+  return flame;
+}
+
 /**
  * Build one floor's course into `group` (the interior group, instance-local
  * frame with the floor at y 0). Returns the per-frame tick.
  */
+export interface RiftCourseFxHosts {
+  /** The renderer's scenery-flame list: joining it buys the shared flicker,
+   *  ember emission, and perceptual cadence for free. */
+  flames: THREE.Mesh[];
+  /** The renderer's budgeted fire lights. */
+  fireLights: THREE.PointLight[];
+}
+
 export function buildRiftCourseFeatures(
   group: THREE.Group,
   plan: CoursePlan,
   instKey: string,
   lowGfx: boolean,
   localPid: () => number,
+  fx?: RiftCourseFxHosts,
 ): (displayTime: number) => void {
   const deckMat = new THREE.MeshLambertMaterial({ color: 0x4a4038 });
+  const conveyorChevrons: Array<{
+    pad: CoursePlan['pads'][number];
+    chevron: THREE.Group;
+    phase: number;
+  }> = [];
   const bandMat = new THREE.MeshLambertMaterial({ color: 0x6b5a3e });
   const emberMat = new THREE.MeshBasicMaterial({ color: EMBER, transparent: true, opacity: 0.7 });
 
@@ -93,30 +127,22 @@ export function buildRiftCourseFeatures(
         body.add(rail);
       }
     } else if (deck.kind === 'geyser') {
-      const drum = new THREE.Mesh(
-        new THREE.CylinderGeometry(
-          Math.min(deck.hw, deck.hd),
-          Math.min(deck.hw, deck.hd) * 1.1,
-          0.5,
-          10,
-        ),
-        bandMat,
-      );
-      drum.position.y = -0.25;
-      body.add(drum);
-      const flame = new THREE.Mesh(
-        new THREE.ConeGeometry(Math.min(deck.hw, deck.hd) * 0.6, 2.6, 8),
-        new THREE.MeshBasicMaterial({
-          color: EMBER,
-          transparent: true,
-          opacity: 0.55,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-        }),
-      );
-      flame.position.y = 1.3;
+      // The launch pad: pipeline-built machinery, not a drawn cone. The
+      // eruption is a house-style scenery flame (emissive, flickered, ember
+      // emitting via the shared renderer loop), scaled up while the window
+      // is open and hidden between eruptions.
+      const pad = buildRiftCourseProp('rift_launch_pad');
+      if (pad) {
+        const s = (Math.min(deck.hw, deck.hd) * 2) / 2.4;
+        pad.scale.setScalar(s);
+        pad.position.y = -0.05;
+        body.add(pad);
+      }
+      const flame = makeSceneryFlame(0.55, 1.6, lowGfx);
+      flame.position.y = 0.9;
       flame.visible = false;
       body.add(flame);
+      fx?.flames.push(flame);
       body.userData.flame = flame;
     }
     body.position.set(deck.x, deck.y, deck.z);
@@ -154,19 +180,29 @@ export function buildRiftCourseFeatures(
     strip.position.set(pad.x, pad.y + 0.04, pad.z);
     group.add(strip);
     if (pad.kind === 'conveyor' && !lowGfx) {
-      for (let a = -1; a <= 1; a++) {
-        const arrow = new THREE.Mesh(
-          new THREE.ConeGeometry(0.28, 0.7, 4),
-          new THREE.MeshBasicMaterial({ color: 0xc8ecf5 }),
-        );
-        arrow.rotation.z = -Math.PI / 2;
-        arrow.rotation.y = Math.atan2(pad.dirZ ?? 0, pad.dirX ?? 1);
-        arrow.position.set(
-          pad.x + a * 1.4 * (pad.dirX ?? 1),
-          pad.y + 0.14,
-          pad.z + a * 1.4 * (pad.dirZ ?? 0),
-        );
-        group.add(arrow);
+      // Travelling chevrons: the belt's direction and speed, readable in
+      // motion. Two thin angled slats per chevron; the tick slides them
+      // along the run and wraps.
+      const yaw = Math.atan2(pad.dirX ?? 1, pad.dirZ ?? 0);
+      for (let a = 0; a < 3; a++) {
+        const chevron = new THREE.Group();
+        for (const side of [-1, 1]) {
+          const slat = new THREE.Mesh(
+            new THREE.BoxGeometry(0.34, 0.04, 0.1),
+            new THREE.MeshBasicMaterial({
+              color: 0xc8ecf5,
+              transparent: true,
+              opacity: 0.85,
+            }),
+          );
+          slat.position.set(side * 0.14, 0, side * 0.12);
+          slat.rotation.y = side * 0.8;
+          chevron.add(slat);
+        }
+        chevron.rotation.y = yaw;
+        chevron.position.set(pad.x, pad.y + 0.12, pad.z);
+        group.add(chevron);
+        conveyorChevrons.push({ pad, chevron, phase: a / 3 });
       }
     }
   }
@@ -226,32 +262,41 @@ export function buildRiftCourseFeatures(
 
   // ---- Gems, braziers, summit ---------------------------------------------
   const gemViews = plan.gems.map((gem, index) => {
-    const orb = new THREE.Mesh(
-      new THREE.OctahedronGeometry(0.42),
-      new THREE.MeshBasicMaterial({ color: GEM, transparent: true, opacity: 0.9 }),
-    );
-    orb.position.set(gem.x, gem.y, gem.z);
+    const orb: THREE.Object3D =
+      buildRiftCourseProp('rift_gem_crystal') ??
+      new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.42),
+        new THREE.MeshBasicMaterial({ color: GEM, transparent: true, opacity: 0.9 }),
+      );
+    // The crystal is floor-seated; a collectible floats. Hang it from its
+    // middle so the spin reads.
+    orb.position.set(gem.x, gem.y - 0.45, gem.z);
     group.add(orb);
-    return { index, orb, baseY: gem.y };
+    return { index, orb, baseY: gem.y - 0.45 };
   });
   const brazierViews = plan.braziers.map((b) => {
-    const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.32, 0.6, 8), bandMat);
-    bowl.position.set(b.x, b.y + 0.3, b.z);
-    group.add(bowl);
-    const flame = new THREE.Mesh(
-      new THREE.ConeGeometry(0.34, 0.9, 6),
-      new THREE.MeshBasicMaterial({
-        color: EMBER,
-        transparent: true,
-        opacity: 0.8,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      }),
-    );
-    flame.position.set(b.x, b.y + 1.0, b.z);
+    const stand = buildRiftCourseProp('rift_waybrazier');
+    if (stand) {
+      stand.position.set(b.x, b.y, b.z);
+      group.add(stand);
+    } else {
+      const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.32, 0.6, 8), bandMat);
+      bowl.position.set(b.x, b.y + 0.3, b.z);
+      group.add(bowl);
+    }
+    const flame = makeSceneryFlame(0.26, 0.7, lowGfx);
+    flame.position.set(b.x, b.y + 1.55, b.z);
     flame.visible = false;
     group.add(flame);
-    return { b, flame };
+    fx?.flames.push(flame);
+    let light: THREE.PointLight | null = null;
+    if (fx && !lowGfx) {
+      light = new THREE.PointLight(0xff9a4a, 0, 9);
+      light.position.set(b.x, b.y + 1.8, b.z);
+      group.add(light);
+      fx.fireLights.push(light);
+    }
+    return { b, flame, light };
   });
   {
     const banner = new THREE.Mesh(
@@ -306,7 +351,17 @@ export function buildRiftCourseFeatures(
         }
       } else if (deck.kind === 'geyser' && deck.window) {
         const flame = v.mesh.userData.flame as THREE.Mesh | undefined;
-        if (flame) flame.visible = dutyActive(deck.window, t);
+        if (flame) {
+          const active = dutyActive(deck.window, t);
+          flame.visible = active;
+          if (active) {
+            // Rise through the eruption window: the jet grows as it vents.
+            const flip = dutyTimeToFlip(deck.window, t);
+            const total = deck.window.duty * deck.window.period;
+            const grow = 1 + 1.6 * Math.min(1, Math.max(0, 1 - flip / Math.max(0.2, total)));
+            flame.scale.set(1, grow, 1);
+          }
+        }
       }
     }
     for (const hv of hazardViews) {
@@ -343,7 +398,21 @@ export function buildRiftCourseFeatures(
     }
     const lit = pid >= 0 ? courseCheckpointFor(instKey, pid) : null;
     for (const bv of brazierViews) {
-      bv.flame.visible = lit !== null && bv.b.index <= lit;
+      const on = lit !== null && bv.b.index <= lit;
+      bv.flame.visible = on;
+      if (bv.light) bv.light.intensity = on ? 9 : 0;
+    }
+    for (const cv of conveyorChevrons) {
+      // Travel the belt and wrap: speed matches the sim drift, so the belt
+      // tells the truth about how hard it pushes.
+      const speed = cv.pad.strength ?? 2.4;
+      const span = Math.max(cv.pad.hw, cv.pad.hd) * 1.6;
+      const u = (((displayTime * speed) / span + cv.phase) % 1) - 0.5;
+      cv.chevron.position.set(
+        cv.pad.x + (cv.pad.dirX ?? 0) * u * span,
+        cv.pad.y + 0.12,
+        cv.pad.z + (cv.pad.dirZ ?? 0) * u * span,
+      );
     }
   };
 }

@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/rift_course_kit/rift_launch_pad-final.glb",
+      "out": "models/props/rift_launch_pad.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/rift_course_kit/rift_gem_crystal-final.glb",
+      "out": "models/props/rift_gem_crystal.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/rift_course_kit/rift_waybrazier-final.glb",
+      "out": "models/props/rift_waybrazier.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

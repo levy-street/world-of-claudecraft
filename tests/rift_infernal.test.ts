@@ -146,6 +146,9 @@ describe('infernal citadel: seed selection', () => {
   // narrow pass after course sentries landed excluded `spawns` as well:
   // course floors append rift_vaulter spawns from the course stream, and
   // non-course floors keep their spawn lists byte-identical.
+  // DELIBERATE re-pin (course density retune): fewer legs, shorter runs and
+  // fewer gems per course, by owner feedback. Course floors only; the same
+  // narrow non-course digest is byte-identical.
   it('regenerates procedural floors byte-identically to the pre-set-piece baseline', () => {
     // Hand-picked on the base branch, so the seed list itself cannot drift with the
     // set-piece roll.
@@ -161,7 +164,7 @@ describe('infernal citadel: seed selection', () => {
       }
     }
     expect(h.digest('hex')).toBe(
-      '2c2a8d9296b33f2c7fda37a4f98dd8af5452debbbcad786a19db3ec1767d4b3d',
+      '2d98692ee51b1e07ff597b4d9b711789fac54573a12a8ab68cc2e905b2cb9dc5',
     );
   });
 });

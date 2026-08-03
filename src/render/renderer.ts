@@ -7404,6 +7404,7 @@ export class Renderer {
                       courseInstKey(o.x, o.z),
                       this.lowGfx,
                       () => this.sim.player?.id ?? -1,
+                      { flames: this.flames, fireLights: this.fireLights },
                     ),
                   );
                 }
