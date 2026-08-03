@@ -215,18 +215,16 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // takes equal-rate secondary paths to both rather than a fifth signature
     // mount (owner call, 2026-08-01). Rate parity below is what keeps that
     // honest: every path still pays the one rarity rate.
-    // WORLD-RARE path (owner call, 2026-08-03, the Drakelands brood rework): the
-    // Drakemaw Raptor is the first mount whose source is an OPEN-WORLD rare
-    // rather than a heroic five-man or a Rift S clear. The Drakelands has no
-    // heroic tier, and the design intent was a legendary that drops off the
-    // zone's standing elites at the usual legendary rate. It is listed EXPLICITLY
-    // here, and its rate is still derived from its rarity below, so the guard's
-    // original job survives: a stray new path, or a re-tier that moves the
-    // rarity without moving the drop, still reds. Keep this table to mounts whose
-    // world-rare supply is a deliberate decision.
-    const WORLD_RARE_SOURCES: Record<string, readonly string[]> = {
-      reins_drakemaw_raptor: ['drakemaw_broodlord'],
-    };
+    // NO SOURCE YET (owner call, 2026-08-04): the Drakemaw Raptor briefly took an
+    // open-world-rare path, dropping off the four Drakemaw Broodlords. That is
+    // reverted: the broodlord is the 90% source of the quest chain's own
+    // emberwing_scale, so hanging the only farmable epic mount on it camped the
+    // Drakemaw belt and tap-blocked every leveler questing through. The reins move
+    // to a dedicated world boss in a follow-up; until then the def ships with no
+    // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
+    // decision and never an accident: when the world boss lands, delete the entry
+    // and the rarity-derived rule below takes back over.
+    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor'];
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],
@@ -239,26 +237,12 @@ describe('mount reins items (the collection: owning the item is owning the mount
       if (key === 'terrorspark_groundshaker') continue; // developer-only, pinned separately below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
-      // No mount is on a NORMAL mob table, at any rarity, EXCEPT the named
-      // world-rare paths above (and then only on the exact mobs listed).
-      const worldRare = WORLD_RARE_SOURCES[itemId] ?? [];
+      // No mount is ever on a NORMAL mob table, at any rarity.
       for (const mob of Object.values(MOBS)) {
-        if (worldRare.includes(mob.id)) continue;
         expect(
           mob.loot.find((l) => l.itemId === itemId),
           `${itemId} must not be on normal table ${mob.id}`,
         ).toBeUndefined();
-      }
-      // A world-rare mount really is on every mob its table names, at the
-      // legendary rate, as an independent draw (never inside a roll group, or it
-      // would compete with the gear and stop being a true lottery).
-      for (const mobId of worldRare) {
-        const entry = MOBS[mobId]?.loot.find((l) => l.itemId === itemId);
-        expect(entry, `${itemId} on world rare ${mobId}`).toBeDefined();
-        expect(entry?.chance, `${itemId} pays the legendary rate on ${mobId}`).toBe(0.001);
-        expect(entry?.rollGroup, `${itemId} is an independent draw`).toBeUndefined();
-        expect(entry?.questId, `${itemId} is not quest-gated`).toBeUndefined();
-        expect(MOBS[mobId]?.rare, `${mobId} is a world RARE`).toBe(true);
       }
 
       const heroicEntries = Object.entries(HEROIC_BOSS_LOOT).flatMap(([bossId, entries]) =>
@@ -266,15 +250,24 @@ describe('mount reins items (the collection: owning the item is owning the mount
       );
 
       if (rarity === 'epic') {
-        // Rift S clears are the sole source, EXCEPT a named world-rare epic,
-        // whose supply is its rare's own drop. Either way it stays out of every
-        // heroic table, so the heroic tier's mount supply is unchanged.
+        // Rift S clears are the sole source, EXCEPT a mount held sourceless on
+        // purpose. Either way it stays out of every heroic table, so the heroic
+        // tier's mount supply is unchanged.
         expect(heroicEntries, `${itemId} (epic) must not be heroic-reachable`).toEqual([]);
-        if (worldRare.length > 0) {
-          expect(
-            RIFT_EPIC_MOUNT_REINS as readonly string[],
-            `${itemId} is world-rare sourced, so not in the rift S pool`,
-          ).not.toContain(itemId);
+        if (NO_SOURCE_YET.includes(itemId)) {
+          // The mob-table sweep above already proved it drops off nothing. Pin
+          // the remaining three pools too, so "no path" means no path: the day
+          // its world boss lands, it gets ONE source, not a quiet second one.
+          for (const [pool, name] of [
+            [RIFT_EPIC_MOUNT_REINS, 'rift S'],
+            [RIFT_BLUE_MOUNT_REINS, 'rift blue'],
+            [RIFT_GREEN_MOUNT_REINS, 'rift green'],
+          ] as const) {
+            expect(
+              pool as readonly string[],
+              `${itemId} has no source yet: not in ${name}`,
+            ).not.toContain(itemId);
+          }
           continue;
         }
         expect(RIFT_EPIC_MOUNT_REINS as readonly string[]).toContain(itemId);

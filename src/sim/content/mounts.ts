@@ -94,9 +94,9 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
-  // The Drakemaw legendary: a saddle-broken brood raptor, dropped by the four
-  // Drakemaw Broodlords (content/drakelands.ts) at the heroic-blue mount rate
-  // (0.1%). The only open-world farmable epic mount.
+  // The Drakemaw legendary: a saddle-broken brood raptor. Its reins
+  // (content/drakelands.ts) currently have NO acquisition path; the broodlord
+  // drop was pulled and a dedicated world boss carries it in a follow-up.
   drakemaw_raptor: {
     key: 'drakemaw_raptor',
     name: 'Drakemaw Raptor',

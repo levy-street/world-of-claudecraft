@@ -269,8 +269,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
   // ringed by eggs. The opening shout cracks every egg around it and wards
   // the hatchlings (one free hit each); in the fight it counters any stun
   // with a tail hammer of its own, cleaves the whole front arc on a cadence,
-  // and hoses a fire cone on a timer. Carries the raptor reins at the
-  // heroic-blue legendary rate (0.1%).
+  // and hoses a fire cone on a timer.
   drakemaw_broodlord: {
     id: 'drakemaw_broodlord',
     name: 'Drakemaw Broodlord',
@@ -295,7 +294,6 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 100, chance: 1 },
       { itemId: 'emberwing_scale', chance: 0.9, questId: 'q_dk_scales_of_the_maw' },
-      { itemId: 'reins_drakemaw_raptor', chance: 0.001 },
     ],
     // Menace scale: half again over the first cut. Its melee reach follows
     // through the bespoke combat profile (mob_combat.ts), never the visual
@@ -748,10 +746,13 @@ export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 72, sta: 6, int: 4 },
     sellValue: 2200,
   },
-  // --- the broodlord legendary ---
-  // Drops off the four Drakemaw Broodlords at the heroic-blue mount rate
-  // (0.1%, the reins_grag_bear precedent). Owning the reins IS owning the
-  // mount (src/sim/mounts.ts mountOwned): soulbound, never transfers.
+  // --- the Drakemaw legendary ---
+  // Has NO acquisition path yet: the broodlord drop was pulled (owner call,
+  // 2026-08-04) because hanging the only farmable epic mount on the quest
+  // chain's own 90% scale source camped the Drakemaw belt. The reins move to a
+  // dedicated world boss in a follow-up; the def stays so the mount, its GLB,
+  // and its strings keep shipping. Owning the reins IS owning the mount
+  // (src/sim/mounts.ts mountOwned): soulbound, never transfers.
   reins_drakemaw_raptor: {
     id: 'reins_drakemaw_raptor',
     name: 'Reins of the Drakemaw Raptor',

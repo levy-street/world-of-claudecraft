@@ -68,13 +68,19 @@ describe('dragonkin brood content', () => {
     expect(maw.counterStun).toBeDefined();
   });
 
-  it('whelps are one-hit squishy and the broodlord carries the raptor reins at 0.1%', () => {
+  it('whelps are one-hit squishy and the broodlord carries no mount reins', () => {
     const whelp = createMob(1, MOBS.dragonkin_whelp, 20, { x: 0, y: 0, z: 0 });
     // A level-20 player's weakest swing clears ~50; the whelp must die to one.
     expect(whelp.maxHp).toBeLessThanOrEqual(50);
-    const reins = MOBS.drakemaw_broodlord.loot.find((l) => l.itemId === 'reins_drakemaw_raptor');
-    expect(reins?.chance).toBe(0.001);
-    expect(reins?.questId).toBeUndefined();
+    // The raptor reins were pulled off this table (owner call, 2026-08-04): the
+    // broodlord is the quest chain's own 90% emberwing_scale source, so a mount
+    // lottery on it camps the Drakemaw belt. Its table keeps the coin and the
+    // scale, and nothing else: a mount added back here reds this AND the
+    // rarity-derived pin in mounts.test.ts.
+    expect(MOBS.drakemaw_broodlord.loot.map((l) => l.itemId)).toEqual([
+      undefined, // the guaranteed copper row
+      'emberwing_scale',
+    ]);
   });
 });
 
