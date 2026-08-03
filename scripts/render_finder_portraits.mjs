@@ -42,7 +42,21 @@ const bundled = await esbuild.build({
   bundle: true,
   format: 'iife',
   platform: 'browser',
-  define: { 'import.meta.env.DEV': 'true', 'import.meta.env.PROD': 'false' },
+  // Every env field the transitive graph reads needs its own define (esbuild
+  // matches the FULL member path). The runtime/client-origin fields arrived with
+  // the v0.34 native/desktop work; without them current esbuild rewrites
+  // import.meta to an EMPTY OBJECT in an IIFE and the page TypeErrors at boot,
+  // which surfaces only as a __ready timeout. Same fix as
+  // scripts/wiki/render_model_stills.mjs, whose guard comment carries the detail.
+  define: {
+    'import.meta.env.DEV': 'true',
+    'import.meta.env.PROD': 'false',
+    'import.meta.env.VITE_NATIVE_APP': "''",
+    'import.meta.env.VITE_API_ORIGIN': "''",
+    'import.meta.env.VITE_DESKTOP_APP': "''",
+    'import.meta.env.VITE_DESKTOP_API_ORIGIN': "''",
+    'import.meta.env.VITE_DESKTOP_RELATIVE_API': "''",
+  },
   write: false,
   logLevel: 'silent',
 });

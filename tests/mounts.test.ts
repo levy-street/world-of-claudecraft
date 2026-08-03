@@ -94,8 +94,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly eight mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(8);
+  it('has exactly nine mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(9);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -214,6 +214,18 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // takes equal-rate secondary paths to both rather than a fifth signature
     // mount (owner call, 2026-08-01). Rate parity below is what keeps that
     // honest: every path still pays the one rarity rate.
+    // WORLD-RARE path (owner call, 2026-08-03, the Drakelands brood rework): the
+    // Drakemaw Raptor is the first mount whose source is an OPEN-WORLD rare
+    // rather than a heroic five-man or a Rift S clear. The Drakelands has no
+    // heroic tier, and the design intent was a legendary that drops off the
+    // zone's standing elites at the usual legendary rate. It is listed EXPLICITLY
+    // here, and its rate is still derived from its rarity below, so the guard's
+    // original job survives: a stray new path, or a re-tier that moves the
+    // rarity without moving the drop, still reds. Keep this table to mounts whose
+    // world-rare supply is a deliberate decision.
+    const WORLD_RARE_SOURCES: Record<string, readonly string[]> = {
+      reins_drakemaw_raptor: ['drakemaw_broodlord'],
+    };
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],
@@ -226,12 +238,26 @@ describe('mount reins items (the collection: owning the item is owning the mount
       if (key === 'terrorspark_groundshaker') continue; // developer-only, pinned separately below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
-      // No mount is ever on a NORMAL mob table, at any rarity.
+      // No mount is on a NORMAL mob table, at any rarity, EXCEPT the named
+      // world-rare paths above (and then only on the exact mobs listed).
+      const worldRare = WORLD_RARE_SOURCES[itemId] ?? [];
       for (const mob of Object.values(MOBS)) {
+        if (worldRare.includes(mob.id)) continue;
         expect(
           mob.loot.find((l) => l.itemId === itemId),
           `${itemId} must not be on normal table ${mob.id}`,
         ).toBeUndefined();
+      }
+      // A world-rare mount really is on every mob its table names, at the
+      // legendary rate, as an independent draw (never inside a roll group, or it
+      // would compete with the gear and stop being a true lottery).
+      for (const mobId of worldRare) {
+        const entry = MOBS[mobId]?.loot.find((l) => l.itemId === itemId);
+        expect(entry, `${itemId} on world rare ${mobId}`).toBeDefined();
+        expect(entry?.chance, `${itemId} pays the legendary rate on ${mobId}`).toBe(0.001);
+        expect(entry?.rollGroup, `${itemId} is an independent draw`).toBeUndefined();
+        expect(entry?.questId, `${itemId} is not quest-gated`).toBeUndefined();
+        expect(MOBS[mobId]?.rare, `${mobId} is a world RARE`).toBe(true);
       }
 
       const heroicEntries = Object.entries(HEROIC_BOSS_LOOT).flatMap(([bossId, entries]) =>
@@ -239,8 +265,17 @@ describe('mount reins items (the collection: owning the item is owning the mount
       );
 
       if (rarity === 'epic') {
-        // Rift S clears are the sole source. Nothing heroic, nothing static.
+        // Rift S clears are the sole source, EXCEPT a named world-rare epic,
+        // whose supply is its rare's own drop. Either way it stays out of every
+        // heroic table, so the heroic tier's mount supply is unchanged.
         expect(heroicEntries, `${itemId} (epic) must not be heroic-reachable`).toEqual([]);
+        if (worldRare.length > 0) {
+          expect(
+            RIFT_EPIC_MOUNT_REINS as readonly string[],
+            `${itemId} is world-rare sourced, so not in the rift S pool`,
+          ).not.toContain(itemId);
+          continue;
+        }
         expect(RIFT_EPIC_MOUNT_REINS as readonly string[]).toContain(itemId);
         continue;
       }

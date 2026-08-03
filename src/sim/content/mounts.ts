@@ -19,8 +19,8 @@ export type MountKey =
   | 'shadowjump_toad'
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
-  | 'terrorspark_groundshaker'
-  | 'drakemaw_raptor';
+  | 'drakemaw_raptor'
+  | 'terrorspark_groundshaker';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -80,7 +80,8 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   },
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
   // The Terrorspark Groundshaker is developer-only for now and has no
-  // player-facing acquisition.
+  // player-facing acquisition, and stays LAST in the catalog (the tests pin the
+  // developer mount as the tail, so a new player-facing mount lands above it).
   aether_hover_cycle: {
     key: 'aether_hover_cycle',
     name: 'Aether-Jouster Hover-Cycle',
@@ -93,18 +94,18 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
-  terrorspark_groundshaker: {
-    key: 'terrorspark_groundshaker',
-    name: 'Terrorspark Groundshaker',
-    rarity: 'epic',
-    moveSpeedPct: 0.8,
-  },
   // The Drakemaw legendary: a saddle-broken brood raptor, dropped by the four
   // Drakemaw Broodlords (content/drakelands.ts) at the heroic-blue mount rate
   // (0.1%). The only open-world farmable epic mount.
   drakemaw_raptor: {
     key: 'drakemaw_raptor',
     name: 'Drakemaw Raptor',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  terrorspark_groundshaker: {
+    key: 'terrorspark_groundshaker',
+    name: 'Terrorspark Groundshaker',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },

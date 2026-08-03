@@ -77,6 +77,14 @@ const JOBS = [
     id: 'reins_terrorspark_groundshaker',
     cfg: { headFwd: 0.1, headUp: 0, fill: 1.18, yaw: 0.68, pitch: 0.24 },
   },
+  {
+    // The raptor carries its head high and well forward on a long neck, above a
+    // saddle set back over the hips: anchor forward and high, and look slightly
+    // down so the snout reads rather than the saddle behind it.
+    file: 'drakemaw_raptor.glb',
+    id: 'reins_drakemaw_raptor',
+    cfg: { headFwd: 0.95, headUp: 0.82, fill: 0.55, yaw: 0.52, pitch: 0.14 },
+  },
 ];
 
 const only = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;
