@@ -548,7 +548,7 @@ describe('Thornhollow Fields map painter: no magic colours (canvas sub-rule)', (
     // the same tree two ways, which is the whole reason the ground already
     // shares bg_field_relief_core.
     expect(mapPainterCode).toContain(
-      "import { drawBgAtlasMarks } from './battleground_atlas_marks_painter'",
+      "import { drawBgAtlasMarks, drawBgBackdropCrowns } from './battleground_atlas_marks_painter'",
     );
     expect(
       mapPainterCode.match(/drawBgAtlasMarks\(bctx,/g) ?? [],
@@ -673,6 +673,12 @@ function fakePlateCanvas(trace: PlateTrace): unknown {
       void plate.ops.push(`strokeText ${text} ${x} ${y} ${ctx.font} ${ctx.strokeStyle}`),
     fillText: (text: string, x: number, y: number): void =>
       void plate.ops.push(`fillText ${text} ${x} ${y} ${ctx.font} ${ctx.fillStyle}`),
+    // The vignette draws one edge gradient per side; the trace records the
+    // geometry and stops so a moved vignette fails the deterministic arm.
+    createLinearGradient: (x0: number, y0: number, x1: number, y1: number) => ({
+      addColorStop: (offset: number, color: string): void =>
+        void plate.ops.push(`gradientStop ${x0} ${y0} ${x1} ${y1} ${offset} ${color}`),
+    }),
     // Deterministic stand-in for the real metrics: the label clamp reads the
     // glyph-run width to keep names inside the plate, so the fake returns a
     // width proportional to the text length (any stable function works; the
@@ -809,21 +815,35 @@ describe('Thornhollow Fields atlas plate: built once, and always the same plate'
     expect(a.ops.some((op) => op.startsWith('putImageData'))).toBe(true);
   });
 
-  it('is the field plus exactly the map padding of wooded lip, so it blits edge to edge', () => {
-    // The geometry the blit depends on. The tall axis fills the canvas: the fit
-    // leaves the map's own 18px padding on each side, and the plate claims that
-    // padding as its margin, so plate height == canvas size and the field
-    // raster lands at (margin, margin) inside it. Get this wrong and the whole
+  it('is the whole square canvas, with the field centered in a full-bleed surround', () => {
+    // The geometry the blit depends on. The plate IS the map's inner square
+    // now (blitted at the origin): the field raster sits centered, and every
+    // pixel around it is the wooded surround, so the tall field never floats
+    // on the window's bare background. Get the centering wrong and the whole
     // plan slides against the markers drawn over it.
     const plate = buildPlate(0);
     const s = (PLATE_CANVAS_SIZE - 36) / (HALF_Z * 2);
     const fieldW = Math.round(HALF_X * 2 * s);
     const fieldH = Math.round(HALF_Z * 2 * s);
+    const mx = Math.round((PLATE_CANVAS_SIZE - fieldW) / 2);
+    const my = Math.round((PLATE_CANVAS_SIZE - fieldH) / 2);
+    expect(plate.w).toBe(PLATE_CANVAS_SIZE);
     expect(plate.h).toBe(PLATE_CANVAS_SIZE);
-    expect(plate.h - fieldH).toBe(36);
-    expect(plate.w - fieldW).toBe(36);
+    // The tall axis keeps the map's own 18px padding; the wide axis's margin
+    // is the leftover half-width, which is what the surround fills.
+    expect(my).toBe(18);
+    // The 100x280 field in a square canvas leaves a wide flank on each side
+    // (floor: a third of the old 18px lip era would fail this loudly).
+    expect(mx).toBeGreaterThan(40);
     const raster = plate.ops.find((op) => op.startsWith('putImageData'));
-    expect(raster?.startsWith('putImageData 18 18 ')).toBe(true);
+    expect(raster?.startsWith(`putImageData ${mx} ${my} `)).toBe(true);
+    // Non-vacuous surround: the backdrop canopy really grows in the wide
+    // margins (crown arcs whose centers sit left of the field slab).
+    const marginArcs = plate.ops.filter((op) => {
+      const m = /^arc (-?[\d.]+) /.exec(op);
+      return m !== null && Number(m[1]) < mx - 4;
+    });
+    expect(marginArcs.length).toBeGreaterThan(50);
   });
 
   it('caches per size, team and language, and rebuilds when any of the three moves', () => {
@@ -938,8 +958,9 @@ describe('Thornhollow Fields atlas plate: built once, and always the same plate'
     }
     const stones = bgAtlasMarks().filter((mark) => mark.kind === 'headstone');
     expect(stones.length).toBe(6 * GRAVEYARDS.length);
+    const mx = Math.round((PLATE_CANVAS_SIZE - Math.round(HALF_X * 2 * s)) / 2);
     for (const stone of stones) {
-      const sx = 18 + (HALF_X - stone.x) * s;
+      const sx = mx + (HALF_X - stone.x) * s;
       const sy = 18 + (HALF_Z - stone.z) * s;
       expect(
         arcs.some((a) => Math.hypot(a.x - sx, a.y - sy) < 1),

@@ -21,6 +21,7 @@
 // Everything a player reads as INTERFACE (team hues, the self arrow, the marker
 // set) stays a resolved token in the calling painter.
 
+import { hash2 } from '../../../sim/rng';
 import type { BgAtlasMark, BgAtlasMarkKind } from './battleground_atlas_view';
 import { bgAtlasMarks } from './battleground_atlas_view';
 
@@ -104,6 +105,45 @@ export function drawBgAtlasMarks(
       if (mark.kind !== kind) continue;
       if (accept && !accept(mark)) continue;
       drawMark(ctx, proj.fx(mark.x), proj.fy(mark.z), mark.r * proj.s, fill, lit);
+    }
+  }
+}
+
+// The backdrop canopy grid: one jittered crown per cell, so the fill reads as
+// clumped forest rather than a dot pattern. Sizes are canvas pixels, not yards;
+// the backdrop is set dressing outside the authored field, so unlike the marks
+// above it projects no real placement.
+const BACKDROP_CELL_PX = 13;
+const BACKDROP_R_MIN = 0.45; // of a cell
+const BACKDROP_R_MAX = 0.85;
+const BACKDROP_JITTER = 0.7; // of a cell; keeps a crown inside its own cell
+
+/**
+ * Fill a canvas region with a deterministic old-growth canopy in the shared
+ * crown palette: the M-map plate calls this to carry its wooded surround
+ * across the whole square canvas instead of an 18px lip. Positions and radii
+ * come from hash2 over the cell grid (the map_terrain technique), so the same
+ * canvas size always grows the same forest, and `skip` carves out the region
+ * the field raster will overwrite (crowns straddling the boundary are cut by
+ * the slab exactly the way the rampart cuts the real lip crowns).
+ */
+export function drawBgBackdropCrowns(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  skip: (x: number, y: number) => boolean,
+): void {
+  const cols = Math.ceil(width / BACKDROP_CELL_PX) + 1;
+  const rows = Math.ceil(height / BACKDROP_CELL_PX) + 1;
+  for (let gy = 0; gy < rows; gy++) {
+    for (let gx = 0; gx < cols; gx++) {
+      const pad = (1 - BACKDROP_JITTER) / 2;
+      const x = (gx + pad + BACKDROP_JITTER * hash2(gx, gy, 11)) * BACKDROP_CELL_PX;
+      const y = (gy + pad + BACKDROP_JITTER * hash2(gx, gy, 23)) * BACKDROP_CELL_PX;
+      if (skip(x, y)) continue;
+      const r =
+        (BACKDROP_R_MIN + (BACKDROP_R_MAX - BACKDROP_R_MIN) * hash2(gx, gy, 37)) * BACKDROP_CELL_PX;
+      drawMark(ctx, x, y, r, CROWN_FILL, CROWN_LIT);
     }
   }
 }

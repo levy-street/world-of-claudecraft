@@ -12,9 +12,11 @@
 // THE PLATE. The static half of this surface is a hand-drawn fantasy atlas
 // plate, the same art language src/ui/map_terrain.ts paints the overworld map
 // in, so the two map surfaces read as one atlas. Layer by layer:
-//   1. the wooded lip the hollow sits in, filling the plate's margin,
-//   2. the tree crowns standing OUT there, painted blobs with a lit northwest
-//      side (map_terrain's clumped crowns, placed from the real trees),
+//   1. the old growth the hollow sits in, filling the WHOLE square canvas
+//      (deterministic hash-grid canopy plus an edge vignette), so the tall
+//      field never floats on the window's bare background,
+//   2. the tree crowns standing just outside the walls, painted blobs with a
+//      lit northwest side (map_terrain's clumped crowns, from the real trees),
 //   3. the field slab's cast shadow, thrown southeast onto that lip,
 //   4. the field itself: the authored ground paint as base colour (the two
 //      graveyard plots included, stamped in as their own surface family so a
@@ -54,7 +56,7 @@ import { BG_BASES, BG_FLAG_Z, bgFieldPlanWalls } from '../../../sim/battleground
 import { TH_LOCATIONS } from '../../../sim/thornhollow_field.generated';
 import { paintBgFieldAtlas } from '../../bg_field_relief_core';
 import { getI18nRevision, type TranslationKey, t } from '../../i18n';
-import { drawBgAtlasMarks } from './battleground_atlas_marks_painter';
+import { drawBgAtlasMarks, drawBgBackdropCrowns } from './battleground_atlas_marks_painter';
 import { type BgAtlasLabelId, type BgAtlasMark, bgAtlasLabels } from './battleground_atlas_view';
 import type { BgMapModel } from './battleground_map_view';
 
@@ -106,10 +108,10 @@ const SURROUND_FILL = '#3d4a33';
 const LABEL_HALO = '#efe6cf';
 
 const FIELD_PAD_PX = 18;
-// The plate keeps the map's own padding as a margin of wooded lip on every
-// side, so it blits edge to edge in the square canvas and the field never
-// floats on a bare background.
-const PLATE_MARGIN_PX = FIELD_PAD_PX;
+// The wooded surround's edge vignette (ink token; alphas compound with it).
+const VIGNETTE_ALPHA = 0.16;
+const VIGNETTE_DEPTH_FRAC = 0.14;
+const VIGNETTE_DEPTH_MAX_PX = 72;
 const MATE_R = 4;
 const SELF_R = 6;
 const WASH_ALPHA = 0.2;
@@ -233,9 +235,20 @@ export class BattlegroundMapPainter {
     // point-symmetric, so team 1's home-down view is the same ground walked the
     // other way round), which is why it blits straight rather than under a
     // rotation: a rotated raster would light the away team's plate from the
-    // southeast and stand its labels on their heads.
-    const plan = this.ensurePlan(fieldW, fieldH, model.halfX, model.halfZ, s, flip, colors);
-    ctx.drawImage(plan, left - PLATE_MARGIN_PX, top - PLATE_MARGIN_PX);
+    // southeast and stand its labels on their heads. The plate is the WHOLE
+    // square canvas (the field centered in a full-bleed wooded surround), so it
+    // blits at the origin.
+    const plan = this.ensurePlan(
+      canvasSize,
+      fieldW,
+      fieldH,
+      model.halfX,
+      model.halfZ,
+      s,
+      flip,
+      colors,
+    );
+    ctx.drawImage(plan, 0, 0);
 
     // Team end washes: your colour bleeds up from the bottom edge, theirs down
     // from the top, fading out at the keep fronts, so orientation reads at a
@@ -357,6 +370,7 @@ export class BattlegroundMapPainter {
    * top, which is exactly the projection paint() blits into.
    */
   private ensurePlan(
+    canvasSize: number,
     w: number,
     h: number,
     halfX: number,
@@ -365,24 +379,40 @@ export class BattlegroundMapPainter {
     flip: number,
     colors: BgMapColors,
   ): HTMLCanvasElement {
-    const key = `${w}x${h}:${flip}:${getI18nRevision()}`;
+    const key = `${canvasSize}:${w}x${h}:${flip}:${getI18nRevision()}`;
     if (this.plan && this.planKey === key) return this.plan;
-    const m = PLATE_MARGIN_PX;
+    // The field sits centered in the square canvas; everything outside it is
+    // the wooded surround, filled edge to edge so the tall field never floats
+    // on the window's bare background.
+    const mx = Math.round((canvasSize - w) / 2);
+    const my = Math.round((canvasSize - h) / 2);
     const canvas = document.createElement('canvas');
-    canvas.width = w + m * 2;
-    canvas.height = h + m * 2;
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
     const bctx = canvas.getContext('2d');
     // A transient context failure must not be cached: returning the blank
     // canvas makes this redraw's blit a no-op and self-heals on the next one.
     if (!bctx) return canvas;
     // Field-local yards to plate pixels. Both axes negate (the map's east-left,
     // north-up convention) and `flip` turns the whole field for the away team.
-    const fx = (x: number): number => m + (halfX - x * flip) * s;
-    const fy = (z: number): number => m + (halfZ - z * flip) * s;
+    const fx = (x: number): number => mx + (halfX - x * flip) * s;
+    const fy = (z: number): number => my + (halfZ - z * flip) * s;
 
-    // 1. the old growth the hollow was cut out of, filling the whole plate.
+    // 1. the old growth the hollow was cut out of, filling the whole canvas.
     bctx.fillStyle = SURROUND_FILL;
     bctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 1b. the canopy over that old growth: a deterministic hash-grid crown
+    //     fill (shared palette and crown read) across everything the field
+    //     raster will not overwrite, so the margin reads as painted forest
+    //     rather than flat green. Crowns whose center falls under the field
+    //     are skipped; ones straddling the boundary are cut by the slab.
+    drawBgBackdropCrowns(
+      bctx,
+      canvasSize,
+      canvasSize,
+      (x, y) => x > mx && x < mx + w && y > my && y < my + h,
+    );
 
     // 2. the crowns standing OUTSIDE the walls, drawn before the field slab so
     //    the rampart line cuts them the way the wall really does. The mark read
@@ -393,19 +423,24 @@ export class BattlegroundMapPainter {
       Math.abs(mark.x) <= halfX && Math.abs(mark.z) <= halfZ;
     drawBgAtlasMarks(bctx, proj, (mark) => mark.kind === 'crown' && !onField(mark));
 
+    // 2b. a soft vignette pulling the canopy down toward the canvas edges, so
+    //     the eye lands on the lit field. Ink-token based and drawn BEFORE the
+    //     relief, so the field itself never darkens.
+    this.drawBackdropVignette(bctx, canvasSize, colors);
+
     // 3. the slab's cast shadow on the lip (light from the northwest, so the
     //    shadow falls southeast). The part under the field is painted over by
     //    the relief below; what survives is the band beyond two edges.
     bctx.save();
     bctx.globalAlpha = SLAB_SHADOW_ALPHA;
     bctx.fillStyle = colors.ink;
-    bctx.fillRect(m + SLAB_SHADOW_PX, m + SLAB_SHADOW_PX, w, h);
+    bctx.fillRect(mx + SLAB_SHADOW_PX, my + SLAB_SHADOW_PX, w, h);
     bctx.restore();
 
     // 4. the field itself, written straight into a pixel buffer by the pure core.
     const relief = bctx.createImageData(w, h);
     paintBgFieldAtlas(relief.data, w, h, s, flip * halfX, flip * halfZ, flip < 0 ? -1 : 1);
-    bctx.putImageData(relief, m, m);
+    bctx.putImageData(relief, mx, my);
 
     // 5a. Keep floors: cooler stone over the two keep plateaus, so the
     //     fortresses read as built rather than as bright high ground.
@@ -461,7 +496,7 @@ export class BattlegroundMapPainter {
     //    field has no coast, and its rampart is the same cut.
     bctx.strokeStyle = colors.ink;
     bctx.lineWidth = SLAB_EDGE_WIDTH;
-    bctx.strokeRect(m, m, w, h);
+    bctx.strokeRect(mx, my, w, h);
 
     // 8. the landmark names, written on the plate at build time.
     this.drawLabels(bctx, fx, fy, h, colors);
@@ -469,6 +504,34 @@ export class BattlegroundMapPainter {
     this.plan = canvas;
     this.planKey = key;
     return canvas;
+  }
+
+  /** Darken the wooded surround toward each canvas edge (ink token at a low
+   *  alpha, one linear gradient per side), so the backdrop frames the field
+   *  instead of competing with it. Runs before the field raster is placed, so
+   *  only the surround ever darkens. */
+  private drawBackdropVignette(
+    bctx: CanvasRenderingContext2D,
+    canvasSize: number,
+    colors: BgMapColors,
+  ): void {
+    const depth = Math.min(Math.round(canvasSize * VIGNETTE_DEPTH_FRAC), VIGNETTE_DEPTH_MAX_PX);
+    bctx.save();
+    bctx.globalAlpha = VIGNETTE_ALPHA;
+    const edges: ReadonlyArray<readonly [number, number, number, number]> = [
+      [0, 0, depth, 0], // left, fading rightward
+      [canvasSize, 0, canvasSize - depth, 0], // right
+      [0, 0, 0, depth], // top
+      [0, canvasSize, 0, canvasSize - depth], // bottom
+    ];
+    for (const [x0, y0, x1, y1] of edges) {
+      const g = bctx.createLinearGradient(x0, y0, x1, y1);
+      g.addColorStop(0, colors.ink);
+      g.addColorStop(1, 'transparent'); // the CSS keyword, not a colour choice
+      bctx.fillStyle = g;
+      bctx.fillRect(0, 0, canvasSize, canvasSize);
+    }
+    bctx.restore();
   }
 
   /** Write every landmark name the authored map exposes, in the atlas serif,
